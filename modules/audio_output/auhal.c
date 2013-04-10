@@ -150,6 +150,7 @@ static OSStatus RenderCallbackSPDIF     (AudioDeviceID, const AudioTimeStamp *, 
 static OSStatus HardwareListener        (AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void *);
 static OSStatus StreamListener          (AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void *);
 
+static int      RegisterAudioStreamsCallback(audio_output_t *, AudioDeviceID);
 static int      AudioDeviceHasOutput    (AudioDeviceID);
 static int      AudioDeviceSupportsDigital(audio_output_t *, AudioDeviceID);
 static int      AudioStreamSupportsDigital(audio_output_t *, AudioStreamID);
@@ -175,6 +176,8 @@ vlc_module_end ()
 
 static int Open(vlc_object_t *obj)
 {
+    OSStatus            err = noErr;
+
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = malloc(sizeof (*sys));
 
@@ -193,6 +196,13 @@ static int Open(vlc_object_t *obj)
     aout->sys->devices = NULL;
     aout->device_select = SwitchAudioDevice;
 
+
+    /* Attach a Listener so that we are notified of a change in the Device setup */
+    AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+    err = AudioObjectAddPropertyListener(kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, (void *)aout);
+    if (err != noErr)
+        msg_Warn(aout, "failed to add listener for audio device configuration [%4.4s]", (char *)&err);
+
     RebuildDeviceList(aout);
 
     /* remember the volume */
@@ -208,6 +218,22 @@ static void Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
+
+    OSStatus            err = noErr;
+
+    /* remove audio device callback */
+    AudioObjectPropertyAddress deviceAliveAddress = { kAudioDevicePropertyDeviceIsAlive, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+    err = AudioObjectRemovePropertyListener(sys->i_selected_dev, &deviceAliveAddress, HardwareListener, (void *)aout);
+    if (err != noErr)
+        msg_Err(aout, "failed to remove audio device life checker: [%4.4s]", (char *)&err);
+
+    /* remove audio streams callback */
+    if (sys->i_stream_id > 0) {
+        AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyAvailablePhysicalFormats, kAudioObjectPropertyScopeGlobal, 0 };
+        err = AudioObjectRemovePropertyListener(sys->i_stream_id, &physicalFormatsAddress, HardwareListener, (void *)aout);
+        if (err != noErr)
+            msg_Err(aout, "failed to remove audio device property streams callback: [%4.4s]", (char *)&err);
+    }
 
     config_PutPsz(aout, "auhal-audio-device", aout_DeviceGet(aout));
 
@@ -819,13 +845,6 @@ static int StartSPDIF (audio_output_t * p_aout, audio_sample_format_t *fmt)
     }
     free(p_streams);
 
-    /* get notified when we don't have spdif-output anymore */
-    err = AudioObjectAddPropertyListener(p_sys->i_stream_id, &physicalFormatsAddress, HardwareListener, (void *)p_aout);
-    if (err != noErr) {
-        msg_Warn(p_aout, "could not set audio device property streams callback on device: %4.4s",
-                 (char *)&err);
-    }
-
     msg_Dbg(p_aout, STREAM_FORMAT_MSG("original stream format: ", p_sys->sfmt_revert));
 
     if (!AudioStreamChangeFormat(p_aout, p_sys->i_stream_id, p_sys->stream_format))
@@ -880,18 +899,6 @@ static void Stop(audio_output_t *p_aout)
     struct aout_sys_t   *p_sys = p_aout->sys;
     OSStatus            err = noErr;
     UInt32              i_param_size = 0;
-
-    AudioObjectPropertyAddress deviceAliveAddress = { kAudioDevicePropertyDeviceIsAlive, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
-    err = AudioObjectRemovePropertyListener(p_sys->i_selected_dev, &deviceAliveAddress, HardwareListener, (void *)p_aout);
-    if (err != noErr)
-        msg_Err(p_aout, "failed to remove audio device life checker: [%4.4s]", (char *)&err);
-
-    if (p_sys->b_digital) {
-        AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyAvailablePhysicalFormats, kAudioObjectPropertyScopeGlobal, 0 };
-        err = AudioObjectRemovePropertyListener(p_sys->i_stream_id, &physicalFormatsAddress, HardwareListener, (void *)p_aout);
-        if (err != noErr)
-            msg_Err(p_aout, "failed to remove audio device property streams callback: [%4.4s]", (char *)&err);
-    }
 
     if (p_sys->au_unit) {
         verify_noerr(AudioOutputUnitStop(p_sys->au_unit));
@@ -1047,7 +1054,7 @@ static void RebuildDeviceList(audio_output_t * p_aout)
     /* Find the ID of the default Device */
     AudioObjectPropertyAddress defaultDeviceAddress = { kAudioHardwarePropertyDefaultOutputDevice, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
     propertySize = sizeof(AudioObjectID);
-    err= AudioObjectGetPropertyData(kAudioObjectSystemObject, &defaultDeviceAddress, 0, NULL, &propertySize, &defaultDeviceID);
+    err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &defaultDeviceAddress, 0, NULL, &propertySize, &defaultDeviceID);
     if (err != noErr) {
         msg_Err(p_aout, "could not get default audio device: [%4.4s]", (char *)&err);
         return;
@@ -1101,16 +1108,15 @@ static void RebuildDeviceList(audio_output_t * p_aout)
             free(psz_encoded_name);
         }
 
+        // TODO: only register once for each device
+        RegisterAudioStreamsCallback(p_aout, deviceIDs[i]);
+
         CFRelease(device_name_ref);
         free(psz_name);
     }
 
+    // TODO: fix default audio device
     add_device_to_list(p_aout, 0, _("System Sound Output Device"));
-
-    /* Attach a Listener so that we are notified of a change in the Device setup */
-    err = AudioObjectAddPropertyListener(kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, (void *)p_aout);
-    if (err != noErr)
-        msg_Warn(p_aout, "failed to add listener for audio device configuration (%i)", err);
 
     free(deviceIDs);
 }
@@ -1427,6 +1433,52 @@ static OSStatus StreamListener(AudioObjectID inObjectID,  UInt32 inNumberAddress
 #pragma mark -
 #pragma mark helpers
 
+static int RegisterAudioStreamsCallback(audio_output_t *p_aout, AudioDeviceID i_dev_id)
+{
+    OSStatus                    err = noErr;
+    UInt32                      i_param_size = 0;
+    AudioStreamID               *p_streams = NULL;
+    int                         i_streams = 0;
+
+    /* Retrieve all the output streams */
+    AudioObjectPropertyAddress streamsAddress = { kAudioDevicePropertyStreams, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
+    err = AudioObjectGetPropertyDataSize(i_dev_id, &streamsAddress, 0, NULL, &i_param_size);
+    if (err != noErr) {
+        msg_Err(p_aout, "could not get number of streams: [%s] (%i)", (char *)&err, (int32_t)err);
+        return VLC_EGENERIC;
+    }
+
+    i_streams = i_param_size / sizeof(AudioStreamID);
+    p_streams = (AudioStreamID *)malloc(i_param_size);
+    if (p_streams == NULL)
+        return VLC_ENOMEM;
+
+    err = AudioObjectGetPropertyData(i_dev_id, &streamsAddress, 0, NULL, &i_param_size, p_streams);
+    if (err != noErr) {
+        msg_Err(p_aout, "could not get list of streams: [%s]", (char *)&err);
+        return VLC_EGENERIC;
+    }
+
+    for (int i = 0; i < i_streams; i++) {
+        /* get notified when physical formats change */
+        AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyAvailablePhysicalFormats, kAudioObjectPropertyScopeGlobal, 0 };
+        err = AudioObjectAddPropertyListener(p_streams[i], &physicalFormatsAddress, HardwareListener, (void *)p_aout);
+        if (err != noErr) {
+            // nope just means that we already have a callback
+            if (err == kAudioHardwareIllegalOperationError) {
+                msg_Dbg(p_aout, "could not set audio stream formats property callback on stream id %i, already have callback: %4.4s", p_streams[i],
+                         (char *)&err);
+            } else {
+            msg_Warn(p_aout, "could not set audio stream formats property callback on stream id %i: %4.4s", p_streams[i],
+                     (char *)&err);
+            }
+        }
+    }
+
+    free(p_streams);
+    return VLC_SUCCESS;
+}
+
 /*
  * AudioDeviceHasOutput: Checks if the device is actually an output device
  */
@@ -1503,7 +1555,7 @@ static int AudioStreamSupportsDigital(audio_output_t *p_aout, AudioStreamID i_st
     }
 
     i_formats = i_param_size / sizeof(AudioStreamRangedDescription);
-    msg_Dbg(p_aout, "found %i stream formats", i_formats);
+    msg_Dbg(p_aout, "found %i stream formats for stream id %i", i_formats, i_stream_id);
 
     p_format_list = (AudioStreamRangedDescription *)malloc(i_param_size);
     if (p_format_list == NULL)
