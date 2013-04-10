@@ -315,6 +315,12 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 {
     vout_display_sys_t *sys = vd->sys;
 
+    if (!vd->sys)
+        return VLC_EGENERIC;
+
+    if (!sys->embed)
+        return VLC_EGENERIC;
+
     switch (query)
     {
         case VOUT_DISPLAY_CHANGE_FULLSCREEN:
@@ -336,9 +342,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         {
-            if (!vd->sys)
-                return VLC_EGENERIC;
-
             NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
 
             id o_window = [sys->glView window];
