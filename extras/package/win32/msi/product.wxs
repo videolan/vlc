@@ -306,9 +306,6 @@
                     <ComponentRef Id='CompNpvlc' />
                 </Feature>
             </Feature>
-            <Feature Id='DISCSPLAYBACK' Title='Discs Playback' Level='1' AllowAdvertise="no">
-                <ComponentRef Id='CompPlayDiscs' />
-            </Feature>
             <Feature Id='FILEASSOCIATION' Title='File associations' Level='1' AllowAdvertise="no">
                 <Feature Id='VIDEOFILEASSOCIATION' Title='Video' Level='1' AllowAdvertise="no">
                     <ComponentRef Id='CompVideoFileAssociation' />
@@ -319,6 +316,9 @@
                 <Feature Id='OTHERFILEASSOCIATION' Title='Others' Level='1' AllowAdvertise="no">
                     <ComponentRef Id='CompOtherFileAssociation' />
                 </Feature>
+            </Feature>
+            <Feature Id='DISCSPLAYBACK' Title='Disc associations' Level='1' AllowAdvertise="no">
+                <ComponentRef Id='CompPlayDiscs' />
             </Feature>
         </Feature>
 
