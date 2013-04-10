@@ -302,7 +302,7 @@
                     <ComponentRef Id='CompAxvlc' />
                     <ComponentGroupRef Id='CompAxvlcGroup' />
                 </Feature>
-                <Feature Id='MOZILLA' Title='Mozilla plugin' Level='1000' AllowAdvertise="no">
+                <Feature Id='MOZILLA' Title='Mozilla plugin' Level='1' AllowAdvertise="no">
                     <ComponentRef Id='CompNpvlc' />
                 </Feature>
             </Feature>
