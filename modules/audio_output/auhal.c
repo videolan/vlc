@@ -102,6 +102,8 @@ struct aout_sys_t
     AudioStreamBasicDescription sfmt_revert;        /* The original format of the stream */
     bool                        b_revert;           /* Whether we need to revert the stream format */
     bool                        b_changed_mixing;   /* Whether we need to set the mixing mode back */
+
+
     bool                        b_got_first_sample; /* did the aout core provide something to render? */
 
     int                         i_rate;             /* media sample rate */
@@ -176,77 +178,75 @@ vlc_module_end ()
 
 static int Open(vlc_object_t *obj)
 {
-    OSStatus            err = noErr;
-
-    audio_output_t *aout = (audio_output_t *)obj;
-    aout_sys_t *sys = malloc(sizeof (*sys));
-
-    if (unlikely(sys == NULL))
+    audio_output_t *p_aout = (audio_output_t *)obj;
+    aout_sys_t *p_sys = malloc(sizeof (*p_sys));
+    if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
 
-    vlc_mutex_init(&sys->lock);
-    vlc_cond_init(&sys->cond);
+    OSStatus err = noErr;
 
-    aout->sys = sys;
-    aout->start = Start;
-    aout->stop = Stop;
-    aout->volume_set = VolumeSet;
-    aout->mute_set = MuteSet;
-    aout->device_enum = DeviceList;
-    aout->sys->devices = NULL;
-    aout->device_select = SwitchAudioDevice;
+    vlc_mutex_init(&p_sys->lock);
+    vlc_cond_init(&p_sys->cond);
 
+    p_aout->sys = p_sys;
+    p_aout->start = Start;
+    p_aout->stop = Stop;
+    p_aout->volume_set = VolumeSet;
+    p_aout->mute_set = MuteSet;
+    p_aout->device_enum = DeviceList;
+    p_aout->sys->devices = NULL;
+    p_aout->device_select = SwitchAudioDevice;
 
     /* Attach a Listener so that we are notified of a change in the Device setup */
     AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
-    err = AudioObjectAddPropertyListener(kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, (void *)aout);
+    err = AudioObjectAddPropertyListener(kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, (void *)p_aout);
     if (err != noErr)
-        msg_Warn(aout, "failed to add listener for audio device configuration [%4.4s]", (char *)&err);
+        msg_Warn(p_aout, "failed to add listener for audio device configuration [%4.4s]", (char *)&err);
 
-    RebuildDeviceList(aout);
+    RebuildDeviceList(p_aout);
 
     /* remember the volume */
-    aout_VolumeReport(aout, var_InheritInteger(aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT);
-    MuteSet(aout, var_InheritBool(aout, "mute"));
+    aout_VolumeReport(p_aout, var_InheritInteger(p_aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT);
+    MuteSet(p_aout, var_InheritBool(p_aout, "mute"));
 
-    SwitchAudioDevice(aout, config_GetPsz(aout, "auhal-audio-device"));
+    SwitchAudioDevice(p_aout, config_GetPsz(p_aout, "auhal-audio-device"));
 
     return VLC_SUCCESS;
 }
 
 static void Close(vlc_object_t *obj)
 {
-    audio_output_t *aout = (audio_output_t *)obj;
-    aout_sys_t *sys = aout->sys;
+    audio_output_t *p_aout = (audio_output_t *)obj;
+    aout_sys_t *p_sys = p_aout->sys;
 
-    OSStatus            err = noErr;
+    OSStatus err = noErr;
 
     /* remove audio device callback */
     AudioObjectPropertyAddress deviceAliveAddress = { kAudioDevicePropertyDeviceIsAlive, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
-    err = AudioObjectRemovePropertyListener(sys->i_selected_dev, &deviceAliveAddress, HardwareListener, (void *)aout);
+    err = AudioObjectRemovePropertyListener(p_sys->i_selected_dev, &deviceAliveAddress, HardwareListener, (void *)p_aout);
     if (err != noErr)
-        msg_Err(aout, "failed to remove audio device life checker: [%4.4s]", (char *)&err);
+        msg_Err(p_aout, "failed to remove audio device life checker: [%4.4s]", (char *)&err);
 
     /* remove audio streams callback */
-    if (sys->i_stream_id > 0) {
+    if (p_sys->i_stream_id > 0) {
         AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyAvailablePhysicalFormats, kAudioObjectPropertyScopeGlobal, 0 };
-        err = AudioObjectRemovePropertyListener(sys->i_stream_id, &physicalFormatsAddress, HardwareListener, (void *)aout);
+        err = AudioObjectRemovePropertyListener(p_sys->i_stream_id, &physicalFormatsAddress, HardwareListener, (void *)p_aout);
         if (err != noErr)
-            msg_Err(aout, "failed to remove audio device property streams callback: [%4.4s]", (char *)&err);
+            msg_Err(p_aout, "failed to remove audio device property streams callback: [%4.4s]", (char *)&err);
     }
 
-    config_PutPsz(aout, "auhal-audio-device", aout_DeviceGet(aout));
+    config_PutPsz(p_aout, "auhal-audio-device", aout_DeviceGet(p_aout));
 
-    for (struct audio_device_t * device = sys->devices, *next; device != NULL; device = next) {
+    for (struct audio_device_t * device = p_sys->devices, *next; device != NULL; device = next) {
         next = device->next;
         free(device->name);
         free(device);
     }
 
-    vlc_mutex_destroy(&sys->lock);
-    vlc_cond_destroy(&sys->cond);
+    vlc_mutex_destroy(&p_sys->lock);
+    vlc_cond_destroy(&p_sys->cond);
 
-    free(sys);
+    free(p_sys);
 }
 
 static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
@@ -693,7 +693,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 /*
  * StartSPDIF: Setup an encoded digital stream (SPDIF) output
  */
-static int StartSPDIF (audio_output_t * p_aout, audio_sample_format_t *fmt)
+static int StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
 {
     struct aout_sys_t       *p_sys = p_aout->sys;
     OSStatus                err = noErr;
@@ -1190,7 +1190,7 @@ static int MuteSet(audio_output_t * p_aout, bool mute)
 #pragma mark -
 #pragma mark actual playback
 
-static void Play (audio_output_t * p_aout, block_t * p_block)
+static void Play(audio_output_t * p_aout, block_t * p_block)
 {
     struct aout_sys_t *p_sys = p_aout->sys;
 
@@ -1221,7 +1221,7 @@ static void Play (audio_output_t * p_aout, block_t * p_block)
     block_Release(p_block);
 }
 
-static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
+static void Pause(audio_output_t *p_aout, bool pause, mtime_t date)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
     VLC_UNUSED(date);
@@ -1324,7 +1324,7 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
 /*
  * RenderCallbackSPDIF: callback for SPDIF audio output
  */
-static OSStatus RenderCallbackSPDIF (AudioDeviceID inDevice,
+static OSStatus RenderCallbackSPDIF(AudioDeviceID inDevice,
                                     const AudioTimeStamp * inNow,
                                     const void * inInputData,
                                     const AudioTimeStamp * inInputTime,
