@@ -29,7 +29,7 @@
 
 #include <vlc/vlc.h>
 #include "acoustid.h"
-#include "use_json.h"
+#include "json.h"
 
 /*****************************************************************************
  * Requests lifecycle

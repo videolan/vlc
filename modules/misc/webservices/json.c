@@ -38,13 +38,14 @@
 #ifdef __cplusplus
    const struct _json_value json_value_none; /* zero-d by ctor */
 #else
-   const struct _json_value json_value_none = { 0 };
+   const struct _json_value json_value_none = { 0, 0, { 0 }, { 0 } };
 #endif
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 typedef unsigned short json_uchar;
 
@@ -117,6 +118,7 @@ static int new_value
                return 0;
             }
 
+            value->u.array.length = 0;
             break;
 
          case json_object:
@@ -131,6 +133,7 @@ static int new_value
 
             value->_reserved.object_mem = (*(char **) &value->u.object.values) + values_size;
 
+            value->u.object.length = 0;
             break;
 
          case json_string:
@@ -141,13 +144,12 @@ static int new_value
                return 0;
             }
 
+            value->u.string.length = 0;
             break;
 
          default:
             break;
       };
-
-      value->u.array.length = 0;
 
       return 1;
    }
@@ -181,10 +183,11 @@ static int new_value
 #define string_add(b)  \
    do { if (!state.first_pass) string [string_length] = b;  ++ string_length; } while (0);
 
-const static int
-   flag_next = 1, flag_reproc = 2, flag_need_comma = 4, flag_seek_value = 8, flag_exponent = 16,
-   flag_got_exponent_sign = 32, flag_escaped = 64, flag_string = 128, flag_need_colon = 256,
-   flag_done = 512;
+static const long
+   flag_next = 1,  flag_reproc = 2,  flag_need_comma = 4,  flag_seek_value = 8,
+   flag_escaped = 16,  flag_string = 32,  flag_need_colon = 64,  flag_done = 128,
+   flag_num_negative = 256,  flag_num_zero = 512,  flag_num_e = 1024,
+   flag_num_e_got_sign = 2048,  flag_num_e_negative = 4096;
 
 json_value * json_parse_ex (json_settings * settings, const json_char * json, char * error_buf)
 {
@@ -193,7 +196,8 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
    const json_char * cur_line_begin, * i;
    json_value * top, * root, * alloc = 0;
    json_state state;
-   int flags;
+   long flags;
+   long num_digits = 0, num_fraction = 0, num_e = 0;
 
    error[0] = '\0';
 
@@ -210,8 +214,8 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
    {
       json_uchar uchar;
       unsigned char uc_b1, uc_b2, uc_b3, uc_b4;
-      json_char * string;
-      unsigned int string_length;
+      json_char * string = NULL;
+      unsigned int string_length = 0;
 
       top = root = 0;
       flags = flag_seek_value;
@@ -285,7 +289,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                         if (state.first_pass)
                            string_length += 2;
                         else
-                        {  string [string_length ++] = 0xC0 | ((uc_b2 & 0xC0) >> 6) | ((uc_b1 & 0x3) << 3);
+                        {  string [string_length ++] = 0xC0 | ((uc_b2 & 0xC0) >> 6) | ((uc_b1 & 0x7) << 2);
                            string [string_length ++] = 0x80 | (uc_b2 & 0x3F);
                         }
 
@@ -475,17 +479,34 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                            if (!new_value (&state, &top, &root, &alloc, json_integer))
                               goto e_alloc_failure;
 
-                           flags &= ~ (flag_exponent | flag_got_exponent_sign);
+                           if (!state.first_pass)
+                           {
+                              while (isdigit (b) || b == '+' || b == '-'
+                                        || b == 'e' || b == 'E' || b == '.')
+                              {
+                                 b = *++ i;
+                              }
 
-                           if (state.first_pass)
-                              continue;
+                              flags |= flag_next | flag_reproc;
+                              break;
+                           }
 
-                           if (top->type == json_double)
-                              top->u.dbl = strtod (i, (json_char **) &i);
-                           else
-                              top->u.integer = strtol (i, (json_char **) &i, 10);
+                           flags &= ~ (flag_num_negative | flag_num_e |
+                                        flag_num_e_got_sign | flag_num_e_negative |
+                                           flag_num_zero);
 
-                           flags |= flag_next | flag_reproc;
+                           num_digits = 0;
+                           num_fraction = 0;
+                           num_e = 0;
+
+                           if (b != '-')
+                           {
+                              flags |= flag_reproc;
+                              break;
+                           }
+
+                           flags |= flag_num_negative;
+                           continue;
                         }
                         else
                         {  sprintf (error, "%d:%d: Unexpected %c when seeking value", cur_line, e_off, b);
@@ -545,30 +566,106 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
             case json_double:
 
                if (isdigit (b))
-                  continue;
-
-               if (b == 'e' || b == 'E')
                {
-                  if (!(flags & flag_exponent))
-                  {
-                     flags |= flag_exponent;
-                     top->type = json_double;
+                  ++ num_digits;
 
+                  if (top->type == json_integer || flags & flag_num_e)
+                  {
+                     if (! (flags & flag_num_e))
+                     {
+                        if (flags & flag_num_zero)
+                        {  sprintf (error, "%d:%d: Unexpected `0` before `%c`", cur_line, e_off, b);
+                           goto e_failed;
+                        }
+
+                        if (num_digits == 1 && b == '0')
+                           flags |= flag_num_zero;
+                     }
+                     else
+                     {
+                        flags |= flag_num_e_got_sign;
+                        num_e = (num_e * 10) + (b - '0');
+                        continue;
+                     }
+
+                     top->u.integer = (top->u.integer * 10) + (b - '0');
                      continue;
                   }
+
+                  num_fraction = (num_fraction * 10) + (b - '0');
+                  continue;
                }
-               else if (b == '+' || b == '-')
+
+               if (b == '+' || b == '-')
                {
-                  if (flags & flag_exponent && !(flags & flag_got_exponent_sign))
+                  if ( (flags & flag_num_e) && !(flags & flag_num_e_got_sign))
                   {
-                     flags |= flag_got_exponent_sign;
+                     flags |= flag_num_e_got_sign;
+
+                     if (b == '-')
+                        flags |= flag_num_e_negative;
+
                      continue;
                   }
                }
                else if (b == '.' && top->type == json_integer)
                {
+                  if (!num_digits)
+                  {  sprintf (error, "%d:%d: Expected digit before `.`", cur_line, e_off);
+                     goto e_failed;
+                  }
+
                   top->type = json_double;
+                  top->u.dbl = (double) top->u.integer;
+
+                  num_digits = 0;
                   continue;
+               }
+
+               if (! (flags & flag_num_e))
+               {
+                  if (top->type == json_double)
+                  {
+                     if (!num_digits)
+                     {  sprintf (error, "%d:%d: Expected digit after `.`", cur_line, e_off);
+                        goto e_failed;
+                     }
+
+                     top->u.dbl += ((double) num_fraction) / (pow ( (double) 10.0, (double) num_digits));
+                  }
+
+                  if (b == 'e' || b == 'E')
+                  {
+                     flags |= flag_num_e;
+
+                     if (top->type == json_integer)
+                     {
+                        top->type = json_double;
+                        top->u.dbl = (double) top->u.integer;
+                     }
+
+                     num_digits = 0;
+                     flags &= ~ flag_num_zero;
+
+                     continue;
+                  }
+               }
+               else
+               {
+                  if (!num_digits)
+                  {  sprintf (error, "%d:%d: Expected digit after `e`", cur_line, e_off);
+                     goto e_failed;
+                  }
+
+                  top->u.dbl *= pow (10, (double) (flags & flag_num_e_negative ? - num_e : num_e));
+               }
+
+               if (flags & flag_num_negative)
+               {
+                  if (top->type == json_integer)
+                     top->u.integer = - top->u.integer;
+                  else
+                     top->u.dbl = - top->u.dbl;
                }
 
                flags |= flag_next | flag_reproc;

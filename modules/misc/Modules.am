@@ -3,7 +3,6 @@ SOURCES_audioscrobbler = audioscrobbler.c
 SOURCES_fingerprinter = fingerprinter.c \
 	webservices/acoustid.c \
 	webservices/acoustid.h \
-	webservices/use_json.h \
 	webservices/json.c \
 	webservices/json.h
 
@@ -55,7 +54,6 @@ libstats_plugin_la_LIBADD = $(AM_LIBADD)
 
 libvlc_LTLIBRARIES += \
 	libaudioscrobbler_plugin.la \
-	libfingerprinter_plugin.la \
 	liblogger_plugin.la \
 	libstats_plugin.la
 

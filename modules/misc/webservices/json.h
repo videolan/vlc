@@ -1,34 +1,229 @@
-/*****************************************************************************
- * json.h: json-parser fixups
- *****************************************************************************
- * Copyright (C) 2012 VLC authors and VideoLAN
+
+/* vim: set et ts=3 sw=3 ft=c:
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
+ * Copyright (C) 2012 James McLaughlin et al.  All rights reserved.
+ * https://github.com/udp/json-parser
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
- *****************************************************************************/
+ * 1. Redistributions of source code must retain the above copyright
+ *   notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *   notice, this list of conditions and the following disclaimer in the
+ *   documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
 #ifndef _JSON_H
-#ifndef _JSONFIXUPS_H
-#define _JSONFIXUPS_H
+#define _JSON_H
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
+#ifndef json_char
+   #define json_char char
 #endif
-#include <vlc_common.h>
-#include <vlc_charset.h>
-/* json.c depends on the locale */
-#define strtod(foo,bar) us_strtod(foo,bar)
-#include "use_json.h"
+
+#ifndef json_int_t
+   #ifndef _WIN32
+      #include <inttypes.h>
+      #define json_int_t int64_t
+   #else
+      #define json_int_t __int64
+   #endif
+#endif
+
+#ifdef __cplusplus
+
+   #include <string.h>
+
+   extern "C"
+   {
 
 #endif
+
+typedef struct
+{
+   unsigned long max_memory;
+   int settings;
+
+} json_settings;
+
+#define json_relaxed_commas 1
+
+typedef enum
+{
+   json_none,
+   json_object,
+   json_array,
+   json_integer,
+   json_double,
+   json_string,
+   json_boolean,
+   json_null
+
+} json_type;
+
+extern const struct _json_value json_value_none;
+
+typedef struct _json_value
+{
+   struct _json_value * parent;
+
+   json_type type;
+
+   union
+   {
+      int boolean;
+      json_int_t integer;
+      double dbl;
+
+      struct
+      {
+         unsigned int length;
+         json_char * ptr; /* null terminated */
+
+      } string;
+
+      struct
+      {
+         unsigned int length;
+
+         struct
+         {
+            json_char * name;
+            struct _json_value * value;
+
+         } * values;
+
+      } object;
+
+      struct
+      {
+         unsigned int length;
+         struct _json_value ** values;
+
+      } array;
+
+   } u;
+
+   union
+   {
+      struct _json_value * next_alloc;
+      void * object_mem;
+
+   } _reserved;
+
+
+   /* Some C++ operator sugar */
+
+   #ifdef __cplusplus
+
+      public:
+
+         inline _json_value ()
+         {  memset (this, 0, sizeof (_json_value));
+         }
+
+         inline const struct _json_value &operator [] (int index) const
+         {
+            if (type != json_array || index < 0
+                     || ((unsigned int) index) >= u.array.length)
+            {
+               return json_value_none;
+            }
+
+            return *u.array.values [index];
+         }
+
+         inline const struct _json_value &operator [] (const char * index) const
+         {
+            if (type != json_object)
+               return json_value_none;
+
+            for (unsigned int i = 0; i < u.object.length; ++ i)
+               if (!strcmp (u.object.values [i].name, index))
+                  return *u.object.values [i].value;
+
+            return json_value_none;
+         }
+
+         inline operator const char * () const
+         {
+            switch (type)
+            {
+               case json_string:
+                  return u.string.ptr;
+
+               default:
+                  return "";
+            };
+         }
+
+         inline operator json_int_t () const
+         {
+            switch (type)
+            {
+               case json_integer:
+                  return u.integer;
+
+               case json_double:
+                  return (json_int_t) u.dbl;
+
+               default:
+                  return 0;
+            };
+         }
+
+         inline operator bool () const
+         {
+            if (type != json_boolean)
+               return false;
+
+            return u.boolean != 0;
+         }
+
+         inline operator double () const
+         {
+            switch (type)
+            {
+               case json_integer:
+                  return (double) u.integer;
+
+               case json_double:
+                  return u.dbl;
+
+               default:
+                  return 0;
+            };
+         }
+
+   #endif
+
+} json_value;
+
+json_value * json_parse
+   (const json_char * json);
+
+json_value * json_parse_ex
+   (json_settings * settings, const json_char * json, char * error);
+
+void json_value_free (json_value *);
+
+
+#ifdef __cplusplus
+   } /* extern "C" */
+#endif
+
 #endif

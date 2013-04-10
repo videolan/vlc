@@ -3605,6 +3605,22 @@ AC_SUBST(KAI_LIBS)
 AM_CONDITIONAL([HAVE_KAI], [test "${have_kai}" = "yes"])
 
 dnl
+dnl  chromaprint audio track fingerprinter
+dnl
+m4_pushdef([libchromaprint_version], 0.6.0)
+PKG_WITH_MODULES([CHROMAPRINT],[libchromaprint >= libchromaprint_version],
+    VLC_ADD_PLUGIN([stream_out_chromaprint fingerprinter])
+    VLC_ADD_CFLAGS([stream_out_chromaprint],[${CHROMAPRINT_CFLAGS}] [-I./webservices -I../stream_out])
+    VLC_ADD_LIBS([stream_out_chromaprint],[${CHROMAPRINT_LIBS}])
+    VLC_ADD_LIBS([fingerprinter],[-lm]),
+    AS_IF([test "${enable_chromaprint}" = "yes"],
+        [AC_MSG_ERROR(Library [libchromaprint >= libchromaprint_version] needed for [chromaprint] was not found)],
+        [AC_MSG_WARN(Library [libchromaprint >= libchromaprint_version] needed for [chromaprint] was not found)]
+         ),
+    [(Chromaprint based audio fingerprinter)],[auto])
+m4_popdef([libchromaprint_version])
+
+dnl
 dnl  Interface plugins
 dnl
 
@@ -3833,11 +3849,6 @@ dnl
 dnl  goom visualization plugin
 dnl
 PKG_ENABLE_MODULES_VLC([GOOM], [], [libgoom2], [goom visualization plugin], [auto])
-
-dnl
-dnl  chromaprint audio track fingerprinter
-dnl
-PKG_ENABLE_MODULES_VLC([CHROMAPRINT], [stream_out_chromaprint], [libchromaprint >= 0.6.0], (Chromaprint based audio fingerprinter), [auto], [-I./webservices -I../stream_out])
 
 dnl
 dnl libprojectM visualization plugin
