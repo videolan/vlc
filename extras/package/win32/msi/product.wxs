@@ -102,13 +102,9 @@
                             <!-- Open With... contextual menu -->
                             <RegistryValue Root="HKCR" Key="Applications\vlc.exe\shell\open" Name="$(var.ShortProductName)" Value="$(var.ProductName)" Type="string" />
 
-                            <!-- File association -->
-                            <!-- <?include extensions.wxi?> -->
-
                             <!-- App Paths to support Start, Run -->
                             <RegistryValue Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\vlc.exe" Value="[#vlc.exe]" Type="string" />
                             <RegistryValue Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\vlc.exe" Name="Path" Value="[APPLICATIONFOLDER]" Type="string" />
-
                         </Component>
 
                         <Component Id='CompTXT' Guid='7fbd228c-87d8-4e91-85b3-aa65e03c9f1e' Win64="$(var.Win64)">
@@ -241,9 +237,7 @@
                             <RegistryValue Root="HKCR" Key="VLC.OPENFolder\shell" Value="Open" Type="string" />
                             <RegistryValue Root="HKCR" Key="VLC.OPENFolder\shell\open\command" Value="&quot;[#vlc.exe]&quot; %1" Type="string" />
                             <RegistryValue Root="HKCR" Key="VLC.OPENFolder\DefaultIcon" Value="[#vlc.exe],0" Type="string" />
-
                         </Component>
-
                     </Directory>
                 </Directory>
             </Directory>
@@ -276,7 +270,7 @@
                 <Shortcut Id="NEWSShortcut" Name="Release Notes" Target="[APPLICATIONFOLDER]NEWS.txt" />
                 <util:InternetShortcut Id="WebsiteShortcut" Name="VideoLAN website" Target="http://www.videolan.org/"/>
                 <util:InternetShortcut Id="DocumentationShortcut" Name="Documentation" Target="http://www.videolan.org/doc/"/>
-                <!-- RegistryValue whichs serves as KeyPath -->
+                <!-- RegistryValue which serves as KeyPath -->
                 <RegistryValue Root="HKCU"
                                Key="Software\VideoLAN\VLC"
                                Name="StartMenuShortcuts"
@@ -301,7 +295,6 @@
             <ComponentGroupRef Id='CompPluginsGroup' />
             <ComponentGroupRef Id='CompLocaleGroup' />
             <ComponentGroupRef Id='CompLuaGroup' />
-            <!-- <ComponentGroupRef Id='CompOsdmenuGroup' /> -->
             <ComponentGroupRef Id='CompSkinsGroup' />
 
             <Feature Id='ACTIVEX' Title='ActiveX plugin' Level='1' AllowAdvertise="no">
@@ -317,11 +310,7 @@
             <Feature Id='FILEASSOCIATION' Title='Extensions' Level='1' AllowAdvertise="no">
                 <ComponentRef Id='CompFileAssociation' />
             </Feature>
-            <Feature Id='EXPLORERINTEGRATION' Title='Explorer integration' Level='1' AllowAdvertise="no">
-            </Feature>
         </Feature>
-
-
 
         <UIRef Id="WixUI_Advanced" />
 
@@ -330,7 +319,6 @@
             <Custom Action="ExecVLCCacheGen" Before="InstallFinalize">REINSTALL OR NOT Installed</Custom>
             <Custom Action="SetExecVLCCacheGen" Before="ExecVLCCacheGen">REINSTALL OR NOT Installed</Custom>
         </InstallExecuteSequence>
-
 
         <!-- Launch silently vlc-cache-gen.exe during install -->
         <CustomAction Id            = "SetExecVLCCacheGen"
@@ -364,13 +352,12 @@
             </Publish>
             <ProgressText Action="ExecVLCCacheGen">Generating modules cache...</ProgressText>
        </UI>
-
    </Product>
 </Wix>
 
 <!--
     BACKUP: MANUAL REGISTRATION OF AXVLC.DLL
-     **** THIS IS METHOD IS DEPRECATED ****
+     **** THIS METHOD IS DEPRECATED ****
 
     Within the <InstallExecuteSequence> node:
     <Custom Action="RegisterAxvlc" After="InstallFinalize">NOT Installed</Custom>
