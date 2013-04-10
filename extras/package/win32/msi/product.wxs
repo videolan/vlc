@@ -297,12 +297,14 @@
             <ComponentGroupRef Id='CompLuaGroup' />
             <ComponentGroupRef Id='CompSkinsGroup' />
 
-            <Feature Id='ACTIVEX' Title='ActiveX plugin' Level='1' AllowAdvertise="no">
-                <ComponentRef Id='CompAxvlc' />
-                <ComponentGroupRef Id='CompAxvlcGroup' />
-            </Feature>
-            <Feature Id='MOZILLA' Title='Mozilla plugin' Level='1000' AllowAdvertise="no">
-                <ComponentRef Id='CompNpvlc' />
+            <Feature Id='WEBPLUGINS' Title='Web plugins' Level='1' AllowAdvertise="no">
+                <Feature Id='ACTIVEX' Title='ActiveX plugin' Level='1' AllowAdvertise="no">
+                    <ComponentRef Id='CompAxvlc' />
+                    <ComponentGroupRef Id='CompAxvlcGroup' />
+                </Feature>
+                <Feature Id='MOZILLA' Title='Mozilla plugin' Level='1000' AllowAdvertise="no">
+                    <ComponentRef Id='CompNpvlc' />
+                </Feature>
             </Feature>
             <Feature Id='DISCSPLAYBACK' Title='Discs Playback' Level='1' AllowAdvertise="no">
                 <ComponentRef Id='CompPlayDiscs' />
