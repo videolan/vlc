@@ -307,8 +307,16 @@
             <Feature Id='DISCSPLAYBACK' Title='Discs Playback' Level='1' AllowAdvertise="no">
                 <ComponentRef Id='CompPlayDiscs' />
             </Feature>
-            <Feature Id='FILEASSOCIATION' Title='Extensions' Level='1' AllowAdvertise="no">
-                <ComponentRef Id='CompFileAssociation' />
+            <Feature Id='FILEASSOCIATION' Title='File associations' Level='1' AllowAdvertise="no">
+                <Feature Id='VIDEOFILEASSOCIATION' Title='Video' Level='1' AllowAdvertise="no">
+                    <ComponentRef Id='CompVideoFileAssociation' />
+                </Feature>
+                <Feature Id='AUDIOFILEASSOCIATION' Title='Audio' Level='1' AllowAdvertise="no">
+                    <ComponentRef Id='CompAudioFileAssociation' />
+                </Feature>
+                <Feature Id='OTHERFILEASSOCIATION' Title='Others' Level='1' AllowAdvertise="no">
+                    <ComponentRef Id='CompOtherFileAssociation' />
+                </Feature>
             </Feature>
         </Feature>
 
