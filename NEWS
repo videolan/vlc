@@ -104,6 +104,7 @@ Stream Output:
  * Livehttp places more accurate segments durations in playlist
  * Livehttp allows setting cachin-variable in playlist
  * Livehttp stream encryption support
+ * Livehttp supports changing encryption key and uri on segment change with key-loadfile option
 
 Interfaces:
  * configurable password for the HTTP server.
