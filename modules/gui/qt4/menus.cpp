@@ -392,7 +392,7 @@ QMenu *VLCMenuBar::FileMenu( intf_thread_t *p_intf, QWidget *parent, MainInterfa
     }
 
     addDPStaticEntry( menu, qtr( "&Quit" ) ,
-        ":/menu/quit", SLOT( quit() ), "Ctrl+Q" );
+        ":/menu/exit", SLOT( quit() ), "Ctrl+Q" );
     return menu;
 }
 
@@ -920,7 +920,7 @@ void VLCMenuBar::PopupMenuStaticEntries( QMenu *menu )
     menu->addMenu( helpmenu );
 #endif
 
-    addDPStaticEntry( menu, qtr( "Quit" ), ":/menu/quit",
+    addDPStaticEntry( menu, qtr( "Quit" ), ":/menu/exit",
                       SLOT( quit() ), "Ctrl+Q", QAction::QuitRole );
 }
 
@@ -1144,7 +1144,7 @@ void VLCMenuBar::updateSystrayMenu( MainInterface *mi,
     addDPStaticEntry( sysMenu, qtr( "&Open Media" ),
             ":/type/file-wide", SLOT( openFileDialog() ) );
     addDPStaticEntry( sysMenu, qtr( "&Quit" ) ,
-            ":/menu/quit", SLOT( quit() ) );
+            ":/menu/exit", SLOT( quit() ) );
 
     /* Set the menu */
     mi->getSysTray()->setContextMenu( sysMenu );
