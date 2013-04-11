@@ -36,12 +36,8 @@
 #endif
 
 #ifndef json_int_t
-   #ifndef _WIN32
-      #include <inttypes.h>
-      #define json_int_t int64_t
-   #else
-      #define json_int_t __int64
-   #endif
+#include <inttypes.h>
+#define json_int_t int64_t
 #endif
 
 #ifdef __cplusplus
