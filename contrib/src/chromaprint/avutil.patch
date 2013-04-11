@@ -8,3 +8,13 @@
  #include <libavcodec/avcodec.h>
  #include <libavcodec/avfft.h>
  }
+--- chromaprint/libchromaprint.pc.cmake.orig	2013-04-11 16:03:15.878116880 +0200
++++ chromaprint/libchromaprint.pc.cmake	2013-04-11 16:03:26.178116971 +0200
+@@ -7,6 +7,6 @@
+ Description: Audio fingerprint library
+ URL: http://wiki.acoustid.org/wiki/Chromaprint
+ Version: ${PROJECT_VERSION}
+-Libs: -L${LIB_INSTALL_DIR} -lchromaprint
++Libs: -L${LIB_INSTALL_DIR} -lchromaprint -lavcodec -lavutil
+ Cflags: -I${INCLUDE_INSTALL_DIR}
+ 
