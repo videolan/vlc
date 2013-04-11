@@ -20,6 +20,7 @@
         <file alias="play">pixmaps/play_16px.png</file>
         <file alias="pause">pixmaps/pause_16px.png</file>
         <file alias="stop">pixmaps/stop_16px.png</file>
+        <file alias="exit">pixmaps/menus/exit_16px.png</file>
     </qresource>
     <qresource prefix="/util">
         <file alias="wait0">pixmaps/util/wait0.png</file>
