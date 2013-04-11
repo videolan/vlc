@@ -147,9 +147,9 @@ signals:
 
 
 static const QString viewNames[ StandardPLPanel::VIEW_COUNT ]
-                                = { qtr( "Icon View" ),
-                                    qtr( "Detailed View" ),
-                                    qtr( "List View" ),
-                                    qtr( "PictureFlow View ") };
+                                = { qtr( "Icons" ),
+                                    qtr( "Detailed List" ),
+                                    qtr( "List" ),
+                                    qtr( "PictureFlow") };
 
 #endif
