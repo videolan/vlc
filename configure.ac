@@ -214,6 +214,8 @@ case "${host_os}" in
     case "${host_os}" in
       *mingw32*)
         SYS=mingw32
+        CC="$CC -static-libgcc"
+        CXX="$CXX -static-libgcc -static-libstdc++"
         ;;
       *cygwin*)
         dnl Check if we are using the mno-cygwin mode in which case we are
