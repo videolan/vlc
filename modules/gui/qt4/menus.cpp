@@ -475,8 +475,15 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
             qtr( "Play&list" ), mi,
             SLOT( togglePlaylist() ), qtr( "Ctrl+L" ) );
 
+    /* Docked Playlist */
+    action = menu->addAction( qtr( "Docked Playlist" ) );
+    action->setCheckable( true );
+    action->setChecked( mi->isPlDocked() );
+    CONNECT( action, triggered( bool ), mi, dockPlaylist( bool ) );
+
     if( mi->getPlaylistView() )
         menu->addMenu( StandardPLPanel::viewSelectionMenu( mi->getPlaylistView() ) );
+
     menu->addSeparator();
 
     /* Minimal View */
@@ -503,12 +510,6 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
     action->setCheckable( true );
     if( mi->getControlsVisibilityStatus() & MainInterface::CONTROLS_ADVANCED )
         action->setChecked( true );
-
-    /* Docked Playlist */
-    action = menu->addAction( qtr( "Docked Playlist" ) );
-    action->setCheckable( true );
-    action->setChecked( mi->isPlDocked() );
-    CONNECT( action, triggered( bool ), mi, dockPlaylist( bool ) );
 
     action = menu->addAction( qtr( "Status Bar" ) );
     action->setCheckable( true );
