@@ -55,14 +55,6 @@
 #include <assert.h>
 #include <limits.h>
 
-#ifdef HAVE_LIBPROXY
-#    include <proxy.h>
-#endif
-
-#ifdef WIN32
-#   include <windows.h>
-#endif
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -367,117 +359,33 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
 
     /* Check proxy */
     psz = var_InheritString( p_access, "http-proxy" );
-    if( psz )
+    if( psz == NULL )
+    {
+        char *url;
+
+        if (likely(asprintf(&url, "%s://%s", psz_access,
+                            p_access->psz_location) != -1))
+        {
+            msg_Dbg(p_access, "querying proxy for %s", url);
+            psz = vlc_getProxyUrl(url);
+            free(url);
+        }
+
+        if (psz != NULL)
+            msg_Dbg(p_access, "proxy: %s", psz);
+        else
+            msg_Dbg(p_access, "no proxy");
+    }
+    if( psz != NULL )
     {
         p_sys->b_proxy = true;
         vlc_UrlParse( &p_sys->proxy, psz, 0 );
         free( psz );
-    }
-#ifdef HAVE_LIBPROXY
-    else
-    {
-        pxProxyFactory *pf = px_proxy_factory_new();
-        if (pf)
-        {
-            char *buf;
-            int i;
-            i=asprintf(&buf, "%s://%s", psz_access, p_access->psz_location);
-            if (i >= 0)
-            {
-                msg_Dbg(p_access, "asking libproxy about url '%s'", buf);
-                char **proxies = px_proxy_factory_get_proxies(pf, buf);
-                if (proxies[0])
-                {
-                    msg_Dbg(p_access, "libproxy suggest to use '%s'", proxies[0]);
-                    if(strcmp(proxies[0],"direct://") != 0)
-                    {
-                        p_sys->b_proxy = true;
-                        vlc_UrlParse( &p_sys->proxy, proxies[0], 0);
-                    }
-                }
-                for(i=0;proxies[i];i++) free(proxies[i]);
-                free(proxies);
-                free(buf);
-            }
-            px_proxy_factory_free(pf);
-        }
-        else
-        {
-            msg_Err(p_access, "Allocating memory for libproxy failed");
-        }
-    }
-#elif (0) // defined( WIN32 ) The parsing is not complete enough
-    else
-    {
-        /* Try to get the proxy server address from Windows internet settings using registry. */
-        HKEY h_key;
-        /* Open the key */
-        if( RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Microsoft"
-                          "\\Windows\\CurrentVersion\\Internet Settings",
-                          0, KEY_READ, &h_key ) == ERROR_SUCCESS )
-        {
-            DWORD len = sizeof( DWORD );
-            BYTE proxyEnable;
 
-            /* Get the proxy enable value */
-            if( RegQueryValueEx( h_key, "ProxyEnable", NULL, NULL,
-                                 &proxyEnable, &len ) == ERROR_SUCCESS
-             && proxyEnable )
-            {
-                /* Proxy is enabled */
-                /* Get the proxy URL :
-                   Proxy server value in the registry can be something like "address:port"
-                   or "ftp=address1:port1;http=address2:port2 ..." depending of the
-                   confirguration. */
-                unsigned char key[256];
-
-                len = sizeof( key );
-                if( RegQueryValueEx( h_key, "ProxyServer", NULL, NULL,
-                                     key, &len ) == ERROR_SUCCESS )
-                {
-                    /* FIXME: This is lame. The string should be tokenized. */
-#warning FIXME.
-                    char *psz_proxy = strstr( (char *)key, "http=" );
-                    if( psz_proxy != NULL )
-                    {
-                        psz_proxy += 5;
-                        char *end = strchr( psz_proxy, ';' );
-                        if( end != NULL )
-                            *end = '\0';
-                    }
-                    else
-                        psz_proxy = (char *)key;
-                    /* Set proxy enable for this connection. */
-                    p_sys->b_proxy = true;
-                    vlc_UrlParse( &p_sys->proxy, psz_proxy, 0 );
-                }
-            }
-            else
-                msg_Dbg( p_access, "HTTP proxy disabled (MSIE)" );
-            RegCloseKey( h_key );
-        }
-    }
-#else
-    else
-    {
-        psz = getenv( "http_proxy" );
-        if( psz )
-        {
-            p_sys->b_proxy = true;
-            vlc_UrlParse( &p_sys->proxy, psz, 0 );
-        }
-    }
-#endif
-
-    if( psz ) /* No, this is NOT a use-after-free error */
-    {
         psz = var_InheritString( p_access, "http-proxy-pwd" );
         if( psz )
             p_sys->proxy.psz_password = p_sys->psz_proxy_passbuf = psz;
-    }
 
-    if( p_sys->b_proxy )
-    {
         if( p_sys->proxy.psz_host == NULL || *p_sys->proxy.psz_host == '\0' )
         {
             msg_Warn( p_access, "invalid proxy host" );
