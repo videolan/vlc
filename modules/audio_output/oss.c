@@ -363,7 +363,12 @@ static int DevicesEnum (audio_output_t *aout, char ***idp, char ***namep)
     oss_sysinfo si;
 
     if (fd == -1)
-        return -1;
+    {
+        fd = vlc_open ("/dev/dsp", O_WRONLY);
+        if (fd == -1)
+            return -1;
+    }
+
     if (ioctl (fd, SNDCTL_SYSINFO, &si) < 0)
     {
         msg_Err (aout, "cannot get system infos: %m");
@@ -397,8 +402,12 @@ static int DevicesEnum (audio_output_t *aout, char ***idp, char ***namep)
         names[n] = xstrdup (ai.name);
         n++;
     }
+
     *idp = ids;
     *namep = names;
+    if (sys->fd == -1)
+        close (fd);
+
     return n;
 }
 
