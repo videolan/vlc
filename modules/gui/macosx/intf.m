@@ -420,7 +420,17 @@ static int PlaylistUpdated(vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
+
+    /* Avoid event queue flooding with playlistUpdated selectors, leading to UI freezes.
+     * Therefore, only enqueue if no selector already enqueued.
+     */
+    VLCMain *o_main = [VLCMain sharedInstance];
+    @synchronized(o_main) {
+        if(![o_main playlistUpdatedSelectorInQueue]) {
+            [o_main setPlaylistUpdatedSelectorInQueue:YES];
+            [o_main performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
+        }
+    }
 
     [o_pool release];
     return VLC_SUCCESS;
@@ -591,6 +601,7 @@ audio_output_t *getAout(void)
 
 @synthesize voutController=o_vout_controller;
 @synthesize nativeFullscreenMode=b_nativeFullscreenMode;
+@synthesize playlistUpdatedSelectorInQueue=b_playlist_updated_selector_in_queue;
 
 #pragma mark -
 #pragma mark Initialization
@@ -1342,6 +1353,10 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)playlistUpdated
 {
+    @synchronized(self) {
+        b_playlist_updated_selector_in_queue = NO;
+    }
+
     [self playbackStatusUpdated];
     [o_playlist playlistUpdated];
     [o_mainwindow updateWindow];

@@ -149,11 +149,13 @@ struct intf_sys_t
     /* iTunes play/pause support */
     BOOL b_has_itunes_paused;
     NSTimer *o_itunes_play_timer;
+
+    BOOL b_playlist_updated_selector_in_queue;
 }
 
 @property (readonly) VLCVoutWindowController* voutController;
 @property (readonly) BOOL nativeFullscreenMode;
-
+@property (nonatomic, readwrite) BOOL playlistUpdatedSelectorInQueue;
 + (VLCMain *)sharedInstance;
 
 - (intf_thread_t *)intf;
