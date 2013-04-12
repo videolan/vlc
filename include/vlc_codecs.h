@@ -433,7 +433,7 @@ static const struct
 }
 sub_format_tag_to_fourcc[] =
 {
-    { _KSDATAFORMAT_SUBTYPE_PCM_, VLC_FOURCC( 'p', 'c', 'm', ' ' ), "PCM" },
+    { _KSDATAFORMAT_SUBTYPE_PCM_, VLC_FOURCC( 'a', 'r', 'a', 'w' ), "PCM" },
     { _KSDATAFORMAT_SUBTYPE_UNKNOWN_, VLC_FOURCC( 'u', 'n', 'd', 'f' ), "Unknown" }
 };
 

@@ -111,7 +111,6 @@ static int DecoderOpen( vlc_object_t *p_this )
     switch( p_dec->fmt_in.i_codec )
     {
     case VLC_FOURCC('a','r','a','w'):
-    case VLC_FOURCC('p','c','m',' '):
     case VLC_FOURCC('a','f','l','t'):
     /* _signed_ big endian samples (mov) */
     case VLC_FOURCC('t','w','o','s'):

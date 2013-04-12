@@ -268,7 +268,6 @@ static int Open( vlc_object_t * p_this )
     if( p_sys->i_channel_mask )
     {
         if( p_sys->fmt.i_codec == VLC_FOURCC('a','r','a','w') ||
-            p_sys->fmt.i_codec == VLC_FOURCC('p','c','m',' ') ||
             p_sys->fmt.i_codec == VLC_FOURCC('a','f','l','t') )
             p_sys->i_chans_to_reorder =
                 aout_CheckChannelReorder( pi_channels_in, NULL,
@@ -312,7 +311,6 @@ static int Open( vlc_object_t * p_this )
     case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
     case VLC_CODEC_ALAW:
     case VLC_CODEC_MULAW:
-    case VLC_FOURCC( 'p', 'c', 'm', ' ' ):
         if( FrameInfo_PCM( &p_sys->i_frame_size, &p_sys->i_frame_samples,
                            &p_sys->fmt ) )
             goto error;

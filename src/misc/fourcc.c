@@ -1513,8 +1513,7 @@ vlc_fourcc_t vlc_fourcc_GetCodecAudio( vlc_fourcc_t i_fourcc, int i_bits )
             return 0;
         }
     }
-    else if( i_fourcc == VLC_FOURCC( 'a', 'r', 'a', 'w' ) ||
-             i_fourcc == VLC_FOURCC( 'p', 'c', 'm', ' ' ) )
+    else if( i_fourcc == VLC_FOURCC( 'a', 'r', 'a', 'w' ) )
     {
         switch( i_bytes )
         {
