@@ -269,6 +269,7 @@ SOURCES_libvlc_android = \
 SOURCES_libvlc_linux = \
 	posix/dirs.c \
 	posix/filesystem.c \
+	posix/netconf.c \
 	posix/plugin.c \
 	posix/thread.c \
 	posix/timer.c \
@@ -281,6 +282,7 @@ SOURCES_libvlc_linux = \
 SOURCES_libvlc_win32 = \
 	win32/dirs.c \
 	win32/filesystem.c \
+	win32/netconf.c \
 	win32/plugin.c \
 	win32/thread.c \
 	win32/specific.c \
@@ -308,6 +310,7 @@ SOURCES_libvlc_os2 = \
 SOURCES_libvlc_other = \
 	posix/dirs.c \
 	posix/filesystem.c \
+	posix/netconf.c \
 	posix/thread.c \
 	posix/timer.c \
 	posix/plugin.c \

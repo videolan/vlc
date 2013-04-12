@@ -506,6 +506,7 @@ vlc_fourcc_AreUVPlanesSwapped
 vlc_GetActionId
 vlc_getaddrinfo
 vlc_getnameinfo
+vlc_getProxyUrl
 vlc_gettext
 vlc_ngettext
 vlc_iconv
