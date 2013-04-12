@@ -322,13 +322,13 @@ do { \
         default:
         {
             unsigned size = aout_BitsPerSample( fourcc ) / 8;
-            const size_t frames = bytes / size;
+            const size_t frames = bytes / (size * channels);
             unsigned char *buf = ptr;
 
             assert( bytes != 0 );
             for( size_t i = 0; i < frames; i++ )
             {
-                unsigned char tmp[AOUT_CHAN_MAX * bytes];
+                unsigned char tmp[AOUT_CHAN_MAX * size];
 
                 for( size_t j = 0; j < channels; j++ )
                     memcpy( tmp + size * chans_table[j], buf + size * j, size );
