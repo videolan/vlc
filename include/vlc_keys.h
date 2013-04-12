@@ -159,6 +159,7 @@ typedef enum vlc_action {
     ACTIONID_PLAY_BOOKMARK9,
     ACTIONID_PLAY_BOOKMARK10,
     /* end of contiguous zone */
+    ACTIONID_PLAY_CLEAR,
     ACTIONID_SUBDELAY_UP,
     ACTIONID_SUBDELAY_DOWN,
     ACTIONID_SUBPOS_UP,

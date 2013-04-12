@@ -275,6 +275,7 @@ static const struct action actions[] =
     { "audiodevice-cycle", ACTIONID_AUDIODEVICE_CYCLE, },
     { "chapter-next", ACTIONID_CHAPTER_NEXT, },
     { "chapter-prev", ACTIONID_CHAPTER_PREV, },
+    { "clear-playlist", ACTIONID_PLAY_CLEAR, },
     { "crop", ACTIONID_CROP, },
     { "crop-bottom", ACTIONID_CROP_BOTTOM, },
     { "crop-left", ACTIONID_CROP_LEFT, },

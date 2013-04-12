@@ -1346,6 +1346,8 @@ static const char *const mouse_wheel_texts[] =
 #define SET_BOOKMARK9_KEY_TEXT N_("Set playlist bookmark 9")
 #define SET_BOOKMARK10_KEY_TEXT N_("Set playlist bookmark 10")
 #define SET_BOOKMARK_KEY_LONGTEXT N_("Select the key to set this playlist bookmark.")
+#define PLAY_CLEAR_KEY_TEXT N_("Clear the playlist")
+#define PLAY_CLEAR_KEY_LONGTEXT N_("Select the key to clear the current playlist.")
 
 #define BOOKMARK1_TEXT N_("Playlist bookmark 1")
 #define BOOKMARK2_TEXT N_("Playlist bookmark 2")
@@ -2245,6 +2247,7 @@ vlc_module_begin ()
 #   define KEY_RECORD             "Command+Shift+r"
 #   define KEY_WALLPAPER          "w"
 #   define KEY_AUDIODEVICE_CYCLE  "Shift+a"
+#   define KEY_PLAY_CLEAR         NULL
 
 #else /* Non Mac OS X */
     /*
@@ -2361,6 +2364,9 @@ vlc_module_begin ()
 #   define KEY_PLAY_BOOKMARK8     "F8"
 #   define KEY_PLAY_BOOKMARK9     "F9"
 #   define KEY_PLAY_BOOKMARK10    "F10"
+
+/* Playlist clear */
+#   define KEY_PLAY_CLEAR         "Ctrl+w"
 #endif
 
     add_key( "key-toggle-fullscreen", KEY_TOGGLE_FULLSCREEN, TOGGLE_FULLSCREEN_KEY_TEXT,
@@ -2577,6 +2583,8 @@ vlc_module_begin ()
              PLAY_BOOKMARK9_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, true )
     add_key( "key-play-bookmark10", KEY_PLAY_BOOKMARK10,
              PLAY_BOOKMARK10_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, true )
+    add_key( "key-clear-playlist", KEY_PLAY_CLEAR,
+             PLAY_CLEAR_KEY_TEXT, PLAY_CLEAR_KEY_LONGTEXT, true )
 
 
     add_string( "bookmark1", NULL,
