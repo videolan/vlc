@@ -1149,7 +1149,8 @@ static int Play( demux_t *p_demux )
             p_sys->i_timeout = 60; /* default value from RFC2326 */
 
         /* start timeout-thread only if GET_PARAMETER is supported by the server */
-        if( !p_sys->p_timeout && p_sys->b_get_param )
+        /* or start it if wmserver dialect, since they don't report that GET_PARAMETER is supported correctly */
+        if( !p_sys->p_timeout && ( p_sys->b_get_param || var_InheritBool( p_demux, "rtsp-wmserver" ) ) )
         {
             msg_Dbg( p_demux, "We have a timeout of %d seconds",  p_sys->i_timeout );
             p_sys->p_timeout = (timeout_thread_t *)malloc( sizeof(timeout_thread_t) );
