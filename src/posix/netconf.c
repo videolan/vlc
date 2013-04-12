@@ -95,12 +95,16 @@ char *vlc_getProxyUrl(const char *url)
         close(fd[0]);
         while (waitpid(pid, &(int){ 0 }, 0) == -1);
 
-        if (len >= sizeof (buf))
-            return NULL; /* overflow */
         if (len >= 9 && !strncasecmp(buf, "direct://", 9))
             return NULL;
-        if (len > 0)
-            return strndup(buf, len);
+
+        char *end = memchr(buf, '\n', len);
+        if (end != NULL)
+        {
+            *end = '\0';
+            return strdup(buf);
+        }
+        /* Parse error: fallback (may be due to missing executable) */
     }
     else
         close(fd[0]);
