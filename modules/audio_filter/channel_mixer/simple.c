@@ -79,8 +79,8 @@ static void DoWork_5_x_to_2_0( filter_t * p_filter,  block_t * p_in_buf, block_t
     const float *p_src = (const float *)p_in_buf->p_buffer;
     for( int i = p_in_buf->i_nb_samples; i--; )
     {
-        *p_dest++ = p_src[4] + 0.5 * p_src[0] + 0.33 * p_src[2];
-        *p_dest++ = p_src[4] + 0.5 * p_src[1] + 0.33 * p_src[3];
+        *p_dest++ = p_src[0] + 0.7071 * (p_src[4] + p_src[2]);
+        *p_dest++ = p_src[1] + 0.7071 * (p_src[4] + p_src[3]);
 
         p_src += 5;
 
@@ -132,7 +132,7 @@ static void DoWork_5_x_to_1_0( filter_t * p_filter,  block_t * p_in_buf, block_t
     const float *p_src = (const float *)p_in_buf->p_buffer;
     for( int i = p_in_buf->i_nb_samples; i--; )
     {
-        *p_dest++ = p_src[4] + p_src[0] / 4 + p_src[1] / 4 + p_src[2] / 6 + p_src[3] / 6;
+        *p_dest++ = 0.7071 * (p_src[0] + p_src[1]) + p_src[4] + 0.5f * (p_src[2] + p_src[3]);
 
         p_src += 5;
 
@@ -197,8 +197,8 @@ static void DoWork_5_x_to_4_0( filter_t * p_filter,  block_t * p_in_buf, block_t
     const float *p_src = (const float *)p_in_buf->p_buffer;
     for( int i = p_in_buf->i_nb_samples; i--; )
     {
-        *p_dest++ = p_src[4] + 0.5 * p_src[0];
-        *p_dest++ = p_src[4] + 0.5 * p_src[1];
+        *p_dest++ = p_src[0] + p_src[4] * 0.7071;
+        *p_dest++ = p_src[1] + p_src[4] * 0.7071;
         *p_dest++ = p_src[2];
         *p_dest++ = p_src[3];
 
