@@ -1587,23 +1587,6 @@ dnl
 EXTEND_HELP_STRING([Input plugins:])
 
 dnl
-dnl libproxy support
-dnl
-AC_ARG_ENABLE(libproxy,
-  [AS_HELP_STRING([--enable-libproxy],[support libproxy (default auto)])])
-AS_IF([test "${enable_libproxy}" != "no"], [
-  PKG_CHECK_MODULES(LIBPROXY, libproxy-1.0, [
-    AC_DEFINE(HAVE_LIBPROXY, 1, [Define if libproxy is available])
-    VLC_ADD_CFLAGS([access_http],[$LIBPROXY_CFLAGS])
-    VLC_ADD_LIBS([access_http],[$LIBPROXY_LIBS])
-  ], [
-    AS_IF([test -n "${enable_libproxy}"], [
-      AC_MSG_ERROR([${LIBPROXY_PKG_ERRORS}.])
-    ])
-  ])
-])
-
-dnl
 dnl  live555 input
 dnl
 AC_ARG_ENABLE(live555,
