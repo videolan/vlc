@@ -140,6 +140,17 @@ static void DoWork_5_x_to_1_0( filter_t * p_filter,  block_t * p_in_buf, block_t
     }
 }
 
+static void DoWork_4_0_to_1_0( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
+    VLC_UNUSED(p_filter);
+    float *p_dest = (float *)p_out_buf->p_buffer;
+    const float *p_src = (const float *)p_in_buf->p_buffer;
+    for( int i = p_in_buf->i_nb_samples; i--; )
+    {
+        *p_dest++ = p_src[2] + p_src[3] + p_src[0] / 4 + p_src[1] / 4;
+        p_src += 4;
+    }
+}
+
 static void DoWork_3_x_to_1_0( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
     float *p_dest = (float *)p_out_buf->p_buffer;
     const float *p_src = (const float *)p_in_buf->p_buffer;
@@ -248,6 +259,8 @@ static int OpenFilter( vlc_object_t *p_this )
             p_filter->p_sys->pf_dowork = DoWork_7_x_to_1_0;
         else if( b_input_5_0 )
             p_filter->p_sys->pf_dowork = DoWork_5_x_to_1_0;
+        else if( b_input_4_center_rear )
+            p_filter->p_sys->pf_dowork = DoWork_4_0_to_1_0;
         else if( b_input_3_0 )
             p_filter->p_sys->pf_dowork = DoWork_3_x_to_1_0;
         else
