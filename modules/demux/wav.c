@@ -316,6 +316,9 @@ static int Open( vlc_object_t * p_this )
         if( FrameInfo_PCM( &p_sys->i_frame_size, &p_sys->i_frame_samples,
                            &p_sys->fmt ) )
             goto error;
+        p_sys->fmt.i_codec =
+            vlc_fourcc_GetCodecAudio( p_sys->fmt.i_codec,
+                                      p_sys->fmt.audio.i_bitspersample );
         break;
     case VLC_CODEC_ADPCM_MS:
     /* FIXME not sure at all FIXME */
