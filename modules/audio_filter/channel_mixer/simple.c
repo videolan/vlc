@@ -208,6 +208,26 @@ static void DoWork_5_x_to_4_0( filter_t * p_filter,  block_t * p_in_buf, block_t
     }
 }
 
+static void DoWork_7_x_to_5_x( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
+    float *p_dest = (float *)p_out_buf->p_buffer;
+    const float *p_src = (const float *)p_in_buf->p_buffer;
+    for( int i = p_in_buf->i_nb_samples; i--; )
+    {
+        *p_dest++ = p_src[0];
+        *p_dest++ = p_src[1];
+        *p_dest++ = (p_src[2] + p_src[4]) * 0.5;
+        *p_dest++ = (p_src[3] + p_src[5]) * 0.5;
+        *p_dest++ = p_src[6];
+
+        p_src += 7;
+
+        if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE &&
+            p_filter->fmt_out.audio.i_physical_channels & AOUT_CHAN_LFE )
+            *p_dest++ = *p_src++;
+        else if( p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
+    }
+}
+
 
 /*****************************************************************************
  * OpenFilter:
@@ -266,15 +286,17 @@ static int OpenFilter( vlc_object_t *p_this )
         else
             p_filter->p_sys->pf_dowork = DoWork_2_x_to_1_0;
     }
-    else
+    else if(p_filter->fmt_out.audio.i_physical_channels == AOUT_CHANS_4_0)
     {
-        assert( p_filter->fmt_out.audio.i_physical_channels == AOUT_CHANS_4_0 );
-        assert( b_input_7_0 || b_input_5_0 );
-
         if( b_input_7_0 )
             p_filter->p_sys->pf_dowork = DoWork_7_x_to_4_0;
         else
             p_filter->p_sys->pf_dowork = DoWork_5_x_to_4_0;
+    }
+    else
+    {
+        assert( b_input_7_0 );
+        p_filter->p_sys->pf_dowork = DoWork_7_x_to_5_x;
     }
 
     return VLC_SUCCESS;
@@ -341,7 +363,8 @@ static bool IsSupported( const audio_format_t *p_input, const audio_format_t *p_
     /* Only conversion to Mono, Stereo and 4.0 right now */
     if( p_output->i_physical_channels != AOUT_CHAN_CENTER &&
         p_output->i_physical_channels != AOUT_CHANS_2_0 &&
-        p_output->i_physical_channels != AOUT_CHANS_4_0 )
+        p_output->i_physical_channels != AOUT_CHANS_4_0 &&
+        p_output->i_physical_channels != AOUT_CHANS_5_1 )
     {
         return false;
     }
