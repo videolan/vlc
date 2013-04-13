@@ -160,8 +160,6 @@ enum demux_query_e
 
     DEMUX_CAN_SEEK,            /* arg1= bool*    can fail (assume false)*/
 
-    DEMUX_GET_SIGNAL,          /* arg1= double * arg2= double * can fail */
-
     /* Navigation */
     DEMUX_NAV_ACTIVATE,        /* res=can fail */
     DEMUX_NAV_UP,              /* res=can fail */
