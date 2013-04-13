@@ -327,34 +327,4 @@ static inline int aout_ChannelsRestart (vlc_object_t *obj, const char *varname,
 /* */
 VLC_API vout_thread_t * aout_filter_RequestVout( filter_t *, vout_thread_t *p_vout, video_format_t *p_fmt );
 
-/** Audio output buffer FIFO */
-struct aout_fifo_t
-{
-    block_t  *p_first;
-    block_t **pp_last;
-    date_t    end_date;
-};
-
-/* Legacy packet-oriented audio output helpers */
-typedef struct
-{
-    vlc_mutex_t lock;
-    audio_sample_format_t format;
-    aout_fifo_t partial; /**< Audio blocks before packetization */
-    aout_fifo_t fifo; /**< Packetized audio blocks */
-    mtime_t pause_date; /**< Date when paused or VLC_TS_INVALID */
-    unsigned samples; /**< Samples per packet */
-    bool starving; /**< Whether currently starving (to limit error messages) */
-} aout_packet_t;
-
-VLC_DEPRECATED void aout_PacketInit(audio_output_t *, aout_packet_t *, unsigned, const audio_sample_format_t *);
-VLC_DEPRECATED void aout_PacketDestroy(audio_output_t *);
-
-VLC_DEPRECATED int aout_PacketTimeGet(audio_output_t *, mtime_t *);
-VLC_DEPRECATED void aout_PacketPlay(audio_output_t *, block_t *);
-VLC_DEPRECATED void aout_PacketFlush(audio_output_t *, bool);
-
-VLC_DEPRECATED block_t *aout_PacketNext(audio_output_t *, mtime_t) VLC_USED;
-
-
 #endif /* VLC_AOUT_H */
