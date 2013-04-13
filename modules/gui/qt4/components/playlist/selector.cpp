@@ -333,6 +333,7 @@ void PLSelector::createItems()
             selItem = addItem( SD_TYPE, *ppsz_longname );
         }
 
+        selItem->treeItem()->setData( 0, SD_CATEGORY_ROLE, *p_category );
         putSDData( selItem, *ppsz_name, *ppsz_longname );
         if ( ! icon.isNull() )
             selItem->treeItem()->setData( 0, Qt::DecorationRole, icon );
@@ -418,7 +419,12 @@ void PLSelector::setSource( QTreeWidgetItem *item )
 
     /* */
     if( pl_item )
+    {
         emit categoryActivated( pl_item, false );
+        int i_cat = item->data( 0, SD_CATEGORY_ROLE ).toInt();
+        emit SDCategorySelected( i_cat == SD_CAT_INTERNET
+                                 || i_cat == SD_CAT_LAN );
+    }
 }
 
 PLSelItem * PLSelector::addItem (
