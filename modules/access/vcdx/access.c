@@ -1046,12 +1046,10 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
     case ACCESS_GET_PTS_DELAY:
         *(int64_t*)va_arg(args,int64_t *) = INT64_C(1000) *
                                 var_InheritInteger( p_access, "disc-caching" );
-        dbg_print( INPUT_DBG_EVENT, "GET PTS DELAY" );
         return VLC_SUCCESS;
 
         /* */
     case ACCESS_SET_PAUSE_STATE:
-        dbg_print( INPUT_DBG_EVENT, "SET PAUSE STATE" );
         return VLC_SUCCESS;
 
     case ACCESS_GET_TITLE_INFO:
