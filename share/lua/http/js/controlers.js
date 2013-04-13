@@ -1,8 +1,7 @@
-var current_id = 1;
 var currentArt = null;
 var current_que = 'main';
-var previous_title = null;
-var current_title = null;
+var current_playlist_id = -1;
+var previous_playlist_id = -1;
 
 function updateArt(url) {
     $('#albumArt').fadeOut(500, function () {
@@ -75,11 +74,11 @@ function updateStatus() {
                     updateArt(currentArt);
                 }
 
-                current_title = $('[name="filename"]', data).text();
-                if (previous_title != current_title) {
+                current_playlist_id = parseInt($('currentplid', data).text());
+                if (previous_playlist_id != current_playlist_id) {
                     updatePlayList();
+                    previous_playlist_id = current_playlist_id;
                 }
-                previous_title = current_title;
 
                 if (pollStatus) {
                     setTimeout(updateStatus, 1000);
@@ -138,8 +137,7 @@ function updatePlayList(force_refresh) {
         $('.jstree-leaf').each(function(){
             var id = $(this).attr('id');
             if (id != null && id.substr(0,5) == 'plid_') {
-                var name = $(this).attr('name');
-                if (name != null && name == current_title) {
+                if ( id.substr(5) == current_playlist_id ) {
                     $(this).addClass('ui-state-highlight');
                     $(this).attr('current', 'current');
                     this.scrollIntoView(true);
@@ -513,17 +511,17 @@ $(function () {
     }).bind("loaded.jstree", function (event, data) {
         $('[current]', '[id^="plid_"]').each(function () {
             $(this).addClass('ui-state-highlight');
-            current_id = $(this).attr('id').substr(5);
+            current_playlist_id = $(this).attr('id').substr(5);
         });
     }).bind("refresh.jstree", function (event, data) {
         $('[current]', '[id^="plid_"]').each(function () {
             $(this).addClass('ui-state-highlight');
-            current_id = $(this).attr('id').substr(5);
+            current_playlist_id = $(this).attr('id').substr(5);
         });
     }).delegate("#plid_2 li.jstree-leaf a", "click", function (event, data) {
         event.preventDefault();
-        current_id = $(this).parent().attr('id').substr(5);
-        sendCommand('command=pl_play&id=' + current_id);
+        current_playlist_id = $(this).parent().attr('id').substr(5);
+        sendCommand('command=pl_play&id=' + current_playlist_id);
     });
     updateStatus();
     updateStreams();
