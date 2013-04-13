@@ -116,7 +116,7 @@ public:
     PixmapAnimator( QWidget *parent, QList<QString> _frames );
     void setFps( int _fps ) { fps = _fps; interval = 1000.0 / fps; };
     virtual int duration() const { return interval * pixmaps.count(); };
-    virtual ~PixmapAnimator() { while( pixmaps.count() ) pixmaps.erase( pixmaps.end() ); };
+    virtual ~PixmapAnimator() { qDeleteAll( pixmaps ); };
     QPixmap *getPixmap() { return currentPixmap; }
 protected:
     virtual void updateCurrentTime ( int msecs );
