@@ -55,11 +55,11 @@ function print_playlist(item)
 		end
     else
         local name, path = vlc.strings.convert_xml_special_chars(item.name or "", item.path or "")
-        local current_item = vlc.input.item()
+        local current_item_id = vlc.playlist.current()
         local current = ""
         -- Is the item the one currently played
-        if(current_item ~= nil) then
-            if(vlc.input.item().uri(current_item) == path) then
+        if(current_item_id ~= nil) then
+            if(current_item_id == item.id) then
                 current = 'current="current"'
             end
         end

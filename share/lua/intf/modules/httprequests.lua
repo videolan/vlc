@@ -334,11 +334,11 @@ parseplaylist = function (item)
         local result={}
         local name, path = item.name or ""
         local path = item.path or ""
-        local current_item = vlc.input.item()
+        local current_item_id = vlc.playlist.current()
 
         -- Is the item the one currently played
-        if(current_item ~= nil) then
-            if(vlc.input.item().uri(current_item) == path) then
+        if(current_item_id ~= nil) then
+            if(current_item_id == item.id) then
                 result.current = "current"
             end
         end
