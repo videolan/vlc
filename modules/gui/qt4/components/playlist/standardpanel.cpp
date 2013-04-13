@@ -231,7 +231,7 @@ bool StandardPLPanel::popup( const QModelIndex & index, const QPoint &point, con
     }
 
     if( model->canEdit() ) {
-        menu.addAction( QIcon( ":/toolbar/clear" ), qtr("Clear playlist"),
+        menu.addAction( QIcon( ":/toolbar/clear" ), qtr("Clear the playlist"),
                         model, SLOT( clearPlaylist() ) );
     }
 
