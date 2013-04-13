@@ -291,7 +291,7 @@ playlist.get( [what, [tree]] ): Get the playlist.
       .nb_played:
       .children: A table of children playlist items.
 playlist.search( name ): filter the playlist items with the given string
-playlist.current(): return the current input item
+playlist.current(): return the current input item id
 playlist.sort( key ): sort the playlist according to the key.
   Key must be one of the followings values: 'id', 'title', 'title nodes first',
                                             'artist', 'genre', 'random', 'duration',
