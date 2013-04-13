@@ -84,7 +84,7 @@ struct access_sys_t
     LIBSSH2_SESSION* ssh_session;
     LIBSSH2_SFTP* sftp_session;
     LIBSSH2_SFTP_HANDLE* file;
-    int i_read_size;
+    size_t i_read_size;
 };
 
 
@@ -171,9 +171,9 @@ static int Open( vlc_object_t* p_this )
 
     char *psz_home = config_GetUserDir( VLC_HOME_DIR );
     char *psz_knownhosts_file;
-    asprintf( &psz_knownhosts_file, "%s/.ssh/known_hosts", psz_home );
-    libssh2_knownhost_readfile( ssh_knownhosts, psz_knownhosts_file,
-                                LIBSSH2_KNOWNHOST_FILE_OPENSSH );
+    if( asprintf( &psz_knownhosts_file, "%s/.ssh/known_hosts", psz_home ) != -1 )
+        libssh2_knownhost_readfile( ssh_knownhosts, psz_knownhosts_file,
+                LIBSSH2_KNOWNHOST_FILE_OPENSSH );
     free( psz_knownhosts_file );
     free( psz_home );
 
