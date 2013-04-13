@@ -2681,9 +2681,6 @@ error:
     if( in->p_stream )
         stream_Delete( in->p_stream );
 
-    if( in->p_access )
-        access_Delete( in->p_access );
-
     free( psz_var_demux );
     free( psz_dup );
 
@@ -2702,9 +2699,6 @@ static void InputSourceClean( input_source_t *in )
 
     if( in->p_stream )
         stream_Delete( in->p_stream );
-
-    if( in->p_access )
-        access_Delete( in->p_access );
 
     if( in->i_title > 0 )
     {

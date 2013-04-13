@@ -200,7 +200,6 @@ static int  AReadStream( stream_t *s, void *p_read, unsigned int i_read );
 /* Common */
 static int AStreamControl( stream_t *s, int i_query, va_list );
 static void AStreamDestroy( stream_t *s );
-static void UStreamDestroy( stream_t *s );
 static int  ASeek( stream_t *s, uint64_t i_pos );
 
 /****************************************************************************
@@ -249,7 +248,6 @@ stream_t *stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
 {
     const char *psz_access, *psz_demux, *psz_path, *psz_anchor;
     access_t *p_access;
-    stream_t *p_res;
 
     if( !psz_url )
         return NULL;
@@ -266,14 +264,7 @@ stream_t *stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
         return NULL;
     }
 
-    if( !( p_res = stream_AccessNew( p_access, NULL ) ) )
-    {
-        access_Delete( p_access );
-        return NULL;
-    }
-
-    p_res->pf_destroy = UStreamDestroy;
-    return p_res;
+    return stream_AccessNew( p_access, NULL );
 }
 
 stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
@@ -450,6 +441,7 @@ error:
     free( p_sys->list );
     free( s->p_sys );
     stream_CommonDelete( s );
+    access_Delete( p_access );
     return NULL;
 }
 
@@ -475,18 +467,11 @@ static void AStreamDestroy( stream_t *s )
         free( p_sys->list[p_sys->i_list]->psz_path );
         free( p_sys->list[p_sys->i_list] );
     }
-
     free( p_sys->list );
-    free( p_sys );
 
     stream_CommonDelete( s );
-}
-
-static void UStreamDestroy( stream_t *s )
-{
-    access_t *p_access = (access_t *)s->p_parent;
-    AStreamDestroy( s );
-    access_Delete( p_access );
+    access_Delete( p_sys->p_access );
+    free( p_sys );
 }
 
 /****************************************************************************
