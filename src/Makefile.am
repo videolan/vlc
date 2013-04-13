@@ -245,12 +245,12 @@ endif
 endif
 
 SOURCES_libvlc_darwin = \
-	posix/darwin_dirs.c \
+	darwin/dirs.c \
 	posix/filesystem.c \
 	posix/plugin.c \
 	posix/thread.c \
 	posix/timer.c \
-	posix/darwin_specific.c \
+	darwin/specific.c \
 	posix/rand.c \
 	$(NULL)
 
