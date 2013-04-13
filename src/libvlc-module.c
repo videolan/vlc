@@ -1310,6 +1310,14 @@ static const char *const mouse_wheel_texts[] =
 #define SUBDELAY_UP_KEY_LONGTEXT N_("Select the key to increase the subtitle delay.")
 #define SUBDELAY_DOWN_KEY_TEXT N_("Subtitle delay down")
 #define SUBDELAY_DOWN_KEY_LONGTEXT N_("Select the key to decrease the subtitle delay.")
+#define SUBSYNC_MARKAUDIO_KEY_TEXT N_("Subtitle sync / bookmark audio timestamp")
+#define SUBSYNC_MARKAUDIO_KEY_LONGTEXT N_("Select the key to bookmark audio timestamp when syncing subtitles.")
+#define SUBSYNC_MARKSUB_KEY_TEXT N_("Subtitle sync / bookmark subtitle timestamp")
+#define SUBSYNC_MARKSUB_KEY_LONGTEXT N_("Select the key to bookmark subtitle timestamp when syncing subtitles.")
+#define SUBSYNC_APPLY_KEY_TEXT N_("Subtitle sync / synchronize audio & subtitle timestamps")
+#define SUBSYNC_APPLY_KEY_LONGTEXT N_("Select the key to synchronize bookmarked audio & subtitle timestamps.")
+#define SUBSYNC_RESET_KEY_TEXT N_("Subtitle sync / reset audio & subtitle synchronization")
+#define SUBSYNC_RESET_KEY_LONGTEXT N_("Select the key to reset synchronization of audio & subtitle timestamps.")
 #define SUBPOS_UP_KEY_TEXT N_("Subtitle position up")
 #define SUBPOS_UP_KEY_LONGTEXT N_("Select the key to move subtitles higher.")
 #define SUBPOS_DOWN_KEY_TEXT N_("Subtitle position down")
@@ -2182,6 +2190,10 @@ vlc_module_begin ()
 #   define KEY_SUBDELAY_DOWN      "h"
 #   define KEY_SUBPOS_DOWN        NULL
 #   define KEY_SUBPOS_UP          NULL
+#   define KEY_SUBSYNC_MARKAUDIO  "Shift+h"
+#   define KEY_SUBSYNC_MARKSUB    "Shift+j"
+#   define KEY_SUBSYNC_APPLY      "Shift+k"
+#   define KEY_SUBSYNC_RESET      "Command+Shift+k"
 #   define KEY_AUDIODELAY_UP      "g"
 #   define KEY_AUDIODELAY_DOWN    "f"
 #   define KEY_AUDIO_TRACK        "l"
@@ -2293,6 +2305,10 @@ vlc_module_begin ()
 #   define KEY_SUBDELAY_DOWN      "g"
 #   define KEY_SUBPOS_DOWN        NULL
 #   define KEY_SUBPOS_UP          NULL
+#   define KEY_SUBSYNC_MARKAUDIO  "Shift+h"
+#   define KEY_SUBSYNC_MARKSUB    "Shift+j"
+#   define KEY_SUBSYNC_APPLY      "Shift+k"
+#   define KEY_SUBSYNC_RESET      "Ctrl+Shift+k"
 #   define KEY_AUDIODELAY_UP      "k"
 #   define KEY_AUDIODELAY_DOWN    "j"
 #   define KEY_RANDOM             "r"
@@ -2448,6 +2464,14 @@ vlc_module_begin ()
              SUBDELAY_UP_KEY_TEXT, SUBDELAY_UP_KEY_LONGTEXT, true )
     add_key( "key-subdelay-down", KEY_SUBDELAY_DOWN,
              SUBDELAY_DOWN_KEY_TEXT, SUBDELAY_DOWN_KEY_LONGTEXT, true )
+    add_key( "key-subsync-markaudio", KEY_SUBSYNC_MARKAUDIO,
+             SUBSYNC_MARKAUDIO_KEY_TEXT, SUBSYNC_MARKAUDIO_KEY_LONGTEXT, true )
+    add_key( "key-subsync-marksub", KEY_SUBSYNC_MARKSUB,
+             SUBSYNC_MARKSUB_KEY_TEXT, SUBSYNC_MARKSUB_KEY_LONGTEXT, true )
+    add_key( "key-subsync-apply", KEY_SUBSYNC_APPLY,
+             SUBSYNC_APPLY_KEY_TEXT, SUBSYNC_APPLY_KEY_LONGTEXT, true )
+     add_key( "key-subsync-reset", KEY_SUBSYNC_RESET,
+              SUBSYNC_RESET_KEY_TEXT, SUBSYNC_RESET_KEY_LONGTEXT, true )
     add_key( "key-subpos-up", KEY_SUBPOS_UP,
              SUBPOS_UP_KEY_TEXT, SUBPOS_UP_KEY_LONGTEXT, true )
     add_key( "key-subpos-down", KEY_SUBPOS_DOWN,

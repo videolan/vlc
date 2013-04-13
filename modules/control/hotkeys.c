@@ -48,6 +48,13 @@ struct intf_sys_t
 {
     vout_thread_t      *p_last_vout;
     int slider_chan;
+
+    /*subtitle_delaybookmarks: placeholder for storing subtitle sync timestamps*/
+    struct
+    {
+        int64_t i_time_subtitle;
+        int64_t i_time_audio;
+    } subtitle_delaybookmarks;
 };
 
 /*****************************************************************************
@@ -101,6 +108,8 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys = p_sys;
 
     p_sys->p_last_vout = NULL;
+    p_sys->subtitle_delaybookmarks.i_time_audio = 0;
+    p_sys->subtitle_delaybookmarks.i_time_subtitle = 0;
 
     var_AddCallback( p_intf->p_libvlc, "key-action", ActionEvent, p_intf );
     return VLC_SUCCESS;
@@ -372,6 +381,62 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 DisplayMessage( p_vout, _("Next frame") );
             }
             break;
+
+        case ACTIONID_SUBSYNC_MARKAUDIO:
+        {
+            p_sys->subtitle_delaybookmarks.i_time_audio = mdate();
+            DisplayMessage( p_vout, _("Sub sync: bookmarked audio timestamp"));
+            break;
+        }
+        case ACTIONID_SUBSYNC_MARKSUB:
+        {
+            p_sys->subtitle_delaybookmarks.i_time_subtitle = mdate();
+            DisplayMessage( p_vout, _("Sub sync: bookmarked subtitle timestamp"));
+            break;
+        }
+        case ACTIONID_SUBSYNC_APPLY:
+        {
+            /* Warning! Can yield a pause in the playback.
+             * For example, the following succession of actions will yield a 5 second delay :
+             * - Pressing Shift-H (ACTIONID_SUBSYNC_MARKAUDIO)
+             * - wait 5 second
+             * - Press Shift-J (ACTIONID_SUBSYNC_MARKSUB)
+             * - Press Shift-K (ACTIONID_SUBSYNC_APPLY)
+             * --> 5 seconds pause
+             * This is due to var_SetTime() (and ultimately UpdatePtsDelay())
+             * which causes the video to pause for an equivalent duration
+             * (This problem is also present in the "Track synchronization" window) */
+            if ( p_input )
+            {
+                if ( (p_sys->subtitle_delaybookmarks.i_time_audio == 0) || (p_sys->subtitle_delaybookmarks.i_time_subtitle == 0) )
+                {
+                    DisplayMessage( p_vout, _( "Sub sync: set bookmarks first!" ) );
+                }
+                else
+                {
+                    int64_t i_current_subdelay = var_GetTime( p_input, "spu-delay" );
+                    int64_t i_additional_subdelay = p_sys->subtitle_delaybookmarks.i_time_audio - p_sys->subtitle_delaybookmarks.i_time_subtitle;
+                    int64_t i_total_subdelay = i_current_subdelay + i_additional_subdelay;
+                    var_SetTime( p_input, "spu-delay", i_total_subdelay);
+                    ClearChannels( p_intf, p_vout );
+                    DisplayMessage( p_vout, _( "Sub sync: corrected %i ms (total delay = %i ms)" ),
+                                            (int)(i_additional_subdelay / 1000),
+                                            (int)(i_total_subdelay / 1000) );
+                    p_sys->subtitle_delaybookmarks.i_time_audio = 0;
+                    p_sys->subtitle_delaybookmarks.i_time_subtitle = 0;
+                }
+            }
+            break;
+        }
+        case ACTIONID_SUBSYNC_RESET:
+        {
+            var_SetTime( p_input, "spu-delay", 0);
+            ClearChannels( p_intf, p_vout );
+            DisplayMessage( p_vout, _( "Sub sync: delay reset" ) );
+            p_sys->subtitle_delaybookmarks.i_time_audio = 0;
+            p_sys->subtitle_delaybookmarks.i_time_subtitle = 0;
+            break;
+        }
 
         case ACTIONID_SUBDELAY_DOWN:
         case ACTIONID_SUBDELAY_UP:
