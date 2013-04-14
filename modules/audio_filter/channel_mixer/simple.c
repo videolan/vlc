@@ -92,6 +92,7 @@ static bool IsSupported( const audio_format_t *p_input, const audio_format_t *p_
      * TODO: We don't support 4.0 rear and 4.0 middle
      * */
     if( (p_input->i_physical_channels & ~AOUT_CHAN_LFE) != AOUT_CHANS_7_0 &&
+        (p_input->i_physical_channels)                  != AOUT_CHANS_6_1_MIDDLE &&
         (p_input->i_physical_channels & ~AOUT_CHAN_LFE) != AOUT_CHANS_5_0 &&
         (p_input->i_physical_channels & ~AOUT_CHAN_LFE) != AOUT_CHANS_5_0_MIDDLE &&
         (p_input->i_physical_channels & ~AOUT_CHAN_LFE) != AOUT_CHANS_4_CENTER_REAR &&
@@ -278,6 +279,24 @@ static void DoWork_7_x_to_5_x( filter_t * p_filter,  block_t * p_in_buf, block_t
     }
 }
 
+static void DoWork_6_1_to_5_x( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
+    float *p_dest = (float *)p_out_buf->p_buffer;
+    const float *p_src = (const float *)p_in_buf->p_buffer;
+    for( int i = p_in_buf->i_nb_samples; i--; )
+    {
+        *p_dest++ = p_src[0];
+        *p_dest++ = p_src[1];
+        *p_dest++ = (p_src[2] + p_src[4]) * 0.5;
+        *p_dest++ = (p_src[3] + p_src[4]) * 0.5;
+        *p_dest++ = p_src[5];
+
+        p_src += 6;
+
+        /* We always have LFE here */
+        *p_dest++ = *p_src++;
+    }
+}
+
 
 /*****************************************************************************
  * OpenFilter:
@@ -304,7 +323,9 @@ static int OpenFilter( vlc_object_t *p_this )
 
     const unsigned i_input_physical = p_filter->fmt_in.audio.i_physical_channels;
     const bool b_input_7_0 = (i_input_physical & ~AOUT_CHAN_LFE) == AOUT_CHANS_7_0;
-    const bool b_input_5_0 = !b_input_7_0 &&
+    const bool b_input_6_1 = !b_input_7_0 &&
+                             i_input_physical == AOUT_CHANS_6_1_MIDDLE;
+    const bool b_input_5_0 = !b_input_7_0 && !b_input_6_1 &&
                              ( (i_input_physical & AOUT_CHANS_5_0) == AOUT_CHANS_5_0 ||
                                (i_input_physical & AOUT_CHANS_5_0_MIDDLE) == AOUT_CHANS_5_0_MIDDLE );
     const bool b_input_4_center_rear =  !b_input_7_0 && !b_input_5_0 &&
@@ -345,8 +366,11 @@ static int OpenFilter( vlc_object_t *p_this )
     }
     else
     {
-        assert( b_input_7_0 );
-        p_filter->p_sys->pf_dowork = DoWork_7_x_to_5_x;
+        assert( b_input_7_0 || b_input_6_1 );
+        if( b_input_7_0 )
+            p_filter->p_sys->pf_dowork = DoWork_7_x_to_5_x;
+        else
+            p_filter->p_sys->pf_dowork = DoWork_6_1_to_5_x;
     }
 
     return VLC_SUCCESS;
