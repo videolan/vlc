@@ -80,6 +80,7 @@
     IBOutlet NSMenu * o_mu_view;
     IBOutlet NSMenuItem * o_mi_toggleJumpButtons;
     IBOutlet NSMenuItem * o_mi_togglePlaymodeButtons;
+    IBOutlet NSMenuItem * o_mi_toggleEffectsButton;
     IBOutlet NSMenuItem * o_mi_toggleSidebar;
     IBOutlet NSMenu * o_mu_playlistTableColumns;
     NSMenu * o_mu_playlistTableColumnsContextMenu;
@@ -226,6 +227,7 @@
 - (IBAction)intfOpenNet:(id)sender;
 - (IBAction)intfOpenCapture:(id)sender;
 
+- (IBAction)toggleEffectsButton:(id)sender;
 - (IBAction)toggleJumpButtons:(id)sender;
 - (IBAction)togglePlaymodeButtons:(id)sender;
 - (IBAction)toggleSidebar:(id)sender;

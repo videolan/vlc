@@ -140,7 +140,7 @@
     if ([[o_bottombar_view window] styleMask] & NSResizableWindowMask)
         [o_resize_view removeFromSuperviewWithoutNeedingDisplay];
 
-    
+
     // remove fullscreen button for lion fullscreen
     if (b_nativeFullscreenMode) {
         float f_width = [o_fullscreen_btn frame].size.width;
@@ -531,7 +531,7 @@ frame.origin.x = f_width + frame.origin.x; \
 
         // time field and progress bar are moved in super method!
     }
-    
+
 
     b_show_jump_buttons = config_GetInt(VLCIntf, "macosx-show-playback-buttons");
     if (b_show_jump_buttons)
@@ -541,12 +541,127 @@ frame.origin.x = f_width + frame.origin.x; \
     if (!b_show_playmode_buttons)
         [self removePlaymodeButtons:YES];
 
+    if (!config_GetInt(VLCIntf, "macosx-show-effects-button"))
+        [self removeEffectsButton:YES];
+
     [[VLCMain sharedInstance] playbackModeUpdated];
 
 }
 
 #pragma mark -
 #pragma mark interface customization
+
+
+- (void)toggleEffectsButton
+{
+    if (config_GetInt(VLCIntf, "macosx-show-effects-button"))
+        [self addEffectsButton:NO];
+    else
+        [self removeEffectsButton:NO];
+}
+
+- (void)addEffectsButton:(BOOL)b_fast
+{
+    if (!o_effects_btn)
+        return;
+
+    if (b_fast) {
+        [o_effects_btn setHidden: NO];
+    } else {
+        [[o_effects_btn animator] setHidden: NO];
+    }
+
+#define moveItem(item) \
+frame = [item frame]; \
+frame.origin.x = frame.origin.x - f_space; \
+if (b_fast) \
+[item setFrame: frame]; \
+else \
+[[item animator] setFrame: frame]
+
+    NSRect frame;
+    float f_space = [o_effects_btn frame].size.width;
+    // extra margin between button and volume up button
+    if (b_nativeFullscreenMode)
+        f_space += 2;
+
+
+    moveItem(o_volume_up_btn);
+    moveItem(o_volume_sld);
+    moveItem(o_volume_track_view);
+    moveItem(o_volume_down_btn);
+    moveItem(o_time_fld);
+#undef moveItem
+
+
+    frame = [o_progress_view frame];
+    frame.size.width = frame.size.width - f_space;
+    if (b_fast)
+        [o_progress_view setFrame: frame];
+    else
+        [[o_progress_view animator] setFrame: frame];
+
+    if (!b_nativeFullscreenMode) {
+        if (b_dark_interface) {
+            [o_fullscreen_btn setImage: [NSImage imageNamed:@"fullscreen-double-buttons_dark"]];
+            [o_fullscreen_btn setAlternateImage: [NSImage imageNamed:@"fullscreen-double-buttons-pressed_dark"]];
+        } else {
+            [o_fullscreen_btn setImage: [NSImage imageNamed:@"fullscreen-double-buttons"]];
+            [o_fullscreen_btn setAlternateImage: [NSImage imageNamed:@"fullscreen-double-buttons-pressed"]];
+        }
+    }
+
+    [o_bottombar_view setNeedsDisplay:YES];
+}
+
+- (void)removeEffectsButton:(BOOL)b_fast
+{
+    if (!o_effects_btn)
+        return;
+
+    [o_effects_btn setHidden: YES];
+
+#define moveItem(item) \
+frame = [item frame]; \
+frame.origin.x = frame.origin.x + f_space; \
+if (b_fast) \
+[item setFrame: frame]; \
+else \
+[[item animator] setFrame: frame]
+
+    NSRect frame;
+    float f_space = [o_effects_btn frame].size.width;
+    // extra margin between button and volume up button
+    if (b_nativeFullscreenMode)
+        f_space += 2;
+
+    moveItem(o_volume_up_btn);
+    moveItem(o_volume_sld);
+    moveItem(o_volume_track_view);
+    moveItem(o_volume_down_btn);
+    moveItem(o_time_fld);
+#undef moveItem
+
+
+    frame = [o_progress_view frame];
+    frame.size.width = frame.size.width + f_space;
+    if (b_fast)
+        [o_progress_view setFrame: frame];
+    else
+        [[o_progress_view animator] setFrame: frame];
+
+    if (!b_nativeFullscreenMode) {
+        if (b_dark_interface) {
+            [[o_fullscreen_btn animator] setImage: [NSImage imageNamed:@"fullscreen-one-button_dark"]];
+            [[o_fullscreen_btn animator] setAlternateImage: [NSImage imageNamed:@"fullscreen-one-button-pressed_dark"]];
+        } else {
+            [[o_fullscreen_btn animator] setImage: [NSImage imageNamed:@"fullscreen-one-button"]];
+            [[o_fullscreen_btn animator] setAlternateImage: [NSImage imageNamed:@"fullscreen-one-button-pressed"]];
+        }
+    }
+
+    [o_bottombar_view setNeedsDisplay:YES];
+}
 
 - (void)toggleJumpButtons
 {
@@ -616,7 +731,7 @@ if (b_fast) \
     [item setFrame: frame]; \
 else \
     [[item animator] setFrame: frame]
-    
+
     float f_space = 29.;
     moveItem(o_bwd_btn);
     f_space = 28.;

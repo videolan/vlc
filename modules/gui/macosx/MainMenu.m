@@ -300,6 +300,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_toggleJumpButtons setState: config_GetInt(VLCIntf, "macosx-show-playback-buttons")];
     [o_mi_togglePlaymodeButtons setTitle: _NS("Show Shuffle & Repeat Buttons")];
     [o_mi_togglePlaymodeButtons setState: config_GetInt(VLCIntf, "macosx-show-playmode-buttons")];
+    [o_mi_toggleEffectsButton setTitle: _NS("Show Audio Effects Button")];
+    [o_mi_toggleEffectsButton setState: config_GetInt(VLCIntf, "macosx-show-effects-button")];
     [o_mi_toggleSidebar setTitle: _NS("Show Sidebar")];
     [o_mi_toggleSidebar setState: config_GetInt(VLCIntf, "macosx-show-sidebar")];
     [o_mu_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
@@ -635,6 +637,15 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 #pragma mark -
 #pragma mark View
+
+- (IBAction)toggleEffectsButton:(id)sender
+{
+    BOOL b_value = !config_GetInt(VLCIntf, "macosx-show-effects-button");
+    config_PutInt(VLCIntf, "macosx-show-effects-button", b_value);
+    [[[[VLCMain sharedInstance] mainWindow] controlsBar] toggleEffectsButton];
+    [o_mi_toggleEffectsButton setState: b_value];
+}
+
 - (IBAction)toggleJumpButtons:(id)sender
 {
     BOOL b_value = !config_GetInt(VLCIntf, "macosx-show-playback-buttons");
