@@ -39,13 +39,14 @@
  * Module descriptor
  *****************************************************************************/
 static int  OpenFilter( vlc_object_t * );
+static void CloseFilter( vlc_object_t * );
 
 vlc_module_begin ()
     set_description( N_("Audio filter for simple channel mixing") )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_MISC )
     set_capability( "audio converter", 10 )
-    set_callbacks( OpenFilter, NULL )
+    set_callbacks( OpenFilter, CloseFilter );
 vlc_module_end ()
 
 /*****************************************************************************
@@ -300,6 +301,13 @@ static int OpenFilter( vlc_object_t *p_this )
     }
 
     return VLC_SUCCESS;
+}
+
+static void CloseFilter( vlc_object_t *p_this )
+{
+    filter_t *p_filter = (filter_t *) p_this;
+    filter_sys_t *p_sys = p_filter->p_sys;
+    free( p_sys );
 }
 
 /*****************************************************************************
