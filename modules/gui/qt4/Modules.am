@@ -72,7 +72,6 @@ nodist_SOURCES_qt4 = \
 		util/input_slider.moc.cpp \
 		util/timetooltip.moc.cpp \
 		util/customwidgets.moc.cpp \
-		util/events_extender.moc.cpp \
 		util/searchlineedit.moc.cpp \
 		util/qmenuview.moc.cpp \
 		util/qvlcapp.moc.cpp \
@@ -340,7 +339,6 @@ SOURCES_qt4 = 	qt4.cpp \
 		util/input_slider.cpp \
  		util/timetooltip.cpp \
 		util/customwidgets.cpp \
-		util/events_extender.cpp \
 		util/searchlineedit.cpp \
 		util/registry.cpp \
 		util/qmenuview.cpp \
@@ -421,7 +419,6 @@ noinst_HEADERS = \
 	util/input_slider.hpp \
 	util/timetooltip.hpp \
 	util/customwidgets.hpp \
-	util/events_extender.hpp \
 	util/searchlineedit.hpp \
 	util/qvlcframe.hpp \
 	util/qvlcapp.hpp \
