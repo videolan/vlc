@@ -473,7 +473,7 @@ static void *MMThread(void *data)
 }
 
 /*** Audio devices ***/
-static int DevicesEnum(audio_output_t *aout, char ***idp, char ***namep)
+static int DevicesEnum(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
     HRESULT hr;
@@ -494,16 +494,13 @@ static int DevicesEnum(audio_output_t *aout, char ***idp, char ***namep)
         msg_Warn(aout, "cannot count audio endpoints (error 0x%lx)", hr);
         count = 0;
     }
-    else
-        msg_Dbg(aout, "Available Windows Audio devices:");
 
-    char **ids = xmalloc (count * sizeof (*ids));
-    char **names = xmalloc (count * sizeof (*names));
     unsigned n = 0;
 
     for (UINT i = 0; i < count; i++)
     {
         IMMDevice *dev;
+        char *id, *name = NULL;
 
         hr = IMMDeviceCollection_Item(devs, i, &dev);
         if (FAILED(hr))
@@ -517,8 +514,7 @@ static int DevicesEnum(audio_output_t *aout, char ***idp, char ***namep)
             IMMDevice_Release(dev);
             continue;
         }
-        ids[n] = FromWide(devid);
-        names[n] = NULL;
+        id = FromWide(devid);
         CoTaskMemFree(devid);
 
         /* User-readable device name */
@@ -531,21 +527,18 @@ static int DevicesEnum(audio_output_t *aout, char ***idp, char ***namep)
             PropVariantInit(&v);
             hr = IPropertyStore_GetValue(props, &PKEY_Device_FriendlyName, &v);
             if (SUCCEEDED(hr))
-                names[n] = FromWide(v.pwszVal);
+                name = FromWide(v.pwszVal);
             PropVariantClear(&v);
             IPropertyStore_Release(props);
         }
         IMMDevice_Release(dev);
-        if (names[n] == NULL)
-            names[n] = xstrdup(ids[n]);
 
-        msg_Dbg(aout, "%s (%s)", ids[n], names[n]);
+        aout_HotplugReport(aout, id, (name != NULL) ? name : id);
+        free(name);
+        free(id);
         n++;
     }
     IMMDeviceCollection_Release(devs);
-
-    *idp = ids;
-    *namep = names;
     return n;
 }
 
@@ -765,8 +758,8 @@ static int Open(vlc_object_t *obj)
     aout->flush = Flush;
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
-    aout->device_enum = DevicesEnum;
     aout->device_select = DeviceSelect;
+    DevicesEnum(aout);
     return VLC_SUCCESS;
 
 error:
