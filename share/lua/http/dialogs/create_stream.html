@@ -136,7 +136,7 @@
 	<table width="100%">
 		<tr>
 			<td style="text-align:right" valign="top">
-				<h5><?vlc gettext("Stream Name") ?></h5>
+				<h5><?vlc gettext("Stream name") ?></h5>
 			</td>
 			<td colspan="5" valign="top">
 				<input type="text" name="stream_name" id="stream_name" value=""/>
@@ -157,7 +157,7 @@
 			</th>
 		</tr>
 		<tr>
-			<td style="text-align:right" valign="top"><?vlc gettext("Video Codec") ?></td>
+			<td style="text-align:right" valign="top"><?vlc gettext("Video codec") ?></td>
 			<td valign="top">
 				<select name="stream_vcodec" id="stream_vcodec">
 					<option value="FLV1">FLV1</option>
@@ -175,7 +175,7 @@
 					<option value="theo">theo</option>
 				</select>
 			</td>
-			<td style="text-align:right" valign="top"><?vlc gettext("Audio Codec") ?></td>
+			<td style="text-align:right" valign="top"><?vlc gettext("Audio codec") ?></td>
 			<td valign="top">
 				<select name="stream_acodec" id="stream_acodec">
 					<option value="mp3">mp3</option>
@@ -190,14 +190,14 @@
 					<option value="fl32">fl32</option>
 				</select>
 			</td>
-			<td style="text-align:right" valign="top"><?vlc gettext("Subtitle Codec") ?></td>
+			<td style="text-align:right" valign="top"><?vlc gettext("Subtitle codec") ?></td>
 			<td valign="top">
 				<select name="stream_scodec" id="stream_scodec">
 					<option value=""><?vlc gettext("none") ?></option>
 					<option value="dvbs">dvbs</option>
 				</select>
 			</td>
-			<td style="text-align:right" valign="top"><?vlc gettext("Output Method") ?></td>
+			<td style="text-align:right" valign="top"><?vlc gettext("Output	method") ?></td>
 			<td valign="top">
 				<select name="stream_out_method" id="stream_out_method">
 					<option value="http">HTTP</option>
@@ -209,7 +209,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td style="text-align:right" valign="top"><?vlc gettext("Video Bit Rate") ?></td>
+			<td style="text-align:right" valign="top"><?vlc gettext("Video bitrate") ?></td>
 			<td valign="top">
 				<select name="stream_vb" id="stream_vb">
 					<option value="4096">4096</option>
@@ -228,7 +228,7 @@
 					<option value="16">16</option>
 				</select>
 			</td>
-			<td style="text-align:right" valign="top"><?vlc gettext("Audio Bit Rate") ?></td>
+			<td style="text-align:right" valign="top"><?vlc gettext("Audio bitrate") ?></td>
 			<td valign="top">
 				<select name="stream_ab" id="stream_ab">
 					<option value="512">512</option>
@@ -278,7 +278,7 @@
 					<option value="24">24</option>
 				</select>
 			</td>
-			<td style="text-align:right" valign="top"><?vlc gettext("Audio Sample Rate") ?></td>
+			<td style="text-align:right" valign="top"><?vlc gettext("Audio sample rate") ?></td>
 			<td valign="top">
 				<select name="stream_samplerate" id="stream_samplerate">
 					<option value="192000">192 KHz</option>
@@ -294,13 +294,13 @@
 				</select>
 			</td>
 			<td colspan="2" valign="top">&nbsp;</td>
-			<td style="text-align:right" valign="top"><?vlc gettext("MUX Options") ?></td>
+			<td style="text-align:right" valign="top"><?vlc gettext("MUX options") ?></td>
 			<td valign="top">
 				<input type="text" name="stream_out_mux_opts" id="stream_out_mux_opts" value="{mux=flv}" />
 			</td>
 		</tr>
 		<tr>
-			<td style="text-align:right" valign="top"><?vlc gettext("Video Scale") ?></td>
+			<td style="text-align:right" valign="top"><?vlc gettext("Video scale") ?></td>
 			<td valign="top">
 				<select name="stream_scale" id="stream_scale">
 					<option value="0.25">25%</option>
@@ -313,7 +313,7 @@
 					<option value="2">200%</option>
 				</select>
 			</td>
-			<td style="text-align:right" valign="top"><?vlc gettext("Audio Channels") ?></td>
+			<td style="text-align:right" valign="top"><?vlc gettext("Audio channels") ?></td>
 			<td valign="top">
 				<select name="stream_channels" id="stream_channels" >
 					<option value="1">1</option>
@@ -327,15 +327,15 @@
 				<div id="output_options">
 						<table>
 							<tr>
-								<td style="text-align:right" valign="top"><?vlc gettext("Output Port") ?></td>
+								<td style="text-align:right" valign="top"><?vlc gettext("Output port") ?></td>
 								<td valign="top"><input type="text" name="stream_out_port" id="stream_out_port" value="8081" /></td>
 							</tr>
 							<tr>
-								<td style="text-align:right" valign="top"><?vlc gettext("Output Destination") ?></td>
+								<td style="text-align:right" valign="top"><?vlc gettext("Output destination") ?></td>
 								<td><input type="text" name="stream_out_dest" id="stream_out_dest" value="0.0.0.0" /></td>
 							</tr>
 							<tr>
-								<td style="text-align:right" valign="top"><?vlc gettext("Output File") ?></td>
+								<td style="text-align:right" valign="top"><?vlc gettext("Output	file") ?></td>
 								<td valign="top"><input type="text" name="stream_out_file" id="stream_out_file" value="stream.flv" /></td>
 							</tr>
 						</table>
@@ -352,12 +352,12 @@
 		</tr>
 		<tr>
 			<td style="text-align:right" colspan="2" valign="top">
-				<?vlc gettext("Input Media") ?>
+				<?vlc gettext("Input media") ?>
 			</td>
 			<td colspan="6" valign="top">
 				<input type="text" name="stream_input" id="stream_input" value="" size="50" />
-				<div id="button_input" class="button icon ui-widget ui-state-default" title="<?vlc gettext("Media File") ?>" opendialog="window_browse"><span class="ui-icon ui-icon-eject"></span></div>
-				<div id="button_in_screen" class="button icon ui-widget ui-state-default" title="<?vlc gettext("Capture Screen") ?>" ><span class="ui-icon ui-icon-contact"></span></div>
+				<div id="button_input" class="button icon ui-widget ui-state-default" title="<?vlc gettext("Media file") ?>" opendialog="window_browse"><span class="ui-icon ui-icon-eject"></span></div>
+				<div id="button_in_screen" class="button icon ui-widget ui-state-default" title="<?vlc gettext("Capture screen") ?>" ><span class="ui-icon ui-icon-contact"></span></div>
 			</td>
 		</tr>
 	</table>
@@ -371,15 +371,15 @@
 <div id="net_options" style="display:none;visibility: hidden;">
 	<table>
 		<tr>
-			<td style="text-align:right" valign="top"><?vlc gettext("Output Port") ?></td>
+			<td style="text-align:right" valign="top"><?vlc gettext("Output port") ?></td>
 			<td valign="top"><input type="text" name="stream_out_port_" id="stream_out_port_" value="8081" /></td>
 		</tr>
 		<tr>
-			<td style="text-align:right" valign="top"><?vlc gettext("Output Destination") ?></td>
+			<td style="text-align:right" valign="top"><?vlc gettext("Output destination") ?></td>
 			<td valign="top"><input type="text" name="stream_out_dest_" id="stream_out_dest_" value="0.0.0.0" /></td>
 		</tr>
 		<tr>
-			<td style="text-align:right" valign="top"><?vlc gettext("Output File") ?></td>
+			<td style="text-align:right" valign="top"><?vlc gettext("Output file") ?></td>
 			<td valign="top"><input type="text" name="stream_out_file_" id="stream_out_file_" value="stream.flv" /></td>
 		</tr>
 	</table>
@@ -387,7 +387,7 @@
 <div id="file_options" style="display:none;visibility: hidden;">
 	<table>
 		<tr>
-			<td style="text-align:right" valign="top"><?vlc gettext("File Name") ?></td>
+			<td style="text-align:right" valign="top"><?vlc gettext("File name") ?></td>
 			<td valign="top"><input type="text" name="stream_out_filename_" id="stream_out_filename_"/></td>
 		</tr>
 	</table>
