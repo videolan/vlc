@@ -109,19 +109,9 @@ struct aout_sys_t
     int                         i_rate;             /* media sample rate */
     int                         i_bytes_per_sample;
 
-    struct audio_device_t       *devices;
-
     vlc_mutex_t                 lock;
     vlc_cond_t                  cond;
 };
-
-struct audio_device_t
-{
-    struct audio_device_t *next;
-    UInt32 deviceid;
-    char *name;
-};
-
 
 #pragma mark -
 #pragma mark local prototypes & module descriptor
@@ -192,7 +182,6 @@ static int Open(vlc_object_t *obj)
     p_aout->stop = Stop;
     p_aout->volume_set = VolumeSet;
     p_aout->mute_set = MuteSet;
-    p_aout->sys->devices = NULL;
     p_aout->device_select = SwitchAudioDevice;
 
     /* Attach a Listener so that we are notified of a change in the Device setup */
@@ -234,12 +223,6 @@ static void Close(vlc_object_t *obj)
     }
 
     config_PutPsz(p_aout, "auhal-audio-device", aout_DeviceGet(p_aout));
-
-    for (struct audio_device_t * device = p_sys->devices, *next; device != NULL; device = next) {
-        next = device->next;
-        free(device->name);
-        free(device);
-    }
 
     vlc_mutex_destroy(&p_sys->lock);
     vlc_cond_destroy(&p_sys->cond);
@@ -982,15 +965,6 @@ static void RebuildDeviceList(audio_output_t * p_aout)
     UInt32              numberOfDevices;
 
     struct aout_sys_t   *p_sys = p_aout->sys;
-
-    if (p_sys->devices) {
-        for (struct audio_device_t * device = p_sys->devices, *next; device != NULL; device = next) {
-            next = device->next;
-            free(device->name);
-            free(device);
-        }
-    }
-    p_sys->devices = NULL;
 
     /* Get number of devices */
     AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
