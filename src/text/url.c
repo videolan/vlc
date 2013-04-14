@@ -400,13 +400,16 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str, unsigned char opt)
     char *cur = buf, *next;
 
     /* URL scheme */
-    next = strchr (cur, ':');
+    next = buf;
+    while ((*next >= 'A' && *next <= 'Z') || (*next >= 'a' && *next <= 'z')
+        || (*next >= '0' && *next <= '9') || (strchr ("+-.", *next) != NULL))
+        next++;
     /* This is not strictly correct. In principles, the scheme is always
      * present in an absolute URL and followed by a colon. Depending on the
      * URL scheme, the two subsequent slashes are not required.
      * VLC uses a different scheme for historical compatibility reasons - the
      * scheme is often implicit. */
-    if (next != NULL && !strncmp (next + 1, "//", 2))
+    if (*next == ':' && !strncmp (next + 1, "//", 2))
     {
         *next = '\0';
         next += 3;
