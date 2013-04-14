@@ -970,14 +970,33 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         case ACTIONID_SUBPOS_DOWN:
         case ACTIONID_SUBPOS_UP:
         {
-            int i_pos;
-            if( i_action == ACTIONID_SUBPOS_DOWN )
-                i_pos = var_DecInteger( p_vout, "sub-margin" );
-            else
-                i_pos = var_IncInteger( p_vout, "sub-margin" );
+            if( p_input )
+            {
+                vlc_value_t val, list, list2;
+                int i_count;
+                var_Get( p_input, "spu-es", &val );
 
-            ClearChannels( p_intf, p_vout );
-            DisplayMessage( p_vout, _( "Subtitle position %d px" ), i_pos );
+                var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
+                            &list, &list2 );
+                i_count = list.p_list->i_count;
+                if( i_count < 1 || val.i_int < 0 )
+                {
+                    DisplayMessage( p_vout,
+                                    _("Subtitle position: no active subtitle") );
+                    var_FreeList( &list, &list2 );
+                    break;
+                }
+
+                int i_pos;
+                if( i_action == ACTIONID_SUBPOS_DOWN )
+                    i_pos = var_DecInteger( p_vout, "sub-margin" );
+                else
+                    i_pos = var_IncInteger( p_vout, "sub-margin" );
+
+                ClearChannels( p_intf, p_vout );
+                DisplayMessage( p_vout, _( "Subtitle position %d px" ), i_pos );
+                var_FreeList( &list, &list2 );
+            }
             break;
         }
 
