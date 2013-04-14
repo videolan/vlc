@@ -59,7 +59,6 @@ vlc_module_end ()
 struct sink
 {
     struct sink *next;
-    char *description;
     uint32_t index;
     char name[1];
 };
@@ -93,8 +92,9 @@ static void sink_add_cb(pa_context *ctx, const pa_sink_info *i, int eol,
         return;
     (void) ctx;
 
-    msg_Dbg(aout, "listing sink %s (%"PRIu32"): %s", i->name, i->index,
+    msg_Dbg(aout, "adding sink %"PRIu32": %s (%s)", i->index, i->name,
             i->description);
+    aout_HotplugReport(aout, i->name, i->description);
 
     size_t namelen = strlen(i->name);
     struct sink *sink = malloc(sizeof (*sink) + namelen);
@@ -103,7 +103,6 @@ static void sink_add_cb(pa_context *ctx, const pa_sink_info *i, int eol,
 
     sink->next = sys->sinks;
     sink->index = i->index;
-    sink->description = strdup(i->description);
     memcpy(sink->name, i->name, namelen + 1);
     sys->sinks = sink;
 }
@@ -112,18 +111,14 @@ static void sink_mod_cb(pa_context *ctx, const pa_sink_info *i, int eol,
                         void *userdata)
 {
     audio_output_t *aout = userdata;
-    aout_sys_t *sys = aout->sys;
 
     if (eol)
         return;
     (void) ctx;
 
-    for (struct sink *sink = sys->sinks; sink != NULL; sink = sink->next)
-        if (sink->index == i->index)
-        {
-            free(sink->description);
-            sink->description = strdup(i->description);
-        }
+    msg_Dbg(aout, "changing sink %"PRIu32": %s (%s)", i->index, i->name,
+            i->description);
+    aout_HotplugReport(aout, i->name, i->description);
 }
 
 static void sink_del(uint32_t index, audio_output_t *aout)
@@ -131,11 +126,13 @@ static void sink_del(uint32_t index, audio_output_t *aout)
     aout_sys_t *sys = aout->sys;
     struct sink **pp = &sys->sinks, *sink;
 
+    msg_Dbg(aout, "removing sink %"PRIu32, index);
+
     while ((sink = *pp) != NULL)
         if (sink->index == index)
         {
             *pp = sink->next;
-            free(sink->description);
+            aout_HotplugReport(aout, sink->name, NULL);
             free(sink);
         }
         else
@@ -663,28 +660,6 @@ static int MuteSet(audio_output_t *aout, bool mute)
     return 0;
 }
 
-static int SinksList(audio_output_t *aout, char ***namesp, char ***descsp)
-{
-    aout_sys_t *sys = aout->sys;
-    char **names, **descs;
-    unsigned n = 0;
-
-    pa_threaded_mainloop_lock(sys->mainloop);
-    for (struct sink *sink = sys->sinks; sink != NULL; sink = sink->next)
-        n++;
-
-    *namesp = names = xmalloc(sizeof(*names) * n);
-    *descsp = descs = xmalloc(sizeof(*descs) * n);
-
-    for (struct sink *sink = sys->sinks; sink != NULL; sink = sink->next)
-    {
-        *(names++) = strdup(sink->name);
-        *(descs++) = strdup(sink->description);
-    }
-    pa_threaded_mainloop_unlock(sys->mainloop);
-    return n;
-}
-
 static int StreamMove(audio_output_t *aout, const char *name)
 {
     aout_sys_t *sys = aout->sys;
@@ -1017,7 +992,6 @@ static int Open(vlc_object_t *obj)
     aout->flush = Flush;
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
-    aout->device_enum = SinksList;
     aout->device_select = StreamMove;
 
     pa_threaded_mainloop_lock(sys->mainloop);
@@ -1052,7 +1026,6 @@ static void Close(vlc_object_t *obj)
     for (struct sink *sink = sys->sinks, *next; sink != NULL; sink = next)
     {
         next = sink->next;
-        free(sink->description);
         free(sink);
     }
     free(sys->sink_force);
