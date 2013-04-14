@@ -143,15 +143,17 @@
     IBOutlet NSMenu * o_mu_aspect_ratio;
     IBOutlet NSMenuItem * o_mi_crop;
     IBOutlet NSMenu * o_mu_crop;
-    IBOutlet NSMenuItem * o_mi_subtitle;
-    IBOutlet NSMenu * o_mu_subtitle;
-    IBOutlet NSMenuItem * o_mi_addSub;
     IBOutlet NSMenuItem * o_mi_deinterlace;
     IBOutlet NSMenu * o_mu_deinterlace;
     IBOutlet NSMenuItem * o_mi_deinterlace_mode;
     IBOutlet NSMenu * o_mu_deinterlace_mode;
     IBOutlet NSMenuItem * o_mi_ffmpeg_pp;
     IBOutlet NSMenu * o_mu_ffmpeg_pp;
+
+    IBOutlet NSMenu * o_mu_subtitles;
+    IBOutlet NSMenuItem * o_mi_subtitle_track;
+    IBOutlet NSMenu * o_mu_subtitle_tracks;
+    IBOutlet NSMenuItem * o_mi_openSubtitleFile;
     IBOutlet NSMenuItem * o_mi_teletext;
     IBOutlet NSMenuItem * o_mi_teletext_transparent;
     IBOutlet NSMenuItem * o_mi_teletext_index;
@@ -244,6 +246,10 @@
 - (IBAction)floatOnTop:(id)sender;
 - (IBAction)createVideoSnapshot:(id)sender;
 - (IBAction)toggleFullscreenDevice:(id)sender;
+
+- (IBAction)addSubtitleFile:(id)sender;
+- (IBAction)telxTransparent:(id)sender;
+- (IBAction)telxNavLink:(id)sender;
 
 - (IBAction)showWizard:(id)sender;
 - (IBAction)showConvertAndSave:(id)sender;

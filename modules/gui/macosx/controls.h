@@ -61,10 +61,7 @@
 
 - (IBAction)showPosition: (id)sender;
 
-- (IBAction)telxTransparent:(id)sender;
-- (IBAction)telxNavLink:(id)sender;
 - (IBAction)lockVideosAspectRatio:(id)sender;
-- (IBAction)addSubtitleFile:(id)sender;
 
 - (BOOL)keyEvent:(NSEvent *)o_event;
 
