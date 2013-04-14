@@ -356,31 +356,23 @@ static int MuteSet (audio_output_t *aout, bool mute)
     return 0;
 }
 
-static int DevicesEnum (audio_output_t *aout, char ***idp, char ***namep)
+static int DevicesEnum (audio_output_t *aout)
 {
-    aout_sys_t *sys = aout->sys;
-    int fd = sys->fd;
-    oss_sysinfo si;
-
+    int fd = vlc_open ("/dev/dsp", O_WRONLY);
     if (fd == -1)
-    {
-        fd = vlc_open ("/dev/dsp", O_WRONLY);
-        if (fd == -1)
-            return -1;
-    }
+        return -1;
+
+    oss_sysinfo si;
+    int n = -1;
 
     if (ioctl (fd, SNDCTL_SYSINFO, &si) < 0)
     {
         msg_Err (aout, "cannot get system infos: %m");
-        return -1;
+        goto out;
     }
 
     msg_Dbg (aout, "using %s version %s (0x%06X) under %s", si.product,
              si.version, si.versionnum, si.license);
-
-    char **ids = xmalloc (sizeof (*ids) * si.numaudios);
-    char **names = xmalloc (sizeof (*names) * si.numaudios);
-    int n = 0;
 
     for (int i = 0; i < si.numaudios; i++)
     {
@@ -398,16 +390,11 @@ static int DevicesEnum (audio_output_t *aout, char ***idp, char ***namep)
         if (!ai.enabled)
             continue;
 
-        ids[n] = xstrdup (ai.devnode);
-        names[n] = xstrdup (ai.name);
+        aout_HotplugReport (aout, ai.devnode, ai.name);
         n++;
     }
-
-    *idp = ids;
-    *namep = names;
-    if (sys->fd == -1)
-        close (fd);
-
+out:
+    close (fd);
     return n;
 }
 
@@ -449,8 +436,9 @@ static int Open (vlc_object_t *obj)
     aout->stop = Stop;
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
-    aout->device_enum = DevicesEnum;
     aout->device_select = DeviceSelect;
+
+    DevicesEnum (aout);
     return VLC_SUCCESS;
 }
 
