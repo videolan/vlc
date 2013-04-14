@@ -444,12 +444,26 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             int diff = (i_action == ACTIONID_SUBDELAY_UP) ? 50000 : -50000;
             if( p_input )
             {
+                vlc_value_t val, list, list2;
+                int i_count;
+                var_Get( p_input, "spu-es", &val );
+
+                var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
+                            &list, &list2 );
+                i_count = list.p_list->i_count;
+                if( i_count < 1 || val.i_int < 0 )
+                {
+                    DisplayMessage( p_vout, _("Subtitle delay: No active subtitle") );
+                    var_FreeList( &list, &list2 );
+                    break;
+                }
                 int64_t i_delay = var_GetTime( p_input, "spu-delay" ) + diff;
 
                 var_SetTime( p_input, "spu-delay", i_delay );
                 ClearChannels( p_intf, p_vout );
                 DisplayMessage( p_vout, _( "Subtitle delay %i ms" ),
                                 (int)(i_delay/1000) );
+                var_FreeList( &list, &list2 );
             }
             break;
         }
