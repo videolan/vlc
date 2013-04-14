@@ -62,7 +62,7 @@ struct vlc_va_sys_t
 {
     struct vda_context  hw_ctx;
 
-    const uint8_t       *p_extradata;
+    uint8_t             *p_extradata;
     int                 i_extradata;
 
     vlc_fourcc_t        i_chroma;
@@ -161,7 +161,6 @@ static int Setup( vlc_va_t *p_external, void **pp_hw_ctx, vlc_fourcc_t *pi_chrom
     p_va->hw_ctx.width = i_width;
     p_va->hw_ctx.height = i_height;
     p_va->hw_ctx.format = 'avc1';
-    p_va->hw_ctx.use_sync_decoding = 1;
 
     int i_pix_fmt = var_CreateGetInteger( p_va->p_log, "avcodec-vda-pix-fmt" );
 
@@ -207,7 +206,7 @@ static int Get( vlc_va_t *p_external, AVFrame *p_ff )
         p_ff->linesize[i] = 0;
 
         if( i == 0 || i == 3 )
-        p_ff->data[i] = 1; // dummy
+        p_ff->data[i] = (uint8_t *)1; // dummy
     }
 
     return VLC_SUCCESS;
@@ -265,17 +264,17 @@ static void Close( vlc_va_t *p_external )
 static int Open( vlc_va_t *external, int i_codec_id, const es_format_t *fmt )
 {
     if( i_codec_id != AV_CODEC_ID_H264 )
-        return NULL;
+        return VLC_EGENERIC;
 
     if( fmt->p_extra == NULL || fmt->i_extra < 7 )
     {
         msg_Warn( external, "VDA requires extradata." );
-        return NULL;
+        return VLC_EGENERIC;
     }
 
     vlc_va_vda_t *p_va = calloc( 1, sizeof(*p_va) );
     if( !p_va )
-        return NULL;
+        return VLC_EGENERIC;
 
     p_va->p_log = VLC_OBJECT(external);
     p_va->p_extradata = fmt->p_extra;
