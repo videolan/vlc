@@ -133,7 +133,6 @@ static int      StartAnalog             (audio_output_t *, audio_sample_format_t
 static int      StartSPDIF              (audio_output_t *, audio_sample_format_t *);
 static void     Stop                    (audio_output_t *);
 
-static int      DeviceList              (audio_output_t *p_aout, char ***namesp, char ***descsp);
 static void     RebuildDeviceList       (audio_output_t *);
 static int      SwitchAudioDevice       (audio_output_t *p_aout, const char *name);
 static int      VolumeSet               (audio_output_t *, float);
@@ -193,7 +192,6 @@ static int Open(vlc_object_t *obj)
     p_aout->stop = Stop;
     p_aout->volume_set = VolumeSet;
     p_aout->mute_set = MuteSet;
-    p_aout->device_enum = DeviceList;
     p_aout->sys->devices = NULL;
     p_aout->device_select = SwitchAudioDevice;
 
@@ -967,41 +965,12 @@ static void Stop(audio_output_t *p_aout)
 #pragma mark -
 #pragma mark core interaction
 
-static int DeviceList(audio_output_t *p_aout, char ***namesp, char ***descsp)
+static void ReportDevice(audio_output_t *p_aout, UInt32 i_id, char *name)
 {
-    struct aout_sys_t   *p_sys = p_aout->sys;
-    char **names, **descs;
-    unsigned n = 0;
-
-    for (struct audio_device_t *device = p_sys->devices; device != NULL; device = device->next)
-        n++;
-
-    *namesp = names = xmalloc(sizeof(*names) * n);
-    *descsp = descs = xmalloc(sizeof(*descs) * n);
-
     char deviceid[100];
-    for (struct audio_device_t *device = p_sys->devices; device != NULL; device = device->next) {
-        sprintf(deviceid, "%i", device->deviceid);
-        *(names++) = strdup(deviceid);
-        *(descs++) = strdup(device->name);
-    }
+    sprintf(deviceid, "%i", i_id);
 
-    return n;
-}
-
-static void add_device_to_list(audio_output_t * p_aout, UInt32 i_id, char *name)
-{
-    struct aout_sys_t *p_sys = p_aout->sys;
-
-    struct audio_device_t *device = malloc(sizeof(*device));
-    if (unlikely(device == NULL))
-        return;
-
-    device->next = p_sys->devices;
-    device->deviceid = i_id;
-    device->name = strdup(name);
-
-    p_sys->devices = device;
+    aout_HotplugReport(p_aout, deviceid, name);
 }
 
 static void RebuildDeviceList(audio_output_t * p_aout)
@@ -1096,7 +1065,7 @@ static void RebuildDeviceList(audio_output_t * p_aout)
             continue;
         }
 
-        add_device_to_list(p_aout, i_id, psz_name);
+        ReportDevice(p_aout, i_id, psz_name);
 
         if (AudioDeviceSupportsDigital(p_aout, deviceIDs[i])) {
             b_digital = true;
@@ -1104,7 +1073,7 @@ static void RebuildDeviceList(audio_output_t * p_aout)
             char *psz_encoded_name = nil;
             asprintf(&psz_encoded_name, _("%s (Encoded Output)"), psz_name);
             i_id = i_id | AOUT_VAR_SPDIF_FLAG;
-            add_device_to_list(p_aout, i_id, psz_encoded_name);
+            ReportDevice(p_aout, i_id, psz_encoded_name);
             free(psz_encoded_name);
         }
 
@@ -1116,7 +1085,7 @@ static void RebuildDeviceList(audio_output_t * p_aout)
     }
 
     // TODO: fix default audio device
-    add_device_to_list(p_aout, 0, _("System Sound Output Device"));
+    ReportDevice(p_aout, 0, _("System Sound Output Device"));
 
     free(deviceIDs);
 }
