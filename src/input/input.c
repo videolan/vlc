@@ -2410,6 +2410,8 @@ static int InputSourceInit( input_thread_t *p_input,
         msg_Dbg( p_input, "trying to pre-parse %s",  psz_path );
     }
 
+    mtime_t i_pts_delay;
+
     if( in->p_demux )
     {
         /* Get infos from access_demux */
@@ -2453,10 +2455,10 @@ static int InputSourceInit( input_thread_t *p_input,
         var_SetBool( p_input, "can-seek", b_can_seek );
     }
     else
-    {
-        /* Now try a real access */
-        in->p_access = access_New( p_input, p_input, psz_access, psz_demux, psz_path );
-        if( in->p_access == NULL )
+    {   /* Now try a real access */
+        access_t *p_access = access_New( p_input, p_input,
+                                         psz_access, psz_demux, psz_path );
+        if( p_access == NULL )
         {
             if( vlc_object_alive( p_input ) )
             {
@@ -2475,26 +2477,32 @@ static int InputSourceInit( input_thread_t *p_input,
             bool b_can_seek;
 
             in->b_title_demux = false;
-            if( access_Control( in->p_access, ACCESS_GET_TITLE_INFO,
-                                 &in->title, &in->i_title,
+            if( access_Control( p_access, ACCESS_GET_TITLE_INFO,
+                                &in->title, &in->i_title,
                                 &in->i_title_offset, &in->i_seekpoint_offset ) )
 
             {
                 TAB_INIT( in->i_title, in->title );
             }
-            access_Control( in->p_access, ACCESS_CAN_CONTROL_PACE,
-                             &in->b_can_pace_control );
+            access_Control( p_access, ACCESS_CAN_CONTROL_PACE,
+                            &in->b_can_pace_control );
             in->b_can_rate_control = in->b_can_pace_control;
             in->b_rescale_ts = true;
 
-            access_Control( in->p_access, ACCESS_CAN_PAUSE, &in->b_can_pause );
+            access_Control( p_access, ACCESS_CAN_PAUSE, &in->b_can_pause );
             var_SetBool( p_input, "can-pause", in->b_can_pause || !in->b_can_pace_control ); /* XXX temporary because of es_out_timeshift*/
             var_SetBool( p_input, "can-rate", !in->b_can_pace_control || in->b_can_rate_control ); /* XXX temporary because of es_out_timeshift*/
             var_SetBool( p_input, "can-rewind", !in->b_rescale_ts && !in->b_can_pace_control );
 
-            access_Control( in->p_access, ACCESS_CAN_SEEK, &b_can_seek );
+            access_Control( p_access, ACCESS_CAN_SEEK, &b_can_seek );
             var_SetBool( p_input, "can-seek", b_can_seek );
+
+            access_Control( p_access, ACCESS_GET_PTS_DELAY, &i_pts_delay );
         }
+
+        /* Access-forced demuxer (PARENTAL ADVISORY: EXPLICIT HACK) */
+        if( !*psz_demux && *p_access->psz_demux )
+            psz_demux = p_access->psz_demux;
 
         /* */
         int  i_input_list;
@@ -2538,7 +2546,7 @@ static int InputSourceInit( input_thread_t *p_input,
             TAB_APPEND( i_input_list, ppsz_input_list, NULL );
 
         /* Create the stream_t */
-        in->p_stream = stream_AccessNew( in->p_access, ppsz_input_list );
+        in->p_stream = stream_AccessNew( p_access, ppsz_input_list );
         if( ppsz_input_list )
         {
             for( int i = 0; ppsz_input_list[i] != NULL; i++ )
@@ -2559,12 +2567,6 @@ static int InputSourceInit( input_thread_t *p_input,
                                               psz_stream_filter,
                                               var_GetBool( p_input, "input-record-native" ) );
         free( psz_stream_filter );
-
-        /* Open a demuxer */
-        if( *psz_demux == '\0' && *in->p_access->psz_demux )
-        {
-            psz_demux = in->p_access->psz_demux;
-        }
 
         in->p_demux = demux_New( p_input, p_input, psz_access, psz_demux,
                    /* Take access/stream redirections into account: */
@@ -2602,6 +2604,7 @@ static int InputSourceInit( input_thread_t *p_input,
                 in->b_title_demux = true;
             }
         }
+        in->p_access = p_access; /* <- TODO: remove this nasty pointer */
     }
 
     free( psz_var_demux );
@@ -2638,12 +2641,7 @@ static int InputSourceInit( input_thread_t *p_input,
          * fallback to access */
         if( demux_Control( in->p_demux, DEMUX_GET_PTS_DELAY,
                            &in->i_pts_delay ) )
-        {
-            /* GET_PTS_DELAY is mandatory for access_demux */
-            assert( in->p_access );
-            access_Control( in->p_access,
-                            ACCESS_GET_PTS_DELAY, &in->i_pts_delay );
-        }
+            in->i_pts_delay = i_pts_delay;
         if( in->i_pts_delay > INPUT_PTS_DELAY_MAX )
             in->i_pts_delay = INPUT_PTS_DELAY_MAX;
         else if( in->i_pts_delay < 0 )
