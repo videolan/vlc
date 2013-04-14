@@ -37,6 +37,14 @@
 
 static const char unset_str[1] = ""; /* Non-NULL constant string pointer */
 
+struct aout_dev
+{
+    aout_dev_t *next;
+    char *name;
+    char id[1];
+};
+
+
 /* Local functions */
 static void aout_OutputAssertLocked (audio_output_t *aout)
 {
@@ -86,6 +94,50 @@ static void aout_DeviceNotify (audio_output_t *aout, const char *id)
     var_SetString (aout, "device", (id != NULL) ? id : "");
 }
 
+static void aout_HotplugNotify (audio_output_t *aout,
+                                const char *id, const char *name)
+{
+    aout_owner_t *owner = aout_owner (aout);
+    aout_dev_t *dev, **pp = &owner->dev.list;
+
+    vlc_mutex_lock (&owner->dev.lock);
+    while ((dev = *pp) != NULL)
+    {
+        if (!strcmp (id, dev->id))
+            break;
+        pp = &dev->next;
+    }
+
+    if (name != NULL)
+    {
+        if (dev == NULL) /* Added device */
+        {
+            dev = malloc (sizeof (*dev) + strlen (id));
+            if (unlikely(dev == NULL))
+                goto out;
+            dev->next = NULL;
+            strcpy (dev->id, id);
+            *pp = dev;
+            owner->dev.count++;
+        }
+        else /* Modified device */
+            free (dev->name);
+        dev->name = strdup (name);
+    }
+    else
+    {
+        if (dev != NULL) /* Removed device */
+        {
+            owner->dev.count--;
+            *pp = dev->next;
+            free (dev->name);
+            free (dev);
+        }
+    }
+out:
+    vlc_mutex_unlock (&owner->dev.lock);
+}
+
 static void aout_RestartNotify (audio_output_t *aout, unsigned mode)
 {
     aout_RequestRestart (aout, mode);
@@ -118,6 +170,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
 
     vlc_mutex_init (&owner->lock);
     vlc_mutex_init (&owner->req.lock);
+    vlc_mutex_init (&owner->dev.lock);
     owner->req.device = (char *)unset_str;
     owner->req.volume = -1.f;
     owner->req.mute = -1;
@@ -133,8 +186,9 @@ audio_output_t *aout_New (vlc_object_t *parent)
 
     aout->event.volume_report = aout_VolumeNotify;
     aout->event.mute_report = aout_MuteNotify;
-    aout->event.device_report = aout_DeviceNotify;
     aout->event.policy_report = aout_PolicyNotify;
+    aout->event.device_report = aout_DeviceNotify;
+    aout->event.hotplug_report = aout_HotplugNotify;
     aout->event.gain_request = aout_GainNotify;
     aout->event.restart_request = aout_RestartNotify;
 
@@ -143,7 +197,6 @@ audio_output_t *aout_New (vlc_object_t *parent)
     aout->stop = NULL;
     aout->volume_set = NULL;
     aout->mute_set = NULL;
-    aout->device_enum = NULL;
     aout->device_select = NULL;
     owner->module = module_need (aout, "audio output", "$aout", false);
     if (owner->module == NULL)
@@ -276,6 +329,14 @@ static void aout_Destructor (vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_owner_t *owner = aout_owner (aout);
+
+    vlc_mutex_destroy (&owner->dev.lock);
+    for (aout_dev_t *dev = owner->dev.list, *next; dev != NULL; dev = next)
+    {
+        next = dev->next;
+        free (dev->name);
+        free (dev);
+    }
 
     assert (owner->req.device == unset_str);
     vlc_mutex_destroy (&owner->req.lock);
@@ -461,14 +522,6 @@ static int aout_OutputDeviceSet (audio_output_t *aout, const char *id)
     return (aout->device_select != NULL) ? aout->device_select (aout, id) : -1;
 }
 
-static int aout_OutputDevicesEnum (audio_output_t *aout,
-                                   char ***ids, char ***names)
-{
-    aout_OutputAssertLocked (aout);
-    return (aout->device_enum != NULL) ? aout->device_enum (aout, ids, names)
-                                       : -1;
-}
-
 void aout_OutputLock (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
@@ -624,10 +677,22 @@ int aout_DeviceSet (audio_output_t *aout, const char *id)
  */
 int aout_DevicesList (audio_output_t *aout, char ***ids, char ***names)
 {
-    int ret;
+    aout_owner_t *owner = aout_owner (aout);
+    char **tabid, **tabname;
+    unsigned count;
 
-    aout_OutputLock (aout);
-    ret = aout_OutputDevicesEnum (aout, ids, names);
-    aout_OutputUnlock (aout);
-    return ret;
+    vlc_mutex_lock (&owner->dev.lock);
+    count = owner->dev.count;
+    tabid = xmalloc (sizeof (*tabid) * count);
+    tabname = xmalloc (sizeof (*tabname) * count);
+    *ids = tabid;
+    *names = tabname;
+    for (aout_dev_t *dev = owner->dev.list; dev != NULL; dev = dev->next)
+    {
+        *(tabid++) = xstrdup (dev->id);
+        *(tabname++) = xstrdup (dev->name);
+    }
+    vlc_mutex_unlock (&owner->dev.lock);
+
+    return count;
 }

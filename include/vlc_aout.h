@@ -178,6 +178,7 @@ struct audio_output
         void (*mute_report)(audio_output_t *, bool);
         void (*policy_report)(audio_output_t *, bool);
         void (*device_report)(audio_output_t *, const char *);
+        void (*hotplug_report)(audio_output_t *, const char *, const char *);
         int (*gain_request)(audio_output_t *, float);
         void (*restart_request)(audio_output_t *, unsigned);
     } event;
@@ -296,6 +297,17 @@ static inline void aout_PolicyReport(audio_output_t *aout, bool cork)
 static inline void aout_DeviceReport(audio_output_t *aout, const char *id)
 {
     aout->event.device_report(aout, id);
+}
+
+/**
+ * Report a device hot-plug event.
+ * @param id device ID
+ * @param name human-readable device name (NULL for hot unplug)
+ */
+static inline void aout_HotplugReport(audio_output_t *aout,
+                                      const char *id, const char *name)
+{
+    aout->event.hotplug_report(aout, id, name);
 }
 
 /**
