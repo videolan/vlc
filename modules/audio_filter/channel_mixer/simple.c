@@ -247,7 +247,7 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     p_filter->p_sys = malloc( sizeof(*p_sys) );
-    if( unlikely(p_filter->p_sys) )
+    if( unlikely(!p_filter->p_sys) )
         return VLC_ENOMEM;
 
     p_filter->pf_audio_filter = Filter;
