@@ -409,7 +409,7 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str, unsigned char opt)
      * URL scheme, the two subsequent slashes are not required.
      * VLC uses a different scheme for historical compatibility reasons - the
      * scheme is often implicit. */
-    if (*next == ':' && !strncmp (next + 1, "//", 2))
+    if (!strncmp (next, "://", 3))
     {
         *next = '\0';
         next += 3;
