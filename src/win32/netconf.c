@@ -54,7 +54,7 @@ char *vlc_getProxyUrl(const char *url)
     /* Get the proxy URL :
        Proxy server value in the registry can be something like "address:port"
        or "ftp=address1:port1;http=address2:port2 ..."
-       depending of the confirguration. */
+       depending of the configuration. */
     unsigned char key[256];
 
     len = sizeof( key );

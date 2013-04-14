@@ -252,6 +252,7 @@ SOURCES_libvlc_darwin = \
 	posix/timer.c \
 	darwin/specific.c \
 	posix/rand.c \
+	darwin/netconf.c \
 	$(NULL)
 
 SOURCES_libvlc_android = \
