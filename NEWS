@@ -16,6 +16,9 @@ Core:
  * Fix support for .001, .00x split files on Windows
  * Full support for UNICODE Windows mode
  * Partial support for Windows Store App
+ * Removed SQL support
+ * Added audio fingerprinter support
+ * Disabled and marked obsolete --language selection
 
 Decoders:
  * Support for OPUS via libopus.
@@ -105,6 +108,10 @@ Stream Output:
  * Livehttp allows setting cachin-variable in playlist
  * Livehttp stream encryption support
  * Livehttp supports changing encryption key and uri on segment change with key-loadfile option
+ * Added chromaprint based audio fingerprinting
+
+Fingerprinters:
+ * Added AcoustID/Musicbrainz based fingerprinter
 
 Interfaces:
  * configurable password for the HTTP server.
@@ -167,6 +174,8 @@ Qt:
  * Display playlist total duration
  * Support for a Maximum volume in the UI
  * Numerous fixes
+ * Add audio track fingerprinting from media info
+ * Removed language preference
 
 libVLC:
  * new libvlc_audio_output_device_list_get and libvlc_audio_output_device_list_release functions
@@ -176,6 +185,7 @@ libVLC:
  * new libvlc_log_subscribe and libvlc_log_unsubscribe function to register logging callbacks
  * new libvlc_media_tracks_get and libvlc_media_tracks_release methods to get more info about the
    media tracks. libvlc_media_get_tracks_info is now deprecated.
+ * new fingerprinter_Create and fingerprinter_Destroy for fingerprinter support.
 
 Removed modules:
  * portaudio audio output: use the native audio output instead
@@ -193,6 +203,8 @@ Removed modules:
  * OSD parser and menu
  * Xscreensaver: use xdg-screensaver
  * Removed DLL loader for non-Windows Operating Systems
+ * SQL Media Library (broken and unmaintained)
+ * SQL Lite (only used as SQL Media library backend)
 
 
 Changes between 2.0.4 and 2.0.5:
