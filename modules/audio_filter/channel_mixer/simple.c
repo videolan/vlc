@@ -125,6 +125,22 @@ static void DoWork_7_x_to_2_0( filter_t * p_filter,  block_t * p_in_buf, block_t
     }
 }
 
+static void DoWork_6_1_to_2_0( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
+    VLC_UNUSED(p_filter);
+    float *p_dest = (float *)p_out_buf->p_buffer;
+    const float *p_src = (const float *)p_in_buf->p_buffer;
+    for( int i = p_in_buf->i_nb_samples; i--; )
+    {
+        *p_dest++ = p_src[0] + 0.7071 * (p_src[3] + (p_src[2] + p_src[5]) / 2);
+        *p_dest++ = p_src[1] + 0.7071 * (p_src[4] + (p_src[2] + p_src[5]) / 2);
+
+        p_src += 6;
+
+        /* We always have LFE here */
+        p_src++;
+    }
+}
+
 static void DoWork_5_x_to_2_0( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
     float *p_dest = (float *)p_out_buf->p_buffer;
     const float *p_src = (const float *)p_in_buf->p_buffer;
@@ -280,6 +296,7 @@ static void DoWork_7_x_to_5_x( filter_t * p_filter,  block_t * p_in_buf, block_t
 }
 
 static void DoWork_6_1_to_5_x( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
+    VLC_UNUSED(p_filter);
     float *p_dest = (float *)p_out_buf->p_buffer;
     const float *p_src = (const float *)p_in_buf->p_buffer;
     for( int i = p_in_buf->i_nb_samples; i--; )
@@ -337,6 +354,8 @@ static int OpenFilter( vlc_object_t *p_this )
     {
         if( b_input_7_0 )
             p_filter->p_sys->pf_dowork = DoWork_7_x_to_2_0;
+        else if( b_input_6_1 )
+            p_filter->p_sys->pf_dowork = DoWork_6_1_to_2_0;
         else if( b_input_5_0 )
             p_filter->p_sys->pf_dowork = DoWork_5_x_to_2_0;
         else if( b_input_4_center_rear )
@@ -424,5 +443,4 @@ static block_t *Filter( filter_t *p_filter, block_t *p_block )
 
     return p_out;
 }
-
 
