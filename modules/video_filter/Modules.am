@@ -52,6 +52,16 @@ if HAVE_GCRYPT
 libvlc_LTLIBRARIES += libremoteosd_plugin.la
 endif
 
+libpuzzle_plugin_la_SOURCES = \
+	puzzle.c puzzle.h \
+	puzzle_bezier.c puzzle_bezier.h \
+	puzzle_lib.c puzzle_lib.h \
+	puzzle_mgt.c puzzle_mgt.h \
+	puzzle_pce.c puzzle_pce.h
+libpuzzle_plugin_la_CFLAGS = $(AM_CFLAGS)
+libpuzzle_plugin_la_LIBADD = $(AM_LIBADD)
+libvlc_LTLIBRARIES += libpuzzle_plugin.la
+
 SOURCES_magnify = magnify.c
 SOURCES_wave = wave.c
 SOURCES_ripple = ripple.c
@@ -75,7 +85,6 @@ SOURCES_rotate = \
 	$(motion_extra) \
 	$(NULL)
 
-SOURCES_puzzle = puzzle.c
 SOURCES_colorthres = colorthres.c
 SOURCES_extract = extract.c
 SOURCES_sharpen = sharpen.c
@@ -149,7 +158,6 @@ libvlc_LTLIBRARIES += \
 	libmotiondetect_plugin.la \
 	libposterize_plugin.la \
 	libpsychedelic_plugin.la \
-	libpuzzle_plugin.la \
 	libripple_plugin.la \
 	librotate_plugin.la \
 	librss_plugin.la \
