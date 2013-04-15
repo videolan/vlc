@@ -185,7 +185,7 @@ vlc_module_begin ()
 
 
     add_string( ENC_CFG_PREFIX "codec", NULL, CODEC_TEXT, CODEC_LONGTEXT, true )
-    add_string( ENC_CFG_PREFIX "hq", "simple", ENC_HQ_TEXT,
+    add_string( ENC_CFG_PREFIX "hq", "rd", ENC_HQ_TEXT,
                 ENC_HQ_LONGTEXT, false )
         change_string_list( enc_hq_list, enc_hq_list_text )
     add_integer( ENC_CFG_PREFIX "keyint", 0, ENC_KEYINT_TEXT,
