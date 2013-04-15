@@ -46,43 +46,45 @@ char *vlc_getProxyUrl(const char *url)
         CFNumberRef cfn_httpProxyOn =
             (CFNumberRef)CFDictionaryGetValue(proxies,
                                               kSCPropNetProxiesHTTPEnable);
-        int i_httpProxyOn;
-        CFNumberGetValue(cfn_httpProxyOn, kCFNumberIntType, &i_httpProxyOn);
-        CFRelease(cfn_httpProxyOn);
+        if (cfn_httpProxyOn) {
+            int i_httpProxyOn;
+            CFNumberGetValue(cfn_httpProxyOn, kCFNumberIntType, &i_httpProxyOn);
+            CFRelease(cfn_httpProxyOn);
 
-        if (i_httpProxyOn == 1) // http proxy is on
-        {
-            CFStringRef httpProxy =
-                (CFStringRef)CFDictionaryGetValue(proxies,
-                                                  kSCPropNetProxiesHTTPProxy);
+            if (i_httpProxyOn == 1) // http proxy is on
+            {
+                CFStringRef httpProxy =
+                    (CFStringRef)CFDictionaryGetValue(proxies,
+                                                      kSCPropNetProxiesHTTPProxy);
 
-            if (httpProxy) {
-                CFNumberRef cfn_httpProxyPort =
-                    (CFNumberRef)CFDictionaryGetValue(proxies,
-                                                    kSCPropNetProxiesHTTPPort);
-                int i_httpProxyPort;
-                CFNumberGetValue(cfn_httpProxyPort,
-                                 kCFNumberIntType,
-                                 &i_httpProxyPort);
-                CFRelease(cfn_httpProxyPort);
+                if (httpProxy) {
+                    CFNumberRef cfn_httpProxyPort =
+                        (CFNumberRef)CFDictionaryGetValue(proxies,
+                                                        kSCPropNetProxiesHTTPPort);
+                    int i_httpProxyPort;
+                    CFNumberGetValue(cfn_httpProxyPort,
+                                     kCFNumberIntType,
+                                     &i_httpProxyPort);
+                    CFRelease(cfn_httpProxyPort);
 
-                CFMutableStringRef outputURL =
-                    CFStringCreateMutableCopy(kCFAllocatorDefault,
-                                              0,
-                                              httpProxy);
-                if (i_httpProxyPort > 0)
-                    CFStringAppendFormat(outputURL,
-                                         NULL,
-                                         CFSTR(":%i"),
-                                         i_httpProxyPort);
+                    CFMutableStringRef outputURL =
+                        CFStringCreateMutableCopy(kCFAllocatorDefault,
+                                                  0,
+                                                  httpProxy);
+                    if (i_httpProxyPort > 0)
+                        CFStringAppendFormat(outputURL,
+                                             NULL,
+                                             CFSTR(":%i"),
+                                             i_httpProxyPort);
 
-                CFStringGetCString(outputURL,
-                                   proxy_url,
-                                   sizeof(proxy_url),
-                                   kCFStringEncodingASCII);
-                CFRelease(outputURL);
+                    CFStringGetCString(outputURL,
+                                       proxy_url,
+                                       sizeof(proxy_url),
+                                       kCFStringEncodingASCII);
+                    CFRelease(outputURL);
+                }
+                CFRelease(httpProxy);
             }
-            CFRelease(httpProxy);
         }
         CFRelease(proxies);
     }
