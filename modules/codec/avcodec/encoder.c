@@ -346,8 +346,12 @@ int OpenEncoder( vlc_object_t *p_this )
     p_sys->b_mpeg4_matrix = var_GetBool( p_enc, ENC_CFG_PREFIX "mpeg4-matrix" );
 
     f_val = var_GetFloat( p_enc, ENC_CFG_PREFIX "qscale" );
-    if( f_val < 0.01 || f_val > 255.0 ) f_val = 0;
-    p_sys->i_quality = (int)(FF_QP2LAMBDA * f_val + 0.5);
+
+    p_sys->i_quality = 0;
+    if( f_val < 0.01 || f_val > 255.0 )
+        f_val = 0;
+    else
+        p_sys->i_quality = (int)(FF_QP2LAMBDA * f_val + 0.5);
 
     psz_val = var_GetString( p_enc, ENC_CFG_PREFIX "hq" );
     p_sys->i_hq = FF_MB_DECISION_RD;
