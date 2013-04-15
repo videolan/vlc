@@ -797,7 +797,7 @@ static ssize_t openNextFile( sout_access_out_t *p_access, sout_access_out_sys_t 
     segment->i_segment_number = i_newseg;
     segment->psz_filename = formatSegmentPath( p_access->psz_path, i_newseg, true );
     char *psz_idxFormat = p_sys->psz_indexUrl ? p_sys->psz_indexUrl : p_access->psz_path;
-    segment->psz_uri = formatSegmentPath( psz_idxFormat , i_newseg, true );
+    segment->psz_uri = formatSegmentPath( psz_idxFormat , i_newseg, false );
 
     if ( unlikely( !segment->psz_filename ) )
     {
