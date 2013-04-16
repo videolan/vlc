@@ -39,8 +39,14 @@
 background-color: rgb(245, 245, 245);</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="3" column="2" rowspan="4">
+      <item row="2" column="2" rowspan="4">
        <widget class="QStackedWidget" name="stackedWidget">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+          <horstretch>10</horstretch>
+          <verstretch>10</verstretch>
+         </sizepolicy>
+        </property>
         <property name="lineWidth">
          <number>0</number>
         </property>
@@ -155,7 +161,7 @@ background-color: rgb(245, 245, 245);</string>
         </widget>
        </widget>
       </item>
-      <item row="1" column="0" rowspan="6">
+      <item row="0" column="0" rowspan="6">
        <widget class="QLabel" name="VLCcone">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -192,7 +198,7 @@ background-color: rgb(245, 245, 245);</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
+      <item row="0" column="2">
        <widget class="QLabel" name="title">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -203,7 +209,7 @@ background-color: rgb(245, 245, 245);</string>
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>40</height>
+          <height>50</height>
          </size>
         </property>
         <property name="baseSize">
@@ -212,15 +218,15 @@ background-color: rgb(245, 245, 245);</string>
           <height>0</height>
          </size>
         </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
         <property name="text">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:26pt; color:#353535;&quot;&gt;VLC media player&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+        </property>
        </widget>
       </item>
-      <item row="2" column="2">
+      <item row="1" column="2">
        <widget class="QLabel" name="version">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
@@ -239,19 +245,6 @@ margin-bottom: 6px;</string>
          <string/>
         </property>
        </widget>
-      </item>
-      <item row="0" column="2">
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>0</width>
-          <height>10</height>
-         </size>
-        </property>
-       </spacer>
       </item>
      </layout>
     </widget>
