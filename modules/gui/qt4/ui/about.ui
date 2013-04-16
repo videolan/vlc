@@ -179,6 +179,12 @@ background-color: rgb(245, 245, 245);</string>
          </layout>
         </widget>
         <widget class="QTextEdit" name="licensePage">
+         <property name="font">
+          <font>
+           <family>Courier</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
          <property name="frameShadow">
           <enum>QFrame::Plain</enum>
          </property>
