@@ -76,6 +76,7 @@ struct stream_sys_t
     vlc_thread_t thread;
     pid_t        pid;
     int          write_fd, read_fd;
+    bool         can_pace;
 };
 
 extern char **environ;
@@ -244,7 +245,11 @@ static int Control (stream_t *stream, int query, va_list args)
     {
         case STREAM_CAN_SEEK:
         case STREAM_CAN_FASTSEEK:
+        case STREAM_CAN_PAUSE: /* TODO: support pause */
             *(va_arg (args, bool *)) = false;
+            break;
+        case STREAM_CAN_CONTROL_PACE:
+            *(va_arg (args, bool *)) = p_sys->can_pace;
             break;
         case STREAM_GET_POSITION:
             *(va_arg (args, uint64_t *)) = p_sys->offset;
@@ -275,6 +280,8 @@ static int Open (stream_t *stream, const char *path)
     p_sys->peeked = NULL;
     p_sys->offset = 0;
     p_sys->pid = -1;
+    stream_Control (stream->p_source, STREAM_CAN_CONTROL_PACE,
+                    &p_sys->can_pace);
 
     /* I am not a big fan of the pyramid style, but I cannot think of anything
      * better here. There are too many failure cases. */
