@@ -151,8 +151,10 @@ bool AboutDialog::eventFilter(QObject *obj, QEvent *event)
             }
             return true;
         }
+        return false;
     }
-    return false;
+
+    return QVLCDialog::eventFilter( obj, event);
 }
 #ifdef UPDATE_CHECK
 
