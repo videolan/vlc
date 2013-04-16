@@ -279,41 +279,50 @@ background-color: rgb(230, 230, 230);</string>
        <number>0</number>
       </property>
       <item>
-       <widget class="QToolButton" name="authorsButton">
+       <widget class="QLabel" name="authorsButton">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="styleSheet">
          <string notr="true">padding: 10px</string>
         </property>
         <property name="text">
-         <string>Authors</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;Authors&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="autoRaise">
-         <bool>true</bool>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="licenseButton">
+       <widget class="QLabel" name="licenseButton">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="styleSheet">
          <string notr="true">padding: 10px</string>
         </property>
         <property name="text">
-         <string>License</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;License&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="autoRaise">
-         <bool>true</bool>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="creditsButton">
+       <widget class="QLabel" name="creditsButton">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="styleSheet">
          <string notr="true">padding: 10px;</string>
         </property>
         <property name="text">
-         <string>Credits</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;Credits&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="autoRaise">
-         <bool>true</bool>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>

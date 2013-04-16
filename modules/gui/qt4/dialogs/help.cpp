@@ -110,9 +110,9 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf)
     /* People who wrote the software */
     ui.authorsPage->setText( qfu( psz_authors ) );
 
-    BUTTONACT(ui.licenseButton, showLicense() );
-    BUTTONACT(ui.authorsButton, showAuthors() );
-    BUTTONACT(ui.creditsButton,  showCredit() );
+    ui.licenseButton->installEventFilter( this );
+    ui.authorsButton->installEventFilter( this );
+    ui.creditsButton->installEventFilter( this );
 
     ui.version->installEventFilter( this );
 }
@@ -134,9 +134,9 @@ void AboutDialog::showCredit()
 
 bool AboutDialog::eventFilter(QObject *obj, QEvent *event)
 {
-    if( obj == ui.version )
+    if (event->type() == QEvent::MouseButtonPress )
     {
-        if (event->type() == QEvent::MouseButtonPress )
+        if( obj == ui.version )
         {
             if( !b_advanced )
             {
@@ -151,6 +151,13 @@ bool AboutDialog::eventFilter(QObject *obj, QEvent *event)
             }
             return true;
         }
+        else if( obj == ui.licenseButton )
+            showLicense();
+        else if( obj == ui.authorsButton )
+            showAuthors();
+        else if( obj == ui.creditsButton )
+            showCredit();
+
         return false;
     }
 
