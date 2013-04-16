@@ -236,15 +236,11 @@ int FileOpen( vlc_object_t *p_this )
         posix_fadvise (fd, 0, 4096, POSIX_FADV_WILLNEED);
         /* In most cases, we only read the file once. */
         posix_fadvise (fd, 0, 0, POSIX_FADV_NOREUSE);
-#if defined(HAVE_FCNTL)
-        /* We'd rather use any available memory for reading ahead
-         * than for caching what we've already seen/heard */
-# if defined(F_RDAHEAD)
+#ifdef F_RDAHEAD
         fcntl (fd, F_RDAHEAD, 1);
-# endif
-# if defined(F_NOCACHE)
-        fcntl (fd, F_NOCACHE, 1);
-# endif
+#endif
+#ifdef F_NOCACHE
+        fcntl (fd, F_NOCACHE, 0);
 #endif
     }
     else
