@@ -240,6 +240,9 @@ background-color: rgb(245, 245, 245);</string>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="styleSheet">
          <string notr="true">font: 75 12pt &quot;Sans Serif&quot;;
 margin-bottom: 6px;</string>
