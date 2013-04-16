@@ -247,6 +247,11 @@ static int  Control         (stream_t *p_stream, int i_query, va_list args)
             /*TODO Support Seek */
             *(va_arg (args, bool *)) = SEEK;
             break;
+        case STREAM_CAN_PAUSE:
+        case STREAM_CAN_CONTROL_PACE:
+            *(va_arg (args, bool *)) = false; /* TODO */
+            break;
+
         case STREAM_GET_POSITION:
             *(va_arg (args, uint64_t *)) = p_sys->position;
             break;
