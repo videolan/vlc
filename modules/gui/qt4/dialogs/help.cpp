@@ -79,7 +79,7 @@ HelpDialog::~HelpDialog()
 }
 
 AboutDialog::AboutDialog( intf_thread_t *_p_intf)
-            : QVLCDialog( (QWidget*)_p_intf->p_sys->p_mi, _p_intf )
+            : QVLCDialog( (QWidget*)_p_intf->p_sys->p_mi, _p_intf ), b_advanced( false )
 {
     /* Build UI */
     ui.setupUi( this );
@@ -113,6 +113,8 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf)
     BUTTONACT(ui.licenseButton, showLicense() );
     BUTTONACT(ui.authorsButton, showAuthors() );
     BUTTONACT(ui.creditsButton,  showCredit() );
+
+    ui.version->installEventFilter( this );
 }
 
 void AboutDialog::showLicense()
@@ -130,6 +132,28 @@ void AboutDialog::showCredit()
     ui.stackedWidget->setCurrentWidget( ui.creditPage );
 }
 
+bool AboutDialog::eventFilter(QObject *obj, QEvent *event)
+{
+    if( obj == ui.version )
+    {
+        if (event->type() == QEvent::MouseButtonPress )
+        {
+            if( !b_advanced )
+            {
+                ui.version->setText(qfu( VLC_CompileBy() )+ "@" + qfu( VLC_CompileHost() )
+                    + __DATE__ + " " +__TIME__);
+                b_advanced = true;
+            }
+            else
+            {
+                ui.version->setText(qfu( " " VERSION_MESSAGE ) );
+                b_advanced = false;
+            }
+            return true;
+        }
+    }
+    return false;
+}
 #ifdef UPDATE_CHECK
 
 /*****************************************************************************

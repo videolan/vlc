@@ -60,6 +60,12 @@ private:
 public slots:
     friend class    Singleton<AboutDialog>;
 
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
+
+private:
+    bool b_advanced;
+
 private slots:
     void showLicense();
     void showAuthors();
