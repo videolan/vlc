@@ -71,11 +71,17 @@ vlc_module_end ()
 
 struct stream_sys_t
 {
-    block_t      *peeked;
-    uint64_t     offset;
+    /* Thread data */
+    int          write_fd;
+
+    /* Caller data */
     vlc_thread_t thread;
     pid_t        pid;
-    int          write_fd, read_fd;
+
+    uint64_t     offset;
+    block_t      *peeked;
+
+    int          read_fd;
     bool         can_pace;
 };
 
@@ -277,9 +283,10 @@ static int Open (stream_t *stream, const char *path)
     stream->pf_read = Read;
     stream->pf_peek = Peek;
     stream->pf_control = Control;
-    p_sys->peeked = NULL;
-    p_sys->offset = 0;
+
     p_sys->pid = -1;
+    p_sys->offset = 0;
+    p_sys->peeked = NULL;
     stream_Control (stream->p_source, STREAM_CAN_CONTROL_PACE,
                     &p_sys->can_pace);
 
@@ -344,12 +351,15 @@ static int Open (stream_t *stream, const char *path)
         }
         close (comp[0]);
         if (ret != VLC_SUCCESS)
-        {
             close (comp[1]);
-            if (p_sys->pid != -1)
-                while (waitpid (p_sys->pid, &(int){ 0 }, 0) == -1);
-        }
     }
+
+    if (ret == VLC_SUCCESS)
+        return VLC_SUCCESS;
+
+    if (p_sys->pid != -1)
+        while (waitpid (p_sys->pid, &(int){ 0 }, 0) == -1);
+    free (p_sys);
     return ret;
 }
 
