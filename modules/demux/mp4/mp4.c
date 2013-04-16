@@ -2505,13 +2505,13 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     if( p_track->i_timescale == 0 )
         return;
 
-    if( p_mdhd->data.p_mdhd->i_language_code < 0x800 )
+    if( p_mdhd->data.p_mdhd->i_language_code < 0x400 )
     {
-        /* We can convert i_language_code into iso 639 code,
-         * I won't */
         strcpy( language, MP4_ConvertMacCode( p_mdhd->data.p_mdhd->i_language_code ) );
         p_track->b_mac_encoding = true;
     }
+    else if( p_mdhd->data.p_mdhd->i_language_code == 0x7fff )
+        p_track->b_mac_encoding = true;
     else
     {
         for( unsigned i = 0; i < 3; i++ )
