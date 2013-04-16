@@ -74,6 +74,11 @@ struct stream_sys_t
     /* Thread data */
     int          write_fd;
 
+    /* Shared data */
+    vlc_cond_t   wait;
+    vlc_mutex_t  lock;
+    bool         paused;
+
     /* Caller data */
     vlc_thread_t thread;
     pid_t        pid;
@@ -83,6 +88,7 @@ struct stream_sys_t
 
     int          read_fd;
     bool         can_pace;
+    bool         can_pause;
 };
 
 extern char **environ;
@@ -122,7 +128,12 @@ static void *Thread (void *data)
         vlc_cleanup_push (free, buf);
 #endif
 
+        vlc_mutex_lock (&p_sys->lock);
+        while (p_sys->paused) /* practically always false, but... */
+            vlc_cond_wait (&p_sys->wait, &p_sys->lock);
         len = stream_Read (stream->p_source, buf, bufsize);
+        vlc_mutex_unlock (&p_sys->lock);
+
         vlc_restorecancel (canc);
         error = len <= 0;
 
@@ -251,8 +262,10 @@ static int Control (stream_t *stream, int query, va_list args)
     {
         case STREAM_CAN_SEEK:
         case STREAM_CAN_FASTSEEK:
-        case STREAM_CAN_PAUSE: /* TODO: support pause */
             *(va_arg (args, bool *)) = false;
+            break;
+        case STREAM_CAN_PAUSE:
+             *(va_arg (args, bool *)) = p_sys->can_pause;
             break;
         case STREAM_CAN_CONTROL_PACE:
             *(va_arg (args, bool *)) = p_sys->can_pace;
@@ -263,6 +276,17 @@ static int Control (stream_t *stream, int query, va_list args)
         case STREAM_GET_SIZE:
             *(va_arg (args, uint64_t *)) = 0;
             break;
+        case STREAM_SET_PAUSE_STATE:
+        {
+            bool paused = va_arg (args, unsigned);
+
+            vlc_mutex_lock (&p_sys->lock);
+            stream_Control (stream->p_source, STREAM_SET_PAUSE_STATE, paused);
+            p_sys->paused = paused;
+            vlc_cond_signal (&p_sys->wait);
+            vlc_mutex_unlock (&p_sys->lock);
+            break;
+        }
         default:
             return VLC_EGENERIC;
     }
@@ -284,9 +308,13 @@ static int Open (stream_t *stream, const char *path)
     stream->pf_peek = Peek;
     stream->pf_control = Control;
 
+    vlc_cond_init (&p_sys->wait);
+    vlc_mutex_init (&p_sys->lock);
+    p_sys->paused = false;
     p_sys->pid = -1;
     p_sys->offset = 0;
     p_sys->peeked = NULL;
+    stream_Control (stream->p_source, STREAM_CAN_PAUSE, &p_sys->can_pause);
     stream_Control (stream->p_source, STREAM_CAN_CONTROL_PACE,
                     &p_sys->can_pace);
 
@@ -359,6 +387,8 @@ static int Open (stream_t *stream, const char *path)
 
     if (p_sys->pid != -1)
         while (waitpid (p_sys->pid, &(int){ 0 }, 0) == -1);
+    vlc_mutex_destroy (&p_sys->lock);
+    vlc_cond_destroy (&p_sys->wait);
     free (p_sys);
     return ret;
 }
@@ -386,6 +416,8 @@ static void Close (vlc_object_t *obj)
 
     if (p_sys->peeked)
         block_Release (p_sys->peeked);
+    vlc_mutex_destroy (&p_sys->lock);
+    vlc_cond_destroy (&p_sys->wait);
     free (p_sys);
 }
 
