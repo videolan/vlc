@@ -142,11 +142,6 @@
                             <File Id='vlc.ico' Name='vlc.ico' KeyPath='yes' DiskId='1' />
                         </Component>
 
-                        <Component Id='CompRundep' Guid='9a4e5b99-6575-46b6-8744-3b4ddc5aa68d' Win64="$(var.Win64)">
-                            <File Id='libgcc_s_sjlj_1.dll' Name='libgcc_s_sjlj-1.dll' KeyPath='yes' Vital='yes' DiskId='1' />
-                            <File Id='libstdcpp_6.dll' Name='libstdc++-6.dll' Vital='yes' DiskId='1' />
-                        </Component>
-
                         <Directory Id='PLUGINSDIR' Name='plugins'>
                             <Component Id='CompPluginsCache' Guid='0b72e987-8e3c-4201-aa3e-5b57ca9c040e' Win64="$(var.Win64)">
                                 <RemoveFile Id="RemovePluginsCache" Name="plugins.dat" On="uninstall" />
@@ -290,7 +285,6 @@
             <ComponentRef Id='CompVLC' />
             <ComponentRef Id='CompLibvlccore' />
             <ComponentRef Id='CompLibvlc' />
-            <ComponentRef Id='CompRundep' />
             <ComponentRef Id='CompNpvlc' />
             <ComponentRef Id='CompCacheGen' />
             <ComponentRef Id='CompIcon' />
