@@ -203,7 +203,7 @@ vlc_module_begin ()
                  ARATE_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "audio-sync", false, ASYNC_TEXT,
               ASYNC_LONGTEXT, false )
-    add_module_list( SOUT_CFG_PREFIX "afilter",  "audio converter",
+    add_module_list( SOUT_CFG_PREFIX "afilter",  "audio filter",
                      NULL, AFILTER_TEXT, AFILTER_LONGTEXT, false )
 
     set_section( N_("Overlays/Subtitles"), NULL )
