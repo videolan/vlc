@@ -90,9 +90,17 @@ static VLAboutBox *_o_sharedInstance = nil;
 
         /* l10n */
         [o_about_window setTitle: _NS("About VLC media player")];
-        [o_credits_btn setTitle: _NS("Credits")];
-        [o_gpl_btn setTitle: _NS("License")];
-        [o_authors_btn setTitle: _NS("Authors")];
+        NSDictionary *stringAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:NSUnderlineStyleSingle], NSUnderlineStyleAttributeName, [NSColor colorWithCalibratedRed:0. green:0.3411 blue:0.6824 alpha:1.], NSForegroundColorAttributeName, [NSFont systemFontOfSize:13], NSFontAttributeName, nil];
+        NSAttributedString *attrStr;
+        attrStr = [[NSAttributedString alloc] initWithString:_NS("Credits") attributes:stringAttributes];
+        [o_credits_btn setAttributedTitle:attrStr];
+        [attrStr release];
+        attrStr = [[NSAttributedString alloc] initWithString:_NS("License") attributes:stringAttributes];
+        [o_gpl_btn setAttributedTitle:attrStr];
+        [attrStr release];
+        attrStr = [[NSAttributedString alloc] initWithString:_NS("Authors") attributes:stringAttributes];
+        [o_authors_btn setAttributedTitle:attrStr];
+        [attrStr release];
 
         /* setup the creator / revision field */
         NSString *compiler;
@@ -122,7 +130,7 @@ static VLAboutBox *_o_sharedInstance = nil;
         /* setup join us! */
         NSString *joinus = [NSString stringWithString:_NS("<p>VLC media player is a free and open source media player, encoder and streamer made by the volunteers of the "
                                "<a href=\"http://www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</span>"
-                               "</a> community.</p><p>VLC uses its internal codecs and works on essentially every popular platform and can read"
+                               "</a> community.</p><p>VLC uses its internal codecs and works on essentially every popular platform and can read "
                                "almost every files, CDs, DVDs, network streams, capture cards and other media formats!</p><p>"
                                "<a href=\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;\">Help "
                                "and join us!</span></a>")];
@@ -140,7 +148,7 @@ static VLAboutBox *_o_sharedInstance = nil;
         [o_about_window setExcludedFromWindowsMenu:YES];
         [o_about_window setMenu:nil];
         [o_about_window center];
-        [o_gpl_btn setTitle: _NS("License")];
+        [o_about_window setBackgroundColor: [NSColor colorWithCalibratedWhite:.96 alpha:1.]];
 
         if (config_GetInt(VLCIntf, "macosx-icon-change")) {
             /* After day 354 of the year, the usual VLC cone is replaced by another cone
