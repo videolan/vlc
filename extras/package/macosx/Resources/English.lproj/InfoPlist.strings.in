@@ -3,4 +3,4 @@
 CFBundleName = "VLC";
 CFBundleShortVersionString = "@VERSION@";
 CFBundleGetInfoString = "@COPYRIGHT_MESSAGE@";
-NSHumanReadableCopyright = "Copyright (c) @COPYRIGHT_YEARS@ the VideoLAN Team";
+NSHumanReadableCopyright = "Copyright (c) @COPYRIGHT_YEARS@ VLC authors and VideoLAN";
