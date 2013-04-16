@@ -108,6 +108,7 @@ enum stream_query_e
 
     /* */
     STREAM_GET_CONTENT_TYPE,    /**< arg1= char **         res=can fail */
+    STREAM_SET_PAUSE_STATE = 0x200, /**< arg1= bool        res=can fail */
 
     /* XXX only data read through stream_Read/Block will be recorded */
     STREAM_SET_RECORD_STATE,     /**< arg1=bool, arg2=const char *psz_ext (if arg1 is true)  res=can fail */

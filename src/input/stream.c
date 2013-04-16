@@ -616,6 +616,9 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
         case STREAM_GET_CONTENT_TYPE:
             return access_vaControl( p_access, ACCESS_GET_CONTENT_TYPE, args );
 
+        case STREAM_SET_PAUSE_STATE:
+            return access_vaControl( p_access, ACCESS_SET_PAUSE_STATE, args );
+
         case STREAM_SET_RECORD_STATE:
         default:
             msg_Err( s, "invalid stream_vaControl query=0x%x", i_query );
