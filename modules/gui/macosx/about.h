@@ -42,6 +42,7 @@
     IBOutlet id o_name_field;
     IBOutlet id o_icon_view;
     IBOutlet id o_joinus_txt;
+    IBOutlet id o_trademarks_txt;
 
     NSTimer *o_scroll_timer;
     float f_current;

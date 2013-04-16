@@ -101,6 +101,7 @@ static VLAboutBox *_o_sharedInstance = nil;
         attrStr = [[NSAttributedString alloc] initWithString:_NS("Authors") attributes:stringAttributes];
         [o_authors_btn setAttributedTitle:attrStr];
         [attrStr release];
+        [o_trademarks_txt setStringValue:_NS("VLC media player and VideoLAN are trademarks of the VideoLAN Association.")];
 
         /* setup the creator / revision field */
         NSString *compiler;
