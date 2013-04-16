@@ -260,7 +260,7 @@ int transcode_audio_new( sout_stream_t *p_stream,
         es_format_t fmt_fl32 = fmt_last;
         fmt_fl32.i_codec =
         fmt_fl32.audio.i_format = VLC_CODEC_FL32;
-        id->p_uf_chain = filter_chain_New( p_stream, "audio filter", false,
+        id->p_uf_chain = filter_chain_New( p_stream, "audio converter", false,
                                            transcode_audio_filter_allocation_init, NULL, NULL );
         filter_chain_Reset( id->p_uf_chain, &fmt_last, &fmt_fl32 );
 
