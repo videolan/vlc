@@ -163,6 +163,13 @@ bool AboutDialog::eventFilter(QObject *obj, QEvent *event)
 
     return QVLCDialog::eventFilter( obj, event);
 }
+
+void AboutDialog::showEvent( QShowEvent *event )
+{
+    ui.stackedWidget->setCurrentWidget( ui.blablaPage );
+    QVLCDialog::showEvent( event );
+}
+
 #ifdef UPDATE_CHECK
 
 /*****************************************************************************

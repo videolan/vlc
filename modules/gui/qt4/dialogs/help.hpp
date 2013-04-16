@@ -62,6 +62,7 @@ public slots:
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
+    virtual void showEvent ( QShowEvent * );
 
 private:
     bool b_advanced;
