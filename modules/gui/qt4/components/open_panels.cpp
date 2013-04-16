@@ -704,13 +704,10 @@ void NetOpenPanel::updateMRL()
 {
     QString url = ui.urlComboBox->lineEdit()->text();
 
-    if( url.isEmpty() )
-        return;
-
     emit methodChanged( qfu( "network-caching" ) );
 
     QStringList qsl;
-    qsl << url;
+    if( !url.isEmpty() ) qsl << url;
     emit mrlUpdated( qsl, "" );
 }
 
