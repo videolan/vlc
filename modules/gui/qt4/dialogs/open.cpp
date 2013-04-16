@@ -443,6 +443,9 @@ void OpenDialog::updateMRL() {
     }
     ui.advancedLineInput->setText( mrl );
     ui.mrlLine->setText( itemsMRL.join( " " ) );
+    /* Only allow action without valid items */
+    playButton->setEnabled( !itemsMRL.isEmpty() );
+    selectButton->setEnabled( !itemsMRL.isEmpty() );
 }
 
 /* Change the caching combobox */
