@@ -88,8 +88,11 @@ static VLAboutBox *_o_sharedInstance = nil;
         /* Setup the copyright field */
         [o_copyright_field setStringValue: [o_local_dict objectForKey:@"NSHumanReadableCopyright"]];
 
-        /* Set the box title */
+        /* l10n */
         [o_about_window setTitle: _NS("About VLC media player")];
+        [o_credits_btn setTitle: _NS("Credits")];
+        [o_gpl_btn setTitle: _NS("License")];
+        [o_authors_btn setTitle: _NS("Authors")];
 
         /* setup the creator / revision field */
         NSString *compiler;
