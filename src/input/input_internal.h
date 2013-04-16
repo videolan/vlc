@@ -40,7 +40,7 @@
 typedef struct
 {
     /* Access/Stream/Demux plugins */
-    access_t *p_access;
+    access_t *p_access VLC_DEPRECATED;
     stream_t *p_stream;
     demux_t  *p_demux;
 
