@@ -59,16 +59,6 @@ endif
 	cp "$(top_builddir)/npapi-vlc/npapi/package/npvlc.dll.manifest" "$(win32_destdir)/"
 	cp "$(top_builddir)/npapi-vlc/installed/lib/npvlc.dll" "$(win32_destdir)/"
 
-# Compiler shared DLLs, when using compilers built with --enable-shared
-# The shared DLLs may not necessarily be in the first LIBRARY_PATH, we
-# should check them all.
-	library_path_list=`$(CXX) -v /dev/null 2>&1 | grep ^LIBRARY_PATH|cut -d= -f2` ;\
-	IFS=':' ;\
-	for x in $$library_path_list ;\
-	do \
-		cp "$$x/libstdc++-6.dll" "$$x/libgcc_s_sjlj-1.dll" "$(win32_destdir)/" ; true ;\
-	done
-
 # SDK
 	mkdir -p "$(win32_destdir)/sdk/lib/"
 	cp -r $(prefix)/include "$(win32_destdir)/sdk"
