@@ -1046,7 +1046,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 - (IBAction)showLicense:(id)sender
 {
     [self initAbout];
-    [o_about showGPL: sender];
+    [o_about showGPL];
 }
 
 - (IBAction)viewHelp:(id)sender

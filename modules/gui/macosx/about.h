@@ -1,7 +1,7 @@
 /*****************************************************************************
  * about.h: MacOS X About Panel
  *****************************************************************************
- * Copyright (C) 2001-2012 VLC authors and VideoLAN
+ * Copyright (C) 2001-2013 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -37,8 +37,11 @@
     IBOutlet id o_credits_textview;
     IBOutlet id o_credits_scrollview;
     IBOutlet id o_gpl_btn;
+    IBOutlet id o_credits_btn;
+    IBOutlet id o_authors_btn;
     IBOutlet id o_name_field;
-    id o_color_backdrop;
+    IBOutlet id o_icon_view;
+    IBOutlet id o_joinus_txt;
 
     NSTimer *o_scroll_timer;
     float f_current;
@@ -47,26 +50,21 @@
     BOOL b_restart;
     BOOL b_isSetUp;
 
+    NSString *o_authors;
+
     /* generic help window */
     IBOutlet id o_help_window;
     IBOutlet WebView *o_help_web_view; //we may _not_ use id here because of method name collisions
     IBOutlet id o_help_bwd_btn;
     IBOutlet id o_help_fwd_btn;
     IBOutlet id o_help_home_btn;
-
-    /* licence window */
-    IBOutlet id o_gpl_window;
-    IBOutlet id o_gpl_field;
 }
 
 + (VLAboutBox *)sharedInstance;
 - (void)showAbout;
 - (void)showHelp;
-- (IBAction)showGPL:(id)sender;
+- (void)showGPL;
+- (IBAction)buttonAction:(id)sender;
 - (IBAction)helpGoHome:(id)sender;
-
-@end
-
-@interface VLAboutColoredBackdrop : NSView
 
 @end
