@@ -389,11 +389,27 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             break;
         }
         case ACTIONID_SUBSYNC_MARKSUB:
-        {
-            p_sys->subtitle_delaybookmarks.i_time_subtitle = mdate();
-            DisplayMessage( p_vout, _("Sub sync: bookmarked subtitle timestamp"));
+            if( p_input )
+            {
+                vlc_value_t val, list, list2;
+                int i_count;
+                var_Get( p_input, "spu-es", &val );
+
+                var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
+                            &list, &list2 );
+                i_count = list.p_list->i_count;
+                if( i_count < 1 || val.i_int < 0 )
+                {
+                    DisplayMessage( p_vout, _("Sub sync: No active subtitle") );
+                    var_FreeList( &list, &list2 );
+                    break;
+                }
+                p_sys->subtitle_delaybookmarks.i_time_subtitle = mdate();
+                DisplayMessage( p_vout,
+                                _("Sub sync: bookmarked subtitle timestamp"));
+                var_FreeList( &list, &list2 );
+            }
             break;
-        }
         case ACTIONID_SUBSYNC_APPLY:
         {
             /* Warning! Can yield a pause in the playback.
