@@ -90,6 +90,8 @@ enum stream_query_e
     /* capabilities */
     STREAM_CAN_SEEK,            /**< arg1= bool *   res=cannot fail*/
     STREAM_CAN_FASTSEEK,        /**< arg1= bool *   res=cannot fail*/
+    STREAM_CAN_PAUSE,           /**< arg1= bool *   res=cannot fail*/
+    STREAM_CAN_CONTROL_PACE,    /**< arg1= bool *   res=cannot fail*/
 
     /* */
     STREAM_SET_POSITION,        /**< arg1= uint64_t       res=can fail  */

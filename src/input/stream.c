@@ -568,9 +568,12 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
 
         case STREAM_CAN_SEEK:
             return access_vaControl( p_access, ACCESS_CAN_SEEK, args );
-
         case STREAM_CAN_FASTSEEK:
             return access_vaControl( p_access, ACCESS_CAN_FASTSEEK, args );
+        case STREAM_CAN_PAUSE:
+            return access_vaControl( p_access, ACCESS_CAN_PAUSE, args );
+        case STREAM_CAN_CONTROL_PACE:
+            return access_vaControl( p_access, ACCESS_CAN_CONTROL_PACE, args );
 
         case STREAM_GET_POSITION:
             pi_64 = va_arg( args, uint64_t * );
