@@ -1593,12 +1593,12 @@ static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
 
     if( p_input->p->b_can_pause )
     {
-        if( p_input->p->input.p_access )
-            i_ret = access_Control( p_input->p->input.p_access,
-                                     ACCESS_SET_PAUSE_STATE, true );
+        if( p_input->p->input.p_stream != NULL )
+            i_ret = stream_Control( p_input->p->input.p_stream,
+                                    STREAM_SET_PAUSE_STATE, true );
         else
             i_ret = demux_Control( p_input->p->input.p_demux,
-                                    DEMUX_SET_PAUSE_STATE, true );
+                                   DEMUX_SET_PAUSE_STATE, true );
 
         if( i_ret )
         {
@@ -1627,12 +1627,12 @@ static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
 
     if( p_input->p->b_can_pause )
     {
-        if( p_input->p->input.p_access )
-            i_ret = access_Control( p_input->p->input.p_access,
-                                     ACCESS_SET_PAUSE_STATE, false );
+        if( p_input->p->input.p_stream )
+            i_ret = stream_Control( p_input->p->input.p_stream,
+                                    STREAM_SET_PAUSE_STATE, false );
         else
             i_ret = demux_Control( p_input->p->input.p_demux,
-                                    DEMUX_SET_PAUSE_STATE, false );
+                                   DEMUX_SET_PAUSE_STATE, false );
         if( i_ret )
         {
             /* FIXME What to do ? */
