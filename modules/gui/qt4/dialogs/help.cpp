@@ -83,53 +83,51 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf)
 {
     /* Build UI */
     ui.setupUi( this );
-    ui.closeButtonBox->addButton(
-        new QPushButton( qtr("&Close"), this ), QDialogButtonBox::RejectRole );
-
     setWindowTitle( qtr( "About" ) );
     setWindowRole( "vlc-about" );
-    setMinimumSize( 600, 500 );
-    resize( 600, 500 );
     setWindowModality( Qt::WindowModal );
 
-    CONNECT( ui.closeButtonBox, rejected(), this, close() );
-    ui.closeButtonBox->setFocus();
-
-    ui.introduction->setText(
-            qtr( "VLC media player" ) + qfu( " " VERSION_MESSAGE ) );
-
+    ui.version->setText(qfu( " " VERSION_MESSAGE ) );
+#if 0
     if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY && var_InheritBool( p_intf, "qt-icon-change" ) )
         ui.iconVLC->setPixmap( QPixmap( ":/logo/vlc128-xmas.png" ) );
     else
         ui.iconVLC->setPixmap( QPixmap( ":/logo/vlc128.png" ) );
+#endif
 
-    /* Main Introduction */
-    ui.infoLabel->setText(
-            qtr( "VLC media player is a free media player, "
-                "encoder and streamer that can read from files, "
-                "CDs, DVDs, network streams, capture cards and even more!\n"
-                "VLC uses its internal codecs and works on essentially every "
-                "popular platform.\n\n" )
-            + qtr( "This version of VLC was compiled by:\n" )
-            + qfu( VLC_CompileBy() )+ " on " + qfu( VLC_CompileHost() ) +
-            + " ("__DATE__" "__TIME__").\n"
-            + qtr( "Compiler: " ) + qfu( VLC_Compiler() ) + ".\n"
-            + qtr( "You are using the Qt Interface.\n\n" )
-            + qtr( "Copyright (C) " ) + COPYRIGHT_YEARS
-            + qtr( " by the VideoLAN Team.\n" )
-            + "<a href=\"http://www.videolan.org\">http://www.videolan.org</a>" );
-
-    /* Be translators friendly: Convert to rich text */
-    ui.infoLabel->setText( ui.infoLabel->text().replace( "\n", "<br/>" ) );
+#if 0
+    ifdef UPDATE_CHECK
+#else
+    ui.update->hide();
+#endif
 
     /* GPL License */
-    ui.licenseEdit->setText( qfu( psz_license ) );
+    ui.licensePage->setText( qfu( psz_license ) );
 
     /* People who helped */
-    ui.thanksEdit->setText( qfu( psz_thanks ) );
+    ui.creditPage->setText( qfu( psz_thanks ) );
 
     /* People who wrote the software */
-    ui.authorsEdit->setText( qfu( psz_authors ) );
+    ui.authorsPage->setText( qfu( psz_authors ) );
+
+    BUTTONACT(ui.licenseButton, showLicense() );
+    BUTTONACT(ui.authorsButton, showAuthors() );
+    BUTTONACT(ui.creditsButton,  showCredit() );
+}
+
+void AboutDialog::showLicense()
+{
+    ui.stackedWidget->setCurrentWidget( ui.licensePage );
+}
+
+void AboutDialog::showAuthors()
+{
+    ui.stackedWidget->setCurrentWidget( ui.authorsPage );
+}
+
+void AboutDialog::showCredit()
+{
+    ui.stackedWidget->setCurrentWidget( ui.creditPage );
 }
 
 #ifdef UPDATE_CHECK

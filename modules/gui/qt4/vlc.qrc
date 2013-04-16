@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/logo">
+        <file alias="vlc256.png">../../../share/icons/256x256/vlc.png</file>
         <file alias="vlc128.png">../../../share/icons/128x128/vlc.png</file>
         <file alias="vlc16.png">../../../share/icons/16x16/vlc.png</file>
         <file alias="vlc48.png">../../../share/icons/48x48/vlc.png</file>
