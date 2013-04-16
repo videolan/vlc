@@ -548,7 +548,6 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
     stream_sys_t *p_sys = s->p_sys;
     access_t     *p_access = p_sys->p_access;
 
-    bool     *p_bool;
     uint64_t *pi_64, i_64;
     int      i_int;
 
@@ -568,14 +567,10 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
             break;
 
         case STREAM_CAN_SEEK:
-            p_bool = (bool*)va_arg( args, bool * );
-            access_Control( p_access, ACCESS_CAN_SEEK, p_bool );
-            break;
+            return access_vaControl( p_access, ACCESS_CAN_SEEK, args );
 
         case STREAM_CAN_FASTSEEK:
-            p_bool = (bool*)va_arg( args, bool * );
-            access_Control( p_access, ACCESS_CAN_FASTSEEK, p_bool );
-            break;
+            return access_vaControl( p_access, ACCESS_CAN_FASTSEEK, args );
 
         case STREAM_GET_POSITION:
             pi_64 = va_arg( args, uint64_t * );
@@ -619,8 +614,8 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case STREAM_GET_CONTENT_TYPE:
-            return access_Control( p_access, ACCESS_GET_CONTENT_TYPE,
-                                    va_arg( args, char ** ) );
+            return access_vaControl( p_access, ACCESS_GET_CONTENT_TYPE, args );
+
         case STREAM_SET_RECORD_STATE:
         default:
             msg_Err( s, "invalid stream_vaControl query=0x%x", i_query );
