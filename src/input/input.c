@@ -2474,8 +2474,6 @@ static int InputSourceInit( input_thread_t *p_input,
         /* Get infos from access */
         if( !p_input->b_preparsing )
         {
-            bool b_can_seek;
-
             in->b_title_demux = false;
             if( access_Control( p_access, ACCESS_GET_TITLE_INFO,
                                 &in->title, &in->i_title,
@@ -2484,18 +2482,6 @@ static int InputSourceInit( input_thread_t *p_input,
             {
                 TAB_INIT( in->i_title, in->title );
             }
-            access_Control( p_access, ACCESS_CAN_CONTROL_PACE,
-                            &in->b_can_pace_control );
-            in->b_can_rate_control = in->b_can_pace_control;
-            in->b_rescale_ts = true;
-
-            access_Control( p_access, ACCESS_CAN_PAUSE, &in->b_can_pause );
-            var_SetBool( p_input, "can-pause", in->b_can_pause || !in->b_can_pace_control ); /* XXX temporary because of es_out_timeshift*/
-            var_SetBool( p_input, "can-rate", !in->b_can_pace_control || in->b_can_rate_control ); /* XXX temporary because of es_out_timeshift*/
-            var_SetBool( p_input, "can-rewind", !in->b_rescale_ts && !in->b_can_pace_control );
-
-            access_Control( p_access, ACCESS_CAN_SEEK, &b_can_seek );
-            var_SetBool( p_input, "can-seek", b_can_seek );
 
             access_Control( p_access, ACCESS_GET_PTS_DELAY, &i_pts_delay );
         }
@@ -2567,6 +2553,27 @@ static int InputSourceInit( input_thread_t *p_input,
                                               psz_stream_filter,
                                               var_GetBool( p_input, "input-record-native" ) );
         free( psz_stream_filter );
+
+        if( !p_input->b_preparsing )
+        {
+            bool b;
+
+            stream_Control( in->p_stream, STREAM_CAN_CONTROL_PACE,
+                            &in->b_can_pace_control );
+            in->b_can_rate_control = in->b_can_pace_control;
+            in->b_rescale_ts = true;
+
+            stream_Control( in->p_stream, STREAM_CAN_PAUSE, &in->b_can_pause );
+            var_SetBool( p_input, "can-pause",
+                         in->b_can_pause || !in->b_can_pace_control ); /* XXX temporary because of es_out_timeshift*/
+            var_SetBool( p_input, "can-rate",
+                         !in->b_can_pace_control || in->b_can_rate_control ); /* XXX temporary because of es_out_timeshift*/
+            var_SetBool( p_input, "can-rewind",
+                         !in->b_rescale_ts && !in->b_can_pace_control );
+
+            stream_Control( in->p_stream, STREAM_CAN_SEEK, &b );
+            var_SetBool( p_input, "can-seek", b );
+        }
 
         in->p_demux = demux_New( p_input, p_input, psz_access, psz_demux,
                    /* Take access/stream redirections into account: */
