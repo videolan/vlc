@@ -321,6 +321,7 @@ void VLCMenuBar::createMenuBar( MainInterface *mi,
     BAR_DADD( NavigMenu( p_intf, bar ), qtr( "P&layback" ), 3 );
     BAR_DADD( AudioMenu( p_intf, bar ), qtr( "&Audio" ), 1 );
     BAR_DADD( VideoMenu( p_intf, bar ), qtr( "&Video" ), 2 );
+    BAR_DADD( SubtitleMenu( p_intf, bar ), qtr( "Subti&tle" ), 5 );
 
     addMenuToMainbar( ToolsMenu( bar ), qtr( "&Tools" ), bar );
 
@@ -619,16 +620,19 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 }
 
 /* Subtitles */
-QMenu *VLCMenuBar::SubtitleMenu( QMenu *current )
+QMenu *VLCMenuBar::SubtitleMenu( intf_thread_t *, QMenu *current )
 {
-    QAction *action;
-    QMenu *submenu = new QMenu( qtr( "&Subtitle Track" ), current );
-    action = current->addMenu( submenu );
-    action->setData( "spu-es" );
-    addDPStaticEntry( submenu, qtr( "Open File..." ), "",
-                      SLOT( loadSubtitlesFile() ) );
-    submenu->addSeparator();
-    return submenu;
+    if( current->isEmpty() )
+    {
+        QAction *action;
+        QMenu *submenu = new QMenu( qtr( "&Subtitle Track" ), current );
+        action = current->addMenu( submenu );
+        action->setData( "spu-es" );
+        addDPStaticEntry( submenu, qtr( "Open File..." ), "",
+                SLOT( loadSubtitlesFile() ) );
+        submenu->addSeparator();
+    }
+    return current;
 }
 
 /**
@@ -646,7 +650,7 @@ QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current, bool b_subt
     {
         addActionWithSubmenu( current, "video-es", qtr( "Video &Track" ) );
         if( b_subtitle)
-            SubtitleMenu( current );
+            SubtitleMenu( p_intf, current );
 
         current->addSeparator();
         /* Surface modifiers */
@@ -1036,7 +1040,7 @@ void VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
         if( action->menu()->isEmpty() )
             action->setEnabled( false );
 
-        submenu = SubtitleMenu( menu );
+        submenu = SubtitleMenu( p_intf, menu );
         submenu->setTitle( qtr( "Subti&tle") );
         UpdateItem( p_intf, menu, "spu-es", VLC_OBJECT(p_input), true );
 

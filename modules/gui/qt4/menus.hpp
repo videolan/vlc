@@ -117,11 +117,14 @@ private:
     }
     static QMenu *RebuildNavigMenu( intf_thread_t *, QMenu *, bool b_keep = false );
 
-    static QMenu *VideoMenu( intf_thread_t *, QMenu *, bool b_subtitle = true );
+    static QMenu *VideoMenu( intf_thread_t *, QMenu *, bool b_subtitle = false );
     static QMenu *VideoMenu( intf_thread_t *p_intf, QWidget *parent ) {
         return VideoMenu( p_intf, new QMenu( parent ) );
     }
-    static QMenu *SubtitleMenu( QMenu *current);
+    static QMenu *SubtitleMenu( intf_thread_t *, QMenu *current);
+    static QMenu *SubtitleMenu( intf_thread_t *p_intf, QWidget *parent) {
+        return SubtitleMenu( p_intf, new QMenu( parent ) );
+    }
 
     static QMenu *AudioMenu( intf_thread_t *, QMenu * );
     static QMenu *AudioMenu( intf_thread_t *p_intf, QWidget *parent ) {
@@ -173,6 +176,7 @@ public:
             case 2: VLCMenuBar::VideoMenu( p_intf, menu ); break;
             case 3: VLCMenuBar::RebuildNavigMenu( p_intf, menu ); break;
             case 4: VLCMenuBar::ViewMenu( p_intf, menu ); break;
+            case 5: VLCMenuBar::SubtitleMenu( p_intf, menu ); break;
         }
     }
 private:
