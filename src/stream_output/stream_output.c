@@ -128,6 +128,7 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
 
     FREENULL( p_sout->psz_sout );
 
+    vlc_mutex_destroy( &p_sout->lock );
     vlc_object_release( p_sout );
     return NULL;
 }
