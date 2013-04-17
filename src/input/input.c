@@ -1920,7 +1920,7 @@ static bool Control( input_thread_t *p_input,
                                DEMUX_SET_TITLE, i_title );
             else
                 stream_Control( p_input->p->input.p_stream,
-                            STREAM_CONTROL_ACCESS, ACCESS_SET_TITLE, i_title );
+                                STREAM_SET_TITLE, i_title );
             input_SendEventTitle( p_input, i_title );
             break;
         }
@@ -1978,8 +1978,7 @@ static bool Control( input_thread_t *p_input,
                                DEMUX_SET_SEEKPOINT, i_seekpoint );
             else
                 stream_Control( p_input->p->input.p_stream,
-                                STREAM_CONTROL_ACCESS,
-                                ACCESS_SET_SEEKPOINT, i_seekpoint );
+                                STREAM_SET_SEEKPOINT, i_seekpoint );
             input_SendEventSeekpoint( p_input, i_title, i_seekpoint );
             break;
         }
@@ -2433,15 +2432,6 @@ static int InputSourceInit( input_thread_t *p_input,
         /* Get infos from access */
         if( !p_input->b_preparsing )
         {
-            in->b_title_demux = false;
-            if( access_Control( p_access, ACCESS_GET_TITLE_INFO,
-                                &in->title, &in->i_title,
-                                &in->i_title_offset, &in->i_seekpoint_offset ) )
-
-            {
-                TAB_INIT( in->i_title, in->title );
-            }
-
             access_Control( p_access, ACCESS_GET_PTS_DELAY, &i_pts_delay );
         }
 
@@ -2532,6 +2522,12 @@ static int InputSourceInit( input_thread_t *p_input,
 
             stream_Control( in->p_stream, STREAM_CAN_SEEK, &b );
             var_SetBool( p_input, "can-seek", b );
+
+            in->b_title_demux = false;
+            if( stream_Control( in->p_stream, STREAM_GET_TITLE_INFO,
+                                &in->title, &in->i_title, &in->i_title_offset,
+                                &in->i_seekpoint_offset ) )
+                TAB_INIT( in->i_title, in->title );
         }
 
         in->p_demux = demux_New( p_input, p_input, psz_access, psz_demux,

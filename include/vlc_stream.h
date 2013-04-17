@@ -109,8 +109,13 @@ enum stream_query_e
     STREAM_UPDATE_SIZE,
 
     /* */
+    STREAM_GET_TITLE_INFO = 0x102, /**< arg1=input_title_t*** arg2=int* res=can fail */
+    STREAM_RESERVED_FOR_GET_META_DO_NOT_USE,
     STREAM_GET_CONTENT_TYPE,    /**< arg1= char **         res=can fail */
+
     STREAM_SET_PAUSE_STATE = 0x200, /**< arg1= bool        res=can fail */
+    STREAM_SET_TITLE,       /**< arg1= int          res=can fail */
+    STREAM_SET_SEEKPOINT,   /**< arg1= int          res=can fail */
 
     /* XXX only data read through stream_Read/Block will be recorded */
     STREAM_SET_RECORD_STATE,     /**< arg1=bool, arg2=const char *psz_ext (if arg1 is true)  res=can fail */

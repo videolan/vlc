@@ -549,7 +549,6 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
     access_t     *p_access = p_sys->p_access;
 
     uint64_t *pi_64, i_64;
-    int      i_int;
 
     switch( i_query )
     {
@@ -595,32 +594,43 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
 
         case STREAM_CONTROL_ACCESS:
         {
-            i_int = (int) va_arg( args, int );
+            int i_int = (int) va_arg( args, int );
             if( i_int != ACCESS_SET_PRIVATE_ID_STATE &&
                 i_int != ACCESS_SET_PRIVATE_ID_CA &&
-                i_int != ACCESS_GET_PRIVATE_ID_STATE &&
-                i_int != ACCESS_SET_TITLE &&
-                i_int != ACCESS_SET_SEEKPOINT )
+                i_int != ACCESS_GET_PRIVATE_ID_STATE )
             {
                 msg_Err( s, "Hey, what are you thinking ?"
                             "DON'T USE STREAM_CONTROL_ACCESS !!!" );
                 return VLC_EGENERIC;
             }
-            int i_ret = access_vaControl( p_access, i_int, args );
-            if( i_int == ACCESS_SET_TITLE || i_int == ACCESS_SET_SEEKPOINT )
-                AStreamControlReset( s );
-            return i_ret;
+            return access_vaControl( p_access, i_int, args );
         }
 
         case STREAM_UPDATE_SIZE:
             AStreamControlUpdate( s );
             return VLC_SUCCESS;
 
+        case STREAM_GET_TITLE_INFO:
+            return access_vaControl( p_access, ACCESS_GET_TITLE_INFO, args );
         case STREAM_GET_CONTENT_TYPE:
             return access_vaControl( p_access, ACCESS_GET_CONTENT_TYPE, args );
 
         case STREAM_SET_PAUSE_STATE:
             return access_vaControl( p_access, ACCESS_SET_PAUSE_STATE, args );
+        case STREAM_SET_TITLE:
+        {
+            int ret = access_vaControl( p_access, ACCESS_SET_TITLE, args );
+            if( ret == VLC_SUCCESS )
+                AStreamControlReset( s );
+            return ret;
+        }
+        case STREAM_SET_SEEKPOINT:
+        {
+            int ret = access_vaControl( p_access, ACCESS_SET_SEEKPOINT, args );
+            if( ret == VLC_SUCCESS )
+                AStreamControlReset( s );
+            return ret;
+        }
 
         case STREAM_SET_RECORD_STATE:
         default:

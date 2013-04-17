@@ -122,7 +122,10 @@ static int Control( stream_t *s, int i_query, va_list args )
             p_sys->i_pos = i_64;
             break;
 
+        case STREAM_GET_TITLE_INFO:
         case STREAM_GET_CONTENT_TYPE:
+        case STREAM_SET_TITLE:
+        case STREAM_SET_SEEKPOINT:
             return VLC_EGENERIC;
 
         case STREAM_SET_PAUSE_STATE:
