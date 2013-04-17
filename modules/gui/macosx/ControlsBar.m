@@ -291,22 +291,26 @@
 
         mtime_t dur = input_item_GetDuration(input_GetItem(p_input));
         if (dur == -1) {
-            [o_time_sld setEnabled: NO];
             [o_time_sld setHidden: YES];
             [o_time_sld_fancygradient_view setHidden: YES];
         } else {
-            [o_time_sld setEnabled: YES];
-            [o_time_sld setHidden: NO];
-            [o_time_sld_fancygradient_view setHidden: NO];
-        }
+            if ([o_time_sld isHidden] == YES) {
+                bool b_buffering = false;
+                input_state_e inputState = input_GetState(p_input);
+                if (inputState == INIT_S || inputState == OPENING_S)
+                    b_buffering = YES;
 
+                [o_time_sld setHidden: b_buffering];
+                [o_time_sld_fancygradient_view setHidden: b_buffering];
+            }
+        }
         [o_time_fld setStringValue: o_time];
         [o_time_fld setNeedsDisplay:YES];
+
         vlc_object_release(p_input);
     } else {
         [o_time_sld setFloatValue: 0.0];
         [o_time_fld setStringValue: @"00:00"];
-        [o_time_sld setEnabled: NO];
         [o_time_sld setHidden: YES];
         [o_time_sld_fancygradient_view setHidden: YES];
     }
@@ -340,6 +344,7 @@
     bool b_plmul = false;
     bool b_seekable = false;
     bool b_chapters = false;
+    bool b_buffering = false;
 
     playlist_t * p_playlist = pl_Get(VLCIntf);
 
@@ -351,6 +356,10 @@
 
 
     if (p_input) {
+        input_state_e inputState = input_GetState(p_input);
+        if (inputState == INIT_S || inputState == OPENING_S)
+            b_buffering = YES;
+
         /* seekable streams */
         b_seekable = var_GetBool(p_input, "can-seek");
 
@@ -359,6 +368,18 @@
 
         vlc_object_release(p_input);
     }
+
+
+    if (b_buffering) {
+        [o_progress_bar startAnimation:self];
+        [o_progress_bar setIndeterminate:YES];
+        [o_progress_bar setHidden:NO];
+    } else {
+        [o_progress_bar stopAnimation:self];
+        [o_progress_bar setHidden:YES];
+    }
+
+    [o_time_sld setEnabled: b_seekable];
 
     [o_fwd_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
     [o_bwd_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
@@ -1058,9 +1079,9 @@ else \
     [super updateControls];
 
     bool b_input = false;
+    bool b_seekable = false;
     bool b_plmul = false;
     bool b_control = false;
-    bool b_seekable = false;
     bool b_chapters = false;
 
     playlist_t * p_playlist = pl_Get(VLCIntf);
@@ -1070,15 +1091,7 @@ else \
     PL_UNLOCK;
 
     input_thread_t * p_input = playlist_CurrentInput(p_playlist);
-
-    bool b_buffering = NO;
-
     if ((b_input = (p_input != NULL))) {
-        /* seekable streams */
-        input_state_e inputState = input_GetState(p_input);
-        if (inputState == INIT_S || inputState == OPENING_S)
-            b_buffering = YES;
-
         /* seekable streams */
         b_seekable = var_GetBool(p_input, "can-seek");
 
@@ -1091,15 +1104,6 @@ else \
         vlc_object_release(p_input);
     }
 
-    if (b_buffering) {
-        [o_progress_bar startAnimation:self];
-        [o_progress_bar setIndeterminate:YES];
-        [o_progress_bar setHidden:NO];
-    } else {
-        [o_progress_bar stopAnimation:self];
-        [o_progress_bar setHidden:YES];
-    }
-
     [o_stop_btn setEnabled: b_input];
 
     if (b_show_jump_buttons) {
@@ -1107,7 +1111,6 @@ else \
         [o_next_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
     }
 
-    [o_time_sld setEnabled: b_seekable];
     [[VLCMainMenu sharedInstance] setRateControlsEnabled: b_control];
 }
 
