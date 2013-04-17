@@ -292,17 +292,11 @@ static int open_file( access_t *p_access, const char *path )
                         _( "VLC could not open the file \"%s\". (%m)" ), path );
         return -1;
     }
-
-#if defined( HAVE_FCNTL )
-    /* We'd rather use any available memory for reading ahead
-     * than for caching what we've already seen/heard */
-# if defined( F_RDAHEAD )
+#ifdef F_RDAHEAD
     fcntl( fd, F_RDAHEAD, 1 );
-# endif
-# if defined( F_NOCACHE )
-    fcntl( fd, F_NOCACHE, 1 );
-# endif
 #endif
-
+#ifdef F_NOCACHE
+    fcntl( fd, F_NOCACHE, 0 );
+#endif
     return fd;
 }
