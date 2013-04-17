@@ -203,7 +203,6 @@ static inline void vlc_input_attachment_Delete( input_attachment_t *a )
  *****************************************************************************/
 
 /* i_update field of access_t/demux_t */
-#define INPUT_UPDATE_NONE       0x0000
 #define INPUT_UPDATE_SIZE       0x0001
 #define INPUT_UPDATE_TITLE      0x0010
 #define INPUT_UPDATE_SEEKPOINT  0x0020
