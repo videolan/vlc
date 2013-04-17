@@ -34,6 +34,7 @@ OPTIONS="
         --enable-macosx-audio
         --enable-macosx-eyetv
         --enable-macosx-qtkit
+        --enable-macosx-avfoundation
         --enable-macosx-vout
         --disable-skins2
         --disable-xcb

@@ -434,6 +434,7 @@
 		CCDB535D13E97D3500A1782F /* dropzone-background.png in Resources */ = {isa = PBXBuildFile; fileRef = CCDB535C13E97D3500A1782F /* dropzone-background.png */; };
 		CCE8BAC4160615D9006741FB /* effects-one-button-pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE8BAC2160615D9006741FB /* effects-one-button-pressed.png */; };
 		CCE8BAC5160615D9006741FB /* effects-one-button-pressed@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE8BAC3160615D9006741FB /* effects-one-button-pressed@2x.png */; };
+		DCC8017A16FCA0DA007FE736 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCC8017916FCA0DA007FE736 /* AVFoundation.framework */; };
 		E0FB95CE1615B6DF0005069A /* DetachedVideoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = E0FB95CC1615B6DF0005069A /* DetachedVideoWindow.xib */; };
 /* End PBXBuildFile section */
 
@@ -980,6 +981,8 @@
 		DC1A176914E2778A001477C6 /* qtsound.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = qtsound.m; path = ../../../modules/access/qtsound.m; sourceTree = "<group>"; };
 		DC769AB7085DF0DB001A838D /* wizard.m */ = {isa = PBXFileReference; fileEncoding = 5; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; name = wizard.m; path = ../../../modules/gui/macosx/wizard.m; sourceTree = SOURCE_ROOT; tabWidth = 4; usesTabs = 0; };
 		DC769AB8085DF0DB001A838D /* wizard.h */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.h; name = wizard.h; path = ../../../modules/gui/macosx/wizard.h; sourceTree = SOURCE_ROOT; };
+		DCC8017816FCA036007FE736 /* avcapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = avcapture.m; path = ../../../modules/access/avcapture.m; sourceTree = "<group>"; };
+		DCC8017916FCA0DA007FE736 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		DCE7BD0608A5724D007B10AE /* bookmarks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = bookmarks.m; path = ../../../modules/gui/macosx/bookmarks.m; sourceTree = SOURCE_ROOT; };
 		DCE7BD0708A5724D007B10AE /* bookmarks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bookmarks.h; path = ../../../modules/gui/macosx/bookmarks.h; sourceTree = SOURCE_ROOT; };
 		E0382C00160BA09E0031D7FF /* ControlsBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ControlsBar.h; path = ../../../modules/gui/macosx/ControlsBar.h; sourceTree = SOURCE_ROOT; };
@@ -997,6 +1000,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCC8017A16FCA0DA007FE736 /* AVFoundation.framework in Frameworks */,
 				CC402F410E00ABBB006A4BA4 /* Cocoa.framework in Frameworks */,
 				CC402F420E00ABBB006A4BA4 /* ApplicationServices.framework in Frameworks */,
 				CC402F430E00ABBB006A4BA4 /* QTKit.framework in Frameworks */,
@@ -1134,6 +1138,7 @@
 				CC426FD01020D44F00A32659 /* Sparkle.framework */,
 				CCBE999E0F922C51000705F8 /* CoreServices.framework */,
 				CC962E2C0CC7992800A56695 /* WebKit.framework */,
+				DCC8017916FCA0DA007FE736 /* AVFoundation.framework */,
 				CC1941240B9C1F8400635F6B /* QTKit.framework */,
 				CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */,
 				1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */,
@@ -1661,6 +1666,7 @@
 				CC4D67F71348F601003FCC5B /* darwin_specific.c */,
 				CC6C01BA0DDF3EEC00C7D754 /* auhal.c */,
 				CCC895830D9A8A82005AE59C /* eyetv.m */,
+				DCC8017816FCA036007FE736 /* avcapture.m */,
 				CC9E3E7913D1CFCF00429A71 /* qtcapture.m */,
 				DC1A176914E2778A001477C6 /* qtsound.m */,
 				CCDBA3B313D32E200006127B /* macosx.m */,

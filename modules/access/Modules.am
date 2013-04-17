@@ -84,6 +84,16 @@ libvlc_LTLIBRARIES += \
         $(NULL)
 endif
 
+if HAVE_AVFOUNDATION
+libavcapture_plugin_la_SOURCES = avcapture.m
+libavcapture_plugin_la_LIBADD = $(AM_LIBADD)
+libavcapture_plugin_la_LDFLAGS = -Wl,-framework,Cocoa -Wl,-framework,AVFoundation -Wl,-framework,CoreMedia
+
+libvlc_LTLIBRARIES += \
+        libavcapture_plugin.la \
+        $(NULL)
+endif
+
 libvlc_LTLIBRARIES += \
 	libfilesystem_plugin.la \
 	libidummy_plugin.la \
