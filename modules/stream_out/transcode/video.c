@@ -234,6 +234,8 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         if( p_sys->pp_pics == NULL )
         {
             msg_Err( p_stream, "cannot create picture fifo" );
+            vlc_mutex_destroy( &p_sys->lock_out );
+            vlc_cond_destroy( &p_sys->cond );
             module_unneed( id->p_decoder, id->p_decoder->p_module );
             id->p_decoder->p_module = NULL;
             free( id->p_decoder->p_owner );
@@ -244,6 +246,9 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         if( vlc_clone( &p_sys->thread, EncoderThread, p_sys, i_priority ) )
         {
             msg_Err( p_stream, "cannot spawn encoder thread" );
+            vlc_mutex_destroy( &p_sys->lock_out );
+            vlc_cond_destroy( &p_sys->cond );
+            picture_fifo_Delete( p_sys->pp_pics );
             module_unneed( id->p_decoder, id->p_decoder->p_module );
             id->p_decoder->p_module = NULL;
             free( id->p_decoder->p_owner );
