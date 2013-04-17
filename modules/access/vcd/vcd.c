@@ -273,7 +273,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
             {
                 /* Update info */
                 p_access->info.i_update |=
-                  INPUT_UPDATE_TITLE|INPUT_UPDATE_SEEKPOINT|INPUT_UPDATE_SIZE;
+                                     INPUT_UPDATE_TITLE|INPUT_UPDATE_SEEKPOINT;
                 p_access->info.i_title = i;
                 p_access->info.i_seekpoint = 0;
                 p_access->info.i_size = p_sys->title[i]->i_size;
@@ -336,7 +336,7 @@ static block_t *Block( access_t *p_access )
         }
 
         p_access->info.i_update |=
-            INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT | INPUT_UPDATE_SIZE;
+                                   INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
         p_access->info.i_title++;
         p_access->info.i_seekpoint = 0;
         p_access->info.i_size = p_sys->title[p_access->info.i_title]->i_size;

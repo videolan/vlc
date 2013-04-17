@@ -715,8 +715,7 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
                   p_vcdplayer->play_item.type );
     }
 
-    p_access->info.i_update = INPUT_UPDATE_TITLE|INPUT_UPDATE_SIZE
-                              |INPUT_UPDATE_SEEKPOINT;
+    p_access->info.i_update = INPUT_UPDATE_TITLE|INPUT_UPDATE_SEEKPOINT;
 
     VCDUpdateTitle( p_access );
 

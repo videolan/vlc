@@ -313,12 +313,8 @@ static ssize_t FileRead (access_t *p_access, uint8_t *p_buffer, size_t i_len)
     {
         struct stat st;
 
-        if ((fstat (fd, &st) == 0)
-         && (p_access->info.i_size != (uint64_t)st.st_size))
-        {
+        if (fstat (fd, &st) == 0)
             p_access->info.i_size = st.st_size;
-            p_access->info.i_update |= INPUT_UPDATE_SIZE;
-        }
     }
     return val;
 }

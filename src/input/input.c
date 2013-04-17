@@ -2208,8 +2208,6 @@ static void UpdateGenericFromDemux( input_thread_t *p_input )
         }
         p_demux->info.i_update &= ~INPUT_UPDATE_META;
     }
-
-    p_demux->info.i_update &= ~INPUT_UPDATE_SIZE;
 }
 
 static void UpdateTitleListfromDemux( input_thread_t *p_input )
@@ -2293,8 +2291,6 @@ static void UpdateGenericFromAccess( input_thread_t *p_input )
 
         p_access->info.i_update &= ~INPUT_UPDATE_SIGNAL;
     }
-
-    p_access->info.i_update &= ~INPUT_UPDATE_SIZE;
 }
 
 /*****************************************************************************

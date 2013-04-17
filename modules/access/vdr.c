@@ -481,7 +481,6 @@ static bool ImportNextFile( access_t *p_access )
 
     ARRAY_APPEND( p_sys->file_sizes, st.st_size );
     p_access->info.i_size += st.st_size;
-    p_access->info.i_update |= INPUT_UPDATE_SIZE;
 
     return true;
 }
@@ -586,7 +585,6 @@ static void UpdateFileSize( access_t *p_access )
     p_access->info.i_size -= CURRENT_FILE_SIZE;
     CURRENT_FILE_SIZE = st.st_size;
     p_access->info.i_size += CURRENT_FILE_SIZE;
-    p_access->info.i_update |= INPUT_UPDATE_SIZE;
 }
 
 /*****************************************************************************
