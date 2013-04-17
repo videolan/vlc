@@ -1893,56 +1893,37 @@ static bool Control( input_thread_t *p_input,
         case INPUT_CONTROL_SET_TITLE:
         case INPUT_CONTROL_SET_TITLE_NEXT:
         case INPUT_CONTROL_SET_TITLE_PREV:
+        {
             if( p_input->p->b_recording )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_TITLE(*) ignored while recording" );
                 break;
             }
-            if( p_input->p->input.b_title_demux &&
-                p_input->p->input.i_title > 0 )
-            {
-                /* TODO */
-                /* FIXME handle demux title */
-                demux_t *p_demux = p_input->p->input.p_demux;
-                int i_title;
+            if( p_input->p->input.i_title <= 0 )
+                break;
 
-                if( i_type == INPUT_CONTROL_SET_TITLE_PREV )
-                    i_title = p_demux->info.i_title - 1;
-                else if( i_type == INPUT_CONTROL_SET_TITLE_NEXT )
-                    i_title = p_demux->info.i_title + 1;
-                else
-                    i_title = val.i_int;
+            int i_title = p_input->p->input.b_title_demux
+                        ? p_input->p->input.p_demux->info.i_title
+                        : p_input->p->input.p_access->info.i_title;
+            if( i_type == INPUT_CONTROL_SET_TITLE_PREV )
+                i_title--;
+            else if( i_type == INPUT_CONTROL_SET_TITLE_NEXT )
+                i_title++;
+            else
+                i_title = val.i_int;
+            if( i_title < 0 || i_title >= p_input->p->input.i_title )
+                break;
 
-                if( i_title >= 0 && i_title < p_input->p->input.i_title )
-                {
-                    es_out_SetTime( p_input->p->p_es_out, -1 );
-
-                    demux_Control( p_demux, DEMUX_SET_TITLE, i_title );
-                    input_SendEventTitle( p_input, i_title );
-                }
-            }
-            else if( p_input->p->input.i_title > 0 )
-            {
-                access_t *p_access = p_input->p->input.p_access;
-                int i_title;
-
-                if( i_type == INPUT_CONTROL_SET_TITLE_PREV )
-                    i_title = p_access->info.i_title - 1;
-                else if( i_type == INPUT_CONTROL_SET_TITLE_NEXT )
-                    i_title = p_access->info.i_title + 1;
-                else
-                    i_title = val.i_int;
-
-                if( i_title >= 0 && i_title < p_input->p->input.i_title )
-                {
-                    es_out_SetTime( p_input->p->p_es_out, -1 );
-
-                    stream_Control( p_input->p->input.p_stream, STREAM_CONTROL_ACCESS,
-                                    ACCESS_SET_TITLE, i_title );
-                    input_SendEventTitle( p_input, i_title );
-                }
-            }
+            es_out_SetTime( p_input->p->p_es_out, -1 );
+            if( p_input->p->input.b_title_demux )
+                demux_Control( p_input->p->input.p_demux,
+                               DEMUX_SET_TITLE, i_title );
+            else
+                stream_Control( p_input->p->input.p_stream,
+                            STREAM_CONTROL_ACCESS, ACCESS_SET_TITLE, i_title );
+            input_SendEventTitle( p_input, i_title );
             break;
+        }
         case INPUT_CONTROL_SET_SEEKPOINT:
         case INPUT_CONTROL_SET_SEEKPOINT_NEXT:
         case INPUT_CONTROL_SET_SEEKPOINT_PREV:
