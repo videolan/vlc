@@ -556,13 +556,11 @@ static void OptimizeForRead( int fd )
     posix_fadvise( fd, 0, 4096, POSIX_FADV_WILLNEED );
     posix_fadvise( fd, 0, 0, POSIX_FADV_NOREUSE );
 #endif
-#ifdef HAVE_FCNTL
 #ifdef F_RDAHEAD
     fcntl( fd, F_RDAHEAD, 1 );
 #endif
 #ifdef F_NOCACHE
-    fcntl( fd, F_NOCACHE, 1 );
-#endif
+    fcntl( fd, F_NOCACHE, 0 );
 #endif
 }
 
