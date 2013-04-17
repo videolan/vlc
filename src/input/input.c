@@ -2024,7 +2024,9 @@ static bool Control( input_thread_t *p_input,
                     p_meta = vlc_meta_New();
                     if( p_meta )
                     {
-                        access_Control( slave->p_access, ACCESS_GET_META, p_meta );
+                        if( slave->p_stream != NULL )
+                            stream_Control( slave->p_stream,
+                                            STREAM_GET_META, p_meta );
                         demux_Control( slave->p_demux, DEMUX_GET_META, p_meta );
                         InputUpdateMeta( p_input, p_meta );
                     }
@@ -2266,6 +2268,7 @@ static int UpdateTitleSeekpointFromAccess( input_thread_t *p_input )
 }
 static void UpdateGenericFromAccess( input_thread_t *p_input )
 {
+    stream_t *p_stream = p_input->p->input.p_stream;
     access_t *p_access = p_input->p->input.p_access;
 
     if( p_access->info.i_update & INPUT_UPDATE_META )
@@ -2274,7 +2277,7 @@ static void UpdateGenericFromAccess( input_thread_t *p_input )
         vlc_meta_t *p_meta = vlc_meta_New();
         if( p_meta )
         {
-            access_Control( p_input->p->input.p_access, ACCESS_GET_META, p_meta );
+            stream_Control( p_stream, STREAM_GET_META, p_meta );
             InputUpdateMeta( p_input, p_meta );
         }
         p_access->info.i_update &= ~INPUT_UPDATE_META;
@@ -2658,19 +2661,22 @@ static void InputSourceClean( input_source_t *in )
 static void InputSourceMeta( input_thread_t *p_input,
                              input_source_t *p_source, vlc_meta_t *p_meta )
 {
-    access_t *p_access = p_source->p_access;
+    stream_t *p_stream = p_source->p_stream;
     demux_t *p_demux = p_source->p_demux;
 
     /* XXX Remember that checking against p_item->p_meta->i_status & ITEM_PREPARSED
      * is a bad idea */
 
-    bool has_meta;
+    bool has_meta = false;
 
     /* Read access meta */
-    has_meta = p_access && !access_Control( p_access, ACCESS_GET_META, p_meta );
+    if( p_stream != NULL
+     && !stream_Control( p_stream, STREAM_GET_META, p_meta ) )
+        has_meta = true;
 
     /* Read demux meta */
-    has_meta |= !demux_Control( p_demux, DEMUX_GET_META, p_meta );
+    if( !demux_Control( p_demux, DEMUX_GET_META, p_meta ) )
+        has_meta = true;
 
     bool has_unsupported;
     if( demux_Control( p_demux, DEMUX_HAS_UNSUPPORTED_META, &has_unsupported ) )
