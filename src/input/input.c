@@ -1927,84 +1927,62 @@ static bool Control( input_thread_t *p_input,
         case INPUT_CONTROL_SET_SEEKPOINT:
         case INPUT_CONTROL_SET_SEEKPOINT_NEXT:
         case INPUT_CONTROL_SET_SEEKPOINT_PREV:
+        {
             if( p_input->p->b_recording )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_SEEKPOINT(*) ignored while recording" );
                 break;
             }
+            if( p_input->p->input.i_title <= 0 )
+                break;
 
-            if( p_input->p->input.b_title_demux &&
-                p_input->p->input.i_title > 0 )
+            int i_title, i_seekpoint;
+            if( p_input->p->input.b_title_demux )
             {
                 demux_t *p_demux = p_input->p->input.p_demux;
-                int i_seekpoint;
-                int64_t i_input_time;
-                int64_t i_seekpoint_time;
 
-                if( i_type == INPUT_CONTROL_SET_SEEKPOINT_PREV )
-                {
-                    i_seekpoint = p_demux->info.i_seekpoint;
-                    i_seekpoint_time = p_input->p->input.title[p_demux->info.i_title]->seekpoint[i_seekpoint]->i_time_offset;
-                    i_input_time = var_GetTime( p_input, "time" );
-                    if( i_seekpoint_time >= 0 && i_input_time >= 0 )
-                    {
-                        if( i_input_time < i_seekpoint_time + 3000000 )
-                            i_seekpoint--;
-                    }
-                    else
-                        i_seekpoint--;
-                }
-                else if( i_type == INPUT_CONTROL_SET_SEEKPOINT_NEXT )
-                    i_seekpoint = p_demux->info.i_seekpoint + 1;
-                else
-                    i_seekpoint = val.i_int;
-
-                if( i_seekpoint >= 0 && i_seekpoint <
-                    p_input->p->input.title[p_demux->info.i_title]->i_seekpoint )
-                {
-
-                    es_out_SetTime( p_input->p->p_es_out, -1 );
-
-                    demux_Control( p_demux, DEMUX_SET_SEEKPOINT, i_seekpoint );
-                    input_SendEventSeekpoint( p_input, p_demux->info.i_title, i_seekpoint );
-                }
+                i_title = p_demux->info.i_title;
+                i_seekpoint = p_demux->info.i_seekpoint;
             }
-            else if( p_input->p->input.i_title > 0 )
+            else
             {
                 access_t *p_access = p_input->p->input.p_access;
-                int i_seekpoint;
-                int64_t i_input_time;
-                int64_t i_seekpoint_time;
 
-                if( i_type == INPUT_CONTROL_SET_SEEKPOINT_PREV )
+                i_title = p_access->info.i_title;
+                i_seekpoint = p_access->info.i_seekpoint;
+            }
+
+            if( i_type == INPUT_CONTROL_SET_SEEKPOINT_PREV )
+            {
+                int64_t i_seekpoint_time = p_input->p->input.title[i_title]->seekpoint[i_seekpoint]->i_time_offset;
+                int64_t i_input_time = var_GetTime( p_input, "time" );
+                if( i_seekpoint_time >= 0 && i_input_time >= 0 )
                 {
-                    i_seekpoint = p_access->info.i_seekpoint;
-                    i_seekpoint_time = p_input->p->input.title[p_access->info.i_title]->seekpoint[i_seekpoint]->i_time_offset;
-                    i_input_time = var_GetTime( p_input, "time" );
-                    if( i_seekpoint_time >= 0 && i_input_time >= 0 )
-                    {
-                        if( i_input_time < i_seekpoint_time + 3000000 )
-                            i_seekpoint--;
-                    }
-                    else
+                    if( i_input_time < i_seekpoint_time + 3000000 )
                         i_seekpoint--;
                 }
-                else if( i_type == INPUT_CONTROL_SET_SEEKPOINT_NEXT )
-                    i_seekpoint = p_access->info.i_seekpoint + 1;
                 else
-                    i_seekpoint = val.i_int;
-
-                if( i_seekpoint >= 0 && i_seekpoint <
-                    p_input->p->input.title[p_access->info.i_title]->i_seekpoint )
-                {
-                    es_out_SetTime( p_input->p->p_es_out, -1 );
-
-                    stream_Control( p_input->p->input.p_stream, STREAM_CONTROL_ACCESS,
-                                    ACCESS_SET_SEEKPOINT, i_seekpoint );
-                    input_SendEventSeekpoint( p_input, p_access->info.i_title, i_seekpoint );
-                }
+                    i_seekpoint--;
             }
+            else if( i_type == INPUT_CONTROL_SET_SEEKPOINT_NEXT )
+                i_seekpoint++;
+            else
+                i_seekpoint = val.i_int;
+            if( i_seekpoint < 0
+             || i_seekpoint >= p_input->p->input.title[i_title]->i_seekpoint )
+                break;
+
+            es_out_SetTime( p_input->p->p_es_out, -1 );
+            if( p_input->p->input.b_title_demux )
+                demux_Control( p_input->p->input.p_demux,
+                               DEMUX_SET_SEEKPOINT, i_seekpoint );
+            else
+                stream_Control( p_input->p->input.p_stream,
+                                STREAM_CONTROL_ACCESS,
+                                ACCESS_SET_SEEKPOINT, i_seekpoint );
+            input_SendEventSeekpoint( p_input, i_title, i_seekpoint );
             break;
+        }
 
         case INPUT_CONTROL_ADD_SUBTITLE:
             if( val.psz_string )
