@@ -298,6 +298,7 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
 
         case STREAM_CONTROL_ACCESS:
         case STREAM_GET_TITLE_INFO:
+        case STREAM_GET_META:
         case STREAM_GET_CONTENT_TYPE:
         case STREAM_SET_PAUSE_STATE:
         case STREAM_SET_TITLE:
