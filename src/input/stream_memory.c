@@ -95,7 +95,6 @@ static int Control( stream_t *s, int i_query, va_list args )
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    bool *p_bool;
     uint64_t   *pi_64, i_64;
 
     switch( i_query )
@@ -106,13 +105,10 @@ static int Control( stream_t *s, int i_query, va_list args )
             break;
 
         case STREAM_CAN_SEEK:
-            p_bool = (bool*)va_arg( args, bool * );
-            *p_bool = true;
-            break;
-
         case STREAM_CAN_FASTSEEK:
-            p_bool = (bool*)va_arg( args, bool * );
-            *p_bool = true;
+        case STREAM_CAN_PAUSE:
+        case STREAM_CAN_CONTROL_PACE:
+            *va_arg( args, bool * ) = true;
             break;
 
         case STREAM_GET_POSITION:
@@ -128,6 +124,9 @@ static int Control( stream_t *s, int i_query, va_list args )
 
         case STREAM_GET_CONTENT_TYPE:
             return VLC_EGENERIC;
+
+        case STREAM_SET_PAUSE_STATE:
+            break; /* nothing to do */
 
         case STREAM_CONTROL_ACCESS:
             msg_Err( s, "Hey, what are you thinking ?"

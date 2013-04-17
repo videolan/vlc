@@ -259,7 +259,6 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
 {
     stream_sys_t *p_sys = s->p_sys;
     uint64_t    *p_i64;
-    bool *p_b;
 
     switch( i_query )
     {
@@ -269,13 +268,10 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case STREAM_CAN_SEEK:
-            p_b = (bool*) va_arg( args, bool * );
-            *p_b = false;
-            return VLC_SUCCESS;
-
         case STREAM_CAN_FASTSEEK:
-            p_b = (bool*) va_arg( args, bool * );
-            *p_b = false;
+        case STREAM_CAN_PAUSE:
+        case STREAM_CAN_CONTROL_PACE:
+            *va_arg( args, bool * ) = false;
             return VLC_SUCCESS;
 
         case STREAM_GET_POSITION:
@@ -302,6 +298,7 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
 
         case STREAM_CONTROL_ACCESS:
         case STREAM_GET_CONTENT_TYPE:
+        case STREAM_SET_PAUSE_STATE:
         case STREAM_SET_RECORD_STATE:
             return VLC_EGENERIC;
 
