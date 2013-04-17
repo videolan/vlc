@@ -63,7 +63,6 @@ static int     Control( access_t *, int, va_list );
 
 struct access_sys_t
 {
-    unsigned int i_nb_reads;
     char *psz_name;
 
     GnomeVFSHandle *p_handle;
@@ -105,7 +104,6 @@ static int Open( vlc_object_t *p_this )
     STANDARD_READ_ACCESS_INIT;
 
     p_sys->p_handle = p_handle;
-    p_sys->i_nb_reads = 0;
     p_sys->b_pace_control = true;
 
     if( strcmp( "gnomevfs", p_access->psz_access ) &&
@@ -288,35 +286,19 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
                                     gnome_vfs_result_to_string( i_ret ) );
         }
     }
-    else
-    {
-        p_sys->i_nb_reads++;
-        if( p_access->info.i_size != 0 &&
-            (p_sys->i_nb_reads % INPUT_FSTAT_NB_READS) == 0 &&
-            p_sys->b_local )
-        {
-            gnome_vfs_file_info_clear( p_sys->p_file_info );
-            i_ret = gnome_vfs_get_file_info_from_handle( p_sys->p_handle,
-                                                p_sys->p_file_info, 8 );
-            if( i_ret )
-            {
-                msg_Warn( p_access, "couldn't get file properties again (%s)",
-                                        gnome_vfs_result_to_string( i_ret ) );
-            }
-            else
-            {
-                p_access->info.i_size = (int64_t)(p_sys->p_file_info->size);
-            }
-        }
-    }
 
     p_access->info.i_pos += (int64_t)i_read_len;
-
-    /* Some Acces (http) never return EOF and loop on the file */
-    if( p_access->info.i_pos > p_access->info.i_size )
+    if( p_access->info.i_pos >= p_access->info.i_size
+     && p_access->info.i_size != 0 && p_sys->b_local )
     {
-        p_access->info.b_eof = true;
-        return 0;
+        gnome_vfs_file_info_clear( p_sys->p_file_info );
+        i_ret = gnome_vfs_get_file_info_from_handle( p_sys->p_handle,
+                                                     p_sys->p_file_info, 8 );
+        if( i_ret )
+            msg_Warn( p_access, "couldn't get file properties again (%s)",
+                      gnome_vfs_result_to_string( i_ret ) );
+        else
+            p_access->info.i_size = (int64_t)(p_sys->p_file_info->size);
     }
     return (int)i_read_len;
 }

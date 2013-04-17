@@ -66,8 +66,6 @@
 
 struct access_sys_t
 {
-    unsigned int i_nb_reads;
-
     int fd;
 
     /* */
@@ -222,7 +220,6 @@ int FileOpen( vlc_object_t *p_this )
     p_access->pf_block = NULL;
     p_access->pf_control = FileControl;
     p_access->p_sys = p_sys;
-    p_sys->i_nb_reads = 0;
     p_sys->fd = fd;
 
     if (S_ISREG (st.st_mode) || S_ISBLK (st.st_mode))
@@ -305,11 +302,7 @@ static ssize_t FileRead (access_t *p_access, uint8_t *p_buffer, size_t i_len)
 
     p_access->info.i_pos += val;
     p_access->info.b_eof = !val;
-
-    p_sys->i_nb_reads++;
-
-    if (!(p_sys->i_nb_reads % INPUT_FSTAT_NB_READS)
-     || (p_access->info.i_pos > p_access->info.i_size))
+    if (p_access->info.i_pos >= p_access->info.i_size)
     {
         struct stat st;
 

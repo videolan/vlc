@@ -59,10 +59,6 @@
 /* Used in ErrorThread */
 #define INPUT_IDLE_SLEEP                (CLOCK_FREQ/10)
 
-/* Number of read() calls needed until we check the file size through
- * fstat() */
-#define INPUT_FSTAT_NB_READS            16
-
 /*
  * General limitations
  */
