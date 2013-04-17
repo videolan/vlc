@@ -176,6 +176,7 @@ static int Open(vlc_object_t *obj)
 
     vlc_mutex_init(&p_sys->lock);
     vlc_cond_init(&p_sys->cond);
+    p_sys->b_digital = false;
 
     p_aout->sys = p_sys;
     p_aout->start = Start;
@@ -940,6 +941,7 @@ static void Stop(audio_output_t *p_aout)
     }
 
     p_sys->i_bytes_per_sample = 0;
+    p_sys->b_digital = false;
 
     /* clean-up circular buffer */
     TPCircularBufferCleanup(&p_sys->circular_buffer);
@@ -1092,6 +1094,10 @@ static int VolumeSet(audio_output_t * p_aout, float volume)
     struct aout_sys_t *p_sys = p_aout->sys;
     OSStatus ostatus;
 
+    if(p_sys->b_digital) {
+        return VLC_EGENERIC;
+    }
+
     aout_VolumeReport(p_aout, volume);
 
     /* Set volume for output unit */
@@ -1112,6 +1118,10 @@ static int MuteSet(audio_output_t * p_aout, bool mute)
 {
     struct   aout_sys_t *p_sys = p_aout->sys;
     OSStatus ostatus;
+
+    if(p_sys->b_digital) {
+        return VLC_EGENERIC;
+    }
 
     aout_MuteReport(p_aout, mute);
 
