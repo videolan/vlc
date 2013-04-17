@@ -112,6 +112,7 @@ enum stream_query_e
     STREAM_GET_TITLE_INFO = 0x102, /**< arg1=input_title_t*** arg2=int* res=can fail */
     STREAM_GET_META,        /**< arg1= vlc_meta_t **       res=can fail */
     STREAM_GET_CONTENT_TYPE,    /**< arg1= char **         res=can fail */
+    STREAM_GET_SIGNAL,      /**< arg1=double *pf_quality, arg2=double *pf_strength   res=can fail */
 
     STREAM_SET_PAUSE_STATE = 0x200, /**< arg1= bool        res=can fail */
     STREAM_SET_TITLE,       /**< arg1= int          res=can fail */

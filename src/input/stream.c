@@ -616,6 +616,8 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
             return access_vaControl( p_access, ACCESS_GET_META, args );
         case STREAM_GET_CONTENT_TYPE:
             return access_vaControl( p_access, ACCESS_GET_CONTENT_TYPE, args );
+        case STREAM_GET_SIGNAL:
+            return access_vaControl( p_access, ACCESS_GET_SIGNAL, args );
 
         case STREAM_SET_PAUSE_STATE:
             return access_vaControl( p_access, ACCESS_SET_PAUSE_STATE, args );

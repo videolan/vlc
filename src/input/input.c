@@ -2287,7 +2287,7 @@ static void UpdateGenericFromAccess( input_thread_t *p_input )
         double f_quality;
         double f_strength;
 
-        if( access_Control( p_access, ACCESS_GET_SIGNAL, &f_quality, &f_strength ) )
+        if( stream_Control( p_stream, STREAM_GET_SIGNAL, &f_quality, &f_strength ) )
             f_quality = f_strength = -1;
 
         input_SendEventSignal( p_input, f_quality, f_strength );
