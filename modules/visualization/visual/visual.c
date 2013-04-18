@@ -178,11 +178,6 @@ static int Open( vlc_object_t *p_this )
     char *psz_effects, *psz_parser;
     video_format_t fmt;
 
-    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 )
-    {
-        return VLC_EGENERIC;
-    }
-
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( unlikely (p_sys == NULL ) )
         return VLC_EGENERIC;
@@ -308,6 +303,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
+    p_filter->fmt_out.audio = p_filter->fmt_in.audio;
     p_filter->pf_audio_filter = DoWork;
 
     return VLC_SUCCESS;
