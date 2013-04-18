@@ -116,8 +116,9 @@ static void DoWork_7_x_to_2_0( filter_t * p_filter,  block_t * p_in_buf, block_t
     const float *p_src = (const float *)p_in_buf->p_buffer;
     for( int i = p_in_buf->i_nb_samples; i--; )
     {
-        *p_dest++ = p_src[6] * 0.7071 + p_src[0] + p_src[2] / 4 + p_src[4] / 4;
-        *p_dest++ = p_src[6] * 0.7071 + p_src[1] + p_src[3] / 4 + p_src[5] / 4;
+        float ctr = p_src[6] * 0.7071f;
+        *p_dest++ = ctr + p_src[0] + p_src[2] / 4 + p_src[4] / 4;
+        *p_dest++ = ctr + p_src[1] + p_src[3] / 4 + p_src[5] / 4;
 
         p_src += 7;
 
@@ -125,14 +126,17 @@ static void DoWork_7_x_to_2_0( filter_t * p_filter,  block_t * p_in_buf, block_t
     }
 }
 
-static void DoWork_6_1_to_2_0( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
+static void DoWork_6_1_to_2_0( filter_t *p_filter, block_t *p_in_buf,
+                               block_t *p_out_buf )
+{
     VLC_UNUSED(p_filter);
     float *p_dest = (float *)p_out_buf->p_buffer;
     const float *p_src = (const float *)p_in_buf->p_buffer;
     for( int i = p_in_buf->i_nb_samples; i--; )
     {
-        *p_dest++ = p_src[0] + p_src[3] + 0.7071 * (p_src[2] + p_src[5]);
-        *p_dest++ = p_src[1] + p_src[4] + 0.7071 * (p_src[2] + p_src[5]);
+        float ctr = (p_src[2] + p_src[5]) * 0.7071f;
+        *p_dest++ = p_src[0] + p_src[3] + ctr;
+        *p_dest++ = p_src[1] + p_src[4] + ctr;
 
         p_src += 6;
 
@@ -146,8 +150,8 @@ static void DoWork_5_x_to_2_0( filter_t * p_filter,  block_t * p_in_buf, block_t
     const float *p_src = (const float *)p_in_buf->p_buffer;
     for( int i = p_in_buf->i_nb_samples; i--; )
     {
-        *p_dest++ = p_src[0] + 0.7071 * (p_src[4] + p_src[2]);
-        *p_dest++ = p_src[1] + 0.7071 * (p_src[4] + p_src[3]);
+        *p_dest++ = p_src[0] + 0.7071f * (p_src[4] + p_src[2]);
+        *p_dest++ = p_src[1] + 0.7071f * (p_src[4] + p_src[3]);
 
         p_src += 5;
 
@@ -161,8 +165,8 @@ static void DoWork_4_0_to_2_0( filter_t * p_filter,  block_t * p_in_buf, block_t
     const float *p_src = (const float *)p_in_buf->p_buffer;
     for( int i = p_in_buf->i_nb_samples; i--; )
     {
-        *p_dest++ = p_src[2] + p_src[3] + 0.5 * p_src[0];
-        *p_dest++ = p_src[2] + p_src[3] + 0.5 * p_src[1];
+        *p_dest++ = p_src[2] + p_src[3] + 0.5f * p_src[0];
+        *p_dest++ = p_src[2] + p_src[3] + 0.5f * p_src[1];
         p_src += 4;
     }
 }
@@ -172,8 +176,8 @@ static void DoWork_3_x_to_2_0( filter_t * p_filter,  block_t * p_in_buf, block_t
     const float *p_src = (const float *)p_in_buf->p_buffer;
     for( int i = p_in_buf->i_nb_samples; i--; )
     {
-        *p_dest++ = p_src[2] + 0.5 * p_src[0];
-        *p_dest++ = p_src[2] + 0.5 * p_src[1];
+        *p_dest++ = p_src[2] + 0.5f * p_src[0];
+        *p_dest++ = p_src[2] + 0.5f * p_src[1];
 
         p_src += 3;
 
@@ -199,7 +203,8 @@ static void DoWork_5_x_to_1_0( filter_t * p_filter,  block_t * p_in_buf, block_t
     const float *p_src = (const float *)p_in_buf->p_buffer;
     for( int i = p_in_buf->i_nb_samples; i--; )
     {
-        *p_dest++ = 0.7071 * (p_src[0] + p_src[1]) + p_src[4] + 0.5f * (p_src[2] + p_src[3]);
+        *p_dest++ = 0.7071f * (p_src[0] + p_src[1]) + p_src[4]
+                     + 0.5f * (p_src[2] + p_src[3]);
 
         p_src += 5;
 
@@ -248,8 +253,8 @@ static void DoWork_7_x_to_4_0( filter_t * p_filter,  block_t * p_in_buf, block_t
     const float *p_src = (const float *)p_in_buf->p_buffer;
     for( int i = p_in_buf->i_nb_samples; i--; )
     {
-        *p_dest++ = p_src[6] + 0.5 * p_src[0] + p_src[2] / 6;
-        *p_dest++ = p_src[6] + 0.5 * p_src[1] + p_src[3] / 6;
+        *p_dest++ = p_src[6] + 0.5f * p_src[0] + p_src[2] / 6;
+        *p_dest++ = p_src[6] + 0.5f * p_src[1] + p_src[3] / 6;
         *p_dest++ = p_src[2] / 6 +  p_src[4];
         *p_dest++ = p_src[3] / 6 +  p_src[5];
 
@@ -264,8 +269,9 @@ static void DoWork_5_x_to_4_0( filter_t * p_filter,  block_t * p_in_buf, block_t
     const float *p_src = (const float *)p_in_buf->p_buffer;
     for( int i = p_in_buf->i_nb_samples; i--; )
     {
-        *p_dest++ = p_src[0] + p_src[4] * 0.7071;
-        *p_dest++ = p_src[1] + p_src[4] * 0.7071;
+        float ctr = p_src[4] * 0.7071f;
+        *p_dest++ = p_src[0] + ctr;
+        *p_dest++ = p_src[1] + ctr;
         *p_dest++ = p_src[2];
         *p_dest++ = p_src[3];
 
@@ -282,8 +288,8 @@ static void DoWork_7_x_to_5_x( filter_t * p_filter,  block_t * p_in_buf, block_t
     {
         *p_dest++ = p_src[0];
         *p_dest++ = p_src[1];
-        *p_dest++ = (p_src[2] + p_src[4]) * 0.5;
-        *p_dest++ = (p_src[3] + p_src[5]) * 0.5;
+        *p_dest++ = (p_src[2] + p_src[4]) * 0.5f;
+        *p_dest++ = (p_src[3] + p_src[5]) * 0.5f;
         *p_dest++ = p_src[6];
 
         p_src += 7;
@@ -303,8 +309,8 @@ static void DoWork_6_1_to_5_x( filter_t * p_filter,  block_t * p_in_buf, block_t
     {
         *p_dest++ = p_src[0];
         *p_dest++ = p_src[1];
-        *p_dest++ = (p_src[2] + p_src[4]) * 0.5;
-        *p_dest++ = (p_src[3] + p_src[4]) * 0.5;
+        *p_dest++ = (p_src[2] + p_src[4]) * 0.5f;
+        *p_dest++ = (p_src[3] + p_src[4]) * 0.5f;
         *p_dest++ = p_src[5];
 
         p_src += 6;
