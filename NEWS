@@ -50,6 +50,7 @@ Access:
  * Add support for Remote Desktop/RDP in view only mode
  * Timecode: generate a clock/timecode as a subtitle track
    vlc video.mkv --input-slave timecode:// --timecode-fps 30/1001
+ * New video capture module for OS X based on AVFoundation
 
 Demuxers:
  * MP4: partial support for fragmented MP4

@@ -44,6 +44,7 @@ $Id$
  * android_audiotrack: audio output for Android, based on AudioTrack
  * android_surface: video output for Android, based on Surface
  * antiflicker: anti-flicker video filter
+ * avcapture: AVFoundation based video capture module
  * araw: Pseudo audio decoder for raw PCM
  * asf: ASF demuxer
  * atmo: Ambilight-like video-output
