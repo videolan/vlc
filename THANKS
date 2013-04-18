@@ -23,11 +23,40 @@ Sebastien Chaumat
 Some VLC plugins use external libraries and makes extensive use of the
 following persons' or companies' code:
 
-FFmpeg - Copyright (c) 2000-2010 the FFmpeg developers
-liba52 - Aaron Holtzman & Michel Lespinasse, et al.
-FAAD2 - "Code from FAAD2 is copyright (c) Nero AG, www.nero.com"
-FAAC - Menno Bakker, Krzysztof Nikiel & The individual contributors
-libmpeg2 - Aaron Holtzman & Michel Lespinasse, et al.
-ogg, theora, vorbis - Monty & the Xiph.org Foundation
-flac - Josh Coalson et al.
-Sparkle — Andy Matuschak et al.
+FAAD2 - Copyright (c) Nero AG, www.nero.com" - GPLv2 or later
+FFmpeg - Copyright (c) 2000-2010 the FFmpeg developers - LGPLv2.1 or later
+liba52 - Aaron Holtzman & Michel Lespinasse, et al. - GPLv2 or later
+libav - Copyright (c) 2000 - 2013 the libav developers - LGPLv2.1 or later
+libFLAC - Copyright (c) 2001 - 2013 Josh Coalson et al. - Xiph.org BSD license
+freetype - David Turner, Robert Wilhelm, and Werner Lemberg - FreeType License
+GSM - Copyright (c) 1992 - 1994, 2009 Jutta Degener & Carsten Bormann - GSM
+ permissive license
+harfbuzz - Copyright (c) 2010, 2011, 2012  Google, Inc., (c) 2012  Mozilla
+ Foundation, (c) 2011 Codethink Limited, (c) 2008, 2010  Nokia Corporation
+ and/or its subsidiary(-ies), (c) 2009 Keith Stribley, (c) 2009 Martin Hosken
+ and SIL International, (c) 2007 Chris Wilson, (c) 2006 Behdad Esfahbod,
+ (c) 2005 David Turner, (c) 2004, 2007, 2008, 2009, 2010 Red Hat, Inc.,
+ (c) 1998-2004 David Turner and Werner Lemberg - Old MIT License
+libdvbpsi - Copyright (c) 2001-2013 VideoLAN and authors - LGPLv2.1 or later
+libebml - Copyright (c) 2002-2013 Steve Lhomme - LGPLv2.1 or later
+liblive555 - Copyright (c) 1996-2013 Live Networks, Inc. - LGPLv2.1 or later
+libmatroska - Copyright (c) 2002-2013 Steve Lhomme - LGPLv2.1 or later
+libmpeg2 - Aaron Holtzman & Michel Lespinasse, et al. - GPLv2 or later
+libmodplug - Oliver Lapicque, Konstanty - Public domain
+libogg, libvorbis - Copyright (c) 2002 Xiph.org Foundation - Xiph.org BSD
+ license
+libpng - Copyright (c) 2004, 2006-2012 Glenn Randers-Perhson, et al. - libpng
+ license
+libtheora - Copyright (c) Xiph.org Foundation - Xiph.org BSD license
+libxml2 - Copyright (c) 1998-2003 Daniel Veillard - MIT License
+lua - Copyright (c) 1994-2008 Lua.org, PUC-Rio. - MIT License
+OpenJpeg - Copyright (c) 2002-2012, Communcations and Remote Sensing
+ Laboratory, UCL, Belgium - ISC License
+Opus - Copyright 2001-2011 Xiph.Org, Skype Limited, Octasic, Jean-Marc Valin,
+ Timothy B. Terriberry, CSIRO, Gregory Maxwell, Mark Borgerding,
+ Erik de Castro Lopo - Xiph.org BSD License
+Sparkle — Andy Matuschak et al. - MIT License
+Speex, Speexdsp - Copyright (c) 1992-2008 Xiph.org Foundation, Jean-Marc Valin,
+ Analog Devices Inc. Commonwealth Scientific and Industrial Research
+ Organisation, David Row, Jutta Degener, Carsten Bormann - 3-clause BSD License
+zlib - Copyright (c) 1995-2012 Jean-loup Gailly and Mark Adler - zlib license
