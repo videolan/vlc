@@ -133,7 +133,7 @@ libplaylist_plugin_la_SOURCES = \
 libplaylist_plugin_la_CFLAGS = $(AM_CFLAGS)
 libplaylist_plugin_la_LIBADD = $(AM_LIBADD)
 
-libts_plugin_la_SOURCES = ts.c ../mux/mpeg/csa.c dvb-text.h
+libts_plugin_la_SOURCES = ts.c ../mux/mpeg/csa.c ../mux/mpeg/dvbpsi_compat.h dvb-text.h
 libts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)
 libts_plugin_la_LIBADD = $(AM_LIBADD) $(DVBPSI_LIBS) $(SOCKET_LIBS)
 if HAVE_DVBPSI
