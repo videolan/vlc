@@ -93,6 +93,10 @@
 #define COLOR1_LONGTEXT N_( \
         "YUV-Color cube shifting across the V-plane ( 0 - 127 )." )
 
+/* Default vout size */
+#define VOUT_WIDTH  800
+#define VOUT_HEIGHT 500
+
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
@@ -165,6 +169,17 @@ static const struct
     { "spectrometer", spectrometer_Run },
     { "dummy",        dummy_Run},
     { NULL,           dummy_Run}
+};
+
+struct filter_sys_t
+{
+    vout_thread_t*  p_vout;
+
+    int             i_width;
+    int             i_height;
+
+    int             i_effect;
+    visual_effect_t **effect;
 };
 
 /*****************************************************************************

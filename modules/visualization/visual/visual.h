@@ -55,23 +55,6 @@ typedef struct
     int16_t *p_prev_s16_buff;
 } spectrometer_data;
 
-/*****************************************************************************
- * aout_filter_sys_t: visualizer audio filter method descriptor
- *****************************************************************************
- * This structure is part of the audio filter descriptor.
- * It describes some visualizer specific variables.
- *****************************************************************************/
-struct filter_sys_t
-{
-    vout_thread_t*  p_vout;
-
-    int             i_width;
-    int             i_height;
-
-    int             i_effect;
-    visual_effect_t **effect;
-};
-
 /* Prototypes */
 int scope_Run
         (visual_effect_t * , vlc_object_t *, const block_t *, picture_t *);
@@ -85,7 +68,3 @@ int spectrum_Run
         (visual_effect_t * , vlc_object_t *, const block_t *, picture_t *);
 int spectrometer_Run
         (visual_effect_t * , vlc_object_t *, const block_t *, picture_t *);
-
-/* Default vout size */
-#define VOUT_WIDTH  800
-#define VOUT_HEIGHT 500
