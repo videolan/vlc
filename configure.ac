@@ -472,7 +472,7 @@ AC_ARG_ENABLE(winstore_app,
                     [Build targetted for Windows Store apps (default disabled)]))
 
 AS_IF([test "${SYS}" = "mingw32"], [
-    AS_IF([test "${enable_winstore_app}" == "yes"], [
+    AS_IF([test "${enable_winstore_app}" = "yes"], [
        AC_DEFINE(WINAPI_FAMILY_APP, 1, [Define if you want to build for Windows Store apps])])
     ])
 
@@ -2300,7 +2300,7 @@ AS_IF([test "${enable_libva}" = "yes" -a "${have_avcodec}" != "yes" ], [
   AC_MSG_ERROR([--enable-libva and --disable-avcodec options are mutually exclusive. Use --enable-avcodec.])
 ])
 have_avcodec_vaapi="no"
-AS_IF([test "${enable_libva}" != "no" -a "${have_avcodec}" == "yes"], [
+AS_IF([test "${enable_libva}" != "no" -a "${have_avcodec}" = "yes"], [
   PKG_CHECK_MODULES(LIBVA, [libva libva-x11], [
     VLC_SAVE_FLAGS
     CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
@@ -3022,7 +3022,7 @@ AC_ARG_ENABLE(vdpau,
   [AS_HELP_STRING([--enable-vdpau],
     [VDPAU hardware decoder support (default auto)])])
 have_vdpau="no"
-AS_IF([test "${enable_vdpau}" != "no" -a "${have_avcodec}" == "yes"], [
+AS_IF([test "${enable_vdpau}" != "no" -a "${have_avcodec}" = "yes"], [
   PKG_CHECK_MODULES([VDPAU], [vdpau], [
     have_vdpau="yes"
     AS_IF([test "${no_x}" = "yes"], [
