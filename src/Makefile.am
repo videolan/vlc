@@ -303,6 +303,7 @@ SOURCES_libvlc_os2 = \
 	os2/getaddrinfo.c \
 	os2/dirs.c \
 	os2/filesystem.c \
+	os2/netconf.c \
 	os2/plugin.c \
 	os2/thread.c \
 	os2/specific.c \
