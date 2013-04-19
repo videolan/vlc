@@ -192,8 +192,6 @@ static int Open( vlc_object_t *p_this )
     if( (p_sys->i_height % 2 ) != 0 ) p_sys->i_height--;
     if( (p_sys->i_width % 2 )  != 0 ) p_sys->i_width--;
 
-    vlc_mutex_init( &p_sys->lock );
-    p_sys->b_close = false;
     p_sys->i_effect = 0;
     p_sys->effect   = NULL;
 
@@ -321,16 +319,8 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     picture_t *p_outpic;
 
     /* First, get a new picture */
-    do
-    {
-        vlc_mutex_lock( &p_sys->lock );
-        bool close = p_sys->b_close;
-        vlc_mutex_unlock( &p_sys->lock );
-        if( close )
-            return NULL;
+    while( ( p_outpic = vout_GetPicture( p_sys->p_vout ) ) == NULL )
         msleep( VOUT_OUTMEM_SLEEP );
-    }
-    while( ( p_outpic = vout_GetPicture( p_sys->p_vout ) ) == NULL);
 
     /* Blank the picture */
     for( int i = 0 ; i < p_outpic->i_planes ; i++ )
@@ -365,10 +355,6 @@ static void Close( vlc_object_t *p_this )
     filter_t * p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    vlc_mutex_lock( &p_sys->lock );
-    p_sys->b_close = true;
-    vlc_mutex_unlock( &p_sys->lock );
-
     if( p_filter->p_sys->p_vout )
     {
         aout_filter_RequestVout( p_filter, p_filter->p_sys->p_vout, 0 );
@@ -402,6 +388,4 @@ static void Close( vlc_object_t *p_this )
 
     free( p_sys->effect );
     free( p_filter->p_sys );
-
-    vlc_mutex_destroy( &p_sys->lock );
 }

@@ -64,8 +64,6 @@ typedef struct
 struct filter_sys_t
 {
     vout_thread_t*  p_vout;
-    vlc_mutex_t     lock;
-    bool            b_close;
 
     int             i_width;
     int             i_height;
