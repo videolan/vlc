@@ -156,20 +156,6 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static block_t *DoWork( filter_t *, block_t * );
-static const struct
-{
-    const char *psz_name;
-    int  (*pf_run)( visual_effect_t *, vlc_object_t *,
-                    const block_t *, picture_t *);
-} pf_effect_run[]=
-{
-    { "scope",        scope_Run },
-    { "vuMeter",      vuMeter_Run },
-    { "spectrum",     spectrum_Run },
-    { "spectrometer", spectrometer_Run },
-    { "dummy",        dummy_Run},
-    { NULL,           dummy_Run}
-};
 
 struct filter_sys_t
 {
@@ -227,14 +213,13 @@ static int Open( vlc_object_t *p_this )
         p_effect->pf_run   = NULL;
         p_effect->psz_name = NULL;
 
-        for( int i = 0; pf_effect_run[i].psz_name != NULL; i++ )
+        for( unsigned i = 0; i < effectc; i++ )
         {
-            if( !strncasecmp( psz_parser,
-                              pf_effect_run[i].psz_name,
-                              strlen( pf_effect_run[i].psz_name ) ) )
+            if( !strncasecmp( psz_parser, effectv[i].name,
+                              strlen( effectv[i].name ) ) )
             {
-                p_effect->pf_run = pf_effect_run[i].pf_run;
-                p_effect->psz_name = pf_effect_run[i].psz_name;
+                p_effect->pf_run = effectv[i].run_cb;
+                p_effect->psz_name = effectv[i].name;
                 break;
             }
         }

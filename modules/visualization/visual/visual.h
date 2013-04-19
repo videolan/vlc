@@ -54,16 +54,11 @@ typedef struct
     int16_t *p_prev_s16_buff;
 } spectrometer_data;
 
-/* Prototypes */
-int scope_Run
-        (visual_effect_t * , vlc_object_t *, const block_t *, picture_t *);
-int vuMeter_Run
-        (visual_effect_t * , vlc_object_t *, const block_t *, picture_t *);
-int dummy_Run
-        (visual_effect_t * , vlc_object_t *, const block_t *, picture_t *);
-int random_Run
-        (visual_effect_t * , vlc_object_t *, const block_t *, picture_t *);
-int spectrum_Run
-        (visual_effect_t * , vlc_object_t *, const block_t *, picture_t *);
-int spectrometer_Run
-        (visual_effect_t * , vlc_object_t *, const block_t *, picture_t *);
+typedef int (*visual_run_t)(visual_effect_t *, vlc_object_t *,
+                            const block_t *, picture_t *);
+extern const struct visual_cb_t
+{
+    char name[16];
+    visual_run_t run_cb;
+} effectv[];
+extern const unsigned effectc;
