@@ -30,7 +30,6 @@ typedef struct visual_effect_t
     void *     p_data; /* The effect stores whatever it wants here */
     int        i_width;
     int        i_height;
-    char *     psz_args;
     int        i_nb_chans;
 
     /* Channels index */

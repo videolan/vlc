@@ -222,7 +222,6 @@ static int Open( vlc_object_t *p_this )
         p_effect->i_idx_left  = 0;
         p_effect->i_idx_right = __MIN( 1, p_effect->i_nb_chans-1 );
 
-        p_effect->psz_args = NULL;
         p_effect->p_data   = NULL;
 
         p_effect->pf_run   = NULL;
@@ -256,8 +255,6 @@ static int Open( vlc_object_t *p_this )
                    free( p_effect );
                    break;
                 }
-                p_effect->psz_args =
-                    strndup( psz_parser, psz_eoa - psz_parser);
             }
             TAB_APPEND( p_sys->i_effect, p_sys->effect, p_effect );
         }
@@ -305,10 +302,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_filter, "no suitable vout module" );
         for( int i = 0; i < p_sys->i_effect; i++ )
-        {
-            free( p_sys->effect[i]->psz_args );
             free( p_sys->effect[i] );
-        }
         free( p_sys->effect );
         free( p_sys );
         return VLC_EGENERIC;
@@ -394,7 +388,6 @@ static void Close( vlc_object_t *p_this )
             }
             free( p_effect->p_data );
         }
-        free( p_effect->psz_args );
         free( p_effect );
 #undef p_effect
     }
