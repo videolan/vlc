@@ -28,6 +28,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
@@ -156,13 +158,15 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static block_t *DoWork( filter_t *, block_t * );
+static void *Thread( void *);
 
 struct filter_sys_t
 {
-    vout_thread_t*  p_vout;
-
-    int             i_effect;
+    block_fifo_t    *fifo;
+    vout_thread_t   *p_vout;
     visual_effect_t **effect;
+    int             i_effect;
+    vlc_thread_t    thread;
 };
 
 /*****************************************************************************
@@ -265,8 +269,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys->i_effect )
     {
         msg_Err( p_filter, "no effects found" );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     /* Open the video output */
@@ -283,26 +286,38 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->p_vout == NULL )
     {
         msg_Err( p_filter, "no suitable vout module" );
-        for( int i = 0; i < p_sys->i_effect; i++ )
-            free( p_sys->effect[i] );
-        free( p_sys->effect );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
+    }
+
+    p_sys->fifo = block_FifoNew();
+    if( unlikely( p_sys->fifo == NULL ) )
+    {
+        aout_filter_RequestVout( p_filter, p_sys->p_vout, 0 );
+        goto error;
+    }
+
+    if( vlc_clone( &p_sys->thread, Thread, p_filter,
+                   VLC_THREAD_PRIORITY_VIDEO ) )
+    {
+        block_FifoRelease( p_sys->fifo );
+        aout_filter_RequestVout( p_filter, p_sys->p_vout, 0 );
+        goto error;
     }
 
     p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
     p_filter->pf_audio_filter = DoWork;
-
     return VLC_SUCCESS;
+
+error:
+    for( int i = 0; i < p_sys->i_effect; i++ )
+        free( p_sys->effect[i] );
+    free( p_sys->effect );
+    free( p_sys );
+    return VLC_EGENERIC;
 }
 
-/*****************************************************************************
- * DoWork: convert a buffer
- *****************************************************************************
- * Audio part pasted from trivial.c
- ****************************************************************************/
-static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
+static block_t *DoRealWork( filter_t *p_filter, block_t *p_in_buf )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     picture_t *p_outpic;
@@ -336,6 +351,30 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     return p_in_buf;
 }
 
+static void *Thread( void *data )
+{
+    filter_t *p_filter = data;
+    filter_sys_t *sys = p_filter->p_sys;
+
+    for (;;)
+    {
+        block_t *block = block_FifoGet( sys->fifo );
+
+        int canc = vlc_savecancel( );
+        block_Release( DoRealWork( p_filter, block ) );
+        vlc_restorecancel( canc );
+    }
+    assert(0);
+}
+
+static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
+{
+    block_t *block = block_Duplicate( p_in_buf );
+    if( likely(block != NULL) )
+        block_FifoPut( p_filter->p_sys->fifo, block );
+    return p_in_buf;
+}
+
 /*****************************************************************************
  * Close: close the plugin
  *****************************************************************************/
@@ -344,10 +383,10 @@ static void Close( vlc_object_t *p_this )
     filter_t * p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( p_filter->p_sys->p_vout )
-    {
-        aout_filter_RequestVout( p_filter, p_filter->p_sys->p_vout, 0 );
-    }
+    vlc_cancel( p_sys->thread );
+    vlc_join( p_sys->thread, NULL );
+    block_FifoRelease( p_sys->fifo );
+    aout_filter_RequestVout( p_filter, p_filter->p_sys->p_vout, 0 );
 
     /* Free the list */
     for( int i = 0; i < p_sys->i_effect; i++ )
