@@ -175,9 +175,6 @@ struct filter_sys_t
 {
     vout_thread_t*  p_vout;
 
-    int             i_width;
-    int             i_height;
-
     int             i_effect;
     visual_effect_t **effect;
 };
@@ -191,21 +188,20 @@ static int Open( vlc_object_t *p_this )
     filter_sys_t *p_sys;
 
     char *psz_effects, *psz_parser;
-    video_format_t fmt;
 
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( unlikely (p_sys == NULL ) )
         return VLC_EGENERIC;
 
-    p_sys->i_height = var_InheritInteger( p_filter , "effect-height");
-    p_sys->i_width  = var_InheritInteger( p_filter , "effect-width");
-
-    /* No resolution under 400x532 */
-    if( p_sys->i_height < 400 ) p_sys->i_height = 400;
-    if( p_sys->i_width  < 532 ) p_sys->i_width  = 532;
-    /* Work on even dimensions */
-    if( (p_sys->i_height % 2 ) != 0 ) p_sys->i_height--;
-    if( (p_sys->i_width % 2 )  != 0 ) p_sys->i_width--;
+    int width = var_InheritInteger( p_filter , "effect-width");
+    int height = var_InheritInteger( p_filter , "effect-width");
+    /* No resolution under 400x532 and no odd dimension */
+    if( width < 532 )
+        width  = 532;
+    width &= ~1;
+    if( height < 400 )
+        height = 400;
+    height &= ~1;
 
     p_sys->i_effect = 0;
     p_sys->effect   = NULL;
@@ -220,8 +216,8 @@ static int Open( vlc_object_t *p_this )
         p_effect = malloc( sizeof( visual_effect_t ) );
         if( !p_effect )
             break;
-        p_effect->i_width     = p_sys->i_width;
-        p_effect->i_height    = p_sys->i_height;
+        p_effect->i_width     = width;
+        p_effect->i_height    = height;
         p_effect->i_nb_chans  = aout_FormatNbChannels( &p_filter->fmt_in.audio);
         p_effect->i_idx_left  = 0;
         p_effect->i_idx_right = __MIN( 1, p_effect->i_nb_chans-1 );
@@ -295,13 +291,15 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Open the video output */
-    memset( &fmt, 0, sizeof(video_format_t) );
-
-    fmt.i_width   = fmt.i_visible_width  = p_sys->i_width;
-    fmt.i_height  = fmt.i_visible_height = p_sys->i_height;
-    fmt.i_chroma  = VLC_CODEC_I420;
-    fmt.i_sar_num = fmt.i_sar_den = 1;
-
+    video_format_t fmt = {
+        .i_chroma = VLC_CODEC_I420,
+        .i_width = width,
+        .i_height = height,
+        .i_visible_width = width,
+        .i_visible_height = height,
+        .i_sar_num = 1,
+        .i_sar_den = 1,
+    };
     p_sys->p_vout = aout_filter_RequestVout( p_filter, NULL, &fmt );
     if( p_sys->p_vout == NULL )
     {
