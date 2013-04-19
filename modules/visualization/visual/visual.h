@@ -21,12 +21,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-typedef struct visual_effect_t
-{
-    const char *psz_name;    /* Filter name*/
+typedef struct visual_effect_t visual_effect_t;
+typedef int (*visual_run_t)(visual_effect_t *, vlc_object_t *,
+                            const block_t *, picture_t *);
+typedef void (*visual_free_t)(void *);
 
-    int        (*pf_run)( struct visual_effect_t * , vlc_object_t *,
-                          const block_t *, picture_t *);
+struct visual_effect_t
+{
+    visual_run_t pf_run;
+    visual_free_t pf_free;
     void *     p_data; /* The effect stores whatever it wants here */
     int        i_width;
     int        i_height;
@@ -35,30 +38,12 @@ typedef struct visual_effect_t
     /* Channels index */
     int        i_idx_left;
     int        i_idx_right;
-} visual_effect_t ;
+};
 
-typedef struct spectrum_data
-{
-    int *peaks;
-    int *prev_heights;
-
-    unsigned i_prev_nb_samples;
-    int16_t *p_prev_s16_buff;
-} spectrum_data;
-
-typedef struct
-{
-    int *peaks;
-
-    unsigned i_prev_nb_samples;
-    int16_t *p_prev_s16_buff;
-} spectrometer_data;
-
-typedef int (*visual_run_t)(visual_effect_t *, vlc_object_t *,
-                            const block_t *, picture_t *);
 extern const struct visual_cb_t
 {
     char name[16];
     visual_run_t run_cb;
+    visual_free_t free_cb;
 } effectv[];
 extern const unsigned effectc;

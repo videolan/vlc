@@ -209,9 +209,7 @@ static int Open( vlc_object_t *p_this )
         p_effect->i_idx_right = __MIN( 1, p_effect->i_nb_chans-1 );
 
         p_effect->p_data   = NULL;
-
         p_effect->pf_run   = NULL;
-        p_effect->psz_name = NULL;
 
         for( unsigned i = 0; i < effectc; i++ )
         {
@@ -219,15 +217,14 @@ static int Open( vlc_object_t *p_this )
                               strlen( effectv[i].name ) ) )
             {
                 p_effect->pf_run = effectv[i].run_cb;
-                p_effect->psz_name = effectv[i].name;
+                p_effect->pf_free = effectv[i].free_cb;
+                psz_parser += strlen( effectv[i].name );
                 break;
             }
         }
 
-        if( p_effect->psz_name )
+        if( p_effect->pf_run != NULL )
         {
-            psz_parser += strlen( p_effect->psz_name );
-
             if( *psz_parser == '{' )
             {
                 char *psz_eoa;
@@ -355,28 +352,12 @@ static void Close( vlc_object_t *p_this )
     /* Free the list */
     for( int i = 0; i < p_sys->i_effect; i++ )
     {
-#define p_effect p_sys->effect[i]
-        if( p_effect->p_data != NULL )
-        {
-            if( !strncmp( p_effect->psz_name, "spectrum", strlen( "spectrum" ) ) )
-            {
-                spectrum_data* p_data = p_effect->p_data;
-                free( p_data->peaks );
-                free( p_data->prev_heights );
-                free( p_data->p_prev_s16_buff );
-            }
-            if( !strncmp( p_effect->psz_name, "spectrometer", strlen( "spectrometer" ) ) )
-            {
-                spectrometer_data* p_data = p_effect->p_data;
-                free( p_data->peaks );
-                free( p_data->p_prev_s16_buff );
-            }
-            free( p_effect->p_data );
-        }
+#define p_effect (p_sys->effect[i])
+        p_effect->pf_free( p_effect->p_data );
         free( p_effect );
 #undef p_effect
     }
 
     free( p_sys->effect );
-    free( p_filter->p_sys );
+    free( p_sys );
 }

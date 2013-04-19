@@ -56,9 +56,24 @@ static int dummy_Run( visual_effect_t * p_effect, vlc_object_t *p_aout,
     return 0;
 }
 
+static void dummy_Free( void *data )
+{
+    VLC_UNUSED(data);
+}
+
+
 /*****************************************************************************
  * spectrum_Run: spectrum analyser
  *****************************************************************************/
+typedef struct spectrum_data
+{
+    int *peaks;
+    int *prev_heights;
+
+    unsigned i_prev_nb_samples;
+    int16_t *p_prev_s16_buff;
+} spectrum_data;
+
 static int spectrum_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
                         const block_t * p_buffer , picture_t * p_picture)
 {
@@ -332,10 +347,31 @@ static int spectrum_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
     return 0;
 }
 
+static void spectrum_Free( void *data )
+{
+    spectrum_data *p_data = data;
+
+    if( p_data != NULL )
+    {
+        free( p_data->peaks );
+        free( p_data->prev_heights );
+        free( p_data->p_prev_s16_buff );
+        free( p_data );
+    }
+}
+
 
 /*****************************************************************************
  * spectrometer_Run: derivative spectrum analysis
  *****************************************************************************/
+typedef struct
+{
+    int *peaks;
+
+    unsigned i_prev_nb_samples;
+    int16_t *p_prev_s16_buff;
+} spectrometer_data;
+
 static int spectrometer_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
                             const block_t * p_buffer , picture_t * p_picture)
 {
@@ -789,6 +825,18 @@ static int spectrometer_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
     return 0;
 }
 
+static void spectrometer_Free( void *data )
+{
+    spectrometer_data *p_data = data;
+
+    if( p_data != NULL )
+    {
+        free( p_data->peaks );
+        free( p_data->p_prev_s16_buff );
+        free( p_data );
+    }
+}
+
 
 /*****************************************************************************
  * scope_Run: scope effect
@@ -988,10 +1036,10 @@ static int vuMeter_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
 
 /* Table of effects */
 const struct visual_cb_t effectv[] = {
-    { "scope",        scope_Run },
-    { "vuMeter",      vuMeter_Run },
-    { "spectrum",     spectrum_Run },
-    { "spectrometer", spectrometer_Run },
-    { "dummy",        dummy_Run },
+    { "scope",        scope_Run,        dummy_Free        },
+    { "vuMeter",      vuMeter_Run,      dummy_Free        },
+    { "spectrum",     spectrum_Run,     spectrum_Free     },
+    { "spectrometer", spectrometer_Run, spectrometer_Free },
+    { "dummy",        dummy_Run,        dummy_Free        },
 };
 const unsigned effectc = sizeof (effectv) / sizeof (effectv[0]);
