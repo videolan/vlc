@@ -1925,14 +1925,23 @@ AM_CONDITIONAL(HAVE_QTKIT, [test "${SYS}" = "darwin" -a "x${enable_macosx_qtkit}
 
 dnl
 dnl AVFoundation
+AC_SUBST(have_avfoundation, ["no"])
 AC_ARG_ENABLE(macosx-avfoundation,
   [  --enable-macosx-avfoundation Mac OS X avcapture (video) module (default enabled on Mac OS X)])
 if test "x${enable_macosx_avfoundation}" != "xno" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_avfoundation}" = "yes")
 then
-  VLC_ADD_PLUGIN([avcapture])
+  SAVED_LIBS="${LIBS}"
+  LIBS="-framework AVFoundation"
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [])],[have_avfoundation=yes],[have_avfoundation=no])
+  LIBS="${SAVED_LIBS}"
+  if test "${have_avfoundation}" != "no"
+  then
+    VLC_ADD_LIBS([macosx],[-Wl,-framework,AVFoundation])
+    VLC_ADD_PLUGIN([avcapture])
+  fi
 fi
-AM_CONDITIONAL(HAVE_AVFOUNDATION, [test "${SYS}" = "darwin" -a "x${enable_macosx_avfoundation}" != "xno"])
+AM_CONDITIONAL(HAVE_AVFOUNDATION, [test "${have_avfoundation}" != "no"])
 
 dnl
 dnl  Demux plugins
@@ -3761,9 +3770,6 @@ then
   VLC_ADD_PLUGIN([macosx])
 
   VLC_ADD_LIBS([macosx], [-Wl,-framework,QTKit -Wl,-framework,IOKit -Wl,-framework,AddressBook -Wl,-framework,WebKit -Wl,-framework,CoreAudio -Wl,-framework,SystemConfiguration -Wl,-framework,ScriptingBridge])
-
-  AC_CHECK_HEADERS(AVFoundation/AVFoundation.h,
-                       [VLC_ADD_LIBS([macosx],[-Wl,-framework,AVFoundation])])
 
   if test ! -d ${CONTRIB_DIR}/Sparkle.framework
   then
