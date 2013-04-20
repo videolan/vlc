@@ -34,6 +34,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QFileDialog>
+#include <QUrl>
 
 #define I_FILE_SLASH_DIR \
     I_DIR_OR_FOLDER( N_("File/Directory"), N_("File/Folder") )
@@ -68,15 +69,10 @@ SoutInputBox::SoutInputBox( QWidget *_parent, const QString& mrl ) : QGroupBox( 
 
 void SoutInputBox::setMRL( const QString& mrl )
 {
-    sourceLine->setText( mrl );
-    QString type;
-    int i = mrl.indexOf( "://" );
-    if( i != -1 )
-    {
-        type = mrl.left( i );
-    }
-    else
-        type = qtr( I_FILE_SLASH_DIR );
+    QUrl uri = QUrl::fromEncoded( mrl.toAscii() );
+    sourceLine->setText( uri.toString() );
+    QString type = uri.scheme();
+    if ( type.isEmpty() ) type = qtr( I_FILE_SLASH_DIR );
     sourceValueLabel->setText( type );
 }
 
