@@ -118,8 +118,6 @@
 /* Equalizer */
 - (void)setupEqualizer;
 - (void)equalizerUpdated;
-- (void)setBandSlidersValues:(float *)values;
-- (void)initBandSliders;
 - (void)setValue:(float)value forSlider:(int)index;
 - (IBAction)eq_bandSliderUpdated:(id)sender;
 - (IBAction)eq_changePreset:(id)sender;
