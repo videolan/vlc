@@ -28,8 +28,13 @@
 #include <vlc_common.h>
 #include <vlc_network.h>
 
+#import <TargetConditionals.h>
 #include <CoreFoundation/CoreFoundation.h>
+#if TARGET_OS_IPHONE
+#include <CFNetwork/CFProxySupport.h>
+#else
 #include <SystemConfiguration/SystemConfiguration.h>
+#endif
 
 /**
  * Determines the network proxy server to use (if any).
@@ -39,6 +44,37 @@
 char *vlc_getProxyUrl(const char *url)
 {
     VLC_UNUSED(url);
+#if TARGET_OS_IPHONE
+    char *proxy_url = NULL;
+    CFDictionaryRef dicRef = CFNetworkCopySystemProxySettings();
+    if (NULL != dicRef) {
+        const CFStringRef proxyCFstr = (const CFStringRef)CFDictionaryGetValue(
+            dicRef, (const void*)kCFNetworkProxiesHTTPProxy);
+        const CFNumberRef portCFnum = (const CFNumberRef)CFDictionaryGetValue(
+            dicRef, (const void*)kCFNetworkProxiesHTTPPort);
+        if (NULL != proxyCFstr && NULL != portCFnum) {
+            int port = 0;
+            if (!CFNumberGetValue(portCFnum, kCFNumberIntType, &port)) {
+                CFRelease(dicRef);
+                return NULL;
+            }
+
+            char host_buffer[4096];
+            memset(host_buffer, 0, sizeof(host_buffer));
+            if (CFStringGetCString(proxyCFstr, host_buffer, sizeof(host_buffer)
+                                   - 1, kCFStringEncodingUTF8)) {
+                char buffer[4096];
+                memset(host_buffer, 0, sizeof(host_buffer));
+                sprintf(buffer, "%s:%d", host_buffer, port);
+                proxy_url = strdup(buffer);
+            }
+        }
+
+        CFRelease(dicRef);
+    }
+
+    return proxy_url;
+#else
     CFDictionaryRef proxies = SCDynamicStoreCopyProxies(NULL);
     char *proxy_url = NULL;
 
@@ -77,10 +113,11 @@ char *vlc_getProxyUrl(const char *url)
                                              CFSTR(":%i"),
                                              i_httpProxyPort);
 
-                    CFStringGetCString(outputURL,
-                                       proxy_url,
-                                       sizeof(proxy_url),
-                                       kCFStringEncodingASCII);
+                    char buffer[4096];
+                    if (CFStringGetCString(outputURL, buffer, sizeof(buffer),
+                        kCFStringEncodingUTF8))
+                        proxy_url = strdup(buffer);
+
                     CFRelease(outputURL);
                 }
                 CFRelease(httpProxy);
@@ -90,4 +127,5 @@ char *vlc_getProxyUrl(const char *url)
     }
 
     return proxy_url;
+#endif
 }
