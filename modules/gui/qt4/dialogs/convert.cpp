@@ -146,7 +146,8 @@ void ConvertDialog::close()
         if( displayBox->isChecked() )
             mrl += "duplicate{dst=display,dst=";
         mrl += "std{access=file{no-overwrite},mux=" + profile->getMux()
-             + ",dst='" + fileLine->text() + "'}";
+             + ",dst='" + fileLine->text().replace( QChar('\''), "\\\'" )
+             + "'}";
         if( displayBox->isChecked() )
             mrl += "}";
     }
