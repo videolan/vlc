@@ -177,6 +177,7 @@ Qt:
  * Numerous fixes
  * Add audio track fingerprinting from media info
  * Removed language preference
+ * New profiles format and dialog to handle filters and quality. Added new profiles.
 
 libVLC:
  * new libvlc_audio_output_device_list_get and libvlc_audio_output_device_list_release functions
