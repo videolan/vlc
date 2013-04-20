@@ -941,7 +941,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
 
         /* build the textfield */
         if (p_item->value.psz)
-            o_textfieldString = _NS((char *)p_item->value.psz);
+            o_textfieldString = [NSString stringWithCString:p_item->value.psz encoding:NSUTF8StringEncoding];
         else
             o_textfieldString = @"";
         if (p_item->i_type == CONFIG_ITEM_PASSWORD) {
@@ -982,8 +982,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
 
 - (char *)stringValue
 {
-    return [[VLCStringUtility sharedInstance] delocalizeString:
-                        [o_textfield stringValue]];
+    return strdup([[o_textfield stringValue] UTF8String]);
 }
 
 - (void)resetValues
