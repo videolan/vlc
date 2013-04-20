@@ -70,31 +70,6 @@ static VLCStringUtility *_o_sharedInstance = nil;
     return(o_str);
 }
 
-
-
-- (char *)delocalizeString:(NSString *)id
-{
-    NSData * o_data = [id dataUsingEncoding: NSUTF8StringEncoding
-                       allowLossyConversion: NO];
-    char * psz_string;
-
-    if (o_data == nil) {
-        o_data = [id dataUsingEncoding: NSUTF8StringEncoding
-                  allowLossyConversion: YES];
-        psz_string = malloc([o_data length] + 1);
-        [o_data getBytes: psz_string];
-        psz_string[ [o_data length] ] = '\0';
-        msg_Err(VLCIntf, "cannot convert to the requested encoding: %s",
-                psz_string);
-    } else {
-        psz_string = malloc([o_data length] + 1);
-        [o_data getBytes: psz_string];
-        psz_string[ [o_data length] ] = '\0';
-    }
-
-    return psz_string;
-}
-
 /* i_width is in pixels */
 - (NSString *)wrapString: (NSString *)o_in_string toWidth: (int) i_width
 {

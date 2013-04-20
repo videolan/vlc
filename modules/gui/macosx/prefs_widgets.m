@@ -1075,10 +1075,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     if ([o_popup indexOfSelectedItem] >= 0) {
         if (p_item->list.psz[[o_popup indexOfSelectedItem]] != NULL)
             return strdup(p_item->list.psz[[o_popup indexOfSelectedItem]]);
-    } else {
-        if ([[VLCStringUtility sharedInstance] delocalizeString: [o_popup stringValue]] != NULL)
-            return strdup([[VLCStringUtility sharedInstance] delocalizeString: [o_popup stringValue]]);
     }
+
     return NULL;
 }
 
