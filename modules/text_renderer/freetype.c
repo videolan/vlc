@@ -2780,7 +2780,7 @@ static int Create( vlc_object_t *p_this )
     char          *psz_fontfamily = NULL;
     char          *psz_monofontfile   = NULL;
     char          *psz_monofontfamily = NULL;
-    int            i_error = 0, fontindex = 0;
+    int            i_error = 0, fontindex = 0, monofontindex = 0;
 
     /* Allocate structure */
     p_filter->p_sys = p_sys = malloc( sizeof(*p_sys) );
