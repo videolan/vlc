@@ -279,9 +279,6 @@ static void Run(intf_thread_t *p_intf)
 
     [[VLCMain sharedInstance] setIntf: p_intf];
 
-    /* subscribe to LibVLCCore's messages */
-    vlc_LogSet(p_intf->p_libvlc, MsgCallback, NULL);
-
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
 
     [NSApp run];
@@ -1885,6 +1882,10 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)showMessagesPanel:(id)sender
 {
+    /* subscribe to LibVLCCore's messages */
+    vlc_LogSet(p_intf->p_libvlc, MsgCallback, NULL);
+
+    /* show panel */
     [o_msgs_panel makeKeyAndOrderFront: sender];
 }
 
@@ -1892,6 +1893,12 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     [o_msgs_table reloadData];
     [o_msgs_table scrollRowToVisible: [o_msg_arr count] - 1];
+}
+
+- (void)windowWillClose:(NSNotification *)o_notification
+{
+    /* unsubscribe from LibVLCCore's messages */
+    vlc_LogSet( p_intf->p_libvlc, NULL, NULL );
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
