@@ -147,7 +147,6 @@ typedef uint32_t uni_char_t;
  *****************************************************************************/
 static int  Create ( vlc_object_t * );
 static void Destroy( vlc_object_t * );
-static int OptionCallback( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void *);
 
 #define FONT_TEXT N_("Font")
 #define MONOSPACE_FONT_TEXT N_("Monospace Font")
@@ -2796,14 +2795,6 @@ static int Create( vlc_object_t *p_this )
 
     var_Create( p_filter, "freetype-rel-fontsize",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_filter, "freetype-background-opacity",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_filter, "freetype-background-color",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_filter, "freetype-outline-thickness",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_filter, "freetype-color",
-               VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     psz_fontfamily = var_InheritString( p_filter, "freetype-font" );
     psz_monofontfamily = var_InheritString( p_filter, "freetype-monofont" );
@@ -2947,12 +2938,6 @@ static int Create( vlc_object_t *p_this )
 
     LoadFontsFromAttachments( p_filter );
 
-    var_AddCallback(p_this, "freetype-rel-fontsize", OptionCallback, p_this);
-    var_AddCallback(p_this, "freetype-background-opacity", OptionCallback, p_this);
-    var_AddCallback(p_this, "freetype-background-color", OptionCallback, p_this);
-    var_AddCallback(p_this, "freetype-outline-thickness", OptionCallback, p_this);
-    var_AddCallback(p_this, "freetype-color", OptionCallback, p_this);
-
 #ifdef HAVE_STYLES
     free( psz_fontfile );
     free( psz_monofontfile );
@@ -2983,12 +2968,6 @@ static void Destroy( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    var_DelCallback(p_this, "freetype-rel-fontsize", OptionCallback, p_this);
-    var_DelCallback(p_this, "freetype-background-opacity", OptionCallback, p_this);
-    var_DelCallback(p_this, "freetype-background-color", OptionCallback, p_this);
-    var_DelCallback(p_this, "freetype-outline-thickness", OptionCallback, p_this);
-    var_DelCallback(p_this, "freetype-color", OptionCallback, p_this);
-
     if( p_sys->pp_font_attachments )
     {
         for( int k = 0; k < p_sys->i_font_attachments; k++ )
@@ -3015,34 +2994,4 @@ static void Destroy( vlc_object_t *p_this )
     free( p_sys );
 }
 
-static int OptionCallback( vlc_object_t *p_this, char const *psz_var,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data)
-{
-    VLC_UNUSED(oldval);
-    VLC_UNUSED(p_data);
-
-    filter_t *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys = p_filter->p_sys;
-
-    if( !strcmp(psz_var, "freetype-rel-fontsize") )
-        msg_Dbg( p_this, "changed relative font size to %lli", newval.i_int);
-    else if( !strcmp(psz_var, "freetype-color") ) {
-        p_sys->i_font_color = newval.i_int;
-        p_sys->i_font_color = VLC_CLIP( p_sys->i_font_color, 0, 0xFFFFFF );
-    } else if( !strcmp(psz_var, "freetype-background-opacity") ) {
-        p_sys->i_background_opacity = newval.i_int;
-        msg_Dbg( p_filter, "changed background opacity to %lli", newval.i_int);
-    } else if( !strcmp(psz_var, "freetype-outline-thickness") ) {
-        p_sys->f_outline_thickness = newval.i_int / 100.;
-        p_sys->f_outline_thickness = VLC_CLIP( p_sys->f_outline_thickness, 0.0, 0.5 );
-        msg_Dbg( p_filter, "changed outline thickness to %lli", newval.i_int);
-    } else if( !strcmp(psz_var, "freetype-background-color") ) {
-        p_sys->i_background_color = newval.i_int;
-        p_sys->i_background_color = VLC_CLIP( p_sys->i_background_color, 0, 0xFFFFFF );
-        msg_Dbg( p_filter, "changed background color to %lli", newval.i_int);
-    } else
-        return VLC_EGENERIC;
-
-    return VLC_SUCCESS;
-}
 
