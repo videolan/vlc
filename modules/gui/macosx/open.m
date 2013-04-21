@@ -325,6 +325,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (void)setMRL:(NSString *)newMRL
 {
+    if (!newMRL)
+        newMRL = @"";
+
     if (o_mrl)
         [o_mrl release];
 
