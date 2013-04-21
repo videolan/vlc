@@ -133,7 +133,7 @@ static VLAboutBox *_o_sharedInstance = nil;
                                "<a href=\"http://www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</span>"
                                "</a> community.</p><p>VLC uses its internal codecs, works on essentially every popular platform, and can read "
                                "almost all files, CDs, DVDs, network streams, capture cards and other media formats!</p><p>"
-                               "<a href=\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;\">Help "
+                               "<a href=\"http://www.videolan.org/contribute.html\"><span style=\" text-decoration: underline; color:#0057ae;\">Help "
                                "and join us!</span></a>")];
         NSAttributedString *joinus_readytorender = [[NSAttributedString alloc] initWithHTML:[joinus dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES] documentAttributes:NULL];
         [o_joinus_txt setAllowsEditingTextAttributes: YES];
