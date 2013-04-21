@@ -56,7 +56,7 @@
 
     /* let the window sit on top of everything else and start out completely transparent */
     [win setLevel:NSModalPanelWindowLevel];
-    i_device = 0;
+    i_device = config_GetInt(VLCIntf, "macosx-vdev");
     hideAgainTimer = fadeTimer = nil;
     [self setNonActive:nil];
     return win;
@@ -71,8 +71,6 @@
         [self mouseEntered:NULL];
     if (!isInside)
         [self mouseExited:NULL];
-
-    [self center];
 
     /* get a notification if VLC isn't the active app anymore */
     [[NSNotificationCenter defaultCenter]
@@ -359,10 +357,9 @@
         [o_vout_window release];
     o_vout_window = [o_window retain];
     int i_newdevice = (int)[[o_vout_window screen] displayID];
-    if (i_newdevice != i_device) {
-        i_device = i_newdevice;
+    if (i_newdevice != i_device && i_device != 0)
         [self center];
-    }
+    i_device = i_newdevice;
 }
 @end
 

@@ -21,8 +21,8 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="5260"/>
       <integer value="21"/>
+      <integer value="5260"/>
       <integer value="2730"/>
       <integer value="5457"/>
       <integer value="4850"/>
@@ -4081,6 +4081,7 @@
         </object>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
+        <string key="NSFrameAutosaveName">fspanel</string>
         <bool key="NSWindowIsRestorable">YES</bool>
       </object>
       <object class="NSWindowTemplate" id="747974943">
@@ -5146,7 +5147,7 @@ LCAuLi4</string>
         <bool key="NSWindowIsRestorable">YES</bool>
       </object>
       <object class="NSCustomView" id="455649453">
-        <reference key="NSNextResponder"/>
+        <nil key="NSNextResponder"/>
         <int key="NSvFlags">268</int>
         <object class="NSMutableArray" key="NSSubviews">
           <bool key="EncodedWithXMLCoder">YES</bool>
@@ -5155,7 +5156,6 @@ LCAuLi4</string>
             <int key="NSvFlags">268</int>
             <string key="NSFrame">{{19, 22}, {273, 18}}</string>
             <reference key="NSSuperview" ref="455649453"/>
-            <reference key="NSWindow"/>
             <bool key="NSEnabled">YES</bool>
             <object class="NSTextFieldCell" key="NSCell" id="827054880">
               <int key="NSCellFlags">605028416</int>
@@ -5173,7 +5173,6 @@ LCAuLi4</string>
             <int key="NSvFlags">-2147483380</int>
             <string key="NSFrame">{{19, 22}, {273, 18}}</string>
             <reference key="NSSuperview" ref="455649453"/>
-            <reference key="NSWindow"/>
             <bool key="NSEnabled">YES</bool>
             <object class="NSTextFieldCell" key="NSCell" id="887800287">
               <int key="NSCellFlags">605028416</int>
@@ -5191,7 +5190,6 @@ LCAuLi4</string>
             <int key="NSvFlags">298</int>
             <string key="NSFrame">{{28, 3}, {261, 16}}</string>
             <reference key="NSSuperview" ref="455649453"/>
-            <reference key="NSWindow"/>
             <bool key="NSEnabled">YES</bool>
             <object class="NSSliderCell" key="NSCell" id="1014018484">
               <int key="NSCellFlags">-1543241472</int>
@@ -5211,8 +5209,6 @@ LCAuLi4</string>
           </object>
         </object>
         <string key="NSFrameSize">{309, 41}</string>
-        <reference key="NSSuperview"/>
-        <reference key="NSWindow"/>
         <string key="NSClassName">NSView</string>
       </object>
     </object>

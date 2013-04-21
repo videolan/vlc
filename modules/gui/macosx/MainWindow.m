@@ -323,6 +323,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         NSUInteger i_sidebaritem_count = [o_sidebaritems count];
         for (NSUInteger x = 0; x < i_sidebaritem_count; x++)
             [o_sidebar_view expandItem: [o_sidebaritems objectAtIndex: x] expandChildren: YES];
+
+        [o_fspanel center];
     }
 
     if (b_dark_interface) {
