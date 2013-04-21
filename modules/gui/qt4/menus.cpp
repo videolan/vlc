@@ -222,7 +222,6 @@ static int InputAutoMenuBuilder( input_thread_t *p_object,
     PUSH_VAR( "bookmark" );
     PUSH_VAR( "title" );
     PUSH_VAR( "chapter" );
-    PUSH_VAR( "navigation" );
     PUSH_VAR( "program" );
     return VLC_SUCCESS;
 }
@@ -692,8 +691,7 @@ QMenu *VLCMenuBar::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     QMenu *submenu;
 
     addActionWithSubmenu( menu, "title", qtr( "T&itle" ) );
-    addActionWithSubmenu( menu, "chapter", qtr( "&Chapter" ) );
-    submenu = addActionWithSubmenu( menu, "navigation", qtr( "&Navigation" ) );
+    submenu = addActionWithSubmenu( menu, "chapter", qtr( "&Chapter" ) );
     submenu->setTearOffEnabled( true );
     addActionWithSubmenu( menu, "program", qtr( "&Program" ) );
 
