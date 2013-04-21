@@ -137,6 +137,8 @@ OS X Interface:
  * add a GUI to capture QTSound data along with the current screen content
  * add an option to let the Apple Remote control the system volume instead of
    VLC's internal volume level
+ * add a new Subtitles menu to change Subtitles and their properties during
+   playback
  * add the ability to create custom equalizer presets based upon the current
    selection and to manage the list of presets
  * add custom profiles for video and audio effects, which let the user keep
