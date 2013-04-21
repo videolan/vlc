@@ -155,6 +155,19 @@
     IBOutlet NSMenuItem * o_mi_subtitle_track;
     IBOutlet NSMenu * o_mu_subtitle_tracks;
     IBOutlet NSMenuItem * o_mi_openSubtitleFile;
+    IBOutlet NSMenu * o_mu_subtitle_size;
+    IBOutlet NSMenuItem *o_mi_subtitle_size;
+    IBOutlet NSMenu * o_mu_subtitle_textcolor;
+    IBOutlet NSMenuItem *o_mi_subtitle_textcolor;
+    IBOutlet NSMenu * o_mu_subtitle_bgcolor;
+    IBOutlet NSMenuItem * o_mi_subtitle_bgcolor;
+    IBOutlet NSMenuItem * o_mi_subtitle_bgopacity;
+    IBOutlet NSView * o_mi_subtitle_bgopacity_view;
+    IBOutlet id o_mi_subtitle_bgopacity_lbl;
+    IBOutlet id o_mi_subtitle_bgopacity_lbl_gray;
+    IBOutlet id o_mi_subtitle_bgopacity_sld;
+    IBOutlet NSMenu * o_mu_subtitle_outlinethickness;
+    IBOutlet NSMenuItem * o_mi_subtitle_outlinethickness;
     IBOutlet NSMenuItem * o_mi_teletext;
     IBOutlet NSMenuItem * o_mi_teletext_transparent;
     IBOutlet NSMenuItem * o_mi_teletext_index;
@@ -250,6 +263,8 @@
 - (IBAction)toggleFullscreenDevice:(id)sender;
 
 - (IBAction)addSubtitleFile:(id)sender;
+- (IBAction)switchSubtitleOption:(id)sender;
+- (IBAction)switchSubtitleBackgroundOpacity:(id)sender;
 - (IBAction)telxTransparent:(id)sender;
 - (IBAction)telxNavLink:(id)sender;
 

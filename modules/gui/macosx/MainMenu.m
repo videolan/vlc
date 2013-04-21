@@ -259,6 +259,41 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [self setupExtensionsMenu];
 
     [self refreshAudioDeviceList];
+
+    /* setup subtitles menu */
+    [self setupMenu: o_mu_subtitle_size withIntList:"freetype-rel-fontsize" andSelector:@selector(switchSubtitleOption:)];
+    [self setupMenu: o_mu_subtitle_textcolor withIntList:"freetype-color" andSelector:@selector(switchSubtitleOption:)];
+    [o_mi_subtitle_bgopacity_sld setIntValue: config_GetInt(VLC_OBJECT(p_intf), "freetype-background-opacity")];
+    [self setupMenu: o_mu_subtitle_bgcolor withIntList:"freetype-background-color" andSelector:@selector(switchSubtitleOption:)];
+    [self setupMenu: o_mu_subtitle_outlinethickness withIntList:"freetype-outline-thickness" andSelector:@selector(switchSubtitleOption:)];
+}
+
+- (void)setupMenu: (NSMenu*)menu withIntList: (char *)psz_name andSelector:(SEL)selector
+{
+    module_config_t *p_item;
+
+    [menu removeAllItems];
+    p_item = config_FindConfig(VLC_OBJECT(p_intf), psz_name);
+
+    /* serious problem, if no item found */
+    assert(p_item);
+
+    for (int i = 0; i < p_item->list_count; i++) {
+        NSMenuItem *mi;
+        if (p_item->list_text != NULL)
+            mi = [[NSMenuItem alloc] initWithTitle: _NS(p_item->list_text[i]) action:NULL keyEquivalent: @""];
+        else if (p_item->list.i[i])
+            mi = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%d", p_item->list.i[i]] action:NULL keyEquivalent: @""];
+        else
+            msg_Err(p_intf, "item %d of pref %s failed to be created", i, psz_name);
+        [mi setTarget:self];
+        [mi setAction:selector];
+        [mi setTag:p_item->list.i[i]];
+        [mi setRepresentedObject:[NSString stringWithUTF8String:psz_name]];
+        [menu addItem: [mi autorelease]];
+        if (p_item->value.i == p_item->list.i[i])
+            [mi setState:NSOnState];
+    }
 }
 
 - (void)initStrings
@@ -374,6 +409,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_subtitle_track setTitle: _NS("Subtitles Track")];
     [o_mu_subtitle_tracks setTitle: _NS("Subtitles Track")];
     [o_mi_openSubtitleFile setTitle: _NS("Open File...")];
+    [o_mi_subtitle_bgopacity setView: o_mi_subtitle_bgopacity_view];
     [o_mi_teletext setTitle: _NS("Teletext")];
     [o_mi_teletext_transparent setTitle: _NS("Transparent")];
     [o_mi_teletext_index setTitle: _NS("Index")];
@@ -590,6 +626,14 @@ static VLCMainMenu *_o_sharedInstance = nil;
 - (void)setSubtitleMenuEnabled:(BOOL)b_enabled
 {
     [o_mi_openSubtitleFile setEnabled: b_enabled];
+    if (b_enabled) {
+        [o_mi_subtitle_bgopacity_lbl_gray setHidden: YES];
+        [o_mi_subtitle_bgopacity_lbl setHidden: NO];
+    } else {
+        [o_mi_subtitle_bgopacity_lbl_gray setHidden: NO];
+        [o_mi_subtitle_bgopacity_lbl setHidden: YES];
+    }
+    [o_mi_subtitle_bgopacity_sld setEnabled: b_enabled];
     [o_mi_teletext setEnabled: b_enabled];
 }
 
@@ -898,6 +942,38 @@ static VLCMainMenu *_o_sharedInstance = nil;
         }
     }
     vlc_object_release(p_input);
+}
+
+- (IBAction)switchSubtitleOption:(id)sender
+{
+    vlc_object_t *p_freetype;
+    p_freetype = (vlc_object_t *) vlc_object_find_name(pl_Get(VLCIntf), "freetype");
+    int intValue = [sender tag];
+    NSString *representedObject = [sender representedObject];
+
+    if (p_freetype) {
+        var_SetInteger(p_freetype, [representedObject UTF8String], intValue);
+        NSMenu *menu = [sender menu];
+        NSUInteger count = [menu numberOfItems];
+        for (NSUInteger x = 0; x < count; x++)
+            [[menu itemAtIndex:x] setState:NSOffState];
+        [[menu itemWithTag:intValue] setState:NSOnState];
+        vlc_object_release(p_freetype);
+    }
+    config_PutInt(p_freetype, [representedObject UTF8String], intValue);
+}
+
+- (IBAction)switchSubtitleBackgroundOpacity:(id)sender
+{
+    vlc_object_t *p_freetype;
+    p_freetype = (vlc_object_t *) vlc_object_find_name(pl_Get(VLCIntf), "freetype");
+    int intValue = [sender intValue];
+
+    if (p_freetype) {
+        var_SetInteger(p_freetype, "freetype-background-opacity", intValue);
+        vlc_object_release(p_freetype);
+    }
+    config_PutInt(p_freetype, "freetype-background-opacity", intValue);
 }
 
 - (IBAction)telxTransparent:(id)sender
@@ -1434,6 +1510,15 @@ static VLCMainMenu *_o_sharedInstance = nil;
         }
 
         [self setupMenus]; /* Make sure video menu is up to date */
+    } else {
+        NSMenuItem *o_mi_parent = [o_mi parentItem];
+        if (o_mi_parent == o_mi_subtitle_size || o_mi == o_mi_subtitle_size ||
+            o_mi_parent == o_mi_subtitle_textcolor || o_mi == o_mi_subtitle_textcolor ||
+            o_mi_parent == o_mi_subtitle_bgcolor || o_mi == o_mi_subtitle_bgcolor ||
+            o_mi_parent == o_mi_subtitle_bgopacity || o_mi == o_mi_subtitle_bgopacity ||
+            o_mi_parent == o_mi_subtitle_outlinethickness || o_mi == o_mi_subtitle_outlinethickness ||
+            o_mi_parent == o_mi_teletext || o_mi == o_mi_teletext)
+            bEnabled = o_mi_openSubtitleFile.isEnabled;
     }
 
     /* Special case for telx menu */

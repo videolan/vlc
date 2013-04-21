@@ -21,11 +21,11 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
+      <integer value="5260"/>
       <integer value="21"/>
       <integer value="2730"/>
+      <integer value="5457"/>
       <integer value="4850"/>
-      <integer value="5260"/>
-      <integer value="29"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -2354,6 +2354,118 @@
                     <string key="NSTitle">Subtitle track</string>
                     <object class="NSMutableArray" key="NSMenuItems">
                       <bool key="EncodedWithXMLCoder">YES</bool>
+                    </object>
+                  </object>
+                </object>
+                <object class="NSMenuItem" id="884213303">
+                  <reference key="NSMenu" ref="971852719"/>
+                  <bool key="NSIsDisabled">YES</bool>
+                  <bool key="NSIsSeparator">YES</bool>
+                  <string key="NSTitle"/>
+                  <string key="NSKeyEquiv"/>
+                  <int key="NSMnemonicLoc">2147483647</int>
+                  <reference key="NSOnImage" ref="447396056"/>
+                  <reference key="NSMixedImage" ref="100133332"/>
+                </object>
+                <object class="NSMenuItem" id="133721515">
+                  <reference key="NSMenu" ref="971852719"/>
+                  <string key="NSTitle">Size</string>
+                  <string key="NSKeyEquiv"/>
+                  <int key="NSMnemonicLoc">2147483647</int>
+                  <reference key="NSOnImage" ref="447396056"/>
+                  <reference key="NSMixedImage" ref="100133332"/>
+                  <string key="NSAction">submenuAction:</string>
+                  <object class="NSMenu" key="NSSubmenu" id="149418896">
+                    <string key="NSTitle">Size</string>
+                    <object class="NSMutableArray" key="NSMenuItems">
+                      <bool key="EncodedWithXMLCoder">YES</bool>
+                    </object>
+                  </object>
+                </object>
+                <object class="NSMenuItem" id="678387719">
+                  <reference key="NSMenu" ref="971852719"/>
+                  <string key="NSTitle">Text Color</string>
+                  <string key="NSKeyEquiv"/>
+                  <int key="NSMnemonicLoc">2147483647</int>
+                  <reference key="NSOnImage" ref="447396056"/>
+                  <reference key="NSMixedImage" ref="100133332"/>
+                  <string key="NSAction">submenuAction:</string>
+                  <object class="NSMenu" key="NSSubmenu" id="439831381">
+                    <string key="NSTitle">Text Color</string>
+                    <object class="NSMutableArray" key="NSMenuItems">
+                      <bool key="EncodedWithXMLCoder">YES</bool>
+                      <object class="NSMenuItem" id="711336493">
+                        <reference key="NSMenu" ref="439831381"/>
+                        <string key="NSTitle">Item</string>
+                        <string key="NSKeyEquiv"/>
+                        <int key="NSMnemonicLoc">2147483647</int>
+                        <reference key="NSOnImage" ref="447396056"/>
+                        <reference key="NSMixedImage" ref="100133332"/>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+                <object class="NSMenuItem" id="710671498">
+                  <reference key="NSMenu" ref="971852719"/>
+                  <string key="NSTitle">Outline Thickness</string>
+                  <string key="NSKeyEquiv"/>
+                  <int key="NSMnemonicLoc">2147483647</int>
+                  <reference key="NSOnImage" ref="447396056"/>
+                  <reference key="NSMixedImage" ref="100133332"/>
+                  <string key="NSAction">submenuAction:</string>
+                  <object class="NSMenu" key="NSSubmenu" id="550290671">
+                    <string key="NSTitle">Outline Thickness</string>
+                    <object class="NSMutableArray" key="NSMenuItems">
+                      <bool key="EncodedWithXMLCoder">YES</bool>
+                      <object class="NSMenuItem" id="850148662">
+                        <reference key="NSMenu" ref="550290671"/>
+                        <string key="NSTitle">Item</string>
+                        <string key="NSKeyEquiv"/>
+                        <int key="NSMnemonicLoc">2147483647</int>
+                        <reference key="NSOnImage" ref="447396056"/>
+                        <reference key="NSMixedImage" ref="100133332"/>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+                <object class="NSMenuItem" id="139799176">
+                  <reference key="NSMenu" ref="971852719"/>
+                  <bool key="NSIsDisabled">YES</bool>
+                  <bool key="NSIsSeparator">YES</bool>
+                  <string key="NSTitle"/>
+                  <string key="NSKeyEquiv"/>
+                  <int key="NSMnemonicLoc">2147483647</int>
+                  <reference key="NSOnImage" ref="447396056"/>
+                  <reference key="NSMixedImage" ref="100133332"/>
+                </object>
+                <object class="NSMenuItem" id="401014340">
+                  <reference key="NSMenu" ref="971852719"/>
+                  <string key="NSTitle">BG Opacity (view)</string>
+                  <string key="NSKeyEquiv"/>
+                  <int key="NSMnemonicLoc">2147483647</int>
+                  <reference key="NSOnImage" ref="447396056"/>
+                  <reference key="NSMixedImage" ref="100133332"/>
+                </object>
+                <object class="NSMenuItem" id="119956074">
+                  <reference key="NSMenu" ref="971852719"/>
+                  <string key="NSTitle">Background Color</string>
+                  <string key="NSKeyEquiv"/>
+                  <int key="NSMnemonicLoc">2147483647</int>
+                  <reference key="NSOnImage" ref="447396056"/>
+                  <reference key="NSMixedImage" ref="100133332"/>
+                  <string key="NSAction">submenuAction:</string>
+                  <object class="NSMenu" key="NSSubmenu" id="208741524">
+                    <string key="NSTitle">Background Color</string>
+                    <object class="NSMutableArray" key="NSMenuItems">
+                      <bool key="EncodedWithXMLCoder">YES</bool>
+                      <object class="NSMenuItem" id="7880414">
+                        <reference key="NSMenu" ref="208741524"/>
+                        <string key="NSTitle">Item</string>
+                        <string key="NSKeyEquiv"/>
+                        <int key="NSMnemonicLoc">2147483647</int>
+                        <reference key="NSOnImage" ref="447396056"/>
+                        <reference key="NSMixedImage" ref="100133332"/>
+                      </object>
                     </object>
                   </object>
                 </object>
@@ -5032,6 +5144,76 @@ LCAuLi4</string>
         <string key="NSMinSize">{612, 181}</string>
         <string key="NSMaxSize">{612, 181}</string>
         <bool key="NSWindowIsRestorable">YES</bool>
+      </object>
+      <object class="NSCustomView" id="455649453">
+        <reference key="NSNextResponder"/>
+        <int key="NSvFlags">268</int>
+        <object class="NSMutableArray" key="NSSubviews">
+          <bool key="EncodedWithXMLCoder">YES</bool>
+          <object class="NSTextField" id="800637816">
+            <reference key="NSNextResponder" ref="455649453"/>
+            <int key="NSvFlags">268</int>
+            <string key="NSFrame">{{19, 22}, {273, 18}}</string>
+            <reference key="NSSuperview" ref="455649453"/>
+            <reference key="NSWindow"/>
+            <bool key="NSEnabled">YES</bool>
+            <object class="NSTextFieldCell" key="NSCell" id="827054880">
+              <int key="NSCellFlags">605028416</int>
+              <int key="NSCellFlags2">272630784</int>
+              <string key="NSContents">Background opacity</string>
+              <reference key="NSSupport" ref="481094678"/>
+              <reference key="NSControlView" ref="800637816"/>
+              <reference key="NSBackgroundColor" ref="3414043"/>
+              <reference key="NSTextColor" ref="140632782"/>
+            </object>
+            <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+          </object>
+          <object class="NSTextField" id="329303705">
+            <reference key="NSNextResponder" ref="455649453"/>
+            <int key="NSvFlags">-2147483380</int>
+            <string key="NSFrame">{{19, 22}, {273, 18}}</string>
+            <reference key="NSSuperview" ref="455649453"/>
+            <reference key="NSWindow"/>
+            <bool key="NSEnabled">YES</bool>
+            <object class="NSTextFieldCell" key="NSCell" id="887800287">
+              <int key="NSCellFlags">605028416</int>
+              <int key="NSCellFlags2">272630784</int>
+              <string key="NSContents">Background opacity</string>
+              <reference key="NSSupport" ref="481094678"/>
+              <reference key="NSControlView" ref="329303705"/>
+              <reference key="NSBackgroundColor" ref="3414043"/>
+              <reference key="NSTextColor" ref="306532497"/>
+            </object>
+            <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+          </object>
+          <object class="NSSlider" id="269608566">
+            <reference key="NSNextResponder" ref="455649453"/>
+            <int key="NSvFlags">298</int>
+            <string key="NSFrame">{{28, 3}, {261, 16}}</string>
+            <reference key="NSSuperview" ref="455649453"/>
+            <reference key="NSWindow"/>
+            <bool key="NSEnabled">YES</bool>
+            <object class="NSSliderCell" key="NSCell" id="1014018484">
+              <int key="NSCellFlags">-1543241472</int>
+              <int key="NSCellFlags2">262144</int>
+              <string key="NSContents"/>
+              <reference key="NSControlView" ref="269608566"/>
+              <double key="NSMaxValue">255</double>
+              <double key="NSMinValue">0.0</double>
+              <double key="NSValue">0.0</double>
+              <double key="NSAltIncValue">0.0</double>
+              <int key="NSNumberOfTickMarks">17</int>
+              <int key="NSTickMarkPosition">1</int>
+              <bool key="NSAllowsTickMarkValuesOnly">NO</bool>
+              <bool key="NSVertical">NO</bool>
+            </object>
+            <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+          </object>
+        </object>
+        <string key="NSFrameSize">{309, 41}</string>
+        <reference key="NSSuperview"/>
+        <reference key="NSWindow"/>
+        <string key="NSClassName">NSView</string>
       </object>
     </object>
     <object class="IBObjectContainer" key="IBDocument.Objects">
@@ -8133,6 +8315,118 @@ LCAuLi4</string>
           </object>
           <int key="connectionID">5540</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mu_subtitle_size</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="149418896"/>
+          </object>
+          <int key="connectionID">5546</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_subtitle_bgopacity_view</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="455649453"/>
+          </object>
+          <int key="connectionID">5564</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_subtitle_bgopacity_lbl</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="329303705"/>
+          </object>
+          <int key="connectionID">5565</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_subtitle_bgopacity_lbl_gray</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="800637816"/>
+          </object>
+          <int key="connectionID">5566</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_subtitle_bgopacity_sld</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="269608566"/>
+          </object>
+          <int key="connectionID">5567</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_subtitle_bgopacity</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="401014340"/>
+          </object>
+          <int key="connectionID">5569</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">switchSubtitleBackgroundOpacity:</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="269608566"/>
+          </object>
+          <int key="connectionID">5570</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mu_subtitle_outlinethickness</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="550290671"/>
+          </object>
+          <int key="connectionID">5575</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mu_subtitle_textcolor</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="439831381"/>
+          </object>
+          <int key="connectionID">5579</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mu_subtitle_bgcolor</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="208741524"/>
+          </object>
+          <int key="connectionID">5585</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_subtitle_size</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="133721515"/>
+          </object>
+          <int key="connectionID">5587</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_subtitle_textcolor</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="678387719"/>
+          </object>
+          <int key="connectionID">5588</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_subtitle_bgcolor</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="119956074"/>
+          </object>
+          <int key="connectionID">5589</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_subtitle_outlinethickness</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="710671498"/>
+          </object>
+          <int key="connectionID">5590</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -11178,6 +11472,13 @@ LCAuLi4</string>
               <reference ref="528264770"/>
               <reference ref="31619570"/>
               <reference ref="434705889"/>
+              <reference ref="133721515"/>
+              <reference ref="401014340"/>
+              <reference ref="678387719"/>
+              <reference ref="884213303"/>
+              <reference ref="119956074"/>
+              <reference ref="710671498"/>
+              <reference ref="139799176"/>
             </object>
             <reference key="parent" ref="763249836"/>
           </object>
@@ -11271,6 +11572,161 @@ LCAuLi4</string>
             <int key="objectID">5537</int>
             <reference key="object" ref="857384880"/>
             <reference key="parent" ref="815243229"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5543</int>
+            <reference key="object" ref="133721515"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="149418896"/>
+            </object>
+            <reference key="parent" ref="971852719"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5544</int>
+            <reference key="object" ref="149418896"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+            </object>
+            <reference key="parent" ref="133721515"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5547</int>
+            <reference key="object" ref="455649453"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="800637816"/>
+              <reference ref="329303705"/>
+              <reference ref="269608566"/>
+            </object>
+            <reference key="parent" ref="0"/>
+            <string key="objectName">Sub BG Opacity</string>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5548</int>
+            <reference key="object" ref="800637816"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="827054880"/>
+            </object>
+            <reference key="parent" ref="455649453"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5550</int>
+            <reference key="object" ref="329303705"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="887800287"/>
+            </object>
+            <reference key="parent" ref="455649453"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5555</int>
+            <reference key="object" ref="269608566"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="1014018484"/>
+            </object>
+            <reference key="parent" ref="455649453"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5556</int>
+            <reference key="object" ref="1014018484"/>
+            <reference key="parent" ref="269608566"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5560</int>
+            <reference key="object" ref="887800287"/>
+            <reference key="parent" ref="329303705"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5562</int>
+            <reference key="object" ref="827054880"/>
+            <reference key="parent" ref="800637816"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5568</int>
+            <reference key="object" ref="401014340"/>
+            <reference key="parent" ref="971852719"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5571</int>
+            <reference key="object" ref="710671498"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="550290671"/>
+            </object>
+            <reference key="parent" ref="971852719"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5572</int>
+            <reference key="object" ref="550290671"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="850148662"/>
+            </object>
+            <reference key="parent" ref="710671498"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5573</int>
+            <reference key="object" ref="850148662"/>
+            <reference key="parent" ref="550290671"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5576</int>
+            <reference key="object" ref="678387719"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="439831381"/>
+            </object>
+            <reference key="parent" ref="971852719"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5577</int>
+            <reference key="object" ref="439831381"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="711336493"/>
+            </object>
+            <reference key="parent" ref="678387719"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5578</int>
+            <reference key="object" ref="711336493"/>
+            <reference key="parent" ref="439831381"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5580</int>
+            <reference key="object" ref="884213303"/>
+            <reference key="parent" ref="971852719"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5581</int>
+            <reference key="object" ref="119956074"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="208741524"/>
+            </object>
+            <reference key="parent" ref="971852719"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5582</int>
+            <reference key="object" ref="208741524"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="7880414"/>
+            </object>
+            <reference key="parent" ref="119956074"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5583</int>
+            <reference key="object" ref="7880414"/>
+            <reference key="parent" ref="208741524"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5584</int>
+            <reference key="object" ref="139799176"/>
+            <reference key="parent" ref="971852719"/>
           </object>
         </object>
       </object>
@@ -12093,6 +12549,35 @@ LCAuLi4</string>
           <string>5515.IBPluginDependency</string>
           <string>5515.ImportedFromIB2</string>
           <string>5537.IBPluginDependency</string>
+          <string>5543.IBPluginDependency</string>
+          <string>5544.IBEditorWindowLastContentRect</string>
+          <string>5544.IBPluginDependency</string>
+          <string>5547.IBEditorWindowLastContentRect</string>
+          <string>5547.IBPluginDependency</string>
+          <string>5547.IBViewBoundsToFrameTransform</string>
+          <string>5548.IBPluginDependency</string>
+          <string>5548.IBViewBoundsToFrameTransform</string>
+          <string>5550.IBPluginDependency</string>
+          <string>5550.IBViewBoundsToFrameTransform</string>
+          <string>5555.IBPluginDependency</string>
+          <string>5556.IBPluginDependency</string>
+          <string>5560.IBPluginDependency</string>
+          <string>5562.IBPluginDependency</string>
+          <string>5568.IBPluginDependency</string>
+          <string>5571.IBPluginDependency</string>
+          <string>5572.IBEditorWindowLastContentRect</string>
+          <string>5572.IBPluginDependency</string>
+          <string>5573.IBPluginDependency</string>
+          <string>5576.IBPluginDependency</string>
+          <string>5577.IBEditorWindowLastContentRect</string>
+          <string>5577.IBPluginDependency</string>
+          <string>5578.IBPluginDependency</string>
+          <string>5580.IBPluginDependency</string>
+          <string>5581.IBPluginDependency</string>
+          <string>5582.IBEditorWindowLastContentRect</string>
+          <string>5582.IBPluginDependency</string>
+          <string>5583.IBPluginDependency</string>
+          <string>5584.IBPluginDependency</string>
           <string>56.IBPluginDependency</string>
           <string>56.ImportedFromIB2</string>
           <string>57.IBEditorWindowLastContentRect</string>
@@ -12481,7 +12966,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{391, 415}, {595, 20}}</string>
+          <string>{{379, 595}, {595, 20}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12870,7 +13355,7 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{585, 32}, {222, 383}}</string>
+          <string>{{573, 212}, {222, 383}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -13040,11 +13525,11 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{715, 418}, {156, 73}}</string>
+          <string>{{765, 402}, {188, 193}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{792, 465}, {64, 6}}</string>
+          <string>{{921, 569}, {64, 6}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -13069,6 +13554,39 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>{{953, 539}, {64, 6}}</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>{{1287, 958}, {309, 41}}</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABB2AAAwiwAAA</bytes>
+          </object>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABBmAAAwkwAAA</bytes>
+          </object>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>{{953, 482}, {83, 23}}</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>{{953, 502}, {83, 23}}</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>{{953, 432}, {83, 23}}</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
@@ -13127,7 +13645,7 @@ LCAuLi4</string>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">5540</int>
+      <int key="maxID">5590</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -16211,6 +16729,1488 @@ LCAuLi4</string>
           <string key="className">VLCWindowTitleTextField</string>
           <string key="superclassName">NSTextField</string>
           <reference key="sourceIdentifier" ref="925772039"/>
+        </object>
+      </object>
+      <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
+        <bool key="EncodedWithXMLCoder">YES</bool>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCMainMenu</string>
+          <string key="superclassName">NSObject</string>
+          <object class="NSMutableDictionary" key="actions">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>addSubtitleFile:</string>
+              <string>createVideoSnapshot:</string>
+              <string>floatOnTop:</string>
+              <string>intfOpenCapture:</string>
+              <string>intfOpenDisc:</string>
+              <string>intfOpenFile:</string>
+              <string>intfOpenFileGeneric:</string>
+              <string>intfOpenNet:</string>
+              <string>openDocumentation:</string>
+              <string>openDonate:</string>
+              <string>openForum:</string>
+              <string>openReadMe:</string>
+              <string>openWebsite:</string>
+              <string>resizeVideoWindow:</string>
+              <string>setPlaybackRate:</string>
+              <string>showAudioEffects:</string>
+              <string>showBookmarks:</string>
+              <string>showConvertAndSave:</string>
+              <string>showInformationPanel:</string>
+              <string>showLicense:</string>
+              <string>showTrackSynchronization:</string>
+              <string>showVideoEffects:</string>
+              <string>showWizard:</string>
+              <string>switchSubtitleBackgroundOpacity:</string>
+              <string>switchSubtitleOption:</string>
+              <string>telxNavLink:</string>
+              <string>telxTransparent:</string>
+              <string>toggleAtoBloop:</string>
+              <string>toggleAudioDevice:</string>
+              <string>toggleEffectsButton:</string>
+              <string>toggleFullscreen:</string>
+              <string>toggleFullscreenDevice:</string>
+              <string>toggleJumpButtons:</string>
+              <string>togglePlaylistColumnTable:</string>
+              <string>togglePlaymodeButtons:</string>
+              <string>toggleRecord:</string>
+              <string>toggleSidebar:</string>
+              <string>toggleVar:</string>
+              <string>viewAbout:</string>
+              <string>viewErrorsAndWarnings:</string>
+              <string>viewHelp:</string>
+              <string>viewPreferences:</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="actionInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>addSubtitleFile:</string>
+              <string>createVideoSnapshot:</string>
+              <string>floatOnTop:</string>
+              <string>intfOpenCapture:</string>
+              <string>intfOpenDisc:</string>
+              <string>intfOpenFile:</string>
+              <string>intfOpenFileGeneric:</string>
+              <string>intfOpenNet:</string>
+              <string>openDocumentation:</string>
+              <string>openDonate:</string>
+              <string>openForum:</string>
+              <string>openReadMe:</string>
+              <string>openWebsite:</string>
+              <string>resizeVideoWindow:</string>
+              <string>setPlaybackRate:</string>
+              <string>showAudioEffects:</string>
+              <string>showBookmarks:</string>
+              <string>showConvertAndSave:</string>
+              <string>showInformationPanel:</string>
+              <string>showLicense:</string>
+              <string>showTrackSynchronization:</string>
+              <string>showVideoEffects:</string>
+              <string>showWizard:</string>
+              <string>switchSubtitleBackgroundOpacity:</string>
+              <string>switchSubtitleOption:</string>
+              <string>telxNavLink:</string>
+              <string>telxTransparent:</string>
+              <string>toggleAtoBloop:</string>
+              <string>toggleAudioDevice:</string>
+              <string>toggleEffectsButton:</string>
+              <string>toggleFullscreen:</string>
+              <string>toggleFullscreenDevice:</string>
+              <string>toggleJumpButtons:</string>
+              <string>togglePlaylistColumnTable:</string>
+              <string>togglePlaymodeButtons:</string>
+              <string>toggleRecord:</string>
+              <string>toggleSidebar:</string>
+              <string>toggleVar:</string>
+              <string>viewAbout:</string>
+              <string>viewErrorsAndWarnings:</string>
+              <string>viewHelp:</string>
+              <string>viewPreferences:</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBActionInfo">
+                <string key="name">addSubtitleFile:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">createVideoSnapshot:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">floatOnTop:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">intfOpenCapture:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">intfOpenDisc:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">intfOpenFile:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">intfOpenFileGeneric:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">intfOpenNet:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">openDocumentation:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">openDonate:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">openForum:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">openReadMe:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">openWebsite:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">resizeVideoWindow:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">setPlaybackRate:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">showAudioEffects:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">showBookmarks:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">showConvertAndSave:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">showInformationPanel:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">showLicense:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">showTrackSynchronization:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">showVideoEffects:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">showWizard:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">switchSubtitleBackgroundOpacity:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">switchSubtitleOption:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">telxNavLink:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">telxTransparent:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">toggleAtoBloop:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">toggleAudioDevice:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">toggleEffectsButton:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">toggleFullscreen:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">toggleFullscreenDevice:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">toggleJumpButtons:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">togglePlaylistColumnTable:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">togglePlaymodeButtons:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">toggleRecord:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">toggleSidebar:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">toggleVar:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">viewAbout:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">viewErrorsAndWarnings:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">viewHelp:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">viewPreferences:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="outlets">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_about</string>
+              <string>o_audioeffects</string>
+              <string>o_bookmarks</string>
+              <string>o_convertandsave</string>
+              <string>o_dmi_mute</string>
+              <string>o_dmi_next</string>
+              <string>o_dmi_play</string>
+              <string>o_dmi_previous</string>
+              <string>o_dmi_stop</string>
+              <string>o_extMgr</string>
+              <string>o_mi_AtoBloop</string>
+              <string>o_mi_about</string>
+              <string>o_mi_add_intf</string>
+              <string>o_mi_aspect_ratio</string>
+              <string>o_mi_audioeffects</string>
+              <string>o_mi_audiotrack</string>
+              <string>o_mi_bookmarks</string>
+              <string>o_mi_bring_atf</string>
+              <string>o_mi_bwd</string>
+              <string>o_mi_channels</string>
+              <string>o_mi_chapter</string>
+              <string>o_mi_checkForUpdate</string>
+              <string>o_mi_clear</string>
+              <string>o_mi_close_window</string>
+              <string>o_mi_controller</string>
+              <string>o_mi_convertandsave</string>
+              <string>o_mi_copy</string>
+              <string>o_mi_crop</string>
+              <string>o_mi_cut</string>
+              <string>o_mi_deinterlace</string>
+              <string>o_mi_deinterlace_mode</string>
+              <string>o_mi_device</string>
+              <string>o_mi_documentation</string>
+              <string>o_mi_donation</string>
+              <string>o_mi_double_window</string>
+              <string>o_mi_errorsAndWarnings</string>
+              <string>o_mi_extensions</string>
+              <string>o_mi_ffmpeg_pp</string>
+              <string>o_mi_fittoscreen</string>
+              <string>o_mi_floatontop</string>
+              <string>o_mi_forum</string>
+              <string>o_mi_fullscreen</string>
+              <string>o_mi_fwd</string>
+              <string>o_mi_half_window</string>
+              <string>o_mi_help</string>
+              <string>o_mi_hide</string>
+              <string>o_mi_hide_others</string>
+              <string>o_mi_info</string>
+              <string>o_mi_license</string>
+              <string>o_mi_loop</string>
+              <string>o_mi_messages</string>
+              <string>o_mi_minimize</string>
+              <string>o_mi_mute</string>
+              <string>o_mi_next</string>
+              <string>o_mi_normal_window</string>
+              <string>o_mi_openSubtitleFile</string>
+              <string>o_mi_open_capture</string>
+              <string>o_mi_open_disc</string>
+              <string>o_mi_open_file</string>
+              <string>o_mi_open_generic</string>
+              <string>o_mi_open_net</string>
+              <string>o_mi_open_recent</string>
+              <string>o_mi_open_wizard</string>
+              <string>o_mi_paste</string>
+              <string>o_mi_play</string>
+              <string>o_mi_player</string>
+              <string>o_mi_playlist</string>
+              <string>o_mi_prefs</string>
+              <string>o_mi_previous</string>
+              <string>o_mi_program</string>
+              <string>o_mi_quit</string>
+              <string>o_mi_quitAfterPB</string>
+              <string>o_mi_random</string>
+              <string>o_mi_rate</string>
+              <string>o_mi_rate_faster_lbl</string>
+              <string>o_mi_rate_fld</string>
+              <string>o_mi_rate_lbl</string>
+              <string>o_mi_rate_lbl_gray</string>
+              <string>o_mi_rate_normal_lbl</string>
+              <string>o_mi_rate_sld</string>
+              <string>o_mi_rate_slower_lbl</string>
+              <string>o_mi_rate_view</string>
+              <string>o_mi_readme</string>
+              <string>o_mi_record</string>
+              <string>o_mi_repeat</string>
+              <string>o_mi_screen</string>
+              <string>o_mi_select_all</string>
+              <string>o_mi_services</string>
+              <string>o_mi_show_all</string>
+              <string>o_mi_snapshot</string>
+              <string>o_mi_stop</string>
+              <string>o_mi_subtitle_bgcolor</string>
+              <string>o_mi_subtitle_bgopacity</string>
+              <string>o_mi_subtitle_bgopacity_lbl</string>
+              <string>o_mi_subtitle_bgopacity_lbl_gray</string>
+              <string>o_mi_subtitle_bgopacity_sld</string>
+              <string>o_mi_subtitle_bgopacity_view</string>
+              <string>o_mi_subtitle_outlinethickness</string>
+              <string>o_mi_subtitle_size</string>
+              <string>o_mi_subtitle_textcolor</string>
+              <string>o_mi_subtitle_track</string>
+              <string>o_mi_teletext</string>
+              <string>o_mi_teletext_blue</string>
+              <string>o_mi_teletext_green</string>
+              <string>o_mi_teletext_index</string>
+              <string>o_mi_teletext_red</string>
+              <string>o_mi_teletext_transparent</string>
+              <string>o_mi_teletext_yellow</string>
+              <string>o_mi_title</string>
+              <string>o_mi_toggleEffectsButton</string>
+              <string>o_mi_toggleJumpButtons</string>
+              <string>o_mi_togglePlaymodeButtons</string>
+              <string>o_mi_toggleSidebar</string>
+              <string>o_mi_trackSynchronization</string>
+              <string>o_mi_videoeffects</string>
+              <string>o_mi_videotrack</string>
+              <string>o_mi_visual</string>
+              <string>o_mi_vol_down</string>
+              <string>o_mi_vol_up</string>
+              <string>o_mi_website</string>
+              <string>o_mu_add_intf</string>
+              <string>o_mu_aspect_ratio</string>
+              <string>o_mu_audio</string>
+              <string>o_mu_audiotrack</string>
+              <string>o_mu_channels</string>
+              <string>o_mu_chapter</string>
+              <string>o_mu_controls</string>
+              <string>o_mu_crop</string>
+              <string>o_mu_deinterlace</string>
+              <string>o_mu_deinterlace_mode</string>
+              <string>o_mu_device</string>
+              <string>o_mu_edit</string>
+              <string>o_mu_extensions</string>
+              <string>o_mu_ffmpeg_pp</string>
+              <string>o_mu_file</string>
+              <string>o_mu_help</string>
+              <string>o_mu_playlistTableColumns</string>
+              <string>o_mu_program</string>
+              <string>o_mu_screen</string>
+              <string>o_mu_subtitle_bgcolor</string>
+              <string>o_mu_subtitle_outlinethickness</string>
+              <string>o_mu_subtitle_size</string>
+              <string>o_mu_subtitle_textcolor</string>
+              <string>o_mu_subtitle_tracks</string>
+              <string>o_mu_subtitles</string>
+              <string>o_mu_title</string>
+              <string>o_mu_video</string>
+              <string>o_mu_videotrack</string>
+              <string>o_mu_view</string>
+              <string>o_mu_visual</string>
+              <string>o_mu_window</string>
+              <string>o_trackSynchronization</string>
+              <string>o_videoeffects</string>
+              <string>o_vmi_fullscreen</string>
+              <string>o_vmi_mute</string>
+              <string>o_vmi_next</string>
+              <string>o_vmi_play</string>
+              <string>o_vmi_prev</string>
+              <string>o_vmi_snapshot</string>
+              <string>o_vmi_stop</string>
+              <string>o_vmi_voldown</string>
+              <string>o_vmi_volup</string>
+              <string>o_vout_menu</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>id</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>NSView</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>NSView</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>NSMenu</string>
+              <string>id</string>
+              <string>id</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
+              <string>NSMenu</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_about</string>
+              <string>o_audioeffects</string>
+              <string>o_bookmarks</string>
+              <string>o_convertandsave</string>
+              <string>o_dmi_mute</string>
+              <string>o_dmi_next</string>
+              <string>o_dmi_play</string>
+              <string>o_dmi_previous</string>
+              <string>o_dmi_stop</string>
+              <string>o_extMgr</string>
+              <string>o_mi_AtoBloop</string>
+              <string>o_mi_about</string>
+              <string>o_mi_add_intf</string>
+              <string>o_mi_aspect_ratio</string>
+              <string>o_mi_audioeffects</string>
+              <string>o_mi_audiotrack</string>
+              <string>o_mi_bookmarks</string>
+              <string>o_mi_bring_atf</string>
+              <string>o_mi_bwd</string>
+              <string>o_mi_channels</string>
+              <string>o_mi_chapter</string>
+              <string>o_mi_checkForUpdate</string>
+              <string>o_mi_clear</string>
+              <string>o_mi_close_window</string>
+              <string>o_mi_controller</string>
+              <string>o_mi_convertandsave</string>
+              <string>o_mi_copy</string>
+              <string>o_mi_crop</string>
+              <string>o_mi_cut</string>
+              <string>o_mi_deinterlace</string>
+              <string>o_mi_deinterlace_mode</string>
+              <string>o_mi_device</string>
+              <string>o_mi_documentation</string>
+              <string>o_mi_donation</string>
+              <string>o_mi_double_window</string>
+              <string>o_mi_errorsAndWarnings</string>
+              <string>o_mi_extensions</string>
+              <string>o_mi_ffmpeg_pp</string>
+              <string>o_mi_fittoscreen</string>
+              <string>o_mi_floatontop</string>
+              <string>o_mi_forum</string>
+              <string>o_mi_fullscreen</string>
+              <string>o_mi_fwd</string>
+              <string>o_mi_half_window</string>
+              <string>o_mi_help</string>
+              <string>o_mi_hide</string>
+              <string>o_mi_hide_others</string>
+              <string>o_mi_info</string>
+              <string>o_mi_license</string>
+              <string>o_mi_loop</string>
+              <string>o_mi_messages</string>
+              <string>o_mi_minimize</string>
+              <string>o_mi_mute</string>
+              <string>o_mi_next</string>
+              <string>o_mi_normal_window</string>
+              <string>o_mi_openSubtitleFile</string>
+              <string>o_mi_open_capture</string>
+              <string>o_mi_open_disc</string>
+              <string>o_mi_open_file</string>
+              <string>o_mi_open_generic</string>
+              <string>o_mi_open_net</string>
+              <string>o_mi_open_recent</string>
+              <string>o_mi_open_wizard</string>
+              <string>o_mi_paste</string>
+              <string>o_mi_play</string>
+              <string>o_mi_player</string>
+              <string>o_mi_playlist</string>
+              <string>o_mi_prefs</string>
+              <string>o_mi_previous</string>
+              <string>o_mi_program</string>
+              <string>o_mi_quit</string>
+              <string>o_mi_quitAfterPB</string>
+              <string>o_mi_random</string>
+              <string>o_mi_rate</string>
+              <string>o_mi_rate_faster_lbl</string>
+              <string>o_mi_rate_fld</string>
+              <string>o_mi_rate_lbl</string>
+              <string>o_mi_rate_lbl_gray</string>
+              <string>o_mi_rate_normal_lbl</string>
+              <string>o_mi_rate_sld</string>
+              <string>o_mi_rate_slower_lbl</string>
+              <string>o_mi_rate_view</string>
+              <string>o_mi_readme</string>
+              <string>o_mi_record</string>
+              <string>o_mi_repeat</string>
+              <string>o_mi_screen</string>
+              <string>o_mi_select_all</string>
+              <string>o_mi_services</string>
+              <string>o_mi_show_all</string>
+              <string>o_mi_snapshot</string>
+              <string>o_mi_stop</string>
+              <string>o_mi_subtitle_bgcolor</string>
+              <string>o_mi_subtitle_bgopacity</string>
+              <string>o_mi_subtitle_bgopacity_lbl</string>
+              <string>o_mi_subtitle_bgopacity_lbl_gray</string>
+              <string>o_mi_subtitle_bgopacity_sld</string>
+              <string>o_mi_subtitle_bgopacity_view</string>
+              <string>o_mi_subtitle_outlinethickness</string>
+              <string>o_mi_subtitle_size</string>
+              <string>o_mi_subtitle_textcolor</string>
+              <string>o_mi_subtitle_track</string>
+              <string>o_mi_teletext</string>
+              <string>o_mi_teletext_blue</string>
+              <string>o_mi_teletext_green</string>
+              <string>o_mi_teletext_index</string>
+              <string>o_mi_teletext_red</string>
+              <string>o_mi_teletext_transparent</string>
+              <string>o_mi_teletext_yellow</string>
+              <string>o_mi_title</string>
+              <string>o_mi_toggleEffectsButton</string>
+              <string>o_mi_toggleJumpButtons</string>
+              <string>o_mi_togglePlaymodeButtons</string>
+              <string>o_mi_toggleSidebar</string>
+              <string>o_mi_trackSynchronization</string>
+              <string>o_mi_videoeffects</string>
+              <string>o_mi_videotrack</string>
+              <string>o_mi_visual</string>
+              <string>o_mi_vol_down</string>
+              <string>o_mi_vol_up</string>
+              <string>o_mi_website</string>
+              <string>o_mu_add_intf</string>
+              <string>o_mu_aspect_ratio</string>
+              <string>o_mu_audio</string>
+              <string>o_mu_audiotrack</string>
+              <string>o_mu_channels</string>
+              <string>o_mu_chapter</string>
+              <string>o_mu_controls</string>
+              <string>o_mu_crop</string>
+              <string>o_mu_deinterlace</string>
+              <string>o_mu_deinterlace_mode</string>
+              <string>o_mu_device</string>
+              <string>o_mu_edit</string>
+              <string>o_mu_extensions</string>
+              <string>o_mu_ffmpeg_pp</string>
+              <string>o_mu_file</string>
+              <string>o_mu_help</string>
+              <string>o_mu_playlistTableColumns</string>
+              <string>o_mu_program</string>
+              <string>o_mu_screen</string>
+              <string>o_mu_subtitle_bgcolor</string>
+              <string>o_mu_subtitle_outlinethickness</string>
+              <string>o_mu_subtitle_size</string>
+              <string>o_mu_subtitle_textcolor</string>
+              <string>o_mu_subtitle_tracks</string>
+              <string>o_mu_subtitles</string>
+              <string>o_mu_title</string>
+              <string>o_mu_video</string>
+              <string>o_mu_videotrack</string>
+              <string>o_mu_view</string>
+              <string>o_mu_visual</string>
+              <string>o_mu_window</string>
+              <string>o_trackSynchronization</string>
+              <string>o_videoeffects</string>
+              <string>o_vmi_fullscreen</string>
+              <string>o_vmi_mute</string>
+              <string>o_vmi_next</string>
+              <string>o_vmi_play</string>
+              <string>o_vmi_prev</string>
+              <string>o_vmi_snapshot</string>
+              <string>o_vmi_stop</string>
+              <string>o_vmi_voldown</string>
+              <string>o_vmi_volup</string>
+              <string>o_vout_menu</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_about</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audioeffects</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_bookmarks</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_convertandsave</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_dmi_mute</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_dmi_next</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_dmi_play</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_dmi_previous</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_dmi_stop</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_extMgr</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_AtoBloop</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_about</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_add_intf</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_aspect_ratio</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_audioeffects</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_audiotrack</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_bookmarks</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_bring_atf</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_bwd</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_channels</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_chapter</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_checkForUpdate</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_clear</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_close_window</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_controller</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_convertandsave</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_copy</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_crop</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_cut</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_deinterlace</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_deinterlace_mode</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_device</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_documentation</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_donation</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_double_window</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_errorsAndWarnings</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_extensions</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_ffmpeg_pp</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_fittoscreen</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_floatontop</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_forum</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_fullscreen</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_fwd</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_half_window</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_help</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_hide</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_hide_others</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_info</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_license</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_loop</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_messages</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_minimize</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_mute</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_next</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_normal_window</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_openSubtitleFile</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_open_capture</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_open_disc</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_open_file</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_open_generic</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_open_net</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_open_recent</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_open_wizard</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_paste</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_play</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_player</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_playlist</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_prefs</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_previous</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_program</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_quit</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_quitAfterPB</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_random</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_rate</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_rate_faster_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_rate_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_rate_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_rate_lbl_gray</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_rate_normal_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_rate_sld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_rate_slower_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_rate_view</string>
+                <string key="candidateClassName">NSView</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_readme</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_record</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_repeat</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_screen</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_select_all</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_services</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_show_all</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_snapshot</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_stop</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_subtitle_bgcolor</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_subtitle_bgopacity</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_subtitle_bgopacity_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_subtitle_bgopacity_lbl_gray</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_subtitle_bgopacity_sld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_subtitle_bgopacity_view</string>
+                <string key="candidateClassName">NSView</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_subtitle_outlinethickness</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_subtitle_size</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_subtitle_textcolor</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_subtitle_track</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_teletext</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_teletext_blue</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_teletext_green</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_teletext_index</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_teletext_red</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_teletext_transparent</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_teletext_yellow</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_title</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_toggleEffectsButton</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_toggleJumpButtons</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_togglePlaymodeButtons</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_toggleSidebar</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_trackSynchronization</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_videoeffects</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_videotrack</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_visual</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_vol_down</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_vol_up</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_website</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_add_intf</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_aspect_ratio</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_audio</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_audiotrack</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_channels</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_chapter</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_controls</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_crop</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_deinterlace</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_deinterlace_mode</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_device</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_edit</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_extensions</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_ffmpeg_pp</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_file</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_help</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_playlistTableColumns</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_program</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_screen</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_subtitle_bgcolor</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_subtitle_outlinethickness</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_subtitle_size</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_subtitle_textcolor</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_subtitle_tracks</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_subtitles</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_title</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_video</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_videotrack</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_view</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_visual</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mu_window</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_trackSynchronization</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_videoeffects</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_vmi_fullscreen</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_vmi_mute</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_vmi_next</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_vmi_play</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_vmi_prev</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_vmi_snapshot</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_vmi_stop</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_vmi_voldown</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_vmi_volup</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_vout_menu</string>
+                <string key="candidateClassName">NSMenu</string>
+              </object>
+            </object>
+          </object>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBDocumentRelativeSource</string>
+            <string key="minorKey">../../../../../modules/gui/macosx/MainMenu.h</string>
+          </object>
         </object>
       </object>
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.2+">
