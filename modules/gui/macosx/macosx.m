@@ -4,11 +4,7 @@
  * Copyright (C) 2001-2013 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Colin Delacroix <colin@zoy.org>
- *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
- *          Florian G. Pflug <fgp@phlo.org>
- *          Jon Lech Johansen <jon-vl@nanocrew.net>
- *          Felix Paul Kühne <fkuehne at videolan dot org>
+ * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
  *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
  *
  * This program is free software; you can redistribute it and/or modify

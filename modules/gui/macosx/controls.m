@@ -4,9 +4,7 @@
  * Copyright (C) 2002-2013 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
- *          Christophe Massiot <massiot@via.ecp.fr>
- *          Derk-Jan Hartman <hartman at videolan dot org>
+ * Authors: Derk-Jan Hartman <hartman at videolan dot org>
  *          Benjamin Pracht <bigben at videolan doit org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
  *
