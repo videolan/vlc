@@ -149,6 +149,7 @@ OS X Interface:
  * add an option to disable skipping to next/previous file with the Apple Remote
  * add an option to show next / previous buttons
  * add an option to hide the shuffle and repeat buttons
+ * add an option to hide the audio effects button (default enabled)
  * add optional playlist columns for track number, genre, album, description,
    date and language
  * add options to the Advanced Open File dialog for start and stop time
@@ -161,8 +162,9 @@ OS X Interface:
    3rd party applications
  * add a UI to the preferences dialog to configure the default application
    handler for ftp, mms, rtmp, rtp, rtsp, sftp, smb and udp streams
+   (system-wide settings)
  * The Streaming/Transcoding wizard and the open dialog's output panel are
-   deprecated now
+   deprecated now and will be removed in a future release.
 
 Qt:
  * Partial support for Qt5.0
@@ -179,7 +181,8 @@ Qt:
  * Numerous fixes
  * Add audio track fingerprinting from media info
  * Removed language preference
- * New profiles format and dialog to handle filters and quality. Added new profiles.
+ * New profiles format and dialog to handle filters and quality.
+   Added new profiles.
 
 libVLC:
  * new libvlc_audio_output_device_list_get and libvlc_audio_output_device_list_release functions
