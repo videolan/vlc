@@ -406,10 +406,16 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mu_ffmpeg_pp setTitle: _NS("Post processing")];
 
     [o_mu_subtitles setTitle:_NS("Subtitles")];
+    [o_mi_openSubtitleFile setTitle: _NS("Add Subtitle File...")];
     [o_mi_subtitle_track setTitle: _NS("Subtitles Track")];
     [o_mu_subtitle_tracks setTitle: _NS("Subtitles Track")];
-    [o_mi_openSubtitleFile setTitle: _NS("Open File...")];
+    [o_mi_subtitle_size setTitle: _NS("Text Size")];
+    [o_mi_subtitle_textcolor setTitle: _NS("Text Color")];
+    [o_mi_subtitle_outlinethickness setTitle: _NS("Outline Thickness")];
     [o_mi_subtitle_bgopacity setView: o_mi_subtitle_bgopacity_view];
+    [o_mi_subtitle_bgopacity_lbl setStringValue: _NS("Background Opacity")];
+    [o_mi_subtitle_bgopacity_lbl_gray setStringValue: _NS("Background Opacity")];
+    [o_mi_subtitle_bgcolor setTitle: _NS("Background Color")];
     [o_mi_teletext setTitle: _NS("Teletext")];
     [o_mi_teletext_transparent setTitle: _NS("Transparent")];
     [o_mi_teletext_index setTitle: _NS("Index")];
