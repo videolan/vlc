@@ -190,11 +190,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self setExcludedFromWindowsMenu: YES];
     [self setAcceptsMouseMovedEvents: YES];
     // Set that here as IB seems to be buggy
-    if (b_dark_interface) {
+    if (b_dark_interface)
         [self setContentMinSize:NSMakeSize(604., 288. + [o_titlebar_view frame].size.height)];
-    } else {
+    else
         [self setContentMinSize:NSMakeSize(604., 288.)];
-    }
 
     [self setTitle: _NS("VLC media player")];
 
@@ -356,7 +355,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         o_color_backdrop = [[VLCColorView alloc] initWithFrame: [o_split_view frame]];
         [[self contentView] addSubview: o_color_backdrop positioned: NSWindowBelow relativeTo: o_split_view];
         [o_color_backdrop setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
-
     } else {
         [o_video_view setFrame: [o_split_view frame]];
         [o_playlist_table setBorderType: NSNoBorder];
@@ -366,7 +364,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(someWindowWillClose:) name: NSWindowWillCloseNotification object: nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(someWindowWillMiniaturize:) name: NSWindowWillMiniaturizeNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mainSplitViewWillResizeSubviews:) name:NSSplitViewWillResizeSubviewsNotification object:o_split_view];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(mainSplitViewDidResizeSubviews:) name: NSSplitViewDidResizeSubviewsNotification object:o_split_view];
 
     if (b_splitviewShouldBeHidden) {
         [self hideSplitView];
@@ -788,8 +786,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         }
 
     }
-    
-    
+
+
 }
 
 - (void)makeKeyAndOrderFront: (id)sender
@@ -856,7 +854,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     return YES;
 }
 
-- (void)mainSplitViewWillResizeSubviews:(id)object
+- (void)mainSplitViewDidResizeSubviews:(id)object
 {
     i_lastLeftSplitViewWidth = [o_left_split_view frame].size.width;
     config_PutInt(VLCIntf, "macosx-show-sidebar", ![o_split_view isSubviewCollapsed:o_left_split_view]);
@@ -870,6 +868,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_split_view setPosition:i_lastLeftSplitViewWidth ofDividerAtIndex:0];
     else
         [o_split_view setPosition:[o_split_view minPossiblePositionOfDividerAtIndex:0] ofDividerAtIndex:0];
+    [[[VLCMain sharedInstance] mainMenu] updateSidebarMenuItem];
 }
 
 #pragma mark -

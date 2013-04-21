@@ -714,10 +714,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (IBAction)toggleSidebar:(id)sender
 {
-    BOOL b_value = !config_GetInt(VLCIntf, "macosx-show-sidebar");
-    config_PutInt(VLCIntf, "macosx-show-sidebar", b_value);
     [[[VLCMain sharedInstance] mainWindow] toggleLeftSubSplitView];
-    [o_mi_toggleSidebar setState: b_value];
 }
 
 - (void)updateSidebarMenuItem

@@ -147,7 +147,6 @@ vlc_module_begin()
         add_bool("macosx-show-playback-buttons", false, JUMPBUTTONS_TEXT, JUMPBUTTONS_LONGTEXT, false)
         add_bool("macosx-show-playmode-buttons", true, PLAYMODEBUTTONS_TEXT, PLAYMODEBUTTONS_LONGTEXT, false)
         add_bool("macosx-show-effects-button", false, EFFECTSBUTTON_TEXT, EFFECTSBUTTON_LONGTEXT, false)
-
         add_bool("macosx-show-sidebar", true, SIDEBAR_TEXT, SIDEBAR_LONGTEXT, false)
 
     set_section(N_("Behaviour"), 0)
@@ -160,13 +159,11 @@ vlc_module_begin()
         add_integer("macosx-control-itunes", 1, ITUNES_TEXT, ITUNES_LONGTEXT, false)
         change_integer_list(itunes_list, itunes_list_text)
 
-
     set_section(N_("Apple Remote and media keys"), 0)
         add_bool("macosx-appleremote", true, USE_APPLE_REMOTE_TEXT, USE_APPLE_REMOTE_LONGTEXT, false)
         add_bool("macosx-appleremote-sysvol", false, USE_APPLE_REMOTE_VOLUME_TEXT, USE_APPLE_REMOTE_VOLUME_LONGTEXT, false)
         add_bool("macosx-appleremote-prevnext", false, USE_APPLE_REMOTE_PREVNEXT_TEXT, USE_APPLE_REMOTE_PREVNEXT_LONGTEXT, false)
         add_bool("macosx-mediakeys", true, USE_MEDIAKEYS_TEXT, USE_MEDIAKEYS_LONGTEXT, false)
-
 
     add_obsolete_bool("macosx-stretch") /* since 2.0.0 */
     add_obsolete_bool("macosx-eq-keep") /* since 2.0.0 */
