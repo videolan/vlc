@@ -302,7 +302,7 @@ do { \
 \
     for( size_t i = 0; i < frames; i++ ) \
     { \
-        float tmp[AOUT_CHAN_MAX]; \
+        type tmp[AOUT_CHAN_MAX]; \
 \
         for( size_t j = 0; j < channels; j++ ) \
             tmp[chans_table[j]] = buf[j]; \
