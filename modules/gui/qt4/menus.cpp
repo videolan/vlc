@@ -343,6 +343,8 @@ QMenu *VLCMenuBar::FileMenu( intf_thread_t *p_intf, QWidget *parent, MainInterfa
 
     addDPStaticEntry( menu, qtr( "Open &File..." ),
         ":/type/file-asym", SLOT( simpleOpenDialog() ), "Ctrl+O" );
+    addDPStaticEntry( menu, qtr( "&Open Multiple Files..." ),
+        ":/type/file-asym", SLOT( openFileDialog() ), "Ctrl+Shift+O" );
     addDPStaticEntry( menu, qtr( I_OP_OPDIR ),
         ":/type/folder-grey", SLOT( PLOpenDir() ), "Ctrl+F" );
     addDPStaticEntry( menu, qtr( "Open &Disc..." ),
@@ -351,12 +353,6 @@ QMenu *VLCMenuBar::FileMenu( intf_thread_t *p_intf, QWidget *parent, MainInterfa
         ":/type/network", SLOT( openNetDialog() ), "Ctrl+N" );
     addDPStaticEntry( menu, qtr( "Open &Capture Device..." ),
         ":/type/capture-card", SLOT( openCaptureDialog() ), "Ctrl+C" );
-
-    menu->addSeparator();
-
-    addDPStaticEntry( menu, qtr( "&Open (advanced)..." ),
-        ":/type/file-asym", SLOT( openFileDialog() ), "Ctrl+Shift+O" );
-    menu->addSeparator();
 
     addDPStaticEntry( menu, qtr( "Open &Location from clipboard" ),
                       NULL, SLOT( openUrlDialog() ), "Ctrl+V" );
@@ -371,7 +367,6 @@ QMenu *VLCMenuBar::FileMenu( intf_thread_t *p_intf, QWidget *parent, MainInterfa
 
     addDPStaticEntry( menu, qtr( I_PL_SAVE ), "", SLOT( saveAPlaylist() ),
         "Ctrl+Y" );
-    menu->addSeparator();
 
 #ifdef ENABLE_SOUT
     addDPStaticEntry( menu, qtr( "Conve&rt / Save..." ), "",
