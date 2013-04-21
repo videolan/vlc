@@ -3119,6 +3119,15 @@ then
   VLC_ADD_PLUGIN([vout_macosx])
 fi
 
+dnl
+dnl Mac CoreGraphics Layer Vout
+AC_ARG_ENABLE(coregraphicslayer-vout,
+  [  --enable-coregraphicslayer-vout CoreGraphics layered video output module (default disabled)])
+if test "${enable_coregraphicslayer_vout}" = "yes"; then
+  VLC_ADD_LIBS([vout_coregraphicslayer],[-Wl,-framework,Cocoa])
+  VLC_ADD_LIBS([vout_coregraphicslayer],[-Wl,-framework,QuartzCore])
+  VLC_ADD_PLUGIN([vout_coregraphicslayer])
+fi
 
 dnl
 dnl  freetype module
