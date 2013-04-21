@@ -385,7 +385,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         case ACTIONID_SUBSYNC_MARKAUDIO:
         {
             p_sys->subtitle_delaybookmarks.i_time_audio = mdate();
-            DisplayMessage( p_vout, _("Sub sync: bookmarked audio timestamp"));
+            DisplayMessage( p_vout, _("Sub sync: bookmarked audio time"));
             break;
         }
         case ACTIONID_SUBSYNC_MARKSUB:
@@ -400,13 +400,13 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 i_count = list.p_list->i_count;
                 if( i_count < 1 || val.i_int < 0 )
                 {
-                    DisplayMessage( p_vout, _("Sub sync: No active subtitle") );
+                    DisplayMessage( p_vout, _("No active subtitle") );
                     var_FreeList( &list, &list2 );
                     break;
                 }
                 p_sys->subtitle_delaybookmarks.i_time_subtitle = mdate();
                 DisplayMessage( p_vout,
-                                _("Sub sync: bookmarked subtitle timestamp"));
+                                _("Sub sync: bookmarked subtitle time"));
                 var_FreeList( &list, &list2 );
             }
             break;
@@ -469,7 +469,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 i_count = list.p_list->i_count;
                 if( i_count < 1 || val.i_int < 0 )
                 {
-                    DisplayMessage( p_vout, _("Subtitle delay: No active subtitle") );
+                    DisplayMessage( p_vout, _("No active subtitle") );
                     var_FreeList( &list, &list2 );
                     break;
                 }
