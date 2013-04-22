@@ -79,6 +79,7 @@ struct aout_sys_t
 {
     AudioObjectID               i_default_dev;      /* DeviceID of defaultOutputDevice */
     AudioObjectID               i_selected_dev;     /* DeviceID of the selected device */
+    AudioObjectID               i_new_selected_dev; /* DeviceID of device which will be selected on start */
     bool                        b_selected_dev_is_digital;
     AudioDeviceIOProcID         i_procID;           /* DeviceID of current device */
     bool                        b_digital;          /* Are we running in digital mode? */
@@ -254,6 +255,8 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_sys->b_revert = false;
     p_sys->b_changed_mixing = false;
     p_sys->i_bytes_per_sample = 0;
+
+    p_sys->i_selected_dev = p_sys->i_new_selected_dev;
 
     aout_FormatPrint(p_aout, "VLC is looking for:", fmt);
 
@@ -1071,17 +1074,17 @@ static int SwitchAudioDevice(audio_output_t *p_aout, const char *name)
     struct aout_sys_t *p_sys = p_aout->sys;
 
     if (name)
-        p_sys->i_selected_dev = atoi(name);
+        p_sys->i_new_selected_dev = atoi(name);
     else
-        p_sys->i_selected_dev = 0;
+        p_sys->i_new_selected_dev = 0;
 
-    bool b_supports_digital = (p_sys->i_selected_dev & AOUT_VAR_SPDIF_FLAG);
+    bool b_supports_digital = (p_sys->i_new_selected_dev & AOUT_VAR_SPDIF_FLAG);
     if (b_supports_digital)
         p_sys->b_selected_dev_is_digital = true;
     else
         p_sys->b_selected_dev_is_digital = false;
 
-    p_sys->i_selected_dev = p_sys->i_selected_dev & ~AOUT_VAR_SPDIF_FLAG;
+    p_sys->i_new_selected_dev = p_sys->i_new_selected_dev & ~AOUT_VAR_SPDIF_FLAG;
 
     aout_DeviceReport(p_aout, name);
     aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
