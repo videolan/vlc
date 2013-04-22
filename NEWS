@@ -164,6 +164,7 @@ OS X Interface:
    handler for ftp, mms, rtmp, rtp, rtsp, sftp, smb and udp streams
    (system-wide settings)
  * add support for the Video Title option
+ * add support for the Boss Key
  * The Streaming/Transcoding wizard and the open dialog's output panel are
    deprecated now and will be removed in a future release.
 

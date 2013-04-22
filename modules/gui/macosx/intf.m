@@ -94,6 +94,8 @@ static int PlaybackModeUpdated(vlc_object_t *, const char *,
                                vlc_value_t, vlc_value_t, void *);
 static int VolumeUpdated(vlc_object_t *, const char *,
                          vlc_value_t, vlc_value_t, void *);
+static int BossCallback(vlc_object_t *, const char *,
+                         vlc_value_t, vlc_value_t, void *);
 
 #pragma mark -
 #pragma mark VLC Interface Object Callbacks
@@ -453,6 +455,18 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
+static int BossCallback(vlc_object_t *p_this, const char *psz_var,
+                        vlc_value_t oldval, vlc_value_t new_val, void *param)
+{
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+
+    [[VLCCoreInteraction sharedInstance] performSelectorOnMainThread:@selector(pause) withObject:nil waitUntilDone:NO];
+    [[VLCApplication sharedApplication] hide:nil];
+
+    [o_pool release];
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * ShowController: Callback triggered by the show-intf playlist variable
  * through the ShowIntf-control-intf, to let us show the controller-win;
@@ -678,6 +692,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     var_AddCallback(p_intf->p_libvlc, "intf-toggle-fscontrol", ShowController, self);
     var_AddCallback(p_intf->p_libvlc, "intf-show", ShowController, self);
+    var_AddCallback(p_intf->p_libvlc, "intf-boss", BossCallback, self);
     //    var_AddCallback(p_playlist, "item-change", PLItemChanged, self);
     var_AddCallback(p_playlist, "activity", PLItemChanged, self);
     var_AddCallback(p_playlist, "leaf-to-parent", PlaylistUpdated, self);
@@ -861,6 +876,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_DelCallback(p_playlist, "mute", VolumeUpdated, self);
     var_DelCallback(p_intf->p_libvlc, "intf-toggle-fscontrol", ShowController, self);
     var_DelCallback(p_intf->p_libvlc, "intf-show", ShowController, self);
+    var_DelCallback(p_intf->p_libvlc, "intf-boss", BossCallback, self);
 
     if (p_current_input) {
         var_DelCallback(p_current_input, "intf-event", InputEvent, [VLCMain sharedInstance]);
@@ -1385,7 +1401,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                 [iTunesApp playpause];
             }
         }
-        
+
     }
 
     b_has_itunes_paused = NO;
@@ -1421,7 +1437,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             }
         }
 
-        
+
         /* Declare user activity.
          This wakes the display if it is off, and postpones display sleep according to the users system preferences
          Available from 10.7.3 */
