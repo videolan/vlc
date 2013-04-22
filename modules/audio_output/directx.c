@@ -612,7 +612,7 @@ static int InitDirectSound( audio_output_t *p_aout )
      * sound without any video, and so what window handle should we use ???
      * The hack for now is to use the Desktop window handle - it seems to be
      * working */
-#ifndef VLC_WINSTORE_APP
+#if !VLC_WINSTORE_APP
     if( IDirectSound_SetCooperativeLevel( p_aout->sys->p_dsobject,
                                           GetDesktopWindow(),
                                           DSSCL_EXCLUSIVE) )
