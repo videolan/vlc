@@ -39,6 +39,7 @@
 #include <QApplication>
 #include <QFile>
 #include <QDir>
+#include <QSignalMapper>
 
 #include <assert.h>
 
@@ -999,6 +1000,10 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     p_input = playlist_CurrentInput( pl_Get(p_intf) );
     if( p_input )
         emit inputChanged( p_input );
+
+    /* Audio Menu */
+    menusAudioMapper = new QSignalMapper();
+    CONNECT( menusAudioMapper, mapped(QString), this, menusUpdateAudio( QString ) );
 }
 
 MainInputManager::~MainInputManager()
@@ -1015,6 +1020,8 @@ MainInputManager::~MainInputManager()
 
     var_DelCallback( THEPL, "playlist-item-append", PLItemAppended, this );
     var_DelCallback( THEPL, "playlist-item-deleted", PLItemRemoved, this );
+
+    delete menusAudioMapper;
 }
 
 vout_thread_t* MainInputManager::getVout()
@@ -1218,6 +1225,12 @@ void MainInputManager::notifyMute( bool mute )
     emit soundMuteChanged(mute);
 }
 
+
+void MainInputManager::menusUpdateAudio( const QString& data )
+{
+    aout_DeviceSet( getAout(), qtu(data) );
+}
+
 static int PLItemAppended
 ( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
 {
@@ -1231,6 +1244,7 @@ static int PLItemAppended
     QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
 }
+
 static int PLItemRemoved
 ( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
 {

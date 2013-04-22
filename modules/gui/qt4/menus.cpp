@@ -82,6 +82,7 @@ enum
 static QActionGroup *currentGroup;
 
 QMenu *VLCMenuBar::recentsMenu = NULL;
+QMenu *VLCMenuBar::audioDeviceMenu = NULL;
 
 /**
  * @brief Add static entries to DP in menus
@@ -255,7 +256,6 @@ static int AudioAutoMenuBuilder( audio_output_t *p_object,
 {
     PUSH_INPUTVAR( "audio-es" );
     PUSH_VAR( "stereo-mode" );
-    PUSH_VAR( "device" );
     PUSH_VAR( "visual" );
     return VLC_SUCCESS;
 }
@@ -593,8 +593,8 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     if( current->isEmpty() )
     {
         addActionWithSubmenu( current, "audio-es", qtr( "Audio &Track" ) );
+        audioDeviceMenu = current->addMenu( qtr( "Audio &Device" ) );
         addActionWithSubmenu( current, "stereo-mode", qtr( "&Stereo Mode" ) );
-        addActionWithSubmenu( current, "device", qtr( "Audio &Device" ) );
         current->addSeparator();
 
         addActionWithSubmenu( current, "visual", qtr( "&Visualizations" ) );
@@ -605,6 +605,7 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     p_aout = THEMIM->getAout();
     EnableStaticEntries( current, ( p_aout != NULL ) );
     AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
+    updateAudioDevice( p_intf, p_aout, audioDeviceMenu );
     if( p_aout )
     {
         vlc_object_release( p_aout );
@@ -1522,6 +1523,39 @@ void VLCMenuBar::DoAction( QObject *data )
         var_TriggerCallback( p_object, var );
     else
         var_Set( p_object, var, val );
+}
+
+void VLCMenuBar::updateAudioDevice( intf_thread_t * p_intf, audio_output_t *p_aout, QMenu *current )
+{
+    char **ids, **names;
+    char *selected;
+
+    if( !p_aout )
+        return;
+
+    current->clear();
+    int i_result = aout_DevicesList( p_aout, &ids, &names);
+    selected = aout_DeviceGet( p_aout );
+
+    QActionGroup *actionGroup = new QActionGroup(current);
+    QAction *action;
+
+    for( int i = 0; i < i_result; i++ )
+    {
+        action = new QAction( qfu( names[i] ), NULL );
+        action->setData( ids[i] );
+        action->setCheckable( true );
+        if( selected && !strcmp( ids[i], selected ) )
+            action->setChecked( true );
+        actionGroup->addAction( action );
+        current->addAction( action );
+        CONNECT(action, changed(), THEMIM->menusAudioMapper, map());
+        THEMIM->menusAudioMapper->setMapping(action, ids[i]);
+        free( ids[i] );
+        free( names[i] );
+    }
+    free( ids );
+    free( names );
 }
 
 void VLCMenuBar::updateRecents( intf_thread_t *p_intf )

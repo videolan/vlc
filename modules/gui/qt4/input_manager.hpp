@@ -37,6 +37,7 @@
 
 #include <QObject>
 #include <QEvent>
+class QSignalMapper;
 
 enum { NORMAL,    /* loop: 0, repeat: 0 */
        REPEAT_ONE,/* loop: 0, repeat: 1 */
@@ -253,6 +254,7 @@ class MainInputManager : public QObject, public Singleton<MainInputManager>
 {
     Q_OBJECT
     friend class Singleton<MainInputManager>;
+    friend class VLCMenuBar;
 
 public:
     input_thread_t *getInput() { return p_input; }
@@ -269,6 +271,9 @@ public:
     bool hasEmptyPlaylist();
 
     void requestVoutUpdate() { return im->UpdateVout(); }
+
+protected:
+    QSignalMapper *menusAudioMapper;
 
 private:
     MainInputManager( intf_thread_t * );
@@ -301,6 +306,7 @@ private slots:
     void notifyRepeatLoop( bool );
     void notifyVolume( float );
     void notifyMute( bool );
+    void menusUpdateAudio( const QString& );
 
 signals:
     void inputChanged( input_thread_t * );

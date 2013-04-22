@@ -153,7 +153,9 @@ private:
     static void EnableStaticEntries( QMenu *, bool );
 
     /* recentMRL menu */
-    static QMenu *recentsMenu;
+    static QMenu *recentsMenu, *audioDeviceMenu;
+
+    static void updateAudioDevice( intf_thread_t *, audio_output_t *, QMenu* );
 
 public slots:
     static void updateRecents( intf_thread_t * );
