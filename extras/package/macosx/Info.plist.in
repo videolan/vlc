@@ -17,6 +17,20 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.volume</string>
+			</array>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>disk</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Volume</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>f4v</string>
