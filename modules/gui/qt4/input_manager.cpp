@@ -1228,7 +1228,12 @@ void MainInputManager::notifyMute( bool mute )
 
 void MainInputManager::menusUpdateAudio( const QString& data )
 {
-    aout_DeviceSet( getAout(), qtu(data) );
+    audio_output_t *aout = getAout();
+    if( aout != NULL )
+    {
+        aout_DeviceSet( aout, qtu(data) );
+        vlc_object_release( aout );
+    }
 }
 
 static int PLItemAppended
