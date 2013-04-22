@@ -1556,6 +1556,7 @@ void VLCMenuBar::updateAudioDevice( intf_thread_t * p_intf, audio_output_t *p_ao
     }
     free( ids );
     free( names );
+    free( selected );
 }
 
 void VLCMenuBar::updateRecents( intf_thread_t *p_intf )
