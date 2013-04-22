@@ -163,6 +163,7 @@ OS X Interface:
  * add a UI to the preferences dialog to configure the default application
    handler for ftp, mms, rtmp, rtp, rtsp, sftp, smb and udp streams
    (system-wide settings)
+ * add support for the Video Title option
  * The Streaming/Transcoding wizard and the open dialog's output panel are
    deprecated now and will be removed in a future release.
 

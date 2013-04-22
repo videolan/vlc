@@ -623,11 +623,15 @@ static VLCMainWindow *_o_sharedInstance = nil;
     p_input = pl_CurrentInput(VLCIntf);
     if (p_input) {
         NSString *aString;
-        char *format = var_InheritString(VLCIntf, "input-title-format");
-        char *formated = str_format_meta(pl_Get(VLCIntf), format);
-        free(format);
-        aString = [NSString stringWithUTF8String:formated];
-        free(formated);
+
+        if (!config_GetPsz(VLCIntf, "video-title")) {
+            char *format = var_InheritString(VLCIntf, "input-title-format");
+            char *formated = str_format_meta(pl_Get(VLCIntf), format);
+            free(format);
+            aString = [NSString stringWithUTF8String:formated];
+            free(formated);
+        } else
+            aString = [NSString stringWithUTF8String:config_GetPsz(VLCIntf, "video-title")];
 
         char *uri = input_item_GetURI(input_GetItem(p_input));
 
@@ -660,7 +664,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
             [o_fspanel setStreamTitle: aString];
         } else {
-           [self setTitle: _NS("VLC media player")];
+            [self setTitle: _NS("VLC media player")];
             [self setRepresentedURL: nil];
         }
 
