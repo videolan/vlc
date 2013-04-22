@@ -122,7 +122,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
     // these are key events which should be handled by vlc core, but are attached to a main menu item
     if (![self isEvent: o_event forKey: "key-vol-up"] &&
         ![self isEvent: o_event forKey: "key-vol-down"] &&
-        ![self isEvent: o_event forKey: "key-vol-mute"]) {
+        ![self isEvent: o_event forKey: "key-vol-mute"] &&
+        ![self isEvent: o_event forKey: "key-prev"] &&
+        ![self isEvent: o_event forKey: "key-next"] &&
+        ![self isEvent: o_event forKey: "key-jump+short"] &&
+        ![self isEvent: o_event forKey: "key-jump-short"]) {
         /* We indeed want to prioritize some Cocoa key equivalent against libvlc,
          so we perform the menu equivalent now. */
         if ([[NSApp mainMenu] performKeyEquivalent:o_event])
