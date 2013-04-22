@@ -755,7 +755,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     b_mediaKeySupport = var_InheritBool(VLCIntf, "macosx-mediakeys");
     if (b_mediaKeySupport) {
         o_mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
-        [o_mediaKeyController startWatchingMediaKeys];
         [[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
                                                                  [SPMediaKeyTap defaultMediaKeyUserBundleIdentifiers], kMediaKeyUsingBundleIdentifiersDefaultsKey,
                                                                  nil]];
@@ -906,6 +905,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_msg_arr = NULL;
     [o_usedHotkeys release];
     o_usedHotkeys = NULL;
+
+    [o_mediaKeyController release];
 
     [o_msg_lock release];
 
@@ -1358,6 +1359,10 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_playlist playlistUpdated];
     [o_mainwindow updateWindow];
     [o_mainwindow updateName];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
+                                                        object: nil
+                                                      userInfo: nil];
 }
 
 - (void)updateRecordState: (BOOL)b_value
@@ -1520,11 +1525,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mainmenu setShuffle];
 }
 
-
 #pragma mark -
 #pragma mark Window updater
-
-
 
 - (void)setActiveVideoPlayback:(BOOL)b_value
 {
@@ -2030,7 +2032,12 @@ static VLCMain *_o_sharedMainInstance = nil;
     if (b_mediaKeySupport) {
         if (!o_mediaKeyController)
             o_mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
-        [o_mediaKeyController startWatchingMediaKeys];
+
+        if ([[[VLCMain sharedInstance] playlist] currentPlaylistRoot]->i_children > 0 ||
+            p_current_input)
+            [o_mediaKeyController startWatchingMediaKeys];
+        else
+            [o_mediaKeyController stopWatchingMediaKeys];
     }
     else if (!b_mediaKeySupport && o_mediaKeyController)
         [o_mediaKeyController stopWatchingMediaKeys];

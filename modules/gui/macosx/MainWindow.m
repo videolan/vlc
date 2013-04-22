@@ -1052,6 +1052,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self showPodcastControls];
     else
         [self hidePodcastControls];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
+                                                        object: nil
+                                                      userInfo: nil];
 }
 
 - (NSDragOperation)sourceList:(PXSourceList *)aSourceList validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
