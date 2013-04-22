@@ -210,7 +210,14 @@ static void Close(vlc_object_t *obj)
 
     OSStatus err = noErr;
 
-    /* remove audio device callback */
+    /* remove audio devices callback */
+    AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+    err = AudioObjectRemovePropertyListener(kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, (void *)p_aout);
+    if (err != noErr)
+        msg_Err(p_aout, "AudioHardwareRemovePropertyListener failed: [%4.4s]", (char *)&err);
+
+
+    /* remove audio device alive callback */
     AudioObjectPropertyAddress deviceAliveAddress = { kAudioDevicePropertyDeviceIsAlive, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
     err = AudioObjectRemovePropertyListener(p_sys->i_selected_dev, &deviceAliveAddress, HardwareListener, (void *)p_aout);
     if (err != noErr)
@@ -925,12 +932,6 @@ static void Stop(audio_output_t *p_aout)
                 msg_Err(p_aout, "failed to set mixmode: [%4.4s]", (char *)&err);
         }
     }
-
-    AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
-    err = AudioObjectRemovePropertyListener(kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, (void *)p_aout);
-
-    if (err != noErr)
-        msg_Err(p_aout, "AudioHardwareRemovePropertyListener failed: [%4.4s]", (char *)&err);
 
     if (p_sys->i_hog_pid == getpid()) {
         p_sys->i_hog_pid = -1;
