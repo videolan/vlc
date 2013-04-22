@@ -1,0 +1,20 @@
+--- libxml2/xmlIO.c.orig	2013-04-22 19:24:23.613036400 +0200
++++ libxml2/xmlIO.c	2013-04-22 19:24:56.249035859 +0200
+@@ -726,14 +726,14 @@
+ xmlInitPlatformSpecificIo(void)
+ {
+     static int xmlPlatformIoInitialized = 0;
+-    OSVERSIONINFO osvi;
++    /*OSVERSIONINFO osvi;*/
+ 
+     if(xmlPlatformIoInitialized)
+       return;
+ 
+-    osvi.dwOSVersionInfoSize = sizeof(osvi);
++    /*osvi.dwOSVersionInfoSize = sizeof(osvi);*/
+ 
+-    if(GetVersionEx(&osvi) && (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT)) {
++    if(1 /*GetVersionEx(&osvi) && (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT)*/) {
+       xmlWrapStat = xmlWrapStatUtf8;
+       xmlWrapOpen = xmlWrapOpenUtf8;
+ #ifdef HAVE_ZLIB_H

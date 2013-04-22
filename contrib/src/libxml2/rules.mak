@@ -21,6 +21,7 @@ ifdef HAVE_DARWIN_OS
 	$(APPLY) $(SRC)/libxml2/osx-threads.patch
 endif
 	$(APPLY) $(SRC)/libxml2/no-tests.patch
+	$(APPLY) $(SRC)/libxml2/win32.patch
 	$(APPLY) $(SRC)/libxml2/pthread.patch
 	$(MOVE)
 
