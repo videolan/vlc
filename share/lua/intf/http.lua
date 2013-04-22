@@ -320,6 +320,8 @@ if config.host then
 end
 
 password = vlc.var.inherit(nil,"http-password")
+assert(password ~= "", "password not defined")
+
 h = vlc.httpd()
 load_dir( http_dir )
 a = h:handler("/art",nil,password,callback_art,nil)
