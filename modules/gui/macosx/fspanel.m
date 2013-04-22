@@ -357,9 +357,11 @@
         [o_vout_window release];
     o_vout_window = [o_window retain];
     int i_newdevice = (int)[[o_vout_window screen] displayID];
-    if (i_newdevice != i_device && i_device != 0)
+    if ((i_newdevice != i_device && i_device != 0) || i_newdevice != [[self screen] displayID]) {
+        i_device = i_newdevice;
         [self center];
-    i_device = i_newdevice;
+    } else
+        i_device = i_newdevice;
 }
 @end
 
