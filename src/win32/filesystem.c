@@ -240,7 +240,7 @@ int vlc_dup (int oldfd)
 
 int vlc_pipe (int fds[2])
 {
-#ifdef WINAPI_FAMILY_APP
+#if VLC_WINSTORE_APP
     _set_errno(EPERM);
     return -1;
 #else

@@ -833,7 +833,7 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
             luaopen_vlm( L );
             luaopen_volume( L );
             luaopen_xml( L );
-#if defined(WIN32) && !defined(WINAPI_FAMILY_APP)
+#if defined(WIN32) && !VLC_WINSTORE_APP
             luaopen_win( L );
 #endif
 

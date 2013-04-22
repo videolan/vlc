@@ -80,7 +80,7 @@ typedef struct
 
 void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_argv[] )
 {
-#if !defined(WINAPI_FAMILY_APP)
+#if !VLC_WINSTORE_APP
     /* Raise default priority of the current process */
 #ifndef ABOVE_NORMAL_PRIORITY_CLASS
 #   define ABOVE_NORMAL_PRIORITY_CLASS 0x00008000
@@ -210,7 +210,7 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
 #endif
 }
 
-#if !defined(WINAPI_FAMILY_APP)
+#if !VLC_WINSTORE_APP
 static unsigned __stdcall IPCHelperThread( void *data )
 {
     vlc_object_t *p_this = data;
@@ -323,7 +323,7 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
  */
 void system_End(void)
 {
-#if !defined(WINAPI_FAMILY_APP)
+#if !VLC_WINSTORE_APP
     HWND ipcwindow;
 
     /* FIXME: thread-safety... */

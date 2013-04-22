@@ -317,7 +317,7 @@ static void AllocateAllPlugins (vlc_object_t *p_this)
     else
         mode = CACHE_USE;
 
-#ifdef WINAPI_FAMILY_APP
+#if VLC_WINSTORE_APP
     /* Windows Store Apps can not load external plugins with absolute paths. */
     AllocatePluginPath (p_this, "plugins", mode);
 #else
@@ -331,7 +331,7 @@ static void AllocateAllPlugins (vlc_object_t *p_this)
         free( paths );
     }
     free (vlcpath);
-#endif /* WINAPI_FAMILY_APP */
+#endif /* VLC_WINSTORE_APP */
 
     /* If the user provided a plugin path, we add it to the list */
     paths = getenv( "VLC_PLUGIN_PATH" );
