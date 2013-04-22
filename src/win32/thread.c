@@ -651,6 +651,7 @@ static mtime_t mdate_tick (void)
     static_assert ((CLOCK_FREQ % 1000) == 0, "Broken frequencies ratio");
     return ts * (CLOCK_FREQ / 1000);
 }
+#if !VLC_WINSTORE_APP
 #include <mmsystem.h>
 static mtime_t mdate_multimedia (void)
 {
@@ -660,6 +661,7 @@ static mtime_t mdate_multimedia (void)
     static_assert ((CLOCK_FREQ % 1000) == 0, "Broken frequencies ratio");
     return ts * (CLOCK_FREQ / 1000);
 }
+#endif
 
 static mtime_t mdate_perf (void)
 {
@@ -723,7 +725,11 @@ static void SelectClockSource (vlc_object_t *obj)
         return;
     }
 
+#if !VLC_WINSTORE_APP
+    const char *name = "perf";
+#else
     const char *name = "multimedia";
+#endif
     char *str = var_InheritString (obj, "clock-source");
     if (str != NULL)
         name = str;
@@ -755,6 +761,7 @@ static void SelectClockSource (vlc_object_t *obj)
 #endif
         mdate_selected = mdate_tick;
     }
+#if !VLC_WINSTORE_APP
     else
     if (!strcmp (name, "multimedia"))
     {
@@ -767,6 +774,7 @@ static void SelectClockSource (vlc_object_t *obj)
                  caps.wPeriodMin, caps.wPeriodMax);
         mdate_selected = mdate_multimedia;
     }
+#endif
     else
     if (!strcmp (name, "perf"))
     {
@@ -825,9 +833,11 @@ size_t EnumClockSource (vlc_object_t *obj, const char *var,
         names[n] = xstrdup ("Windows time");
         n++;
     }
+#if !VLC_WINSTORE_APP
     values[n] = xstrdup ("multimedia");
     names[n] = xstrdup ("Multimedia timers");
     n++;
+#endif
     values[n] = xstrdup ("perf");
     names[n] = xstrdup ("Performance counters");
     n++;

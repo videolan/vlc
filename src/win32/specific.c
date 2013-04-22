@@ -56,7 +56,9 @@ static int system_InitWSA(int hi, int lo)
  */
 void system_Init(void)
 {
+#if !VLC_WINSTORE_APP
     timeBeginPeriod(5);
+#endif
 
     if (system_InitWSA(2, 2) && system_InitWSA(1, 1))
         fputs("Error: cannot initialize Winsocks\n", stderr);
@@ -336,9 +338,9 @@ void system_End(void)
         vlc_object_release (p_helper);
         p_helper = NULL;
     }
-#endif
 
     timeEndPeriod(5);
+#endif
 
     /* XXX: In theory, we should not call this if WSAStartup() failed. */
     WSACleanup();
