@@ -168,9 +168,6 @@ VLC_API int var_GetAndSet( vlc_object_t *, const char *, int, vlc_value_t * );
 
 VLC_API int var_Inherit( vlc_object_t *, const char *, int, vlc_value_t * );
 
-VLC_API int var_Command( vlc_object_t *, const char *, const char *, const char *, char ** );
-#define var_Command(a,b,c,d,e) var_Command( VLC_OBJECT( a ), b, c, d, e )
-
 VLC_API void var_FreeList( vlc_value_t *, vlc_value_t * );
 
 
