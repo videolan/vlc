@@ -316,7 +316,7 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         date_Init( &p_sys->end_date, ctx->sample_rate, 1 );
 
     if( p_block->i_pts > VLC_TS_INVALID &&
-        p_block->i_pts != date_Get( &p_sys->end_date ) )
+        p_block->i_pts > date_Get( &p_sys->end_date ) )
     {
         date_Set( &p_sys->end_date, p_block->i_pts );
     }
