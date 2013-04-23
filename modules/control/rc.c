@@ -82,7 +82,7 @@ static int  Activate     ( vlc_object_t * );
 static void Deactivate   ( vlc_object_t * );
 static void *Run         ( void * );
 
-static void Help         ( intf_thread_t *, bool );
+static void Help         ( intf_thread_t * );
 static void RegisterCallbacks( intf_thread_t * );
 
 static bool ReadCommand( intf_thread_t *, char *, int * );
@@ -465,7 +465,6 @@ static void *Run( void *data )
 
     char p_buffer[ MAX_LINE_LENGTH + 1 ];
     bool b_showpos = var_InheritBool( p_intf, "rc-show-pos" );
-    bool b_longhelp = false;
 
     int  i_size = 0;
     int  i_oldpos = 0;
@@ -595,37 +594,8 @@ static void *Run( void *data )
             psz_arg = (char*)"";
         }
 
-        /* module specfic commands: @<module name> <command> <args...> */
-        if( *psz_cmd == '@' && *psz_arg )
-        {
-            /* Parse miscellaneous commands */
-            char *psz_alias = psz_cmd + 1;
-            char *psz_mycmd = strdup( psz_arg );
-            char *psz_myarg = strchr( psz_mycmd, ' ' );
-            char *psz_msg;
-
-            if( !psz_myarg )
-            {
-                msg_rc( "Not enough parameters." );
-            }
-            else
-            {
-                *psz_myarg = '\0';
-                psz_myarg ++;
-
-                var_Command( p_intf, psz_alias, psz_mycmd, psz_myarg,
-                             &psz_msg );
-
-                if( psz_msg )
-                {
-                    msg_rc( "%s", psz_msg );
-                    free( psz_msg );
-                }
-            }
-            free( psz_mycmd );
-        }
         /* If the user typed a registered local command, try it */
-        else if( var_Type( p_intf, psz_cmd ) & VLC_VAR_ISCOMMAND )
+        if( var_Type( p_intf, psz_cmd ) & VLC_VAR_ISCOMMAND )
         {
             vlc_value_t val;
             int i_ret;
@@ -746,11 +716,7 @@ static void *Run( void *data )
         else if( !strcmp( psz_cmd, "longhelp" ) || !strncmp( psz_cmd, "h", 1 )
                  || !strncmp( psz_cmd, "H", 1 ) || !strncmp( psz_cmd, "?", 1 ) )
         {
-            if( !strcmp( psz_cmd, "longhelp" ) || !strncmp( psz_cmd, "H", 1 ) )
-                 b_longhelp = true;
-            else b_longhelp = false;
-
-            Help( p_intf, b_longhelp );
+            Help( p_intf );
         }
         else if( !strcmp( psz_cmd, "key" ) || !strcmp( psz_cmd, "hotkey" ) )
         {
@@ -808,7 +774,7 @@ static void *Run( void *data )
     return NULL;
 }
 
-static void Help( intf_thread_t *p_intf, bool b_longhelp)
+static void Help( intf_thread_t *p_intf)
 {
     msg_rc("%s", _("+----[ Remote control commands ]"));
     msg_rc(  "| ");
@@ -863,42 +829,7 @@ static void Help( intf_thread_t *p_intf, bool b_longhelp)
     msg_rc("%s", _("| key [hotkey name] . . . . . .  simulate hotkey press"));
     msg_rc("%s", _("| menu . . [on|off|up|down|left|right|select] use menu"));
     msg_rc(  "| ");
-
-    if (b_longhelp)
-    {
-        msg_rc("%s", _("| @name marq-marquee  STRING  . . overlay STRING in video"));
-        msg_rc("%s", _("| @name marq-x X . . . . . . . . . . . .offset from left"));
-        msg_rc("%s", _("| @name marq-y Y . . . . . . . . . . . . offset from top"));
-        msg_rc("%s", _("| @name marq-position #. . .  .relative position control"));
-        msg_rc("%s", _("| @name marq-color # . . . . . . . . . . font color, RGB"));
-        msg_rc("%s", _("| @name marq-opacity # . . . . . . . . . . . . . opacity"));
-        msg_rc("%s", _("| @name marq-timeout T. . . . . . . . . . timeout, in ms"));
-        msg_rc("%s", _("| @name marq-size # . . . . . . . . font size, in pixels"));
-        msg_rc(  "| ");
-        msg_rc("%s", _("| @name logo-file STRING . . .the overlay file path/name"));
-        msg_rc("%s", _("| @name logo-x X . . . . . . . . . . . .offset from left"));
-        msg_rc("%s", _("| @name logo-y Y . . . . . . . . . . . . offset from top"));
-        msg_rc("%s", _("| @name logo-position #. . . . . . . . relative position"));
-        msg_rc("%s", _("| @name logo-transparency #. . . . . . . . .transparency"));
-        msg_rc(  "| ");
-        msg_rc("%s", _("| @name mosaic-alpha # . . . . . . . . . . . . . . alpha"));
-        msg_rc("%s", _("| @name mosaic-height #. . . . . . . . . . . . . .height"));
-        msg_rc("%s", _("| @name mosaic-width # . . . . . . . . . . . . . . width"));
-        msg_rc("%s", _("| @name mosaic-xoffset # . . . .top left corner position"));
-        msg_rc("%s", _("| @name mosaic-yoffset # . . . .top left corner position"));
-        msg_rc("%s", _("| @name mosaic-offsets x,y(,x,y)*. . . . list of offsets"));
-        msg_rc("%s", _("| @name mosaic-align 0..2,4..6,8..10. . .mosaic alignment"));
-        msg_rc("%s", _("| @name mosaic-vborder # . . . . . . . . vertical border"));
-        msg_rc("%s", _("| @name mosaic-hborder # . . . . . . . horizontal border"));
-        msg_rc("%s", _("| @name mosaic-position {0=auto,1=fixed} . . . .position"));
-        msg_rc("%s", _("| @name mosaic-rows #. . . . . . . . . . .number of rows"));
-        msg_rc("%s", _("| @name mosaic-cols #. . . . . . . . . . .number of cols"));
-        msg_rc("%s", _("| @name mosaic-order id(,id)* . . . . order of pictures "));
-        msg_rc("%s", _("| @name mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"));
-        msg_rc(  "| ");
-    }
     msg_rc("%s", _("| help . . . . . . . . . . . . . . . this help message"));
-    msg_rc("%s", _("| longhelp . . . . . . . . . . . a longer help message"));
     msg_rc("%s", _("| logout . . . . . . .  exit (if in socket connection)"));
     msg_rc("%s", _("| quit . . . . . . . . . . . . . . . . . . .  quit vlc"));
     msg_rc(  "| ");
