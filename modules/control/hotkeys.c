@@ -186,8 +186,12 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             break;
 
         case ACTIONID_RANDOM:
-            var_ToggleBool( p_playlist, "random" );
+        {
+            const bool state = var_ToggleBool( p_playlist, "random" );
+            DisplayMessage( p_vout, _("Random: %s"),
+                            vlc_gettext( state ? N_("On") : N_("Off") ) );
             break;
+        }
 
         case ACTIONID_NEXT:
             DisplayMessage( p_vout, _("Next") );
