@@ -29,10 +29,10 @@
 #import <vlc_common.h>
 #import <vlc_plugin.h>
 #import <vlc_aout.h>
-#import <AudioToolBox/AudioQueue.h>
+#import <AudioToolbox/AudioQueue.h>
 #import <TargetConditionals.h>
 #if TARGET_OS_IPHONE
-#import <AudioToolBox/AudioSession.h>
+#import <AudioToolbox/AudioSession.h>
 #else
 #define AudioSessionSetActive(x)
 #endif
