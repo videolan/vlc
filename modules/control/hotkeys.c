@@ -172,18 +172,29 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
 
         /* Playlist actions (including audio) */
         case ACTIONID_LOOP:
+        {
             /* Toggle Normal -> Loop -> Repeat -> Normal ... */
+            const char *mode;
             if( var_GetBool( p_playlist, "repeat" ) )
+            {
                 var_SetBool( p_playlist, "repeat", false );
+                mode = N_("Off");
+            }
             else
             if( var_GetBool( p_playlist, "loop" ) )
             { /* FIXME: this is not atomic, we should use a real tristate */
                 var_SetBool( p_playlist, "loop", false );
                 var_SetBool( p_playlist, "repeat", true );
+                mode = N_("One");
             }
             else
+            {
                 var_SetBool( p_playlist, "loop", true );
+                mode = N_("All");
+            }
+            DisplayMessage( p_vout, _("Loop: %s"), vlc_gettext(mode) );
             break;
+        }
 
         case ACTIONID_RANDOM:
         {
