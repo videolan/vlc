@@ -32,7 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_services_discovery.h>
-
+#include <vlc_playlist.h>
 #include <vlc_network.h>
 #include <assert.h>
 
@@ -122,6 +122,7 @@ static void SaveUrls( services_discovery_t *p_sd );
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
+    playlist_t *pl = pl_Get( p_this );
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = malloc(
                                     sizeof( services_discovery_sys_t ) );
@@ -144,16 +145,16 @@ static int Open( vlc_object_t *p_this )
     p_sd->p_sys  = p_sys;
 
     /* Launch the callback associated with this variable */
-    var_Create( p_sd, "podcast-urls", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_AddCallback( p_sd, "podcast-urls", UrlsChange, p_sys );
+    var_Create( pl, "podcast-urls", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_AddCallback( pl, "podcast-urls", UrlsChange, p_sys );
 
-    var_Create( p_sd, "podcast-request", VLC_VAR_STRING );
-    var_AddCallback( p_sd, "podcast-request", Request, p_sys );
+    var_Create( pl, "podcast-request", VLC_VAR_STRING );
+    var_AddCallback( pl, "podcast-request", Request, p_sys );
 
     if (vlc_clone (&p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW))
     {
-        var_DelCallback( p_sd, "podcast-request", Request, p_sys );
-        var_DelCallback( p_sd, "podcast-urls", UrlsChange, p_sys );
+        var_DelCallback( pl, "podcast-request", Request, p_sys );
+        var_DelCallback( pl, "podcast-urls", UrlsChange, p_sys );
         vlc_cond_destroy( &p_sys->wait );
         vlc_mutex_destroy( &p_sys->lock );
         free (p_sys);
@@ -169,13 +170,14 @@ static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
+    playlist_t *pl = pl_Get( p_this );
     int i;
 
     vlc_cancel (p_sys->thread);
     vlc_join (p_sys->thread, NULL);
 
-    var_DelCallback( p_sd, "podcast-urls", UrlsChange, p_sys );
-    var_DelCallback( p_sd, "podcast-request", Request, p_sys );
+    var_DelCallback( pl, "podcast-urls", UrlsChange, p_sys );
+    var_DelCallback( pl, "podcast-request", Request, p_sys );
     vlc_cond_destroy( &p_sys->wait );
     vlc_mutex_destroy( &p_sys->lock );
 
