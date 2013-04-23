@@ -37,6 +37,9 @@ class AbstractPLItem
     friend class PLModel;
     friend class MLModel;
 
+public:
+    virtual ~AbstractPLItem() {}
+
 protected:
     virtual int id() const = 0;
     int childCount() const { return children.count(); }
