@@ -230,29 +230,6 @@ static int vlclua_var_get_list( lua_State *L )
     return 2;
 }
 
-static int vlclua_command( lua_State *L )
-{
-    vlc_object_t * p_this = vlclua_get_this( L );
-    char *psz_msg;
-
-    const char *psz_name = luaL_checkstring( L, 1 );
-    const char *psz_cmd = luaL_checkstring( L, 2 );
-    const char *psz_arg = luaL_checkstring( L, 3 );
-    int ret = var_Command( p_this, psz_name, psz_cmd, psz_arg, &psz_msg );
-    lua_pop( L, 3 );
-
-    if( psz_msg )
-    {
-        lua_pushstring( L, psz_msg );
-        free( psz_msg );
-    }
-    else
-    {
-        lua_pushliteral( L, "" );
-    }
-    return vlclua_push_ret( L, ret ) + 1;
-}
-
 static int vlclua_libvlc_command( lua_State *L )
 {
     vlc_object_t * p_this = vlclua_get_this( L );
@@ -373,7 +350,6 @@ static const luaL_Reg vlclua_var_reg[] = {
     { "set", vlclua_var_set },
     { "create", vlclua_var_create },
     { "trigger_callback", vlclua_trigger_callback },
-    { "command", vlclua_command },
     { "libvlc_command", vlclua_libvlc_command },
     { "inc_integer", vlclua_inc_integer },
     { "dec_integer", vlclua_dec_integer },

@@ -384,8 +384,6 @@ var.create( object, name, value ): Create and set the object's variable "name"
 var.trigger_callback( object, name ): Trigger the callbacks associated with the
   object's "name" variable.
 
-var.command( object name, name, argument ): Issue "object name"'s "name"
-  command with argument "argument".
 var.libvlc_command( name, argument ): Issue libvlc's "name" command with
   argument "argument".
 
