@@ -1392,8 +1392,8 @@ static const char *const mouse_wheel_texts[] =
 #define RECORD_KEY_TEXT N_("Record")
 #define RECORD_KEY_LONGTEXT N_("Record access filter start/stop.")
 
-#define LOOP_KEY_TEXT N_("Normal/Repeat/Loop")
-#define LOOP_KEY_LONGTEXT N_("Toggle Normal/Repeat/Loop playlist modes")
+#define LOOP_KEY_TEXT N_("Normal/Loop/Repeat")
+#define LOOP_KEY_LONGTEXT N_("Toggle Normal/Loop/Repeat playlist modes")
 
 #define RANDOM_KEY_TEXT N_("Random")
 #define RANDOM_KEY_LONGTEXT N_("Toggle random playlist playback")
