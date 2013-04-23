@@ -680,32 +680,12 @@ function call_libvlc_command(cmd,client,arg)
     return vlcerr
 end
 
-function call_object_command(cmd,client,arg)
-    local var, val
-    if arg ~= nil then
-        var, val = split_input(arg)
-    end
-    local ok, vlcmsg, vlcerr = pcall( vlc.var.command, cmd, var, val )
-    if not ok then
-        local v = var and " "..var or ""
-        local v2 = val and " "..val or ""
-        client:append("Error in `"..cmd..v..v2.."' ".. vlcmsg) -- when pcall fails the 2nd arg is the error message
-    end
-    if vlcmsg ~= "" then
-        client:append(vlcmsg)
-    end
-    return vlcerr
-end
-
 function client_command( client )
     local cmd,arg = split_input(client.buffer)
     client.buffer = ""
 
     if commands[cmd] then
         call_command(cmd,client,arg)
-    elseif string.sub(cmd,0,1)=='@'
-    and call_object_command(string.sub(cmd,2,#cmd),client,arg) == 0 then
-        --
     elseif call_vlm_command(cmd,client,arg) == 0 then
         --
     elseif client.type == host.client_type.stdio
