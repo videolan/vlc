@@ -188,9 +188,11 @@ libvlc_media_discoverer_t *
 libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
                                        const char * psz_name )
 {
-    libvlc_media_discoverer_t * p_mdis;
+    /* podcast SD is a hack and only works with custom playlist callbacks. */
+    if( !strncasecmp( psz_name, "podcast", 7 ) )
+        return NULL;
 
-    p_mdis = malloc(sizeof(libvlc_media_discoverer_t));
+    libvlc_media_discoverer_t *p_mdis = malloc(sizeof(*p_mdis));
     if( unlikely(!p_mdis) )
     {
         libvlc_printerr( "Not enough memory" );
