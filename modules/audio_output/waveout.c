@@ -795,6 +795,21 @@ static int Open(vlc_object_t *obj)
     vlc_mutex_init( &sys->lock );
     vlc_cond_init( &sys->cond );
 
+    /* WaveOut does not support hot-plug events so list devices at startup */
+    char **ids, **names;
+    int count = ReloadWaveoutDevices(VLC_OBJECT(aout), NULL, &ids, &names);
+    if (count >= 0)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            aout_HotplugReport(aout, ids[i], names[i]);
+            free(names[i]);
+            free(ids[i]);
+        }
+        free(names);
+        free(ids);
+    }
+
     return VLC_SUCCESS;
 }
 
