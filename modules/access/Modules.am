@@ -245,7 +245,7 @@ if HAVE_LINUX_DVB
 libdtv_plugin_la_SOURCES += dtv/linux.c
 libdtv_plugin_la_CFLAGS += -DHAVE_LINUX_DVB
 if HAVE_DVBPSI
-libdtv_plugin_la_SOURCES += dtv/en50221.c dtv/en50221.h
+libdtv_plugin_la_SOURCES += dtv/en50221.c dtv/en50221.h ../mux/mpeg/dvbpsi_compat.h
 libdtv_plugin_la_CFLAGS += -DHAVE_DVBPSI $(DVBPSI_CFLAGS)
 libdtv_plugin_la_LIBADD += $(DVBPSI_LIBS)
 endif
@@ -276,6 +276,7 @@ libdvb_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdvb_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_LINUX_DVB
 if HAVE_DVBPSI
+libdvb_plugin_la_SOURCES += ../mux/mpeg/dvbpsi_compat.h
 libvlc_LTLIBRARIES += libdvb_plugin.la
 libdvb_plugin_la_CFLAGS += $(DVBPSI_CFLAGS)
 libdvb_plugin_la_LIBADD += $(DVBPSI_LIBS)

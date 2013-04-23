@@ -58,6 +58,8 @@
 #include "../demux/dvb-text.h"
 #include "dtv/en50221.h"
 
+#include "../mux/mpeg/dvbpsi_compat.h"
+
 typedef struct en50221_session_t
 {
     unsigned i_slot;

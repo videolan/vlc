@@ -55,6 +55,7 @@
 #include "dvb.h"
 #include "scan.h"
 #include "../../demux/dvb-text.h"
+#include "../../mux/mpeg/dvbpsi_compat.h"
 
 typedef enum
 {
@@ -750,7 +751,12 @@ static void SDTCallBack( scan_session_t *p_session, dvbpsi_sdt_t *p_sdt )
 
     /* */
     msg_Dbg( p_obj, "new SDT ts_id=%d version=%d current_next=%d network_id=%d",
-             p_sdt->i_ts_id, p_sdt->i_version, p_sdt->b_current_next,
+#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
+             p_sdt->i_extension,
+#else
+             p_sdt->i_ts_id,
+#endif
+             p_sdt->i_version, p_sdt->b_current_next,
              p_sdt->i_network_id );
 
 
@@ -930,15 +936,33 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
 }
 #endif
 
+#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
+static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id, uint16_t i_extension, void *p_data )
+{
+    scan_session_t *p_session = (scan_session_t *)p_data;
+
+    if( i_table_id == 0x42 )
+    {
+        if( !dvbpsi_sdt_attach( h, i_table_id, i_extension, (dvbpsi_sdt_callback)SDTCallBack, p_session ) )
+            msg_Err( p_session->p_obj, "PSINewTableCallback: failed attaching SDTCallback" );
+    }
+    else if( i_table_id == 0x40 || i_table_id == 0x41 )
+    {
+        if( !dvbpsi_nit_attach( h, i_table_id, i_extension, (dvbpsi_nit_callback)NITCallBack, p_session ) )
+            msg_Err( p_session->p_obj, "PSINewTableCallback: failed attaching NITCallback" );
+    }
+}
+#else
 static void PSINewTableCallBack( scan_session_t *p_session, dvbpsi_handle h, uint8_t  i_table_id, uint16_t i_extension )
 {
     if( i_table_id == 0x42 )
         dvbpsi_AttachSDT( h, i_table_id, i_extension, (dvbpsi_sdt_callback)SDTCallBack, p_session );
-#ifdef DVBPSI_USE_NIT
+# ifdef DVBPSI_USE_NIT
     else if( i_table_id == 0x40 || i_table_id == 0x41 )
         dvbpsi_AttachNIT( h, i_table_id, i_extension, (dvbpsi_nit_callback)NITCallBack, p_session );
-#endif
+# endif
 }
+#endif
 
 scan_session_t *scan_session_New( vlc_object_t *p_obj,
                                   const scan_configuration_t *p_cfg )
@@ -1074,7 +1098,6 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
 #endif
     }
 
-
     /* */
     if( p_session->pat )
         dvbpsi_DetachPAT( p_session->pat );
@@ -1085,6 +1108,7 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
         dvbpsi_DetachDemux( p_session->sdt );
     if( p_session->p_sdt )
         dvbpsi_DeleteSDT( p_session->p_sdt );
+
 #ifdef DVBPSI_USE_NIT
     if( p_session->nit )
         dvbpsi_DetachDemux( p_session->nit );
@@ -1207,15 +1231,52 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
     if( i_pid == 0x00 )
     {
         if( !p_scan->pat )
+#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
+        {
+            p_scan->pat = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
+            if( !p_scan->pat )
+            {
+                block_Release( p_block );
+                return false;
+            }
+            p_scan->pat->p_sys = (void *) VLC_OBJECT(p_scan->p_obj);
+            if( !dvbpsi_pat_attach( p_scan->pat, (dvbpsi_pat_callback)PATCallBack, p_scan ) )
+            {
+                dvbpsi_delete( p_scan->pat );
+                p_scan->pat = NULL;
+                block_Release( p_block );
+                return false;
+            }
+        }
+#else
             p_scan->pat = dvbpsi_AttachPAT( (dvbpsi_pat_callback)PATCallBack, p_scan );
-
+#endif
         if( p_scan->pat )
             dvbpsi_PushPacket( p_scan->pat, p_block->p_buffer );
     }
     else if( i_pid == 0x11 )
     {
         if( !p_scan->sdt )
+#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
+        {
+            p_scan->sdt = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
+            if( !p_scan->sdt )
+            {
+                block_Release( p_block );
+                return false;
+            }
+            p_scan->sdt->p_sys = (void *) VLC_OBJECT(p_scan->p_obj);
+            if( !dvbpsi_AttachDemux( p_scan->sdt, (dvbpsi_demux_new_cb_t)PSINewTableCallBack, p_scan ) )
+            {
+                dvbpsi_delete( p_scan->sdt );
+                p_scan->sdt = NULL;
+                block_Release( p_block );
+                return false;
+            }
+        }
+#else
             p_scan->sdt = dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack, p_scan );
+#endif
 
         if( p_scan->sdt )
             dvbpsi_PushPacket( p_scan->sdt, p_block->p_buffer );
@@ -1224,8 +1285,26 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
     {
 #ifdef DVBPSI_USE_NIT
         if( !p_scan->nit )
+# if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
+        {
+            p_scan->nit = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
+            if( !p_scan->nit )
+            {
+                block_Release( p_block );
+                return false;
+            }
+            p_scan->nit->p_sys = (void *) VLC_OBJECT(p_scan->p_obj);
+            if( !dvbpsi_AttachDemux( p_scan->nit, (dvbpsi_demux_new_cb_t)PSINewTableCallBack, p_scan ) )
+            {
+                dvbpsi_delete( p_scan->nit );
+                p_scan->nit = NULL;
+                block_Release( p_block );
+                return false;
+            }
+        }
+# else
             p_scan->nit = dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack, p_scan );
-
+# endif
         if( p_scan->nit )
             dvbpsi_PushPacket( p_scan->nit, p_block->p_buffer );
 #endif
@@ -1245,4 +1324,3 @@ void scan_service_SetSNR( scan_session_t *p_session, int i_snr )
 {
     p_session->i_snr = i_snr;
 }
-
