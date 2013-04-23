@@ -595,13 +595,9 @@ void PLSelector::podcastAdd( PLSelItem * )
 
     setSource( podcastsParent ); //to load the SD in case it's not loaded
 
-    vlc_object_t *p_obj = (vlc_object_t*) vlc_object_find_name( p_intf->p_libvlc, "podcast" );
-    if( !p_obj ) return;
-
     QString request("ADD:");
     request += url.trimmed();
-    var_SetString( p_obj, "podcast-request", qtu( request ) );
-    vlc_object_release( p_obj );
+    var_SetString( THEPL, "podcast-request", qtu( request ) );
 }
 
 void PLSelector::podcastRemove( PLSelItem* item )
@@ -617,15 +613,10 @@ void PLSelector::podcastRemove( PLSelItem* item )
     input_item_t *input = item->treeItem()->data( 0, IN_ITEM_ROLE ).value<input_item_t*>();
     if( !input ) return;
 
-    vlc_object_t *p_obj = (vlc_object_t*) vlc_object_find_name(
-        p_intf->p_libvlc, "podcast" );
-    if( !p_obj ) return;
-
     QString request("RM:");
     char *psz_uri = input_item_GetURI( input );
     request += qfu( psz_uri );
-    var_SetString( p_obj, "podcast-request", qtu( request ) );
-    vlc_object_release( p_obj );
+    var_SetString( THEPL, "podcast-request", qtu( request ) );
     free( psz_uri );
 }
 
