@@ -233,7 +233,6 @@ static int VideoAutoMenuBuilder( vout_thread_t *p_object,
         QVector<const char *> &varnames )
 {
     PUSH_INPUTVAR( "video-es" );
-    PUSH_INPUTVAR( "spu-es" );
     PUSH_VAR( "fullscreen" );
     PUSH_VAR( "video-on-top" );
     PUSH_VAR( "video-wallpaper" );
@@ -248,6 +247,17 @@ static int VideoAutoMenuBuilder( vout_thread_t *p_object,
 
     return VLC_SUCCESS;
 }
+
+static int SubsAutoMenuBuilder( input_thread_t *p_object,
+        QVector<vlc_object_t *> &objects,
+        QVector<const char *> &varnames )
+{
+    PUSH_VAR( "spu-es" );
+
+    return VLC_SUCCESS;
+}
+
+
 
 static int AudioAutoMenuBuilder( audio_output_t *p_object,
         input_thread_t *p_input,
@@ -615,19 +625,24 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 }
 
 /* Subtitles */
-QMenu *VLCMenuBar::SubtitleMenu( intf_thread_t *, QMenu *current )
+QMenu *VLCMenuBar::SubtitleMenu( intf_thread_t *p_intf, QMenu *current )
 {
+    input_thread_t *p_input;
+    QVector<vlc_object_t *> objects;
+    QVector<const char *> varnames;
+
     if( current->isEmpty() )
     {
-        QAction *action;
-        QMenu *submenu = new QMenu( qtr( "&Subtitle Track" ), current );
-        action = current->addMenu( submenu );
-        action->setData( "spu-es" );
-        addDPStaticEntry( submenu, qtr( "Open File..." ), "",
+        addDPStaticEntry( current, qtr( "Add &Subtitle File..." ), "",
                 SLOT( loadSubtitlesFile() ) );
-        submenu->addSeparator();
+        addActionWithSubmenu( current, "spu-es", qtr( "Sub &Track" ) );
+        current->addSeparator();
     }
-    return current;
+
+    p_input = THEMIM->getInput();
+    SubsAutoMenuBuilder( p_input, objects, varnames );
+
+    return Populate( p_intf, current, varnames, objects );
 }
 
 /**
@@ -644,8 +659,6 @@ QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current, bool b_subt
     if( current->isEmpty() )
     {
         addActionWithSubmenu( current, "video-es", qtr( "Video &Track" ) );
-        if( b_subtitle)
-            SubtitleMenu( p_intf, current );
 
         current->addSeparator();
         /* Surface modifiers */
