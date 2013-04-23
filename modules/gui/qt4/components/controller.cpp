@@ -740,7 +740,6 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
 
     setWindowFlags( Qt::ToolTip );
     setMinimumWidth( FSC_WIDTH );
-    setMinimumHeight( FSC_HEIGHT );
     isWideFSC = false;
 
     setFrameShape( QFrame::StyledPanel );
@@ -908,7 +907,7 @@ void FullscreenControllerWidget::updateFullwidthGeometry( int number )
 {
     QRect screenGeometry = QApplication::desktop()->screenGeometry( number );
     setMinimumWidth( screenGeometry.width() );
-    setGeometry( screenGeometry.x(), screenGeometry.y() + screenGeometry.height() - FSC_HEIGHT, screenGeometry.width(), FSC_HEIGHT );
+    setGeometry( screenGeometry.x(), screenGeometry.y() + screenGeometry.height() - height(), screenGeometry.width(), height() );
     adjustSize();
 }
 

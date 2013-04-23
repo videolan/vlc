@@ -249,8 +249,6 @@ signals:
 /* Used to restore the minimum width after a full-width switch */
 #define FSC_WIDTH 800
 
-#define FSC_HEIGHT 72
-
 /***********************************
  * Fullscreen controller
  ***********************************/
