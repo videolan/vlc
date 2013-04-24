@@ -3061,21 +3061,21 @@ static int OptionCallback( vlc_object_t *p_this, char const *psz_var,
 
     vlc_mutex_lock( &p_sys->lock );
     if( !strcmp(psz_var, "freetype-rel-fontsize") )
-        msg_Dbg( p_this, "changed relative font size to %lli", newval.i_int);
+        msg_Dbg( p_this, "changed relative font size to %"PRId64, newval.i_int);
     else if( !strcmp(psz_var, "freetype-color") ) {
         p_sys->i_font_color = newval.i_int;
         p_sys->i_font_color = VLC_CLIP( p_sys->i_font_color, 0, 0xFFFFFF );
     } else if( !strcmp(psz_var, "freetype-background-opacity") ) {
         p_sys->i_background_opacity = newval.i_int;
-        msg_Dbg( p_filter, "changed background opacity to %lli", newval.i_int);
+        msg_Dbg( p_filter, "changed background opacity to %"PRId64, newval.i_int);
     } else if( !strcmp(psz_var, "freetype-outline-thickness") ) {
         p_sys->f_outline_thickness = newval.i_int / 100.;
         p_sys->f_outline_thickness = VLC_CLIP( p_sys->f_outline_thickness, 0.0, 0.5 );
-        msg_Dbg( p_filter, "changed outline thickness to %lli", newval.i_int);
+        msg_Dbg( p_filter, "changed outline thickness to %"PRId64, newval.i_int);
     } else if( !strcmp(psz_var, "freetype-background-color") ) {
         p_sys->i_background_color = newval.i_int;
         p_sys->i_background_color = VLC_CLIP( p_sys->i_background_color, 0, 0xFFFFFF );
-        msg_Dbg( p_filter, "changed background color to %lli", newval.i_int);
+        msg_Dbg( p_filter, "changed background color to %"PRId64, newval.i_int);
     }
     vlc_mutex_unlock( &p_sys->lock );
 
