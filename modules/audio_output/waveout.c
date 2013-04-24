@@ -97,8 +97,6 @@ static const wchar_t device_name_fmt[] = L"%ls ($%x,$%x)";
 
 struct aout_sys_t
 {
-    uint32_t i_wave_device_id;               /* ID of selected output device */
-
     HWAVEOUT h_waveout;                        /* handle to waveout instance */
 
     WAVEFORMATEXTENSIBLE waveformat;                         /* audio format */
@@ -187,26 +185,16 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     fmt->i_format = var_InheritBool( p_aout, "waveout-float32" )?
         VLC_CODEC_FL32: VLC_CODEC_S16N;
 
-    char *psz_waveout_dev = var_CreateGetString( p_aout, "waveout-audio-device");
+    char *dev = var_CreateGetString( p_aout, "waveout-audio-device");
+    uint32_t devid = findDeviceID( dev );
 
-    p_aout->sys->i_wave_device_id =
-         findDeviceID( psz_waveout_dev );
-
-    if(p_aout->sys->i_wave_device_id == WAVE_MAPPER)
-    {
-       if(psz_waveout_dev &&
-          stricmp(psz_waveout_dev,"wavemapper"))
-       {
-           msg_Warn( p_aout, "configured audio device '%s' not available, "\
-                         "use default instead", psz_waveout_dev );
-       }
-    }
-    free( psz_waveout_dev );
-
+    if(devid == WAVE_MAPPER && dev != NULL && stricmp(dev,"wavemapper"))
+        msg_Warn( p_aout, "configured audio device '%s' not available, "
+                          "using default instead", dev );
+    free( dev );
 
     WAVEOUTCAPS waveoutcaps;
-    if(waveOutGetDevCaps( p_aout->sys->i_wave_device_id,
-                          &waveoutcaps,
+    if(waveOutGetDevCaps( devid, &waveoutcaps,
                           sizeof(WAVEOUTCAPS)) == MMSYSERR_NOERROR)
     {
       /* log debug some infos about driver, to know who to blame
@@ -225,8 +213,8 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     if( AOUT_FMT_SPDIF(fmt) && var_InheritBool (p_aout, "spdif") )
     {
 
-        if( OpenWaveOut( p_aout, p_aout->sys->i_wave_device_id,
-                         VLC_CODEC_SPDIFL, fmt->i_physical_channels,
+        if( OpenWaveOut( p_aout, devid, VLC_CODEC_SPDIFL,
+                         fmt->i_physical_channels,
                          aout_FormatNbChannels( fmt ), fmt->i_rate, false )
             == VLC_SUCCESS )
         {
@@ -280,9 +268,9 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
             }
             msg_Dbg( p_aout, "Trying %d channels", i_channels );
         }
-        while( ( OpenWaveOutPCM( p_aout, p_aout->sys->i_wave_device_id,
-                                 &fmt->i_format, fmt->i_physical_channels,
-                                 i_channels, fmt->i_rate, false ) != VLC_SUCCESS ) &&
+        while( ( OpenWaveOutPCM( p_aout, devid, &fmt->i_format,
+                                 fmt->i_physical_channels, i_channels,
+                                 fmt->i_rate, false ) != VLC_SUCCESS ) &&
                --i_channels );
 
         if( !i_channels )
