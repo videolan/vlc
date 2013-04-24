@@ -1192,11 +1192,11 @@ static inline int RenderAXYZ( filter_t *p_filter,
     /* Initialize the picture background */
     vlc_mutex_lock( &p_sys->lock );
     uint8_t i_opacity = p_sys->i_background_opacity;
-    uint8_t i_background_color = p_sys->i_background_color;
+    uint32_t i_background_color = p_sys->i_background_color;
     uint8_t i_shadow_opacity = p_sys->i_shadow_opacity;
     uint8_t i_outline_opacity = p_sys->i_outline_opacity;
-    uint8_t i_shadow_color = p_sys->i_shadow_color;
-    uint8_t i_outline_color = p_sys->i_outline_color;
+    uint32_t i_shadow_color = p_sys->i_shadow_color;
+    uint32_t i_outline_color = p_sys->i_outline_color;
     vlc_mutex_unlock( &p_sys->lock );
     uint8_t i_x, i_y, i_z;
 
@@ -1694,9 +1694,11 @@ static text_style_t *GetStyleFromFontStack( filter_sys_t *p_sys,
                                             int i_style_flags )
 {
     char       *psz_fontname = NULL;
+    vlc_mutex_lock(&p_sys->lock);
     uint32_t    i_font_color = p_sys->i_font_color & 0x00ffffff;
-    uint32_t    i_karaoke_bg_color = i_font_color;
     int         i_font_size  = p_sys->i_font_size;
+    vlc_mutex_unlock(&p_sys->lock);
+    uint32_t    i_karaoke_bg_color = i_font_color;
 
     if( PeekFont( p_fonts, &psz_fontname, &i_font_size,
                   &i_font_color, &i_karaoke_bg_color ) )
@@ -1787,11 +1789,16 @@ static int ProcessNodes( filter_t *p_filter,
     }
     else
     {
+        vlc_mutex_lock(&p_sys->lock);
+        uint32_t i_font_size = p_sys->i_font_size;
+        uint32_t i_font_color = p_sys->i_font_color;
+        uint32_t i_font_opacity = p_sys->i_font_opacity;
+        vlc_mutex_unlock(&p_sys->lock);
         rv = PushFont( &p_fonts,
                        p_sys->psz_fontfamily,
-                       p_sys->i_font_size,
-                       (p_sys->i_font_color & 0xffffff) |
-                          ((p_sys->i_font_opacity & 0xff) << 24),
+                       i_font_size,
+                       (i_font_color & 0xffffff) |
+                          ((i_font_opacity & 0xff) << 24),
                        0x00ffffff );
     }
     if( p_sys->b_font_bold )
@@ -2690,7 +2697,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
         else {
             vlc_mutex_lock( &p_sys->lock );
             uint8_t i_font_size = p_sys->i_font_size;
-            uint8_t i_font_color = p_sys->i_font_color;
+            uint32_t i_font_color = p_sys->i_font_color;
             uint8_t i_font_opacity = p_sys->i_font_opacity;
             vlc_mutex_unlock( &p_sys->lock );
             p_style = CreateStyle( p_sys->psz_fontfamily,
