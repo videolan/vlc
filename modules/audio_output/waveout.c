@@ -185,7 +185,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     fmt->i_format = var_InheritBool( p_aout, "waveout-float32" )?
         VLC_CODEC_FL32: VLC_CODEC_S16N;
 
-    char *dev = var_CreateGetString( p_aout, "waveout-audio-device");
+    char *dev = var_GetNonEmptyString( p_aout, "waveout-audio-device");
     uint32_t devid = findDeviceID( dev );
 
     if(devid == WAVE_MAPPER && dev != NULL && stricmp(dev,"wavemapper"))
@@ -753,6 +753,14 @@ static uint32_t findDeviceID(char *psz_device_name)
     return WAVE_MAPPER;
 }
 
+static int DeviceSelect (audio_output_t *aout, const char *id)
+{
+    var_SetString(aout, "waveout-audio-device", (id != NULL) ? id : "");
+    aout_DeviceReport (aout, id);
+    aout_RestartRequest (aout, AOUT_RESTART_OUTPUT);
+    return 0;
+}
+
 static int Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
@@ -765,6 +773,7 @@ static int Open(vlc_object_t *obj)
     aout->stop = Stop;
     aout->volume_set = WaveoutVolumeSet;
     aout->mute_set = WaveoutMuteSet;
+    aout->device_select = DeviceSelect;
 
     sys->f_volume = var_InheritFloat(aout, "waveout-volume");
     sys->b_mute = var_InheritBool(aout, "mute");
@@ -797,7 +806,7 @@ static int Open(vlc_object_t *obj)
         free(names);
         free(ids);
     }
-
+    var_Create(aout, "waveout-audio-device", VLC_VAR_STRING|VLC_VAR_DOINHERIT);
     return VLC_SUCCESS;
 }
 
@@ -806,8 +815,9 @@ static void Close(vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
 
-    vlc_timer_destroy( sys->volume_poll_timer );
+    var_Destroy(aout, "waveout-audio-device");
 
+    vlc_timer_destroy( sys->volume_poll_timer );
     vlc_cond_destroy( &sys->cond );
     vlc_mutex_destroy( &sys->lock );
 
