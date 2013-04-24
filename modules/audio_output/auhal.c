@@ -110,6 +110,8 @@ struct aout_sys_t
     int                         i_rate;             /* media sample rate */
     int                         i_bytes_per_sample;
 
+    CFArrayRef                  device_list;
+
     vlc_mutex_t                 lock;
     vlc_cond_t                  cond;
 };
@@ -185,6 +187,7 @@ static int Open(vlc_object_t *obj)
     p_aout->volume_set = VolumeSet;
     p_aout->mute_set = MuteSet;
     p_aout->device_select = SwitchAudioDevice;
+    p_sys->device_list = CFArrayCreate(kCFAllocatorDefault, NULL, 0, NULL);
 
     /* Attach a Listener so that we are notified of a change in the Device setup */
     AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
@@ -232,6 +235,8 @@ static void Close(vlc_object_t *obj)
     }
 
     config_PutPsz(p_aout, "auhal-audio-device", aout_DeviceGet(p_aout));
+
+    CFRelease(p_sys->device_list);
 
     vlc_mutex_destroy(&p_sys->lock);
     vlc_cond_destroy(&p_sys->cond);
@@ -969,8 +974,12 @@ static void RebuildDeviceList(audio_output_t * p_aout)
     AudioObjectID       defaultDeviceID = 0;
     AudioObjectID       *deviceIDs;
     UInt32              numberOfDevices;
+    CFMutableArrayRef   currentListOfDevices;
 
     struct aout_sys_t   *p_sys = p_aout->sys;
+
+    /* setup local array */
+    currentListOfDevices = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
 
     /* Get number of devices */
     AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
@@ -1046,6 +1055,7 @@ static void RebuildDeviceList(audio_output_t * p_aout)
         }
 
         ReportDevice(p_aout, i_id, psz_name);
+        CFArrayAppendValue(currentListOfDevices, CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &i_id));
 
         if (AudioDeviceSupportsDigital(p_aout, deviceIDs[i])) {
             b_digital = true;
@@ -1054,6 +1064,7 @@ static void RebuildDeviceList(audio_output_t * p_aout)
             asprintf(&psz_encoded_name, _("%s (Encoded Output)"), psz_name);
             i_id = i_id | AOUT_VAR_SPDIF_FLAG;
             ReportDevice(p_aout, i_id, psz_encoded_name);
+            CFArrayAppendValue(currentListOfDevices, CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &i_id));
             free(psz_encoded_name);
         }
 
@@ -1064,7 +1075,30 @@ static void RebuildDeviceList(audio_output_t * p_aout)
         free(psz_name);
     }
 
-    // TODO: fix default audio device
+    CFIndex count = 0;
+    if (p_sys->device_list)
+        count = CFArrayGetCount(p_sys->device_list);
+
+    if (count > 0) {
+        CFShow(currentListOfDevices);
+        CFShow(p_sys->device_list);
+        CFNumberRef cfn_device_id;
+        int i_device_id = 0;
+        for (CFIndex x = 0; x < count; x++) {
+            if (!CFArrayContainsValue(currentListOfDevices, CFRangeMake(0, count), CFArrayGetValueAtIndex(p_sys->device_list, x))) {
+                cfn_device_id = CFArrayGetValueAtIndex(p_sys->device_list, x);
+
+                if (cfn_device_id) {
+                    CFNumberGetValue(cfn_device_id, kCFNumberSInt32Type, &i_device_id);
+                    ReportDevice(p_aout, i_device_id, NULL);
+                }
+            }
+        }
+    }
+    CFRelease(p_sys->device_list);
+    p_sys->device_list = CFArrayCreateCopy(kCFAllocatorDefault, currentListOfDevices);
+    CFRelease(currentListOfDevices);
+
     ReportDevice(p_aout, 0, _("System Sound Output Device"));
 
     free(deviceIDs);
