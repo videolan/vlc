@@ -472,12 +472,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (b_nativeFullscreenMode && b_fullscreen && b_activeVideo && sender != nil)
         return;
 
-    if (b_dropzone_active && ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0) {
+    BOOL b_have_alt_key = ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0;
+    if (sender && [sender isKindOfClass: [NSMenuItem class]])
+        b_have_alt_key = NO;
+
+    if (b_dropzone_active && b_have_alt_key) {
         [self hideDropZone];
         return;
     }
 
-    if (!(b_nativeFullscreenMode && b_fullscreen) && !b_splitview_removed && ((([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0 && b_activeVideo)
+    if (!(b_nativeFullscreenMode && b_fullscreen) && !b_splitview_removed && ((b_have_alt_key && b_activeVideo)
                                                                               || (b_nonembedded && sender != nil)
                                                                               || (!b_activeVideo && sender != nil)
                                                                               || b_minimized_view))
