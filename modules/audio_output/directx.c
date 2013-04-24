@@ -994,6 +994,20 @@ static int Open(vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
+    /* DirectSound does not support hot-plug events (unless with WASAPI) */
+    char **ids, **names;
+    int count = ReloadDirectXDevices(obj, NULL, &ids, &names);
+    if (count >= 0)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            aout_HotplugReport(aout, ids[i], names[i]);
+            free(names[i]);
+            free(ids[i]);
+        }
+        free(names);
+        free(ids);
+    }
     return VLC_SUCCESS;
 }
 
