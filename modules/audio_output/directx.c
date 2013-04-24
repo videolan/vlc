@@ -467,8 +467,6 @@ static void Probe( audio_output_t * p_aout, const audio_sample_format_t *fmt )
         var_Destroy( p_aout, "audio-device" );
         return;
     }
-
-    var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
 }
 
 /*****************************************************************************

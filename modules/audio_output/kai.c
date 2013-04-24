@@ -251,7 +251,6 @@ static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
             val.i_int = AOUT_VAR_MONO;
         }
         var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
-        var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
     }
 
     /* Prevent SIG_FPE */
