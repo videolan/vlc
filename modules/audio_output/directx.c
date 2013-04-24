@@ -582,17 +582,17 @@ static int InitDirectSound( audio_output_t *p_aout )
         goto error;
     }
 
-    char *dev = var_InheritString( p_aout, "directx-audio-device" );
+    char *dev = var_GetNonEmptyString( p_aout, "directx-audio-device" );
     if( dev != NULL )
     {
         LPOLESTR lpsz = ToWide( dev );
+        free( dev );
 
         if( SUCCEEDED( IIDFromString( lpsz, &guid ) ) )
             p_guid = &guid;
         else
             msg_Err( p_aout, "bad device GUID: %ls", lpsz );
         free( lpsz );
-        free( dev );
     }
 
     /* Create the direct sound object */
@@ -959,6 +959,14 @@ out:
     return list.count;
 }
 
+static int DeviceSelect (audio_output_t *aout, const char *id)
+{
+    var_SetString(aout, "directx-audio-device", (id != NULL) ? id : "");
+    aout_DeviceReport (aout, id);
+    aout_RestartRequest (aout, AOUT_RESTART_OUTPUT);
+    return 0;
+}
+
 static int Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
@@ -979,6 +987,7 @@ static int Open(vlc_object_t *obj)
     aout->stop = Stop;
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
+    aout->device_select = DeviceSelect;
 
     /* Volume */
     sys->volume.volume = var_InheritFloat(aout, "directx-volume");
@@ -1008,6 +1017,7 @@ static int Open(vlc_object_t *obj)
         free(names);
         free(ids);
     }
+    var_Create(aout, "directx-audio-device", VLC_VAR_STRING|VLC_VAR_DOINHERIT);
     return VLC_SUCCESS;
 }
 
@@ -1016,6 +1026,7 @@ static void Close(vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
 
+    var_Destroy(aout, "directx-audio-device");
     CloseHandle(sys->hnotify_evt);
     FreeLibrary(sys->hdsound_dll); /* free DSOUND.DLL */
     free(sys);
