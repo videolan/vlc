@@ -1164,12 +1164,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         [podcastConf appendString: [o_podcast_subscribe_url_fld stringValue]];
         config_PutPsz(VLCIntf, "podcast-urls", [podcastConf UTF8String]);
-
-        vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name(VLCIntf->p_libvlc, "podcast");
-        if (p_obj) {
-            var_SetString(p_obj, "podcast-urls", [podcastConf UTF8String]);
-            vlc_object_release(p_obj);
-        }
+        var_SetString(pl_Get(VLCIntf), "podcast-urls", [podcastConf UTF8String]);
         [podcastConf release];
     }
 }
@@ -1192,13 +1187,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         NSMutableArray * urls = [[NSMutableArray alloc] initWithArray:[[NSString stringWithUTF8String:config_GetPsz(VLCIntf, "podcast-urls")] componentsSeparatedByString:@"|"]];
         [urls removeObjectAtIndex: [o_podcast_unsubscribe_pop indexOfSelectedItem]];
         config_PutPsz(VLCIntf, "podcast-urls", [[urls componentsJoinedByString:@"|"] UTF8String]);
+        var_SetString(pl_Get(VLCIntf), "podcast-urls", config_GetPsz(VLCIntf, "podcast-urls"));
         [urls release];
-
-        vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name(VLCIntf->p_libvlc, "podcast");
-        if (p_obj) {
-            var_SetString(p_obj, "podcast-urls", config_GetPsz(VLCIntf, "podcast-urls"));
-            vlc_object_release(p_obj);
-        }
 
         /* reload the podcast module, since it won't update its list when removing podcasts */
         playlist_t * p_playlist = pl_Get(VLCIntf);
