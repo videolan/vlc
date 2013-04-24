@@ -188,10 +188,9 @@ static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
 /*** Latency management and lip synchronization ***/
 static void stream_start_now(pa_stream *s, audio_output_t *aout)
 {
-    aout_sys_t *sys = aout->sys;
     pa_operation *op;
 
-    assert (sys->trigger == NULL);
+    assert (aout->sys->trigger == NULL);
 
     op = pa_stream_cork(s, 0, NULL, NULL);
     if (op != NULL)
