@@ -907,7 +907,8 @@ static ssize_t ReadCompressed( access_t *p_access, uint8_t *p_buffer,
         p_sys->inflate.stream.next_out = p_buffer;
 
         i_ret = inflate( &p_sys->inflate.stream, Z_SYNC_FLUSH );
-        msg_Warn( p_access, "inflate return value: %d, %s", i_ret, p_sys->inflate.stream.msg );
+        if ( i_ret != Z_OK && i_ret != Z_STREAM_END )
+            msg_Warn( p_access, "inflate return value: %d, %s", i_ret, p_sys->inflate.stream.msg );
 
         return i_len - p_sys->inflate.stream.avail_out;
     }
