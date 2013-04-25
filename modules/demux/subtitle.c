@@ -72,7 +72,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     add_float( "sub-fps", 0.0,
-               N_("Frames per second"),
+               N_("Frames per Second"),
                SUB_FPS_LONGTEXT, true )
     add_integer( "sub-delay", 0,
                N_("Subtitle delay"),
