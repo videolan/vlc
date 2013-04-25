@@ -169,12 +169,14 @@ static int Setup( vlc_va_t *p_external, void **pp_hw_ctx, vlc_fourcc_t *pi_chrom
         case 1 :
             p_va->hw_ctx.cv_pix_fmt_type = kCVPixelFormatType_422YpCbCr8;
             p_va->i_chroma = VLC_CODEC_UYVY;
+            msg_Dbg(p_va->p_log, "using pixel format 422YpCbCr8");
             break;
         case 0 :
         default :
             p_va->hw_ctx.cv_pix_fmt_type = kCVPixelFormatType_420YpCbCr8Planar;
             p_va->i_chroma = VLC_CODEC_I420;
             CopyInitCache( &p_va->image_cache, i_width );
+            msg_Dbg(p_va->p_log, "using pixel format 420YpCbCr8Planar");
     }
 
 ok:
@@ -188,9 +190,11 @@ ok:
                                         p_va->i_extradata );
     if( status )
     {
-        msg_Err( p_va->p_log, "Failed to create the decoder : %i", status );
+        msg_Err( p_va->p_log, "Failed to create decoder: %i", status );
         return VLC_EGENERIC;
     }
+    else
+        msg_Dbg( p_va->p_log, "VDA decoder created");
 
     return VLC_SUCCESS;
 }
@@ -253,6 +257,8 @@ static void Close( vlc_va_t *p_external )
 {
     vlc_va_vda_t *p_va = vlc_va_vda_Get( p_external );
 
+    msg_Dbg(p_va->p_log, "destroying VDA decoder");
+
     ff_vda_destroy_decoder( &p_va->hw_ctx ) ;
 
     if( p_va->hw_ctx.cv_pix_fmt_type == kCVPixelFormatType_420YpCbCr8Planar )
@@ -263,8 +269,12 @@ static void Close( vlc_va_t *p_external )
 
 static int Open( vlc_va_t *external, int i_codec_id, const es_format_t *fmt )
 {
+    msg_Dbg( external, "opening VDA module" );
     if( i_codec_id != AV_CODEC_ID_H264 )
+    {
+        msg_Warn( external, "input codec isn't H264, canceling VDA decoding" );
         return VLC_EGENERIC;
+    }
 
     if( fmt->p_extra == NULL || fmt->i_extra < 7 )
     {
