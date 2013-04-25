@@ -25,9 +25,24 @@
 #include <vlc_strings.h>
 #include <vlc_input.h>
 
-static input_attachment_t* ParseFlacPicture( const uint8_t *p_data, int i_data, int i_attachments, int *i_type )
+static input_attachment_t* ParseFlacPicture( const uint8_t *p_data, int i_data,
+    int i_attachments, int *i_cover_score, int *i_cover_idx )
 {
+    static const char pi_cover_score[] = {
+        0,      /* other */
+        2, 1,   /* icons */
+        10,     /* front cover */
+        9,      /* back cover */
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        6,      /* movie/video screen capture */
+        0,
+        7,      /* Illustration */
+        8,      /* Band/Artist logotype */
+        0,      /* Publisher/Studio */
+    };
+
     int i_len;
+    int i_type;
     char *psz_mime = NULL;
     char psz_name[128];
     char *psz_description = NULL;
@@ -37,7 +52,7 @@ static input_attachment_t* ParseFlacPicture( const uint8_t *p_data, int i_data, 
         return NULL;
 #define RM(x) do { i_data -= (x); p_data += (x); } while(0)
 
-    *i_type = GetDWBE( p_data ); RM(4);
+    i_type = GetDWBE( p_data ); RM(4);
     i_len = GetDWBE( p_data ); RM(4);
 
     if( i_len < 0 || i_data < i_len + 4 )
@@ -54,7 +69,7 @@ static input_attachment_t* ParseFlacPicture( const uint8_t *p_data, int i_data, 
         goto error;
 
     /* printf( "Picture type=%d mime=%s description='%s' file length=%d\n",
-             *i_type, psz_mime, psz_description, i_len ); */
+             i_type, psz_mime, psz_description, i_len ); */
 
     snprintf( psz_name, sizeof(psz_name), "picture%d", i_attachments );
     if( !strcasecmp( psz_mime, "image/jpeg" ) )
@@ -65,6 +80,13 @@ static input_attachment_t* ParseFlacPicture( const uint8_t *p_data, int i_data, 
     p_attachment = vlc_input_attachment_New( psz_name, psz_mime,
             psz_description, p_data, i_data );
 
+    if( i_type >= 0 && (unsigned int)i_type < sizeof(pi_cover_score)/sizeof(pi_cover_score[0]) &&
+        *i_cover_score < pi_cover_score[i_type] )
+    {
+        *i_cover_idx = i_attachments;
+        *i_cover_score = pi_cover_score[i_type];
+    }
+
 error:
     free( psz_mime );
     free( psz_description );
@@ -74,11 +96,11 @@ error:
 static inline void vorbis_ParseComment( vlc_meta_t **pp_meta,
         const uint8_t *p_data, int i_data,
         int *i_attachments, input_attachment_t ***attachments,
+        int *i_cover_score, int *i_cover_idx,
         int *i_seekpoint, seekpoint_t ***ppp_seekpoint )
 {
     int n;
     int i_comment;
-    int i_attach = 0;
     seekpoint_t *sk = NULL;
 
     if( i_data < 8 )
@@ -175,16 +197,13 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta,
             if( attachments == NULL )
                 continue;
 
-            int i;
             uint8_t *p_picture;
             size_t i_size = vlc_b64_decode_binary( &p_picture, &psz_comment[strlen("METADATA_BLOCK_PICTURE=")]);
-            input_attachment_t *p_attachment = ParseFlacPicture( p_picture, i_size, i_attach, &i );
+            input_attachment_t *p_attachment = ParseFlacPicture( p_picture,
+                i_size, *i_attachments, i_cover_score, i_cover_idx );
+            free( p_picture );
             if( p_attachment )
             {
-                char psz_url[128];
-                snprintf( psz_url, sizeof(psz_url), "attachment://%s", p_attachment->psz_name );
-                vlc_meta_Set( p_meta, vlc_meta_ArtworkURL, psz_url );
-                i_attach++;
                 TAB_APPEND_CAST( (input_attachment_t**),
                     *i_attachments, *attachments, p_attachment );
             }

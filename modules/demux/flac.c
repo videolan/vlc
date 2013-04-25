@@ -574,40 +574,22 @@ static void ParseComment( demux_t *p_demux, const uint8_t *p_data, int i_data )
     if( i_data < 4 )
         return;
 
-    vorbis_ParseComment( &p_sys->p_meta, &p_data[4], i_data - 4, NULL, NULL, NULL, NULL );
-
+    vorbis_ParseComment( &p_sys->p_meta, &p_data[4], i_data - 4,
+        &p_sys->i_attachments, &p_sys->attachments,
+        &p_sys->i_cover_score, &p_sys->i_cover_idx, NULL, NULL );
 }
 
 static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, int i_data )
 {
-    static const int pi_cover_score[] = {
-        0,      /* other */
-        2, 1,   /* icons */
-        10,     /* front cover */
-        9,      /* back cover */
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        6,      /* movie/video screen capture */
-        0,
-        7,      /* Illustration */
-        8,      /* Band/Artist logotype */
-        0,      /* Publisher/Studio */
-    };
     demux_sys_t *p_sys = p_demux->p_sys;
-    int i_type;
 
     i_data -= 4; p_data += 4;
 
-    input_attachment_t *p_attachment = ParseFlacPicture( p_data, i_data, p_sys->i_attachments, &i_type );
+    input_attachment_t *p_attachment = ParseFlacPicture( p_data, i_data,
+        p_sys->i_attachments, &p_sys->i_cover_score, &p_sys->i_cover_idx );
     if( p_attachment == NULL )
         return;
 
     TAB_APPEND( p_sys->i_attachments, p_sys->attachments, p_attachment );
-
-    if( i_type >= 0 && (unsigned int)i_type < sizeof(pi_cover_score)/sizeof(pi_cover_score[0]) &&
-        p_sys->i_cover_score < pi_cover_score[i_type] )
-    {
-        p_sys->i_cover_idx = p_sys->i_attachments-1;
-        p_sys->i_cover_score = pi_cover_score[i_type];
-    }
 }
 

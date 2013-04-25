@@ -467,9 +467,13 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
             return;
 
         uint8_t *p_data;
-        int type;
+        int i_cover_score;
+        int i_cover_idx;
         int i_data = vlc_b64_decode_binary( &p_data, art_list[0].toCString(true) );
-        p_attachment = ParseFlacPicture( p_data, i_data, 0, &type );
+        i_cover_score = i_cover_idx = 0;
+        /* TODO: Use i_cover_score / i_cover_idx to select the picture. */
+        p_attachment = ParseFlacPicture( p_data, i_data, 0,
+            &i_cover_score, &i_cover_idx );
     }
 
     TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );

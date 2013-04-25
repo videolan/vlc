@@ -1826,9 +1826,21 @@ static void Ogg_ExtractXiphMeta( demux_t *p_demux, const void *p_headers, unsign
 
     /* TODO how to handle multiple comments properly ? */
     if( i_count >= 2 && pi_size[1] > i_skip )
+    {
+        int i_cover_score = 0;
+        int i_cover_idx = 0;
         vorbis_ParseComment( &p_ogg->p_meta, (uint8_t*)pp_data[1] + i_skip, pi_size[1] - i_skip,
                              &p_ogg->i_attachments, &p_ogg->attachments,
+                             &i_cover_score, &i_cover_idx,
                              &p_ogg->i_seekpoints, &p_ogg->pp_seekpoints );
+        if( p_ogg->p_meta != NULL && i_cover_idx < p_ogg->i_attachments )
+        {
+            char psz_url[128];
+            snprintf( psz_url, sizeof(psz_url), "attachment://%s",
+                p_ogg->attachments[i_cover_idx]->psz_name );
+            vlc_meta_Set( p_ogg->p_meta, vlc_meta_ArtworkURL, psz_url );
+        }
+    }
 
     if( p_ogg->i_seekpoints > 1 )
     {
