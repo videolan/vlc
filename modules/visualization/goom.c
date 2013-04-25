@@ -366,7 +366,7 @@ static void Close( vlc_object_t *p_this )
     vlc_join( p_sys->p_thread->thread, NULL );
 
     /* Free data */
-    aout_filter_RequestVout( p_filter, p_sys->p_thread->p_vout, 0 );
+    aout_filter_RequestVout( p_filter, p_sys->p_thread->p_vout, NULL );
     vlc_mutex_destroy( &p_sys->p_thread->lock );
     vlc_cond_destroy( &p_sys->p_thread->wait );
 
