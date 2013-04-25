@@ -1000,30 +1000,30 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
 
                         free(uri);
 
-                        /* Download playlist file from server */
-                        uint8_t *buf = NULL;
-                        ssize_t len = read_M3U8_from_url(s, hls->url, &buf);
-                        if (len < 0)
-                        {
-                            msg_Warn(s, "failed to read %s, continue for other streams", hls->url);
-                            failed_to_download_stream_m3u8 = true;
-
-                            /* remove stream just added */
-                            if (new_stream_added)
-                                vlc_array_remove(streams, vlc_array_count(streams) - 1);
-
-                            /* ignore download error, so we have chance to try other streams */
-                            err = VLC_SUCCESS;
-                        }
-                        else
-                        {
-                            /* Parse HLS m3u8 content. */
-                            err = parse_M3U8(s, streams, buf, len);
-                            free(buf);
-                        }
-
                         if (hls)
                         {
+                            /* Download playlist file from server */
+                            uint8_t *buf = NULL;
+                            ssize_t len = read_M3U8_from_url(s, hls->url, &buf);
+                            if (len < 0)
+                            {
+                                msg_Warn(s, "failed to read %s, continue for other streams", hls->url);
+                                failed_to_download_stream_m3u8 = true;
+
+                                /* remove stream just added */
+                                if (new_stream_added)
+                                    vlc_array_remove(streams, vlc_array_count(streams) - 1);
+
+                                /* ignore download error, so we have chance to try other streams */
+                                err = VLC_SUCCESS;
+                            }
+                            else
+                            {
+                                /* Parse HLS m3u8 content. */
+                                err = parse_M3U8(s, streams, buf, len);
+                                free(buf);
+                            }
+
                             hls->version = version;
                             if (!p_sys->b_live)
                                 hls->size = hls_GetStreamSize(hls); /* Stream size (approximate) */
