@@ -466,7 +466,7 @@ QString PLModel::getURI( const QModelIndex &index ) const
     input_item_t *p_item = getItem( index )->inputItem();
     /* no PL lock as item gets refcount +1 from PLItem, which only depends of events */
     vlc_mutex_lock( &p_item->lock );
-    uri = QString( p_item->psz_uri );
+    uri = qfu( p_item->psz_uri );
     vlc_mutex_unlock( &p_item->lock );
     return uri;
 }
