@@ -169,9 +169,9 @@
     [o_transcode_audio_channels addItemsWithObjectValues: o_a_channels];
 
     [o_misc_lbl setTitle: _NS("Stream Announcing")];
-    [o_sap_chkbox setTitle: _NS("SAP announce")];
-    [o_rtsp_chkbox setTitle: _NS("RTSP announce")];
-    [o_http_chkbox setTitle:_NS("HTTP announce")];
+    [o_sap_chkbox setTitle: _NS("SAP Announcement")];
+    [o_rtsp_chkbox setTitle: _NS("RTSP Announcement")];
+    [o_http_chkbox setTitle:_NS("HTTP Announcement")];
     [o_file_chkbox setTitle:_NS("Export SDP as file")];
 
     [o_channel_name_lbl setStringValue: _NS("Channel Name")];
@@ -542,15 +542,15 @@
                 [o_mode isEqualToString: @"RTP"]];
 
     if ([o_mode isEqualToString: @"RTP"]) {
-/*        if ([[sender title] isEqualToString: _NS("SAP announce")]) {
+/*        if ([[sender title] isEqualToString: _NS("SAP Announcement")]) {
             [o_rtsp_chkbox setState:NSOffState];
             [o_http_chkbox setState:NSOffState];
         }*/
-        if ([[sender title] isEqualToString:_NS("RTSP announce")]) {
+        if ([[sender title] isEqualToString:_NS("RTSP Announcement")]) {
 //            [o_sap_chkbox setState:NSOffState];
             [o_http_chkbox setState:NSOffState];
             [o_file_chkbox setState:NSOffState];
-        } else if ([[sender title] isEqualToString:_NS("HTTP announce")]) {
+        } else if ([[sender title] isEqualToString:_NS("HTTP Announcement")]) {
 //            [o_sap_chkbox setState:NSOffState];
             [o_rtsp_chkbox setState:NSOffState];
             [o_file_chkbox setState:NSOffState];

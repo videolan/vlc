@@ -159,7 +159,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_watereffect_ckb setTitle:_NS("Water effect")];
     [o_waves_ckb setTitle:_NS("Waves")];
     [o_psychedelic_ckb setTitle:_NS("Psychedelic")];
-    [o_anaglyph_ckb setTitle:_NS("Anaglyph 3D")];
+    [o_anaglyph_ckb setTitle:_NS("Anaglyph")];
 
     [o_addtext_ckb setTitle:_NS("Add text")];
     [o_addtext_text_lbl setStringValue:_NS("Text")];

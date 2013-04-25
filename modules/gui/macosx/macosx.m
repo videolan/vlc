@@ -107,16 +107,16 @@ void WindowClose  (vout_window_t *);
 
 #define LOCK_ASPECT_RATIO_TEXT N_("Lock Aspect Ratio")
 
-#define JUMPBUTTONS_TEXT N_("Shows playlist item control buttons")
+#define JUMPBUTTONS_TEXT N_("Show Previous & Next Buttons")
 #define JUMPBUTTONS_LONGTEXT N_("Shows the previous and next buttons in the main window.")
 
-#define PLAYMODEBUTTONS_TEXT N_("Show play mode control buttons")
+#define PLAYMODEBUTTONS_TEXT N_("Show Shuffle & Repeat Buttons")
 #define PLAYMODEBUTTONS_LONGTEXT N_("Shows the shuffle and repeat buttons in the main window.")
 
-#define EFFECTSBUTTON_TEXT N_("Show audio effects button")
+#define EFFECTSBUTTON_TEXT N_("Show Audio Effects Button")
 #define EFFECTSBUTTON_LONGTEXT N_("Shows the audio effects button in the main window.")
 
-#define SIDEBAR_TEXT N_("Show sidebar")
+#define SIDEBAR_TEXT N_("Show Sidebar")
 #define SIDEBAR_LONGTEXT N_("Shows a sidebar in the main window listing media sources.")
 
 #define ITUNES_TEXT N_("Pause iTunes during VLC playback")
@@ -145,7 +145,7 @@ vlc_module_begin()
         add_bool("macosx-show-effects-button", false, EFFECTSBUTTON_TEXT, EFFECTSBUTTON_LONGTEXT, false)
         add_bool("macosx-show-sidebar", true, SIDEBAR_TEXT, SIDEBAR_LONGTEXT, false)
 
-    set_section(N_("Behaviour"), 0)
+    set_section(N_("Behavior"), 0)
         add_bool("macosx-autoplay", true, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT, false)
         add_bool("macosx-recentitems", true, RECENT_ITEMS_TEXT, RECENT_ITEMS_LONGTEXT, false)
         add_bool("macosx-fspanel", true, FSPANEL_TEXT, FSPANEL_LONGTEXT, false)

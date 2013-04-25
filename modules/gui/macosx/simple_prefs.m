@@ -244,17 +244,17 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     [o_osd_encoding_txt setStringValue: _NS("Default Encoding")];
     [o_osd_font_box setTitle: _NS("Display Settings")];
     [o_osd_font_btn setTitle: _NS("Choose...")];
-    [o_osd_font_color_txt setStringValue: _NS("Font Color")];
-    [o_osd_font_size_txt setStringValue: _NS("Font Size")];
+    [o_osd_font_color_txt setStringValue: _NS("Font color")];
+    [o_osd_font_size_txt setStringValue: _NS("Font size")];
     [o_osd_font_txt setStringValue: _NS("Font")];
-    [o_osd_lang_box setTitle: _NS("Subtitle Languages")];
-    [o_osd_lang_txt setStringValue: _NS("Preferred Subtitle Language")];
+    [o_osd_lang_box setTitle: _NS("Subtitle languages")];
+    [o_osd_lang_txt setStringValue: _NS("Preferred subtitle language")];
     [o_osd_osd_box setTitle: _NS("On Screen Display")];
     [o_osd_osd_ckb setTitle: _NS("Enable OSD")];
     [o_osd_opacity_txt setStringValue: _NS("Opacity")];
-    [o_osd_forcebold_ckb setTitle: _NS("Force Bold")];
-    [o_osd_outline_color_txt setStringValue: _NS("Outline Color")];
-    [o_osd_outline_thickness_txt setStringValue: _NS("Outline Thickness")];
+    [o_osd_forcebold_ckb setTitle: _NS("Force bold")];
+    [o_osd_outline_color_txt setStringValue: _NS("Outline color")];
+    [o_osd_outline_thickness_txt setStringValue: _NS("Outline thickness")];
 
     /* video */
     [o_video_black_ckb setTitle: _NS("Black screens in Fullscreen mode")];

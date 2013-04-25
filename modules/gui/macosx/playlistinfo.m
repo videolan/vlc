@@ -159,9 +159,9 @@ static VLCInfo *_o_sharedInstance = nil;
 - (void)initMediaPanelStats
 {
     //Initializing Input Variables
-    [o_read_bytes_txt setStringValue: [NSString stringWithFormat:@"%.1f KiB", (float)0]];
+    [o_read_bytes_txt setStringValue: [NSString stringWithFormat:_NS("%.1f KiB"), (float)0]];
     [o_input_bitrate_txt setStringValue: [NSString stringWithFormat:@"%6.0f kb/s", (float)0]];
-    [o_demux_bytes_txt setStringValue: [NSString stringWithFormat:@"%.1f KiB", (float)0]];
+    [o_demux_bytes_txt setStringValue: [NSString stringWithFormat:_NS("%.1f KiB"), (float)0]];
     [o_demux_bitrate_txt setStringValue: [NSString stringWithFormat:@"%6.0f kb/s", (float)0]];
 
     //Initializing Video Variables
@@ -171,7 +171,7 @@ static VLCInfo *_o_sharedInstance = nil;
 
     //Initializing Output Variables
     [o_sent_packets_txt setIntValue: 0];
-    [o_sent_bytes_txt setStringValue: [NSString stringWithFormat:@"%.1f KiB", (float)0]];
+    [o_sent_bytes_txt setStringValue: [NSString stringWithFormat:_NS("%.1f KiB"), (float)0]];
     [o_sent_bitrate_txt setStringValue: [NSString stringWithFormat:@"%6.0f kb/s", (float)0]];
 
     //Initializing Audio Variables

@@ -403,7 +403,7 @@ static VLCWizard *_o_sharedInstance = nil;
                               "additional streaming parameters can be set.")];
     [o_t6_txt_ttl setStringValue: _NS("Time-To-Live (TTL)")];
     [o_t6_btn_mrInfo_ttl setTitle: _NS("More Info")];
-    [o_t6_ckb_sap setTitle: _NS("SAP Announce")];
+    [o_t6_ckb_sap setTitle: _NS("SAP Announcement")];
     [o_t6_btn_mrInfo_sap setTitle: _NS("More Info")];
     [o_t6_ckb_local setTitle: _NS("Local playback")];
     [o_t6_btn_mrInfo_local setTitle: _NS("More Info")];
@@ -435,7 +435,7 @@ static VLCWizard *_o_sharedInstance = nil;
         stringByAppendingString: @":"]];
     [o_t8_txt_partExtract setStringValue: [_NS("Partial Extract")
         stringByAppendingString: @":"]];
-    [o_t8_txt_sap setStringValue: [_NS("SAP Announce")
+    [o_t8_txt_sap setStringValue: [_NS("SAP Announcement")
         stringByAppendingString: @":"]];
     [o_t8_txt_saveFileTo setStringValue: [_NS("Save file to")
         stringByAppendingString: @":"]];
@@ -1808,7 +1808,7 @@ static VLCWizard *_o_sharedInstance = nil;
 - (IBAction)t6_mrInfo_sap:(id)sender
 {
     /* show a sheet for the help */
-    NSBeginInformationalAlertSheet(_NS("SAP Announce"),
+    NSBeginInformationalAlertSheet(_NS("SAP Announcement"),
         _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, @"%@",
         _NS("When streaming using UDP, the streams can be "
         "announced using the SAP/SDP announcing protocol. This "
