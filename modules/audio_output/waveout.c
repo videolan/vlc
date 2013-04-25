@@ -806,7 +806,11 @@ static int Open(vlc_object_t *obj)
         free(names);
         free(ids);
     }
-    var_Create(aout, "waveout-audio-device", VLC_VAR_STRING|VLC_VAR_DOINHERIT);
+
+    char *dev = var_CreateGetNonEmptyString(aout, "waveout-audio-device");
+    aout_DeviceReport(aout, dev);
+    free(dev);
+
     return VLC_SUCCESS;
 }
 
