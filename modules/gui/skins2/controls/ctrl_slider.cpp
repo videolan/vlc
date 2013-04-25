@@ -171,6 +171,7 @@ void CtrlSliderCursor::notifyLayout( int width, int height,
     }
 }
 
+
 void CtrlSliderCursor::onUpdate( Subject<VarPercent> &rVariable, void *arg  )
 {
     (void)rVariable; (void)arg;
@@ -473,6 +474,26 @@ void CtrlSliderBg::associateCursor( CtrlSliderCursor &rCursor )
 }
 
 
+void CtrlSliderBg::notifyLayout( int width, int height,
+                                 int xOffSet, int yOffSet )
+{
+    if( width > 0 && height > 0 )
+    {
+        CtrlGeneric::notifyLayout( width, height, xOffSet, yOffSet );
+    }
+    else
+    {
+        // Compute the resize factors
+        float factorX, factorY;
+        getResizeFactors( factorX, factorY );
+        // real background size
+        int width = m_bgWidth - (int)(m_padHoriz * factorX);
+        int height = m_bgHeight - (int)(m_padVert * factorY);
+        CtrlGeneric::notifyLayout( width, height );
+    }
+}
+
+
 void CtrlSliderBg::onUpdate( Subject<VarPercent> &rVariable, void*arg )
 {
     (void)rVariable; (void)arg;
@@ -482,14 +503,8 @@ void CtrlSliderBg::onUpdate( Subject<VarPercent> &rVariable, void*arg )
 
     m_position = position;
 
-    // Compute the resize factors
-    float factorX, factorY;
-    getResizeFactors( factorX, factorY );
-    // real background size
-    int width = m_bgWidth - (int)(m_padHoriz * factorX);
-    int height = m_bgHeight - (int)(m_padVert * factorY);
-
-    notifyLayout( width, height );
+    // redraw the entire control
+    notifyLayout();
 }
 
 
