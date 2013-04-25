@@ -288,10 +288,22 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         b_alive = false;
     }
 
-    if (!b_alive) {
-        msg_Warn(p_aout, "selected audio device is not alive, switching to default device with id %i", p_sys->i_default_dev);
-        p_sys->i_selected_dev = p_sys->i_default_dev;
-        p_sys->b_selected_dev_is_digital = false;
+    if (!b_alive || p_sys->i_selected_dev == 0) {
+        msg_Warn(p_aout, "selected audio device is not alive, switching to default device");
+
+        AudioObjectID defaultDeviceID = 0;
+        UInt32 propertySize = 0;
+        AudioObjectPropertyAddress defaultDeviceAddress = { kAudioHardwarePropertyDefaultOutputDevice, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
+        propertySize = sizeof(AudioObjectID);
+        err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &defaultDeviceAddress, 0, NULL, &propertySize, &defaultDeviceID);
+        if (err != noErr) {
+            msg_Err(p_aout, "could not get default audio device [%4.4s]", (char *)&err);
+            goto error;
+        }
+        else
+            msg_Dbg(p_aout, "using default audio device %i", defaultDeviceID);
+
+        p_sys->i_selected_dev = defaultDeviceID;
     }
 
     // recheck if device still supports digital
@@ -966,7 +978,7 @@ static void Stop(audio_output_t *p_aout)
 
 static void ReportDevice(audio_output_t *p_aout, UInt32 i_id, char *name)
 {
-    char deviceid[100];
+    char deviceid[10];
     sprintf(deviceid, "%i", i_id);
 
     aout_HotplugReport(p_aout, deviceid, name);
@@ -976,7 +988,6 @@ static void RebuildDeviceList(audio_output_t * p_aout)
 {
     OSStatus            err = noErr;
     UInt32              propertySize = 0;
-    AudioObjectID       defaultDeviceID = 0;
     AudioObjectID       *deviceIDs;
     UInt32              numberOfDevices;
     CFMutableArrayRef   currentListOfDevices;
@@ -1013,16 +1024,6 @@ static void RebuildDeviceList(audio_output_t * p_aout)
         msg_Err(p_aout, "could not get the device IDs [%4.4s]", (char *)&err);
         return;
     }
-
-    /* Find the ID of the default Device */
-    AudioObjectPropertyAddress defaultDeviceAddress = { kAudioHardwarePropertyDefaultOutputDevice, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
-    propertySize = sizeof(AudioObjectID);
-    err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &defaultDeviceAddress, 0, NULL, &propertySize, &defaultDeviceID);
-    if (err != noErr) {
-        msg_Err(p_aout, "could not get default audio device [%4.4s]", (char *)&err);
-        return;
-    }
-    p_sys->i_default_dev = defaultDeviceID;
 
     AudioObjectPropertyAddress deviceNameAddress = { kAudioObjectPropertyName, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
 
@@ -1085,8 +1086,6 @@ static void RebuildDeviceList(audio_output_t * p_aout)
         count = CFArrayGetCount(p_sys->device_list);
 
     if (count > 0) {
-        CFShow(currentListOfDevices);
-        CFShow(p_sys->device_list);
         CFNumberRef cfn_device_id;
         int i_device_id = 0;
         for (CFIndex x = 0; x < count; x++) {
