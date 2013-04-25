@@ -76,16 +76,7 @@
        || ((p_format)->i_format == VLC_CODEC_A52)       \
        || ((p_format)->i_format == VLC_CODEC_DTS) )
 
-/* Values used for the audio-device and audio-channels object variables */
-#define AOUT_VAR_MONO               1
-#define AOUT_VAR_STEREO             2
-#define AOUT_VAR_2F2R               4
-#define AOUT_VAR_3F2R               5
-#define AOUT_VAR_5_1                6
-#define AOUT_VAR_6_1                7
-#define AOUT_VAR_7_1                8
-#define AOUT_VAR_SPDIF              10
-
+/* Values used for the audio-channels object variable */
 #define AOUT_VAR_CHAN_UNSET         0 /* must be zero */
 #define AOUT_VAR_CHAN_STEREO        1
 #define AOUT_VAR_CHAN_RSTEREO       2
