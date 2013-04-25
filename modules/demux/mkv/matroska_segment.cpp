@@ -1094,7 +1094,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
          * either by an earlier 'default track' (??) or by default
          * language choice behaviour.
          */
-        if( p_tk->b_default )
+        if( p_tk->b_default || p_tk->b_forced )
         {
             es_out_Control( sys.demuxer.out,
                             ES_OUT_SET_ES_DEFAULT,
