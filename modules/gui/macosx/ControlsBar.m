@@ -158,6 +158,11 @@
 
 }
 
+- (CGFloat)height
+{
+    return [o_bottombar_view frame].size.height;
+}
+
 #pragma mark -
 #pragma mark Button Actions
 

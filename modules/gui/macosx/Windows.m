@@ -618,9 +618,9 @@
         }
     }
 
-    [o_video_view setFrame: [[self contentView] frame]];
+    if ([self hasActiveVideo])
+        [[VLCMainWindow sharedInstance] recreateHideMouseTimer];
 
-    [[VLCMainWindow sharedInstance] recreateHideMouseTimer];
     i_originalLevel = [self level];
     [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
     [self setLevel:NSNormalWindowLevel];
@@ -636,9 +636,11 @@
         [self setFrame: winrect display:NO animate:NO];
     }
 
-    // TODO fix bottom bar status when vout just not visible, but there
-    if (![o_video_view isHidden])
+    [o_video_view setFrame: [[self contentView] frame]];
+    if (![o_video_view isHidden]) {
         [[o_controls_bar bottomBarView] setHidden: YES];
+    }
+    
 
     [self setMovableByWindowBackground: NO];
 }
@@ -654,7 +656,8 @@
 
     if ([self hasActiveVideo]) {
         [[[VLCMainWindow sharedInstance] fsPanel] setVoutWasUpdated: self];
-        [[[VLCMainWindow sharedInstance] fsPanel] setActive: nil];
+        if (![o_video_view isHidden])
+            [[[VLCMainWindow sharedInstance] fsPanel] setActive: nil];
     }
 
     NSArray *subviews = [[self videoView] subviews];
@@ -690,24 +693,28 @@
     if (b_dark_interface) {
         NSRect winrect;
         CGFloat f_titleBarHeight = [o_titlebar_view frame].size.height;
-        winrect = [self frame];
 
+        winrect = [o_video_view frame];
+        winrect.size.height -= f_titleBarHeight;
+        [o_video_view setFrame: winrect];
+
+        winrect = [self frame];
         [o_titlebar_view setFrame: NSMakeRect(0, winrect.size.height - f_titleBarHeight,
                                               winrect.size.width, f_titleBarHeight)];
         [[self contentView] addSubview: o_titlebar_view];
 
         winrect.size.height = winrect.size.height + f_titleBarHeight;
         [self setFrame: winrect display:NO animate:NO];
-        winrect = [o_video_view frame];
-        winrect.size.height -= f_titleBarHeight;
-        [o_video_view setFrame: winrect];
     }
 
     NSRect videoViewFrame = [o_video_view frame];
-    videoViewFrame.origin.y = [[o_controls_bar bottomBarView] frame].size.height;
-    videoViewFrame.size.height -= [[o_controls_bar bottomBarView] frame].size.height;
+    videoViewFrame.origin.y += [o_controls_bar height];
+    videoViewFrame.size.height -= [o_controls_bar height];
     [o_video_view setFrame: videoViewFrame];
-    [[o_controls_bar bottomBarView] setHidden: NO];
+
+    if (![o_video_view isHidden]) {
+        [[o_controls_bar bottomBarView] setHidden: NO];
+    }
     
     [self setMovableByWindowBackground: YES];
 }

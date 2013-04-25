@@ -438,6 +438,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [o_video_view setHidden: YES];
     [o_split_view setHidden: NO];
+    if ([self fullscreen]) {
+        [[o_controls_bar bottomBarView] setHidden: NO];
+        [o_fspanel setNonActive:nil];
+    }
+
     [self makeFirstResponder: nil];
 
 }
@@ -451,6 +456,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [o_split_view setHidden: YES];
     [o_video_view setHidden: NO];
+    if ([self fullscreen]) {
+        [[o_controls_bar bottomBarView] setHidden: YES];
+        [o_fspanel setActive:nil];
+    }
 
     if ([[o_video_view subviews] count] > 0)
         [self makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
@@ -466,11 +475,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     BOOL b_activeVideo = [[VLCMain sharedInstance] activeVideoPlayback];
     BOOL b_restored = NO;
-
-    // TODO: implement toggle playlist in this situation (triggerd via menu item).
-    // but for now we block this case, to avoid displaying only the half
-    if (b_nativeFullscreenMode && b_fullscreen && b_activeVideo && sender != nil)
-        return;
 
     BOOL b_have_alt_key = ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0;
     if (sender && [sender isKindOfClass: [NSMenuItem class]])
@@ -775,7 +779,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [super windowWillEnterFullScreen:notification];
 
     // update split view frame after removing title bar
-    [o_split_view setFrame: [o_video_view frame]];
+    if (b_dark_interface) {
+        NSRect frame = [[self contentView] frame];
+        frame.origin.y += [o_controls_bar height];
+        frame.size.height -= [o_controls_bar height];
+        [o_split_view setFrame:frame];
+    }
 }
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
@@ -783,7 +792,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [super windowWillExitFullScreen: notification];
 
     // update split view frame after readding title bar
-    [o_split_view setFrame: [o_video_view frame]];
+    if (b_dark_interface) {
+        NSRect frame = [o_split_view frame];
+        frame.size.height -= [o_titlebar_view frame].size.height;
+        [o_split_view setFrame:frame];
+    }
 }
 #pragma mark -
 #pragma mark Fullscreen support
@@ -793,7 +806,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     id currentWindow = [NSApp keyWindow];
     if ([currentWindow respondsToSelector:@selector(hasActiveVideo)] && [currentWindow hasActiveVideo]) {
-        if ([currentWindow respondsToSelector:@selector(fullscreen)] && [currentWindow fullscreen]) {
+        if ([currentWindow respondsToSelector:@selector(fullscreen)] && [currentWindow fullscreen] && ![[currentWindow videoView] isHidden]) {
 
             if ([[VLCMain sharedInstance] activeVideoPlayback])
                 [o_fspanel fadeIn];

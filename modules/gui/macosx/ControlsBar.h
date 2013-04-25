@@ -69,6 +69,8 @@
 
 @property (readonly) id bottomBarView;
 
+- (CGFloat)height;
+
 - (IBAction)play:(id)sender;
 - (IBAction)bwd:(id)sender;
 - (IBAction)fwd:(id)sender;
