@@ -313,22 +313,6 @@ static int EqualizerCallback (vlc_object_t *obj, const char *var,
     return VLC_SUCCESS;
 }
 
-static vout_thread_t *RequestVout (void *data, vout_thread_t *vout,
-                                   video_format_t *fmt, bool recycle)
-{
-    audio_output_t *aout = data;
-    vout_configuration_t cfg = {
-        .vout       = vout,
-        .input      = NULL,
-        .change_fmt = true,
-        .fmt        = fmt,
-        .dpb_size   = 1,
-    };
-
-    (void) recycle;
-    return vout_Request (aout, &cfg);
-}
-
 vout_thread_t *aout_filter_RequestVout (filter_t *filter, vout_thread_t *vout,
                                         video_format_t *fmt)
 {
@@ -426,14 +410,7 @@ int aout_FiltersNew (audio_output_t *aout,
         free (visual);
         visual = NULL;
     }
-
-    if (request_vout != NULL)
-        owner->request_vout = *request_vout;
-    else
-    {
-        owner->request_vout.pf_request_vout = RequestVout;
-        owner->request_vout.p_private = aout;
-    }
+    owner->request_vout = *request_vout;
     owner->recycle_vout = visual != NULL;
 
     /* parse user filter lists */
