@@ -2836,16 +2836,6 @@ static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta )
     }
 }
 
-/*****************************************************************************
- * InputUpdateMeta: merge p_item meta data with p_meta taking care of
- * arturl and locking issue.
- *****************************************************************************/
-static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
-{
-    es_out_ControlSetMeta( p_input->p->p_es_out, p_meta );
-    vlc_meta_Delete( p_meta );
-}
-
 static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment,
                               int i_new, input_attachment_t **pp_new )
 {
@@ -2863,6 +2853,36 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
     *pi_attachment = i_attachment;
     *ppp_attachment = attachment;
 }
+
+/*****************************************************************************
+ * InputUpdateMeta: merge p_item meta data with p_meta taking care of
+ * arturl and locking issue.
+ *****************************************************************************/
+static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
+{
+    /* If metadata changed, then the attachments might have changed.
+       We need to update them in case they contain album art. */
+    input_source_t *in = &p_input->p->input;
+    int i_attachment;
+    input_attachment_t **attachment;
+    if( !demux_Control( in->p_demux, DEMUX_GET_ATTACHMENTS,
+                         &attachment, &i_attachment ) )
+    {
+        vlc_mutex_lock( &p_input->p->p_item->lock );
+        if( p_input->p->i_attachment > 0 )
+        {
+            for( int i = 0; i < p_input->p->i_attachment; i++ )
+                vlc_input_attachment_Delete( p_input->p->attachment[i] );
+            TAB_CLEAN( p_input->p->i_attachment, p_input->p->attachment );
+        }
+        AppendAttachment( &p_input->p->i_attachment, &p_input->p->attachment,
+                          i_attachment, attachment );
+        vlc_mutex_unlock( &p_input->p->p_item->lock );
+    }
+    es_out_ControlSetMeta( p_input->p->p_es_out, p_meta );
+    vlc_meta_Delete( p_meta );
+}
+
 /*****************************************************************************
  * InputGetExtraFiles
  *  Autodetect extra input list
