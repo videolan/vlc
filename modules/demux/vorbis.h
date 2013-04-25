@@ -28,17 +28,29 @@
 static input_attachment_t* ParseFlacPicture( const uint8_t *p_data, int i_data,
     int i_attachments, int *i_cover_score, int *i_cover_idx )
 {
+    /* TODO: Merge with ID3v2 copy in modules/meta_engine/taglib.cpp. */
     static const char pi_cover_score[] = {
-        0,      /* other */
-        2, 1,   /* icons */
-        10,     /* front cover */
-        9,      /* back cover */
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        6,      /* movie/video screen capture */
-        0,
-        7,      /* Illustration */
-        8,      /* Band/Artist logotype */
-        0,      /* Publisher/Studio */
+        0,  /* Other */
+        5,  /* 32x32 PNG image that should be used as the file icon */
+        4,  /* File icon of a different size or format. */
+        20, /* Front cover image of the album. */
+        19, /* Back cover image of the album. */
+        13, /* Inside leaflet page of the album. */
+        18, /* Image from the album itself. */
+        17, /* Picture of the lead artist or soloist. */
+        16, /* Picture of the artist or performer. */
+        14, /* Picture of the conductor. */
+        15, /* Picture of the band or orchestra. */
+        9,  /* Picture of the composer. */
+        8,  /* Picture of the lyricist or text writer. */
+        7,  /* Picture of the recording location or studio. */
+        10, /* Picture of the artists during recording. */
+        11, /* Picture of the artists during performance. */
+        6,  /* Picture from a movie or video related to the track. */
+        1,  /* Picture of a large, coloured fish. */
+        12, /* Illustration related to the track. */
+        3,  /* Logo of the band or performer. */
+        2   /* Logo of the publisher (record company). */
     };
 
     int i_len;
