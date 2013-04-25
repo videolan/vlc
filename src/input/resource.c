@@ -259,7 +259,7 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
         if( p_resource->p_vout_free || i_vout_active > 0 || !b_recycle )
         {
             if( b_recycle )
-                msg_Dbg( p_resource->p_parent, "detroying vout (already one saved or active)" );
+                msg_Dbg( p_resource->p_parent, "destroying vout (already one saved or active)" );
             vout_CloseAndRelease( p_vout );
         }
         else
