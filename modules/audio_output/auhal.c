@@ -112,6 +112,9 @@ struct aout_sys_t
 
     CFArrayRef                  device_list;
 
+    float                       f_volume;
+    bool                        b_mute;
+
     vlc_mutex_t                 lock;
     vlc_cond_t                  cond;
 };
@@ -198,8 +201,10 @@ static int Open(vlc_object_t *obj)
     RebuildDeviceList(p_aout);
 
     /* remember the volume */
-    aout_VolumeReport(p_aout, var_InheritInteger(p_aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT);
-    MuteSet(p_aout, var_InheritBool(p_aout, "mute"));
+    p_sys->f_volume = var_InheritInteger(p_aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT;
+    aout_VolumeReport(p_aout, p_sys->f_volume);
+    p_sys->b_mute = var_InheritBool(p_aout, "mute");
+    aout_MuteReport(p_aout, p_sys->b_mute);
 
     SwitchAudioDevice(p_aout, config_GetPsz(p_aout, "auhal-audio-device"));
 
@@ -690,14 +695,8 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     p_sys->b_got_first_sample = false;
 
     /* Set volume for output unit */
-    float volume = var_InheritInteger(p_aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT;
-    volume = volume * volume * volume;
-    verify_noerr(AudioUnitSetParameter(p_sys->au_unit,
-                                    kHALOutputParam_Volume,
-                                    kAudioUnitScope_Global,
-                                    0,
-                                    volume,
-                                    0));
+    VolumeSet(p_aout, p_sys->f_volume);
+    MuteSet(p_aout, p_sys->b_mute);
 
     return true;
 }
@@ -1139,6 +1138,7 @@ static int VolumeSet(audio_output_t * p_aout, float volume)
     if(p_sys->b_digital)
         return VLC_EGENERIC;
 
+    p_sys->f_volume = volume;
     aout_VolumeReport(p_aout, volume);
 
     /* Set volume for output unit */
@@ -1163,12 +1163,12 @@ static int MuteSet(audio_output_t * p_aout, bool mute)
     if(p_sys->b_digital)
         return VLC_EGENERIC;
 
+    p_sys->b_mute = mute;
     aout_MuteReport(p_aout, mute);
 
     float volume = .0;
-
     if (!mute)
-        volume = var_InheritInteger(p_aout, "auhal-volume") / (float)AOUT_VOLUME_DEFAULT;
+        volume = p_sys->f_volume;
 
     ostatus = AudioUnitSetParameter(p_sys->au_unit,
                                     kHALOutputParam_Volume,
