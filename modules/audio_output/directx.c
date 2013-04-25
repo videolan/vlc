@@ -930,7 +930,13 @@ static int CALLBACK DeviceEnumCallback( LPGUID guid, LPCWSTR desc,
 static int ReloadDirectXDevices( vlc_object_t *p_this, char const *psz_name,
                                  char ***values, char ***descs )
 {
-    ds_list_t list = { 0, NULL, NULL };
+    ds_list_t list = {
+        .count = 1,
+        .ids = xmalloc(sizeof (char *)),
+        .names = xmalloc(sizeof (char *)),
+    };
+    list.ids[0] = xstrdup("");
+    list.names[0] = xstrdup(_("Default"));
 
     (void) psz_name;
 
