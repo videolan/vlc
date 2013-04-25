@@ -1239,7 +1239,7 @@ static bool IsMenuEmpty( const char *psz_var,
     return i_result;
 }
 
-#define TEXT_OR_VAR qfu ( text.psz_string ? text.psz_string : psz_var )
+#define TEXT_OR_VAR qfue ( text.psz_string ? text.psz_string : psz_var )
 
 void VLCMenuBar::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
         const char *psz_var, vlc_object_t *p_object, bool b_submenu )
@@ -1423,14 +1423,14 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
         {
             case VLC_VAR_VARIABLE:
                 CreateChoicesMenu( subsubmenu, CURVAL.psz_string, p_object, false );
-                subsubmenu->setTitle( qfu( CURTEXT ? CURTEXT :CURVAL.psz_string ) );
+                subsubmenu->setTitle( qfue( CURTEXT ? CURTEXT :CURVAL.psz_string ) );
                 submenu->addMenu( subsubmenu );
                 break;
 
             case VLC_VAR_STRING:
                 var_Get( p_object, psz_var, &val );
                 another_val.psz_string = strdup( CURVAL.psz_string );
-                menutext = qfu( CURTEXT ? CURTEXT : another_val.psz_string );
+                menutext = qfue( CURTEXT ? CURTEXT : another_val.psz_string );
                 CreateAndConnect( submenu, psz_var, menutext, "", RADIO_OR_COMMAND,
                         p_object, another_val, i_type,
                         val.psz_string && !strcmp( val.psz_string, CURVAL.psz_string ) );
@@ -1440,7 +1440,7 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
 
             case VLC_VAR_INTEGER:
                 var_Get( p_object, psz_var, &val );
-                if( CURTEXT ) menutext = qfu( CURTEXT );
+                if( CURTEXT ) menutext = qfue( CURTEXT );
                 else menutext = QString::number( CURVAL.i_int );
                 CreateAndConnect( submenu, psz_var, menutext, "", RADIO_OR_COMMAND,
                         p_object, CURVAL, i_type,
@@ -1450,7 +1450,7 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
 
             case VLC_VAR_FLOAT:
                 var_Get( p_object, psz_var, &val );
-                if( CURTEXT ) menutext = qfu( CURTEXT );
+                if( CURTEXT ) menutext = qfue( CURTEXT );
                 else menutext.sprintf( "%.2f", CURVAL.f_float );
                 CreateAndConnect( submenu, psz_var, menutext, "", RADIO_OR_COMMAND,
                         p_object, CURVAL, i_type,
@@ -1469,6 +1469,7 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
 #undef RADIO_OR_COMMAND
 #undef CURVAL
 #undef CURTEXT
+
     return submenu->isEmpty() ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
@@ -1555,7 +1556,7 @@ void VLCMenuBar::updateAudioDevice( intf_thread_t * p_intf, audio_output_t *p_ao
 
     for( int i = 0; i < i_result; i++ )
     {
-        action = new QAction( qfu( names[i] ), NULL );
+        action = new QAction( qfue( names[i] ), NULL );
         action->setData( ids[i] );
         action->setCheckable( true );
         if( selected && !strcmp( ids[i], selected ) )

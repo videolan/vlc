@@ -92,6 +92,7 @@ struct intf_sys_t
 #define THEAM ActionsManager::getInstance( p_intf )
 
 #define qfu( i ) QString::fromUtf8( i )
+#define qfue( i ) QString::fromUtf8( i ).replace( "&", "&&" ) /* for actions/buttons */
 #define qtr( i ) QString::fromUtf8( vlc_gettext(i) )
 #define qtu( i ) ((i).toUtf8().constData())
 
