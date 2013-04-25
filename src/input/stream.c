@@ -1472,7 +1472,7 @@ char *stream_ReadLine( stream_t *s )
     char *p_line = NULL;
     int i_line = 0, i_read = 0;
 
-    while( i_read < STREAM_LINE_MAX )
+    for( ;; )
     {
         char *psz_eol;
         const uint8_t *p_data;
@@ -1585,6 +1585,9 @@ char *stream_ReadLine( stream_t *s )
         if( i_data <= 0 ) break; /* Hmmm */
         i_line += i_data;
         i_read += i_data;
+
+        if( i_read >= STREAM_LINE_MAX )
+            goto error; /* line too long */
     }
 
     if( i_read > 0 )
