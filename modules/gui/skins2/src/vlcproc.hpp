@@ -95,8 +95,8 @@ public:
     /// Indicate whether the embedded video output is currently used
     bool isVoutUsed() const { return m_pVout != NULL; }
 
-    /// update equalizer
-    void update_equalizer( );
+    /// initialize equalizer
+    void init_equalizer( );
 
     /// update global variables for the current input
     void update_current_input( );
@@ -164,8 +164,6 @@ private:
 
     /// Vout thread
     vout_thread_t *m_pVout;
-    /// Audio output
-    audio_output_t *m_pAout;
 
     // reset variables when input is over
     void reset_input();

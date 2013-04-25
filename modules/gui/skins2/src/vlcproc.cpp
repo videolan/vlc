@@ -82,7 +82,7 @@ void VlcProc::destroy( intf_thread_t *pIntf )
 #define SET_VOLUME(m,v,b)     ((Volume*)(m).get())->setVolume(v,b)
 
 VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
-    m_varEqBands( pIntf ), m_pVout( NULL ), m_pAout( NULL )
+    m_varEqBands( pIntf ), m_pVout( NULL )
 {
     // Create and register VLC variables
     VarManager *pVarManager = VarManager::instance( getIntf() );
@@ -189,11 +189,6 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
 VlcProc::~VlcProc()
 {
-    if( m_pAout )
-    {
-        vlc_object_release( m_pAout );
-        m_pAout = NULL;
-    }
     if( m_pVout )
     {
         vlc_object_release( m_pVout );
@@ -533,57 +528,6 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
             break;
         }
 
-        case INPUT_EVENT_AOUT:
-        {
-            audio_output_t* pAout = input_GetAout( pInput );
-
-            // end of input or aout reuse (nothing to do)
-            if( !pAout || pAout == m_pAout )
-            {
-                if( pAout )
-                    vlc_object_release( pAout );
-                break;
-            }
-
-            // remove previous Aout if any
-            if( m_pAout )
-            {
-                var_DelCallback( m_pAout, "audio-filter",
-                                 onGenericCallback, this );
-                var_DelCallback( m_pAout, "equalizer-bands",
-                                 onEqBandsChange, this );
-                var_DelCallback( m_pAout, "equalizer-preamp",
-                                 onEqPreampChange, this );
-                vlc_object_release( m_pAout );
-                m_pAout = NULL;
-            }
-
-            m_pAout = pAout;
-
-            // make sure some key variables exist !
-            // yes, this is a ugly but needed hack
-            if( !var_Type( pAout, "equalizer-bands" ) )
-                var_Create( pAout, "equalizer-bands",
-                            VLC_VAR_STRING | VLC_VAR_DOINHERIT);
-            if( !var_Type( pAout, "equalizer-preamp" ) )
-                var_Create( pAout, "equalizer-preamp",
-                            VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
-
-            // New Aout (addCallbacks)
-            var_AddCallback( pAout, "audio-filter",
-                             onGenericCallback, this );
-            var_AddCallback( pAout, "equalizer-bands",
-                             onEqBandsChange, this );
-            var_AddCallback( pAout, "equalizer-preamp",
-                             onEqPreampChange, this );
-
-            char *pFilters = var_GetNonEmptyString( pAout, "audio-filter" );
-            bool b_equalizer = pFilters && strstr( pFilters, "equalizer" );
-            free( pFilters );
-            SET_BOOL( m_cVarEqualizer, b_equalizer );
-            break;
-        }
-
         case INPUT_EVENT_CHAPTER:
         {
             vlc_value_t chapters_count;
@@ -779,7 +723,7 @@ void VlcProc::init_variables()
 
     SET_BOOL( m_cVarStopped, true );
 
-    update_equalizer();
+    init_equalizer();
 }
 
 
@@ -815,19 +759,55 @@ void VlcProc::update_current_input()
     }
 }
 
-void VlcProc::update_equalizer()
+void VlcProc::init_equalizer()
 {
+    playlist_t* pPlaylist = getIntf()->p_sys->p_playlist;
+    audio_output_t* pAout = playlist_GetAout( pPlaylist );
+    if( pAout )
+    {
+        if( !var_Type( pAout, "equalizer-bands" ) )
+            var_Create( pAout, "equalizer-bands",
+                        VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+        if( !var_Type( pAout, "equalizer-preamp" ) )
+            var_Create( pAout, "equalizer-preamp",
+                        VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
 
-    char *pFilters;
-    if( m_pAout )
-        pFilters = var_GetNonEmptyString( m_pAout, "audio-filter" );
-    else
-        pFilters = var_InheritString( getIntf(), "audio-filter" );
+        // New Aout (addCallbacks)
+        var_AddCallback( pAout, "audio-filter",
+                         onGenericCallback, this );
+        var_AddCallback( pAout, "equalizer-bands",
+                         onEqBandsChange, this );
+        var_AddCallback( pAout, "equalizer-preamp",
+                         onEqPreampChange, this );
+    }
 
+    // is equalizer enabled ?
+    char *pFilters = pAout ?
+                   var_GetNonEmptyString( pAout, "audio-filter" ) :
+                   var_InheritString( getIntf(), "audio-filter" );
     bool b_equalizer = pFilters && strstr( pFilters, "equalizer" );
     free( pFilters );
-
     SET_BOOL( m_cVarEqualizer, b_equalizer );
+
+    // retrieve initial bands
+    char* bands = pAout ?
+                  var_GetString( pAout, "equalizer-bands" ) :
+                  var_InheritString( getIntf(), "equalizer-bands" );
+    if( bands )
+    {
+        m_varEqBands.set( bands );
+        free( bands );
+    }
+
+    // retrieve initial preamp
+    float preamp = pAout ?
+                   var_GetFloat( pAout, "equalizer-preamp" ) :
+                   var_InheritFloat( getIntf(), "equalizer-preamp" );
+    EqualizerPreamp *pVarPreamp = (EqualizerPreamp*)m_cVarEqPreamp.get();
+    pVarPreamp->set( (preamp + 20.0) / 40.0 );
+
+    if( pAout )
+        vlc_object_release( pAout);
 }
 
 void VlcProc::setFullscreenVar( bool b_fullscreen )
