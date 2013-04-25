@@ -139,13 +139,13 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     if ([o_itemIdent isEqual: VLCIntfSettingToolbarIdentifier]) {
         CreateToolbarItem(_NS("Interface"), _NS("Interface Settings"), @"spref_cone_Interface_64", showInterfaceSettings);
     } else if ([o_itemIdent isEqual: VLCAudioSettingToolbarIdentifier]) {
-        CreateToolbarItem(_NS("Audio"), _NS("General Audio Settings"), @"spref_cone_Audio_64", showAudioSettings);
+        CreateToolbarItem(_NS("Audio"), _NS("Audio Settings"), @"spref_cone_Audio_64", showAudioSettings);
     } else if ([o_itemIdent isEqual: VLCVideoSettingToolbarIdentifier]) {
-        CreateToolbarItem(_NS("Video"), _NS("General Video Settings"), @"spref_cone_Video_64", showVideoSettings);
+        CreateToolbarItem(_NS("Video"), _NS("Video Settings"), @"spref_cone_Video_64", showVideoSettings);
     } else if ([o_itemIdent isEqual: VLCOSDSettingToolbarIdentifier]) {
         CreateToolbarItem(_NS(SUBPIC_TITLE), _NS("Subtitle & On Screen Display Settings"), @"spref_cone_Subtitles_64", showOSDSettings);
     } else if ([o_itemIdent isEqual: VLCInputSettingToolbarIdentifier]) {
-        CreateToolbarItem(_NS(INPUT_TITLE), _NS("Input & Codec settings"), @"spref_cone_Input_64", showInputSettings);
+        CreateToolbarItem(_NS(INPUT_TITLE), _NS("Input & Codec Settings"), @"spref_cone_Input_64", showInputSettings);
     } else if ([o_itemIdent isEqual: VLCHotkeysSettingToolbarIdentifier]) {
         CreateToolbarItem(_NS("Hotkeys"), _NS("Hotkeys settings"), @"spref_cone_Hotkeys_64", showHotkeySettings);
     }
@@ -176,7 +176,7 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     /* audio */
     [o_audio_dolby_txt setStringValue: _NS("Force detection of Dolby Surround")];
     [o_audio_effects_box setTitle: _NS("Effects")];
-    [o_audio_enable_ckb setTitle: _NS("Enable Audio")];
+    [o_audio_enable_ckb setTitle: _NS("Enable audio")];
     [o_audio_general_box setTitle: _NS("General Audio")];
     [o_audio_lang_txt setStringValue: _NS("Preferred Audio language")];
     [o_audio_last_ckb setTitle: _NS("Enable Last.fm submissions")];
@@ -260,7 +260,7 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     [o_video_black_ckb setTitle: _NS("Black screens in Fullscreen mode")];
     [o_video_device_txt setStringValue: _NS("Fullscreen Video Device")];
     [o_video_display_box setTitle: _NS("Display")];
-    [o_video_enable_ckb setTitle: _NS("Enable Video")];
+    [o_video_enable_ckb setTitle: _NS("Enable video")];
     [o_video_fullscreen_ckb setTitle: _NS("Fullscreen")];
     [o_video_videodeco_ckb setTitle: _NS("Window decorations")];
     [o_video_onTop_ckb setTitle: _NS("Always on top")];
