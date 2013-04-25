@@ -42,22 +42,26 @@
 #include <libvlc.h>
 #include "aout_internal.h"
 
-static filter_t *FindFilter (vlc_object_t *obj, const char *type,
-                             const char *name,
-                             const audio_sample_format_t *infmt,
-                             const audio_sample_format_t *outfmt)
+static filter_t *CreateFilter (vlc_object_t *obj, const char *type,
+                               const char *name, bool force,
+                               const audio_sample_format_t *infmt,
+                               const audio_sample_format_t *outfmt)
 {
     filter_t *filter = vlc_custom_create (obj, sizeof (*filter), type);
     if (unlikely(filter == NULL))
         return NULL;
 
+    /*filter->p_owner not set here */
     filter->fmt_in.audio = *infmt;
     filter->fmt_in.i_codec = infmt->i_format;
     filter->fmt_out.audio = *outfmt;
     filter->fmt_out.i_codec = outfmt->i_format;
-    filter->p_module = module_need (filter, type, name, false);
+    filter->p_module = module_need (filter, type, name, force);
     if (filter->p_module == NULL)
     {
+        /* If probing failed, formats shall not have been modified. */
+        assert (AOUT_FMTS_IDENTICAL(&filter->fmt_in.audio, infmt));
+        assert (AOUT_FMTS_IDENTICAL(&filter->fmt_out.audio, outfmt));
         vlc_object_release (filter);
         filter = NULL;
     }
@@ -70,15 +74,15 @@ static filter_t *FindConverter (vlc_object_t *obj,
                                 const audio_sample_format_t *infmt,
                                 const audio_sample_format_t *outfmt)
 {
-    return FindFilter (obj, "audio converter", NULL, infmt, outfmt);
+    return CreateFilter (obj, "audio converter", NULL, false, infmt, outfmt);
 }
 
 static filter_t *FindResampler (vlc_object_t *obj,
                                 const audio_sample_format_t *infmt,
                                 const audio_sample_format_t *outfmt)
 {
-    return FindFilter (obj, "audio resampler", "$audio-resampler",
-                       infmt, outfmt);
+    return CreateFilter (obj, "audio resampler", "$audio-resampler", false,
+                         infmt, outfmt);
 }
 
 /**
@@ -327,40 +331,41 @@ vout_thread_t *aout_filter_RequestVout (filter_t *filter, vout_thread_t *vout,
                                  owner->recycle_vout);
 }
 
-static filter_t *CreateFilter (vlc_object_t *parent, const char *name,
-                               const audio_sample_format_t *restrict infmt,
-                               const audio_sample_format_t *restrict outfmt,
-                               bool visu)
+static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
+                        filter_t **filters, unsigned *count,
+                        audio_sample_format_t *restrict infmt,
+                        const audio_sample_format_t *restrict outfmt)
 {
-    filter_t *filter = vlc_custom_create (parent, sizeof (*filter),
-                                          "audio filter");
-    if (unlikely(filter == NULL))
-        return NULL;
-
-    /*filter->p_owner = NOT NEEDED;*/
-    filter->fmt_in.i_codec = infmt->i_format;
-    filter->fmt_in.audio = *infmt;
-    filter->fmt_out.i_codec = outfmt->i_format;
-    filter->fmt_out.audio = *outfmt;
-
-    if (!visu)
+    const unsigned max = AOUT_MAX_FILTERS;
+    if (*count >= max)
     {
-        filter->p_module = module_need (filter, "audio filter", name, true);
-        if (filter->p_module != NULL)
-            return filter;
-
-        /* If probing failed, formats shall not have been modified. */
-        assert (AOUT_FMTS_IDENTICAL(&filter->fmt_in.audio, infmt));
-        assert (AOUT_FMTS_IDENTICAL(&filter->fmt_out.audio, outfmt));
+        msg_Err (obj, "maximum of %u filters reached", max);
+        return -1;
     }
 
-    filter->p_module = module_need (filter, "visualization", name, true);
-    if (filter->p_module != NULL)
-        return filter;
+    filter_t *filter = CreateFilter (obj, type, name, true, infmt, outfmt);
+    if (filter == NULL)
+    {
+        msg_Err (obj, "cannot add user %s \"%s\" (skipped)", type, name);
+        return -1;
+    }
 
-    vlc_object_release (filter);
-    return NULL;
+    /* convert to the filter input format if necessary */
+    if (aout_FiltersPipelineCreate (filter, filters, count, max - 1, infmt,
+                                    &filter->fmt_in.audio))
+    {
+        msg_Err (filter, "cannot add user %s \"%s\" (skipped)", type, name);
+        module_unneed (filter, filter->p_module);
+        vlc_object_release (filter);
+        return -1;
+    }
+
+    assert (*count < max);
+    filters[(*count)++] = filter;
+    *infmt = filter->fmt_out.audio;
+    return 0;
 }
+
 
 /**
  * Sets up the audio filters.
@@ -401,74 +406,38 @@ int aout_FiltersNew (audio_output_t *aout,
         return 0;
     }
 
-    const char *scaletempo =
-        var_InheritBool (aout, "audio-time-stretch") ? "scaletempo" : NULL;
-    char *filters = var_InheritString (aout, "audio-filter");
-    char *visual = var_InheritString (aout, "audio-visual");
-    if (visual != NULL && !strcasecmp (visual, "none"))
-    {
-        free (visual);
-        visual = NULL;
-    }
-    owner->request_vout = *request_vout;
-    owner->recycle_vout = visual != NULL;
-
     /* parse user filter lists */
-    const char *list[AOUT_MAX_FILTERS];
-    unsigned n = 0;
+    if (var_InheritBool (aout, "audio-time-stretch"))
+    {
+        if (AppendFilter(VLC_OBJECT(aout), "audio filter", "scaletempo",
+                         owner->filters, &owner->nb_filters,
+                         &input_format, &output_format) == 0)
+            owner->rate_filter = owner->filters[owner->nb_filters - 1];
+    }
 
-    if (scaletempo != NULL)
-        list[n++] = scaletempo;
+    char *filters = var_InheritString (aout, "audio-filter");
     if (filters != NULL)
     {
         char *p = filters, *name;
-        while ((name = strsep (&p, " :")) != NULL && n < AOUT_MAX_FILTERS)
-            list[n++] = name;
+        while ((name = strsep (&p, " :")) != NULL)
+        {
+            AppendFilter(VLC_OBJECT(aout), "audio filter", name,
+                         owner->filters, &owner->nb_filters,
+                         &input_format, &output_format);
+        }
+        free (filters);
     }
-    if (visual != NULL && n < AOUT_MAX_FILTERS)
-        list[n++] = visual;
 
-    for (unsigned i = 0; i < n; i++)
+    char *visual = var_InheritString (aout, "audio-visual");
+    owner->request_vout = *request_vout;
+    owner->recycle_vout = visual != NULL;
+    if (visual != NULL && strcasecmp (visual, "none"))
     {
-        const char *name = list[i];
-
-        if (owner->nb_filters >= AOUT_MAX_FILTERS)
-        {
-            msg_Err (aout, "maximum of %u filters reached", AOUT_MAX_FILTERS);
-            msg_Err (aout, "cannot add user filter %s (skipped)", name);
-            break;
-        }
-
-        filter_t *filter = CreateFilter (VLC_OBJECT(aout), name,
-                                         &input_format, &output_format,
-                                         name == visual);
-        if (filter == NULL)
-        {
-            msg_Err (aout, "cannot add user filter %s (skipped)", name);
-            continue;
-        }
-
-        /* convert to the filter input format if necessary */
-        if (aout_FiltersPipelineCreate (aout, owner->filters,
-                                        &owner->nb_filters,
-                                        AOUT_MAX_FILTERS - 1,
-                                        &input_format, &filter->fmt_in.audio))
-        {
-            msg_Err (aout, "cannot add user filter %s (skipped)", name);
-            module_unneed (filter, filter->p_module);
-            vlc_object_release (filter);
-            continue;
-        }
-
-        assert (owner->nb_filters < AOUT_MAX_FILTERS);
-        owner->filters[owner->nb_filters++] = filter;
-        input_format = filter->fmt_out.audio;
-
-        if (name == scaletempo)
-            owner->rate_filter = filter;
+        AppendFilter(VLC_OBJECT(aout), "visualization", visual,
+                     owner->filters, &owner->nb_filters,
+                     &input_format, &output_format);
     }
     free (visual);
-    free (filters);
 
     /* convert to the output format (minus resampling) if necessary */
     output_format.i_rate = input_format.i_rate;
