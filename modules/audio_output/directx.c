@@ -265,110 +265,10 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
  *****************************************************************************/
 static void Probe( audio_output_t * p_aout, const audio_sample_format_t *fmt )
 {
-    vlc_value_t val, text;
-    vlc_fourcc_t i_format;
+    vlc_value_t val;
     DWORD ui_speaker_config;
-    bool is_default_output_set = false;
 
     var_Create( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-    text.psz_string = _("Audio Device");
-    var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
-
-    /* Test for 5.1 support */
-    if( fmt->i_physical_channels == AOUT_CHANS_5_1 )
-    {
-        if( CreateDSBufferPCM( p_aout, &i_format, AOUT_CHANS_5_1,
-                               fmt->i_rate, true ) == VLC_SUCCESS )
-        {
-            val.i_int = AOUT_VAR_5_1;
-            text.psz_string = (char*) "5.1";
-            var_Change( p_aout, "audio-device",
-                        VLC_VAR_ADDCHOICE, &val, &text );
-            var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
-            is_default_output_set = true;
-            msg_Dbg( p_aout, "device supports 5.1 channels" );
-        }
-    }
-
-    /* Test for 7.1 support */
-    if( fmt->i_physical_channels == AOUT_CHANS_7_1 )
-    {
-        if( CreateDSBufferPCM( p_aout, &i_format, AOUT_CHANS_7_1,
-                               fmt->i_rate, true ) == VLC_SUCCESS )
-        {
-            val.i_int = AOUT_VAR_7_1;
-            text.psz_string = (char*) "7.1";
-            var_Change( p_aout, "audio-device",
-                        VLC_VAR_ADDCHOICE, &val, &text );
-            var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
-            is_default_output_set = true;
-            msg_Dbg( p_aout, "device supports 7.1 channels" );
-        }
-    }
-
-    /* Test for 3 Front 2 Rear support */
-    if( fmt->i_physical_channels == AOUT_CHANS_5_0 )
-    {
-        if( CreateDSBufferPCM( p_aout, &i_format, AOUT_CHANS_5_0,
-                               fmt->i_rate, true ) == VLC_SUCCESS )
-        {
-            val.i_int = AOUT_VAR_3F2R;
-            text.psz_string = _("3 Front 2 Rear");
-            var_Change( p_aout, "audio-device",
-                        VLC_VAR_ADDCHOICE, &val, &text );
-            if(!is_default_output_set)
-            {
-                var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
-                is_default_output_set = true;
-            }
-            msg_Dbg( p_aout, "device supports 5 channels" );
-        }
-    }
-
-    /* Test for 2 Front 2 Rear support */
-    if( ( fmt->i_physical_channels & AOUT_CHANS_4_0 ) == AOUT_CHANS_4_0 )
-    {
-        if( CreateDSBufferPCM( p_aout, &i_format, AOUT_CHANS_4_0,
-                               fmt->i_rate, true ) == VLC_SUCCESS )
-        {
-            val.i_int = AOUT_VAR_2F2R;
-            text.psz_string = _("2 Front 2 Rear");
-            var_Change( p_aout, "audio-device",
-                        VLC_VAR_ADDCHOICE, &val, &text );
-            if(!is_default_output_set)
-            {
-                var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
-                is_default_output_set = true;
-            }
-            msg_Dbg( p_aout, "device supports 4 channels" );
-        }
-    }
-
-    /* Test for stereo support */
-    if( CreateDSBufferPCM( p_aout, &i_format, AOUT_CHANS_2_0,
-                           fmt->i_rate, true ) == VLC_SUCCESS )
-    {
-        val.i_int = AOUT_VAR_STEREO;
-        text.psz_string = _("Stereo");
-        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
-        if(!is_default_output_set)
-        {
-            var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
-            is_default_output_set = true;
-            msg_Dbg( p_aout, "device supports 2 channels (DEFAULT!)" );
-        }
-        else msg_Dbg( p_aout, "device supports 2 channels" );
-    }
-
-    /* Test for mono support */
-    if( CreateDSBufferPCM( p_aout, &i_format, AOUT_CHAN_CENTER,
-                           fmt->i_rate, true ) == VLC_SUCCESS )
-    {
-        val.i_int = AOUT_VAR_MONO;
-        text.psz_string = _("Mono");
-        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
-        msg_Dbg( p_aout, "device supports 1 channel" );
-    }
 
     /* Check the speaker configuration to determine which channel config should
      * be the default */
@@ -451,21 +351,9 @@ static void Probe( audio_output_t * p_aout, const audio_sample_format_t *fmt )
             == VLC_SUCCESS )
         {
             msg_Dbg( p_aout, "device supports A/52 over S/PDIF" );
-            val.i_int = AOUT_VAR_SPDIF;
-            text.psz_string = _("A/52 over S/PDIF");
-            var_Change( p_aout, "audio-device",
-                        VLC_VAR_ADDCHOICE, &val, &text );
             if( var_InheritBool( p_aout, "spdif" ) )
                 var_Set( p_aout, "audio-device", val );
         }
-    }
-
-    var_Change( p_aout, "audio-device", VLC_VAR_CHOICESCOUNT, &val, NULL );
-    if( val.i_int <= 0 )
-    {
-        /* Probe() has failed. */
-        var_Destroy( p_aout, "audio-device" );
-        return;
     }
 }
 
