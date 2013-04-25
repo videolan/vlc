@@ -184,7 +184,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_podcast_unsubscribe_cancel_btn setTitle: _NS("Cancel")];
 
     /* interface builder action */
-    float f_threshold_height = f_min_video_height + [[o_controls_bar bottomBarView] frame].size.height;
+    float f_threshold_height = f_min_video_height + [o_controls_bar height];
     if (b_dark_interface)
         f_threshold_height += [o_titlebar_view frame].size.height;
     if ([[self contentView] frame].size.height < f_threshold_height)
@@ -587,11 +587,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self setFrame: winrect display: YES animate: YES];
     [self performSelector:@selector(hideDropZone) withObject:nil afterDelay:0.1];
     if (b_dark_interface) {
-        [self setContentMinSize: NSMakeSize(604., [[o_controls_bar bottomBarView] frame].size.height + [o_titlebar_view frame].size.height)];
-        [self setContentMaxSize: NSMakeSize(FLT_MAX, [[o_controls_bar bottomBarView] frame].size.height + [o_titlebar_view frame].size.height)];
+        [self setContentMinSize: NSMakeSize(604., [o_controls_bar height] + [o_titlebar_view frame].size.height)];
+        [self setContentMaxSize: NSMakeSize(FLT_MAX, [o_controls_bar height] + [o_titlebar_view frame].size.height)];
     } else {
-        [self setContentMinSize: NSMakeSize(604., [[o_controls_bar bottomBarView] frame].size.height)];
-        [self setContentMaxSize: NSMakeSize(FLT_MAX, [[o_controls_bar bottomBarView] frame].size.height)];
+        [self setContentMinSize: NSMakeSize(604., [o_controls_bar height])];
+        [self setContentMaxSize: NSMakeSize(FLT_MAX, [o_controls_bar height])];
     }
 
     b_splitview_removed = YES;
@@ -1284,7 +1284,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     NSRect videoViewRect = [[self contentView] bounds];
     if (b_dark_interface)
         videoViewRect.size.height -= [o_titlebar_view frame].size.height;
-    CGFloat f_bottomBarHeight = [[[self controlsBar] bottomBarView] frame].size.height;
+    CGFloat f_bottomBarHeight = [[self controlsBar] height];
     videoViewRect.size.height -= f_bottomBarHeight;
     videoViewRect.origin.y = f_bottomBarHeight;
     [o_video_view setFrame: videoViewRect];
@@ -1294,9 +1294,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [[self contentView] addSubview: o_color_backdrop positioned: NSWindowBelow relativeTo: o_video_view];
         [o_color_backdrop setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
 
-        [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[[self controlsBar] bottomBarView] frame].size.height + [o_titlebar_view frame].size.height)];
+        [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[self controlsBar] height] + [o_titlebar_view frame].size.height)];
     } else {
-        [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[[self controlsBar] bottomBarView] frame].size.height)];
+        [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[self controlsBar] height])];
     }
 }
 
