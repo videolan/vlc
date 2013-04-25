@@ -148,7 +148,7 @@ vlc_module_begin ()
              PEAK_WIDTH_TEXT, PEAK_WIDTH_LONGTEXT, true )
     add_integer("spect-peak-height", 1,
              PEAK_HEIGHT_TEXT, PEAK_HEIGHT_LONGTEXT, true )
-    set_capability( "visualization2", 0 )
+    set_capability( "visualization", 0 )
     set_callbacks( Open, Close )
     add_shortcut( "visualizer")
 vlc_module_end ()

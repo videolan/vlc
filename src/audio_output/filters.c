@@ -354,7 +354,7 @@ static filter_t *CreateFilter (vlc_object_t *parent, const char *name,
         assert (AOUT_FMTS_IDENTICAL(&filter->fmt_out.audio, outfmt));
     }
 
-    filter->p_module = module_need (filter, "visualization2", name, true);
+    filter->p_module = module_need (filter, "visualization", name, true);
     if (filter->p_module != NULL)
         return filter;
 

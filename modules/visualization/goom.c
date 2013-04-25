@@ -58,7 +58,7 @@ vlc_module_begin ()
     set_description( N_("Goom effect") )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_VISUAL )
-    set_capability( "visualization2", 0 )
+    set_capability( "visualization", 0 )
     add_integer( "goom-width", 800,
                  WIDTH_TEXT, RES_LONGTEXT, false )
     add_integer( "goom-height", 500,

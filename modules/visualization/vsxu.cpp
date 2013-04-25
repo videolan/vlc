@@ -61,7 +61,7 @@ static void Close        ( vlc_object_t * );
 vlc_module_begin ()
     set_shortname( N_("vsxu"))
     set_description( N_("vsxu") )
-    set_capability( "visualization2", 0 )
+    set_capability( "visualization", 0 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_VISUAL )
     add_integer( "vsxu-width", 1280, WIDTH_TEXT, WIDTH_LONGTEXT,
