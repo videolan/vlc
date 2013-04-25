@@ -529,11 +529,11 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
             }
             if (fmt->i_physical_channels == 0) {
                 fmt->i_physical_channels = AOUT_CHANS_STEREO;
-                msg_Err(p_aout, "You should configure your speaker layout with Audio Midi Setup Utility in /Applications/Utilities. Now using Stereo mode.");
+                msg_Err(p_aout, "You should configure your speaker layout with Audio Midi Setup in /Applications/Utilities. VLC will output Stereo only.");
                 dialog_Fatal(p_aout, _("Audio device is not configured"), "%s",
                                 _("You should configure your speaker layout with "
-                                  "the \"Audio Midi Setup\" utility in /Applications/"
-                                  "Utilities. Stereo mode is being used now."));
+                                  "\"Audio Midi Setup\" in /Applications/"
+                                  "Utilities. VLC will output Stereo only."));
             }
         }
         free(layout);
@@ -1136,9 +1136,8 @@ static int VolumeSet(audio_output_t * p_aout, float volume)
     struct aout_sys_t *p_sys = p_aout->sys;
     OSStatus ostatus;
 
-    if(p_sys->b_digital) {
+    if(p_sys->b_digital)
         return VLC_EGENERIC;
-    }
 
     aout_VolumeReport(p_aout, volume);
 
@@ -1161,9 +1160,8 @@ static int MuteSet(audio_output_t * p_aout, bool mute)
     struct   aout_sys_t *p_sys = p_aout->sys;
     OSStatus ostatus;
 
-    if(p_sys->b_digital) {
+    if(p_sys->b_digital)
         return VLC_EGENERIC;
-    }
 
     aout_MuteReport(p_aout, mute);
 
