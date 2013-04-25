@@ -135,20 +135,6 @@ static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
     vlc_value_t val, text;
     audio_sample_format_t format = *fmt;
 
-    if( var_Get( p_aout, "audio-device", &val ) != VLC_ENOVAR )
-    {
-        /* The user has selected an audio device. */
-        if ( val.i_int == AOUT_VAR_STEREO )
-        {
-            format.i_physical_channels
-                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-        }
-        else if ( val.i_int == AOUT_VAR_MONO )
-        {
-            format.i_physical_channels = AOUT_CHAN_CENTER;
-        }
-    }
-
     psz_mode = var_InheritString( p_aout, "kai-audio-device" );
     if( !psz_mode )
         psz_mode = ( char * )ppsz_kai_audio_device[ 0 ];  // "auto"
@@ -164,13 +150,14 @@ static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
         free( psz_mode );
 
     i_nb_channels = aout_FormatNbChannels( &format );
-    if ( i_nb_channels > 2 )
+    if ( i_nb_channels >= 2 )
     {
         /* KAI doesn't support more than two channels. */
         i_nb_channels = 2;
-        format.i_physical_channels
-            = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+        format.i_physical_channels = AOUT_CHANS_STEREO;
     }
+    else
+        format.i_physical_channels = AOUT_CHAN_CENTER;
 
     /* Support S16 only */
     format.i_format = VLC_CODEC_S16N;
@@ -227,31 +214,6 @@ static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
 
     CreateBuffer( p_aout, AUDIO_BUFFER_SIZE_IN_SECONDS *
                           format.i_rate * format.i_bytes_per_frame );
-
-    if ( var_Type( p_aout, "audio-device" ) == 0 )
-    {
-        /* First launch. */
-        var_Create( p_aout, "audio-device",
-                    VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-        text.psz_string = _("Audio Device");
-        var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
-
-        val.i_int = AOUT_VAR_STEREO;
-        text.psz_string = _("Stereo");
-        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
-        val.i_int = AOUT_VAR_MONO;
-        text.psz_string = _("Mono");
-        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
-        if ( i_nb_channels == 2 )
-        {
-            val.i_int = AOUT_VAR_STEREO;
-        }
-        else
-        {
-            val.i_int = AOUT_VAR_MONO;
-        }
-        var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
-    }
 
     /* Prevent SIG_FPE */
     _control87(MCW_EM, MCW_EM);
