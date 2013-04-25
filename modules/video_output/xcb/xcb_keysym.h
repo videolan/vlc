@@ -38,7 +38,6 @@
         { XK_KP_Begin,      KEY_HOME, }, /* KP middle (5 without numlock) */
         { XK_KP_Insert,     KEY_INSERT, },
         { XK_KP_Delete,     KEY_DELETE, },
-        { XK_KP_Equal,      '=', },
         { XK_KP_Multiply,   '*', },
         { XK_KP_Add,        '+', },
         { XK_KP_Separator,  ',', },
@@ -55,6 +54,7 @@
         { XK_KP_7,          '7', },
         { XK_KP_8,          '8', },
         { XK_KP_9,          '9', },
+        { XK_KP_Equal,      '=', },
 
         { XK_F1,            KEY_F1, },
         { XK_F2,            KEY_F2, },
