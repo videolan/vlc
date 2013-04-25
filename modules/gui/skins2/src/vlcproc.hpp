@@ -166,7 +166,6 @@ private:
     vout_thread_t *m_pVout;
     /// Audio output
     audio_output_t *m_pAout;
-    bool m_bEqualizer_started;
 
     // reset variables when input is over
     void reset_input();
