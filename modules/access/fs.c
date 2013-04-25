@@ -39,7 +39,7 @@
 
 static const char *const psz_recursive_list[] = { "none", "collapse", "expand" };
 static const char *const psz_recursive_list_text[] = {
-    N_("none"), N_("collapse"), N_("expand") };
+    N_("None"), N_("Collapse"), N_("Expand") };
 
 #define IGNORE_TEXT N_("Ignored extensions")
 #define IGNORE_LONGTEXT N_( \

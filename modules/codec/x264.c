@@ -428,12 +428,12 @@ static const char *const bpyramid_list[] =
 static const char *const enc_analyse_list[] =
   { "none", "fast", "normal", "slow", "all" };
 static const char *const enc_analyse_list_text[] =
-  { N_("none"), N_("fast"), N_("normal"), N_("slow"), N_("all") };
+  { N_("None"), N_("Fast"), N_("Normal"), N_("Slow"), N_("All") };
 
 static const char *const direct_pred_list[] =
   { "none", "spatial", "temporal", "auto" };
 static const char *const direct_pred_list_text[] =
-  { N_("none"), N_("spatial"), N_("temporal"), N_("auto") };
+  { N_("None"), N_("Spatial"), N_("Temporal"), N_("Auto") };
 
 static const int const framepacking_list[] =
   { -1, 0, 1, 2, 3, 4, 5 };

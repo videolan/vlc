@@ -76,7 +76,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict );
 static const char *const enc_prefilter_list[] =
   { "none", "cwm", "rectlp", "diaglp" };
 static const char *const enc_prefilter_list_text[] =
-  { N_("none"), N_("Centre Weighted Median"),
+  { N_("None"), N_("Centre Weighted Median"),
     N_("Rectangular Linear Phase"), N_("Diagonal Linear Phase") };
 
 #define ENC_PREFILTER_STRENGTH "prefilter-strength"
