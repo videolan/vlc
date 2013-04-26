@@ -18,6 +18,10 @@ aout_MuteGet
 aout_DeviceGet
 aout_DeviceSet
 aout_DevicesList
+aout_FiltersNew
+aout_FiltersDelete
+aout_FiltersPlay
+aout_FiltersAdjustResampling
 block_Alloc
 block_FifoCount
 block_FifoEmpty

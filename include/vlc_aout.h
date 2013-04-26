@@ -317,8 +317,22 @@ static inline int aout_ChannelsRestart (vlc_object_t *obj, const char *varname,
     return 0;
 }
 
+/* Audio output filters */
+typedef struct aout_filters aout_filters_t;
+typedef struct aout_request_vout aout_request_vout_t;
 
-/* */
+VLC_API aout_filters_t *aout_FiltersNew(vlc_object_t *,
+                                        const audio_sample_format_t *,
+                                        const audio_sample_format_t *,
+                                        const aout_request_vout_t *) VLC_USED;
+#define aout_FiltersNew(o,inf,outf,rv) \
+        aout_FiltersNew(VLC_OBJECT(o),inf,outf,rv)
+VLC_API void aout_FiltersDelete(vlc_object_t *, aout_filters_t *);
+#define aout_FiltersDelete(o,f) \
+        aout_FiltersDelete(VLC_OBJECT(o),f)
+VLC_API bool aout_FiltersAdjustResampling(aout_filters_t *, int);
+VLC_API block_t *aout_FiltersPlay(aout_filters_t *, block_t *, int rate);
+
 VLC_API vout_thread_t * aout_filter_RequestVout( filter_t *, vout_thread_t *p_vout, video_format_t *p_fmt );
 
 #endif /* VLC_AOUT_H */

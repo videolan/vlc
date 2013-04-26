@@ -35,14 +35,13 @@ enum {
     AOUT_RESAMPLING_DOWN
 };
 
-typedef struct
+struct aout_request_vout
 {
     struct vout_thread_t  *(*pf_request_vout)( void *, struct vout_thread_t *,
                                                video_format_t *, bool );
     void *p_private;
-} aout_request_vout_t;
+};
 
-typedef struct aout_filters aout_filters_t;
 typedef struct aout_volume aout_volume_t;
 typedef struct aout_dev aout_dev_t;
 
@@ -99,18 +98,6 @@ static inline aout_owner_t *aout_owner (audio_output_t *aout)
 /****************************************************************************
  * Prototypes
  *****************************************************************************/
-
-/* From filters.c : */
-aout_filters_t *aout_FiltersNew(vlc_object_t *, const audio_sample_format_t *,
-                                const audio_sample_format_t *,
-                                const aout_request_vout_t *);
-#define aout_FiltersNew(o,inf,outf,rv) \
-        aout_FiltersNew(VLC_OBJECT(o),inf,outf,rv)
-void aout_FiltersDelete(vlc_object_t *, aout_filters_t *);
-#define aout_FiltersDelete(o,f) \
-        aout_FiltersDelete(VLC_OBJECT(o),f)
-bool aout_FiltersAdjustResampling(aout_filters_t *, int);
-block_t *aout_FiltersPlay(aout_filters_t *, block_t *, int rate);
 
 /* From mixer.c : */
 aout_volume_t *aout_volume_New(vlc_object_t *, const audio_replay_gain_t *);
