@@ -71,10 +71,6 @@
     IBOutlet id o_input_cachelevel_txt;
     IBOutlet id o_input_cachelevel_custom_txt;
     IBOutlet id o_input_caching_box;
-    IBOutlet id o_input_httpproxy_fld;
-    IBOutlet id o_input_httpproxy_txt;
-    IBOutlet id o_input_httpproxypwd_sfld;
-    IBOutlet id o_input_httpproxypwd_txt;
     IBOutlet id o_input_mux_box;
     IBOutlet id o_input_net_box;
     IBOutlet id o_input_avcodec_hw_txt;

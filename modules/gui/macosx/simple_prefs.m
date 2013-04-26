@@ -205,8 +205,6 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     [o_input_cachelevel_txt setStringValue: _NS("Default Caching Level")];
     [o_input_caching_box setTitle: _NS("Caching")];
     [o_input_cachelevel_custom_txt setStringValue: _NS("Use the complete preferences to configure custom caching values for each access module.")];
-    [o_input_httpproxy_txt setStringValue: _NS("HTTP Proxy")];
-    [o_input_httpproxypwd_txt setStringValue: _NS("Password for HTTP Proxy")];
     [o_input_mux_box setTitle: _NS("Codecs / Muxers")];
     [o_input_net_box setTitle: _NS("Network")];
     [o_input_avcodec_hw_txt setStringValue: _NS("Hardware Acceleration")];
@@ -548,8 +546,6 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
      * input & codecs settings *
      ***************************/
     [self setupField: o_input_record_fld forOption:"input-record-path"];
-    [self setupField: o_input_httpproxy_fld forOption:"http-proxy"];
-    [self setupField: o_input_httpproxypwd_sfld forOption:"http-proxy-pwd"];
     [o_input_postproc_fld setIntValue: config_GetInt(p_intf, "postproc-q")];
     [o_input_postproc_fld setToolTip: _NS(config_GetLabel(p_intf, "postproc-q"))];
     [self setupButton: o_input_avcodec_hw_pop forModuleList: "avcodec-hw"];
@@ -885,8 +881,6 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
      ***************************/
     if (b_inputSettingChanged) {
         config_PutPsz(p_intf, "input-record-path", [[o_input_record_fld stringValue] UTF8String]);
-        config_PutPsz(p_intf, "http-proxy", [[o_input_httpproxy_fld stringValue] UTF8String]);
-        config_PutPsz(p_intf, "http-proxy-pwd", [[o_input_httpproxypwd_sfld stringValue] UTF8String]);
         config_PutInt(p_intf, "postproc-q", [o_input_postproc_fld intValue]);
 
         SaveIntList(o_input_avi_pop, "avi-index");
@@ -1086,8 +1080,6 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
        notificationObject == o_audio_vol_fld)
         b_audioSettingChanged = YES;
     else if (notificationObject == o_input_record_fld ||
-             notificationObject == o_input_httpproxy_fld ||
-            notificationObject == o_input_httpproxypwd_sfld ||
             notificationObject == o_input_postproc_fld)
         b_inputSettingChanged = YES;
     else if (notificationObject == o_osd_font_fld ||
