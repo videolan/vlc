@@ -84,8 +84,9 @@ int aout_DecNew( audio_output_t *p_aout,
     aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
 
     /* Create the audio filtering "input" pipeline */
-    if (aout_FiltersNew (p_aout, p_format, &owner->mixer_format,
-                         p_request_vout))
+    owner->filters = aout_FiltersNew (p_aout, p_format, &owner->mixer_format,
+                                      p_request_vout);
+    if (owner->filters == NULL)
     {
         aout_OutputDelete (p_aout);
 error:
@@ -113,7 +114,7 @@ void aout_DecDelete (audio_output_t *aout)
     aout_OutputLock (aout);
     if (owner->mixer_format.i_format)
     {
-        aout_FiltersDelete (aout);
+        aout_FiltersDelete (aout, owner->filters);
         aout_OutputDelete (aout);
     }
     aout_volume_Delete (owner->volume);
@@ -131,7 +132,7 @@ static int aout_CheckReady (audio_output_t *aout)
         const aout_request_vout_t request_vout = owner->request_vout;
 
         if (owner->mixer_format.i_format)
-            aout_FiltersDelete (aout);
+            aout_FiltersDelete (aout, owner->filters);
 
         if (restart & AOUT_RESTART_OUTPUT)
         {   /* Reinitializes the output */
@@ -149,12 +150,16 @@ static int aout_CheckReady (audio_output_t *aout)
         owner->sync.end = VLC_TS_INVALID;
         owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
 
-        if (owner->mixer_format.i_format
-         && aout_FiltersNew (aout, &owner->input_format, &owner->mixer_format,
-                             &request_vout))
+        if (owner->mixer_format.i_format)
         {
-            aout_OutputDelete (aout);
-            owner->mixer_format.i_format = 0;
+            owner->filters = aout_FiltersNew (aout, &owner->input_format,
+                                              &owner->mixer_format,
+                                              &request_vout);
+            if (owner->filters == NULL)
+            {
+                aout_OutputDelete (aout);
+                owner->mixer_format.i_format = 0;
+            }
         }
     }
     return (owner->mixer_format.i_format) ? 0 : -1;
@@ -208,7 +213,7 @@ static void aout_StopResampling (audio_output_t *aout)
     aout_owner_t *owner = aout_owner (aout);
 
     owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
-    aout_FiltersAdjustResampling (aout, 0);
+    aout_FiltersAdjustResampling (owner->filters, 0);
 }
 
 static void aout_DecSilence (audio_output_t *aout, mtime_t length, mtime_t pts)
@@ -342,7 +347,7 @@ static void aout_DecSynchronize (audio_output_t *aout, mtime_t dec_pts,
          * value, then it is time to switch back the resampling direction. */
         adj *= -1;
 
-    if (!aout_FiltersAdjustResampling (aout, adj))
+    if (!aout_FiltersAdjustResampling (owner->filters, adj))
     {   /* Everything is back to normal: stop resampling. */
         owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
         msg_Dbg (aout, "resampling stopped (drift: %"PRId64" us)", drift);
@@ -384,7 +389,7 @@ int aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
     if (block->i_flags & BLOCK_FLAG_DISCONTINUITY)
         owner->sync.discontinuity = true;
 
-    block = aout_FiltersPlay (aout, block, input_rate);
+    block = aout_FiltersPlay (owner->filters, block, input_rate);
     if (block == NULL)
         goto lost;
 

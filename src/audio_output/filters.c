@@ -272,6 +272,18 @@ static block_t *aout_FiltersPipelinePlay(filter_t *const *filters,
     return block;
 }
 
+struct aout_filters
+{
+    filter_t *rate_filter; /**< The filter adjusting samples count
+        (either the scaletempo filter or a resampler) */
+    filter_t *resampler; /**< The resampler */
+    int resampling; /**< Current resampling (Hz) */
+
+    unsigned count; /**< Number of filters */
+    filter_t *tab[AOUT_MAX_FILTERS]; /**< Configured user filters
+        (e.g. equalization) and their conversions */
+};
+
 /** Callback for visualization selection */
 static int VisualizationCallback (vlc_object_t *obj, const char *var,
                                   vlc_value_t oldval, vlc_value_t newval,
@@ -332,12 +344,12 @@ vout_thread_t *aout_filter_RequestVout (filter_t *filter, vout_thread_t *vout,
 }
 
 static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
-                        filter_t **filters, unsigned *count,
+                        aout_filters_t *restrict filters,
                         audio_sample_format_t *restrict infmt,
                         const audio_sample_format_t *restrict outfmt)
 {
-    const unsigned max = AOUT_MAX_FILTERS;
-    if (*count >= max)
+    const unsigned max = sizeof (filters->tab) / sizeof (filters->tab[0]);
+    if (filters->count >= max)
     {
         msg_Err (obj, "maximum of %u filters reached", max);
         return -1;
@@ -351,8 +363,8 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
     }
 
     /* convert to the filter input format if necessary */
-    if (aout_FiltersPipelineCreate (filter, filters, count, max - 1, infmt,
-                                    &filter->fmt_in.audio))
+    if (aout_FiltersPipelineCreate (filter, filters->tab, &filters->count,
+                                    max - 1, infmt, &filter->fmt_in.audio))
     {
         msg_Err (filter, "cannot add user %s \"%s\" (skipped)", type, name);
         module_unneed (filter, filter->p_module);
@@ -360,8 +372,9 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
         return -1;
     }
 
-    assert (*count < max);
-    filters[(*count)++] = filter;
+    assert (filters->count < max);
+    filters->tab[filters->count] = filter;
+    filters->count++;
     *infmt = filter->fmt_out.audio;
     return 0;
 }
@@ -370,11 +383,20 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
 /**
  * Sets up the audio filters.
  */
-int aout_FiltersNew (audio_output_t *aout,
-                     const audio_sample_format_t *restrict infmt,
-                     const audio_sample_format_t *restrict outfmt,
-                     const aout_request_vout_t *request_vout)
+aout_filters_t *aout_FiltersNew (audio_output_t *aout,
+                                 const audio_sample_format_t *restrict infmt,
+                                 const audio_sample_format_t *restrict outfmt,
+                                 const aout_request_vout_t *request_vout)
 {
+    aout_filters_t *filters = malloc (sizeof (*filters));
+    if (unlikely(filters == NULL))
+        return NULL;
+
+    filters->rate_filter = NULL;
+    filters->resampler = NULL;
+    filters->resampling = 0;
+    filters->count = 0;
+
     aout_owner_t *owner = aout_owner (aout);
 
     /* Prepare format structure */
@@ -383,10 +405,6 @@ int aout_FiltersNew (audio_output_t *aout,
     audio_sample_format_t output_format = *outfmt;
 
     /* Now add user filters */
-    owner->nb_filters = 0;
-    owner->rate_filter = NULL;
-    owner->resampler = NULL;
-
     var_AddCallback (aout, "visual", VisualizationCallback, NULL);
     var_AddCallback (aout, "equalizer", EqualizerCallback, NULL);
 
@@ -395,37 +413,35 @@ int aout_FiltersNew (audio_output_t *aout,
         if (!AOUT_FMTS_IDENTICAL(infmt, outfmt))
         {
             aout_FormatsPrint (aout, "pass-through:", infmt, outfmt);
-            owner->filters[0] = FindConverter(VLC_OBJECT(aout), infmt, outfmt);
-            if (owner->filters[0] == NULL)
+            filters->tab[0] = FindConverter(VLC_OBJECT(aout), infmt, outfmt);
+            if (filters->tab[0] == NULL)
             {
                 msg_Err (aout, "cannot setup pass-through");
                 goto error;
             }
-            owner->nb_filters++;
+            filters->count++;
         }
-        return 0;
+        return filters;
     }
 
     /* parse user filter lists */
     if (var_InheritBool (aout, "audio-time-stretch"))
     {
         if (AppendFilter(VLC_OBJECT(aout), "audio filter", "scaletempo",
-                         owner->filters, &owner->nb_filters,
-                         &input_format, &output_format) == 0)
-            owner->rate_filter = owner->filters[owner->nb_filters - 1];
+                         filters, &input_format, &output_format) == 0)
+            filters->rate_filter = filters->tab[filters->count - 1];
     }
 
-    char *filters = var_InheritString (aout, "audio-filter");
-    if (filters != NULL)
+    char *str = var_InheritString (aout, "audio-filter");
+    if (str != NULL)
     {
-        char *p = filters, *name;
+        char *p = str, *name;
         while ((name = strsep (&p, " :")) != NULL)
         {
-            AppendFilter(VLC_OBJECT(aout), "audio filter", name,
-                         owner->filters, &owner->nb_filters,
+            AppendFilter(VLC_OBJECT(aout), "audio filter", name, filters,
                          &input_format, &output_format);
         }
-        free (filters);
+        free (str);
     }
 
     char *visual = var_InheritString (aout, "audio-visual");
@@ -433,17 +449,15 @@ int aout_FiltersNew (audio_output_t *aout,
     owner->recycle_vout = visual != NULL;
     if (visual != NULL && strcasecmp (visual, "none"))
     {
-        AppendFilter(VLC_OBJECT(aout), "visualization", visual,
-                     owner->filters, &owner->nb_filters,
+        AppendFilter(VLC_OBJECT(aout), "visualization", visual, filters,
                      &input_format, &output_format);
     }
     free (visual);
 
     /* convert to the output format (minus resampling) if necessary */
     output_format.i_rate = input_format.i_rate;
-    if (aout_FiltersPipelineCreate (aout, owner->filters, &owner->nb_filters,
-                                    AOUT_MAX_FILTERS,
-                                    &input_format, &output_format))
+    if (aout_FiltersPipelineCreate (aout, filters->tab, &filters->count,
+                              AOUT_MAX_FILTERS, &input_format, &output_format))
     {
         msg_Err (aout, "cannot setup filtering pipeline");
         goto error;
@@ -453,36 +467,36 @@ int aout_FiltersNew (audio_output_t *aout,
     /* insert the resampler */
     output_format.i_rate = outfmt->i_rate;
     assert (AOUT_FMTS_IDENTICAL(&output_format, outfmt));
-    owner->resampler = FindResampler (VLC_OBJECT(aout), &input_format,
-                                      &output_format);
-    if (owner->resampler == NULL && input_format.i_rate != outfmt->i_rate)
+    filters->resampler = FindResampler (VLC_OBJECT(aout), &input_format,
+                                        &output_format);
+    if (filters->resampler == NULL && input_format.i_rate != outfmt->i_rate)
     {
         msg_Err (aout, "cannot setup a resampler");
         goto error;
     }
-    if (owner->rate_filter == NULL)
-        owner->rate_filter = owner->resampler;
-    owner->resampling = 0;
+    if (filters->rate_filter == NULL)
+        filters->rate_filter = filters->resampler;
 
-    return 0;
+    return filters;
 
 error:
-    aout_FiltersPipelineDestroy (owner->filters, owner->nb_filters);
+    aout_FiltersPipelineDestroy (filters->tab, filters->count);
     var_DelCallback (aout, "equalizer", EqualizerCallback, NULL);
     var_DelCallback (aout, "visual", VisualizationCallback, NULL);
-    return -1;
+    free (filters);
+    return NULL;
 }
 
 /**
  * Destroys the audio filters.
  */
-void aout_FiltersDelete (audio_output_t *aout)
+void aout_FiltersDelete (audio_output_t *aout, aout_filters_t *filters)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    if (owner->resampler != NULL)
-        aout_FiltersPipelineDestroy (&owner->resampler, 1);
-    aout_FiltersPipelineDestroy (owner->filters, owner->nb_filters);
+    if (filters->resampler != NULL)
+        aout_FiltersPipelineDestroy (&filters->resampler, 1);
+    aout_FiltersPipelineDestroy (filters->tab, filters->count);
     var_DelCallback (aout, "equalizer", EqualizerCallback, NULL);
     var_DelCallback (aout, "visual", VisualizationCallback, NULL);
 
@@ -494,30 +508,29 @@ void aout_FiltersDelete (audio_output_t *aout)
     char *visual = var_InheritString (aout, "audio-visual");
     owner->recycle_vout = (visual != NULL) && *visual;
     free (visual);
+
+    free (filters);
 }
 
-bool aout_FiltersAdjustResampling (audio_output_t *aout, int adjust)
+bool aout_FiltersAdjustResampling (aout_filters_t *filters, int adjust)
 {
-    aout_owner_t *owner = aout_owner (aout);
-
-    if (owner->resampler == NULL)
+    if (filters->resampler == NULL)
         return false;
 
     if (adjust)
-        owner->resampling += adjust;
+        filters->resampling += adjust;
     else
-        owner->resampling = 0;
-    return owner->resampling != 0;
+        filters->resampling = 0;
+    return filters->resampling != 0;
 }
 
-block_t *aout_FiltersPlay (audio_output_t *aout, block_t *block, int rate)
+block_t *aout_FiltersPlay (aout_filters_t *filters, block_t *block, int rate)
 {
-    aout_owner_t *owner = aout_owner (aout);
     int nominal_rate = 0;
 
     if (rate != INPUT_RATE_DEFAULT)
     {
-        filter_t *rate_filter = owner->rate_filter;
+        filter_t *rate_filter = filters->rate_filter;
 
         if (rate_filter == NULL)
             goto drop; /* Without linear, non-nominal rate is impossible. */
@@ -528,20 +541,19 @@ block_t *aout_FiltersPlay (audio_output_t *aout, block_t *block, int rate)
             (nominal_rate * INPUT_RATE_DEFAULT) / rate;
     }
 
-    block = aout_FiltersPipelinePlay (owner->filters, owner->nb_filters,
-                                      block);
-    if (owner->resampler != NULL)
+    block = aout_FiltersPipelinePlay (filters->tab, filters->count, block);
+    if (filters->resampler != NULL)
     {   /* NOTE: the resampler needs to run even if resampling is 0.
          * The decoder and output rates can still be different. */
-        owner->resampler->fmt_in.audio.i_rate += owner->resampling;
-        block = aout_FiltersPipelinePlay (&owner->resampler, 1, block);
-        owner->resampler->fmt_in.audio.i_rate -= owner->resampling;
+        filters->resampler->fmt_in.audio.i_rate += filters->resampling;
+        block = aout_FiltersPipelinePlay (&filters->resampler, 1, block);
+        filters->resampler->fmt_in.audio.i_rate -= filters->resampling;
     }
 
     if (nominal_rate != 0)
     {   /* Restore input rate */
-        assert (owner->rate_filter != NULL);
-        owner->rate_filter->fmt_in.audio.i_rate = nominal_rate;
+        assert (filters->rate_filter != NULL);
+        filters->rate_filter->fmt_in.audio.i_rate = nominal_rate;
     }
     return block;
 

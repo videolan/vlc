@@ -44,6 +44,7 @@ typedef struct
     void *p_private;
 } aout_request_vout_t;
 
+typedef struct aout_filters aout_filters_t;
 typedef struct aout_volume aout_volume_t;
 typedef struct aout_dev aout_dev_t;
 
@@ -51,6 +52,7 @@ typedef struct
 {
     vlc_mutex_t lock;
     module_t *module; /**< Output plugin (or NULL if inactive) */
+    aout_filters_t *filters;
     aout_volume_t *volume;
 
     struct
@@ -79,14 +81,6 @@ typedef struct
     audio_sample_format_t input_format;
     audio_sample_format_t mixer_format;
 
-    filter_t *rate_filter; /**< The filter adjusting samples count
-        (either the scaletempo filter or a resampler) */
-    filter_t *resampler; /**< The resampler */
-    int resampling; /**< Current resampling (Hz) */
-    unsigned nb_filters;
-    filter_t *filters[AOUT_MAX_FILTERS]; /**< Configured user filters
-        (e.g. equalization) and their conversions */
-
     aout_request_vout_t request_vout;
     bool recycle_vout;
 
@@ -110,11 +104,13 @@ static inline aout_owner_t *aout_owner (audio_output_t *aout)
  *****************************************************************************/
 
 /* From filters.c : */
-int aout_FiltersNew(audio_output_t *, const audio_sample_format_t *,
-                   const audio_sample_format_t *, const aout_request_vout_t *);
-void aout_FiltersDelete(audio_output_t *);
-bool aout_FiltersAdjustResampling(audio_output_t *, int);
-block_t *aout_FiltersPlay(audio_output_t *, block_t *, int rate);
+aout_filters_t *aout_FiltersNew(audio_output_t *,
+                               const audio_sample_format_t *,
+                               const audio_sample_format_t *,
+                               const aout_request_vout_t *);
+void aout_FiltersDelete(audio_output_t *, aout_filters_t *);
+bool aout_FiltersAdjustResampling(aout_filters_t *, int);
+block_t *aout_FiltersPlay(aout_filters_t *, block_t *, int rate);
 
 /* From mixer.c : */
 aout_volume_t *aout_volume_New(vlc_object_t *, const audio_replay_gain_t *);
