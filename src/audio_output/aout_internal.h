@@ -29,8 +29,6 @@
 /* Max input rate factor (1/4 -> 4) */
 # define AOUT_MAX_INPUT_RATE (4)
 
-# define AOUT_MAX_FILTERS 10
-
 enum {
     AOUT_RESAMPLING_NONE=0,
     AOUT_RESAMPLING_UP,
@@ -103,11 +101,14 @@ static inline aout_owner_t *aout_owner (audio_output_t *aout)
  *****************************************************************************/
 
 /* From filters.c : */
-aout_filters_t *aout_FiltersNew(audio_output_t *,
-                               const audio_sample_format_t *,
-                               const audio_sample_format_t *,
-                               const aout_request_vout_t *);
-void aout_FiltersDelete(audio_output_t *, aout_filters_t *);
+aout_filters_t *aout_FiltersNew(vlc_object_t *, const audio_sample_format_t *,
+                                const audio_sample_format_t *,
+                                const aout_request_vout_t *);
+#define aout_FiltersNew(o,inf,outf,rv) \
+        aout_FiltersNew(VLC_OBJECT(o),inf,outf,rv)
+void aout_FiltersDelete(vlc_object_t *, aout_filters_t *);
+#define aout_FiltersDelete(o,f) \
+        aout_FiltersDelete(VLC_OBJECT(o),f)
 bool aout_FiltersAdjustResampling(aout_filters_t *, int);
 block_t *aout_FiltersPlay(aout_filters_t *, block_t *, int rate);
 
