@@ -78,6 +78,7 @@ int aout_DecNew( audio_output_t *p_aout,
     atomic_store (&owner->restart, 0);
     owner->input_format = *p_format;
     owner->mixer_format = owner->input_format;
+    owner->request_vout = *p_request_vout;
 
     if (aout_OutputNew (p_aout, &owner->mixer_format))
         goto error;
@@ -85,7 +86,7 @@ int aout_DecNew( audio_output_t *p_aout,
 
     /* Create the audio filtering "input" pipeline */
     owner->filters = aout_FiltersNew (p_aout, p_format, &owner->mixer_format,
-                                      p_request_vout);
+                                      &owner->request_vout);
     if (owner->filters == NULL)
     {
         aout_OutputDelete (p_aout);
@@ -129,8 +130,6 @@ static int aout_CheckReady (audio_output_t *aout)
     int restart = atomic_exchange (&owner->restart, 0);
     if (unlikely(restart))
     {
-        const aout_request_vout_t request_vout = owner->request_vout;
-
         if (owner->mixer_format.i_format)
             aout_FiltersDelete (aout, owner->filters);
 
@@ -154,7 +153,7 @@ static int aout_CheckReady (audio_output_t *aout)
         {
             owner->filters = aout_FiltersNew (aout, &owner->input_format,
                                               &owner->mixer_format,
-                                              &request_vout);
+                                              &owner->request_vout);
             if (owner->filters == NULL)
             {
                 aout_OutputDelete (aout);

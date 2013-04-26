@@ -43,7 +43,7 @@
 #include "aout_internal.h"
 
 static filter_t *CreateFilter (vlc_object_t *obj, const char *type,
-                               const char *name,
+                               const char *name, filter_owner_sys_t *owner,
                                const audio_sample_format_t *infmt,
                                const audio_sample_format_t *outfmt)
 {
@@ -51,7 +51,7 @@ static filter_t *CreateFilter (vlc_object_t *obj, const char *type,
     if (unlikely(filter == NULL))
         return NULL;
 
-    /*filter->p_owner not set here */
+    filter->p_owner = owner;
     filter->fmt_in.audio = *infmt;
     filter->fmt_in.i_codec = infmt->i_format;
     filter->fmt_out.audio = *outfmt;
@@ -74,14 +74,14 @@ static filter_t *FindConverter (vlc_object_t *obj,
                                 const audio_sample_format_t *infmt,
                                 const audio_sample_format_t *outfmt)
 {
-    return CreateFilter (obj, "audio converter", NULL, infmt, outfmt);
+    return CreateFilter (obj, "audio converter", NULL, NULL, infmt, outfmt);
 }
 
 static filter_t *FindResampler (vlc_object_t *obj,
                                 const audio_sample_format_t *infmt,
                                 const audio_sample_format_t *outfmt)
 {
-    return CreateFilter (obj, "audio resampler", "$audio-resampler",
+    return CreateFilter (obj, "audio resampler", "$audio-resampler", NULL,
                          infmt, outfmt);
 }
 
@@ -332,19 +332,19 @@ static int EqualizerCallback (vlc_object_t *obj, const char *var,
 vout_thread_t *aout_filter_RequestVout (filter_t *filter, vout_thread_t *vout,
                                         video_format_t *fmt)
 {
-    /* NOTE: This only works from audio output.
+    /* NOTE: This only works from aout_filters_t.
      * If you want to use visualization filters from another place, you will
      * need to add a new pf_aout_request_vout callback or store a pointer
      * to aout_request_vout_t inside filter_t (i.e. a level of indirection). */
     aout_owner_t *owner = aout_owner ((audio_output_t *)filter->p_parent);
-    aout_request_vout_t *req = &owner->request_vout;
+    const aout_request_vout_t *req = (void *)filter->p_owner;
 
     return req->pf_request_vout (req->p_private, vout, fmt,
                                  owner->recycle_vout);
 }
 
 static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
-                        aout_filters_t *restrict filters,
+                        aout_filters_t *restrict filters, const void *owner,
                         audio_sample_format_t *restrict infmt,
                         const audio_sample_format_t *restrict outfmt)
 {
@@ -355,7 +355,8 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
         return -1;
     }
 
-    filter_t *filter = CreateFilter (obj, type, name, infmt, outfmt);
+    filter_t *filter = CreateFilter (obj, type, name,
+                                     (void *)owner, infmt, outfmt);
     if (filter == NULL)
     {
         msg_Err (obj, "cannot add user %s \"%s\" (skipped)", type, name);
@@ -428,7 +429,7 @@ aout_filters_t *aout_FiltersNew (audio_output_t *aout,
     if (var_InheritBool (aout, "audio-time-stretch"))
     {
         if (AppendFilter(VLC_OBJECT(aout), "audio filter", "scaletempo",
-                         filters, &input_format, &output_format) == 0)
+                         filters, NULL, &input_format, &output_format) == 0)
             filters->rate_filter = filters->tab[filters->count - 1];
     }
 
@@ -439,18 +440,17 @@ aout_filters_t *aout_FiltersNew (audio_output_t *aout,
         while ((name = strsep (&p, " :")) != NULL)
         {
             AppendFilter(VLC_OBJECT(aout), "audio filter", name, filters,
-                         &input_format, &output_format);
+                         NULL, &input_format, &output_format);
         }
         free (str);
     }
 
     char *visual = var_InheritString (aout, "audio-visual");
-    owner->request_vout = *request_vout;
     owner->recycle_vout = visual != NULL;
     if (visual != NULL && strcasecmp (visual, "none"))
     {
         AppendFilter(VLC_OBJECT(aout), "visualization", visual, filters,
-                     &input_format, &output_format);
+                     request_vout, &input_format, &output_format);
     }
     free (visual);
 
