@@ -125,7 +125,7 @@ static int Open( vlc_object_t *p_this )
 
     p_playlist = pl_Get( p_intf );
     var_AddCallback( p_playlist, "item-change", ItemChange, p_intf );
-    var_AddCallback( p_playlist, "item-current", ItemChange, p_intf );
+    var_AddCallback( p_playlist, "activity", ItemChange, p_intf );
 
     [p_sys->o_growl_delegate registerToGrowl];
     return VLC_SUCCESS;
@@ -141,7 +141,7 @@ static void Close( vlc_object_t *p_this )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
-    var_DelCallback( p_playlist, "item-current", ItemChange, p_intf );
+    var_DelCallback( p_playlist, "activity", ItemChange, p_intf );
 
     [p_sys->o_growl_delegate release];
     free( p_sys );
@@ -162,7 +162,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     char *psz_album         = NULL;
     input_item_t *p_item = newval.p_address;
 
-    bool b_is_item_current = !strcmp( "item-current", psz_var );
+    bool b_is_item_current = !strcmp( "activity", psz_var );
 
     /* Don't update each time an item has been preparsed */
     if( b_is_item_current )
