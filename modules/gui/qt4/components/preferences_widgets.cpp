@@ -1428,6 +1428,10 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
     buttonBox->addButton( cancel, QDialogButtonBox::RejectRole );
     ok->setDefault( true );
 
+    ok->setFocusPolicy(Qt::NoFocus);
+    unset->setFocusPolicy(Qt::NoFocus);
+    cancel->setFocusPolicy(Qt::NoFocus);
+
     vLayout->addWidget( buttonBox );
     ok->hide();
 
