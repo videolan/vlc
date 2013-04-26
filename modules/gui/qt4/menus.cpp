@@ -709,8 +709,7 @@ QMenu *VLCMenuBar::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     submenu->setTearOffEnabled( true );
     addActionWithSubmenu( menu, "program", qtr( "&Program" ) );
 
-    /* FixMe: sync I_MENU_BOOKMARK string */
-    submenu = new QMenu( qtr( "Custom &Bookmarks" ), menu );
+    submenu = new QMenu( qtr( I_MENU_BOOKMARK ), menu );
     submenu->setTearOffEnabled( true );
     addDPStaticEntry( submenu, qtr( "&Manage" ), "",
                       SLOT( bookmarksDialog() ), "Ctrl+B" );
@@ -913,7 +912,7 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
 void VLCMenuBar::PopupMenuStaticEntries( QMenu *menu )
 {
     QMenu *openmenu = new QMenu( qtr( "Open Media" ), menu );
-    addDPStaticEntry( openmenu, qtr( "&Open File..." ),
+    addDPStaticEntry( openmenu, qtr( I_OP_OPF ),
         ":/type/file-asym", SLOT( openFileDialog() ) );
     addDPStaticEntry( openmenu, qtr( I_OP_OPDIR ),
         ":/type/folder-grey", SLOT( PLOpenDir() ) );

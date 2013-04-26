@@ -931,7 +931,7 @@
        <item row="2" column="0" colspan="2">
         <widget class="QCheckBox" name="puzzleBlackSlotCheck">
          <property name="text">
-          <string>Black slot</string>
+          <string>Black Slot</string>
          </property>
         </widget>
        </item>

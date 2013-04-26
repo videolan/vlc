@@ -321,7 +321,6 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
     "tradeoffs involved in the motion estimation decision process " \
     "(lower = quicker and higher = better quality). Range 1 to 9." )
 
-#define B_RDO_TEXT N_("RD based mode decision for B-frames")
 #define B_RDO_LONGTEXT N_( "RD based mode decision for B-frames. This " \
     "requires subme 6 (or higher).")
 
@@ -334,7 +333,6 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 #define CHROMA_ME_LONGTEXT N_( "Chroma ME for subpel and mode decision in " \
     "P-frames.")
 
-#define BIME_TEXT N_("Jointly optimize both MVs in B-frames")
 #define BIME_LONGTEXT N_( "Joint bidirectional motion refinement.")
 
 #define TRANSFORM_8X8DCT_TEXT N_("Adaptive spatial transform size")

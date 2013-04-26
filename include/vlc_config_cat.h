@@ -118,7 +118,6 @@
 #define SDEC_TITLE N_( "Subtitle codecs")
 #define SDEC_HELP N_( "Settings for subtitle, teletext and CC decoders and encoders." )
 
-#define ADVANCED_TITLE N_("General Input" )
 #define ADVANCED_HELP N_( "General input settings. Use with care..." )
 
 /* Sout */

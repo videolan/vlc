@@ -92,7 +92,6 @@ static void Close( vlc_object_t * );
 #define RATECONTROL_TEXT N_("Use muxers rate control mechanism")
 
 #define KEYURI_TEXT N_("AES key URI to place in playlist")
-#define KEYURI_LONGTEXT N_("Location from where client will retrieve the stream decryption key")
 
 #define KEYFILE_TEXT N_("AES key file")
 #define KEYFILE_LONGTEXT N_("File containing the 16 bytes encryption key")

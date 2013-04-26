@@ -117,8 +117,6 @@ static void Close ( vlc_object_t * );
 #define SILENT_TEXT N_("Silent mode")
 #define SILENT_LONGTEXT N_("Do not complain on encrypted PES.")
 
-#define CAPMT_SYSID_TEXT N_("CAPMT System ID")
-#define CAPMT_SYSID_LONGTEXT N_("Only forward descriptors from this SysID to the CAM.")
 
 #define CPKT_TEXT N_("Packet size in bytes to decrypt")
 #define CPKT_LONGTEXT N_("Specify the size of the TS packet to decrypt. " \

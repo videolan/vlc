@@ -93,7 +93,7 @@
 #define ARATE_TEXT N_("Audio sample rate")
 #define ARATE_LONGTEXT N_( \
  "Sample rate of the transcoded audio stream (11250, 22500, 44100 or 48000).")
-#define ALANG_TEXT N_("Audio Language")
+#define ALANG_TEXT N_("Audio language")
 #define ALANG_LONGTEXT N_( \
     "This is the language of the audio stream.")
 #define ACHANS_TEXT N_("Audio channels")

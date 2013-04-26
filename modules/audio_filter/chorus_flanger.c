@@ -86,7 +86,7 @@ vlc_module_begin ()
         N_("Rate of change of sweep depth in milliseconds shift per second "
            "of play"), true )
     add_float_with_range( "feedback-gain", 0.5, -0.9, 0.9,
-        N_("Feedback Gain"), N_("Gain on Feedback loop"), true )
+        N_("Feedback gain"), N_("Gain on Feedback loop"), true )
     add_float_with_range( "wet-mix", 0.4, -0.999, 0.999,
         N_("Wet mix"), N_("Level of delayed signal"), true )
     add_float_with_range( "dry-mix", 0.4, -0.999, 0.999,

@@ -135,11 +135,6 @@ static const char *const ppsz_snap_formats[] =
     "You can completely disable the audio output. The audio " \
     "decoding stage will not take place, thus saving some processing power.")
 
-#if 0
-#define MONO_TEXT N_("Force mono audio")
-#define MONO_LONGTEXT N_("This will force a mono audio output.")
-#endif
-
 #define GAIN_TEXT N_("Audio gain")
 #define GAIN_LONGTEXT N_( \
     "This linear gain will be applied to outputted audio.")
@@ -163,7 +158,6 @@ static const char *const ppsz_snap_formats[] =
 #define AUDIO_RESAMPLER_LONGTEXT N_( \
     "This selects which plugin to use for audio resampling." )
 
-#define MULTICHA_TEXT N_("Audio output channels mode")
 #define MULTICHA_LONGTEXT N_( \
     "This sets the audio output channels mode that will " \
     "be used by default when possible (ie. if your hardware supports it as " \
@@ -973,7 +967,6 @@ static const char *const ppsz_prefres[] = {
 #define ACCESS_OUTPUT_LONGTEXT N_( \
     "This is a legacy entry to let you configure access output modules")
 
-#define ANN_SAPCTRL_TEXT N_("Control SAP flow")
 #define ANN_SAPCTRL_LONGTEXT N_( \
     "If this option is enabled, the flow on " \
     "the SAP multicast address will be controlled. This is needed if you " \
@@ -1029,12 +1022,10 @@ static const char *const ppsz_prefres[] = {
     "priorities. You can use it to tune VLC priority against other " \
     "programs, or against other VLC instances.")
 
-#define USE_STREAM_IMMEDIATE N_("(Experimental) Don't do caching at the access level.")
 #define USE_STREAM_IMMEDIATE_LONGTEXT N_( \
      "This option is useful if you want to lower the latency when " \
      "reading a stream")
 
-#define PLUGIN_PATH_TEXT N_("Modules search path")
 #define PLUGIN_PATH_LONGTEXT N_( \
     "Additional path for VLC to look for its modules. You can add " \
     "several paths by concatenating them using \" PATH_SEP \" as separator")
@@ -1393,10 +1384,6 @@ static const char *const mouse_wheel_texts[] =
 #define DEINTERLACE_MODE_KEY_TEXT N_("Cycle deinterlace modes")
 #define DEINTERLACE_MODE_KEY_LONGTEXT N_("Cycle through available deinterlace modes.")
 #define INTF_TOGGLE_FSC_KEY_TEXT N_("Show controller in fullscreen")
-#define INTF_SHOW_KEY_TEXT N_("Show interface")
-#define INTF_SHOW_KEY_LONGTEXT N_("Raise the interface above all other windows.")
-#define INTF_HIDE_KEY_TEXT N_("Hide interface")
-#define INTF_HIDE_KEY_LONGTEXT N_("Lower the interface below all other windows.")
 #define INTF_BOSS_KEY_TEXT N_("Boss key")
 #define INTF_BOSS_KEY_LONGTEXT N_("Hide the interface and pause playback.")
 #define INTF_POPUP_MENU_KEY_TEXT N_("Context menu")

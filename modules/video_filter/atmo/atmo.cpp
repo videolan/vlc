@@ -257,12 +257,12 @@ static const char *const ppsz_device_type_descriptions[] = {
                                 "On Windows usually something like COM1 or " \
                                 "COM2. On Linux /dev/ttyS01 f.e.")
 
-#define EDGE_TEXT            N_("Edge Weightning")
+#define EDGE_TEXT            N_("Edge weightning")
 #define EDGE_LONGTEXT        N_("Increasing this value will result in color "\
                                 "more depending on the border of the frame.")
 #define BRIGHTNESS_TEXT     N_("Brightness")
 #define BRIGHTNESS_LONGTEXT N_("Overall brightness of your LED stripes")
-#define DARKNESS_TEXT       N_("Darkness Limit")
+#define DARKNESS_TEXT       N_("Darkness limit")
 #define DARKNESS_LONGTEXT   N_("Pixels with a saturation lower than this will "\
                                "be ignored. Should be greater than one for "\
                                "letterboxed videos.")
@@ -277,7 +277,7 @@ static const char *const ppsz_device_type_descriptions[] = {
 #define MEANTHRESHOLD_TEXT     N_("Filter threshold")
 #define MEANTHRESHOLD_LONGTEXT N_("How much a color has to be changed for an "\
                                   "immediate color change.")
-#define MEANPERCENTNEW_TEXT     N_("Filter Smoothness (in %)")
+#define MEANPERCENTNEW_TEXT     N_("Filter smoothness (%)")
 #define MEANPERCENTNEW_LONGTEXT N_("Filter Smoothness")
 
 #define FILTERMODE_TEXT        N_("Output Color filter mode")

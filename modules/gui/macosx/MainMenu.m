@@ -392,8 +392,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_snapshot setTitle: _NS("Snapshot")];
     [o_mi_videotrack setTitle: _NS("Video Track")];
     [o_mu_videotrack setTitle: _NS("Video Track")];
-    [o_mi_aspect_ratio setTitle: _NS("Aspect-ratio")];
-    [o_mu_aspect_ratio setTitle: _NS("Aspect-ratio")];
+    [o_mi_aspect_ratio setTitle: _NS("Aspect ratio")];
+    [o_mu_aspect_ratio setTitle: _NS("Aspect ratio")];
     [o_mi_crop setTitle: _NS("Crop")];
     [o_mu_crop setTitle: _NS("Crop")];
     [o_mi_screen setTitle: _NS("Fullscreen Video Device")];
@@ -1307,7 +1307,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_parent setEnabled:NO];
 
     /* Aspect Ratio */
-    if ([[o_parent title] isEqualToString: _NS("Aspect-ratio")] == YES) {
+    if ([[o_parent title] isEqualToString: _NS("Aspect ratio")] == YES) {
         NSMenuItem *o_lmi_tmp2;
         o_lmi_tmp2 = [o_menu addItemWithTitle: _NS("Lock Aspect Ratio") action: @selector(lockVideosAspectRatio:) keyEquivalent: @""];
         [o_lmi_tmp2 setTarget: [[VLCMain sharedInstance] controls]];

@@ -52,7 +52,6 @@
 static int  Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
-#define DESKTOP_TEXT N_("Enable desktop mode ")
 #define DESKTOP_LONGTEXT N_(\
     "The desktop mode allows you to display the video on the desktop.")
 

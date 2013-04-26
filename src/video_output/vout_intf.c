@@ -237,7 +237,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "aspect-ratio", VLC_VAR_STRING | VLC_VAR_ISCOMMAND |
                 VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT );
 
-    text.psz_string = _("Aspect-ratio");
+    text.psz_string = _("Aspect ratio");
     var_Change( p_vout, "aspect-ratio", VLC_VAR_SETTEXT, &text, NULL );
 
     val.psz_string = (char*)"";

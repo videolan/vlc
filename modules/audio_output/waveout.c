@@ -137,7 +137,6 @@ struct aout_sys_t
 #define DEVICE_LONG N_("Select special Audio device, or let windows "\
                        "decide (default), change needs VLC restart "\
                        "to apply.")
-#define DEFAULT_AUDIO_DEVICE N_("Default Audio Device")
 
 #define AUDIO_CHAN_TEXT N_("Audio output channels")
 #define AUDIO_CHAN_LONGTEXT N_("Channels available for audio output. " \
