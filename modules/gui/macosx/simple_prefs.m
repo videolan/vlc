@@ -389,7 +389,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
         p_parser = p_list[i_index];
         if (module_provides(p_parser, p_item->psz_type)) {
             [object addItemWithTitle: [NSString stringWithUTF8String: _(module_GetLongName(p_parser)) ?: ""]];
-            if (p_item->value.psz && !strcmp(p_item->value.psz, module_get_object(p_parser)))
+            if (p_item->value.psz && !strcmp(p_item->value.psz, module_get_name(p_parser, false)))
                 [object selectItem: [object lastItem]];
         }
     }
@@ -751,16 +751,19 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
         p_parser = p_list[i_module_index];
 
         if (p_item->i_type == CONFIG_ITEM_MODULE && module_provides(p_parser, p_item->psz_type)) {
-            if ([objectTitle isEqualToString: _NS(module_GetLongName(p_parser))])
-            {
-                config_PutPsz(p_intf, name, strdup(module_get_object(p_parser)));
+            if ([objectTitle isEqualToString: _NS(module_GetLongName(p_parser))]) {
+                config_PutPsz(p_intf, name, strdup(module_get_name(p_parser, false)));
                 break;
             }
         }
     }
     module_list_free(p_list);
-    if ([objectTitle isEqualToString: _NS("Default")])
-        config_PutPsz(p_intf, name, "");
+    if ([objectTitle isEqualToString: _NS("Default")]) {
+        if (!strcmp(name, "vout"))
+            config_PutPsz(p_intf, name, "");
+        else
+            config_PutPsz(p_intf, name, "none");
+    }
 }
 
 - (void)saveChangedSettings
