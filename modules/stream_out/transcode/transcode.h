@@ -72,6 +72,8 @@ struct sout_stream_sys_t
     mtime_t         i_master_drift;
 };
 
+struct aout_filters;
+
 struct sout_stream_id_t
 {
     bool            b_transcode;
@@ -82,10 +84,15 @@ struct sout_stream_id_t
     /* Decoder */
     decoder_t       *p_decoder;
 
-    /* Filters */
-    filter_chain_t  *p_f_chain;
-    /* User specified filters */
-    filter_chain_t  *p_uf_chain;
+    union
+    {
+         struct
+         {
+             filter_chain_t  *p_f_chain; /**< Video filters */
+             filter_chain_t  *p_uf_chain; /**< User-specified video filters */
+         };
+         struct aout_filters *p_af_chain; /**< Audio filters */
+    };
 
     /* Encoder */
     encoder_t       *p_encoder;
