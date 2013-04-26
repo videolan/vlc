@@ -1290,7 +1290,7 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
     audio_output_t * p_aout = (audio_output_t *)p_obj;
     struct aout_sys_t * p_sys = p_aout->sys;
 
-    int bytesToCopy = ioData->mBuffers[0].mDataByteSize;
+    int bytesRequested = ioData->mBuffers[0].mDataByteSize;
     Float32 *targetBuffer = (Float32*)ioData->mBuffers[0].mData;
 
     vlc_mutex_lock(&p_sys->lock);
@@ -1301,11 +1301,13 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
     /* check if we have enough data */
     if (!availableBytes) {
         /* return an empty buffer so silence is played until we have data */
-        for (UInt32 j = 0; j < inNumberFrames; j++)
-            targetBuffer[j] = 0.;
+        memset(targetBuffer, 0, ioData->mBuffers[0].mDataByteSize);
     } else {
-        memcpy(targetBuffer, buffer, __MIN(bytesToCopy, availableBytes));
-        TPCircularBufferConsume(&p_sys->circular_buffer, __MIN(bytesToCopy, availableBytes));
+        int32_t bytesToCopy = __MIN(bytesRequested, availableBytes);
+
+        memcpy(targetBuffer, buffer, bytesToCopy);
+        TPCircularBufferConsume(&p_sys->circular_buffer, bytesToCopy);
+        ioData->mBuffers[0].mDataByteSize = bytesToCopy;
     }
 
     vlc_cond_signal(&p_sys->cond);
@@ -1334,7 +1336,7 @@ static OSStatus RenderCallbackSPDIF(AudioDeviceID inDevice,
     audio_output_t * p_aout = (audio_output_t *)threadGlobals;
     struct aout_sys_t * p_sys = p_aout->sys;
 
-    int bytesToCopy = outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize;
+    int bytesRequested = outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize;
     char *targetBuffer = outOutputData->mBuffers[p_sys->i_stream_index].mData;
 
     vlc_mutex_lock(&p_sys->lock);
@@ -1347,8 +1349,11 @@ static OSStatus RenderCallbackSPDIF(AudioDeviceID inDevice,
         /* return an empty buffer so silence is played until we have data */
         memset(targetBuffer, 0, outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize);
     } else {
-        memcpy(targetBuffer, buffer, __MIN(bytesToCopy, availableBytes));
-        TPCircularBufferConsume(&p_sys->circular_buffer, __MIN(bytesToCopy, availableBytes));
+        int32_t bytesToCopy = __MIN(bytesRequested, availableBytes);
+
+        memcpy(targetBuffer, buffer, bytesToCopy);
+        TPCircularBufferConsume(&p_sys->circular_buffer, bytesToCopy);
+        outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize = bytesToCopy;
     }
 
     vlc_cond_signal(&p_sys->cond);
