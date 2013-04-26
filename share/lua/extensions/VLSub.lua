@@ -21,27 +21,29 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]]
 
--- Extension description
 function descriptor()
-	return { title = "VLsub" ;
-		version = "0.8" ;
+	return { title = "VLsub 0.9" ;
+		version = "0.9" ;
 		author = "exebetche" ;
 		url = 'http://www.opensubtitles.org/';
 		shortdesc = "VLsub";
 		description = "<center><b>VLsub</b></center>"
-				.. "Download subtitles from OpenSubtitles.org" ;
+				.. "Dowload subtitles from OpenSubtitles.org" ;
 		capabilities = { "input-listener", "meta-listener" }
 	}
 end
 
+require "os"
+
 -- Global variables
 dlg = nil     -- Dialog
-conflocation = 'subdownloader.conf'
+--~ conflocation = 'subdownloader.conf'
 url = "http://api.opensubtitles.org/xml-rpc"
-progressBarSize = 40
-interface_state = 0
-result_state = {}
-default_language = "eng"
+progressBarSize = 70
+
+--~ default_language = "fre"
+default_language = nil
+refresh_toggle = false
 
 function set_default_language()
 	if default_language then
@@ -57,10 +59,10 @@ end
 function activate()
     vlc.msg.dbg("[VLsub] Welcome")
     set_default_language()
+
     create_dialog()
-	openSub.getFileInfo()
-	openSub.getMovieInfo()
-    --~ openSub.request("LogIn")
+	openSub.request("LogIn")
+	update_fields()
 end
 
 function deactivate()
@@ -75,19 +77,30 @@ function close()
 end
 
 function meta_changed()
-	openSub.getFileInfo()
-	openSub.getMovieInfo()
-	if tmp_method_id == "hash" then
-		searchHash()
-	elseif tmp_method_id == "imdb" then
-		widget.get("title").input:set_text(openSub.movie.name)
-		widget.get("season").input:set_text(openSub.movie.seasonNumber)
-		widget.get("episode").input:set_text(openSub.movie.episodeNumber)
-	end
+	update_fields()
 end
 
 function input_changed()
-	return false
+	--~ Crash !?
+	--~ wait(3)
+	--~ update_fields()
+end
+
+function update_fields()
+	openSub.getFileInfo()
+	openSub.getMovieInfo()
+
+	if openSub.movie.name ~= nil then
+		widget.get("title").input:set_text(openSub.movie.name)
+	end
+
+	if openSub.movie.seasonNumber ~= nil then
+		widget.get("season").input:set_text(openSub.movie.seasonNumber)
+	end
+
+	if openSub.movie.episodeNumber ~= nil then
+		widget.get("episode").input:set_text(openSub.movie.episodeNumber)
+	end
 end
 
 openSub = {
@@ -96,12 +109,12 @@ openSub = {
 	conf = {
 		url = "http://api.opensubtitles.org/xml-rpc",
 		userAgentHTTP = "VLSub",
-		useragent = "VLSub 0.8",
+		useragent = "VLSub 0.9",
 		username = "",
 		password = "",
 		language = "",
 		downloadSub = true,
-		removeTag = true,
+		removeTag = false,
 		justgetlink = false
 	},
 	session = {
@@ -123,14 +136,7 @@ openSub = {
 	movie = {
 		name = "",
 		season = "",
-		episode = "",
-		imdbid = nil,
-		imdbidShow = nil,
-		imdbidEpisode = nil,
-		imdbRequest = nil,
-		year = nil,
-		releasename = nil,
-		aka = nil
+		episode = ""
 	},
 	sub = {
 		id = nil,
@@ -166,8 +172,8 @@ openSub = {
 
 		if status == 200 then
 			response = parse_xmlrpc(responseStr)
+			--~ vlc.msg.dbg(responseStr)
 			if (response and response.status == "200 OK") then
-				vlc.msg.dbg(responseStr)
 				return openSub.methods[methodName].callback(response)
 			elseif response then
 				setError("code "..response.status.."("..status..")")
@@ -272,32 +278,24 @@ openSub = {
 				end
 			end
 		},
-		SearchMoviesOnIMDB = {
-			params = function()
-				openSub.actionLabel = "Searching movie on IMDB"
-				setMessage(openSub.actionLabel..": "..progressBarContent(0))
-
-				return {
-					{ value={ string=openSub.session.token } },
-					{ value={ string=openSub.movie.imdbRequest } }
-				}
-			end,
-			callback = function(resp)
-				openSub.itemStore = resp.data
-
-				if openSub.itemStore ~= "0" then
-					return true
-				else
-					openSub.itemStore = nil
-					return false
-				end
-			end
-		},
-		SearchSubtitlesByIdIMDB = {
+		SearchSubtitles = {
 			methodName = "SearchSubtitles",
 			params = function()
 				openSub.actionLabel = "Searching subtitles"
 				setMessage(openSub.actionLabel..": "..progressBarContent(0))
+
+				local member = {
+						  { name="sublanguageid", value={ string=openSub.sub.languageid } },
+						  { name="query", value={ string=openSub.movie.name } } }
+
+
+				if openSub.movie.season ~= nil then
+					table.insert(member, { name="season", value={ string=openSub.movie.season } })
+				end
+
+				if openSub.movie.episode ~= nil then
+					table.insert(member, { name="episode", value={ string=openSub.movie.episode } })
+				end
 
 				return {
 					{ value={ string=openSub.session.token } },
@@ -306,9 +304,8 @@ openSub = {
 						  data={
 							value={
 							  struct={
-								member={
-								  { name="sublanguageid", value={ string=openSub.sub.languageid } },
-								  { name="imdbid", value={ string=openSub.movie.imdbid } } }}}}}}}
+								member=member
+								   }}}}}}
 				}
 			end,
 			callback = function(resp)
@@ -321,29 +318,6 @@ openSub = {
 					return false
 				end
 			end
-		},
-		GetIMDBMovieDetails = {
-			params = function()
-				return {
-					{ value={ string=openSub.session.token } },
-					{ value={ string=openSub.movie.imdbid } }
-				}
-			end,
-			callback = function(resp)
-				print(dump_xml(resp))
-			end
-		},
-		IsTVserie = {
-			methodName = "GetIMDBMovieDetails",
-			params = function()
-				return {
-					{ value={ string=openSub.session.token } },
-					{ value={ string=openSub.movie.imdbid } }
-				}
-			end,
-			callback = function(resp)
-				return (string.lower(resp.data.kind)=="tv series")
-			end
 		}
 	},
 	getInputItem = function()
@@ -351,10 +325,12 @@ openSub = {
 	end,
 	getFileInfo = function()
 		local item = openSub.getInputItem()
+		local file = openSub.file
 		if not item then
+			file.hasInput = false;
+			file.cleanName = "";
 			return false
 		else
-			local file = openSub.file
 			local parsed_uri = vlc.net.url_parse(item:uri())
 			file.uri = item:uri()
 			file.protocol = parsed_uri["protocol"]
@@ -370,11 +346,16 @@ openSub = {
 			if file.ext == "part" then
 				file.name, file.ext = string.match(file.name, "^([^/]+)%.([^%.]+)$")
 			end
+			file.hasInput = true;
 			file.cleanName = string.gsub(file.name, "[%._]", " ")
+			vlc.msg.dbg(file.cleanName)
 		end
 	end,
 	getMovieInfo = function()
 		if not openSub.file.name then
+			openSub.movie.name = ""
+			openSub.movie.seasonNumber = ""
+			openSub.movie.episodeNumber = ""
 			return false
 		end
 
@@ -392,6 +373,8 @@ openSub = {
 			openSub.movie.name = openSub.file.cleanName
 			openSub.movie.seasonNumber = ""
 			openSub.movie.episodeNumber = ""
+
+			vlc.msg.dbg(openSub.movie.name)
 		end
 	end,
 	getMovieHash = function()
@@ -423,141 +406,61 @@ openSub = {
 			return false
 		end
 
-		local i = 1
-		local a = {0, 0, 0, 0, 0, 0, 0, 0}
-		local hash = ""
-
-		local size = file:seek("end")
-		file:seek("set", 0)
-		local bytes = file:read(65536)
-		file:seek("set", size-65536)
-		bytes = bytes..file:read("*all")
-		file:close ()
-
-		for b in string.gfind(string.format("%16X ", size), "..") do
-			d = tonumber(b, 16)
-			if type(d) ~= "nil" then a[9-i] = d end
-			i=i+1
-		end
-
-		i = 1
-		for b in string.gfind(bytes, ".") do
-			a[i] = a[i] + string.byte(b)
-			d = math.floor(a[i]/255)
-
-			if d>=1 then
-				a[i] = a[i] - d * 256
-				if i<8 then a[i+1] = a[i+1] + d end
-			end
-
-			i=i+1
-			if i==9 then i=1 end
-		end
-
-		for i=8, 1, -1 do
-			hash = hash..string.format("%02x",a[i])
-		end
+        local lo,hi=0,0
+        for i=1,8192 do
+                local a,b,c,d = file:read(4):byte(1,4)
+                lo = lo + a + b*256 + c*65536 + d*16777216
+                a,b,c,d = file:read(4):byte(1,4)
+                hi = hi + a + b*256 + c*65536 + d*16777216
+                while lo>=4294967296 do
+                        lo = lo-4294967296
+                        hi = hi+1
+                end
+                while hi>=4294967296 do
+                        hi = hi-4294967296
+                end
+        end
+        local size = file:seek("end", -65536) + 65536
+        for i=1,8192 do
+                local a,b,c,d = file:read(4):byte(1,4)
+                lo = lo + a + b*256 + c*65536 + d*16777216
+                a,b,c,d = file:read(4):byte(1,4)
+                hi = hi + a + b*256 + c*65536 + d*16777216
+                while lo>=4294967296 do
+                        lo = lo-4294967296
+                        hi = hi+1
+                end
+                while hi>=4294967296 do
+                        hi = hi-4294967296
+                end
+        end
+        lo = lo + size
+                while lo>=4294967296 do
+                        lo = lo-4294967296
+                        hi = hi+1
+                end
+                while hi>=4294967296 do
+                        hi = hi-4294967296
+                end
 
 		openSub.file.bytesize = size
-		openSub.file.hash = hash
+		openSub.file.hash = string.format("%08x%08x", hi,lo)
 
 		return true
 	end,
-	getImdbEpisodeId = function(season, episode)
-		openSub.actionLabel = "Searching episode id on IMDB"
-		setMessage(openSub.actionLabel..": "..progressBarContent(0))
-		local IMDBurl = "http://www.imdb.com/title/tt"..openSub.movie.imdbid.."/episodes/_ajax?season="..season
-
-		local host, path = parse_url(IMDBurl)
-
-		local stream = vlc.stream(IMDBurl)
-		local data = ""
-
-		while data do
-			data = stream:read(65536)
-			local id = string.match(data, 'data%-const="tt(%d+)"[^>]+>\r?\n<img[^>]+>\r?\n<div> S'..season..', Ep'..episode)
-			return id
-		end
-		return false
-	end,
-	getImdbEpisodeIdYQL = function(season, episode)
-		openSub.actionLabel = "Searching episode on IMDB"
-		setMessage(openSub.actionLabel..": "..progressBarContent(0))
-
-		local url = "http://pipes.yahoo.com/pipes/pipe.run?_id=5f525406f2b2b376eeb20b97a216bcb1&_render=json&imdbid="..openSub.movie.imdbid.."&season="..season.."&episode="..episode
-		local host, path = parse_url(url)
-		local header = {
-			"GET "..path.." HTTP/1.1",
-			"Host: "..host,
-			"User-Agent: "..openSub.conf.userAgentHTTP,
-			"",
-			""
-		}
-		local request = table.concat(header, "\r\n")
-		local fd = vlc.net.connect_tcp(host, 80)
-		local data = ""
-		if fd >= 0 then
-			local pollfds = {}
-
-			pollfds[fd] = vlc.net.POLLIN
-			vlc.net.send(fd, request)
-			vlc.net.poll(pollfds)
-
-			data = vlc.net.recv(fd, 2048)
-			print(data)
-		end
-
-		setMessage(openSub.actionLabel..": "..progressBarContent(100))
-
-		local id = string.match(data, '"content":"(%d+)"')
-		return id
-	end,
-	getImdbEpisodeIdGoogle = function(season, episode, title)
-		openSub.actionLabel = "Searching episode on IMDB"
-		setMessage(openSub.actionLabel..": "..progressBarContent(0))
-
-		local query = 'site:imdb.com tv episode "'..title..'" (#'..season..'.'..episode..')'
-		local url = "https://www.google.com/uds/GwebSearch?hl=fr&source=gsc&gss=.com&gl=www.google.com&context=1&key=notsupplied&v=1.0&&q="..vlc.strings.encode_uri_component(query)
-		local host, path = parse_url(url)
-		local header = {
-			"GET "..path.." HTTP/1.1",
-			"Host: "..host,
-			"User-Agent: "..openSub.conf.userAgentHTTP,
-			"",
-			""
-		}
-		local request = table.concat(header, "\r\n")
-		local fd = vlc.net.connect_tcp(host, 80)
-		local data = ""
-		if fd >= 0 then
-			local pollfds = {}
-
-			pollfds[fd] = vlc.net.POLLIN
-			vlc.net.send(fd, request)
-			vlc.net.poll(pollfds)
-
-			data = vlc.net.recv(fd, 2048)
-			--print(data)
-		end
-
-		setMessage(openSub.actionLabel..": "..progressBarContent(100))
-
-		local id = string.match(data, '"url":"http://www.imdb.com/title/tt(%d+)/"')
-		return id
-	end,
-    loadSubtitles = function(url, fileDir, SubFileName, target)
+    loadSubtitles = function(url, SubFileName, target)
         openSub.actionLabel = "Downloading subtitle"
-
         setMessage(openSub.actionLabel..": "..progressBarContent(0))
+        local subfileURI = nil
         local resp = get(url)
-        local subfileURI = ""
         if resp then
-            local tmpFileName = fileDir..SubFileName..".zip"
+            local tmpFileName = openSub.file.dir..SubFileName..".zip"
+            subfileURI = "zip://"..make_uri(tmpFileName, true).."!/"..SubFileName
             local tmpFile = assert(io.open(tmpFileName, "wb"))
             tmpFile:write(resp)
+            tmpFile:flush()
             tmpFile:close()
 
-            subfileURI = "zip://"..make_uri(tmpFileName, true).."!/"..SubFileName
             if target then
                 local stream = vlc.stream(subfileURI)
                 local data = ""
@@ -571,18 +474,20 @@ openSub = {
                     end
                     data = stream:readline()
                 end
-                subfile:close()
 
+                subfile:flush()
+                subfile:close()
                 stream = nil
+                collectgarbage()
+				subfileURI = make_uri(target, true)
             end
-            subfileURI = make_uri(target, true)
-            collectgarbage() -- force gargabe collection in order to close the opened stream
-            os.remove(tmpFileName)
+			os.remove(tmpFileName)
         end
 
-        local item = vlc.item or vlc.input.item()
-        if item then
+        if vlc.item or vlc.input.item() then
+			vlc.msg.dbg("Adding subtitle :" .. subfileURI)
             vlc.input.add_subtitle(subfileURI)
+            setMessage("Success: Subtitles loaded.")
         else
             setError("No current input, unable to add subtitles "..target)
         end
@@ -590,8 +495,7 @@ openSub = {
 }
 
 function make_uri(str, encode)
-    local iswindowPath = string.match(str, "^%a:/.+$")
-       -- vlc.msg.dbg(iswindowPath)
+    local windowdrive = string.match(str, "^(%a:/).+$")
 	if encode then
 		local encodedPath = ""
 		for w in string.gmatch(str, "/([^/]+)") do
@@ -600,139 +504,58 @@ function make_uri(str, encode)
 		end
 		str = encodedPath
 	end
-    if iswindowPath then
-        return "file:///"..str
+    if windowdrive then
+        return "file:///"..windowdrive..str
     else
         return "file://"..str
     end
 end
 
+function download_selection()
+	local selection = widget.getVal("mainlist")
+	if #selection > 0 and openSub.itemStore then
+		download_subtitles(selection)
+	end
+end
+
 function searchHash()
-	if not hasAssociatedResult() then
-		openSub.sub.languageid = languages[widget.getVal("language")][2]
+	openSub.sub.languageid = languages[widget.getVal("language")][2]
 
-		openSub.getMovieHash()
-		associatedResult()
+	message = widget.get("message")
+	if message.display == "none" then
+		message.display = "block"
+		widget.set_interface(interface)
+	end
 
-		if openSub.file.hash then
-			openSub.request("SearchSubtitlesByHash")
-			display_subtitles()
-		end
-	else
-		local selection = widget.getVal("hashmainlist")
-		if #selection > 0 then
-			download_subtitles(selection)
-		end
+	openSub.getMovieHash()
+
+	if openSub.file.hash then
+		openSub.request("SearchSubtitlesByHash")
+		display_subtitles()
 	end
 end
 
 function searchIMBD()
-	local title = trim(widget.getVal("title"))
-	local old_title = trim(widget.get("title").value)
-	local season = tonumber(widget.getVal("season"))
-	local old_season = tonumber(widget.get("season").value)
-	local episode = tonumber(widget.getVal("episode"))
-	local old_episode = tonumber(widget.get("episode").value)
-	local language = languages[widget.getVal("language")][2]
-	local selection = widget.getVal("imdbmainlist")
-	local sel = (#selection > 0)
-	local newTitle = (title ~= old_title)
-	local newEpisode = (season ~= old_season or episode ~= old_episode)
-	local newLanguage = (language ~= openSub.sub.languageid)
-	local movie = openSub.movie
-	local imdbResults = {}
-	widget.get("title").value = title
-	widget.get("season").value = season
-	widget.get("episode").value = episode
-	openSub.sub.languageid = language
+	openSub.movie.name = trim(widget.getVal("title"))
+	openSub.movie.season = tonumber(widget.getVal("season"))
+	openSub.movie.episode = tonumber(widget.getVal("episode"))
+	openSub.sub.languageid  = languages[widget.getVal("language")][2]
 
-	if newTitle then
-		movie.imdbRequest = title
-		movie.imdbid = nil
-		movie.imdbidShow = nil
-		if openSub.request("SearchMoviesOnIMDB") then -- search exact match
-			local lowerTitle = string.lower(title)
-			local itemTitle = ""
-			for i, item in ipairs(openSub.itemStore) do
-				-- itemTitle = string.match(item.title, "[%s\"]*([^%(\"]*)[%s\"']*%(?")
-				item.cleanTitle = string.match(item.title, "[%s\"]*([^%(\"]*)[%s\"']*%(?")
-				-- vlc.msg.dbg(itemTitle)
-
-				--[[if string.lower(itemTitle) == lowerTitle then
-					movie.imdbid = item.id
-					break
-				end]]
-				table.insert(imdbResults, item.title)
-			end
-			if not movie.imdbid then
-				widget.setVal("imdbmainlist")
-				widget.setVal("imdbmainlist", imdbResults)
-			end
-		end
+	message = widget.get("message")
+	if message.display == "none" then
+		message.display = "block"
+		widget.set_interface(interface)
 	end
 
-	if not movie.imdbid and sel then
-		local index = selection[1][1]
-		local item = openSub.itemStore[index]
-		movie.imdbid = item.id
-		movie.title = item.cleanTitle
-		movie.imdbidShow = movie.imdbid
-		newEpisode = true
+	if openSub.file.name ~= "" then
+		openSub.request("SearchSubtitles")
+		display_subtitles()
 	end
-
-	if movie.imdbid then
-		if season and episode and (newTitle or newEpisode) then
-			if not newTitle then
-				movie.imdbid = movie.imdbidShow
-			end
-
-			movie.imdbidEpisode = openSub.getImdbEpisodeIdGoogle(season, episode, movie.title)
-			-- movie.imdbidEpisode = openSub.getImdbEpisodeId(season, episode)
-
-
-			if movie.imdbidEpisode then
-				vlc.msg.dbg("Episode imdbid: "..movie.imdbidEpisode)
-				movie.imdbidShow = movie.imdbid
-				movie.imdbid = movie.imdbidEpisode
-			elseif openSub.request("IsTVserie") then
-				movie.imdbidEpisode = openSub.getImdbEpisodeIdYQL(season, episode)
-				if movie.imdbidEpisode then
-					movie.imdbidShow = movie.imdbid
-					movie.imdbid = movie.imdbidEpisode
-				else
-					setError("Season/episode don't match for this title")
-				end
-			else
-				setError("Title not referenced as a TV serie on IMDB")
-				--~ -- , choose an other one and/or empty episode/season field")
-				widget.setVal("imdbmainlist", imdbResults)
-			end
-		end
-
-		if newTitle or newEpisode or newLanguage then
-			openSub.request("SearchSubtitlesByIdIMDB")
-			display_subtitles()
-		elseif sel and openSub.itemStore then
-			download_subtitles(selection)
-		end
-	end
-end
-
-function associatedResult()
-	local item = openSub.getInputItem()
-	if not item then return false end
-	result_state[tmp_method_id] = item:uri()
-end
-
-function hasAssociatedResult()
-	local item = openSub.getInputItem()
-	if not item then return false end
-	return (result_state[tmp_method_id] == item:uri())
 end
 
 function display_subtitles()
-	local list = tmp_method_id.."mainlist"
-	widget.setVal(list)
+	local list = "mainlist"
+	widget.setVal(list)	--~ Reset list
 	if openSub.itemStore then
 		for i, item in ipairs(openSub.itemStore) do
 			widget.setVal(list, item.SubFileName.." ["..item.SubLanguageID.."] ("..item.SubSumCD.." CD)")
@@ -743,21 +566,21 @@ function display_subtitles()
 end
 
 function download_subtitles(selection)
-	local list = tmp_method_id.."mainlist"
+	local list = "mainlist"
 	widget.resetSel(list) -- reset selection
 	local index = selection[1][1]
 	local item = openSub.itemStore[index]
 	local subfileTarget = ""
-	if openSub.file.dir and openSub.file.name then
-		subfileTarget = openSub.file.dir..openSub.file.name.."."..item.SubLanguageID.."."..item.SubFormat
-	else
-		subfileTarget = os.tmpname() --FIXME: ask the user where to put it instaed
-	end
 
-	if openSub.conf.justgetlink then
-		setMessage("Link: <a href='"..item.ZipDownloadLink.."'>"..item.ZipDownloadLink.."</a>")
+	if openSub.conf.justgetlink
+	or not (vlc.item or vlc.input.item())
+	or not openSub.file.dir
+	or not openSub.file.name then
+		setMessage("Link : <a href='"..item.ZipDownloadLink.."'>"..item.ZipDownloadLink.."</a>")
 	else
-		openSub.loadSubtitles(item.ZipDownloadLink, openSub.file.dir, item.SubFileName, subfileTarget)
+		subfileTarget = openSub.file.dir..openSub.file.name.."."..item.SubLanguageID.."."..item.SubFormat
+		vlc.msg.dbg("subfileTarget: "..subfileTarget)
+		openSub.loadSubtitles(item.ZipDownloadLink, item.SubFileName, subfileTarget)
 	end
 end
 
@@ -835,11 +658,19 @@ widget = {
 	set_interface = function(intf_map)
 		local root = {left = 1, top = 0, height = 0, hidden = false}
 		widget.set_node(intf_map, root)
+		widget.force_refresh()
+	end,
+	force_refresh = function() --~ Hacky
+		if refresh_toggle then
+			refresh_toggle = false
+			dlg:set_title(openSub.conf.useragent)
+		else
+			refresh_toggle = true
+			dlg:set_title(openSub.conf.useragent.." ")
+		end
 	end,
 	destroy = function(w)
 		dlg:del_widget(w.input)
-		--~ w.input = nil
-		--~ w.value = nil
 		if widget.registered_table[w.id] then
 			widget.registered_table[w.id] = nil
 		end
@@ -968,11 +799,24 @@ widget = {
 }
 
 function create_dialog()
-	dlg = vlc.dialog("VLSub")
+	dlg = vlc.dialog(openSub.conf.useragent)
 	widget.set_interface(interface)
 end
 
-function set_interface()
+
+function toggle_help()
+	helpMessage = widget.get("helpMessage")
+	if helpMessage.display == "block" then
+		helpMessage.display = "none"
+	elseif helpMessage.display == "none" then
+		helpMessage.display = "block"
+	end
+
+	widget.set_interface(interface)
+end
+
+
+function set_interface()  --~ old
 	local method_index = widget.getVal("method")
 	local method_id = methods[method_index][2]
 	if tmp_method_id then
@@ -1001,13 +845,14 @@ function set_interface()
 end
 
 function progressBarContent(pct)
-	local content = "<span style='color:#181'>"
+	local content = "<span style='background-color:#181;color:#181;'>"
 	local accomplished = math.ceil(progressBarSize*pct/100)
 
 	local left = progressBarSize - accomplished
-	content = content .. string.rep ("|", accomplished)
+	content = content .. string.rep ("-", accomplished)
+	content = content .. "</span><span style='background-color:#fff;color:#fff;'>"
+	content = content .. string.rep ("-", left)
 	content = content .. "</span>"
-	content = content .. string.rep ("|", left)
 	return content
 end
 
@@ -1022,13 +867,44 @@ function setMessage(str)
 	end
 end
 
+--~ Misc utils
+
+function file_exists(name)
+	local f=io.open(name ,"r")
+	if f~=nil then
+		io.close(f)
+		vlc.msg.dbg("File found!" .. name)
+		return true
+	else
+		vlc.msg.dbg("File not found. "..name)
+		return false
+	end
+end
+
+function wait(seconds)
+	local _start = os.time()
+	local _end = _start+seconds
+	while (_end ~= os.time()) do
+	end
+end
+
+function trim(str)
+    if not str then return "" end
+    return string.gsub(str, "^%s*(.-)%s*$", "%1")
+end
+
+function remove_tag(str)
+	return string.gsub(str, "{[^}]+}", "")
+end
+
+--~ Network utils
+
 function get(url)
 	local host, path = parse_url(url)
 	local header = {
 		"GET "..path.." HTTP/1.1",
 		"Host: "..host,
 		"User-Agent: "..openSub.conf.userAgentHTTP,
-		--~ "TE: identity", -- useless, and that's a shame
 		"",
 		""
 	}
@@ -1100,6 +976,8 @@ function parse_url(url)
 	return  url_parsed["host"], url_parsed["path"], url_parsed["option"]
 end
 
+--~ XML utils
+
 function parse_xml(data)
 	local tree = {}
 	local stack = {}
@@ -1159,7 +1037,6 @@ function parse_xmlrpc(data)
 	table.insert(stack, tree)
 
 	for op, tag, p, empty, val in string.gmatch(data, "<(%/?)([%w:]+)(.-)(%/?)>[%s\r\n\t]*([^<]*)") do
-
 		if op=="/" then
 			if tag == "member" or tag == "array" then
 				if level>0  then
@@ -1209,7 +1086,6 @@ function dump_xml(data)
 	local function parse(data, stack)
 		for k,v in pairs(data) do
 			if type(k)=="string" then
-				--~ print(k)
 				dump = dump.."\r\n"..string.rep (" ", level).."<"..k..">"
 				table.insert(stack, k)
 				level = level + 1
@@ -1247,14 +1123,7 @@ function dump_xml(data)
 	return dump
 end
 
-function trim(str)
-    if not str then return "" end
-    return string.gsub(str, "^%s*(.-)%s*$", "%1")
-end
-
-function remove_tag(str)
-	return string.gsub(str, "{[^}]+}", "")
-end
+--~ Interface data
 
 languages = {
 	{'All', 'all'},
@@ -1321,53 +1190,39 @@ interface = {
 		type = "div",
 		content = {
 			{
-				{ type = "label", value = "Search method:" },
-				{
-					type = "dropdown",
-					value = methods,
-					id = "method",
-					width = 2
-				},
-				{ type = "button", value = "Go", callback = set_interface }
-			},
-			{
 				{ type = "label", value = "Language:" },
-				{ type = "dropdown", value = languages, id = "language" , width = 2 }
-			}
-		}
-	},
-	{
-		id = "hash",
-		type = "div",
-		display = "none",
-		content = {
-			{
-				{ type = "list", width = 4, id = "hashmainlist" }
-			},{
-				{ type = "span", width = 2},
-				{ type = "button", value = "Ok", callback = searchHash },
-				{ type = "button", value = "Close", callback = close }
+				{ type = "dropdown", value = languages, id = "language" , width = 2 },
+				{ type = "button", value = "Search by hash", callback = searchHash },
 			}
 		}
 	},
 	{
 		id = "imdb",
 		type = "div",
-		display = "none",
 		content = {
 			{
 				{ type = "label", value = "Title:"},
-				{ type = "text_input", value = openSub.movie.name or "", id = "title" }
+				{ type = "text_input", value = openSub.movie.name or "", id = "title", width = 2 },
+				{ type = "button", value = "Search by name", callback = searchIMBD }
 			},{
 				{ type = "label", value = "Season (series):"},
-				{ type = "text_input", value = openSub.movie.seasonNumber or "", id = "season" }
+				{ type = "text_input", value = openSub.movie.seasonNumber or "", id = "season", width = 2 }
 			},{
 				{ type = "label", value = "Episode (series):"},
-				{ type = "text_input", value = openSub.movie.episodeNumber or "", id = "episode" },
-				{ type = "button", value = "Ok", callback = searchIMBD },
-				{ type = "button", value = "Close", callback = close }
+				{ type = "text_input", value = openSub.movie.episodeNumber or "", id = "episode", width = 2 }
 			},{
-				{ type = "list", width = 4, id = "imdbmainlist" }
+				{ type = "list", width = 4, id = "mainlist" }
+			}
+		}
+	},
+	{
+		type = "div",
+		content = {
+			{
+				{ type = "button", value = "Help", callback = toggle_help },
+				{ type = "span", width = 1},
+				{ type = "button", value = "Download", callback = download_selection },
+				{ type = "button", value = "Close", callback = close }
 			}
 		}
 	},
@@ -1376,7 +1231,39 @@ interface = {
 		type = "div",
 		content = {
 			{
-				{ type = "label", width = 4, value = "Powered by <a href='http://www.opensubtitles.org/'>opensubtitles.org</a>", id = "message" }
+				{ type = "html", width = 4,
+					display = "none",
+					value = ""..
+					" Download subtittles from <a href='http://www.opensubtitles.org/'>opensubtitles.org</a> and display them while watching a video.<br>"..
+					" <br>"..
+					" <b><u>Usage:</u></b><br>"..
+					" <br>"..
+					" VLSub is meant to be used while your watching the video, so start it first (if nothing is playing you will get a link to download the subtitles in your browser).<br>"..
+					" <br>"..
+					" Choose the language for your subtitles and click on the button corresponding to one of the two research method provided by VLSub:<br>"..
+					" <br>"..
+					" <b>Method 1: Search by hash</b><br>"..
+					" It is recommended to try this method first, because it performs a research based on the video file print, so you can find subtitles synchronized with your video.<br>"..
+					" <br>"..
+					" <b>Method 2: Search by name</b><br>"..
+					" If you have no luck with the first method, just check the title is correct before clicking. If you search subtitles for a serie, you can also provide a season and episode number.<br>"..
+					" <br>"..
+					" <b>Downloading Subtitles</b><br>"..
+					" Select one subtitle in the list and click on 'Download'.<br>"..
+					" It will be put in the same directory that your video, with the same name (different extension)"..
+					" so Vlc will load them automatically the next time you'll start the video.<br>"..
+					" <br>"..
+					" <b>/!\\ Beware :</b> Existing subtitles are overwrited without asking confirmation, so put them elsewhere if thet're important."
+					, id = "helpMessage"
+				}
+			},{
+				{
+					type = "label",
+					width = 4,
+					display = "none",
+					value = "  ",
+					id = "message"
+				}
 			}
 		}
 	}
