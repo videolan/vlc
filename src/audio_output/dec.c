@@ -160,6 +160,9 @@ static int aout_CheckReady (audio_output_t *aout)
                 owner->mixer_format.i_format = 0;
             }
         }
+        /* TODO: This would be a good time to call clean up any video output
+         * left over by an audio visualization:
+        input_resource_TerminatVout(MAGIC HERE); */
     }
     return (owner->mixer_format.i_format) ? 0 : -1;
 }

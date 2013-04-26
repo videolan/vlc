@@ -336,11 +336,12 @@ vout_thread_t *aout_filter_RequestVout (filter_t *filter, vout_thread_t *vout,
      * If you want to use visualization filters from another place, you will
      * need to add a new pf_aout_request_vout callback or store a pointer
      * to aout_request_vout_t inside filter_t (i.e. a level of indirection). */
-    aout_owner_t *owner = aout_owner ((audio_output_t *)filter->p_parent);
     const aout_request_vout_t *req = (void *)filter->p_owner;
+    char *visual = var_InheritString (filter->p_parent, "audio-visual");
+    bool recycle = (visual != NULL) && strcasecmp(visual, "none");
+    free (visual);
 
-    return req->pf_request_vout (req->p_private, vout, fmt,
-                                 owner->recycle_vout);
+    return req->pf_request_vout (req->p_private, vout, fmt, recycle);
 }
 
 static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
@@ -398,8 +399,6 @@ aout_filters_t *aout_FiltersNew (audio_output_t *aout,
     filters->resampling = 0;
     filters->count = 0;
 
-    aout_owner_t *owner = aout_owner (aout);
-
     /* Prepare format structure */
     aout_FormatPrint (aout, "input", infmt);
     audio_sample_format_t input_format = *infmt;
@@ -446,7 +445,6 @@ aout_filters_t *aout_FiltersNew (audio_output_t *aout,
     }
 
     char *visual = var_InheritString (aout, "audio-visual");
-    owner->recycle_vout = visual != NULL;
     if (visual != NULL && strcasecmp (visual, "none"))
     {
         AppendFilter(VLC_OBJECT(aout), "visualization", visual, filters,
@@ -492,22 +490,11 @@ error:
  */
 void aout_FiltersDelete (audio_output_t *aout, aout_filters_t *filters)
 {
-    aout_owner_t *owner = aout_owner (aout);
-
     if (filters->resampler != NULL)
         aout_FiltersPipelineDestroy (&filters->resampler, 1);
     aout_FiltersPipelineDestroy (filters->tab, filters->count);
     var_DelCallback (aout, "equalizer", EqualizerCallback, NULL);
     var_DelCallback (aout, "visual", VisualizationCallback, NULL);
-
-    /* XXX We need to update recycle_vout before calling
-     * aout_FiltersPipelineDestroy().
-     * FIXME There may be a race condition if audio-visual is updated between
-     * aout_FiltersDestroy() and the next aout_FiltersNew().
-     */
-    char *visual = var_InheritString (aout, "audio-visual");
-    owner->recycle_vout = (visual != NULL) && *visual;
-    free (visual);
 
     free (filters);
 }

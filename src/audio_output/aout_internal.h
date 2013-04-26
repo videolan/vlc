@@ -82,7 +82,6 @@ typedef struct
     audio_sample_format_t mixer_format;
 
     aout_request_vout_t request_vout;
-    bool recycle_vout;
 
     atomic_uint buffers_lost;
     atomic_uchar restart;
