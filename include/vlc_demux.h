@@ -177,10 +177,9 @@ VLC_API int demux_vaControlHelper( stream_t *, int64_t i_start, int64_t i_end, i
 VLC_USED
 static inline bool demux_IsPathExtension( demux_t *p_demux, const char *psz_extension )
 {
-    if( !p_demux->psz_file )
-        return false;
-
-    const char *psz_ext = strrchr ( p_demux->psz_file, '.' );
+    const char *name = (p_demux->psz_file != NULL) ? p_demux->psz_file
+                                                   : p_demux->psz_location;
+    const char *psz_ext = strrchr ( name, '.' );
     if( !psz_ext || strcasecmp( psz_ext, psz_extension ) )
         return false;
     return true;
