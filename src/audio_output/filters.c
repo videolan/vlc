@@ -43,7 +43,7 @@
 #include "aout_internal.h"
 
 static filter_t *CreateFilter (vlc_object_t *obj, const char *type,
-                               const char *name, bool force,
+                               const char *name,
                                const audio_sample_format_t *infmt,
                                const audio_sample_format_t *outfmt)
 {
@@ -56,7 +56,7 @@ static filter_t *CreateFilter (vlc_object_t *obj, const char *type,
     filter->fmt_in.i_codec = infmt->i_format;
     filter->fmt_out.audio = *outfmt;
     filter->fmt_out.i_codec = outfmt->i_format;
-    filter->p_module = module_need (filter, type, name, force);
+    filter->p_module = module_need (filter, type, name, false);
     if (filter->p_module == NULL)
     {
         /* If probing failed, formats shall not have been modified. */
@@ -74,14 +74,14 @@ static filter_t *FindConverter (vlc_object_t *obj,
                                 const audio_sample_format_t *infmt,
                                 const audio_sample_format_t *outfmt)
 {
-    return CreateFilter (obj, "audio converter", NULL, false, infmt, outfmt);
+    return CreateFilter (obj, "audio converter", NULL, infmt, outfmt);
 }
 
 static filter_t *FindResampler (vlc_object_t *obj,
                                 const audio_sample_format_t *infmt,
                                 const audio_sample_format_t *outfmt)
 {
-    return CreateFilter (obj, "audio resampler", "$audio-resampler", false,
+    return CreateFilter (obj, "audio resampler", "$audio-resampler",
                          infmt, outfmt);
 }
 
@@ -343,7 +343,7 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
         return -1;
     }
 
-    filter_t *filter = CreateFilter (obj, type, name, true, infmt, outfmt);
+    filter_t *filter = CreateFilter (obj, type, name, infmt, outfmt);
     if (filter == NULL)
     {
         msg_Err (obj, "cannot add user %s \"%s\" (skipped)", type, name);
