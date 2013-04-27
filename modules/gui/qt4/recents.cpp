@@ -45,6 +45,8 @@
         SHARD_SHELLITEM         = 0x00000008 
     } SHARD; */
     #define SHARD_PATHW 0x00000003
+
+    #include <vlc_charset.h>
 #endif
 
 
@@ -91,7 +93,9 @@ void RecentsMRL::addRecent( const QString &mrl )
     char* path = make_path( qtu( mrl ) );
     if( path )
     {
-        SHAddToRecentDocs( SHARD_PATHW, mrl.utf16() );
+        wchar_t *wmrl = ToWide( path );
+        SHAddToRecentDocs( SHARD_PATHW, wmrl );
+        free( wmrl );
         free( path );
     }
 #endif
