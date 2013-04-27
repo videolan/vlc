@@ -67,6 +67,9 @@ struct vlc_va_sys_t
     VdpGetErrorString *GetErrorString;
     VdpGetInformationString *GetInformationString;
     VdpDeviceDestroy *DeviceDestroy;
+    VdpVideoSurfaceQueryCapabilities *VideoSurfaceQueryCapabilities;
+    VdpVideoSurfaceQueryGetPutBitsYCbCrCapabilities
+                                 *VideoSurfaceQueryGetPutBitsYCbCrCapabilities;
     VdpVideoSurfaceCreate *VideoSurfaceCreate;
     VdpVideoSurfaceDestroy *VideoSurfaceDestroy;
     VdpVideoSurfaceGetBitsYCbCr *VideoSurfaceGetBitsYCbCr;
@@ -306,7 +309,7 @@ static int Open (vlc_va_t *va, int codec, const es_format_t *fmt)
 #define PROC(id,name) \
     do { \
         void *ptr; \
-        err = GetProcAddress (sys->device, VDP_FUNC_ID_##id, &ptr); \
+        err = GetProcAddress (device, VDP_FUNC_ID_##id, &ptr); \
         if (unlikely(err)) \
             abort (); \
         sys->name = ptr; \
@@ -317,6 +320,10 @@ static int Open (vlc_va_t *va, int codec, const es_format_t *fmt)
     PROC(GET_ERROR_STRING, GetErrorString);
     PROC(GET_INFORMATION_STRING, GetInformationString);
     PROC(DEVICE_DESTROY, DeviceDestroy);
+    /* NOTE: We do not really need to retain QueryCap pointers in *sys */
+    PROC(VIDEO_SURFACE_QUERY_CAPABILITIES, VideoSurfaceQueryCapabilities);
+    PROC(VIDEO_SURFACE_QUERY_GET_PUT_BITS_Y_CB_CR_CAPABILITIES,
+                                 VideoSurfaceQueryGetPutBitsYCbCrCapabilities);
     PROC(VIDEO_SURFACE_CREATE, VideoSurfaceCreate);
     PROC(VIDEO_SURFACE_DESTROY, VideoSurfaceDestroy);
     PROC(VIDEO_SURFACE_GET_BITS_Y_CB_CR, VideoSurfaceGetBitsYCbCr);
@@ -325,7 +332,33 @@ static int Open (vlc_va_t *va, int codec, const es_format_t *fmt)
     PROC(DECODER_RENDER, DecoderRender);
     sys->context.render = sys->DecoderRender;
 
-    /* TODO: Query cap */
+    /* Check capabilities */
+    VdpBool support;
+    uint32_t width, height;
+
+    if (sys->VideoSurfaceQueryCapabilities (device, VDP_CHROMA_TYPE_420,
+                                   &support, &width, &height) != VDP_STATUS_OK)
+        support = VDP_FALSE;
+    if (!support || width < fmt->video.i_width || height < fmt->video.i_height)
+    {
+        msg_Err (va, "video surface not supported: %s %ux%u",
+                 "YUV 4:2:0", fmt->video.i_width, fmt->video.i_height);
+        goto error;
+    }
+    msg_Dbg (va, "video surface supported maximum: %s %"PRIu32"x%"PRIu32,
+                 "YUV 4:2:0", width, height);
+
+    if (sys->VideoSurfaceQueryGetPutBitsYCbCrCapabilities (device,
+        VDP_CHROMA_TYPE_420, VDP_YCBCR_FORMAT_YV12, &support) != VDP_STATUS_OK)
+        support = VDP_FALSE;
+    if (!support)
+    {
+        msg_Err (va, "video surface reading not supported: %s as %s",
+                 "YUV 4:2:0", "YV12");
+        goto error;
+    }
+
+    /* TODO: check decoder */
 
     const char *infos;
     if (sys->GetInformationString (&infos) != VDP_STATUS_OK)
@@ -338,13 +371,13 @@ static int Open (vlc_va_t *va, int codec, const es_format_t *fmt)
     va->get = Lock;
     va->release = Unlock;
     va->extract = Copy;
-    (void) fmt;
     return VLC_SUCCESS;
 
-/*error:
+error:
+    sys->DeviceDestroy (device);
     XCloseDisplay (sys->display);
     free (sys);
-    return VLC_EGENERIC;*/
+    return VLC_EGENERIC;
 }
 
 static void Close (vlc_va_t *va)
