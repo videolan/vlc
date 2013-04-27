@@ -443,8 +443,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_fspanel setNonActive:nil];
     }
 
-    [self makeFirstResponder: nil];
-
+    [self makeFirstResponder: o_playlist_table];
 }
 
 - (void)makeSplitViewHidden
@@ -754,7 +753,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [o_controls_bar setFullscreenState:YES];
         }
 
-        [self makeFirstResponder: nil];
+        [self makeFirstResponder: o_playlist_table];
         [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
 
         // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
