@@ -153,8 +153,14 @@ static int Init (vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
     height = (height + 3) & ~3;
 
     unsigned surfaces = 2;
-    if (sys->profile == VDP_DECODER_PROFILE_H264_HIGH)
+    switch (sys->profile)
+    {
+      case VDP_DECODER_PROFILE_H264_BASELINE:
+      case VDP_DECODER_PROFILE_H264_MAIN:
+      case VDP_DECODER_PROFILE_H264_HIGH:
         surfaces = 16;
+        break;
+    }
 
     err = sys->DecoderCreate (sys->device, sys->profile, width, height,
                               surfaces, &sys->context.decoder);
@@ -262,29 +268,97 @@ static int Open (vlc_va_t *va, int codec, const es_format_t *fmt)
 {
     VdpStatus err;
     VdpDecoderProfile profile;
+    int level;
 
     switch (codec)
     {
-        case AV_CODEC_ID_MPEG1VIDEO:
-            profile = VDP_DECODER_PROFILE_MPEG1;
-            break;
-        case AV_CODEC_ID_MPEG2VIDEO:
+      case AV_CODEC_ID_MPEG1VIDEO:
+        profile = VDP_DECODER_PROFILE_MPEG1;
+        level = VDP_DECODER_LEVEL_MPEG1_NA;
+        break;
+
+      case AV_CODEC_ID_MPEG2VIDEO:
+        switch (fmt->i_profile)
+        {
+          case FF_PROFILE_MPEG2_MAIN:
             profile = VDP_DECODER_PROFILE_MPEG2_MAIN;
             break;
-        case AV_CODEC_ID_H263:
-        case AV_CODEC_ID_MPEG4:
+          case FF_PROFILE_MPEG2_SIMPLE:
+            profile = VDP_DECODER_PROFILE_MPEG2_SIMPLE;
+            break;
+          default:
+            msg_Err (va, "unsupported %s profile %d", "MPEG2", fmt->i_profile);
+            return VLC_EGENERIC;
+        }
+        level = VDP_DECODER_LEVEL_MPEG2_HL;
+        break;
+
+      case AV_CODEC_ID_H263:
+        profile = VDP_DECODER_PROFILE_MPEG4_PART2_ASP;
+        level = VDP_DECODER_LEVEL_MPEG4_PART2_ASP_L5;
+        break;
+      case AV_CODEC_ID_MPEG4:
+        switch (fmt->i_profile)
+        {
+          case FF_PROFILE_MPEG4_SIMPLE:
+            profile = VDP_DECODER_PROFILE_MPEG4_PART2_SP;
+            break;
+          case FF_PROFILE_MPEG4_SIMPLE_STUDIO:
+            msg_Err (va, "unsupported %s profile %d", "MPEG4", fmt->i_profile);
+            return VLC_EGENERIC;
+          default:
             profile = VDP_DECODER_PROFILE_MPEG4_PART2_ASP;
             break;
-        case AV_CODEC_ID_H264:
+        }
+        level = fmt->i_level;
+        break;
+
+      case AV_CODEC_ID_H264:
+        switch (fmt->i_profile
+                        & ~(FF_PROFILE_H264_CONSTRAINED|FF_PROFILE_H264_INTRA))
+        {
+          case FF_PROFILE_H264_BASELINE:
+            profile = VDP_DECODER_PROFILE_H264_BASELINE;
+            break;
+          case FF_PROFILE_H264_MAIN:
+            profile = VDP_DECODER_PROFILE_H264_MAIN;
+            break;
+          case FF_PROFILE_H264_HIGH:
             profile = VDP_DECODER_PROFILE_H264_HIGH;
             break;
-        case AV_CODEC_ID_WMV3:
-        case AV_CODEC_ID_VC1:
+          case FF_PROFILE_H264_EXTENDED:
+          default:
+            msg_Err (va, "unsupported %s profile %d", "H.264", fmt->i_profile);
+            return VLC_EGENERIC;
+        }
+        level = fmt->i_level;
+        if ((fmt->i_profile & FF_PROFILE_H264_INTRA) && (fmt->i_level == 11))
+            level = VDP_DECODER_LEVEL_H264_1b;
+        break;
+
+      case AV_CODEC_ID_WMV3:
+      case AV_CODEC_ID_VC1:
+        switch (fmt->i_profile)
+        {
+          case FF_PROFILE_VC1_SIMPLE:
+            profile = VDP_DECODER_PROFILE_VC1_SIMPLE;
+            break;
+          case FF_PROFILE_VC1_MAIN:
+            profile = VDP_DECODER_PROFILE_VC1_MAIN;
+            break;
+          case FF_PROFILE_VC1_ADVANCED:
             profile = VDP_DECODER_PROFILE_VC1_ADVANCED;
             break;
-        default:
-            msg_Err (va, "unknown codec (%d)", codec);
+          default:
+            msg_Err (va, "unsupported %s profile %d", "VC-1", fmt->i_profile);
             return VLC_EGENERIC;
+        }
+        level = fmt->i_level;
+        break;
+
+      default:
+        msg_Err (va, "unknown codec %d", codec);
+        return VLC_EGENERIC;
     }
 
     vlc_va_sys_t *sys = malloc (sizeof (*sys));
@@ -336,7 +410,7 @@ static int Open (vlc_va_t *va, int codec, const es_format_t *fmt)
 
     /* Check capabilities */
     VdpBool support;
-    uint32_t level, mb, width, height;
+    uint32_t lvl, mb, width, height;
 
     if (sys->VideoSurfaceQueryCapabilities (device, VDP_CHROMA_TYPE_420,
                                    &support, &width, &height) != VDP_STATUS_OK)
@@ -360,17 +434,18 @@ static int Open (vlc_va_t *va, int codec, const es_format_t *fmt)
         goto error;
     }
 
-    if (sys->DecoderQueryCapabilities (device, profile, &support, &level,
+    if (sys->DecoderQueryCapabilities (device, profile, &support, &lvl,
                                        &mb, &width, &height) != VDP_STATUS_OK)
         support = VDP_FALSE;
-    if (!support || width < fmt->video.i_width || height < fmt->video.i_height)
+    if (!support || (int)lvl < level
+     || width < fmt->video.i_width || height < fmt->video.i_height)
     {
-        msg_Err (va, "decoding profile not supported: %"PRIu32" %ux%u",
-                 profile, fmt->video.i_width, fmt->video.i_height);
+        msg_Err (va, "decoding profile not supported: %"PRIu32".%d %ux%u",
+                 profile, lvl, fmt->video.i_width, fmt->video.i_height);
         goto error;
     }
     msg_Dbg (va, "decoding profile supported maximum: %"PRIu32".%"PRIu32" mb %"
-             PRIu32", %"PRIu32"x%"PRIu32, profile, level, mb, width, height);
+             PRIu32", %"PRIu32"x%"PRIu32, profile, lvl, mb, width, height);
 
     const char *infos;
     if (sys->GetInformationString (&infos) != VDP_STATUS_OK)
