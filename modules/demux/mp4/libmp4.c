@@ -2901,7 +2901,7 @@ static int MP4_ReadBox_sdtp( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_GET1BYTE( p_sdtp->p_sample_table[i] );
 
 #ifdef MP4_VERBOSE
-    msg_Info( p_stream, "i_sample_count is %"PRIu32"", i_sample_count );
+    msg_Dbg( p_stream, "i_sample_count is %"PRIu32"", i_sample_count );
     msg_Dbg( p_stream,
              "read box: \"sdtp\" head: %"PRIx8" %"PRIx8" %"PRIx8" %"PRIx8"",
                  p_sdtp->p_sample_table[0],
@@ -3052,8 +3052,8 @@ static int MP4_ReadBox_tfra( stream_t *p_stream, MP4_Box_t *p_box )
                 ((uint64_t *)(p_tfra->p_moof_offset))[1] );
     }
 
-    msg_Info( p_stream, "number_of_entries is %"PRIu32"", i_number_of_entries );
-    msg_Info( p_stream, "track ID is: %"PRIu32"", p_tfra->i_track_ID );
+    msg_Dbg( p_stream, "number_of_entries is %"PRIu32"", i_number_of_entries );
+    msg_Dbg( p_stream, "track ID is: %"PRIu32"", p_tfra->i_track_ID );
 #endif
 
     MP4_READBOX_EXIT( 1 );
