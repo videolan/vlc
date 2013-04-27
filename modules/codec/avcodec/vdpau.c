@@ -73,6 +73,7 @@ struct vlc_va_sys_t
     VdpVideoSurfaceCreate *VideoSurfaceCreate;
     VdpVideoSurfaceDestroy *VideoSurfaceDestroy;
     VdpVideoSurfaceGetBitsYCbCr *VideoSurfaceGetBitsYCbCr;
+    VdpDecoderQueryCapabilities *DecoderQueryCapabilities;
     VdpDecoderCreate *DecoderCreate;
     VdpDecoderDestroy *DecoderDestroy;
     VdpDecoderRender *DecoderRender;
@@ -260,7 +261,7 @@ static int vdp_device_Create (vlc_object_t *obj, void **sysp, VdpDevice *devp,
 static int Open (vlc_va_t *va, int codec, const es_format_t *fmt)
 {
     VdpStatus err;
-    int profile;
+    VdpDecoderProfile profile;
 
     switch (codec)
     {
@@ -327,6 +328,7 @@ static int Open (vlc_va_t *va, int codec, const es_format_t *fmt)
     PROC(VIDEO_SURFACE_CREATE, VideoSurfaceCreate);
     PROC(VIDEO_SURFACE_DESTROY, VideoSurfaceDestroy);
     PROC(VIDEO_SURFACE_GET_BITS_Y_CB_CR, VideoSurfaceGetBitsYCbCr);
+    PROC(DECODER_QUERY_CAPABILITIES, DecoderQueryCapabilities);
     PROC(DECODER_CREATE, DecoderCreate);
     PROC(DECODER_DESTROY, DecoderDestroy);
     PROC(DECODER_RENDER, DecoderRender);
@@ -334,7 +336,7 @@ static int Open (vlc_va_t *va, int codec, const es_format_t *fmt)
 
     /* Check capabilities */
     VdpBool support;
-    uint32_t width, height;
+    uint32_t level, mb, width, height;
 
     if (sys->VideoSurfaceQueryCapabilities (device, VDP_CHROMA_TYPE_420,
                                    &support, &width, &height) != VDP_STATUS_OK)
@@ -358,7 +360,17 @@ static int Open (vlc_va_t *va, int codec, const es_format_t *fmt)
         goto error;
     }
 
-    /* TODO: check decoder */
+    if (sys->DecoderQueryCapabilities (device, profile, &support, &level,
+                                       &mb, &width, &height) != VDP_STATUS_OK)
+        support = VDP_FALSE;
+    if (!support || width < fmt->video.i_width || height < fmt->video.i_height)
+    {
+        msg_Err (va, "decoding profile not supported: %"PRIu32" %ux%u",
+                 profile, fmt->video.i_width, fmt->video.i_height);
+        goto error;
+    }
+    msg_Dbg (va, "decoding profile supported maximum: %"PRIu32".%"PRIu32" mb %"
+             PRIu32", %"PRIu32"x%"PRIu32, profile, level, mb, width, height);
 
     const char *infos;
     if (sys->GetInformationString (&infos) != VDP_STATUS_OK)
