@@ -1082,9 +1082,7 @@ static const char *const ppsz_prefres[] = {
     "Tell VLC that it is being launched due to a file association in the OS" )
 
 #define ONEINSTANCEWHENSTARTEDFROMFILE_TEXT N_( \
-    "One instance when started from file")
-#define ONEINSTANCEWHENSTARTEDFROMFILE_LONGTEXT N_( \
-    "Allow only one running instance when started from file.")
+    "Use only one instance when started from file manager")
 
 #define HPRIORITY_TEXT N_("Increase the priority of the process")
 #define HPRIORITY_LONGTEXT N_( \
@@ -1096,7 +1094,7 @@ static const char *const ppsz_prefres[] = {
     "might require a reboot of your machine.")
 
 #define PLAYLISTENQUEUE_TEXT N_( \
-    "Enqueue items to playlist when in one instance mode")
+    "Enqueue items to playlist into one instance mode")
 #define PLAYLISTENQUEUE_LONGTEXT N_( \
     "When using the one instance only option, enqueue items to playlist " \
     "and keep playing current item.")
@@ -2027,7 +2025,7 @@ vlc_module_begin ()
         change_volatile ()
     add_bool( "one-instance-when-started-from-file", 1,
               ONEINSTANCEWHENSTARTEDFROMFILE_TEXT,
-              ONEINSTANCEWHENSTARTEDFROMFILE_LONGTEXT, true )
+              ONEINSTANCEWHENSTARTEDFROMFILE_TEXT, true )
     add_bool( "playlist-enqueue", 0, PLAYLISTENQUEUE_TEXT,
               PLAYLISTENQUEUE_LONGTEXT, true )
 #endif

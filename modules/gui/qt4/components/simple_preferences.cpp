@@ -623,6 +623,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                                                        ui.OneInterfaceMode->isChecked() );
                 CONNECT( ui.OneInterfaceMode, toggled( bool ),
                          ui.EnqueueOneInterfaceMode, setEnabled( bool ) );
+                CONFIG_BOOL( "one-instance-when-started-from-file", oneInstanceFromFile );
             }
 
             /* RECENTLY PLAYED options */
