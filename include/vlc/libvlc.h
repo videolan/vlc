@@ -354,8 +354,8 @@ typedef struct vlc_log_t libvlc_log_t;
  *
  * \version LibVLC 2.1.0 or later
  */
-void libvlc_log_get_context(const libvlc_log_t *ctx, const char **module,
-                            const char **file, unsigned *line);
+LIBVLC_API void libvlc_log_get_context(const libvlc_log_t *ctx,
+                       const char **module, const char **file, unsigned *line);
 
 /**
  * Gets VLC object informations about a log message: the type name of the VLC
@@ -378,8 +378,8 @@ void libvlc_log_get_context(const libvlc_log_t *ctx, const char **module,
  *
  * \version LibVLC 2.1.0 or later
  */
-void libvlc_log_get_object(const libvlc_log_t *ctx, const char **name,
-                           const char **header, uintptr_t *id);
+LIBVLC_API void libvlc_log_get_object(const libvlc_log_t *ctx,
+                        const char **name, const char **header, uintptr_t *id);
 
 /**
  * Callback prototype for LibVLC log message handler.
