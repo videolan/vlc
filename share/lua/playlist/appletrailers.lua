@@ -24,6 +24,7 @@
 function probe()
     return vlc.access == "http"
         and string.match( vlc.path, "trailers.apple.com" )
+        and string.match( vlc.path, "web.inc" )
 end
 
 function find( haystack, needle )
@@ -63,8 +64,9 @@ function parse()
         line = vlc.readline()
         if not line then break end
 
-        if string.match( line, "class=\".-first" ) then
-            description = find( line, "h%d.->(.-)</h%d") .. ' '
+        if string.match( line, "h%d>.-</h%d" ) then
+            description = find( line, "h%d>(.+)</h%d")
+            vlc.msg.dbg(description)
         end
         if string.match( line, 'img src=') then
             for img in string.gmatch(line, '<img src="(http://.*%.jpg)" ') do
@@ -73,20 +75,19 @@ function parse()
             for i,value in pairs(playlist) do
                 if value.arturl == '' then
                     playlist[i].arturl = art_url
-                else break end
+                end
             end
         end
         if string.match( line, 'class="hd".-%.mov') then
-            for urlline,resolution in string.gmatch(line, 'class="hd".-href="(.-%.mov)".-(%d+.-p)') do
+            for urlline,resolution in string.gmatch(line, 'class="hd".-href="(.-%.mov)".->(%d+.-p)') do
                 urlline = string.gsub( urlline, "_"..resolution, "_h"..resolution )
                 table.insert( playlist, { path = urlline,
-                                          name = description ..  '(' .. resolution .. ')',
+                                          name = description.." "..resolution,
                                           arturl = art_url,
-                                          options = {":http-user-agent=QuickTime/7.5", ":play-and-pause"} } )
+                                          options = {":http-user-agent=QuickTime/7.5", ":play-and-pause", ":demux=avformat"} } )
             end
         end
     end
 
-    table.sort(playlist, sort)
     return playlist
 end
