@@ -364,9 +364,8 @@ static int OpenFilter( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_EGENERIC;
 
-    p_sys->b_downmix = var_CreateGetBool( p_this, MONO_CFG "downmix" );
-    p_sys->i_channel_selected =
-            (unsigned int) var_CreateGetInteger( p_this, MONO_CFG "channel" );
+    p_sys->b_downmix = var_InheritBool( p_this, MONO_CFG "downmix" );
+    p_sys->i_channel_selected = var_InheritInteger( p_this, MONO_CFG "channel" );
 
     p_sys->i_nb_channels = aout_FormatNbChannels( &(p_filter->fmt_in.audio) );
     p_sys->i_bitspersample = p_filter->fmt_out.audio.i_bitspersample;
@@ -381,8 +380,6 @@ static int OpenFilter( vlc_object_t *p_this )
               p_filter->fmt_in.audio.i_physical_channels,
               p_filter->fmt_in.audio.i_rate ) < 0 )
     {
-        var_Destroy( p_this, MONO_CFG "channel" );
-        var_Destroy( p_this, MONO_CFG "downmix" );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -421,8 +418,6 @@ static void CloseFilter( vlc_object_t *p_this)
     filter_t *p_filter = (filter_t *) p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    var_Destroy( p_this, MONO_CFG "channel" );
-    var_Destroy( p_this, MONO_CFG "downmix" );
     free( p_sys->p_atomic_operations );
     free( p_sys->p_overflow_buffer );
     free( p_sys );
