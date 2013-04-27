@@ -464,16 +464,24 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
     EbmlElement *p_l0, *p_l1, *p_l2;
     bool b_keep_stream = false, b_keep_segment = false;
 
-    // verify the EBML Header
-    p_l0 = p_estream->FindNextID(EBML_INFO(EbmlHead), UINT64_MAX);
+    /* verify the EBML Header... it shouldn't be bigger than 1kB */
+    p_l0 = p_estream->FindNextID(EBML_INFO(EbmlHead), 1024);
     if (p_l0 == NULL)
     {
         msg_Err( p_demux, "No EBML header found" );
         return NULL;
     }
 
-    // verify we can read this Segment, we only support Matroska version 1 for now
-    p_l0->Read(*p_estream, EBML_CLASS_CONTEXT(EbmlHead), i_upper_lvl, p_l0, true);
+    /* verify we can read this Segment */
+    try
+    {
+        p_l0->Read(*p_estream, EBML_CLASS_CONTEXT(EbmlHead), i_upper_lvl, p_l0, true);
+    }
+    catch(...)
+    {
+        msg_Err(p_demux, "EBML Header Read failed");
+        return NULL;
+    }
 
     EDocType doc_type = GetChild<EDocType>(*static_cast<EbmlHead*>(p_l0));
     if (std::string(doc_type) != "matroska" && std::string(doc_type) != "webm" )
@@ -519,8 +527,15 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
                     // find the families of this segment
                     KaxInfo *p_info = static_cast<KaxInfo*>(p_l1);
                     b_keep_segment = b_initial;
-
-                    p_info->Read(*p_estream, EBML_CLASS_CONTEXT(KaxInfo), i_upper_lvl, p_l2, true);
+                    try
+                    {
+                        p_info->Read(*p_estream, EBML_CLASS_CONTEXT(KaxInfo), i_upper_lvl, p_l2, true);
+                    }
+                    catch (...)
+                    {
+                        msg_Err( p_demux, "KaxInfo found but corrupted");
+                        break;
+                    }
                     for( size_t i = 0; i < p_info->ListSize(); i++ )
                     {
                         EbmlElement *l = (*p_info)[i];

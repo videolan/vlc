@@ -86,25 +86,32 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
             msg_Dbg( &sys.demuxer, "|   |   + Seek" );
 #endif
             ep->Down();
-            while( ( l = ep->Get() ) != NULL )
+            try
             {
-                if( MKV_IS_ID( l, KaxSeekID ) )
+                while( ( l = ep->Get() ) != NULL )
                 {
-                    KaxSeekID &sid = *(KaxSeekID*)l;
-                    sid.ReadData( es.I_O() );
-                    id = EbmlId( sid.GetBuffer(), sid.GetSize() );
+                    if( MKV_IS_ID( l, KaxSeekID ) )
+                    {
+                        KaxSeekID &sid = *(KaxSeekID*)l;
+                        sid.ReadData( es.I_O() );
+                        id = EbmlId( sid.GetBuffer(), sid.GetSize() );
+                    }
+                    else if( MKV_IS_ID( l, KaxSeekPosition ) )
+                    {
+                        KaxSeekPosition &spos = *(KaxSeekPosition*)l;
+                        spos.ReadData( es.I_O() );
+                        i_pos = (int64_t)segment->GetGlobalPosition( uint64( spos ) );
+                    }
+                    else
+                    {
+                        /* Many mkvmerge files hit this case. It seems to be a broken SeekHead */
+                        msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid(*l).name() );
+                    }
                 }
-                else if( MKV_IS_ID( l, KaxSeekPosition ) )
-                {
-                    KaxSeekPosition &spos = *(KaxSeekPosition*)l;
-                    spos.ReadData( es.I_O() );
-                    i_pos = (int64_t)segment->GetGlobalPosition( uint64( spos ) );
-                }
-                else
-                {
-                    /* Many mkvmerge files hit this case. It seems to be a broken SeekHead */
-                    msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid(*l).name()  );
-                }
+            }
+            catch(...)
+            {
+                msg_Err( &sys.demuxer,"Error while reading %s",  typeid(*l).name() );
             }
             ep->Up();
 
@@ -713,7 +720,15 @@ void matroska_segment_c::ParseTracks( KaxTracks *tracks )
     int i_upper_level = 0;
 
     /* Master elements */
-    tracks->Read( es, EBML_CONTEXT(tracks), i_upper_level, el, true );
+    try
+    {
+        tracks->Read( es, EBML_CONTEXT(tracks), i_upper_level, el, true );
+    }
+    catch(...)
+    {
+        msg_Err( &sys.demuxer, "Couldn't read tracks" );
+        return;
+    }
 
     for( size_t i = 0; i < tracks->ListSize(); i++ )
     {
@@ -741,7 +756,15 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
 
     /* Master elements */
     m = static_cast<EbmlMaster *>(info);
-    m->Read( es, EBML_CONTEXT(info), i_upper_level, el, true );
+    try
+    {
+        m->Read( es, EBML_CONTEXT(info), i_upper_level, el, true );
+    }
+    catch(...)
+    {
+        msg_Err( &sys.demuxer, "Couldn't read info" );
+        return;
+    }   
 
     for( size_t i = 0; i < m->ListSize(); i++ )
     {
@@ -854,28 +877,35 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         else if( MKV_IS_ID( l, KaxChapterTranslate ) )
         {
             KaxChapterTranslate *p_trans = static_cast<KaxChapterTranslate*>( l );
-            chapter_translation_c *p_translate = new chapter_translation_c();
-
-            p_trans->Read( es, EBML_CONTEXT(p_trans), i_upper_level, el, true );
-            for( size_t j = 0; j < p_trans->ListSize(); j++ )
+            try
             {
-                EbmlElement *l = (*p_trans)[j];
+                p_trans->Read( es, EBML_CONTEXT(p_trans), i_upper_level, el, true );
+                chapter_translation_c *p_translate = new chapter_translation_c();
 
-                if( MKV_IS_ID( l, KaxChapterTranslateEditionUID ) )
+                for( size_t j = 0; j < p_trans->ListSize(); j++ )
                 {
-                    p_translate->editions.push_back( uint64( *static_cast<KaxChapterTranslateEditionUID*>( l ) ) );
+                    EbmlElement *l = (*p_trans)[j];
+
+                    if( MKV_IS_ID( l, KaxChapterTranslateEditionUID ) )
+                    {
+                        p_translate->editions.push_back( uint64( *static_cast<KaxChapterTranslateEditionUID*>( l ) ) );
+                    }
+                    else if( MKV_IS_ID( l, KaxChapterTranslateCodec ) )
+                    {
+                        p_translate->codec_id = uint32( *static_cast<KaxChapterTranslateCodec*>( l ) );
+                    }
+                    else if( MKV_IS_ID( l, KaxChapterTranslateID ) )
+                    {
+                        p_translate->p_translated = new KaxChapterTranslateID( *static_cast<KaxChapterTranslateID*>( l ) );
+                    }
                 }
-                else if( MKV_IS_ID( l, KaxChapterTranslateCodec ) )
-                {
-                    p_translate->codec_id = uint32( *static_cast<KaxChapterTranslateCodec*>( l ) );
-                }
-                else if( MKV_IS_ID( l, KaxChapterTranslateID ) )
-                {
-                    p_translate->p_translated = new KaxChapterTranslateID( *static_cast<KaxChapterTranslateID*>( l ) );
-                }
+
+                translations.push_back( p_translate );
             }
-
-            translations.push_back( p_translate );
+            catch(...)
+            {
+                msg_Err( &sys.demuxer, "Error while reading Chapter Tranlate");
+            }
         }
         else
         {
@@ -1039,7 +1069,15 @@ void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
     EbmlElement *el;
     int i_upper_level = 0;
 
-    attachments->Read( es, EBML_CONTEXT(attachments), i_upper_level, el, true );
+    try
+    {
+        attachments->Read( es, EBML_CONTEXT(attachments), i_upper_level, el, true );
+    }
+    catch(...)
+    {
+        msg_Err( &sys.demuxer, "Error while reading attachments" );
+        return;
+    }
 
     KaxAttached *attachedFile = FindChild<KaxAttached>( *attachments );
 
@@ -1089,7 +1127,15 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
     int i_upper_level = 0;
 
     /* Master elements */
-    chapters->Read( es, EBML_CONTEXT(chapters), i_upper_level, el, true );
+    try
+    {
+        chapters->Read( es, EBML_CONTEXT(chapters), i_upper_level, el, true );
+    }
+    catch(...)
+    {
+        msg_Err( &sys.demuxer, "Error while reading chapters" );
+        return;
+    }
 
     for( size_t i = 0; i < chapters->ListSize(); i++ )
     {
@@ -1150,7 +1196,15 @@ void matroska_segment_c::ParseCluster( bool b_update_start_time )
 
     /* Master elements */
     m = static_cast<EbmlMaster *>( cluster );
-    m->Read( es, EBML_CONTEXT(cluster), i_upper_level, el, true );
+    try
+    {
+        m->Read( es, EBML_CONTEXT(cluster), i_upper_level, el, true );
+    }
+    catch(...)
+    {
+        msg_Err( &sys.demuxer, "Error while reading cluster" );
+        return;
+    }
 
     for( unsigned int i = 0; i < m->ListSize(); i++ )
     {
