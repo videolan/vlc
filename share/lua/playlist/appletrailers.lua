@@ -64,8 +64,8 @@ function parse()
         line = vlc.readline()
         if not line then break end
 
-        if string.match( line, "h%d>.-</h%d" ) then
-            description = find( line, "h%d>(.+)</h%d")
+        if string.match( line, "h3>.-</h3" ) then
+            description = find( line, "h3>(.-)</h3")
             vlc.msg.dbg(description)
         end
         if string.match( line, 'img src=') then
