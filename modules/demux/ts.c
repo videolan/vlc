@@ -3939,13 +3939,6 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
             }
             else
             {
-                if( old_pid )
-                {
-                    PIDClean( p_demux, old_pid );
-                    TAB_REMOVE( i_clean, pp_clean, old_pid );
-                    old_pid = 0;
-                }
-
                 pid->es->id = es_out_Add( p_demux->out, &pid->es->fmt );
                 for( int i = 0; i < pid->i_extra_es; i++ )
                 {
