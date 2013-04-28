@@ -113,9 +113,6 @@ background-color: rgb(245, 245, 245);</string>
             <property name="styleSheet">
              <string notr="true">padding-right: 20px;</string>
             </property>
-            <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;VLC media player is a free and open source media player, encoder, and streamer made by the volunteers of the &lt;a href=&quot;http://www.videolan.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;VideoLAN&lt;/span&gt;&lt;/a&gt; community.&lt;/p&gt;&lt;p&gt;VLC uses its internal codecs, works on essentially every popular platform, and can read almost all files, CDs, DVDs, network streams, capture cards and other media formats!&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;http://www.videolan.org/contribute/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;Help and join us!&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
             </property>
@@ -218,9 +215,6 @@ background-color: rgb(245, 245, 245);</string>
           <height>0</height>
          </size>
         </property>
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:26pt; color:#353535;&quot;&gt;VLC media player&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
         <property name="alignment">
          <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
         </property>
@@ -279,9 +273,6 @@ background-color: rgb(230, 230, 230);</string>
         <property name="styleSheet">
          <string notr="true">padding: 10px</string>
         </property>
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;Authors&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
@@ -295,9 +286,6 @@ background-color: rgb(230, 230, 230);</string>
         <property name="styleSheet">
          <string notr="true">padding: 10px</string>
         </property>
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;License&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
@@ -310,9 +298,6 @@ background-color: rgb(230, 230, 230);</string>
         </property>
         <property name="styleSheet">
          <string notr="true">padding: 10px;</string>
-        </property>
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;Credits&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
