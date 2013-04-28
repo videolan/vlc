@@ -59,7 +59,7 @@
 #define RFB_FPS N_("Frame rate")
 #define RFB_FPS_LONGTEXT N_("How many times the screen content should be refreshed per second.")
 #define RFB_COMPRESS N_("Compression level")
-#define RFB_COMPRESS_LONGTEXT N_("Transfert compression level from 0 (none) to 9 (max)")
+#define RFB_COMPRESS_LONGTEXT N_("Transfer compression level from 0 (none) to 9 (max)")
 #define RFB_QUALITY N_("Image quality")
 #define RFB_QUALITY_LONGTEXT N_("Image quality 1 to 9 (max)")
 
