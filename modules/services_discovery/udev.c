@@ -585,7 +585,7 @@ static char *disc_get_name (struct udev_device *dev)
         else if (!strncmp (name, "DVD", 3))
             cat = N_("DVD");
         else if (!strncmp (name, "BD", 2))
-            cat = N_("BluRay");
+            cat = N_("Blu-ray");
         else if (!strncmp (name, "HDDVD", 5))
             cat = N_("HD DVD");
 
