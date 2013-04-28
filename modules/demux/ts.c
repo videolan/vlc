@@ -3646,6 +3646,8 @@ static void PMTSetupEsRegistration( demux_t *p_demux, ts_pid_t *pid,
         {
             p_fmt->i_cat   = p_regs[i].i_cat;
             p_fmt->i_codec = p_regs[i].i_codec;
+            if (p_es->i_type == 0x87)
+                p_fmt->i_codec = VLC_CODEC_EAC3;
             return;
         }
     }
