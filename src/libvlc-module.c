@@ -1094,7 +1094,7 @@ static const char *const ppsz_prefres[] = {
     "might require a reboot of your machine.")
 
 #define PLAYLISTENQUEUE_TEXT N_( \
-    "Enqueue items to playlist into one instance mode")
+    "Enqueue items into playlist in one instance mode")
 #define PLAYLISTENQUEUE_LONGTEXT N_( \
     "When using the one instance only option, enqueue items to playlist " \
     "and keep playing current item.")

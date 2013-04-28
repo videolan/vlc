@@ -589,7 +589,7 @@
       <item row="0" column="1">
        <widget class="QCheckBox" name="EnqueueOneInterfaceMode">
         <property name="text">
-         <string>Enqueue items in playlist in one instance mode</string>
+         <string>Enqueue items into playlist in one instance mode</string>
         </property>
        </widget>
       </item>
