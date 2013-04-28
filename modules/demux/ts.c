@@ -114,9 +114,6 @@ static void Close ( vlc_object_t * );
 #define CSA2_LONGTEXT N_("The even CSA encryption key. This must be a " \
   "16 char string (8 hexadecimal bytes).")
 
-#define SILENT_TEXT N_("Silent mode")
-#define SILENT_LONGTEXT N_("Do not complain on encrypted PES.")
-
 
 #define CPKT_TEXT N_("Packet size in bytes to decrypt")
 #define CPKT_LONGTEXT N_("Specify the size of the TS packet to decrypt. " \
@@ -154,10 +151,10 @@ vlc_module_begin ()
     add_integer( "ts-csa-pkt", 188, CPKT_TEXT, CPKT_LONGTEXT, true )
         change_safe()
 
-    add_bool( "ts-silent", false, SILENT_TEXT, SILENT_LONGTEXT, true )
-
     add_bool( "ts-split-es", true, SPLIT_ES_TEXT, SPLIT_ES_LONGTEXT, false )
     add_bool( "ts-seek-percent", false, SEEK_PERCENT_TEXT, SEEK_PERCENT_LONGTEXT, true )
+
+    add_obsolete_bool( "ts-silent" );
 
     set_capability( "demux", 10 )
     set_callbacks( Open, Close )
@@ -309,7 +306,6 @@ struct demux_sys_t
     bool        b_es_id_pid;
     csa_t       *csa;
     int         i_csa_pkt_size;
-    bool        b_silent;
     bool        b_split_es;
 
     bool        b_udp_out;
@@ -679,7 +675,6 @@ static int Open( vlc_object_t *p_this )
     }
     free( psz_string );
 
-    p_sys->b_silent = var_CreateGetBool( p_demux, "ts-silent" );
     p_sys->b_split_es = var_InheritBool( p_demux, "ts-split-es" );
 
     p_sys->i_pid_ref_pcr = -1;
@@ -1411,9 +1406,8 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
 
     if( header[0] != 0 || header[1] != 0 || header[2] != 1 )
     {
-        if( !p_demux->p_sys->b_silent )
-            msg_Warn( p_demux, "invalid header [0x%02x:%02x:%02x:%02x] (pid: %d)",
-                      header[0], header[1],header[2],header[3], pid->i_pid );
+        msg_Warn( p_demux, "invalid header [0x%02x:%02x:%02x:%02x] (pid: %d)",
+                    header[0], header[1],header[2],header[3], pid->i_pid );
         block_ChainRelease( p_pes );
         return;
     }
