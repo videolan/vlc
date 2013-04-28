@@ -64,8 +64,8 @@ struct aout_sys_t
         bool             mute;
     } volume;
 
-    int      i_bytes_per_sample;      /* Size in bytes of one frame */     
-    int      i_rate;                  /* Sample rate */ 
+    int      i_bytes_per_sample;      /* Size in bytes of one frame */
+    int      i_rate;                  /* Sample rate */
 
     uint8_t  chans_to_reorder;        /* do we need channel reordering */
     uint8_t  chan_table[AOUT_CHAN_MAX];
@@ -598,7 +598,7 @@ static int CreateDSBuffer( audio_output_t *p_aout, int i_format,
                                            (void **) &p_aout->sys->p_notify )
             != DS_OK )
     {
-        
+
         msg_Err(p_aout, "Couldn't query IDirectSoundNotify");
         p_aout->sys->p_notify = NULL;
     }
@@ -901,7 +901,7 @@ static void Flush ( audio_output_t * aout, bool drain )
     else
     {
         IDirectSoundBuffer_Stop( aout->sys->p_dsbuffer );
-        IDirectSoundBuffer_SetCurrentPosition( aout->sys->p_dsbuffer, 
+        IDirectSoundBuffer_SetCurrentPosition( aout->sys->p_dsbuffer,
                                                aout->sys->i_write );
     }
 }
