@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>733</width>
-    <height>544</height>
+    <height>548</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -257,10 +257,23 @@
              <property name="topMargin">
               <number>0</number>
              </property>
-             <item row="3" column="0">
-              <widget class="QCheckBox" name="minimalviewBox">
+             <item row="1" column="2" colspan="2">
+              <widget class="QCheckBox" name="resizingBox">
                <property name="text">
-                <string>Start in minimal view mode</string>
+                <string>Resize interface to video size</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="2" colspan="2">
+              <widget class="QComboBox" name="notificationCombo"/>
+             </item>
+             <item row="9" column="2" colspan="2">
+              <widget class="QComboBox" name="stylesCombo"/>
+             </item>
+             <item row="0" column="0" colspan="5">
+              <widget class="QCheckBox" name="fsController">
+               <property name="text">
+                <string>Show controls in full screen mode</string>
                </property>
               </widget>
              </item>
@@ -271,21 +284,24 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="0" colspan="3">
-              <widget class="QCheckBox" name="fsController">
+             <item row="5" column="0">
+              <widget class="QLabel" name="notificationComboLabel">
                <property name="text">
-                <string>Show controls in full screen mode</string>
+                <string>Show media change popup:</string>
+               </property>
+               <property name="buddy">
+                <cstring>notificationCombo</cstring>
                </property>
               </widget>
              </item>
-             <item row="5" column="0" rowspan="2">
-              <widget class="QCheckBox" name="systrayBox">
+             <item row="3" column="0">
+              <widget class="QCheckBox" name="minimalviewBox">
                <property name="text">
-                <string>Show systray icon</string>
+                <string>Start in minimal view mode</string>
                </property>
               </widget>
              </item>
-             <item row="8" column="0">
+             <item row="9" column="0">
               <widget class="QLabel" name="stylesLabel">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
@@ -301,13 +317,6 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="2" colspan="2">
-              <widget class="QCheckBox" name="resizingBox">
-               <property name="text">
-                <string>Resize interface to video size</string>
-               </property>
-              </widget>
-             </item>
              <item row="1" column="0">
               <widget class="QCheckBox" name="embedVideo">
                <property name="text">
@@ -315,20 +324,7 @@
                </property>
               </widget>
              </item>
-             <item row="3" column="4">
-              <spacer name="horizontalSpacer_7">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="3" column="1">
+             <item row="1" column="1">
               <spacer name="horizontalSpacer_3">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -341,18 +337,25 @@
                </property>
               </spacer>
              </item>
-             <item row="8" column="2" colspan="3">
-              <widget class="QComboBox" name="stylesCombo"/>
+             <item row="1" column="4">
+              <spacer name="horizontalSpacer_7">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
              </item>
-             <item row="5" column="1" colspan="2">
-              <widget class="QLabel" name="notificationComboLabel">
+             <item row="4" column="0" colspan="2">
+              <widget class="QCheckBox" name="systrayBox">
                <property name="text">
-                <string>Show media change popup:</string>
+                <string>Show systray icon</string>
                </property>
               </widget>
-             </item>
-             <item row="5" column="3" colspan="2">
-              <widget class="QComboBox" name="notificationCombo"/>
              </item>
             </layout>
            </widget>
@@ -485,9 +488,9 @@
     </widget>
    </item>
    <item row="3" column="0" colspan="2">
-    <widget class="QGroupBox" name="playlistGroupBox">
+    <widget class="QGroupBox" name="osGroupBox">
      <property name="title">
-      <string>Playlist</string>
+      <string>Operating System Integration</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
       <item row="2" column="0">
@@ -640,19 +643,27 @@
   <tabstop>qt</tabstop>
   <tabstop>skins</tabstop>
   <tabstop>fsController</tabstop>
+  <tabstop>embedVideo</tabstop>
+  <tabstop>resizingBox</tabstop>
   <tabstop>minimalviewBox</tabstop>
   <tabstop>pauseMinimizedBox</tabstop>
   <tabstop>systrayBox</tabstop>
+  <tabstop>notificationCombo</tabstop>
   <tabstop>stylesCombo</tabstop>
   <tabstop>OneInterfaceMode</tabstop>
   <tabstop>EnqueueOneInterfaceMode</tabstop>
+  <tabstop>oneInstanceFromFile</tabstop>
+  <tabstop>treePlaylist</tabstop>
+  <tabstop>playPauseBox</tabstop>
+  <tabstop>artFetcher</tabstop>
+  <tabstop>sqlMLbtn</tabstop>
   <tabstop>updatesBox</tabstop>
   <tabstop>updatesDays</tabstop>
   <tabstop>saveRecentlyPlayed</tabstop>
   <tabstop>recentlyPlayedFilters</tabstop>
   <tabstop>assoButton</tabstop>
-  <tabstop>fileSkin</tabstop>
   <tabstop>skinBrowse</tabstop>
+  <tabstop>fileSkin</tabstop>
  </tabstops>
  <resources/>
  <connections/>

@@ -587,6 +587,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "qt-notification", IntegerList, ui.notificationComboLabel,
                                                       notificationCombo );
             CONNECT( ui.systrayBox, toggled( bool ), ui.notificationCombo, setEnabled( bool ) );
+            CONNECT( ui.systrayBox, toggled( bool ), ui.notificationComboLabel, setEnabled( bool ) );
             ui.notificationCombo->setEnabled( ui.systrayBox->isChecked() );
 
             CONFIG_BOOL( "qt-pause-minimized", pauseMinimizedBox );
