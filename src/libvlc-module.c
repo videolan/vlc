@@ -1374,9 +1374,9 @@ static const char *const mouse_wheel_texts[] =
 #define TOGGLE_AUTOSCALE_KEY_TEXT N_("Toggle autoscaling")
 #define TOGGLE_AUTOSCALE_KEY_LONGTEXT N_("Activate or deactivate autoscaling.")
 #define SCALE_UP_KEY_TEXT N_("Increase scale factor")
-#define SCALE_UP_KEY_LONGTEXT N_("Increase scale factor.")
+#define SCALE_UP_KEY_LONGTEXT SCALE_UP_KEY_TEXT
 #define SCALE_DOWN_KEY_TEXT N_("Decrease scale factor")
-#define SCALE_DOWN_KEY_LONGTEXT N_("Decrease scale factor.")
+#define SCALE_DOWN_KEY_LONGTEXT SCALE_DOWN_KEY_TEXT
 #define DEINTERLACE_KEY_TEXT N_("Toggle deinterlacing")
 #define DEINTERLACE_KEY_LONGTEXT N_("Activate or deactivate deinterlacing.")
 #define DEINTERLACE_MODE_KEY_TEXT N_("Cycle deinterlace modes")

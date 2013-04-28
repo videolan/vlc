@@ -57,7 +57,7 @@
  * Module descriptor
  *****************************************************************************/
 
-#define BD_MENU_TEXT        N_( "Bluray menus" )
+#define BD_MENU_TEXT        N_( "BluRay menus" )
 #define BD_MENU_LONGTEXT    N_( "Use bluray menus. If disabled, "\
                                 "the movie will start directly" )
 
@@ -67,7 +67,7 @@ static void blurayClose( vlc_object_t * );
 
 vlc_module_begin ()
     set_shortname( N_("BluRay") )
-    set_description( N_("Blu-Ray Disc support (libbluray)") )
+    set_description( N_("BluRay Disc support (libbluray)") )
 
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
@@ -260,7 +260,7 @@ static int blurayOpen( vlc_object_t *object )
     /* AACS */
     if (disc_info->aacs_detected) {
         if (!disc_info->libaacs_detected) {
-            error_msg = _("This Blu-Ray Disc needs a library for AACS decoding, "
+            error_msg = _("This BluRay Disc needs a library for AACS decoding, "
                       "and your system does not have it.");
             goto error;
         }
@@ -300,7 +300,7 @@ static int blurayOpen( vlc_object_t *object )
     /* BD+ */
     if (disc_info->bdplus_detected) {
         if (!disc_info->libbdplus_detected) {
-            error_msg = _("This Blu-Ray Disc needs a library for BD+ decoding, "
+            error_msg = _("This BluRay Disc needs a library for BD+ decoding, "
                       "and your system does not have it.");
             goto error;
         }
@@ -367,7 +367,7 @@ static int blurayOpen( vlc_object_t *object )
 
 error:
     if (error_msg)
-        dialog_Fatal(p_demux, _("Blu-Ray error"), "%s", error_msg);
+        dialog_Fatal(p_demux, _("BluRay error"), "%s", error_msg);
     blurayClose(object);
     return VLC_EGENERIC;
 }

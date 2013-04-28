@@ -271,7 +271,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
     "(p4x4 requires p8x8. i8x8 requires 8x8dct).")
 
 #define DIRECT_PRED_TEXT N_("Direct MV prediction mode")
-#define DIRECT_PRED_LONGTEXT N_( "Direct MV prediction mode.")
+#define DIRECT_PRED_LONGTEXT DIRECT_PRED_TEXT
 
 #define DIRECT_PRED_SIZE_TEXT N_("Direct prediction size")
 #define DIRECT_PRED_SIZE_LONGTEXT N_( "Direct prediction size: "\

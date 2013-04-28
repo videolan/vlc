@@ -137,7 +137,7 @@ static const char *const power_freq_user[] = { N_("Unspecified"),
     N_("Off"), N_("50 Hz"), N_("60 Hz"), N_("Automatic"),
 };
 #define BKLT_COMPENSATE_TEXT N_( "Backlight compensation" )
-#define BKLT_COMPENSATE_LONGTEXT N_( "Backlight compensation." )
+#define BKLT_COMPENSATE_LONGTEXT BKLT_COMPENSATE_TEXT
 #define BAND_STOP_FILTER_TEXT N_( "Band-stop filter" )
 #define BAND_STOP_FILTER_LONGTEXT N_(  \
     "Cut a light band induced by fluorescent lighting (unit undocumented)." )
