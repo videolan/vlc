@@ -3929,12 +3929,15 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
                     !strcmp( pid->es->fmt.psz_language,
                              old_pid->es->fmt.psz_language ) ) ) )
             {
-                pid->es->id = old_pid->es->id;
-                old_pid->es->id = NULL;
+                pid->i_cc = old_pid->i_cc;
+                ts_es_t *e = pid->es;
+                pid->es = old_pid->es;
+                old_pid->es = e;
                 for( int i = 0; i < pid->i_extra_es; i++ )
                 {
-                    pid->extra_es[i]->id = old_pid->extra_es[i]->id;
-                    old_pid->extra_es[i]->id = NULL;
+                    e = pid->extra_es[i];
+                    pid->extra_es[i] = old_pid->extra_es[i];
+                    old_pid->extra_es[i] = e;
                 }
             }
             else
