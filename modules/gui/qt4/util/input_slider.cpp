@@ -441,7 +441,7 @@ bool SeekSlider::isAnimationRunning() const
 #define WHEIGHT   22  // px
 #define SOUNDMIN  0   // %
 
-SoundSlider::SoundSlider( QWidget *_parent, int _i_step,
+SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
                           char *psz_colors, int max )
                         : QAbstractSlider( _parent )
 {

@@ -130,7 +130,7 @@ class SoundSlider : public QAbstractSlider
 {
     Q_OBJECT
 public:
-    SoundSlider(QWidget *_parent, int _i_step, char *psz_colors, int max = SOUNDMAX );
+    SoundSlider(QWidget *_parent, float _i_step, char *psz_colors, int max = SOUNDMAX );
     void setMuted( bool ); /* Set Mute status */
 
 protected:

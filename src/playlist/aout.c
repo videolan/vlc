@@ -76,7 +76,7 @@ int playlist_VolumeUp (playlist_t *pl, int value, float *volp)
 {
     int ret = -1;
 
-    value *= var_InheritInteger (pl, "volume-step");
+    float delta = value * var_InheritFloat (pl, "volume-step");
 
     audio_output_t *aout = playlist_GetAout (pl);
     if (aout != NULL)
@@ -84,7 +84,7 @@ int playlist_VolumeUp (playlist_t *pl, int value, float *volp)
         float vol = aout_VolumeGet (aout);
         if (vol >= 0.)
         {
-            vol += value / (float)AOUT_VOLUME_DEFAULT;
+            vol += delta / (float)AOUT_VOLUME_DEFAULT;
             if (vol < 0.)
                 vol = 0.;
             if (vol > 2.)
