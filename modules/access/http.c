@@ -438,6 +438,11 @@ connect:
 
     if( p_sys->i_code == 401 )
     {
+        if( p_sys->auth.psz_realm == NULL )
+        {
+            msg_Err( p_access, "authentication failed without realm" );
+            goto error;
+        }
         char *psz_login, *psz_password;
         /* FIXME ? */
         if( p_sys->url.psz_username && p_sys->url.psz_password &&
