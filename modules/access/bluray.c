@@ -46,7 +46,7 @@
 #include <vlc_atomic.h>
 #include <vlc_dialog.h>                     /* BD+/AACS warnings */
 #include <vlc_vout.h>                       /* vout_PutSubpicture / subpicture_t */
-#include <vlc_url.h>			    /* vlc_path2uri */
+#include <vlc_url.h>                        /* vlc_path2uri */
 
 #include <libbluray/bluray.h>
 #include <libbluray/keys.h>
