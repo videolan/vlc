@@ -99,8 +99,7 @@ int transcode_audio_new( sout_stream_t *p_stream,
     }
     /* decoders don't set audio.i_format, but audio filters use it */
     id->p_decoder->fmt_out.audio.i_format = id->p_decoder->fmt_out.i_codec;
-    id->p_decoder->fmt_out.audio.i_bitspersample =
-        aout_BitsPerSample( id->p_decoder->fmt_out.i_codec );
+    aout_FormatPrepare( &id->p_decoder->fmt_out.audio );
     fmt_last = id->p_decoder->fmt_out.audio;
     /* Fix AAC SBR changing number of channels and sampling rate */
     if( !(id->p_decoder->fmt_in.i_codec == VLC_CODEC_MP4A &&
@@ -116,16 +115,12 @@ int transcode_audio_new( sout_stream_t *p_stream,
     es_format_Init( &id->p_encoder->fmt_in, id->p_decoder->fmt_in.i_cat,
                     id->p_decoder->fmt_out.i_codec );
     id->p_encoder->fmt_in.audio.i_format = id->p_decoder->fmt_out.i_codec;
-
     id->p_encoder->fmt_in.audio.i_rate = id->p_encoder->fmt_out.audio.i_rate;
     id->p_encoder->fmt_in.audio.i_physical_channels =
         id->p_encoder->fmt_out.audio.i_physical_channels;
     id->p_encoder->fmt_in.audio.i_original_channels =
         id->p_encoder->fmt_out.audio.i_original_channels;
-    id->p_encoder->fmt_in.audio.i_channels =
-        id->p_encoder->fmt_out.audio.i_channels;
-    id->p_encoder->fmt_in.audio.i_bitspersample =
-        aout_BitsPerSample( id->p_encoder->fmt_in.i_codec );
+    aout_FormatPrepare( &id->p_encoder->fmt_in.audio );
 
     id->p_encoder->p_cfg = p_stream->p_sys->p_audio_cfg;
     id->p_encoder->p_module =
@@ -139,14 +134,12 @@ int transcode_audio_new( sout_stream_t *p_stream,
         id->p_decoder->p_module = NULL;
         return VLC_EGENERIC;
     }
-    id->p_encoder->fmt_in.audio.i_format = id->p_encoder->fmt_in.i_codec;
-    id->p_encoder->fmt_in.audio.i_bitspersample =
-        aout_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 
     id->p_encoder->fmt_out.i_codec =
         vlc_fourcc_GetCodec( AUDIO_ES, id->p_encoder->fmt_out.i_codec );
 
-    /* Fix channels */
+    /* Fix input format */
+    id->p_encoder->fmt_in.audio.i_format = id->p_encoder->fmt_in.i_codec;
     if( !id->p_encoder->fmt_in.audio.i_physical_channels
      || !id->p_encoder->fmt_in.audio.i_original_channels )
     {
@@ -155,6 +148,7 @@ int transcode_audio_new( sout_stream_t *p_stream,
             id->p_encoder->fmt_in.audio.i_original_channels =
                       pi_channels_maps[id->p_encoder->fmt_in.audio.i_channels];
     }
+    aout_FormatPrepare( &id->p_encoder->fmt_in.audio );
 
     /* Load user specified audio filters */
     /* XXX: These variable names come kinda out of nowhere... */
