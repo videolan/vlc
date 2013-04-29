@@ -740,73 +740,66 @@ int OpenEncoder( vlc_object_t *p_this )
     vlc_avcodec_unlock();
     if( ret )
     {
-        if( p_enc->fmt_in.i_cat == AUDIO_ES &&
-             (p_context->channels > 2 || i_codec_id == AV_CODEC_ID_MP2
-               || i_codec_id == AV_CODEC_ID_MP3) )
-        {
-            if( p_context->channels > 2 )
-            {
-                p_context->channels = 2;
-                p_enc->fmt_in.audio.i_channels = 2; // FIXME
-                msg_Warn( p_enc, "stereo mode selected (codec limitation)" );
-            }
-
-            if( i_codec_id == AV_CODEC_ID_MP2 || i_codec_id == AV_CODEC_ID_MP3 )
-            {
-                int i_frequency, i;
-
-                for ( i_frequency = 0; i_frequency < 6; i_frequency++ )
-                {
-                    if ( p_enc->fmt_out.audio.i_rate
-                            == mpa_freq_tab[i_frequency] )
-                        break;
-                }
-                if ( i_frequency == 6 )
-                {
-                    msg_Err( p_enc, "MPEG audio doesn't support frequency=%d",
-                             p_enc->fmt_out.audio.i_rate );
-                    free( p_sys );
-                    return VLC_EGENERIC;
-                }
-
-                for ( i = 1; i < 14; i++ )
-                {
-                    if ( p_enc->fmt_out.i_bitrate / 1000
-                          <= mpa_bitrate_tab[i_frequency / 3][i] )
-                        break;
-                }
-                if ( p_enc->fmt_out.i_bitrate / 1000
-                      != mpa_bitrate_tab[i_frequency / 3][i] )
-                {
-                    msg_Warn( p_enc,
-                              "MPEG audio doesn't support bitrate=%d, using %d",
-                              p_enc->fmt_out.i_bitrate,
-                              mpa_bitrate_tab[i_frequency / 3][i] * 1000 );
-                    p_enc->fmt_out.i_bitrate =
-                        mpa_bitrate_tab[i_frequency / 3][i] * 1000;
-                    p_context->bit_rate = p_enc->fmt_out.i_bitrate;
-                }
-            }
-
-            p_context->codec = NULL;
-            vlc_avcodec_lock();
-            ret = avcodec_open2( p_context, p_codec, NULL /* options */ );
-            vlc_avcodec_unlock();
-            if( ret )
-            {
-                msg_Err( p_enc, "cannot open encoder" );
-                dialog_Fatal( p_enc,
-                                _("Streaming / Transcoding failed"),
-                                "%s", _("VLC could not open the encoder.") );
-                free( p_sys );
-                return VLC_EGENERIC;
-            }
-        }
-        else
+        if( p_enc->fmt_in.i_cat != AUDIO_ES ||
+                (p_context->channels <= 2 && i_codec_id != AV_CODEC_ID_MP2
+                 && i_codec_id != AV_CODEC_ID_MP3) )
         {
             msg_Err( p_enc, "cannot open encoder" );
             dialog_Fatal( p_enc, _("Streaming / Transcoding failed"),
-                            "%s", _("VLC could not open the encoder.") );
+                    "%s", _("VLC could not open the encoder.") );
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
+
+        if( p_context->channels > 2 )
+        {
+            p_context->channels = 2;
+            p_enc->fmt_in.audio.i_channels = 2; // FIXME
+            msg_Warn( p_enc, "stereo mode selected (codec limitation)" );
+        }
+
+        if( i_codec_id == AV_CODEC_ID_MP2 || i_codec_id == AV_CODEC_ID_MP3 )
+        {
+            int i_frequency, i;
+            es_format_t *fmt = &p_enc->fmt_out;
+
+            for ( i_frequency = 0; i_frequency < 6; i_frequency++ )
+                if ( fmt->audio.i_rate == mpa_freq_tab[i_frequency] )
+                    break;
+
+            if ( i_frequency == 6 )
+            {
+                msg_Err( p_enc, "MPEG audio doesn't support frequency=%d",
+                        fmt->audio.i_rate );
+                free( p_sys );
+                return VLC_EGENERIC;
+            }
+
+            for ( i = 1; i < 14; i++ )
+                if (fmt->i_bitrate/1000 <= mpa_bitrate_tab[i_frequency / 3][i])
+                    break;
+
+            if (fmt->i_bitrate / 1000 != mpa_bitrate_tab[i_frequency / 3][i])
+            {
+                msg_Warn( p_enc,
+                        "MPEG audio doesn't support bitrate=%d, using %d",
+                        fmt->i_bitrate,
+                        mpa_bitrate_tab[i_frequency / 3][i] * 1000 );
+                fmt->i_bitrate = mpa_bitrate_tab[i_frequency / 3][i] * 1000;
+                p_context->bit_rate = fmt->i_bitrate;
+            }
+        }
+
+        p_context->codec = NULL;
+        vlc_avcodec_lock();
+        ret = avcodec_open2( p_context, p_codec, NULL /* options */ );
+        vlc_avcodec_unlock();
+        if( ret )
+        {
+            msg_Err( p_enc, "cannot open encoder" );
+            dialog_Fatal( p_enc,
+                    _("Streaming / Transcoding failed"),
+                    "%s", _("VLC could not open the encoder.") );
             free( p_sys );
             return VLC_EGENERIC;
         }
