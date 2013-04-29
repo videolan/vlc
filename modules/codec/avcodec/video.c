@@ -336,7 +336,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     char *hw = var_CreateGetString( p_dec, "avcodec-hw" ); /* FIXME */
     if( (hw == NULL || strcasecmp( hw, "none" )) &&
         (i_codec_id == AV_CODEC_ID_MPEG1VIDEO || i_codec_id == AV_CODEC_ID_MPEG2VIDEO ||
-         i_codec_id == AV_CODEC_ID_MPEG4 ||
+         i_codec_id == AV_CODEC_ID_MPEG4 || i_codec_id == AV_CODEC_ID_H263 ||
          i_codec_id == AV_CODEC_ID_H264 ||
          i_codec_id == AV_CODEC_ID_VC1 || i_codec_id == AV_CODEC_ID_WMV3) )
     {
