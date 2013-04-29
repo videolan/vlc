@@ -62,7 +62,7 @@
       <item row="0" column="3">
        <widget class="QRadioButton" name="bdRadioButton">
         <property name="text">
-         <string>BluRay</string>
+         <string>Blu-ray</string>
         </property>
        </widget>
       </item>
