@@ -28,7 +28,7 @@
 #define kVLCMediaDVD @"DVD"
 #define kVLCMediaVCD @"VCD"
 #define kVLCMediaSVCD @"SVCD"
-#define kVLCMediaBD @"Bluray"
+#define kVLCMediaBD @"Blu-ray"
 #define kVLCMediaVideoTSFolder @"VIDEO_TS"
 #define kVLCMediaBDMVFolder @"BDMV"
 #define kVLCMediaUnknown @"Unknown"
