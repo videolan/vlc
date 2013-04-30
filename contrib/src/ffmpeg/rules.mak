@@ -96,7 +96,6 @@ endif
 # Linux
 ifdef HAVE_LINUX
 FFMPEGCONF += --target-os=linux --enable-pic
-
 endif
 
 # Windows
@@ -117,6 +116,12 @@ endif
 else # !Windows
 FFMPEGCONF += --enable-pthreads
 endif
+
+# Disable mpegvideo-based hwaccel - known broken
+FFMPEGCONF += \
+	$(foreach codec,h263 mpeg1 mpeg2 mpeg4 vc1 wmv3,\
+		$(foreach api,dxva2 vaapi vdpau,\
+			--disable-hwaccel=$(codec)_$(api)))
 
 # Build
 PKGS += ffmpeg
