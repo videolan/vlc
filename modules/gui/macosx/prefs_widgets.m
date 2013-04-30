@@ -2132,8 +2132,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
             [o_tableColumn setDataCell: o_dataCell];
             [o_tableColumn setWidth:s_rc.size.width - 34];
             [o_tableview addTableColumn: o_tableColumn];
-            [o_tableview registerForDraggedTypes:[NSArray arrayWithObjects:
-                                                  @"VLC media player module", nil]];
+            [o_tableview registerForDraggedTypes:@[@"VLC media player module"]];
 
             [o_tableview setDataSource:self];
             [o_tableview setTarget: self];
@@ -2205,8 +2204,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
             return NO;
     }
 
-    [pb declareTypes:[NSArray
-        arrayWithObject:@"VLC media player module"] owner:nil];
+    [pb declareTypes:@[@"VLC media player module"] owner:nil];
     [pb setPropertyList:rows forType:@"VLC media player module"];
     return YES;
 }

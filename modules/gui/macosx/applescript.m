@@ -46,7 +46,7 @@
             if (o_url != nil)
                 [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: o_url];
 
-            NSMutableArray *o_result = [NSMutableArray arrayWithObject:[NSDictionary dictionaryWithObject:o_urlString forKey:@"ITEM_URL"]];
+            NSArray *o_result = @[[NSDictionary dictionaryWithObject:o_urlString forKey: @"ITEM_URL"]];
 
             if (b_autoplay)
                 [[[VLCMain sharedInstance] playlist] appendArray: o_result atPos: -1 enqueue: NO];

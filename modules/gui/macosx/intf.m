@@ -1868,7 +1868,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             return;
         }
 
-        NSArray * ourPreferences = [NSArray arrayWithObjects:@"org.videolan.vlc.plist", @"VLC", @"org.videolan.vlc", nil];
+        NSArray * ourPreferences = @[@"org.videolan.vlc.plist", @"VLC", @"org.videolan.vlc"];
 
         /* Move the file to trash so that user can find them later */
         [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:preferences destination:nil files:ourPreferences tag:0];
@@ -1982,7 +1982,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [saveFolderPanel setCanSelectHiddenExtension: NO];
     [saveFolderPanel setCanCreateDirectories: YES];
-    [saveFolderPanel setAllowedFileTypes: [NSArray arrayWithObject:@"rtf"]];
+    [saveFolderPanel setAllowedFileTypes: @[@"rtf"]];
     [saveFolderPanel setNameFieldStringValue:[NSString stringWithFormat: _NS("VLC Debug Log (%s).rtf"), VERSION_MESSAGE]];
     [saveFolderPanel beginSheetModalForWindow: o_msgs_panel completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSOKButton) {

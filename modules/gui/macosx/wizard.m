@@ -83,16 +83,14 @@ static VLCWizard *_o_sharedInstance = nil;
 
     /* add audio-bitrates for transcoding */
     NSArray * audioBitratesArray;
-    audioBitratesArray = [NSArray arrayWithObjects: @"512", @"256", @"192",
-        @"128", @"64", @"32", @"16", nil ];
+    audioBitratesArray = @[@"512", @"256", @"192", @"128", @"64", @"32", @"16"];
     [o_t4_pop_audioBitrate removeAllItems];
     [o_t4_pop_audioBitrate addItemsWithTitles: audioBitratesArray];
     [o_t4_pop_audioBitrate selectItemWithTitle: @"192"];
 
     /* add video-bitrates for transcoding */
     NSArray * videoBitratesArray;
-    videoBitratesArray = [NSArray arrayWithObjects: @"3072", @"2048", @"1024",
-        @"768", @"512", @"256", @"192", @"128", @"64", @"32", @"16", nil ];
+    videoBitratesArray = @[@"3072", @"2048", @"1024", @"768", @"512", @"256", @"192", @"128", @"64", @"32", @"16"];
     [o_t4_pop_videoBitrate removeAllItems];
     [o_t4_pop_videoBitrate addItemsWithTitles: videoBitratesArray];
     [o_t4_pop_videoBitrate selectItemWithTitle: @"1024"];
@@ -114,58 +112,58 @@ static VLCWizard *_o_sharedInstance = nil;
     NSArray * o_mjpg;
     NSArray * o_theo;
     NSArray * o_dummyVid;
-    o_mp1v = [NSArray arrayWithObjects: @"MPEG-1 Video", @"mp1v",
-        _NS("MPEG-1 Video codec (usable with MPEG PS, MPEG TS, MPEG1, OGG "
-        "and RAW)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG", @"MUX_OGG", @"MUX_RAW",
-        @"NO", @"NO", @"NO", @"NO", nil];
-    o_mp2v = [NSArray arrayWithObjects: @"MPEG-2 Video", @"mp2v",
-        _NS("MPEG-2 Video codec (usable with MPEG PS, MPEG TS, MPEG1, OGG "
-        "and RAW)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG", @"MUX_OGG", @"MUX_RAW",
-        @"NO", @"NO", @"NO", @"NO", nil];
-    o_mp4v = [NSArray arrayWithObjects: @"MPEG-4 Video", @"mp4v",
-        _NS("MPEG-4 Video codec (useable with MPEG PS, MPEG TS, MPEG1, ASF, "
-        "MP4, OGG and RAW)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG", @"MUX_ASF",
-        @"MUX_MP4", @"MUX_OGG", @"MUX_RAW", @"NO", @"NO", nil];
-    o_div1 = [NSArray arrayWithObjects: @"DIVX 1", @"DIV1",
-        _NS("DivX first version (useable with MPEG TS, MPEG1, ASF and OGG)"),
-        @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG", @"NO", @"NO", @"NO",
-        @"NO", @"NO", nil];
-    o_div2 = [NSArray arrayWithObjects: @"DIVX 2", @"DIV2",
-        _NS("DivX second version (useable with MPEG TS, MPEG1, ASF and OGG)"),
-        @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG", @"NO", @"NO", @"NO",
-        @"NO", @"NO", nil];
-    o_div3 = [NSArray arrayWithObjects: @"DIVX 3", @"DIV3",
-        _NS("DivX third version (useable with MPEG TS, MPEG1, ASF and OGG)"),
-        @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG", @"NO", @"NO", @"NO",
-        @"NO", @"NO", nil];
-    o_h263 = [NSArray arrayWithObjects: @"H.263", @"h263",
-        _NS("H263 is a video codec optimized for videoconference "
-        "(low rates, useable with MPEG TS)"), @"MUX_TS", @"NO", @"NO", @"NO",
-        @"NO", @"NO", @"NO", @"NO", @"NO", nil];
-    o_h264 = [NSArray arrayWithObjects: @"H.264", @"h264",
-        _NS("H264 is a new video codec (useable with MPEG TS and MP4)"),
-        @"MUX_TS", @"MUX_MP4", @"NO", @"NO", @"NO", @"NO", @"NO", @"NO",
-        @"NO", nil];
-    o_wmv1 = [NSArray arrayWithObjects: @"WMV 1", @"WMV1",
-        _NS("WMV (Windows Media Video) 1 (useable with MPEG TS, MPEG1, ASF and "
-        "OGG)"), @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG", @"NO", @"NO",
-        @"NO", @"NO", @"NO", nil];
-    o_wmv2 = [NSArray arrayWithObjects: @"WMV 2", @"WMV2",
-        _NS("WMV (Windows Media Video) 2 (useable with MPEG TS, MPEG1, ASF and "
-        "OGG)"), @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG", @"NO", @"NO",
-        @"NO", @"NO", @"NO", nil];
-    o_mjpg = [NSArray arrayWithObjects: @"MJPEG", @"MJPG",
-        _NS("MJPEG consists of a series of JPEG pictures (useable with MPEG TS,"
-        " MPEG1, ASF and OGG)"), @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG",
-        @"NO", @"NO", @"NO", @"NO", @"NO", nil];
-    o_theo = [NSArray arrayWithObjects: @"Theora", @"theo",
-        _NS("Theora is a free general-purpose codec (useable with MPEG TS "
-        "and OGG)"), @"MUX_TS", @"MUX_OGG", @"NO", @"NO", @"NO", @"NO", @"NO",
-        @"NO", @"NO", nil];
-    o_dummyVid = [NSArray arrayWithObjects: @"Dummy", @"dummy",
-        _NS("Dummy codec (do not transcode, useable with all encapsulation "
-        "formats)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_MP4",
-        @"MUX_OGG", @"MUX_WAV", @"MUX_RAW", @"MUX_MOV", nil];
+    o_mp1v = @[@"MPEG-1 Video", @"mp1v",
+               _NS("MPEG-1 Video codec (usable with MPEG PS, MPEG TS, MPEG1, OGG "
+                   "and RAW)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG", @"MUX_OGG", @"MUX_RAW",
+               @"NO", @"NO", @"NO", @"NO"];
+    o_mp2v = @[@"MPEG-2 Video", @"mp2v",
+               _NS("MPEG-2 Video codec (usable with MPEG PS, MPEG TS, MPEG1, OGG "
+                   "and RAW)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG", @"MUX_OGG", @"MUX_RAW",
+               @"NO", @"NO", @"NO", @"NO"];
+    o_mp4v = @[@"MPEG-4 Video", @"mp4v",
+               _NS("MPEG-4 Video codec (useable with MPEG PS, MPEG TS, MPEG1, ASF, "
+                   "MP4, OGG and RAW)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG", @"MUX_ASF",
+               @"MUX_MP4", @"MUX_OGG", @"MUX_RAW", @"NO", @"NO"];
+    o_div1 = @[@"DIVX 1", @"DIV1",
+               _NS("DivX first version (useable with MPEG TS, MPEG1, ASF and OGG)"),
+               @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG", @"NO", @"NO", @"NO",
+               @"NO", @"NO"];
+    o_div2 = @[@"DIVX 2", @"DIV2",
+               _NS("DivX second version (useable with MPEG TS, MPEG1, ASF and OGG)"),
+               @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG", @"NO", @"NO", @"NO",
+               @"NO", @"NO"];
+    o_div3 = @[@"DIVX 3", @"DIV3",
+               _NS("DivX third version (useable with MPEG TS, MPEG1, ASF and OGG)"),
+               @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG", @"NO", @"NO", @"NO",
+               @"NO", @"NO"];
+    o_h263 = @[@"H.263", @"h263",
+               _NS("H263 is a video codec optimized for videoconference "
+                   "(low rates, useable with MPEG TS)"), @"MUX_TS", @"NO", @"NO", @"NO",
+               @"NO", @"NO", @"NO", @"NO", @"NO"];
+    o_h264 = @[@"H.264", @"h264",
+               _NS("H264 is a new video codec (useable with MPEG TS and MP4)"),
+               @"MUX_TS", @"MUX_MP4", @"NO", @"NO", @"NO", @"NO", @"NO", @"NO",
+               @"NO"];
+    o_wmv1 = @[@"WMV 1", @"WMV1",
+               _NS("WMV (Windows Media Video) 1 (useable with MPEG TS, MPEG1, ASF and "
+                   "OGG)"), @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG", @"NO", @"NO",
+               @"NO", @"NO", @"NO"];
+    o_wmv2 = @[@"WMV 2", @"WMV2",
+               _NS("WMV (Windows Media Video) 2 (useable with MPEG TS, MPEG1, ASF and "
+                   "OGG)"), @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG", @"NO", @"NO",
+               @"NO", @"NO", @"NO"];
+    o_mjpg = @[@"MJPEG", @"MJPG",
+               _NS("MJPEG consists of a series of JPEG pictures (useable with MPEG TS,"
+                   " MPEG1, ASF and OGG)"), @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG",
+               @"NO", @"NO", @"NO", @"NO", @"NO"];
+    o_theo = @[@"Theora", @"theo",
+               _NS("Theora is a free general-purpose codec (useable with MPEG TS "
+                   "and OGG)"), @"MUX_TS", @"MUX_OGG", @"NO", @"NO", @"NO", @"NO", @"NO",
+               @"NO", @"NO"];
+    o_dummyVid = @[@"Dummy", @"dummy",
+                   _NS("Dummy codec (do not transcode, useable with all encapsulation "
+                       "formats)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_MP4",
+                   @"MUX_OGG", @"MUX_WAV", @"MUX_RAW", @"MUX_MOV"];
     o_videoCodecs = [[NSArray alloc] initWithObjects: o_mp1v, o_mp2v, o_mp4v,
         o_div1, o_div2, o_div3, o_h263, o_h264, o_wmv1, o_wmv2, o_mjpg, o_theo,
         o_dummyVid, nil];
@@ -181,42 +179,41 @@ static VLCWizard *_o_sharedInstance = nil;
     NSArray * o_s16l;
     NSArray * o_fl32;
     NSArray * o_dummyAud;
-    o_mpga = [NSArray arrayWithObjects: @"MPEG Audio", @"mpga",
-        _NS("The standard MPEG audio (1/2) format (useable with MPEG PS, MPEG TS, "
-        "MPEG1, ASF, OGG and RAW)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG",
-        @"MUX_ASF", @"MUX_OGG", @"MUX_RAW", @"-1", @"-1", @"-1", nil];
-    o_mp3 = [NSArray arrayWithObjects: @"MP3", @"mp3",
-        _NS("MPEG Audio Layer 3 (useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG "
-        "and RAW)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG",
-        @"MUX_RAW", @"-1", @"-1", @"-1", nil];
-    o_mp4a = [NSArray arrayWithObjects: @"MPEG 4 Audio", @"mp4a",
-        _NS("Audio format for MPEG4 (useable with MPEG TS and MPEG4)"), @"MUX_TS",
-        @"MUX_MP4", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", nil];
-    o_a52 = [NSArray arrayWithObjects: @"A/52", @"a52",
-        _NS("DVD audio format (useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG "
-        "and RAW)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG",
-        @"MUX_RAW", @"-1", @"-1", @"-1", nil];
-    o_vorb = [NSArray arrayWithObjects: @"Vorbis", @"vorb",
-        _NS("Vorbis is a free audio codec (useable with OGG)"), @"MUX_OGG",
-        @"-1",  @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", nil];
-    o_flac = [NSArray arrayWithObjects: @"FLAC", @"flac",
-        _NS("FLAC is a lossless audio codec (useable with OGG and RAW)"),
-        @"MUX_OGG", @"MUX_RAW", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1",
-        @"-1", nil];
-    o_spx = [NSArray arrayWithObjects: @"Speex", @"spx",
-        _NS("A free audio codec dedicated to compression of voice (useable "
-        "with OGG)"), @"MUX_OGG", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1",
-        @"-1", @"-1", nil];
-    o_s16l = [NSArray arrayWithObjects: @"Uncompressed, integer", @"s16l",
-        _NS("Uncompressed audio samples (useable with WAV)"), @"MUX_WAV",
-        @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", nil];
-    o_fl32 = [NSArray arrayWithObjects: @"Uncompressed, floating point", @"fl32",
-        _NS("Uncompressed audio samples (useable with WAV)"), @"MUX_WAV",
-        @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", nil];
-    o_dummyAud = [NSArray arrayWithObjects: @"Dummy", @"dummy",
-        _NS("Dummy codec (do not transcode, useable with all encapsulation "
-        "formats)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_MP4",
-        @"MUX_OGG", @"MUX_RAW", @"MUX_MOV", @"MUX_WAV", nil];
+    o_mpga = @[@"MPEG Audio", @"mpga",
+               _NS("The standard MPEG audio (1/2) format (useable with MPEG PS, MPEG TS, "
+                   "MPEG1, ASF, OGG and RAW)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG",
+               @"MUX_ASF", @"MUX_OGG", @"MUX_RAW", @"-1", @"-1", @"-1"];
+    o_mp3 = @[@"MP3", @"mp3",
+              _NS("MPEG Audio Layer 3 (useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG "
+                  "and RAW)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG",
+              @"MUX_RAW", @"-1", @"-1", @"-1"];
+    o_mp4a = @[@"MPEG 4 Audio", @"mp4a",
+               _NS("Audio format for MPEG4 (useable with MPEG TS and MPEG4)"), @"MUX_TS",
+               @"MUX_MP4", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1"];
+    o_a52 = @[@"A/52", @"a52",
+              _NS("DVD audio format (useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG "
+                  "and RAW)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG",
+              @"MUX_RAW", @"-1", @"-1", @"-1"];
+    o_vorb = @[@"Vorbis", @"vorb",
+               _NS("Vorbis is a free audio codec (useable with OGG)"), @"MUX_OGG",
+               @"-1",  @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1"];
+    o_flac = @[@"FLAC", @"flac",
+               _NS("FLAC is a lossless audio codec (useable with OGG and RAW)"),
+               @"MUX_OGG", @"MUX_RAW", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1"];
+    o_spx = @[@"Speex", @"spx",
+              _NS("A free audio codec dedicated to compression of voice (useable "
+                  "with OGG)"), @"MUX_OGG", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1",
+              @"-1", @"-1"];
+    o_s16l = @[@"Uncompressed, integer", @"s16l",
+               _NS("Uncompressed audio samples (useable with WAV)"), @"MUX_WAV",
+               @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1"];
+    o_fl32 = @[@"Uncompressed, floating point", @"fl32",
+               _NS("Uncompressed audio samples (useable with WAV)"), @"MUX_WAV",
+               @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1"];
+    o_dummyAud = @[@"Dummy", @"dummy",
+                   _NS("Dummy codec (do not transcode, useable with all encapsulation "
+                       "formats)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_MP4",
+                   @"MUX_OGG", @"MUX_RAW", @"MUX_MOV", @"MUX_WAV"];
     o_audioCodecs = [[NSArray alloc] initWithObjects: o_mpga, o_mp3, o_mp4a,
         o_a52, o_vorb, o_flac, o_spx, o_s16l, o_fl32, o_dummyAud, nil];
 
@@ -234,19 +231,16 @@ static VLCWizard *_o_sharedInstance = nil;
     NSArray * o_mov;
     NSArray * o_wav;
     NSArray * o_asfh;
-    o_ps = [NSArray arrayWithObjects: @"ps", @"MPEG PS",
-        _NS("MPEG Program Stream"), @"mpg", nil];
-    o_ts = [NSArray arrayWithObjects: @"ts", @"MPEG TS",
-        _NS("MPEG Transport Stream"), nil];
-    o_mpeg = [NSArray arrayWithObjects: @"ps", @"MPEG 1",
-        _NS("MPEG 1 Format"), @"mpg", nil];
-    o_ogg = [NSArray arrayWithObjects: @"ogg", @"OGG", @"OGG", nil];
-    o_raw = [NSArray arrayWithObjects: @"raw", @"RAW", @"RAW", nil];
-    o_asf = [NSArray arrayWithObjects: @"asf", @"ASF", @"ASF", nil];
-    o_mp4 = [NSArray arrayWithObjects: @"mp4", @"MP4", @"MPEG4", nil];
-    o_mov = [NSArray arrayWithObjects: @"mov", @"MOV", @"MOV", nil];
-    o_wav = [NSArray arrayWithObjects: @"wav", @"WAV", @"WAV", nil];
-    o_asfh = [NSArray arrayWithObjects: @"asfh", @"ASFH", @"ASFH", nil];
+    o_ps = @[@"ps", @"MPEG PS", _NS("MPEG Program Stream"), @"mpg"];
+    o_ts = @[@"ts", @"MPEG TS", _NS("MPEG Transport Stream")];
+    o_mpeg = @[@"ps", @"MPEG 1", _NS("MPEG 1 Format"), @"mpg"];
+    o_ogg = @[@"ogg", @"OGG", @"OGG"];
+    o_raw = @[@"raw", @"RAW", @"RAW"];
+    o_asf = @[@"asf", @"ASF", @"ASF"];
+    o_mp4 = @[@"mp4", @"MP4", @"MPEG4"];
+    o_mov = @[@"mov", @"MOV", @"MOV"];
+    o_wav = @[@"wav", @"WAV", @"WAV"];
+    o_asfh = @[@"asfh", @"ASFH", @"ASFH"];
     o_encapFormats = [[NSArray alloc] initWithObjects: o_ps, o_ts, o_mpeg,
         o_ogg, o_raw, o_asf, o_mp4, o_mov, o_wav, o_asfh, nil];
 
@@ -257,14 +251,14 @@ static VLCWizard *_o_sharedInstance = nil;
     NSArray * o_udp_multi;
     NSArray * o_rtp_uni;
     NSArray * o_rtp_multi;
-    o_http = [NSArray arrayWithObjects: @"http", @"HTTP", _NS("Enter the local "
+    o_http = @[@"http", @"HTTP", _NS("Enter the local "
         "addresses you want to listen requests on. Do not enter anything if "
         "you want to listen on all the network interfaces. This is generally "
         "the best thing to do. Other computers can then access the stream at "
         "http://yourip:8080 by default.") , _NS("Use this to stream to several "
         "computers. This method is not the most efficient, as the server needs "\
-        "to send the stream several times, but generally the most compatible"), nil];
-    o_mms = [NSArray arrayWithObjects: @"mmsh", @"MMS", _NS("Enter the local "
+        "to send the stream several times, but generally the most compatible")];
+    o_mms = @[@"mmsh", @"MMS", _NS("Enter the local "
         "addresses you want to listen requests on. Do not enter anything if "
         "you want to listen on all the network interfaces. This is generally "
         "the best thing to do. Other computers can then access the stream at "
@@ -272,27 +266,27 @@ static VLCWizard *_o_sharedInstance = nil;
         "computers using the Microsoft MMS protocol. This protocol is used as "
         "transport method by many Microsoft's softwares. Note that only a "
         "small part of the MMS protocol is supported (MMS encapsulated in "
-        "HTTP)."), nil];
-    o_udp_uni = [NSArray arrayWithObjects: @"udp", @"UDP-Unicast", _NS("Enter "
+        "HTTP).")];
+    o_udp_uni = @[@"udp", @"UDP-Unicast", _NS("Enter "
         "the address of the computer to stream to."), _NS("Use this to stream "
-        "to a single computer."), nil];
-    o_udp_multi = [NSArray arrayWithObjects: @"udp", @"UDP-Multicast", _NS("Enter "
+        "to a single computer.")];
+    o_udp_multi = @[@"udp", @"UDP-Multicast", _NS("Enter "
         "the multicast address to stream to in this field. This must be an IP "
         "address between 224.0.0.0 and 239.255.255.255. For a private use, "
         "enter an address beginning with 239.255."), _NS("Use this to stream "
         "to a dynamic group of computers on a multicast-enabled network. This "
         "is the most efficient method to stream to several computers, but it "
-        "won't work over the Internet."), nil];
-    o_rtp_uni = [NSArray arrayWithObjects: @"rtp", @"RTP-Unicast", _NS("Enter the "
+        "won't work over the Internet.")];
+    o_rtp_uni = @[@"rtp", @"RTP-Unicast", _NS("Enter the "
         "address of the computer to stream to.") , _NS("Use this to stream "
-        "to a single computer. RTP headers will be added to the stream"), nil];
-    o_rtp_multi = [NSArray arrayWithObjects: @"rtp", @"RTP-Multicast", _NS("Enter "
+        "to a single computer. RTP headers will be added to the stream")];
+    o_rtp_multi = @[@"rtp", @"RTP-Multicast", _NS("Enter "
         "the multicast address to stream to in this field. This must be an IP "
         "address between 224.0.0.0 and 239.255.255.255. For a private use, "
         "enter an address beginning with 239.255."), _NS("Use this to stream "
         "to a dynamic group of computers on a multicast-enabled network. This "
         "is the most efficient method to stream to several computers, but it "
-        "won't work over Internet. RTP headers will be added to the stream"), nil];
+        "won't work over Internet. RTP headers will be added to the stream")];
     o_strmgMthds = [[NSArray alloc] initWithObjects: o_http, o_mms,
         o_udp_uni, o_udp_multi, o_rtp_uni, o_rtp_multi, nil];
 }
@@ -542,8 +536,7 @@ static VLCWizard *_o_sharedInstance = nil;
             }
             else
             {
-                [o_userSelections setObject:[NSArray arrayWithObject:
-                    [o_t2_fld_pathToNewStrm stringValue]] forKey:@"pathToStrm"];
+                [o_userSelections setObject:@[[o_t2_fld_pathToNewStrm stringValue]] forKey:@"pathToStrm"];
             }
         }
         else
@@ -1180,8 +1173,7 @@ static VLCWizard *_o_sharedInstance = nil;
                 /* we don't need to check for existing items because Cocoa
                  * does that already when we are asking the user for a location
                  * to save her file */
-                [o_userSelections setObject: [NSArray arrayWithObject:
-                    [o_t7_fld_filePath stringValue]] forKey: @"trnscdFilePath"];
+                [o_userSelections setObject: @[[o_t7_fld_filePath stringValue]] forKey: @"trnscdFilePath"];
             }
 
             /* include subtitles ? */
@@ -1859,9 +1851,9 @@ static VLCWizard *_o_sharedInstance = nil;
         [[o_userSelections objectForKey:@"encapFormat"] intValue]]
         objectAtIndex:0];
         if (![theEncapFormat isEqualToString:@"ps"])
-            [saveFilePanel setAllowedFileTypes: [NSArray arrayWithObject:theEncapFormat]];
+            [saveFilePanel setAllowedFileTypes: @[theEncapFormat]];
         else
-            [saveFilePanel setAllowedFileTypes: [NSArray arrayWithObject:@"mpg"]];
+            [saveFilePanel setAllowedFileTypes: @[@"mpg"]];
 
         [saveFilePanel setCanSelectHiddenExtension: YES];
         [saveFilePanel setCanCreateDirectories: YES];

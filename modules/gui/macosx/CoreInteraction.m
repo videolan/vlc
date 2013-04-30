@@ -551,7 +551,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
     NSPasteboard *o_paste = [sender draggingPasteboard];
-    NSArray *o_types = [NSArray arrayWithObject: NSFilenamesPboardType];
+    NSArray *o_types = @[NSFilenamesPboardType];
     NSString *o_desired_type = [o_paste availableTypeFromArray:o_types];
     NSData *o_carried_data = [o_paste dataForType:o_desired_type];
     BOOL b_autoplay = config_GetInt(VLCIntf, "macosx-autoplay");

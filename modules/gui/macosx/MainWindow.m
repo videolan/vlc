@@ -296,7 +296,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     free(ppsz_longnames);
     free(p_categories);
 
-    [libraryItem setChildren: [NSArray arrayWithObjects: playlistItem, medialibraryItem, nil]];
+    [libraryItem setChildren: @[playlistItem, medialibraryItem]];
     [o_sidebaritems addObject: libraryItem];
     if ([mycompItem hasChildren])
         [o_sidebaritems addObject: mycompItem];
@@ -310,7 +310,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_sidebar_view reloadData];
     [o_sidebar_view selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
     [o_sidebar_view setDropItem:playlistItem dropChildIndex:NSOutlineViewDropOnItemIndex];
-    [o_sidebar_view registerForDraggedTypes:[NSArray arrayWithObjects: NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
+    [o_sidebar_view registerForDraggedTypes:@[NSFilenamesPboardType, @"VLCPlaylistItemPboardType"]];
 
     [o_sidebar_view setAutosaveName:@"mainwindow-sidebar"];
     [(PXSourceList *)o_sidebar_view setDataSource:self];
@@ -836,7 +836,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [dict setObject:self forKey:NSViewAnimationTargetKey];
     [dict setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
 
-    o_makekey_anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict]];
+    o_makekey_anim = [[NSViewAnimation alloc] initWithViewAnimations:@[dict]];
     [dict release];
 
     [o_makekey_anim setAnimationBlockingMode: NSAnimationNonblocking];

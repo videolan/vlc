@@ -379,7 +379,7 @@ static AppleRemote* sharedInstance=nil;
                 eventNumber= [NSNumber numberWithUnsignedInt:event];
             }
             [self performSelector: @selector(executeClickCountEvent:)
-                       withObject: [NSArray arrayWithObjects:eventNumber, timeNumber, nil]
+                       withObject: @[eventNumber, timeNumber]
                        afterDelay: _maxClickTimeDifference];
         } else {
             [delegate appleRemoteButton:event pressedDown: pressedDown clickCount:1];

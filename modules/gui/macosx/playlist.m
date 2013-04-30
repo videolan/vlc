@@ -411,10 +411,10 @@
 + (void)initialize{
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSMutableArray * o_columnArray = [[NSMutableArray alloc] init];
-    [o_columnArray addObject: [NSArray arrayWithObjects: TITLE_COLUMN, [NSNumber numberWithFloat: 190.], nil]];
-    [o_columnArray addObject: [NSArray arrayWithObjects: ARTIST_COLUMN, [NSNumber numberWithFloat: 95.], nil]];
-    [o_columnArray addObject: [NSArray arrayWithObjects: DURATION_COLUMN, [NSNumber numberWithFloat: 95.], nil]];
-    NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:[NSArray arrayWithArray:o_columnArray] forKey:@"PlaylistColumnSelection"];
+    [o_columnArray addObject: @[TITLE_COLUMN, @190.]];
+    [o_columnArray addObject: @[ARTIST_COLUMN, @95.]];
+    [o_columnArray addObject: @[DURATION_COLUMN, @95.]];
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:[NSArray arrayWithArray:o_columnArray] forKey: @"PlaylistColumnSelection"];
 
     [defaults registerDefaults:appDefaults];
     [o_columnArray release];
@@ -446,14 +446,10 @@
     [o_outline_view setDoubleAction: @selector(playItem:)];
     [o_outline_view_other setDoubleAction: @selector(playItem:)];
 
-    [o_outline_view registerForDraggedTypes:
-        [NSArray arrayWithObjects: NSFilenamesPboardType,
-        @"VLCPlaylistItemPboardType", nil]];
+    [o_outline_view registerForDraggedTypes: @[NSFilenamesPboardType, @"VLCPlaylistItemPboardType"]];
     [o_outline_view setIntercellSpacing: NSMakeSize (0.0, 1.0)];
 
-    [o_outline_view_other registerForDraggedTypes:
-     [NSArray arrayWithObjects: NSFilenamesPboardType,
-      @"VLCPlaylistItemPboardType", nil]];
+    [o_outline_view_other registerForDraggedTypes: @[NSFilenamesPboardType, @"VLCPlaylistItemPboardType"]];
     [o_outline_view_other setIntercellSpacing: NSMakeSize (0.0, 1.0)];
 
     /* This uses a private API, but works fine on all current OSX releases.
@@ -1374,7 +1370,7 @@
     NSTableColumn * o_currentColumn;
     for (NSUInteger i = 0; i < count; i++) {
         o_currentColumn = [o_columns objectAtIndex: i];
-        [o_arrayToSave addObject: [NSArray arrayWithObjects: [o_currentColumn identifier], [NSNumber numberWithFloat: [o_currentColumn width]], nil]];
+        [o_arrayToSave addObject: @[[o_currentColumn identifier], @([o_currentColumn width])]];
     }
     [[NSUserDefaults standardUserDefaults] setObject: o_arrayToSave forKey:@"PlaylistColumnSelection"];
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -1424,8 +1420,7 @@
     /* We add the "VLCPlaylistItemPboardType" type to be able to recognize
        a Drop operation coming from the playlist. */
 
-    [pboard declareTypes: [NSArray arrayWithObjects:
-        @"VLCPlaylistItemPboardType", nil] owner: self];
+    [pboard declareTypes: @[@"VLCPlaylistItemPboardType"] owner: self];
     [pboard setData:[NSData data] forType:@"VLCPlaylistItemPboardType"];
 
     return YES;

@@ -123,7 +123,7 @@
     [dict setObject:self forKey:NSViewAnimationTargetKey];
 
     [dict setObject:NSViewAnimationFadeOutEffect forKey:NSViewAnimationEffectKey];
-    anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict, nil]];
+    anim = [[NSViewAnimation alloc] initWithViewAnimations:@[dict]];
     [dict release];
 
     [anim setAnimationBlockingMode:NSAnimationNonblocking];
@@ -176,7 +176,7 @@
     [dict setObject:self forKey:NSViewAnimationTargetKey];
 
     [dict setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
-    anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict, nil]];
+    anim = [[NSViewAnimation alloc] initWithViewAnimations:@[dict]];
     [dict release];
 
     [anim setAnimationBlockingMode:NSAnimationNonblocking];
@@ -859,8 +859,8 @@
      - Keep at most 2 animation at a time
      - leaveFullscreen/enterFullscreen are the only responsible for releasing and alloc-ing
      */
-    o_fullscreen_anim1 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict1]];
-    o_fullscreen_anim2 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict2]];
+    o_fullscreen_anim1 = [[NSViewAnimation alloc] initWithViewAnimations:@[dict1]];
+    o_fullscreen_anim2 = [[NSViewAnimation alloc] initWithViewAnimations:@[dict2]];
 
     [dict1 release];
     [dict2 release];
@@ -978,7 +978,7 @@
     [dict2 setObject:self forKey:NSViewAnimationTargetKey];
     [dict2 setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
 
-    o_fullscreen_anim2 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict2, nil]];
+    o_fullscreen_anim2 = [[NSViewAnimation alloc] initWithViewAnimations:@[dict2]];
     [dict2 release];
 
     [o_fullscreen_anim2 setAnimationBlockingMode: NSAnimationNonblocking];
@@ -993,7 +993,7 @@
     [dict1 setObject:[NSValue valueWithRect:[o_fullscreen_window frame]] forKey:NSViewAnimationStartFrameKey];
     [dict1 setObject:[NSValue valueWithRect:frame] forKey:NSViewAnimationEndFrameKey];
 
-    o_fullscreen_anim1 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict1, nil]];
+    o_fullscreen_anim1 = [[NSViewAnimation alloc] initWithViewAnimations:@[dict1]];
     [dict1 release];
 
     [o_fullscreen_anim1 setAnimationBlockingMode: NSAnimationNonblocking];
@@ -1074,11 +1074,10 @@
     static NSMutableArray *attributes = nil;
     if (attributes == nil) {
         attributes = [[super accessibilityAttributeNames] mutableCopy];
-        NSArray *appendAttributes = [NSArray arrayWithObjects: NSAccessibilitySubroleAttribute,
-                                     NSAccessibilityCloseButtonAttribute,
-                                     NSAccessibilityMinimizeButtonAttribute,
-                                     NSAccessibilityZoomButtonAttribute,
-                                     nil];
+        NSArray *appendAttributes = @[NSAccessibilitySubroleAttribute,
+                                      NSAccessibilityCloseButtonAttribute,
+                                      NSAccessibilityMinimizeButtonAttribute,
+                                      NSAccessibilityZoomButtonAttribute];
 
         for(NSString *attribute in appendAttributes) {
             if (![attributes containsObject:attribute])

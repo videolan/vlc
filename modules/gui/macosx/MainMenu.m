@@ -77,8 +77,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
                       _NS("URI"),           URI_COLUMN,
                       nil];
         // this array also assigns tags (index) to type of menu item
-        o_ptc_menuorder = [NSArray arrayWithObjects:TRACKNUM_COLUMN, TITLE_COLUMN, ARTIST_COLUMN, DURATION_COLUMN,
-                       GENRE_COLUMN, ALBUM_COLUMN, DESCRIPTION_COLUMN, DATE_COLUMN, LANGUAGE_COLUMN, URI_COLUMN, nil];
+        o_ptc_menuorder = @[TRACKNUM_COLUMN, TITLE_COLUMN, ARTIST_COLUMN, DURATION_COLUMN,
+                            GENRE_COLUMN, ALBUM_COLUMN, DESCRIPTION_COLUMN, DATE_COLUMN, LANGUAGE_COLUMN, URI_COLUMN];
     }
 
     return _o_sharedInstance;
@@ -925,7 +925,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [openPanel setCanChooseFiles: YES];
     [openPanel setCanChooseDirectories: NO];
     [openPanel setAllowsMultipleSelection: YES];
-    [openPanel setAllowedFileTypes: [NSArray arrayWithObjects: @"cdg",@"@idx",@"srt",@"sub",@"utf",@"ass",@"ssa",@"aqt",@"jss",@"psb",@"rt",@"smi",@"txt",@"smil", nil]];
+    [openPanel setAllowedFileTypes: @[@"cdg",@"@idx",@"srt",@"sub",@"utf",@"ass",@"ssa",@"aqt",@"jss",@"psb",@"rt",@"smi",@"txt",@"smil"]];
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:[[NSString stringWithUTF8String:path] stringByExpandingTildeInPath]]];
     i_returnValue = [openPanel runModal];
     free(path);

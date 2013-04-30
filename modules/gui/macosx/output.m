@@ -112,17 +112,17 @@
 
 - (void)initStrings
 {
-    NSArray *o_muxers = [NSArray arrayWithObjects: @"MPEG TS", @"MPEG PS", @"MPEG 1",
-        @"Ogg", @"AVI", @"ASF", @"MPEG 4", @"Quicktime", @"Raw", nil];
-    NSArray *o_a_channels = [NSArray arrayWithObjects: @"1", @"2", @"4", @"6", nil];
-    NSArray *o_a_bitrates = [NSArray arrayWithObjects: @"16", @"32", @"64", @"96",
-        @"128", @"192", @"256", @"512", nil];
-    NSArray *o_v_bitrates = [NSArray arrayWithObjects: @"16", @"32", @"64", @"96",
-        @"128", @"192", @"256", @"384", @"512", @"768", @"1024", @"2048", @"3072", nil];
-    NSArray *o_v_scales = [NSArray arrayWithObjects: @"0.25",@"0.5",@"0.75",@"1",@"1.25",@"1.5",@"1.75",@"2",nil];
-    NSArray *o_a_codecs = [NSArray arrayWithObjects: @"mpga", @"mp3 ", @"mp4a", @"a52 ", @"vorb", @"flac", @"spx ", nil];
-    NSArray *o_v_codecs = [NSArray arrayWithObjects: @"mp1v", @"mp2v", @"mp4v", @"DIV1",
-        @"DIV2", @"DIV3", @"h263", @"h264", @"WMV1", @"WMV2", @"MJPG", @"theo", nil];
+    NSArray *o_muxers = @[@"MPEG TS", @"MPEG PS", @"MPEG 1",
+        @"Ogg", @"AVI", @"ASF", @"MPEG 4", @"Quicktime", @"Raw"];
+    NSArray *o_a_channels = @[@"1", @"2", @"4", @"6"];
+    NSArray *o_a_bitrates = @[@"16", @"32", @"64", @"96",
+        @"128", @"192", @"256", @"512"];
+    NSArray *o_v_bitrates = @[@"16", @"32", @"64", @"96",
+        @"128", @"192", @"256", @"384", @"512", @"768", @"1024", @"2048", @"3072"];
+    NSArray *o_v_scales = @[@"0.25",@"0.5",@"0.75",@"1",@"1.25",@"1.5",@"1.75",@"2"];
+    NSArray *o_a_codecs = @[@"mpga", @"mp3 ", @"mp4a", @"a52 ", @"vorb", @"flac", @"spx "];
+    NSArray *o_v_codecs = @[@"mp1v", @"mp2v", @"mp4v", @"DIV1",
+        @"DIV2", @"DIV3", @"h263", @"h264", @"WMV1", @"WMV2", @"MJPG", @"theo"];
 
     [o_output_ckbox setTitle: _NS("Streaming/Saving:")];
     [o_output_settings setTitle: _NS("Settings...")];
@@ -340,13 +340,10 @@
 
     if ([o_mode isEqualToString: _NS("File")]) {
         if ([o_dump_chkbox state] == NSOnState) {
-            NSMutableArray * o_sout_options;
-            o_sout_options = [NSArray arrayWithObjects:
-                                    @":demux=dump",
-                                    [NSString stringWithFormat:
-                                    @":demuxdump-file=%@",
-                                    [o_file_field stringValue]],
-                                    nil];
+            o_sout_options = @[@":demux=dump",
+                               [NSString stringWithFormat:
+                               @":demuxdump-file=%@",
+                               [o_file_field stringValue]]];
             [self setSoutMRL:o_sout_options];
             return;
         } else
@@ -420,7 +417,7 @@
     if ([o_display state] == NSOnState)
         [o_mrl_string appendString: @"}"];
 
-    o_sout_options = [NSArray arrayWithObjects: o_mrl_string,nil];
+    o_sout_options = @[o_mrl_string];
     [self setSoutMRL:o_sout_options];
 }
 
