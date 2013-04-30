@@ -249,19 +249,19 @@ static VLCMainWindow *_o_sharedInstance = nil;
                     else
                         [[internetItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
                     [[internetItems lastObject] setSdtype: SD_CAT_INTERNET];
-                    [[internetItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String: *ppsz_longname]];
+                    [[internetItems lastObject] setUntranslatedTitle: @(*ppsz_longname)];
                 break;
             case SD_CAT_DEVICES:
                     [devicesItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                     [[devicesItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
                     [[devicesItems lastObject] setSdtype: SD_CAT_DEVICES];
-                    [[devicesItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String: *ppsz_longname]];
+                    [[devicesItems lastObject] setUntranslatedTitle: @(*ppsz_longname)];
                 break;
             case SD_CAT_LAN:
                     [lanItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                     [[lanItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-local"]];
                     [[lanItems lastObject] setSdtype: SD_CAT_LAN];
-                    [[lanItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String: *ppsz_longname]];
+                    [[lanItems lastObject] setUntranslatedTitle: @(*ppsz_longname)];
                 break;
             case SD_CAT_MYCOMPUTER:
                     [mycompItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
@@ -273,7 +273,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
                         [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-pictures"]];
                     else
                         [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
-                    [[mycompItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String: *ppsz_longname]];
+                    [[mycompItems lastObject] setUntranslatedTitle: @(*ppsz_longname)];
                     [[mycompItems lastObject] setSdtype: SD_CAT_MYCOMPUTER];
                 break;
             default:
@@ -635,14 +635,14 @@ static VLCMainWindow *_o_sharedInstance = nil;
             char *format = var_InheritString(VLCIntf, "input-title-format");
             char *formated = str_format_meta(pl_Get(VLCIntf), format);
             free(format);
-            aString = [NSString stringWithUTF8String:formated];
+            aString = @(formated);
             free(formated);
         } else
-            aString = [NSString stringWithUTF8String:config_GetPsz(VLCIntf, "video-title")];
+            aString = @(config_GetPsz(VLCIntf, "video-title"));
 
         char *uri = input_item_GetURI(input_GetItem(p_input));
 
-        NSURL * o_url = [NSURL URLWithString: [NSString stringWithUTF8String: uri]];
+        NSURL * o_url = [NSURL URLWithString: @(uri)];
         if ([o_url isFileURL]) {
             [self setRepresentedURL: o_url];
             [[[VLCMain sharedInstance] voutController] updateWindowsUsingBlock:^(VLCVideoWindowCommon *o_window) {
@@ -1189,7 +1189,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     if (config_GetPsz(VLCIntf, "podcast-urls") != NULL) {
         [o_podcast_unsubscribe_pop removeAllItems];
-        [o_podcast_unsubscribe_pop addItemsWithTitles:[[NSString stringWithUTF8String:config_GetPsz(VLCIntf, "podcast-urls")] componentsSeparatedByString:@"|"]];
+        [o_podcast_unsubscribe_pop addItemsWithTitles:[@(config_GetPsz(VLCIntf, "podcast-urls")) componentsSeparatedByString:@"|"]];
         [NSApp beginSheet:o_podcast_unsubscribe_window modalForWindow:self modalDelegate:self didEndSelector:NULL contextInfo:nil];
     }
 }
@@ -1200,7 +1200,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [NSApp endSheet: o_podcast_unsubscribe_window];
 
     if (sender == o_podcast_unsubscribe_ok_btn) {
-        NSMutableArray * urls = [[NSMutableArray alloc] initWithArray:[[NSString stringWithUTF8String:config_GetPsz(VLCIntf, "podcast-urls")] componentsSeparatedByString:@"|"]];
+        NSMutableArray * urls = [[NSMutableArray alloc] initWithArray:[@(config_GetPsz(VLCIntf, "podcast-urls")) componentsSeparatedByString:@"|"]];
         [urls removeObjectAtIndex: [o_podcast_unsubscribe_pop indexOfSelectedItem]];
         config_PutPsz(VLCIntf, "podcast-urls", [[urls componentsJoinedByString:@"|"] UTF8String]);
         var_SetString(pl_Get(VLCIntf), "podcast-urls", config_GetPsz(VLCIntf, "podcast-urls"));

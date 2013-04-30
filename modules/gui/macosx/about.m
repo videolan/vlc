@@ -117,7 +117,7 @@ static VLAboutBox *_o_sharedInstance = nil;
         /* Setup the nameversion field */
         [o_name_version_field setStringValue: [NSString stringWithFormat:@"Version %s (%s)", VERSION_MESSAGE, PLATFORM]];
 
-        NSMutableArray *tmpArray = [NSMutableArray arrayWithArray: [[NSString stringWithUTF8String: psz_authors]componentsSeparatedByString:@"\n\n"]];
+        NSMutableArray *tmpArray = [NSMutableArray arrayWithArray: [@(psz_authors) componentsSeparatedByString:@"\n\n"]];
         NSUInteger count = [tmpArray count];
         for (NSUInteger i = 0; i < count; i++) {
             [tmpArray replaceObjectAtIndex:i withObject:[[tmpArray objectAtIndex:i]stringByReplacingOccurrencesOfString:@"\n" withString:@", "]];
@@ -236,9 +236,9 @@ static VLAboutBox *_o_sharedInstance = nil;
     if (sender == o_authors_btn)
         [o_credits_textview setString:o_authors];
     else if (sender == o_credits_btn)
-        [o_credits_textview setString:[[NSString stringWithUTF8String: psz_thanks] stringByReplacingOccurrencesOfString:@"\n" withString:@" " options:0 range:NSRangeFromString(@"680 2")]];
+        [o_credits_textview setString:[@(psz_thanks) stringByReplacingOccurrencesOfString:@"\n" withString:@" " options:0 range:NSRangeFromString(@"680 2")]];
     else
-        [o_credits_textview setString:[NSString stringWithUTF8String: psz_license]];
+        [o_credits_textview setString:@(psz_license)];
 
     [o_credits_textview scrollPoint:NSMakePoint(0, 0)];
     b_restart = YES;
@@ -255,7 +255,7 @@ static VLAboutBox *_o_sharedInstance = nil;
     [o_credits_textview setHidden:NO];
     [o_joinus_txt setHidden:YES];
 
-    [o_credits_textview setString:[NSString stringWithUTF8String: psz_license]];
+    [o_credits_textview setString:@(psz_license)];
 
     [o_credits_textview scrollPoint:NSMakePoint(0, 0)];
     b_restart = YES;

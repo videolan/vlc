@@ -77,8 +77,8 @@ static VLCAudioEffects *_o_sharedInstance = nil;
                       eqz_preset_10b[i].f_amp[9]];
         [workValues addObject:workString];
         [workPreamp addObject:[NSString stringWithFormat:@"%1.f", eqz_preset_10b[i].f_preamp]];
-        [workTitles addObject:[NSString stringWithUTF8String:preset_list_text[i]]];
-        [workNames addObject:[NSString stringWithUTF8String:preset_list[i]]];
+        [workTitles addObject:@(preset_list_text[i])];
+        [workNames addObject:@(preset_list[i])];
     }
 
     NSString *defaultProfile = [NSString stringWithFormat:@"ZmxhdA==;;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%i",
@@ -178,9 +178,9 @@ static VLCAudioEffects *_o_sharedInstance = nil;
         }
     } else {
         if (psz_tmp) {
-            psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithFormat:@":%s",psz_name]]] UTF8String];
-            psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithFormat:@"%s:",psz_name]]] UTF8String];
-            psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithUTF8String:psz_name]]] UTF8String];
+            psz_tmp = (char *)[[@(psz_tmp) stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithFormat:@":%s",psz_name]]] UTF8String];
+            psz_tmp = (char *)[[@(psz_tmp) stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithFormat:@"%s:",psz_name]]] UTF8String];
+            psz_tmp = (char *)[[@(psz_tmp) stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@(psz_name)]] UTF8String];
             config_PutPsz(p_intf, "audio-filter", psz_tmp);
         }
     }

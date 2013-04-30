@@ -295,20 +295,20 @@
     if ([o_identifier isEqualToString:TRACKNUM_COLUMN]) {
         psz_value = input_item_GetTrackNumber(p_item->p_input);
         if (psz_value) {
-            o_value = [NSString stringWithUTF8String: psz_value];
+            o_value = @(psz_value);
             free(psz_value);
         }
     } else if ([o_identifier isEqualToString:TITLE_COLUMN]) {
         /* sanity check to prevent the NSString class from crashing */
         char *psz_title =  input_item_GetTitleFbName(p_item->p_input);
         if (psz_title) {
-            o_value = [NSString stringWithUTF8String: psz_title];
+            o_value = @(psz_title);
             free(psz_title);
         }
     } else if ([o_identifier isEqualToString:ARTIST_COLUMN]) {
         psz_value = input_item_GetArtist(p_item->p_input);
         if (psz_value) {
-            o_value = [NSString stringWithUTF8String: psz_value];
+            o_value = @(psz_value);
             free(psz_value);
         }
     } else if ([o_identifier isEqualToString:@"duration"]) {
@@ -316,45 +316,45 @@
         mtime_t dur = input_item_GetDuration(p_item->p_input);
         if (dur != -1) {
             secstotimestr(psz_duration, dur/1000000);
-            o_value = [NSString stringWithUTF8String: psz_duration];
+            o_value = @(psz_duration);
         }
         else
             o_value = @"--:--";
     } else if ([o_identifier isEqualToString:GENRE_COLUMN]) {
         psz_value = input_item_GetGenre(p_item->p_input);
         if (psz_value) {
-            o_value = [NSString stringWithUTF8String: psz_value];
+            o_value = @(psz_value);
             free(psz_value);
         }
     } else if ([o_identifier isEqualToString:ALBUM_COLUMN]) {
         psz_value = input_item_GetAlbum(p_item->p_input);
         if (psz_value) {
-            o_value = [NSString stringWithUTF8String: psz_value];
+            o_value = @(psz_value);
             free(psz_value);
         }
     } else if ([o_identifier isEqualToString:DESCRIPTION_COLUMN]) {
         psz_value = input_item_GetDescription(p_item->p_input);
         if (psz_value) {
-            o_value = [NSString stringWithUTF8String: psz_value];
+            o_value = @(psz_value);
             free(psz_value);
         }
     } else if ([o_identifier isEqualToString:DATE_COLUMN]) {
         psz_value = input_item_GetDate(p_item->p_input);
         if (psz_value) {
-            o_value = [NSString stringWithUTF8String: psz_value];
+            o_value = @(psz_value);
             free(psz_value);
         }
     } else if ([o_identifier isEqualToString:LANGUAGE_COLUMN]) {
         psz_value = input_item_GetLanguage(p_item->p_input);
         if (psz_value) {
-            o_value = [NSString stringWithUTF8String: psz_value];
+            o_value = @(psz_value);
             free(psz_value);
         }
     }
     else if ([o_identifier isEqualToString:URI_COLUMN]) {
         psz_value = decode_URI(input_item_GetURI(p_item->p_input));
         if (psz_value) {
-            o_value = [NSString stringWithUTF8String: psz_value];
+            o_value = @(psz_value);
             free(psz_value);
         }
     }
@@ -792,7 +792,7 @@
             continue;
 
         char * psz_url = decode_URI(input_item_GetURI(p_item->p_input));
-        o_mrl = [[NSMutableString alloc] initWithString: [NSString stringWithUTF8String: psz_url ? psz_url : ""]];
+        o_mrl = [[NSMutableString alloc] initWithString: @(psz_url ? psz_url : "")];
         if (psz_url != NULL)
             free( psz_url );
 
@@ -1111,11 +1111,9 @@
         NSString *o_current_name, *o_current_author;
 
         PL_LOCK;
-        o_current_name = [NSString stringWithUTF8String:
-            p_item->pp_children[i_current]->p_input->psz_name];
-        psz_temp = input_item_GetInfo(p_item->p_input ,
-                   _("Meta-information"),_("Artist"));
-        o_current_author = [NSString stringWithUTF8String: psz_temp];
+        o_current_name = @(p_item->pp_children[i_current]->p_input->psz_name);
+        psz_temp = input_item_GetInfo(p_item->p_input, _("Meta-information"),_("Artist"));
+        o_current_author = @(psz_temp);
         free(psz_temp);
         PL_UNLOCK;
 

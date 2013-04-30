@@ -553,7 +553,7 @@ static VLCWizard *_o_sharedInstance = nil;
                     if (p_item->i_children <= 0)
                     {
                         char *psz_uri = input_item_GetURI( p_item->p_input);
-                        [tempArray addObject: [NSString stringWithUTF8String: psz_uri]];
+                        [tempArray addObject: @(psz_uri)];
                         free( psz_uri);
                         stop = NO;
                     }

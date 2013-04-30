@@ -216,14 +216,14 @@ static VLCInfo *_o_sharedInstance = nil;
 
         /* fill uri info */
         char * psz_url = decode_URI(input_item_GetURI(p_item));
-        [o_uri_txt setStringValue: [NSString stringWithUTF8String: psz_url ? psz_url : ""]];
+        [o_uri_txt setStringValue: @(psz_url ? psz_url : "")];
         free(psz_url);
 
         /* fill title info */
         char * psz_title = input_item_GetTitle(p_item);
         if (!psz_title)
             psz_title = input_item_GetName(p_item);
-        [o_title_txt setStringValue: [NSString stringWithUTF8String: psz_title ? : ""  ]];
+        [o_title_txt setStringValue: @(psz_title ? : "")];
         free(psz_title);
 
     #define SET( foo, bar ) \
@@ -252,7 +252,7 @@ static VLCInfo *_o_sharedInstance = nil;
 
         /* FIXME Can also be attachment:// */
         if (psz_meta && strncmp(psz_meta, "attachment://", 13))
-            o_image = [[NSImage alloc] initWithContentsOfURL: [NSURL URLWithString:[NSString stringWithUTF8String: psz_meta]]];
+            o_image = [[NSImage alloc] initWithContentsOfURL: [NSURL URLWithString:@(psz_meta)]];
         else
             o_image = [[NSImage imageNamed: @"noart.png"] retain];
         [o_image_well setImage: o_image];
@@ -272,7 +272,7 @@ static VLCInfo *_o_sharedInstance = nil;
 - (void)setMeta: (char *)psz_meta forLabel: (id)theItem
 {
     if (psz_meta != NULL && *psz_meta)
-        [theItem setStringValue: [NSString stringWithUTF8String:psz_meta]];
+        [theItem setStringValue: @(psz_meta)];
     else
         [theItem setStringValue: @""];
 }
@@ -464,7 +464,7 @@ error:
             vlc_mutex_lock(&p_item->lock);
             o_children = [[NSMutableArray alloc] initWithCapacity: p_item->i_categories];
             for (int i = 0 ; i < p_item->i_categories ; i++) {
-                NSString * name = [NSString stringWithUTF8String: p_item->pp_categories[i]->psz_name];
+                NSString * name = @(p_item->pp_categories[i]->psz_name);
                 VLCInfoTreeItem * item = [[VLCInfoTreeItem alloc] initWithName:name value:@"" ID:i parent:self];
                 [item autorelease];
                 [o_children addObject:item];
@@ -476,8 +476,8 @@ error:
             info_category_t * cat = p_item->pp_categories[i_object_id];
             o_children = [[NSMutableArray alloc] initWithCapacity: cat->i_infos];
             for (int i = 0 ; i < cat->i_infos ; i++) {
-                NSString * name = [NSString stringWithUTF8String: cat->pp_infos[i]->psz_name];
-                NSString * value = [NSString stringWithUTF8String: cat->pp_infos[i]->psz_value ? : ""];
+                NSString * name = @(cat->pp_infos[i]->psz_name);
+                NSString * value = @(cat->pp_infos[i]->psz_value ? : "");
                 VLCInfoTreeItem * item = [[VLCInfoTreeItem alloc] initWithName:name value:value ID:i parent:self];
                 [item autorelease];
                 [o_children addObject:item];

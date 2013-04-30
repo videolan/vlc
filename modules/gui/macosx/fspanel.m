@@ -551,13 +551,13 @@
                     remaining = dur - time.i_time;
                 o_total_time = [NSString stringWithFormat: @"-%s", secstotimestr(psz_time, (remaining / 1000000))];
             } else
-                o_total_time = [NSString stringWithUTF8String: secstotimestr(psz_time, (dur / 1000000))];
+                o_total_time = @(secstotimestr(psz_time, (dur / 1000000)));
 
             [o_streamLength_txt setStringValue: o_total_time];
         }
 
         // update current position (left field)
-        NSString *o_playback_pos = [NSString stringWithUTF8String: secstotimestr(psz_time, (time.i_time / 1000000))];
+        NSString *o_playback_pos = @(secstotimestr(psz_time, (time.i_time / 1000000)));
                
         [o_streamPosition_txt setStringValue: o_playback_pos];
         vlc_object_release(p_input);

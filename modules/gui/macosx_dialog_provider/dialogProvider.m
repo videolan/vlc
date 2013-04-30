@@ -276,7 +276,7 @@ void updateProgressPanel (void *priv, const char *text, float value)
 
     NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
                           [NSNumber numberWithFloat:value], @"value",
-                          text ? [NSString stringWithUTF8String:text] : nil, @"text",
+                          text ? @(text) : nil, @"text",
                           nil];
 
     [sys->displayer performSelectorOnMainThread:@selector(updateProgressPanel:) withObject:dict waitUntilDone:YES];
@@ -329,15 +329,15 @@ bool checkProgressPanel (void *priv)
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     if (title)
-        [dict setObject:[NSString stringWithUTF8String:title] forKey:@"title"];
+        [dict setObject:@(title) forKey:@"title"];
     if (message)
-        [dict setObject:[NSString stringWithUTF8String:message] forKey:@"message"];
+        [dict setObject:@(message) forKey:@"message"];
     if (yes)
-        [dict setObject:[NSString stringWithUTF8String:yes] forKey:@"yes"];
+        [dict setObject:@(yes) forKey:@"yes"];
     if (no)
-        [dict setObject:[NSString stringWithUTF8String:no] forKey:@"no"];
+        [dict setObject:@(no) forKey:@"no"];
     if (cancel)
-        [dict setObject:[NSString stringWithUTF8String:cancel] forKey:@"cancel"];
+        [dict setObject:@(cancel) forKey:@"cancel"];
 
     return dict;
 }
@@ -672,7 +672,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
 //
 //            assert([control isKindOfClass:[NSTextView class]]);
 //            NSTextView *textView = (NSTextView *)control;
-//            NSString *string = [NSString stringWithUTF8String:widget->psz_text];
+//            NSString *string = @(widget->psz_text);
 //            NSAttributedString *attrString = [[NSAttributedString alloc] initWithHTML:[string dataUsingEncoding:NSISOLatin1StringEncoding] documentAttributes:NULL];
 //            [[textView textStorage] setAttributedString:[[NSAttributedString alloc] initWithString:@"Hello"]];
 //            [textView setNeedsDisplay:YES];
@@ -684,7 +684,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
         {
             assert([control isKindOfClass:[NSTextView class]]);
             NSTextView *textView = (NSTextView *)control;
-            NSString *string = [NSString stringWithUTF8String:widget->psz_text];
+            NSString *string = @(widget->psz_text);
             NSAttributedString *attrString = [[NSAttributedString alloc] initWithHTML:[string dataUsingEncoding:NSISOLatin1StringEncoding] documentAttributes:NULL];
             [[textView textStorage] setAttributedString:attrString];
             [textView setNeedsDisplay:YES];
@@ -701,7 +701,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
                 break;
             assert([control isKindOfClass:[NSControl class]]);
             NSControl *field = (NSControl *)control;
-            NSString *string = [NSString stringWithUTF8String:widget->psz_text];
+            NSString *string = @(widget->psz_text);
             NSAttributedString *attrString = [[NSAttributedString alloc] initWithHTML:[string dataUsingEncoding:NSISOLatin1StringEncoding] documentAttributes:NULL];
             [field setAttributedStringValue:attrString];
             [attrString release];
@@ -714,7 +714,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
             NSButton *button = (NSButton *)control;
             if (!widget->psz_text)
                 break;
-            [button setTitle:[NSString stringWithUTF8String:widget->psz_text]];
+            [button setTitle:@(widget->psz_text)];
             break;
         }
         case EXTENSION_WIDGET_DROPDOWN:
@@ -725,7 +725,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
             struct extension_widget_value_t *value;
             for(value = widget->p_values; value != NULL; value = value->p_next)
             {
-                [popup addItemWithTitle:[NSString stringWithUTF8String:value->psz_text]];
+                [popup addItemWithTitle:@(value->psz_text)];
             }
             [popup synchronizeTitleAndSelectedItem];
             [self popUpSelectionChanged:popup];
@@ -745,7 +745,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
             {
                 NSDictionary *entry = [NSDictionary dictionaryWithObjectsAndKeys:
                                        [NSNumber numberWithInt:value->i_id], @"id",
-                                       [NSString stringWithUTF8String:value->psz_text], @"text",
+                                       @(value->psz_text), @"text",
                                        nil];
                 [contentArray addObject:entry];
             }
@@ -757,7 +757,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
         {
             assert([control isKindOfClass:[NSImageView class]]);
             NSImageView *imageView = (NSImageView *)control;
-            NSString *string = widget->psz_text ? [NSString stringWithUTF8String:widget->psz_text] : nil;
+            NSString *string = widget->psz_text ? @(widget->psz_text) : nil;
             NSImage *image = nil;
             if (string)
                 image = [[NSImage alloc] initWithContentsOfURL:[NSURL fileURLWithPath:string]];
@@ -855,7 +855,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
         window = [[VLCDialogWindow alloc] initWithContentRect:content styleMask:NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask backing:NSBackingStoreBuffered defer:NO];
         [window setDelegate:self];
         [window setDialog:dialog];
-        [window setTitle:[NSString stringWithUTF8String:dialog->psz_title]];
+        [window setTitle:@(dialog->psz_title)];
         VLCDialogGridView *gridView = [[VLCDialogGridView alloc] init];
         [gridView setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
         [window setContentView:gridView];

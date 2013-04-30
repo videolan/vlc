@@ -366,7 +366,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_crop_sync_left_right_ckb setState: NSOffState];
 
     tmpChar = config_GetPsz(p_intf, "transform-type");
-    tmpString = [NSString stringWithUTF8String: tmpChar];
+    tmpString = @(tmpChar);
     if ([tmpString isEqualToString:@"hflip"])
         [o_transform_pop selectItemWithTag: 1];
     else if ([tmpString isEqualToString:@"vflip"])
@@ -425,7 +425,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_sepia_lbl setEnabled: b_state];
 
     tmpChar = config_GetPsz(p_intf, "gradient-mode");
-    tmpString = [NSString stringWithUTF8String: tmpChar];
+    tmpString = @(tmpChar);
     if ([tmpString isEqualToString:@"hough"])
         [o_gradient_mode_pop selectItemWithTag: 3];
     else if ([tmpString isEqualToString:@"edge"])
@@ -458,7 +458,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
     tmpChar = config_GetPsz(p_intf, "marq-marquee");
     if (tmpChar) {
-        [o_addtext_text_fld setStringValue: [NSString stringWithUTF8String: tmpChar]];
+        [o_addtext_text_fld setStringValue: @(tmpChar)];
         FREENULL(tmpChar);
     } else
         [o_addtext_text_fld setStringValue: @""];
@@ -471,7 +471,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
     tmpChar = config_GetPsz(p_intf, "logo-file");
     if (tmpChar) {
-        [o_addlogo_logo_fld setStringValue: [NSString stringWithUTF8String: tmpChar]];
+        [o_addlogo_logo_fld setStringValue: @(tmpChar)];
         FREENULL(tmpChar);
     } else
         [o_addlogo_logo_fld setStringValue: @""];

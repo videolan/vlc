@@ -142,7 +142,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
             // Get the web view
             assert([control isKindOfClass:[WebView class]]);
             WebView *webView = (WebView *)control;
-            NSString *string = [NSString stringWithUTF8String:widget->psz_text];
+            NSString *string = @(widget->psz_text);
             [[webView mainFrame] loadHTMLString:string baseURL:[NSURL URLWithString:@""]];
             [webView setNeedsDisplay:YES];
             break;
@@ -151,7 +151,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
         {
             assert([control isKindOfClass:[NSTextView class]]);
             NSTextView *textView = (NSTextView *)control;
-            NSString *string = [NSString stringWithUTF8String:widget->psz_text];
+            NSString *string = @(widget->psz_text);
             NSAttributedString *attrString = [[NSAttributedString alloc] initWithHTML:[string dataUsingEncoding: NSISOLatin1StringEncoding] documentAttributes:NULL];
             [[textView textStorage] setAttributedString:attrString];
             [textView setNeedsDisplay:YES];
@@ -181,7 +181,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
             NSButton *button = (NSButton *)control;
             if (!widget->psz_text)
                 break;
-            [button setTitle:[NSString stringWithUTF8String:widget->psz_text]];
+            [button setTitle:@(widget->psz_text)];
             break;
         }
         case EXTENSION_WIDGET_DROPDOWN:
@@ -191,9 +191,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
             [popup removeAllItems];
             struct extension_widget_value_t *value;
             for (value = widget->p_values; value != NULL; value = value->p_next)
-            {
-                [popup addItemWithTitle:[NSString stringWithUTF8String:value->psz_text]];
-            }
+                [popup addItemWithTitle:@(value->psz_text)];
             [popup synchronizeTitleAndSelectedItem];
             [self popUpSelectionChanged:popup];
             break;
@@ -211,7 +209,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
             {
                 NSDictionary *entry = [NSDictionary dictionaryWithObjectsAndKeys:
                                        [NSNumber numberWithInt:value->i_id], @"id",
-                                       [NSString stringWithUTF8String:value->psz_text], @"text",
+                                       @(value->psz_text), @"text",
                                        nil];
                 [contentArray addObject:entry];
             }
@@ -223,7 +221,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
         {
             assert([control isKindOfClass:[NSImageView class]]);
             NSImageView *imageView = (NSImageView *)control;
-            NSString *string = widget->psz_text ? [NSString stringWithUTF8String:widget->psz_text] : nil;
+            NSString *string = widget->psz_text ? @(widget->psz_text) : nil;
             NSImage *image = nil;
             if (string)
                 image = [[NSImage alloc] initWithContentsOfURL:[NSURL fileURLWithPath:string]];
@@ -311,7 +309,7 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
 
 - (void)performEventWithObject: (NSValue *)o_value ofType: (const char*)type
 {
-    NSString *o_type = [NSString stringWithUTF8String:type];
+    NSString *o_type = @(type);
 
     if ([o_type isEqualToString: @"dialog-extension"]) {
         [self performSelectorOnMainThread:@selector(updateExtensionDialog:)
@@ -459,7 +457,7 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
                                                               defer:NO];
         [dialogWindow setDelegate:self];
         [dialogWindow setDialog:p_dialog];
-        [dialogWindow setTitle:[NSString stringWithUTF8String:p_dialog->psz_title]];
+        [dialogWindow setTitle:@(p_dialog->psz_title)];
 
         VLCDialogGridView *gridView = [[VLCDialogGridView alloc] init];
         [gridView setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];

@@ -289,7 +289,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         [mi setTarget:self];
         [mi setAction:selector];
         [mi setTag:p_item->list.i[i]];
-        [mi setRepresentedObject:[NSString stringWithUTF8String:psz_name]];
+        [mi setRepresentedObject:@(psz_name)];
         [menu addItem: [mi autorelease]];
         if (p_item->value.i == p_item->list.i[i])
             [mi setState:NSOnState];
@@ -926,7 +926,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [openPanel setCanChooseDirectories: NO];
     [openPanel setAllowsMultipleSelection: YES];
     [openPanel setAllowedFileTypes: @[@"cdg",@"@idx",@"srt",@"sub",@"utf",@"ass",@"ssa",@"aqt",@"jss",@"psb",@"rt",@"smi",@"txt",@"smil"]];
-    [openPanel setDirectoryURL:[NSURL fileURLWithPath:[[NSString stringWithUTF8String:path] stringByExpandingTildeInPath]]];
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:[@(path) stringByExpandingTildeInPath]]];
     i_returnValue = [openPanel runModal];
     free(path);
 

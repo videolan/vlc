@@ -850,7 +850,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     GetVolParmsInfoBuffer volumeParms;
     err = FSGetVolumeParms(actualVolume, &volumeParms, sizeof(volumeParms));
     if (noErr == err) {
-        NSString *bsdName = [NSString stringWithUTF8String:(char *)volumeParms.vMDeviceID];
+        NSString *bsdName = @((char *)volumeParms.vMDeviceID);
         return [NSString stringWithFormat:@"/dev/r%@", bsdName];
     }
 

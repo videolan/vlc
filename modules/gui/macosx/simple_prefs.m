@@ -330,10 +330,10 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
             continue;
         }
         else if (p_item->list.psz[i])
-            mi = [[NSMenuItem alloc] initWithTitle: [NSString stringWithUTF8String: p_item->list.psz[i]] action:NULL keyEquivalent: @""];
+            mi = [[NSMenuItem alloc] initWithTitle: @(p_item->list.psz[i]) action:NULL keyEquivalent: @""];
         else
             msg_Err(p_intf, "item %d of pref %s failed to be created", i, name);
-        [mi setRepresentedObject:[NSString stringWithUTF8String: p_item->list.psz[i]]];
+        [mi setRepresentedObject:@(p_item->list.psz[i])];
         [[object menu] addItem: [mi autorelease]];
         if (p_item->value.psz && !strcmp(p_item->value.psz, p_item->list.psz[i]))
             [object selectItem:[object lastItem]];
@@ -388,7 +388,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     for (size_t i_index = 0; i_index < count; i_index++) {
         p_parser = p_list[i_index];
         if (module_provides(p_parser, p_item->psz_type)) {
-            [object addItemWithTitle: [NSString stringWithUTF8String: _(module_GetLongName(p_parser)) ?: ""]];
+            [object addItemWithTitle: @(_(module_GetLongName(p_parser)) ?: "")];
             if (p_item->value.psz && !strcmp(p_item->value.psz, module_get_name(p_parser, false)))
                 [object selectItem: [object lastItem]];
         }
@@ -406,7 +406,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
 - (void)setupField:(NSTextField *)o_object forOption:(const char *)psz_option
 {
     char *psz_tmp = config_GetPsz(p_intf, psz_option);
-    [o_object setStringValue: [NSString stringWithUTF8String: psz_tmp ?: ""]];
+    [o_object setStringValue: @(psz_tmp ?: "")];
     [o_object setToolTip: _NS(config_GetLabel(p_intf, psz_option))];
     free(psz_tmp);
 }
@@ -633,9 +633,9 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
            && !strncmp(p_item->psz_name , "key-", 4)
            && !EMPTY_STR(p_item->psz_text)) {
             [o_tempArray_desc addObject: _NS(p_item->psz_text)];
-            [o_tempArray_names addObject: [NSString stringWithUTF8String:p_item->psz_name]];
+            [o_tempArray_names addObject: @(p_item->psz_name)];
             if (p_item->value.psz)
-                [o_hotkeySettings addObject: [NSString stringWithUTF8String:p_item->value.psz]];
+                [o_hotkeySettings addObject: @(p_item->value.psz)];
             else
                 [o_hotkeySettings addObject: [NSString string]];
         }
@@ -1114,7 +1114,7 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
 - (IBAction)showFontPicker:(id)sender
 {
     char * font = config_GetPsz(p_intf, "freetype-font");
-    NSString * fontName = font ? [NSString stringWithUTF8String: font] : nil;
+    NSString * fontName = font ? @(font) : nil;
     free(font);
     if (fontName) {
         NSFont * font = [NSFont fontWithName:fontName size:0.0];

@@ -233,7 +233,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     }
 
     NSURL *o_url;
-    o_url = [NSURL URLWithString:[NSString stringWithUTF8String:psz_uri]];
+    o_url = [NSURL URLWithString:@(psz_uri)];
     vlc_object_release(p_input);
 
     return o_url;
@@ -265,10 +265,10 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     char *format = var_InheritString(VLCIntf, "input-title-format");
     char *formated = str_format_meta(pl_Get(VLCIntf), format);
     free(format);
-    o_name = [NSString stringWithUTF8String:formated];
+    o_name = @(formated);
     free(formated);
 
-    NSURL * o_url = [NSURL URLWithString: [NSString stringWithUTF8String: psz_uri]];
+    NSURL * o_url = [NSURL URLWithString: @(psz_uri)];
     free(psz_uri);
 
     if ([o_name isEqualToString:@""]) {

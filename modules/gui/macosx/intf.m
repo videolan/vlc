@@ -496,7 +496,7 @@ static int DialogCallback(vlc_object_t *p_this, const char *type, vlc_value_t pr
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
     VLCMain *interface = (VLCMain *)data;
 
-    if ([[NSString stringWithUTF8String: type] isEqualToString: @"dialog-progress-bar"]) {
+    if ([@(type) isEqualToString: @"dialog-progress-bar"]) {
         /* the progress panel needs to update itself and therefore wants special treatment within this context */
         dialog_progress_bar_t *p_dialog = (dialog_progress_bar_t *)value.p_address;
 
@@ -519,7 +519,7 @@ void updateProgressPanel (void *priv, const char *text, float value)
 
     NSString *o_txt;
     if (text != NULL)
-        o_txt = [NSString stringWithUTF8String: text];
+        o_txt = @(text);
     else
         o_txt = @"";
 
@@ -1271,7 +1271,7 @@ static VLCMain *_o_sharedMainInstance = nil;
            && !strncmp(p_item->psz_name , "key-", 4)
            && !EMPTY_STR(p_item->psz_text)) {
             if (p_item->value.psz)
-                [o_tempArray addObject: [NSString stringWithUTF8String:p_item->value.psz]];
+                [o_tempArray addObject: @(p_item->value.psz)];
         }
     }
     module_config_free (p_config);
