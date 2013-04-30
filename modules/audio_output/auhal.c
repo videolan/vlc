@@ -394,6 +394,10 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     AURenderCallbackStruct      input;
     p_aout->sys->chans_to_reorder = 0;
 
+    SInt32 currentMinorSystemVersion;
+    if(Gestalt(gestaltSystemVersionMinor, &currentMinorSystemVersion) != noErr)
+        msg_Err(p_aout, "failed to check OSX version");
+
     /* Lets go find our Component */
     desc.componentType = kAudioUnitType_Output;
     desc.componentSubType = kAudioUnitSubType_HALOutput;
@@ -626,7 +630,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 
             break;
         case 8:
-            if (fmt->i_physical_channels & (AOUT_CHAN_LFE)) {
+            if (fmt->i_physical_channels & (AOUT_CHAN_LFE) || currentMinorSystemVersion < 7) {
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_7_1_A; // L R C LFE Ls Rs Lc Rc
 
                 chans_out[0] = AOUT_CHAN_LEFT;
@@ -637,7 +641,12 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                 chans_out[5] = AOUT_CHAN_MIDDLERIGHT;
                 chans_out[6] = AOUT_CHAN_REARLEFT;
                 chans_out[7] = AOUT_CHAN_REARRIGHT;
-            } else {
+
+                if (!(fmt->i_physical_channels & (AOUT_CHAN_LFE)))
+                    msg_Warn(p_aout, "8.0 audio output not supported on OS X 10.%i, layout will be incorrect", currentMinorSystemVersion);
+            }
+#ifdef MAC_OS_X_VERSION_10_7
+            else {
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DTS_8_0_B; // Lc C Rc L R Ls Cs Rs
 
                 chans_out[0] = AOUT_CHAN_MIDDLELEFT;
@@ -649,12 +658,19 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                 chans_out[6] = AOUT_CHAN_REARCENTER;
                 chans_out[7] = AOUT_CHAN_REARRIGHT;
             }
+#endif
             p_aout->sys->chans_to_reorder = aout_CheckChannelReorder(NULL, chans_out, fmt->i_physical_channels, p_aout->sys->chan_table);
             if (p_aout->sys->chans_to_reorder)
                 msg_Dbg(p_aout, "channel reordering needed for 7.1 / 8.0 output");
 
             break;
         case 9:
+            if (currentMinorSystemVersion < 7) {
+                msg_Warn(p_aout, "8.1 audio output not supported on OS X 10.%i", currentMinorSystemVersion);
+                break;
+            }
+
+#ifdef MAC_OS_X_VERSION_10_7
             new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DTS_8_1_B; // Lc C Rc L R Ls Cs Rs LFE
             chans_out[0] = AOUT_CHAN_MIDDLELEFT;
             chans_out[1] = AOUT_CHAN_CENTER;
@@ -669,6 +685,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
             p_aout->sys->chans_to_reorder = aout_CheckChannelReorder(NULL, chans_out, fmt->i_physical_channels, p_aout->sys->chan_table);
             if (p_aout->sys->chans_to_reorder)
                 msg_Dbg(p_aout, "channel reordering needed for 8.1 output");
+#endif
             break;
     }
 
