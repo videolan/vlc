@@ -154,6 +154,11 @@
 
         if (b_nonembedded) {
             NSRect window_rect = [o_new_video_window getWindowRectForProposedVideoViewSize:videoViewSize];
+            if (videoViewPosition.origin.x > 0.)
+                window_rect.origin.x = videoViewPosition.origin.x;
+            if (videoViewPosition.origin.y > 0.)
+                window_rect.origin.y = videoViewPosition.origin.y;
+
             [o_new_video_window setFrame:window_rect display:YES];
         }
 
