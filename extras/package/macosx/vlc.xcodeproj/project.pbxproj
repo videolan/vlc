@@ -759,7 +759,7 @@
 		CC461F74160084A10022423C /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/SharedDialogs.xib; sourceTree = "<group>"; };
 		CC4A33210F8CB017000FC4A7 /* coredialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = coredialogs.m; path = ../../../modules/gui/macosx/coredialogs.m; sourceTree = SOURCE_ROOT; };
 		CC4A33220F8CB017000FC4A7 /* coredialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = coredialogs.h; path = ../../../modules/gui/macosx/coredialogs.h; sourceTree = SOURCE_ROOT; };
-		CC4D67F71348F601003FCC5B /* darwin_specific.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = darwin_specific.c; path = ../../../src/posix/darwin_specific.c; sourceTree = "<group>"; };
+		CC4D67F71348F601003FCC5B /* specific.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = specific.c; path = ../../../src/darwin/specific.c; sourceTree = "<group>"; };
 		CC4EFC2C13E96BD00091D19A /* dropzone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dropzone.png; path = Resources/mainwindow/dropzone.png; sourceTree = "<group>"; };
 		CC5560231365CDC700D54038 /* AudioEffects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AudioEffects.h; path = ../../../modules/gui/macosx/AudioEffects.h; sourceTree = "<group>"; };
 		CC5560241365CDC800D54038 /* AudioEffects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AudioEffects.m; path = ../../../modules/gui/macosx/AudioEffects.m; sourceTree = "<group>"; };
@@ -771,12 +771,6 @@
 		CC6C01AB0DDF3E9200C7D754 /* macosx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = macosx.c; path = ../../../modules/gui/minimal_macosx/macosx.c; sourceTree = SOURCE_ROOT; };
 		CC6C01AC0DDF3E9200C7D754 /* VLCMinimalVoutWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCMinimalVoutWindow.h; path = ../../../modules/gui/minimal_macosx/VLCMinimalVoutWindow.h; sourceTree = SOURCE_ROOT; };
 		CC6C01AD0DDF3E9200C7D754 /* VLCMinimalVoutWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCMinimalVoutWindow.m; path = ../../../modules/gui/minimal_macosx/VLCMinimalVoutWindow.m; sourceTree = SOURCE_ROOT; };
-		CC6C01AE0DDF3E9200C7D754 /* VLCOpenGLVoutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCOpenGLVoutView.m; path = ../../../modules/gui/minimal_macosx/VLCOpenGLVoutView.m; sourceTree = SOURCE_ROOT; };
-		CC6C01AF0DDF3E9200C7D754 /* voutagl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = voutagl.h; path = ../../../modules/gui/minimal_macosx/voutagl.h; sourceTree = SOURCE_ROOT; };
-		CC6C01B00DDF3E9200C7D754 /* voutgl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = voutgl.h; path = ../../../modules/gui/minimal_macosx/voutgl.h; sourceTree = SOURCE_ROOT; };
-		CC6C01B10DDF3E9200C7D754 /* voutgl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = voutgl.m; path = ../../../modules/gui/minimal_macosx/voutgl.m; sourceTree = SOURCE_ROOT; };
-		CC6C01B20DDF3E9200C7D754 /* VLCOpenGLVoutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCOpenGLVoutView.h; path = ../../../modules/gui/minimal_macosx/VLCOpenGLVoutView.h; sourceTree = SOURCE_ROOT; };
-		CC6C01B30DDF3E9200C7D754 /* voutagl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = voutagl.m; path = ../../../modules/gui/minimal_macosx/voutagl.m; sourceTree = SOURCE_ROOT; };
 		CC6C01BA0DDF3EEC00C7D754 /* auhal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = auhal.c; path = ../../../modules/audio_output/auhal.c; sourceTree = SOURCE_ROOT; };
 		CC6C01BB0DDF3F0700C7D754 /* opengl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = opengl.c; path = ../../../modules/video_output/opengl.c; sourceTree = SOURCE_ROOT; };
 		CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppleRemote.h; path = ../../../modules/gui/macosx/AppleRemote.h; sourceTree = SOURCE_ROOT; };
@@ -972,6 +966,8 @@
 		CCD83E4313FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/Wizard.xib; sourceTree = "<group>"; };
 		CCDB535C13E97D3500A1782F /* dropzone-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "dropzone-background.png"; path = "Resources/mainwindow/dropzone-background.png"; sourceTree = "<group>"; };
 		CCDBA3B313D32E200006127B /* macosx.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = macosx.m; path = ../../../modules/video_output/macosx.m; sourceTree = "<group>"; };
+		CCDDF1AC172FF4C4007729A1 /* netconf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = netconf.c; path = ../../../src/darwin/netconf.c; sourceTree = "<group>"; };
+		CCDDF1AD172FF4C4007729A1 /* dirs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = dirs.c; path = ../../../src/darwin/dirs.c; sourceTree = "<group>"; };
 		CCE8BAC2160615D9006741FB /* effects-one-button-pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed.png"; path = "Resources/mainwindow/effects-one-button-pressed.png"; sourceTree = "<group>"; };
 		CCE8BAC3160615D9006741FB /* effects-one-button-pressed@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed@2x.png"; path = "Resources/mainwindow/effects-one-button-pressed@2x.png"; sourceTree = "<group>"; };
 		CCF0777913659A8000AF19FD /* SPInvocationGrabbing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPInvocationGrabbing.h; path = ../../../modules/gui/macosx/SPInvocationGrabbing.h; sourceTree = "<group>"; };
@@ -1602,12 +1598,6 @@
 				CC6C01AB0DDF3E9200C7D754 /* macosx.c */,
 				CC6C01AC0DDF3E9200C7D754 /* VLCMinimalVoutWindow.h */,
 				CC6C01AD0DDF3E9200C7D754 /* VLCMinimalVoutWindow.m */,
-				CC6C01AE0DDF3E9200C7D754 /* VLCOpenGLVoutView.m */,
-				CC6C01AF0DDF3E9200C7D754 /* voutagl.h */,
-				CC6C01B00DDF3E9200C7D754 /* voutgl.h */,
-				CC6C01B10DDF3E9200C7D754 /* voutgl.m */,
-				CC6C01B20DDF3E9200C7D754 /* VLCOpenGLVoutView.h */,
-				CC6C01B30DDF3E9200C7D754 /* voutagl.m */,
 			);
 			name = "Minimal Mac OS X Classes";
 			sourceTree = "<group>";
@@ -1661,15 +1651,10 @@
 			isa = PBXGroup;
 			children = (
 				CC79F66714014FDC0015D89E /* quartztext.c */,
-				CC79F66614014FC30015D89E /* opengl.h */,
-				CC6C01BB0DDF3F0700C7D754 /* opengl.c */,
-				CC4D67F71348F601003FCC5B /* darwin_specific.c */,
+				CCDDF1AE172FF4CE007729A1 /* vout */,
+				CCDDF1AF172FF4D6007729A1 /* core */,
 				CC6C01BA0DDF3EEC00C7D754 /* auhal.c */,
-				CCC895830D9A8A82005AE59C /* eyetv.m */,
-				DCC8017816FCA036007FE736 /* avcapture.m */,
-				CC9E3E7913D1CFCF00429A71 /* qtcapture.m */,
-				DC1A176914E2778A001477C6 /* qtsound.m */,
-				CCDBA3B313D32E200006127B /* macosx.m */,
+				CCDDF1B0172FF4E2007729A1 /* access */,
 			);
 			name = "OSX-specific source files";
 			sourceTree = "<group>";
@@ -1719,6 +1704,37 @@
 				CCD590F310E5B76300D39094 /* VLCLoginPanel.m */,
 			);
 			name = "Minimal Dialog Provider";
+			sourceTree = "<group>";
+		};
+		CCDDF1AE172FF4CE007729A1 /* vout */ = {
+			isa = PBXGroup;
+			children = (
+				CC79F66614014FC30015D89E /* opengl.h */,
+				CC6C01BB0DDF3F0700C7D754 /* opengl.c */,
+				CCDBA3B313D32E200006127B /* macosx.m */,
+			);
+			name = vout;
+			sourceTree = "<group>";
+		};
+		CCDDF1AF172FF4D6007729A1 /* core */ = {
+			isa = PBXGroup;
+			children = (
+				CC4D67F71348F601003FCC5B /* specific.c */,
+				CCDDF1AC172FF4C4007729A1 /* netconf.c */,
+				CCDDF1AD172FF4C4007729A1 /* dirs.c */,
+			);
+			name = core;
+			sourceTree = "<group>";
+		};
+		CCDDF1B0172FF4E2007729A1 /* access */ = {
+			isa = PBXGroup;
+			children = (
+				CCC895830D9A8A82005AE59C /* eyetv.m */,
+				DCC8017816FCA036007FE736 /* avcapture.m */,
+				CC9E3E7913D1CFCF00429A71 /* qtcapture.m */,
+				DC1A176914E2778A001477C6 /* qtsound.m */,
+			);
+			name = access;
 			sourceTree = "<group>";
 		};
 		CCE6438C13E8CC040061B5F2 /* sidebar */ = {
