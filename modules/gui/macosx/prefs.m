@@ -224,30 +224,6 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     [o_prefs_window orderOut:self];
 }
 
-- (IBAction)resetAll: (id)sender
-{
-    NSBeginInformationalAlertSheet(_NS("Reset Preferences"), _NS("Cancel"),
-        _NS("Continue"), nil, o_prefs_window, self,
-        @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, @"%@",
-        _NS("Beware this will reset the VLC media player preferences.\n"
-            "Are you sure you want to continue?"));
-}
-
-- (void)sheetDidEnd:(NSWindow *)o_sheet returnCode:(int)i_return
-    contextInfo:(void *)o_context
-{
-    if (i_return == NSAlertAlternateReturn) {
-        /* reset VLC's config */
-        config_ResetAll(p_intf);
-        [_rootTreeItem resetView];
-        config_SaveConfigFile(p_intf);
-
-        /* reset OS X defaults */
-        [NSUserDefaults resetStandardUserDefaults];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-}
-
 - (IBAction)buttonAction: (id)sender
 {
     [o_prefs_window orderOut: self];

@@ -682,21 +682,24 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
         [self saveChangedSettings];
         [[NSFontPanel sharedFontPanel] close];
         [o_sprefs_win orderOut: sender];
-    } else if (sender == o_sprefs_reset_btn)
-        NSBeginInformationalAlertSheet(_NS("Reset Preferences"), _NS("Cancel"),
-                                        _NS("Continue"), nil, o_sprefs_win, self,
-                                        @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, @"%@",
-                                        _NS("This will reset VLC media player's preferences.\n\n"
-                                            "Note that VLC will restart during the process, so your current "
-                                            "playlist will be emptied and eventual playback, streaming or "
-                                            "transcoding activities will stop immediately.\n\n"
-                                            "The Media Library will not be affected.\n\n"
-                                            "Are you sure you want to continue?"));
-    else if (sender == o_sprefs_showAll_btn) {
+    } else if (sender == o_sprefs_showAll_btn) {
         [o_sprefs_win orderOut: self];
         [[[VLCMain sharedInstance] preferences] showPrefsWithLevel:[o_sprefs_win level]];
     } else
         msg_Warn(p_intf, "unknown buttonAction sender");
+}
+
+- (IBAction)resetPreferences:(NSControl *)sender
+{
+    NSBeginInformationalAlertSheet(_NS("Reset Preferences"), _NS("Cancel"),
+                                   _NS("Continue"), nil, [sender window], self,
+                                   @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, @"%@",
+                                   _NS("This will reset VLC media player's preferences.\n\n"
+                                       "Note that VLC will restart during the process, so your current "
+                                       "playlist will be emptied and eventual playback, streaming or "
+                                       "transcoding activities will stop immediately.\n\n"
+                                       "The Media Library will not be affected.\n\n"
+                                       "Are you sure you want to continue?"));
 }
 
 - (void)sheetDidEnd:(NSWindow *)o_sheet

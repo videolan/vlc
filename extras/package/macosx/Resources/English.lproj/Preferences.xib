@@ -12,8 +12,10 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="2311"/>
+      <integer value="2410"/>
+      <integer value="1531"/>
       <integer value="2562"/>
+      <integer value="2311"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -48,7 +50,7 @@
         <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <string key="NSWindowContentMinSize">{775, 485}</string>
         <object class="NSView" key="NSWindowView" id="669190984">
-          <nil key="NSNextResponder"/>
+          <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -341,6 +343,7 @@
             </object>
           </object>
           <string key="NSFrameSize">{775, 485}</string>
+          <reference key="NSSuperview"/>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
         <string key="NSMinSize">{775, 507}</string>
@@ -364,7 +367,7 @@
         <nil key="NSUserInterfaceItemIdentifier"/>
         <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <object class="NSView" key="NSWindowView" id="323943617">
-          <nil key="NSNextResponder"/>
+          <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -502,6 +505,7 @@
             </object>
           </object>
           <string key="NSFrameSize">{570, 38}</string>
+          <reference key="NSSuperview"/>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
@@ -5484,14 +5488,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
-            <string key="label">resetAll:</string>
-            <reference key="source" ref="990163127"/>
-            <reference key="destination" ref="703971607"/>
-          </object>
-          <int key="connectionID">1552</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
             <string key="label">closePrefs:</string>
             <reference key="source" ref="990163127"/>
             <reference key="destination" ref="148928696"/>
@@ -5745,14 +5741,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <reference key="destination" ref="222165135"/>
           </object>
           <int key="connectionID">2409</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">buttonAction:</string>
-            <reference key="source" ref="150917409"/>
-            <reference key="destination" ref="910206764"/>
-          </object>
-          <int key="connectionID">2415</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
@@ -7409,6 +7397,22 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <reference key="destination" ref="579515050"/>
           </object>
           <int key="connectionID">3871</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">resetPreferences:</string>
+            <reference key="source" ref="150917409"/>
+            <reference key="destination" ref="910206764"/>
+          </object>
+          <int key="connectionID">3872</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">resetPreferences:</string>
+            <reference key="source" ref="150917409"/>
+            <reference key="destination" ref="703971607"/>
+          </object>
+          <int key="connectionID">3873</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -12234,7 +12238,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">3871</int>
+      <int key="maxID">3873</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -13457,6 +13461,127 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           </object>
         </object>
         <object class="IBPartialClassDescription">
+          <string key="className">VLCPrefs</string>
+          <string key="superclassName">NSObject</string>
+          <object class="NSMutableDictionary" key="actions">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>buttonAction:</string>
+              <string>closePrefs:</string>
+              <string>savePrefs:</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="actionInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>buttonAction:</string>
+              <string>closePrefs:</string>
+              <string>savePrefs:</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBActionInfo">
+                <string key="name">buttonAction:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">closePrefs:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">savePrefs:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="outlets">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_cancel_btn</string>
+              <string>o_prefs_view</string>
+              <string>o_prefs_window</string>
+              <string>o_reset_btn</string>
+              <string>o_save_btn</string>
+              <string>o_showBasic_btn</string>
+              <string>o_title</string>
+              <string>o_tree</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_cancel_btn</string>
+              <string>o_prefs_view</string>
+              <string>o_prefs_window</string>
+              <string>o_reset_btn</string>
+              <string>o_save_btn</string>
+              <string>o_showBasic_btn</string>
+              <string>o_title</string>
+              <string>o_tree</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_cancel_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_prefs_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_prefs_window</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_reset_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_save_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_showBasic_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_title</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_tree</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBDocumentRelativeSource</string>
+            <string key="minorKey">../../../../../modules/gui/macosx/prefs.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
           <string key="className">VLCSimplePrefs</string>
           <string key="superclassName">NSObject</string>
           <object class="NSMutableDictionary" key="actions">
@@ -13470,12 +13595,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               <string>inputSettingChanged:</string>
               <string>interfaceSettingChanged:</string>
               <string>osdSettingChanged:</string>
+              <string>resetPreferences:</string>
               <string>showFontPicker:</string>
               <string>urlHandlerAction:</string>
               <string>videoSettingChanged:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -13499,6 +13626,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               <string>inputSettingChanged:</string>
               <string>interfaceSettingChanged:</string>
               <string>osdSettingChanged:</string>
+              <string>resetPreferences:</string>
               <string>showFontPicker:</string>
               <string>urlHandlerAction:</string>
               <string>videoSettingChanged:</string>
@@ -13531,6 +13659,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               </object>
               <object class="IBActionInfo">
                 <string key="name">osdSettingChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">resetPreferences:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
