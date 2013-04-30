@@ -61,7 +61,7 @@ struct demux_sys_t
     es_out_id_t     *p_es;
 
     int64_t         i_data_pos;
-    unsigned int    i_data_size;
+    int64_t         i_data_size;
 
     unsigned int    i_frame_size;
     int             i_frame_samples;
@@ -100,7 +100,9 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t *p_sys;
 
     const uint8_t *p_peek;
+    bool           b_is_rf64;
     unsigned int   i_size;
+    uint64_t       i_data_size;
     unsigned int   i_extended;
     const char    *psz_name;
 
@@ -111,7 +113,9 @@ static int Open( vlc_object_t * p_this )
     if( stream_Peek( p_demux->s, &p_peek, 12 ) < 12 )
         return VLC_EGENERIC;
 
-    if( memcmp( p_peek, "RIFF", 4 ) || memcmp( &p_peek[8], "WAVE", 4 ) )
+    b_is_rf64 = ( memcmp( p_peek, "RF64", 4 ) == 0 );
+    if( ( !b_is_rf64 && memcmp( p_peek, "RIFF", 4 ) ) ||
+	  memcmp( &p_peek[8], "WAVE", 4 ) )
     {
         return VLC_EGENERIC;
     }
@@ -123,12 +127,40 @@ static int Open( vlc_object_t * p_this )
         return VLC_ENOMEM;
 
     p_sys->p_es           = NULL;
+    p_sys->i_data_size    = 0;
     p_sys->i_chans_to_reorder = 0;
     p_sys->i_channel_mask = 0;
 
     /* skip riff header */
     if( stream_Read( p_demux->s, NULL, 12 ) != 12 )
         goto error;
+
+    if( b_is_rf64 )
+    {
+        /* search datasize64 chunk */
+        if( ChunkFind( p_demux, "ds64", &i_size ) )
+        {
+            msg_Err( p_demux, "cannot find 'ds64' chunk" );
+            goto error;
+        }
+        if( i_size < 24 )
+        {
+            msg_Err( p_demux, "invalid 'ds64' chunk" );
+            goto error;
+        }
+        if( stream_Read( p_demux->s, NULL, 8 ) != 8 )
+            goto error;
+        if( stream_Peek( p_demux->s, &p_peek, 24 ) < 24 )
+            goto error;
+        i_data_size = GetQWLE( &p_peek[8] );
+        if( i_data_size >> 62 )
+            p_sys->i_data_size = (int64_t)1 << 62;
+        else
+            p_sys->i_data_size = i_data_size;
+        if( stream_Read( p_demux->s, NULL, i_size ) != (int)i_size ||
+            ( (i_size & 1) && stream_Read( p_demux->s, NULL, 1 ) != 1 ) )
+            goto error;
+    }
 
     /* search fmt chunk */
     if( ChunkFind( p_demux, "fmt ", &i_size ) )
@@ -365,11 +397,13 @@ static int Open( vlc_object_t * p_this )
 
     msg_Dbg( p_demux, "found %s audio format", psz_name );
 
-    if( ChunkFind( p_demux, "data", &p_sys->i_data_size ) )
+    if( ChunkFind( p_demux, "data", &i_size ) )
     {
         msg_Err( p_demux, "cannot find 'data' chunk" );
         goto error;
     }
+    if( !b_is_rf64 || i_size < UINT32_MAX )
+        p_sys->i_data_size = i_size;
     if( stream_Read( p_demux->s, NULL, 8 ) != 8 )
         goto error;
     p_sys->i_data_pos = stream_Tell( p_demux->s );
