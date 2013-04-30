@@ -132,6 +132,8 @@ void CloseIntf (vlc_object_t *p_this)
     free(p_intf->p_sys);
 }
 
+static NSLock * o_vout_provider_lock = nil;
+
 static int WindowControl(vout_window_t *, int i_query, va_list);
 
 int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
@@ -140,11 +142,19 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
     intf_thread_t *p_intf = VLCIntf;
     if (!p_intf) {
         msg_Err(p_wnd, "Mac OS X interface not found");
+        [o_pool release];
         return VLC_EGENERIC;
     }
     NSRect proposedVideoViewPosition = NSMakeRect(cfg->x, cfg->y, cfg->width, cfg->height);
 
+    [o_vout_provider_lock lock];
     VLCVoutWindowController *o_vout_controller = [[VLCMain sharedInstance] voutController];
+    if (!o_vout_controller) {
+        [o_vout_provider_lock unlock];
+        [o_pool release];
+        return VLC_EGENERIC;
+    }
+
     SEL sel = @selector(setupVoutForWindow:withProposedVideoViewPosition:);
     NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[o_vout_controller methodSignatureForSelector:sel]];
     [inv setTarget:o_vout_controller];
@@ -160,13 +170,13 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 
     if (!videoView) {
         msg_Err(p_wnd, "got no video view from the interface");
+        [o_vout_provider_lock unlock];
         [o_pool release];
         return VLC_EGENERIC;
     }
 
     msg_Dbg(VLCIntf, "returning videoview with proposed position x=%i, y=%i, width=%i, height=%i", cfg->x, cfg->y, cfg->width, cfg->height);
     p_wnd->handle.nsobject = videoView;
-
 
     // TODO: find a cleaner way for "start in fullscreen"
     if (var_GetBool(pl_Get(VLCIntf), "fullscreen")) {
@@ -181,6 +191,7 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
         [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
                            waitUntilDone:NO];
     }
+    [o_vout_provider_lock unlock];
 
     [[VLCMain sharedInstance] setActiveVideoPlayback: YES];
     p_wnd->control = WindowControl;
@@ -191,10 +202,19 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 
 static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
 {
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+
+    [o_vout_provider_lock lock];
+    VLCVoutWindowController *o_vout_controller = [[VLCMain sharedInstance] voutController];
+    if (!o_vout_controller) {
+        [o_vout_provider_lock unlock];
+        [o_pool release];
+        return VLC_EGENERIC;
+    }
+
     switch(i_query) {
         case VOUT_WINDOW_SET_STATE:
         {
-            NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
             unsigned i_state = va_arg(args, unsigned);
 
             NSInteger i_cooca_level = NSNormalWindowLevel;
@@ -202,36 +222,33 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
                 i_cooca_level = NSStatusWindowLevel;
 
             SEL sel = @selector(setWindowLevel:forWindow:);
-            NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[[[VLCMain sharedInstance] voutController] methodSignatureForSelector:sel]];
-            [inv setTarget:[[VLCMain sharedInstance] voutController]];
+            NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[o_vout_controller methodSignatureForSelector:sel]];
+            [inv setTarget:o_vout_controller];
             [inv setSelector:sel];
             [inv setArgument:&i_cooca_level atIndex:2]; // starting at 2!
             [inv setArgument:&p_wnd atIndex:3];
             [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
                                waitUntilDone:NO];
 
-            [o_pool release];
-            return VLC_SUCCESS;
+            break;
         }
         case VOUT_WINDOW_SET_SIZE:
         {
-            NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
 
             unsigned int i_width  = va_arg(args, unsigned int);
             unsigned int i_height = va_arg(args, unsigned int);
 
             NSSize newSize = NSMakeSize(i_width, i_height);
             SEL sel = @selector(setNativeVideoSize:forWindow:);
-            NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[[[VLCMain sharedInstance] voutController] methodSignatureForSelector:sel]];
-            [inv setTarget:[[VLCMain sharedInstance] voutController]];
+            NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[o_vout_controller methodSignatureForSelector:sel]];
+            [inv setTarget:o_vout_controller];
             [inv setSelector:sel];
             [inv setArgument:&newSize atIndex:2]; // starting at 2!
             [inv setArgument:&p_wnd atIndex:3];
             [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
                                waitUntilDone:NO];
 
-            [o_pool release];
-            return VLC_SUCCESS;
+            break;
         }
         case VOUT_WINDOW_SET_FULLSCREEN:
         {
@@ -239,28 +256,44 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
             int i_full = va_arg(args, int);
 
             SEL sel = @selector(setFullscreen:forWindow:);
-            NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[[[VLCMain sharedInstance] voutController] methodSignatureForSelector:sel]];
-            [inv setTarget:[[VLCMain sharedInstance] voutController]];
+            NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[o_vout_controller methodSignatureForSelector:sel]];
+            [inv setTarget:o_vout_controller];
             [inv setSelector:sel];
             [inv setArgument:&i_full atIndex:2]; // starting at 2!
             [inv setArgument:&p_wnd atIndex:3];
             [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
                                waitUntilDone:NO];
 
-            [o_pool release];
-            return VLC_SUCCESS;
+            break;
         }
         default:
+        {
             msg_Warn(p_wnd, "unsupported control query");
+            [o_vout_provider_lock unlock];
+            [o_pool release];
             return VLC_EGENERIC;
+        }
     }
+
+    [o_vout_provider_lock unlock];
+    [o_pool release];
+    return VLC_SUCCESS;
 }
 
 void WindowClose(vout_window_t *p_wnd)
 {
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
 
-    [[[VLCMain sharedInstance] voutController] performSelectorOnMainThread:@selector(removeVoutforDisplay:) withObject:[NSValue valueWithPointer:p_wnd] waitUntilDone:NO];
+    [o_vout_provider_lock lock];
+    VLCVoutWindowController *o_vout_controller = [[VLCMain sharedInstance] voutController];
+    if (!o_vout_controller) {
+        [o_vout_provider_lock unlock];
+        [o_pool release];
+        return;
+    }
+
+    [o_vout_controller performSelectorOnMainThread:@selector(removeVoutforDisplay:) withObject:[NSValue valueWithPointer:p_wnd] waitUntilDone:NO];
+    [o_vout_provider_lock unlock];
 
     [o_pool release];
 }
@@ -278,6 +311,7 @@ static void Run(intf_thread_t *p_intf)
 
     o_appLock = [[NSLock alloc] init];
     o_plItemChangedLock = [[NSLock alloc] init];
+    o_vout_provider_lock = [[NSLock alloc] init];
 
     [[VLCMain sharedInstance] setIntf: p_intf];
 
@@ -287,6 +321,8 @@ static void Run(intf_thread_t *p_intf)
     [[VLCMain sharedInstance] applicationWillTerminate:nil];
     [o_plItemChangedLock release];
     [o_appLock release];
+    [o_vout_provider_lock release];
+    o_vout_provider_lock = nil;
     [o_pool release];
 
     raise(SIGTERM);
@@ -887,9 +923,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* remove global observer watching for vout device changes correctly */
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
+    [o_vout_provider_lock lock];
     // release before o_info!
     [o_vout_controller release];
     o_vout_controller = nil;
+    [o_vout_provider_lock unlock];
 
     /* release some other objects here, because it isn't sure whether dealloc
      * will be called later on */
