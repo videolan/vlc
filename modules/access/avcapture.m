@@ -297,7 +297,7 @@ static int Open(vlc_object_t *p_this)
     {
         AVCaptureDevice *avf_device;
         avf_device = myVideoDevices[ivideo];
-        msg_Dbg(p_demux, "avcapture %lu/%lu %s %s", ivideo, deviceCount, [[avf_device modelID] UTF8String], [[avf_device uniqueID] UTF8String]);
+        msg_Dbg(p_demux, "avcapture %u/%u %s %s", ivideo, deviceCount, [[avf_device modelID] UTF8String], [[avf_device uniqueID] UTF8String]);
         if ([[[avf_device uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:avf_currdevice_uid]) {
             break;
         }
@@ -347,7 +347,7 @@ static int Open(vlc_object_t *p_this)
     [p_sys->session addOutput:p_sys->output];
 
     dispatch_queue_t queue = dispatch_queue_create("avCaptureQueue", NULL);
-    [p_sys->output setSampleBufferDelegate:p_sys->output queue:queue];
+    [p_sys->output setSampleBufferDelegate:(id)p_sys->output queue:queue];
     dispatch_release(queue);
 
     p_sys->output.videoSettings = [NSDictionary dictionaryWithObject:@(kCVPixelFormatType_32BGRA) forKey:(id)kCVPixelBufferPixelFormatTypeKey];
