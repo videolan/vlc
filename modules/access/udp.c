@@ -202,9 +202,6 @@ static block_t *BlockUDP( access_t *p_access )
     block_t      *p_block;
     ssize_t len;
 
-    if( p_access->info.b_eof )
-        return NULL;
-
     /* Read data */
     p_block = block_Alloc( MTU );
     len = net_Read( p_access, (intptr_t)p_sys, NULL,
