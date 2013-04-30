@@ -189,3 +189,20 @@
 @interface VLCThreePartDropView : VLCThreePartImageView
 
 @end
+
+/*****************************************************************************
+ * PositionFormatter interface
+ *
+ * Formats a text field to only accept decimals and :
+ *****************************************************************************/
+@interface PositionFormatter : NSFormatter
+{
+    NSCharacterSet *o_forbidden_characters;
+}
+- (NSString*)stringForObjectValue:(id)obj;
+
+- (BOOL)getObjectValue:(id*)obj forString:(NSString*)string errorDescription:(NSString**)error;
+
+- (bool)isPartialStringValid:(NSString*)partialString newEditingString:(NSString**)newString errorDescription:(NSString**)error;
+
+@end

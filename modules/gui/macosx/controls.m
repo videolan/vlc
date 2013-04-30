@@ -37,6 +37,7 @@
 #import "playlist.h"
 #import "MainMenu.h"
 #import "CoreInteraction.h"
+#import "misc.h"
 #import <vlc_keys.h>
 
 #pragma mark -
@@ -54,6 +55,8 @@
     [o_specificTime_ok_btn setTitle: _NS("OK")];
     [o_specificTime_sec_lbl setStringValue: _NS("sec.")];
     [o_specificTime_goTo_lbl setStringValue: _NS("Jump to time")];
+
+    [o_specificTime_enter_fld setFormatter:[[[PositionFormatter alloc] init] autorelease]];
 }
 
 - (void)dealloc

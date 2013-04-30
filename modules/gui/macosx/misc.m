@@ -787,3 +787,38 @@ void _drawFrameInRect(NSRect frameRect)
 }
 
 @end
+
+@implementation PositionFormatter
+
+- (id)init
+{
+    self = [super init];
+    NSMutableCharacterSet *nonNumbers = [[[NSCharacterSet decimalDigitCharacterSet] invertedSet] mutableCopy];
+    [nonNumbers removeCharactersInString:@":"];
+    o_forbidden_characters = [nonNumbers copy];
+
+    return self;
+}
+
+- (NSString*)stringForObjectValue:(id)obj
+{
+    return obj;
+}
+
+- (BOOL)getObjectValue:(id*)obj forString:(NSString*)string errorDescription:(NSString**)error
+{
+    *obj = [[string copy] autorelease];
+    return YES;
+}
+
+- (bool)isPartialStringValid:(NSString*)partialString newEditingString:(NSString**)newString errorDescription:(NSString**)error
+{
+    if ([partialString rangeOfCharacterFromSet:o_forbidden_characters options:NSLiteralSearch].location != NSNotFound) {
+        return NO;
+    } else {
+        return YES;
+    }
+}
+
+
+@end
