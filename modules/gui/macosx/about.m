@@ -90,7 +90,7 @@ static VLAboutBox *_o_sharedInstance = nil;
 
         /* l10n */
         [o_about_window setTitle: _NS("About VLC media player")];
-        NSDictionary *stringAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:NSUnderlineStyleSingle], NSUnderlineStyleAttributeName, [NSColor colorWithCalibratedRed:0. green:0.3411 blue:0.6824 alpha:1.], NSForegroundColorAttributeName, [NSFont systemFontOfSize:13], NSFontAttributeName, nil];
+        NSDictionary *stringAttributes = [NSDictionary dictionaryWithObjectsAndKeys:@(NSUnderlineStyleSingle), NSUnderlineStyleAttributeName, [NSColor colorWithCalibratedRed:0. green:0.3411 blue:0.6824 alpha:1.], NSForegroundColorAttributeName, [NSFont systemFontOfSize:13], NSFontAttributeName, nil];
         NSAttributedString *attrStr;
         attrStr = [[NSAttributedString alloc] initWithString:_NS("Credits") attributes:stringAttributes];
         [o_credits_btn setAttributedTitle:attrStr];

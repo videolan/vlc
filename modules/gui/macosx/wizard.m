@@ -632,8 +632,7 @@ static VLCWizard *_o_sharedInstance = nil;
             [o_t4_pop_videoCodec removeItemWithTitle:@"Theora"];
         } else {
             /* RTP/UDP Unicast/Multicast Streaming */
-            [o_userSelections setObject: [[NSNumber numberWithInt: mode]
-                stringValue] forKey:@"stmgMhd"];
+            [o_userSelections setObject: [@(mode) stringValue] forKey:@"stmgMhd"];
 
             /* disable all codecs which don't support MPEG-TS */
             [o_t4_pop_audioCodec removeItemWithTitle:@"Vorbis"];
@@ -678,7 +677,7 @@ static VLCWizard *_o_sharedInstance = nil;
         if ([o_t4_ckb_video state] == NSOnState)
         {
             NSNumber * theNum;
-            theNum = [NSNumber numberWithInt:[[o_t4_pop_videoCodec selectedItem]tag]];
+            theNum = @([[o_t4_pop_videoCodec selectedItem]tag]);
             [o_userSelections setObject:@"YES" forKey:@"trnscdVideo"];
             [o_userSelections setObject:[o_t4_pop_videoBitrate titleOfSelectedItem]
                 forKey:@"trnscdVideoBitrate"];
@@ -692,7 +691,7 @@ static VLCWizard *_o_sharedInstance = nil;
         if ([o_t4_ckb_audio state] == NSOnState)
         {
             NSNumber * theNum;
-            theNum = [NSNumber numberWithInt:[[o_t4_pop_audioCodec selectedItem]tag]];
+            theNum = @([[o_t4_pop_audioCodec selectedItem]tag]);
             [o_userSelections setObject:@"YES" forKey:@"trnscdAudio"];
             [o_userSelections setObject:[o_t4_pop_audioBitrate titleOfSelectedItem]
                 forKey:@"trnscdAudioBitrate"];
@@ -1002,7 +1001,7 @@ static VLCWizard *_o_sharedInstance = nil;
     {
         /* get the chosen encap format and store it */
         NSNumber * theNum;
-        theNum = [NSNumber numberWithInt:[[o_t5_matrix_encap selectedCell] tag]];
+        theNum = @([[o_t5_matrix_encap selectedCell] tag]);
         [o_userSelections setObject:[theNum stringValue] forKey:@"encapFormat"];
 
         /* show either "Streaming 2" or "Transcode 2" to the user */
@@ -1051,8 +1050,7 @@ static VLCWizard *_o_sharedInstance = nil;
 
         /* include subtitles? */
         [o_userSelections setObject:
-            [[NSNumber numberWithInt:[o_t6_ckb_soverlay state]] stringValue]
-                             forKey: @"soverlay"];
+            [@([o_t6_ckb_soverlay state]) stringValue] forKey: @"soverlay"];
 
         /* go to "Summary" */
         [self showSummary];
@@ -1178,8 +1176,7 @@ static VLCWizard *_o_sharedInstance = nil;
 
             /* include subtitles ? */
             [o_userSelections setObject:
-                [[NSNumber numberWithInt:[o_t7_ckb_soverlay state]] stringValue]
-                                 forKey: @"soverlay"];
+                [@([o_t7_ckb_soverlay state]) stringValue] forKey: @"soverlay"];
 
             /* go to "Summary" */
             [self showSummary];

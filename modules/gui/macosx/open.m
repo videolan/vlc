@@ -1043,7 +1043,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [o_specialMediaFolders addObject:o_dict];
     }
 
-    [self performSelectorOnMainThread:@selector(updateMediaSelector:) withObject:[NSNumber numberWithBool:YES] waitUntilDone:NO];
+    [self performSelectorOnMainThread:@selector(updateMediaSelector:) withObject:@YES waitUntilDone:NO];
     [o_pool release];
 }
 

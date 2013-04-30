@@ -208,7 +208,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
             for (value = widget->p_values; value != NULL; value = value->p_next)
             {
                 NSDictionary *entry = [NSDictionary dictionaryWithObjectsAndKeys:
-                                       [NSNumber numberWithInt:value->i_id], @"id",
+                                       @(value->i_id), @"id",
                                        @(value->psz_text), @"text",
                                        nil];
                 [contentArray addObject:entry];

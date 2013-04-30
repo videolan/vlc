@@ -359,7 +359,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
             mi = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%d", p_item->list.i[i]] action:NULL keyEquivalent: @""];
         else
             msg_Err(p_intf, "item %d of pref %s failed to be created", i, name);
-        [mi setRepresentedObject:[NSNumber numberWithInt: p_item->list.i[i]]];
+        [mi setRepresentedObject:@(p_item->list.i[i])];
         [[object menu] addItem: [mi autorelease]];
         if (p_item->value.i == p_item->list.i[i])
             [object selectItem:[object lastItem]];

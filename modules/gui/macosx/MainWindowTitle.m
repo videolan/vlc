@@ -411,7 +411,7 @@
 }
 
 - (NSNumber*)extendedAccessibilityIsAttributeSettable: (NSString*)theAttributeName {
-    return ([theAttributeName isEqualToString: NSAccessibilitySubroleAttribute] ? [NSNumber numberWithBool: NO] : nil); // make the Subrole attribute we added non-settable
+    return ([theAttributeName isEqualToString: NSAccessibilitySubroleAttribute] ? @NO : nil); // make the Subrole attribute we added non-settable
 }
 
 - (void)accessibilityPerformAction: (NSString*)theActionName {

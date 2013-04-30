@@ -350,7 +350,7 @@ static int Open(vlc_object_t *p_this)
     [p_sys->output setSampleBufferDelegate:p_sys->output queue:queue];
     dispatch_release(queue);
 
-    p_sys->output.videoSettings = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_32BGRA] forKey:(id)kCVPixelBufferPixelFormatTypeKey];
+    p_sys->output.videoSettings = [NSDictionary dictionaryWithObject:@(kCVPixelFormatType_32BGRA) forKey:(id)kCVPixelBufferPixelFormatTypeKey];
     [p_sys->session startRunning];
 
     [input release];

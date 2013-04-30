@@ -344,10 +344,10 @@ static int Open(vlc_object_t *p_this)
     msg_Dbg(p_demux, "PAR size %i %i", (int)par_size.width, (int)par_size.height);
 
     [p_sys->output setPixelBufferAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
-        [NSNumber numberWithUnsignedInt:kCVPixelFormatType_422YpCbCr8], (id)kCVPixelBufferPixelFormatTypeKey,
-        [NSNumber numberWithInt: p_sys->height], kCVPixelBufferHeightKey,
-        [NSNumber numberWithInt: p_sys->width], kCVPixelBufferWidthKey,
-        [NSNumber numberWithBool:YES], (id)kCVPixelBufferOpenGLCompatibilityKey,
+        @(kCVPixelFormatType_422YpCbCr8), (id)kCVPixelBufferPixelFormatTypeKey,
+        @(p_sys->height), kCVPixelBufferHeightKey,
+        @(p_sys->width), kCVPixelBufferWidthKey,
+        @YES, (id)kCVPixelBufferOpenGLCompatibilityKey,
         nil]];
     [p_sys->output setAutomaticallyDropsLateVideoFrames:YES];
     [p_sys->output setMinimumVideoFrameInterval: (1/25)]; // 25 fps

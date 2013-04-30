@@ -265,7 +265,7 @@
 
     if ([self alphaValue] < 1.0 || b_displayed != YES) {
         if (![self fadeTimer])
-            [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(focus:) userInfo:[NSNumber numberWithShort:1] repeats:YES]];
+            [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(focus:) userInfo:@1 repeats:YES]];
         else if ([[[self fadeTimer] userInfo] shortValue]==0)
             b_fadeQueued=YES;
     }
@@ -279,7 +279,7 @@
 
     if (([self alphaValue] > 0.0)) {
         if (![self fadeTimer])
-            [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(unfocus:) userInfo:[NSNumber numberWithShort:0] repeats:YES]];
+            [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(unfocus:) userInfo:@0 repeats:YES]];
         else if ([[[self fadeTimer] userInfo] shortValue]==1)
             b_fadeQueued=YES;
     }

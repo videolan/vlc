@@ -1153,7 +1153,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             /* simulate an event as long as the user holds the button */
             b_remote_button_hold = pressedDown;
             if (pressedDown) {
-                NSNumber* buttonIdentifierNumber = [NSNumber numberWithInt: buttonIdentifier];
+                NSNumber* buttonIdentifierNumber = @(buttonIdentifier);
                 [self performSelector:@selector(executeHoldActionForRemoteButton:)
                            withObject:buttonIdentifierNumber];
             }
