@@ -186,6 +186,20 @@ function add(name,client,arg)
     f({{path=uri,options=options}})
 end
 
+function move(name,client,arg)
+    local x,y
+    local tbl = {}
+    for token in string.gmatch(arg, "[^%s]+") do
+        table.insert(tbl,token)
+    end
+    x = tonumber(tbl[1])
+    y = tonumber(tbl[2])
+    local res = vlc.playlist.move(x,y)
+    if res == (-1) then
+        client:append("You should choose valid id.")
+    end
+end
+
 function playlist_is_tree( client )
     if client.env.flatplaylist == 0 then
         return true
@@ -524,6 +538,8 @@ commands_ordered = {
     { "enqueue"; { func = add; args = "XYZ"; help = "queue XYZ to playlist" } };
     { "playlist"; { func = playlist; help = "show items currently in playlist" } };
     { "search"; { func = playlist; args = "[string]"; help = "search for items in playlist (or reset search)" } };
+    { "delete"; { func = skip2(vlc.playlist.delete); args = "[X]"; help = "delete item X in playlist" } };
+    { "move"; { func = move; args = "[X][Y]"; help = "move item X in playlist after Y" } };
     { "sort"; { func = playlist_sort; args = "key"; help = "sort the playlist" } };
     { "sd"; { func = services_discovery; args = "[sd]"; help = "show services discovery or toggle" } };
     { "play"; { func = skip2(vlc.playlist.play); help = "play stream" } };

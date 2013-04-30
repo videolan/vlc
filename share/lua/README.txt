@@ -297,6 +297,9 @@ playlist.sort( key ): sort the playlist according to the key.
                                             'artist', 'genre', 'random', 'duration',
                                             'title numeric' or 'album'.
 playlist.status(): return the playlist status: 'stopped', 'playing', 'paused' or 'unknown'.
+playlist.delete( id ): check if item of id is in playlist and delete it. returns -1 when invalid id.
+playlist.move( id_item, id_where ): take id_item and if id_where has children, it put it as first children, 
+   if id_where don't have children, id_item is put after id_where in same playlist. returns -1 when invalid ids.
 
 FIXME: add methods to get an item's meta, options, es ...
 
