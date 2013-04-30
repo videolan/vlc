@@ -686,7 +686,11 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
         NSBeginInformationalAlertSheet(_NS("Reset Preferences"), _NS("Cancel"),
                                         _NS("Continue"), nil, o_sprefs_win, self,
                                         @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, @"%@",
-                                        _NS("Beware this will reset the VLC media player preferences.\n"
+                                        _NS("This will reset VLC media player's preferences.\n\n"
+                                            "Note that VLC will restart during the process, so your current "
+                                            "playlist will be emptied and eventual playback, streaming or "
+                                            "transcoding activities will stop immediately.\n\n"
+                                            "The Media Library will not be affected.\n\n"
                                             "Are you sure you want to continue?"));
     else if (sender == o_sprefs_showAll_btn) {
         [o_sprefs_win orderOut: self];
@@ -703,11 +707,23 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
         /* reset VLC's config */
         config_ResetAll(p_intf);
         [self resetControls];
+
+        /* force config file creation, since libvlc won't exit normally */
         config_SaveConfigFile(p_intf);
 
         /* reset OS X defaults */
         [NSUserDefaults resetStandardUserDefaults];
         [[NSUserDefaults standardUserDefaults] synchronize];
+
+        /* Relaunch now */
+        const char * path = [[[NSBundle mainBundle] executablePath] UTF8String];
+
+        /* For some reason we need to fork(), not just execl(), which reports a ENOTSUP then. */
+        if (fork() != 0) {
+            exit(0);
+            return;
+        }
+        execl(path, path, NULL);
     }
 }
 
