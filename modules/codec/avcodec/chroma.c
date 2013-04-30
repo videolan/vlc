@@ -31,6 +31,7 @@
 
 #include <libavutil/avutil.h>
 #include <libavutil/pixfmt.h>
+#include "avcommon.h"
 #include "chroma.h"
 
 /*****************************************************************************
@@ -120,7 +121,10 @@ static const struct
      /* Paletized RGB */
     {VLC_CODEC_RGBP, PIX_FMT_PAL8, 0, 0, 0},
 
-
+    /* XYZ */
+#if LIBAVUTIL_VERSION_CHECK(52, 10, 0, 25, 100)
+    {VLC_CODEC_XYZ12, AV_PIX_FMT_XYZ12, 0xfff0, 0xfff0, 0xfff0},
+#endif
     { 0, 0, 0, 0, 0 }
 };
 
