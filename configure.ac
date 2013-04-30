@@ -3569,7 +3569,29 @@ fi
 dnl
 dnl  JACK modules
 dnl
-PKG_ENABLE_MODULES_VLC([JACK], [jack access_jack], [jack], [JACK audio I/O modules],[auto])
+AC_ARG_ENABLE(jack,
+  [AS_HELP_STRING([--disable-jack],
+    [do not use jack (default auto)])])
+if test "${enable_jack}" != "no" ; then
+    PKG_CHECK_MODULES(JACK, jack >= 1.9.7,
+      [ have_jack=yes ],
+      [
+      AC_MSG_WARN([${JACK_PKG_ERRORS}, trying jack1 instead])
+
+      PKG_CHECK_MODULES(JACK, jack >= 0.120.1 jack < 1.0,
+      [ have_jack=yes ],
+      [
+      AS_IF([test -n "${enable_jack}"],
+         [AC_MSG_ERROR([${JACK_PKG_ERRORS}.])],
+         [AC_MSG_WARN([${JACK_PKG_ERRORS}.])])
+      ])
+    ])
+    if test "x${have_jack}" = "xyes" ;  then
+      VLC_ADD_PLUGIN([jack access_jack])
+      VLC_ADD_LIBS([jack access_jack],[$JACK_LIBS])
+      VLC_ADD_CFLAGS([jack access_jack],[$JACK_CFLAGS])
+    fi
+fi
 
 dnl
 dnl  OpenSLES Android
