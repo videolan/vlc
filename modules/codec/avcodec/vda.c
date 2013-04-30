@@ -52,7 +52,6 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_callbacks( Open, Close )
-    add_shortcut ( "vdadecoder" )
     add_integer ( "avcodec-vda-pix-fmt", 0, VDA_PIX_FMT_TEXT,
                   VDA_PIX_FMT_LONGTEXT, false)
         change_integer_list( nvda_pix_fmt_list, nvda_pix_fmt_list_text )
