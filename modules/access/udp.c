@@ -198,14 +198,15 @@ static int Control( access_t *p_access, int i_query, va_list args )
  *****************************************************************************/
 static block_t *BlockUDP( access_t *p_access )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    block_t      *p_block;
-    ssize_t len;
+    int fd = (intptr_t)p_access->p_sys;
 
     /* Read data */
-    p_block = block_Alloc( MTU );
-    len = net_Read( p_access, (intptr_t)p_sys, NULL,
-                    p_block->p_buffer, MTU, false );
+    block_t *p_block = block_Alloc( MTU );
+    if( unlikely(p_block == NULL) )
+        return NULL;
+
+    ssize_t len = net_Read( p_access, fd, NULL,
+                            p_block->p_buffer, MTU, false );
     if( len < 0 )
     {
         block_Release( p_block );
