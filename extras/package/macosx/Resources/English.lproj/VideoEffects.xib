@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">12C60</string>
+    <string key="IBDocument.SystemVersion">12D78</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1187.34</string>
-    <string key="IBDocument.HIToolboxVersion">625.00</string>
+    <string key="IBDocument.AppKitVersion">1187.37</string>
+    <string key="IBDocument.HIToolboxVersion">626.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <object class="NSArray" key="dict.sortedKeys">
@@ -21,7 +21,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="1"/>
+      <integer value="9"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1456,35 +1456,10 @@
                             <int key="NSvFlags">274</int>
                             <object class="NSMutableArray" key="NSSubviews">
                               <bool key="EncodedWithXMLCoder">YES</bool>
-                              <object class="NSButton" id="268273719">
-                                <reference key="NSNextResponder" ref="390350599"/>
-                                <int key="NSvFlags">268</int>
-                                <string key="NSFrame">{{15, 12}, {271, 18}}</string>
-                                <reference key="NSSuperview" ref="390350599"/>
-                                <bool key="NSEnabled">YES</bool>
-                                <object class="BGHUDButtonCell" key="NSCell" id="825848151">
-                                  <int key="NSCellFlags">67108864</int>
-                                  <int key="NSCellFlags2">131072</int>
-                                  <string key="NSContents">Black Slot</string>
-                                  <reference key="NSSupport" ref="26"/>
-                                  <reference key="NSControlView" ref="268273719"/>
-                                  <int key="NSButtonFlags">1211912448</int>
-                                  <int key="NSButtonFlags2">2</int>
-                                  <reference key="NSNormalImage" ref="908559007"/>
-                                  <reference key="NSAlternateImage" ref="223641879"/>
-                                  <string key="NSAlternateContents"/>
-                                  <string key="NSKeyEquivalent"/>
-                                  <int key="NSPeriodicDelay">200</int>
-                                  <int key="NSPeriodicInterval">25</int>
-                                  <string key="themeKey">gradientTheme</string>
-                                  <int key="BGButtonType">3</int>
-                                </object>
-                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
-                              </object>
                               <object class="NSTextField" id="357710165">
                                 <reference key="NSNextResponder" ref="390350599"/>
                                 <int key="NSvFlags">268</int>
-                                <string key="NSFrame">{{170, 70}, {96, 19}}</string>
+                                <string key="NSFrame">{{170, 41}, {96, 19}}</string>
                                 <reference key="NSSuperview" ref="390350599"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDTextFieldCell" key="NSCell" id="371370652">
@@ -1562,7 +1537,7 @@
                               <object class="NSStepper" id="444599762">
                                 <reference key="NSNextResponder" ref="390350599"/>
                                 <int key="NSvFlags">268</int>
-                                <string key="NSFrame">{{271, 68}, {15, 22}}</string>
+                                <string key="NSFrame">{{271, 39}, {15, 22}}</string>
                                 <reference key="NSSuperview" ref="390350599"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDStepperCell" key="NSCell" id="45229381">
@@ -1581,7 +1556,7 @@
                               <object class="BGHUDLabel" id="422916449">
                                 <reference key="NSNextResponder" ref="390350599"/>
                                 <int key="NSvFlags">268</int>
-                                <string key="NSFrame">{{15, 73}, {86, 14}}</string>
+                                <string key="NSFrame">{{15, 44}, {86, 14}}</string>
                                 <reference key="NSSuperview" ref="390350599"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="149241228">
@@ -1599,7 +1574,7 @@
                               <object class="NSTextField" id="227755793">
                                 <reference key="NSNextResponder" ref="390350599"/>
                                 <int key="NSvFlags">268</int>
-                                <string key="NSFrame">{{170, 43}, {96, 19}}</string>
+                                <string key="NSFrame">{{170, 14}, {96, 19}}</string>
                                 <reference key="NSSuperview" ref="390350599"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDTextFieldCell" key="NSCell" id="54082411">
@@ -1675,7 +1650,7 @@
                               <object class="NSStepper" id="814287388">
                                 <reference key="NSNextResponder" ref="390350599"/>
                                 <int key="NSvFlags">268</int>
-                                <string key="NSFrame">{{271, 41}, {15, 22}}</string>
+                                <string key="NSFrame">{{271, 12}, {15, 22}}</string>
                                 <reference key="NSSuperview" ref="390350599"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDStepperCell" key="NSCell" id="267728995">
@@ -1694,7 +1669,7 @@
                               <object class="BGHUDLabel" id="56743507">
                                 <reference key="NSNextResponder" ref="390350599"/>
                                 <int key="NSvFlags">268</int>
-                                <string key="NSFrame">{{15, 46}, {86, 14}}</string>
+                                <string key="NSFrame">{{15, 17}, {86, 14}}</string>
                                 <reference key="NSSuperview" ref="390350599"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="588626332">
@@ -1710,11 +1685,11 @@
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
-                            <string key="NSFrame">{{1, 1}, {308, 101}}</string>
+                            <string key="NSFrame">{{1, 1}, {308, 72}}</string>
                             <reference key="NSSuperview" ref="915406024"/>
                           </object>
                         </object>
-                        <string key="NSFrame">{{320, 77}, {310, 103}}</string>
+                        <string key="NSFrame">{{320, 106}, {310, 74}}</string>
                         <reference key="NSSuperview" ref="934925915"/>
                         <string key="NSOffsets">{0, 0}</string>
                         <object class="NSTextFieldCell" key="NSTitleCell">
@@ -2031,7 +2006,7 @@
                       <object class="NSButton" id="415395095">
                         <reference key="NSNextResponder" ref="934925915"/>
                         <int key="NSvFlags">268</int>
-                        <string key="NSFrame">{{320, 57}, {170, 18}}</string>
+                        <string key="NSFrame">{{320, 84}, {170, 18}}</string>
                         <reference key="NSSuperview" ref="934925915"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDButtonCell" key="NSCell" id="453694164">
@@ -2183,7 +2158,7 @@
                             <reference key="NSSuperview" ref="1040338176"/>
                           </object>
                         </object>
-                        <string key="NSFrame">{{320, 12}, {310, 47}}</string>
+                        <string key="NSFrame">{{320, 39}, {310, 47}}</string>
                         <reference key="NSSuperview" ref="934925915"/>
                         <string key="NSOffsets">{0, 0}</string>
                         <object class="NSTextFieldCell" key="NSTitleCell">
@@ -4260,14 +4235,6 @@
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
-            <string key="label">o_puzzle_blackslot_ckb</string>
-            <reference key="source" ref="707254443"/>
-            <reference key="destination" ref="268273719"/>
-          </object>
-          <int key="connectionID">546</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
             <string key="label">o_puzzle_ckb</string>
             <reference key="source" ref="707254443"/>
             <reference key="destination" ref="36160666"/>
@@ -4753,14 +4720,6 @@
             <reference key="destination" ref="227755793"/>
           </object>
           <int key="connectionID">627</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">puzzleModifierChanged:</string>
-            <reference key="source" ref="707254443"/>
-            <reference key="destination" ref="268273719"/>
-          </object>
-          <int key="connectionID">628</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
@@ -5769,10 +5728,10 @@
               <reference ref="351076845"/>
               <reference ref="322802751"/>
               <reference ref="767337060"/>
-              <reference ref="415395095"/>
-              <reference ref="1040338176"/>
               <reference ref="1038213364"/>
               <reference ref="292241539"/>
+              <reference ref="415395095"/>
+              <reference ref="1040338176"/>
             </object>
             <reference key="parent" ref="160045531"/>
           </object>
@@ -6446,7 +6405,6 @@
             <reference key="object" ref="915406024"/>
             <object class="NSMutableArray" key="children">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="268273719"/>
               <reference ref="357710165"/>
               <reference ref="444599762"/>
               <reference ref="422916449"/>
@@ -6460,20 +6418,6 @@
             <int key="objectID">129</int>
             <reference key="object" ref="795958519"/>
             <reference key="parent" ref="36160666"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">136</int>
-            <reference key="object" ref="268273719"/>
-            <object class="NSMutableArray" key="children">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="825848151"/>
-            </object>
-            <reference key="parent" ref="915406024"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">137</int>
-            <reference key="object" ref="825848151"/>
-            <reference key="parent" ref="268273719"/>
           </object>
           <object class="IBObjectRecord">
             <int key="objectID">138</int>
@@ -7791,9 +7735,6 @@
           <string>124.IBViewBoundsToFrameTransform</string>
           <string>129.IBPluginDependency</string>
           <string>13.IBPluginDependency</string>
-          <string>136.IBPluginDependency</string>
-          <string>136.IBViewBoundsToFrameTransform</string>
-          <string>137.IBPluginDependency</string>
           <string>138.IBPluginDependency</string>
           <string>138.IBViewBoundsToFrameTransform</string>
           <string>139.IBPluginDependency</string>
@@ -8251,11 +8192,6 @@
           </object>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>com.binarymethod.BGHUDAppKitPlugin</string>
-          <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">P4AAAL+AAABBcAAAwhgAAA</bytes>
-          </object>
-          <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABDKgAAwq4AAA</bytes>
@@ -8745,12 +8681,12 @@
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">P4AAAL+AAABBAAAAwtAAAA</bytes>
+            <bytes key="NSTransformStruct">P4AAAL+AAABDoAAAwqgAAA</bytes>
           </object>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">AUEAAABCLAAAA</bytes>
+            <bytes key="NSTransformStruct">AUOgAABBuAAAA</bytes>
           </object>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <object class="NSAffineTransform">

@@ -82,7 +82,6 @@
     IBOutlet id o_puzzle_columns_lbl;
     IBOutlet id o_puzzle_columns_fld;
     IBOutlet id o_puzzle_columns_stp;
-    IBOutlet id o_puzzle_blackslot_ckb;
     IBOutlet id o_clone_ckb;
     IBOutlet id o_clone_number_fld;
     IBOutlet id o_clone_number_stp;

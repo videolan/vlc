@@ -124,7 +124,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_puzzle_ckb setTitle:_NS("Puzzle game")];
     [o_puzzle_rows_lbl setStringValue:_NS("Rows")];
     [o_puzzle_columns_lbl setStringValue:_NS("Columns")];
-    [o_puzzle_blackslot_ckb setTitle:_NS("Black Slot")];
     [o_clone_ckb setTitle:_NS("Clone")];
     [o_clone_number_lbl setStringValue:_NS("Number of clones")];
     [o_wall_ckb setTitle:_NS("Wall")];
@@ -378,7 +377,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
     [self setPuzzleColumnsValue: config_GetInt(p_intf, "puzzle-cols")];
     [self setPuzzleRowsValue: config_GetInt(p_intf, "puzzle-rows")];
-    [o_puzzle_blackslot_ckb setState: config_GetInt(p_intf, "puzzle-black-slot")];
     b_state = [o_puzzle_ckb state];
     [o_puzzle_rows_fld setEnabled: b_state];
     [o_puzzle_rows_stp setEnabled: b_state];
@@ -386,8 +384,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_puzzle_columns_fld setEnabled: b_state];
     [o_puzzle_columns_stp setEnabled: b_state];
     [o_puzzle_columns_lbl setEnabled: b_state];
-    [o_puzzle_blackslot_ckb setEnabled: b_state];
-    
+
     [self setCloneValue: config_GetInt(p_intf, "clone-count")];
     b_state = [o_clone_ckb state];
     [o_clone_number_lbl setEnabled: b_state];
@@ -1115,14 +1112,11 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_puzzle_rows_fld setEnabled: b_state];
     [o_puzzle_rows_stp setEnabled: b_state];
     [o_puzzle_rows_lbl setEnabled: b_state];
-    [o_puzzle_blackslot_ckb setEnabled: b_state];
 }
 
 - (IBAction)puzzleModifierChanged:(id)sender
 {
-    if (sender == o_puzzle_blackslot_ckb)
-        [self setVideoFilterProperty: "puzzle-black-slot" forFilter: "puzzle" boolean: [o_puzzle_blackslot_ckb state]];
-    else if (sender == o_puzzle_columns_fld || sender == o_puzzle_columns_stp)
+    if (sender == o_puzzle_columns_fld || sender == o_puzzle_columns_stp)
         [self setVideoFilterProperty: "puzzle-cols" forFilter: "puzzle" integer: [sender intValue]];
     else
         [self setVideoFilterProperty: "puzzle-rows" forFilter: "puzzle" integer: [sender intValue]];
