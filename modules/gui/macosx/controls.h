@@ -40,6 +40,8 @@
     IBOutlet id o_specificTime_mi;
 }
 
+@property (nonatomic) int jumpTimeValue;
+
 - (IBAction)play:(id)sender;
 - (IBAction)stop:(id)sender;
 

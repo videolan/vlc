@@ -45,6 +45,8 @@
  *****************************************************************************/
 @implementation VLCControls
 
+@synthesize jumpTimeValue;
+
 - (void)awakeFromNib
 {
     [o_specificTime_mi setTitle: _NS("Jump To Time")];
@@ -240,11 +242,10 @@
         if (p_input) {
             /* we can obviously only do that if an input is available */
             vlc_value_t pos, length;
-            var_Get(p_input, "time", &pos);
-            [o_specificTime_enter_fld setIntValue: (pos.i_time / 1000000)];
             var_Get(p_input, "length", &length);
             [o_specificTime_stepper setMaxValue: (length.i_time / 1000000)];
-
+            var_Get(p_input, "time", &pos);
+            [self setJumpTimeValue: (pos.i_time / 1000000)];
             [NSApp beginSheet: o_specificTime_win modalForWindow: \
                 [NSApp mainWindow] modalDelegate: self didEndSelector: nil \
                 contextInfo: nil];

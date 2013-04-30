@@ -21,11 +21,12 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="21"/>
-      <integer value="5260"/>
-      <integer value="2730"/>
       <integer value="5457"/>
+      <integer value="2730"/>
       <integer value="4850"/>
+      <integer value="5260"/>
+      <integer value="2461"/>
+      <integer value="21"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -3294,7 +3295,7 @@
         <nil key="NSUserInterfaceItemIdentifier"/>
         <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <object class="NSView" key="NSWindowView" id="500944643">
-          <nil key="NSNextResponder"/>
+          <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -3422,6 +3423,7 @@
             </object>
           </object>
           <string key="NSFrameSize">{249, 103}</string>
+          <reference key="NSSuperview"/>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
@@ -5574,22 +5576,6 @@ LCAuLi4</string>
             <reference key="destination" ref="725223680"/>
           </object>
           <int key="connectionID">2400</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">takeIntValueFrom:</string>
-            <reference key="source" ref="460273327"/>
-            <reference key="destination" ref="378726756"/>
-          </object>
-          <int key="connectionID">2467</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">takeIntValueFrom:</string>
-            <reference key="source" ref="378726756"/>
-            <reference key="destination" ref="460273327"/>
-          </object>
-          <int key="connectionID">2468</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
@@ -8422,6 +8408,42 @@ LCAuLi4</string>
             <reference key="destination" ref="710671498"/>
           </object>
           <int key="connectionID">5590</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBBindingConnection" key="connection">
+            <string key="label">value: self.jumpTimeValue</string>
+            <reference key="source" ref="378726756"/>
+            <reference key="destination" ref="113811151"/>
+            <object class="NSNibBindingConnector" key="connector">
+              <reference key="NSSource" ref="378726756"/>
+              <reference key="NSDestination" ref="113811151"/>
+              <string key="NSLabel">value: self.jumpTimeValue</string>
+              <string key="NSBinding">value</string>
+              <string key="NSKeyPath">self.jumpTimeValue</string>
+              <int key="NSNibBindingConnectorVersion">2</int>
+            </object>
+          </object>
+          <int key="connectionID">5592</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBBindingConnection" key="connection">
+            <string key="label">value: self.jumpTimeValue</string>
+            <reference key="source" ref="460273327"/>
+            <reference key="destination" ref="113811151"/>
+            <object class="NSNibBindingConnector" key="connector">
+              <reference key="NSSource" ref="460273327"/>
+              <reference key="NSDestination" ref="113811151"/>
+              <string key="NSLabel">value: self.jumpTimeValue</string>
+              <string key="NSBinding">value</string>
+              <string key="NSKeyPath">self.jumpTimeValue</string>
+              <object class="NSDictionary" key="NSOptions">
+                <string key="NS.key.0">NSContinuouslyUpdatesValue</string>
+                <boolean value="YES" key="NS.object.0"/>
+              </object>
+              <int key="NSNibBindingConnectorVersion">2</int>
+            </object>
+          </object>
+          <int key="connectionID">5595</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -13641,7 +13663,7 @@ LCAuLi4</string>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">5590</int>
+      <int key="maxID">5595</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
