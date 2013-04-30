@@ -58,7 +58,7 @@
 
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
-    return [[contentArray objectAtIndex:rowIndex] objectForKey:@"text"];
+    return [contentArray[rowIndex] objectForKey:@"text"];
 }
 @end
 

@@ -176,7 +176,7 @@ static NSMutableArray *blackoutWindows = NULL;
     NSUInteger count = [[NSScreen screens] count];
 
     for ( NSUInteger i = 0; i < count; i++ ) {
-        NSScreen *screen = [[NSScreen screens] objectAtIndex: i];
+        NSScreen *screen = [NSScreen screens][i];
         if ([screen displayID] == displayID)
             return screen;
     }
@@ -185,7 +185,7 @@ static NSMutableArray *blackoutWindows = NULL;
 
 - (BOOL)hasMenuBar
 {
-    return ([self displayID] == [[[NSScreen screens] objectAtIndex:0] displayID]);
+    return ([self displayID] == [[NSScreen screens][0] displayID]);
 }
 
 - (BOOL)hasDock
@@ -221,7 +221,7 @@ static NSMutableArray *blackoutWindows = NULL;
 
     NSUInteger screenCount = [[NSScreen screens] count];
     for (NSUInteger i = 0; i < screenCount; i++) {
-        NSScreen *screen = [[NSScreen screens] objectAtIndex: i];
+        NSScreen *screen = [NSScreen screens][i];
         VLCWindow *blackoutWindow;
         NSRect screen_rect;
 
@@ -255,7 +255,7 @@ static NSMutableArray *blackoutWindows = NULL;
     NSUInteger blackoutWindowCount = [blackoutWindows count];
 
     for (NSUInteger i = 0; i < blackoutWindowCount; i++) {
-        VLCWindow *blackoutWindow = [blackoutWindows objectAtIndex: i];
+        VLCWindow *blackoutWindow = blackoutWindows[i];
         [[blackoutWindow screen] setNonFullscreenPresentationOptions];
         [blackoutWindow closeAndAnimate: YES];
     }

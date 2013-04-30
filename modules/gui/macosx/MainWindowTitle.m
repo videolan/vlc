@@ -493,7 +493,7 @@
     for (NSUInteger i = count - 1; i > 0; i--) {
         currentPath = [NSMutableString stringWithCapacity:1024];
         for (NSUInteger y = 0; y < i; y++)
-            [currentPath appendFormat: @"/%@", [pathComponents objectAtIndex:y + 1]];
+            [currentPath appendFormat: @"/%@", pathComponents[y + 1]];
 
         [contextMenu addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath: currentPath] action:@selector(revealInFinder:) keyEquivalent:@""];
         currentItem = [contextMenu itemAtIndex:[contextMenu numberOfItems] - 1];
@@ -504,7 +504,7 @@
         [currentItem setImage: icon];
     }
 
-    if ([[pathComponents objectAtIndex: 1] isEqualToString:@"Volumes"]) {
+    if ([pathComponents[1] isEqualToString:@"Volumes"]) {
         /* we don't want to show the Volumes item, since the Cocoa does it neither */
         currentItem = [contextMenu itemWithTitle:[[NSFileManager defaultManager] displayNameAtPath: @"/Volumes"]];
         if (currentItem)
@@ -559,11 +559,11 @@
     selectedItem = count - selectedItem;
 
     /* fix for non-startup volumes */
-    if ([[pathComponents objectAtIndex:1] isEqualToString:@"Volumes"])
+    if ([pathComponents[1] isEqualToString:@"Volumes"])
         selectedItem += 1;
 
     for (NSUInteger y = 1; y < selectedItem; y++)
-        [currentPath appendFormat: @"/%@", [pathComponents objectAtIndex:y]];
+        [currentPath appendFormat: @"/%@", pathComponents[y]];
 
     [[NSWorkspace sharedWorkspace] selectFile: currentPath inFileViewerRootedAtPath: currentPath];
 }

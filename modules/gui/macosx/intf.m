@@ -1023,7 +1023,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (void)application:(NSApplication *)o_app openFiles:(NSArray *)o_names
 {
     BOOL b_autoplay = config_GetInt(VLCIntf, "macosx-autoplay");
-    char *psz_uri = vlc_path2uri([[o_names objectAtIndex:0] UTF8String], "file");
+    char *psz_uri = vlc_path2uri([o_names[0] UTF8String], "file");
 
     // try to add file as subtitle
     if ([o_names count] == 1 && psz_uri) {
@@ -1043,7 +1043,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     NSArray *o_sorted_names = [o_names sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
     NSMutableArray *o_result = [NSMutableArray arrayWithCapacity: [o_sorted_names count]];
     for (int i = 0; i < [o_sorted_names count]; i++) {
-        psz_uri = vlc_path2uri([[o_sorted_names objectAtIndex: i] UTF8String], "file");
+        psz_uri = vlc_path2uri([o_sorted_names[i] UTF8String], "file");
         if (!psz_uri)
             continue;
 
@@ -1231,7 +1231,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
         BOOL b_found_key = NO;
         for (int i = 0; i < [o_usedHotkeys count]; i++) {
-            NSString *str = [o_usedHotkeys objectAtIndex: i];
+            NSString *str = o_usedHotkeys[i];
             unsigned int i_keyModifiers = [[VLCStringUtility sharedInstance] VLCModifiersToCocoa: str];
 
             if ([[characters lowercaseString] isEqualToString: [[VLCStringUtility sharedInstance] VLCKeyToString: str]] &&
@@ -1746,22 +1746,22 @@ static VLCMain *_o_sharedMainInstance = nil;
             NSArray * compo = [fname componentsSeparatedByString:@"_"];
             if ([compo count] < 3)
                 continue;
-            compo = [[compo objectAtIndex:1] componentsSeparatedByString:@"-"];
+            compo = [compo[1] componentsSeparatedByString:@"-"];
             if ([compo count] < 4)
                 continue;
 
             // Dooh. ugly.
-            if (year < [[compo objectAtIndex:0] intValue] ||
-                (year ==[[compo objectAtIndex:0] intValue] &&
-                 (month < [[compo objectAtIndex:1] intValue] ||
-                  (month ==[[compo objectAtIndex:1] intValue] &&
-                   (day   < [[compo objectAtIndex:2] intValue] ||
-                    (day   ==[[compo objectAtIndex:2] intValue] &&
-                      hours < [[compo objectAtIndex:3] intValue])))))) {
-                year  = [[compo objectAtIndex:0] intValue];
-                month = [[compo objectAtIndex:1] intValue];
-                day   = [[compo objectAtIndex:2] intValue];
-                hours = [[compo objectAtIndex:3] intValue];
+            if (year < [compo[0] intValue] ||
+                (year ==[compo[0] intValue] &&
+                 (month < [compo[1] intValue] ||
+                  (month ==[compo[1] intValue] &&
+                   (day   < [compo[2] intValue] ||
+                    (day   ==[compo[2] intValue] &&
+                      hours < [compo[3] intValue])))))) {
+                year  = [compo[0] intValue];
+                month = [compo[1] intValue];
+                day   = [compo[2] intValue];
+                hours = [compo[3] intValue];
                 latestLog = [crashReporter stringByAppendingPathComponent:fname];
             }
         }
@@ -1851,7 +1851,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         NSArray *libraries = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
             NSUserDomainMask, YES);
         if (!libraries || [libraries count] == 0) return;
-        NSString * preferences = [[libraries objectAtIndex:0] stringByAppendingPathComponent:@"Preferences"];
+        NSString * preferences = [libraries[0] stringByAppendingPathComponent:@"Preferences"];
 
         /* File not found, don't attempt anything */
         if (![[NSFileManager defaultManager] fileExistsAtPath:[preferences stringByAppendingPathComponent:@"org.videolan.vlc"]] &&
@@ -1932,7 +1932,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [o_msg_lock lock];
     if (rowIndex < [o_msg_arr count])
-        result = [o_msg_arr objectAtIndex: rowIndex];
+        result = o_msg_arr[rowIndex];
     [o_msg_lock unlock];
 
     if (result != NULL)
@@ -1989,7 +1989,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             NSUInteger count = [o_msg_arr count];
             NSMutableAttributedString * string = [[NSMutableAttributedString alloc] init];
             for (NSUInteger i = 0; i < count; i++)
-                [string appendAttributedString: [o_msg_arr objectAtIndex: i]];
+                [string appendAttributedString: o_msg_arr[i]];
 
             NSData *data = [string RTFFromRange:NSMakeRange(0, [string length])
                              documentAttributes:[NSDictionary dictionaryWithObject: NSRTFTextDocumentType forKey: NSDocumentTypeDocumentAttribute]];

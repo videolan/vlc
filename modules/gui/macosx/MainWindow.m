@@ -326,7 +326,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         NSUInteger i_sidebaritem_count = [o_sidebaritems count];
         for (NSUInteger x = 0; x < i_sidebaritem_count; x++)
-            [o_sidebar_view expandItem: [o_sidebaritems objectAtIndex: x] expandChildren: YES];
+            [o_sidebar_view expandItem: o_sidebaritems[x] expandChildren: YES];
 
         [o_fspanel center];
     }
@@ -461,7 +461,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     if ([[o_video_view subviews] count] > 0)
-        [self makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
+        [self makeFirstResponder: [o_video_view subviews][0]];
 }
 
 // only exception for an controls bar button action
@@ -914,9 +914,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     //Works the same way as the NSOutlineView data source: `nil` means a parent item
     if (item==nil)
-        return [o_sidebaritems objectAtIndex:index];
+        return o_sidebaritems[index];
     else
-        return [[item children] objectAtIndex:index];
+        return [item children][index];
 }
 
 
@@ -1103,7 +1103,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         for(NSUInteger i = 0; i < count; i++) {
             NSDictionary *o_dic;
-            char *psz_uri = vlc_path2uri([[o_values objectAtIndex:i] UTF8String], NULL);
+            char *psz_uri = vlc_path2uri([o_values[i] UTF8String], NULL);
             if (!psz_uri)
                 continue;
 
@@ -1125,7 +1125,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         PL_LOCK;
         for(NSUInteger i = 0; i < count; i++) {
-            p_item = [[array objectAtIndex:i] pointerValue];
+            p_item = [array[i] pointerValue];
             if (!p_item) continue;
             playlist_NodeAddCopy(p_playlist, p_item, p_node, PLAYLIST_END);
         }
@@ -1152,7 +1152,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         return nil;
 
     for (NSUInteger x = 0; x < count; x++) {
-        id item = [array objectAtIndex: x]; // save one objc selector call
+        id item = array[x]; // save one objc selector call
         if ([[item identifier] isEqualToString:object])
             return item;
     }
