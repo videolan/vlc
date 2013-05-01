@@ -181,21 +181,23 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     text.psz_string = _("Zoom");
     var_Change( p_vout, "zoom", VLC_VAR_SETTEXT, &text, NULL );
-
-    var_Get( p_vout, "zoom", &old_val );
+    old_val.f_float = var_GetFloat( p_vout, "zoom" );
 
     for( size_t i = 0; i < ARRAY_SIZE(p_zoom_values); i++ )
     {
-        if( old_val.f_float == p_zoom_values[i].f_value )
-            var_Change( p_vout, "zoom", VLC_VAR_DELCHOICE, &old_val, NULL );
         val.f_float = p_zoom_values[i].f_value;
-        text.psz_string = _( p_zoom_values[i].psz_label );
+        text.psz_string = vlc_gettext( p_zoom_values[i].psz_label );
+        /* FIXME: This DELCHOICE hack corrupts the the "zoom" variable value
+         * for a short time window. Same for "crop" and "aspect-ratio". */
+        if( old_val.f_float == val.f_float )
+            var_Change( p_vout, "zoom", VLC_VAR_DELCHOICE, &old_val, NULL );
         var_Change( p_vout, "zoom", VLC_VAR_ADDCHOICE, &val, &text );
+        if( old_val.f_float == val.f_float )
+            var_Change( p_vout, "zoom", VLC_VAR_SETVALUE, &old_val, NULL );
     }
 
-    var_Set( p_vout, "zoom", old_val ); /* Is this really needed? */
-
     var_AddCallback( p_vout, "zoom", ZoomCallback, NULL );
+    var_TriggerCallback( p_vout, "zoom" );
 
     /* Crop offset vars */
     var_Create( p_vout, "crop-left", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
