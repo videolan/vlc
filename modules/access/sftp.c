@@ -48,9 +48,7 @@
 static int  Open ( vlc_object_t* );
 static void Close( vlc_object_t* );
 
-#define USER_TEXT N_("SFTP user name")
 #define USER_LONGTEXT N_("User name that will be used for the connection.")
-#define PASS_TEXT N_("SFTP password")
 #define PASS_LONGTEXT N_("Password that will be used for the connection.")
 #define PORT_TEXT N_("SFTP port")
 #define PORT_LONGTEXT N_("SFTP port number to use on the server")

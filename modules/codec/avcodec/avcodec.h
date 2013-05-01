@@ -69,7 +69,6 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
  *****************************************************************************/
 #define DR_TEXT N_("Direct rendering")
 /* FIXME Does somebody who knows what it does, explain */
-#define DR_LONGTEXT N_("Direct rendering")
 
 #define ERROR_TEXT N_("Error resilience")
 #define ERROR_LONGTEXT N_( \

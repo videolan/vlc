@@ -82,7 +82,7 @@ static const int pi_channels_maps[CHANNELS_MAX+1] =
     "Audio connection for DeckLink output.")
 
 
-#define RATE_TEXT N_("Audio sampling rate in Hz")
+#define RATE_TEXT N_("Audio samplerate (Hz)")
 #define RATE_LONGTEXT N_(\
     "Audio sampling rate (in hertz) for DeckLink output. " \
     "0 disables audio output.")

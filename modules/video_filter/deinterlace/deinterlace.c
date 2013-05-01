@@ -51,7 +51,6 @@
  *****************************************************************************/
 
 #define MODE_TEXT N_("Deinterlace mode")
-#define MODE_LONGTEXT N_("Deinterlace method to use for local playback.")
 
 #define SOUT_MODE_TEXT N_("Streaming deinterlace mode")
 #define SOUT_MODE_LONGTEXT N_("Deinterlace method to use for streaming.")

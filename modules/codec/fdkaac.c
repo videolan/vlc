@@ -50,9 +50,6 @@ static void CloseEncoder( vlc_object_t * );
 #define AFTERBURNER_TEXT N_("Enable afterburner library")
 #define AFTERBURNER_LONGTEXT N_( "This library will produce higher quality audio at the expense of additional CPU usage (default is enabled)" )
 
-#define BITRATE_TEXT N_("CBR Bitrate")
-#define BITRATE_LONGTEXT N_( "Bitrate of desired stream (in bps)" )
-
 #define SIGNALING_TEXT N_("Signaling mode of the extension AOT")
 #define SIGNALING_LONGTEXT N_( "1 is explicit for SBR and implicit for PS (default), 2 is explicit hierarchical" )
 

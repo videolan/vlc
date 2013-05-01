@@ -58,7 +58,7 @@ static void Close(vlc_object_t *);
     "Valid choices: embedded, aesebu, analog. " \
     "Leave blank for card default.")
 
-#define RATE_TEXT N_("Audio sampling rate in Hz")
+#define RATE_TEXT N_("Audio samplerate (Hz)")
 #define RATE_LONGTEXT N_( \
     "Audio sampling rate (in hertz) for DeckLink captures. " \
     "0 disables audio input.")
