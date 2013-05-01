@@ -77,7 +77,6 @@ int CommonInit(vout_display_t *vd)
     sys->is_first_display = true;
     sys->is_on_top = false;
 
-    var_Create(vd, "video-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     var_Create(vd, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 
     /* */

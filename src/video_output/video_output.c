@@ -149,9 +149,9 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     /* Take care of some "interface/control" related initialisations */
     vout_IntfInit(vout);
 
-    vout->p->title.show     = var_GetBool(vout, "video-title-show");
-    vout->p->title.timeout  = var_GetInteger(vout, "video-title-timeout");
-    vout->p->title.position = var_GetInteger(vout, "video-title-position");
+    vout->p->title.show     = var_InheritBool(vout, "video-title-show");
+    vout->p->title.timeout  = var_InheritInteger(vout, "video-title-timeout");
+    vout->p->title.position = var_InheritInteger(vout, "video-title-position");
 
     /* Get splitter name if present */
     char *splitter_name = var_InheritString(vout, "video-splitter");

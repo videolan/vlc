@@ -54,7 +54,7 @@ int vout_OpenWrapper(vout_thread_t *vout,
     msg_Dbg(vout, "Opening vout display wrapper");
 
     /* */
-    sys->display.title = var_CreateGetNonEmptyString(vout, "video-title");
+    sys->display.title = var_InheritString(vout, "video-title");
 
     /* */
     const mtime_t double_click_timeout = 300000;

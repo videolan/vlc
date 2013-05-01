@@ -957,7 +957,7 @@ void EventThreadMouseHide( event_thread_t *p_event )
 
 void EventThreadUpdateTitle( event_thread_t *p_event, const char *psz_fallback )
 {
-    char *psz_title = var_GetNonEmptyString( p_event->vd, "video-title" );
+    char *psz_title = var_InheritString( p_event->vd, "video-title" );
     if( !psz_title )
         psz_title = strdup( psz_fallback );
     if( !psz_title )
