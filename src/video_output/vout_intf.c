@@ -197,7 +197,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
     }
 
     var_AddCallback( p_vout, "zoom", ZoomCallback, NULL );
-    var_TriggerCallback( p_vout, "zoom" );
 
     /* Crop offset vars */
     var_Create( p_vout, "crop-left", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
@@ -236,10 +235,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
     }
 
     var_AddCallback( p_vout, "crop", CropCallback, NULL );
-    var_Get( p_vout, "crop", &old_val );
-    if( old_val.psz_string && *old_val.psz_string )
-        var_TriggerCallback( p_vout, "crop" );
-    free( old_val.psz_string );
 
     /* Monitor pixel aspect-ratio */
     var_Create( p_vout, "monitor-par", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -270,10 +265,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
     }
 
     var_AddCallback( p_vout, "aspect-ratio", AspectCallback, NULL );
-    var_Get( p_vout, "aspect-ratio", &old_val );
-    if( (old_val.psz_string && *old_val.psz_string) )
-        var_TriggerCallback( p_vout, "aspect-ratio" );
-    free( old_val.psz_string );
 
     /* Add a variable to indicate if the window should be on top of others */
     var_Create( p_vout, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT
@@ -281,7 +272,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
     text.psz_string = _("Always on top");
     var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_vout, "video-on-top", OnTopCallback, NULL );
-    var_TriggerCallback( p_vout, "video-on-top" );
 
     /* Add a variable to indicate whether we want window decoration or not */
     var_Create( p_vout, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -303,31 +293,43 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "video-filter",
                 VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_vout, "video-filter", VideoFilterCallback, NULL );
-    var_TriggerCallback( p_vout, "video-filter" );
 
     /* Add a sub-source variable */
     var_Create( p_vout, "sub-source",
                 VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_vout, "sub-source", SubSourceCallback, NULL );
-    var_TriggerCallback( p_vout, "sub-source" );
 
     /* Add a sub-filter variable */
     var_Create( p_vout, "sub-filter",
                 VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_vout, "sub-filter", SubFilterCallback, NULL );
-    var_TriggerCallback( p_vout, "sub-filter" );
 
     /* Add sub-margin variable */
     var_Create( p_vout, "sub-margin",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_vout, "sub-margin", SubMarginCallback, NULL );
-    var_TriggerCallback( p_vout, "sub-margin" );
 
     /* Mouse coordinates */
     var_Create( p_vout, "mouse-button-down", VLC_VAR_INTEGER );
     var_Create( p_vout, "mouse-moved", VLC_VAR_COORDS );
     var_Create( p_vout, "mouse-clicked", VLC_VAR_COORDS );
     var_Create( p_vout, "mouse-object", VLC_VAR_BOOL );
+
+    vout_IntfReinit( p_vout );
+}
+
+void vout_IntfReinit( vout_thread_t *p_vout )
+{
+    var_TriggerCallback( p_vout, "zoom" );
+    var_TriggerCallback( p_vout, "crop" );
+    var_TriggerCallback( p_vout, "aspect-ratio" );
+
+    var_TriggerCallback( p_vout, "video-on-top" );
+
+    var_TriggerCallback( p_vout, "video-filter" );
+    var_TriggerCallback( p_vout, "sub-source" );
+    var_TriggerCallback( p_vout, "sub-filter" );
+    var_TriggerCallback( p_vout, "sub-margin" );
 }
 
 /*****************************************************************************

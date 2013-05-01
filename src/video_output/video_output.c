@@ -221,6 +221,7 @@ vout_thread_t *(vout_Request)(vlc_object_t *object,
 
         if (!vout->p->dead) {
             msg_Dbg(object, "reusing provided vout");
+            vout_IntfReinit(vout);
             return vout;
         }
         vout_CloseAndRelease(vout);
