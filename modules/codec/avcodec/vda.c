@@ -91,6 +91,9 @@ static void vda_Copy420YpCbCr8Planar( picture_t *p_pic,
     uint8_t *pp_plane[3];
     size_t  pi_pitch[3];
 
+    if (!buffer)
+        return;
+
     CVPixelBufferLockBaseAddress( buffer, 0 );
 
     for( int i = 0; i < 3; i++ )
@@ -137,11 +140,10 @@ static void vda_Copy422YpCbCr8( picture_t *p_pic,
     CVPixelBufferRelease( buffer );
 }
 
-static int Setup( vlc_va_t *p_external, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
+static int Setup( vlc_va_t *external, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
                   int i_width, int i_height )
 {
-
-    vlc_va_vda_t *p_va = vlc_va_vda_Get( p_external );
+    vlc_va_vda_t *p_va = vlc_va_vda_Get( external );
 
     if( p_va->hw_ctx.width == i_width
         && p_va->hw_ctx.height == i_height
@@ -200,9 +202,10 @@ ok:
     return VLC_SUCCESS;
 }
 
-static int Get( vlc_va_t *p_external, AVFrame *p_ff )
+static int Get( vlc_va_t *external, AVFrame *p_ff )
 {
-    VLC_UNUSED( p_external );
+    msg_Dbg(external, "Get");
+    VLC_UNUSED( external );
 
     /* */
     for( int i = 0; i < 4; i++ )
@@ -217,9 +220,9 @@ static int Get( vlc_va_t *p_external, AVFrame *p_ff )
     return VLC_SUCCESS;
 }
 
-static int Extract( vlc_va_t *p_external, picture_t *p_picture, AVFrame *p_ff )
+static int Extract( vlc_va_t *external, picture_t *p_picture, AVFrame *p_ff )
 {
-    vlc_va_vda_t *p_va = vlc_va_vda_Get( p_external );
+    vlc_va_vda_t *p_va = vlc_va_vda_Get( external );
     CVPixelBufferRef cv_buffer = ( CVPixelBufferRef )p_ff->data[3];
 
     if( !cv_buffer )
@@ -230,8 +233,10 @@ static int Extract( vlc_va_t *p_external, picture_t *p_picture, AVFrame *p_ff )
 
     if( p_va->hw_ctx.cv_pix_fmt_type == kCVPixelFormatType_420YpCbCr8Planar )
     {
-        if( !p_va->image_cache.buffer )
+        if( !p_va->image_cache.buffer ) {
+            CVPixelBufferRelease( cv_buffer );
             return VLC_EGENERIC;
+        }
 
         vda_Copy420YpCbCr8Planar( p_picture,
                                   cv_buffer,
@@ -245,18 +250,18 @@ static int Extract( vlc_va_t *p_external, picture_t *p_picture, AVFrame *p_ff )
     return VLC_SUCCESS;
 }
 
-static void Release( vlc_va_t *p_external, AVFrame *p_ff )
+static void Release( vlc_va_t *external, AVFrame *p_ff )
 {
-    VLC_UNUSED( p_external );
+    VLC_UNUSED( external );
     CVPixelBufferRef cv_buffer = ( CVPixelBufferRef )p_ff->data[3];
 
     if ( cv_buffer )
-        CFRelease( cv_buffer );
+        CVPixelBufferRelease( cv_buffer );
 }
 
-static void Close( vlc_va_t *p_external )
+static void Close( vlc_va_t *external )
 {
-    vlc_va_vda_t *p_va = vlc_va_vda_Get( p_external );
+    vlc_va_vda_t *p_va = vlc_va_vda_Get( external );
 
     msg_Dbg(p_va->p_log, "destroying VDA decoder");
 
