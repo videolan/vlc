@@ -193,7 +193,6 @@ fi
     --disable-SDL_image \
     --disable-fontconfig \
     --disable-ass \
-    --disable-freetype2 \
     --disable-iconv \
     --disable-fribidi \
     --disable-zvbi \
@@ -215,6 +214,7 @@ fi
     --disable-libmpeg2 \
     --disable-chromaprint \
     --disable-mad \
+    --enable-freetype2 \
     --disable-taglib > ${out}
 
 echo "EXTRA_CFLAGS += ${EXTRA_CFLAGS}" >> config.mak
@@ -311,7 +311,7 @@ ${VLCROOT}/configure \
     --enable-theora \
     --enable-flac \
     --disable-screen \
-    --disable-freetype \
+    --enable-freetype \
     --disable-taglib \
     --disable-mmx \
     --disable-mad > ${out} # MMX and SSE support requires llvm which is broken on Simulator
