@@ -307,8 +307,6 @@ static void Flush(audio_output_t *p_aout, bool wait)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
     jack_ringbuffer_t *rb = p_sys->p_jack_ringbuffer;
-    jack_client_t *client = p_sys->p_jack_client;
-    int i_error;
 
     /* Sleep if wait was requested */
     if( wait )
@@ -318,60 +316,8 @@ static void Flush(audio_output_t *p_aout, bool wait)
             msleep(delay);
     }
 
-    /* FIXME: maybe the ringbuffer_reset should just be protected by signalling
-     * with atomic variables?
-     * Here we save and restore connections, otherwise we'd lose the connections
-     * every seek because of the deactivate/activate */
-
-    /* Save connections */
-    const char **connections_list[p_sys->i_channels];
-
-    for( size_t i = 0; i < p_sys->i_channels; i++ )
-    {
-        const char **port_connections = jack_port_get_all_connections( client,
-                p_sys->p_jack_ports[i] );
-        connections_list[i] = port_connections;
-    }
-
-    /* Suspend audio processing */
-    i_error = jack_deactivate( p_sys->p_jack_client );
-    if( i_error )
-    {
-        msg_Err( p_aout, "failed to deactivate JACK client (error %d)",
-                i_error );
-        return;
-    }
-
     /* reset ringbuffer read and write pointers */
     jack_ringbuffer_reset(rb);
-
-    /* Resume audio processing */
-    i_error = jack_activate( p_sys->p_jack_client );
-    if( i_error )
-    {
-        msg_Err( p_aout, "failed to activate JACK client (error %d)", i_error );
-        return;
-    }
-
-    /* Restore connections */
-    for( size_t i = 0; i < p_sys->i_channels; i++ )
-    {
-        const char **port_connections = connections_list[i];
-        const char *psz_out = jack_port_name( p_sys->p_jack_ports[i] );
-        for (const char **psz_in = port_connections; psz_in && *psz_in;
-                psz_in++)
-        {
-            i_error = jack_connect( client, psz_out, *psz_in );
-            if( i_error )
-            {
-                msg_Err( p_aout, "failed to connect ports %s and %s (error %d)",
-                        psz_out, *psz_in, i_error );
-            }
-        }
-
-        if( port_connections )
-            jack_free(port_connections);
-    }
 }
 
 static int TimeGet(audio_output_t *p_aout, mtime_t *delay)
