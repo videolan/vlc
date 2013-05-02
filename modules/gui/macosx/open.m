@@ -47,6 +47,7 @@
 #import "open.h"
 #import "output.h"
 #import "eyetv.h"
+#import "misc.h"
 
 #import <vlc_url.h>
 
@@ -222,6 +223,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_eyetv_getPlugin_btn setTitle: _NS("Download Plugin")];
     [o_capture_width_lbl setStringValue: [NSString stringWithFormat:@"%@:",_NS("Image width")]];
     [o_capture_height_lbl setStringValue: [NSString stringWithFormat:@"%@:",_NS("Image height")]];
+
+    // setup start / stop time fields
+    [o_file_starttime_fld setFormatter:[[[PositionFormatter alloc] init] autorelease]];
+    [o_file_stoptime_fld setFormatter:[[[PositionFormatter alloc] init] autorelease]];
 
     [self qtkvideoDevices];
     [o_qtk_video_device_pop removeAllItems];
