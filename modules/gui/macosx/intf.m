@@ -179,12 +179,12 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
     p_wnd->handle.nsobject = videoView;
 
     // TODO: find a cleaner way for "start in fullscreen"
-    if (var_GetBool(pl_Get(VLCIntf), "fullscreen")) {
+    if (var_InheritBool(VLCIntf, "fullscreen")) {
         int i_full = 1;
 
         SEL sel = @selector(setFullscreen:forWindow:);
-        NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[[[VLCMain sharedInstance] voutController] methodSignatureForSelector:sel]];
-        [inv setTarget:[[VLCMain sharedInstance] voutController]];
+        NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[o_vout_controller methodSignatureForSelector:sel]];
+        [inv setTarget:o_vout_controller];
         [inv setSelector:sel];
         [inv setArgument:&i_full atIndex:2];
         [inv setArgument:&p_wnd atIndex:3];
