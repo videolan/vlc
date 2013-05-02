@@ -63,6 +63,7 @@ Demuxers:
  * AVI: support for files produced by Nikon cameras
  * Support for more MJPEG streams
  * Add support for liveleak streams
+ * Add support for Wave/RF64 files
 
 Audio output:
  * Windows Audio Session API audio output support
