@@ -69,7 +69,7 @@ Audio output:
  * OpenBSD sndio audio output support
  * Important improvements on the Android OpenSL ES module
  * Android AudioTrack audio output support
- * OS X Auhal output support for 6.1 and 7.1 playback and layouts
+ * OS X Auhal output support for 6.1, 7.1, 8.0 and 8.1 playback and layouts
  * Rewrite of OSS module to support OSSv4
  * OS X Auhal output support for multi-buffer output devices
    This fix was facilitated through a hardware lending by TEAC Europe GmbH
