@@ -103,6 +103,7 @@ static void vda_Copy420YpCbCr8Planar( picture_t *p_pic,
                   i_width, i_height, cache );
 
     CVPixelBufferUnlockBaseAddress( buffer, 0 );
+    CVPixelBufferRelease( buffer );
 }
 
 /*****************************************************************************
@@ -133,6 +134,7 @@ static void vda_Copy422YpCbCr8( picture_t *p_pic,
     }
 
     CVPixelBufferUnlockBaseAddress( buffer, 0 );
+    CVPixelBufferRelease( buffer );
 }
 
 static int Setup( vlc_va_t *p_external, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
