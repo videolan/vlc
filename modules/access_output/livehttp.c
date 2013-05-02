@@ -603,7 +603,7 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
     }
 
     // Then take care of deletion
-    while( p_sys->b_delsegs && p_sys->i_numsegs && ( (vlc_array_count( p_sys->segments_t ) ) >= p_sys->i_numsegs ) )
+    while( p_sys->b_delsegs && p_sys->i_numsegs && ( (vlc_array_count( p_sys->segments_t ) ) > p_sys->i_numsegs ) )
     {
          output_segment_t *segment = vlc_array_item_at_index( p_sys->segments_t, 0 );
          vlc_array_remove( p_sys->segments_t, 0 );
