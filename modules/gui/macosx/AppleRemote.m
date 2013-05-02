@@ -544,7 +544,7 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
     long                    usage;
     long                    usagePage;
     id                      object;
-    NSArray*                elements = nil;
+    NSArray*                elements;
     NSDictionary*           element;
     IOReturn success;
 
@@ -557,8 +557,6 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
     success = (*handle)->copyMatchingElements(handle, NULL, (CFArrayRef*)&elements);
 
     if (success == kIOReturnSuccess) {
-
-        [elements autorelease];
         /*
         cookies = calloc(NUMBER_OF_APPLE_REMOTE_ACTIONS, sizeof(IOHIDElementCookie));
         memset(cookies, 0, sizeof(IOHIDElementCookie) * NUMBER_OF_APPLE_REMOTE_ACTIONS);
@@ -588,7 +586,10 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
         }
         _allCookies = [[NSArray alloc] initWithArray: mutableAllCookies];
         [mutableAllCookies release];
+        [elements release];
     } else {
+        if (elements)
+            [elements release];
         return NO;
     }
 
