@@ -495,11 +495,15 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
 {
 
     uint32_t i_firstseg;
+    unsigned i_index_offset = 0;
 
     if ( p_sys->i_numsegs == 0 || p_sys->i_segment < p_sys->i_numsegs )
         i_firstseg = 1;
     else
+    {
         i_firstseg = ( p_sys->i_segment - p_sys->i_numsegs ) + 1;
+        i_index_offset = vlc_array_count( p_sys->segments_t ) - p_sys->i_numsegs;
+    }
 
     // First update index
     if ( p_sys->psz_indexPath )
@@ -533,8 +537,8 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
 
         for ( uint32_t i = i_firstseg; i <= p_sys->i_segment; i++ )
         {
-            //scale to 0..numsegs-1
-            uint32_t index = i-i_firstseg;
+            //scale to i_index_offset..numsegs + i_index_offset
+            uint32_t index = i - i_firstseg + i_index_offset;
 
             output_segment_t *segment = (output_segment_t *)vlc_array_item_at_index( p_sys->segments_t, index );
             if( p_sys->key_uri &&
