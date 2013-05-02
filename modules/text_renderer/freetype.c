@@ -103,7 +103,10 @@
 
 /* apple stuff */
 #ifdef __APPLE__
+#include <TargetConditionals.h>
+#if !TARGET_OS_IPHONE
 #include <Carbon/Carbon.h>
+#endif
 #include <sys/param.h>                         /* for MAXPATHLEN */
 #undef HAVE_FONTCONFIG
 #define HAVE_STYLES
@@ -736,6 +739,7 @@ fail:
 #endif /* HAVE_WIN32 */
 
 #ifdef __APPLE__
+#if !TARGET_OS_IPHONE
 static char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
                           bool b_bold, bool b_italic, int i_size, int *i_idx )
 {
@@ -814,6 +818,7 @@ static char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
 
     return psz_path;
 }
+#endif
 #endif
 
 #endif /* HAVE_STYLES */
@@ -1997,7 +2002,9 @@ static FT_Face LoadFace( filter_t *p_filter,
                                           -1,
                                           &i_idx );
 #elif defined( __APPLE__ )
+#if !TARGET_OS_IPHONE
         psz_fontfile = MacLegacy_Select( p_filter, p_style->psz_fontname, false, false, -1, &i_idx );
+#endif
 #elif defined( WIN32 )
         psz_fontfile = Win32_Select( p_filter,
                                     p_style->psz_fontname,
@@ -2911,7 +2918,9 @@ static int Create( vlc_object_t *p_this )
                                           false, p_sys->i_default_font_size,
                                           &monofontindex );
 #elif defined(__APPLE__)
+#if !TARGET_OS_IPHONE
     psz_fontfile = MacLegacy_Select( p_filter, psz_fontfamily, false, false, 0, &fontindex );
+#endif
 #elif defined(WIN32)
     psz_fontfile = Win32_Select( p_filter, psz_fontfamily, false, false,
                                  p_sys->i_default_font_size, &fontindex );
