@@ -1120,6 +1120,11 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     {
         //How much we need to copy from new packet
         const int leftover = leftover_samples * p_enc->fmt_in.audio.i_channels * p_sys->i_sample_bytes;
+#if LIBAVUTIL_VERSION_CHECK( 51,27,2,46,100 )
+        const int align = 0;
+#else
+        const int align = 1;
+#endif
 
         AVPacket packet = {0};
         avcodec_get_frame_defaults( p_sys->frame );
@@ -1146,7 +1151,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         if( avcodec_fill_audio_frame( p_sys->frame, p_enc->fmt_in.audio.i_channels,
                 p_sys->p_context->sample_fmt, p_sys->p_buffer,
                 leftover + buffer_delay,
-                0) < 0 )
+                align) < 0 )
             msg_Err( p_enc, "filling error on fillup" );
 
         buffer_delay = 0;
@@ -1210,6 +1215,11 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
            ( p_sys->b_variable && p_aout_buf->i_nb_samples ) )
     {
         AVPacket packet = {0};
+#if LIBAVUTIL_VERSION_CHECK( 51,27,2,46,100 )
+        const int align = 0;
+#else
+        const int align = 1;
+#endif
 
         if( unlikely( p_aout_buf->i_pts > VLC_TS_INVALID &&
                       p_aout_buf->i_pts != date_Get( &p_sys->buffer_date ) ) )
@@ -1234,7 +1244,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
                                     p_sys->p_context->sample_fmt,
                                     p_sys->b_planar ? p_sys->p_buffer : p_aout_buf->p_buffer,
                                     __MIN(p_sys->i_buffer_out, p_aout_buf->i_buffer),
-                                    0) < 0 )
+                                    align) < 0 )
                  msg_Err( p_enc, "filling error on encode" );
 
         p_aout_buf->p_buffer     += (p_sys->frame->nb_samples * p_enc->fmt_in.audio.i_channels * p_sys->i_sample_bytes);
