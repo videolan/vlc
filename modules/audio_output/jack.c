@@ -175,6 +175,11 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
         goto error_out;
     }
 
+    if( jack_ringbuffer_mlock( p_sys->p_jack_ringbuffer ))
+    {
+        msg_Warn( p_aout, "failed to lock JACK ringbuffer in memory" );
+    }
+
     /* Create the output ports */
     for( i = 0; i < p_sys->i_channels; i++ )
     {
