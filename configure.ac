@@ -1598,74 +1598,83 @@ AC_ARG_ENABLE(live555,
     [enable RTSP input through live555 (default enabled)])])
 
 AS_IF([test "${enable_live555}" != "no" -a -n "${CXX}"], [
-  AC_LANG_PUSH(C++)
-  VLC_SAVE_FLAGS
-
-  dnl detect include paths
-  AS_IF([test -f "${CONTRIB_DIR}/include/UsageEnvironment.hh"], [
-    CPPFLAGS_live555="-I${CONTRIB_DIR}/include/liveMedia -I${CONTRIB_DIR}/include/groupsock -I${CONTRIB_DIR}/include/BasicUsageEnvironment -I${CONTRIB_DIR}/include/UsageEnvironment"
+  PKG_CHECK_MODULES(LIVE555, live555, [
+    VLC_ADD_PLUGIN([live555])
+    VLC_ADD_CXXFLAGS([live555], [$LIVE555_CFLAGS])
+    VLC_ADD_LIBS([live555],[$LIVE555_LIBS])
   ], [
-    AS_IF([test ${SYS} != "os2"], [
-      LIVE555_PREFIX=${LIVE555_PREFIX-"/usr"}
-      CPPFLAGS_live555="-I${LIVE555_PREFIX}/include/liveMedia -I${LIVE555_PREFIX}/include/groupsock -I${LIVE555_PREFIX}/include/BasicUsageEnvironment -I${LIVE555_PREFIX}/include/UsageEnvironment"
+    AC_MSG_WARN([${LIVE555_PKG_ERRORS}.])
+
+    AC_LANG_PUSH(C++)
+    VLC_SAVE_FLAGS
+
+    dnl detect include paths
+    AS_IF([test -f "${CONTRIB_DIR}/include/UsageEnvironment.hh"], [
+      CPPFLAGS_live555="-I${CONTRIB_DIR}/include/liveMedia -I${CONTRIB_DIR}/include/groupsock -I${CONTRIB_DIR}/include/BasicUsageEnvironment -I${CONTRIB_DIR}/include/UsageEnvironment"
     ], [
-      LIVE555_PREFIX=${LIVE555_PREFIX-"/usr/lib/live"}
-      CPPFLAGS_live555="-I${LIVE555_PREFIX}/liveMedia/include -I${LIVE555_PREFIX}/groupsock/include -I${LIVE555_PREFIX}/BasicUsageEnvironment/include -I${LIVE555_PREFIX}/UsageEnvironment/include"
-      LDFLAGS_live555="-L${LIVE555_PREFIX}/liveMedia -L${LIVE555_PREFIX}/groupsock -L${LIVE555_PREFIX}/BasicUsageEnvironment -L${LIVE555_PREFIX}/UsageEnvironment"
+      AS_IF([test "${SYS}" != "os2"], [
+        LIVE555_PREFIX=${LIVE555_PREFIX-"/usr"}
+        CPPFLAGS_live555="-I${LIVE555_PREFIX}/include/liveMedia -I${LIVE555_PREFIX}/include/groupsock -I${LIVE555_PREFIX}/include/BasicUsageEnvironment -I${LIVE555_PREFIX}/include/UsageEnvironment"
+      ], [
+        LIVE555_PREFIX=${LIVE555_PREFIX-"/usr/lib/live"}
+        CPPFLAGS_live555="-I${LIVE555_PREFIX}/liveMedia/include -I${LIVE555_PREFIX}/groupsock/include -I${LIVE555_PREFIX}/BasicUsageEnvironment/include -I${LIVE555_PREFIX}/UsageEnvironment/include"
+        LDFLAGS_live555="-L${LIVE555_PREFIX}/liveMedia -L${LIVE555_PREFIX}/groupsock -L${LIVE555_PREFIX}/BasicUsageEnvironment -L${LIVE555_PREFIX}/UsageEnvironment"
+      ])
     ])
-  ])
 
-  dnl CPP Flags
-  AS_IF([test "${SYS}" = "solaris"], [
-    CPPFLAGS_live555="${CPPFLAGS_live555} -DSOLARIS"
-  ])
-  CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_live555}"
-  LDFLAGS="${LDFLAGS} ${LDFLAGS_live555}"
+    dnl CPP Flags
+    AS_IF([test "${SYS}" = "solaris"], [
+      CPPFLAGS_live555="${CPPFLAGS_live555} -DSOLARIS"
+    ])
+    CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_live555}"
+    LDFLAGS="${LDFLAGS} ${LDFLAGS_live555}"
 
-  dnl version check
-  AC_CACHE_CHECK([for live555 version 1324598400 or later], [ac_cv_live555], [
-    AC_PREPROC_IFELSE([AC_LANG_PROGRAM([
+    dnl version check
+    AC_CACHE_CHECK([for live555 version 1324598400 or later], [ac_cv_live555], [
+      AC_PREPROC_IFELSE([AC_LANG_PROGRAM([
 [#include <liveMedia_version.hh>
 #if !defined (LIVEMEDIA_LIBRARY_VERSION_INT) || (LIVEMEDIA_LIBRARY_VERSION_INT < 1324598400)
 # error BOOM
 #endif]])
-    ], [
-      ac_cv_live555="yes"
-    ], [
-      ac_cv_live555="no"
+      ], [
+        ac_cv_live555="yes"
+      ], [
+        ac_cv_live555="no"
+      ])
     ])
-  ])
 
-  AS_IF([test "$ac_cv_live555" = "no"], [
-    AC_MSG_WARN([liveMedia is missing or its installed version is too old:
+    AS_IF([test "$ac_cv_live555" = "no"], [
+      AC_MSG_WARN([live555 is missing or its installed version is too old:
 Version 2011.12.23 or later is required to proceed.
 You can get an updated one from http://www.live555.com/liveMedia .])
-    AS_IF([test -n "${enable_live555}"], [
-      AC_MSG_ERROR([Update live555 or pass --disable-live555 to disable RTSP input support.])
-    ])
-  ], [
-    other_libs="-lgroupsock -lBasicUsageEnvironment -lUsageEnvironment"
-    other_libs_pic="-lgroupsock_pic -lBasicUsageEnvironment_pic -lUsageEnvironment_pic"
-    AS_IF([test "${SYS}" = "mingw32"], [
-      # add ws2_32 for closesocket, select, recv
-      other_libs="$other_libs -lws2_32"
-    ])
+      AS_IF([test -n "${enable_live555}"], [
+        AC_MSG_ERROR([Update live555 or pass --disable-live555 to disable RTSP input support.])
+      ])
+    ], [
+      other_libs="-lgroupsock -lBasicUsageEnvironment -lUsageEnvironment"
+      other_libs_pic="-lgroupsock_pic -lBasicUsageEnvironment_pic -lUsageEnvironment_pic"
+      AS_IF([test "${SYS}" = "mingw32"], [
+        # add ws2_32 for closesocket, select, recv
+        other_libs="$other_libs -lws2_32"
+      ])
 
-    dnl We need to check for pic because live555 don't provide shared libs
-    dnl and we want to build a plugins so we need -fPIC on some arch.
-    VLC_ADD_CXXFLAGS([live555], [${CPPFLAGS_live555}])
-    VLC_ADD_LDFLAGS([live555], [${LDFLAGS_live555}])
-    AC_CHECK_LIB(liveMedia_pic, main, [
-      VLC_ADD_PLUGIN([live555])
-      VLC_ADD_LIBS([live555], [-lliveMedia_pic ${other_libs_pic}])
-    ],[
-      AC_CHECK_LIB(liveMedia, main, [
+      dnl We need to check for pic because live555 don't provide shared libs
+      dnl and we want to build a plugins so we need -fPIC on some arch.
+      VLC_ADD_CXXFLAGS([live555], [${CPPFLAGS_live555}])
+      VLC_ADD_LDFLAGS([live555], [${LDFLAGS_live555}])
+      AC_CHECK_LIB(liveMedia_pic, main, [
         VLC_ADD_PLUGIN([live555])
-        VLC_ADD_LIBS([live555], [-lliveMedia ${other_libs}])
-      ],[],[${other_libs}])],[${other_libs_pic}])
+        VLC_ADD_LIBS([live555], [-lliveMedia_pic ${other_libs_pic}])
+      ],[
+        AC_CHECK_LIB(liveMedia, main, [
+          VLC_ADD_PLUGIN([live555])
+          VLC_ADD_LIBS([live555], [-lliveMedia ${other_libs}])
+        ],[],[${other_libs}])
+      ],[${other_libs_pic}])
+    ])
+    VLC_RESTORE_FLAGS
+    AC_LANG_POP(C++)
   ])
-  VLC_RESTORE_FLAGS
-  AC_LANG_POP(C++)
 ])
 
 dnl
