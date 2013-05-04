@@ -428,7 +428,6 @@ static int Open (vlc_object_t *obj)
          xcb_xv_adaptor_info_next (&it))
     {
         const xcb_xv_adaptor_info_t *a = it.data;
-        char *name;
 
         adaptor_current++;
         if (adaptor_selected != -1 && adaptor_selected != adaptor_current)
@@ -466,12 +465,8 @@ static int Open (vlc_object_t *obj)
 
     grabbed_port:
         /* Found port - initialize selected format */
-        name = strndup (xcb_xv_adaptor_info_name (a), a->name_size);
-        if (name != NULL)
-        {
-            msg_Dbg (vd, "using adaptor %s", name);
-            free (name);
-        }
+        msg_Dbg (vd, "using adaptor %.*s", (int)a->name_size,
+                 xcb_xv_adaptor_info_name (a));
         msg_Dbg (vd, "using port %"PRIu32, p_sys->port);
         msg_Dbg (vd, "using image format 0x%"PRIx32, p_sys->id);
 

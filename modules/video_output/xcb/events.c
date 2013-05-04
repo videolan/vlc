@@ -72,12 +72,8 @@ static xcb_connection_t *Connect (vlc_object_t *obj, const char *display)
     const xcb_setup_t *setup = xcb_get_setup (conn);
     msg_Dbg (obj, "connected to X%"PRIu16".%"PRIu16" server",
              setup->protocol_major_version, setup->protocol_minor_version);
-    char *vendor = strndup (xcb_setup_vendor (setup), setup->vendor_len);
-    if (vendor)
-    {
-        msg_Dbg (obj, " vendor : %s", vendor);
-        free (vendor);
-    }
+    msg_Dbg (obj, " vendor : %.*s", (int)setup->vendor_len,
+             xcb_setup_vendor (setup));
     msg_Dbg (obj, " version: %"PRIu32, setup->release_number);
     return conn;
 }
