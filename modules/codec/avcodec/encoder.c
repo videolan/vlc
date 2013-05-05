@@ -1148,6 +1148,15 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             p_aout_buf->i_buffer     -= leftover;
             p_aout_buf->i_pts         = date_Get( &p_sys->buffer_date );
         }
+        if(unlikely( ( (leftover + buffer_delay) < p_sys->i_buffer_out ) &&
+                     !(p_sys->p_codec->capabilities & CODEC_CAP_SMALL_LAST_FRAME ))
+          )
+        {
+            msg_Dbg( p_enc, "No small last frame support, padding");
+            size_t padding_size = p_sys->i_buffer_out - (leftover+buffer_delay);
+            memset( p_sys->p_buffer + (leftover+buffer_delay), 0, padding_size );
+            buffer_delay += padding_size;
+        }
         if( avcodec_fill_audio_frame( p_sys->frame, p_enc->fmt_in.audio.i_channels,
                 p_sys->p_context->sample_fmt, p_sys->p_buffer,
                 leftover + buffer_delay,
