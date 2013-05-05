@@ -1,10 +1,11 @@
 /*****************************************************************************
  * vorbis.h: Vorbis Comment parser
  *****************************************************************************
- * Copyright (C) 2008 VLC authors and VideoLAN
+ * Copyright © 2008-2013 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
