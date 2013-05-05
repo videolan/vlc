@@ -204,7 +204,6 @@ ok:
 
 static int Get( vlc_va_t *external, AVFrame *p_ff )
 {
-    msg_Dbg(external, "Get");
     VLC_UNUSED( external );
 
     /* */
