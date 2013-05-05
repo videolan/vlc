@@ -619,9 +619,7 @@ static int CreateDSBufferPCM( audio_output_t *p_aout, vlc_fourcc_t *i_format,
 {
     unsigned i_nb_channels = popcount( i_channels );
 
-    /* Float32 audio samples are not supported for 5.1 output on the emu101k */
     if( !var_GetBool( p_aout, "directx-audio-float32" ) ||
-        i_nb_channels > 2 ||
         CreateDSBuffer( p_aout, VLC_CODEC_FL32,
                         i_channels, i_nb_channels, i_rate, b_probe )
         != VLC_SUCCESS )
