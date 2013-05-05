@@ -157,9 +157,9 @@ vlc_module_begin ()
     add_float( "waveout-volume", 1.0f, VOLUME_TEXT, NULL, true )
          change_float_range(0.0f, 2.0f)
     add_bool( "waveout-float32", true, FLOAT_TEXT, FLOAT_LONGTEXT, true )
-    add_integer ("waveout-audio-channels", 6, AUDIO_CHAN_TEXT,
+    add_integer ("waveout-audio-channels", 9, AUDIO_CHAN_TEXT,
                  AUDIO_CHAN_LONGTEXT, false)
-        change_integer_range(1,6)
+        change_integer_range(1,9)
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -240,6 +240,15 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
         {
             switch(i_channels)
             {
+                case 9:
+                    fmt->i_physical_channels = AOUT_CHANS_8_1;
+                    break;
+                case 8:
+                    fmt->i_physical_channels = AOUT_CHANS_7_1;
+                    break;
+                case 7:
+                    fmt->i_physical_channels = AOUT_CHANS_7_0;
+                    break;
                 case 6:
                     fmt->i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
                         | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT
