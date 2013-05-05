@@ -38,7 +38,7 @@
 
 #include "windows_audio_common.h"
 
-#define DS_BUF_SIZE (1024*1024)
+#define DS_BUF_SIZE (4*1024*1024)
 
 /*****************************************************************************
  * aout_sys_t: directx audio output method descriptor
