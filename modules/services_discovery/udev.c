@@ -523,6 +523,7 @@ int OpenALSA (vlc_object_t *obj)
 /*** Discs support ***/
 static char *disc_get_mrl (struct udev_device *dev)
 {
+    const char *node = udev_device_get_devnode (dev);
     const char *val;
 
     val = udev_device_get_property_value (dev, "ID_CDROM");
@@ -530,7 +531,13 @@ static char *disc_get_mrl (struct udev_device *dev)
         return NULL; /* Ignore non-optical block devices */
 
     val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_STATE");
-    if (val && !strcmp (val, "blank"))
+    if (val == NULL)
+    {   /* Force probing of the disc in the drive if any. */
+        int fd = open (node, O_RDONLY);
+        close (fd);
+        return NULL;
+    }
+    if (!strcmp (val, "blank"))
         return NULL; /* ignore empty drives and virgin recordable discs */
 
     const char *scheme = NULL;
@@ -556,8 +563,7 @@ static char *disc_get_mrl (struct udev_device *dev)
     if (scheme == NULL)
         return NULL;
 
-    val = udev_device_get_devnode (dev);
-    return vlc_path2uri (val, scheme);
+    return vlc_path2uri (node, scheme);
 }
 
 static char *disc_get_name (struct udev_device *dev)
