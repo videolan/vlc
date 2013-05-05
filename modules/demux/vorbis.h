@@ -266,3 +266,42 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta,
 #undef RM
 }
 
+static const struct {
+  const char *psz_tag;
+  const char *psz_i18n;
+} Katei18nCategories[] = {
+    /* From Silvia's Mozilla list */
+    { "CC",      N_("Closed captions") },
+    { "SUB",     N_("Subtitles") },
+    { "TAD",     N_("Textual audio descriptions") },
+    { "KTV",     N_("Karaoke") },
+    { "TIK",     N_("Ticker text") },
+    { "AR",      N_("Active regions") },
+    { "NB",      N_("Semantic annotations") },
+    { "META",    N_("Metadata") },
+    { "TRX",     N_("Transcript") },
+    { "LRC",     N_("Lyrics") },
+    { "LIN",     N_("Linguistic markup") },
+    { "CUE",     N_("Cue points") },
+
+    /* Grandfathered */
+    { "subtitles", N_("Subtitles") },
+    { "spu-subtitles", N_("Subtitles (images)") },
+    { "lyrics", N_("Lyrics") },
+
+    /* Kate specific */
+    { "K-SPU", N_("Subtitles (images)") },
+    { "K-SLD-T", N_("Slides (text)") },
+    { "K-SLD-I", N_("Slides (images)") },
+};
+
+const char *FindKateCategoryName( const char *psz_tag )
+{
+    for( size_t i = 0; i < sizeof(Katei18nCategories)/sizeof(Katei18nCategories[0]); i++ )
+    {
+        if( !strcmp( psz_tag, Katei18nCategories[i].psz_tag ) )
+            return Katei18nCategories[i].psz_i18n;
+    }
+    return N_("Unknown category");
+}
+

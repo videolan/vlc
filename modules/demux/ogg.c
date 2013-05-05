@@ -41,7 +41,6 @@
 #include <vlc_bits.h>
 #include "xiph.h"
 #include "vorbis.h"
-#include "kate_categories.h"
 #include "ogg.h"
 #include "oggseek.h"
 

@@ -1,6 +1,5 @@
 SOURCES_flacsys = flac.c
-SOURCES_ogg = ogg.c ogg.h oggseek.c oggseek.h vorbis.h kate_categories.c \
-	kate_categories.h xiph.h
+SOURCES_ogg = ogg.c ogg.h oggseek.c oggseek.h vorbis.h xiph.h
 SOURCES_demuxdump = demuxdump.c
 SOURCES_rawdv = rawdv.c rawdv.h
 SOURCES_rawvid = rawvid.c
