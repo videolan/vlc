@@ -40,7 +40,7 @@
 #include <vlc_codecs.h>
 #include <vlc_bits.h>
 #include "xiph.h"
-#include "vorbis.h"
+#include "xiph_metadata.h"
 #include "ogg.h"
 #include "oggseek.h"
 

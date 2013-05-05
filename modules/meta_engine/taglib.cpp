@@ -75,7 +75,7 @@
 #include <mpegfile.h>
 #include <oggfile.h>
 #include <oggflacfile.h>
-#include "../demux/vorbis.h"
+#include "../demux/xiph_metadata.h"
 
 #include <aifffile.h>
 #include <wavfile.h>

@@ -38,7 +38,7 @@
 #include <vlc_charset.h>              /* EnsureUTF8 */
 
 #include <assert.h>
-#include "vorbis.h"                   /* vorbis comments */
+#include "xiph_metadata.h"            /* vorbis comments */
 
 /*****************************************************************************
  * Module descriptor

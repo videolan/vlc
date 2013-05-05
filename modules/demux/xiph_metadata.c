@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vorbis.h: Vorbis Comment parser
+ * xiph_metadata.h: Vorbis Comment parser
  *****************************************************************************
  * Copyright © 2008-2013 VLC authors and VideoLAN
  * $Id$
@@ -22,11 +22,17 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <vlc_common.h>
 #include <vlc_charset.h>
 #include <vlc_strings.h>
 #include <vlc_input.h>
+#include "xiph_metadata.h"
 
-static input_attachment_t* ParseFlacPicture( const uint8_t *p_data, int i_data,
+input_attachment_t* ParseFlacPicture( const uint8_t *p_data, int i_data,
     int i_attachments, int *i_cover_score, int *i_cover_idx )
 {
     /* TODO: Merge with ID3v2 copy in modules/meta_engine/taglib.cpp. */
@@ -106,7 +112,7 @@ error:
     return p_attachment;
 }
 
-static inline void vorbis_ParseComment( vlc_meta_t **pp_meta,
+void vorbis_ParseComment( vlc_meta_t **pp_meta,
         const uint8_t *p_data, int i_data,
         int *i_attachments, input_attachment_t ***attachments,
         int *i_cover_score, int *i_cover_idx,
@@ -265,35 +271,6 @@ static inline void vorbis_ParseComment( vlc_meta_t **pp_meta,
     }
 #undef RM
 }
-
-static const struct {
-  const char *psz_tag;
-  const char *psz_i18n;
-} Katei18nCategories[] = {
-    /* From Silvia's Mozilla list */
-    { "CC",      N_("Closed captions") },
-    { "SUB",     N_("Subtitles") },
-    { "TAD",     N_("Textual audio descriptions") },
-    { "KTV",     N_("Karaoke") },
-    { "TIK",     N_("Ticker text") },
-    { "AR",      N_("Active regions") },
-    { "NB",      N_("Semantic annotations") },
-    { "META",    N_("Metadata") },
-    { "TRX",     N_("Transcript") },
-    { "LRC",     N_("Lyrics") },
-    { "LIN",     N_("Linguistic markup") },
-    { "CUE",     N_("Cue points") },
-
-    /* Grandfathered */
-    { "subtitles", N_("Subtitles") },
-    { "spu-subtitles", N_("Subtitles (images)") },
-    { "lyrics", N_("Lyrics") },
-
-    /* Kate specific */
-    { "K-SPU", N_("Subtitles (images)") },
-    { "K-SLD-T", N_("Slides (text)") },
-    { "K-SLD-I", N_("Slides (images)") },
-};
 
 const char *FindKateCategoryName( const char *psz_tag )
 {
