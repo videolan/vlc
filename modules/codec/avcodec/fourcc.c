@@ -379,6 +379,8 @@ static const struct
 
     { VLC_CODEC_G723_1, AV_CODEC_ID_G723_1, AUDIO_ES },
 
+    { VLC_CODEC_BD_LPCM, AV_CODEC_ID_PCM_BLURAY, AUDIO_ES },
+
     /* Lossless */
     { VLC_CODEC_FLAC, AV_CODEC_ID_FLAC, AUDIO_ES },
 
