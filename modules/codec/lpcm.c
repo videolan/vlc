@@ -1054,7 +1054,11 @@ static void BdExtract( block_t *p_aout_buffer, block_t *p_block,
         uint8_t *p_dst = p_aout_buffer->p_buffer;
         while( i_frame_length > 0 )
         {
+#ifdef WORDS_BIGENDIAN
             memcpy( p_dst, p_src, i_channels * i_bits / 8 );
+#else
+            swab( p_dst, p_src, i_channels * i_bits / 8 );
+#endif
             p_src += (i_channels + i_channels_padding) * i_bits / 8;
             p_dst += (i_channels +                  0) * i_bits / 8;
             i_frame_length--;
@@ -1062,7 +1066,11 @@ static void BdExtract( block_t *p_aout_buffer, block_t *p_block,
     }
     else
     {
+#ifdef WORDS_BIGENDIAN
         memcpy( p_aout_buffer->p_buffer, p_block->p_buffer, p_block->i_buffer );
+#else
+        swab( p_block->p_buffer, p_aout_buffer->p_buffer, p_block->i_buffer );
+#endif
     }
 }
 
