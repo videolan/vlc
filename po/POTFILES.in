@@ -446,7 +446,6 @@ modules/demux/dirac.c
 modules/demux/flac.c
 modules/demux/gme.c
 modules/demux/image.c
-modules/demux/kate_categories.c
 modules/demux/mjpeg.c
 modules/demux/mkv/chapter_command.cpp
 modules/demux/mkv/chapter_command.hpp
@@ -515,6 +514,8 @@ modules/demux/vobsub.c
 modules/demux/voc.c
 modules/demux/wav.c
 modules/demux/xa.c
+modules/demux/xiph_metadata.h
+modules/demux/xiph_metadata.c
 modules/gui/macosx/about.h
 modules/gui/macosx/about.m
 modules/gui/macosx/AppleRemote.h
