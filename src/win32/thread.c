@@ -725,7 +725,7 @@ static void SelectClockSource (vlc_object_t *obj)
         return;
     }
 
-#if !VLC_WINSTORE_APP
+#if VLC_WINSTORE_APP
     const char *name = "perf";
 #else
     const char *name = "multimedia";
