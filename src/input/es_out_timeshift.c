@@ -1553,7 +1553,7 @@ static char *GetTmpPath( char *psz_path )
     free( psz_path );
 
     /* Create a suitable path */
-#if defined (WIN32)
+#if defined (WIN32) && !VLC_WINSTORE_APP
     const DWORD dwCount = GetTempPathW( 0, NULL );
     wchar_t *psw_path = calloc( dwCount + 1, sizeof(wchar_t) );
     if( psw_path )
