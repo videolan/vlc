@@ -64,7 +64,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     } else {
         _o_sharedInstance = [super init];
 
-        o_ptc_translation_dict = [NSDictionary dictionaryWithObjectsAndKeys:
+        o_ptc_translation_dict = [[NSDictionary alloc] initWithObjectsAndKeys:
                       _NS("Track Number"),  TRACKNUM_COLUMN,
                       _NS("Title"),         TITLE_COLUMN,
                       _NS("Author"),        ARTIST_COLUMN,
@@ -77,8 +77,9 @@ static VLCMainMenu *_o_sharedInstance = nil;
                       _NS("URI"),           URI_COLUMN,
                       nil];
         // this array also assigns tags (index) to type of menu item
-        o_ptc_menuorder = @[TRACKNUM_COLUMN, TITLE_COLUMN, ARTIST_COLUMN, DURATION_COLUMN,
-                            GENRE_COLUMN, ALBUM_COLUMN, DESCRIPTION_COLUMN, DATE_COLUMN, LANGUAGE_COLUMN, URI_COLUMN];
+        o_ptc_menuorder = [[NSArray alloc] initWithObjects: TRACKNUM_COLUMN, TITLE_COLUMN,
+                           ARTIST_COLUMN, DURATION_COLUMN, GENRE_COLUMN, ALBUM_COLUMN,
+                           DESCRIPTION_COLUMN, DATE_COLUMN, LANGUAGE_COLUMN, URI_COLUMN, nil];
     }
 
     return _o_sharedInstance;
@@ -109,6 +110,9 @@ static VLCMainMenu *_o_sharedInstance = nil;
         [o_mu_playlistTableColumnsContextMenu release];
 
     [self releaseRepresentedObjects:[NSApp mainMenu]];
+
+    [o_ptc_translation_dict release];
+    [o_ptc_menuorder release];
 
     [super dealloc];
 }
