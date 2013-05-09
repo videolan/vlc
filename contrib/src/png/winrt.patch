@@ -1,0 +1,23 @@
+--- png/pngpriv.h.orig	2013-05-09 15:17:34.933583625 +0200
++++ png/pngpriv.h	2013-05-09 15:18:33.981581142 +0200
+@@ -360,11 +360,7 @@
+ 
+ /* Memory model/platform independent fns */
+ #ifndef PNG_ABORT
+-#  ifdef _WINDOWS_
+-#    define PNG_ABORT() ExitProcess(0)
+-#  else
+ #    define PNG_ABORT() abort()
+-#  endif
+ #endif
+ 
+ #ifdef USE_FAR_KEYWORD
+@@ -381,7 +377,7 @@
+ #  ifdef _WINDOWS_  /* Favor Windows over C runtime fns */
+ #    define CVT_PTR(ptr)         (ptr)
+ #    define CVT_PTR_NOCHECK(ptr) (ptr)
+-#    define png_strlen  lstrlenA
++#    define png_strlen  strlen
+ #    define png_memcmp  memcmp
+ #    define png_memcpy  CopyMemory
+ #    define png_memset  memset

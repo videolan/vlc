@@ -14,6 +14,7 @@ $(TARBALLS)/libpng-$(PNG_VERSION).tar.bz2:
 
 png: libpng-$(PNG_VERSION).tar.bz2 .sum-png
 	$(UNPACK)
+	$(APPLY) $(SRC)/png/winrt.patch
 	$(MOVE)
 
 DEPS_png = zlib $(DEPS_zlib)
