@@ -217,12 +217,18 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [self setProfileNames: [defaults arrayForKey:@"CASProfileNames"]];
     [self recreateProfilePopup];
 
-    _videoCodecs = @[@[@"MPEG-1", @"MPEG-2", @"MPEG-4", @"DIVX 1", @"DIVX 2", @"DIVX 3", @"H.263", @"H.264", @"VP8", @"WMV1", @"WMV2", @"M-JPEG", @"Theora", @"Dirac"],
-  @[@"mpgv", @"mp2v", @"mp4v", @"DIV1", @"DIV2", @"DIV3", @"H263", @"h264", @"VP80", @"WMV1", @"WMV2", @"MJPG", @"theo", @"drac"]];
-    _audioCodecs = @[@[@"MPEG Audio", @"MP3", @"MPEG 4 Audio (AAC)", @"A52/AC-3", @"Vorbis", @"Flac", @"Speex", @"WAV", @"WMA2"],
-                    @[@"mpga", @"mp3", @"mp4a", @"a52", @"vorb", @"flac", @"spx", @"s16l", @"wma2"]];
-    _subsCodecs = @[@[@"DVB subtitle", @"T.140"],
-                   @[@"dvbs", @"t140"]];
+    _videoCodecs = [[NSArray alloc] initWithObjects:
+                    @[@"MPEG-1", @"MPEG-2", @"MPEG-4", @"DIVX 1", @"DIVX 2", @"DIVX 3", @"H.263", @"H.264", @"VP8", @"WMV1", @"WMV2", @"M-JPEG", @"Theora", @"Dirac"],
+                    @[@"mpgv", @"mp2v", @"mp4v", @"DIV1", @"DIV2", @"DIV3", @"H263", @"h264", @"VP80", @"WMV1", @"WMV2", @"MJPG", @"theo", @"drac"],
+                    nil];
+    _audioCodecs = [[NSArray alloc] initWithObjects:
+                    @[@"MPEG Audio", @"MP3", @"MPEG 4 Audio (AAC)", @"A52/AC-3", @"Vorbis", @"Flac", @"Speex", @"WAV", @"WMA2"],
+                    @[@"mpga", @"mp3", @"mp4a", @"a52", @"vorb", @"flac", @"spx", @"s16l", @"wma2"],
+                    nil];
+    _subsCodecs = [[NSArray alloc] initWithObjects:
+                   @[@"DVB subtitle", @"T.140"],
+                   @[@"dvbs", @"t140"],
+                    nil];
 
     [_customize_vid_codec_pop removeAllItems];
     [_customize_vid_scale_pop removeAllItems];
