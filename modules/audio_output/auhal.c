@@ -1060,6 +1060,8 @@ static void RebuildDeviceList(audio_output_t * p_aout)
 
     struct aout_sys_t   *p_sys = p_aout->sys;
 
+    ReportDevice(p_aout, 0, _("System Sound Output Device"));
+
     /* setup local array */
     currentListOfDevices = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
 
@@ -1168,8 +1170,6 @@ static void RebuildDeviceList(audio_output_t * p_aout)
     CFRelease(p_sys->device_list);
     p_sys->device_list = CFArrayCreateCopy(kCFAllocatorDefault, currentListOfDevices);
     CFRelease(currentListOfDevices);
-
-    ReportDevice(p_aout, 0, _("System Sound Output Device"));
 
     free(deviceIDs);
 }
