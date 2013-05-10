@@ -198,6 +198,7 @@ check_android_sdk()
 	add_make "ANDROID_ABI := ${ANDROID_ABI}"
 	[ ${ANDROID_ABI} = "armeabi-v7a" ] && add_make_enabled "HAVE_NEON"
 	[ ${ANDROID_ABI} = "armeabi-v7a" ] && add_make_enabled "HAVE_ARMV7A"
+	[ ${ANDROID_ABI} = "armeabi" -a -z "${NO_ARMV6}" ] && add_make_enabled "HAVE_ARMV6"
 }
 
 test -z "$PREFIX" || add_make "PREFIX := $PREFIX"
