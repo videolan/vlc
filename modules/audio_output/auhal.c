@@ -309,6 +309,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
             msg_Dbg(p_aout, "using default audio device %i", defaultDeviceID);
 
         p_sys->i_selected_dev = defaultDeviceID;
+        p_sys->b_selected_dev_is_digital = var_InheritBool(p_aout, "spdif");
     }
 
     // recheck if device still supports digital
