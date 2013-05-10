@@ -60,6 +60,8 @@
 
 @synthesize MRL=_MRL, outputDestination=_outputDestination, profileNames=_profileNames, profileValueList=_profileValueList, currentProfile=_currentProfile;
 
+@synthesize vidBitrate, vidFramerate, audBitrate, audChannels;
+
 static VLCConvertAndSave *_o_sharedInstance = nil;
 
 #pragma mark -
@@ -694,13 +696,13 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_customize_vid_ckb setState:[components[1] intValue]];
     [_customize_aud_ckb setState:[components[2] intValue]];
     [_customize_subs_ckb setState:[components[3] intValue]];
-    [_customize_vid_bitrate_fld setStringValue:components[5]];
+    [self setVidBitrate:[components[5] intValue]];
     [_customize_vid_scale_pop selectItemWithTitle:components[6]];
-    [_customize_vid_framerate_fld setStringValue:components[7]];
+    [self setVidFramerate:[components[7] intValue]];
     [_customize_vid_width_fld setStringValue:components[8]];
     [_customize_vid_height_fld setStringValue:components[9]];
-    [_customize_aud_bitrate_fld setStringValue:components[11]];
-    [_customize_aud_channels_fld setStringValue:components[12]];
+    [self setAudBitrate:[components[11] intValue]];
+    [self setAudChannels:[components[12] intValue]];
     [_customize_aud_samplerate_pop selectItemWithTitle:components[13]];
     [_customize_subs_overlay_ckb setState:[components[15] intValue]];
 
@@ -955,9 +957,9 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         [self.currentProfile addObject: _videoCodecs[1][i]];
     else
         [self.currentProfile addObject: @"none"];
-    [self.currentProfile addObject: [NSString stringWithFormat:@"%i", [_customize_vid_bitrate_fld intValue]]];
+    [self.currentProfile addObject: [NSString stringWithFormat:@"%i", [self vidBitrate]]];
     [self.currentProfile addObject: [NSString stringWithFormat:@"%i", [[[_customize_vid_scale_pop selectedItem] title] intValue]]];
-    [self.currentProfile addObject: [NSString stringWithFormat:@"%i", [_customize_vid_framerate_fld intValue]]];
+    [self.currentProfile addObject: [NSString stringWithFormat:@"%i", [self vidFramerate]]];
     [self.currentProfile addObject: [NSString stringWithFormat:@"%i", [_customize_vid_width_fld intValue]]];
     [self.currentProfile addObject: [NSString stringWithFormat:@"%i", [_customize_vid_height_fld intValue]]];
     i = [_customize_aud_codec_pop indexOfSelectedItem];
@@ -965,8 +967,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         [self.currentProfile addObject: _audioCodecs[1][i]];
     else
         [self.currentProfile addObject: @"none"];
-    [self.currentProfile addObject: [NSString stringWithFormat:@"%i", [_customize_aud_bitrate_fld intValue]]];
-    [self.currentProfile addObject: [NSString stringWithFormat:@"%i", [_customize_aud_channels_fld intValue]]];
+    [self.currentProfile addObject: [NSString stringWithFormat:@"%i", [self audBitrate]]];
+    [self.currentProfile addObject: [NSString stringWithFormat:@"%i", [self audChannels]]];
     [self.currentProfile addObject: [[_customize_aud_samplerate_pop selectedItem] title]];
     i = [_customize_subs_pop indexOfSelectedItem];
     if (i >= 0)

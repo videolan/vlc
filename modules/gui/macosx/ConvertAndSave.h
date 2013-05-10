@@ -128,6 +128,13 @@
 @property (readwrite, retain) NSArray * profileValueList;
 @property (readwrite, retain) NSMutableArray * currentProfile;
 
+/* Bindings for field / stepper combis */
+@property (nonatomic) int vidBitrate;
+@property (nonatomic) int vidFramerate;
+@property (nonatomic) int audBitrate;
+@property (nonatomic) int audChannels;
+
+
 + (VLCConvertAndSave *)sharedInstance;
 
 - (IBAction)toggleWindow;
