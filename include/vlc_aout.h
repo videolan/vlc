@@ -201,7 +201,7 @@ VLC_API void aout_Deinterleave(void *dst, const void *src, unsigned samples,
                              unsigned channels, vlc_fourcc_t fourcc);
 
 /**
- * This fonction will compute the extraction parameter into pi_selection to go
+ * This function will compute the extraction parameter into pi_selection to go
  * from i_channels with their type given by pi_order_src[] into the order
  * describe by pi_order_dst.
  * It will also set :
