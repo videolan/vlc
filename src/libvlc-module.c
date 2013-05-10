@@ -1462,7 +1462,7 @@ vlc_module_begin ()
     add_obsolete_integer( "volume" ) /* since 2.1.0 */
     add_float( "volume-step", AOUT_VOLUME_STEP, VOLUME_STEP_TEXT,
                  VOLUME_STEP_LONGTEXT, true )
-        change_integer_range( 1, AOUT_VOLUME_DEFAULT )
+        change_float_range( 1., AOUT_VOLUME_DEFAULT )
     add_bool( "volume-save", true, VOLUME_SAVE_TEXT, VOLUME_SAVE_TEXT, true )
     add_obsolete_integer( "aout-rate" ) /* since 2.0.0 */
     add_obsolete_bool( "hq-resampling" ) /* since 1.1.8 */
