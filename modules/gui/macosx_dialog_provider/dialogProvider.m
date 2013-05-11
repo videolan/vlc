@@ -597,6 +597,17 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(syncTextField:)  name:NSControlTextDidChangeNotification object:field];
             return field;
         }
+        case EXTENSION_WIDGET_CHECK_BOX:
+        {
+            VLCDialogButton *button = [[VLCDialogButton alloc] init];
+            [button setButtonType:NSSwitchButton];
+            [button setWidget:widget];
+            [button setAction:@selector(triggerClick:)];
+            [button setTarget:self];
+            [[button cell] setControlSize:NSRegularControlSize];
+            [button setAutoresizingMask:NSViewWidthSizable];
+            return button;
+        }
         case EXTENSION_WIDGET_BUTTON:
         {
             VLCDialogButton *button = [[VLCDialogButton alloc] init];
