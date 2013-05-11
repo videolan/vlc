@@ -1195,6 +1195,9 @@ static void RebuildDeviceList(audio_output_t * p_aout)
     p_sys->device_list = CFArrayCreateCopy(kCFAllocatorDefault, currentListOfDevices);
     CFRelease(currentListOfDevices);
 
+    if(!CFArrayContainsValue(p_sys->device_list, CFRangeMake(0, CFArrayGetCount(p_sys->device_list)),CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &p_sys->i_selected_dev)))
+        aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+
     free(deviceIDs);
 }
 
@@ -1491,7 +1494,6 @@ static OSStatus HardwareListener(AudioObjectID inObjectID,  UInt32 inNumberAddre
     }
 
     RebuildDeviceList(p_aout);
-    aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
 
     return err;
 }
