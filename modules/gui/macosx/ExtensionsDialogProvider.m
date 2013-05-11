@@ -566,6 +566,7 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
  **/
 - (void)manageDialog:(extension_dialog_t *)p_dialog
 {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     assert(p_dialog);
     ExtensionsManager *extMgr = [ExtensionsManager getInstance:p_intf];
     assert(extMgr != NULL);
@@ -574,6 +575,7 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
     [self performSelectorOnMainThread:@selector(updateExtensionDialog:)
                            withObject:o_value
                         waitUntilDone:YES];
+    [pool release];
 }
 
 @end
