@@ -2,18 +2,18 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1060</int>
-    <string key="IBDocument.SystemVersion">12C60</string>
+    <string key="IBDocument.SystemVersion">12D78</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1187.34</string>
-    <string key="IBDocument.HIToolboxVersion">625.00</string>
+    <string key="IBDocument.AppKitVersion">1187.37</string>
+    <string key="IBDocument.HIToolboxVersion">626.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
       <string key="NS.object.0">851</string>
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="1"/>
       <integer value="2"/>
+      <integer value="1"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -405,19 +405,19 @@
           <object class="NSButton" id="505211502">
             <reference key="NSNextResponder" ref="669633479"/>
             <int key="NSvFlags">268</int>
-            <string key="NSFrame">{{48, 1}, {14, 16}}</string>
+            <string key="NSFrame">{{47, 3}, {14, 16}}</string>
             <reference key="NSSuperview" ref="669633479"/>
             <string key="NSReuseIdentifierKey">_NS:610</string>
             <bool key="NSEnabled">YES</bool>
             <object class="NSButtonCell" key="NSCell" id="856613968">
-              <int key="NSCellFlags">-2080374784</int>
-              <int key="NSCellFlags2">134217728</int>
+              <int key="NSCellFlags">67108864</int>
+              <int key="NSCellFlags2">0</int>
               <string key="NSContents"/>
               <reference key="NSSupport" ref="755735334"/>
               <string key="NSCellIdentifier">_NS:610</string>
               <reference key="NSControlView" ref="505211502"/>
               <int key="NSButtonFlags">138690560</int>
-              <int key="NSButtonFlags2">6</int>
+              <int key="NSButtonFlags2">194</int>
               <string key="NSAlternateContents"/>
               <string key="NSKeyEquivalent"/>
               <int key="NSPeriodicDelay">200</int>
@@ -428,19 +428,19 @@
           <object class="NSButton" id="207102644">
             <reference key="NSNextResponder" ref="669633479"/>
             <int key="NSvFlags">268</int>
-            <string key="NSFrame">{{28, 1}, {14, 16}}</string>
+            <string key="NSFrame">{{27, 3}, {14, 16}}</string>
             <reference key="NSSuperview" ref="669633479"/>
             <string key="NSReuseIdentifierKey">_NS:610</string>
             <bool key="NSEnabled">YES</bool>
             <object class="NSButtonCell" key="NSCell" id="637045118">
               <int key="NSCellFlags">67108864</int>
-              <int key="NSCellFlags2">134217728</int>
+              <int key="NSCellFlags2">0</int>
               <string key="NSContents"/>
               <reference key="NSSupport" ref="755735334"/>
               <string key="NSCellIdentifier">_NS:610</string>
               <reference key="NSControlView" ref="207102644"/>
               <int key="NSButtonFlags">138690560</int>
-              <int key="NSButtonFlags2">6</int>
+              <int key="NSButtonFlags2">194</int>
               <string key="NSAlternateContents"/>
               <string key="NSKeyEquivalent"/>
               <int key="NSPeriodicDelay">200</int>
@@ -451,19 +451,20 @@
           <object class="NSButton" id="101032218">
             <reference key="NSNextResponder" ref="669633479"/>
             <int key="NSvFlags">268</int>
-            <string key="NSFrame">{{8, 1}, {14, 16}}</string>
+            <string key="NSFrame">{{7, 3}, {14, 16}}</string>
             <reference key="NSSuperview" ref="669633479"/>
             <string key="NSReuseIdentifierKey">_NS:610</string>
             <bool key="NSEnabled">YES</bool>
             <object class="NSButtonCell" key="NSCell" id="597554768">
               <int key="NSCellFlags">67108864</int>
-              <int key="NSCellFlags2">134217728</int>
+              <int key="NSCellFlags2">0</int>
               <string key="NSContents"/>
               <reference key="NSSupport" ref="755735334"/>
               <string key="NSCellIdentifier">_NS:610</string>
               <reference key="NSControlView" ref="101032218"/>
-              <int key="NSButtonFlags">139214848</int>
-              <int key="NSButtonFlags2">6</int>
+              <int key="NSButtonFlags">138821632</int>
+              <int key="NSButtonFlags2">194</int>
+              <reference key="NSAlternateImage" ref="755735334"/>
               <string key="NSAlternateContents"/>
               <string key="NSKeyEquivalent"/>
               <int key="NSPeriodicDelay">200</int>
