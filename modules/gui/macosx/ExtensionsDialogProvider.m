@@ -497,10 +497,14 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
     assert(p_dialog);
 
     VLCDialogWindow *dialogWindow = (VLCDialogWindow*) p_dialog->p_sys_intf;
-    if (!dialogWindow)
+    if (!dialogWindow) {
+        msg_Warn(VLCIntf, "dialog window not found");
         return VLC_EGENERIC;
+    }
 
-    [VLCDialogWindow release];
+    [dialogWindow setDelegate:nil];
+    [dialogWindow close];
+    dialogWindow = nil;
 
     p_dialog->p_sys_intf = NULL;
     vlc_cond_signal(&p_dialog->cond);
