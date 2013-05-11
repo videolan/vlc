@@ -1,10 +1,11 @@
 /*****************************************************************************
  * ExtensionsDialogProvider.m: Mac OS X Extensions Dialogs
  *****************************************************************************
- * Copyright (C) 2005-2012 VLC authors and VideoLAN
+ * Copyright (C) 2010-2013 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Brendon Justin <brendonjustin@gmail.com>,
+ * Authors: Pierre d'Herbemont <pdherbemont # videolan org>
+ *          Brendon Justin <brendonjustin@gmail.com>,
  *          Derk-Jan Hartman <hartman@videolan dot org>,
  *          Felix Paul Kühne <fkuehne@videolan dot org>
  *
