@@ -609,10 +609,33 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_18; // L R Ls Rs LFE
             break;
         case 6:
-            if (fmt->i_physical_channels & (AOUT_CHAN_LFE))
+            if (fmt->i_physical_channels & (AOUT_CHAN_LFE)) {
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_20; // L R Ls Rs C LFE
-            else
+
+                chans_out[0] = AOUT_CHAN_LEFT;
+                chans_out[1] = AOUT_CHAN_RIGHT;
+                chans_out[2] = AOUT_CHAN_REARLEFT;
+                chans_out[3] = AOUT_CHAN_REARRIGHT;
+                chans_out[4] = AOUT_CHAN_CENTER;
+                chans_out[5] = AOUT_CHAN_LFE;
+
+                p_aout->sys->chans_to_reorder = aout_CheckChannelReorder(NULL, chans_out, fmt->i_physical_channels, p_aout->sys->chan_table);
+                if (p_aout->sys->chans_to_reorder)
+                    msg_Dbg(p_aout, "channel reordering needed for 5.1 output");
+            } else {
                 new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_6_0; // L R Ls Rs C Cs
+
+                chans_out[0] = AOUT_CHAN_LEFT;
+                chans_out[1] = AOUT_CHAN_RIGHT;
+                chans_out[2] = AOUT_CHAN_REARLEFT;
+                chans_out[3] = AOUT_CHAN_REARRIGHT;
+                chans_out[4] = AOUT_CHAN_CENTER;
+                chans_out[5] = AOUT_CHAN_REARCENTER;
+
+                p_aout->sys->chans_to_reorder = aout_CheckChannelReorder(NULL, chans_out, fmt->i_physical_channels, p_aout->sys->chan_table);
+                if (p_aout->sys->chans_to_reorder)
+                    msg_Dbg(p_aout, "channel reordering needed for 6.0 output");
+            }
             break;
         case 7:
             new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_6_1_A; // L R C LFE Ls Rs Cs
