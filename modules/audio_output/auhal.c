@@ -279,23 +279,23 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     msg_Dbg(p_aout, "attempting to use device %i", p_sys->i_selected_dev);
 
-    /* Check if the desired device is alive and usable */
-    i_param_size = sizeof(b_alive);
-    AudioObjectPropertyAddress audioDeviceAliveAddress = { kAudioDevicePropertyDeviceIsAlive,
-                                              kAudioObjectPropertyScopeGlobal,
-                                              kAudioObjectPropertyElementMaster };
-    err = AudioObjectGetPropertyData(p_sys->i_selected_dev, &audioDeviceAliveAddress, 0, NULL, &i_param_size, &b_alive);
+    AudioObjectPropertyAddress audioDeviceAliveAddress = { kAudioDevicePropertyDeviceIsAlive, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+    if (p_sys->i_selected_dev > 0) {
+        /* Check if the desired device is alive and usable */
+        i_param_size = sizeof(b_alive);
+        err = AudioObjectGetPropertyData(p_sys->i_selected_dev, &audioDeviceAliveAddress, 0, NULL, &i_param_size, &b_alive);
+        if (err != noErr) {
+            /* Be tolerant, only give a warning here */
+            msg_Warn(p_aout, "could not check whether device [0x%x] is alive [%4.4s]",
+                     (unsigned int)p_sys->i_selected_dev, (char *)&err);
+            b_alive = false;
+        }
 
-    if (err != noErr) {
-        /* Be tolerant, only give a warning here */
-        msg_Warn(p_aout, "could not check whether device [0x%x] is alive [%4.4s]",
-                           (unsigned int)p_sys->i_selected_dev, (char *)&err);
-        b_alive = false;
+        if (!b_alive)
+            msg_Warn(p_aout, "selected audio device is not alive, switching to default device");
     }
 
     if (!b_alive || p_sys->i_selected_dev == 0) {
-        msg_Warn(p_aout, "selected audio device is not alive, switching to default device");
-
         AudioObjectID defaultDeviceID = 0;
         UInt32 propertySize = 0;
         AudioObjectPropertyAddress defaultDeviceAddress = { kAudioHardwarePropertyDefaultOutputDevice, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
