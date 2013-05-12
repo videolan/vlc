@@ -104,7 +104,7 @@ vlc_module_end ()
 
 //Guessing table for missing "default region triplet"
 static const int pi_default_triplet[] = {
- 0, 0,           // slo cze
+ 0, 0, 0, 0,     // slo slk cze ces
  8,              // pol
  24,24,24,24,    //ssc scr slv rum
  32,32,32,32,32, //est lit rus bul ukr
@@ -113,7 +113,7 @@ static const int pi_default_triplet[] = {
  88,             //heb
  16 };           //default
 static const char *const ppsz_default_triplet[] = {
- "slo", "cze",
+ "slo", "slk", "cze", "ces",
  "pol",
  "ssc", "scr", "slv", "rum",
  "est", "lit", "rus", "bul", "ukr",
