@@ -27,6 +27,8 @@
 #include <errno.h>
 #include <search.h>
 #include <poll.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include <libudev.h>
 
