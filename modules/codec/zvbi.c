@@ -106,7 +106,7 @@ vlc_module_end ()
 static const int pi_default_triplet[] = {
  0, 0, 0, 0,     // slo slk cze ces
  8,              // pol
- 24,24,24,24,    //ssc scr slv rum
+ 24,24,24,24,    //scc scr slv rum
  32,32,32,32,32, //est lit rus bul ukr
  48,48,          //gre ell
  64,             //ara
@@ -115,7 +115,7 @@ static const int pi_default_triplet[] = {
 static const char *const ppsz_default_triplet[] = {
  "slo", "slk", "cze", "ces",
  "pol",
- "ssc", "scr", "slv", "rum",
+ "scc", "scr", "slv", "rum",
  "est", "lit", "rus", "bul", "ukr",
  "gre", "ell",
  "ara",
