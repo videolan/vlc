@@ -154,7 +154,7 @@ MRESULT EXPENTRY OS2Factory::OS2Proc( HWND hwnd, ULONG msg,
 
 OS2Factory::OS2Factory( intf_thread_t *pIntf ):
     OSFactory( pIntf ), m_hParentWindow( 0 ),
-    m_dirSep( "\\" ), m_pfnwpOldFrameProc( 0 )
+    m_pfnwpOldFrameProc( 0 ), m_dirSep( "\\" )
 {
     // see init()
 }
@@ -203,6 +203,9 @@ bool OS2Factory::init()
     WinSetWindowPos( m_hParentWindow, HWND_TOP, 0, 0, 0, 0,
                      SWP_ACTIVATE | SWP_ZORDER | SWP_MOVE | SWP_SIZE |
                      SWP_SHOW );
+
+    // Set the mouse pointer to a default arrow
+    changeCursor( kDefaultArrow );
 
     // Initialize the resource path
     char *datadir = config_GetUserDir( VLC_DATA_DIR );
@@ -407,6 +410,8 @@ void OS2Factory::changeCursor( CursorType_t type ) const
 
     HPOINTER hptr = WinQuerySysPointer( HWND_DESKTOP, id, FALSE );
     WinSetPointer( HWND_DESKTOP, hptr );
+
+    m_cursorType = type;
 }
 
 

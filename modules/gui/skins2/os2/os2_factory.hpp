@@ -121,7 +121,11 @@ public:
     /// Map to find the GenericWindow associated with a OS2Window
     map<HWND, GenericWindow*> m_windowMap;
 
+    /// Get the parent window handle
     HWND getParentWindow() { return m_hParentClientWindow; }
+
+    /// Get the m_cursorType
+    CursorType_t getCursorType() const { return m_cursorType; }
 
     /// Callback function (Windows Procedure)
     static MRESULT EXPENTRY OS2FrameProc( HWND hwnd, ULONG msg,
@@ -136,12 +140,14 @@ private:
     HAB m_hab;
     /// Handle of message queue
     HMQ m_hmq;
-    /// Window procedure of the old frame window
-    PFNWP m_pfnwpOldFrameProc;
     /// Handle of the parent window
     HWND m_hParentWindow;
     /// Handle of the client window of the parent window
     HWND m_hParentClientWindow;
+    /// Window procedure of the old frame window
+    PFNWP m_pfnwpOldFrameProc;
+    /// Cursor type
+    mutable CursorType_t m_cursorType;
     /// Directory separator
     const string m_dirSep;
     /// Resource path

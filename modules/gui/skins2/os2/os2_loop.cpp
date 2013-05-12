@@ -147,14 +147,17 @@ MRESULT EXPENTRY OS2Loop::processEvent( HWND hwnd, ULONG msg,
         }
         case WM_MOUSEMOVE:
         {
+            pFactory->changeCursor( pFactory->getCursorType());
+
             // Compute the absolute position of the mouse
-            int x = GET_X_MP( mp1 ) + win.getLeft();
-            int y = GET_Y_MP( mp1 ) + win.getTop();
+            POINTL ptl;
+            WinQueryPointerPos( HWND_DESKTOP, &ptl );
+            int x = ptl.x;
+            int y = ( pFactory->getScreenHeight() - 1 ) - ptl.y;
             EvtMotion evt( getIntf(), x, y );
             win.processEvent( evt );
 
-            // fall though to WinDefWindowProc()
-            break;
+            return MRFROMLONG( TRUE );
         }
         case WM_MOUSELEAVE:
         {
