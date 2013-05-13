@@ -206,7 +206,9 @@ static int Open(vlc_object_t *obj)
     p_sys->b_mute = var_InheritBool(p_aout, "mute");
     aout_MuteReport(p_aout, p_sys->b_mute);
 
-    SwitchAudioDevice(p_aout, config_GetPsz(p_aout, "auhal-audio-device"));
+    char *psz_audio_device = config_GetPsz(p_aout, "auhal-audio-device");
+    SwitchAudioDevice(p_aout, psz_audio_device);
+    free(psz_audio_device);
 
     return VLC_SUCCESS;
 }
