@@ -809,6 +809,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
     [[o_mu_device itemWithTag:[[NSString stringWithFormat:@"%s", currentDevice] intValue]] setState:NSOnState];
 
+    free(currentDevice);
+
     for (NSUInteger x = 0; x < n; x++) {
         free(ids[x]);
         free(names[x]);
