@@ -147,7 +147,7 @@ static OSStatus RenderCallbackSPDIF     (AudioDeviceID, const AudioTimeStamp *, 
 static OSStatus HardwareListener        (AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void *);
 static OSStatus StreamListener          (AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void *);
 
-static int      RegisterAudioStreamsCallback(audio_output_t *, AudioDeviceID);
+static int      ManageAudioStreamsCallback(audio_output_t *p_aout, AudioDeviceID i_dev_id, bool b_register);
 static int      AudioDeviceHasOutput    (AudioDeviceID);
 static int      AudioDeviceSupportsDigital(audio_output_t *, AudioDeviceID);
 static int      AudioStreamSupportsDigital(audio_output_t *, AudioStreamID);
@@ -226,19 +226,20 @@ static void Close(vlc_object_t *obj)
     if (err != noErr)
         msg_Err(p_aout, "AudioHardwareRemovePropertyListener failed [%4.4s]", (char *)&err);
 
+    /* remove streams callbacks */
+    CFIndex count = CFArrayGetCount(p_sys->device_list);
+    if (count > 0) {
+        for (CFIndex x = 0; x < count; x++) {
+            AudioDeviceID deviceId = 0;
+            CFNumberRef cfn_device_id = CFArrayGetValueAtIndex(p_sys->device_list, x);
+            if (!cfn_device_id)
+                continue;
 
-    /* remove audio device alive callback */
-    AudioObjectPropertyAddress deviceAliveAddress = { kAudioDevicePropertyDeviceIsAlive, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
-    err = AudioObjectRemovePropertyListener(p_sys->i_selected_dev, &deviceAliveAddress, HardwareListener, (void *)p_aout);
-    if (err != noErr)
-        msg_Err(p_aout, "failed to remove audio device life checker [%4.4s]", (char *)&err);
-
-    /* remove audio streams callback */
-    if (p_sys->i_stream_id > 0) {
-        AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyAvailablePhysicalFormats, kAudioObjectPropertyScopeGlobal, 0 };
-        err = AudioObjectRemovePropertyListener(p_sys->i_stream_id, &physicalFormatsAddress, HardwareListener, (void *)p_aout);
-        if (err != noErr)
-            msg_Err(p_aout, "failed to remove audio device property streams callback [%4.4s]", (char *)&err);
+            CFNumberGetValue(cfn_device_id, kCFNumberSInt32Type, &deviceId);
+            if (!(deviceId & AOUT_VAR_SPDIF_FLAG)) {
+                ManageAudioStreamsCallback(p_aout, deviceId, false);
+            }
+        }
     }
 
     config_PutPsz(p_aout, "auhal-audio-device", aout_DeviceGet(p_aout));
@@ -1058,6 +1059,16 @@ static void Stop(audio_output_t *p_aout)
             msg_Err(p_aout, "Failed to release hogmode [%4.4s]", (char *)&err);
     }
 
+    /* remove audio device alive callback */
+    AudioObjectPropertyAddress deviceAliveAddress = { kAudioDevicePropertyDeviceIsAlive, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+    err = AudioObjectRemovePropertyListener(p_sys->i_selected_dev, &deviceAliveAddress, HardwareListener, (void *)p_aout);
+    if (err != noErr) {
+        /* Be tolerant, only give a warning here */
+        msg_Warn(p_aout, "failed to remove audio device life checker [%4.4s]", (char *)&err);
+    }
+
+
+
     p_sys->i_bytes_per_sample = 0;
     p_sys->b_digital = false;
 
@@ -1169,7 +1180,7 @@ static void RebuildDeviceList(audio_output_t * p_aout)
         }
 
         // TODO: only register once for each device
-        RegisterAudioStreamsCallback(p_aout, deviceIDs[i]);
+        ManageAudioStreamsCallback(p_aout, deviceIDs[i], true);
 
         CFRelease(device_name_ref);
         free(psz_name);
@@ -1469,8 +1480,6 @@ static OSStatus HardwareListener(AudioObjectID inObjectID,  UInt32 inNumberAddre
     OSStatus err = noErr;
     audio_output_t     *p_aout = (audio_output_t *)inClientData;
     VLC_UNUSED(inObjectID);
-    VLC_UNUSED(inNumberAddresses);
-    VLC_UNUSED(inAddresses);
 
     if (!p_aout)
         return -1;
@@ -1524,7 +1533,7 @@ static OSStatus StreamListener(AudioObjectID inObjectID,  UInt32 inNumberAddress
 #pragma mark -
 #pragma mark helpers
 
-static int RegisterAudioStreamsCallback(audio_output_t *p_aout, AudioDeviceID i_dev_id)
+static int ManageAudioStreamsCallback(audio_output_t *p_aout, AudioDeviceID i_dev_id, bool b_register)
 {
     OSStatus                    err = noErr;
     UInt32                      i_param_size = 0;
@@ -1535,7 +1544,7 @@ static int RegisterAudioStreamsCallback(audio_output_t *p_aout, AudioDeviceID i_
     AudioObjectPropertyAddress streamsAddress = { kAudioDevicePropertyStreams, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
     err = AudioObjectGetPropertyDataSize(i_dev_id, &streamsAddress, 0, NULL, &i_param_size);
     if (err != noErr) {
-        msg_Err(p_aout, "could not get number of streams [%4.4s] (%i)", (char *)&err, (int32_t)err);
+        msg_Err(p_aout, "could not get number of streams for device id %i [%4.4s]", i_dev_id, (char *)&err);
         return VLC_EGENERIC;
     }
 
@@ -1553,17 +1562,26 @@ static int RegisterAudioStreamsCallback(audio_output_t *p_aout, AudioDeviceID i_
     for (int i = 0; i < i_streams; i++) {
         /* get notified when physical formats change */
         AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyAvailablePhysicalFormats, kAudioObjectPropertyScopeGlobal, 0 };
-        err = AudioObjectAddPropertyListener(p_streams[i], &physicalFormatsAddress, HardwareListener, (void *)p_aout);
-        if (err != noErr) {
-            // nope just means that we already have a callback
-            if (err == kAudioHardwareIllegalOperationError) {
-                msg_Dbg(p_aout, "could not set audio stream formats property callback on stream id %i, callback already set? [%4.4s]", p_streams[i],
-                         (char *)&err);
-            } else {
-            msg_Warn(p_aout, "could not set audio stream formats property callback on stream id %i [%4.4s]", p_streams[i],
-                     (char *)&err);
+
+        if (b_register) {
+            err = AudioObjectAddPropertyListener(p_streams[i], &physicalFormatsAddress, HardwareListener, (void *)p_aout);
+            if (err != noErr) {
+                // nope just means that we already have a callback
+                if (err == kAudioHardwareIllegalOperationError) {
+                    msg_Warn(p_aout, "could not set audio stream formats property callback on stream id %i, callback already set? [%4.4s]", p_streams[i],
+                             (char *)&err);
+                } else {
+                    msg_Err(p_aout, "could not set audio stream formats property callback on stream id %i [%4.4s]", p_streams[i],
+                            (char *)&err);
+                }
             }
+
+        } else {  /* unregister callback */
+            err = AudioObjectRemovePropertyListener(p_streams[i], &physicalFormatsAddress, HardwareListener, (void *)p_aout);
+            if (err != noErr)
+                msg_Err(p_aout, "failed to remove audio device property streams callback [%4.4s]", (char *)&err);
         }
+
     }
 
     free(p_streams);
