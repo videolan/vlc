@@ -248,8 +248,9 @@ static void Close(vlc_object_t *obj)
     CFRelease(p_sys->device_list);
     vlc_mutex_unlock(&p_sys->device_list_lock);
 
-    config_PutPsz(p_aout, "auhal-audio-device", aout_DeviceGet(p_aout));
-
+    char *psz_device = aout_DeviceGet(p_aout);
+    config_PutPsz(p_aout, "auhal-audio-device", psz_device);
+    free(psz_device);
 
     vlc_mutex_destroy(&p_sys->device_list_lock);
     vlc_mutex_destroy(&p_sys->lock);
