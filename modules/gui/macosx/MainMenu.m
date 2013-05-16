@@ -969,7 +969,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         [[menu itemWithTag:intValue] setState:NSOnState];
         vlc_object_release(p_freetype);
     }
-    config_PutInt(p_freetype, [representedObject UTF8String], intValue);
+    config_PutInt(p_intf, [representedObject UTF8String], intValue);
 }
 
 - (IBAction)switchSubtitleBackgroundOpacity:(id)sender
@@ -982,7 +982,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         var_SetInteger(p_freetype, "freetype-background-opacity", intValue);
         vlc_object_release(p_freetype);
     }
-    config_PutInt(p_freetype, "freetype-background-opacity", intValue);
+    config_PutInt(p_intf, "freetype-background-opacity", intValue);
 }
 
 - (IBAction)telxTransparent:(id)sender
