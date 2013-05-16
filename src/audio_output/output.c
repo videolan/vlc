@@ -369,8 +369,14 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 
     if (!var_Type (aout, "stereo-mode"))
+    {
         var_Create (aout, "stereo-mode",
                     VLC_VAR_INTEGER | VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT);
+
+        vlc_value_t txt;
+        txt.psz_string = _("Audio Channels");
+        var_Change (aout, "stereo-mode", VLC_VAR_SETTEXT, &txt, NULL);
+    }
 
     /* The user may have selected a different channels configuration. */
     var_AddCallback (aout, "stereo-mode", aout_ChannelsRestart, NULL);
@@ -400,8 +406,6 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt)
             vlc_value_t val, txt;
             val.i_int = 0;
             var_Change (aout, "stereo-mode", VLC_VAR_DELCHOICE, &val, NULL);
-            txt.psz_string = _("Stereo audio mode");
-            var_Change (aout, "stereo-mode", VLC_VAR_SETTEXT, &txt, NULL);
             if (fmt->i_original_channels & AOUT_CHAN_DOLBYSTEREO)
             {
                 val.i_int = AOUT_VAR_CHAN_DOLBYS;
