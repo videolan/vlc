@@ -1519,6 +1519,10 @@ static VLCMainMenu *_o_sharedInstance = nil;
         }
 
         [self setupMenus]; /* Make sure video menu is up to date */
+
+    } else if ([o_title isEqualToString: _NS("Add Subtitle File...")]) {
+        bEnabled = [o_mi isEnabled];
+        [self setupMenus]; /* Make sure subtitles menu is up to date */
     } else {
         NSMenuItem *o_mi_parent = [o_mi parentItem];
         if (o_mi_parent == o_mi_subtitle_size || o_mi == o_mi_subtitle_size ||
