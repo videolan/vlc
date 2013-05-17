@@ -64,6 +64,15 @@ char *config_GetDataDir (void)
     return datadir;
 }
 
+static char *config_GetHomeDir (void)
+{
+    const char *home = getenv ("HOME");
+    if (home != NULL)
+        return FromLocaleDup (home);
+
+    return config_GetLibDir();
+}
+
 char *config_GetUserDir (vlc_userdir_t type)
 {
     switch (type)
@@ -82,5 +91,5 @@ char *config_GetUserDir (vlc_userdir_t type)
         case VLC_VIDEOS_DIR:
             break;
     }
-    return config_GetLibDir ();
+    return config_GetHomeDir ();
 }
