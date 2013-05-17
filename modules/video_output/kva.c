@@ -194,13 +194,6 @@ static void PMThread( void *arg )
     {
         sys->parent = ( HWND )sys->parent_window->handle.hwnd;
 
-        /* Workaround :
-         * When an embedded window opened first, it is not positioned
-         * correctly. So reposition it here, again.
-         */
-        WinSetWindowPos( WinQueryWindow( sys->parent, QW_PARENT ),
-                         HWND_TOP, 0, 0, 0, 0, SWP_MOVE );
-
         ULONG i_style = WinQueryWindowULong( sys->parent, QWL_STYLE );
         WinSetWindowULong( sys->parent, QWL_STYLE,
                            i_style | WS_CLIPCHILDREN );
@@ -496,15 +489,6 @@ static int Control( vout_display_t *vd, int query, va_list args )
             {
                 vout_window_SetSize(sys->parent_window,
                                     cfg->display.width, cfg->display.height);
-
-                /* Workaround :
-                 * If changing aspect ratio after resizing a main window,
-                 * an embedded window is misplaced. So reposition it, here.
-                 */
-                WinSetWindowPos( WinQueryWindow( sys->parent, QW_PARENT ),
-                                 HWND_TOP, 0, 1, 0, 0, SWP_MOVE );
-                WinSetWindowPos( WinQueryWindow( sys->parent, QW_PARENT ),
-                                 HWND_TOP, 0, 0, 0, 0, SWP_MOVE );
             }
             else
                 WinPostMsg( sys->client, WM_VLC_SIZE_CHANGE,
