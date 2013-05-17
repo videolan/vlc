@@ -470,12 +470,12 @@
     [o_playlist_header setMenu: o_context_menu];
 
     for (NSUInteger i = 0; i < count; i++) {
-        o_column = o_columnArray[i][0];
+        o_column = [[o_columnArray objectAtIndex:i] objectAtIndex:0];
         if ([o_column isEqualToString:@"status"])
             continue;
 
         [o_menu setPlaylistColumnTableState: NSOnState forColumn: o_column];
-        [[o_outline_view tableColumnWithIdentifier: o_column] setWidth: [o_columnArray[i][1] floatValue]];
+        [[o_outline_view tableColumnWithIdentifier: o_column] setWidth: [[[o_columnArray objectAtIndex:i] objectAtIndex:1] floatValue]];
     }
 
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
@@ -522,7 +522,7 @@
     /* Clear indications of any existing column sorting */
     NSUInteger count = [[o_outline_view tableColumns] count];
     for (NSUInteger i = 0 ; i < count ; i++)
-        [o_outline_view setIndicatorImage:nil inTableColumn: [o_outline_view tableColumns][i]];
+        [o_outline_view setIndicatorImage:nil inTableColumn: [[o_outline_view tableColumns] objectAtIndex:i]];
 
     [o_outline_view setHighlightedTableColumn:nil];
     o_tc_sortColumn = nil;
@@ -599,7 +599,7 @@
         id o_item;
         if ((o_item = [o_outline_dict objectForKey:
                             [NSString stringWithFormat: @"%p",
-                            [o_array[j] pointerValue]]]) != nil) {
+                            [[o_array objectAtIndex:j] pointerValue]]]) != nil) {
             [o_outline_view expandItem: o_item];
         }
     }
@@ -671,8 +671,8 @@
             if (o_items == o_nodes) {
                 if (j == i) continue;
             }
-            if ([self isItem: [o_items[i] pointerValue]
-                    inNode: [o_nodes[j] pointerValue]
+            if ([self isItem: [[o_items objectAtIndex:i] pointerValue]
+                    inNode: [[o_nodes objectAtIndex:j] pointerValue]
                     checkItemExistence: NO locked:NO]) {
                 [o_items removeObjectAtIndex:i];
                 /* We need to execute the next iteration with the same index
@@ -1009,7 +1009,7 @@
     if (o_options) {
         NSUInteger count = [o_options count];
         for (NSUInteger i = 0; i < count; i++)
-            input_item_AddOption(p_input, [o_options[i] UTF8String], VLC_INPUT_OPTION_TRUSTED);
+            input_item_AddOption(p_input, [[o_options objectAtIndex:i] UTF8String], VLC_INPUT_OPTION_TRUSTED);
     }
 
     /* Recent documents menu */
@@ -1035,7 +1035,7 @@
         NSDictionary *o_one_item;
 
         /* Get the item */
-        o_one_item = o_array[i_item];
+        o_one_item = [o_array objectAtIndex:i_item];
         p_input = [self createItem: o_one_item];
         if (!p_input)
             continue;
@@ -1068,7 +1068,7 @@
         NSDictionary *o_one_item;
 
         /* Get the item */
-        o_one_item = o_array[i_item];
+        o_one_item = [o_array objectAtIndex:i_item];
         p_input = [self createItem: o_one_item];
 
         if (!p_input)
@@ -1161,7 +1161,7 @@
 
     if (o_result != NULL) {
         int i_start;
-        if ([o_result[0] pointerValue] == p_playlist->p_local_category)
+        if ([[o_result objectAtIndex:0] pointerValue] == p_playlist->p_local_category)
             i_start = 1;
         else
             i_start = 0;
@@ -1170,11 +1170,12 @@
         for (NSUInteger i = i_start ; i < count - 1 ; i++) {
             [o_outline_view expandItem: [o_outline_dict objectForKey:
                         [NSString stringWithFormat: @"%p",
-                        [o_result[i] pointerValue]]]];
+                        [[o_result objectAtIndex:i] pointerValue]]]];
         }
         i_row = [o_outline_view rowForItem: [o_outline_dict objectForKey:
                         [NSString stringWithFormat: @"%p",
-                        [o_result[count - 1] pointerValue]]]];
+                        [[o_result objectAtIndex:count - 1 ]
+                        pointerValue]]]];
     }
     if (i_row > -1) {
         [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:i_row] byExtendingSelection:NO];
@@ -1366,7 +1367,7 @@
     NSUInteger count = [o_columns count];
     NSTableColumn * o_currentColumn;
     for (NSUInteger i = 0; i < count; i++) {
-        o_currentColumn = o_columns[i];
+        o_currentColumn = [o_columns objectAtIndex:i];
         [o_arrayToSave addObject: @[[o_currentColumn identifier], @([o_currentColumn width])]];
     }
     [[NSUserDefaults standardUserDefaults] setObject: o_arrayToSave forKey:@"PlaylistColumnSelection"];
@@ -1400,7 +1401,7 @@
     NSUInteger itemCount = [items count];
 
     for (NSUInteger i = 0 ; i < itemCount ; i++) {
-        id o_item = items[i];
+        id o_item = [items objectAtIndex:i];
 
         /* Fill the items and nodes to move in 2 different arrays */
         if (((playlist_item_t *)[o_item pointerValue])->i_children > 0)
@@ -1451,7 +1452,7 @@
         NSUInteger count = [o_nodes_array count];
         for (NSUInteger i = 0 ; i < count ; i++) {
             /* We refuse to Drop in a child of an item we are moving */
-            if ([self isItem: [item pointerValue] inNode: [o_nodes_array[i] pointerValue] checkItemExistence: NO locked:NO]) {
+            if ([self isItem: [item pointerValue] inNode: [[o_nodes_array objectAtIndex:i] pointerValue] checkItemExistence: NO locked:NO]) {
                 return NSDragOperationNone;
             }
         }
@@ -1505,7 +1506,7 @@
         PL_LOCK;
         NSUInteger j = 0;
         for (NSUInteger i = 0; i < count; i++) {
-            p_item = [o_all_items[i] pointerValue];
+            p_item = [[o_all_items objectAtIndex:i] pointerValue];
             if (p_item)
                 pp_items[j++] = p_item;
         }
@@ -1520,7 +1521,7 @@
         free(pp_items);
 
         [self playlistUpdated];
-        i_row = [o_outline_view rowForItem:[o_outline_dict objectForKey:[NSString stringWithFormat: @"%p", [o_all_items[0] pointerValue]]]];
+        i_row = [o_outline_view rowForItem:[o_outline_dict objectForKey:[NSString stringWithFormat: @"%p", [[o_all_items objectAtIndex:0] pointerValue]]]];
 
         if (i_row == -1)
             i_row = [o_outline_view rowForItem:[o_outline_dict objectForKey:[NSString stringWithFormat: @"%p", p_new_parent]]];
@@ -1546,7 +1547,7 @@
         BOOL b_returned = NO;
 
         if (count == 1 && p_input) {
-            b_returned = input_AddSubtitle(p_input, vlc_path2uri([o_values[0] UTF8String], NULL), true);
+            b_returned = input_AddSubtitle(p_input, vlc_path2uri([[o_values objectAtIndex:0] UTF8String], NULL), true);
             vlc_object_release(p_input);
             if (!b_returned)
                 return YES;
@@ -1556,7 +1557,7 @@
 
         for (NSUInteger i = 0; i < count; i++) {
             NSDictionary *o_dic;
-            char *psz_uri = vlc_path2uri([o_values[i] UTF8String], NULL);
+            char *psz_uri = vlc_path2uri([[o_values objectAtIndex:i] UTF8String], NULL);
             if (!psz_uri)
                 continue;
 

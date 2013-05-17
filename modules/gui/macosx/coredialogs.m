@@ -317,10 +317,10 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     (NSTableColumn *)theTableColumn row: (NSInteger)row
 {
     if ([[theTableColumn identifier] isEqualToString: @"error_msg"])
-        return o_errors[row];
+        return [o_errors objectAtIndex:row];
 
     if ([[theTableColumn identifier] isEqualToString: @"icon"])
-        return o_icons[row];
+        return [o_icons objectAtIndex:row];
 
     return @"unknown identifier";
 }

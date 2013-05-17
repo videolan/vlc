@@ -725,7 +725,7 @@ NSString * const PXSLDeleteKeyPressedOnRowsNotification = @"PXSourceListDeleteKe
     NSInteger row = [self rowForItem:item];
 
     //Return the default table column
-    return [[self tableColumns][0] dataCellForRow:row];
+    return [[[self tableColumns] objectAtIndex:0] dataCellForRow:row];
 }
 
 - (void)outlineView:(NSOutlineView *)outlineView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn item:(id)item

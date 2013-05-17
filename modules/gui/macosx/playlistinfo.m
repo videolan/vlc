@@ -502,7 +502,7 @@ error:
 }
 
 - (VLCInfoTreeItem *)childAtIndex:(NSUInteger)i_index {
-    return [self children][i_index];
+    return [[self children] objectAtIndex:i_index];
 }
 
 - (int)numberOfChildren {

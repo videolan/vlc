@@ -256,7 +256,7 @@ static int Open(vlc_object_t *p_this)
     NSUInteger deviceCount = [myVideoDevices count];
     for (ivideo = 0; ivideo < deviceCount; ivideo++) {
         QTCaptureDevice *qtk_device;
-        qtk_device = myVideoDevices[ivideo];
+        qtk_device = [myVideoDevices objectAtIndex:ivideo];
         msg_Dbg(p_demux, "qtcapture %lu/%lu %s %s", ivideo, deviceCount, [[qtk_device localizedDisplayName] UTF8String], [[qtk_device uniqueID] UTF8String]);
         if ([[[qtk_device uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtk_currdevice_uid]) {
             break;
@@ -268,7 +268,7 @@ static int Open(vlc_object_t *p_this)
     QTCaptureDeviceInput * input = nil;
     NSError *o_returnedError;
     if (ivideo < [myVideoDevices count])
-        p_sys->device = myVideoDevices[ivideo];
+        p_sys->device = [myVideoDevices objectAtIndex:ivideo];
     else {
         /* cannot found designated device, fall back to open default device */
         msg_Dbg(p_demux, "Cannot find designated uid device as %s, falling back to default.", [qtk_currdevice_uid UTF8String]);
@@ -306,13 +306,13 @@ static int Open(vlc_object_t *p_this)
     QTFormatDescription* camera_format = NULL;
     NSUInteger formatCount = [format_array count];
     for (NSUInteger k = 0; k < formatCount; k++) {
-        camera_format = format_array[k];
+        camera_format = [format_array objectAtIndex:k];
 
         msg_Dbg(p_demux, "localized Format: %s", [[camera_format localizedFormatSummary] UTF8String]);
         msg_Dbg(p_demux, "format description: %s", [[[camera_format formatDescriptionAttributes] description] UTF8String]);
     }
     if ([format_array count])
-        camera_format = format_array[0];
+        camera_format = [format_array objectAtIndex:0];
     else
         goto error;
 

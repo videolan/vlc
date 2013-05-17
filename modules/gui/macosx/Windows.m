@@ -134,7 +134,7 @@
     @synchronized(self) {
         current_anim = self->o_current_animation;
 
-        if ([[current_anim viewAnimations][0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeOutEffect && [current_anim isAnimating]) {
+        if ([[[current_anim viewAnimations] objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeOutEffect && [current_anim isAnimating]) {
             [anim release];
         } else {
             if (current_anim) {
@@ -186,7 +186,7 @@
     @synchronized(self) {
         current_anim = self->o_current_animation;
 
-        if ([[current_anim viewAnimations][0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeInEffect && [current_anim isAnimating]) {
+        if ([[[current_anim viewAnimations] objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeInEffect && [current_anim isAnimating]) {
             [anim release];
         } else {
             if (current_anim) {
@@ -664,8 +664,8 @@
     NSUInteger count = [subviews count];
 
     for (NSUInteger x = 0; x < count; x++) {
-        if ([subviews[x] respondsToSelector:@selector(reshape)])
-            [subviews[x] reshape];
+        if ([[subviews objectAtIndex:x] respondsToSelector:@selector(reshape)])
+            [[subviews objectAtIndex:x] reshape];
     }
 
 }
@@ -882,7 +882,7 @@
 - (void)hasBecomeFullscreen
 {
     if ([[o_video_view subviews] count] > 0)
-        [o_fullscreen_window makeFirstResponder: [o_video_view subviews][0]];
+        [o_fullscreen_window makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
 
     [o_fullscreen_window makeKeyWindow];
     [o_fullscreen_window setAcceptsMouseMovedEvents: YES];
@@ -1021,7 +1021,7 @@
     [o_video_view release];
     [o_video_view setFrame:[o_temp_view frame]];
     if ([[o_video_view subviews] count] > 0)
-        [self makeFirstResponder: [o_video_view subviews][0]];
+        [self makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
 
     [super makeKeyAndOrderFront:self]; /* our version (in main window) contains a workaround */
 
@@ -1055,7 +1055,7 @@
     /* Fullscreen ended or started (we are a delegate only for leaveFullscreen's/enterFullscren's anim2) */
     viewAnimations = [o_fullscreen_anim2 viewAnimations];
     if ([viewAnimations count] >=1 &&
-        [[viewAnimations[0] objectForKey: NSViewAnimationEffectKey] isEqualToString:NSViewAnimationFadeInEffect]) {
+        [[[viewAnimations objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] isEqualToString:NSViewAnimationFadeInEffect]) {
         /* Fullscreen ended */
         [self hasEndedFullscreen];
     } else

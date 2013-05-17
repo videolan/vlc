@@ -296,8 +296,8 @@ static int Open(vlc_object_t *p_this)
     for ( ivideo = 0; ivideo < deviceCount; ivideo++ )
     {
         AVCaptureDevice *avf_device;
-        avf_device = myVideoDevices[ivideo];
-        msg_Dbg(p_demux, "avcapture %u/%u %s %s", ivideo, deviceCount, [[avf_device modelID] UTF8String], [[avf_device uniqueID] UTF8String]);
+        avf_device = [myVideoDevices objectAtIndex:ivideo];
+        msg_Dbg(p_demux, "avcapture %lu/%lu %s %s", ivideo, deviceCount, [[avf_device modelID] UTF8String], [[avf_device uniqueID] UTF8String]);
         if ([[[avf_device uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:avf_currdevice_uid]) {
             break;
         }
@@ -305,7 +305,7 @@ static int Open(vlc_object_t *p_this)
 
     if ( ivideo < [myVideoDevices count] )
     {
-       p_sys->device = myVideoDevices[ivideo];
+       p_sys->device = [myVideoDevices objectAtIndex:ivideo];
     }
     else
     {

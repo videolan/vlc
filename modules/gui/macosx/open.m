@@ -105,7 +105,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_currentOpticalMediaIconView release];
     [o_currentOpticalMediaView release];
     for (int i = 0; i < [o_displayInfos count]; i ++) {
-        NSValue *v = o_displayInfos[i];
+        NSValue *v = [o_displayInfos objectAtIndex:i];
         free([v pointerValue]);
     }
     [o_displayInfos removeAllObjects];
@@ -240,7 +240,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         NSUInteger deviceCount = [qtkvideoDevices count];
         for (int ivideo = 0; ivideo < deviceCount; ivideo++) {
             QTCaptureDevice *qtk_device;
-            qtk_device = qtkvideoDevices[ivideo];
+            qtk_device = [qtkvideoDevices objectAtIndex:ivideo];
             [o_qtk_video_device_pop addItemWithTitle: [qtk_device localizedDisplayName]];
 
             if ([[[qtk_device uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtk_currdevice_uid])
@@ -264,7 +264,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         NSUInteger deviceCount = [qtkaudioDevices count];
         for (int iaudio = 0; iaudio < deviceCount; iaudio++) {
             QTCaptureDevice *qtkaudio_device;
-            qtkaudio_device = qtkaudioDevices[iaudio];
+            qtkaudio_device = [qtkaudioDevices objectAtIndex:iaudio];
             [o_qtk_audio_device_pop addItemWithTitle: [qtkaudio_device localizedDisplayName]];
             [o_screen_qtk_audio_pop addItemWithTitle: [qtkaudio_device localizedDisplayName]];
             if ([[[qtkaudio_device uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtkaudio_currdevice_uid]) {
@@ -463,21 +463,21 @@ static VLCOpen *_o_sharedMainInstance = nil;
             NSUInteger componentCount = [components count];
             NSInteger tempValue;
             if (componentCount == 1)
-                tempValue = [components[0] intValue];
+                tempValue = [[components objectAtIndex:0] intValue];
             else if (componentCount == 2)
-                tempValue = [components[0] intValue] * 60 + [components[1] intValue];
+                tempValue = [[components objectAtIndex:0] intValue] * 60 + [[components objectAtIndex:1] intValue];
             else if (componentCount == 3)
-                tempValue = [components[0] intValue] * 3600 + [components[1] intValue] * 60 + [components[2] intValue];
+                tempValue = [[components objectAtIndex:0] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue];
             if (tempValue > 0)
                 [o_options addObject: [NSString stringWithFormat:@"start-time=%li", tempValue]];
             components = [[o_file_stoptime_fld stringValue] componentsSeparatedByString:@":"];
             componentCount = [components count];
             if (componentCount == 1)
-                tempValue = [components[0] intValue];
+                tempValue = [[components objectAtIndex:0] intValue];
             else if (componentCount == 2)
-                tempValue = [components[0] intValue] * 60 + [components[1] intValue];
+                tempValue = [[components objectAtIndex:0] intValue] * 60 + [[components objectAtIndex:1] intValue];
             else if (componentCount == 3)
-                tempValue = [components[0] intValue] * 3600 + [components[1] intValue] * 60 + [components[2] intValue];
+                tempValue = [[components objectAtIndex:0] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue];
             if (tempValue > 0)
                 [o_options addObject: [NSString stringWithFormat:@"stop-time=%li", tempValue]];
         }
@@ -485,14 +485,14 @@ static VLCOpen *_o_sharedMainInstance = nil;
             NSArray * soutMRL = [o_sout_options soutMRL];
             NSUInteger count = [soutMRL count];
             for (NSUInteger i = 0 ; i < count ; i++)
-                [o_options addObject: [NSString stringWithString: soutMRL[i]]];
+                [o_options addObject: [NSString stringWithString: [soutMRL objectAtIndex:i]]];
         }
         if ([o_file_slave_ckbox state] && o_file_slave_path)
            [o_options addObject: [NSString stringWithFormat: @"input-slave=%@", o_file_slave_path]];
         if ([[[o_tabview selectedTabViewItem] label] isEqualToString: _NS("Capture")]) {
             if ([[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Screen")]) {
                 int selected_index = [o_screen_screen_pop indexOfSelectedItem];
-                NSValue *v = o_displayInfos[selected_index];
+                NSValue *v = [o_displayInfos objectAtIndex:selected_index];
                 struct display_info_t *item = (struct display_info_t *)[v pointerValue];
 
                 [o_options addObject: [NSString stringWithFormat: @"screen-fps=%f", [o_screen_fps_fld floatValue]]];
@@ -532,7 +532,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     int selected_index = [o_screen_screen_pop indexOfSelectedItem];
     if (selected_index >= [o_displayInfos count]) return;
 
-    NSValue *v = o_displayInfos[selected_index];
+    NSValue *v = [o_displayInfos objectAtIndex:selected_index];
     struct display_info_t *item = (struct display_info_t *)[v pointerValue];
 
     [o_screen_left_stp setMaxValue: item->rect.size.width];
@@ -547,13 +547,13 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     NSInteger i_selectedDevice = [o_qtk_video_device_pop indexOfSelectedItem];
     if ([qtkvideoDevices count] >= 1) {
-        NSValue *sizes = [[qtkvideoDevices[i_selectedDevice] formatDescriptions][0] attributeForKey: QTFormatDescriptionVideoEncodedPixelsSizeAttribute];
+        NSValue *sizes = [[[[qtkvideoDevices objectAtIndex:i_selectedDevice] formatDescriptions] objectAtIndex:0] attributeForKey: QTFormatDescriptionVideoEncodedPixelsSizeAttribute];
 
         [o_capture_width_fld setIntValue: [sizes sizeValue].width];
         [o_capture_height_fld setIntValue: [sizes sizeValue].height];
         [o_capture_width_stp setIntValue: [o_capture_width_fld intValue]];
         [o_capture_height_stp setIntValue: [o_capture_height_fld intValue]];
-        qtk_currdevice_uid = [[(QTCaptureDevice *)qtkvideoDevices[i_selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        qtk_currdevice_uid = [[(QTCaptureDevice *)[qtkvideoDevices objectAtIndex:i_selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
 }
 
@@ -561,7 +561,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     NSInteger i_selectedDevice = [o_qtk_audio_device_pop indexOfSelectedItem];
     if ([qtkaudioDevices count] >= 1) {
-        qtkaudio_currdevice_uid = [[(QTCaptureDevice *)qtkaudioDevices[i_selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        qtkaudio_currdevice_uid = [[(QTCaptureDevice *)[qtkaudioDevices objectAtIndex:i_selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
     [o_screen_qtk_audio_pop selectItemAtIndex: i_selectedDevice];
     [o_qtk_audio_device_pop selectItemAtIndex: i_selectedDevice];
@@ -674,12 +674,12 @@ static VLCOpen *_o_sharedMainInstance = nil;
         NSMutableArray *o_values = [NSMutableArray arrayWithCapacity:count];
         NSMutableArray *o_array = [NSMutableArray arrayWithCapacity:count];
         for (NSUInteger i = 0; i < count; i++)
-            [o_values addObject: [o_urls[i] path]];
+            [o_values addObject: [[o_urls objectAtIndex:i] path]];
         [o_values sortUsingSelector:@selector(caseInsensitiveCompare:)];
 
         for (NSUInteger i = 0; i < count; i++) {
             NSDictionary *o_dic;
-            char *psz_uri = vlc_path2uri([o_values[i] UTF8String], "file");
+            char *psz_uri = vlc_path2uri([[o_values objectAtIndex:i] UTF8String], "file");
             if (!psz_uri)
                 continue;
 
@@ -746,7 +746,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         if (returnCode == NSFileHandlingPanelOKButton) {
             if (o_file_path)
                 [o_file_path release];
-            o_file_path = [[o_open_panel URLs][0] path];
+            o_file_path = [[[o_open_panel URLs] objectAtIndex:0] path];
             [o_file_path retain];
             [self openFilePathChanged: nil];
         }
@@ -770,7 +770,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         if ([o_open_panel runModal] == NSOKButton) {
             if (o_file_slave_path)
                 [o_file_slave_path release];
-            o_file_slave_path = [[o_open_panel URLs][0] path];
+            o_file_slave_path = [[[o_open_panel URLs] objectAtIndex:0] path];
             [o_file_slave_path retain];
         }
     }
@@ -921,7 +921,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
                 NSArray *dirContents = [fm contentsOfDirectoryAtPath:mountPath error:nil];
                 for (int i = 0; i < [dirContents count]; i++) {
-                    NSString *currentFile = dirContents[i];
+                    NSString *currentFile = [dirContents objectAtIndex:i];
                     NSString *fullPath = [mountPath stringByAppendingPathComponent:currentFile];
 
                     BOOL isDir;
@@ -1028,7 +1028,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     NSUInteger count = [o_paths count];
     NSMutableArray *o_result = [NSMutableArray arrayWithCapacity:count];
     for (NSUInteger i = 0; i < count; i++)
-        [o_result addObject: [self scanPath:o_paths[i]]];
+        [o_result addObject: [self scanPath:[o_paths objectAtIndex:i]]];
 
     @synchronized (self) {
         if (o_opticalDevices)
@@ -1072,7 +1072,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     NSUInteger count = [o_allMediaDevices count];
     if (count > 0) {
         for (NSUInteger i = 0; i < count ; i++) {
-            NSDictionary *o_dict = o_allMediaDevices[i];
+            NSDictionary *o_dict = [o_allMediaDevices objectAtIndex:i];
             [o_disc_selector_pop addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath:[o_dict objectForKey:@"path"]]];
         }
 
@@ -1096,7 +1096,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (IBAction)discSelectorChanged:(id)sender
 {
-    NSDictionary *o_dict = o_allMediaDevices[[o_disc_selector_pop indexOfSelectedItem]];
+    NSDictionary *o_dict = [o_allMediaDevices objectAtIndex:[o_disc_selector_pop indexOfSelectedItem]];    
     [self showOpticalAtPath:o_dict];
 }
 
@@ -1116,7 +1116,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_open_panel setAllowedFileTypes:@[@"public.directory"]];
 
     if ([o_open_panel runModal] == NSOKButton) {
-        NSString *o_path = [[o_open_panel URLs][0] path];
+        NSString *o_path = [[[o_open_panel URLs] objectAtIndex:0] path];
         if ([o_path length] > 0) {
             [NSThread detachNewThreadSelector:@selector(scanSpecialPath:) toTarget:self withObject:o_path];
         }
@@ -1125,7 +1125,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (IBAction)dvdreadOptionChanged:(id)sender
 {
-    NSDictionary *o_dict = o_allMediaDevices[[o_disc_selector_pop indexOfSelectedItem]];
+    NSDictionary *o_dict = [o_allMediaDevices objectAtIndex:[o_disc_selector_pop indexOfSelectedItem]];
     NSString *o_device_path = [o_dict objectForKey:@"devicePath"];
 
     if (sender == o_disc_dvdwomenus_enablemenus_btn) {
@@ -1162,7 +1162,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     if (sender == o_disc_vcd_chapter_stp)
         [o_disc_vcd_chapter setIntValue: [o_disc_vcd_chapter_stp intValue]];
 
-    NSString *o_device_path = [o_allMediaDevices[[o_disc_selector_pop indexOfSelectedItem]] objectForKey:@"devicePath"];
+    NSString *o_device_path = [[o_allMediaDevices objectAtIndex:[o_disc_selector_pop indexOfSelectedItem]] objectForKey:@"devicePath"];
     [self setMRL: [NSString stringWithFormat: @"vcd://%@@%i:%i", o_device_path, [o_disc_vcd_title intValue], [o_disc_vcd_chapter intValue]]];
 }
 
@@ -1367,7 +1367,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
             returnedError = CGGetOnlineDisplayList(displayCount, ids, &displayCount);
             if (!returnedError) {
                 for (i = 0; i < [o_displayInfos count]; i ++) {
-                    v = o_displayInfos[i];
+                    v = [o_displayInfos objectAtIndex:i];
                     free([v pointerValue]);
                 }
                 [o_displayInfos removeAllObjects];
@@ -1544,7 +1544,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_open_panel setPrompt: _NS("Open")];
 
     if ([o_open_panel runModal] == NSOKButton) {
-        o_sub_path = [[o_open_panel URLs][0] path];
+        o_sub_path = [[[o_open_panel URLs] objectAtIndex:0] path];
         [o_sub_path retain];
         [o_file_subtitles_filename_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:o_sub_path]];
         [o_file_sub_path_fld setStringValue: [o_file_subtitles_filename_lbl stringValue]];

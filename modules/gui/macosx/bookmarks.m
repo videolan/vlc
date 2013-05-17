@@ -242,11 +242,11 @@ static VLCBookmarks *_o_sharedInstance = nil;
     NSArray * components = [[o_edit_fld_time stringValue] componentsSeparatedByString:@":"];
     NSUInteger componentCount = [components count];
     if (componentCount == 1)
-        pp_bookmarks[i]->i_time_offset = 1000000 * ([components[0] intValue]);
+        pp_bookmarks[i]->i_time_offset = 1000000 * ([[components objectAtIndex:0] intValue]);
     else if (componentCount == 2)
-        pp_bookmarks[i]->i_time_offset = 1000000 * ([components[0] intValue] * 60 + [components[1] intValue]);
+        pp_bookmarks[i]->i_time_offset = 1000000 * ([[components objectAtIndex:0] intValue] * 60 + [[components objectAtIndex:1] intValue]);
     else if (componentCount == 3)
-        pp_bookmarks[i]->i_time_offset = 1000000 * ([components[0] intValue] * 3600 + [components[1] intValue] * 60 + [components[2] intValue]);
+        pp_bookmarks[i]->i_time_offset = 1000000 * ([[components objectAtIndex:0] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue]);
     else {
         msg_Err(VLCIntf, "Invalid string format for time");
         goto clear;

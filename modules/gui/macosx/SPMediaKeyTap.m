@@ -276,7 +276,7 @@ NSString *kIgnoreMediaKeysDefaultsKey = @"SPIgnoreMediaKeys";
 
     ProcessSerialNumber mySerial, topSerial;
     GetCurrentProcess(&mySerial);
-    [_mediaKeyAppList[0] getValue:&topSerial];
+    [[_mediaKeyAppList objectAtIndex:0] getValue:&topSerial];
 
     Boolean same;
     OSErr err = SameProcess(&mySerial, &topSerial, &same);

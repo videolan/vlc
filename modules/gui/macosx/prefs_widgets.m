@@ -1150,7 +1150,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     [o_open_panel setCanChooseDirectories: b_directory];
     [o_open_panel beginSheetModalForWindow:[sender window] completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSOKButton) {
-            NSString *o_path = [[o_open_panel URLs][0] path];
+            NSString *o_path = [[[o_open_panel URLs] objectAtIndex:0] path];
             [o_textfield setStringValue: o_path];
         }        
     }];
@@ -2138,9 +2138,10 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     NSString *o_newstring = @"";
     NSUInteger count = [o_modulearray count];
     for (NSUInteger i = 0 ; i < count ; i++)
-        if ([o_modulearray[i][2]
+        if ([[[o_modulearray objectAtIndex:i] objectAtIndex:2]
             boolValue] != NO) {
-            o_newstring = [o_newstring stringByAppendingString:o_modulearray[i][0]];
+            o_newstring = [o_newstring stringByAppendingString:
+                [[o_modulearray objectAtIndex:i] objectAtIndex:0]];
             o_newstring = [o_newstring stringByAppendingString:@":"];
         }
 
@@ -2224,7 +2225,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
             // Move the modules
             iter = [array objectEnumerator];
             while ((val = [iter nextObject]) != NULL) {
-                NSArray *o_tmp = [o_modulearray[[val intValue]] mutableCopyWithZone:nil];
+                NSArray *o_tmp = [[o_modulearray objectAtIndex:
+                    [val intValue]] mutableCopyWithZone:nil];
                 [o_modulearray removeObject:o_tmp];
                 [o_modulearray insertObject:o_tmp
                     atIndex:(dropRow>[val intValue]) ? dropRow - 1 : dropRow];
@@ -2265,9 +2267,9 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
     if ([[aTableColumn identifier] isEqualToString: @"Enabled"])
-        return o_modulearray[rowIndex][2];
+        return [[o_modulearray objectAtIndex:rowIndex] objectAtIndex:2];
     if ([[aTableColumn identifier] isEqualToString: @"Module"])
-        return o_modulearray[rowIndex][1];
+        return [[o_modulearray objectAtIndex:rowIndex] objectAtIndex:1];
 
     return nil;
 }
@@ -2275,7 +2277,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
 - (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject
     forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
-    [o_modulearray[rowIndex] replaceObjectAtIndex:2
+    [[o_modulearray objectAtIndex:rowIndex] replaceObjectAtIndex:2
         withObject: anObject];
 }
 @end

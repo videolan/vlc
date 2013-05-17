@@ -378,10 +378,10 @@
             if ([o_urlItems count] == 1)
                 [o_finalStreamAddress appendFormat: @"\"%@:%@\"", [o_stream_address stringValue],[o_stream_port stringValue]];
             else {
-                [o_finalStreamAddress appendFormat: @"\"%@:%@", o_urlItems[0], [o_stream_port stringValue]];
+                [o_finalStreamAddress appendFormat: @"\"%@:%@", [o_urlItems objectAtIndex:0], [o_stream_port stringValue]];
                 NSUInteger itemCount = [o_urlItems count];
                 for (NSUInteger x = 0; x < itemCount; x++)
-                    [o_finalStreamAddress appendFormat: @"/%@", o_urlItems[x]];
+                    [o_finalStreamAddress appendFormat: @"/%@", [o_urlItems objectAtIndex:x]];
                 [o_finalStreamAddress appendString: @"\""];
             }
 

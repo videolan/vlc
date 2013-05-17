@@ -279,7 +279,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 {
     NSUInteger childrenCount = [[self children] count];
     for (int i = 0; i < childrenCount; i++) {
-        VLCTreeCategoryItem * categoryItem = [self children][i];
+        VLCTreeCategoryItem * categoryItem = [[self children] objectAtIndex:i];
         if ([categoryItem category] == category)
             return categoryItem;
     }
@@ -404,7 +404,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     assert([self isKindOfClass:[VLCTreeCategoryItem class]]);
     NSUInteger childrenCount = [[self children] count];
     for (NSUInteger i = 0; i < childrenCount; i++) {
-        VLCTreeSubCategoryItem * subCategoryItem = [self children][i];
+        VLCTreeSubCategoryItem * subCategoryItem = [[self children] objectAtIndex:i];
         if ([subCategoryItem subCategory] == subCategory)
             return subCategoryItem;
     }
@@ -523,7 +523,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 
 - (VLCTreeItem *)childAtIndex:(NSInteger)i_index
 {
-    return [self children][i_index];
+    return [[self children] objectAtIndex:i_index];
 }
 
 - (int)numberOfChildren
@@ -551,7 +551,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 
         NSUInteger count = [[self options] count];
         for (NSUInteger i = 0; i < count; i++) {
-            VLCTreeLeafItem * item = [self options][i];
+            VLCTreeLeafItem * item = [[self options] objectAtIndex:i];
 
             VLCConfigControl *control;
             control = [VLCConfigControl newControl:[item configItem] withView:view];
@@ -604,26 +604,26 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     NSUInteger i;
     NSUInteger count = [_subviews count];
     for (i = 0 ; i < count ; i++)
-        [_subviews[i] applyChanges];
+        [[_subviews objectAtIndex:i] applyChanges];
 
     count = [_children count];
     for (i = 0 ; i < count ; i++)
-        [_children[i] applyChanges];
+        [[_children objectAtIndex:i] applyChanges];
 }
 
 - (void)resetView
 {
     NSUInteger count = [_subviews count];
     for (NSUInteger i = 0 ; i < count ; i++)
-        [_subviews[i] resetValues];
+        [[_subviews objectAtIndex:i] resetValues];
 
     count = [_options count];
     for (NSUInteger i = 0 ; i < count ; i++)
-        [_options[i] resetView];
+        [[_options objectAtIndex:i] resetView];
 
     count = [_children count];
     for (NSUInteger i = 0 ; i < count ; i++)
-        [_children[i] resetView];
+        [[_children objectAtIndex:i] resetView];
 
 }
 

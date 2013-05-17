@@ -302,17 +302,17 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     }
 
     /* fetch preset */
-    NSArray *items = [[defaults objectForKey:@"AudioEffectProfiles"][selectedProfile] componentsSeparatedByString:@";"];
+    NSArray *items = [[[defaults objectForKey:@"AudioEffectProfiles"] objectAtIndex:selectedProfile] componentsSeparatedByString:@";"];
 
     /* eq preset */
     vlc_object_t *p_object = VLC_OBJECT(getAout());
     if (p_object == NULL)
         p_object = vlc_object_hold(pl_Get(p_intf));
-    var_SetString(p_object,"equalizer-preset",vlc_b64_decode([items[0] UTF8String]));
+    var_SetString(p_object,"equalizer-preset",vlc_b64_decode([[items objectAtIndex:0] UTF8String]));
     vlc_object_release(p_object);
 
     /* filter handling */
-    NSString *tempString = [NSString stringWithFormat:@"%s", vlc_b64_decode([items[1] UTF8String])];
+    NSString *tempString = [NSString stringWithFormat:@"%s", vlc_b64_decode([[items objectAtIndex:1] UTF8String])];
     NSArray *tempArray;
     NSUInteger count;
     /* enable the new filters, if we have an aout */
@@ -321,43 +321,43 @@ static VLCAudioEffects *_o_sharedInstance = nil;
             tempArray = [tempString componentsSeparatedByString:@":"];
             count = [tempArray count];
             for (NSUInteger x = 0; x < count; x++)
-                playlist_EnableAudioFilter(p_playlist, (char *)[tempArray[x] UTF8String], true);
+                playlist_EnableAudioFilter(p_playlist, (char *)[[tempArray objectAtIndex:x] UTF8String], true);
         }
     }
     config_PutPsz(p_intf,"audio-filter",[tempString UTF8String]);
 
     /* values */
-    config_PutFloat(p_intf, "compressor-rms-peak",[items[2] floatValue]);
-    config_PutFloat(p_intf, "compressor-attack",[items[3] floatValue]);
-    config_PutFloat(p_intf, "compressor-release",[items[4] floatValue]);
-    config_PutFloat(p_intf, "compressor-threshold",[items[5] floatValue]);
-    config_PutFloat(p_intf, "compressor-ratio",[items[6] floatValue]);
-    config_PutFloat(p_intf, "compressor-knee",[items[7] floatValue]);
-    config_PutFloat(p_intf, "compressor-makeup-gain",[items[8] floatValue]);
-    config_PutFloat(p_intf, "spatializer-roomsize",[items[9] floatValue]);
-    config_PutFloat(p_intf, "spatializer-width",[items[10] floatValue]);
-    config_PutFloat(p_intf, "spatializer-wet",[items[11] floatValue]);
-    config_PutFloat(p_intf, "spatializer-dry",[items[12] floatValue]);
-    config_PutFloat(p_intf, "spatializer-damp",[items[13] floatValue]);
-    config_PutFloat(p_intf, "norm-max-level",[items[14] floatValue]);
-    config_PutInt(p_intf, "equalizer-2pass",[items[15] intValue]);
+    config_PutFloat(p_intf, "compressor-rms-peak",[[items objectAtIndex:2] floatValue]);
+    config_PutFloat(p_intf, "compressor-attack",[[items objectAtIndex:3] floatValue]);
+    config_PutFloat(p_intf, "compressor-release",[[items objectAtIndex:4] floatValue]);
+    config_PutFloat(p_intf, "compressor-threshold",[[items objectAtIndex:5] floatValue]);
+    config_PutFloat(p_intf, "compressor-ratio",[[items objectAtIndex:6] floatValue]);
+    config_PutFloat(p_intf, "compressor-knee",[[items objectAtIndex:7] floatValue]);
+    config_PutFloat(p_intf, "compressor-makeup-gain",[[items objectAtIndex:8] floatValue]);
+    config_PutFloat(p_intf, "spatializer-roomsize",[[items objectAtIndex:9] floatValue]);
+    config_PutFloat(p_intf, "spatializer-width",[[items objectAtIndex:10] floatValue]);
+    config_PutFloat(p_intf, "spatializer-wet",[[items objectAtIndex:11] floatValue]);
+    config_PutFloat(p_intf, "spatializer-dry",[[items objectAtIndex:12] floatValue]);
+    config_PutFloat(p_intf, "spatializer-damp",[[items objectAtIndex:13] floatValue]);
+    config_PutFloat(p_intf, "norm-max-level",[[items objectAtIndex:14] floatValue]);
+    config_PutInt(p_intf, "equalizer-2pass",[[items objectAtIndex:15] intValue]);
 
     /* set values on-the-fly if we have an aout */
     if (p_aout) {
-        var_SetFloat(p_aout, "compressor-rms-peak", [items[2] floatValue]);
-        var_SetFloat(p_aout, "compressor-attack", [items[3] floatValue]);
-        var_SetFloat(p_aout, "compressor-release", [items[4] floatValue]);
-        var_SetFloat(p_aout, "compressor-threshold", [items[5] floatValue]);
-        var_SetFloat(p_aout, "compressor-ratio", [items[6] floatValue]);
-        var_SetFloat(p_aout, "compressor-knee", [items[7] floatValue]);
-        var_SetFloat(p_aout, "compressor-makeup-gain", [items[8] floatValue]);
-        var_SetFloat(p_aout, "spatializer-roomsize", [items[9] floatValue]);
-        var_SetFloat(p_aout, "spatializer-width", [items[10] floatValue]);
-        var_SetFloat(p_aout, "spatializer-wet", [items[11] floatValue]);
-        var_SetFloat(p_aout, "spatializer-dry", [items[12] floatValue]);
-        var_SetFloat(p_aout, "spatializer-damp", [items[13] floatValue]);
-        var_SetFloat(p_aout, "norm-max-level", [items[14] floatValue]);
-        var_SetBool(p_aout, "equalizer-2pass", (BOOL)[items[15] intValue]);
+        var_SetFloat(p_aout, "compressor-rms-peak", [[items objectAtIndex:2] floatValue]);
+        var_SetFloat(p_aout, "compressor-attack", [[items objectAtIndex:3] floatValue]);
+        var_SetFloat(p_aout, "compressor-release", [[items objectAtIndex:4] floatValue]);
+        var_SetFloat(p_aout, "compressor-threshold", [[items objectAtIndex:5] floatValue]);
+        var_SetFloat(p_aout, "compressor-ratio", [[items objectAtIndex:6] floatValue]);
+        var_SetFloat(p_aout, "compressor-knee", [[items objectAtIndex:7] floatValue]);
+        var_SetFloat(p_aout, "compressor-makeup-gain", [[items objectAtIndex:8] floatValue]);
+        var_SetFloat(p_aout, "spatializer-roomsize", [[items objectAtIndex:9] floatValue]);
+        var_SetFloat(p_aout, "spatializer-width", [[items objectAtIndex:10] floatValue]);
+        var_SetFloat(p_aout, "spatializer-wet", [[items objectAtIndex:11] floatValue]);
+        var_SetFloat(p_aout, "spatializer-dry", [[items objectAtIndex:12] floatValue]);
+        var_SetFloat(p_aout, "spatializer-damp", [[items objectAtIndex:13] floatValue]);
+        var_SetFloat(p_aout, "norm-max-level", [[items objectAtIndex:14] floatValue]);
+        var_SetBool(p_aout, "equalizer-2pass", (BOOL)[[items objectAtIndex:15] intValue]);
     }
 
     /* update UI */
@@ -365,7 +365,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
         [o_eq_enable_ckb setState:NSOffState];
     else
         [o_eq_enable_ckb setState:NSOnState];
-    [o_eq_twopass_ckb setState:[items[15] intValue]];
+    [o_eq_twopass_ckb setState:[[items objectAtIndex:15] intValue]];
     [self resetCompressor];
     [self resetSpatializer];
     [self resetAudioFilters];
@@ -491,7 +491,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     [self eq_changePreset: o_eq_presets_popup];
 
     
-    [o_eq_preamp_sld setFloatValue:[[defaults objectForKey:@"EQPreampValues"][currentPresetIndex] floatValue]];
+    [o_eq_preamp_sld setFloatValue:[[[defaults objectForKey:@"EQPreampValues"] objectAtIndex:currentPresetIndex] floatValue]];
     [self setBandSliderValuesForPreset:currentPresetIndex];
 }
 
@@ -528,11 +528,11 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (void)setBandSliderValuesForPreset:(NSInteger)presetID
 {
-    NSString *preset = [[NSUserDefaults standardUserDefaults] objectForKey:@"EQValues"][presetID];
+    NSString *preset = [[[NSUserDefaults standardUserDefaults] objectForKey:@"EQValues"] objectAtIndex:presetID];
     NSArray *values = [preset componentsSeparatedByString:@" "];
     NSUInteger count = [values count];
     for (NSUInteger x = 0; x < count; x++)
-        [self setValue:[values[x] floatValue] forSlider:x];
+        [self setValue:[[values objectAtIndex:x] floatValue] forSlider:x];
 }
 
 - (NSString *)generatePresetString
@@ -581,14 +581,14 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     NSInteger numberOfChosenPreset = [sender indexOfSelectedItem];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
-    NSString *preset = [defaults objectForKey:@"EQValues"][numberOfChosenPreset];
-    NSString *preamp = [defaults objectForKey:@"EQPreampValues"][numberOfChosenPreset];
+    NSString *preset = [[defaults objectForKey:@"EQValues"] objectAtIndex:numberOfChosenPreset];
+    NSString *preamp = [[defaults objectForKey:@"EQPreampValues"] objectAtIndex:numberOfChosenPreset];
 
     audio_output_t *p_aout = getAout();
     if (p_aout) {
         var_SetString(p_aout, "equalizer-bands", [preset UTF8String]);
         var_SetFloat(p_aout, "equalizer-preamp", [preamp floatValue]);
-        var_SetString(p_aout, "equalizer-preset" , [[defaults objectForKey:@"EQNames"][numberOfChosenPreset] UTF8String]);
+        var_SetString(p_aout, "equalizer-preset" , [[[defaults objectForKey:@"EQNames"] objectAtIndex:numberOfChosenPreset] UTF8String]);
         vlc_object_release(p_aout);
     }
 
@@ -598,7 +598,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     /* save changed to config */
     config_PutPsz(p_intf, "equalizer-bands", [preset UTF8String]);
     config_PutFloat(p_intf, "equalizer-preamp", [preamp floatValue]);
-    config_PutPsz(p_intf, "equalizer-preset", [[defaults objectForKey:@"EQNames"][numberOfChosenPreset] UTF8String]);
+    config_PutPsz(p_intf, "equalizer-preset", [[[defaults objectForKey:@"EQNames"] objectAtIndex:numberOfChosenPreset] UTF8String]);
 
 }
 

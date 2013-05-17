@@ -275,7 +275,7 @@ static int Open(vlc_object_t *p_this)
     unsigned iaudio;
     for (iaudio = 0; iaudio < [myAudioDevices count]; iaudio++) {
         QTCaptureDevice *qtk_audioDevice;
-        qtk_audioDevice = myAudioDevices[iaudio];
+        qtk_audioDevice = [myAudioDevices objectAtIndex:iaudio];
         msg_Dbg(p_demux, "qtsound audio %u/%lu localizedDisplayName: %s uniqueID: %s", iaudio, [myAudioDevices count], [[qtk_audioDevice localizedDisplayName] UTF8String], [[qtk_audioDevice uniqueID] UTF8String]);
         if ([[[qtk_audioDevice uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtk_curraudiodevice_uid]) {
             msg_Dbg(p_demux, "Device found");
@@ -285,7 +285,7 @@ static int Open(vlc_object_t *p_this)
 
     audioInput = nil;
     if(iaudio < [myAudioDevices count])
-        p_sys->audiodevice = myAudioDevices[iaudio];
+        p_sys->audiodevice = [myAudioDevices objectAtIndex:iaudio];
     else {
         /* cannot find designated audio device, fall back to open default audio device */
         msg_Dbg(p_demux, "Cannot find designated uid audio device as %s. Fall back to open default audio device.", [qtk_curraudiodevice_uid UTF8String]);
@@ -357,7 +357,7 @@ static int Open(vlc_object_t *p_this)
     audioformat_array = [p_sys->audiodevice formatDescriptions];
     audio_format = NULL;
     for(int k = 0; k < [audioformat_array count]; k++) {
-        audio_format = (QTFormatDescription *)audioformat_array[k];
+        audio_format = (QTFormatDescription *)[audioformat_array objectAtIndex:k];
 
         msg_Dbg(p_demux, "Audio localized format summary: %s", [[audio_format localizedFormatSummary] UTF8String]);
         msg_Dbg(p_demux, "Audio format description attributes: %s",[[[audio_format formatDescriptionAttributes] description] UTF8String]);
@@ -400,7 +400,7 @@ static int Open(vlc_object_t *p_this)
     }
 
     if([audioformat_array count])
-        audio_format = audioformat_array[0];
+        audio_format = [audioformat_array objectAtIndex:0];
     else
         goto error;
 

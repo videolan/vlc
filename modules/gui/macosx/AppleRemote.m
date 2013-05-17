@@ -388,8 +388,8 @@ static AppleRemote* sharedInstance=nil;
 }
 
 - (void) executeClickCountEvent: (NSArray*) values {
-    AppleRemoteEventIdentifier event = [values[0] unsignedIntValue];
-    NSTimeInterval eventTimePoint = [values[1] doubleValue];
+    AppleRemoteEventIdentifier event = [[values objectAtIndex:0] unsignedIntValue];
+    NSTimeInterval eventTimePoint = [[values objectAtIndex:1] doubleValue];
 
     BOOL finishedClicking = NO;
     int finalClickCount = eventClickCount;
@@ -564,7 +564,7 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
         NSMutableArray *mutableAllCookies = [[NSMutableArray alloc] init];
         NSUInteger elementCount = [elements count];
         for (NSUInteger i=0; i< elementCount; i++) {
-            element = elements[i];
+            element = [elements objectAtIndex:i];
 
             //Get cookie
             object = [element valueForKey: (NSString*)CFSTR(kIOHIDElementCookieKey) ];
@@ -610,7 +610,7 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
 
             NSUInteger cookieCount = [_allCookies count];
             for(NSUInteger i=0; i<cookieCount; i++) {
-                IOHIDElementCookie cookie = (IOHIDElementCookie)[_allCookies[i] intValue];
+                IOHIDElementCookie cookie = (IOHIDElementCookie)[[_allCookies objectAtIndex:i] intValue];
                 (*queue)->addElement(queue, cookie, 0);
             }
 

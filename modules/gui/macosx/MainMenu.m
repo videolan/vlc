@@ -126,7 +126,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
     /* check whether the user runs OSX with a RTL language */
     NSArray* languages = [NSLocale preferredLanguages];
-    NSString* preferredLanguage = languages[0];
+    NSString* preferredLanguage = [languages objectAtIndex:0];
 
     if ([NSLocale characterDirectionForLanguage:preferredLanguage] == NSLocaleLanguageDirectionRightToLeft) {
         msg_Dbg(VLCIntf, "adapting interface since '%s' is a RTL language", [preferredLanguage UTF8String]);
@@ -478,12 +478,12 @@ static VLCMainMenu *_o_sharedInstance = nil;
     NSMenuItem *o_mi_tmp;
     NSUInteger count = [o_ptc_menuorder count];
     for (NSUInteger i = 0; i < count; i++) {
-        NSString *o_title = [o_ptc_translation_dict objectForKey:o_ptc_menuorder[i]];
+        NSString *o_title = [o_ptc_translation_dict objectForKey:[o_ptc_menuorder objectAtIndex:i]];
         o_mi_tmp = [o_mu_playlistTableColumns addItemWithTitle:o_title
                                                         action:@selector(togglePlaylistColumnTable:)
                                                  keyEquivalent:@""];
         /* don't set a valid target for the title column selector, since we want it to be disabled */
-        if (![o_ptc_menuorder[i] isEqualToString: TITLE_COLUMN])
+        if (![[o_ptc_menuorder objectAtIndex:i] isEqualToString: TITLE_COLUMN])
             [o_mi_tmp setTarget:self];
         [o_mi_tmp setTag:i];
 
@@ -491,7 +491,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
                                              action:@selector(togglePlaylistColumnTable:)
                                       keyEquivalent:@""];
         /* don't set a valid target for the title column selector, since we want it to be disabled */
-        if (![o_ptc_menuorder[i] isEqualToString: TITLE_COLUMN])
+        if (![[o_ptc_menuorder objectAtIndex:i] isEqualToString: TITLE_COLUMN])
             [o_mi_tmp setTarget:self];
         [o_mi_tmp setTag:i];
     }
@@ -510,7 +510,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     NSArray *menuitems_array = [the_menu itemArray];
     NSUInteger menuItemCount = [menuitems_array count];
     for (NSUInteger i=0; i < menuItemCount; i++) {
-        NSMenuItem *one_item = menuitems_array[i];
+        NSMenuItem *one_item = [menuitems_array objectAtIndex:i];
         if ([one_item hasSubmenu])
             [self releaseRepresentedObjects: [one_item submenu]];
 
@@ -604,11 +604,11 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mitem setTarget: self];
     NSRect s_rect;
     for (NSUInteger i = 0; i < count; i++) {
-        s_rect = [o_screens[i] frame];
+        s_rect = [[o_screens objectAtIndex:i] frame];
         [o_submenu addItemWithTitle: [NSString stringWithFormat: @"%@ %li (%ix%i)", _NS("Screen"), i+1,
                                       (int)s_rect.size.width, (int)s_rect.size.height] action:@selector(toggleFullscreenDevice:) keyEquivalent:@""];
         o_mitem = [o_submenu itemAtIndex:i+1];
-        [o_mitem setTag: (int)[o_screens[i] displayID]];
+        [o_mitem setTag: (int)[[o_screens objectAtIndex:i] displayID]];
         [o_mitem setEnabled: YES];
         [o_mitem setTarget: self];
     }
@@ -733,7 +733,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [[o_mu_playlistTableColumns            itemWithTag: i_tag] setState: i_new_state];
     [[o_mu_playlistTableColumnsContextMenu itemWithTag: i_tag] setState: i_new_state];
 
-    NSString *o_column = o_ptc_menuorder[i_tag];
+    NSString *o_column = [o_ptc_menuorder objectAtIndex:i_tag];
     [[[VLCMain sharedInstance] playlist] setColumn: o_column state: i_new_state translationDict: o_ptc_translation_dict];
 }
 
@@ -944,10 +944,10 @@ static VLCMainMenu *_o_sharedInstance = nil;
         c = [[openPanel URLs] count];
 
         for (int i = 0; i < c ; i++) {
-            msg_Dbg(VLCIntf, "loading subs from %s", [[[openPanel URLs][i] path] UTF8String]);
-            if (input_AddSubtitle(p_input, [[[openPanel URLs][i] path] UTF8String], TRUE))
+            msg_Dbg(VLCIntf, "loading subs from %s", [[[[openPanel URLs] objectAtIndex:i] path] UTF8String]);
+            if (input_AddSubtitle(p_input, [[[[openPanel URLs] objectAtIndex:i] path] UTF8String], TRUE))
                 msg_Warn(VLCIntf, "unable to load subtitles from '%s'",
-                         [[[openPanel URLs][i] path] UTF8String]);
+                         [[[[openPanel URLs] objectAtIndex:i] path] UTF8String]);
         }
     }
     vlc_object_release(p_input);

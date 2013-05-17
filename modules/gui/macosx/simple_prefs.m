@@ -527,11 +527,11 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     [o_video_device_pop addItemWithTitle: _NS("Default")];
     [[o_video_device_pop lastItem] setTag: 0];
     while (i < y) {
-        NSRect s_rect = [[NSScreen screens][i] frame];
+        NSRect s_rect = [[[NSScreen screens] objectAtIndex:i] frame];
         [o_video_device_pop addItemWithTitle:
          [NSString stringWithFormat: @"%@ %i (%ix%i)", _NS("Screen"), i+1,
                    (int)s_rect.size.width, (int)s_rect.size.height]];
-        [[o_video_device_pop lastItem] setTag: (int)[[NSScreen screens][i] displayID]];
+        [[o_video_device_pop lastItem] setTag: (int)[[[NSScreen screens] objectAtIndex:i] displayID]];
         i++;
     }
     [o_video_device_pop selectItemAtIndex: 0];
@@ -954,7 +954,7 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
     if (b_hotkeyChanged) {
         NSUInteger hotKeyCount = [o_hotkeySettings count];
         for (NSUInteger i = 0; i < hotKeyCount; i++)
-            config_PutPsz(p_intf, [o_hotkeyNames[i] UTF8String], [o_hotkeySettings[i]UTF8String]);
+            config_PutPsz(p_intf, [[o_hotkeyNames objectAtIndex:i] UTF8String], [[o_hotkeySettings objectAtIndex:i]UTF8String]);
         b_hotkeyChanged = NO;
     }
 
@@ -1209,11 +1209,11 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
         [object removeAllItems]; \
         count = [handlers count]; \
         for (NSUInteger x = 0; x < count; x++) { \
-            rawhandler = handlers[x]; \
+            rawhandler = [handlers objectAtIndex:x]; \
             handler = [self applicationNameForBundleIdentifier:rawhandler]; \
             if (handler && ![handler isEqualToString:@""]) { \
                 [object addItemWithTitle:handler]; \
-                [[object lastItem] setImage: [self iconForBundleIdentifier:handlers[x]]]; \
+                [[object lastItem] setImage: [self iconForBundleIdentifier:[handlers objectAtIndex:x]]]; \
                 [rawHandlers addObject: rawhandler]; \
             } \
         } \
@@ -1264,8 +1264,8 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
 {
     if (sender == o_hotkeys_change_btn || sender == o_hotkeys_listbox) {
         [o_hotkeys_change_lbl setStringValue: [NSString stringWithFormat: _NS("Press new keys for\n\"%@\""),
-                                               o_hotkeyDescriptions[[o_hotkeys_listbox selectedRow]]]];
-        [o_hotkeys_change_keys_lbl setStringValue: [[VLCStringUtility sharedInstance] OSXStringKeyToString:o_hotkeySettings[[o_hotkeys_listbox selectedRow]]]];
+                                               [o_hotkeyDescriptions objectAtIndex:[o_hotkeys_listbox selectedRow]]]];
+        [o_hotkeys_change_keys_lbl setStringValue: [[VLCStringUtility sharedInstance] OSXStringKeyToString:[o_hotkeySettings objectAtIndex:[o_hotkeys_listbox selectedRow]]]];
         [o_hotkeys_change_taken_lbl setStringValue: @""];
         [o_hotkeys_change_win setInitialFirstResponder: [o_hotkeys_change_win contentView]];
         [o_hotkeys_change_win makeFirstResponder: [o_hotkeys_change_win contentView]];
@@ -1325,9 +1325,9 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
     NSString * identifier = [aTableColumn identifier];
 
     if ([identifier isEqualToString: @"action"])
-        return o_hotkeyDescriptions[rowIndex];
+        return [o_hotkeyDescriptions objectAtIndex:rowIndex];
     else if ([identifier isEqualToString: @"shortcut"])
-        return [[VLCStringUtility sharedInstance] OSXStringKeyToString:o_hotkeySettings[rowIndex]];
+        return [[VLCStringUtility sharedInstance] OSXStringKeyToString:[o_hotkeySettings objectAtIndex:rowIndex]];
     else {
         msg_Err(p_intf, "unknown TableColumn identifier (%s)!", [identifier UTF8String]);
         return NULL;
@@ -1352,11 +1352,11 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
         if (i_returnValue != NSNotFound)
             [o_hotkeys_change_taken_lbl setStringValue: [NSString stringWithFormat:
                                                          _NS("This combination is already taken by \"%@\"."),
-                                                         o_hotkeyDescriptions[i_returnValue]]];
+                                                         [o_hotkeyDescriptions objectAtIndex:i_returnValue]]];
         else if (i_returnValue2 != NSNotFound)
             [o_hotkeys_change_taken_lbl setStringValue: [NSString stringWithFormat:
                                                          _NS("This combination is already taken by \"%@\"."),
-                                                         o_hotkeyDescriptions[i_returnValue2]]];
+                                                         [o_hotkeyDescriptions objectAtIndex:i_returnValue2]]];
         else
             [o_hotkeys_change_taken_lbl setStringValue: @""];
 
