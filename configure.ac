@@ -3758,6 +3758,9 @@ AS_IF([test "${enable_skins2}" != "no"], [
   ], [test "${SYS}" = "darwin"], [
     VLC_ADD_CPPFLAGS([skins2],[ -DMACOSX_SKINS])
     VLC_ADD_LIBS([skins2],[-Wl,-framework,Carbon])
+  dnl OS/2
+  ], [test "${SYS}" = "os2"], [
+    VLC_ADD_CPPFLAGS([skins2],[ -DOS2_SKINS])
   dnl Linux/Unix
   ], [
     PKG_CHECK_MODULES([XPM], [xpm],, [have_skins_deps="no"])

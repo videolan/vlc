@@ -235,6 +235,26 @@ SOURCES_skins2 += \
 	macosx/macosx_tooltip.hpp \
     $(NULL)
 else
+if HAVE_OS2
+SOURCES_skins2 += \
+	os2/os2_dragdrop.cpp \
+	os2/os2_dragdrop.hpp \
+	os2/os2_factory.cpp \
+	os2/os2_factory.hpp \
+	os2/os2_graphics.cpp \
+	os2/os2_graphics.hpp \
+	os2/os2_loop.cpp \
+	os2/os2_loop.hpp \
+	os2/os2_popup.cpp \
+	os2/os2_popup.hpp \
+	os2/os2_timer.cpp \
+	os2/os2_timer.hpp \
+	os2/os2_tooltip.cpp \
+	os2/os2_tooltip.hpp \
+	os2/os2_window.cpp \
+	os2/os2_window.hpp \
+    $(NULL)
+else
 SOURCES_skins2 += \
 	x11/x11_display.cpp \
 	x11/x11_display.hpp \
@@ -255,5 +275,6 @@ SOURCES_skins2 += \
 	x11/x11_tooltip.cpp \
 	x11/x11_tooltip.hpp \
     $(NULL)
+endif
 endif
 endif

@@ -1251,7 +1251,7 @@ string Builder::getFilePath( const string &rFileName ) const
            file[pos] = '/';
     }
 
-#ifdef WIN32
+#if defined( WIN32 ) || defined( __OS2__ )
     string::size_type pos;
     while( ( pos = file.find( "/" ) ) != string::npos )
        file.replace( pos, 1, sep );

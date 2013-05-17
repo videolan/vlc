@@ -275,12 +275,12 @@ void WindowManager::resize( GenericLayout &rLayout,
     int xNewOffset = newWidth - rLayout.getWidth();
     int yNewOffset = newHeight - rLayout.getHeight();
 
-    // Do the actual resizing
-    rLayout.resize( newWidth, newHeight );
-
     // Resize the window
     TopWindow *pWindow = rLayout.getWindow();
     pWindow->resize( newWidth, newHeight );
+
+    // Do the actual resizing
+    rLayout.resize( newWidth, newHeight );
 
     // refresh content
     rLayout.refreshAll();

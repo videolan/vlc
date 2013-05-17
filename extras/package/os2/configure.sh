@@ -36,7 +36,7 @@ OPTIONS="
       --enable-kva
       --enable-kai
       --enable-qt
-      --disable-skins2
+      --enable-skins2
       --enable-libxml2
       --enable-libgcrypt
       --enable-vlc
