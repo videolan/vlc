@@ -35,6 +35,7 @@
 #include "input_manager.hpp"    /* THEMIM destruction */
 #include "dialogs_provider.hpp" /* THEDP creation */
 #include "main_interface.hpp"   /* MainInterface creation */
+#include "extensions_manager.hpp" /* Extensions manager */
 #include "dialogs/help.hpp"     /* Launch Update */
 #include "recents.hpp"          /* Recents Item destruction */
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
@@ -562,6 +563,9 @@ static void *Thread( void *obj )
            slots in the MainInputManager */
         delete p_mi;
     }
+
+    /* */
+    ExtensionsManager::killInstance();
 
     /* Destroy all remaining windows,
        because some are connected to some slots

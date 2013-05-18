@@ -32,7 +32,6 @@
 #include "main_interface.hpp"
 #include "input_manager.hpp"                    // Creation
 #include "actions_manager.hpp"                  // killInstance
-#include "extensions_manager.hpp"               // killInstance
 
 #include "util/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
 #include "util/qt_dirs.hpp"                     // toNativeSeparators
@@ -280,9 +279,6 @@ MainInterface::~MainInterface()
 
     /* Be sure to kill the actionsManager... Only used in the MI and control */
     ActionsManager::killInstance();
-
-    /* Idem */
-    ExtensionsManager::killInstance();
 
     /* Delete the FSC controller */
     delete fullscreenControls;
