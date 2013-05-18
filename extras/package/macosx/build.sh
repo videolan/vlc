@@ -10,7 +10,8 @@ info()
 }
 
 ARCH="x86_64"
-OSX_VERSION="10.7"
+MINIMAL_OSX_VERSION="10.6"
+OSX_VERSION="10.8"
 SDKROOT=`xcode-select -print-path`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$OSX_VERSION.sdk
 
 usage()
@@ -140,7 +141,7 @@ if [ "${vlcroot}/configure" -nt Makefile ]; then
   ${vlcroot}/extras/package/macosx/configure.sh \
       --build=$TRIPLET \
       --host=$TRIPLET \
-      --with-macosx-version-min=$OSX_VERSION \
+      --with-macosx-version-min=$MINIMAL_OSX_VERSION \
       --with-macosx-sdk=$SDKROOT > $out
 fi
 
