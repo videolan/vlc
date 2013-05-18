@@ -186,7 +186,7 @@ else
   export ASCPP="xcrun as"
 fi
 
-../bootstrap --host=${TARGET} --build="i686-apple-darwin10" --disable-gpl \
+../bootstrap --host=${TARGET} --build="i686-apple-darwin10" --prefix=${VLCROOT}/contrib/${TARGET}-${ARCH} --disable-gpl \
     --disable-disc --disable-sout \
     --enable-small \
     --disable-sdl \
@@ -239,12 +239,6 @@ if [ ".$PLATFORM" != ".Simulator" ]; then
     export AVFORMAT_LIBS="-L${PREFIX}/lib -lavcodec -lz -lavutil -lavformat"
 fi
 
-export DVBPSI_CFLAGS="-I${VLCROOT}/contrib-ios-${TARGET}/include "
-export DVBPSI_LIBS="-L${VLCROOT}/contrib-ios-${TARGET}/lib "
-
-export SWSCALE_CFLAGS="-I${VLCROOT}/contrib-ios-${TARGET}/include "
-export SWSCALE_LIBS="-L${VLCROOT}/contrib-ios-${TARGET}/lib "
-
 mkdir -p ${BUILDDIR}
 spushd ${BUILDDIR}
 
@@ -253,10 +247,10 @@ info ">> --prefix=${PREFIX} --host=${TARGET}"
 # Run configure only upon changes.
 if [ "${VLCROOT}/configure" -nt config.log -o \
      "${THIS_SCRIPT_PATH}" -nt config.log ]; then
-CONTRIB_DIR=${VLCROOT}/contrib-ios-${TARGET} \
 ${VLCROOT}/configure \
     --prefix="${PREFIX}" \
     --host="${TARGET}" \
+    --with-contrib="${VLCROOT}/contrib/${TARGET}-${ARCH}" \
     --disable-debug \
     --enable-static \
     --disable-macosx \
