@@ -37,7 +37,7 @@
 #include <QString>
 #include <QFont>
 #include <QToolButton>
-#include <QButtonGroup>
+#include <QSignalMapper>
 #include <QVBoxLayout>
 #include <QScrollArea>
 
@@ -61,10 +61,11 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent, bool sma
 {
     QVBoxLayout *layout = new QVBoxLayout();
 
-    QButtonGroup *buttonGroup = new QButtonGroup( this );
-    buttonGroup->setExclusive ( true );
-    CONNECT( buttonGroup, buttonClicked ( int ),
-            this, switchPanel( int ) );
+    /* Use autoExclusive buttons and a mapper as QButtonGroup can't
+       set focus (keys) when it manages the buttons's exclusivity.
+       See QT bugs 131 & 816 and QAbstractButton's source code. */
+    QSignalMapper *mapper = new QSignalMapper( layout );
+    CONNECT( mapper, mapped(int), this, switchPanel(int) );
 
     short icon_height = small ? ICON_HEIGHT /2 : ICON_HEIGHT;
 
@@ -79,7 +80,9 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent, bool sma
     button->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding) ;  \
     button->setAutoRaise( true );                                           \
     button->setCheckable( true );                                           \
-    buttonGroup->addButton( button, numb );                                 \
+    button->setAutoExclusive( true );                                       \
+    CONNECT( button, clicked(), mapper, map() );                            \
+    mapper->setMapping( button, numb );                                     \
     layout->addWidget( button );
 
     ADD_CATEGORY( SPrefsInterface, qtr("Interface"), qtr("Interface Settings"),
