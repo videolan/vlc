@@ -199,9 +199,9 @@ void SeekSlider::updateBuffering( float f_buffering_ )
     repaint();
 }
 
-void SeekSlider::mouseReleaseEvent( QMouseEvent *event )
+void SeekSlider::processReleasedButton()
 {
-    event->accept();
+    if ( !isSliding && !isJumping ) return;
     isSliding = false;
     bool b_seekPending = seekLimitTimer->isActive();
     seekLimitTimer->stop(); /* We're not sliding anymore: only last seek on release */
@@ -210,9 +210,19 @@ void SeekSlider::mouseReleaseEvent( QMouseEvent *event )
         isJumping = false;
         return;
     }
-    QSlider::mouseReleaseEvent( event );
     if( b_seekPending && isEnabled() )
         updatePos();
+}
+
+void SeekSlider::mouseReleaseEvent( QMouseEvent *event )
+{
+    if ( event->button() != Qt::LeftButton && event->button() != Qt::MidButton )
+    {
+        QSlider::mouseReleaseEvent( event );
+        return;
+    }
+    event->accept();
+    processReleasedButton();
 }
 
 void SeekSlider::mousePressEvent( QMouseEvent* event )
@@ -273,6 +283,12 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
 
 void SeekSlider::mouseMoveEvent( QMouseEvent *event )
 {
+    if ( ! ( event->buttons() & ( Qt::LeftButton | Qt::MidButton ) ) )
+    {
+        /* Handle button release when mouserelease has been hijacked by popup */
+        processReleasedButton();
+    }
+
     if ( !isEnabled() ) return event->accept();
 
     if( isSliding )
@@ -546,23 +562,30 @@ void SoundSlider::mousePressEvent( QMouseEvent *event )
     }
 }
 
+void SoundSlider::processReleasedButton()
+{
+    if( !b_mouseOutside && value() != i_oldvalue )
+    {
+        emit sliderReleased();
+        setValue( value() );
+        emit sliderMoved( value() );
+    }
+    isSliding = false;
+    b_mouseOutside = false;
+}
+
 void SoundSlider::mouseReleaseEvent( QMouseEvent *event )
 {
     if( event->button() != Qt::RightButton )
-    {
-        if( !b_mouseOutside && value() != i_oldvalue )
-        {
-            emit sliderReleased();
-            setValue( value() );
-            emit sliderMoved( value() );
-        }
-        isSliding = false;
-        b_mouseOutside = false;
-    }
+        processReleasedButton();
 }
 
 void SoundSlider::mouseMoveEvent( QMouseEvent *event )
 {
+    /* handle mouserelease hijacking */
+    if ( isSliding && ( event->buttons() & ~Qt::RightButton ) == Qt::NoButton )
+        processReleasedButton();
+
     if( isSliding )
     {
         QRect rect( paddingL - 15,    -1,

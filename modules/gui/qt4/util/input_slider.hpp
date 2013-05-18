@@ -71,6 +71,7 @@ protected:
 
     virtual QSize sizeHint() const;
 
+    void processReleasedButton();
     bool isAnimationRunning() const;
     qreal handleOpacity() const;
     void setHandleOpacity( qreal opacity );
@@ -142,6 +143,8 @@ protected:
     virtual void mousePressEvent( QMouseEvent * );
     virtual void mouseMoveEvent( QMouseEvent * );
     virtual void mouseReleaseEvent( QMouseEvent * );
+
+    void processReleasedButton();
 
 private:
     bool isSliding; /* Whether we are currently sliding by user action */
