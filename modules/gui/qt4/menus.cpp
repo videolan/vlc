@@ -1073,6 +1073,7 @@ void VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
             submenu->setTitle( qtr( "Interface" ) );
             if( p_intf->p_sys->b_isDialogProvider )
             {
+                /* list of skins available */
                 vlc_object_t* p_object = p_intf->p_parent;
 
                 objects.clear(); varnames.clear();
@@ -1084,6 +1085,12 @@ void VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
                 objects.append( p_object );
                 varnames.append( "intf-skins-interactive" );
                 Populate( p_intf, submenu, varnames, objects );
+
+                submenu->addSeparator();
+
+                /* Extensions */
+                ExtensionsMenu( p_intf, submenu );
+
             }
             else
                 msg_Warn( p_intf, "could not find parent interface" );
