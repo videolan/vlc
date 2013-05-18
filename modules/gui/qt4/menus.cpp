@@ -332,7 +332,7 @@ void VLCMenuBar::createMenuBar( MainInterface *mi,
     BAR_DADD( VideoMenu( p_intf, bar ), qtr( "&Video" ), 2 );
     BAR_DADD( SubtitleMenu( p_intf, bar ), qtr( "Subti&tle" ), 5 );
 
-    addMenuToMainbar( ToolsMenu( bar ), qtr( "T&ools" ), bar );
+    addMenuToMainbar( ToolsMenu( p_intf, bar ), qtr( "T&ools" ), bar );
 
     /* View menu, a bit different */
     BAR_DADD( ViewMenu( p_intf, NULL, mi ), qtr( "V&iew" ), 4 );
@@ -404,7 +404,7 @@ QMenu *VLCMenuBar::FileMenu( intf_thread_t *p_intf, QWidget *parent, MainInterfa
 /**
  * Tools, like Media Information, Preferences or Messages
  **/
-QMenu *VLCMenuBar::ToolsMenu( QMenu *menu )
+QMenu *VLCMenuBar::ToolsMenu( intf_thread_t *p_intf, QMenu *menu )
 {
     addDPStaticEntry( menu, qtr( "&Effects and Filters"), ":/menu/settings",
             SLOT( extendedDialog() ), "Ctrl+E" );
@@ -432,8 +432,9 @@ QMenu *VLCMenuBar::ToolsMenu( QMenu *menu )
         "", SLOT( pluginDialog() ) );
     menu->addSeparator();
 
-    addDPStaticEntry( menu, qtr( "Customi&ze Interface..." ),
-        ":/menu/preferences", SLOT( toolbarDialog() ) );
+    if( !p_intf->p_sys->b_isDialogProvider )
+        addDPStaticEntry( menu, qtr( "Customi&ze Interface..." ),
+            ":/menu/preferences", SLOT( toolbarDialog() ) );
 
     addDPStaticEntry( menu, qtr( "&Preferences" ),
         ":/menu/preferences", SLOT( prefsDialog() ), "Ctrl+P", QAction::PreferencesRole );
@@ -1064,7 +1065,7 @@ void VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
     if( !b_isFullscreen )
     {
         QMenu *submenu = new QMenu( qtr( "T&ools" ), menu );
-        /*QMenu *tools =*/ ToolsMenu( submenu );
+        /*QMenu *tools =*/ ToolsMenu( p_intf, submenu );
         submenu->addSeparator();
 
         /* In skins interface, append some items */
