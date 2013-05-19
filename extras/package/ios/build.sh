@@ -191,10 +191,7 @@ fi
     --enable-small \
     --disable-sdl \
     --disable-SDL_image \
-    --disable-fontconfig \
-    --disable-ass \
     --disable-iconv \
-    --disable-fribidi \
     --disable-zvbi \
     --disable-kate \
     --disable-caca \
@@ -214,7 +211,11 @@ fi
     --disable-libmpeg2 \
     --disable-chromaprint \
     --disable-mad \
+    --enable-fribidi \
+    --enable-libxml2 \
     --enable-freetype2 \
+    --enable-ass \
+    --disable-fontconfig \
     --disable-taglib > ${out}
 
 echo "EXTRA_CFLAGS += ${EXTRA_CFLAGS}" >> config.mak
@@ -273,7 +274,7 @@ ${VLCROOT}/configure \
     --disable-faad \
     --disable-lua \
     --disable-a52 \
-    --disable-fribidi \
+    --enable-fribidi \
     --disable-macosx-audio \
     --disable-qt --disable-skins2 \
     --disable-libgcrypt \
@@ -291,8 +292,8 @@ ${VLCROOT}/configure \
     --enable-dvbpsi \
     --enable-swscale \
     --disable-projectm \
-    --disable-libass \
-    --disable-libxml2 \
+    --enable-libass \
+    --enable-libxml2 \
     --disable-goom \
     --disable-dvdread \
     --disable-dvdnav \
