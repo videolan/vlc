@@ -327,7 +327,7 @@ info "Installing libvlc"
 make install > ${out}
 
 find ${PREFIX}/lib/vlc/plugins -name *.a -type f -exec cp '{}' ${PREFIX}/lib/vlc/plugins \;
-cp -R "${VLCROOT}/contrib/${TARGET}" "${PREFIX}/contribs"
+cp -R "${VLCROOT}/contrib/${TARGET}-${ARCH}" "${PREFIX}/contribs"
 
 info "Removing unneeded modules"
 blacklist="
