@@ -315,7 +315,7 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *sub
 {
     vout_display_sys_t *sys = vd->sys;
     sys->has_first_frame = true;
-    if ([sys->glESView isAppActive])
+    if (likely([sys->glESView isAppActive]))
         vout_display_opengl_Display(sys->vgl, &vd->source);
 
     picture_Release(pic);
@@ -329,7 +329,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subp
 
     vout_display_sys_t *sys = vd->sys;
 
-    if ([sys->glESView isAppActive])
+    if (likely([sys->glESView isAppActive]))
         vout_display_opengl_Prepare(sys->vgl, pic, subpicture);
 }
 
@@ -356,7 +356,7 @@ static int OpenglESClean(vlc_gl_t *gl)
 static void OpenglESSwap(vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
-    if ([sys->glESView isAppActive])
+    if (likely([sys->glESView isAppActive]))
         [[sys->glESView eaglContext] presentRenderbuffer:GL_RENDERBUFFER];
 }
 
