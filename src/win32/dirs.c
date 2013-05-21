@@ -42,6 +42,9 @@
 
 char *config_GetLibDir (void)
 {
+#if VLC_WINSTORE_APP
+    return NULL;
+#else
     /* Get our full path */
     MEMORY_BASIC_INFORMATION mbi;
     if (!VirtualQuery (config_GetLibDir, &mbi, sizeof(mbi)))
@@ -59,6 +62,7 @@ char *config_GetLibDir (void)
     return FromWide (wpath);
 error:
     abort ();
+#endif
 }
 
 char *config_GetDataDir (void)
