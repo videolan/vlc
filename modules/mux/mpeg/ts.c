@@ -523,7 +523,7 @@ static int Open( vlc_object_t *p_this )
     p_mux->p_sys        = p_sys;
 
 #if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
-    p_sys->p_dvbpsi = dvbpsi_new( &dvbpsi_message, DVBPSI_MSG_DEBUG );
+    p_sys->p_dvbpsi = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
     if( !p_sys->p_dvbpsi )
     {
         free( p_sys );

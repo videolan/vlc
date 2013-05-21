@@ -64,7 +64,7 @@
 /* NIT */
 # define dvbpsi_DeleteNIT(table)        dvbpsi_nit_delete((table))
 
-static void dvbpsi_message(dvbpsi_t *p_dvbpsi, const dvbpsi_msg_level_t level, const char* msg)
+static void dvbpsi_messages(dvbpsi_t *p_dvbpsi, const dvbpsi_msg_level_t level, const char* msg)
 {
     vlc_object_t *obj = (vlc_object_t *)p_dvbpsi->p_sys;
 
