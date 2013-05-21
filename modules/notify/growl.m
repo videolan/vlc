@@ -167,11 +167,18 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     /* Don't update each time an item has been preparsed */
     if( b_is_item_current )
     { /* stores the current input item id */
+        input_thread_t *p_input = playlist_CurrentInput( (playlist_t*)p_this );
+        if( !p_input )
+            return VLC_SUCCESS;
+
+        p_item = input_GetItem( p_input );
         if( p_intf->p_sys->i_id != p_item->i_id )
         {
             p_intf->p_sys->i_id = p_item->i_id;
             p_intf->p_sys->i_item_changes = 0;
         }
+
+        vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
     /* ignore items which weren't pre-parsed yet */
