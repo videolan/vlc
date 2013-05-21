@@ -29,6 +29,7 @@
 # include "config.h"
 #endif
 #include <string.h>
+#include <math.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -172,6 +173,7 @@ static int BarGraphCallback( vlc_object_t *, char const *,
 
 static void LoadBarGraph( vlc_object_t *, BarGraph_t *);
 void parse_i_values( BarGraph_t *p_BarGraph, char *i_values);
+static float iec_scale(float dB);
 
 /**
  * Open the sub source
@@ -532,24 +534,37 @@ static picture_t *LoadImage( vlc_object_t *p_this, int nbChannels, int* i_values
 {
     VLC_UNUSED(p_this);
     picture_t *p_pic;
-    int i,j;
+    int i, j, pi;
     int i_width = 0;
     int i_line;
-    int moinsTrois, moinsCinq, moinsSept, moinsDix, moinsVingt;
+    int minus8, minus10, minus18, minus20, minus30, minus40, minus50, minus60;
 
     if (nbChannels == 0) {
         i_width = 20;
     } else {
         i_width = 2 * nbChannels * barWidth + 10;
     }
-
-    moinsTrois = 0.71*scale + 20;
-    moinsCinq = 0.56*scale + 20;
-    moinsSept = 0.45*scale + 20;
-    moinsDix = 0.32*scale + 20;
-    moinsVingt = 0.1*scale + 20;
+    minus8  = iec_scale(-8)*scale + 20;
+    minus10 = iec_scale(-10)*scale + 20;
+    minus18 = iec_scale(-18)*scale + 20;
+    minus20 = iec_scale(-20)*scale + 20;
+    minus30 = iec_scale(-30)*scale + 20;
+    minus40 = iec_scale(-40)*scale + 20;
+    minus50 = iec_scale(-50)*scale + 20;
+    minus60 = iec_scale(-60)*scale + 20;
 
     p_pic = picture_New(VLC_FOURCC('Y','U','V','A'), i_width+20, scale+30, 1, 1);
+
+
+#define DrawLine(a,b,Y,U,V,A) \
+        for (i=a; i<b; i++) {\
+            *(p_pic->p[0].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[0].i_pitch + i ) = Y;\
+            *(p_pic->p[1].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[1].i_pitch + i ) = U;\
+            *(p_pic->p[2].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[2].i_pitch + i ) = V;\
+            *(p_pic->p[3].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[3].i_pitch + i ) = A; \
+        }
+#define DrawLineBlack(a,b) DrawLine(a,b,0,128,128,0xFF)
+#define DrawLineWhite(a,b) DrawLine(a,b,255,128,128,0xFF)
 
     // blacken the whole picture
     for( i = 0 ; i < p_pic->i_planes ; i++ )
@@ -558,353 +573,315 @@ static picture_t *LoadImage( vlc_object_t *p_this, int nbChannels, int* i_values
                 p_pic->p[i].i_visible_lines * p_pic->p[i].i_pitch );
     }
 
+
     // side bar
     for ( i_line = 20; i_line < scale+20; i_line++ ) {
-
-#define DrawPointsBlack(a,b) {\
-        for (i=a; i<b; i++) {\
-            *(p_pic->p[0].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[0].i_pitch + i ) = 0x00; \
-            *(p_pic->p[1].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[1].i_pitch + i ) = 128; \
-            *(p_pic->p[2].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[2].i_pitch + i ) = 128; \
-            *(p_pic->p[3].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[3].i_pitch + i ) = 0xFF; \
-        }\
-    }
-#define DrawPointsWhite(a,b) {\
-        for (i=a; i<b; i++) {\
-            *(p_pic->p[0].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[0].i_pitch + i ) = 0xFF;\
-            *(p_pic->p[1].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[1].i_pitch + i ) = 128;\
-            *(p_pic->p[2].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[2].i_pitch + i ) = 128;\
-            *(p_pic->p[3].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[3].i_pitch + i ) = 0xFF; \
-        }\
-    }
-
         // vertical line
-        DrawPointsBlack(20,22);
-        DrawPointsWhite(22,24);
-
-        // -3dB
-        if (i_line == moinsTrois - 2) {
-            // 3
-            DrawPointsBlack(16,19);
-        }
-        if (i_line == moinsTrois - 1) {
-            // 3
-            DrawPointsBlack(18,19);
-            // limit
-            DrawPointsWhite(24,27);
-        }
-        if (i_line == moinsTrois) {
-            // 3
-            DrawPointsBlack(16,19);
-            // limit
-            DrawPointsBlack(24,27);
-        }
-        if (i_line == moinsTrois + 1) {
-            // 3
-            DrawPointsBlack(18,19);
-            // limit
-            DrawPointsBlack(24,27);
-        }
-        if (i_line == moinsTrois + 2) {
-            // 3
-            DrawPointsBlack(16,19);
-        }
-
-        // -5dB
-        if (i_line == moinsCinq - 2) {
-            // 5
-            DrawPointsBlack(16,19);
-        }
-        if (i_line == moinsCinq - 1) {
-            // 5
-            DrawPointsBlack(18,19);
-            // limit
-            DrawPointsWhite(24,27);
-        }
-        if (i_line == moinsCinq) {
-            // 5
-            DrawPointsBlack(16,19);
-            // limit
-            DrawPointsBlack(24,27);
-        }
-        if (i_line == moinsCinq + 1) {
-            // 5
-            DrawPointsBlack(16,17);
-            // limit
-            DrawPointsBlack(24,27);
-        }
-        if (i_line == moinsCinq + 2) {
-            // 5
-            DrawPointsBlack(16,19);
-        }
-
-        // -7dB
-        if (i_line == moinsSept - 2) {
-            // 7
-            DrawPointsBlack(18,19);
-        }
-        if (i_line == moinsSept - 1) {
-            // 7
-            DrawPointsBlack(18,19);
-            // limit
-            DrawPointsWhite(24,27);
-        }
-        if (i_line == moinsSept) {
-            // 7
-            DrawPointsBlack(18,19);
-            // limit
-            DrawPointsBlack(24,27);
-        }
-        if (i_line == moinsSept + 1) {
-            // 7
-            DrawPointsBlack(18,19);
-            // limit
-            DrawPointsBlack(24,27);
-        }
-        if (i_line == moinsSept + 2) {
-            // 7
-            DrawPointsBlack(16,19);
-        }
-
+        DrawLineBlack(20,22);
+        DrawLineWhite(22,24);
 
         // -10dB
-        if (i_line == moinsDix - 2) {
+        if (i_line == minus10 - 2) {
             // 1
-            DrawPointsBlack(14,15);
+            DrawLineBlack(14,15);
             // 0
-            DrawPointsBlack(16,19);
+            DrawLineBlack(16,19);
         }
-        if (i_line == moinsDix - 1) {
+        if (i_line == minus10 - 1) {
             // 1
-            DrawPointsBlack(14,15);
+            DrawLineBlack(14,15);
             // 0
-            DrawPointsBlack(16,17);
-            DrawPointsBlack(18,19);
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
             // limit
-            DrawPointsWhite(24,27);
+            DrawLineWhite(24,27); //White
         }
-        if (i_line == moinsDix) {
+        if (i_line == minus10) {
             // 1
-            DrawPointsBlack(14,15);
+            DrawLineBlack(14,15);
             // 0
-            DrawPointsBlack(16,17);
-            DrawPointsBlack(18,19);
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
             // limit
-            DrawPointsBlack(24,27);
+            DrawLineBlack(24,27);
         }
-        if (i_line == moinsDix + 1) {
+        if (i_line == minus10 + 1) {
             // 1
-            DrawPointsBlack(14,15);
+            DrawLineBlack(14,15);
             // 0
-            DrawPointsBlack(16,17);
-            DrawPointsBlack(18,19);
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
             // limit
-            DrawPointsBlack(24,27);
+            DrawLineBlack(24,27);
         }
-        if (i_line == moinsDix + 2) {
+        if (i_line == minus10 + 2) {
             // 1
-            DrawPointsBlack(14,15);
+            DrawLineBlack(14,15);
             // 0
-            DrawPointsBlack(16,19);
+            DrawLineBlack(16,19);
         }
 
         // -20dB
-        if (i_line == moinsVingt - 2) {
+        if (i_line == minus20 - 2) {
             // 2
-            DrawPointsBlack(12,15);
+            DrawLineBlack(12,15);
             // 0
-            DrawPointsBlack(16,19);
+            DrawLineBlack(16,19);
         }
-        if (i_line == moinsVingt - 1) {
+        if (i_line == minus20 - 1) {
             // 2
-            DrawPointsBlack(12,13);
+            DrawLineBlack(12,13);
             // 0
-            DrawPointsBlack(16,17);
-            DrawPointsBlack(18,19);
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
             // limit
-            DrawPointsWhite(24,27);
+            DrawLineWhite(24,27); //White
         }
-        if (i_line == moinsVingt) {
+        if (i_line == minus20) {
             // 2
-            DrawPointsBlack(12,15);
+            DrawLineBlack(12,15);
             // 0
-            DrawPointsBlack(16,17);
-            DrawPointsBlack(18,19);
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
             // limit
-            DrawPointsBlack(24,27);
+            DrawLineBlack(24,27);
         }
-        if (i_line == moinsVingt + 1) {
+        if (i_line == minus20 + 1) {
             // 2
-            DrawPointsBlack(14,15);
+            DrawLineBlack(14,15);
             // 0
-            DrawPointsBlack(16,17);
-            DrawPointsBlack(18,19);
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
             // limit
-            DrawPointsBlack(24,27);
+            DrawLineBlack(24,27);
         }
-        if (i_line == moinsVingt + 2) {
+        if (i_line == minus20 + 2) {
             // 2
-            DrawPointsBlack(12,15);
+            DrawLineBlack(12,15);
             // 0
-            DrawPointsBlack(16,19);
+            DrawLineBlack(16,19);
         }
 
+        // -30dB
+        if (i_line == minus30 - 2) {
+            // 3
+            DrawLineBlack(12,15);
+            // 0
+            DrawLineBlack(16,19);
+        }
+        if (i_line == minus30 - 1) {
+            // 3
+            DrawLineBlack(14,15);
+            // 0
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
+            // limit
+            DrawLineWhite(24,27); //White
+        }
+        if (i_line == minus30) {
+            // 3
+            DrawLineBlack(12,15);
+            // 0
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
+            // limit
+            DrawLineBlack(24,27);
+        }
+        if (i_line == minus30 + 1) {
+            // 3
+            DrawLineBlack(14,15);
+            // 0
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
+            // limit
+            DrawLineBlack(24,27);
+        }
+        if (i_line == minus30 + 2) {
+            // 3
+            DrawLineBlack(12,15);
+            // 0
+            DrawLineBlack(16,19);
+        }
 
+        // -40dB
+        if (i_line == minus40 - 2) {
+            // 4
+            DrawLineBlack(14,15);
+            // 0
+            DrawLineBlack(16,19);
+        }
+        if (i_line == minus40 - 1) {
+            // 4
+            DrawLineBlack(14,15);
+            // 0
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
+            // limit
+            DrawLineWhite(24,27); // white
+        }
+        if (i_line == minus40) {
+            // 4
+            DrawLineBlack(12,15);
+            // 0
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
+            // limit
+            DrawLineBlack(24,27);
+        }
+        if (i_line == minus40 + 1) {
+            // 4
+            DrawLineBlack(12,13);
+            DrawLineBlack(14,15);
+            // 0
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
+            // limit
+            DrawLineBlack(24,27);
+        }
+        if (i_line == minus40 + 2) {
+            // 4
+            DrawLineBlack(12,13);
+            DrawLineBlack(14,15);
+            // 0
+            DrawLineBlack(16,19);
+        }
+
+        // -50dB
+        if (i_line == minus50 - 2) {
+            // 5
+            DrawLineBlack(12,15);
+            // 0
+            DrawLineBlack(16,19);
+        }
+        if (i_line == minus50 - 1) {
+            // 5
+            DrawLineBlack(14,15);
+            // 0
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
+            // limit
+            DrawLineWhite(24,27); //White
+        }
+        if (i_line == minus50) {
+            // 5
+            DrawLineBlack(12,15);
+            // 0
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
+            // limit
+            DrawLineBlack(24,27);
+        }
+        if (i_line == minus50 + 1) {
+            // 5
+            DrawLineBlack(12,13);
+            // 0
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
+            // limit
+            DrawLineBlack(24,27);
+        }
+        if (i_line == minus50 + 2) {
+            // 2
+            DrawLineBlack(12,15);
+            // 0
+            DrawLineBlack(16,19);
+        }
+        // -60dB
+        if (i_line == minus60 - 2) {
+            // 6
+            DrawLineBlack(12,15);
+            // 0
+            DrawLineBlack(16,19);
+        }
+        if (i_line == minus60 - 1) {
+            // 6
+            DrawLineBlack(12,13);
+            DrawLineBlack(14,15);
+            // 0
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
+            // limit
+            DrawLineWhite(24,27); //White
+        }
+        if (i_line == minus60) {
+            // 6
+            DrawLineBlack(12,15);
+            // 0
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
+            // limit
+            DrawLineBlack(24,27);
+        }
+        if (i_line == minus60 + 1) {
+            // 6
+            DrawLineBlack(12,13);
+            // 0
+            DrawLineBlack(16,17);
+            DrawLineBlack(18,19);
+            // limit
+            DrawLineBlack(24,27);
+        }
+        if (i_line == minus60 + 2) {
+            // 6
+            DrawLineBlack(12,15);
+            // 0
+            DrawLineBlack(16,19);
+        }
     }
+
+#define drawPoint(offset,y,u,v,a)  \
+                *(p_pic->p[0].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[0].i_pitch + offset ) = y; \
+                *(p_pic->p[1].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[1].i_pitch + offset ) = u; \
+                *(p_pic->p[2].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[2].i_pitch + offset ) = v; \
+                *(p_pic->p[3].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[3].i_pitch + offset ) = a;
+
 
     // draw the bars and channel indicators
     for (i=0; i<nbChannels; i++) {
-        for( j = barWidth+20 ; j < 2*barWidth+20; j++)
+        pi =  25 + ((i+1)*5) + (i*barWidth) ;  // 25 separació amb indicador, 5 separació entre barres
+
+        for( j = pi; j < pi + barWidth; j++)
         {
             // channel indicators
-            for ( i_line = 12; i_line < 18; i_line++ ) {
-                // white
-                *(p_pic->p[0].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[0].i_pitch +
-                    ( (2*i*barWidth)+j ) ) = 255;
-                *(p_pic->p[1].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[1].i_pitch +
-                    ( (2*i*barWidth)+j ) ) = 128;
-                *(p_pic->p[2].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[2].i_pitch +
-                    ( (2*i*barWidth)+j ) ) = 128;
-                *(p_pic->p[3].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[3].i_pitch +
-                    ( (2*i*barWidth)+j )) = 0xFF;
+            for ( i_line = 12; i_line < 20; i_line++ ) {
+                if( alarm ) {
+                    drawPoint(j,76,85,0xFF,0xFF);  // red
+                }
+                else {
+                    drawPoint(j,0,128,128,0xFF); // black             DrawLine(pi,pf,0xFF,128,128,0xFF);
+                }
             }
+
             // bars
             for( i_line = 20; i_line < i_values[i]+20; i_line++ )
             {
-                if (i_line < moinsDix) { // green if < -10 dB
-                    *(p_pic->p[0].p_pixels +
-                        (scale + 30 - i_line - 1) *
-                        p_pic->p[0].i_pitch +
-                        ( (2*i*barWidth)+j ) ) = 150;
-                    *(p_pic->p[1].p_pixels +
-                        (scale + 30 - i_line - 1) *
-                        p_pic->p[1].i_pitch +
-                        ( (2*i*barWidth)+j ) ) = 44;
-                    *(p_pic->p[2].p_pixels +
-                        (scale + 30 - i_line - 1) *
-                        p_pic->p[2].i_pitch +
-                        ( (2*i*barWidth)+j ) ) = 21;
-                    *(p_pic->p[3].p_pixels +
-                        (scale + 30 - i_line - 1) *
-                        p_pic->p[3].i_pitch +
-                        ( (2*i*barWidth)+j )) = 0xFF;
-                } else if (i_line < moinsTrois) { // yellow if > -10dB and < -3dB
-                    *(p_pic->p[0].p_pixels +
-                        (scale + 30 - i_line - 1) *
-                        p_pic->p[0].i_pitch +
-                        ( (2*i*barWidth)+j ) ) = 226;
-                    *(p_pic->p[1].p_pixels +
-                        (scale + 30 - i_line - 1) *
-                        p_pic->p[1].i_pitch +
-                        ( (2*i*barWidth)+j ) ) = 1;
-                    *(p_pic->p[2].p_pixels +
-                        (scale + 30 - i_line - 1) *
-                        p_pic->p[2].i_pitch +
-                        ( (2*i*barWidth)+j ) ) = 148;
-                    *(p_pic->p[3].p_pixels +
-                        (scale + 30 - i_line - 1) *
-                        p_pic->p[3].i_pitch +
-                        ( (2*i*barWidth)+j )) = 0xFF;
-                } else { // red if > -3 dB
-                    *(p_pic->p[0].p_pixels +
-                        (scale + 30 - i_line - 1) *
-                        p_pic->p[0].i_pitch +
-                        ( (2*i*barWidth)+j ) ) = 76;
-                    *(p_pic->p[1].p_pixels +
-                        (scale + 30 - i_line - 1) *
-                        p_pic->p[1].i_pitch +
-                        ( (2*i*barWidth)+j ) ) = 85;
-                    *(p_pic->p[2].p_pixels +
-                        (scale + 30 - i_line - 1) *
-                        p_pic->p[2].i_pitch +
-                        ( (2*i*barWidth)+j ) ) = 0xFF;
-                    *(p_pic->p[3].p_pixels +
-                        (scale + 30 - i_line - 1) *
-                        p_pic->p[3].i_pitch +
-                        ( (2*i*barWidth)+j )) = 0xFF;
+                if (i_line < minus18) { // green if < -18 dB
+                    drawPoint(j,150,44,21,0xFF);
+                    //DrawLine(pi,pf,150,44,21,0xFF);
+                } else if (i_line < minus8) { // yellow if > -18dB and < -8dB
+                    drawPoint(j,226,1,148,0xFF);
+                    //DrawLine(pi,pf,226,1,148,0xFF);
+                } else { // red if > -8 dB
+                    drawPoint(j,76,85,0xFF,0xFF);
+                    //DrawLine(pi,pf,76,85,255,0xFF);
+                }
+            }
+            // bars no signal
+            for( ; i_line < scale+20; i_line++ )
+            {
+                if (i_line < minus18) { // green if < -18 dB
+                    drawPoint(j,74,85,74,0xFF);
+                    //DrawLine(pi,pf,74,85,74,0xFF);
+                } else if (i_line < minus8) { // yellow if > -18dB and < -8dB
+                    drawPoint(j,112,64,138,0xFF);
+                    //DrawLine(pi,pf,112,64,138,0xFF);
+                } else { // red if > -8 dB
+                    drawPoint(j,37,106,191,0xFF);
+                    //DrawLine(pi,pf,37,106,191,0xFF);
                 }
             }
         }
     }
-
-
-
-    if (alarm) {// draw the alarm square
-        // bottom
-        for ( i_line = 0; i_line < 10; i_line++ ) {
-            for (i=0; i<i_width+20; i++) {
-                *(p_pic->p[0].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[0].i_pitch + i ) = 76;
-                *(p_pic->p[1].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[1].i_pitch + i ) = 85;
-                *(p_pic->p[2].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[2].i_pitch + i ) = 0xFF;
-                *(p_pic->p[3].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[3].i_pitch + i ) = 0xFF;
-            }
-        }
-        // top
-        for ( i_line = scale+21; i_line < scale+30; i_line++ ) {
-            for (i=0; i<i_width+20; i++) {
-                *(p_pic->p[0].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[0].i_pitch + i ) = 76;
-                *(p_pic->p[1].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[1].i_pitch + i ) = 85;
-                *(p_pic->p[2].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[2].i_pitch + i ) = 0xFF;
-                *(p_pic->p[3].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[3].i_pitch + i ) = 0xFF;
-            }
-        }
-        // sides
-        for ( i_line = 9; i_line < scale+21; i_line++ ) {
-            for (i=0; i<10; i++) {
-                *(p_pic->p[0].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[0].i_pitch + i ) = 76;
-                *(p_pic->p[1].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[1].i_pitch + i ) = 85;
-                *(p_pic->p[2].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[2].i_pitch + i ) = 0xFF;
-                *(p_pic->p[3].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[3].i_pitch + i ) = 0xFF;
-            }
-            for (i=i_width+11; i<i_width+20; i++) {
-                *(p_pic->p[0].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[0].i_pitch + i ) = 76;
-                *(p_pic->p[1].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[1].i_pitch + i ) = 85;
-                *(p_pic->p[2].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[2].i_pitch + i ) = 0xFF;
-                *(p_pic->p[3].p_pixels +
-                    (scale + 30 - i_line - 1) *
-                    p_pic->p[3].i_pitch + i ) = 0xFF;
-            }
-        }
-    }
-
 
     return p_pic;
 }
@@ -931,6 +908,7 @@ void parse_i_values( BarGraph_t *p_BarGraph, char *i_values)
     char* res = NULL;
     char delim[] = ":";
     char* tok;
+    float db;
 
     p_BarGraph->nbChannels = 0;
     p_BarGraph->i_values = NULL;
@@ -939,8 +917,34 @@ void parse_i_values( BarGraph_t *p_BarGraph, char *i_values)
         p_BarGraph->nbChannels++;
         p_BarGraph->i_values = xrealloc(p_BarGraph->i_values,
                                           p_BarGraph->nbChannels*sizeof(int));
-        p_BarGraph->i_values[p_BarGraph->nbChannels-1] = VLC_CLIP( atof(res)*p_BarGraph->scale, 0, p_BarGraph->scale );
+        db = log10(atof(res)) * 20;
+        p_BarGraph->i_values[p_BarGraph->nbChannels-1] = VLC_CLIP( iec_scale(db)*p_BarGraph->scale, 0, p_BarGraph->scale );
         res = strtok_r(NULL, delim, &tok);
     }
 
+}
+
+/*****************************************************************************
+ * IEC 268-18  Source: meterbridge
+ *****************************************************************************/
+static float iec_scale(float dB)
+{
+       float fScale = 1.0f;
+
+       if (dB < -70.0f)
+              fScale = 0.0f;
+       else if (dB < -60.0f)
+              fScale = (dB + 70.0f) * 0.0025f;
+       else if (dB < -50.0f)
+              fScale = (dB + 60.0f) * 0.005f + 0.025f;
+       else if (dB < -40.0)
+              fScale = (dB + 50.0f) * 0.0075f + 0.075f;
+       else if (dB < -30.0f)
+              fScale = (dB + 40.0f) * 0.015f + 0.15f;
+       else if (dB < -20.0f)
+              fScale = (dB + 30.0f) * 0.02f + 0.3f;
+       else if (dB < -0.001f || dB > 0.001f)  /* if (dB < 0.0f) */
+              fScale = (dB + 20.0f) * 0.025f + 0.5f;
+
+       return fScale;
 }
