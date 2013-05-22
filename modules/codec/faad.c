@@ -146,10 +146,7 @@ static int Open( vlc_object_t *p_this )
     date_Set( &p_sys->date, 0 );
     p_dec->fmt_out.i_cat = AUDIO_ES;
 
-    if (HAVE_FPU)
-        p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
-    else
-        p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
+    p_dec->fmt_out.i_codec = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_S16N;
     p_dec->pf_decode_audio = DecodeBlock;
 
     p_dec->fmt_out.audio.i_physical_channels =
@@ -187,10 +184,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Set the faad config */
     cfg = faacDecGetCurrentConfiguration( p_sys->hfaad );
-    if (HAVE_FPU)
-        cfg->outputFormat = FAAD_FMT_FLOAT;
-    else
-        cfg->outputFormat = FAAD_FMT_16BIT;
+    cfg->outputFormat = HAVE_FPU ? FAAD_FMT_FLOAT : FAAD_FMT_16BIT;
     faacDecSetConfiguration( p_sys->hfaad, cfg );
 
     /* buffer */
