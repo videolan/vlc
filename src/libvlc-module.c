@@ -1490,7 +1490,7 @@ vlc_module_begin ()
     add_bool( "audio-replay-gain-peak-protection", true,
               AUDIO_REPLAY_GAIN_PEAK_PROTECTION_TEXT, AUDIO_REPLAY_GAIN_PEAK_PROTECTION_LONGTEXT, true )
 
-    add_bool( "audio-time-stretch", HAVE_FPU,
+    add_bool( "audio-time-stretch", true,
               AUDIO_TIME_STRETCH_TEXT, AUDIO_TIME_STRETCH_LONGTEXT, false )
 
     set_subcategory( SUBCAT_AUDIO_AOUT )
