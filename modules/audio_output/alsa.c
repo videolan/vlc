@@ -229,7 +229,7 @@ static unsigned SetupChannels (vlc_object_t *obj, snd_pcm_t *pcm,
                                 uint16_t *restrict mask, uint8_t *restrict tab)
 {
     snd_pcm_chmap_query_t **maps = snd_pcm_query_chmaps (pcm);
-    if (tab == NULL)
+    if (maps == NULL)
     {   /* Fallback to manual configuration */
         msg_Dbg(obj, "channels map not provided");
         return SetupChannelsUnknown (obj, mask);
