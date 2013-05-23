@@ -374,7 +374,7 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt)
                     VLC_VAR_INTEGER | VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT);
 
         vlc_value_t txt;
-        txt.psz_string = _("Audio Channels");
+        txt.psz_string = _("Stereo audio mode");
         var_Change (aout, "stereo-mode", VLC_VAR_SETTEXT, &txt, NULL);
     }
 
