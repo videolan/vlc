@@ -102,6 +102,7 @@ struct encoder_sys_t
      */
     uint8_t *p_buffer;
     size_t i_buffer_out;
+    uint8_t *p_interleave_buf;
 
     /*
      * Video properties
@@ -310,6 +311,7 @@ int OpenEncoder( vlc_object_t *p_this )
     p_sys->b_planar = false;
 
     p_sys->p_buffer = NULL;
+    p_sys->p_interleave_buf = NULL;
     p_sys->i_buffer_out = 0;
 
     p_context = avcodec_alloc_context3(p_codec);
@@ -864,6 +866,13 @@ int OpenEncoder( vlc_object_t *p_this )
         p_sys->b_variable = p_context->frame_size ? false : true;
 
         p_sys->i_buffer_out = p_sys->i_frame_size * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels;
+
+        if( p_sys->b_planar )
+        {
+            p_sys->p_interleave_buf = malloc( p_sys->i_buffer_out );
+            if( unlikely( p_sys->p_interleave_buf == NULL ) )
+                goto error;
+        }
     }
 
     p_sys->frame = avcodec_alloc_frame();
@@ -881,6 +890,7 @@ int OpenEncoder( vlc_object_t *p_this )
 error:
     free( p_enc->fmt_out.p_extra );
     free( p_sys->p_buffer );
+    free( p_sys->p_interleave_buf );
     free( p_sys );
     return VLC_ENOMEM;
 }
@@ -1120,6 +1130,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     {
         //How much we need to copy from new packet
         const int leftover = leftover_samples * p_enc->fmt_in.audio.i_channels * p_sys->i_sample_bytes;
+
 #if LIBAVUTIL_VERSION_CHECK( 51,27,2,46,100 )
         const int align = 0;
 #else
@@ -1136,11 +1147,12 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         if( likely( p_aout_buf ) )
         {
             p_aout_buf->i_nb_samples -= leftover_samples;
+            memcpy( p_sys->p_buffer+buffer_delay, p_aout_buf->p_buffer, leftover );
 
             // We need to deinterleave from p_aout_buf to p_buffer the leftover bytes
             if( p_sys->b_planar )
-                aout_Deinterleave( p_sys->p_buffer+buffer_delay, p_aout_buf->p_buffer,
-                    leftover_samples, p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.i_codec );
+                aout_Deinterleave( p_sys->p_interleave_buf, p_sys->p_buffer,
+                    p_sys->i_frame_size, p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.i_codec );
             else
                 memcpy( p_sys->p_buffer + buffer_delay, p_aout_buf->p_buffer, leftover);
 
@@ -1158,7 +1170,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             buffer_delay += padding_size;
         }
         if( avcodec_fill_audio_frame( p_sys->frame, p_enc->fmt_in.audio.i_channels,
-                p_sys->p_context->sample_fmt, p_sys->p_buffer,
+                p_sys->p_context->sample_fmt, p_sys->b_planar ? p_sys->p_interleave_buf : p_sys->p_buffer,
                 leftover + buffer_delay,
                 align) < 0 )
             msg_Err( p_enc, "filling error on fillup" );
@@ -1296,13 +1308,9 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     // that frame has more data than p_sys->i_frame_size most of the cases currently.
     if( p_aout_buf->i_nb_samples > 0 )
     {
-       if( p_sys->b_planar )
-          aout_Deinterleave( p_sys->p_buffer+buffer_delay, p_aout_buf->p_buffer,
-              p_aout_buf->i_nb_samples, p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.i_codec );
-       else
-           memcpy( p_sys->p_buffer + buffer_delay, p_aout_buf->p_buffer,
-                   p_aout_buf->i_nb_samples * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels);
-        p_sys->i_samples_delay += p_aout_buf->i_nb_samples;
+       memcpy( p_sys->p_buffer + buffer_delay, p_aout_buf->p_buffer,
+               p_aout_buf->i_nb_samples * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels);
+       p_sys->i_samples_delay += p_aout_buf->i_nb_samples;
     }
 
     return p_chain;
@@ -1325,6 +1333,7 @@ void CloseEncoder( vlc_object_t *p_this )
     av_free( p_sys->p_context );
 
 
+    free( p_sys->p_interleave_buf );
     free( p_sys->p_buffer );
 
     free( p_sys );
