@@ -326,9 +326,6 @@ static int Open (vlc_object_t *obj)
     demux_t *demux = (demux_t *)obj;
     demux_sys_t *sys = malloc (sizeof (*sys));
 
-    static_assert (sizeof (formats) / sizeof (formats[0]) ==
-                   SND_PCM_FORMAT_LAST + 1, "unknown formats");
-
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
