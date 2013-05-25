@@ -650,7 +650,7 @@ QMenu *VLCMenuBar::SubtitleMenu( intf_thread_t *p_intf, QMenu *current )
  * Main Video Menu
  * Subtitles are part of Video.
  **/
-QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current, bool b_subtitle )
+QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 {
     vout_thread_t *p_vout;
     input_thread_t *p_input;
@@ -1042,7 +1042,7 @@ void VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
 
         /* Video menu */
         submenu = new QMenu( menu );
-        action = menu->addMenu( VideoMenu( p_intf, submenu, false ) );
+        action = menu->addMenu( VideoMenu( p_intf, submenu ) );
         action->setText( qtr( "&Video" ) );
         if( action->menu()->isEmpty() )
             action->setEnabled( false );
