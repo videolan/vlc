@@ -49,6 +49,7 @@ RequestExecutionLevel user
 !addincludedir NSIS
 !addplugindir NSIS
 !include UAC.nsh
+!include WinVer.nsh
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; NSIS Modern User Interface configuration ;
@@ -430,6 +431,14 @@ Function .onInit
 @HAVE_WIN64_TRUE@    MessageBox MB_OK|MB_ICONSTOP "This version of VLC only runs on 64bits operating systems.$\nYour operating system is 32bits.$\n$\nPlease get the 32 BITS version."
 @HAVE_WIN64_TRUE@    Quit
 @HAVE_WIN64_TRUE@ ${Endif}
+${If} ${AtLeastWinXP}
+    ${If} ${IsWinXP}
+    ${AndIf} ${AtMostServicePack} 1
+        Goto WinTooOld
+    ${Endif}
+${Else}
+    Goto WinTooOld
+${Endif}
 
 @HAVE_WIN64_TRUE@ SetRegView 64
 ReadRegStr $INSTDIR HKLM "${PRODUCT_DIR_REGKEY}" "InstallDir"
@@ -450,6 +459,10 @@ UAC_Err:
 UAC_ElevationAborted:
     MessageBox mb_iconstop "This installer requires admin access, aborting!"
     Abort
+
+WinTooOld:
+    MessageBox MB_OK|MB_ICONSTOP "This version of VLC only runs on Windows XP SP2 and newer."
+    Quit
 
 UAC_Success:
     StrCmp 1 $3 +4
