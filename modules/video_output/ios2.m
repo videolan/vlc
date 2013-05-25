@@ -449,7 +449,6 @@ static void OpenglESSwap(vlc_gl_t *gl)
 - (void)resetBuffers
 {
     if (_bufferNeedReset) {
-        NSLog(@"actually resetting buffers");
         [self destroyBuffers];
         [self createBuffers];
         _bufferNeedReset = NO;
@@ -458,7 +457,6 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
 - (void)layoutSubviews
 {
-    NSLog(@"layoutSubviews");
     /* this method is called as soon as we are resized.
      * so set a variable to re-create our buffers on the next clean event */
     _bufferNeedReset = YES;
