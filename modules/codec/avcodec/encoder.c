@@ -902,7 +902,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
     int i_out, i_plane, i_got_packet=1;
-    AVPacket av_pkt;
 
     /* Initialize the video output buffer the first time.
      * This is done here instead of OpenEncoder() because we need the actual
@@ -914,6 +913,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     block_t *p_block = block_Alloc( blocksize );
 
 #if (LIBAVCODEC_VERSION_MAJOR >= 54)
+    AVPacket av_pkt;
     /*We don't use av_pkt with major_version < 54, so no point init it*/
     av_init_packet( &av_pkt );
     av_pkt.data = p_block->p_buffer;
