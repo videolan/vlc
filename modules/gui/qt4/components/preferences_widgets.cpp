@@ -1155,7 +1155,7 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
 
     /* Find the top most widget */
     QWidget *parent, *rootWidget = p;
-    while( parent = rootWidget->parentWidget() )
+    while( (parent = rootWidget->parentWidget()) != NULL )
         rootWidget = parent;
     buildAppHotkeysList( rootWidget );
 
