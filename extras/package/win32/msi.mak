@@ -28,7 +28,7 @@ candle:
 
 light:
 	test ! -d "$(WINE_C)/v" -o ! -f "$(WINE_C)/v"
-	ln -sf "$(win32_destdir)" "$(WINE_C)"/v
+	ln -Tsf "$(win32_destdir)" "$(WINE_C)"/v
 	$(LIGHT) -sval -ext WixUIExtension -ext WixUtilExtension -cultures:en-us -b $(W_MSIDIR) -b C:/v/plugins -b C:/v/locale -b C:/v/lua -b C:/v/skins $(W_MSIBUILDDIR)\\product.wixobj $(W_MSIBUILDDIR)\\axvlc.wixobj $(W_MSIBUILDDIR)\\extensions.wixobj $(W_MSIBUILDDIR)\\*.fragment.wixobj -o $(MSIOUTFILE)
 	chmod 644 $(MSIOUTFILE)
 
