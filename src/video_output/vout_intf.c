@@ -47,16 +47,18 @@
  * Local prototypes
  *****************************************************************************/
 /* Object variables callbacks */
-static int ZoomCallback( vlc_object_t *, char const *,
-                         vlc_value_t, vlc_value_t, void * );
 static int CropCallback( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 static int CropBorderCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
 static int AspectCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
-static int ScalingCallback( vlc_object_t *, char const *,
-                            vlc_value_t, vlc_value_t, void * );
+static int AutoScaleCallback( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t, void * );
+static int ScaleCallback( vlc_object_t *, char const *,
+                          vlc_value_t, vlc_value_t, void * );
+static int ZoomCallback( vlc_object_t *, char const *,
+                         vlc_value_t, vlc_value_t, void * );
 static int OnTopCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
 static int FullscreenCallback( vlc_object_t *, char const *,
@@ -167,13 +169,13 @@ void vout_IntfInit( vout_thread_t *p_vout )
                 | VLC_VAR_ISCOMMAND );
     text.psz_string = _("Autoscale video");
     var_Change( p_vout, "autoscale", VLC_VAR_SETTEXT, &text, NULL );
-    var_AddCallback( p_vout, "autoscale", ScalingCallback, NULL );
+    var_AddCallback( p_vout, "autoscale", AutoScaleCallback, NULL );
 
     var_Create( p_vout, "scale", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT
                 | VLC_VAR_ISCOMMAND );
     text.psz_string = _("Scale factor");
     var_Change( p_vout, "scale", VLC_VAR_SETTEXT, &text, NULL );
-    var_AddCallback( p_vout, "scale", ScalingCallback, NULL );
+    var_AddCallback( p_vout, "scale", ScaleCallback, NULL );
 
     /* Zoom object var */
     var_Create( p_vout, "zoom", VLC_VAR_FLOAT | VLC_VAR_ISCOMMAND |
@@ -535,14 +537,6 @@ void vout_EnableFilter( vout_thread_t *p_vout, const char *psz_name,
 /*****************************************************************************
  * Object variables callbacks
  *****************************************************************************/
-static int ZoomCallback( vlc_object_t *p_this, char const *psz_cmd,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    (void)psz_cmd; (void)oldval; (void)p_data;
-
-    return var_SetFloat( p_this, "scale", newval.f_float );
-}
-
 static int CropCallback( vlc_object_t *object, char const *cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *data )
 {
@@ -598,18 +592,31 @@ static int AspectCallback( vlc_object_t *object, char const *cmd,
     return VLC_SUCCESS;
 }
 
-static int ScalingCallback( vlc_object_t *p_this, char const *psz_cmd,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int AutoScaleCallback( vlc_object_t *obj, char const *name,
+                              vlc_value_t prev, vlc_value_t cur, void *data )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    (void)oldval; (void)newval; (void)p_data;
+    vout_thread_t *p_vout = (vout_thread_t *)obj;
 
-    if( !strcmp( psz_cmd, "autoscale" ) )
-        vout_ControlChangeDisplayFilled( p_vout, newval.b_bool );
-    else if( !strcmp( psz_cmd, "scale" ) )
-        vout_ControlChangeZoom( p_vout, 1000 * newval.f_float, 1000 );
-
+    (void) name; (void) prev; (void) data;
+    vout_ControlChangeDisplayFilled( p_vout, cur.b_bool );
     return VLC_SUCCESS;
+}
+
+static int ScaleCallback( vlc_object_t *obj, char const *name,
+                          vlc_value_t prev, vlc_value_t cur, void *data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)obj;
+
+    (void) name; (void) prev; (void) data;
+    vout_ControlChangeZoom( p_vout, 1000 * cur.f_float, 1000 );
+    return VLC_SUCCESS;
+}
+
+static int ZoomCallback( vlc_object_t *obj, char const *name,
+                         vlc_value_t prev, vlc_value_t cur, void *data )
+{
+    (void) name; (void) prev; (void) data;
+    return var_SetFloat( obj, "scale", cur.f_float );
 }
 
 static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
