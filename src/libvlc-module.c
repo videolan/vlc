@@ -1605,7 +1605,7 @@ vlc_module_begin ()
                  VIDEO_TITLE_LONGTEXT, true )
     add_integer( "align", 0, ALIGN_TEXT, ALIGN_LONGTEXT, true )
         change_integer_list( pi_align_values, ppsz_align_descriptions )
-    add_float( "zoom", 1, ZOOM_TEXT, ZOOM_LONGTEXT, true )
+    add_float( "zoom", 1., ZOOM_TEXT, ZOOM_LONGTEXT, true )
     add_integer( "deinterlace", 0,
                  DEINTERLACE_TEXT, DEINTERLACE_LONGTEXT, false )
         change_integer_list( pi_deinterlace, ppsz_deinterlace_text )
