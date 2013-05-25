@@ -76,7 +76,8 @@ static inline uint16_t dv_audio_12to16( uint16_t sample )
     return result;
 }
 
-static void dv_get_audio_format( es_format_t *p_fmt, const uint8_t *p_aaux_src )
+static inline void dv_get_audio_format( es_format_t *p_fmt,
+                                        const uint8_t *p_aaux_src )
 {
     /* 12 bits non-linear will be converted to 16 bits linear */
     es_format_Init( p_fmt, AUDIO_ES, VLC_CODEC_S16L );
@@ -113,7 +114,7 @@ static inline int dv_get_audio_sample_count( const uint8_t *p_buffer, int i_dsf 
     }
 }
 
-static block_t *dv_extract_audio( block_t *p_frame_block )
+static inline block_t *dv_extract_audio( block_t *p_frame_block )
 {
     block_t *p_block;
     uint8_t *p_frame, *p_buf;
