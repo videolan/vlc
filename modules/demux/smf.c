@@ -172,16 +172,12 @@ static int Open (vlc_object_t * p_this)
     }
 
     p_sys = malloc (sizeof (*p_sys) + (sizeof (mtrk_t) * tracks));
-    if (p_sys == NULL)
+    if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
 
     /* We've had a valid SMF header - now skip it*/
     if (stream_Read (stream, NULL, 14) < 14)
         goto error;
-
-    p_demux->pf_demux   = Demux;
-    p_demux->pf_control = Control;
-    p_demux->p_sys      = p_sys;
 
     /* Default SMF tempo is 120BPM, i.e. half a second per quarter note */
     date_Init (&p_sys->pts, ppqn * 2, 1);
@@ -200,7 +196,7 @@ static int Open (vlc_object_t * p_this)
             /* Seeking screws streaming up, but there is no way around this,
              * as SMF1 tracks are performed simultaneously.
              * Not a big deal as SMF1 are usually only a few kbytes anyway. */
-            if (stream_Seek (stream,  p_sys->trackv[i-1].end))
+            if (stream_Seek (stream, p_sys->trackv[i - 1].end))
             {
                 msg_Err (p_this, "cannot build SMF index (corrupted file?)");
                 goto error;
@@ -239,6 +235,9 @@ static int Open (vlc_object_t * p_this)
     fmt.audio.i_rate = 44100; /* dummy value */
     p_sys->es = es_out_Add (p_demux->out, &fmt);
 
+    p_demux->pf_demux   = Demux;
+    p_demux->pf_control = Control;
+    p_demux->p_sys      = p_sys;
     return VLC_SUCCESS;
 
 error:
@@ -539,7 +538,7 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr)
         if (datalen == 0)
         {
             msg_Err (p_demux, "malformatted MIDI event");
-            return -1; /* can't use implicit running status with empty payload! */
+            return -1; /* implicit running status requires non-empty payload */
         }
 
         block->p_buffer[1] = first;
@@ -574,7 +573,8 @@ static int Demux (demux_t *p_demux)
     if (pulse == UINT64_MAX)
         return 0; /* all tracks are done */
 
-    es_out_Control (p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + date_Get (&p_sys->pts));
+    es_out_Control (p_demux->out, ES_OUT_SET_PCR,
+                    VLC_TS_0 + date_Get (&p_sys->pts));
 
     for (unsigned i = 0; i < p_sys->trackc; i++)
     {
