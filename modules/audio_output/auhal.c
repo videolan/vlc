@@ -111,7 +111,8 @@ struct aout_sys_t
     int                         i_bytes_per_sample;
 
     CFArrayRef                  device_list;
-    vlc_mutex_t                 device_list_lock;
+
+    vlc_mutex_t                 var_lock;           /* protects access to device_list and i_selected_dev */
 
     float                       f_volume;
     bool                        b_mute;
@@ -184,7 +185,7 @@ static int Open(vlc_object_t *obj)
 
     OSStatus err = noErr;
 
-    vlc_mutex_init(&p_sys->device_list_lock);
+    vlc_mutex_init(&p_sys->var_lock);
     vlc_mutex_init(&p_sys->lock);
     vlc_cond_init(&p_sys->cond);
     p_sys->b_digital = false;
@@ -231,7 +232,7 @@ static void Close(vlc_object_t *obj)
     if (err != noErr)
         msg_Err(p_aout, "AudioHardwareRemovePropertyListener failed [%4.4s]", (char *)&err);
 
-    vlc_mutex_lock(&p_sys->device_list_lock);
+    vlc_mutex_lock(&p_sys->var_lock);
     /* remove streams callbacks */
     CFIndex count = CFArrayGetCount(p_sys->device_list);
     if (count > 0) {
@@ -249,13 +250,13 @@ static void Close(vlc_object_t *obj)
     }
 
     CFRelease(p_sys->device_list);
-    vlc_mutex_unlock(&p_sys->device_list_lock);
+    vlc_mutex_unlock(&p_sys->var_lock);
 
     char *psz_device = aout_DeviceGet(p_aout);
     config_PutPsz(p_aout, "auhal-audio-device", psz_device);
     free(psz_device);
 
-    vlc_mutex_destroy(&p_sys->device_list_lock);
+    vlc_mutex_destroy(&p_sys->var_lock);
     vlc_mutex_destroy(&p_sys->lock);
     vlc_cond_destroy(&p_sys->cond);
 
@@ -286,6 +287,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_sys->b_changed_mixing = false;
     p_sys->i_bytes_per_sample = 0;
 
+    vlc_mutex_lock(&p_sys->var_lock);
     p_sys->i_selected_dev = p_sys->i_new_selected_dev;
 
     aout_FormatPrint(p_aout, "VLC is looking for:", fmt);
@@ -377,6 +379,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
             b_success = true;
         }
     }
+    vlc_mutex_unlock(&p_sys->var_lock);
 
     if (b_success) {
         p_aout->play = Play;
@@ -388,6 +391,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
 error:
     /* If we reach this, this aout has failed */
+    vlc_mutex_unlock(&p_sys->var_lock);
     msg_Err(p_aout, "opening auhal output failed");
     return VLC_EGENERIC;
 }
@@ -1023,6 +1027,7 @@ static void Stop(audio_output_t *p_aout)
         verify_noerr(AudioComponentInstanceDispose(p_sys->au_unit));
     }
 
+    vlc_mutex_lock(&p_sys->var_lock);
     if (p_sys->b_digital) {
         /* Stop device */
         err = AudioDeviceStop(p_sys->i_selected_dev,
@@ -1077,7 +1082,7 @@ static void Stop(audio_output_t *p_aout)
         msg_Warn(p_aout, "failed to remove audio device life checker [%4.4s]", (char *)&err);
     }
 
-
+    vlc_mutex_unlock(&p_sys->var_lock);
 
     p_sys->i_bytes_per_sample = 0;
     p_sys->b_digital = false;
@@ -1196,7 +1201,7 @@ static void RebuildDeviceList(audio_output_t * p_aout)
         free(psz_name);
     }
 
-    vlc_mutex_lock(&p_sys->device_list_lock);
+    vlc_mutex_lock(&p_sys->var_lock);
     CFIndex count = 0;
     if (p_sys->device_list)
         count = CFArrayGetCount(p_sys->device_list);
@@ -1218,7 +1223,7 @@ static void RebuildDeviceList(audio_output_t * p_aout)
     CFRelease(p_sys->device_list);
     p_sys->device_list = CFArrayCreateCopy(kCFAllocatorDefault, currentListOfDevices);
     CFRelease(currentListOfDevices);
-    vlc_mutex_unlock(&p_sys->device_list_lock);
+    vlc_mutex_unlock(&p_sys->var_lock);
 
     free(deviceIDs);
 }
@@ -1498,10 +1503,10 @@ static OSStatus DevicesListener(AudioObjectID inObjectID,  UInt32 inNumberAddres
     msg_Dbg(p_aout, "audio device configuration changed, resetting cache");
     RebuildDeviceList(p_aout);
 
-    vlc_mutex_lock(&p_sys->device_list_lock);
+    vlc_mutex_lock(&p_sys->var_lock);
     if(!CFArrayContainsValue(p_sys->device_list, CFRangeMake(0, CFArrayGetCount(p_sys->device_list)),CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &p_sys->i_selected_dev)))
         aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
-    vlc_mutex_unlock(&p_sys->device_list_lock);
+    vlc_mutex_unlock(&p_sys->var_lock);
 
     return noErr;
 }
@@ -1550,6 +1555,7 @@ static OSStatus StreamsChangedListener(AudioObjectID inObjectID,  UInt32 inNumbe
     /*
      * check if changed stream id belongs to current device
      */
+    vlc_mutex_lock(&p_sys->var_lock);
     AudioObjectPropertyAddress streamsAddress = { kAudioDevicePropertyStreams, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
     err = AudioObjectGetPropertyDataSize(p_sys->i_selected_dev, &streamsAddress, 0, NULL, &i_param_size);
     if (err != noErr) {
@@ -1567,6 +1573,7 @@ static OSStatus StreamsChangedListener(AudioObjectID inObjectID,  UInt32 inNumbe
         msg_Err(p_aout, "could not get list of streams [%4.4s]", (char *)&err);
         return VLC_EGENERIC;
     }
+    vlc_mutex_unlock(&p_sys->var_lock);
 
     for (int i = 0; i < i_streams; i++) {
         if (p_streams[i] == inObjectID) {
