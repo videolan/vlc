@@ -955,34 +955,21 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (IBAction)switchSubtitleOption:(id)sender
 {
-    vlc_object_t *p_freetype;
-    p_freetype = (vlc_object_t *) vlc_object_find_name(pl_Get(VLCIntf), "freetype");
     int intValue = [sender tag];
     NSString *representedObject = [sender representedObject];
 
-    if (p_freetype) {
-        var_SetInteger(p_freetype, [representedObject UTF8String], intValue);
-        NSMenu *menu = [sender menu];
-        NSUInteger count = [menu numberOfItems];
-        for (NSUInteger x = 0; x < count; x++)
-            [[menu itemAtIndex:x] setState:NSOffState];
-        [[menu itemWithTag:intValue] setState:NSOnState];
-        vlc_object_release(p_freetype);
-    }
     config_PutInt(p_intf, [representedObject UTF8String], intValue);
+
+    NSMenu *menu = [sender menu];
+    NSUInteger count = [menu numberOfItems];
+    for (NSUInteger x = 0; x < count; x++)
+        [[menu itemAtIndex:x] setState:NSOffState];
+    [[menu itemWithTag:intValue] setState:NSOnState];
 }
 
 - (IBAction)switchSubtitleBackgroundOpacity:(id)sender
 {
-    vlc_object_t *p_freetype;
-    p_freetype = (vlc_object_t *) vlc_object_find_name(pl_Get(VLCIntf), "freetype");
-    int intValue = [sender intValue];
-
-    if (p_freetype) {
-        var_SetInteger(p_freetype, "freetype-background-opacity", intValue);
-        vlc_object_release(p_freetype);
-    }
-    config_PutInt(p_intf, "freetype-background-opacity", intValue);
+    config_PutInt(p_intf, "freetype-background-opacity", [sender intValue]);
 }
 
 - (IBAction)telxTransparent:(id)sender
