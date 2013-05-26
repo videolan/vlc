@@ -1,10 +1,9 @@
-diff -ru libbluray/src/libbluray.pc.in libbluray2/src/libbluray.pc.in
---- libbluray/src/libbluray.pc.in	2011-11-27 10:58:55.000000000 +0200
-+++ libbluray2/src/libbluray.pc.in	2011-11-27 11:26:30.000000000 +0200
-@@ -6,5 +6,5 @@
- Name: libbluray
+--- libbluray-0.3.0/src/libbluray.pc.in.orig	2013-05-26 12:05:07.233864756 +0200
++++ libbluray-0.3.0/src/libbluray.pc.in	2013-05-26 12:07:43.552878009 +0200
+@@ -7,5 +7,5 @@
  Description: library supporting Blu-ray playback
  Version: @PACKAGE_VERSION@
--Libs: -L${libdir} -lbluray
-+Libs: -L${libdir} -lbluray @DLOPEN_LIBS@ @LIBXML2_LIBS@
+ Libs: -L${libdir} -lbluray
+-Libs.private: @DLOPEN_LIBS@
++Libs.private: @DLOPEN_LIBS@ @LIBXML2_LIBS@
  Cflags: -I${includedir}

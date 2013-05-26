@@ -1,0 +1,43 @@
+From 78e2db66ee6b592feaf1d1b4af490f50d164aab7 Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Diego=20Elio=20Petten=C3=B2?= <flameeyes@flameeyes.eu>
+Date: Wed, 8 May 2013 09:40:37 -0700
+Subject: [PATCH] build: make sure to add -ldl to Libs.private if needed.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Diego Elio PettenÃ² <flameeyes@flameeyes.eu>
+Signed-off-by: Jean-Baptiste Kempf <jb@videolan.org>
+---
+ configure.ac        |    4 ++++
+ src/libbluray.pc.in |    1 +
+ 2 files changed, 5 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 61ff283..c6439bd 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -126,6 +126,10 @@ AS_IF([test "${SYS}" != "mingw32"], [
+   AC_SEARCH_LIBS([pthread_create], [pthread], ,
+     [AC_MSG_ERROR([pthread required])])
+   AC_SEARCH_LIBS([dlopen], [dl])
++  DLOPEN_LIBS="$ac_cv_search_dlopen"
++  AS_CASE([$DLOPEN_LIBS],
++    [no|none\ required], [DLOPEN_LIBS=""])
++  AC_SUBST([DLOPEN_LIBS])
+ ])
+ 
+ dnl libxml2 for metadata parser
+diff --git a/src/libbluray.pc.in b/src/libbluray.pc.in
+index 4e3fe15..ce256e2 100644
+--- a/src/libbluray.pc.in
++++ b/src/libbluray.pc.in
+@@ -7,4 +7,5 @@ Name: libbluray
+ Description: library supporting Blu-ray playback
+ Version: @PACKAGE_VERSION@
+ Libs: -L${libdir} -lbluray
++Libs.private: @DLOPEN_LIBS@
+ Cflags: -I${includedir}
+-- 
+1.7.10.4
+
