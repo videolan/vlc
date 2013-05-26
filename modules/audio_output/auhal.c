@@ -77,18 +77,15 @@
  *****************************************************************************/
 struct aout_sys_t
 {
-    AudioObjectID               i_default_dev;      /* DeviceID of defaultOutputDevice */
     AudioObjectID               i_selected_dev;     /* DeviceID of the selected device */
     AudioObjectID               i_new_selected_dev; /* DeviceID of device which will be selected on start */
     bool                        b_selected_dev_is_digital;
     AudioDeviceIOProcID         i_procID;           /* DeviceID of current device */
     bool                        b_digital;          /* Are we running in digital mode? */
-    mtime_t                     clock_diff;         /* Difference between VLC clock and Device clock */
 
     uint8_t                     chans_to_reorder;   /* do we need channel reordering */
     uint8_t                     chan_table[AOUT_CHAN_MAX];
 
-    UInt32                      i_numberOfChannels;
     TPCircularBuffer            circular_buffer;    /* circular buffer to swap the audio data */
 
     /* AUHAL specific */
@@ -279,7 +276,6 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_sys->b_digital = false;
     p_sys->au_component = NULL;
     p_sys->au_unit = NULL;
-    p_sys->clock_diff = (mtime_t) 0;
     p_sys->i_hog_pid = -1;
     p_sys->i_stream_id = 0;
     p_sys->i_stream_index = -1;
@@ -571,7 +567,6 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 
     msg_Dbg(p_aout, "selected %d physical channels for device output", aout_FormatNbChannels(fmt));
     msg_Dbg(p_aout, "VLC will output: %s", aout_FormatPrintChannels(fmt));
-    p_sys->i_numberOfChannels = aout_FormatNbChannels(fmt);
 
     memset (&new_layout, 0, sizeof(new_layout));
     uint32_t chans_out[AOUT_CHAN_MAX];
@@ -791,11 +786,6 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     /* AU initiliaze */
     verify_noerr(AudioUnitInitialize(p_sys->au_unit));
 
-    /* Find the difference between device clock and mdate clock */
-    p_sys->clock_diff = - (mtime_t)
-        AudioConvertHostTimeToNanos(AudioGetCurrentHostTime()) / 1000;
-    p_sys->clock_diff += mdate();
-
     /* setup circular buffer */
     TPCircularBufferInit(&p_sys->circular_buffer, AUDIO_BUFFER_SIZE_IN_SECONDS *
                          fmt->i_rate * fmt->i_bytes_per_frame);
@@ -991,11 +981,6 @@ static int StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
         msg_Err(p_aout, "Failed to create Process ID [%4.4s]", (char *)&err);
         return false;
     }
-
-    /* Check for the difference between the Device clock and mdate */
-    p_sys->clock_diff = - (mtime_t)
-        AudioConvertHostTimeToNanos(AudioGetCurrentHostTime()) / 1000;
-    p_sys->clock_diff += mdate();
 
     /* Start device */
     err = AudioDeviceStart(p_sys->i_selected_dev, p_sys->i_procID);
