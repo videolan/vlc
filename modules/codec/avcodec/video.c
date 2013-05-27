@@ -911,33 +911,11 @@ static int ffmpeg_va_GetFrameBuf( struct AVCodecContext *p_context, AVFrame *p_f
     return 0;
 }
 
-/*****************************************************************************
- * ffmpeg_GetFrameBuf: callback used by ffmpeg to get a frame buffer.
- *****************************************************************************
- * It is used for direct rendering as well as to get the right PTS for each
- * decoded picture (even in indirect rendering mode).
- *****************************************************************************/
-static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
-                               AVFrame *p_ff_pic )
+static picture_t *ffmpeg_dr_GetFrameBuf(struct AVCodecContext *p_context)
 {
     decoder_t *p_dec = (decoder_t *)p_context->opaque;
     decoder_sys_t *p_sys = p_dec->p_sys;
-
-    /* */
-    p_ff_pic->opaque = NULL;
-#if LIBAVCODEC_VERSION_MAJOR < 54
-    p_ff_pic->age = 256*256*256*64;
-#endif
-
-    if( p_sys->p_va )
-        return ffmpeg_va_GetFrameBuf(p_context, p_ff_pic);
-
-    if( !p_sys->b_direct_rendering )
-        return avcodec_default_get_buffer( p_context, p_ff_pic );
-
-    wait_mt( p_sys );
-    /* Some codecs set pix_fmt only after the 1st frame has been decoded,
-     * so we need to check for direct rendering again. */
+    vlc_va_t *p_va = p_sys->p_va;
 
     int i_width = p_context->width;
     int i_height = p_context->height;
@@ -989,8 +967,56 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
             goto no_dr;
     }
 
-    if( p_sys->i_direct_rendering_used != 1 )
-    {
+    return p_pic;
+
+no_dr:
+    if (p_pic)
+        decoder_DeletePicture( p_dec, p_pic );
+
+    return NULL;
+}
+
+/*****************************************************************************
+ * ffmpeg_GetFrameBuf: callback used by ffmpeg to get a frame buffer.
+ *****************************************************************************
+ * It is used for direct rendering as well as to get the right PTS for each
+ * decoded picture (even in indirect rendering mode).
+ *****************************************************************************/
+static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
+                               AVFrame *p_ff_pic )
+{
+    decoder_t *p_dec = (decoder_t *)p_context->opaque;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* */
+    p_ff_pic->opaque = NULL;
+#if LIBAVCODEC_VERSION_MAJOR < 54
+    p_ff_pic->age = 256*256*256*64;
+#endif
+
+    if( p_sys->p_va )
+        return ffmpeg_va_GetFrameBuf(p_context, p_ff_pic);
+
+    if( !p_sys->b_direct_rendering )
+        return avcodec_default_get_buffer( p_context, p_ff_pic );
+
+    wait_mt( p_sys );
+    /* Some codecs set pix_fmt only after the 1st frame has been decoded,
+     * so we need to check for direct rendering again. */
+
+    picture_t *p_pic = ffmpeg_dr_GetFrameBuf(p_context);
+    if (!p_pic) {
+        if( p_sys->i_direct_rendering_used != 0 )
+        {
+            msg_Warn( p_dec, "disabling direct rendering" );
+            p_sys->i_direct_rendering_used = 0;
+        }
+
+        post_mt( p_sys );
+        return avcodec_default_get_buffer( p_context, p_ff_pic );
+    }
+
+    if( p_sys->i_direct_rendering_used != 1 ) {
         msg_Dbg( p_dec, "using direct rendering" );
         p_sys->i_direct_rendering_used = 1;
     }
@@ -1011,18 +1037,6 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 
     post_mt( p_sys );
     return 0;
-
-no_dr:
-    if (p_pic)
-        decoder_DeletePicture( p_dec, p_pic );
-
-    if( p_sys->i_direct_rendering_used != 0 )
-    {
-        msg_Warn( p_dec, "disabling direct rendering" );
-        p_sys->i_direct_rendering_used = 0;
-    }
-    post_mt( p_sys );
-    return avcodec_default_get_buffer( p_context, p_ff_pic );
 }
 
 static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
