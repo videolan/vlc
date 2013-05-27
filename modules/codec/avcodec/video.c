@@ -886,6 +886,31 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
     }
 }
 
+static int ffmpeg_va_GetFrameBuf( struct AVCodecContext *p_context, AVFrame *p_ff_pic )
+{
+    decoder_t *p_dec = (decoder_t *)p_context->opaque;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    vlc_va_t *p_va = p_sys->p_va;
+
+    /* hwaccel_context is not present in old ffmpeg version */
+    if( vlc_va_Setup( p_va,
+                &p_context->hwaccel_context, &p_dec->fmt_out.video.i_chroma,
+                p_context->width, p_context->height ) )
+    {
+        msg_Err( p_dec, "vlc_va_Setup failed" );
+        return -1;
+    }
+
+    if( vlc_va_Get( p_va, p_ff_pic ) )
+    {
+        msg_Err( p_dec, "VaGrabSurface failed" );
+        return -1;
+    }
+
+    p_ff_pic->type = FF_BUFFER_TYPE_USER;
+    return 0;
+}
+
 /*****************************************************************************
  * ffmpeg_GetFrameBuf: callback used by ffmpeg to get a frame buffer.
  *****************************************************************************
@@ -906,30 +931,10 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 #endif
 
     if( p_sys->p_va )
-    {
-        /* hwaccel_context is not present in old ffmpeg version */
-        if( vlc_va_Setup( p_sys->p_va,
-                          &p_context->hwaccel_context, &p_dec->fmt_out.video.i_chroma,
-                          p_context->width, p_context->height ) )
-        {
-            msg_Err( p_dec, "vlc_va_Setup failed" );
-            return -1;
-        }
+        return ffmpeg_va_GetFrameBuf(p_context, p_ff_pic);
 
-        if( vlc_va_Get( p_sys->p_va, p_ff_pic ) )
-        {
-            msg_Err( p_dec, "VaGrabSurface failed" );
-            return -1;
-        }
-
-        p_ff_pic->type = FF_BUFFER_TYPE_USER;
-        return 0;
-    }
-    else if( !p_sys->b_direct_rendering )
-    {
-        /* Not much to do in indirect rendering mode. */
+    if( !p_sys->b_direct_rendering )
         return avcodec_default_get_buffer( p_context, p_ff_pic );
-    }
 
     wait_mt( p_sys );
     /* Some codecs set pix_fmt only after the 1st frame has been decoded,
