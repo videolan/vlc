@@ -19944,7 +19944,7 @@ msgstr "Spille&liste"
 
 #: modules/gui/qt4/menus.cpp:482
 msgid "Ctrl+L"
-msgstr "Ctrl + L"
+msgstr "Ctrl+L"
 
 #: modules/gui/qt4/menus.cpp:485
 msgid "Docked Playlist"
@@ -19956,7 +19956,7 @@ msgstr ""
 
 #: modules/gui/qt4/menus.cpp:497
 msgid "Ctrl+H"
-msgstr "Ctrl + H"
+msgstr "Ctrl+H"
 
 #: modules/gui/qt4/menus.cpp:506
 msgid "&Fullscreen Interface"

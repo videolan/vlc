@@ -21778,7 +21778,7 @@ msgstr "&Erreprodukzio-zerrenda"
 
 #: modules/gui/qt4/menus.cpp:482
 msgid "Ctrl+L"
-msgstr "Ktrl+L"
+msgstr "Ctrl+L"
 
 #: modules/gui/qt4/menus.cpp:485
 msgid "Docked Playlist"
@@ -21790,7 +21790,7 @@ msgstr "Interfaze mi&nimala"
 
 #: modules/gui/qt4/menus.cpp:497
 msgid "Ctrl+H"
-msgstr "Ktrl+H"
+msgstr "Ctrl+H"
 
 #: modules/gui/qt4/menus.cpp:506
 msgid "&Fullscreen Interface"
