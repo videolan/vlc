@@ -989,6 +989,9 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 
     /* */
     p_ff_pic->opaque = NULL;
+#if ! LIBAVCODEC_VERSION_CHECK(54, 34, 0, 79, 101)
+    p_ff_pic->pkt_pts = p_context->pkt ? p_context->pkt->pts : AV_NOPTS_VALUE;
+#endif
 #if LIBAVCODEC_VERSION_MAJOR < 54
     p_ff_pic->age = 256*256*256*64;
 #endif
