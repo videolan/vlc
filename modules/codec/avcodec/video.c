@@ -767,13 +767,12 @@ void EndVideoDec( decoder_t *p_dec )
 
     wait_mt( p_sys );
 
-    if( p_sys->p_ff_pic ) av_free( p_sys->p_ff_pic );
+    if( p_sys->p_ff_pic )
+        av_free( p_sys->p_ff_pic );
 
     if( p_sys->p_va )
-    {
         vlc_va_Delete( p_sys->p_va );
-        p_sys->p_va = NULL;
-    }
+
     vlc_sem_destroy( &p_sys->sem_mt );
 }
 
