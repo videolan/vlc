@@ -355,9 +355,6 @@ static void CloseDecoder( vlc_object_t *p_this )
     case VIDEO_ES:
          EndVideoDec ( p_dec );
         break;
-    case SPU_ES:
-         EndSubtitleDec( p_dec );
-        break;
     }
 
     if( p_sys->p_context )

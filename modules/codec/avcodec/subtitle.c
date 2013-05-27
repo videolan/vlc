@@ -170,14 +170,6 @@ subpicture_t *DecodeSubtitle(decoder_t *dec, block_t **block_ptr)
 }
 
 /**
- * Clean up private data
- */
-void EndSubtitleDec(decoder_t *dec)
-{
-    VLC_UNUSED(dec);
-}
-
-/**
  * Convert a RGBA libavcodec region to our format.
  */
 static subpicture_region_t *ConvertRegionRGBA(AVSubtitleRect *ffregion)
