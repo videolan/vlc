@@ -922,7 +922,6 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 {
     decoder_t *p_dec = (decoder_t *)p_context->opaque;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    picture_t *p_pic;
 
     /* */
     p_ff_pic->opaque = NULL;
@@ -944,21 +943,24 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     int i_height = p_context->height;
     avcodec_align_dimensions( p_context, &i_width, &i_height );
 
-    if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS ||
-        p_context->pix_fmt == PIX_FMT_PAL8 )
+    picture_t *p_pic = NULL;
+    if (GetVlcChroma(&p_dec->fmt_out.video, p_context->pix_fmt) != VLC_SUCCESS)
+        goto no_dr;
+
+    if (p_context->pix_fmt == PIX_FMT_PAL8)
         goto no_dr;
 
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
-    /* Get a new picture */
     p_pic = ffmpeg_NewPictBuf( p_dec, p_context );
     if( !p_pic )
         goto no_dr;
-    bool b_compatible = true;
+
     if( p_pic->p[0].i_pitch / p_pic->p[0].i_pixel_pitch < i_width ||
         p_pic->p[0].i_lines < i_height )
-        b_compatible = false;
-    for( int i = 0; i < p_pic->i_planes && b_compatible; i++ )
+        goto no_dr;
+
+    for( int i = 0; i < p_pic->i_planes; i++ )
     {
         unsigned i_align;
         switch( p_sys->i_codec_id )
@@ -975,20 +977,16 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
             break;
         }
         if( p_pic->p[i].i_pitch % i_align )
-            b_compatible = false;
+            goto no_dr;
         if( (intptr_t)p_pic->p[i].p_pixels % i_align )
-            b_compatible = false;
+            goto no_dr;
     }
-    if( p_context->pix_fmt == PIX_FMT_YUV422P && b_compatible )
+
+    if( p_context->pix_fmt == PIX_FMT_YUV422P )
     {
         if( 2 * p_pic->p[1].i_pitch != p_pic->p[0].i_pitch ||
             2 * p_pic->p[2].i_pitch != p_pic->p[0].i_pitch )
-            b_compatible = false;
-    }
-    if( !b_compatible )
-    {
-        decoder_DeletePicture( p_dec, p_pic );
-        goto no_dr;
+            goto no_dr;
     }
 
     if( p_sys->i_direct_rendering_used != 1 )
@@ -1015,6 +1013,9 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     return 0;
 
 no_dr:
+    if (p_pic)
+        decoder_DeletePicture( p_dec, p_pic );
+
     if( p_sys->i_direct_rendering_used != 0 )
     {
         msg_Warn( p_dec, "disabling direct rendering" );
