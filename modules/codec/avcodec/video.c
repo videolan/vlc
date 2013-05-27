@@ -901,6 +901,9 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 
     /* */
     p_ff_pic->opaque = NULL;
+#if LIBAVCODEC_VERSION_MAJOR < 54
+    p_ff_pic->age = 256*256*256*64;
+#endif
 
     if( p_sys->p_va )
     {
@@ -913,18 +916,13 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
             return -1;
         }
 
-        /* */
-        p_ff_pic->type = FF_BUFFER_TYPE_USER;
-
-#if LIBAVCODEC_VERSION_MAJOR < 54
-        p_ff_pic->age = 256*256*256*64;
-#endif
-
         if( vlc_va_Get( p_sys->p_va, p_ff_pic ) )
         {
             msg_Err( p_dec, "VaGrabSurface failed" );
             return -1;
         }
+
+        p_ff_pic->type = FF_BUFFER_TYPE_USER;
         return 0;
     }
     else if( !p_sys->b_direct_rendering )
@@ -1007,10 +1005,6 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_ff_pic->linesize[1] = p_pic->p[1].i_pitch;
     p_ff_pic->linesize[2] = p_pic->p[2].i_pitch;
     p_ff_pic->linesize[3] = 0;
-
-#if LIBAVCODEC_VERSION_MAJOR < 54
-    p_ff_pic->age = 256*256*256*64;
-#endif
 
     post_mt( p_sys );
     return 0;
