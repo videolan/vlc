@@ -948,7 +948,6 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
         };
         glActiveTexture(GL_TEXTURE0+j);
         glClientActiveTexture(GL_TEXTURE0+j);
-        glEnable(vgl->tex_target);
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
 
         char attribute[20];
@@ -1022,7 +1021,9 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 #endif
     }
 
+#ifdef SUPPORTS_FIXED_PIPELINE
     glEnable(GL_TEXTURE_2D);
+#endif
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -1072,7 +1073,9 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         }
     }
     glDisable(GL_BLEND);
+#ifdef SUPPORTS_FIXED_PIPELINE
     glDisable(GL_TEXTURE_2D);
+#endif
 
     /* Display */
     vlc_gl_Swap(vgl->gl);
