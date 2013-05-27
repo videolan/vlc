@@ -40,6 +40,7 @@ enum vlc_inhibit_api
 {
     FDO_SS, /**< KDE >= 4 and GNOME >= 3.6 */
     FDO_PM, /**< KDE and GNOME <= 2.26 */
+    MATE,  /**< >= 1.0 */
     GNOME, /**< GNOME 2.26..3.4 */
 };
 
@@ -50,6 +51,7 @@ static const char dbus_service[][40] =
 {
     [FDO_SS] = "org.freedesktop.ScreenSaver",
     [FDO_PM] = "org.freedesktop.PowerManagement.Inhibit",
+    [MATE]   = "org.mate.SessionManager",
     [GNOME]  = "org.gnome.SessionManager",
 };
 
@@ -57,6 +59,7 @@ static const char dbus_path[][33] =
 {
     [FDO_SS] = "/ScreenSaver",
     [FDO_PM] = "/org/freedesktop/PowerManagement",
+    [MATE]   = "/org/mate/SessionManager",
     [GNOME]  = "/org/gnome/SessionManager",
 };
 
@@ -64,6 +67,7 @@ static const char dbus_method_uninhibit[][10] =
 {
     [FDO_SS] = "UnInhibit",
     [FDO_PM] = "UnInhibit",
+    [MATE]   = "Uninhibit",
     [GNOME]  = "Uninhibit",
 };
 
@@ -128,6 +132,7 @@ static void Inhibit(vlc_inhibit_t *ih, unsigned flags)
 
         switch (type)
         {
+            case MATE:
             case GNOME:
             {
                 dbus_uint32_t xid = 0; // FIXME ?
