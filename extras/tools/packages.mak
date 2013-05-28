@@ -32,8 +32,8 @@ XZ_URL=http://tukaani.org/xz/xz-$(XZ_VERSION).tar.bz2
 OPENSSL_VERSION=1.0.0e
 OPENSSL_URL=http://www.openssl.org/source/openssl-$(OPENSSL_VERSION).tar.gz
 
-GAS_URL=https://github.com/mansr/gas-preprocessor/tarball/master
-GAS_VERSION=76a72f0
+GAS_URL=https://github.com/libav/gas-preprocessor/tarball/master
+GAS_VERSION=c76b628
 
 RAGEL_VERSION=6.8
 RAGEL_URL=http://www.complang.org/ragel/ragel-$(RAGEL_VERSION).tar.gz
