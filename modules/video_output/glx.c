@@ -196,6 +196,8 @@ static int Open (vlc_object_t *obj)
 
 #ifdef GLX_ARB_get_proc_address
     bool is_swap_interval_set = false;
+
+    MakeCurrent (gl);
 # ifdef GLX_SGI_swap_control
     if (!is_swap_interval_set
      && CheckGLXext (dpy, snum, "GLX_SGI_swap_control"))
@@ -217,6 +219,7 @@ static int Open (vlc_object_t *obj)
         is_swap_interval_set = true;
     }
 # endif
+    ReleaseCurrent (gl);
 #endif
 
     return VLC_SUCCESS;
