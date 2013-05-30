@@ -69,6 +69,7 @@ typedef struct vlc_gl_sys_t
 
 /* OpenGL callbacks */
 static int MakeCurrent (vlc_gl_t *);
+static void ReleaseCurrent (vlc_gl_t *);
 static void SwapBuffers (vlc_gl_t *);
 static void *GetSymbol(vlc_gl_t *, const char *);
 
@@ -214,6 +215,7 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     /* Initialize OpenGL callbacks */
     gl->sys = sys;
     gl->makeCurrent = MakeCurrent;
+    gl->releaseCurrent = ReleaseCurrent;
     gl->swap = SwapBuffers;
     gl->getProcAddress = GetSymbol;
     gl->lock = NULL;
@@ -269,6 +271,14 @@ static int MakeCurrent (vlc_gl_t *gl)
                         sys->context) != EGL_TRUE)
         return VLC_EGENERIC;
     return VLC_SUCCESS;
+}
+
+static void ReleaseCurrent (vlc_gl_t *gl)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    eglMakeCurrent (sys->display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+                    EGL_NO_CONTEXT);
 }
 
 static void SwapBuffers (vlc_gl_t *gl)

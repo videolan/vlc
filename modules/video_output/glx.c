@@ -55,6 +55,7 @@ typedef struct vlc_gl_sys_t
 } vlc_gl_sys_t;
 
 static int MakeCurrent (vlc_gl_t *);
+static void ReleaseCurrent (vlc_gl_t *);
 static void SwapBuffers (vlc_gl_t *);
 static void *GetSymbol(vlc_gl_t *, const char *);
 
@@ -184,6 +185,15 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
 
+    /* Initialize OpenGL callbacks */
+    gl->sys = sys;
+    gl->makeCurrent = MakeCurrent;
+    gl->releaseCurrent = ReleaseCurrent;
+    gl->swap = SwapBuffers;
+    gl->getProcAddress = GetSymbol;
+    gl->lock = NULL;
+    gl->unlock = NULL;
+
 #ifdef GLX_ARB_get_proc_address
     bool is_swap_interval_set = false;
 # ifdef GLX_SGI_swap_control
@@ -209,13 +219,6 @@ static int Open (vlc_object_t *obj)
 # endif
 #endif
 
-    /* Initialize OpenGL callbacks */
-    gl->sys = sys;
-    gl->makeCurrent = MakeCurrent;
-    gl->swap = SwapBuffers;
-    gl->getProcAddress = GetSymbol;
-    gl->lock = NULL;
-    gl->unlock = NULL;
     return VLC_SUCCESS;
 
 error:
@@ -243,6 +246,13 @@ static int MakeCurrent (vlc_gl_t *gl)
     if (!glXMakeContextCurrent (sys->display, sys->win, sys->win, sys->ctx))
         return VLC_EGENERIC;
     return VLC_SUCCESS;
+}
+
+static void ReleaseCurrent (vlc_gl_t *gl)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    glXMakeContextCurrent (sys->display, None, None, NULL);
 }
 
 static void SwapBuffers (vlc_gl_t *gl)
