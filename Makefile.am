@@ -675,10 +675,6 @@ install-exec-hook:
 uninstall-hook:
 	rm -f -- "$(DESTDIR)$(vlclibdir)/plugins/plugins.dat"
 
-silentstd = $(silentstd_$(V))
-silentstd_ = $(silentstd_$(AM_DEFAULT_VERBOSITY))
-silentstd_0 = 2>&1 >/dev/null
-
 ###############################################################################
 # PO translation files update
 ###############################################################################
