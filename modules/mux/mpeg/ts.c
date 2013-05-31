@@ -1286,6 +1286,8 @@ static bool MuxStreams(sout_mux_t *p_mux )
              || p_input->p_fmt->i_codec != VLC_CODEC_MPGA )
         {
             p_data = block_FifoGet( p_input->p_fifo );
+            if (p_data->i_pts <= VLC_TS_INVALID)
+                p_data->i_pts = p_data->i_dts;
 
             if( p_input->p_fmt->i_codec == VLC_CODEC_MP4A )
                 p_data = Add_ADTS( p_data, p_input->p_fmt );
