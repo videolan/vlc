@@ -3906,7 +3906,7 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pid_t *pid,
                 pid->es->fmt.p_extra_languages[i].psz_language[3] = '\0';
             }
             int type = p_decoded->code[i].i_audio_type;
-            pid->es->fmt.psz_description = GetAudioTypeDesc(p_demux, type);
+            pid->es->fmt.p_extra_languages[i].psz_description = GetAudioTypeDesc(p_demux, type);
         }
     }
 #else
