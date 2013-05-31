@@ -1,5 +1,5 @@
-# visibility.m4 serial 3 (gettext-0.18)
-dnl Copyright (C) 2005, 2008-2010 Free Software Foundation, Inc.
+# visibility.m4 serial 5 (gettext-0.18.2)
+dnl Copyright (C) 2005, 2008, 2010-2013 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -12,7 +12,7 @@ dnl __attribute__((__visibility__("hidden"))) and
 dnl __attribute__((__visibility__("default"))).
 dnl Does *not* test for __visibility__("protected") - which has tricky
 dnl semantics (see the 'vismain' test in glibc) and does not exist e.g. on
-dnl MacOS X.
+dnl Mac OS X.
 dnl Does *not* test for __visibility__("internal") - which has processor
 dnl dependent semantics.
 dnl Does *not* test for #pragma GCC visibility push(hidden) - which is
@@ -33,7 +33,8 @@ AC_DEFUN([gl_VISIBILITY],
     AC_CACHE_VAL([gl_cv_cc_vis_werror], [
       gl_save_CFLAGS="$CFLAGS"
       CFLAGS="$CFLAGS -Werror"
-      AC_TRY_COMPILE([], [],
+      AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([[]], [[]])],
         [gl_cv_cc_vis_werror=yes],
         [gl_cv_cc_vis_werror=no])
       CFLAGS="$gl_save_CFLAGS"])
@@ -51,13 +52,15 @@ AC_DEFUN([gl_VISIBILITY],
       if test $gl_cv_cc_vis_werror = yes; then
         CFLAGS="$CFLAGS -Werror"
       fi
-      AC_TRY_COMPILE(
-        [extern __attribute__((__visibility__("hidden"))) int hiddenvar;
-         extern __attribute__((__visibility__("default"))) int exportedvar;
-         extern __attribute__((__visibility__("hidden"))) int hiddenfunc (void);
-         extern __attribute__((__visibility__("default"))) int exportedfunc (void);
-         void dummyfunc (void) {}],
-        [],
+      AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM(
+           [[extern __attribute__((__visibility__("hidden"))) int hiddenvar;
+             extern __attribute__((__visibility__("default"))) int exportedvar;
+             extern __attribute__((__visibility__("hidden"))) int hiddenfunc (void);
+             extern __attribute__((__visibility__("default"))) int exportedfunc (void);
+             void dummyfunc (void) {}
+           ]],
+           [[]])],
         [gl_cv_cc_visibility=yes],
         [gl_cv_cc_visibility=no])
       CFLAGS="$gl_save_CFLAGS"])
