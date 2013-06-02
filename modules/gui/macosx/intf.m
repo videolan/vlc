@@ -1379,6 +1379,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)showFullscreenController
 {
+    // defer selector here (possibly another time) to ensure that keyWindow is set properly
+    // (needed for NSApplicationDidBecomeActiveNotification)
     [o_mainwindow performSelectorOnMainThread:@selector(showFullscreenController) withObject:nil waitUntilDone:NO];
 }
 

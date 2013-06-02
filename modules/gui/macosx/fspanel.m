@@ -72,6 +72,8 @@
     if (!isInside)
         [self mouseExited:NULL];
 
+    [self setAnimationBehavior:NSWindowAnimationBehaviorNone];
+
     /* get a notification if VLC isn't the active app anymore */
     [[NSNotificationCenter defaultCenter]
     addObserver: self
@@ -79,7 +81,8 @@
            name: NSApplicationDidResignActiveNotification
          object: NSApp];
 
-    /* get a notification if VLC is the active app again */
+    /* Get a notification if VLC is the active app again.
+     Needed as becomeKeyWindow does not get called when window is activated by clicking */
     [[NSNotificationCenter defaultCenter]
     addObserver: self
        selector: @selector(setActive:)
@@ -170,13 +173,15 @@
 - (void)setNonActive:(id)noData
 {
     b_nonActive = YES;
-    [self orderOut: self];
 
     /* here's fadeOut, just without visibly fading */
     b_displayed = NO;
     [self setAlphaValue:0.0];
     [self setFadeTimer:nil];
+
     b_fadeQueued = NO;
+
+    [self orderOut: self];
 }
 
 - (void)setActive:(id)noData
@@ -195,8 +200,9 @@
         b_voutWasUpdated = NO;
     }
 
-    if ([self alphaValue] < 1.0)
+    if ([self alphaValue] < 1.0) {
         [self setAlphaValue:[self alphaValue]+0.1];
+    }
     if ([self alphaValue] >= 1.0) {
         b_displayed = YES;
         [self setAlphaValue: 1.0];
@@ -218,8 +224,9 @@
         [self fadeIn];
         return;
     }
-    if ([self alphaValue] > 0.0)
+    if ([self alphaValue] > 0.0) {
         [self setAlphaValue:[self alphaValue]-0.05];
+    }
     if ([self alphaValue] <= 0.05) {
         b_displayed = NO;
         [self setAlphaValue:0.0];
@@ -292,7 +299,7 @@
     b_keptVisible = YES;
 
     /* get us a valid timer */
-    if (! b_alreadyCounting) {
+    if (!b_alreadyCounting) {
         i_timeToKeepVisibleInSec = var_CreateGetInteger(VLCIntf, "mouse-hide-timeout") / 500;
         if (hideAgainTimer) {
             [hideAgainTimer invalidate];

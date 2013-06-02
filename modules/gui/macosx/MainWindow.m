@@ -802,7 +802,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)showFullscreenController
 {
-
     id currentWindow = [NSApp keyWindow];
     if ([currentWindow respondsToSelector:@selector(hasActiveVideo)] && [currentWindow hasActiveVideo]) {
         if ([currentWindow respondsToSelector:@selector(fullscreen)] && [currentWindow fullscreen] && ![[currentWindow videoView] isHidden]) {
@@ -810,9 +809,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             if ([[VLCMain sharedInstance] activeVideoPlayback])
                 [o_fspanel fadeIn];
         }
-
     }
-
 
 }
 
