@@ -366,13 +366,12 @@ static int Demux ( demux_t *p_demux )
             return -1;
         }
 
-        free( p_sys->psz_uri );
-        if( asprintf( &p_sys->psz_uri, "%s%%3FMeDiAbAsEshowingId=%d%%26MeDiAbAsEconcert%%3FMeDiAbAsE",
-                p_sys->psz_uri, p_sys->i_sid ) == -1 )
-        {
-            p_sys->psz_uri = NULL;
+        char *uri;
+        if( asprintf( &uri, "%s%%3FMeDiAbAsEshowingId=%d%%26MeDiAbAsEconcert"
+                      "%%3FMeDiAbAsE", p_sys->psz_uri, p_sys->i_sid ) == -1 )
             return -1;
-        }
+        free( p_sys->psz_uri );
+        p_sys->psz_uri = uri;
     }
 
     p_child = input_item_NewWithType( p_sys->psz_uri,
