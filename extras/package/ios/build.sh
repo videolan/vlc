@@ -109,8 +109,6 @@ BUILDDIR="${VLCROOT}/build-ios-${PLATFORM}/${ARCH}"
 
 PREFIX="${VLCROOT}/install-ios-${PLATFORM}/${ARCH}"
 
-IOS_GAS_PREPROCESSOR="${VLCROOT}/extras/tools/gas/gas-preprocessor.pl"
-
 export PATH="${VLCROOT}/extras/tools/build/bin:${VLCROOT}/contrib/${TARGET}/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin"
 
 # contains gas-processor.pl
@@ -178,9 +176,9 @@ mkdir -p "${VLCROOT}/contrib/iPhone${PLATFORM}-${ARCH}"
 cd "${VLCROOT}/contrib/iPhone${PLATFORM}-${ARCH}"
 
 if [ "$PLATFORM" = "OS" ]; then
-      export AS="${IOS_GAS_PREPROCESSOR} ${CC}"
-      export ASCPP="${IOS_GAS_PREPROCESSOR} ${CC}"
-      export CCAS="${IOS_GAS_PREPROCESSOR} ${CC}"
+      export AS="gas-preprocessor.pl ${CC}"
+      export ASCPP="gas-preprocessor.pl ${CC}"
+      export CCAS="gas-preprocessor.pl ${CC}"
 else
   export AS="xcrun as"
   export ASCPP="xcrun as"
