@@ -325,10 +325,11 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         {
             msg_Warn( p_dec, "%s", faacDecGetErrorMessage( frame.error ) );
 
-            if( frame.error == 21 )
+            if( frame.error == 21 || frame.error == 12 )
             {
                 /*
-                 * Once an "Unexpected channel configuration change" error
+                 * Once an "Unexpected channel configuration change"
+                 * or a "Invalid number of channels" error
                  * occurs, it will occurs afterwards, and we got no sound.
                  * Reinitialization of the decoder is required.
                  */
