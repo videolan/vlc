@@ -43,7 +43,7 @@
 
 #ifdef OVERLAP
 /* OS CODE DEPENDENT to get display dimensions */
-#   ifdef WIN32
+#   ifdef _WIN32
 #       include <windows.h>
 #   else
 #       include <xcb/xcb.h>
@@ -169,7 +169,7 @@ vlc_module_begin()
     add_integer_with_range( CFG_PREFIX "bz-whitelevel-red", 0, 0, 255, RGAMMA_WL_TEXT, RGAMMA_WL_LONGTEXT, true )
     add_integer_with_range( CFG_PREFIX "bz-whitelevel-green", 0, 0, 255, GGAMMA_WL_TEXT, GGAMMA_WL_LONGTEXT, true )
     add_integer_with_range( CFG_PREFIX "bz-whitelevel-blue", 0, 0, 255, BGAMMA_WL_TEXT, BGAMMA_WL_LONGTEXT, true )
-#ifndef WIN32
+#ifndef _WIN32
     add_obsolete_bool( CFG_PREFIX "xinerama" );
 #endif
     add_obsolete_bool( CFG_PREFIX "offset-x" )
@@ -343,7 +343,7 @@ static const panoramix_chroma_t p_chroma_array[] = {
     { 0, {0, }, { 0, }, { 0, 0, 0 }, false }
 };
 
-#ifndef WIN32
+#ifndef _WIN32
 /* Get the number of outputs */
 static unsigned CountMonitors( vlc_object_t *obj )
 {
@@ -454,7 +454,7 @@ static int Open( vlc_object_t *p_this )
     /* Autodetect number of displays */
     if( p_sys->i_col < 0 || p_sys->i_row < 0 )
     {
-#ifdef WIN32
+#ifdef _WIN32
         const int i_monitor_count = GetSystemMetrics(SM_CMONITORS);
         if( i_monitor_count > 1 )
         {

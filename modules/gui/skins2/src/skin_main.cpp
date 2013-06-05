@@ -491,7 +491,7 @@ vlc_module_begin ()
     add_string( "skins2-config", "", SKINS2_CONFIG, SKINS2_CONFIG_LONG,
                 true )
         change_private ()
-#ifdef WIN32
+#ifdef _WIN32
     add_bool( "skins2-systray", true, SKINS2_SYSTRAY,
               SKINS2_SYSTRAY_LONG, false );
     add_bool( "skins2-taskbar", true, SKINS2_TASKBAR,
@@ -511,7 +511,7 @@ vlc_module_begin ()
     add_shortcut( "skins" )
 
     add_submodule ()
-#if defined( WIN32 ) || defined( __OS2__ )
+#if defined( _WIN32 ) || defined( __OS2__ )
         set_capability( "vout window hwnd", 51 )
 #else
         set_capability( "vout window xid", 51 )

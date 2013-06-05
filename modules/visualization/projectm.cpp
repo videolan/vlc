@@ -74,7 +74,7 @@ static void Close        ( vlc_object_t * );
 #define TEXTURE_TEXT N_("Texture size")
 #define TEXTURE_LONGTEXT N_("The size of the texture, in pixels.")
 
-#ifdef WIN32
+#ifdef _WIN32
 # define FONT_PATH      "C:\\WINDOWS\\Fonts\\arial.ttf"
 # define FONT_PATH_MENU "C:\\WINDOWS\\Fonts\\arial.ttf"
 # define PRESET_PATH    NULL
@@ -362,7 +362,7 @@ static void *Thread( void *p_data )
     free( psz_config );
 #else
     psz_preset_path = var_InheritString( p_filter, "projectm-preset-path" );
-#ifdef WIN32
+#ifdef _WIN32
     if ( psz_preset_path == NULL )
     {
         char *psz_data_path = config_GetDataDir();

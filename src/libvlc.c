@@ -80,7 +80,7 @@
  * The evil global variables. We handle them with care, don't worry.
  *****************************************************************************/
 
-#if !defined(WIN32) && !defined(__OS2__)
+#if !defined(_WIN32) && !defined(__OS2__)
 static bool b_daemon = false;
 #endif
 
@@ -484,7 +484,7 @@ dbus_out:
     var_Create( p_libvlc, "drawable-clip-right", VLC_VAR_INTEGER );
     var_Create( p_libvlc, "drawable-nsobject", VLC_VAR_ADDRESS );
 #endif
-#if defined (WIN32) || defined (__OS2__)
+#if defined (_WIN32) || defined (__OS2__)
     var_Create( p_libvlc, "drawable-hwnd", VLC_VAR_INTEGER );
 #endif
 
@@ -537,7 +537,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     msg_Dbg( p_libvlc, "removing stats" );
 
-#if !defined( WIN32 ) && !defined( __OS2__ )
+#if !defined( _WIN32 ) && !defined( __OS2__ )
     char* psz_pidfile = NULL;
 
     if( b_daemon )
@@ -565,7 +565,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     /* Free module bank. It is refcounted, so we call this each time  */
     module_EndBank (true);
     vlc_LogDeinit (p_libvlc);
-#if defined(WIN32) || defined(__OS2__)
+#if defined(_WIN32) || defined(__OS2__)
     system_End( );
 #endif
 }
@@ -600,7 +600,7 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
         char *psz_interface = var_CreateGetNonEmptyString( p_libvlc, "intf" );
         if( !psz_interface ) /* "intf" has not been set */
         {
-#if !defined( WIN32 ) && !defined( __OS2__ )
+#if !defined( _WIN32 ) && !defined( __OS2__ )
             if( b_daemon )
                  /* Daemon mode hack.
                   * We prefer the dummy interface if none is specified. */

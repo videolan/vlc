@@ -32,7 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_codec.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 #    define LOADER
 #else
 #   include <objbase.h>

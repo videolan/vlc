@@ -53,7 +53,7 @@
 # elif USE_OPENGL_ES == 1
 #  include <GLES/gl.h>
 # else
-#  ifdef WIN32
+#  ifdef _WIN32
 #   include <GL/glew.h>
 #   undef glClientActiveTexture
 #   undef glActiveTexture

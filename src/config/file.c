@@ -88,7 +88,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
                  psz_filename );
 
     }
-#if !( defined(WIN32) || defined(__APPLE__) || defined(__OS2__) )
+#if !( defined(_WIN32) || defined(__APPLE__) || defined(__OS2__) )
     else if( p_stream == NULL && errno == ENOENT )
     {
         /* This is the fallback for pre XDG Base Directory
@@ -508,7 +508,7 @@ int config_SaveConfigFile (vlc_object_t *p_this)
 #else
     fdatasync (fd); /* Flush from OS */
 #endif
-#if defined (WIN32) || defined (__OS2__)
+#if defined (_WIN32) || defined (__OS2__)
     /* Windows cannot (re)move open files nor overwrite existing ones */
     fclose (file);
     vlc_unlink (permanent);
@@ -519,7 +519,7 @@ int config_SaveConfigFile (vlc_object_t *p_this)
     /* (...then synchronize the directory, err, TODO...) */
     /* ...and finally close the file */
     vlc_mutex_unlock (&lock);
-#if !defined (WIN32) && !defined (__OS2__)
+#if !defined (_WIN32) && !defined (__OS2__)
     fclose (file);
 #endif
 

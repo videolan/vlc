@@ -24,7 +24,7 @@
 
 #include <stdio.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 # ifndef HAVE__LOCK_FILE
 #  warning Broken SDK: VLC logs will be garbage.
 #  define _lock_file(s) ((void)(s))

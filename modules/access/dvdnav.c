@@ -204,7 +204,7 @@ static int Open( vlc_object_t *p_this )
     else
         psz_file = strdup( p_demux->psz_file );
 
-#if defined( WIN32 ) || defined( __OS2__ )
+#if defined( _WIN32 ) || defined( __OS2__ )
     if( psz_file != NULL )
     {
         /* Remove trailing backslash, otherwise dvdnav_open will fail */

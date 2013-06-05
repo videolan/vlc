@@ -51,7 +51,7 @@
 # define SYSTEM_DEFAULT_FAMILY "Arial Unicode MS"
 # define SYSTEM_DEFAULT_MONOSPACE_FONT_FILE "/System/Library/Fonts/Monaco.dfont"
 # define SYSTEM_DEFAULT_MONOSPACE_FAMILY "Monaco"
-#elif defined( WIN32 )
+#elif defined( _WIN32 )
 # define SYSTEM_DEFAULT_FONT_FILE "arial.ttf" /* Default path font found at run-time */
 # define SYSTEM_DEFAULT_FAMILY "Arial"
 # define SYSTEM_DEFAULT_MONOSPACE_FONT_FILE "cour.ttf"
@@ -118,7 +118,7 @@
 #endif
 
 /* Win32 GDI */
-#ifdef WIN32
+#ifdef _WIN32
 # include <windows.h>
 # include <shlobj.h>
 # define HAVE_STYLES
@@ -361,7 +361,7 @@ struct filter_sys_t
     char*          psz_fontfamily;
     char*          psz_monofontfamily;
     xml_reader_t  *p_xml;
-#ifdef WIN32
+#ifdef _WIN32
     char*          psz_win_fonts_path;
 #endif
 
@@ -490,7 +490,7 @@ static void FontConfig_BuildCache( filter_t *p_filter )
     FcInit();
 #endif
 
-#if defined( WIN32 ) || defined( __APPLE__ )
+#if defined( _WIN32 ) || defined( __APPLE__ )
     dialog_progress_bar_t *p_dialog = NULL;
     FcConfig *fcConfig = FcInitLoadConfig();
 
@@ -598,7 +598,7 @@ static char* FontConfig_Select( FcConfig* config, const char* family,
 }
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #define FONT_DIR_NT _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts")
 
 static int GetFileFontByName( LPCTSTR font_name, char **psz_filename )
@@ -725,7 +725,7 @@ fail:
             return psz_tmp;
     }
 }
-#endif /* HAVE_WIN32 */
+#endif /* _WIN32 */
 
 #ifdef __APPLE__
 #if !TARGET_OS_IPHONE
@@ -1989,7 +1989,7 @@ static FT_Face LoadFace( filter_t *p_filter,
 #if !TARGET_OS_IPHONE
         psz_fontfile = MacLegacy_Select( p_filter, p_style->psz_fontname, false, false, -1, &i_idx );
 #endif
-#elif defined( WIN32 )
+#elif defined( _WIN32 )
         psz_fontfile = Win32_Select( p_filter,
                                     p_style->psz_fontname,
                                     (p_style->i_style_flags & STYLE_BOLD) != 0,
@@ -2843,7 +2843,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->f_shadow_vector_x = f_shadow_distance * cos(2 * M_PI * f_shadow_angle / 360);
     p_sys->f_shadow_vector_y = f_shadow_distance * sin(2 * M_PI * f_shadow_angle / 360);
 
-#ifdef WIN32
+#ifdef _WIN32
     /* Get Windows Font folder */
     wchar_t wdir[MAX_PATH];
     if( S_OK != SHGetFolderPathW( NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, wdir ) )
@@ -2861,7 +2861,7 @@ static int Create( vlc_object_t *p_this )
 #ifdef HAVE_STYLES
         psz_fontfamily = strdup( DEFAULT_FAMILY );
 #else
-# ifdef WIN32
+# ifdef _WIN32
         if( asprintf( &psz_fontfamily, "%s"DEFAULT_FONT_FILE, p_sys->psz_win_fonts_path ) == -1 )
             goto error;
 # else
@@ -2887,7 +2887,7 @@ static int Create( vlc_object_t *p_this )
 #if !TARGET_OS_IPHONE
     psz_fontfile = MacLegacy_Select( p_filter, psz_fontfamily, false, false, 0, &fontindex );
 #endif
-#elif defined(WIN32)
+#elif defined(_WIN32)
     psz_fontfile = Win32_Select( p_filter, psz_fontfamily, false, false,
                                  p_sys->i_default_font_size, &fontindex );
 
@@ -2997,7 +2997,7 @@ static void Destroy( vlc_object_t *p_this )
     if( p_sys->p_xml ) xml_ReaderDelete( p_sys->p_xml );
     free( p_sys->psz_fontfamily );
 
-#ifdef WIN32
+#ifdef _WIN32
     free( p_sys->psz_win_fonts_path );
 #endif
 

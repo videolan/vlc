@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#if defined (WIN32)
+#if defined (_WIN32)
 #  include <direct.h>
 #endif
 #include <sys/stat.h>
@@ -41,7 +41,7 @@
 
 #include <vlc_common.h>
 #include <vlc_fs.h>
-#ifdef WIN32
+#ifdef _WIN32
 #  include <vlc_charset.h>
 #endif
 #include <vlc_input.h>
@@ -1553,7 +1553,7 @@ static char *GetTmpPath( char *psz_path )
     free( psz_path );
 
     /* Create a suitable path */
-#if defined (WIN32) && !VLC_WINSTORE_APP
+#if defined (_WIN32) && !VLC_WINSTORE_APP
     const DWORD dwCount = GetTempPathW( 0, NULL );
     wchar_t *psw_path = calloc( dwCount + 1, sizeof(wchar_t) );
     if( psw_path )

@@ -173,7 +173,7 @@ static int Open( vlc_object_t * p_this )
                     {
                         s_filename = s_path + DIR_SEP_CHAR + psz_file;
 
-#if defined(WIN32) || defined(__OS2__)
+#if defined(_WIN32) || defined(__OS2__)
                         if (!strcasecmp(s_filename.c_str(), p_demux->psz_file))
 #else
                         if (!s_filename.compare(p_demux->psz_file))

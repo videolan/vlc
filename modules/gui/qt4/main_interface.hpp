@@ -29,7 +29,7 @@
 
 #include "util/qvlcframe.hpp"
 
-#ifdef WIN32
+#ifdef _WIN32
  #include <vlc_windows_interfaces.h>
 #endif
 
@@ -93,7 +93,7 @@ public:
 protected:
     void dropEventPlay( QDropEvent* event, bool b_play ) { dropEventPlay(event, b_play, true); }
     void dropEventPlay( QDropEvent *, bool, bool );
-#ifdef WIN32
+#ifdef _WIN32
     virtual bool winEvent( MSG *, long * );
 #endif
     virtual void changeEvent( QEvent * );
@@ -174,7 +174,7 @@ private:
     bool                 b_hasPausedWhenMinimized;
     bool                 b_statusbarVisible;
 
-#ifdef WIN32
+#ifdef _WIN32
     HIMAGELIST himl;
     ITaskbarList3 *p_taskbl;
     UINT taskbar_wmsg;
@@ -199,7 +199,7 @@ public slots:
     void setPlaylistVisibility(bool b_visible);
 
     void popupMenu( const QPoint& );
-#ifdef WIN32
+#ifdef _WIN32
     void changeThumbbarButtons( int );
 #endif
 

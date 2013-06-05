@@ -138,7 +138,7 @@ strings for settings menus and hints
                                   "process - with more options")
 
 static const int pi_device_type_values[] = {
-#if defined( WIN32 )
+#if defined( _WIN32 )
      0, /* use AtmoWinA.exe userspace driver */
 #endif
      1, /* AtmoLight classic */
@@ -148,7 +148,7 @@ static const int pi_device_type_values[] = {
      5  /* fnordlicht */
 };
 static const char *const ppsz_device_type_descriptions[] = {
-#if defined( WIN32 )
+#if defined( _WIN32 )
         N_("AtmoWin Software"),
 #endif
         N_("Classic AtmoLight"),
@@ -174,7 +174,7 @@ static const char *const ppsz_device_type_descriptions[] = {
                                    "fnordlicht hardware " \
                                    "choose 1 to 254 channels")
 
-#if defined( WIN32 )
+#if defined( _WIN32 )
 #  define DEFAULT_DEVICE   0
 #else
 #  define DEFAULT_DEVICE   1
@@ -349,7 +349,7 @@ static const char *const ppsz_zone_assignment_descriptions[] = {
     "bitmaps, put them as zone_0.bmp, zone_1.bmp etc. into one folder and "\
     "set the foldername here")
 
-#if defined( WIN32 )
+#if defined( _WIN32 )
 #   define ATMOWINEXE_TEXT      N_("Filename of AtmoWin*.exe")
 #   define ATMOWINEXE_LONGTEXT  N_("if you want the AtmoLight control "\
                                    "software to be launched by VLC, enter the "\
@@ -378,7 +378,7 @@ add_integer( CFG_PREFIX "device", DEFAULT_DEVICE,
 change_integer_list( pi_device_type_values,
                      ppsz_device_type_descriptions )
 
-#if defined(WIN32)
+#if defined(_WIN32)
 add_string(CFG_PREFIX "serialdev", "COM1",
            SERIALDEV_TEXT, SERIALDEV_LONGTEXT, false )
 /*
@@ -673,7 +673,7 @@ static const char *const ppsz_filter_options[] = {
         "momo-channels",
         "fnordlicht-amount",
 
-#if defined(WIN32 )
+#if defined(_WIN32 )
         "atmowinexe",
 #endif
 #if defined(__ATMO_DEBUG__)
@@ -793,7 +793,7 @@ struct filter_sys_t
         picture_t *p_inpic,
         uint8_t *p_transfer_dest);
 
-#if defined( WIN32 )
+#if defined( _WIN32 )
     /* External Library as wrapper arround COM Stuff */
     HINSTANCE h_AtmoCtrl;
     int32_t (*pf_ctrl_atmo_initialize) (void);
@@ -836,7 +836,7 @@ static int32_t AtmoInitialize(filter_t *p_filter, bool b_for_thread)
                                   "some other software/driver may use it?");
             }
         }
-#if defined(WIN32)
+#if defined(_WIN32)
     } else if(p_sys->pf_ctrl_atmo_initialize)
     {
         /* on win32 with active ctrl dll */
@@ -908,7 +908,7 @@ static void AtmoFinalize(filter_t *p_filter, int32_t what)
                 p_atmo_dyndata->UnLockCriticalSection();
             }
         }
-#if defined(WIN32)
+#if defined(_WIN32)
     } else if(p_sys->pf_ctrl_atmo_finalize)
     {
         /* on win32 with active ctrl dll */
@@ -929,7 +929,7 @@ static int32_t AtmoSwitchEffect(filter_t *p_filter, int32_t newMode)
     if(p_sys->p_atmo_config)
     {
        return CAtmoTools::SwitchEffect(p_sys->p_atmo_dyndata, emLivePicture);
-#if defined(WIN32)
+#if defined(_WIN32)
     } else if(p_sys->pf_ctrl_atmo_switch_effect)
     {
         /* on win32 with active ctrl dll */
@@ -959,7 +959,7 @@ static int32_t AtmoSetLiveSource(filter_t *p_filter, int32_t newSource)
         function call would just do nothing special
         in this case
         */
-#if defined(WIN32)
+#if defined(_WIN32)
     } else if(p_sys->pf_ctrl_atmo_set_live_source)
     {
         /* on win32 with active ctrl dll */
@@ -1000,7 +1000,7 @@ static void AtmoCreateTransferBuffers(filter_t *p_filter,
         p_sys->mini_image_format.biBitCount = bytePerPixel*8;
         p_sys->mini_image_format.biCompression = FourCC;
 
-#if defined(WIN32)
+#if defined(_WIN32)
     } else if(p_sys->pf_ctrl_atmo_create_transfer_buffers)
     {
         /* on win32 with active ctrl dll */
@@ -1024,7 +1024,7 @@ static uint8_t* AtmoLockTransferBuffer(filter_t *p_filter)
     if(p_sys->p_atmo_config)
     {
         return p_sys->p_atmo_transfer_buffer;
-#if defined(WIN32)
+#if defined(_WIN32)
     } else if(p_sys->pf_ctrl_atmo_lock_transfer_buffer)
     {
         /* on win32 with active ctrl dll */
@@ -1071,7 +1071,7 @@ static void AtmoSendPixelData(filter_t *p_filter)
                                                p_sys->p_atmo_transfer_buffer);
             }
         }
-#if defined(WIN32)
+#if defined(_WIN32)
     } else if(p_sys->pf_ctrl_atmo_send_pixel_data)
     {
         /* on win32 with active ctrl dll */
@@ -1182,7 +1182,7 @@ static void Atmo_SetupImageSize(filter_t *p_filter)
 
     if(p_sys->p_atmo_config)
     {
-#if defined(WIN32)
+#if defined(_WIN32)
     } else if(p_sys->pf_ctrl_atmo_get_image_size)
     {
         /* on win32 with active ctrl dll */
@@ -1586,9 +1586,9 @@ static void Atmo_SetupParameters(filter_t *p_filter)
     */
 
 
-#if defined(WIN32)
+#if defined(_WIN32)
     /*
-    only on WIN32 the user has the choice between
+    only on _WIN32 the user has the choice between
     internal driver and external
     */
 
@@ -1776,7 +1776,7 @@ static void Atmo_SetupParameters(filter_t *p_filter)
     if(psz_path != NULL)
     {
         strcpy(p_sys->sz_framepath, psz_path);
-#if defined( WIN32 ) || defined( __OS2__ )
+#if defined( _WIN32 ) || defined( __OS2__ )
         size_t i_strlen = strlen(p_sys->sz_framepath);
         if((i_strlen>0) && (p_sys->sz_framepath[i_strlen-1] != '\\'))
         {
@@ -1843,7 +1843,7 @@ static void Atmo_SetupParameters(filter_t *p_filter)
     */
     int i = AtmoInitialize(p_filter, false);
 
-#if defined( WIN32 )
+#if defined( _WIN32 )
     if((i != 1) && (p_sys->i_device_type == 0))
     {
         /*
@@ -1986,7 +1986,7 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     Atmo_Shutdown(p_filter);
 
-#if defined( WIN32 )
+#if defined( _WIN32 )
     if(p_sys->h_AtmoCtrl != NULL)
     {
         FreeLibrary(p_sys->h_AtmoCtrl);

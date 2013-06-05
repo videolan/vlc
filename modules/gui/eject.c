@@ -36,7 +36,7 @@
 #include <vlc_fs.h>
 #include <vlc_charset.h>
 
-#if defined( WIN32 )
+#if defined( _WIN32 )
 #   include <mmsystem.h>
 #elif defined(__linux__)
 #   include <sys/types.h>
@@ -123,7 +123,7 @@ static int intf_Eject( vlc_object_t *p_this, const char *psz_device )
 {
     VLC_UNUSED(p_this);
 
-#if defined(WIN32)
+#if defined(_WIN32)
     MCI_OPEN_PARMS op;
     DWORD i_flags;
     TCHAR psz_drive[4];

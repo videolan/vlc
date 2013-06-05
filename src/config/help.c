@@ -34,7 +34,7 @@
 #include "config/configuration.h"
 #include "libvlc.h"
 
-#if defined( WIN32 ) && !VLC_WINSTORE_APP
+#if defined( _WIN32 ) && !VLC_WINSTORE_APP
 static void ShowConsole (void);
 static void PauseConsole (void);
 #else
@@ -248,7 +248,7 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
 
 #define LINE_START 8
 #define PADDING_SPACES 25
-#ifdef WIN32
+#ifdef _WIN32
 #   define OPTION_VALUE_SEP "="
 #else
 #   define OPTION_VALUE_SEP " "
@@ -276,7 +276,7 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
     psz_spaces_text[PADDING_SPACES+LINE_START] = '\0';
     memset( psz_spaces_longtext, ' ', LINE_START+2 );
     psz_spaces_longtext[LINE_START+2] = '\0';
-#ifndef WIN32
+#ifndef _WIN32
     if( !isatty( 1 ) )
 #endif
         b_color = false; // don't put color control codes in a .txt file
@@ -724,7 +724,7 @@ static void ListModules (vlc_object_t *p_this, bool b_verbose)
     bool b_color = var_InheritBool( p_this, "color" );
 
     ShowConsole();
-#ifdef WIN32
+#ifdef _WIN32
     b_color = false; // don't put color control codes in a .txt file
 #else
     if( !isatty( 1 ) )
@@ -796,7 +796,7 @@ static void Version( void )
     PauseConsole();
 }
 
-#if defined( WIN32 ) && !VLC_WINSTORE_APP
+#if defined( _WIN32 ) && !VLC_WINSTORE_APP
 /*****************************************************************************
  * ShowConsole: On Win32, create an output console for debug messages
  *****************************************************************************
@@ -854,7 +854,7 @@ static int ConsoleWidth( void )
 {
     unsigned i_width = 80;
 
-#ifndef WIN32
+#ifndef _WIN32
     FILE *file = popen( "stty size 2>/dev/null", "r" );
     if (file != NULL)
     {

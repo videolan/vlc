@@ -5,7 +5,7 @@ diff -ru lame.orig/libmp3lame/vbrquantize.c lame/libmp3lame/vbrquantize.c
  #    define FORCEINLINE __forceinline
  #  endif
  #  endif
-+#elif defined (WIN32)
++#elif defined (_WIN32)
 +#  define VOLATILE
 +/* Make sure FORCEINLINE does not include "extern" */
 +#  undef FORCEINLINE

@@ -174,7 +174,7 @@ public:
     virtual ~DiscOpenPanel();
     virtual void clear() ;
     virtual void accept() ;
-#if defined( WIN32 ) || defined( __OS2__ )
+#if defined( _WIN32 ) || defined( __OS2__ )
     virtual void onFocus();
 #endif
 private:
@@ -204,7 +204,7 @@ private:
     QString advMRL;
     QStringList configList;
     QDialog *adv;
-#ifdef WIN32
+#ifdef _WIN32
     StringListConfigControl *vdevDshowW, *adevDshowW;
     QLineEdit *dshowVSizeLine;
 #else

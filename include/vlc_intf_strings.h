@@ -35,7 +35,7 @@
    2. folder: a string with the same meaning but with directory
               substituted with "folder"
 */
-#if defined( WIN32 ) || defined(__APPLE__)
+#if defined( _WIN32 ) || defined(__APPLE__)
     #define I_DIR_OR_FOLDER( dir, folder ) folder
 #else
     #define I_DIR_OR_FOLDER( dir, folder ) dir

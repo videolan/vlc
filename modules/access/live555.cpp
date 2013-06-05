@@ -52,7 +52,7 @@
 #include <assert.h>
 
 
-#if defined( WIN32 )
+#if defined( _WIN32 )
 #   include <winsock2.h>
 #endif
 

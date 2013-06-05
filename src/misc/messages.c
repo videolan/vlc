@@ -45,7 +45,7 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
-#ifdef WIN32
+#ifdef _WIN32
 #   include <vlc_network.h>          /* 'net_strerror' and 'WSAGetLastError' */
 #endif
 #include <vlc_charset.h>
@@ -69,7 +69,7 @@ void vlc_Log (vlc_object_t *obj, int type, const char *module,
     va_end (args);
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 static void Win32DebugOutputMsg (void *, int , const vlc_log_t *,
                                  const char *, va_list);
 #endif
@@ -106,7 +106,7 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
             char errbuf[2001];
             size_t errlen;
 
-#ifndef WIN32
+#ifndef _WIN32
             strerror_r( errno, errbuf, 1001 );
 #else
             int sockerr = WSAGetLastError( );
@@ -162,7 +162,7 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
     /* Pass message to the callback */
     libvlc_priv_t *priv = obj ? libvlc_priv (obj->p_libvlc) : NULL;
 
-#ifdef WIN32
+#ifdef _WIN32
     va_list ap;
 
     va_copy (ap, args);
@@ -208,7 +208,7 @@ static void PrintColorMsg (void *d, int type, const vlc_log_t *p_item,
                   p_item->psz_object_type, msg_type[type], msg_color[type]);
     utf8_vfprintf (stream, format, ap);
     fputs (GRAY"\n", stream);
-#if defined (WIN32) || defined (__OS2__)
+#if defined (_WIN32) || defined (__OS2__)
     fflush (stream);
 #endif
     funlockfile (stream);
@@ -234,14 +234,14 @@ static void PrintMsg (void *d, int type, const vlc_log_t *p_item,
                   p_item->psz_object_type, msg_type[type]);
     utf8_vfprintf (stream, format, ap);
     putc_unlocked ('\n', stream);
-#if defined (WIN32) || defined (__OS2__)
+#if defined (_WIN32) || defined (__OS2__)
     fflush (stream);
 #endif
     funlockfile (stream);
     vlc_restorecancel (canc);
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 static void Win32DebugOutputMsg (void* d, int type, const vlc_log_t *p_item,
                                  const char *format, va_list dol)
 {
@@ -293,7 +293,7 @@ void vlc_LogSet (libvlc_int_t *vlc, vlc_log_cb cb, void *opaque)
 
     if (cb == NULL)
     {
-#if defined (HAVE_ISATTY) && !defined (WIN32)
+#if defined (HAVE_ISATTY) && !defined (_WIN32)
         if (isatty (STDERR_FILENO) && var_InheritBool (vlc, "color"))
             cb = PrintColorMsg;
         else

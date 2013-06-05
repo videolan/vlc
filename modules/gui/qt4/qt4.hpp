@@ -78,7 +78,7 @@ struct intf_sys_t
     int  i_screenHeight;     /* Detection of Small screens */
     unsigned voutWindowType; /* Type of vout_window_t provided */
     bool b_isDialogProvider; /* Qt mode or Skins mode */
-#ifdef WIN32
+#ifdef _WIN32
     bool disable_volume_keys;
 #endif
 };

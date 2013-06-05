@@ -34,7 +34,7 @@
 
 #include <assert.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 # define CHROMAPRINT_NODLL
 #endif
 

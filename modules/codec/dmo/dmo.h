@@ -38,7 +38,7 @@ const GUID MEDIASUBTYPE_RGB24;
 const GUID MEDIASUBTYPE_RGB565;
 
 
-#ifndef WIN32
+#ifndef _WIN32
 void* CoTaskMemAlloc(unsigned long cb);
 void CoTaskMemFree(void* cb);
 #endif

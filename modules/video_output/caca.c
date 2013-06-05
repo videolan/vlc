@@ -34,7 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_picture_pool.h>
-#if !defined(WIN32) && !defined(__APPLE__)
+#if !defined(_WIN32) && !defined(__APPLE__)
 # ifdef X_DISPLAY_MISSING
 #  error Xlib required due to XInitThreads
 # endif
@@ -88,14 +88,14 @@ static int Open(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
 
-#if !defined(__APPLE__) && !defined(WIN32)
+#if !defined(__APPLE__) && !defined(_WIN32)
 # ifndef X_DISPLAY_MISSING
     if (!vlc_xlib_init(object))
         return VLC_EGENERIC;
 # endif
 #endif
 
-#if defined(WIN32)
+#if defined(_WIN32)
     CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
     SMALL_RECT rect;
     COORD coord;
@@ -216,7 +216,7 @@ error:
 
         free(sys);
     }
-#if defined(WIN32)
+#if defined(_WIN32)
     FreeConsole();
 #endif
     return VLC_EGENERIC;
@@ -237,7 +237,7 @@ static void Close(vlc_object_t *object)
     caca_free_display(sys->dp);
     cucul_free_canvas(sys->cv);
 
-#if defined(WIN32)
+#if defined(_WIN32)
     FreeConsole();
 #endif
 

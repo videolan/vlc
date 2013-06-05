@@ -126,7 +126,7 @@
 # define VLC_EXTERN
 #endif
 
-#if defined (WIN32) && defined (DLL_EXPORT)
+#if defined (_WIN32) && defined (DLL_EXPORT)
 # define VLC_EXPORT __declspec(dllexport)
 #elif VLC_GCC_VERSION(4,0)
 # define VLC_EXPORT __attribute__((visibility("default")))
@@ -392,7 +392,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 /*****************************************************************************
  * OS-specific headers and thread types
  *****************************************************************************/
-#if defined( WIN32 )
+#if defined( _WIN32 )
 #   include <malloc.h>
 #   ifndef PATH_MAX
 #       define PATH_MAX MAX_PATH
@@ -774,7 +774,7 @@ static inline void SetQWLE (void *p, uint64_t qw)
 
 /* Stuff defined in src/extras/libc.c */
 
-#if defined(WIN32)
+#if defined(_WIN32)
 /* several type definitions */
 #   if defined( __MINGW32__ )
 #       if !defined( _OFF_T_ )
@@ -794,7 +794,7 @@ static inline void SetQWLE (void *p, uint64_t qw)
 #   endif
 
 #   include <tchar.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 VLC_API bool vlc_ureduce( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t );
 
@@ -803,7 +803,7 @@ VLC_API bool vlc_ureduce( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t )
 #include <AvailabilityMacros.h>
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 # define vlc_memalign(align, size) (__mingw_aligned_malloc(size, align))
 # define vlc_free(base)            (__mingw_aligned_free(base))
 #elif defined(__APPLE__) && !defined(MAC_OS_X_VERSION_10_6)
@@ -906,7 +906,7 @@ VLC_API const char * VLC_Compiler( void ) VLC_USED;
 #include "vlc_main.h"
 #include "vlc_configuration.h"
 
-#if defined( WIN32 ) || defined( __SYMBIAN32__ ) || defined( __OS2__ )
+#if defined( _WIN32 ) || defined( __SYMBIAN32__ ) || defined( __OS2__ )
 #   define DIR_SEP_CHAR '\\'
 #   define DIR_SEP "\\"
 #   define PATH_SEP_CHAR ';'

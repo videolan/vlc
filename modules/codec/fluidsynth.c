@@ -36,7 +36,7 @@
 #endif
 
 /* On Win32, we link statically */
-#ifdef WIN32
+#ifdef _WIN32
 # define FLUIDSYNTH_NOT_A_DLL
 #endif
 

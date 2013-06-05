@@ -33,7 +33,7 @@ static int check_align (size_t align)
     return EINVAL;
 }
 
-#if !defined (WIN32) && !defined (__APPLE__)
+#if !defined (_WIN32) && !defined (__APPLE__)
 #include <malloc.h>
 
 int posix_memalign (void **ptr, size_t align, size_t size)

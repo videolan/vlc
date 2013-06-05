@@ -73,7 +73,7 @@
 #elif defined( HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H )
 #   include <sys/cdio.h>
 #   include <sys/cdrio.h>
-#elif defined( WIN32 )
+#elif defined( _WIN32 )
 #   include <windows.h>
 #   include <winioctl.h>
 #elif defined (__linux__)
@@ -97,7 +97,7 @@ vcddev_t *ioctl_Open( vlc_object_t *p_this, const char *psz_dev )
     int i_ret;
     int b_is_file;
     vcddev_t *p_vcddev;
-#if !defined( WIN32 ) && !defined( __OS2__ )
+#if !defined( _WIN32 ) && !defined( __OS2__ )
     struct stat fileinfo;
 #endif
 
@@ -116,7 +116,7 @@ vcddev_t *ioctl_Open( vlc_object_t *p_this, const char *psz_dev )
     /*
      *  Check if we are dealing with a device or a file (vcd image)
      */
-#if defined( WIN32 ) || defined( __OS2__ )
+#if defined( _WIN32 ) || defined( __OS2__ )
     if( (strlen( psz_dev ) == 2 && psz_dev[1] == ':') )
     {
         b_is_file = 0;
@@ -144,7 +144,7 @@ vcddev_t *ioctl_Open( vlc_object_t *p_this, const char *psz_dev )
          *  open the vcd device
          */
 
-#ifdef WIN32
+#ifdef _WIN32
         i_ret = win32_vcd_open( p_this, psz_dev, p_vcddev );
 #elif defined( __OS2__ )
         i_ret = os2_vcd_open( p_this, psz_dev, p_vcddev );
@@ -189,7 +189,7 @@ void ioctl_Close( vlc_object_t * p_this, vcddev_t *p_vcddev )
      *  vcd device mode
      */
 
-#ifdef WIN32
+#ifdef _WIN32
     if( p_vcddev->h_device_handle )
         CloseHandle( p_vcddev->h_device_handle );
 #elif defined( __OS2__ )
@@ -296,7 +296,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
 
         darwin_freeTOC( pTOC );
 
-#elif defined( WIN32 )
+#elif defined( _WIN32 )
         DWORD dwBytesReturned;
         CDROM_TOC cdrom_toc;
 
@@ -547,7 +547,7 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             goto error;
         }
 
-#elif defined( WIN32 )
+#elif defined( _WIN32 )
         DWORD dwBytesReturned;
         RAW_READ_INFO cdrom_raw;
 
@@ -998,7 +998,7 @@ static int darwin_getNumberOfTracks( CDTOC *pTOC, int i_descriptors )
 }
 #endif /* __APPLE__ */
 
-#if defined( WIN32 )
+#if defined( _WIN32 )
 /*****************************************************************************
  * win32_vcd_open: open vcd drive
  *****************************************************************************
@@ -1024,7 +1024,7 @@ static int win32_vcd_open( vlc_object_t * p_this, const char *psz_dev,
     return (p_vcddev->h_device_handle == NULL) ? -1 : 0;
 }
 
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 #ifdef __OS2__
 /*****************************************************************************
@@ -1217,7 +1217,7 @@ static int CdTextRead( vlc_object_t *p_object, const vcddev_t *p_vcddev,
     VLC_UNUSED( pi_buffer );
     return -1;
 }
-#elif defined( WIN32 )
+#elif defined( _WIN32 )
 static int CdTextRead( vlc_object_t *p_object, const vcddev_t *p_vcddev,
                        uint8_t **pp_buffer, int *pi_buffer )
 {

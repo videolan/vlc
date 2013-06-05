@@ -94,7 +94,7 @@ VLMDialog::VLMDialog( intf_thread_t *_p_intf ) : QVLCDialog( (QWidget*)_p_intf->
     date = new QDateTimeEdit( QDate::currentDate() );
     date->setAlignment( Qt::AlignRight );
     date->setCalendarPopup( true );
-#ifdef WIN32
+#ifdef _WIN32
     date->setDisplayFormat( "dd MM yyyy" );
 #else
     date->setDisplayFormat( "dd MMMM yyyy" );

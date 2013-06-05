@@ -28,7 +28,7 @@
 #include "AtmoConnection.h"
 #include "AtmoConfig.h"
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #   include <windows.h>
 #endif
 
@@ -44,7 +44,7 @@ class CFnordlichtConnection : public CAtmoConnection
         ATMO_BOOL start_bootloader(unsigned char addr);
         ATMO_BOOL boot_enter_application(unsigned char addr);
 
-#if defined(WIN32)
+#if defined(_WIN32)
         DWORD  m_dwLastWin32Error;
     public:
         DWORD getLastError() { return m_dwLastWin32Error; }

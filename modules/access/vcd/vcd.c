@@ -123,7 +123,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-#if defined( WIN32 ) || defined( __OS2__ )
+#if defined( _WIN32 ) || defined( __OS2__ )
     if( psz_dup[0] && psz_dup[1] == ':' &&
         psz_dup[2] == '\\' && psz_dup[3] == '\0' ) psz_dup[2] = '\0';
 #endif

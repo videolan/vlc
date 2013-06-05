@@ -34,7 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 
-#if !defined (__APPLE__) && !defined(WIN32)
+#if !defined (__APPLE__) && !defined(_WIN32)
 # define LOADER 1
 #endif
 
@@ -79,7 +79,7 @@ static int           OpenAudio( decoder_t * );
 static int           OpenVideo( decoder_t * );
 
 static block_t       *DecodeAudio( decoder_t *, block_t ** );
-#ifndef WIN32
+#ifndef _WIN32
 static picture_t     *DecodeVideo( decoder_t *, block_t ** );
 #endif
 
@@ -144,7 +144,7 @@ struct decoder_sys_t
     unsigned int    InFrameSize;
     unsigned int    OutFrameSize;
 
-#ifndef WIN32
+#ifndef _WIN32
     /* Video */
     Component         (*FindNextComponent)
         ( Component prev, ComponentDescription* desc );
@@ -215,7 +215,7 @@ static const int pi_channels_maps[6] =
 };
 
 static int QTAudioInit( decoder_t * );
-#ifndef WIN32
+#ifndef _WIN32
 static int QTVideoInit( decoder_t * );
 #endif
 
@@ -666,7 +666,7 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
  *****************************************************************************/
 static int OpenVideo( decoder_t *p_dec )
 {
-#ifndef WIN32
+#ifndef _WIN32
     decoder_sys_t *p_sys = malloc( sizeof( decoder_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
@@ -857,12 +857,12 @@ exit_error:
 
 #else
     VLC_UNUSED( p_dec );
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 
     return VLC_EGENERIC;
 }
 
-#ifndef WIN32
+#ifndef _WIN32
 /*****************************************************************************
  * DecodeVideo:
  *****************************************************************************/
@@ -951,7 +951,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     block_Release( p_block );
     return p_pic;
 }
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 
 /*****************************************************************************
  * QTAudioInit:
@@ -1020,7 +1020,7 @@ static int QTAudioInit( decoder_t *p_dec )
     return VLC_SUCCESS;
 }
 
-#ifndef WIN32
+#ifndef _WIN32
 /*****************************************************************************
  * QTVideoInit:
  *****************************************************************************/
@@ -1092,4 +1092,4 @@ static int QTVideoInit( decoder_t *p_dec )
 
     return VLC_SUCCESS;
 }
-#endif /* !WIN32 */
+#endif /* !_WIN32 */

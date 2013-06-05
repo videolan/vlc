@@ -25,7 +25,7 @@
 # include "config.h"
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #include <stdlib.h>
 #include "registry.hpp"
@@ -213,4 +213,4 @@ long QVLCRegistry::DeleteKey( const char *path, const char *keyName )
     return result;
 }
 
-#endif /* WIN32 */
+#endif /* _WIN32 */

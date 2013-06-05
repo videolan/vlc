@@ -34,7 +34,7 @@
 #ifndef HAVE_LRINTF
 #   ifdef HAVE_LRINT
 #       define lrintf( x ) (int)rint( x )
-#   elif defined WIN32
+#   elif defined _WIN32
         __inline long int lrintf( float x )
         {
             int i;

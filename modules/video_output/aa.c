@@ -36,7 +36,7 @@
 #include <assert.h>
 #include <aalib.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 # ifdef X_DISPLAY_MISSING
 #  error Xlib required due to XInitThreads
 # endif
@@ -90,7 +90,7 @@ static int Open(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
 
-#ifndef WIN32
+#ifndef _WIN32
     if (!vlc_xlib_init (object))
         return VLC_EGENERIC;
 #endif

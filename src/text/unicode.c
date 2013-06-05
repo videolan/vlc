@@ -39,7 +39,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#if defined(WIN32)
+#if defined(_WIN32)
 #  include <io.h>
 #endif
 #include <errno.h>
@@ -51,7 +51,7 @@
  */
 int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
 {
-#ifndef WIN32
+#ifndef _WIN32
     return vfprintf (stream, fmt, ap);
 #else
     char *str;

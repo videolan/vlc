@@ -38,7 +38,7 @@
 #include <vlc_intf_strings.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
-#ifdef WIN32
+#ifdef _WIN32
   #include <vlc_charset.h> /* FromWide for Win32 */
 #endif
 
@@ -338,7 +338,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.deviceCombo->setToolTip( qtr(I_DEVICE_TOOLTIP) );
     ui.deviceCombo->setInsertPolicy( QComboBox::InsertAtTop );
 
-#if !defined( WIN32 ) && !defined( __OS2__ )
+#if !defined( _WIN32 ) && !defined( __OS2__ )
     char const * const ppsz_discdevices[] = {
         "sr*",
         "sg*",
@@ -374,7 +374,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     updateButtons();
 }
 
-#ifdef WIN32 /* Disc drives probing for Windows */
+#ifdef _WIN32 /* Disc drives probing for Windows */
 void DiscOpenPanel::onFocus()
 {
     ui.deviceCombo->clear();
@@ -470,7 +470,7 @@ void DiscOpenPanel::clear()
     m_discType = None;
 }
 
-#if defined( WIN32 ) || defined( __OS2__ )
+#if defined( _WIN32 ) || defined( __OS2__ )
     #define setDrive( psz_name ) {\
     int index = ui.deviceCombo->findText( qfu( psz_name ) ); \
     if( index != -1 ) ui.deviceCombo->setCurrentIndex( index );}
@@ -766,7 +766,7 @@ void CaptureOpenPanel::initialize()
 
 #define CuMRL( widget, slot ) CONNECT( widget , slot , this, updateMRL() );
 
-#ifdef WIN32
+#ifdef _WIN32
     /*********************
      * DirectShow Stuffs *
      *********************/
@@ -803,7 +803,7 @@ void CaptureOpenPanel::initialize()
     CuMRL( dshowVSizeLine, textChanged( const QString& ) );
     configList << "dshow-vdev" << "dshow-adev" << "dshow-size";
     }
-#else /* WIN32 */
+#else /* _WIN32 */
     /*******
      * V4L2*
      *******/
@@ -1026,7 +1026,7 @@ void CaptureOpenPanel::initialize()
                << "dvb-bandwidth";
     }
 
-#ifndef WIN32
+#ifndef _WIN32
     /************
      * PVR      *
      ************/
@@ -1143,7 +1143,7 @@ void CaptureOpenPanel::updateMRL()
             ui.deviceCombo->currentIndex() ).toInt();
     switch( i_devicetype )
     {
-#ifdef WIN32
+#ifdef _WIN32
     case DSHOW_DEVICE:
         fileList << "dshow://";
         mrl+= " :dshow-vdev=" +

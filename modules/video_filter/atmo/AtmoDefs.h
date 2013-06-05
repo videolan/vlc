@@ -52,7 +52,7 @@
 #define ATMO_MAX(X, Y)  ((X) > (Y) ? (X) : (Y))
 
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 
 #define INVALID_HANDLE_VALUE -1
 typedef int HANDLE;

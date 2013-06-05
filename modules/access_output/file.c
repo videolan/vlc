@@ -43,11 +43,11 @@
 #include <vlc_strings.h>
 #include <vlc_dialog.h>
 
-#if defined( WIN32 ) || defined( __OS2__ )
+#if defined( _WIN32 ) || defined( __OS2__ )
 #   include <io.h>
 #endif
 
-#ifndef WIN32
+#ifndef _WIN32
 #   include <unistd.h>
 #endif
 
@@ -153,7 +153,7 @@ static int Open( vlc_object_t *p_this )
     else
     if( !strcmp( p_access->psz_path, "-" ) )
     {
-#if defined( WIN32 ) || defined( __OS2__ )
+#if defined( _WIN32 ) || defined( __OS2__ )
         setmode (STDOUT_FILENO, O_BINARY);
 #endif
         fd = vlc_dup (STDOUT_FILENO);

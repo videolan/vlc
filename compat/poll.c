@@ -26,7 +26,7 @@
 #include <string.h>
 #include <errno.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 # ifdef FD_SETSIZE
 /* Too late for #undef FD_SETSIZE to work: fd_set is already defined. */
 #  error Header inclusion order compromised!
@@ -40,7 +40,7 @@
 
 int (poll) (struct pollfd *fds, unsigned nfds, int timeout)
 {
-#ifdef WIN32
+#ifdef _WIN32
     size_t setsize = sizeof (fd_set) + nfds * sizeof (SOCKET);
     fd_set *rdset = malloc (setsize);
     fd_set *wrset = malloc (setsize);
@@ -89,7 +89,7 @@ int (poll) (struct pollfd *fds, unsigned nfds, int timeout)
          * Note that Vista has a much nicer WSAPoll(), but Mingw does not
          * support it yet.
          */
-#ifndef WIN32
+#ifndef _WIN32
         if ((unsigned)fd >= FD_SETSIZE)
         {
             errno = EINVAL;
@@ -123,7 +123,7 @@ int (poll) (struct pollfd *fds, unsigned nfds, int timeout)
                        | (FD_ISSET (fd, wrset) ? POLLOUT : 0)
                        | (FD_ISSET (fd, exset) ? POLLPRI : 0);
     }
-#ifdef WIN32
+#ifdef _WIN32
     free (exset);
     free (wrset);
     free (rdset);

@@ -71,7 +71,7 @@ public:
     }
     virtual ~VoutMainWindow() { }
 
-#if defined( WIN32 ) || defined( __OS2__ )
+#if defined( _WIN32 ) || defined( __OS2__ )
 
     virtual void processEvent( EvtKey &rEvtKey )
     {

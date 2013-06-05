@@ -42,7 +42,7 @@
 #define FPS_LONGTEXT N_( \
     "Desired frame rate for the capture." )
 
-#ifdef WIN32
+#ifdef _WIN32
 #define FRAGS_TEXT N_("Capture fragment size")
 #define FRAGS_LONGTEXT N_( \
     "Optimize the capture by fragmenting the screen in chunks " \
@@ -86,7 +86,7 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#ifdef WIN32
+#ifdef _WIN32
 #   define SCREEN_FPS 1
 #else
 #   define SCREEN_FPS 5
@@ -114,7 +114,7 @@ vlc_module_begin ()
     add_loadfile( "screen-mouse-image", "", MOUSE_TEXT, MOUSE_LONGTEXT, true )
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
     add_integer( "screen-fragment-size", 0, FRAGS_TEXT, FRAGS_LONGTEXT, true )
 #endif
 

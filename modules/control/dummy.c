@@ -33,7 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #define QUIET_TEXT N_("Do not open a DOS command box interface")
 #define QUIET_LONGTEXT N_( \
     "By default the dummy interface plugin will start a DOS command box. " \
@@ -49,7 +49,7 @@ vlc_module_begin ()
     set_description( N_("Dummy interface") )
     set_capability( "interface", 0 )
     set_callbacks( Open, NULL )
-#ifdef WIN32
+#ifdef _WIN32
     add_bool( "dummy-quiet", false, QUIET_TEXT, QUIET_LONGTEXT, false )
 #endif
 vlc_module_end ()
@@ -61,7 +61,7 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
 
-#ifdef WIN32
+#ifdef _WIN32
     bool b_quiet;
     b_quiet = var_InheritBool( p_intf, "dummy-quiet" );
     if( !b_quiet )

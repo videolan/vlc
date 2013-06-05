@@ -190,7 +190,7 @@ static int Open(vlc_object_t *object)
     /* Set tty and fb devices */
     sys->tty = 0; /* 0 == /dev/tty0 == current console */
     sys->is_tty = var_InheritBool(vd, "fb-tty");
-#if !defined(WIN32) &&  defined(HAVE_ISATTY)
+#if !defined(_WIN32) &&  defined(HAVE_ISATTY)
     /* Check that stdin is a TTY */
     if (sys->is_tty && !isatty(0)) {
         msg_Warn(vd, "standard input is not a TTY");

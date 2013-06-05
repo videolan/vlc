@@ -15,7 +15,7 @@
 #include "AtmoConnection.h"
 #include "AtmoConfig.h"
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #   include <windows.h>
 #endif
 
@@ -26,7 +26,7 @@ class CAtmoMultiConnection :  public CAtmoConnection
         HANDLE m_hComports[4];
         unsigned char m_output[4 * 4 * 3];
 
-#if defined(WIN32)
+#if defined(_WIN32)
         DWORD  m_dwLastWin32Error;
     public:
         DWORD getLastError() { return m_dwLastWin32Error; }

@@ -56,7 +56,7 @@
 # include <sys/socket.h>
 # include <netinet/in.h>
 # include <unistd.h>    // close(), write()
-#elif defined(WIN32)
+#elif defined(_WIN32)
 # include <io.h>
 # include <winsock2.h>
 # include <ws2tcpip.h>
@@ -287,7 +287,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 }
 
 
-#if defined(WIN32) || defined(__OS2__)
+#if defined(_WIN32) || defined(__OS2__)
 /**
  * select()-able pipes emulated using Winsock
  */
@@ -329,7 +329,7 @@ error:
         close (c);
     return -1;
 }
-#endif /* WIN32 || __OS2__ */
+#endif /* _WIN32 || __OS2__ */
 
 static vlc_mutex_t pipe_lock = VLC_STATIC_MUTEX;
 

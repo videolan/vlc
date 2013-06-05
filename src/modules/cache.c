@@ -512,7 +512,7 @@ void CacheSave (vlc_object_t *p_this, const char *dir,
         goto out;
     }
 
-#if !defined( WIN32 ) && !defined( __OS2__ )
+#if !defined( _WIN32 ) && !defined( __OS2__ )
     vlc_rename (tmpname, filename); /* atomically replace old cache */
     fclose (file);
 #else

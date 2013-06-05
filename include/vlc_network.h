@@ -32,7 +32,7 @@
  * This file defines interface to communicate with network plug-ins
  */
 
-#if defined( WIN32 )
+#if defined( _WIN32 )
 #   define _NO_OLDNAMES 1
 #   include <io.h>
 #   include <winsock2.h>
@@ -157,7 +157,7 @@ VLC_API ssize_t net_Printf( vlc_object_t *p_this, int fd, const v_socket_t *, co
 VLC_API ssize_t net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, va_list args );
 #define net_vaPrintf(a,b,c,d,e) net_vaPrintf(VLC_OBJECT(a),b,c,d,e)
 
-#ifdef WIN32
+#ifdef _WIN32
 /* Microsoft: same semantic, same value, different name... go figure */
 # define SHUT_RD SD_RECEIVE
 # define SHUT_WR SD_SEND
@@ -226,7 +226,7 @@ VLC_API ssize_t net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *, 
 # define AI_IDN 0 /* GNU/libc extension */
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 # undef gai_strerror
 # define gai_strerror gai_strerrorA
 #endif

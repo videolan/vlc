@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <termios.h>
 #include <unistd.h>
 #endif
@@ -52,7 +52,7 @@ ATMO_BOOL CMoMoConnection::OpenConnection() {
      sprintf(serdevice,"com%d",portNummer);
 #endif
 
-#if defined(WIN32)
+#if defined(_WIN32)
 
      m_hComport = CreateFileA(serdevice, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
      if(m_hComport == INVALID_HANDLE_VALUE) {
@@ -100,7 +100,7 @@ ATMO_BOOL CMoMoConnection::OpenConnection() {
 
 void CMoMoConnection::CloseConnection() {
   if(m_hComport!=INVALID_HANDLE_VALUE) {
-#if defined(WIN32)
+#if defined(_WIN32)
      CloseHandle(m_hComport);
 #else
      close(m_hComport);
@@ -150,7 +150,7 @@ ATMO_BOOL CMoMoConnection::SendData(pColorPacket data) {
        }
    }
 
-#if defined(WIN32)
+#if defined(_WIN32)
    WriteFile(m_hComport, buffer, bufSize, &iBytesWritten, NULL); // send to COM-Port
 #else
    iBytesWritten = write(m_hComport, buffer, bufSize);

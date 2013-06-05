@@ -24,7 +24,7 @@
 
 #ifndef ZCALLBACK
 
-#if (defined(WIN32) || defined (WINDOWS) || defined (_WINDOWS)) && defined(CALLBACK) && defined (USEWINDOWS_CALLBACK)
+#if (defined(_WIN32) || defined (WINDOWS) || defined (_WINDOWS)) && defined(CALLBACK) && defined (USEWINDOWS_CALLBACK)
 #define ZCALLBACK CALLBACK
 #else
 #define ZCALLBACK

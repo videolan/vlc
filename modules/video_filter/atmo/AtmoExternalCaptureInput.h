@@ -3,7 +3,7 @@
 
 #include "AtmoDefs.h"
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #   include <windows.h>
 # else
 #   if defined(_ATMO_VLC_PLUGIN_)

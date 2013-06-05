@@ -154,7 +154,7 @@ void *rtp_dgram_thread (void *opaque)
  */
 void *rtp_stream_thread (void *opaque)
 {
-#ifndef WIN32
+#ifndef _WIN32
     demux_t *demux = opaque;
     demux_sys_t *sys = demux->p_sys;
     int fd = sys->fd;

@@ -45,7 +45,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 # include <locale.h>
 #endif
 #ifdef HAVE_XLOCALE_H
@@ -422,7 +422,7 @@ static void RtspClientAlive( rtsp_session_t *session )
 static int dup_socket(int oldfd)
 {
     int newfd;
-#ifndef WIN32
+#ifndef _WIN32
     newfd = vlc_dup(oldfd);
 #else
     WSAPROTOCOL_INFO info;

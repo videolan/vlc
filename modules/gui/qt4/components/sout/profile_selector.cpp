@@ -83,7 +83,7 @@ VLCProfileSelector::VLCProfileSelector( QWidget *_parent ): QWidget( _parent )
 inline void VLCProfileSelector::fillProfilesCombo()
 {
     QSettings settings(
-#ifdef WIN32
+#ifdef _WIN32
             QSettings::IniFormat,
 #else
             QSettings::NativeFormat,
@@ -159,7 +159,7 @@ void VLCProfileSelector::deleteProfile()
 void VLCProfileSelector::saveProfiles()
 {
     QSettings settings(
-#ifdef WIN32
+#ifdef _WIN32
             QSettings::IniFormat,
 #else
             QSettings::NativeFormat,

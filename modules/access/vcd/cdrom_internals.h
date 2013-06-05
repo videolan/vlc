@@ -36,7 +36,7 @@ struct vcddev_s
 
     /* Section used in vcd device mode */
 
-#ifdef WIN32
+#ifdef _WIN32
     HANDLE h_device_handle;                         /* vcd device descriptor */
 #elif defined( __OS2__ )
     HFILE  hcd;                                     /* vcd device descriptor */
@@ -70,7 +70,7 @@ struct vcddev_s
 #define CD_MAX_TRACK_NO 99
 #endif
 
-#if defined( WIN32 )
+#if defined( _WIN32 )
 
 /* Win32 DeviceIoControl specifics */
 #ifndef MAXIMUM_NUMBER_TRACKS
@@ -127,7 +127,7 @@ typedef struct _CDROM_READ_TOC_EX {
 #define MINIMUM_CDROM_READ_TOC_EX_SIZE    2
 #define CDROM_READ_TOC_EX_FORMAT_CDTEXT   0x05
 
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 #ifdef __OS2__
 #pragma pack( push, 1 )
@@ -192,7 +192,7 @@ static void   CloseVCDImage( vlc_object_t *, struct vcddev_s * );
 static CDTOC *darwin_getTOC( vlc_object_t *, const struct vcddev_s * );
 static int    darwin_getNumberOfTracks( CDTOC *, int );
 
-#elif defined( WIN32 )
+#elif defined( _WIN32 )
 static int    win32_vcd_open( vlc_object_t *, const char *, struct vcddev_s *);
 
 #elif defined( __OS2__ )

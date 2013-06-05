@@ -54,7 +54,7 @@
 #   include <zlib.h>
 #endif
 
-#ifndef WIN32
+#ifndef _WIN32
 #   include <net/if.h>
 #endif
 
@@ -473,7 +473,7 @@ static void *Run( void *data )
     InitSocket( p_sd, SAP_V4_LINK_ADDRESS, SAP_PORT );
 
     char psz_address[NI_MAXNUMERICHOST] = "ff02::2:7ffe%";
-#ifndef WIN32
+#ifndef _WIN32
     struct if_nameindex *l = if_nameindex ();
     if (l != NULL)
     {

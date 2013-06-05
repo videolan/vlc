@@ -139,7 +139,7 @@ static int gnutls_Error (vlc_object_t *obj, int val)
     switch (val)
     {
         case GNUTLS_E_AGAIN:
-#ifdef WIN32
+#ifdef _WIN32
             WSASetLastError (WSAEWOULDBLOCK);
 #else
             errno = EAGAIN;
@@ -147,7 +147,7 @@ static int gnutls_Error (vlc_object_t *obj, int val)
             break;
 
         case GNUTLS_E_INTERRUPTED:
-#ifdef WIN32
+#ifdef _WIN32
             WSASetLastError (WSAEINTR);
 #else
             errno = EINTR;
@@ -160,7 +160,7 @@ static int gnutls_Error (vlc_object_t *obj, int val)
             if (!gnutls_error_is_fatal (val))
                 msg_Err (obj, "Error above should be handled");
 #endif
-#ifdef WIN32
+#ifdef _WIN32
             WSASetLastError (WSAECONNRESET);
 #else
             errno = ECONNRESET;
@@ -216,7 +216,7 @@ static int gnutls_ContinueHandshake (vlc_tls_t *session, const char *host,
     vlc_tls_sys_t *sys = session->sys;
     int val;
 
-#ifdef WIN32
+#ifdef _WIN32
     WSASetLastError (0);
 #endif
     do
@@ -232,7 +232,7 @@ static int gnutls_ContinueHandshake (vlc_tls_t *session, const char *host,
 
     if (val < 0)
     {
-#ifdef WIN32
+#ifdef _WIN32
         msg_Dbg (session, "Winsock error %d", WSAGetLastError ());
 #endif
         msg_Err (session, "TLS handshake error: %s", gnutls_strerror (val));

@@ -44,7 +44,7 @@
 #   include <linux/magic.h>
 #endif
 
-#if defined( WIN32 )
+#if defined( _WIN32 )
 #   include <io.h>
 #   include <ctype.h>
 #   include <shlwapi.h>
@@ -58,7 +58,7 @@
 #include <vlc_input.h>
 #include <vlc_access.h>
 #include <vlc_dialog.h>
-#ifdef WIN32
+#ifdef _WIN32
 # include <vlc_charset.h>
 #endif
 #include <vlc_fs.h>
@@ -72,7 +72,7 @@ struct access_sys_t
     bool b_pace_control;
 };
 
-#if !defined (WIN32) && !defined (__OS2__)
+#if !defined (_WIN32) && !defined (__OS2__)
 static bool IsRemote (int fd)
 {
 #if defined (HAVE_FSTATVFS) && defined (MNT_LOCAL)
@@ -109,7 +109,7 @@ static bool IsRemote (int fd)
 }
 # define IsRemote(fd,path) IsRemote(fd)
 
-#else /* WIN32 || __OS2__ */
+#else /* _WIN32 || __OS2__ */
 static bool IsRemote (const char *path)
 {
 # if !defined(__OS2__) && !VLC_WINSTORE_APP
@@ -333,7 +333,7 @@ static ssize_t StreamRead (access_t *p_access, uint8_t *p_buffer, size_t i_len)
     access_sys_t *p_sys = p_access->p_sys;
     int fd = p_sys->fd;
 
-#if !defined (WIN32) && !defined (__OS2__)
+#if !defined (_WIN32) && !defined (__OS2__)
     ssize_t val = net_Read (p_access, fd, NULL, p_buffer, i_len, false);
 #else
     ssize_t val = read (fd, p_buffer, i_len);

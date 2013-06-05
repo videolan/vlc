@@ -29,7 +29,7 @@
 #endif
 
 #include <errno.h>
-#ifdef WIN32
+#ifdef _WIN32
 #   include <fcntl.h>
 #   include <sys/stat.h>
 #   include <io.h>
@@ -93,7 +93,7 @@ struct access_sys_t
     int i_smb;
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 static void Win32AddConnection( access_t *, char *, char *, char *, char * );
 #else
 static void smb_auth( const char *srv, const char *shr, char *wg, int wglen,
@@ -179,7 +179,7 @@ static int Open( vlc_object_t *p_this )
     if( !psz_domain ) psz_domain = var_InheritString( p_access, "smb-domain" );
     if( psz_domain && !*psz_domain ) { free( psz_domain ); psz_domain = NULL; }
 
-#ifdef WIN32
+#ifdef _WIN32
     if( psz_user )
         Win32AddConnection( p_access, psz_location, psz_user, psz_pwd, psz_domain);
     i_ret = asprintf( &psz_uri, "//%s", psz_location );
@@ -200,7 +200,7 @@ static int Open( vlc_object_t *p_this )
     if( i_ret == -1 )
         return VLC_ENOMEM;
 
-#ifndef WIN32
+#ifndef _WIN32
     if( smbc_init( smb_auth, 0 ) )
     {
         free( psz_uri );
@@ -343,7 +343,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
     return VLC_SUCCESS;
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 static void Win32AddConnection( access_t *p_access, char *psz_path,
                                 char *psz_user, char *psz_pwd,
                                 char *psz_domain )
@@ -387,4 +387,4 @@ static void Win32AddConnection( access_t *p_access, char *psz_path,
         msg_Dbg( p_access, "failed to connect to %s", psz_remote );
     }
 }
-#endif // WIN32
+#endif // _WIN32

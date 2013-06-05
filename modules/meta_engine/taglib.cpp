@@ -38,7 +38,7 @@
 
 #include <sys/stat.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 # include <vlc_charset.h>
 # include <io.h>
 #else
@@ -47,7 +47,7 @@
 
 
 // Taglib headers
-#ifdef WIN32
+#ifdef _WIN32
 # define TAGLIB_STATIC
 #endif
 #include <taglib.h>
@@ -542,7 +542,7 @@ static int ReadMeta( vlc_object_t* p_this)
     if( !psz_path )
         return VLC_ENOMEM;
 
-#if defined(WIN32)
+#if defined(_WIN32)
     wchar_t *wpath = ToWide( psz_path );
     if( wpath == NULL )
     {
@@ -863,7 +863,7 @@ static int WriteMeta( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-#if defined(WIN32)
+#if defined(_WIN32)
     wchar_t *wpath = ToWide( p_export->psz_file );
     if( wpath == NULL )
         return VLC_EGENERIC;

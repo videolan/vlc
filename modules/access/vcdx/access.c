@@ -555,7 +555,7 @@ VCDParse( access_t * p_access, /*out*/ vcdinfo_itemid_t * p_itemid,
       p_itemid->num = 0;
     }
 
-#ifdef WIN32
+#ifdef _WIN32
     /* On Win32 we want the VCD access plugin to be explicitly requested,
      * we end up with lots of problems otherwise */
     if( !p_access->psz_access || !*p_access->psz_access ) return NULL;

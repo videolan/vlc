@@ -24,7 +24,7 @@
 
 #define _XPG4_2 /* ancilliary data on Solaris */
 
-#if !defined (WIN32) && !defined (__OS2__)
+#if !defined (_WIN32) && !defined (__OS2__)
 # define ENABLE_ROOTWRAP 1
 #endif
 

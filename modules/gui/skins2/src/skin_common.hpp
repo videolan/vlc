@@ -76,7 +76,7 @@ static inline string sFromLocale( const string &rLocale )
     return res;
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 /// Wrapper around FromWide, to avoid the need to call free()
 static inline string sFromWide( const wstring &rWide )
 {

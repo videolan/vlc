@@ -64,7 +64,7 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
 
     const char *type;
     switch (cfg->type) {
-#if defined(WIN32) || defined(__OS2__)
+#if defined(_WIN32) || defined(__OS2__)
     case VOUT_WINDOW_TYPE_HWND:
         type = "vout window hwnd";
         window->handle.hwnd = NULL;

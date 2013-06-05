@@ -29,7 +29,7 @@
 
 #include <vlc_common.h>
 
-#if !defined WIN32
+#if !defined _WIN32
 # include <locale.h>
 #else
 # include <windows.h>

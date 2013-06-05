@@ -32,7 +32,7 @@
 #include <QRegExp>
 #include <QSignalMapper>
 
-#ifdef WIN32
+#ifdef _WIN32
     #include <shlobj.h>
     /* typedef enum  {
         SHARD_PIDL              = 0x00000001,
@@ -88,7 +88,7 @@ void RecentsMRL::addRecent( const QString &mrl )
 
     msg_Dbg( p_intf, "Adding a new MRL to recent ones: %s", qtu( mrl ) );
 
-#ifdef WIN32
+#ifdef _WIN32
     /* Add to the Windows 7 default list in taskbar */
     char* path = make_path( qtu( mrl ) );
     if( path )

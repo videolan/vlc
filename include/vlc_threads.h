@@ -34,7 +34,7 @@
  *
  */
 
-#if defined (WIN32)
+#if defined (_WIN32)
 # include <process.h>
 # ifndef ETIMEDOUT
 #  define ETIMEDOUT 10060 /* This is the value in winsock.h. */

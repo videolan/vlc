@@ -142,7 +142,7 @@ static int Open( vlc_object_t *p_this )
     }
     else psz_name = ToLocaleDup( p_access->psz_filepath );
 
-#if defined( WIN32 ) || defined( __OS2__ )
+#if defined( _WIN32 ) || defined( __OS2__ )
     if( psz_name[0] && psz_name[1] == ':' &&
         psz_name[2] == '\\' && psz_name[3] == '\0' ) psz_name[2] = '\0';
 #endif

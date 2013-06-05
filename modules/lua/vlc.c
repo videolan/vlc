@@ -109,7 +109,7 @@ vlc_module_begin ()
         set_capability( "interface", 25 )
         set_description( N_("Command-line interface") )
         set_callbacks( Open_LuaCLI, Close_LuaIntf )
-#ifndef WIN32
+#ifndef _WIN32
         add_shortcut( "luacli", "luarc", "cli", "rc" )
 #else
         add_shortcut( "luacli", "luarc" )
@@ -215,7 +215,7 @@ int vlclua_dir_list( const char *luadirname, char ***pppsz_dir_list )
         i++;
     free( datadir );
 
-#if !(defined(__APPLE__) || defined(WIN32) || defined(__OS2__))
+#if !(defined(__APPLE__) || defined(_WIN32) || defined(__OS2__))
     char *psz_libpath = config_GetLibDir();
     if( likely(psz_libpath != NULL) )
     {

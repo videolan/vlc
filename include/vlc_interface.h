@@ -120,7 +120,7 @@ typedef struct msg_subscription { } msg_subscription_t;
 
 /*@}*/
 
-#if defined( WIN32 ) && !VLC_WINSTORE_APP
+#if defined( _WIN32 ) && !VLC_WINSTORE_APP
 #    define CONSOLE_INTRO_MSG \
          if( !getenv( "PWD" ) ) /* detect Cygwin shell or Wine */ \
          { \

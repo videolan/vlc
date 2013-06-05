@@ -26,7 +26,7 @@
 #include <errno.h>
 
 #include <sys/types.h>
-#ifndef WIN32
+#ifndef _WIN32
 # include <sys/socket.h>
 #else
 # include <winsock2.h>

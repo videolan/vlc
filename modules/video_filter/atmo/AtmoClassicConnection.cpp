@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <termios.h>
 #include <unistd.h>
 #endif
@@ -52,7 +52,7 @@ ATMO_BOOL CAtmoClassicConnection::OpenConnection() {
      sprintf(serdevice,"com%d",portNummer);
 #endif
 
-#if defined(WIN32)
+#if defined(_WIN32)
 
      m_hComport = CreateFileA(serdevice, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
      if(m_hComport == INVALID_HANDLE_VALUE) {
@@ -100,7 +100,7 @@ ATMO_BOOL CAtmoClassicConnection::OpenConnection() {
 
 void CAtmoClassicConnection::CloseConnection() {
   if(m_hComport!=INVALID_HANDLE_VALUE) {
-#if defined(WIN32)
+#if defined(_WIN32)
      CloseHandle(m_hComport);
 #else
      close(m_hComport);
@@ -170,7 +170,7 @@ ATMO_BOOL CAtmoClassicConnection::HardwareWhiteAdjust(int global_gamma,
      else
         sendBuffer[12] = 0;
 
-#if defined(WIN32)
+#if defined(_WIN32)
      WriteFile(m_hComport, sendBuffer, 13, &iBytesWritten, NULL); // send to COM-Port
 #else
      iBytesWritten = write(m_hComport, sendBuffer, 13);
@@ -213,7 +213,7 @@ ATMO_BOOL CAtmoClassicConnection::SendData(pColorPacket data) {
        }
    }
 
-#if defined(WIN32)
+#if defined(_WIN32)
    WriteFile(m_hComport, buffer, 19, &iBytesWritten, NULL); // send to COM-Port
 #else
    iBytesWritten = write(m_hComport, buffer, 19);

@@ -50,7 +50,7 @@ vlc_module_begin ()
     set_capability( "xml", 10 )
     set_callbacks( Open, Close )
 
-#ifdef WIN32
+#ifdef _WIN32
     cannot_unload_broken_library()
 #endif
 

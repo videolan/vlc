@@ -687,7 +687,7 @@ void ModuleListConfigControl::finish( bool bycat )
                 {
                     checkbox_lists( "Web", "Lua HTTP", "http" );
                     checkbox_lists( "Telnet", "Lua Telnet", "telnet" );
-#ifndef WIN32
+#ifndef _WIN32
                     checkbox_lists( "Console", "Lua CLI", "cli" );
 #endif
                 }

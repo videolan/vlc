@@ -118,7 +118,7 @@
             "por       "MM"5, "MM"3 \n\t"\
             MOVQ"      "MM"3, "MM"1 \n\t"
 
-#if defined(__MINGW32__) && defined(WIN32) && !defined(WIN64)
+#if defined(__MINGW32__) && defined(_WIN32) && !defined(_WIN64)
 __attribute__((__force_align_arg_pointer__))
 #endif
 VLC_TARGET static void RENAME(yadif_filter_line)(uint8_t *dst,

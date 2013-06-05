@@ -37,7 +37,7 @@
 #include "ui/sprefs_subtitles.h"
 #include "ui/sprefs_interface.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 # include "util/registry.hpp"
 #endif
 
@@ -70,7 +70,7 @@ class QRadioButton;
 class QCheckBox;
 class QString;
 
-#ifdef WIN32
+#ifdef _WIN32
 class QTreeWidgetItem;
 #endif
 
@@ -107,7 +107,7 @@ private:
     QStringList qs_filter;
     QButtonGroup *radioGroup;
 
-#ifdef WIN32
+#ifdef _WIN32
     QList<QTreeWidgetItem *> listAsso;
     bool addType( const char * psz_ext, QTreeWidgetItem*, QTreeWidgetItem*, QVLCRegistry* );
 #endif
@@ -117,7 +117,7 @@ private slots:
     void lastfm_Changed( int );
     void updateAudioOptions( int );
     void updateAudioVolume( int );
-#ifdef WIN32
+#ifdef _WIN32
     void assoDialog();
     void saveAsso();
 #endif

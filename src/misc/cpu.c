@@ -38,7 +38,7 @@
 
 #ifndef __linux__
 #include <sys/types.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <unistd.h>
 #include <sys/wait.h>
 #include <signal.h>
@@ -63,7 +63,7 @@ static uint32_t cpu_flags;
 
 #if defined (__i386__) || defined (__x86_64__) || defined (__powerpc__) \
  || defined (__ppc__) || defined (__ppc64__) || defined (__powerpc64__)
-# if !defined (WIN32) && !defined (__OS2__)
+# if !defined (_WIN32) && !defined (__OS2__)
 static bool vlc_CPU_check (const char *name, void (*func) (void))
 {
     pid_t pid = fork();
@@ -113,7 +113,7 @@ static void Altivec_test (void)
 }
 #endif
 
-#else /* WIN32 || __OS2__ */
+#else /* _WIN32 || __OS2__ */
 # define vlc_CPU_check(name, func) (1)
 #endif
 #endif
@@ -271,7 +271,7 @@ unsigned vlc_CPU (void)
 {
 /* On Windows and OS/2,
  * initialized from DllMain() and _DLL_InitTerm() respectively, instead */
-#if !defined(WIN32) && !defined(__OS2__)
+#if !defined(_WIN32) && !defined(__OS2__)
     static pthread_once_t once = PTHREAD_ONCE_INIT;
     pthread_once (&once, vlc_CPU_init);
 #endif

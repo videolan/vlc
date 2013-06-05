@@ -58,7 +58,7 @@
 #    define PF_LOCAL PF_UNIX
 #endif
 
-#if defined(AF_LOCAL) && ! defined(WIN32)
+#if defined(AF_LOCAL) && ! defined(_WIN32)
 #    include <sys/un.h>
 #endif
 
@@ -132,7 +132,7 @@ struct intf_sys_t
     input_thread_t    *p_input;
     bool              b_input_buffering;
 
-#ifdef WIN32
+#ifdef _WIN32
     HANDLE hConsoleIn;
     bool b_quiet;
 #endif
@@ -173,7 +173,7 @@ static void msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 #define HOST_LONGTEXT N_("Accept commands over a socket rather than stdin. " \
             "You can set the address and port the interface will bind to." )
 
-#ifdef WIN32
+#ifdef _WIN32
 #define QUIET_TEXT N_("Do not open a DOS command box interface")
 #define QUIET_LONGTEXT N_( \
     "By default the rc interface plugin will start a DOS command box. " \
@@ -189,7 +189,7 @@ vlc_module_begin ()
     set_description( N_("Remote control interface") )
     add_bool( "rc-show-pos", false, POS_TEXT, POS_LONGTEXT, true )
 
-#ifdef WIN32
+#ifdef _WIN32
     add_bool( "rc-quiet", false, QUIET_TEXT, QUIET_LONGTEXT, false )
 #else
 #if defined (HAVE_ISATTY)
@@ -202,7 +202,7 @@ vlc_module_begin ()
     set_capability( "interface", 20 )
 
     set_callbacks( Activate, Deactivate )
-#ifdef WIN32
+#ifdef _WIN32
     add_shortcut( "rc" )
 #endif
 vlc_module_end ()
@@ -218,7 +218,7 @@ static int Activate( vlc_object_t *p_this )
     char *psz_host, *psz_unix_path = NULL;
     int  *pi_socket = NULL;
 
-#ifndef WIN32
+#ifndef _WIN32
 #if defined(HAVE_ISATTY)
     /* Check that stdin is a TTY */
     if( !var_InheritBool( p_intf, "rc-fake-tty" ) && !isatty( 0 ) )
@@ -293,7 +293,7 @@ static int Activate( vlc_object_t *p_this )
         pi_socket[1] = -1;
 #endif /* AF_LOCAL */
     }
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 
     if( ( pi_socket == NULL ) &&
         ( psz_host = var_InheritString( p_intf, "rc-host" ) ) != NULL )
@@ -335,7 +335,7 @@ static int Activate( vlc_object_t *p_this )
     /* Non-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
 
-#ifdef WIN32
+#ifdef _WIN32
     p_sys->b_quiet = var_InheritBool( p_intf, "rc-quiet" );
     if( !p_sys->b_quiet )
 #endif
@@ -376,7 +376,7 @@ static void Deactivate( vlc_object_t *p_this )
         net_Close( p_sys->i_socket );
     if( p_sys->psz_unix_path != NULL )
     {
-#if defined(AF_LOCAL) && !defined(WIN32)
+#if defined(AF_LOCAL) && !defined(_WIN32)
         unlink( p_sys->psz_unix_path );
 #endif
         free( p_sys->psz_unix_path );
@@ -473,7 +473,7 @@ static void *Run( void *data )
 
     p_buffer[0] = 0;
 
-#ifdef WIN32
+#ifdef _WIN32
     /* Get the file descriptor of the console input */
     p_intf->p_sys->hConsoleIn = GetStdHandle(STD_INPUT_HANDLE);
     if( p_intf->p_sys->hConsoleIn == INVALID_HANDLE_VALUE )
@@ -1788,7 +1788,7 @@ static int updateStatistics( intf_thread_t *p_intf, input_item_t *p_item )
     return VLC_SUCCESS;
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 static bool ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
 {
     INPUT_RECORD input_record;
@@ -1858,7 +1858,7 @@ bool ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
 {
     int i_read = 0;
 
-#ifdef WIN32
+#ifdef _WIN32
     if( p_intf->p_sys->i_socket == -1 && !p_intf->p_sys->b_quiet )
         return ReadWin32( p_intf, p_buffer, pi_size );
     else if( p_intf->p_sys->i_socket == -1 )

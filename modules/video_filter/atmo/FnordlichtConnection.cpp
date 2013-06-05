@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <termios.h>
 #include <unistd.h>
 #endif
@@ -71,7 +71,7 @@ ATMO_BOOL CFnordlichtConnection::OpenConnection()
     sprintf(serdevice,"com%d",portNummer);
 #endif
 
-#if defined(WIN32)
+#if defined(_WIN32)
 
     m_hComport = CreateFileA(serdevice,
                     GENERIC_WRITE, 0, NULL,
@@ -132,7 +132,7 @@ void CFnordlichtConnection::CloseConnection()
     {
         reset(255);
 
-#if defined(WIN32)
+#if defined(_WIN32)
         CloseHandle(m_hComport);
 #else
         close(m_hComport);
@@ -194,7 +194,7 @@ ATMO_BOOL CFnordlichtConnection::SendData(pColorPacket data)
             buffer[6] = data->zone[idx].b;
         }
 
-#if defined(WIN32)
+#if defined(_WIN32)
         // send to COM-Port
         WriteFile( m_hComport, buffer, sizeof(buffer),
                     (DWORD*)&iBytesWritten, NULL );
@@ -260,7 +260,7 @@ ATMO_BOOL CFnordlichtConnection::sync(void)
 
     buffer[sizeof(buffer)-1] = 0x00; // append one zero byte
 
-#if defined(WIN32)
+#if defined(_WIN32)
         // send to COM-Port
         WriteFile( m_hComport, buffer, sizeof(buffer),
                     (DWORD*)&iBytesWritten, NULL );
@@ -302,7 +302,7 @@ ATMO_BOOL CFnordlichtConnection::stop(unsigned char addr)
     buffer[1] = 0x08; // stop command
     buffer[2] = 1;    // fading
 
-#if defined(WIN32)
+#if defined(_WIN32)
         // send to COM-Port
         WriteFile( m_hComport, buffer, sizeof(buffer),
                     (DWORD*)&iBytesWritten, NULL );
@@ -367,7 +367,7 @@ ATMO_BOOL CFnordlichtConnection::start_bootloader(unsigned char addr)
     buffer[4] = 0x27;
     buffer[5] = 0xfc;
 
-#if defined(WIN32)
+#if defined(_WIN32)
         // send to COM-Port
         WriteFile( m_hComport, buffer, sizeof(buffer),
                     (DWORD*)&iBytesWritten, NULL );
@@ -404,7 +404,7 @@ ATMO_BOOL CFnordlichtConnection::boot_enter_application(unsigned char addr)
     buffer[0] = addr; // fnordlicht address (255 = broadcast)
     buffer[1] = 0x87; // boot_ender_application command
 
-#if defined(WIN32)
+#if defined(_WIN32)
         // send to COM-Port
         WriteFile( m_hComport, buffer, sizeof(buffer),
                     (DWORD*)&iBytesWritten, NULL );

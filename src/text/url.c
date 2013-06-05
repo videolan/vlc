@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#ifdef WIN32
+#ifdef _WIN32
 # include <io.h>
 #endif
 
@@ -170,7 +170,7 @@ char *vlc_path2uri (const char *path, const char *scheme)
     path = p;
 #endif
 
-#if defined( WIN32 ) || defined( __OS2__ )
+#if defined( _WIN32 ) || defined( __OS2__ )
     /* Drive letter */
     if (isalpha ((unsigned char)path[0]) && (path[1] == ':'))
     {
@@ -186,7 +186,7 @@ char *vlc_path2uri (const char *path, const char *scheme)
 #endif
     if (!strncmp (path, "\\\\", 2))
     {   /* Windows UNC paths */
-#if !defined( WIN32 ) && !defined( __OS2__ )
+#if !defined( _WIN32 ) && !defined( __OS2__ )
         if (scheme != NULL)
             return NULL; /* remote files not supported */
 
@@ -302,7 +302,7 @@ char *make_path (const char *url)
 
     if (schemelen == 4 && !strncasecmp (url, "file", 4))
     {
-#if !defined (WIN32) && !defined (__OS2__)
+#if !defined (_WIN32) && !defined (__OS2__)
         /* Leading slash => local path */
         if (*path == '/')
             return path;
@@ -336,7 +336,7 @@ char *make_path (const char *url)
         if (*end)
             goto out;
 
-#if !defined( WIN32 ) && !defined( __OS2__ )
+#if !defined( _WIN32 ) && !defined( __OS2__ )
         switch (fd)
         {
             case 0:
@@ -490,7 +490,7 @@ void vlc_UrlClean (vlc_url_t *restrict url)
 
 #if defined (HAVE_IDN)
 # include <idna.h>
-#elif defined (WIN32)
+#elif defined (_WIN32)
 # include <windows.h>
 # include <vlc_charset.h>
 #endif
@@ -509,7 +509,7 @@ static char *vlc_idna_to_ascii (const char *idn)
         return NULL;
     return adn;
 
-#elif defined (WIN32) && (_WIN32_WINNT >= 0x0601)
+#elif defined (_WIN32) && (_WIN32_WINNT >= 0x0601)
     char *ret = NULL;
 
     wchar_t *wide = ToWide (idn);

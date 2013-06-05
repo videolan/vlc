@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <termios.h>
 #include <unistd.h>
 #endif
@@ -49,7 +49,7 @@ HANDLE CAtmoMultiConnection::OpenDevice(char *devName)
      m_dwLastWin32Error = 0;
 #endif
 
-#if defined(WIN32)
+#if defined(_WIN32)
      hComport = CreateFileA(devName, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
      if(hComport == INVALID_HANDLE_VALUE) {
 #if !defined(_ATMO_VLC_PLUGIN_)
@@ -105,7 +105,7 @@ ATMO_BOOL CAtmoMultiConnection::OpenConnection()
             if(m_hComports[z] == INVALID_HANDLE_VALUE) {
                 while(z) {
                       z--;
-#if defined(WIN32)
+#if defined(_WIN32)
                       CloseHandle( m_hComports[z] );
 #else
                       close( m_hComports[z] );
@@ -147,7 +147,7 @@ ATMO_BOOL CAtmoMultiConnection::OpenConnection()
 void CAtmoMultiConnection::CloseConnection() {
     for(int i = 0; i < 4; i++ ) {
         if(m_hComports[i] != INVALID_HANDLE_VALUE) {
-#if defined(WIN32)
+#if defined(_WIN32)
            CloseHandle( m_hComports[i] );
 #else
            close( m_hComports[i] );
@@ -254,7 +254,7 @@ ATMO_BOOL CAtmoMultiConnection::internal_HardwareWhiteAdjust(HANDLE hComport,
      else
         sendBuffer[12] = 0;
 
-#if defined(WIN32)
+#if defined(_WIN32)
      WriteFile(hComport, sendBuffer, 13, &iBytesWritten, NULL); // send to COM-Port
 #else
      iBytesWritten = write(hComport, sendBuffer, 13);
@@ -303,7 +303,7 @@ ATMO_BOOL CAtmoMultiConnection::internal_SendData(HANDLE hComport, unsigned char
   buffer[6] = 0; // Summe Blue
   memcpy(&buffer[7], colorData, 4 * 3);
 
-#if defined(WIN32)
+#if defined(_WIN32)
    WriteFile(hComport, buffer, 19, &iBytesWritten, NULL); // send to COM-Port
 #else
    iBytesWritten = write(hComport, buffer, 19);

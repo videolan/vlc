@@ -50,7 +50,7 @@ See http://www.vdr-wiki.de/ and http://www.tvdr.de/ for more information.
 #include <fcntl.h>
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( WIN32 )
+#elif defined( _WIN32 )
 #   include <io.h>
 #endif
 

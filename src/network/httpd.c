@@ -52,13 +52,13 @@
 # include <poll.h>
 #endif
 
-#if defined( WIN32 )
+#if defined( _WIN32 )
 #   include <winsock2.h>
 #else
 #   include <sys/socket.h>
 #endif
 
-#if defined( WIN32 )
+#if defined( _WIN32 )
 /* We need HUGE buffer otherwise TCP throughput is very limited */
 #define HTTPD_CL_BUFSIZE 1000000
 #else
@@ -1727,7 +1727,7 @@ static void httpd_ClientRecv( httpd_client_t *cl )
     }
 
     /* check if the client is to be set to dead */
-#if defined( WIN32 )
+#if defined( _WIN32 )
     if( ( i_len < 0 && WSAGetLastError() != WSAEWOULDBLOCK ) || ( i_len == 0 ) )
 #else
     if( ( i_len < 0 && errno != EAGAIN ) || ( i_len == 0 ) )
@@ -1866,7 +1866,7 @@ static void httpd_ClientSend( httpd_client_t *cl )
     }
     else
     {
-#if defined( WIN32 )
+#if defined( _WIN32 )
         if( ( i_len < 0 && WSAGetLastError() != WSAEWOULDBLOCK ) || ( i_len == 0 ) )
 #else
         if( ( i_len < 0 && errno != EAGAIN ) || ( i_len == 0 ) )

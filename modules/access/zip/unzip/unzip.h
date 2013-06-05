@@ -58,7 +58,7 @@ extern "C" {
 #endif
 
 #if defined(STRICTUNZIP) || defined(STRICTZIPUNZIP)
-/* like the STRICT of WIN32, we define a pointer that cannot be converted
+/* like the STRICT of _WIN32, we define a pointer that cannot be converted
     from (void*) without cast */
 typedef struct TagunzFile__ { int unused; } unzFile__;
 typedef unzFile__ *unzFile;

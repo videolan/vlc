@@ -58,7 +58,7 @@
 #   define INADDR_NONE 0xFFFFFFFF
 #endif
 
-#if defined(WIN32)
+#if defined(_WIN32)
 # undef EAFNOSUPPORT
 # define EAFNOSUPPORT WSAEAFNOSUPPORT
 #endif
@@ -96,7 +96,7 @@ int net_Socket (vlc_object_t *p_this, int family, int socktype,
         setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &(int){ 1 }, sizeof (int));
 #endif
 
-#if defined (WIN32)
+#if defined (_WIN32)
 # ifndef IPV6_PROTECTION_LEVEL
 #  warning Please update your C library headers.
 #  define IPV6_PROTECTION_LEVEL 23
@@ -159,7 +159,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
         }
 
         /* Bind the socket */
-#if defined (WIN32)
+#if defined (_WIN32)
         /*
          * Under Win32 and for multicasting, we bind to INADDR_ANY.
          * This is of course a severe bug, since the socket would logically
@@ -183,7 +183,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
         if (bind (fd, ptr->ai_addr, ptr->ai_addrlen))
         {
             net_Close (fd);
-#if !defined(WIN32)
+#if !defined(_WIN32)
             fd = rootwrap_bind (ptr->ai_family, ptr->ai_socktype,
                                 ptr->ai_protocol,
                                 ptr->ai_addr, ptr->ai_addrlen);
@@ -289,7 +289,7 @@ net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
             if (ufd[1].revents)
             {
                 msg_Dbg (p_this, "socket %d polling interrupted", fd);
-#if defined(WIN32)
+#if defined(_WIN32)
                 WSASetLastError (WSAEINTR);
 #else
                 errno = EINTR;
@@ -301,14 +301,14 @@ net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
         assert (ufd[0].revents);
 
         ssize_t n;
-#if defined(WIN32)
+#if defined(_WIN32)
         int error;
 #endif
         if (vs != NULL)
         {
             int canc = vlc_savecancel ();
             n = vs->pf_recv (vs->p_sys, p_buf, i_buflen);
-#if defined(WIN32)
+#if defined(_WIN32)
             /* We must read last error immediately, because vlc_restorecancel()
              * access thread local storage, and TlsGetValue() will call
              * SetLastError() to indicate that the function succeeded, thus
@@ -321,7 +321,7 @@ net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
         }
         else
         {
-#ifdef WIN32
+#ifdef _WIN32
             n = recv (fd, p_buf, i_buflen, 0);
             error = WSAGetLastError();
 #else
@@ -331,7 +331,7 @@ net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
 
         if (n == -1)
         {
-#if defined(WIN32)
+#if defined(_WIN32)
             switch (error)
             {
                 case WSAEWOULDBLOCK:
@@ -449,7 +449,7 @@ ssize_t net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
         if (p_vs != NULL)
             val = p_vs->pf_send (p_vs->p_sys, p_data, i_data);
         else
-#ifdef WIN32
+#ifdef _WIN32
             val = send (fd, p_data, i_data, 0);
 #else
             val = write (fd, p_data, i_data);

@@ -44,7 +44,7 @@
 #include <vlc_strings.h>
 #include <vlc_rand.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 # include <locale.h>
 #endif
 

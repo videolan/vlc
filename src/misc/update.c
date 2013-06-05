@@ -52,7 +52,7 @@
 
 #include <gcrypt.h>
 #include <vlc_gcrypt.h>
-#ifdef WIN32
+#ifdef _WIN32
 #include <shellapi.h>
 #endif
 #include "update.h"
@@ -74,9 +74,9 @@
  * Remaining text is a required description of the update
  */
 
-#if defined( WIN64 )
+#if defined( _WIN64 )
 # define UPDATE_OS_SUFFIX "-win-x64"
-#elif defined( WIN32 )
+#elif defined( _WIN32 )
 # define UPDATE_OS_SUFFIX "-win-x86"
 #else
 # define UPDATE_OS_SUFFIX ""
@@ -706,7 +706,7 @@ static void* update_DownloadReal( void *obj )
     msg_Info( p_udt, "%s authenticated", psz_destfile );
     free( p_hash );
 
-#ifdef WIN32
+#ifdef _WIN32
     int answer = dialog_Question( p_udt, _("Update VLC media player"),
     _("The new version was successfully downloaded. Do you want to close VLC and install it now?"),
     _("Install"), _("Cancel"), NULL);

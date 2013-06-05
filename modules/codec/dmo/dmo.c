@@ -34,7 +34,7 @@
 #include <vlc_codec.h>
 #include <vlc_codecs.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #   include <objbase.h>
 #   include <vlc_charset.h>
 #endif

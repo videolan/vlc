@@ -48,7 +48,7 @@ VLC_API const char * IsUTF8( const char * ) VLC_USED;
 VLC_API char * FromCharset( const char *charset, const void *data, size_t data_size ) VLC_USED;
 VLC_API void * ToCharset( const char *charset, const char *in, size_t *outsize ) VLC_USED;
 
-#ifdef WIN32
+#ifdef _WIN32
 VLC_USED
 static inline char *FromWide (const wchar_t *wide)
 {

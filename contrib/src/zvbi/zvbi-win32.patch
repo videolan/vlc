@@ -5,7 +5,7 @@ diff -ruN zvbi/src/conv.c zvbi.new/src/conv.c
  #endif
  
  #include <errno.h>
-+#ifndef WIN32
++#ifndef _WIN32
  #include <langinfo.h>
 +#endif
  
@@ -16,7 +16,7 @@ diff -ruN zvbi/src/conv.c zvbi.new/src/conv.c
  
  	dst_format = bind_textdomain_codeset (vbi_intl_domainname, NULL);
 -
-+#ifdef WIN32
++#ifdef _WIN32
 +#warning this is wrong
 +#else
  	if (NULL == dst_format)
@@ -62,7 +62,7 @@ diff -ruN zvbi/src/packet.c zvbi.new/src/packet.c
  #include <fcntl.h>
  #include <time.h>
  #include <errno.h>
-+#ifndef WIN32
++#ifndef _WIN32
  #include <sys/ioctl.h>
 +#endif
  
@@ -75,7 +75,7 @@ diff -ruN zvbi/src/proxy-msg.c zvbi.new/src/proxy-msg.c
  #include <netinet/tcp.h>
  #include <arpa/inet.h>
  #include <netdb.h>
-+#ifndef WIN32
++#ifndef _WIN32
  #include <syslog.h>
 +#endif
  #include <assert.h>
@@ -88,7 +88,7 @@ diff -ruN zvbi/src/proxy-msg.h zvbi.new/src/proxy-msg.h
  #ifndef PROXY_MSG_H
  #define PROXY_MSG_H
  
-+#ifndef WIN32
++#ifndef _WIN32
  #include <sys/syslog.h>
 +#endif
  
@@ -101,7 +101,7 @@ diff -ruN zvbi/src/vbi.c zvbi.new/src/vbi.c
  #include <fcntl.h>
  #include <time.h>
  #include <errno.h>
-+#ifndef WIN32
++#ifndef _WIN32
  #include <sys/ioctl.h>
 +#endif
  #include <sys/time.h>
@@ -138,7 +138,7 @@ diff -ruN zvbi/src/vbi.c zvbi.new/src/vbi.c
  
  #include <fcntl.h>		/* open() */
  #include <unistd.h>		/* close(), mmap(), munmap(), gettimeofday() */
-+#ifndef WIN32
++#ifndef _WIN32
  #include <sys/ioctl.h>		/* ioctl() */
  #include <sys/mman.h>		/* mmap(), munmap() */
 +#endif
@@ -150,7 +150,7 @@ diff -ruN zvbi/src/vbi.c zvbi.new/src/vbi.c
  }
  
 -
-+#ifndef WIN32
++#ifndef _WIN32
  /**
   * @internal
   *
@@ -167,7 +167,7 @@ diff -ruN zvbi/src/vbi.c zvbi.new/src/vbi.c
  				 "EXCL", O_EXCL,
  				 "TRUNC", O_TRUNC,
  				 "APPEND", O_APPEND,
-+#ifndef WIN32
++#ifndef _WIN32
  				 "NONBLOCK", O_NONBLOCK,
 +#endif
  				 0);
@@ -177,7 +177,7 @@ diff -ruN zvbi/src/vbi.c zvbi.new/src/vbi.c
  	return err;
  }
  
-+#ifndef WIN32
++#ifndef _WIN32
  /**
   * @internal
   * Drop-in for mmap(). Logs the request on fp if not NULL.

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * win32.c: Global-Hotkey WIN32 handling for vlc
+ * win32.c: Global-Hotkey _WIN32 handling for vlc
  *****************************************************************************
  * Copyright (C) 2008-2009 the VideoLAN team
  *

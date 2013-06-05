@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <termios.h>
 #include <unistd.h>
 #endif
@@ -67,7 +67,7 @@ ATMO_BOOL CAtmoDmxSerialConnection::OpenConnection() {
      sprintf(serdevice,"com%d",portNummer);
 #endif
 
-#if defined(WIN32)
+#if defined(_WIN32)
 
      m_hComport = CreateFileA(serdevice, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
      if(m_hComport == INVALID_HANDLE_VALUE) {
@@ -115,7 +115,7 @@ ATMO_BOOL CAtmoDmxSerialConnection::OpenConnection() {
 
 void CAtmoDmxSerialConnection::CloseConnection() {
   if(m_hComport!=INVALID_HANDLE_VALUE) {
-#if defined(WIN32)
+#if defined(_WIN32)
      CloseHandle(m_hComport);
 #else
      close(m_hComport);
@@ -160,7 +160,7 @@ ATMO_BOOL CAtmoDmxSerialConnection::SendData(pColorPacket data) {
           z++;
    }
 
-#if defined(WIN32)
+#if defined(_WIN32)
    WriteFile(m_hComport, DMXout, 259, &iBytesWritten, NULL); // send to COM-Port
 #else
    iBytesWritten = write(m_hComport, DMXout, 259);
@@ -189,7 +189,7 @@ ATMO_BOOL CAtmoDmxSerialConnection::setChannelValues(int numValues,unsigned char
          dmxIndex = ((int)channel_values[i]) + 2;
          DMXout[dmxIndex] = channel_values[i+1];
     }
-#if defined(WIN32)
+#if defined(_WIN32)
 	WriteFile(m_hComport, DMXout, 259, &iBytesWritten, NULL);
 #else
     iBytesWritten = write(m_hComport, DMXout, 259);
@@ -212,7 +212,7 @@ ATMO_BOOL CAtmoDmxSerialConnection::setChannelColor(int channel, tRGBColor color
 	DMXout[channel+1+2]=color.g;
 	DMXout[channel+2+2]=color.b;
 
-#if defined(WIN32)
+#if defined(_WIN32)
 	WriteFile(m_hComport, DMXout, 259, &iBytesWritten, NULL);
 #else
     iBytesWritten = write(m_hComport, DMXout, 259);

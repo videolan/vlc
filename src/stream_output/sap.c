@@ -232,7 +232,7 @@ int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session)
 
     switch (addr.a.sa_family)
     {
-#if defined (HAVE_INET_PTON) || defined (WIN32)
+#if defined (HAVE_INET_PTON) || defined (_WIN32)
         case AF_INET6:
         {
             /* See RFC3513 for list of valid IPv6 scopes */

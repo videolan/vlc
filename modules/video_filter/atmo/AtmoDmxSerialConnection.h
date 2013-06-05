@@ -14,7 +14,7 @@
 #include "AtmoConnection.h"
 #include "AtmoConfig.h"
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #   include <windows.h>
 #endif
 
@@ -26,7 +26,7 @@ class CAtmoDmxSerialConnection : public CAtmoConnection {
         // contains the DMX Start Adress of each Atmo-Dmx-Channel
         int *m_dmx_channels_base;
 
-#if defined(WIN32)
+#if defined(_WIN32)
         DWORD  m_dwLastWin32Error;
     public:
         DWORD getLastError() { return m_dwLastWin32Error; }

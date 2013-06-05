@@ -43,7 +43,7 @@
 #include "playlist.h"
 #include "../../audio_filter/equalizer_presets.h"
 
-#if !defined WIN32
+#if !defined _WIN32
 # include <locale.h>
 #else
 # include <windows.h>

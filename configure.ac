@@ -204,7 +204,7 @@ case "${host_os}" in
   *mingw32* | *cygwin* | *wince* | *mingwce*)
     AC_CHECK_TOOL(WINDRES, windres, :)
     AC_CHECK_TOOL(OBJCOPY, objcopy, :)
-    AH_TOP([#if defined(WIN32) && !defined(_WIN32_WINNT)])
+    AH_TOP([#if defined(_WIN32) && !defined(_WIN32_WINNT)])
     AH_TOP([# define _WIN32_WINNT 0x0502 /* Windows XP SP2 */])
     AH_TOP([#endif])
     AC_DEFINE([_WIN32_IE], 0x0600, [Define to '0x0600' for IE 6.0 (and shell) APIs.])
@@ -219,7 +219,7 @@ case "${host_os}" in
         dnl Check if we are using the mno-cygwin mode in which case we are
         dnl actually dealing with a mingw32 compiler.
         AC_EGREP_CPP(yes,
-            [#ifdef WIN32
+            [#ifdef _WIN32
              yes
              #endif],
             SYS=mingw32, AC_MSG_ERROR([VLC requires -mno-cygwin]))
@@ -564,7 +564,7 @@ AC_CHECK_TYPES([struct pollfd],,,
 [#include <sys/types.h>
 #if HAVE_POLL
 # include <poll.h>
-#elif defined (WIN32)
+#elif defined (_WIN32)
 # include <winsock2.h>
 #endif
 ])
@@ -590,7 +590,7 @@ AC_SEARCH_LIBS([getaddrinfo], [nsl], [
 
 LIBS="${LIBS} ${SOCKET_LIBS}"
 AC_LINK_IFELSE([
-    AC_LANG_PROGRAM([#ifdef WIN32
+    AC_LANG_PROGRAM([#ifdef _WIN32
         # if _WIN32_WINNT < 0x600
         #  error Needs vista+
         # endif
@@ -616,7 +616,7 @@ AC_CACHE_CHECK([for socklen_t in sys/socket.h], dnl ` (fix VIM syntax highlight
 ac_cv_type_socklen_t,
 [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
 [#include <sys/types.h>
-#ifdef WIN32
+#ifdef _WIN32
 # include <winsock2.h>
 # include <ws2tcpip.h>
 #else
@@ -633,7 +633,7 @@ AH_TEMPLATE(ss_family, [Define to `sa_family' if <sys/socket.h> does not define.
 AC_CACHE_CHECK([for struct sockaddr_storage], ac_cv_struct_sockaddr_storage,
   [AC_TRY_COMPILE(
     [#include <sys/types.h>
-     #if defined( WIN32 )
+     #if defined( _WIN32 )
      # include <winsock2.h>
      #else
      # include <sys/socket.h>
