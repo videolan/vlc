@@ -686,7 +686,7 @@
 
     [NSCursor setHiddenUntilMouseMoves: NO];
     [[[VLCMainWindow sharedInstance] fsPanel] setNonActive: nil];
-    
+
     [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: i_originalLevel];
     [self setLevel:i_originalLevel];
 
@@ -715,22 +715,12 @@
     if (![o_video_view isHidden]) {
         [[o_controls_bar bottomBarView] setHidden: NO];
     }
-    
+
     [self setMovableByWindowBackground: YES];
 }
 
 #pragma mark -
 #pragma mark Fullscreen Logic
-
-- (void)lockFullscreenAnimation
-{
-    [o_animation_lock lock];
-}
-
-- (void)unlockFullscreenAnimation
-{
-    [o_animation_lock unlock];
-}
 
 - (void)enterFullscreen
 {
@@ -741,7 +731,6 @@
     BOOL blackout_other_displays = var_InheritBool(VLCIntf, "macosx-black");
 
     screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_InheritInteger(VLCIntf, "macosx-vdev")];
-    [self lockFullscreenAnimation];
 
     if (!screen) {
         msg_Dbg(VLCIntf, "chosen screen isn't present, using current screen for fullscreen mode");
@@ -830,7 +819,6 @@
         /* Make sure we are hidden */
         [self orderOut: self];
 
-        [self unlockFullscreenAnimation];
         return;
     }
 
@@ -895,7 +883,6 @@
         [self orderOut: self];
 
     [self setFullscreen:YES];
-    [self unlockFullscreenAnimation];
 }
 
 - (void)leaveFullscreen
@@ -909,8 +896,6 @@
     NSRect frame;
     BOOL blackout_other_displays = var_InheritBool(VLCIntf, "macosx-black");
 
-    [self lockFullscreenAnimation];
-
     if (o_controls_bar)
         [o_controls_bar setFullscreenState:NO];
     [[[VLCMainWindow sharedInstance] controlsBar] setFullscreenState:NO];
@@ -922,7 +907,6 @@
 
     /* Don't do anything if o_fullscreen_window is already closed */
     if (!o_fullscreen_window) {
-        [self unlockFullscreenAnimation];
         return;
     }
 
@@ -1030,7 +1014,7 @@
 
     [o_fullscreen_window release];
     o_fullscreen_window = nil;
-    
+
     [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: i_originalLevel];
     [self setLevel:i_originalLevel];
     [self setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
@@ -1038,8 +1022,6 @@
     // if we quit fullscreen because there is no video anymore, make sure non-embedded window is not visible
     if (![[VLCMain sharedInstance] activeVideoPlayback] && [self class] != [VLCMainWindow class])
         [self orderOut: self];
-
-    [self unlockFullscreenAnimation];
 }
 
 - (void)animationDidEnd:(NSAnimation*)animation

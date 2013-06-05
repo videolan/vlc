@@ -103,7 +103,6 @@ static const float f_min_video_height = 70.0;
     NSView          * o_temp_view;
 
     BOOL              b_window_is_invisible;
-    NSRecursiveLock * o_animation_lock;
     NSInteger i_originalLevel;
 
     NSTimer *t_hide_mouse_timer;
