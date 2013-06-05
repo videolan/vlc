@@ -144,6 +144,7 @@ vlc_module_begin ()
     add_obsolete_integer( "ffmpeg-threads" ) /* removed since 2.1.0 */
     add_integer( "avcodec-threads", 0, THREADS_TEXT, THREADS_LONGTEXT, true );
 #endif
+    add_string( "avcodec-options", NULL, AV_OPTIONS_TEXT, AV_OPTIONS_LONGTEXT, true )
 
 
 #ifdef ENABLE_SOUT
@@ -239,6 +240,8 @@ vlc_module_begin ()
     /* Audio AAC encoder profile */
     add_string( ENC_CFG_PREFIX "aac-profile", "low",
                 ENC_PROFILE_TEXT, ENC_PROFILE_LONGTEXT, true )
+
+    add_string( ENC_CFG_PREFIX "options", NULL, AV_OPTIONS_TEXT, AV_OPTIONS_LONGTEXT, true )
 #endif /* ENABLE_SOUT */
 
 #ifdef MERGE_FFMPEG
@@ -416,9 +419,22 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
                                                       p_sys->p_context->sample_rate;
     }
     int ret;
+    char *psz_opts = var_InheritString( p_dec, "avcodec-options" );
+    AVDictionary *options = NULL;
+    if (psz_opts && *psz_opts)
+        options = vlc_av_get_options(psz_opts);
+    free(psz_opts);
+
     vlc_avcodec_lock();
-    ret = avcodec_open2( p_sys->p_context, p_sys->p_codec, NULL /* options */ );
+    ret = avcodec_open2( p_sys->p_context, p_sys->p_codec, options ? &options : NULL );
     vlc_avcodec_unlock();
+
+    AVDictionaryEntry *t = NULL;
+    while ((t = av_dict_get(options, "", t, AV_DICT_IGNORE_SUFFIX))) {
+        msg_Err( p_dec, "Unknown option \"%s\"", t->key );
+    }
+    av_dict_free(&options);
+
     if( ret < 0 )
         return VLC_EGENERIC;
     msg_Dbg( p_dec, "avcodec codec (%s) started", p_sys->psz_namecodec );

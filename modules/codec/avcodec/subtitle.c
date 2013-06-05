@@ -82,9 +82,22 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
 
     /* */
     int ret;
+    char *psz_opts = var_InheritString(dec, "avcodec-options");
+    AVDictionary *options = NULL;
+    if (psz_opts && *psz_opts)
+        options = vlc_av_get_options(psz_opts);
+    free(psz_opts);
+
     vlc_avcodec_lock();
-    ret = avcodec_open2(context, codec, NULL /* options */);
+    ret = avcodec_open2(context, codec, options ? &options : NULL);
     vlc_avcodec_unlock();
+
+    AVDictionaryEntry *t = NULL;
+    while ((t = av_dict_get(options, "", t, AV_DICT_IGNORE_SUFFIX))) {
+        msg_Err(dec, "Unknown option \"%s\"", t->key);
+    }
+    av_dict_free(&options);
+
     if (ret < 0) {
         msg_Err(dec, "cannot open codec (%s)", namecodec);
         free(context->extradata);

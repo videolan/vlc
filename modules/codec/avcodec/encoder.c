@@ -158,7 +158,7 @@ static const char *const ppsz_enc_options[] = {
 #if (LIBAVCODEC_VERSION_MAJOR < 55)
     "luma-elim-threshold", "chroma-elim-threshold",
 #endif
-    "aac-profile",
+    "aac-profile", "options",
     NULL
 };
 
@@ -738,9 +738,21 @@ int OpenEncoder( vlc_object_t *p_this )
         p_context->thread_count = vlc_GetCPUCount();
 
     int ret;
+    char *psz_opts = var_InheritString(p_enc, ENC_CFG_PREFIX "options");
+    AVDictionary *options = NULL;
+    if (psz_opts && *psz_opts)
+        options = vlc_av_get_options(psz_opts);
+    free(psz_opts);
+
     vlc_avcodec_lock();
-    ret = avcodec_open2( p_context, p_codec, NULL /* options */ );
+    ret = avcodec_open2( p_context, p_codec, options ? &options : NULL );
     vlc_avcodec_unlock();
+
+    AVDictionaryEntry *t = NULL;
+    while ((t = av_dict_get(options, "", t, AV_DICT_IGNORE_SUFFIX))) {
+        msg_Err(p_enc, "Unknown option \"%s\"", t->key);
+    }
+
     if( ret )
     {
         if( p_enc->fmt_in.i_cat != AUDIO_ES ||
@@ -750,8 +762,8 @@ int OpenEncoder( vlc_object_t *p_this )
             msg_Err( p_enc, "cannot open encoder" );
             dialog_Fatal( p_enc, _("Streaming / Transcoding failed"),
                     "%s", _("VLC could not open the encoder.") );
-            free( p_sys );
-            return VLC_EGENERIC;
+            av_dict_free(&options);
+            goto error;
         }
 
         if( p_context->channels > 2 )
@@ -774,8 +786,8 @@ int OpenEncoder( vlc_object_t *p_this )
             {
                 msg_Err( p_enc, "MPEG audio doesn't support frequency=%d",
                         fmt->audio.i_rate );
-                free( p_sys );
-                return VLC_EGENERIC;
+                av_dict_free(&options);
+                goto error;
             }
 
             for ( i = 1; i < 14; i++ )
@@ -795,7 +807,7 @@ int OpenEncoder( vlc_object_t *p_this )
 
         p_context->codec = NULL;
         vlc_avcodec_lock();
-        ret = avcodec_open2( p_context, p_codec, NULL /* options */ );
+        ret = avcodec_open2( p_context, p_codec, options ? &options : NULL );
         vlc_avcodec_unlock();
         if( ret )
         {
@@ -803,10 +815,12 @@ int OpenEncoder( vlc_object_t *p_this )
             dialog_Fatal( p_enc,
                     _("Streaming / Transcoding failed"),
                     "%s", _("VLC could not open the encoder.") );
-            free( p_sys );
-            return VLC_EGENERIC;
+            av_dict_free(&options);
+            goto error;
         }
     }
+
+    av_dict_free(&options);
 
     if( i_codec_id == AV_CODEC_ID_FLAC )
     {
