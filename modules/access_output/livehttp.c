@@ -236,6 +236,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->segments_t = vlc_array_new();
 
     p_sys->stuffing_size = 0;
+    p_sys->i_opendts = VLC_TS_INVALID;
 
     p_sys->psz_indexPath = NULL;
     psz_idx = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "index" );
@@ -897,6 +898,10 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
             if ( p_sys->i_handle < 0 )
             {
                 p_sys->i_opendts = output ? output->i_dts : p_buffer->i_dts;
+                //For first segment we can get negative duration otherwise...?
+                if( ( p_sys->i_opendts != VLC_TS_INVALID ) &&
+                    ( p_buffer->i_dts < p_sys->i_opendts ) )
+                    p_sys->i_opendts = p_buffer->i_dts;
                 if ( openNextFile( p_access, p_sys ) < 0 )
                    return -1;
             }
