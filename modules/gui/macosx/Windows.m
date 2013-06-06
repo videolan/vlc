@@ -784,9 +784,11 @@
 
             [screen setFullscreenPresentationOptions];
 
+            [o_video_view retain];
             [[o_video_view superview] replaceSubview:o_video_view with:o_temp_view];
             [o_temp_view setFrame:[o_video_view frame]];
             [o_fullscreen_window setContentView:o_video_view];
+            [o_video_view release];
 
             [o_fullscreen_window makeKeyAndOrderFront:self];
             [o_fullscreen_window orderFront:self animate:YES];
@@ -807,9 +809,11 @@
 
         /* Make sure we don't see the o_video_view disappearing of the screen during this operation */
         NSDisableScreenUpdates();
+        [o_video_view retain];
         [[o_video_view superview] replaceSubview:o_video_view with:o_temp_view];
         [o_temp_view setFrame:[o_video_view frame]];
         [o_fullscreen_window setContentView:o_video_view];
+        [o_video_view release];
         [o_fullscreen_window makeKeyAndOrderFront:self];
         NSEnableScreenUpdates();
     }
