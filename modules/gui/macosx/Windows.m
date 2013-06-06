@@ -1049,6 +1049,55 @@
         [self hasBecomeFullscreen];
 }
 
+- (void)orderOut:(id)sender
+{
+    [super orderOut:sender];
+
+    /*
+     * TODO reimplement leaveFullscreenAndFadeOut:YES, or remove code
+     * and the hack below
+    
+    if (![NSStringFromClass([self class]) isEqualToString:@"VLCMainWindow"]) {
+        [self leaveFullscreenAndFadeOut:YES];
+    }
+     */
+}
+
+- (void)makeKeyAndOrderFront: (id)sender
+{
+    /* Hack
+     * when we exit fullscreen and fade out, we may endup in
+     * having a window that is faded. We can't have it fade in unless we
+     * animate again. */
+
+    if (!b_window_is_invisible) {
+        /* Make sure we don't do it too much */
+        [super makeKeyAndOrderFront: sender];
+        return;
+    }
+
+    [super setAlphaValue:0.0f];
+    [super makeKeyAndOrderFront: sender];
+
+    NSMutableDictionary * dict = [[NSMutableDictionary alloc] initWithCapacity:2];
+    [dict setObject:self forKey:NSViewAnimationTargetKey];
+    [dict setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
+
+    o_makekey_anim = [[NSViewAnimation alloc] initWithViewAnimations:@[dict]];
+    [dict release];
+
+    [o_makekey_anim setAnimationBlockingMode: NSAnimationNonblocking];
+    [o_makekey_anim setDuration: 0.1];
+    [o_makekey_anim setFrameRate: 30];
+    [o_makekey_anim setDelegate: self];
+
+    [o_makekey_anim startAnimation];
+    b_window_is_invisible = NO;
+
+    /* fullscreenAnimation will be unlocked when animation ends */
+}
+
+
 #pragma mark -
 #pragma mark Accessibility stuff
 
