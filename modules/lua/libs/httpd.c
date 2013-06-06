@@ -61,17 +61,23 @@ static const luaL_Reg vlclua_httpd_reg[] = {
     { NULL, NULL }
 };
 
-static const char no_password[] = N_("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
+static const char no_password_fmt[] = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
 "<html xmlns=\"http://www.w3.org/1999/xhtml\">"
 "<head>"
 "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />"
-"<title>VLC media player</title>"
+"<title>%s</title>"
 "</head>"
 "<body>"
+"%s"
+"<!-- VLC_PASSWORD_NOT_SET --></body></html>";
+
+static const char no_password_body[] = N_(
 "<p>Password for Web interface has not been set.</p>"
 "<p>Please use --http-password, or set a password in </p>"
 "<p>Preferences &gt; All &gt; Main interfaces &gt; Lua &gt; Lua HTTP &gt; Password.</p>"
-"<!-- VLC_PASSWORD_NOT_SET --></body></html>");
+);
+
+static const char no_password_title[] = N_("VLC media player");
 
 static int vlclua_httpd_tls_host_new( lua_State *L )
 {
@@ -154,13 +160,20 @@ static int vlclua_httpd_handler_callback(
     if (!p_sys->password)
     {
         free(*pp_data);
-        size_t s = strlen(_(no_password));
-        if (asprintf((char**)pp_data, "Status: 403\n"
-                "Content-Length: %zu\n"
-                "Content-Type: text/html\n\n%s", s, _(no_password)) < 0)
+        char *no_password = NULL;
+        if (asprintf(&no_password, no_password_fmt,
+                _(no_password_title), _(no_password_body)) < 0) {
             *pi_data = 0;
-        else
-            *pi_data = strlen((char*)*pp_data);
+        } else {
+            size_t s = strlen(no_password);
+            if (asprintf((char**)pp_data, "Status: 403\n"
+                        "Content-Length: %zu\n"
+                        "Content-Type: text/html\n\n%s", s, no_password) < 0)
+                *pi_data = 0;
+            else
+                *pi_data = strlen((char*)*pp_data);
+            free(no_password);
+        }
     }
     lua_pop( L, 1 );
     /* function data */
@@ -257,8 +270,12 @@ static int vlclua_httpd_file_callback(
     if (!p_sys->password)
     {
         free(*pp_data);
-        *pp_data = (uint8_t*)strdup(_(no_password));
-        *pi_data = strlen((char*)*pp_data);
+        if (asprintf((char**)pp_data, no_password_fmt,
+                _(no_password_title), _(no_password_body)) < 0) {
+            *pi_data = 0;
+        } else {
+            *pi_data = strlen((char*)*pp_data);
+        }
     }
     lua_pop( L, 1 );
     /* function data */
