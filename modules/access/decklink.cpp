@@ -518,6 +518,7 @@ static int Open(vlc_object_t *p_this)
     int         ret = VLC_EGENERIC;
     int         card_index;
     int         width = 0, height, fps_num, fps_den;
+    int         physical_channels = 0;
     int         rate;
     unsigned    aspect_num, aspect_den;
 
@@ -650,6 +651,20 @@ static int Open(vlc_object_t *p_this)
 
     /* Set up audio. */
     sys->channels = var_InheritInteger(demux, "decklink-audio-channels");
+    switch (sys->channels) {
+    case 0:
+        break;
+    case 2:
+        physical_channels = AOUT_CHANS_STEREO;
+        break;
+    case 8:
+        physical_channels = AOUT_CHANS_7_1;
+        break;
+    //case 16:
+    default:
+        msg_Err(demux, "Invalid number of channels (%d), disabling audio", sys->channels);
+        sys->channels = 0;
+    }
     rate = var_InheritInteger(demux, "decklink-audio-rate");
     if (rate > 0 && sys->channels > 0) {
         if (sys->input->EnableAudioInput(rate, bmdAudioSampleType16bitInteger, sys->channels) != S_OK) {
@@ -692,6 +707,7 @@ static int Open(vlc_object_t *p_this)
     es_format_t audio_fmt;
     es_format_Init(&audio_fmt, AUDIO_ES, VLC_CODEC_S16N);
     audio_fmt.audio.i_channels = sys->channels;
+    audio_fmt.audio.i_physical_channels = physical_channels;
     audio_fmt.audio.i_rate = rate;
     audio_fmt.audio.i_bitspersample = 16;
     audio_fmt.audio.i_blockalign = audio_fmt.audio.i_channels * audio_fmt.audio.i_bitspersample / 8;
