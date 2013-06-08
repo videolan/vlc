@@ -388,7 +388,8 @@ static int Open (vlc_object_t *obj)
     const xcb_screen_t *screen;
     uint16_t width, height;
     uint8_t depth;
-    p_sys->embed = GetWindow (vd, &conn, &screen, &depth, &width, &height);
+    p_sys->embed = XCB_parent_Create (vd, &conn, &screen,
+                                      &depth, &width, &height);
     if (p_sys->embed == NULL)
     {
         free (p_sys);
@@ -506,7 +507,7 @@ static int Open (vlc_object_t *obj)
                  p_sys->embed->handle.xid, 0, 0, 1, 1, 0,
                  XCB_WINDOW_CLASS_INPUT_OUTPUT, f->visual, mask, list);
 
-            if (!CheckError (vd, conn, "cannot create X11 window", c))
+            if (!XCB_error_Check (vd, conn, "cannot create X11 window", c))
             {
                 msg_Dbg (vd, "using X11 visual ID 0x%"PRIx32
                          " (depth: %"PRIu8")", f->visual, f->depth);
@@ -565,9 +566,9 @@ static int Open (vlc_object_t *obj)
     }
 
     /* Create cursor */
-    p_sys->cursor = CreateBlankCursor (conn, screen);
+    p_sys->cursor = XCB_cursor_Create (conn, screen);
 
-    p_sys->shm = CheckSHM (obj, conn);
+    p_sys->shm = XCB_shm_Check (obj, conn);
 
     /* */
     vout_display_info_t info = vd->info;
@@ -619,7 +620,7 @@ static void Close (vlc_object_t *obj)
 
             if (!res->p->p_pixels)
                 break;
-            PictureResourceFree (res, NULL);
+            XCB_pictures_Free (res, NULL);
         }
         picture_pool_Delete (p_sys->pool);
     }
@@ -663,8 +664,8 @@ static void PoolAlloc (vout_display_t *vd, unsigned requested_count)
             res->p[i].i_pitch = pitches[i];
         }
 
-        if (PictureResourceAlloc (vd, res, p_sys->att->data_size,
-                                  p_sys->conn, p_sys->shm))
+        if (XCB_pictures_Alloc (vd, res, p_sys->att->data_size,
+                                p_sys->conn, p_sys->shm))
             break;
 
         /* Allocate further planes as specified by XVideo */
@@ -682,7 +683,7 @@ static void PoolAlloc (vout_display_t *vd, unsigned requested_count)
         pic_array[count] = picture_NewFromResource (&vd->fmt, res);
         if (!pic_array[count])
         {
-            PictureResourceFree (res, p_sys->conn);
+            XCB_pictures_Free (res, p_sys->conn);
             memset (res, 0, sizeof(*res));
             break;
         }
@@ -840,7 +841,7 @@ static void Manage (vout_display_t *vd)
 {
     vout_display_sys_t *p_sys = vd->sys;
 
-    ManageEvent (vd, p_sys->conn, &p_sys->visible);
+    XCB_Manage (vd, p_sys->conn, &p_sys->visible);
 }
 
 static int EnumAdaptors (vlc_object_t *obj, const char *var,

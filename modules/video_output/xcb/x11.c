@@ -116,7 +116,8 @@ static int Open (vlc_object_t *obj)
     xcb_connection_t *conn;
     const xcb_screen_t *scr;
     uint16_t width, height;
-    sys->embed = GetWindow (vd, &conn, &scr, &(uint8_t){ 0 }, &width, &height);
+    sys->embed = XCB_parent_Create (vd, &conn, &scr,
+                                    &(uint8_t){ 0 }, &width, &height);
     if (sys->embed == NULL)
     {
         free (sys);
@@ -287,15 +288,15 @@ found_format:;
         /* Create graphic context (I wonder why the heck do we need this) */
         xcb_create_gc (conn, sys->gc, sys->window, 0, NULL);
 
-        if (CheckError (vd, conn, "cannot create X11 window", c))
+        if (XCB_error_Check (vd, conn, "cannot create X11 window", c))
             goto error;
     }
     msg_Dbg (vd, "using X11 window %08"PRIx32, sys->window);
     msg_Dbg (vd, "using X11 graphic context %08"PRIx32, sys->gc);
 
-    sys->cursor = CreateBlankCursor (conn, scr);
+    sys->cursor = XCB_cursor_Create (conn, scr);
     sys->visible = false;
-    sys->shm = CheckSHM (obj, conn);
+    sys->shm = XCB_shm_Check (obj, conn);
 
 
     /* Setup vout_display_t once everything is fine */
@@ -382,13 +383,13 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 
         res->p->i_lines = pic->p->i_lines;
         res->p->i_pitch = pic->p->i_pitch;
-        if (PictureResourceAlloc (vd, res, res->p->i_pitch * res->p->i_lines,
-                                  sys->conn, sys->shm))
+        if (XCB_pictures_Alloc (vd, res, res->p->i_pitch * res->p->i_lines,
+                                sys->conn, sys->shm))
             break;
         pic_array[count] = picture_NewFromResource (&vd->fmt, res);
         if (!pic_array[count])
         {
-            PictureResourceFree (res, sys->conn);
+            XCB_pictures_Free (res, sys->conn);
             memset (res, 0, sizeof(*res));
             break;
         }
@@ -546,7 +547,7 @@ static void Manage (vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    ManageEvent (vd, sys->conn, &sys->visible);
+    XCB_Manage (vd, sys->conn, &sys->visible);
 }
 
 static void ResetPictures (vout_display_t *vd)
@@ -562,7 +563,7 @@ static void ResetPictures (vout_display_t *vd)
 
         if (!res->p->p_pixels)
             break;
-        PictureResourceFree (res, sys->conn);
+        XCB_pictures_Free (res, sys->conn);
     }
     picture_pool_Delete (sys->pool);
     sys->pool = NULL;

@@ -37,8 +37,8 @@
 /**
  * Check for an error
  */
-int CheckError (vout_display_t *vd, xcb_connection_t *conn,
-                const char *str, xcb_void_cookie_t ck)
+int XCB_error_Check (vout_display_t *vd, xcb_connection_t *conn,
+                     const char *str, xcb_void_cookie_t ck)
 {
     xcb_generic_error_t *err;
 
@@ -125,12 +125,12 @@ static const xcb_screen_t *FindScreen (vlc_object_t *obj,
  * Create a VLC video X window object, connect to the corresponding X server,
  * find the corresponding X server screen.
  */
-vout_window_t *GetWindow (vout_display_t *vd,
-                          xcb_connection_t **restrict pconn,
-                          const xcb_screen_t **restrict pscreen,
-                          uint8_t *restrict pdepth,
-                          uint16_t *restrict pwidth,
-                          uint16_t *restrict pheight)
+vout_window_t *XCB_parent_Create (vout_display_t *vd,
+                                  xcb_connection_t **restrict pconn,
+                                  const xcb_screen_t **restrict pscreen,
+                                  uint8_t *restrict pdepth,
+                                  uint16_t *restrict pwidth,
+                                  uint16_t *restrict pheight)
 {
     vout_window_cfg_t cfg = {
         .type = VOUT_WINDOW_TYPE_XID,
@@ -189,7 +189,7 @@ error:
  * @param conn XCB connection
  * @param scr target XCB screen
  */
-xcb_cursor_t CreateBlankCursor (xcb_connection_t *conn,
+xcb_cursor_t XCB_cursor_Create (xcb_connection_t *conn,
                                 const xcb_screen_t *scr)
 {
     xcb_cursor_t cur = xcb_generate_id (conn);
@@ -304,7 +304,7 @@ static int ProcessEvent (vout_display_t *vd, xcb_connection_t *conn,
 /**
  * Process incoming X events.
  */
-int ManageEvent (vout_display_t *vd, xcb_connection_t *conn, bool *visible)
+int XCB_Manage (vout_display_t *vd, xcb_connection_t *conn, bool *visible)
 {
     xcb_generic_event_t *ev;
 

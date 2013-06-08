@@ -44,7 +44,7 @@ libvlc_LTLIBRARIES += \
 libxcb_x11_plugin_la_SOURCES = \
 	xcb/xcb_vlc.h \
 	xcb/x11.c \
-	xcb/common.c \
+	xcb/pictures.c \
 	xcb/events.c
 libxcb_x11_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS)
@@ -54,7 +54,7 @@ libxcb_x11_plugin_la_LIBADD = $(AM_LIBADD) \
 libxcb_xv_plugin_la_SOURCES = \
 	xcb/xcb_vlc.h \
 	xcb/xvideo.c \
-	xcb/common.c \
+	xcb/pictures.c \
 	xcb/events.c
 libxcb_xv_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS) $(XCB_XV_CFLAGS)

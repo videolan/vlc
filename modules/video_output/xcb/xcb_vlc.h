@@ -33,23 +33,26 @@
 #include <vlc_picture.h>
 #include <vlc_vout_display.h>
 
-int ManageEvent (vout_display_t *vd, xcb_connection_t *conn, bool *);
-
 /* keys.c */
 typedef struct key_handler_t key_handler_t;
-key_handler_t *CreateKeyHandler (vlc_object_t *, xcb_connection_t *);
-void DestroyKeyHandler (key_handler_t *);
-int ProcessKeyEvent (key_handler_t *, xcb_generic_event_t *);
+key_handler_t *XCB_keyHandler_Create (vlc_object_t *, xcb_connection_t *);
+void XCB_keyHandler_Destroy (key_handler_t *);
+int XCB_keyHandler_Process (key_handler_t *, xcb_generic_event_t *);
+
+/* events.c */
+int XCB_error_Check (vout_display_t *, xcb_connection_t *conn,
+                     const char *str, xcb_void_cookie_t);
+
+struct vout_window_t *XCB_parent_Create (vout_display_t *obj,
+                                         xcb_connection_t **,
+                                         const xcb_screen_t **, uint8_t *depth,
+                                         uint16_t *width, uint16_t *height);
+xcb_cursor_t XCB_cursor_Create (xcb_connection_t *, const xcb_screen_t *);
+
+int XCB_Manage (vout_display_t *vd, xcb_connection_t *conn, bool *);
 
 /* common.c */
-struct vout_window_t *GetWindow (vout_display_t *obj, xcb_connection_t **,
-                                 const xcb_screen_t **, uint8_t *depth,
-                                 uint16_t *width, uint16_t *height);
-bool CheckSHM (vlc_object_t *obj, xcb_connection_t *conn);
-xcb_cursor_t CreateBlankCursor (xcb_connection_t *, const xcb_screen_t *);
-
-int CheckError (vout_display_t *, xcb_connection_t *conn,
-                const char *str, xcb_void_cookie_t);
+bool XCB_shm_Check (vlc_object_t *obj, xcb_connection_t *conn);
 
 /* FIXME
  * maybe it would be better to split this header in 2 */
@@ -58,7 +61,6 @@ struct picture_sys_t
 {
     xcb_shm_seg_t segment;
 };
-int PictureResourceAlloc (vout_display_t *vd, picture_resource_t *res, size_t size,
-                          xcb_connection_t *conn, bool attach);
-void PictureResourceFree (picture_resource_t *res, xcb_connection_t *conn);
-
+int XCB_pictures_Alloc (vout_display_t *, picture_resource_t *, size_t size,
+                        xcb_connection_t *, bool attach);
+void XCB_pictures_Free (picture_resource_t *, xcb_connection_t *);

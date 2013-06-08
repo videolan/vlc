@@ -1,9 +1,9 @@
 /**
- * @file common.c
- * @brief Common code for XCB video output plugins
+ * @file pictures.c
+ * @brief Pictures management code for XCB video output plugins
  */
 /*****************************************************************************
- * Copyright © 2009 Rémi Denis-Courmont
+ * Copyright © 2009-2013 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -42,7 +42,7 @@
 #include "xcb_vlc.h"
 
 /** Check MIT-SHM shared memory support */
-bool CheckSHM (vlc_object_t *obj, xcb_connection_t *conn)
+bool XCB_shm_Check (vlc_object_t *obj, xcb_connection_t *conn)
 {
 #ifdef HAVE_SYS_SHM_H
     xcb_shm_query_version_cookie_t ck;
@@ -69,8 +69,8 @@ bool CheckSHM (vlc_object_t *obj, xcb_connection_t *conn)
  * format. If a attach is true, the segment is attached to
  * the X server (MIT-SHM extension).
  */
-int PictureResourceAlloc (vout_display_t *vd, picture_resource_t *res, size_t size,
-                          xcb_connection_t *conn, bool attach)
+int XCB_pictures_Alloc (vout_display_t *vd, picture_resource_t *res,
+                        size_t size, xcb_connection_t *conn, bool attach)
 {
     res->p_sys = malloc (sizeof(*res->p_sys));
     if (!res->p_sys)
@@ -105,7 +105,8 @@ int PictureResourceAlloc (vout_display_t *vd, picture_resource_t *res, size_t si
         segment = xcb_generate_id (conn);
         ck = xcb_shm_attach_checked (conn, segment, id, 1);
 
-        switch (CheckError (vd, conn, "shared memory server-side error", ck))
+        switch (XCB_error_Check (vd, conn, "shared memory server-side error",
+                                 ck))
         {
             case 0:
                 break;
@@ -118,7 +119,7 @@ int PictureResourceAlloc (vout_display_t *vd, picture_resource_t *res, size_t si
                 buf.shm_perm.mode |= S_IRGRP|S_IROTH;
                 shmctl (id, IPC_SET, &buf);
                 ck = xcb_shm_attach_checked (conn, segment, id, 1);
-                if (CheckError (vd, conn, "same error on retry", ck) == 0)
+                if (XCB_error_Check (vd, conn, "same error on retry", ck) == 0)
                     break;
                 /* fall through */
             }
@@ -152,7 +153,7 @@ int PictureResourceAlloc (vout_display_t *vd, picture_resource_t *res, size_t si
 /**
  * Release picture private data: detach the shared memory segment.
  */
-void PictureResourceFree (picture_resource_t *res, xcb_connection_t *conn)
+void XCB_pictures_Free (picture_resource_t *res, xcb_connection_t *conn)
 {
 #ifdef HAVE_SYS_SHM_H
     xcb_shm_seg_t segment = res->p_sys->segment;
