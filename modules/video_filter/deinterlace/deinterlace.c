@@ -240,6 +240,11 @@ void GetOutputFormat( filter_t *p_filter,
         p_dst->i_sar_den *= 2;
     }
 
+    if( p_sys->b_double_rate )
+    {
+        p_dst->i_frame_rate *= 2;
+    }
+
     if( p_sys->i_mode == DEINTERLACE_PHOSPHOR  &&
         2 * p_sys->chroma->p[1].h.num == p_sys->chroma->p[1].h.den &&
         2 * p_sys->chroma->p[2].h.num == p_sys->chroma->p[2].h.den &&
