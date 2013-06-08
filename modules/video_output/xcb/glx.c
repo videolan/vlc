@@ -121,22 +121,34 @@ static bool CheckGLX (vout_display_t *vd, Display *dpy)
 }
 
 static int CreateWindow (vout_display_t *vd, xcb_connection_t *conn,
-                         uint_fast8_t depth, xcb_visualid_t vid,
+                         const xcb_screen_t *screen,
                          uint_fast16_t width, uint_fast16_t height)
 {
     vout_display_sys_t *sys = vd->sys;
-    const uint32_t mask = XCB_CW_EVENT_MASK;
+    xcb_pixmap_t pixmap = xcb_generate_id (conn);
+    const uint32_t mask =
+        XCB_CW_BACK_PIXMAP |
+        XCB_CW_BACK_PIXEL |
+        XCB_CW_BORDER_PIXMAP |
+        XCB_CW_BORDER_PIXEL |
+        XCB_CW_EVENT_MASK |
+        XCB_CW_COLORMAP;
     const uint32_t values[] = {
-        /* XCB_CW_EVENT_MASK */
+        pixmap,
+        screen->black_pixel,
+        pixmap,
+        screen->black_pixel,
         XCB_EVENT_MASK_VISIBILITY_CHANGE,
+        screen->default_colormap,
     };
     xcb_void_cookie_t cc, cm;
 
-    cc = xcb_create_window_checked (conn, depth, sys->window,
+    xcb_create_pixmap (conn, screen->root_depth, pixmap, screen->root, 1, 1);
+    cc = xcb_create_window_checked (conn, screen->root_depth, sys->window,
                                     sys->embed->handle.xid, 0, 0,
                                     width, height, 0,
                                     XCB_WINDOW_CLASS_INPUT_OUTPUT,
-                                    vid, mask, values);
+                                    screen->root_visual, mask, values);
     cm = xcb_map_window_checked (conn, sys->window);
     if (XCB_error_Check (vd, conn, "cannot create X11 window", cc)
      || XCB_error_Check (vd, conn, "cannot map X11 window", cm))
@@ -246,7 +258,7 @@ static int Open (vlc_object_t *obj)
     }
 
     sys->glwin = None;
-    if (!CreateWindow (vd, conn, depth, 0 /* ??? */, width, height))
+    if (!CreateWindow (vd, conn, scr, width, height))
         sys->glwin = glXCreateWindow (dpy, conf, sys->window, NULL );
     if (sys->glwin == None)
     {
