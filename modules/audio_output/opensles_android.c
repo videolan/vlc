@@ -202,6 +202,9 @@ static void Flush(audio_output_t *aout, bool drain)
 
 static int VolumeSet(audio_output_t *aout, float vol)
 {
+    if (!aout->sys->volumeItf)
+        return -1;
+
     /* Convert UI volume to linear factor (cube) */
     vol = vol * vol * vol;
 
@@ -218,6 +221,9 @@ static int VolumeSet(audio_output_t *aout, float vol)
 
 static int MuteSet(audio_output_t *aout, bool mute)
 {
+    if (!aout->sys->volumeItf)
+        return -1;
+
     SLresult r = SetMute(aout->sys->volumeItf, mute);
     return (r == SL_RESULT_SUCCESS) ? 0 : -1;
 }
