@@ -803,19 +803,36 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
             }
         }
 
-        /* Run filter chain */
-        if( id->p_f_chain )
-            p_pic = filter_chain_VideoFilter( id->p_f_chain, p_pic );
-        if( !p_pic )
-            continue;
+        /* Run the filter and output chains; first with the picture,
+         * and then with NULL as many times as we need until they
+         * stop outputting frames.
+         */
+        for ( ;; ) {
+            picture_t *p_filtered_pic = p_pic;
 
-        /* Run user specified filter chain */
-        if( id->p_uf_chain )
-            p_pic = filter_chain_VideoFilter( id->p_uf_chain, p_pic );
-        if( !p_pic )
-            continue;
+            /* Run filter chain */
+            if( id->p_f_chain )
+                p_filtered_pic = filter_chain_VideoFilter( id->p_f_chain, p_filtered_pic );
+            if( !p_filtered_pic )
+                break;
 
-        OutputFrame( p_sys, p_pic, b_need_duplicate, p_stream, id, out );
+            for ( ;; ) {
+                picture_t *p_user_filtered_pic = p_filtered_pic;
+
+                /* Run user specified filter chain */
+                if( id->p_uf_chain )
+                    p_user_filtered_pic = filter_chain_VideoFilter( id->p_uf_chain, p_user_filtered_pic );
+                if( !p_user_filtered_pic )
+                    break;
+
+                OutputFrame( p_sys, p_user_filtered_pic, b_need_duplicate, p_stream, id, out );
+                b_need_duplicate = false;
+
+                p_filtered_pic = NULL;
+            }
+
+            p_pic = NULL;
+        }
     }
 
     if( p_sys->i_threads >= 1 )
