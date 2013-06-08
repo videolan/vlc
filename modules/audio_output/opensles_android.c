@@ -352,16 +352,6 @@ static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext
 /*****************************************************************************
  *
  *****************************************************************************/
-static void Clean(aout_sys_t *sys)
-{
-    if (sys->playerObject)
-        Destroy(sys->playerObject);
-    if (sys->outputMixObject)
-        Destroy(sys->outputMixObject);
-    if (sys->engineObject)
-        Destroy(sys->engineObject);
-}
-
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     SLresult       result;
@@ -446,7 +436,11 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     return VLC_SUCCESS;
 
 error:
-    Clean(sys);
+    if (sys->playerObject) {
+        Destroy(sys->playerObject);
+        sys->playerObject = NULL;
+    }
+
     return VLC_EGENERIC;
 }
 
@@ -460,6 +454,9 @@ static void Stop(audio_output_t *aout)
 
     free(sys->buf);
     block_ChainRelease(sys->p_buffer_chain);
+
+    Destroy(sys->playerObject);
+    sys->playerObject = NULL;
 }
 
 /*****************************************************************************
@@ -470,7 +467,8 @@ static void Close(vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
 
-    Clean(sys);
+    Destroy(sys->outputMixObject);
+    Destroy(sys->engineObject);
     dlclose(sys->p_so_handle);
     vlc_mutex_destroy(&sys->lock);
     free(sys);
@@ -553,7 +551,10 @@ static int Open (vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
-    Clean(sys);
+    if (sys->outputMixObject)
+        Destroy(sys->outputMixObject);
+    if (sys->engineObject)
+        Destroy(sys->engineObject);
     if (sys->p_so_handle)
         dlclose(sys->p_so_handle);
     free(sys);
