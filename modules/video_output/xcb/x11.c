@@ -474,11 +474,17 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
         const bool is_forced = (bool)va_arg (ap, int);
 
-        if (is_forced
-         && vout_window_SetSize (sys->embed,
-                                 p_cfg->display.width,
-                                 p_cfg->display.height))
+        if (is_forced)
+        {   /* Changing the dimensions of the parent window takes place
+             * asynchronously (in the X server). Also it might fail or result
+             * in different dimensions than requested. Request the size change
+             * and return a failure since the size is not (yet) changed.
+             * If the change eventually succeeds, HandleParentStructure()
+             * will trigger a non-forced display size change later. */
+            vout_window_SetSize (sys->embed, p_cfg->display.width,
+                                 p_cfg->display.height);
             return VLC_EGENERIC;
+        }
 
         vout_display_place_t place;
         vout_display_PlacePicture (&place, &vd->source, p_cfg, false);
