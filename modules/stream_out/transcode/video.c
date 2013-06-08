@@ -261,12 +261,15 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
 static void transcode_video_filter_init( sout_stream_t *p_stream,
                                          sout_stream_id_t *id )
 {
+    const es_format_t *p_fmt_out = &id->p_decoder->fmt_out;
 
     id->p_f_chain = filter_chain_New( p_stream, "video filter2",
-                                     false,
-                                     transcode_video_filter_allocation_init,
-                                     transcode_video_filter_allocation_clear,
-                                     p_stream->p_sys );
+                                      false,
+                                      transcode_video_filter_allocation_init,
+                                      transcode_video_filter_allocation_clear,
+                                      p_stream->p_sys );
+    filter_chain_Reset( id->p_f_chain, p_fmt_out, p_fmt_out );
+
     /* Deinterlace */
     if( p_stream->p_sys->b_deinterlace )
     {
@@ -277,17 +280,6 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
                                    &id->p_decoder->fmt_out );
 
         p_fmt_out = filter_chain_GetFmtOut( id->p_f_chain );
-    }
-
-    /* Take care of the scaling and chroma conversions */
-    if( ( p_fmt_out->video.i_chroma != id->p_encoder->fmt_in.video.i_chroma ) ||
-        ( p_fmt_out->video.i_width != id->p_encoder->fmt_in.video.i_width ) ||
-        ( p_fmt_out->video.i_height != id->p_encoder->fmt_in.video.i_height ) )
-    {
-        filter_chain_AppendFilter( id->p_f_chain,
-                                   NULL, NULL,
-                                   p_fmt_out,
-                                   &id->p_encoder->fmt_in );
     }
 
     if( p_stream->p_sys->psz_vf2 )
@@ -313,6 +305,28 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
             id->p_encoder->fmt_in.video.i_sar_den;
     }
 
+}
+
+/* Take care of the scaling and chroma conversions.
+ *
+ * XXX: Shouldn't this really be after p_uf_chain, not p_f_chain,
+ * in case p_uf_chain changes the format?
+ */
+static void conversion_video_filter_append( sout_stream_id_t *id )
+{
+    const es_format_t *p_fmt_out = &id->p_decoder->fmt_out;
+    if( id->p_f_chain )
+        p_fmt_out = filter_chain_GetFmtOut( id->p_f_chain );
+
+    if( ( p_fmt_out->video.i_chroma != id->p_encoder->fmt_in.video.i_chroma ) ||
+        ( p_fmt_out->video.i_width != id->p_encoder->fmt_in.video.i_width ) ||
+        ( p_fmt_out->video.i_height != id->p_encoder->fmt_in.video.i_height ) )
+    {
+        filter_chain_AppendFilter( id->p_f_chain,
+                                   NULL, NULL,
+                                   p_fmt_out,
+                                   &id->p_encoder->fmt_in );
+    }
 }
 
 static void transcode_video_encoder_init( sout_stream_t *p_stream,
@@ -788,17 +802,24 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
             id->p_encoder->fmt_out.video.i_height = p_sys->i_height & ~1;
             id->p_encoder->fmt_out.video.i_sar_num = id->p_encoder->fmt_out.video.i_sar_den = 0;
 
-            transcode_video_encoder_init( p_stream, id );
             transcode_video_filter_init( p_stream, id );
+            transcode_video_encoder_init( p_stream, id );
+            conversion_video_filter_append( id );
             memcpy( &p_sys->fmt_input_video, &id->p_decoder->fmt_out.video, sizeof(video_format_t));
         }
 
 
         if( unlikely( !id->p_encoder->p_module ) )
         {
-            transcode_video_encoder_init( p_stream, id );
+            if( id->p_f_chain )
+                filter_chain_Delete( id->p_f_chain );
+            if( id->p_uf_chain )
+                filter_chain_Delete( id->p_uf_chain );
+            id->p_f_chain = id->p_uf_chain = NULL;
 
             transcode_video_filter_init( p_stream, id );
+            transcode_video_encoder_init( p_stream, id );
+            conversion_video_filter_append( id );
             memcpy( &p_sys->fmt_input_video, &id->p_decoder->fmt_out.video, sizeof(video_format_t));
 
             if( transcode_video_encoder_open( p_stream, id ) != VLC_SUCCESS )
