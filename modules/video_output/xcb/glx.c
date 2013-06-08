@@ -444,7 +444,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     {
         const vout_display_cfg_t *cfg;
         const video_format_t *source;
-        bool is_forced = false;
 
         if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT
          || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP)
@@ -456,18 +455,15 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         {
             source = &vd->source;
             cfg = (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
-            if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
-                is_forced = (bool)va_arg (ap, int);
         }
 
         /* */
-        if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE
-         && is_forced
-         && (cfg->display.width  != vd->cfg->display.width
-           ||cfg->display.height != vd->cfg->display.height)
-         && vout_window_SetSize (sys->embed,
-                                 cfg->display.width, cfg->display.height))
-            return VLC_EGENERIC;
+        if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE && va_arg (ap, int))
+        {
+            vout_window_SetSize (sys->embed,
+                                 cfg->display.width, cfg->display.height);
+            return VLC_EGENERIC; /* Always fail. See x11.c for rationale. */
+        }
 
         vout_display_place_t place;
         vout_display_PlacePicture (&place, source, cfg, false);
