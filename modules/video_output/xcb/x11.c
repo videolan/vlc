@@ -116,8 +116,7 @@ static int Open (vlc_object_t *obj)
     xcb_connection_t *conn;
     const xcb_screen_t *scr;
     uint16_t width, height;
-    sys->embed = XCB_parent_Create (vd, &conn, &scr,
-                                    &(uint8_t){ 0 }, &width, &height);
+    sys->embed = XCB_parent_Create (vd, &conn, &scr, &width, &height);
     if (sys->embed == NULL)
     {
         free (sys);

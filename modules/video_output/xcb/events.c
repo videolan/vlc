@@ -128,7 +128,6 @@ static const xcb_screen_t *FindScreen (vlc_object_t *obj,
 vout_window_t *XCB_parent_Create (vout_display_t *vd,
                                   xcb_connection_t **restrict pconn,
                                   const xcb_screen_t **restrict pscreen,
-                                  uint8_t *restrict pdepth,
                                   uint16_t *restrict pwidth,
                                   uint16_t *restrict pheight)
 {
@@ -164,7 +163,6 @@ vout_window_t *XCB_parent_Create (vout_display_t *vd,
         msg_Err (vd, "window not valid");
         goto error;
     }
-    *pdepth = geo->depth;
     *pwidth = geo->width;
     *pheight = geo->height;
 

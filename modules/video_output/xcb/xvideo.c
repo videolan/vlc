@@ -387,9 +387,7 @@ static int Open (vlc_object_t *obj)
     xcb_connection_t *conn;
     const xcb_screen_t *screen;
     uint16_t width, height;
-    uint8_t depth;
-    p_sys->embed = XCB_parent_Create (vd, &conn, &screen,
-                                      &depth, &width, &height);
+    p_sys->embed = XCB_parent_Create (vd, &conn, &screen, &width, &height);
     if (p_sys->embed == NULL)
     {
         free (p_sys);

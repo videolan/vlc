@@ -45,7 +45,7 @@ int XCB_error_Check (vout_display_t *, xcb_connection_t *conn,
 
 struct vout_window_t *XCB_parent_Create (vout_display_t *obj,
                                          xcb_connection_t **,
-                                         const xcb_screen_t **, uint8_t *depth,
+                                         const xcb_screen_t **,
                                          uint16_t *width, uint16_t *height);
 xcb_cursor_t XCB_cursor_Create (xcb_connection_t *, const xcb_screen_t *);
 
