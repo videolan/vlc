@@ -2863,7 +2863,10 @@ static int Create( vlc_object_t *p_this )
 #else
 # ifdef _WIN32
         if( asprintf( &psz_fontfamily, "%s"DEFAULT_FONT_FILE, p_sys->psz_win_fonts_path ) == -1 )
+        {
+            psz_fontfamily = NULL;
             goto error;
+        }
 # else
         psz_fontfamily = strdup( DEFAULT_FONT_FILE );
 # endif
