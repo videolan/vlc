@@ -313,7 +313,7 @@ libvlc_media_t *libvlc_media_new_location( libvlc_instance_t *p_instance,
 libvlc_media_t *libvlc_media_new_path( libvlc_instance_t *p_instance,
                                        const char *path )
 {
-    char *mrl = vlc_path2uri( path, "file" );
+    char *mrl = vlc_path2uri( path, NULL );
     if( unlikely(mrl == NULL) )
     {
         libvlc_printerr( "Not enough memory" );
