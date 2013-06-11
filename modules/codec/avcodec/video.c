@@ -335,6 +335,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( i_codec_id == AV_CODEC_ID_MPEG4 )
         p_sys->p_context->thread_count = 1;
 
+    p_sys->p_context->thread_safe_callbacks = true;
 #endif
 
     char *hw = var_CreateGetString( p_dec, "avcodec-hw" ); /* FIXME */
