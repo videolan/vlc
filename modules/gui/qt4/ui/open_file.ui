@@ -21,6 +21,46 @@
    <string>Open File</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="subGroupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Use a sub&amp;title file</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLineEdit" name="subInput"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="subBrowseButton">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Select the subtitle file</string>
+        </property>
+        <property name="text">
+         <string>Browse...</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="QGroupBox" name="tempWidget">
      <property name="toolTip">
@@ -96,60 +136,7 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QCheckBox" name="subCheckBox">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="toolTip">
-      <string>Add a subtitle file</string>
-     </property>
-     <property name="text">
-      <string>Use a sub&amp;title file</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="0">
-    <widget class="QFrame" name="subFrame">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QWidget" name="widget" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QLineEdit" name="subInput"/>
-         </item>
-         <item>
-          <widget class="QPushButton" name="subBrowseButton">
-           <property name="minimumSize">
-            <size>
-             <width>100</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Select the subtitle file</string>
-           </property>
-           <property name="text">
-            <string>Browse...</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="3" column="0">
     <spacer>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -171,7 +158,6 @@
   <tabstop>fileListWidg</tabstop>
   <tabstop>fileBrowseButton</tabstop>
   <tabstop>removeFileButton</tabstop>
-  <tabstop>subCheckBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>

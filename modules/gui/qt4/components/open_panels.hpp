@@ -130,7 +130,6 @@ private slots:
     void browseFile();
     void removeFile();
     void updateButtons();
-    void toggleSubtitleFrame( bool );
 };
 
 class NetOpenPanel: public OpenPanel

@@ -107,14 +107,14 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     /* Subtitles */
     /* Deactivate the subtitles control by default. */
-    ui.subFrame->setEnabled( false );
+    ui.subGroupBox->setEnabled( false );
 
     /* Connects  */
     BUTTONACT( ui.fileBrowseButton, browseFile() );
     BUTTONACT( ui.removeFileButton, removeFile() );
 
     BUTTONACT( ui.subBrowseButton, browseFileSub() );
-    CONNECT( ui.subCheckBox, toggled( bool ), this, toggleSubtitleFrame( bool ) );
+    CONNECT( ui.subGroupBox, toggled( bool ), this, updateMRL() );
 
     CONNECT( ui.fileListWidg, itemChanged( QListWidgetItem * ), this, updateMRL() );
     CONNECT( ui.subInput, textChanged( const QString& ), this, updateMRL() );
@@ -257,15 +257,6 @@ void FileOpenPanel::browseFileSub()
     updateMRL();
 }
 
-void FileOpenPanel::toggleSubtitleFrame( bool b )
-{
-    ui.subFrame->setEnabled( b );
-
-    /* Update the MRL */
-    updateMRL();
-}
-
-
 /* Update the current MRL */
 void FileOpenPanel::updateMRL()
 {
@@ -287,7 +278,7 @@ void FileOpenPanel::updateMRL()
     }
 
     /* Options */
-    if( ui.subCheckBox->isChecked() &&  !ui.subInput->text().isEmpty() ) {
+    if( ui.subGroupBox->isChecked() &&  !ui.subInput->text().isEmpty() ) {
         mrl.append( " :sub-file=" + colon_escape( ui.subInput->text() ) );
     }
 
@@ -315,7 +306,7 @@ void FileOpenPanel::updateButtons()
 {
     bool b_has_files = ( ui.fileListWidg->count() > 0 );
     ui.removeFileButton->setEnabled( b_has_files );
-    ui.subCheckBox->setEnabled( b_has_files );
+    ui.subGroupBox->setEnabled( b_has_files );
 }
 
 /**************************************************************************
