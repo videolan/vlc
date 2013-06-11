@@ -707,7 +707,16 @@ static const staticentry_t p_list_video[] = {
         E("ap4h", "Apple ProRes 4444"),
 
     B(VLC_CODEC_ICOD, "Apple Intermediate Codec"),
-	A("icod"),
+        A("icod"),
+
+    B(VLC_CODEC_G2M2, "GoTo Meeting Codec 2"),
+        A("G2M2"),
+
+    B(VLC_CODEC_G2M3, "GoTo Meeting Codec 3"),
+        A("G2M3"),
+
+    B(VLC_CODEC_G2M4, "GoTo Meeting Codec 4"),
+        A("G2M4"),
 
     /* */
     B(VLC_CODEC_YV12, "Planar 4:2:0 YVU"),

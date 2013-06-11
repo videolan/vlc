@@ -133,6 +133,9 @@
 #define VLC_CODEC_HEVC            VLC_FOURCC('h','e','v','c')
 #define VLC_CODEC_VP9             VLC_FOURCC('V','P','9','0')
 #define VLC_CODEC_ICOD            VLC_FOURCC('i','c','o','d')
+#define VLC_CODEC_G2M2            VLC_FOURCC('G','2','M','2')
+#define VLC_CODEC_G2M3            VLC_FOURCC('G','2','M','3')
+#define VLC_CODEC_G2M4            VLC_FOURCC('G','2','M','4')
 
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9             VLC_FOURCC('Y','V','U','9')
