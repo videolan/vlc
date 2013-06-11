@@ -112,7 +112,7 @@ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
 
 void ConvertDialog::fileBrowse()
 {
-    QString fileExtension = "." + profile->getMux();
+    QString fileExtension = ( ! profile->isEnabled() ) ? ".*" : "." + profile->getMux();
 
     QString fileName = QFileDialog::getSaveFileName( this, qtr( "Save file..." ),
         "",
@@ -165,7 +165,7 @@ void ConvertDialog::dumpChecked( bool checked )
 
 void ConvertDialog::setDestinationFileExtension()
 {
-    if( !fileLine->text().isEmpty() )
+    if( !fileLine->text().isEmpty() && profile->isEnabled() )
     {
         QString newFileExtension = "." + profile->getMux();
         QString newFileName;
