@@ -253,6 +253,11 @@ static const struct
     { VLC_CODEC_ICOD, AV_CODEC_ID_AIC, VIDEO_ES },
 #endif
 
+#if LIBAVCODEC_VERSION_CHECK( 55, 8, 0, 15, 100 )
+    { VLC_CODEC_G2M4, AV_CODEC_ID_G2M, VIDEO_ES },
+#endif
+
+
 #if 0
 /*    UNTESTED VideoGames*/
     { VLC_FOURCC('W','C','3','V'), AV_CODEC_ID_XAN_WC3,
