@@ -57,9 +57,11 @@ struct vlc_va_sys_t
 {
     VdpDevice device;
     VdpDecoderProfile profile;
+    VdpYCbCrFormat format;
     AVVDPAUContext context;
     VdpVideoSurface surfaces[MAX_SURFACES];
     uint32_t available;
+    vlc_fourcc_t chroma;
     uint16_t width;
     uint16_t height;
     void *display;
@@ -133,7 +135,7 @@ static int Copy (vlc_va_t *va, picture_t *pic, AVFrame *ff)
          pitches[i] = pic->p[i].i_pitch;
     }
 
-    err = sys->VideoSurfaceGetBitsYCbCr (*surface, VDP_YCBCR_FORMAT_YV12,
+    err = sys->VideoSurfaceGetBitsYCbCr (*surface, sys->format,
                                          planes, pitches);
     if (err != VDP_STATUS_OK)
     {
@@ -193,7 +195,7 @@ static int Init (vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
     }
 
     *ctxp = &sys->context;
-    *chromap = VLC_CODEC_YV12;
+    *chromap = sys->chroma;
     return VLC_SUCCESS;
 }
 
@@ -425,12 +427,23 @@ static int Open (vlc_va_t *va, int codec, const es_format_t *fmt)
                  "YUV 4:2:0", width, height);
 
     if (sys->VideoSurfaceQueryGetPutBitsYCbCrCapabilities (device,
-        VDP_CHROMA_TYPE_420, VDP_YCBCR_FORMAT_YV12, &support) != VDP_STATUS_OK)
-        support = VDP_FALSE;
-    if (!support)
+                         VDP_CHROMA_TYPE_420, VDP_YCBCR_FORMAT_YV12, &support)
+                                       == VDP_STATUS_OK && support == VDP_TRUE)
     {
-        msg_Err (va, "video surface reading not supported: %s as %s",
-                 "YUV 4:2:0", "YV12");
+        sys->format = VDP_YCBCR_FORMAT_YV12;
+        sys->chroma = VLC_CODEC_YV12;
+    }
+    else
+    if (sys->VideoSurfaceQueryGetPutBitsYCbCrCapabilities (device,
+                         VDP_CHROMA_TYPE_420, VDP_YCBCR_FORMAT_NV12, &support)
+                                       == VDP_STATUS_OK && support == VDP_TRUE)
+    {
+        sys->format = VDP_YCBCR_FORMAT_NV12;
+        sys->chroma = VLC_CODEC_NV12;
+    }
+    else
+    {
+        msg_Err (va, "video surface reading not supported: %s", "YUV 4:2:0");
         goto error;
     }
 
