@@ -141,69 +141,56 @@ void SetFilterMethod( filter_t *p_filter, const char *psz_method )
     if( !psz_method )
         psz_method = "";
 
+    p_sys->b_double_rate = false;
+    p_sys->b_half_height = false;
+    p_sys->b_use_frame_history = false;
+
     if( !strcmp( psz_method, "mean" ) )
     {
         p_sys->i_mode = DEINTERLACE_MEAN;
-        p_sys->b_double_rate = false;
         p_sys->b_half_height = true;
-        p_sys->b_use_frame_history = false;
     }
     else if( !strcmp( psz_method, "bob" )
              || !strcmp( psz_method, "progressive-scan" ) )
     {
         p_sys->i_mode = DEINTERLACE_BOB;
         p_sys->b_double_rate = true;
-        p_sys->b_half_height = false;
-        p_sys->b_use_frame_history = false;
     }
     else if( !strcmp( psz_method, "linear" ) )
     {
         p_sys->i_mode = DEINTERLACE_LINEAR;
         p_sys->b_double_rate = true;
-        p_sys->b_half_height = false;
-        p_sys->b_use_frame_history = false;
     }
     else if( !strcmp( psz_method, "x" ) && p_sys->chroma->pixel_size == 1 )
     {
         p_sys->i_mode = DEINTERLACE_X;
-        p_sys->b_double_rate = false;
-        p_sys->b_half_height = false;
-        p_sys->b_use_frame_history = false;
     }
     else if( !strcmp( psz_method, "yadif" ) )
     {
         p_sys->i_mode = DEINTERLACE_YADIF;
-        p_sys->b_double_rate = false;
-        p_sys->b_half_height = false;
         p_sys->b_use_frame_history = true;
     }
     else if( !strcmp( psz_method, "yadif2x" ) )
     {
         p_sys->i_mode = DEINTERLACE_YADIF2X;
         p_sys->b_double_rate = true;
-        p_sys->b_half_height = false;
         p_sys->b_use_frame_history = true;
     }
     else if( !strcmp( psz_method, "phosphor" ) && p_sys->chroma->pixel_size == 1 )
     {
         p_sys->i_mode = DEINTERLACE_PHOSPHOR;
         p_sys->b_double_rate = true;
-        p_sys->b_half_height = false;
         p_sys->b_use_frame_history = true;
     }
     else if( !strcmp( psz_method, "ivtc" ) && p_sys->chroma->pixel_size == 1 )
     {
         p_sys->i_mode = DEINTERLACE_IVTC;
-        p_sys->b_double_rate = false;
-        p_sys->b_half_height = false;
         p_sys->b_use_frame_history = true;
     }
     else if( !strcmp( psz_method, "discard" ) )
     {
         p_sys->i_mode = DEINTERLACE_DISCARD;
-        p_sys->b_double_rate = false;
         p_sys->b_half_height = true;
-        p_sys->b_use_frame_history = false;
     }
     else
     {
@@ -212,9 +199,6 @@ void SetFilterMethod( filter_t *p_filter, const char *psz_method )
                      "no valid/compatible deinterlace mode provided, using \"blend\"" );
 
         p_sys->i_mode = DEINTERLACE_BLEND;
-        p_sys->b_double_rate = false;
-        p_sys->b_half_height = false;
-        p_sys->b_use_frame_history = false;
     }
 
     p_sys->i_frame_offset = 0; /* reset to default when method changes */
@@ -613,11 +597,13 @@ int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
+    config_ChainParse( p_filter, FILTER_CFG_PREFIX, ppsz_filter_options,
+                       p_filter->p_cfg );
+    char *psz_mode = var_InheritString( p_filter, FILTER_CFG_PREFIX "mode" );
+    SetFilterMethod( p_filter, psz_mode );
+    free( psz_mode );
+
     p_sys->chroma = chroma;
-    p_sys->i_mode = DEINTERLACE_BLEND;
-    p_sys->b_double_rate = false;
-    p_sys->b_half_height = true;
-    p_sys->b_use_frame_history = false;
     for( int i = 0; i < METADATA_SIZE; i++ )
     {
         p_sys->meta.pi_date[i] = VLC_TS_INVALID;
@@ -678,13 +664,6 @@ int Open( vlc_object_t *p_this )
     }
 
     /* */
-    config_ChainParse( p_filter, FILTER_CFG_PREFIX, ppsz_filter_options,
-                       p_filter->p_cfg );
-
-    char *psz_mode = var_GetNonEmptyString( p_filter, FILTER_CFG_PREFIX "mode" );
-    SetFilterMethod( p_filter, psz_mode );
-    free( psz_mode );
-
     if( p_sys->i_mode == DEINTERLACE_PHOSPHOR )
     {
         int i_c420 = var_GetInteger( p_filter,
