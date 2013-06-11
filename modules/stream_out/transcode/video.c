@@ -34,8 +34,8 @@
 #include <vlc_spu.h>
 #include <vlc_modules.h>
 
-#define ENC_FRAMERATE (25 * 1001 + .5)
-#define ENC_FRAMERATE_BASE 1001
+#define ENC_FRAMERATE (25 * 1000)
+#define ENC_FRAMERATE_BASE 1000
 
 struct decoder_owner_sys_t
 {
@@ -903,7 +903,7 @@ bool transcode_video_add( sout_stream_t *p_stream, es_format_t *p_fmt,
 
     if( p_sys->f_fps > 0 )
     {
-        id->p_encoder->fmt_out.video.i_frame_rate = (p_sys->f_fps * ENC_FRAMERATE_BASE) + 0.5;
+        id->p_encoder->fmt_out.video.i_frame_rate = (p_sys->f_fps * ENC_FRAMERATE_BASE);
         id->p_encoder->fmt_out.video.i_frame_rate_base = ENC_FRAMERATE_BASE;
     }
 
