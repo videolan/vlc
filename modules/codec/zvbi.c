@@ -183,7 +183,9 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
 
 static void EventHandler( vbi_event *ev, void *user_data );
 static int OpaquePage( picture_t *p_src, const vbi_page p_page,
-                       const video_format_t fmt, bool b_opaque );
+                       const video_format_t fmt, bool b_opaque, const int text_offset );
+static int get_first_visible_row( vbi_char *p_text, int rows, int columns);
+static int get_last_visible_row( vbi_char *p_text, int rows, int columns);
 
 /* Properties callbacks */
 static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
@@ -406,10 +408,21 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     msg_Dbg( p_dec, "we now have page: %d ready for display",
              i_wanted_page );
 #endif
+
+    /* Ignore transparent rows at the beginning and end */
+    int i_first_row = get_first_visible_row( p_page.text, p_page.rows, p_page.columns );
+    if ( i_first_row < 0 )
+        goto error;
+    int i_num_rows = get_last_visible_row( p_page.text, p_page.rows, p_page.columns ) - i_first_row + 1;
+#ifdef ZVBI_DEBUG
+    msg_Dbg( p_dec, "After top and tail of page we have rows %i-%i of %i",
+             i_first_row + 1, i_first_row + i_num_rows, p_page.rows );
+#endif
+
     /* If there is a page or sub to render, then we do that here */
     /* Create the subpicture unit */
     p_spu = Subpicture( p_dec, &fmt, p_sys->b_text,
-                        p_page.columns, p_page.rows,
+                        p_page.columns, i_num_rows,
                         i_align, p_block->i_pts );
     if( !p_spu )
         goto error;
@@ -421,13 +434,9 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         char p_text[i_textsize+1];
 
         i_total = vbi_print_page_region( &p_page, p_text, i_textsize,
-                        "UTF-8", 0, 0, 0, 0, p_page.columns, p_page.rows );
+                        "UTF-8", 0, 0, 0, i_first_row, p_page.columns, i_num_rows );
         p_text[i_total] = '\0';
-        /* Strip off the pagenumber */
-        if( i_total <= 40 )
-            goto error;
-        p_spu->p_region->psz_text = strdup( &p_text[8] );
-
+        p_spu->p_region->psz_text = strdup( p_text );
 #ifdef ZVBI_DEBUG
         msg_Info( p_dec, "page %x-%x(%d)\n%s", p_page.pgno, p_page.subno, i_total, p_text );
 #endif
@@ -438,14 +447,22 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
         /* ZVBI is stupid enough to assume pitch == width */
         p_pic->p->i_pitch = 4 * fmt.i_width;
-        vbi_draw_vt_page( &p_page, ZVBI_PIXFMT_RGBA32,
-                          p_spu->p_region->p_picture->p->p_pixels, 1, 1 );
+
+        /* Maintain subtitle postion */
+        p_spu->p_region->i_y = i_first_row*10;
+        p_spu->i_original_picture_width = p_page.columns*12;
+        p_spu->i_original_picture_height = p_page.rows*10;
+
+        vbi_draw_vt_page_region( &p_page, ZVBI_PIXFMT_RGBA32,
+                          p_spu->p_region->p_picture->p->p_pixels, -1,
+                          0, i_first_row, p_page.columns, i_num_rows,
+                          1, 1);
 
         vlc_mutex_lock( &p_sys->lock );
         memcpy( p_sys->nav_link, &p_page.nav_link, sizeof( p_sys->nav_link )) ;
         vlc_mutex_unlock( &p_sys->lock );
 
-        OpaquePage( p_pic, p_page, fmt, b_opaque );
+        OpaquePage( p_pic, p_page, fmt, b_opaque, i_first_row * p_page.columns );
     }
 
 exit:
@@ -513,7 +530,7 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
     p_spu->i_start = i_pts;
     p_spu->i_stop = 0;
     p_spu->b_ephemer = true;
-    p_spu->b_absolute = false;
+    p_spu->b_absolute = true;
 
     if( !b_text )
     {
@@ -567,8 +584,34 @@ static void EventHandler( vbi_event *ev, void *user_data )
         msg_Dbg( p_dec, "Network ID changed" );
 }
 
+static int get_first_visible_row( vbi_char *p_text, int rows, int columns)
+{
+    for ( int i = 0; i < rows * columns; i++ )
+    {
+        if ( p_text[i].opacity != VBI_TRANSPARENT_SPACE )
+        {
+            return i / columns;
+        }
+    }
+
+    return rows;
+}
+
+static int get_last_visible_row( vbi_char *p_text, int rows, int columns)
+{
+    for ( int i = rows * columns - 1; i >= 0; i-- )
+    {
+        if (p_text[i].opacity != VBI_TRANSPARENT_SPACE)
+        {
+            return ( i + columns - 1) / columns;
+        }
+    }
+
+    return 0;
+}
+
 static int OpaquePage( picture_t *p_src, const vbi_page p_page,
-                       const video_format_t fmt, bool b_opaque )
+                       const video_format_t fmt, bool b_opaque, const int text_offset )
 {
     unsigned int    x, y;
 
@@ -579,8 +622,8 @@ static int OpaquePage( picture_t *p_src, const vbi_page p_page,
     {
         for( x = 0; x < fmt.i_width; x++ )
         {
-            const vbi_opacity opacity = p_page.text[ y/10 * p_page.columns + x/12 ].opacity;
-            const int background = p_page.text[ y/10 * p_page.columns + x/12 ].background;
+            const vbi_opacity opacity = p_page.text[ text_offset + y/10 * p_page.columns + x/12 ].opacity;
+            const int background = p_page.text[ text_offset + y/10 * p_page.columns + x/12 ].background;
             uint32_t *p_pixel = (uint32_t*)&p_src->p->p_pixels[y * p_src->p->i_pitch + 4*x];
 
             switch( opacity )
