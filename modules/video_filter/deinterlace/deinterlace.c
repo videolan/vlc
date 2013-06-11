@@ -134,7 +134,16 @@ static const char *const ppsz_filter_options[] = {
  * SetFilterMethod: setup the deinterlace method to use.
  *****************************************************************************/
 
-void SetFilterMethod( filter_t *p_filter, const char *psz_method )
+/**
+ * Setup the deinterlace method to use.
+ *
+ * FIXME: extract i_chroma from p_filter automatically?
+ *
+ * @param p_filter The filter instance.
+ * @param psz_method Desired method. See mode_list for available choices.
+ * @see mode_list
+ */
+static void SetFilterMethod( filter_t *p_filter, const char *psz_method )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -206,11 +215,19 @@ void SetFilterMethod( filter_t *p_filter, const char *psz_method )
     msg_Dbg( p_filter, "using %s deinterlace method", psz_method );
 }
 
-/*****************************************************************************
- * GetOutputFormat: return which format the chosen algorithm outputs.
- *****************************************************************************/
-
-void GetOutputFormat( filter_t *p_filter,
+/**
+ * Get the output video format of the chosen deinterlace method
+ * for the given input video format.
+ *
+ * Note that each algorithm is allowed to specify its output format,
+ * which may (for some input formats) differ from the input format.
+ *
+ * @param p_filter The filter instance.
+ * @param[out] p_dst Output video format. The structure must be allocated by ca
+ * @param[in] p_src Input video format.
+ * @see SetFilterMethod()
+ */
+static void GetOutputFormat( filter_t *p_filter,
                       video_format_t *p_dst, const video_format_t *p_src )
 {
     filter_sys_t *p_sys = p_filter->p_sys;

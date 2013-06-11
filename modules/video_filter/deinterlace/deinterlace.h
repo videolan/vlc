@@ -124,37 +124,6 @@ struct filter_sys_t
 };
 
 /*****************************************************************************
- * Filter control related internal functions for the deinterlace filter
- *****************************************************************************/
-
-/**
- * Setup the deinterlace method to use.
- *
- * FIXME: extract i_chroma from p_filter automatically?
- *
- * @param p_filter The filter instance.
- * @param psz_method Desired method. See mode_list for available choices.
- * @see mode_list
- */
-void SetFilterMethod( filter_t *p_filter, const char *psz_method );
-
-/**
- * Get the output video format of the chosen deinterlace method
- * for the given input video format.
- *
- * Note that each algorithm is allowed to specify its output format,
- * which may (for some input formats) differ from the input format.
- *
- * @param p_filter The filter instance.
- * @param[out] p_dst Output video format. The structure must be allocated by caller.
- * @param[in] p_src Input video format.
- * @see SetFilterMethod()
- */
-void GetOutputFormat( filter_t *p_filter,
-                      video_format_t *p_dst,
-                      const video_format_t *p_src );
-
-/*****************************************************************************
  * video filter2 functions
  *****************************************************************************/
 
