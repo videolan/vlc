@@ -140,79 +140,86 @@ static const char *const ppsz_filter_options[] = {
  * FIXME: extract i_chroma from p_filter automatically?
  *
  * @param p_filter The filter instance.
- * @param psz_method Desired method. See mode_list for available choices.
+ * @param mode Desired method. See mode_list for available choices.
  * @see mode_list
  */
-static void SetFilterMethod( filter_t *p_filter, const char *psz_method )
+static void SetFilterMethod( filter_t *p_filter, const char *mode, bool pack )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( !psz_method )
-        psz_method = "";
+    if( mode == NULL )
+        mode = "blend";
 
+    p_sys->i_mode = DEINTERLACE_BLEND; /* default */
     p_sys->b_double_rate = false;
     p_sys->b_half_height = false;
     p_sys->b_use_frame_history = false;
 
-    if( !strcmp( psz_method, "mean" ) )
+    if( !strcmp( mode, "discard" ) )
     {
-        p_sys->i_mode = DEINTERLACE_MEAN;
+        p_sys->i_mode = DEINTERLACE_DISCARD;
         p_sys->b_half_height = true;
     }
-    else if( !strcmp( psz_method, "bob" )
-             || !strcmp( psz_method, "progressive-scan" ) )
+    else if( !strcmp( mode, "bob" ) || !strcmp( mode, "progressive-scan" ) )
     {
         p_sys->i_mode = DEINTERLACE_BOB;
         p_sys->b_double_rate = true;
     }
-    else if( !strcmp( psz_method, "linear" ) )
+    else if( !strcmp( mode, "linear" ) )
     {
         p_sys->i_mode = DEINTERLACE_LINEAR;
         p_sys->b_double_rate = true;
     }
-    else if( !strcmp( psz_method, "x" ) && p_sys->chroma->pixel_size == 1 )
+    else if( !strcmp( mode, "mean" ) )
     {
-        p_sys->i_mode = DEINTERLACE_X;
+        p_sys->i_mode = DEINTERLACE_MEAN;
+        p_sys->b_half_height = true;
     }
-    else if( !strcmp( psz_method, "yadif" ) )
+    else if( !strcmp( mode, "blend" ) )
+    {
+    }
+    else if( pack )
+    {
+        msg_Err( p_filter, "unknown or incompatible deinterlace mode \"%s\""
+                 " for packed format", mode );
+        mode = "blend";
+    }
+    else if( !strcmp( mode, "yadif" ) )
     {
         p_sys->i_mode = DEINTERLACE_YADIF;
         p_sys->b_use_frame_history = true;
     }
-    else if( !strcmp( psz_method, "yadif2x" ) )
+    else if( !strcmp( mode, "yadif2x" ) )
     {
         p_sys->i_mode = DEINTERLACE_YADIF2X;
         p_sys->b_double_rate = true;
         p_sys->b_use_frame_history = true;
     }
-    else if( !strcmp( psz_method, "phosphor" ) && p_sys->chroma->pixel_size == 1 )
+    else if( p_sys->chroma->pixel_size > 1 )
+    {
+        msg_Err( p_filter, "unknown or incompatible deinterlace mode \"%s\""
+                 " for high depth format", mode );
+        mode = "blend";
+    }
+    else if( !strcmp( mode, "x" ) )
+    {
+        p_sys->i_mode = DEINTERLACE_X;
+    }
+    else if( !strcmp( mode, "phosphor" ) )
     {
         p_sys->i_mode = DEINTERLACE_PHOSPHOR;
         p_sys->b_double_rate = true;
         p_sys->b_use_frame_history = true;
     }
-    else if( !strcmp( psz_method, "ivtc" ) && p_sys->chroma->pixel_size == 1 )
+    else if( !strcmp( mode, "ivtc" ) )
     {
         p_sys->i_mode = DEINTERLACE_IVTC;
         p_sys->b_use_frame_history = true;
     }
-    else if( !strcmp( psz_method, "discard" ) )
-    {
-        p_sys->i_mode = DEINTERLACE_DISCARD;
-        p_sys->b_half_height = true;
-    }
     else
-    {
-        if( strcmp( psz_method, "blend" ) )
-            msg_Err( p_filter,
-                     "no valid/compatible deinterlace mode provided, using \"blend\"" );
+        msg_Err( p_filter, "unknown deinterlace mode \"%s\"", mode );
 
-        p_sys->i_mode = DEINTERLACE_BLEND;
-    }
-
-    p_sys->i_frame_offset = 0; /* reset to default when method changes */
-
-    msg_Dbg( p_filter, "using %s deinterlace method", psz_method );
+    msg_Dbg( p_filter, "using %s deinterlace method", mode );
 }
 
 /**
@@ -602,12 +609,33 @@ int Open( vlc_object_t *p_this )
 
     const vlc_fourcc_t fourcc = p_filter->fmt_in.video.i_chroma;
     const vlc_chroma_description_t *chroma = vlc_fourcc_GetChromaDescription( fourcc );
-    if( !vlc_fourcc_IsYUV( fourcc ) ||
-        !chroma || chroma->plane_count != 3 || chroma->pixel_size > 2 )
+    if( chroma == NULL || chroma->pixel_size > 2 )
     {
-        msg_Err( p_filter, "Unsupported chroma (%4.4s)", (char*)&fourcc );
+notsupp:
+        msg_Err( p_filter, "unsupported chroma %4.4s", (char*)&fourcc );
         return VLC_EGENERIC;
     }
+
+    unsigned pixel_size = chroma->pixel_size;
+    bool packed = false;
+    if( chroma->plane_count != 3 )
+    {
+        packed = true;
+        switch( fourcc )
+        {
+            case VLC_CODEC_YUYV:
+            case VLC_CODEC_UYVY:
+            case VLC_CODEC_YVYU:
+            case VLC_CODEC_VYUY:
+            case VLC_CODEC_NV12:
+            case VLC_CODEC_NV21:
+                pixel_size = 1;
+                break;
+            default:
+                goto notsupp;
+        }
+    }
+    assert( vlc_fourcc_IsYUV( fourcc ) );
 
     /* */
     p_sys = p_filter->p_sys = malloc( sizeof( *p_sys ) );
@@ -617,7 +645,7 @@ int Open( vlc_object_t *p_this )
     config_ChainParse( p_filter, FILTER_CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
     char *psz_mode = var_InheritString( p_filter, FILTER_CFG_PREFIX "mode" );
-    SetFilterMethod( p_filter, psz_mode );
+    SetFilterMethod( p_filter, psz_mode, packed );
     free( psz_mode );
 
     p_sys->chroma = chroma;
@@ -635,20 +663,20 @@ int Open( vlc_object_t *p_this )
     IVTCClearState( p_filter );
 
 #if defined(CAN_COMPILE_C_ALTIVEC)
-    if( chroma->pixel_size == 1 && vlc_CPU_ALTIVEC() )
+    if( pixel_size == 1 && vlc_CPU_ALTIVEC() )
         p_sys->pf_merge = MergeAltivec;
     else
 #endif
 #if defined(CAN_COMPILE_SSE2)
     if( vlc_CPU_SSE2() )
     {
-        p_sys->pf_merge = chroma->pixel_size == 1 ? Merge8BitSSE2 : Merge16BitSSE2;
+        p_sys->pf_merge = pixel_size == 1 ? Merge8BitSSE2 : Merge16BitSSE2;
         p_sys->pf_end_merge = EndMMX;
     }
     else
 #endif
 #if defined(CAN_COMPILE_MMXEXT)
-    if( chroma->pixel_size == 1 && vlc_CPU_MMXEXT() )
+    if( pixel_size == 1 && vlc_CPU_MMXEXT() )
     {
         p_sys->pf_merge = MergeMMXEXT;
         p_sys->pf_end_merge = EndMMX;
@@ -656,7 +684,7 @@ int Open( vlc_object_t *p_this )
     else
 #endif
 #if defined(CAN_COMPILE_3DNOW)
-    if( chroma->pixel_size == 1 && vlc_CPU_3dNOW() )
+    if( pixel_size == 1 && vlc_CPU_3dNOW() )
     {
         p_sys->pf_merge = Merge3DNow;
         p_sys->pf_end_merge = End3DNow;
@@ -665,16 +693,14 @@ int Open( vlc_object_t *p_this )
 #endif
 #if defined(CAN_COMPILE_ARM)
     if( vlc_CPU_ARM_NEON() )
-        p_sys->pf_merge =
-            (chroma->pixel_size == 1) ? merge8_arm_neon : merge16_arm_neon;
+        p_sys->pf_merge = pixel_size == 1 ? merge8_arm_neon : merge16_arm_neon;
     else
     if( vlc_CPU_ARMv6() )
-        p_sys->pf_merge =
-            (chroma->pixel_size == 1) ? merge8_armv6 : merge16_armv6;
+        p_sys->pf_merge = pixel_size == 1 ? merge8_armv6 : merge16_armv6;
     else
 #endif
     {
-        p_sys->pf_merge = chroma->pixel_size == 1 ? Merge8BitGeneric : Merge16BitGeneric;
+        p_sys->pf_merge = pixel_size == 1 ? Merge8BitGeneric : Merge16BitGeneric;
 #if defined(__i386__) || defined(__x86_64__)
         p_sys->pf_end_merge = NULL;
 #endif
