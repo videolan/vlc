@@ -305,6 +305,7 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
         QPixmap pix( iconL[i] );
         widgetItem->setIcon( pix.scaled( 16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
         widgetItem->setData( Qt::UserRole, QVariant( i ) );
+        widgetItem->setToolTip( widgetItem->text() );
         addItem( widgetItem );
     }
 
@@ -312,11 +313,13 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
     QListWidgetItem *widgetItem = new QListWidgetItem( QIcon( ":/toolbar/space" ),
             qtr( "Spacer" ), this );
     widgetItem->setData( Qt::UserRole, WIDGET_SPACER );
+    widgetItem->setToolTip( widgetItem->text() );
     addItem( widgetItem );
 
     widgetItem = new QListWidgetItem( QIcon( ":/toolbar/space" ),
             qtr( "Expanding Spacer" ), this );
     widgetItem->setData( Qt::UserRole, WIDGET_SPACER_EXTEND );
+    widgetItem->setToolTip( widgetItem->text() );
     addItem( widgetItem );
 
     /**
@@ -470,6 +473,7 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
 
 
         widgetItem->setIcon( QIcon( QPixmap::grabWidget( widget ) ) );
+        widgetItem->setToolTip( widgetItem->text() );
         widget->hide();
         widgetItem->setData( Qt::UserRole, QVariant( i ) );
 
