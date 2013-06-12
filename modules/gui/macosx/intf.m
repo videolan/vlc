@@ -179,7 +179,13 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
     p_wnd->handle.nsobject = videoView;
 
     // TODO: find a cleaner way for "start in fullscreen"
-    if (var_InheritBool(VLCIntf, "fullscreen")) {
+    // either prefs settings, or fullscreen button was pressed before
+    if (var_InheritBool(VLCIntf, "fullscreen") || var_GetBool(pl_Get(VLCIntf), "fullscreen")) {
+
+        // this is not set when we start in fullscreen because of
+        // fullscreen settings in video prefs the second time
+        var_SetBool(p_wnd->p_parent, "fullscreen", 1);
+
         int i_full = 1;
 
         SEL sel = @selector(setFullscreen:forWindow:);
