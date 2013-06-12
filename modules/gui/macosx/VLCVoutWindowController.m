@@ -69,7 +69,7 @@
     if (b_multiple_vout_windows && b_video_wallpaper)
         b_video_wallpaper = false;
 
-    // TODO: make lion fullscreen compatible with video-wallpaper and !embedded-video
+    // TODO: make lion fullscreen compatible with video-wallpaper
     if ((b_video_wallpaper || !b_video_deco) && !b_nativeFullscreenMode) {
         // b_video_wallpaper is priorized over !b_video_deco
 
