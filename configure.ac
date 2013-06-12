@@ -1955,7 +1955,6 @@ then
   LIBS="${SAVED_LIBS}"
   if test "${have_avfoundation}" != "no"
   then
-    VLC_ADD_LIBS([macosx],[-Wl,-framework,AVFoundation])
     VLC_ADD_PLUGIN([avcapture])
   fi
 fi
