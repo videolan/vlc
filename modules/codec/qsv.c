@@ -723,12 +723,13 @@ static block_t *Encode(encoder_t *this, picture_t *pic)
     task->bs.MaxLength = sys->params.mfx.BufferSizeInKB * 1000;
     task->bs.Data = task->block->p_buffer;
 
-    sts = MFXVideoENCODE_EncodeFrameAsync(sys->session, 0, frame, &task->bs, &task->syncp);
-    while (sts == MFX_WRN_DEVICE_BUSY) {
+    for (;;) {
+        sts = MFXVideoENCODE_EncodeFrameAsync(sys->session, 0, frame, &task->bs, &task->syncp);
+        if (sts != MFX_WRN_DEVICE_BUSY)
+            break;
         if (sys->busy_warn_counter++ % 16 == 0)
             msg_Dbg(enc, "Device is busy, let's wait and retry");
         msleep(QSV_BUSYWAIT_TIME);
-        sts = MFXVideoENCODE_EncodeFrameAsync(sys->session, 0, frame, &task->bs, &task->syncp);
     }
 
     // msg_Dbg(enc, "Encode async status: %d, Syncpoint = %tx", sts, (ptrdiff_t)task->syncp);
