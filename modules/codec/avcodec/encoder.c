@@ -916,8 +916,7 @@ error:
 static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
-    int i_out, i_plane, i_got_packet=1;
-
+    int i_plane;
     /* Initialize the video output buffer the first time.
      * This is done here instead of OpenEncoder() because we need the actual
      * bits_per_pixel value, without having to assume anything.
@@ -929,15 +928,10 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     if( unlikely(p_block == NULL) )
         return NULL;
 
-#if (LIBAVCODEC_VERSION_MAJOR >= 54)
-    AVPacket av_pkt;
-    /*We don't use av_pkt with major_version < 54, so no point init it*/
-    av_init_packet( &av_pkt );
-    av_pkt.data = p_block->p_buffer;
-    av_pkt.size = p_block->i_buffer;
-#endif
+    AVFrame *frame = NULL;
     if( likely(p_pict) ) {
-        avcodec_get_frame_defaults( p_sys->frame );
+        frame = p_sys->frame;
+        avcodec_get_frame_defaults( frame );
         for( i_plane = 0; i_plane < p_pict->i_planes; i_plane++ )
         {
             p_sys->frame->data[i_plane] = p_pict->p[i_plane].p_pixels;
@@ -1012,31 +1006,40 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             }
         }
 
-        p_sys->frame->quality = p_sys->i_quality;
-
-#if (LIBAVCODEC_VERSION_MAJOR < 54)
-        i_out = avcodec_encode_video( p_sys->p_context, p_block->p_buffer, p_block->i_buffer, p_sys->frame );
-#else
-        i_out = avcodec_encode_video2( p_sys->p_context, &av_pkt, p_sys->frame, &i_got_packet );
-#endif
-    }
-    else
-    {
-#if (LIBAVCODEC_VERSION_MAJOR < 54)
-        i_out = avcodec_encode_video( p_sys->p_context, p_block->p_buffer, p_block->i_buffer, NULL);
-#else
-        i_out = avcodec_encode_video2( p_sys->p_context, &av_pkt, NULL, &i_got_packet );
-#endif
+        frame->quality = p_sys->i_quality;
     }
 
-    if( unlikely( i_out < 0 || i_got_packet == 0 ) )
+#if (LIBAVCODEC_VERSION_MAJOR >= 54)
+    AVPacket av_pkt;
+    int is_data;
+
+    av_init_packet( &av_pkt );
+    av_pkt.data = p_block->p_buffer;
+    av_pkt.size = p_block->i_buffer;
+
+    if( avcodec_encode_video2( p_sys->p_context, &av_pkt, frame, &is_data ) < 0
+     || is_data == 0 )
     {
         block_Release( p_block );
         return NULL;
     }
 
+    p_block->i_buffer = av_pkt.size;
+    p_block->i_length = av_pkt.duration / p_sys->p_context->time_base.den;
+    p_block->i_pts = av_pkt.pts;
+    p_block->i_dts = av_pkt.dts;
+    if( unlikely( av_pkt.flags & AV_PKT_FLAG_CORRUPT ) )
+        p_block->i_flags |= BLOCK_FLAG_CORRUPTED;
 
-#if (LIBAVCODEC_VERSION_MAJOR < 54)
+#else
+    int i_out = avcodec_encode_video( p_sys->p_context, p_block->p_buffer,
+                                      p_block->i_buffer, frame );
+    if( i_out <= 0 )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
+
     p_block->i_buffer = i_out;
 
     /* FIXME, 3-2 pulldown is not handled correctly */
@@ -1084,15 +1087,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
          * correctly */
         p_block->i_dts = p_block->i_pts = p_pict->date;
     }
-#else
-    p_block->i_buffer = av_pkt.size;
-
-    p_block->i_length = av_pkt.duration / p_sys->p_context->time_base.den;
-
-    p_block->i_pts = av_pkt.pts;
-    p_block->i_dts = av_pkt.dts;
-    if( unlikely( av_pkt.flags & AV_PKT_FLAG_CORRUPT ) )
-        p_block->i_flags |= BLOCK_FLAG_CORRUPTED;
 #endif
 
     switch ( p_sys->p_context->coded_frame->pict_type )
