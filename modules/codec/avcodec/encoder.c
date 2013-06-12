@@ -926,6 +926,8 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
                          p_enc->fmt_out.video.i_bits_per_pixel / 8 : 3;
     const int blocksize = __MAX( FF_MIN_BUFFER_SIZE,bytesPerPixel * p_sys->p_context->height * p_sys->p_context->width + 200 );
     block_t *p_block = block_Alloc( blocksize );
+    if( unlikely(p_block == NULL) )
+        return NULL;
 
 #if (LIBAVCODEC_VERSION_MAJOR >= 54)
     AVPacket av_pkt;
