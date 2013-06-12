@@ -45,6 +45,7 @@ static int SetupStandard (vlc_object_t *obj, int fd,
     if (!(input->capabilities & V4L2_IN_CAP_STD))
     {
         msg_Dbg (obj, "no video standard selection");
+        *std = V4L2_STD_UNKNOWN;
         return 0;
     }
 
