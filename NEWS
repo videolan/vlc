@@ -36,6 +36,7 @@ Decoders:
 
 Encoders:
  * high10, high422 and high444 encoding support in h264
+ * QuickSyncVideo Encoding (Intel Media SDK) support using Intel GPU on Windows
 
 Access:
  * Screen: add support for OS X Lion and later,

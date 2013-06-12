@@ -259,7 +259,7 @@ typedef struct qsv_frame_pool_t
 {
     mfxFrameInfo          fmt;            // IntelMediaSDK format info.
     mfxFrameSurface1      *frames;        // An allocated array of 'size' frames.
-    unsigned int          size;           // The number of frame in the pool.
+    size_t                size;           // The number of frame in the pool.
 } qsv_frame_pool_t;
 
 typedef struct async_task_t

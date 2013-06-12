@@ -263,6 +263,7 @@ $Id$
  * pulsesrc: PulseAudio audio input
  * puzzle: puzzle video filter
  * pva: PVA demuxer
+ * qsv: QuickSyncVideo Encoder for Intel hardware
  * qt4: interface module using the cross-platform Qt4 library
  * qtcapture: Quicktime Video Capture
  * qtsound: Quicktime Audio Capture
