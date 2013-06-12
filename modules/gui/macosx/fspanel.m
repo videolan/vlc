@@ -72,7 +72,8 @@
     if (!isInside)
         [self mouseExited:NULL];
 
-    [self setAnimationBehavior:NSWindowAnimationBehaviorNone];
+    if (!OSX_SNOW_LEOPARD)
+        [self setAnimationBehavior:NSWindowAnimationBehaviorNone];
 
     /* get a notification if VLC isn't the active app anymore */
     [[NSNotificationCenter defaultCenter]
