@@ -745,7 +745,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if (!b_fullscreen)
             frameBeforePlayback = [self frame];
     } else {
-        if (!b_nonembedded && !b_fullscreen && frameBeforePlayback.size.width > 0 && frameBeforePlayback.size.height > 0)
+        if (!b_nonembedded && (!b_nativeFullscreenMode || (b_nativeFullscreenMode && !b_fullscreen)) && frameBeforePlayback.size.width > 0 && frameBeforePlayback.size.height > 0)
             [[self animator] setFrame:frameBeforePlayback display:YES];
 
         // update fs button to reflect state for next startup
