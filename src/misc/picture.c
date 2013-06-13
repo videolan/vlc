@@ -46,16 +46,8 @@
  * used exactly like a video buffer. The video output thread then manages
  * how it gets displayed.
  */
-static int AllocatePicture( picture_t *p_pic,
-                            vlc_fourcc_t i_chroma,
-                            int i_width, int i_height,
-                            int i_sar_num, int i_sar_den )
+static int AllocatePicture( picture_t *p_pic )
 {
-    /* Make sure the real dimensions are a multiple of 16 */
-    if( picture_Setup( p_pic, i_chroma, i_width, i_height,
-                       i_sar_num, i_sar_den ) != VLC_SUCCESS )
-        return VLC_EGENERIC;
-
     /* Calculate how big the new image should be */
     size_t i_bytes = 0;
     for( int i = 0; i < p_pic->i_planes; i++ )
@@ -210,14 +202,16 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
     if( !p_picture )
         return NULL;
 
+    /* Make sure the real dimensions are a multiple of 16 */
+    if( picture_Setup( p_picture, fmt.i_chroma, fmt.i_width, fmt.i_height,
+                       fmt.i_sar_num, fmt.i_sar_den ) )
+    {
+        free( p_picture );
+        return NULL;
+    }
+
     if( p_resource )
     {
-        if( picture_Setup( p_picture, fmt.i_chroma, fmt.i_width, fmt.i_height,
-                           fmt.i_sar_num, fmt.i_sar_den ) )
-        {
-            free( p_picture );
-            return NULL;
-        }
         p_picture->p_sys = p_resource->p_sys;
         assert( p_picture->gc.p_sys == NULL );
 
@@ -230,9 +224,7 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
     }
     else
     {
-        if( AllocatePicture( p_picture,
-                             fmt.i_chroma, fmt.i_width, fmt.i_height,
-                             fmt.i_sar_num, fmt.i_sar_den ) )
+        if( AllocatePicture( p_picture ) )
         {
             free( p_picture );
             return NULL;
