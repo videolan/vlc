@@ -38,7 +38,8 @@
 #include <vlc_picture_pool.h>
 #include <vlc_dialog.h>
 
-#include "xcb_vlc.h"
+#include "pictures.h"
+#include "events.h"
 
 #define ADAPTOR_TEXT N_("XVideo adaptor number")
 #define ADAPTOR_LONGTEXT N_( \

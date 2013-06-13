@@ -42,31 +42,27 @@ libvlc_LTLIBRARIES += \
 
 ### XCB ###
 libxcb_x11_plugin_la_SOURCES = \
-	xcb/xcb_vlc.h \
-	xcb/x11.c \
-	xcb/pictures.c \
-	xcb/events.c
+	xcb/pictures.c xcb/pictures.h \
+	xcb/events.c xcb/events.h \
+	xcb/x11.c
 libxcb_x11_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS)
 libxcb_x11_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_LIBS) $(XCB_SHM_LIBS)
 
 libxcb_xv_plugin_la_SOURCES = \
-	xcb/xcb_vlc.h \
-	xcb/xvideo.c \
-	xcb/pictures.c \
-	xcb/events.c
+	xcb/pictures.c xcb/pictures.h \
+	xcb/events.c xcb/events.h \
+	xcb/xvideo.c
 libxcb_xv_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS) $(XCB_XV_CFLAGS)
 libxcb_xv_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_LIBS) $(XCB_SHM_LIBS) $(XCB_XV_LIBS)
 
 libxcb_glx_plugin_la_SOURCES = \
-	xcb/xcb_vlc.h \
-	xcb/glx.c \
-	opengl.h \
-	opengl.c \
-	xcb/events.c
+	opengl.c opengl.h \
+	xcb/events.c xcb/events.h \
+	xcb/glx.c
 libxcb_glx_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(GL_CFLAGS)
 libxcb_glx_plugin_la_LIBADD = $(AM_LIBADD) \

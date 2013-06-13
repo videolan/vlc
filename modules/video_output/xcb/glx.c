@@ -39,7 +39,7 @@
 #include <vlc_opengl.h>
 #include "../opengl.h"
 
-#include "xcb_vlc.h"
+#include "events.h"
 
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);

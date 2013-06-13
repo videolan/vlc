@@ -32,7 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_vout_display.h>
 
-#include "xcb_vlc.h"
+#include "events.h"
 
 /**
  * Check for an error

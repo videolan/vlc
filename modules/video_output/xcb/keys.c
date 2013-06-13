@@ -30,7 +30,7 @@
 
 #include <xcb/xcb.h>
 #include <vlc_common.h>
-#include "xcb_vlc.h"
+#include "events.h"
 
 #ifdef HAVE_XCB_KEYSYMS
 #include <xcb/xcb_keysyms.h>

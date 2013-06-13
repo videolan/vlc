@@ -35,7 +35,8 @@
 #include <vlc_vout_display.h>
 #include <vlc_picture_pool.h>
 
-#include "xcb_vlc.h"
+#include "pictures.h"
+#include "events.h"
 
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);

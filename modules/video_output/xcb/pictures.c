@@ -39,7 +39,8 @@
 #include <vlc_common.h>
 #include <vlc_vout_display.h>
 
-#include "xcb_vlc.h"
+#include "pictures.h"
+#include "events.h"
 
 /** Check MIT-SHM shared memory support */
 bool XCB_shm_Check (vlc_object_t *obj, xcb_connection_t *conn)

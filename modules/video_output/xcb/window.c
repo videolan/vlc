@@ -38,7 +38,7 @@ typedef xcb_atom_t Atom;
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
 
-#include "xcb_vlc.h"
+#include "events.h"
 
 #define DISPLAY_TEXT N_("X11 display")
 #define DISPLAY_LONGTEXT N_( \
