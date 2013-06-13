@@ -1793,6 +1793,8 @@ static const vlc_fourcc_t p_list_YUV[] = {
     VLC_CODEC_YUV_PLANAR_420_16,
     VLC_CODEC_YUV_PLANAR_422_16,
     VLC_CODEC_YUV_PLANAR_444_16,
+    VLC_CODEC_VDPAU_VIDEO_420,
+    VLC_CODEC_VDPAU_VIDEO_422,
     0,
 };
 
@@ -1924,6 +1926,13 @@ bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
       .pixel_size = size, \
       .pixel_bits = bits }
 
+/* Zero planes for hardware picture handles. Cannot be manipulated directly. */
+#define FAKE_FMT() \
+    { .plane_count = 0, \
+      .p = { {.w = {1,1}, .h = {1,1}} }, \
+      .pixel_size = 0, \
+      .pixel_bits = 0 }
+
 static const struct
 {
     vlc_fourcc_t             p_fourcc[6];
@@ -1967,6 +1976,9 @@ static const struct
 
     { { VLC_CODEC_Y211, 0 },                   { 1, { {{1,4}, {1,1}} }, 4, 32 } },
     { { VLC_CODEC_XYZ12,  0 },                 PACKED_FMT(6, 48) },
+
+    { { VLC_CODEC_VDPAU_VIDEO_420, VLC_CODEC_VDPAU_VIDEO_422,
+        VLC_CODEC_VDPAU_OUTPUT, 0 },           FAKE_FMT() },
 
     { {0}, { 0, {}, 0, 0 } }
 };
