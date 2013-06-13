@@ -27,6 +27,7 @@ EXTRA_SUBDIRS = \
 	sse2 \
 	altivec \
 	arm_neon \
+	hw/vdpau \
 	lua \
 	$(NULL)
 
@@ -46,6 +47,9 @@ SUBDIRS += altivec
 endif
 if HAVE_NEON
 SUBDIRS += arm_neon
+endif
+if HAVE_VDPAU
+SUBDIRS += hw/vdpau
 endif
 if BUILD_LUA
 SUBDIRS += lua

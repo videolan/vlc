@@ -4223,6 +4223,7 @@ AC_CONFIG_FILES([
   modules/sse2/Makefile
   modules/altivec/Makefile
   modules/arm_neon/Makefile
+  modules/hw/vdpau/Makefile
 ])
 
 AM_COND_IF([HAVE_WIN32], [
