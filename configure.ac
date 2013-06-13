@@ -3038,31 +3038,30 @@ AM_CONDITIONAL([HAVE_XCB], [test "${have_xcb}" = "yes"])
 
 
 dnl
-dnl VDPAU needs X11 and avcodec
+dnl VDPAU needs X11
 dnl
 AC_ARG_ENABLE(vdpau,
-  [AS_HELP_STRING([--enable-vdpau],
-    [VDPAU hardware decoder support (default auto)])])
+  [AS_HELP_STRING([--enable-vdpau], [VDPAU hardware support (default auto)])])
 have_vdpau="no"
-AS_IF([test "${enable_vdpau}" != "no" -a "${have_avcodec}" = "yes"], [
+AS_IF([test "${enable_vdpau}" != "no"], [
   PKG_CHECK_MODULES([VDPAU], [vdpau], [
     have_vdpau="yes"
     AS_IF([test "${no_x}" = "yes"], [
       AC_MSG_ERROR([VDPAU requires Xlib (X11).])
     ])
-    AC_MSG_NOTICE([VDPAU acceleration activated])
   ], [
     AS_IF([test -n "${enable_vdpau}"], [
       AC_MSG_ERROR([${VDPAU_PKG_ERRORS}.])
     ])
   ])
 ])
-dnl AM_CONDITIONAL([HAVE_VDPAU], [test "${have_vdpau}" = "yes"])
+AM_CONDITIONAL([HAVE_VDPAU], [test "${have_vdpau}" = "yes"])
 
 have_avcodec_vdpau="no"
-AS_IF([test "${have_vdpau}" = "yes"], [
+AS_IF([test "${have_vdpau}" = "yes" -a "${have_avcodec}" = "yes"], [
   PKG_CHECK_EXISTS([libavutil >= 0.52.4 libavcodec >= 54.36.0], [
     have_avcodec_vdpau="yes"
+    AC_MSG_NOTICE([VDPAU decoding acceleration activated])
   ], [
     AS_IF([test -n "${enable_vdpau}"], [
       AC_MSG_ERROR([libavutil >= 0.52.4 and libavcodec >= 54.36.0 are required for VDPAU decoding.])
