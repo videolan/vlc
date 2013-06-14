@@ -152,7 +152,7 @@ bool AboutDialog::eventFilter(QObject *obj, QEvent *event)
             if( !b_advanced )
             {
                 ui.version->setText(qfu( VLC_CompileBy() )+ "@" + qfu( VLC_CompileHost() )
-                    + __DATE__ + " " +__TIME__);
+                    + " " + __DATE__ + " " + __TIME__);
                 b_advanced = true;
             }
             else
