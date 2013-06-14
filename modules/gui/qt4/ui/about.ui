@@ -35,8 +35,7 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(222, 222, 222);
-background-color: rgb(245, 245, 245);</string>
+      <string notr="true">background-color: rgb(245, 245, 245);</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="2" column="2" rowspan="4">
@@ -258,8 +257,7 @@ margin-bottom: 6px;</string>
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(201, 201, 201);
-background-color: rgb(230, 230, 230);</string>
+      <string notr="true">background-color: rgb(230, 230, 230);</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="margin">
