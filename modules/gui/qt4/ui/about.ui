@@ -60,16 +60,10 @@
    <item>
     <widget class="QFrame" name="horizontalFrame">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+      <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>300</height>
-      </size>
      </property>
      <property name="styleSheet">
       <string notr="true">background-color: rgb(245, 245, 245);</string>
