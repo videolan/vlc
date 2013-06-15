@@ -862,14 +862,14 @@ static char var_InheritPolarization (vlc_object_t *obj)
     return pol;
 }
 
-static int sec_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
+static void sec_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
     char pol = var_InheritPolarization (obj);
     unsigned lowf = var_InheritInteger (obj, "dvb-lnb-low");
     unsigned highf = var_InheritInteger (obj, "dvb-lnb-high");
     unsigned switchf = var_InheritInteger (obj, "dvb-lnb-switch");
 
-    return dvb_set_sec (dev, freq, pol, lowf, highf, switchf);
+    dvb_set_sec (dev, freq, pol, lowf, highf, switchf);
 }
 
 static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
@@ -879,7 +879,7 @@ static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 
     int ret = dvb_set_dvbs (dev, freq, srate, fec);
     if (ret == 0)
-        ret = sec_setup (obj, dev, freq);
+        sec_setup (obj, dev, freq);
     return ret;
 }
 
@@ -893,7 +893,7 @@ static int dvbs2_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 
     int ret = dvb_set_dvbs2 (dev, freq, mod, srate, fec, pilot, rolloff);
     if (ret == 0)
-        ret = sec_setup (obj, dev, freq);
+        sec_setup (obj, dev, freq);
     return ret;
 }
 
@@ -951,7 +951,7 @@ static int isdbs_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 
     int ret = dvb_set_isdbs (dev, freq, ts_id);
     if (ret == 0)
-        ret = sec_setup (obj, dev, freq);
+        sec_setup (obj, dev, freq);
     return ret;
 }
 
