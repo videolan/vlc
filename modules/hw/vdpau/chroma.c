@@ -38,6 +38,7 @@ struct filter_sys_t
     VdpVideoMixer mixer;
     VdpChromaType chroma;
     VdpYCbCrFormat format;
+    VdpVideoSurface (*import)(filter_t *, picture_t *);
 };
 
 /** Create VDPAU video mixer */
@@ -183,6 +184,19 @@ static VdpVideoSurface VideoImport(filter_t *filter, picture_t *src)
     return surface;
 }
 
+static VdpVideoSurface VideoPassthrough(filter_t *filter, picture_t *src)
+{
+    vlc_vdp_video_t *psys = src->context;
+
+    if (unlikely(psys == NULL))
+    {
+        msg_Err(filter, "corrupt VDPAU video surface");
+        return VDP_INVALID_HANDLE;
+    }
+    /* FIXME: deal with mismatched VDPAU devices */
+    return psys->surface;
+}
+
 static picture_t *MixerRender(filter_t *filter, picture_t *src)
 {
     filter_sys_t *sys = filter->p_sys;
@@ -192,7 +206,7 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
         goto out;
     picture_CopyProperties(dst, src);
 
-    VdpVideoSurface surface = VideoImport(filter, src);
+    VdpVideoSurface surface = sys->import(filter, src);
     if (surface == VDP_INVALID_HANDLE)
         goto drop;
 
@@ -214,7 +228,8 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
                                  NULL, VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME,
                                  0, NULL, surface, 0, NULL, &src_rect,
                                  output, &dst_rect, NULL, 0, NULL);
-    vdp_video_surface_destroy(sys->vdp, surface);
+    if (sys->import != VideoPassthrough)
+        vdp_video_surface_destroy(sys->vdp, surface);
     if (err != VDP_STATUS_OK)
     {
         msg_Err(filter, "video %s %s failure: %s", "mixer", "rendering",
@@ -241,8 +256,22 @@ static int OutputOpen(vlc_object_t *obj)
     sys->vdp = NULL;
     sys->mixer = VDP_INVALID_HANDLE;
 
-    if (!vlc_fourcc_to_vdp_ycc(filter->fmt_in.video.i_chroma,
-                               &sys->chroma, &sys->format))
+    if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_422)
+    {
+        sys->chroma = VDP_CHROMA_TYPE_422;
+        sys->import = VideoPassthrough;
+    }
+    else
+    if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_420)
+    {
+        sys->chroma = VDP_CHROMA_TYPE_420;
+        sys->import = VideoPassthrough;
+    }
+    else
+    if (vlc_fourcc_to_vdp_ycc(filter->fmt_in.video.i_chroma,
+                              &sys->chroma, &sys->format))
+        sys->import = VideoImport;
+    else
     {
         free(sys);
         return VLC_EGENERIC;
