@@ -362,7 +362,6 @@ $Id$
  * vcd: input module for accessing Video CDs
  * vcdx: input module for accessing Video CDs with navigation & stills
  * vda: VDADecoder hardware-accelerated decoding
- * vdpau: VDPAU hardware-accelerated decoding
  * vdpau_avcodec: VDPAU hardware-accelerated decoding
  * vdummy: dummy video display
  * visual: visualisation system

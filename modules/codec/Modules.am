@@ -156,16 +156,6 @@ if HAVE_AVCODEC_VDA
 libvlc_LTLIBRARIES += libvda_plugin.la
 endif
 
-libvdpau_plugin_la_SOURCES = avcodec/vdpau.c
-libvdpau_plugin_la_CFLAGS = $(AM_CFLAGS) $(VDPAU_CFLAGS) \
-	$(X_CFLAGS) $(CFLAGS_avcodec)
-libvdpau_plugin_la_LIBADD = $(AM_LIBADD) $(VDPAU_LIBS) \
-	 $(X_LIBS) $(X_PRE_LIBS) -lX11 $(LIBS_avcodec)
-libvdpau_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_avcodec)
-if HAVE_AVCODEC_VDPAU
-libvlc_LTLIBRARIES += libvdpau_plugin.la
-endif
-
 libhwdummy_plugin_la_SOURCES = avcodec/hwdummy.c
 libhwdummy_plugin_la_CFLAGS = $(AM_CFLAGS) $(VDPAU_CFLAGS) $(CFLAGS_avcodec)
 libhwdummy_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_avcodec)
