@@ -237,4 +237,11 @@ bool vlc_fourcc_to_vdp_ycc(vlc_fourcc_t fourcc,
     }
     return true;
 }
+
+struct picture_sys_t
+{
+    VdpOutputSurface surface;
+    VdpDevice device;
+    const vdp_t *vdp;
+};
 #endif
