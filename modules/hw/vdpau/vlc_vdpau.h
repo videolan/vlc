@@ -203,4 +203,38 @@ vdp_t *vdp_hold_x11(vdp_t *vdp, VdpDevice *device);
  */
 void vdp_release_x11(vdp_t *);
 
+/* VLC specifics */
+# include <stdbool.h>
+# include <vlc_common.h>
+# include <vlc_fourcc.h>
+
+/** Converts VLC YUV format to VDPAU chroma type and YCbCr format */
+static inline
+bool vlc_fourcc_to_vdp_ycc(vlc_fourcc_t fourcc,
+                 VdpChromaType *restrict type, VdpYCbCrFormat *restrict format)
+{
+    switch (fourcc)
+    {
+        case VLC_CODEC_I420:
+        case VLC_CODEC_YV12:
+            *type = VDP_CHROMA_TYPE_420;
+            *format = VDP_YCBCR_FORMAT_YV12;
+            break;
+        case VLC_CODEC_NV12:
+            *type = VDP_CHROMA_TYPE_420;
+            *format = VDP_YCBCR_FORMAT_NV12;
+            break;
+        case VLC_CODEC_YUYV:
+            *type = VDP_CHROMA_TYPE_422;
+            *format = VDP_YCBCR_FORMAT_YUYV;
+            break;
+        case VLC_CODEC_UYVY:
+            *type = VDP_CHROMA_TYPE_422;
+            *format = VDP_YCBCR_FORMAT_UYVY;
+            break;
+        default:
+            return false;
+    }
+    return true;
+}
 #endif
