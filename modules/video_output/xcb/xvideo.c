@@ -420,7 +420,12 @@ static int Open (vlc_object_t *obj)
 
     /* */
     video_format_t fmt;
+    vout_display_place_t place;
+
     p_sys->port = 0;
+    vout_display_PlacePicture (&place, &vd->source, vd->cfg, false);
+    p_sys->width  = place.width;
+    p_sys->height = place.height;
 
     xcb_xv_adaptor_info_iterator_t it;
     for (it = xcb_xv_query_adaptors_info_iterator (adaptors);
@@ -498,13 +503,14 @@ static int Open (vlc_object_t *obj)
                 /* XCB_CW_COLORMAP */
                 screen->default_colormap,
             };
-
             xcb_void_cookie_t c;
 
             xcb_create_pixmap (conn, f->depth, pixmap, screen->root, 1, 1);
             c = xcb_create_window_checked (conn, f->depth, p_sys->window,
-                 p_sys->embed->handle.xid, 0, 0, 1, 1, 0,
-                 XCB_WINDOW_CLASS_INPUT_OUTPUT, f->visual, mask, list);
+                 p_sys->embed->handle.xid, place.x, place.y,
+                 place.width, place.height, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT,
+                 f->visual, mask, list);
+            xcb_map_window (conn, p_sys->window);
 
             if (!XCB_error_Check (vd, conn, "cannot create X11 window", c))
             {
@@ -528,26 +534,6 @@ static int Open (vlc_object_t *obj)
         msg_Err (vd, "no available XVideo adaptor");
         goto error;
     }
-    /* Compute video (window) placement within the parent window */
-    {
-        xcb_map_window (conn, p_sys->window);
-
-        vout_display_place_t place;
-
-        vout_display_PlacePicture (&place, &vd->source, vd->cfg, false);
-        p_sys->width  = place.width;
-        p_sys->height = place.height;
-
-        /* */
-        const uint32_t values[] = {
-            place.x, place.y, place.width, place.height };
-        xcb_configure_window (conn, p_sys->window,
-                              XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y |
-                              XCB_CONFIG_WINDOW_WIDTH |
-                              XCB_CONFIG_WINDOW_HEIGHT,
-                              values);
-    }
-    p_sys->visible = false;
 
     /* Create graphic context */
     p_sys->gc = xcb_generate_id (conn);
@@ -568,6 +554,7 @@ static int Open (vlc_object_t *obj)
     p_sys->cursor = XCB_cursor_Create (conn, screen);
 
     p_sys->shm = XCB_shm_Check (obj, conn);
+    p_sys->visible = false;
 
     /* */
     vout_display_info_t info = vd->info;
