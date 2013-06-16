@@ -433,7 +433,7 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str, unsigned char opt)
         url->psz_path = "/";*/
 
     /* User name */
-    next = strchr (cur, '@');
+    next = strrchr (cur, '@');
     if (next != NULL)
     {
         *(next++) = '\0';
