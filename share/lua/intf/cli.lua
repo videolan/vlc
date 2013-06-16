@@ -67,6 +67,8 @@ strip = common.strip
 _ = vlc.gettext._
 N_ = vlc.gettext.N_
 
+running = true
+
 --[[ Setup default environement ]]
 env = { prompt = "> ";
         width = 70;
@@ -158,6 +160,7 @@ function shutdown(name,client)
     h:broadcast("Shutting down.\r\n")
     vlc.msg.info("Requested shutdown.")
     vlc.misc.quit()
+    running = false
 end
 
 function quit(name,client)
@@ -784,7 +787,7 @@ h:listen( config.hosts or config.host or "*console" )
 password = config.password or "admin"
 
 --[[ The main loop ]]
-while true do
+while running do
     local write, read = h:accept_and_select()
 
     for _, client in pairs(write) do
