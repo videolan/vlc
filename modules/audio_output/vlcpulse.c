@@ -104,10 +104,29 @@ pa_context *vlc_pa_connect (vlc_object_t *obj, pa_threaded_mainloop **mlp)
     pa_proplist *props = pa_proplist_new ();
     if (likely(props != NULL))
     {
-        pa_proplist_sets (props, PA_PROP_APPLICATION_NAME, ua);
-        pa_proplist_sets (props, PA_PROP_APPLICATION_ID, "org.VideoLAN.VLC");
-        pa_proplist_sets (props, PA_PROP_APPLICATION_VERSION, PACKAGE_VERSION);
-        pa_proplist_sets (props, PA_PROP_APPLICATION_ICON_NAME, PACKAGE_NAME);
+        char *str;
+
+        if (ua != NULL)
+            pa_proplist_sets (props, PA_PROP_APPLICATION_NAME, ua);
+
+        str = var_InheritString (obj, "app-id");
+        if (str != NULL)
+        {
+            pa_proplist_sets (props, PA_PROP_APPLICATION_ID, str);
+            free (str);
+        }
+        str = var_InheritString (obj, "app-version");
+        if (str != NULL)
+        {
+            pa_proplist_sets (props, PA_PROP_APPLICATION_VERSION, str);
+            free (str);
+        }
+        str = var_InheritString (obj, "app-icon-name");
+        if (str != NULL)
+        {
+            pa_proplist_sets (props, PA_PROP_APPLICATION_ICON_NAME, str);
+            free (str);
+        }
         //pa_proplist_sets (props, PA_PROP_APPLICATION_LANGUAGE, _("C"));
         pa_proplist_sets (props, PA_PROP_APPLICATION_LANGUAGE,
                           setlocale (LC_MESSAGES, NULL));
