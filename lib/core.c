@@ -69,8 +69,6 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
     p_new->ref_count = 1;
     p_new->p_callback_list = NULL;
     vlc_mutex_init(&p_new->instance_lock);
-    var_Create( p_libvlc_int, "http-user-agent",
-                VLC_VAR_STRING|VLC_VAR_DOINHERIT );
     return p_new;
 
 error:
