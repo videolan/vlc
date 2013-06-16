@@ -144,13 +144,89 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
     return sys->pool;
 }
 
-static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
+static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
+                         const subpicture_region_t *reg, int alpha)
+{
+    vout_display_sys_t *sys = vd->sys;
+    VdpBitmapSurface surface;
+    VdpRGBAFormat fmt = VDP_RGBA_FORMAT_R8G8B8A8; /* TODO? YUVA */
+    VdpStatus err;
+
+    /* Create GPU surface for sub-picture */
+    err = vdp_bitmap_surface_create(sys->vdp, sys->device, fmt,
+        reg->fmt.i_visible_width, reg->fmt.i_visible_height, VDP_FALSE,
+                                    &surface);
+    if (err != VDP_STATUS_OK)
+    {
+        msg_Err(vd, "%s creation failure: %s", "bitmap surface",
+                vdp_get_error_string(sys->vdp, err));
+        return;
+    }
+
+    /* Upload sub-picture to GPU surface */
+    picture_t *subpic = reg->p_picture;
+    const void *data = subpic->p[0].p_pixels;
+    uint32_t pitch = subpic->p[0].i_pitch;
+
+    err = vdp_bitmap_surface_put_bits_native(sys->vdp, surface, &data, &pitch,
+                                             NULL);
+    if (err != VDP_STATUS_OK)
+    {
+        msg_Err(vd, "subpicture upload failure: %s",
+                vdp_get_error_string(sys->vdp, err));
+        goto out;
+    }
+
+    /* Render onto main surface */
+    VdpRect area = {
+        reg->i_x,
+        reg->i_y,
+        reg->i_x + reg->fmt.i_visible_width,
+        reg->i_y + reg->fmt.i_visible_height,
+    };
+    VdpColor color = { 1.f, 1.f, 1.f, reg->i_alpha * alpha / 65535.f };
+    VdpOutputSurfaceRenderBlendState state = {
+        .struct_version = VDP_OUTPUT_SURFACE_RENDER_BLEND_STATE_VERSION,
+        .blend_factor_source_color =
+            VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_SRC_ALPHA,
+        .blend_factor_destination_color =
+            VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+        .blend_factor_source_alpha =
+            VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ZERO,
+        .blend_factor_destination_alpha =
+            VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ONE,
+        .blend_equation_color = VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
+        .blend_equation_alpha = VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
+        .blend_constant = { 0.f, 0.f, 0.f, 0.f },
+    };
+
+    err = vdp_output_surface_render_bitmap_surface(sys->vdp, target, &area,
+                                             surface, NULL, &color, &state, 0);
+    if (err != VDP_STATUS_OK)
+        msg_Err(vd, "blending failure: %s",
+                vdp_get_error_string(sys->vdp, err));
+
+out:/* Destroy GPU surface */
+    vdp_bitmap_surface_destroy(sys->vdp, surface);
+}
+
+static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic)
 {
     vout_display_sys_t *sys = vd->sys;
     VdpOutputSurface surface = pic->p_sys->surface;
     VdpStatus err;
 
-    (void) subpicture;
+    VdpPresentationQueueStatus status;
+    VdpTime ts;
+    err = vdp_presentation_queue_query_surface_status(sys->vdp, sys->queue,
+                                                      surface, &status, &ts);
+    if (err == VDP_STATUS_OK && status != VDP_PRESENTATION_QUEUE_STATUS_IDLE)
+        msg_Dbg(vd, "surface status: %u", status);
+
+    if (subpic != NULL)
+        for (subpicture_region_t *r = subpic->p_region; r != NULL;
+             r = r->p_next)
+            RenderRegion(vd, surface, r, subpic->i_alpha);
 
     /* Compute picture presentation time */
     mtime_t now = mdate();
@@ -500,6 +576,25 @@ static int Open(vlc_object_t *obj)
         xcb_map_window(sys->conn, sys->window);
     }
 
+    /* Check bitmap capabilities (for SPU) */
+    const vlc_fourcc_t *spu_chromas = NULL;
+    {
+        static const vlc_fourcc_t subpicture_chromas[] = { VLC_CODEC_RGBA, 0 };
+        uint32_t w, h;
+        VdpBool ok;
+
+        err = vdp_bitmap_surface_query_capabilities(sys->vdp, sys->device,
+                                        VDP_RGBA_FORMAT_R8G8B8A8, &ok, &w, &h);
+        if (err != VDP_STATUS_OK)
+        {
+            msg_Err(vd, "%s capabilities query failure: %s", "output surface",
+                    vdp_get_error_string(sys->vdp, err));
+            ok = VDP_FALSE;
+        }
+        if (ok)
+            spu_chromas = subpicture_chromas;
+    }
+
     /* Initialize VDPAU queue */
     err = vdp_presentation_queue_target_create_x11(sys->vdp, sys->device,
                                                    sys->window, &sys->target);
@@ -532,6 +627,7 @@ static int Open(vlc_object_t *obj)
     vd->sys = sys;
     vd->info.has_pictures_invalid = true;
     vd->info.has_event_thread = true;
+    vd->info.subpicture_chromas = spu_chromas;
     vd->fmt.i_chroma = VLC_CODEC_VDPAU_OUTPUT;
 
     vd->pool = Pool;
