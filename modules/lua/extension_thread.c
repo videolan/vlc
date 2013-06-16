@@ -325,13 +325,22 @@ static void* Run( void *data )
 
     while( !p_ext->p_sys->b_exiting )
     {
-        /* Pop command in front */
         struct command_t *cmd = p_ext->p_sys->command;
+
+        /* Pop command in front */
+        if( cmd == NULL )
+        {
+            vlc_cond_wait( &p_ext->p_sys->wait, &p_ext->p_sys->command_lock );
+            continue;
+        }
+        p_ext->p_sys->command = cmd->next;
+        cmd->next = NULL; /* unlink command (for FreeCommands()) */
+
         vlc_mutex_unlock( &p_ext->p_sys->command_lock );
         vlc_restorecancel( cancel );
 
         /* Run command */
-        if( cmd )
+        if( true )
         {
             if( LockExtension( p_ext ) )
             {
@@ -344,7 +353,6 @@ static void* Run( void *data )
                         {
                             msg_Err( p_mgr, "Could not activate extension!" );
                             Deactivate( p_mgr, p_ext );
-                            cmd = NULL;
                         }
                         break;
                     }
@@ -422,21 +430,10 @@ static void* Run( void *data )
                 UnlockExtension( p_ext );
             }
         }
+        FreeCommands( cmd );
 
         cancel = vlc_savecancel();
         vlc_mutex_lock( &p_ext->p_sys->command_lock );
-        if( p_ext->p_sys->command )
-        {
-            cmd = p_ext->p_sys->command;
-            p_ext->p_sys->command = cmd->next;
-            cmd->next = NULL; // This prevents FreeCommands from freeing next
-            FreeCommands( cmd );
-        }
-
-        if( !p_ext->p_sys->b_exiting && !p_ext->p_sys->command )
-        {
-            vlc_cond_wait( &p_ext->p_sys->wait, &p_ext->p_sys->command_lock );
-        }
     }
 
     vlc_mutex_unlock( &p_ext->p_sys->command_lock );
