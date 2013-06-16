@@ -146,8 +146,13 @@ static int OpenDecoder( vlc_object_t *p_this )
             (unsigned int)(-(int)p_dec->fmt_in.video.i_height);
         p_sys->b_invert = true;
     }
+    if( !p_dec->fmt_in.video.i_visible_width )
+        p_dec->fmt_in.video.i_visible_width = p_dec->fmt_in.video.i_width;
+    if( !p_dec->fmt_in.video.i_visible_height )
+        p_dec->fmt_in.video.i_visible_height = p_dec->fmt_in.video.i_height;
 
-    if( p_dec->fmt_in.video.i_width <= 0 || p_dec->fmt_in.video.i_height <= 0 )
+    if( p_dec->fmt_in.video.i_visible_width <= 0
+     || p_dec->fmt_in.video.i_visible_height <= 0 )
     {
         msg_Err( p_dec, "invalid display size %dx%d",
                  p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height );
@@ -169,8 +174,8 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Find out p_vdec->i_raw_size */
     video_format_Setup( &p_dec->fmt_out.video, p_dec->fmt_in.i_codec,
-                        p_dec->fmt_in.video.i_width,
-                        p_dec->fmt_in.video.i_height,
+                        p_dec->fmt_in.video.i_visible_width,
+                        p_dec->fmt_in.video.i_visible_height,
                         p_dec->fmt_in.video.i_sar_num,
                         p_dec->fmt_in.video.i_sar_den );
     picture_t picture;
