@@ -215,6 +215,20 @@ void libvlc_set_user_agent( libvlc_instance_t *p_instance,
                             const char *name, const char *http );
 
 /**
+ * Sets some meta-informations about the application.
+ * See also libvlc_set_user_agent().
+ *
+ * \param p_instance LibVLC instance
+ * \param id Java-style application identifier, e.g. "com.acme.foobar"
+ * \param version application version numbers, e.g. "1.2.3"
+ * \param icon application icon name, e.g. "foobar"
+ * \version LibVLC 2.1.0 or later.
+ */
+LIBVLC_API
+void libvlc_set_app_id( libvlc_instance_t *p_instance, const char *id,
+                        const char *version, const char *icon );
+
+/**
  * Retrieve libvlc version.
  *
  * Example: "1.1.0-git The Luggage"

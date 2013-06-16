@@ -395,6 +395,12 @@ dbus_out:
     var_Create( p_libvlc, "http-user-agent", VLC_VAR_STRING );
     var_SetString( p_libvlc, "http-user-agent",
                    "VLC/"PACKAGE_VERSION" LibVLC/"PACKAGE_VERSION );
+    var_Create( p_libvlc, "app-icon-name", VLC_VAR_STRING );
+    var_SetString( p_libvlc, "app-icon-name", PACKAGE_NAME );
+    var_Create( p_libvlc, "app-id", VLC_VAR_STRING );
+    var_SetString( p_libvlc, "app-id", "org.VideoLAN.VLC" );
+    var_Create( p_libvlc, "app-version", VLC_VAR_STRING );
+    var_SetString( p_libvlc, "app-version", PACKAGE_VERSION );
 
     /* System specific configuration */
     system_Configure( p_libvlc, i_argc - vlc_optind, ppsz_argv + vlc_optind );

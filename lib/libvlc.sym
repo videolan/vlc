@@ -180,6 +180,7 @@ libvlc_retain
 libvlc_set_fullscreen
 libvlc_set_log_verbosity
 libvlc_set_user_agent
+libvlc_set_app_id
 libvlc_toggle_fullscreen
 libvlc_toggle_teletext
 libvlc_track_description_release
