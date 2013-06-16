@@ -393,7 +393,11 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
     es_fmt.video.i_rmask = selected->red;
     es_fmt.video.i_gmask = selected->green;
     es_fmt.video.i_bmask = selected->blue;
-    es_fmt.video.i_width = fmt.fmt.pix.width;
+    es_fmt.video.i_visible_width = fmt.fmt.pix.width;
+    if (fmt.fmt.pix.bytesperline != 0 && selected->bpp != 0)
+        es_fmt.video.i_width = fmt.fmt.pix.bytesperline / selected->bpp;
+    else
+        es_fmt.video.i_width = fmt.fmt.pix.width;
     es_fmt.video.i_height = fmt.fmt.pix.height;
     es_fmt.video.i_frame_rate = parm.parm.capture.timeperframe.denominator;
     es_fmt.video.i_frame_rate_base = parm.parm.capture.timeperframe.numerator;
