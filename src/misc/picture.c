@@ -54,7 +54,7 @@ static int AllocatePicture( picture_t *p_pic )
     {
         const plane_t *p = &p_pic->p[i];
 
-        if( p->i_pitch <= 0 || p->i_lines <= 0 ||
+        if( p->i_pitch < 0 || p->i_lines <= 0 ||
             (size_t)p->i_pitch > (SIZE_MAX - i_bytes)/p->i_lines )
         {
             p_pic->i_planes = 0;
@@ -64,7 +64,7 @@ static int AllocatePicture( picture_t *p_pic )
     }
 
     uint8_t *p_data = vlc_memalign( 16, i_bytes );
-    if( !p_data )
+    if( i_bytes > 0 && p_data == NULL )
     {
         p_pic->i_planes = 0;
         return VLC_EGENERIC;
