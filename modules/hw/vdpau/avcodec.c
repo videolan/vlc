@@ -49,8 +49,6 @@ vlc_module_begin()
     add_shortcut("vdpau")
 vlc_module_end()
 
-#define MAX_SURFACES (16+1)
-
 struct vlc_va_sys_t
 {
     vdp_t *vdp;
@@ -58,8 +56,6 @@ struct vlc_va_sys_t
     VdpDecoderProfile profile;
     VdpYCbCrFormat format;
     AVVDPAUContext context;
-    VdpVideoSurface surfaces[MAX_SURFACES];
-    uint32_t available;
     vlc_fourcc_t chroma;
     uint16_t width;
     uint16_t height;
@@ -68,6 +64,8 @@ struct vlc_va_sys_t
 static int Lock(vlc_va_t *va, AVFrame *ff)
 {
     vlc_va_sys_t *sys = va->sys;
+    VdpVideoSurface surface;
+    VdpStatus err;
 
     for (unsigned i = 0; i < AV_NUM_DATA_POINTERS; i++)
     {
@@ -75,40 +73,41 @@ static int Lock(vlc_va_t *va, AVFrame *ff)
         ff->linesize[i] = 0;
     }
 
-    if (!sys->available)
+    /* TODO: select better chromas when appropriate */
+    err = vdp_video_surface_create(sys->vdp, sys->device, VDP_CHROMA_TYPE_420,
+                                   sys->width, sys->height, &surface);
+    if (err != VDP_STATUS_OK)
     {
-        msg_Err(va, "no free surfaces");
+        msg_Err(va, "%s creation failure: %s", "video surface",
+                vdp_get_error_string(sys->vdp, err));
         return VLC_EGENERIC;
     }
 
-    unsigned idx = ctz (sys->available);
-    sys->available &= ~(1 << idx);
-
-    VdpVideoSurface *surface = sys->surfaces + idx;
-    assert(*surface != VDP_INVALID_HANDLE);
-    ff->data[0] = (void *)surface; /* must be non-NULL */
-    ff->data[3] = (void *)(uintptr_t)*surface;
-    ff->opaque = surface;
+    ff->data[0] = (void *)sys->vdp; /* must be non-NULL */
+    ff->data[3] = (void *)(uintptr_t)surface;
+    ff->opaque = (void *)(uintptr_t)surface;
     return VLC_SUCCESS;
 }
 
 static void Unlock(vlc_va_t *va, AVFrame *ff)
 {
     vlc_va_sys_t *sys = va->sys;
-    VdpVideoSurface *surface = ff->opaque;
-    unsigned idx = surface - sys->surfaces;
-
-    assert(idx < MAX_SURFACES);
-    sys->available |= (1 << idx);
+    VdpVideoSurface surface = (uintptr_t)ff->opaque;
+    VdpStatus err;
 
     ff->data[0] = ff->data[3] = NULL;
     ff->opaque = NULL;
+
+    err = vdp_video_surface_destroy(sys->vdp, surface);
+    if (err != VDP_STATUS_OK)
+        msg_Err(va, "%s destruction failure: %s", "video surface",
+                vdp_get_error_string(sys->vdp, err));
 }
 
 static int Copy(vlc_va_t *va, picture_t *pic, AVFrame *ff)
 {
     vlc_va_sys_t *sys = va->sys;
-    VdpVideoSurface *surface = ff->opaque;
+    VdpVideoSurface surface = (uintptr_t)ff->opaque;
     void *planes[3];
     uint32_t pitches[3];
     VdpStatus err;
@@ -119,7 +118,7 @@ static int Copy(vlc_va_t *va, picture_t *pic, AVFrame *ff)
          pitches[i] = pic->p[i].i_pitch;
     }
 
-    err = vdp_video_surface_get_bits_y_cb_cr(sys->vdp, *surface, sys->format,
+    err = vdp_video_surface_get_bits_y_cb_cr(sys->vdp, surface, sys->format,
                                              planes, pitches);
     if (err != VDP_STATUS_OK)
     {
@@ -161,26 +160,6 @@ static int Init(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
         return VLC_EGENERIC;
     }
 
-    assert (width > 0 && height > 0);
-    surfaces++;
-    assert (surfaces <= MAX_SURFACES);
-    sys->available = 0;
-
-    /* TODO: select better chromas when appropriate */
-    for (unsigned i = 0; i < surfaces; i++)
-    {
-        err = vdp_video_surface_create(sys->vdp, sys->device,
-                        VDP_CHROMA_TYPE_420, width, height, sys->surfaces + i);
-        if (err != VDP_STATUS_OK)
-        {
-             msg_Err(va, "%s creation failure: %s", "video surface",
-                     vdp_get_error_string(sys->vdp, err));
-             sys->surfaces[i] = VDP_INVALID_HANDLE;
-             break;
-        }
-        sys->available |= (1 << i);
-    }
-
     *ctxp = &sys->context;
     *chromap = sys->chroma;
     return VLC_SUCCESS;
@@ -189,17 +168,6 @@ static int Init(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
 static void Deinit(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
-
-    for (unsigned i = 0; i < MAX_SURFACES; i++)
-    {
-        VdpVideoSurface *surface = sys->surfaces + i;
-
-        if (*surface != VDP_INVALID_HANDLE)
-        {
-            vdp_video_surface_destroy(sys->vdp, *surface);
-            *surface = VDP_INVALID_HANDLE;
-        }
-    }
 
     assert(sys->context.decoder != VDP_INVALID_HANDLE);
     vdp_decoder_destroy(sys->vdp, sys->context.decoder);
@@ -332,8 +300,6 @@ static int Open(vlc_va_t *va, int codec, const es_format_t *fmt)
     sys->profile = profile;
     memset(&sys->context, 0, sizeof (sys->context));
     sys->context.decoder = VDP_INVALID_HANDLE;
-    for (unsigned i = 0; i < MAX_SURFACES; i++)
-        sys->surfaces[i] = VDP_INVALID_HANDLE;
 
     err = vdp_get_x11(NULL, -1, &sys->vdp, &sys->device);
     if (err != VDP_STATUS_OK)
