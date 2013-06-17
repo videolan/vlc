@@ -259,7 +259,7 @@ if HAVE_DARWIN
 	$(moc_verbose)$(MOC) -DQ_WS_MAC $(DEFS) -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) $(CPPFLAGS_qt4) -o $@ $<
 else
 if HAVE_WIN32
-	$(moc_verbose)$(MOC) -DWIN32 $(DEFS) -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) $(CPPFLAGS_qt4) -o $@ $<
+	$(moc_verbose)$(MOC) -D_WIN32 $(DEFS) -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) $(CPPFLAGS_qt4) -o $@ $<
 else
 	$(moc_verbose)$(MOC) $(DEFS) -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) $(CPPFLAGS_qt4) -o $@ $<
 endif
