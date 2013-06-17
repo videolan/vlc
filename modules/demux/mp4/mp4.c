@@ -2166,7 +2166,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                             p_sample->data.p_sample_soun->p_qt_description,
                             p_track->fmt.i_extra);
                 }
-                if( p_track->fmt.i_extra >= 56 && p_sample->i_type == VLC_CODEC_ALAC )
+                if( p_track->fmt.i_extra == 56 && p_sample->i_type == VLC_CODEC_ALAC )
                 {
                     p_track->fmt.audio.i_channels = *((uint8_t*)p_track->fmt.p_extra + 41);
                     p_track->fmt.audio.i_rate = GetDWBE((uint8_t*)p_track->fmt.p_extra + 52);
