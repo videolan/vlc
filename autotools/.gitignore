@@ -6,3 +6,4 @@ install-sh
 ltmain.sh
 missing
 mkinstalldirs
+test-driver
