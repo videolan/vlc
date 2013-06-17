@@ -209,11 +209,7 @@ void InputManager::customEvent( QEvent *event )
         }
         break;
     case IMEvent::ItemStateChanged:
-        // TODO: Fusion with above state
         UpdateStatus();
-        // UpdateName();
-        // UpdateNavigation(); This shouldn't be useful now
-        // UpdateTeletext(); Same
         break;
     case IMEvent::NameChanged:
         UpdateName();
@@ -274,15 +270,11 @@ void InputManager::customEvent( QEvent *event )
 inline void InputManager::addCallbacks()
 {
     var_AddCallback( p_input, "intf-event", InputEvent, this );
-    if( !p_intf->p_sys->b_isDialogProvider )
-        var_AddCallback( p_input, "state", PLItemChanged, THEMIM );
 }
 
 /* Delete the callbacks on Input. Self explanatory */
 inline void InputManager::delCallbacks()
 {
-    if( !p_intf->p_sys->b_isDialogProvider )
-        var_DelCallback( p_input, "state", PLItemChanged, THEMIM );
     var_DelCallback( p_input, "intf-event", InputEvent, this );
 }
 
@@ -1192,7 +1184,7 @@ bool MainInputManager::hasEmptyPlaylist()
  * Static callbacks for MIM *
  ****************************/
 static int PLItemChanged( vlc_object_t *p_this, const char *psz_var,
-                        vlc_value_t oldval, vlc_value_t, void *param )
+                        vlc_value_t oldval, vlc_value_t val, void *param )
 {
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
 
