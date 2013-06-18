@@ -459,6 +459,7 @@
     [o_fs_volumeSlider setContinuous: YES];
     [o_fs_volumeSlider setTarget: self];
     [o_fs_volumeSlider setAction: @selector(fsVolumeSliderUpdate:)];
+    [o_fs_volumeSlider setUsesBrightArtwork:YES];
     [[o_fs_volumeSlider cell] accessibilitySetOverrideValue:_NS("Volume") forAttribute:NSAccessibilityTitleAttribute];
     [[o_fs_volumeSlider cell] accessibilitySetOverrideValue:_NS("Click and move the mouse while keeping the button pressed to use this slider to change the volume.") forAttribute:NSAccessibilityDescriptionAttribute];
     [self addSubview: o_fs_volumeSlider];
@@ -708,6 +709,7 @@
 * VLCFSVolumeSlider
 *****************************************************************************/
 @implementation VLCFSVolumeSlider
+
 - (void)drawKnobInRect:(NSRect) knobRect
 {
     NSRect image_rect;
@@ -728,6 +730,8 @@
     NSRectClip(NSZeroRect);
     [super drawRect:rect];
     [[NSGraphicsContext currentContext] restoreGraphicsState];
+
+    [self drawFullVolumeMarker];
 
     NSRect knobRect = [[self cell] knobRectFlipped:NO];
     knobRect.origin.y+=7.5;

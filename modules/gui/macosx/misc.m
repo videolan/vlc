@@ -511,6 +511,8 @@ void _drawFrameInRect(NSRect frameRect)
 
 @implementation VLCVolumeSliderCommon : NSSlider
 
+@synthesize usesBrightArtwork = _usesBrightArtwork;
+
 - (void)scrollWheel:(NSEvent *)o_event
 {
     intf_thread_t * p_intf = VLCIntf;
@@ -541,6 +543,30 @@ void _drawFrameInRect(NSRect frameRect)
         else
             [[VLCCoreInteraction sharedInstance] volumeDown];
     }
+}
+
+- (void)drawFullVolumeMarker
+{
+    NSRect frame = [self frame];
+
+    NSColor *drawingColor;
+    if (_usesBrightArtwork)
+        drawingColor = [[NSColor whiteColor] colorWithAlphaComponent:.8];
+    else
+        drawingColor = [[NSColor blackColor] colorWithAlphaComponent:.6];
+
+    NSBezierPath* bezierPath = [NSBezierPath bezierPath];
+
+    float fullVolPos = frame.size.width / 2.;
+    [bezierPath moveToPoint:NSMakePoint(fullVolPos, frame.size.height - 3.)];
+    [bezierPath lineToPoint:NSMakePoint(fullVolPos, 3.)];
+    [bezierPath closePath];
+
+    bezierPath.lineWidth = 1.;
+    [drawingColor setStroke];
+    [bezierPath stroke];
+    [drawingColor setFill];
+    [bezierPath fill];
 }
 
 @end
@@ -583,6 +609,8 @@ void _drawFrameInRect(NSRect frameRect)
     NSRectClip(NSZeroRect);
     [super drawRect:rect];
     [[NSGraphicsContext currentContext] restoreGraphicsState];
+
+    [self drawFullVolumeMarker];
 
     NSRect knobRect = [[self cell] knobRectFlipped:NO];
     knobRect.origin.y+=2;

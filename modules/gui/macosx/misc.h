@@ -1,7 +1,7 @@
 /*****************************************************************************
  * misc.h: code not specific to vlc
  *****************************************************************************
- * Copyright (C) 2003-2012 VLC authors and VideoLAN
+ * Copyright (C) 2003-2013 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -121,8 +121,13 @@
  *****************************************************************************/
 
 @interface VLCVolumeSliderCommon : NSSlider
+{
+    BOOL _usesBrightArtwork;
+}
+@property (readwrite, nonatomic) BOOL usesBrightArtwork;
 
 - (void)scrollWheel:(NSEvent *)o_event;
+- (void)drawFullVolumeMarker;
 
 @end
 
