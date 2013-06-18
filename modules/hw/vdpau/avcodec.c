@@ -24,6 +24,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 
 #include <libavutil/mem.h>
@@ -54,9 +55,7 @@ struct vlc_va_sys_t
     vdp_t *vdp;
     VdpDevice device;
     VdpDecoderProfile profile;
-    VdpYCbCrFormat format;
     AVVDPAUContext context;
-    vlc_fourcc_t chroma;
     uint16_t width;
     uint16_t height;
 };
@@ -73,7 +72,6 @@ static int Lock(vlc_va_t *va, AVFrame *ff)
         ff->linesize[i] = 0;
     }
 
-    /* TODO: select better chromas when appropriate */
     err = vdp_video_surface_create(sys->vdp, sys->device, VDP_CHROMA_TYPE_420,
                                    sys->width, sys->height, &surface);
     if (err != VDP_STATUS_OK)
@@ -91,42 +89,18 @@ static int Lock(vlc_va_t *va, AVFrame *ff)
 
 static void Unlock(vlc_va_t *va, AVFrame *ff)
 {
-    vlc_va_sys_t *sys = va->sys;
-    VdpVideoSurface surface = (uintptr_t)ff->opaque;
-    VdpStatus err;
-
+    (void) va;
     ff->data[0] = ff->data[3] = NULL;
     ff->opaque = NULL;
-
-    err = vdp_video_surface_destroy(sys->vdp, surface);
-    if (err != VDP_STATUS_OK)
-        msg_Err(va, "%s destruction failure: %s", "video surface",
-                vdp_get_error_string(sys->vdp, err));
 }
 
 static int Copy(vlc_va_t *va, picture_t *pic, AVFrame *ff)
 {
     vlc_va_sys_t *sys = va->sys;
     VdpVideoSurface surface = (uintptr_t)ff->opaque;
-    void *planes[3];
-    uint32_t pitches[3];
-    VdpStatus err;
 
-    for (unsigned i = 0; i < 3; i++)
-    {
-         planes[i] = pic->p[i].p_pixels;
-         pitches[i] = pic->p[i].i_pitch;
-    }
-
-    err = vdp_video_surface_get_bits_y_cb_cr(sys->vdp, surface, sys->format,
-                                             planes, pitches);
-    if (err != VDP_STATUS_OK)
-    {
-        msg_Err(va, "surface copy failure: %s",
-                vdp_get_error_string(sys->vdp, err));
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
+    return vlc_vdp_video_attach(sys->vdp, surface, pic)
+        ? VLC_ENOMEM : VLC_SUCCESS;
 }
 
 static int Init(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
@@ -161,7 +135,8 @@ static int Init(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
     }
 
     *ctxp = &sys->context;
-    *chromap = sys->chroma;
+    /* TODO: select better chromas when appropriate */
+    *chromap = VLC_CODEC_VDPAU_VIDEO_420;
     return VLC_SUCCESS;
 }
 
@@ -330,27 +305,6 @@ static int Open(vlc_va_t *va, int codec, const es_format_t *fmt)
     }
     msg_Dbg(va, "video surface supported maximum: %s %"PRIu32"x%"PRIu32,
             "YUV 4:2:0", width, height);
-
-    if (vdp_video_surface_query_get_put_bits_y_cb_cr_capabilities(sys->vdp,
-            sys->device, VDP_CHROMA_TYPE_420, VDP_YCBCR_FORMAT_YV12, &support)
-                                       == VDP_STATUS_OK && support == VDP_TRUE)
-    {
-        sys->format = VDP_YCBCR_FORMAT_YV12;
-        sys->chroma = VLC_CODEC_YV12;
-    }
-    else
-    if (vdp_video_surface_query_get_put_bits_y_cb_cr_capabilities(sys->vdp,
-            sys->device, VDP_CHROMA_TYPE_420, VDP_YCBCR_FORMAT_NV12, &support)
-                                       == VDP_STATUS_OK && support == VDP_TRUE)
-    {
-        sys->format = VDP_YCBCR_FORMAT_NV12;
-        sys->chroma = VLC_CODEC_NV12;
-    }
-    else
-    {
-        msg_Err(va, "video surface reading not supported: %s", "YUV 4:2:0");
-        goto error;
-    }
 
     if (vdp_decoder_query_capabilities(sys->vdp, sys->device, profile,
                         &support, &lvl, &mb, &width, &height) != VDP_STATUS_OK)

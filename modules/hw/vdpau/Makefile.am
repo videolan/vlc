@@ -16,7 +16,7 @@ pkglib_LTLIBRARIES = libvlc_vdpau.la
 
 libvlc_LTLIBRARIES =
 
-libvdpau_avcodec_plugin_la_SOURCES = avcodec.c
+libvdpau_avcodec_plugin_la_SOURCES = avcodec.c picture.c
 libvdpau_avcodec_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(X_CFLAGS) $(CFLAGS_avcodec)
 libvdpau_avcodec_plugin_la_LIBADD = $(AM_LIBADD) \
