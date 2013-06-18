@@ -491,6 +491,26 @@ static void destroySegment( output_segment_t *segment )
 }
 
 /************************************************************************
+ * segmentAmountNeeded: check that playlist has atleast 3*p_sys->i_seglength of segments
+ * return how many segments are needed for that (max of p_sys->i_segment )
+ ************************************************************************/
+static uint32_t segmentAmountNeeded( sout_access_out_sys_t *p_sys )
+{
+    float duration = .0f;
+    for( unsigned index = 1; index <= vlc_array_count( p_sys->segments_t ) ; index++ )
+    {
+        output_segment_t* segment = vlc_array_item_at_index( p_sys->segments_t, vlc_array_count( p_sys->segments_t ) - index );
+        duration += segment->f_seglength;
+
+        if( duration >= (float)( 3 * p_sys->i_seglen ) )
+            return __MAX(index, p_sys->i_numsegs);
+    }
+    return vlc_array_count( p_sys->segments_t )-1;
+
+}
+
+
+/************************************************************************
  * isFirstItemRemovable: Check for draft 11 section 6.2.2 
  * check that the first item has been around outside playlist 
  * segment->f_seglength + p_sys->i_seglen before it is removed.
@@ -525,8 +545,9 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
         i_firstseg = 1;
     else
     {
-        i_firstseg = ( p_sys->i_segment - p_sys->i_numsegs ) + 1;
-        i_index_offset = vlc_array_count( p_sys->segments_t ) - p_sys->i_numsegs;
+        unsigned numsegs = segmentAmountNeeded( p_sys );
+        i_firstseg = ( p_sys->i_segment - numsegs ) + 1;
+        i_index_offset = vlc_array_count( p_sys->segments_t ) - numsegs;
     }
 
     // First update index
