@@ -19578,16 +19578,15 @@ msgstr "[Affichage]"
 
 #: modules/gui/ncurses.c:864
 msgid " h,H                    Show/Hide help box"
-msgstr "     h,H       Afficher/Cacher l'aide"
+msgstr "     h,H         Afficher/Cacher l'aide"
 
 #: modules/gui/ncurses.c:865
 msgid " i                      Show/Hide info box"
-msgstr "     i            Afficher/Cacher les informations"
+msgstr "     i           Afficher/Cacher les informations"
 
 #: modules/gui/ncurses.c:866
-#, fuzzy
 msgid " M                      Show/Hide metadata box"
-msgstr "     m          Afficher/Cacher les méta informations"
+msgstr "     m           Afficher/Cacher les méta informations"
 
 #: modules/gui/ncurses.c:867
 msgid " L                      Show/Hide messages box"
@@ -19611,11 +19610,11 @@ msgstr "     P           Afficher/Cacher les statistiques"
 
 #: modules/gui/ncurses.c:872
 msgid " Esc                    Close Add/Search entry"
-msgstr "     [Echap]       Fermer le dialogue Ajouter/Chercher"
+msgstr "     [Echap]     Fermer le dialogue Ajouter/Chercher"
 
 #: modules/gui/ncurses.c:873
 msgid " Ctrl-l                 Refresh the screen"
-msgstr "     Ctrl+l                     Rafraîchir l'écran"
+msgstr "     Ctrl+l      Rafraîchir l'écran"
 
 #: modules/gui/ncurses.c:877
 msgid "[Global]"
@@ -19623,7 +19622,7 @@ msgstr "[Global]"
 
 #: modules/gui/ncurses.c:879
 msgid " q, Q, Esc              Quit"
-msgstr "     q, Q, Échap     Quitter"
+msgstr "     q, Q, Échap Quitter"
 
 #: modules/gui/ncurses.c:880
 msgid " s                      Stop"
@@ -19631,7 +19630,7 @@ msgstr "     s           Stop"
 
 #: modules/gui/ncurses.c:881
 msgid " <space>                Pause/Play"
-msgstr "    [Espace]     Suspendre/Lire"
+msgstr "     [Espace]    Suspendre/Lire"
 
 #: modules/gui/ncurses.c:882
 msgid " f                      Toggle Fullscreen"
@@ -19639,7 +19638,7 @@ msgstr "     f           Basculer le mode plein écran"
 
 #: modules/gui/ncurses.c:883
 msgid " n, p                   Next/Previous playlist item"
-msgstr "     n, p       Suivant/Précédent"
+msgstr "     n, p        Suivant/Précédent"
 
 #: modules/gui/ncurses.c:884
 msgid " [, ]                   Next/Previous title"
@@ -19647,37 +19646,36 @@ msgstr "     [, ]        Titre Suivant/Précédent"
 
 #: modules/gui/ncurses.c:885
 msgid " <, >                   Next/Previous chapter"
-msgstr "     <, >      Chapitre Suivant/Précédent"
+msgstr "     <, >        Chapitre Suivant/Précédent"
 
 #. xgettext: You can use ← and → characters
 #: modules/gui/ncurses.c:887
 #, c-format
 msgid " <left>,<right>         Seek -/+ 1%%"
-msgstr "    [gauche], [droite]    Sauter -/+1%%"
+msgstr "     ←, →        Sauter -/+1%%"
 
 #: modules/gui/ncurses.c:888
 msgid " a, z                   Volume Up/Down"
-msgstr "     a,z           Monter/baisser le volume"
+msgstr "     a,z         Monter/baisser le volume"
 
 #: modules/gui/ncurses.c:889
-#, fuzzy
 msgid " m                      Mute"
-msgstr "     s           Stop"
+msgstr "     m           Muet"
 
 #. xgettext: You can use ↑ and ↓ characters
 #: modules/gui/ncurses.c:891
 msgid " <up>,<down>            Navigate through the box line by line"
-msgstr "     [haut], [bas]         Naviguer ligne par ligne"
+msgstr "     ↑,↓         Naviguer ligne par ligne"
 
 #. xgettext: You can use ⇞ and ⇟ characters
 #: modules/gui/ncurses.c:893
 msgid " <pageup>,<pagedown>    Navigate through the box page by page"
-msgstr "     [P.Prec],[P.Suiv]   Naviguer page par page"
+msgstr "     ⇞,⇟         Naviguer page par page"
 
 #. xgettext: You can use ↖ and ↘ characters
 #: modules/gui/ncurses.c:895
 msgid " <start>,<end>          Navigate to start/end of box"
-msgstr "[Début],[Fin]          Aller au début/à la fin du dialogue"
+msgstr "     ↖,↘         Aller au début/à la fin du dialogue"
 
 #: modules/gui/ncurses.c:899
 msgid "[Playlist]"
@@ -19689,7 +19687,7 @@ msgstr "     r           Basculer le mode aléatoire"
 
 #: modules/gui/ncurses.c:902
 msgid " l                      Toggle Loop Playlist"
-msgstr "     l            Basculer le mode boucler"
+msgstr "     l           Basculer le mode boucler"
 
 #: modules/gui/ncurses.c:903
 msgid " R                      Toggle Repeat item"
@@ -19709,11 +19707,11 @@ msgstr "     g           Aller à l'élément courant"
 
 #: modules/gui/ncurses.c:907
 msgid " /                      Look for an item"
-msgstr "     /            Rechercher"
+msgstr "     /           Rechercher"
 
 #: modules/gui/ncurses.c:908
 msgid " ;                      Look for the next item"
-msgstr " ;                      Rechercher le prochain"
+msgstr "     ;           Rechercher le prochain"
 
 #: modules/gui/ncurses.c:909
 msgid " A                      Add an entry"
@@ -19722,7 +19720,7 @@ msgstr "     A           Ajouter"
 #. xgettext: You can use ⌫ character to translate <backspace>
 #: modules/gui/ncurses.c:911
 msgid " D, <backspace>, <del>  Delete an entry"
-msgstr "     D, [<-], [Suppr]                  Effacer"
+msgstr "     D,⌫,[Suppr] Effacer"
 
 #: modules/gui/ncurses.c:912
 msgid " e                      Eject (if stopped)"
@@ -19735,13 +19733,13 @@ msgstr "[Navigateur de fichiers]"
 #: modules/gui/ncurses.c:918
 msgid " <enter>                Add the selected file to the playlist"
 msgstr ""
-"     [Entrée]                Ajouter le fichier sélectionné à la liste de "
+"     [Entrée]           Ajouter le fichier sélectionné à la liste de "
 "lecture"
 
 #: modules/gui/ncurses.c:919
 msgid " <space>                Add the selected directory to the playlist"
 msgstr ""
-"     [Espace]               Ajouter le dossier sélectionné à la liste de "
+"     [Espace]           Ajouter le dossier sélectionné à la liste de "
 "lecture"
 
 #: modules/gui/ncurses.c:920
@@ -19756,7 +19754,7 @@ msgstr "[Lecteur]"
 #: modules/gui/ncurses.c:927
 #, c-format
 msgid " <up>,<down>            Seek +/-5%%"
-msgstr "     [haut], [bas]         Sauter +/-5%%"
+msgstr "     ↑,↓         Sauter +/-5%%"
 
 #: modules/gui/ncurses.c:1047
 msgid "[Repeat] "
