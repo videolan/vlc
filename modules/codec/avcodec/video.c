@@ -331,6 +331,10 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     i_thread_count = __MIN( i_thread_count, 16 );
     msg_Dbg( p_dec, "allowing %d thread(s) for decoding", i_thread_count );
     p_sys->p_context->thread_count = i_thread_count;
+
+    if( i_codec_id == AV_CODEC_ID_MPEG4 )
+        p_sys->p_context->thread_count = 1;
+
 #endif
 
     char *hw = var_CreateGetString( p_dec, "avcodec-hw" ); /* FIXME */
