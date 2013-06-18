@@ -570,6 +570,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 
     memset (&new_layout, 0, sizeof(new_layout));
     uint32_t chans_out[AOUT_CHAN_MAX];
+    memset(&chans_out, 0, sizeof(chans_out));
 
     /* Some channel abbreviations used below:
      * L - left
@@ -622,14 +623,16 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
             break;
         case 6:
             if (fmt->i_physical_channels & (AOUT_CHAN_LFE)) {
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_20; // L R Ls Rs C LFE
+                /* note: for some reason, kAudioChannelLayoutTag_DVD_20, which would not require channel reordering, 
+                 does not work anymore */
+                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_5_1; // L R C LFE Ls Rs
 
                 chans_out[0] = AOUT_CHAN_LEFT;
                 chans_out[1] = AOUT_CHAN_RIGHT;
-                chans_out[2] = AOUT_CHAN_REARLEFT;
-                chans_out[3] = AOUT_CHAN_REARRIGHT;
-                chans_out[4] = AOUT_CHAN_CENTER;
-                chans_out[5] = AOUT_CHAN_LFE;
+                chans_out[2] = AOUT_CHAN_CENTER;
+                chans_out[3] = AOUT_CHAN_LFE;
+                chans_out[4] = AOUT_CHAN_REARLEFT;
+                chans_out[5] = AOUT_CHAN_REARRIGHT;
 
                 p_aout->sys->chans_to_reorder = aout_CheckChannelReorder(NULL, chans_out, fmt->i_physical_channels, p_aout->sys->chan_table);
                 if (p_aout->sys->chans_to_reorder)
