@@ -115,6 +115,7 @@ static const staticentry_t p_list_video[] = {
         E("xdve", "XDCAM EX 1080p25 50Mb/s CBR"),
         E("xdvf", "XDCAM EX 1080p30 50Mb/s CBR"),
 
+        E("xd51", "XDCAM HD422 720p30 50Mb/s CBR"),
         E("xd54", "XDCAM HD422 720p24 50Mb/s CBR"),
         E("xd55", "XDCAM HD422 720p25 50Mb/s CBR"),
         E("xd59", "XDCAM HD422 720p60 50Mb/s CBR"),
