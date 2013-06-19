@@ -285,7 +285,8 @@ Section $Name_Section04 SEC04
   !insertmacro InstallFile axvlc.dll
   !insertmacro InstallFile axvlc.dll.manifest
   !insertmacro CloseUninstallLog
-  RegDLL "$INSTDIR\axvlc.dll"
+@HAVE_WIN64_FALSE@ RegDLL "$INSTDIR\axvlc.dll"
+@HAVE_WIN64_TRUE@  ExecWait 'regsvr32.exe /s "$INSTDIR\axvlc.dll"'
 SectionEnd
 !endif
 SectionGroupEnd
@@ -697,7 +698,8 @@ Section "un.$Name_Section91" SEC91
   !insertmacro DeleteContextMenuExt "Directory"
 
   ;remove activex plugin
-  UnRegDLL "$INSTDIR\axvlc.dll"
+@HAVE_WIN64_FALSE@ UnRegDLL "$INSTDIR\axvlc.dll"
+@HAVE_WIN64_TRUE@  ExecWait 'regsvr32.exe /s /u "$INSTDIR\axvlc.dll"'
   Delete /REBOOTOK "$INSTDIR\axvlc.dll"
   Delete /REBOOTOK "$INSTDIR\axvlc.dll.manifest"
 
