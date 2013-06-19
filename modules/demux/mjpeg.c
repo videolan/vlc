@@ -322,7 +322,15 @@ static int Open( vlc_object_t * p_this )
         char* boundary = strstr( content_type, "boundary=" );
         if( boundary )
         {
-            p_sys->psz_separator = strdup( boundary + strlen("boundary=") );
+	    boundary += strlen( "boundary=" );
+	    size_t len = strlen( boundary );
+	    if( len > 2 && boundary[0] == '"'
+	        && boundary[len-1] == '"' )
+	    {
+	        boundary[len-1] = '\0';
+	        boundary++;
+	    }
+            p_sys->psz_separator = strdup( boundary );
             if( !p_sys->psz_separator )
             {
                 free( content_type );
