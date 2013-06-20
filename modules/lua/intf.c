@@ -238,7 +238,6 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
     }
 
     vlclua_set_this( L, p_intf );
-    vlclua_set_intf( L, p_sys );
 
     luaL_openlibs( L );
 
