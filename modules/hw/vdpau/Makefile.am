@@ -3,7 +3,7 @@ include $(top_srcdir)/modules/common.am
 
 AM_CFLAGS += $(VDPAU_CFLAGS)
 
-libvlc_vdpau_la_SOURCES = vlc_vdpau.c vlc_vdpau.h
+libvlc_vdpau_la_SOURCES = vlc_vdpau.c vlc_vdpau.h instance.c
 libvlc_vdpau_la_CPPFLAGS =
 libvlc_vdpau_la_LIBADD = $(X_LIBS) $(X_PRE_LIBS) -lX11 \
 	$(LIBDL) $(LIBPTHREAD)
