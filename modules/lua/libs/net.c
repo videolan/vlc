@@ -211,7 +211,6 @@ static int vlclua_net_poll( lua_State *L )
     {
         p_fds[i].fd = luaL_checkinteger( L, -2 );
         p_fds[i].events = luaL_checkinteger( L, -1 );
-        p_fds[i].revents = 0;
         lua_pop( L, 1 );
         i++;
     }
