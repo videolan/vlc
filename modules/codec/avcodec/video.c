@@ -906,7 +906,7 @@ static int ffmpeg_va_GetFrameBuf( struct AVCodecContext *p_context, AVFrame *p_f
 
     if( vlc_va_Get( p_va, p_ff_pic ) )
     {
-        msg_Err( p_dec, "VaGrabSurface failed" );
+        msg_Err( p_dec, "vlc_va_Get failed" );
         return -1;
     }
 
