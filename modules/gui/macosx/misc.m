@@ -556,8 +556,13 @@ void _drawFrameInRect(NSRect frameRect)
         drawingColor = [[NSColor blackColor] colorWithAlphaComponent:.6];
 
     NSBezierPath* bezierPath = [NSBezierPath bezierPath];
-
     float fullVolPos = frame.size.width / 2.;
+
+    CGFloat maxAudioVol = self.maxValue / AOUT_VOLUME_DEFAULT;
+
+    if ((maxAudioVol - 1.) > 0)
+        fullVolPos += ((maxAudioVol - 1.) * 2000) / fullVolPos;
+
     [bezierPath moveToPoint:NSMakePoint(fullVolPos, frame.size.height - 3.)];
     [bezierPath lineToPoint:NSMakePoint(fullVolPos, 3.)];
     [bezierPath closePath];

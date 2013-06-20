@@ -483,6 +483,7 @@
         [o_volume_down_btn setImage: [NSImage imageNamed:@"volume-low"]];
         [o_volume_track_view setImage: [NSImage imageNamed:@"volume-slider-track"]];
         [o_volume_up_btn setImage: [NSImage imageNamed:@"volume-high"]];
+        [o_volume_sld setUsesBrightArtwork: YES];
 
         if (b_nativeFullscreenMode) {
             [o_effects_btn setImage: [NSImage imageNamed:@"effects-one-button"]];
@@ -514,6 +515,7 @@
         [o_volume_down_btn setImage: [NSImage imageNamed:@"volume-low_dark"]];
         [o_volume_track_view setImage: [NSImage imageNamed:@"volume-slider-track_dark"]];
         [o_volume_up_btn setImage: [NSImage imageNamed:@"volume-high_dark"]];
+        [o_volume_sld setUsesBrightArtwork: NO];
 
         if (b_nativeFullscreenMode) {
             [o_effects_btn setImage: [NSImage imageNamed:@"effects-one-button_dark"]];
@@ -533,8 +535,8 @@
 
     BOOL b_mute = ![[VLCCoreInteraction sharedInstance] mute];
     [o_volume_sld setEnabled: b_mute];
+    [o_volume_sld setMaxValue: [[VLCCoreInteraction sharedInstance] maxVolume]];
     [o_volume_up_btn setEnabled: b_mute];
-
 
     // remove fullscreen button for lion fullscreen
     if (b_nativeFullscreenMode) {

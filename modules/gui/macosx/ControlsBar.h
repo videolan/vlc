@@ -24,6 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "CompatibilityFixes.h"
+#import "misc.h"
 
 @class VLCFSPanel;
 
@@ -103,7 +104,7 @@
     IBOutlet id o_repeat_btn;
     IBOutlet id o_shuffle_btn;
 
-    IBOutlet id o_volume_sld;
+    IBOutlet VLCVolumeSliderCommon * o_volume_sld;
     IBOutlet id o_volume_track_view;
     IBOutlet id o_volume_down_btn;
     IBOutlet id o_volume_up_btn;

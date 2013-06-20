@@ -123,6 +123,7 @@
 @interface VLCVolumeSliderCommon : NSSlider
 {
     BOOL _usesBrightArtwork;
+    CGFloat _maximumVolume;
 }
 @property (readwrite, nonatomic) BOOL usesBrightArtwork;
 

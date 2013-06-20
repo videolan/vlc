@@ -538,6 +538,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
         return 0;
 
     float volume = playlist_VolumeGet(pl_Get(p_intf));
+    NSLog(@"return vol %f", volume);
 
     return lroundf(volume * AOUT_VOLUME_DEFAULT);
 }
@@ -548,9 +549,18 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     if (!p_intf)
         return;
 
+    if (i_value >= self.maxVolume)
+        i_value = self.maxVolume;
+
     float f_value = i_value / (float)AOUT_VOLUME_DEFAULT;
+    NSLog( @"set vol %f", f_value);
 
     playlist_VolumeSet(pl_Get(p_intf), f_value);
+}
+
+- (float)maxVolume
+{
+    return 1.2 * AOUT_VOLUME_DEFAULT;
 }
 
 #pragma mark -
