@@ -148,9 +148,37 @@
         }
     }
 
+    NSSize videoViewSize = NSMakeSize(videoViewPosition.size.width, videoViewPosition.size.height);
+
+    // TODO: find a cleaner way for "start in fullscreen"
+    // Start in fs, because either prefs settings, or fullscreen button was pressed before
+    if (var_InheritBool(VLCIntf, "fullscreen") || var_GetBool(pl_Get(VLCIntf), "fullscreen")) {
+
+        // this is not set when we start in fullscreen because of
+        // fullscreen settings in video prefs the second time
+        var_SetBool(p_wnd->p_parent, "fullscreen", 1);
+
+        int i_full = 1;
+
+        SEL sel = @selector(setFullscreen:forWindow:);
+        NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[self methodSignatureForSelector:sel]];
+        [inv setTarget:self];
+        [inv setSelector:sel];
+        [inv setArgument:&i_full atIndex:2];
+        [inv setArgument:&p_wnd atIndex:3];
+
+        NSTimeInterval resizeTime = 0.;
+        if(!b_nonembedded && !b_video_wallpaper) {
+            NSRect window_rect = [o_new_video_window getWindowRectForProposedVideoViewSize:videoViewSize];
+            resizeTime = [o_new_video_window animationResizeTime:window_rect];
+            resizeTime += 0.1;
+        }
+        
+        [NSTimer scheduledTimerWithTimeInterval:resizeTime invocation:inv repeats:NO];
+    }
+
     if (!b_video_wallpaper) {
         // set window size
-        NSSize videoViewSize = NSMakeSize(videoViewPosition.size.width, videoViewPosition.size.height);
 
         if (b_nonembedded) {
             NSRect window_rect = [o_new_video_window getWindowRectForProposedVideoViewSize:videoViewSize];
