@@ -749,7 +749,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [[self animator] setFrame:frameBeforePlayback display:YES];
 
         // update fs button to reflect state for next startup
-        if (var_InheritBool(pl_Get(VLCIntf), "fullscreen")) {
+        if (var_InheritBool(VLCIntf, "fullscreen") || var_GetBool(pl_Get(VLCIntf), "fullscreen")) {
             [o_controls_bar setFullscreenState:YES];
         }
 
