@@ -158,6 +158,7 @@ struct intf_sys_t
 {
     char *psz_filename;
     lua_State *L;
+    int fd[2];
 
     vlc_thread_t thread;
 };

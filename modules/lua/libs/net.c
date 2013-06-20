@@ -41,6 +41,7 @@
 #include <vlc_network.h>
 #include <vlc_url.h>
 #include <vlc_fs.h>
+#include <vlc_interface.h>
 
 #include "../vlc.h"
 #include "../libs.h"
@@ -194,19 +195,25 @@ static int vlclua_net_recv( lua_State *L )
 /* Takes a { fd : events } table as first arg and modifies it to { fd : revents } */
 static int vlclua_net_poll( lua_State *L )
 {
+    intf_thread_t *intf = (intf_thread_t *)vlclua_get_this( L );
+    intf_sys_t *sys = intf->p_sys;
+
     luaL_checktype( L, 1, LUA_TTABLE );
 
-    int i_fds = 0;
+    int i_fds = 1;
     lua_pushnil( L );
     while( lua_next( L, 1 ) )
     {
         i_fds++;
         lua_pop( L, 1 );
     }
-    struct pollfd *p_fds = malloc( i_fds * sizeof( struct pollfd ) );
-    vlc_cleanup_push( free, p_fds );
+
+    struct pollfd *p_fds = xmalloc( i_fds * sizeof( *p_fds ) );
+
     lua_pushnil( L );
-    int i = 0;
+    int i = 1;
+    p_fds[0].fd = sys->fd[0];
+    p_fds[0].events = POLLIN;
     while( lua_next( L, 1 ) )
     {
         p_fds[i].fd = luaL_checkinteger( L, -2 );
@@ -220,15 +227,21 @@ static int vlclua_net_poll( lua_State *L )
         i_ret = poll( p_fds, i_fds, -1 );
     while( i_ret == -1 && errno == EINTR );
 
-    for( i = 0; i < i_fds; i++ )
+    for( i = 1; i < i_fds; i++ )
     {
         lua_pushinteger( L, p_fds[i].fd );
         lua_pushinteger( L, p_fds[i].revents );
         lua_settable( L, 1 );
     }
     lua_pushinteger( L, i_ret );
-    vlc_cleanup_run();
-    return 1;
+
+    if( p_fds[0].revents )
+        i_ret = luaL_error( L, "Interrupted." );
+    else
+        i_ret = 1;
+    free( p_fds );
+
+    return i_ret;
 }
 
 /*****************************************************************************

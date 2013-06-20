@@ -159,6 +159,10 @@ misc.quit(): Quit VLC.
 
 Net
 ---
+----------------------------------------------------------------
+/!\ NB: this namespace is ONLY usable for interfaces.
+---
+----------------------------------------------------------------
 net.url_parse( url, [option delimiter] ): Parse URL. Returns a table with
   fields "protocol", "username", "password", "host", "port", path" and
   "option".
