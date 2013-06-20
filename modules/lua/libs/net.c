@@ -219,7 +219,7 @@ static int vlclua_net_poll( lua_State *L )
     int i_ret;
     do
         i_ret = poll( p_fds, i_fds, -1 );
-    while( i_ret == -1 );
+    while( i_ret == -1 && errno == EINTR );
 
     for( i = 0; i < i_fds; i++ )
     {
