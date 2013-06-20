@@ -66,6 +66,9 @@
     VLCVoutView *o_vout_view;
     VLCVideoWindowCommon *o_new_video_window;
 
+    // should be called before any window resizing occurs
+    [[VLCMainWindow sharedInstance] videoplayWillBeStarted];
+
     if (b_multiple_vout_windows && b_video_wallpaper)
         b_video_wallpaper = false;
 

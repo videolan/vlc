@@ -130,6 +130,7 @@
 
 - (void)showFullscreenController;
 
+- (void)videoplayWillBeStarted;
 - (void)setVideoplayEnabled;
 
 @end
