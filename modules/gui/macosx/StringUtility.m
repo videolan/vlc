@@ -311,6 +311,8 @@ unsigned int CocoaKeyToVLC(unichar i_key)
             return [NSString stringWithFormat:@"%C", NSF2FunctionKey];
         else if ([theString rangeOfString:@"F1"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSF1FunctionKey];
+        else if ([theString rangeOfString:@"Space"].location != NSNotFound)
+            return @" ";
         /* note that we don't support esc here, since it is reserved for leaving fullscreen */
     }
 #ifdef __clang__

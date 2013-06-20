@@ -193,10 +193,6 @@
                             eventHandled = YES;
                         }
                     }
-                    else if (key == ' ') {
-                        [self play:self];
-                        eventHandled = YES;
-                    }
                     vlc_object_release(p_vout);
                 }
                 vlc_object_release(p_input);
