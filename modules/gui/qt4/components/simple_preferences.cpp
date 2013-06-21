@@ -529,8 +529,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #ifdef _WIN32
             BUTTONACT( ui.assoButton, assoDialog() );
 #else
-            ui.assoButton->hide();
-            ui.assocLabel->hide();
+            ui.osGroupBox->hide();
 #endif
 #ifdef MEDIA_LIBRARY
             BUTTONACT( ui.sqlMLbtn, configML() );
