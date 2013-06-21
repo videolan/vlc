@@ -601,8 +601,9 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
             [workArray addObject:text];
             [self setProfileNames:[[[NSArray alloc] initWithArray:workArray] autorelease]];
             [workArray release];
+
             workArray = [[NSMutableArray alloc] initWithArray:self.profileValueList];
-            [workArray addObject:[[[NSArray alloc] initWithArray:self.currentProfile] autorelease]];
+            [workArray addObject:[self.currentProfile componentsJoinedByString:@";"]];
             [self setProfileValueList:[[[NSArray alloc] initWithArray:workArray] autorelease]];
             [workArray release];
 
