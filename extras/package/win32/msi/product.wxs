@@ -43,6 +43,9 @@
         </Condition>
 
         <MajorUpgrade Schedule="afterInstallInitialize" DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."/>
+        <Property Id="NSISLOCATION">
+            <RegistrySearch Id="NSISLOCATION" Type="raw" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\VLC media player" Name="UninstallString" />
+        </Property>
 
         <Icon Id="vlc.ico" SourceFile="$(var.SourceDir)/vlc.ico"/>
 
@@ -326,10 +329,18 @@
 
         <InstallExecuteSequence>
             <!-- <RemoveExistingProducts After="InstallValidate" /> -->
+            <Custom Action="ExecVLCNSISUninstall" Before="InstallValidate">NSISLOCATION AND NOT Installed</Custom>
             <Custom Action="ExecVLCCacheGen" Before="InstallFinalize">REINSTALL OR NOT Installed</Custom>
             <Custom Action="SetExecVLCCacheGen" Before="ExecVLCCacheGen">REINSTALL OR NOT Installed</Custom>
         </InstallExecuteSequence>
 
+        <!-- Uninstall an older version of VLC (using NSIS) -->
+        <CustomAction Id            = "ExecVLCNSISUninstall"
+                      Directory     = "APPLICATIONFOLDER"
+                      ExeCommand    = "[NSISLOCATION] /S"
+                      Execute       = "immediate"
+                      Impersonate   = "no"
+                      Return        = "check" />
         <!-- Launch silently vlc-cache-gen.exe during install -->
         <CustomAction Id            = "SetExecVLCCacheGen"
                       Property      = "ExecVLCCacheGen"
