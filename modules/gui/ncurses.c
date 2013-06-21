@@ -1024,8 +1024,8 @@ static int DrawStatus(intf_thread_t *intf)
     intf_sys_t     *sys = intf->p_sys;
     input_thread_t *p_input = sys->p_input;
     playlist_t     *p_playlist = pl_Get(intf);
-    static const char name[] = "VLC media player "PACKAGE_VERSION;
-    const size_t name_len = sizeof name - 1; /* without \0 termination */
+    char *name = _("VLC media player");
+    const size_t name_len = strlen(name) + sizeof(PACKAGE_VERSION);
     int y = 0;
     const char *repeat, *loop, *random;
 
@@ -1038,7 +1038,7 @@ static int DrawStatus(intf_thread_t *intf)
     attrset(A_REVERSE);
     if (sys->color) color_set(C_TITLE, NULL);
     DrawEmptyLine(y, 0, COLS);
-    mvnprintw(y++, padding / 2, COLS, "%s", name);
+    mvnprintw(y++, padding / 2, COLS, "%s %s", name, PACKAGE_VERSION);
     if (sys->color) color_set(C_STATUS, NULL);
     attroff(A_REVERSE);
 
