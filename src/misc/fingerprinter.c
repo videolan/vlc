@@ -40,7 +40,7 @@ fingerprinter_thread_t *fingerprinter_Create( vlc_object_t *p_this )
     }
 
     p_fingerprint->p_module = module_need( p_fingerprint, "fingerprinter",
-                                           "acoustid", false );
+                                           NULL, false );
     if( !p_fingerprint->p_module )
     {
         vlc_object_release( p_fingerprint );
