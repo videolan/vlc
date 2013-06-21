@@ -45,8 +45,6 @@
  #include <vlc_xlib.h>
 #endif
 
-#include "../../../share/icons/32x32/vlc.xpm"
-#include "../../../share/icons/32x32/vlc-xmas.xpm"
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
 
@@ -469,9 +467,9 @@ static void *Thread( void *obj )
     /* Icon setting, Mac uses icon from .icns */
 #ifndef Q_WS_MAC
     if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY && var_InheritBool( p_intf, "qt-icon-change" ) )
-        app.setWindowIcon( QIcon::fromTheme( "vlc-xmas", QIcon(vlc_xmas_xpm) ) );
+        app.setWindowIcon( QIcon::fromTheme( "vlc-xmas", QIcon( ":/logo/vlc128-xmas.png" ) ) );
     else
-        app.setWindowIcon( QIcon::fromTheme( "vlc", QIcon(vlc_xpm) ) );
+        app.setWindowIcon( QIcon::fromTheme( "vlc", QIcon( ":/logo/vlc256.png" ) ) );
 #endif
 
     /* Initialize timers and the Dialog Provider */
