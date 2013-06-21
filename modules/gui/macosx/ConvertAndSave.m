@@ -67,7 +67,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 #pragma mark -
 #pragma mark Initialization
 
-+ (void)initialize{
++ (void)initialize
+{
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
     /* We are using the same format as the Qt4 intf here:
@@ -86,11 +87,11 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
                                  @"ts;1;1;0;mp2v;800;1;0;0;0;mpga;128;2;44100;0;0",
                                  @"asf;1;1;0;WMV2;800;1;0;0;0;wma2;128;2;44100;0;0",
                                  @"asf;1;1;0;DIV3;800;1;0;0;0;mp3;128;2;44100;0;0",
-                                 @"ogg;1;1;0;none;800;1;0;0;0;vorb;128;2;44100;none;0",
-                                 @"raw;1;1;0;none;800;1;0;0;0;mp3;128;2;44100;none;0",
-                                 @"mp4;1;1;0;none;800;1;0;0;0;mpga;128;2;44100;none;0",
-                                 @"raw;1;1;0;none;800;1;0;0;0;flac;128;2;44100;none;0",
-                                 @"wav;1;1;0;none;800;1;0;0;0;s16l;128;2;44100;none;0", nil];
+                                 @"ogg;0;1;0;none;800;1;0;0;0;vorb;128;2;44100;none;0",
+                                 @"raw;0;1;0;none;800;1;0;0;0;mp3;128;2;44100;none;0",
+                                 @"mp4;0;1;0;none;800;1;0;0;0;mpga;128;2;44100;none;0",
+                                 @"raw;0;1;0;none;800;1;0;0;0;flac;128;2;44100;none;0",
+                                 @"wav;0;1;0;none;800;1;0;0;0;s16l;128;2;44100;none;0", nil];
 
     NSArray * defaultProfileNames = [[NSArray alloc] initWithObjects:
                                      @"Video - H.264 + MP3 (MP4)",
@@ -876,13 +877,14 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
             if ([[self.currentProfile objectAtIndex:9] intValue] > 0) // height
                 [composedOptions appendFormat:@",height=%@", [self.currentProfile objectAtIndex:9]];
         }
+    } else {
+        [composedOptions appendString:@"vcodec=none"];
     }
+
+    [composedOptions appendString:@","];
+
     if ([[self.currentProfile objectAtIndex:2] intValue]) {
         // audio is enabled
-
-        // add another comma in case video is enabled
-        if ([[self.currentProfile objectAtIndex:1] intValue])
-            [composedOptions appendString:@","];
 
         [composedOptions appendFormat:@"acodec=%@", [self.currentProfile objectAtIndex:10]];
         if (![[self.currentProfile objectAtIndex:10] isEqualToString:@"none"]) {
@@ -890,6 +892,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
             [composedOptions appendFormat:@",channels=%@", [self.currentProfile objectAtIndex:12]]; // channel number
             [composedOptions appendFormat:@",samplerate=%@", [self.currentProfile objectAtIndex:13]]; // sample rate
         }
+    } else {
+        [composedOptions appendString:@"acodec=none"];
     }
     if ([self.currentProfile objectAtIndex:3]) {
         // subtitles enabled
