@@ -633,13 +633,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         [workArray release];
 
         /* update UI */
-        [_profile_pop removeAllItems];
-        [_profile_pop addItemsWithTitles:self.profileNames];
-        [_profile_pop addItemWithTitle:_NS("Custom")];
-        [[_profile_pop menu] addItem:[NSMenuItem separatorItem]];
-        [_profile_pop addItemWithTitle:_NS("Organize Profiles...")];
-        [[_profile_pop lastItem] setTarget: self];
-        [[_profile_pop lastItem] setAction: @selector(deleteProfileAction:)];
+        [self recreateProfilePopup];
 
         /* update internals */
         [self switchProfile:self];
