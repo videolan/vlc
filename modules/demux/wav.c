@@ -115,7 +115,7 @@ static int Open( vlc_object_t * p_this )
 
     b_is_rf64 = ( memcmp( p_peek, "RF64", 4 ) == 0 );
     if( ( !b_is_rf64 && memcmp( p_peek, "RIFF", 4 ) ) ||
-	  memcmp( &p_peek[8], "WAVE", 4 ) )
+          memcmp( &p_peek[8], "WAVE", 4 ) )
     {
         return VLC_EGENERIC;
     }
