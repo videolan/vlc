@@ -91,6 +91,8 @@ struct picture_t
     bool            b_progressive;          /**< is it a progressive frame ? */
     bool            b_top_field_first;             /**< which field is first */
     unsigned int    i_nb_fields;                  /**< # of displayed fields */
+    void          * context;          /**< video format-specific data pointer,
+             * must point to a (void (*)(void*)) pointer to free the context */
     /**@}*/
 
     /** Private data - the video output plugin might want to put stuff here to

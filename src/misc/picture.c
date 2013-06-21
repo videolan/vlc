@@ -85,6 +85,18 @@ static int AllocatePicture( picture_t *p_pic )
 /*****************************************************************************
  *
  *****************************************************************************/
+
+static void PictureDestroyContext( picture_t *p_picture )
+{
+    void (**context)( void * ) = p_picture->context;
+    if( context != NULL )
+    {
+        void (*context_destroy)( void * ) = *context;
+        context_destroy( context );
+        p_picture->context = NULL;
+    }
+}
+
 static void PictureDestroy( picture_t *p_picture )
 {
     assert( p_picture &&
@@ -106,6 +118,7 @@ void picture_Reset( picture_t *p_picture )
     p_picture->b_progressive = false;
     p_picture->i_nb_fields = 2;
     p_picture->b_top_field_first = false;
+    PictureDestroyContext( p_picture );
 }
 
 /*****************************************************************************
@@ -271,6 +284,7 @@ void picture_Release( picture_t *p_picture )
     if( refs > 0 )
         return;
 
+    PictureDestroyContext( p_picture );
     if( p_picture->gc.pf_destroy != NULL )
         p_picture->gc.pf_destroy( p_picture );
 }
