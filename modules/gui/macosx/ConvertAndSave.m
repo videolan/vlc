@@ -339,7 +339,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 - (IBAction)switchProfile:(id)sender
 {
     NSUInteger index = [_profile_pop indexOfSelectedItem];
-    if (index < ([self.profileValueList count] - 1))
+    // last index is "custom"
+    if (index <= ([self.profileValueList count] - 1))
         [self resetCustomizationSheetBasedOnProfile:[self.profileValueList objectAtIndex:index]];
 }
 
