@@ -162,9 +162,9 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
 /*** Condition variables ***/
 enum
 {
-    CLOCK_STATIC=0, /* must be zero for VLC_STATIC_COND */
-    CLOCK_MONOTONIC,
-    CLOCK_REALTIME,
+    VLC_CLOCK_STATIC=0, /* must be zero for VLC_STATIC_COND */
+    VLC_CLOCK_MONOTONIC,
+    VLC_CLOCK_REALTIME,
 };
 
 static void vlc_cond_init_common (vlc_cond_t *p_condvar, unsigned clock)
@@ -178,12 +178,12 @@ static void vlc_cond_init_common (vlc_cond_t *p_condvar, unsigned clock)
 
 void vlc_cond_init (vlc_cond_t *p_condvar)
 {
-    vlc_cond_init_common (p_condvar, CLOCK_MONOTONIC);
+    vlc_cond_init_common (p_condvar, VLC_CLOCK_MONOTONIC);
 }
 
 void vlc_cond_init_daytime (vlc_cond_t *p_condvar)
 {
-    vlc_cond_init_common (p_condvar, CLOCK_REALTIME);
+    vlc_cond_init_common (p_condvar, VLC_CLOCK_REALTIME);
 }
 
 void vlc_cond_destroy (vlc_cond_t *p_condvar)
@@ -243,10 +243,10 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
         mtime_t total;
         switch (p_condvar->clock)
         {
-            case CLOCK_MONOTONIC:
+            case VLC_CLOCK_MONOTONIC:
                 total = mdate();
                 break;
-            case CLOCK_REALTIME: /* FIXME? sub-second precision */
+            case VLC_CLOCK_REALTIME: /* FIXME? sub-second precision */
                 total = CLOCK_FREQ * time (NULL);
                 break;
             default:
