@@ -39,7 +39,7 @@
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
-#if !defined (_POSIX_TIMERS)
+#if !defined (_POSIX_TIMERS) || defined (_WIN32)
 # define _POSIX_TIMERS (-1)
 #endif
 #if (_POSIX_TIMERS > 0)
