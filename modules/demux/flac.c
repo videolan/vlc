@@ -178,10 +178,11 @@ static void Close( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    for( int i = 0; i < p_sys->i_seekpoint; i++ )
+        vlc_seekpoint_Delete(p_sys->seekpoint[i]);
     TAB_CLEAN( p_sys->i_seekpoint, p_sys->seekpoint );
 
-    int i;
-    for( i = 0; i < p_sys->i_attachments; i++ )
+    for( int i = 0; i < p_sys->i_attachments; i++ )
         vlc_input_attachment_Delete( p_sys->attachments[i] );
     TAB_CLEAN( p_sys->i_attachments, p_sys->attachments);
 
