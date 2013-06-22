@@ -10,7 +10,7 @@
 <title>HowTo create your own skin</title>
 
 <copyright>
-<year>2004-2012</year>
+<year>2004-2013</year>
 <holder>
 the VideoLAN project
 </holder>
@@ -1180,7 +1180,7 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>WindowID.isVisible</emphasis>: True when the window whose <link linkend="windowid">id</link> is "WindowID" is visible, false otherwise.
   </para></listitem>
   <listitem><para>
-    <emphasis>LayoutID.isVisible</emphasis>: True when the layout whose <link linkend="layoutid">id</link> is "LayoutID" is the active layout in its window (even if the window is hidden), false otherwise (since VLC 0.8.6).
+    <emphasis>LayoutID.isActive</emphasis>: True when the layout whose <link linkend="layoutid">id</link> is "LayoutID" is the active layout in its window (even if the window is hidden), false otherwise (since VLC 0.8.6).
   </para></listitem>
 </itemizedlist>
 
