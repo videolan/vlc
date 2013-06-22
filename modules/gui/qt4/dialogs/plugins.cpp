@@ -387,6 +387,12 @@ QVariant ExtensionListModel::data( const QModelIndex& index, int role ) const
 
     switch( role )
     {
+    case Qt::DisplayRole:
+        return ((ExtensionCopy *)index.internalPointer())->title;
+    case Qt::DecorationRole:
+        return *((ExtensionCopy *)index.internalPointer())->icon;
+    case DescriptionRole:
+        return ((ExtensionCopy *)index.internalPointer())->shortdesc;
     default:
         return QVariant();
     }
@@ -419,9 +425,6 @@ void ExtensionItemDelegate::paint( QPainter *painter,
                                    const QStyleOptionViewItem &option,
                                    const QModelIndex &index ) const
 {
-    ExtensionCopy *ext = ( ExtensionCopy* ) index.internalPointer();
-    assert( ext != NULL );
-
     int width = option.rect.width();
 
     // Pixmap: buffer where to draw
@@ -453,10 +456,11 @@ void ExtensionItemDelegate::paint( QPainter *painter,
     QFontMetrics metrics = option.fontMetrics;
 
     // Icon
-    if( ext->icon != NULL )
+    QPixmap icon = index.data( Qt::DecorationRole ).value<QPixmap>();
+    if( !icon.isNull() )
     {
         pixpaint->drawPixmap( 7, 7, 2*metrics.height(), 2*metrics.height(),
-                              *ext->icon );
+                              icon );
     }
 
     // Title: bold
@@ -466,7 +470,7 @@ void ExtensionItemDelegate::paint( QPainter *painter,
     pixpaint->drawText( QRect( 17 + 2 * metrics.height(), 7,
                                width - 40 - 2 * metrics.height(),
                                metrics.height() ),
-                        Qt::AlignLeft, ext->title );
+                        Qt::AlignLeft, index.data( Qt::DisplayRole ).toString() );
 
     // Short description: normal
     font.setBold( false );
@@ -474,7 +478,7 @@ void ExtensionItemDelegate::paint( QPainter *painter,
     pixpaint->drawText( QRect( 17 + 2 * metrics.height(),
                                7 + metrics.height(), width - 40,
                                metrics.height() ),
-                        Qt::AlignLeft, ext->shortdesc );
+                        Qt::AlignLeft, index.data( ExtensionListModel::DescriptionRole ).toString() );
 
     // Flush paint operations
     delete pixpaint;

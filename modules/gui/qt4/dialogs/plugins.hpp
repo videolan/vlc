@@ -135,6 +135,7 @@ public:
     ExtensionListModel( QListView *view, intf_thread_t *p_intf );
     virtual ~ExtensionListModel();
 
+    static const Qt::ItemDataRole DescriptionRole = Qt::UserRole;
     virtual QVariant data( const QModelIndex& index, int role ) const;
     virtual QModelIndex index( int row, int column = 0,
                                const QModelIndex& = QModelIndex() ) const;
