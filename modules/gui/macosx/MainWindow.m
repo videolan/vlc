@@ -227,8 +227,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     SideBarItem *internetItem = [SideBarItem itemWithTitle:_NS("INTERNET") identifier:@"internet"];
 
     /* SD subnodes, inspired by the Qt4 intf */
-    char **ppsz_longnames;
-    int *p_categories;
+    char **ppsz_longnames = NULL;
+    int *p_categories = NULL;
     char **ppsz_names = vlc_sd_GetNames(pl_Get(VLCIntf), &ppsz_longnames, &p_categories);
     if (!ppsz_names)
         msg_Err(VLCIntf, "no sd item found"); //TODO
@@ -239,7 +239,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     NSMutableArray *lanItems = [[NSMutableArray alloc] init];
     NSMutableArray *mycompItems = [[NSMutableArray alloc] init];
     NSString *o_identifier;
-    for (; *ppsz_name; ppsz_name++, ppsz_longname++, p_category++) {
+    for (; ppsz_name && *ppsz_name; ppsz_name++, ppsz_longname++, p_category++) {
         o_identifier = [NSString stringWithCString: *ppsz_name encoding: NSUTF8StringEncoding];
         switch (*p_category) {
             case SD_CAT_INTERNET:
