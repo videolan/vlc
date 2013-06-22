@@ -436,47 +436,26 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
     int     i_peek;
     const uint8_t *p_peek;
     bool b_last;
-    int i_sample_rate;
+    int i_sample_rate = 0;
     int64_t i_sample_count;
-    seekpoint_t *s;
 
-    /* Read STREAMINFO */
-    i_peek = stream_Peek( p_demux->s, &p_peek, 8 );
-    if( (p_peek[4] & 0x7F) != META_STREAMINFO )
-    {
-        msg_Err( p_demux, "this isn't a STREAMINFO metadata block" );
-        return VLC_EGENERIC;
-    }
-    if( Get24bBE(&p_peek[5]) != (STREAMINFO_SIZE - 4) )
-    {
-        msg_Err( p_demux, "invalid size for a STREAMINFO metadata block" );
-        return VLC_EGENERIC;
-    }
-
-    *pi_streaminfo = 4 + STREAMINFO_SIZE;
-    *pp_streaminfo = malloc( 4 + STREAMINFO_SIZE );
-    if( *pp_streaminfo == NULL )
-        return VLC_EGENERIC;
-
-    if( stream_Read( p_demux->s, *pp_streaminfo, 4+STREAMINFO_SIZE ) != 4+STREAMINFO_SIZE )
-    {
-        msg_Err( p_demux, "failed to read STREAMINFO metadata block" );
-        free( *pp_streaminfo );
-        return VLC_EGENERIC;
-    }
-
-    /* */
-    ParseStreamInfo( &i_sample_rate, &i_sample_count, *pp_streaminfo );
-    if( i_sample_rate > 0 )
-        p_sys->i_length = i_sample_count * INT64_C(1000000)/i_sample_rate;
+    *pp_streaminfo = NULL;
 
     /* Be sure we have seekpoint 0 */
-    s = vlc_seekpoint_New();
+    seekpoint_t *s = vlc_seekpoint_New();
     s->i_time_offset = 0;
     s->i_byte_offset = 0;
     TAB_APPEND( p_sys->i_seekpoint, p_sys->seekpoint, s );
 
-    b_last = (*pp_streaminfo)[4]&0x80;
+    static const uint8_t marker[4] = { 'f', 'L', 'a', 'C' };
+    uint8_t header[4];
+    if( stream_Read( p_demux->s, header, 4) < 4)
+        return VLC_EGENERIC;
+
+    if (memcmp(header, marker, 4))
+        return VLC_EGENERIC;
+
+    b_last = 0;
     while( !b_last )
     {
         int i_len;
@@ -489,7 +468,35 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
         i_type = p_peek[0]&0x7f;
         i_len  = Get24bBE( &p_peek[1] );
 
-        if( i_type == META_SEEKTABLE )
+        if( i_type == META_STREAMINFO && !*pp_streaminfo )
+        {
+            if( i_len != (STREAMINFO_SIZE - 4) ) {
+                msg_Err( p_demux, "invalid size %d for a STREAMINFO metadata block", i_len );
+                return VLC_EGENERIC;
+            }
+            i_peek = stream_Peek( p_demux->s, &p_peek, STREAMINFO_SIZE);
+            if( i_peek == STREAMINFO_SIZE)
+
+            *pi_streaminfo = STREAMINFO_SIZE + 4;
+            *pp_streaminfo = malloc( STREAMINFO_SIZE + 4 );
+            if( *pp_streaminfo == NULL )
+                return VLC_EGENERIC;
+
+            if( stream_Read( p_demux->s, &(*pp_streaminfo)[4], STREAMINFO_SIZE ) != STREAMINFO_SIZE )
+            {
+                msg_Err( p_demux, "failed to read STREAMINFO metadata block" );
+                free( *pp_streaminfo );
+                return VLC_EGENERIC;
+            }
+
+            memcpy(*pp_streaminfo, marker, 4);
+
+            /* */
+            ParseStreamInfo( &i_sample_rate, &i_sample_count, *pp_streaminfo );
+            if( i_sample_rate > 0 )
+                p_sys->i_length = i_sample_count * INT64_C(1000000)/i_sample_rate;
+        }
+        else if( i_type == META_SEEKTABLE )
         {
             i_peek = stream_Peek( p_demux->s, &p_peek, 4+i_len );
             if( i_peek == 4+i_len )
@@ -514,6 +521,9 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
 
     /* */
     p_sys->i_data_pos = stream_Tell( p_demux->s );
+
+    if (!*pp_streaminfo)
+        return VLC_EGENERIC;
 
     return VLC_SUCCESS;
 }
