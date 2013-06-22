@@ -971,19 +971,19 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     bool is_direct = vout->p->decoder_pool == vout->p->display_pool;
     picture_t *todisplay = filtered;
     if (do_early_spu && subpic) {
-        todisplay = picture_pool_Get(vout->p->private_pool);
-        if (todisplay) {
-            VideoFormatCopyCropAr(&todisplay->format, &filtered->format);
-            picture_Copy(todisplay, filtered);
-            if (vout->p->spu_blend)
-                picture_BlendSubpicture(todisplay, vout->p->spu_blend, subpic);
+        picture_t *blent = picture_pool_Get(vout->p->private_pool);
+        if (blent) {
+            VideoFormatCopyCropAr(&blent->format, &filtered->format);
+            picture_Copy(blent, filtered);
+            if (vout->p->spu_blend) {
+                picture_BlendSubpicture(blent, vout->p->spu_blend, subpic);
+                picture_Release(todisplay);
+                todisplay = blent;
+            } else
+                picture_Release(blent);
         }
-        picture_Release(filtered);
         subpicture_Delete(subpic);
         subpic = NULL;
-
-        if (!todisplay)
-            return VLC_EGENERIC;
     }
 
     assert(vout_IsDisplayFiltered(vd) == !sys->display.use_dr);
