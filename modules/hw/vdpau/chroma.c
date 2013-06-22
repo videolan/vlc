@@ -209,6 +209,7 @@ error:
 
 static picture_t *VideoPassthrough(filter_t *filter, picture_t *src)
 {
+    filter_sys_t *sys = filter->p_sys;
     vlc_vdp_video_t *psys = src->context;
 
     if (unlikely(psys == NULL))
@@ -216,7 +217,24 @@ static picture_t *VideoPassthrough(filter_t *filter, picture_t *src)
         msg_Err(filter, "corrupt VDPAU video surface");
         return NULL;
     }
-    /* FIXME: deal with mismatched VDPAU devices */
+
+    /* Corner case: different VDPAU instances decoding and rendering */
+    if (psys->vdp != sys->vdp)
+    {
+        video_format_t fmt = src->format;
+        fmt.i_chroma = (sys->chroma == VDP_CHROMA_TYPE_420)
+            ? VLC_CODEC_UYVY : VLC_CODEC_NV12;
+
+        picture_t *pic = picture_NewFromFormat(&fmt);
+        if (unlikely(pic == NULL))
+            return NULL;
+
+        pic = VideoExport(filter, src, pic);
+        if (pic == NULL)
+            return NULL;
+
+        src = VideoImport(filter, pic);
+    }
     return src;
 }
 
@@ -289,12 +307,14 @@ static int OutputOpen(vlc_object_t *obj)
     if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_422)
     {
         sys->chroma = VDP_CHROMA_TYPE_422;
+        sys->format = VDP_YCBCR_FORMAT_UYVY;
         sys->import = VideoPassthrough;
     }
     else
     if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_420)
     {
         sys->chroma = VDP_CHROMA_TYPE_420;
+        sys->format = VDP_YCBCR_FORMAT_NV12;
         sys->import = VideoPassthrough;
     }
     else
