@@ -26,7 +26,7 @@ if HAVE_AVCODEC_VDPAU
 libvlc_LTLIBRARIES += libvdpau_avcodec_plugin.la
 endif
 
-libvdpau_chroma_plugin_la_SOURCES = chroma.c
+libvdpau_chroma_plugin_la_SOURCES = chroma.c picture.c
 libvdpau_chroma_plugin_la_CFLAGS = $(AM_CFLAGS) # dummy
 libvdpau_chroma_plugin_la_LIBADD = $(AM_LIBADD)
 libvlc_LTLIBRARIES += libvdpau_chroma_plugin.la

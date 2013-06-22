@@ -242,7 +242,7 @@ struct picture_sys_t
 {
     VdpOutputSurface surface;
     VdpDevice device;
-    const vdp_t *vdp;
+    vdp_t *vdp;
 };
 
 typedef struct vlc_vdp_video
