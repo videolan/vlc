@@ -975,8 +975,8 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         if (blent) {
             VideoFormatCopyCropAr(&blent->format, &filtered->format);
             picture_Copy(blent, filtered);
-            if (vout->p->spu_blend) {
-                picture_BlendSubpicture(blent, vout->p->spu_blend, subpic);
+            if (vout->p->spu_blend
+             && picture_BlendSubpicture(blent, vout->p->spu_blend, subpic)) {
                 picture_Release(todisplay);
                 todisplay = blent;
             } else
