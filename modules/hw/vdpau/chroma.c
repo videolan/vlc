@@ -102,6 +102,42 @@ error:
     return NULL;
 }
 
+/** Export a VDPAU video surface picture to a normal VLC picture */
+static picture_t *VideoExport(filter_t *filter, picture_t *src, picture_t *dst)
+{
+    filter_sys_t *sys = filter->p_sys;
+    vlc_vdp_video_t *psys = src->context;
+    VdpStatus err;
+    VdpVideoSurface surface = psys->surface;
+    void *planes[3];
+    uint32_t pitches[3];
+
+    for (int i = 0; i < dst->i_planes; i++)
+    {
+        planes[i] = dst->p[i].p_pixels;
+        pitches[i] = dst->p[i].i_pitch;
+    }
+    if (dst->format.i_chroma == VLC_CODEC_I420)
+    {
+        planes[1] = dst->p[2].p_pixels;
+        planes[2] = dst->p[1].p_pixels;
+        pitches[1] = dst->p[2].i_pitch;
+        pitches[2] = dst->p[1].i_pitch;
+    }
+    err = vdp_video_surface_get_bits_y_cb_cr(psys->vdp, surface, sys->format,
+                                             planes, pitches);
+    if (err != VDP_STATUS_OK)
+    {
+        msg_Err(filter, "video %s %s failure: %s", "surface", "export",
+                vdp_get_error_string(psys->vdp, err));
+        picture_Release(dst);
+        dst = NULL;
+    }
+    picture_CopyProperties(dst, src);
+    picture_Release(src);
+    return dst;
+}
+
 /** Import VLC picture into VDPAU video surface */
 static VdpVideoSurface VideoImport(filter_t *filter, picture_t *src)
 {
@@ -192,10 +228,9 @@ out:
     return dst;
 }
 
-static int Open(vlc_object_t *obj)
+static int OutputOpen(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
-
     if (filter->fmt_out.video.i_chroma != VLC_CODEC_VDPAU_OUTPUT)
         return VLC_EGENERIC;
 
@@ -225,7 +260,7 @@ static int Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
-static void Close(vlc_object_t *obj)
+static void OutputClose(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
     filter_sys_t *sys = filter->p_sys;
@@ -236,11 +271,70 @@ static void Close(vlc_object_t *obj)
     free(sys);
 }
 
+static picture_t *VideoExport_Filter(filter_t *filter, picture_t *src)
+{
+    if (unlikely(src->context == NULL))
+    {
+        msg_Err(filter, "corrupt VDPAU video surface %p", src);
+        picture_Release(src);
+        return NULL;
+    }
+
+    picture_t *dst = filter_NewPicture(filter);
+    if (dst == NULL)
+        return NULL;
+
+    return VideoExport(filter, src, dst);
+}
+
+static int YCbCrOpen(vlc_object_t *obj)
+{
+    filter_t *filter = (filter_t *)obj;
+    if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
+     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_422)
+        return VLC_EGENERIC;
+
+    if (filter->fmt_in.video.i_visible_width
+                                       != filter->fmt_out.video.i_visible_width
+     || filter->fmt_in.video.i_visible_height
+                                      != filter->fmt_out.video.i_visible_height
+     || filter->fmt_in.video.i_x_offset != filter->fmt_out.video.i_x_offset
+     || filter->fmt_in.video.i_y_offset != filter->fmt_out.video.i_y_offset
+     || (filter->fmt_in.video.i_sar_num * filter->fmt_out.video.i_sar_den
+          != filter->fmt_in.video.i_sar_den * filter->fmt_out.video.i_sar_num))
+        return VLC_EGENERIC;
+
+    filter_sys_t *sys = malloc(sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
+    if (!vlc_fourcc_to_vdp_ycc(filter->fmt_out.video.i_chroma,
+                               &sys->chroma, &sys->format))
+    {
+        free(sys);
+        return VLC_EGENERIC;
+    }
+
+    filter->pf_video_filter = VideoExport_Filter;
+    filter->p_sys = sys;
+    return VLC_SUCCESS;
+}
+
+static void YCbCrClose(vlc_object_t *obj)
+{
+    filter_t *filter = (filter_t *)obj;
+    filter_sys_t *sys = filter->p_sys;
+
+    free(sys);
+}
+
 vlc_module_begin()
     set_shortname(N_("VDPAU"))
     set_description(N_("VDPAU surface conversions"))
     set_capability("video filter2", 10)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_callbacks(Open, Close)
+    set_callbacks(OutputOpen, OutputClose)
+    add_submodule()
+    set_callbacks(YCbCrOpen, YCbCrClose)
 vlc_module_end()
