@@ -15,6 +15,10 @@ $(TARBALLS)/gettext-$(GETTEXT_VERSION).tar.gz:
 
 gettext: gettext-$(GETTEXT_VERSION).tar.gz .sum-gettext
 	$(UNPACK)
+ifdef HAVE_MACOSX
+	# detect libintl correctly in configure for static library
+	sed -i.orig  's/$$LIBS $$LIBINTL/$$LIBS $$LIBINTL $$INTL_MACOSX_LIBS/' gettext-$(GETTEXT_VERSION)/gettext-runtime/m4/gettext.m4
+endif
 	$(MOVE)
 
 DEPS_gettext = iconv $(DEPS_iconv)
@@ -31,10 +35,6 @@ ifdef HAVE_WIN32
 else
 	(cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-java --disable-native-java --without-emacs)
 	(cd $< && $(MAKE) -C gettext-runtime install && $(MAKE) -C gettext-tools/intl && $(MAKE) -C gettext-tools/libgrep && $(MAKE) -C gettext-tools/gnulib-lib && $(MAKE) -C gettext-tools/src install && $(MAKE) -C gettext-tools/misc install && $(MAKE) -C gettext-tools/m4 install)
-endif
-ifdef HAVE_MACOSX
-	# detect libintl correctly in configure for static library
-	(cd $(PREFIX)/share/aclocal; sed -i.orig  '184s/$$LIBINTL/$$LIBINTL $$INTL_MACOSX_LIBS/' gettext.m4)
 endif
 	touch $@
 
