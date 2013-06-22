@@ -244,4 +244,19 @@ struct picture_sys_t
     VdpDevice device;
     const vdp_t *vdp;
 };
+
+typedef struct vlc_vdp_video
+{
+    void (*destroy)(void *); /* must be first @ref picture_Release() */
+    VdpVideoSurface surface;
+    VdpDevice device;
+    vdp_t *vdp;
+} vlc_vdp_video_t;
+
+/**
+ * Attaches a VDPAU video surface as context of a VLC picture.
+ * @note In case of error, the surface is destroyed immediately. Otherwise,
+ * it will be destroyed at the same time as the picture it was attached to.
+ */
+VdpStatus vlc_vdp_video_attach(vdp_t *, VdpVideoSurface, picture_t *);
 #endif
