@@ -29,6 +29,10 @@
 /* for the icon in our custom error panel */
 #import <ApplicationServices/ApplicationServices.h>
 
+NSString *toNSStr(const char *str) {
+    return str != NULL ? @(str) : @"";
+}
+
 /*****************************************************************************
  * VLCCoreDialogProvider implementation
  *****************************************************************************/
@@ -87,7 +91,7 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
 {
     dialog_fatal_t *p_dialog = [o_value pointerValue];
 
-    [o_error_panel addError: @(p_dialog->title) withMsg: @(p_dialog->message)];
+    [o_error_panel addError: toNSStr(p_dialog->title) withMsg: toNSStr(p_dialog->message)];
     [o_error_panel showPanel];
 }
 
@@ -96,7 +100,7 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     dialog_fatal_t *p_dialog = [o_value pointerValue];
     NSAlert *o_alert;
 
-    o_alert = [NSAlert alertWithMessageText: @(p_dialog->title) defaultButton: _NS("OK") alternateButton: nil otherButton: nil informativeTextWithFormat: @"%s", p_dialog->message];
+    o_alert = [NSAlert alertWithMessageText: toNSStr(p_dialog->title) defaultButton: _NS("OK") alternateButton: nil otherButton: nil informativeTextWithFormat: @"%s", p_dialog->message];
     [o_alert setAlertStyle: NSCriticalAlertStyle];
     [o_alert runModal];
 }
@@ -105,17 +109,9 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
 {
     dialog_question_t *p_dialog = [o_value pointerValue];
     NSAlert *o_alert;
-    NSString *o_yes, *o_no, *o_cancel;
     NSInteger i_returnValue = 0;
-
-    if (p_dialog->yes != NULL)
-        o_yes = @(p_dialog->yes);
-    if (p_dialog->no != NULL)
-        o_no = @(p_dialog->no);
-    if (p_dialog->cancel != NULL)
-        o_cancel = @(p_dialog->cancel);
-
-    o_alert = [NSAlert alertWithMessageText: @(p_dialog->title) defaultButton: o_yes alternateButton:o_no otherButton: o_cancel informativeTextWithFormat: @"%s", p_dialog->message];
+  
+    o_alert = [NSAlert alertWithMessageText: toNSStr(p_dialog->title) defaultButton: toNSStr(p_dialog->yes) alternateButton: toNSStr(p_dialog->no) otherButton: toNSStr(p_dialog->cancel) informativeTextWithFormat: @"%s", p_dialog->message];
     [o_alert setAlertStyle: NSInformationalAlertStyle];
     i_returnValue = [o_alert runModal];
 
@@ -132,9 +128,9 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     dialog_login_t *p_dialog = [o_value pointerValue];
     NSInteger i_returnValue = 0;
 
-    [o_auth_title_txt setStringValue: @(p_dialog->title)];
-    [o_auth_win setTitle: @(p_dialog->title)];
-    [o_auth_description_txt setStringValue: @(p_dialog->message)];
+    [o_auth_title_txt setStringValue: toNSStr(p_dialog->title)];
+    [o_auth_win setTitle: toNSStr(p_dialog->title)];
+    [o_auth_description_txt setStringValue: toNSStr(p_dialog->message)];
     [o_auth_login_fld setStringValue: @""];
     [o_auth_pw_fld setStringValue: @""];
 
@@ -164,26 +160,18 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     b_progress_cancelled = NO;
 
     dialog_progress_bar_t *p_dialog = [o_value pointerValue];
-
     if (!p_dialog || b_progress_cancelled)
         return;
 
-    if (p_dialog->title != NULL)
-    {
-        [o_prog_win setTitle: @(p_dialog->title)];
-        [o_prog_title_txt setStringValue: @(p_dialog->title)];
-    } else {
-        [o_prog_win setTitle: @""];
-        [o_prog_title_txt setStringValue: @""];
-    }
+    [o_prog_win setTitle: toNSStr(p_dialog->title)];
+    [o_prog_title_txt setStringValue: toNSStr(p_dialog->title)];
+
     if (p_dialog->cancel != NULL)
         [o_prog_cancel_btn setTitle: @(p_dialog->cancel)];
     else
         [o_prog_cancel_btn setTitle: _NS("Cancel")];
-    if (p_dialog->message != NULL)
-        [o_prog_description_txt setStringValue: @(p_dialog->message)];
-    else
-        [o_prog_description_txt setStringValue: @""];
+
+    [o_prog_description_txt setStringValue: toNSStr(p_dialog->message)];
 
     if (VLCIntf)
         [self performSelector:@selector(showProgressDialog:) withObject: o_value afterDelay:3.00];
