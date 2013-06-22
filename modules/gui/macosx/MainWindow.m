@@ -914,7 +914,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (NSInteger)sourceList:(PXSourceList*)aSourceList badgeValueForItem:(id)item
 {
     playlist_t * p_playlist = pl_Get(VLCIntf);
-    NSInteger i_playlist_size;
+    NSInteger i_playlist_size = 0;
 
     if ([[item identifier] isEqualToString: @"playlist"]) {
         PL_LOCK;
@@ -925,7 +925,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
     if ([[item identifier] isEqualToString: @"medialibrary"]) {
         PL_LOCK;
-        i_playlist_size = p_playlist->p_ml_category->i_children;
+        if (p_playlist->p_ml_category)
+            i_playlist_size = p_playlist->p_ml_category->i_children;
         PL_UNLOCK;
 
         return i_playlist_size;
@@ -1014,7 +1015,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if ([[item identifier] isEqualToString:@"playlist"]) {
         [[[VLCMain sharedInstance] playlist] setPlaylistRoot:p_playlist->p_local_category];
     } else if ([[item identifier] isEqualToString:@"medialibrary"]) {
-        [[[VLCMain sharedInstance] playlist] setPlaylistRoot:p_playlist->p_ml_category];
+        if (p_playlist->p_ml_category)
+            [[[VLCMain sharedInstance] playlist] setPlaylistRoot:p_playlist->p_ml_category];
     } else {
         playlist_item_t * pl_item;
         PL_LOCK;
