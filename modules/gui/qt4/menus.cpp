@@ -974,7 +974,6 @@ void VLCMenuBar::MiscPopupMenu( intf_thread_t *p_intf, bool show )
     menu = new QMenu();
     if( p_input )
     {
-        varnames.append( "audio-es" );
         InputAutoMenuBuilder( p_input, objects, varnames );
         menu->addSeparator();
     }
