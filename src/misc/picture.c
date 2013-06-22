@@ -435,21 +435,24 @@ int picture_Export( vlc_object_t *p_obj,
     return VLC_SUCCESS;
 }
 
-void picture_BlendSubpicture(picture_t *dst,
-                             filter_t *blend, subpicture_t *src)
+unsigned picture_BlendSubpicture(picture_t *dst,
+                                 filter_t *blend, subpicture_t *src)
 {
+    unsigned done = 0;
+
     assert(src && !src->b_fade && src->b_absolute);
 
     for (subpicture_region_t *r = src->p_region; r != NULL; r = r->p_next) {
         assert(r->p_picture && r->i_align == 0);
-        if (filter_ConfigureBlend(blend, dst->format.i_width, dst->format.i_height,
-                                  &r->fmt) ||
-            filter_Blend(blend, dst,
-                         r->i_x, r->i_y, r->p_picture,
-                         src->i_alpha * r->i_alpha / 255)) {
+        if (filter_ConfigureBlend(blend, dst->format.i_width,
+                                  dst->format.i_height,  &r->fmt)
+         || filter_Blend(blend, dst, r->i_x, r->i_y, r->p_picture,
+                         src->i_alpha * r->i_alpha / 255))
             msg_Err(blend, "blending %4.4s to %4.4s failed",
                     (char *)&blend->fmt_in.video.i_chroma,
                     (char *)&blend->fmt_out.video.i_chroma );
-        }
+        else
+            done++;
     }
+    return done;
 }
