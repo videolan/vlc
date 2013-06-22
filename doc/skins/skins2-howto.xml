@@ -505,12 +505,12 @@ difficulty to understand how VLC skins work.</para>
   </sect3>
   <sect3 id="xoffset">
     <title>xoffset</title>
-    <para>Coupled with position and xmargin, this parameter moves the widget horizontally by this offset from the position computed above.</para>
+    <para>Coupled with position and xmargin, this parameter moves the widget horizontally by this offset from the position computed above. From VLC2.1.0 on, xoffset can directly be used without position, in which case percentage is computed against the current object instead of the upper container</para>
     <para>Default value: 0</para>
   </sect3>
   <sect3 id="yoffset">
     <title>yoffset</title>
-    <para>Coupled with position and ymargin, this parameter moves the widget vertically by this offset from the position computed above.</para>
+    <para>Coupled with position and ymargin, this parameter moves the widget vertically by this offset from the position computed above. From VLC2.1.0 on, yoffset can directly be used without position, in which case percentage is computed against the current object instead of the upper container</para>
     <para>Default value: 0</para>
   </sect3>
 </sect2>
