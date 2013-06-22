@@ -493,24 +493,24 @@ difficulty to understand how VLC skins work.</para>
     <para>Relative placement of windows or widget within their respective container(screen for windows, layout or panel for widgets). This placement is given with a geographical qualifier. Possible values are "Center", "North", "NorthWest", ....The skin engine computes the size of the element (from the width and height parameters) then places it at the center or sticks it to a given border depending on the geographical qualifer.</para>
     <para>Default value: -1(N/A)</para>
   </sect3>
-  <sect3 id="x-margin">
-    <title>x-margin</title>
-    <para>Coupled with position, x-margin allows for a horizontal margin instead of just sticking to the border. It can be given in pixels or in percentage of the width of the container.</para>
+  <sect3 id="xmargin">
+    <title>xmargin</title>
+    <para>Coupled with position, xmargin allows for a horizontal margin instead of just sticking to the border. It can be given in pixels or in percentage of the width of the container.</para>
     <para>Default value: 0</para>
   </sect3>
-  <sect3 id="y-margin">
-    <title>y-margin</title>
-    <para>Coupled with position, y-margin allows for a vertical margin instead of just sticking to the border. It can be given in pixels or in percentage of the height of the container.</para>
+  <sect3 id="ymargin">
+    <title>ymargin</title>
+    <para>Coupled with position, ymargin allows for a vertical margin instead of just sticking to the border. It can be given in pixels or in percentage of the height of the container.</para>
     <para>Default value: 0</para>
   </sect3>
-  <sect3 id="x-offset">
-    <title>x-offset</title>
-    <para>Coupled with position and x-margin, this parameter moves the widget horizontally by this offset from the position computed above.</para>
+  <sect3 id="xoffset">
+    <title>xoffset</title>
+    <para>Coupled with position and xmargin, this parameter moves the widget horizontally by this offset from the position computed above.</para>
     <para>Default value: 0</para>
   </sect3>
-  <sect3 id="y-offset">
-    <title>y-offset</title>
-    <para>Coupled with position and y-margin, this parameter moves the widget vertically by this offset from the position computed above.</para>
+  <sect3 id="yoffset">
+    <title>yoffset</title>
+    <para>Coupled with position and ymargin, this parameter moves the widget vertically by this offset from the position computed above.</para>
     <para>Default value: 0</para>
   </sect3>
 </sect2>
