@@ -82,6 +82,8 @@ struct intf_sys_t
 {
     intf_thread_t *p_intf;      /* The main intf object */
     input_thread_t *p_current_input, *p_input_changed;
+    BOOL launched;              /* finishedLaunching */
+    int items_at_launch;        /* items in playlist after launch */
     id o_mainmenu;              /* VLCMainMenu */
     id o_prefs;                 /* VLCPrefs       */
     id o_sprefs;                /* VLCSimplePrefs */
