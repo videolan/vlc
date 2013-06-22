@@ -959,33 +959,45 @@ void SkinParser::convertPosition( string position, string xOffset,
                           int refWidth, int refHeight, int* p_x, int* p_y )
 {
     int iPosition = getPosition( position );
-    if( iPosition == POS_UNDEF )
-        return;
+    if( iPosition != POS_UNDEF )
+    {
+        // compute offset against the parent object size
+        // for backward compatibility
+        int i_xOffset = getDimension( xOffset, refWidth );
+        int i_yOffset = getDimension( yOffset, refHeight );
+        int i_xMargin = getDimension( xMargin, refWidth );
+        int i_yMargin = getDimension( yMargin, refHeight );
 
-    int i_xOffset = getDimension( xOffset, refWidth );
-    int i_yOffset = getDimension( yOffset, refHeight );
-    int i_xMargin = getDimension( xMargin, refWidth );
-    int i_yMargin = getDimension( yMargin, refHeight );
+        // compute *p_x
+        if( iPosition & POS_LEFT )
+            *p_x = i_xMargin;
+        else if( iPosition & POS_RIGHT )
+            *p_x = refWidth - width - i_xMargin;
+        else
+            *p_x = ( refWidth - width ) / 2;
 
-   // compute *p_x
-   if( iPosition & POS_LEFT )
-       *p_x = i_xMargin;
-   else if( iPosition & POS_RIGHT )
-       *p_x = refWidth - width - i_xMargin;
-   else
-       *p_x = ( refWidth - width ) / 2;
+        // compute *p_y
+        if( iPosition & POS_TOP )
+            *p_y = i_yMargin;
+        else if( iPosition & POS_BOTTOM )
+            *p_y = refHeight - height - i_yMargin;
+        else
+            *p_y = ( refHeight - height ) / 2;
 
-   // compute *p_y
-   if( iPosition & POS_TOP )
-       *p_y = i_yMargin;
-   else if( iPosition & POS_BOTTOM )
-       *p_y = refHeight - height - i_yMargin;
-   else
-       *p_y = ( refHeight - height ) / 2;
+        // add offset
+        *p_x += i_xOffset;
+        *p_y += i_yOffset;
+    }
+    else
+    {
+        // compute offset against the current object size
+        int i_xOffset = getDimension( xOffset, width );
+        int i_yOffset = getDimension( yOffset, height );
 
-    // add offset
-    *p_x += i_xOffset;
-    *p_y += i_yOffset;
+        // add offset
+        *p_x += i_xOffset;
+        *p_y += i_yOffset;
+    }
 }
 
 
