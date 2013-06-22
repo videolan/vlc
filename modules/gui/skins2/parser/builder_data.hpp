@@ -396,13 +396,15 @@ m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( lef
     /// Type definition
     struct Slider
     {
-        Slider( const string & id, const string & visible, int xPos, int yPos, const string & leftTop, const string & rightBottom, bool xKeepRatio, bool yKeepRatio, const string & upId, const string & downId, const string & overId, const string & points, int thickness, const string & value, const string & imageId, int nbHoriz, int nbVert, int padHoriz, int padVert, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId, const string & panelId ):
-m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_xKeepRatio( xKeepRatio ), m_yKeepRatio( yKeepRatio ), m_upId( upId ), m_downId( downId ), m_overId( overId ), m_points( points ), m_thickness( thickness ), m_value( value ), m_imageId( imageId ), m_nbHoriz( nbHoriz ), m_nbVert( nbVert ), m_padHoriz( padHoriz ), m_padVert( padVert ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ), m_panelId( panelId ) {}
+        Slider( const string & id, const string & visible, int xPos, int yPos, int width, int height, const string & leftTop, const string & rightBottom, bool xKeepRatio, bool yKeepRatio, const string & upId, const string & downId, const string & overId, const string & points, int thickness, const string & value, const string & imageId, int nbHoriz, int nbVert, int padHoriz, int padVert, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId, const string & panelId ):
+m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_xKeepRatio( xKeepRatio ), m_yKeepRatio( yKeepRatio ), m_upId( upId ), m_downId( downId ), m_overId( overId ), m_points( points ), m_thickness( thickness ), m_value( value ), m_imageId( imageId ), m_nbHoriz( nbHoriz ), m_nbVert( nbVert ), m_padHoriz( padHoriz ), m_padVert( padVert ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ), m_panelId( panelId ) {}
 
         string m_id;
         string m_visible;
         int m_xPos;
         int m_yPos;
+        int m_width;
+        int m_height;
         string m_leftTop;
         string m_rightBottom;
         bool m_xKeepRatio;

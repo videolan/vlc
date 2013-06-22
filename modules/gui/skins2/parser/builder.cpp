@@ -902,12 +902,13 @@ void Builder::addSlider( const BuilderData::Slider &rData )
     m_pTheme->m_controls[rData.m_id + "_bg"] = CtrlGenericPtr( pBackground );
 
     // Compute the position of the control
+    int width = (rData.m_width > 0) ? rData.m_width : pCurve->getWidth();
+    int height = (rData.m_height > 0) ? rData.m_height : pCurve->getHeight();
     const GenericRect *pRect;
     GET_BOX( pRect, rData.m_panelId , pLayout);
     const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,
                                        rData.m_xPos, rData.m_yPos,
-                                       pCurve->getWidth(), pCurve->getHeight(),
-                                       *pRect,
+                                       width, height, *pRect,
                                        rData.m_xKeepRatio, rData.m_yKeepRatio );
 
     pLayout->addControl( pBackground, pos, rData.m_layer );

@@ -200,6 +200,8 @@
         visible     CDATA   "true"
         x           CDATA   "0"
         y           CDATA   "0"
+        width       CDATA   "-1"
+        height      CDATA   "-1"
         lefttop     CDATA   "lefttop"
         rightbottom CDATA   "lefttop"
         xkeepratio  CDATA   "false"

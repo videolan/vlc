@@ -556,6 +556,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         DefaultAttr( attr, "visible", "true" );
         DefaultAttr( attr, "x", "0" );
         DefaultAttr( attr, "y", "0" );
+        DefaultAttr( attr, "width", "-1" );
+        DefaultAttr( attr, "height", "-1" );
         DefaultAttr( attr, "lefttop", "lefttop" );
         DefaultAttr( attr, "rightbottom", "lefttop" );
         DefaultAttr( attr, "xkeepratio", "false" );
@@ -578,9 +580,11 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         getRefDimensions( refWidth, refHeight, false );
         int x = getDimension( attr["x"], refWidth );
         int y = getDimension( attr["y"], refHeight );
+        int width = getDimension( attr["width"], refWidth );
+        int height = getDimension( attr["height"], refHeight );
         const BuilderData::Slider slider( uniqueId( attr["id"] ),
-                attr["visible"], x + m_xOffset,
-                y + m_yOffset, attr["lefttop"],
+                attr["visible"], x + m_xOffset, y + m_yOffset,
+                width, height, attr["lefttop"],
                 attr["rightbottom"], convertBoolean( attr["xkeepratio"] ),
                 convertBoolean( attr["ykeepratio"] ), attr["up"], attr["down"],
                 attr["over"], attr["points"], atoi( attr["thickness"] ),
