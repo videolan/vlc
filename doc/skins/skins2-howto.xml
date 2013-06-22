@@ -524,6 +524,16 @@ difficulty to understand how VLC skins work.</para>
     <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>.</para>
     <para><emphasis>Required.</emphasis></para>
   </sect3>
+  <sect3 id="imagewidth">
+    <title>width</title>
+    <para>Width of the image. If set, this width supersedes the actual width of the image. The initial resizing takes the resize policy into account</para>
+    <para>Default value: -1</para>
+  </sect3>
+  <sect3 id="imageheight">
+    <title>height</title>
+    <para>Height of the image. If set, this height supersedes the actual height of the image. The initial resizing takes the resize policy into account</para>
+    <para>Default value: -1</para>
+  </sect3>
   <sect3 id="imageresize">
     <title>resize</title>
     <para>Since VLC 0.8.2. Specify the behaviour of the image when it is resized. Possible values are 'mosaic' (the image is repeated as many times as necessary to reach the wanted dimensions) and 'scale' (the image is actually rescaled). Beware that the 'scale' behaviour is much slower than the 'mosaic' one, so make sure to use it only when it's really needed.</para>
@@ -713,6 +723,16 @@ difficulty to understand how VLC skins work.</para>
     <title>value</title>
     <para>Variable controlled by the slider. This must be a <link linkend="percent">percentage variable</link>, e.g "volume" or "time" (only exception: the <link linkend="Slider">Slider</link> defined inside the <link linkend="Playtree">Playtree</link> tag does not need to set this attribute).</para>
     <para>Default value: none</para>
+  </sect3>
+  <sect3 id="sliderwidth">
+    <title>width</title>
+    <para>Width of the slider. If set, this width supersedes the actual width of the slider computed from the curve width. (new after VLC 2.1.0)</para>
+    <para>Default value: -1</para>
+  </sect3>
+  <sect3 id="sliderheight">
+    <title>height</title>
+    <para>Height of the slider. If set, this height supersedes the actual height of the slider computed from the curve height. (new after VLC 2.1.0)</para>
+    <para>Default value: -1</para>
   </sect3>
   <sect3 id="slidertooltiptext">
     <title>tooltiptext</title>
