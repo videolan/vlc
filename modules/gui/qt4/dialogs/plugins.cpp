@@ -307,7 +307,7 @@ public:
         url = qfu( p_ext->psz_url );
         icon = loadPixmapFromData( p_ext->p_icondata, p_ext->i_icondata_size );
     }
-    ~ExtensionCopy() {}
+    ~ExtensionCopy() { delete icon; }
 
     QString name, title, description, shortdesc, author, version, url;
     QPixmap *icon;
