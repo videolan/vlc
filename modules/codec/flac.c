@@ -379,9 +379,26 @@ static void ProcessHeader( decoder_t *p_dec )
 
     /* Decode STREAMINFO */
     msg_Dbg( p_dec, "decode STREAMINFO" );
-    p_sys->p_block = block_Alloc( p_dec->fmt_in.i_extra );
-    memcpy( p_sys->p_block->p_buffer, p_dec->fmt_in.p_extra,
-            p_dec->fmt_in.i_extra );
+    size_t i_extra = p_dec->fmt_in.i_extra;
+    switch (i_extra) {
+    case 34:
+        p_sys->p_block = block_Alloc( 8 + i_extra );
+        memcpy( p_sys->p_block->p_buffer + 8, p_dec->fmt_in.p_extra, i_extra );
+        memcpy( p_sys->p_block->p_buffer, "fLaC", 4);
+        uint8_t *p = p_sys->p_block->p_buffer;
+        p[4] = 0; /* STREAMINFO */
+        p[5] = 0;
+        p[6] = 0;
+        p[7] = 34; /* block size */
+        break;
+    case 42:
+        p_sys->p_block = block_Alloc( i_extra );
+        memcpy( p_sys->p_block->p_buffer, p_dec->fmt_in.p_extra, i_extra );
+        break;
+    default:
+        msg_Err(p_dec, "Invalid flac header size %zu\n", i_extra);
+        return;
+    }
     FLAC__stream_decoder_process_until_end_of_metadata( p_sys->p_flac );
     msg_Dbg( p_dec, "STREAMINFO decoded" );
 }
