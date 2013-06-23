@@ -228,16 +228,14 @@ ExtensionTab::ExtensionTab( intf_thread_t *p_intf_ )
     extList->setModel( model );
 
     // Buttons' layout
-    QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->addItem( new QSpacerItem( 1, 1, QSizePolicy::Expanding,
-                                    QSizePolicy::Fixed ) );
+    QDialogButtonBox *buttonsBox = new QDialogButtonBox;
 
     // More information button
     butMoreInfo = new QPushButton( QIcon( ":/menu/info" ),
                                    qtr( "More information..." ),
                                    this );
     CONNECT( butMoreInfo, clicked(), this, moreInformation() );
-    hbox->addWidget( butMoreInfo );
+    buttonsBox->addButton( butMoreInfo, QDialogButtonBox::ActionRole );
 
     // Reload button
     ExtensionsManager *EM = ExtensionsManager::getInstance( p_intf );
@@ -250,10 +248,9 @@ ExtensionTab::ExtensionTab( intf_thread_t *p_intf_ )
              selectionChanged( const QItemSelection &, const QItemSelection & ),
              this,
              updateButtons() );
-    hbox->addWidget( reload );
+    buttonsBox->addButton( reload, QDialogButtonBox::ResetRole );
 
-    // Add buttons hbox
-    layout->addItem( hbox );
+    layout->addWidget( buttonsBox );
     updateButtons();
 }
 
