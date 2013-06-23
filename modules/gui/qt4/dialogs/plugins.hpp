@@ -132,10 +132,32 @@ class ExtensionListModel : public QAbstractListModel
     Q_OBJECT
 
 public:
+    /* Safe copy of the extension_t struct */
+    class ExtensionCopy
+    {
+
+    public:
+        ExtensionCopy( extension_t * );
+        ~ExtensionCopy();
+        QVariant data( int role ) const;
+
+    private:
+        QString name, title, description, shortdesc, author, version, url;
+        QPixmap *icon;
+    };
+
     ExtensionListModel( QListView *view, intf_thread_t *p_intf );
     virtual ~ExtensionListModel();
 
-    static const Qt::ItemDataRole DescriptionRole = Qt::UserRole;
+    enum
+    {
+        DescriptionRole = Qt::UserRole,
+        VersionRole,
+        AuthorRole,
+        LinkRole,
+        NameRole
+    };
+
     virtual QVariant data( const QModelIndex& index, int role ) const;
     virtual QModelIndex index( int row, int column = 0,
                                const QModelIndex& = QModelIndex() ) const;
@@ -145,6 +167,7 @@ private slots:
     void updateList();
 
 private:
+
     intf_thread_t *p_intf;
     QList<ExtensionCopy*> extensions;
 };
@@ -169,7 +192,7 @@ private:
 class ExtensionInfoDialog : public QVLCDialog
 {
 public:
-    ExtensionInfoDialog( const ExtensionCopy& extension,
+    ExtensionInfoDialog( const QModelIndex &index,
                          intf_thread_t *p_intf, QWidget *parent );
 };
 

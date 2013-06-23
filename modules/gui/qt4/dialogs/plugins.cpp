@@ -280,38 +280,58 @@ void ExtensionTab::keyPressEvent( QKeyEvent *keyEvent )
 void ExtensionTab::moreInformation()
 {
     QModelIndex index = extList->selectionModel()->selectedIndexes().first();
-    ExtensionCopy *ext = (ExtensionCopy*) index.internalPointer();
-    if( !ext )
+
+    if( !index.isValid() )
         return;
 
-    ExtensionInfoDialog dlg( *ext, p_intf, this );
+    ExtensionInfoDialog dlg( index, p_intf, this );
     dlg.exec();
 }
 
 /* Safe copy of the extension_t struct */
-class ExtensionCopy
+ExtensionListModel::ExtensionCopy::ExtensionCopy( extension_t *p_ext )
 {
-public:
-    ExtensionCopy( extension_t *p_ext )
-    {
-        name = qfu( p_ext->psz_name );
-        description = qfu( p_ext->psz_description );
-        shortdesc = qfu( p_ext->psz_shortdescription );
-        if( description.isEmpty() )
-            description = shortdesc;
-        if( shortdesc.isEmpty() && !description.isEmpty() )
-            shortdesc = description;
-        title = qfu( p_ext->psz_title );
-        author = qfu( p_ext->psz_author );
-        version = qfu( p_ext->psz_version );
-        url = qfu( p_ext->psz_url );
-        icon = loadPixmapFromData( p_ext->p_icondata, p_ext->i_icondata_size );
-    }
-    ~ExtensionCopy() { delete icon; }
+    name = qfu( p_ext->psz_name );
+    description = qfu( p_ext->psz_description );
+    shortdesc = qfu( p_ext->psz_shortdescription );
+    if( description.isEmpty() )
+        description = shortdesc;
+    if( shortdesc.isEmpty() && !description.isEmpty() )
+        shortdesc = description;
+    title = qfu( p_ext->psz_title );
+    author = qfu( p_ext->psz_author );
+    version = qfu( p_ext->psz_version );
+    url = qfu( p_ext->psz_url );
+    icon = loadPixmapFromData( p_ext->p_icondata, p_ext->i_icondata_size );
+}
 
-    QString name, title, description, shortdesc, author, version, url;
-    QPixmap *icon;
-};
+ExtensionListModel::ExtensionCopy::~ExtensionCopy()
+{
+    delete icon;
+}
+
+QVariant ExtensionListModel::ExtensionCopy::data( int role ) const
+{
+    switch( role )
+    {
+    case Qt::DisplayRole:
+        return title;
+    case Qt::DecorationRole:
+        return *icon;
+    case DescriptionRole:
+        return shortdesc;
+    case VersionRole:
+        return version;
+    case AuthorRole:
+        return author;
+    case LinkRole:
+        return url;
+    case NameRole:
+        return name;
+    default:
+        return QVariant();
+    }
+}
 
 /* Extensions list model for the QListView */
 
@@ -385,17 +405,10 @@ QVariant ExtensionListModel::data( const QModelIndex& index, int role ) const
     if( !index.isValid() )
         return QVariant();
 
-    switch( role )
-    {
-    case Qt::DisplayRole:
-        return ((ExtensionCopy *)index.internalPointer())->title;
-    case Qt::DecorationRole:
-        return *((ExtensionCopy *)index.internalPointer())->icon;
-    case DescriptionRole:
-        return ((ExtensionCopy *)index.internalPointer())->shortdesc;
-    default:
-        return QVariant();
-    }
+    ExtensionCopy * extension =
+            static_cast<ExtensionCopy *>(index.internalPointer());
+
+    return extension->data( role );
 }
 
 QModelIndex ExtensionListModel::index( int row, int column,
@@ -501,7 +514,7 @@ QSize ExtensionItemDelegate::sizeHint( const QStyleOptionViewItem &option,
 
 /* "More information" dialog */
 
-ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
+ExtensionInfoDialog::ExtensionInfoDialog( const QModelIndex &index,
                                           intf_thread_t *p_intf,
                                           QWidget *parent )
        : QVLCDialog( parent, p_intf )
@@ -510,28 +523,25 @@ ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
     setWindowModality( Qt::WindowModal );
 
     // Window title
-    setWindowTitle( qtr( "About" ) + " " + extension.title );
+    setWindowTitle( qtr( "About" ) + " " + index.data(Qt::DisplayRole).toString() );
 
     // Layout
     QGridLayout *layout = new QGridLayout( this );
 
     // Icon
     QLabel *icon = new QLabel( this );
-    if( !extension.icon )
+    QPixmap pix = index.data(Qt::DecorationRole).value<QPixmap>();
+    if( pix.isNull() )
     {
-        QPixmap pix( ":/logo/vlc48.png" );
+        pix = QPixmap( ":/logo/vlc48.png" );
         icon->setPixmap( pix );
-    }
-    else
-    {
-        icon->setPixmap( *extension.icon );
     }
     icon->setAlignment( Qt::AlignCenter );
     icon->setFixedSize( 48, 48 );
     layout->addWidget( icon, 1, 0, 2, 1 );
 
     // Title
-    QLabel *label = new QLabel( extension.title, this );
+    QLabel *label = new QLabel( index.data(Qt::DisplayRole).toString(), this );
     QFont font = label->font();
     font.setBold( true );
     font.setPointSizeF( font.pointSizeF() * 1.3f );
@@ -541,19 +551,19 @@ ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
     // Version
     label = new QLabel( "<b>" + qtr( "Version" ) + ":</b>", this );
     layout->addWidget( label, 1, 1, 1, 1, Qt::AlignBottom );
-    label = new QLabel( extension.version, this );
+    label = new QLabel( index.data(ExtensionListModel::VersionRole).toString(), this );
     layout->addWidget( label, 1, 2, 1, 2, Qt::AlignBottom );
 
     // Author
     label = new QLabel( "<b>" + qtr( "Author" ) + ":</b>", this );
     layout->addWidget( label, 2, 1, 1, 1, Qt::AlignTop );
-    label = new QLabel( extension.author, this );
+    label = new QLabel( index.data(ExtensionListModel::AuthorRole).toString(), this );
     layout->addWidget( label, 2, 2, 1, 2, Qt::AlignTop );
 
 
     // Description
     label = new QLabel( this );
-    label->setText( extension.description );
+    label->setText( index.data(ExtensionListModel::DescriptionRole).toString() );
     label->setWordWrap( true );
     label->setOpenExternalLinks( true );
     layout->addWidget( label, 4, 0, 1, -1 );
@@ -562,7 +572,8 @@ ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
     label = new QLabel( "<b>" + qtr( "Website" ) + ":</b>", this );
     layout->addWidget( label, 5, 0, 1, 2 );
     label = new QLabel( QString("<a href=\"%1\">%2</a>")
-                        .arg( extension.url ).arg( extension.url )
+                        .arg( index.data(ExtensionListModel::LinkRole).toString() )
+                        .arg( index.data(ExtensionListModel::LinkRole).toString() )
                         , this );
     label->setOpenExternalLinks( true );
     layout->addWidget( label, 5, 2, 1, -1 );
@@ -570,7 +581,8 @@ ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
     // Script file
     label = new QLabel( "<b>" + qtr( "File" ) + ":</b>", this );
     layout->addWidget( label, 6, 0, 1, 2 );
-    QLineEdit *line = new QLineEdit( extension.name, this );
+    QLineEdit *line =
+            new QLineEdit( index.data(ExtensionListModel::NameRole).toString(), this );
     line->setReadOnly( true );
     layout->addWidget( line, 6, 2, 1, -1 );
 
