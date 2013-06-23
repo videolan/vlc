@@ -17,11 +17,12 @@ LTLIBVLCCORE = $(top_builddir)/src/libvlccore.la
 MODULE_NAME = $$(p="$@"; p="$${p\#\#*/}"; p="$${p\#lib}"; echo "$${p%_plugin*}")
 
 AM_CPPFLAGS = \
-	-DMODULE_NAME=$(MODULE_NAME) \
 	-DMODULE_NAME_IS_$(MODULE_NAME) \
 	-DMODULE_STRING=\"$(MODULE_NAME)\"
 if HAVE_DYNAMIC_PLUGINS
 AM_CPPFLAGS += -D__PLUGIN__
+else
+AM_CPPFLAGS += -DMODULE_NAME=$(MODULE_NAME)
 endif
 AM_CFLAGS =
 AM_CXXFLAGS =
