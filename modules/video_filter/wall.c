@@ -123,6 +123,11 @@ static int Open( vlc_object_t *p_this )
     video_splitter_t *p_splitter = (video_splitter_t*)p_this;
     video_splitter_sys_t *p_sys;
 
+    const vlc_chroma_description_t *p_chroma =
+        vlc_fourcc_GetChromaDescription( p_splitter->fmt.i_chroma );
+    if( p_chroma == NULL || p_chroma->plane_count == 0 )
+        return VLC_EGENERIC;
+
     p_splitter->p_sys = p_sys = malloc( sizeof(*p_sys) );
     if( !p_sys )
         return VLC_ENOMEM;
