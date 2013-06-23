@@ -779,11 +779,24 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
             msg_Dbg( p_mux, "writing extra data" );
             op.bytes  = p_input->p_fmt->i_extra;
             op.packet = p_input->p_fmt->p_extra;
+            uint8_t flac_streaminfo[34 + 4];
             if( p_stream->i_fourcc == VLC_CODEC_FLAC )
             {
-                /* Skip the flac stream marker */
-                op.bytes -= 4;
-                op.packet+= 4;
+                if (op.bytes == 42 && !memcmp(op.packet, "fLaC", 4)) {
+                    op.bytes -= 4;
+                    memcpy(flac_streaminfo, op.packet + 4, 38);
+                    op.packet = flac_streaminfo;
+                } else if (op.bytes == 34) {
+                    op.bytes += 4;
+                    memcpy(flac_streaminfo + 4, op.packet, 34);
+                    flac_streaminfo[0] = 0x80; /* last block, streaminfo */
+                    flac_streaminfo[1] = 0;
+                    flac_streaminfo[2] = 0;
+                    flac_streaminfo[3] = 34; /* block size */
+                    op.packet = flac_streaminfo;
+                } else {
+                    msg_Err(p_mux, "Invalid FLAC streaminfo (%d bytes)", op.bytes);
+                }
             }
             op.b_o_s  = 0;
             op.e_o_s  = 0;

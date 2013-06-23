@@ -1416,7 +1416,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
     else if( !strcmp( p_tk->psz_codec, "A_FLAC" ) )
     {
         p_tk->fmt.i_codec = VLC_CODEC_FLAC;
-        fill_extra_data( p_tk, 0 );
+        fill_extra_data( p_tk, 8 );
     }
     else if( !strcmp( p_tk->psz_codec, "A_VORBIS" ) )
     {

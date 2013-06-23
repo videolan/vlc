@@ -76,15 +76,11 @@ static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
     if( p_dec->fmt_in.i_extra > 0 )
     {
         const uint8_t * const p_src = p_dec->fmt_in.p_extra;
-        int i_offset;
-        int i_size;
 
-        if( p_dec->fmt_in.i_codec == VLC_CODEC_FLAC )
-        {
-            i_offset = 8;
-            i_size = p_dec->fmt_in.i_extra - 8;
-        }
-        else if( p_dec->fmt_in.i_codec == VLC_CODEC_ALAC )
+        int i_offset = 0;
+        int i_size = p_dec->fmt_in.i_extra;
+
+        if( p_dec->fmt_in.i_codec == VLC_CODEC_ALAC )
         {
             static const uint8_t p_pattern[] = { 0, 0, 0, 36, 'a', 'l', 'a', 'c' };
             /* Find alac atom XXX it is a bit ugly */
@@ -96,11 +92,6 @@ static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
             i_size = __MIN( p_dec->fmt_in.i_extra - i_offset, 36 );
             if( i_size < 36 )
                 i_size = 0;
-        }
-        else
-        {
-            i_offset = 0;
-            i_size = p_dec->fmt_in.i_extra;
         }
 
         if( i_size > 0 )

@@ -2068,30 +2068,28 @@ static void Ogg_ReadFlacHeader( demux_t *p_demux, logical_stream_t *p_stream,
     bs_init( &s, p_oggpacket->packet, p_oggpacket->bytes );
 
     bs_read( &s, 1 );
-    if( p_oggpacket->bytes > 0 && bs_read( &s, 7 ) == 0 )
+    if( p_oggpacket->bytes > 0 && bs_read( &s, 7 ) != 0 )
     {
-        if( bs_read( &s, 24 ) >= 34 /*size STREAMINFO*/ )
-        {
-            bs_skip( &s, 80 );
-            p_stream->f_rate = p_stream->fmt.audio.i_rate = bs_read( &s, 20 );
-            p_stream->fmt.audio.i_channels = bs_read( &s, 3 ) + 1;
+        msg_Dbg( p_demux, "Invalid FLAC STREAMINFO metadata" );
+        return;
+    }
 
-            msg_Dbg( p_demux, "FLAC header, channels: %i, rate: %i",
-                     p_stream->fmt.audio.i_channels, (int)p_stream->f_rate );
-        }
-        else
-        {
-            msg_Dbg( p_demux, "FLAC STREAMINFO metadata too short" );
-        }
+    if( bs_read( &s, 24 ) >= 34 /*size STREAMINFO*/ )
+    {
+        bs_skip( &s, 80 );
+        p_stream->f_rate = p_stream->fmt.audio.i_rate = bs_read( &s, 20 );
+        p_stream->fmt.audio.i_channels = bs_read( &s, 3 ) + 1;
 
-        /* Fake this as the last metadata block */
-        *((uint8_t*)p_oggpacket->packet) |= 0x80;
+        msg_Dbg( p_demux, "FLAC header, channels: %i, rate: %i",
+                 p_stream->fmt.audio.i_channels, (int)p_stream->f_rate );
     }
     else
     {
-        /* This ain't a STREAMINFO metadata */
-        msg_Dbg( p_demux, "Invalid FLAC STREAMINFO metadata" );
+        msg_Dbg( p_demux, "FLAC STREAMINFO metadata too short" );
     }
+
+    /* Fake this as the last metadata block */
+    *((uint8_t*)p_oggpacket->packet) |= 0x80;
 }
 
 static void Ogg_ReadKateHeader( logical_stream_t *p_stream,

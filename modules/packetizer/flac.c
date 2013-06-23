@@ -170,11 +170,18 @@ static void ProcessHeader( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     bs_t bs;
+    int i_extra = p_dec->fmt_in.i_extra;
+    char *p_extra = p_dec->fmt_in.p_extra;
 
-    if( p_dec->fmt_in.i_extra < 8 + 14 )
+    if (i_extra > 8 && !memcmp(p_extra, "fLaC", 4)) {
+        i_extra -= 8;
+        p_extra += 8;
+    }
+
+    if( p_dec->fmt_in.i_extra < 14 )
         return;
 
-    bs_init( &bs, (uint8_t*)p_dec->fmt_in.p_extra + 8, p_dec->fmt_in.i_extra - 8 );
+    bs_init( &bs, p_extra, i_extra);
 
     p_sys->stream_info.min_blocksize = bs_read( &bs, 16 );
     p_sys->stream_info.max_blocksize = bs_read( &bs, 16 );
@@ -188,11 +195,9 @@ static void ProcessHeader( decoder_t *p_dec )
 
     p_sys->b_stream_info = true;
 
-    p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
-    p_dec->fmt_out.p_extra = xrealloc( p_dec->fmt_out.p_extra,
-                                       p_dec->fmt_out.i_extra );
-    memcpy( p_dec->fmt_out.p_extra,
-            p_dec->fmt_in.p_extra, p_dec->fmt_out.i_extra );
+    p_dec->fmt_out.i_extra = i_extra;
+    p_dec->fmt_out.p_extra = xrealloc( p_dec->fmt_out.p_extra, i_extra );
+    memcpy( p_dec->fmt_out.p_extra, p_extra, i_extra );
 }
 
 /* */

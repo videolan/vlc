@@ -386,7 +386,7 @@ static void ProcessHeader( decoder_t *p_dec )
         memcpy( p_sys->p_block->p_buffer + 8, p_dec->fmt_in.p_extra, i_extra );
         memcpy( p_sys->p_block->p_buffer, "fLaC", 4);
         uint8_t *p = p_sys->p_block->p_buffer;
-        p[4] = 0; /* STREAMINFO */
+        p[4] = 0x80 | 0; /* STREAMINFO faked as last block */
         p[5] = 0;
         p[6] = 0;
         p[7] = 34; /* block size */
@@ -396,7 +396,7 @@ static void ProcessHeader( decoder_t *p_dec )
         memcpy( p_sys->p_block->p_buffer, p_dec->fmt_in.p_extra, i_extra );
         break;
     default:
-        msg_Err(p_dec, "Invalid flac header size %zu\n", i_extra);
+        msg_Err(p_dec, "Invalid flac header size %zu", i_extra);
         return;
     }
     FLAC__stream_decoder_process_until_end_of_metadata( p_sys->p_flac );
@@ -547,7 +547,7 @@ struct encoder_sys_t
     mtime_t i_pts;
 };
 
-#define STREAMINFO_SIZE 38
+#define STREAMINFO_SIZE 34
 
 static block_t *Encode( encoder_t *, block_t * );
 
@@ -572,14 +572,9 @@ EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
             msg_Dbg( p_enc, "Writing STREAMINFO: %zu", bytes );
 
             /* Backup the STREAMINFO metadata block */
-            p_enc->fmt_out.i_extra = STREAMINFO_SIZE + 4;
-            p_enc->fmt_out.p_extra = xmalloc( STREAMINFO_SIZE + 4 );
-            memcpy( p_enc->fmt_out.p_extra, "fLaC", 4 );
-            memcpy( ((uint8_t *)p_enc->fmt_out.p_extra) + 4, buffer,
-                    STREAMINFO_SIZE );
-
-            /* Fake this as the last metadata block */
-            ((uint8_t*)p_enc->fmt_out.p_extra)[4] |= 0x80;
+            p_enc->fmt_out.i_extra = STREAMINFO_SIZE;
+            p_enc->fmt_out.p_extra = xmalloc( STREAMINFO_SIZE );
+            memcpy(p_enc->fmt_out.p_extra, buffer + 4, STREAMINFO_SIZE );
         }
         p_sys->i_headers++;
         return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
