@@ -317,6 +317,7 @@ QVariant ExtensionListModel::ExtensionCopy::data( int role ) const
     case Qt::DisplayRole:
         return title;
     case Qt::DecorationRole:
+        if ( !icon ) return QPixmap( ":/logo/vlc48.png" );
         return *icon;
     case DescriptionRole:
         return shortdesc;
@@ -531,11 +532,8 @@ ExtensionInfoDialog::ExtensionInfoDialog( const QModelIndex &index,
     // Icon
     QLabel *icon = new QLabel( this );
     QPixmap pix = index.data(Qt::DecorationRole).value<QPixmap>();
-    if( pix.isNull() )
-    {
-        pix = QPixmap( ":/logo/vlc48.png" );
-        icon->setPixmap( pix );
-    }
+    Q_ASSERT( !pix.isNull() );
+    icon->setPixmap( pix );
     icon->setAlignment( Qt::AlignCenter );
     icon->setFixedSize( 48, 48 );
     layout->addWidget( icon, 1, 0, 2, 1 );
