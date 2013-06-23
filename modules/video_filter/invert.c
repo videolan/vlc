@@ -72,7 +72,7 @@ static int Create( vlc_object_t *p_this )
 
     const vlc_chroma_description_t *p_chroma =
         vlc_fourcc_GetChromaDescription( fourcc );
-    if( p_chroma == NULL
+    if( p_chroma == NULL || p_chroma->plane_count == 0
      || p_chroma->pixel_size * 8 != p_chroma->pixel_bits )
         return VLC_EGENERIC;
 
