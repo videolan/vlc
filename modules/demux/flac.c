@@ -496,6 +496,7 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
             ParseStreamInfo( &i_sample_rate, &i_sample_count, *pp_streaminfo );
             if( i_sample_rate > 0 )
                 p_sys->i_length = i_sample_count * INT64_C(1000000)/i_sample_rate;
+            continue;
         }
         else if( i_type == META_SEEKTABLE )
         {
