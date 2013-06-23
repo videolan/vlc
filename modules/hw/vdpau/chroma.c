@@ -31,6 +31,10 @@
 #include <vlc_filter.h>
 #include "vlc_vdpau.h"
 
+/* Picture history as recommended by VDPAU documentation */
+#define MAX_PAST   2
+#define MAX_FUTURE 1
+
 struct filter_sys_t
 {
     vdp_t *vdp;
@@ -39,6 +43,7 @@ struct filter_sys_t
     VdpChromaType chroma;
     VdpYCbCrFormat format;
     picture_t *(*import)(filter_t *, picture_t *);
+    picture_t *history[MAX_PAST + 1 + MAX_FUTURE];
 };
 
 /** Create VDPAU video mixer */
@@ -68,6 +73,18 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
     return mixer;
 }
 
+static void Flush(filter_t *filter)
+{
+    filter_sys_t *sys = filter->p_sys;
+
+    for (unsigned i = 0; i < MAX_PAST + MAX_FUTURE; i++)
+        if (sys->history[i] != NULL)
+        {
+            picture_Release(sys->history[i]);
+            sys->history[i] = NULL;
+        }
+}
+
 /** Get a VLC picture for a VDPAU output surface */
 static picture_t *OutputAllocate(filter_t *filter)
 {
@@ -83,6 +100,7 @@ static picture_t *OutputAllocate(filter_t *filter)
     {
         if (sys->mixer != VDP_INVALID_HANDLE)
         {
+            Flush(filter);
             vdp_video_mixer_destroy(sys->vdp, sys->mixer);
             sys->mixer = VDP_INVALID_HANDLE;
         }
@@ -250,18 +268,26 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
 
     picture_t *dst = OutputAllocate(filter);
     if (dst == NULL)
-        goto out;
-
-    src = sys->import(filter, src);
-    if (src == NULL)
     {
-        picture_Release(dst);
+        picture_Release(src);
+        Flush(filter);
         return NULL;
     }
+
+    src = sys->import(filter, src);
+
+    /* Update history and take "present" picture */
+    sys->history[MAX_PAST + MAX_FUTURE] = src;
+    src = sys->history[MAX_PAST];
+
+    if (src == NULL)
+        goto skip;
     picture_CopyProperties(dst, src);
 
     /* Render video into output */
+    VdpVideoSurface past[MAX_PAST];
     VdpVideoSurface surface = picture_GetVideoSurface(src);
+    VdpVideoSurface future[MAX_FUTURE];
     VdpRect src_rect = {
         filter->fmt_in.video.i_x_offset, filter->fmt_in.video.i_y_offset,
         filter->fmt_in.video.i_visible_width + filter->fmt_in.video.i_x_offset,
@@ -275,19 +301,42 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
     };
     VdpStatus err;
 
+    for (unsigned i = 0; i < MAX_PAST; i++)
+    {
+        picture_t *pic = sys->history[(MAX_PAST - 1) - i];
+        if (pic != NULL)
+            past[i] = picture_GetVideoSurface(pic);
+        else
+            past[i] = VDP_INVALID_HANDLE;
+    }
+    for (unsigned i = 0; i < MAX_FUTURE; i++)
+    {
+        picture_t *pic = sys->history[(MAX_PAST + 1) + i];
+        if (pic != NULL)
+            future[i] = picture_GetVideoSurface(pic);
+        else
+            future[i] = VDP_INVALID_HANDLE;
+    }
+
     err = vdp_video_mixer_render(sys->vdp, sys->mixer, VDP_INVALID_HANDLE,
                                  NULL, VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME,
-                                 0, NULL, surface, 0, NULL, &src_rect,
-                                 output, &dst_rect, NULL, 0, NULL);
+                                 MAX_PAST, past, surface, MAX_FUTURE, future,
+                                 &src_rect, output, &dst_rect, NULL, 0, NULL);
     if (err != VDP_STATUS_OK)
     {
         msg_Err(filter, "video %s %s failure: %s", "mixer", "rendering",
                 vdp_get_error_string(sys->vdp, err));
+skip:
         picture_Release(dst);
         dst = NULL;
     }
-out:
-    picture_Release(src);
+
+    /* Forget old history */
+    if (sys->history[0] != NULL)
+        picture_Release(sys->history[0]);
+    memmove(sys->history, sys->history + 1,
+            sizeof (sys->history[0]) * (MAX_PAST + MAX_FUTURE));
+
     return dst;
 }
 
@@ -334,7 +383,11 @@ static int OutputOpen(vlc_object_t *obj)
      * 2) Bailing out due to insufficient capabilities would break the
      *    video pipeline. Thus capabilities should be checked earlier. */
 
+    for (unsigned i = 0; i < MAX_PAST + MAX_FUTURE; i++)
+        sys->history[i] = NULL;
+
     filter->pf_video_filter = MixerRender;
+    filter->pf_video_flush = Flush;
     filter->p_sys = sys;
     return VLC_SUCCESS;
 }
@@ -344,6 +397,7 @@ static void OutputClose(vlc_object_t *obj)
     filter_t *filter = (filter_t *)obj;
     filter_sys_t *sys = filter->p_sys;
 
+    /*Flush(filter); -- core frees pictures for us! */
     if (sys->mixer != VDP_INVALID_HANDLE)
         vdp_video_mixer_destroy(sys->vdp, sys->mixer);
 
