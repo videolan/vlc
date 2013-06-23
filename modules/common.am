@@ -34,10 +34,3 @@ AM_LDFLAGS = -rpath '$(libvlcdir)' \
 	-shrext $(LIBEXT) \
 	-no-undefined \
 	$(LTLIBVLCCORE) $(top_builddir)/compat/libcompat.la
-
-include $(srcdir)/Modules.am
-
-if MAINTAINER_MODE
-$(srcdir)/Makefile.am: $(srcdir)/Modules.am $(top_srcdir)/modules/genmf
-	$(AM_V_GEN)cd \$(top_srcdir) && \$(SHELL) modules/genmf $(dir)
-endif

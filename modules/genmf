@@ -45,6 +45,12 @@ libvlc_LTLIBRARIES = ${libvlc_ltlibs}
 EXTRA_LTLIBRARIES = ${extra_ltlibs}
 
 include \$(top_srcdir)/modules/common.am
+include \$(srcdir)/Modules.am
+
+if MAINTAINER_MODE
+\$(srcdir)/Makefile.am: \$(srcdir)/Modules.am \$(top_srcdir)/modules/genmf
+	\$(AM_V_GEN)cd \\\$(top_srcdir) && \\\$(SHELL) modules/genmf \$(dir)
+endif
 
 EOF
   for mod in $mods
