@@ -70,8 +70,13 @@ int Import_M3U( vlc_object_t *p_this )
     CHECK_PEEK( p_peek, 8 );
     char *(*pf_dup) (const char *);
 
+    if( POKE( p_peek, "\xef\xbb\xbf", 3) )/* BOM at start */
+    {
+        pf_dup = CheckUnicode; /* UTF-8 */
+        stream_Seek( p_demux->s, 3 );
+    }
+    else
     if( POKE( p_peek, "RTSPtext", 8 ) /* QuickTime */
-     || POKE( p_peek, "\xef\xbb\xbf" "#EXTM3U", 10) /* BOM at start */
      || demux_IsPathExtension( p_demux, ".m3u8" )
      || demux_IsForced( p_demux, "m3u8" )
      || CheckContentType( p_demux->s, "application/vnd.apple.mpegurl" ) )
