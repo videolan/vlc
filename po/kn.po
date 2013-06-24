@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2013-05-28 11:42+0200\n"
-"PO-Revision-Date: 2013-05-19 19:06+0000\n"
+"POT-Creation-Date: 2013-06-06 17:40+0200\n"
+"PO-Revision-Date: 2013-06-15 08:36+0000\n"
 "Last-Translator: yogi <yogesh@karnatakaeducation.org.in>\n"
 "Language-Team: Kannada (http://www.transifex.com/projects/p/vlc-trans/"
 "language/kn/)\n"
@@ -621,7 +621,7 @@ msgstr ""
 #: modules/access/v4l2/v4l2.c:268 modules/audio_output/alsa.c:76
 #: modules/codec/twolame.c:70
 msgid "Stereo"
-msgstr ""
+msgstr "Stereo"
 
 #: src/audio_output/output.c:422 src/config/keys.c:85 src/libvlc-module.c:189
 #: src/libvlc-module.c:286 src/libvlc-module.c:364
@@ -666,19 +666,19 @@ msgstr ""
 
 #: src/config/file.c:458
 msgid "boolean"
-msgstr ""
+msgstr "boolean"
 
 #: src/config/file.c:458 src/config/help.c:468
 msgid "integer"
-msgstr ""
+msgstr "integer"
 
 #: src/config/file.c:466 src/config/help.c:498
 msgid "float"
-msgstr ""
+msgstr "float"
 
 #: src/config/file.c:479 src/config/help.c:447
 msgid "string"
-msgstr ""
+msgstr "string"
 
 #: src/config/help.c:127
 msgid "To get exhaustive help, use '-H'."
@@ -917,27 +917,27 @@ msgstr "ಮಾದ್ಯಮದ ಮೆನು"
 
 #: src/config/keys.c:90
 msgid "Media Next Frame"
-msgstr ""
+msgstr "ಮಾದ್ಯಮದ ಮುಂದಿನ ಫ್ರೇಮ್"
 
 #: src/config/keys.c:91
 msgid "Media Next Track"
-msgstr ""
+msgstr "ಮಾದ್ಯಮದ ಮುಂದಿನ ಹಾಡು"
 
 #: src/config/keys.c:92
 msgid "Media Play Pause"
-msgstr ""
+msgstr "ಮಾದ್ಯಮವನ್ನು ಪ್ಲೆ ಮಾಡಿ ವಿರಾಮಿಸು"
 
 #: src/config/keys.c:93
 msgid "Media Prev Frame"
-msgstr ""
+msgstr "ಮಾದ್ಯಮದ ಹಿಂದಿನ ಫ್ರೇಮ್"
 
 #: src/config/keys.c:94
 msgid "Media Prev Track"
-msgstr ""
+msgstr "ಮಾದ್ಯಮದ ಹಿಂದಿನ ಹಾಡು"
 
 #: src/config/keys.c:95
 msgid "Media Record"
-msgstr ""
+msgstr "ರೇಕಾರ್ಡ್"
 
 #: src/config/keys.c:96
 msgid "Media Repeat"
@@ -1072,8 +1072,8 @@ msgstr ""
 
 #: src/input/decoder.c:276 src/input/decoder.c:467
 #: modules/codec/avcodec/encoder.c:248 modules/codec/avcodec/encoder.c:256
-#: modules/codec/avcodec/encoder.c:290 modules/codec/avcodec/encoder.c:750
-#: modules/codec/avcodec/encoder.c:803 modules/stream_out/es.c:362
+#: modules/codec/avcodec/encoder.c:290 modules/codec/avcodec/encoder.c:763
+#: modules/codec/avcodec/encoder.c:816 modules/stream_out/es.c:362
 #: modules/stream_out/es.c:377
 msgid "Streaming / Transcoding failed"
 msgstr ""
@@ -1282,11 +1282,11 @@ msgstr "ಆಲ್ಬಮ್"
 
 #: src/input/meta.c:60
 msgid "Track number"
-msgstr ""
+msgstr "ಹಾಡಿನ ಸಂಖ್ಯೆ"
 
 #: src/input/meta.c:62 modules/mux/asf.c:64
 msgid "Rating"
-msgstr ""
+msgstr "Rating"
 
 #: src/input/meta.c:63 modules/gui/macosx/MainMenu.m:75
 msgid "Date"
@@ -1320,7 +1320,7 @@ msgstr ""
 
 #: src/input/meta.c:71
 msgid "Track ID"
-msgstr ""
+msgstr "ಹಾಡಿನ ಐಡಿ"
 
 #: src/input/var.c:158
 msgid "Bookmark"
@@ -1328,7 +1328,7 @@ msgstr "ಗುರುತು"
 
 #: src/input/var.c:172 src/libvlc-module.c:570
 msgid "Programs"
-msgstr ""
+msgstr "ತಂತ್ರಾಂಶಗಳು"
 
 #: src/input/var.c:182 modules/gui/macosx/MainMenu.m:373
 #: modules/gui/macosx/MainMenu.m:374 modules/gui/macosx/open.m:173
@@ -1352,7 +1352,7 @@ msgstr "ಹಾಡುಗಳು"
 
 #: src/input/var.c:210
 msgid "Subtitle Track"
-msgstr ""
+msgstr "ಉಪಶೀರ್ಷಿಕೆಗಳು"
 
 #: src/input/var.c:273
 msgid "Next title"
@@ -1720,7 +1720,7 @@ msgstr ""
 #: modules/text_renderer/freetype.c:214
 #: share/lua/http/dialogs/create_stream.html:196
 msgid "None"
-msgstr ""
+msgstr "ಯಾವುದಿಲ್ಲ"
 
 #: src/libvlc-module.c:238
 msgid ""
@@ -1800,7 +1800,7 @@ msgstr ""
 
 #: src/libvlc-module.c:274
 msgid "Video title"
-msgstr ""
+msgstr "ದೃಶ್ಯಾವಳಿಯ ಹೆಸರು"
 
 #: src/libvlc-module.c:276
 msgid ""
@@ -1828,7 +1828,7 @@ msgstr ""
 #: modules/video_filter/marq.c:139 modules/video_filter/mosaic.c:170
 #: modules/video_filter/rss.c:173
 msgid "Center"
-msgstr ""
+msgstr "ಮಧ್ಯೆ"
 
 #: src/libvlc-module.c:286 src/libvlc-module.c:364 modules/codec/dvbsub.c:102
 #: modules/codec/zvbi.c:78 modules/gui/macosx/VideoEffects.m:104
@@ -1839,7 +1839,7 @@ msgstr ""
 #: modules/gui/qt4/ui/video_effects.h:1360
 #: modules/gui/qt4/ui/video_effects.h:1371
 msgid "Top"
-msgstr ""
+msgstr "ಮೇಲೆ"
 
 #: src/libvlc-module.c:286 src/libvlc-module.c:364 modules/codec/dvbsub.c:102
 #: modules/codec/zvbi.c:78 modules/gui/macosx/VideoEffects.m:107
@@ -1848,7 +1848,7 @@ msgstr ""
 #: modules/video_filter/marq.c:139 modules/video_filter/mosaic.c:170
 #: modules/video_filter/rss.c:173 modules/gui/qt4/ui/video_effects.h:1321
 msgid "Bottom"
-msgstr ""
+msgstr "ಕೆಳಗೆ"
 
 #: src/libvlc-module.c:287 src/libvlc-module.c:365 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:79 modules/gui/macosx/VideoEffects.m:178
@@ -1857,7 +1857,7 @@ msgstr ""
 #: modules/video_filter/marq.c:140 modules/video_filter/mosaic.c:171
 #: modules/video_filter/rss.c:174
 msgid "Top-Left"
-msgstr ""
+msgstr "ಮೇಲಿನ ಎಡ"
 
 #: src/libvlc-module.c:287 src/libvlc-module.c:365 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:79 modules/gui/macosx/VideoEffects.m:180
@@ -1866,7 +1866,7 @@ msgstr ""
 #: modules/video_filter/marq.c:140 modules/video_filter/mosaic.c:171
 #: modules/video_filter/rss.c:174
 msgid "Top-Right"
-msgstr ""
+msgstr "ಮೇಲಿನ ಬಲ"
 
 #: src/libvlc-module.c:287 src/libvlc-module.c:365 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:79 modules/gui/macosx/VideoEffects.m:182
@@ -1875,7 +1875,7 @@ msgstr ""
 #: modules/video_filter/marq.c:140 modules/video_filter/mosaic.c:171
 #: modules/video_filter/rss.c:174
 msgid "Bottom-Left"
-msgstr ""
+msgstr "ಕೆಳಗಿನ ಬಲ"
 
 #: src/libvlc-module.c:287 src/libvlc-module.c:365 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:79 modules/gui/macosx/VideoEffects.m:184
@@ -1884,7 +1884,7 @@ msgstr ""
 #: modules/video_filter/marq.c:140 modules/video_filter/mosaic.c:171
 #: modules/video_filter/rss.c:174
 msgid "Bottom-Right"
-msgstr ""
+msgstr "ಕೆಳಗಿನ ಎಡ"
 
 #: src/libvlc-module.c:289
 msgid "Zoom video"
@@ -2489,19 +2489,19 @@ msgstr ""
 
 #: src/libvlc-module.c:615
 msgid "HD (720p)"
-msgstr ""
+msgstr "HD(720p)"
 
 #: src/libvlc-module.c:616
 msgid "Standard Definition (576 or 480 lines)"
-msgstr ""
+msgstr "Standard Definition (576 or 480 lines)"
 
 #: src/libvlc-module.c:617
 msgid "Low Definition (360 lines)"
-msgstr ""
+msgstr "Low Definition (360 lines)"
 
 #: src/libvlc-module.c:618
 msgid "Very Low Definition (240 lines)"
-msgstr ""
+msgstr "Very Low Definition (240 lines)"
 
 #: src/libvlc-module.c:621
 msgid "Input repetitions"
@@ -2798,7 +2798,7 @@ msgstr ""
 
 #: src/libvlc-module.c:792
 msgid "HTTP server address"
-msgstr ""
+msgstr "HTTP server address"
 
 #: src/libvlc-module.c:794
 msgid ""
@@ -2809,7 +2809,7 @@ msgstr ""
 
 #: src/libvlc-module.c:798
 msgid "RTSP server address"
-msgstr ""
+msgstr "RTSP server address"
 
 #: src/libvlc-module.c:800
 msgid ""
@@ -2822,7 +2822,7 @@ msgstr ""
 
 #: src/libvlc-module.c:806
 msgid "HTTP server port"
-msgstr ""
+msgstr "HTTP server port"
 
 #: src/libvlc-module.c:808
 msgid ""
@@ -2833,7 +2833,7 @@ msgstr ""
 
 #: src/libvlc-module.c:813
 msgid "HTTPS server port"
-msgstr ""
+msgstr "HTTPS server port"
 
 #: src/libvlc-module.c:815
 msgid ""
@@ -2844,7 +2844,7 @@ msgstr ""
 
 #: src/libvlc-module.c:820
 msgid "RTSP server port"
-msgstr ""
+msgstr "RTSP server port"
 
 #: src/libvlc-module.c:822
 msgid ""
@@ -2855,7 +2855,7 @@ msgstr ""
 
 #: src/libvlc-module.c:827
 msgid "HTTP/TLS server certificate"
-msgstr ""
+msgstr "HTTP/TLS server certificate"
 
 #: src/libvlc-module.c:829
 msgid "This X.509 certicate file (PEM format) is used for server-side TLS."
@@ -2863,7 +2863,7 @@ msgstr ""
 
 #: src/libvlc-module.c:831
 msgid "HTTP/TLS server private key"
-msgstr ""
+msgstr "HTTP/TLS server private key"
 
 #: src/libvlc-module.c:833
 msgid "This private key file (PEM format) is used for server-side TLS."
@@ -2871,7 +2871,7 @@ msgstr ""
 
 #: src/libvlc-module.c:835
 msgid "HTTP/TLS Certificate Authority"
-msgstr ""
+msgstr "HTTP/TLS Certificate Authority"
 
 #: src/libvlc-module.c:837
 msgid ""
@@ -2881,7 +2881,7 @@ msgstr ""
 
 #: src/libvlc-module.c:840
 msgid "HTTP/TLS Certificate Revocation List"
-msgstr ""
+msgstr "HTTP/TLS Certificate Revocation List"
 
 #: src/libvlc-module.c:842
 msgid ""
@@ -3933,47 +3933,47 @@ msgstr ""
 
 #: src/libvlc-module.c:1324
 msgid "Play playlist bookmark 1"
-msgstr ""
+msgstr "ಹಾಡುಗಳ ಪಟ್ಟಿಯ ಬುಕ್ ಮಾರ್ಕ್ 1 ಅನ್ನು ಪ್ಲೇ ಮಾಡಿ"
 
 #: src/libvlc-module.c:1325
 msgid "Play playlist bookmark 2"
-msgstr ""
+msgstr "ಹಾಡುಗಳ ಪಟ್ಟಿಯ ಬುಕ್ ಮಾರ್ಕ್ 2 ಅನ್ನು ಪ್ಲೇ ಮಾಡಿ"
 
 #: src/libvlc-module.c:1326
 msgid "Play playlist bookmark 3"
-msgstr ""
+msgstr "ಹಾಡುಗಳ ಪಟ್ಟಿಯ ಬುಕ್ ಮಾರ್ಕ್ 3 ಅನ್ನು ಪ್ಲೇ ಮಾಡಿ"
 
 #: src/libvlc-module.c:1327
 msgid "Play playlist bookmark 4"
-msgstr ""
+msgstr "ಹಾಡುಗಳ ಪಟ್ಟಿಯ ಬುಕ್ ಮಾರ್ಕ್ 4 ಅನ್ನು ಪ್ಲೇ ಮಾಡಿ"
 
 #: src/libvlc-module.c:1328
 msgid "Play playlist bookmark 5"
-msgstr ""
+msgstr "ಹಾಡುಗಳ ಪಟ್ಟಿಯ ಬುಕ್ ಮಾರ್ಕ್ 5 ಅನ್ನು ಪ್ಲೇ ಮಾಡಿ"
 
 #: src/libvlc-module.c:1329
 msgid "Play playlist bookmark 6"
-msgstr ""
+msgstr "ಹಾಡುಗಳ ಪಟ್ಟಿಯ ಬುಕ್ ಮಾರ್ಕ್ 6 ಅನ್ನು ಪ್ಲೇ ಮಾಡಿ"
 
 #: src/libvlc-module.c:1330
 msgid "Play playlist bookmark 7"
-msgstr ""
+msgstr "ಹಾಡುಗಳ ಪಟ್ಟಿಯ ಬುಕ್ ಮಾರ್ಕ್ 7 ಅನ್ನು ಪ್ಲೇ ಮಾಡಿ"
 
 #: src/libvlc-module.c:1331
 msgid "Play playlist bookmark 8"
-msgstr ""
+msgstr "ಹಾಡುಗಳ ಪಟ್ಟಿಯ ಬುಕ್ ಮಾರ್ಕ್ 8 ಅನ್ನು ಪ್ಲೇ ಮಾಡಿ"
 
 #: src/libvlc-module.c:1332
 msgid "Play playlist bookmark 9"
-msgstr ""
+msgstr "ಹಾಡುಗಳ ಪಟ್ಟಿಯ ಬುಕ್ ಮಾರ್ಕ್ 9 ಅನ್ನು ಪ್ಲೇ ಮಾಡಿ"
 
 #: src/libvlc-module.c:1333
 msgid "Play playlist bookmark 10"
-msgstr ""
+msgstr "ಹಾಡುಗಳ ಪಟ್ಟಿಯ ಬುಕ್ ಮಾರ್ಕ್ 10 ಅನ್ನು ಪ್ಲೇ ಮಾಡಿ"
 
 #: src/libvlc-module.c:1334
 msgid "Select the key to play this bookmark."
-msgstr ""
+msgstr "ಈ ಬುಕ್ ಮಾರ್ಕ್ ಅನ್ನು ಪ್ಲೇ ಮಾಡಲು ಕೀ ಅನ್ನು ಆಯ್ದುಕೊಳ್ಳಿ"
 
 #: src/libvlc-module.c:1335
 msgid "Set playlist bookmark 1"
@@ -4017,7 +4017,7 @@ msgstr "ಹಾಡುಗಳ ಪಟ್ಟಿಯ ಬುಕ್ ಮಾರ್ಕ್ 10
 
 #: src/libvlc-module.c:1345
 msgid "Select the key to set this playlist bookmark."
-msgstr ""
+msgstr "ಈ ಹಾಡುಗಳ ಪಟ್ಟಿಯ ಬುಕ್ ಮಾರ್ಕ್ ಅನ್ನು set ಮಾಡಲು ಕೀ ಅನ್ನು ಆಯ್ದುಕೊಳ್ಳಿ"
 
 #: src/libvlc-module.c:1346
 #: modules/gui/qt4/components/playlist/standardpanel.cpp:234
@@ -4185,7 +4185,7 @@ msgstr ""
 #: modules/gui/qt4/components/controller.hpp:129
 #: modules/stream_out/record.c:60
 msgid "Record"
-msgstr ""
+msgstr "ರೇಕಾರ್ಡ"
 
 #: src/libvlc-module.c:1393
 msgid "Record access filter start/stop."
@@ -4278,7 +4278,7 @@ msgstr ""
 #: modules/gui/qt4/ui/profiles.h:702 modules/gui/qt4/ui/profiles.h:746
 #: modules/gui/qt4/ui/profiles.h:749
 msgid "Subtitles"
-msgstr ""
+msgstr "ಉಪಶೀರ್ಷಿಕೆ"
 
 #: src/libvlc-module.c:1660 modules/stream_out/transcode/transcode.c:115
 msgid "Overlays"
@@ -5392,7 +5392,7 @@ msgstr ""
 
 #: modules/access/cdda.c:78
 msgid "CDDB Server"
-msgstr ""
+msgstr "CDDB Server"
 
 #: modules/access/cdda.c:79
 msgid "Address of the CDDB server to use."
@@ -5400,7 +5400,7 @@ msgstr ""
 
 #: modules/access/cdda.c:80
 msgid "CDDB port"
-msgstr ""
+msgstr "CDBD port"
 
 #: modules/access/cdda.c:81
 msgid "CDDB Server port to use."
@@ -5813,7 +5813,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:50
 msgid "Network name"
-msgstr ""
+msgstr "ಜಾಲಬಂಧದ ಹೆಸರು"
 
 #: modules/access/dtv/access.c:51
 msgid "Unique network name in the System Tuning Spaces"
@@ -5915,31 +5915,31 @@ msgstr ""
 
 #: modules/access/dtv/access.c:119
 msgid "Bandwidth (MHz)"
-msgstr ""
+msgstr "Bandwidth (MHz)"
 
 #: modules/access/dtv/access.c:124
 msgid "10 MHz"
-msgstr ""
+msgstr "10 Mhz"
 
 #: modules/access/dtv/access.c:124
 msgid "8 MHz"
-msgstr ""
+msgstr "8 MHz"
 
 #: modules/access/dtv/access.c:124
 msgid "7 MHz"
-msgstr ""
+msgstr "7 MHz"
 
 #: modules/access/dtv/access.c:124
 msgid "6 MHz"
-msgstr ""
+msgstr "6 MHz"
 
 #: modules/access/dtv/access.c:125
 msgid "5 MHz"
-msgstr ""
+msgstr "5 MHz"
 
 #: modules/access/dtv/access.c:125
 msgid "1.712 MHz"
-msgstr ""
+msgstr "1.712 MHz"
 
 #: modules/access/dtv/access.c:128
 msgid "Guard interval"
@@ -5987,15 +5987,15 @@ msgstr ""
 
 #: modules/access/dtv/access.c:161
 msgid "0.35 (same as DVB-S)"
-msgstr ""
+msgstr "0.35 (same as DVB-S)"
 
 #: modules/access/dtv/access.c:161
 msgid "0.20"
-msgstr ""
+msgstr "0.20"
 
 #: modules/access/dtv/access.c:161
 msgid "0.25"
-msgstr ""
+msgstr "0.25"
 
 #: modules/access/dtv/access.c:164
 msgid "Transport stream ID"
@@ -6371,7 +6371,7 @@ msgstr ""
 #: share/lua/http/dialogs/stream_config_window.html:36
 #: share/lua/http/dialogs/stream_window.html:95
 msgid "File"
-msgstr ""
+msgstr "ಕಡತ"
 
 #: modules/access/fs.c:72 modules/gui/qt4/ui/sprefs_video.h:360
 msgid "Directory"
@@ -9654,24 +9654,24 @@ msgstr ""
 msgid "Decoding"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.c:153 modules/codec/omxil/omxil.c:87
+#: modules/codec/avcodec/avcodec.c:154 modules/codec/omxil/omxil.c:87
 #: modules/codec/schroedinger.c:370
 msgid "Encoding"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.c:154
+#: modules/codec/avcodec/avcodec.c:155
 msgid "FFmpeg audio/video encoder"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:70
+#: modules/codec/avcodec/avcodec.h:69
 msgid "Direct rendering"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:73
+#: modules/codec/avcodec/avcodec.h:72
 msgid "Error resilience"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:75
+#: modules/codec/avcodec/avcodec.h:74
 msgid ""
 "libavcodec can do error resilience.\n"
 "However, with a buggy encoder (such as the ISO MPEG-4 encoder from M$) this "
@@ -9679,11 +9679,11 @@ msgid ""
 "Valid values range from 0 to 4 (0 disables all errors resilience)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:80
+#: modules/codec/avcodec/avcodec.h:79
 msgid "Workaround bugs"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:82
+#: modules/codec/avcodec/avcodec.h:81
 msgid ""
 "Try to fix some bugs:\n"
 "1  autodetect\n"
@@ -9697,75 +9697,75 @@ msgid ""
 "\"ump4\", enter 40."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:93 modules/codec/avcodec/avcodec.h:204
+#: modules/codec/avcodec/avcodec.h:92 modules/codec/avcodec/avcodec.h:203
 #: modules/demux/rawdv.c:42 modules/stream_out/transcode/transcode.c:139
 msgid "Hurry up"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:95
+#: modules/codec/avcodec/avcodec.h:94
 msgid ""
 "The decoder can partially decode or skip frame(s) when there is not enough "
 "time. It's useful with low CPU power but it can produce distorted pictures."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:99
+#: modules/codec/avcodec/avcodec.h:98
 msgid "Allow speed tricks"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:101
+#: modules/codec/avcodec/avcodec.h:100
 msgid ""
 "Allow non specification compliant speedup tricks. Faster but error-prone."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:103
+#: modules/codec/avcodec/avcodec.h:102
 msgid "Skip frame (default=0)"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:105
+#: modules/codec/avcodec/avcodec.h:104
 msgid ""
 "Force skipping of frames to speed up decoding (-1=None, 0=Default, 1=B-"
 "frames, 2=P-frames, 3=B+P frames, 4=all frames)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:108
+#: modules/codec/avcodec/avcodec.h:107
 msgid "Skip idct (default=0)"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:110
+#: modules/codec/avcodec/avcodec.h:109
 msgid ""
 "Force skipping of idct to speed up decoding for frame types (-1=None, "
 "0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:113
+#: modules/codec/avcodec/avcodec.h:112
 msgid "Discard cropping information"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:114
+#: modules/codec/avcodec/avcodec.h:113
 msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:116
+#: modules/codec/avcodec/avcodec.h:115
 msgid "Debug mask"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:117
+#: modules/codec/avcodec/avcodec.h:116
 msgid "Set FFmpeg debug mask"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:119
+#: modules/codec/avcodec/avcodec.h:118
 msgid "Codec name"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:120
+#: modules/codec/avcodec/avcodec.h:119
 msgid "Internal libavcodec codec name"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:123
+#: modules/codec/avcodec/avcodec.h:122
 msgid "Visualize motion vectors"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:125
+#: modules/codec/avcodec/avcodec.h:124
 msgid ""
 "You can overlay the motion vectors (arrows showing how the images move) on "
 "the image. This value is a mask, based on these values:\n"
@@ -9775,149 +9775,149 @@ msgid ""
 "To visualize all vectors, the value should be 7."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:132 modules/gui/macosx/simple_prefs.m:215
+#: modules/codec/avcodec/avcodec.h:131 modules/gui/macosx/simple_prefs.m:215
 msgid "Skip the loop filter for H.264 decoding"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:133
+#: modules/codec/avcodec/avcodec.h:132
 msgid ""
 "Skipping the loop filter (aka deblocking) usually has a detrimental effect "
 "on quality. However it provides a big speedup for high definition streams."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:137
+#: modules/codec/avcodec/avcodec.h:136
 msgid "Hardware decoding"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:138
+#: modules/codec/avcodec/avcodec.h:137
 msgid "This allows hardware decoding when available."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:140
+#: modules/codec/avcodec/avcodec.h:139
 msgid "VDA output pixel format"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:141
+#: modules/codec/avcodec/avcodec.h:140
 msgid "The pixel format for output image buffers."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:143
+#: modules/codec/avcodec/avcodec.h:142
 msgid "Threads"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:144
+#: modules/codec/avcodec/avcodec.h:143
 msgid "Number of threads used for decoding, 0 meaning auto"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:151
+#: modules/codec/avcodec/avcodec.h:150
 msgid "Ratio of key frames"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:152
+#: modules/codec/avcodec/avcodec.h:151
 msgid "Number of frames that will be coded for one key frame."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:155
+#: modules/codec/avcodec/avcodec.h:154
 msgid "Ratio of B frames"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:156
+#: modules/codec/avcodec/avcodec.h:155
 msgid "Number of B frames that will be coded between two reference frames."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:159
+#: modules/codec/avcodec/avcodec.h:158
 msgid "Video bitrate tolerance"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:160
+#: modules/codec/avcodec/avcodec.h:159
 msgid "Video bitrate tolerance in kbit/s."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:162
+#: modules/codec/avcodec/avcodec.h:161
 msgid "Interlaced encoding"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:163
+#: modules/codec/avcodec/avcodec.h:162
 msgid "Enable dedicated algorithms for interlaced frames."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:166
+#: modules/codec/avcodec/avcodec.h:165
 msgid "Interlaced motion estimation"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:167
+#: modules/codec/avcodec/avcodec.h:166
 msgid "Enable interlaced motion estimation algorithms. This requires more CPU."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:170
+#: modules/codec/avcodec/avcodec.h:169
 msgid "Pre-motion estimation"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:171
+#: modules/codec/avcodec/avcodec.h:170
 msgid "Enable the pre-motion estimation algorithm."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:174
+#: modules/codec/avcodec/avcodec.h:173
 msgid "Rate control buffer size"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:175
+#: modules/codec/avcodec/avcodec.h:174
 msgid ""
 "Rate control buffer size (in kbytes). A bigger buffer will allow for better "
 "rate control, but will cause a delay in the stream."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:179
+#: modules/codec/avcodec/avcodec.h:178
 msgid "Rate control buffer aggressiveness"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:180
+#: modules/codec/avcodec/avcodec.h:179
 msgid "Rate control buffer aggressiveness."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:183
+#: modules/codec/avcodec/avcodec.h:182
 msgid "I quantization factor"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:185
+#: modules/codec/avcodec/avcodec.h:184
 msgid ""
 "Quantization factor of I frames, compared with P frames (for instance 1.0 => "
 "same qscale for I and P frames)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:188 modules/codec/x264.c:360
+#: modules/codec/avcodec/avcodec.h:187 modules/codec/x264.c:360
 #: modules/demux/mod.c:78
 msgid "Noise reduction"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:189
+#: modules/codec/avcodec/avcodec.h:188
 msgid ""
 "Enable a simple noise reduction algorithm to lower the encoding length and "
 "bitrate, at the expense of lower quality frames."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:193
+#: modules/codec/avcodec/avcodec.h:192
 msgid "MPEG4 quantization matrix"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:194
+#: modules/codec/avcodec/avcodec.h:193
 msgid ""
 "Use the MPEG4 quantization matrix for MPEG2 encoding. This generally yields "
 "a better looking picture, while still retaining the compatibility with "
 "standard MPEG2 decoders."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:199
+#: modules/codec/avcodec/avcodec.h:198
 msgid "Quality level"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:200
+#: modules/codec/avcodec/avcodec.h:199
 msgid ""
 "Quality level for the encoding of motions vectors (this can slow down the "
 "encoding very much)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:205
+#: modules/codec/avcodec/avcodec.h:204
 msgid ""
 "The encoder can make on-the-fly quality tradeoffs if your CPU can't keep up "
 "with the encoding rate. It will disable trellis quantization, then the rate "
@@ -9925,110 +9925,110 @@ msgid ""
 "to ease the encoder's task."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:211
+#: modules/codec/avcodec/avcodec.h:210
 msgid "Minimum video quantizer scale"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:212
+#: modules/codec/avcodec/avcodec.h:211
 msgid "Minimum video quantizer scale."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:215
+#: modules/codec/avcodec/avcodec.h:214
 msgid "Maximum video quantizer scale"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:216
+#: modules/codec/avcodec/avcodec.h:215
 msgid "Maximum video quantizer scale."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:219
+#: modules/codec/avcodec/avcodec.h:218
 msgid "Trellis quantization"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:220
+#: modules/codec/avcodec/avcodec.h:219
 msgid "Enable trellis quantization (rate distortion for block coefficients)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:223
+#: modules/codec/avcodec/avcodec.h:222
 msgid "Fixed quantizer scale"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:224
+#: modules/codec/avcodec/avcodec.h:223
 msgid ""
 "A fixed video quantizer scale for VBR encoding (accepted values: 0.01 to "
 "255.0)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:227
+#: modules/codec/avcodec/avcodec.h:226
 msgid "Strict standard compliance"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:228
+#: modules/codec/avcodec/avcodec.h:227
 msgid ""
 "Force a strict standard compliance when encoding (accepted values: -2 to 2)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:231
+#: modules/codec/avcodec/avcodec.h:230
 msgid "Luminance masking"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:232
+#: modules/codec/avcodec/avcodec.h:231
 msgid "Raise the quantizer for very bright macroblocks (default: 0.0)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:235
+#: modules/codec/avcodec/avcodec.h:234
 msgid "Darkness masking"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:236
+#: modules/codec/avcodec/avcodec.h:235
 msgid "Raise the quantizer for very dark macroblocks (default: 0.0)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:239
+#: modules/codec/avcodec/avcodec.h:238
 msgid "Motion masking"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:240
+#: modules/codec/avcodec/avcodec.h:239
 msgid ""
 "Raise the quantizer for macroblocks with a high temporal complexity "
 "(default: 0.0)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:243
+#: modules/codec/avcodec/avcodec.h:242
 msgid "Border masking"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:244
+#: modules/codec/avcodec/avcodec.h:243
 msgid ""
 "Raise the quantizer for macroblocks at the border of the frame (default: "
 "0.0)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:247
+#: modules/codec/avcodec/avcodec.h:246
 msgid "Luminance elimination"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:248
+#: modules/codec/avcodec/avcodec.h:247
 msgid ""
 "Eliminates luminance blocks when the PSNR isn't much changed (default: 0.0). "
 "The H264 specification recommends -4."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:252
+#: modules/codec/avcodec/avcodec.h:251
 msgid "Chrominance elimination"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:253
+#: modules/codec/avcodec/avcodec.h:252
 msgid ""
 "Eliminates chrominance blocks when the PSNR isn't much changed (default: "
 "0.0). The H264 specification recommends 7."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:257
+#: modules/codec/avcodec/avcodec.h:256
 msgid "Specify AAC audio profile to use"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:258
+#: modules/codec/avcodec/avcodec.h:257
 msgid ""
 "Specify the AAC audio profile to use for encoding the audio bitstream. It "
 "takes the following options: main, low, ssr (not supported),ltp, hev1, hev2 "
@@ -10062,7 +10062,7 @@ msgid ""
 "Do not contact the VideoLAN project about this issue.\n"
 msgstr ""
 
-#: modules/codec/avcodec/encoder.c:751 modules/codec/avcodec/encoder.c:804
+#: modules/codec/avcodec/encoder.c:764 modules/codec/avcodec/encoder.c:817
 msgid "VLC could not open the encoder."
 msgstr ""
 
@@ -10414,7 +10414,7 @@ msgstr ""
 msgid "AAC audio decoder (using libfaad2)"
 msgstr ""
 
-#: modules/codec/faad.c:429
+#: modules/codec/faad.c:430
 msgid "AAC extension"
 msgstr ""
 
@@ -12528,8 +12528,8 @@ msgstr ""
 #: modules/gui/qt4/main_interface.cpp:1158
 #: modules/gui/qt4/main_interface.cpp:1175
 #: modules/gui/qt4/main_interface.cpp:1183
-#: modules/gui/qt4/main_interface.cpp:1206 modules/notify/growl.m:281
-#: modules/video_output/xcb/window.c:313
+#: modules/gui/qt4/main_interface.cpp:1206 modules/lua/libs/httpd.c:80
+#: modules/notify/growl.m:281 modules/video_output/xcb/window.c:313
 msgid "VLC media player"
 msgstr ""
 
@@ -20308,16 +20308,11 @@ msgstr ""
 msgid "Open skin ..."
 msgstr ""
 
-#: modules/lua/libs/httpd.c:64
+#: modules/lua/libs/httpd.c:75
 msgid ""
-"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3."
-"org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
-"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta http-equiv="
-"\"Content-Type\" content=\"text/html;charset=utf-8\" /><title>VLC media "
-"player</title></head><body><p>Password for Web interface has not been set.</"
-"p><p>Please use --http-password, or set a password in </p><p>Preferences "
-"&gt; All &gt; Main interfaces &gt; Lua &gt; Lua HTTP &gt; Password.</p><!-- "
-"VLC_PASSWORD_NOT_SET --></body></html>"
+"<p>Password for Web interface has not been set.</p><p>Please use --http-"
+"password, or set a password in </p><p>Preferences &gt; All &gt; Main "
+"interfaces &gt; Lua &gt; Lua HTTP &gt; Password.</p>"
 msgstr ""
 
 #: modules/lua/vlc.c:48
@@ -27035,17 +27030,21 @@ msgstr ""
 msgid "Media Manager List"
 msgstr ""
 
-#~ msgid "Subtitles codecs"
-#~ msgstr "ಉಪಶೀರ್ಷಿಕೆಗಳ ಸಂಕೇತಕಗಳು"
-
-#~ msgid "General Input"
-#~ msgstr "ಸಾಮಾನ್ಯ ಆದಾನ"
-
 #~ msgid "Licence"
 #~ msgstr "ಪರವಾನಗಿ"
 
-#~ msgid "Add a subtitles file"
-#~ msgstr "ಉಪಶೀರ್ಷಿಕೆಯ ಕಡತವನ್ನು ಸೇರಿಸಿ"
+#, fuzzy
+#~ msgid "Subtitles codecs"
+#~ msgstr "ಉಪಶೀರ್ಷಿಕೆಗಳ codec ಗಳು"
 
+#, fuzzy
+#~ msgid "General Input"
+#~ msgstr "ಆದಾನ ಆಯ್ಕೆಮಾಡಿ"
+
+#, fuzzy
+#~ msgid "Add a subtitles file"
+#~ msgstr "ಉಪಶೀರ್ಷಿಕೆಯ ಕಡತವನ್ನು ಬಳಸು"
+
+#, fuzzy
 #~ msgid "Select the subtitles file"
-#~ msgstr "ಉಪಶೀರ್ಷಿಕೆಯ ಕಡತವನ್ನು ಆಯ್ದುಕೊಳ್ಳಿ"
+#~ msgstr "ಕಡತವನ್ನು ಆಯ್ದುಕೊಳ್ಳಿ"
