@@ -1,14 +1,14 @@
 VideoLAN and the VLC team would like to acknowledge the following contributors:
 
-Programming:
-------------
+Programming
+-----------
 Rémi Denis-Courmont
 Jean-Baptiste Kempf
 Laurent Aimar
 Gildas Bazin
-Pierre d'Herbemont
-Rafaël Carré
 Felix Paul Kühne
+Rafaël Carré
+Pierre d'Herbemont
 Rémi Duraffort
 Derk-Jan Hartman
 Antoine Cellerier
@@ -19,180 +19,187 @@ Clément Stenac
 Christophe Massiot
 Ilkka Ollakka
 Pierre Ynard
+François Cartegnie
 Damien Fouilleul
 Sigmund Augdal Helberg
 Erwan Tulou
+David Fuhrmann
 Olivier Teulière
 Cyril Deguet
 Eric Petit
 Filippo Carone
 Rocky Bernstein
-François Cartegnie
+Hugo Beauzée-Luyssen
 Olivier Aubert
+Pavlov Konstantin
 Jakob Leben
 Benjamin Pracht
-Pavlov Konstantin
 Jean-Philippe André
-Hugo Beauzée-Luyssen
 Steve Lhomme
 Stéphane Borel
 JP Dinger
 Geoffroy Couprie
+Martin Storsjö
 Marian Ďurkovič
+Ludovic Fauvet
 Yoann Peronneau
-Jon Lech Johansen
 Sébastien Escudier
+Jon Lech Johansen
+KO Myung-Hun
+Edward Wang
 Dennis van Amerongen
 Faustino Osuna
+Mirsal Ennaime
+Denis Charmet
 Jérôme Decoodt
 Loïc Minier
-KO Myung-Hun
 David Flynn
+Frédéric Yhuel
+Kaarlo Raiha
 Mark Moriarty
-Ludovic Fauvet
+Christopher Mueller
 Fabio Ritrovato
 Tony Castley
-Mirsal Ennaime
-Kaarlo Raiha
 Srikanth Raju
 Michel Kaempf
 Jean-Marc Dressler
 Johan Bilien
 Vincent Seguin
-David Fuhrmann
-Martin Storsjö
 Simon Latapie
-Christopher Mueller
 Bernie Purcell
 Henri Fallon
-Emmanuel Puig
 Sebastien Zwickert
+Christoph Miebach
 Adrien Maglo
+Emmanuel Puig
 Renaud Dartus
 Alexis de Lattre
 Vincent Penquerc'h
 Arnaud de Bossoreille de Ribou
-Denis Charmet
 Mohammed Adnène Trojette
 Boris Dorès
-Edward Wang
 Jai Menon
 Anil Daoud
 Daniel Mierswa
-Pierre Baillet
+Naohiro Koriyama
 Rob Jonson
+Pierre Baillet
 Dominique Leuenberger
 Andre Pang
+Zoran Turalija
 Akash Mehrotra
 André Weber
 Anthony Loiseau
 Lukas Durfina
 Xavier Marchesini
 Cyril Mathé
+Devin Heitmueller
 Juho Vähä-Herttua
 Ken Self
+Alexis Ballier
 Juha Jeronen
+Nicolas Chauvet
 Richard Hosking
 Éric Lassauge
-Alexis Ballier
 Marc Ariberti
+Sébastien Toque
+Tobias Güntner
 Benoit Steiner
 Michel Lespinasse
-Tobias Güntner
 Carlo Calabrò
 Cheng Sun
-Nicolas Chauvet
-Dean Lee
-Naohiro Koriyama
+Michał Trzebiatowski
+Brad Smith
+Brendon Justin
 Alexey Sokolov
 Basos G
-Brad Smith
-Michał Trzebiatowski
 Philippe Morin
+Steinar H. Gunderson
 Vicente Jimenez Aguilar
-Vincenzo Reale
 Yuval Tze
-Brendon Justin
 Yves Duret
-Frédéric Yhuel
+Benjamin Drung
 Michael Hanselmann
-Damien Erambert
+Alex Merry
 Damien Lucas
-Marián Hikaník
-Mihkel Kirjutas
-Richard Shepherd
-Sébastien Toque
-Gaël Hendryckx
 Grigori Goronzy
+Richard Shepherd
+Gaël Hendryckx
+Michael Feurstein
 Stephan Assmus
 Adrien Grand
 Colin Guthrie
 David Menestrina
 Dominique Martinet
-Fumio Nakayama
+Gleb Pinigin
 Jason Luka
 Luc Saillard
+Luca Barbato
+Mario Speiß
 Pankaj Yadav
 Ramiro Polla
-Sidney Doria
-Steinar H. Gunderson
+Ronald Wright
+Rui Zhang
 Can Wu
 Christophe Courtaut
-Gonçalo Cordeiro
+FUJISAWA Tooru
 Hannes Domani
-Ivo Ivanov
 Manol Manolov
-Mindaugas Baranauskas
-A S Alam
+Timothy B. Terriberry
 Antoine Lejeune
 Arnaud Schauly
 Branko Kokanovic
-Christoph Miebach
-David González
 Dylan Yudaken
 Florian G. Pflug
+François Revol
 G Finch
-Gaëtan Rousseaux
 Keary Griffin
 Konstanty Bialkowski
-Myckel Habets
+Ming Hu
+Philippe Coent
 Przemyslaw Fiala
 Tanguy Krotoff
-Thomas De Rocker
-Xabier Aramendi
-Benjamin Drung
+Vianney BOYER
+Casian Andrei
+Chris Smowton
 David Kaplan
-Devin Heitmueller
 Eugenio Jarosiewicz
+Fabian Keil
 Guillaume Poussel
+John Peterson
 Justus Piater
-Luca Barbato
+Mark Lee
 Martin T. H. Sandsmark
 Rune Botten
 Søren Bøg
 Toralf Niebuhr
+Tristan Matthews
+Angelo Haller
+Aurélien Nephtali
 Austin Burrow
 Bill C. Riemers
+Colin Delacroix
 Cristian Maglie
 Elminster2031
-Fabian Keil
 Jakub Wieczorek
-Khoem Sokhem
-Mario Siegmann
+John Freed
+Mark Hassman
 Martin Briza
 Mike Houben
 Romain Goyet
+Adrian Yanes
+Alexander Lakhin
+Anatoliy Anischovich
 Barry Wardell
 Ben Hutchings
 Besnard Jean-Baptiste
 Brian Weaver
-Casian Andrei
 Clement Chesnin
-Daniel Nylander
-Eirik U. Birkeland
-FUJISAWA Tooru
-Gabor Kelemen
-Jamil Ahmed
+David Geldreich
+Diego Elio Pettenò
+Diego Fernando Nieto
+Georgi Chorbadzhiyski
+Jon Stacey
 Jonathan Rosser
 Joris van Rooij
 Kaloyan Kovachev
@@ -202,66 +209,69 @@ Loren Merritt
 Maciej Blizinski
 Mark Bidewell
 Miguel Angel Cabrera Moya
-Ming Hu
 Niles Bindel
-Otto Kekäläinen
-Pauline Castets
-Predrag Ljubenović
+Samuel Pitoiset
 Scott Caudle
+Sean Robinson
+Sergey Radionov
 Simon Hailes
+Stephen Parry
+Sukrit Sangwan
+Thierry Reding
 Xavier Martin
-Yaron Shahrabani
-Adrian Yanes
 Alex Converse
 Alexander Bethke
-Alexander Law
+Alexandre Ratchov
 Andres Krapf
+Andrey Utkin
 Andri Pálsson
 Andy Chenee
 Anuradha Suraparaju
-Aurélien Nephtali
 Benjamin Poulain
 Brieuc Jeunhomme
 Chris Clayton
-Chris Smowton
-Colin Delacroix
+Clément Lecigne
 Cédric Cocquebert
+Daniel Peng
 Danny Wood
 David K
-Denis Arnaud
 Edouard Gomez
 Emmanuel de Roux
+Frode Tennebø
 GBX
 Gaurav Narula
-Georgi Chorbadzhiyski
 Geraud CONTINSOUZAS
+Hugues Fruchet
 Jan Winter
 Jean-François Massol
 Jean-Philippe Grimaldi
-Jon Stacey
+Josh Watzman
 Kai Lauterbach
 Konstantin Bogdanov
 Kuan-Chung Chiu
-Mark Hassman
+Kuang Rufan
 Matthias Dahl
-Michael Feurstein
 Michael McEll
 Michael Ploujnikov
 Mike Schrag
+Nickolai Zeldovich
+Nicolas Bertrand
 Niklas Hayer
+Olafs Vandāns
 Olivier Gambier
 Paul Corke
-Praveen Illa
 Ron Frederick
-Ronald Wright
 Rov Juvano
 Sabourin Gilles
+Sam Lade
+Sandeep Kumar
 Sasha Koruga
-Sergey Radionov
+Sreng Jean
 Sven Petai
-Thierry Reding
+Tomas Krotil
 Tomer Barletz
 Tristan Leteurtre
+Vittorio Giovara
 Wang Bo
 maxime Ripard
 xxcv
@@ -269,14 +279,17 @@ Adam Hoka
 Adrian Knoth
 Adrien Cunin
 Alan Fischer
+Alan McCosh
 Alex Helfet
+Alexander Terentyev
 Alexandre Ferreira
 Alina Friedrichsen
 An L. Ber
 Andreas Schlick
+Andrew Schubert
 Andrey Makhnutin
-Andrey Wolk
 Arnaud Vallat
+Asad Mehmood
 Ashok Bhat
 Austin English
 Baptiste Coudurier
@@ -286,24 +299,23 @@ Blake Livingston
 Brandon Brooks
 Brian Johnson
 Brian Kurle
+Cezar Elnazli
 Chris White
 Christian Masus
+Christoph Pfister
 Christoph Seibert
 Christopher Key
 Christopher Rath
 Claudio Ortelli
-Clement Lecigne
 Cody Russell
 Cristian Morales Vega
 Dan Rosenberg
-Daniel Dreibrodt
 Daniel Marth
 Daniel Tisza
-David Planella
 Detlef Schroeder
-Diego Fernando Nieto
-Dominic Spitaler
+Diego Biurrun
 Dominik 'Rathann' Mierzejewski
+Duncan Salerno
 Edward Sheldrake
 Elliot Murphy
 Eren Inan Canpolat
@@ -313,38 +325,47 @@ Fargier Sylvain
 Fathi Boudra
 Felix Geyer
 Filipe Azevedo
+Finn Hughes
 Florian Hubold
+Florian Roeske
 Frank Enderle
-François Revol
 Frédéric Crozat
 Georg Seifert
 Gertjan Van Droogenbroeck
 Gilles Chanteperdrix
 Greg Farrell
+Gregory Maxwell
 Gwenole Beauchesne
 Götz Waschk
 Hans-Kristian Arntzen
 Harry Sintonen
 Iain Wade
 Ibraheem Paredath
+Isamu Arimoto
 Ismael Luceno
+James Bates
 James Bond
 James Turner
+Janne Grunau
 Janne Kujanpää
 Jarmo Torvinen
 Jason Scheunemann
 Jeff Lu
 Jeroen Ost
+Joe Taber
 Johann Ransay
 Johannes Weißl
 John Hendrikx
 John Stebbins
 Jonas Gehring
 Joseph S. Atkinson
+Juergen Lock
+Julien 'Lta' BALLET
 Julien / Gellule
 Julien Humbert
 Kamil Baldyga
 Kamil Klimek
+Karlheinz Wohlmuth
 Kevin Anthony
 Kevin DuBois
 Lari Natri
@@ -353,8 +374,8 @@ Lucas C. Villa Real
 Lukáš Lalinský
 Mal Graty
 Malte Tancred
-Mark Lee
 Martin Pöhlmann
+Martin Zeman
 Marton Balint
 Mathew King
 Mathieu Sonet
@@ -363,47 +384,57 @@ Matthias Bauer
 Mika Tiainen
 Mike Cardillo
 Mounir Lamouri (volkmar)
+Natanael Copa
 Nathan Phillip Brink
 Nick Briggs
 Nick Pope
-Pavol Babincak
+Nil Geiswiller
+Pascal Thomet
 Pere Orga
 Peter Bak Nielsen
 Phil Roffe and David Grellscheid
+Philip Sequeira
 Pierre Souchay
+Piotr Fusik
 Pádraig Brady
 R.M
 Ralph Giles
-Ricardo Pérez López
+Ramon Gabarró
+Robert Forsman
 Robert Jedrzejczyk
 Robert Paciorek
 Rolf Ahrenberg
 Roman Pen
 Ruud Althuizen
-Sam Lade
-Samuel Pitoiset
 Samuli Suominen
 Scott Lyons
 Sebastian Birk
 Sergey Puzanov
+Sergio Ammirata
 Sharad Dixit
+Song Ye Wen
 Stephan Krempel
 Steven Kramer
 Steven Sheehy
-Sukrit Sangwan
-Sveinn í Felli
 Sveinung Kvilhaugsvik
 Sylvain Cadhillac
+Sylver Bruneau
+Takahito HIRANO
 Theron Lewis
 Thijs Alkemade
+Tillmann Karras
 Timo Paulssen
+Timo Rothenpieler
+Tobias Rapp
 Tomasen
 Tony Vankrunkelsven
 Tristan Heaven
+Varphone Wong
+Vasily Fomin
+Vikram Narayanan
 Yannick Bréhon
 Yavor Doganov
 Yohann Martineau
-bbcallen
 dharani.prabhu.s
 suheaven
 wucan
@@ -478,7 +509,6 @@ Jan Van Boghout
 Jasper Alias
 Jean-Alexis Montignies
 Jean-Baptiste Le Stang
-Jean Sreng
 Jeffrey Baker
 Jeroen Massar
 Jérôme Guilbaud
@@ -528,6 +558,7 @@ Ondrej Kuda aka Albert
 Pascal Levesque
 Patrick Horn
 Patrick McLean
+Pauline Castets
 Paul Mackerras
 Peter Surda
 Petr Vacek
@@ -557,7 +588,6 @@ Tim Schuerewegen
 Tong Ka Man
 Torsten Spindler
 Udo Richter
-Vianney Boyer
 Vincent Dimar
 Vincent Penne
 Vitalijus Slavinskas
@@ -594,97 +624,225 @@ Bill Eldridge
 
 Localization
 ------------
+Abdul Fousan - Tamil
+A. Decorte - Friulian
+Adem Gunes - Turkish
+Adi Nugroho - Tagalog
+Adnan Memija - Bosnian
+airplanez - Korean
 Ajith Manjula - Sinhala
+Aled Powell - Welsh
 Alexander Didebulidze - Georgian
-Alexander Law - Russian
+Alexander Henket - Dutch
+Alexander Jansen - Norwegian Bokmål
+Alexander Lakhin - Russian
 Alexey Lugin - Ukrainian
 Alexey Salmin - Russian
+Alfred John - Acoli
 Amanpreet Singh Alam - Punjabi
 André de Barros Martins Ribeiro - Brazilian portuguese
 Andrey Brilevskiy - Russian
 Andrey Wolk - Russian
+Andri Pálsson - Icelandic
+Andriy Bandura - Ukrainian
 Anh Phan - Vietnamese
 Animesh Swar - Nepalese
+Aputsiaĸ Niels Janussen - Danish
 Ara Bextiyar - Sorani (Kurdish)
 Ari Constâncio - Portuguese
 Arkadiusz Lipiec - Polish
+Ask Hjorth Larsen - Danish
 Audrey Prevost - French
+Auk Piseth - Khmer
 Bayarsaikhan Enkhtaivan Баярсайхан Энхтайван - Mongolian
+Biraj Karmakar - Bengali (India)
 Bruno Queirós - Portuguese
 Bruno Vella - Italian
 Carlo Calabrò - Italian
+Chandan Kumar - Hindi
+Chesús Daniel Trigo - Aragonese
+Christoph Miebach - German
+Chynggyz Jumaliev - Kirgyz
+Circo Radu - Romanian
 Cristian Secară - Romanian
 Daniel Nylander - Swedish
+Daniel Winzen - German
 David González - Spanish
-Dean Lee - Chinese
+David Planella - Catalan
+Dean Lee - Simplified Chinese
+Denis Arnaud - Breton
+Derk-Jan Hartman - Dutch
 DirektX - Hungarian
 Dominko Aždajić - Croatian
 Dylan Aïssi - French
+Đorđe Vasiljević - Serbian
 Eduard Babayan - Armenian
+Eero - Estonian
 Eirik U. Birkeland - Norwegian Nynorsk
-Éric Lassauge  -- French
+Elizabeth Da Conceicao Baptista - Tetum
+Emilio Sepúlveda - Interlingua
+Emin Mastizada - Azerbaijani
+Éric Lassauge - French
 Farzaneh Sarafraz - Persian
+Florence Tushabe - Chiga
 Fouzia Bourai - Arabic
-Frank Chao - Chinese Traditional
+Frank Chao - Traditional Chinese
+Freyr Gunnar Ólafsson - Icelandic
+Friedel Wolff - Afrikaans
 Fumio Nakayama - Japanese
 Gabor Kelemen - Hungarian
+Gaurav Kumar - Hindi
 Gaëtan Rousseaux - Walloon
+Ghjuvan Pasquinu - Corsican
 Goce Manevski - Macedonian
+Golam Maruf Oovee - Bengali
+Gonçalo Cordeiro - Galician
 Gorana Milicevic - Serbian
+Goswami Hardikpuri Kishorpuri - Gujarati
 Haakon Meland Eriksen - Norwegian
 Han HoJoong - Korean
+Hardik Kishorpuri Goswami - Gujarati
+Hemanta Nandi - Bengali (India)
+Huw Waters - Welsh
 H.Shalitha Vikum - Sinhala
+Ibrahima Sarr - Fulah
+Israt Jahan - Bengali
+Ivar Smolin - Estonian
+Iván Seoane Pardo - Galician
 Ivo Ivanov - Bulgarian
+Iñaki Larrañaga Murgoitio - Basque
+Iñigo Varela - Asturian; Bable
+Jakub Žáček - Czech
+James Olweny - Ganda
 Jamil Ahmed - Bengali
 Javier Varela - Spanish
 Jean-Pierre Kuypers - French
+Jens Seidel - German
+Joao Almeida - Portuguese
 Joel Arvidsson - Swedish
-Jon Stødle - Norwegian Nynorsk
+jogijs - Latvian
 Jonas Larsen - Danish
+Jon Stødle - Norwegian Nynorsk
 Jouni Kähkönen - Finnish
+Juha Jeronen - Finnish
+Julen Ruiz Aizpuru - Basque
 Kai Hermann - German
+Kamil Páral - Czech
 Kang Jeong-Hee - Korean
+Kasper Tvede - Danish
 Kaya Zeren - Turkish
+Kenneth Nielsen - Danish
+Khin Mi Mi Aung - Burmese
+Khoem Sokhem - Khmer
+Kola - Albanian
 Kypchak Kypchak - Kazakh
 Laurent Jonqueres - Occitan
+Loba Yeasmeen - Bengali
 Lorena Gomes - Catalan
+Lorenzo Porta - Italian
 Luqman Hakim - Indonesian
+L. Balasubramaniam - Hindi
 Mahrazi Mohd Kamal - Malay
 Manolis Stefanis - Modern Greek
+Manuela Silva/Alfredo Silva - Portuguese
 Marián Hikaník - Slovak
+Mario Siegmann - German
 Marko Uskokovic - Serbian
+Martin Srebotnjak - Slovenian
+Martin Zicha - Czech
 Matej Urbančič - Slovenian
 Mathias C. Berens, welcome-soft - German
 Mattias Põldaru - Estonian
 Md. Rezwan Shahid - Bengali
 Meelad Zakaria - Persian
+Michael Bauer - Scottish Gaelic
+Michal Halenka - Czech
 Michał Trzebiatowski - Polish
+Miguel Sousa - Portuguese
+Mihkel Kirjutas - Estonian
 Mindaugas Baranauskas - Lithuanian
 Miroslav Oujeský - Czech
 Morten Brix Pedersen - Danish
+Mustafa Sandal - Czech
 Myckel Habets - Dutch
 Namhyung Kim - Korean
+Niels Fanøe - Danish
+Niklas 'Nille' Åkerström - Swedish
+Olav Dahlum - Norwegian Bokmål
 Oleksandr Natalenko - Ukrainian
 Omer Ensari - Kurmanji (Kurdish)
+Osama Khalid - Arabic
 Otto Kekäläinen - Finnish
+Paras Nath Chaudhary - Nepali
+Pau Iranzo - Catalan
+Paula Iglesias - Galician
+Pedro Valadares - Portuguese
+Peter Jespersen - Danish
+Petr Šimáček - Czech
+Phan Anh - Vietnamese
+Philipp Weissenbacher - German
 Pittayakom Saingtong - Thai
+Prasannajit Acharya - Oriya
+Praveen Illa - Telugu
 Predrag Ljubenović - Serbian
+Pyae Sone - Burmese
+Rajnikant Kumbhar - Marathi
+Ricardo Perdigão - Portuguese
+Ricardo Pérez López - Spanish
 Roustam Ghizdatov - Russian
-Salar Khalilzadeh" - Persian
-Сергей Дарьичев - Belarusian
+Ruei-Yuan Lu - Traditional Chinese
+Saad Liaquat Kiani - Urdu
+Sadia Afroz - Bengali
+Said Marjan Zazai - Pashto
+Salar Khalilzadeh - Persian
+Sam Askari - Spanish
+Sam Hocevar - British
+Samuel Hocevar - French
+Saúl Ortega - Spanish
+Sayan Chowdhury - Hindi
+Seanán Ó Coistín - Irish
+Semsudin Abdic - Bosnian
+Shambhu Kumar - Hindi
+Shantanu Sarkar - Hindi
+Shashi Ranjan - Hindi
+Siarhei Daryichau Дар'ічаў Сяргей - Belarusian
 Sidney Doria - Brazilian Portuguese
+Sigmund Augdal - Norwegian Bokmål
+Simos Xenitellis - Greek
+Sipho Sibiya - Zulu
+Sok Sophea - Khmer
+Solomon Gizaw - Amharic
 Sreejith P - Malayalam
+Suraj Kawade - Marathi
+Stian Jørgensrud - Norwegian Bokmål
+Sveinn í Felli - Icelandic
 Tadashi Jokagi - Japanese
+Tarsem Singh - Hindi
+Thanakrit Chomphuming - Thai
+Tero Pelander - Finnish
 Thomas De Rocker - Dutch
 Thomas Graf - gettext support, German
 Tomáš Chvátal - Czech
 Tòni Galhard - Occitan
+Umesh Agarwal - Bengali (India)
+Umidjon Almasov - Uzbek
+Václav Pavlíček - Czech
 Valek Filippov - Russian
 Vicente Jimenez Aguilar - Spanish
 Vincenzo Reale - Italian
-Vladimir Yermolayev  - Russian
-Wei Mingzhi - Simplied Chinese
+Vít Pelčák - Czech
+viyyer - Hindi
+Vladimir Yermolayev - Russian
+Vojtěch Smejkal - Czech
+Wei Mingzhi - Simplified Chinese
+Xabier Aramendi - Basque
 Xènia Albà Cantero - Catalan
 Xuacu Saturio - Asturian
+Yaron Shahrabani - Hebrew
+Yaşar Tay - Turkish
+Yhal Htet Aung - Burmese
+Yogesh K S - Kannada
+Yoyo - Simplified Chinese
 Yuksel Yildirim - Turkish
+Zabeeh Khan - Pashto
 Zhang Tong - Chinese
