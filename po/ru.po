@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2013-05-28 11:42+0200\n"
-"PO-Revision-Date: 2013-05-04 13:12+0000\n"
+"POT-Creation-Date: 2013-06-06 17:40+0200\n"
+"PO-Revision-Date: 2013-06-08 09:05+0000\n"
 "Last-Translator: law <exclusion@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/vlc-trans/"
 "language/ru/)\n"
@@ -34,9 +34,9 @@ msgid ""
 msgstr ""
 "Эта программа поставляется БЕЗ ГАРАНТИИ в степени, разрешенной "
 "законодательством.\n"
-"Вы можете передавать ее на условиях Стандартной общественной лицензии GNU;\n"
+"Вы можете передавать её на условиях Стандартной общественной лицензии GNU;\n"
 "Подробная информация находится в файле COPYING.\n"
-"Написана командой VideoLAN; см. файл AUTHORS.\n"
+"Программа разработана командой VideoLAN (см. файл AUTHORS).\n"
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
@@ -1187,8 +1187,8 @@ msgstr "декодер"
 
 #: src/input/decoder.c:276 src/input/decoder.c:467
 #: modules/codec/avcodec/encoder.c:248 modules/codec/avcodec/encoder.c:256
-#: modules/codec/avcodec/encoder.c:290 modules/codec/avcodec/encoder.c:750
-#: modules/codec/avcodec/encoder.c:803 modules/stream_out/es.c:362
+#: modules/codec/avcodec/encoder.c:290 modules/codec/avcodec/encoder.c:763
+#: modules/codec/avcodec/encoder.c:816 modules/stream_out/es.c:362
 #: modules/stream_out/es.c:377
 msgid "Streaming / Transcoding failed"
 msgstr "Ошибка вещания/перекодирования"
@@ -10420,24 +10420,24 @@ msgstr "Аудио/видеодекодер FFmpeg"
 msgid "Decoding"
 msgstr "Декодирование"
 
-#: modules/codec/avcodec/avcodec.c:153 modules/codec/omxil/omxil.c:87
+#: modules/codec/avcodec/avcodec.c:154 modules/codec/omxil/omxil.c:87
 #: modules/codec/schroedinger.c:370
 msgid "Encoding"
 msgstr "Кодирование"
 
-#: modules/codec/avcodec/avcodec.c:154
+#: modules/codec/avcodec/avcodec.c:155
 msgid "FFmpeg audio/video encoder"
 msgstr "Аудио/видеокодер FFmpeg"
 
-#: modules/codec/avcodec/avcodec.h:70
+#: modules/codec/avcodec/avcodec.h:69
 msgid "Direct rendering"
 msgstr "Прямой рендеринг"
 
-#: modules/codec/avcodec/avcodec.h:73
+#: modules/codec/avcodec/avcodec.h:72
 msgid "Error resilience"
 msgstr "Устойчивость к ошибкам"
 
-#: modules/codec/avcodec/avcodec.h:75
+#: modules/codec/avcodec/avcodec.h:74
 msgid ""
 "libavcodec can do error resilience.\n"
 "However, with a buggy encoder (such as the ISO MPEG-4 encoder from M$) this "
@@ -10449,11 +10449,11 @@ msgstr ""
 "генерируют слишком много ошибок.\n"
 "Возможные значения параметра — от 0 до 4 (0 отключает все сообщения)."
 
-#: modules/codec/avcodec/avcodec.h:80
+#: modules/codec/avcodec/avcodec.h:79
 msgid "Workaround bugs"
 msgstr "Обход ошибок"
 
-#: modules/codec/avcodec/avcodec.h:82
+#: modules/codec/avcodec/avcodec.h:81
 msgid ""
 "Try to fix some bugs:\n"
 "1  autodetect\n"
@@ -10477,12 +10477,12 @@ msgstr ""
 "Вы должны ввести сумму необходимых значений. К примеру, чтобы исправить «ac "
 "vlc» и «ump4», введите 40."
 
-#: modules/codec/avcodec/avcodec.h:93 modules/codec/avcodec/avcodec.h:204
+#: modules/codec/avcodec/avcodec.h:92 modules/codec/avcodec/avcodec.h:203
 #: modules/demux/rawdv.c:42 modules/stream_out/transcode/transcode.c:139
 msgid "Hurry up"
 msgstr "Ускорить"
 
-#: modules/codec/avcodec/avcodec.h:95
+#: modules/codec/avcodec/avcodec.h:94
 msgid ""
 "The decoder can partially decode or skip frame(s) when there is not enough "
 "time. It's useful with low CPU power but it can produce distorted pictures."
@@ -10491,22 +10491,22 @@ msgstr ""
 "времени. Это может быть полезно с медленным CPU, но может давать испорченную "
 "картину."
 
-#: modules/codec/avcodec/avcodec.h:99
+#: modules/codec/avcodec/avcodec.h:98
 msgid "Allow speed tricks"
 msgstr "Расшир. возможности по управлению скоростью"
 
-#: modules/codec/avcodec/avcodec.h:101
+#: modules/codec/avcodec/avcodec.h:100
 msgid ""
 "Allow non specification compliant speedup tricks. Faster but error-prone."
 msgstr ""
 "Использование недокументированных возможностей по увеличению скорости. Более "
 "быстрый, но и более подверженный ошибкам."
 
-#: modules/codec/avcodec/avcodec.h:103
+#: modules/codec/avcodec/avcodec.h:102
 msgid "Skip frame (default=0)"
 msgstr "Пропускать кадры (по умолчанию 0)"
 
-#: modules/codec/avcodec/avcodec.h:105
+#: modules/codec/avcodec/avcodec.h:104
 msgid ""
 "Force skipping of frames to speed up decoding (-1=None, 0=Default, 1=B-"
 "frames, 2=P-frames, 3=B+P frames, 4=all frames)."
@@ -10514,11 +10514,11 @@ msgstr ""
 "Принудительный пропуск кадров для ускорения декодирования (-1=нет, 0=по "
 "умолчанию, 1=B-кадры, 2=P-кадры, 3=B+P-кадры, 4=все кадры)."
 
-#: modules/codec/avcodec/avcodec.h:108
+#: modules/codec/avcodec/avcodec.h:107
 msgid "Skip idct (default=0)"
 msgstr "Пропустить ИДКП (по умолчанию=0)"
 
-#: modules/codec/avcodec/avcodec.h:110
+#: modules/codec/avcodec/avcodec.h:109
 msgid ""
 "Force skipping of idct to speed up decoding for frame types (-1=None, "
 "0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)."
@@ -10527,36 +10527,36 @@ msgstr ""
 "ускорения декодирования типов кадров (-1=нет, 0=по умолчанию, 1=B-кадры, 2=P-"
 "кадры, 3=B+P-кадры, 4=все кадры)."
 
-#: modules/codec/avcodec/avcodec.h:113
+#: modules/codec/avcodec/avcodec.h:112
 msgid "Discard cropping information"
 msgstr "Игнорировать параметры обрезания"
 
-#: modules/codec/avcodec/avcodec.h:114
+#: modules/codec/avcodec/avcodec.h:113
 msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
 msgstr ""
 "Игнорировать внутренние параметры обрезания видео (например, в H.264 SPS)."
 
-#: modules/codec/avcodec/avcodec.h:116
+#: modules/codec/avcodec/avcodec.h:115
 msgid "Debug mask"
 msgstr "Маска для отладки"
 
-#: modules/codec/avcodec/avcodec.h:117
+#: modules/codec/avcodec/avcodec.h:116
 msgid "Set FFmpeg debug mask"
 msgstr "Установите маску отладки ffmpeg"
 
-#: modules/codec/avcodec/avcodec.h:119
+#: modules/codec/avcodec/avcodec.h:118
 msgid "Codec name"
 msgstr "Название кодека"
 
-#: modules/codec/avcodec/avcodec.h:120
+#: modules/codec/avcodec/avcodec.h:119
 msgid "Internal libavcodec codec name"
 msgstr "Внутреннее название кодека libavcodec"
 
-#: modules/codec/avcodec/avcodec.h:123
+#: modules/codec/avcodec/avcodec.h:122
 msgid "Visualize motion vectors"
 msgstr "Показывать векторы движения"
 
-#: modules/codec/avcodec/avcodec.h:125
+#: modules/codec/avcodec/avcodec.h:124
 msgid ""
 "You can overlay the motion vectors (arrows showing how the images move) on "
 "the image. This value is a mask, based on these values:\n"
@@ -10573,11 +10573,11 @@ msgstr ""
 "4 - показывать обратно предсказанные векторы движения B-кадров\n"
 "Чтобы показать все векторы, укажите значение 7."
 
-#: modules/codec/avcodec/avcodec.h:132 modules/gui/macosx/simple_prefs.m:215
+#: modules/codec/avcodec/avcodec.h:131 modules/gui/macosx/simple_prefs.m:215
 msgid "Skip the loop filter for H.264 decoding"
 msgstr "Не устранять блочность при декодировании с H.264"
 
-#: modules/codec/avcodec/avcodec.h:133
+#: modules/codec/avcodec/avcodec.h:132
 msgid ""
 "Skipping the loop filter (aka deblocking) usually has a detrimental effect "
 "on quality. However it provides a big speedup for high definition streams."
@@ -10586,86 +10586,86 @@ msgstr ""
 "ухудшению качества изображения, но и к большому приросту производительности "
 "для потоков с высоким разрешением."
 
-#: modules/codec/avcodec/avcodec.h:137
+#: modules/codec/avcodec/avcodec.h:136
 msgid "Hardware decoding"
 msgstr "Аппаратное декодирование"
 
-#: modules/codec/avcodec/avcodec.h:138
+#: modules/codec/avcodec/avcodec.h:137
 msgid "This allows hardware decoding when available."
 msgstr "Позволяет использовать аппаратный декодер видео, если он есть."
 
-#: modules/codec/avcodec/avcodec.h:140
+#: modules/codec/avcodec/avcodec.h:139
 msgid "VDA output pixel format"
 msgstr "Формат пикселов VDA"
 
-#: modules/codec/avcodec/avcodec.h:141
+#: modules/codec/avcodec/avcodec.h:140
 msgid "The pixel format for output image buffers."
 msgstr "Формат пикселов в буферах вывода изображения."
 
-#: modules/codec/avcodec/avcodec.h:143
+#: modules/codec/avcodec/avcodec.h:142
 msgid "Threads"
 msgstr "Потоки"
 
-#: modules/codec/avcodec/avcodec.h:144
+#: modules/codec/avcodec/avcodec.h:143
 msgid "Number of threads used for decoding, 0 meaning auto"
 msgstr "Количество потоков, используемых для декодирования (0 - авто)."
 
-#: modules/codec/avcodec/avcodec.h:151
+#: modules/codec/avcodec/avcodec.h:150
 msgid "Ratio of key frames"
 msgstr "Частота ключевых кадров"
 
-#: modules/codec/avcodec/avcodec.h:152
+#: modules/codec/avcodec/avcodec.h:151
 msgid "Number of frames that will be coded for one key frame."
 msgstr "Число кадров, которые будут закодированы от одного ключевого кадра."
 
-#: modules/codec/avcodec/avcodec.h:155
+#: modules/codec/avcodec/avcodec.h:154
 msgid "Ratio of B frames"
 msgstr "Частота B-кадров"
 
-#: modules/codec/avcodec/avcodec.h:156
+#: modules/codec/avcodec/avcodec.h:155
 msgid "Number of B frames that will be coded between two reference frames."
 msgstr ""
 "Число B-кадров, которые будут закодированы между двумя референсными кадрами."
 
-#: modules/codec/avcodec/avcodec.h:159
+#: modules/codec/avcodec/avcodec.h:158
 msgid "Video bitrate tolerance"
 msgstr "Допустимое отклонение битрейта видео"
 
-#: modules/codec/avcodec/avcodec.h:160
+#: modules/codec/avcodec/avcodec.h:159
 msgid "Video bitrate tolerance in kbit/s."
 msgstr "Допустимое отклонение битрейта видео в кбит/сек."
 
-#: modules/codec/avcodec/avcodec.h:162
+#: modules/codec/avcodec/avcodec.h:161
 msgid "Interlaced encoding"
 msgstr "Чересстрочное кодирование"
 
-#: modules/codec/avcodec/avcodec.h:163
+#: modules/codec/avcodec/avcodec.h:162
 msgid "Enable dedicated algorithms for interlaced frames."
 msgstr ""
 "Задействовать специальный алгоритм для кадров с чересстрочной развёрткой."
 
-#: modules/codec/avcodec/avcodec.h:166
+#: modules/codec/avcodec/avcodec.h:165
 msgid "Interlaced motion estimation"
 msgstr "Чересстрочная оценка движения"
 
-#: modules/codec/avcodec/avcodec.h:167
+#: modules/codec/avcodec/avcodec.h:166
 msgid "Enable interlaced motion estimation algorithms. This requires more CPU."
 msgstr ""
 "Включить чересстрочные алгоритмы оценки движения. Требует более мощного CPU."
 
-#: modules/codec/avcodec/avcodec.h:170
+#: modules/codec/avcodec/avcodec.h:169
 msgid "Pre-motion estimation"
 msgstr "Оценка пре-движения"
 
-#: modules/codec/avcodec/avcodec.h:171
+#: modules/codec/avcodec/avcodec.h:170
 msgid "Enable the pre-motion estimation algorithm."
 msgstr "Включить алгоритм оценки пре-движения"
 
-#: modules/codec/avcodec/avcodec.h:174
+#: modules/codec/avcodec/avcodec.h:173
 msgid "Rate control buffer size"
 msgstr "Размер буфера контроля частоты"
 
-#: modules/codec/avcodec/avcodec.h:175
+#: modules/codec/avcodec/avcodec.h:174
 msgid ""
 "Rate control buffer size (in kbytes). A bigger buffer will allow for better "
 "rate control, but will cause a delay in the stream."
@@ -10673,19 +10673,19 @@ msgstr ""
 "Размер буфера контроля частоты (в килобайтах). Большие значения буфера "
 "позволяют лучше контролировать частоту, но вызывают большую задержку потока."
 
-#: modules/codec/avcodec/avcodec.h:179
+#: modules/codec/avcodec/avcodec.h:178
 msgid "Rate control buffer aggressiveness"
 msgstr "Эффективность буфера контроля частоты"
 
-#: modules/codec/avcodec/avcodec.h:180
+#: modules/codec/avcodec/avcodec.h:179
 msgid "Rate control buffer aggressiveness."
 msgstr "Эффективность буфера контроля частоты."
 
-#: modules/codec/avcodec/avcodec.h:183
+#: modules/codec/avcodec/avcodec.h:182
 msgid "I quantization factor"
 msgstr "Фактор квантования I-кадров"
 
-#: modules/codec/avcodec/avcodec.h:185
+#: modules/codec/avcodec/avcodec.h:184
 msgid ""
 "Quantization factor of I frames, compared with P frames (for instance 1.0 => "
 "same qscale for I and P frames)."
@@ -10693,12 +10693,12 @@ msgstr ""
 "Фактор квантования I-кадров, в сравнении с P-кадрами (например при 1.0 "
 "масштаб квантования I и P-кадров будет одинаковым)"
 
-#: modules/codec/avcodec/avcodec.h:188 modules/codec/x264.c:360
+#: modules/codec/avcodec/avcodec.h:187 modules/codec/x264.c:360
 #: modules/demux/mod.c:78
 msgid "Noise reduction"
 msgstr "Уменьшение шума"
 
-#: modules/codec/avcodec/avcodec.h:189
+#: modules/codec/avcodec/avcodec.h:188
 msgid ""
 "Enable a simple noise reduction algorithm to lower the encoding length and "
 "bitrate, at the expense of lower quality frames."
@@ -10706,11 +10706,11 @@ msgstr ""
 "Включить алгоритм простого уменьшения шума для уменьшения длительности "
 "кодирования и битрейта за счет менее качественных кадров."
 
-#: modules/codec/avcodec/avcodec.h:193
+#: modules/codec/avcodec/avcodec.h:192
 msgid "MPEG4 quantization matrix"
 msgstr "Матрица квантования MPEG4"
 
-#: modules/codec/avcodec/avcodec.h:194
+#: modules/codec/avcodec/avcodec.h:193
 msgid ""
 "Use the MPEG4 quantization matrix for MPEG2 encoding. This generally yields "
 "a better looking picture, while still retaining the compatibility with "
@@ -10720,11 +10720,11 @@ msgstr ""
 "дает лучшее изображение, однако оставляет несовместимость со стандартными "
 "декодерами MPEG2."
 
-#: modules/codec/avcodec/avcodec.h:199
+#: modules/codec/avcodec/avcodec.h:198
 msgid "Quality level"
 msgstr "Уровень качества"
 
-#: modules/codec/avcodec/avcodec.h:200
+#: modules/codec/avcodec/avcodec.h:199
 msgid ""
 "Quality level for the encoding of motions vectors (this can slow down the "
 "encoding very much)."
@@ -10732,7 +10732,7 @@ msgstr ""
 "Уровень качества для кодирования векторов движения (это может существенно "
 "замедлить процесс кодирования)."
 
-#: modules/codec/avcodec/avcodec.h:205
+#: modules/codec/avcodec/avcodec.h:204
 msgid ""
 "The encoder can make on-the-fly quality tradeoffs if your CPU can't keep up "
 "with the encoding rate. It will disable trellis quantization, then the rate "
@@ -10743,36 +10743,36 @@ msgstr ""
 "сохранять скорость кодирования. Он выключает квантование trellis, затем rate "
 "distortion и поднимает значение шумоподавления, чтобы уменьшить загрузку."
 
-#: modules/codec/avcodec/avcodec.h:211
+#: modules/codec/avcodec/avcodec.h:210
 msgid "Minimum video quantizer scale"
 msgstr "Минимальный коэффициент квантования"
 
-#: modules/codec/avcodec/avcodec.h:212
+#: modules/codec/avcodec/avcodec.h:211
 msgid "Minimum video quantizer scale."
 msgstr "Минимальное значение качественности макроблока."
 
-#: modules/codec/avcodec/avcodec.h:215
+#: modules/codec/avcodec/avcodec.h:214
 msgid "Maximum video quantizer scale"
 msgstr "Максимальный коэффициент квантования"
 
-#: modules/codec/avcodec/avcodec.h:216
+#: modules/codec/avcodec/avcodec.h:215
 msgid "Maximum video quantizer scale."
 msgstr "Максимальное значение качественности макроблока."
 
-#: modules/codec/avcodec/avcodec.h:219
+#: modules/codec/avcodec/avcodec.h:218
 msgid "Trellis quantization"
 msgstr "Квантование trellis"
 
-#: modules/codec/avcodec/avcodec.h:220
+#: modules/codec/avcodec/avcodec.h:219
 msgid "Enable trellis quantization (rate distortion for block coefficients)."
 msgstr ""
 "Включить квантование trellis (rate distortion для коэффициентов макроблока)."
 
-#: modules/codec/avcodec/avcodec.h:223
+#: modules/codec/avcodec/avcodec.h:222
 msgid "Fixed quantizer scale"
 msgstr "Фиксированный коэффициент квантования"
 
-#: modules/codec/avcodec/avcodec.h:224
+#: modules/codec/avcodec/avcodec.h:223
 msgid ""
 "A fixed video quantizer scale for VBR encoding (accepted values: 0.01 to "
 "255.0)."
@@ -10780,42 +10780,42 @@ msgstr ""
 "Фиксированное значение качественности макроблока для кодирования в режиме "
 "VBR (допустимые значения: от 0.01 до 255.0)."
 
-#: modules/codec/avcodec/avcodec.h:227
+#: modules/codec/avcodec/avcodec.h:226
 msgid "Strict standard compliance"
 msgstr "Строгое следование стандартам"
 
-#: modules/codec/avcodec/avcodec.h:228
+#: modules/codec/avcodec/avcodec.h:227
 msgid ""
 "Force a strict standard compliance when encoding (accepted values: -2 to 2)."
 msgstr ""
 "Включить строгое следование стандартам при кодировании (допустимые значения: "
 "-2..2)."
 
-#: modules/codec/avcodec/avcodec.h:231
+#: modules/codec/avcodec/avcodec.h:230
 msgid "Luminance masking"
 msgstr "Коррекция ярких участков"
 
-#: modules/codec/avcodec/avcodec.h:232
+#: modules/codec/avcodec/avcodec.h:231
 msgid "Raise the quantizer for very bright macroblocks (default: 0.0)."
 msgstr ""
 "Увеличивает коэффициент квантования для очень ярких макроблоков (по "
 "умолчанию: 0.0)."
 
-#: modules/codec/avcodec/avcodec.h:235
+#: modules/codec/avcodec/avcodec.h:234
 msgid "Darkness masking"
 msgstr "Коррекция темных участков"
 
-#: modules/codec/avcodec/avcodec.h:236
+#: modules/codec/avcodec/avcodec.h:235
 msgid "Raise the quantizer for very dark macroblocks (default: 0.0)."
 msgstr ""
 "Увеличивает коэффициент квантования для очень темных макроблоков (по "
 "умолчанию: 0.0)."
 
-#: modules/codec/avcodec/avcodec.h:239
+#: modules/codec/avcodec/avcodec.h:238
 msgid "Motion masking"
 msgstr "Коррекция движения"
 
-#: modules/codec/avcodec/avcodec.h:240
+#: modules/codec/avcodec/avcodec.h:239
 msgid ""
 "Raise the quantizer for macroblocks with a high temporal complexity "
 "(default: 0.0)."
@@ -10823,11 +10823,11 @@ msgstr ""
 "Увеличивает коэффициент квантования для макроблоков с высокой скоростью "
 "движения (по умолчанию: 0.0)."
 
-#: modules/codec/avcodec/avcodec.h:243
+#: modules/codec/avcodec/avcodec.h:242
 msgid "Border masking"
 msgstr "Коррекция краев"
 
-#: modules/codec/avcodec/avcodec.h:244
+#: modules/codec/avcodec/avcodec.h:243
 msgid ""
 "Raise the quantizer for macroblocks at the border of the frame (default: "
 "0.0)."
@@ -10835,11 +10835,11 @@ msgstr ""
 "Увеличивает коэффициент квантования для макроблоков на краю кадра (по "
 "умолчанию: 0.0)."
 
-#: modules/codec/avcodec/avcodec.h:247
+#: modules/codec/avcodec/avcodec.h:246
 msgid "Luminance elimination"
 msgstr "Коррекция яркости"
 
-#: modules/codec/avcodec/avcodec.h:248
+#: modules/codec/avcodec/avcodec.h:247
 msgid ""
 "Eliminates luminance blocks when the PSNR isn't much changed (default: 0.0). "
 "The H264 specification recommends -4."
@@ -10847,11 +10847,11 @@ msgstr ""
 "Коррекция яркости макроблоков, если PSNR не слишком сильно меняется (по "
 "умолчанию: 0.0). Стандарт H.264 рекомендует значение -4."
 
-#: modules/codec/avcodec/avcodec.h:252
+#: modules/codec/avcodec/avcodec.h:251
 msgid "Chrominance elimination"
 msgstr "Коррекция цветности"
 
-#: modules/codec/avcodec/avcodec.h:253
+#: modules/codec/avcodec/avcodec.h:252
 msgid ""
 "Eliminates chrominance blocks when the PSNR isn't much changed (default: "
 "0.0). The H264 specification recommends 7."
@@ -10859,11 +10859,11 @@ msgstr ""
 "Коррекция цветности макроблоков, если PSNR не слишком сильно меняется (по "
 "умолчанию 0.0). Стандарт H.264 рекомендует значение 7."
 
-#: modules/codec/avcodec/avcodec.h:257
+#: modules/codec/avcodec/avcodec.h:256
 msgid "Specify AAC audio profile to use"
 msgstr "Используемый аудиопрофиль ACC"
 
-#: modules/codec/avcodec/avcodec.h:258
+#: modules/codec/avcodec/avcodec.h:257
 msgid ""
 "Specify the AAC audio profile to use for encoding the audio bitstream. It "
 "takes the following options: main, low, ssr (not supported),ltp, hev1, hev2 "
@@ -10908,7 +10908,7 @@ msgstr ""
 "Это не ошибка медиапроигрывателя VLC.\n"
 "Не обращайтесь к участникам проекта VideoLAN с этим вопросом.\n"
 
-#: modules/codec/avcodec/encoder.c:751 modules/codec/avcodec/encoder.c:804
+#: modules/codec/avcodec/encoder.c:764 modules/codec/avcodec/encoder.c:817
 msgid "VLC could not open the encoder."
 msgstr "VLC не может открыть этот кодировщик."
 
@@ -11279,7 +11279,7 @@ msgstr "Фиктивный кодировщик"
 msgid "AAC audio decoder (using libfaad2)"
 msgstr "Аудиодекодер AAC (через libfaad2)"
 
-#: modules/codec/faad.c:429
+#: modules/codec/faad.c:430
 msgid "AAC extension"
 msgstr "Расширение AAC"
 
@@ -13616,8 +13616,8 @@ msgstr "Интерфейс управления D-Bus"
 #: modules/gui/qt4/main_interface.cpp:1158
 #: modules/gui/qt4/main_interface.cpp:1175
 #: modules/gui/qt4/main_interface.cpp:1183
-#: modules/gui/qt4/main_interface.cpp:1206 modules/notify/growl.m:281
-#: modules/video_output/xcb/window.c:313
+#: modules/gui/qt4/main_interface.cpp:1206 modules/lua/libs/httpd.c:80
+#: modules/notify/growl.m:281 modules/video_output/xcb/window.c:313
 msgid "VLC media player"
 msgstr "Медиапроигрыватель VLC"
 
@@ -21792,17 +21792,15 @@ msgstr "Выбрать оболочку"
 msgid "Open skin ..."
 msgstr "Открыть оболочку..."
 
-#: modules/lua/libs/httpd.c:64
+#: modules/lua/libs/httpd.c:75
 msgid ""
-"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3."
-"org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
-"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta http-equiv="
-"\"Content-Type\" content=\"text/html;charset=utf-8\" /><title>VLC media "
-"player</title></head><body><p>Password for Web interface has not been set.</"
-"p><p>Please use --http-password, or set a password in </p><p>Preferences "
-"&gt; All &gt; Main interfaces &gt; Lua &gt; Lua HTTP &gt; Password.</p><!-- "
-"VLC_PASSWORD_NOT_SET --></body></html>"
+"<p>Password for Web interface has not been set.</p><p>Please use --http-"
+"password, or set a password in </p><p>Preferences &gt; All &gt; Main "
+"interfaces &gt; Lua &gt; Lua HTTP &gt; Password.</p>"
 msgstr ""
+"<p>Веб-интерфейс не защищён паролем.</p><p>Пожалуйста, задайте пароль, "
+"передав ключ --http-password, или в поле </p><p>Настройки &gt; Все &gt; "
+"Основные интерфейсы &gt; Lua &gt; Lua HTTP &gt; Пароль</p>."
 
 #: modules/lua/vlc.c:48
 msgid "Lua interface"
@@ -29004,27 +29002,12 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Список настроек медиаменеджера"
 
-#~ msgid "Subtitles/OSD"
-#~ msgstr "Субтитры/индикация"
-
-#~ msgid "Subtitles codecs"
-#~ msgstr "Кодеки субтитров"
-
-#~ msgid "Settings for subtitles, teletext and CC decoders and encoders."
-#~ msgstr "Настройки декодеров и кодеров субтитров и телетекста."
-
-#~ msgid "General Input"
-#~ msgstr "Общие настройки ввода"
-
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
 #~ "multicast UDP or RTP."
 #~ msgstr ""
 #~ "SAP используется для оповещения о посылаемых потоках используя multicast "
 #~ "UDP или RTP."
-
-#~ msgid "CPU features"
-#~ msgstr "Особенности CPU"
 
 #~ msgid ""
 #~ "You can choose to disable some CPU accelerations here. Use with extreme "
@@ -29034,70 +29017,8 @@ msgstr "Список настроек медиаменеджера"
 #~ "процессора. Не стоит что-либо менять в этом разделе, если вы не уверены "
 #~ "на 100% в том, что делаете!"
 
-#~ msgid "Chroma modules settings"
-#~ msgstr "Настройки модулей цветности"
-
 #~ msgid "These settings affect chroma transformation modules."
 #~ msgstr "Эти настройки затрагивают модули преобразования сигнала цветности."
-
-#~ msgid "Packetizer modules settings"
-#~ msgstr "Настройки модулей упаковщиков"
-
-#~ msgid "Encoders settings"
-#~ msgstr "Настройки кодеров"
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitles encoding modules."
-#~ msgstr "Общие параметры модулей кодирования видео/аудио/субтитров."
-
-#~ msgid "Dialog providers settings"
-#~ msgstr "Модули диалогов"
-
-#~ msgid "Subtitle demuxer settings"
-#~ msgstr "Настройки демультиплексора субтитров"
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitles type or file name."
-#~ msgstr ""
-#~ "Здесь вы можете настроить демультиплексор субтитров, например тип "
-#~ "субтитров или имя файла."
-
-#~ msgid "No help available"
-#~ msgstr "Справка недоступна"
-
-#~ msgid "There is no help available for these modules."
-#~ msgstr "Справка для данных модулей недоступна."
-
-#~ msgid "Quick &Open File..."
-#~ msgstr "Быстро &открыть файл..."
-
-#~ msgid "&Bookmarks"
-#~ msgstr "За&кладки"
-
-#~ msgid "Fetch Information"
-#~ msgstr "Получить информацию"
-
-#~ msgid "Sort"
-#~ msgstr "Сортировка"
-
-#~ msgid "No Repeat"
-#~ msgstr "Не повторять"
-
-#~ msgid "Add to Media Library"
-#~ msgstr "Добавить в медиатеку"
-
-#~ msgid "Advanced Open..."
-#~ msgstr "Добавить источник..."
-
-#~ msgid "Open Play&list..."
-#~ msgstr "Открыть плейлист..."
-
-#~ msgid "Search Filter"
-#~ msgstr "Введите текст..."
-
-#~ msgid "&Services Discovery"
-#~ msgstr "&Обнаружение служб"
 
 #~ msgid ""
 #~ "Some options are available but hidden. Check \"Advanced options\" to see "
@@ -29105,15 +29026,6 @@ msgstr "Список настроек медиаменеджера"
 #~ msgstr ""
 #~ "Некоторые параметры доступны, но скрыты.\n"
 #~ " Отметьте \"Дополнительные параметры\", чтобы увидеть их."
-
-#~ msgid "Image clone"
-#~ msgstr "Клонирование"
-
-#~ msgid "Clone the image"
-#~ msgstr "Клонировать изображение"
-
-#~ msgid "Magnification"
-#~ msgstr "Экранная лупа"
 
 #~ msgid ""
 #~ "Magnify a part of the video. You can select which part of the image "
@@ -29127,9 +29039,6 @@ msgstr "Список настроек медиаменеджера"
 
 #~ msgid "\"Water surface\" video distortion effect"
 #~ msgstr "Эффект искажения видео \"водная гладь\""
-
-#~ msgid "Image colors inversion"
-#~ msgstr "Инверсия цветов в изображении"
 
 #~ msgid "Split the image to make an image wall"
 #~ msgstr "Отделить это изображение для \"стены\" изображений"
@@ -29157,12 +29066,6 @@ msgstr "Список настроек медиаменеджера"
 #~ "исключением тех частей, цвет которых соответствует цвету указанному в "
 #~ "параметрах."
 
-#~ msgid ""
-#~ "%d module(s) were not displayed because they only have advanced options.\n"
-#~ msgstr ""
-#~ "Модуль(и) %d не были показаны, так как у них есть только расширенные "
-#~ "параметры.\n"
-
 #~ msgid "Choose which objects should print debug message"
 #~ msgstr "Выбор объектов, которые должны выдавать сообщения отладки"
 
@@ -29188,27 +29091,10 @@ msgstr "Список настроек медиаменеджера"
 #~ "Язык интерфейса. Если указано значение \"авто\", то будет использоваться "
 #~ "системный язык."
 
-#~ msgid "Force mono audio"
-#~ msgstr "Принудительно включить моно"
-
-#~ msgid "This will force a mono audio output."
-#~ msgstr "Любой звук будет воспроизводиться в моно-режиме."
-
-#~ msgid "Default audio volume"
-#~ msgstr "Громкость по умолчанию"
-
 #~ msgid ""
 #~ "You can set the default audio output volume here, in a range from 0 to "
 #~ "1024."
 #~ msgstr "Уровень громкости звука по умолчанию, в диапазоне от 0 до 1024."
-
-#~ msgid ""
-#~ "The step size of the volume is adjustable using this option, in a range "
-#~ "from 0 to 1024."
-#~ msgstr "Размер шага изменения громкости в диапазоне от 0 до 1024."
-
-#~ msgid "Audio output frequency (Hz)"
-#~ msgstr "Частота вывода аудио (Гц)"
 
 #~ msgid ""
 #~ "You can force the audio output frequency here. Common values are 0 "
@@ -29230,54 +29116,12 @@ msgstr "Список настроек медиаменеджера"
 #~ "Высококачественный алгоритм может сильно загрузить процессор, поэтому вы "
 #~ "можете отключить его и использовать более простой алгоритм."
 
-#~ msgid "Audio output channels mode"
-#~ msgstr "Режим каналов вывода звука"
-
-#~ msgid "Audio visualizations "
-#~ msgstr "Визуализация аудио"
-
-#~ msgid "Subtitles track"
-#~ msgstr "Дорожка субтитров"
-
-#~ msgid "Subtitles track ID"
-#~ msgstr "№ дорожки субтитров"
-
-#~ msgid "Low definition (320 lines)"
-#~ msgstr "Низкое разрешение (320 строк)"
-
-#~ msgid ""
-#~ "This adds so-called \"subpicture filters\". These filter subpictures "
-#~ "created by subtitles decoders or other subpictures sources."
-#~ msgstr ""
-#~ "Добавляет так называемые \"фильтры слоёв\", которые фильтруют слои "
-#~ "созданные источниками слоёв, например декодером субтитров."
-
-#~ msgid ""
-#~ "This file countains an optional CRL to prevent remove clients from using "
-#~ "revoked certificates in TLS sessions."
-#~ msgstr ""
-#~ "CRL в этом файле позволит предотвратить использование отозванных "
-#~ "сертификатов в TLS-сеансах."
-
-#~ msgid ""
-#~ "This allow you to configure the initial caching amount for stream output  "
-#~ "muxer. This value should be set in milliseconds."
-#~ msgstr ""
-#~ "Изменить размер стартового кэша для мультиплексора вывода потока. "
-#~ "Значение указывается в миллисекундах."
-
-#~ msgid "Control SAP flow"
-#~ msgstr "Управление потоком SAP"
-
 #~ msgid ""
 #~ "These options allow you to enable special CPU optimizations. You should "
 #~ "always leave all these enabled."
 #~ msgstr ""
 #~ "Эти параметры позволяют вам включить специальную оптимизацию \n"
 #~ " центрального процессора. Не стоит отключать здесь что-либо."
-
-#~ msgid "Memory copy module"
-#~ msgstr "Модуль памяти"
 
 #~ msgid ""
 #~ "You can select which memory copy module you want to use. By default VLC "
@@ -29294,72 +29138,11 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "Modules search path"
 #~ msgstr "Путь поиска модулей"
 
-#~ msgid "Data search path"
-#~ msgstr "Путь для поиска данных"
-
-#~ msgid "Override the default data/share search path."
-#~ msgstr "Переопределённый путь для поиска общих данных."
-
-#~ msgid ""
-#~ "Allowing only one running instance of VLC can sometimes be useful, for "
-#~ "example if you associated VLC with some media types and you don't want a "
-#~ "new instance of VLC to be opened each time you double-click on a file in "
-#~ "the explorer. This option will allow you to play the file with the "
-#~ "already running instance or enqueue it."
-#~ msgstr ""
-#~ "Разрешение запуска только одной копии VLC иногда бывает полезно, к "
-#~ "примеру, если вы привязали к VLC некоторые типы медиа-файлов и не хотите, "
-#~ "чтобы запускалась новая копия VLC при каждом открытии файла из менеджера "
-#~ "файлов. Эта опция позволяет воспроизводить файл в уже существующей копии "
-#~ "или добавлять его в очередь."
-
-#~ msgid "One instance when started from file"
-#~ msgstr "Одна копия при запуске из файла"
-
-#~ msgid "Allow only one running instance when started from file."
-#~ msgstr "Разрешить запуск только одной копии, при запуске из файла"
-
-#~ msgid "Enqueue items to playlist when in one instance mode"
-#~ msgstr "Добавлять позиции в очередь в режиме одной копии"
-
-#~ msgid "Leave fullscreen"
-#~ msgstr "Выйти из полноэкранного режима"
-
-#~ msgid "Select the hotkey to use to leave fullscreen state."
-#~ msgstr "Выберите горячую клавишу для выхода из полноэкранного режима."
-
-#~ msgid "Increase scale factor."
-#~ msgstr "Увеличить масштаб."
-
-#~ msgid "Decrease scale factor."
-#~ msgstr "Уменьшить масштаб."
-
-#~ msgid "Cycle through deinterlace modes."
-#~ msgstr "Циклически переключать режимы устранения чересстрочности."
-
-#~ msgid "Show interface"
-#~ msgstr "Показать интерфейс"
-
 #~ msgid "Raise the interface above all other windows."
 #~ msgstr "Поднять интерфейс над всеми другими окнами."
 
-#~ msgid "Hide interface"
-#~ msgstr "Скрыть интерфейс"
-
 #~ msgid "Lower the interface below all other windows."
 #~ msgstr "Спрятать интерфейс под другими окнами."
-
-#~ msgid "Normal/Repeat/Loop"
-#~ msgstr "Обычный/Повтор/Цикл"
-
-#~ msgid "Toggle Normal/Repeat/Loop playlist modes"
-#~ msgstr "Вкл./выкл. режимы плейлиста Обычный/Повтор/Цикл"
-
-#~ msgid "Display OSD menu on top of video output"
-#~ msgstr "Показывать экранное меню поверх вывода видео"
-
-#~ msgid "Do not display OSD menu on video output"
-#~ msgstr "Не показывать экранное меню на выводе видео"
 
 #~ msgid "Do not display OSD menu on top of video output"
 #~ msgstr "Не показывать экранное меню поверх вывода видео"
@@ -29388,37 +29171,16 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "Move OSD menu highlight to the widget below"
 #~ msgstr "Выделить в экранном меню элемент интерфейса внизу"
 
-#~ msgid "Select current widget"
-#~ msgstr "Выбрать текущий элемент интерфейса"
-
 #~ msgid "Selecting current widget performs the associated action."
 #~ msgstr ""
 #~ "При выборе текущего элемента интерфейса осуществляется соответствующее "
 #~ "действие."
 
-#~ msgid "CPU"
-#~ msgstr "CPU"
-
-#~ msgid "Greek, Modern ()"
-#~ msgstr "Греческий (Новогреческий)"
-
 #~ msgid "Kalaallisut (Greenlandic)"
 #~ msgstr "Эскимосский"
 
-#~ msgid "Occitan (post 1500); Provencal"
-#~ msgstr "Окситанский"
-
-#~ msgid "Aspect-ratio"
-#~ msgstr "Соотношение сторон"
-
 #~ msgid "3D Now! memcpy"
 #~ msgstr "3D Now! memcpy"
-
-#~ msgid "Capture format (default s16l)"
-#~ msgstr "Формат записи (по умолчанию s16l)"
-
-#~ msgid "Capture format of audio stream."
-#~ msgstr "Формат захватывемого потока звука."
 
 #~ msgid ""
 #~ "Use alsa:// to open the default audio input. If multiple audio inputs are "
@@ -29434,9 +29196,6 @@ msgstr "Список настроек медиаменеджера"
 
 #~ msgid "PCM S8"
 #~ msgstr "PCM S8"
-
-#~ msgid "GSM Audio"
-#~ msgstr "GSM-аудио"
 
 #~ msgid "PCM U16 LE"
 #~ msgstr "PCM U16 LE"
@@ -29486,98 +29245,14 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "PCM F64 BE"
 #~ msgstr "PCM F64 BE"
 
-#~ msgid "ALSA audio capture input"
-#~ msgstr "Ввод звука через ALSA"
-
-#~ msgid "Blu-Ray Disc Input"
-#~ msgstr "Ввод с диска Blu-ray"
-
-#~ msgid "Bluray menus"
-#~ msgstr "Меню Bluray"
-
-#~ msgid "Use bluray menus. If disabled, the movie will start directly"
-#~ msgstr ""
-#~ "Показывать меню Bluray. Если отключено, воспроизведение начнётся сразу"
-
 #~ msgid "BluRay"
 #~ msgstr "BluRay"
-
-#~ msgid "Blu-Ray Disc support (libbluray)"
-#~ msgstr "Поддержка дисков Blu-Ray (libbluray)"
-
-#~ msgid ""
-#~ "This Blu-Ray Disc needs a library for AACS decoding, and your system does "
-#~ "not have it."
-#~ msgstr ""
-#~ "Для воспроизведения этого диска Blu-Ray нужна библиотека декодирования "
-#~ "AACS, но её нет в вашей системе."
-
-#~ msgid "BluRay Disc is corrupted."
-#~ msgstr "Диск BluRay испорчен"
-
-#~ msgid ""
-#~ "This Blu-Ray Disc needs a library for BD+ decoding, and your system does "
-#~ "not have it."
-#~ msgstr ""
-#~ "Для воспроизведения этого диска Blu-Ray нужна библиотека декодирования BD"
-#~ "+, но её нет в вашей системе."
-
-#~ msgid "Blu-Ray error"
-#~ msgstr "Ошибка Blu-Ray"
-
-#~ msgid "dc1394 input"
-#~ msgstr "Ввод с dc1394"
-
-#~ msgid "Audio sampling rate in Hz"
-#~ msgstr "Частота дискретизации звука (Гц)"
-
-#~ msgid ""
-#~ "Force the DirectShow video input to use a specific frame rate(eg. 0 means "
-#~ "default, 25, 29.97, 50, 59.94, etc.)"
-#~ msgstr ""
-#~ "Указать DirectShow использовать определенную частоту кадров (например 0 "
-#~ "(означает по умолчанию), 25, 29.97, 50, 59.94, ...)"
-
-#~ msgid "Refresh list"
-#~ msgstr "Обновить список"
-
-#~ msgid "VLC cannot open ANY capture device.Check the error log for details."
-#~ msgstr ""
-#~ "Не удаётся обнаружить какое-либо устройство захвата. В журнал ошибок "
-#~ "записана подробная информация."
-
-#~ msgid "VLC cannot use the device \"%s\", because its type is not supported."
-#~ msgstr ""
-#~ "VLC не может использовать устройство \"%s\", так как его тип не "
-#~ "поддерживается."
-
-#~ msgid ""
-#~ "If there is more than one digital broadcasting adapter, the adapter "
-#~ "number must be selected. Numbering start from zero."
-#~ msgstr ""
-#~ "Если подключено несколько приёмников цифрового телесигнала, необходимо "
-#~ "указать номер используемого адаптера (начиная с 0)."
-
-#~ msgid "Digital Video (Firewire/ieee1394)  input"
-#~ msgstr "Ввод с Digital Video (Firewire/IEEE 1394)"
-
-#~ msgid "collapse"
-#~ msgstr "свернуть"
-
-#~ msgid "expand"
-#~ msgstr "развернуть"
-
-#~ msgid "Coffee pot control"
-#~ msgstr "Управление кофеваркой"
 
 #~ msgid "Teapot"
 #~ msgstr "Чайник"
 
 #~ msgid "The server is a teapot. You can't brew coffee with a teapot."
 #~ msgstr "Этот сервер является чайником. Сварить кофе в чайнике нельзя."
-
-#~ msgid "Coffee pot"
-#~ msgstr "Кофеварка"
 
 #~ msgid "The pot failed to brew coffee (server error %u)."
 #~ msgstr "Сварить кофе не удалось (ошибка сервера %u)."
@@ -29590,17 +29265,11 @@ msgstr "Список настроек медиаменеджера"
 #~ "Вы можете указать произвольную строку User-Agent или ввести одну из "
 #~ "известных"
 
-#~ msgid "Auto Connection"
-#~ msgstr "Автоматическое соединение"
-
 #~ msgid "Advertise with Bonjour"
 #~ msgstr "Оповещение Bonjour"
 
 #~ msgid "Advertise the stream with the Bonjour protocol."
 #~ msgstr "Оповещать о потоке с помощью протокола Bonjour."
-
-#~ msgid "Active TCP connection"
-#~ msgstr "Активное TCP-соединение"
 
 #~ msgid ""
 #~ "If enabled, VLC will connect to a remote destination instead of waiting "
@@ -29609,23 +29278,8 @@ msgstr "Список настроек медиаменеджера"
 #~ "Подключаться к удалённому пункту назначения вместо того, чтобы ждать "
 #~ "входящее соединение."
 
-#~ msgid "RTMP stream output"
-#~ msgstr "Вывод RTMP-потока"
-
 #~ msgid "RTMP"
 #~ msgstr "RTMP"
-
-#~ msgid "PVR video device"
-#~ msgstr "Видео-устройство PVR"
-
-#~ msgid "PVR radio device"
-#~ msgstr "Радио-устройство PVR"
-
-#~ msgid "Norm"
-#~ msgstr "Стандарт"
-
-#~ msgid "Norm of the stream (Automatic, SECAM, PAL, or NTSC)."
-#~ msgstr "Стандарт потока (автоматически, SECAM, PAL или NTSC)."
 
 #~ msgid "Width of the stream to capture (-1 for autodetection)."
 #~ msgstr "Ширина захватываемого потока (-1 для автоопределения)."
@@ -29636,21 +29290,12 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "Frequency to capture (in kHz), if applicable."
 #~ msgstr "Частота захвата (в кГц), если возможно изменение."
 
-#~ msgid "Framerate"
-#~ msgstr "Частота кадров"
-
 #~ msgid "Framerate to capture, if applicable (-1 for autodetect)."
 #~ msgstr ""
 #~ "Частота кадров захвата, если возможно применение (-1 для автоопределения)."
 
-#~ msgid "Key interval"
-#~ msgstr "Интервал ключевых кадров"
-
 #~ msgid "Interval between keyframes (-1 for autodetect)."
 #~ msgstr "Интервал между ключевыми кадрами (-1 для автоопределения)."
-
-#~ msgid "B Frames"
-#~ msgstr "B-кадры"
 
 #~ msgid ""
 #~ "If this option is set, B-Frames will be used. Use this option to set the "
@@ -29662,29 +29307,14 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "Bitrate to use (-1 for default)."
 #~ msgstr "Используемый битрейт (-1 - по умолчанию)."
 
-#~ msgid "Bitrate peak"
-#~ msgstr "Пиковый битрейт"
-
 #~ msgid "Peak bitrate in VBR mode."
 #~ msgstr "Пиковый битрейт в режиме VBR."
-
-#~ msgid "Bitrate mode"
-#~ msgstr "Режим битрейта"
 
 #~ msgid "Bitrate mode to use (VBR or CBR)."
 #~ msgstr "Используемый режим битрейта (VBR или CBR)."
 
-#~ msgid "Audio bitmask"
-#~ msgstr "Битовая маска аудио"
-
 #~ msgid "Bitmask that will get used by the audio part of the card."
 #~ msgstr "Битовая маска, используемая аудио-частью карты."
-
-#~ msgid "Audio volume (0-65535)."
-#~ msgstr "Громкость аудио (0-65535)."
-
-#~ msgid "Channel"
-#~ msgstr "Канал"
 
 #~ msgid ""
 #~ "Channel of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)"
@@ -29706,9 +29336,6 @@ msgstr "Список настроек медиаменеджера"
 
 #~ msgid "cbr"
 #~ msgstr "CBR"
-
-#~ msgid "PVR"
-#~ msgstr "PVR"
 
 #~ msgid "IVTV MPEG Encoding cards input"
 #~ msgstr "Ввод с карты, декодирующей IVTV MPEG"
@@ -29732,27 +29359,6 @@ msgstr "Список настроек медиаменеджера"
 #~ msgstr ""
 #~ "Адрес страницы, которая будет представлена серверу как ссылающаяся, то "
 #~ "есть страница, где размещён файл SWF."
-
-#~ msgid "RTMP input"
-#~ msgstr "Ввод с RTMP"
-
-#~ msgid "Abscissa of the capture reion in pixels."
-#~ msgstr "Абсцисса области захвата (в пикселах)."
-
-#~ msgid "SFTP user name"
-#~ msgstr "Имя пользователя"
-
-#~ msgid "SFTP password"
-#~ msgstr "Пароль"
-
-#~ msgid "Pixel width of the frame buffer"
-#~ msgstr "Ширина буфера кадров в пикселах"
-
-#~ msgid "Pixel height of the frame buffer"
-#~ msgstr "Высота буфера кадров в пикселах"
-
-#~ msgid "Pixel depth of the frame buffer"
-#~ msgstr "Глубина цвета в буфере кадров в битах"
 
 #~ msgid "Video device (Default: /dev/video0)."
 #~ msgstr "Видеоустройство (По умолчанию: /dev/video0)."
@@ -29778,20 +29384,8 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "Force usage of the libv4l2 wrapper."
 #~ msgstr "Принудительное использование надстройки libv4l2."
 
-#~ msgid "Backlight compensation."
-#~ msgstr "Компенсация при съёмке против света."
-
-#~ msgid "Tuner id"
-#~ msgstr "№ приёмника"
-
-#~ msgid "Tuner id (see debug output)."
-#~ msgstr "№ приёмника (см. результат отладки)."
-
 #~ msgid "Primary language (Analog TV tuners only)"
 #~ msgstr "осн. язык (только аналог. ТВ-приёмники)"
-
-#~ msgid "Secondary language (Analog TV tuners only)"
-#~ msgstr "доп. язык (только аналог. ТВ-приёмники)"
 
 #~ msgid "Second audio program (Analog TV tuners only)"
 #~ msgstr "2-я аудио-программа (только аналог. ТВ-приёмники)"
@@ -29799,86 +29393,8 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "Primary language left, Secondary language right"
 #~ msgstr "осн. язык слева, доп. язык справа"
 
-#~ msgid "Video4Linux2"
-#~ msgstr "Video4Linux2"
-
-#~ msgid "Video4Linux2 input"
-#~ msgstr "Ввод из Video4Linux2"
-
-#~ msgid "Video4Linux2 Compressed A/V"
-#~ msgstr "Аудио/видео, сжатое Video4Linux2"
-
-#~ msgid "[vcd:][device][@[title][,[chapter]]]"
-#~ msgstr "[vcd:][устройство][@[раздел][,[глава]]]"
-
 #~ msgid "AltiVec memcpy"
 #~ msgstr "AltiVec memcpy"
-
-#~ msgid "ARM NEON audio format conversions"
-#~ msgstr "Преобразования аудио-форматов для ARM NEON"
-
-#~ msgid "TCP address to use (default localhost)"
-#~ msgstr "Целевой адрес (по умолчанию localhost)"
-
-#~ msgid ""
-#~ "TCP address to use to communicate with the video part of the Bar Graph "
-#~ "(default localhost).In the case of bargraph incrustation, use localhost."
-#~ msgstr ""
-#~ "TCP-адрес для подключения к видео-компоненту модуля Гистограмма (по "
-#~ "умолчанию localhost)."
-
-#~ msgid "TCP port to use (default 12345)"
-#~ msgstr "TCP-порт (по умолчанию 12345)"
-
-#~ msgid ""
-#~ "TCP port to use to communicate with the video part of the Bar Graph "
-#~ "(default 12345).Use the same port as the one used in the rc interface."
-#~ msgstr ""
-#~ "TCP-порт для подключения к видео-компоненту модуля Гистограмма (по "
-#~ "умолчанию 12345). Используйте тот же порт, что был указан в настройках "
-#~ "интерфейса RC."
-
-#~ msgid "Defines if BarGraph information should be sent (default 1)"
-#~ msgstr "Передавать данные для Гистограммы (по умолчанию 1)"
-
-#~ msgid "Sends the barGraph information every n audio packets (default 4)"
-#~ msgstr "Частота передачи данных (по умолчанию 4 пакета аудио)"
-
-#~ msgid "Defines if silence alarm information should be sent (default 1)"
-#~ msgstr "Передавать уведомления о тишине (по умолчанию 1)"
-
-#~ msgid "Time window to use in ms (default 5000)"
-#~ msgstr "Интервал, в мс (по умолчанию 5000)"
-
-#~ msgid "Minimum Audio level to raise the alarm (default 0.1)"
-#~ msgstr "Предельный уровень звука для тишины (по умолчанию 0,1)"
-
-#~ msgid "Time between two alarm messages in ms (default 2000)"
-#~ msgstr "Время между уведомлениями (в мс) (по умолчанию 2000)"
-
-#~ msgid "Force connection reset regularly (default 1)"
-#~ msgstr "Принудительный сброс соединения (по умолчанию 1)"
-
-#~ msgid "Feedback Gain"
-#~ msgstr "Обратная связь"
-
-#~ msgid "Fixed point audio format conversions"
-#~ msgstr "Преобразования аудио-формата с фиксированной запятой"
-
-#~ msgid "Fixed-point audio mixer"
-#~ msgstr "Микшер с целочисленной арифметикой"
-
-#~ msgid "Float32 audio mixer"
-#~ msgstr "Микшер с арифметикой Float32"
-
-#~ msgid ""
-#~ "Channels available for audio output.If the input has more channels than "
-#~ "the output, it will be down-mixed.This parameter is ignored when digital "
-#~ "pass-through is active."
-#~ msgstr ""
-#~ "Каналы, через которые будет выводиться звук. Если на входе больше "
-#~ "каналов, чем на выходе, они будут сведены. Если включен цифровой вывод, "
-#~ "этот параметр игнорируется."
 
 #~ msgid ""
 #~ "Choose a number corresponding to the number of an audio device, as listed "
@@ -29889,14 +29405,6 @@ msgstr "Список настроек медиаменеджера"
 #~ "\"Аудио устройство\". Это устройство будет использовано по умолчанию для "
 #~ "воспроизведения аудио."
 
-#~ msgid ""
-#~ "You should configure your speaker layout with the \"Audio Midi Setup\" "
-#~ "utility in /Applications/Utilities. Stereo mode is being used now."
-#~ msgstr ""
-#~ "Следует сделать расстановку громкоговорителей с помощью утилиты \"Audio "
-#~ "Midi Setup\", находящейся в /Applications/Utilities. Сейчас используется "
-#~ "режим стерео."
-
 #~ msgid "3 Front 2 Rear"
 #~ msgstr "3 передних 2 задних"
 
@@ -29906,54 +29414,11 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "A/52 over S/PDIF"
 #~ msgstr "A/52 через S/PDIF"
 
-#~ msgid "Open Sound System"
-#~ msgstr "Open Sound System"
-
-#~ msgid "OSS DSP device"
-#~ msgstr "Устройство DSP в OSS"
-
 #~ msgid "Portaudio identifier for the output device"
 #~ msgstr "Идентификатор Portaudio для устройства вывода"
 
-#~ msgid "PORTAUDIO audio output"
-#~ msgstr "Вывод звука через PORTAUDIO"
-
 #~ msgid "5.1"
 #~ msgstr "5.1"
-
-#~ msgid "Audio device"
-#~ msgstr "Аудио-устройство"
-
-#~ msgid "Default Audio Device"
-#~ msgstr "Аудио-устройство по умолчанию"
-
-#~ msgid "Win32 waveOut extension output"
-#~ msgstr "Вывод аудио через Win32 waveOut"
-
-#~ msgid "FFmpeg deinterlace video filter"
-#~ msgstr "Видео-фильтр FFmpeg для устранения чересстрочности"
-
-#~ msgid ""
-#~ "FFmpeg can do error resilience.\n"
-#~ "However, with a buggy encoder (such as the ISO MPEG-4 encoder from M$) "
-#~ "this can produce a lot of errors.\n"
-#~ "Valid values range from 0 to 4 (0 disables all errors resilience)."
-#~ msgstr ""
-#~ "FFmpeg может сообщать об ошибках.\n"
-#~ "Однако, некоторые дефектные кодировщики (например, ISO MPEG-4 от MS) "
-#~ "генерируют слишком много ошибок.\n"
-#~ "Возможные значения параметра - от 0 до 4 (0 - отключает все сообщения)."
-
-#~ msgid ""
-#~ "Force skipping of idct to speed up decoding for frame types(-1=None, "
-#~ "0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)."
-#~ msgstr ""
-#~ "Принудительный пропуск инверсного дискретного косинусного преобразования "
-#~ "для ускорения декодирования типов кадров (-1=нет, 0=по умолчанию, 1=B-"
-#~ "кадры, 2=P-кадры, 3=B+P-кадры, 4=все кадры)."
-
-#~ msgid "Low resolution decoding"
-#~ msgstr "Декодирование с низким разрешением"
 
 #~ msgid ""
 #~ "Only decode a low resolution version of the video. This requires less "
@@ -29961,65 +29426,6 @@ msgstr "Список настроек медиаменеджера"
 #~ msgstr ""
 #~ "Декодировать только вариант видео с низким разрешением. Это требует "
 #~ "меньше ресурсов."
-
-#~ msgid ""
-#~ "Specify the AAC audio profile to use for encoding the audio bitstream. It "
-#~ "takes the following options: main, low, ssr (not supported) and ltp "
-#~ "(default: main)"
-#~ msgstr ""
-#~ "Указать аудио-профиль AAC, используемый при кодировании битового аудио-"
-#~ "потока. Имеющиеся варианты: основной, низкий, SSR (не поддерживается) и "
-#~ "LTP (по умолчанию - main (основной))"
-
-#~ msgid ""
-#~ "It seems your FFMPEG (libavcodec) installation lacks the following "
-#~ "encoder:\n"
-#~ "%s.\n"
-#~ "If you don't know how to fix this, ask for support from your "
-#~ "distribution.\n"
-#~ "\n"
-#~ "This is not an error inside VLC media player.\n"
-#~ "Do not contact the VideoLAN project about this issue.\n"
-#~ msgstr ""
-#~ "Скорее всего, в установленном FFMPEG (libavcodec) не хватает следующего "
-#~ "кодировщика:\n"
-#~ "%s.\n"
-#~ "Обратитесь за помощью в службу поддержки данного дистрибутива.\n"
-#~ "\n"
-#~ "Это не ошибка медиа-проигрывателя VLC.\n"
-#~ "Не обращайтесь к участникам проекта VideoLAN с этим вопросом.\n"
-
-#~ msgid "RealVideo library decoder"
-#~ msgstr "Декодер библиотеки RealVideo"
-
-#~ msgid "Subtitles text encoding"
-#~ msgstr "Кодировка текста в субтитрах"
-
-#~ msgid "Subtitles justification"
-#~ msgstr "Выравнивание субтитров"
-
-#~ msgid "UTF-8 subtitles autodetection"
-#~ msgstr "Автоопределение UTF-8"
-
-#~ msgid ""
-#~ "This enables automatic detection of UTF-8 encoding within subtitles files."
-#~ msgstr "Автоматическое определение кодировки UTF-8 в файлах субтитров."
-
-#~ msgid "Text subtitles decoder"
-#~ msgstr "Декодер текстовых субтитров"
-
-#~ msgid ""
-#~ "Sets maximum interval between IDR-frames.Larger values save bits, thus "
-#~ "improving quality for a given bitrate at the cost of seeking precision."
-#~ msgstr ""
-#~ "Максимальный интервал между IDR-кадрами. Большие значения экономят биты, "
-#~ "что увеличивает качество заданного битрейта за счет точности поиска."
-
-#~ msgid "Direct MV prediction mode."
-#~ msgstr "Режим прямого предсказания вектора движения."
-
-#~ msgid "RD based mode decision for B-frames"
-#~ msgstr "Режим rate distortion (RD) для B-кадров"
 
 #~ msgid "Jointly optimize both MVs in B-frames"
 #~ msgstr "Оптимизация обоих видов векторов движения в B-кадрах"
@@ -30039,47 +29445,14 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "fast"
 #~ msgstr "быстрый"
 
-#~ msgid "normal"
-#~ msgstr "обычный"
-
 #~ msgid "slow"
 #~ msgstr "медленный"
-
-#~ msgid "all"
-#~ msgstr "все"
-
-#~ msgid "spatial"
-#~ msgstr "пространственный"
-
-#~ msgid "temporal"
-#~ msgstr "временной"
-
-#~ msgid "H.264/MPEG4 AVC encoder (x264)"
-#~ msgstr "Кодировщик AVC H.264/MPEG4 (x264)"
-
-#~ msgid "Subtitle position %i px"
-#~ msgstr "Положение субтитров: %i пк"
-
-#~ msgid "Volume %d%%"
-#~ msgstr "Громкость %d%%"
 
 #~ msgid "Use the rotate video filter instead of transform"
 #~ msgstr "Использовать видео-фильтр поворота вместо трансформации"
 
-#~ msgid "| adev [X] . . . . . . . . . . .  set/get audio device"
-#~ msgstr "| adev [X] . . . . . . . . . . .  выбрать/считать аудио-устройство"
-
-#~ msgid "| strack [X] . . . . . . . . . set/get subtitles track"
-#~ msgstr "| strack [X] . . . . . . . . . выбрать/считать дорожку субтитров"
-
 #~ msgid "| @name marq-marquee  STRING  . . overlay STRING in video"
 #~ msgstr "| @name marq-marquee  STRING  . . наложить STRING в видео"
-
-#~ msgid "| @name marq-x X . . . . . . . . . . . .offset from left"
-#~ msgstr "| @name marq-x X . . . . . . . . . . . .смещение слева"
-
-#~ msgid "| @name marq-y Y . . . . . . . . . . . . offset from top"
-#~ msgstr "| @name marq-y Y . . . . . . . . . . . . смещение сверху"
 
 #~ msgid "| @name marq-position #. . .  .relative position control"
 #~ msgstr ""
@@ -30088,38 +29461,11 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "| @name marq-color # . . . . . . . . . . font color, RGB"
 #~ msgstr "| @name marq-color # . . . . . . . . . . цвет шрифта, RGB"
 
-#~ msgid "| @name marq-opacity # . . . . . . . . . . . . . opacity"
-#~ msgstr "| @name marq-opacity # . . . . . . . . . . . . . непрозрачность"
-
-#~ msgid "| @name marq-timeout T. . . . . . . . . . timeout, in ms"
-#~ msgstr "| @name marq-timeout T. . . . . . . . . . время задержки, в мс"
-
-#~ msgid "| @name marq-size # . . . . . . . . font size, in pixels"
-#~ msgstr "| @name marq-size # . . . . . . . . размер шрифта, в пикселах"
-
 #~ msgid "| @name logo-file STRING . . .the overlay file path/name"
 #~ msgstr "| @name logo-file STRING . . .путь/название файла для наложения"
 
-#~ msgid "| @name logo-x X . . . . . . . . . . . .offset from left"
-#~ msgstr "| @name logo-x X . . . . . . . . . . . .смещение слева"
-
-#~ msgid "| @name logo-y Y . . . . . . . . . . . . offset from top"
-#~ msgstr "| @name logo-y Y . . . . . . . . . . . . смещение сверху"
-
-#~ msgid "| @name logo-position #. . . . . . . . relative position"
-#~ msgstr "| @name logo-position #. . . . . . . . относительное расположение"
-
 #~ msgid "| @name logo-transparency #. . . . . . . . .transparency"
 #~ msgstr "| @name logo-transparency #. . . . . . . . .прозрачность"
-
-#~ msgid "| @name mosaic-alpha # . . . . . . . . . . . . . . alpha"
-#~ msgstr "| @name mosaic-alpha # . . . . . . . . . . . . . . альфа"
-
-#~ msgid "| @name mosaic-height #. . . . . . . . . . . . . .height"
-#~ msgstr "| @name mosaic-height #. . . . . . . . . . . . . .высота"
-
-#~ msgid "| @name mosaic-width # . . . . . . . . . . . . . . width"
-#~ msgstr "| @name mosaic-width # . . . . . . . . . . . . . . ширина"
 
 #~ msgid "| @name mosaic-xoffset # . . . .top left corner position"
 #~ msgstr "| @name mosaic-xoffset # . . . .расположение верхнего левого угла"
@@ -30144,99 +29490,17 @@ msgstr "Список настроек медиаменеджера"
 #~ "| @name mosaic-position {0 - автоматическое, 1 - фиксированное} . . . ."
 #~ "расположение"
 
-#~ msgid "| @name mosaic-rows #. . . . . . . . . . .number of rows"
-#~ msgstr "| @name mosaic-rows #. . . . . . . . . . .количество рядов"
-
-#~ msgid "| @name mosaic-cols #. . . . . . . . . . .number of cols"
-#~ msgstr "| @name mosaic-cols #. . . . . . . . . . .количество столбцов"
-
 #~ msgid "| @name mosaic-order id(,id)* . . . . order of pictures "
 #~ msgstr "| @name mosaic-order id(,id)* . . . . порядок изображений"
 
 #~ msgid "| @name mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"
 #~ msgstr "| @name mosaic-keep-aspect-ratio {0,1} . . .соотношение сторон"
 
-#~ msgid "| longhelp . . . . . . . . . . . a longer help message"
-#~ msgstr "| longhelp . . . . . . . . . . . более длинное сообщение справки"
-
-#~ msgid "Playlist has only %d elements"
-#~ msgstr "В плейлисте только %d элементов"
-
 #~ msgid "Please provide one of the following parameters:"
 #~ msgstr "Укажите один из следующих параметров:"
 
-#~ msgid "Force interleaved method."
-#~ msgstr "Принудительно включить \"слоеный\" режим воспроизведения."
-
-#~ msgid ""
-#~ "Because this AVI file index is broken or missing, seeking will not work "
-#~ "correctly.\n"
-#~ "VLC won't repair your file but can temporary fix this problem by building "
-#~ "an index in memory.\n"
-#~ "This step might take a long time on a large file.\n"
-#~ "What do you want to do ?"
-#~ msgstr ""
-#~ "Индекс этого файла AVI повреждён или отсутствует, поэтому перемотка и "
-#~ "переход может не работать.\n"
-#~ "VLC не будет исправлять файл, но может временно решить проблему, построив "
-#~ "индекс в памяти.\n"
-#~ "Для большого файла это может занять много времени.\n"
-#~ "Что вы хотите сделать?"
-
-#~ msgid "Classic rock"
-#~ msgstr "Классический рок"
-
-#~ msgid "Death metal"
-#~ msgstr "Дет-метал"
-
-#~ msgid "Sound clip"
-#~ msgstr "Музыкальный клип"
-
-#~ msgid "Alternative rock"
-#~ msgstr "Альтернативный рок"
-
-#~ msgid "Instrumental pop"
-#~ msgstr "Инструментальный поп"
-
-#~ msgid "Instrumental rock"
-#~ msgstr "Инструментальный рок"
-
-#~ msgid "Southern rock"
-#~ msgstr "Южный рок"
-
-#~ msgid "Christian rap"
-#~ msgstr "Христианский рэп"
-
-#~ msgid "Pop/funk"
-#~ msgstr "Поп/Фанк"
-
-#~ msgid "New wave"
-#~ msgstr "Новая волна"
-
-#~ msgid "Acid punk"
-#~ msgstr "Кислотный панк"
-
-#~ msgid "Acid jazz"
-#~ msgstr "Кислотный джаз"
-
-#~ msgid "Rock & roll"
-#~ msgstr "Рок-н-ролл"
-
-#~ msgid "Hard rock"
-#~ msgstr "Тяжелый рок"
-
 #~ msgid "Make"
 #~ msgstr "Производство"
-
-#~ msgid "Dummy ifo demux"
-#~ msgstr "Демультиплексор фиктивного IFO"
-
-#~ msgid ""
-#~ "This is the desired frame rate when playing raw video streams.  In the "
-#~ "form 30000/1001 or 29.97"
-#~ msgstr ""
-#~ "Желательная частота кадров при проигрывании потоков Raw Video. В форме "
-#~ "30000/1001 или 29,97"
 
 #~ msgid ""
 #~ "Force the subtiles format. Valid values are : \"microdvd\", \"subrip\", "
@@ -30252,51 +29516,14 @@ msgstr "Список настроек медиаменеджера"
 #~ "\"subviewer1\" и \"auto\" (т.е. автоматическое определение, оно должно "
 #~ "всегда срабатывать)."
 
-#~ msgid "Text subtitles parser"
-#~ msgstr "Анализатор текстовых субтитров"
-
-#~ msgid "Frames per second"
-#~ msgstr "Кадры в секунду"
-
-#~ msgid "Subtitles delay"
-#~ msgstr "Задержка субтитров"
-
-#~ msgid "Subtitles format"
-#~ msgstr "Формат субтитров"
-
-#~ msgid "Subtitles description"
-#~ msgstr "Описание субтитров"
-
-#~ msgid "Silent mode"
-#~ msgstr "Тихий режим"
-
 #~ msgid "Do not complain on encrypted PES."
 #~ msgstr "Не жаловаться на зашифрованный PES."
-
-#~ msgid "CAPMT System ID"
-#~ msgstr "Системный ID CAPMT"
 
 #~ msgid "Only forward descriptors from this SysID to the CAM."
 #~ msgstr "Перенаправлять дескрипторы только этого системного ID на CAM."
 
-#~ msgid "Filename of dump"
-#~ msgstr "Имя файла для сохранения"
-
 #~ msgid "Specify a filename where to dump the TS in."
 #~ msgstr "Укажите имя файла для сохранения потока TS."
-
-#~ msgid "Append"
-#~ msgstr "Добавить"
-
-#~ msgid ""
-#~ "If the file exists and this option is selected, the existing file will "
-#~ "not be overwritten."
-#~ msgstr ""
-#~ "Если файл существует и этот параметр включен, существующий файл не будет "
-#~ "переписан."
-
-#~ msgid "Dump buffer size"
-#~ msgstr "Размер буфера дампа"
 
 #~ msgid ""
 #~ "Tweak the buffer size for reading and writing an integer number of "
@@ -30306,54 +29533,12 @@ msgstr "Список настроек медиаменеджера"
 #~ "Настройка размера буфера для чтения и записи целого числа пакетов. "
 #~ "Указывайте размер буфера, а не количество пакетов."
 
-#~ msgid "Video aspect ratio"
-#~ msgstr "Соотношение сторон видео"
-
-#~ msgid ""
-#~ "Aspect ratio of the video image (4:3, 16:9). Default is square pixels."
-#~ msgstr ""
-#~ "Соотношение сторон видео-изображения (4:3, 16:9). По умолчанию пикселы "
-#~ "квадратные."
-
-#~ msgid "Image file"
-#~ msgstr "Файл изображения"
-
 #~ msgid "Filename of image file to use on the overlay framebuffer."
 #~ msgstr ""
 #~ "Название файла изображения для использования на кадровом буфере наложения."
 
-#~ msgid "Transparency of the image"
-#~ msgstr "Прозрачность изображения"
-
-#~ msgid ""
-#~ "Transparency value of the new image used in blending. By default it set "
-#~ "to fully opaque (255). (from 0 for full transparency to 255 for full "
-#~ "opacity)"
-#~ msgstr ""
-#~ "Величина прозрачности нового изображения, используемого для наложения. По "
-#~ "умолчанию абсолютно непрозрачно (255). (от 0 для абсолютной прозрачности "
-#~ "до 255 для абсолютной непрозрачности)"
-
 #~ msgid "Text to display on the overlay framebuffer."
 #~ msgstr "Текст для отображения на кадровом буфере наложения."
-
-#~ msgid "X coordinate of the rendered image"
-#~ msgstr "Координата X визуализируемого изображения"
-
-#~ msgid "Y coordinate of the rendered image"
-#~ msgstr "Координата Y визуализируемого изображения"
-
-#~ msgid ""
-#~ "You can enforce the picture position on the overlay (0=center, 1=left, "
-#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-#~ "e.g. 6=top-right)."
-#~ msgstr ""
-#~ "Изменить расположение изображения на слое (0-центр, 1-слева, 2-справа, 4-"
-#~ "сверху, 8-снизу, также можно использовать комбинации этих значений, "
-#~ "например, 6 - сверху и справа)."
-
-#~ msgid "Clear overlay framebuffer"
-#~ msgstr "Очистить кадровый буфер наложения"
 
 #~ msgid ""
 #~ "The displayed overlay images is cleared by making the overlay completely "
@@ -30364,66 +29549,15 @@ msgstr "Список настроек медиаменеджера"
 #~ "слой делается абсолютно прозрачным. Все ранее визуализированные "
 #~ "изображения и текст будут очищены из кэша."
 
-#~ msgid "Render text or image"
-#~ msgstr "Визуализировать текст или изображение"
-
 #~ msgid "Render the image or text in current overlay buffer."
 #~ msgstr ""
 #~ "Визуализировать это изображение или текст в текущем буфере наложения."
-
-#~ msgid "Display on overlay framebuffer"
-#~ msgstr "Отобразить на кадровом буфере наложения"
 
 #~ msgid ""
 #~ "All rendered images and text will be displayed on the overlay framebuffer."
 #~ msgstr ""
 #~ "Все визуализированные изображения и текст будут отображены на кадровом "
 #~ "буфере наложения."
-
-#~ msgid "Commands"
-#~ msgstr "Команды"
-
-#~ msgid "GNU/Linux osd/overlay framebuffer interface"
-#~ msgstr "GNU/Linux-интерфейс кадрового буфера экранной индикации/наложения"
-
-#~ msgid "Maemo hildon interface"
-#~ msgstr "Интерфейс Maemo Hildon"
-
-#~ msgid "Compiled by %@ with %@"
-#~ msgstr "Скомпилировано %@ %@"
-
-#~ msgid "VLC Debug Log (%s).rtfd"
-#~ msgstr "Отладочные сообщения VLC (%s).rtfd"
-
-#~ msgid "Run VLC with dark or bright interface style"
-#~ msgstr "Запускать VLC с ярким или тёмным интерфейсом"
-
-#~ msgid "By default, VLC will use the dark interface style."
-#~ msgstr "По умолчанию VLC использует тёмный интерфейс."
-
-#~ msgid "Use the native fullscreen mode on OS X Lion"
-#~ msgstr "Использовать стандартный полноэкранный режим в OS X Lion"
-
-#~ msgid "Automatically save the volume on exit"
-#~ msgstr "Автоматическое сохранение уровня громкости при выходе"
-
-#~ msgid "Capture Device"
-#~ msgstr "Устройство захвата"
-
-#~ msgid "Frames per Second:"
-#~ msgstr "Кадров в секунду:"
-
-#~ msgid "Subscreen left:"
-#~ msgstr "Левая сторона подэкрана:"
-
-#~ msgid "Subscreen top:"
-#~ msgstr "Верхняя сторона подэкрана:"
-
-#~ msgid "Subscreen width:"
-#~ msgstr "Ширина подэкрана:"
-
-#~ msgid "Subscreen height:"
-#~ msgstr "Высота подэкрана:"
 
 #~ msgid ""
 #~ "This input allows you to process input signals from QuickTime-compatible "
@@ -30434,33 +29568,6 @@ msgstr "Список настроек медиаменеджера"
 #~ "совместимых с QuickTime .\n"
 #~ "Ввод Live Audio не поддерживается."
 
-#~ msgid "Image width:"
-#~ msgstr "Ширина изображения:"
-
-#~ msgid "Image height:"
-#~ msgstr "Высота изображения:"
-
-#~ msgid "Load subtitles file:"
-#~ msgstr "Загрузить файл субтитров:"
-
-#~ msgid "Subtitles encoding"
-#~ msgstr "Кодировка субтитров"
-
-#~ msgid "Subtitles alignment"
-#~ msgstr "Выравнивание субтитров"
-
-#~ msgid "SAP announce"
-#~ msgstr "Извещение по SAP"
-
-#~ msgid "RTSP announce"
-#~ msgstr "Извещение по RTSP"
-
-#~ msgid "HTTP announce"
-#~ msgstr "Извещение по HTTP"
-
-#~ msgid "HTML Playlist"
-#~ msgstr "Плейлист HTML"
-
 #~ msgid ""
 #~ "Beware this will reset the VLC media player preferences.\n"
 #~ "Are you sure you want to continue?"
@@ -30468,226 +29575,8 @@ msgstr "Список настроек медиаменеджера"
 #~ "Это сбросит все настройки медиа-проигрывателя VLC.\n"
 #~ "Вы уверены, что хотите это сделать?"
 
-#~ msgid "General Audio Settings"
-#~ msgstr "Основные настройки аудио"
-
-#~ msgid "General Video Settings"
-#~ msgstr "Основные настройки видео"
-
-#~ msgid "Subtitles & OSD"
-#~ msgstr "Субтитры и индикация"
-
-#~ msgid "Subtitles & On Screen Display Settings"
-#~ msgstr "Настройки субтитров и экранной индикации"
-
-#~ msgid "Input & Codecs"
-#~ msgstr "Ввод и кодеки"
-
-#~ msgid "Input & Codec settings"
-#~ msgstr "Настройки ввода и кодеков"
-
-#~ msgid "Enable Audio"
-#~ msgstr "Включить аудио"
-
-#~ msgid "HTTP Proxy"
-#~ msgstr "HTTP-прокси"
-
 #~ msgid "Password for HTTP Proxy"
 #~ msgstr "Пароль для HTTP-прокси"
-
-#~ msgid "Font Color"
-#~ msgstr "Цвет шрифта"
-
-#~ msgid "Font Size"
-#~ msgstr "Размер шрифта"
-
-#~ msgid "Subtitle Languages"
-#~ msgstr "Язык субтитров"
-
-#~ msgid "Preferred Subtitle Language"
-#~ msgstr "Предпочтительный язык субтитров"
-
-#~ msgid "Force Bold"
-#~ msgstr "Полужирный шрифт"
-
-#~ msgid "Outline Color"
-#~ msgstr "Цвет контура"
-
-#~ msgid "Enable Video"
-#~ msgstr "Включить видео"
-
-#~ msgid "Subtitle track syncronization:"
-#~ msgstr "Синхронизация дорожки субтитров:"
-
-#~ msgid "Subtitles speed:"
-#~ msgstr "Скорость субтитров:"
-
-#~ msgid "Subtitles duration factor:"
-#~ msgstr "Поправка длительности субтитров:"
-
-#~ msgid ""
-#~ "Extend subtitles duration by this value.\n"
-#~ "Set 0 to disable."
-#~ msgstr ""
-#~ "Увеличить длительность субтитров на эту величину.\n"
-#~ "0 - не менять."
-
-#~ msgid ""
-#~ "Multiply subtitles duration by this value.\n"
-#~ "Set 0 to disable."
-#~ msgstr ""
-#~ "Умножить длительность субтитров на эту величину.\n"
-#~ "0 - не менять."
-
-#~ msgid ""
-#~ "Recalculate subtitles duration according\n"
-#~ "to their content and this value.\n"
-#~ "Set 0 to disable."
-#~ msgstr ""
-#~ "Вычислить длительность субтитров,\n"
-#~ "исходя из длины слов и этого множителя.\n"
-#~ "0 - не менять."
-
-#~ msgid "SAP Announce"
-#~ msgstr "Оповещение SAP"
-
-#~ msgid ""
-#~ "The chosen codecs are not compatible with each other. For example: It is "
-#~ "impossibleto  mix uncompressed audio with any video codec.\n"
-#~ "\n"
-#~ "Correct your selection and try again."
-#~ msgstr ""
-#~ "Выбранные кодеки несовместимы друг с другом. Например, невозможно "
-#~ "смикшировать несжатое аудио с каким-либо видео-кодеком.\n"
-#~ "\n"
-#~ "Необходимо скорректировать выбор и попробовать снова."
-
-#~ msgid "Minimal Mac OS X OpenGL video output (opens a borderless window)"
-#~ msgstr ""
-#~ "Минимальный вывод видео через Mac OS X OpenGL (открывается окно без "
-#~ "оформления)"
-
-#~ msgid "  [Incoming]"
-#~ msgstr "  [Ввод]"
-
-#~ msgid "      input bytes read : %8.0f KiB"
-#~ msgstr "      прочитано байт на входе            : %8.0f КиБ"
-
-#~ msgid "      input bitrate    :   %6.0f kb/s"
-#~ msgstr "      битрейт на входе                   :   %6.0f Кб/с"
-
-#~ msgid "      demux bytes read : %8.0f KiB"
-#~ msgstr "      прочитано байт на демультиплексоре : %8.0f КиБ"
-
-#~ msgid "      demux bitrate    :   %6.0f kb/s"
-#~ msgstr "      битрейт на демультиплексоре        :   %6.0f Кб/с"
-
-#~ msgid "  [Video Decoding]"
-#~ msgstr "  [Декодирование видео]"
-
-#~ msgid "      video decoded    :    %<PRId64>"
-#~ msgstr "      декодировано видео                 :    %<PRId64>"
-
-#~ msgid "      frames displayed :    %<PRId64>"
-#~ msgstr "      показано кадров                    :    %<PRId64>"
-
-#~ msgid "      frames lost      :    %<PRId64>"
-#~ msgstr "      потеряно кадров                    :    %<PRId64>"
-
-#~ msgid "  [Audio Decoding]"
-#~ msgstr "  [Декодирование аудио]"
-
-#~ msgid "      audio decoded    :    %<PRId64>"
-#~ msgstr "      декодировано аудио                 :    %<PRId64>"
-
-#~ msgid "      buffers played   :    %<PRId64>"
-#~ msgstr "      воспроизведено буферов             :    %<PRId64>"
-
-#~ msgid "      buffers lost     :    %<PRId64>"
-#~ msgstr "      потеряно буферов                   :    %<PRId64>"
-
-#~ msgid "  [Streaming]"
-#~ msgstr "  [Потоковая передача]"
-
-#~ msgid "      packets sent     :    %5i"
-#~ msgstr "      отправлено пакетов                 :    %5i"
-
-#~ msgid "      bytes sent       : %8.0f KiB"
-#~ msgstr "      отправлено байт                    : %8.0f КиБ"
-
-#~ msgid "      sending bitrate  :   %6.0f kb/s"
-#~ msgstr "      битрейт на отправке                :   %6.0f Кб/с"
-
-#~ msgid " m                      Show/Hide metadata box"
-#~ msgstr " m                      Показать/скрыть метаданные"
-
-#~ msgid " Volume   : %u%%"
-#~ msgstr " Громкость   : %u%%"
-
-#~ msgid "Previous media in the playlist, skip backward when keep-pressed"
-#~ msgstr ""
-#~ "Предыдущая позиция плейлиста; перемотка к началу при длительном нажатии"
-
-#~ msgid "Next media in the playlist, skip forward when keep-pressed"
-#~ msgstr ""
-#~ "Следующая позиция плейлиста; перемотка вперёд при длительном нажатии"
-
-#~ msgid "Show playlist"
-#~ msgstr "Показать плейлист"
-
-#~ msgid "Open subtitles file"
-#~ msgstr "Открыть файл субтитров"
-
-#~ msgid "Preamp\n"
-#~ msgstr "Предусилитель\n"
-
-#~ msgid " dB"
-#~ msgstr " дБ"
-
-#~ msgid "Enable spatializer"
-#~ msgstr "Включить объёмное звучание"
-
-#~ msgid "Radio device name"
-#~ msgstr "Название радио-устройства"
-
-#~ msgid "TV (digital)"
-#~ msgstr "Телевидение (цифровое)"
-
-#~ msgid "Add to playlist"
-#~ msgstr "Добавить"
-
-#~ msgid "Clear playlist"
-#~ msgstr "Очистить плейлист"
-
-#~ msgid "Icon View"
-#~ msgstr "Значки"
-
-#~ msgid "Detailed View"
-#~ msgstr "Таблица"
-
-#~ msgid "List View"
-#~ msgstr "Список"
-
-#~ msgid "PictureFlow View "
-#~ msgstr "Галерея"
-
-#~ msgid "Select an action to change the associated hotkey"
-#~ msgstr "Выберите действие для изменения соответствующей горячей клавиши"
-
-#~ msgid "Hotkey for "
-#~ msgstr "Горячие клавиши для "
-
-#~ msgid "Press the new keys for "
-#~ msgstr "Нажмите новую комбинацию клавиш для "
-
-#~ msgid "Warning: the key is already assigned to \""
-#~ msgstr "Предупреждение: клавиша уже назначена для \""
-
-#~ msgid "Subtitles && OSD"
-#~ msgstr "Субтитры и индикация"
-
-#~ msgid "Input && Codecs"
-#~ msgstr "Ввод и кодеки"
 
 #~ msgid ""
 #~ "<p><i>VLC media player</i> does <b>not</b> send or collect any "
@@ -30706,15 +29595,6 @@ msgstr "Список настроек медиаменеджера"
 #~ "<p>Разработчики <i>VideoLAN</i> не позволяют VLC обращаться в Интернет "
 #~ "без вашего предварительного согласия.</p>\n"
 #~ "<p>Установите следующие параметры согласно своим предпочтениям:</p>\n"
-
-#~ msgid "Allow downloading media information"
-#~ msgstr "Загружать сведения о медиа-данных"
-
-#~ msgid "Allow checking for VLC updates"
-#~ msgstr "Проверять обновления VLC"
-
-#~ msgid "Save and Continue"
-#~ msgstr "Сохранить и продолжить"
 
 #~ msgid ""
 #~ "VLC media player is a free media player, encoder and streamer that can "
@@ -30738,9 +29618,6 @@ msgstr "Список настроек медиаменеджера"
 #~ "Эта версия VLC была скомпилирована:\n"
 #~ " "
 
-#~ msgid "Compiler: "
-#~ msgstr "Компилятор: "
-
 #~ msgid ""
 #~ "You are using the Qt4 Interface.\n"
 #~ "\n"
@@ -30748,67 +29625,8 @@ msgstr "Список настроек медиаменеджера"
 #~ "Вы используете интерфейс Qt4.\n"
 #~ "\n"
 
-#~ msgid "Copyright (C) "
-#~ msgstr "Авторские права (C) "
-
 #~ msgid " by the VideoLAN Team.\n"
 #~ msgstr " команда VideoLAN.\n"
-
-#~ msgid "&Codec"
-#~ msgstr "&Кодек"
-
-#~ msgid "&Convert"
-#~ msgstr "&Конвертировать"
-
-#~ msgid "&Convert / Save"
-#~ msgstr "&Конвертировать/сохранить"
-
-#~ msgid "Please enter the URL or path to the media you want to play"
-#~ msgstr "Введите URL или путь к файлу, который вы хотите проиграть"
-
-#~ msgid "Subtitles Files"
-#~ msgstr "Файлы субтитров"
-
-#~ msgid ""
-#~ "This dialog will allow you to stream or convert your media for use "
-#~ "locally, on your private network, or on the Internet.\n"
-#~ "You should start by checking that source matches what you want your input "
-#~ "to be and then press the \"Next\" button to continue.\n"
-#~ msgstr ""
-#~ "В этом диалоге вы сможете начать потоковое вещание или преобразование "
-#~ "медиа-файлов для локального использования или для передачи в сеть.\n"
-#~ "Начните с проверки правильности выбора источника, а затем нажмите кнопку "
-#~ "\"Следующий\" для продолжения.\n"
-
-#~ msgid "&Tools"
-#~ msgstr "Инструменты"
-
-#~ msgid "&Open (advanced)..."
-#~ msgstr "&Открыть источник..."
-
-#~ msgid "Audio &Channels"
-#~ msgstr "Аудио-каналы"
-
-#~ msgid "&Subtitles Track"
-#~ msgstr "Дорожка субтитров"
-
-#~ msgid "&Navigation"
-#~ msgstr "Навигация"
-
-#~ msgid "Tools"
-#~ msgstr "Инструменты"
-
-#~ msgid "Hide VLC media player in taskbar"
-#~ msgstr "Скрыть VLC в панели задач"
-
-#~ msgid "Show VLC media player"
-#~ msgstr "Показать медиа-проигрыватель VLC"
-
-#~ msgid "Advanced options"
-#~ msgstr "Расширенные параметры"
-
-#~ msgid "Show all the advanced options in the dialogs."
-#~ msgstr "Показывать в диалоговых окнах все дополнительные параметры."
 
 #~ msgid ""
 #~ "A single administration password is used to protect this interface. The "
@@ -30820,18 +29638,6 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "Freebox TV"
 #~ msgstr "Freebox TV"
 
-#~ msgid "French TV"
-#~ msgstr "French TV"
-
-#~ msgid "Filename of the SQLite database"
-#~ msgstr "Файл базы данных SQLite"
-
-#~ msgid "Path to the file containing the SQLite database"
-#~ msgstr "Путь к файлу, содержащему базу данных SQLite"
-
-#~ msgid "Ignored extensions in the media library"
-#~ msgstr "Типы файлов, не включаемые в медиатеку"
-
 #~ msgid ""
 #~ "Files with these extensions will not be added to the media library when "
 #~ "scanning directories."
@@ -30839,29 +29645,14 @@ msgstr "Список настроек медиаменеджера"
 #~ "Файлы этих типов (с такими расширениями) не будут добавлены в медиатеку "
 #~ "при сканировании каталогов."
 
-#~ msgid "Subdirectory recursive scanning"
-#~ msgstr "Рекурсивное сканирование подкаталогов"
-
 #~ msgid "When scanning a directory, scan also all its subdirectories."
 #~ msgstr "При сканировании каталога сканировать также все подкаталоги."
 
 #~ msgid "Media Library based on a SQL based database"
 #~ msgstr "Медиатека в базе данных SQL"
 
-#~ msgid "Username for the database"
-#~ msgstr "Имя пользователя для подключения к БД"
-
-#~ msgid "Password for the database"
-#~ msgstr "Пароль для подключения к БД"
-
-#~ msgid "Port for the database"
-#~ msgstr "Порт сервера БД"
-
 #~ msgid "Auto add new medias"
 #~ msgstr "Автодобавление медиа-файлов"
-
-#~ msgid "Automatically add new medias to ML"
-#~ msgstr "Автоматически добавлять новые медиа-файлы в медиатеку"
 
 #~ msgid "Power Management Inhibitor"
 #~ msgstr "Отключение управления питанием"
@@ -30871,9 +29662,6 @@ msgstr "Список настроек медиаменеджера"
 
 #~ msgid "Nokia MCE screen unblanking"
 #~ msgstr "Пробуждение экрана Nokia MCE"
-
-#~ msgid "X Screensaver disabler"
-#~ msgstr "Отключать хранитель экрана"
 
 #~ msgid ""
 #~ "Specify the log format. Available choices are \"text\" (default) and "
@@ -30902,23 +29690,11 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "libc memcpy"
 #~ msgstr "libc memcpy"
 
-#~ msgid "OSD configuration importer"
-#~ msgstr "Импорт конфигурации для экранной индикации"
-
-#~ msgid "XML OSD configuration importer"
-#~ msgstr "Импорт XML-конфигурации для экранной индикации"
-
-#~ msgid "SQLite database module"
-#~ msgstr "Модуль БД SQLite"
-
 #~ msgid "MMX EXT memcpy"
 #~ msgstr "MMX EXT memcpy"
 
 #~ msgid "MMX memcpy"
 #~ msgstr "MMX memcpy"
-
-#~ msgid "Title format string"
-#~ msgstr "Строка формата названия"
 
 #~ msgid ""
 #~ "Format of the string to send to MSN {0} Artist, {1} Title, {2} Album. "
@@ -30927,20 +29703,8 @@ msgstr "Список настроек медиаменеджера"
 #~ "Формат строки, посылаемой в MSN. Допустимые значения: {0} Исполнитель, "
 #~ "{1} Название, {2} Альбом. По умолчанию \"Исполнитель - Название\""
 
-#~ msgid "MSN Now-Playing"
-#~ msgstr "Информация о воспроизведении в MSN"
-
 #~ msgid "Telepathy \"Now Playing\" (MissionControl)"
 #~ msgstr "\"Телепатия\" \"Сейчас играет\" (MissionControl)"
-
-#~ msgid "Flip vertical position"
-#~ msgstr "Перевернуть позицию по вертикали"
-
-#~ msgid "Display XOSD output at the bottom of the screen instead of the top."
-#~ msgstr "Показывать вывод XOSD внизу, а не вверху экрана."
-
-#~ msgid "Vertical offset"
-#~ msgstr "Смещение по вертикали"
 
 #~ msgid ""
 #~ "Vertical offset between the border of the screen and the displayed text "
@@ -30948,9 +29712,6 @@ msgstr "Список настроек медиаменеджера"
 #~ msgstr ""
 #~ "Смещение по вертикали между краем экрана и текстом (в пикселах, по "
 #~ "умолчанию 30)."
-
-#~ msgid "Shadow offset"
-#~ msgstr "Смещение тени"
 
 #~ msgid ""
 #~ "Offset between the text and the shadow (in pixels, defaults to 2 pixels)."
@@ -30962,110 +29723,32 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "Color used to display text in the XOSD output."
 #~ msgstr "Цвет, используемый для показа текста XOSD."
 
-#~ msgid "XOSD interface"
-#~ msgstr "Интерфейс XOSD"
-
-#~ msgid "Blu-Ray"
-#~ msgstr "Blu-Ray"
-
-#~ msgid "Decompression"
-#~ msgstr "Восстановление сжатых данных"
-
-#~ msgid "Command UDP port"
-#~ msgstr "Управляющий порт UDP"
-
 #~ msgid ""
 #~ "UDP port to listen to for commands (show | enable <pid> | disable <pid>)."
 #~ msgstr ""
 #~ "Порт UDP, на котором будут приниматься команды (show | enable <pid> | "
 #~ "disable <pid>)."
 
-#~ msgid "Disable ES id"
-#~ msgstr "Отключить поток"
-
 #~ msgid "Disable ES id at startup."
 #~ msgstr "Отключить элементарный поток с заданным кодом при запуске."
-
-#~ msgid "Enable ES id"
-#~ msgstr "Включить поток"
 
 #~ msgid "Only enable ES id at startup."
 #~ msgstr "Включить элементарный поток с заданным кодом при запуске."
 
-#~ msgid "Select individual es to enable or disable from stream"
-#~ msgstr ""
-#~ "Выберите, какие элементарные потоки следует включить или исключить из "
-#~ "потока"
-
 #~ msgid "Full paths of the files separated by colons."
 #~ msgstr "Полные пути к файлам, разделенные двоеточиями."
-
-#~ msgid "Sizes"
-#~ msgstr "Размеры"
 
 #~ msgid "List of sizes separated by colons (720x576:480x576)."
 #~ msgstr "Размеры кадров, разделенные двоеточиями (720x576:480x576)."
 
-#~ msgid "Aspect ratio (4:3, 16:9)."
-#~ msgstr "Соотношение сторон (4:3, 16:9)"
-
 #~ msgid "UDP port to listen to for commands."
 #~ msgstr "Порт UDP, на котором будут приниматься команды управления."
-
-#~ msgid "Command"
-#~ msgstr "Команда"
 
 #~ msgid "Initial command to execute."
 #~ msgstr "Команда при запуске."
 
-#~ msgid "GOP size"
-#~ msgstr "Размер GOP"
-
-#~ msgid "Number of P frames between two I frames."
-#~ msgstr "Количество P-кадров между двумя I-кадрами."
-
-#~ msgid "Quantizer scale"
-#~ msgstr "Коэффициент квантования"
-
-#~ msgid "Fixed quantizer scale to use."
-#~ msgstr "Фиксированный коэффициент квантования."
-
-#~ msgid "Mute audio"
-#~ msgstr "Выключить аудио"
-
 #~ msgid "Mute audio when command is not 0."
 #~ msgstr "Выключать аудио, если команда не равна 0."
-
-#~ msgid "MPEG2 video switcher stream output"
-#~ msgstr "Вывод потока через MPEG2 video switcher"
-
-#~ msgid "Audio Language"
-#~ msgstr "Язык аудио"
-
-#~ msgid "Subtitles encoder"
-#~ msgstr "Кодировщик субтитров"
-
-#~ msgid ""
-#~ "This is the subtitles encoder module that will be used (and its "
-#~ "associated options)."
-#~ msgstr ""
-#~ "Используемый модуль кодировщика субтитров (и все его соответствующие "
-#~ "параметры)"
-
-#~ msgid "Destination subtitles codec"
-#~ msgstr "Конечный кодек субтитров"
-
-#~ msgid "This is the subtitles codec that will be used."
-#~ msgstr "Этот кодек субтитров будет использован для перекодирования."
-
-#~ msgid "Edge Weightning"
-#~ msgstr "Усиление краёв"
-
-#~ msgid "Darkness Limit"
-#~ msgstr "Лимит для темноты"
-
-#~ msgid "Filter Smoothness (in %)"
-#~ msgstr "Плавность фильтра (в %)"
 
 #~ msgid "Crop geometry (pixels)"
 #~ msgstr "Размеры для кадрирования (пикселы)"
@@ -31076,15 +29759,6 @@ msgstr "Список настроек медиаменеджера"
 #~ msgstr ""
 #~ "Указать размеры зоны для кадрирования в виде: <ширина> x <высота> + "
 #~ "<смещение слева> + <смещение справа>."
-
-#~ msgid "Automatic cropping"
-#~ msgstr "Автоматическое кадрирование"
-
-#~ msgid "Automatically detect black borders and crop them."
-#~ msgstr "Автоматическое кадрирование чёрных краёв."
-
-#~ msgid "Remove borders of the video and replace them by black borders"
-#~ msgstr "Выделяет края видео и заменяет их краями чистого чёрного цвета."
 
 #~ msgid "Ratio max (x 1000)"
 #~ msgstr "Максимальное соотношение (х1000)"
@@ -31099,16 +29773,10 @@ msgstr "Список настроек медиаменеджера"
 #~ "приплюснутого изображения). Значение увеличено в 1000 раз: 1333 означает "
 #~ "4/3."
 
-#~ msgid "Manual ratio"
-#~ msgstr "Соотношение сторон"
-
 #~ msgid "Force a ratio (0 for automatic). Value is x1000: 1333 means 4/3."
 #~ msgstr ""
 #~ "Принудительное использование указанного соотношения сторон (0 - "
 #~ "автоматическое). Значение увеличено в 1000 раз: 1333 означает 4/3."
-
-#~ msgid "Number of images for change"
-#~ msgstr "Количество изображений для смены"
 
 #~ msgid ""
 #~ "The number of consecutive images with the same detected ratio (different "
@@ -31120,9 +29788,6 @@ msgstr "Список настроек медиаменеджера"
 #~ "при котором считается, что соотношение изменилось, и начинается другое "
 #~ "кадрирование."
 
-#~ msgid "Number of lines for change"
-#~ msgstr "Количество строк для смены"
-
 #~ msgid ""
 #~ "The minimum difference in the number of detected black lines to consider "
 #~ "that ratio changed and trigger recrop."
@@ -31130,9 +29795,6 @@ msgstr "Список настроек медиаменеджера"
 #~ "Минимальная разница в количестве обнаруженных чёрных строк, при которой "
 #~ "считается, что соотношение сторон изменилось, и начинается другое "
 #~ "кадрирование."
-
-#~ msgid "Number of non black pixels "
-#~ msgstr "Количество не чёрных пикселов"
 
 #~ msgid ""
 #~ "The maximum of non-black pixels in a line to consider that the line is "
@@ -31151,33 +29813,12 @@ msgstr "Список настроек медиаменеджера"
 #~ "Процент от линии, учитываемый при проверке чёрных строк. Позволяет "
 #~ "пропускать логотипы на чёрных краях и кадрировать также и их."
 
-#~ msgid "Luminance threshold "
-#~ msgstr "Порог яркости"
-
 #~ msgid "Maximum luminance to consider a pixel as black (0-255)."
 #~ msgstr ""
 #~ "Максимальная яркость, при которой считается, что пиксел чёрный (0-255)."
 
-#~ msgid "Crop video filter"
-#~ msgstr "Видео-фильтр Кадрирование"
-
-#~ msgid "Cropping failed"
-#~ msgstr "Кадрирование не удалось"
-
-#~ msgid "VLC could not open the video output module."
-#~ msgstr "VLC не может открыть этот модуль вывода видео."
-
-#~ msgid "Deinterlace method to use for local playback."
-#~ msgstr "Метод устранения чересстрочности для локального воспроизведения."
-
-#~ msgid "Wrapper filter verbosity"
-#~ msgstr "Детальность сообщений фильтра надстройки"
-
 #~ msgid "Determines wrapper filter verbosity level"
 #~ msgstr "Определяет уровень детальности сообщений фильтра надстройки"
-
-#~ msgid "Configuration file"
-#~ msgstr "Файл конфигурации"
 
 #~ msgid "Configuration file for the OSD Menu."
 #~ msgstr "Файл конфигурации для экранного меню."
@@ -31192,24 +29833,6 @@ msgstr "Список настроек медиаменеджера"
 #~ "Путь к изображениям экранного меню. Этот параметр переопределяет "
 #~ "значение, указанное в файле конфигурации."
 
-#~ msgid "You can move the OSD menu by left-clicking on it."
-#~ msgstr "Вы можете переместить экранное меню мышью, щелкнув его."
-
-#~ msgid "Menu position"
-#~ msgstr "Расположение меню"
-
-#~ msgid ""
-#~ "You can enforce the OSD menu position on the video (0=center, 1=left, "
-#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-#~ "eg. 6 = top-right)."
-#~ msgstr ""
-#~ "Указать позицию экранного меню на видео (0 = центр, 1 = слева, 2 = "
-#~ "справа, 4 = сверху, 8 = снизу, также вы можете использовать комбинации "
-#~ "этих значений, например 6 = сверху-слева)."
-
-#~ msgid "Menu timeout"
-#~ msgstr "Задержка"
-
 #~ msgid ""
 #~ "OSD menu pictures get a default timeout of 15 seconds added to their "
 #~ "remaining time. This will ensure that they are at least the specified "
@@ -31218,9 +29841,6 @@ msgstr "Список настроек медиаменеджера"
 #~ "Изображения экранного меню будут оставаться на экране указанное значение "
 #~ "секунд (по умолчанию 15). Убедитесь, что этого значения достаточно для "
 #~ "того, чтобы увидеть меню."
-
-#~ msgid "Menu update interval"
-#~ msgstr "Период обновления"
 
 #~ msgid ""
 #~ "The default is to update the OSD menu picture every 200 ms. Shorten the "
@@ -31233,23 +29853,6 @@ msgstr "Список настроек медиаменеджера"
 #~ "Будьте осторожны, так как этот параметр может сильно нагрузить CPU. "
 #~ "Допустимые значения от 0 до 1000 мс."
 
-#~ msgid ""
-#~ "The transparency of the OSD menu can be changed by giving a value between "
-#~ "0 and 255. A lower value specifies more transparency a higher means less "
-#~ "transparency. The default is being not transparent (value 255) the "
-#~ "minimum is fully transparent (value 0)."
-#~ msgstr ""
-#~ "Прозрачность экранного меню изменяется присвоением значения от 0 до 255. "
-#~ "Более низкое значение приводит к увеличению прозрачности, более высокое - "
-#~ "к уменьшению. По умолчанию - непрозрачное (значение 255), минимум - "
-#~ "абсолютно прозрачное (значение 0)."
-
-#~ msgid "On Screen Display menu"
-#~ msgstr "Экранное меню"
-
-#~ msgid "Comma separated list of active windows, defaults to all"
-#~ msgstr "Список активных окон, разделенных запятыми. По умолчанию все"
-
 #~ msgid "Make one tile a black slot"
 #~ msgstr "Сделать одну ячейку чёрной"
 
@@ -31259,115 +29862,8 @@ msgstr "Список настроек медиаменеджера"
 #~ "Создание свободного сегмента. Другие ячейки могут меняться местами только "
 #~ "с ним."
 
-#~ msgid ""
-#~ "Directory path where images files should be saved.If not set, then images "
-#~ "will be automatically saved in users homedir."
-#~ msgstr ""
-#~ "Путь к каталогу, где будут сохранены файлы изображений. Если этот путь не "
-#~ "задан, они будут сохраняться в домашнем каталоге пользователя."
-
-#~ msgid "Change subtitles delay"
-#~ msgstr "Управление задержкой субтитров"
-
 #~ msgid "One of '90', '180', '270', 'hflip' and 'vflip'"
 #~ msgstr "один из '90', '180', '270', 'hflip' и 'vflip'"
-
-#~ msgid "Enable desktop mode "
-#~ msgstr "Включить режим рабочего стола"
-
-#~ msgid "Try to use hardware acceleration for subtitles/OSD blending."
-#~ msgstr ""
-#~ "Попытаться использовать аппаратное ускорение для наложения субтитров/OSD."
-
-#~ msgid "Windows GAPI video output"
-#~ msgstr "Вывод видео через Windows GAPI"
-
-#~ msgid ""
-#~ "Your video output acceleration driver does not support the required "
-#~ "resolution: %ux%u pixels. The maximum supported resolution is %<PRIu32>x"
-#~ "%<PRIu32>.\n"
-#~ "Video output acceleration will be disabled. However, rendering videos "
-#~ "with overly large resolution may cause severe performance degration."
-#~ msgstr ""
-#~ "Ваш драйвер ускорения видео-вывода не поддерживает требуемое разрешение: "
-#~ "%ux%u пикселов. Максимально возможное разрешение: %<PRIu32>x%<PRIu32>.\n"
-#~ "Ускорение видео-вывода будет отключено. При воспроизведении видео с "
-#~ "большим разрешением может наблюдаться низкая производительность."
-
-#~ msgid "Stream Name"
-#~ msgstr "Имя потока"
-
-#~ msgid "Video Codec"
-#~ msgstr "Кодек видео"
-
-#~ msgid "Audio Codec"
-#~ msgstr "Кодек звука"
-
-#~ msgid "Subtitle Codec"
-#~ msgstr "Кодек субтитров"
-
-#~ msgid "Output Method"
-#~ msgstr "Режим вывода"
-
-#~ msgid "Video Bit Rate"
-#~ msgstr "Битрейт видео"
-
-#~ msgid "Audio Bit Rate"
-#~ msgstr "Битрейт звука"
-
-#~ msgid "Audio Sample Rate"
-#~ msgstr "Частота дискретизации звука"
-
-#~ msgid "MUX Options"
-#~ msgstr "Параметры мультиплексирования"
-
-#~ msgid "Video Scale"
-#~ msgstr "Масштаб видео"
-
-#~ msgid "Output Port"
-#~ msgstr "Порт назначения вывода"
-
-#~ msgid "Output Destination"
-#~ msgstr "Адрес назначения вывода"
-
-#~ msgid "Output File"
-#~ msgstr "Выходной файл"
-
-#~ msgid "Input Media"
-#~ msgstr "Входящий поток"
-
-#~ msgid "File Name"
-#~ msgstr "Имя файла"
-
-#~ msgid "Rows:"
-#~ msgstr "Строки:"
-
-#~ msgid "x offset"
-#~ msgstr "сдвиг по X"
-
-#~ msgid "row border"
-#~ msgstr "граница строк"
-
-#~ msgid "width"
-#~ msgstr "ширина"
-
-#~ msgid "Columns:"
-#~ msgstr "Столбцы:"
-
-#~ msgid "y offset"
-#~ msgstr "сдвиг по y"
-
-#~ msgid "column border"
-#~ msgstr "граница столбцов"
-
-#~ msgid "height"
-#~ msgstr "высота"
-
-#~ msgid "Are you sure you wish to create the stream ?"
-#~ msgstr "Вы действительно хотите создать поток?"
-
-#~ msgid "Preamp: "
-#~ msgstr "Предусиление: "
 
 #~ msgid ""
 #~ "We would like to thank the whole VLC community, the testers, our users "
@@ -31377,21 +29873,6 @@ msgstr "Список настроек медиаменеджера"
 #~ "Мы хотели бы поблагодарить всё сообщество VLC, тестеров, пользователей и "
 #~ "в частности следующих людей за их вклад в создание лучшего бесплатного "
 #~ "программного обеспечения."
-
-#~ msgid "Licence"
-#~ msgstr "Лицензия"
-
-#~ msgid "Verbosity:"
-#~ msgstr "Подробность сообщений:"
-
-#~ msgid "Add a subtitles file"
-#~ msgstr "Добавить файл субтитров"
-
-#~ msgid "Use a sub&titles file"
-#~ msgstr "Использовать файл суб&титров"
-
-#~ msgid "Select the subtitles file"
-#~ msgstr "Выбрать файла субтитров"
 
 #~ msgid ""
 #~ "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/"
@@ -31427,75 +29908,6 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "00000; "
 #~ msgstr "00000; "
 
-#~ msgid "Destinations"
-#~ msgstr "Пути назначения"
-
-#~ msgid "Group name"
-#~ msgstr "Имя группы"
-
-#~ msgid "Use GPU accelerated decoding"
-#~ msgstr "Использовать видеоускоритель"
-
-#~ msgid "Instances"
-#~ msgstr "Копии программы"
-
-#~ msgid "Enqueue files when in one instance mode"
-#~ msgstr "Использовать очередь в режиме одной копии"
-
-#~ msgid "Menus language:"
-#~ msgstr "Язык меню:"
-
-#~ msgid "Systray popup when minimized"
-#~ msgstr "Сворачивать в системный лоток"
-
-#~ msgid "Subtitles Language"
-#~ msgstr "Язык субтитров"
-
-#~ msgid "Preferred subtitles language"
-#~ msgstr "Предпочтительный язык субтитров"
-
-#~ msgid "Subtitles effects"
-#~ msgstr "Эффекты субтитров"
-
-#~ msgid "Do you want to download it ?"
-#~ msgstr "Скачать его?"
-
-#~ msgid "Black slot"
-#~ msgstr "Один чёрный сегмент"
-
-#~ msgid "DVB"
-#~ msgstr "DVB"
-
-#~ msgid "Advance of subtitles over video:"
-#~ msgstr "Сдвиг между субтитрами и видео:"
-
-#~ msgid "Speed of the subtitles:"
-#~ msgstr "Скорость субтитров"
-
-#~ msgid "Session groupname"
-#~ msgstr "Группа сессии"
-
-#~ msgid "Default Volume"
-#~ msgstr "Уровень громкости по умолчанию"
-
-#~ msgid "Enable wallpaper mode"
-#~ msgstr "Включить режим обоев"
-
-#~ msgid "Clear Menu"
-#~ msgstr "Очистить меню"
-
-#~ msgid "RTSP host address"
-#~ msgstr "Адрес сервера RTSP"
-
-#~ msgid "Media Browser"
-#~ msgstr "Обзор источников"
-
-#~ msgid "Left rear"
-#~ msgstr "левый задний"
-
-#~ msgid "Right rear"
-#~ msgstr "правый задний"
-
 #, fuzzy
 #~ msgid ""
 #~ "This is a ',' separated string, each objects should be prefixed by a '+' "
@@ -31513,87 +29925,12 @@ msgstr "Список настроек медиаменеджера"
 #~ "отладочных сообщений нужно указать ключ -vvv."
 
 #~ msgid ""
-#~ "RTP packets will be authenticated and deciphered with this Secure RTP "
-#~ "master shared secret key."
-#~ msgstr ""
-#~ "RTP-пакеты будут проверяться и расшифровываться с помощью этого "
-#~ "первичного общего секретного Secure RTP-ключа."
-
-#~ msgid "Secure RTP requires a (non-secret) master salt value."
-#~ msgstr "Для Secure RTP требуется (несекретное) первичное значение salt."
-
-#~ msgid ""
-#~ "This option silences all other channels except the selected channel. "
-#~ "Choose one from (0=left, 1=right, 2=rear left, 3=rear right, 4=center, "
-#~ "5=left front)"
-#~ msgstr "Отключение всех других каналов, кроме выбранного."
-
-#~ msgid ""
-#~ "Force a strict standard compliance when encoding (accepted values: -1, 0, "
-#~ "1)."
-#~ msgstr ""
-#~ "Включить строгое следование стандартом при кодировании (допустимые "
-#~ "значения: -1, 0, 1)."
-
-#, fuzzy
-#~ msgid "Low Pass Ffilter"
-#~ msgstr "Логотип"
-
-#, fuzzy
-#~ msgid ""
-#~ "When set then This VLC instance shall dictate its clock for "
-#~ "synchronization over clients listening on the masters network ip address"
-#~ msgstr ""
-#~ "VLC будет сообщать показания часов компьютера клиентам сети, "
-#~ "запрашивающим время у этого компьютера"
-
-#, fuzzy
-#~ msgid ""
-#~ "The IP address of The network master clock to use for clock "
-#~ "synchronization."
-#~ msgstr "IP-адрес сервера времени в сети для синхронизации часов компьютера."
-
-#, fuzzy
-#~ msgid "Duration in second"
-#~ msgstr "Длительность в мс"
-
-#~ msgid "Override parametters"
-#~ msgstr "Переопределить параметры"
-
-#~ msgid "yes: from %@ to %@ secs"
-#~ msgstr "да: от %@ до %@ сек"
-
-#, fuzzy
-#~ msgid "Previous/Backward"
-#~ msgstr "Предыдущая глава"
-
-#, fuzzy
-#~ msgid "Next/Forward"
-#~ msgstr "Вперед"
-
-#~ msgid "Loop/Repeat mode"
-#~ msgstr "Режим повтора"
-
-#~ msgid ""
 #~ "Specify the log format. Available choices are \"text\" (default), \"html"
 #~ "\", and \"syslog\" (special mode to send to syslog instead of file."
 #~ msgstr ""
 #~ "Укажите формат журнала. Допустимые значения: \"текст\" (по умолчанию), "
 #~ "\"html\", и \"syslog\" (специальный режим, при котором сообщения "
 #~ "посылаются в syslog вместо файла)."
-
-#~ msgid ""
-#~ "RTP packets will be integrity-protected and ciphered with this Secure RTP "
-#~ "master shared secret key."
-#~ msgstr ""
-#~ "RTP-пакеты будут проверяться на целостность и расшифровываться с помощью "
-#~ "этого первичного общего секретного Secure RTP-ключа."
-
-#~ msgid ""
-#~ "This allows you to specify a group for the session, that will be "
-#~ "announced if you choose to use SAP."
-#~ msgstr ""
-#~ "Группа сессии, которая будет указана в оповещениях при использовании SAP."
 
 #~ msgid "Probe DVB card for capabilities"
 #~ msgstr "Опросить DVB карту"
@@ -31669,10 +30006,6 @@ msgstr "Список настроек медиаменеджера"
 
 #~ msgid "Ball color, one of \"red\", \"blue\" and \"green\"."
 #~ msgstr "Цвет шарика: красный, синий или зелёный."
-
-#, fuzzy
-#~ msgid "Live Update"
-#~ msgstr "Обновить"
 
 #~ msgid ""
 #~ "One of \"u8\", \"s8\", \"u16\", \"s16\", \"u16_le\", \"s16_le\", \"u16_be"
@@ -31939,9 +30272,6 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "FEC rate includes DVB-T high priority stream FEC Rate"
 #~ msgstr "Это отношение учитывает FEC высокоприоритетного потока DVB-T"
 
-#~ msgid "1/2"
-#~ msgstr "1/2"
-
 #~ msgid "2/3"
 #~ msgstr "2/3"
 
@@ -31992,12 +30322,6 @@ msgstr "Список настроек медиаменеджера"
 
 #~ msgid "Hierarchy alpha value [Undefined,1,2,4]"
 #~ msgstr "Альфа-величина иерархии [неопределённая,1,2,4]"
-
-#~ msgid "2"
-#~ msgstr "2"
-
-#~ msgid "4"
-#~ msgstr "4"
 
 #~ msgid "Modulation type for front-end device."
 #~ msgstr "Типа модуляции для фронтенда."
@@ -32215,9 +30539,6 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "Reload image file every n seconds."
 #~ msgstr "Перезагружать файл изображения каждые n секунд."
 
-#~ msgid "Consider width and height as maximum values."
-#~ msgstr "Использовать высоту и ширину как максимальные значения."
-
 #~ msgid ""
 #~ "This integer when viewed in binary is a debugging mask\n"
 #~ "calls                 1\n"
@@ -32283,21 +30604,11 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "Repair"
 #~ msgstr "Исправление"
 
-#~ msgid ""
-#~ "Force the subtiles format. Use \"auto\", the set of supported values "
-#~ "varies."
-#~ msgstr ""
-#~ "Принудительное использование этого формата субтитров. Выбирайте "
-#~ "\"автоматически\", набор поддерживаемых значений может быть разным."
-
 #~ msgid "Control word for the CSA encryption algorithm"
 #~ msgstr "Управляющее слово для алгоритма кодирования CSA"
 
 #~ msgid "VLC was brought to you by:"
 #~ msgstr "Кто предоставил VLC:"
-
-#~ msgid "Rewind"
-#~ msgstr "Перемотка назад"
 
 #~ msgid "Apply the equalizer filter twice. The effect will be sharper."
 #~ msgstr "Применять фильтр эквалайзера дважды. Эффект будет более выраженным."
@@ -32376,9 +30687,6 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "Add controls to the video window"
 #~ msgstr "Добавить органы управления в окне видео."
 
-#~ msgid "Input Settings not saved"
-#~ msgstr "Настройки ввода не сохранены"
-
 #~ msgid " State    : Playing %s"
 #~ msgstr " Состояние    : Проигрывается %s"
 
@@ -32418,9 +30726,6 @@ msgstr "Список настроек медиаменеджера"
 #~ "чтобы получить обложку CD или проверить наличие обновлений.</p>\n"
 #~ "<p>Но <i>VLC</i> <b>НЕ</b> отправляет и <b>НЕ</b> собирает <b>НИКАКУЮ</b> "
 #~ "информацию о ваших действиях, даже обезличенную.</p>\n"
-
-#~ msgid "&Update"
-#~ msgstr "О&бновить"
 
 #~ msgid "Sca&le"
 #~ msgstr "По размеру окна"
@@ -32479,9 +30784,6 @@ msgstr "Список настроек медиаменеджера"
 
 #~ msgid "Growl UDP port on the Growl server."
 #~ msgstr "Порт UDP на сервере Growl."
-
-#~ msgid "Simple XML Parser"
-#~ msgstr "Простой анализатор XMP"
 
 #~ msgid "IPv4 SAP"
 #~ msgstr "IPv4 SAP"
@@ -32612,13 +30914,2210 @@ msgstr "Список настроек медиаменеджера"
 #~ "Определить тип развёртки (прогрессивная или чересстрочная) при "
 #~ "кодировании по входному изображению."
 
+#~ msgid ""
+#~ "Channel of the card to use (Usually, 0 = tuner, 1 = composite, 2 = "
+#~ "svideo)."
+#~ msgstr "Канал карты (обычно, 0 = тюнер, 1 = композитный вход, 2 - s-video)."
+
+#~ msgid "Width of the stream to capture (-1 for autodetect)."
+#~ msgstr "Ширина потока для захвата (-1 для автоматического определения)."
+
+#~ msgid "Height of the stream to capture (-1 for autodetect)."
+#~ msgstr "Высота потока для захвата (-1 для автоматического определения)."
+
+#~ msgid "IO Method"
+#~ msgstr "Метод ввода/вывода"
+
+#~ msgid "Crops a defined part of the image"
+#~ msgstr "Обрезает часть изображения"
+
+#~ msgid "iSight Capture Input"
+#~ msgstr "Ввод для захвата iSight"
+
+#, fuzzy
+#~ msgid "Subtitles/OSD"
+#~ msgstr "Субтитры / экранное меню"
+
+#, fuzzy
+#~ msgid "Subtitles codecs"
+#~ msgstr "Кодеки субтитров"
+
+#, fuzzy
+#~ msgid "Settings for subtitles, teletext and CC decoders and encoders."
+#~ msgstr "Настройки декодеров и кодеров для субтитров и телетекста."
+
+#, fuzzy
+#~ msgid "General Input"
+#~ msgstr "Общие"
+
+#, fuzzy
+#~ msgid "CPU features"
+#~ msgstr "Характеристики"
+
+#, fuzzy
+#~ msgid "Chroma modules settings"
+#~ msgstr "Основные настройки видео"
+
+#, fuzzy
+#~ msgid "Packetizer modules settings"
+#~ msgstr "Основные настройки видео"
+
+#, fuzzy
+#~ msgid "Encoders settings"
+#~ msgstr "Редактировать настройки"
+
+#, fuzzy
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitles encoding modules."
+#~ msgstr "Общие параметры модулей кодирования видео/аудио/субтитров."
+
+#, fuzzy
+#~ msgid "Dialog providers settings"
+#~ msgstr "Основные настройки видео"
+
+#, fuzzy
+#~ msgid "Subtitle demuxer settings"
+#~ msgstr "Кодировка текста субтитров"
+
+#, fuzzy
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitles type or file name."
+#~ msgstr ""
+#~ "Здесь вы можете настроить демультиплексор субтитров, например имя файла "
+#~ "или тип субтитров."
+
+#, fuzzy
+#~ msgid "No help available"
+#~ msgstr "Максимально возможное"
+
+#, fuzzy
+#~ msgid "There is no help available for these modules."
+#~ msgstr "показать список доступных модулей"
+
+#, fuzzy
+#~ msgid "Quick &Open File..."
+#~ msgstr "Открыть файл..."
+
+#, fuzzy
+#~ msgid "&Bookmarks"
+#~ msgstr "Закладки"
+
+#, fuzzy
+#~ msgid "Fetch Information"
+#~ msgstr "Информация о &кодеке"
+
+#, fuzzy
+#~ msgid "Sort"
+#~ msgstr "Сортировать"
+
+#, fuzzy
+#~ msgid "No Repeat"
+#~ msgstr "Повтор"
+
+#, fuzzy
+#~ msgid "Add to Media Library"
+#~ msgstr "Загружать медиатеку"
+
+#, fuzzy
+#~ msgid "Advanced Open..."
+#~ msgstr "Расширенные параметры..."
+
+#, fuzzy
+#~ msgid "Open Play&list..."
+#~ msgstr "Открыть плейлист..."
+
+#, fuzzy
+#~ msgid "Search Filter"
+#~ msgstr "Фильтры потока"
+
+#, fuzzy
+#~ msgid "&Services Discovery"
+#~ msgstr "Обнаружение служб"
+
+#, fuzzy
+#~ msgid "Image clone"
+#~ msgstr "Цветность изображения"
+
+#, fuzzy
+#~ msgid "Clone the image"
+#~ msgstr "Очистить сообщения"
+
+#, fuzzy
+#~ msgid "Magnification"
+#~ msgstr "Увеличение/масштаб"
+
+#, fuzzy
+#~ msgid "Image colors inversion"
+#~ msgstr "Тип инверсии"
+
+#, fuzzy
+#~ msgid ""
+#~ "%d module(s) were not displayed because they only have advanced options.\n"
+#~ msgstr "Не был показан %u модуль, имеющий только расширенные параметры.\n"
+
+#, fuzzy
+#~ msgid "Force mono audio"
+#~ msgstr "Полужирный"
+
+#, fuzzy
+#~ msgid "This will force a mono audio output."
+#~ msgstr "Вывод звука в файл"
+
+#, fuzzy
+#~ msgid "Default audio volume"
+#~ msgstr "Целочисленный уровень громкости"
+
+#, fuzzy
+#~ msgid ""
+#~ "The step size of the volume is adjustable using this option, in a range "
+#~ "from 0 to 1024."
+#~ msgstr ""
+#~ "Этот параметр задаёт размер шага, с которым будет изменяться громкость."
+
+#, fuzzy
+#~ msgid "Audio output frequency (Hz)"
+#~ msgstr "Мультиплексор звука."
+
+#, fuzzy
+#~ msgid "Audio output channels mode"
+#~ msgstr "Каналы вывода звука"
+
+#, fuzzy
+#~ msgid "Audio visualizations "
+#~ msgstr "Визуализация аудио"
+
+#, fuzzy
+#~ msgid "Subtitles track"
+#~ msgstr "Дорожка субтитров"
+
+#, fuzzy
+#~ msgid "Subtitles track ID"
+#~ msgstr "№ дорожки субтитров"
+
+#, fuzzy
+#~ msgid "Low definition (320 lines)"
+#~ msgstr "Низкое разрешение (360 строк)"
+
+#, fuzzy
+#~ msgid ""
+#~ "This adds so-called \"subpicture filters\". These filter subpictures "
+#~ "created by subtitles decoders or other subpictures sources."
+#~ msgstr ""
+#~ "Добавляет так называемые «фильтры слоёв», которые фильтруют слои, "
+#~ "созданные, например декодером субтитров или другими источниками."
+
+#, fuzzy
+#~ msgid ""
+#~ "This file countains an optional CRL to prevent remove clients from using "
+#~ "revoked certificates in TLS sessions."
+#~ msgstr ""
+#~ "CRL в этом файле позволит предотвратить использование отозванных "
+#~ "сертификатов в TLS-сеансах."
+
+#, fuzzy
+#~ msgid ""
+#~ "This allow you to configure the initial caching amount for stream output  "
+#~ "muxer. This value should be set in milliseconds."
+#~ msgstr ""
+#~ "Изменить размер стартового кэша для мультиплексора вывода потока. "
+#~ "Значение указывается в миллисекундах."
+
+#, fuzzy
+#~ msgid "Control SAP flow"
+#~ msgstr "Управление"
+
+#, fuzzy
+#~ msgid "Memory copy module"
+#~ msgstr "Модуль вывода видео"
+
+#, fuzzy
+#~ msgid "Data search path"
+#~ msgstr "Путь папки с градиентами"
+
+#, fuzzy
+#~ msgid "Override the default data/share search path."
+#~ msgstr ""
+#~ "Переопределяет описание дорожки с субтитрами, заданное по умолчанию."
+
+#, fuzzy
+#~ msgid ""
+#~ "Allowing only one running instance of VLC can sometimes be useful, for "
+#~ "example if you associated VLC with some media types and you don't want a "
+#~ "new instance of VLC to be opened each time you double-click on a file in "
+#~ "the explorer. This option will allow you to play the file with the "
+#~ "already running instance or enqueue it."
+#~ msgstr ""
+#~ "Ограничение одной копии VLC бывает полезно, например если вы привязали к "
+#~ "VLC некоторые типы медиафайлов и не хотите, чтобы при открытии в файловом "
+#~ "менеджере каждого нового файла запускалась новая копия VLC. В этом режиме "
+#~ "файл будет воспроизводиться в существующей копии или добавлен в очередь."
+
+#, fuzzy
+#~ msgid "One instance when started from file"
+#~ msgstr "Ограничиться одной копией при запуске из менеджера файлов"
+
+#, fuzzy
+#~ msgid "Allow only one running instance when started from file."
+#~ msgstr "Ограничиться одной копией при запуске из менеджера файлов"
+
+#, fuzzy
+#~ msgid "Enqueue items to playlist when in one instance mode"
+#~ msgstr "Добавлять позиции в очередь в режиме одной копии"
+
+#, fuzzy
+#~ msgid "Leave fullscreen"
+#~ msgstr "Выйти из полноэкранного режима"
+
+#, fuzzy
+#~ msgid "Select the hotkey to use to leave fullscreen state."
+#~ msgstr "Назначьте клавишу для переключения полноэкранного режима."
+
+#, fuzzy
+#~ msgid "Increase scale factor."
+#~ msgstr "Увеличение масштаба"
+
+#, fuzzy
+#~ msgid "Decrease scale factor."
+#~ msgstr "Уменьшение масштаба"
+
+#, fuzzy
+#~ msgid "Cycle through deinterlace modes."
+#~ msgstr "Переключает режимы устранения чересстрочности по кругу."
+
+#, fuzzy
+#~ msgid "Show interface"
+#~ msgstr "Интерфейс Qt"
+
+#, fuzzy
+#~ msgid "Hide interface"
+#~ msgstr "Интерфейс Qt"
+
+#, fuzzy
+#~ msgid "Normal/Repeat/Loop"
+#~ msgstr "Обычный/Цикл/Повтор"
+
+#, fuzzy
+#~ msgid "Toggle Normal/Repeat/Loop playlist modes"
+#~ msgstr "Вкл./выкл. режимы плейлиста Обычный/Цикл/Повтор"
+
+#, fuzzy
+#~ msgid "Display OSD menu on top of video output"
+#~ msgstr "Вывод видео через OpenGL (для iOS)"
+
+#, fuzzy
+#~ msgid "Do not display OSD menu on video output"
+#~ msgstr "Не показывать видео"
+
+#, fuzzy
+#~ msgid "Select current widget"
+#~ msgstr "Повторить текущий элемент"
+
+#, fuzzy
+#~ msgid "CPU"
+#~ msgstr "TCP"
+
+#, fuzzy
+#~ msgid "Greek, Modern ()"
+#~ msgstr "Греческий современный"
+
+#, fuzzy
+#~ msgid "Occitan (post 1500); Provencal"
+#~ msgstr "Окситанский; Прованский"
+
+#, fuzzy
+#~ msgid "Aspect-ratio"
+#~ msgstr "Соотношение сторон"
+
+#, fuzzy
+#~ msgid "Capture format (default s16l)"
+#~ msgstr "Формат изображения (по умолчанию RGB)"
+
+#, fuzzy
+#~ msgid "Capture format of audio stream."
+#~ msgstr "Захватывать аудиопоток в стерео-режиме"
+
+#, fuzzy
+#~ msgid "GSM Audio"
+#~ msgstr "Аудио"
+
+#, fuzzy
+#~ msgid "ALSA audio capture input"
+#~ msgstr "Ввод звука через ALSA"
+
+#, fuzzy
+#~ msgid "Blu-Ray Disc Input"
+#~ msgstr "Ввод с диска Blu-ray"
+
+#, fuzzy
+#~ msgid "Bluray menus"
+#~ msgstr "Меню Blu-ray"
+
+#, fuzzy
+#~ msgid "Use bluray menus. If disabled, the movie will start directly"
+#~ msgstr ""
+#~ "Показывать меню Blu-ray. Если отключено, воспроизведение начнётся сразу"
+
+#, fuzzy
+#~ msgid "Blu-Ray Disc support (libbluray)"
+#~ msgstr "Поддержка дисков Blu-ray (libbluray)"
+
+#, fuzzy
+#~ msgid ""
+#~ "This Blu-Ray Disc needs a library for AACS decoding, and your system does "
+#~ "not have it."
+#~ msgstr ""
+#~ "Для воспроизведения этого диска Blu-ray нужна библиотека декодирования "
+#~ "AACS, но её нет в вашей системе."
+
+#, fuzzy
+#~ msgid "BluRay Disc is corrupted."
+#~ msgstr "Диск Blu-ray испорчен"
+
+#, fuzzy
+#~ msgid ""
+#~ "This Blu-Ray Disc needs a library for BD+ decoding, and your system does "
+#~ "not have it."
+#~ msgstr ""
+#~ "Для воспроизведения этого диска Blu-ray нужна библиотека декодирования BD"
+#~ "+, но её нет в вашей системе."
+
+#, fuzzy
+#~ msgid "Blu-Ray error"
+#~ msgstr "Ошибка Blu-ray"
+
+#, fuzzy
+#~ msgid "dc1394 input"
+#~ msgstr "Аудиовход"
+
+#, fuzzy
+#~ msgid "Audio sampling rate in Hz"
+#~ msgstr "Частота дискретизации (Гц)"
+
+#, fuzzy
+#~ msgid ""
+#~ "Force the DirectShow video input to use a specific frame rate(eg. 0 means "
+#~ "default, 25, 29.97, 50, 59.94, etc.)"
+#~ msgstr ""
+#~ "Задаёт для видеовхода DirectShow определённую частоту кадров (например: 0 "
+#~ "(значение по умолчанию), 25, 29.97, 50, 59.94, ...)"
+
+#, fuzzy
+#~ msgid "Refresh list"
+#~ msgstr "Обновить список"
+
+#, fuzzy
+#~ msgid "VLC cannot open ANY capture device.Check the error log for details."
+#~ msgstr ""
+#~ "Не удаётся обнаружить какое-либо устройство захвата. В журнал ошибок "
+#~ "записана подробная информация."
+
+#, fuzzy
+#~ msgid "VLC cannot use the device \"%s\", because its type is not supported."
+#~ msgstr ""
+#~ "Выбранное вам устройство не может использоваться, так как его тип не "
+#~ "поддерживается."
+
+#, fuzzy
+#~ msgid ""
+#~ "If there is more than one digital broadcasting adapter, the adapter "
+#~ "number must be selected. Numbering start from zero."
+#~ msgstr ""
+#~ "Если подключено несколько приёмников цифрового телесигнала, необходимо "
+#~ "указать номер используемого адаптера (начиная с 0)."
+
+#, fuzzy
+#~ msgid "Digital Video (Firewire/ieee1394)  input"
+#~ msgstr "Ввод Digital Video (Firewire/IEEE 1394)"
+
+#, fuzzy
+#~ msgid "collapse"
+#~ msgstr "Свернуть"
+
+#, fuzzy
+#~ msgid "expand"
+#~ msgstr "Развернуть"
+
+#, fuzzy
+#~ msgid "Coffee pot control"
+#~ msgstr "Сброс настроек"
+
+#, fuzzy
+#~ msgid "Coffee pot"
+#~ msgstr "Контрольные точки"
+
+#, fuzzy
+#~ msgid "Auto Connection"
+#~ msgstr "Автоподключение"
+
+#, fuzzy
+#~ msgid "Active TCP connection"
+#~ msgstr "Автоподключение"
+
+#, fuzzy
+#~ msgid "RTMP stream output"
+#~ msgstr "Вывод RTP-потока"
+
+#, fuzzy
+#~ msgid "PVR video device"
+#~ msgstr "Видеоустройство"
+
+#, fuzzy
+#~ msgid "PVR radio device"
+#~ msgstr "Радиоприёмник"
+
+#, fuzzy
+#~ msgid "Norm"
+#~ msgstr "обычный"
+
+#, fuzzy
+#~ msgid "Norm of the stream (Automatic, SECAM, PAL, or NTSC)."
+#~ msgstr "Стандарт видео (по умолчанию, SECAM, PAL или NTSC)."
+
+#, fuzzy
+#~ msgid "Framerate"
+#~ msgstr "Частота кадров"
+
+#, fuzzy
+#~ msgid "Key interval"
+#~ msgstr "Защитный интервал"
+
+#, fuzzy
+#~ msgid "B Frames"
+#~ msgstr "кадров"
+
+#, fuzzy
+#~ msgid "Bitrate peak"
+#~ msgstr "Битрейт"
+
+#, fuzzy
+#~ msgid "Bitrate mode"
+#~ msgstr "Переопределение битрейта"
+
+#, fuzzy
+#~ msgid "Audio bitmask"
+#~ msgstr "Битрейт аудио"
+
+#, fuzzy
+#~ msgid "Audio volume (0-65535)."
+#~ msgstr "Громкость звука"
+
+#, fuzzy
+#~ msgid "Channel"
+#~ msgstr "Каналы"
+
+#, fuzzy
+#~ msgid "PVR"
+#~ msgstr "VDR"
+
+#, fuzzy
+#~ msgid "RTMP input"
+#~ msgstr "Ввод с FTP"
+
+#, fuzzy
+#~ msgid "Abscissa of the capture reion in pixels."
+#~ msgstr "Абсцисса области захвата (в пикселах)."
+
+#, fuzzy
+#~ msgid "SFTP user name"
+#~ msgstr "Имя пользователя"
+
+#, fuzzy
+#~ msgid "SFTP password"
+#~ msgstr "Пароль"
+
+#, fuzzy
+#~ msgid "Pixel width of the frame buffer"
+#~ msgstr "Ширина буфера кадров в пикселах (с XWD игнорируется)"
+
+#, fuzzy
+#~ msgid "Pixel height of the frame buffer"
+#~ msgstr "Высота буфера кадров в пикселах (с XWD игнорируется)"
+
+#, fuzzy
+#~ msgid "Pixel depth of the frame buffer"
+#~ msgstr "Глубина цвета в буфере кадров (или 0 для файла XWD)"
+
+#, fuzzy
+#~ msgid "Backlight compensation."
+#~ msgstr "Съёмка против света"
+
+#, fuzzy
+#~ msgid "Tuner id"
+#~ msgstr "Тюнер"
+
+#, fuzzy
+#~ msgid "Tuner id (see debug output)."
+#~ msgstr "Частота приёмника в Гц или кГц (см. результат отладки)"
+
+#, fuzzy
+#~ msgid "Secondary language (Analog TV tuners only)"
+#~ msgstr "Доп. язык или программа"
+
+#, fuzzy
+#~ msgid "Video4Linux2"
+#~ msgstr "Ввод из Video4Linux"
+
+#, fuzzy
+#~ msgid "Video4Linux2 input"
+#~ msgstr "Ввод из Video4Linux"
+
+#, fuzzy
+#~ msgid "Video4Linux2 Compressed A/V"
+#~ msgstr "Аудио/видео, обработанное Video4Linux"
+
+#, fuzzy
+#~ msgid "[vcd:][device][@[title][,[chapter]]]"
+#~ msgstr "[vcd:][устройство][#[раздел][,[глава]]]"
+
+#, fuzzy
+#~ msgid "ARM NEON audio format conversions"
+#~ msgstr "Преобразования цветности видео для ARM NEON"
+
+#, fuzzy
+#~ msgid "TCP address to use (default localhost)"
+#~ msgstr "Целевой адрес"
+
+#, fuzzy
+#~ msgid ""
+#~ "TCP address to use to communicate with the video part of the Bar Graph "
+#~ "(default localhost).In the case of bargraph incrustation, use localhost."
+#~ msgstr ""
+#~ "TCP-адрес для подключения к видеокомпоненту модуля Гистограмма (по "
+#~ "умолчанию localhost). Для инкрустации bargraph используйте localhost."
+
+#, fuzzy
+#~ msgid "TCP port to use (default 12345)"
+#~ msgstr "TCP-порт"
+
+#, fuzzy
+#~ msgid ""
+#~ "TCP port to use to communicate with the video part of the Bar Graph "
+#~ "(default 12345).Use the same port as the one used in the rc interface."
+#~ msgstr ""
+#~ "TCP-порт для подключения к видеокомпоненту модуля Гистограмма (по "
+#~ "умолчанию 12345). Используйте тот же порт, что был указан в настройках "
+#~ "интерфейса RC."
+
+#, fuzzy
+#~ msgid "Defines if BarGraph information should be sent (default 1)"
+#~ msgstr "Передавать данные для Гистограммы"
+
+#, fuzzy
+#~ msgid "Sends the barGraph information every n audio packets (default 4)"
+#~ msgstr "Частота передачи данных в аудиопакетах"
+
+#, fuzzy
+#~ msgid "Defines if silence alarm information should be sent (default 1)"
+#~ msgstr "Передавать уведомления о тишине"
+
+#, fuzzy
+#~ msgid "Time window to use in ms (default 5000)"
+#~ msgstr "Интервал"
+
+#, fuzzy
+#~ msgid "Minimum Audio level to raise the alarm (default 0.1)"
+#~ msgstr "Предельный уровень звука для тишины"
+
+#, fuzzy
+#~ msgid "Time between two alarm messages in ms (default 2000)"
+#~ msgstr "Время между уведомлениями (в мс)"
+
+#, fuzzy
+#~ msgid "Force connection reset regularly (default 1)"
+#~ msgstr "Принудительный сброс соединения"
+
+#, fuzzy
+#~ msgid "Feedback Gain"
+#~ msgstr "Усиление отзвука"
+
+#, fuzzy
+#~ msgid "Fixed point audio format conversions"
+#~ msgstr "Преобразование формата PCM"
+
+#, fuzzy
+#~ msgid "Fixed-point audio mixer"
+#~ msgstr "Аудиокодер MP3 с фиксированной точкой"
+
+#, fuzzy
+#~ msgid "Float32 audio mixer"
+#~ msgstr "Демультиплексор несжатого звука"
+
+#, fuzzy
+#~ msgid ""
+#~ "Channels available for audio output.If the input has more channels than "
+#~ "the output, it will be down-mixed.This parameter is ignored when digital "
+#~ "pass-through is active."
+#~ msgstr ""
+#~ "Каналы, через которые будет выводиться звук. Если на входе больше "
+#~ "каналов, чем на выходе, они будут сведены. Если включен цифровой вывод, "
+#~ "этот параметр игнорируется."
+
+#, fuzzy
+#~ msgid ""
+#~ "You should configure your speaker layout with the \"Audio Midi Setup\" "
+#~ "utility in /Applications/Utilities. Stereo mode is being used now."
+#~ msgstr ""
+#~ "Вы должны определить схему динамиков с помощью утилиты «Audio Midi "
+#~ "Setup», находящейся в /Applications/Utilities. Сейчас используется режим "
+#~ "стерео."
+
+#, fuzzy
+#~ msgid "Open Sound System"
+#~ msgstr "Вывод звука через OSS (Open Sound System)"
+
+#, fuzzy
+#~ msgid "OSS DSP device"
+#~ msgstr "Устройство DVD"
+
+#, fuzzy
+#~ msgid "PORTAUDIO audio output"
+#~ msgstr "Вывод звука через ALSA"
+
+#, fuzzy
+#~ msgid "Audio device"
+#~ msgstr "Аудиоустройство"
+
+#, fuzzy
+#~ msgid "Default Audio Device"
+#~ msgstr "Выбрать аудиоустройство"
+
+#, fuzzy
+#~ msgid "Win32 waveOut extension output"
+#~ msgstr "Вывод звука через WaveOut"
+
+#, fuzzy
+#~ msgid "FFmpeg deinterlace video filter"
+#~ msgstr "Видеофильтр Устранение чересстрочности"
+
+#, fuzzy
+#~ msgid ""
+#~ "FFmpeg can do error resilience.\n"
+#~ "However, with a buggy encoder (such as the ISO MPEG-4 encoder from M$) "
+#~ "this can produce a lot of errors.\n"
+#~ "Valid values range from 0 to 4 (0 disables all errors resilience)."
+#~ msgstr ""
+#~ "libavcodec может сообщать об ошибках.\n"
+#~ "Однако, некоторые дефектные кодировщики (например, ISO MPEG-4 от M$) "
+#~ "генерируют слишком много ошибок.\n"
+#~ "Возможные значения параметра — от 0 до 4 (0 отключает все сообщения)."
+
+#, fuzzy
+#~ msgid ""
+#~ "Force skipping of idct to speed up decoding for frame types(-1=None, "
+#~ "0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)."
+#~ msgstr ""
+#~ "Принудительный пропуск инверсного дискретного косинусного преобразования "
+#~ "для ускорения декодирования типов кадров (-1=нет, 0=по умолчанию, 1=B-"
+#~ "кадры, 2=P-кадры, 3=B+P-кадры, 4=все кадры)."
+
+#, fuzzy
+#~ msgid "Low resolution decoding"
+#~ msgstr "Аппаратное декодирование"
+
+#, fuzzy
+#~ msgid ""
+#~ "Specify the AAC audio profile to use for encoding the audio bitstream. It "
+#~ "takes the following options: main, low, ssr (not supported) and ltp "
+#~ "(default: main)"
+#~ msgstr ""
+#~ "Укажите аудиопрофиль AAC для кодировании битового аудиопотока. Допустимые "
+#~ "варианты: main, low, ssr, ltp, hev1, hev2 (по умолчанию — low). В "
+#~ "настоящее время hev1 и hev2 поддерживаются, только если в libavcodec "
+#~ "включено libfdk-aac."
+
+#, fuzzy
+#~ msgid ""
+#~ "It seems your FFMPEG (libavcodec) installation lacks the following "
+#~ "encoder:\n"
+#~ "%s.\n"
+#~ "If you don't know how to fix this, ask for support from your "
+#~ "distribution.\n"
+#~ "\n"
+#~ "This is not an error inside VLC media player.\n"
+#~ "Do not contact the VideoLAN project about this issue.\n"
+#~ msgstr ""
+#~ "Скорее всего, в установленном Libav/FFMPEG (libavcodec) не хватает "
+#~ "следующего кодировщика:\n"
+#~ "%s.\n"
+#~ "Обратитесь за помощью в службу поддержки вашего дистрибутива.\n"
+#~ "\n"
+#~ "Это не ошибка медиапроигрывателя VLC.\n"
+#~ "Не обращайтесь к участникам проекта VideoLAN с этим вопросом.\n"
+
+#, fuzzy
+#~ msgid "RealVideo library decoder"
+#~ msgstr "Внешний декодер QuickTime"
+
+#, fuzzy
+#~ msgid "Subtitles text encoding"
+#~ msgstr "Кодировка текста субтитров"
+
+#, fuzzy
+#~ msgid "Subtitles justification"
+#~ msgstr "Выравнивание субтитров"
+
+#, fuzzy
+#~ msgid "UTF-8 subtitles autodetection"
+#~ msgstr "Автоопределение UTF-8"
+
+#, fuzzy
+#~ msgid ""
+#~ "This enables automatic detection of UTF-8 encoding within subtitles files."
+#~ msgstr ""
+#~ "Включает автоматическое определение кодировки UTF-8 в файлах субтитров."
+
+#, fuzzy
+#~ msgid "Text subtitles decoder"
+#~ msgstr "Декодер текстовых субтитров"
+
+#, fuzzy
+#~ msgid ""
+#~ "Sets maximum interval between IDR-frames.Larger values save bits, thus "
+#~ "improving quality for a given bitrate at the cost of seeking precision."
+#~ msgstr ""
+#~ "Максимальный интервал между IDR-кадрами. Большие значения экономят биты, "
+#~ "улучшая качество для заданного битрейта за счет потери точности поиска. "
+#~ "-1 не ограничивает этот интервал."
+
+#, fuzzy
+#~ msgid "Direct MV prediction mode."
+#~ msgstr "Режим прямого предсказания вектора движения"
+
+#, fuzzy
+#~ msgid "RD based mode decision for B-frames"
+#~ msgstr "Режим rate distortion (RD) для B-кадров. Требует subme 6 или выше."
+
+#, fuzzy
+#~ msgid "normal"
+#~ msgstr "обычный"
+
+#, fuzzy
+#~ msgid "all"
+#~ msgstr "Стена"
+
+#, fuzzy
+#~ msgid "spatial"
+#~ msgstr "пространственный"
+
+#, fuzzy
+#~ msgid "temporal"
+#~ msgstr "временной"
+
+#, fuzzy
+#~ msgid "H.264/MPEG4 AVC encoder (x264)"
+#~ msgstr "Кодировщик H.264/MPEG-4 Part 10/AVC (x264)"
+
+#, fuzzy
+#~ msgid "Subtitle position %i px"
+#~ msgstr "Положение субтитров: %d пк"
+
+#, fuzzy
+#~ msgid "Volume %d%%"
+#~ msgstr "Громкость %ld%%"
+
+#, fuzzy
+#~ msgid "| adev [X] . . . . . . . . . . .  set/get audio device"
+#~ msgstr "| adev [устройство]  . . .  задать/получить аудиоустройство"
+
+#, fuzzy
+#~ msgid "| strack [X] . . . . . . . . . set/get subtitles track"
+#~ msgstr ""
+#~ "| strack [X] . . . . . . . . .  установить/получить дорожку субтитров"
+
+#, fuzzy
+#~ msgid "| @name marq-x X . . . . . . . . . . . .offset from left"
+#~ msgstr "| rewind  . . . . . . . . . установить минимальную скорость"
+
+#, fuzzy
+#~ msgid "| @name marq-y Y . . . . . . . . . . . . offset from top"
+#~ msgstr "| rewind  . . . . . . . . . установить минимальную скорость"
+
+#, fuzzy
+#~ msgid "| @name marq-opacity # . . . . . . . . . . . . . opacity"
+#~ msgstr "| next . . . . . . . . . .  следующая позиция в плейлисте"
+
+#, fuzzy
+#~ msgid "| @name marq-timeout T. . . . . . . . . . timeout, in ms"
+#~ msgstr "| snapshot . . . . . . . .  сделать снимок видео"
+
+#, fuzzy
+#~ msgid "| @name marq-size # . . . . . . . . font size, in pixels"
+#~ msgstr "| title_n  . . . . . . . .  следующее заглавие в текущей позиции"
+
+#, fuzzy
+#~ msgid "| @name logo-x X . . . . . . . . . . . .offset from left"
+#~ msgstr "| rewind  . . . . . . . . . установить минимальную скорость"
+
+#, fuzzy
+#~ msgid "| @name logo-y Y . . . . . . . . . . . . offset from top"
+#~ msgstr "| rewind  . . . . . . . . . установить минимальную скорость"
+
+#, fuzzy
+#~ msgid "| @name logo-position #. . . . . . . . relative position"
+#~ msgstr "| logout . . . . . . . . .  выход (при соединении через сокет)"
+
+#, fuzzy
+#~ msgid "| @name mosaic-alpha # . . . . . . . . . . . . . . alpha"
+#~ msgstr "| pause  . . . . . . . . .  вкл./выкл. паузу"
+
+#, fuzzy
+#~ msgid "| @name mosaic-height #. . . . . . . . . . . . . .height"
+#~ msgstr "| next . . . . . . . . . .  следующая позиция в плейлисте"
+
+#, fuzzy
+#~ msgid "| @name mosaic-width # . . . . . . . . . . . . . . width"
+#~ msgstr "| next . . . . . . . . . .  следующая позиция в плейлисте"
+
+#, fuzzy
+#~ msgid "| @name mosaic-rows #. . . . . . . . . . .number of rows"
+#~ msgstr "| faster . . . . . . . . .  ускоренное воспроизведение потока"
+
+#, fuzzy
+#~ msgid "| @name mosaic-cols #. . . . . . . . . . .number of cols"
+#~ msgstr "| normal . . . . . . . . .  нормальное воспроизведение потока"
+
+#, fuzzy
+#~ msgid "| longhelp . . . . . . . . . . . a longer help message"
+#~ msgstr "| help . . . . . . . . . .  эта справка"
+
+#, fuzzy
+#~ msgid "Playlist has only %d elements"
+#~ msgstr "В плейлисте только %u элемент"
+
+#, fuzzy
+#~ msgid "Force interleaved method."
+#~ msgstr "Принудительный метод чередования"
+
+#, fuzzy
+#~ msgid ""
+#~ "Because this AVI file index is broken or missing, seeking will not work "
+#~ "correctly.\n"
+#~ "VLC won't repair your file but can temporary fix this problem by building "
+#~ "an index in memory.\n"
+#~ "This step might take a long time on a large file.\n"
+#~ "What do you want to do ?"
+#~ msgstr ""
+#~ "Индекс этого файла AVI повреждён или отсутствует, поэтому перемотка и "
+#~ "переход может не работать.\n"
+#~ "VLC не будет исправлять файл, но может временно решить проблему, построив "
+#~ "индекс в памяти.\n"
+#~ "Для большого файла это может занять много времени.\n"
+#~ "Что вы хотите сделать?"
+
+#, fuzzy
+#~ msgid "Classic rock"
+#~ msgstr "Классический рок"
+
+#, fuzzy
+#~ msgid "Death metal"
+#~ msgstr "Дет-метал"
+
+#, fuzzy
+#~ msgid "Sound clip"
+#~ msgstr "Музыкальный клип"
+
+#, fuzzy
+#~ msgid "Alternative rock"
+#~ msgstr "Альтернативный рок"
+
+#, fuzzy
+#~ msgid "Instrumental pop"
+#~ msgstr "Инструментальный поп"
+
+#, fuzzy
+#~ msgid "Instrumental rock"
+#~ msgstr "Инструментальный рок"
+
+#, fuzzy
+#~ msgid "Southern rock"
+#~ msgstr "Южный рок"
+
+#, fuzzy
+#~ msgid "Christian rap"
+#~ msgstr "Христианский рэп"
+
+#, fuzzy
+#~ msgid "Pop/funk"
+#~ msgstr "Поп/Фанк"
+
+#, fuzzy
+#~ msgid "New wave"
+#~ msgstr "Новая волна"
+
+#, fuzzy
+#~ msgid "Acid punk"
+#~ msgstr "Кислотный панк"
+
+#, fuzzy
+#~ msgid "Acid jazz"
+#~ msgstr "Кислотный джаз"
+
+#, fuzzy
+#~ msgid "Rock & roll"
+#~ msgstr "Рок-н-ролл"
+
+#, fuzzy
+#~ msgid "Hard rock"
+#~ msgstr "Тяжёлый рок"
+
+#, fuzzy
+#~ msgid "Dummy ifo demux"
+#~ msgstr "Фиктивный демультиплексор IFO"
+
+#, fuzzy
+#~ msgid ""
+#~ "This is the desired frame rate when playing raw video streams.  In the "
+#~ "form 30000/1001 or 29.97"
+#~ msgstr ""
+#~ "Желательная частота кадров при проигрывании потоков необработанного видео "
+#~ "(в форме 30000/1001 или 29.97)."
+
+#, fuzzy
+#~ msgid "Text subtitles parser"
+#~ msgstr "Разборщик текстовых субтитров"
+
+#, fuzzy
+#~ msgid "Frames per second"
+#~ msgstr "Кадры в секунду"
+
+#, fuzzy
+#~ msgid "Subtitles delay"
+#~ msgstr "Задержка субтитров"
+
+#, fuzzy
+#~ msgid "Subtitles format"
+#~ msgstr "Формат субтитров"
+
+#, fuzzy
+#~ msgid "Subtitles description"
+#~ msgstr "Описание субтитров"
+
+#, fuzzy
+#~ msgid "Silent mode"
+#~ msgstr "Тихий режим"
+
+#, fuzzy
+#~ msgid "CAPMT System ID"
+#~ msgstr "Системный Id"
+
+#, fuzzy
+#~ msgid "Filename of dump"
+#~ msgstr "Имя файла"
+
+#, fuzzy
+#~ msgid "Append"
+#~ msgstr "Внешний вид"
+
+#, fuzzy
+#~ msgid ""
+#~ "If the file exists and this option is selected, the existing file will "
+#~ "not be overwritten."
+#~ msgstr "Если файл уже существует, он будет переписан."
+
+#, fuzzy
+#~ msgid "Dump buffer size"
+#~ msgstr "Размер буфера кадров RTSP"
+
+#, fuzzy
+#~ msgid "Video aspect ratio"
+#~ msgstr "Сохранять соотношение сторон"
+
+#, fuzzy
+#~ msgid ""
+#~ "Aspect ratio of the video image (4:3, 16:9). Default is square pixels."
+#~ msgstr ""
+#~ "Соотношение сторон (4:3, 16:9). По умолчанию пикселы считаются "
+#~ "квадратными."
+
+#, fuzzy
+#~ msgid "Image file"
+#~ msgstr "Стена из изображений"
+
+#, fuzzy
+#~ msgid "Transparency of the image"
+#~ msgstr "Прозрачность гистограммы"
+
+#, fuzzy
+#~ msgid ""
+#~ "Transparency value of the new image used in blending. By default it set "
+#~ "to fully opaque (255). (from 0 for full transparency to 255 for full "
+#~ "opacity)"
+#~ msgstr ""
+#~ "Значение прозрачности гистограммы от 0 (полная прозрачность) до 255 "
+#~ "(полная непрозрачность)."
+
+#, fuzzy
+#~ msgid "X coordinate of the rendered image"
+#~ msgstr "Координата X при декодировании субтитров"
+
+#, fuzzy
+#~ msgid "Y coordinate of the rendered image"
+#~ msgstr "Координата Y при декодировании субтитров"
+
+#, fuzzy
+#~ msgid ""
+#~ "You can enforce the picture position on the overlay (0=center, 1=left, "
+#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
+#~ "e.g. 6=top-right)."
+#~ msgstr ""
+#~ "Вы можете задать позицию слоя на видео (0 = центр, 1 = слева, 2 = справа, "
+#~ "4 = сверху, 8 = снизу, вы можете также использовать комбинации этих "
+#~ "значений, например 6 = сверху-справа)."
+
+#, fuzzy
+#~ msgid "Clear overlay framebuffer"
+#~ msgstr "Буфер кадров в общей памяти"
+
+#, fuzzy
+#~ msgid "Render text or image"
+#~ msgstr "Страница телетекста"
+
+#, fuzzy
+#~ msgid "Display on overlay framebuffer"
+#~ msgstr "Буфер кадров в общей памяти"
+
+#, fuzzy
+#~ msgid "Commands"
+#~ msgstr "Command+"
+
+#, fuzzy
+#~ msgid "GNU/Linux osd/overlay framebuffer interface"
+#~ msgstr "Вывод видео через фреймбуфер GNU/Linux"
+
+#, fuzzy
+#~ msgid "Maemo hildon interface"
+#~ msgstr "Основные интерфейсы"
+
+#, fuzzy
+#~ msgid "Compiled by %@ with %@"
+#~ msgstr "Скомпилировано %s компилятором %@"
+
+#, fuzzy
+#~ msgid "VLC Debug Log (%s).rtfd"
+#~ msgstr "Отладочные сообщения VLC (%s).rtf"
+
+#, fuzzy
+#~ msgid "Run VLC with dark or bright interface style"
+#~ msgstr "Запускать VLC с тёмным интерфейсом"
+
+#, fuzzy
+#~ msgid "By default, VLC will use the dark interface style."
+#~ msgstr "Запускать VLC с тёмным интерфейсом"
+
+#, fuzzy
+#~ msgid "Use the native fullscreen mode on OS X Lion"
+#~ msgstr "Использовать стандартный полноэкранный режим"
+
+#, fuzzy
+#~ msgid "Automatically save the volume on exit"
+#~ msgstr "Автоматическое усиление видеосигнала."
+
+#, fuzzy
+#~ msgid "Capture Device"
+#~ msgstr "Устройство за&хвата"
+
+#, fuzzy
+#~ msgid "Frames per Second:"
+#~ msgstr "Кадры в секунду"
+
+#, fuzzy
+#~ msgid "Subscreen left:"
+#~ msgstr "Левая сторона подэкрана"
+
+#, fuzzy
+#~ msgid "Subscreen top:"
+#~ msgstr "Верхняя сторона подэкрана"
+
+#, fuzzy
+#~ msgid "Subscreen width:"
+#~ msgstr "Ширина подэкрана"
+
+#, fuzzy
+#~ msgid "Subscreen height:"
+#~ msgstr "Высота подэкрана"
+
+#, fuzzy
+#~ msgid "Image width:"
+#~ msgstr "Ширина изображения"
+
+#, fuzzy
+#~ msgid "Image height:"
+#~ msgstr "Высота изображения"
+
+#, fuzzy
+#~ msgid "Load subtitles file:"
+#~ msgstr "Добавить файл субтитров"
+
+#, fuzzy
+#~ msgid "Subtitles encoding"
+#~ msgstr "Кодировка субтитров"
+
+#, fuzzy
+#~ msgid "Subtitles alignment"
+#~ msgstr "Выравнивание субтитров"
+
+#, fuzzy
+#~ msgid "SAP announce"
+#~ msgstr "Оповещение SAP"
+
+#, fuzzy
+#~ msgid "RTSP announce"
+#~ msgstr "Оповещение по RTSP"
+
+#, fuzzy
+#~ msgid "HTTP announce"
+#~ msgstr "Оповещение по HTTP"
+
+#, fuzzy
+#~ msgid "HTML Playlist"
+#~ msgstr "Плейлист HTML"
+
+#, fuzzy
+#~ msgid "General Audio Settings"
+#~ msgstr "Основные настройки аудио"
+
+#, fuzzy
+#~ msgid "General Video Settings"
+#~ msgstr "Основные настройки видео"
+
+#, fuzzy
+#~ msgid "Subtitles & OSD"
+#~ msgstr "Субтитры / экранное меню"
+
+#, fuzzy
+#~ msgid "Subtitles & On Screen Display Settings"
+#~ msgstr "Настройки субтитров и экранной индикации"
+
+#, fuzzy
+#~ msgid "Input & Codecs"
+#~ msgstr "Ввод / кодеки"
+
+#, fuzzy
+#~ msgid "Input & Codec settings"
+#~ msgstr "Настройки ввода и кодеков"
+
+#, fuzzy
+#~ msgid "Enable Audio"
+#~ msgstr "Включить аудио"
+
+#, fuzzy
+#~ msgid "HTTP Proxy"
+#~ msgstr "HTTP-прокси"
+
+#, fuzzy
+#~ msgid "Font Color"
+#~ msgstr "Цвет шрифта"
+
+#, fuzzy
+#~ msgid "Font Size"
+#~ msgstr "Размер шрифта"
+
+#, fuzzy
+#~ msgid "Subtitle Languages"
+#~ msgstr "Язык субтитров"
+
+#, fuzzy
+#~ msgid "Preferred Subtitle Language"
+#~ msgstr "Предпочитаемый язык субтитров"
+
+#, fuzzy
+#~ msgid "Force Bold"
+#~ msgstr "Полужирный"
+
+#, fuzzy
+#~ msgid "Outline Color"
+#~ msgstr "Цвет контура"
+
+#, fuzzy
+#~ msgid "Enable Video"
+#~ msgstr "Включить видео"
+
+#, fuzzy
+#~ msgid "Subtitle track syncronization:"
+#~ msgstr "Синхронизация дорожки субтитров:"
+
+#, fuzzy
+#~ msgid "Subtitles speed:"
+#~ msgstr "Скорость субтитров:"
+
+#, fuzzy
+#~ msgid "Subtitles duration factor:"
+#~ msgstr "Поправка длительности субтитров:"
+
+#, fuzzy
+#~ msgid ""
+#~ "Extend subtitles duration by this value.\n"
+#~ "Set 0 to disable."
+#~ msgstr ""
+#~ "Увеличивает длительность субтитров на эту величину.\n"
+#~ "0 не меняет её."
+
+#, fuzzy
+#~ msgid ""
+#~ "Multiply subtitles duration by this value.\n"
+#~ "Set 0 to disable."
+#~ msgstr ""
+#~ "Умножает длительность субтитров на заданный коэффициент.\n"
+#~ "0 не меняет её."
+
+#, fuzzy
+#~ msgid ""
+#~ "Recalculate subtitles duration according\n"
+#~ "to their content and this value.\n"
+#~ "Set 0 to disable."
+#~ msgstr ""
+#~ "Вычисляет длительность субтитров,\n"
+#~ "исходя из длины слов и этого множителя.\n"
+#~ "0 не меняет её."
+
+#, fuzzy
+#~ msgid "SAP Announce"
+#~ msgstr "Оповещение SAP"
+
+#, fuzzy
+#~ msgid ""
+#~ "The chosen codecs are not compatible with each other. For example: It is "
+#~ "impossibleto  mix uncompressed audio with any video codec.\n"
+#~ "\n"
+#~ "Correct your selection and try again."
+#~ msgstr ""
+#~ "Выбранные кодеки несовместимы друг с другом. Например, несжатое аудио "
+#~ "нельзя смикшировать с каким-либо кодированным видео.\n"
+#~ "\n"
+#~ "Измените свой выбор и попробовать снова."
+
+#, fuzzy
+#~ msgid "Minimal Mac OS X OpenGL video output (opens a borderless window)"
+#~ msgstr "Вывод видео через Mac OS X OpenGL (требуется drawable-nsobject)"
+
+#, fuzzy
+#~ msgid "  [Incoming]"
+#~ msgstr "+-[Ввод]"
+
+#, fuzzy
+#~ msgid "      input bytes read : %8.0f KiB"
+#~ msgstr "| прочитано байт на входе            : %8.0f КиБ"
+
+#, fuzzy
+#~ msgid "      input bitrate    :   %6.0f kb/s"
+#~ msgstr "| битрейт на входе                   :   %6.0f Кб/с"
+
+#, fuzzy
+#~ msgid "      demux bytes read : %8.0f KiB"
+#~ msgstr "| прочитано байт на демультиплексоре : %8.0f КиБ"
+
+#, fuzzy
+#~ msgid "      demux bitrate    :   %6.0f kb/s"
+#~ msgstr "| битрейт на демультиплексоре        :   %6.0f Кб/с"
+
+#, fuzzy
+#~ msgid "  [Video Decoding]"
+#~ msgstr "+-[Декодирование видео]"
+
+#, fuzzy
+#~ msgid "      video decoded    :    %<PRId64>"
+#~ msgstr "| декодировано видео                 :    %5<PRIi64>"
+
+#, fuzzy
+#~ msgid "      frames displayed :    %<PRId64>"
+#~ msgstr "| показано кадров                    :    %5<PRIi64>"
+
+#, fuzzy
+#~ msgid "      frames lost      :    %<PRId64>"
+#~ msgstr "| потеряно кадров                    :    %5<PRIi64>"
+
+#, fuzzy
+#~ msgid "  [Audio Decoding]"
+#~ msgstr "+-[Декодирование аудио]"
+
+#, fuzzy
+#~ msgid "      audio decoded    :    %<PRId64>"
+#~ msgstr "| декодировано аудио                 :    %5<PRIi64>"
+
+#, fuzzy
+#~ msgid "      buffers played   :    %<PRId64>"
+#~ msgstr "| воспроизведено буферов             :    %5<PRIi64>"
+
+#, fuzzy
+#~ msgid "      buffers lost     :    %<PRId64>"
+#~ msgstr "| потеряно буферов                   :    %5<PRIi64>"
+
+#, fuzzy
+#~ msgid "  [Streaming]"
+#~ msgstr "+-[Потоковая передача]"
+
+#, fuzzy
+#~ msgid "      packets sent     :    %5i"
+#~ msgstr "| отправлено пакетов                 :    %5<PRIi64>"
+
+#, fuzzy
+#~ msgid "      bytes sent       : %8.0f KiB"
+#~ msgstr "| отправлено байт                    : %8.0f КиБ"
+
+#, fuzzy
+#~ msgid "      sending bitrate  :   %6.0f kb/s"
+#~ msgstr "| битрейт на отправке                :   %6.0f Кб/с"
+
+#, fuzzy
+#~ msgid " m                      Show/Hide metadata box"
+#~ msgstr " M                      Показать/скрыть метаданные"
+
+#, fuzzy
+#~ msgid " Volume   : %u%%"
+#~ msgstr " Громкость : %3ld%%"
+
+#, fuzzy
+#~ msgid "Previous media in the playlist, skip backward when keep-pressed"
+#~ msgstr ""
+#~ "Предыдущая позиция плейлиста; перемотка к началу при длительном нажатии"
+
+#, fuzzy
+#~ msgid "Next media in the playlist, skip forward when keep-pressed"
+#~ msgstr ""
+#~ "Следующая позиция плейлиста; перемотка вперёд при длительном нажатии"
+
+#, fuzzy
+#~ msgid "Show playlist"
+#~ msgstr "Показать/скрыть плейлист"
+
+#, fuzzy
+#~ msgid "Open subtitles file"
+#~ msgstr "Открыть файл субтитров"
+
+#, fuzzy
+#~ msgid "Preamp\n"
+#~ msgstr "Предусилитель"
+
+#, fuzzy
+#~ msgid " dB"
+#~ msgstr "дБ"
+
+#, fuzzy
+#~ msgid "Enable spatializer"
+#~ msgstr "Включить объёмное звучание"
+
+#, fuzzy
+#~ msgid "Radio device name"
+#~ msgstr "Название аудиоустройства"
+
+#, fuzzy
+#~ msgid "TV (digital)"
+#~ msgstr "ТВ (цифровое)"
+
+#, fuzzy
+#~ msgid "Add to playlist"
+#~ msgstr "Добавить"
+
+#, fuzzy
+#~ msgid "Clear playlist"
+#~ msgstr "Очистить плейлист"
+
+#, fuzzy
+#~ msgid "Icon View"
+#~ msgstr "Вид"
+
+#, fuzzy
+#~ msgid "Detailed View"
+#~ msgstr "Таблица"
+
+#, fuzzy
+#~ msgid "List View"
+#~ msgstr "Медиа: Вид"
+
+#, fuzzy
+#~ msgid "PictureFlow View "
+#~ msgstr "Галерея"
+
+#, fuzzy
+#~ msgid "Select an action to change the associated hotkey"
+#~ msgstr "Выбрать действие для изменения соответствующей горячей клавиши:"
+
+#, fuzzy
+#~ msgid "Hotkey for "
+#~ msgstr "Горячие клавиши"
+
+#, fuzzy
+#~ msgid "Press the new keys for "
+#~ msgstr ""
+#~ "Нажмите сочетание клавиш для\n"
+#~ "«%@»"
+
+#, fuzzy
+#~ msgid "Warning: the key is already assigned to \""
+#~ msgstr "Предупреждение: клавиша уже назначена для: "
+
+#, fuzzy
+#~ msgid "Subtitles && OSD"
+#~ msgstr "Субтитры / экранное меню"
+
+#, fuzzy
+#~ msgid "Input && Codecs"
+#~ msgstr "Ввод / кодеки"
+
+#, fuzzy
+#~ msgid "Allow downloading media information"
+#~ msgstr "Щелкните дважды, чтобы получить информацию о медиафайле"
+
+#, fuzzy
+#~ msgid "Allow checking for VLC updates"
+#~ msgstr "Регулярно проверять обновления VLC"
+
+#, fuzzy
+#~ msgid "Save and Continue"
+#~ msgstr "Продолжить"
+
+#, fuzzy
+#~ msgid "Compiler: "
+#~ msgstr "Компилятор: %s\n"
+
+#, fuzzy
+#~ msgid "Copyright (C) "
+#~ msgstr "Авторские права"
+
+#, fuzzy
+#~ msgid "&Codec"
+#~ msgstr "Кодек"
+
+#, fuzzy
+#~ msgid "&Convert"
+#~ msgstr "Преобразовать"
+
+#, fuzzy
+#~ msgid "&Convert / Save"
+#~ msgstr "&Конвертировать/сохранить"
+
+#, fuzzy
+#~ msgid "Please enter the URL or path to the media you want to play"
+#~ msgstr "Введите URL или путь к файлу, который вы хотите проиграть."
+
+#, fuzzy
+#~ msgid "Subtitles Files"
+#~ msgstr "Файлы субтитров"
+
+#, fuzzy
+#~ msgid ""
+#~ "This dialog will allow you to stream or convert your media for use "
+#~ "locally, on your private network, or on the Internet.\n"
+#~ "You should start by checking that source matches what you want your input "
+#~ "to be and then press the \"Next\" button to continue.\n"
+#~ msgstr ""
+#~ "Этот мастер поможет вам начать потоковое вещание или преобразование "
+#~ "медиафайлов для локального использования или для передачи в сеть.\n"
+#~ "Начните с проверки правильности выбора источника, а затем нажмите кнопку "
+#~ "«Следующий» для продолжения.\n"
+
+#, fuzzy
+#~ msgid "&Tools"
+#~ msgstr "Инструменты"
+
+#, fuzzy
+#~ msgid "&Open (advanced)..."
+#~ msgstr "Открыть файл..."
+
+#, fuzzy
+#~ msgid "Audio &Channels"
+#~ msgstr "Аудиоканалы"
+
+#, fuzzy
+#~ msgid "&Subtitles Track"
+#~ msgstr "Дорожка субтитров"
+
+#, fuzzy
+#~ msgid "&Navigation"
+#~ msgstr "Навигация"
+
+#, fuzzy
+#~ msgid "Tools"
+#~ msgstr "Инструменты"
+
+#, fuzzy
+#~ msgid "Hide VLC media player in taskbar"
+#~ msgstr "&Свернуть VLC в панель задач"
+
+#, fuzzy
+#~ msgid "Show VLC media player"
+#~ msgstr "&Развернуть VLC"
+
+#, fuzzy
+#~ msgid "Advanced options"
+#~ msgstr "Расширенные параметры"
+
+#, fuzzy
+#~ msgid "Show all the advanced options in the dialogs."
+#~ msgstr "Показать дополнительные параметры"
+
+#, fuzzy
+#~ msgid "French TV"
+#~ msgstr "Французский"
+
+#, fuzzy
+#~ msgid "Filename of the SQLite database"
+#~ msgstr "Имя файла шрифта, который вы хотите использовать"
+
+#, fuzzy
+#~ msgid "Path to the file containing the SQLite database"
+#~ msgstr "Путь к Zip-архиву с медиафайлами"
+
+#, fuzzy
+#~ msgid "Ignored extensions in the media library"
+#~ msgstr "Пропускать расширения"
+
+#, fuzzy
+#~ msgid "Subdirectory recursive scanning"
+#~ msgstr "Поведение подкаталогов"
+
+#, fuzzy
+#~ msgid "Username for the database"
+#~ msgstr "Желаемая частота кадров для захвата."
+
+#, fuzzy
+#~ msgid "Password for the database"
+#~ msgstr "Пароль для целевого устройства."
+
+#, fuzzy
+#~ msgid "Port for the database"
+#~ msgstr "Цветность осн. изображения"
+
+#, fuzzy
+#~ msgid "Automatically add new medias to ML"
+#~ msgstr "Автоматически получать медиаданные"
+
+#, fuzzy
+#~ msgid "X Screensaver disabler"
+#~ msgstr "Отключение хранителя экрана XDG"
+
+#, fuzzy
+#~ msgid "OSD configuration importer"
+#~ msgstr "Конфигурационный файл VLM"
+
+#, fuzzy
+#~ msgid "XML OSD configuration importer"
+#~ msgstr "Конфигурационный файл VLM"
+
+#, fuzzy
+#~ msgid "SQLite database module"
+#~ msgstr "Модуль фильтров для потока"
+
+#, fuzzy
+#~ msgid "Title format string"
+#~ msgstr "Формат субтитров"
+
+#, fuzzy
+#~ msgid "MSN Now-Playing"
+#~ msgstr "Сейчас играет"
+
+#, fuzzy
+#~ msgid "Flip vertical position"
+#~ msgstr "переворот по вертикали"
+
+#, fuzzy
+#~ msgid "Display XOSD output at the bottom of the screen instead of the top."
+#~ msgstr "Отображать название дорожки или её MRL поверх видео."
+
+#, fuzzy
+#~ msgid "Vertical offset"
+#~ msgstr "Вертикальный переворот"
+
+#, fuzzy
+#~ msgid "Shadow offset"
+#~ msgstr "Прозрачность тени"
+
+#, fuzzy
+#~ msgid "XOSD interface"
+#~ msgstr "Интерфейс Qt"
+
+#, fuzzy
+#~ msgid "Blu-Ray"
+#~ msgstr "Blu-ray"
+
+#, fuzzy
+#~ msgid "Decompression"
+#~ msgstr "Распаковка данных LZMA"
+
+#, fuzzy
+#~ msgid "Command UDP port"
+#~ msgstr "Ввод команд из TCP"
+
+#, fuzzy
+#~ msgid "Disable ES id"
+#~ msgstr "отключить"
+
+#, fuzzy
+#~ msgid "Enable ES id"
+#~ msgstr "Включить видео"
+
+#, fuzzy
+#~ msgid "Select individual es to enable or disable from stream"
+#~ msgstr ""
+#~ "Щёлкните, чтобы включить или выключить случайный порядок воспроизведения."
+
+#, fuzzy
+#~ msgid "Sizes"
+#~ msgstr "Размер"
+
+#, fuzzy
+#~ msgid "Aspect ratio (4:3, 16:9)."
+#~ msgstr "Соотношение сторон: %s"
+
+#, fuzzy
+#~ msgid "Command"
+#~ msgstr "Command+"
+
+#, fuzzy
+#~ msgid "GOP size"
+#~ msgstr "Максимальный размер GOP"
+
+#, fuzzy
+#~ msgid "Number of P frames between two I frames."
+#~ msgstr ""
+#~ "Число B-кадров, которые будут закодированы между двумя референсными "
+#~ "кадрами."
+
+#, fuzzy
+#~ msgid "Quantizer scale"
+#~ msgstr "Фиксированный коэффициент квантования"
+
+#, fuzzy
+#~ msgid "Fixed quantizer scale to use."
+#~ msgstr "Фиксированный коэффициент квантования"
+
+#, fuzzy
+#~ msgid "Mute audio"
+#~ msgstr "Отключение звука."
+
+#, fuzzy
+#~ msgid "MPEG2 video switcher stream output"
+#~ msgstr "Включить вывод видеопотока"
+
+#, fuzzy
+#~ msgid "Audio Language"
+#~ msgstr "Язык аудио"
+
+#, fuzzy
+#~ msgid "Subtitles encoder"
+#~ msgstr "Кодировщик субтитров"
+
+#, fuzzy
+#~ msgid ""
+#~ "This is the subtitles encoder module that will be used (and its "
+#~ "associated options)."
+#~ msgstr ""
+#~ "Используемый модуль кодировщика субтитров (и все его соответствующие "
+#~ "параметры)."
+
+#, fuzzy
+#~ msgid "Destination subtitles codec"
+#~ msgstr "Целевой кодек субтитров"
+
+#, fuzzy
+#~ msgid "This is the subtitles codec that will be used."
+#~ msgstr "Этот кодек субтитров будет использован для перекодирования."
+
+#, fuzzy
+#~ msgid "Edge Weightning"
+#~ msgstr "Усиление краёв"
+
+#, fuzzy
+#~ msgid "Darkness Limit"
+#~ msgstr "Граница темноты"
+
+#, fuzzy
+#~ msgid "Filter Smoothness (in %)"
+#~ msgstr "Плавность фильтра (%)"
+
+#, fuzzy
+#~ msgid "Automatic cropping"
+#~ msgstr "Автоусиление цветности"
+
+#, fuzzy
+#~ msgid "Automatically detect black borders and crop them."
+#~ msgstr "Проверять обновления автоматически"
+
+#, fuzzy
+#~ msgid "Remove borders of the video and replace them by black borders"
+#~ msgstr "Стирает части видео, используя изображение в качестве маски."
+
+#, fuzzy
+#~ msgid "Manual ratio"
+#~ msgstr "Насыщенность"
+
+#, fuzzy
+#~ msgid "Number of images for change"
+#~ msgstr "Количество аудиоканалов"
+
+#, fuzzy
+#~ msgid "Number of lines for change"
+#~ msgstr "Количество аудиоканалов"
+
+#, fuzzy
+#~ msgid "Number of non black pixels "
+#~ msgstr "Количество черных пикселов между полосами."
+
+#, fuzzy
+#~ msgid "Luminance threshold "
+#~ msgstr "Порог фильтра"
+
+#, fuzzy
+#~ msgid "Crop video filter"
+#~ msgstr "Видеофильтр Клонирование"
+
+#, fuzzy
+#~ msgid "Cropping failed"
+#~ msgstr "Соединение не удалось"
+
+#, fuzzy
+#~ msgid "VLC could not open the video output module."
+#~ msgstr "VLC не может открыть модуль декодирования."
+
+#, fuzzy
+#~ msgid "Deinterlace method to use for local playback."
+#~ msgstr "Метод устранения чересстрочности при обработке видео."
+
+#, fuzzy
+#~ msgid "Wrapper filter verbosity"
+#~ msgstr "Вывод фильтра надстройки"
+
+#, fuzzy
+#~ msgid "Configuration file"
+#~ msgstr "Конфигурационный файл VLM"
+
+#, fuzzy
+#~ msgid "You can move the OSD menu by left-clicking on it."
+#~ msgstr ""
+#~ "Координата X логотипа. Вы можете перемещать логотип, щелкнув по нему."
+
+#, fuzzy
+#~ msgid "Menu position"
+#~ msgstr "Позиция текста"
+
+#, fuzzy
+#~ msgid ""
+#~ "You can enforce the OSD menu position on the video (0=center, 1=left, "
+#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
+#~ "eg. 6 = top-right)."
+#~ msgstr ""
+#~ "Указать позицию маркизы на видео (0 = центр, 1 = слева, 2 = справа, 4 = "
+#~ "сверху, 8 = снизу, также вы можете использовать комбинации этих значений, "
+#~ "например 6 = сверху-слева)."
+
+#, fuzzy
+#~ msgid "Menu timeout"
+#~ msgstr "Задержка"
+
+#, fuzzy
+#~ msgid "Menu update interval"
+#~ msgstr "Защитный интервал"
+
+#, fuzzy
+#~ msgid ""
+#~ "The transparency of the OSD menu can be changed by giving a value between "
+#~ "0 and 255. A lower value specifies more transparency a higher means less "
+#~ "transparency. The default is being not transparent (value 255) the "
+#~ "minimum is fully transparent (value 0)."
+#~ msgstr ""
+#~ "Прозрачность экранного меню VNC определяется значением от 0 до 255. Чем "
+#~ "меньше значение, тем прозрачнее меню, и наоборот. По умолчанию меню "
+#~ "непрозрачное (значение 255), минимум — абсолютно прозрачное (значение 0)."
+
+#, fuzzy
+#~ msgid "On Screen Display menu"
+#~ msgstr "Экранная индикация"
+
+#, fuzzy
+#~ msgid "Comma separated list of active windows, defaults to all"
+#~ msgstr "Список активных окон, разделенных запятыми. По умолчанию все"
+
+#, fuzzy
+#~ msgid ""
+#~ "Directory path where images files should be saved.If not set, then images "
+#~ "will be automatically saved in users homedir."
+#~ msgstr ""
+#~ "Путь к каталогу, где будут сохранены файлы изображений. Если этот путь не "
+#~ "задан, они будут сохраняться в домашнем каталоге пользователя."
+
+#, fuzzy
+#~ msgid "Change subtitles delay"
+#~ msgstr "Управление задержкой субтитров"
+
+#, fuzzy
+#~ msgid "Enable desktop mode "
+#~ msgstr "Включить режим супербаса"
+
+#, fuzzy
+#~ msgid "Try to use hardware acceleration for subtitles/OSD blending."
+#~ msgstr ""
+#~ "Попытаться использовать аппаратное ускорение для наложения субтитров/OSD."
+
+#, fuzzy
+#~ msgid "Windows GAPI video output"
+#~ msgstr "Вывод видео через Windows GDI"
+
+#, fuzzy
+#~ msgid ""
+#~ "Your video output acceleration driver does not support the required "
+#~ "resolution: %ux%u pixels. The maximum supported resolution is %<PRIu32>x"
+#~ "%<PRIu32>.\n"
+#~ "Video output acceleration will be disabled. However, rendering videos "
+#~ "with overly large resolution may cause severe performance degration."
+#~ msgstr ""
+#~ "Ваш драйвер ускорения вывода XVideo не поддерживает требуемое разрешение: "
+#~ "%ux%u пикселов. Максимально возможное разрешение: %<PRIu32>x%<PRIu32>.\n"
+#~ "Ускорение видеовывода будет отключено. При воспроизведении видео с "
+#~ "большим разрешением может наблюдаться замедление."
+
+#, fuzzy
+#~ msgid "Stream Name"
+#~ msgstr "Имя потока"
+
+#, fuzzy
+#~ msgid "Video Codec"
+#~ msgstr "Видеокодек"
+
+#, fuzzy
+#~ msgid "Audio Codec"
+#~ msgstr "Аудиокодек"
+
+#, fuzzy
+#~ msgid "Subtitle Codec"
+#~ msgstr "Кодек субтитров"
+
+#, fuzzy
+#~ msgid "Output Method"
+#~ msgstr "Режим вывода"
+
+#, fuzzy
+#~ msgid "Video Bit Rate"
+#~ msgstr "Битрейт видео"
+
+#, fuzzy
+#~ msgid "Audio Bit Rate"
+#~ msgstr "Битрейт аудио"
+
+#, fuzzy
+#~ msgid "Audio Sample Rate"
+#~ msgstr "Частота дискретизации звука"
+
+#, fuzzy
+#~ msgid "MUX Options"
+#~ msgstr "Параметры мультиплекса"
+
+#, fuzzy
+#~ msgid "Video Scale"
+#~ msgstr "Масштаб видео"
+
+#, fuzzy
+#~ msgid "Output Port"
+#~ msgstr "Порт вывода"
+
+#, fuzzy
+#~ msgid "Output Destination"
+#~ msgstr "Адрес назначения вывода (dst)"
+
+#, fuzzy
+#~ msgid "Output File"
+#~ msgstr "Выходной файл"
+
+#, fuzzy
+#~ msgid "Input Media"
+#~ msgstr "Медиаисточник"
+
+#, fuzzy
+#~ msgid "File Name"
+#~ msgstr "Имя файла"
+
+#, fuzzy
+#~ msgid "Rows:"
+#~ msgstr "Строк"
+
+#, fuzzy
+#~ msgid "x offset"
+#~ msgstr "Смещение по X"
+
+#, fuzzy
+#~ msgid "row border"
+#~ msgstr "Граница строк"
+
+#, fuzzy
+#~ msgid "width"
+#~ msgstr "Ширина"
+
+#, fuzzy
+#~ msgid "Columns:"
+#~ msgstr "Столбцов"
+
+#, fuzzy
+#~ msgid "y offset"
+#~ msgstr "Смещение по X"
+
+#, fuzzy
+#~ msgid "column border"
+#~ msgstr "Граница столбцов"
+
+#, fuzzy
+#~ msgid "height"
+#~ msgstr "Высота"
+
+#, fuzzy
+#~ msgid "Are you sure you wish to create the stream ?"
+#~ msgstr "Вы действительно хотите создать поток?"
+
+#, fuzzy
+#~ msgid "Preamp: "
+#~ msgstr "Предусиление:"
+
+#, fuzzy
+#~ msgid "Licence"
+#~ msgstr "Лицензия"
+
+#, fuzzy
+#~ msgid "Verbosity:"
+#~ msgstr "&Детализация:"
+
+#, fuzzy
+#~ msgid "Add a subtitles file"
+#~ msgstr "Добавить файл субтитров"
+
+#, fuzzy
+#~ msgid "Use a sub&titles file"
+#~ msgstr "Использовать файл суб&титров"
+
+#, fuzzy
+#~ msgid "Select the subtitles file"
+#~ msgstr "Выбрать файл субтитров"
+
+#, fuzzy
+#~ msgid "Destinations"
+#~ msgstr "Адрес"
+
+#, fuzzy
+#~ msgid "Group name"
+#~ msgstr "Пакеты в группах"
+
+#, fuzzy
+#~ msgid "Use GPU accelerated decoding"
+#~ msgstr "Декодирование с аппаратным ускорением"
+
+#, fuzzy
+#~ msgid "Instances"
+#~ msgstr "Установить"
+
+#, fuzzy
+#~ msgid "Enqueue files when in one instance mode"
+#~ msgstr "Добавлять позиции в очередь в режиме одной копии"
+
+#, fuzzy
+#~ msgid "Menus language:"
+#~ msgstr "Язык аудио"
+
+#, fuzzy
+#~ msgid "Systray popup when minimized"
+#~ msgstr "Пауза при сворачивании"
+
+#, fuzzy
+#~ msgid "Subtitles Language"
+#~ msgstr "Язык субтитров"
+
+#, fuzzy
+#~ msgid "Preferred subtitles language"
+#~ msgstr "Предпочитаемый язык субтитров"
+
+#, fuzzy
+#~ msgid "Subtitles effects"
+#~ msgstr "Эффекты субтитров"
+
+#, fuzzy
+#~ msgid "Do you want to download it ?"
+#~ msgstr "Скачать его?"
+
+#, fuzzy
+#~ msgid "Black slot"
+#~ msgstr "Пятнашки"
+
+#, fuzzy
+#~ msgid "DVB"
+#~ msgstr "DV"
+
+#, fuzzy
+#~ msgid "Advance of subtitles over video:"
+#~ msgstr "Накладывать субтитры на видео"
+
+#, fuzzy
+#~ msgid "Speed of the subtitles:"
+#~ msgstr "Субтитры телетекста"
+
+#, fuzzy
+#~ msgid "Session groupname"
+#~ msgstr "Название сессии"
+
+#, fuzzy
+#~ msgid "Default Volume"
+#~ msgstr "Полная громкость"
+
+#, fuzzy
+#~ msgid "Enable wallpaper mode"
+#~ msgstr "Видео на рабочем столе"
+
+#, fuzzy
+#~ msgid "Clear Menu"
+#~ msgstr "Медиа: Меню"
+
+#, fuzzy
+#~ msgid "RTSP host address"
+#~ msgstr "Адрес RTSP-сервера"
+
+#, fuzzy
+#~ msgid "Media Browser"
+#~ msgstr "Медиа: Вперёд"
+
+#, fuzzy
+#~ msgid "Left rear"
+#~ msgstr "слева"
+
+#, fuzzy
+#~ msgid "Right rear"
+#~ msgstr "справа"
+
+#, fuzzy
+#~ msgid ""
+#~ "RTP packets will be authenticated and deciphered with this Secure RTP "
+#~ "master shared secret key."
+#~ msgstr ""
+#~ "RTP-пакеты будут проверяться и расшифровываться с помощью этого главного "
+#~ "общего секретного ключа Secure RTP. Укажите его в виде 32 "
+#~ "шестнадцатеричных цифр."
+
+#, fuzzy
+#~ msgid "Secure RTP requires a (non-secret) master salt value."
+#~ msgstr ""
+#~ "Для Secure RTP требуется (несекретное) значение примеси (28 "
+#~ "шестнадцатеричных цифр)."
+
+#, fuzzy
+#~ msgid ""
+#~ "This option silences all other channels except the selected channel. "
+#~ "Choose one from (0=left, 1=right, 2=rear left, 3=rear right, 4=center, "
+#~ "5=left front)"
+#~ msgstr "Отключение всех других каналов, кроме выбранного."
+
+#, fuzzy
+#~ msgid ""
+#~ "Force a strict standard compliance when encoding (accepted values: -1, 0, "
+#~ "1)."
+#~ msgstr ""
+#~ "Включить строгое следование стандартам при кодировании (допустимые "
+#~ "значения: -2..2)."
+
+#, fuzzy
+#~ msgid "Low Pass Ffilter"
+#~ msgstr "Низкочастотный фильтр"
+
+#, fuzzy
+#~ msgid ""
+#~ "When set then This VLC instance shall dictate its clock for "
+#~ "synchronization over clients listening on the masters network ip address"
+#~ msgstr ""
+#~ "VLC будет основным источником времени для синхронизации часов настроенных "
+#~ "на него клиентов"
+
+#, fuzzy
+#~ msgid ""
+#~ "The IP address of The network master clock to use for clock "
+#~ "synchronization."
+#~ msgstr "IP-адрес сервера времени в сети для синхронизации часов компьютера."
+
+#, fuzzy
+#~ msgid "Duration in second"
+#~ msgstr "Длительность в сек."
+
+#, fuzzy
+#~ msgid "Override parametters"
+#~ msgstr "Переопределить параметры"
+
+#, fuzzy
+#~ msgid "yes: from %@ to %@ secs"
+#~ msgstr "да: с %@ по %@"
+
+#, fuzzy
+#~ msgid "Previous/Backward"
+#~ msgstr "Предыдущий / Назад"
+
+#, fuzzy
+#~ msgid "Next/Forward"
+#~ msgstr "Следующий / Вперёд"
+
+#, fuzzy
+#~ msgid "Loop/Repeat mode"
+#~ msgstr "Цикл / Повторение"
+
+#, fuzzy
+#~ msgid ""
+#~ "RTP packets will be integrity-protected and ciphered with this Secure RTP "
+#~ "master shared secret key."
+#~ msgstr ""
+#~ "RTP-пакеты будут защищаться от изменений и шифроваться с помощью этого "
+#~ "главного общего секретного ключа Secure RTP. Укажите его в виде 32 "
+#~ "шестнадцатеричных цифр."
+
+#, fuzzy
+#~ msgid ""
+#~ "This allows you to specify a group for the session, that will be "
+#~ "announced if you choose to use SAP."
+#~ msgstr ""
+#~ "Вы можете задать категорию сессии, которая будет указана в оповещениях "
+#~ "при использовании SAP."
+
+#, fuzzy
+#~ msgid "Live Update"
+#~ msgstr "Обновить"
+
+#, fuzzy
+#~ msgid "1/2"
+#~ msgstr "F12"
+
+#, fuzzy
+#~ msgid "2"
+#~ msgstr "F2"
+
+#, fuzzy
+#~ msgid "4"
+#~ msgstr "F4"
+
+#, fuzzy
+#~ msgid "Consider width and height as maximum values."
+#~ msgstr "Щёлкните, чтобы установить максимальную громкость звука."
+
+#, fuzzy
+#~ msgid ""
+#~ "Force the subtiles format. Use \"auto\", the set of supported values "
+#~ "varies."
+#~ msgstr ""
+#~ "Переопределяет формат субтитров. Значение «auto» включает "
+#~ "автоопределение, что должно работать."
+
+#, fuzzy
+#~ msgid "Rewind"
+#~ msgstr "Медиа: Перемотка"
+
+#, fuzzy
+#~ msgid "Input Settings not saved"
+#~ msgstr "Настройки ввода и кодеков"
+
+#, fuzzy
+#~ msgid "&Update"
+#~ msgstr "Обновить"
+
+#, fuzzy
+#~ msgid "Simple XML Parser"
+#~ msgstr "Простые настройки"
+
 #, fuzzy
 #~ msgid "Satellite scanning config"
 #~ msgstr "Код спутникового устройства"
 
 #, fuzzy
 #~ msgid "Video Filters..."
-#~ msgstr "видео-файлы"
+#~ msgstr "Видеофайлы"
 
 #, fuzzy
 #~ msgid "Relaunch required"
@@ -32630,7 +33129,7 @@ msgstr "Список настроек медиаменеджера"
 
 #, fuzzy
 #~ msgid "Front speakers"
-#~ msgstr "3 передних 2 задних"
+#~ msgstr "Свойства шрифта"
 
 #, fuzzy
 #~ msgid "Rear speakers"
@@ -32638,7 +33137,7 @@ msgstr "Список настроек медиаменеджера"
 
 #, fuzzy
 #~ msgid "ALSA device"
-#~ msgstr "Аудио-устройство"
+#~ msgstr "Устройство DVD"
 
 #, fuzzy
 #~ msgid "Open a Media"
@@ -32646,7 +33145,7 @@ msgstr "Список настроек медиаменеджера"
 
 #, fuzzy
 #~ msgid "&Open a Media"
-#~ msgstr "Источник"
+#~ msgstr "&Источник"
 
 #, fuzzy
 #~ msgid "Display on &Desktop"
@@ -32666,7 +33165,7 @@ msgstr "Список настроек медиаменеджера"
 
 #, fuzzy
 #~ msgid "Viewer"
-#~ msgstr "&Вид"
+#~ msgstr "Вид"
 
 #, fuzzy
 #~ msgid "Library"
@@ -32686,7 +33185,7 @@ msgstr "Список настроек медиаменеджера"
 
 #, fuzzy
 #~ msgid "Seek Time"
-#~ msgstr "Старт через"
+#~ msgstr "Медиа: Время"
 
 #, fuzzy
 #~ msgid "Graphical Equalizer"
@@ -32702,15 +33201,15 @@ msgstr "Список настроек медиаменеджера"
 
 #, fuzzy
 #~ msgid "Create Stream"
-#~ msgstr "Поток по умолчанию"
+#~ msgstr "Конвертировать/передавать"
 
 #, fuzzy
 #~ msgid "Media File"
-#~ msgstr "Медиа-файлы"
+#~ msgstr "Медиафайлы"
 
 #, fuzzy
 #~ msgid "Capture Screen"
-#~ msgstr "Устройство захвата"
+#~ msgstr "Режим захвата"
 
 #, fuzzy
 #~ msgid "Close"
@@ -32734,7 +33233,7 @@ msgstr "Список настроек медиаменеджера"
 
 #, fuzzy
 #~ msgid "Create New Stream"
-#~ msgstr "Создать новый профиль"
+#~ msgstr "Конвертировать/передавать"
 
 #, fuzzy
 #~ msgid "Delete All Streams"
@@ -32752,857 +33251,1108 @@ msgstr "Список настроек медиаменеджера"
 #~ msgid "Enqueue"
 #~ msgstr "Добавить в &очередь"
 
+#, fuzzy
 #~ msgid ""
 #~ "The specified sound font file (%s) is incorrect.\n"
 #~ "Please install a valid sound font and reconfigure it from the VLC "
 #~ "preferences (Codecs / Audio / FluidSynth).\n"
 #~ msgstr ""
-#~ "Указанный банк инструментов (%s) неправильный.\n"
+#~ "Для синтеза MIDI необходим банк инструментов (.SF2).\n"
 #~ "Пожалуйста, установите банк SF2 и подключите его в настройках VLC (Ввод/"
-#~ "кодеки / Аудио-кодеки / FluidSynth).\n"
+#~ "кодеки / Аудиокодеки / FluidSynth).\n"
 
+#, fuzzy
 #~ msgid "Audio filter for ugly resampling"
-#~ msgstr "Грубая передискретизация"
+#~ msgstr "Простое микширование каналов"
 
+#, fuzzy
 #~ msgid "Quiet mode."
 #~ msgstr "Тихий режим"
 
+#, fuzzy
 #~ msgid "Preload Directory"
-#~ msgstr "Загрузка каталога"
+#~ msgstr "Создание каталога"
 
 #, fuzzy
 #~ msgid "Motion blue"
 #~ msgstr "Размывание движения"
 
+#, fuzzy
 #~ msgid "Effect"
-#~ msgstr "Эффект"
+#~ msgstr "Эффекты"
 
 #, fuzzy
 #~ msgid "Zoom playlist"
-#~ msgstr "Показать плейлист"
+#~ msgstr "плейлист"
 
+#, fuzzy
 #~ msgid "key"
-#~ msgstr "key"
+#~ msgstr "Горячие клавиши"
 
+#, fuzzy
 #~ msgid "Telnet Interface"
-#~ msgstr "Telnet-интерфейс"
+#~ msgstr "Интерфейс"
 
+#, fuzzy
 #~ msgid "Web Interface"
-#~ msgstr "Веб-интерфейс"
+#~ msgstr "Интерфейс"
 
+#, fuzzy
 #~ msgid "Audio output saved volume"
-#~ msgstr "Сохраненная громкость вывода аудио"
+#~ msgstr "Шаг громкости звука на выходе"
 
+#, fuzzy
 #~ msgid ""
 #~ "X11 hardware display to use. By default VLC will use the value of the "
 #~ "DISPLAY environment variable."
 #~ msgstr ""
-#~ "Используемый дисплей X11. По умолчанию используется значение переменной "
-#~ "окружения DISPLAY."
+#~ "Видеоадаптер, используемый для XVideo. По умолчанию используется первый "
+#~ "функционирующий адаптер."
 
+#, fuzzy
 #~ msgid ""
 #~ "Hide mouse cursor and fullscreen controller after n milliseconds, default "
 #~ "is 3000 ms (3 sec.)"
 #~ msgstr ""
-#~ "Скрывать курсор мыши и панель управления в полноэкранном режиме через n "
-#~ "миллисекунд, по умолчанию 3000 мс (3 сек)"
+#~ "Скрывать курсор и панель управления в полноэкранном режиме через n "
+#~ "миллисекунд."
 
+#, fuzzy
 #~ msgid "Video output filter module"
-#~ msgstr "Модуль фильтра вывода видео"
+#~ msgstr "Модуль вывода видео"
 
+#, fuzzy
 #~ msgid "UDP port"
-#~ msgstr "UDP порт"
+#~ msgstr "Порт SFTP"
 
+#, fuzzy
 #~ msgid "This is the default port used for UDP streams. Default is 1234."
-#~ msgstr "Порт для передачи UDP-потоков (по умолчанию 1234)."
+#~ msgstr "Устройство Audio CD для использования по умолчанию."
 
+#, fuzzy
 #~ msgid "IPv4 multicast output interface address"
-#~ msgstr "Интерфейс вывода IPv4 multicast"
+#~ msgstr "Интерфейс вывода групповой передачи"
 
+#, fuzzy
 #~ msgid ""
 #~ "IPv4 address for the default multicast interface. This overrides the "
 #~ "routing table."
 #~ msgstr ""
-#~ "Адрес IPv4 для multicast-интерфейса по умолчанию, переопределяющий запись "
-#~ "в таблице маршрутизации ОС."
+#~ "Интерфейс групповой передачи по умолчанию. Замещает таблицу маршрутизации."
 
+#, fuzzy
 #~ msgid "Force IPv6"
-#~ msgstr "Использовать только IPv6"
+#~ msgstr "Установить профиль"
 
+#, fuzzy
 #~ msgid "IPv6 will be used by default for all connections."
-#~ msgstr "IPv6 будет использован по умолчанию для всех соединений."
+#~ msgstr "Пароль для соединения с FTP-сервером."
 
+#, fuzzy
 #~ msgid "Force IPv4"
-#~ msgstr "Использовать только IPv4"
+#~ msgstr "Установить профиль"
 
+#, fuzzy
 #~ msgid "IPv4 will be used by default for all connections."
-#~ msgstr "IPv4 будет использован по умолчанию для всех соединений."
+#~ msgstr "Пароль для соединения с FTP-сервером."
 
+#, fuzzy
 #~ msgid "Enable CPU MMX support"
-#~ msgstr "Включить поддержку MMX"
+#~ msgstr "Включить вывод субтитров"
 
+#, fuzzy
 #~ msgid "Enable CPU 3D Now! support"
-#~ msgstr "Включить поддержку 3D Now!"
+#~ msgstr "Включить вывод субтитров"
 
+#, fuzzy
 #~ msgid "Enable CPU SSE support"
-#~ msgstr "Включить поддержку SSE"
+#~ msgstr "Включить вывод субтитров"
 
+#, fuzzy
 #~ msgid "Enable CPU AltiVec support"
-#~ msgstr "Включить поддержку AltiVec"
+#~ msgstr "Включить вывод субтитров"
 
+#, fuzzy
 #~ msgid ""
 #~ "Select the key to go back (to the previous media item) in the browsing "
 #~ "history."
-#~ msgstr ""
-#~ "Выберите горячую клавишу для возврата к предыдущему элементу в истории "
-#~ "плейлиста."
+#~ msgstr "Назначьте клавишу для переключения к предыдущей позиции плейлиста."
 
+#, fuzzy
 #~ msgid ""
 #~ "Select the key to go forward (to the next media item) in the browsing "
 #~ "history."
-#~ msgstr ""
-#~ "Выберите горячую клавишу для перехода к следующему элементу в истории "
-#~ "плейлиста."
+#~ msgstr "Назначьте клавишу для перехода к следующей позиции плейлиста."
 
+#, fuzzy
 #~ msgid "Media dump access filter trigger."
-#~ msgstr "Переключатель фильтра доступа для сброса медиа-данных."
+#~ msgstr "Включение/выключение входного фильтра записи."
 
+#, fuzzy
 #~ msgid "Caching value in ms"
 #~ msgstr "Размер кэша (мс)"
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for Alsa captures. This value should be set in milliseconds."
-#~ msgstr ""
-#~ "Размер кэша для захвата с ALSA. Значение указывается в миллисекундах."
+#~ msgstr "Смещение всех глав по времени (в мс)."
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for DVB streams. This value should be set in milliseconds."
-#~ msgstr "Размер кэша для потока DVB. Значение указывается в миллисекундах."
-
-#~ msgid "Device number to use on adapter"
-#~ msgstr "Номер устройства в адаптере"
-
-#~ msgid "Inversion mode"
-#~ msgstr "Режим инверсии"
-
-#~ msgid "Budget mode"
-#~ msgstr "Бюджетный режим"
-
-#~ msgid "LNB voltage"
-#~ msgstr "Напряжение LNB"
-
-#~ msgid "22 kHz tone"
-#~ msgstr "Тон 22 кГц"
-
-#~ msgid "Transponder FEC"
-#~ msgstr "FEC транспондера"
-
-#~ msgid "Transponder symbol rate in kHz"
-#~ msgstr "Символьная частота транспондера в кГц"
-
-#~ msgid "Terrestrial guard interval"
-#~ msgstr "Интервал защитный интервал"
-
-#~ msgid "Transmission mode [Undefined,2k,8k]"
-#~ msgstr "Режим передачи [неопределённый,2К,8К]"
-
-#~ msgid "Terrestrial hierarchy mode"
-#~ msgstr "Наземный режим иерархии"
-
-#~ msgid "Satellite Polarisation"
-#~ msgstr "Поляризация спутника"
-
-#~ msgid "Satellite Polarisation [H/V/L/R]"
 #~ msgstr ""
-#~ "Поляризация спутника [H/V/L/R]. H - горизонтальная линейная, V - "
-#~ "вертикальная линейная, L - левая круговая, R - правая круговая."
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
+#~ msgid "Device number to use on adapter"
+#~ msgstr "Номер порта SFTP на сервере"
+
+#, fuzzy
+#~ msgid "Inversion mode"
+#~ msgstr "Режим передачи"
+
+#, fuzzy
+#~ msgid "Budget mode"
+#~ msgstr "Тихий режим"
+
+#, fuzzy
+#~ msgid "LNB voltage"
+#~ msgstr "Повышенное напряжение LNB"
+
+#, fuzzy
+#~ msgid "22 kHz tone"
+#~ msgstr "Тоновый сигнал 22 КГц"
+
+#, fuzzy
+#~ msgid "Transponder FEC"
+#~ msgstr "транспонирование"
+
+#, fuzzy
+#~ msgid "Transponder symbol rate in kHz"
+#~ msgstr "Символьная скорость транспондера в кГц. Например, 27500"
+
+#, fuzzy
+#~ msgid "Terrestrial guard interval"
+#~ msgstr "Защитный интервал"
+
+#, fuzzy
+#~ msgid "Transmission mode [Undefined,2k,8k]"
+#~ msgstr "Режим передачи"
+
+#, fuzzy
+#~ msgid "Terrestrial hierarchy mode"
+#~ msgstr "Режим иерархии"
+
+#, fuzzy
+#~ msgid "Satellite Polarisation"
+#~ msgstr "Угол возвышения спутника"
+
+#, fuzzy
+#~ msgid "Satellite Polarisation [H/V/L/R]"
+#~ msgstr "Угол возвышения спутника"
+
+#, fuzzy
 #~ msgid "DirectShow DVB input"
-#~ msgstr "Ввод с DVB DirectShow"
+#~ msgstr "Источник DirectShow"
 
+#, fuzzy
 #~ msgid ""
 #~ "Default caching value for Audio CDs. This value should be set in "
 #~ "milliseconds."
-#~ msgstr "Размер кэша для аудио-CD. Значение указывается в миллисекундах."
+#~ msgstr ""
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for DirectShow streams. This value should be set in "
 #~ "milliseconds."
 #~ msgstr ""
-#~ "Размер кэша для потока DirectShow. Значение указывается в миллисекундах."
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for DV streams. This value should be set in milliseconds."
-#~ msgstr "Размер кэша для потоков DV. Значение указывается в миллисекундах."
+#~ msgstr ""
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid "HTTP password"
 #~ msgstr "Пароль"
 
+#, fuzzy
 #~ msgid "Certificate file"
-#~ msgstr "Файл сертификатов"
+#~ msgstr "Просмотреть сертификат"
 
+#, fuzzy
 #~ msgid "Private key file"
-#~ msgstr "Файл приватного ключа"
+#~ msgstr "Файл с ключом AES"
 
+#, fuzzy
 #~ msgid "Root CA file"
-#~ msgstr "Файл корневого сертификата (Root CA)"
+#~ msgstr "Выберите файл"
 
+#, fuzzy
 #~ msgid "CRL file"
-#~ msgstr "CRL-файл"
+#~ msgstr "Сохранять журнал в файл"
 
+#, fuzzy
 #~ msgid "Input syntax is deprecated"
-#~ msgstr "Синтаксис ввода не рекомендуется"
+#~ msgstr "Входной поток был изменен"
 
+#, fuzzy
 #~ msgid "Invalid polarization"
-#~ msgstr "Неправильная поляризация"
+#~ msgstr "Неправильная комбинация"
 
+#, fuzzy
 #~ msgid "Caching value for DVDs. This value should be set in milliseconds."
-#~ msgstr "Размер кэша для DVD. Значение указывается в миллисекундах."
+#~ msgstr ""
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for EyeTV captures. This value should be set in "
 #~ "milliseconds."
 #~ msgstr ""
-#~ "Величина кэша для захвата с EyeTV. Значение указывается в миллисекундах."
+#~ "Размер кэша для исходящих потоков RTP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for fake streams. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Размер кэша для фиктивных потоков. Значение указывается в миллисекундах."
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid "Fake"
-#~ msgstr "Фиктивный"
+#~ msgstr "Фиктивный TTY"
 
+#, fuzzy
 #~ msgid "Fake video input"
-#~ msgstr "Фиктивный ввод видео"
+#~ msgstr "Сделать стоп-кадр"
 
+#, fuzzy
 #~ msgid "Supplementary caching value for remote files, in milliseconds."
-#~ msgstr "Дополнительный кэш для удалённых файлов (в миллисекундах)."
+#~ msgstr "Объём кэша для локальных файлов (в миллисекундах)."
 
+#, fuzzy
 #~ msgid "Directory input"
-#~ msgstr "Ввод из каталога"
+#~ msgstr "Источник DirectShow"
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for FTP streams. This value should be set in milliseconds."
-#~ msgstr "Размер кэша для потока FTP. Значение указывается в миллисекундах."
+#~ msgstr ""
+#~ "Размер кэша для исходящих потоков RTP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for GnomeVFS streams.This value should be set in "
 #~ "milliseconds."
 #~ msgstr ""
-#~ "Размер кэша для потоков GnomeVFS. Значение указывается в миллисекундах."
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for HTTP streams. This value should be set in milliseconds."
-#~ msgstr "Размер кэша для потока HTTP. Значение указывается в миллисекундах."
-
-#~ msgid "User agent that will be used for the connection."
 #~ msgstr ""
-#~ "Идентификатор клиентской программы, который будет использоваться при "
-#~ "соединении."
+#~ "Размер кэша для исходящих потоков RTP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
+#~ msgid "User agent that will be used for the connection."
+#~ msgstr "Имя пользователя для соединения с FTP-сервером."
+
+#, fuzzy
 #~ msgid "Max number of redirection"
-#~ msgstr "Максимальное число перенаправлений"
+#~ msgstr "Максимальное количество соединений"
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for imem streams. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Размер кэша для потоков в памяти. Значение указывается в миллисекундах."
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid "Memory-mapped file input"
-#~ msgstr "Ввод из спроецированного файла"
+#~ msgstr "Ввод из памяти"
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for MMS streams. This value should be set in milliseconds."
-#~ msgstr "Размер кэша для потоков MMS. Значение указывается в миллисекундах."
+#~ msgstr ""
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid "Caching value for files. This value should be set in milliseconds."
-#~ msgstr "Размер кэша для файлов. Значение указывается в миллисекундах."
+#~ msgstr ""
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for OSS captures. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Размер кэша для захватов с OSS. Значение указывается в миллисекундах."
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Default caching value for PVR streams. This value should be set in "
 #~ "milliseconds."
-#~ msgstr "Размер кэша для потоков PVR. Значение указывается в миллисекундах."
+#~ msgstr ""
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for RTMP streams. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Величина кэша для RTMP-потоков. Значение указывается в миллисекундах."
+#~ "Размер кэша для исходящих потоков RTP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid "RTP de-jitter buffer length (msec)"
-#~ msgstr "Длина буфера для устранения дрожания в RTP (мс)"
+#~ msgstr "Продолжительность фильтра (мс)"
 
+#, fuzzy
 #~ msgid "How long to wait for late RTP packets (and delay the performance)."
 #~ msgstr ""
-#~ "Как долго следует ждать отстающие RTP-пакеты (и задерживать исполнение)."
+#~ "Как долго ждать какого-либо пакета прежде чем источник станет "
+#~ "недействительным."
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for RTSP streams. This value should be set in milliseconds."
-#~ msgstr "Размер кэша для потоков RTSP. Значение указывается в миллисекундах."
+#~ msgstr ""
+#~ "Размер кэша для исходящих потоков RTP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for screen capture. This value should be set in "
 #~ "milliseconds."
 #~ msgstr ""
-#~ "Размер кэша для захвата экрана. Значение указывается в миллисекундах."
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for SFTP streams. This value should be set in milliseconds."
-#~ msgstr "Размер кэша для потоков SFTP. Значение указывается в миллисекундах."
+#~ msgstr ""
+#~ "Размер кэша для исходящих потоков RTP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for SMB streams. This value should be set in milliseconds."
-#~ msgstr "Размер кэша для потоков SMB. Значение указывается в миллисекундах."
+#~ msgstr ""
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for TCP streams. This value should be set in milliseconds."
-#~ msgstr "Размер кэша для потоков TCP. Значение указывается в миллисекундах."
+#~ msgstr ""
+#~ "Размер кэша для исходящих потоков RTP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for UDP streams. This value should be set in milliseconds."
-#~ msgstr "Размер кэша для потоков UDP. Значение указывается в миллисекундах."
+#~ msgstr ""
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for V4L captures. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Размер кэша для захвата с V4L. Значение указывается в миллисекундах."
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Name of the video device to use. If you don't specify anything, no video "
 #~ "device will be used."
 #~ msgstr ""
-#~ "Название используемого видео-устройства. Если ничего не указано, то "
-#~ "никакое устройство не будет использоваться."
+#~ "Название видеоустройства, используемое модулем DirectShow. Если ничего не "
+#~ "указано, будет использоваться устройство по умолчанию."
 
+#, fuzzy
 #~ msgid ""
 #~ "Force the Video4Linux video device to use a specific chroma format (eg. "
 #~ "I420 (default), RV24, etc.)"
 #~ msgstr ""
-#~ "Использовать определенный формат цветности в устройстве Video4Linux "
-#~ "(например I420 (по умолчанию), RV24, и т.д.)"
+#~ "Выбирает для видеовхода DirectShow определённый формат цветности "
+#~ "(например: I420 (по умолчанию), RV24, ...)"
 
-#~ msgid ""
-#~ "Channel of the card to use (Usually, 0 = tuner, 1 = composite, 2 = "
-#~ "svideo)."
-#~ msgstr "Канал карты (обычно, 0 = тюнер, 1 = композитный вход, 2 - s-video)."
-
+#, fuzzy
 #~ msgid "Audio Channel"
-#~ msgstr "Аудио канал"
+#~ msgstr "Аудиоканалы"
 
-#~ msgid "Width of the stream to capture (-1 for autodetect)."
-#~ msgstr "Ширина потока для захвата (-1 для автоматического определения)."
-
-#~ msgid "Height of the stream to capture (-1 for autodetect)."
-#~ msgstr "Высота потока для захвата (-1 для автоматического определения)."
-
+#, fuzzy
 #~ msgid "Brightness of the video input."
-#~ msgstr "Яркость входящего видео."
+#~ msgstr "Баланс записываемого звука."
 
+#, fuzzy
 #~ msgid "Color of the video input."
-#~ msgstr "Цвет входящего видео."
+#~ msgstr "Громкость записываемого звука."
 
+#, fuzzy
 #~ msgid "Tuner to use, if there are several ones."
-#~ msgstr "Выберите тюнер, если их несколько."
+#~ msgstr "Используемый мультиплексор для потока."
 
+#, fuzzy
 #~ msgid "Set this option if the capture device outputs MJPEG"
-#~ msgstr "Включите этот параметр, если устройство захвата выводит MJPEG"
+#~ msgstr "Выбрать тип устройства захвата"
 
+#, fuzzy
 #~ msgid "Decimation"
-#~ msgstr "Прореживание"
+#~ msgstr "Адрес"
 
+#, fuzzy
 #~ msgid "Quality of the stream."
-#~ msgstr "Качество потока."
+#~ msgstr "Используемый мультиплексор для потока."
 
+#, fuzzy
 #~ msgid "Video4Linux"
-#~ msgstr "Video4Linux"
+#~ msgstr "Ввод из Video4Linux"
 
-#~ msgid "IO Method"
-#~ msgstr "Метод ввода/вывода"
-
+#, fuzzy
 #~ msgid "Reset controls to defaults provided by the v4l2 driver."
-#~ msgstr "Установить стандартные настройки драйвера v4l2."
+#~ msgstr "Установка исходных значений параметров."
 
+#, fuzzy
 #~ msgid "Brightness of the video input (if supported by the v4l2 driver)."
-#~ msgstr "Яркость входящего видео (если поддерживается драйвером v4l2)."
+#~ msgstr ""
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
 #~ msgid "Contrast of the video input (if supported by the v4l2 driver)."
-#~ msgstr "Контрастность входящего видео (если поддерживается драйвером v4l2)."
+#~ msgstr ""
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
 #~ msgid "Saturation of the video input (if supported by the v4l2 driver)."
-#~ msgstr "Насыщенность входящего видео (если поддерживается драйвером v4l2)."
+#~ msgstr ""
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
 #~ msgid "Hue of the video input (if supported by the v4l2 driver)."
-#~ msgstr "Оттенок входящего видео (если поддерживается драйвером v4l2)."
+#~ msgstr ""
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
 #~ msgid "Black level of the video input (if supported by the v4l2 driver)."
 #~ msgstr ""
-#~ "Уровень чёрного во входящем видео (если поддерживается драйвером v4l2)."
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
 #~ msgid "Do white balance"
-#~ msgstr "Применять баланс белого"
+#~ msgstr "Автобаланс белого"
 
+#, fuzzy
 #~ msgid "Red balance of the video input (if supported by the v4l2 driver)."
 #~ msgstr ""
-#~ "Баланс красного во входящем видео (если поддерживается драйвером v4l2)."
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
 #~ msgid "Gamma of the video input (if supported by the v4l2 driver)."
-#~ msgstr "Гамма входящего видео (если поддерживается драйвером v4l2)."
+#~ msgstr ""
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
 #~ msgid "Exposure of the video input (if supported by the v4L2 driver)."
-#~ msgstr "Экспозиция входящего видео (если поддерживается драйвером v4l2)."
+#~ msgstr ""
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
 #~ msgid "Auto gain"
-#~ msgstr "Автоматическое усиление"
+#~ msgstr "Усиление звука"
 
+#, fuzzy
 #~ msgid ""
 #~ "Automatically set the video input's gain (if supported by the v4l2 "
 #~ "driver)."
-#~ msgstr ""
-#~ "Устанавливать усиление входящего видео автоматически (если поддерживается "
-#~ "драйвером v4l2)."
+#~ msgstr "Автоматическое усиление видеосигнала."
 
+#, fuzzy
 #~ msgid "Flip the video horizontally (if supported by the v4l2 driver)."
 #~ msgstr ""
-#~ "Перевернуть видео по горизонтали (если поддерживается драйвером v4l2)."
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
 #~ msgid "Flip the video vertically (if supported by the v4l2 driver)."
 #~ msgstr ""
-#~ "Перевернуть видео по вертикали (если поддерживается драйвером v4l2)."
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
 #~ msgid "Horizontal centering"
-#~ msgstr "Горизонтальное центрирование"
+#~ msgstr "Горизонтальный переворот"
 
+#, fuzzy
 #~ msgid "Vertical centering"
-#~ msgstr "Вертикальное центрирование"
+#~ msgstr "Вертикальный переворот"
 
+#, fuzzy
 #~ msgid ""
 #~ "Set the camera's vertical centering (if supported by the v4l2 driver)."
 #~ msgstr ""
-#~ "Установить вертикальное центрирование камеры (если поддерживается "
-#~ "драйвером v4l2)."
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
 #~ msgid "Volume of the audio input (if supported by the v4l2 driver)."
 #~ msgstr ""
-#~ "Уровень громкости на аудио-входе (если поддерживается драйвером v4l2)."
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
 #~ msgid "Balance"
-#~ msgstr "Баланс"
+#~ msgstr "Баланс синего"
 
+#, fuzzy
 #~ msgid "Balance of the audio input (if supported by the v4l2 driver)."
-#~ msgstr "Баланс на аудио-входе (если поддерживается драйвером v4l2)."
+#~ msgstr ""
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
 #~ msgid "Mute audio input (if supported by the v4l2 driver)."
-#~ msgstr "Отключить аудио-вход (если поддерживается драйвером v4l2)."
+#~ msgstr ""
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
 #~ msgid "Bass level of the audio input (if supported by the v4l2 driver)."
 #~ msgstr ""
-#~ "Уровень низких частот на аудио-входе (если поддерживается драйвером v4l2)."
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
 #~ msgid "Loudness of the audio input (if supported by the v4l2 driver)."
-#~ msgstr "Громкость на аудио-входе (если поддерживается драйвером v4l2)."
+#~ msgstr ""
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
 #~ msgid ""
 #~ "Caching value for V4L2 captures. This value should be set in milliseconds."
 #~ msgstr ""
-#~ "Величина кэша для захватов с V4L2. Это значение указывается в "
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
 #~ "миллисекундах."
 
+#, fuzzy
 #~ msgid "v4l2 driver controls, if supported by your v4l2 driver."
-#~ msgstr "Настройки драйвера v4l2, если поддерживаются этим драйвером v4l2."
-
-#~ msgid "Caching value for VCDs. This value should be set in milliseconds."
-#~ msgstr "Размер кэша для VCD. Значение указывается в миллисекундах."
-
-#~ msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
 #~ msgstr ""
-#~ "Путь к файлу сертификатов x509 PEM, который будет использован для HTTPS."
+#~ "Управление параметрами видеосъёмки (если поддерживается устройством)"
 
+#, fuzzy
+#~ msgid "Caching value for VCDs. This value should be set in milliseconds."
+#~ msgstr ""
+#~ "Размер кэша для исходящих потоков UDP. Значение указывается в "
+#~ "миллисекундах."
+
+#, fuzzy
+#~ msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
+#~ msgstr "Мультиплексор, который будет использоваться для вывода звука."
+
+#, fuzzy
 #~ msgid "Dummy S/PDIF audio mixer"
-#~ msgstr "Фиктивный аудио-микшер S/PDIF"
+#~ msgstr "Фиктивный демультиплексор IFO"
 
+#, fuzzy
 #~ msgid "Trivial audio mixer"
-#~ msgstr "Обычный аудио-микшер"
+#~ msgstr "Оригинальный звук"
 
+#, fuzzy
 #~ msgid "default"
 #~ msgstr "по умолчанию"
 
+#, fuzzy
 #~ msgid "No Audio Device"
-#~ msgstr "Нет аудио-устройства"
+#~ msgstr "Аудиоустройство"
 
+#, fuzzy
 #~ msgid "VLC could not open the ALSA device \"%s\" (%s)."
-#~ msgstr "VLC не может открыть устройство ALSA \"%s\" (%s)."
+#~ msgstr "VLC не может открыть файл «%s» (%m)."
 
+#, fuzzy
 #~ msgid "Unknown soundcard"
-#~ msgstr "Неизвестная звуковая карта"
+#~ msgstr "Неопределённая категория"
 
+#, fuzzy
 #~ msgid "Roku HD1000 audio output"
-#~ msgstr "Вывод аудио через Roku HD1000"
+#~ msgstr "Фиктивный вывод звука"
 
+#, fuzzy
 #~ msgid "UNIX OSS audio output"
-#~ msgstr "Вывод аудио через UNIX OSS"
+#~ msgstr "Вывод звука через OpenSLES"
 
+#, fuzzy
 #~ msgid "Simple DirectMedia Layer audio output"
-#~ msgstr "Вывод аудио через Simple DirectMedia Layer"
+#~ msgstr "Вывод видео через Simple DirectMedia Layer"
 
+#, fuzzy
 #~ msgid "Reload image file"
-#~ msgstr "Перезагружать файл изображения"
+#~ msgstr "Видеофильтр Вращение"
 
+#, fuzzy
 #~ msgid ""
 #~ "Aspect ratio of the image file (4:3, 16:9). Default is square pixels."
 #~ msgstr ""
-#~ "Соотношение сторон файла изображения (4:3, 16:9). По умолчанию пикселы "
-#~ "квадратные."
+#~ "Соотношение сторон (4:3, 16:9). По умолчанию пикселы считаются "
+#~ "квадратными."
 
+#, fuzzy
 #~ msgid "Deinterlace the image after loading it."
-#~ msgstr "Устранять чересстрочность изображения после его загрузки."
+#~ msgstr "Устранять чересстрочность видео перед его кодированием."
 
+#, fuzzy
 #~ msgid "Deinterlace module to use."
-#~ msgstr "Модуль, используемый для устранения чересстрочности."
+#~ msgstr "Модуль устранения чересстрочности"
 
+#, fuzzy
 #~ msgid "Fake video decoder"
-#~ msgstr "Фиктивный видео-декодировщик"
+#~ msgstr "Видеодекодер CDG"
 
+#, fuzzy
 #~ msgid "Lock function"
-#~ msgstr "Блокирующая функция"
+#~ msgstr "Функция получения данных"
 
+#, fuzzy
 #~ msgid ""
 #~ "Address of the locking callback function. This function must return a "
 #~ "valid memory address for use by the video renderer."
 #~ msgstr ""
-#~ "Адрес блокирующей функции обратного вызова. Эта функция должна возвращать "
-#~ "действительный адрес памяти для использования программой визуализации "
-#~ "видео."
+#~ "Адрес функции, вызываемой до просчёта видео. Эта функция устанавливает "
+#~ "буфер, в котором будет производиться просчёт."
 
+#, fuzzy
 #~ msgid "Unlock function"
-#~ msgstr "Деблокирующая функция"
+#~ msgstr "Функция получения данных"
 
+#, fuzzy
 #~ msgid "Address of the unlocking callback function"
-#~ msgstr "Адрес деблокирующей функции обратного вызова"
+#~ msgstr "Адрес функции, вызываемой при получении данных"
 
+#, fuzzy
 #~ msgid "Data for the locking and unlocking functions"
-#~ msgstr "Данные для блокирующей и деблокирующей функций"
+#~ msgstr "Данные для функций получения и освобождения данных"
 
+#, fuzzy
 #~ msgid "Memory video decoder"
-#~ msgstr "Видео-декодировщик для данных в памяти"
+#~ msgstr "Видеодекодер Theora"
 
+#, fuzzy
 #~ msgid "Schroedinger video decoder"
-#~ msgstr "Видео-декодировщик Schroedinger"
+#~ msgstr "Видеодекодер Theora"
 
+#, fuzzy
 #~ msgid "Enable debug"
-#~ msgstr "Включить отладку"
+#~ msgstr "Включить видео"
 
+#, fuzzy
 #~ msgid ""
 #~ "Allows B-frames to be used as references for predicting other frames. "
 #~ "Keeps the middle of 2+ consecutive B-frames as a reference, and reorders "
 #~ "frame appropriately."
 #~ msgstr ""
-#~ "Позволяет использовать B-кадры как референсные для прогнозирования других "
-#~ "кадров. Помечает середину из 2-х и больше последовательных B-кадров как "
-#~ "референсный кадр и формирует кадр соответствующе."
+#~ "Позволяет использовать B-кадры для ссылки при прогнозировании других "
+#~ "кадров. Помечает середину из 2-х и более последовательных B-кадров для "
+#~ "ссылки и упорядочивает кадры соответственно.\n"
+#~ " - none: Отключено\n"
+#~ " - strict: Строго иерархическая пирамида\n"
+#~ " - normal: Не строгая структура (несовместимо с Blu-Ray)\n"
 
+#, fuzzy
 #~ msgid "Host address"
-#~ msgstr "Адрес сервера"
+#~ msgstr "Адрес HTTP-сервера"
 
+#, fuzzy
 #~ msgid ""
 #~ "Address and port the HTTP interface will listen on. It defaults to all "
 #~ "network interfaces (0.0.0.0). If you want the HTTP interface to be "
 #~ "available only on the local machine, enter 127.0.0.1"
 #~ msgstr ""
-#~ "Адрес и порт, на котором будет слушать интерфейс HTTP. По умолчанию "
-#~ "слушает на всех интерфейсах (0.0.0.0). Если вы хотите, чтобы интерфейс "
-#~ "HTTP был доступен только на локальной машине, введите 127.0.0.1"
+#~ "Адрес и порт, на котором будет слушать интерфейс. По умолчанию слушает на "
+#~ "всех интерфейсах (0.0.0.0). Если вы хотите, чтобы интерфейс был доступен "
+#~ "только на локальной машине, введите 127.0.0.1"
 
+#, fuzzy
 #~ msgid "HTTP interace Certificates Revocation List file."
-#~ msgstr "Список отозванных сертификатов (CRL)."
+#~ msgstr "Список отозванных сертификатов (CRL) для HTTP/TLS"
 
+#, fuzzy
 #~ msgid "HTTP"
-#~ msgstr "HTTP"
+#~ msgstr "HTTP(S)"
 
+#, fuzzy
 #~ msgid "HTTP remote control interface"
-#~ msgstr "Интерфейс управления HTTP"
+#~ msgstr "Интерфейс дистанционного управления"
 
+#, fuzzy
 #~ msgid "HTTP SSL"
-#~ msgstr "HTTP SSL"
+#~ msgstr "HTTP(S)"
 
+#, fuzzy
 #~ msgid "POSIX signals handling interface"
-#~ msgstr "Интерфейс обработки сигналов POSIX"
+#~ msgstr "Настройки главного интерфейса"
 
+#, fuzzy
 #~ msgid "VLM remote control interface"
-#~ msgstr "Интерфейс управления VLM"
+#~ msgstr "Интерфейс дистанционного управления"
 
+#, fuzzy
 #~ msgid "ASF v1.0 demuxer"
-#~ msgstr "Демультиплексор ASF v1.0"
+#~ msgstr "Демультиплексор SMF"
 
+#, fuzzy
 #~ msgid "FFmpeg demuxer"
-#~ msgstr "Демультиплексор FFmpeg"
+#~ msgstr "Демультиплексор AIFF"
 
+#, fuzzy
 #~ msgid "Ffmpeg mux"
-#~ msgstr "Мультиплексор FFmpeg"
+#~ msgstr "FFmpeg"
 
+#, fuzzy
 #~ msgid "AVI Index"
-#~ msgstr "Индексация AVI"
+#~ msgstr "Индекс"
 
+#, fuzzy
 #~ msgid "Don't repair"
-#~ msgstr "Не исправлять"
+#~ msgstr "Не высылать"
 
+#, fuzzy
 #~ msgid ""
 #~ "Allows you to modify the default caching value for RTSP streams. This "
 #~ "value should be set in millisecond units."
 #~ msgstr ""
-#~ "Изменить величину кэша по умолчанию для RTSP-потоков. Значение "
-#~ "указывается в миллисекундах."
+#~ "Размер кэша для исходящих потоков RTP. Значение указывается в "
+#~ "миллисекундах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Override the normal frames per second settings. This will only affect "
 #~ "frame-based subtitle formats without a fixed value."
 #~ msgstr ""
-#~ "Изменить количество кадров в секунду (только для форматов субтитров с "
-#~ "покадровым отображением без фиксированной скорости)."
+#~ "Переопределяет обычное значение числа кадров в секунду. Применимо только "
+#~ "к субтитрам MicroDVD и SubRIP (SRT)."
 
+#, fuzzy
 #~ msgid "Subtitles (asa demuxer)"
-#~ msgstr "Субтитры (демультиплексор asa)"
+#~ msgstr "Субтитры (расширенные)"
 
+#, fuzzy
 #~ msgid "CSA ck"
-#~ msgstr "Слово для CSA"
+#~ msgstr "Ключ CSA"
 
+#, fuzzy
 #~ msgid "Fast Forward"
-#~ msgstr "Перемотка вперёд"
+#~ msgstr "Вперед"
 
+#, fuzzy
 #~ msgid "Extended controls"
-#~ msgstr "Расширенное управление"
+#~ msgstr "Сброс настроек"
 
+#, fuzzy
 #~ msgid "General editing filters"
-#~ msgstr "Основные фильтры редактирования"
+#~ msgstr "Сохранить существующий файл"
 
+#, fuzzy
 #~ msgid "Distortion filters"
-#~ msgstr "Фильтры искажения"
+#~ msgstr "Конечный файл:"
 
+#, fuzzy
 #~ msgid "Image cropping"
-#~ msgstr "Кадрирование изображения"
+#~ msgstr "Кадрирование видео"
 
-#~ msgid "Crops a defined part of the image"
-#~ msgstr "Обрезает часть изображения"
-
+#, fuzzy
 #~ msgid "Inverts the colors of the image"
-#~ msgstr "Инвертирует цвета изображения"
+#~ msgstr "Определить цвета для регулятора громкости"
 
+#, fuzzy
 #~ msgid "Rotates or flips the image"
-#~ msgstr "Поворачивает или переворачивает изображение"
+#~ msgstr "Вращает или переворачивает изображение"
 
+#, fuzzy
 #~ msgid "Audio Filter"
-#~ msgstr "Аудио-фильтр"
+#~ msgstr "Аудиофильтр"
 
+#, fuzzy
 #~ msgid "About the video filters"
-#~ msgstr "О видео-фильтрах"
+#~ msgstr "Видеофильтр Вращение"
 
+#, fuzzy
 #~ msgid "Controller..."
-#~ msgstr "Контроллер ..."
+#~ msgstr "Управление"
 
+#, fuzzy
 #~ msgid "Equalizer..."
-#~ msgstr "Эквалайзер ..."
+#~ msgstr "Эквалайзер"
 
+#, fuzzy
 #~ msgid "Extended Controls..."
-#~ msgstr "Расширенное управление ..."
+#~ msgstr "Расширенная панель"
 
+#, fuzzy
 #~ msgid "Volume: %d%%"
-#~ msgstr "Громкость: %d%%"
+#~ msgstr "Громкость %ld%%"
 
+#, fuzzy
 #~ msgid "Keep current Equalizer settings"
-#~ msgstr "Сохранять текущие настройки эквалайзера"
+#~ msgstr "Основные настройки видео"
 
+#, fuzzy
 #~ msgid ""
 #~ "By default, VLC keeps the last equalizer settings before termination. "
 #~ "This feature can be disabled here."
 #~ msgstr ""
-#~ "По умолчанию VLC сохраняет последние настройки эквалайзера перед "
-#~ "закрытием. Эту функцию можно отключить здесь."
+#~ "По умолчанию VLC ведёт список последних 10 позиций. Эту функцию можно "
+#~ "отключить здесь."
 
+#, fuzzy
 #~ msgid "No device connected"
-#~ msgstr "Никакое устройство не подключено"
+#~ msgstr "Устройство не выбрано"
 
+#, fuzzy
 #~ msgid "Screen Capture Input"
-#~ msgstr "Ввод для захвата экрана"
+#~ msgstr "Захват экрана"
 
+#, fuzzy
 #~ msgid "No %@s found"
-#~ msgstr "%@s не найден"
+#~ msgstr "Нет входного потока"
 
+#, fuzzy
 #~ msgid "Open VIDEO_TS Directory"
-#~ msgstr "Открыть каталог VIDEO_TS"
+#~ msgstr "Открыть каталог"
 
-#~ msgid "iSight Capture Input"
-#~ msgstr "Ввод для захвата iSight"
-
+#, fuzzy
 #~ msgid "Add Folder to Playlist"
-#~ msgstr "Добавить папку в плейлист"
+#~ msgstr "Добавить"
 
+#, fuzzy
 #~ msgid "1 item"
-#~ msgstr "1 позиция"
+#~ msgstr "%i позиций"
 
+#, fuzzy
 #~ msgid "Empty Folder"
-#~ msgstr "Пустая папка"
+#~ msgstr "Выбор папки"
 
+#, fuzzy
 #~ msgid "Default Server Port"
-#~ msgstr "Порт сервера по умолчанию"
+#~ msgstr "Устройства по умолчанию"
 
+#, fuzzy
 #~ msgid "Interface Settings not saved"
-#~ msgstr "Настройки интерфейса не сохранены"
+#~ msgstr "Настройки интерфейса"
 
+#, fuzzy
 #~ msgid "An error occured while saving your settings via SimplePrefs (%i)."
-#~ msgstr "Ошибка при сохранении настроек через SimplePrefs (%i)."
+#~ msgstr "В процессе обновления возникла ошибка..."
 
+#, fuzzy
 #~ msgid "Audio Settings not saved"
-#~ msgstr "Настройки аудио не сохранены"
+#~ msgstr "Настройки аудио"
 
+#, fuzzy
 #~ msgid "On Screen Display/Subtitle Settings not saved"
-#~ msgstr "Настройки субтитров/индикации не сохранены"
+#~ msgstr "Настройки субтитров и экранной индикации"
 
+#, fuzzy
 #~ msgid "Hotkeys not saved"
-#~ msgstr "Горячие клавиши не сохранены"
+#~ msgstr "Настройка горячих клавиш"
 
+#, fuzzy
 #~ msgid " State    : Paused %s"
-#~ msgstr " Состояние    : Приостановлено %s"
+#~ msgstr "      %s: %s"
 
+#, fuzzy
 #~ msgid " Help "
-#~ msgstr " Справка"
+#~ msgstr "Помощь"
 
+#, fuzzy
 #~ msgid "     <left>      Seek -1%%"
-#~ msgstr "     <влево>      Перемотка -1%%"
+#~ msgstr " <влево>,<вправо>       Перемотка -/+ 1%%"
 
+#, fuzzy
 #~ msgid "     a           Volume Up"
-#~ msgstr "     a           Громче"
+#~ msgstr " a, z                   Громче/Тише"
 
+#, fuzzy
 #~ msgid "     D, <del>    Delete an entry"
-#~ msgstr "     D, <del>    Удалить запись"
+#~ msgstr " D, <backspace>, <del>  Удаление позиции"
 
+#, fuzzy
 #~ msgid "[Miscellaneous]"
-#~ msgstr "[Прочее]"
+#~ msgstr "Прочее"
 
+#, fuzzy
 #~ msgid " Information "
-#~ msgstr " Информация"
+#~ msgstr "Информация"
 
+#, fuzzy
 #~ msgid "No item currently playing"
-#~ msgstr "Сейчас ничего не проигрывается"
+#~ msgstr "Играет новый медиаобъект"
 
+#, fuzzy
 #~ msgid " Browse "
-#~ msgstr " Обзор "
+#~ msgstr "Обзор"
 
+#, fuzzy
 #~ msgid " Stats "
-#~ msgstr " Статистика "
+#~ msgstr "Статистика"
 
+#, fuzzy
 #~ msgid "\\ sending bitrate  :   %6.0f kb/s"
-#~ msgstr "\\ битрейт на отправке  :   %6.0f кб/с"
+#~ msgstr "| битрейт на отправке                :   %6.0f Кб/с"
 
+#, fuzzy
 #~ msgid " Playlist (By category) "
-#~ msgstr " Плейлист (по категории) "
+#~ msgstr "Подкатегория"
 
+#, fuzzy
 #~ msgid "Input caching:"
-#~ msgstr "Кэширование ввода:"
+#~ msgstr "Входной поток был изменен"
 
+#, fuzzy
 #~ msgid "Privacy and Network Warning"
-#~ msgstr "Предупреждение о конфиденциальности в сети"
+#~ msgstr "Конфиденциальность / взаимодействие с сетью"
 
+#, fuzzy
 #~ msgid "&Extra Metadata"
-#~ msgstr "&Доп. мета-данные"
+#~ msgstr "&Сохранить метаданные"
 
+#, fuzzy
 #~ msgid "&Codec Details"
-#~ msgstr "Информация о &кодеке"
+#~ msgstr "Информация о кодеке"
 
+#, fuzzy
 #~ msgid "&Statistics"
-#~ msgstr "&Статистика"
+#~ msgstr "Статистика"
 
+#, fuzzy
 #~ msgid "C&lear"
 #~ msgstr "Очистить"
 
+#, fuzzy
 #~ msgid "Verbosity Level"
-#~ msgstr "Уровень детальности сообщений"
+#~ msgstr "Детализация сообщений"
 
+#, fuzzy
 #~ msgid "Message filter"
-#~ msgstr "Фильтр сообщений"
+#~ msgstr "Сцены"
 
+#, fuzzy
 #~ msgid "XSPF playlist (*.xspf)"
-#~ msgstr "Плейлист XSPF (*.xspf)"
+#~ msgstr "Экспорт плейлиста в XSPF"
 
+#, fuzzy
 #~ msgid "M3U8 playlist (*.m3u8)"
-#~ msgstr "Плейлист M3U8 (*.m3u8)"
+#~ msgstr "Плейлист M3U8"
 
+#, fuzzy
 #~ msgid "M3U playlist (*.m3u)"
-#~ msgstr "Плейлист M3U (*.m3u)"
+#~ msgstr "Плейлист M3U"
 
+#, fuzzy
 #~ msgid "HTML playlist (*.html)"
-#~ msgstr "Плейлист HTML (*.html)"
+#~ msgstr "Плейлист HTML"
 
+#, fuzzy
 #~ msgid "&Streaming..."
-#~ msgstr "Потоковое вещание"
+#~ msgstr "&Передавать..."
 
+#, fuzzy
 #~ msgid "Direct3D Desktop mode"
-#~ msgstr "Режим Direct3D"
+#~ msgstr "Режим прямого предсказания вектора движения"
 
+#, fuzzy
 #~ msgid "Sna&pshot"
 #~ msgstr "Снимок"
 
+#, fuzzy
 #~ msgid "Manage &bookmarks"
-#~ msgstr "Управление закладками"
+#~ msgstr "Создать новую закладку"
 
+#, fuzzy
 #~ msgid "Configure podcasts..."
-#~ msgstr "Конфигурация подкастов"
+#~ msgstr "Конфигурация горячих клавиш"
 
+#, fuzzy
 #~ msgctxt "Tooltip|Clear"
 #~ msgid "Clear"
 #~ msgstr "Очистить"
 
+#, fuzzy
 #~ msgid "Dummy interface function"
 #~ msgstr "Фиктивный интерфейс"
 
+#, fuzzy
 #~ msgid "Dummy demux function"
-#~ msgstr "Фиктивный демультиплексор"
+#~ msgstr "Функция статистики демультиплексора"
 
+#, fuzzy
 #~ msgid "Dummy decoder function"
-#~ msgstr "Фиктивный декодер"
+#~ msgstr "Функция статистики декодера"
 
+#, fuzzy
 #~ msgid "Dump decoder function"
-#~ msgstr "Функция декодировщика сброса"
+#~ msgstr "Функция статистики декодера"
 
+#, fuzzy
 #~ msgid "Dummy encoder function"
-#~ msgstr "Фиктивный кодировщик"
+#~ msgstr "Функция статистики кодировщика"
 
+#, fuzzy
 #~ msgid "Dummy audio output function"
-#~ msgstr "фиктивный вывод аудио"
+#~ msgstr "Фиктивный вывод звука"
 
+#, fuzzy
 #~ msgid "Dummy video output function"
-#~ msgstr "фиктивный вывод видео"
+#~ msgstr "Фиктивный вывод видео"
 
+#, fuzzy
 #~ msgid "Stats video output function"
-#~ msgstr "Функция вывода статистики видео"
+#~ msgstr "Функция статистики демультиплексора"
 
+#, fuzzy
 #~ msgid "Font Effect"
-#~ msgstr "Эффект шрифта"
+#~ msgstr "Аудиоэффекты"
 
+#, fuzzy
 #~ msgid "Fat Outline"
-#~ msgstr "жирный контур"
+#~ msgstr "контур"
 
+#, fuzzy
 #~ msgid "Number of resumed TLS sessions"
-#~ msgstr "Количество восстановленных сессий TLS"
+#~ msgstr "Количество повторений ДВП"
 
+#, fuzzy
 #~ msgid "Lua Interface Module"
-#~ msgstr "Модуль интерфейса Lua"
+#~ msgstr "Модуль интерфейса"
 
+#, fuzzy
 #~ msgid "Interfaces implemented using lua scripts"
-#~ msgstr "Интерфейсы, реализованные в скриптах Lua"
+#~ msgstr "Обработка метаданных с помощью сценариев Lua"
 
+#, fuzzy
 #~ msgid "Lua Interface Module (shortcuts)"
-#~ msgstr "Модуль интерфейса Lua"
+#~ msgstr "Загружаемый модуль интерфейса Lua"
 
+#, fuzzy
 #~ msgid "Server"
-#~ msgstr "Сервер"
+#~ msgstr "Службы"
 
+#, fuzzy
 #~ msgid "Growl UDP Notification Plugin"
-#~ msgstr "Модуль UDP-оповещения Growl"
+#~ msgstr "Оповещения Growl"
 
+#, fuzzy
 #~ msgid ""
 #~ "Format of the string to send to Telepathy.Defaults to \"Artist - Title"
 #~ "\" ($a - $t). You can use the following substitutions: $a Artist, $b "
@@ -33612,121 +34362,153 @@ msgstr "Список настроек медиаменеджера"
 #~ "Title, $L Time Remaining, $N Name, $O Audio language, $P Position, $R "
 #~ "Rate, $S Sample rate, $T Time elapsed, $U Publisher, $V Volume"
 #~ msgstr ""
-#~ "Формат строки для передачи в Telepathy. По умолчанию \"Исполнитель - "
-#~ "Название\" ($a - $t). Используются следующие замены: $a Исполнитель, $b "
-#~ "Альбом, $c Авторское право, $d Описание, $e Кодировщик, $g Жанр, $l Язык, "
-#~ "$n Номер, $p Сейчас играет, $r Рейтинг, $s Язык субтитров, $t Название, "
-#~ "$u URL, $A Дата, $B Битрейт, $C Глава, $D Продолжительность, $F URI, $I "
-#~ "Название видео, $L Осталось времени, $N Имя, $O Язык аудио, $P Позиция, "
-#~ "$R Скорость, $S Частота дискретизации, $T Прошло времени, $U Издатель, $V "
-#~ "Громкость"
+#~ "Отображать текст маркизы. (Имеющиеся строковые параметры: Время: %Y = "
+#~ "год, %m = месяц, %d = день, %H = час, %M = минута, %S = секунда, ... "
+#~ "Метаданные: $a = исполнитель, $b = альбом, $c = авторское право, $d = "
+#~ "описание, $e = кто закодировал, $g = жанр, $l = язык, $n = № дорожки, $p "
+#~ "= сейчас играет, $r = рейтинг, $s = язык субтитров, $t = заглавие, $u = "
+#~ "URL, $A = дата, $B = битрейт звука (в кб/с), $C = глава, $D = "
+#~ "продолжительность, $F = полное название, вкл. путь, $I = заголовок, $L = "
+#~ "осталось времени, $N = название, $O = язык аудио, $P = позиция (в %), $R "
+#~ "= скорость, $S = частота дискретизации звука (в кГц), $T = время, $U = "
+#~ "издатель, $V = громкость, $_ = новая строка) "
 
+#, fuzzy
 #~ msgid "Use SAP cache"
-#~ msgstr "Использовать кэш"
+#~ msgstr "Скорость VLC"
 
+#, fuzzy
 #~ msgid ""
 #~ "X11 hardware display to use.\n"
 #~ "By default, VLC will use the value of the DISPLAY environment variable."
 #~ msgstr ""
-#~ "Используемый дисплей X11.\n"
-#~ "По умолчанию используется значение переменной окружения DISPLAY."
+#~ "Видеоадаптер, используемый для XVideo. По умолчанию используется первый "
+#~ "функционирующий адаптер."
 
+#, fuzzy
 #~ msgid "HD1000 video output"
-#~ msgstr "Вывод видео через HD1000"
+#~ msgstr "Фиктивный вывод видео"
 
+#, fuzzy
 #~ msgid "OMAP Framebuffer device"
-#~ msgstr "Устройство фреймбуфера OMAP"
+#~ msgstr "Устройство фреймбуфера"
 
+#, fuzzy
 #~ msgid "OMAP Framebuffer device to use for rendering (usually /dev/fb0)."
-#~ msgstr ""
-#~ "Устройство фреймбуфера OMAP, используемое для рендеринга (обычно /dev/"
-#~ "fb0)."
+#~ msgstr "Используемое устройство фреймбуфера (обычно /dev/fb0)."
 
+#, fuzzy
 #~ msgid ""
 #~ "Force use of a specific chroma for output. Default is Y420 (specific to "
 #~ "N770/N8xx hardware)."
 #~ msgstr ""
-#~ "Принудительное использование определённой цветности для вывода. По "
-#~ "умолчанию - Y420 (особенность оборудования N770/N8xx)."
+#~ "Принудительное использование определённой цветности для выводе. По "
+#~ "умолчанию - I420."
 
+#, fuzzy
 #~ msgid "OMAP framebuffer"
-#~ msgstr "Устройство фреймбуфера OMAP"
+#~ msgstr "Размер буфера кадров RTSP"
 
+#, fuzzy
 #~ msgid "OMAP framebuffer video output"
-#~ msgstr "Вывод видео через фреймбуфер OMAP"
+#~ msgstr "Вывод видео через фреймбуфер GNU/Linux"
 
+#, fuzzy
 #~ msgid "OpenGL Provider"
-#~ msgstr "Провайдер OpenGL"
+#~ msgstr "Выбор папки"
 
+#, fuzzy
 #~ msgid "Snapshot width"
-#~ msgstr "Ширина стоп-кадра"
+#~ msgstr "Ширина снимков"
 
+#, fuzzy
 #~ msgid "Width of the snapshot image."
-#~ msgstr "Ширина изображения стоп-кадра."
+#~ msgstr "Формат снимков"
 
+#, fuzzy
 #~ msgid "Snapshot height"
-#~ msgstr "Высота стоп-кадра"
+#~ msgstr "Высота снимков"
 
+#, fuzzy
 #~ msgid "Height of the snapshot image."
-#~ msgstr "Высота изображения стоп-кадра."
+#~ msgstr "Общая высота мозаики, в пикселах."
 
+#, fuzzy
 #~ msgid ""
 #~ "Output chroma for the snapshot image (a 4 character string, like "
 #~ "\"RV32\")."
 #~ msgstr ""
-#~ "Тип выходная цветности стоп-кадра (строка из 4 символов, например "
-#~ "\"RV32\")."
+#~ "Цветность на выходе для изображения в памяти (строка из 4 символов, "
+#~ "например, «RV32»)."
 
+#, fuzzy
 #~ msgid "Snapshot output"
-#~ msgstr "Вывод снимков"
+#~ msgstr "Снимок"
 
+#, fuzzy
 #~ msgid "SVGAlib video output"
-#~ msgstr "Вывод видео через SVGAlib"
+#~ msgstr "Вывод видео через YUV"
 
+#, fuzzy
 #~ msgid "More bands for the spectrum analyzer : 80 if enabled else 20."
-#~ msgstr "Больше полос для анализатора спектра: 80 (вкл.) или 20 (выкл.)."
+#~ msgstr "Больше полос для спектрометра: 80 (вкл.) или 20 (выкл.)."
 
+#, fuzzy
 #~ msgid "Enable peaks"
-#~ msgstr "Включить пики"
+#~ msgstr "Включить аудио"
 
+#, fuzzy
 #~ msgid "Enable bands"
-#~ msgstr "Включить полосы"
+#~ msgstr "Включить аудио"
 
+#, fuzzy
 #~ msgid "Enable base"
-#~ msgstr "Включить основание"
+#~ msgstr "Включить режим супербаса"
 
+#, fuzzy
 #~ msgid "Font size:"
-#~ msgstr "Размер шрифта:"
+#~ msgstr "Размер шрифта"
 
+#, fuzzy
 #~ msgid "Text alignment:"
-#~ msgstr "Выравнивание текста:"
+#~ msgstr "Выравнивание телетекста"
 
+#, fuzzy
 #~ msgid "Enter the URL of the network stream here."
-#~ msgstr "Введите в это поле URL сетевого потока."
+#~ msgstr "Введите адрес компьютера, на который необходимо вещать поток."
 
+#, fuzzy
 #~ msgid "Default port (server mode)"
-#~ msgstr "Порт сервера по умолчанию"
+#~ msgstr "Модуль сервера VoD"
 
+#, fuzzy
 #~ msgid "Refresh"
-#~ msgstr "Обновить"
+#~ msgstr "Время обновления"
 
+#, fuzzy
 #~ msgid "Color fun"
-#~ msgstr "Игра цветом"
+#~ msgstr "Цвет"
 
+#, fuzzy
 #~ msgid "Vout/Overlay"
-#~ msgstr "В-выход/наложение"
+#~ msgstr "Наложение"
 
+#, fuzzy
 #~ msgid "Subpicture filters"
-#~ msgstr "Фильтры изображений"
+#~ msgstr "Модуль фильтров слоёв"
 
+#, fuzzy
 #~ msgid "Video filters"
-#~ msgstr "Видео-фильтры"
+#~ msgstr "Видеофильтр"
 
+#, fuzzy
 #~ msgid "Vout filters"
-#~ msgstr "Фильтры В-выхода"
+#~ msgstr "Видеофильтр"
 
+#, fuzzy
 #~ msgid "Advanced video filter controls"
-#~ msgstr "Дополнительные настройки"
+#~ msgstr "&Доп. элементы управления"
 
+#, fuzzy
 #~ msgid "Automate picture coding mode"
-#~ msgstr "Автоопределение режима кодирования"
+#~ msgstr "Режим кодирования изображения"
