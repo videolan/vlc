@@ -17,7 +17,7 @@ Core:
  * Full support for UNICODE Windows mode
  * Partial support for Windows Store App
  * Removed SQL support
- * Added audio fingerprinter support
+ * Add an audio fingerprinter
  * Disabled and marked obsolete --language selection
 
 Decoders:
@@ -84,6 +84,7 @@ Audio Filters:
  * New filter to enhance stereo effect by mono suppression and delay effect
  * New VSXu visualization plugin
  * ARM NEON acceleration of volume filter
+ * Rewrite of the simple downmixer filter
 
 Video Outputs:
  * New module to output using Decklink Blackmagic cards
@@ -114,7 +115,7 @@ Stream Output:
  * Added chromaprint based audio fingerprinting
 
 Fingerprinters:
- * Added AcoustID/Musicbrainz based fingerprinter
+ * Add AcoustID/Musicbrainz based fingerprinter
 
 Interfaces:
  * configurable password for the HTTP server.
@@ -129,44 +130,44 @@ Services discovery:
  * Support for multiple UPnP resources on a single item
 
 OS X Interface:
- * add support for multiple video outputs
- * add accessibility support to playback windows, open panel and fullscreen
+ * Add support for multiple video outputs
+ * Add accessibility support to playback windows, open panel and fullscreen
    controller
- * add a GUI to manage podcasts
- * add a new panel for media conversation and streaming
- * add a GUI for the QTSound access module to process audio captured locally
+ * Add a GUI to manage podcasts
+ * Add a new panel for media conversation and streaming
+ * Add a GUI for the QTSound access module to process audio captured locally
    - This also allows to capture input from a webcam and a mic at the same time.
- * add a GUI to capture QTSound data along with the current screen content
- * add an option to let the Apple Remote control the system volume instead of
+ * Add a GUI to capture QTSound data along with the current screen content
+ * Add an option to let the Apple Remote control the system volume instead of
    VLC's internal volume level
- * add a new Subtitles menu to change Subtitles and their properties during
+ * Add a new Subtitles menu to change Subtitles and their properties during
    playback
- * add the ability to create custom equalizer presets based upon the current
+ * Add the ability to create custom equalizer presets based upon the current
    selection and to manage the list of presets
- * add custom profiles for video and audio effects, which let the user keep
+ * Add custom profiles for video and audio effects, which let the user keep
    multiple configuration sets of all the individual filters
  * Support for pausing iTunes during media playback with VLC
- * add support for video filters to clone the video output or split it in parts
- * add A->B loop feature known from the Qt interface
- * add an option to disable skipping to next/previous file with the Apple Remote
- * add an option to show next / previous buttons
- * add an option to hide the shuffle and repeat buttons
- * add an option to hide the audio effects button (default enabled)
- * add optional playlist columns for track number, genre, album, description,
+ * Add support for video filters to clone the video output or split it in parts
+ * Add A->B loop feature known from the Qt interface
+ * Add an option to disable skipping to next/previous file with the Apple Remote
+ * Add an option to show next / previous buttons
+ * Add an option to hide the shuffle and repeat buttons
+ * Add an option to hide the audio effects button (default enabled)
+ * Add optional playlist columns for track number, genre, album, description,
    date and language
- * add options to the Advanced Open File dialog for start and stop time
- * add an option to play videos as a desktop background
- * add support for playing video and showing audio visualizations side by side
+ * Add options to the Advanced Open File dialog for start and stop time
+ * Add an option to play videos as a desktop background
+ * Add support for playing video and showing audio visualizations side by side
  * improve fullscreen controller time slider with larger click target
  * rewrite of minimal macosx module for use within VLCKit
- * add support for 'macosx-autoplay' to the Apple Event / Apple Script bindings
+ * Add support for 'macosx-autoplay' to the Apple Event / Apple Script bindings
    when adding new inputs - this also affects network streams opened through
    3rd party applications
- * add a UI to the preferences dialog to configure the default application
+ * Add a UI to the preferences dialog to configure the default application
    handler for ftp, mms, rtmp, rtp, rtsp, sftp, smb and udp streams
    (system-wide settings)
- * add support for the Video Title option
- * add support for the Boss Key
+ * Add support for the Video Title option
+ * Add support for the Boss Key
  * The Streaming/Transcoding wizard and the open dialog's output panel are
    deprecated now and will be removed in a future release.
 
@@ -184,19 +185,28 @@ Qt:
  * Support for a Maximum volume in the UI
  * Numerous fixes
  * Add audio track fingerprinting from media info
- * Removed language preference
+ * Remove language preference
  * New profiles format and dialog to handle filters and quality.
    Added new profiles.
+
+Skins2:
+ * Port to OS/2
+ * Extend sliders, offsets options
+ * New bitmaps caching mechanism
+ * Numerous fixes and improvements
+ * Skinning of the Fullscreen controller
 
 libVLC:
  * new libvlc_audio_output_device_list_get and libvlc_audio_output_device_list_release functions
    to replace the deprecated libvlc_audio_output_device_count, libvlc_audio_output_device_longname
    and libvlc_audio_output_device_id
  * libvlc_audio_output_get_device_type and libvlc_audio_output_set_device_type are now deprecated
- * new libvlc_log_subscribe and libvlc_log_unsubscribe function to register logging callbacks
  * new libvlc_media_tracks_get and libvlc_media_tracks_release methods to get more info about the
    media tracks. libvlc_media_get_tracks_info is now deprecated.
- * new fingerprinter_Create and fingerprinter_Destroy for fingerprinter support.
+ * new fingerprinter_Create and fingerprinter_Destroy for fingerprinter support
+ * new libvlc_log_set, libvlc_log_set_file, libvlc_log_unset, libvlc_log_get_context and
+   libvlc_log_get_object for a better logger mechanism
+ * new libvlc_set_app_id to complement libvlc_set_user_agent to set the icons
 
 Removed modules:
  * portaudio audio output: use the native audio output instead
@@ -216,6 +226,7 @@ Removed modules:
  * Removed DLL loader for non-Windows Operating Systems
  * SQL Media Library (broken and unmaintained)
  * SQL Lite (only used as SQL Media library backend)
+ * htcpcp :)
 
 
 Changes between 2.0.6 and 2.0.7:
