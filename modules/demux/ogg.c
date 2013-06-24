@@ -948,8 +948,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     if( i_pts == VLC_TS_INVALID ) i_pts = VLC_TS_0;
     else if( i_pts == -1 && i_interpolated_pts == VLC_TS_INVALID )
         i_pts = VLC_TS_0;
-    else if( i_pts == -1 && p_stream->fmt.i_cat == VIDEO_ES )
-        i_pts = i_interpolated_pts;
+    else if( i_pts == -1 && (p_stream->fmt.i_cat == VIDEO_ES || p_stream->fmt.i_codec == VLC_CODEC_OPUS) )
+        i_pts = i_interpolated_pts; /* FIXME : why is this incorrect for vorbis? */
     else if( i_pts == -1 ) i_pts = VLC_TS_INVALID;
 
     if( p_stream->fmt.i_cat == AUDIO_ES )
