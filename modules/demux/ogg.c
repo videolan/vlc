@@ -146,6 +146,34 @@ static void Ogg_ReadFlacHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadAnnodexHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static bool Ogg_ReadDiracHeader( logical_stream_t *, ogg_packet * );
 
+static void fill_channels_info(audio_format_t *audio)
+{
+    static const int pi_channels_map[9] =
+    {
+        0,
+        AOUT_CHAN_CENTER,
+        AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
+        AOUT_CHAN_CENTER | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
+        AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
+            | AOUT_CHAN_REARRIGHT,
+        AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+            | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
+        AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+            | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE,
+        AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+            | AOUT_CHAN_REARCENTER | AOUT_CHAN_MIDDLELEFT
+            | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE,
+        AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT
+            | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT
+            | AOUT_CHAN_LFE,
+    };
+
+    unsigned chans = audio->i_channels;
+    if (chans < sizeof(pi_channels_map) / sizeof(pi_channels_map[0]))
+        audio->i_physical_channels =
+        audio->i_original_channels = pi_channels_map[chans];
+}
+
 /*****************************************************************************
  * Open: initializes ogg demux structures
  *****************************************************************************/
@@ -1329,6 +1357,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         i_format_tag = GetWLE((oggpacket.packet+124));
                         p_stream->fmt.audio.i_channels =
                             GetWLE((oggpacket.packet+126));
+                        fill_channels_info(&p_stream->fmt.audio);
                         p_stream->f_rate = p_stream->fmt.audio.i_rate =
                             GetDWLE((oggpacket.packet+128));
                         p_stream->fmt.i_bitrate =
@@ -1452,6 +1481,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         p_buffer[4] = '\0';
                         i_format_tag = strtol(p_buffer,NULL,16);
                         p_stream->fmt.audio.i_channels = st->sh.audio.channels;
+                        fill_channels_info(&p_stream->fmt.audio);
                         if( st->time_unit <= 0 )
                             st->time_unit = 10000000;
                         p_stream->f_rate = p_stream->fmt.audio.i_rate = st->samples_per_unit * 10000000 / st->time_unit;
@@ -1987,6 +2017,7 @@ static void Ogg_ReadVorbisHeader( demux_t *p_demux, logical_stream_t *p_stream,
     oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes);
     oggpack_adv( &opb, 88 );
     p_stream->fmt.audio.i_channels = oggpack_read( &opb, 8 );
+    fill_channels_info(&p_stream->fmt.audio);
     p_stream->f_rate = p_stream->fmt.audio.i_rate =
         oggpack_read( &opb, 32 );
     oggpack_adv( &opb, 32 );
@@ -2022,6 +2053,7 @@ static void Ogg_ReadSpeexHeader( logical_stream_t *p_stream,
     oggpack_adv( &opb, 32 ); /* mode */
     oggpack_adv( &opb, 32 ); /* mode_bitstream_version */
     p_stream->fmt.audio.i_channels = oggpack_read( &opb, 32 );
+    fill_channels_info(&p_stream->fmt.audio);
     p_stream->fmt.i_bitrate = oggpack_read( &opb, 32 );
 }
 
@@ -2049,6 +2081,7 @@ static void Ogg_ReadOpusHeader( demux_t *p_demux,
     oggpack_adv( &opb, 64 );
     oggpack_adv( &opb, 8 ); /* version_id */
     p_stream->fmt.audio.i_channels = oggpack_read( &opb, 8 );
+    fill_channels_info(&p_stream->fmt.audio);
     p_stream->i_pre_skip = oggpack_read( &opb, 16 );
 
     if ( p_demux->p_sys->i_length < 0 )
@@ -2079,6 +2112,7 @@ static void Ogg_ReadFlacHeader( demux_t *p_demux, logical_stream_t *p_stream,
         bs_skip( &s, 80 );
         p_stream->f_rate = p_stream->fmt.audio.i_rate = bs_read( &s, 20 );
         p_stream->fmt.audio.i_channels = bs_read( &s, 3 ) + 1;
+        fill_channels_info(&p_stream->fmt.audio);
 
         msg_Dbg( p_demux, "FLAC header, channels: %i, rate: %i",
                  p_stream->fmt.audio.i_channels, (int)p_stream->f_rate );
