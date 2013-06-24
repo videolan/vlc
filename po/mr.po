@@ -4,13 +4,14 @@
 #
 # Translators:
 # Rajnikant Kumbhar <rajnikant.kumbhar@gmail.com>, 2012
+# Suraj Kawade <suraj.kawade@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2013-05-28 11:42+0200\n"
-"PO-Revision-Date: 2013-05-04 07:53+0000\n"
-"Last-Translator: Christoph Miebach <christoph.miebach@web.de>\n"
+"POT-Creation-Date: 2013-06-06 17:40+0200\n"
+"PO-Revision-Date: 2013-06-17 13:14+0000\n"
+"Last-Translator: suraj.kawade\n"
 "Language-Team: Marathi (http://www.transifex.com/projects/p/vlc-trans/"
 "language/mr/)\n"
 "Language: mr\n"
@@ -27,9 +28,9 @@ msgid ""
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
 "हा प्रोग्राम ठरवलेल्या कायद्यानुसार कोणत्याही हमीशिवाय येतो.\n"
-"तुम्ही हा प्रोग्राम GNU General Public License नियमानुसार पुनः प्रसारित करू शकता.\n"
-"अधिक माहितीसाठी तुम्ही COPYING नावाची फाईल पाहू शकता.\n"
-"प्रोग्राम VideoLAN team ने बनवला आहे;त्यासाठी AUTHORS हि फाईल पाहू शकता.\n"
+"तुम्ही हा प्रोग्राम GNU General Public License नियमानुसार पुनः प्रसारित करू शकता;\n"
+"अधिक माहितीसाठी COPYING नावाची फाईल पहा.\n"
+"प्रोग्राम VideoLAN team ने बनवला आहे; त्यासाठी AUTHORS ही फाईल पहा.\n"
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
@@ -86,20 +87,20 @@ msgstr "हॉट-कि सेटिंग"
 #: share/lua/http/dialogs/create_stream.html:150
 #: modules/gui/qt4/ui/profiles.h:705 modules/gui/qt4/ui/profiles.h:736
 msgid "Audio"
-msgstr "संगीत"
+msgstr "ध्वनि"
 
 #: include/vlc_config_cat.h:54
 msgid "Audio settings"
-msgstr "संगीत सेटिंग"
+msgstr "ध्वनि सेटिंग"
 
 #: include/vlc_config_cat.h:56
 msgid "General audio settings"
-msgstr "सामान्य संगीत सेटिंग"
+msgstr "सामान्य ध्वनि सेटिंग"
 
 #: include/vlc_config_cat.h:58 include/vlc_config_cat.h:80
 #: modules/gui/qt4/ui/profiles.h:734 modules/gui/qt4/ui/profiles.h:744
 msgid "Filters"
-msgstr "निवड"
+msgstr "फिल्टर"
 
 #: include/vlc_config_cat.h:59
 msgid "Audio filters are used to process the audio stream."
@@ -113,7 +114,7 @@ msgstr "चित्ररचना"
 #: include/vlc_config_cat.h:62 src/audio_output/output.c:284
 #: src/libvlc-module.c:197
 msgid "Audio visualizations"
-msgstr "संगीत चित्ररचना"
+msgstr "ध्वनि चित्ररचना"
 
 #: include/vlc_config_cat.h:64 include/vlc_config_cat.h:76
 msgid "Output modules"
@@ -131,7 +132,7 @@ msgstr "संकीर्ण"
 
 #: include/vlc_config_cat.h:68
 msgid "Miscellaneous audio settings and modules."
-msgstr "संकीर्ण संगीत सेटिंग व साधने"
+msgstr "संकीर्ण ध्वनि सेटिंग व साधने"
 
 #: include/vlc_config_cat.h:71 src/input/es_out.c:2853 src/input/es_out.c:2935
 #: src/libvlc-module.c:1510 modules/access/imem.c:64
@@ -147,15 +148,15 @@ msgstr "संकीर्ण संगीत सेटिंग व साध�
 #: modules/gui/qt4/ui/profiles.h:706 modules/gui/qt4/ui/profiles.h:710
 #: modules/gui/qt4/ui/sprefs_video.h:354
 msgid "Video"
-msgstr "चित्रफित"
+msgstr "चित्रफीत"
 
 #: include/vlc_config_cat.h:72
 msgid "Video settings"
-msgstr "चित्रफित सेटिंग "
+msgstr "चित्रफीत सेटिंग "
 
 #: include/vlc_config_cat.h:74
 msgid "General video settings"
-msgstr "सामान्य चित्रफित सेटिंग "
+msgstr "सामान्य चित्रफीत सेटिंग "
 
 #: include/vlc_config_cat.h:78
 msgid "Choose your preferred video output and configure it here."
@@ -167,7 +168,7 @@ msgstr "चित्रफित निवड चित्रफित स्ट
 
 #: include/vlc_config_cat.h:84
 msgid "Subtitles / OSD"
-msgstr ""
+msgstr "उपशीर्षक / OSD"
 
 #: include/vlc_config_cat.h:85
 msgid ""
@@ -212,7 +213,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:111
 msgid "Video codecs"
-msgstr "चित्रफित कोडेक"
+msgstr "चित्रफीत कोडेक"
 
 #: include/vlc_config_cat.h:112
 msgid "Settings for the video, images or video+audio decoders and encoders."
@@ -228,7 +229,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:117
 msgid "Subtitle codecs"
-msgstr ""
+msgstr "उपशीर्षक कोडेक"
 
 #: include/vlc_config_cat.h:118
 msgid "Settings for subtitle, teletext and CC decoders and encoders."
@@ -663,7 +664,7 @@ msgstr "उलट स्टेरिओ"
 #: modules/access/v4l2/v4l2.c:137
 #: modules/gui/qt4/components/open_panels.cpp:970
 msgid "Automatic"
-msgstr ""
+msgstr "swayamch"
 
 #: src/config/file.c:458
 msgid "boolean"
@@ -724,11 +725,11 @@ msgstr ""
 
 #: src/config/help.c:514
 msgid " (default enabled)"
-msgstr ""
+msgstr "(डिफॉल्ट सक्षम)"
 
 #: src/config/help.c:515
 msgid " (default disabled)"
-msgstr ""
+msgstr "(डिफॉल्ट aक्षम)"
 
 #: src/config/help.c:680 src/config/help.c:683 src/config/help.c:690
 #: src/config/help.c:692
@@ -784,43 +785,43 @@ msgstr ""
 
 #: src/config/keys.c:56
 msgid "Backspace"
-msgstr ""
+msgstr "बकस्पेस"
 
 #: src/config/keys.c:57
 msgid "Brightness Down"
-msgstr ""
+msgstr "तेजस्वीपणा कमी"
 
 #: src/config/keys.c:58
 msgid "Brightness Up"
-msgstr ""
+msgstr "तेजस्वीपणा अधिक"
 
 #: src/config/keys.c:59
 msgid "Browser Back"
-msgstr ""
+msgstr "ब्राउसर बॅक"
 
 #: src/config/keys.c:60
 msgid "Browser Favorites"
-msgstr ""
+msgstr "ब्राउसर fevr"
 
 #: src/config/keys.c:61
 msgid "Browser Forward"
-msgstr ""
+msgstr "ब्राउसर फॉरवर्ड"
 
 #: src/config/keys.c:62
 msgid "Browser Home"
-msgstr ""
+msgstr "ब्राउसर मुखपृष्ठ"
 
 #: src/config/keys.c:63
 msgid "Browser Refresh"
-msgstr ""
+msgstr "ब्राउसर rifr"
 
 #: src/config/keys.c:64
 msgid "Browser Search"
-msgstr ""
+msgstr "ब्राउसर शोध"
 
 #: src/config/keys.c:65
 msgid "Browser Stop"
-msgstr ""
+msgstr "ब्राउसर स्टॉप"
 
 #: src/config/keys.c:66 modules/gui/macosx/playlist.m:499
 #: modules/gui/qt4/dialogs/bookmarks.cpp:50
@@ -831,7 +832,7 @@ msgstr "काढून टाका"
 
 #: src/config/keys.c:67
 msgid "Down"
-msgstr ""
+msgstr "खाली"
 
 #: src/config/keys.c:68 modules/control/rc.c:74
 msgid "End"
@@ -839,83 +840,83 @@ msgstr "शेवट"
 
 #: src/config/keys.c:69
 msgid "Enter"
-msgstr ""
+msgstr "Enter"
 
 #: src/config/keys.c:70
 msgid "Esc"
-msgstr ""
+msgstr "Esc"
 
 #: src/config/keys.c:71
 msgid "F1"
-msgstr ""
+msgstr "F1"
 
 #: src/config/keys.c:72
 msgid "F10"
-msgstr ""
+msgstr "F10"
 
 #: src/config/keys.c:73
 msgid "F11"
-msgstr ""
+msgstr "F11"
 
 #: src/config/keys.c:74
 msgid "F12"
-msgstr ""
+msgstr "F12"
 
 #: src/config/keys.c:75
 msgid "F2"
-msgstr ""
+msgstr "F2"
 
 #: src/config/keys.c:76
 msgid "F3"
-msgstr ""
+msgstr "F3"
 
 #: src/config/keys.c:77
 msgid "F4"
-msgstr ""
+msgstr "F4"
 
 #: src/config/keys.c:78
 msgid "F5"
-msgstr ""
+msgstr "F5"
 
 #: src/config/keys.c:79
 msgid "F6"
-msgstr ""
+msgstr "F6"
 
 #: src/config/keys.c:80
 msgid "F7"
-msgstr ""
+msgstr "F7"
 
 #: src/config/keys.c:81
 msgid "F8"
-msgstr ""
+msgstr "F8"
 
 #: src/config/keys.c:82
 msgid "F9"
-msgstr ""
+msgstr "F9"
 
 #: src/config/keys.c:83
 msgid "Home"
-msgstr ""
+msgstr "mukhp"
 
 #: src/config/keys.c:84
 msgid "Insert"
-msgstr ""
+msgstr "प्रविष्ट करा"
 
 #: src/config/keys.c:86
 msgid "Media Angle"
-msgstr ""
+msgstr "मीडिया कोन"
 
 #: src/config/keys.c:87
 msgid "Media Audio Track"
-msgstr ""
+msgstr "मीडिया ध्वनि ट्रॅक"
 
 #: src/config/keys.c:88
 msgid "Media Forward"
-msgstr ""
+msgstr "मीडिया फरवर्ड"
 
 #: src/config/keys.c:89
 msgid "Media Menu"
-msgstr ""
+msgstr "मीडिया मेनू"
 
 #: src/config/keys.c:90
 msgid "Media Next Frame"
@@ -927,51 +928,51 @@ msgstr ""
 
 #: src/config/keys.c:92
 msgid "Media Play Pause"
-msgstr ""
+msgstr "मीडिया प्ले विराम"
 
 #: src/config/keys.c:93
 msgid "Media Prev Frame"
-msgstr ""
+msgstr "मीडिया मागील फ्रेम"
 
 #: src/config/keys.c:94
 msgid "Media Prev Track"
-msgstr ""
+msgstr "मीडिया मागील ट्रॅक"
 
 #: src/config/keys.c:95
 msgid "Media Record"
-msgstr ""
+msgstr "मीडिया रेकॉर्ड"
 
 #: src/config/keys.c:96
 msgid "Media Repeat"
-msgstr ""
+msgstr "मीडिया रिपीट"
 
 #: src/config/keys.c:97
 msgid "Media Rewind"
-msgstr ""
+msgstr "मीडिया रीवाइंड"
 
 #: src/config/keys.c:98
 msgid "Media Select"
-msgstr ""
+msgstr "मीडिया निवड"
 
 #: src/config/keys.c:99
 msgid "Media Shuffle"
-msgstr ""
+msgstr "मीडिया शफल"
 
 #: src/config/keys.c:100
 msgid "Media Stop"
-msgstr ""
+msgstr "मीडिया थांबवा"
 
 #: src/config/keys.c:101
 msgid "Media Subtitle"
-msgstr ""
+msgstr "मीडिया उपशीर्षक"
 
 #: src/config/keys.c:102
 msgid "Media Time"
-msgstr ""
+msgstr "मीडिया वेळ"
 
 #: src/config/keys.c:103
 msgid "Media View"
-msgstr ""
+msgstr "मीडिया व्हू"
 
 #: src/config/keys.c:104 modules/gui/qt4/components/controller.cpp:541
 msgid "Menu"
@@ -979,35 +980,35 @@ msgstr "मेनू"
 
 #: src/config/keys.c:105
 msgid "Mouse Wheel Down"
-msgstr ""
+msgstr "माउस चाक खाली"
 
 #: src/config/keys.c:106
 msgid "Mouse Wheel Left"
-msgstr ""
+msgstr "माउस चाक डावीकडे"
 
 #: src/config/keys.c:107
 msgid "Mouse Wheel Right"
-msgstr ""
+msgstr "माउस चाक उजवीकडे"
 
 #: src/config/keys.c:108
 msgid "Mouse Wheel Up"
-msgstr ""
+msgstr "माउस चाक वर"
 
 #: src/config/keys.c:109
 msgid "Page Down"
-msgstr ""
+msgstr "Page Down"
 
 #: src/config/keys.c:110
 msgid "Page Up"
-msgstr ""
+msgstr "Page Up"
 
 #: src/config/keys.c:112 modules/demux/mp4/id3genres.h:76
 msgid "Space"
-msgstr ""
+msgstr "Space"
 
 #: src/config/keys.c:113
 msgid "Tab"
-msgstr ""
+msgstr "Tab"
 
 #: src/config/keys.c:114 src/libvlc-module.c:187
 #: modules/gui/qt4/components/preferences_widgets.cpp:1425
@@ -1017,7 +1018,7 @@ msgstr "मूलस्वरूप"
 
 #: src/config/keys.c:115
 msgid "Up"
-msgstr ""
+msgstr "Up"
 
 #: src/config/keys.c:116 modules/gui/macosx/MainMenu.m:468
 msgid "Volume Down"
@@ -1025,7 +1026,7 @@ msgstr "आवाज कमी"
 
 #: src/config/keys.c:117
 msgid "Volume Mute"
-msgstr ""
+msgstr "आवाज बंद"
 
 #: src/config/keys.c:118 modules/gui/macosx/MainMenu.m:467
 msgid "Volume Up"
@@ -1033,31 +1034,31 @@ msgstr "आवाज जास्त"
 
 #: src/config/keys.c:119
 msgid "Zoom In"
-msgstr ""
+msgstr "आत झूम"
 
 #: src/config/keys.c:120
 msgid "Zoom Out"
-msgstr ""
+msgstr "बाहेर झूम"
 
 #: src/config/keys.c:248
 msgid "Ctrl+"
-msgstr ""
+msgstr "Ctrl+"
 
 #: src/config/keys.c:249
 msgid "Alt+"
-msgstr ""
+msgstr "Alt+"
 
 #: src/config/keys.c:250
 msgid "Shift+"
-msgstr ""
+msgstr "Shift+"
 
 #: src/config/keys.c:251
 msgid "Meta+"
-msgstr ""
+msgstr "Meta+"
 
 #: src/config/keys.c:252
 msgid "Command+"
-msgstr ""
+msgstr "Command+"
 
 #: src/input/control.c:226
 #, c-format
@@ -1066,16 +1067,16 @@ msgstr "बुकमार्क %i"
 
 #: src/input/decoder.c:267
 msgid "packetizer"
-msgstr ""
+msgstr "पकेटाइझर "
 
 #: src/input/decoder.c:267
 msgid "decoder"
-msgstr ""
+msgstr "डिकोडर"
 
 #: src/input/decoder.c:276 src/input/decoder.c:467
 #: modules/codec/avcodec/encoder.c:248 modules/codec/avcodec/encoder.c:256
-#: modules/codec/avcodec/encoder.c:290 modules/codec/avcodec/encoder.c:750
-#: modules/codec/avcodec/encoder.c:803 modules/stream_out/es.c:362
+#: modules/codec/avcodec/encoder.c:290 modules/codec/avcodec/encoder.c:763
+#: modules/codec/avcodec/encoder.c:816 modules/stream_out/es.c:362
 #: modules/stream_out/es.c:377
 msgid "Streaming / Transcoding failed"
 msgstr ""
@@ -2800,7 +2801,7 @@ msgstr ""
 
 #: src/libvlc-module.c:792
 msgid "HTTP server address"
-msgstr ""
+msgstr "HTTP सर्वर पत्ता"
 
 #: src/libvlc-module.c:794
 msgid ""
@@ -2811,7 +2812,7 @@ msgstr ""
 
 #: src/libvlc-module.c:798
 msgid "RTSP server address"
-msgstr ""
+msgstr "RTSP सर्वर पत्ता"
 
 #: src/libvlc-module.c:800
 msgid ""
@@ -2824,7 +2825,7 @@ msgstr ""
 
 #: src/libvlc-module.c:806
 msgid "HTTP server port"
-msgstr ""
+msgstr " HTTP सर्वर पोर्ट"
 
 #: src/libvlc-module.c:808
 msgid ""
@@ -2835,7 +2836,7 @@ msgstr ""
 
 #: src/libvlc-module.c:813
 msgid "HTTPS server port"
-msgstr ""
+msgstr "HTTPS सर्वर पोर्ट"
 
 #: src/libvlc-module.c:815
 msgid ""
@@ -2846,7 +2847,7 @@ msgstr ""
 
 #: src/libvlc-module.c:820
 msgid "RTSP server port"
-msgstr ""
+msgstr "RTSP सर्वर पोर्ट"
 
 #: src/libvlc-module.c:822
 msgid ""
@@ -2857,7 +2858,7 @@ msgstr ""
 
 #: src/libvlc-module.c:827
 msgid "HTTP/TLS server certificate"
-msgstr ""
+msgstr "HTTP/TLS सर्वर प्रमाणपत्र"
 
 #: src/libvlc-module.c:829
 msgid "This X.509 certicate file (PEM format) is used for server-side TLS."
@@ -2865,7 +2866,7 @@ msgstr ""
 
 #: src/libvlc-module.c:831
 msgid "HTTP/TLS server private key"
-msgstr ""
+msgstr "HTTP/TLS सर्वर निजी ki"
 
 #: src/libvlc-module.c:833
 msgid "This private key file (PEM format) is used for server-side TLS."
@@ -2893,7 +2894,7 @@ msgstr ""
 
 #: src/libvlc-module.c:845
 msgid "SOCKS server"
-msgstr ""
+msgstr "SOCKS सर्वर"
 
 #: src/libvlc-module.c:847
 msgid ""
@@ -2935,7 +2936,7 @@ msgstr ""
 
 #: src/libvlc-module.c:866
 msgid "Artist metadata"
-msgstr ""
+msgstr "कलाकार मेटाडेta"
 
 #: src/libvlc-module.c:868
 msgid "Allows you to specify an \"artist\" metadata for an input."
@@ -2943,7 +2944,7 @@ msgstr ""
 
 #: src/libvlc-module.c:870
 msgid "Genre metadata"
-msgstr ""
+msgstr "जॉन्र मेटाडेta"
 
 #: src/libvlc-module.c:872
 msgid "Allows you to specify a \"genre\" metadata for an input."
@@ -2951,7 +2952,7 @@ msgstr ""
 
 #: src/libvlc-module.c:874
 msgid "Copyright metadata"
-msgstr ""
+msgstr "कॉपीराईट मेटाडेटा"
 
 #: src/libvlc-module.c:876
 msgid "Allows you to specify a \"copyright\" metadata for an input."
@@ -2959,7 +2960,7 @@ msgstr ""
 
 #: src/libvlc-module.c:878
 msgid "Description metadata"
-msgstr ""
+msgstr "वर्णन मेटाडेटा"
 
 #: src/libvlc-module.c:880
 msgid "Allows you to specify a \"description\" metadata for an input."
@@ -2967,7 +2968,7 @@ msgstr ""
 
 #: src/libvlc-module.c:882
 msgid "Date metadata"
-msgstr ""
+msgstr "दिनांक मेटाडेटा"
 
 #: src/libvlc-module.c:884
 msgid "Allows you to specify a \"date\" metadata for an input."
@@ -2975,7 +2976,7 @@ msgstr ""
 
 #: src/libvlc-module.c:886
 msgid "URL metadata"
-msgstr ""
+msgstr "URL मेटाडेटा"
 
 #: src/libvlc-module.c:888
 msgid "Allows you to specify a \"url\" metadata for an input."
@@ -3035,7 +3036,7 @@ msgstr ""
 
 #: src/libvlc-module.c:927
 msgid "Display while streaming"
-msgstr ""
+msgstr "स्ट्रीम करताना दाखवा"
 
 #: src/libvlc-module.c:929
 msgid "Play locally the stream while streaming it."
@@ -3043,7 +3044,7 @@ msgstr ""
 
 #: src/libvlc-module.c:931
 msgid "Enable video stream output"
-msgstr ""
+msgstr "चित्रफीत स्ट्रीम आउटपुट सक्षम करा"
 
 #: src/libvlc-module.c:933
 msgid ""
@@ -3053,7 +3054,7 @@ msgstr ""
 
 #: src/libvlc-module.c:936
 msgid "Enable audio stream output"
-msgstr ""
+msgstr "ध्वनि स्ट्रीम आउटपुट सक्षम करा"
 
 #: src/libvlc-module.c:938
 msgid ""
@@ -3063,7 +3064,7 @@ msgstr ""
 
 #: src/libvlc-module.c:941
 msgid "Enable SPU stream output"
-msgstr ""
+msgstr "SPU स्ट्रीम आउटपुट सक्षम करा"
 
 #: src/libvlc-module.c:943
 msgid ""
@@ -3073,7 +3074,7 @@ msgstr ""
 
 #: src/libvlc-module.c:946
 msgid "Keep stream output open"
-msgstr ""
+msgstr "स्ट्रीम आउटपुट उघडे ठेवा"
 
 #: src/libvlc-module.c:948
 msgid ""
@@ -3417,23 +3418,23 @@ msgstr "प्लेलिस्टमध्ये काहीच नसल्�
 
 #: src/libvlc-module.c:1153
 msgid "Play and pause"
-msgstr "प्ले करा व पौझ करा"
+msgstr "प्ले करा आणि विराम घ्या"
 
 #: src/libvlc-module.c:1155
 msgid "Pause each item in the playlist on the last frame."
-msgstr "शेवट फ्रेम आल्यावर प्लेलिस्ट मधील गाणे पौझ करा"
+msgstr "शेवटची फ्रेम आल्यावर प्लेलिस्ट मधील गाण्याला विराम दया"
 
 #: src/libvlc-module.c:1157
 msgid "Auto start"
-msgstr "स्वयंचालक"
+msgstr "स्वयंचलित सुरुवात"
 
 #: src/libvlc-module.c:1158
 msgid "Automatically start playing the playlist content once it's loaded."
-msgstr "प्लेलिस्ट भरल्यावर आपोआप प्ले करा"
+msgstr "प्लेलिस्ट भरल्यावर स्वयंचलितपणे प्ले करा"
 
 #: src/libvlc-module.c:1161
 msgid "Pause on audio communication"
-msgstr ""
+msgstr "ध्वनि संपर्कावेळी विराम घ्या"
 
 #: src/libvlc-module.c:1163
 msgid ""
@@ -3443,17 +3444,17 @@ msgstr ""
 
 #: src/libvlc-module.c:1166
 msgid "Use media library"
-msgstr "मेडिया ग्रंथालय वापरा"
+msgstr "मीडिया लाइब्रेरी वापरा"
 
 #: src/libvlc-module.c:1168
 msgid ""
 "The media library is automatically saved and reloaded each time you start "
 "VLC."
-msgstr "मेडिया ग्रंथालय आपोआप जतन केले जाते व  VLC सुरु होताच पुन्हा भरले जाते."
+msgstr "मीडिया लाइब्रेरी आपोआप जतन केली जाते व VLC सुरु होताच पुन्हा भरले जाते."
 
 #: src/libvlc-module.c:1171
 msgid "Load Media Library"
-msgstr "मेडिया ग्रंथालय भरा"
+msgstr "मीडिया लाइब्रेरी भरा"
 
 #: src/libvlc-module.c:1173
 msgid "Enable this option to load the SQL-based Media Library at VLC startup"
@@ -3510,7 +3511,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1205
 msgid "Exit fullscreen"
-msgstr ""
+msgstr "फुलस्क्रीनच्या बाहेर या"
 
 #: src/libvlc-module.c:1206
 msgid "Select the hotkey to use to exit fullscreen state."
@@ -3519,7 +3520,7 @@ msgstr ""
 #: src/libvlc-module.c:1207 modules/gui/macosx/ControlsBar.m:52
 #: modules/gui/macosx/fspanel.m:410
 msgid "Play/Pause"
-msgstr "प्ले / पौज"
+msgstr "प्ले / विराम "
 
 #: src/libvlc-module.c:1208
 msgid "Select the hotkey to use to swap paused state."
@@ -3527,11 +3528,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1209
 msgid "Pause only"
-msgstr "फक्त पौज"
+msgstr "फक्त विराम"
 
 #: src/libvlc-module.c:1210
 msgid "Select the hotkey to use to pause."
-msgstr "पौझ करण्यासाठी हॉट-कि वापरा."
+msgstr "विराम घेण्यासाठी हॉट-की निवडा."
 
 #: src/libvlc-module.c:1211
 msgid "Play only"
@@ -3549,7 +3550,7 @@ msgstr "जलद "
 
 #: src/libvlc-module.c:1214 src/libvlc-module.c:1220
 msgid "Select the hotkey to use for fast forward playback."
-msgstr "जलद पुढे जाण्यासाठी हॉट-कि चा वापर करा."
+msgstr "जलद पुढे जाण्यासाठी हॉट-की चा वापर करा."
 
 #: src/libvlc-module.c:1215 modules/gui/macosx/MainMenu.m:355
 #: modules/gui/qt4/components/controller.hpp:116
@@ -4527,18 +4528,18 @@ msgstr "अद्ययावन डाउनलोड झाले आहे.�
 
 #: src/misc/update.c:712
 msgid "Install"
-msgstr "प्रतिष्ठापन करा"
+msgstr "प्रतिष्ठाpit करा"
 
 #: src/playlist/engine.c:269 src/playlist/loadsave.c:152 lib/media_list.c:252
 #: modules/gui/macosx/MainWindow.m:222
 #: modules/gui/qt4/components/playlist/selector.cpp:238
 msgid "Media Library"
-msgstr "मेडिया ग्रंथालय"
+msgstr "मीडिया लाइब्रेरी"
 
 #: src/playlist/tree.c:67 modules/access/dtv/access.c:75
 #: modules/access/v4l2/v4l2.c:242
 msgid "Undefined"
-msgstr "ठरवले नाही"
+msgstr "अपरिभाषित"
 
 #: src/text/iso-639_def.h:40
 msgid "Afar"
@@ -4798,7 +4799,7 @@ msgstr "Japanese"
 
 #: src/text/iso-639_def.h:104
 msgid "Greenlandic, Kalaallisut"
-msgstr ""
+msgstr "Greenlandic, Kalaallisut"
 
 #: src/text/iso-639_def.h:105
 msgid "Kannada"
@@ -4950,7 +4951,7 @@ msgstr "Chichewa; Nyanja"
 
 #: src/text/iso-639_def.h:142
 msgid "Occitan; Provençal"
-msgstr ""
+msgstr "Occitan; Provençal"
 
 #: src/text/iso-639_def.h:143
 msgid "Oriya"
@@ -5230,55 +5231,55 @@ msgstr ""
 
 #: modules/access/alsa.c:49
 msgid "192000 Hz"
-msgstr ""
+msgstr "192000 Hz"
 
 #: modules/access/alsa.c:49
 msgid "176400 Hz"
-msgstr ""
+msgstr "176400 Hz"
 
 #: modules/access/alsa.c:50
 msgid "96000 Hz"
-msgstr ""
+msgstr "96000 Hz"
 
 #: modules/access/alsa.c:50
 msgid "88200 Hz"
-msgstr ""
+msgstr "88200 Hz"
 
 #: modules/access/alsa.c:50
 msgid "48000 Hz"
-msgstr ""
+msgstr "48000 Hz"
 
 #: modules/access/alsa.c:50
 msgid "44100 Hz"
-msgstr ""
+msgstr "44100 Hz"
 
 #: modules/access/alsa.c:51
 msgid "32000 Hz"
-msgstr ""
+msgstr "32000 Hz"
 
 #: modules/access/alsa.c:51
 msgid "22050 Hz"
-msgstr ""
+msgstr "22050 Hz"
 
 #: modules/access/alsa.c:51
 msgid "24000 Hz"
-msgstr ""
+msgstr "24000 Hz"
 
 #: modules/access/alsa.c:51
 msgid "16000 Hz"
-msgstr ""
+msgstr "16000 Hz"
 
 #: modules/access/alsa.c:52
 msgid "11025 Hz"
-msgstr ""
+msgstr "11025 Hz"
 
 #: modules/access/alsa.c:52
 msgid "8000 Hz"
-msgstr ""
+msgstr "8000 Hz"
 
 #: modules/access/alsa.c:52
 msgid "4000 Hz"
-msgstr ""
+msgstr "4000 Hz"
 
 #: modules/access/alsa.c:56
 msgid "ALSA"
@@ -5286,7 +5287,7 @@ msgstr "ALSA"
 
 #: modules/access/alsa.c:57
 msgid "ALSA audio capture"
-msgstr ""
+msgstr "ALSA ध्वनि kapchar"
 
 #: modules/access/attachment.c:44
 msgid "Attachment"
@@ -5384,11 +5385,11 @@ msgstr ""
 #: modules/access/cdda.c:62 modules/gui/macosx/open.m:160
 #: modules/gui/qt4/ui/open_disk.h:301
 msgid "Audio CD"
-msgstr "संगीत CD"
+msgstr "ध्वनि CD"
 
 #: modules/access/cdda.c:63
 msgid "Audio CD input"
-msgstr "संगीत CD आदान"
+msgstr "धनि CD आदान"
 
 #: modules/access/cdda.c:69
 msgid "[cdda:][device][@[track]]"
@@ -5396,28 +5397,28 @@ msgstr "[cdda:][साधन][@[गाणे]]"
 
 #: modules/access/cdda.c:78
 msgid "CDDB Server"
-msgstr ""
+msgstr "CDDB सर्वर"
 
 #: modules/access/cdda.c:79
 msgid "Address of the CDDB server to use."
-msgstr ""
+msgstr "वापरण्यासाठी CDDB सर्वरचा पत्ता"
 
 #: modules/access/cdda.c:80
 msgid "CDDB port"
-msgstr ""
+msgstr " CDDB पोर्ट"
 
 #: modules/access/cdda.c:81
 msgid "CDDB Server port to use."
-msgstr ""
+msgstr "वापरण्यासाठी CDDB सर्वरचा पोर्ट."
 
 #: modules/access/cdda.c:491
 #, c-format
 msgid "Audio CD - Track %02i"
-msgstr ""
+msgstr "ध्वनि CD - ट्रॅक %02i"
 
 #: modules/access/dc1394.c:51
 msgid "DC1394"
-msgstr ""
+msgstr "DC1394"
 
 #: modules/access/dc1394.c:52
 msgid "IIDC Digital Camera (FireWire) input"
@@ -5626,7 +5627,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:155
 msgid "Device properties"
-msgstr ""
+msgstr "साधन गुणधर्म"
 
 #: modules/access/dshow/dshow.cpp:157
 msgid ""
@@ -5635,7 +5636,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:159
 msgid "Tuner properties"
-msgstr ""
+msgstr "ट्यूनर गुणधर्म"
 
 #: modules/access/dshow/dshow.cpp:161
 msgid "Show the tuner properties [channel selection] page."
@@ -5643,7 +5644,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:162
 msgid "Tuner TV Channel"
-msgstr ""
+msgstr "ट्यूनर TV चॅनल "
 
 #: modules/access/dshow/dshow.cpp:164
 msgid "Set the TV channel the tuner will set to (0 means default)."
@@ -5651,7 +5652,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:166
 msgid "Tuner Frequency"
-msgstr ""
+msgstr "ट्यूनर frikwe"
 
 #: modules/access/dshow/dshow.cpp:167
 msgid "This overrides the channel. Measured in Hz."
@@ -5695,37 +5696,39 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:182
 msgid "Audio input pin"
-msgstr ""
+msgstr "ध्वनि इनपुट पिन"
 
 #: modules/access/dshow/dshow.cpp:184
 msgid "Select the audio input source. See the \"video input\" option."
-msgstr ""
+msgstr "ध्वनि इनपुट स्रोत निवडा. \"चित्रफीत इनपुट\" पर्याय पहा."
 
 #: modules/access/dshow/dshow.cpp:185
 msgid "Video output pin"
-msgstr ""
+msgstr "चित्रफीत इनपुट पिन"
 
 #: modules/access/dshow/dshow.cpp:187
 msgid "Select the video output type. See the \"video input\" option."
-msgstr ""
+msgstr "चित्रफीत आउटपुट प्रकार निवडा. \"चित्रफीत इनपुट\" पर्याय पहा."
 
 #: modules/access/dshow/dshow.cpp:188
 msgid "Audio output pin"
-msgstr ""
+msgstr "ध्वनि आउटपुट पिन"
 
 #: modules/access/dshow/dshow.cpp:190
 msgid "Select the audio output type. See the \"video input\" option."
-msgstr ""
+msgstr "ध्वनि आउटपुट प्रकार निवडा. \"चित्रफीत इनपुट\" पर्याय पहा."
 
 #: modules/access/dshow/dshow.cpp:192
 msgid "AM Tuner mode"
-msgstr ""
+msgstr "AM ट्यूनर मोड"
 
 #: modules/access/dshow/dshow.cpp:194
 msgid ""
 "AM Tuner mode. Can be one of Default (0), TV (1),AM Radio (2), FM Radio (3) "
 "or DSS (4)."
 msgstr ""
+"AM ट्यूनर मोड. Default (0), TV (1),AM Radio (2), FM Radio (3) or DSS (4) यांपैकी "
+"एक असू शकतो."
 
 #: modules/access/dshow/dshow.cpp:199
 msgid ""
@@ -5752,15 +5755,15 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:219
 msgid "DirectShow"
-msgstr ""
+msgstr "DirectShow"
 
 #: modules/access/dshow/dshow.cpp:220 modules/access/dshow/dshow.cpp:300
 msgid "DirectShow input"
-msgstr ""
+msgstr "DirectShow इनपुट"
 
 #: modules/access/dshow/dshow.cpp:226 modules/access/dshow/dshow.cpp:230
 msgid "Configure"
-msgstr ""
+msgstr "कॉन्फिगर करा"
 
 #: modules/access/dshow/dshow.cpp:527 modules/access/dshow/dshow.cpp:601
 #: modules/access/dshow/dshow.cpp:1048 modules/access/dshow/dshow.cpp:1101
@@ -5817,7 +5820,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:50
 msgid "Network name"
-msgstr ""
+msgstr "नेटवर्कचे NAV"
 
 #: modules/access/dtv/access.c:51
 msgid "Unique network name in the System Tuning Spaces"
@@ -5825,7 +5828,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:53
 msgid "Network name to create"
-msgstr ""
+msgstr "तयार करण्यासाठी नेटवर्कचे NAV"
 
 #: modules/access/dtv/access.c:54
 msgid "Create unique name in the System Tuning Spaces"
@@ -5833,7 +5836,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:56
 msgid "Frequency (Hz)"
-msgstr ""
+msgstr "फ्रिक्वेन्सी (Hz)"
 
 #: modules/access/dtv/access.c:58
 msgid ""
@@ -5867,7 +5870,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:81
 msgid "Symbol rate (bauds)"
-msgstr ""
+msgstr "सिम्बॉल दर (bauds)"
 
 #: modules/access/dtv/access.c:83
 msgid ""
@@ -5919,7 +5922,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:119
 msgid "Bandwidth (MHz)"
-msgstr ""
+msgstr "बँडविड्थ (MHz)"
 
 #: modules/access/dtv/access.c:124
 msgid "10 MHz"
@@ -6219,11 +6222,11 @@ msgstr "DV"
 
 #: modules/access/dvdnav.c:72 modules/access/dvdread.c:70
 msgid "DVD angle"
-msgstr ""
+msgstr "DVD कोन"
 
 #: modules/access/dvdnav.c:74 modules/access/dvdread.c:72
 msgid "Default DVD angle."
-msgstr ""
+msgstr "डिफॉल्ट DVD कोन"
 
 #: modules/access/dvdnav.c:76
 msgid "Start directly in menu"
@@ -6363,7 +6366,7 @@ msgstr ""
 
 #: modules/access/fs.c:62
 msgid "File input"
-msgstr ""
+msgstr "फाईल इनपुट"
 
 #: modules/access/fs.c:63 modules/access_output/file.c:79
 #: modules/audio_output/file.c:110 modules/gui/macosx/open.m:128
@@ -6375,76 +6378,76 @@ msgstr ""
 #: share/lua/http/dialogs/stream_config_window.html:36
 #: share/lua/http/dialogs/stream_window.html:95
 msgid "File"
-msgstr ""
+msgstr "फाईल"
 
 #: modules/access/fs.c:72 modules/gui/qt4/ui/sprefs_video.h:360
 msgid "Directory"
-msgstr ""
+msgstr "निर्देशिका"
 
 #: modules/access/ftp.c:58
 msgid "FTP user name"
-msgstr ""
+msgstr "FTP युजरनेम"
 
 #: modules/access/ftp.c:59 modules/access/smb.c:57
 msgid "User name that will be used for the connection."
-msgstr ""
+msgstr "युजरनेम जे कनेक्शनसाठी वापरले जाईल."
 
 #: modules/access/ftp.c:61
 msgid "FTP password"
-msgstr ""
+msgstr "FTP पासवर्ड"
 
 #: modules/access/ftp.c:62 modules/access/smb.c:60
 msgid "Password that will be used for the connection."
-msgstr ""
+msgstr "पासवर्ड जो कनेक्शनसाठी वापरला जाईल."
 
 #: modules/access/ftp.c:64
 msgid "FTP account"
-msgstr ""
+msgstr "FTP खाते"
 
 #: modules/access/ftp.c:65
 msgid "Account that will be used for the connection."
-msgstr ""
+msgstr "खाते जे कनेक्शनसाठी वापरले जाईल."
 
 #: modules/access/ftp.c:70
 msgid "FTP input"
-msgstr ""
+msgstr "FTP इनपुट"
 
 #: modules/access/ftp.c:85
 msgid "FTP upload output"
-msgstr ""
+msgstr "FTP अपलोड आउटपुट"
 
 #: modules/access/ftp.c:246 modules/access/ftp.c:256 modules/access/ftp.c:321
 #: modules/access/ftp.c:330 modules/access/ftp.c:337
 msgid "Network interaction failed"
-msgstr ""
+msgstr "नेटवर्क इंटेरक्शन अपयशी"
 
 #: modules/access/ftp.c:247
 msgid "VLC could not connect with the given server."
-msgstr ""
+msgstr "VLC दिलेल्या सर्वर सोबत कनेक्ट होऊ शकले नाही."
 
 #: modules/access/ftp.c:257
 msgid "VLC's connection to the given server was rejected."
-msgstr ""
+msgstr "VLC चे दिलेल्या सर्वरशी कनेक्शन नाकारले गेले."
 
 #: modules/access/ftp.c:322
 msgid "Your account was rejected."
-msgstr ""
+msgstr "तुमचे खाते नाकारले गेले."
 
 #: modules/access/ftp.c:331
 msgid "Your password was rejected."
-msgstr ""
+msgstr "तुमचा पासवर्ड नाकारला गेला."
 
 #: modules/access/ftp.c:338
 msgid "Your connection attempt to the server was rejected."
-msgstr ""
+msgstr "तुमचा सर्वरशी कनेक्शन करण्याचा प्रयत्न नाकारला गेला."
 
 #: modules/access/gnomevfs.c:47
 msgid "GnomeVFS input"
-msgstr ""
+msgstr "GnomeVFS इनपुट"
 
 #: modules/access/http.c:64 modules/access/mms/mms.c:58
 msgid "HTTP proxy"
-msgstr ""
+msgstr "HTTP प्रॉक्सी"
 
 #: modules/access/http.c:66
 msgid ""
@@ -6454,7 +6457,7 @@ msgstr ""
 
 #: modules/access/http.c:70
 msgid "HTTP proxy password"
-msgstr ""
+msgstr "HTTP प्रॉक्सी पासवर्ड"
 
 #: modules/access/http.c:72
 msgid "If your HTTP proxy requires a password, set it here."
@@ -6566,7 +6569,7 @@ msgstr "अनामिक"
 
 #: modules/access/imem.c:64
 msgid "Data"
-msgstr ""
+msgstr "डेटा"
 
 #: modules/access/imem.c:69
 msgid "Set the codec of the elementary stream"
@@ -6596,7 +6599,7 @@ msgstr ""
 #: share/lua/http/dialogs/mosaic_window.html:108
 #: modules/gui/qt4/ui/profiles.h:727
 msgid "Width"
-msgstr ""
+msgstr "रुंदी"
 
 #: modules/access/imem.c:84
 msgid "Width of video or subtitle elementary streams"
@@ -6608,7 +6611,7 @@ msgstr ""
 #: share/lua/http/dialogs/mosaic_window.html:126
 #: modules/gui/qt4/ui/profiles.h:730
 msgid "Height"
-msgstr ""
+msgstr "उंची"
 
 #: modules/access/imem.c:87
 msgid "Height of video or subtitle elementary streams"
@@ -6673,7 +6676,7 @@ msgstr ""
 
 #: modules/access/jack.c:59
 msgid "Pace"
-msgstr ""
+msgstr "गती"
 
 #: modules/access/jack.c:61
 msgid "Read the audio stream at VLC pace rather than Jack pace."
@@ -6698,7 +6701,7 @@ msgstr ""
 #: modules/access/linsys/linsys_hdsdi.c:72
 #: modules/access/linsys/linsys_sdi.c:67
 msgid "Link #"
-msgstr ""
+msgstr "लिंक #"
 
 #: modules/access/linsys/linsys_hdsdi.c:74
 #: modules/access/linsys/linsys_sdi.c:69
@@ -6710,7 +6713,7 @@ msgstr ""
 #: modules/access/linsys/linsys_hdsdi.c:75
 #: modules/access/linsys/linsys_sdi.c:70
 msgid "Video ID"
-msgstr ""
+msgstr "चित्रफीत ID"
 
 #: modules/access/linsys/linsys_hdsdi.c:77
 #: modules/access/linsys/linsys_sdi.c:72
@@ -6759,7 +6762,7 @@ msgstr ""
 
 #: modules/access/linsys/linsys_sdi.c:92
 msgid "SDI Input"
-msgstr ""
+msgstr "SDI आदान"
 
 #: modules/access/linsys/linsys_sdi.c:113
 msgid "SDI Demux"
@@ -6910,7 +6913,7 @@ msgstr ""
 
 #: modules/access/mtp.c:57
 msgid "MTP input"
-msgstr ""
+msgstr "MTP आदान"
 
 #: modules/access/mtp.c:58
 msgid "MTP"
@@ -6946,7 +6949,7 @@ msgstr "OSS"
 
 #: modules/access/oss.c:77
 msgid "OSS input"
-msgstr ""
+msgstr "OSS आदान"
 
 #: modules/access_output/dummy.c:45 modules/stream_out/dummy.c:51
 msgid "Dummy stream output"
@@ -7005,7 +7008,7 @@ msgstr ""
 #: modules/access_output/http.c:51 modules/access/vnc.c:46
 #: modules/misc/audioscrobbler.c:114 modules/stream_out/rtp.c:177
 msgid "Username"
-msgstr "वापरकर्ता"
+msgstr "yujr"
 
 #: modules/access_output/http.c:52 modules/stream_out/rtp.c:178
 msgid "User name that will be requested to access the stream."
@@ -7808,7 +7811,7 @@ msgstr ""
 #: modules/video_filter/atmo/atmo.cpp:263
 #: modules/gui/qt4/ui/video_effects.h:1305
 msgid "Brightness"
-msgstr ""
+msgstr "teja"
 
 #: modules/access/v4l2/v4l2.c:85
 msgid "Picture brightness or black level."
@@ -7816,7 +7819,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:86
 msgid "Automatic brightness"
-msgstr ""
+msgstr "स्वयंचलित tej"
 
 #: modules/access/v4l2/v4l2.c:88
 msgid "Automatically adjust the picture brightness."
@@ -8015,32 +8018,32 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:164
 msgid "Black & white"
-msgstr ""
+msgstr "कृष्णधवल"
 
 #: modules/access/v4l2/v4l2.c:164 modules/gui/macosx/VideoEffects.m:137
 #: modules/video_filter/sepia.c:65 modules/gui/qt4/ui/video_effects.h:1342
 msgid "Sepia"
-msgstr ""
+msgstr "सेपिया"
 
 #: modules/access/v4l2/v4l2.c:164
 msgid "Negative"
-msgstr ""
+msgstr "nige"
 
 #: modules/access/v4l2/v4l2.c:165
 msgid "Emboss"
-msgstr ""
+msgstr "इम्बोस"
 
 #: modules/access/v4l2/v4l2.c:165
 msgid "Sketch"
-msgstr ""
+msgstr "स्केच"
 
 #: modules/access/v4l2/v4l2.c:165
 msgid "Sky blue"
-msgstr ""
+msgstr "आकाशी"
 
 #: modules/access/v4l2/v4l2.c:166
 msgid "Grass green"
-msgstr ""
+msgstr "हिरवा"
 
 #: modules/access/v4l2/v4l2.c:166
 msgid "Skin whiten"
@@ -8053,7 +8056,7 @@ msgstr ""
 #: modules/access/v4l2/v4l2.c:169 modules/audio_output/auhal.c:66
 #: modules/audio_output/directx.c:115 modules/audio_output/waveout.c:146
 msgid "Audio volume"
-msgstr "संगीत आवाज"
+msgstr "ध्वनि आवाज"
 
 #: modules/access/v4l2/v4l2.c:171
 msgid "Volume of the audio input."
@@ -8069,7 +8072,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:175
 msgid "Bass level"
-msgstr "बास पातळी"
+msgstr "बेस पातळी"
 
 #: modules/access/v4l2/v4l2.c:177
 msgid "Bass adjustment of the audio input."
@@ -8093,7 +8096,7 @@ msgstr "मोठा आवाज"
 
 #: modules/access/v4l2/v4l2.c:186
 msgid "Loudness mode a.k.a. bass boost."
-msgstr ""
+msgstr "मोठा आवाज किंवा बेस boost"
 
 #: modules/access/v4l2/v4l2.c:188
 msgid "v4l2 driver controls"
@@ -8119,23 +8122,23 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:247
 msgid "525 lines / 60 Hz"
-msgstr "525 ओळी / 60 हर्ट्स"
+msgstr "525 ओळी / 60 Hz"
 
 #: modules/access/v4l2/v4l2.c:247
 msgid "625 lines / 50 Hz"
-msgstr "625 ओळी / 50 हर्ट्स"
+msgstr "625 ओळी / 50 Hz"
 
 #: modules/access/v4l2/v4l2.c:255
 msgid "PAL N Argentina"
-msgstr ""
+msgstr "PAL N arjent"
 
 #: modules/access/v4l2/v4l2.c:256
 msgid "NTSC M Japan"
-msgstr ""
+msgstr "NTSC M जपान"
 
 #: modules/access/v4l2/v4l2.c:256
 msgid "NTSC M South Korea"
-msgstr ""
+msgstr "NTSC M दक्षिण koriy"
 
 #: modules/access/v4l2/v4l2.c:267 modules/audio_output/alsa.c:76
 msgid "Mono"
@@ -8143,31 +8146,31 @@ msgstr "मोनो"
 
 #: modules/access/v4l2/v4l2.c:269
 msgid "Primary language"
-msgstr ""
+msgstr "प्रमुख भाषा"
 
 #: modules/access/v4l2/v4l2.c:270
 msgid "Secondary language or program"
-msgstr ""
+msgstr "दुय्यम भाषा किंवा प्रोग्राम"
 
 #: modules/access/v4l2/v4l2.c:271 modules/codec/twolame.c:70
 msgid "Dual mono"
-msgstr ""
+msgstr "दुहेरी मोनो"
 
 #: modules/access/v4l2/v4l2.c:275
 msgid "V4L"
-msgstr ""
+msgstr "V4L"
 
 #: modules/access/v4l2/v4l2.c:276
 msgid "Video4Linux input"
-msgstr ""
+msgstr "Video4Linux इनपुट"
 
 #: modules/access/v4l2/v4l2.c:280
 msgid "Video input"
-msgstr "चित्रफीत आदान"
+msgstr "चित्रफीत इनपुट"
 
 #: modules/access/v4l2/v4l2.c:318
 msgid "Tuner"
-msgstr ""
+msgstr "ट्युनर"
 
 #: modules/access/v4l2/v4l2.c:333
 msgid "Controls"
@@ -8191,17 +8194,17 @@ msgstr "VCD"
 
 #: modules/access/vcd/vcd.c:48
 msgid "VCD input"
-msgstr ""
+msgstr "VCD input"
 
 #: modules/access/vcd/vcd.c:54
 msgid "[vcd:][device][#[title][,[chapter]]]"
-msgstr ""
+msgstr "[vcd:][device][#[title][,[chapter]]]"
 
 #: modules/access/vcdx/access.c:272 modules/access/vcdx/access.c:352
 #: modules/access/vcdx/access.c:674 modules/access/vcdx/info.c:229
 #: modules/gui/qt4/components/open_panels.cpp:519
 msgid "Entry"
-msgstr ""
+msgstr "नोंद"
 
 #: modules/access/vcdx/access.c:396 modules/access/vcdx/info.c:74
 msgid "Segments"
@@ -8223,11 +8226,11 @@ msgstr "डिस्क"
 
 #: modules/access/vcdx/info.c:62
 msgid "VCD Format"
-msgstr ""
+msgstr "VCD स्वरूप"
 
 #: modules/access/vcdx/info.c:64 modules/gui/qt4/dialogs/messages.cpp:264
 msgid "Application"
-msgstr ""
+msgstr "anupray"
 
 #: modules/access/vcdx/info.c:65
 msgid "Preparer"
@@ -8249,7 +8252,7 @@ msgstr ""
 #: modules/gui/macosx/fspanel.m:454 modules/gui/qt4/dialogs/toolbar.cpp:362
 #: modules/stream_out/raop.c:150 modules/gui/qt4/ui/sprefs_audio.h:433
 msgid "Volume"
-msgstr "आवाज"
+msgstr "आवाज patali"
 
 #: modules/access/vcdx/info.c:71
 msgid "System Id"
@@ -8257,27 +8260,27 @@ msgstr ""
 
 #: modules/access/vcdx/info.c:73
 msgid "Entries"
-msgstr ""
+msgstr "नोंदी"
 
 #: modules/access/vcdx/info.c:75 modules/gui/qt4/ui/sprefs_audio.h:449
 msgid "Tracks"
-msgstr "गाणी"
+msgstr "ट्रॅक"
 
 #: modules/access/vcdx/info.c:86
 msgid "Audio Channels"
-msgstr "संगीत वाहिनी"
+msgstr "ध्वनि वाहिनी"
 
 #: modules/access/vcdx/info.c:90
 msgid "First Entry Point"
-msgstr "प्रथम प्रवेश बिंदू"
+msgstr "प्रथमिक प्रवेश बिंदू"
 
 #: modules/access/vcdx/info.c:95
 msgid "Last Entry Point"
-msgstr "शेवट प्रवेश बिंदू"
+msgstr "शेवटचा प्रवेश बिंदू"
 
 #: modules/access/vcdx/info.c:96
 msgid "Track size (in sectors)"
-msgstr "गाण्याची लांबी(सेक्टर मध्ये)"
+msgstr "गाण्याची लांबी (सेक्टर मध्ये)"
 
 #: modules/access/vcdx/info.c:106 modules/access/vcdx/info.c:109
 #: modules/access/vcdx/info.c:118 modules/access/vcdx/info.c:130
@@ -8294,7 +8297,7 @@ msgstr "प्लेलिस्ट"
 
 #: modules/access/vcdx/info.c:119
 msgid "extended selection list"
-msgstr ""
+msgstr "विस्तारित निवड यादी"
 
 #: modules/access/vcdx/info.c:119
 msgid "selection list"
@@ -9658,24 +9661,24 @@ msgstr ""
 msgid "Decoding"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.c:153 modules/codec/omxil/omxil.c:87
+#: modules/codec/avcodec/avcodec.c:154 modules/codec/omxil/omxil.c:87
 #: modules/codec/schroedinger.c:370
 msgid "Encoding"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.c:154
+#: modules/codec/avcodec/avcodec.c:155
 msgid "FFmpeg audio/video encoder"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:70
+#: modules/codec/avcodec/avcodec.h:69
 msgid "Direct rendering"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:73
+#: modules/codec/avcodec/avcodec.h:72
 msgid "Error resilience"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:75
+#: modules/codec/avcodec/avcodec.h:74
 msgid ""
 "libavcodec can do error resilience.\n"
 "However, with a buggy encoder (such as the ISO MPEG-4 encoder from M$) this "
@@ -9683,11 +9686,11 @@ msgid ""
 "Valid values range from 0 to 4 (0 disables all errors resilience)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:80
+#: modules/codec/avcodec/avcodec.h:79
 msgid "Workaround bugs"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:82
+#: modules/codec/avcodec/avcodec.h:81
 msgid ""
 "Try to fix some bugs:\n"
 "1  autodetect\n"
@@ -9701,75 +9704,75 @@ msgid ""
 "\"ump4\", enter 40."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:93 modules/codec/avcodec/avcodec.h:204
+#: modules/codec/avcodec/avcodec.h:92 modules/codec/avcodec/avcodec.h:203
 #: modules/demux/rawdv.c:42 modules/stream_out/transcode/transcode.c:139
 msgid "Hurry up"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:95
+#: modules/codec/avcodec/avcodec.h:94
 msgid ""
 "The decoder can partially decode or skip frame(s) when there is not enough "
 "time. It's useful with low CPU power but it can produce distorted pictures."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:99
+#: modules/codec/avcodec/avcodec.h:98
 msgid "Allow speed tricks"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:101
+#: modules/codec/avcodec/avcodec.h:100
 msgid ""
 "Allow non specification compliant speedup tricks. Faster but error-prone."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:103
+#: modules/codec/avcodec/avcodec.h:102
 msgid "Skip frame (default=0)"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:105
+#: modules/codec/avcodec/avcodec.h:104
 msgid ""
 "Force skipping of frames to speed up decoding (-1=None, 0=Default, 1=B-"
 "frames, 2=P-frames, 3=B+P frames, 4=all frames)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:108
+#: modules/codec/avcodec/avcodec.h:107
 msgid "Skip idct (default=0)"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:110
+#: modules/codec/avcodec/avcodec.h:109
 msgid ""
 "Force skipping of idct to speed up decoding for frame types (-1=None, "
 "0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:113
+#: modules/codec/avcodec/avcodec.h:112
 msgid "Discard cropping information"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:114
+#: modules/codec/avcodec/avcodec.h:113
 msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:116
+#: modules/codec/avcodec/avcodec.h:115
 msgid "Debug mask"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:117
+#: modules/codec/avcodec/avcodec.h:116
 msgid "Set FFmpeg debug mask"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:119
+#: modules/codec/avcodec/avcodec.h:118
 msgid "Codec name"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:120
+#: modules/codec/avcodec/avcodec.h:119
 msgid "Internal libavcodec codec name"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:123
+#: modules/codec/avcodec/avcodec.h:122
 msgid "Visualize motion vectors"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:125
+#: modules/codec/avcodec/avcodec.h:124
 msgid ""
 "You can overlay the motion vectors (arrows showing how the images move) on "
 "the image. This value is a mask, based on these values:\n"
@@ -9779,149 +9782,149 @@ msgid ""
 "To visualize all vectors, the value should be 7."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:132 modules/gui/macosx/simple_prefs.m:215
+#: modules/codec/avcodec/avcodec.h:131 modules/gui/macosx/simple_prefs.m:215
 msgid "Skip the loop filter for H.264 decoding"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:133
+#: modules/codec/avcodec/avcodec.h:132
 msgid ""
 "Skipping the loop filter (aka deblocking) usually has a detrimental effect "
 "on quality. However it provides a big speedup for high definition streams."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:137
+#: modules/codec/avcodec/avcodec.h:136
 msgid "Hardware decoding"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:138
+#: modules/codec/avcodec/avcodec.h:137
 msgid "This allows hardware decoding when available."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:140
+#: modules/codec/avcodec/avcodec.h:139
 msgid "VDA output pixel format"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:141
+#: modules/codec/avcodec/avcodec.h:140
 msgid "The pixel format for output image buffers."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:143
+#: modules/codec/avcodec/avcodec.h:142
 msgid "Threads"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:144
+#: modules/codec/avcodec/avcodec.h:143
 msgid "Number of threads used for decoding, 0 meaning auto"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:151
+#: modules/codec/avcodec/avcodec.h:150
 msgid "Ratio of key frames"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:152
+#: modules/codec/avcodec/avcodec.h:151
 msgid "Number of frames that will be coded for one key frame."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:155
+#: modules/codec/avcodec/avcodec.h:154
 msgid "Ratio of B frames"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:156
+#: modules/codec/avcodec/avcodec.h:155
 msgid "Number of B frames that will be coded between two reference frames."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:159
+#: modules/codec/avcodec/avcodec.h:158
 msgid "Video bitrate tolerance"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:160
+#: modules/codec/avcodec/avcodec.h:159
 msgid "Video bitrate tolerance in kbit/s."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:162
+#: modules/codec/avcodec/avcodec.h:161
 msgid "Interlaced encoding"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:163
+#: modules/codec/avcodec/avcodec.h:162
 msgid "Enable dedicated algorithms for interlaced frames."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:166
+#: modules/codec/avcodec/avcodec.h:165
 msgid "Interlaced motion estimation"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:167
+#: modules/codec/avcodec/avcodec.h:166
 msgid "Enable interlaced motion estimation algorithms. This requires more CPU."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:170
+#: modules/codec/avcodec/avcodec.h:169
 msgid "Pre-motion estimation"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:171
+#: modules/codec/avcodec/avcodec.h:170
 msgid "Enable the pre-motion estimation algorithm."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:174
+#: modules/codec/avcodec/avcodec.h:173
 msgid "Rate control buffer size"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:175
+#: modules/codec/avcodec/avcodec.h:174
 msgid ""
 "Rate control buffer size (in kbytes). A bigger buffer will allow for better "
 "rate control, but will cause a delay in the stream."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:179
+#: modules/codec/avcodec/avcodec.h:178
 msgid "Rate control buffer aggressiveness"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:180
+#: modules/codec/avcodec/avcodec.h:179
 msgid "Rate control buffer aggressiveness."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:183
+#: modules/codec/avcodec/avcodec.h:182
 msgid "I quantization factor"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:185
+#: modules/codec/avcodec/avcodec.h:184
 msgid ""
 "Quantization factor of I frames, compared with P frames (for instance 1.0 => "
 "same qscale for I and P frames)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:188 modules/codec/x264.c:360
+#: modules/codec/avcodec/avcodec.h:187 modules/codec/x264.c:360
 #: modules/demux/mod.c:78
 msgid "Noise reduction"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:189
+#: modules/codec/avcodec/avcodec.h:188
 msgid ""
 "Enable a simple noise reduction algorithm to lower the encoding length and "
 "bitrate, at the expense of lower quality frames."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:193
+#: modules/codec/avcodec/avcodec.h:192
 msgid "MPEG4 quantization matrix"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:194
+#: modules/codec/avcodec/avcodec.h:193
 msgid ""
 "Use the MPEG4 quantization matrix for MPEG2 encoding. This generally yields "
 "a better looking picture, while still retaining the compatibility with "
 "standard MPEG2 decoders."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:199
+#: modules/codec/avcodec/avcodec.h:198
 msgid "Quality level"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:200
+#: modules/codec/avcodec/avcodec.h:199
 msgid ""
 "Quality level for the encoding of motions vectors (this can slow down the "
 "encoding very much)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:205
+#: modules/codec/avcodec/avcodec.h:204
 msgid ""
 "The encoder can make on-the-fly quality tradeoffs if your CPU can't keep up "
 "with the encoding rate. It will disable trellis quantization, then the rate "
@@ -9929,110 +9932,110 @@ msgid ""
 "to ease the encoder's task."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:211
+#: modules/codec/avcodec/avcodec.h:210
 msgid "Minimum video quantizer scale"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:212
+#: modules/codec/avcodec/avcodec.h:211
 msgid "Minimum video quantizer scale."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:215
+#: modules/codec/avcodec/avcodec.h:214
 msgid "Maximum video quantizer scale"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:216
+#: modules/codec/avcodec/avcodec.h:215
 msgid "Maximum video quantizer scale."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:219
+#: modules/codec/avcodec/avcodec.h:218
 msgid "Trellis quantization"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:220
+#: modules/codec/avcodec/avcodec.h:219
 msgid "Enable trellis quantization (rate distortion for block coefficients)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:223
+#: modules/codec/avcodec/avcodec.h:222
 msgid "Fixed quantizer scale"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:224
+#: modules/codec/avcodec/avcodec.h:223
 msgid ""
 "A fixed video quantizer scale for VBR encoding (accepted values: 0.01 to "
 "255.0)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:227
+#: modules/codec/avcodec/avcodec.h:226
 msgid "Strict standard compliance"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:228
+#: modules/codec/avcodec/avcodec.h:227
 msgid ""
 "Force a strict standard compliance when encoding (accepted values: -2 to 2)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:231
+#: modules/codec/avcodec/avcodec.h:230
 msgid "Luminance masking"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:232
+#: modules/codec/avcodec/avcodec.h:231
 msgid "Raise the quantizer for very bright macroblocks (default: 0.0)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:235
+#: modules/codec/avcodec/avcodec.h:234
 msgid "Darkness masking"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:236
+#: modules/codec/avcodec/avcodec.h:235
 msgid "Raise the quantizer for very dark macroblocks (default: 0.0)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:239
+#: modules/codec/avcodec/avcodec.h:238
 msgid "Motion masking"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:240
+#: modules/codec/avcodec/avcodec.h:239
 msgid ""
 "Raise the quantizer for macroblocks with a high temporal complexity "
 "(default: 0.0)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:243
+#: modules/codec/avcodec/avcodec.h:242
 msgid "Border masking"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:244
+#: modules/codec/avcodec/avcodec.h:243
 msgid ""
 "Raise the quantizer for macroblocks at the border of the frame (default: "
 "0.0)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:247
+#: modules/codec/avcodec/avcodec.h:246
 msgid "Luminance elimination"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:248
+#: modules/codec/avcodec/avcodec.h:247
 msgid ""
 "Eliminates luminance blocks when the PSNR isn't much changed (default: 0.0). "
 "The H264 specification recommends -4."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:252
+#: modules/codec/avcodec/avcodec.h:251
 msgid "Chrominance elimination"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:253
+#: modules/codec/avcodec/avcodec.h:252
 msgid ""
 "Eliminates chrominance blocks when the PSNR isn't much changed (default: "
 "0.0). The H264 specification recommends 7."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:257
+#: modules/codec/avcodec/avcodec.h:256
 msgid "Specify AAC audio profile to use"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:258
+#: modules/codec/avcodec/avcodec.h:257
 msgid ""
 "Specify the AAC audio profile to use for encoding the audio bitstream. It "
 "takes the following options: main, low, ssr (not supported),ltp, hev1, hev2 "
@@ -10066,7 +10069,7 @@ msgid ""
 "Do not contact the VideoLAN project about this issue.\n"
 msgstr ""
 
-#: modules/codec/avcodec/encoder.c:751 modules/codec/avcodec/encoder.c:804
+#: modules/codec/avcodec/encoder.c:764 modules/codec/avcodec/encoder.c:817
 msgid "VLC could not open the encoder."
 msgstr ""
 
@@ -10418,7 +10421,7 @@ msgstr ""
 msgid "AAC audio decoder (using libfaad2)"
 msgstr ""
 
-#: modules/codec/faad.c:429
+#: modules/codec/faad.c:430
 msgid "AAC extension"
 msgstr ""
 
@@ -12532,8 +12535,8 @@ msgstr ""
 #: modules/gui/qt4/main_interface.cpp:1158
 #: modules/gui/qt4/main_interface.cpp:1175
 #: modules/gui/qt4/main_interface.cpp:1183
-#: modules/gui/qt4/main_interface.cpp:1206 modules/notify/growl.m:281
-#: modules/video_output/xcb/window.c:313
+#: modules/gui/qt4/main_interface.cpp:1206 modules/lua/libs/httpd.c:80
+#: modules/notify/growl.m:281 modules/video_output/xcb/window.c:313
 msgid "VLC media player"
 msgstr "VLC मेडिया प्लेयर"
 
@@ -18343,78 +18346,78 @@ msgstr "dB"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1191
 msgid "170 Hz"
-msgstr ""
+msgstr "170 Hz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1192
 msgid "310 Hz"
-msgstr ""
+msgstr "310 Hz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1193
 msgid "600 Hz"
-msgstr ""
+msgstr "600 Hz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1194
 #: modules/gui/qt4/components/extended_panels.cpp:1208
 msgid "1 KHz"
-msgstr ""
+msgstr "1 KHz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1195
 msgid "3 KHz"
-msgstr ""
+msgstr "3 KHz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1196
 msgid "6 KHz"
-msgstr ""
+msgstr "6 KHz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1197
 msgid "12 KHz"
-msgstr ""
+msgstr "12 KHz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1198
 msgid "14 KHz"
-msgstr ""
+msgstr "14 KHz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1199
 #: modules/gui/qt4/components/extended_panels.cpp:1212
 msgid "16 KHz"
-msgstr ""
+msgstr "16 KHz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1203
 msgid "31 Hz"
-msgstr ""
+msgstr "31 Hz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1204
 msgid "63 Hz"
-msgstr ""
+msgstr "63 Hz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1205
 msgid "125 Hz"
-msgstr ""
+msgstr "125 Hz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1206
 msgid "250 Hz"
-msgstr ""
+msgstr "250 Hz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1207
 msgid "500 Hz"
-msgstr ""
+msgstr "500 Hz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1209
 msgid "2 KHz"
-msgstr ""
+msgstr "2 KHz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1210
 msgid "4 KHz"
-msgstr ""
+msgstr "4 KHz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1211
 msgid "8 KHz"
-msgstr ""
+msgstr "8 KHz"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1379
 #: modules/gui/qt4/components/extended_panels.cpp:1380
 msgid "ms"
-msgstr ""
+msgstr "ms"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1383
 msgid ""
@@ -18542,7 +18545,7 @@ msgstr ""
 
 #: modules/gui/qt4/components/info_panels.cpp:605
 msgid "Last 60 seconds"
-msgstr ""
+msgstr "मागील 60 सेकंद"
 
 #: modules/gui/qt4/components/info_panels.cpp:606
 msgid "Overall"
@@ -18564,19 +18567,19 @@ msgstr ""
 
 #: modules/gui/qt4/components/interface_widgets.cpp:647
 msgid "Download cover art"
-msgstr ""
+msgstr "कवर आर्ट डाऊनलोड करा"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:651
 msgid "Add cover art from file"
-msgstr ""
+msgstr "फाईल मधून कवर आर्ट समाविष्ट करा"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:717
 msgid "Choose Cover Art"
-msgstr ""
+msgstr "कवर आर्ट निवडा"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:718
 msgid "Image Files (*.gif *.jpg *.jpeg *.png)"
-msgstr ""
+msgstr "Image Files (*.gif *.jpg *.jpeg *.png)"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:743
 #: modules/gui/qt4/dialogs/toolbar.cpp:458
@@ -18628,19 +18631,19 @@ msgstr ""
 
 #: modules/gui/qt4/components/open_panels.cpp:872
 msgid "Channels:"
-msgstr ""
+msgstr "वाहिन्या:"
 
 #: modules/gui/qt4/components/open_panels.cpp:883
 msgid "Selected ports:"
-msgstr ""
+msgstr "निवडलेले पोर्ट:"
 
 #: modules/gui/qt4/components/open_panels.cpp:886
 msgid ".*"
-msgstr ""
+msgstr ".*"
 
 #: modules/gui/qt4/components/open_panels.cpp:893
 msgid "Use VLC pace"
-msgstr ""
+msgstr "VLC गती वापरा"
 
 #: modules/gui/qt4/components/open_panels.cpp:913
 msgid "TV - digital"
@@ -18787,11 +18790,11 @@ msgstr ""
 
 #: modules/gui/qt4/components/playlist/standardpanel.hpp:158
 msgid "List"
-msgstr ""
+msgstr "यादी"
 
 #: modules/gui/qt4/components/playlist/standardpanel.hpp:159
 msgid "PictureFlow"
-msgstr ""
+msgstr "PictureFlow"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:304
 msgid "Select File"
@@ -18805,15 +18808,15 @@ msgstr ""
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1137
 msgid "in"
-msgstr ""
+msgstr "आत"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1139
 msgid "Any field"
-msgstr ""
+msgstr "कोणतेही क्षेत्र"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1140
 msgid "Actions"
-msgstr ""
+msgstr "कृत्या"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1147
 msgid "Hotkey"
@@ -20328,16 +20331,11 @@ msgstr "स्कीन निवडा"
 msgid "Open skin ..."
 msgstr "स्कीन उघडा..."
 
-#: modules/lua/libs/httpd.c:64
+#: modules/lua/libs/httpd.c:75
 msgid ""
-"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3."
-"org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
-"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta http-equiv="
-"\"Content-Type\" content=\"text/html;charset=utf-8\" /><title>VLC media "
-"player</title></head><body><p>Password for Web interface has not been set.</"
-"p><p>Please use --http-password, or set a password in </p><p>Preferences "
-"&gt; All &gt; Main interfaces &gt; Lua &gt; Lua HTTP &gt; Password.</p><!-- "
-"VLC_PASSWORD_NOT_SET --></body></html>"
+"<p>Password for Web interface has not been set.</p><p>Please use --http-"
+"password, or set a password in </p><p>Preferences &gt; All &gt; Main "
+"interfaces &gt; Lua &gt; Lua HTTP &gt; Password.</p>"
 msgstr ""
 
 #: modules/lua/vlc.c:48
@@ -20414,67 +20412,67 @@ msgstr ""
 
 #: modules/lua/vlc.c:96 modules/lua/vlc.c:103
 msgid "Lua HTTP"
-msgstr ""
+msgstr "Lua HTTP"
 
 #: modules/lua/vlc.c:106
 msgid "Lua CLI"
-msgstr ""
+msgstr "Lua CLI"
 
 #: modules/lua/vlc.c:110
 msgid "Command-line interface"
-msgstr ""
+msgstr "Command-line interface"
 
 #: modules/lua/vlc.c:119 modules/lua/vlc.c:130
 msgid "Lua Telnet"
-msgstr ""
+msgstr "Lua Telnet"
 
 #: modules/lua/vlc.c:134
 msgid "Lua Meta Fetcher"
-msgstr ""
+msgstr "Lua Meta Fetcher"
 
 #: modules/lua/vlc.c:135
 msgid "Fetch meta data using lua scripts"
-msgstr ""
+msgstr "Lua scripts वापरून मेटाडेटा मागवा"
 
 #: modules/lua/vlc.c:140
 msgid "Lua Meta Reader"
-msgstr ""
+msgstr "Lua Meta Reader"
 
 #: modules/lua/vlc.c:141
 msgid "Read meta data using lua scripts"
-msgstr ""
+msgstr "Lua scripts वापरून मेटाडेटा वाचा"
 
 #: modules/lua/vlc.c:147
 msgid "Lua Playlist"
-msgstr ""
+msgstr "Lua Playlist"
 
 #: modules/lua/vlc.c:148
 msgid "Lua Playlist Parser Interface"
-msgstr ""
+msgstr "Lua Playlist Parser Interface"
 
 #: modules/lua/vlc.c:153
 msgid "Lua Art"
-msgstr ""
+msgstr "Lua Art"
 
 #: modules/lua/vlc.c:154
 msgid "Fetch artwork using lua scripts"
-msgstr ""
+msgstr "Lua scripts वापरून आर्टवर्क मागवा"
 
 #: modules/lua/vlc.c:159 modules/lua/vlc.c:160
 msgid "Lua Extension"
-msgstr ""
+msgstr "Lua Extension"
 
 #: modules/lua/vlc.c:166
 msgid "Lua SD Module"
-msgstr ""
+msgstr "Lua SD Module"
 
 #: modules/meta_engine/folder.c:64
 msgid "Folder meta data"
-msgstr ""
+msgstr "फोल्डर मेटाडेटा"
 
 #: modules/meta_engine/folder.c:66
 msgid "Album art filename"
-msgstr ""
+msgstr "अल्बम आर्ट फाईलचे नाव"
 
 #: modules/meta_engine/folder.c:66
 msgid "Filename to look for album art in current directory"
@@ -20591,7 +20589,7 @@ msgstr ""
 
 #: modules/misc/gnutls.c:295
 msgid "View certificate"
-msgstr ""
+msgstr "प्रमाणपत्र पहा"
 
 #: modules/misc/gnutls.c:312
 #, c-format
@@ -24705,19 +24703,19 @@ msgstr ""
 
 #: modules/video_filter/puzzle.c:75
 msgid "0"
-msgstr ""
+msgstr "0"
 
 #: modules/video_filter/puzzle.c:75
 msgid "0/180"
-msgstr ""
+msgstr "0/180"
 
 #: modules/video_filter/puzzle.c:75
 msgid "0/90/180/270"
-msgstr ""
+msgstr "0/90/180/270"
 
 #: modules/video_filter/puzzle.c:75
 msgid "0/90/180/270/mirror"
-msgstr ""
+msgstr "0/90/180/270/mirror"
 
 #: modules/video_filter/puzzle.c:83
 msgid "Puzzle interactive game video filter"
@@ -26751,7 +26749,7 @@ msgstr "स्कीन स्त्रोत फाईल:"
 
 #: modules/gui/qt4/ui/sprefs_interface.h:517
 msgid "Operating System Integration"
-msgstr ""
+msgstr "Operating System Integration"
 
 #: modules/gui/qt4/ui/sprefs_interface.h:518
 msgid "File extensions association"
@@ -27055,82 +27053,13 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "मेडिया नियंत्रक लिस्ट"
 
-#~ msgid "Subtitles/OSD"
-#~ msgstr "सबटायटल/OSD"
-
-#~ msgid "Subtitles codecs"
-#~ msgstr "उपशीर्षक कोडेक"
-
-#~ msgid "General Input"
-#~ msgstr "सामान्य आदान"
-
-#~ msgid "CPU features"
-#~ msgstr "CPU विशेष"
-
-#~ msgid "Chroma modules settings"
-#~ msgstr "क्रोमा साधने सेटिंग"
-
-#~ msgid "Packetizer modules settings"
-#~ msgstr "पकेटायझर साधने सेटिंग"
-
-#~ msgid "Encoders settings"
-#~ msgstr "एनकोडर सेटिंग "
-
-#~ msgid "Dialog providers settings"
-#~ msgstr "संवादक पुरवठादार सेटिंग"
-
-#~ msgid "Subtitle demuxer settings"
-#~ msgstr "उपशीर्षक डीमक्सर सेटिंग"
-
-#~ msgid "No help available"
-#~ msgstr "मदत उपलब्ध नाही"
-
 #~ msgid "There is no help available for these modules."
 #~ msgstr "या साधनांसाठी मदत उपलब्ध नाही."
-
-#~ msgid "Quick &Open File..."
-#~ msgstr "वेगाने फाईल उघडा..."
-
-#~ msgid "&Bookmarks"
-#~ msgstr "बुकमार्क"
-
-#~ msgid "Fetch Information"
-#~ msgstr "माहिती मिळवा"
-
-#~ msgid "Sort"
-#~ msgstr "क्रम"
-
-#~ msgid "No Repeat"
-#~ msgstr "पुन्हा करू नका"
-
-#~ msgid "Add to Media Library"
-#~ msgstr "मेडिया ग्रंथालय मध्ये टाका"
-
-#~ msgid "Advanced Open..."
-#~ msgstr "प्रगतपणे उघडा..."
-
-#~ msgid "Open Play&list..."
-#~ msgstr "प्लेलिस्ट उघडा..."
-
-#~ msgid "Search Filter"
-#~ msgstr "शोध निवड "
-
-#~ msgid "&Services Discovery"
-#~ msgstr "सेवांचा शोध"
 
 #~ msgid ""
 #~ "Some options are available but hidden. Check \"Advanced options\" to see "
 #~ "them."
 #~ msgstr "काही पर्याय लपवले आहेत. पाहण्यासाठी  \"प्रगत पर्याय\" तपासा."
-
-#~ msgid "Image clone"
-#~ msgstr "प्रतिमा प्रत"
-
-#~ msgid "Clone the image"
-#~ msgstr "प्रतिमा प्रत बनवा"
-
-#~ msgid "Magnification"
-#~ msgstr "वाढ"
 
 #~ msgid "\"Waves\" video distortion effect"
 #~ msgstr "\"वेवज\" चित्रफित बदल परिणाम"
@@ -27160,49 +27089,13 @@ msgstr "मेडिया नियंत्रक लिस्ट"
 #~ msgid "This will force a mono audio output."
 #~ msgstr "हे मोनो संगीत आवश्यक बनवेल."
 
-#~ msgid "Default audio volume"
-#~ msgstr "मूळ संगीत आवाज "
-
 #~ msgid ""
 #~ "You can set the default audio output volume here, in a range from 0 to "
 #~ "1024."
 #~ msgstr "तुम्ही संगीत आवाज येथे ठरवू शकता. त्याची कक्षा  0 पासून  1024 पर्यंत आहे. "
 
-#~ msgid "Audio output frequency (Hz)"
-#~ msgstr "संगीत प्रदान फ्रीक्वेन्सी [Hz]"
-
 #~ msgid "High quality audio resampling"
 #~ msgstr "उच्य दर्ज्याचे संगीत रीसाम्प्लिंग"
-
-#~ msgid "Audio output channels mode"
-#~ msgstr "संगीत प्रदान वाहिनी प्रकार"
-
-#~ msgid "Audio visualizations "
-#~ msgstr "संगीत चित्ररचना"
-
-#~ msgid "Subtitles track"
-#~ msgstr "उपशीर्षक गाणे"
-
-#~ msgid "Subtitles track ID"
-#~ msgstr "उपशीर्षक गाणे क्रमांक"
-
-#~ msgid "Low definition (320 lines)"
-#~ msgstr "लहान व्याख्या(320 ओळी)"
-
-#~ msgid "Leave fullscreen"
-#~ msgstr "फुलस्क्रीन मधून बाहेर पडा"
-
-#~ msgid "Select the hotkey to use to leave fullscreen state."
-#~ msgstr "फुलस्क्रीन मधून बाहेर पडण्यासाठी हॉट-कि वापरा."
-
-#~ msgid "Show interface"
-#~ msgstr "दर्शक दाखवा"
-
-#~ msgid "Hide interface"
-#~ msgstr "दर्शक लपवा"
-
-#~ msgid "CPU"
-#~ msgstr "CPU"
 
 #~ msgid "Greek, Modern ()"
 #~ msgstr "Greek, Modern ()"
@@ -27210,20 +27103,11 @@ msgstr "मेडिया नियंत्रक लिस्ट"
 #~ msgid "Kalaallisut (Greenlandic)"
 #~ msgstr "Kalaallisut (Greenlandic)"
 
-#~ msgid "Occitan (post 1500); Provencal"
-#~ msgstr "Occitan (post 1500); Provencal"
-
-#~ msgid "Aspect-ratio"
-#~ msgstr "दुष्य गुणोत्तर"
-
 #~ msgid "PCM U8"
 #~ msgstr "PCM U8"
 
 #~ msgid "PCM S8"
 #~ msgstr "PCM S8"
-
-#~ msgid "GSM Audio"
-#~ msgstr "GSM Audio"
 
 #~ msgid "PCM U16 LE"
 #~ msgstr "PCM U16 LE"
@@ -27273,9 +27157,6 @@ msgstr "मेडिया नियंत्रक लिस्ट"
 #~ msgid "PCM F64 BE"
 #~ msgstr "PCM F64 BE"
 
-#~ msgid "ALSA audio capture input"
-#~ msgstr "ALSA संगीत पकड आदान"
-
 #~ msgid "Blu-Ray Disc Input"
 #~ msgstr "ब्लू-रे डिस्क आदान"
 
@@ -27305,15 +27186,6 @@ msgstr "मेडिया नियंत्रक लिस्ट"
 #~ msgid "RTMP"
 #~ msgstr "RTMP"
 
-#~ msgid "Framerate"
-#~ msgstr "फ्रेम रेट"
-
-#~ msgid "Audio volume (0-65535)."
-#~ msgstr "संगीत आवाज (0-655350)"
-
-#~ msgid "Channel"
-#~ msgstr "वाहिनी"
-
 #~ msgid "SECAM"
 #~ msgstr "SECAM"
 
@@ -27329,29 +27201,11 @@ msgstr "मेडिया नियंत्रक लिस्ट"
 #~ msgid "cbr"
 #~ msgstr "cbr"
 
-#~ msgid "PVR"
-#~ msgstr "PVR"
-
-#~ msgid "SFTP user name"
-#~ msgstr "SFTP वापरकर्ता"
-
-#~ msgid "SFTP password"
-#~ msgstr "SFTP पासवर्ड"
-
 #~ msgid "fast"
 #~ msgstr "fast"
 
-#~ msgid "normal"
-#~ msgstr "normal"
-
 #~ msgid "slow"
 #~ msgstr "slow"
-
-#~ msgid "all"
-#~ msgstr "all"
-
-#~ msgid "spatial"
-#~ msgstr "spatial"
 
 #~ msgid "temporal"
 #~ msgstr "temporal"
@@ -27359,41 +27213,8 @@ msgstr "मेडिया नियंत्रक लिस्ट"
 #~ msgid "H.264/MPEG4 AVC encoder (x264)"
 #~ msgstr "H.264/MPEG4 AVC encoder (x264)"
 
-#~ msgid "Subtitle position %i px"
-#~ msgstr "उपशीर्षक  %i px"
-
-#~ msgid "Volume %d%%"
-#~ msgstr "आवाज %d%%"
-
-#~ msgid "Classic rock"
-#~ msgstr "क्लासिक रॉक"
-
-#~ msgid "Commands"
-#~ msgstr "आदेश"
-
-#~ msgid "Compiled by %@ with %@"
-#~ msgstr "संकलन यांचे %@ यांच्यासोबत %@"
-
-#~ msgid "Capture Device"
-#~ msgstr "पकड साधन"
-
 #~ msgid "Frames per Second:"
 #~ msgstr "फ्रेम्स पर सेकंद:"
-
-#~ msgid "Subscreen left:"
-#~ msgstr "सब्स्क्रीन डावा:"
-
-#~ msgid "Subscreen top:"
-#~ msgstr "सब्स्क्रीन वर:"
-
-#~ msgid "Subscreen width:"
-#~ msgstr "सब्स्क्रीन रुंदी:"
-
-#~ msgid "Subscreen height:"
-#~ msgstr "सब्स्क्रीन उंची:"
-
-#~ msgid "Subtitles alignment"
-#~ msgstr "उपशीर्षक मांडणी"
 
 #~ msgid "SAP announce"
 #~ msgstr "SAP समालोचन"
@@ -27401,119 +27222,20 @@ msgstr "मेडिया नियंत्रक लिस्ट"
 #~ msgid "RTSP announce"
 #~ msgstr "RTSP समालोचन"
 
-#~ msgid "HTTP announce"
-#~ msgstr "HTTP समालोचन"
-
-#~ msgid "HTML Playlist"
-#~ msgstr "HTML प्लेलिस्ट"
-
-#~ msgid "General Audio Settings"
-#~ msgstr "सामान्य संगीत सेटिंग"
-
-#~ msgid "General Video Settings"
-#~ msgstr "सामान्य चित्रफीत सेटिंग"
-
-#~ msgid "Subtitles & OSD"
-#~ msgstr "उपशीर्षक आणि OSD"
-
-#~ msgid "Subtitles & On Screen Display Settings"
-#~ msgstr "उपशीर्षक आणि डिस्प्ले सेटिंग"
-
-#~ msgid "Input & Codecs"
-#~ msgstr "आदान & कोडेक"
-
-#~ msgid "Input & Codec settings"
-#~ msgstr "आदान & कोडेक सेटिंग"
-
-#~ msgid "Enable Audio"
-#~ msgstr "संगीत सुरु करा"
-
-#~ msgid "Font Color"
-#~ msgstr "फोन्ट रंग"
-
-#~ msgid "Font Size"
-#~ msgstr "फोन्ट आकार"
-
-#~ msgid "Subtitle Languages"
-#~ msgstr "उपशीर्षक भाषा"
-
-#~ msgid "Preferred Subtitle Language"
-#~ msgstr "पसंतीची उपशीर्षक भाषा"
-
 #~ msgid "Force Bold"
 #~ msgstr "ठळक आवश्यक"
-
-#~ msgid "Enable Video"
-#~ msgstr "चित्रफीत चालू करा"
 
 #~ msgid "  [Incoming]"
 #~ msgstr "  [Incoming]"
 
-#~ msgid "  [Video Decoding]"
-#~ msgstr "  [Video Decoding]"
-
-#~ msgid "  [Audio Decoding]"
-#~ msgstr "  [Audio Decoding]"
-
-#~ msgid "  [Streaming]"
-#~ msgstr "  [Streaming]"
-
-#~ msgid " Volume   : %u%%"
-#~ msgstr "आवाज : %u%%"
-
-#~ msgid "Show playlist"
-#~ msgstr "प्लेलिस्ट दाखवा"
-
-#~ msgid "Open subtitles file"
-#~ msgstr "उपशीर्षक फाईल उघडा"
-
-#~ msgid " dB"
-#~ msgstr " dB"
-
-#~ msgid "Add to playlist"
-#~ msgstr "प्लेलिस्ट मध्ये टाका"
-
-#~ msgid "Clear playlist"
-#~ msgstr "प्लेलिस्ट मोकळी करा"
-
 #~ msgid "Icon View"
 #~ msgstr "आयकॉन दृश्य"
-
-#~ msgid "Detailed View"
-#~ msgstr "सविस्तर दृश्य"
-
-#~ msgid "List View"
-#~ msgstr "लिस्ट दृश्य"
-
-#~ msgid "PictureFlow View "
-#~ msgstr "प्रतिमा दृश्य"
-
-#~ msgid "Select an action to change the associated hotkey"
-#~ msgstr "सहत्व असणारी हॉट-कि बदलण्यासाठी कृती निवडा"
-
-#~ msgid "Hotkey for "
-#~ msgstr "च्यासाठी हॉट-कि"
 
 #~ msgid "Press the new keys for "
 #~ msgstr "नवीन कि दाबा"
 
 #~ msgid "Warning: the key is already assigned to \""
 #~ msgstr "सूचना:कि अगोदर दिलेली आहे \""
-
-#~ msgid "Subtitles && OSD"
-#~ msgstr "उपशीर्षके && OSD"
-
-#~ msgid "Input && Codecs"
-#~ msgstr "आदान && कोडेक"
-
-#~ msgid "Allow downloading media information"
-#~ msgstr "मेडिया माहिती डाउनलोड करू द्या"
-
-#~ msgid "Allow checking for VLC updates"
-#~ msgstr "VLC अद्ययावन तपासू द्या"
-
-#~ msgid "Save and Continue"
-#~ msgstr "जतन करा आणि पुढे चालू ठेवा"
 
 #~ msgid ""
 #~ "VLC media player is a free media player, encoder and streamer that can "
@@ -27535,9 +27257,6 @@ msgstr "मेडिया नियंत्रक लिस्ट"
 #~ "VLC ची हि आवृत्ती यांनी संकलित केली:\n"
 #~ " "
 
-#~ msgid "Compiler: "
-#~ msgstr "संकलक:"
-
 #~ msgid ""
 #~ "You are using the Qt4 Interface.\n"
 #~ "\n"
@@ -27545,53 +27264,8 @@ msgstr "मेडिया नियंत्रक लिस्ट"
 #~ "आपण QT दर्शक वापरत आहात.\n"
 #~ "\n"
 
-#~ msgid "Copyright (C) "
-#~ msgstr "कॉपीराईट(C)"
-
-#~ msgid "&Codec"
-#~ msgstr "कोडेक"
-
-#~ msgid "&Convert"
-#~ msgstr "रुपांतर करा"
-
-#~ msgid "&Convert / Save"
-#~ msgstr "रुपांतर/जतन करा"
-
 #~ msgid "Please enter the URL or path to the media you want to play"
 #~ msgstr "तुम्ही प्ले करू इच्छिणारा URL अथवा मार्ग येथे द्या"
-
-#~ msgid "Subtitles Files"
-#~ msgstr "उपशीर्षक फाईल्स"
-
-#~ msgid "&Tools"
-#~ msgstr "साधने"
-
-#~ msgid "&Open (advanced)..."
-#~ msgstr "उघडा (प्रगत)..."
-
-#~ msgid "Audio &Channels"
-#~ msgstr "संगीत वाहिनी"
-
-#~ msgid "&Subtitles Track"
-#~ msgstr "उपशीर्षक गाणे"
-
-#~ msgid "&Navigation"
-#~ msgstr "नेविगेशन"
-
-#~ msgid "Tools"
-#~ msgstr "साधने"
-
-#~ msgid "Hide VLC media player in taskbar"
-#~ msgstr "टास्कबार मधून VLC लपवा"
-
-#~ msgid "Show VLC media player"
-#~ msgstr "VLC मेडिया प्लेयर दाखवा"
-
-#~ msgid "Advanced options"
-#~ msgstr "प्रगत पर्याय"
-
-#~ msgid "Show all the advanced options in the dialogs."
-#~ msgstr "सर्व अधिकतम पर्याय डायलॉग मध्ये दाखवा"
 
 #~ msgid "MCE"
 #~ msgstr "MCE"
@@ -27602,20 +27276,462 @@ msgstr "मेडिया नियंत्रक लिस्ट"
 #~ msgid "Sizes"
 #~ msgstr "आकार"
 
+#~ msgid "00000; "
+#~ msgstr "00000; "
+
+#~ msgid "Enqueue files when in one instance mode"
+#~ msgstr "एकच ठिकाण मोड असताना फाईल्स टाका"
+
+#~ msgid "Do you want to download it ?"
+#~ msgstr "तुम्ही डाउनलोड करू इच्छिता?"
+
+#, fuzzy
+#~ msgid "Subtitles/OSD"
+#~ msgstr "उपशीर्षक / OSD"
+
+#, fuzzy
+#~ msgid "Subtitles codecs"
+#~ msgstr "उपशीर्षक कोडेक"
+
+#, fuzzy
+#~ msgid "General Input"
+#~ msgstr "सामान्य"
+
+#, fuzzy
+#~ msgid "CPU features"
+#~ msgstr "पकडा"
+
+#, fuzzy
+#~ msgid "Chroma modules settings"
+#~ msgstr "सामान्य चित्रफीत सेटिंग "
+
+#, fuzzy
+#~ msgid "Packetizer modules settings"
+#~ msgstr "सामान्य चित्रफीत सेटिंग "
+
+#, fuzzy
+#~ msgid "Encoders settings"
+#~ msgstr "सेटिंग बदला"
+
+#, fuzzy
+#~ msgid "Dialog providers settings"
+#~ msgstr "सामान्य चित्रफीत सेटिंग "
+
+#, fuzzy
+#~ msgid "Subtitle demuxer settings"
+#~ msgstr "उपशीर्षक उशीर %i ms"
+
+#, fuzzy
+#~ msgid "No help available"
+#~ msgstr "उत्र्कृष्ट उपलब्ध"
+
+#, fuzzy
+#~ msgid "Quick &Open File..."
+#~ msgstr "फाईल उघडा..."
+
+#, fuzzy
+#~ msgid "&Bookmarks"
+#~ msgstr "बुकमार्क"
+
+#, fuzzy
+#~ msgid "Fetch Information"
+#~ msgstr "कोडेक माहिती"
+
+#, fuzzy
+#~ msgid "Sort"
+#~ msgstr "क्रमित करा"
+
+#, fuzzy
+#~ msgid "No Repeat"
+#~ msgstr "पुन्हा"
+
+#, fuzzy
+#~ msgid "Add to Media Library"
+#~ msgstr "मीडिया लाइब्रेरी भरा"
+
+#, fuzzy
+#~ msgid "Advanced Open..."
+#~ msgstr "प्रगतपणे उघडा..."
+
+#, fuzzy
+#~ msgid "Open Play&list..."
+#~ msgstr "प्लेलिस्ट उघडा..."
+
+#, fuzzy
+#~ msgid "Search Filter"
+#~ msgstr "स्ट्रीम निवड "
+
+#, fuzzy
+#~ msgid "&Services Discovery"
+#~ msgstr "सेवांचा शोध"
+
+#, fuzzy
+#~ msgid "Image clone"
+#~ msgstr "प्रतिमा क्रोमा"
+
+#, fuzzy
+#~ msgid "Clone the image"
+#~ msgstr "माउस पोइंटर प्रतिमा"
+
+#, fuzzy
+#~ msgid "Magnification"
+#~ msgstr "मेटा-इन्फोर्मेशन"
+
+#, fuzzy
+#~ msgid "Default audio volume"
+#~ msgstr "ध्वनि आवाज"
+
+#, fuzzy
+#~ msgid "Audio output frequency (Hz)"
+#~ msgstr "संगीत प्रदान अयशस्वी"
+
+#, fuzzy
+#~ msgid "Audio output channels mode"
+#~ msgstr "संगीत प्रदान साधन"
+
+#, fuzzy
+#~ msgid "Audio visualizations "
+#~ msgstr "ध्वनि चित्ररचना"
+
+#, fuzzy
+#~ msgid "Subtitles track"
+#~ msgstr "उपशीर्षक गाणे"
+
+#, fuzzy
+#~ msgid "Subtitles track ID"
+#~ msgstr "उपशीर्षक गाणे"
+
+#, fuzzy
+#~ msgid "Low definition (320 lines)"
+#~ msgstr "प्रमाण व्याख्या(576 alebo 480 riadkov)"
+
+#, fuzzy
+#~ msgid "Leave fullscreen"
+#~ msgstr "फुलस्क्रीन सोडा"
+
+#, fuzzy
+#~ msgid "Select the hotkey to use to leave fullscreen state."
+#~ msgstr "विराम घेण्यासाठी हॉट-की निवडा."
+
+#, fuzzy
+#~ msgid "Show interface"
+#~ msgstr "QT दर्शक"
+
+#, fuzzy
+#~ msgid "Hide interface"
+#~ msgstr "QT दर्शक"
+
+#, fuzzy
+#~ msgid "CPU"
+#~ msgstr "TCP"
+
+#, fuzzy
+#~ msgid "Occitan (post 1500); Provencal"
+#~ msgstr "Occitan; Provençal"
+
+#, fuzzy
+#~ msgid "Aspect-ratio"
+#~ msgstr "दृश्य गुणोत्तर"
+
+#, fuzzy
+#~ msgid "GSM Audio"
+#~ msgstr "ध्वनि"
+
+#, fuzzy
+#~ msgid "ALSA audio capture input"
+#~ msgstr "ALSA ध्वनि kapchar"
+
+#, fuzzy
+#~ msgid "Framerate"
+#~ msgstr "फ्रेम रेट"
+
+#, fuzzy
+#~ msgid "Audio volume (0-65535)."
+#~ msgstr "ध्वनि आवाज"
+
+#, fuzzy
+#~ msgid "Channel"
+#~ msgstr "वाहिनी"
+
+#, fuzzy
+#~ msgid "PVR"
+#~ msgstr "VDR"
+
+#, fuzzy
+#~ msgid "SFTP user name"
+#~ msgstr "FTP युजरनेम"
+
+#, fuzzy
+#~ msgid "SFTP password"
+#~ msgstr "FTP पासवर्ड"
+
+#, fuzzy
+#~ msgid "normal"
+#~ msgstr "सामान्य"
+
+#, fuzzy
+#~ msgid "all"
+#~ msgstr "वौल"
+
+#, fuzzy
+#~ msgid "spatial"
+#~ msgstr "महत्वाचे"
+
+#, fuzzy
+#~ msgid "Subtitle position %i px"
+#~ msgstr "उपशीर्षक जागा आवश्यक"
+
+#, fuzzy
+#~ msgid "Volume %d%%"
+#~ msgstr "आवाज कमी"
+
+#, fuzzy
+#~ msgid "Classic rock"
+#~ msgstr "क्लासिकल"
+
+#, fuzzy
+#~ msgid "Commands"
+#~ msgstr "Command+"
+
+#, fuzzy
+#~ msgid "Compiled by %@ with %@"
+#~ msgstr "संकलन यांचे %s on %s (%s)\n"
+
+#, fuzzy
+#~ msgid "Capture Device"
+#~ msgstr "पकड साधन"
+
+#, fuzzy
+#~ msgid "Subscreen left:"
+#~ msgstr "सबस्क्रीन रुंदी"
+
+#, fuzzy
+#~ msgid "Subscreen top:"
+#~ msgstr "सबस्क्रीन रुंदी"
+
+#, fuzzy
+#~ msgid "Subscreen width:"
+#~ msgstr "सबस्क्रीन रुंदी"
+
+#, fuzzy
+#~ msgid "Subscreen height:"
+#~ msgstr "सबस्क्रीन रुंदी"
+
+#, fuzzy
+#~ msgid "Subtitles alignment"
+#~ msgstr "चित्रफीत मांडणी"
+
+#, fuzzy
+#~ msgid "HTTP announce"
+#~ msgstr "HTTP आदान"
+
+#, fuzzy
+#~ msgid "HTML Playlist"
+#~ msgstr "HTML प्लेलिस्ट"
+
+#, fuzzy
+#~ msgid "General Audio Settings"
+#~ msgstr "सामान्य ध्वनि सेटिंग"
+
+#, fuzzy
+#~ msgid "General Video Settings"
+#~ msgstr "सामान्य चित्रफीत सेटिंग "
+
+#, fuzzy
+#~ msgid "Subtitles & OSD"
+#~ msgstr "उपशीर्षक / OSD"
+
+#, fuzzy
+#~ msgid "Subtitles & On Screen Display Settings"
+#~ msgstr "ऑन स्क्रीन डिस्प्ले(OSD)  सुरु करा"
+
+#, fuzzy
+#~ msgid "Input & Codecs"
+#~ msgstr "आदान / कोडेक"
+
+#, fuzzy
+#~ msgid "Input & Codec settings"
+#~ msgstr "आदान व कोडेक सेटिंग"
+
+#, fuzzy
+#~ msgid "Enable Audio"
+#~ msgstr "संगीत सुरु करा"
+
+#, fuzzy
+#~ msgid "Font Color"
+#~ msgstr "फोन्ट रंग"
+
+#, fuzzy
+#~ msgid "Font Size"
+#~ msgstr "फोन्ट आकार"
+
+#, fuzzy
+#~ msgid "Subtitle Languages"
+#~ msgstr "उपशीर्षक भाषा "
+
+#, fuzzy
+#~ msgid "Preferred Subtitle Language"
+#~ msgstr "पसंतीची संगीत भाषा"
+
+#, fuzzy
+#~ msgid "Enable Video"
+#~ msgstr "चित्रफीत सुरु करा"
+
+#, fuzzy
+#~ msgid "  [Video Decoding]"
+#~ msgstr "चित्रफीत सेटिंग "
+
+#, fuzzy
+#~ msgid "  [Audio Decoding]"
+#~ msgstr "ध्वनि सेटिंग"
+
+#, fuzzy
+#~ msgid "  [Streaming]"
+#~ msgstr "स्ट्रीमिंग"
+
+#, fuzzy
+#~ msgid " Volume   : %u%%"
+#~ msgstr "स्त्रोत : %s"
+
+#, fuzzy
+#~ msgid "Show playlist"
+#~ msgstr "प्लेलिस्ट दाखवा/लपवा "
+
+#, fuzzy
+#~ msgid "Open subtitles file"
+#~ msgstr "उपशीर्षक फाईल वापरा"
+
+#, fuzzy
+#~ msgid " dB"
+#~ msgstr "dB"
+
+#, fuzzy
+#~ msgid "Add to playlist"
+#~ msgstr "प्लेलिस्ट मध्ये टाका"
+
+#, fuzzy
+#~ msgid "Clear playlist"
+#~ msgstr "लिस्ट मोकळी करा"
+
+#, fuzzy
+#~ msgid "Detailed View"
+#~ msgstr "मीडिया व्हू"
+
+#, fuzzy
+#~ msgid "List View"
+#~ msgstr "मीडिया व्हू"
+
+#, fuzzy
+#~ msgid "PictureFlow View "
+#~ msgstr "PictureFlow"
+
+#, fuzzy
+#~ msgid "Select an action to change the associated hotkey"
+#~ msgstr "हॉट-कि शी सहत्व असणारी कृती निवडा"
+
+#, fuzzy
+#~ msgid "Hotkey for "
+#~ msgstr "हॉट-कि"
+
+#, fuzzy
+#~ msgid "Subtitles && OSD"
+#~ msgstr "उपशीर्षक / OSD"
+
+#, fuzzy
+#~ msgid "Input && Codecs"
+#~ msgstr "आदान / कोडेक"
+
+#, fuzzy
+#~ msgid "Allow downloading media information"
+#~ msgstr "मेडिया माहितीसाठी डबल क्लिक करा"
+
+#, fuzzy
+#~ msgid "Allow checking for VLC updates"
+#~ msgstr "VLC अद्ययावन तपासा"
+
+#, fuzzy
+#~ msgid "Save and Continue"
+#~ msgstr "सुरु ठेवा"
+
+#, fuzzy
+#~ msgid "Compiler: "
+#~ msgstr "संकलक: %s\n"
+
+#, fuzzy
+#~ msgid "Copyright (C) "
+#~ msgstr "कॉपीराईट"
+
+#, fuzzy
+#~ msgid "&Codec"
+#~ msgstr "कोडेक"
+
+#, fuzzy
+#~ msgid "&Convert"
+#~ msgstr "रुपांतर करा"
+
+#, fuzzy
+#~ msgid "&Convert / Save"
+#~ msgstr "रुपांतर /जतन करा..."
+
+#, fuzzy
+#~ msgid "Subtitles Files"
+#~ msgstr "उपशीर्षक फाईल"
+
+#, fuzzy
+#~ msgid "&Tools"
+#~ msgstr "साधन"
+
+#, fuzzy
+#~ msgid "&Open (advanced)..."
+#~ msgstr "फाईल उघडा..."
+
+#, fuzzy
+#~ msgid "Audio &Channels"
+#~ msgstr "ध्वनि वाहिनी"
+
+#, fuzzy
+#~ msgid "&Subtitles Track"
+#~ msgstr "उपशीर्षक गाणे"
+
+#, fuzzy
+#~ msgid "&Navigation"
+#~ msgstr "नेविगेशन"
+
+#, fuzzy
+#~ msgid "Tools"
+#~ msgstr "साधन"
+
+#, fuzzy
+#~ msgid "Hide VLC media player in taskbar"
+#~ msgstr "VLC Media Player अद्ययावत करा"
+
+#, fuzzy
+#~ msgid "Show VLC media player"
+#~ msgstr "VLC मेडिया प्लेयर"
+
+#, fuzzy
+#~ msgid "Advanced options"
+#~ msgstr "अधिकतम पर्याय"
+
+#, fuzzy
+#~ msgid "Show all the advanced options in the dialogs."
+#~ msgstr "प्रगत पर्याय दाखवा"
+
+#, fuzzy
 #~ msgid "Licence"
 #~ msgstr "परवाना"
 
+#, fuzzy
 #~ msgid "Add a subtitles file"
-#~ msgstr "उपशीर्षक फाईल वाढवा"
+#~ msgstr "उपशीर्षक फाईल वापरा"
 
+#, fuzzy
 #~ msgid "Use a sub&titles file"
 #~ msgstr "उपशीर्षक फाईल वापरा"
 
+#, fuzzy
 #~ msgid "Select the subtitles file"
-#~ msgstr "उपशीर्षक फाईल निवडा"
-
-#~ msgid "00000; "
-#~ msgstr "00000; "
+#~ msgstr "फाईल निवडा"
 
 #, fuzzy
 #~ msgid "Destinations"
@@ -27625,36 +27741,38 @@ msgstr "मेडिया नियंत्रक लिस्ट"
 #~ msgid "Group name"
 #~ msgstr "संघ"
 
+#, fuzzy
 #~ msgid "Instances"
-#~ msgstr "ठिकाण"
+#~ msgstr "प्रतिष्ठाpit करा"
 
-#~ msgid "Enqueue files when in one instance mode"
-#~ msgstr "एकच ठिकाण मोड असताना फाईल्स टाका"
-
+#, fuzzy
 #~ msgid "Menus language:"
-#~ msgstr "मेनू भाषा"
+#~ msgstr "संगीत भाषा"
 
+#, fuzzy
 #~ msgid "Systray popup when minimized"
-#~ msgstr "विंडो लहान केल्यावर सीसट्रे वर घ्या"
+#~ msgstr "विंडो लहान केल्यावर पौझ करा"
 
+#, fuzzy
 #~ msgid "Subtitles Language"
-#~ msgstr "उपशीर्षक भाषा"
+#~ msgstr "उपशीर्षक भाषा "
 
+#, fuzzy
 #~ msgid "Preferred subtitles language"
-#~ msgstr "पसंतीची उपशीर्षक भाषा"
+#~ msgstr "पसंतीची संगीत भाषा"
 
+#, fuzzy
 #~ msgid "Subtitles effects"
-#~ msgstr "उपशीर्षक परिणाम"
+#~ msgstr "उपशीर्षक कोडेक"
 
-#~ msgid "Do you want to download it ?"
-#~ msgstr "तुम्ही डाउनलोड करू इच्छिता?"
-
+#, fuzzy
 #~ msgid "Black slot"
-#~ msgstr "काळा भाग"
+#~ msgstr "Black"
 
 #, fuzzy
 #~ msgid "DVB"
 #~ msgstr "DV"
 
+#, fuzzy
 #~ msgid "Video Filters..."
-#~ msgstr "चित्रफीत निवड..."
+#~ msgstr "चित्रफीत फाईल्स"
