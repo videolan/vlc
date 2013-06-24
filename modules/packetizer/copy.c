@@ -167,7 +167,8 @@ static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
 
     if( p_ret != NULL && p_block->i_pts > p_ret->i_pts )
     {
-        p_ret->i_length = p_block->i_pts - p_ret->i_pts;
+        if (p_dec->fmt_in.i_codec != VLC_CODEC_OPUS)
+            p_ret->i_length = p_block->i_pts - p_ret->i_pts;
     }
     p_dec->p_sys->p_block = p_block;
 
