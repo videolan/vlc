@@ -388,6 +388,14 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     result = CreateAudioPlayer(sys->engineEngine, &sys->playerObject, &audioSrc,
                                     &audioSnk, sizeof(ids2) / sizeof(*ids2),
                                     ids2, req2);
+    if (unlikely(result != SL_RESULT_SUCCESS)) {
+        /* Try again with a more sensible samplerate */
+        fmt->i_rate = 44100;
+        format_pcm.samplesPerSec = ((SLuint32) 44100 * 1000) ;
+        result = CreateAudioPlayer(sys->engineEngine, &sys->playerObject, &audioSrc,
+                &audioSnk, sizeof(ids2) / sizeof(*ids2),
+                ids2, req2);
+    }
     CHECK_OPENSL_ERROR("Failed to create audio player");
 
     result = Realize(sys->playerObject, SL_BOOLEAN_FALSE);
