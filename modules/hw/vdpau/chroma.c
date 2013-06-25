@@ -125,7 +125,8 @@ error:
 static picture_t *VideoExport(filter_t *filter, picture_t *src, picture_t *dst)
 {
     filter_sys_t *sys = filter->p_sys;
-    vlc_vdp_video_t *psys = src->context;
+    vlc_vdp_video_field_t *field = src->context;
+    vlc_vdp_video_frame_t *psys = field->frame;
     VdpStatus err;
     VdpVideoSurface surface = psys->surface;
     void *planes[3];
@@ -228,13 +229,15 @@ error:
 static picture_t *VideoPassthrough(filter_t *filter, picture_t *src)
 {
     filter_sys_t *sys = filter->p_sys;
-    vlc_vdp_video_t *psys = src->context;
+    vlc_vdp_video_field_t *field = src->context;
 
-    if (unlikely(psys == NULL))
+    if (unlikely(field == NULL))
     {
         msg_Err(filter, "corrupt VDPAU video surface");
         return NULL;
     }
+
+    vlc_vdp_video_frame_t *psys = field->frame;
 
     /* Corner case: different VDPAU instances decoding and rendering */
     if (psys->vdp != sys->vdp)
@@ -258,8 +261,8 @@ static picture_t *VideoPassthrough(filter_t *filter, picture_t *src)
 
 static inline VdpVideoSurface picture_GetVideoSurface(const picture_t *pic)
 {
-    vlc_vdp_video_t *psys = pic->context;
-    return psys->surface;
+    vlc_vdp_video_field_t *field = pic->context;
+    return field->frame->surface;
 }
 
 static picture_t *MixerRender(filter_t *filter, picture_t *src)

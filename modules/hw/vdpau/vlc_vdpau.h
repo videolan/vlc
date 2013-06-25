@@ -207,6 +207,7 @@ void vdp_release_x11(vdp_t *);
 # include <stdbool.h>
 # include <vlc_common.h>
 # include <vlc_fourcc.h>
+# include <vlc_atomic.h>
 
 /** Converts VLC YUV format to VDPAU chroma type and YCbCr format */
 static inline
@@ -245,13 +246,19 @@ struct picture_sys_t
     vdp_t *vdp;
 };
 
-typedef struct vlc_vdp_video
+typedef struct vlc_vdp_video_frame
 {
-    void (*destroy)(void *); /* must be first @ref picture_Release() */
     VdpVideoSurface surface;
     VdpDevice device;
     vdp_t *vdp;
-} vlc_vdp_video_t;
+    atomic_uintptr_t refs;
+} vlc_vdp_video_frame_t;
+
+typedef struct vlc_vdp_video_field
+{
+    void (*destroy)(void *); /* must be first @ref picture_Release() */
+    vlc_vdp_video_frame_t *frame;
+} vlc_vdp_video_field_t;
 
 /**
  * Attaches a VDPAU video surface as context of a VLC picture.
@@ -259,4 +266,9 @@ typedef struct vlc_vdp_video
  * it will be destroyed at the same time as the picture it was attached to.
  */
 VdpStatus vlc_vdp_video_attach(vdp_t *, VdpVideoSurface, picture_t *);
+
+/**
+ * Copies the VDPAU video surface from a VLC picture into another VLC picture.
+ */
+VdpStatus vlc_vdp_video_copy(picture_t *dst, picture_t *src);
 #endif

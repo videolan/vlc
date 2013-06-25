@@ -33,31 +33,65 @@
 
 static void SurfaceDestroy(void *opaque)
 {
-    vlc_vdp_video_t *ctx = opaque;
+    vlc_vdp_video_field_t *field = opaque;
+    vlc_vdp_video_frame_t *frame = field->frame;
     VdpStatus err;
 
-    err = vdp_video_surface_destroy(ctx->vdp, ctx->surface);
+    /* Destroy field-specific infos */
+    free(field);
+
+    if (atomic_fetch_sub(&frame->refs, 1) != 1)
+        return;
+
+    /* Destroy frame (video surface) */
+    err = vdp_video_surface_destroy(frame->vdp, frame->surface);
     if (err != VDP_STATUS_OK)
         fprintf(stderr, "video surface destruction failure: %s\n",
-                vdp_get_error_string(ctx->vdp, err));
-    vdp_release_x11(ctx->vdp);
-    free(ctx);
+                vdp_get_error_string(frame->vdp, err));
+    vdp_release_x11(frame->vdp);
+    free(frame);
 }
 
 VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
                                picture_t *pic)
 {
-    vlc_vdp_video_t *ctx = malloc(sizeof (*ctx));
-    if (unlikely(ctx == NULL))
+    vlc_vdp_video_field_t *field = malloc(sizeof (*field));
+    vlc_vdp_video_frame_t *frame = malloc(sizeof (*frame));
+
+    if (unlikely(field == NULL || frame == NULL))
     {
+        free(frame);
+        free(field);
         vdp_video_surface_destroy(vdp, surface);
         return VDP_STATUS_RESOURCES;
     }
 
-    ctx->destroy = SurfaceDestroy;
-    ctx->surface = surface;
-    ctx->vdp = vdp_hold_x11(vdp, &ctx->device);
     assert(pic->context == NULL);
-    pic->context = ctx;
+    pic->context = field;
+
+    field->destroy = SurfaceDestroy;
+    field->frame = frame;
+
+    atomic_init(&frame->refs, 1);
+    frame->surface = surface;
+    frame->vdp = vdp_hold_x11(vdp, &frame->device);
+    return VDP_STATUS_OK;
+}
+
+VdpStatus vlc_vdp_video_copy(picture_t *restrict dst, picture_t *restrict src)
+{
+    vlc_vdp_video_field_t *fold = src->context;
+    vlc_vdp_video_frame_t *frame = fold->frame;
+    vlc_vdp_video_field_t *fnew = malloc(sizeof (*fnew));
+    if (unlikely(fnew == NULL))
+        return VDP_STATUS_RESOURCES;
+
+    assert(dst->context == NULL);
+    dst->context = fnew;
+
+    fnew->destroy = SurfaceDestroy;
+    fnew->frame = frame;
+
+    atomic_fetch_add(&frame->refs, 1);
     return VDP_STATUS_OK;
 }
