@@ -48,7 +48,7 @@ static int fd_open (int fd, int flags)
 
 static void v4l2_lib_load (void)
 {
-    void *h = dlopen ("libv4l2.so", RTLD_LAZY | RTLD_LOCAL);
+    void *h = dlopen ("libv4l2.so.0", RTLD_LAZY | RTLD_LOCAL);
     if (h == NULL)
         goto fallback;
 
