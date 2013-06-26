@@ -40,7 +40,7 @@
 #include "../../codec/avcodec/avcommon.h"
 
 
-#define AVFORMAT_DEBUG 1
+//#define AVFORMAT_DEBUG 1
 
 static const char *const ppsz_mux_options[] = {
     "mux", "options", NULL
