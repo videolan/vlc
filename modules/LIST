@@ -364,6 +364,7 @@ $Id$
  * vda: VDADecoder hardware-accelerated decoding
  * vdpau_avcodec: VDPAU hardware-accelerated decoding
  * vdpau_chroma: VDPAU hardware surfaces conversion and rendering
+ * vdpau_deinterlace: VDPAU deinterlacing video filter
  * vdpau_display: VDPAU video display
  * vdummy: dummy video display
  * visual: visualisation system

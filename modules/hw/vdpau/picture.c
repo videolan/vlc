@@ -71,6 +71,7 @@ VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
 
     field->destroy = SurfaceDestroy;
     field->frame = frame;
+    field->structure = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME;
 
     atomic_init(&frame->refs, 1);
     frame->surface = surface;
@@ -91,6 +92,7 @@ VdpStatus vlc_vdp_video_copy(picture_t *restrict dst, picture_t *restrict src)
 
     fnew->destroy = SurfaceDestroy;
     fnew->frame = frame;
+    fnew->structure = fold->structure;
 
     atomic_fetch_add(&frame->refs, 1);
     return VDP_STATUS_OK;

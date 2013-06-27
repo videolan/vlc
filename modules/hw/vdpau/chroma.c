@@ -288,6 +288,8 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
     picture_CopyProperties(dst, src);
 
     /* Render video into output */
+    VdpVideoMixerPictureStructure structure =
+        ((vlc_vdp_video_field_t *)(src->context))->structure;
     VdpVideoSurface past[MAX_PAST];
     VdpVideoSurface surface = picture_GetVideoSurface(src);
     VdpVideoSurface future[MAX_FUTURE];
@@ -322,7 +324,7 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
     }
 
     err = vdp_video_mixer_render(sys->vdp, sys->mixer, VDP_INVALID_HANDLE,
-                                 NULL, VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME,
+                                 NULL, structure,
                                  MAX_PAST, past, surface, MAX_FUTURE, future,
                                  &src_rect, output, &dst_rect, NULL, 0, NULL);
     if (err != VDP_STATUS_OK)

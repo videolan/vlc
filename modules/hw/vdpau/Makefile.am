@@ -26,6 +26,11 @@ if HAVE_AVCODEC_VDPAU
 libvlc_LTLIBRARIES += libvdpau_avcodec_plugin.la
 endif
 
+libvdpau_deinterlace_plugin_la_SOURCES = deinterlace.c picture.c
+libvdpau_deinterlace_plugin_la_CFLAGS = $(AM_CFLAGS) # dummy
+libvdpau_deinterlace_plugin_la_LIBADD = $(AM_LIBADD)
+libvlc_LTLIBRARIES += libvdpau_deinterlace_plugin.la
+
 libvdpau_chroma_plugin_la_SOURCES = chroma.c picture.c
 libvdpau_chroma_plugin_la_CFLAGS = $(AM_CFLAGS) # dummy
 libvdpau_chroma_plugin_la_LIBADD = $(AM_LIBADD)

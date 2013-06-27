@@ -258,6 +258,7 @@ typedef struct vlc_vdp_video_field
 {
     void (*destroy)(void *); /* must be first @ref picture_Release() */
     vlc_vdp_video_frame_t *frame;
+    VdpVideoMixerPictureStructure structure;
 } vlc_vdp_video_field_t;
 
 /**
