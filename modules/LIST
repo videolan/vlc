@@ -366,6 +366,7 @@ $Id$
  * vdpau_chroma: VDPAU hardware surfaces conversion and rendering
  * vdpau_deinterlace: VDPAU deinterlacing video filter
  * vdpau_display: VDPAU video display
+ * vdpau_sharpen: VDPAU sharpen/blur video filter
  * vdummy: dummy video display
  * visual: visualisation system
  * vmem: video memory output

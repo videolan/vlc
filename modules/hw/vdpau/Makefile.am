@@ -31,6 +31,11 @@ libvdpau_deinterlace_plugin_la_CFLAGS = $(AM_CFLAGS) # dummy
 libvdpau_deinterlace_plugin_la_LIBADD = $(AM_LIBADD)
 libvlc_LTLIBRARIES += libvdpau_deinterlace_plugin.la
 
+libvdpau_sharpen_plugin_la_SOURCES = sharpen.c picture.c
+libvdpau_sharpen_plugin_la_CFLAGS = $(AM_CFLAGS) # dummy
+libvdpau_sharpen_plugin_la_LIBADD = $(AM_LIBADD)
+libvlc_LTLIBRARIES += libvdpau_sharpen_plugin.la
+
 libvdpau_chroma_plugin_la_SOURCES = chroma.c picture.c
 libvdpau_chroma_plugin_la_CFLAGS = $(AM_CFLAGS) # dummy
 libvdpau_chroma_plugin_la_LIBADD = $(AM_LIBADD)

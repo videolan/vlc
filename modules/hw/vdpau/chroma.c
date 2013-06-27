@@ -52,7 +52,21 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
     filter_sys_t *sys = filter->p_sys;
     VdpVideoMixer mixer;
     VdpStatus err;
+    VdpBool ok;
 
+    /* Check for potentially useful features */
+    VdpVideoMixerFeature featv[1];
+    unsigned featc = 0;
+
+    err = vdp_video_mixer_query_feature_support(sys->vdp, sys->device,
+                                       VDP_VIDEO_MIXER_FEATURE_SHARPNESS, &ok);
+    if (err == VDP_STATUS_OK && ok == VDP_TRUE)
+    {
+        msg_Dbg(filter, "using video mixer %s feature", "sharpness");
+        featv[featc++] = VDP_VIDEO_MIXER_FEATURE_SHARPNESS;
+    }
+
+    /* Create the mixer */
     VdpVideoMixerParameter parms[3] = {
         VDP_VIDEO_MIXER_PARAMETER_VIDEO_SURFACE_WIDTH,
         VDP_VIDEO_MIXER_PARAMETER_VIDEO_SURFACE_HEIGHT,
@@ -62,7 +76,7 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
     uint32_t height = filter->fmt_in.video.i_height;
     const void *values[3] = { &width, &height, &sys->chroma, };
 
-    err = vdp_video_mixer_create(sys->vdp, sys->device, 0, NULL,
+    err = vdp_video_mixer_create(sys->vdp, sys->device, featc, featv,
                                  3, parms, values, &mixer);
     if (err != VDP_STATUS_OK)
     {
@@ -268,6 +282,7 @@ static inline VdpVideoSurface picture_GetVideoSurface(const picture_t *pic)
 static picture_t *MixerRender(filter_t *filter, picture_t *src)
 {
     filter_sys_t *sys = filter->p_sys;
+    VdpStatus err;
 
     picture_t *dst = OutputAllocate(filter);
     if (dst == NULL)
@@ -287,9 +302,38 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
         goto skip;
     picture_CopyProperties(dst, src);
 
+    vlc_vdp_video_field_t *f = src->context;
+
+    /* Enable/Disable features */
+    const VdpVideoMixerFeature features[] = {
+        VDP_VIDEO_MIXER_FEATURE_SHARPNESS,
+    };
+    const VdpBool enables[] = {
+        f->sharpen != 0.f,
+    };
+
+    err = vdp_video_mixer_set_feature_enables(sys->vdp, sys->mixer,
+                  sizeof (features) / sizeof (features[0]), features, enables);
+    if (err != VDP_STATUS_OK)
+        msg_Err(filter, "video %s %s failure: %s", "mixer", "features",
+                vdp_get_error_string(sys->vdp, err));
+
+    /* Configure mixer depending on upstream video filters */
+    const VdpVideoMixerAttribute attrs[] = {
+        VDP_VIDEO_MIXER_ATTRIBUTE_SHARPNESS_LEVEL,
+    };
+    const void *const values[] = {
+        &f->sharpen,
+    };
+
+    err = vdp_video_mixer_set_attribute_values(sys->vdp, sys->mixer,
+                            sizeof (attrs) / sizeof (attrs[0]), attrs, values);
+    if (err != VDP_STATUS_OK)
+        msg_Err(filter, "video %s %s failure: %s", "mixer", "attributes",
+                vdp_get_error_string(sys->vdp, err));
+
     /* Render video into output */
-    VdpVideoMixerPictureStructure structure =
-        ((vlc_vdp_video_field_t *)(src->context))->structure;
+    VdpVideoMixerPictureStructure structure = f->structure;
     VdpVideoSurface past[MAX_PAST];
     VdpVideoSurface surface = picture_GetVideoSurface(src);
     VdpVideoSurface future[MAX_FUTURE];
@@ -304,7 +348,6 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
         filter->fmt_out.video.i_visible_width,
         filter->fmt_out.video.i_visible_height
     };
-    VdpStatus err;
 
     for (unsigned i = 0; i < MAX_PAST; i++)
     {
