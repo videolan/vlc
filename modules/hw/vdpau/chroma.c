@@ -55,8 +55,20 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
     VdpBool ok;
 
     /* Check for potentially useful features */
-    VdpVideoMixerFeature featv[1];
+    VdpVideoMixerFeature featv[2];
     unsigned featc = 0;
+
+    const float noise = var_InheritFloat(filter, "vdpau-noise-reduction");
+    if (noise > 0.f)
+    {
+        err = vdp_video_mixer_query_feature_support(sys->vdp, sys->device,
+                                 VDP_VIDEO_MIXER_FEATURE_NOISE_REDUCTION, &ok);
+        if (err == VDP_STATUS_OK && ok == VDP_TRUE)
+        {
+            msg_Dbg(filter, "using video mixer %s feature", "noise reduction");
+            featv[featc++] = VDP_VIDEO_MIXER_FEATURE_NOISE_REDUCTION;
+        }
+    }
 
     err = vdp_video_mixer_query_feature_support(sys->vdp, sys->device,
                                        VDP_VIDEO_MIXER_FEATURE_SHARPNESS, &ok);
@@ -84,6 +96,45 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
                 vdp_get_error_string(sys->vdp, err));
         mixer = VDP_INVALID_HANDLE;
     }
+
+    /* Set initial features and attributes */
+    VdpVideoMixerAttribute attrv[1];
+    const void *valv[1];
+    unsigned attrc = 0;
+
+    featc = 0;
+    if (noise > 0.f)
+    {
+        featv[featc++] = VDP_VIDEO_MIXER_FEATURE_NOISE_REDUCTION;
+
+        attrv[attrc] = VDP_VIDEO_MIXER_ATTRIBUTE_NOISE_REDUCTION_LEVEL;
+        valv[attrc] = &noise;
+        attrc++;
+    }
+
+    if (featc > 0)
+    {
+        VdpBool enablev[featc];
+
+        for (unsigned i = 0; i < featc; i++)
+            enablev[i] = VDP_TRUE;
+
+        err = vdp_video_mixer_set_feature_enables(sys->vdp, mixer,
+                                                  featc, featv, enablev);
+        if (err != VDP_STATUS_OK)
+            msg_Err(filter, "video %s %s failure: %s", "mixer", "features",
+                    vdp_get_error_string(sys->vdp, err));
+    }
+
+    if (attrc > 0)
+    {
+        err = vdp_video_mixer_set_attribute_values(sys->vdp, mixer,
+                                                   attrc, attrv, valv);
+        if (err != VDP_STATUS_OK)
+            msg_Err(filter, "video %s %s failure: %s", "mixer", "attributes",
+                    vdp_get_error_string(sys->vdp, err));
+    }
+
     return mixer;
 }
 
@@ -516,6 +567,10 @@ vlc_module_begin()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_callbacks(OutputOpen, OutputClose)
+
+    add_float_with_range("vdpau-noise-reduction", 0., 0., 1.,
+        N_("Noise reduction level"), N_("Noise reduction level"), true)
+
     add_submodule()
     set_callbacks(YCbCrOpen, YCbCrClose)
 vlc_module_end()
