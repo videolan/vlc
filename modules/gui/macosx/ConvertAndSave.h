@@ -62,6 +62,8 @@
     IBOutlet id _customize_newProfile_btn;
     IBOutlet id _customize_tabview;
     IBOutlet id _customize_encap_matrix;
+
+    IBOutlet id _customize_vid_settings_box;
     IBOutlet id _customize_vid_ckb;
     IBOutlet id _customize_vid_keep_ckb;
     IBOutlet id _customize_vid_codec_lbl;
@@ -78,6 +80,8 @@
     IBOutlet id _customize_vid_height_fld;
     IBOutlet id _customize_vid_scale_lbl;
     IBOutlet id _customize_vid_scale_pop;
+
+    IBOutlet id _customize_aud_settings_box;
     IBOutlet id _customize_aud_ckb;
     IBOutlet id _customize_aud_keep_ckb;
     IBOutlet id _customize_aud_codec_lbl;
@@ -88,6 +92,7 @@
     IBOutlet id _customize_aud_channels_fld;
     IBOutlet id _customize_aud_samplerate_lbl;
     IBOutlet id _customize_aud_samplerate_pop;
+
     IBOutlet id _customize_subs_ckb;
     IBOutlet id _customize_subs_pop;
     IBOutlet id _customize_subs_overlay_ckb;
@@ -157,6 +162,10 @@
 
 - (void)panel:(VLCEnterTextPanel *)panel returnValue:(NSUInteger)value text:(NSString *)text;
 - (void)panel:(VLCSelectItemInPopupPanel *)panel returnValue:(NSUInteger)value item:(NSUInteger)item;
+
+- (IBAction)videoSettingsChanged:(id)sender;
+- (IBAction)audioSettingsChanged:(id)sender;
+- (IBAction)subSettingsChanged:(id)sender;
 
 - (void)updateDropView;
 

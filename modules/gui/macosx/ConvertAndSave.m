@@ -641,6 +641,27 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     }
 }
 
+- (IBAction)videoSettingsChanged:(id)sender
+{
+    bool enableSettings = [_customize_vid_ckb state] == NSOnState && [_customize_vid_keep_ckb state] == NSOffState;
+    [_customize_vid_settings_box enableSubviews:enableSettings];
+    [_customize_vid_keep_ckb setEnabled:[_customize_vid_ckb state] == NSOnState];
+}
+
+- (IBAction)audioSettingsChanged:(id)sender
+{
+    bool enableSettings = [_customize_aud_ckb state] == NSOnState && [_customize_aud_keep_ckb state] == NSOffState;
+    [_customize_aud_settings_box enableSubviews:enableSettings];
+    [_customize_aud_keep_ckb setEnabled:[_customize_aud_ckb state] == NSOnState];
+}
+
+- (IBAction)subSettingsChanged:(id)sender
+{
+    bool enableSettings = [_customize_subs_ckb state] == NSOnState;
+    [_customize_subs_overlay_ckb setEnabled:enableSettings];
+    [_customize_subs_pop setEnabled:enableSettings];
+}
+
 # pragma mark -
 # pragma mark Private Functionality
 - (void)updateDropView
@@ -749,6 +770,10 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
             }
         }
     }
+
+    [self videoSettingsChanged:nil];
+    [self audioSettingsChanged:nil];
+    [self subSettingsChanged:nil];
 
     [self setCurrentProfile: [[[NSMutableArray alloc] initWithArray: [profileString componentsSeparatedByString:@";"]] autorelease]];
 }

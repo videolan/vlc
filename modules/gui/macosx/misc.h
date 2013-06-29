@@ -211,3 +211,11 @@
 - (bool)isPartialStringValid:(NSString*)partialString newEditingString:(NSString**)newString errorDescription:(NSString**)error;
 
 @end
+
+/*****************************************************************************
+ * NSView addition
+ *****************************************************************************/
+
+@interface NSView (EnableSubviews)
+- (void)enableSubviews:(BOOL)b_enable;
+@end
