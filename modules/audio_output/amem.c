@@ -56,12 +56,12 @@ struct aout_sys_t
 {
     void *opaque;
     int (*setup) (void **, char *, unsigned *, unsigned *);
+    void (*cleanup) (void *opaque);
     union
     {
         struct
         {
             void *setup_opaque;
-            void (*cleanup) (void *opaque);
         };
         struct
         {
@@ -243,11 +243,12 @@ static int Open (vlc_object_t *obj)
     sys->setup = var_InheritAddress (obj, "amem-setup");
     if (sys->setup != NULL)
     {
-        sys->setup_opaque = opaque;
         sys->cleanup = var_InheritAddress (obj, "amem-cleanup");
+        sys->setup_opaque = opaque;
     }
     else
     {
+        sys->cleanup = NULL;
         sys->opaque = opaque;
         sys->rate = var_InheritInteger (obj, "amem-rate");
         sys->channels = var_InheritInteger (obj, "amem-channels");
