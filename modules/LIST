@@ -362,6 +362,7 @@ $Id$
  * vcd: input module for accessing Video CDs
  * vcdx: input module for accessing Video CDs with navigation & stills
  * vda: VDADecoder hardware-accelerated decoding
+ * vdpau_adjust: VDPAU color adjust video filter
  * vdpau_avcodec: VDPAU hardware-accelerated decoding
  * vdpau_chroma: VDPAU hardware surfaces conversion and rendering
  * vdpau_deinterlace: VDPAU deinterlacing video filter

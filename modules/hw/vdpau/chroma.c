@@ -44,10 +44,18 @@ struct filter_sys_t
     VdpYCbCrFormat format;
     picture_t *(*import)(filter_t *, picture_t *);
     picture_t *history[MAX_PAST + 1 + MAX_FUTURE];
+    struct
+    {
+        float brightness;
+        float contrast;
+        float saturation;
+        float hue;
+    } procamp;
 };
 
 /** Initialize the colour space conversion matrix */
-static VdpStatus MixerSetupColors(filter_t *filter, VdpCSCMatrix *restrict csc)
+static VdpStatus MixerSetupColors(filter_t *filter, const VdpProcamp *procamp,
+                                  VdpCSCMatrix *restrict csc)
 {
     filter_sys_t *sys = filter->p_sys;
     VdpStatus err;
@@ -55,11 +63,29 @@ static VdpStatus MixerSetupColors(filter_t *filter, VdpCSCMatrix *restrict csc)
                          ? VDP_COLOR_STANDARD_ITUR_BT_709
                          : VDP_COLOR_STANDARD_ITUR_BT_601;
 
-    err = vdp_generate_csc_matrix(sys->vdp, NULL, std, csc);
+    err = vdp_generate_csc_matrix(sys->vdp, procamp, std, csc);
     if (err != VDP_STATUS_OK)
+    {
         msg_Err(filter, "video %s failure: %s", "color space matrix",
                 vdp_get_error_string(sys->vdp, err));
-    return err;
+        return err;
+    }
+
+    if (procamp != NULL)
+    {
+        sys->procamp.brightness = procamp->brightness;
+        sys->procamp.contrast = procamp->contrast;
+        sys->procamp.saturation = procamp->saturation;
+        sys->procamp.hue = procamp->hue;
+    }
+    else
+    {
+        sys->procamp.brightness = 0.f;
+        sys->procamp.contrast = 1.f;
+        sys->procamp.saturation = 1.f;
+        sys->procamp.hue = 0.f;
+    }
+    return VDP_STATUS_OK;
 }
 
 /** Create VDPAU video mixer */
@@ -138,7 +164,7 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
 
     featc = 0;
 
-    if (MixerSetupColors(filter, &csc) == VDP_STATUS_OK)
+    if (MixerSetupColors(filter, NULL, &csc) == VDP_STATUS_OK)
     {
         attrv[attrc] = VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX;
         valv[attrc] = &csc;
@@ -415,15 +441,28 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
                 vdp_get_error_string(sys->vdp, err));
 
     /* Configure mixer depending on upstream video filters */
-    const VdpVideoMixerAttribute attrs[] = {
+    VdpVideoMixerAttribute attrs[2] = {
         VDP_VIDEO_MIXER_ATTRIBUTE_SHARPNESS_LEVEL,
     };
-    const void *const values[] = {
+    const void *values[2] = {
         &f->sharpen,
     };
+    unsigned count = 1;
+    VdpCSCMatrix csc;
+
+    if ((sys->procamp.brightness != f->procamp.brightness
+      || sys->procamp.contrast != f->procamp.contrast
+      || sys->procamp.saturation != f->procamp.saturation
+      || sys->procamp.hue != f->procamp.hue)
+     && (MixerSetupColors(filter, &f->procamp, &csc) == VDP_STATUS_OK))
+    {
+        attrs[count] = VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX;
+        values[count] = &csc;
+        count++;
+    }
 
     err = vdp_video_mixer_set_attribute_values(sys->vdp, sys->mixer,
-                            sizeof (attrs) / sizeof (attrs[0]), attrs, values);
+                                               count, attrs, values);
     if (err != VDP_STATUS_OK)
         msg_Err(filter, "video %s %s failure: %s", "mixer", "attributes",
                 vdp_get_error_string(sys->vdp, err));
@@ -529,6 +568,11 @@ static int OutputOpen(vlc_object_t *obj)
 
     for (unsigned i = 0; i < MAX_PAST + MAX_FUTURE; i++)
         sys->history[i] = NULL;
+
+    sys->procamp.brightness = 0.f;
+    sys->procamp.contrast = 1.f;
+    sys->procamp.saturation = 1.f;
+    sys->procamp.hue = 0.f;
 
     filter->pf_video_filter = MixerRender;
     filter->pf_video_flush = Flush;

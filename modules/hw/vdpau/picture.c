@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 #include <vlc_common.h>
 #include <vlc_picture.h>
@@ -52,6 +53,15 @@ static void SurfaceDestroy(void *opaque)
     free(frame);
 }
 
+static const VdpProcamp procamp_default =
+{
+    .struct_version = VDP_PROCAMP_VERSION,
+    .brightness = 0.f,
+    .contrast = 1.f,
+    .saturation = 1.f,
+    .hue = 0.f,
+};
+
 VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
                                picture_t *pic)
 {
@@ -72,6 +82,7 @@ VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
     field->destroy = SurfaceDestroy;
     field->frame = frame;
     field->structure = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME;
+    field->procamp = procamp_default;
     field->sharpen = 0.f;
 
     atomic_init(&frame->refs, 1);
@@ -94,6 +105,7 @@ VdpStatus vlc_vdp_video_copy(picture_t *restrict dst, picture_t *restrict src)
     fnew->destroy = SurfaceDestroy;
     fnew->frame = frame;
     fnew->structure = fold->structure;
+    fnew->procamp = fold->procamp;
     fnew->sharpen = fold->sharpen;
 
     atomic_fetch_add(&frame->refs, 1);
