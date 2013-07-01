@@ -496,8 +496,10 @@ int vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                     input_item_t *p_input;
 
                     /* Read path and name */
-                    psz_oldurl = input_item_GetURI( p_parent );
-                    msg_Dbg( p_this, "old path: %s", psz_oldurl );
+                    if (p_parent) {
+                        psz_oldurl = input_item_GetURI( p_parent );
+                        msg_Dbg( p_this, "old path: %s", psz_oldurl );
+                    }
                     psz_path = lua_tostring( L, -1 );
                     msg_Dbg( p_this, "Path: %s", psz_path );
                     lua_getfield( L, -2, "name" );
@@ -547,14 +549,14 @@ int vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
 
                     /* copy the original URL to the meta data, if "URL" is still empty */
                     char* url = input_item_GetURL( p_input );
-                    if( url == NULL )
+                    if( url == NULL && p_parent)
                     {
                         EnsureUTF8( psz_oldurl );
                         msg_Dbg( p_this, "meta-URL: %s", psz_oldurl );
                         input_item_SetURL ( p_input, psz_oldurl );
+                        free( psz_oldurl );
                     }
                     free( url );
-                    free( psz_oldurl );
 
                     /* copy the psz_name to the meta data, if "Title" is still empty */
                     char* title = input_item_GetTitle( p_input );
