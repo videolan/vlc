@@ -55,7 +55,7 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
     VdpBool ok;
 
     /* Check for potentially useful features */
-    VdpVideoMixerFeature featv[2];
+    VdpVideoMixerFeature featv[3];
     unsigned featc = 0;
 
     const float noise = var_InheritFloat(filter, "vdpau-noise-reduction");
@@ -76,6 +76,23 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
     {
         msg_Dbg(filter, "using video mixer %s feature", "sharpness");
         featv[featc++] = VDP_VIDEO_MIXER_FEATURE_SHARPNESS;
+    }
+
+    const int offset = VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1 - 1;
+    unsigned level = var_InheritInteger(filter, "vdpau-scaling");
+    while (level > 0)
+    {
+
+        err = vdp_video_mixer_query_feature_support(sys->vdp, sys->device,
+                                                    offset + level, &ok);
+        if (err == VDP_STATUS_OK && ok == VDP_TRUE)
+        {
+            msg_Dbg(filter, "using video mixer high quality scaling L%u",
+                    level);
+            featv[featc++] = offset + level;
+            break;
+        }
+        level--; /* fallback to lower quality */
     }
 
     /* Create the mixer */
@@ -111,6 +128,9 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
         valv[attrc] = &noise;
         attrc++;
     }
+
+    if (level > 0)
+        featv[featc++] = offset + level;
 
     if (featc > 0)
     {
@@ -570,6 +590,8 @@ vlc_module_begin()
 
     add_float_with_range("vdpau-noise-reduction", 0., 0., 1.,
         N_("Noise reduction level"), N_("Noise reduction level"), true)
+    add_integer_with_range("vdpau-scaling", 0, 0, 9,
+       N_("Scaling quality"), N_("High quality scaling level"), true)
 
     add_submodule()
     set_callbacks(YCbCrOpen, YCbCrClose)
