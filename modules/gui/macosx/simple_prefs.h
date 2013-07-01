@@ -102,6 +102,9 @@
     IBOutlet id o_intf_nativefullscreen_ckb;
     IBOutlet id o_intf_autoresize_ckb;
     IBOutlet id o_intf_pauseminimized_ckb;
+    IBOutlet id o_intf_luahttp_box;
+    IBOutlet id o_intf_luahttppwd_lbl;
+    IBOutlet id o_intf_luahttppwd_fld;
 
     IBOutlet id o_osd_encoding_pop;
     IBOutlet id o_osd_encoding_txt;

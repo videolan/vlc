@@ -239,6 +239,8 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     [o_intf_enableGrowl_ckb setTitle: _NS("Enable Growl notifications (on playlist item change)")];
     [o_intf_autoresize_ckb setTitle: _NS("Resize interface to the native video size")];
     [o_intf_pauseminimized_ckb setTitle: _NS("Pause the video playback when minimized")];
+    [o_intf_luahttp_box setTitle:_NS("Lua HTTP")];
+    [o_intf_luahttppwd_lbl setStringValue:_NS("Password")];
 
     /* Subtitles and OSD */
     [o_osd_encoding_txt setStringValue: _NS("Default Encoding")];
@@ -459,6 +461,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     }
     [self setupButton: o_intf_autoresize_ckb forBoolValue: "macosx-video-autoresize"];
     [self setupButton: o_intf_pauseminimized_ckb forBoolValue: "macosx-pause-minimized"];
+    [self setupField: o_intf_luahttppwd_fld forOption: "http-password"];
 
     /******************
      * audio settings *
@@ -831,6 +834,7 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
                 config_PutPsz(p_intf, "control", [tmpString UTF8String]);
             }
         }
+        config_PutPsz(p_intf, "http-password", [[o_intf_luahttppwd_fld stringValue] UTF8String]);
 
         /* activate stuff without restart */
         if ([o_intf_appleremote_ckb state] == YES)
