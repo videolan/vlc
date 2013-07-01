@@ -46,6 +46,22 @@ struct filter_sys_t
     picture_t *history[MAX_PAST + 1 + MAX_FUTURE];
 };
 
+/** Initialize the colour space conversion matrix */
+static VdpStatus MixerSetupColors(filter_t *filter, VdpCSCMatrix *restrict csc)
+{
+    filter_sys_t *sys = filter->p_sys;
+    VdpStatus err;
+    VdpColorStandard std = (filter->fmt_in.video.i_height > 576)
+                         ? VDP_COLOR_STANDARD_ITUR_BT_709
+                         : VDP_COLOR_STANDARD_ITUR_BT_601;
+
+    err = vdp_generate_csc_matrix(sys->vdp, NULL, std, csc);
+    if (err != VDP_STATUS_OK)
+        msg_Err(filter, "video %s failure: %s", "color space matrix",
+                vdp_get_error_string(sys->vdp, err));
+    return err;
+}
+
 /** Create VDPAU video mixer */
 static VdpVideoMixer MixerCreate(filter_t *filter)
 {
@@ -115,11 +131,20 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
     }
 
     /* Set initial features and attributes */
-    VdpVideoMixerAttribute attrv[1];
-    const void *valv[1];
+    VdpVideoMixerAttribute attrv[2];
+    const void *valv[2];
     unsigned attrc = 0;
+    VdpCSCMatrix csc;
 
     featc = 0;
+
+    if (MixerSetupColors(filter, &csc) == VDP_STATUS_OK)
+    {
+        attrv[attrc] = VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX;
+        valv[attrc] = &csc;
+        attrc++;
+    }
+
     if (noise > 0.f)
     {
         featv[featc++] = VDP_VIDEO_MIXER_FEATURE_NOISE_REDUCTION;
