@@ -824,7 +824,7 @@ static int Start( access_t *p_access, uint64_t i_pos )
                 i_select = 0;
             }
             net_Printf( p_access, p_sys->fd, NULL,
-                        "ffff:%d:%d ", i, i_select );
+                        "ffff:%x:%d ", i, i_select );
         }
     }
     net_Printf( p_access, p_sys->fd, NULL, "\r\n" );
