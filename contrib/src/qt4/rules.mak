@@ -1,7 +1,7 @@
 # qt4
 
-QT4_VERSION = 4.8.2
-QT4_URL := http://releases.qt-project.org/qt4/source/qt-everywhere-opensource-src-$(QT4_VERSION).tar.gz
+QT4_VERSION = 4.8.5
+QT4_URL := http://download.qt-project.org/official_releases/qt/4.8/$(QT4_VERSION)/qt-everywhere-opensource-src-$(QT4_VERSION).tar.gz
 
 ifdef HAVE_MACOSX
 #PKGS += qt4
@@ -28,18 +28,16 @@ qt4: qt-$(QT4_VERSION).tar.gz .sum-qt4
 	$(APPLY) $(SRC)/qt4/imageformats.patch
 	$(MOVE)
 
-XTOOLS := XCC="$(CC)" XCXX="$(CXX)" XSTRIP="$(STRIP)" XAR="$(AR)"
-
 ifdef HAVE_MACOSX
 QT_PLATFORM := -platform darwin-g++
 endif
 ifdef HAVE_WIN32
-QT_PLATFORM := -xplatform win32-g++
+QT_PLATFORM := -xplatform win32-g++ -device-option CROSS_COMPILE=$(HOST)-
 endif
 
 .qt4: qt4
-	cd $< && $(XTOOLS) ./configure $(QT_PLATFORM) -static -release -fast -no-exceptions -no-stl -no-sql-sqlite -no-qt3support -no-gif -no-libmng -qt-libjpeg -no-libtiff -no-qdbus -no-openssl -no-webkit -sse -no-script -no-multimedia -no-phonon -opensource -no-scripttools -no-opengl -no-script -no-scripttools -no-declarative -no-declarative-debug -opensource -no-s60 -host-little-endian -confirm-license
-	cd $< && $(MAKE) $(XTOOLS) sub-src
+	cd $< && ./configure $(QT_PLATFORM) -static -release -fast -no-exceptions -no-stl -no-sql-sqlite -no-qt3support -no-gif -no-libmng -qt-libjpeg -no-libtiff -no-qdbus -no-openssl -no-webkit -sse -no-script -no-multimedia -no-phonon -opensource -no-scripttools -no-opengl -no-script -no-scripttools -no-declarative -no-declarative-debug -opensource -no-s60 -host-little-endian -confirm-license
+	cd $< && $(MAKE) sub-src
 	# BUILDING QT BUILD TOOLS
 ifdef HAVE_CROSS_COMPILE
 	cd $</src/tools; $(MAKE) clean; \
@@ -47,7 +45,7 @@ ifdef HAVE_CROSS_COMPILE
 			do (cd $$i; ../../../bin/qmake); \
 		done; \
 		../../../bin/qmake; \
-		$(MAKE) $(XTOOLS)
+		$(MAKE)
 endif
 	# INSTALLING LIBRARIES
 	for lib in QtGui QtCore QtNetwork QtXml; \
