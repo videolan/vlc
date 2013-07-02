@@ -987,7 +987,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     }
 
     picture_t *direct;
-    if (!is_direct && todisplay) {
+    if (!is_direct) {
         direct = picture_pool_Get(vout->p->display_pool);
         if (direct) {
             VideoFormatCopyCropAr(&direct->format, &todisplay->format);
