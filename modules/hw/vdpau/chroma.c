@@ -194,10 +194,11 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
     }
 
     /* Set initial features and attributes */
-    VdpVideoMixerAttribute attrv[2];
-    const void *valv[2];
+    VdpVideoMixerAttribute attrv[3];
+    const void *valv[3];
     unsigned attrc = 0;
     VdpCSCMatrix csc;
+    uint8_t chroma_skip;
 
     featc = 0;
 
@@ -213,6 +214,11 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
         featv[featc++] = algo;
         if (ivtc)
             featv[featc++] = VDP_VIDEO_MIXER_FEATURE_INVERSE_TELECINE;
+
+        chroma_skip = var_InheritBool(filter, "vdpau-chroma-skip");
+        attrv[attrc] = VDP_VIDEO_MIXER_ATTRIBUTE_SKIP_CHROMA_DEINTERLACE;
+        valv[attrc] = &chroma_skip;
+        attrc++;
     }
 
     if (noise > 0.f)
@@ -717,6 +723,9 @@ vlc_module_begin()
         change_integer_list(algo_values, algo_names)
     add_bool("vdpau-ivtc", false,
              N_("Inverse telecine"), N_("Inverse telecine"), true)
+    add_bool("vdpau-chroma-skip", false,
+             N_("Deinterlace chroma skip"),
+             N_("Whether temporal deinterlacing applies to luma only"), true)
     add_float_with_range("vdpau-noise-reduction", 0., 0., 1.,
         N_("Noise reduction level"), N_("Noise reduction level"), true)
     add_integer_with_range("vdpau-scaling", 0, 0, 9,
