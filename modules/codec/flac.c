@@ -381,11 +381,18 @@ static void ProcessHeader( decoder_t *p_dec )
     /* Decode STREAMINFO */
     msg_Dbg( p_dec, "decode STREAMINFO" );
     size_t i_extra = p_dec->fmt_in.i_extra;
+    static const char header[4] = { 'f', 'L', 'a', 'C' };
+
+    if (i_extra > 42 && !memcmp(p_dec->fmt_in.p_extra, header, 4))
+        i_extra = 42;
+    else if (i_extra > 34 && memcmp(p_dec->fmt_in.p_extra, header, 4))
+        i_extra = 34;
+
     switch (i_extra) {
     case 34:
         p_sys->p_block = block_Alloc( 8 + i_extra );
         memcpy( p_sys->p_block->p_buffer + 8, p_dec->fmt_in.p_extra, i_extra );
-        memcpy( p_sys->p_block->p_buffer, "fLaC", 4);
+        memcpy( p_sys->p_block->p_buffer, header, 4);
         uint8_t *p = p_sys->p_block->p_buffer;
         p[4] = 0x80 | 0; /* STREAMINFO faked as last block */
         p[5] = 0;
