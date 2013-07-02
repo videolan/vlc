@@ -97,10 +97,11 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
     VdpBool ok;
 
     /* Check for potentially useful features */
-    VdpVideoMixerFeature featv[4];
+    VdpVideoMixerFeature featv[5];
     unsigned featc = 0;
 
     int algo = var_InheritInteger(filter, "vdpau-deinterlace");
+    bool ivtc = false;
     if (algo == VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL)
     {
         err = vdp_video_mixer_query_feature_support(sys->vdp, sys->device,
@@ -122,7 +123,19 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
             algo = -1;
     }
     if (algo >= 0)
+    {
         featv[featc++] = algo;
+        ivtc = var_InheritBool(filter, "vdpau-ivtc");
+        if (ivtc)
+        {
+            err = vdp_video_mixer_query_feature_support(sys->vdp, sys->device,
+                                VDP_VIDEO_MIXER_FEATURE_INVERSE_TELECINE, &ok);
+            if (err == VDP_STATUS_OK && ok == VDP_TRUE)
+                msg_Dbg(filter, "using video mixer %s feature",
+                        "inverse telecine");
+            featv[featc++] = VDP_VIDEO_MIXER_FEATURE_INVERSE_TELECINE;
+        }
+    }
 
     const float noise = var_InheritFloat(filter, "vdpau-noise-reduction");
     if (noise > 0.f)
@@ -196,7 +209,11 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
     }
 
     if (algo >= 0)
+    {
         featv[featc++] = algo;
+        if (ivtc)
+            featv[featc++] = VDP_VIDEO_MIXER_FEATURE_INVERSE_TELECINE;
+    }
 
     if (noise > 0.f)
     {
@@ -698,6 +715,8 @@ vlc_module_begin()
                 VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL,
                 N_("Deinterlace"), N_("Deinterlacing algorithm"), true)
         change_integer_list(algo_values, algo_names)
+    add_bool("vdpau-ivtc", false,
+             N_("Inverse telecine"), N_("Inverse telecine"), true)
     add_float_with_range("vdpau-noise-reduction", 0., 0., 1.,
         N_("Noise reduction level"), N_("Noise reduction level"), true)
     add_integer_with_range("vdpau-scaling", 0, 0, 9,
