@@ -338,7 +338,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     o_mrl = newMRL;
     [o_mrl retain];
-    [o_mrl_fld setStringValue: o_mrl];
+    [o_mrl_fld performSelectorOnMainThread:@selector(setStringValue:) withObject:o_mrl waitUntilDone:NO];
     if ([o_mrl length] > 0)
         [o_btn_ok setEnabled: YES];
     else
