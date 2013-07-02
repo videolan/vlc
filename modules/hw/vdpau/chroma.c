@@ -97,8 +97,32 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
     VdpBool ok;
 
     /* Check for potentially useful features */
-    VdpVideoMixerFeature featv[3];
+    VdpVideoMixerFeature featv[4];
     unsigned featc = 0;
+
+    int algo = var_InheritInteger(filter, "vdpau-deinterlace");
+    if (algo == VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL)
+    {
+        err = vdp_video_mixer_query_feature_support(sys->vdp, sys->device,
+                                                    algo, &ok);
+        if (err == VDP_STATUS_OK && ok == VDP_TRUE)
+            msg_Dbg(filter, "using video mixer %s feature",
+                    "temporal-spatial deinterlace");
+        else
+            algo = VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL; /* fallback */
+    }
+    if (algo == VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL)
+    {
+        err = vdp_video_mixer_query_feature_support(sys->vdp, sys->device,
+                                                    algo, &ok);
+        if (err == VDP_STATUS_OK && ok == VDP_TRUE)
+            msg_Dbg(filter, "using video mixer %s feature",
+                    "temporal deinterlace");
+        else
+            algo = -1;
+    }
+    if (algo >= 0)
+        featv[featc++] = algo;
 
     const float noise = var_InheritFloat(filter, "vdpau-noise-reduction");
     if (noise > 0.f)
@@ -170,6 +194,9 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
         valv[attrc] = &csc;
         attrc++;
     }
+
+    if (algo >= 0)
+        featv[featc++] = algo;
 
     if (noise > 0.f)
     {
@@ -649,6 +676,16 @@ static void YCbCrClose(vlc_object_t *obj)
     free(sys);
 }
 
+static const int algo_values[] = {
+    -1,
+    VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL,
+    VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL,
+};
+
+static const char *const algo_names[] = {
+    N_("Bob"), N_("Temporal"), N_("Temporal-spatial"),
+};
+
 vlc_module_begin()
     set_shortname(N_("VDPAU"))
     set_description(N_("VDPAU surface conversions"))
@@ -657,6 +694,10 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_callbacks(OutputOpen, OutputClose)
 
+    add_integer("vdpau-deinterlace",
+                VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL,
+                N_("Deinterlace"), N_("Deinterlacing algorithm"), true)
+        change_integer_list(algo_values, algo_names)
     add_float_with_range("vdpau-noise-reduction", 0., 0., 1.,
         N_("Noise reduction level"), N_("Noise reduction level"), true)
     add_integer_with_range("vdpau-scaling", 0, 0, 9,
