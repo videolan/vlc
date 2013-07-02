@@ -2013,6 +2013,11 @@ static VLCMain *_o_sharedMainInstance = nil;
             [o_msg_arr removeObjectAtIndex: 0];
             [o_msg_arr removeObjectAtIndex: 1];
         }
+        if (!item->psz_module)
+            return;
+        if (!str)
+            return;
+
         firstString = [NSString stringWithFormat:@"%s%s", item->psz_module, ppsz_type[i_type]];
         secondString = [NSString stringWithFormat:@"%@%s\n", firstString, str];
 
