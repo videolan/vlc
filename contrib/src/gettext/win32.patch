@@ -1,0 +1,11 @@
+--- gettext/gettext-runtime/gnulib-lib/msvc-inval.c.orig	2013-07-02 17:44:02.000000000 +0200
++++ gettext/gettext-runtime/gnulib-lib/msvc-inval.c	2013-07-02 17:42:58.000000000 +0200
+@@ -28,7 +28,7 @@
+ 
+ # if MSVC_INVALID_PARAMETER_HANDLING == DEFAULT_HANDLING
+ 
+-static void cdecl
++static void __cdecl
+ gl_msvc_invalid_parameter_handler (const wchar_t *expression,
+                                    const wchar_t *function,
+                                    const wchar_t *file,

@@ -15,6 +15,7 @@ $(TARBALLS)/gettext-$(GETTEXT_VERSION).tar.gz:
 
 gettext: gettext-$(GETTEXT_VERSION).tar.gz .sum-gettext
 	$(UNPACK)
+	$(APPLY) $(SRC)/gettext/win32.patch
 	$(MOVE)
 
 DEPS_gettext = iconv $(DEPS_iconv)

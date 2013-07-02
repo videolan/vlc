@@ -26,3 +26,14 @@
  Libs.private: @LTLIBNETTLE@ @LTLIBZ@ @LTLIBINTL@ @LIBSOCKET@ @LTLIBPTHREAD@ @LTLIBICONV@ @P11_KIT_LIBS@ @LIB_SELECT@ @TSS_LIBS@ @LIB_CLOCK_GETTIME@
  @GNUTLS_REQUIRES_PRIVATE@
  Cflags: -I${includedir}
+--- gnutls/gl/msvc-inval.c.orig	2013-07-02 17:57:58.000000000 +0200
++++ gnutls/gl/msvc-inval.c	2013-07-02 17:58:05.000000000 +0200
+@@ -28,7 +28,7 @@
+ 
+ # if MSVC_INVALID_PARAMETER_HANDLING == DEFAULT_HANDLING
+ 
+-static void cdecl
++static void __cdecl
+ gl_msvc_invalid_parameter_handler (const wchar_t *expression,
+                                    const wchar_t *function,
+                                    const wchar_t *file,
