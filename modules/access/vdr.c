@@ -202,8 +202,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    free( p_access->psz_demux );
-    p_access->psz_demux = strdup( "ts" );
     return VLC_SUCCESS;
 }
 
