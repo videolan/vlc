@@ -986,37 +986,38 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
             return VLC_EGENERIC;
     }
 
-    picture_t *direct;
-    if (!is_direct) {
-        direct = picture_pool_Get(vout->p->display_pool);
-        if (direct) {
-            VideoFormatCopyCropAr(&direct->format, &todisplay->format);
-            picture_Copy(direct, todisplay);
+    assert(vout_IsDisplayFiltered(vd) == !sys->display.use_dr);
+    if (sys->display.use_dr && !is_direct) {
+        picture_t *direct = picture_pool_Get(vout->p->display_pool);
+        if (!direct) {
+            picture_Release(todisplay);
+            if (subpic)
+                subpicture_Delete(subpic);
+            return VLC_EGENERIC;
         }
-        picture_Release(todisplay);
-    } else {
-        direct = todisplay;
-    }
 
-    if (!direct) {
-        if (subpic)
-            subpicture_Delete(subpic);
-        return VLC_EGENERIC;
+        /* The display uses direct rendering (no conversion), but its pool of
+         * pictures is not usable by the decoder (too few, too slow or
+         * subject to invalidation...). Since there are no filters, copying
+         * pictures from the decoder to the output is unavoidable. */
+        VideoFormatCopyCropAr(&direct->format, &todisplay->format);
+        picture_Copy(direct, todisplay);
+        picture_Release(todisplay);
+        todisplay = direct;
     }
 
     /*
      * Take a snapshot if requested
      */
     if (do_snapshot)
-        vout_snapshot_Set(&vout->p->snapshot, &vd->source, direct);
+        vout_snapshot_Set(&vout->p->snapshot, &vd->source, todisplay);
 
     /* Render the direct buffer */
-    assert(vout_IsDisplayFiltered(vd) == !sys->display.use_dr);
-    vout_UpdateDisplaySourceProperties(vd, &direct->format);
+    vout_UpdateDisplaySourceProperties(vd, &todisplay->format);
     if (sys->display.use_dr) {
-        vout_display_Prepare(vd, direct, subpic);
+        vout_display_Prepare(vd, todisplay, subpic);
     } else {
-        sys->display.filtered = vout_FilterDisplay(vd, direct);
+        sys->display.filtered = vout_FilterDisplay(vd, todisplay);
         if (sys->display.filtered) {
             if (!do_dr_spu && !do_early_spu && vout->p->spu_blend && subpic)
                 picture_BlendSubpicture(sys->display.filtered, vout->p->spu_blend, subpic);
@@ -1045,13 +1046,13 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         msg_Warn(vout, "picture is late (%lld ms)", delay / 1000);
 #endif
     if (!is_forced)
-        mwait(direct->date);
+        mwait(todisplay->date);
 
     /* Display the direct buffer returned by vout_RenderPicture */
     vout->p->displayed.date = mdate();
     vout_display_Display(vd,
                          sys->display.filtered ? sys->display.filtered
-                                                : direct,
+                                                : todisplay,
                          subpic);
     sys->display.filtered = NULL;
 
