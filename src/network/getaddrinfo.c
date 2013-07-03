@@ -121,5 +121,13 @@ int vlc_getaddrinfo (const char *node, unsigned port,
             node = NULL;
     }
 
+#if defined(__APPLE__) && defined(AI_NUMERICSERV)
+    /* work-around a segfault in libSystem on Darwin 12 and later
+     * if AI_NUMERICSERV is set and servname is either NULL or "0"
+     * radar://13058317 */
+    if ((hints->ai_flags & AI_NUMERICSERV) && (servname == NULL || (servname[0] == '0' && servname[1] == 0)))
+        servname = (char *)"00";
+#endif
+
     return getaddrinfo (node, servname, hints, res);
 }
