@@ -129,13 +129,16 @@ static VLAboutBox *_o_sharedInstance = nil;
         [o_authors retain];
 
         /* setup join us! */
-        NSString *joinus = [NSString stringWithString:_NS("<p>VLC media player is a free and open source media player, encoder, and streamer made by the volunteers of the "
-                               "<a href=\"http://www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</span>"
-                               "</a> community.</p><p>VLC uses its internal codecs, works on essentially every popular platform, and can read "
-                               "almost all files, CDs, DVDs, network streams, capture cards and other media formats!</p><p>"
-                               "<a href=\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;\">Help "
-                               "and join us!</span></a>")];
-        NSAttributedString *joinus_readytorender = [[NSAttributedString alloc] initWithHTML:[joinus dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES] documentAttributes:NULL];
+        NSString *joinus = [NSString stringWithUTF8String:_(""
+                                                            "<p>VLC media player is a free and open source media player, encoder, and "
+                                                            "streamer made by the volunteers of the <a href=\"http://www.videolan.org/"
+                                                            "\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
+                                                            "span></a> community.</p><p>VLC uses its internal codecs, works on "
+                                                            "essentially every popular platform, and can read almost all files, CDs, "
+                                                            "DVDs, network streams, capture cards and other media formats!</p><p><a href="
+                                                            "\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
+                                                            "underline; color:#0057ae;\">Help and join us!</span></a>")];
+        NSAttributedString *joinus_readytorender = [[NSAttributedString alloc] initWithHTML:[joinus dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES] options:[NSDictionary dictionaryWithObject:@(NSUTF8StringEncoding) forKey:NSCharacterEncodingDocumentOption] documentAttributes:NULL];
         [o_joinus_txt setAllowsEditingTextAttributes: YES];
         [o_joinus_txt setSelectable: YES];
         [o_joinus_txt setAttributedStringValue:joinus_readytorender];
