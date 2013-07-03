@@ -121,6 +121,22 @@ typedef enum libvlc_navigate_mode_t
 } libvlc_navigate_mode_t;
 
 /**
+ * Enumeration of values used to set position (e.g. of video title).
+ */
+typedef enum libvlc_position_t {
+    libvlc_position_disable=-1,
+    libvlc_position_center,
+    libvlc_position_left,
+    libvlc_position_right,
+    libvlc_position_top,
+    libvlc_position_top_left,
+    libvlc_position_top_right,
+    libvlc_position_bottom,
+    libvlc_position_bottom_left,
+    libvlc_position_bottom_right
+} libvlc_position_t;
+
+/**
  * Create an empty Media Player object
  *
  * \param p_libvlc_instance the libvlc instance in which the Media Player
@@ -822,6 +838,16 @@ LIBVLC_API void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi );
  */
 LIBVLC_API void libvlc_media_player_navigate( libvlc_media_player_t* p_mi,
                                               unsigned navigate );
+
+/**
+ * Set if, and how, the video title will be shown when media is played.
+ *
+ * \param p_mi the media player
+ * \param position position at which to display the title, or libvlc_position_disable to prevent the title from being displayed
+ * \param timeout title display timeout in milliseconds (ignored if libvlc_position_disable)
+ * \version libVLC 2.1.0 or later
+ */
+LIBVLC_API void libvlc_media_player_set_video_title_display( libvlc_media_player_t *p_mi, libvlc_position_t position, unsigned int timeout );
 
 /**
  * Release (free) libvlc_track_description_t

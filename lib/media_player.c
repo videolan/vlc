@@ -457,6 +457,11 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "amem-rate", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
     var_Create (mp, "amem-channels", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
 
+    /* Video Title */
+    var_Create (mp, "video-title-show", VLC_VAR_BOOL);
+    var_Create (mp, "video-title-position", VLC_VAR_INTEGER);
+    var_Create (mp, "video-title-timeout", VLC_VAR_INTEGER);
+
     mp->p_md = NULL;
     mp->state = libvlc_NothingSpecial;
     mp->p_libvlc_instance = instance;
@@ -1383,5 +1388,19 @@ void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi )
     {
         var_TriggerCallback( p_input_thread, "frame-next" );
         vlc_object_release( p_input_thread );
+    }
+}
+
+void libvlc_media_player_set_video_title_display( libvlc_media_player_t *p_mi, libvlc_position_t position, unsigned timeout )
+{
+    if ( position != libvlc_position_disable )
+    {
+        var_SetBool( p_mi, "video-title-show", true );
+        var_SetInteger( p_mi, "video-title-position", position );
+        var_SetInteger( p_mi, "video-title-timeout", timeout );
+    }
+    else
+    {
+        var_SetBool( p_mi, "video-title-show", false );
     }
 }
