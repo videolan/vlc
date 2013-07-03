@@ -229,6 +229,11 @@ static int Extract( vlc_va_t *external, picture_t *p_picture, AVFrame *p_ff )
         msg_Dbg( p_va->p_log, "Frame buffer is empty.");
         return VLC_EGENERIC;
     }
+    if (!CVPixelBufferGetDataSize(cv_buffer) > 0)
+    {
+        msg_Dbg( p_va->p_log, "Empty frame buffer");
+        return VLC_EGENERIC;
+    }
 
     if( p_va->hw_ctx.cv_pix_fmt_type == kCVPixelFormatType_420YpCbCr8Planar )
     {
