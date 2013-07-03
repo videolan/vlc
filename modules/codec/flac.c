@@ -271,6 +271,10 @@ static void DecoderErrorCallback( const FLAC__StreamDecoder *decoder,
         msg_Err( p_dec, "frame's data did not match the CRC in the "
                  "footer." );
         break;
+    case FLAC__STREAM_DECODER_ERROR_STATUS_UNPARSEABLE_STREAM:
+        msg_Err( p_dec, "The decoder encountered reserved fields in use in "
+                 "the stream." );
+        break;
     default:
         msg_Err( p_dec, "got decoder error: %d", status );
     }
