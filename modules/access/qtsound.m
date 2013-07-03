@@ -184,7 +184,7 @@ vlc_module_end ()
 {
     @synchronized (self) {
         if (rawAudioData)
-            free(rawAudioData);
+            block_Release(rawAudioData);
     }
 }
 
