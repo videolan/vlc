@@ -470,8 +470,10 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
         p_sys->i_late_frames = 0;
 
+        post_mt( p_sys );
         if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
             avcodec_flush_buffers( p_context );
+        wait_mt( p_sys );
 
         block_Release( p_block );
         return NULL;
