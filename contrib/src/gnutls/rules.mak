@@ -1,6 +1,6 @@
 # GnuTLS
 
-GNUTLS_VERSION := 3.1.10
+GNUTLS_VERSION := 3.1.12
 GNUTLS_URL := ftp://ftp.gnutls.org/gcrypt/gnutls/v3.1/gnutls-$(GNUTLS_VERSION).tar.xz
 
 PKGS += gnutls
