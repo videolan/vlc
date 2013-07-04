@@ -1,12 +1,11 @@
-diff -ru libmatroska-1.3.0/make/linux/Makefile libmatroska-fix/make/linux/Makefile
---- libmatroska-1.3.0/make/linux/Makefile	2012-03-31 15:04:21.000000000 +0200
-+++ libmatroska-fix/make/linux/Makefile	2012-03-31 15:05:04.000000000 +0200
+--- libmatroska-1.4.0/make/linux/Makefile.orig	2013-07-04 19:12:54.531784786 +0200
++++ libmatroska-1.4.0/make/linux/Makefile	2013-07-04 19:13:25.958887357 +0200
 @@ -67,7 +67,7 @@
  
  objects_so:=$(objects)
  
--WARNINGFLAGS=-Wall -Wno-unknown-pragmas -ansi -fno-gnu-keywords -D_GNU_SOURCE \
-+WARNINGFLAGS=-Wall -Wno-unknown-pragmas -fno-gnu-keywords -D_GNU_SOURCE \
+-WARNINGFLAGS=-Wall -Wextra -Wno-unknown-pragmas -ansi -fno-gnu-keywords -D_GNU_SOURCE \
++WARNINGFLAGS=-Wall -Wextra -Wno-unknown-pragmas -fno-gnu-keywords -D_GNU_SOURCE \
  		-Wshadow
  COMPILEFLAGS=$(DEBUGFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(WARNINGFLAGS) $(INCLUDE)
  LINKFLAGS=-L. -L$(LIBEBML_LIB_DIR) $(LDFLAGS)
