@@ -266,8 +266,12 @@ picture_t *picture_Hold( picture_t *p_picture )
 
 void picture_Release( picture_t *p_picture )
 {
-    if( vlc_atomic_dec( &p_picture->gc.refcount ) == 0 &&
-        p_picture->gc.pf_destroy )
+    uintptr_t refs = vlc_atomic_dec( &p_picture->gc.refcount );
+    assert( refs != (uintptr_t)-1 );
+    if( refs > 0 )
+        return;
+
+    if( p_picture->gc.pf_destroy != NULL )
         p_picture->gc.pf_destroy( p_picture );
 }
 
