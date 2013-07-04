@@ -1,6 +1,6 @@
 # orc
 
-ORC_VERSION := 0.4.16
+ORC_VERSION := 0.4.17
 
 ORC_URL := http://code.entropywave.com/download/orc/orc-$(ORC_VERSION).tar.gz
 
@@ -15,7 +15,6 @@ $(TARBALLS)/orc-$(ORC_VERSION).tar.gz:
 
 orc: orc-$(ORC_VERSION).tar.gz .sum-orc
 	$(UNPACK)
-	$(APPLY) $(SRC)/orc/orc-stdint.patch
 	$(APPLY) $(SRC)/orc/android.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
