@@ -795,7 +795,8 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
                     flac_streaminfo[3] = 34; /* block size */
                     op.packet = flac_streaminfo;
                 } else {
-                    msg_Err(p_mux, "Invalid FLAC streaminfo (%d bytes)", op.bytes);
+                    msg_Err(p_mux, "Invalid FLAC streaminfo (%ld bytes)",
+                            op.bytes);
                 }
             }
             op.b_o_s  = 0;
