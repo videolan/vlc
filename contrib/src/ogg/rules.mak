@@ -1,10 +1,10 @@
 # libogg
 
-OGG_VERSION := 1.3.0
+OGG_VERSION := 1.3.1
 
 OGG_URL := http://downloads.xiph.org/releases/ogg/libogg-$(OGG_VERSION).tar.xz
 #OGG_URL := $(CONTRIB_VIDEOLAN)/libogg-$(OGG_VERSION).tar.xz
-OGG_CVSROOT := :pserver:anoncvs@xiph.org:/usr/local/cvsroot
+#OGG_CVSROOT := :pserver:anoncvs@xiph.org:/usr/local/cvsroot
 
 PKGS += ogg
 ifeq ($(call need_pkg,"ogg >= 1.0"),)
