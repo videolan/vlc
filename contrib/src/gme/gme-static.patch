@@ -1,6 +1,6 @@
---- game-music-emu-0.5.5/gme/CMakeLists.txt	2009-07-13 06:53:08.000000000 +0200
-+++ game-music-emu-0.5.5.new/gme/CMakeLists.txt	2010-11-01 14:39:13.570651361 +0100
-@@ -148,7 +148,7 @@
+--- game-music-emu-0.6.0/gme/CMakeLists.txt.orig	2012-05-27 22:48:53.000000000 +0200
++++ game-music-emu-0.6.0/gme/CMakeLists.txt	2013-07-04 19:48:23.031372405 +0200
+@@ -143,7 +143,7 @@
  include_directories(${CMAKE_CURRENT_BINARY_DIR})
  
  # Add library to be compiled.
@@ -8,12 +8,4 @@
 +add_library(gme STATIC ${libgme_SRCS})
  
  # The version is the release.  The "soversion" is the API version.  As long
- # as only build fixes are performed (i.e. no changes/additions to API) the
-@@ -158,6 +158,6 @@
-                SOVERSION 0)
- 
- # TODO: Libsuffix for 64-bit?
--install(TARGETS gme LIBRARY DESTINATION lib)
-+install(TARGETS gme ARCHIVE DESTINATION lib)
- 
- install(FILES ${EXPORTED_HEADERS} DESTINATION include/gme)
+ # as only build fixes are performed (i.e. no backwards-incompatible changes
