@@ -1,6 +1,6 @@
 # libxml2
 
-LIBXML2_VERSION := 2.9.0
+LIBXML2_VERSION := 2.9.1
 LIBXML2_URL := http://xmlsoft.org/sources/libxml2-$(LIBXML2_VERSION).tar.gz
 
 PKGS += libxml2
