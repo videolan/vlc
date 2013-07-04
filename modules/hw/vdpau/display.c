@@ -439,6 +439,10 @@ static int Open(vlc_object_t *obj)
     /* Check source format */
     VdpChromaType chroma;
     VdpYCbCrFormat format;
+    if (vd->fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
+     || vd->fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_422)
+        ;
+    else
     if (vlc_fourcc_to_vdp_ycc(vd->fmt.i_chroma, &chroma, &format))
     {
         uint32_t w, h;
