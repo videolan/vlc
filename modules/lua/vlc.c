@@ -554,8 +554,8 @@ int vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                         EnsureUTF8( psz_oldurl );
                         msg_Dbg( p_this, "meta-URL: %s", psz_oldurl );
                         input_item_SetURL ( p_input, psz_oldurl );
-                        free( psz_oldurl );
                     }
+                    free( psz_oldurl );
                     free( url );
 
                     /* copy the psz_name to the meta data, if "Title" is still empty */
