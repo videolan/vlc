@@ -185,10 +185,13 @@ net.send( fd, string, [length] ): Send data on fd.
 net.recv( fd, [max length] ): Receive data from fd.
 net.poll( { fd = events } ): Implement poll function.
   Returns the numbers of file descriptors with a non 0 revent. The function
-  modifies the input table to { fd = revents }. See "man poll".
+  modifies the input table to { fd = revents }. See "man poll". This function
+  is not available on Windows.
 net.POLLIN/POLLPRI/POLLOUT/POLLRDHUP/POLLERR/POLLHUP/POLLNVAL: poll event flags
-net.read( fd, [max length] ): Read data from fd.
-net.write( fd, string, [length] ): Write data to fd.
+net.read( fd, [max length] ): Read data from fd. This function is not
+  available on Windows.
+net.write( fd, string, [length] ): Write data to fd. This function is not
+  available on Windows.
 net.stat( path ): Stat a file. Returns a table with the following fields:
     .type
     .mode

@@ -189,6 +189,7 @@ static int vlclua_net_recv( lua_State *L )
     return 1;
 }
 
+#ifndef _WIN32
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -277,6 +278,7 @@ static int vlclua_fd_read( lua_State *L )
         lua_pushnil( L );
     return 1;
 }
+#endif
 
 /*****************************************************************************
  *
@@ -366,9 +368,11 @@ static const luaL_Reg vlclua_net_reg[] = {
     { "close", vlclua_net_close },
     { "send", vlclua_net_send },
     { "recv", vlclua_net_recv },
+#ifndef _WIN32
     { "poll", vlclua_net_poll },
     { "read", vlclua_fd_read },
     { "write", vlclua_fd_write },
+#endif
     { "stat", vlclua_stat }, /* Not really "net" */
     { "opendir", vlclua_opendir }, /* Not really "net" */
     { NULL, NULL }
