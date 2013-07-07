@@ -167,7 +167,7 @@ endif
 
 libdshow_plugin_la_SOURCES = dshow/vlc_dshow.h dshow/dshow.cpp dshow/access.h \
 	dshow/filter.cpp dshow/filter.h dshow/crossbar.cpp
-libdshow_plugin_la_CFLAGS = $(AM_CFLAGS)
+libdshow_plugin_la_CXXFLAGS = $(AM_CXXFLAGS)
 libdshow_plugin_la_LIBADD = $(AM_LIBADD) -lole32 -loleaut32 -luuid -lstrmiids -lksuser
 if HAVE_WIN32
 libvlc_LTLIBRARIES += libdshow_plugin.la
