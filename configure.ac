@@ -156,7 +156,7 @@ case "${host_os}" in
     LDFLAGS="${LDFLAGS} -Wl,-headerpad_max_install_names ${ARCH_flag}"
     VLC_ADD_LIBS([motion rotate], [-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup,-framework,AppKit])
-    VLC_ADD_LIBS([avcodec access_avio swscale postproc i420_rgb_mmx x264 x26410b],[-Wl,-read_only_relocs,suppress])
+    VLC_ADD_LIBS([avcodec access_avio swscale postproc i420_rgb_mmx x262 x264 x26410b],[-Wl,-read_only_relocs,suppress])
     VLC_ADD_CFLAGS([motion rotate],[-fconstant-cfstrings])
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation,-framework,SystemConfiguration])
 
@@ -655,7 +655,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom rotate noise grain scene kate lua chorus_flanger freetype avcodec access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a audiobargraph_v speex opus mono colorthres extract ball access_imem hotkeys mosaic gaussianblur x26410b hqdn3d anaglyph oldrc ncurses oldmovie glspectrum],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom rotate noise grain scene kate lua chorus_flanger freetype avcodec access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a audiobargraph_v speex opus mono colorthres extract ball access_imem hotkeys mosaic gaussianblur x262 x26410b hqdn3d anaglyph oldrc ncurses oldmovie glspectrum],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -2725,6 +2725,52 @@ AC_CHECK_HEADERS(png.h, [
   VLC_RESTORE_FLAGS
   ])
 ])
+
+dnl
+dnl H262 encoder plugin (lib262)
+dnl
+AC_ARG_ENABLE(x262,
+  [  --enable-x262           H262 encoding support with static libx262 (default disabled)])
+if test "${enable_x262}" != "no"; then
+AC_ARG_WITH(x262-tree,
+  [ --with-x262-tree=PATH      H262 encoding module with libx262 (static linking)],[],[])
+  if test "${with_x262_tree}" != "no" -a -n "${with_x262_tree}"
+  then
+    real_x262_tree="̧`cd ${with_x262_tree} 2>/dev/null && pwd`"
+    if test -z "${real_x262_tree}"
+    then
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([${with_x262_tree} directory does not exist])
+    fi
+    AC_MSG_CHECKING(for x262.h in ${real_x262_tree})
+    if test -f ${with_x262_tree}/x262_config.h
+    then
+      VLC_ADD_PLUGIN([x262])
+      VLC_ADD_CFLAGS([x262],[-I${with_x262_tree}])
+      VLC_ADD_LIBS([x262],[-L${with_x262_tree} -lm -lpthread -lx262])
+    else
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([${with_x262_tree} doesnt have x262_config.h])
+    fi
+  else
+    PKG_CHECK_MODULES(X262, x262, [
+        VLC_ADD_PLUGIN([x262])
+        VLC_ADD_LDFLAGS([x262],[${X262_LIBS}])
+        AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
+          VLC_ADD_LIBS([x262],[-Wl,-Bsymbolic])
+        ])
+        VLC_ADD_CFLAGS([x262],[${X262_CFLAGS}])
+        if echo ${X262_LIBS} |grep -q 'pthreadGC2'; then
+          VLC_ADD_CFLAGS([x262], [-DPTW32_STATIC_LIB])
+        fi
+    ], [
+       if test "${enable_x262}" = "yes"; then
+        AC_MSG_ERROR([x262 module doesn't work without staticly compiled libx262.a])
+       fi
+    ])
+  fi
+fi
+
 
 dnl
 dnl H264 encoder plugin (10-bit lib264)

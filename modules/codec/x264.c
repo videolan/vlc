@@ -40,13 +40,21 @@
 #ifdef PTW32_STATIC_LIB
 #include <pthread.h>
 #endif
+#ifdef MODULE_NAME_IS_x262
+#include <x262.h>
+#else
 #include <x264.h>
+#endif
 
 #include <assert.h>
 
 #ifdef MODULE_NAME_IS_x26410b
 #define SOUT_CFG_PREFIX "sout-x26410b-"
-#else
+#endif
+#ifdef MODULE_NAME_IS_x262
+#define SOUT_CFG_PREFIX "sout-x262-"
+#endif
+#ifdef MODULE_NAME_IS_x264
 #define SOUT_CFG_PREFIX "sout-x264-"
 #endif
 
@@ -442,7 +450,12 @@ vlc_module_begin ()
 #ifdef MODULE_NAME_IS_x26410b
     set_description( N_("H.264/MPEG-4 Part 10/AVC encoder (x264 10-bit)"))
     set_capability( "encoder", 0 )
-#else
+#endif
+#ifdef MODULE_NAME_IS_x262
+    set_description( N_("H.262/MPEG-2 encoder (x262)"))
+    set_capability( "encoder", 0 )
+#endif
+#ifdef MODULE_NAME_IS_x264
     set_description( N_("H.264/MPEG-4 Part 10/AVC encoder (x264)"))
     set_capability( "encoder", 200 )
 #endif
@@ -799,18 +812,30 @@ static int  Open ( vlc_object_t *p_this )
     int i, i_nal;
     bool fullrange = false;
 
+#ifdef MODULE_NAME_IS_x262
+    if( p_enc->fmt_out.i_codec != VLC_CODEC_MP2V &&
+#else
     if( p_enc->fmt_out.i_codec != VLC_CODEC_H264 &&
+#endif
         !p_enc->b_force )
     {
         return VLC_EGENERIC;
     }
     /* X264_POINTVER or X264_VERSION are not available */
+#ifdef MODULE_NAME_IS_x262
+    msg_Dbg ( p_enc, "version x262 0.%d.X", X264_BUILD );
+#else
     msg_Dbg ( p_enc, "version x264 0.%d.X", X264_BUILD );
+#endif
 
     config_ChainParse( p_enc, SOUT_CFG_PREFIX, ppsz_sout_options, p_enc->p_cfg );
 
     p_enc->fmt_out.i_cat = VIDEO_ES;
+#ifdef MODULE_NAME_IS_x262
+    p_enc->fmt_out.i_codec = VLC_CODEC_MP2V;
+#else
     p_enc->fmt_out.i_codec = VLC_CODEC_H264;
+#endif
     p_enc->p_sys = p_sys = malloc( sizeof( encoder_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
@@ -824,13 +849,14 @@ static int  Open ( vlc_object_t *p_this )
     {
         const int mask = x264_bit_depth > 8 ? X264_CSP_HIGH_DEPTH : 0;
 
-#ifdef MODULE_NAME_IS_x26410b
+
+# ifdef MODULE_NAME_IS_x26410b
         if( mask == 0)
         {
             msg_Err( p_enc, "Only high bith depth encoding supported, bit depth:%d", x264_bit_depth);
             return VLC_EGENERIC;
         }
-#endif
+# endif
 
         if( !strcmp( psz_profile, "high10" ) )
         {
@@ -847,22 +873,22 @@ static int  Open ( vlc_object_t *p_this )
             p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I444_10L : fullrange ? VLC_CODEC_J444 : VLC_CODEC_I444;
             p_sys->i_colorspace = X264_CSP_I444 | mask;
         }
-#ifdef MODULE_NAME_IS_x26410b
+# ifdef MODULE_NAME_IS_x26410b
         else
         {
             msg_Err( p_enc, "Only high-profiles and 10-bit are supported");
             return VLC_EGENERIC;
         }
 
-#endif
+# endif
     }
-#ifdef MODULE_NAME_IS_x26410b
+# ifdef MODULE_NAME_IS_x26410b
     else
     {
             msg_Err( p_enc, "Only high-profiles and 10-bit are supported");
             return VLC_EGENERIC;
     }
-#endif
+# endif
     free( psz_profile );
 #endif //X264_BUILD
 
@@ -873,7 +899,6 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->i_sei_size = 0;
     p_sys->p_sei = NULL;
 
-    x264_param_default( &p_sys->param );
     char *psz_preset = var_GetString( p_enc, SOUT_CFG_PREFIX  "preset" );
     char *psz_tune = var_GetString( p_enc, SOUT_CFG_PREFIX  "tune" );
     if( *psz_preset == '\0' )
@@ -881,7 +906,14 @@ static int  Open ( vlc_object_t *p_this )
         free(psz_preset);
         psz_preset = NULL;
     }
+#ifdef MODULE_NAME_IS_x262
+    p_sys->param.b_mpeg2 = true;
+    x264_param_default_mpeg2( &p_sys->param );
+    x264_param_default_preset_mpeg2( &p_sys->param, psz_preset, psz_tune );
+#else
+    x264_param_default( &p_sys->param );
     x264_param_default_preset( &p_sys->param, psz_preset, psz_tune );
+#endif
     free( psz_preset );
     free( psz_tune );
     p_sys->param.i_csp = p_sys->i_colorspace;
