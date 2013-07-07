@@ -4,16 +4,13 @@
  * Copyright (C) 2001-2013 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Derk-Jan Hartman <hartman at videolan dot org>
- *          Eric Petit <titer@m0k.org>
- *          Benjamin Pracht <bigben at videolan dot org>
- *          Damien Fouilleul <damienf at videolan dot org>
- *          Pierre d'Herbemont <pdherbemont at videolan dot org>
+ * Authors: Pierre d'Herbemont <pdherbemont at videolan dot org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
  *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
  *          Rémi Denis-Courmont
- *          Juho Vähä-Herttua <juhovh at iki dot fi>
  *          Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
+ *          Eric Petit <titer@m0k.org>
+ *
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -54,8 +51,8 @@
 /**
  * Forward declarations
  */
-static int Open (vlc_object_t *);
-static void Close (vlc_object_t *);
+static int Open(vlc_object_t *);
+static void Close(vlc_object_t *);
 
 static picture_pool_t* PicturePool(vout_display_t *vd, unsigned requested_count);
 static void PictureRender(vout_display_t* vd, picture_t *pic, subpicture_t *subpicture);
@@ -71,18 +68,17 @@ static void OpenglESSwap(vlc_gl_t* gl);
  * Module declaration
  */
 vlc_module_begin ()
-    set_shortname ("iOS vout")
-    set_description (N_("iOS OpenGL video output"))
-    set_category (CAT_VIDEO)
-    set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout display", 300)
-    set_callbacks (Open, Close)
+    set_shortname("iOS vout")
+    set_description(N_("iOS OpenGL video output"))
+    set_category(CAT_VIDEO)
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+    set_capability("vout display", 300)
+    set_callbacks(Open, Close)
 
-    add_shortcut ("vout_ios2")
+    add_shortcut("vout_ios2")
 vlc_module_end ()
 
-@interface VLCOpenGLES2VideoView : UIView
-{
+@interface VLCOpenGLES2VideoView : UIView {
     vout_display_t *_voutDisplay;
     EAGLContext *_eaglContext;
     GLuint _renderBuffer;
@@ -98,9 +94,7 @@ vlc_module_end ()
 - (void)createBuffers;
 - (void)destroyBuffers;
 - (void)resetBuffers;
-
 @end
-
 
 struct vout_display_sys_t
 {
@@ -111,12 +105,10 @@ struct vout_display_sys_t
     vout_display_opengl_t *vgl;
 
     picture_pool_t *picturePool;
-    picture_t *current;
     bool has_first_frame;
 
     vout_display_place_t place;
 };
-
 
 static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
 {
@@ -233,8 +225,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    switch (query)
-    {
+    switch (query) {
         case VOUT_DISPLAY_CHANGE_FULLSCREEN:
         case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
         case VOUT_DISPLAY_HIDE_MOUSE:
@@ -326,7 +317,6 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *sub
 
 static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
-
     vout_display_sys_t *sys = vd->sys;
 
     if (likely([sys->glESView isAppActive]))
