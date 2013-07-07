@@ -158,7 +158,9 @@ struct intf_sys_t
 {
     char *psz_filename;
     lua_State *L;
+#ifndef _WIN32
     int fd[2];
+#endif
 
     vlc_thread_t thread;
 };

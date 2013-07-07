@@ -362,11 +362,15 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
 
     p_sys->L = L;
 
+#ifndef _WIN32
     if( vlc_pipe( p_sys->fd ) )
     {
         lua_close( p_sys->L );
         goto error;
     }
+#else
+# define close(fd) (void)0
+#endif
 
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
