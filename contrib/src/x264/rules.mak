@@ -2,6 +2,7 @@
 
 X264_GITURL := git://git.videolan.org/x264.git
 X264_SNAPURL := http://git.videolan.org/?p=x264.git;a=snapshot;h=HEAD;sf=tgz
+X262_GITURL := https://github.com/kierank/x262.git
 
 ifdef BUILD_ENCODERS
 ifdef GPL
@@ -16,6 +17,11 @@ endif
 ifeq ($(call need_pkg,"x26410b"),)
 PKGS_FOUND += x26410b
 endif
+
+ifeq ($(call need_pkg,"x262"),)
+PKGS_FOUND += x262
+endif
+
 
 X264CONF = --prefix="$(PREFIX)" --host="$(HOST)" \
 	--enable-static \
@@ -32,6 +38,12 @@ ifdef HAVE_CROSS_COMPILE
 X264CONF += --cross-prefix="$(HOST)-"
 endif
 
+$(TARBALLS)/x262-git.tar.xz:
+	$(call download_git,$(X262_GITURL))
+
+$(TARBALLS)/x262-git.tar.gz:
+	$(call download,$(X262_SNAPURL))
+
 $(TARBALLS)/x26410b-git.tar.xz:
 	$(call download_git,$(X264_GITURL))
 
@@ -43,6 +55,10 @@ $(TARBALLS)/x264-git.tar.xz:
 
 $(TARBALLS)/x264-git.tar.gz:
 	$(call download,$(X264_SNAPURL))
+
+.sum-x262: x262-git.tar.gz
+	$(warning $@ not implemented)
+	touch $@
 
 .sum-x26410b: x26410b-git.tar.gz
 	$(warning $@ not implemented)
@@ -66,6 +82,14 @@ x26410b: x26410b-git.tar.gz .sum-x26410b
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
+x262: x262-git.tar.gz .sum-x26410b
+	rm -Rf $@-git
+	mkdir -p $@-git
+	$(ZCAT) "$<" | (cd $@-git && tar xv --strip-components=1)
+	$(UPDATE_AUTOCONFIG)
+	$(MOVE)
+
+
 .x264: x264
 	cd $< && $(HOSTVARS) ./configure $(X264CONF)
 	cd $< && $(MAKE) install
@@ -77,5 +101,16 @@ x26410b: x26410b-git.tar.gz .sum-x26410b
 	cd $< && sed -i -e 's/x264/x26410b/g' x264.pc
 	cd $< && mv x264.pc x26410b.pc
 	cd $< && sed -i -e 's/x264.pc/x26410b.pc/g' Makefile
+	cd $< && $(MAKE) install
+	touch $@
+
+.x262: x262
+	cd $< && sed -i -e 's/x264/x262/g' configure
+	cd $< && sed -i -e 's/x264_config/x262_config/g' *.h Makefile *.c
+	cd $< && $(HOSTVARS) ./configure $(X264CONF)
+	cd $< && sed -i -e 's/x264.pc/x262.pc/g' Makefile
+	cd $< && sed -i -e 's/x264.h/x262.h/g' Makefile
+	cd $< && $(MAKE)
+	cd $< && cp x264.h x262.h
 	cd $< && $(MAKE) install
 	touch $@
