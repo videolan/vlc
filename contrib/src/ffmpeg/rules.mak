@@ -80,9 +80,6 @@ endif
 # Darwin
 ifdef HAVE_DARWIN_OS
 FFMPEGCONF += --arch=$(ARCH) --target-os=darwin
-ifneq ($(findstring $(ARCH),i386 x86_64),)
-FFMPEGCONF += --enable-memalign-hack
-endif
 ifeq ($(ARCH),x86_64)
 FFMPEGCONF += --cpu=core2
 endif
