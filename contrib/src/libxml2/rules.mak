@@ -17,9 +17,6 @@ XMLCONF = --with-minimal --with-catalog --with-reader --with-tree --with-push --
 
 libxml2: libxml2-$(LIBXML2_VERSION).tar.gz .sum-libxml2
 	$(UNPACK)
-ifdef HAVE_DARWIN_OS
-	$(APPLY) $(SRC)/libxml2/osx-threads.patch
-endif
 	$(APPLY) $(SRC)/libxml2/no-tests.patch
 	$(APPLY) $(SRC)/libxml2/win32.patch
 	$(APPLY) $(SRC)/libxml2/pthread.patch
