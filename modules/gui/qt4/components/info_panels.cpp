@@ -97,7 +97,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     date_text = new QLineEdit;
     date_text->setAlignment( Qt::AlignRight );
     date_text->setInputMask("0000");
-    date_text->setMaximumWidth( 128 );
+    date_text->setMaximumWidth( 140 );
     metaLayout->addWidget( date_text, line, 7, 1, -1 );
     line++;
 
@@ -108,13 +108,19 @@ MetaPanel::MetaPanel( QWidget *parent,
     /* Number - on the same line */
     label = new QLabel( qtr( VLC_META_TRACK_NUMBER ) );
     label->setFont( smallFont ); label->setContentsMargins( 3, 2, 0, 0 );
-    metaLayout->addWidget( label, line - 1, 7, 1, 3  );
+    metaLayout->addWidget( label, line - 1, 7, 1, 3 );
 
     tracknumber_text = new QLineEdit;
+    tracktotal_text = new QLineEdit;
     tracknumber_text->setAlignment( Qt::AlignRight );
-    tracknumber_text->setInputMask("0000/0000");
-    tracknumber_text->setMaximumWidth( 128 );
-    metaLayout->addWidget( tracknumber_text, line, 7, 1, -1 );
+    tracktotal_text->setAlignment( Qt::AlignRight );
+    tracknumber_text->setMaximumWidth( 64 );
+    tracktotal_text->setMaximumWidth( 64 );
+    metaLayout->addWidget( tracknumber_text, line, 7, 1, 1 );
+    metaLayout->addWidget( tracktotal_text, line, 9, 1, -1 );
+
+    QLabel *sep = new QLabel( "/" );
+    metaLayout->addWidget( sep, line, 8, 1, -1 );
 
     line++;
 
