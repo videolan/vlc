@@ -1,3 +1,7 @@
+basedir = stream_filter
+include $(top_srcdir)/modules/common.am
+libvlc_LTLIBRARIES =
+
 libdecomp_plugin_la_SOURCES = decomp.c
 libdecomp_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdecomp_plugin_la_LIBADD = $(AM_LIBADD)

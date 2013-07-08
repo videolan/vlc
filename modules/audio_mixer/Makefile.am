@@ -1,3 +1,6 @@
+basedir = audio_mixer
+include $(top_srcdir)/modules/common.am
+
 libfloat_mixer_plugin_la_SOURCES = float.c
 libfloat_mixer_plugin_la_CFLAGS = $(AM_CFLAGS)
 libfloat_mixer_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
@@ -6,6 +9,6 @@ libinteger_mixer_plugin_la_SOURCES = integer.c
 libinteger_mixer_plugin_la_CFLAGS = $(AM_CFLAGS)
 libinteger_mixer_plugin_la_LIBADD = $(AM_LIBADD)
 
-libvlc_LTLIBRARIES += \
+libvlc_LTLIBRARIES = \
 	libfloat_mixer_plugin.la \
 	libinteger_mixer_plugin.la

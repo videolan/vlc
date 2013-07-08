@@ -1,9 +1,11 @@
+basedir = altivec
+include $(top_srcdir)/modules/common.am
+
 libi420_yuy2_altivec_plugin_la_SOURCES = \
         ../video_chroma/i420_yuy2.c \
 	../video_chroma/i420_yuy2.h
 libi420_yuy2_altivec_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_i420_yuy2_altivec)
 libi420_yuy2_altivec_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_i420_yuy2_altivec)
 
-libvlc_LTLIBRARIES += \
-	libi420_yuy2_altivec_plugin.la \
-	$(NULL)
+libvlc_LTLIBRARIES = \
+	libi420_yuy2_altivec_plugin.la

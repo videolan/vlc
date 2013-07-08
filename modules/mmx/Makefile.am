@@ -1,3 +1,6 @@
+basedir = mmx
+include $(top_srcdir)/modules/common.am
+
 libi420_rgb_mmx_plugin_la_SOURCES = \
         ../video_chroma/i420_rgb.c \
 	../video_chroma/i420_rgb.h \
@@ -18,8 +21,7 @@ libi422_yuy2_mmx_plugin_la_SOURCES = \
 libi422_yuy2_mmx_plugin_la_CFLAGS = $(AM_CFLAGS)
 libi422_yuy2_mmx_plugin_la_LIBADD = $(AM_LIBADD)
 
-libvlc_LTLIBRARIES += \
+libvlc_LTLIBRARIES = \
 	libi420_rgb_mmx_plugin.la \
 	libi420_yuy2_mmx_plugin.la \
-	libi422_yuy2_mmx_plugin.la \
-	$(NULL)
+	libi422_yuy2_mmx_plugin.la

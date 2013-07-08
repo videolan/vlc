@@ -1,3 +1,6 @@
+basedir = arm_neon
+include $(top_srcdir)/modules/common.am
+
 AM_LIBTOOLFLAGS=--tag=CC
 
 libsimple_channel_mixer_neon_plugin_la_SOURCES = \
@@ -28,9 +31,8 @@ libyuv_rgb_neon_plugin_la_SOURCES = \
 libyuv_rgb_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
 libyuv_rgb_neon_plugin_la_LIBADD = $(AM_LIBADD)
 
-libvlc_LTLIBRARIES += \
+libvlc_LTLIBRARIES = \
 	libsimple_channel_mixer_neon_plugin.la \
 	libchroma_yuv_neon_plugin.la \
 	libvolume_neon_plugin.la \
-	libyuv_rgb_neon_plugin.la \
-	$(NULL)
+	libyuv_rgb_neon_plugin.la
