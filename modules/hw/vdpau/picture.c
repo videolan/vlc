@@ -119,3 +119,14 @@ VdpStatus vlc_vdp_video_copy(picture_t *restrict dst, picture_t *restrict src)
     atomic_fetch_add(&frame->refs, 1);
     return VDP_STATUS_OK;
 }
+
+vlc_vdp_video_field_t *vlc_vdp_video_detach(picture_t *pic)
+{
+    vlc_vdp_video_field_t *field = pic->context;
+
+    assert(pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
+        || pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_422);
+    //assert(!picture_IsReferenced(pic));
+    pic->context = NULL;
+    return field;
+}

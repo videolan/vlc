@@ -274,4 +274,10 @@ VdpStatus vlc_vdp_video_attach(vdp_t *, VdpVideoSurface, picture_t *);
  * Copies the VDPAU video surface from a VLC picture into another VLC picture.
  */
 VdpStatus vlc_vdp_video_copy(picture_t *dst, picture_t *src);
+
+/**
+ * Detaches a VDPAU video surface as context from a VLC picture.
+ * @return the detached context, or NULL on error.
+ */
+vlc_vdp_video_field_t *vlc_vdp_video_detach(picture_t *);
 #endif
