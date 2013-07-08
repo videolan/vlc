@@ -44,6 +44,8 @@ mods = ${mods}
 libvlc_LTLIBRARIES = ${libvlc_ltlibs}
 EXTRA_LTLIBRARIES = ${extra_ltlibs}
 
+EXTRA_DIST = Modules.am
+
 include \$(top_srcdir)/modules/common.am
 include \$(srcdir)/Modules.am
 
