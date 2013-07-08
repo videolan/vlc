@@ -76,6 +76,9 @@ VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
         return VDP_STATUS_RESOURCES;
     }
 
+    assert(pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
+        || pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_422);
+    assert(!picture_IsReferenced(pic));
     assert(pic->context == NULL);
     pic->context = field;
 
@@ -99,6 +102,11 @@ VdpStatus vlc_vdp_video_copy(picture_t *restrict dst, picture_t *restrict src)
     if (unlikely(fnew == NULL))
         return VDP_STATUS_RESOURCES;
 
+    assert(src->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
+        || src->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_422);
+    assert(dst->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
+        || dst->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_422);
+    assert(!picture_IsReferenced(dst));
     assert(dst->context == NULL);
     dst->context = fnew;
 
