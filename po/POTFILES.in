@@ -351,7 +351,6 @@ modules/codec/avcodec/encoder.c
 modules/codec/avcodec/fourcc.c
 modules/codec/avcodec/vaapi.c
 modules/codec/avcodec/vda.c
-modules/codec/avcodec/vdpau.c
 modules/codec/avcodec/video.c
 modules/codec/cc.c
 modules/codec/cc.h
@@ -913,6 +912,12 @@ modules/gui/skins2/x11/x11_tooltip.cpp
 modules/gui/skins2/x11/x11_tooltip.hpp
 modules/gui/skins2/x11/x11_window.cpp
 modules/gui/skins2/x11/x11_window.hpp
+modules/hw/vdpau/adjust.c
+modules/hw/vdpau/avcodec.c
+modules/hw/vdpau/chroma.c
+modules/hw/vdpau/deinterlace.c
+modules/hw/vdpau/display.c
+modules/hw/vdpau/sharpen.c
 modules/lua/demux.c
 modules/lua/intf.c
 modules/lua/libs/configuration.c
