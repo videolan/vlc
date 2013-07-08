@@ -43,7 +43,14 @@ struct filter_sys_t
     VdpChromaType chroma;
     VdpYCbCrFormat format;
     picture_t *(*import)(filter_t *, picture_t *);
-    picture_t *history[MAX_PAST + 1 + MAX_FUTURE];
+
+    struct
+    {
+        vlc_vdp_video_field_t *field;
+        mtime_t date;
+        bool force;
+    } history[MAX_PAST + 1 + MAX_FUTURE];
+
     struct
     {
         float brightness;
@@ -264,10 +271,10 @@ static void Flush(filter_t *filter)
     filter_sys_t *sys = filter->p_sys;
 
     for (unsigned i = 0; i < MAX_PAST + MAX_FUTURE; i++)
-        if (sys->history[i] != NULL)
+        if (sys->history[i].field != NULL)
         {
-            picture_Release(sys->history[i]);
-            sys->history[i] = NULL;
+            sys->history[i].field->destroy(sys->history[i].field);
+            sys->history[i].field = NULL;
         }
 }
 
@@ -466,15 +473,17 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
 
     src = sys->import(filter, src);
 
-    /* Update history and take "present" picture */
-    sys->history[MAX_PAST + MAX_FUTURE] = src;
-    src = sys->history[MAX_PAST];
+    /* Update history and take "present" picture field */
+    sys->history[MAX_PAST + MAX_FUTURE].field = vlc_vdp_video_detach(src);
+    sys->history[MAX_PAST + MAX_FUTURE].date = src->date;
+    sys->history[MAX_PAST + MAX_FUTURE].force = src->b_force;
+    picture_Release(src);
 
-    if (src == NULL)
+    vlc_vdp_video_field_t *f = sys->history[MAX_PAST].field;
+    if (f == NULL)
         goto skip;
-    picture_CopyProperties(dst, src);
-
-    vlc_vdp_video_field_t *f = src->context;
+    dst->date = sys->history[MAX_PAST].date;
+    dst->b_force = sys->history[MAX_PAST].force;
 
     /* Enable/Disable features */
     const VdpVideoMixerFeature features[] = {
@@ -520,7 +529,7 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
     /* Render video into output */
     VdpVideoMixerPictureStructure structure = f->structure;
     VdpVideoSurface past[MAX_PAST];
-    VdpVideoSurface surface = picture_GetVideoSurface(src);
+    VdpVideoSurface surface = f->frame->surface;
     VdpVideoSurface future[MAX_FUTURE];
     VdpRect src_rect = {
         filter->fmt_in.video.i_x_offset, filter->fmt_in.video.i_y_offset,
@@ -536,19 +545,13 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
 
     for (unsigned i = 0; i < MAX_PAST; i++)
     {
-        picture_t *pic = sys->history[(MAX_PAST - 1) - i];
-        if (pic != NULL)
-            past[i] = picture_GetVideoSurface(pic);
-        else
-            past[i] = VDP_INVALID_HANDLE;
+        f = sys->history[(MAX_PAST - 1) - i].field;
+        past[i] = (f != NULL) ? f->frame->surface : VDP_INVALID_HANDLE;
     }
     for (unsigned i = 0; i < MAX_FUTURE; i++)
     {
-        picture_t *pic = sys->history[(MAX_PAST + 1) + i];
-        if (pic != NULL)
-            future[i] = picture_GetVideoSurface(pic);
-        else
-            future[i] = VDP_INVALID_HANDLE;
+        f = sys->history[(MAX_PAST + 1) + i].field;
+        future[i] = (f != NULL) ? f->frame->surface : VDP_INVALID_HANDLE;
     }
 
     err = vdp_video_mixer_render(sys->vdp, sys->mixer, VDP_INVALID_HANDLE,
@@ -564,10 +567,10 @@ skip:
         dst = NULL;
     }
 
-    /* Forget old history */
-    if (sys->history[0] != NULL)
-        picture_Release(sys->history[0]);
-    memmove(sys->history, sys->history + 1,
+    f = sys->history[0].field;
+    if (f != NULL)
+        f->destroy(f); /* Release oldest field */
+    memmove(sys->history, sys->history + 1, /* Advance history */
             sizeof (sys->history[0]) * (MAX_PAST + MAX_FUTURE));
 
     return dst;
@@ -617,7 +620,7 @@ static int OutputOpen(vlc_object_t *obj)
      *    video pipeline. Thus capabilities should be checked earlier. */
 
     for (unsigned i = 0; i < MAX_PAST + MAX_FUTURE; i++)
-        sys->history[i] = NULL;
+        sys->history[i].field = NULL;
 
     sys->procamp.brightness = 0.f;
     sys->procamp.contrast = 1.f;
@@ -635,7 +638,7 @@ static void OutputClose(vlc_object_t *obj)
     filter_t *filter = (filter_t *)obj;
     filter_sys_t *sys = filter->p_sys;
 
-    /*Flush(filter); -- core frees pictures for us! */
+    Flush(filter);
     if (sys->mixer != VDP_INVALID_HANDLE)
         vdp_video_mixer_destroy(sys->vdp, sys->mixer);
 
