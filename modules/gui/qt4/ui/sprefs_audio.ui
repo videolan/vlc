@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>707</width>
-    <height>536</height>
+    <height>509</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -46,39 +46,7 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item row="0" column="0" colspan="2">
-          <widget class="QRadioButton" name="keepVolumeRadio">
-           <property name="minimumSize">
-            <size>
-             <width>250</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Keep audio level between sessions</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QRadioButton" name="resetVolumeRadio">
-           <property name="minimumSize">
-            <size>
-             <width>250</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Always reset audio start level to:</string>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
+         <item row="0" column="2">
           <widget class="QWidget" name="defaultVolume_zone" native="true">
            <layout class="QHBoxLayout" name="horizontalLayout">
             <property name="spacing">
@@ -147,6 +115,22 @@
              </widget>
             </item>
            </layout>
+          </widget>
+         </item>
+         <item row="0" column="0" colspan="2">
+          <widget class="QCheckBox" name="resetVolumeCheckbox">
+           <property name="minimumSize">
+            <size>
+             <width>250</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Always reset audio start level to:</string>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
           </widget>
          </item>
         </layout>
@@ -551,8 +535,7 @@
  </widget>
  <tabstops>
   <tabstop>enableAudio</tabstop>
-  <tabstop>keepVolumeRadio</tabstop>
-  <tabstop>resetVolumeRadio</tabstop>
+  <tabstop>resetVolumeCheckbox</tabstop>
   <tabstop>defaultVolume</tabstop>
   <tabstop>volumeValue</tabstop>
   <tabstop>outputModule</tabstop>

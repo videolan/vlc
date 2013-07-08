@@ -45,6 +45,7 @@
 #include <QSettings>
 #include <QtAlgorithms>
 #include <QDir>
+#include <math.h>
 
 #define ICON_HEIGHT 64
 
@@ -326,16 +327,50 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #undef audioControl
 #undef audioCommon
 
+            int i_max_volume = config_GetInt( p_intf, "qt-max-volume" );
+
             /* Audio Options */
-            ui.volumeValue->setMaximum( 200 );
-            CONFIG_GENERIC_NO_BOOL( "volume" , IntegerRangeSlider, NULL,
-                                     defaultVolume );
+            ui.volumeValue->setMaximum( i_max_volume );
+            ui.defaultVolume->setMaximum( i_max_volume );
+
+            bool b_enabled = config_GetInt( p_intf, "volume-save" );
+            ui.resetVolumeCheckbox->setChecked( !b_enabled );
+
+            p_config = config_FindConfig( VLC_OBJECT(p_intf), "aout" );
+            char *psz_aout = p_config->value.psz;
+
+            int i_volume = 100; //FIXME not foolproof
+
+#define get_vol_aout( name ) \
+            module_exists( name ) && ( !strcmp( psz_aout, name ) || !strcmp( psz_aout, "any" ) )
+
+#if defined( _WIN32 )
+            if( get_vol_aout( "directx" ) )
+                i_volume = config_GetFloat( p_intf, "directx-volume") * 100 + 0.5;
+            else if( get_vol_aout( "waveout" ) )
+                i_volume = config_GetFloat( p_intf, "waveout-volume") * 100 + 0.5;
+#elif defined( Q_WS_MAC )
+            if( get_vol_aout( "auhal" ) )
+                i_volume = ( config_GetFloat( p_intf, "auhal-volume") * 100 + 0.5 )
+                    / AOUT_VOLUME_DEFAULT;
+#elif defined( __OS2__ )
+            if( get_vol_aout( "kai" ) )
+                i_volume = cbrtf( config_GetFloat( p_intf, "kai-gain" ) ) * 100 + 0.5;
+#else
+            if( get_vol_aout( "alsa" ) )
+                i_volume = cbrtf( config_GetFloat( p_intf, "alsa-gain" ) ) * 100 + 0.5;
+            else if( get_vol_aout( "jack" ) )
+                i_volume = cbrtf( config_GetFloat( p_intf, "jack-gain" ) ) * 100 + 0.5;
+#endif
+#undef get_vol_aout
+
+            ui.defaultVolume->setValue( i_volume );
+
             CONNECT( ui.defaultVolume, valueChanged( int ),
                      this, updateAudioVolume( int ) );
 
-            CONFIG_BOOL( "volume-save", keepVolumeRadio );
-            ui.defaultVolume_zone->setEnabled( ui.resetVolumeRadio->isChecked() );
-            CONNECT( ui.resetVolumeRadio, toggled( bool ),
+            ui.defaultVolume_zone->setEnabled( ui.resetVolumeCheckbox->isChecked() );
+            CONNECT( ui.resetVolumeCheckbox, toggled( bool ),
                      ui.defaultVolume_zone, setEnabled( bool ) );
 
             CONFIG_GENERIC( "audio-language" , String , ui.langLabel,
@@ -371,6 +406,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             optionWidgets["volLW"] = ui.volumeValue;
             optionWidgets["headphoneB"] = ui.headphoneEffect;
             optionWidgets["spdifChB"] = ui.spdifBox;
+            optionWidgets["defaultVolume"] = ui.defaultVolume;
+            optionWidgets["resetVolumeCheckbox"] = ui.resetVolumeCheckbox;
             updateAudioOptions( ui.outputModule->currentIndex() );
 
             /* LastFM */
@@ -407,7 +444,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             qs_filter = qfu( psz ).split( ':', QString::SkipEmptyParts );
             free( psz );
 
-            bool b_enabled = ( qs_filter.contains( "normvol" ) );
+            b_enabled = ( qs_filter.contains( "normvol" ) );
             ui.volNormBox->setChecked( b_enabled );
             ui.volNormSpin->setEnabled( b_enabled );
 
@@ -782,7 +819,7 @@ SPrefsPanel::~SPrefsPanel()
 void SPrefsPanel::updateAudioVolume( int volume )
 {
     qobject_cast<QSpinBox *>(optionWidgets["volLW"])
-        ->setValue( volume * 100 / AOUT_VOLUME_DEFAULT );
+        ->setValue( volume );
 }
 
 
@@ -859,6 +896,46 @@ void SPrefsPanel::apply()
             qs_filter.removeAll( "headphone" );
 
         config_PutPsz( p_intf, "audio-filter", qtu( qs_filter.join( ":" ) ) );
+
+        /* Default volume */
+        int i_volume =
+            qobject_cast<QSlider *>(optionWidgets["defaultVolume"])->value();
+        bool b_reset_volume =
+            qobject_cast<QCheckBox *>(optionWidgets["resetVolumeCheckbox"])->isChecked();
+        module_config_t *p_config = config_FindConfig( VLC_OBJECT(p_intf), "aout" );
+        char *psz_aout = p_config->value.psz;
+
+
+        float f_gain = powf( i_volume / 100.f, 3 );
+
+#define save_vol_aout( name ) \
+            module_exists( name ) && ( !strcmp( psz_aout, name ) || !strcmp( psz_aout, "any" ) )
+
+        //FIXME this is moot
+#if defined( _WIN32 )
+        VLC_UNUSED( f_gain );
+        if( save_vol_aout( "directx" ) )
+            config_PutFloat( p_intf, "directx-volume", i_volume / 100.f );
+        if( save_vol_aout( "waveout" ) )
+            config_PutFloat( p_intf, "waveout-volume", i_volume / 100.f );
+#elif defined( Q_WS_MAC )
+        VLC_UNUSED( f_gain );
+        if( save_vol_aout( "auhal" ) )
+            config_PutFloat( p_intf, "auhal-volume", i_volume / 100.f
+                    * AOUT_VOLUME_DEFAULT );
+#elif defined( __OS2__ )
+        if( save_vol_aout( "kai" ) )
+            config_PutFloat( p_intf, "kai-gain",  f_gain );
+#else
+        if( save_vol_aout( "alsa" ) )
+            config_PutFloat( p_intf, "alsa-gain", f_gain );
+        if( save_vol_aout( "jack" ) )
+            config_PutFloat( p_intf, "jack-gain", f_gain );
+#endif
+#undef save_vol_aout
+
+        config_PutInt( p_intf, "volume-save", !b_reset_volume );
+
         break;
     }
     case SPrefsSubtitles:
