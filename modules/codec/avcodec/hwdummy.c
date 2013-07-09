@@ -115,11 +115,18 @@ static int Setup(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
 
 static int Open(vlc_va_t *va, int codec, const es_format_t *fmt)
 {
-    (void) codec; (void) fmt;
+    union
+    {
+        char str[4];
+        vlc_fourcc_t fourcc;
+    } u = { .fourcc = fmt->i_codec };
 
     vlc_va_sys_t *sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
        return VLC_ENOMEM;
+
+    msg_Dbg(va, "codec %d (%4.4s) profile %d level %d", codec, u.str,
+            fmt->i_profile, fmt->i_level);
 
     sys->context.render = Render;
 
