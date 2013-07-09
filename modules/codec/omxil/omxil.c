@@ -1594,7 +1594,8 @@ static OMX_ERRORTYPE OmxEventHandler( OMX_HANDLETYPE omx_handle,
         break;
 
     case OMX_EventPortSettingsChanged:
-        if( data_2 == 0 || data_2 == OMX_IndexParamPortDefinition )
+        if( data_2 == 0 || data_2 == OMX_IndexParamPortDefinition ||
+            data_2 == OMX_IndexParamAudioPcm )
         {
             OMX_BUFFERHEADERTYPE *sentinel;
             for(i = 0; i < p_sys->ports; i++)
