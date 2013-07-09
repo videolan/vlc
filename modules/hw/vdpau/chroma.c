@@ -472,7 +472,6 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
     }
 
     src = sys->import(filter, src);
-
     /* Update history and take "present" picture field */
     if (likely(src != NULL))
     {
