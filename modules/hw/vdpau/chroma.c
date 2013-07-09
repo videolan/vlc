@@ -474,10 +474,15 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
     src = sys->import(filter, src);
 
     /* Update history and take "present" picture field */
-    sys->history[MAX_PAST + MAX_FUTURE].field = vlc_vdp_video_detach(src);
-    sys->history[MAX_PAST + MAX_FUTURE].date = src->date;
-    sys->history[MAX_PAST + MAX_FUTURE].force = src->b_force;
-    picture_Release(src);
+    if (likely(src != NULL))
+    {
+        sys->history[MAX_PAST + MAX_FUTURE].field = vlc_vdp_video_detach(src);
+        sys->history[MAX_PAST + MAX_FUTURE].date = src->date;
+        sys->history[MAX_PAST + MAX_FUTURE].force = src->b_force;
+        picture_Release(src);
+    }
+    else
+        sys->history[MAX_PAST + MAX_FUTURE].field = NULL;
 
     vlc_vdp_video_field_t *f = sys->history[MAX_PAST].field;
     if (f == NULL)
