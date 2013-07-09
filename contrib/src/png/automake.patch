@@ -1,0 +1,12 @@
+diff -ur png/configure.ac png.new/configure.ac
+--- png/configure.ac	2013-06-27 06:25:42.000000000 +0300
++++ png.new/configure.ac	2013-07-09 14:19:02.953919579 +0300
+@@ -19,7 +19,7 @@
+ dnl Version number stuff here:
+ 
+ AC_INIT([libpng], [1.5.17], [png-mng-implement@lists.sourceforge.net])
+-AM_INIT_AUTOMAKE([serial-tests])
++AM_INIT_AUTOMAKE
+ dnl stop configure from automagically running automake
+ AM_MAINTAINER_MODE
+ 
