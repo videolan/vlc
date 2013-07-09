@@ -204,12 +204,12 @@ static int Open(vlc_va_t *va, int codec, const es_format_t *fmt)
           case FF_PROFILE_MPEG4_SIMPLE:
             profile = VDP_DECODER_PROFILE_MPEG4_PART2_SP;
             break;
-          case FF_PROFILE_MPEG4_SIMPLE_STUDIO:
-            msg_Err(va, "unsupported %s profile %d", "MPEG4", fmt->i_profile);
-            return VLC_EGENERIC;
-          default:
+          case FF_PROFILE_MPEG4_ADVANCED_SIMPLE:
             profile = VDP_DECODER_PROFILE_MPEG4_PART2_ASP;
             break;
+          default:
+            msg_Err(va, "unsupported %s profile %d", "MPEG4", fmt->i_profile);
+            return VLC_EGENERIC;
         }
         level = fmt->i_level;
         break;
