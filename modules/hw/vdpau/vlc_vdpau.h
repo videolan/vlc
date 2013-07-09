@@ -271,9 +271,10 @@ typedef struct vlc_vdp_video_field
 VdpStatus vlc_vdp_video_attach(vdp_t *, VdpVideoSurface, picture_t *);
 
 /**
- * Copies the VDPAU video surface from a VLC picture into another VLC picture.
+ * Performs a shallow copy of a VDPAU video surface context
+ * (the underlying VDPAU video surface is shared).
  */
-VdpStatus vlc_vdp_video_copy(picture_t *dst, picture_t *src);
+vlc_vdp_video_field_t *vlc_vdp_video_copy(vlc_vdp_video_field_t *);
 
 /**
  * Detaches a VDPAU video surface as context from a VLC picture.

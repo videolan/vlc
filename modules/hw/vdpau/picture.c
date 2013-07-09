@@ -94,21 +94,12 @@ VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
     return VDP_STATUS_OK;
 }
 
-VdpStatus vlc_vdp_video_copy(picture_t *restrict dst, picture_t *restrict src)
+vlc_vdp_video_field_t *vlc_vdp_video_copy(vlc_vdp_video_field_t *fold)
 {
-    vlc_vdp_video_field_t *fold = src->context;
     vlc_vdp_video_frame_t *frame = fold->frame;
     vlc_vdp_video_field_t *fnew = malloc(sizeof (*fnew));
     if (unlikely(fnew == NULL))
-        return VDP_STATUS_RESOURCES;
-
-    assert(src->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
-        || src->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_422);
-    assert(dst->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
-        || dst->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_422);
-    assert(!picture_IsReferenced(dst));
-    assert(dst->context == NULL);
-    dst->context = fnew;
+        return NULL;
 
     fnew->destroy = SurfaceDestroy;
     fnew->frame = frame;
@@ -117,7 +108,7 @@ VdpStatus vlc_vdp_video_copy(picture_t *restrict dst, picture_t *restrict src)
     fnew->sharpen = fold->sharpen;
 
     atomic_fetch_add(&frame->refs, 1);
-    return VDP_STATUS_OK;
+    return fnew;
 }
 
 vlc_vdp_video_field_t *vlc_vdp_video_detach(picture_t *pic)

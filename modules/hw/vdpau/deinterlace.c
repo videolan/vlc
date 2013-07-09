@@ -45,9 +45,9 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
     vlc_vdp_video_field_t *f1 = src->context;
     if (unlikely(f1 == NULL))
         return src;
-
     if (f1->structure != VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME)
         return src; /* cannot deinterlace twice */
+
 #ifdef VOUT_CORE_GETS_A_CLUE
     picture_t *dst = filter_NewPicture(filter);
 #else
@@ -55,12 +55,16 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
 #endif
     if (dst == NULL)
         return src; /* cannot deinterlace without copying fields */
-    if (vlc_vdp_video_copy(dst, src) != VDP_STATUS_OK) // shallow copy
+
+    vlc_vdp_video_field_t *f2 = vlc_vdp_video_copy(f1); // shallow copy
+    if (unlikely(f2 == NULL))
     {
         picture_Release(dst);
         return src;
     }
+
     picture_CopyProperties(dst, src);
+    dst->context = f2;
 
     if (last_pts != VLC_TS_INVALID)
         dst->date = (3 * src->date - last_pts) / 2;
@@ -75,7 +79,6 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
     assert(src->p_next == NULL);
     src->p_next = dst;
 
-    vlc_vdp_video_field_t *f2 = dst->context;
     if (src->b_progressive || src->b_top_field_first)
     {
         f1->structure = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_TOP_FIELD;
