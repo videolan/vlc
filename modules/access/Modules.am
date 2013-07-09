@@ -190,6 +190,7 @@ libscreen_plugin_la_CFLAGS = $(AM_CFLAGS)
 libscreen_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libscreen_plugin_la_SOURCES += screen/win32.c
+libscreen_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 libscreen_plugin_la_LIBADD += -lgdi32
 libvlc_LTLIBRARIES += libscreen_plugin.la
 endif
