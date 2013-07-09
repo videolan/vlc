@@ -66,6 +66,12 @@ static const int pi_channels_maps[CHANNELS_MAX+1] =
 };
 #endif
 
+#define NOSIGNAL_INDEX_TEXT N_("Timelength after which we assume there is no signal.")
+#define NOSIGNAL_INDEX_LONGTEXT N_(\
+    "Timelength after which we assume there is no signal.\n"\
+    "After this delay we black out the video."\
+    )
+
 #define CARD_INDEX_TEXT N_("Output card")
 #define CARD_INDEX_LONGTEXT N_(\
     "DeckLink output card, if multiple exist. " \
@@ -125,6 +131,7 @@ struct vout_display_sys_t
 {
     picture_pool_t *pool;
     bool tenbits;
+    int nosignal_delay;
 };
 
 /* Only one audio output module and one video output module
@@ -191,6 +198,8 @@ vlc_module_begin()
                 MODE_TEXT, MODE_LONGTEXT, true)
     add_bool(VIDEO_CFG_PREFIX "tenbits", false,
                 VIDEO_TENBITS_TEXT, VIDEO_TENBITS_LONGTEXT, true)
+    add_integer(VIDEO_CFG_PREFIX "nosignal-delay", 5,
+                NOSIGNAL_INDEX_TEXT, NOSIGNAL_INDEX_LONGTEXT, true)
 
 
     add_submodule ()
@@ -601,13 +610,35 @@ static void DisplayVideo(vout_display_t *vd, picture_t *picture, subpicture_t *)
 {
     vout_display_sys_t *sys = vd->sys;
     struct decklink_sys_t *decklink_sys = GetDLSys(VLC_OBJECT(vd));
+    mtime_t now = mdate();
 
     if (!picture)
         return;
 
+    if (now - picture->date > sys->nosignal_delay * CLOCK_FREQ) {
+        msg_Dbg(vd, "no signal");
+        if (sys->tenbits) { // I422_10L
+            plane_t *y = &picture->p[0];
+            memset(y->p_pixels, 0x0, y->i_lines * y->i_pitch);
+            for (int i = 1; i < picture->i_planes; i++) {
+                plane_t *p = &picture->p[i];
+                size_t len = p->i_lines * p->i_pitch / 2;
+                int16_t *data = (int16_t*)p->p_pixels;
+                for (size_t j = 0; j < len; j++) // XXX: SIMD
+                    data[j] = 0x200;
+            }
+        } else { // UYVY
+            size_t len = picture->p[0].i_lines * picture->p[0].i_pitch;
+            for (size_t i = 0; i < len; i+= 2) { // XXX: SIMD
+                picture->p[0].p_pixels[i+0] = 0x80;
+                picture->p[0].p_pixels[i+1] = 0;
+            }
+        }
+        picture->date = now;
+    }
+
     HRESULT result;
     int w, h, stride, length;
-    mtime_t now;
     w = decklink_sys->i_width;
     h = decklink_sys->i_height;
 
@@ -692,6 +723,7 @@ static int OpenVideo(vlc_object_t *p_this)
         return VLC_ENOMEM;
 
     sys->tenbits = var_InheritBool(p_this, VIDEO_CFG_PREFIX "tenbits");
+    sys->nosignal_delay = var_InheritInteger(p_this, VIDEO_CFG_PREFIX "nosignal-delay");
 
     decklink_sys = OpenDecklink(vd);
     if (!decklink_sys) {
