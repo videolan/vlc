@@ -1743,6 +1743,7 @@ dnl
 dnl  libsmbclient plugin
 dnl
 PKG_ENABLE_MODULES_VLC([SMBCLIENT], [access_smb], [smbclient], (SMB/CIFS support), [auto])
+AS_IF([test "${SYS}" = "mingw32"], [ VLC_ADD_PLUGIN([access_smb]) ])
 
 
 dnl
