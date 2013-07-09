@@ -340,6 +340,46 @@ static void BuildRGBAFragmentShader(vout_display_opengl_t *vgl,
     vgl->ShaderSource(*shader, 1, &code, NULL);
     vgl->CompileShader(*shader);
 }
+
+static void BuildXYZFragmentShader(vout_display_opengl_t *vgl,
+                                   GLint *shader)
+{
+    /* Shader for XYZ to RGB correction
+     * 3 steps :
+     *  - XYZ gamma correction
+     *  - XYZ to RGB matrix conversion
+     *  - reverse RGB gamma correction
+     */
+      const char *code =
+        "#version " GLSL_VERSION "\n"
+        PRECISION
+        "uniform sampler2D Texture0;"
+        "uniform vec4 xyz_gamma = vec4(2.6);"
+        "uniform vec4 rgb_gamma = vec4(1.0/2.2);"
+        // WARN: matrix Is filled column by column (not row !)
+        "uniform mat4 matrix_xyz_rgb = mat4("
+        "    3.240454 , -0.9692660, 0.0556434, 0.0,"
+        "   -1.5371385,  1.8760108, -0.2040259, 0.0,"
+        "    -0.4985314, 0.0415560, 1.0572252,  0.0,"
+        "    0.0,      0.0,         0.0,        1.0 "
+        " );"
+
+        "varying vec4 TexCoord0;"
+        "void main()"
+        "{ "
+        " vec4 v_in, v_out;"
+        " v_in  = texture2D(Texture0, TexCoord0.st);"
+        " v_in = pow(v_in, xyz_gamma);"
+        " v_out = matrix_xyz_rgb * v_in ;"
+        " v_out = pow(v_out, rgb_gamma) ;"
+        " v_out = clamp(v_out, 0.0, 1.0) ;"
+        " gl_FragColor = v_out;"
+        "}";
+    *shader = vgl->CreateShader(GL_FRAGMENT_SHADER);
+    vgl->ShaderSource(*shader, 1, &code, NULL);
+    vgl->CompileShader(*shader);
+}
+
 #endif
 
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
@@ -465,6 +505,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->tex_type     = GL_UNSIGNED_BYTE;
     /* Use YUV if possible and needed */
     bool need_fs_yuv = false;
+    bool need_fs_xyz = false;
     bool need_fs_rgba = USE_OPENGL_ES == 2;
     float yuv_range_correction = 1.0;
 
@@ -498,6 +539,15 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         }
     }
 
+    if (fmt->i_chroma == VLC_CODEC_XYZ12) {
+        vlc_fourcc_GetChromaDescription(fmt->i_chroma);
+        need_fs_xyz       = true;
+        vgl->fmt          = *fmt;
+        vgl->fmt.i_chroma = VLC_CODEC_XYZ12;
+        vgl->tex_format   = GL_RGB;
+        vgl->tex_internal = GL_RGB;
+        vgl->tex_type     = GL_UNSIGNED_SHORT;
+    }
     vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
     vgl->use_multitexture = vgl->chroma->plane_count > 1;
 
@@ -521,10 +571,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->shader[1] =
     vgl->shader[2] = -1;
     vgl->local_count = 0;
-    if (supports_shaders && (need_fs_yuv || need_fs_rgba)) {
+    if (supports_shaders && (need_fs_yuv || need_fs_xyz|| need_fs_rgba)) {
 #ifdef SUPPORTS_SHADERS
-        BuildYUVFragmentShader(vgl, &vgl->shader[0], &vgl->local_count,
-                               vgl->local_value, fmt, yuv_range_correction);
+        if (need_fs_xyz)
+            BuildXYZFragmentShader(vgl, &vgl->shader[0]);
+        else
+            BuildYUVFragmentShader(vgl, &vgl->shader[0], &vgl->local_count,
+                                vgl->local_value, fmt, yuv_range_correction);
+
         BuildRGBAFragmentShader(vgl, &vgl->shader[1]);
         BuildVertexShader(vgl, &vgl->shader[2]);
 
