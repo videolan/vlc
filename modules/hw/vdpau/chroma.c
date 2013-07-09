@@ -476,7 +476,8 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
     /* Update history and take "present" picture field */
     if (likely(src != NULL))
     {
-        sys->history[MAX_PAST + MAX_FUTURE].field = vlc_vdp_video_detach(src);
+        sys->history[MAX_PAST + MAX_FUTURE].field =
+                                              vlc_vdp_video_copy(src->context);
         sys->history[MAX_PAST + MAX_FUTURE].date = src->date;
         sys->history[MAX_PAST + MAX_FUTURE].force = src->b_force;
         picture_Release(src);
