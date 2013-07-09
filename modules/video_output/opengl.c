@@ -923,10 +923,15 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
 {
     vgl->UseProgram(vgl->program[program]);
     if (program == 0) {
-        vgl->Uniform4fv(vgl->GetUniformLocation(vgl->program[0], "Coefficient"), 4, vgl->local_value);
-        vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture0"), 0);
-        vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture1"), 1);
-        vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture2"), 2);
+        if (vgl->chroma->plane_count == 3) {
+            vgl->Uniform4fv(vgl->GetUniformLocation(vgl->program[0], "Coefficient"), 4, vgl->local_value);
+            vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture0"), 0);
+            vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture1"), 1);
+            vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture2"), 2);
+        }
+        else if (vgl->chroma->plane_count == 1) {
+            vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[0], "Texture0"), 0);
+        }
     } else {
         vgl->Uniform1i(vgl->GetUniformLocation(vgl->program[1], "Texture0"), 0);
         vgl->Uniform4f(vgl->GetUniformLocation(vgl->program[1], "FillColor"), 1.0f, 1.0f, 1.0f, 1.0f);
@@ -1000,7 +1005,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     }
 
 #ifdef SUPPORTS_SHADERS
-    if (vgl->program[0] && vgl->chroma->plane_count == 3)
+    if (vgl->program[0] && (vgl->chroma->plane_count == 3 || vgl->chroma->plane_count == 1))
         DrawWithShaders(vgl, left, top, right, bottom, 0);
     else if (vgl->program[1] && vgl->chroma->plane_count == 1)
         DrawWithShaders(vgl, left, top, right, bottom, 1);
