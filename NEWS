@@ -260,7 +260,7 @@ HTTP Interface
  * Fix two xss vulnerabilities (CVE-2013-3565)
 
 Translations:
- * Update Basque, Simplified Chinese, Ukrainian, Turkish, Portuguese, Norwegian BokmÃ¥l,
+ * Update Basque, Simplified Chinese, Ukrainian, Turkish, Portuguese, Norwegian Bokmål,
    Burmese, Lithuanian, Italian, Hindi, Spanish, German, Czech, Danish, Welsh translations
  * New Azerbaijani, Kirgyz, Oriya translations
 
@@ -316,7 +316,7 @@ Translations:
  * Update of Brazilian Portuguese, Traditional Chinese, Thai, Portuguese,
    Japanese, Italian, Hebrew, Estonian, Spanish, Czech, Catalan, Bosnian,
    Asturian, French, Romanian, Serbian, Russian, Hindi, Estonian, German
-   Slovenian Norwegian BokmÃ¥l, Khmer, Icelandic, Interlingua, Welsh, Ukrainian,
+   Slovenian Norwegian Bokmål, Khmer, Icelandic, Interlingua, Welsh, Ukrainian,
    Dutch, Danish, translations
  * New Gujarati, Aragonese translations
 
