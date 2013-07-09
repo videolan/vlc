@@ -1916,7 +1916,7 @@ dnl
 AC_ARG_ENABLE(realrtsp,
   [  --enable-realrtsp       Real RTSP module (default disabled)])
 if test "${enable_realrtsp}" = "yes"; then
-  VLC_ADD_PLUGIN([realrtsp])
+  VLC_ADD_PLUGIN([access_realrtsp])
 fi
 
 dnl
