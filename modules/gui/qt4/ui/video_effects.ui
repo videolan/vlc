@@ -843,7 +843,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QDial" name="rotateAngleDial">
+        <widget class="VLCQDial" name="rotateAngleDial">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
            <horstretch>0</horstretch>
@@ -1795,6 +1795,13 @@
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>VLCQDial</class>
+   <extends>QDial</extends>
+   <header>util/customwidgets.hpp</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>adjustEnable</tabstop>
   <tabstop>hueSlider</tabstop>

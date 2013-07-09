@@ -47,6 +47,7 @@
 #include "qt4.hpp"
 #include "input_manager.hpp"
 #include "util/qt_dirs.hpp"
+#include "util/customwidgets.hpp"
 
 #include "../../audio_filter/equalizer_presets.h"
 #include <vlc_intf_strings.h>
@@ -529,7 +530,7 @@ void ExtVideo::setWidgetValue( QObject *widget )
     QCheckBox      *checkbox      = qobject_cast<QCheckBox*>     ( widget );
     QSpinBox       *spinbox       = qobject_cast<QSpinBox*>      ( widget );
     QDoubleSpinBox *doublespinbox = qobject_cast<QDoubleSpinBox*>( widget );
-    QDial          *dial          = qobject_cast<QDial*>         ( widget );
+    VLCQDial       *dial          = qobject_cast<VLCQDial*>      ( widget );
     QLineEdit      *lineedit      = qobject_cast<QLineEdit*>     ( widget );
     QComboBox      *combobox      = qobject_cast<QComboBox*>     ( widget );
 
@@ -605,7 +606,7 @@ void ExtVideo::updateFilterOptions()
     QCheckBox      *checkbox      = qobject_cast<QCheckBox*>     ( sender() );
     QSpinBox       *spinbox       = qobject_cast<QSpinBox*>      ( sender() );
     QDoubleSpinBox *doublespinbox = qobject_cast<QDoubleSpinBox*>( sender() );
-    QDial          *dial          = qobject_cast<QDial*>         ( sender() );
+    VLCQDial       *dial          = qobject_cast<VLCQDial*>      ( sender() );
     QLineEdit      *lineedit      = qobject_cast<QLineEdit*>     ( sender() );
     QComboBox      *combobox      = qobject_cast<QComboBox*>     ( sender() );
 

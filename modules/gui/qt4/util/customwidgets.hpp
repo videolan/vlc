@@ -37,6 +37,7 @@
 #include <QTimer>
 #include <QToolButton>
 #include <QAbstractAnimation>
+#include <QDial>
 
 class QPixmap;
 class QWidget;
@@ -47,6 +48,15 @@ class QFramelessButton : public QPushButton
 public:
     QFramelessButton( QWidget *parent = NULL );
     virtual QSize sizeHint() const { return iconSize(); }
+protected:
+    virtual void paintEvent( QPaintEvent * event );
+};
+
+class VLCQDial : public QDial
+{
+    Q_OBJECT
+public:
+    VLCQDial( QWidget *parent = NULL );
 protected:
     virtual void paintEvent( QPaintEvent * event );
 };

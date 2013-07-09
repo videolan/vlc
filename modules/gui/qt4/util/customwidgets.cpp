@@ -87,6 +87,22 @@ QString QVLCDebugLevelSpinBox::textFromValue( int v ) const
     return QString( "%1 (%2)" ).arg( v ).arg( texts[v] );
 }
 
+VLCQDial::VLCQDial( QWidget *parent ) : QDial( parent )
+{
+
+}
+
+void VLCQDial::paintEvent( QPaintEvent *event )
+{
+    QDial::paintEvent( event );
+    QPainter painter( this );
+    QRect rect = geometry();
+    painter.setPen( QPen( palette().color( QPalette::WindowText ) ) );
+    painter.drawText( QRectF( 0, rect.height() * 0.66, rect.width(), rect.height() ),
+                      Qt::AlignHCenter, QString::number( value() ), 0 );
+    painter.end();
+}
+
 /***************************************************************************
  * Hotkeys converters
  ***************************************************************************/
