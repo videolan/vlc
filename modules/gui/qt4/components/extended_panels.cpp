@@ -1,7 +1,7 @@
 /*****************************************************************************
  * extended_panels.cpp : Extended controls panels
  ****************************************************************************
- * Copyright (C) 2006-2012 the VideoLAN team
+ * Copyright (C) 2006-2013 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -60,29 +60,6 @@
 static char *ChangeFiltersString( struct intf_thread_t *p_intf, const char *psz_filter_type, const char *psz_name, bool b_add );
 static void ChangeAFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add );
 static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add );
-
-#if 0
-class ConfClickHandler : public QObject
-{
-public:
-    ConfClickHandler( intf_thread_t *_p_intf, ExtVideo *_e ) : QObject ( _e ) {
-        e = _e; p_intf = _p_intf;
-    }
-    virtual ~ConfClickHandler() {}
-    bool eventFilter( QObject *obj, QEvent *evt )
-    {
-        if( evt->type() == QEvent::MouseButtonPress )
-        {
-            e->gotoConf( obj );
-            return true;
-        }
-        return false;
-    }
-private:
-    ExtVideo* e;
-    intf_thread_t *p_intf;
-};
-#endif
 
 const QString ModuleFromWidgetName( QObject *obj )
 {
@@ -707,28 +684,6 @@ void ExtVideo::updateFilterOptions()
 
     if( p_obj ) vlc_object_release( p_obj );
 }
-
-#if 0
-void ExtVideo::gotoConf( QObject* src )
-{
-#define SHOWCONF( module ) \
-    if( src->objectName().contains( module ) ) \
-    { \
-        PrefsDialog::getInstance( p_intf )->showModulePrefs( module ); \
-        return; \
-    }
-    SHOWCONF( "clone" );
-    SHOWCONF( "magnify" );
-    SHOWCONF( "wave" );
-    SHOWCONF( "ripple" );
-    SHOWCONF( "invert" );
-    SHOWCONF( "puzzle" );
-    SHOWCONF( "wall" );
-    SHOWCONF( "gradient" );
-    SHOWCONF( "colorthres" );
-    SHOWCONF( "anaglyph" )
-}
-#endif
 
 /**********************************************************************
  * v4l2 controls
