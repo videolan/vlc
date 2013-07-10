@@ -166,7 +166,7 @@
         <property name="title">
          <string>Video</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout">
+        <layout class="QGridLayout" name="gridLayout_1">
          <item row="0" column="0">
           <widget class="QLabel" name="deinterLabel">
            <property name="text">

@@ -220,7 +220,7 @@
        <widget class="Line" name="line"/>
       </item>
       <item row="3" column="1" colspan="5">
-       <widget class="Line" name="line"/>
+       <widget class="Line" name="line_1"/>
       </item>
       <item row="0" column="4" colspan="2">
        <widget class="QTimeEdit" name="startTimeTimeEdit">
