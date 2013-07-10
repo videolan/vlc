@@ -96,10 +96,13 @@ void VLCQDial::paintEvent( QPaintEvent *event )
 {
     QDial::paintEvent( event );
     QPainter painter( this );
-    QRect rect = geometry();
     painter.setPen( QPen( palette().color( QPalette::WindowText ) ) );
-    painter.drawText( QRectF( 0, rect.height() * 0.66, rect.width(), rect.height() ),
-                      Qt::AlignHCenter, QString::number( value() ), 0 );
+    float radius = 0.5 * 0.707106 * qMin( size().width(), size().height() );
+    painter.drawText( QRectF( rect().center().x() + radius,
+                              rect().center().y() + radius,
+                              size().width(),
+                              size().height() ),
+                      0, QString::number( value() ), 0 );
     painter.end();
 }
 
