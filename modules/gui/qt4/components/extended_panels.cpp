@@ -58,6 +58,7 @@
 #include <vlc_charset.h> /* us_strtod */
 
 static char *ChangeFiltersString( struct intf_thread_t *p_intf, const char *psz_filter_type, const char *psz_name, bool b_add );
+static void ChangeAFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add );
 static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add );
 
 #if 0
@@ -351,6 +352,26 @@ static char *ChangeFiltersString( struct intf_thread_t *p_intf, const char *psz_
         }
     }
     return psz_string;
+}
+
+static void ChangeAFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add )
+{
+    char *psz_string;
+
+    module_t *p_obj = module_find( psz_name );
+    if( !p_obj )
+    {
+        msg_Err( p_intf, "Unable to find filter module \"%s\".", psz_name );
+        return;
+    }
+
+    psz_string = ChangeFiltersString( p_intf, "audio-filter", psz_name, b_add );
+    if( !psz_string )
+        return;
+
+    config_PutPsz( p_intf, "audio-filter", psz_string );
+
+    free( psz_string );
 }
 
 static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add )
@@ -1086,6 +1107,7 @@ AudioFilterControlWidget::~AudioFilterControlWidget()
 
 void AudioFilterControlWidget::enable( bool b_enable ) const
 {
+    ChangeAFiltersString( p_intf, qtu(name), b_enable );
     playlist_EnableAudioFilter( THEPL, qtu(name), b_enable );
 }
 
