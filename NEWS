@@ -68,6 +68,9 @@ Demuxers:
  * Support for more MJPEG streams
  * Add support for liveleak streams
  * Add support for Wave/RF64 files
+ * Prevent numerous uncaught exceptions in MKV causing the 
+   program to terminate.
+ * Add protection against several heap buffer overflow in libebml
 
 Audio output:
  * Windows Audio Session API audio output support
