@@ -207,19 +207,21 @@ static int Map2Mask (vlc_object_t *obj, const snd_pcm_chmap_t *restrict map)
  * Compares a fixed ALSA channels map with the VLC channels order.
  */
 static unsigned SetupChannelsFixed(const snd_pcm_chmap_t *restrict map,
-                                uint16_t *restrict mask, uint8_t *restrict tab)
+                               uint16_t *restrict maskp, uint8_t *restrict tab)
 {
     uint32_t chans_out[AOUT_CHAN_MAX];
+    uint16_t mask = 0;
 
     for (unsigned i = 0; i < map->channels; i++)
     {
         uint_fast16_t vlc_chan = vlc_chans[map->pos[i]];
 
         chans_out[i] = vlc_chan;
-        *mask |= vlc_chan;
+        mask |= vlc_chan;
     }
 
-    return aout_CheckChannelReorder(NULL, chans_out, *mask, tab);
+    *maskp = mask;
+    return aout_CheckChannelReorder(NULL, chans_out, mask, tab);
 }
 
 /**
