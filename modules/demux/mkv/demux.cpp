@@ -527,6 +527,11 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
                     // find the families of this segment
                     KaxInfo *p_info = static_cast<KaxInfo*>(p_l1);
                     b_keep_segment = b_initial;
+                    if( unlikely( p_info->GetSize() >= SIZE_MAX ) )
+                    {
+                        msg_Err( p_demux, "KaxInfo too big aborting" );
+                        break;
+                    }
                     try
                     {
                         p_info->Read(*p_estream, EBML_CLASS_CONTEXT(KaxInfo), i_upper_lvl, p_l2, true);
