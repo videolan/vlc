@@ -57,6 +57,7 @@
 
 #include <vlc_charset.h> /* us_strtod */
 
+static char *ChangeFiltersString( struct intf_thread_t *p_intf, const char *psz_filter_type, const char *psz_name, bool b_add );
 static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add );
 
 #if 0
@@ -293,9 +294,68 @@ void ExtVideo::clean()
     ui.cropRightPx->setValue( 0 );
 }
 
-static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add )
+static char *ChangeFiltersString( struct intf_thread_t *p_intf, const char *psz_filter_type, const char *psz_name, bool b_add )
 {
     char *psz_parser, *psz_string;
+
+    psz_string = config_GetPsz( p_intf, psz_filter_type );
+
+    if( !psz_string ) psz_string = strdup( "" );
+
+    psz_parser = strstr( psz_string, psz_name );
+
+    if( b_add )
+    {
+        if( !psz_parser )
+        {
+            psz_parser = psz_string;
+            if( asprintf( &psz_string, ( *psz_string ) ? "%s:%s" : "%s%s",
+                            psz_string, psz_name ) == -1 )
+            {
+                free( psz_parser );
+                return NULL;
+            }
+            free( psz_parser );
+        }
+        else
+        {
+            free( psz_string );
+            return NULL;
+        }
+    }
+    else
+    {
+        if( psz_parser )
+        {
+            if( *( psz_parser + strlen( psz_name ) ) == ':' )
+            {
+                memmove( psz_parser, psz_parser + strlen( psz_name ) + 1,
+                         strlen( psz_parser + strlen( psz_name ) + 1 ) + 1 );
+            }
+            else
+            {
+                *psz_parser = '\0';
+            }
+
+            /* Remove trailing : : */
+            size_t i_len = strlen( psz_string );
+            if( i_len > 0 && *( psz_string + i_len - 1 ) == ':' )
+            {
+                *( psz_string + i_len - 1 ) = '\0';
+            }
+        }
+        else
+        {
+            free( psz_string );
+            return NULL;
+        }
+    }
+    return psz_string;
+}
+
+static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add )
+{
+    char *psz_string;
     const char *psz_filter_type;
 
     module_t *p_obj = module_find( psz_name );
@@ -327,58 +387,10 @@ static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_
         return;
     }
 
-    psz_string = config_GetPsz( p_intf, psz_filter_type );
+    psz_string = ChangeFiltersString( p_intf, psz_filter_type, psz_name, b_add );
+    if( !psz_string )
+        return;
 
-    if( !psz_string ) psz_string = strdup( "" );
-
-    psz_parser = strstr( psz_string, psz_name );
-
-    if( b_add )
-    {
-        if( !psz_parser )
-        {
-            psz_parser = psz_string;
-            if( asprintf( &psz_string, ( *psz_string ) ? "%s:%s" : "%s%s",
-                            psz_string, psz_name ) == -1 )
-            {
-                free( psz_parser );
-                return;
-            }
-            free( psz_parser );
-        }
-        else
-        {
-            free( psz_string );
-            return;
-        }
-    }
-    else
-    {
-        if( psz_parser )
-        {
-            if( *( psz_parser + strlen( psz_name ) ) == ':' )
-            {
-                memmove( psz_parser, psz_parser + strlen( psz_name ) + 1,
-                         strlen( psz_parser + strlen( psz_name ) + 1 ) + 1 );
-            }
-            else
-            {
-                *psz_parser = '\0';
-            }
-
-            /* Remove trailing : : */
-            size_t i_len = strlen( psz_string );
-            if( i_len > 0 && *( psz_string + i_len - 1 ) == ':' )
-            {
-                *( psz_string + i_len - 1 ) = '\0';
-            }
-        }
-        else
-        {
-            free( psz_string );
-            return;
-        }
-    }
     /* Vout is not kept, so put that in the config */
     config_PutPsz( p_intf, psz_filter_type, psz_string );
 
