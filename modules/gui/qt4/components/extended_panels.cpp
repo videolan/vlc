@@ -50,12 +50,9 @@
 #include "util/customwidgets.hpp"
 
 #include "../../audio_filter/equalizer_presets.h"
-#include <vlc_intf_strings.h>
 #include <vlc_vout.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
-
-#include <vlc_charset.h> /* us_strtod */
 
 static char *ChangeFiltersString( struct intf_thread_t *p_intf, const char *psz_filter_type, const char *psz_name, bool b_add );
 static void ChangeAFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add );
