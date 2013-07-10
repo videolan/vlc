@@ -445,15 +445,16 @@ static const struct
     { VLC_CODEC_XSUB, AV_CODEC_ID_XSUB, SPU_ES },
     { VLC_CODEC_SSA, AV_CODEC_ID_SSA, SPU_ES },
     { VLC_CODEC_TELETEXT, AV_CODEC_ID_DVB_TELETEXT, SPU_ES },
-
-    { 0, 0, UNKNOWN_ES }
 };
+
+static const size_t codecs_count = sizeof (codecs_table)
+                                 / sizeof (codecs_table[0]);
 
 int GetFfmpegCodec( vlc_fourcc_t i_fourcc, int *pi_cat,
                     int *pi_ffmpeg_codec, const char **ppsz_name )
 {
     i_fourcc = vlc_fourcc_GetCodec( UNKNOWN_ES, i_fourcc );
-    for( unsigned i = 0; codecs_table[i].i_fourcc != 0; i++ )
+    for( unsigned i = 0; i < codecs_count; i++ )
     {
         if( codecs_table[i].i_fourcc == i_fourcc )
         {
@@ -470,7 +471,7 @@ int GetFfmpegCodec( vlc_fourcc_t i_fourcc, int *pi_cat,
 int GetVlcFourcc( int i_ffmpeg_codec, int *pi_cat,
                   vlc_fourcc_t *pi_fourcc, const char **ppsz_name )
 {
-    for( unsigned i = 0; codecs_table[i].i_codec != 0; i++ )
+    for( unsigned i = 0; i < codecs_count; i++ )
     {
         if( codecs_table[i].i_codec == i_ffmpeg_codec )
         {
