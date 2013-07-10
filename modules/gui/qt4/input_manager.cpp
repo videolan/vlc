@@ -1187,6 +1187,7 @@ static int PLItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t val, void *param )
 {
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
+    VLC_UNUSED( val );
 
     MainInputManager *mim = (MainInputManager*)param;
 
