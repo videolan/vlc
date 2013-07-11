@@ -1113,6 +1113,8 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
     else if (notificationObject == o_video_snap_folder_fld ||
             notificationObject == o_video_snap_prefix_fld)
         b_videoSettingChanged = YES;
+    else if (notificationObject == o_intf_luahttppwd_fld)
+        b_intfSettingChanged = YES;
 }
 
 - (IBAction)showFontPicker:(id)sender
