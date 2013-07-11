@@ -222,14 +222,13 @@ static void *Run( void *data )
 
         if( p_sys->update_type == UPDATE_URLS )
         {
-          char* psz_urls = var_GetNonEmptyString( p_sd, "podcast-urls" );
-          ParseUrls( p_sd, psz_urls );
-          free( psz_urls );
+            playlist_t *pl = pl_Get( p_sd );
+            char* psz_urls = var_GetNonEmptyString( pl, "podcast-urls" );
+            ParseUrls( p_sd, psz_urls );
+            free( psz_urls );
         }
         else if( p_sys->update_type == UPDATE_REQUEST )
-        {
-          ParseRequest( p_sd );
-        }
+            ParseRequest( p_sd );
 
         p_sys->b_update = false;
 
@@ -303,7 +302,8 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
 
     for( ;; )
     {
-        if( !psz_urls ) break;
+        if( !psz_urls )
+            break;
 
         char *psz_tok = strchr( psz_urls, '|' );
         if( psz_tok ) *psz_tok = '\0';
@@ -332,8 +332,10 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
                          strdup( p_sys->ppsz_urls[i]) );
             INSERT_ELEM( pp_new_items, i_new_items, i_new_items, p_sys->pp_items[i] );
         }
-        if( psz_tok )  psz_urls = psz_tok+1;
-        else break;
+        if( psz_tok )
+            psz_urls = psz_tok+1;
+        else
+            break;
     }
 
     /* delete removed items and signal the removal */
@@ -343,12 +345,13 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
             if( pp_new_items[j] == p_sys->pp_items[i] ) break;
         if( j == i_new_items )
         {
-          services_discovery_RemoveItem( p_sd, p_sys->pp_items[i] );
-          vlc_gc_decref( p_sys->pp_items[i] );
+            services_discovery_RemoveItem( p_sd, p_sys->pp_items[i] );
+            vlc_gc_decref( p_sys->pp_items[i] );
         }
     }
     free( p_sys->pp_items );
-    for( int i = 0; i < p_sys->i_urls; i++ ) free( p_sys->ppsz_urls[i] );
+    for( int i = 0; i < p_sys->i_urls; i++ )
+        free( p_sys->ppsz_urls[i] );
     free( p_sys->ppsz_urls );
 
     p_sys->ppsz_urls = ppsz_new_urls;
@@ -371,7 +374,8 @@ static void ParseRequest( services_discovery_t *p_sd )
 
     if ( ! p_sys->b_savedurls_loaded )
     {
-        char* psz_urls = var_GetNonEmptyString( p_sd, "podcast-urls" );
+        playlist_t *pl = pl_Get( p_sd );
+        char* psz_urls = var_GetNonEmptyString( pl, "podcast-urls" );
         ParseUrls( p_sd, psz_urls );
         free( psz_urls );
     }
