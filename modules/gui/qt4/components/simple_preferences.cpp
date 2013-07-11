@@ -342,7 +342,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             int i_volume = 100; //FIXME not foolproof
 
 #define get_vol_aout( name ) \
-            module_exists( name ) && ( !strcmp( psz_aout, name ) || !strcmp( psz_aout, "any" ) )
+            module_exists( name ) && ( !psz_aout || !strcmp( psz_aout, name ) || !strcmp( psz_aout, "any" ) )
 
 #if defined( _WIN32 )
             if( get_vol_aout( "directx" ) )
@@ -909,7 +909,7 @@ void SPrefsPanel::apply()
         float f_gain = powf( i_volume / 100.f, 3 );
 
 #define save_vol_aout( name ) \
-            module_exists( name ) && ( !strcmp( psz_aout, name ) || !strcmp( psz_aout, "any" ) )
+            module_exists( name ) && ( !psz_aout || !strcmp( psz_aout, name ) || !strcmp( psz_aout, "any" ) )
 
         //FIXME this is moot
 #if defined( _WIN32 )
