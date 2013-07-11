@@ -19,5 +19,5 @@ vncserver: LibVNCServer-$(VNCSERVER_VERSION).tar.gz .sum-vncserver
 
 .vncserver: vncserver
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && $(MAKE) && $(MAKE) install
+	cd $< && $(MAKE) -C libvncclient install
 	touch $@
