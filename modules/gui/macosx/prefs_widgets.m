@@ -859,9 +859,12 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     case CONFIG_ITEM_DIRECTORY:
     case CONFIG_ITEM_MODULE:
     case CONFIG_ITEM_MODULE_LIST:
-    case CONFIG_ITEM_MODULE_LIST_CAT:
-        config_PutPsz(VLCIntf, psz_name, [self stringValue]);
+    case CONFIG_ITEM_MODULE_LIST_CAT: {
+        char *psz_val = [self stringValue];
+        config_PutPsz(VLCIntf, psz_name, psz_val);
+        free(psz_val);
         break;
+    }
     case CONFIG_ITEM_KEY:
         /* So you don't need to restart to have the changes take effect */
         val.i_int = [self intValue];

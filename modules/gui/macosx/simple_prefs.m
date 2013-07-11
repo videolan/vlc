@@ -771,7 +771,7 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
 
         if (p_item->i_type == CONFIG_ITEM_MODULE && module_provides(p_parser, p_item->psz_type)) {
             if ([objectTitle isEqualToString: _NS(module_GetLongName(p_parser))]) {
-                config_PutPsz(p_intf, name, strdup(module_get_name(p_parser, false)));
+                config_PutPsz(p_intf, name, module_get_name(p_parser, false));
                 break;
             }
         }
