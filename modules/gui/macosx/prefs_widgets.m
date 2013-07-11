@@ -1280,6 +1280,10 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
         }
     }
     module_list_free(p_list);
+
+    if(returnval == NULL && [newval isEqualToString: _NS("Default")] && p_item->orig.psz != NULL) {
+        returnval = strdup(p_item->orig.psz);
+    }
     return returnval;
 }
 
