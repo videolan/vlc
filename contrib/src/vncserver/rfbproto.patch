@@ -1,0 +1,12 @@
+--- vncserver/libvncclient/rfbproto.c.orig	2013-07-11 22:15:57.000000000 +0200
++++ vncserver/libvncclient/rfbproto.c	2013-07-11 22:25:21.000000000 +0200
+@@ -52,6 +52,9 @@
+ #endif
+ #ifdef WIN32
+ #include <basetsd.h>
++#else
++#undef TRUE
++#undef FALSE
+ #endif
+ #include <jpeglib.h>
+ #endif
