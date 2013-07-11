@@ -1,0 +1,12 @@
+--- vncserver/libvncclient/rfbproto.c	2012-05-04 16:19:00.000000000 +0200
++++ vncserver/libvncclient/rfbproto.c.new	2013-07-11 14:51:35.951976814 +0200
+@@ -50,6 +50,9 @@
+ #ifdef _RPCNDR_H /* This Windows header typedefs 'boolean', jpeglib has to know */
+ #define HAVE_BOOLEAN
+ #endif
++#ifdef WIN32
++#include <basetsd.h>
++#endif
+ #include <jpeglib.h>
+ #endif
+ #include <stdarg.h>

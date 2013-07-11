@@ -15,6 +15,7 @@ $(TARBALLS)/LibVNCServer-$(VNCSERVER_VERSION).tar.gz:
 
 vncserver: LibVNCServer-$(VNCSERVER_VERSION).tar.gz .sum-vncserver
 	$(UNPACK)
+	$(APPLY) $(SRC)/vncserver/libvncclient-libjpeg-win32.patch
 	$(MOVE)
 
 .vncserver: vncserver
