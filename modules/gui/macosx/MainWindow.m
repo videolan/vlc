@@ -725,7 +725,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_fspanel setPlay];
 
     [[[VLCMain sharedInstance] voutController] updateWindowsControlsBarWithSelector:@selector(setPlay)];
-
 }
 
 - (void)updateVolumeSlider
@@ -1179,9 +1178,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if (playlist_IsServicesDiscoveryLoaded(p_playlist, "podcast{longname=\"Podcasts\"}")) {
             playlist_ServicesDiscoveryRemove(p_playlist, "podcast{longname=\"Podcasts\"}");
             playlist_ServicesDiscoveryAdd(p_playlist, "podcast{longname=\"Podcasts\"}");
-            [o_playlist_table reloadData];
+            [[[VLCMain sharedInstance] playlist] playlistUpdated];
         }
-
     }
 }
 
