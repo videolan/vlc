@@ -18,6 +18,8 @@ vncserver: LibVNCServer-$(VNCSERVER_VERSION).tar.gz .sum-vncserver
 	$(APPLY) $(SRC)/vncserver/libvncclient-libjpeg-win32.patch
 	$(MOVE)
 
+DEPS_vncserver = gcrypt $(DEPS_gcrypt) jpeg $(DEPS_jpeg) png $(DEPS_png)
+
 .vncserver: vncserver
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) -C libvncclient install
