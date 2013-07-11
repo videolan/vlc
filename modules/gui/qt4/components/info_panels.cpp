@@ -108,20 +108,20 @@ MetaPanel::MetaPanel( QWidget *parent,
     /* Number - on the same line */
     label = new QLabel( qtr( VLC_META_TRACK_NUMBER ) );
     label->setFont( smallFont ); label->setContentsMargins( 3, 2, 0, 0 );
-    metaLayout->addWidget( label, line - 1, 7, 1, 3 );
+    metaLayout->addWidget( label, line - 1, 7, 1, 3  );
 
-    tracknumber_text = new QLineEdit;
-    tracktotal_text = new QLineEdit;
-    tracknumber_text->setAlignment( Qt::AlignRight );
-    tracktotal_text->setAlignment( Qt::AlignRight );
-    tracknumber_text->setMaximumWidth( 64 );
-    tracktotal_text->setMaximumWidth( 64 );
-    metaLayout->addWidget( tracknumber_text, line, 7, 1, 1 );
-    metaLayout->addWidget( tracktotal_text, line, 9, 1, -1 );
+    seqnum_text = new QLineEdit;
+    seqnum_text->setMaximumWidth( 64 );
+    seqnum_text->setAlignment( Qt::AlignRight );
+    metaLayout->addWidget( seqnum_text, line, 7, 1, 1 );
 
-    QLabel *sep = new QLabel( "/" );
-    metaLayout->addWidget( sep, line, 8, 1, -1 );
+    label = new QLabel( "/" ); label->setFont( smallFont );
+    metaLayout->addWidget( label, line, 8, 1, 1 );
 
+    seqtot_text = new QLineEdit;
+    seqtot_text->setMaximumWidth( 64 );
+    seqtot_text->setAlignment( Qt::AlignRight );
+    metaLayout->addWidget( seqtot_text, line, 9, 1, 1 );
     line++;
 
     /* Rating - on the same line */
@@ -178,7 +178,8 @@ MetaPanel::MetaPanel( QWidget *parent,
     metaLayout->setRowStretch( line, 10 );
 #undef ADD_META
 
-    CONNECT( tracknumber_text, textEdited( QString ), this, enterEditMode() );
+    CONNECT( seqnum_text, textEdited( QString ), this, enterEditMode() );
+    CONNECT( seqtot_text, textEdited( QString ), this, enterEditMode() );
 
     CONNECT( date_text, textEdited( QString ), this, enterEditMode() );
 //    CONNECT( THEMIM->getIM(), artChanged( QString ), this, enterEditMode() );
@@ -244,16 +245,8 @@ void MetaPanel::update( input_item_t *p_item )
     UPDATE_META( EncodedBy, encodedby_text );
 
     UPDATE_META( Date, date_text );
-
-    QString trackposition( "%1/%2" );
-    psz_meta = input_item_GetTrackNum( p_item );
-    trackposition = trackposition.arg( psz_meta );
-    free( psz_meta );
-    psz_meta = input_item_GetTrackTotal( p_item );
-    trackposition = trackposition.arg( psz_meta );
-    free( psz_meta );
-    tracknumber_text->setText( trackposition );
-
+    UPDATE_META( TrackNum, seqnum_text );
+    UPDATE_META( TrackTotal, seqtot_text );
 //    UPDATE_META( Setting, setting_text );
 //    UPDATE_META_INT( Rating, rating_text );
 
@@ -302,9 +295,8 @@ void MetaPanel::saveMeta()
     input_item_SetArtist( p_input, qtu( artist_text->text() ) );
     input_item_SetAlbum(  p_input, qtu( collection_text->text() ) );
     input_item_SetGenre(  p_input, qtu( genre_text->text() ) );
-    QStringList trackparts = tracknumber_text->text().split( "/" );
-    input_item_SetTrackNum( p_input, qtu( trackparts[0] ) );
-    input_item_SetTrackTotal( p_input, qtu( trackparts[1] ) );
+    input_item_SetTrackNum(  p_input, qtu( seqnum_text->text() ) );
+    input_item_SetTrackTotal(  p_input, qtu( seqtot_text->text() ) );
     input_item_SetDate(  p_input, qtu( date_text->text() ) );
 
     input_item_SetCopyright( p_input, qtu( copyright_text->text() ) );
@@ -346,7 +338,8 @@ void MetaPanel::clear()
     genre_text->clear();
     copyright_text->clear();
     collection_text->clear();
-    tracknumber_text->clear();
+    seqnum_text->clear();
+    seqtot_text->clear();
     description_text->clear();
     date_text->clear();
     language_text->clear();
