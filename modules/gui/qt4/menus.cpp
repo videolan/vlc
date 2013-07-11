@@ -1601,6 +1601,8 @@ void VLCMenuBar::updateRecents( intf_thread_t *p_intf )
                 char *psz = decode_URI_duplicate( qtu( mrl ) );
                 QString text = qfu( psz );
 
+                text.replace("&", "&&");
+
                 free( psz );
                 action = recentsMenu->addAction(
                         QString( i < 9 ? "&%1: ": "%1: " ).arg( i + 1 ) +
