@@ -1602,6 +1602,14 @@ void VLCMenuBar::updateRecents( intf_thread_t *p_intf )
                 QString text = qfu( psz );
 
                 text.replace("&", "&&");
+#ifdef _WIN32
+# define FILE_SCHEME "file:///"
+#else
+# define FILE_SCHEME "file://"
+#endif
+                if ( text.startsWith( FILE_SCHEME ) )
+                    text.remove( 0, strlen( FILE_SCHEME ) );
+#undef FILE_SCHEME
 
                 free( psz );
                 action = recentsMenu->addAction(
