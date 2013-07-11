@@ -38,6 +38,8 @@ GNUTLS_CONF := \
 	--disable-openpgp-authentication \
 	--disable-openssl-compatibility \
 	--disable-guile \
+	--disable-nls \
+	--without-libintl-prefix \
 	$(HOSTCONF)
 
 DEPS_gnutls = nettle $(DEPS_nettle)
