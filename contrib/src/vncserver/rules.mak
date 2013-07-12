@@ -17,6 +17,7 @@ vncserver: LibVNCServer-$(VNCSERVER_VERSION).tar.gz .sum-vncserver
 	$(UNPACK)
 	$(APPLY) $(SRC)/vncserver/libvncclient-libjpeg-win32.patch
 	$(APPLY) $(SRC)/vncserver/rfbproto.patch
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 DEPS_vncserver = gcrypt $(DEPS_gcrypt) jpeg $(DEPS_jpeg) png $(DEPS_png)
