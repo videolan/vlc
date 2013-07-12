@@ -2,6 +2,10 @@
 
 CRYSTAL_HEADERS_URL := http://www.broadcom.com/docs/support/crystalhd/crystalhd_lgpl_includes_v1.zip
 
+ifdef HAVE_WIN32
+PKGS += crystalhd
+endif
+
 $(TARBALLS)/crystalhd_lgpl_includes_v1.zip:
 	$(call download,$(CRYSTAL_HEADERS_URL))
 
