@@ -299,8 +299,6 @@ block_t *DirBlock (access_t *p_access)
                 goto fatal;
 
             block_t *block = block_heap_Alloc (footer, len);
-            if (unlikely(block == NULL))
-                free (footer);
             p_access->info.b_eof = true;
             return block;
         }
@@ -452,10 +450,7 @@ notdir:
 
     block_t *block = block_heap_Alloc (entry, len);
     if (unlikely(block == NULL))
-    {
-        free (entry);
         goto fatal;
-    }
     return block;
 
 fatal:
