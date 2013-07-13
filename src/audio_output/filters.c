@@ -314,8 +314,7 @@ static int EqualizerCallback (vlc_object_t *obj, const char *var,
                               void *data)
 {
     const char *val = newval.psz_string;
-
-    if (*val)
+    if (!strcmp("equalizer", var) && *val)
     {
         var_Create (obj, "equalizer-preset", VLC_VAR_STRING);
         var_SetString (obj, "equalizer-preset", val);
@@ -418,7 +417,10 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
     if (request_vout != NULL)
     {
         var_AddCallback (obj, "equalizer", EqualizerCallback, NULL);
+        var_AddCallback (obj, "equalizer-bands", EqualizerCallback, NULL);
         var_AddCallback (obj, "visual", VisualizationCallback, NULL);
+
+        var_TriggerCallback( obj, "equalizer-bands" );
     }
 
     /* Now add user filters */
@@ -495,6 +497,7 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
 error:
     aout_FiltersPipelineDestroy (filters->tab, filters->count);
     var_DelCallback (obj, "equalizer", EqualizerCallback, NULL);
+    var_DelCallback (obj, "equalizer-bands", EqualizerCallback, NULL);
     var_DelCallback (obj, "visual", VisualizationCallback, NULL);
     free (filters);
     return NULL;
@@ -517,6 +520,7 @@ void aout_FiltersDelete (vlc_object_t *obj, aout_filters_t *filters)
     if (obj != NULL)
     {
         var_DelCallback (obj, "equalizer", EqualizerCallback, NULL);
+        var_DelCallback (obj, "equalizer-bands", EqualizerCallback, NULL);
         var_DelCallback (obj, "visual", VisualizationCallback, NULL);
     }
     free (filters);

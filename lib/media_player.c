@@ -33,6 +33,7 @@
 #include <vlc_demux.h>
 #include <vlc_input.h>
 #include <vlc_vout.h>
+#include <vlc_aout.h>
 #include <vlc_keys.h>
 
 #include "libvlc_internal.h"
@@ -461,6 +462,10 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "video-title-show", VLC_VAR_BOOL);
     var_Create (mp, "video-title-position", VLC_VAR_INTEGER);
     var_Create (mp, "video-title-timeout", VLC_VAR_INTEGER);
+
+    /* Equalizer */
+    var_Create (mp, "equalizer-preamp", VLC_VAR_FLOAT);
+    var_Create (mp, "equalizer-bands", VLC_VAR_STRING);
 
     mp->p_md = NULL;
     mp->state = libvlc_NothingSpecial;
@@ -1403,4 +1408,64 @@ void libvlc_media_player_set_video_title_display( libvlc_media_player_t *p_mi, l
     {
         var_SetBool( p_mi, "video-title-show", false );
     }
+}
+
+/**
+ * Maximum size of a formatted equalizer amplification band frequency value.
+ *
+ * The allowed value range is supposed to be constrained from -20.0 to 20.0.
+ *
+ * The format string " %.07f" with a minimum value of "-20" gives a maximum
+ * string length of e.g. " -19.1234567", i.e. 12 bytes (not including the null
+ * terminator).
+ */
+#define EQZ_BAND_VALUE_SIZE 12
+
+int libvlc_media_player_set_equalizer( libvlc_media_player_t *p_mi, libvlc_equalizer_t *p_equalizer )
+{
+    float f_preamp;
+    char *psz_bands;
+
+    if ( p_equalizer )
+    {
+        f_preamp = p_equalizer->f_preamp;
+
+        psz_bands = malloc( EQZ_BANDS_MAX * EQZ_BAND_VALUE_SIZE + 1 );
+        if ( unlikely( psz_bands == NULL ) )
+            return -1;
+
+        char *p = psz_bands;
+        int c;
+        for ( int i = 0; i < EQZ_BANDS_MAX; i++ )
+        {
+            c = snprintf( p, EQZ_BAND_VALUE_SIZE + 1, " %.07f", p_equalizer->f_amp[i] );
+            if ( unlikely( c >= EQZ_BAND_VALUE_SIZE + 1 ) )
+            {
+                free( psz_bands );
+                return -1;
+            }
+
+            p += c;
+        }
+    }
+    else
+    {
+        f_preamp = 0.f;
+        psz_bands = NULL;
+    }
+
+    var_SetFloat( p_mi, "equalizer-preamp", f_preamp );
+    var_SetString( p_mi, "equalizer-bands", psz_bands );
+
+    audio_output_t *p_aout = input_resource_HoldAout( p_mi->input.p_resource );
+    if ( p_aout )
+    {
+        var_SetFloat( p_aout, "equalizer-preamp", f_preamp );
+        var_SetString( p_aout, "equalizer-bands", psz_bands );
+
+        vlc_object_release( p_aout );
+    }
+
+    free( psz_bands );
+    return 0;
 }

@@ -299,6 +299,9 @@ audio_output_t *aout_New (vlc_object_t *parent)
                             &val, &text);
         }
 
+    var_Create (aout, "equalizer-preamp", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
+    var_Create (aout, "equalizer-bands", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+
     return aout;
 }
 

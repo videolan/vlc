@@ -21,6 +21,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef _EQUALIZER_PRESETS_H
+#define _EQUALIZER_PRESETS_H 1
+
 /*****************************************************************************
  * Equalizer presets
  *****************************************************************************/
@@ -29,6 +32,17 @@
  */
 
 #define EQZ_BANDS_MAX 10
+
+/* The frequency tables */
+static const float f_vlc_frequency_table_10b[EQZ_BANDS_MAX] =
+{
+    60, 170, 310, 600, 1000, 3000, 6000, 12000, 14000, 16000,
+};
+
+static const float f_iso_frequency_table_10b[EQZ_BANDS_MAX] =
+{
+    31.25, 62.5, 125, 250, 500, 1000, 2000, 4000, 8000, 16000,
+};
 
 #define NB_PRESETS 18
 static const char *const preset_list[NB_PRESETS] = {
@@ -139,3 +153,5 @@ static const eqz_preset_t eqz_preset_10b[NB_PRESETS] =
           9.6f, 8.8f }
     },
 };
+
+#endif

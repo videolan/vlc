@@ -429,3 +429,138 @@ int libvlc_audio_set_delay( libvlc_media_player_t *p_mi, int64_t i_delay )
     }
     return ret;
 }
+
+/*****************************************************************************
+ * libvlc_audio_equalizer_get_preset_count : Get the number of equalizer presets
+ *****************************************************************************/
+unsigned libvlc_audio_equalizer_get_preset_count( void )
+{
+    return NB_PRESETS;
+}
+
+/*****************************************************************************
+ * libvlc_audio_equalizer_get_preset_name : Get the name for a preset
+ *****************************************************************************/
+const char *libvlc_audio_equalizer_get_preset_name( unsigned u_index )
+{
+    if ( u_index >= NB_PRESETS )
+        return NULL;
+
+    return preset_list_text[ u_index ];
+}
+
+/*****************************************************************************
+ * libvlc_audio_equalizer_get_band_count : Get the number of equalizer frequency bands
+ *****************************************************************************/
+unsigned libvlc_audio_equalizer_get_band_count( void )
+{
+    return EQZ_BANDS_MAX;
+}
+
+/*****************************************************************************
+ * libvlc_audio_equalizer_get_band_frequency : Get the frequency for a band
+ *****************************************************************************/
+float libvlc_audio_equalizer_get_band_frequency( unsigned u_index )
+{
+    if ( u_index >= EQZ_BANDS_MAX )
+        return -1.f;
+
+    return f_vlc_frequency_table_10b[ u_index ];
+}
+
+/*****************************************************************************
+ * libvlc_audio_equalizer_new : Create a new audio equalizer with zeroed values
+ *****************************************************************************/
+libvlc_equalizer_t *libvlc_audio_equalizer_new( void )
+{
+    libvlc_equalizer_t *p_equalizer;
+    p_equalizer = malloc( sizeof( *p_equalizer ) );
+    if ( unlikely( p_equalizer == NULL ) )
+        return NULL;
+
+    p_equalizer->f_preamp = 0.f;
+    for ( unsigned i = 0; i < EQZ_BANDS_MAX; i++ )
+        p_equalizer->f_amp[ i ] = 0.f;
+
+    return p_equalizer;
+}
+
+/*****************************************************************************
+ * libvlc_audio_equalizer_new_from_preset : Create a new audio equalizer based on a preset
+ *****************************************************************************/
+libvlc_equalizer_t *libvlc_audio_equalizer_new_from_preset( unsigned u_index )
+{
+    libvlc_equalizer_t *p_equalizer;
+
+    if ( u_index >= NB_PRESETS )
+        return NULL;
+
+    p_equalizer = malloc( sizeof( *p_equalizer ) );
+    if ( unlikely( p_equalizer == NULL ) )
+        return NULL;
+
+    p_equalizer->f_preamp = eqz_preset_10b[ u_index ].f_preamp;
+
+    for ( unsigned i = 0; i < EQZ_BANDS_MAX; i++ )
+        p_equalizer->f_amp[ i ] = eqz_preset_10b[ u_index ].f_amp[ i ];
+
+    return p_equalizer;
+}
+
+/*****************************************************************************
+ * libvlc_audio_equalizer_release : Release a previously created equalizer
+ *****************************************************************************/
+void libvlc_audio_equalizer_release( libvlc_equalizer_t *p_equalizer )
+{
+    free( p_equalizer );
+}
+
+/*****************************************************************************
+ * libvlc_audio_equalizer_set_preamp : Set the preamp value for an equalizer
+ *****************************************************************************/
+int libvlc_audio_equalizer_set_preamp( libvlc_equalizer_t *p_equalizer, float f_preamp )
+{
+    if ( f_preamp < -20.0f )
+        f_preamp = -20.0f;
+    else if ( f_preamp > 20.0f )
+        f_preamp = 20.0f;
+
+    p_equalizer->f_preamp = f_preamp;
+    return 0;
+}
+
+/*****************************************************************************
+ * libvlc_audio_equalizer_get_preamp : Get the preamp value for an equalizer
+ *****************************************************************************/
+float libvlc_audio_equalizer_get_preamp( libvlc_equalizer_t *p_equalizer )
+{
+    return p_equalizer->f_preamp;
+}
+
+/*****************************************************************************
+ * libvlc_audio_equalizer_set_amp_at_index : Set the amplification value for an equalizer band
+ *****************************************************************************/
+int libvlc_audio_equalizer_set_amp_at_index( libvlc_equalizer_t *p_equalizer, float f_amp, unsigned u_band )
+{
+    if ( u_band >= EQZ_BANDS_MAX )
+        return -1;
+
+    if ( f_amp < -20.0f )
+        f_amp = -20.0f;
+    else if ( f_amp > 20.0f )
+        f_amp = 20.0f;
+
+    p_equalizer->f_amp[ u_band ] = f_amp;
+    return 0;
+}
+
+/*****************************************************************************
+ * libvlc_audio_equalizer_get_amp_at_index : Get the amplification value for an equalizer band
+ *****************************************************************************/
+float libvlc_audio_equalizer_get_amp_at_index( libvlc_equalizer_t *p_equalizer, unsigned u_band )
+{
+    if ( u_band >= EQZ_BANDS_MAX )
+        return 0.f;
+
+    return p_equalizer->f_amp[ u_band ];
+}

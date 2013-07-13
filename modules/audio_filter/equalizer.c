@@ -217,19 +217,6 @@ typedef struct
 
 } eqz_config_t;
 
-/* The frequency tables */
-static const float f_vlc_frequency_table_10b[EQZ_BANDS_MAX] =
-{
-    60.0f, 170.0f, 310.0f, 600.0f, 1000.0f, 3000.0f, 6000.0f, 12000.0f,
-    14000.0f, 16000.0f,
-};
-
-static const float f_iso_frequency_table_10b[EQZ_BANDS_MAX] =
-{
-    31.25f, 62.5f, 125.0f, 250.0f, 500.0f, 1000.0f, 2000.0f, 4000.0f,
-    8000.0f, 16000.0f,
-};
-
 /* Equalizer coefficient calculation function based on equ-xmms */
 static void EqzCoeffs( int i_rate, float f_octave_percent,
                        bool b_use_vlc_freqs,
