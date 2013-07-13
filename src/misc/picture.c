@@ -242,7 +242,6 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
             free( p_picture );
             return NULL;
         }
-        assert( p_picture->gc.p_sys != NULL );
     }
     /* */
     p_picture->format = fmt;
