@@ -296,8 +296,8 @@ void VoutManager::setFullscreenWnd( vout_window_t *pWnd, bool b_fullscreen )
             {
                 VoutWindow* pVoutWindow = it->pVoutWindow;
                 configureFullscreen( *pVoutWindow );
+                break;
             }
-            break;
         }
     }
 
