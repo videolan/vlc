@@ -1102,8 +1102,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     return VLC_SUCCESS;
 
 oom:
-    free(p_stream->lang);
-    free(p_stream);
+    if(p_stream)
+    {
+        free(p_stream->lang);
+        free(p_stream);
+    }
     return VLC_ENOMEM;
 }
 
