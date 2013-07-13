@@ -279,8 +279,6 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->psz_path = strdup( url.psz_path ? url.psz_path : "/" );
 
-    vlc_UrlClean( &url );
-
     TAB_INIT( p_sys->i_media, p_sys->media );
     p_sys->i_media_id = 0;
 
@@ -296,6 +294,7 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
+    vlc_UrlClean( &url );
     return VLC_SUCCESS;
 
 error:
