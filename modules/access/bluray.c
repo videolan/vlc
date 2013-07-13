@@ -605,7 +605,10 @@ static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
 
     subpicture_region_t *p_src = p_overlay->p_regions;
     if (!p_src)
+    {
+        vlc_mutex_unlock(&p_overlay->lock);
         return;
+    }
 
     subpicture_region_t **p_dst = &(p_subpic->p_region);
     while (p_src != NULL) {
