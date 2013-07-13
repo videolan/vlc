@@ -2763,9 +2763,9 @@ AC_ARG_WITH(x26410b-tree,
   else
     PKG_CHECK_MODULES(X26410B, x26410b, [
         VLC_ADD_PLUGIN([x26410b])
-        VLC_ADD_LDFLAGS([x26410b],[${X26410B_LIBS}])
+        VLC_ADD_LIBS([x26410b],[${X26410B_LIBS}])
         AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
-          VLC_ADD_LIBS([x26410b],[-Wl,-Bsymbolic])
+          VLC_ADD_LDFLAGS([x26410b],[-Wl,-Bsymbolic])
         ])
         VLC_ADD_CFLAGS([x26410b],[${X26410B_CFLAGS}])
         if echo ${X26410B_LIBS} |grep -q 'pthreadGC2'; then
@@ -2821,10 +2821,10 @@ if test "${enable_x264}" != "no"; then
   else
       PKG_CHECK_MODULES(X264,x264 >= 0.86, [
         VLC_ADD_PLUGIN([x264])
-        VLC_ADD_LDFLAGS([x264],[${X264_LIBS}])
+        VLC_ADD_LIBS([x264],[${X264_LIBS}])
 
         AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
-          VLC_ADD_LIBS([x264],[-Wl,-Bsymbolic])
+          VLC_ADD_LDFLAGS([x264],[-Wl,-Bsymbolic])
         ])
 
         VLC_ADD_CFLAGS([x264],[${X264_CFLAGS}])
@@ -3221,7 +3221,7 @@ AC_ARG_ENABLE(android-surface,
 if test "${enable_android_surface}" = "yes"; then
   if test "${HAVE_ANDROID}" = "1"; then
      VLC_ADD_PLUGIN([android_surface])
-     VLC_ADD_LDFLAGS([android_surface], [-ldl])
+     VLC_ADD_LIBS([android_surface], [-ldl])
   fi
 fi
 
