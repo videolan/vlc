@@ -69,16 +69,16 @@ void FirstRun::buildPrivDialog()
     QGroupBox *blabla = new QGroupBox( qtr( "Privacy and Network Access Policy" ) );
     QGridLayout *blablaLayout = new QGridLayout( blabla );
     QLabel *text = new QLabel( qtr(
-        "<p>In order to protect your privacy, the <i>VLC media player</i> "
+        "<p>In order to protect your privacy, <i>VLC media player</i> "
         "does <b>not</b> collect personal data or transmit them, "
         "not even in anonymized form, to anyone."
         "</p>\n"
         "<p>Nevertheless, <i>VLC</i> is able to automatically retrieve "
         "information about the media in your playlist from third party "
-        "Internet-based services. That includes covert arts, track names, "
-        "authoring and other meta-data."
+        "Internet-based services. This includes cover art, track names, "
+        "artist names and other meta-data."
         "</p>\n"
-        "That may entail identifying some of your media files to third party "
+        "Consequently, this may entail identifying some of your media files to third party "
         "entities. Therefore the <i>VLC</i> developers require your express "
         "consent for the media player to access the Internet automatically."
         "</p>\n"
