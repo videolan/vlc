@@ -67,7 +67,7 @@ public:
     void detachVoutWindow( );
 
     // Get TopWindow associated with the video control
-    virtual TopWindow* getWindow() { return CtrlGeneric::getWindow(); }
+    virtual TopWindow* getWindow() const { return CtrlGeneric::getWindow(); }
 
     // Get the VoutWindow associated with the video control
     virtual VoutWindow* getVoutWindow() { return m_pVoutWindow; }
