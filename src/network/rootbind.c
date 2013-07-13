@@ -167,7 +167,10 @@ int rootwrap_bind (int family, int socktype, int protocol,
 
     pthread_mutex_lock (&mutex);
     if (send (sock, &ss, sizeof (ss), 0) != sizeof (ss))
+    {
+        pthread_mutex_unlock (&mutex);
         return -1;
+    }
 
     fd = recv_fd (sock);
     pthread_mutex_unlock (&mutex);
