@@ -69,7 +69,7 @@ struct vout_display_sys_t
     xcb_cursor_t cursor; /* blank cursor */
     xcb_window_t window; /* drawable X window */
     xcb_gcontext_t gc; /* context to put images */
-    bool shm; /* whether to use MIT-SHM */
+    xcb_shm_seg_t seg_base; /**< shared memory segment XID base */
     bool visible; /* whether to draw */
     uint8_t depth; /* useful bits per pixel */
 
@@ -296,8 +296,14 @@ found_format:;
 
     sys->cursor = XCB_cursor_Create (conn, scr);
     sys->visible = false;
-    sys->shm = XCB_shm_Check (obj, conn);
-
+    if (XCB_shm_Check (obj, conn))
+    {
+        sys->seg_base = xcb_generate_id (conn);
+        for (unsigned i = 1; i < MAX_PICTURES; i++)
+             xcb_generate_id (conn);
+    }
+    else
+        sys->seg_base = 0;
 
     /* Setup vout_display_t once everything is fine */
     vd->info.has_pictures_invalid = true;
@@ -385,7 +391,7 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
         res->p->i_pitch = pic->p->i_pitch;
         if (XCB_pictures_Alloc (vd, res, res->p->i_pitch * res->p->i_lines,
                                 sys->conn,
-                                sys->shm ? xcb_generate_id(sys->conn) : 0))
+                                sys->seg_base ? (sys->seg_base + count) : 0))
             break;
         pic_array[count] = picture_NewFromResource (&vd->fmt, res);
         if (!pic_array[count])
