@@ -519,30 +519,24 @@ static void Port_finder( demux_t *p_demux )
         pp_jack_port_output = jack_get_ports( p_sys->p_jack_client,
            psz_uri, NULL, JackPortIsOutput );
         if( pp_jack_port_output == NULL )
-        {
             msg_Err( p_demux, "port(s) asked not found:%s", psz_uri );
-            free( pp_jack_port_output );
-        }
         else
         {
-            while( pp_jack_port_output && pp_jack_port_output[i_out_ports] )
-            {
+            while( pp_jack_port_output[i_out_ports] )
                 i_out_ports++;
-            }
             /* alloc an array to store all the matched ports */
             p_sys->pp_jack_port_table = xrealloc( p_sys->pp_jack_port_table,
                 (i_out_ports * sizeof( char * ) + i_total_out_ports * sizeof( char * ) ) );
 
             for(int i=0; i<i_out_ports;i++)
-            {
                 p_sys->pp_jack_port_table[i_total_out_ports+i] = ( char * ) pp_jack_port_output[i];
-            }
 
             i_total_out_ports += i_out_ports;
+
+            free( pp_jack_port_output );
         }
     }
 
-    free( pp_jack_port_output );
     p_sys->i_match_ports = i_total_out_ports;
 }
 
