@@ -320,7 +320,11 @@ static int Activate( vlc_object_t *p_this )
 
     intf_sys_t *p_sys = malloc( sizeof( *p_sys ) );
     if( unlikely(p_sys == NULL) )
+    {
+        net_ListenClose( p_sys->pi_socket_listen );
+        free( psz_unix_path );
         return VLC_ENOMEM;
+    }
 
     p_intf->p_sys = p_sys;
     p_sys->pi_socket_listen = pi_socket;
