@@ -2013,9 +2013,9 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
 
                 if (_p_item->value.psz &&
                    strstr(_p_item->value.psz, module_get_object(p_parser)))
-                    o_moduleenabled = @YES;
+                    o_moduleenabled = [NSNumber numberWithBool:YES];
                 else
-                    o_moduleenabled = @NO;
+                    o_moduleenabled = [NSNumber numberWithBool:NO];
 
                 [o_modulearray addObject:[NSMutableArray
                                           arrayWithObjects: o_modulename, o_modulelongname,
@@ -2032,9 +2032,9 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
 
 #define addLuaIntf(shortname, longname) \
                 if (_p_item->value.psz && strstr(_p_item->value.psz, shortname))\
-                    o_moduleenabled = @YES;\
+                    o_moduleenabled = [NSNumber numberWithBool:YES];\
                 else\
-                    o_moduleenabled = @NO;\
+                    o_moduleenabled = [NSNumber numberWithBool:NO];\
                 [o_modulearray addObject:[NSMutableArray arrayWithObjects: @shortname, _NS(longname), o_moduleenabled, nil]]
 
                 addLuaIntf("http", "Web");
