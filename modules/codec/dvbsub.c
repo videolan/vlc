@@ -817,7 +817,7 @@ static void decode_page_composition( decoder_t *p_dec, bs_t *s )
     if( p_sys->p_page->i_region_defs == 0 ) return;
 
     p_sys->p_page->p_region_defs =
-        malloc( p_sys->p_page->i_region_defs * sizeof(dvbsub_region_t) );
+        malloc( p_sys->p_page->i_region_defs * sizeof(dvbsub_regiondef_t) );
     if( p_sys->p_page->p_region_defs )
     {
         for( i = 0; i < p_sys->p_page->i_region_defs; i++ )
