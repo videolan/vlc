@@ -2313,7 +2313,10 @@ static int Peek(stream_t *s, const uint8_t **pp_peek, unsigned int i_peek)
         else if (peeked->i_buffer < i_peek)
             peeked = block_Realloc (peeked, 0, i_peek);
         if (peeked == NULL)
+        {
+            vlc_mutex_unlock(&segment->lock);
             return 0;
+        }
         p_sys->peeked = peeked;
 
         memcpy(peeked->p_buffer, p_buff, i_buff);
