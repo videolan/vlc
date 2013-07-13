@@ -135,7 +135,7 @@ libvlc_audio_output_device_list_get( libvlc_instance_t *p_instance,
                                      const char *aout )
 {
     char varname[32];
-    if( (size_t)snprintf( varname, sizeof(varname), "%s-output-device", aout )
+    if( (size_t)snprintf( varname, sizeof(varname), "%s-audio-device", aout )
                                                            >= sizeof(varname) )
         return NULL;
 
