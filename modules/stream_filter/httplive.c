@@ -1351,7 +1351,11 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
     for (int n = 0; n < count; n++)
     {
         segment_t *p = segment_GetSegment(hls_new, n);
-        if (p == NULL) return VLC_EGENERIC;
+        if (p == NULL)
+        {
+            vlc_mutex_unlock(&hls_old->lock);
+            return VLC_EGENERIC;
+        }
 
         segment_t *segment = segment_Find(hls_old, p->sequence);
         if (segment)
