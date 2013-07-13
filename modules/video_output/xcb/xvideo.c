@@ -640,6 +640,7 @@ static void PoolAlloc (vout_display_t *vd, unsigned requested_count)
     for (count = 0; count < requested_count; count++)
     {
         picture_resource_t *res = &p_sys->resource[count];
+        xcb_shm_seg_t seg = p_sys->shm ? xcb_generate_id (p_sys->conn) : 0;
 
         for (unsigned i = 0; i < num_planes; i++)
         {
@@ -651,7 +652,7 @@ static void PoolAlloc (vout_display_t *vd, unsigned requested_count)
         }
 
         if (XCB_pictures_Alloc (vd, res, p_sys->att->data_size,
-                                p_sys->conn, p_sys->shm))
+                                p_sys->conn, seg))
             break;
 
         /* Allocate further planes as specified by XVideo */

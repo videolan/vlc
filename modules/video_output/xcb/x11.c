@@ -384,7 +384,8 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
         res->p->i_lines = pic->p->i_lines;
         res->p->i_pitch = pic->p->i_pitch;
         if (XCB_pictures_Alloc (vd, res, res->p->i_pitch * res->p->i_lines,
-                                sys->conn, sys->shm))
+                                sys->conn,
+                                sys->shm ? xcb_generate_id(sys->conn) : 0))
             break;
         pic_array[count] = picture_NewFromResource (&vd->fmt, res);
         if (!pic_array[count])

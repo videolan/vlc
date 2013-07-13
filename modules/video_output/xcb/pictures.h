@@ -37,5 +37,5 @@ struct picture_sys_t
     xcb_shm_seg_t segment;
 };
 int XCB_pictures_Alloc (vout_display_t *, picture_resource_t *, size_t size,
-                        xcb_connection_t *, bool attach);
+                        xcb_connection_t *, xcb_shm_seg_t);
 void XCB_pictures_Free (picture_resource_t *, xcb_connection_t *);

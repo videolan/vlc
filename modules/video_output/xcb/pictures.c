@@ -71,7 +71,8 @@ bool XCB_shm_Check (vlc_object_t *obj, xcb_connection_t *conn)
  * the X server (MIT-SHM extension).
  */
 int XCB_pictures_Alloc (vout_display_t *vd, picture_resource_t *res,
-                        size_t size, xcb_connection_t *conn, bool attach)
+                        size_t size, xcb_connection_t *conn,
+                        xcb_shm_seg_t segment)
 {
     res->p_sys = malloc (sizeof(*res->p_sys));
     if (!res->p_sys)
@@ -97,15 +98,9 @@ int XCB_pictures_Alloc (vout_display_t *vd, picture_resource_t *res,
         return VLC_EGENERIC;
     }
 
-    xcb_shm_seg_t segment;
-    if (attach)
-    {
-        /* Attach the segment to X */
-        xcb_void_cookie_t ck;
-
-        segment = xcb_generate_id (conn);
-        ck = xcb_shm_attach_checked (conn, segment, id, 1);
-
+    if (segment != 0)
+    {   /* Attach the segment to X */
+        xcb_void_cookie_t ck = xcb_shm_attach_checked (conn, segment, id, 1);
         switch (XCB_error_Check (vd, conn, "shared memory server-side error",
                                  ck))
         {
@@ -130,8 +125,6 @@ int XCB_pictures_Alloc (vout_display_t *vd, picture_resource_t *res,
                 segment = 0;
         }
     }
-    else
-        segment = 0;
 
     shmctl (id, IPC_RMID, NULL);
     res->p_sys->segment = segment;
