@@ -45,7 +45,7 @@ FscWindow::FscWindow( intf_thread_t *pIntf, int left, int top,
                       bool dragDrop, bool playOnDrop, bool visible ) :
     TopWindow( pIntf, left, top, rWindowManager, dragDrop,
                playOnDrop, false, GenericWindow::FscWindow ),
-    m_pTimer( NULL ), m_count( 0 ), m_opacity( m_opacity ),
+    m_pTimer( NULL ), m_count( 0 ),
     m_cmdFscHide( this )
 {
     (void)visible;
