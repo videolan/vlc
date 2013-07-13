@@ -645,7 +645,7 @@ void virtual_segment_c::ChangeSegment( matroska_segment_c * p_old, matroska_segm
                         !memcmp( &p_nfmt->video, &p_ofmt->video, sizeof(video_format_t) ) ) ) )
                 {
                     /* FIXME handle video palettes... */
-                    msg_Warn( &p_old->sys.demuxer, "Reusing decoder of old track %u for track %u", j, i);
+                    msg_Warn( &p_old->sys.demuxer, "Reusing decoder of old track %zu for track %zu", j, i);
                     p_tk->p_es = p_old->tracks[j]->p_es;
                     p_old->tracks[j]->p_es = NULL;
                     break;
