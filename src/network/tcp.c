@@ -138,14 +138,15 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
     }, *res;
 
     int val = vlc_getaddrinfo (psz_realhost, i_realport, &hints, &res);
-    free( psz_socks );
 
     if (val)
     {
         msg_Err (p_this, "cannot resolve %s port %d : %s", psz_realhost,
                  i_realport, gai_strerror (val));
+        free( psz_socks );
         return -1;
     }
+    free( psz_socks );
 
     int timeout = var_InheritInteger (p_this, "ipv4-timeout");
     if (timeout < 0)
