@@ -3695,8 +3695,6 @@ AS_IF([test "${enable_qt}" != "no"], [
 ])
 AS_IF([test "${enable_qt}" != "no"], [
   VLC_ADD_PLUGIN([qt4])
-  VLC_ADD_LIBS([qt4],[${QT_LIBS}])
-  VLC_ADD_CXXFLAGS([qt4],[${QT_CFLAGS}])
   ALIASES="${ALIASES} qvlc"
 
   AC_LANG_PUSH([C++])
@@ -3711,21 +3709,12 @@ AS_IF([test "${enable_qt}" != "no"], [
 #endif
   ])], [
     AC_MSG_RESULT([yes])
-    VLC_ADD_LIBS([qt4],[${X_LIBS} ${X_PRE_LIBS} -lX11])
-    VLC_ADD_CXXFLAGS([qt4],[${X_CFLAGS}])
   ], [
     AC_MSG_RESULT([no])
   ])
 
   VLC_RESTORE_FLAGS
   AC_LANG_POP([C++])
-
-  AS_IF([test "${SYS}" = "mingw32"], [
-      VLC_ADD_LIBS([qt4],[-lole32])
-  ])
-  AS_IF([test "${SYS}" = "darwin" ],[
-       VLC_ADD_LIBS([qt4], [-Wl,-framework,Cocoa])
-  ])
 
   QT_PATH="$(eval $PKG_CONFIG --variable=exec_prefix QtCore)"
   AC_PATH_PROGS(MOC, [moc-qt4 moc], moc, [${QT_PATH}/bin ${CONTRIB_DIR}/bin])
