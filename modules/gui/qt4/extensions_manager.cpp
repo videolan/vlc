@@ -226,6 +226,7 @@ void ExtensionsManager::triggerMenu( int id )
     {
         msg_Dbg( p_intf, "can't trigger extension with wrong id %d",
                  (int) i_ext );
+        vlc_mutex_unlock( &p_extensions_manager->lock );
         return;
     }
 
