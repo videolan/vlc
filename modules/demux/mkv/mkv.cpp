@@ -674,7 +674,11 @@ static int Demux( demux_t *p_demux)
 
     virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
     matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
-    if ( p_segment == NULL ) return 0;
+    if ( p_segment == NULL )
+    {
+        vlc_mutex_unlock( &p_sys->lock_demuxer );
+        return 0;
+    }
     int                i_block_count = 0;
     int                i_return = 0;
 
