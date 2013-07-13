@@ -1234,11 +1234,10 @@ static int UserPmt( demux_t *p_demux, const char *psz_fmt )
     PIDInit( pmt, true, NULL );
 
     /* Dummy PMT */
-    prg = malloc( sizeof( ts_prg_psi_t ) );
+    prg = calloc( 1, sizeof( ts_prg_psi_t ) );
     if( !prg )
         goto error;
 
-    memset( prg, 0, sizeof( ts_prg_psi_t ) );
     prg->i_pid_pcr  = -1;
     prg->i_pid_pmt  = -1;
     prg->i_version  = -1;
@@ -1341,6 +1340,7 @@ static int UserPmt( demux_t *p_demux, const char *psz_fmt )
     return VLC_SUCCESS;
 
 error:
+    free( prg );
     free( psz_dup );
     return VLC_EGENERIC;
 }
