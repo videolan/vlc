@@ -91,7 +91,7 @@ static int recv_fd (int p)
          cmsg = CMSG_NXTHDR (&hdr, cmsg))
     {
         if ((cmsg->cmsg_level == SOL_SOCKET)
-         && (cmsg->cmsg_type = SCM_RIGHTS)
+         && (cmsg->cmsg_type == SCM_RIGHTS)
          && (cmsg->cmsg_len >= CMSG_LEN (sizeof (fd))))
         {
             memcpy (&fd, CMSG_DATA (cmsg), sizeof (fd));
