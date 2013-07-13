@@ -766,6 +766,7 @@ libvlc_media_tracks_get( libvlc_media_t *p_md, libvlc_media_track_t *** pp_es )
         {
             libvlc_media_tracks_release( *pp_es, i_es );
             *pp_es = NULL;
+            free( p_mes );
             return 0;
         }
         (*pp_es)[i] = p_mes;
