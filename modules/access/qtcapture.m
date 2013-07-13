@@ -347,7 +347,7 @@ static int Open(vlc_object_t *p_this)
         @(kCVPixelFormatType_422YpCbCr8), (id)kCVPixelBufferPixelFormatTypeKey,
         @(p_sys->height), kCVPixelBufferHeightKey,
         @(p_sys->width), kCVPixelBufferWidthKey,
-        @YES, (id)kCVPixelBufferOpenGLCompatibilityKey,
+        [NSNumber numberWithBool:YES], (id)kCVPixelBufferOpenGLCompatibilityKey,
         nil]];
     [p_sys->output setAutomaticallyDropsLateVideoFrames:YES];
     [p_sys->output setMinimumVideoFrameInterval: (1/25)]; // 25 fps
