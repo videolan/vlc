@@ -716,10 +716,10 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
     p_sys->i_samples_delay += p_aout_buf->i_nb_samples;
 
     /* Convert samples to FLAC__int32 */
-    if( p_sys->i_buffer < p_aout_buf->i_buffer * 2 )
+    if( p_sys->i_buffer < p_aout_buf->i_buffer * sizeof(FLAC__int32) )
     {
         p_sys->p_buffer =
-            xrealloc( p_sys->p_buffer, p_aout_buf->i_buffer * 2 );
+            xrealloc( p_sys->p_buffer, p_aout_buf->i_buffer * sizeof(FLAC__int32) );
         p_sys->i_buffer = p_aout_buf->i_buffer * 2;
     }
 
