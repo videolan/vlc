@@ -296,11 +296,6 @@ static int Open(vlc_object_t *p_this)
             goto error;
         rsc->p_sys->sys = p_sys;
 
-        for (int i = 0; i < PICTURE_PLANE_MAX; i++) {
-            rsc->p[i].p_pixels = NULL;
-            rsc->p[i].i_pitch = 0;
-            rsc->p[i].i_lines = 0;
-        }
         picture_t *picture = picture_NewFromResource(&fmt, rsc);
         if (!picture)
             goto error;
