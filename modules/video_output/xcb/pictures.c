@@ -31,6 +31,8 @@
 #ifdef HAVE_SYS_SHM_H
 # include <sys/shm.h>
 # include <sys/stat.h>
+#else
+# define shmdt(mem) free(mem)
 #endif
 
 #include <xcb/xcb.h>
@@ -66,26 +68,30 @@ bool XCB_shm_Check (vlc_object_t *obj, xcb_connection_t *conn)
 }
 
 /**
+ * Release picture private data: detach the shared memory segment.
+ */
+static void XCB_picture_Destroy (picture_t *pic)
+{
+    shmdt (pic->p[0].p_pixels);
+    free (pic);
+}
+
+/**
  * Initialize a picture buffer as shared memory, according to the video output
  * format. If a attach is true, the segment is attached to
  * the X server (MIT-SHM extension).
  */
-void *XCB_pictures_Alloc (vout_display_t *vd, picture_sys_t **sysp,
-                          size_t size, xcb_connection_t *conn,
-                          xcb_shm_seg_t segment)
+int XCB_picture_Alloc (vout_display_t *vd, picture_resource_t *res,
+                       size_t size, xcb_connection_t *conn,
+                       xcb_shm_seg_t segment)
 {
-    picture_sys_t *picsys = malloc (sizeof (*picsys));
-    if (unlikely(picsys == NULL))
-        return NULL;
-
 #ifdef HAVE_SYS_SHM_H
     /* Allocate shared memory segment */
     int id = shmget (IPC_PRIVATE, size, IPC_CREAT | S_IRWXU);
     if (id == -1)
     {
         msg_Err (vd, "shared memory allocation error: %m");
-        free (picsys);
-        return NULL;
+        return -1;
     }
 
     /* Attach the segment to VLC */
@@ -94,8 +100,7 @@ void *XCB_pictures_Alloc (vout_display_t *vd, picture_sys_t **sysp,
     {
         msg_Err (vd, "shared memory attachment error: %m");
         shmctl (id, IPC_RMID, 0);
-        free (picsys);
-        return NULL;
+        return -1;
     }
 
     if (segment != 0)
@@ -127,30 +132,25 @@ void *XCB_pictures_Alloc (vout_display_t *vd, picture_sys_t **sysp,
     }
 
     shmctl (id, IPC_RMID, NULL);
-    picsys->segment = segment;
 #else
-    assert (!attach);
-    picsys->segment = 0;
+    assert (segment == 0);
 
     /* XXX: align on 32 bytes for VLC chroma filters */
     void *shm = malloc (size);
     if (unlikely(shm == NULL))
-        free (picsys);
+        return -1;
 #endif
-    *sysp = picsys;
-    return shm;
+    res->p_sys = (void *)(uintptr_t)segment;
+    res->pf_destroy = XCB_picture_Destroy;
+    res->p[0].p_pixels = shm;
+    return 0;
 }
 
-/**
- * Release picture private data: detach the shared memory segment.
- */
-void XCB_pictures_Free (void *mem)
+picture_t *XCB_picture_NewFromResource (const video_format_t *restrict fmt,
+                                        const picture_resource_t *restrict res)
 {
-#ifdef HAVE_SYS_SHM_H
-    if (mem != NULL)
-        shmdt (mem);
-#else
-    free (mem);
-#endif
+    picture_t *pic = picture_NewFromResource (fmt, res);
+    if (unlikely(pic == NULL))
+        shmdt (res->p[0].p_pixels);
+    return pic;
 }
-

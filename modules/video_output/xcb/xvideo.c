@@ -96,7 +96,6 @@ struct vout_display_sys_t
 
     xcb_xv_query_image_attributes_reply_t *att;
     picture_pool_t *pool; /* picture pool */
-    void *segments[MAX_PICTURES];
 };
 
 static picture_pool_t *Pool (vout_display_t *, unsigned);
@@ -599,11 +598,7 @@ static void Close (vlc_object_t *obj)
     vout_display_sys_t *p_sys = vd->sys;
 
     if (p_sys->pool)
-    {
-        for (unsigned i = 0; i < MAX_PICTURES; i++)
-           XCB_pictures_Free(p_sys->segments[i]);
         picture_pool_Delete (p_sys->pool);
-    }
 
     /* show the default cursor */
     xcb_change_window_attributes (p_sys->conn, p_sys->embed->handle.xid, XCB_CW_CURSOR,
@@ -619,9 +614,6 @@ static void Close (vlc_object_t *obj)
 static void PoolAlloc (vout_display_t *vd, unsigned requested_count)
 {
     vout_display_sys_t *p_sys = vd->sys;
-
-    for (unsigned count = 0; count < MAX_PICTURES; count++)
-        p_sys->segments[count] = NULL;
 
     const uint32_t *pitches= xcb_xv_query_image_attributes_pitches (p_sys->att);
     const uint32_t *offsets= xcb_xv_query_image_attributes_offsets (p_sys->att);
@@ -646,9 +638,7 @@ static void PoolAlloc (vout_display_t *vd, unsigned requested_count)
     {
         xcb_shm_seg_t seg = p_sys->shm ? xcb_generate_id (p_sys->conn) : 0;
 
-        res.p[0].p_pixels = XCB_pictures_Alloc (vd, &res.p_sys,
-                                           p_sys->data_size, p_sys->conn, seg);
-        if (res.p[0].p_pixels == NULL)
+        if (XCB_picture_Alloc (vd, &res, p_sys->data_size, p_sys->conn, seg))
             break;
 
         /* Allocate further planes as specified by XVideo */
@@ -663,16 +653,9 @@ static void PoolAlloc (vout_display_t *vd, unsigned requested_count)
             res.p[1].p_pixels = buf;
         }
 
-        pic_array[count] = picture_NewFromResource (&vd->fmt, &res);
-        if (!pic_array[count])
-        {
-            free (res.p_sys);
-            XCB_pictures_Free (res.p[0].p_pixels);
-            if (seg != 0)
-                xcb_shm_detach (p_sys->conn, seg);
+        pic_array[count] = XCB_picture_NewFromResource (&vd->fmt, &res);
+        if (unlikely(pic_array[count] == NULL))
             break;
-        }
-        p_sys->segments[count] = res.p[0].p_pixels;
     }
 
     if (count == 0)
@@ -702,7 +685,7 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 static void Display (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *p_sys = vd->sys;
-    xcb_shm_seg_t segment = pic->p_sys->segment;
+    xcb_shm_seg_t segment = XCB_picture_GetSegment(pic);
     xcb_void_cookie_t ck;
 
     if (!p_sys->visible)

@@ -31,11 +31,12 @@
 #include <xcb/shm.h>
 
 bool XCB_shm_Check (vlc_object_t *obj, xcb_connection_t *conn);
+int XCB_picture_Alloc (vout_display_t *, picture_resource_t *, size_t size,
+                       xcb_connection_t *, xcb_shm_seg_t);
+picture_t *XCB_picture_NewFromResource (const video_format_t *,
+                                        const picture_resource_t *);
 
-struct picture_sys_t
+static inline xcb_shm_seg_t XCB_picture_GetSegment(const picture_t *pic)
 {
-    xcb_shm_seg_t segment;
-};
-void *XCB_pictures_Alloc (vout_display_t *, picture_sys_t **, size_t size,
-                          xcb_connection_t *, xcb_shm_seg_t);
-void XCB_pictures_Free (void *);
+    return (uintptr_t)pic->p_sys;
+}

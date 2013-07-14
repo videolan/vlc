@@ -74,7 +74,6 @@ struct vout_display_sys_t
     uint8_t depth; /* useful bits per pixel */
 
     picture_pool_t *pool; /* picture pool */
-    void *segments[MAX_PICTURES];
 };
 
 static picture_pool_t *Pool (vout_display_t *, unsigned);
@@ -390,29 +389,22 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
     };
     picture_Release (pic);
 
-    for (unsigned count = 0; count < MAX_PICTURES; count++)
-        sys->segments[count] = NULL;
-
     unsigned count;
     picture_t *pic_array[MAX_PICTURES];
+    const size_t size = res.p->i_pitch * res.p->i_lines;
     for (count = 0; count < MAX_PICTURES; count++)
     {
         xcb_shm_seg_t seg = (sys->seg_base != 0) ? (sys->seg_base + count) : 0;
 
-        res.p[0].p_pixels = XCB_pictures_Alloc (vd, &res.p_sys,
-                              res.p->i_pitch * res.p->i_lines, sys->conn, seg);
-        if (res.p[0].p_pixels == NULL)
+        if (XCB_picture_Alloc (vd, &res, size, sys->conn, seg))
             break;
-        pic_array[count] = picture_NewFromResource (&vd->fmt, &res);
-        if (!pic_array[count])
+        pic_array[count] = XCB_picture_NewFromResource (&vd->fmt, &res);
+        if (unlikely(pic_array[count] == NULL))
         {
-            free (res.p_sys);
-            XCB_pictures_Free (res.p[0].p_pixels);
             if (seg != 0)
                 xcb_shm_detach (sys->conn, seg);
             break;
         }
-        sys->segments[count] = res.p[0].p_pixels;
     }
 
     if (count == 0)
@@ -430,7 +422,7 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 static void Display (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
-    xcb_shm_seg_t segment = pic->p_sys->segment;
+    xcb_shm_seg_t segment = XCB_picture_GetSegment(pic);
     xcb_void_cookie_t ck;
 
     if (!sys->visible)
@@ -582,12 +574,10 @@ static void ResetPictures (vout_display_t *vd)
     if (!sys->pool)
         return;
 
-    for (unsigned i = 0; i < MAX_PICTURES; i++)
-    {
-        XCB_pictures_Free (sys->segments[i]);
-        if (sys->seg_base != 0)
+    if (sys->seg_base != 0)
+        for (unsigned i = 0; i < MAX_PICTURES; i++)
             xcb_shm_detach (sys->conn, sys->seg_base + i);
-    }
+
     picture_pool_Delete (sys->pool);
     sys->pool = NULL;
 }
