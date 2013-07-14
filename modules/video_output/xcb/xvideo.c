@@ -657,13 +657,15 @@ static void PoolAlloc (vout_display_t *vd, unsigned requested_count)
         if (unlikely(pic_array[count] == NULL))
             break;
     }
+    xcb_flush (p_sys->conn);
 
     if (count == 0)
         return;
 
     p_sys->pool = picture_pool_New (count, pic_array);
-    /* TODO release picture resources if NULL */
-    xcb_flush (p_sys->conn);
+    if (unlikely(p_sys->pool == NULL))
+        while (count > 0)
+            picture_Release(pic_array[--count]);
 }
 
 /**
