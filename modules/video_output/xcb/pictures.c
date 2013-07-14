@@ -70,13 +70,13 @@ bool XCB_shm_Check (vlc_object_t *obj, xcb_connection_t *conn)
  * format. If a attach is true, the segment is attached to
  * the X server (MIT-SHM extension).
  */
-int XCB_pictures_Alloc (vout_display_t *vd, picture_resource_t *res,
-                        size_t size, xcb_connection_t *conn,
-                        xcb_shm_seg_t segment)
+void *XCB_pictures_Alloc (vout_display_t *vd, picture_sys_t **sysp,
+                          size_t size, xcb_connection_t *conn,
+                          xcb_shm_seg_t segment)
 {
-    res->p_sys = malloc (sizeof(*res->p_sys));
-    if (!res->p_sys)
-        return VLC_EGENERIC;
+    picture_sys_t *picsys = malloc (sizeof (*picsys));
+    if (unlikely(picsys == NULL))
+        return NULL;
 
 #ifdef HAVE_SYS_SHM_H
     /* Allocate shared memory segment */
@@ -84,8 +84,8 @@ int XCB_pictures_Alloc (vout_display_t *vd, picture_resource_t *res,
     if (id == -1)
     {
         msg_Err (vd, "shared memory allocation error: %m");
-        free (res->p_sys);
-        return VLC_EGENERIC;
+        free (picsys);
+        return NULL;
     }
 
     /* Attach the segment to VLC */
@@ -94,8 +94,8 @@ int XCB_pictures_Alloc (vout_display_t *vd, picture_resource_t *res,
     {
         msg_Err (vd, "shared memory attachment error: %m");
         shmctl (id, IPC_RMID, 0);
-        free (res->p_sys);
-        return VLC_EGENERIC;
+        free (picsys);
+        return NULL;
     }
 
     if (segment != 0)
@@ -127,21 +127,18 @@ int XCB_pictures_Alloc (vout_display_t *vd, picture_resource_t *res,
     }
 
     shmctl (id, IPC_RMID, NULL);
-    res->p_sys->segment = segment;
-    res->p->p_pixels = shm;
+    picsys->segment = segment;
 #else
     assert (!attach);
-    res->p_sys->segment = 0;
+    picsys->segment = 0;
 
     /* XXX: align on 32 bytes for VLC chroma filters */
-    res->p->p_pixels = malloc (size);
-    if (unlikely(res->p->p_pixels == NULL))
-    {
-        free (res->p_sys);
-        return VLC_EGENERIC;
-    }
+    void *shm = malloc (size);
+    if (unlikely(shm == NULL))
+        free (picsys);
 #endif
-    return VLC_SUCCESS;
+    *sysp = picsys;
+    return shm;
 }
 
 /**

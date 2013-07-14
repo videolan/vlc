@@ -380,29 +380,33 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 
     assert (pic->i_planes == 1);
 
+    picture_resource_t res = {
+       .p = {
+           [0] = {
+               .i_lines = pic->p->i_lines,
+               .i_pitch = pic->p->i_pitch,
+           },
+       },
+    };
+    picture_Release (pic);
+
+    for (unsigned count = 0; count < MAX_PICTURES; count++)
+        sys->segments[count] = NULL;
+
     unsigned count;
     picture_t *pic_array[MAX_PICTURES];
-
-    for (count = 0; count < MAX_PICTURES; count++)
-        sys->segments[count] = NULL;
     for (count = 0; count < MAX_PICTURES; count++)
     {
-        picture_resource_t res = {
-           .p = {
-               [0] = {
-                   .i_lines = pic->p->i_lines,
-                   .i_pitch = pic->p->i_pitch,
-               },
-           },
-        };
         xcb_shm_seg_t seg = (sys->seg_base != 0) ? (sys->seg_base + count) : 0;
 
-        if (XCB_pictures_Alloc (vd, &res, res.p->i_pitch * res.p->i_lines,
-                                sys->conn, seg))
+        res.p[0].p_pixels = XCB_pictures_Alloc (vd, &res.p_sys,
+                              res.p->i_pitch * res.p->i_lines, sys->conn, seg);
+        if (res.p[0].p_pixels == NULL)
             break;
         pic_array[count] = picture_NewFromResource (&vd->fmt, &res);
         if (!pic_array[count])
         {
+            free (res.p_sys);
             XCB_pictures_Free (res.p[0].p_pixels);
             if (seg != 0)
                 xcb_shm_detach (sys->conn, seg);
@@ -410,7 +414,6 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
         }
         sys->segments[count] = res.p[0].p_pixels;
     }
-    picture_Release (pic);
 
     if (count == 0)
         return NULL;
