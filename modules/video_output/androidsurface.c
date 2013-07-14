@@ -108,8 +108,6 @@ struct vout_display_sys_t {
     Surface_lock2 s_lock2;
     Surface_unlockAndPost s_unlockAndPost;
 
-    picture_resource_t resource;
-
     /* density */
     int i_sar_num;
     int i_sar_den;
@@ -229,15 +227,8 @@ static int Open(vlc_object_t *p_this)
         goto enomem;
     picsys->sys = sys;
 
-    picture_resource_t *rsc = &sys->resource;
-    rsc->p_sys = picsys;
-
-    for (int i = 0; i < PICTURE_PLANE_MAX; i++) {
-        rsc->p[i].p_pixels = NULL;
-        rsc->p[i].i_pitch = 0;
-        rsc->p[i].i_lines = 0;
-    }
-    picture_t *picture = picture_NewFromResource(&fmt, rsc);
+    picture_resource_t resource = { .p_sys = picsys };
+    picture_t *picture = picture_NewFromResource(&fmt, &resource);
     if (!picture) {
         free(picsys);
         goto enomem;
