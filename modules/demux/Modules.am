@@ -90,9 +90,6 @@ libmkv_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 if HAVE_ZLIB
 libmkv_plugin_la_LIBADD += -lz
 endif
-if HAVE_DARWIN
-libmkv_plugin_la_LDFLAGS += -Wl,-framework,IOKit,-framework,CoreFoundation
-endif
 libvlc_LTLIBRARIES += $(LTLIBmkv)
 EXTRA_LTLIBRARIES += libmkv_plugin.la
 
@@ -102,9 +99,6 @@ libmp4_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
 libmp4_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 if HAVE_ZLIB
 libmp4_plugin_la_LIBADD += -lz
-endif
-if HAVE_DARWIN
-libmp4_plugin_la_LDFLAGS += -Wl,-framework,IOKit,-framework,CoreFoundation
 endif
 
 libmpgv_plugin_la_SOURCES = mpeg/mpgv.c
