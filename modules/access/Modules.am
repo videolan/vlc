@@ -72,11 +72,11 @@ endif
 if HAVE_QTKIT
 libqtcapture_plugin_la_SOURCES = qtcapture.m
 libqtcapture_plugin_la_LIBADDD = $(AM_LIBADD)
-libqtcapture_plugin_la_LDFLAGS = -Wl,-framework,Cocoa -Wl,-framework,QTKit -Wl,-framework,CoreVideo -Wl,-framework,QuartzCore
+libqtcapture_plugin_la_LDFLAGS = -Wl,-framework,QTKit -Wl,-framework,CoreVideo -Wl,-framework,QuartzCore
 
 libqtsound_plugin_la_SOURCES = qtsound.m
 libqtsound_plugin_la_LIBADD = $(AM_LIBADD)
-libqtsound_plugin_la_LDFLAGS = -Wl,-framework,Cocoa -Wl,-framework,QTKit -Wl,-framework,CoreAudio
+libqtsound_plugin_la_LDFLAGS = -Wl,-framework,QTKit -Wl,-framework,CoreAudio
 
 libvlc_LTLIBRARIES += \
         libqtcapture_plugin.la \
@@ -87,7 +87,7 @@ endif
 if HAVE_AVFOUNDATION
 libavcapture_plugin_la_SOURCES = avcapture.m
 libavcapture_plugin_la_LIBADD = $(AM_LIBADD)
-libavcapture_plugin_la_LDFLAGS = -Wl,-framework,Cocoa -Wl,-framework,AVFoundation -Wl,-framework,CoreMedia
+libavcapture_plugin_la_LDFLAGS = -Wl,-framework,AVFoundation -Wl,-framework,CoreMedia
 
 libvlc_LTLIBRARIES += \
         libavcapture_plugin.la \
