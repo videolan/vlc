@@ -226,6 +226,7 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
     if( p_resource )
     {
         p_picture->p_sys = p_resource->p_sys;
+        p_picture->gc.pf_destroy = p_resource->pf_destroy;
         assert( p_picture->gc.p_sys == NULL );
 
         for( int i = 0; i < p_picture->i_planes; i++ )
@@ -243,18 +244,22 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
             return NULL;
         }
     }
+
     /* */
     p_picture->format = fmt;
 
     vlc_atomic_set( &p_picture->gc.refcount, 1 );
-    p_picture->gc.pf_destroy = PictureDestroy;
+    if( p_picture->gc.pf_destroy == NULL )
+        p_picture->gc.pf_destroy = PictureDestroy;
 
     return p_picture;
 }
+
 picture_t *picture_NewFromFormat( const video_format_t *p_fmt )
 {
     return picture_NewFromResource( p_fmt, NULL );
 }
+
 picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den )
 {
     video_format_t fmt;
