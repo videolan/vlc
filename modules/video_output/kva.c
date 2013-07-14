@@ -101,7 +101,6 @@ struct vout_display_sys_t
     HWND               parent;
     RECTL              parent_rect;
     picture_pool_t    *pool;
-    picture_resource_t resource;
     unsigned           button_pressed;
     bool               is_mouse_hidden;
     bool               is_on_top;
@@ -657,23 +656,18 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
     }
 
     /* Create the associated picture */
-    picture_resource_t *rsc = &sys->resource;
-    rsc->p_sys = malloc( sizeof( *rsc->p_sys ));
-    if( !rsc->p_sys )
-        return VLC_EGENERIC;
+    picture_sys_t *picsys = malloc( sizeof( *picsys ) );
+    if( picsys == NULL )
+        return VLC_ENOMEM;
+    picsys->i_chroma_shift = i_chroma_shift;
 
-    rsc->p_sys->i_chroma_shift = i_chroma_shift;
-
-    for( int i = 0; i < PICTURE_PLANE_MAX; i++ )
-    {
-        rsc->p[ i ].p_pixels = NULL;
-        rsc->p[ i ].i_pitch  = 0;
-        rsc->p[ i ].i_lines  = 0;
-    }
-
-    picture_t *picture = picture_NewFromResource( fmt, rsc );
+    picture_resource_t resource = { .p_sys = picsys };
+    picture_t *picture = picture_NewFromResource( fmt, &resource );
     if( !picture )
-        goto exit_picture;
+    {
+        free( picsys );
+        return VLC_ENOMEM;
+    }
 
     /* Wrap it into a picture pool */
     picture_pool_configuration_t pool_cfg;
@@ -687,8 +681,7 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
     if( !sys->pool )
     {
         picture_Release( picture );
-
-        goto exit_picture;
+        return VLC_ENOMEM;
     }
 
     if (vd->cfg->display.title)
@@ -726,11 +719,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                      SWP_ACTIVATE );
 
     return VLC_SUCCESS;
-
-exit_picture:
-    free( rsc->p_sys );
-
-    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
