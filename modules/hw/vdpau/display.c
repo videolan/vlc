@@ -52,8 +52,6 @@ vlc_module_begin()
     add_shortcut("vdpau", "xid")
 vlc_module_end()
 
-#define MAX_PICTURES (32)
-
 struct vout_display_sys_t
 {
     xcb_connection_t *conn; /**< XCB connection */
@@ -69,47 +67,73 @@ struct vout_display_sys_t
     VdpRGBAFormat rgb_fmt; /**< Output surface format */
 
     picture_pool_t *pool; /**< pictures pool */
-    picture_sys_t *pics[MAX_PICTURES];
 };
+
+static void pictureSys_DestroyVDPAU(picture_sys_t *psys)
+{
+    vdp_output_surface_destroy(psys->vdp, psys->surface);
+    vdp_release_x11(psys->vdp);
+    free(psys);
+}
+
+static void PictureDestroyVDPAU(picture_t *pic)
+{
+    pictureSys_DestroyVDPAU(pic->p_sys);
+    free(pic);
+}
+
+static VdpStatus picture_NewVDPAU(vdp_t *vdp, VdpRGBAFormat rgb_fmt,
+                                  const video_format_t *restrict fmt,
+                                  picture_t **restrict picp)
+{
+    picture_sys_t *psys = malloc(sizeof (*psys));
+    if (unlikely(psys == NULL))
+        return VDP_STATUS_RESOURCES;
+
+    psys->vdp = vdp_hold_x11(vdp, &psys->device);
+
+    VdpStatus err = vdp_output_surface_create(psys->vdp, psys->device,
+                          rgb_fmt, fmt->i_visible_width, fmt->i_visible_height,
+                                              &psys->surface);
+    if (err != VDP_STATUS_OK)
+    {
+        vdp_release_x11(psys->vdp);
+        free(psys);
+        return err;
+    }
+
+    picture_resource_t res = {
+        .p_sys = psys,
+        .pf_destroy = PictureDestroyVDPAU,
+    };
+
+    picture_t *pic = picture_NewFromResource(fmt, &res);
+    if (unlikely(pic == NULL))
+    {
+        pictureSys_DestroyVDPAU(psys);
+        return VDP_STATUS_RESOURCES;
+    }
+    *picp = pic;
+    return VDP_STATUS_OK;
+}
 
 static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
 {
     vout_display_sys_t *sys = vd->sys;
-    const video_format_t *fmt = &vd->fmt;
-    picture_t *pics[MAX_PICTURES];
-    picture_resource_t res = { .p_sys = NULL };
-
-    if (requested_count > MAX_PICTURES)
-        requested_count = MAX_PICTURES;
+    picture_t *pics[requested_count];
 
     unsigned count = 0;
     while (count < requested_count)
     {
-        picture_sys_t *psys = malloc(sizeof (*psys));
-        if (unlikely(psys == NULL))
-            break;
-
-        VdpStatus err = vdp_output_surface_create(sys->vdp, sys->device,
-                     sys->rgb_fmt, fmt->i_visible_width, fmt->i_visible_height,
-                                                  &psys->surface);
+        VdpStatus err = picture_NewVDPAU(sys->vdp, sys->rgb_fmt, &vd->fmt,
+                                         pics + count);
         if (err != VDP_STATUS_OK)
         {
-            free(psys);
             msg_Err(vd, "%s creation failure: %s", "output surface",
                     vdp_get_error_string(sys->vdp, err));
             break;
         }
-        psys->device = sys->device;
-        psys->vdp = sys->vdp;
-
-        res.p_sys = psys;
-        pics[count] = picture_NewFromResource(&vd->fmt, &res);
-        if (pics[count] == NULL)
-        {
-            free(psys);
-            break;
-        }
-        sys->pics[count++] = res.p_sys;
+        count++;
     }
     sys->current = NULL;
     return count ? picture_pool_New(count, pics) : NULL;
@@ -119,17 +143,6 @@ static void PoolFree(vout_display_t *vd, picture_pool_t *pool)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    for (unsigned count = 0; count < MAX_PICTURES; count++)
-    {
-        picture_sys_t *psys = sys->pics[count];
-        if (psys == NULL)
-            continue;
-
-        VdpStatus err = vdp_output_surface_destroy(sys->vdp, psys->surface);
-        if (err != VDP_STATUS_OK)
-            msg_Err(vd, "%s destruction failure: %s", "output surface",
-                    vdp_get_error_string(sys->vdp, err));
-    }
     if (sys->current != NULL)
         picture_Release(sys->current);
     picture_pool_Delete(pool);
@@ -626,8 +639,6 @@ static int Open(vlc_object_t *obj)
 
     sys->cursor = XCB_cursor_Create(sys->conn, screen);
     sys->pool = NULL;
-    for (unsigned count = 0; count < MAX_PICTURES; count++)
-        sys->pics[count] = NULL;
 
     /* */
     vd->sys = sys;
