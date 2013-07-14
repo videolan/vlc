@@ -289,16 +289,19 @@ static int Open(vlc_object_t *p_this)
     if (!pictures)
         goto error;
     for (unsigned int i = 0; i < p_sys->port.i_buffers; i++) {
-        picture_resource_t resource = { 0 };
-        picture_resource_t *rsc = &resource;
-        rsc->p_sys = malloc(sizeof(*rsc->p_sys));
-        if (!rsc->p_sys)
+        picture_sys_t *picsys = malloc(sizeof(*picsys));
+        if (unlikely(picsys == NULL))
             goto error;
-        rsc->p_sys->sys = p_sys;
+        picsys->sys = p_sys;
 
-        picture_t *picture = picture_NewFromResource(&fmt, rsc);
-        if (!picture)
+        picture_resource_t resource = { .p_sys = picsys };
+
+        picture_t *picture = picture_NewFromResource(&fmt, &resource);
+        if (unlikely(picture == NULL))
+        {
+            free(picsys);
             goto error;
+        }
         pictures[i] = picture;
     }
 
