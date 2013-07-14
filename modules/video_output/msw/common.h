@@ -146,7 +146,7 @@ struct vout_display_sys_t
     int                     d3dregion_count;
     struct d3d_region_t     *d3dregion;
 
-    picture_resource_t      resource;
+    picture_sys_t           *picsys;
 
     /* */
     bool                    reset_device;

@@ -916,25 +916,25 @@ static int Direct3DCreatePool(vout_display_t *vd, video_format_t *fmt)
     IDirect3DDevice9_ColorFill(d3ddev, surface, NULL, D3DCOLOR_ARGB(0xFF, 0, 0, 0));
 
     /* Create the associated picture */
-    picture_resource_t *rsc = &sys->resource;
-    rsc->p_sys = malloc(sizeof(*rsc->p_sys));
-    if (!rsc->p_sys) {
+    picture_sys_t *picsys = malloc(sizeof(*picsys));
+    if (unlikely(picsys == NULL)) {
         IDirect3DSurface9_Release(surface);
         return VLC_ENOMEM;
     }
-    rsc->p_sys->surface = surface;
-    rsc->p_sys->fallback = NULL;
-    for (int i = 0; i < PICTURE_PLANE_MAX; i++) {
-        rsc->p[i].p_pixels = NULL;
-        rsc->p[i].i_pitch = 0;
-        rsc->p[i].i_lines = fmt->i_height / (i > 0 ? 2 : 1);
-    }
-    picture_t *picture = picture_NewFromResource(fmt, rsc);
+    picsys->surface = surface;
+    picsys->fallback = NULL;
+
+    picture_resource_t resource = { .p_sys = picsys };
+    for (int i = 0; i < PICTURE_PLANE_MAX; i++)
+        resource.p[i].i_lines = fmt->i_height / (i > 0 ? 2 : 1);
+
+    picture_t *picture = picture_NewFromResource(fmt, &resource);
     if (!picture) {
         IDirect3DSurface9_Release(surface);
-        free(rsc->p_sys);
+        free(picsys);
         return VLC_ENOMEM;
     }
+    sys->picsys = picsys;
 
     /* Wrap it into a picture pool */
     picture_pool_configuration_t pool_cfg;
@@ -960,10 +960,10 @@ static void Direct3DDestroyPool(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->pool) {
-        picture_resource_t *rsc = &sys->resource;
-        IDirect3DSurface9_Release(rsc->p_sys->surface);
-        if (rsc->p_sys->fallback)
-            picture_Release(rsc->p_sys->fallback);
+        picture_sys_t *picsys = sys->picsys;
+        IDirect3DSurface9_Release(picsys->surface);
+        if (picsys->fallback)
+            picture_Release(picsys->fallback);
         picture_pool_Delete(sys->pool);
     }
     sys->pool = NULL;
