@@ -298,10 +298,8 @@ static int Init(vout_display_t *vd,
         cfg.picture_count = 1;
         cfg.picture = &picture;
         sys->pool = picture_pool_NewExtended(&cfg);
-    } else {
-        free(rsc.p_sys);
+    } else
         sys->pool = NULL;
-    }
 
     UpdateRects(vd, NULL, NULL, true);
 
