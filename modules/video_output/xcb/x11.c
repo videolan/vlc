@@ -406,13 +406,15 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
             break;
         }
     }
+    xcb_flush (sys->conn);
 
     if (count == 0)
         return NULL;
 
     sys->pool = picture_pool_New (count, pic_array);
-    /* TODO release picture resources if NULL */
-    xcb_flush (sys->conn);
+    if (unlikely(sys->pool == NULL))
+        while (count > 0)
+            picture_Release(pic_array[--count]);
     return sys->pool;
 }
 
