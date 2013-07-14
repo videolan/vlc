@@ -224,11 +224,13 @@ static int Open(vlc_object_t *p_this)
     msg_Dbg(vd, "Pixel format %4.4s", (char*)&fmt.i_chroma);
 
     /* Create the associated picture */
-    picture_resource_t *rsc = &sys->resource;
-    rsc->p_sys = malloc(sizeof(*rsc->p_sys));
-    if (!rsc->p_sys)
+    picture_sys_t picsys = malloc(sizeof(*picsys));
+    if (unlikely(picsys == NULL))
         goto enomem;
-    rsc->p_sys->sys = sys;
+    picsys->sys = sys;
+
+    picture_resource_t *rsc = &sys->resource;
+    rsc->p_sys = picsys;
 
     for (int i = 0; i < PICTURE_PLANE_MAX; i++) {
         rsc->p[i].p_pixels = NULL;
@@ -236,8 +238,10 @@ static int Open(vlc_object_t *p_this)
         rsc->p[i].i_lines = 0;
     }
     picture_t *picture = picture_NewFromResource(&fmt, rsc);
-    if (!picture)
+    if (!picture) {
+        free(picsys);
         goto enomem;
+    }
 
     /* Wrap it into a picture pool */
     picture_pool_configuration_t pool_cfg;
@@ -271,7 +275,6 @@ static int Open(vlc_object_t *p_this)
     return VLC_SUCCESS;
 
 enomem:
-    free(rsc->p_sys);
     dlclose(sys->p_library);
     free(sys);
     vlc_mutex_unlock(&single_instance);
