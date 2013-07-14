@@ -136,7 +136,15 @@ static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
         count++;
     }
     sys->current = NULL;
-    return count ? picture_pool_New(count, pics) : NULL;
+
+    if (count == 0)
+        return NULL;
+
+    picture_pool_t *pool = picture_pool_New(count, pics);
+    if (unlikely(pool == NULL))
+        while (count > 0)
+            picture_Release(pics[--count]);
+    return pool;
 }
 
 static void PoolFree(vout_display_t *vd, picture_pool_t *pool)
