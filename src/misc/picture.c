@@ -289,8 +289,8 @@ void picture_Release( picture_t *p_picture )
         return;
 
     PictureDestroyContext( p_picture );
-    if( p_picture->gc.pf_destroy != NULL )
-        p_picture->gc.pf_destroy( p_picture );
+    assert( p_picture->gc.pf_destroy != NULL );
+    p_picture->gc.pf_destroy( p_picture );
 }
 
 bool picture_IsReferenced( picture_t *p_picture )
