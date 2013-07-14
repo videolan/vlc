@@ -96,7 +96,7 @@ struct vout_display_sys_t
 
     xcb_xv_query_image_attributes_reply_t *att;
     picture_pool_t *pool; /* picture pool */
-    picture_resource_t resource[MAX_PICTURES];
+    void *segments[MAX_PICTURES];
 };
 
 static picture_pool_t *Pool (vout_display_t *, unsigned);
@@ -601,13 +601,7 @@ static void Close (vlc_object_t *obj)
     if (p_sys->pool)
     {
         for (unsigned i = 0; i < MAX_PICTURES; i++)
-        {
-            picture_resource_t *res = &p_sys->resource[i];
-
-            if (!res->p->p_pixels)
-                break;
-            XCB_pictures_Free (res->p->p_pixels);
-        }
+           XCB_pictures_Free(p_sys->segments[i]);
         picture_pool_Delete (p_sys->pool);
     }
 
@@ -626,8 +620,6 @@ static void PoolAlloc (vout_display_t *vd, unsigned requested_count)
 {
     vout_display_sys_t *p_sys = vd->sys;
 
-    memset (p_sys->resource, 0, sizeof(p_sys->resource));
-
     const uint32_t *pitches= xcb_xv_query_image_attributes_pitches (p_sys->att);
     const uint32_t *offsets= xcb_xv_query_image_attributes_offsets (p_sys->att);
     const unsigned num_planes= __MIN(p_sys->att->num_planes, PICTURE_PLANE_MAX);
@@ -637,45 +629,47 @@ static void PoolAlloc (vout_display_t *vd, unsigned requested_count)
     requested_count = __MIN(requested_count, MAX_PICTURES);
 
     unsigned count;
+    for (count = 0; count < MAX_PICTURES; count++)
+        p_sys->segments[count] = NULL;
     for (count = 0; count < requested_count; count++)
     {
-        picture_resource_t *res = &p_sys->resource[count];
         xcb_shm_seg_t seg = p_sys->shm ? xcb_generate_id (p_sys->conn) : 0;
+        picture_resource_t res = { NULL };
 
         for (unsigned i = 0; i < num_planes; i++)
         {
             uint32_t data_size;
             data_size = (i < num_planes - 1) ? offsets[i+1] : p_sys->data_size;
 
-            res->p[i].i_lines = (data_size - offsets[i]) / pitches[i];
-            res->p[i].i_pitch = pitches[i];
+            res.p[i].i_lines = (data_size - offsets[i]) / pitches[i];
+            res.p[i].i_pitch = pitches[i];
         }
 
-        if (XCB_pictures_Alloc (vd, res, p_sys->att->data_size,
+        if (XCB_pictures_Alloc (vd, &res, p_sys->att->data_size,
                                 p_sys->conn, seg))
             break;
 
         /* Allocate further planes as specified by XVideo */
         /* We assume that offsets[0] is zero */
         for (unsigned i = 1; i < num_planes; i++)
-            res->p[i].p_pixels = res->p[0].p_pixels + offsets[i];
+            res.p[i].p_pixels = res.p[0].p_pixels + offsets[i];
 
         if (p_sys->swap_uv)
         {   /* YVU: swap U and V planes */
-            uint8_t *buf = res->p[2].p_pixels;
-            res->p[2].p_pixels = res->p[1].p_pixels;
-            res->p[1].p_pixels = buf;
+            uint8_t *buf = res.p[2].p_pixels;
+            res.p[2].p_pixels = res.p[1].p_pixels;
+            res.p[1].p_pixels = buf;
         }
 
-        pic_array[count] = picture_NewFromResource (&vd->fmt, res);
+        pic_array[count] = picture_NewFromResource (&vd->fmt, &res);
         if (!pic_array[count])
         {
-            XCB_pictures_Free (res->p->p_pixels);
-            if (res->p_sys->segment)
-                xcb_shm_detach (p_sys->conn, res->p_sys->segment);
-            memset (res, 0, sizeof(*res));
+            XCB_pictures_Free (res.p[0].p_pixels);
+            if (seg != 0)
+                xcb_shm_detach (p_sys->conn, seg);
             break;
         }
+        p_sys->segments[count] = res.p[0].p_pixels;
     }
 
     if (count == 0)
