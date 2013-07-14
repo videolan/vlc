@@ -100,7 +100,7 @@ struct vout_display_sys_t
     LPDIRECTDRAWCLIPPER  clipper;             /* clipper used for blitting */
     HINSTANCE            hddraw_dll;       /* handle of the opened ddraw dll */
 
-    picture_resource_t   resource;
+    picture_sys_t        *picsys;
 
     /* It protects the following variables */
     vlc_mutex_t    lock;

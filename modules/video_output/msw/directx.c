@@ -1039,10 +1039,10 @@ static int DirectXCreatePictureResourceYuvOverlay(vout_display_t *vd,
     }
 
     /* */
-    picture_resource_t *rsc = &sys->resource;
-    rsc->p_sys->front_surface = front_surface;
-    rsc->p_sys->surface       = surface;
-    rsc->p_sys->fallback      = NULL;
+    picture_sys_t *picsys = sys->picsys;
+    picsys->front_surface = front_surface;
+    picsys->surface       = surface;
+    picsys->fallback      = NULL;
     return VLC_SUCCESS;
 }
 static int DirectXCreatePictureResourceYuv(vout_display_t *vd,
@@ -1095,10 +1095,10 @@ static int DirectXCreatePictureResourceYuv(vout_display_t *vd,
     }
 
     /* */
-    picture_resource_t *rsc = &sys->resource;
-    rsc->p_sys->front_surface = surface;
-    rsc->p_sys->surface       = surface;
-    rsc->p_sys->fallback      = NULL;
+    picture_sys_t *picsys = sys->picsys;
+    picsys->front_surface = surface;
+    picsys->surface       = surface;
+    picsys->fallback      = NULL;
     return VLC_SUCCESS;
 }
 static int DirectXCreatePictureResourceRgb(vout_display_t *vd,
@@ -1155,10 +1155,10 @@ static int DirectXCreatePictureResourceRgb(vout_display_t *vd,
     }
 
     /* */
-    picture_resource_t *rsc = &sys->resource;
-    rsc->p_sys->front_surface = surface;
-    rsc->p_sys->surface       = surface;
-    rsc->p_sys->fallback      = NULL;
+    picture_sys_t *picsys = sys->picsys;
+    picsys->front_surface = surface;
+    picsys->surface       = surface;
+    picsys->fallback      = NULL;
     return VLC_SUCCESS;
 }
 
@@ -1169,10 +1169,10 @@ static int DirectXCreatePictureResource(vout_display_t *vd,
     vout_display_sys_t *sys = vd->sys;
 
     /* */
-    picture_resource_t *rsc = &sys->resource;
-    rsc->p_sys = calloc(1, sizeof(*rsc->p_sys));
-    if (!rsc->p_sys)
+    picture_sys_t *picsys = calloc(1, sizeof(*picsys));
+    if (unlikely(picsys == NULL))
         return VLC_ENOMEM;
+    sys->picsys = picsys;
 
     /* */
     bool allow_hw_yuv  = sys->can_blit_fourcc &&
@@ -1212,11 +1212,11 @@ static void DirectXDestroyPictureResource(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->resource.p_sys->front_surface != sys->resource.p_sys->surface)
-        DirectXDestroySurface(sys->resource.p_sys->surface);
-    DirectXDestroySurface(sys->resource.p_sys->front_surface);
-    if (sys->resource.p_sys->fallback)
-        picture_Release(sys->resource.p_sys->fallback);
+    if (sys->picsys->front_surface != sys->picsys->surface)
+        DirectXDestroySurface(sys->picsys->surface);
+    DirectXDestroySurface(sys->picsys->front_surface);
+    if (sys->picsys->fallback)
+        picture_Release(sys->picsys->fallback);
 }
 
 static int DirectXLock(picture_t *picture)
@@ -1247,16 +1247,11 @@ static int DirectXCreatePool(vout_display_t *vd,
         return VLC_EGENERIC;
 
     /* Create the associated picture */
-    picture_resource_t *rsc = &sys->resource;
-    for (int i = 0; i < PICTURE_PLANE_MAX; i++) {
-        rsc->p[i].p_pixels = NULL;
-        rsc->p[i].i_pitch  = 0;
-        rsc->p[i].i_lines  = 0;
-    }
-    picture_t *picture = picture_NewFromResource(fmt, rsc);
+    picture_resource_t resource = { .p_sys = sys->picsys };
+    picture_t *picture = picture_NewFromResource(fmt, &resource);
     if (!picture) {
         DirectXDestroyPictureResource(vd);
-        free(rsc->p_sys);
+        free(sys->picsys);
         return VLC_ENOMEM;
     }
 
@@ -1325,7 +1320,7 @@ static int DirectXUpdateOverlay(vout_display_t *vd, LPDIRECTDRAWSURFACE2 surface
     if (!surface) {
         if (!sys->pool)
             return VLC_EGENERIC;
-        surface = sys->resource.p_sys->front_surface;
+        surface = sys->picsys->front_surface;
     }
 
     /* The new window dimensions should already have been computed by the
