@@ -74,7 +74,7 @@ struct vout_display_sys_t
     uint8_t depth; /* useful bits per pixel */
 
     picture_pool_t *pool; /* picture pool */
-    picture_resource_t resource[MAX_PICTURES];
+    void *segments[MAX_PICTURES];
 };
 
 static picture_pool_t *Pool (vout_display_t *, unsigned);
@@ -379,29 +379,36 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
         return NULL;
 
     assert (pic->i_planes == 1);
-    memset (sys->resource, 0, sizeof(sys->resource));
 
     unsigned count;
     picture_t *pic_array[MAX_PICTURES];
+
+    for (count = 0; count < MAX_PICTURES; count++)
+        sys->segments[count] = NULL;
     for (count = 0; count < MAX_PICTURES; count++)
     {
-        picture_resource_t *res = &sys->resource[count];
+        picture_resource_t res = {
+           .p = {
+               [0] = {
+                   .i_lines = pic->p->i_lines,
+                   .i_pitch = pic->p->i_pitch,
+               },
+           },
+        };
+        xcb_shm_seg_t seg = (sys->seg_base != 0) ? (sys->seg_base + count) : 0;
 
-        res->p->i_lines = pic->p->i_lines;
-        res->p->i_pitch = pic->p->i_pitch;
-        if (XCB_pictures_Alloc (vd, res, res->p->i_pitch * res->p->i_lines,
-                                sys->conn,
-                                sys->seg_base ? (sys->seg_base + count) : 0))
+        if (XCB_pictures_Alloc (vd, &res, res.p->i_pitch * res.p->i_lines,
+                                sys->conn, seg))
             break;
-        pic_array[count] = picture_NewFromResource (&vd->fmt, res);
+        pic_array[count] = picture_NewFromResource (&vd->fmt, &res);
         if (!pic_array[count])
         {
-            XCB_pictures_Free (res->p->p_pixels);
-            if (res->p_sys->segment)
-                xcb_shm_detach (sys->conn, res->p_sys->segment);
-            memset (res, 0, sizeof(*res));
+            XCB_pictures_Free (res.p[0].p_pixels);
+            if (seg != 0)
+                xcb_shm_detach (sys->conn, seg);
             break;
         }
+        sys->segments[count] = res.p[0].p_pixels;
     }
     picture_Release (pic);
 
@@ -574,13 +581,9 @@ static void ResetPictures (vout_display_t *vd)
 
     for (unsigned i = 0; i < MAX_PICTURES; i++)
     {
-        picture_resource_t *res = &sys->resource[i];
-
-        if (!res->p->p_pixels)
-            break;
-        XCB_pictures_Free (res->p->p_pixels);
-        if (res->p_sys->segment)
-            xcb_shm_detach (sys->conn, res->p_sys->segment);
+        XCB_pictures_Free (sys->segments[i]);
+        if (sys->seg_base != 0)
+            xcb_shm_detach (sys->conn, sys->seg_base + i);
     }
     picture_pool_Delete (sys->pool);
     sys->pool = NULL;
