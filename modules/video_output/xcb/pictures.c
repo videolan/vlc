@@ -147,16 +147,13 @@ int XCB_pictures_Alloc (vout_display_t *vd, picture_resource_t *res,
 /**
  * Release picture private data: detach the shared memory segment.
  */
-void XCB_pictures_Free (picture_resource_t *res, xcb_connection_t *conn)
+void XCB_pictures_Free (void *mem)
 {
 #ifdef HAVE_SYS_SHM_H
-    xcb_shm_seg_t segment = res->p_sys->segment;
-
-    if (conn != NULL && segment != 0)
-        xcb_shm_detach (conn, segment);
-    shmdt (res->p->p_pixels);
+    if (mem != NULL)
+        shmdt (mem);
 #else
-    free (res->p->p_pixels);
+    free (mem);
 #endif
 }
 

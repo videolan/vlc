@@ -396,7 +396,9 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
         pic_array[count] = picture_NewFromResource (&vd->fmt, res);
         if (!pic_array[count])
         {
-            XCB_pictures_Free (res, sys->conn);
+            XCB_pictures_Free (res->p->p_pixels);
+            if (res->p_sys->segment)
+                xcb_shm_detach (sys->conn, res->p_sys->segment);
             memset (res, 0, sizeof(*res));
             break;
         }
@@ -576,7 +578,9 @@ static void ResetPictures (vout_display_t *vd)
 
         if (!res->p->p_pixels)
             break;
-        XCB_pictures_Free (res, sys->conn);
+        XCB_pictures_Free (res->p->p_pixels);
+        if (res->p_sys->segment)
+            xcb_shm_detach (sys->conn, res->p_sys->segment);
     }
     picture_pool_Delete (sys->pool);
     sys->pool = NULL;

@@ -606,7 +606,7 @@ static void Close (vlc_object_t *obj)
 
             if (!res->p->p_pixels)
                 break;
-            XCB_pictures_Free (res, NULL);
+            XCB_pictures_Free (res->p->p_pixels);
         }
         picture_pool_Delete (p_sys->pool);
     }
@@ -670,7 +670,9 @@ static void PoolAlloc (vout_display_t *vd, unsigned requested_count)
         pic_array[count] = picture_NewFromResource (&vd->fmt, res);
         if (!pic_array[count])
         {
-            XCB_pictures_Free (res, p_sys->conn);
+            XCB_pictures_Free (res->p->p_pixels);
+            if (res->p_sys->segment)
+                xcb_shm_detach (p_sys->conn, res->p_sys->segment);
             memset (res, 0, sizeof(*res));
             break;
         }
