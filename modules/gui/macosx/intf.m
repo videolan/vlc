@@ -824,6 +824,13 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mainwindow updateWindow];
     [o_mainwindow updateTimeSlider];
     [o_mainwindow updateVolumeSlider];
+
+    playlist_t * p_playlist = pl_Get(VLCIntf);
+    PL_LOCK;
+    BOOL kidsAround = p_playlist->p_local_category->i_children;
+    PL_UNLOCK;
+    if (kidsAround && var_GetBool(p_playlist, "playlist-autostart"))
+        [[self playlist] playItem:nil];
 }
 
 - (void)initStrings
