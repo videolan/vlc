@@ -1512,7 +1512,7 @@ void VLCMenuBar::CreateAndConnect( QMenu *menu, const char *psz_var,
 
     action->setChecked( checked );
 
-    MenuItemData *itemData = qFindChild<MenuItemData*>( action, QString() );
+    MenuItemData *itemData = action->findChild<MenuItemData*>( QString() );
     delete itemData;
     itemData = new MenuItemData( action, p_obj, i_val_type, val, psz_var );
 
