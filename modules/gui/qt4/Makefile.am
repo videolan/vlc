@@ -234,7 +234,7 @@ MOC_CPPFLAGS = $(DEFS) \
 	-I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) \
 	$(libqt4_plugin_la_CPPFLAGS)
 if HAVE_DARWIN
-MOC_CPPFLAGS += -DQ_WS_MAC
+MOC_CPPFLAGS += -DQ_OS_MAC
 endif
 if HAVE_WIN32
 MOC_CPPFLAGS += -D_WIN32
