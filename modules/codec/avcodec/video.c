@@ -125,8 +125,14 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    p_dec->fmt_out.video.i_width = p_context->width;
-    p_dec->fmt_out.video.i_height = p_context->height;
+    if( p_context->coded_width != p_context->width ||
+        p_context->coded_height != p_context->height )
+    {
+        p_dec->fmt_out.video.i_visible_width = p_context->width;
+        p_dec->fmt_out.video.i_visible_height = p_context->height;
+    }
+    p_dec->fmt_out.video.i_width = p_context->coded_width;
+    p_dec->fmt_out.video.i_height = p_context->coded_height;
 
     if( !p_context->width || !p_context->height )
     {
