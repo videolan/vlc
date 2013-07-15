@@ -420,7 +420,7 @@ QSize LocationButton::sizeHint() const
 
 #undef PADDING
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
 QSplitterHandle *PlaylistSplitter::createHandle()
 {
     return new SplitterHandle( orientation(), this );

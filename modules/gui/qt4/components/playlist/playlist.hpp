@@ -82,7 +82,7 @@ private slots:
     friend class PlaylistDialog;
 };
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
 class PlaylistSplitter : public QSplitter
 {
 public:
@@ -94,7 +94,7 @@ protected:
  #define PlaylistSplitter QSplitter
 #endif
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
 class SplitterHandle : public QSplitterHandle
 {
 public:

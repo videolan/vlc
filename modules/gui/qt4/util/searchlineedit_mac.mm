@@ -31,7 +31,7 @@
 
 #include "searchlineedit.hpp"
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
 
 #include <Cocoa/Cocoa.h>
 
@@ -61,4 +61,4 @@ SearchLineEdit::SearchLineEdit(QWidget *parent)
 }
 //![0]
 
-#endif // Q_WS_MAC
+#endif // Q_OS_MAC

@@ -72,7 +72,7 @@ private:
 };
 #endif
 
-#ifndef Q_WS_MAC
+#ifndef Q_OS_MAC
 class QFramelessButton;
 class SearchLineEdit : public QLineEdit
 {

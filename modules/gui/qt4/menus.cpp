@@ -1137,7 +1137,7 @@ void VLCMenuBar::updateSystrayMenu( MainInterface *mi,
     QMenu *sysMenu = mi->getSysTrayMenu();
     sysMenu->clear();
 
-#ifndef Q_WS_MAC
+#ifndef Q_OS_MAC
     /* Hide / Show VLC and cone */
     if( mi->isVisible() || b_force_visible )
     {

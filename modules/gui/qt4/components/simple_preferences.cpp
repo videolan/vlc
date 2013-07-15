@@ -349,7 +349,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 i_volume = config_GetFloat( p_intf, "directx-volume") * 100 + 0.5;
             else if( get_vol_aout( "waveout" ) )
                 i_volume = config_GetFloat( p_intf, "waveout-volume") * 100 + 0.5;
-#elif defined( Q_WS_MAC )
+#elif defined( Q_OS_MAC )
             if( get_vol_aout( "auhal" ) )
                 i_volume = ( config_GetFloat( p_intf, "auhal-volume") * 100 + 0.5 )
                     / AOUT_VOLUME_DEFAULT;
@@ -918,7 +918,7 @@ void SPrefsPanel::apply()
             config_PutFloat( p_intf, "directx-volume", i_volume / 100.f );
         if( save_vol_aout( "waveout" ) )
             config_PutFloat( p_intf, "waveout-volume", i_volume / 100.f );
-#elif defined( Q_WS_MAC )
+#elif defined( Q_OS_MAC )
         VLC_UNUSED( f_gain );
         if( save_vol_aout( "auhal" ) )
             config_PutFloat( p_intf, "auhal-volume", i_volume / 100.f
