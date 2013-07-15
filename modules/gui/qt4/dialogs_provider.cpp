@@ -332,7 +332,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
         foreach( const QString &file, files )
             p_arg->psz_results[i++] = strdup( qtu( toNativeSepNoSlash( file ) ) );
         if(i == 0)
-            p_intf->p_sys->filepath = QString::fromAscii("");
+            p_intf->p_sys->filepath = QString::fromLatin1("");
         else
             p_intf->p_sys->filepath = qfu( p_arg->psz_results[i-1] );
     }
