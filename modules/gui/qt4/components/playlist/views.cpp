@@ -425,7 +425,11 @@ PlTreeView::PlTreeView( PLModel *, QWidget *parent ) : QTreeView( parent )
     viewport()->setAttribute( Qt::WA_Hover );
     header()->setSortIndicator( -1 , Qt::AscendingOrder );
     header()->setSortIndicatorShown( true );
+#if QT_VERSION >= 0x050000
+    header()->setSectionsClickable( true );
+#else
     header()->setClickable( true );
+#endif
     header()->setContextMenuPolicy( Qt::CustomContextMenu );
 
     setSelectionBehavior( QAbstractItemView::SelectRows );
