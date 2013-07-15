@@ -275,8 +275,8 @@ static void OSDWidgetUpdate(subpicture_t *subpic,
     fmt.i_sar_num       = 1;
     fmt.i_sar_den       = 1;
 
-    subpic->i_original_picture_width  = fmt.i_width;
-    subpic->i_original_picture_height = fmt.i_height;
+    subpic->i_original_picture_width  = fmt.i_visible_width;
+    subpic->i_original_picture_height = fmt.i_visible_height;
     if (sys->type == OSD_HOR_SLIDER || sys->type == OSD_VERT_SLIDER)
         subpic->p_region = OSDSlider(sys->type, sys->position, &fmt);
     else
