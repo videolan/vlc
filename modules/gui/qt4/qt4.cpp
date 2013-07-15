@@ -318,7 +318,7 @@ static bool active = false;
  * Module callbacks
  *****************************************************************************/
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
 /* Used to abort the app.exec() on OSX after libvlc_Quit is called */
 #include "../../../lib/libvlc_internal.h" /* libvlc_SetExitHandler */
 static void Abort( void *obj )
@@ -369,7 +369,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 
     /* */
     vlc_sem_init (&ready, 0);
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     /* Run mainloop on the main thread as Cocoa requires */
     libvlc_SetExitHandler( p_intf->p_libvlc, Abort, p_intf );
     Thread( (void *)p_intf );
@@ -388,7 +388,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     vlc_sem_destroy (&ready);
     busy = active = true;
 
-#ifndef Q_WS_MAC
+#ifndef Q_OS_MAC
     if( !isDialogProvider )
     {
         RegisterIntf( p_this );
@@ -429,7 +429,7 @@ static void Close( vlc_object_t *p_this )
     QVLCApp::triggerQuit();
 
     msg_Dbg( p_this, "waiting for UI thread..." );
-#ifndef Q_WS_MAC
+#ifndef Q_OS_MAC
     vlc_join (p_sys->thread, NULL);
 #endif
     delete p_sys;
@@ -465,7 +465,7 @@ static void *Thread( void *obj )
             QSettings::UserScope, "vlc", "vlc-qt-interface" );
 
     /* Icon setting, Mac uses icon from .icns */
-#ifndef Q_WS_MAC
+#ifndef Q_OS_MAC
     if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY && var_InheritBool( p_intf, "qt-icon-change" ) )
         app.setWindowIcon( QIcon::fromTheme( "vlc-xmas", QIcon( ":/logo/vlc128-xmas.png" ) ) );
     else
@@ -526,7 +526,7 @@ static void *Thread( void *obj )
     /* Tell the main LibVLC thread we are ready */
     vlc_sem_post (&ready);
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     /* We took over main thread, register and start here */
     if( !p_intf->p_sys->b_isDialogProvider )
     {

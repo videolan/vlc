@@ -28,7 +28,7 @@
 #include <QApplication>
 #include <QEvent>
 
-#if defined(Q_WS_WIN)
+#if defined(Q_OS_WIN)
 #   include "qt4.hpp"
 #   include <windows.h>
 #   include "input_manager.hpp"
