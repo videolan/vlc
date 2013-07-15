@@ -95,7 +95,11 @@ PluginTab::PluginTab( intf_thread_t *p_intf_ )
     layout->addWidget( treePlugins, 0, 0, 1, -1 );
 
     /* Users cannot move the columns around but we need to sort */
+#if QT_VERSION >= 0x050000
+    treePlugins->header()->setSectionsMovable( false );
+#else
     treePlugins->header()->setMovable( false );
+#endif
     treePlugins->header()->setSortIndicatorShown( true );
     //    treePlugins->header()->setResizeMode( QHeaderView::ResizeToContents );
     treePlugins->setAlternatingRowColors( true );
