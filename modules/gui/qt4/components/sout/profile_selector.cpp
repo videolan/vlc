@@ -250,7 +250,7 @@ void VLCProfileSelector::updateOptions( int i )
             HASHPICK( "video", "filters" );
             if ( !value.isEmpty() )
             {
-                QStringList valuesList = QUrl::fromPercentEncoding( value.toAscii() ).split( ";" );
+                QStringList valuesList = QUrl::fromPercentEncoding( value.toLatin1() ).split( ";" );
                 smrl.option( "vfilter", valuesList.join( ":" ) );
             }
 
@@ -265,7 +265,7 @@ void VLCProfileSelector::updateOptions( int i )
 
                 HASHPICK( "vcodec", "custom" );
                 if( !value.isEmpty() )
-                    codecoptions << QUrl::fromPercentEncoding( value.toAscii() );
+                    codecoptions << QUrl::fromPercentEncoding( value.toLatin1() );
 
                 if ( codecoptions.count() )
                     smrl.option( "venc",
@@ -316,7 +316,7 @@ void VLCProfileSelector::updateOptions( int i )
             HASHPICK( "audio", "filters" );
             if ( !value.isEmpty() )
             {
-                QStringList valuesList = QUrl::fromPercentEncoding( value.toAscii() ).split( ";" );
+                QStringList valuesList = QUrl::fromPercentEncoding( value.toLatin1() ).split( ";" );
                 smrl.option( "afilter", valuesList.join( ":" ) );
             }
 
@@ -679,11 +679,11 @@ void VLCProfileEditor::fillProfile( const QString& qs )
             else if( object->inherits( "QLineEdit" ) )
             {
                 QLineEdit *box = qobject_cast<QLineEdit *>( object );
-                box->setText( QUrl::fromPercentEncoding( value.toAscii() ) );
+                box->setText( QUrl::fromPercentEncoding( value.toLatin1() ) );
             }
             else if ( object->inherits( "QListWidget" ) )
             {
-                QStringList valuesList = QUrl::fromPercentEncoding( value.toAscii() ).split( ";" );
+                QStringList valuesList = QUrl::fromPercentEncoding( value.toLatin1() ).split( ";" );
                 const QListWidget *list = qobject_cast<const QListWidget *>( object );
                 for( int i=0; i < list->count(); i++ )
                 {

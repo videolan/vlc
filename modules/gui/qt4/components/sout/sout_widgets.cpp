@@ -69,7 +69,7 @@ SoutInputBox::SoutInputBox( QWidget *_parent, const QString& mrl ) : QGroupBox( 
 
 void SoutInputBox::setMRL( const QString& mrl )
 {
-    QUrl uri = QUrl::fromEncoded( mrl.toAscii() );
+    QUrl uri = QUrl::fromEncoded( mrl.toLatin1() );
     sourceLine->setText( uri.toString() );
     QString type = uri.scheme();
     if ( type.isEmpty() ) type = qtr( I_FILE_SLASH_DIR );
