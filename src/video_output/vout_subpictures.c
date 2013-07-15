@@ -476,16 +476,16 @@ static void SpuRegionPlace(int *x, int *y,
         if (region->i_align & SUBPICTURE_ALIGN_TOP)
             *y = region->i_y;
         else if (region->i_align & SUBPICTURE_ALIGN_BOTTOM)
-            *y = subpic->i_original_picture_height - region->fmt.i_height - region->i_y;
+            *y = subpic->i_original_picture_height - region->fmt.i_visible_height - region->i_y;
         else
-            *y = subpic->i_original_picture_height / 2 - region->fmt.i_height / 2;
+            *y = subpic->i_original_picture_height / 2 - region->fmt.i_visible_height / 2;
 
         if (region->i_align & SUBPICTURE_ALIGN_LEFT)
             *x = region->i_x;
         else if (region->i_align & SUBPICTURE_ALIGN_RIGHT)
-            *x = subpic->i_original_picture_width - region->fmt.i_width - region->i_x;
+            *x = subpic->i_original_picture_width - region->fmt.i_visible_width - region->i_x;
         else
-            *x = subpic->i_original_picture_width / 2 - region->fmt.i_width / 2;
+            *x = subpic->i_original_picture_width / 2 - region->fmt.i_visible_width / 2;
     }
 }
 
@@ -722,7 +722,8 @@ static void SpuRenderRegion(spu_t *spu,
     /* Save this position for subtitle overlap support
      * it is really important that there are given without scale_size applied */
     *dst_area = spu_area_create(x_offset, y_offset,
-                                region->fmt.i_width, region->fmt.i_height,
+                                region->fmt.i_visible_width,
+                                region->fmt.i_visible_height,
                                 scale_size);
 
     /* Handle overlapping subtitles when possible */
@@ -738,8 +739,10 @@ static void SpuRenderRegion(spu_t *spu,
     if (subpic->b_subtitle)
         restrained.y -= y_margin;
 
-    spu_area_t display = spu_area_create(0, 0, fmt->i_width, fmt->i_height,
+    spu_area_t display = spu_area_create(0, 0, fmt->i_visible_width,
+                                         fmt->i_visible_height,
                                          spu_scale_unit());
+    //fprintf("
     SpuAreaFitInside(&restrained, &display);
 
     /* Fix the position for the current scale_size */
@@ -782,8 +785,8 @@ static void SpuRenderRegion(spu_t *spu,
         (!using_palette || (sys->scale_yuvp && sys->scale_yuvp->p_module)) &&
         (scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT ||
         using_palette || convert_chroma)) {
-        const unsigned dst_width  = spu_scale_w(region->fmt.i_width,  scale_size);
-        const unsigned dst_height = spu_scale_h(region->fmt.i_height, scale_size);
+        const unsigned dst_width  = spu_scale_w(region->fmt.i_visible_width,  scale_size);
+        const unsigned dst_height = spu_scale_h(region->fmt.i_visible_height, scale_size);
 
         /* Destroy the cache if unusable */
         if (region->p_private) {
@@ -791,8 +794,8 @@ static void SpuRenderRegion(spu_t *spu,
             bool is_changed = false;
 
             /* Check resize changes */
-            if (dst_width  != private->fmt.i_width ||
-                dst_height != private->fmt.i_height)
+            if (dst_width  != private->fmt.i_visible_width ||
+                dst_height != private->fmt.i_visible_height)
                 is_changed = true;
 
             /* Check forced palette changes */
@@ -835,8 +838,8 @@ static void SpuRenderRegion(spu_t *spu,
 
             /* Conversion(except from YUVP)/Scaling */
             if (picture &&
-                (picture->format.i_width  != dst_width ||
-                 picture->format.i_height != dst_height ||
+                (picture->format.i_visible_width  != dst_width ||
+                 picture->format.i_visible_height != dst_height ||
                  (convert_chroma && !using_palette)))
             {
                 scale->fmt_in.video  = picture->format;
@@ -987,8 +990,8 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
     subpicture_t *output = subpicture_New(NULL);
     if (!output)
         return NULL;
-    output->i_original_picture_width  = fmt_dst->i_width;
-    output->i_original_picture_height = fmt_dst->i_height;
+    output->i_original_picture_width  = fmt_dst->i_visible_width;
+    output->i_original_picture_height = fmt_dst->i_visible_height;
     subpicture_region_t **output_last_ptr = &output->p_region;
 
     /* Allocate area array for subtitle overlap */
@@ -1019,8 +1022,8 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
             else
                 msg_Warn(spu, "original picture size is undefined");
 
-            subpic->i_original_picture_width  = fmt_src->i_width;
-            subpic->i_original_picture_height = fmt_src->i_height;
+            subpic->i_original_picture_width  = fmt_src->i_visible_width;
+            subpic->i_original_picture_height = fmt_src->i_visible_height;
         }
 
         if (sys->text) {
@@ -1042,8 +1045,8 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
             /* Compute region scale AR */
             video_format_t region_fmt = region->fmt;
             if (region_fmt.i_sar_num <= 0 || region_fmt.i_sar_den <= 0) {
-                region_fmt.i_sar_num = (int64_t)fmt_dst->i_width  * fmt_dst->i_sar_num * subpic->i_original_picture_height;
-                region_fmt.i_sar_den = (int64_t)fmt_dst->i_height * fmt_dst->i_sar_den * subpic->i_original_picture_width;
+                region_fmt.i_sar_num = (int64_t)fmt_dst->i_visible_width  * fmt_dst->i_sar_num * subpic->i_original_picture_height;
+                region_fmt.i_sar_den = (int64_t)fmt_dst->i_visible_height * fmt_dst->i_sar_den * subpic->i_original_picture_width;
                 vlc_ureduce(&region_fmt.i_sar_num, &region_fmt.i_sar_den,
                             region_fmt.i_sar_num, region_fmt.i_sar_den, 65536);
             }
@@ -1052,9 +1055,9 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
              * FIXME The current scaling ensure that the heights match, the width being
              * cropped.
              */
-            spu_scale_t scale = spu_scale_createq((int64_t)fmt_dst->i_height                 * fmt_dst->i_sar_den * region_fmt.i_sar_num,
+            spu_scale_t scale = spu_scale_createq((int64_t)fmt_dst->i_visible_height                 * fmt_dst->i_sar_den * region_fmt.i_sar_num,
                                                   (int64_t)subpic->i_original_picture_height * fmt_dst->i_sar_num * region_fmt.i_sar_den,
-                                                  fmt_dst->i_height,
+                                                  fmt_dst->i_visible_height,
                                                   subpic->i_original_picture_height);
 
             /* Check scale validity */
