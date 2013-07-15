@@ -23,14 +23,14 @@
 #ifndef SEEKSTYLE_HPP
 #define SEEKSTYLE_HPP
 
-#include <QWindowsStyle>
+#include <QProxyStyle>
 
 
-class SeekStyle : public QWindowsStyle
+class SeekStyle : public QProxyStyle
 {
     Q_OBJECT
 public:
-    SeekStyle() { }
+    SeekStyle();
     virtual int pixelMetric(PixelMetric metric, const QStyleOption * option = 0, const QWidget * widget = 0) const;
     virtual void drawComplexControl(ComplexControl cc, const QStyleOptionComplex *opt, QPainter *p, const QWidget *widget) const;
 };
