@@ -794,6 +794,8 @@ void PLModel::rebuild( playlist_item_t *p_root )
     /* Invalidate cache */
     i_cached_id = i_cached_input_id = -1;
 
+    beginResetModel();
+
     if( rootItem ) rootItem->clearChildren();
 
     PL_LOCK;
@@ -808,7 +810,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
     PL_UNLOCK;
 
     /* And signal the view */
-    reset();
+    endResetModel();
     if( p_root ) emit rootIndexChanged();
 }
 
