@@ -822,11 +822,6 @@ void FullscreenControllerWidget::restoreFSC()
         /* Dock at the bottom of the screen */
         updateFullwidthGeometry( targetScreen() );
     }
-
-#ifdef Q_WS_X11
-    // Tell kwin that we do not want a shadow around the fscontroller
-    setMask( QRegion( 0, 0, width(), height() ) );
-#endif
 }
 
 void FullscreenControllerWidget::centerFSC( int number )
