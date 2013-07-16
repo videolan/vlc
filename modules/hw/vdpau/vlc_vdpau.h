@@ -225,6 +225,14 @@ bool vlc_fourcc_to_vdp_ycc(vlc_fourcc_t fourcc,
             *type = VDP_CHROMA_TYPE_420;
             *format = VDP_YCBCR_FORMAT_NV12;
             break;
+        case VLC_CODEC_I422:
+            *type = VDP_CHROMA_TYPE_422;
+            *format = VDP_YCBCR_FORMAT_YV12;
+            break;
+        case VLC_CODEC_NV16:
+            *type = VDP_CHROMA_TYPE_422;
+            *format = VDP_YCBCR_FORMAT_NV12;
+            break;
         case VLC_CODEC_YUYV:
             *type = VDP_CHROMA_TYPE_422;
             *format = VDP_YCBCR_FORMAT_YUYV;

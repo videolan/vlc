@@ -330,7 +330,8 @@ static picture_t *VideoExport(filter_t *filter, picture_t *src, picture_t *dst)
         planes[i] = dst->p[i].p_pixels;
         pitches[i] = dst->p[i].i_pitch;
     }
-    if (dst->format.i_chroma == VLC_CODEC_I420)
+    if (dst->format.i_chroma == VLC_CODEC_I420
+     || dst->format.i_chroma == VLC_CODEC_I422)
     {
         planes[1] = dst->p[2].p_pixels;
         planes[2] = dst->p[1].p_pixels;
@@ -601,6 +602,7 @@ static int OutputOpen(vlc_object_t *obj)
     if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_422)
     {
         sys->chroma = VDP_CHROMA_TYPE_422;
+        /* TODO: check if the drivery supports NV12 or UYVY */
         sys->format = VDP_YCBCR_FORMAT_UYVY;
         sys->import = VideoPassthrough;
     }
