@@ -231,6 +231,10 @@
 #define VLC_CODEC_NV16            VLC_FOURCC('N','V','1','6')
 /* 2 planes Y/VU 4:2:2 */
 #define VLC_CODEC_NV61            VLC_FOURCC('N','V','6','1')
+/* 2 planes Y/UV 4:4:4 */
+#define VLC_CODEC_NV24            VLC_FOURCC('N','V','2','4')
+/* 2 planes Y/VU 4:4:4 */
+#define VLC_CODEC_NV42            VLC_FOURCC('N','V','4','2')
 
 /* VDPAU video surface YCbCr 4:2:0 */
 #define VLC_CODEC_VDPAU_VIDEO_420 VLC_FOURCC('V','D','V','0')

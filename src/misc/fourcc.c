@@ -824,6 +824,10 @@ static const staticentry_t p_list_video[] = {
         A("NV16"),
     B(VLC_CODEC_NV61, "Biplanar 4:2:2 Y/VU"),
         A("NV61"),
+    B(VLC_CODEC_NV24, "Biplanar 4:4:4 Y/UV"),
+        A("NV24"),
+    B(VLC_CODEC_NV42, "Biplanar 4:4:4 Y/VU"),
+        A("NV42"),
 
     B(VLC_CODEC_I420_9L, "Planar 4:2:0 YUV 9-bit LE"),
         A("I09L"),
@@ -1618,6 +1622,9 @@ const char *vlc_fourcc_GetDescription( int i_cat, vlc_fourcc_t i_fourcc )
 #define VLC_CODEC_YUV_PLANAR_444 \
     VLC_CODEC_I444, VLC_CODEC_J444
 
+#define VLC_CODEC_YUV_SEMIPLANAR_444 \
+    VLC_CODEC_NV24, VLC_CODEC_NV42
+
 #define VLC_CODEC_YUV_PLANAR_444_16 \
     VLC_CODEC_I444_10L, VLC_CODEC_I444_10B, VLC_CODEC_I444_9L, VLC_CODEC_I444_9B
 
@@ -1792,6 +1799,7 @@ static const vlc_fourcc_t p_list_YUV[] = {
     VLC_CODEC_YUV_SEMIPLANAR_422,
     VLC_CODEC_YUV_PLANAR_440,
     VLC_CODEC_YUV_PLANAR_444,
+    VLC_CODEC_YUV_SEMIPLANAR_444,
     VLC_CODEC_YUV_PACKED,
     VLC_CODEC_I411, VLC_CODEC_YUV_PLANAR_410, VLC_CODEC_Y211,
     VLC_CODEC_YUV_PLANAR_420_16,
