@@ -115,7 +115,9 @@ static bool ContainsURL( demux_t *p_demux )
             !strncasecmp( (const char *)p_peek, "mms://", 6 ) ||
             !strncasecmp( (const char *)p_peek, "rtsp://", 7 ) ||
             !strncasecmp( (const char *)p_peek, "https://", 8 ) ||
-            !strncasecmp( (const char *)p_peek, "ftp://", 6 ) )
+            !strncasecmp( (const char *)p_peek, "ftp://", 6 ) ||
+            !strncasecmp( (const char *)p_peek, "ftps://", 7 ) ||
+            !strncasecmp( (const char *)p_peek, "ftpes://", 8 ) )
         {
             return true;
         }
