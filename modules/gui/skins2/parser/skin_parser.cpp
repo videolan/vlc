@@ -705,7 +705,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         DefaultAttr( attr, "rightbottom", "lefttop" );
         DefaultAttr( attr, "xkeepratio", "false" );
         DefaultAttr( attr, "ykeepratio", "false" );
-        DefaultAttr( attr, "autoresize", "false" );
+        DefaultAttr( attr, "autoresize", "true" );
         DefaultAttr( attr, "help", "" );
 
         int refWidth, refHeight;
