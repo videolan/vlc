@@ -549,6 +549,17 @@ static int Open (vlc_object_t *obj)
         free(r);
     }
 
+    /* Colour space */
+    {
+        xcb_intern_atom_reply_t *r =
+            xcb_intern_atom_reply (conn,
+                xcb_intern_atom (conn, 1, 13, "XV_ITURBT_709"), NULL);
+        if (r != NULL && r->atom != 0)
+            xcb_xv_set_port_attribute(conn, p_sys->port, r->atom,
+                                      fmt.i_height > 576);
+        free(r);
+    }
+
     /* Create cursor */
     p_sys->cursor = XCB_cursor_Create (conn, screen);
 
