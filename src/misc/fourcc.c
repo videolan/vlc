@@ -1606,6 +1606,9 @@ const char *vlc_fourcc_GetDescription( int i_cat, vlc_fourcc_t i_fourcc )
 #define VLC_CODEC_YUV_PLANAR_422 \
     VLC_CODEC_I422, VLC_CODEC_J422
 
+#define VLC_CODEC_YUV_SEMIPLANAR_422 \
+    VLC_CODEC_NV16, VLC_CODEC_NV61
+
 #define VLC_CODEC_YUV_PLANAR_422_16 \
     VLC_CODEC_I422_10L, VLC_CODEC_I422_10B, VLC_CODEC_I422_9L, VLC_CODEC_I422_9B
 
@@ -1786,6 +1789,7 @@ static const vlc_fourcc_t p_list_YUV[] = {
     VLC_CODEC_YUV_PLANAR_420,
     VLC_CODEC_YUV_SEMIPLANAR_420,
     VLC_CODEC_YUV_PLANAR_422,
+    VLC_CODEC_YUV_SEMIPLANAR_422,
     VLC_CODEC_YUV_PLANAR_440,
     VLC_CODEC_YUV_PLANAR_444,
     VLC_CODEC_YUV_PACKED,
@@ -1943,6 +1947,7 @@ static const struct
     { { VLC_CODEC_YUV_PLANAR_420, 0 },         PLANAR_8(3, 2, 2) },
     { { VLC_CODEC_NV12, VLC_CODEC_NV21, 0 },   PLANAR_8(2, 1, 2) },
     { { VLC_CODEC_YUV_PLANAR_422, 0 },         PLANAR_8(3, 2, 1) },
+    { { VLC_CODEC_NV16, VLC_CODEC_NV61, 0 },   PLANAR_8(2, 1, 1) },
     { { VLC_CODEC_YUV_PLANAR_440, 0 },         PLANAR_8(3, 1, 2) },
     { { VLC_CODEC_YUV_PLANAR_444, 0 },         PLANAR_8(3, 1, 1) },
     { { VLC_CODEC_YUVA, 0 },                   PLANAR_8(4, 1, 1) },
