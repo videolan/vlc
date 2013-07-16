@@ -1807,6 +1807,7 @@ static const vlc_fourcc_t p_list_YUV[] = {
     VLC_CODEC_YUV_PLANAR_444_16,
     VLC_CODEC_VDPAU_VIDEO_420,
     VLC_CODEC_VDPAU_VIDEO_422,
+    VLC_CODEC_VDPAU_VIDEO_444,
     0,
 };
 
@@ -1991,6 +1992,7 @@ static const struct
     { { VLC_CODEC_XYZ12,  0 },                 PACKED_FMT(6, 48) },
 
     { { VLC_CODEC_VDPAU_VIDEO_420, VLC_CODEC_VDPAU_VIDEO_422,
+        VLC_CODEC_VDPAU_VIDEO_444,
         VLC_CODEC_VDPAU_OUTPUT, 0 },           FAKE_FMT() },
 
     { {0}, { 0, {}, 0, 0 } }

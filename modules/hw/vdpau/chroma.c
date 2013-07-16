@@ -441,6 +441,7 @@ static picture_t *VideoPassthrough(filter_t *filter, picture_t *src)
         {
              case VDP_CHROMA_TYPE_420: fmt.i_chroma = VLC_CODEC_NV12; break;
              case VDP_CHROMA_TYPE_422: fmt.i_chroma = VLC_CODEC_UYVY; break;
+             case VDP_CHROMA_TYPE_444: fmt.i_chroma = VLC_CODEC_NV24; break;
              default: assert(0);
         }
 
@@ -599,6 +600,13 @@ static int OutputOpen(vlc_object_t *obj)
     sys->vdp = NULL;
     sys->mixer = VDP_INVALID_HANDLE;
 
+    if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_444)
+    {
+        sys->chroma = VDP_CHROMA_TYPE_444;
+        sys->format = VDP_YCBCR_FORMAT_NV12;
+        sys->import = VideoPassthrough;
+    }
+    else
     if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_422)
     {
         sys->chroma = VDP_CHROMA_TYPE_422;
@@ -676,7 +684,8 @@ static int YCbCrOpen(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
     if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
-     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_422)
+     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
+     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
         return VLC_EGENERIC;
 
     if (filter->fmt_in.video.i_visible_width

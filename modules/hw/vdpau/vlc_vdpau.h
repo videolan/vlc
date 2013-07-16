@@ -241,6 +241,14 @@ bool vlc_fourcc_to_vdp_ycc(vlc_fourcc_t fourcc,
             *type = VDP_CHROMA_TYPE_422;
             *format = VDP_YCBCR_FORMAT_UYVY;
             break;
+        case VLC_CODEC_I444:
+            *type = VDP_CHROMA_TYPE_444;
+            *format = VDP_YCBCR_FORMAT_YV12;
+            break;
+        case VLC_CODEC_NV24:
+            *type = VDP_CHROMA_TYPE_444;
+            *format = VDP_YCBCR_FORMAT_NV12;
+            break;
         default:
             return false;
     }
