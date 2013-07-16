@@ -436,8 +436,12 @@ static picture_t *VideoPassthrough(filter_t *filter, picture_t *src)
     if (psys->vdp != sys->vdp)
     {
         video_format_t fmt = src->format;
-        fmt.i_chroma = (sys->chroma == VDP_CHROMA_TYPE_420)
-            ? VLC_CODEC_UYVY : VLC_CODEC_NV12;
+        switch (sys->chroma)
+        {
+             case VDP_CHROMA_TYPE_420: fmt.i_chroma = VLC_CODEC_NV12; break;
+             case VDP_CHROMA_TYPE_422: fmt.i_chroma = VLC_CODEC_UYVY; break;
+             default: assert(0);
+        }
 
         picture_t *pic = picture_NewFromFormat(&fmt);
         if (unlikely(pic == NULL))
