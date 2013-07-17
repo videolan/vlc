@@ -768,7 +768,7 @@ QMenu *VLCMenuBar::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu, bool b_
 QMenu *VLCMenuBar::HelpMenu( QWidget *parent )
 {
     QMenu *menu = new QMenu( parent );
-    addDPStaticEntry( menu, qtr( "&Help..." ) ,
+    addDPStaticEntry( menu, qtr( "&Help" ) ,
         ":/menu/help", SLOT( helpDialog() ), "F1" );
 #ifdef UPDATE_CHECK
     addDPStaticEntry( menu, qtr( "Check for &Updates..." ) , "",
