@@ -935,7 +935,7 @@ static int Seek( access_t *p_access, uint64_t i_pos )
 
     if( p_access->info.i_size
      && i_pos >= p_access->info.i_size ) {
-        msg_Err( p_access, "seek to far" );
+        msg_Err( p_access, "seek too far" );
         int retval = Seek( p_access, p_access->info.i_size - 1 );
         if( retval == VLC_SUCCESS ) {
             uint8_t p_buffer[2];
