@@ -351,12 +351,14 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
          i_codec_id == AV_CODEC_ID_H264 ||
          i_codec_id == AV_CODEC_ID_VC1 || i_codec_id == AV_CODEC_ID_WMV3) )
     {
-#if defined(HAVE_AVCODEC_MT) //&& LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55, 1, 0)
+#if defined(HAVE_AVCODEC_MT)
+# if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55, 1, 0))
         if( p_sys->p_context->thread_type & FF_THREAD_FRAME )
         {
             msg_Warn( p_dec, "threaded frame decoding is not compatible with avcodec-hw, disabled" );
             p_sys->p_context->thread_type &= ~FF_THREAD_FRAME;
         }
+# endif
         if( ( p_sys->p_context->thread_type & FF_THREAD_SLICE ) &&
             ( i_codec_id == AV_CODEC_ID_MPEG1VIDEO || i_codec_id == AV_CODEC_ID_MPEG2VIDEO ) )
         {
