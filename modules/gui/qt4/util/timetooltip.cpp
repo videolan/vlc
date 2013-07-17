@@ -31,7 +31,7 @@
 #define TIP_HEIGHT 5
 
 TimeTooltip::TimeTooltip( QWidget *parent ) :
-    QWidget( parent ), mInitialized( false )
+    QWidget( parent )
 {
     setWindowFlags( Qt::Window                  |
                     Qt::WindowStaysOnTopHint    |
@@ -132,7 +132,6 @@ void TimeTooltip::buildPath()
 
 void TimeTooltip::setTip( const QPoint& target, const QString& time, const QString& text )
 {
-    mInitialized = true;
     mDisplayedText = time;
     if ( !text.isEmpty() )
         mDisplayedText.append( " - " ).append( text );
@@ -146,18 +145,13 @@ void TimeTooltip::setTip( const QPoint& target, const QString& time, const QStri
     }
 
     update();
+    raise();
 }
 
 void TimeTooltip::show()
 {
     setVisible( true );
-#ifdef Q_OS_OS2
-    // Bring a tooltip on the top
-    // Without this, tooltip does not appear on fullscreen
-    // from the second fullscreen state change
-    if( mInitialized )
-        QWidget::raise();
-#endif
+    raise();
 }
 
 void TimeTooltip::paintEvent( QPaintEvent * )
