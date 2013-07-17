@@ -53,10 +53,19 @@ TimeTooltip::TimeTooltip( QWidget *parent ) :
     // Inherit from the system default font size -5
     mFont = QFont( "Verdana", qMax( qApp->font().pointSize() - 5, 7 ) );
     mTipX = -1;
+
+    // By default the widget is unintialized and should not be displayed
+    resize( 0, 0 );
 }
 
 void TimeTooltip::adjustPosition()
 {
+    if( mDisplayedText.isEmpty() )
+    {
+        resize( 0, 0 );
+        return;
+    }
+
     // Get the bounding box required to print the text and add some padding
     QFontMetrics metrics( mFont );
     QRect textbox = metrics.boundingRect( mDisplayedText );
@@ -141,7 +150,7 @@ void TimeTooltip::setTip( const QPoint& target, const QString& time, const QStri
 
 void TimeTooltip::show()
 {
-    QWidget::setVisible( mInitialized );
+    setVisible( true );
 #ifdef Q_OS_OS2
     // Bring a tooltip on the top
     // Without this, tooltip does not appear on fullscreen
