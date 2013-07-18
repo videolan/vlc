@@ -51,7 +51,7 @@ static void Delete( vlc_va_t * );
 
 vlc_module_begin ()
     set_description( N_("Video Acceleration (VA) API") )
-    set_capability( "hw decoder", 50 )
+    set_capability( "hw decoder", 0 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_callbacks( Create, Delete )
