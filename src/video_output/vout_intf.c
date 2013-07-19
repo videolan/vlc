@@ -501,7 +501,10 @@ void vout_EnableFilter( vout_thread_t *p_vout, const char *psz_name,
             free( psz_parser );
         }
         else
+        {
+            free( psz_string );
             return;
+        }
     }
     else
     {
