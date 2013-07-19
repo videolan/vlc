@@ -176,7 +176,7 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
                 break;
             }
             /* Inheritance. Ugly!! */
-            submodule->pp_shortcuts = xmalloc (sizeof (char **));
+            submodule->pp_shortcuts = xmalloc (sizeof ( *submodule->pp_shortcuts ));
             submodule->pp_shortcuts[0] = strdup_null (module->pp_shortcuts[0]);
             submodule->i_shortcuts = 1; /* object name */
 
@@ -251,7 +251,7 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
             const char *value = va_arg (ap, const char *);
 
             assert (module->i_shortcuts == 0);
-            module->pp_shortcuts = malloc( sizeof( char ** ) );
+            module->pp_shortcuts = malloc( sizeof( *module->pp_shortcuts ) );
             module->pp_shortcuts[0] = strdup (value);
             module->i_shortcuts = 1;
 
