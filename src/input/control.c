@@ -403,7 +403,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 return VLC_EGENERIC;
             }
             *pi_attachment = p_input->p->i_attachment;
-            *ppp_attachment = malloc( sizeof(input_attachment_t**) * p_input->p->i_attachment );
+            *ppp_attachment = malloc( sizeof(input_attachment_t*) * p_input->p->i_attachment );
             for( i = 0; i < p_input->p->i_attachment; i++ )
                 (*ppp_attachment)[i] = vlc_input_attachment_Duplicate( p_input->p->attachment[i] );
 
