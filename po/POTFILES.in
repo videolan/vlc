@@ -349,6 +349,7 @@ modules/codec/avcodec/chroma.c
 modules/codec/avcodec/dxva2.c
 modules/codec/avcodec/encoder.c
 modules/codec/avcodec/fourcc.c
+modules/codec/avcodec/hwdummy.c
 modules/codec/avcodec/vaapi.c
 modules/codec/avcodec/vda.c
 modules/codec/avcodec/video.c
