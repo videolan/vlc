@@ -96,7 +96,20 @@ function main()
         elseif( string.find( line, "urlIPhone = \"" ) ) then
             _, _, path = string.find( line, "\"([^\"]+)\"" )
             iphone_base = path
-        elseif( string.find( line, "var streamNames = new Array" ) ) then
+        end
+        line = fd:readline()
+    end
+
+    -- fetch the streams JS file
+    fd, msg = vlc.stream( "http://www.assemblee-nationale.tv/ahp/scripts/streams.js" )
+    if not fd then
+        vlc.msg.warn(msg)
+        return nil
+    end
+
+    line = fd:readline()
+    while line ~= nil do
+        if( string.find( line, "var streamNames = new Array" ) ) then
             _, _, str = string.find( line, "Array%( (.*)%);" )
             repeat
                 _, len, s = string.find( str, "\"([^\"]+)\"" )
