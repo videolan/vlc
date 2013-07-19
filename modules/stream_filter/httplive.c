@@ -1834,7 +1834,10 @@ static ssize_t read_M3U8_from_stream(stream_t *s, uint8_t **buffer)
         if (bytes == 0)
             break;      /* EOF ? */
         else if (bytes < 0)
+        {
+            free (p);
             return bytes;
+        }
 
         if ( (total_bytes + bytes + 1) > total_allocated )
         {
