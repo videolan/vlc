@@ -1492,7 +1492,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             int *pi_int = va_arg( args, int * );
 
             *pi_int     = p_sys->i_attachment;
-            *ppp_attach = calloc( p_sys->i_attachment, sizeof(*ppp_attach));
+            *ppp_attach = calloc( p_sys->i_attachment, sizeof(**ppp_attach));
             for( unsigned i = 0; i < p_sys->i_attachment && *ppp_attach; i++ )
                 (*ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachment[i] );
             return VLC_SUCCESS;
