@@ -2846,7 +2846,7 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
     int i;
 
     attachment = xrealloc( attachment,
-                    sizeof(input_attachment_t**) * ( i_attachment + i_new ) );
+                    sizeof(*attachment) * ( i_attachment + i_new ) );
     for( i = 0; i < i_new; i++ )
         attachment[i_attachment++] = pp_new[i];
     free( pp_new );
