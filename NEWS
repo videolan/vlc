@@ -1,6 +1,13 @@
 Changes between 2.1.x and 2.2.0-git:
 --------------------------------
 
+Video Output:
+ * Direct rendering and filtering for VDPAU hardware acceleration
+
+Removed modules:
+ * ios video output: use ios2
+
+
 Changes between 2.0.x and 2.1.0:
 --------------------------------
 

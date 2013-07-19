@@ -377,7 +377,6 @@ $Id$
  * volume_neon: audio volume optimized for ARM NEON
  * vorbis: a vorbis audio decoder/packetizer using the libvorbis library
  * vout_ios2: iOS video provider using OpenGL ES 2
- * vout_ios: iOS video output
  * vout_macosx: Mac OS X OpenGL provider
  * vout_sdl: video output module using the SDL library
  * vsxu: audio visualization using Vovoid VSXu
