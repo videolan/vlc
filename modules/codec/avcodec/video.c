@@ -1175,9 +1175,8 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     msg_Err( p_dec, "acceleration not available" );
     vlc_va_Delete( p_va );
 
-    p_sys->p_va = NULL;
-
 end:
     /* Fallback to default behaviour */
+    p_sys->p_va = NULL;
     return avcodec_default_get_format( p_context, pi_fmt );
 }
