@@ -492,6 +492,7 @@ char *str_format_time( const char *tformat )
             char *ret = realloc (str, len + 1);
             return ret ? ret : str; /* <- this cannot fail */
         }
+        free (str);
     }
     assert (0);
 }
