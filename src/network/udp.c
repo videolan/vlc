@@ -560,11 +560,8 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
 #endif
             b_unreach = true;
         else
-        {
             msg_Warn( p_this, "%s port %d : %m", psz_host, i_port);
-            net_Close( fd );
-            continue;
-        }
+        net_Close( fd );
     }
 
     freeaddrinfo( res );
