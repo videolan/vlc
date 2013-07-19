@@ -318,6 +318,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     /* Always use our get_buffer wrapper so we can calculate the
      * PTS correctly */
+    p_sys->p_context->get_format = ffmpeg_GetFormat;
     p_sys->p_context->get_buffer = ffmpeg_GetFrameBuf;
     p_sys->p_context->reget_buffer = avcodec_default_reget_buffer;
     p_sys->p_context->release_buffer = ffmpeg_ReleaseFrameBuf;
@@ -337,43 +338,29 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     i_thread_count = __MIN( i_thread_count, 16 );
     msg_Dbg( p_dec, "allowing %d thread(s) for decoding", i_thread_count );
     p_sys->p_context->thread_count = i_thread_count;
-
-    if( i_codec_id == AV_CODEC_ID_MPEG4 )
-        p_sys->p_context->thread_count = 1;
-
     p_sys->p_context->thread_safe_callbacks = true;
-#endif
 
-    char *hw = var_CreateGetString( p_dec, "avcodec-hw" ); /* FIXME */
-    if( (hw == NULL || strcasecmp( hw, "none" )) &&
-        (i_codec_id == AV_CODEC_ID_MPEG1VIDEO || i_codec_id == AV_CODEC_ID_MPEG2VIDEO ||
-         i_codec_id == AV_CODEC_ID_MPEG4 || i_codec_id == AV_CODEC_ID_H263 ||
-         i_codec_id == AV_CODEC_ID_H264 ||
-         i_codec_id == AV_CODEC_ID_VC1 || i_codec_id == AV_CODEC_ID_WMV3) )
+    switch( i_codec_id )
     {
-#if defined(HAVE_AVCODEC_MT)
-# if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55, 1, 0))
-        if( p_sys->p_context->thread_type & FF_THREAD_FRAME )
-        {
-            msg_Warn( p_dec, "threaded frame decoding is not compatible with avcodec-hw, disabled" );
-            p_sys->p_context->thread_type &= ~FF_THREAD_FRAME;
-        }
-# endif
-        if( ( p_sys->p_context->thread_type & FF_THREAD_SLICE ) &&
-            ( i_codec_id == AV_CODEC_ID_MPEG1VIDEO || i_codec_id == AV_CODEC_ID_MPEG2VIDEO ) )
-        {
-            msg_Warn( p_dec, "threaded slice decoding is not compatible with avcodec-hw, disabled" );
+        case AV_CODEC_ID_MPEG4:
+        case AV_CODEC_ID_H263:
+            p_sys->p_context->thread_type = 0;
+            break;
+        case AV_CODEC_ID_MPEG1VIDEO:
+        case AV_CODEC_ID_MPEG2VIDEO:
             p_sys->p_context->thread_type &= ~FF_THREAD_SLICE;
-        }
-#endif
-        p_sys->p_context->get_format = ffmpeg_GetFormat;
+            /* fall through */
+# if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55, 1, 0))
+        case AV_CODEC_ID_H264:
+        case AV_CODEC_ID_VC1:
+        case AV_CODEC_ID_WMV3:
+            p_sys->p_context->thread_type &= ~FF_THREAD_FRAME;
+# endif
     }
-    free( hw );
-#ifdef HAVE_AVCODEC_MT
+
     if( p_sys->p_context->thread_type & FF_THREAD_FRAME )
         p_dec->i_extra_picture_buffers = 2 * p_sys->p_context->thread_count;
 #endif
-
 
     /* ***** misc init ***** */
     p_sys->i_pts = VLC_TS_INVALID;
