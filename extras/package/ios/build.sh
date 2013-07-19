@@ -203,6 +203,7 @@ fi
     --disable-samplerate \
     --disable-goom \
     --disable-gcrypt \
+    --disable-vncserver \
     --disable-gnutls \
     --disable-orc \
     --disable-schroedinger \
