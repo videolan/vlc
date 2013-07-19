@@ -1128,6 +1128,28 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     if( p_va != NULL )
         vlc_va_Delete( p_va );
 
+    /* Enumerate available formats */
+    bool can_hwaccel = false;
+    for( size_t i = 0; pi_fmt[i] != PIX_FMT_NONE; i++ )
+    {
+#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(51, 44, 0)
+        const AVPixFmtDescriptor *dsc = av_pix_fmt_desc_get(pi_fmt[i]);
+        if (dsc == NULL)
+            continue;
+#else
+        const AVPixFmtDescriptor *dsc = &av_pix_fmt_descriptors[pi_fmt[i]];
+#endif
+        bool hwaccel = (dsc->flags & AV_PIX_FMT_FLAG_HWACCEL) != 0;
+
+        msg_Dbg( p_dec, "available %sware decoder output format %d (%s)",
+                 hwaccel ? "hard" : "soft", pi_fmt[i], dsc->name );
+        if (hwaccel)
+            can_hwaccel = true;
+    }
+
+    if (!can_hwaccel)
+        goto end;
+
     /* Profile and level informations are needed now.
      * TODO: avoid code duplication with avcodec.c */
     if( p_context->profile != FF_PROFILE_UNKNOWN)
@@ -1139,12 +1161,8 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     if( p_va == NULL )
         goto end;
 
-    /* Try too look for a supported hw acceleration */
     for( size_t i = 0; pi_fmt[i] != PIX_FMT_NONE; i++ )
     {
-        const char *name = av_get_pix_fmt_name(pi_fmt[i]);
-        msg_Dbg( p_dec, "Available decoder output format %d (%s)",
-                 pi_fmt[i], name ? name : "unknown" );
         if( p_va->pix_fmt != pi_fmt[i] )
             continue;
 
@@ -1172,7 +1190,6 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         return pi_fmt[i];
     }
 
-    msg_Err( p_dec, "acceleration not available" );
     vlc_va_Delete( p_va );
 
 end:
