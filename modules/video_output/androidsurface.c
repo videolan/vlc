@@ -222,7 +222,7 @@ static int Open(vlc_object_t *p_this)
     msg_Dbg(vd, "Pixel format %4.4s", (char*)&fmt.i_chroma);
 
     /* Create the associated picture */
-    picture_sys_t picsys = malloc(sizeof(*picsys));
+    picture_sys_t *picsys = malloc(sizeof(*picsys));
     if (unlikely(picsys == NULL))
         goto enomem;
     picsys->sys = sys;
