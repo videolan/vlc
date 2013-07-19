@@ -117,8 +117,13 @@ int puzzle_bake_pieces_shapes( filter_t *p_filter)
         point_t *ps_neg_pts_H =   puzzle_curve_H_2_negative(7, ps_scale_pts_H);
         point_t *ps_neg_pts_V =   puzzle_curve_V_2_negative(7, ps_scale_pts_V);
 
-        if (!ps_scale_pts_H || !ps_scale_pts_V || !ps_neg_pts_H || !ps_neg_pts_V)
+        if (!ps_scale_pts_H || !ps_scale_pts_V || !ps_neg_pts_H || !ps_neg_pts_V) {
+            free(ps_scale_pts_H);
+            free(ps_scale_pts_V);
+            free(ps_neg_pts_H);
+            free(ps_neg_pts_V);
             return VLC_EGENERIC;
+        }
 
         int i_ret;
         for (uint8_t i_plane = 0; i_plane < p_filter->p_sys->s_allocated.i_planes; i_plane++) {
