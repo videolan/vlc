@@ -358,7 +358,7 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
             else
             {
                 submodule->pp_shortcuts =
-                           xmalloc (sizeof (char **) * submodule->i_shortcuts);
+                           xmalloc (sizeof (*submodule->pp_shortcuts) * submodule->i_shortcuts);
                 for (unsigned j = 0; j < submodule->i_shortcuts; j++)
                     LOAD_STRING(submodule->pp_shortcuts[j]);
             }
