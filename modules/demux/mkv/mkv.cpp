@@ -354,7 +354,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 int *pi_int    = (int*)va_arg( args, int* );
 
                 *pi_int = p_sys->titles.size();
-                *ppp_title = (input_title_t**)malloc( sizeof( input_title_t**) * p_sys->titles.size() );
+                *ppp_title = (input_title_t**)malloc( sizeof( input_title_t* ) * p_sys->titles.size() );
 
                 for( size_t i = 0; i < p_sys->titles.size(); i++ )
                     (*ppp_title)[i] = vlc_input_title_Duplicate( p_sys->titles[i] );
