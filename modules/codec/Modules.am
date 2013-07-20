@@ -100,7 +100,7 @@ libavcodec_plugin_la_SOURCES = \
 	avcodec/cpu.c \
 	avcodec/fourcc.c \
 	avcodec/chroma.c avcodec/chroma.h \
-	avcodec/va.h \
+	avcodec/va.c avcodec/va.h \
 	avcodec/avcodec.c avcodec/avcodec.h
 if ENABLE_SOUT
 libavcodec_plugin_la_SOURCES += \

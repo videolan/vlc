@@ -33,7 +33,6 @@
 #include <vlc_codec.h>
 #include <vlc_avcodec.h>
 #include <vlc_cpu.h>
-#include <vlc_modules.h>
 #include <assert.h>
 
 #include <libavcodec/avcodec.h>
@@ -107,7 +106,6 @@ static int  ffmpeg_GetFrameBuf    ( struct AVCodecContext *, AVFrame * );
 static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame * );
 static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *,
                                           const enum PixelFormat * );
-static void vlc_va_Delete( vlc_va_t * );
 
 static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
 {
@@ -1061,48 +1059,6 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
 
     for( int i = 0; i < 4; i++ )
         p_ff_pic->data[i] = NULL;
-}
-
-static int ffmpeg_va_Start( void *func, va_list ap )
-{
-    vlc_va_t *va = va_arg( ap, vlc_va_t * );
-    int codec = va_arg( ap, int );
-    const es_format_t *fmt = va_arg( ap, const es_format_t * );
-    int (*open)( vlc_va_t *, int, const es_format_t * ) = func;
-
-    return open( va, codec, fmt );
-}
-
-static vlc_va_t *vlc_va_New( vlc_object_t *parent, int codec_id,
-                             const es_format_t *fmt )
-{
-    vlc_va_t *p_va = vlc_object_create( parent, sizeof( *p_va ) );
-    if( unlikely(p_va == NULL) )
-        return NULL;
-
-    p_va->module = vlc_module_load( p_va, "hw decoder", "$avcodec-hw",
-                                    true, ffmpeg_va_Start, p_va,
-                                    codec_id, fmt );
-    if( p_va->module == NULL )
-    {
-        vlc_object_release( p_va );
-        p_va = NULL;
-    }
-    return p_va;
-}
-
-static void ffmpeg_va_Stop( void *func, va_list ap )
-{
-    vlc_va_t *va = va_arg( ap, vlc_va_t * );
-    void (*close)( vlc_va_t * ) = func;
-
-    close( va );
-}
-
-static void vlc_va_Delete( vlc_va_t *va )
-{
-    vlc_module_unload( va->module, ffmpeg_va_Stop, va );
-    vlc_object_release( va );
 }
 
 static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
