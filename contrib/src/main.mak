@@ -123,6 +123,8 @@ endif
 
 endif
 
+CCAS=$(CC)
+
 ifdef HAVE_IOS
 CC=xcrun clang
 CXX=xcrun clang++
@@ -131,6 +133,7 @@ AS=perl $(abspath ../../extras/tools/build/bin/gas-preprocessor.pl) $(CC)
 else
 AS=xcrun as
 endif
+CCAS=gas-preprocessor.pl $(CC)
 AR=xcrun ar
 LD=xcrun ld
 STRIP=xcrun strip
@@ -249,7 +252,7 @@ endif
 
 HOSTTOOLS := \
 	CC="$(CC)" CXX="$(CXX)" LD="$(LD)" \
-	AR="$(AR)" RANLIB="$(RANLIB)" STRIP="$(STRIP)" \
+	AR="$(AR)" CCAS="$(CCAS)" RANLIB="$(RANLIB)" STRIP="$(STRIP)" \
 	PATH="$(PREFIX)/bin:$(PATH)"
 HOSTVARS := $(HOSTTOOLS) \
 	CPPFLAGS="$(CPPFLAGS)" \
