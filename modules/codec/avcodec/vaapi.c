@@ -80,6 +80,7 @@ struct vlc_va_sys_t
     int i_version_minor;
 
     /* */
+    vlc_mutex_t  lock;
     int          i_surface_count;
     unsigned int i_surface_order;
     int          i_surface_width;
@@ -207,6 +208,8 @@ static int Open( vlc_va_t *va, int i_codec_id )
 
     sys->b_supports_derive = false;
 
+    vlc_mutex_init(&sys->lock);
+
     if( asprintf( &va->description, "VA API version %d.%d",
                   sys->i_version_major, sys->i_version_minor ) < 0 )
         va->description = NULL;
@@ -215,6 +218,7 @@ static int Open( vlc_va_t *va, int i_codec_id )
     return VLC_SUCCESS;
 
 error:
+#warning Leaks!
     return VLC_EGENERIC;
 }
 
@@ -248,7 +252,9 @@ static void DestroySurfaces( vlc_va_sys_t *sys )
     sys->p_surface = NULL;
     sys->i_surface_width = 0;
     sys->i_surface_height = 0;
+    vlc_mutex_destroy(&sys->lock);
 }
+
 static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
                            int i_width, int i_height )
 {
@@ -469,12 +475,14 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, AVFrame *p_ff )
 
     return VLC_SUCCESS;
 }
+
 static int Get( vlc_va_t *va, AVFrame *p_ff )
 {
     vlc_va_sys_t *sys = va->sys;
     int i_old;
     int i;
 
+    vlc_mutex_lock( &sys->lock );
     /* Grab an unused surface, in case none are, try the oldest
      * XXX using the oldest is a workaround in case a problem happens with ffmpeg */
     for( i = 0, i_old = 0; i < sys->i_surface_count; i++ )
@@ -489,6 +497,7 @@ static int Get( vlc_va_t *va, AVFrame *p_ff )
     }
     if( i >= sys->i_surface_count )
         i = i_old;
+    vlc_mutex_unlock( &sys->lock );
 
     vlc_va_surface_t *p_surface = &sys->p_surface[i];
 
@@ -506,12 +515,14 @@ static int Get( vlc_va_t *va, AVFrame *p_ff )
     }
     return VLC_SUCCESS;
 }
+
 static void Release( vlc_va_t *va, AVFrame *p_ff )
 {
     vlc_va_sys_t *sys = va->sys;
 
     VASurfaceID i_surface_id = (VASurfaceID)(uintptr_t)p_ff->data[3];
 
+    vlc_mutex_lock( &sys->lock );
     for( int i = 0; i < sys->i_surface_count; i++ )
     {
         vlc_va_surface_t *p_surface = &sys->p_surface[i];
@@ -519,6 +530,7 @@ static void Release( vlc_va_t *va, AVFrame *p_ff )
         if( p_surface->i_id == i_surface_id )
             p_surface->i_refcount--;
     }
+    vlc_mutex_unlock( &sys->lock );
 }
 
 static void Close( vlc_va_sys_t *sys )
