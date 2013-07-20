@@ -318,7 +318,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         /* Duplicate title infos */
         *pi_int = p_sys->i_title;
-        *ppp_title = calloc( p_sys->i_title, sizeof(input_title_t **) );
+        *ppp_title = calloc( p_sys->i_title, sizeof(input_title_t *) );
         for( int i = 0; i < p_sys->i_title; i++ )
             (*ppp_title)[i] = vlc_input_title_Duplicate( p_sys->pp_title[i] );
 
