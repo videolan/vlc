@@ -256,135 +256,91 @@ ssize_t
 net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
           void *restrict p_buf, size_t i_buflen, bool waitall)
 {
+    struct pollfd ufd[2];
+
+    ufd[0].fd = fd;
+    ufd[0].events = POLLIN;
+    ufd[1].fd = vlc_object_waitpipe (p_this);
+    ufd[1].events = POLLIN;
+
     size_t i_total = 0;
-    struct pollfd ufd[2] = {
-        { .fd = fd,                           .events = POLLIN },
-        { .fd = vlc_object_waitpipe (p_this), .events = POLLIN },
-    };
-
-    if (ufd[1].fd == -1)
-        return -1; /* vlc_object_waitpipe() sets errno */
-
-    while (i_buflen > 0)
+    do
     {
-        if (poll (ufd, sizeof (ufd) / sizeof (ufd[0]), -1) < 0)
-        {
-            if (errno != EINTR)
-                goto error;
-            continue;
-        }
-
-        if (i_total > 0)
-        {
-            /* Errors (-1) and EOF (0) will be returned on next call,
-             * otherwise we'd "hide" the error from the caller, which is a
-             * bad idea™. */
-            if (ufd[0].revents & (POLLERR|POLLNVAL))
-                break;
-            if (ufd[1].revents)
-                break;
-        }
-        else
-        {
-            if (ufd[1].revents)
-            {
-                msg_Dbg (p_this, "socket %d polling interrupted", fd);
-#if defined(_WIN32)
-                WSASetLastError (WSAEINTR);
-#else
-                errno = EINTR;
-#endif
-                goto silent;
-            }
-        }
-
-        assert (ufd[0].revents);
-
         ssize_t n;
-#if defined(_WIN32)
-        int error;
-#endif
         if (vs != NULL)
         {
             int canc = vlc_savecancel ();
             n = vs->pf_recv (vs->p_sys, p_buf, i_buflen);
-#if defined(_WIN32)
-            /* We must read last error immediately, because vlc_restorecancel()
-             * access thread local storage, and TlsGetValue() will call
-             * SetLastError() to indicate that the function succeeded, thus
-             * overwriting the error code coming from pf_recv().
-             * WSAGetLastError is just an alias for GetLastError these days.
-             */
-            error = WSAGetLastError();
-#endif
             vlc_restorecancel (canc);
         }
         else
         {
 #ifdef _WIN32
             n = recv (fd, p_buf, i_buflen, 0);
-            error = WSAGetLastError();
 #else
             n = read (fd, p_buf, i_buflen);
 #endif
         }
 
-        if (n == -1)
+        if (n < 0)
         {
-#if defined(_WIN32)
-            switch (error)
-            {
-                case WSAEWOULDBLOCK:
-                case WSAEINTR:
-                /* only happens with vs != NULL (TLS) - not really an error */
-                    continue;
-
-                case WSAEMSGSIZE:
-                /* For UDP only */
-                /* On Win32, recv() fails if the datagram doesn't fit inside
-                 * the passed buffer, even though the buffer will be filled
-                 * with the first part of the datagram. */
-                    msg_Err (p_this, "Receive error: "
-                                     "Increase the mtu size (--mtu option)");
-                    n = i_buflen;
-                    break;
-            }
-#else
-            switch (errno)
+            switch (net_errno)
             {
                 case EAGAIN: /* spurious wakeup or no TLS data */
 #if (EAGAIN != EWOULDBLOCK)
                 case EWOULDBLOCK:
 #endif
                 case EINTR:  /* asynchronous signal */
-                    continue;
-            }
+                    break;
+#ifdef _WIN32
+                case WSAEMSGSIZE: /* datagram too big */
+                    n = i_buflen;
+                    break;
 #endif
-            goto error;
+                default:
+                    goto error;
+            }
+        }
+        else
+        if (n > 0)
+        {
+            i_total += n;
+            p_buf = (char *)p_buf + n;
+            i_buflen -= n;
+
+            if (!waitall)
+                break;
+        }
+        else
+            break;/* end of stream or empty packet */
+
+        /* Wait for more data */
+        if (ufd[1].fd == -1)
+        {
+            errno = EINTR;
+            return -1;
+        }
+        while (poll (ufd, sizeof (ufd) / sizeof (ufd[0]), -1) < 0)
+            if (errno != EINTR)
+                goto error;
+
+        if (ufd[1].revents)
+        {
+            msg_Dbg (p_this, "socket %d polling interrupted", fd);
+#if defined(_WIN32)
+            WSASetLastError (WSAEINTR);
+#endif
+            errno = EINTR;
+            return -1;
         }
 
-        if (n == 0)
-            /* For streams, this means end of file, and there will not be any
-             * further data ever on the stream. For datagram sockets, this
-             * means empty datagram, and there could be more data coming.
-             * However, it makes no sense to set <waitall> with datagrams in the
-             * first place.
-             */
-            break; // EOF
-
-        i_total += n;
-        p_buf = (char *)p_buf + n;
-        i_buflen -= n;
-
-        if (!waitall)
-            break;
+        assert (ufd[0].revents);
     }
+    while (i_buflen > 0);
 
     return i_total;
-
 error:
-    msg_Err (p_this, "Read error: %m");
-silent:
+    msg_Err (p_this, "read error: %m");
     return -1;
 }
 
