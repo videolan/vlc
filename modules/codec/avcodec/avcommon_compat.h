@@ -499,6 +499,10 @@ enum {
 #   define AV_PIX_FMT_FLAG_HWACCEL  PIX_FMT_HWACCEL
 #endif
 
+#if !LIBAVUTIL_VERSION_CHECK( 51, 44, 0, 76, 100 )
+#   define av_pix_fmt_desc_get(a) &av_pix_fmt_descriptors[a]
+#endif
+
 #endif /* HAVE_LIBAVUTIL_AVUTIL_H */
 
 #endif

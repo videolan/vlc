@@ -1075,13 +1075,9 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     bool can_hwaccel = false;
     for( size_t i = 0; pi_fmt[i] != PIX_FMT_NONE; i++ )
     {
-#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(51, 44, 0)
         const AVPixFmtDescriptor *dsc = av_pix_fmt_desc_get(pi_fmt[i]);
         if (dsc == NULL)
             continue;
-#else
-        const AVPixFmtDescriptor *dsc = &av_pix_fmt_descriptors[pi_fmt[i]];
-#endif
         bool hwaccel = (dsc->flags & AV_PIX_FMT_FLAG_HWACCEL) != 0;
 
         msg_Dbg( p_dec, "available %sware decoder output format %d (%s)",
