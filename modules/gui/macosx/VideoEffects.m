@@ -763,34 +763,35 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     NSString *tempString = [NSString stringWithFormat:@"%s", vlc_b64_decode([[items objectAtIndex:0] UTF8String])];
     NSArray *tempArray;
     NSUInteger count;
+
     /* enable the new filters */
+    config_PutPsz(p_intf, "video-filter", "");
     if ([tempString length] > 0) {
         tempArray = [tempString componentsSeparatedByString:@":"];
         count = [tempArray count];
         for (NSUInteger x = 0; x < count; x++)
             [self setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
     }
-    config_PutPsz(p_intf, "video-filter", [tempString UTF8String]);
 
     tempString = [NSString stringWithFormat:@"%s", vlc_b64_decode([[items objectAtIndex:1] UTF8String])];
     /* enable another round of new filters */
+    config_PutPsz(p_intf,"sub-source", "");
     if ([tempString length] > 0) {
         tempArray = [tempString componentsSeparatedByString:@":"];
         count = [tempArray count];
         for (NSUInteger x = 0; x < count; x++)
             [self setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
     }
-    config_PutPsz(p_intf,"sub-source", [tempString UTF8String]);
 
     tempString = [NSString stringWithFormat:@"%s", vlc_b64_decode([[items objectAtIndex:2] UTF8String])];
     /* enable another round of new filters */
+    config_PutPsz(p_intf,"video-splitter", "");
     if ([tempString length] > 0) {
         tempArray = [tempString componentsSeparatedByString:@":"];
         count = [tempArray count];
         for (NSUInteger x = 0; x < count; x++)
             [self setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
     }
-    config_PutPsz(p_intf,"video-splitter", [tempString UTF8String]);
 
     /* try to set filter values on-the-fly and store them appropriately */
     [self setVideoFilterProperty:"hue" forFilter:"adjust" integer:[[items objectAtIndex:3] intValue]];
