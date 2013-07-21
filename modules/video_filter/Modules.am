@@ -3,8 +3,6 @@ SOURCES_transform = transform.c
 SOURCES_invert = invert.c
 SOURCES_mirror = mirror.c
 SOURCES_adjust = adjust.c adjust_sat_hue.c adjust_sat_hue.h
-SOURCES_wall = wall.c
-SOURCES_clone = clone.c
 SOURCES_motionblur = motionblur.c
 SOURCES_logo = logo.c
 SOURCES_audiobargraph_v = audiobargraph_v.c
@@ -70,7 +68,6 @@ SOURCES_posterize = posterize.c
 SOURCES_psychedelic = psychedelic.c
 SOURCES_gradient = gradient.c
 SOURCES_ball = ball.c
-SOURCES_panoramix = panoramix.c
 SOURCES_opencv_wrapper = opencv_wrapper.c
 SOURCES_opencv_example = opencv_example.cpp filter_event_info.h
 
@@ -138,7 +135,6 @@ libvlc_LTLIBRARIES += \
 	libblendbench_plugin.la \
 	libbluescreen_plugin.la \
 	libcanvas_plugin.la \
-	libclone_plugin.la \
 	libcolorthres_plugin.la \
 	libcroppadd_plugin.la \
 	liberase_plugin.la \
@@ -165,7 +161,6 @@ libvlc_LTLIBRARIES += \
 	libsharpen_plugin.la \
 	libsubsdelay_plugin.la \
 	libtransform_plugin.la \
-	libwall_plugin.la \
 	libwave_plugin.la \
 	libgradfun_plugin.la \
 	libyuvp_plugin.la \

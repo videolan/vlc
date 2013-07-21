@@ -655,7 +655,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom panoramix rotate noise grain scene kate lua chorus_flanger freetype avcodec access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a audiobargraph_v speex opus mono colorthres extract ball access_imem hotkeys mosaic gaussianblur x26410b hqdn3d anaglyph oldrc ncurses],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom rotate noise grain scene kate lua chorus_flanger freetype avcodec access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a audiobargraph_v speex opus mono colorthres extract ball access_imem hotkeys mosaic gaussianblur x26410b hqdn3d anaglyph oldrc ncurses],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -2991,6 +2991,7 @@ AC_ARG_ENABLE(glx,
 ])
 
 have_xcb="no"
+have_xcb_randr="no"
 AS_IF([test "${enable_xcb}" != "no"], [
   dnl libxcb
   PKG_CHECK_MODULES(XCB, [xcb >= 1.6])
@@ -3005,11 +3006,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
   ])
 
   PKG_CHECK_MODULES(XCB_RANDR, [xcb-randr >= 1.3], [
-    VLC_ADD_PLUGIN([panoramix])
-    VLC_ADD_LIBS([panoramix],[${XCB_RANDR_LIBS} ${XCB_LIBS}])
-    VLC_ADD_CFLAGS([panoramix],[${XCB_RANDR_CFLAGS} ${XCB_CFLAGS}])
-  ], [
-    AC_MSG_WARN([${XCB_RANDR_PKG_ERRORS}. Panoramix filter will not be supported.])
+    have_xcb_randr="yes"
   ])
 
   PKG_CHECK_MODULES(XPROTO, [xproto], [
@@ -3036,6 +3033,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
   ])
 ])
 AM_CONDITIONAL([HAVE_XCB], [test "${have_xcb}" = "yes"])
+AM_CONDITIONAL([HAVE_XCB_RANDR], [test "${have_xcb_randr}" = "yes"])
 
 
 dnl
@@ -3252,11 +3250,6 @@ fi
 dnl
 dnl  Windows DirectX module
 dnl
-
-if test "${SYS}" = "mingw32"
-then
-  VLC_ADD_PLUGIN([panoramix])
-fi
 
 AC_ARG_ENABLE(directx,
   [AS_HELP_STRING([--enable-directx],
@@ -4208,6 +4201,7 @@ AC_CONFIG_FILES([
   modules/video_chroma/Makefile
   modules/video_filter/Makefile
   modules/video_output/Makefile
+  modules/video_splitter/Makefile
   modules/visualization/Makefile
   modules/mmx/Makefile
   modules/sse2/Makefile

@@ -18,6 +18,7 @@ BASE_SUBDIRS = \
 	video_chroma \
 	video_filter \
 	video_output \
+	video_splitter \
 	visualization
 EXTRA_SUBDIRS = \
 	access_output \

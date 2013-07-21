@@ -1080,7 +1080,6 @@ modules/video_filter/blendbench.c
 modules/video_filter/blend.cpp
 modules/video_filter/bluescreen.c
 modules/video_filter/canvas.c
-modules/video_filter/clone.c
 modules/video_filter/colorthres.c
 modules/video_filter/croppadd.c
 modules/video_filter/deinterlace/algo_phosphor.h
@@ -1112,7 +1111,6 @@ modules/video_filter/motionblur.c
 modules/video_filter/motiondetect.c
 modules/video_filter/opencv_example.cpp
 modules/video_filter/opencv_wrapper.c
-modules/video_filter/panoramix.c
 modules/video_filter/posterize.c
 modules/video_filter/postproc.c
 modules/video_filter/psychedelic.c
@@ -1128,7 +1126,6 @@ modules/video_filter/sepia.c
 modules/video_filter/sharpen.c
 modules/video_filter/subsdelay.c
 modules/video_filter/transform.c
-modules/video_filter/wall.c
 modules/video_filter/wave.c
 modules/video_filter/yuvp.c
 modules/video_output/aa.c
@@ -1158,6 +1155,9 @@ modules/video_output/xcb/window.c
 modules/video_output/xcb/x11.c
 modules/video_output/xcb/xvideo.c
 modules/video_output/yuv.c
+modules/video_splitter/clone.c
+modules/video_splitter/panoramix.c
+modules/video_splitter/wall.c
 modules/visualization/goom.c
 modules/visualization/projectm.cpp
 modules/visualization/visual/effects.c
