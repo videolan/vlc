@@ -994,6 +994,11 @@ static int Control( access_t *p_access, int i_query, va_list args )
                 * var_InheritInteger( p_access, "network-caching" );
             break;
 
+        case ACCESS_GET_SIZE:
+            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            *pi_64 = p_sys->size;
+           break;
+
         /* */
         case ACCESS_SET_PAUSE_STATE:
             break;
