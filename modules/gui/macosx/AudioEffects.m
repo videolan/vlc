@@ -33,7 +33,6 @@
 #import "SharedDialogs.h"
 
 #import <vlc_common.h>
-#import <vlc_strings.h>
 
 #import <math.h>
 
@@ -238,9 +237,9 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     if (p_object == NULL)
         p_object = vlc_object_hold(pl_Get(p_intf));
 
-    NSString *o_str = [NSString stringWithFormat:@"%s;%s;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%lli",
-                       vlc_b64_encode(var_GetNonEmptyString(p_object, "equalizer-preset")),
-                       vlc_b64_encode(config_GetPsz(p_intf, "audio-filter")),
+    NSString *o_str = [NSString stringWithFormat:@"%@;%@;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%lli",
+                       B64EncAndFree(var_GetNonEmptyString(p_object, "equalizer-preset")),
+                       B64EncAndFree(config_GetPsz(p_intf, "audio-filter")),
                        config_GetFloat(p_intf, "compressor-rms-peak"),
                        config_GetFloat(p_intf, "compressor-attack"),
                        config_GetFloat(p_intf, "compressor-release"),
@@ -308,11 +307,11 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     vlc_object_t *p_object = VLC_OBJECT(getAout());
     if (p_object == NULL)
         p_object = vlc_object_hold(pl_Get(p_intf));
-    var_SetString(p_object,"equalizer-preset",vlc_b64_decode([[items objectAtIndex:0] UTF8String]));
+    var_SetString(p_object, "equalizer-preset", [B64DecNSStr([items objectAtIndex:0]) UTF8String]);
     vlc_object_release(p_object);
 
     /* filter handling */
-    NSString *tempString = [NSString stringWithFormat:@"%s", vlc_b64_decode([[items objectAtIndex:1] UTF8String])];
+    NSString *tempString = B64DecNSStr([items objectAtIndex:1]);
     NSArray *tempArray;
     NSUInteger count;
     /* enable the new filters, if we have an aout */
@@ -473,7 +472,9 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
     NSString *currentPreset = nil;
     if (p_aout) {
-        currentPreset = [NSString stringWithFormat:@"%s",var_GetNonEmptyString(p_aout, "equalizer-preset")];
+        char *psz_preset_string = var_GetNonEmptyString(p_aout, "equalizer-preset");
+        currentPreset = [NSString stringWithFormat:@"%s", psz_preset_string];
+        free(psz_preset_string);
         vlc_object_release(p_aout);
     }
 
