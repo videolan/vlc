@@ -32,6 +32,10 @@
  * the translated string. the translation should be '1:translatedstring' though */
 #define _ANS(s) [[[VLCStringUtility sharedInstance] localizedString: _(s)] substringFromIndex:2]
 
+#define B64DecNSStr(s) [[VLCStringUtility sharedInstance] b64Decode: s]
+#define B64EncAndFree(s) [[VLCStringUtility sharedInstance] b64EncodeAndFree: s]
+
+
 unsigned int CocoaKeyToVLC(unichar i_key);
 
 @interface VLCStringUtility : NSObject
@@ -45,5 +49,9 @@ unsigned int CocoaKeyToVLC(unichar i_key);
 
 - (NSString *)VLCKeyToString:(NSString *)theString;
 - (unsigned int)VLCModifiersToCocoa:(NSString *)theString;
+
+- (NSString *)b64Decode:(NSString *)string;
+
+- (NSString *)b64EncodeAndFree:(char *)psz_string;
 
 @end

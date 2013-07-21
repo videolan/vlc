@@ -26,7 +26,6 @@
 #import <vlc_common.h>
 #import <vlc_modules.h>
 #import <vlc_charset.h>
-#import <vlc_strings.h>
 #import "VideoEffects.h"
 #import "SharedDialogs.h"
 
@@ -521,10 +520,13 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     psz_string = config_GetPsz(p_intf, psz_filter_type);
 
     if (b_on) {
-        if (!psz_string)
-            psz_string = psz_name;
-        else if (strstr(psz_string, psz_name) == NULL)
-            psz_string = (char *)[[NSString stringWithFormat: @"%s:%s", psz_string, psz_name] UTF8String];
+        if (!psz_string) {
+            free(psz_string);
+            psz_string = strdup(psz_name);
+        } else if (strstr(psz_string, psz_name) == NULL) {
+            free(psz_string);
+            psz_string = strdup([[NSString stringWithFormat: @"%s:%s", psz_string, psz_name] UTF8String]);
+        }
     } else {
         if (!psz_string)
             return;
@@ -559,6 +561,8 @@ static VLCVideoEffects *_o_sharedInstance = nil;
             vlc_object_release(p_vout);
         }
     }
+
+    free(psz_string);
 }
 
 - (void)restartFilterIfNeeded: (char *)psz_filter option: (char *)psz_name
@@ -658,12 +662,13 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     }
 }
 
-- (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter string: (char *)psz_value
+- (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter string: (const char *)psz_value
 {
+    char *psz_new_value = strdup(psz_value);
     vout_thread_t *p_vout = getVout();
     vlc_object_t *p_filter;
 
-    config_PutPsz(p_intf, psz_name, EnsureUTF8(psz_value));
+    config_PutPsz(p_intf, psz_name, EnsureUTF8(psz_new_value));
 
     if (p_vout) {
         p_filter = vlc_object_find_name(pl_Get(p_intf), psz_filter);
@@ -673,12 +678,14 @@ static VLCVideoEffects *_o_sharedInstance = nil;
             vlc_object_release(p_vout);
             return;
         }
-        var_SetString(p_filter, psz_name, EnsureUTF8(psz_value));
+        var_SetString(p_filter, psz_name, EnsureUTF8(psz_new_value));
         vlc_object_release(p_vout);
         vlc_object_release(p_filter);
 
         [self restartFilterIfNeeded: psz_filter option: psz_name];
     }
+
+    free(psz_new_value);
 }
 
 - (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter boolean: (BOOL)b_value
@@ -704,10 +711,10 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (NSString *)generateProfileString
 {
-    return [NSString stringWithFormat:@"%s;%s;%s;%lli;%f;%f;%f;%f;%f;%lli;%f;%s;%lli;%lli;%lli;%lli;%lli;%lli;%s;%lli;%lli;%lli;%lli;%lli;%s;%lli;%s;%lli;%lli;%lli;%lli;%lli",
-            vlc_b64_encode(config_GetPsz(p_intf, "video-filter")),
-            vlc_b64_encode(config_GetPsz(p_intf, "sub-source")),
-            vlc_b64_encode(config_GetPsz(p_intf, "video-splitter")),
+    return [NSString stringWithFormat:@"%@;%@;%@;%lli;%f;%f;%f;%f;%f;%lli;%f;%@;%lli;%lli;%lli;%lli;%lli;%lli;%@;%lli;%lli;%lli;%lli;%lli;%@;%lli;%@;%lli;%lli;%lli;%lli;%lli",
+            B64EncAndFree(config_GetPsz(p_intf, "video-filter")),
+            B64EncAndFree(config_GetPsz(p_intf, "sub-source")),
+            B64EncAndFree(config_GetPsz(p_intf, "video-splitter")),
             config_GetInt(p_intf, "hue"),
             config_GetFloat(p_intf, "contrast"),
             config_GetFloat(p_intf, "brightness"),
@@ -716,22 +723,22 @@ static VLCVideoEffects *_o_sharedInstance = nil;
             config_GetFloat(p_intf, "sharpen-sigma"),
             config_GetInt(p_intf, "gradfun-radius"),
             config_GetFloat(p_intf, "grain-variance"),
-            vlc_b64_encode(config_GetPsz(p_intf, "transform-type")),
+            B64EncAndFree(config_GetPsz(p_intf, "transform-type")),
             config_GetInt(p_intf, "puzzle-rows"),
             config_GetInt(p_intf, "puzzle-cols"),
             config_GetInt(p_intf, "colorthres-color"),
             config_GetInt(p_intf, "colorthres-saturationthres"),
             config_GetInt(p_intf, "colorthres-similaritythres"),
             config_GetInt(p_intf, "sepia-intensity"),
-            vlc_b64_encode(config_GetPsz(p_intf, "gradient-mode")),
+            B64EncAndFree(config_GetPsz(p_intf, "gradient-mode")),
             config_GetInt(p_intf, "gradient-cartoon"),
             config_GetInt(p_intf, "gradient-type"),
             config_GetInt(p_intf, "extract-component"),
             config_GetInt(p_intf, "posterize-level"),
             config_GetInt(p_intf, "blur-factor"),
-            vlc_b64_encode(config_GetPsz(p_intf, "marq-marquee")),
+            B64EncAndFree(config_GetPsz(p_intf, "marq-marquee")),
             config_GetInt(p_intf, "marq-position"),
-            vlc_b64_encode(config_GetPsz(p_intf, "logo-file")),
+            B64EncAndFree(config_GetPsz(p_intf, "logo-file")),
             config_GetInt(p_intf, "logo-position"),
             config_GetInt(p_intf, "logo-opacity"),
             config_GetInt(p_intf, "clone-count"),
@@ -793,7 +800,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     NSArray *items = [[[defaults objectForKey:@"VideoEffectProfiles"] objectAtIndex:selectedProfile] componentsSeparatedByString:@";"];
 
     /* filter handling */
-    NSString *tempString = [NSString stringWithFormat:@"%s", vlc_b64_decode([[items objectAtIndex:0] UTF8String])];
+    NSString *tempString = B64DecNSStr([items objectAtIndex:0]);
     NSArray *tempArray;
     NSUInteger count;
 
@@ -806,7 +813,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
             [self setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
     }
 
-    tempString = [NSString stringWithFormat:@"%s", vlc_b64_decode([[items objectAtIndex:1] UTF8String])];
+    tempString = B64DecNSStr([items objectAtIndex:1]);
     /* enable another round of new filters */
     config_PutPsz(p_intf,"sub-source", "");
     if ([tempString length] > 0) {
@@ -816,7 +823,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
             [self setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
     }
 
-    tempString = [NSString stringWithFormat:@"%s", vlc_b64_decode([[items objectAtIndex:2] UTF8String])];
+    tempString = B64DecNSStr([items objectAtIndex:2]);
     /* enable another round of new filters */
     config_PutPsz(p_intf,"video-splitter", "");
     if ([tempString length] > 0) {
@@ -835,22 +842,22 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [self setVideoFilterProperty:"sharpen-sigma" forFilter:"sharpen" float:[[items objectAtIndex:8] floatValue]];
     [self setVideoFilterProperty:"gradfun-radius" forFilter:"gradfun" integer:[[items objectAtIndex:9] intValue]];
     [self setVideoFilterProperty:"grain-variance" forFilter:"grain" float:[[items objectAtIndex:10] floatValue]];
-    [self setVideoFilterProperty:"transform-type" forFilter:"transform" string:vlc_b64_decode([[items objectAtIndex:11] UTF8String])];
+    [self setVideoFilterProperty:"transform-type" forFilter:"transform" string:[B64DecNSStr([items objectAtIndex:11]) UTF8String]];
     [self setVideoFilterProperty:"puzzle-rows" forFilter:"puzzle" integer:[[items objectAtIndex:12] intValue]];
     [self setVideoFilterProperty:"puzzle-cols" forFilter:"puzzle" integer:[[items objectAtIndex:13] intValue]];
     [self setVideoFilterProperty:"colorthres-color" forFilter:"colorthres" integer:[[items objectAtIndex:14] intValue]];
     [self setVideoFilterProperty:"colorthres-saturationthres" forFilter:"colorthres" integer:[[items objectAtIndex:15] intValue]];
     [self setVideoFilterProperty:"colorthres-similaritythres" forFilter:"colorthres" integer:[[items objectAtIndex:16] intValue]];
     [self setVideoFilterProperty:"sepia-intensity" forFilter:"sepia" integer:[[items objectAtIndex:17] intValue]];
-    [self setVideoFilterProperty:"gradient-mode" forFilter:"gradient" string:vlc_b64_decode([[items objectAtIndex:18] UTF8String])];
+    [self setVideoFilterProperty:"gradient-mode" forFilter:"gradient" string:[B64DecNSStr([items objectAtIndex:18]) UTF8String]];
     [self setVideoFilterProperty:"gradient-cartoon" forFilter:"gradient" integer:[[items objectAtIndex:19] intValue]];
     [self setVideoFilterProperty:"gradient-type" forFilter:"gradient" integer:[[items objectAtIndex:20] intValue]];
     [self setVideoFilterProperty:"extract-component" forFilter:"extract" integer:[[items objectAtIndex:21] intValue]];
     [self setVideoFilterProperty:"posterize-level" forFilter:"posterize" integer:[[items objectAtIndex:22] intValue]];
     [self setVideoFilterProperty:"blur-factor" forFilter:"motionblur" integer:[[items objectAtIndex:23] intValue]];
-    [self setVideoFilterProperty:"marq-marquee" forFilter:"marq" string:vlc_b64_decode([[items objectAtIndex:24] UTF8String])];
+    [self setVideoFilterProperty:"marq-marquee" forFilter:"marq" string:[B64DecNSStr([items objectAtIndex:24]) UTF8String]];
     [self setVideoFilterProperty:"marq-position" forFilter:"marq" integer:[[items objectAtIndex:25] intValue]];
-    [self setVideoFilterProperty:"logo-file" forFilter:"logo" string:vlc_b64_decode([[items objectAtIndex:26] UTF8String])];
+    [self setVideoFilterProperty:"logo-file" forFilter:"logo" string:[B64DecNSStr([items objectAtIndex:26]) UTF8String]];
     [self setVideoFilterProperty:"logo-position" forFilter:"logo" integer:[[items objectAtIndex:27] intValue]];
     [self setVideoFilterProperty:"logo-opacity" forFilter:"logo" integer:[[items objectAtIndex:28] intValue]];
     [self setVideoFilterProperty:"clone-count" forFilter:"clone" integer:[[items objectAtIndex:29] intValue]];
@@ -1119,11 +1126,11 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 - (IBAction)transformModifierChanged:(id)sender
 {
     NSInteger tag = [[o_transform_pop selectedItem] tag];
-    char *psz_string = (char *)[[NSString stringWithFormat:@"%li", tag] UTF8String];
+    const char *psz_string = [[NSString stringWithFormat:@"%li", tag] UTF8String];
     if (tag == 1)
-        psz_string = (char *)"hflip";
+        psz_string = "hflip";
     else if (tag == 2)
-        psz_string = (char *)"vflip";
+        psz_string = "vflip";
 
     [self setVideoFilterProperty: "transform-type" forFilter: "transform" string: psz_string];
 }

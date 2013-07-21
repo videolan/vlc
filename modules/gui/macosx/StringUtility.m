@@ -26,6 +26,8 @@
 
 #import <vlc_input.h>
 #import <vlc_keys.h>
+#import <vlc_strings.h>
+
 #import "StringUtility.h"
 #import "intf.h"
 
@@ -321,5 +323,31 @@ unsigned int CocoaKeyToVLC(unichar i_key)
 
     return theString;
 }
+
+- (NSString *)b64Decode:(NSString *)string
+{
+    char *psz_decoded_string = vlc_b64_decode([string UTF8String]);
+    if(!psz_decoded_string)
+        return @"";
+
+    NSString *returnStr = [NSString stringWithFormat:@"%s", psz_decoded_string];
+    free(psz_decoded_string);
+
+    return returnStr;
+}
+
+- (NSString *)b64EncodeAndFree:(char *)psz_string
+{
+    char *psz_encoded_string = vlc_b64_encode(psz_string);
+    free(psz_string);
+    if(!psz_encoded_string)
+        return @"";
+
+    NSString *returnStr = [NSString stringWithFormat:@"%s", psz_encoded_string];
+    free(psz_encoded_string);
+
+    return returnStr;
+}
+
 
 @end
