@@ -484,46 +484,47 @@ error:
  * This function is not thread-safe; the same file descriptor I/O cannot be
  * read by another thread at the same time (although it can be written to).
  *
+ * @note This only works with stream-oriented file descriptors, not with
+ * datagram or packet-oriented ones.
+ *
  * @return nul-terminated heap-allocated string, or NULL on I/O error.
  */
-char *net_Gets( vlc_object_t *p_this, int fd, const v_socket_t *p_vs )
+char *net_Gets(vlc_object_t *obj, int fd, const v_socket_t *vs)
 {
-    char *psz_line = NULL, *ptr = NULL;
-    size_t  i_line = 0, i_max = 0;
+    char *buf = NULL;
+    size_t bufsize = 0, buflen = 0;
 
-
-    for( ;; )
+    for (;;)
     {
-        if( i_line == i_max )
+        if (buflen == bufsize)
         {
-            i_max += 1024;
-            psz_line = xrealloc( psz_line, i_max );
-            ptr = psz_line + i_line;
+            if (unlikely(bufsize >= (1 << 10)))
+                goto error; /* put sane buffer size limit */
+
+            char *newbuf = realloc(buf, bufsize + 1024);
+            if (unlikely(newbuf == NULL))
+                goto error;
+            buf = newbuf;
+            bufsize += 1024;
         }
 
-        if( net_Read( p_this, fd, p_vs, ptr, 1, true ) != 1 )
-        {
-            if( i_line == 0 )
-            {
-                free( psz_line );
-                return NULL;
-            }
-            break;
-        }
+        ssize_t val = net_Read(obj, fd, vs, buf + buflen, 1, false);
+        if (val < 1)
+            goto error;
 
-        if ( *ptr == '\n' )
+        if (buf[buflen] == '\n')
             break;
 
-        i_line++;
-        ptr++;
+        buflen++;
     }
 
-    *ptr-- = '\0';
-
-    if( ( ptr >= psz_line ) && ( *ptr == '\r' ) )
-        *ptr = '\0';
-
-    return psz_line;
+    buf[--buflen] = '\0';
+    if (buflen > 0 && buf[buflen - 1] == '\r')
+        buf[buflen] = '\0';
+    return buf;
+error:
+    free(buf);
+    return NULL;
 }
 
 #undef net_Printf
