@@ -237,15 +237,14 @@ static int Peek (stream_t *stream, const uint8_t **pbuf, unsigned int len)
     if ((p_sys->peeked = peeked) == NULL)
         return 0;
 
-    if (curlen < len)
+    while (curlen < len)
     {
         ssize_t val = net_Read (stream, fd, NULL, peeked->p_buffer + curlen,
-                                len - curlen, true);
-        if (val >= 0)
-        {
-            curlen += val;
-            peeked->i_buffer = curlen;
-        }
+                                len - curlen, false);
+        if (val <= 0)
+            break;
+        curlen += val;
+        peeked->i_buffer = curlen;
     }
     *pbuf = peeked->p_buffer;
     return curlen;
