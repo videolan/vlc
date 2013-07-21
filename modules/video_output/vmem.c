@@ -253,16 +253,16 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
     picture_t *pictures[count];
 
     for (unsigned i = 0; i < count; i++) {
-        picture_resource_t rsc;
-
-        rsc.p_sys = malloc(sizeof(*rsc.p_sys));
-        if (unlikely(!rsc.p_sys)) {
+        picture_sys_t *picsys = malloc(sizeof (*picsys));
+        if (unlikely(picsys == NULL))
+        {
             count = i;
             break;
         }
+        picsys->sys = sys;
+        picsys->id = NULL;
 
-        rsc.p_sys->sys = sys;
-        rsc.p_sys->id = NULL;
+        picture_resource_t rsc = { .p_sys = picsys };
 
         for (unsigned i = 0; i < PICTURE_PLANE_MAX; i++) {
             /* vmem-lock is responsible for the allocation */
