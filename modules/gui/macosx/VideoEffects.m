@@ -406,7 +406,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_threshold_saturation_sld setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "colorthres-saturationthres")]];
     [o_threshold_similarity_sld setIntValue: config_GetInt(p_intf, "colorthres-similaritythres")];
     [o_threshold_similarity_sld setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "colorthres-similaritythres")]];
-    
+
     b_state = [o_threshold_ckb state];
     [o_threshold_color_fld setEnabled: b_state];
     [o_threshold_color_lbl setEnabled: b_state];
@@ -414,7 +414,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_threshold_saturation_lbl setEnabled: b_state];
     [o_threshold_similarity_sld setEnabled: b_state];
     [o_threshold_similarity_lbl setEnabled: b_state];
-    
+
     [self setSepiaValue: config_GetInt(p_intf, "sepia-intensity")];
     b_state = [o_sepia_ckb state];
     [o_sepia_fld setEnabled: b_state];
@@ -447,7 +447,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_posterize_fld setEnabled: b_state];
     [o_posterize_stp setEnabled: b_state];
     [o_posterize_lbl setEnabled: b_state];
-    
+
     [o_blur_sld setIntValue: config_GetInt(p_intf, "blur-factor")];
     [o_blur_sld setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "blur-factor")]];
     [o_blur_sld setEnabled: [o_blur_ckb state]];
@@ -484,30 +484,39 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_addlogo_transparency_lbl setEnabled: b_state];
 }
 
+- (const char *)getFilterType:(char *)psz_name
+{
+    module_t *p_obj = module_find(psz_name);
+    if (!p_obj) {
+        return NULL;
+    }
+
+    if (module_provides(p_obj, "video splitter")) {
+        return "video-splitter";
+    } else if (module_provides(p_obj, "video filter2")) {
+        return "video-filter";
+    } else if (module_provides(p_obj, "sub source")) {
+        return "sub-source";
+    } else if (module_provides(p_obj, "sub filter")) {
+        return "sub-filter";
+    } else {
+        msg_Err(p_intf, "Unknown video filter type.");
+        return NULL;
+    }
+}
+
 - (void)setVideoFilter: (char *)psz_name on:(BOOL)b_on
 {
     char *psz_string, *psz_parser;
-    const char *psz_filter_type;
 
-    module_t *p_obj = module_find(psz_name);
-    if (!p_obj) {
+    const char *psz_filter_type = [self getFilterType:psz_name];
+    if (!psz_filter_type) {
         msg_Err(p_intf, "Unable to find filter module \"%s\".", psz_name);
         return;
     }
+
     msg_Dbg(p_intf, "will set filter '%s'", psz_name);
 
-    if (module_provides(p_obj, "video splitter")) {
-        psz_filter_type = "video-splitter";
-    } else if (module_provides(p_obj, "video filter2")) {
-        psz_filter_type = "video-filter";
-    } else if (module_provides(p_obj, "sub source")) {
-        psz_filter_type = "sub-source";
-    } else if (module_provides(p_obj, "sub filter")) {
-        psz_filter_type = "sub-filter";
-    } else {
-        msg_Err(p_intf, "Unknown video filter type.");
-        return;
-    }
 
     psz_string = config_GetPsz(p_intf, psz_filter_type);
 
@@ -563,6 +572,28 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
     vlc_object_t *p_filter = vlc_object_find_name(pl_Get(p_intf), psz_filter);
     if (p_filter) {
+
+        /* we cannot rely on the p_filter existence.
+         This filter might be just
+         disabled, but the object still exists. Therefore, the string
+         is checked, additionally.
+         */
+        const char *psz_filter_type = [self getFilterType:psz_filter];
+        if (!psz_filter_type) {
+            msg_Err(p_intf, "Unable to find filter module \"%s\".", psz_name);
+            goto out;
+        }
+
+        char *psz_string = config_GetPsz(p_intf, psz_filter_type);
+        if (!psz_string) {
+            goto out;
+        }
+        if (strstr(psz_string, psz_filter) == NULL) {
+            free(psz_string);
+            goto out;
+        }
+        free(psz_string);
+
         int i_type;
         i_type = var_Type(p_filter, psz_name);
         if (i_type == 0)
@@ -570,11 +601,13 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
         if (!(i_type & VLC_VAR_ISCOMMAND)) {
             msg_Warn(p_intf, "Brute-restarting filter '%s', because the last changed option isn't a command", psz_name);
+
             [self setVideoFilter: psz_filter on: NO];
             [self setVideoFilter: psz_filter on: YES];
         } else
             msg_Dbg(p_intf, "restart not needed");
 
+        out:
         vlc_object_release(p_filter);
     }
 }
@@ -880,7 +913,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfiles"];
     [defaults setInteger:[workArray count] - 1 forKey:@"VideoEffectSelectedProfile"];
     [workArray release];
-    
+
     workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"VideoEffectProfileNames"]];
     [workArray addObject:text];
     [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfileNames"];
@@ -1154,7 +1187,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_wall_numofcols_fld setEnabled: b_state];
     [o_wall_numofcols_stp setEnabled: b_state];
     [o_wall_numofcols_lbl setEnabled: b_state];
-    
+
     [o_wall_numofrows_fld setEnabled: b_state];
     [o_wall_numofrows_stp setEnabled: b_state];
     [o_wall_numofrows_lbl setEnabled: b_state];
