@@ -75,7 +75,6 @@ static int  open_file( access_t *, const char * );
 
 struct access_sys_t
 {
-    unsigned int i_nb_reads;
     int fd;
 };
 
@@ -141,7 +140,6 @@ static int Open( vlc_object_t *p_this )
     free( p_rawdevices );
 
     STANDARD_READ_ACCESS_INIT;
-    p_sys->i_nb_reads = 0;
     int fd = p_sys->fd = -1;
 
     /* Open file */
@@ -209,8 +207,6 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         p_access->info.i_pos += i_ret;
     else
         p_access->info.b_eof = true;
-
-    p_sys->i_nb_reads++;
 
     return i_ret;
 }
