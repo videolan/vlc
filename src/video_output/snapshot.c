@@ -28,6 +28,7 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/time.h>
 #include <dirent.h>
 #include <time.h>
 
@@ -174,30 +175,21 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
                 free(filename);
             }
         } else {
-            struct tm    curtime;
-            time_t       lcurtime = time(NULL) ;
+            struct timeval tv;
+            struct tm curtime;
+            char buffer[128];
 
-            if (!localtime_r(&lcurtime, &curtime)) {
-                const unsigned int id = (image->i_pts / 100000) & 0xFFFFFF;
+            gettimeofday(&tv, NULL);
+            if (localtime_r(&tv.tv_sec, &curtime) == NULL)
+                gmtime_r(&tv.tv_sec, &curtime);
+            if (strftime(buffer, sizeof(buffer), "%Y-%m-%d-%Hh%Mm%Ss",
+                         &curtime) == 0)
+                strcpy(buffer, "error");
 
-                msg_Warn(object, "failed to get current time. Falling back to legacy snapshot naming");
-
-                if (asprintf(&filename, "%s" DIR_SEP "%s%u.%s",
-                             cfg->path, prefix, id, cfg->format) < 0)
-                    filename = NULL;
-            } else {
-                /* suffix with the last decimal digit in 10s of seconds resolution
-                 * FIXME gni ? */
-                const int id = (image->i_pts / (100*1000)) & 0xFF;
-                char buffer[128];
-
-                if (!strftime(buffer, sizeof(buffer), "%Y-%m-%d-%Hh%Mm%Ss", &curtime))
-                    strcpy(buffer, "error");
-
-                if (asprintf(&filename, "%s" DIR_SEP "%s%s%1u.%s",
-                             cfg->path, prefix, buffer, id, cfg->format) < 0)
-                    filename = NULL;
-            }
+            if (asprintf(&filename, "%s" DIR_SEP "%s%s%03lu.%s",
+                         cfg->path, prefix, buffer, tv.tv_usec / 1000,
+                         cfg->format) < 0)
+                filename = NULL;
         }
         free(prefix);
     } else {
