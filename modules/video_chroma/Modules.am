@@ -34,6 +34,14 @@ SOURCES_yuy2_i420 = \
 
 SOURCES_rv32 = rv32.c
 
+libchain_plugin_la_SOURCES = chain.c
+libchain_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+
+libswscale_plugin_la_SOURCES = swscale.c ../codec/avcodec/chroma.c
+libswscale_plugin_la_CFLAGS = $(AM_CFLAGS) $(SWSCALE_FLAGS)
+libswscale_plugin_la_LIBADD = $(AM_LIBADD) $(SWSCALE_LIBS)
+EXTRA_LTLIBRARIES += libswscale_plugin.la
+
 libvlc_LTLIBRARIES += \
 	libi420_rgb_plugin.la \
 	libi420_yuy2_plugin.la \
@@ -43,7 +51,8 @@ libvlc_LTLIBRARIES += \
 	libyuy2_i420_plugin.la \
 	libyuy2_i422_plugin.la \
 	librv32_plugin.la \
-	$(NULL)
+	libchain_plugin.la \
+	$(LTLIBswscale)
 
 libchroma_omx_plugin_la_SOURCES = omxdl.c
 libchroma_omx_plugin_la_CFLAGS = $(AM_CFLAGS) $(OMXIP_CFLAGS)

@@ -97,9 +97,7 @@ SOURCES_grain = grain.c
 SOURCES_croppadd = croppadd.c
 SOURCES_canvas = canvas.c
 SOURCES_blendbench = blendbench.c
-SOURCES_chain = chain.c
 SOURCES_postproc = postproc.c
-SOURCES_swscale = swscale.c ../codec/avcodec/chroma.c
 SOURCES_scene = scene.c
 SOURCES_sepia = sepia.c
 SOURCES_yuvp = yuvp.c
@@ -140,7 +138,6 @@ libvlc_LTLIBRARIES += \
 	libblendbench_plugin.la \
 	libbluescreen_plugin.la \
 	libcanvas_plugin.la \
-	libchain_plugin.la \
 	libclone_plugin.la \
 	libcolorthres_plugin.la \
 	libcroppadd_plugin.la \
