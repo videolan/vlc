@@ -103,7 +103,14 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
 - (void)pause
 {
-    playlist_Pause(pl_Get(VLCIntf));
+    playlist_t *p_playlist = pl_Get(VLCIntf);
+
+    PL_LOCK;
+    bool b_playlist_playing = playlist_Status(p_playlist) == PLAYLIST_RUNNING;
+    PL_UNLOCK;
+
+    if (b_playlist_playing)
+        playlist_Pause(p_playlist);
 }
 
 - (void)stop
