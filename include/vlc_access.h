@@ -43,6 +43,7 @@ enum access_query_e
     ACCESS_CAN_FASTSEEK,    /* arg1= bool*    cannot fail */
     ACCESS_CAN_PAUSE,       /* arg1= bool*    cannot fail */
     ACCESS_CAN_CONTROL_PACE,/* arg1= bool*    cannot fail */
+    ACCESS_GET_SIZE=6,      /* arg1= uin64_t* */
 
     /* */
     ACCESS_GET_PTS_DELAY = 0x101,/* arg1= int64_t*       cannot fail */
@@ -107,7 +108,6 @@ struct access_t
         unsigned int i_update;  /* Access sets them on change,
                                    Input removes them once take into account*/
 
-        uint64_t     i_size;    /* Write only for access, read only for input */
         uint64_t     i_pos;     /* idem */
         bool         b_eof;     /* idem */
 
@@ -137,10 +137,17 @@ static inline int access_Control( access_t *p_access, int i_query, ... )
     return i_result;
 }
 
+static inline uint64_t access_GetSize( access_t *p_access )
+{
+    uint64_t val;
+    if( access_Control( p_access, ACCESS_GET_SIZE, &val ) )
+        val = 0;
+    return val;
+}
+
 static inline void access_InitFields( access_t *p_a )
 {
     p_a->info.i_update = 0;
-    p_a->info.i_size = 0;
     p_a->info.i_pos = 0;
     p_a->info.b_eof = false;
     p_a->info.i_title = 0;

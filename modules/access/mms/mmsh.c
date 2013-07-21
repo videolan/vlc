@@ -185,11 +185,6 @@ int MMSHOpen( access_t *p_access )
         goto error;
     }
 
-    if( !p_sys->b_broadcast )
-    {
-        p_access->info.i_size = p_sys->asfh.i_file_size;
-    }
-
     return VLC_SUCCESS;
 
 error:
@@ -244,6 +239,13 @@ static int Control( access_t *p_access, int i_query, va_list args )
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = true;
             break;
+
+        case ACCESS_GET_SIZE:
+        {
+            uint64_t *s = va_arg( args, uint64_t * );
+            *s = p_sys->b_broadcast ? 0 : p_sys->asfh.i_file_size;
+            return VLC_SUCCESS;
+        }
 
         /* */
         case ACCESS_GET_PTS_DELAY:

@@ -91,6 +91,7 @@ static int Control( access_t *, int, va_list );
 struct access_sys_t
 {
     int i_smb;
+    uint64_t size;
 };
 
 #ifdef _WIN32
@@ -234,7 +235,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_access, "stat failed (%m)" );
     }
     else
-        p_access->info.i_size = filestat.st_size;
+        p_sys->size = filestat.st_size;
 
     free( psz_uri );
 
@@ -316,6 +317,10 @@ static int Control( access_t *p_access, int i_query, va_list args )
     case ACCESS_CAN_PAUSE:
     case ACCESS_CAN_CONTROL_PACE:
         *va_arg( args, bool* ) = true;
+        break;
+
+    case ACCESS_GET_SIZE:
+        *va_arg( args, uint64_t * ) = p_access->p_sys->size;
         break;
 
     case ACCESS_GET_PTS_DELAY:

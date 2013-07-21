@@ -176,7 +176,7 @@ int  MMSTUOpen( access_t *p_access )
     else
     {
         p_sys->b_seekable = true;
-        p_access->info.i_size =
+        p_sys->i_size =
             (uint64_t)p_sys->i_header +
             (uint64_t)p_sys->i_packet_count * (uint64_t)p_sys->i_packet_length;
     }
@@ -248,6 +248,10 @@ static int Control( access_t *p_access, int i_query, va_list args )
             *pb_bool = false;
 #endif
             *pb_bool = true;
+            break;
+
+        case ACCESS_GET_SIZE:
+            *va_arg( args, uint64_t * ) = p_sys->i_size;
             break;
 
         /* */

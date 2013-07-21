@@ -109,6 +109,7 @@ struct access_sys_t
     char       sz_epsv_ip[NI_MAXNUMERICHOST];
     bool       out;
     bool       directory;
+    uint64_t   size;
 };
 #define GET_OUT_SYS( p_this ) \
     ((access_sys_t *)(((sout_access_out_t *)(p_this))->p_sys))
@@ -475,6 +476,7 @@ static int InOpen( vlc_object_t *p_this )
     p_sys->fd_data = -1;
     p_sys->out = false;
     p_sys->directory = false;
+    p_sys->size = 0;
 
     if( parseURL( &p_sys->url, p_access->psz_location ) )
         goto exit_error;
@@ -491,9 +493,9 @@ static int InOpen( vlc_object_t *p_this )
     else
     if ( ftp_RecvCommand( p_this, p_sys, NULL, &psz_arg ) == 2 )
     {
-        p_access->info.i_size = atoll( &psz_arg[4] );
+        p_sys->size = atoll( &psz_arg[4] );
         free( psz_arg );
-        msg_Dbg( p_access, "file size: %"PRIu64, p_access->info.i_size );
+        msg_Dbg( p_access, "file size: %"PRIu64, p_sys->size );
     }
     else
     if( ftp_SendCommand( p_this, p_sys, "CWD %s", p_sys->url.psz_path ) < 0 )
@@ -727,6 +729,9 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_CONTROL_PACE:
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = true;    /* FIXME */
+            break;
+        case ACCESS_GET_SIZE:
+            *va_arg( args, uint64_t * ) = p_access->p_sys->size;
             break;
 
         /* */

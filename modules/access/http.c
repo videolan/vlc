@@ -176,6 +176,7 @@ struct access_sys_t
     char       *psz_icy_title;
 
     uint64_t i_remaining;
+    uint64_t size;
 
     bool b_seekable;
     bool b_reconnect;
@@ -281,7 +282,7 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
     p_sys->i_remaining = 0;
     p_sys->b_persist = false;
     p_sys->b_has_size = false;
-    p_access->info.i_size = 0;
+    p_sys->size = 0;
     p_access->info.i_pos  = 0;
     p_access->info.b_eof  = false;
 
@@ -732,7 +733,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if( p_sys->b_has_size )
     {
         /* Remaining bytes in the file */
-        uint64_t remainder = p_access->info.i_size - p_access->info.i_pos;
+        uint64_t remainder = p_sys->size - p_access->info.i_pos;
         if( remainder < i_len )
             i_len = remainder;
 
@@ -805,7 +806,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     p_access->info.i_pos += i_read;
     if( p_sys->b_has_size )
     {
-        assert( p_access->info.i_pos <= p_access->info.i_size );
+        assert( p_access->info.i_pos <= p_sys->size );
         assert( (unsigned)i_read <= p_sys->i_remaining );
         p_sys->i_remaining -= i_read;
     }
@@ -929,14 +930,15 @@ static ssize_t ReadCompressed( access_t *p_access, uint8_t *p_buffer,
  *****************************************************************************/
 static int Seek( access_t *p_access, uint64_t i_pos )
 {
-    msg_Dbg( p_access, "trying to seek to %"PRId64, i_pos );
+    access_sys_t *p_sys = p_access->p_sys;
 
+    msg_Dbg( p_access, "trying to seek to %"PRId64, i_pos );
     Disconnect( p_access );
 
-    if( p_access->info.i_size
-     && i_pos >= p_access->info.i_size ) {
+    if( p_sys->size && i_pos >= p_sys->size )
+    {
         msg_Err( p_access, "seek too far" );
-        int retval = Seek( p_access, p_access->info.i_size - 1 );
+        int retval = Seek( p_access, p_sys->size - 1 );
         if( retval == VLC_SUCCESS ) {
             uint8_t p_buffer[2];
             Read( p_access, p_buffer, 1);
@@ -1058,7 +1060,7 @@ static int Connect( access_t *p_access, uint64_t i_tell )
     p_sys->i_remaining = 0;
     p_sys->b_persist = false;
     p_sys->b_has_size = false;
-    p_access->info.i_size = 0;
+    p_sys->size = 0;
     p_access->info.i_pos  = i_tell;
     p_access->info.b_eof  = false;
 
@@ -1337,25 +1339,25 @@ static int Request( access_t *p_access, uint64_t i_tell )
         if( !strcasecmp( psz, "Content-Length" ) )
         {
             uint64_t i_size = i_tell + (p_sys->i_remaining = (uint64_t)atoll( p ));
-            if(i_size > p_access->info.i_size) {
+            if(i_size > p_sys->size) {
                 p_sys->b_has_size = true;
-                p_access->info.i_size = i_size;
+                p_sys->size = i_size;
             }
             msg_Dbg( p_access, "this frame size=%"PRIu64, p_sys->i_remaining );
         }
         else if( !strcasecmp( psz, "Content-Range" ) ) {
             uint64_t i_ntell = i_tell;
-            uint64_t i_nend = (p_access->info.i_size > 0)?(p_access->info.i_size - 1):i_tell;
-            uint64_t i_nsize = p_access->info.i_size;
+            uint64_t i_nend = (p_sys->size > 0) ? (p_sys->size - 1) : i_tell;
+            uint64_t i_nsize = p_sys->size;
             sscanf(p,"bytes %"SCNu64"-%"SCNu64"/%"SCNu64,&i_ntell,&i_nend,&i_nsize);
             if(i_nend > i_ntell ) {
                 p_access->info.i_pos = i_ntell;
                 p_sys->i_icy_offset  = i_ntell;
                 p_sys->i_remaining = i_nend+1-i_ntell;
                 uint64_t i_size = (i_nsize > i_nend) ? i_nsize : (i_nend + 1);
-                if(i_size > p_access->info.i_size) {
+                if(i_size > p_sys->size) {
                     p_sys->b_has_size = true;
-                    p_access->info.i_size = i_size;
+                    p_sys->size = i_size;
                 }
                 msg_Dbg( p_access, "stream size=%"PRIu64",pos=%"PRIu64",remaining=%"PRIu64,
                          i_nsize, i_ntell, p_sys->i_remaining);

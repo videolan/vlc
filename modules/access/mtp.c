@@ -153,11 +153,6 @@ static int Open( vlc_object_t *p_this )
     }
     p_sys->fd = fd;
 
-    struct stat st;
-    if( fstat( fd, &st ) )
-        msg_Err( p_access, "fstat(%d): %m", fd );
-    p_access->info.i_size = st.st_size;
-
     return VLC_SUCCESS;
 }
 
@@ -229,6 +224,7 @@ static int Seek( access_t *p_access, uint64_t i_pos )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
+    access_sys_t *sys = p_access->p_sys;
     bool   *pb_bool;
     int64_t      *pi_64;
 
@@ -246,6 +242,19 @@ static int Control( access_t *p_access, int i_query, va_list args )
             pb_bool = ( bool* )va_arg( args, bool* );
             *pb_bool = true;
             break;
+
+        case ACCESS_GET_SIZE:
+        {
+            uint64_t *s = va_arg( args, uint64_t * );
+            struct stat st;
+            if( fstat( sys->fd, &st ) )
+            {
+                msg_Err( p_access, "fstat error: %m" );
+                return VLC_EGENERIC;
+            }
+            *s = st.st_size;
+            break;
+        }
 
         case ACCESS_GET_PTS_DELAY:
             pi_64 = ( int64_t* )va_arg( args, int64_t * );

@@ -43,6 +43,7 @@ struct access_sys_t
     char        sz_bind_addr[NI_MAXNUMERICHOST]; /* used by udp */
 
     vlc_url_t   url;
+    uint64_t    i_size;
 
     asf_header_t    asfh;
 

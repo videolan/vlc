@@ -675,16 +675,16 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
         p_access->info.i_title     = i_track-1;
         if (p_vcdplayer->b_track_length)
         {
-            p_access->info.i_size = p_vcdplayer->p_title[i_track-1]->i_size;
+            p_access->p_sys->size = p_vcdplayer->p_title[i_track-1]->i_size;
             p_access->info.i_pos  = (uint64_t) M2F2_SECTOR_SIZE *
                      (vcdinfo_get_track_lsn(p_vcdplayer->vcd, i_track)-i_lsn);
         } else {
-            p_access->info.i_size = M2F2_SECTOR_SIZE * (int64_t)
+            p_access->p_sys->size = M2F2_SECTOR_SIZE * (int64_t)
                  vcdinfo_get_entry_sect_count(p_vcdplayer->vcd,p_itemid->num);
             p_access->info.i_pos = 0;
         }
         dbg_print( (INPUT_DBG_LSN|INPUT_DBG_PBC), "size: %"PRIu64", pos: %"PRIu64,
-                   p_access->info.i_size, p_access->info.i_pos );
+                   p_access->p_sys->size, p_access->info.i_pos );
         p_access->info.i_seekpoint = p_itemid->num;
         break;
 
@@ -696,7 +696,7 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
            the entry seekpoints and (zeroed) lid seekpoints.
         */
         p_access->info.i_title     = p_vcdplayer->i_titles - 1;
-        p_access->info.i_size      = 0; /* No seeking on stills, please. */
+        p_access->p_sys->size      = 0; /* No seeking on stills, please. */
         p_access->info.i_pos       = 0;
         p_access->info.i_seekpoint = p_vcdplayer->i_entries
                                    + p_vcdplayer->i_lids + p_itemid->num;
@@ -704,7 +704,7 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
 
     case VCDINFO_ITEM_TYPE_TRACK:
         p_access->info.i_title     = i_track-1;
-        p_access->info.i_size      = p_vcdplayer->p_title[i_track-1]->i_size;
+        p_access->p_sys->size      = p_vcdplayer->p_title[i_track-1]->i_size;
         p_access->info.i_pos       = 0;
         p_access->info.i_seekpoint = vcdinfo_track_get_entry(p_vcdplayer->vcd,
                                                              i_track);
@@ -853,7 +853,6 @@ VCDOpen ( vlc_object_t *p_this )
     p_access->pf_seek          = VCDSeek;
 
     p_access->info.i_update    = 0;
-    p_access->info.i_size      = 0;
     p_access->info.i_pos       = 0;
     p_access->info.b_eof       = false;
     p_access->info.i_title     = 0;
@@ -866,6 +865,7 @@ VCDOpen ( vlc_object_t *p_this )
 
     p_vcdplayer->i_debug = var_InheritInteger( p_this, MODULE_STRING "-debug" );
     p_access->p_sys = (access_sys_t *) p_vcdplayer;
+    p_access->p_sys->size = 0;
 
     /* Set where to log errors messages from libcdio. */
     p_vcd_access = p_access;

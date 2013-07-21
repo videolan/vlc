@@ -96,6 +96,7 @@ vlc_module_end ()
 struct access_sys_t
 {
     vcddev_t    *vcddev;                            /* vcd device descriptor */
+    uint64_t    size;
 
     /* Current position */
     int         i_sector;                                  /* Current Sector */
@@ -219,7 +220,7 @@ static int Open( vlc_object_t *p_this )
         }
 
         p_sys->i_sector = p_sys->i_first_sector;
-        p_access->info.i_size = (p_sys->i_last_sector - p_sys->i_first_sector)
+        p_sys->size = (p_sys->i_last_sector - p_sys->i_first_sector)
                                      * (int64_t)CDDA_DATA_SIZE;
     }
 
@@ -333,7 +334,9 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_CONTROL_PACE:
             *va_arg( args, bool* ) = true;
             break;
-
+        case ACCESS_GET_SIZE:
+            *va_arg( args, uint64_t * ) = p_access->p_sys->size;
+            break;
         case ACCESS_GET_PTS_DELAY:
             *va_arg( args, int64_t * ) =
                 INT64_C(1000) * var_InheritInteger( p_access, "disc-caching" );

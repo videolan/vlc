@@ -123,7 +123,8 @@ static ssize_t Read(access_t *access, uint8_t *data, size_t size)
 
 static int Control(access_t *access, int query, va_list args)
 {
-    stream_t *s = access->p_sys->s;
+    access_sys_t *sys = access->p_sys;
+    stream_t *s = sys->s;
     if (!s)
         return VLC_EGENERIC;
 
@@ -143,6 +144,9 @@ static int Control(access_t *access, int query, va_list args)
         *b = true;
         return VLC_SUCCESS;
     }
+    case ACCESS_GET_SIZE:
+        *va_arg(args, uint64_t *) = sys->file->size;
+        return VLC_SUCCESS;
     case ACCESS_GET_PTS_DELAY: {
         int64_t *delay = va_arg(args, int64_t *);
         *delay = DEFAULT_PTS_DELAY;
@@ -198,7 +202,6 @@ static int Open(vlc_object_t *object)
     access->pf_seek    = Seek;
 
     access_InitFields(access);
-    access->info.i_size = file->size;
 
     rar_file_chunk_t dummy = {
         .mrl = base,

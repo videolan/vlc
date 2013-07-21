@@ -68,8 +68,8 @@ struct access_sys_t
 {
     int fd;
 
-    /* */
     bool b_pace_control;
+    uint64_t size;
 };
 
 #if !defined (_WIN32) && !defined (__OS2__)
@@ -226,8 +226,8 @@ int FileOpen( vlc_object_t *p_this )
     {
         p_access->pf_read = FileRead;
         p_access->pf_seek = FileSeek;
-        p_access->info.i_size = st.st_size;
         p_sys->b_pace_control = true;
+        p_sys->size = st.st_size;
 
         /* Demuxers will need the beginning of the file for probing. */
         posix_fadvise (fd, 0, 4096, POSIX_FADV_WILLNEED);
@@ -245,6 +245,7 @@ int FileOpen( vlc_object_t *p_this )
         p_access->pf_read = StreamRead;
         p_access->pf_seek = NoSeek;
         p_sys->b_pace_control = strcasecmp (p_access->psz_access, "stream");
+        p_sys->size = 0;
     }
 
     return VLC_SUCCESS;
@@ -302,12 +303,12 @@ static ssize_t FileRead (access_t *p_access, uint8_t *p_buffer, size_t i_len)
 
     p_access->info.i_pos += val;
     p_access->info.b_eof = !val;
-    if (p_access->info.i_pos >= p_access->info.i_size)
+    if (p_access->info.i_pos >= p_sys->size)
     {
         struct stat st;
 
         if (fstat (fd, &st) == 0)
-            p_access->info.i_size = st.st_size;
+            p_sys->size = st.st_size;
     }
     return val;
 }
@@ -385,6 +386,10 @@ static int FileControl( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_CONTROL_PACE:
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = p_sys->b_pace_control;
+            break;
+
+        case ACCESS_GET_SIZE:
+            *va_arg( args, uint64_t * ) = p_sys->size;
             break;
 
         /* */

@@ -318,7 +318,7 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
         if( !p_entry )
             goto error;
 
-        p_entry->i_size = p_access->info.i_size;
+        p_entry->i_size = access_GetSize( p_access );
         p_entry->psz_path = strdup( p_access->psz_location );
         if( !p_entry->psz_path )
         {
@@ -328,7 +328,7 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
         p_sys->p_list_access = p_access;
         TAB_APPEND( p_sys->i_list, p_sys->list, p_entry );
         msg_Dbg( p_access, "adding file `%s', (%"PRId64" bytes)",
-                 p_entry->psz_path, p_access->info.i_size );
+                 p_entry->psz_path, p_entry->i_size );
 
         for( int i = 0; ppsz_list[i] != NULL; i++ )
         {
@@ -342,15 +342,14 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
             if( !p_tmp )
                 continue;
 
-            msg_Dbg( p_access, "adding file `%s', (%"PRId64" bytes)",
-                     psz_name, p_tmp->info.i_size );
-
             p_entry = malloc( sizeof(*p_entry) );
             if( p_entry )
             {
-                p_entry->i_size = p_tmp->info.i_size;
+                p_entry->i_size = access_GetSize( p_tmp );
                 p_entry->psz_path = psz_name;
                 TAB_APPEND( p_sys->i_list, p_sys->list, p_entry );
+                msg_Dbg( p_access, "adding file `%s', (%"PRId64" bytes)",
+                         p_entry->psz_path, p_entry->i_size );
             }
             access_Delete( p_tmp );
         }
@@ -562,7 +561,7 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
                     *pi_64 += s->p_sys->list[i]->i_size;
                 break;
             }
-            *pi_64 = p_access->info.i_size;
+            *pi_64 = access_GetSize( p_access );
             break;
 
         case STREAM_CAN_SEEK:

@@ -80,6 +80,7 @@ struct access_sys_t
     LIBSSH2_SESSION* ssh_session;
     LIBSSH2_SFTP* sftp_session;
     LIBSSH2_SFTP_HANDLE* file;
+    uint64_t filesize;
     size_t i_read_size;
 };
 
@@ -233,7 +234,7 @@ static int Open( vlc_object_t* p_this )
         msg_Err( p_access, "Impossible to get information about the remote file %s", url.psz_path );
         goto error;
     }
-    p_access->info.i_size = attributes.filesize;
+    p_sys->filesize = attributes.filesize;
 
     p_sys->i_read_size = var_InheritInteger( p_access, "sftp-readsize" );
 
@@ -269,12 +270,14 @@ static void Close( vlc_object_t* p_this )
 
 static block_t* Block( access_t* p_access )
 {
+    access_sys_t *p_sys = p_access->p_sys;
+
     if( p_access->info.b_eof )
         return NULL;
 
     /* Allocate the buffer we need */
-    size_t i_len = __MIN( p_access->p_sys->i_read_size, p_access->info.i_size -
-                                              p_access->info.i_pos );
+    size_t i_len = __MIN( p_sys->i_read_size,
+                          p_sys->filesize - p_access->info.i_pos );
     block_t* p_block = block_Alloc( i_len );
     if( !p_block )
         return NULL;
@@ -333,6 +336,10 @@ static int Control( access_t* p_access, int i_query, va_list args )
     case ACCESS_CAN_CONTROL_PACE:
         pb_bool = (bool*)va_arg( args, bool* );
         *pb_bool = true;
+        break;
+
+    case ACCESS_GET_SIZE:
+        *va_arg( args, uint64_t * ) = p_access->p_sys->filesize;
         break;
 
     case ACCESS_GET_PTS_DELAY:

@@ -160,6 +160,7 @@ typedef struct vcdplayer_input_s
   bool           b_track_length; /* Use track as max unit in seek */
   input_thread_t *p_input;
   access_t       *p_access;
+  uint64_t       size;
  
 } vcdplayer_t;
 

@@ -101,7 +101,6 @@ int AccessOpen( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     int i_ret              = VLC_EGENERIC;
-    unzFile file           = 0;
 
     char *psz_pathToZip = NULL, *psz_path = NULL, *psz_sep = NULL;
 
@@ -163,8 +162,8 @@ int AccessOpen( vlc_object_t *p_this )
     p_func->opaque       = p_access;
 
     /* Open zip archive */
-    file = p_access->p_sys->zipFile = unzOpen2( psz_pathToZip, p_func );
-    if( !file )
+    p_access->p_sys->zipFile = unzOpen2( psz_pathToZip, p_func );
+    if( !p_access->p_sys->zipFile )
     {
         msg_Err( p_access, "not a valid zip archive: '%s'", psz_pathToZip );
         i_ret = VLC_EGENERIC;
@@ -178,12 +177,6 @@ int AccessOpen( vlc_object_t *p_this )
     /* Set callback */
     ACCESS_SET_CALLBACKS( AccessRead, NULL, AccessControl, AccessSeek );
 
-    /* Get some infos about current file. Maybe we could want some more ? */
-    unz_file_info z_info;
-    unzGetCurrentFileInfo( file, &z_info, NULL, 0, NULL, 0, NULL, 0 );
-
-    /* Set access information: size is needed for AccessSeek */
-    p_access->info.i_size = z_info.uncompressed_size;
     p_access->info.i_pos  = 0;
     p_access->info.b_eof  = false;
 
@@ -192,10 +185,10 @@ int AccessOpen( vlc_object_t *p_this )
 exit:
     if( i_ret != VLC_SUCCESS )
     {
-        if( file )
+        if( p_access->p_sys->zipFile )
         {
-            unzCloseCurrentFile( file );
-            unzClose( file );
+            unzCloseCurrentFile( p_access->p_sys->zipFile );
+            unzClose( p_access->p_sys->zipFile );
         }
         free( p_sys->psz_fileInzip );
         free( p_sys->fileFunctions );
@@ -250,6 +243,16 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = false;
             break;
+
+        case ACCESS_GET_SIZE:
+        {
+            unz_file_info z_info;
+
+            unzGetCurrentFileInfo( p_access->p_sys->zipFile, &z_info,
+                                   NULL, 0, NULL, 0, NULL, 0 );
+            *va_arg( args, uint64_t * ) = z_info.uncompressed_size;
+            break;
+        }
 
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );

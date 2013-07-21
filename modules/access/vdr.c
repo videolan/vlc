@@ -114,6 +114,7 @@ struct access_sys_t
 {
     /* file sizes of all parts */
     size_array_t file_sizes;
+    uint64_t size; /* total size */
 
     /* index and fd of current open file */
     unsigned i_current_file;
@@ -379,7 +380,7 @@ static int Seek( access_t *p_access, uint64_t i_pos )
     access_sys_t *p_sys = p_access->p_sys;
 
     /* might happen if called by ACCESS_SET_SEEKPOINT */
-    i_pos = __MIN( i_pos, p_access->info.i_size );
+    i_pos = __MIN( i_pos, p_sys->size );
 
     p_access->info.i_pos = i_pos;
     p_access->info.b_eof = false;
@@ -478,7 +479,7 @@ static bool ImportNextFile( access_t *p_access )
     free( psz_path );
 
     ARRAY_APPEND( p_sys->file_sizes, st.st_size );
-    p_access->info.i_size += st.st_size;
+    p_sys->size += st.st_size;
 
     return true;
 }
@@ -571,7 +572,7 @@ static void UpdateFileSize( access_t *p_access )
     access_sys_t *p_sys = p_access->p_sys;
     struct stat st;
 
-    if( p_access->info.i_size >= p_access->info.i_pos )
+    if( p_sys->size >= p_access->info.i_pos )
         return;
 
     /* TODO: not sure if this can happen or what to do in this case */
@@ -580,9 +581,9 @@ static void UpdateFileSize( access_t *p_access )
     if( (uint64_t)st.st_size <= CURRENT_FILE_SIZE )
         return;
 
-    p_access->info.i_size -= CURRENT_FILE_SIZE;
+    p_sys->size -= CURRENT_FILE_SIZE;
     CURRENT_FILE_SIZE = st.st_size;
-    p_access->info.i_size += CURRENT_FILE_SIZE;
+    p_sys->size += CURRENT_FILE_SIZE;
 }
 
 /*****************************************************************************
@@ -808,7 +809,7 @@ static void ImportMarks( access_t *p_access )
     }
     p_marks->psz_name = strdup( _("VDR Cut Marks") );
     p_marks->i_length = i_frame_count * (int64_t)( CLOCK_FREQ / p_sys->fps );
-    p_marks->i_size = p_access->info.i_size;
+    p_marks->i_size = p_sys->size;
 
     /* offset for chapter positions */
     int i_chapter_offset = p_sys->fps / 1000 *

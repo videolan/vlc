@@ -199,7 +199,6 @@ static int Open( vlc_object_t *p_this )
 
     p_access->info.i_title     = i_title;
     p_access->info.i_seekpoint = i_chapter;
-    p_access->info.i_size      = p_sys->title[i_title]->i_size;
     p_access->info.i_pos       = (uint64_t)( p_sys->i_sector - p_sys->p_sectors[1+i_title] ) *
                                  VCD_DATA_SIZE;
 
@@ -245,6 +244,11 @@ static int Control( access_t *p_access, int i_query, va_list args )
             *va_arg( args, bool* ) = true;
             break;
 
+        case ACCESS_GET_SIZE:
+            *va_arg( args, uint64_t * ) =
+                p_sys->title[p_access->info.i_title]->i_size;
+            break;
+
         /* */
         case ACCESS_GET_PTS_DELAY:
             *va_arg( args, int64_t * ) = INT64_C(1000)
@@ -276,7 +280,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
                                      INPUT_UPDATE_TITLE|INPUT_UPDATE_SEEKPOINT;
                 p_access->info.i_title = i;
                 p_access->info.i_seekpoint = 0;
-                p_access->info.i_size = p_sys->title[i]->i_size;
                 p_access->info.i_pos  = 0;
 
                 /* Next sector to read */
@@ -339,7 +342,6 @@ static block_t *Block( access_t *p_access )
                                    INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
         p_access->info.i_title++;
         p_access->info.i_seekpoint = 0;
-        p_access->info.i_size = p_sys->title[p_access->info.i_title]->i_size;
         p_access->info.i_pos = 0;
     }
 
