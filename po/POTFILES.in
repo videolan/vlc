@@ -1029,6 +1029,7 @@ modules/text_renderer/quartztext.c
 modules/text_renderer/svg.c
 modules/text_renderer/tdummy.c
 modules/text_renderer/win32text.c
+modules/video_chroma/chain.c
 modules/video_chroma/grey_yuv.c
 modules/video_chroma/i420_rgb16.c
 modules/video_chroma/i420_rgb8.c
@@ -1042,6 +1043,7 @@ modules/video_chroma/i422_yuy2.c
 modules/video_chroma/i422_yuy2.h
 modules/video_chroma/omxdl.c
 modules/video_chroma/rv32.c
+modules/video_chroma/swscale.c
 modules/video_chroma/yuy2_i420.c
 modules/video_chroma/yuy2_i422.c
 modules/video_filter/adjust.c
@@ -1078,7 +1080,6 @@ modules/video_filter/blendbench.c
 modules/video_filter/blend.cpp
 modules/video_filter/bluescreen.c
 modules/video_filter/canvas.c
-modules/video_filter/chain.c
 modules/video_filter/clone.c
 modules/video_filter/colorthres.c
 modules/video_filter/croppadd.c
@@ -1126,7 +1127,6 @@ modules/video_filter/scene.c
 modules/video_filter/sepia.c
 modules/video_filter/sharpen.c
 modules/video_filter/subsdelay.c
-modules/video_filter/swscale.c
 modules/video_filter/transform.c
 modules/video_filter/wall.c
 modules/video_filter/wave.c
