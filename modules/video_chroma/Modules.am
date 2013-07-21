@@ -38,7 +38,7 @@ libchain_plugin_la_SOURCES = chain.c
 libchain_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 libswscale_plugin_la_SOURCES = swscale.c ../codec/avcodec/chroma.c
-libswscale_plugin_la_CFLAGS = $(AM_CFLAGS) $(SWSCALE_FLAGS)
+libswscale_plugin_la_CFLAGS = $(AM_CFLAGS) $(SWSCALE_CFLAGS)
 libswscale_plugin_la_LIBADD = $(AM_LIBADD) $(SWSCALE_LIBS)
 EXTRA_LTLIBRARIES += libswscale_plugin.la
 
