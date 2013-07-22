@@ -379,8 +379,7 @@ static void* Run( void *data )
                     assert( p_widget );
                     msg_Dbg( p_mgr, "Clicking '%s': '%s'",
                              p_ext->psz_name, p_widget->psz_text );
-                    if( !lua_ExtensionWidgetClick( p_mgr, p_ext, p_widget )
-                        < 0 )
+                    if( lua_ExtensionWidgetClick( p_mgr, p_ext, p_widget ) < 0 )
                     {
                         msg_Warn( p_mgr, "Could not translate click" );
                     }
