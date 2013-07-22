@@ -142,8 +142,8 @@ function parse()
                 _,_,artist = string.find( line, "href=\"/user/([^\"]*)\"" )
             end
             -- JSON parameters, also formerly known as "swfConfig",
-            -- "SWF_ARGS", "swfArgs", "PLAYER_CONFIG" ...
-            if string.match( line, "playerConfig" ) then
+            -- "SWF_ARGS", "swfArgs", "PLAYER_CONFIG", "playerConfig" ...
+            if string.match( line, "ytplayer%.config" ) then
                 if not fmt then
                     fmt_list = string.match( line, "\"fmt_list\": \"(.-)\"" )
                     if fmt_list then
