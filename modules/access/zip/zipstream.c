@@ -136,14 +136,14 @@ inline static void free_all_node( node *root )
 /* Allocate strcat and format */
 static int astrcatf( char **ppsz_dest, const char *psz_fmt_src, ... )
 {
-    va_list args;
-    va_start( args, psz_fmt_src );
-
     char *psz_tmp;
-    int i_ret = vasprintf( &psz_tmp, psz_fmt_src, args );
-    if( i_ret == -1 ) return -1;
+    va_list args;
 
+    va_start( args, psz_fmt_src );
+    int i_ret = vasprintf( &psz_tmp, psz_fmt_src, args );
     va_end( args );
+
+    if( i_ret == -1 ) return -1;
 
     int i_len = strlen( *ppsz_dest ) + strlen( psz_tmp ) + 1;
     char *psz_out = realloc( *ppsz_dest, i_len );
