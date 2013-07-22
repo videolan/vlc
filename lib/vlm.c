@@ -391,6 +391,7 @@ const char* libvlc_vlm_show_media( libvlc_instance_t *p_instance,
         }
         free( psz_tmp );
     }
+    vlm_MessageDelete( answer );
     free( psz_message );
     return( psz_response );
 }
