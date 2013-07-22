@@ -751,7 +751,10 @@ int puzzle_mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
             if (p_sys->i_mouse_drag_pce != NO_PCE) {
                 int i_ret = puzzle_piece_foreground( p_filter, p_sys->i_mouse_drag_pce);
                 if (i_ret != VLC_SUCCESS)
+                {
+                    vlc_mutex_unlock( &p_sys->pce_lock );
                     return i_ret;
+                }
                 p_sys->i_mouse_drag_pce = 0;
 
                 uint32_t i_group_ID = p_sys->ps_pieces[0].i_group_ID;
