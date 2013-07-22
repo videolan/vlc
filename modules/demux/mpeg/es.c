@@ -151,7 +151,7 @@ static const codec_t p_codecs[] = {
     { VLC_CODEC_A52, true,  "a52 audio",  A52Probe,  A52Init },
     { VLC_CODEC_EAC3, true,  "eac3 audio", EA52Probe, A52Init },
     { VLC_CODEC_DTS, false, "dts audio",  DtsProbe,  DtsInit },
-    { VLC_CODEC_TRUEHD, false, "mlp audio",  MlpProbe,  MlpInit },
+    { VLC_CODEC_MLP, false, "mlp audio",  MlpProbe,  MlpInit },
 
     { 0, false, NULL, NULL, NULL }
 };
