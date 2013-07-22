@@ -689,9 +689,10 @@ static void MainBoxWrite(intf_sys_t *sys, int l, const char *p_fmt, ...)
         return;
 
     va_start(vl_args, p_fmt);
-    if (vasprintf(&p_buf, p_fmt, vl_args) == -1)
-        return;
+    int i_ret = vasprintf(&p_buf, p_fmt, vl_args);
     va_end(vl_args);
+    if (i_ret == -1)
+        return;
 
     if (b_selected) attron(A_REVERSE);
     mvnprintw(sys->box_y + l - sys->box_start, 1, COLS - 2, "%s", p_buf);
