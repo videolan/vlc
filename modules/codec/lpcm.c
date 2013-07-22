@@ -1052,15 +1052,24 @@ static void BdExtract( block_t *p_aout_buffer, block_t *p_block,
     {
         uint8_t *p_src = p_block->p_buffer;
         uint8_t *p_dst = p_aout_buffer->p_buffer;
+        int dst_inc = ((i_bits == 16) ? 2 : 4) * i_channels;
+
         while( i_frame_length > 0 )
         {
 #ifdef WORDS_BIGENDIAN
             memcpy( p_dst, p_src, i_channels * i_bits / 8 );
 #else
-            swab( p_dst, p_src, i_channels * i_bits / 8 );
+            if (i_bits == 16) {
+                swab( p_dst, p_src, (i_channels + i_channels_padding) * i_bits / 8 );
+            } else {
+                p_dst[0] = 0;
+                p_dst[1] = p_src[2];
+                p_dst[2] = p_src[1];
+                p_dst[3] = p_src[0];
+            }
 #endif
             p_src += (i_channels + i_channels_padding) * i_bits / 8;
-            p_dst += (i_channels +                  0) * i_bits / 8;
+            p_dst += dst_inc;
             i_frame_length--;
         }
     }
