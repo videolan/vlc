@@ -547,24 +547,28 @@ void _drawFrameInRect(NSRect frameRect)
 
 - (void)drawFullVolumeMarker
 {
+    CGFloat maxAudioVol = self.maxValue / AOUT_VOLUME_DEFAULT;
+    if (maxAudioVol < 1.)
+        return;
+
     NSRect frame = [self frame];
 
     NSColor *drawingColor;
+    // for bright artwork, a black color is used and vice versa
     if (_usesBrightArtwork)
-        drawingColor = [[NSColor whiteColor] colorWithAlphaComponent:.8];
+        drawingColor = [[NSColor blackColor] colorWithAlphaComponent:.4];
     else
-        drawingColor = [[NSColor blackColor] colorWithAlphaComponent:.6];
+        drawingColor = [[NSColor whiteColor] colorWithAlphaComponent:.4];
 
     NSBezierPath* bezierPath = [NSBezierPath bezierPath];
-    float fullVolPos = frame.size.width / 2.;
 
-    CGFloat maxAudioVol = self.maxValue / AOUT_VOLUME_DEFAULT;
+    CGFloat sliderRange = frame.size.width - [self knobThickness];
+    CGFloat sliderOrigin = [self knobThickness] / 2.;
 
-    if ((maxAudioVol - 1.) > 0)
-        fullVolPos += ((maxAudioVol - 1.) * 2000) / fullVolPos;
+    CGFloat fullVolPos = 1. / maxAudioVol * sliderRange + sliderOrigin;
 
     [bezierPath moveToPoint:NSMakePoint(fullVolPos, frame.size.height - 3.)];
-    [bezierPath lineToPoint:NSMakePoint(fullVolPos, 3.)];
+    [bezierPath lineToPoint:NSMakePoint(fullVolPos, 2.)];
     [bezierPath closePath];
 
     bezierPath.lineWidth = 1.;

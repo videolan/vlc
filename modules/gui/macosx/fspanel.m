@@ -454,12 +454,12 @@
     s_rc.size.height = 12;
     o_fs_volumeSlider = [[VLCFSVolumeSlider alloc] initWithFrame: s_rc];
     [o_fs_volumeSlider setMinValue:0];
-    [o_fs_volumeSlider setMaxValue:AOUT_VOLUME_MAX];
+    [o_fs_volumeSlider setMaxValue: [[VLCCoreInteraction sharedInstance] maxVolume]];
     [o_fs_volumeSlider setIntValue:AOUT_VOLUME_DEFAULT];
     [o_fs_volumeSlider setContinuous: YES];
     [o_fs_volumeSlider setTarget: self];
     [o_fs_volumeSlider setAction: @selector(fsVolumeSliderUpdate:)];
-    [o_fs_volumeSlider setUsesBrightArtwork:YES];
+    [o_fs_volumeSlider setUsesBrightArtwork:NO];
     [[o_fs_volumeSlider cell] accessibilitySetOverrideValue:_NS("Volume") forAttribute:NSAccessibilityTitleAttribute];
     [[o_fs_volumeSlider cell] accessibilitySetOverrideValue:_NS("Click and move the mouse while keeping the button pressed to use this slider to change the volume.") forAttribute:NSAccessibilityDescriptionAttribute];
     [self addSubview: o_fs_volumeSlider];
