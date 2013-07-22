@@ -339,11 +339,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_HAS_UNSUPPORTED_META:
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = true;
+            va_end( args_save );
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
             *pi64 = p_sys->i_pts + p_sys->i_time_offset;
+            va_end( args_save );
             return VLC_SUCCESS;
 
         case DEMUX_GET_LENGTH:
@@ -360,10 +362,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                  * don't bother trying ... Too bad */
                 if( f_pos < 0.01 ||
                     (p_sys->i_pts + p_sys->i_time_offset) < 8000000 )
+                {
+                    va_end( args_save );
                     return VLC_EGENERIC;
+                }
 
                 pi64 = (int64_t *)va_arg( args_save, int64_t * );
                 *pi64 = (p_sys->i_pts + p_sys->i_time_offset) / f_pos;
+                va_end( args_save );
                 return VLC_SUCCESS;
             }
             va_end( args_save );
@@ -376,6 +382,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             i_ret = demux_vaControlHelper( p_demux->s, p_sys->i_stream_offset, -1,
                                             p_sys->i_bitrate_avg, 1, i_query,
                                             args );
+            va_end( args_save );
             if( !i_ret && p_sys->i_bitrate_avg > 0 &&
                 (i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME) )
             {
