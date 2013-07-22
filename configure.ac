@@ -812,7 +812,7 @@ AC_ARG_ENABLE(dbus,
     [compile D-Bus message bus support (default enabled)])])
 have_dbus="no"
 AS_IF([test "${enable_dbus}" != "no"], [
-  PKG_CHECK_MODULES(DBUS, [dbus-1 >= 1.0.0], [
+  PKG_CHECK_MODULES(DBUS, [dbus-1 >= 1.6.0], [
     have_dbus="yes"
   ], [
     AS_IF([test -n "${enable_dbus}"], [
