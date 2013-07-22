@@ -240,6 +240,10 @@ function parse()
             title = vlc.strings.decode_uri( title )
         end
         local artist = string.match( line, "&author=([^&]*)" )
+        if artist then
+            artist = string.gsub( artist, "+", " " )
+            -- Not sure if there may be encoded characters to decode here
+        end
         local arturl = string.match( line, "&thumbnail_url=([^&]*)" )
         if arturl then
             arturl = vlc.strings.decode_uri( arturl )
