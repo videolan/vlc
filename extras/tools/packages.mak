@@ -33,7 +33,7 @@ OPENSSL_VERSION=1.0.0e
 OPENSSL_URL=http://www.openssl.org/source/openssl-$(OPENSSL_VERSION).tar.gz
 
 GAS_VERSION=c76b628
-GAS_URL=https://github.com/libav/gas-preprocessor/tarball/$(GAS_VERSION)
+GAS_URL=http://git.libav.org/?p=gas-preprocessor.git;a=snapshot;h=$(GAS_VERSION);sf=tgz
 
 RAGEL_VERSION=6.8
 RAGEL_URL=http://www.complang.org/ragel/ragel-$(RAGEL_VERSION).tar.gz

@@ -216,10 +216,10 @@ CLEAN_PKG += openssl
 DISTCLEAN_PKG += openssl-$(OPENSSL_VERSION).tar.gz
 
 # gas-preprocessor
-libav-gas-preprocessor-$(GAS_VERSION).tar.gz:
+gas-preprocessor-$(GAS_VERSION).tar.gz:
 	$(call download,$(GAS_URL))
 
-gas: libav-gas-preprocessor-$(GAS_VERSION).tar.gz
+gas: gas-preprocessor-$(GAS_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
