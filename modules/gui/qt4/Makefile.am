@@ -19,10 +19,13 @@ SUFFIXES = .ui .h .hpp .moc.cpp
 libqt4_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS)
 libqt4_plugin_la_LIBADD = $(AM_LIBADD) $(QT_LIBS)
 libqt4_plugin_la_LDFLAGS = $(AM_LDFLAGS)
+if HAVE_OS2
+else
 if HAVE_WIN32
 libqt4_plugin_la_LIBADD += -lole32
 else
 libqt4_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIB) -lX11
+endif
 endif
 if HAVE_DARWIN
 libqt4_plugin_la_LDFLAGS += -Wl,-framework,Cocoa
