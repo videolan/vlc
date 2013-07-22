@@ -599,9 +599,11 @@ static void mvnprintw(int y, int x, int w, const char *p_fmt, ...)
         return;
 
     va_start(vl_args, p_fmt);
-    if (vasprintf(&p_buf, p_fmt, vl_args) == -1)
-        return;
+    int i_ret = vasprintf(&p_buf, p_fmt, vl_args);
     va_end(vl_args);
+
+    if (i_ret == -1)
+        return;
 
     len = strlen(p_buf);
 
