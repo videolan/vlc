@@ -231,7 +231,6 @@ vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *crd, int fd,
             break;
         }
     }
-    while (val > 0);
 
     if (val != 0)
     {
