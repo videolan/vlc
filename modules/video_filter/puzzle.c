@@ -453,7 +453,10 @@ picture_t *Filter( filter_t *p_filter, picture_t *p_pic_in ) {
             && p_sys->s_current_param.b_advanced ) {
         i_ret = puzzle_sort_layers( p_filter);
         if (i_ret != VLC_SUCCESS)
+        {
+            vlc_mutex_unlock( &p_sys->pce_lock );
             return CopyInfoAndRelease( p_pic_out, p_pic_in );
+        }
     }
 
     for (uint32_t i = 0; i < __MAX( 4, p_sys->s_allocated.i_pieces_nbr / 24 )
