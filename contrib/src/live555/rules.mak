@@ -4,7 +4,9 @@
 LIVE555_FILE := live.2012.12.18.tar.gz
 LIVEDOTCOM_URL := http://download.videolan.org/pub/contrib/live555/$(LIVE555_FILE)
 
+ifdef BUILD_NETWORK
 PKGS += live555
+endif
 
 $(TARBALLS)/$(LIVE555_FILE):
 	$(call download,$(LIVEDOTCOM_URL))

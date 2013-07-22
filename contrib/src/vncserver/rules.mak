@@ -3,7 +3,9 @@
 VNCSERVER_VERSION := 0.9.9
 VNCSERVER_URL := $(SF)/libvncserver/libvncserver/$(VNCSERVER_VERSION)/LibVNCServer-$(VNCSERVER_VERSION).tar.gz
 
+ifdef BUILD_NETWORK
 PKGS += vncserver
+endif
 ifeq ($(call need_pkg,"libvncclient"),)
 PKGS_FOUND += vncserver
 endif

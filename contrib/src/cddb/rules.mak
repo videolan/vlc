@@ -2,8 +2,10 @@
 CDDB_VERSION := 1.3.2
 CDDB_URL := $(SF)/libcddb/libcddb-$(CDDB_VERSION).tar.bz2
 
+ifdef BUILD_NETWORK
 ifdef BUILD_DISCS
 PKGS += cddb
+endif
 endif
 ifeq ($(call need_pkg,"libcddb"),)
 PKGS_FOUND += cddb

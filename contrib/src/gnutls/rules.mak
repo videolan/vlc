@@ -3,7 +3,9 @@
 GNUTLS_VERSION := 3.1.12
 GNUTLS_URL := ftp://ftp.gnutls.org/gcrypt/gnutls/v3.1/gnutls-$(GNUTLS_VERSION).tar.xz
 
+ifdef BUILD_NETWORK
 PKGS += gnutls
+endif
 ifeq ($(call need_pkg,"gnutls >= 3.0.20"),)
 PKGS_FOUND += gnutls
 endif

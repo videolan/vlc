@@ -4,7 +4,9 @@ SHOUT_VERSION := 2.3.1
 SHOUT_URL := http://downloads.us.xiph.org/releases/libshout/libshout-$(SHOUT_VERSION).tar.gz
 
 ifdef BUILD_ENCODERS
+ifdef BUILD_NETWORK
 PKGS += shout
+endif
 endif
 ifeq ($(call need_pkg,"shout >= 2.1"),)
 PKGS_FOUND += shout

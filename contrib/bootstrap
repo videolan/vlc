@@ -27,6 +27,7 @@ usage()
 	echo "  --disable-FOO    configure to not build package FOO"
 	echo "  --enable-FOO     configure to build package FOO"
 	echo "  --disable-disc   configure to not build optical discs packages"
+	echo "  --disable-net    configure to not build networking packages"
 	echo "  --disable-sout   configure to not build stream output packages"
 	echo "  --enable-small   optimize libraries for size with slight speed decrease [DANGEROUS]"
 	echo "  --disable-gpl    configure to not build viral GPL code"
@@ -38,6 +39,7 @@ PREFIX=
 PKGS_ENABLE=
 PKGS_DISABLE=
 BUILD_ENCODERS="1"
+BUILD_NETWORK="1"
 BUILD_DISCS="1"
 GPL="1"
 
@@ -65,6 +67,9 @@ do
 			;;
 		--disable-disc)
 			BUILD_DISCS=
+			;;
+		--disable-net)
+			BUILD_NETWORK=
 			;;
 		--disable-sout)
 			BUILD_ENCODERS=
@@ -204,6 +209,7 @@ check_android_sdk()
 test -z "$PREFIX" || add_make "PREFIX := $PREFIX"
 test -z "$BUILD_DISCS" || add_make_enabled "BUILD_DISCS"
 test -z "$BUILD_ENCODERS" || add_make_enabled "BUILD_ENCODERS"
+test -z "$BUILD_NETWORK" || add_make_enabled "BUILD_NETWORK"
 test -z "$ENABLE_SMALL" || add_make_enabled "ENABLE_SMALL"
 test -z "$GPL" || add_make_enabled "GPL"
 
