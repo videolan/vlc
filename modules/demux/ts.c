@@ -132,6 +132,8 @@ static void Close ( vlc_object_t * );
     "Seek and position based on a percent byte position, not a PCR generated " \
     "time position. If seeking doesn't work property, turn on this option." )
 
+#define PCR_TEXT N_("Trust in-stream PCR")
+#define PCR_LONGTEXT N_("Use the stream PCR as a reference.")
 
 vlc_module_begin ()
     set_description( N_("MPEG Transport Stream demuxer") )
@@ -140,6 +142,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
 
     add_string( "ts-extra-pmt", NULL, PMT_TEXT, PMT_LONGTEXT, true )
+    add_bool( "ts-trust-pcr", true, PCR_TEXT, PCR_LONGTEXT, true )
+        change_safe()
     add_bool( "ts-es-id-pid", true, PID_TEXT, PID_LONGTEXT, true )
         change_safe()
     add_string( "ts-out", NULL, TSOUT_TEXT, TSOUT_LONGTEXT, true )
@@ -312,6 +316,7 @@ struct demux_sys_t
     bool        b_udp_out;
     int         fd; /* udp socket */
     uint8_t     *buffer;
+    bool        b_trust_pcr;
 
     /* */
     bool        b_access_control;
@@ -690,6 +695,8 @@ static int Open( vlc_object_t *p_this )
 
     /* Read config */
     p_sys->b_es_id_pid = var_CreateGetBool( p_demux, "ts-es-id-pid" );
+
+    p_sys->b_trust_pcr = var_CreateGetBool( p_demux, "ts-trust-pcr" );
 
     char* psz_string = var_CreateGetString( p_demux, "ts-out" );
     if( psz_string && *psz_string )
@@ -1542,6 +1549,7 @@ static void PIDClean( demux_t *p_demux, ts_pid_t *pid )
  ****************************************************************************/
 static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
     uint8_t header[34];
     unsigned i_pes_size = 0;
     unsigned i_skip = 0;
@@ -1749,6 +1757,9 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
             es_out_Send( p_demux->out, pid->extra_es[i]->id,
                          block_Duplicate( p_block ) );
         }
+
+        if (!p_sys->b_trust_pcr)
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts);
 
         es_out_Send( p_demux->out, pid->es->id, p_block );
     }
@@ -2168,9 +2179,10 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
             if( pid->i_pid == p_sys->pmt[i]->psi->prg[i_prg]->i_pid_pcr )
             {
                 p_sys->pmt[i]->psi->prg[i_prg]->i_pcr_value = i_pcr;
-                es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
-                                (int)p_sys->pmt[i]->psi->prg[i_prg]->i_number,
-                                (int64_t)(VLC_TS_0 + i_pcr * 100 / 9) );
+                if (p_sys->b_trust_pcr)
+                    es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
+                      (int)p_sys->pmt[i]->psi->prg[i_prg]->i_number,
+                      (int64_t)(VLC_TS_0 + i_pcr * 100 / 9) );
             }
 }
 
