@@ -389,6 +389,8 @@ static OSStatus RenderCallback(vlc_object_t *p_obj,
         memcpy(targetBuffer, buffer, __MIN(bytesToCopy, availableBytes));
         TPCircularBufferConsume(&p_sys->circular_buffer, __MIN(bytesToCopy, availableBytes));
         VLC_UNUSED(inNumberFrames);
+        if (availableBytes < bytesToCopy)
+            memset((uint8_t*) targetBuffer + availableBytes, 0, bytesToCopy - availableBytes);
     }
 
     return noErr;
