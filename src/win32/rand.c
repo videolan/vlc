@@ -78,12 +78,18 @@ void vlc_rand_bytes (void *buf, size_t len)
 
     IBuffer *buffer = NULL;
     hr = ICryptographicBufferStatics_GenerateRandom(cryptoStatics, len, &buffer);
-    if (hr)
+    if (hr) {
+        ICryptographicBufferStatics_Release(cryptoStatics);
         return;
+    }
+
     UINT32 olength;
     unsigned char *rnd = NULL;
     hr = ICryptographicBufferStatics_CopyToByteArray(cryptoStatics, buffer, &olength, (BYTE**)&rnd);
     memcpy(buf, rnd, len);
+
+    IBuffer_Release(buffer);
+    ICryptographicBufferStatics_Release(cryptoStatics);
 #else
     HCRYPTPROV hProv;
     /* acquire default encryption context */
