@@ -755,7 +755,7 @@ static void VoutDisplayCropRatio(int *left, int *top, int *right, int *bottom,
     }
 }
 
-void vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
+bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
@@ -1055,6 +1055,8 @@ void vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
     }
     if (reset_render)
         VoutDisplayResetRender(vd);
+
+    return reset_render;
 }
 
 bool vout_AreDisplayPicturesInvalid(vout_display_t *vd)
