@@ -739,5 +739,12 @@
     [self drawKnobInRect: knobRect];
 }
 
+- (void)drawFullVolBezierPath:(NSBezierPath*)bezierPath
+{
+    CGFloat fullVolPos = [self fullVolumePos];
+    [bezierPath moveToPoint:NSMakePoint(fullVolPos, [self frame].size.height)];
+    [bezierPath lineToPoint:NSMakePoint(fullVolPos, 1.)];
+}
+
 @end
 

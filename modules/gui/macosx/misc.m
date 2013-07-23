@@ -551,8 +551,6 @@ void _drawFrameInRect(NSRect frameRect)
     if (maxAudioVol < 1.)
         return;
 
-    NSRect frame = [self frame];
-
     NSColor *drawingColor;
     // for bright artwork, a black color is used and vice versa
     if (_usesBrightArtwork)
@@ -561,21 +559,28 @@ void _drawFrameInRect(NSRect frameRect)
         drawingColor = [[NSColor whiteColor] colorWithAlphaComponent:.4];
 
     NSBezierPath* bezierPath = [NSBezierPath bezierPath];
-
-    CGFloat sliderRange = frame.size.width - [self knobThickness];
-    CGFloat sliderOrigin = [self knobThickness] / 2.;
-
-    CGFloat fullVolPos = 1. / maxAudioVol * sliderRange + sliderOrigin;
-
-    [bezierPath moveToPoint:NSMakePoint(fullVolPos, frame.size.height - 3.)];
-    [bezierPath lineToPoint:NSMakePoint(fullVolPos, 2.)];
+    [self drawFullVolBezierPath:bezierPath];
     [bezierPath closePath];
 
     bezierPath.lineWidth = 1.;
     [drawingColor setStroke];
     [bezierPath stroke];
-    [drawingColor setFill];
-    [bezierPath fill];
+}
+
+- (CGFloat)fullVolumePos
+{
+    CGFloat maxAudioVol = self.maxValue / AOUT_VOLUME_DEFAULT;
+    CGFloat sliderRange = [self frame].size.width - [self knobThickness];
+    CGFloat sliderOrigin = [self knobThickness] / 2.;
+
+    return 1. / maxAudioVol * sliderRange + sliderOrigin;
+}
+
+- (void)drawFullVolBezierPath:(NSBezierPath*)bezierPath
+{
+    CGFloat fullVolPos = [self fullVolumePos];
+    [bezierPath moveToPoint:NSMakePoint(fullVolPos, [self frame].size.height - 3.)];
+    [bezierPath lineToPoint:NSMakePoint(fullVolPos, 2.)];
 }
 
 @end
@@ -641,7 +646,7 @@ void _drawFrameInRect(NSRect frameRect)
                                  @"NO", @"DisplayTimeAsTimeRemaining",
                                  @"YES", @"DisplayFullscreenTimeAsTimeRemaining",
                                  nil];
-    
+
     [defaults registerDefaults:appDefaults];
 }
 
@@ -651,7 +656,7 @@ void _drawFrameInRect(NSRect frameRect)
         textAlignment = NSCenterTextAlignment;
         o_remaining_identifier = @"";
     }
-    
+
     return self;
 }
 

@@ -129,6 +129,8 @@
 - (void)scrollWheel:(NSEvent *)o_event;
 - (void)drawFullVolumeMarker;
 
+- (CGFloat)fullVolumePos;
+
 @end
 
 /*****************************************************************************
