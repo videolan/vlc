@@ -258,7 +258,8 @@ vlc_module_end ()
 static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*) p_this;
-    int i_cat, i_codec_id, i_result;
+    unsigned i_codec_id;
+    int i_cat, i_result;
     const char *psz_namecodec;
 
     AVCodecContext *p_context = NULL;

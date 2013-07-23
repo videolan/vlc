@@ -37,9 +37,9 @@
  *****************************************************************************/
 static const struct
 {
-    vlc_fourcc_t  i_fourcc;
-    int  i_codec;
-    int  i_cat;
+    vlc_fourcc_t i_fourcc;
+    unsigned i_codec;
+    int i_cat;
 } codecs_table[] =
 {
     /*
@@ -451,7 +451,7 @@ static const size_t codecs_count = sizeof (codecs_table)
                                  / sizeof (codecs_table[0]);
 
 int GetFfmpegCodec( vlc_fourcc_t i_fourcc, int *pi_cat,
-                    int *pi_ffmpeg_codec, const char **ppsz_name )
+                    unsigned *pi_ffmpeg_codec, const char **ppsz_name )
 {
     i_fourcc = vlc_fourcc_GetCodec( UNKNOWN_ES, i_fourcc );
     for( unsigned i = 0; i < codecs_count; i++ )
@@ -468,7 +468,7 @@ int GetFfmpegCodec( vlc_fourcc_t i_fourcc, int *pi_cat,
     return false;
 }
 
-int GetVlcFourcc( int i_ffmpeg_codec, int *pi_cat,
+int GetVlcFourcc( unsigned i_ffmpeg_codec, int *pi_cat,
                   vlc_fourcc_t *pi_fourcc, const char **ppsz_name )
 {
     for( unsigned i = 0; i < codecs_count; i++ )

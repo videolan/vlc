@@ -203,7 +203,8 @@ int OpenEncoder( vlc_object_t *p_this )
     encoder_sys_t *p_sys;
     AVCodecContext *p_context;
     AVCodec *p_codec = NULL;
-    int i_codec_id, i_cat;
+    unsigned i_codec_id;
+    int i_cat;
     const char *psz_namecodec;
     float f_val;
     char *psz_val;
