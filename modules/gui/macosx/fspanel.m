@@ -710,6 +710,16 @@
 *****************************************************************************/
 @implementation VLCFSVolumeSlider
 
+- (id)initWithFrame:(NSRect)frame
+{
+    self = [super initWithFrame:frame];
+    if(self) {
+        [self setCell:[[[VolumeSliderCell alloc] init] autorelease]];
+    }
+
+    return self;
+}
+
 - (void)drawKnobInRect:(NSRect) knobRect
 {
     NSRect image_rect;

@@ -585,6 +585,22 @@ void _drawFrameInRect(NSRect frameRect)
 
 @end
 
+@implementation VolumeSliderCell
+
+- (BOOL)continueTracking:(NSPoint)lastPoint at:(NSPoint)currentPoint inView:(NSView *)controlView
+{
+    VLCVolumeSliderCommon *o_slider = (VLCVolumeSliderCommon *)controlView;
+    CGFloat fullVolumePos = [o_slider fullVolumePos] + 2.;
+
+    CGPoint snapToPoint = currentPoint;
+    if (ABS(fullVolumePos - currentPoint.x) <= 4.)
+        snapToPoint.x = fullVolumePos;
+
+    return [super continueTracking:lastPoint at:snapToPoint inView:controlView];
+}
+
+@end
+
 /*****************************************************************************
  * ITSlider
  *****************************************************************************/

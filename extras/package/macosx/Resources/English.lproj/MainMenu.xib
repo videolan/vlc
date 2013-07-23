@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">12D78</string>
+    <string key="IBDocument.SystemVersion">12E55</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1187.37</string>
+    <string key="IBDocument.AppKitVersion">1187.39</string>
     <string key="IBDocument.HIToolboxVersion">626.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -21,12 +21,12 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="21"/>
-      <integer value="4850"/>
       <integer value="5260"/>
-      <integer value="2730"/>
       <integer value="29"/>
       <integer value="2461"/>
+      <integer value="4850"/>
+      <integer value="2730"/>
+      <integer value="21"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -714,7 +714,7 @@
                   </object>
                   <bool key="NSEnabled">YES</bool>
                   <object class="NSSliderCell" key="NSCell" id="180862414">
-                    <int key="NSCellFlags">-2080112384</int>
+                    <int key="NSCellFlags">67371264</int>
                     <int key="NSCellFlags2">131072</int>
                     <object class="NSMutableString" key="NSContents">
                       <characters key="NS.bytes"/>
@@ -727,7 +727,7 @@
                     <reference key="NSControlView" ref="788281303"/>
                     <double key="NSMaxValue">512</double>
                     <double key="NSMinValue">0.0</double>
-                    <double key="NSValue">256</double>
+                    <double key="NSValue">251.95348837209303</double>
                     <double key="NSAltIncValue">0.0</double>
                     <int key="NSNumberOfTickMarks">0</int>
                     <int key="NSTickMarkPosition">1</int>
@@ -12181,6 +12181,7 @@ LCAuLi4</string>
           <string>4272.ImportedFromIB2</string>
           <string>4274.IBPluginDependency</string>
           <string>4275.IBPluginDependency</string>
+          <string>4276.CustomClassName</string>
           <string>4276.IBPluginDependency</string>
           <string>4278.IBPluginDependency</string>
           <string>4279.IBPluginDependency</string>
@@ -13099,6 +13100,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>VolumeSliderCell</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -13709,6 +13711,10 @@ LCAuLi4</string>
             <string key="majorKey">IBProjectSource</string>
             <string key="minorKey">../../../modules/gui/macosx/SPMediaKeyTap.h</string>
           </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSView</string>
+          <reference key="sourceIdentifier" ref="516086310"/>
         </object>
         <object class="IBPartialClassDescription">
           <string key="className">NSWindow</string>
@@ -16851,6 +16857,11 @@ LCAuLi4</string>
           <string key="className">VLCWindowTitleTextField</string>
           <string key="superclassName">NSTextField</string>
           <reference key="sourceIdentifier" ref="925772039"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VolumeSliderCell</string>
+          <string key="superclassName">NSSliderCell</string>
+          <reference key="sourceIdentifier" ref="516086310"/>
         </object>
       </object>
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.2+">
