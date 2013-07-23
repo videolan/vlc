@@ -25,7 +25,9 @@
 # include "config.h"
 #endif
 
+#ifndef UNICODE
 #define UNICODE
+#endif
 #include <vlc_common.h>
 
 #include <w32api.h>
