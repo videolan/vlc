@@ -26,11 +26,18 @@
 #include <vlc_common.h>
 #include <vlc_rand.h>
 
-#include <wincrypt.h>
+#if VLC_WINSTORE_APP
+# define COBJMACROS
+# define INITGUID
+# include <winstring.h>
+# include <roapi.h>
+# include <windows.security.cryptography.h>
+#else
+# include <wincrypt.h>
+#endif
 
 void vlc_rand_bytes (void *buf, size_t len)
 {
-    HCRYPTPROV hProv;
     size_t count = len;
     uint8_t *p_buf = (uint8_t *)buf;
 
@@ -50,6 +57,35 @@ void vlc_rand_bytes (void *buf, size_t len)
         p_buf += sizeof (val);
     }
 
+#if VLC_WINSTORE_APP
+    static const WCHAR *className = L"Windows.Security.Cryptography.CryptographicBuffer";
+    const UINT32 clen = wcslen(className);
+
+    HSTRING hClassName = NULL;
+    HSTRING_HEADER header;
+    HRESULT hr = WindowsCreateStringReference(className, clen, &header, &hClassName);
+    if (hr) {
+        WindowsDeleteString(hClassName);
+        return;
+    }
+
+    ICryptographicBufferStatics *cryptoStatics = NULL;
+    hr = RoGetActivationFactory(hClassName, &IID_ICryptographicBufferStatics, (void**)&cryptoStatics);
+    WindowsDeleteString(hClassName);
+
+    if (hr)
+        return;
+
+    IBuffer *buffer = NULL;
+    hr = ICryptographicBufferStatics_GenerateRandom(cryptoStatics, len, &buffer);
+    if (hr)
+        return;
+    UINT32 olength;
+    unsigned char *rnd = NULL;
+    hr = ICryptographicBufferStatics_CopyToByteArray(cryptoStatics, buffer, &olength, (BYTE**)&rnd);
+    memcpy(buf, rnd, len);
+#else
+    HCRYPTPROV hProv;
     /* acquire default encryption context */
     if( CryptAcquireContext(
         &hProv,                 // Variable to hold returned handle.
@@ -63,4 +99,5 @@ void vlc_rand_bytes (void *buf, size_t len)
         CryptGenRandom(hProv, len, buf);
         CryptReleaseContext(hProv, 0);
     }
+#endif /* VLC_WINSTORE_APP */
 }

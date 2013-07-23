@@ -475,7 +475,10 @@ AC_ARG_ENABLE(winstore_app,
                     [Build targetted for Windows Store apps (default disabled)]))
 
 vlc_winstore_app=0
-AS_IF([test "${SYS}" = "mingw32" -a "${enable_winstore_app}" = "yes"], [vlc_winstore_app=1])
+AS_IF([test "${SYS}" = "mingw32" -a "${enable_winstore_app}" = "yes"], [
+    vlc_winstore_app=1
+    VLC_ADD_LIBS([libvlccore], [-lole32 -lruntimeobject])
+    ])
 AC_DEFINE_UNQUOTED(VLC_WINSTORE_APP, ${vlc_winstore_app}, [Define to 1 if you want to build for Windows Store apps])
 
 
