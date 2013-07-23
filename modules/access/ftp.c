@@ -52,8 +52,10 @@
  *****************************************************************************/
 static int   InOpen ( vlc_object_t * );
 static void  InClose( vlc_object_t * );
+#ifdef ENABLE_SOUT
 static int  OutOpen ( vlc_object_t * );
 static void OutClose( vlc_object_t * );
+#endif
 
 #define USER_TEXT N_("FTP user name")
 #define USER_LONGTEXT N_("User name that will " \
@@ -80,6 +82,7 @@ vlc_module_begin ()
     add_shortcut( "ftp" )
     set_callbacks( InOpen, InClose )
 
+#ifdef ENABLE_SOUT
     add_submodule ()
         set_shortname( "FTP" )
         set_description( N_("FTP upload output") )
@@ -88,16 +91,19 @@ vlc_module_begin ()
         set_subcategory( SUBCAT_SOUT_ACO )
         add_shortcut( "ftp" )
         set_callbacks( OutOpen, OutClose )
+#endif
 vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static ssize_t Read( access_t *, uint8_t *, size_t );
-static ssize_t Write( sout_access_out_t *, block_t * );
 static int Seek( access_t *, uint64_t );
-static int OutSeek( sout_access_out_t *, off_t );
 static int Control( access_t *, int, va_list );
+#ifdef ENABLE_SOUT
+static int OutSeek( sout_access_out_t *, off_t );
+static ssize_t Write( sout_access_out_t *, block_t * );
+#endif
 
 struct access_sys_t
 {
@@ -527,6 +533,7 @@ exit_error:
     return VLC_EGENERIC;
 }
 
+#ifdef ENABLE_SOUT
 static int OutOpen( vlc_object_t *p_this )
 {
     sout_access_out_t *p_access = (sout_access_out_t *)p_this;
@@ -570,6 +577,7 @@ exit_error:
     free( p_sys );
     return VLC_EGENERIC;
 }
+#endif
 
 /*****************************************************************************
  * Close: free unused data structures
@@ -599,10 +607,12 @@ static void InClose( vlc_object_t *p_this )
     Close( p_this, ((access_t *)p_this)->p_sys);
 }
 
+#ifdef ENABLE_SOUT
 static void OutClose( vlc_object_t *p_this )
 {
     Close( p_this, GET_OUT_SYS(p_this));
 }
+#endif
 
 
 /*****************************************************************************
@@ -631,10 +641,12 @@ static int Seek( access_t *p_access, uint64_t i_pos )
     return VLC_SUCCESS;
 }
 
+#ifdef ENABLE_SOUT
 static int OutSeek( sout_access_out_t *p_access, off_t i_pos )
 {
     return _Seek( (vlc_object_t *)p_access, GET_OUT_SYS( p_access ), i_pos);
 }
+#endif
 
 /*****************************************************************************
  * Read:
@@ -682,6 +694,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 /*****************************************************************************
  * Write:
  *****************************************************************************/
+#ifdef ENABLE_SOUT
 static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     access_sys_t *p_sys = GET_OUT_SYS(p_access);
@@ -702,6 +715,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 
     return i_write;
 }
+#endif
 
 /*****************************************************************************
  * Control:
