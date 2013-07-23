@@ -175,8 +175,8 @@ static int Demux( demux_t *p_demux )
     if( !EMPTY_STR(variable) )                          \
     {                                                   \
         input_item_Set##type( p_input, variable );      \
-        FREENULL( variable );                           \
-    }
+    }                                                   \
+    FREENULL( variable );
             /* set the meta */
             SET( psz_genre, Genre );
             SET( psz_tracknum, TrackNum );
@@ -204,6 +204,22 @@ static int Demux( demux_t *p_demux )
     input_item_node_PostAndDelete( p_subitems );
 
     vlc_gc_decref(p_current_input);
+
+    // Free everything if the file is wrongly formated
+    free( psz_title );
+    free( psz_genre );
+    free( psz_tracknum );
+    free( psz_language );
+    free( psz_artist );
+    free( psz_album );
+    free( psz_date );
+    free( psz_publisher );
+    free( psz_encodedby );
+    free( psz_description );
+    free( psz_url );
+    free( psz_copyright );
+    free( psz_mrl );
+
     var_Destroy( p_demux, "zpl-extvlcopt" );
     return 0; /* Needed for correct operation of go back */
 }
