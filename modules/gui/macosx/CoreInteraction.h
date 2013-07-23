@@ -28,6 +28,8 @@
 @interface VLCCoreInteraction : NSObject {
     int i_currentPlaybackRate;
     mtime_t timeA, timeB;
+
+    float f_maxVolume;
 }
 + (VLCCoreInteraction *)sharedInstance;
 @property (readwrite) int volume;

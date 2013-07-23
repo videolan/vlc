@@ -558,7 +558,11 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
 - (float)maxVolume
 {
-    return 1.2 * AOUT_VOLUME_DEFAULT;
+    if (f_maxVolume == 0.) {
+        f_maxVolume = (float)var_InheritInteger(VLCIntf, "macosx-max-volume") / 100. * AOUT_VOLUME_DEFAULT;
+    }
+
+    return f_maxVolume;
 }
 
 #pragma mark -

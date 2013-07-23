@@ -128,6 +128,9 @@ static const char *const itunes_list_text[] = {
     N_("Do nothing"), N_("Pause iTunes"), N_("Pause and resume iTunes")
 };
 
+#define VOLUME_MAX_TEXT N_("Maximum Volume displayed")
+
+
 vlc_module_begin()
     set_description(N_("Mac OS X interface"))
     set_capability("interface", 200)
@@ -144,6 +147,7 @@ vlc_module_begin()
         add_bool("macosx-show-playmode-buttons", false, PLAYMODEBUTTONS_TEXT, PLAYMODEBUTTONS_LONGTEXT, false)
         add_bool("macosx-show-effects-button", false, EFFECTSBUTTON_TEXT, EFFECTSBUTTON_LONGTEXT, false)
         add_bool("macosx-show-sidebar", true, SIDEBAR_TEXT, SIDEBAR_LONGTEXT, false)
+        add_integer_with_range("macosx-max-volume", 125, 60, 200, VOLUME_MAX_TEXT, VOLUME_MAX_TEXT, true)
 
     set_section(N_("Behavior"), 0)
         add_bool("macosx-autoplay", true, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT, false)
