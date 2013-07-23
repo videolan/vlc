@@ -608,7 +608,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             block_Release( p_block );
             return NULL;
         }
-        else if( i_used > p_block->i_buffer ||
+        else if( (unsigned)i_used > p_block->i_buffer ||
                  p_context->thread_count > 1 )
         {
             i_used = p_block->i_buffer;
