@@ -254,9 +254,8 @@ static int Extract( vlc_va_t *external, picture_t *p_picture, AVFrame *p_ff )
     return VLC_SUCCESS;
 }
 
-static void Release( vlc_va_t *external, AVFrame *p_ff )
+static void Release( AVFrame *p_ff )
 {
-    VLC_UNUSED( external );
     CVPixelBufferRef cv_buffer = ( CVPixelBufferRef )p_ff->data[3];
 
     if ( cv_buffer )

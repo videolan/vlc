@@ -69,9 +69,8 @@ static int Lock(vlc_va_t *va, AVFrame *ff)
     return VLC_SUCCESS;
 }
 
-static void Unlock(vlc_va_t *va, AVFrame *ff)
+static void Unlock(AVFrame *ff)
 {
-    (void) va;
     assert((uintptr_t)ff->opaque == SURFACE_MAGIC);
 }
 

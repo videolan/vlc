@@ -91,14 +91,12 @@ static int Lock(vlc_va_t *va, AVFrame *ff)
     return VLC_SUCCESS;
 }
 
-static void Unlock(vlc_va_t *va, AVFrame *ff)
+static void Unlock(AVFrame *ff)
 {
     vlc_vdp_video_field_t *field = ff->opaque;
 
     assert(field != NULL);
     field->destroy(field);
-
-    (void) va;
 }
 
 static int Copy(vlc_va_t *va, picture_t *pic, AVFrame *ff)

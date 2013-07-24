@@ -518,7 +518,7 @@ static int Get( vlc_va_t *va, AVFrame *p_ff )
     return VLC_SUCCESS;
 }
 
-static void Release( vlc_va_t *va, AVFrame *p_ff )
+static void Release( AVFrame *p_ff )
 {
     vlc_va_surface_t *p_surface = p_ff->opaque;
 

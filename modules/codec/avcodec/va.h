@@ -38,7 +38,7 @@ struct vlc_va_t {
     int  (*setup)(vlc_va_t *, void **hw, vlc_fourcc_t *output,
                   int width, int height);
     int  (*get)(vlc_va_t *, AVFrame *frame);
-    void (*release)(vlc_va_t *, AVFrame *frame);
+    void (*release)(AVFrame *frame);
     int  (*extract)(vlc_va_t *, picture_t *dst, AVFrame *src);
 };
 
@@ -94,7 +94,7 @@ static inline int vlc_va_Get(vlc_va_t *va, AVFrame *frame)
  */
 static inline void vlc_va_Release(vlc_va_t *va, AVFrame *frame)
 {
-    va->release(va, frame);
+    va->release(frame);
 }
 
 /**
