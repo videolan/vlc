@@ -669,13 +669,26 @@ static int FillBuffer( audio_output_t *p_aout, block_t *p_buffer )
     size_t towrite = (p_buffer)?p_buffer->i_buffer:DS_BUF_SIZE;
     void *p_write_position, *p_wrap_around;
     unsigned long l_bytes1, l_bytes2;
+    uint32_t i_read;
+    size_t i_size;
+    mtime_t i_buf;
     HRESULT dsresult;
+
+    if( IDirectSoundBuffer_GetCurrentPosition( p_aout->sys->p_dsbuffer, (LPDWORD) &i_read, NULL) ==  DS_OK )
+    {
+        /* Compute the outer interval between the write and read pointers within the ring buffer */
+        i_buf = (mtime_t)p_aout->sys->i_write - (mtime_t)i_read;
+        if( i_buf <= 0 )
+            i_buf += DS_BUF_SIZE;
+    }
+    else
+        i_buf = towrite;
 
     /* Before copying anything, we have to lock the buffer */
     dsresult = IDirectSoundBuffer_Lock(
                 p_sys->p_dsbuffer,         /* DS buffer */
                 p_aout->sys->i_write,      /* Start offset */
-                towrite,                   /* Number of bytes */
+                i_buf,                     /* Number of bytes */
                 &p_write_position,         /* Address of lock start */
                 &l_bytes1,                 /* Count of bytes locked before wrap around */
                 &p_wrap_around,            /* Buffer address (if wrap around) */
@@ -687,7 +700,7 @@ static int FillBuffer( audio_output_t *p_aout, block_t *p_buffer )
         dsresult = IDirectSoundBuffer_Lock(
                                p_sys->p_dsbuffer,
                                p_aout->sys->i_write,
-                               towrite,
+                               i_buf,
                                &p_write_position,
                                &l_bytes1,
                                &p_wrap_around,
@@ -714,9 +727,19 @@ static int FillBuffer( audio_output_t *p_aout, block_t *p_buffer )
                                  p_sys->chans_to_reorder, p_sys->chan_table,
                                  p_sys->format );
 
-        memcpy( p_write_position, p_buffer->p_buffer, l_bytes1 );
+
+        i_size = ( p_buffer->i_buffer < l_bytes1 ) ? p_buffer->i_buffer : l_bytes1;
+        memcpy( p_write_position, p_buffer->p_buffer, i_size );
+        memset( (uint8_t*) p_write_position + i_size, 0, l_bytes1 - i_size );
+
         if( l_bytes1 < p_buffer->i_buffer)
-            memcpy(p_wrap_around, p_buffer->p_buffer + l_bytes1, l_bytes2);
+        {
+            /* Compute the remaining buffer space to be written */
+            i_buf = i_buf - i_size - (l_bytes1 - i_size);
+            i_size = ( p_buffer->i_buffer - l_bytes1 < l_bytes2 ) ? p_buffer->i_buffer - l_bytes1 : l_bytes2;
+            memcpy( p_wrap_around, p_buffer->p_buffer + l_bytes1, i_size );
+            memset( (uint8_t*) p_wrap_around + i_size, 0, i_buf - i_size );
+        }
         block_Release( p_buffer );
     }
 
