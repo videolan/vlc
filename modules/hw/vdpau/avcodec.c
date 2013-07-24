@@ -81,26 +81,41 @@ static int Lock(vlc_va_t *va, AVFrame *ff)
         return VLC_EGENERIC;
     }
 
+    vlc_vdp_video_field_t *field = vlc_vdp_video_create(sys->vdp, surface);
+    if (unlikely(field == NULL))
+        return VLC_ENOMEM;
+
     ff->data[0] = (void *)sys->vdp; /* must be non-NULL */
     ff->data[3] = (void *)(uintptr_t)surface;
-    ff->opaque = (void *)(uintptr_t)surface;
+    ff->opaque = field;
     return VLC_SUCCESS;
 }
 
 static void Unlock(vlc_va_t *va, AVFrame *ff)
 {
-    (void) va;
+    vlc_vdp_video_field_t *field = ff->opaque;
+
+    assert(field != NULL);
+    field->destroy(field);
+
     ff->data[0] = ff->data[3] = NULL;
     ff->opaque = NULL;
+    (void) va;
 }
 
 static int Copy(vlc_va_t *va, picture_t *pic, AVFrame *ff)
 {
-    vlc_va_sys_t *sys = va->sys;
-    VdpVideoSurface surface = (uintptr_t)ff->opaque;
+    vlc_vdp_video_field_t *field = ff->opaque;
 
-    return vlc_vdp_video_attach(sys->vdp, surface, pic)
-        ? VLC_ENOMEM : VLC_SUCCESS;
+    assert(field != NULL);
+    field = vlc_vdp_video_copy(field);
+    if (unlikely(field == NULL))
+        return VLC_ENOMEM;
+
+    assert(pic->context == NULL);
+    pic->context = field;
+    (void) va;
+    return VLC_SUCCESS;
 }
 
 static int Init(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
