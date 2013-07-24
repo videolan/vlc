@@ -254,12 +254,15 @@ static int Extract( vlc_va_t *external, picture_t *p_picture, AVFrame *p_ff )
     return VLC_SUCCESS;
 }
 
-static void Release( AVFrame *p_ff )
+static void Release( void *opaque )
 {
+    assert( opaque == NULL );
+#if 0
     CVPixelBufferRef cv_buffer = ( CVPixelBufferRef )p_ff->data[3];
 
     if ( cv_buffer )
         CVPixelBufferRelease( cv_buffer );
+#endif
 }
 
 static void Close( vlc_va_t *external )

@@ -38,7 +38,7 @@ struct vlc_va_t {
     int  (*setup)(vlc_va_t *, void **hw, vlc_fourcc_t *output,
                   int width, int height);
     int  (*get)(vlc_va_t *, AVFrame *frame);
-    void (*release)(AVFrame *frame);
+    void (*release)(void *opaque);
     int  (*extract)(vlc_va_t *, picture_t *dst, AVFrame *src);
 };
 
@@ -86,15 +86,17 @@ static inline int vlc_va_Get(vlc_va_t *va, AVFrame *frame)
  * Releases a hardware surface from a libavcodec frame.
  * The surface has been previously allocated with vlc_va_Get().
  *
+ * @param opaque opaque data pointer of the AVFrame passed to vlc_va_Get().
+ *
  * @note This function needs not be reentrant. However it may be called
  * concurrently with vlc_va_Get() and/or vlc_va_Extract() from other threads
  * and other frames.
  *
  * @param frame libavcodec frame previously allocated by vlc_va_Get()
  */
-static inline void vlc_va_Release(vlc_va_t *va, AVFrame *frame)
+static inline void vlc_va_Release(vlc_va_t *va, void *opaque)
 {
-    va->release(frame);
+    va->release(opaque);
 }
 
 /**

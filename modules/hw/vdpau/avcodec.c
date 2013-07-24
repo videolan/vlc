@@ -91,9 +91,9 @@ static int Lock(vlc_va_t *va, AVFrame *ff)
     return VLC_SUCCESS;
 }
 
-static void Unlock(AVFrame *ff)
+static void Unlock(void *opaque)
 {
-    vlc_vdp_video_field_t *field = ff->opaque;
+    vlc_vdp_video_field_t *field = opaque;
 
     assert(field != NULL);
     field->destroy(field);
