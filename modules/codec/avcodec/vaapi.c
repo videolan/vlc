@@ -62,7 +62,7 @@ typedef struct
     VASurfaceID  i_id;
     int          i_refcount;
     unsigned int i_order;
-
+    vlc_mutex_t *p_lock;
 } vlc_va_surface_t;
 
 struct vlc_va_sys_t
@@ -284,6 +284,7 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
         p_surface->i_id = pi_surface_id[i];
         p_surface->i_refcount = 0;
         p_surface->i_order = 0;
+        p_surface->p_lock = &sys->lock;
     }
 
     /* Create a context */
@@ -519,12 +520,11 @@ static int Get( vlc_va_t *va, AVFrame *p_ff )
 
 static void Release( vlc_va_t *va, AVFrame *p_ff )
 {
-    vlc_va_sys_t *sys = va->sys;
     vlc_va_surface_t *p_surface = p_ff->opaque;
 
-    vlc_mutex_lock( &sys->lock );
+    vlc_mutex_lock( p_surface->p_lock );
     p_surface->i_refcount--;
-    vlc_mutex_unlock( &sys->lock );
+    vlc_mutex_unlock( p_surface->p_lock );
 }
 
 static void Close( vlc_va_sys_t *sys )
