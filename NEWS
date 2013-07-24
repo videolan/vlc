@@ -1,6 +1,10 @@
 Changes between 2.1.x and 2.2.0-git:
 --------------------------------
 
+Access:
+ * Added TLS support for ftp access and sout access.
+   New schemes for implicit (ftps) and explicit (ftpes) modes.
+
 Video Output:
  * Direct rendering and filtering for VDPAU hardware acceleration
 
