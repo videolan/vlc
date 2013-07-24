@@ -72,8 +72,7 @@ static int Lock(vlc_va_t *va, AVFrame *ff)
 static void Unlock(vlc_va_t *va, AVFrame *ff)
 {
     (void) va;
-    ff->data[0] = ff->data[3] = NULL;
-    ff->opaque = NULL;
+    assert((uintptr_t)ff->opaque == SURFACE_MAGIC);
 }
 
 static VdpStatus Render(VdpDecoder decoder, VdpVideoSurface target,
