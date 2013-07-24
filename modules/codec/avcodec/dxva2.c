@@ -468,19 +468,15 @@ static int Get(vlc_va_t *external, AVFrame *ff)
         if (i == 0 || i == 3)
             ff->data[i] = (void*)surface->d3d;/* Yummie */
     }
+    ff->opaque = surface;
     return VLC_SUCCESS;
 }
 static void Release(vlc_va_t *external, AVFrame *ff)
 {
-    vlc_va_dxva2_t *va = vlc_va_dxva2_Get(external);
-    LPDIRECT3DSURFACE9 d3d = (LPDIRECT3DSURFACE9)(uintptr_t)ff->data[3];
+    vlc_va_surface_t *surface = ff->opaque;
 
-    for (unsigned i = 0; i < va->surface_count; i++) {
-        vlc_va_surface_t *surface = &va->surface[i];
-
-        if (surface->d3d == d3d)
-            surface->refcount--;
-    }
+    surface->refcount--;
+    (void) external;
 }
 static void Close(vlc_va_t *external)
 {
