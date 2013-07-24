@@ -98,8 +98,6 @@ static void Unlock(vlc_va_t *va, AVFrame *ff)
     assert(field != NULL);
     field->destroy(field);
 
-    ff->data[0] = ff->data[3] = NULL;
-    ff->opaque = NULL;
     (void) va;
 }
 
