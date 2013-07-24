@@ -277,7 +277,7 @@ static unsigned SetupChannels (vlc_object_t *obj, snd_pcm_t *pcm,
 
     const snd_pcm_chmap_t *map = &maps[best_offset]->map;
     msg_Dbg (obj, "using channels map %u, type %u, %u channel(s)", best_offset,
-             maps[best_offset]->type, best_score);
+             maps[best_offset]->type, map->channels);
 
     /* Setup channels map */
     unsigned to_reorder = SetupChannelsFixed(map, mask, tab);
