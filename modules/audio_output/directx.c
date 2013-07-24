@@ -704,6 +704,7 @@ static int FillBuffer( audio_output_t *p_aout, block_t *p_buffer )
     if( p_buffer == NULL )
     {
         memset( p_write_position, 0, l_bytes1 );
+        memset( p_wrap_around, 0, l_bytes2 );
     }
     else
     {
