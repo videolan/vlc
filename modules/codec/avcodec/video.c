@@ -989,8 +989,8 @@ static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
 
     for (int i = 0; i < pic->i_planes; i++)
     {
-        /*if (pic->p[i].i_pitch % aligns[i])
-            goto no_dr;*/
+        if (pic->p[i].i_pitch % aligns[i])
+            goto no_dr;
         if (((uintptr_t)pic->p[i].p_pixels) % aligns[i])
             goto no_dr;
     }
