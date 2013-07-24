@@ -996,8 +996,6 @@ static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
     }
 
     /* Allocate buffer references */
-    for (unsigned i = 0; i < AV_NUM_DATA_POINTERS; i++)
-        frame->buf[i] = NULL;
     for (int i = 0; i < pic->i_planes; i++)
     {
         lavc_pic_ref_t *ref = malloc(sizeof (*ref));
@@ -1040,6 +1038,13 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
     decoder_t *dec = ctx->opaque;
     decoder_sys_t *sys = dec->p_sys;
     picture_t *pic;
+
+    for (unsigned i = 0; i < AV_NUM_DATA_POINTERS; i++)
+    {
+        frame->data[i] = NULL;
+        frame->linesize[i] = 0;
+        frame->buf[i] = NULL;
+    }
 
     if (sys->p_va != NULL)
         return lavc_va_GetFrame(ctx, frame);
