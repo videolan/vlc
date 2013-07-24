@@ -987,16 +987,33 @@ static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
         return NULL;
 
     /* Check that the picture is suitable for libavcodec */
-    if (pic->p[0].i_pitch < width * pic->p[0].i_pixel_pitch
-     || pic->p[0].i_lines < height)
+    if (pic->p[0].i_pitch < width * pic->p[0].i_pixel_pitch)
+    {
+        msg_Dbg(dec, "plane 0: pitch too small (%d/%d*%d)",
+                pic->p[0].i_pitch, width, pic->p[0].i_pixel_pitch);
         goto no_dr;
+    }
+
+    if (pic->p[0].i_lines < height)
+    {
+        msg_Dbg(dec, "plane 0: lines too few (%d/%d)",
+                pic->p[0].i_lines, height);
+        goto no_dr;
+    }
 
     for (int i = 0; i < pic->i_planes; i++)
     {
         if (pic->p[i].i_pitch % aligns[i])
+        {
+            msg_Dbg(dec, "plane %d: pitch not aligned (%d%%%d)",
+                    i, pic->p[i].i_pitch, aligns[i]);
             goto no_dr;
+        }
         if (((uintptr_t)pic->p[i].p_pixels) % aligns[i])
+        {
+            msg_Warn(dec, "plane %d not aligned", i);
             goto no_dr;
+        }
     }
 
     /* Allocate buffer references */
