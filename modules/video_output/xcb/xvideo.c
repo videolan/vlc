@@ -318,8 +318,8 @@ FindFormat (vlc_object_t *obj, xcb_connection_t *conn, video_format_t *fmt,
             continue;
 
         /* VLC pads scanline to 16 pixels internally */
-        unsigned width = fmt->i_width;
-        unsigned height = fmt->i_height;
+        unsigned width = (fmt->i_width + 31) & ~31;
+        unsigned height = (fmt->i_height + 15) & ~15;
         xcb_xv_query_image_attributes_reply_t *i;
         i = xcb_xv_query_image_attributes_reply (conn,
             xcb_xv_query_image_attributes (conn, a->base_id, f->id,
