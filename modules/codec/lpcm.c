@@ -93,6 +93,8 @@ struct decoder_sys_t
     /* */
     unsigned i_header_size;
     int      i_type;
+    uint8_t  i_chans_to_reorder;
+    uint8_t  pi_chan_table[AOUT_CHAN_MAX];
 };
 
 #ifdef ENABLE_SOUT
@@ -180,7 +182,8 @@ static int AobHeader( unsigned *pi_rate,
                       const uint8_t *p_header );
 static void AobExtract( block_t *, block_t *, unsigned i_bits, aob_group_t p_group[2] );
 /* */
-static int BdHeader( unsigned *pi_rate,
+static int BdHeader( decoder_sys_t *p_sys,
+                     unsigned *pi_rate,
                      unsigned *pi_channels,
                      unsigned *pi_channels_padding,
                      unsigned *pi_original_channels,
@@ -229,6 +232,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     date_Set( &p_sys->end_date, 0 );
     p_sys->i_type = i_type;
     p_sys->i_header_size = i_header_size;
+    p_sys->i_chans_to_reorder = 0;
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
@@ -335,7 +339,7 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
                            p_block->p_buffer );
         break;
     case LPCM_BD:
-        i_ret = BdHeader( &i_rate, &i_channels, &i_channels_padding, &i_original_channels, &i_bits,
+        i_ret = BdHeader( p_sys, &i_rate, &i_channels, &i_channels_padding, &i_original_channels, &i_bits,
                           p_block->p_buffer );
         break;
     default:
@@ -400,6 +404,13 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 
         p_block->p_buffer += p_sys->i_header_size + i_padding;
         p_block->i_buffer -= p_sys->i_header_size + i_padding;
+
+        if( p_sys->i_chans_to_reorder )
+        {
+            aout_ChannelReorder( p_block->p_buffer, p_block->i_buffer,
+                                 p_sys->i_chans_to_reorder, p_sys->pi_chan_table,
+                                 p_dec->fmt_out.i_codec );
+        }
 
         switch( p_sys->i_type )
         {
@@ -822,7 +833,35 @@ static int AobHeader( unsigned *pi_rate,
     return VLC_SUCCESS;
 }
 
-static int BdHeader( unsigned *pi_rate,
+static const uint32_t pi_8channels_in[] =
+{ AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER,
+  AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
+  AOUT_CHAN_MIDDLERIGHT, AOUT_CHAN_LFE, 0 };
+
+static const uint32_t pi_7channels_in[] =
+{ AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER,
+  AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
+  AOUT_CHAN_MIDDLERIGHT, 0 };
+
+static const uint32_t pi_6channels_in[] =
+{ AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER,
+  AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, AOUT_CHAN_LFE, 0 };
+
+static const uint32_t pi_5channels_in[] =
+{ AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER,
+  AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT, 0 };
+
+static const uint32_t pi_4channels_in[] =
+{ AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
+  AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, 0 };
+
+static const uint32_t pi_3channels_in[] =
+{ AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
+  AOUT_CHAN_CENTER, 0 };
+
+
+static int BdHeader( decoder_sys_t *p_sys,
+                     unsigned *pi_rate,
                      unsigned *pi_channels,
                      unsigned *pi_channels_padding,
                      unsigned *pi_original_channels,
@@ -830,6 +869,7 @@ static int BdHeader( unsigned *pi_rate,
                      const uint8_t *p_header )
 {
     const uint32_t h = GetDWBE( p_header );
+    const uint32_t *pi_channels_in = NULL;
     switch( ( h & 0xf000) >> 12 )
     {
     case 1:
@@ -843,6 +883,7 @@ static int BdHeader( unsigned *pi_rate,
     case 4:
         *pi_channels = 3;
         *pi_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER;
+        pi_channels_in = pi_3channels_in;
         break;
     case 5:
         *pi_channels = 3;
@@ -857,23 +898,27 @@ static int BdHeader( unsigned *pi_rate,
         *pi_channels = 4;
         *pi_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
                                 AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+        pi_channels_in = pi_4channels_in;
         break;
     case 8:
         *pi_channels = 5;
         *pi_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
                                 AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+        pi_channels_in = pi_5channels_in;
         break;
     case 9:
         *pi_channels = 6;
         *pi_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
                                 AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT |
                                 AOUT_CHAN_LFE;
+        pi_channels_in = pi_6channels_in;
         break;
     case 10:
         *pi_channels = 7;
         *pi_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
                                 AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT |
                                 AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT;
+        pi_channels_in = pi_7channels_in;
         break;
     case 11:
         *pi_channels = 8;
@@ -881,6 +926,7 @@ static int BdHeader( unsigned *pi_rate,
                                 AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT |
                                 AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT |
                                 AOUT_CHAN_LFE;
+        pi_channels_in = pi_8channels_in;
         break;
 
     default:
@@ -914,6 +960,15 @@ static int BdHeader( unsigned *pi_rate,
     default:
         return -1;
     }
+
+    if( pi_channels_in )
+    {
+        p_sys->i_chans_to_reorder =
+            aout_CheckChannelReorder( pi_channels_in, NULL,
+                                      *pi_original_channels,
+                                      p_sys->pi_chan_table );
+    }
+
     return 0;
 }
 
