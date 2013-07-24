@@ -243,7 +243,11 @@ public:
                    char const* applicationName, portNumBits tunnelOverHTTPPortNum,
                    demux_sys_t *p_sys) :
                    RTSPClient( env, rtspURL, verbosityLevel, applicationName,
-                   tunnelOverHTTPPortNum )
+                   tunnelOverHTTPPortNum
+#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1373932800
+                   , -1
+#endif
+                   )
     {
         this->p_sys = p_sys;
     }
