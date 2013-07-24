@@ -909,7 +909,8 @@ static void lavc_va_ReleaseFrame(void *opaque, uint8_t *data)
     (void) data;
 }
 
-static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
+static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
+                            int flags)
 {
     decoder_t *dec = ctx->opaque;
     decoder_sys_t *sys = dec->p_sys;
@@ -943,6 +944,9 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
         lavc_va_ReleaseFrame(ref, frame->data[0]);
         return -1;
     }
+    assert(frame->data[0] != NULL);
+    assert(frame->data[3] != NULL);
+    (void) flags;
     return 0;
 }
 
@@ -962,7 +966,7 @@ static void lavc_dr_ReleaseFrame(void *opaque, uint8_t *data)
 }
 
 static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
-                                   AVFrame *frame, unsigned flags)
+                                   AVFrame *frame, int flags)
 {
     decoder_t *dec = (decoder_t *)ctx->opaque;
 
@@ -1047,7 +1051,7 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
     }
 
     if (sys->p_va != NULL)
-        return lavc_va_GetFrame(ctx, frame);
+        return lavc_va_GetFrame(ctx, frame, flags);
 
     frame->opaque = NULL;
     if (!sys->b_direct_rendering)
