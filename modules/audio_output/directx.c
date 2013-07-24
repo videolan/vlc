@@ -889,13 +889,9 @@ static void Flush ( audio_output_t * aout, bool drain )
             }
         }
         else
-            while( IDirectSoundBuffer_GetCurrentPosition( aout->sys->p_dsbuffer,(LPDWORD) &read, NULL) ==  DS_OK )
-            {
-                read %= DS_BUF_SIZE;
-                if( read == aout->sys->i_write )
-                    break;
-                msleep(10000);
-            }
+        {
+            IDirectSoundBuffer_Stop( aout->sys->p_dsbuffer );
+        }
     }
     else
     {
