@@ -875,30 +875,10 @@ static void Close(vlc_object_t *obj)
 
 static void Flush ( audio_output_t * aout, bool drain )
 {
-    aout_sys_t *sys = aout->sys;
-    size_t read;
-    if( drain )
-    {
-        if( sys->p_notify )
-        {
-            DSBPOSITIONNOTIFY notif = {.dwOffset = aout->sys->i_write, .hEventNotify = sys->hnotify_evt } ;
-            if( IDirectSoundNotify_SetNotificationPositions( sys->p_notify, 1, &notif ) ==  DS_OK )
-            {
-                WaitForSingleObject( sys->hnotify_evt, INFINITE );
-                IDirectSoundBuffer_Stop( aout->sys->p_dsbuffer );
-            }
-        }
-        else
-        {
-            IDirectSoundBuffer_Stop( aout->sys->p_dsbuffer );
-        }
-    }
-    else
-    {
-        IDirectSoundBuffer_Stop( aout->sys->p_dsbuffer );
+    IDirectSoundBuffer_Stop( aout->sys->p_dsbuffer );
+    if( !drain )
         IDirectSoundBuffer_SetCurrentPosition( aout->sys->p_dsbuffer,
                                                aout->sys->i_write );
-    }
 }
 
 static void Pause( audio_output_t * aout, bool pause, mtime_t date )
