@@ -161,8 +161,6 @@ static int Setup( vlc_va_t *external, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
     }
 
     memset( &p_va->hw_ctx, 0, sizeof(p_va->hw_ctx) );
-    p_va->hw_ctx.width = i_width;
-    p_va->hw_ctx.height = i_height;
     p_va->hw_ctx.format = 'avc1';
 
     int i_pix_fmt = var_CreateGetInteger( p_va->p_log, "avcodec-vda-pix-fmt" );
@@ -186,6 +184,9 @@ ok:
     /* Setup the libavcodec hardware context */
     *pp_hw_ctx = &p_va->hw_ctx;
     *pi_chroma = p_va->i_chroma;
+
+    p_va->hw_ctx.width = i_width;
+    p_va->hw_ctx.height = i_height;
 
     /* create the decoder */
     int status = ff_vda_create_decoder( &p_va->hw_ctx,
