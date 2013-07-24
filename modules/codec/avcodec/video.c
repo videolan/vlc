@@ -1103,11 +1103,6 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
         frame->data[i] = pic->p[i].p_pixels;
         frame->linesize[i] = pic->p[i].i_pitch;
     }
-    for (unsigned i = PICTURE_PLANE_MAX; i < AV_NUM_DATA_POINTERS; i++)
-    {
-        frame->data[i] = NULL;
-        frame->linesize[i] = 0;
-    }
     return 0;
 }
 #else
