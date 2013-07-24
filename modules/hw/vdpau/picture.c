@@ -62,8 +62,8 @@ static const VdpProcamp procamp_default =
     .hue = 0.f,
 };
 
-VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
-                               picture_t *pic)
+vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *vdp,
+                                            VdpVideoSurface surface)
 {
     vlc_vdp_video_field_t *field = malloc(sizeof (*field));
     vlc_vdp_video_frame_t *frame = malloc(sizeof (*frame));
@@ -73,14 +73,8 @@ VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
         free(frame);
         free(field);
         vdp_video_surface_destroy(vdp, surface);
-        return VDP_STATUS_RESOURCES;
+        return NULL;
     }
-
-    assert(pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
-        || pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_422);
-    assert(!picture_IsReferenced(pic));
-    assert(pic->context == NULL);
-    pic->context = field;
 
     field->destroy = SurfaceDestroy;
     field->frame = frame;
@@ -91,6 +85,21 @@ VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
     atomic_init(&frame->refs, 1);
     frame->surface = surface;
     frame->vdp = vdp_hold_x11(vdp, &frame->device);
+    return field;
+}
+
+VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
+                               picture_t *pic)
+{
+    vlc_vdp_video_field_t *field = vlc_vdp_video_create(vdp, surface);
+    if (unlikely(field == NULL))
+        return VDP_STATUS_RESOURCES;
+
+    assert(pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
+        || pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_422);
+    assert(!picture_IsReferenced(pic));
+    assert(pic->context == NULL);
+    pic->context = field;
     return VDP_STATUS_OK;
 }
 

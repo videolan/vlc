@@ -287,6 +287,11 @@ typedef struct vlc_vdp_video_field
 VdpStatus vlc_vdp_video_attach(vdp_t *, VdpVideoSurface, picture_t *);
 
 /**
+ * Wraps a VDPAU video surface into a VLC picture context.
+ */
+vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *, VdpVideoSurface);
+
+/**
  * Performs a shallow copy of a VDPAU video surface context
  * (the underlying VDPAU video surface is shared).
  */
