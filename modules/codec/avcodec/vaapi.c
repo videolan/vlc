@@ -513,23 +513,17 @@ static int Get( vlc_va_t *va, AVFrame *p_ff )
         if( i == 0 || i == 3 )
             p_ff->data[i] = (void*)(uintptr_t)p_surface->i_id;/* Yummie */
     }
+    p_ff->opaque = p_surface;
     return VLC_SUCCESS;
 }
 
 static void Release( vlc_va_t *va, AVFrame *p_ff )
 {
     vlc_va_sys_t *sys = va->sys;
-
-    VASurfaceID i_surface_id = (VASurfaceID)(uintptr_t)p_ff->data[3];
+    vlc_va_surface_t *p_surface = p_ff->opaque;
 
     vlc_mutex_lock( &sys->lock );
-    for( int i = 0; i < sys->i_surface_count; i++ )
-    {
-        vlc_va_surface_t *p_surface = &sys->p_surface[i];
-
-        if( p_surface->i_id == i_surface_id )
-            p_surface->i_refcount--;
-    }
+    p_surface->i_refcount--;
     vlc_mutex_unlock( &sys->lock );
 }
 
