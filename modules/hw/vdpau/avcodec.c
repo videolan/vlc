@@ -297,32 +297,40 @@ static int Open(vlc_va_t *va, int codec, const es_format_t *fmt)
 
     /* Check capabilities */
     VdpBool support;
-    uint32_t lvl, mb, width, height;
+    uint32_t l, mb, w, h;
 
     if (vdp_video_surface_query_capabilities(sys->vdp, sys->device,
-              VDP_CHROMA_TYPE_420, &support, &width, &height) != VDP_STATUS_OK)
+              VDP_CHROMA_TYPE_420, &support, &w, &h) != VDP_STATUS_OK)
         support = VDP_FALSE;
-    if (!support || width < fmt->video.i_width || height < fmt->video.i_height)
+    if (!support)
     {
-        msg_Err(va, "video surface not supported: %s %ux%u",
-                 "YUV 4:2:0", fmt->video.i_width, fmt->video.i_height);
+        msg_Err(va, "video surface format not supported: %s", "YUV 4:2:0");
         goto error;
     }
-    msg_Dbg(va, "video surface supported maximum: %s %"PRIu32"x%"PRIu32,
-            "YUV 4:2:0", width, height);
+    msg_Dbg(va, "video surface limits: %"PRIu32"x%"PRIu32, w, h);
+    if (w < fmt->video.i_width || h < fmt->video.i_height)
+    {
+        msg_Err(va, "video surface above limits: %ux%u",
+                fmt->video.i_width, fmt->video.i_height);
+        goto error;
+    }
 
     if (vdp_decoder_query_capabilities(sys->vdp, sys->device, profile,
-                        &support, &lvl, &mb, &width, &height) != VDP_STATUS_OK)
+                                   &support, &l, &mb, &w, &h) != VDP_STATUS_OK)
         support = VDP_FALSE;
-    if (!support || (int)lvl < level
-     || width < fmt->video.i_width || height < fmt->video.i_height)
+    if (!support)
     {
-        msg_Err(va, "decoding profile not supported: %"PRIu32".%d %ux%u",
-                profile, lvl, fmt->video.i_width, fmt->video.i_height);
+        msg_Err(va, "decoder profile not supported: %u", profile);
         goto error;
     }
-    msg_Dbg(va, "decoding profile supported maximum: %"PRIu32".%"PRIu32" mb %"
-            PRIu32", %"PRIu32"x%"PRIu32, profile, lvl, mb, width, height);
+    msg_Dbg(va, "decoder profile limits: level %"PRIu32" mb %"PRIu32" "
+            "%"PRIu32"x%"PRIu32, l, mb, w, h);
+    if ((int)l < level || w < fmt->video.i_width || h < fmt->video.i_height)
+    {
+        msg_Err(va, "decoder profile above limits: level %d %ux%u",
+                level, fmt->video.i_width, fmt->video.i_height);
+        goto error;
+    }
 
     const char *infos;
     if (vdp_get_information_string(sys->vdp, &infos) != VDP_STATUS_OK)
