@@ -1,5 +1,5 @@
 # GCRYPT
-GCRYPT_VERSION := 1.5.2
+GCRYPT_VERSION := 1.5.3
 GCRYPT_URL := ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-$(GCRYPT_VERSION).tar.bz2
 
 PKGS += gcrypt
