@@ -37,7 +37,7 @@ struct vlc_va_t {
 
     int  (*setup)(vlc_va_t *, void **hw, vlc_fourcc_t *output,
                   int width, int height);
-    int  (*get)(vlc_va_t *, AVFrame *frame);
+    int  (*get)(vlc_va_t *, void **opaque, uint8_t **data);
     void (*release)(void *opaque, uint8_t *surface);
     int  (*extract)(vlc_va_t *, picture_t *dst, AVFrame *src);
 };
@@ -70,6 +70,9 @@ static inline int vlc_va_Setup(vlc_va_t *va, void **hw, vlc_fourcc_t *output,
  * The surface will be used as output for the hardware decoder, and possibly
  * also as a reference frame to decode other surfaces.
  *
+ * @param opaque pointer to storage space for surface internal data [OUT]
+ * @param data pointer to the AVFrame data[0] and data[3] pointers [OUT]
+ *
  * @note This function needs not be reentrant. However it may be called
  * concurrently with vlc_va_Extract() and/or vlc_va_Release() from other
  * threads and other frames.
@@ -77,9 +80,9 @@ static inline int vlc_va_Setup(vlc_va_t *va, void **hw, vlc_fourcc_t *output,
  * @param frame libavcodec frame [IN/OUT]
  * @return VLC_SUCCESS on success, otherwise an error code.
  */
-static inline int vlc_va_Get(vlc_va_t *va, AVFrame *frame)
+static inline int vlc_va_Get(vlc_va_t *va, void **opaque, uint8_t **data)
 {
-    return va->get(va, frame);
+    return va->get(va, opaque, data);
 }
 
 /**

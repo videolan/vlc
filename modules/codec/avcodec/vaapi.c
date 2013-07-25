@@ -477,7 +477,7 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, AVFrame *p_ff )
     return VLC_SUCCESS;
 }
 
-static int Get( vlc_va_t *va, AVFrame *p_ff )
+static int Get( vlc_va_t *va, void **opaque, uint8_t **data )
 {
     vlc_va_sys_t *sys = va->sys;
     int i_old;
@@ -504,17 +504,8 @@ static int Get( vlc_va_t *va, AVFrame *p_ff )
 
     p_surface->i_refcount = 1;
     p_surface->i_order = sys->i_surface_order++;
-
-    /* */
-    for( int i = 0; i < 4; i++ )
-    {
-        p_ff->data[i] = NULL;
-        p_ff->linesize[i] = 0;
-
-        if( i == 0 || i == 3 )
-            p_ff->data[i] = (void*)(uintptr_t)p_surface->i_id;/* Yummie */
-    }
-    p_ff->opaque = p_surface;
+    *data = (void *)(uintptr_t)p_surface->i_id;
+    *opaque = p_surface;
     return VLC_SUCCESS;
 }
 

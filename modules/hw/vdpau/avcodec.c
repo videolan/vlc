@@ -60,17 +60,11 @@ struct vlc_va_sys_t
     uint16_t height;
 };
 
-static int Lock(vlc_va_t *va, AVFrame *ff)
+static int Lock(vlc_va_t *va, void **opaque, uint8_t **data)
 {
     vlc_va_sys_t *sys = va->sys;
     VdpVideoSurface surface;
     VdpStatus err;
-
-    for (unsigned i = 0; i < AV_NUM_DATA_POINTERS; i++)
-    {
-        ff->data[i] = NULL;
-        ff->linesize[i] = 0;
-    }
 
     err = vdp_video_surface_create(sys->vdp, sys->device, VDP_CHROMA_TYPE_420,
                                    sys->width, sys->height, &surface);
@@ -85,9 +79,8 @@ static int Lock(vlc_va_t *va, AVFrame *ff)
     if (unlikely(field == NULL))
         return VLC_ENOMEM;
 
-    ff->data[0] = (void *)sys->vdp; /* must be non-NULL */
-    ff->data[3] = (void *)(uintptr_t)surface;
-    ff->opaque = field;
+    *data = (void *)(uintptr_t)surface;
+    *opaque = field;
     return VLC_SUCCESS;
 }
 

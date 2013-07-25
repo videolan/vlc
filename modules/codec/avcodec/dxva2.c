@@ -425,8 +425,9 @@ static int Extract(vlc_va_t *external, picture_t *picture, AVFrame *ff)
     IDirect3DSurface9_UnlockRect(d3d);
     return VLC_SUCCESS;
 }
+
 /* FIXME it is nearly common with VAAPI */
-static int Get(vlc_va_t *external, AVFrame *ff)
+static int Get(vlc_va_t *external, void **opaque, uint8_t **data)
 {
     vlc_va_dxva2_t *va = vlc_va_dxva2_Get(external);
 
@@ -459,16 +460,8 @@ static int Get(vlc_va_t *external, AVFrame *ff)
 
     surface->refcount = 1;
     surface->order = va->surface_order++;
-
-    /* */
-    for (int i = 0; i < 4; i++) {
-        ff->data[i] = NULL;
-        ff->linesize[i] = 0;
-
-        if (i == 0 || i == 3)
-            ff->data[i] = (void*)surface->d3d;/* Yummie */
-    }
-    ff->opaque = surface;
+    *data = (void *)surface->d3d;
+    *opaque = surface;
     return VLC_SUCCESS;
 }
 

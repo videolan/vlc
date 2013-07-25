@@ -56,17 +56,11 @@ struct vlc_va_sys_t
     AVVDPAUContext context;
 };
 
-static int Lock(vlc_va_t *va, AVFrame *ff)
+static int Lock(vlc_va_t *va, void **opaque, uint8_t **data)
 {
-    for (unsigned i = 0; i < AV_NUM_DATA_POINTERS; i++)
-    {
-        ff->data[i] = NULL;
-        ff->linesize[i] = 0;
-    }
-
-    ff->data[0] = (void *)(uintptr_t)DATA_MAGIC; /* must be non-NULL */
-    ff->data[3] = (void *)(uintptr_t)DATA_MAGIC;
-    ff->opaque = (void *)(uintptr_t)OPAQUE_MAGIC;
+    *data = (void *)(uintptr_t)DATA_MAGIC;
+    *opaque = (void *)(uintptr_t)OPAQUE_MAGIC;
+    (void) va;
     return VLC_SUCCESS;
 }
 

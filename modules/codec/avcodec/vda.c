@@ -203,20 +203,12 @@ ok:
     return VLC_SUCCESS;
 }
 
-static int Get( vlc_va_t *external, AVFrame *p_ff )
+static int Get( vlc_va_t *external, void **opaque, uint8_t **data )
 {
     VLC_UNUSED( external );
 
-    /* */
-    for( int i = 0; i < 4; i++ )
-    {
-        p_ff->data[i] = NULL;
-        p_ff->linesize[i] = 0;
-
-        if( i == 0 || i == 3 )
-        p_ff->data[i] = (uint8_t *)1; // dummy
-    }
-
+    *data = (uint8_t *)1; // dummy
+    (void) opaque;
     return VLC_SUCCESS;
 }
 
@@ -257,14 +249,13 @@ static int Extract( vlc_va_t *external, picture_t *p_picture, AVFrame *p_ff )
 
 static void Release( void *opaque, uint8_t *data )
 {
-    assert( opaque == NULL );
 #if 0
     CVPixelBufferRef cv_buffer = ( CVPixelBufferRef )p_ff->data[3];
 
     if ( cv_buffer )
         CVPixelBufferRelease( cv_buffer );
 #endif
-    (void) data;
+    (void) opaque; (void) data;
 }
 
 static void Close( vlc_va_t *external )

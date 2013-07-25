@@ -907,11 +907,14 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
         msg_Err(dec, "hardware acceleration setup failed");
         return -1;
     }
-    if (vlc_va_Get(va, frame))
+    if (vlc_va_Get(va, &frame->opaque, &frame->data[0]))
     {
         msg_Err(dec, "hardware acceleration picture allocation failed");
         return -1;
     }
+    /* data[0] must be non-NULL for libavcodec internal checks.
+     * data[3] actually contains the format-specific surface handle. */
+    frame->data[3] = frame->data[0];
 
     frame->buf[0] = av_buffer_create(frame->data[0], 0, va->release,
                                      frame->opaque, 0);
@@ -921,7 +924,6 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
         return -1;
     }
     assert(frame->data[0] != NULL);
-    assert(frame->data[3] != NULL);
     (void) flags;
     return 0;
 }
@@ -1097,12 +1099,13 @@ static int ffmpeg_va_GetFrameBuf( struct AVCodecContext *p_context, AVFrame *p_f
         return -1;
     }
 
-    if( vlc_va_Get( p_va, p_ff_pic ) )
+    if( vlc_va_Get( p_va, &p_ff_pic->opaque, &p_ff_pic->data[0] ) )
     {
         msg_Err( p_dec, "vlc_va_Get failed" );
         return -1;
     }
 
+    p_ff_pic->data[3] = p_ff_pic->data[0];
     p_ff_pic->type = FF_BUFFER_TYPE_USER;
     return 0;
 }
