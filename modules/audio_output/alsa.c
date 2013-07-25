@@ -241,7 +241,8 @@ static unsigned SetupChannels (vlc_object_t *obj, snd_pcm_t *pcm,
         if (chans == -1)
             continue;
 
-        unsigned score = popcount (chans & *mask);
+        unsigned score = (popcount (chans & *mask) << 8)
+                       | (255 - popcount (chans));
         if (score > best_score)
         {
             best_offset = p - maps;
