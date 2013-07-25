@@ -894,21 +894,6 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
 }
 
 #if LIBAVCODEC_VERSION_MAJOR >= 55
-typedef struct
-{
-    vlc_va_t *va;
-    void *opaque;
-} lavc_hw_ref_t;
-
-static void lavc_va_ReleaseFrame(void *opaque, uint8_t *data)
-{
-    lavc_hw_ref_t *ref = opaque;
-
-    vlc_va_Release(ref->va, ref->opaque);
-    free(ref);
-    (void) data;
-}
-
 static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
                             int flags)
 {
@@ -928,20 +913,11 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
         return -1;
     }
 
-    lavc_hw_ref_t *ref = malloc(sizeof (*ref));
-    if (unlikely(ref == NULL))
-    {
-        vlc_va_Release(va, frame->opaque);
-        return -1;
-    }
-    ref->va = va;
-    ref->opaque = frame->opaque;
-
-    frame->buf[0] = av_buffer_create(frame->data[0], 0, lavc_va_ReleaseFrame,
-                                     ref, 0);
+    frame->buf[0] = av_buffer_create(frame->data[0], 0, va->release,
+                                     frame->opaque, 0);
     if (unlikely(frame->buf[0] == NULL))
     {
-        lavc_va_ReleaseFrame(ref, frame->data[0]);
+        vlc_va_Release(va, frame->opaque, frame->data[0]);
         return -1;
     }
     assert(frame->data[0] != NULL);
@@ -1262,7 +1238,7 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if( p_sys->p_va )
-        vlc_va_Release( p_sys->p_va, p_ff_pic->opaque );
+        vlc_va_Release( p_sys->p_va, p_ff_pic->opaque, p_ff_pic->data[0] );
     else if( p_ff_pic->opaque )
         decoder_UnlinkPicture( p_dec, (picture_t*)p_ff_pic->opaque);
     else if( p_ff_pic->type == FF_BUFFER_TYPE_INTERNAL )

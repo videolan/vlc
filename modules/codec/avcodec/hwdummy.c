@@ -47,8 +47,9 @@ vlc_module_begin()
     add_shortcut("dummy")
 vlc_module_end()
 
-#define DECODER_MAGIC 0x12345678
-#define SURFACE_MAGIC 0x87654321
+#define DECODER_MAGIC 0xdec0dea0
+#define DATA_MAGIC    0xda1a0000
+#define OPAQUE_MAGIC  0x0da00e00
 
 struct vlc_va_sys_t
 {
@@ -63,15 +64,16 @@ static int Lock(vlc_va_t *va, AVFrame *ff)
         ff->linesize[i] = 0;
     }
 
-    ff->data[0] = (void *)(uintptr_t)SURFACE_MAGIC; /* must be non-NULL */
-    ff->data[3] = (void *)(uintptr_t)SURFACE_MAGIC;
-    ff->opaque = (void *)(uintptr_t)SURFACE_MAGIC;
+    ff->data[0] = (void *)(uintptr_t)DATA_MAGIC; /* must be non-NULL */
+    ff->data[3] = (void *)(uintptr_t)DATA_MAGIC;
+    ff->opaque = (void *)(uintptr_t)OPAQUE_MAGIC;
     return VLC_SUCCESS;
 }
 
-static void Unlock(void *opaque)
+static void Unlock(void *opaque, uint8_t *data)
 {
-    assert((uintptr_t)opaque == SURFACE_MAGIC);
+    assert((uintptr_t)opaque == OPAQUE_MAGIC);
+    assert((uintptr_t)data == DATA_MAGIC);
 }
 
 static VdpStatus Render(VdpDecoder decoder, VdpVideoSurface target,
@@ -82,7 +84,7 @@ static VdpStatus Render(VdpDecoder decoder, VdpVideoSurface target,
     (void) decoder; (void) target; (void) picture_info;
     (void) bitstream_buffer_count; (void) bitstream_buffers;
     assert(decoder == DECODER_MAGIC);
-    assert(target == SURFACE_MAGIC);
+    assert(target == DATA_MAGIC);
     return VDP_STATUS_OK;
 }
 
@@ -90,8 +92,8 @@ static int Copy(vlc_va_t *va, picture_t *pic, AVFrame *ff)
 {
     (void) va; (void) ff;
 
-    assert((uintptr_t)ff->data[3] == SURFACE_MAGIC);
-    assert((uintptr_t)ff->opaque == SURFACE_MAGIC);
+    assert((uintptr_t)ff->data[3] == DATA_MAGIC);
+    assert((uintptr_t)ff->opaque == OPAQUE_MAGIC);
 
     /* Put some dummy picture content */
     memset(pic->p[0].p_pixels, 0xF0,

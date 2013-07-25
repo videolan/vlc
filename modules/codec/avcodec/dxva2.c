@@ -471,12 +471,15 @@ static int Get(vlc_va_t *external, AVFrame *ff)
     ff->opaque = surface;
     return VLC_SUCCESS;
 }
-static void Release(void *opaque)
+
+static void Release(void *opaque, uint8_t *data)
 {
     vlc_va_surface_t *surface = opaque;
 
     surface->refcount--;
+    (void) data;
 }
+
 static void Close(vlc_va_t *external)
 {
     vlc_va_dxva2_t *va = vlc_va_dxva2_Get(external);

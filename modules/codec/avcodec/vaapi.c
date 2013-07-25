@@ -518,13 +518,14 @@ static int Get( vlc_va_t *va, AVFrame *p_ff )
     return VLC_SUCCESS;
 }
 
-static void Release( void *opaque )
+static void Release( void *opaque, uint8_t *data )
 {
     vlc_va_surface_t *p_surface = opaque;
 
     vlc_mutex_lock( p_surface->p_lock );
     p_surface->i_refcount--;
     vlc_mutex_unlock( p_surface->p_lock );
+    (void) data;
 }
 
 static void Close( vlc_va_sys_t *sys )
