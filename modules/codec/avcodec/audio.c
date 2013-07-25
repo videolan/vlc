@@ -264,6 +264,7 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         p_block = block_Realloc( p_block, 0, p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
         if( !p_block )
             return NULL;
+        *pp_block = p_block;
         p_block->i_buffer -= FF_INPUT_BUFFER_PADDING_SIZE;
         memset( &p_block->p_buffer[p_block->i_buffer], 0, FF_INPUT_BUFFER_PADDING_SIZE );
 
