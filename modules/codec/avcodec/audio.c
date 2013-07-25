@@ -69,7 +69,6 @@ struct decoder_sys_t
 #define BLOCK_FLAG_PRIVATE_REALLOCATED (1 << BLOCK_FLAG_PRIVATE_SHIFT)
 
 static void SetupOutputFormat( decoder_t *p_dec, bool b_trust );
-static int GetAudioBuf( struct AVCodecContext *, AVFrame * );
 
 static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
 {
@@ -114,6 +113,51 @@ static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
         p_context->extradata_size = 0;
         p_context->extradata = NULL;
     }
+}
+
+/**
+ * Allocates decoded audio buffer for libavcodec to use.
+ */
+static int GetAudioBuf( AVCodecContext *ctx, AVFrame *buf )
+{
+    block_t *block;
+    bool planar = av_sample_fmt_is_planar( ctx->sample_fmt );
+    unsigned channels = planar ? 1 : ctx->channels;
+    unsigned planes = planar ? ctx->channels : 1;
+
+    int bytes = av_samples_get_buffer_size( &buf->linesize[0], channels,
+                                            buf->nb_samples, ctx->sample_fmt,
+                                            16 );
+    assert( bytes >= 0 );
+    block = block_Alloc( bytes * planes );
+    if( unlikely(block == NULL) )
+        return AVERROR(ENOMEM);
+
+    block->i_nb_samples = buf->nb_samples;
+    buf->opaque = block;
+
+    if( planes > AV_NUM_DATA_POINTERS )
+    {
+        uint8_t **ext = malloc( sizeof( *ext ) * planes );
+        if( unlikely(ext == NULL) )
+        {
+            block_Release( block );
+            return AVERROR(ENOMEM);
+        }
+        buf->extended_data = ext;
+    }
+    else
+        buf->extended_data = buf->data;
+
+    uint8_t *buffer = block->p_buffer;
+    for( unsigned i = 0; i < planes; i++ )
+    {
+        buf->linesize[i] = buf->linesize[0];
+        buf->extended_data[i] = buffer;
+        buffer += bytes;
+    }
+
+    return 0;
 }
 
 /*****************************************************************************
@@ -171,51 +215,6 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
         date_Init( &p_sys->end_date, p_dec->fmt_in.audio.i_rate, 1 );
 
     return VLC_SUCCESS;
-}
-
-/**
- * Allocates decoded audio buffer for libavcodec to use.
- */
-static int GetAudioBuf( AVCodecContext *ctx, AVFrame *buf )
-{
-    block_t *block;
-    bool planar = av_sample_fmt_is_planar( ctx->sample_fmt );
-    unsigned channels = planar ? 1 : ctx->channels;
-    unsigned planes = planar ? ctx->channels : 1;
-
-    int bytes = av_samples_get_buffer_size( &buf->linesize[0], channels,
-                                            buf->nb_samples, ctx->sample_fmt,
-                                            16 );
-    assert( bytes >= 0 );
-    block = block_Alloc( bytes * planes );
-    if( unlikely(block == NULL) )
-        return AVERROR(ENOMEM);
-
-    block->i_nb_samples = buf->nb_samples;
-    buf->opaque = block;
-
-    if( planes > AV_NUM_DATA_POINTERS )
-    {
-        uint8_t **ext = malloc( sizeof( *ext ) * planes );
-        if( unlikely(ext == NULL) )
-        {
-            block_Release( block );
-            return AVERROR(ENOMEM);
-        }
-        buf->extended_data = ext;
-    }
-    else
-        buf->extended_data = buf->data;
-
-    uint8_t *buffer = block->p_buffer;
-    for( unsigned i = 0; i < planes; i++ )
-    {
-        buf->linesize[i] = buf->linesize[0];
-        buf->extended_data[i] = buffer;
-        buffer += bytes;
-    }
-
-    return 0;
 }
 
 /*****************************************************************************
