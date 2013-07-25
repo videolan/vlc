@@ -145,24 +145,6 @@ static void DumpDeviceStatus (vlc_object_t *obj, snd_pcm_t *pcm)
 }
 #define DumpDeviceStatus(o, p) DumpDeviceStatus(VLC_OBJECT(o), p)
 
-static unsigned SetupChannelsUnknown (vlc_object_t *obj,
-                                      uint16_t *restrict mask)
-{
-    uint16_t map = var_InheritInteger (obj, "alsa-audio-channels");
-    uint16_t chans = *mask & map;
-
-    if (unlikely(chans == 0)) /* WTH? */
-        chans = AOUT_CHANS_STEREO;
-
-    if (popcount (chans) < popcount (*mask))
-        msg_Dbg (obj, "downmixing from %u to %u channels",
-                 popcount (*mask), popcount (chans));
-    else
-        msg_Dbg (obj, "keeping %u channels", popcount (chans));
-    *mask = chans;
-    return 0;
-}
-
 #if (SND_LIB_VERSION >= 0x01001B)
 static const uint16_t vlc_chans[] = {
     [SND_CHMAP_MONO] = AOUT_CHAN_CENTER,
@@ -228,18 +210,17 @@ static unsigned SetupChannelsFixed(const snd_pcm_chmap_t *restrict map,
  * Negotiate channels mapping.
  */
 static unsigned SetupChannels (vlc_object_t *obj, snd_pcm_t *pcm,
-                                uint16_t *restrict mask, uint8_t *restrict tab)
+                               uint16_t *restrict mask, uint8_t *restrict tab)
 {
     snd_pcm_chmap_query_t **maps = snd_pcm_query_chmaps (pcm);
     if (maps == NULL)
-    {   /* Fallback to manual configuration */
+    {   /* Fallback to default order if unknown */
         msg_Dbg(obj, "channels map not provided");
-        return SetupChannelsUnknown (obj, mask);
+        return 0;
     }
 
     /* Find most appropriate available channels map */
-    unsigned best_offset;
-    unsigned best_score = 0;
+    unsigned best_offset, best_score = 0, to_reorder = 0;
 
     for (snd_pcm_chmap_query_t *const *p = maps; *p != NULL; p++)
     {
@@ -271,8 +252,7 @@ static unsigned SetupChannels (vlc_object_t *obj, snd_pcm_t *pcm,
     if (best_score == 0)
     {
         msg_Err (obj, "cannot find supported channels map");
-        snd_pcm_free_chmaps (maps);
-        return SetupChannelsUnknown (obj, mask);
+        goto out;
     }
 
     const snd_pcm_chmap_t *map = &maps[best_offset]->map;
@@ -280,17 +260,16 @@ static unsigned SetupChannels (vlc_object_t *obj, snd_pcm_t *pcm,
              maps[best_offset]->type, map->channels);
 
     /* Setup channels map */
-    unsigned to_reorder = SetupChannelsFixed(map, mask, tab);
+    to_reorder = SetupChannelsFixed(map, mask, tab);
 
     /* TODO: avoid reordering for PAIRED and VAR types */
     //snd_pcm_set_chmap (pcm, ...)
-
+out:
     snd_pcm_free_chmaps (maps);
     return to_reorder;
 }
 #else /* (SND_LIB_VERSION < 0x01001B) */
-# define SetupChannels(obj, pcm, mask, tab) \
-         SetupChannelsUnknown(obj, mask)
+# define SetupChannels(obj, pcm, mask, tab) (0)
 #endif
 
 static int TimeGet (audio_output_t *aout, mtime_t *);
@@ -457,16 +436,19 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     unsigned channels;
     if (!spdif)
     {
-        sys->chans_to_reorder = SetupChannels (VLC_OBJECT(aout), pcm,
-                                  &fmt->i_physical_channels, sys->chans_table);
-        channels = popcount (fmt->i_physical_channels);
+        uint16_t map = var_InheritInteger (aout, "alsa-audio-channels");
+
+        sys->chans_to_reorder = SetupChannels (VLC_OBJECT(aout), pcm, &map,
+                                               sys->chans_table);
+        fmt->i_physical_channels = map;
+        fmt->i_original_channels = map;
+        channels = popcount (map);
     }
     else
     {
         sys->chans_to_reorder = 0;
         channels = 2;
     }
-    fmt->i_original_channels = fmt->i_physical_channels;
 
     /* By default, ALSA plug will pad missing channels with zeroes, which is
      * usually fine. However, it will also discard extraneous channels, which
