@@ -450,7 +450,7 @@ static void EqzFilter( filter_t *p_filter, float *out, float *in,
                 p_sys->x2[ch][0] = x2;
 
                 /* We add source PCM + filtered PCM */
-                out[ch] = p_sys->f_gamp *( EQZ_IN_FACTOR * x2 + o );
+                out[ch] = p_sys->f_gamp * p_sys->f_gamp *( EQZ_IN_FACTOR * x2 + o );
             }
             else
             {
