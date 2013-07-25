@@ -362,10 +362,11 @@ ok:
     return VLC_SUCCESS;
 }
 
-static int Extract(vlc_va_t *external, picture_t *picture, AVFrame *ff)
+static int Extract(vlc_va_t *external, picture_t *picture, void *opaque,
+                    uint8_t *data)
 {
     vlc_va_dxva2_t *va = vlc_va_dxva2_Get(external);
-    LPDIRECT3DSURFACE9 d3d = (LPDIRECT3DSURFACE9)(uintptr_t)ff->data[3];
+    LPDIRECT3DSURFACE9 d3d = (LPDIRECT3DSURFACE9)(uintptr_t)data;
 
     if (!va->surface_cache.buffer)
         return VLC_EGENERIC;
@@ -423,6 +424,7 @@ static int Extract(vlc_va_t *external, picture_t *picture, AVFrame *ff)
 
     /* */
     IDirect3DSurface9_UnlockRect(d3d);
+    (void) opaque;
     return VLC_SUCCESS;
 }
 

@@ -82,12 +82,12 @@ static VdpStatus Render(VdpDecoder decoder, VdpVideoSurface target,
     return VDP_STATUS_OK;
 }
 
-static int Copy(vlc_va_t *va, picture_t *pic, AVFrame *ff)
+static int Copy(vlc_va_t *va, picture_t *pic, void *opaque, uint8_t *data)
 {
-    (void) va; (void) ff;
+    (void) va;
 
-    assert((uintptr_t)ff->data[3] == DATA_MAGIC);
-    assert((uintptr_t)ff->opaque == OPAQUE_MAGIC);
+    assert((uintptr_t)opaque == OPAQUE_MAGIC);
+    assert((uintptr_t)data == DATA_MAGIC);
 
     /* Put some dummy picture content */
     memset(pic->p[0].p_pixels, 0xF0,

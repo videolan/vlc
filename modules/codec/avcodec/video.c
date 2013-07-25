@@ -859,7 +859,8 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
 
     if( p_sys->p_va )
     {
-        vlc_va_Extract( p_sys->p_va, p_pic, p_ff_pic );
+        vlc_va_Extract( p_sys->p_va, p_pic, p_ff_pic->opaque,
+                        p_ff_pic->data[3] );
     }
     else if( FindVlcChroma( p_sys->p_context->pix_fmt ) )
     {

@@ -399,11 +399,12 @@ static int Setup( vlc_va_t *va, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
 
     return VLC_EGENERIC;
 }
-static int Extract( vlc_va_t *va, picture_t *p_picture, AVFrame *p_ff )
+
+static int Extract( vlc_va_t *va, picture_t *p_picture, void *opaque,
+                    uint8_t *data )
 {
     vlc_va_sys_t *sys = va->sys;
-
-    VASurfaceID i_surface_id = (VASurfaceID)(uintptr_t)p_ff->data[3];
+    VASurfaceID i_surface_id = (VASurfaceID)(uintptr_t)data;
 
 #if VA_CHECK_VERSION(0,31,0)
     if( vaSyncSurface( sys->p_display, i_surface_id ) )
@@ -473,7 +474,7 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, AVFrame *p_ff )
         vaDestroyImage( sys->p_display, sys->image.image_id );
         sys->image.image_id = VA_INVALID_ID;
     }
-
+    (void) opaque;
     return VLC_SUCCESS;
 }
 

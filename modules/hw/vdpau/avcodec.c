@@ -93,9 +93,9 @@ static void Unlock(void *opaque, uint8_t *data)
     (void) data;
 }
 
-static int Copy(vlc_va_t *va, picture_t *pic, AVFrame *ff)
+static int Copy(vlc_va_t *va, picture_t *pic, void *opaque, uint8_t *data)
 {
-    vlc_vdp_video_field_t *field = ff->opaque;
+    vlc_vdp_video_field_t *field = opaque;
 
     assert(field != NULL);
     field = vlc_vdp_video_copy(field);
@@ -104,7 +104,7 @@ static int Copy(vlc_va_t *va, picture_t *pic, AVFrame *ff)
 
     assert(pic->context == NULL);
     pic->context = field;
-    (void) va;
+    (void) va; (void) data;
     return VLC_SUCCESS;
 }
 

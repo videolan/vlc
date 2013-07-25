@@ -39,7 +39,7 @@ struct vlc_va_t {
                   int width, int height);
     int  (*get)(vlc_va_t *, void **opaque, uint8_t **data);
     void (*release)(void *opaque, uint8_t *surface);
-    int  (*extract)(vlc_va_t *, picture_t *dst, AVFrame *src);
+    int  (*extract)(vlc_va_t *, picture_t *dst, void *opaque, uint8_t *data);
 };
 
 /**
@@ -115,9 +115,10 @@ static inline void vlc_va_Release(vlc_va_t *va, void *opaque, uint8_t *data)
  *
  * @param frame libavcodec frame previously allocated by vlc_va_Get()
  */
-static inline int vlc_va_Extract(vlc_va_t *va, picture_t *dst, AVFrame *src)
+static inline int vlc_va_Extract(vlc_va_t *va, picture_t *dst, void *opaque,
+                                 uint8_t *data)
 {
-    return va->extract(va, dst, src);
+    return va->extract(va, dst, opaque, data);
 }
 
 /**
