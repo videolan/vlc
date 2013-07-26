@@ -46,30 +46,10 @@ static const int pi_channels_maps[6] =
      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
 };
 
-static block_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
+static int audio_update_format( decoder_t *p_dec )
 {
-    block_t *p_block;
-    int i_size;
-
-    if( p_dec->fmt_out.audio.i_bitspersample )
-    {
-        i_size = i_samples * p_dec->fmt_out.audio.i_bitspersample / 8 *
-            p_dec->fmt_out.audio.i_channels;
-    }
-    else if( p_dec->fmt_out.audio.i_bytes_per_frame &&
-             p_dec->fmt_out.audio.i_frame_length )
-    {
-        i_size = i_samples * p_dec->fmt_out.audio.i_bytes_per_frame /
-            p_dec->fmt_out.audio.i_frame_length;
-    }
-    else
-    {
-        i_size = i_samples * 4 * p_dec->fmt_out.audio.i_channels;
-    }
-
-    p_block = block_Alloc( i_size );
-    p_block->i_nb_samples = i_samples;
-    return p_block;
+    aout_FormatPrepare( &p_dec->fmt_out.audio );
+    return 0;
 }
 
 int transcode_audio_new( sout_stream_t *p_stream,
@@ -87,7 +67,7 @@ int transcode_audio_new( sout_stream_t *p_stream,
     id->p_decoder->fmt_out.i_extra = 0;
     id->p_decoder->fmt_out.p_extra = 0;
     id->p_decoder->pf_decode_audio = NULL;
-    id->p_decoder->pf_aout_buffer_new = audio_new_buffer;
+    id->p_decoder->pf_aout_format_update = audio_update_format;
     /* id->p_decoder->p_cfg = p_sys->p_audio_cfg; */
 
     id->p_decoder->p_module =

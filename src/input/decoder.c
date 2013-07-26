@@ -69,13 +69,11 @@ static void       DecoderFlushBuffering( decoder_t * );
 static void       DecoderUnsupportedCodec( decoder_t *, vlc_fourcc_t );
 
 /* Buffers allocation callbacks for the decoders */
-static block_t *aout_new_buffer( decoder_t *, int );
-
 static picture_t *vout_new_buffer( decoder_t * );
 static void vout_del_buffer( decoder_t *, picture_t * );
 static void vout_link_picture( decoder_t *, picture_t * );
 static void vout_unlink_picture( decoder_t *, picture_t * );
-
+static int aout_update_format( decoder_t * );
 static subpicture_t *spu_new_buffer( decoder_t *, const subpicture_updater_t * );
 static void spu_del_buffer( decoder_t *, subpicture_t * );
 
@@ -206,11 +204,20 @@ void decoder_UnlinkPicture( decoder_t *p_decoder, picture_t *p_picture )
     p_decoder->pf_picture_unlink( p_decoder, p_picture );
 }
 
-block_t *decoder_NewAudioBuffer( decoder_t *p_decoder, int i_size )
+block_t *decoder_NewAudioBuffer( decoder_t *dec, int samples )
 {
-    if( !p_decoder->pf_aout_buffer_new )
+    if( decoder_UpdateAudioFormat( dec ) )
         return NULL;
-    return p_decoder->pf_aout_buffer_new( p_decoder, i_size );
+
+    size_t length = samples * dec->fmt_out.audio.i_bytes_per_frame
+                            / dec->fmt_out.audio.i_frame_length;
+    block_t *block = block_Alloc( length );
+    if( likely(block != NULL) )
+    {
+        block->i_nb_samples = samples;
+        block->i_pts = block->i_length = 0;
+    }
+    return block;
 }
 
 subpicture_t *decoder_NewSubpicture( decoder_t *p_decoder,
@@ -795,7 +802,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     }
 
     /* Set buffers allocation callbacks for the decoders */
-    p_dec->pf_aout_buffer_new = aout_new_buffer;
+    p_dec->pf_aout_format_update = aout_update_format;
     p_dec->pf_vout_buffer_new = vout_new_buffer;
     p_dec->pf_vout_buffer_del = vout_del_buffer;
     p_dec->pf_picture_link    = vout_link_picture;
@@ -2177,7 +2184,7 @@ static vout_thread_t *aout_request_vout( void *p_private,
     return p_vout;
 }
 
-static block_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
+static int aout_update_format( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     block_t *p_buffer;
@@ -2207,6 +2214,7 @@ static block_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
 
         p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
         p_owner->audio = p_dec->fmt_out.audio;
+        aout_FormatPrepare( &p_owner->audio );
 
         memcpy( &format, &p_owner->audio, sizeof( audio_sample_format_t ) );
         if( i_force_dolby &&
@@ -2232,7 +2240,6 @@ static block_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         p_aout = input_resource_GetAout( p_owner->p_resource );
         if( p_aout )
         {
-            aout_FormatPrepare( &format );
             if( aout_DecNew( p_aout, &format,
                              &p_dec->fmt_out.audio_replay_gain,
                              &request_vout ) )
@@ -2258,23 +2265,14 @@ static block_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         {
             msg_Err( p_dec, "failed to create audio output" );
             p_dec->b_error = true;
-            return NULL;
+            return -1;
         }
 
-        aout_FormatPrepare( &p_owner->audio );
         p_dec->fmt_out.audio.i_bytes_per_frame =
             p_owner->audio.i_bytes_per_frame;
+        p_dec->fmt_out.audio.i_frame_length = p_owner->audio.i_frame_length;
     }
-
-    size_t length = i_samples * p_owner->audio.i_bytes_per_frame
-                              / p_owner->audio.i_frame_length;
-    block_t *block = block_Alloc( length );
-    if( likely(block != NULL) )
-    {
-        block->i_nb_samples = i_samples;
-        block->i_pts = block->i_length = 0;
-    }
-    return block;
+    return 0;
 }
 
 static picture_t *vout_new_buffer( decoder_t *p_dec )

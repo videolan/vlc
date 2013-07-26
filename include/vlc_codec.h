@@ -108,9 +108,8 @@ struct decoder_t
      */
     int             i_extra_picture_buffers;
 
-    /* Audio output callbacks
-     * XXX use decoder_NewAudioBuffer/decoder_DeleteAudioBuffer */
-    block_t        *(*pf_aout_buffer_new)( decoder_t *, int );
+    /* Audio output callbacks */
+    int             (*pf_aout_format_update)( decoder_t * );
 
     /* SPU output callbacks
      * XXX use decoder_NewSubpicture and decoder_DeleteSubpicture */
@@ -203,6 +202,19 @@ VLC_API void decoder_LinkPicture( decoder_t *, picture_t * );
  * (picture_Release is not usable.)
  */
 VLC_API void decoder_UnlinkPicture( decoder_t *, picture_t * );
+
+/**
+ * This function notifies the audio output pipeline of a new audio output
+ * format (fmt_out.audio). If there is currently no audio output or if the
+ * audio output format has changed, a new audio output will be set up.
+ * @return 0 if the audio output is working, -1 if not. */
+static inline int decoder_UpdateAudioFormat( decoder_t *dec )
+{
+    if( dec->pf_aout_format_update != NULL )
+        return dec->pf_aout_format_update( dec );
+    else
+        return -1;
+}
 
 /**
  * This function will return a new audio buffer usable by a decoder as an
