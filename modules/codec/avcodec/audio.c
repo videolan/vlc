@@ -319,9 +319,11 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         *pp_block = NULL;
     }
 
-    /* NOTE WELL: Beyond this point, p_block now refers to the DECODED block */
+    /* NOTE WELL: Beyond this point, p_block refers to the DECODED block! */
     p_block = frame.opaque;
     SetupOutputFormat( p_dec, true );
+    if( decoder_UpdateAudioFormat( p_dec ) )
+        goto drop;
 
     /* Silent unwanted samples */
     if( p_sys->i_reject_count > 0 )
@@ -330,16 +332,14 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         p_sys->i_reject_count--;
     }
 
-    block_t *p_buffer = decoder_NewAudioBuffer( p_dec, p_block->i_nb_samples );
-    if (!p_buffer)
-        return NULL;
     assert( p_block->i_nb_samples >= (unsigned)frame.nb_samples );
-    assert( p_block->i_nb_samples == p_buffer->i_nb_samples );
-    p_block->i_buffer = p_buffer->i_buffer; /* drop buffer padding */
 
     /* Interleave audio if required */
     if( av_sample_fmt_is_planar( ctx->sample_fmt ) )
     {
+        block_t *p_buffer = block_Alloc( p_block->i_buffer );
+        if( unlikely(p_buffer == NULL) )
+            goto drop;
         aout_Interleave( p_buffer->p_buffer, p_block->p_buffer,
                          p_block->i_nb_samples, ctx->channels,
                          p_dec->fmt_out.audio.i_format );
@@ -348,18 +348,13 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         block_Release( p_block );
         p_block = p_buffer;
     }
-    else /* FIXME: improve decoder_NewAudioBuffer(), avoid useless buffer... */
-        block_Release( p_buffer );
 
     if (p_sys->b_extract)
     {   /* TODO: do not drop channels... at least not here */
-        p_buffer = block_Alloc( p_dec->fmt_out.audio.i_bytes_per_frame
-                                * frame.nb_samples );
+        block_t *p_buffer = block_Alloc( p_dec->fmt_out.audio.i_bytes_per_frame
+                                         * frame.nb_samples );
         if( unlikely(p_buffer == NULL) )
-        {
-            block_Release( p_block );
-            return NULL;
-        }
+            goto drop;
         aout_ChannelExtract( p_buffer->p_buffer,
                              p_dec->fmt_out.audio.i_channels,
                              p_block->p_buffer, ctx->channels,
@@ -378,8 +373,9 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     return p_block;
 
 end:
-    block_Release(p_block);
     *pp_block = NULL;
+drop:
+    block_Release(p_block);
     return NULL;
 }
 
