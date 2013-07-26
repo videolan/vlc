@@ -1266,7 +1266,7 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
         if( DecoderIsExitRequested( p_dec ) )
         {
             /* It prevent freezing VLC in case of broken decoder */
-            aout_DecDeleteBuffer( p_aout, p_aout_buf );
+            block_Release( p_aout_buf );
             if( p_block )
                 block_Release( p_block );
             break;
@@ -1276,7 +1276,7 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
         if( p_owner->i_preroll_end > VLC_TS_INVALID &&
             p_aout_buf->i_pts < p_owner->i_preroll_end )
         {
-            aout_DecDeleteBuffer( p_aout, p_aout_buf );
+            block_Release( p_aout_buf );
             continue;
         }
 

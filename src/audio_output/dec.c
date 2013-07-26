@@ -182,15 +182,6 @@ void aout_RequestRestart (audio_output_t *aout, unsigned mode)
  * Buffer management
  */
 
-/*****************************************************************************
- * aout_DecDeleteBuffer : destroy an undecoded buffer
- *****************************************************************************/
-void aout_DecDeleteBuffer (audio_output_t *aout, block_t *block)
-{
-    (void) aout;
-    block_Release (block);
-}
-
 static void aout_StopResampling (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
