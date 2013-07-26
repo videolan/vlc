@@ -134,6 +134,7 @@ SOURCES_subsdelay = subsdelay.c
 SOURCES_hqdn3d = hqdn3d.c hqdn3d.h
 SOURCES_anaglyph = anaglyph.c
 SOURCES_oldmovie = oldmovie.c
+SOURCES_vhs = vhs.c
 noinst_HEADERS = filter_picture.h
 
 libvlc_LTLIBRARIES += \
@@ -177,5 +178,6 @@ libvlc_LTLIBRARIES += \
 	libantiflicker_plugin.la \
 	libhqdn3d_plugin.la \
 	libanaglyph_plugin.la \
-	liboldmovie_plugin.la
+	liboldmovie_plugin.la \
+	libvhs_plugin.la
 

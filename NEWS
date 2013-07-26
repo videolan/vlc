@@ -10,6 +10,7 @@ Video Output:
 
 Video Filter:
  * New Oldmovie effect filter
+ * New VHS effect filter
 
 Removed modules:
  * ios video output: use ios2

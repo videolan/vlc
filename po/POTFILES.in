@@ -1127,6 +1127,7 @@ modules/video_filter/sepia.c
 modules/video_filter/sharpen.c
 modules/video_filter/subsdelay.c
 modules/video_filter/transform.c
+modules/video_filter/vhs.c
 modules/video_filter/wave.c
 modules/video_filter/yuvp.c
 modules/video_output/aa.c

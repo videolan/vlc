@@ -370,6 +370,7 @@ $Id$
  * vdpau_display: VDPAU video display
  * vdpau_sharpen: VDPAU sharpen/blur video filter
  * vdummy: dummy video display
+ * vhs: vhs style video filter
  * visual: visualisation system
  * vmem: video memory output
  * vobsub: VobSUB subtitles demuxer
