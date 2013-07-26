@@ -133,6 +133,7 @@ SOURCES_gradfun = gradfun.c gradfun.h
 SOURCES_subsdelay = subsdelay.c
 SOURCES_hqdn3d = hqdn3d.c hqdn3d.h
 SOURCES_anaglyph = anaglyph.c
+SOURCES_oldmovie = oldmovie.c
 noinst_HEADERS = filter_picture.h
 
 libvlc_LTLIBRARIES += \
@@ -175,4 +176,6 @@ libvlc_LTLIBRARIES += \
 	libyuvp_plugin.la \
 	libantiflicker_plugin.la \
 	libhqdn3d_plugin.la \
-	libanaglyph_plugin.la
+	libanaglyph_plugin.la \
+	liboldmovie_plugin.la
+

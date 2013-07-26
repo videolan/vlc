@@ -8,6 +8,9 @@ Access:
 Video Output:
  * Direct rendering and filtering for VDPAU hardware acceleration
 
+Video Filter:
+ * New Oldmovie effect filter
+
 Removed modules:
  * ios video output: use ios2
 
