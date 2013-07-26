@@ -2189,7 +2189,6 @@ static block_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
 
         /* Parameters changed, restart the aout */
         vlc_mutex_lock( &p_owner->lock );
-
         DecoderFlushBuffering( p_dec );
 
         aout_DecDelete( p_owner->p_aout );
@@ -2261,13 +2260,21 @@ static block_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
             p_dec->b_error = true;
             return NULL;
         }
+
+        aout_FormatPrepare( &p_owner->audio );
         p_dec->fmt_out.audio.i_bytes_per_frame =
             p_owner->audio.i_bytes_per_frame;
     }
 
-    p_buffer = aout_DecNewBuffer( p_owner->p_aout, i_samples );
-
-    return p_buffer;
+    size_t length = i_samples * p_owner->audio.i_bytes_per_frame
+                              / p_owner->audio.i_frame_length;
+    block_t *block = block_Alloc( length );
+    if( likely(block != NULL) )
+    {
+        block->i_nb_samples = i_samples;
+        block->i_pts = block->i_length = 0;
+    }
+    return block;
 }
 
 static picture_t *vout_new_buffer( decoder_t *p_dec )
