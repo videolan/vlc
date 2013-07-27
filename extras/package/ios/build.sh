@@ -214,6 +214,9 @@ fi
     --enable-freetype2 \
     --enable-ass \
     --disable-fontconfig \
+    --disable-gpg-error \
+    --disable-gcrypt \
+    --disable-lua \
     --disable-taglib > ${out}
 
 echo "EXTRA_CFLAGS += ${EXTRA_CFLAGS}" >> config.mak
