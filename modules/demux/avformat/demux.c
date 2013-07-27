@@ -338,7 +338,10 @@ int OpenDemux( vlc_object_t *p_this )
             fmt.video.i_frame_rate = cc->time_base.den;
             fmt.video.i_frame_rate_base = cc->time_base.num * __MAX( cc->ticks_per_frame, 1 );
             fmt.video.i_sar_num = s->sample_aspect_ratio.num;
-            fmt.video.i_sar_den = s->sample_aspect_ratio.den;
+            if (s->sample_aspect_ratio.num > 0)
+                fmt.video.i_sar_den = s->sample_aspect_ratio.den;
+            else
+                fmt.video.i_sar_den = 0;
             break;
 
         case AVMEDIA_TYPE_SUBTITLE:
