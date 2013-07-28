@@ -264,7 +264,7 @@ ${VLCROOT}/configure \
     --enable-ios-vout \
     --enable-ios-vout2 \
     --disable-shared \
-    --disable-macosx-quartztext \
+    --enable-macosx-quartztext \
     --enable-avcodec \
     --enable-mkv \
     --enable-opus \
