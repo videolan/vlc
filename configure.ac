@@ -401,9 +401,6 @@ LT_LANG([Windows Resource])
 
 DOLT
 
-m4_undefine([AC_DEPLIBS_CHECK_METHOD])
-m4_defun([AC_DEPLIBS_CHECK_METHOD],[])
-
 lt_cv_deplibs_check_method=pass_all
 
 AS_IF([test "${enable_shared}" = "no" -a "${enable_vlc}" != "no"], [
