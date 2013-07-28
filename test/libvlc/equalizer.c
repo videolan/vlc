@@ -139,7 +139,7 @@ static void test_equalizer (const char ** argv, int argc)
     log ("Testing equalizer-bands string limit\n");
 
     for (unsigned i = 0; i < u_bands; i++)
-        assert (0 == libvlc_audio_equalizer_set_amp_at_index (equalizer, i, -19.1234567f));
+        assert (0 == libvlc_audio_equalizer_set_amp_at_index (equalizer, -19.1234567f, i));
 
     assert (0 == libvlc_media_player_set_equalizer(mp, equalizer));
 
