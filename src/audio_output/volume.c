@@ -177,7 +177,7 @@ static float aout_ReplayGainSelect(vlc_object_t *obj, const char *str,
         else
             gain = var_InheritFloat (obj, "audio-replay-gain-default");
 
-        multiplier = pow (10., gain / 20.);
+        multiplier = powf (10.f, gain / 20.f);
 
         if (var_InheritBool (obj, "audio-replay-gain-peak-protection"))
             multiplier = fminf (multiplier, replay_gain->pb_peak[mode]
