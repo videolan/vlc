@@ -521,9 +521,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
         /* apply the options to our item(s) */
         [o_dic setObject: (NSArray *)[o_options copy] forKey: @"ITEM_OPTIONS"];
         if (b_autoplay)
-            [[[VLCMain sharedInstance] playlist] appendArray: @[o_dic] atPos: -1 enqueue:NO];
+            [[[VLCMain sharedInstance] playlist] appendArray: [NSArray arrayWithObject:o_dic] atPos: -1 enqueue:NO];
         else
-            [[[VLCMain sharedInstance] playlist] appendArray: @[o_dic] atPos: -1 enqueue:YES];
+            [[[VLCMain sharedInstance] playlist] appendArray: [NSArray arrayWithObject:o_dic] atPos: -1 enqueue:YES];
     }
 }
 
@@ -857,7 +857,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     GetVolParmsInfoBuffer volumeParms;
     err = FSGetVolumeParms(actualVolume, &volumeParms, sizeof(volumeParms));
     if (noErr == err) {
-        NSString *bsdName = @((char *)volumeParms.vMDeviceID);
+        NSString *bsdName = [NSString stringWithUTF8String:(char *)volumeParms.vMDeviceID];
         return [NSString stringWithFormat:@"/dev/r%@", bsdName];
     }
 
@@ -1113,7 +1113,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     /* work-around for Mountain Lion, which treats folders called "BDMV" including an item named "INDEX.BDM"
      * as a _FILE_. Don't ask, move on. There is nothing to see here */
     [o_open_panel setCanChooseFiles: YES];
-    [o_open_panel setAllowedFileTypes:@[@"public.directory"]];
+    [o_open_panel setAllowedFileTypes:[NSArray arrayWithObject:@"public.directory"]];
 
     if ([o_open_panel runModal] == NSOKButton) {
         NSString *o_path = [[[o_open_panel URLs] objectAtIndex:0] path];

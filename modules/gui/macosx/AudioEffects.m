@@ -76,14 +76,14 @@ static VLCAudioEffects *_o_sharedInstance = nil;
                       eqz_preset_10b[i].f_amp[9]];
         [workValues addObject:workString];
         [workPreamp addObject:[NSString stringWithFormat:@"%1.f", eqz_preset_10b[i].f_preamp]];
-        [workTitles addObject:@(preset_list_text[i])];
-        [workNames addObject:@(preset_list[i])];
+        [workTitles addObject:[NSString stringWithUTF8String:preset_list_text[i]]];
+        [workNames addObject:[NSString stringWithUTF8String:preset_list[i]]];
     }
 
     NSString *defaultProfile = [NSString stringWithFormat:@"ZmxhdA==;;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%i",
                                 .0,25.,100.,-11.,8.,2.5,7.,.85,1.,.4,.5,.5,2.,0];
 
-    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithArray:workValues], @"EQValues", [NSArray arrayWithArray:workPreamp], @"EQPreampValues", [NSArray arrayWithArray:workTitles], @"EQTitles", [NSArray arrayWithArray:workNames], @"EQNames", @[defaultProfile], @"AudioEffectProfiles", @[_NS("Default")], @"AudioEffectProfileNames", nil];
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithArray:workValues], @"EQValues", [NSArray arrayWithArray:workPreamp], @"EQPreampValues", [NSArray arrayWithArray:workTitles], @"EQTitles", [NSArray arrayWithArray:workNames], @"EQNames", [NSArray arrayWithObject:defaultProfile], @"AudioEffectProfiles", [NSArray arrayWithObject:_NS("Default")], @"AudioEffectProfileNames", nil];
     [defaults registerDefaults:appDefaults];
 
     [workValues release];
@@ -177,9 +177,9 @@ static VLCAudioEffects *_o_sharedInstance = nil;
         }
     } else {
         if (psz_tmp) {
-            psz_tmp = (char *)[[@(psz_tmp) stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithFormat:@":%s",psz_name]]] UTF8String];
-            psz_tmp = (char *)[[@(psz_tmp) stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithFormat:@"%s:",psz_name]]] UTF8String];
-            psz_tmp = (char *)[[@(psz_tmp) stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@(psz_name)]] UTF8String];
+            psz_tmp = (char *)[[[NSString stringWithUTF8String:psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithFormat:@":%s",psz_name]]] UTF8String];
+            psz_tmp = (char *)[[[NSString stringWithUTF8String:psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithFormat:@"%s:",psz_name]]] UTF8String];
+            psz_tmp = (char *)[[[NSString stringWithUTF8String:psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithUTF8String:psz_name]]] UTF8String];
             config_PutPsz(p_intf, "audio-filter", psz_tmp);
         }
     }

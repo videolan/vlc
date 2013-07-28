@@ -62,7 +62,7 @@
 -(id)initWithFrame:(NSRect)frameRect
 {
     if (self = [super initWithFrame:frameRect]) {
-        [self registerForDraggedTypes:@[NSFilenamesPboardType]];
+        [self registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
     }
 
     i_lastScrollWheelDirection = 0;

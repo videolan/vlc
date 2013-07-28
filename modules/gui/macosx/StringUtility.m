@@ -132,18 +132,18 @@ static VLCStringUtility *_o_sharedInstance = nil;
             theString = [NSString stringWithFormat:@"%@-", theString];
         }
         /* modifiers */
-        theString = [theString stringByReplacingOccurrencesOfString:@"Command" withString: @("\xE2\x8C\x98")];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Alt" withString: @("\xE2\x8C\xA5")];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Shift" withString: @("\xE2\x87\xA7")];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Ctrl" withString: @("\xE2\x8C\x83")];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Command" withString: [NSString stringWithUTF8String:"\xE2\x8C\x98"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Alt" withString: [NSString stringWithUTF8String:"\xE2\x8C\xA5"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Shift" withString: [NSString stringWithUTF8String:"\xE2\x87\xA7"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Ctrl" withString: [NSString stringWithUTF8String:"\xE2\x8C\x83"]];
         /* show non-character keys correctly */
-        theString = [theString stringByReplacingOccurrencesOfString:@"Right" withString:@("\xE2\x86\x92")];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Left" withString:@("\xE2\x86\x90")];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Up" withString:@("\xE2\x86\x91")];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Down" withString:@("\xE2\x86\x93")];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Enter" withString:@("\xe2\x86\xb5")];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Tab" withString:@("\xe2\x87\xa5")];
-        theString = [theString stringByReplacingOccurrencesOfString:@"Delete" withString:@("\xe2\x8c\xab")];        /* capitalize plain characters to suit the menubar's look */
+        theString = [theString stringByReplacingOccurrencesOfString:@"Right" withString:[NSString stringWithUTF8String:"\xE2\x86\x92"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Left" withString:[NSString stringWithUTF8String:"\xE2\x86\x90"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Up" withString:[NSString stringWithUTF8String:"\xE2\x86\x91"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Down" withString:[NSString stringWithUTF8String:"\xE2\x86\x93"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Enter" withString:[NSString stringWithUTF8String:"\xe2\x86\xb5"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Tab" withString:[NSString stringWithUTF8String:"\xe2\x87\xa5"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Delete" withString:[NSString stringWithUTF8String:"\xe2\x8c\xab"]];        /* capitalize plain characters to suit the menubar's look */
         theString = [theString capitalizedString];
     }
     else
@@ -167,7 +167,7 @@ static VLCStringUtility *_o_sharedInstance = nil;
             remaining = dur - time.i_time;
         return [NSString stringWithFormat: @"-%s", secstotimestr(psz_time, (remaining / 1000000))];
     } else
-        return @(secstotimestr(psz_time, (time.i_time / 1000000)));
+        return [NSString stringWithUTF8String:secstotimestr(psz_time, (time.i_time / 1000000))];
 }
 
 #pragma mark -

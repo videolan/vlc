@@ -30,7 +30,7 @@
 #import <ApplicationServices/ApplicationServices.h>
 
 NSString *toNSStr(const char *str) {
-    return str != NULL ? @(str) : @"";
+    return str != NULL ? [NSString stringWithUTF8String:str] : @"";
 }
 
 /*****************************************************************************
@@ -71,7 +71,7 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
 
 -(void)performEventWithObject: (NSValue *)o_value ofType: (const char*)type
 {
-    NSString *o_type = @(type);
+    NSString *o_type = [NSString stringWithUTF8String:type];
 
     if ([o_type isEqualToString: @"dialog-error"])
         [self performSelectorOnMainThread:@selector(showFatalDialog:) withObject:o_value waitUntilDone:YES];
@@ -167,7 +167,7 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     [o_prog_title_txt setStringValue: toNSStr(p_dialog->title)];
 
     if (p_dialog->cancel != NULL)
-        [o_prog_cancel_btn setTitle: @(p_dialog->cancel)];
+        [o_prog_cancel_btn setTitle: [NSString stringWithUTF8String:p_dialog->cancel]];
     else
         [o_prog_cancel_btn setTitle: _NS("Cancel")];
 

@@ -131,7 +131,8 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 
 + (NSArray*)defaultMediaKeyUserBundleIdentifiers;
 {
-    return @[[[NSBundle mainBundle] bundleIdentifier], // your app
+    return [NSArray arrayWithObjects:
+            [[NSBundle mainBundle] bundleIdentifier], // your app
              @"com.spotify.client",
              @"com.apple.iTunes",
              @"com.apple.QuickTimePlayerX",
@@ -157,6 +158,7 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
              @"com.jriver.MediaCenter18",
              @"com.jriver.MediaCenter19",
              @"com.jriver.MediaCenter20",
+            nil
     ];
 }
 

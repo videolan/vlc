@@ -317,10 +317,10 @@
         [dict setObject:view forKey:@"view"];
         [_griddedViews addObject:dict];
     }
-    [dict setObject:@(rowSpan) forKey:@"rowSpan"];
-    [dict setObject:@(colSpan) forKey:@"colSpan"];
-    [dict setObject:@(row) forKey:@"row"];
-    [dict setObject:@(column) forKey:@"col"];
+    [dict setObject:[NSNumber numberWithInt:rowSpan] forKey:@"rowSpan"];
+    [dict setObject:[NSNumber numberWithInt:colSpan] forKey:@"colSpan"];
+    [dict setObject:[NSNumber numberWithInt:row] forKey:@"row"];
+    [dict setObject:[NSNumber numberWithInt:column] forKey:@"col"];
 
     [self addSubview:view];
     [self relayout];

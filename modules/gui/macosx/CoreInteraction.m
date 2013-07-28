@@ -240,7 +240,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     }
 
     NSURL *o_url;
-    o_url = [NSURL URLWithString:@(psz_uri)];
+    o_url = [NSURL URLWithString:[NSString stringWithUTF8String:psz_uri]];
     vlc_object_release(p_input);
 
     return o_url;
@@ -272,15 +272,15 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     char *format = var_InheritString(VLCIntf, "input-title-format");
     char *formated = str_format_meta(pl_Get(VLCIntf), format);
     free(format);
-    o_name = @(formated);
+    o_name = [NSString stringWithUTF8String:formated];
     free(formated);
 
-    NSURL * o_url = [NSURL URLWithString: @(psz_uri)];
+    NSURL * o_url = [NSURL URLWithString:[NSString stringWithUTF8String:psz_uri]];
     free(psz_uri);
 
     if ([o_name isEqualToString:@""]) {
         if ([o_url isFileURL])
-            o_name = [[NSFileManager defaultManager] displayNameAtPath: [o_url path]];
+            o_name = [[NSFileManager defaultManager] displayNameAtPath:[o_url path]];
         else
             o_name = [o_url absoluteString];
     }
@@ -570,7 +570,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
     NSPasteboard *o_paste = [sender draggingPasteboard];
-    NSArray *o_types = @[NSFilenamesPboardType];
+    NSArray *o_types = [NSArray arrayWithObject:NSFilenamesPboardType];
     NSString *o_desired_type = [o_paste availableTypeFromArray:o_types];
     NSData *o_carried_data = [o_paste dataForType:o_desired_type];
     BOOL b_autoplay = config_GetInt(VLCIntf, "macosx-autoplay");

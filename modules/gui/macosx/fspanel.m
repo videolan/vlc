@@ -273,7 +273,7 @@
 
     if ([self alphaValue] < 1.0 || b_displayed != YES) {
         if (![self fadeTimer])
-            [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(focus:) userInfo:@1 repeats:YES]];
+            [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(focus:) userInfo:[NSNumber numberWithInt:1] repeats:YES]];
         else if ([[[self fadeTimer] userInfo] shortValue]==0)
             b_fadeQueued=YES;
     }
@@ -287,7 +287,7 @@
 
     if (([self alphaValue] > 0.0)) {
         if (![self fadeTimer])
-            [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(unfocus:) userInfo:@0 repeats:YES]];
+            [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(unfocus:) userInfo:[NSNumber numberWithInt:0] repeats:YES]];
         else if ([[[self fadeTimer] userInfo] shortValue]==1)
             b_fadeQueued=YES;
     }
@@ -560,13 +560,13 @@
                     remaining = dur - time.i_time;
                 o_total_time = [NSString stringWithFormat: @"-%s", secstotimestr(psz_time, (remaining / 1000000))];
             } else
-                o_total_time = @(secstotimestr(psz_time, (dur / 1000000)));
+                o_total_time = [NSString stringWithUTF8String:secstotimestr(psz_time, (dur / 1000000))];
 
             [o_streamLength_txt setStringValue: o_total_time];
         }
 
         // update current position (left field)
-        NSString *o_playback_pos = @(secstotimestr(psz_time, (time.i_time / 1000000)));
+        NSString *o_playback_pos = [NSString stringWithUTF8String:secstotimestr(psz_time, (time.i_time / 1000000))];
                
         [o_streamPosition_txt setStringValue: o_playback_pos];
         vlc_object_release(p_input);

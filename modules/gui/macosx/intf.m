@@ -519,7 +519,7 @@ static int DialogCallback(vlc_object_t *p_this, const char *type, vlc_value_t pr
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
     VLCMain *interface = (VLCMain *)data;
 
-    if ([@(type) isEqualToString: @"dialog-progress-bar"]) {
+    if ([[NSString stringWithUTF8String:type] isEqualToString: @"dialog-progress-bar"]) {
         /* the progress panel needs to update itself and therefore wants special treatment within this context */
         dialog_progress_bar_t *p_dialog = (dialog_progress_bar_t *)value.p_address;
 
@@ -542,7 +542,7 @@ void updateProgressPanel (void *priv, const char *text, float value)
 
     NSString *o_txt;
     if (text != NULL)
-        o_txt = @(text);
+        o_txt = [NSString stringWithUTF8String:text];
     else
         o_txt = @"";
 
@@ -1202,7 +1202,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             /* simulate an event as long as the user holds the button */
             b_remote_button_hold = pressedDown;
             if (pressedDown) {
-                NSNumber* buttonIdentifierNumber = @(buttonIdentifier);
+                NSNumber* buttonIdentifierNumber = [NSNumber numberWithInt:buttonIdentifier];
                 [self performSelector:@selector(executeHoldActionForRemoteButton:)
                            withObject:buttonIdentifierNumber];
             }
@@ -1320,7 +1320,7 @@ static VLCMain *_o_sharedMainInstance = nil;
            && !strncmp(p_item->psz_name , "key-", 4)
            && !EMPTY_STR(p_item->psz_text)) {
             if (p_item->value.psz)
-                [o_tempArray addObject: @(p_item->value.psz)];
+                [o_tempArray addObject: [NSString stringWithUTF8String:p_item->value.psz]];
         }
     }
     module_config_free (p_config);
@@ -1926,7 +1926,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             return;
         }
 
-        NSArray * ourPreferences = @[@"org.videolan.vlc.plist", @"VLC", @"org.videolan.vlc"];
+        NSArray * ourPreferences = [NSArray arrayWithObjects:@"org.videolan.vlc.plist", @"VLC", @"org.videolan.vlc", nil];
 
         /* Move the file to trash so that user can find them later */
         [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:preferences destination:nil files:ourPreferences tag:0];
@@ -2045,7 +2045,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [saveFolderPanel setCanSelectHiddenExtension: NO];
     [saveFolderPanel setCanCreateDirectories: YES];
-    [saveFolderPanel setAllowedFileTypes: @[@"rtf"]];
+    [saveFolderPanel setAllowedFileTypes: [NSArray arrayWithObject:@"rtf"]];
     [saveFolderPanel setNameFieldStringValue:[NSString stringWithFormat: _NS("VLC Debug Log (%s).rtf"), VERSION_MESSAGE]];
     [saveFolderPanel beginSheetModalForWindow: o_msgs_panel completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSOKButton) {
