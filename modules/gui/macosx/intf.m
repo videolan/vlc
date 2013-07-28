@@ -1511,7 +1511,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
         IOReturn success;
         /* work-around a bug in 10.7.4 and 10.7.5, so check for 10.7.x < 10.7.4, 10.8 and 10.6 */
-        if ((NSAppKitVersionNumber >= 1115.2 && NSAppKitVersionNumber < 1138.45) || OSX_MOUNTAIN_LION || OSX_SNOW_LEOPARD) {
+        if ((NSAppKitVersionNumber >= 1115.2 && NSAppKitVersionNumber < 1138.45) || OSX_MOUNTAIN_LION || OSX_REDACTED || OSX_SNOW_LEOPARD) {
             CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
             if ([self activeVideoPlayback])
                 success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
@@ -1778,7 +1778,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (NSString *)latestCrashLogPathPreviouslySeen:(BOOL)previouslySeen
 {
     NSString * crashReporter;
-    if (OSX_MOUNTAIN_LION)
+    if (OSX_MOUNTAIN_LION || OSX_REDACTED)
         crashReporter = [@"~/Library/Logs/DiagnosticReports" stringByExpandingTildeInPath];
     else
         crashReporter = [@"~/Library/Logs/CrashReporter" stringByExpandingTildeInPath];

@@ -27,7 +27,8 @@
 #pragma OS detection code
 #define OSX_SNOW_LEOPARD (NSAppKitVersionNumber < 1115 && NSAppKitVersionNumber >= 1038)
 #define OSX_LION (NSAppKitVersionNumber < 1162 && NSAppKitVersionNumber >= 1115.2)
-#define OSX_MOUNTAIN_LION NSAppKitVersionNumber >= 1162
+#define OSX_MOUNTAIN_LION (NSAppKitVersionNumber < 1244 && NSAppKitVersionNumber >= 1162)
+#define OSX_REDACTED NSAppKitVersionNumber >= 1244
 
 #pragma mark -
 #pragma Fixes for OS X Snow Leopard (10.6)

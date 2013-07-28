@@ -185,7 +185,10 @@ static NSMutableArray *blackoutWindows = NULL;
 
 - (BOOL)hasMenuBar
 {
-    return ([self displayID] == [[[NSScreen screens] objectAtIndex:0] displayID]);
+    if (OSX_REDACTED)
+        return YES;
+    else
+        return ([self displayID] == [[[NSScreen screens] objectAtIndex:0] displayID]);
 }
 
 - (BOOL)hasDock
