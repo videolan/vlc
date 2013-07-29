@@ -252,6 +252,13 @@ audio_output_t *aout_New (vlc_object_t *parent)
         text.psz_string = (char*)"Vovoid VSXu";
         var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
     }
+    /* Look for glspectrum plugin */
+    if (module_exists ("glspectrum"))
+    {
+        val.psz_string = (char *)"glspectrum";
+        text.psz_string = (char*)"3D spectrum";
+        var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    }
     str = var_GetNonEmptyString (aout, "effect-list");
     if (str != NULL)
     {

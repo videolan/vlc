@@ -141,6 +141,7 @@ $Id$
  * gles1: OpenGL ES video output using the generic OpenGL provider
  * gles2: OpenGL ES2 video output using the generic OpenGL provider
  * globalhotkeys: module to catch hotkeys when application doesn't have the focus
+ * glspectrum: 3D OpenGL spectrum visualization
  * glwin32: a opengl provider using DirectX OpenGL
  * glx: GLX extension for OpenGL
  * gme: old console games music playback using Game Music Emu

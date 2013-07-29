@@ -19,6 +19,9 @@ Video Filter:
 libVLC:
  * add equalizer API libvlc_audio_equalizer_* functions
 
+Visualizations:
+ * Add a 3D OpenGL spectrum visualization.
+
 Removed modules:
  * ios video output: use ios2
 

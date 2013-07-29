@@ -296,7 +296,8 @@ static int VisualizationCallback (vlc_object_t *obj, const char *var,
      * separate "visual" (external) and "audio-visual" (internal) variables...
      * The visual plugin should have one submodule per effect instead. */
     if (strcasecmp (mode, "none") && strcasecmp (mode, "goom")
-     && strcasecmp (mode, "projectm") && strcasecmp (mode, "vsxu"))
+     && strcasecmp (mode, "projectm") && strcasecmp (mode, "vsxu")
+     && strcasecmp (mode, "glspectrum"))
     {
         var_Create (obj, "effect-list", VLC_VAR_STRING);
         var_SetString (obj, "effect-list", mode);

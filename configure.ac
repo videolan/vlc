@@ -3942,6 +3942,16 @@ AS_IF([test "${enable_atmo}" != no], [
   ])
 ])
 
+dnl
+dnl  glSpectrum
+dnl
+AC_ARG_ENABLE(glspectrum,
+  [  --enable-glspectrum    3D OpenGL spectrum visualization (default auto)])
+if test "${enable_glspectrum}" != "no" && test "${have_gl}" = "yes"
+then
+    VLC_ADD_PLUGIN([glspectrum])
+    VLC_ADD_LIBS([glspectrum],[$GL_LIBS])
+fi
 
 EXTEND_HELP_STRING([Service Discovery plugins:])
 dnl
