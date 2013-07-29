@@ -77,7 +77,7 @@ extern JavaVM *myVm;
 extern void *jni_LockAndGetAndroidSurface();
 extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void  jni_UnlockAndroidSurface();
-extern void  jni_SetAndroidSurfaceSize(int width, int height, int sar_num, int sar_den);
+extern void  jni_SetAndroidSurfaceSize(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
 
 // _ZN7android7Surface4lockEPNS0_11SurfaceInfoEb
 typedef void (*Surface_lock)(void *, void *, int);
@@ -127,6 +127,9 @@ struct vout_display_sys_t {
     /* density */
     int i_sar_num;
     int i_sar_den;
+
+    video_format_t fmt;
+    bool b_changed_crop;
 };
 
 struct picture_sys_t {
@@ -265,6 +268,7 @@ static int Open(vlc_object_t *p_this)
     video_format_FixRgb(&fmt);
 
     msg_Dbg(vd, "Pixel format %4.4s", (char*)&fmt.i_chroma);
+    sys->fmt = fmt;
 
     /* Create the associated picture */
     picture_sys_t *picsys = malloc(sizeof(*picsys));
@@ -373,8 +377,8 @@ static int  AndroidLockSurface(picture_t *picture)
     uint32_t sw, sh;
     void *surf;
 
-    sw = picture->p[0].i_visible_pitch / picture->p[0].i_pixel_pitch;
-    sh = picture->p[0].i_visible_lines;
+    sw = sys->fmt.i_width;
+    sh = sys->fmt.i_height;
 
     if (sys->s_winFromSurface) {
         jobject jsurf = jni_LockAndGetAndroidJavaSurface();
@@ -422,14 +426,15 @@ static int  AndroidLockSurface(picture_t *picture)
     int align_pixels = (16 / picture->p[0].i_pixel_pitch) - 1;
     uint32_t aligned_width = (sw + align_pixels) & ~align_pixels;
 
-    if (info->w != aligned_width || info->h != sh) {
+    if (info->w != aligned_width || info->h != sh || sys->b_changed_crop) {
         // input size doesn't match the surface size -> request a resize
-        jni_SetAndroidSurfaceSize(sw, sh, sys->i_sar_num, sys->i_sar_den);
+        jni_SetAndroidSurfaceSize(aligned_width, sh, sys->fmt.i_visible_width, sys->fmt.i_visible_height, sys->i_sar_num, sys->i_sar_den);
         // When using ANativeWindow, one should use ANativeWindow_setBuffersGeometry
         // to set the size and format. In our case, these are set via the SurfaceHolder
         // in Java, so we seem to manage without calling this ANativeWindow function.
         sys->s_unlockAndPost(surf);
         jni_UnlockAndroidSurface();
+        sys->b_changed_crop = false;
         return VLC_EGENERIC;
     }
 
@@ -471,6 +476,18 @@ static int Control(vout_display_t *vd, int query, va_list args)
     case VOUT_DISPLAY_HIDE_MOUSE:
         return VLC_SUCCESS;
 
+    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+    {
+        if (!vd->sys)
+            return VLC_EGENERIC;
+        vout_display_sys_t *sys = vd->sys;
+
+        const video_format_t *source = (const video_format_t *)va_arg(args, const video_format_t *);
+        sys->fmt = *source;
+        sys->b_changed_crop = true;
+        return VLC_SUCCESS;
+    }
+
     default:
         msg_Err(vd, "Unknown request in android vout display");
 
@@ -480,7 +497,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
-    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     case VOUT_DISPLAY_GET_OPENGL:
         return VLC_EGENERIC;
     }
