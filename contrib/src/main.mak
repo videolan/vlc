@@ -123,7 +123,7 @@ endif
 
 endif
 
-CCAS=$(CC)
+CCAS=$(CC) -c
 
 ifdef HAVE_IOS
 CC=xcrun clang
@@ -133,7 +133,7 @@ AS=perl $(abspath ../../extras/tools/build/bin/gas-preprocessor.pl) $(CC)
 else
 AS=xcrun as
 endif
-CCAS=gas-preprocessor.pl $(CC)
+CCAS=gas-preprocessor.pl $(CC) -c
 AR=xcrun ar
 LD=xcrun ld
 STRIP=xcrun strip
