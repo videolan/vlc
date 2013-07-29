@@ -219,9 +219,9 @@ static int Open(vlc_object_t *p_this)
     }
 
     /* */
-    sys->p_library = InitLibrary(sys);
+    sys->p_library = InitLibrary2(sys);
     if (!sys->p_library)
-        sys->p_library = InitLibrary2(sys);
+        sys->p_library = InitLibrary(sys);
     if (!sys->p_library) {
         free(sys);
         msg_Err(vd, "Could not initialize libandroid.so/libui.so/libgui.so/libsurfaceflinger_client.so!");
@@ -323,9 +323,9 @@ static void Close(vlc_object_t *p_this)
     vout_display_sys_t *sys = vd->sys;
 
     picture_pool_Delete(sys->pool);
-    dlclose(sys->p_library);
     if (sys->window)
         sys->s_winRelease(sys->window);
+    dlclose(sys->p_library);
     free(sys);
     vlc_mutex_unlock(&single_instance);
 }
