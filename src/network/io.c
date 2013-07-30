@@ -61,6 +61,10 @@
 #if defined(_WIN32)
 # undef EAFNOSUPPORT
 # define EAFNOSUPPORT WSAEAFNOSUPPORT
+# undef EWOULDBLOCK
+# define EWOULDBLOCK WSAEWOULDBLOCK
+# undef EAGAIN
+# define EAGAIN WSAEWOULDBLOCK
 #endif
 
 #ifdef HAVE_LINUX_DCCP_H
@@ -286,13 +290,15 @@ net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
         {
             switch (net_errno)
             {
-                case EAGAIN: /* spurious wakeup or no TLS data */
+                case EAGAIN: /* no data */
 #if (EAGAIN != EWOULDBLOCK)
                 case EWOULDBLOCK:
 #endif
-                case EINTR:  /* asynchronous signal */
                     break;
-#ifdef _WIN32
+#ifndef _WIN32
+                case EINTR:  /* asynchronous signal */
+                    continue;
+#else
                 case WSAEMSGSIZE: /* datagram too big */
                     n = i_buflen;
                     break;
@@ -311,25 +317,26 @@ net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
             if (!waitall)
                 break;
         }
-        else
+        else /* n == 0 */
             break;/* end of stream or empty packet */
 
-        /* Wait for more data */
         if (ufd[1].fd == -1)
         {
             errno = EINTR;
             return -1;
         }
-        while (poll (ufd, sizeof (ufd) / sizeof (ufd[0]), -1) < 0)
-            if (errno != EINTR)
-                goto error;
+
+        /* Wait for more data */
+        if (poll (ufd, sizeof (ufd) / sizeof (ufd[0]), -1) < 0)
+        {
+            if (errno == EINTR)
+                continue;
+            goto error;
+        }
 
         if (ufd[1].revents)
         {
             msg_Dbg (p_this, "socket %d polling interrupted", fd);
-#if defined(_WIN32)
-            WSASetLastError (WSAEINTR);
-#endif
             errno = EINTR;
             return -1;
         }
