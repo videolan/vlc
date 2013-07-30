@@ -48,10 +48,10 @@
 #   define EINPROGRESS WSAEWOULDBLOCK
 #   undef EWOULDBLOCK
 #   define EWOULDBLOCK WSAEWOULDBLOCK
+#   undef EAGAIN
+#   define EAGAIN WSAEWOULDBLOCK
 #   undef EINTR
 #   define EINTR WSAEINTR
-#   undef ETIMEDOUT
-#   define ETIMEDOUT WSAETIMEDOUT
 #endif
 
 #include "libvlc.h" /* vlc_object_waitpipe */
