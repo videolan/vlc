@@ -18,14 +18,23 @@ endif
 libadummy_plugin_la_SOURCES = adummy.c
 libadummy_plugin_la_CFLAGS = $(AM_CFLAGS)
 libadummy_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libadummy_plugin_la_DEPENDENCIES = libadummy_plugin.rc.o
+endif
 
 libafile_plugin_la_SOURCES = file.c
 libafile_plugin_la_CFLAGS = $(AM_CFLAGS)
 libafile_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libafile_plugin_la_DEPENDENCIES = libafile_plugin.rc.o
+endif
 
 libamem_plugin_la_SOURCES = amem.c
 libamem_plugin_la_CFLAGS = $(AM_CFLAGS)
 libamem_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libamem_plugin_la_DEPENDENCIES = libamem_plugin.rc.o
+endif
 
 libvlc_LTLIBRARIES += \
 	libadummy_plugin.la \
@@ -62,6 +71,9 @@ libvlc_LTLIBRARIES += $(LTLIBjack)
 libmmdevice_plugin_la_SOURCES = mmdevice.c mmdevice.h wasapi.c
 libmmdevice_plugin_la_CFLAGS = $(AM_CFLAGS)
 libmmdevice_plugin_la_LIBADD = $(AM_LIBADD) -lole32 -lksuser
+if HAVE_WIN32
+libmmdevice_plugin_la_DEPENDENCIES = libmmdevice_plugin.rc.o
+endif
 if HAVE_WASAPI
 libvlc_LTLIBRARIES += libmmdevice_plugin.la
 endif
@@ -69,6 +81,9 @@ endif
 libdirectsound_plugin_la_SOURCES = directx.c windows_audio_common.h
 libdirectsound_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdirectsound_plugin_la_LIBADD = $(AM_LIBADD) -lole32
+if HAVE_WIN32
+libdirectsound_plugin_la_DEPENDENCIES = libdirectsound_plugin.rc.o
+endif
 if HAVE_DIRECTX
 libvlc_LTLIBRARIES += libdirectsound_plugin.la
 endif

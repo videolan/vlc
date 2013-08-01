@@ -33,3 +33,13 @@ AM_LDFLAGS = -rpath '$(libvlcdir)' \
 	-shrext $(LIBEXT) \
 	-no-undefined \
 	$(LTLIBVLCCORE) $(top_builddir)/compat/libcompat.la
+
+if HAVE_WIN32
+AM_LDFLAGS += -Wl,lib$(MODULE_NAME)_plugin.rc.$(OBJEXT)
+
+$(top_builddir)/modules/module.rc: $(top_builddir)/modules/module.rc.in $(top_builddir)/config.status
+	$(AM_V_GEN) cd "$(top_builddir)" && $(SHELL) ./config.status --file="modules/module.rc"
+
+lib%_plugin.rc.$(OBJEXT): $(top_builddir)/modules/module.rc
+	$(AM_V_GEN) $(WINDRES) -DMODULE_NAME=\\\"$(MODULE_NAME)\\\" --include-dir $(top_srcdir)/share --include-dir $(top_srcdir)/extras/package/win32 -i $< -o $@
+endif

@@ -33,6 +33,9 @@ TESTS = $(check_PROGRAMS)
 librtp_plugin_la_CFLAGS += -DHAVE_SRTP $(GCRYPT_CFLAGS)
 librtp_plugin_la_LIBADD += libvlc_srtp.la $(GCRYPT_LIBS)
 librtp_plugin_la_DEPENDENCIES = libvlc_srtp.la
+if HAVE_WIN32
+librtp_plugin_la_DEPENDENCIES += librtp_plugin.rc.o
+endif
 endif
 
 lcov-run:

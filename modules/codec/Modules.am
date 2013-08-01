@@ -109,6 +109,9 @@ endif
 libavcodec_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_avcodec)
 libavcodec_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_avcodec)
 libavcodec_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_avcodec)
+if HAVE_WIN32
+libavcodec_plugin_la_DEPENDENCIES = libavcodec_plugin.rc.o
+endif
 
 if MERGE_FFMPEG
 libavcodec_plugin_la_SOURCES += \
@@ -145,6 +148,7 @@ libdxva2_plugin_la_LIBADD = $(AM_LIBADD) -lole32 -lshlwapi -luuid
 if HAVE_AVCODEC_DXVA2
 libvlc_LTLIBRARIES += libdxva2_plugin.la
 endif
+libdxva2_plugin_la_DEPENDENCIES = libdxva2_plugin.rc.o
 
 libvda_plugin_la_SOURCES = \
 	avcodec/copy.c avcodec/copy.h \
@@ -163,11 +167,17 @@ libhwdummy_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_avcodec)
 if HAVE_AVCODEC_VDPAU
 libvlc_LTLIBRARIES += libhwdummy_plugin.la
 endif
+if HAVE_WIN32
+libhwdummy_plugin_la_DEPENDENCIES = libhwdummy_plugin.rc.o
+endif
 
 ### XWD ###
 libxwd_plugin_la_SOURCES = xwd.c
 libxwd_plugin_la_CFLAGS = $(AM_CFLAGS) $(XPROTO_CFLAGS)
 libxwd_plugin_la_LIBADD = $(AM_LIBADD) $(XPROTO_LIBS)
+if HAVE_WIN32
+libxwd_plugin_la_DEPENDENCIES = libxwd_plugin.rc.o
+endif
 libvlc_LTLIBRARIES += $(LTLIBxwd)
 EXTRA_LTLIBRARIES += libxwd_plugin.la
 

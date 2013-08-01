@@ -30,6 +30,9 @@ if HAVE_NEON
 libdeinterlace_plugin_la_SOURCES += deinterlace/merge_arm.S
 libdeinterlace_plugin_la_CFLAGS += -DCAN_COMPILE_ARM
 endif
+if HAVE_WIN32
+libdeinterlace_plugin_la_DEPENDENCIES = libdeinterlace_plugin.rc.o
+endif
 libvlc_LTLIBRARIES += libdeinterlace_plugin.la
 
 libdynamicoverlay_plugin_la_SOURCES = \
@@ -47,6 +50,9 @@ endif
 libremoteosd_plugin_la_SOURCES = remoteosd.c remoteosd_rfbproto.h
 libremoteosd_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
 libremoteosd_plugin_la_LIBADD = $(AM_LIBADD) $(GCRYPT_LIBS) $(LIBS_remoteosd)
+if HAVE_WIN32
+libremoteosd_plugin_la_DEPENDENCIES = libremoteosd_plugin.rc.o
+endif
 if HAVE_GCRYPT
 libvlc_LTLIBRARIES += libremoteosd_plugin.la
 endif
@@ -59,6 +65,9 @@ libpuzzle_plugin_la_SOURCES = \
 	puzzle_pce.c puzzle_pce.h
 libpuzzle_plugin_la_CFLAGS = $(AM_CFLAGS)
 libpuzzle_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libpuzzle_plugin_la_DEPENDENCIES = libpuzzle_plugin.rc.o
+endif
 libvlc_LTLIBRARIES += libpuzzle_plugin.la
 
 SOURCES_magnify = magnify.c

@@ -20,6 +20,9 @@ libmux_ps_plugin_la_SOURCES = \
 	mpeg/ps.c mpeg/bits.h
 libmux_ps_plugin_la_CFLAGS = $(AM_CLFAGS)
 libmux_ps_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libmux_ps_plugin_la_DEPENDENCIES = libmux_ps_plugin.rc.o
+endif
 libvlc_LTLIBRARIES += libmux_ps_plugin.la
 
 libmux_ts_plugin_la_SOURCES = \
@@ -28,6 +31,9 @@ libmux_ts_plugin_la_SOURCES = \
 	mpeg/ts.c mpeg/bits.h mpeg/dvbpsi_compat.h
 libmux_ts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)
 libmux_ts_plugin_la_LIBADD = $(AM_LIBADD) $(DVBPSI_LIBS)
+if HAVE_WIN32
+libmux_ts_plugin_la_DEPENDENCIES = libmux_ts_plugin.rc.o
+endif
 if HAVE_DVBPSI
 libvlc_LTLIBRARIES += libmux_ts_plugin.la
 endif

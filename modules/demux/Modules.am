@@ -34,10 +34,16 @@ SOURCES_demux_stl = stl.c
 libasf_plugin_la_SOURCES = asf/asf.c asf/libasf.c asf/libasf.h asf/libasf_guid.h
 libasf_plugin_la_CFLAGS = $(AM_CFLAGS)
 libasf_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libasf_plugin_la_DEPENDENCIES = libasf_plugin.rc.o
+endif
 
 libavi_plugin_la_SOURCES = avi/avi.c avi/libavi.c avi/libavi.h
 libavi_plugin_la_CFLAGS = $(AM_CFLAGS)
 libavi_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libavi_plugin_la_DEPENDENCIES = libavi_plugin.rc.o
+endif
 
 libavformat_plugin_la_SOURCES = avformat/demux.c \
 	../codec/avcodec/fourcc.c \
@@ -60,6 +66,9 @@ endif
 if HAVE_DARWIN
 libavformat_plugin_la_LDFLAGS += -Wl,-read_only_relocs,suppress
 endif
+if HAVE_WIN32
+libavformat_plugin_la_DEPENDENCIES = libavformat_plugin.rc.o
+endif
 
 libvlc_LTLIBRARIES += $(LTLIBavformat)
 EXTRA_LTLIBRARIES += libavformat_plugin.la
@@ -67,10 +76,16 @@ EXTRA_LTLIBRARIES += libavformat_plugin.la
 libes_plugin_la_SOURCES  = mpeg/es.c ../codec/dts_header.c ../codec/dts_header.h ../codec/a52.h
 libes_plugin_la_CFLAGS = $(AM_CFLAGS)
 libes_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libes_plugin_la_DEPENDENCIES = libes_plugin.rc.o
+endif
 
 libh264_plugin_la_SOURCES = mpeg/h264.c
 libh264_plugin_la_CFLAGS = $(AM_CFLAGS)
 libh264_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libh264_plugin_la_DEPENDENCIES = libh264_plugin.rc.o
+endif
 
 libmkv_plugin_la_SOURCES = \
 	mkv/util.hpp mkv/util.cpp \
@@ -90,6 +105,9 @@ libmkv_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 if HAVE_ZLIB
 libmkv_plugin_la_LIBADD += -lz
 endif
+if HAVE_WIN32
+libmkv_plugin_la_DEPENDENCIES = libmkv_plugin.rc.o
+endif
 libvlc_LTLIBRARIES += $(LTLIBmkv)
 EXTRA_LTLIBRARIES += libmkv_plugin.la
 
@@ -100,10 +118,16 @@ libmp4_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 if HAVE_ZLIB
 libmp4_plugin_la_LIBADD += -lz
 endif
+if HAVE_WIN32
+libmp4_plugin_la_DEPENDENCIES = libmp4_plugin.rc.o
+endif
 
 libmpgv_plugin_la_SOURCES = mpeg/mpgv.c
 libmpgv_plugin_la_CFLAGS = $(AM_CFLAGS)
 libmpgv_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libmpgv_plugin_la_DEPENDENCIES = libmpgv_plugin.rc.o
+endif
 
 libplaylist_plugin_la_SOURCES = \
 	playlist/asx.c \
@@ -126,10 +150,16 @@ libplaylist_plugin_la_SOURCES = \
 	playlist/playlist.c playlist/playlist.h
 libplaylist_plugin_la_CFLAGS = $(AM_CFLAGS)
 libplaylist_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libplaylist_plugin_la_DEPENDENCIES = libplaylist_plugin.rc.o
+endif
 
 libts_plugin_la_SOURCES = ts.c ../mux/mpeg/csa.c ../mux/mpeg/dvbpsi_compat.h dvb-text.h
 libts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)
 libts_plugin_la_LIBADD = $(AM_LIBADD) $(DVBPSI_LIBS) $(SOCKET_LIBS)
+if HAVE_WIN32
+libts_plugin_la_DEPENDENCIES = libts_plugin.rc.o
+endif
 if HAVE_DVBPSI
 libvlc_LTLIBRARIES += libts_plugin.la
 endif

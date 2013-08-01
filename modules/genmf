@@ -57,6 +57,9 @@ EOF
   do
     cat >> "${makf}" << EOF
 # The ${mod} plugin
+if HAVE_WIN32
+lib${mod}_plugin_la_DEPENDENCIES = lib${mod}_plugin.rc.o
+endif
 lib${mod}_plugin_la_SOURCES = \$(SOURCES_${mod})
 nodist_lib${mod}_plugin_la_SOURCES = \$(nodist_SOURCES_${mod})
 # Force per-target objects:

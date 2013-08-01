@@ -48,6 +48,7 @@ else
 libglobalhotkeys_plugin_la_SOURCES = globalhotkeys/win32.c
 libglobalhotkeys_plugin_la_CFLAGS = $(AM_CFLAGS)
 libglobalhotkeys_plugin_la_LIBADD = $(AM_LIBADD)
+libglobalhotkeys_plugin_la_DEPENDENCIES = libglobalhotkeys_plugin.rc.o
 
 libvlc_LTLIBRARIES += \
 	libglobalhotkeys_plugin.la \

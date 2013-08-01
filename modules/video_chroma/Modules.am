@@ -36,10 +36,16 @@ SOURCES_rv32 = rv32.c
 
 libchain_plugin_la_SOURCES = chain.c
 libchain_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+if HAVE_WIN32
+libchain_plugin_la_DEPENDENCIES = libchain_plugin.rc.o
+endif
 
 libswscale_plugin_la_SOURCES = swscale.c ../codec/avcodec/chroma.c
 libswscale_plugin_la_CFLAGS = $(AM_CFLAGS) $(SWSCALE_CFLAGS)
 libswscale_plugin_la_LIBADD = $(AM_LIBADD) $(SWSCALE_LIBS)
+if HAVE_WIN32
+libswscale_plugin_la_DEPENDENCIES = libswscale_plugin.rc.o
+endif
 EXTRA_LTLIBRARIES += libswscale_plugin.la
 
 libvlc_LTLIBRARIES += \

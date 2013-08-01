@@ -15,5 +15,8 @@ if HAVE_GCRYPT
 libaccess_output_livehttp_plugin_la_SOURCES = livehttp.c
 libaccess_output_livehttp_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
 libaccess_output_livehttp_plugin_la_LIBADD = $(AM_LIBADD) $(GCRYPT_LIBS) -lgpg-error
+if HAVE_WIN32
+libaccess_output_livehttp_plugin_la_DEPENDENCIES = libaccess_output_livehttp_plugin.rc.o
+endif
 libvlc_LTLIBRARIES += libaccess_output_livehttp_plugin.la
 endif

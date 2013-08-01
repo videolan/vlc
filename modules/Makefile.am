@@ -57,5 +57,10 @@ SUBDIRS += lua
 endif
 SUBDIRS += .
 
-dist_noinst_SCRIPTS = genmf list.sh
+dist_noinst_SCRIPTS = genmf list.sh module.rc.in
 dist_noinst_DATA = LIST
+
+if HAVE_WIN32
+module.rc: $(top_builddir)/modules/module.rc.in $(top_builddir)/config.status
+	$(AM_V_GEN) cd "$(top_builddir)" && $(SHELL) ./config.status --file="modules/$@"
+endif

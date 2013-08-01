@@ -10,23 +10,34 @@ libfilesystem_plugin_la_CFLAGS = $(AM_CFLAGS)
 libfilesystem_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libfilesystem_plugin_la_LIBADD += -lshlwapi
+libfilesystem_plugin_la_DEPENDENCIES = libfilesystem_plugin.rc.o
 endif
 
 libidummy_plugin_la_SOURCES = idummy.c
 libidummy_plugin_la_CFLAGS = $(AM_CFLAGS)
 libidummy_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libidummy_plugin_la_DEPENDENCIES = libidummy_plugin.rc.o
+endif
 
 libsdp_plugin_la_SOURCES = sdp.c
 libsdp_plugin_la_CFLAGS = $(AM_CFLAGS)
 libsdp_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libsdp_plugin_la_DEPENDENCIES = libsdp_plugin.rc.o
+endif
 
 libtimecode_plugin_la_SOURCES = timecode.c
 libtimecode_plugin_la_CFLAGS = $(AM_CFLAGS)
 libtimecode_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libtimecode_plugin_la_DEPENDENCIES = libtimecode_plugin.rc.o
+endif
 
 libzip_plugin_la_SOURCES = zip/zip.h zip/zipstream.c zip/zipaccess.c
 libzip_plugin_la_CFLAGS = $(AM_CFLAGS) $(MINIZIP_CFLAGS)
 libzip_plugin_la_LIBADD = $(AM_LIBADD) $(MINIZIP_LIBS)
+libzip_plugin_la_DEPENDENCIES = 
 if HAVE_ZLIB
 libvlc_LTLIBRARIES += libzip_plugin.la
 if !HAVE_MINIZIP
@@ -37,6 +48,10 @@ libunzip_la_LDFLAGS = -static
 noinst_LTLIBRARIES += libunzip.la
 libzip_plugin_la_CFLAGS += -I$(srcdir)/zip/unzip
 libzip_plugin_la_LIBADD += libunzip.la
+libzip_plugin_la_DEPENDENCIES += libunzip.la
+endif
+if HAVE_WIN32
+libzip_plugin_la_DEPENDENCIES += libzip_plugin.rc.o
 endif
 endif
 
@@ -67,6 +82,9 @@ libdecklink_plugin_la_SOURCES = decklink.cpp
 libdecklink_plugin_la_CXXFLAGS = $(AM_CFLAGS) $(CPPFLAGS_decklink)
 libdecklink_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_decklink) -ldl
 libvlc_LTLIBRARIES += libdecklink_plugin.la
+if HAVE_WIN32
+libdecklink_plugin_la_DEPENDENCIES = libdecklink_plugin.rc.o
+endif
 endif
 
 if HAVE_QTKIT
@@ -143,6 +161,9 @@ endif
 libshm_plugin_la_SOURCES = shm.c
 libshm_plugin_la_CFLAGS = $(AM_CFLAGS)
 libshm_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
+if HAVE_WIN32
+libshm_plugin_la_DEPENDENCIES = libshm_plugin.rc.o
+endif
 libvlc_LTLIBRARIES += libshm_plugin.la
 
 libv4l2_plugin_la_SOURCES = \
@@ -171,6 +192,7 @@ libdshow_plugin_la_CXXFLAGS = $(AM_CXXFLAGS)
 libdshow_plugin_la_LIBADD = $(AM_LIBADD) -lole32 -loleaut32 -luuid -lstrmiids -lksuser
 if HAVE_WIN32
 libvlc_LTLIBRARIES += libdshow_plugin.la
+libdshow_plugin_la_DEPENDENCIES = libdshow_plugin.rc.o
 endif
 
 
@@ -193,6 +215,7 @@ libscreen_plugin_la_SOURCES += screen/win32.c
 libscreen_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 libscreen_plugin_la_LIBADD += -lgdi32
 libvlc_LTLIBRARIES += libscreen_plugin.la
+libscreen_plugin_la_DEPENDENCIES = libscreen_plugin.rc.o
 endif
 if HAVE_MAC_SCREEN
 libscreen_plugin_la_SOURCES += screen/mac.c
@@ -232,6 +255,9 @@ libaccess_bd_plugin_la_SOURCES = bd/bd.c bd/mpls.c bd/mpls.h bd/clpi.c bd/clpi.h
 libaccess_bd_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaccess_bd_plugin_la_LIBADD = $(AM_LIBADD)
 libvlc_LTLIBRARIES += libaccess_bd_plugin.la
+if HAVE_WIN32
+libaccess_bd_plugin_la_DEPENDENCIES = libaccess_bd_plugin.rc.o
+endif
 
 
 ### Digital TV ###
@@ -262,7 +288,7 @@ libbda_la_LDFLAGS = -static
 libbda_la_LIBADD = -lstrmiids -lole32 -loleaut32 -luuid
 noinst_LTLIBRARIES += libbda.la
 
-libdtv_plugin_la_DEPENDENCIES = libbda.la
+libdtv_plugin_la_DEPENDENCIES = libbda.la libdtv_plugin.rc.o
 libdtv_plugin_la_LIBADD += libbda.la -lstdc++
 libvlc_LTLIBRARIES += libdtv_plugin.la
 endif
@@ -291,6 +317,7 @@ libaccess_smb_plugin_la_CFLAGS = $(AM_CFLAGS) $(SMBCLIENT_CFLAGS)
 libaccess_smb_plugin_la_LIBADD = $(AM_LIBADD) $(SMBCLIENT_LIBS)
 if HAVE_WIN32
 libaccess_smb_plugin_la_LIBADD += -lmpr
+libaccess_smb_plugin_la_DEPENDENCIES = libaccess_smb_plugin.rc.o
 endif
 libvlc_LTLIBRARIES += $(LTLIBaccess_smb)
 EXTRA_LTLIBRARIES += libaccess_smb_plugin.la
@@ -312,6 +339,10 @@ libaccess_mms_plugin_la_SOURCES = \
 libaccess_mms_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaccess_mms_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
 libvlc_LTLIBRARIES += libaccess_mms_plugin.la
+if HAVE_WIN32
+libaccess_mms_plugin_la_DEPENDENCIES = libaccess_mms_plugin.rc.o
+endif
+
 
 libaccess_realrtsp_plugin_la_SOURCES = \
 	rtsp/access.c \
@@ -322,5 +353,8 @@ libaccess_realrtsp_plugin_la_SOURCES = \
 	rtsp/real_asmrp.c
 libaccess_realrtsp_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaccess_realrtsp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
+if HAVE_WIN32
+libaccess_realrtsp_plugin_la_DEPENDENCIES = libaccess_realrtsp_plugin.rc.o
+endif
 libvlc_LTLIBRARIES += $(LTLIBaccess_realrtsp)
 EXTRA_LTLIBRARIES += libaccess_realrtsp_plugin.la

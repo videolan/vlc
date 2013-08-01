@@ -7,6 +7,9 @@ SOURCES_mediadirs = mediadirs.c
 libsap_plugin_la_SOURCES = sap.c
 libsap_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_sap)
 libsap_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_sap) $(SOCKET_LIBS)
+if HAVE_WIN32
+libsap_plugin_la_DEPENDENCIES = libsap_plugin.rc.o
+endif
 
 libpulselist_plugin_la_SOURCES = \
 	../audio_output/vlcpulse.c ../audio_output/vlcpulse.h \
@@ -39,6 +42,7 @@ libwindrive_plugin_la_CFLAGS = $(AM_CFLAGS)
 libwindrive_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libvlc_LTLIBRARIES += libwindrive_plugin.la
+libwindrive_plugin_la_DEPENDENCIES = libwindrive_plugin.rc.o
 endif
 
 libos2drive_plugin_la_SOURCES = os2drive.c
