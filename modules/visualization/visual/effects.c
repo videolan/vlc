@@ -867,7 +867,7 @@ static int scope_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
         uint8_t i_value;
 
         /* Left channel */
-        i_value =  (1.0+p_sample[p_effect->i_idx_left]) * 127;
+        i_value =  p_sample[p_effect->i_idx_left] * 127;
         *(ppp_area[0][0]
                 + p_picture->p[0].i_pitch * i_index / p_effect->i_width
                 + p_picture->p[0].i_lines * i_value / 512
@@ -879,7 +879,7 @@ static int scope_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
 
 
         /* Right channel */
-        i_value = (1.0+p_sample[p_effect->i_idx_right]) * 127;
+        i_value = p_sample[p_effect->i_idx_right] * 127;
         *(ppp_area[1][0]
                 + p_picture->p[0].i_pitch * i_index / p_effect->i_width
                 + p_picture->p[0].i_lines * i_value / 512
