@@ -393,10 +393,10 @@ static void OpenglESSwap(vlc_gl_t *gl)
     [super dealloc];
 }
 
-/* we don't get the correct scale factor if we don't overwrite this method */
-- (void)drawRect:(CGRect) rect
+- (void)didMoveToWindow
 {
-    [super drawRect:rect];
+    self.contentScaleFactor = self.window.screen.scale;
+    _bufferNeedReset = YES;
 }
 
 - (void)createBuffers
