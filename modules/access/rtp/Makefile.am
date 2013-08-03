@@ -23,6 +23,7 @@ srtp_test_recv_LDADD = libvlc_srtp.la
 srtp_test_aes_CPPFLAGS =
 srtp_test_aes_LDADD = $(GCRYPT_LIBS)
 
+librtp_plugin_la_DEPENDENCIES =
 if HAVE_GCRYPT
 noinst_HEADERS = srtp.h
 noinst_LTLIBRARIES = libvlc_srtp.la
@@ -32,10 +33,10 @@ TESTS = $(check_PROGRAMS)
 
 librtp_plugin_la_CFLAGS += -DHAVE_SRTP $(GCRYPT_CFLAGS)
 librtp_plugin_la_LIBADD += libvlc_srtp.la $(GCRYPT_LIBS)
-librtp_plugin_la_DEPENDENCIES = libvlc_srtp.la
+librtp_plugin_la_DEPENDENCIES += libvlc_srtp.la
+endif
 if HAVE_WIN32
 librtp_plugin_la_DEPENDENCIES += librtp_plugin.rc.o
-endif
 endif
 
 lcov-run:
