@@ -165,8 +165,8 @@ function parse()
             if string.match( line, "<meta property=\"og:image\"" ) then
                 _,_,arturl = string.find( line, "content=\"(.-)\"" )
             end
-            if string.match( line, " rel=\"author\"" ) then
-                _,_,artist = string.find( line, "href=\"/user/([^\"]*)\"" )
+            if not artist then
+                artist = string.match( line, "yt%-uix%-sessionlink yt%-user%-name[^>]*>([^<]*)</" )
             end
             -- JSON parameters, also formerly known as "swfConfig",
             -- "SWF_ARGS", "swfArgs", "PLAYER_CONFIG", "playerConfig" ...
