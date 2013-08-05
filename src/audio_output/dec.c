@@ -52,7 +52,7 @@ int aout_DecNew( audio_output_t *p_aout,
         return -1;
     }
 
-    if( p_format->i_rate > 192000 )
+    if( p_format->i_rate > 352800 )
     {
         msg_Err( p_aout, "excessive audio sample frequency (%u)",
                  p_format->i_rate );

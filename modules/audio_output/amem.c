@@ -43,7 +43,7 @@ vlc_module_begin ()
         change_private()
     add_integer ("amem-rate", 44100,
                  N_("Sample rate"), N_("Sample rate"), false)
-        change_integer_range (1, 192000)
+        change_integer_range (1, 352800)
         change_private()
     add_integer ("amem-channels", 2,
                  N_("Channels count"), N_("Channels count"), false)
