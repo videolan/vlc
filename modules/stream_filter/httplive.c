@@ -1682,7 +1682,7 @@ static void* hls_Reload(void *p_this)
                 p_sys->playlist.tries++;
                 if (p_sys->playlist.tries == 1) wait = 0.5;
                 else if (p_sys->playlist.tries == 2) wait = 1;
-                else if (p_sys->playlist.tries >= 3) wait = 2;
+                else if (p_sys->playlist.tries >= 3) wait = 1.5;
 
                 /* Can we afford to backoff? */
                 if (p_sys->download.segment - p_sys->playback.segment < 3)
