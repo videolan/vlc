@@ -3043,7 +3043,7 @@ AC_ARG_ENABLE(vdpau,
   [AS_HELP_STRING([--enable-vdpau], [VDPAU hardware support (default auto)])])
 have_vdpau="no"
 AS_IF([test "${enable_vdpau}" != "no"], [
-  PKG_CHECK_MODULES([VDPAU], [vdpau], [
+  PKG_CHECK_MODULES([VDPAU], [vdpau >= 0.6], [
     have_vdpau="yes"
     AS_IF([test "${no_x}" = "yes"], [
       AC_MSG_ERROR([VDPAU requires Xlib (X11).])
