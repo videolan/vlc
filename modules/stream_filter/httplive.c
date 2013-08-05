@@ -1991,7 +1991,7 @@ static int Open(vlc_object_t *p_this)
            sizeof( hls_stream_t* ), &hls_CompareStreams );
 
     /* Choose first HLS stream to start with */
-    int current = p_sys->playback.stream = 0;
+    int current = p_sys->playback.stream = p_sys->hls_stream->i_count-1;
     p_sys->playback.segment = p_sys->download.segment = ChooseSegment(s, current);
 
     /* manage encryption key if needed */
