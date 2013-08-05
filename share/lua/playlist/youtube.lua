@@ -165,8 +165,13 @@ function parse()
             if string.match( line, "<meta property=\"og:image\"" ) then
                 _,_,arturl = string.find( line, "content=\"(.-)\"" )
             end
+            -- This is not available in the video parameters (whereas it
+            -- is given by the get_video_info API as the "author" field)
             if not artist then
                 artist = string.match( line, "yt%-uix%-sessionlink yt%-user%-name[^>]*>([^<]*)</" )
+                if artist then
+                    artist = vlc.strings.resolve_xml_special_chars( artist )
+                end
             end
             -- JSON parameters, also formerly known as "swfConfig",
             -- "SWF_ARGS", "swfArgs", "PLAYER_CONFIG", "playerConfig" ...
