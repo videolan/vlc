@@ -2,7 +2,7 @@ basedir = vdpau
 include $(top_srcdir)/modules/common.am
 
 AM_CFLAGS += $(VDPAU_CFLAGS)
-AM_LIBADD += libvlc_vdpau.la $(VDPAU_LIBS)
+AM_LIBADD += libvlc_vdpau.la
 
 libvlc_vdpau_la_SOURCES = vlc_vdpau.c vlc_vdpau.h instance.c
 libvlc_vdpau_la_CPPFLAGS =
