@@ -114,7 +114,7 @@ void SoutDialog::addDest( )
     switch( ui.destBox->currentIndex() )
     {
         case 0:
-            db = new FileDestBox( this );
+            db = new FileDestBox( this, p_intf );
             caption = qtr( "File" );
             break;
         case 1:

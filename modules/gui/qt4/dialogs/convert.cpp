@@ -128,7 +128,7 @@ void ConvertDialog::fileBrowse()
     QString fileExtension = ( ! profile->isEnabled() ) ? ".*" : "." + profile->getMux();
 
     QString fileName = QFileDialog::getSaveFileName( this, qtr( "Save file..." ),
-        "",
+        p_intf->p_sys->filepath,
         QString( qtr( "Containers (*" ) + fileExtension + ")" ) );
     fileLine->setText( toNativeSeparators( fileName ) );
     setDestinationFileExtension();

@@ -80,8 +80,10 @@ void SoutInputBox::setMRL( const QString& mrl )
 #define CS( x ) connect( x, SIGNAL(valueChanged(int)), this, SIGNAL(mrlUpdated()) );
 
 /* FileDest Box */
-FileDestBox::FileDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
+FileDestBox::FileDestBox( QWidget *_parent, intf_thread_t * _p_intf ) : VirtualDestBox( _parent )
 {
+    p_intf = _p_intf;
+
     QPushButton *fileSelectButton;
     QGridLayout *layout = new QGridLayout( this );
 
@@ -133,7 +135,7 @@ QString FileDestBox::getMRL( const QString& mux )
 void FileDestBox::fileBrowse()
 {
     QString fileName = QFileDialog::getSaveFileName( this, qtr( "Save file..." ),
-            "", qtr( "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)" ) );
+            p_intf->p_sys->filepath, qtr( "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)" ) );
     fileEdit->setText( toNativeSeparators( fileName ) );
     emit mrlUpdated();
 }
