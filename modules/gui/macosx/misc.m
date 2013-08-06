@@ -242,6 +242,7 @@ static NSMutableArray *blackoutWindows = NULL;
                 backing: NSBackingStoreBuffered defer: NO screen: screen];
         [blackoutWindow setBackgroundColor:[NSColor blackColor]];
         [blackoutWindow setLevel: NSFloatingWindowLevel]; /* Disappear when Expose is triggered */
+        [blackoutWindow setReleasedWhenClosed:NO]; // window is released when deleted from array above
 
         [blackoutWindow displayIfNeeded];
         [blackoutWindow orderFront: self animate: YES];
