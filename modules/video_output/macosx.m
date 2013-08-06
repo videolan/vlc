@@ -346,8 +346,10 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
 
             id o_window = [sys->glView window];
-            if (!o_window)
+            if (!o_window) {
+                [o_pool release];
                 return VLC_SUCCESS; // this is okay, since the event will occur again when we have a window
+            }
 
             NSSize windowMinSize = [o_window minSize];
 
@@ -368,10 +370,12 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE && is_forced
                 && (cfg->display.width != vd->cfg->display.width
                     || cfg->display.height != vd->cfg->display.height)
-                && vout_window_SetSize (sys->embed, cfg->display.width, cfg->display.height))
+                && vout_window_SetSize (sys->embed, cfg->display.width, cfg->display.height)) {
+                [o_pool release];
                 return VLC_EGENERIC;
+            }
  
-            /* we always use our current frame here, because we have some size constraints 
+            /* we always use our current frame here, because we have some size constraints
                in the ui vout provider */
             vout_display_cfg_t cfg_tmp = *cfg;
             NSRect bounds;
