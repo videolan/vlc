@@ -77,7 +77,7 @@ static void FilterS16N (audio_volume_t *vol, block_t *block, float volume)
         if (s >= (INT16_MAX << 8))
             *p = INT16_MAX;
         else
-        if (s < (INT_MIN << 8))
+        if (s < (INT16_MIN << 8))
             *p = INT16_MIN;
         else
             *p = s >> 8;
