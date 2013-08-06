@@ -33,7 +33,7 @@
 
 @class VLCVoutView;
 
-@interface VLCWindow : NSWindow
+@interface VLCWindow : NSWindow <NSAnimationDelegate>
 {
     BOOL b_canBecomeKeyWindow;
     BOOL b_isset_canBecomeKeyWindow;

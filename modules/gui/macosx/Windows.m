@@ -88,7 +88,9 @@
         return;
     }
 
-    invoc = [NSInvocation invocationWithMethodSignature:[super methodSignatureForSelector:@selector(close)]];
+    // TODO this callback stuff does not work and is not needed
+    invoc = [[[NSInvocation alloc] init] autorelease];
+    [invoc setSelector:@selector(close)];
     [invoc setTarget: self];
 
     if (![self isVisible] || [self alphaValue] == 0.0) {
@@ -101,9 +103,10 @@
 
 - (void)orderOut: (id)sender animate: (BOOL)animate
 {
-    NSInvocation *invoc = [NSInvocation invocationWithMethodSignature:[super methodSignatureForSelector:@selector(orderOut:)]];
+    NSInvocation *invoc = [[[NSInvocation alloc] init] autorelease];
+    [invoc setSelector:@selector(orderOut:)];
     [invoc setTarget: self];
-    [invoc setArgument: sender atIndex: 0];
+    [invoc setArgument: sender atIndex: 2];
     [self orderOut: sender animate: animate callback: invoc];
 }
 
@@ -129,7 +132,8 @@
     [anim setAnimationBlockingMode:NSAnimationNonblocking];
     [anim setDuration:0.9];
     [anim setFrameRate:30];
-    [anim setUserInfo: callback];
+    [anim setUserInfo:callback];
+    [anim setDelegate:self];
 
     @synchronized(self) {
         current_anim = self->o_current_animation;
@@ -182,6 +186,7 @@
     [anim setAnimationBlockingMode:NSAnimationNonblocking];
     [anim setDuration:0.5];
     [anim setFrameRate:30];
+    [anim setDelegate:self];
 
     @synchronized(self) {
         current_anim = self->o_current_animation;
@@ -209,8 +214,9 @@
         NSInvocation * invoc;
         [super orderOut: nil];
         [self setAlphaValue: 1.0];
-        if ((invoc = [anim userInfo]))
+        if ((invoc = [anim userInfo])) {
             [invoc invoke];
+        }
     }
 }
 
