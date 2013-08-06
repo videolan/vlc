@@ -175,6 +175,7 @@ static int Open(vlc_object_t *object)
         sys->count = 1;
         sys->cleanup = NULL;
     }
+    fmt.i_x_offset = fmt.i_y_offset = 0;
     fmt.i_width = fmt.i_visible_width;
     fmt.i_height = fmt.i_visible_height;
 
