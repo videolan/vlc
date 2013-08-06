@@ -151,7 +151,9 @@ static void Deinit(vlc_va_t *va)
 
     assert(sys->context.decoder != VDP_INVALID_HANDLE);
     vdp_decoder_destroy(sys->vdp, sys->context.decoder);
+#if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55, 13, 0))
     av_freep(&sys->context.bitstream_buffers);
+#endif
 }
 
 static int Setup(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
