@@ -63,7 +63,7 @@ struct decoder_sys_t
     bool    b_extract;
     int     pi_extraction[AOUT_CHAN_MAX];
     int     i_previous_channels;
-    int64_t i_previous_layout;
+    uint64_t i_previous_layout;
 };
 
 #define BLOCK_FLAG_PRIVATE_REALLOCATED (1 << BLOCK_FLAG_PRIVATE_SHIFT)
