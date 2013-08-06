@@ -1532,10 +1532,11 @@ static void Close( vlc_object_t *p_this )
     free( p_sys->psz_stat_name );
     free( p_sys->p_sei );
 
-    msg_Dbg( p_enc, "framecount still in libx264 buffer: %d", x264_encoder_delayed_frames( p_sys->h ) );
-
     if( p_sys->h )
+    {
+        msg_Dbg( p_enc, "framecount still in libx264 buffer: %d", x264_encoder_delayed_frames( p_sys->h ) );
         x264_encoder_close( p_sys->h );
+    }
 
 #ifdef PTW32_STATIC_LIB
     vlc_mutex_lock( &pthread_win32_mutex );
