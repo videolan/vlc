@@ -149,8 +149,8 @@ static int Open(vlc_object_t *object)
         memset(sys->pitches, 0, sizeof(sys->pitches));
         memset(sys->lines, 0, sizeof(sys->lines));
 
-        sys->count = setup(&sys->opaque, chroma, &fmt.i_width, &fmt.i_height,
-                           sys->pitches, sys->lines);
+        sys->count = setup(&sys->opaque, chroma, &fmt.i_visible_width,
+                           &fmt.i_visible_height, sys->pitches, sys->lines);
         if (sys->count == 0) {
             msg_Err(vd, "video format setup failure (no pictures)");
             free(sys);
@@ -163,8 +163,8 @@ static int Open(vlc_object_t *object)
         fmt.i_chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, chroma);
         free(chroma);
 
-        fmt.i_width  = var_InheritInteger(vd, "vmem-width");
-        fmt.i_height = var_InheritInteger(vd, "vmem-height");
+        fmt.i_visible_width  = var_InheritInteger(vd, "vmem-width");
+        fmt.i_visible_height = var_InheritInteger(vd, "vmem-height");
         sys->pitches[0] = var_InheritInteger(vd, "vmem-pitch");
         sys->lines[0] = fmt.i_height;
         for (size_t i = 1; i < PICTURE_PLANE_MAX; i++)
@@ -175,6 +175,8 @@ static int Open(vlc_object_t *object)
         sys->count = 1;
         sys->cleanup = NULL;
     }
+    fmt.i_width = fmt.i_visible_width;
+    fmt.i_height = fmt.i_visible_height;
 
     if (!fmt.i_chroma) {
         msg_Err(vd, "vmem-chroma should be 4 characters long");
