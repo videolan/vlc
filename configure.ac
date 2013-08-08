@@ -2285,9 +2285,9 @@ AC_ARG_ENABLE(avcodec,
 [  --enable-avcodec        libavcodec codec (default enabled)])
 AS_IF([test "${enable_avcodec}" != "no"], [
   PKG_CHECK_MODULES(AVCODEC,[libavcodec >= 53.34.0 libavutil >= 51.22.0], [
-    PKG_CHECK_EXISTS([libavcodec < 56],, [
-      AC_MSG_ERROR([libavcodec versions 56 and later are not supported yet.])
-    ])
+    dnl PKG_CHECK_EXISTS([libavcodec < 56],, [
+    dnl   AC_MSG_ERROR([libavcodec versions 56 and later are not supported yet.])
+    dnl ])
     VLC_SAVE_FLAGS
     CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
     CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
