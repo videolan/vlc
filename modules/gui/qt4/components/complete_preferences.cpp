@@ -539,7 +539,10 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
     }
 
     if (name.contains( text, cs ) || head.contains( text, cs ) || help.contains( text, cs ))
+    {
+        module_config_free( p_config );
         return true;
+    }
 
     if( p_item ) do
     {
@@ -555,7 +558,10 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
         if( p_item->b_internal ) continue;
 
         if ( p_item->psz_text && qtr( p_item->psz_text ).contains( text, cs ) )
+        {
+            module_config_free( p_config );
             return true;
+        }
     }
     while (
             !(
@@ -566,6 +572,7 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
              && ( ++p_item < p_end )
           );
 
+    module_config_free( p_config );
     return false;
 }
 
@@ -592,7 +599,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     }
 
     unsigned confsize;
-    module_config_t *const p_config = module_config_get (p_module, &confsize),
+    module_config_t *const p_config = module_config_get( p_module, &confsize ),
                     *p_item = p_config,
                     *p_end = p_config + confsize;
 
@@ -723,6 +730,8 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     scroller->setWidgetResizable( true );
     global_layout->addWidget( scroller );
     setLayout( global_layout );
+
+    module_config_free( p_config );
 }
 
 void AdvPrefsPanel::apply()
