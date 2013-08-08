@@ -1024,7 +1024,10 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
             vout_display_Prepare(vd, sys->display.filtered, do_dr_spu ? subpic : NULL);
         }
         if (!do_dr_spu && subpic)
+        {
             subpicture_Delete(subpic);
+            subpic = NULL;
+        }
         if (!sys->display.filtered)
             return VLC_EGENERIC;
     }
