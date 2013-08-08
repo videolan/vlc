@@ -654,6 +654,15 @@ static int onMouseEvent(vlc_object_t *p_vout, const char *psz_var, vlc_value_t o
     return VLC_SUCCESS;
 }
 
+static int sendKeyEvent(demux_sys_t *p_sys, unsigned int key)
+{
+    mtime_t now = mdate();
+    if (bd_user_input(p_sys->bluray, now, key) < 0) {
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * libbluray overlay handling:
  *****************************************************************************/
@@ -1123,6 +1132,17 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
 
             return VLC_SUCCESS;
         }
+
+        case DEMUX_NAV_ACTIVATE:
+            return sendKeyEvent(p_sys, BD_VK_ENTER);
+        case DEMUX_NAV_UP:
+            return sendKeyEvent(p_sys, BD_VK_UP);
+        case DEMUX_NAV_DOWN:
+            return sendKeyEvent(p_sys, BD_VK_DOWN);
+        case DEMUX_NAV_LEFT:
+            return sendKeyEvent(p_sys, BD_VK_LEFT);
+        case DEMUX_NAV_RIGHT:
+            return sendKeyEvent(p_sys, BD_VK_RIGHT);
 
         case DEMUX_CAN_RECORD:
         case DEMUX_GET_FPS:
