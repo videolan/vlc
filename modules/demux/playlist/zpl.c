@@ -119,6 +119,7 @@ static int Demux( demux_t *p_demux )
             char *psz_tabvalue = ParseTabValue( psz_parse );
             if( !EMPTY_STR(psz_tabvalue) )
             {
+                free( psz_mrl );
                 psz_mrl = ProcessMRL( psz_tabvalue, p_demux->p_sys->psz_prefix );
             }
             free( psz_tabvalue );
@@ -139,7 +140,10 @@ static int Demux( demux_t *p_demux )
 
 #define PARSE(tag,variable)                                     \
     else if( !strncasecmp( psz_parse, tag, strlen( tag ) ) )    \
-        variable = ParseTabValue( psz_parse );
+    {                                                           \
+        free( variable );                                       \
+        variable = ParseTabValue( psz_parse );                  \
+    }
 
         PARSE( "TT", psz_title )
         PARSE( "TG", psz_genre )
