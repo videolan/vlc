@@ -170,6 +170,11 @@ struct vout_display_opengl_t {
     PFNGLGETSHADERINFOLOGPROC GetShaderInfoLog;
 #endif
 
+#if defined(_WIN32)
+    PFNGLACTIVETEXTUREPROC  ActiveTexture;
+    PFNGLCLIENTACTIVETEXTUREPROC  ClientActiveTexture;
+#endif
+
 
     /* multitexture */
     bool use_multitexture;
@@ -464,6 +469,13 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     if (!vgl->CreateShader || !vgl->ShaderSource || !vgl->CreateProgram)
         supports_shaders = false;
+#endif
+
+#if defined(_WIN32)
+    vgl->ActiveTexture = (PFNGLACTIVETEXTUREPROC)vlc_gl_GetProcAddress(vgl->gl, "glActiveTexture");
+    vgl->ClientActiveTexture = (PFNGLCLIENTACTIVETEXTUREPROC)vlc_gl_GetProcAddress(vgl->gl, "glClientActiveTexture");
+#   define glActiveTexture vgl->ActiveTexture
+#   define glClientActiveTexture vgl->ClientActiveTexture
 #endif
 
     vgl->supports_npot = HasExtension(extensions, "GL_ARB_texture_non_power_of_two") ||
