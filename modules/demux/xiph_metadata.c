@@ -155,7 +155,6 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
     /* */
     bool hasTitle        = false;
     bool hasAlbum        = false;
-    bool hasTrackNumber  = false;
     bool hasTrackTotal   = false;
     bool hasArtist       = false;
     bool hasCopyright    = false;
@@ -198,7 +197,22 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
     }
         IF_EXTRACT("TITLE=", Title )
         else IF_EXTRACT("ALBUM=", Album )
-        else IF_EXTRACT("TRACKNUMBER=", TrackNumber )
+        else if( !strncasecmp(psz_comment, "TRACKNUMBER=", strlen("TRACKNUMBER=" ) ) )
+        {
+            /* Yeah yeah, such a clever idea, let's put xx/xx inside TRACKNUMBER
+             * Oh, and let's not use TRACKTOTAL or TOTALTRACKS... */
+            short unsigned u_track, u_total;
+            if( sscanf( &psz_comment[strlen("TRACKNUMBER=")], "%hu/%hu", &u_track, &u_total ) == 2 )
+            {
+                char str[6];
+                snprintf(str, 6, "%d", u_track);
+                vlc_meta_Set( p_meta, vlc_meta_TrackNumber, str );
+                snprintf(str, 6, "%d", u_total);
+                vlc_meta_Set( p_meta, vlc_meta_TrackTotal, str );
+            }
+            else
+                vlc_meta_Set( p_meta, vlc_meta_TrackNumber, &psz_comment[strlen("TRACKNUMBER=")] );
+        }
         else if( !strncasecmp(psz_comment, "TRACKTOTAL=", strlen("TRACKTOTAL=")))
             vlc_meta_Set( p_meta, vlc_meta_TrackTotal, &psz_comment[strlen("TRACKTOTAL=")] );
         else if( !strncasecmp(psz_comment, "TOTALTRACKS=", strlen("TOTALTRACKS=")))
