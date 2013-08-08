@@ -557,10 +557,10 @@ static int Open( vlc_object_t *p_this )
         {
             p_sys->pmtmap[p_sys->i_pmtslots].i_pid = i_pid;
             p_sys->pmtmap[p_sys->i_pmtslots].i_prog = p_sys->i_num_pmt - 1;
-            if ( ++p_sys->i_pmtslots > MAX_PMT_PID )
+            if ( ++p_sys->i_pmtslots >= MAX_PMT_PID )
             {
                 msg_Err( p_mux, "Number of pids in PMT > %d", MAX_PMT_PID );
-                p_sys->i_pmtslots = MAX_PMT_PID;
+                p_sys->i_pmtslots = MAX_PMT_PID - 1;
             }
         }
     }
@@ -633,7 +633,7 @@ static int Open( vlc_object_t *p_this )
 
             if( i_pid == 0 )
             {
-                if( i > MAX_PMT )
+                if( i >= MAX_PMT )
                     msg_Err( p_mux, "Number of PMTs > maximum (%d)", MAX_PMT );
             }
             else
