@@ -340,9 +340,13 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         block_t *p_buffer = block_Alloc( p_block->i_buffer );
         if( unlikely(p_buffer == NULL) )
             goto drop;
-        aout_Interleave( p_buffer->p_buffer, p_block->p_buffer,
-                         p_block->i_nb_samples, ctx->channels,
-                         p_dec->fmt_out.audio.i_format );
+
+        const void *planes[ctx->channels];
+        for( int i = 0; i < ctx->channels; i++)
+            planes[i] = frame.extended_data[i];
+
+        aout_Interleave( p_buffer->p_buffer, planes, frame.nb_samples,
+                         ctx->channels, p_dec->fmt_out.audio.i_format );
         if( ctx->channels > AV_NUM_DATA_POINTERS )
             free( frame.extended_data );
         block_Release( p_block );

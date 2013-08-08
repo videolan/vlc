@@ -343,21 +343,21 @@ do { \
 /**
  * Interleaves audio samples within a block of samples.
  * \param dst destination buffer for interleaved samples
- * \param src source buffer with consecutive planes of samples
+ * \param srcv source buffers (one per plane) of uninterleaved samples
  * \param samples number of samples (per channel/per plane)
  * \param chans channels/planes count
  * \param fourcc sample format (must be a linear sample format)
  * \note The samples must be naturally aligned in memory.
  * \warning Destination and source buffers MUST NOT overlap.
  */
-void aout_Interleave( void *restrict dst, const void *restrict src,
+void aout_Interleave( void *restrict dst, const void *const *srcv,
                       unsigned samples, unsigned chans, vlc_fourcc_t fourcc )
 {
 #define INTERLEAVE_TYPE(type) \
 do { \
     type *d = dst; \
-    const type *s = src; \
     for( size_t i = 0; i < chans; i++ ) { \
+        const type *s = srcv[i]; \
         for( size_t j = 0, k = 0; j < samples; j++, k += chans ) \
             d[k] = *(s++); \
         d++; \

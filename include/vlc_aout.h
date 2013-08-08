@@ -195,8 +195,9 @@ VLC_API unsigned aout_CheckChannelReorder( const uint32_t *, const uint32_t *,
                                            uint32_t mask, uint8_t *table );
 VLC_API void aout_ChannelReorder(void *, size_t, unsigned, const uint8_t *, vlc_fourcc_t);
 
-VLC_API void aout_Interleave(void *dst, const void *src, unsigned samples,
-                             unsigned channels, vlc_fourcc_t fourcc);
+VLC_API void aout_Interleave(void *dst, const void *const *planes,
+                             unsigned samples, unsigned channels,
+                             vlc_fourcc_t fourcc);
 VLC_API void aout_Deinterleave(void *dst, const void *src, unsigned samples,
                              unsigned channels, vlc_fourcc_t fourcc);
 
