@@ -29,6 +29,7 @@
 #endif
 
 #include <assert.h>
+#include <limits.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -129,7 +130,7 @@ vlc_module_begin ()
              BASE_TEXT, BASE_TEXT, true )
     add_integer("spect-radius", 42,
              RADIUS_TEXT, RADIUS_LONGTEXT, true )
-    add_integer("spect-sections", 3,
+    add_integer_with_range("spect-sections", 3, 1, INT_MAX,
              SSECT_TEXT, SSECT_LONGTEXT, true )
     add_integer("spect-color", 80,
              COLOR1_TEXT, COLOR1_LONGTEXT, true )
