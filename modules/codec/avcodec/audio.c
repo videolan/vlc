@@ -118,6 +118,42 @@ static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
 /**
  * Allocates decoded audio buffer for libavcodec to use.
  */
+#if (LIBAVCODEC_VERSION_MAJOR >= 55)
+typedef struct
+{
+    block_t self;
+    AVFrame *frame;
+} vlc_av_frame_t;
+
+static void vlc_av_frame_Release(block_t *block)
+{
+    vlc_av_frame_t *b = (void *)block;
+
+    av_frame_free(&b->frame);
+    free(b);
+}
+
+static block_t *vlc_av_frame_Wrap(AVFrame *frame)
+{
+    for (unsigned i = 1; i < AV_NUM_DATA_POINTERS; i++)
+        assert(frame->linesize[i] == 0); /* only packed frame supported */
+
+    if (av_frame_make_writable(frame)) /* TODO: read-only block_t */
+        return NULL;
+
+    vlc_av_frame_t *b = malloc(sizeof (*b));
+    if (unlikely(b == NULL))
+        return NULL;
+
+    block_t *block = &b->self;
+
+    block_Init(block, frame->extended_data[0], frame->linesize[0]);
+    block->i_nb_samples = frame->nb_samples;
+    block->pf_release = vlc_av_frame_Release;
+    b->frame = frame;
+    return block;
+}
+#else
 static int GetAudioBuf( AVCodecContext *ctx, AVFrame *buf )
 {
     block_t *block;
@@ -159,6 +195,7 @@ static int GetAudioBuf( AVCodecContext *ctx, AVFrame *buf )
 
     return 0;
 }
+#endif
 
 /*****************************************************************************
  * InitAudioDec: initialize audio decoder
@@ -179,7 +216,11 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_codec->type = AVMEDIA_TYPE_AUDIO;
     p_context->codec_type = AVMEDIA_TYPE_AUDIO;
     p_context->codec_id = i_codec_id;
+#if (LIBAVCODEC_VERSION_MAJOR >= 55)
+    p_context->refcounted_frames = true;
+#else
     p_context->get_buffer = GetAudioBuf;
+#endif
     p_sys->p_context = p_context;
     p_sys->p_codec = p_codec;
     p_sys->i_codec_id = i_codec_id;
@@ -270,7 +311,13 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         p_block->i_flags |= BLOCK_FLAG_PRIVATE_REALLOCATED;
     }
 
+#if (LIBAVCODEC_VERSION_MAJOR >= 55)
+    AVFrame *frame = av_frame_alloc();
+    if (unlikely(frame == NULL))
+        goto end;
+#else
     AVFrame *frame = &(AVFrame) { };
+#endif
 
     for( int got_frame = 0; !got_frame; )
     {
@@ -317,23 +364,38 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         *pp_block = NULL;
     }
 
+#if (LIBAVCODEC_VERSION_MAJOR < 55)
     /* NOTE WELL: Beyond this point, p_block refers to the DECODED block! */
     p_block = frame->opaque;
+#endif
     SetupOutputFormat( p_dec, true );
     if( decoder_UpdateAudioFormat( p_dec ) )
         goto drop;
 
-    /* Silent unwanted samples */
-    if( p_sys->i_reject_count > 0 )
-    {
-        memset( p_block->p_buffer, 0, p_block->i_buffer );
-        p_sys->i_reject_count--;
-    }
-
-    assert( p_block->i_nb_samples >= (unsigned)frame->nb_samples );
-
     /* Interleave audio if required */
     if( av_sample_fmt_is_planar( ctx->sample_fmt ) )
+#if (LIBAVCODEC_VERSION_MAJOR >= 55)
+    {
+        p_block = block_Alloc(frame->linesize[0] * ctx->channels);
+        if (unlikely(p_block == NULL))
+            goto drop;
+
+        const void *planes[ctx->channels];
+        for (int i = 0; i < ctx->channels; i++)
+            planes[i] = frame->extended_data[i];
+
+        aout_Interleave(p_block->p_buffer, planes, frame->nb_samples,
+                        ctx->channels, p_dec->fmt_out.audio.i_format);
+        p_block->i_nb_samples = frame->nb_samples;
+        av_frame_free(&frame);
+    }
+    else
+    {
+        p_block = vlc_av_frame_Wrap(frame);
+        if (unlikely(p_block == NULL))
+            goto drop;
+    }
+#else
     {
         block_t *p_buffer = block_Alloc( p_block->i_buffer );
         if( unlikely(p_buffer == NULL) )
@@ -351,6 +413,7 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         p_block = p_buffer;
     }
     p_block->i_nb_samples = frame->nb_samples;
+#endif
 
     if (p_sys->b_extract)
     {   /* TODO: do not drop channels... at least not here */
@@ -366,6 +429,13 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         p_buffer->i_nb_samples = p_block->i_nb_samples;
         block_Release( p_block );
         p_block = p_buffer;
+    }
+
+    /* Silent unwanted samples */
+    if( p_sys->i_reject_count > 0 )
+    {
+        memset( p_block->p_buffer, 0, p_block->i_buffer );
+        p_sys->i_reject_count--;
     }
 
     p_block->i_buffer = p_block->i_nb_samples
