@@ -60,6 +60,16 @@
 #define BD_MENU_TEXT        N_( "Blu-ray menus" )
 #define BD_MENU_LONGTEXT    N_( "Use Blu-ray menus. If disabled, "\
                                 "the movie will start directly" )
+#define BD_REGION_TEXT      N_( "Region code" )
+#define BD_REGION_LONGTEXT  N_( "Blu-Ray player region code. "\
+                                "Some discs can be played only with a correct region code.")
+
+static const char *const ppsz_region_code[] = {
+    "A", "B", "C" };
+static const char *const ppsz_region_code_text[] = {
+    "Region A", "Region B", "Region C" };
+
+#define REGION_DEFAULT   1   /* Index to region list. Actual region code is (1<<REGION_DEFAULT) */
 
 /* Callbacks */
 static int  blurayOpen ( vlc_object_t * );
@@ -73,6 +83,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_capability( "access_demux", 200)
     add_bool( "bluray-menu", false, BD_MENU_TEXT, BD_MENU_LONGTEXT, false )
+    add_string( "bluray-region", ppsz_region_code[REGION_DEFAULT], BD_REGION_TEXT, BD_REGION_LONGTEXT, false)
+        change_string_list( ppsz_region_code, ppsz_region_code_text )
 
     add_shortcut( "bluray", "file" )
 
@@ -310,6 +322,12 @@ static int blurayOpen( vlc_object_t *object )
             goto error;
         }
     }
+
+    /* set player region code */
+    char *psz_region = var_InheritString(p_demux, "bluray-region");
+    unsigned int region = psz_region ? (psz_region[0] - 'A') : REGION_DEFAULT;
+    free(psz_region);
+    bd_set_player_setting(p_sys->bluray, BLURAY_PLAYER_SETTING_REGION_CODE, 1<<region);
 
     /* Get titles and chapters */
     p_sys->p_meta = bd_get_meta(p_sys->bluray);
