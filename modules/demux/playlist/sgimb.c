@@ -216,8 +216,6 @@ static int ParseLine ( demux_t *p_demux, char *psz_line )
     else if( !strncasecmp( psz_bol, "Stream=\"", sizeof("Stream=\"") - 1 ) )
     {
         psz_bol += sizeof("Stream=\"") - 1;
-        if ( !psz_bol )
-            return 0;
         char* psz_tmp = strrchr( psz_bol, '"' );
         if( !psz_tmp )
             return 0;
