@@ -1,6 +1,6 @@
 # freetype2
 
-FREETYPE2_VERSION := 2.4.12
+FREETYPE2_VERSION := 2.5.0.1
 FREETYPE2_URL := $(SF)/freetype/freetype2/$(FREETYPE2_VERSION)/freetype-$(FREETYPE2_VERSION).tar.gz
 
 PKGS += freetype2
