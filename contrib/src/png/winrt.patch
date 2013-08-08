@@ -12,12 +12,3 @@
  #endif
  
  #ifdef USE_FAR_KEYWORD
-@@ -381,7 +377,7 @@
- #  ifdef _WINDOWS_  /* Favor Windows over C runtime fns */
- #    define CVT_PTR(ptr)         (ptr)
- #    define CVT_PTR_NOCHECK(ptr) (ptr)
--#    define png_strlen  lstrlenA
-+#    define png_strlen  strlen
- #    define png_memcmp  memcmp
- #    define png_memcpy  CopyMemory
- #    define png_memset  memset
