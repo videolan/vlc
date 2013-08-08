@@ -939,7 +939,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
 
                     char *psz_mode = var_GetString( p_vout, "deinterlace-mode" );
                     vlc_value_t vlist, tlist;
-                    if( psz_mode && !var_Change( p_vout, "deinterlace-mode", VLC_VAR_GETCHOICES, &vlist, &tlist ) >= 0 )
+                    if( psz_mode && !var_Change( p_vout, "deinterlace-mode", VLC_VAR_GETCHOICES, &vlist, &tlist ) )
                     {
                         const char *psz_text = NULL;
                         for( int i = 0; i < vlist.p_list->i_count; i++ )
