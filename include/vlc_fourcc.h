@@ -364,6 +364,7 @@
 #define VLC_CODEC_ULEAD_DV_AUDIO_NTSC        VLC_FOURCC('m','s',0x02,0x15)
 #define VLC_CODEC_ULEAD_DV_AUDIO_PAL         VLC_FOURCC('m','s',0x02,0x16)
 #define VLC_CODEC_INDEO_AUDIO                VLC_FOURCC('m','s',0x04,0x02)
+#define VLC_CODEC_METASOUND                  VLC_FOURCC('m','s',0x00,0x75)
 
 /* Subtitle */
 #define VLC_CODEC_SPU       VLC_FOURCC('s','p','u',' ')

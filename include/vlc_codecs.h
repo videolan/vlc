@@ -235,6 +235,7 @@ ATTR_PACKED
 #define WAVE_FORMAT_MPEGLAYER3          0x0055 /* ISO/MPEG Layer3 Format Tag */
 #define WAVE_FORMAT_AMR_NB              0x0057 /* AMR NB */
 #define WAVE_FORMAT_AMR_WB              0x0058 /* AMR Wideband */
+#define WAVE_FORMAT_VOXWARE_RT29        0x0075 /* VoxWare MetaSound */
 #define WAVE_FORMAT_DOLBY_AC3_SPDIF     0x0092 /* Sonic Foundry */
 
 #define WAVE_FORMAT_AAC                 0x00FF /* */
@@ -396,6 +397,8 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_ULEAD_DV_AUDIO_NTSC, VLC_CODEC_ULEAD_DV_AUDIO_NTSC, "Ulead DV audio NTSC" },
     { WAVE_FORMAT_ULEAD_DV_AUDIO_PAL, VLC_CODEC_ULEAD_DV_AUDIO_PAL, "Ulead DV audio PAL" },
     { WAVE_FORMAT_INDEO_AUDIO, VLC_CODEC_INDEO_AUDIO, "Indeo Audio Coder" },
+    { WAVE_FORMAT_VOXWARE_RT29,VLC_CODEC_METASOUND,             "VoxWare MetaSound" },
+
     { WAVE_FORMAT_UNKNOWN,    VLC_FOURCC( 'u', 'n', 'd', 'f' ), "Unknown" }
 };
 
