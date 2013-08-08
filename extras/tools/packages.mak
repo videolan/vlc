@@ -7,7 +7,7 @@ YASM_URL=http://www.tortall.net/projects/yasm/releases/yasm-$(YASM_VERSION).tar.
 CMAKE_VERSION=2.8.6
 CMAKE_URL=http://www.cmake.org/files/v2.8/cmake-$(CMAKE_VERSION).tar.gz
 
-LIBTOOL_VERSION=2.2.10
+LIBTOOL_VERSION=2.4.2
 LIBTOOL_URL=$(GNU)/libtool/libtool-$(LIBTOOL_VERSION).tar.gz
 
 AUTOCONF_VERSION=2.69
