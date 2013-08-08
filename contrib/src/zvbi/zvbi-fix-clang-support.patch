@@ -1,0 +1,30 @@
+diff -ru zvbi/src/misc.h zvbi-fixed/src/misc.h
+--- zvbi/src/misc.h	2013-07-02 04:32:31.000000000 +0200
++++ zvbi-fixed/src/misc.h	2013-08-08 21:37:22.000000000 +0200
+@@ -52,17 +52,6 @@
+ #  define unlikely(expr) __builtin_expect(expr, 0)
+ #endif
+ 
+-#undef __i386__
+-#undef __i686__
+-/* FIXME #cpu is deprecated
+-#if #cpu (i386)
+-#  define __i386__ 1
+-#endif
+-#if #cpu (i686)
+-#  define __i686__ 1
+-#endif
+-*/
+-
+ /* &x == PARENT (&x.tm_min, struct tm, tm_min),
+    safer than &x == (struct tm *) &x.tm_min. A NULL _ptr is safe and
+    will return NULL, not -offsetof(_member). */
+@@ -156,8 +145,6 @@
+ 
+ #define likely(expr) (expr)
+ #define unlikely(expr) (expr)
+-#undef __i386__
+-#undef __i686__
+ 
+ static char *
+ PARENT_HELPER (char *p, unsigned int offset)

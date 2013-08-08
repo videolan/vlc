@@ -20,6 +20,9 @@ zvbi: zvbi-$(ZVBI_VERSION).tar.bz2 .sum-zvbi
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/zvbi/zvbi-win32.patch
 endif
+ifdef HAVE_DARWIN_OS
+	$(APPLY) $(SRC)/zvbi/zvbi-fix-clang-support.patch
+endif
 	$(MOVE)
 
 DEPS_zvbi = pthreads iconv $(DEPS_iconv)
