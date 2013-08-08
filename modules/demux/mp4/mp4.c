@@ -2458,7 +2458,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     MP4_Box_t *p_vmhd;
     MP4_Box_t *p_smhd;
 
-    char language[4];
+    char language[4] = { '\0' };
 
     /* hint track unsupported */
 
