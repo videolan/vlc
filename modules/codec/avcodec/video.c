@@ -237,11 +237,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( var_CreateGetBool( p_dec, "avcodec-fast" ) )
         p_sys->p_context->flags2 |= CODEC_FLAG2_FAST;
 
-#if LIBAVCODEC_VERSION_CHECK( 54, 41, 0, 91, 100 )
-    if( var_InheritBool( p_dec, "avcodec-ignorecrop" ) )
-        p_sys->p_context->flags2 |= CODEC_FLAG2_IGNORE_CROP;
-#endif
-
     /* ***** libavcodec frame skipping ***** */
     p_sys->b_hurry_up = var_CreateGetBool( p_dec, "avcodec-hurry-up" );
 
