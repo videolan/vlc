@@ -19,6 +19,6 @@ freetype: freetype-$(FREETYPE2_VERSION).tar.gz .sum-freetype2
 
 .freetype2: freetype
 	sed -i.orig s/-ansi// $</builds/unix/configure
-	cd $< && GNUMAKE=$(MAKE) $(HOSTVARS) ./configure $(HOSTCONF)
+	cd $< && GNUMAKE=$(MAKE) $(HOSTVARS) ./configure --without-png $(HOSTCONF)
 	cd $< && $(MAKE) && $(MAKE) install
 	touch $@
