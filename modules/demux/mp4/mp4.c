@@ -3241,7 +3241,7 @@ static int MP4_frg_TrackCreate( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_
 /**
  * Return the track identified by tid
  */
-static mp4_track_t *MP4_frg_GetTrack( demux_t *p_demux, const uint16_t tid )
+static mp4_track_t *MP4_frg_GetTrack( demux_t *p_demux, const uint32_t tid )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -3254,7 +3254,7 @@ static mp4_track_t *MP4_frg_GetTrack( demux_t *p_demux, const uint16_t tid )
         if( ret->i_track_ID == tid )
             return ret;
     }
-    msg_Err( p_demux, "MP4_frg_GetTrack: track %"PRIu16" not found!", tid );
+    msg_Err( p_demux, "MP4_frg_GetTrack: track %"PRIu32" not found!", tid );
     return NULL;
 }
 
@@ -3552,7 +3552,7 @@ static int MP4_frg_GetChunks( demux_t *p_demux, const unsigned i_tk_id )
         if( !p_chunk->p_first )
             goto MP4_frg_GetChunks_Error;
         uint32_t i_type = p_chunk->p_first->i_type;
-        uint16_t tid = 0;
+        uint32_t tid = 0;
         if( i_type == ATOM_uuid || i_type == ATOM_ftyp )
         {
             MP4_BoxFree( p_demux->s, p_sys->p_root );
@@ -3588,7 +3588,7 @@ static int MP4_frg_GetChunks( demux_t *p_demux, const unsigned i_tk_id )
             return MP4_frg_GetChunks( p_demux, i_tk_id );
         }
 
-        if( MP4_frg_GetChunk( p_demux, p_chunk, (unsigned *)&tid ) != VLC_SUCCESS )
+        if( MP4_frg_GetChunk( p_demux, p_chunk, &tid ) != VLC_SUCCESS )
             goto MP4_frg_GetChunks_Error;
 
         MP4_BoxFree( p_demux->s, p_chunk );
