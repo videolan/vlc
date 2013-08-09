@@ -725,7 +725,7 @@ static void blurayCloseAllOverlays(demux_t *p_demux)
  * If is has already been acquired, the overlay has already been sent to it,
  * therefore, we only flag the overlay as "Outdated"
  */
-static void blurayActivateOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
+static void blurayActivateOverlay(demux_t *p_demux, int plane)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -733,12 +733,12 @@ static void blurayActivateOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
      * If the overlay is already displayed, mark the picture as outdated.
      * We must NOT use vout_PutSubpicture if a picture is already displayed.
      */
-    vlc_mutex_lock(&p_sys->p_overlays[ov->plane]->lock);
-    if ((p_sys->p_overlays[ov->plane]->status == Displayed ||
-            p_sys->p_overlays[ov->plane]->status == Outdated)
+    vlc_mutex_lock(&p_sys->p_overlays[plane]->lock);
+    if ((p_sys->p_overlays[plane]->status == Displayed ||
+            p_sys->p_overlays[plane]->status == Outdated)
             && p_sys->p_vout) {
-        p_sys->p_overlays[ov->plane]->status = Outdated;
-        vlc_mutex_unlock(&p_sys->p_overlays[ov->plane]->lock);
+        p_sys->p_overlays[plane]->status = Outdated;
+        vlc_mutex_unlock(&p_sys->p_overlays[plane]->lock);
         return;
     }
     /*
@@ -746,43 +746,43 @@ static void blurayActivateOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
      * the blurayDemuxMenu will send it to vout, as it may be unavailable when
      * the overlay is computed
      */
-    p_sys->current_overlay = ov->plane;
-    p_sys->p_overlays[ov->plane]->status = ToDisplay;
-    vlc_mutex_unlock(&p_sys->p_overlays[ov->plane]->lock);
+    p_sys->current_overlay = plane;
+    p_sys->p_overlays[plane]->status = ToDisplay;
+    vlc_mutex_unlock(&p_sys->p_overlays[plane]->lock);
 }
 
-static void blurayInitOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
+static void blurayInitOverlay(demux_t *p_demux, int plane, int width, int height)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    assert(p_sys->p_overlays[ov->plane] == NULL);
+    assert(p_sys->p_overlays[plane] == NULL);
 
-    p_sys->p_overlays[ov->plane] = calloc(1, sizeof(**p_sys->p_overlays));
-    if (unlikely(!p_sys->p_overlays[ov->plane]))
+    p_sys->p_overlays[plane] = calloc(1, sizeof(**p_sys->p_overlays));
+    if (unlikely(!p_sys->p_overlays[plane]))
         return;
 
     subpicture_updater_sys_t *p_upd_sys = malloc(sizeof(*p_upd_sys));
     if (unlikely(!p_upd_sys)) {
-        free(p_sys->p_overlays[ov->plane]);
-        p_sys->p_overlays[ov->plane] = NULL;
+        free(p_sys->p_overlays[plane]);
+        p_sys->p_overlays[plane] = NULL;
         return;
     }
     /* two references: vout + demux */
-    p_sys->p_overlays[ov->plane]->released_once = ATOMIC_FLAG_INIT;
+    p_sys->p_overlays[plane]->released_once = ATOMIC_FLAG_INIT;
 
-    p_upd_sys->p_overlay = p_sys->p_overlays[ov->plane];
+    p_upd_sys->p_overlay = p_sys->p_overlays[plane];
     subpicture_updater_t updater = {
         .pf_validate = subpictureUpdaterValidate,
         .pf_update   = subpictureUpdaterUpdate,
         .pf_destroy  = subpictureUpdaterDestroy,
         .p_sys       = p_upd_sys,
     };
-    vlc_mutex_init(&p_sys->p_overlays[ov->plane]->lock);
-    p_sys->p_overlays[ov->plane]->p_pic = subpicture_New(&updater);
-    p_sys->p_overlays[ov->plane]->p_pic->i_original_picture_width = ov->w;
-    p_sys->p_overlays[ov->plane]->p_pic->i_original_picture_height = ov->h;
-    p_sys->p_overlays[ov->plane]->p_pic->b_ephemer = true;
-    p_sys->p_overlays[ov->plane]->p_pic->b_absolute = true;
+    vlc_mutex_init(&p_sys->p_overlays[plane]->lock);
+    p_sys->p_overlays[plane]->p_pic = subpicture_New(&updater);
+    p_sys->p_overlays[plane]->p_pic->i_original_picture_width = width;
+    p_sys->p_overlays[plane]->p_pic->i_original_picture_height = height;
+    p_sys->p_overlays[plane]->p_pic->b_ephemer = true;
+    p_sys->p_overlays[plane]->p_pic->b_absolute = true;
 }
 
 /**
@@ -793,16 +793,16 @@ static void blurayInitOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
  *   the subpicture_updater_t::pf_update
  * This doesn't destroy the subpicture, as the overlay may be used again by libbluray.
  */
-static void blurayClearOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
+static void blurayClearOverlay(demux_t *p_demux, int plane)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    vlc_mutex_lock(&p_sys->p_overlays[ov->plane]->lock);
+    vlc_mutex_lock(&p_sys->p_overlays[plane]->lock);
 
-    subpicture_region_ChainDelete(p_sys->p_overlays[ov->plane]->p_regions);
-    p_sys->p_overlays[ov->plane]->p_regions = NULL;
-    p_sys->p_overlays[ov->plane]->status = Outdated;
-    vlc_mutex_unlock(&p_sys->p_overlays[ov->plane]->lock);
+    subpicture_region_ChainDelete(p_sys->p_overlays[plane]->p_regions);
+    p_sys->p_overlays[plane]->p_regions = NULL;
+    p_sys->p_overlays[plane]->status = Outdated;
+    vlc_mutex_unlock(&p_sys->p_overlays[plane]->lock);
 }
 
 /*
@@ -887,13 +887,13 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
     switch (overlay->cmd) {
         case BD_OVERLAY_INIT:
             msg_Info(p_demux, "Initializing overlay");
-            blurayInitOverlay(p_demux, overlay);
+            blurayInitOverlay(p_demux, overlay->plane, overlay->w, overlay->h);
             break;
         case BD_OVERLAY_CLEAR:
-            blurayClearOverlay(p_demux, overlay);
+            blurayClearOverlay(p_demux, overlay->plane);
             break;
         case BD_OVERLAY_FLUSH:
-            blurayActivateOverlay(p_demux, overlay);
+            blurayActivateOverlay(p_demux, overlay->plane);
             break;
         case BD_OVERLAY_DRAW:
             blurayDrawOverlay(p_demux, overlay);
