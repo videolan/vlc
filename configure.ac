@@ -1374,7 +1374,7 @@ AM_CONDITIONAL(HAVE_NEON, [test "${ac_cv_arm_neon}" = "yes"])
 AC_ARG_ENABLE(altivec,
   [AS_HELP_STRING([--disable-altivec],
     [disable AltiVec optimizations (default auto)])],, [
-  AS_CASE("${host_cpu}", "powerpc*",
+  AS_CASE("${host_cpu}", [powerpc*],
         [enable_altivec=yes], [enable_altivec=no])
 ])
 have_altivec="no"
