@@ -255,6 +255,7 @@ static int net_SetMcastOut (vlc_object_t *p_this, int fd, int family,
             if (setsockopt (fd, SOL_IPV6, IPV6_MULTICAST_IF,
                             &scope, sizeof (scope)) == 0)
                 return 0;
+            break;
 #endif
 
 #ifdef __linux__
@@ -264,6 +265,7 @@ static int net_SetMcastOut (vlc_object_t *p_this, int fd, int family,
             if (setsockopt (fd, SOL_IP, IP_MULTICAST_IF,
                             &req, sizeof (req)) == 0)
                 return 0;
+            break;
         }
 #endif
         default:
