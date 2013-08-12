@@ -171,6 +171,52 @@ static void  blurayResetParser(demux_t *p_demux);
 #define TO_TICKS(a)   (a*INT64_C(90000)/CLOCK_FREQ)
 #define CUR_LENGTH    p_sys->pp_title[p_demux->info.i_title]->i_length
 
+/* */
+static void FindMountPoint(char **file)
+{
+    char *device = *file;
+#if defined (HAVE_MNTENT_H) && defined (HAVE_SYS_STAT_H)
+    struct stat st;
+    if (!stat (device, &st) && S_ISBLK (st.st_mode)) {
+        FILE *mtab = setmntent ("/proc/self/mounts", "r");
+        struct mntent *m, mbuf;
+        char buf [8192];
+        /* bd path may be a symlink (e.g. /dev/dvd -> /dev/sr0), so make
+         * sure we look up the real device */
+        char *bd_device = realpath(device, NULL);
+        if (!bd_device)
+            bd_device = strdup(device);
+
+        while ((m = getmntent_r (mtab, &mbuf, buf, sizeof(buf))) != NULL) {
+            if (!strcmp (m->mnt_fsname, bd_device)) {
+                free(device);
+                *file = strdup(m->mnt_dir);
+                break;
+            }
+        }
+        free(bd_device);
+        endmntent (mtab);
+    }
+#elif defined(__APPLE__)
+    struct stat st;
+    if (!stat (device, &st) && S_ISBLK (st.st_mode)) {
+        int fs_count = getfsstat (NULL, 0, MNT_NOWAIT);
+        if (fs_count > 0) {
+            struct statfs mbuf[128];
+            getfsstat (mbuf, fs_count * sizeof(mbuf[0]), MNT_NOWAIT);
+            for (int i = 0; i < fs_count; ++i)
+                if (!strcmp (mbuf[i].f_mntfromname, device)) {
+                    free(device);
+                    *file = strdup(mbuf[i].f_mntonname);
+                    return;
+                }
+        }
+    }
+#else
+# warning Disc device to mount point not implemented
+#endif
+}
+
 /*****************************************************************************
  * blurayOpen: module init function
  *****************************************************************************/
@@ -207,50 +253,12 @@ static int blurayOpen( vlc_object_t *object )
         p_sys->psz_bd_path = strndup(p_demux->psz_file, strlen(p_demux->psz_file));
     }
 
-#if defined (HAVE_MNTENT_H) && defined (HAVE_SYS_STAT_H)
     /* If we're passed a block device, try to convert it to the mount point. */
-    struct stat st;
-    if ( !stat (p_sys->psz_bd_path, &st)) {
-        if (S_ISBLK (st.st_mode)) {
-            FILE* mtab = setmntent ("/proc/self/mounts", "r");
-            struct mntent* m;
-            struct mntent mbuf;
-            char buf [8192];
-            /* bd path may be a symlink (e.g. /dev/dvd -> /dev/sr0), so make
-             * sure we look up the real device */
-            char* bd_device = realpath(p_sys->psz_bd_path, NULL);
-            while ((m = getmntent_r (mtab, &mbuf, buf, sizeof(buf))) != NULL) {
-                if (!strcmp (m->mnt_fsname, (bd_device == NULL ? p_sys->psz_bd_path : bd_device))) {
-                    p_sys->psz_bd_path = strndup(m->mnt_dir, strlen(m->mnt_dir));
-                    break;
-                }
-            }
-            free(bd_device);
-            endmntent (mtab);
-        }
-    }
-#endif /* HAVE_MNTENT_H && HAVE_SYS_STAT_H */
-#ifdef __APPLE__
-    /* If we're passed a block device, try to convert it to the mount point. */
-    struct stat st;
-    if ( !stat (p_sys->psz_bd_path, &st)) {
-        if (S_ISBLK (st.st_mode)) {
-            struct statfs mbuf[128];
-            int fs_count;
+    FindMountPoint(&p_sys->psz_bd_path);
 
-            if ( (fs_count = getfsstat (NULL, 0, MNT_NOWAIT)) > 0 ) {
-                getfsstat (mbuf, fs_count * sizeof(mbuf[0]), MNT_NOWAIT);
-                for ( int i = 0; i < fs_count; ++i) {
-                    if (!strcmp (mbuf[i].f_mntfromname, p_sys->psz_bd_path)) {
-                        p_sys->psz_bd_path = strndup(mbuf[i].f_mntonname, strlen(mbuf[i].f_mntonname));
-                    }
-                }
-            }
-        }
-    }
-#endif
     p_sys->bluray = bd_open(p_sys->psz_bd_path, NULL);
     if (!p_sys->bluray) {
+        free(p_sys->psz_bd_path);
         free(p_sys);
         return VLC_EGENERIC;
     }
