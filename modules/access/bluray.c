@@ -156,7 +156,7 @@ static es_out_t *esOutNew( demux_t *p_demux );
 static int   blurayControl(demux_t *, int, va_list);
 static int   blurayDemux(demux_t *);
 
-static int   blurayInitTitles(demux_t *p_demux );
+static void  blurayInitTitles(demux_t *p_demux );
 static int   bluraySetTitle(demux_t *p_demux, int i_title);
 
 static void  blurayOverlayProc(void *ptr, const BD_OVERLAY * const overlay);
@@ -342,9 +342,7 @@ static int blurayOpen( vlc_object_t *object )
     if (!p_sys->p_meta)
         msg_Warn(p_demux, "Failed to get meta info." );
 
-    if (blurayInitTitles(p_demux) != VLC_SUCCESS) {
-        goto error;
-    }
+    blurayInitTitles(p_demux);
 
     /*
      * Initialize the event queue, so we can receive events in blurayDemux(Menu).
@@ -1030,7 +1028,7 @@ static void bluraySendOverlayToVout(demux_t *p_demux)
     p_sys->p_overlays[p_sys->current_overlay]->status = Outdated;
 }
 
-static int blurayInitTitles(demux_t *p_demux )
+static void blurayInitTitles(demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -1064,7 +1062,6 @@ static int blurayInitTitles(demux_t *p_demux )
         TAB_APPEND( p_sys->i_title, p_sys->pp_title, t );
         bd_free_title_info(title_info);
     }
-    return VLC_SUCCESS;
 }
 
 static void blurayResetParser( demux_t *p_demux )
