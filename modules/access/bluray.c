@@ -1303,12 +1303,12 @@ static void blurayHandleEvent( demux_t *p_demux, const BD_EVENT *e )
             break ;
         /* The param we get is the real stream id, not an index, ie. it starts from 1 */
         int pid = info->clips[p_sys->i_current_clip].audio_streams[e->param - 1].pid;
+        bd_free_title_info( info );
         int idx = findEsPairIndex(p_sys, pid);
         if (idx >= 0) {
             es_out_id_t *p_es = vlc_array_item_at_index(&p_sys->es, idx);
             es_out_Control( p_demux->out, ES_OUT_SET_ES, p_es );
         }
-        bd_free_title_info( info );
         p_sys->i_audio_stream = pid;
         break ;
     case BD_EVENT_CHAPTER:
