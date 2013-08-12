@@ -1323,31 +1323,24 @@ static void blurayHandleEvent( demux_t *p_demux, const BD_EVENT *e )
     }
 }
 
-static void blurayHandleEvents( demux_t *p_demux )
-{
-    BD_EVENT e;
-
-    while (bd_get_event(p_demux->p_sys->bluray, &e))
-    {
-        blurayHandleEvent(p_demux, &e);
-    }
-}
-
 #define BD_TS_PACKET_SIZE (192)
 #define NB_TS_PACKETS (200)
 
 static int blurayDemux(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    BD_EVENT e;
 
     block_t *p_block = block_Alloc(NB_TS_PACKETS * (int64_t)BD_TS_PACKET_SIZE);
-    if (!p_block) {
+    if (!p_block)
         return -1;
-    }
 
-    int nread = -1;
+    int nread;
+
     if (p_sys->b_menu == false) {
-        blurayHandleEvents(p_demux);
+        while (bd_get_event(p_demux->p_sys->bluray, &e))
+            blurayHandleEvent(p_demux, &e);
+
         nread = bd_read(p_sys->bluray, p_block->p_buffer,
                         NB_TS_PACKETS * BD_TS_PACKET_SIZE);
         if (nread < 0) {
@@ -1355,7 +1348,6 @@ static int blurayDemux(demux_t *p_demux)
             return nread;
         }
     } else {
-        BD_EVENT e;
         nread = bd_read_ext(p_sys->bluray, p_block->p_buffer,
                             NB_TS_PACKETS * BD_TS_PACKET_SIZE, &e);
         if (nread < 0)
