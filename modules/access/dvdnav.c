@@ -282,9 +282,8 @@ static int Open( vlc_object_t *p_this )
         msg_Warn( p_demux, "cannot set PGC positioning flag" );
     }
 
-    /* Set menu language
-     * XXX A menu-language may be better than sub-language */
-    psz_code = DemuxGetLanguageCode( p_demux, "sub-language" );
+    /* Set menu language */
+    psz_code = DemuxGetLanguageCode( p_demux, "menu-language" );
     if( dvdnav_menu_language_select( p_sys->dvdnav, psz_code ) !=
         DVDNAV_STATUS_OK )
     {

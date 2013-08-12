@@ -429,6 +429,8 @@ void input_ConfigVarInit ( input_thread_t *p_input )
                     VLC_VAR_STRING|VLC_VAR_DOINHERIT );
         var_Create( p_input, "sub-language",
                     VLC_VAR_STRING|VLC_VAR_DOINHERIT );
+        var_Create( p_input, "menu-language",
+                    VLC_VAR_STRING|VLC_VAR_DOINHERIT );
 
         var_Create( p_input, "audio-track-id",
                     VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
