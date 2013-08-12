@@ -692,6 +692,21 @@ static void blurayCleanOverlayStruct(bluray_overlay_t *p_overlay)
     free(p_overlay);
 }
 
+static void blurayCloseOverlay(demux_t *p_demux, int plane)
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    bluray_overlay_t *ov = p_sys->p_overlays[plane];
+
+    if (ov != NULL) {
+        vout_FlushSubpictureChannel(p_sys->p_vout, ov->p_pic->i_channel);
+        blurayCleanOverlayStruct(ov);
+        if (p_sys->current_overlay == plane)
+            p_sys->current_overlay = -1;
+    }
+
+    p_sys->p_overlays[plane] = NULL;
+}
+
 static void blurayCloseAllOverlays(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -700,14 +715,9 @@ static void blurayCloseAllOverlays(demux_t *p_demux)
     if (!p_sys->p_vout)
         return;
 
-    for (int i = 0; i < MAX_OVERLAY; i++) {
-        if (p_sys->p_overlays[i] != NULL) {
-            vout_FlushSubpictureChannel(p_sys->p_vout,
-                                        p_sys->p_overlays[i]->p_pic->i_channel);
-            blurayCleanOverlayStruct(p_sys->p_overlays[i]);
-            p_sys->p_overlays[i] = NULL;
-        }
-    }
+    for (int i = 0; i < MAX_OVERLAY; i++)
+        blurayCloseOverlay(p_demux, i);
+
     var_DelCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
     var_DelCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
     vlc_object_release(p_sys->p_vout);
@@ -890,6 +900,10 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
         msg_Info(p_demux, "Initializing overlay");
         blurayInitOverlay(p_demux, overlay->plane, overlay->w, overlay->h);
         break;
+    case BD_OVERLAY_CLOSE:
+        blurayClearOverlay(p_demux, overlay->plane);
+        blurayCloseOverlay(p_demux, overlay->plane);
+        break;
     case BD_OVERLAY_CLEAR:
         blurayClearOverlay(p_demux, overlay->plane);
         break;
@@ -972,7 +986,7 @@ static void blurayArgbOverlayProc(void *ptr, const BD_ARGB_OVERLAY *const overla
         break;
     case BD_ARGB_OVERLAY_CLOSE:
         blurayClearOverlay(p_demux, overlay->plane);
-        // TODO: blurayCloseOverlay(p_demux, overlay->plane);
+        blurayCloseOverlay(p_demux, overlay->plane);
         break;
     case BD_ARGB_OVERLAY_FLUSH:
         blurayActivateOverlay(p_demux, overlay->plane);
