@@ -226,6 +226,7 @@ static int blurayOpen( vlc_object_t *object )
     demux_sys_t *p_sys;
 
     const char *error_msg = NULL;
+#define BLURAY_ERROR(s) do { error_msg = s; goto error; } while(0)
 
     if (strcmp(p_demux->psz_access, "bluray")) {
         // TODO BDMV support, once we figure out what to do in libbluray
@@ -266,10 +267,8 @@ static int blurayOpen( vlc_object_t *object )
     const BLURAY_DISC_INFO *disc_info = bd_get_disc_info(p_sys->bluray);
 
     /* Is it a bluray? */
-    if (!disc_info->bluray_detected) {
-        error_msg = "Path doesn't appear to be a Blu-ray";
-        goto error;
-    }
+    if (!disc_info->bluray_detected)
+        BLURAY_ERROR(_("Path doesn't appear to be a Blu-ray"));
 
     msg_Info(p_demux, "First play: %i, Top menu: %i\n"
                       "HDMV Titles: %i, BD-J Titles: %i, Other: %i",
@@ -279,56 +278,43 @@ static int blurayOpen( vlc_object_t *object )
 
     /* AACS */
     if (disc_info->aacs_detected) {
-        if (!disc_info->libaacs_detected) {
-            error_msg = _("This Blu-ray Disc needs a library for AACS decoding, "
-                      "and your system does not have it.");
-            goto error;
-        }
+        if (!disc_info->libaacs_detected)
+            BLURAY_ERROR(_("This Blu-ray Disc needs a library for AACS decoding"
+                      ", and your system does not have it."));
         if (!disc_info->aacs_handled) {
 #ifdef BD_AACS_CORRUPTED_DISC
             if (disc_info->aacs_error_code) {
                 switch (disc_info->aacs_error_code) {
-                    case BD_AACS_CORRUPTED_DISC:
-                        error_msg = _("Blu-ray Disc is corrupted.");
-                        break;
-                    case BD_AACS_NO_CONFIG:
-                        error_msg = _("Missing AACS configuration file!");
-                        break;
-                    case BD_AACS_NO_PK:
-                        error_msg = _("No valid processing key found in AACS config file.");
-                        break;
-                    case BD_AACS_NO_CERT:
-                        error_msg = _("No valid host certificate found in AACS config file.");
-                        break;
-                    case BD_AACS_CERT_REVOKED:
-                        error_msg = _("AACS Host certificate revoked.");
-                        break;
-                    case BD_AACS_MMC_FAILED:
-                        error_msg = _("AACS MMC failed.");
-                        break;
+                case BD_AACS_CORRUPTED_DISC:
+                    BLURAY_ERROR(_("Blu-ray Disc is corrupted."));
+                case BD_AACS_NO_CONFIG:
+                    BLURAY_ERROR(_("Missing AACS configuration file!"));
+                case BD_AACS_NO_PK:
+                    BLURAY_ERROR(_("No valid processing key found in AACS config file."));
+                case BD_AACS_NO_CERT:
+                    BLURAY_ERROR(_("No valid host certificate found in AACS config file."));
+                case BD_AACS_CERT_REVOKED:
+                    BLURAY_ERROR(_("AACS Host certificate revoked."));
+                case BD_AACS_MMC_FAILED:
+                    BLURAY_ERROR(_("AACS MMC failed."));
                 }
-                goto error;
             }
 #else
-            error_msg = _("Your system AACS decoding library does not work. "
-                      "Missing keys?");
-            goto error;
+            /* libbluray < 0.2.3 */
+            BLURAY_ERROR(_("Your system AACS decoding library does not work. "
+                      "Missing keys?"));
 #endif /* BD_AACS_CORRUPTED_DISC */
         }
     }
 
     /* BD+ */
     if (disc_info->bdplus_detected) {
-        if (!disc_info->libbdplus_detected) {
-            error_msg = _("This Blu-ray Disc needs a library for BD+ decoding, "
-                      "and your system does not have it.");
-            goto error;
-        }
-        if (!disc_info->bdplus_handled) {
-            error_msg = _("Your system BD+ decoding library does not work. "
-                      "Missing configuration?");
-            goto error;
-        }
+        if (!disc_info->libbdplus_detected)
+            BLURAY_ERROR(_("This Blu-ray Disc needs a library for BD+ decoding"
+                      ", and your system does not have it."));
+        if (!disc_info->bdplus_handled)
+            BLURAY_ERROR(_("Your system BD+ decoding library does not work. "
+                      "Missing configuration?"));
     }
 
     /* set player region code */
@@ -353,20 +339,18 @@ static int blurayOpen( vlc_object_t *object )
     if (p_sys->b_menu) {
         p_sys->p_input = demux_GetParentInput(p_demux);
         if (unlikely(!p_sys->p_input)) {
-            error_msg = "Could not get parent input";
+            msg_Err(p_demux, "Could not get parent input");
             goto error;
         }
 
         /* Register ARGB overlay handler for BD-J */
-        if (disc_info->num_bdj_titles) {
+        if (disc_info->num_bdj_titles)
             bd_register_argb_overlay_proc(p_sys->bluray, p_demux, blurayArgbOverlayProc, NULL);
-        }
 
         /* libbluray will start playback from "First-Title" title */
-        if (bd_play(p_sys->bluray) == 0) {
-            error_msg = "Failed to start bluray playback. Please try without menu support.";
-            goto error;
-        }
+        if (bd_play(p_sys->bluray) == 0)
+            BLURAY_ERROR(_("Failed to start bluray playback. Please try without menu support."));
+
         /* Registering overlay event handler */
         bd_register_overlay_proc(p_sys->bluray, p_demux, blurayOverlayProc);
     } else {
@@ -399,6 +383,7 @@ error:
         dialog_Fatal(p_demux, _("Blu-ray error"), "%s", error_msg);
     blurayClose(object);
     return VLC_EGENERIC;
+#undef BLURAY_ERROR
 }
 
 
