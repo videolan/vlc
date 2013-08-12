@@ -1026,23 +1026,30 @@ static void blurayInitTitles(demux_t *p_demux )
             break;
 
         BLURAY_TITLE_INFO *title_info = bd_get_title_info(p_sys->bluray, i, 0);
-        if (!title_info)
+        if (!title_info) {
+            vlc_input_title_Delete(t);
             break;
+        }
+
         t->i_length = FROM_TICKS(title_info->duration);
+
+        for ( unsigned int j = 0; j < title_info->chapter_count; j++) {
+            seekpoint_t *s = vlc_seekpoint_New();
+            if (!s) {
+                bd_free_title_info(title_info);
+                vlc_input_title_Delete(t);
+                break;
+            }
+            s->i_time_offset = title_info->chapters[j].offset;
+
+            TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
+        }
 
         if (t->i_length > duration) {
             duration = t->i_length;
             p_sys->i_longest_title = i;
         }
 
-        for ( unsigned int j = 0; j < title_info->chapter_count; j++) {
-            seekpoint_t *s = vlc_seekpoint_New();
-            if (!s)
-                break;
-            s->i_time_offset = title_info->chapters[j].offset;
-
-            TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
-        }
         TAB_APPEND( p_sys->i_title, p_sys->pp_title, t );
         bd_free_title_info(title_info);
     }
