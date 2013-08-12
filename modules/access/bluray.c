@@ -1225,8 +1225,10 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
                           p_sys->psz_bd_path, meta->thumbnails[0].path ) > 0 )
             {
                 char *psz_thumburl = vlc_path2uri( psz_thumbpath, "file" );
-                if( unlikely(psz_thumburl == NULL) )
+                if( unlikely(psz_thumburl == NULL) ) {
+                    free( psz_thumbpath );
                     return VLC_ENOMEM;
+                }
 
                 vlc_meta_SetArtURL( p_meta, psz_thumburl );
                 free( psz_thumburl );
