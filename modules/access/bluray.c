@@ -249,9 +249,8 @@ static int blurayOpen( vlc_object_t *object )
     TAB_INIT( p_sys->i_title, p_sys->pp_title );
 
     /* store current bd path */
-    if (p_demux->psz_file) {
-        p_sys->psz_bd_path = strndup(p_demux->psz_file, strlen(p_demux->psz_file));
-    }
+    if (p_demux->psz_file)
+        p_sys->psz_bd_path = strdup(p_demux->psz_file);
 
     /* If we're passed a block device, try to convert it to the mount point. */
     FindMountPoint(&p_sys->psz_bd_path);
