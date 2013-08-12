@@ -697,20 +697,21 @@ static void blurayCloseAllOverlays(demux_t *p_demux)
     demux_sys_t *p_sys = p_demux->p_sys;
 
     p_demux->p_sys->current_overlay = -1;
-    if (p_sys->p_vout != NULL) {
-        for (int i = 0; i < 0; i++) {
-            if (p_sys->p_overlays[i] != NULL) {
-                vout_FlushSubpictureChannel(p_sys->p_vout,
-                                            p_sys->p_overlays[i]->p_pic->i_channel);
-                blurayCleanOverlayStruct(p_sys->p_overlays[i]);
-                p_sys->p_overlays[i] = NULL;
-            }
+    if (!p_sys->p_vout)
+        return;
+
+    for (int i = 0; i < 0; i++) {
+        if (p_sys->p_overlays[i] != NULL) {
+            vout_FlushSubpictureChannel(p_sys->p_vout,
+                                        p_sys->p_overlays[i]->p_pic->i_channel);
+            blurayCleanOverlayStruct(p_sys->p_overlays[i]);
+            p_sys->p_overlays[i] = NULL;
         }
-        var_DelCallback(p_sys->p_vout, "mouse-moved", &onMouseEvent, p_demux);
-        var_DelCallback(p_sys->p_vout, "mouse-clicked", &onMouseEvent, p_demux);
-        vlc_object_release(p_sys->p_vout);
-        p_sys->p_vout = NULL;
     }
+    var_DelCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
+    var_DelCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
+    vlc_object_release(p_sys->p_vout);
+    p_sys->p_vout = NULL;
 }
 
 /*
@@ -723,27 +724,27 @@ static void blurayCloseAllOverlays(demux_t *p_demux)
 static void blurayActivateOverlay(demux_t *p_demux, int plane)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    bluray_overlay_t *ov = p_sys->p_overlays[plane];
 
     /*
      * If the overlay is already displayed, mark the picture as outdated.
      * We must NOT use vout_PutSubpicture if a picture is already displayed.
      */
-    vlc_mutex_lock(&p_sys->p_overlays[plane]->lock);
-    if ((p_sys->p_overlays[plane]->status == Displayed ||
-            p_sys->p_overlays[plane]->status == Outdated)
-            && p_sys->p_vout) {
-        p_sys->p_overlays[plane]->status = Outdated;
-        vlc_mutex_unlock(&p_sys->p_overlays[plane]->lock);
+    vlc_mutex_lock(&ov->lock);
+    if (ov->status >= Displayed && p_sys->p_vout) {
+        ov->status = Outdated;
+        vlc_mutex_unlock(&ov->lock);
         return;
     }
+
     /*
      * Mark the overlay as available, but don't display it right now.
      * the blurayDemuxMenu will send it to vout, as it may be unavailable when
      * the overlay is computed
      */
     p_sys->current_overlay = plane;
-    p_sys->p_overlays[plane]->status = ToDisplay;
-    vlc_mutex_unlock(&p_sys->p_overlays[plane]->lock);
+    ov->status = ToDisplay;
+    vlc_mutex_unlock(&ov->lock);
 }
 
 static void blurayInitOverlay(demux_t *p_demux, int plane, int width, int height)
@@ -756,28 +757,30 @@ static void blurayInitOverlay(demux_t *p_demux, int plane, int width, int height
     if (unlikely(!p_sys->p_overlays[plane]))
         return;
 
+    bluray_overlay_t *ov = p_sys->p_overlays[plane];
+
     subpicture_updater_sys_t *p_upd_sys = malloc(sizeof(*p_upd_sys));
     if (unlikely(!p_upd_sys)) {
-        free(p_sys->p_overlays[plane]);
+        free(ov);
         p_sys->p_overlays[plane] = NULL;
         return;
     }
     /* two references: vout + demux */
-    p_sys->p_overlays[plane]->released_once = ATOMIC_FLAG_INIT;
+    ov->released_once = ATOMIC_FLAG_INIT;
 
-    p_upd_sys->p_overlay = p_sys->p_overlays[plane];
+    p_upd_sys->p_overlay = ov;
     subpicture_updater_t updater = {
         .pf_validate = subpictureUpdaterValidate,
         .pf_update   = subpictureUpdaterUpdate,
         .pf_destroy  = subpictureUpdaterDestroy,
         .p_sys       = p_upd_sys,
     };
-    vlc_mutex_init(&p_sys->p_overlays[plane]->lock);
-    p_sys->p_overlays[plane]->p_pic = subpicture_New(&updater);
-    p_sys->p_overlays[plane]->p_pic->i_original_picture_width = width;
-    p_sys->p_overlays[plane]->p_pic->i_original_picture_height = height;
-    p_sys->p_overlays[plane]->p_pic->b_ephemer = true;
-    p_sys->p_overlays[plane]->p_pic->b_absolute = true;
+    vlc_mutex_init(&ov->lock);
+    ov->p_pic = subpicture_New(&updater);
+    ov->p_pic->i_original_picture_width = width;
+    ov->p_pic->i_original_picture_height = height;
+    ov->p_pic->b_ephemer = true;
+    ov->p_pic->b_absolute = true;
 }
 
 /**
@@ -791,13 +794,15 @@ static void blurayInitOverlay(demux_t *p_demux, int plane, int width, int height
 static void blurayClearOverlay(demux_t *p_demux, int plane)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    bluray_overlay_t *ov = p_sys->p_overlays[plane];
 
-    vlc_mutex_lock(&p_sys->p_overlays[plane]->lock);
+    vlc_mutex_lock(&ov->lock);
 
-    subpicture_region_ChainDelete(p_sys->p_overlays[plane]->p_regions);
-    p_sys->p_overlays[plane]->p_regions = NULL;
-    p_sys->p_overlays[plane]->status = Outdated;
-    vlc_mutex_unlock(&p_sys->p_overlays[plane]->lock);
+    subpicture_region_ChainDelete(ov->p_regions);
+    ov->p_regions = NULL;
+    ov->status = Outdated;
+
+    vlc_mutex_unlock(&ov->lock);
 }
 
 /*
@@ -848,9 +853,8 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
     const BD_PG_RLE_ELEM *img = ov->img;
     for (int y = 0; y < ov->h; y++)
         for (int x = 0; x < ov->w;) {
-            memset(p_reg->p_picture->p[0].p_pixels +
-                   y * p_reg->p_picture->p[0].i_pitch + x,
-                   img->color, img->len);
+            plane_t *p = &p_reg->p_picture->p[0];
+            memset(&p->p_pixels[y * p->i_pitch + x], img->color, img->len);
             x += img->len;
             img++;
         }
@@ -904,24 +908,18 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
 /*
  * ARGB overlay (BD-J)
  */
-
 static void blurayInitArgbOverlay(demux_t *p_demux, int plane, int width, int height)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
     blurayInitOverlay(p_demux, plane, width, height);
 
-    /* If there is no region, create a new one. */
-    subpicture_region_t *p_reg = p_sys->p_overlays[plane]->p_regions;
-    if (!p_reg) {
+    if (!p_sys->p_overlays[plane]->p_regions) {
         video_format_t fmt;
         video_format_Init(&fmt, 0);
         video_format_Setup(&fmt, VLC_CODEC_RGBA, width, height, 1, 1);
 
-        p_reg = subpicture_region_New(&fmt);
-        p_reg->i_x = 0;
-        p_reg->i_y = 0;
-        p_sys->p_overlays[plane]->p_regions = p_reg;
+        p_sys->p_overlays[plane]->p_regions = subpicture_region_New(&fmt);
     }
 }
 
@@ -1366,9 +1364,11 @@ static int blurayDemux(demux_t *p_demux)
         }
 
         if (p_sys->current_overlay != -1) {
-            vlc_mutex_lock(&p_sys->p_overlays[p_sys->current_overlay]->lock);
-            if (p_sys->p_overlays[p_sys->current_overlay]->status == ToDisplay) {
-                vlc_mutex_unlock(&p_sys->p_overlays[p_sys->current_overlay]->lock);
+            bluray_overlay_t *ov = p_sys->p_overlays[p_sys->current_overlay];
+            vlc_mutex_lock(&ov->lock);
+            bool display = ov->status == ToDisplay;
+            vlc_mutex_unlock(&ov->lock);
+            if (display) {
                 if (p_sys->p_vout == NULL)
                     p_sys->p_vout = input_GetVout(p_sys->p_input);
                 if (p_sys->p_vout != NULL) {
@@ -1376,8 +1376,7 @@ static int blurayDemux(demux_t *p_demux)
                     var_AddCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
                     bluraySendOverlayToVout(p_demux);
                 }
-            } else
-                vlc_mutex_unlock(&p_sys->p_overlays[p_sys->current_overlay]->lock);
+            }
         }
     }
 
