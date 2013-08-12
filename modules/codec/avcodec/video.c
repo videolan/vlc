@@ -943,6 +943,7 @@ static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
                                    AVFrame *frame, int flags)
 {
     decoder_t *dec = (decoder_t *)ctx->opaque;
+    decoder_sys_t *sys = dec->p_sys;
 
     if (GetVlcChroma(&dec->fmt_out.video, ctx->pix_fmt) != VLC_SUCCESS)
         return NULL;
@@ -963,15 +964,17 @@ static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
     /* Check that the picture is suitable for libavcodec */
     if (pic->p[0].i_pitch < width * pic->p[0].i_pixel_pitch)
     {
-        msg_Dbg(dec, "plane 0: pitch too small (%d/%d*%d)",
-                pic->p[0].i_pitch, width, pic->p[0].i_pixel_pitch);
+        if (sys->i_direct_rendering_used != 0)
+            msg_Dbg(dec, "plane 0: pitch too small (%d/%d*%d)",
+                    pic->p[0].i_pitch, width, pic->p[0].i_pixel_pitch);
         goto no_dr;
     }
 
     if (pic->p[0].i_lines < height)
     {
-        msg_Dbg(dec, "plane 0: lines too few (%d/%d)",
-                pic->p[0].i_lines, height);
+        if (sys->i_direct_rendering_used != 0)
+            msg_Dbg(dec, "plane 0: lines too few (%d/%d)",
+                    pic->p[0].i_lines, height);
         goto no_dr;
     }
 
@@ -979,13 +982,15 @@ static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
     {
         if (pic->p[i].i_pitch % aligns[i])
         {
-            msg_Dbg(dec, "plane %d: pitch not aligned (%d%%%d)",
-                    i, pic->p[i].i_pitch, aligns[i]);
+            if (sys->i_direct_rendering_used != 0)
+                msg_Dbg(dec, "plane %d: pitch not aligned (%d%%%d)",
+                        i, pic->p[i].i_pitch, aligns[i]);
             goto no_dr;
         }
         if (((uintptr_t)pic->p[i].p_pixels) % aligns[i])
         {
-            msg_Warn(dec, "plane %d not aligned", i);
+            if (sys->i_direct_rendering_used != 0)
+                msg_Warn(dec, "plane %d not aligned", i);
             goto no_dr;
         }
     }
