@@ -639,6 +639,7 @@ static void blurayCleanOverlayStruct(bluray_overlay_t *);
 static void subpictureUpdaterDestroy(subpicture_t *p_subpic)
 {
     blurayCleanOverlayStruct(p_subpic->updater.p_sys->p_overlay);
+    free(p_subpic->updater.p_sys);
 }
 
 /*****************************************************************************
@@ -685,7 +686,7 @@ static void blurayCleanOverlayStruct(bluray_overlay_t *p_overlay)
      * Don't delete it again from here!
      */
     vlc_mutex_destroy(&p_overlay->lock);
-    subpicture_region_Delete(p_overlay->p_regions);
+    subpicture_region_ChainDelete(p_overlay->p_regions);
     free(p_overlay);
 }
 
@@ -697,7 +698,7 @@ static void blurayCloseAllOverlays(demux_t *p_demux)
     if (!p_sys->p_vout)
         return;
 
-    for (int i = 0; i < 0; i++) {
+    for (int i = 0; i < MAX_OVERLAY; i++) {
         if (p_sys->p_overlays[i] != NULL) {
             vout_FlushSubpictureChannel(p_sys->p_vout,
                                         p_sys->p_overlays[i]->p_pic->i_channel);
