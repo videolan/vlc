@@ -278,6 +278,7 @@ static int blurayOpen(vlc_object_t *object)
 
     /* AACS */
     if (disc_info->aacs_detected) {
+        msg_Dbg(p_demux, "Disc is using AACS");
         if (!disc_info->libaacs_detected)
             BLURAY_ERROR(_("This Blu-ray Disc needs a library for AACS decoding"
                       ", and your system does not have it."));
@@ -309,6 +310,7 @@ static int blurayOpen(vlc_object_t *object)
 
     /* BD+ */
     if (disc_info->bdplus_detected) {
+        msg_Dbg(p_demux, "Disc is using BD+");
         if (!disc_info->libbdplus_detected)
             BLURAY_ERROR(_("This Blu-ray Disc needs a library for BD+ decoding"
                       ", and your system does not have it."));
