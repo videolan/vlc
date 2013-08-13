@@ -145,24 +145,18 @@ int AccessOpen( vlc_object_t *p_this )
     }
 
     /* Define IO functions */
-    zlib_filefunc_def *p_func = (zlib_filefunc_def*)
-                                    calloc( 1, sizeof( zlib_filefunc_def ) );
-    if( unlikely( !p_func ) )
-    {
-        i_ret = VLC_ENOMEM;
-        goto exit;
-    }
-    p_func->zopen_file   = ZipIO_Open;
-    p_func->zread_file   = ZipIO_Read;
-    p_func->zwrite_file  = ZipIO_Write; // see comment
-    p_func->ztell_file   = ZipIO_Tell;
-    p_func->zseek_file   = ZipIO_Seek;
-    p_func->zclose_file  = ZipIO_Close;
-    p_func->zerror_file  = ZipIO_Error;
-    p_func->opaque       = p_access;
+    zlib_filefunc_def func;
+    func.zopen_file   = ZipIO_Open;
+    func.zread_file   = ZipIO_Read;
+    func.zwrite_file  = ZipIO_Write; // see comment
+    func.ztell_file   = ZipIO_Tell;
+    func.zseek_file   = ZipIO_Seek;
+    func.zclose_file  = ZipIO_Close;
+    func.zerror_file  = ZipIO_Error;
+    func.opaque       = p_access;
 
     /* Open zip archive */
-    p_access->p_sys->zipFile = unzOpen2( psz_pathToZip, p_func );
+    p_access->p_sys->zipFile = unzOpen2( psz_pathToZip, &func );
     if( !p_access->p_sys->zipFile )
     {
         msg_Err( p_access, "not a valid zip archive: '%s'", psz_pathToZip );
