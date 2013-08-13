@@ -15,6 +15,7 @@ gmp: gmp-$(GMP_VERSION).tar.bz2 .sum-gmp
 	$(UNPACK)
 	$(APPLY) $(SRC)/gmp/inline.diff
 	$(APPLY) $(SRC)/gmp/arm.diff
+	$(APPLY) $(SRC)/gmp/mips.diff
 	$(APPLY) $(SRC)/gmp/ansitest.diff
 	$(APPLY) $(SRC)/gmp/ansi2knr.diff
 	$(MOVE)
