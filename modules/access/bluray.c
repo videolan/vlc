@@ -47,6 +47,11 @@
 #include <vlc_dialog.h>                     /* BD+/AACS warnings */
 #include <vlc_vout.h>                       /* vout_PutSubpicture / subpicture_t */
 #include <vlc_url.h>                        /* vlc_path2uri */
+#include <vlc_iso_lang.h>
+
+/* FIXME we should find a better way than including that */
+#include "../../src/text/iso-639_def.h"
+
 
 #include <libbluray/bluray.h>
 #include <libbluray/keys.h>
@@ -70,6 +75,7 @@ static const char *const ppsz_region_code_text[] = {
     "Region A", "Region B", "Region C" };
 
 #define REGION_DEFAULT   1   /* Index to region list. Actual region code is (1<<REGION_DEFAULT) */
+#define LANGUAGE_DEFAULT ("eng")
 
 /* Callbacks */
 static int  blurayOpen (vlc_object_t *);
@@ -147,6 +153,43 @@ struct subpicture_updater_sys_t
 {
     bluray_overlay_t    *p_overlay;
 };
+
+/* Get a 3 char code
+ * FIXME: partiallyy duplicated from src/input/es_out.c
+ */
+static const char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var )
+{
+    const iso639_lang_t *pl;
+    char *psz_lang;
+    char *p;
+
+    psz_lang = var_CreateGetString( p_demux, psz_var );
+    if( !psz_lang )
+        return LANGUAGE_DEFAULT;
+
+    /* XXX: we will use only the first value
+     * (and ignore other ones in case of a list) */
+    if( ( p = strchr( psz_lang, ',' ) ) )
+        *p = '\0';
+
+    for( pl = p_languages; pl->psz_eng_name != NULL; pl++ )
+    {
+        if( *psz_lang == '\0' )
+            continue;
+        if( !strcasecmp( pl->psz_eng_name, psz_lang ) ||
+            !strcasecmp( pl->psz_iso639_1, psz_lang ) ||
+            !strcasecmp( pl->psz_iso639_2T, psz_lang ) ||
+            !strcasecmp( pl->psz_iso639_2B, psz_lang ) )
+            break;
+    }
+
+    free( psz_lang );
+
+    if( pl->psz_eng_name != NULL )
+        return pl->psz_iso639_2T;
+
+    return LANGUAGE_DEFAULT;
+}
 
 /*****************************************************************************
  * Local prototypes
@@ -324,6 +367,14 @@ static int blurayOpen(vlc_object_t *object)
     unsigned int region = psz_region ? (psz_region[0] - 'A') : REGION_DEFAULT;
     free(psz_region);
     bd_set_player_setting(p_sys->bluray, BLURAY_PLAYER_SETTING_REGION_CODE, 1<<region);
+
+    /* set preferred languages */
+    const char *psz_code = DemuxGetLanguageCode( p_demux, "audio-language" );
+    bd_set_player_setting_str(p_sys->bluray, BLURAY_PLAYER_SETTING_AUDIO_LANG, psz_code);
+    psz_code = DemuxGetLanguageCode( p_demux, "sub-language" );
+    bd_set_player_setting_str(p_sys->bluray, BLURAY_PLAYER_SETTING_PG_LANG,    psz_code);
+    psz_code = DemuxGetLanguageCode( p_demux, "menu-language" );
+    bd_set_player_setting_str(p_sys->bluray, BLURAY_PLAYER_SETTING_MENU_LANG,  psz_code);
 
     /* Get titles and chapters */
     p_sys->p_meta = bd_get_meta(p_sys->bluray);
