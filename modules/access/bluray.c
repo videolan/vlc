@@ -123,6 +123,7 @@ struct  demux_sys_t
     /* Titles */
     unsigned int        i_title;
     unsigned int        i_longest_title;
+    int                 i_playlist;          /* -1 = no playlist playing */
     unsigned int        i_current_clip;
     input_title_t       **pp_title;
 
@@ -1149,6 +1150,19 @@ static void blurayUpdateTitle(demux_t *p_demux, unsigned i_title)
     p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
 }
 
+static void blurayUpdatePlaylist(demux_t *p_demux, unsigned i_playlist)
+{
+    blurayResetParser(p_demux);
+
+    p_demux->p_sys->i_playlist = i_playlist;
+    p_demux->p_sys->i_current_clip = 0;
+
+    /* read title info and init some values */
+    p_demux->info.i_title = bd_get_current_title(p_demux->p_sys->bluray);
+    p_demux->info.i_seekpoint = 0;
+    p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+}
+
 /*****************************************************************************
  * bluraySetTitle: select new BD title
  *****************************************************************************/
@@ -1165,7 +1179,7 @@ static int bluraySetTitle(demux_t *p_demux, int i_title)
     msg_Dbg(p_demux, "Selecting Title %i", i_title);
 
     if (bd_select_title(p_demux->p_sys->bluray, i_title) == 0) {
-        msg_Err(p_demux, "cannot select bd title '%d'", p_demux->info.i_title);
+        msg_Err(p_demux, "cannot select bd title '%d'", i_title);
         return VLC_EGENERIC;
     }
     blurayUpdateTitle(p_demux, i_title);
@@ -1333,8 +1347,7 @@ static void blurayUpdateCurrentClip(demux_t *p_demux, uint32_t clip)
     demux_sys_t *p_sys = p_demux->p_sys;
 
     p_sys->i_current_clip = clip;
-    BLURAY_TITLE_INFO *info = bd_get_title_info(p_sys->bluray,
-                                        bd_get_current_title(p_sys->bluray), 0);
+    BLURAY_TITLE_INFO *info = bd_get_playlist_info(p_sys->bluray, p_sys->i_playlist, 0);
     if (info == NULL)
         return ;
     /* Let's assume a single video track for now.
@@ -1351,7 +1364,13 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
 
     switch (e->event) {
     case BD_EVENT_TITLE:
-        blurayUpdateTitle(p_demux, e->param);
+        /* this is feature title, we don't know yet which playlist it will play (if any) */
+        p_sys->i_playlist = -1;
+        /* reset title infos here ? */
+        break;
+    case BD_EVENT_PLAYLIST:
+        /* Start of playlist playback (?????.mpls) */
+        blurayUpdatePlaylist(p_demux, e->param);
         break;
     case BD_EVENT_PLAYITEM:
         blurayUpdateCurrentClip(p_demux, e->param);
@@ -1359,8 +1378,7 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
     case BD_EVENT_AUDIO_STREAM:
         if (e->param == 0xFF)
             break ;
-        BLURAY_TITLE_INFO *info = bd_get_title_info(p_sys->bluray,
-                                   bd_get_current_title(p_sys->bluray), 0);
+        BLURAY_TITLE_INFO *info = bd_get_playlist_info(p_sys->bluray, p_sys->i_playlist, 0);
         if (info == NULL)
             break ;
         /* The param we get is the real stream id, not an index, ie. it starts from 1 */
