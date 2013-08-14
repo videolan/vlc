@@ -200,7 +200,7 @@ static es_out_t *esOutNew(demux_t *p_demux);
 static int   blurayControl(demux_t *, int, va_list);
 static int   blurayDemux(demux_t *);
 
-static void  blurayInitTitles(demux_t *p_demux);
+static void  blurayInitTitles(demux_t *p_demux, int menu_titles);
 static int   bluraySetTitle(demux_t *p_demux, int i_title);
 
 static void  blurayOverlayProc(void *ptr, const BD_OVERLAY * const overlay);
@@ -382,14 +382,15 @@ static int blurayOpen(vlc_object_t *object)
     if (!p_sys->p_meta)
         msg_Warn(p_demux, "Failed to get meta info.");
 
-    blurayInitTitles(p_demux);
+    p_sys->b_menu = var_InheritBool(p_demux, "bluray-menu");
+
+    blurayInitTitles(p_demux, disc_info->num_hdmv_titles + disc_info->num_bdj_titles + 1/*Top Menu*/ + 1/*First Play*/);
 
     /*
      * Initialize the event queue, so we can receive events in blurayDemux(Menu).
      */
     bd_get_event(p_sys->bluray, NULL);
 
-    p_sys->b_menu = var_InheritBool(p_demux, "bluray-menu");
     if (p_sys->b_menu) {
         p_sys->p_input = demux_GetParentInput(p_demux);
         if (unlikely(!p_sys->p_input)) {
@@ -1078,46 +1079,66 @@ static void bluraySendOverlayToVout(demux_t *p_demux)
     p_sys->p_overlays[p_sys->current_overlay]->status = Outdated;
 }
 
-static void blurayInitTitles(demux_t *p_demux)
+static void blurayUpdateTitleInfo(demux_t *p_demux, input_title_t *t, int i_title_idx, int i_playlist)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    BLURAY_TITLE_INFO *title_info = NULL;
 
-    /* get and set the titles */
-    unsigned i_title = bd_get_titles(p_sys->bluray, TITLES_RELEVANT, 60);
-    int64_t duration = 0;
+    if (i_playlist >= 0)
+        title_info = bd_get_playlist_info(p_sys->bluray, i_playlist, 0);
+    else if (i_title_idx >= 0)
+        title_info = bd_get_title_info(p_sys->bluray, i_title_idx, 0);
+    if (!title_info) {
+        return;
+    }
 
-    for (unsigned int i = 0; i < i_title; i++) {
-        input_title_t *t = vlc_input_title_New();
-        if (!t)
-            break;
+    t->i_length = FROM_TICKS(title_info->duration);
 
-        BLURAY_TITLE_INFO *title_info = bd_get_title_info(p_sys->bluray, i, 0);
-        if (!title_info) {
-            vlc_input_title_Delete(t);
-            break;
-        }
-
-        t->i_length = FROM_TICKS(title_info->duration);
-
+    if (!t->i_seekpoint) {
         for (unsigned int j = 0; j < title_info->chapter_count; j++) {
             seekpoint_t *s = vlc_seekpoint_New();
             if (!s) {
-                bd_free_title_info(title_info);
-                vlc_input_title_Delete(t);
                 break;
             }
             s->i_time_offset = title_info->chapters[j].offset;
 
             TAB_APPEND(t->i_seekpoint, t->seekpoint, s);
         }
+    }
 
-        if (t->i_length > duration) {
-            duration = t->i_length;
-            p_sys->i_longest_title = i;
+    bd_free_title_info(title_info);
+}
+
+static void blurayInitTitles(demux_t *p_demux, int menu_titles)
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int64_t duration = 0;
+
+    /* get and set the titles */
+    unsigned i_title = menu_titles;
+
+    if (!p_sys->b_menu)
+        i_title = bd_get_titles(p_sys->bluray, TITLES_RELEVANT, 60);
+
+    for (unsigned int i = 0; i < i_title; i++) {
+        input_title_t *t = vlc_input_title_New();
+        if (!t)
+            break;
+
+        if (!p_sys->b_menu) {
+            blurayUpdateTitleInfo(p_demux, t, i, -1);
+
+            if (t->i_length > duration) {
+                duration = t->i_length;
+                p_sys->i_longest_title = i;
+            }
+        } else if (i == 0) {
+            t->psz_name = strdup(_("Top Menu"));
+        } else if (i == i_title - 1) {
+            t->psz_name = strdup(_("First Play"));
         }
 
         TAB_APPEND(p_sys->i_title, p_sys->pp_title, t);
-        bd_free_title_info(title_info);
     }
 }
 
@@ -1158,9 +1179,12 @@ static void blurayUpdatePlaylist(demux_t *p_demux, unsigned i_playlist)
     p_demux->p_sys->i_current_clip = 0;
 
     /* read title info and init some values */
-    p_demux->info.i_title = bd_get_current_title(p_demux->p_sys->bluray);
+    if (!p_demux->p_sys->b_menu)
+        p_demux->info.i_title = bd_get_current_title(p_demux->p_sys->bluray);
     p_demux->info.i_seekpoint = 0;
     p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+
+    blurayUpdateTitleInfo(p_demux, p_demux->p_sys->pp_title[p_demux->info.i_title], -1, i_playlist);
 }
 
 /*****************************************************************************
@@ -1169,6 +1193,24 @@ static void blurayUpdatePlaylist(demux_t *p_demux, unsigned i_playlist)
 static int bluraySetTitle(demux_t *p_demux, int i_title)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+
+    if (p_sys->b_menu) {
+        if (i_title <= 0) {
+            msg_Dbg(p_demux, "Playing TopMenu Title");
+        } else if (i_title >= (int)p_sys->i_title - 1) {
+            msg_Dbg(p_demux, "Playing FirstPlay Title");
+            i_title = BLURAY_TITLE_FIRST_PLAY;
+        } else {
+            msg_Dbg(p_demux, "Playing Title %i", i_title);
+        }
+
+        if (bd_play_title(p_demux->p_sys->bluray, i_title) == 0) {
+            msg_Err(p_demux, "cannot play bd title '%d'", i_title);
+            return VLC_EGENERIC;
+        }
+
+        return VLC_SUCCESS;
+    }
 
     /* Looking for the main title, ie the longest duration */
     if (i_title < 0)
@@ -1364,9 +1406,14 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
 
     switch (e->event) {
     case BD_EVENT_TITLE:
+        if (e->param == BLURAY_TITLE_FIRST_PLAY)
+            p_demux->info.i_title = p_sys->i_title - 1;
+        else
+            p_demux->info.i_title = e->param;
         /* this is feature title, we don't know yet which playlist it will play (if any) */
         p_sys->i_playlist = -1;
         /* reset title infos here ? */
+        p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT; /* might be BD-J title with no video */
         break;
     case BD_EVENT_PLAYLIST:
         /* Start of playlist playback (?????.mpls) */
