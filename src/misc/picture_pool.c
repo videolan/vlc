@@ -33,7 +33,6 @@
 
 #include <vlc_common.h>
 #include <vlc_picture_pool.h>
-#include <vlc_atomic.h>
 
 /*****************************************************************************
  *
@@ -108,7 +107,7 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
         gc_sys->tick        = 0;
 
         /* */
-        vlc_atomic_set(&picture->gc.refcount, 0);
+        atomic_init(&picture->gc.refcount, 0);
         picture->gc.pf_destroy = Destroy;
         picture->gc.p_sys      = gc_sys;
 
@@ -166,7 +165,7 @@ picture_pool_t *picture_pool_Reserve(picture_pool_t *master, int count)
         if (master->picture_reserved[i])
             continue;
 
-        assert(vlc_atomic_get(&master->picture[i]->gc.refcount) == 0);
+        assert(atomic_load(&master->picture[i]->gc.refcount) == 0);
         master->picture_reserved[i] = true;
 
         pool->picture[found]          = master->picture[i];
@@ -192,11 +191,11 @@ void picture_pool_Delete(picture_pool_t *pool)
         } else {
             picture_gc_sys_t *gc_sys = picture->gc.p_sys;
 
-            assert(vlc_atomic_get(&picture->gc.refcount) == 0);
+            assert(atomic_load(&picture->gc.refcount) == 0);
             assert(!pool->picture_reserved[i]);
 
             /* Restore old release callback */
-            vlc_atomic_set(&picture->gc.refcount, 1);
+            atomic_init(&picture->gc.refcount, 1);
             picture->gc.pf_destroy = gc_sys->destroy;
             picture->gc.p_sys      = gc_sys->destroy_sys;
 
@@ -217,7 +216,7 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
             continue;
 
         picture_t *picture = pool->picture[i];
-        if (vlc_atomic_get(&picture->gc.refcount) > 0)
+        if (atomic_load(&picture->gc.refcount) > 0)
             continue;
 
         if (Lock(picture))
@@ -242,19 +241,19 @@ void picture_pool_NonEmpty(picture_pool_t *pool, bool reset)
 
         picture_t *picture = pool->picture[i];
         if (reset) {
-            if (vlc_atomic_get(&picture->gc.refcount) > 0)
+            if (atomic_load(&picture->gc.refcount) > 0)
                 Unlock(picture);
-            vlc_atomic_set(&picture->gc.refcount, 0);
-        } else if (vlc_atomic_get(&picture->gc.refcount) == 0) {
+            atomic_store(&picture->gc.refcount, 0);
+        } else if (atomic_load(&picture->gc.refcount) == 0) {
             return;
         } else if (!old || picture->gc.p_sys->tick < old->gc.p_sys->tick) {
             old = picture;
         }
     }
     if (!reset && old) {
-        if (vlc_atomic_get(&old->gc.refcount) > 0)
+        if (atomic_load(&old->gc.refcount) > 0)
             Unlock(old);
-        vlc_atomic_set(&old->gc.refcount, 0);
+        atomic_store(&old->gc.refcount, 0);
     }
 }
 int picture_pool_GetSize(picture_pool_t *pool)

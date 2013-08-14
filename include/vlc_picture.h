@@ -102,7 +102,7 @@ struct picture_t
     /** This way the picture_Release can be overloaded */
     struct
     {
-        vlc_atomic_t refcount;
+        atomic_uintptr_t refcount;
         void (*pf_destroy)( picture_t * );
         picture_gc_sys_t *p_sys;
     } gc;
