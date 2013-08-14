@@ -314,7 +314,7 @@ net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
             p_buf = (char *)p_buf + n;
             i_buflen -= n;
 
-            if (!waitall)
+            if (!waitall || i_buflen == 0)
                 break;
         }
         else /* n == 0 */
