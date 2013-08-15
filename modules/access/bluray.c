@@ -751,26 +751,20 @@ static void blurayCloseOverlay(demux_t *p_demux, int plane)
     bluray_overlay_t *ov = p_sys->p_overlays[plane];
 
     if (ov != NULL) {
-        vout_FlushSubpictureChannel(p_sys->p_vout, ov->p_pic->i_channel);
+        if (p_sys->p_vout)
+            vout_FlushSubpictureChannel(p_sys->p_vout, ov->p_pic->i_channel);
         blurayCleanOverlayStruct(ov);
         if (p_sys->current_overlay == plane)
             p_sys->current_overlay = -1;
+
+        p_sys->p_overlays[plane] = NULL;
     }
 
-    p_sys->p_overlays[plane] = NULL;
-}
-
-static void blurayCloseAllOverlays(demux_t *p_demux)
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    p_demux->p_sys->current_overlay = -1;
-    if (!p_sys->p_vout)
-        return;
-
     for (int i = 0; i < MAX_OVERLAY; i++)
-        blurayCloseOverlay(p_demux, i);
+        if (p_sys->p_overlays[i])
+            return;
 
+    /* All overlays have been closed */
     var_DelCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
     var_DelCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
     vlc_object_release(p_sys->p_vout);
@@ -941,10 +935,14 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
 static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
 {
     demux_t *p_demux = (demux_t*)ptr;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     if (!overlay) {
-        msg_Info(p_demux, "Closing overlay.");
-        blurayCloseAllOverlays(p_demux);
+        msg_Info(p_demux, "Closing overlays.");
+        p_sys->current_overlay = -1;
+        if (p_sys->p_vout)
+            for (int i = 0; i < MAX_OVERLAY; i++)
+                blurayCloseOverlay(p_demux, i);
         return;
     }
 
