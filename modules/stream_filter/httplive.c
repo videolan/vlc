@@ -2297,7 +2297,7 @@ static int Peek(stream_t *s, const uint8_t **pp_peek, unsigned int i_peek)
     size_t i_buff = segment->data->i_buffer;
     uint8_t *p_buff = segment->data->p_buffer;
 
-    if (i_peek < i_buff)
+    if ( likely(i_peek < i_buff))
     {
         *pp_peek = p_buff;
         vlc_mutex_unlock(&segment->lock);
