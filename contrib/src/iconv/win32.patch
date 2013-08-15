@@ -1,0 +1,17 @@
+--- iconv/srclib/stdio-write.c.orig	2013-08-15 11:50:20.508093720 +0200
++++ iconv/srclib/stdio-write.c	2013-08-15 11:51:36.344096864 +0200
+@@ -20,6 +20,14 @@
+ /* Specification.  */
+ #include <stdio.h>
+ 
++#ifdef _WIN32
++#include <winapifamily.h>
++
++#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++#define GetFileType(h) FILE_TYPE_UNKNOWN
++#endif
++#endif
++
+ /* Replace these functions only if module 'nonblocking' or module 'sigpipe' is
+    requested.  */
+ #if GNULIB_NONBLOCKING || GNULIB_SIGPIPE
