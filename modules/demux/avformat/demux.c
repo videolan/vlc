@@ -56,9 +56,6 @@
 
 //#define AVFORMAT_DEBUG 1
 
-/* Version checking */
-#if defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_AVFORMAT_H)
-
 # define HAVE_AVUTIL_CODEC_ATTACHMENT 1
 
 /*****************************************************************************
@@ -1035,5 +1032,3 @@ static int64_t IOSeek( void *opaque, int64_t offset, int whence )
 
     return stream_Tell( p_demux->s );
 }
-
-#endif /* HAVE_LIBAVFORMAT_AVFORMAT_H */
