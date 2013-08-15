@@ -30,6 +30,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_atomic.h>
 
 #include "libvlc.h"
 #include <stdarg.h>
@@ -43,18 +44,50 @@ static vlc_cond_t  super_variable;
 
 
 /*** Common helpers ***/
+#if VLC_WINSTORE_APP
+static bool isCancelled(void);
+#endif
+
 static DWORD vlc_WaitForMultipleObjects (DWORD count, const HANDLE *handles,
                                          DWORD delay)
 {
     DWORD ret;
     if (count == 0)
     {
+#if VLC_WINSTORE_APP
+        do {
+            DWORD new_delay = 50;
+            if (new_delay > delay)
+                new_delay = delay;
+            ret = SleepEx (new_delay, TRUE);
+            if (delay != INFINITE)
+                delay -= new_delay;
+            if (isCancelled())
+                ret = WAIT_IO_COMPLETION;
+        } while (delay && ret == 0);
+#else
         ret = SleepEx (delay, TRUE);
+#endif
+
         if (ret == 0)
             ret = WAIT_TIMEOUT;
     }
-    else
+    else {
+#if VLC_WINSTORE_APP
+        do {
+            DWORD new_delay = 50;
+            if (new_delay > delay)
+                new_delay = delay;
+            ret = WaitForMultipleObjectsEx (count, handles, FALSE, new_delay, TRUE);
+            if (delay != INFINITE)
+                delay -= new_delay;
+            if (isCancelled())
+                ret = WAIT_IO_COMPLETION;
+        } while (delay && ret == WAIT_TIMEOUT);
+#else
         ret = WaitForMultipleObjectsEx (count, handles, FALSE, delay, TRUE);
+#endif
+    }
 
     /* We do not abandon objects... this would be a bug */
     assert (ret < WAIT_ABANDONED_0 || WAIT_ABANDONED_0 + count - 1 < ret);
@@ -381,16 +414,27 @@ static vlc_threadvar_t thread_key;
 /** Per-thread data */
 struct vlc_thread
 {
-    HANDLE         id;
+    atomic_uintptr_t id;
 
     bool           detached;
     bool           killable;
-    bool           killed;
+    atomic_bool    killed;
     vlc_cleanup_t *cleaners;
 
     void        *(*entry) (void *);
     void          *data;
 };
+
+#if VLC_WINSTORE_APP
+static bool isCancelled(void)
+{
+    struct vlc_thread *th = vlc_threadvar_get (thread_key);
+    if (th == NULL)
+        return false; /* Main thread - cannot be cancelled anyway */
+
+    return atomic_load(&th->killed);
+}
+#endif
 
 static void vlc_thread_cleanup (struct vlc_thread *th)
 {
@@ -414,7 +458,12 @@ retry:
 
     if (th->detached)
     {
-        CloseHandle (th->id);
+        HANDLE h;
+        do
+            h = (HANDLE) atomic_load(&th->id);
+        while (unlikely(!h)); /* Loop until _beginthreadex has returned */
+
+        CloseHandle (h);
         free (th);
     }
 }
@@ -440,7 +489,8 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
     th->data = data;
     th->detached = detached;
     th->killable = false; /* not until vlc_entry() ! */
-    th->killed = false;
+    atomic_store(&th->killed, false);
+    atomic_store(&th->id, (uintptr_t) NULL);
     th->cleaners = NULL;
 
     HANDLE hThread;
@@ -450,7 +500,7 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
      * Knowledge Base, article 104641) */
     uintptr_t h;
 
-    h = _beginthreadex (NULL, 0, vlc_entry, th, CREATE_SUSPENDED, NULL);
+    h = _beginthreadex (NULL, 0, vlc_entry, th, 0, NULL);
     if (h == 0)
     {
         int err = errno;
@@ -459,15 +509,16 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
     }
     hThread = (HANDLE)h;
 
-    /* Thread is suspended, so we can safely set th->id */
-    th->id = hThread;
+    atomic_store(&th->id, (uintptr_t) hThread);
+
     if (p_handle != NULL)
         *p_handle = th;
 
+
+#if !VLC_WINSTORE_APP
     if (priority)
         SetThreadPriority (hThread, priority);
-
-    ResumeThread (hThread);
+#endif
 
     return 0;
 }
@@ -480,13 +531,15 @@ int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
 
 void vlc_join (vlc_thread_t th, void **result)
 {
+    HANDLE h = (HANDLE) atomic_load(&th->id);
+
     do
         vlc_testcancel ();
-    while (vlc_WaitForSingleObject (th->id, INFINITE) == WAIT_IO_COMPLETION);
+    while (vlc_WaitForSingleObject (h, INFINITE) == WAIT_IO_COMPLETION);
 
     if (result != NULL)
         *result = th->data;
-    CloseHandle (th->id);
+    CloseHandle (h);
     free (th);
 }
 
@@ -502,25 +555,30 @@ int vlc_clone_detach (vlc_thread_t *p_handle, void *(*entry) (void *),
 
 int vlc_set_priority (vlc_thread_t th, int priority)
 {
+#if !VLC_WINSTORE_APP
     if (!SetThreadPriority (th->id, priority))
         return VLC_EGENERIC;
+#endif
     return VLC_SUCCESS;
 }
 
 /*** Thread cancellation ***/
 
+#if !VLC_WINSTORE_APP
 /* APC procedure for thread cancellation */
-static void CALLBACK vlc_cancel_self (ULONG_PTR self)
+static void CALLBACK dummy_apc (ULONG_PTR self)
 {
-    struct vlc_thread *th = (void *)self;
-
-    if (likely(th != NULL))
-        th->killed = true;
+    (void)self;
+    /* Cancelled thread will wake up of alertable state */
 }
+#endif
 
 void vlc_cancel (vlc_thread_t th)
 {
-    QueueUserAPC (vlc_cancel_self, th->id, (uintptr_t)th);
+    atomic_store(&th->killed, true);
+#if !VLC_WINSTORE_APP
+    QueueUserAPC (dummy_apc, atomic_load(&th->id), 0);
+#endif
 }
 
 int vlc_savecancel (void)
@@ -552,7 +610,7 @@ void vlc_testcancel (void)
     if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
 
-    if (th->killable && th->killed)
+    if (th->killable && atomic_load(&th->killed))
     {
         for (vlc_cleanup_t *p = th->cleaners; p != NULL; p = p->next)
              p->proc (p->data);
