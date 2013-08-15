@@ -21,15 +21,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/* ffmpeg header */
-#if defined(HAVE_LIBAVFORMAT_AVFORMAT_H)
-#   include <libavformat/avformat.h>
-#   if defined(HAVE_LIBAVFORMAT_AVIO_H)
-#      include <libavformat/avio.h>
-#   endif
-#elif defined(HAVE_FFMPEG_AVFORMAT_H)
-#   include <ffmpeg/avformat.h>
-#endif
+#include <libavformat/avformat.h>
+#include <libavformat/avio.h>
+
 int  OpenAvio (vlc_object_t *);
 void CloseAvio(vlc_object_t *);
 int  OutOpenAvio (vlc_object_t *);
