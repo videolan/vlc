@@ -61,7 +61,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf )
     QTabWidget *audioTab = new QTabWidget( audioWidget );
 
     equal = new Equalizer( p_intf, audioTab );
-    audioTab->addTab( equal, qtr( "Graphic Equalizer" ) );
+    audioTab->addTab( equal, qtr( "Equalizer" ) );
 
     Compressor *compres = new Compressor( p_intf, audioTab );
     audioTab->addTab( compres, qtr( "Compressor" ) );
