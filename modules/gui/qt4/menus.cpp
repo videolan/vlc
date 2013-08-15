@@ -1565,7 +1565,8 @@ void VLCMenuBar::updateAudioDevice( intf_thread_t * p_intf, audio_output_t *p_ao
         action = new QAction( qfue( names[i] ), NULL );
         action->setData( ids[i] );
         action->setCheckable( true );
-        if( selected && !strcmp( ids[i], selected ) )
+        if( (selected && !strcmp( ids[i], selected ) ) ||
+            (selected == NULL && ids[i] && ids[i][0] == '\0' ) )
             action->setChecked( true );
         actionGroup->addAction( action );
         current->addAction( action );
