@@ -5,12 +5,18 @@ Access:
  * Added TLS support for ftp access and sout access.
    New schemes for implicit (ftps) and explicit (ftpes) modes.
 
+Decoders:
+ * Partial support for Voxware MetaSound
+
 Video Output:
  * Direct rendering and filtering for VDPAU hardware acceleration
 
 Video Filter:
  * New Oldmovie effect filter
  * New VHS effect filter
+
+libVLC:
+ * add equalizer API libvlc_audio_equalizer_* functions
 
 Removed modules:
  * ios video output: use ios2
