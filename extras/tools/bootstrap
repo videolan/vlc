@@ -56,7 +56,7 @@ fi
 
 check autoconf 2.67
 check automake 1.11
-check m4
+check m4 1.4.16
 check libtool 2.2
 check pkg-config
 check cmake

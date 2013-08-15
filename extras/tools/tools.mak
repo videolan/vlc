@@ -171,7 +171,7 @@ m4: m4-$(M4_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
-.m4: m4 .autoconf
+.m4: m4
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
 	touch $@
 
