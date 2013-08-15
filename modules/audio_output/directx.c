@@ -765,7 +765,8 @@ static int CALLBACK DeviceEnumCallback( LPGUID guid, LPCWSTR desc,
     ds_list_t *list = data;
     OLECHAR buf[48];
 
-    StringFromGUID2( guid, buf, 48 );
+    if( StringFromGUID2( guid, buf, 48 ) <= 0 )
+        return true;
 
     list->count++;
     list->ids = xrealloc( list->ids, list->count * sizeof(char *) );
