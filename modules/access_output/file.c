@@ -34,6 +34,9 @@
 #include <time.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -240,6 +243,17 @@ static int Control( sout_access_out_t *p_access, int i_query, va_list args )
         {
             bool *pb = va_arg( args, bool * );
             *pb = strcmp( p_access->psz_access, "stream" );
+            break;
+        }
+
+        case ACCESS_OUT_CAN_SEEK:
+        {
+            bool *pb = va_arg( args, bool * );
+            struct stat st;
+            if( fstat( (intptr_t)p_access->p_sys, &st ) == -1 )
+                *pb = false;
+            else
+                *pb = S_ISREG( st.st_mode ) || S_ISBLK( st.st_mode );
             break;
         }
 

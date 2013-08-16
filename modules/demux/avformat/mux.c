@@ -118,9 +118,12 @@ int OpenMux( vlc_object_t *p_this )
     p_sys->io_buffer_size = 32768;  /* FIXME */
     p_sys->io_buffer = malloc( p_sys->io_buffer_size );
 
+    bool b_can_seek;
+    if( sout_AccessOutControl( p_mux->p_access, ACCESS_OUT_CAN_SEEK, &b_can_seek ) )
+        b_can_seek = false;
     p_sys->io = avio_alloc_context(
         p_sys->io_buffer, p_sys->io_buffer_size,
-        1, p_mux, NULL, IOWrite, IOSeek );
+        1, p_mux, NULL, IOWrite, b_can_seek ? IOSeek : NULL );
 
     p_sys->oc->pb = p_sys->io;
     p_sys->oc->nb_streams = 0;
