@@ -115,7 +115,7 @@ int OpenMux( vlc_object_t *p_this )
         strcpy( p_sys->oc->filename, p_mux->p_access->psz_path );
 
     /* Create I/O wrapper */
-    p_sys->io_buffer_size = 32768;  /* FIXME */
+    p_sys->io_buffer_size = 10 * 1024 * 1024;  /* FIXME */
     p_sys->io_buffer = malloc( p_sys->io_buffer_size );
 
     bool b_can_seek;
