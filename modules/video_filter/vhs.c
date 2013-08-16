@@ -86,23 +86,23 @@ struct filter_sys_t {
  * Prototypes
  *****************************************************************************/
 
-picture_t *Filter( filter_t *, picture_t * );
+static picture_t *Filter( filter_t *, picture_t * );
 
-int  vhs_allocate_data( filter_t *, picture_t * );
-void vhs_free_allocated_data( filter_t * );
+static int  vhs_allocate_data( filter_t *, picture_t * );
+static void vhs_free_allocated_data( filter_t * );
 
-int  vhs_blue_red_line_effect( filter_t *, picture_t * );
-void vhs_blue_red_dots_effect( filter_t *, picture_t * );
-int  vhs_sliding_effect( filter_t *, picture_t * );
+static int  vhs_blue_red_line_effect( filter_t *, picture_t * );
+static void vhs_blue_red_dots_effect( filter_t *, picture_t * );
+static int  vhs_sliding_effect( filter_t *, picture_t * );
 
-int  vhs_sliding_effect_apply( filter_t *, picture_t * );
+static int  vhs_sliding_effect_apply( filter_t *, picture_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 
-int  Open ( vlc_object_t * );
-void Close( vlc_object_t * );
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
 vlc_module_begin()
     set_description( N_("VHS movie effect video filter") )
@@ -117,7 +117,7 @@ vlc_module_end()
 /**
  * Open the filter
  */
-int Open( vlc_object_t *p_this )
+static int Open( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys;
@@ -155,7 +155,7 @@ int Open( vlc_object_t *p_this )
 /**
  * Close the filter
  */
-void Close( vlc_object_t *p_this ) {
+static void Close( vlc_object_t *p_this ) {
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -167,7 +167,7 @@ void Close( vlc_object_t *p_this ) {
 /**
  * Filter a picture
  */
-picture_t *Filter( filter_t *p_filter, picture_t *p_pic_in ) {
+static picture_t *Filter( filter_t *p_filter, picture_t *p_pic_in ) {
     if( unlikely( !p_pic_in || !p_filter) )
         return NULL;
 
@@ -217,7 +217,7 @@ picture_t *Filter( filter_t *p_filter, picture_t *p_pic_in ) {
 /*
  * Allocate data
  */
-int vhs_allocate_data( filter_t *p_filter, picture_t *p_pic_in ) {
+static int vhs_allocate_data( filter_t *p_filter, picture_t *p_pic_in ) {
     filter_sys_t *p_sys = p_filter->p_sys;
 
     vhs_free_allocated_data( p_filter );
@@ -246,7 +246,7 @@ int vhs_allocate_data( filter_t *p_filter, picture_t *p_pic_in ) {
 /**
  * Free allocated data
  */
-void vhs_free_allocated_data( filter_t *p_filter ) {
+static void vhs_free_allocated_data( filter_t *p_filter ) {
     filter_sys_t *p_sys = p_filter->p_sys;
 
     for ( uint32_t i_b = 0; i_b < MAX_BLUE_RED_LINES; i_b++ )
@@ -262,7 +262,7 @@ void vhs_free_allocated_data( filter_t *p_filter ) {
 /**
  * Horizontal blue or red lines random management and effect
  */
-int vhs_blue_red_line_effect( filter_t *p_filter, picture_t *p_pic_out ) {
+static int vhs_blue_red_line_effect( filter_t *p_filter, picture_t *p_pic_out ) {
     filter_sys_t *p_sys = p_filter->p_sys;
 
 #define BR_LINES_GENERATOR_PERIOD ( TIME_UNIT_PER_S * 50 )
@@ -337,7 +337,7 @@ int vhs_blue_red_line_effect( filter_t *p_filter, picture_t *p_pic_out ) {
 /**
  * insert randomly blue and red dots on the picture
  */
-void vhs_blue_red_dots_effect( filter_t *p_filter, picture_t *p_pic_out ) {
+static void vhs_blue_red_dots_effect( filter_t *p_filter, picture_t *p_pic_out ) {
 #define BR_DOTS_RATIO 10000
 
     filter_sys_t *p_sys = p_filter->p_sys;
@@ -389,7 +389,7 @@ void vhs_blue_red_dots_effect( filter_t *p_filter, picture_t *p_pic_out ) {
 /**
 * sliding effects
 */
-int vhs_sliding_effect( filter_t *p_filter, picture_t *p_pic_out ) {
+static int vhs_sliding_effect( filter_t *p_filter, picture_t *p_pic_out ) {
     filter_sys_t *p_sys = p_filter->p_sys;
 
     /**
@@ -498,7 +498,7 @@ int vhs_sliding_effect( filter_t *p_filter, picture_t *p_pic_out ) {
 /**
 * apply both sliding and offset effect
 */
-int vhs_sliding_effect_apply( filter_t *p_filter, picture_t *p_pic_out )
+static int vhs_sliding_effect_apply( filter_t *p_filter, picture_t *p_pic_out )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
