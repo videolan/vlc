@@ -1157,7 +1157,10 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
                 p_sys->p_context->sample_fmt, p_sys->b_planar ? p_sys->p_interleave_buf : p_sys->p_buffer,
                 leftover + buffer_delay,
                 align) < 0 )
+        {
             msg_Err( p_enc, "filling error on fillup" );
+            p_sys->frame->nb_samples = 0;
+        }
 
         buffer_delay = 0;
         p_sys->i_samples_delay = 0;
@@ -1250,7 +1253,10 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
                                     p_sys->b_planar ? p_sys->p_buffer : p_aout_buf->p_buffer,
                                     __MIN(p_sys->i_buffer_out, p_aout_buf->i_buffer),
                                     align) < 0 )
+        {
                  msg_Err( p_enc, "filling error on encode" );
+                 p_sys->frame->nb_samples = 0;
+        }
 
         p_aout_buf->p_buffer     += (p_sys->frame->nb_samples * p_enc->fmt_in.audio.i_channels * p_sys->i_sample_bytes);
         p_aout_buf->i_buffer     -= (p_sys->frame->nb_samples * p_enc->fmt_in.audio.i_channels * p_sys->i_sample_bytes);
