@@ -148,6 +148,7 @@ DIR *vlc_opendir (const char *dirname)
         return NULL;
     }
 
+#if !VLC_WINSTORE_APP
     /* Special mode to list drive letters */
     if (wpath[0] == L'\0' || (wcscmp (wpath, L"\\") == 0))
     {
@@ -156,6 +157,7 @@ DIR *vlc_opendir (const char *dirname)
         p_dir->u.drives = GetLogicalDrives ();
         return (void *)p_dir;
     }
+#endif
 
     assert (wpath[0]); // wpath[1] is defined
     p_dir->u.insert_dot_dot = !wcscmp (wpath + 1, L":\\");
@@ -175,6 +177,7 @@ char *vlc_readdir (DIR *dir)
 {
     vlc_DIR *p_dir = (vlc_DIR *)dir;
 
+#if !VLC_WINSTORE_APP
     /* Drive letters mode */
     if (p_dir->wdir == NULL)
     {
@@ -193,6 +196,7 @@ char *vlc_readdir (DIR *dir)
             return NULL;
         return ret;
     }
+#endif
 
     if (p_dir->u.insert_dot_dot)
     {
