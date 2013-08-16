@@ -155,31 +155,31 @@ struct filter_sys_t {
  * Prototypes
  *****************************************************************************/
 
-picture_t *Filter( filter_t *, picture_t * );
+static picture_t *Filter( filter_t *, picture_t * );
 
-int  oldmovie_allocate_data( filter_t *, picture_t * );
-void oldmovie_free_allocated_data( filter_t * );
+static int  oldmovie_allocate_data( filter_t *, picture_t * );
+static void oldmovie_free_allocated_data( filter_t * );
 
-void oldmovie_shutter_effect( filter_t *, picture_t * );
-int  oldmovie_sliding_offset_effect( filter_t *, picture_t * );
-void oldmovie_black_n_white_effect( picture_t * );
-int  oldmovie_dark_border_effect( filter_t *, picture_t * );
-int  oldmovie_film_scratch_effect( filter_t *, picture_t * );
-void oldmovie_film_blotch_effect( filter_t *, picture_t * );
-void oldmovie_film_dust_effect( filter_t *, picture_t * );
-int  oldmovie_lens_hair_effect( filter_t *, picture_t * );
-int  oldmovie_lens_dust_effect( filter_t *, picture_t * );
+static void oldmovie_shutter_effect( filter_t *, picture_t * );
+static int  oldmovie_sliding_offset_effect( filter_t *, picture_t * );
+static void oldmovie_black_n_white_effect( picture_t * );
+static int  oldmovie_dark_border_effect( filter_t *, picture_t * );
+static int  oldmovie_film_scratch_effect( filter_t *, picture_t * );
+static void oldmovie_film_blotch_effect( filter_t *, picture_t * );
+static void oldmovie_film_dust_effect( filter_t *, picture_t * );
+static int  oldmovie_lens_hair_effect( filter_t *, picture_t * );
+static int  oldmovie_lens_dust_effect( filter_t *, picture_t * );
 
-void oldmovie_define_hair_location( filter_t *p_filter, hair_t* ps_hair );
-void oldmovie_define_dust_location( filter_t *p_filter, dust_t* ps_dust );
-int  oldmovie_sliding_offset_apply( filter_t *p_filter, picture_t *p_pic_out );
+static void oldmovie_define_hair_location( filter_t *p_filter, hair_t* ps_hair );
+static void oldmovie_define_dust_location( filter_t *p_filter, dust_t* ps_dust );
+static int  oldmovie_sliding_offset_apply( filter_t *p_filter, picture_t *p_pic_out );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 
-int  Open ( vlc_object_t * );
-void Close( vlc_object_t * );
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
 vlc_module_begin()
     set_description( N_("Old movie effect video filter") )
@@ -194,7 +194,7 @@ vlc_module_end()
 /**
  * Open the filter
  */
-int Open( vlc_object_t *p_this ) {
+static int Open( vlc_object_t *p_this ) {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
@@ -231,7 +231,7 @@ int Open( vlc_object_t *p_this ) {
 /**
  * Close the filter
  */
-void Close( vlc_object_t *p_this ) {
+static void Close( vlc_object_t *p_this ) {
     filter_t *p_filter  = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -243,7 +243,7 @@ void Close( vlc_object_t *p_this ) {
 /**
  * Filter a picture
  */
-picture_t *Filter( filter_t *p_filter, picture_t *p_pic_in ) {
+static picture_t *Filter( filter_t *p_filter, picture_t *p_pic_in ) {
     if( unlikely( !p_pic_in || !p_filter ) )
         return NULL;
 
@@ -308,7 +308,7 @@ picture_t *Filter( filter_t *p_filter, picture_t *p_pic_in ) {
 /*
  * Allocate data
  */
-int oldmovie_allocate_data( filter_t *p_filter, picture_t *p_pic_in ) {
+static int oldmovie_allocate_data( filter_t *p_filter, picture_t *p_pic_in ) {
     filter_sys_t *p_sys = p_filter->p_sys;
 
     oldmovie_free_allocated_data( p_filter );
@@ -338,7 +338,7 @@ int oldmovie_allocate_data( filter_t *p_filter, picture_t *p_pic_in ) {
 /**
  * Free allocated data
  */
-void oldmovie_free_allocated_data( filter_t *p_filter ) {
+static void oldmovie_free_allocated_data( filter_t *p_filter ) {
     filter_sys_t *p_sys = p_filter->p_sys;
 
     for ( uint32_t i_s = 0; i_s < MAX_SCRATCH; i_s++ )
@@ -359,7 +359,7 @@ void oldmovie_free_allocated_data( filter_t *p_filter ) {
 /**
  * Projector shutter effect
  */
-void oldmovie_shutter_effect( filter_t *p_filter, picture_t *p_pic_out ) {
+static void oldmovie_shutter_effect( filter_t *p_filter, picture_t *p_pic_out ) {
     filter_sys_t *p_sys = p_filter->p_sys;
 
 #define SHUTTER_FREQ      2
@@ -398,7 +398,7 @@ void oldmovie_shutter_effect( filter_t *p_filter, picture_t *p_pic_out ) {
 /**
  * sliding & offset effect
  */
-int oldmovie_sliding_offset_effect( filter_t *p_filter, picture_t *p_pic_out ) {
+static int oldmovie_sliding_offset_effect( filter_t *p_filter, picture_t *p_pic_out ) {
     filter_sys_t *p_sys = p_filter->p_sys;
 
 
@@ -489,7 +489,7 @@ int oldmovie_sliding_offset_effect( filter_t *p_filter, picture_t *p_pic_out ) {
 /**
 * apply both sliding and offset effect
 */
-int oldmovie_sliding_offset_apply( filter_t *p_filter, picture_t *p_pic_out )
+static int oldmovie_sliding_offset_apply( filter_t *p_filter, picture_t *p_pic_out )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -523,7 +523,7 @@ int oldmovie_sliding_offset_apply( filter_t *p_filter, picture_t *p_pic_out )
 /**
  * Black and white transform including a touch of sepia effect
  */
-void oldmovie_black_n_white_effect( picture_t *p_pic_out )
+static void oldmovie_black_n_white_effect( picture_t *p_pic_out )
 {
     for ( int32_t i_y = 0; i_y < p_pic_out->p[Y_PLANE].i_visible_lines; i_y++ )
         for ( int32_t i_x = 0; i_x < p_pic_out->p[Y_PLANE].i_visible_pitch;
@@ -543,7 +543,7 @@ void oldmovie_black_n_white_effect( picture_t *p_pic_out )
 /**
  * Smooth darker borders effect
  */
-int oldmovie_dark_border_effect( filter_t *p_filter, picture_t *p_pic_out )
+static int oldmovie_dark_border_effect( filter_t *p_filter, picture_t *p_pic_out )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -576,7 +576,7 @@ int oldmovie_dark_border_effect( filter_t *p_filter, picture_t *p_pic_out )
 /**
  * Vertical scratch random management and effect
  */
-int oldmovie_film_scratch_effect( filter_t *p_filter, picture_t *p_pic_out )
+static int oldmovie_film_scratch_effect( filter_t *p_filter, picture_t *p_pic_out )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -637,7 +637,7 @@ int oldmovie_film_scratch_effect( filter_t *p_filter, picture_t *p_pic_out )
  * Blotch addition
  *    bigger than dust but only during one frame (due to a local film damage)
  */
-void oldmovie_film_blotch_effect( filter_t *p_filter, picture_t *p_pic_out )
+static void oldmovie_film_blotch_effect( filter_t *p_filter, picture_t *p_pic_out )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -676,7 +676,7 @@ void oldmovie_film_blotch_effect( filter_t *p_filter, picture_t *p_pic_out )
 /**
  * Dust dots addition, visible during one frame only (film damages)
  */
-void oldmovie_film_dust_effect( filter_t *p_filter, picture_t *p_pic_out ) {
+static void oldmovie_film_dust_effect( filter_t *p_filter, picture_t *p_pic_out ) {
 #define ONESHOT_DUST_RATIO 1000
 
     filter_sys_t *p_sys = p_filter->p_sys;
@@ -707,7 +707,7 @@ void oldmovie_film_dust_effect( filter_t *p_filter, picture_t *p_pic_out ) {
  * Define hair location on the lens and timeout
  *
  */
-void oldmovie_define_hair_location( filter_t *p_filter, hair_t* ps_hair ) {
+static void oldmovie_define_hair_location( filter_t *p_filter, hair_t* ps_hair ) {
     filter_sys_t *p_sys = p_filter->p_sys;
 
     ps_hair->i_x = (unsigned)vlc_mrand48() % p_sys->i_width[Y_PLANE];
@@ -723,7 +723,7 @@ void oldmovie_define_hair_location( filter_t *p_filter, hair_t* ps_hair ) {
  * Show black hair on the screen
  *       after random duration it is removed or re-located
  */
-int oldmovie_lens_hair_effect( filter_t *p_filter, picture_t *p_pic_out ) {
+static int oldmovie_lens_hair_effect( filter_t *p_filter, picture_t *p_pic_out ) {
     filter_sys_t *p_sys = p_filter->p_sys;
 
     /* generate new hair */
@@ -797,7 +797,7 @@ int oldmovie_lens_hair_effect( filter_t *p_filter, picture_t *p_pic_out ) {
  * Define dust location on the lens and timeout
  *
  */
-void oldmovie_define_dust_location( filter_t *p_filter, dust_t* ps_dust ) {
+static void oldmovie_define_dust_location( filter_t *p_filter, dust_t* ps_dust ) {
     filter_sys_t *p_sys = p_filter->p_sys;
 
     ps_dust->i_x = (unsigned)vlc_mrand48() % p_sys->i_width[Y_PLANE];
@@ -820,7 +820,7 @@ void oldmovie_define_dust_location( filter_t *p_filter, dust_t* ps_dust ) {
  * Dust addition
  *    smaller than blotch but will remain on the screen for long time
  */
-int oldmovie_lens_dust_effect( filter_t *p_filter, picture_t *p_pic_out ) {
+static int oldmovie_lens_dust_effect( filter_t *p_filter, picture_t *p_pic_out ) {
     filter_sys_t *p_sys = p_filter->p_sys;
 
     /* generate new dust */
