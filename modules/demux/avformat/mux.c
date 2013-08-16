@@ -58,6 +58,7 @@ struct sout_mux_sys_t
     AVFormatContext *oc;
 
     bool     b_write_header;
+    bool     b_write_keyframe;
     bool     b_error;
 };
 
@@ -129,6 +130,7 @@ int OpenMux( vlc_object_t *p_this )
     p_sys->oc->nb_streams = 0;
 
     p_sys->b_write_header = true;
+    p_sys->b_write_keyframe = false;
     p_sys->b_error = false;
 
     /* Fill p_mux fields */
@@ -275,7 +277,17 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     pkt.size = p_data->i_buffer;
     pkt.stream_index = i_stream;
 
-    if( p_data->i_flags & BLOCK_FLAG_TYPE_I ) pkt.flags |= AV_PKT_FLAG_KEY;
+    if( p_data->i_flags & BLOCK_FLAG_TYPE_I )
+    {
+#ifdef AVFMT_ALLOW_FLUSH
+        /* Make sure we don't inadvertedly mark buffered data as keyframes. */
+        if( p_sys->oc->oformat->flags & AVFMT_ALLOW_FLUSH )
+            av_write_frame( p_sys->oc, NULL );
+#endif
+
+        p_sys->b_write_keyframe = true;
+        pkt.flags |= AV_PKT_FLAG_KEY;
+    }
 
     if( p_data->i_pts > 0 )
         pkt.pts = p_data->i_pts * p_stream->time_base.den /
@@ -401,6 +413,12 @@ static int IOWrite( void *opaque, uint8_t *buf, int buf_size )
 
     if( p_mux->p_sys->b_write_header )
         p_buf->i_flags |= BLOCK_FLAG_HEADER;
+
+    if( p_mux->p_sys->b_write_keyframe )
+    {
+        p_buf->i_flags |= BLOCK_FLAG_TYPE_I;
+        p_mux->p_sys->b_write_keyframe = false;
+    }
 
     i_ret = sout_AccessOutWrite( p_mux->p_access, p_buf );
     return i_ret ? i_ret : -1;
