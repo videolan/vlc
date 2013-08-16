@@ -148,10 +148,10 @@ DIR *vlc_opendir (const char *dirname)
         return NULL;
     }
 
+    /* Special mode to list drive letters */
     if (wpath[0] == L'\0' || (wcscmp (wpath, L"\\") == 0))
     {
         free (wpath);
-        /* Special mode to list drive letters */
         p_dir->wdir = NULL;
         p_dir->u.drives = GetLogicalDrives ();
         return (void *)p_dir;
@@ -175,9 +175,9 @@ char *vlc_readdir (DIR *dir)
 {
     vlc_DIR *p_dir = (vlc_DIR *)dir;
 
+    /* Drive letters mode */
     if (p_dir->wdir == NULL)
     {
-        /* Drive letters mode */
         DWORD drives = p_dir->u.drives;
         if (drives == 0)
             return NULL; /* end */
