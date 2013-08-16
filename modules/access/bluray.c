@@ -54,6 +54,7 @@
 
 
 #include <libbluray/bluray.h>
+#include <libbluray/bluray-version.h>
 #include <libbluray/keys.h>
 #include <libbluray/meta_data.h>
 #include <libbluray/overlay.h>
@@ -204,7 +205,9 @@ static void  blurayInitTitles(demux_t *p_demux, int menu_titles);
 static int   bluraySetTitle(demux_t *p_demux, int i_title);
 
 static void  blurayOverlayProc(void *ptr, const BD_OVERLAY * const overlay);
+#if BLURAY_VERSION >= BLURAY_VERSION_CODE(0,3,0)
 static void  blurayArgbOverlayProc(void *ptr, const BD_ARGB_OVERLAY * const overlay);
+#endif
 
 static int   onMouseEvent(vlc_object_t *p_vout, const char *psz_var,
                           vlc_value_t old, vlc_value_t val, void *p_data);
@@ -398,9 +401,11 @@ static int blurayOpen(vlc_object_t *object)
             goto error;
         }
 
+#if BLURAY_VERSION >= BLURAY_VERSION_CODE(0,3,0)
         /* Register ARGB overlay handler for BD-J */
         if (disc_info->num_bdj_titles)
             bd_register_argb_overlay_proc(p_sys->bluray, p_demux, blurayArgbOverlayProc, NULL);
+#endif
 
         /* libbluray will start playback from "First-Title" title */
         if (bd_play(p_sys->bluray) == 0)
@@ -970,6 +975,7 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
     }
 }
 
+#if BLURAY_VERSION >= BLURAY_VERSION_CODE(0,3,0)
 /*
  * ARGB overlay (BD-J)
  */
@@ -1050,6 +1056,7 @@ static void blurayArgbOverlayProc(void *ptr, const BD_ARGB_OVERLAY *const overla
         break;
     }
 }
+#endif
 
 static void bluraySendOverlayToVout(demux_t *p_demux)
 {
