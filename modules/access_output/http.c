@@ -296,8 +296,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 
         i_len += p_buffer->i_buffer;
         /* send data */
-        i_err = httpd_StreamSend( p_sys->p_httpd_stream, p_buffer->p_buffer,
-                                  p_buffer->i_buffer );
+        i_err = httpd_StreamSend( p_sys->p_httpd_stream, p_buffer );
 
         p_next = p_buffer->p_next;
         block_Release( p_buffer );

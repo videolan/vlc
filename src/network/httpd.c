@@ -39,6 +39,7 @@
 #include <vlc_charset.h>
 #include <vlc_url.h>
 #include <vlc_mime.h>
+#include <vlc_block.h>
 #include "../libvlc.h"
 
 #include <string.h>
@@ -66,6 +67,7 @@
 #endif
 
 static void httpd_ClientClean( httpd_client_t *cl );
+static void httpd_AppendData( httpd_stream_t *stream, uint8_t *p_data, int i_data );
 
 /* each host run in his own thread */
 struct httpd_host_t
@@ -158,6 +160,13 @@ struct httpd_client_t
     int     i_buffer_size;
     int     i_buffer;
     uint8_t *p_buffer;
+
+    /*
+     * If waiting for a keyframe, this is the position (in bytes) of the
+     * last keyframe the stream saw before this client connected.
+     * Otherwise, -1.
+     */
+    int64_t i_keyframe_wait_to_pass;
 
     /* */
     httpd_message_t query;  /* client -> httpd */
@@ -626,6 +635,14 @@ struct httpd_stream_t
     uint8_t *p_header;
     int     i_header;
 
+    /* Some muxes, in particular the avformat mux, can mark given blocks
+     * as keyframes, to ensure that the stream starts with one.
+     * (This is particularly important for WebM streaming to certain
+     * browsers.) Store if we've ever seen any such keyframe blocks,
+     * and if so, the byte position of the start of the last one. */
+    bool        b_has_keyframes;
+    int64_t     i_last_keyframe_seen_pos;
+
     /* circular buffer */
     int         i_buffer_size;      /* buffer size, can't be reallocated smaller */
     uint8_t     *p_buffer;          /* buffer */
@@ -658,6 +675,16 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
         {
             /* fprintf( stderr, "httpd_StreamCallBack: no data\n" ); */
             return VLC_EGENERIC;    /* wait, no data available */
+        }
+        if( cl->i_keyframe_wait_to_pass >= 0 )
+        {
+            if( stream->i_last_keyframe_seen_pos <= cl->i_keyframe_wait_to_pass )
+                /* still waiting for the next keyframe */
+                return VLC_EGENERIC;
+
+            /* seek to the new keyframe */
+            answer->i_body_offset = stream->i_last_keyframe_seen_pos;
+            cl->i_keyframe_wait_to_pass = -1;
         }
         if( answer->i_body_offset + stream->i_buffer_size <
             stream->i_buffer_pos )
@@ -717,6 +744,10 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
                 memcpy( answer->p_body, stream->p_header, stream->i_header );
             }
             answer->i_body_offset = stream->i_buffer_last_pos;
+            if( stream->b_has_keyframes )
+                cl->i_keyframe_wait_to_pass = stream->i_last_keyframe_seen_pos;
+            else
+                cl->i_keyframe_wait_to_pass = -1;
             vlc_mutex_unlock( &stream->lock );
         }
         else
@@ -791,6 +822,8 @@ httpd_stream_t *httpd_StreamNew( httpd_host_t *host,
      * (this way i_body_offset can never be 0) */
     stream->i_buffer_pos = 1;
     stream->i_buffer_last_pos = 1;
+    stream->b_has_keyframes = false;
+    stream->i_last_keyframe_seen_pos = 0;
 
     httpd_UrlCatch( stream->url, HTTPD_MSG_HEAD, httpd_StreamCallBack,
                     (httpd_callback_sys_t*)stream );
@@ -819,22 +852,10 @@ int httpd_StreamHeader( httpd_stream_t *stream, uint8_t *p_data, int i_data )
     return VLC_SUCCESS;
 }
 
-int httpd_StreamSend( httpd_stream_t *stream, uint8_t *p_data, int i_data )
+static void httpd_AppendData( httpd_stream_t *stream, uint8_t *p_data, int i_data )
 {
-    int i_count;
-    int i_pos;
-
-    if( i_data < 0 || p_data == NULL )
-    {
-        return VLC_SUCCESS;
-    }
-    vlc_mutex_lock( &stream->lock );
-
-    /* save this pointer (to be used by new connection) */
-    stream->i_buffer_last_pos = stream->i_buffer_pos;
-
-    i_pos = stream->i_buffer_pos % stream->i_buffer_size;
-    i_count = i_data;
+    int i_pos = stream->i_buffer_pos % stream->i_buffer_size;
+    int i_count = i_data;
     while( i_count > 0)
     {
         int i_copy;
@@ -850,6 +871,26 @@ int httpd_StreamSend( httpd_stream_t *stream, uint8_t *p_data, int i_data )
     }
 
     stream->i_buffer_pos += i_data;
+}
+
+int httpd_StreamSend( httpd_stream_t *stream, const block_t *p_block )
+{
+    if( p_block == NULL || p_block->p_buffer == NULL )
+    {
+        return VLC_SUCCESS;
+    }
+    vlc_mutex_lock( &stream->lock );
+
+    /* save this pointer (to be used by new connection) */
+    stream->i_buffer_last_pos = stream->i_buffer_pos;
+
+    if( p_block->i_flags & BLOCK_FLAG_TYPE_I )
+    {
+        stream->b_has_keyframes = true;
+        stream->i_last_keyframe_seen_pos = stream->i_buffer_pos;
+    }
+
+    httpd_AppendData( stream, p_block->p_buffer, p_block->i_buffer );
 
     vlc_mutex_unlock( &stream->lock );
     return VLC_SUCCESS;
@@ -1273,6 +1314,7 @@ static void httpd_ClientInit( httpd_client_t *cl, mtime_t now )
     cl->i_buffer_size = HTTPD_CL_BUFSIZE;
     cl->i_buffer = 0;
     cl->p_buffer = xmalloc( cl->i_buffer_size );
+    cl->i_keyframe_wait_to_pass = -1;
     cl->b_stream_mode = false;
 
     httpd_MsgInit( &cl->query );
