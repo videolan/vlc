@@ -481,9 +481,9 @@ char *net_Gets(vlc_object_t *obj, int fd, const v_socket_t *vs)
         buflen++;
     }
 
-    buf[--buflen] = '\0';
+    buf[buflen] = '\0';
     if (buflen > 0 && buf[buflen - 1] == '\r')
-        buf[buflen] = '\0';
+        buf[buflen - 1] = '\0';
     return buf;
 error:
     free(buf);
