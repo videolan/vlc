@@ -116,6 +116,7 @@ void vlc_meta_Delete( vlc_meta_t *m )
 void vlc_meta_Set( vlc_meta_t *p_meta, vlc_meta_type_t meta_type, const char *psz_val )
 {
     free( p_meta->ppsz_meta[meta_type] );
+    assert( psz_val == NULL || IsUTF8( psz_val ) );
     p_meta->ppsz_meta[meta_type] = psz_val ? strdup( psz_val ) : NULL;
 }
 
