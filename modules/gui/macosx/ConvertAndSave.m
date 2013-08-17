@@ -916,9 +916,6 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
             if(haveVideo)
                 [composedOptions appendString:@","];
             [composedOptions appendFormat:@"acodec=%@", [self.currentProfile objectAtIndex:10]];
-
-
-            [composedOptions appendFormat:@"acodec=%@", [self.currentProfile objectAtIndex:10]];
             [composedOptions appendFormat:@",ab=%@", [self.currentProfile objectAtIndex:11]]; // bitrate
             [composedOptions appendFormat:@",channels=%@", [self.currentProfile objectAtIndex:12]]; // channel number
             [composedOptions appendFormat:@",samplerate=%@", [self.currentProfile objectAtIndex:13]]; // sample rate
