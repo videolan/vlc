@@ -10,6 +10,7 @@ Decoders:
 
 Video Output:
  * Direct rendering and filtering for VDPAU hardware acceleration
+ * New CoreGraphics video output module for NPAPI plugins
 
 Video Filter:
  * New Oldmovie effect filter

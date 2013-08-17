@@ -77,6 +77,7 @@ $Id$
  * clone: Clone video filter
  * colorthres:  Theshold color based on similarity to reference color Video filter
  * compressor: Dynamic range compressor
+ * coregraphicslayer: CoreGraphics video output for NPAPI plugins
  * croppadd: Crop/Padd image filter
  * crystalhd: crystalhd decoder
  * cvdsub: CVD subtitles decoder
