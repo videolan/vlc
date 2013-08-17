@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 #include <vlc_meta.h>
+#include <vlc_charset.h>
 #include <assert.h>
 
 #include <libmodplug/modplug.h>
@@ -368,12 +369,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         char *psz_module_info, *psz_instrument_info;
         unsigned i_temp_index = 0;
         const char *psz_name = ModPlug_GetName( p_sys->f );
-        if( psz_name && *psz_name )
+        if( psz_name && *psz_name && IsUTF8( psz_name ) )
             vlc_meta_SetTitle( p_meta, psz_name );
 
         /* Comment field from artist - not in every type of MOD */
         psz_name = ModPlug_GetMessage( p_sys->f );
-        if( psz_name && *psz_name )
+        if( psz_name && *psz_name && IsUTF8( psz_name ) )
             vlc_meta_SetDescription( p_meta, psz_name );
 
         /* Instruments only in newer MODs - so don't show if 0 */
@@ -402,7 +403,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 char lBuffer[33];
                 ModPlug_InstrumentName( p_sys->f, i, lBuffer );
-                if ( !lBuffer[0] ) continue; // don't add empty fields.
+                if ( !lBuffer[0] || !IsUTF8( lBuffer ) ) continue;
                 i_temp_index += snprintf( &psz_temp[i_temp_index], sizeof(psz_temp) - i_temp_index, "%s\n", lBuffer );
             }
 
@@ -414,7 +415,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             char psz_buffer[33];
             ModPlug_SampleName( p_sys->f, i, psz_buffer );
-            if ( !psz_buffer[0] ) continue; // don't add empty fields.
+            if ( !psz_buffer[0] || !IsUTF8( psz_buffer ) ) continue;
             i_temp_index += snprintf( &psz_temp[i_temp_index], sizeof(psz_temp) - i_temp_index, "%s\n", psz_buffer );
         }
 
