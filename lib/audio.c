@@ -465,7 +465,7 @@ float libvlc_audio_equalizer_get_band_frequency( unsigned u_index )
     if ( u_index >= EQZ_BANDS_MAX )
         return -1.f;
 
-    return f_vlc_frequency_table_10b[ u_index ];
+    return f_iso_frequency_table_10b[ u_index ];
 }
 
 /*****************************************************************************
