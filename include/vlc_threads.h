@@ -382,7 +382,7 @@ struct vlc_cleanup_t
         vlc_cleanup_data.proc (vlc_cleanup_data.data); \
     } while (0)
 
-#endif /* !LIBVLC_USE_PTHREAD_CLEANUO */
+#endif /* !LIBVLC_USE_PTHREAD_CLEANUP */
 
 #ifndef LIBVLC_USE_PTHREAD_CANCEL
 /* poll() with cancellation */
