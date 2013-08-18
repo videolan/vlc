@@ -95,7 +95,7 @@ void FirstRun::buildPrivDialog()
     gLayout->addWidget( options, 1, 0, 1, 3 );
     int line = 0;
 
-    checkbox = new QCheckBox( qtr( "Automatically retrieve media infos" ) );
+    checkbox = new QCheckBox( qtr( "Automatically retrieve media info" ) );
     checkbox->setChecked( true );
     optionsLayout->addWidget( checkbox, line++, 0 );
 
