@@ -1,0 +1,11 @@
+--- libmodplug/libmodplug/src/load_pat.cpp.orig	2013-08-18 21:12:50.404538525 +0200
++++ libmodplug/libmodplug/src/load_pat.cpp	2013-08-18 21:13:15.496538108 +0200
+@@ -626,7 +626,7 @@
+ static int pat_readpat_attr(int pat, WaveHeader *hw, int layer)
+ {
+ 	char fname[128];
+-	uint fsize;
++	long fsize;
+ 	MMSTREAM *mmpat;
+ 	pat_build_path(fname, pat);
+ 	mmpat = _mm_fopen(fname, "r");
