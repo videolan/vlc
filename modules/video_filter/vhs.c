@@ -315,17 +315,17 @@ static int vhs_blue_red_line_effect( filter_t *p_filter, picture_t *p_pic_out ) 
                 switch ( i_p ) {
                   case Y_PLANE:
                     memset( &p_pic_out->p[i_p].p_pixels[i_pix_ofs], 127,
- p_pic_out->p[i_p].i_visible_pitch);
+                            p_pic_out->p[i_p].i_visible_pitch);
                     break;
                   case U_PLANE:
                     memset( &p_pic_out->p[i_p].p_pixels[i_pix_ofs],
- (p_sys->p_BR_lines[i_b]->b_blue_red?255:0),
- p_pic_out->p[i_p].i_visible_pitch);
+                            (p_sys->p_BR_lines[i_b]->b_blue_red?255:0),
+                            p_pic_out->p[i_p].i_visible_pitch);
                     break;
                   case V_PLANE:
                     memset( &p_pic_out->p[i_p].p_pixels[i_pix_ofs],
- (p_sys->p_BR_lines[i_b]->b_blue_red?0:255),
- p_pic_out->p[i_p].i_visible_pitch);
+                            (p_sys->p_BR_lines[i_b]->b_blue_red?0:255),
+                            p_pic_out->p[i_p].i_visible_pitch);
                     break;
                 }
 

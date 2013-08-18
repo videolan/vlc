@@ -50,9 +50,9 @@ static inline int64_t MOD(int64_t a, int64_t b) {
     return ( ( a % b ) + b ) % b; }
 
 #define SUB_MIN(val, sub_val, min) val = \
- ((val-(int32_t)sub_val)<min?min:val-sub_val)
+        ((val-(int32_t)sub_val)<min?min:val-sub_val)
 #define ADD_MAX(val, add_val, max) val = \
- ((val+(int32_t)add_val)>max?max:val+add_val)
+        ((val+(int32_t)add_val)>max?max:val+add_val)
 
 static inline int32_t PIX_OFS(int32_t i_x, int32_t i_y, plane_t *ps_plane) {
     return i_x * ps_plane->i_pixel_pitch + i_y * ps_plane->i_pitch; }
@@ -784,8 +784,8 @@ static int oldmovie_lens_hair_effect( filter_t *p_filter, picture_t *p_pic_out )
                     f_current_y += cos( (double)i_current_rot / 128.0 * M_PI );
                     CHECK_N_DARKEN_PIXEL( (int32_t) f_current_x,
                                           (int32_t) f_current_y,
- p_sys->p_hair[i_h]->i_intensity,
- &p_pic_out->p[Y_PLANE] );
+                                          p_sys->p_hair[i_h]->i_intensity,
+                                          &p_pic_out->p[Y_PLANE] );
                 }
             }
         }
@@ -866,8 +866,8 @@ static int oldmovie_lens_dust_effect( filter_t *p_filter, picture_t *p_pic_out )
                     if ( i_x * i_x + i_y * i_y <= p_sys->p_dust[i_d]->i_width * p_sys->p_dust[i_d]->i_width )
                         CHECK_N_DARKEN_PIXEL( i_x + p_sys->p_dust[i_d]->i_x,
                                               i_y + p_sys->p_dust[i_d]->i_y,
- p_sys->p_dust[i_d]->i_intensity,
- &p_pic_out->p[Y_PLANE] );
+                                              p_sys->p_dust[i_d]->i_intensity,
+                                              &p_pic_out->p[Y_PLANE] );
         }
 
     return VLC_SUCCESS;
