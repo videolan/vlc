@@ -1,4 +1,4 @@
-List of vlc plugins (384)
+List of vlc plugins (413)
 $Id$
  * a52: A/52 basic parser/packetizer
  * a52tofloat32: A/52 audio converter & decoder plugin, using liba52
@@ -133,6 +133,7 @@ $Id$
  * fluidsynth: Software MIDI synthetizer using libfluidsynth
  * folder: folder meta data and art finder
  * freetype: Utility to put text on video using freetype2
+ * freeze: picture freezing video filter
  * g711: G.711 audio codec
  * gain: Gain audio filter
  * gaussianblur: gaussian blur video filter

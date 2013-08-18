@@ -15,6 +15,7 @@ Video Output:
 Video Filter:
  * New Oldmovie effect filter
  * New VHS effect filter
+ * New Freeze effect filter
 
 libVLC:
  * add equalizer API libvlc_audio_equalizer_* functions

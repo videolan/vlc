@@ -1095,6 +1095,7 @@ modules/video_filter/erase.c
 modules/video_filter/extract.c
 modules/video_filter/filter_event_info.h
 modules/video_filter/filter_picture.h
+modules/video_filter/freeze.c
 modules/video_filter/gaussianblur.c
 modules/video_filter/gradfun.c
 modules/video_filter/gradient.c
