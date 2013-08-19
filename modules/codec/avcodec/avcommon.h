@@ -75,7 +75,6 @@ static inline void vlc_init_avcodec(void)
 # include <libavutil/dict.h>
 
 #define AV_OPTIONS_TEXT     "Advanced options"
-#define AV_SOUT_OPTIONS_TEXT "Advanced stream output options"
 #define AV_OPTIONS_LONGTEXT "Advanced options, in the form {opt=val,opt2=val2}."
 
 static inline AVDictionary *vlc_av_get_options(const char *psz_opts)
