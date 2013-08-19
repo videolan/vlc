@@ -73,7 +73,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin ()
     set_shortname( N_("RTSP VoD" ) )
-    set_description( N_("RTSP VoD server") )
+    set_description( N_("Legacy RTSP VoD server") )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_VOD )
     set_capability( "vod server", 1 )
