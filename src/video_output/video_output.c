@@ -814,9 +814,10 @@ static void ThreadChangeFilters(vout_thread_t *vout,
 
 
 /* */
-static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool is_late_dropped)
+static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool frame_by_frame)
 {
     int lost_count = 0;
+    bool is_late_dropped = vout->p->is_late_dropped && !vout->p->pause.is_on && !frame_by_frame;
 
     vlc_mutex_lock(&vout->p->filter.lock);
 
@@ -1066,68 +1067,67 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 
 static int ThreadDisplayPicture(vout_thread_t *vout, mtime_t *deadline)
 {
-    bool now = !deadline;
-    bool is_late_dropped = vout->p->is_late_dropped && !vout->p->pause.is_on && !now;
+    bool frame_by_frame = !deadline;
+    bool paused = vout->p->pause.is_on;
     bool first = !vout->p->displayed.current;
-    if (first && ThreadDisplayPreparePicture(vout, true, is_late_dropped)) /* FIXME not sure it is ok */
-        return VLC_EGENERIC;
-    if (!vout->p->pause.is_on || now) {
-        while (!vout->p->displayed.next) {
-            if (ThreadDisplayPreparePicture(vout, false, is_late_dropped)) {
-                break;
-            }
-        }
-    }
+
+    if (first)
+        if (ThreadDisplayPreparePicture(vout, true, frame_by_frame)) /* FIXME not sure it is ok */
+            return VLC_EGENERIC;
+
+    if (!paused || frame_by_frame)
+        while (!vout->p->displayed.next && !ThreadDisplayPreparePicture(vout, false, frame_by_frame))
+            ;
 
     const mtime_t date = mdate();
     const mtime_t render_delay = vout_chrono_GetHigh(&vout->p->render) + VOUT_MWAIT_TOLERANCE;
 
+    bool drop_next_frame = frame_by_frame;
     mtime_t date_next = VLC_TS_INVALID;
-    if (!vout->p->pause.is_on && vout->p->displayed.next)
+    if (!paused && vout->p->displayed.next) {
         date_next = vout->p->displayed.next->date - render_delay;
+        if (date_next /* + 0 FIXME */ <= date)
+            drop_next_frame = true;
+    }
 
     /* FIXME/XXX we must redisplay the last decoded picture (because
      * of potential vout updated, or filters update or SPU update)
-     * For now a high update period is needed but it coulmd be removed
+     * For now a high update period is needed but it could be removed
      * if and only if:
      * - vout module emits events from theselves.
      * - *and* SPU is modified to emit an event or a deadline when needed.
      *
-     * So it will be done latter.
+     * So it will be done later.
      */
-    mtime_t date_refresh = VLC_TS_INVALID;
-    if (vout->p->displayed.date > VLC_TS_INVALID)
-        date_refresh = vout->p->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
-
-    bool drop = now;
-    if (date_next != VLC_TS_INVALID)
-        drop |= date_next + 0 <= date;
-
     bool refresh = false;
-    if (date_refresh > VLC_TS_INVALID)
-        refresh = date_refresh <= date;
 
-    if (!first && !refresh && !drop) {
-        if (!now) {
-            if (date_next != VLC_TS_INVALID && date_refresh != VLC_TS_INVALID)
-                *deadline = __MIN(date_next, date_refresh);
-            else if (date_next != VLC_TS_INVALID)
-                *deadline = date_next;
-            else if (date_refresh != VLC_TS_INVALID)
+    mtime_t date_refresh = VLC_TS_INVALID;
+    if (vout->p->displayed.date > VLC_TS_INVALID) {
+        date_refresh = vout->p->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
+        refresh = date_refresh <= date;
+    }
+
+    if (!first && !refresh && !drop_next_frame) {
+        if (!frame_by_frame) {
+            if (date_refresh != VLC_TS_INVALID)
                 *deadline = date_refresh;
+            if (date_next != VLC_TS_INVALID && date_next < *deadline)
+                *deadline = date_next;
         }
         return VLC_EGENERIC;
     }
 
-    if (drop) {
+    if (drop_next_frame) {
         picture_Release(vout->p->displayed.current);
         vout->p->displayed.current = vout->p->displayed.next;
         vout->p->displayed.next    = NULL;
     }
+
     if (!vout->p->displayed.current)
         return VLC_EGENERIC;
 
-    bool is_forced = now || (!drop && refresh) || vout->p->displayed.current->b_force;
+    /* display the picture immediately */
+    bool is_forced = frame_by_frame || (!drop_next_frame && refresh) || vout->p->displayed.current->b_force;
     return ThreadDisplayRenderPicture(vout, is_forced);
 }
 
