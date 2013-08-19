@@ -1131,27 +1131,6 @@ static int ThreadDisplayPicture(vout_thread_t *vout, mtime_t *deadline)
     return ThreadDisplayRenderPicture(vout, is_forced);
 }
 
-static void ThreadManage(vout_thread_t *vout,
-                         mtime_t *deadline,
-                         vout_interlacing_support_t *interlacing)
-{
-    vlc_mutex_lock(&vout->p->picture_lock);
-
-    *deadline = VLC_TS_INVALID;
-    for (;;)
-        if (ThreadDisplayPicture(vout, deadline))
-            break;
-
-    const bool picture_interlaced = vout->p->displayed.is_interlaced;
-
-    vlc_mutex_unlock(&vout->p->picture_lock);
-
-    /* Deinterlacing */
-    vout_SetInterlacingState(vout, interlacing, picture_interlaced);
-
-    vout_ManageWrapper(vout);
-}
-
 static void ThreadDisplaySubpicture(vout_thread_t *vout,
                                     subpicture_t *subpicture)
 {
@@ -1472,10 +1451,10 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
     case VOUT_CONTROL_CLEAN:
         ThreadStop(vout, NULL);
         ThreadClean(vout);
-        return -1;
+        return 1;
     case VOUT_CONTROL_REINIT:
         if (ThreadReinit(vout, cmd.u.cfg))
-            return -1;
+            return 1;
         break;
     case VOUT_CONTROL_SUBPICTURE:
         ThreadDisplaySubpicture(vout, cmd.u.subpicture);
@@ -1556,6 +1535,7 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
 static void *Thread(void *object)
 {
     vout_thread_t *vout = object;
+    vout_thread_sys_t *sys = vout->p;
 
     vout_interlacing_support_t interlacing = {
         .is_interlaced = false,
@@ -1566,10 +1546,21 @@ static void *Thread(void *object)
     for (;;) {
         vout_control_cmd_t cmd;
         /* FIXME remove thoses ugly timeouts */
-        while (!vout_control_Pop(&vout->p->control, &cmd, deadline, 100000))
+        while (!vout_control_Pop(&sys->control, &cmd, deadline, 100000))
             if (ThreadControl(vout, cmd))
                 return NULL;
 
-        ThreadManage(vout, &deadline, &interlacing);
+        vlc_mutex_lock(&sys->picture_lock);
+
+        deadline = VLC_TS_INVALID;
+        while (!ThreadDisplayPicture(vout, &deadline))
+            ;
+
+        const bool picture_interlaced = sys->displayed.is_interlaced;
+
+        vlc_mutex_unlock(&sys->picture_lock);
+
+        vout_SetInterlacingState(vout, &interlacing, picture_interlaced);
+        vout_ManageWrapper(vout);
     }
 }
