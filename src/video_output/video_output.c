@@ -816,7 +816,6 @@ static void ThreadChangeFilters(vout_thread_t *vout,
 /* */
 static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool frame_by_frame)
 {
-    int lost_count = 0;
     bool is_late_dropped = vout->p->is_late_dropped && !vout->p->pause.is_on && !frame_by_frame;
 
     vlc_mutex_lock(&vout->p->filter.lock);
@@ -830,22 +829,24 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool fra
             decoded = picture_Hold(vout->p->displayed.decoded);
         } else {
             decoded = picture_fifo_Pop(vout->p->decoder_fifo);
-            if (is_late_dropped && decoded && !decoded->b_force) {
-                const mtime_t predicted = mdate() + 0; /* TODO improve */
-                const mtime_t late = predicted - decoded->date;
-                if (late > VOUT_DISPLAY_LATE_THRESHOLD) {
-                    msg_Warn(vout, "picture is too late to be displayed (missing %d ms)", (int)(late/1000));
-                    picture_Release(decoded);
-                    lost_count++;
-                    continue;
-                } else if (late > 0) {
-                    msg_Dbg(vout, "picture might be displayed late (missing %d ms)", (int)(late/1000));
+            if (decoded) {
+                if (is_late_dropped && !decoded->b_force) {
+                    const mtime_t predicted = mdate() + 0; /* TODO improve */
+                    const mtime_t late = predicted - decoded->date;
+                    if (late > VOUT_DISPLAY_LATE_THRESHOLD) {
+                        msg_Warn(vout, "picture is too late to be displayed (missing %"PRId64" ms)", late/1000);
+                        picture_Release(decoded);
+                        vout_statistic_AddLost(&vout->p->statistic, 1);
+                        continue;
+                    } else if (late > 0) {
+                        msg_Dbg(vout, "picture might be displayed late (missing %"PRId64" ms)", late/1000);
+                    }
                 }
+                if (!VideoFormatIsCropArEqual(&decoded->format, &vout->p->filter.format))
+                    ThreadChangeFilters(vout, &decoded->format, vout->p->filter.configuration, true);
             }
-            if (decoded &&
-                !VideoFormatIsCropArEqual(&decoded->format, &vout->p->filter.format))
-                ThreadChangeFilters(vout, &decoded->format, vout->p->filter.configuration, true);
         }
+
         if (!decoded)
             break;
         reuse = false;
@@ -862,7 +863,6 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool fra
 
     vlc_mutex_unlock(&vout->p->filter.lock);
 
-    vout_statistic_AddLost(&vout->p->statistic, lost_count);
     if (!picture)
         return VLC_EGENERIC;
 
