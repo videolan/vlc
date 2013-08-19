@@ -1064,9 +1064,9 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     return VLC_SUCCESS;
 }
 
-static int ThreadDisplayPicture(vout_thread_t *vout,
-                                bool now, mtime_t *deadline)
+static int ThreadDisplayPicture(vout_thread_t *vout, mtime_t *deadline)
 {
+    bool now = !deadline;
     bool is_late_dropped = vout->p->is_late_dropped && !vout->p->pause.is_on && !now;
     bool first = !vout->p->displayed.current;
     if (first && ThreadDisplayPreparePicture(vout, true, is_late_dropped)) /* FIXME not sure it is ok */
@@ -1108,12 +1108,14 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
         refresh = date_refresh <= date;
 
     if (!first && !refresh && !drop) {
-        if (date_next != VLC_TS_INVALID && date_refresh != VLC_TS_INVALID)
-            *deadline = __MIN(date_next, date_refresh);
-        else if (date_next != VLC_TS_INVALID)
-            *deadline = date_next;
-        else if (date_refresh != VLC_TS_INVALID)
-            *deadline = date_refresh;
+        if (!now) {
+            if (date_next != VLC_TS_INVALID && date_refresh != VLC_TS_INVALID)
+                *deadline = __MIN(date_next, date_refresh);
+            else if (date_next != VLC_TS_INVALID)
+                *deadline = date_next;
+            else if (date_refresh != VLC_TS_INVALID)
+                *deadline = date_refresh;
+        }
         return VLC_EGENERIC;
     }
 
@@ -1136,10 +1138,9 @@ static void ThreadManage(vout_thread_t *vout,
     vlc_mutex_lock(&vout->p->picture_lock);
 
     *deadline = VLC_TS_INVALID;
-    for (;;) {
-        if (ThreadDisplayPicture(vout, false, deadline))
+    for (;;)
+        if (ThreadDisplayPicture(vout, deadline))
             break;
-    }
 
     const bool picture_interlaced = vout->p->displayed.is_interlaced;
 
@@ -1250,8 +1251,7 @@ static void ThreadStep(vout_thread_t *vout, mtime_t *duration)
     if (vout->p->step.last <= VLC_TS_INVALID)
         vout->p->step.last = vout->p->displayed.timestamp;
 
-    mtime_t dummy;
-    if (ThreadDisplayPicture(vout, true, &dummy))
+    if (ThreadDisplayPicture(vout, NULL))
         return;
 
     vout->p->step.timestamp = vout->p->displayed.timestamp;
