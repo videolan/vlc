@@ -580,7 +580,9 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
  * The Panel
  *********************************************************************/
 AdvPrefsPanel::AdvPrefsPanel( QWidget *_parent ) : QWidget( _parent )
-{}
+{
+    p_config = NULL;
+}
 
 AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                         PrefsItemData * data ) :
@@ -588,6 +590,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 {
     /* Find our module */
     module_t *p_module = NULL;
+    p_config = NULL;
     if( data->i_type == PrefsItemData::TYPE_CATEGORY )
         return;
     else if( data->i_type == PrefsItemData::TYPE_MODULE )
@@ -599,8 +602,8 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     }
 
     unsigned confsize;
-    module_config_t *const p_config = module_config_get( p_module, &confsize ),
-                    *p_item = p_config,
+    p_config = module_config_get( p_module, &confsize );
+    module_config_t *p_item = p_config,
                     *p_end = p_config + confsize;
 
     if( data->i_type == PrefsItemData::TYPE_SUBCATEGORY ||
@@ -730,8 +733,6 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     scroller->setWidgetResizable( true );
     global_layout->addWidget( scroller );
     setLayout( global_layout );
-
-    module_config_free( p_config );
 }
 
 void AdvPrefsPanel::apply()
@@ -746,5 +747,5 @@ void AdvPrefsPanel::clean()
 AdvPrefsPanel::~AdvPrefsPanel()
 {
     qDeleteAll( controls ); controls.clear();
+    module_config_free( p_config );
 }
-

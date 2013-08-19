@@ -100,6 +100,7 @@ public:
     void apply();
     void clean();
 private:
+    module_config_t *p_config;
     intf_thread_t *p_intf;
     QList<ConfigControl *> controls;
     QVBoxLayout *global_layout;
