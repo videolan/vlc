@@ -613,11 +613,20 @@ PLItem * PLModel::findInner( PLItem *root, int i_id, bool b_isinputid ) const
 
 PLModel::pl_nodetype PLModel::getPLRootType() const
 {
-    if ( rootItem->id( PLAYLIST_ID ) == 3 )
+    /* can't rely on rootitem as it depends on view / rebuild() */
+    AbstractPLItem *plitem = rootItem;
+
+    while( plitem->parent() ) plitem = plitem->parent();
+
+    switch( plitem->id( PLAYLIST_ID ) )
+    {
+    case 2:
+        return ROOTTYPE_CURRENT_PLAYING;
+    case 3:
         return ROOTTYPE_MEDIA_LIBRARY;
-    else
-        return ROOTTYPE_CURRENT_PLAYING; // id == 2
-    /* FIXME: handle all cases */
+    default:
+        return ROOTTYPE_OTHER;
+    }
 }
 
 bool PLModel::canEdit() const

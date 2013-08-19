@@ -221,7 +221,8 @@ private:
     enum pl_nodetype
     {
         ROOTTYPE_CURRENT_PLAYING,
-        ROOTTYPE_MEDIA_LIBRARY
+        ROOTTYPE_MEDIA_LIBRARY,
+        ROOTTYPE_OTHER
     };
     pl_nodetype getPLRootType() const;
 
