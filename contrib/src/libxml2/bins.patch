@@ -1,0 +1,20 @@
+--- libxml2/Makefile.am.orig	2013-08-20 13:57:37.911178174 +0200
++++ libxml2/Makefile.am	2013-08-20 13:57:44.543177895 +0200
+@@ -2,7 +2,7 @@
+ 
+ ACLOCAL_AMFLAGS = -I m4
+ 
+-SUBDIRS = include . doc example xstc $(PYTHON_SUBDIR)
++SUBDIRS = include . xstc $(PYTHON_SUBDIR)
+ 
+ DIST_SUBDIRS = include . doc example python xstc
+ 
+@@ -15,7 +15,7 @@
+ #                 testReader testapi testModule runtest runsuite testchar \
+ # 		testdict runxmlconf testrecurse testlimits
+ 
+-bin_PROGRAMS = xmllint xmlcatalog
++bin_PROGRAMS =
+ 
+ bin_SCRIPTS=xml2-config
+ 

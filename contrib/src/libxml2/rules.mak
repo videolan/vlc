@@ -19,6 +19,7 @@ libxml2: libxml2-$(LIBXML2_VERSION).tar.gz .sum-libxml2
 	$(UNPACK)
 	$(APPLY) $(SRC)/libxml2/no-tests.patch
 	$(APPLY) $(SRC)/libxml2/win32.patch
+	$(APPLY) $(SRC)/libxml2/bins.patch
 	$(APPLY) $(SRC)/libxml2/pthread.patch
 	$(MOVE)
 
