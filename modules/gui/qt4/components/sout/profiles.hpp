@@ -37,7 +37,7 @@ static const char * video_profile_value_list[] = {
     "audio_enable=yes;audio_codec=mp3;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=DIV3;vcodec_bitrate=800;vcodec_framerate=0;vcodec_width=0;vcodec_height=0;muxer_mux=asf",
     "audio_enable=yes;audio_codec=vorb;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;muxer_mux=ogg",
     "audio_enable=yes;audio_codec=mp3;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;muxer_mux=mp3",
-    "audio_enable=yes;audio_codec=flac;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;muxer_mux=raw",
+    "audio_enable=yes;audio_codec=flac;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;muxer_mux=flac",
     "audio_enable=yes;audio_codec=s16l;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;muxer_mux=wav",
     "audio_enable=yes;audio_codec=mp3;acodec_bitrate=192;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=h264;vcodec_bitrate=1500;vcodec_qp=0;vcodec_framerate=0;vcodec_width=1280;vcodec_height=720;muxer_mux=mp4",
     "audio_enable=yes;audio_codec=mp3;acodec_bitrate=192;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=h264;vcodec_bitrate=3500;vcodec_qp=0;vcodec_framerate=0;vcodec_width=1920;vcodec_height=1080;muxer_mux=mp4",
