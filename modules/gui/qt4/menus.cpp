@@ -1550,7 +1550,7 @@ void VLCMenuBar::updateAudioDevice( intf_thread_t * p_intf, audio_output_t *p_ao
     char **ids, **names;
     char *selected;
 
-    if( !p_aout )
+    if( !p_aout || !current )
         return;
 
     current->clear();
