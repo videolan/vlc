@@ -584,9 +584,12 @@ EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
             msg_Dbg( p_enc, "Writing STREAMINFO: %zu", bytes );
 
             /* Backup the STREAMINFO metadata block */
-            p_enc->fmt_out.i_extra = STREAMINFO_SIZE;
-            p_enc->fmt_out.p_extra = xmalloc( STREAMINFO_SIZE );
-            memcpy(p_enc->fmt_out.p_extra, buffer + 4, STREAMINFO_SIZE );
+            p_enc->fmt_out.i_extra = STREAMINFO_SIZE + 8;
+            p_enc->fmt_out.p_extra = xmalloc( STREAMINFO_SIZE + 8);
+            memcpy(p_enc->fmt_out.p_extra, "fLaC", 4);
+            memcpy(p_enc->fmt_out.p_extra + 4, buffer, STREAMINFO_SIZE );
+            /* Fake this as the last metadata block */
+            ((uint8_t*)p_enc->fmt_out.p_extra)[4] |= 0x80;
         }
         p_sys->i_headers++;
         return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
