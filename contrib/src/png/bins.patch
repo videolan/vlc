@@ -1,0 +1,15 @@
+--- png/Makefile.am.orig	2013-08-20 14:05:04.803159380 +0200
++++ png/Makefile.am	2013-08-20 14:05:10.795159128 +0200
+@@ -7,10 +7,10 @@
+ ACLOCAL_AMFLAGS = -I scripts
+ 
+ # test programs - run on make check, make distcheck
+-check_PROGRAMS= pngtest pngunknown pngstest pngvalid
++check_PROGRAMS= 
+ 
+ # Utilities - installed
+-bin_PROGRAMS= pngfix png-fix-itxt
++bin_PROGRAMS= 
+ 
+ pngtest_SOURCES = pngtest.c
+ pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
