@@ -855,8 +855,8 @@ static int scope_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
         for( int j = 0 ; j < 3 ; j++ )
         {
             ppp_area[i_index][j] =
-                p_picture->p[j].p_pixels + i_index * p_picture->p[j].i_lines
-                / 2 * p_picture->p[j].i_pitch;
+                p_picture->p[j].p_pixels + (i_index * 2 + 1) * p_picture->p[j].i_lines
+                / 4 * p_picture->p[j].i_pitch;
         }
     }
 
@@ -864,7 +864,7 @@ static int scope_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
             i_index < __MIN( p_effect->i_width, (int)p_buffer->i_nb_samples );
             i_index++ )
     {
-        uint8_t i_value;
+        int8_t i_value;
 
         /* Left channel */
         i_value =  p_sample[p_effect->i_idx_left] * 127;
