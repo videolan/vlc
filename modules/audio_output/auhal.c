@@ -116,6 +116,8 @@ struct aout_sys_t
 
     vlc_mutex_t                 lock;
     vlc_cond_t                  cond;
+
+    bool                        b_ignore_streams_changed_callback;
 };
 
 #pragma mark -
@@ -186,6 +188,7 @@ static int Open(vlc_object_t *obj)
     vlc_mutex_init(&p_sys->lock);
     vlc_cond_init(&p_sys->cond);
     p_sys->b_digital = false;
+    p_sys->b_ignore_streams_changed_callback = false;
 
     p_aout->sys = p_sys;
     p_aout->start = Start;
@@ -822,7 +825,13 @@ static int StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
     i_param_size = sizeof(p_sys->i_hog_pid);
     p_sys->i_hog_pid = getpid() ;
 
+    /*
+     * HACK: On 10.6, auhal will trigger the streams changed callback when calling below line,
+     * directly in the same thread. This call needs to be ignored to avoid endless restarting.
+     */
+    p_sys->b_ignore_streams_changed_callback = true;
     err = AudioObjectSetPropertyData(p_sys->i_selected_dev, &audioDeviceHogModeAddress, 0, NULL, i_param_size, &p_sys->i_hog_pid);
+    p_sys->b_ignore_streams_changed_callback = false;
 
     if (err != noErr) {
         msg_Err(p_aout, "failed to set hogmode [%4.4s]", (char *)&err);
@@ -1056,7 +1065,14 @@ static void Stop(audio_output_t *p_aout)
         AudioObjectPropertyAddress audioDeviceHogModeAddress = { kAudioDevicePropertyHogMode,
             kAudioDevicePropertyScopeOutput,
             kAudioObjectPropertyElementMaster };
+
+        /*
+         * HACK: On 10.6, auhal will trigger the streams changed callback when calling below line,
+         * directly in the same thread. This call needs to be ignored to avoid endless restarting.
+         */
+        p_sys->b_ignore_streams_changed_callback = true;
         err = AudioObjectSetPropertyData(p_sys->i_selected_dev, &audioDeviceHogModeAddress, 0, NULL, i_param_size, &p_sys->i_hog_pid);
+        p_sys->b_ignore_streams_changed_callback = false;
         if (err != noErr)
             msg_Err(p_aout, "Failed to release hogmode [%4.4s]", (char *)&err);
     }
@@ -1533,6 +1549,8 @@ static OSStatus StreamsChangedListener(AudioObjectID inObjectID,  UInt32 inNumbe
         return -1;
 
     aout_sys_t *p_sys = p_aout->sys;
+    if(unlikely(p_sys->b_ignore_streams_changed_callback == true))
+        return 0;
 
     msg_Dbg(p_aout, "available physical formats for audio device changed");
     RebuildDeviceList(p_aout);
