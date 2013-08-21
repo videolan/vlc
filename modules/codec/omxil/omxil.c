@@ -1047,6 +1047,8 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     for(i = 0; i < p_port->i_buffers; i++)
     {
         OMX_FIFO_GET(&p_port->fifo, p_buffer);
+        if (p_buffer->pAppPrivate != NULL)
+            decoder_DeletePicture( p_dec, p_buffer->pAppPrivate );
         if (p_buffer->nFlags & SENTINEL_FLAG) {
             free(p_buffer);
             i--;
