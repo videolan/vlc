@@ -993,3 +993,13 @@ reactor leaks ionizing radiations."
 < courmisch> residence registration needs work contract
  -- #videolan, or why OSS is worse than Government administrations
 %
+< j-b> funman patch rejected; /me is afraid
+< TypX> well funman isn't really a good coder anyway
+ * j-b slaps TypX
+< TypX> oh yes
+< TypX> again
+ * funman craps TypX
+< TypX> I don't hate you
+< funman> that might be the most beautiful thing i was ever told <3
+ -- #videolan, BDSM and Litote
+%
