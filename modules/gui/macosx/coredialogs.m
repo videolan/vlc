@@ -111,7 +111,7 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     NSAlert *o_alert;
     NSInteger i_returnValue = 0;
   
-    o_alert = [NSAlert alertWithMessageText: toNSStr(p_dialog->title) defaultButton: toNSStr(p_dialog->yes) alternateButton: toNSStr(p_dialog->no) otherButton: toNSStr(p_dialog->cancel) informativeTextWithFormat: @"%s", p_dialog->message];
+    o_alert = [NSAlert alertWithMessageText: toNSStr(p_dialog->title) defaultButton: toNSStr(p_dialog->yes) alternateButton: toNSStr(p_dialog->no) otherButton: toNSStr(p_dialog->cancel) informativeTextWithFormat: toNSStr(p_dialog->message)];
     [o_alert setAlertStyle: NSInformationalAlertStyle];
     i_returnValue = [o_alert runModal];
 
