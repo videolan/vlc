@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ml_item.hpp: the media library's result item
+ * ml_item.hpp: the SQL media library's result item
  *****************************************************************************
  * Copyright (C) 2008-2011 the VideoLAN Team and AUTHORS
  * $Id$
@@ -32,7 +32,7 @@
 # include <config.h>
 #endif
 
-#ifdef MEDIA_LIBRARY
+#ifdef SQL_MEDIA_LIBRARY
 
 #include <vlc_common.h>
 #include <vlc_interface.h>

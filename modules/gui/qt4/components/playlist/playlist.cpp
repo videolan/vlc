@@ -100,7 +100,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     model->setModel( VLCProxyModel::PL_MODEL, plmodel );
     model->switchToModel( VLCProxyModel::PL_MODEL );
 
-#ifdef MEDIA_LIBRARY
+#ifdef SQL_MEDIA_LIBRARY
     MLModel *mlmodel = new MLModel( p_intf, model );
     model->setModel( VLCProxyModel::SQLML_MODEL, mlmodel );
 #endif

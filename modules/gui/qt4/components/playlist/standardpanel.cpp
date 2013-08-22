@@ -454,7 +454,7 @@ void StandardPLPanel::searchDelayed( const QString& searchText )
 /* This activated by the selector selection */
 void StandardPLPanel::setRootItem( playlist_item_t *p_item, bool b )
 {
-#ifdef MEDIA_LIBRARY
+#ifdef SQL_MEDIA_LIBRARY
     if( b )
     {
         msg_Dbg( p_intf, "Setting the SQL ML" );

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ml_item.cpp: the media library's result item
+ * ml_item.cpp: the SQL media library's result item
  *****************************************************************************
  * Copyright (C) 2008-2011 the VideoLAN Team and AUTHORS
  * $Id$
@@ -29,7 +29,7 @@
 # include <config.h>
 #endif
 
-#ifdef MEDIA_LIBRARY
+#ifdef SQL_MEDIA_LIBRARY
 
 #include <QDateTime>
 #include <QUrl>

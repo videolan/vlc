@@ -568,7 +568,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #else
             ui.osGroupBox->hide();
 #endif
-#ifdef MEDIA_LIBRARY
+#ifdef SQL_MEDIA_LIBRARY
             BUTTONACT( ui.sqlMLbtn, configML() );
 #else
             ui.sqlMLbtn->hide();
@@ -986,7 +986,7 @@ void SPrefsPanel::changeStyle( QString s_style )
 
 void SPrefsPanel::configML()
 {
-#ifdef MEDIA_LIBRARY
+#ifdef SQL_MEDIA_LIBRARY
     MLConfDialog *mld = new MLConfDialog( this, p_intf );
     mld->exec();
     delete mld;

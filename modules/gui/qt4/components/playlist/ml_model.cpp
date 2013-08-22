@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ml_model.cpp: the media library's model
+ * ml_model.cpp: the SQL media library's model
  *****************************************************************************
  * Copyright (C) 2008-2011 the VideoLAN Team and AUTHORS
  * $Id$
@@ -29,7 +29,7 @@
 # include <config.h>
 #endif
 
-#ifdef MEDIA_LIBRARY
+#ifdef SQL_MEDIA_LIBRARY
 
 #include <QUrl>
 #include <QMenu>

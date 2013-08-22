@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ml_model.hpp ML model
+ * ml_model.hpp SQL ML model
  *****************************************************************************
  * Copyright (C) 2008-2011 the VideoLAN Team and AUTHORS
  * $Id$
@@ -32,7 +32,7 @@
 # include <config.h>
 #endif
 
-#ifdef MEDIA_LIBRARY
+#ifdef SQL_MEDIA_LIBRARY
 #include <vlc_common.h>
 #include <vlc_interface.h>
 #include <vlc_media_library.h>

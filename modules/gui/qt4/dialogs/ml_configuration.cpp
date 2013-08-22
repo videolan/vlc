@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ml_configuration.cpp: ML's configuration dialog (folder view)
+ * ml_configuration.cpp: SQL ML's configuration dialog (folder view)
  *****************************************************************************
  * Copyright (C) 2008-2010 the VideoLAN Team and AUTHORS
  * $Id$
@@ -28,7 +28,7 @@
 # include <config.h>
 #endif
 
-#ifdef MEDIA_LIBRARY
+#ifdef SQL_MEDIA_LIBRARY
 
 #include "ml_configuration.hpp"
 
