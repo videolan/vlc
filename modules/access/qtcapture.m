@@ -37,6 +37,8 @@
 #include <vlc_dialog.h>
 #include <vlc_access.h>
 
+#define QTKIT_VERSION_MIN_REQUIRED 70603
+
 #import <QTKit/QTKit.h>
 #import <CoreAudio/CoreAudio.h>
 
