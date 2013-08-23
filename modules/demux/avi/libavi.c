@@ -446,6 +446,12 @@ static void AVI_ChunkFree_strf( avi_chunk_t *p_chk )
 
 static int AVI_ChunkRead_strd( stream_t *s, avi_chunk_t *p_chk )
 {
+    if ( p_chk->common.i_chunk_size == 0 )
+    {
+        msg_Dbg( (vlc_object_t*)s, "Zero sized pre-JUNK section met" );
+        return AVI_STRD_ZERO_CHUNK;
+    }
+
     AVI_READCHUNK_ENTER;
     p_chk->strd.p_data = xmalloc( p_chk->common.i_chunk_size );
     memcpy( p_chk->strd.p_data, p_buff + 8, p_chk->common.i_chunk_size );
@@ -832,7 +838,13 @@ int  AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
     i_index = AVI_ChunkFunctionFind( p_chk->common.i_chunk_fourcc );
     if( AVI_Chunk_Function[i_index].AVI_ChunkRead_function )
     {
-        return AVI_Chunk_Function[i_index].AVI_ChunkRead_function( s, p_chk );
+        int i_return = AVI_Chunk_Function[i_index].AVI_ChunkRead_function( s, p_chk );
+        if ( i_return == AVI_STRD_ZERO_CHUNK )
+        {
+            if ( !p_father ) return VLC_EGENERIC;
+            return AVI_NextChunk( s, p_father );
+        }
+        return i_return;
     }
     else if( ( ((char*)&p_chk->common.i_chunk_fourcc)[0] == 'i' &&
                ((char*)&p_chk->common.i_chunk_fourcc)[1] == 'x' ) ||

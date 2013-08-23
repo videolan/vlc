@@ -178,6 +178,7 @@ typedef struct avi_chunk_dmlh_s
     uint32_t dwTotalFrames;
 } avi_chunk_dmlh_t;
 
+#define AVI_STRD_ZERO_CHUNK     0xFF
 
 #define AVI_INDEX_OF_INDEXES    0x00
 #define AVI_INDEX_OF_CHUNKS     0x01
