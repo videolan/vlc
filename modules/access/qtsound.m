@@ -39,8 +39,7 @@
 #include <vlc_demux.h>
 #include <vlc_dialog.h>
 
-//#define QTKIT_VERSION_MIN_REQUIRED 70603
-#define QTKIT_VERSION_MAX_ALLOWED 70700
+#define QTKIT_VERSION_MIN_REQUIRED 70603
 
 #import <QTKit/QTKit.h>
 
