@@ -112,6 +112,7 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
     avi_chunk_t *p_chk;
     const uint8_t *p_peek;
     bool b_seekable;
+    int i_ret = VLC_SUCCESS;
 
     if( p_container->common.i_chunk_size > 0 && p_container->common.i_chunk_size < 4 )
     {
@@ -173,7 +174,7 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
         }
         p_container->common.p_last = p_chk;
 
-        if( AVI_ChunkRead( s, p_chk, p_container ) )
+        if( i_ret = AVI_ChunkRead( s, p_chk, p_container ) )
         {
             break;
         }
@@ -196,6 +197,7 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
     }
     msg_Dbg( (vlc_object_t*)s, "</list \'%4.4s\'>", (char*)&p_container->list.i_type );
 
+    if ( i_ret == AVI_ZERO_FOURCC ) return i_ret;
     return VLC_SUCCESS;
 }
 
@@ -831,7 +833,7 @@ int  AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
     if( p_chk->common.i_chunk_fourcc == VLC_FOURCC( 0, 0, 0, 0 ) )
     {
         msg_Warn( (vlc_object_t*)s, "found null fourcc chunk (corrupted file?)" );
-        return VLC_EGENERIC;
+        return AVI_ZERO_FOURCC;
     }
     p_chk->common.p_father = p_father;
 
@@ -839,7 +841,7 @@ int  AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
     if( AVI_Chunk_Function[i_index].AVI_ChunkRead_function )
     {
         int i_return = AVI_Chunk_Function[i_index].AVI_ChunkRead_function( s, p_chk );
-        if ( i_return == AVI_STRD_ZERO_CHUNK )
+        if ( i_return == AVI_STRD_ZERO_CHUNK || i_return == AVI_ZERO_FOURCC )
         {
             if ( !p_father ) return VLC_EGENERIC;
             return AVI_NextChunk( s, p_father );
