@@ -136,10 +136,8 @@ struct sout_mux_sys_t
 
 typedef struct bo_t
 {
-    int        i_buffer_size;
-    int        i_buffer;
-    uint8_t    *p_buffer;
-
+    block_t    *b;
+    size_t     len;
 } bo_t;
 
 static void bo_init     ( bo_t * );
@@ -149,7 +147,6 @@ static void bo_add_24be ( bo_t *, uint32_t );
 static void bo_add_32be ( bo_t *, uint32_t );
 static void bo_add_64be ( bo_t *, uint64_t );
 static void bo_add_fourcc(bo_t *, const char * );
-static void bo_add_bo   ( bo_t *, bo_t * );
 static void bo_add_mem  ( bo_t *, int , uint8_t * );
 static void bo_add_descr( bo_t *, uint8_t , uint32_t );
 
@@ -158,12 +155,9 @@ static void bo_fix_32be ( bo_t *, int , uint32_t );
 static bo_t *box_new     ( const char *fcc );
 static bo_t *box_full_new( const char *fcc, uint8_t v, uint32_t f );
 static void  box_fix     ( bo_t *box );
-static void  box_free    ( bo_t *box );
 static void  box_gather  ( bo_t *box, bo_t *box2 );
 
 static void box_send( sout_mux_t *p_mux,  bo_t *box );
-
-static block_t *bo_to_sout( bo_t *box );
 
 static bo_t *GetMoovBox( sout_mux_t *p_mux );
 
@@ -211,7 +205,7 @@ static int Open( vlc_object_t *p_this )
         bo_add_fourcc( box, "qt  " );
         box_fix( box );
 
-        p_sys->i_pos += box->i_buffer;
+        p_sys->i_pos += box->len;
         p_sys->i_mdat_pos = p_sys->i_pos;
 
         box_send( p_mux, box );
@@ -225,7 +219,7 @@ static int Open( vlc_object_t *p_this )
     box = box_new( "mdat" );
     bo_add_64be  ( box, 0 ); // enough to store an extended size
 
-    p_sys->i_pos += box->i_buffer;
+    p_sys->i_pos += box->len;
 
     box_send( p_mux, box );
 
@@ -264,8 +258,8 @@ static void Close( vlc_object_t * p_this )
         bo_add_32be  ( &bo, p_sys->i_pos - p_sys->i_mdat_pos - 8 );
         bo_add_fourcc( &bo, "mdat" );
     }
-    p_hdr = bo_to_sout( &bo );
-    free( bo.p_buffer );
+    p_hdr = bo.b;
+    p_hdr->i_buffer = bo.len;
 
     sout_AccessOutSeek( p_mux->p_access, p_sys->i_mdat_pos );
     sout_AccessOutWrite( p_mux->p_access, p_hdr );
@@ -283,7 +277,7 @@ static void Close( vlc_object_t * p_this )
          * at the start */
         block_t *p_buf;
         int64_t i_chunk, i_size = p_sys->i_pos - p_sys->i_mdat_pos;
-        int i_moov_size = moov->i_buffer;
+        int i_moov_size = moov->len;
 
         while( i_size > 0 )
         {
@@ -314,7 +308,7 @@ static void Close( vlc_object_t * p_this )
             unsigned int i;
             int i_chunk;
 
-            moov->i_buffer = p_stream->i_stco_pos;
+            moov->len = p_stream->i_stco_pos;
             for( i_chunk = 0, i = 0; i < p_stream->i_entry_count; i_chunk++ )
             {
                 if( p_stream->b_stco64 )
@@ -337,7 +331,7 @@ static void Close( vlc_object_t * p_this )
             }
         }
 
-        moov->i_buffer = i_moov_size;
+        moov->len = i_moov_size;
         i_moov_pos = p_sys->i_mdat_pos;
         p_sys->b_fast_start = false;
     }
@@ -1468,7 +1462,7 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     }
     box_gather( stbl, stsc );
     box_gather( stbl, stsz );
-    p_stream->i_stco_pos = stbl->i_buffer + 16;
+    p_stream->i_stco_pos = stbl->len + 16;
     box_gather( stbl, stco );
 
     /* finish stbl */
@@ -1861,22 +1855,22 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
         stbl = GetStblBox( p_mux, p_stream );
 
         /* append stbl to minf */
-        p_stream->i_stco_pos += minf->i_buffer;
+        p_stream->i_stco_pos += minf->len;
         box_gather( minf, stbl );
 
         /* append minf to mdia */
         box_fix( minf );
-        p_stream->i_stco_pos += mdia->i_buffer;
+        p_stream->i_stco_pos += mdia->len;
         box_gather( mdia, minf );
 
         /* append mdia to trak */
         box_fix( mdia );
-        p_stream->i_stco_pos += trak->i_buffer;
+        p_stream->i_stco_pos += trak->len;
         box_gather( trak, mdia );
 
         /* append trak to moov */
         box_fix( trak );
-        p_stream->i_stco_pos += moov->i_buffer;
+        p_stream->i_stco_pos += moov->len;
         box_gather( moov, trak );
     }
 
@@ -1891,25 +1885,16 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
 
 static void bo_init( bo_t *p_bo )
 {
-    p_bo->i_buffer_size = 1024;
-    p_bo->p_buffer = xmalloc( p_bo->i_buffer_size );
-    p_bo->i_buffer = 0;
+    p_bo->len = 0;
+    p_bo->b = block_Alloc( 1024 );
 }
 
 static void bo_add_8( bo_t *p_bo, uint8_t i )
 {
-    if( p_bo->i_buffer < p_bo->i_buffer_size )
-    {
-        p_bo->p_buffer[p_bo->i_buffer] = i;
-    }
-    else
-    {
-        p_bo->i_buffer_size += 1024;
-        p_bo->p_buffer = xrealloc( p_bo->p_buffer, p_bo->i_buffer_size );
-        p_bo->p_buffer[p_bo->i_buffer] = i;
-    }
+    if( p_bo->len >= p_bo->b->i_buffer)
+        p_bo->b = block_Realloc(p_bo->b, 0, p_bo->b->i_buffer + 1024);
 
-    p_bo->i_buffer++;
+    p_bo->b->p_buffer[p_bo->len++] = i;
 }
 
 static void bo_add_16be( bo_t *p_bo, uint16_t i )
@@ -1932,10 +1917,10 @@ static void bo_add_32be( bo_t *p_bo, uint32_t i )
 
 static void bo_fix_32be ( bo_t *p_bo, int i_pos, uint32_t i)
 {
-    p_bo->p_buffer[i_pos    ] = ( i >> 24 )&0xff;
-    p_bo->p_buffer[i_pos + 1] = ( i >> 16 )&0xff;
-    p_bo->p_buffer[i_pos + 2] = ( i >>  8 )&0xff;
-    p_bo->p_buffer[i_pos + 3] = ( i       )&0xff;
+    p_bo->b->p_buffer[i_pos    ] = ( i >> 24 )&0xff;
+    p_bo->b->p_buffer[i_pos + 1] = ( i >> 16 )&0xff;
+    p_bo->b->p_buffer[i_pos + 2] = ( i >>  8 )&0xff;
+    p_bo->b->p_buffer[i_pos + 3] = ( i       )&0xff;
 }
 
 static void bo_add_64be( bo_t *p_bo, uint64_t i )
@@ -1964,12 +1949,6 @@ static void bo_add_descr( bo_t *p_bo, uint8_t tag, uint32_t size )
     for(int i = 3; i>0; i--)
         bo_add_8( p_bo, (size>>(7*i)) | 0x80 );
     bo_add_8(p_bo, size & 0x7F);
-}
-
-static void bo_add_bo( bo_t *p_bo, bo_t *p_bo2 )
-{
-    for( int i = 0; i < p_bo2->i_buffer; i++ )
-        bo_add_8( p_bo, p_bo2->p_buffer[i] );
 }
 
 static bo_t * box_new( const char *fcc )
@@ -2006,47 +1985,26 @@ static bo_t * box_full_new( const char *fcc, uint8_t v, uint32_t f )
 
 static void box_fix( bo_t *box )
 {
-    bo_t box_tmp;
-
-    memcpy( &box_tmp, box, sizeof( bo_t ) );
-
-    box_tmp.i_buffer = 0;
-    bo_add_32be( &box_tmp, box->i_buffer );
-}
-
-static void box_free( bo_t *box )
-{
-    free( box->p_buffer );
-    free( box );
+    box->b->p_buffer[0] = box->len >> 24;
+    box->b->p_buffer[1] = box->len >> 16;
+    box->b->p_buffer[2] = box->len >>  8;
+    box->b->p_buffer[3] = box->len;
 }
 
 static void box_gather ( bo_t *box, bo_t *box2 )
 {
-    bo_add_bo( box, box2 );
-    box_free( box2 );
-}
-
-static block_t * bo_to_sout( bo_t *box )
-{
-    block_t *p_buf;
-
-    p_buf = block_Alloc( box->i_buffer );
-    if( box->i_buffer > 0 )
-    {
-        memcpy( p_buf->p_buffer, box->p_buffer, box->i_buffer );
-    }
-
-    return p_buf;
+    box->b = block_Realloc(box->b, 0, box->len + box2->len);
+    memcpy(&box->b->p_buffer[box->len], box2->b->p_buffer, box2->len);
+    box->len += box2->len;
+    block_Release(box2->b);
+    free( box2 );
 }
 
 static void box_send( sout_mux_t *p_mux,  bo_t *box )
 {
-    block_t *p_buf;
-
-    p_buf = bo_to_sout( box );
-    box_free( box );
-
-    sout_AccessOutWrite( p_mux->p_access, p_buf );
+    box->b->i_buffer = box->len;
+    sout_AccessOutWrite( p_mux->p_access, box->b );
+    free(box);
 }
 
 static int64_t get_timestamp(void)
