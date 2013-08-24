@@ -29,10 +29,6 @@
 /* for the icon in our custom error panel */
 #import <ApplicationServices/ApplicationServices.h>
 
-NSString *toNSStr(const char *str) {
-    return str != NULL ? [NSString stringWithUTF8String:str] : @"";
-}
-
 /*****************************************************************************
  * VLCCoreDialogProvider implementation
  *****************************************************************************/

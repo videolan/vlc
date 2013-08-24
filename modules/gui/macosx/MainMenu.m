@@ -801,7 +801,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     NSMenuItem * o_mi_tmp;
 
     for (NSUInteger x = 0; x < n; x++) {
-        o_mi_tmp = [o_mu_device addItemWithTitle:[NSString stringWithFormat:@"%s", names[x]] action:@selector(toggleAudioDevice:) keyEquivalent:@""];
+        o_mi_tmp = [o_mu_device addItemWithTitle:toNSStr(names[x]) action:@selector(toggleAudioDevice:) keyEquivalent:@""];
         [o_mi_tmp setTarget:self];
         [o_mi_tmp setTag:[[NSString stringWithFormat:@"%s", ids[x]] intValue]];
     }

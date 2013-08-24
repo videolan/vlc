@@ -35,6 +35,9 @@
 #define B64DecNSStr(s) [[VLCStringUtility sharedInstance] b64Decode: s]
 #define B64EncAndFree(s) [[VLCStringUtility sharedInstance] b64EncodeAndFree: s]
 
+inline NSString *toNSStr(const char *str) {
+    return str != NULL ? [NSString stringWithUTF8String:str] : @"";
+}
 
 unsigned int CocoaKeyToVLC(unichar i_key);
 

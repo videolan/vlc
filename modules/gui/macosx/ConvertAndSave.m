@@ -572,7 +572,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
                     if (p_item) {
                         if (p_item->p_input) {
                             if (p_item->p_input->psz_uri != nil) {
-                                [self setMRL: [NSString stringWithFormat:@"%s", p_item->p_input->psz_uri]];
+                                [self setMRL: toNSStr(p_item->p_input->psz_uri)];
                                 [self updateDropView];
                                 [self updateOKButton];
 

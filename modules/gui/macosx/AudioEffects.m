@@ -473,7 +473,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     NSString *currentPreset = nil;
     if (p_aout) {
         char *psz_preset_string = var_GetNonEmptyString(p_aout, "equalizer-preset");
-        currentPreset = [NSString stringWithFormat:@"%s", psz_preset_string];
+        currentPreset = toNSStr(psz_preset_string);
         free(psz_preset_string);
         vlc_object_release(p_aout);
     }
