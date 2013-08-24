@@ -2405,6 +2405,8 @@ static void PIDFillFormat( ts_es_t *es, int i_stream_type )
         break;
     case 0x11:  /* MPEG4 (audio) LATM */
     case 0x0f:  /* ISO/IEC 13818-7 Audio with ADTS transport syntax */
+    case 0x1c:  /* ISO/IEC 14496-3 Audio, without using any additional
+                   transport syntax, such as DST, ALS and SLS */
         es_format_Init( fmt, AUDIO_ES, VLC_CODEC_MP4A );
         break;
     case 0x10:  /* MPEG4 (video) */
