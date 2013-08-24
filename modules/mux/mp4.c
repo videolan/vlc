@@ -136,15 +136,13 @@ struct sout_mux_sys_t
 
 typedef struct bo_t
 {
-    bool b_grow;
-
     int        i_buffer_size;
     int        i_buffer;
     uint8_t    *p_buffer;
 
 } bo_t;
 
-static void bo_init     ( bo_t *, int , uint8_t *, bool  );
+static void bo_init     ( bo_t * );
 static void bo_add_8    ( bo_t *, uint8_t );
 static void bo_add_16be ( bo_t *, uint16_t );
 static void bo_add_24be ( bo_t *, uint32_t );
@@ -251,7 +249,7 @@ static void Close( vlc_object_t * p_this )
     msg_Dbg( p_mux, "Close" );
 
     /* Update mdat size */
-    bo_init( &bo, 0, NULL, true );
+    bo_init( &bo );
     if( p_sys->i_pos - p_sys->i_mdat_pos >= (((uint64_t)1)<<32) )
     {
         /* Extended size */
@@ -1891,21 +1889,10 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
 
 /****************************************************************************/
 
-static void bo_init( bo_t *p_bo, int i_size, uint8_t *p_buffer,
-                     bool b_grow )
+static void bo_init( bo_t *p_bo )
 {
-    if( !p_buffer )
-    {
-        p_bo->i_buffer_size = __MAX( i_size, 1024 );
-        p_bo->p_buffer = xmalloc( p_bo->i_buffer_size );
-    }
-    else
-    {
-        p_bo->i_buffer_size = i_size;
-        p_bo->p_buffer = p_buffer;
-    }
-
-    p_bo->b_grow = b_grow;
+    p_bo->i_buffer_size = 1024;
+    p_bo->p_buffer = xmalloc( p_bo->i_buffer_size );
     p_bo->i_buffer = 0;
 }
 
@@ -1915,7 +1902,7 @@ static void bo_add_8( bo_t *p_bo, uint8_t i )
     {
         p_bo->p_buffer[p_bo->i_buffer] = i;
     }
-    else if( p_bo->b_grow )
+    else
     {
         p_bo->i_buffer_size += 1024;
         p_bo->p_buffer = xrealloc( p_bo->p_buffer, p_bo->i_buffer_size );
@@ -1991,7 +1978,7 @@ static bo_t * box_new( const char *fcc )
 
     if( ( box = malloc( sizeof( bo_t ) ) ) )
     {
-        bo_init( box, 0, NULL, true );
+        bo_init( box );
 
         bo_add_32be  ( box, 0 );
         bo_add_fourcc( box, fcc );
@@ -2006,7 +1993,7 @@ static bo_t * box_full_new( const char *fcc, uint8_t v, uint32_t f )
 
     if( ( box = malloc( sizeof( bo_t ) ) ) )
     {
-        bo_init( box, 0, NULL, true );
+        bo_init( box );
 
         bo_add_32be  ( box, 0 );
         bo_add_fourcc( box, fcc );
