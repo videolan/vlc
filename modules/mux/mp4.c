@@ -457,7 +457,7 @@ static int Mux(sout_mux_t *p_mux)
                 block_t *p_next = block_FifoShow(p_input->p_fifo);
                 int64_t i_diff  = p_next->i_dts - p_data->i_dts;
 
-                if (i_diff < INT64_C(1000000)) /* protection */
+                if (i_diff < CLOCK_FREQ) /* protection */
                     p_data->i_length = i_diff;
             }
             if (p_data->i_length <= 0) {
@@ -1226,10 +1226,9 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
         mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
         i_movie_duration = __MAX(i_movie_duration, p_stream->i_duration);
     }
-    msg_Dbg(p_mux, "movie duration %ds",
-             (uint32_t)(i_movie_duration / (mtime_t)1000000));
+    msg_Dbg(p_mux, "movie duration %"PRId64"s", i_movie_duration / CLOCK_FREQ);
 
-    i_movie_duration = i_movie_duration * i_movie_timescale / 1000000;
+    i_movie_duration = i_movie_duration * i_movie_timescale / CLOCK_FREQ;
 
     /* *** add /moov/mvhd *** */
     if (!p_sys->b_64_ext) {
@@ -1285,8 +1284,7 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
             bo_add_32be(tkhd, p_stream->i_track_id);
             bo_add_32be(tkhd, 0);                     // reserved 0
             bo_add_32be(tkhd, p_stream->i_duration *
-                         (int64_t)i_movie_timescale /
-                         (mtime_t)1000000);            // duration
+                         (int64_t)i_movie_timescale / CLOCK_FREQ); // duration
         } else {
             if (p_sys->b_mov)
                 tkhd = box_full_new("tkhd", 1, 0x0f);
@@ -1298,8 +1296,7 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
             bo_add_32be(tkhd, p_stream->i_track_id);
             bo_add_32be(tkhd, 0);                     // reserved 0
             bo_add_64be(tkhd, p_stream->i_duration *
-                         (int64_t)i_movie_timescale /
-                         (mtime_t)1000000);            // duration
+                         (int64_t)i_movie_timescale / CLOCK_FREQ); // duration
         }
 
         for (int i = 0; i < 2; i++)
@@ -1356,11 +1353,11 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
 
             if (p_sys->b_64_ext) {
                 bo_add_64be(elst, (p_stream->i_dts_start-p_sys->i_dts_start) *
-                             i_movie_timescale / INT64_C(1000000));
+                             i_movie_timescale / CLOCK_FREQ);
                 bo_add_64be(elst, -1);
             } else {
                 bo_add_32be(elst, (p_stream->i_dts_start-p_sys->i_dts_start) *
-                             i_movie_timescale / INT64_C(1000000));
+                             i_movie_timescale / CLOCK_FREQ);
                 bo_add_32be(elst, -1);
             }
             bo_add_16be(elst, 1);
@@ -1370,11 +1367,11 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
         }
         if (p_sys->b_64_ext) {
             bo_add_64be(elst, p_stream->i_duration *
-                         i_movie_timescale / INT64_C(1000000));
+                         i_movie_timescale / CLOCK_FREQ);
             bo_add_64be(elst, 0);
         } else {
             bo_add_32be(elst, p_stream->i_duration *
-                         i_movie_timescale / INT64_C(1000000));
+                         i_movie_timescale / CLOCK_FREQ);
             bo_add_32be(elst, 0);
         }
         bo_add_16be(elst, 1);
@@ -1394,14 +1391,14 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
             bo_add_32be(mdhd, i_timestamp);   // modification time
             bo_add_32be(mdhd, i_timescale);        // timescale
             bo_add_32be(mdhd, p_stream->i_duration * (int64_t)i_timescale /
-                               (mtime_t)1000000);  // duration
+                               CLOCK_FREQ);  // duration
         } else {
             mdhd = box_full_new("mdhd", 1, 0);
             bo_add_64be(mdhd, i_timestamp);   // creation time
             bo_add_64be(mdhd, i_timestamp);   // modification time
             bo_add_32be(mdhd, i_timescale);        // timescale
             bo_add_64be(mdhd, p_stream->i_duration * (int64_t)i_timescale /
-                               (mtime_t)1000000);  // duration
+                               CLOCK_FREQ);  // duration
         }
 
         if (p_stream->fmt.psz_language) {
