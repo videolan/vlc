@@ -733,31 +733,29 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
     bs_init(&s, p_buffer, i_buffer);
 
     /* Read the stream mux configuration if present */
-    if (!bs_read1(&s)) {
-        if (!LatmReadStreamMuxConfiguration(&p_sys->latm, &s) &&
+    if (!bs_read1(&s) && !LatmReadStreamMuxConfiguration(&p_sys->latm, &s) &&
             p_sys->latm.i_streams > 0) {
-            const latm_stream_t *st = &p_sys->latm.stream[0];
+        const latm_stream_t *st = &p_sys->latm.stream[0];
 
-            p_sys->i_channels = st->cfg.i_channel;
-            p_sys->i_rate = st->cfg.i_samplerate;
-            p_sys->i_frame_length = st->cfg.i_frame_length;
+        p_sys->i_channels = st->cfg.i_channel;
+        p_sys->i_rate = st->cfg.i_samplerate;
+        p_sys->i_frame_length = st->cfg.i_frame_length;
 
-            if (p_sys->i_channels > 0 && p_sys->i_rate > 0 &&
-                 p_sys->i_frame_length > 0) {
-                /* FIXME And if it changes ? */
-                if (!p_dec->fmt_out.i_extra && st->i_extra > 0) {
-                    p_dec->fmt_out.i_extra = st->i_extra;
-                    p_dec->fmt_out.p_extra = malloc(st->i_extra);
-                    if (!p_dec->fmt_out.p_extra) {
-                        p_dec->fmt_out.i_extra = 0;
-                        return 0;
-                    }
-                    memcpy(p_dec->fmt_out.p_extra, st->extra, st->i_extra);
+        /* FIXME And if it changes ? */
+        if (p_sys->i_channels && p_sys->i_rate && p_sys->i_frame_length > 0) {
+            if (!p_dec->fmt_out.i_extra && st->i_extra > 0) {
+                p_dec->fmt_out.i_extra = st->i_extra;
+                p_dec->fmt_out.p_extra = malloc(st->i_extra);
+                if (!p_dec->fmt_out.p_extra) {
+                    p_dec->fmt_out.i_extra = 0;
+                    return 0;
                 }
-                p_sys->b_latm_cfg = true;
+                memcpy(p_dec->fmt_out.p_extra, st->extra, st->i_extra);
             }
+            p_sys->b_latm_cfg = true;
         }
     }
+
     /* Wait for the configuration */
     if (!p_sys->b_latm_cfg)
         return 0;
@@ -794,6 +792,7 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
                     }
                 }
             }
+
             /* Payload Data */
             for (int i_program = 0; i_program < p_sys->latm.i_programs; i_program++) {
                 for (int i_layer = 0; i_layer < p_sys->latm.pi_layers[i_program]; i_layer++) {
