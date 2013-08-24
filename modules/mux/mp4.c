@@ -1076,12 +1076,9 @@ static bo_t *GetTextBox(void)
 static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    bo_t *stbl, *stsd, *stts, *stco, *stsc, *stsz, *stss;
-
-    stbl = box_new("stbl");
 
     /* sample description */
-    stsd = box_full_new("stsd", 0, 0);
+    bo_t *stsd = box_full_new("stsd", 0, 0);
     bo_add_32be(stsd, 1);
     if (p_stream->fmt.i_cat == AUDIO_ES)
         box_gather(stsd, GetSounBox(p_mux, p_stream));
@@ -1091,6 +1088,7 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
         box_gather(stsd, GetTextBox());
 
     /* chunk offset table */
+    bo_t *stco;
     if (p_sys->i_pos >= (((uint64_t)0x1) << 32)) {
         /* 64 bits version */
         p_stream->b_stco64 = true;
@@ -1103,7 +1101,7 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
     bo_add_32be(stco, 0);     // entry-count (fixed latter)
 
     /* sample to chunk table */
-    stsc = box_full_new("stsc", 0, 0);
+    bo_t *stsc = box_full_new("stsc", 0, 0);
     bo_add_32be(stsc, 0);     // entry-count (fixed latter)
 
     unsigned i_chunk = 0;
@@ -1142,7 +1140,7 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
     bo_fix_32be(stsc, 12, i_stsc_entries );
 
     /* add stts */
-    stts = box_full_new("stts", 0, 0);
+    bo_t *stts = box_full_new("stts", 0, 0);
     bo_add_32be(stts, 0);     // entry-count (fixed latter)
 
     uint32_t i_timescale;
@@ -1169,14 +1167,14 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
 
     /* FIXME add ctts ?? FIXME */
 
-    stsz = box_full_new("stsz", 0, 0);
+    bo_t *stsz = box_full_new("stsz", 0, 0);
     bo_add_32be(stsz, 0);                             // sample-size
     bo_add_32be(stsz, p_stream->i_entry_count);       // sample-count
     for (unsigned i = 0; i < p_stream->i_entry_count; i++)
         bo_add_32be(stsz, p_stream->entry[i].i_size); // sample-size
 
     /* create stss table */
-    stss = NULL;
+    bo_t *stss = NULL;
     i_index = 0;
     for (unsigned i = 0; i < p_stream->i_entry_count; i++)
         if (p_stream->entry[i].i_flags & BLOCK_FLAG_TYPE_I) {
@@ -1192,6 +1190,8 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
         bo_fix_32be(stss, 12, i_index);
 
     /* Now gather all boxes into stbl */
+    bo_t *stbl = box_new("stbl");
+
     box_gather(stbl, stsd);
     box_gather(stbl, stts);
     if (stss)
