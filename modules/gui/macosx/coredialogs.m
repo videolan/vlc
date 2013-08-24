@@ -100,7 +100,7 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     dialog_fatal_t *p_dialog = [o_value pointerValue];
     NSAlert *o_alert;
 
-    o_alert = [NSAlert alertWithMessageText: toNSStr(p_dialog->title) defaultButton: _NS("OK") alternateButton: nil otherButton: nil informativeTextWithFormat: @"%s", p_dialog->message];
+    o_alert = [NSAlert alertWithMessageText: toNSStr(p_dialog->title) defaultButton: _NS("OK") alternateButton: nil otherButton: nil informativeTextWithFormat: @"%@", toNSStr(p_dialog->message)];
     [o_alert setAlertStyle: NSCriticalAlertStyle];
     [o_alert runModal];
 }
