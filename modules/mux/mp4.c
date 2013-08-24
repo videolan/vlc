@@ -44,28 +44,28 @@
  * Module descriptor
  *****************************************************************************/
 #define FASTSTART_TEXT N_("Create \"Fast Start\" files")
-#define FASTSTART_LONGTEXT N_( \
+#define FASTSTART_LONGTEXT N_(\
     "Create \"Fast Start\" files. " \
     "\"Fast Start\" files are optimized for downloads and allow the user " \
     "to start previewing the file while it is downloading.")
 
-static int  Open   ( vlc_object_t * );
-static void Close  ( vlc_object_t * );
+static int  Open   (vlc_object_t *);
+static void Close  (vlc_object_t *);
 
 #define SOUT_CFG_PREFIX "sout-mp4-"
 
 vlc_module_begin ()
-    set_description( N_("MP4/MOV muxer") )
-    set_category( CAT_SOUT )
-    set_subcategory( SUBCAT_SOUT_MUX )
-    set_shortname( "MP4" )
+    set_description(N_("MP4/MOV muxer"))
+    set_category(CAT_SOUT)
+    set_subcategory(SUBCAT_SOUT_MUX)
+    set_shortname("MP4")
 
-    add_bool( SOUT_CFG_PREFIX "faststart", true,
+    add_bool(SOUT_CFG_PREFIX "faststart", true,
               FASTSTART_TEXT, FASTSTART_LONGTEXT,
-              true )
-    set_capability( "sout mux", 5 )
-    add_shortcut( "mp4", "mov", "3gp" )
-    set_callbacks( Open, Close )
+              true)
+    set_capability("sout mux", 5)
+    add_shortcut("mp4", "mov", "3gp")
+    set_callbacks(Open, Close)
 vlc_module_end ()
 
 /*****************************************************************************
@@ -75,10 +75,10 @@ static const char *const ppsz_sout_options[] = {
     "faststart", NULL
 };
 
-static int Control( sout_mux_t *, int, va_list );
-static int AddStream( sout_mux_t *, sout_input_t * );
-static int DelStream( sout_mux_t *, sout_input_t * );
-static int Mux      ( sout_mux_t * );
+static int Control(sout_mux_t *, int, va_list);
+static int AddStream(sout_mux_t *, sout_input_t *);
+static int DelStream(sout_mux_t *, sout_input_t *);
+static int Mux      (sout_mux_t *);
 
 /*****************************************************************************
  * Local prototypes
@@ -140,75 +140,78 @@ typedef struct bo_t
     size_t     len;
 } bo_t;
 
-static void bo_init     ( bo_t * );
-static void bo_add_8    ( bo_t *, uint8_t );
-static void bo_add_16be ( bo_t *, uint16_t );
-static void bo_add_24be ( bo_t *, uint32_t );
-static void bo_add_32be ( bo_t *, uint32_t );
-static void bo_add_64be ( bo_t *, uint64_t );
-static void bo_add_fourcc(bo_t *, const char * );
-static void bo_add_mem  ( bo_t *, int , uint8_t * );
-static void bo_add_descr( bo_t *, uint8_t , uint32_t );
+static void bo_init     (bo_t *);
+static void bo_add_8    (bo_t *, uint8_t);
+static void bo_add_16be (bo_t *, uint16_t);
+static void bo_add_24be (bo_t *, uint32_t);
+static void bo_add_32be (bo_t *, uint32_t);
+static void bo_add_64be (bo_t *, uint64_t);
+static void bo_add_fourcc(bo_t *, const char *);
+static void bo_add_mem  (bo_t *, int , uint8_t *);
+static void bo_add_descr(bo_t *, uint8_t , uint32_t);
 
-static void bo_fix_32be ( bo_t *, int , uint32_t );
+static void bo_fix_32be (bo_t *, int , uint32_t);
 
-static bo_t *box_new     ( const char *fcc );
-static bo_t *box_full_new( const char *fcc, uint8_t v, uint32_t f );
-static void  box_fix     ( bo_t *box );
-static void  box_gather  ( bo_t *box, bo_t *box2 );
+static bo_t *box_new     (const char *fcc);
+static bo_t *box_full_new(const char *fcc, uint8_t v, uint32_t f);
+static void  box_fix     (bo_t *box);
+static void  box_gather  (bo_t *box, bo_t *box2);
 
-static void box_send( sout_mux_t *p_mux,  bo_t *box );
+static void box_send(sout_mux_t *p_mux,  bo_t *box);
 
-static bo_t *GetMoovBox( sout_mux_t *p_mux );
+static bo_t *GetMoovBox(sout_mux_t *p_mux);
 
-static block_t *ConvertSUBT( block_t *);
-static block_t *ConvertAVC1( block_t * );
+static block_t *ConvertSUBT(block_t *);
+static block_t *ConvertAVC1(block_t *);
 
 /*****************************************************************************
  * Open:
  *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+static int Open(vlc_object_t *p_this)
 {
     sout_mux_t      *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t  *p_sys;
     bo_t            *box;
 
-    msg_Dbg( p_mux, "Mp4 muxer opened" );
-    config_ChainParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
+    msg_Dbg(p_mux, "Mp4 muxer opened");
+    config_ChainParse(p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg);
 
     p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
-    p_mux->p_sys        = p_sys = malloc( sizeof( sout_mux_sys_t ) );
-    if( !p_sys )
+    p_mux->p_sys        = p_sys = malloc(sizeof(sout_mux_sys_t));
+    if (!p_sys)
         return VLC_ENOMEM;
     p_sys->i_pos        = 0;
     p_sys->i_nb_streams = 0;
     p_sys->pp_streams   = NULL;
     p_sys->i_mdat_pos   = 0;
-    p_sys->b_mov        = p_mux->psz_mux && !strcmp( p_mux->psz_mux, "mov" );
-    p_sys->b_3gp        = p_mux->psz_mux && !strcmp( p_mux->psz_mux, "3gp" );
+    p_sys->b_mov        = p_mux->psz_mux && !strcmp(p_mux->psz_mux, "mov");
+    p_sys->b_3gp        = p_mux->psz_mux && !strcmp(p_mux->psz_mux, "3gp");
     p_sys->i_dts_start  = 0;
 
 
-    if( !p_sys->b_mov )
-    {
+    if (!p_sys->b_mov) {
         /* Now add ftyp header */
-        box = box_new( "ftyp" );
-        if( p_sys->b_3gp ) bo_add_fourcc( box, "3gp6" );
-        else bo_add_fourcc( box, "isom" );
-        bo_add_32be  ( box, 0 );
-        if( p_sys->b_3gp ) bo_add_fourcc( box, "3gp4" );
-        else bo_add_fourcc( box, "mp41" );
-        bo_add_fourcc( box, "avc1" );
-        bo_add_fourcc( box, "qt  " );
-        box_fix( box );
+        box = box_new("ftyp");
+        if (p_sys->b_3gp)
+            bo_add_fourcc(box, "3gp6");
+        else
+            bo_add_fourcc(box, "isom");
+        bo_add_32be  (box, 0);
+        if (p_sys->b_3gp)
+            bo_add_fourcc(box, "3gp4");
+        else
+            bo_add_fourcc(box, "mp41");
+        bo_add_fourcc(box, "avc1");
+        bo_add_fourcc(box, "qt  ");
+        box_fix(box);
 
         p_sys->i_pos += box->len;
         p_sys->i_mdat_pos = p_sys->i_pos;
 
-        box_send( p_mux, box );
+        box_send(p_mux, box);
     }
 
     /* FIXME FIXME
@@ -216,12 +219,12 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_64_ext = false;
 
     /* Now add mdat header */
-    box = box_new( "mdat" );
-    bo_add_64be  ( box, 0 ); // enough to store an extended size
+    box = box_new("mdat");
+    bo_add_64be  (box, 0); // enough to store an extended size
 
     p_sys->i_pos += box->len;
 
-    box_send( p_mux, box );
+    box_send(p_mux, box);
 
     return VLC_SUCCESS;
 }
@@ -229,7 +232,7 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Close:
  *****************************************************************************/
-static void Close( vlc_object_t * p_this )
+static void Close(vlc_object_t *p_this)
 {
     sout_mux_t      *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
@@ -237,91 +240,79 @@ static void Close( vlc_object_t * p_this )
     bo_t            bo, *moov;
     vlc_value_t     val;
 
-    int             i_trak;
     uint64_t        i_moov_pos;
 
-    msg_Dbg( p_mux, "Close" );
+    msg_Dbg(p_mux, "Close");
 
     /* Update mdat size */
-    bo_init( &bo );
-    if( p_sys->i_pos - p_sys->i_mdat_pos >= (((uint64_t)1)<<32) )
-    {
+    bo_init(&bo);
+    if (p_sys->i_pos - p_sys->i_mdat_pos >= (((uint64_t)1)<<32)) {
         /* Extended size */
-        bo_add_32be  ( &bo, 1 );
-        bo_add_fourcc( &bo, "mdat" );
-        bo_add_64be  ( &bo, p_sys->i_pos - p_sys->i_mdat_pos );
-    }
-    else
-    {
-        bo_add_32be  ( &bo, 8 );
-        bo_add_fourcc( &bo, "wide" );
-        bo_add_32be  ( &bo, p_sys->i_pos - p_sys->i_mdat_pos - 8 );
-        bo_add_fourcc( &bo, "mdat" );
+        bo_add_32be  (&bo, 1);
+        bo_add_fourcc(&bo, "mdat");
+        bo_add_64be  (&bo, p_sys->i_pos - p_sys->i_mdat_pos);
+    } else {
+        bo_add_32be  (&bo, 8);
+        bo_add_fourcc(&bo, "wide");
+        bo_add_32be  (&bo, p_sys->i_pos - p_sys->i_mdat_pos - 8);
+        bo_add_fourcc(&bo, "mdat");
     }
     p_hdr = bo.b;
     p_hdr->i_buffer = bo.len;
 
-    sout_AccessOutSeek( p_mux->p_access, p_sys->i_mdat_pos );
-    sout_AccessOutWrite( p_mux->p_access, p_hdr );
+    sout_AccessOutSeek(p_mux->p_access, p_sys->i_mdat_pos);
+    sout_AccessOutWrite(p_mux->p_access, p_hdr);
 
     /* Create MOOV header */
     i_moov_pos = p_sys->i_pos;
-    moov = GetMoovBox( p_mux );
+    moov = GetMoovBox(p_mux);
 
     /* Check we need to create "fast start" files */
-    var_Get( p_this, SOUT_CFG_PREFIX "faststart", &val );
+    var_Get(p_this, SOUT_CFG_PREFIX "faststart", &val);
     p_sys->b_fast_start = val.b_bool;
-    while( p_sys->b_fast_start )
-    {
+    while (p_sys->b_fast_start) {
         /* Move data to the end of the file so we can fit the moov header
          * at the start */
         block_t *p_buf;
         int64_t i_chunk, i_size = p_sys->i_pos - p_sys->i_mdat_pos;
         int i_moov_size = moov->len;
 
-        while( i_size > 0 )
-        {
-            i_chunk = __MIN( 32768, i_size );
-            p_buf = block_Alloc( i_chunk );
-            sout_AccessOutSeek( p_mux->p_access,
-                                p_sys->i_mdat_pos + i_size - i_chunk );
-            if( sout_AccessOutRead( p_mux->p_access, p_buf ) < i_chunk )
-            {
-                msg_Warn( p_this, "read() not supported by access output, "
-                          "won't create a fast start file" );
+        while (i_size > 0) {
+            i_chunk = __MIN(32768, i_size);
+            p_buf = block_Alloc(i_chunk);
+            sout_AccessOutSeek(p_mux->p_access,
+                                p_sys->i_mdat_pos + i_size - i_chunk);
+            if (sout_AccessOutRead(p_mux->p_access, p_buf) < i_chunk) {
+                msg_Warn(p_this, "read() not supported by access output, "
+                          "won't create a fast start file");
                 p_sys->b_fast_start = false;
-                block_Release( p_buf );
+                block_Release(p_buf);
                 break;
             }
-            sout_AccessOutSeek( p_mux->p_access, p_sys->i_mdat_pos + i_size +
-                                i_moov_size - i_chunk );
-            sout_AccessOutWrite( p_mux->p_access, p_buf );
+            sout_AccessOutSeek(p_mux->p_access, p_sys->i_mdat_pos + i_size +
+                                i_moov_size - i_chunk);
+            sout_AccessOutWrite(p_mux->p_access, p_buf);
             i_size -= i_chunk;
         }
 
-        if( !p_sys->b_fast_start ) break;
+        if (!p_sys->b_fast_start)
+            break;
 
         /* Fix-up samples to chunks table in MOOV header */
-        for( i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++ )
-        {
+        for (int i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++) {
             mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
-            unsigned int i;
-            int i_chunk;
 
             moov->len = p_stream->i_stco_pos;
-            for( i_chunk = 0, i = 0; i < p_stream->i_entry_count; i_chunk++ )
-            {
-                if( p_stream->b_stco64 )
-                    bo_add_64be( moov, p_stream->entry[i].i_pos + i_moov_size);
+            for (unsigned i = 0; i < p_stream->i_entry_count; ) {
+                if (p_stream->b_stco64)
+                    bo_add_64be(moov, p_stream->entry[i].i_pos + i_moov_size);
                 else
-                    bo_add_32be( moov, p_stream->entry[i].i_pos + i_moov_size);
+                    bo_add_32be(moov, p_stream->entry[i].i_pos + i_moov_size);
 
-                while( i < p_stream->i_entry_count )
-                {
-                    if( i + 1 < p_stream->i_entry_count &&
+                while (i < p_stream->i_entry_count) {
+                    if (i + 1 < p_stream->i_entry_count &&
                         p_stream->entry[i].i_pos + p_stream->entry[i].i_size
-                        != p_stream->entry[i + 1].i_pos )
-                    {
+                        != p_stream->entry[i + 1].i_pos) {
                         i++;
                         break;
                     }
@@ -337,170 +328,157 @@ static void Close( vlc_object_t * p_this )
     }
 
     /* Write MOOV header */
-    sout_AccessOutSeek( p_mux->p_access, i_moov_pos );
-    box_send( p_mux, moov );
+    sout_AccessOutSeek(p_mux->p_access, i_moov_pos);
+    box_send(p_mux, moov);
 
     /* Clean-up */
-    for( i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++ )
-    {
+    for (int i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++) {
         mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
 
-        es_format_Clean( &p_stream->fmt );
-        free( p_stream->entry );
-        free( p_stream );
+        es_format_Clean(&p_stream->fmt);
+        free(p_stream->entry);
+        free(p_stream);
     }
-    if( p_sys->i_nb_streams ) free( p_sys->pp_streams );
-    free( p_sys );
+    if (p_sys->i_nb_streams)
+        free(p_sys->pp_streams);
+    free(p_sys);
 }
 
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int Control( sout_mux_t *p_mux, int i_query, va_list args )
+static int Control(sout_mux_t *p_mux, int i_query, va_list args)
 {
     VLC_UNUSED(p_mux);
     bool *pb_bool;
 
-    switch( i_query )
+    switch(i_query)
     {
-        case MUX_CAN_ADD_STREAM_WHILE_MUXING:
-            pb_bool = (bool*)va_arg( args, bool * );
-            *pb_bool = false;
-            return VLC_SUCCESS;
+    case MUX_CAN_ADD_STREAM_WHILE_MUXING:
+        pb_bool = (bool*)va_arg(args, bool *);
+        *pb_bool = false;
+        return VLC_SUCCESS;
 
-        case MUX_GET_ADD_STREAM_WAIT:
-            pb_bool = (bool*)va_arg( args, bool * );
-            *pb_bool = true;
-            return VLC_SUCCESS;
+    case MUX_GET_ADD_STREAM_WAIT:
+        pb_bool = (bool*)va_arg(args, bool *);
+        *pb_bool = true;
+        return VLC_SUCCESS;
 
-        case MUX_GET_MIME:   /* Not needed, as not streamable */
-        default:
-            return VLC_EGENERIC;
+    case MUX_GET_MIME:   /* Not needed, as not streamable */
+    default:
+        return VLC_EGENERIC;
     }
 }
 
 /*****************************************************************************
  * AddStream:
  *****************************************************************************/
-static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
+static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     mp4_stream_t    *p_stream;
 
-    switch( p_input->p_fmt->i_codec )
+    switch(p_input->p_fmt->i_codec)
     {
-        case VLC_CODEC_MP4A:
-        case VLC_CODEC_MP4V:
-        case VLC_CODEC_MPGA:
-        case VLC_CODEC_MPGV:
-        case VLC_CODEC_MJPG:
-        case VLC_CODEC_MJPGB:
-        case VLC_CODEC_SVQ1:
-        case VLC_CODEC_SVQ3:
-        case VLC_CODEC_H263:
-        case VLC_CODEC_H264:
-        case VLC_CODEC_AMR_NB:
-        case VLC_CODEC_AMR_WB:
-        case VLC_CODEC_YV12:
-        case VLC_CODEC_YUYV:
-            break;
-        case VLC_CODEC_SUBT:
-            msg_Warn( p_mux, "subtitle track added like in .mov (even when creating .mp4)" );
-            break;
-        default:
-            msg_Err( p_mux, "unsupported codec %4.4s in mp4",
-                     (char*)&p_input->p_fmt->i_codec );
-            return VLC_EGENERIC;
+    case VLC_CODEC_MP4A:
+    case VLC_CODEC_MP4V:
+    case VLC_CODEC_MPGA:
+    case VLC_CODEC_MPGV:
+    case VLC_CODEC_MJPG:
+    case VLC_CODEC_MJPGB:
+    case VLC_CODEC_SVQ1:
+    case VLC_CODEC_SVQ3:
+    case VLC_CODEC_H263:
+    case VLC_CODEC_H264:
+    case VLC_CODEC_AMR_NB:
+    case VLC_CODEC_AMR_WB:
+    case VLC_CODEC_YV12:
+    case VLC_CODEC_YUYV:
+        break;
+    case VLC_CODEC_SUBT:
+        msg_Warn(p_mux, "subtitle track added like in .mov (even when creating .mp4)");
+        break;
+    default:
+        msg_Err(p_mux, "unsupported codec %4.4s in mp4",
+                 (char*)&p_input->p_fmt->i_codec);
+        return VLC_EGENERIC;
     }
 
-    p_stream                = malloc( sizeof( mp4_stream_t ) );
-    if( !p_stream )
+    p_stream = malloc(sizeof(mp4_stream_t));
+    if (!p_stream)
         return VLC_ENOMEM;
-    es_format_Copy( &p_stream->fmt, p_input->p_fmt );
+    es_format_Copy(&p_stream->fmt, p_input->p_fmt);
     p_stream->i_track_id    = p_sys->i_nb_streams + 1;
     p_stream->i_length_neg  = 0;
     p_stream->i_entry_count = 0;
     p_stream->i_entry_max   = 1000;
     p_stream->entry         =
-        calloc( p_stream->i_entry_max, sizeof( mp4_entry_t ) );
+        calloc(p_stream->i_entry_max, sizeof(mp4_entry_t));
     p_stream->i_dts_start   = 0;
     p_stream->i_duration    = 0;
 
     p_input->p_sys          = p_stream;
 
-    msg_Dbg( p_mux, "adding input" );
+    msg_Dbg(p_mux, "adding input");
 
-    TAB_APPEND( p_sys->i_nb_streams, p_sys->pp_streams, p_stream );
+    TAB_APPEND(p_sys->i_nb_streams, p_sys->pp_streams, p_stream);
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * DelStream:
  *****************************************************************************/
-static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
+static int DelStream(sout_mux_t *p_mux, sout_input_t *p_input)
 {
     VLC_UNUSED(p_input);
-    msg_Dbg( p_mux, "removing input" );
+    msg_Dbg(p_mux, "removing input");
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * Mux:
  *****************************************************************************/
-static int Mux( sout_mux_t *p_mux )
+static int Mux(sout_mux_t *p_mux)
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
 
-    for( ;; )
-    {
+    for (;;) {
         sout_input_t    *p_input;
         mp4_stream_t    *p_stream;
         block_t         *p_data;
         mtime_t         i_dts;
 
-        int i_stream = sout_MuxGetStream( p_mux, 2, &i_dts);
-        if( i_stream < 0 )
-        {
-            return( VLC_SUCCESS );
-        }
+        int i_stream = sout_MuxGetStream(p_mux, 2, &i_dts);
+        if (i_stream < 0)
+            return(VLC_SUCCESS);
 
         p_input  = p_mux->pp_inputs[i_stream];
         p_stream = (mp4_stream_t*)p_input->p_sys;
 
 again:
-        p_data  = block_FifoGet( p_input->p_fifo );
-        if( p_stream->fmt.i_codec == VLC_CODEC_H264 )
-        {
-            p_data = ConvertAVC1( p_data );
-        }
-        else if( p_stream->fmt.i_codec == VLC_CODEC_SUBT )
-        {
-            p_data = ConvertSUBT( p_data );
-        }
-        if( p_data == NULL ) goto again;
+        p_data  = block_FifoGet(p_input->p_fifo);
+        if (p_stream->fmt.i_codec == VLC_CODEC_H264)
+            p_data = ConvertAVC1(p_data);
+        else if (p_stream->fmt.i_codec == VLC_CODEC_SUBT)
+            p_data = ConvertSUBT(p_data);
+        if (p_data == NULL)
+            goto again;
 
-        if( p_stream->fmt.i_cat != SPU_ES )
-        {
+        if (p_stream->fmt.i_cat != SPU_ES) {
             /* Fix length of the sample */
-            if( block_FifoCount( p_input->p_fifo ) > 0 )
-            {
-                block_t *p_next = block_FifoShow( p_input->p_fifo );
+            if (block_FifoCount(p_input->p_fifo) > 0) {
+                block_t *p_next = block_FifoShow(p_input->p_fifo);
                 int64_t       i_diff  = p_next->i_dts - p_data->i_dts;
 
-                if( i_diff < INT64_C(1000000 ) )   /* protection */
-                {
+                if (i_diff < INT64_C(1000000)) /* protection */
                     p_data->i_length = i_diff;
-                }
             }
-            if( p_data->i_length <= 0 )
-            {
-                msg_Warn( p_mux, "i_length <= 0" );
+            if (p_data->i_length <= 0) {
+                msg_Warn(p_mux, "i_length <= 0");
                 p_stream->i_length_neg += p_data->i_length - 1;
                 p_data->i_length = 1;
-            }
-            else if( p_stream->i_length_neg < 0 )
-            {
-                int64_t i_recover = __MIN( p_data->i_length / 4, - p_stream->i_length_neg );
+            } else if (p_stream->i_length_neg < 0) {
+                int64_t i_recover = __MIN(p_data->i_length / 4, - p_stream->i_length_neg);
 
                 p_data->i_length -= i_recover;
                 p_stream->i_length_neg += i_recover;
@@ -508,33 +486,23 @@ again:
         }
 
         /* Save starting time */
-        if( p_stream->i_entry_count == 0 )
-        {
+        if (p_stream->i_entry_count == 0) {
             p_stream->i_dts_start = p_data->i_dts;
 
             /* Update global dts_start */
-            if( p_sys->i_dts_start <= 0 ||
-                p_stream->i_dts_start < p_sys->i_dts_start )
-            {
+            if (p_sys->i_dts_start <= 0 || p_stream->i_dts_start < p_sys->i_dts_start)
                 p_sys->i_dts_start = p_stream->i_dts_start;
-            }
         }
 
-        if( p_stream->fmt.i_cat == SPU_ES && p_stream->i_entry_count > 0 )
-        {
+        if (p_stream->fmt.i_cat == SPU_ES && p_stream->i_entry_count > 0) {
             int64_t i_length = p_data->i_dts - p_stream->i_last_dts;
 
-            if( i_length <= 0 )
-            {
-                /* FIXME handle this broken case */
+            if (i_length <= 0) /* FIXME handle this broken case */
                 i_length = 1;
-            }
 
             /* Fix last entry */
-            if( p_stream->entry[p_stream->i_entry_count-1].i_length <= 0 )
-            {
+            if (p_stream->entry[p_stream->i_entry_count-1].i_length <= 0)
                 p_stream->entry[p_stream->i_entry_count-1].i_length = i_length;
-            }
         }
 
 
@@ -542,17 +510,16 @@ again:
         p_stream->entry[p_stream->i_entry_count].i_pos    = p_sys->i_pos;
         p_stream->entry[p_stream->i_entry_count].i_size   = p_data->i_buffer;
         p_stream->entry[p_stream->i_entry_count].i_pts_dts=
-            __MAX( p_data->i_pts - p_data->i_dts, 0 );
+            __MAX(p_data->i_pts - p_data->i_dts, 0);
         p_stream->entry[p_stream->i_entry_count].i_length = p_data->i_length;
         p_stream->entry[p_stream->i_entry_count].i_flags  = p_data->i_flags;
 
         p_stream->i_entry_count++;
         /* XXX: -1 to always have 2 entry for easy adding of empty SPU */
-        if( p_stream->i_entry_count >= p_stream->i_entry_max - 1 )
-        {
+        if (p_stream->i_entry_count >= p_stream->i_entry_max - 1) {
             p_stream->i_entry_max += 1000;
-            p_stream->entry = xrealloc( p_stream->entry,
-                         p_stream->i_entry_max * sizeof( mp4_entry_t ) );
+            p_stream->entry = xrealloc(p_stream->entry,
+                         p_stream->i_entry_max * sizeof(mp4_entry_t));
         }
 
         /* update */
@@ -563,16 +530,14 @@ again:
         p_stream->i_last_dts = p_data->i_dts;
 
         /* write data */
-        sout_AccessOutWrite( p_mux->p_access, p_data );
+        sout_AccessOutWrite(p_mux->p_access, p_data);
 
-        if( p_stream->fmt.i_cat == SPU_ES )
-        {
+        if (p_stream->fmt.i_cat == SPU_ES) {
             int64_t i_length = p_stream->entry[p_stream->i_entry_count-1].i_length;
 
-            if( i_length != 0 )
-            {
+            if (i_length != 0) {
                 /* TODO */
-                msg_Dbg( p_mux, "writing an empty sub" ) ;
+                msg_Dbg(p_mux, "writing an empty sub") ;
 
                 /* Append a idx entry */
                 p_stream->entry[p_stream->i_entry_count].i_pos    = p_sys->i_pos;
@@ -588,14 +553,14 @@ again:
                 p_stream->i_last_dts += i_length;
 
                 /* Write a " " */
-                p_data = block_Alloc( 3 );
+                p_data = block_Alloc(3);
                 p_data->p_buffer[0] = 0;
                 p_data->p_buffer[1] = 1;
                 p_data->p_buffer[2] = ' ';
 
                 p_sys->i_pos += p_data->i_buffer;
 
-                sout_AccessOutWrite( p_mux->p_access, p_data );
+                sout_AccessOutWrite(p_mux->p_access, p_data);
             }
 
             /* Fix duration */
@@ -603,27 +568,27 @@ again:
         }
     }
 
-    return( VLC_SUCCESS );
+    return(VLC_SUCCESS);
 }
 
 /*****************************************************************************
  *
  *****************************************************************************/
-static block_t *ConvertSUBT( block_t *p_block )
+static block_t *ConvertSUBT(block_t *p_block)
 {
-    p_block = block_Realloc( p_block, 2, p_block->i_buffer );
+    p_block = block_Realloc(p_block, 2, p_block->i_buffer);
 
     /* No trailling '\0' */
-    if( p_block->i_buffer > 2 && p_block->p_buffer[p_block->i_buffer-1] == '\0' )
+    if (p_block->i_buffer > 2 && p_block->p_buffer[p_block->i_buffer-1] == '\0')
         p_block->i_buffer--;
 
-    p_block->p_buffer[0] = ( (p_block->i_buffer - 2) >> 8 )&0xff;
-    p_block->p_buffer[1] = ( (p_block->i_buffer - 2)      )&0xff;
+    p_block->p_buffer[0] = ((p_block->i_buffer - 2) >> 8)&0xff;
+    p_block->p_buffer[1] = ((p_block->i_buffer - 2)     )&0xff;
 
     return p_block;
 }
 
-static block_t *ConvertAVC1( block_t *p_block )
+static block_t *ConvertAVC1(block_t *p_block)
 {
     uint8_t *last = p_block->p_buffer;  /* Assume it starts with 0x00000001 */
     uint8_t *dat  = &p_block->p_buffer[4];
@@ -631,207 +596,190 @@ static block_t *ConvertAVC1( block_t *p_block )
 
 
     /* Replace the 4 bytes start code with 4 bytes size,
-     * FIXME are all startcodes 4 bytes ? (I don't think :( */
-    while( dat < end )
-    {
+     * FIXME are all startcodes 4 bytes ? (I don't think :(*/
+    while (dat < end) {
         int i_size;
 
-        while( dat < end - 4 )
-        {
-            if( dat[0] == 0x00 && dat[1] == 0x00  &&
-                dat[2] == 0x00 && dat[3] == 0x01 )
-            {
+        while (dat < end - 4) {
+            if (dat[0] == 0x00 && dat[1] == 0x00 && dat[2] == 0x00 && dat[3] == 0x01)
                 break;
-            }
             dat++;
         }
-        if( dat >= end - 4 )
-        {
+        if (dat >= end - 4)
             dat = end;
-        }
 
         /* Fix size */
         i_size = dat - &last[4];
-        last[0] = ( i_size >> 24 )&0xff;
-        last[1] = ( i_size >> 16 )&0xff;
-        last[2] = ( i_size >>  8 )&0xff;
-        last[3] = ( i_size       )&0xff;
+        last[0] = (i_size >> 24)&0xff;
+        last[1] = (i_size >> 16)&0xff;
+        last[2] = (i_size >>  8)&0xff;
+        last[3] = (i_size      )&0xff;
 
         /* Skip blocks with SPS/PPS */
-        if( (last[4]&0x1f) == 7 || (last[4]&0x1f) == 8 )
-        {
-            ; // FIXME Find a way to skip dat without frelling everything
-        }
+        //if ((last[4]&0x1f) == 7 || (last[4]&0x1f) == 8)
+        //    ; // FIXME Find a way to skip dat without frelling everything
         last = dat;
         dat += 4;
     }
     return p_block;
 }
 
-static bo_t *GetESDS( mp4_stream_t *p_stream )
+static bo_t *GetESDS(mp4_stream_t *p_stream)
 {
     bo_t *esds;
     int  i_stream_type;
     int  i_object_type_indication;
     int  i_decoder_specific_info_size;
-    unsigned int i;
     int64_t i_bitrate_avg = 0;
     int64_t i_bitrate_max = 0;
 
     /* Compute avg/max bitrate */
-    for( i = 0; i < p_stream->i_entry_count; i++ )
-    {
+    for (unsigned i = 0; i < p_stream->i_entry_count; i++) {
         i_bitrate_avg += p_stream->entry[i].i_size;
-        if( p_stream->entry[i].i_length > 0)
-        {
+        if (p_stream->entry[i].i_length > 0) {
             int64_t i_bitrate = INT64_C(8000000) * p_stream->entry[i].i_size / p_stream->entry[i].i_length;
-            if( i_bitrate > i_bitrate_max )
+            if (i_bitrate > i_bitrate_max)
                 i_bitrate_max = i_bitrate;
         }
     }
 
-    if( p_stream->i_duration > 0 )
+    if (p_stream->i_duration > 0)
         i_bitrate_avg = INT64_C(8000000) * i_bitrate_avg / p_stream->i_duration;
     else
         i_bitrate_avg = 0;
-    if( i_bitrate_max <= 1 )
+    if (i_bitrate_max <= 1)
         i_bitrate_max = 0x7fffffff;
 
     /* */
-    i_decoder_specific_info_size = ( p_stream->fmt.i_extra > 0 ) ? 5 + p_stream->fmt.i_extra : 0;
+    i_decoder_specific_info_size = (p_stream->fmt.i_extra > 0) ? 5 + p_stream->fmt.i_extra : 0;
 
-    esds = box_full_new( "esds", 0, 0 );
+    esds = box_full_new("esds", 0, 0);
 
     /* ES_Descr */
-    bo_add_descr( esds, 0x03, 3 + 5 + 13 + i_decoder_specific_info_size + 5 + 1 );
-    bo_add_16be( esds, p_stream->i_track_id );
-    bo_add_8   ( esds, 0x1f );      // flags=0|streamPriority=0x1f
+    bo_add_descr(esds, 0x03, 3 + 5 + 13 + i_decoder_specific_info_size + 5 + 1);
+    bo_add_16be(esds, p_stream->i_track_id);
+    bo_add_8   (esds, 0x1f);      // flags=0|streamPriority=0x1f
 
     /* DecoderConfigDescr */
-    bo_add_descr( esds, 0x04, 13 + i_decoder_specific_info_size );
+    bo_add_descr(esds, 0x04, 13 + i_decoder_specific_info_size);
 
-    switch( p_stream->fmt.i_codec )
+    switch(p_stream->fmt.i_codec)
     {
-        case VLC_CODEC_MP4V:
-            i_object_type_indication = 0x20;
-            break;
-        case VLC_CODEC_MPGV:
-            /* FIXME MPEG-I=0x6b, MPEG-II = 0x60 -> 0x65 */
-            i_object_type_indication = 0x60;
-            break;
-        case VLC_CODEC_MP4A:
-            /* FIXME for mpeg2-aac == 0x66->0x68 */
-            i_object_type_indication = 0x40;
-            break;
-        case VLC_CODEC_MPGA:
-            i_object_type_indication =
-                p_stream->fmt.audio.i_rate < 32000 ? 0x69 : 0x6b;
-            break;
-        default:
-            i_object_type_indication = 0x00;
-            break;
+    case VLC_CODEC_MP4V:
+        i_object_type_indication = 0x20;
+        break;
+    case VLC_CODEC_MPGV:
+        /* FIXME MPEG-I=0x6b, MPEG-II = 0x60 -> 0x65 */
+        i_object_type_indication = 0x60;
+        break;
+    case VLC_CODEC_MP4A:
+        /* FIXME for mpeg2-aac == 0x66->0x68 */
+        i_object_type_indication = 0x40;
+        break;
+    case VLC_CODEC_MPGA:
+        i_object_type_indication =
+            p_stream->fmt.audio.i_rate < 32000 ? 0x69 : 0x6b;
+        break;
+    default:
+        i_object_type_indication = 0x00;
+        break;
     }
     i_stream_type = p_stream->fmt.i_cat == VIDEO_ES ? 0x04 : 0x05;
 
-    bo_add_8   ( esds, i_object_type_indication );
-    bo_add_8   ( esds, ( i_stream_type << 2 ) | 1 );
-    bo_add_24be( esds, 1024 * 1024 );       // bufferSizeDB
-    bo_add_32be( esds, i_bitrate_max );     // maxBitrate
-    bo_add_32be( esds, i_bitrate_avg );     // avgBitrate
+    bo_add_8   (esds, i_object_type_indication);
+    bo_add_8   (esds, (i_stream_type << 2) | 1);
+    bo_add_24be(esds, 1024 * 1024);       // bufferSizeDB
+    bo_add_32be(esds, i_bitrate_max);     // maxBitrate
+    bo_add_32be(esds, i_bitrate_avg);     // avgBitrate
 
-    if( p_stream->fmt.i_extra > 0 )
-    {
-        int i;
-
+    if (p_stream->fmt.i_extra > 0) {
         /* DecoderSpecificInfo */
-        bo_add_descr( esds, 0x05, p_stream->fmt.i_extra );
+        bo_add_descr(esds, 0x05, p_stream->fmt.i_extra);
 
-        for( i = 0; i < p_stream->fmt.i_extra; i++ )
-        {
-            bo_add_8( esds, ((uint8_t*)p_stream->fmt.p_extra)[i] );
-        }
+        for (int i = 0; i < p_stream->fmt.i_extra; i++)
+            bo_add_8(esds, ((uint8_t*)p_stream->fmt.p_extra)[i]);
     }
 
     /* SL_Descr mandatory */
-    bo_add_descr( esds, 0x06, 1 );
-    bo_add_8    ( esds, 0x02 );  // sl_predefined
+    bo_add_descr(esds, 0x06, 1);
+    bo_add_8    (esds, 0x02);  // sl_predefined
 
-    box_fix( esds );
+    box_fix(esds);
 
     return esds;
 }
 
-static bo_t *GetWaveTag( mp4_stream_t *p_stream )
+static bo_t *GetWaveTag(mp4_stream_t *p_stream)
 {
     bo_t *wave;
     bo_t *box;
 
-    wave = box_new( "wave" );
+    wave = box_new("wave");
 
-    box = box_new( "frma" );
-    bo_add_fourcc( box, "mp4a" );
-    box_fix( box );
-    box_gather( wave, box );
+    box = box_new("frma");
+    bo_add_fourcc(box, "mp4a");
+    box_fix(box);
+    box_gather(wave, box);
 
-    box = box_new( "mp4a" );
-    bo_add_32be( box, 0 );
-    box_fix( box );
-    box_gather( wave, box );
+    box = box_new("mp4a");
+    bo_add_32be(box, 0);
+    box_fix(box);
+    box_gather(wave, box);
 
-    box = GetESDS( p_stream );
-    box_fix( box );
-    box_gather( wave, box );
+    box = GetESDS(p_stream);
+    box_fix(box);
+    box_gather(wave, box);
 
-    box = box_new( "srcq" );
-    bo_add_32be( box, 0x40 );
-    box_fix( box );
-    box_gather( wave, box );
+    box = box_new("srcq");
+    bo_add_32be(box, 0x40);
+    box_fix(box);
+    box_gather(wave, box);
 
     /* wazza ? */
-    bo_add_32be( wave, 8 ); /* new empty box */
-    bo_add_32be( wave, 0 ); /* box label */
+    bo_add_32be(wave, 8); /* new empty box */
+    bo_add_32be(wave, 0); /* box label */
 
-    box_fix( wave );
+    box_fix(wave);
 
     return wave;
 }
 
-static bo_t *GetDamrTag( mp4_stream_t *p_stream )
+static bo_t *GetDamrTag(mp4_stream_t *p_stream)
 {
     bo_t *damr;
 
-    damr = box_new( "damr" );
+    damr = box_new("damr");
 
-    bo_add_fourcc( damr, "REFC" );
-    bo_add_8( damr, 0 );
+    bo_add_fourcc(damr, "REFC");
+    bo_add_8(damr, 0);
 
-    if( p_stream->fmt.i_codec == VLC_CODEC_AMR_NB )
-        bo_add_16be( damr, 0x81ff ); /* Mode set (all modes for AMR_NB) */
+    if (p_stream->fmt.i_codec == VLC_CODEC_AMR_NB)
+        bo_add_16be(damr, 0x81ff); /* Mode set (all modes for AMR_NB) */
     else
-        bo_add_16be( damr, 0x83ff ); /* Mode set (all modes for AMR_WB) */
-    bo_add_16be( damr, 0x1 ); /* Mode change period (no restriction) */
+        bo_add_16be(damr, 0x83ff); /* Mode set (all modes for AMR_WB) */
+    bo_add_16be(damr, 0x1); /* Mode change period (no restriction) */
 
-    box_fix( damr );
+    box_fix(damr);
 
     return damr;
 }
 
-static bo_t *GetD263Tag( void )
+static bo_t *GetD263Tag(void)
 {
     bo_t *d263;
 
-    d263 = box_new( "d263" );
+    d263 = box_new("d263");
 
-    bo_add_fourcc( d263, "VLC " );
-    bo_add_16be( d263, 0xa );
-    bo_add_8( d263, 0 );
+    bo_add_fourcc(d263, "VLC ");
+    bo_add_16be(d263, 0xa);
+    bo_add_8(d263, 0);
 
-    box_fix( d263 );
+    box_fix(d263);
 
     return d263;
 }
 
-static bo_t *GetAvcCTag( mp4_stream_t *p_stream )
+static bo_t *GetAvcCTag(mp4_stream_t *p_stream)
 {
     bo_t    *avcC = NULL;
     uint8_t *p_sps = NULL;
@@ -839,48 +787,39 @@ static bo_t *GetAvcCTag( mp4_stream_t *p_stream )
     int     i_sps_size = 0;
     int     i_pps_size = 0;
 
-    if( p_stream->fmt.i_extra > 0 )
-    {
+    if (p_stream->fmt.i_extra > 0) {
         /* FIXME: take into account multiple sps/pps */
         uint8_t *p_buffer = p_stream->fmt.p_extra;
         int     i_buffer = p_stream->fmt.i_extra;
 
-        while( i_buffer > 3 )
-        {
+        while (i_buffer > 3) {
             /* seek startcode */
-            while( p_buffer[0] != 0 || p_buffer[1] != 0 ||
-                   p_buffer[2] != 1 )
-            {
+            while (p_buffer[0] != 0 || p_buffer[1] != 0 || p_buffer[2] != 1) {
                  i_buffer--;
                  p_buffer++;
             }
             const int i_nal_type = p_buffer[3]&0x1f;
-            int i_offset    = 1;
             int i_size      = 0;
             int i_startcode = 0;
  
  
-            for( i_offset = 1; i_offset+2 < i_buffer ; i_offset++)
-            {
-                if( p_buffer[i_offset] == 0 && p_buffer[i_offset+1] == 0 &&
-                    p_buffer[i_offset+2] == 1 )
-                {
+            for (int i_offset = 1; i_offset+2 < i_buffer ; i_offset++) {
+                if (p_buffer[i_offset] == 0 && p_buffer[i_offset+1] == 0 &&
+                    p_buffer[i_offset+2] == 1) {
                     /* we found another startcode */
                     i_startcode = i_offset;
-                    while( p_buffer[i_startcode-1] == 0 && i_startcode > 0 )
+                    while (p_buffer[i_startcode-1] == 0 && i_startcode > 0)
                         i_startcode--;
                     break;
                 }
             }
             i_size = i_startcode ? i_startcode : i_buffer;
 
-            if( i_nal_type == 7 )
-            {
+            if (i_nal_type == 7) {
                 p_sps = &p_buffer[3];
                 i_sps_size = i_size - 3;
             }
-            if( i_nal_type == 8 )
-            {
+            if (i_nal_type == 8) {
                 p_pps = &p_buffer[3];
                 i_pps_size = i_size - 3;
             }
@@ -890,52 +829,44 @@ static bo_t *GetAvcCTag( mp4_stream_t *p_stream )
     }
  
     /* FIXME use better value */
-    avcC = box_new( "avcC" );
-    bo_add_8( avcC, 1 );      /* configuration version */
-    bo_add_8( avcC, i_sps_size ? p_sps[1] : 77 );
-    bo_add_8( avcC, i_sps_size ? p_sps[2] : 64 );
-    bo_add_8( avcC, i_sps_size ? p_sps[3] : 30 );       /* level, 5.1 */
-    bo_add_8( avcC, 0xff );   /* 0b11111100 | lengthsize = 0x11 */
+    avcC = box_new("avcC");
+    bo_add_8(avcC, 1);      /* configuration version */
+    bo_add_8(avcC, i_sps_size ? p_sps[1] : 77);
+    bo_add_8(avcC, i_sps_size ? p_sps[2] : 64);
+    bo_add_8(avcC, i_sps_size ? p_sps[3] : 30);       /* level, 5.1 */
+    bo_add_8(avcC, 0xff);   /* 0b11111100 | lengthsize = 0x11 */
 
-    bo_add_8( avcC, 0xe0 | (i_sps_size > 0 ? 1 : 0) );   /* 0b11100000 | sps_count */
-    if( i_sps_size > 0 )
-    {
-        bo_add_16be( avcC, i_sps_size );
-        bo_add_mem( avcC, i_sps_size, p_sps );
+    bo_add_8(avcC, 0xe0 | (i_sps_size > 0 ? 1 : 0));   /* 0b11100000 | sps_count */
+    if (i_sps_size > 0) {
+        bo_add_16be(avcC, i_sps_size);
+        bo_add_mem(avcC, i_sps_size, p_sps);
     }
 
-    bo_add_8( avcC, (i_pps_size > 0 ? 1 : 0) );   /* pps_count */
-    if( i_pps_size > 0 )
-    {
-        bo_add_16be( avcC, i_pps_size );
-        bo_add_mem( avcC, i_pps_size, p_pps );
+    bo_add_8(avcC, (i_pps_size > 0 ? 1 : 0));   /* pps_count */
+    if (i_pps_size > 0) {
+        bo_add_16be(avcC, i_pps_size);
+        bo_add_mem(avcC, i_pps_size, p_pps);
     }
-    box_fix( avcC );
+    box_fix(avcC);
 
     return avcC;
 }
 
 /* TODO: No idea about these values */
-static bo_t *GetSVQ3Tag( mp4_stream_t *p_stream )
+static bo_t *GetSVQ3Tag(mp4_stream_t *p_stream)
 {
-    bo_t *smi = box_new( "SMI " );
+    bo_t *smi = box_new("SMI ");
 
-    if( p_stream->fmt.i_extra > 0x4e )
-    {
+    if (p_stream->fmt.i_extra > 0x4e) {
         uint8_t *p_end = &((uint8_t*)p_stream->fmt.p_extra)[p_stream->fmt.i_extra];
         uint8_t *p     = &((uint8_t*)p_stream->fmt.p_extra)[0x46];
 
-        while( p + 8 < p_end )
-        {
-            int i_size = GetDWBE( p );
-            if( i_size <= 1 )
-            {
-                /* FIXME handle 1 as long size */
+        while (p + 8 < p_end) {
+            int i_size = GetDWBE(p);
+            if (i_size <= 1) /* FIXME handle 1 as long size */
                 break;
-            }
-            if( !strncmp( (const char *)&p[4], "SMI ", 4 ) )
-            {
-                bo_add_mem( smi, p_end - p - 8, &p[8] );
+            if (!strncmp((const char *)&p[4], "SMI ", 4)) {
+                bo_add_mem(smi, p_end - p - 8, &p[8]);
                 return smi;
             }
             p += i_size;
@@ -943,277 +874,246 @@ static bo_t *GetSVQ3Tag( mp4_stream_t *p_stream )
     }
 
     /* Create a dummy one in fallback */
-    bo_add_fourcc( smi, "SEQH" );
-    bo_add_32be( smi, 0x5 );
-    bo_add_32be( smi, 0xe2c0211d );
-    bo_add_8( smi, 0xc0 );
-    box_fix( smi );
+    bo_add_fourcc(smi, "SEQH");
+    bo_add_32be(smi, 0x5);
+    bo_add_32be(smi, 0xe2c0211d);
+    bo_add_8(smi, 0xc0);
+    box_fix(smi);
 
     return smi;
 }
 
-static bo_t *GetUdtaTag( sout_mux_t *p_mux )
+static bo_t *GetUdtaTag(sout_mux_t *p_mux)
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    bo_t *udta = box_new( "udta" );
-    int i_track;
+    bo_t *udta = box_new("udta");
 
     /* Requirements */
-    for( i_track = 0; i_track < p_sys->i_nb_streams; i_track++ )
-    {
+    for (int i_track = 0; i_track < p_sys->i_nb_streams; i_track++) {
         mp4_stream_t *p_stream = p_sys->pp_streams[i_track];
 
-        if( p_stream->fmt.i_codec == VLC_CODEC_MP4V ||
-            p_stream->fmt.i_codec == VLC_CODEC_MP4A )
-        {
-            bo_t *box = box_new( "\251req" );
+        if (p_stream->fmt.i_codec == VLC_CODEC_MP4V ||
+            p_stream->fmt.i_codec == VLC_CODEC_MP4A) {
+            bo_t *box = box_new("\251req");
             /* String length */
-            bo_add_16be( box, sizeof("QuickTime 6.0 or greater") - 1);
-            bo_add_16be( box, 0 );
-            bo_add_mem( box, sizeof("QuickTime 6.0 or greater") - 1,
-                        (uint8_t *)"QuickTime 6.0 or greater" );
-            box_fix( box );
-            box_gather( udta, box );
+            bo_add_16be(box, sizeof("QuickTime 6.0 or greater") - 1);
+            bo_add_16be(box, 0);
+            bo_add_mem(box, sizeof("QuickTime 6.0 or greater") - 1,
+                        (uint8_t *)"QuickTime 6.0 or greater");
+            box_fix(box);
+            box_gather(udta, box);
             break;
         }
     }
 
     /* Encoder */
     {
-        bo_t *box = box_new( "\251enc" );
+        bo_t *box = box_new("\251enc");
         /* String length */
-        bo_add_16be( box, sizeof(PACKAGE_STRING " stream output") - 1);
-        bo_add_16be( box, 0 );
-        bo_add_mem( box, sizeof(PACKAGE_STRING " stream output") - 1,
-                    (uint8_t*)PACKAGE_STRING " stream output" );
-        box_fix( box );
-        box_gather( udta, box );
+        bo_add_16be(box, sizeof(PACKAGE_STRING " stream output") - 1);
+        bo_add_16be(box, 0);
+        bo_add_mem(box, sizeof(PACKAGE_STRING " stream output") - 1,
+                    (uint8_t*)PACKAGE_STRING " stream output");
+        box_fix(box);
+        box_gather(udta, box);
     }
 #if 0
     /* Misc atoms */
     vlc_meta_t *p_meta = p_mux->p_sout->p_meta;
-    if( p_meta )
-    {
-#define ADD_META_BOX( type, box_string ) { \
+    if (p_meta) {
+#define ADD_META_BOX(type, box_string) { \
         bo_t *box = NULL;  \
-        if( vlc_meta_Get( p_meta, vlc_meta_##type ) ) box = box_new( "\251" box_string ); \
-        if( box ) \
-        { \
-            bo_add_16be( box, strlen( vlc_meta_Get( p_meta, vlc_meta_##type ) )); \
-            bo_add_16be( box, 0 ); \
-            bo_add_mem( box, strlen( vlc_meta_Get( p_meta, vlc_meta_##type ) ), \
-                        (uint8_t*)(vlc_meta_Get( p_meta, vlc_meta_##type ) ) ); \
-            box_fix( box ); \
-            box_gather( udta, box ); \
+        if (vlc_meta_Get(p_meta, vlc_meta_##type)) \
+            box = box_new("\251" box_string); \
+        if (box) { \
+            bo_add_16be(box, strlen(vlc_meta_Get(p_meta, vlc_meta_##type))); \
+            bo_add_16be(box, 0); \
+            bo_add_mem(box, strlen(vlc_meta_Get(p_meta, vlc_meta_##type)), \
+                        (uint8_t*)(vlc_meta_Get(p_meta, vlc_meta_##type))); \
+            box_fix(box); \
+            box_gather(udta, box); \
         } }
 
-        ADD_META_BOX( Title, "nam" );
-        ADD_META_BOX( Artist, "ART" );
-        ADD_META_BOX( Genre, "gen" );
-        ADD_META_BOX( Copyright, "cpy" );
-        ADD_META_BOX( Description, "des" );
-        ADD_META_BOX( Date, "day" );
-        ADD_META_BOX( URL, "url" );
+        ADD_META_BOX(Title, "nam");
+        ADD_META_BOX(Artist, "ART");
+        ADD_META_BOX(Genre, "gen");
+        ADD_META_BOX(Copyright, "cpy");
+        ADD_META_BOX(Description, "des");
+        ADD_META_BOX(Date, "day");
+        ADD_META_BOX(URL, "url");
 #undef ADD_META_BOX
     }
 #endif
-    box_fix( udta );
+    box_fix(udta);
     return udta;
 }
 
-static bo_t *GetSounBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
+static bo_t *GetSounBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     bool b_descr = false;
     bo_t *soun;
     char fcc[4] = "    ";
-    int  i;
 
-    switch( p_stream->fmt.i_codec )
+    switch(p_stream->fmt.i_codec)
     {
     case VLC_CODEC_MP4A:
-        memcpy( fcc, "mp4a", 4 );
+        memcpy(fcc, "mp4a", 4);
         b_descr = true;
         break;
 
     case VLC_CODEC_AMR_NB:
     case VLC_CODEC_AMR_WB:
-        memcpy( fcc, (char*)&p_stream->fmt.i_codec, 4 );
+        memcpy(fcc, (char*)&p_stream->fmt.i_codec, 4);
         b_descr = true;
         break;
 
     case VLC_CODEC_MPGA:
-        if( p_sys->b_mov )
-            memcpy( fcc, ".mp3", 4 );
-        else
-        {
-            memcpy( fcc, "mp4a", 4 );
+        if (p_sys->b_mov)
+            memcpy(fcc, ".mp3", 4);
+        else {
+            memcpy(fcc, "mp4a", 4);
             b_descr = true;
         }
         break;
 
     default:
-        memcpy( fcc, (char*)&p_stream->fmt.i_codec, 4 );
+        memcpy(fcc, (char*)&p_stream->fmt.i_codec, 4);
         break;
     }
 
-    soun = box_new( fcc );
-    for( i = 0; i < 6; i++ )
-    {
-        bo_add_8( soun, 0 );        // reserved;
-    }
-    bo_add_16be( soun, 1 );         // data-reference-index
+    soun = box_new(fcc);
+    for (int i = 0; i < 6; i++)
+        bo_add_8(soun, 0);        // reserved;
+    bo_add_16be(soun, 1);         // data-reference-index
 
     /* SoundDescription */
-    if( p_sys->b_mov &&
-        p_stream->fmt.i_codec == VLC_CODEC_MP4A )
-    {
-        bo_add_16be( soun, 1 );     // version 1;
-    }
+    if (p_sys->b_mov && p_stream->fmt.i_codec == VLC_CODEC_MP4A)
+        bo_add_16be(soun, 1);     // version 1;
     else
-    {
-        bo_add_16be( soun, 0 );     // version 0;
-    }
-    bo_add_16be( soun, 0 );         // revision level (0)
-    bo_add_32be( soun, 0 );         // vendor
+        bo_add_16be(soun, 0);     // version 0;
+    bo_add_16be(soun, 0);         // revision level (0)
+    bo_add_32be(soun, 0);         // vendor
     // channel-count
-    bo_add_16be( soun, p_stream->fmt.audio.i_channels );
+    bo_add_16be(soun, p_stream->fmt.audio.i_channels);
     // sample size
-    bo_add_16be( soun, p_stream->fmt.audio.i_bitspersample ?
-                 p_stream->fmt.audio.i_bitspersample : 16 );
-    bo_add_16be( soun, -2 );        // compression id
-    bo_add_16be( soun, 0 );         // packet size (0)
-    bo_add_16be( soun, p_stream->fmt.audio.i_rate ); // sampleratehi
-    bo_add_16be( soun, 0 );                             // sampleratelo
+    bo_add_16be(soun, p_stream->fmt.audio.i_bitspersample ?
+                 p_stream->fmt.audio.i_bitspersample : 16);
+    bo_add_16be(soun, -2);        // compression id
+    bo_add_16be(soun, 0);         // packet size (0)
+    bo_add_16be(soun, p_stream->fmt.audio.i_rate); // sampleratehi
+    bo_add_16be(soun, 0);                             // sampleratelo
 
     /* Extended data for SoundDescription V1 */
-    if( p_sys->b_mov &&
-        p_stream->fmt.i_codec == VLC_CODEC_MP4A )
-    {
+    if (p_sys->b_mov && p_stream->fmt.i_codec == VLC_CODEC_MP4A) {
         /* samples per packet */
-        bo_add_32be( soun, p_stream->fmt.audio.i_frame_length );
-        bo_add_32be( soun, 1536 ); /* bytes per packet */
-        bo_add_32be( soun, 2 );    /* bytes per frame */
+        bo_add_32be(soun, p_stream->fmt.audio.i_frame_length);
+        bo_add_32be(soun, 1536); /* bytes per packet */
+        bo_add_32be(soun, 2);    /* bytes per frame */
         /* bytes per sample */
-        bo_add_32be( soun, 2 /*p_stream->fmt.audio.i_bitspersample/8 */);
+        bo_add_32be(soun, 2 /*p_stream->fmt.audio.i_bitspersample/8 */);
     }
 
     /* Add an ES Descriptor */
-    if( b_descr )
-    {
+    if (b_descr) {
         bo_t *box;
 
-        if( p_sys->b_mov &&
-            p_stream->fmt.i_codec == VLC_CODEC_MP4A )
-        {
-            box = GetWaveTag( p_stream );
-        }
-        else if( p_stream->fmt.i_codec == VLC_CODEC_AMR_NB )
-        {
-            box = GetDamrTag( p_stream );
-        }
+        if (p_sys->b_mov && p_stream->fmt.i_codec == VLC_CODEC_MP4A)
+            box = GetWaveTag(p_stream);
+        else if (p_stream->fmt.i_codec == VLC_CODEC_AMR_NB)
+            box = GetDamrTag(p_stream);
         else
-        {
-            box = GetESDS( p_stream );
-        }
-        box_fix( box );
-        box_gather( soun, box );
+            box = GetESDS(p_stream);
+        box_fix(box);
+        box_gather(soun, box);
     }
 
-    box_fix( soun );
+    box_fix(soun);
 
     return soun;
 }
 
-static bo_t *GetVideBox( mp4_stream_t *p_stream )
+static bo_t *GetVideBox(mp4_stream_t *p_stream)
 {
-
     bo_t *vide;
     char fcc[4] = "    ";
-    int  i;
 
-    switch( p_stream->fmt.i_codec )
+    switch(p_stream->fmt.i_codec)
     {
     case VLC_CODEC_MP4V:
     case VLC_CODEC_MPGV:
-        memcpy( fcc, "mp4v", 4 );
+        memcpy(fcc, "mp4v", 4);
         break;
 
     case VLC_CODEC_MJPG:
-        memcpy( fcc, "mjpa", 4 );
+        memcpy(fcc, "mjpa", 4);
         break;
 
     case VLC_CODEC_SVQ1:
-        memcpy( fcc, "SVQ1", 4 );
+        memcpy(fcc, "SVQ1", 4);
         break;
 
     case VLC_CODEC_SVQ3:
-        memcpy( fcc, "SVQ3", 4 );
+        memcpy(fcc, "SVQ3", 4);
         break;
 
     case VLC_CODEC_H263:
-        memcpy( fcc, "s263", 4 );
+        memcpy(fcc, "s263", 4);
         break;
 
     case VLC_CODEC_H264:
-        memcpy( fcc, "avc1", 4 );
+        memcpy(fcc, "avc1", 4);
         break;
 
     case VLC_CODEC_YV12:
-        memcpy( fcc, "yv12", 4 );
+        memcpy(fcc, "yv12", 4);
         break;
 
     case VLC_CODEC_YUYV:
-        memcpy( fcc, "yuy2", 4 );
+        memcpy(fcc, "yuy2", 4);
         break;
 
     default:
-        memcpy( fcc, (char*)&p_stream->fmt.i_codec, 4 );
+        memcpy(fcc, (char*)&p_stream->fmt.i_codec, 4);
         break;
     }
 
-    vide = box_new( fcc );
-    for( i = 0; i < 6; i++ )
-    {
-        bo_add_8( vide, 0 );        // reserved;
-    }
-    bo_add_16be( vide, 1 );         // data-reference-index
+    vide = box_new(fcc);
+    for (int i = 0; i < 6; i++)
+        bo_add_8(vide, 0);        // reserved;
+    bo_add_16be(vide, 1);         // data-reference-index
 
-    bo_add_16be( vide, 0 );         // predefined;
-    bo_add_16be( vide, 0 );         // reserved;
-    for( i = 0; i < 3; i++ )
-    {
-        bo_add_32be( vide, 0 );     // predefined;
-    }
+    bo_add_16be(vide, 0);         // predefined;
+    bo_add_16be(vide, 0);         // reserved;
+    for (int i = 0; i < 3; i++)
+        bo_add_32be(vide, 0);     // predefined;
 
-    bo_add_16be( vide, p_stream->fmt.video.i_width );  // i_width
-    bo_add_16be( vide, p_stream->fmt.video.i_height ); // i_height
+    bo_add_16be(vide, p_stream->fmt.video.i_width);  // i_width
+    bo_add_16be(vide, p_stream->fmt.video.i_height); // i_height
 
-    bo_add_32be( vide, 0x00480000 );                // h 72dpi
-    bo_add_32be( vide, 0x00480000 );                // v 72dpi
+    bo_add_32be(vide, 0x00480000);                // h 72dpi
+    bo_add_32be(vide, 0x00480000);                // v 72dpi
 
-    bo_add_32be( vide, 0 );         // data size, always 0
-    bo_add_16be( vide, 1 );         // frames count per sample
+    bo_add_32be(vide, 0);         // data size, always 0
+    bo_add_16be(vide, 1);         // frames count per sample
 
     // compressor name;
-    for( i = 0; i < 32; i++ )
-    {
-        bo_add_8( vide, 0 );
-    }
+    for (int i = 0; i < 32; i++)
+        bo_add_8(vide, 0);
 
-    bo_add_16be( vide, 0x18 );      // depth
-    bo_add_16be( vide, 0xffff );    // predefined
+    bo_add_16be(vide, 0x18);      // depth
+    bo_add_16be(vide, 0xffff);    // predefined
 
     /* add an ES Descriptor */
-    switch( p_stream->fmt.i_codec )
+    switch(p_stream->fmt.i_codec)
     {
     case VLC_CODEC_MP4V:
     case VLC_CODEC_MPGV:
         {
-            bo_t *esds = GetESDS( p_stream );
+            bo_t *esds = GetESDS(p_stream);
 
-            box_fix( esds );
-            box_gather( vide, esds );
+            box_fix(esds);
+            box_gather(vide, esds);
         }
         break;
 
@@ -1221,72 +1121,64 @@ static bo_t *GetVideBox( mp4_stream_t *p_stream )
         {
             bo_t *d263 = GetD263Tag();
 
-            box_fix( d263 );
-            box_gather( vide, d263 );
+            box_fix(d263);
+            box_gather(vide, d263);
         }
         break;
 
     case VLC_CODEC_SVQ3:
         {
-            bo_t *esds = GetSVQ3Tag( p_stream );
+            bo_t *esds = GetSVQ3Tag(p_stream);
 
-            box_fix( esds );
-            box_gather( vide, esds );
+            box_fix(esds);
+            box_gather(vide, esds);
         }
         break;
 
     case VLC_CODEC_H264:
-        box_gather( vide, GetAvcCTag( p_stream ) );
+        box_gather(vide, GetAvcCTag(p_stream));
         break;
 
     default:
         break;
     }
 
-    box_fix( vide );
+    box_fix(vide);
 
     return vide;
 }
 
-static bo_t *GetTextBox( void )
+static bo_t *GetTextBox(void)
 {
+    bo_t *text = box_new("text");
 
-    bo_t *text = box_new( "text" );
-    int  i;
+    for (int i = 0; i < 6; i++)
+        bo_add_8(text, 0);        // reserved;
+    bo_add_16be(text, 1);         // data-reference-index
 
-    for( i = 0; i < 6; i++ )
-    {
-        bo_add_8( text, 0 );        // reserved;
-    }
-    bo_add_16be( text, 1 );         // data-reference-index
+    bo_add_32be(text, 0);         // display flags
+    bo_add_32be(text, 0);         // justification
+    for (int i = 0; i < 3; i++)
+        bo_add_16be(text, 0);     // back ground color
 
-    bo_add_32be( text, 0 );         // display flags
-    bo_add_32be( text, 0 );         // justification
-    for( i = 0; i < 3; i++ )
-    {
-        bo_add_16be( text, 0 );     // back ground color
-    }
+    bo_add_16be(text, 0);         // box text
+    bo_add_16be(text, 0);         // box text
+    bo_add_16be(text, 0);         // box text
+    bo_add_16be(text, 0);         // box text
 
-    bo_add_16be( text, 0 );         // box text
-    bo_add_16be( text, 0 );         // box text
-    bo_add_16be( text, 0 );         // box text
-    bo_add_16be( text, 0 );         // box text
+    bo_add_64be(text, 0);         // reserved
+    for (int i = 0; i < 3; i++)
+        bo_add_16be(text, 0xff);  // foreground color
 
-    bo_add_64be( text, 0 );         // reserved
-    for( i = 0; i < 3; i++ )
-    {
-        bo_add_16be( text, 0xff );  // foreground color
-    }
+    bo_add_8 (text, 9);
+    bo_add_mem(text, 9, (uint8_t*)"Helvetica");
 
-    bo_add_8 ( text, 9 );
-    bo_add_mem( text, 9, (uint8_t*)"Helvetica" );
-
-    box_fix( text );
+    box_fix(text);
 
     return text;
 }
 
-static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
+static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     unsigned int i_chunk, i_stsc_last_val, i_stsc_entries, i, i_index;
@@ -1294,62 +1186,51 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     uint32_t i_timescale;
     int64_t i_dts, i_dts_q;
 
-    stbl = box_new( "stbl" );
+    stbl = box_new("stbl");
 
     /* sample description */
-    stsd = box_full_new( "stsd", 0, 0 );
-    bo_add_32be( stsd, 1 );
-    if( p_stream->fmt.i_cat == AUDIO_ES )
-    {
-        bo_t *soun = GetSounBox( p_mux, p_stream );
-        box_gather( stsd, soun );
+    stsd = box_full_new("stsd", 0, 0);
+    bo_add_32be(stsd, 1);
+    if (p_stream->fmt.i_cat == AUDIO_ES) {
+        bo_t *soun = GetSounBox(p_mux, p_stream);
+        box_gather(stsd, soun);
+    } else if (p_stream->fmt.i_cat == VIDEO_ES) {
+        bo_t *vide = GetVideBox(p_stream);
+        box_gather(stsd, vide);
+    } else if (p_stream->fmt.i_cat == SPU_ES) {
+        box_gather(stsd, GetTextBox());
     }
-    else if( p_stream->fmt.i_cat == VIDEO_ES )
-    {
-        bo_t *vide = GetVideBox( p_stream );
-        box_gather( stsd, vide );
-    }
-    else if( p_stream->fmt.i_cat == SPU_ES )
-    {
-        box_gather( stsd, GetTextBox() );
-    }
-    box_fix( stsd );
+    box_fix(stsd);
 
     /* chunk offset table */
-    if( p_sys->i_pos >= (((uint64_t)0x1) << 32) )
-    {
+    if (p_sys->i_pos >= (((uint64_t)0x1) << 32)) {
         /* 64 bits version */
         p_stream->b_stco64 = true;
-        stco = box_full_new( "co64", 0, 0 );
-    }
-    else
-    {
+        stco = box_full_new("co64", 0, 0);
+    } else {
         /* 32 bits version */
         p_stream->b_stco64 = false;
-        stco = box_full_new( "stco", 0, 0 );
+        stco = box_full_new("stco", 0, 0);
     }
-    bo_add_32be( stco, 0 );     // entry-count (fixed latter)
+    bo_add_32be(stco, 0);     // entry-count (fixed latter)
 
     /* sample to chunk table */
-    stsc = box_full_new( "stsc", 0, 0 );
-    bo_add_32be( stsc, 0 );     // entry-count (fixed latter)
+    stsc = box_full_new("stsc", 0, 0);
+    bo_add_32be(stsc, 0);     // entry-count (fixed latter)
 
-    for( i_chunk = 0, i_stsc_last_val = 0, i_stsc_entries = 0, i = 0;
-         i < p_stream->i_entry_count; i_chunk++ )
-    {
+    for (i_chunk = 0, i_stsc_last_val = 0, i_stsc_entries = 0, i = 0;
+         i < p_stream->i_entry_count; i_chunk++) {
         int i_first = i;
 
-        if( p_stream->b_stco64 )
-            bo_add_64be( stco, p_stream->entry[i].i_pos );
+        if (p_stream->b_stco64)
+            bo_add_64be(stco, p_stream->entry[i].i_pos);
         else
-            bo_add_32be( stco, p_stream->entry[i].i_pos );
+            bo_add_32be(stco, p_stream->entry[i].i_pos);
 
-        while( i < p_stream->i_entry_count )
-        {
-            if( i + 1 < p_stream->i_entry_count &&
+        while (i < p_stream->i_entry_count) {
+            if (i + 1 < p_stream->i_entry_count &&
                 p_stream->entry[i].i_pos + p_stream->entry[i].i_size
-                != p_stream->entry[i + 1].i_pos )
-            {
+                != p_stream->entry[i + 1].i_pos) {
                 i++;
                 break;
             }
@@ -1358,37 +1239,35 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
         }
 
         /* Add entry to the stsc table */
-        if( i_stsc_last_val != i - i_first )
-        {
-            bo_add_32be( stsc, 1 + i_chunk );   // first-chunk
-            bo_add_32be( stsc, i - i_first ) ;  // samples-per-chunk
-            bo_add_32be( stsc, 1 );             // sample-descr-index
+        if (i_stsc_last_val != i - i_first) {
+            bo_add_32be(stsc, 1 + i_chunk);   // first-chunk
+            bo_add_32be(stsc, i - i_first) ;  // samples-per-chunk
+            bo_add_32be(stsc, 1);             // sample-descr-index
             i_stsc_last_val = i - i_first;
             i_stsc_entries++;
         }
     }
 
     /* Fix stco entry count */
-    bo_fix_32be( stco, 12, i_chunk );
-    msg_Dbg( p_mux, "created %d chunks (stco)", i_chunk );
-    box_fix( stco );
+    bo_fix_32be(stco, 12, i_chunk);
+    msg_Dbg(p_mux, "created %d chunks (stco)", i_chunk);
+    box_fix(stco);
 
     /* Fix stsc entry count */
-    bo_fix_32be( stsc, 12, i_stsc_entries  );
-    box_fix( stsc );
+    bo_fix_32be(stsc, 12, i_stsc_entries );
+    box_fix(stsc);
 
     /* add stts */
-    stts = box_full_new( "stts", 0, 0 );
-    bo_add_32be( stts, 0 );     // entry-count (fixed latter)
+    stts = box_full_new("stts", 0, 0);
+    bo_add_32be(stts, 0);     // entry-count (fixed latter)
 
-    if( p_stream->fmt.i_cat == AUDIO_ES )
+    if (p_stream->fmt.i_cat == AUDIO_ES)
         i_timescale = p_stream->fmt.audio.i_rate;
     else
         i_timescale = 1001;
 
     /* first, create quantified length */
-    for( i = 0, i_dts = 0, i_dts_q = 0; i < p_stream->i_entry_count; i++ )
-    {
+    for (i = 0, i_dts = 0, i_dts_q = 0; i < p_stream->i_entry_count; i++) {
         int64_t i_dts_deq = i_dts_q * INT64_C(1000000) / (int64_t)i_timescale;
         int64_t i_delta = p_stream->entry[i].i_length + i_dts - i_dts_deq;
 
@@ -1400,73 +1279,60 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
         i_dts_q += p_stream->entry[i].i_length;
     }
     /* then write encoded table */
-    for( i = 0, i_index = 0; i < p_stream->i_entry_count; i_index++)
-    {
+    for (i = 0, i_index = 0; i < p_stream->i_entry_count; i_index++) {
         int     i_first = i;
         int64_t i_delta = p_stream->entry[i].i_length;
 
-        while( i < p_stream->i_entry_count )
-        {
+        while (i < p_stream->i_entry_count) {
             i++;
-            if( i >= p_stream->i_entry_count ||
-                p_stream->entry[i].i_length != i_delta )
-            {
+            if (i >= p_stream->i_entry_count || p_stream->entry[i].i_length != i_delta)
                 break;
-            }
         }
 
-        bo_add_32be( stts, i - i_first ); // sample-count
-        bo_add_32be( stts, i_delta );     // sample-delta
+        bo_add_32be(stts, i - i_first); // sample-count
+        bo_add_32be(stts, i_delta);     // sample-delta
     }
-    bo_fix_32be( stts, 12, i_index );
-    box_fix( stts );
+    bo_fix_32be(stts, 12, i_index);
+    box_fix(stts);
 
     /* FIXME add ctts ?? FIXME */
 
-    stsz = box_full_new( "stsz", 0, 0 );
-    bo_add_32be( stsz, 0 );                             // sample-size
-    bo_add_32be( stsz, p_stream->i_entry_count );       // sample-count
-    for( i = 0; i < p_stream->i_entry_count; i++ )
-    {
-        bo_add_32be( stsz, p_stream->entry[i].i_size ); // sample-size
-    }
-    box_fix( stsz );
+    stsz = box_full_new("stsz", 0, 0);
+    bo_add_32be(stsz, 0);                             // sample-size
+    bo_add_32be(stsz, p_stream->i_entry_count);       // sample-count
+    for (unsigned i = 0; i < p_stream->i_entry_count; i++)
+        bo_add_32be(stsz, p_stream->entry[i].i_size); // sample-size
+    box_fix(stsz);
 
     /* create stss table */
     stss = NULL;
-    for( i = 0, i_index = 0; i < p_stream->i_entry_count; i++ )
-    {
-        if( p_stream->entry[i].i_flags & BLOCK_FLAG_TYPE_I )
-        {
-            if( stss == NULL )
-            {
-                stss = box_full_new( "stss", 0, 0 );
-                bo_add_32be( stss, 0 ); /* fixed later */
+    for (i = 0, i_index = 0; i < p_stream->i_entry_count; i++)
+        if (p_stream->entry[i].i_flags & BLOCK_FLAG_TYPE_I) {
+            if (stss == NULL) {
+                stss = box_full_new("stss", 0, 0);
+                bo_add_32be(stss, 0); /* fixed later */
             }
-            bo_add_32be( stss, 1 + i );
+            bo_add_32be(stss, 1 + i);
             i_index++;
         }
-    }
-    if( stss )
-    {
-        bo_fix_32be( stss, 12, i_index );
-        box_fix( stss );
+
+    if (stss) {
+        bo_fix_32be(stss, 12, i_index);
+        box_fix(stss);
     }
 
     /* Now gather all boxes into stbl */
-    box_gather( stbl, stsd );
-    box_gather( stbl, stts );
-    if( stss )
-    {
-        box_gather( stbl, stss );
-    }
-    box_gather( stbl, stsc );
-    box_gather( stbl, stsz );
+    box_gather(stbl, stsd);
+    box_gather(stbl, stts);
+    if (stss)
+        box_gather(stbl, stss);
+    box_gather(stbl, stsc);
+    box_gather(stbl, stsz);
     p_stream->i_stco_pos = stbl->len + 16;
-    box_gather( stbl, stco );
+    box_gather(stbl, stco);
 
     /* finish stbl */
-    box_fix( stbl );
+    box_fix(stbl);
 
     return stbl;
 }
@@ -1476,71 +1342,59 @@ static int64_t get_timestamp(void);
 static const uint32_t mvhd_matrix[9] =
     { 0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0x40000000 };
 
-static bo_t *GetMoovBox( sout_mux_t *p_mux )
+static bo_t *GetMoovBox(sout_mux_t *p_mux)
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
 
     bo_t            *moov, *mvhd;
-    int             i_trak, i;
 
     uint32_t        i_movie_timescale = 90000;
     int64_t         i_movie_duration  = 0;
     int64_t         i_timestamp = get_timestamp();
 
-    moov = box_new( "moov" );
+    moov = box_new("moov");
 
     /* Create general info */
-    for( i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++ )
-    {
+    for (int i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++) {
         mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
-        i_movie_duration = __MAX( i_movie_duration, p_stream->i_duration );
+        i_movie_duration = __MAX(i_movie_duration, p_stream->i_duration);
     }
-    msg_Dbg( p_mux, "movie duration %ds",
-             (uint32_t)( i_movie_duration / (mtime_t)1000000 ) );
+    msg_Dbg(p_mux, "movie duration %ds",
+             (uint32_t)(i_movie_duration / (mtime_t)1000000));
 
     i_movie_duration = i_movie_duration * i_movie_timescale / 1000000;
 
     /* *** add /moov/mvhd *** */
-    if( !p_sys->b_64_ext )
-    {
-        mvhd = box_full_new( "mvhd", 0, 0 );
-        bo_add_32be( mvhd, i_timestamp );   // creation time
-        bo_add_32be( mvhd, i_timestamp );   // modification time
-        bo_add_32be( mvhd, i_movie_timescale);  // timescale
-        bo_add_32be( mvhd, i_movie_duration );  // duration
+    if (!p_sys->b_64_ext) {
+        mvhd = box_full_new("mvhd", 0, 0);
+        bo_add_32be(mvhd, i_timestamp);   // creation time
+        bo_add_32be(mvhd, i_timestamp);   // modification time
+        bo_add_32be(mvhd, i_movie_timescale);  // timescale
+        bo_add_32be(mvhd, i_movie_duration);  // duration
+    } else {
+        mvhd = box_full_new("mvhd", 1, 0);
+        bo_add_64be(mvhd, i_timestamp);   // creation time
+        bo_add_64be(mvhd, i_timestamp);   // modification time
+        bo_add_32be(mvhd, i_movie_timescale);  // timescale
+        bo_add_64be(mvhd, i_movie_duration);  // duration
     }
-    else
-    {
-        mvhd = box_full_new( "mvhd", 1, 0 );
-        bo_add_64be( mvhd, i_timestamp );   // creation time
-        bo_add_64be( mvhd, i_timestamp );   // modification time
-        bo_add_32be( mvhd, i_movie_timescale);  // timescale
-        bo_add_64be( mvhd, i_movie_duration );  // duration
-    }
-    bo_add_32be( mvhd, 0x10000 );           // rate
-    bo_add_16be( mvhd, 0x100 );             // volume
-    bo_add_16be( mvhd, 0 );                 // reserved
-    for( i = 0; i < 2; i++ )
-    {
-        bo_add_32be( mvhd, 0 );             // reserved
-    }
-    for( i = 0; i < 9; i++ )
-    {
-        bo_add_32be( mvhd, mvhd_matrix[i] );// matrix
-    }
-    for( i = 0; i < 6; i++ )
-    {
-        bo_add_32be( mvhd, 0 );             // pre-defined
-    }
+    bo_add_32be(mvhd, 0x10000);           // rate
+    bo_add_16be(mvhd, 0x100);             // volume
+    bo_add_16be(mvhd, 0);                 // reserved
+    for (int i = 0; i < 2; i++)
+        bo_add_32be(mvhd, 0);             // reserved
+    for (int i = 0; i < 9; i++)
+        bo_add_32be(mvhd, mvhd_matrix[i]);// matrix
+    for (int i = 0; i < 6; i++)
+        bo_add_32be(mvhd, 0);             // pre-defined
 
     /* Next available track id */
-    bo_add_32be( mvhd, p_sys->i_nb_streams + 1 ); // next-track-id
+    bo_add_32be(mvhd, p_sys->i_nb_streams + 1); // next-track-id
 
-    box_fix( mvhd );
-    box_gather( moov, mvhd );
+    box_fix(mvhd);
+    box_gather(moov, mvhd);
 
-    for( i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++ )
-    {
+    for (int i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++) {
         mp4_stream_t *p_stream;
         uint32_t     i_timescale;
 
@@ -1549,91 +1403,74 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
 
         p_stream = p_sys->pp_streams[i_trak];
 
-        if( p_stream->fmt.i_cat == AUDIO_ES )
+        if (p_stream->fmt.i_cat == AUDIO_ES)
             i_timescale = p_stream->fmt.audio.i_rate;
         else
             i_timescale = 1001;
 
         /* *** add /moov/trak *** */
-        trak = box_new( "trak" );
+        trak = box_new("trak");
 
         /* *** add /moov/trak/tkhd *** */
-        if( !p_sys->b_64_ext )
-        {
-            if( p_sys->b_mov )
-                tkhd = box_full_new( "tkhd", 0, 0x0f );
+        if (!p_sys->b_64_ext) {
+            if (p_sys->b_mov)
+                tkhd = box_full_new("tkhd", 0, 0x0f);
             else
-                tkhd = box_full_new( "tkhd", 0, 1 );
+                tkhd = box_full_new("tkhd", 0, 1);
 
-            bo_add_32be( tkhd, i_timestamp );       // creation time
-            bo_add_32be( tkhd, i_timestamp );       // modification time
-            bo_add_32be( tkhd, p_stream->i_track_id );
-            bo_add_32be( tkhd, 0 );                     // reserved 0
-            bo_add_32be( tkhd, p_stream->i_duration *
+            bo_add_32be(tkhd, i_timestamp);       // creation time
+            bo_add_32be(tkhd, i_timestamp);       // modification time
+            bo_add_32be(tkhd, p_stream->i_track_id);
+            bo_add_32be(tkhd, 0);                     // reserved 0
+            bo_add_32be(tkhd, p_stream->i_duration *
                          (int64_t)i_movie_timescale /
-                         (mtime_t)1000000 );            // duration
-        }
-        else
-        {
-            if( p_sys->b_mov )
-                tkhd = box_full_new( "tkhd", 1, 0x0f );
+                         (mtime_t)1000000);            // duration
+        } else {
+            if (p_sys->b_mov)
+                tkhd = box_full_new("tkhd", 1, 0x0f);
             else
-                tkhd = box_full_new( "tkhd", 1, 1 );
+                tkhd = box_full_new("tkhd", 1, 1);
 
-            bo_add_64be( tkhd, i_timestamp );       // creation time
-            bo_add_64be( tkhd, i_timestamp );       // modification time
-            bo_add_32be( tkhd, p_stream->i_track_id );
-            bo_add_32be( tkhd, 0 );                     // reserved 0
-            bo_add_64be( tkhd, p_stream->i_duration *
+            bo_add_64be(tkhd, i_timestamp);       // creation time
+            bo_add_64be(tkhd, i_timestamp);       // modification time
+            bo_add_32be(tkhd, p_stream->i_track_id);
+            bo_add_32be(tkhd, 0);                     // reserved 0
+            bo_add_64be(tkhd, p_stream->i_duration *
                          (int64_t)i_movie_timescale /
-                         (mtime_t)1000000 );            // duration
+                         (mtime_t)1000000);            // duration
         }
 
-        for( i = 0; i < 2; i++ )
-        {
-            bo_add_32be( tkhd, 0 );                 // reserved
-        }
-        bo_add_16be( tkhd, 0 );                     // layer
-        bo_add_16be( tkhd, 0 );                     // pre-defined
+        for (int i = 0; i < 2; i++)
+            bo_add_32be(tkhd, 0);                 // reserved
+        bo_add_16be(tkhd, 0);                     // layer
+        bo_add_16be(tkhd, 0);                     // pre-defined
         // volume
-        bo_add_16be( tkhd, p_stream->fmt.i_cat == AUDIO_ES ? 0x100 : 0 );
-        bo_add_16be( tkhd, 0 );                     // reserved
-        for( i = 0; i < 9; i++ )
-        {
-            bo_add_32be( tkhd, mvhd_matrix[i] );    // matrix
-        }
-        if( p_stream->fmt.i_cat == AUDIO_ES )
-        {
-            bo_add_32be( tkhd, 0 );                 // width (presentation)
-            bo_add_32be( tkhd, 0 );                 // height(presentation)
-        }
-        else if( p_stream->fmt.i_cat == VIDEO_ES )
-        {
+        bo_add_16be(tkhd, p_stream->fmt.i_cat == AUDIO_ES ? 0x100 : 0);
+        bo_add_16be(tkhd, 0);                     // reserved
+        for (int i = 0; i < 9; i++)
+            bo_add_32be(tkhd, mvhd_matrix[i]);    // matrix
+        if (p_stream->fmt.i_cat == AUDIO_ES) {
+            bo_add_32be(tkhd, 0);                 // width (presentation)
+            bo_add_32be(tkhd, 0);                 // height(presentation)
+        } else if (p_stream->fmt.i_cat == VIDEO_ES) {
             int i_width = p_stream->fmt.video.i_width << 16;
-            if( p_stream->fmt.video.i_sar_num > 0 &&
-                p_stream->fmt.video.i_sar_den > 0 )
-            {
+            if (p_stream->fmt.video.i_sar_num > 0 && p_stream->fmt.video.i_sar_den > 0) {
                 i_width = (int64_t)p_stream->fmt.video.i_sar_num *
                           ((int64_t)p_stream->fmt.video.i_width << 16) /
                           p_stream->fmt.video.i_sar_den;
             }
             // width (presentation)
-            bo_add_32be( tkhd, i_width );
+            bo_add_32be(tkhd, i_width);
             // height(presentation)
-            bo_add_32be( tkhd, p_stream->fmt.video.i_height << 16 );
-        }
-        else
-        {
+            bo_add_32be(tkhd, p_stream->fmt.video.i_height << 16);
+        } else {
             int i_width = 320 << 16;
             int i_height = 200;
-            int i;
-            for( i = 0; i < p_sys->i_nb_streams; i++ )
-            {
+            for (int i = 0; i < p_sys->i_nb_streams; i++) {
                 mp4_stream_t *tk = p_sys->pp_streams[i];
-                if( tk->fmt.i_cat == VIDEO_ES )
-                {
-                    if( tk->fmt.video.i_sar_num > 0 &&
-                        tk->fmt.video.i_sar_den > 0 )
+                if (tk->fmt.i_cat == VIDEO_ES) {
+                    if (tk->fmt.video.i_sar_num > 0 &&
+                        tk->fmt.video.i_sar_den > 0)
                         i_width = (int64_t)tk->fmt.video.i_sar_num *
                                   ((int64_t)tk->fmt.video.i_width << 16) /
                                   tk->fmt.video.i_sar_den;
@@ -1643,341 +1480,310 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
                     break;
                 }
             }
-            bo_add_32be( tkhd, i_width );     // width (presentation)
-            bo_add_32be( tkhd, i_height << 16 );    // height(presentation)
+            bo_add_32be(tkhd, i_width);     // width (presentation)
+            bo_add_32be(tkhd, i_height << 16);    // height(presentation)
         }
 
-        box_fix( tkhd );
-        box_gather( trak, tkhd );
+        box_fix(tkhd);
+        box_gather(trak, tkhd);
 
         /* *** add /moov/trak/edts and elst */
-        edts = box_new( "edts" );
-        elst = box_full_new( "elst", p_sys->b_64_ext ? 1 : 0, 0 );
-        if( p_stream->i_dts_start > p_sys->i_dts_start )
-        {
-            bo_add_32be( elst, 2 );
+        edts = box_new("edts");
+        elst = box_full_new("elst", p_sys->b_64_ext ? 1 : 0, 0);
+        if (p_stream->i_dts_start > p_sys->i_dts_start) {
+            bo_add_32be(elst, 2);
 
-            if( p_sys->b_64_ext )
-            {
-                bo_add_64be( elst, (p_stream->i_dts_start-p_sys->i_dts_start) *
-                             i_movie_timescale / INT64_C(1000000) );
-                bo_add_64be( elst, -1 );
+            if (p_sys->b_64_ext) {
+                bo_add_64be(elst, (p_stream->i_dts_start-p_sys->i_dts_start) *
+                             i_movie_timescale / INT64_C(1000000));
+                bo_add_64be(elst, -1);
+            } else {
+                bo_add_32be(elst, (p_stream->i_dts_start-p_sys->i_dts_start) *
+                             i_movie_timescale / INT64_C(1000000));
+                bo_add_32be(elst, -1);
             }
-            else
-            {
-                bo_add_32be( elst, (p_stream->i_dts_start-p_sys->i_dts_start) *
-                             i_movie_timescale / INT64_C(1000000) );
-                bo_add_32be( elst, -1 );
-            }
-            bo_add_16be( elst, 1 );
-            bo_add_16be( elst, 0 );
+            bo_add_16be(elst, 1);
+            bo_add_16be(elst, 0);
+        } else {
+            bo_add_32be(elst, 1);
         }
-        else
-        {
-            bo_add_32be( elst, 1 );
+        if (p_sys->b_64_ext) {
+            bo_add_64be(elst, p_stream->i_duration *
+                         i_movie_timescale / INT64_C(1000000));
+            bo_add_64be(elst, 0);
+        } else {
+            bo_add_32be(elst, p_stream->i_duration *
+                         i_movie_timescale / INT64_C(1000000));
+            bo_add_32be(elst, 0);
         }
-        if( p_sys->b_64_ext )
-        {
-            bo_add_64be( elst, p_stream->i_duration *
-                         i_movie_timescale / INT64_C(1000000) );
-            bo_add_64be( elst, 0 );
-        }
-        else
-        {
-            bo_add_32be( elst, p_stream->i_duration *
-                         i_movie_timescale / INT64_C(1000000) );
-            bo_add_32be( elst, 0 );
-        }
-        bo_add_16be( elst, 1 );
-        bo_add_16be( elst, 0 );
+        bo_add_16be(elst, 1);
+        bo_add_16be(elst, 0);
 
-        box_fix( elst );
-        box_gather( edts, elst );
-        box_fix( edts );
-        box_gather( trak, edts );
+        box_fix(elst);
+        box_gather(edts, elst);
+        box_fix(edts);
+        box_gather(trak, edts);
 
         /* *** add /moov/trak/mdia *** */
-        mdia = box_new( "mdia" );
+        mdia = box_new("mdia");
 
         /* media header */
-        if( !p_sys->b_64_ext )
-        {
-            mdhd = box_full_new( "mdhd", 0, 0 );
-            bo_add_32be( mdhd, i_timestamp );   // creation time
-            bo_add_32be( mdhd, i_timestamp );   // modification time
-            bo_add_32be( mdhd, i_timescale);        // timescale
-            bo_add_32be( mdhd, p_stream->i_duration * (int64_t)i_timescale /
-                               (mtime_t)1000000 );  // duration
-        }
-        else
-        {
-            mdhd = box_full_new( "mdhd", 1, 0 );
-            bo_add_64be( mdhd, i_timestamp );   // creation time
-            bo_add_64be( mdhd, i_timestamp );   // modification time
-            bo_add_32be( mdhd, i_timescale);        // timescale
-            bo_add_64be( mdhd, p_stream->i_duration * (int64_t)i_timescale /
-                               (mtime_t)1000000 );  // duration
+        if (!p_sys->b_64_ext) {
+            mdhd = box_full_new("mdhd", 0, 0);
+            bo_add_32be(mdhd, i_timestamp);   // creation time
+            bo_add_32be(mdhd, i_timestamp);   // modification time
+            bo_add_32be(mdhd, i_timescale);        // timescale
+            bo_add_32be(mdhd, p_stream->i_duration * (int64_t)i_timescale /
+                               (mtime_t)1000000);  // duration
+        } else {
+            mdhd = box_full_new("mdhd", 1, 0);
+            bo_add_64be(mdhd, i_timestamp);   // creation time
+            bo_add_64be(mdhd, i_timestamp);   // modification time
+            bo_add_32be(mdhd, i_timescale);        // timescale
+            bo_add_64be(mdhd, p_stream->i_duration * (int64_t)i_timescale /
+                               (mtime_t)1000000);  // duration
         }
 
-        if( p_stream->fmt.psz_language )
-        {
+        if (p_stream->fmt.psz_language) {
             char *psz = p_stream->fmt.psz_language;
             const iso639_lang_t *pl = NULL;
             uint16_t lang = 0x0;
 
-            if( strlen( psz ) == 2 )
-            {
-                pl = GetLang_1( psz );
+            if (strlen(psz) == 2)
+                pl = GetLang_1(psz);
+            else if (strlen(psz) == 3) {
+                pl = GetLang_2B(psz);
+                if (!strcmp(pl->psz_iso639_1, "??"))
+                    pl = GetLang_2T(psz);
             }
-            else if( strlen( psz ) == 3 )
-            {
-                pl = GetLang_2B( psz );
-                if( !strcmp( pl->psz_iso639_1, "??" ) )
-                {
-                    pl = GetLang_2T( psz );
-                }
-            }
-            if( pl && strcmp( pl->psz_iso639_1, "??" ) )
-            {
-                lang = ( ( pl->psz_iso639_2T[0] - 0x60 ) << 10 ) |
-                       ( ( pl->psz_iso639_2T[1] - 0x60 ) <<  5 ) |
-                       ( ( pl->psz_iso639_2T[2] - 0x60 ) );
-            }
-            bo_add_16be( mdhd, lang );          // language
-        }
-        else
-        {
-            bo_add_16be( mdhd, 0    );          // language
-        }
-        bo_add_16be( mdhd, 0    );              // predefined
-        box_fix( mdhd );
-        box_gather( mdia, mdhd );
+
+            if (pl && strcmp(pl->psz_iso639_1, "??"))
+                lang = ((pl->psz_iso639_2T[0] - 0x60) << 10) |
+                       ((pl->psz_iso639_2T[1] - 0x60) <<  5) |
+                       ((pl->psz_iso639_2T[2] - 0x60));
+            bo_add_16be(mdhd, lang);          // language
+        } else
+            bo_add_16be(mdhd, 0   );          // language
+        bo_add_16be(mdhd, 0   );              // predefined
+        box_fix(mdhd);
+        box_gather(mdia, mdhd);
 
         /* handler reference */
-        hdlr = box_full_new( "hdlr", 0, 0 );
+        hdlr = box_full_new("hdlr", 0, 0);
 
-        if( p_sys->b_mov )
-            bo_add_fourcc( hdlr, "mhlr" );         // media handler
+        if (p_sys->b_mov)
+            bo_add_fourcc(hdlr, "mhlr");         // media handler
         else
-            bo_add_32be( hdlr, 0 );
+            bo_add_32be(hdlr, 0);
 
-        if( p_stream->fmt.i_cat == AUDIO_ES )
-            bo_add_fourcc( hdlr, "soun" );
-        else if( p_stream->fmt.i_cat == VIDEO_ES )
-            bo_add_fourcc( hdlr, "vide" );
-        else if( p_stream->fmt.i_cat == SPU_ES )
-            bo_add_fourcc( hdlr, "text" );
+        if (p_stream->fmt.i_cat == AUDIO_ES)
+            bo_add_fourcc(hdlr, "soun");
+        else if (p_stream->fmt.i_cat == VIDEO_ES)
+            bo_add_fourcc(hdlr, "vide");
+        else if (p_stream->fmt.i_cat == SPU_ES)
+            bo_add_fourcc(hdlr, "text");
 
-        bo_add_32be( hdlr, 0 );         // reserved
-        bo_add_32be( hdlr, 0 );         // reserved
-        bo_add_32be( hdlr, 0 );         // reserved
+        bo_add_32be(hdlr, 0);         // reserved
+        bo_add_32be(hdlr, 0);         // reserved
+        bo_add_32be(hdlr, 0);         // reserved
 
-        if( p_sys->b_mov )
-            bo_add_8( hdlr, 12 );   /* Pascal string for .mov */
+        if (p_sys->b_mov)
+            bo_add_8(hdlr, 12);   /* Pascal string for .mov */
 
-        if( p_stream->fmt.i_cat == AUDIO_ES )
-            bo_add_mem( hdlr, 12, (uint8_t*)"SoundHandler" );
-        else if( p_stream->fmt.i_cat == VIDEO_ES )
-            bo_add_mem( hdlr, 12, (uint8_t*)"VideoHandler" );
+        if (p_stream->fmt.i_cat == AUDIO_ES)
+            bo_add_mem(hdlr, 12, (uint8_t*)"SoundHandler");
+        else if (p_stream->fmt.i_cat == VIDEO_ES)
+            bo_add_mem(hdlr, 12, (uint8_t*)"VideoHandler");
         else
-            bo_add_mem( hdlr, 12, (uint8_t*)"Text Handler" );
+            bo_add_mem(hdlr, 12, (uint8_t*)"Text Handler");
 
-        if( !p_sys->b_mov )
-            bo_add_8( hdlr, 0 );   /* asciiz string for .mp4, yes that's BRAIN DAMAGED F**K MP4 */
+        if (!p_sys->b_mov)
+            bo_add_8(hdlr, 0);   /* asciiz string for .mp4, yes that's BRAIN DAMAGED F**K MP4 */
 
-        box_fix( hdlr );
-        box_gather( mdia, hdlr );
+        box_fix(hdlr);
+        box_gather(mdia, hdlr);
 
         /* minf*/
-        minf = box_new( "minf" );
+        minf = box_new("minf");
 
         /* add smhd|vmhd */
-        if( p_stream->fmt.i_cat == AUDIO_ES )
-        {
+        if (p_stream->fmt.i_cat == AUDIO_ES) {
             bo_t *smhd;
 
-            smhd = box_full_new( "smhd", 0, 0 );
-            bo_add_16be( smhd, 0 );     // balance
-            bo_add_16be( smhd, 0 );     // reserved
-            box_fix( smhd );
+            smhd = box_full_new("smhd", 0, 0);
+            bo_add_16be(smhd, 0);     // balance
+            bo_add_16be(smhd, 0);     // reserved
+            box_fix(smhd);
 
-            box_gather( minf, smhd );
-        }
-        else if( p_stream->fmt.i_cat == VIDEO_ES )
-        {
+            box_gather(minf, smhd);
+        } else if (p_stream->fmt.i_cat == VIDEO_ES) {
             bo_t *vmhd;
 
-            vmhd = box_full_new( "vmhd", 0, 1 );
-            bo_add_16be( vmhd, 0 );     // graphicsmode
-            for( i = 0; i < 3; i++ )
-            {
-                bo_add_16be( vmhd, 0 ); // opcolor
-            }
-            box_fix( vmhd );
+            vmhd = box_full_new("vmhd", 0, 1);
+            bo_add_16be(vmhd, 0);     // graphicsmode
+            for (int i = 0; i < 3; i++)
+                bo_add_16be(vmhd, 0); // opcolor
+            box_fix(vmhd);
 
-            box_gather( minf, vmhd );
-        }
-        else if( p_stream->fmt.i_cat == SPU_ES )
-        {
-            bo_t *gmhd = box_new( "gmhd" );
-            bo_t *gmin = box_full_new( "gmin", 0, 1 );
+            box_gather(minf, vmhd);
+        } else if (p_stream->fmt.i_cat == SPU_ES) {
+            bo_t *gmhd = box_new("gmhd");
+            bo_t *gmin = box_full_new("gmin", 0, 1);
 
-            bo_add_16be( gmin, 0 );     // graphicsmode
-            for( i = 0; i < 3; i++ )
-            {
-                bo_add_16be( gmin, 0 ); // opcolor
-            }
-            bo_add_16be( gmin, 0 );     // balance
-            bo_add_16be( gmin, 0 );     // reserved
-            box_fix( gmin );
+            bo_add_16be(gmin, 0);     // graphicsmode
+            for (int i = 0; i < 3; i++)
+                bo_add_16be(gmin, 0); // opcolor
+            bo_add_16be(gmin, 0);     // balance
+            bo_add_16be(gmin, 0);     // reserved
+            box_fix(gmin);
 
-            box_gather( gmhd, gmin );
-            box_fix( gmhd );
+            box_gather(gmhd, gmin);
+            box_fix(gmhd);
 
-            box_gather( minf, gmhd );
+            box_gather(minf, gmhd);
         }
 
         /* dinf */
-        dinf = box_new( "dinf" );
-        dref = box_full_new( "dref", 0, 0 );
-        bo_add_32be( dref, 1 );
-        url = box_full_new( "url ", 0, 0x01 );
-        box_fix( url );
-        box_gather( dref, url );
-        box_fix( dref );
-        box_gather( dinf, dref );
+        dinf = box_new("dinf");
+        dref = box_full_new("dref", 0, 0);
+        bo_add_32be(dref, 1);
+        url = box_full_new("url ", 0, 0x01);
+        box_fix(url);
+        box_gather(dref, url);
+        box_fix(dref);
+        box_gather(dinf, dref);
 
         /* append dinf to mdia */
-        box_fix( dinf );
-        box_gather( minf, dinf );
+        box_fix(dinf);
+        box_gather(minf, dinf);
 
         /* add stbl */
-        stbl = GetStblBox( p_mux, p_stream );
+        stbl = GetStblBox(p_mux, p_stream);
 
         /* append stbl to minf */
         p_stream->i_stco_pos += minf->len;
-        box_gather( minf, stbl );
+        box_gather(minf, stbl);
 
         /* append minf to mdia */
-        box_fix( minf );
+        box_fix(minf);
         p_stream->i_stco_pos += mdia->len;
-        box_gather( mdia, minf );
+        box_gather(mdia, minf);
 
         /* append mdia to trak */
-        box_fix( mdia );
+        box_fix(mdia);
         p_stream->i_stco_pos += trak->len;
-        box_gather( trak, mdia );
+        box_gather(trak, mdia);
 
         /* append trak to moov */
-        box_fix( trak );
+        box_fix(trak);
         p_stream->i_stco_pos += moov->len;
-        box_gather( moov, trak );
+        box_gather(moov, trak);
     }
 
     /* Add user data tags */
-    box_gather( moov, GetUdtaTag( p_mux ) );
+    box_gather(moov, GetUdtaTag(p_mux));
 
-    box_fix( moov );
+    box_fix(moov);
     return moov;
 }
 
 /****************************************************************************/
 
-static void bo_init( bo_t *p_bo )
+static void bo_init(bo_t *p_bo)
 {
     p_bo->len = 0;
-    p_bo->b = block_Alloc( 1024 );
+    p_bo->b = block_Alloc(1024);
 }
 
-static void bo_add_8( bo_t *p_bo, uint8_t i )
+static void bo_add_8(bo_t *p_bo, uint8_t i)
 {
-    if( p_bo->len >= p_bo->b->i_buffer)
+    if (p_bo->len >= p_bo->b->i_buffer)
         p_bo->b = block_Realloc(p_bo->b, 0, p_bo->b->i_buffer + 1024);
 
     p_bo->b->p_buffer[p_bo->len++] = i;
 }
 
-static void bo_add_16be( bo_t *p_bo, uint16_t i )
+static void bo_add_16be(bo_t *p_bo, uint16_t i)
 {
-    bo_add_8( p_bo, ( ( i >> 8) &0xff ) );
-    bo_add_8( p_bo, i &0xff );
+    bo_add_8(p_bo, ((i >> 8) &0xff));
+    bo_add_8(p_bo, i &0xff);
 }
 
-static void bo_add_24be( bo_t *p_bo, uint32_t i )
+static void bo_add_24be(bo_t *p_bo, uint32_t i)
 {
-    bo_add_8( p_bo, ( ( i >> 16) &0xff ) );
-    bo_add_8( p_bo, ( ( i >> 8) &0xff ) );
-    bo_add_8( p_bo, (   i &0xff ) );
+    bo_add_8(p_bo, ((i >> 16) &0xff));
+    bo_add_8(p_bo, ((i >> 8) &0xff));
+    bo_add_8(p_bo, (  i &0xff));
 }
-static void bo_add_32be( bo_t *p_bo, uint32_t i )
+static void bo_add_32be(bo_t *p_bo, uint32_t i)
 {
-    bo_add_16be( p_bo, ( ( i >> 16) &0xffff ) );
-    bo_add_16be( p_bo, i &0xffff );
-}
-
-static void bo_fix_32be ( bo_t *p_bo, int i_pos, uint32_t i)
-{
-    p_bo->b->p_buffer[i_pos    ] = ( i >> 24 )&0xff;
-    p_bo->b->p_buffer[i_pos + 1] = ( i >> 16 )&0xff;
-    p_bo->b->p_buffer[i_pos + 2] = ( i >>  8 )&0xff;
-    p_bo->b->p_buffer[i_pos + 3] = ( i       )&0xff;
+    bo_add_16be(p_bo, ((i >> 16) &0xffff));
+    bo_add_16be(p_bo, i &0xffff);
 }
 
-static void bo_add_64be( bo_t *p_bo, uint64_t i )
+static void bo_fix_32be (bo_t *p_bo, int i_pos, uint32_t i)
 {
-    bo_add_32be( p_bo, ( ( i >> 32) &0xffffffff ) );
-    bo_add_32be( p_bo, i &0xffffffff );
+    p_bo->b->p_buffer[i_pos    ] = (i >> 24)&0xff;
+    p_bo->b->p_buffer[i_pos + 1] = (i >> 16)&0xff;
+    p_bo->b->p_buffer[i_pos + 2] = (i >>  8)&0xff;
+    p_bo->b->p_buffer[i_pos + 3] = (i      )&0xff;
 }
 
-static void bo_add_fourcc( bo_t *p_bo, const char *fcc )
+static void bo_add_64be(bo_t *p_bo, uint64_t i)
 {
-    bo_add_8( p_bo, fcc[0] );
-    bo_add_8( p_bo, fcc[1] );
-    bo_add_8( p_bo, fcc[2] );
-    bo_add_8( p_bo, fcc[3] );
+    bo_add_32be(p_bo, ((i >> 32) &0xffffffff));
+    bo_add_32be(p_bo, i &0xffffffff);
 }
 
-static void bo_add_mem( bo_t *p_bo, int i_size, uint8_t *p_mem )
+static void bo_add_fourcc(bo_t *p_bo, const char *fcc)
 {
-    for( int i = 0; i < i_size; i++ )
-        bo_add_8( p_bo, p_mem[i] );
+    bo_add_8(p_bo, fcc[0]);
+    bo_add_8(p_bo, fcc[1]);
+    bo_add_8(p_bo, fcc[2]);
+    bo_add_8(p_bo, fcc[3]);
 }
 
-static void bo_add_descr( bo_t *p_bo, uint8_t tag, uint32_t size )
+static void bo_add_mem(bo_t *p_bo, int i_size, uint8_t *p_mem)
 {
-    bo_add_8( p_bo, tag );
-    for(int i = 3; i>0; i--)
-        bo_add_8( p_bo, (size>>(7*i)) | 0x80 );
+    for (int i = 0; i < i_size; i++)
+        bo_add_8(p_bo, p_mem[i]);
+}
+
+static void bo_add_descr(bo_t *p_bo, uint8_t tag, uint32_t size)
+{
+    bo_add_8(p_bo, tag);
+    for (int i = 3; i>0; i--)
+        bo_add_8(p_bo, (size>>(7*i)) | 0x80);
     bo_add_8(p_bo, size & 0x7F);
 }
 
-static bo_t * box_new( const char *fcc )
+static bo_t *box_new(const char *fcc)
 {
-    bo_t *box = malloc( sizeof( *box ) );
+    bo_t *box = malloc(sizeof(*box));
     if (!box)
         return NULL;
 
-    bo_init( box );
+    bo_init(box);
 
-    bo_add_32be  ( box, 0 );
-    bo_add_fourcc( box, fcc );
+    bo_add_32be  (box, 0);
+    bo_add_fourcc(box, fcc);
 
     return box;
 }
 
-static bo_t * box_full_new( const char *fcc, uint8_t v, uint32_t f )
+static bo_t *box_full_new(const char *fcc, uint8_t v, uint32_t f)
 {
-    bo_t *box = box_new( fcc );
+    bo_t *box = box_new(fcc);
     if (!box)
         return NULL;
 
-    bo_add_8     ( box, v );
-    bo_add_24be  ( box, f );
+    bo_add_8     (box, v);
+    bo_add_24be  (box, f);
 
     return box;
 }
 
-static void box_fix( bo_t *box )
+static void box_fix(bo_t *box)
 {
     box->b->p_buffer[0] = box->len >> 24;
     box->b->p_buffer[1] = box->len >> 16;
@@ -1985,19 +1791,19 @@ static void box_fix( bo_t *box )
     box->b->p_buffer[3] = box->len;
 }
 
-static void box_gather ( bo_t *box, bo_t *box2 )
+static void box_gather (bo_t *box, bo_t *box2)
 {
     box->b = block_Realloc(box->b, 0, box->len + box2->len);
     memcpy(&box->b->p_buffer[box->len], box2->b->p_buffer, box2->len);
     box->len += box2->len;
     block_Release(box2->b);
-    free( box2 );
+    free(box2);
 }
 
-static void box_send( sout_mux_t *p_mux,  bo_t *box )
+static void box_send(sout_mux_t *p_mux,  bo_t *box)
 {
     box->b->i_buffer = box->len;
-    sout_AccessOutWrite( p_mux->p_access, box->b );
+    sout_AccessOutWrite(p_mux->p_access, box->b);
     free(box);
 }
 
