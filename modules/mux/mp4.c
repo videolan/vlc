@@ -1953,32 +1953,26 @@ static void bo_add_descr( bo_t *p_bo, uint8_t tag, uint32_t size )
 
 static bo_t * box_new( const char *fcc )
 {
-    bo_t *box;
+    bo_t *box = malloc( sizeof( *box ) );
+    if (!box)
+        return NULL;
 
-    if( ( box = malloc( sizeof( bo_t ) ) ) )
-    {
-        bo_init( box );
+    bo_init( box );
 
-        bo_add_32be  ( box, 0 );
-        bo_add_fourcc( box, fcc );
-    }
+    bo_add_32be  ( box, 0 );
+    bo_add_fourcc( box, fcc );
 
     return box;
 }
 
 static bo_t * box_full_new( const char *fcc, uint8_t v, uint32_t f )
 {
-    bo_t *box;
+    bo_t *box = box_new( fcc );
+    if (!box)
+        return NULL;
 
-    if( ( box = malloc( sizeof( bo_t ) ) ) )
-    {
-        bo_init( box );
-
-        bo_add_32be  ( box, 0 );
-        bo_add_fourcc( box, fcc );
-        bo_add_8     ( box, v );
-        bo_add_24be  ( box, f );
-    }
+    bo_add_8     ( box, v );
+    bo_add_24be  ( box, f );
 
     return box;
 }
