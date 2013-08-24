@@ -804,8 +804,11 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
                         continue;
 
                     /* FIXME that's slow (and a bit ugly to write in place) */
-                    for (int i = 0; i < pi_payload[i_program][i_layer]; i++)
+                    for (int i = 0; i < pi_payload[i_program][i_layer]; i++) {
+                        if (i_accumulated >= i_buffer)
+                            return 0;
                         p_buffer[i_accumulated++] = bs_read(&s, 8);
+                    }
                 }
             }
         } else {
