@@ -1154,13 +1154,11 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
     /* first, create quantified length */
     int64_t i_dts = 0, i_dts_deq = 0;
     for (unsigned i = 0 ; i < p_stream->i_entry_count; i++) {
-        int64_t i_delta = p_stream->entry[i].i_length + i_dts - i_dts_deq;
+        mp4_entry_t *e = &p_stream->entry[i];
 
-        i_dts += p_stream->entry[i].i_length;
-
-        p_stream->entry[i].i_length =
-            i_delta * (int64_t)i_timescale / CLOCK_FREQ;
-
+        int64_t i_delta = e->i_length + i_dts - i_dts_deq;
+        i_dts += e->i_length;
+        e->i_length = i_delta * (int64_t)i_timescale / CLOCK_FREQ;
         i_dts_deq += i_delta;
     }
     /* then write encoded table */
