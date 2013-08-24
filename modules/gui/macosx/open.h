@@ -252,6 +252,11 @@
 @property (readonly) NSArray *qtkvideoDevices;
 @property (readonly) NSArray *qtkaudioDevices;
 
+/* text field / stepper binding values - subs panel */
+@property (nonatomic) float fileSubDelay;
+@property (nonatomic) float fileSubFps;
+
+
 - (void)qtkrefreshVideoDevices;
 - (void)qtkrefreshAudioDevices;
 
@@ -301,8 +306,7 @@
 - (IBAction)subSettings:(id)sender;
 - (IBAction)subFileBrowse:(id)sender;
 - (IBAction)subOverride:(id)sender;
-- (IBAction)subDelayStepperChanged:(id)sender;
-- (IBAction)subFpsStepperChanged:(id)sender;
+
 - (IBAction)subCloseSheet:(id)sender;
 
 - (IBAction)panelCancel:(id)sender;

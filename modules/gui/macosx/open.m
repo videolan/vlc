@@ -71,6 +71,8 @@ struct display_info_t
  *****************************************************************************/
 @implementation VLCOpen
 
+@synthesize fileSubDelay, fileSubFps;
+
 #pragma mark -
 #pragma mark Init
 
@@ -441,8 +443,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
             [o_options addObject: [NSString stringWithFormat: @"sub-file=%@", o_sub_path]];
             if ([o_file_sub_override state] == NSOnState) {
-                [o_options addObject: [NSString stringWithFormat: @"sub-delay=%i", (int)([o_file_sub_delay intValue] * 10)]];
-                [o_options addObject: [NSString stringWithFormat: @"sub-fps=%f", [o_file_sub_fps floatValue]]];
+                [o_options addObject: [NSString stringWithFormat: @"sub-delay=%f", ([self fileSubDelay] * 10)]];
+                [o_options addObject: [NSString stringWithFormat: @"sub-fps=%f", [self fileSubFps]]];
             }
             [o_options addObject: [NSString stringWithFormat:
                     @"subsdec-encoding=%@", [[o_file_sub_encoding_pop selectedItem] representedObject]]];
@@ -1567,16 +1569,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_file_sub_delay_stp setEnabled: b_state];
     [o_file_sub_fps setEnabled: b_state];
     [o_file_sub_fps_stp setEnabled: b_state];
-}
-
-- (IBAction)subDelayStepperChanged:(id)sender
-{
-    [o_file_sub_delay setIntValue: [o_file_sub_delay_stp intValue]];
-}
-
-- (IBAction)subFpsStepperChanged:(id)sender;
-{
-    [o_file_sub_fps setFloatValue: [o_file_sub_fps_stp floatValue]];
 }
 
 #pragma mark -
