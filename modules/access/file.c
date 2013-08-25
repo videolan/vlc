@@ -389,8 +389,14 @@ static int FileControl( access_t *p_access, int i_query, va_list args )
             break;
 
         case ACCESS_GET_SIZE:
+        {
+            struct stat st;
+
+            if (fstat (p_sys->fd, &st) == 0)
+                p_sys->size = st.st_size;
             *va_arg( args, uint64_t * ) = p_sys->size;
             break;
+        }
 
         /* */
         case ACCESS_GET_PTS_DELAY:
