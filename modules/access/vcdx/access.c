@@ -852,7 +852,6 @@ VCDOpen ( vlc_object_t *p_this )
     p_access->pf_control       = VCDControl;
     p_access->pf_seek          = VCDSeek;
 
-    p_access->info.i_update    = 0;
     p_access->info.i_pos       = 0;
     p_access->info.b_eof       = false;
     p_access->info.i_title     = 0;

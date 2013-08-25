@@ -194,7 +194,6 @@ static int Open( vlc_object_t *p_this )
     p_access->pf_control = Control;
     p_access->pf_seek    = Seek;
 
-    p_access->info.i_update    = 0;
     p_access->info.b_eof       = false;
 
     p_access->info.i_title     = i_title;

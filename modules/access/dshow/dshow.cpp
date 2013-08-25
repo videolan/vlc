@@ -699,7 +699,6 @@ static int DemuxOpen( vlc_object_t *p_this )
 
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = DemuxControl;
-    p_demux->info.i_update = 0;
     p_demux->info.i_title = 0;
     p_demux->info.i_seekpoint = 0;
 
@@ -813,7 +812,6 @@ static int AccessOpen( vlc_object_t *p_this )
     p_access->pf_block = ReadCompressed;
     p_access->pf_control = AccessControl;
     p_access->pf_seek = NULL;
-    p_access->info.i_update = 0;
     p_access->info.i_pos = 0;
     p_access->info.b_eof = false;
     p_access->info.i_title = 0;
