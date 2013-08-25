@@ -296,7 +296,6 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
             return VLC_SUCCESS;
         }
 
-        case STREAM_CONTROL_ACCESS:
         case STREAM_GET_TITLE_INFO:
         case STREAM_GET_META:
         case STREAM_GET_CONTENT_TYPE:
@@ -305,6 +304,9 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
         case STREAM_SET_TITLE:
         case STREAM_SET_SEEKPOINT:
         case STREAM_SET_RECORD_STATE:
+        case STREAM_SET_PRIVATE_ID_STATE:
+        case STREAM_SET_PRIVATE_ID_CA:
+        case STREAM_GET_PRIVATE_ID_STATE:
             return VLC_EGENERIC;
 
         default:

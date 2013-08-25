@@ -789,7 +789,7 @@ static int DemuxInit( demux_t *p_demux )
         tk->p_frame = NULL;
 
         /* Check (in case of mms) if this track is selected (ie will receive data) */
-        if( !stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_GET_PRIVATE_ID_STATE,
+        if( !stream_Control( p_demux->s, STREAM_GET_PRIVATE_ID_STATE,
                              p_sp->i_stream_number, &b_access_selected ) &&
             !b_access_selected )
         {

@@ -133,9 +133,11 @@ static int Control( stream_t *s, int i_query, va_list args )
         case STREAM_SET_PAUSE_STATE:
             break; /* nothing to do */
 
-        case STREAM_CONTROL_ACCESS:
-            msg_Err( s, "Hey, what are you thinking ?"
-                     "DON'T USE STREAM_CONTROL_ACCESS !!!" );
+        case STREAM_SET_PRIVATE_ID_STATE:
+        case STREAM_SET_PRIVATE_ID_CA:
+        case STREAM_GET_PRIVATE_ID_STATE:
+            msg_Err( s, "Hey, what are you thinking? "
+                     "DO NOT USE PRIVATE STREAM CONTROLS!!!" );
             return VLC_EGENERIC;
 
         default:

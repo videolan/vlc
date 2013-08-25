@@ -99,11 +99,6 @@ enum stream_query_e
 
     STREAM_GET_SIZE,            /**< arg1= uint64_t *     res=cannot fail (0 if no sense)*/
 
-    /* Special for direct access control from demuxer.
-     * XXX: avoid using it by all means */
-    STREAM_CONTROL_ACCESS,  /* arg1= int i_access_query, args   res: can fail
-                             if access unreachable or access control answer */
-
     /* You should update size of source if any and then update size 
      * FIXME find a way to avoid it */
     STREAM_UPDATE_SIZE,
@@ -120,6 +115,10 @@ enum stream_query_e
 
     /* XXX only data read through stream_Read/Block will be recorded */
     STREAM_SET_RECORD_STATE,     /**< arg1=bool, arg2=const char *psz_ext (if arg1 is true)  res=can fail */
+
+    STREAM_SET_PRIVATE_ID_STATE = 0x1000, /* arg1= int i_private_data, bool b_selected    res=can fail */
+    STREAM_SET_PRIVATE_ID_CA,             /* arg1= int i_program_number, uint16_t i_vpid, uint16_t i_apid1, uint16_t i_apid2, uint16_t i_apid3, uint8_t i_length, uint8_t *p_data */
+    STREAM_GET_PRIVATE_ID_STATE,          /* arg1=int i_private_data arg2=bool *          res=can fail */
 };
 
 VLC_API int stream_Read( stream_t *s, void *p_read, int i_read );

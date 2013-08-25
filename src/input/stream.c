@@ -561,6 +561,9 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
     static_control_match(SET_PAUSE_STATE);
     static_control_match(SET_TITLE);
     static_control_match(SET_SEEKPOINT);
+    static_control_match(SET_PRIVATE_ID_STATE);
+    static_control_match(SET_PRIVATE_ID_CA);
+    static_control_match(GET_PRIVATE_ID_STATE);
 
     switch( i_query )
     {
@@ -573,6 +576,9 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
         case STREAM_GET_CONTENT_TYPE:
         case STREAM_GET_SIGNAL:
         case STREAM_SET_PAUSE_STATE:
+        case STREAM_SET_PRIVATE_ID_STATE:
+        case STREAM_SET_PRIVATE_ID_CA:
+        case STREAM_GET_PRIVATE_ID_STATE:
             return access_vaControl( p_access, i_query, args );
 
         case STREAM_GET_SIZE:
@@ -607,20 +613,6 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
                 assert(0);
                 return VLC_EGENERIC;
             }
-        }
-
-        case STREAM_CONTROL_ACCESS:
-        {
-            int i_int = (int) va_arg( args, int );
-            if( i_int != ACCESS_SET_PRIVATE_ID_STATE &&
-                i_int != ACCESS_SET_PRIVATE_ID_CA &&
-                i_int != ACCESS_GET_PRIVATE_ID_STATE )
-            {
-                msg_Err( s, "Hey, what are you thinking ?"
-                            "DON'T USE STREAM_CONTROL_ACCESS !!!" );
-                return VLC_EGENERIC;
-            }
-            return access_vaControl( p_access, i_int, args );
         }
 
         case STREAM_UPDATE_SIZE:
