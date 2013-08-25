@@ -387,7 +387,7 @@
 
             [o_mrl_string appendFormat:
                         @"standard{mux=%@,access=%@,dst=%@%@}",
-                        o_mode, o_mux_string, o_finalStreamAddress, o_announce];
+                        o_mux_string, o_mode, o_finalStreamAddress, o_announce];
         } else {
             NSString * o_stream_name;
 
