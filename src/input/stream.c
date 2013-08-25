@@ -550,8 +550,6 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
     stream_sys_t *p_sys = s->p_sys;
     access_t     *p_access = p_sys->p_access;
 
-    uint64_t *pi_64, i_64;
-
     static_control_match(CAN_SEEK);
     static_control_match(CAN_FASTSEEK);
     static_control_match(CAN_PAUSE);
@@ -578,7 +576,8 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
             return access_vaControl( p_access, i_query, args );
 
         case STREAM_GET_SIZE:
-            pi_64 = va_arg( args, uint64_t * );
+        {
+            uint64_t *pi_64 = va_arg( args, uint64_t * );
             if( s->p_sys->i_list )
             {
                 int i;
@@ -589,24 +588,26 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
             }
             *pi_64 = access_GetSize( p_access );
             break;
+        }
 
         case STREAM_GET_POSITION:
-            pi_64 = va_arg( args, uint64_t * );
-            *pi_64 = p_sys->i_pos;
+            *va_arg( args, uint64_t * ) = p_sys->i_pos;
             break;
 
         case STREAM_SET_POSITION:
-            i_64 = va_arg( args, uint64_t );
+        {
+            uint64_t offset = va_arg( args, uint64_t );
             switch( p_sys->method )
             {
             case STREAM_METHOD_BLOCK:
-                return AStreamSeekBlock( s, i_64 );
+                return AStreamSeekBlock( s, offset );
             case STREAM_METHOD_STREAM:
-                return AStreamSeekStream( s, i_64 );
+                return AStreamSeekStream( s, offset );
             default:
                 assert(0);
                 return VLC_EGENERIC;
             }
+        }
 
         case STREAM_CONTROL_ACCESS:
         {
