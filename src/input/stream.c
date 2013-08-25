@@ -539,6 +539,9 @@ static void AStreamControlUpdate( stream_t *s )
     }
 }
 
+#define static_control_match(foo) \
+    static_assert((unsigned) STREAM_##foo == ACCESS_##foo, "Mismatch")
+
 /****************************************************************************
  * AStreamControl:
  ****************************************************************************/
@@ -549,8 +552,31 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
 
     uint64_t *pi_64, i_64;
 
+    static_control_match(CAN_SEEK);
+    static_control_match(CAN_FASTSEEK);
+    static_control_match(CAN_PAUSE);
+    static_control_match(CAN_CONTROL_PACE);
+    static_control_match(GET_TITLE_INFO);
+    static_control_match(GET_META);
+    static_control_match(GET_CONTENT_TYPE);
+    static_control_match(GET_SIGNAL);
+    static_control_match(SET_PAUSE_STATE);
+    static_control_match(SET_TITLE);
+    static_control_match(SET_SEEKPOINT);
+
     switch( i_query )
     {
+        case STREAM_CAN_SEEK:
+        case STREAM_CAN_FASTSEEK:
+        case STREAM_CAN_PAUSE:
+        case STREAM_CAN_CONTROL_PACE:
+        case STREAM_GET_TITLE_INFO:
+        case STREAM_GET_META:
+        case STREAM_GET_CONTENT_TYPE:
+        case STREAM_GET_SIGNAL:
+        case STREAM_SET_PAUSE_STATE:
+            return access_vaControl( p_access, i_query, args );
+
         case STREAM_GET_SIZE:
             pi_64 = va_arg( args, uint64_t * );
             if( s->p_sys->i_list )
@@ -563,15 +589,6 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
             }
             *pi_64 = access_GetSize( p_access );
             break;
-
-        case STREAM_CAN_SEEK:
-            return access_vaControl( p_access, ACCESS_CAN_SEEK, args );
-        case STREAM_CAN_FASTSEEK:
-            return access_vaControl( p_access, ACCESS_CAN_FASTSEEK, args );
-        case STREAM_CAN_PAUSE:
-            return access_vaControl( p_access, ACCESS_CAN_PAUSE, args );
-        case STREAM_CAN_CONTROL_PACE:
-            return access_vaControl( p_access, ACCESS_CAN_CONTROL_PACE, args );
 
         case STREAM_GET_POSITION:
             pi_64 = va_arg( args, uint64_t * );
@@ -609,27 +626,10 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
             AStreamControlUpdate( s );
             return VLC_SUCCESS;
 
-        case STREAM_GET_TITLE_INFO:
-            return access_vaControl( p_access, ACCESS_GET_TITLE_INFO, args );
-        case STREAM_GET_META:
-            return access_vaControl( p_access, ACCESS_GET_META, args );
-        case STREAM_GET_CONTENT_TYPE:
-            return access_vaControl( p_access, ACCESS_GET_CONTENT_TYPE, args );
-        case STREAM_GET_SIGNAL:
-            return access_vaControl( p_access, ACCESS_GET_SIGNAL, args );
-
-        case STREAM_SET_PAUSE_STATE:
-            return access_vaControl( p_access, ACCESS_SET_PAUSE_STATE, args );
         case STREAM_SET_TITLE:
-        {
-            int ret = access_vaControl( p_access, ACCESS_SET_TITLE, args );
-            if( ret == VLC_SUCCESS )
-                AStreamControlReset( s );
-            return ret;
-        }
         case STREAM_SET_SEEKPOINT:
         {
-            int ret = access_vaControl( p_access, ACCESS_SET_SEEKPOINT, args );
+            int ret = access_vaControl( p_access, i_query, args );
             if( ret == VLC_SUCCESS )
                 AStreamControlReset( s );
             return ret;
