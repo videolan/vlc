@@ -472,7 +472,7 @@ static int ChooseSegment(stream_t *s, const int current)
             i++;
     }
 
-    msg_Info(s, "Choose segment %d/%d (sequence=%d)", wanted, count, sequence);
+    msg_Dbg(s, "Choose segment %d/%d (sequence=%d)", wanted, count, sequence);
     return wanted;
 }
 
@@ -711,7 +711,7 @@ static int parse_StreamInformation(stream_t *s, vlc_array_t **hls_stream,
         return VLC_EGENERIC;
     }
 
-    msg_Info(s, "bandwidth adaptation detected (program-id=%d, bandwidth=%"PRIu64").", id, bw);
+    msg_Dbg(s, "bandwidth adaptation detected (program-id=%d, bandwidth=%"PRIu64").", id, bw);
 
     char *psz_uri = relative_URI(s->p_sys->m3u8, uri);
 
@@ -792,7 +792,7 @@ static int parse_Key(stream_t *s, hls_stream_t *hls, char *p_read)
         char *value, *uri, *iv;
         if (s->p_sys->b_aesmsg == false)
         {
-            msg_Info(s, "playback of AES-128 encrypted HTTP Live media detected.");
+            msg_Dbg(s, "playback of AES-128 encrypted HTTP Live media detected.");
             s->p_sys->b_aesmsg = true;
         }
         value = uri = parse_Attributes(p_read, "URI");
@@ -911,7 +911,7 @@ static int parse_EndList(stream_t *s, hls_stream_t *hls)
     assert(hls);
 
     s->p_sys->b_live = false;
-    msg_Info(s, "video on demand (vod) mode");
+    msg_Dbg(s, "video on demand (vod) mode");
     return VLC_SUCCESS;
 }
 
@@ -994,7 +994,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
 
     if (b_meta)
     {
-        msg_Info(s, "Meta playlist");
+        msg_Dbg(s, "Meta playlist");
 
         /* M3U8 Meta Index file */
         do {
@@ -1017,7 +1017,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
                 {
                     if (*uri == '#')
                     {
-                        msg_Info(s, "Skipping invalid stream-inf: %s", uri);
+                        msg_Warn(s, "Skipping invalid stream-inf: %s", uri);
                         free(uri);
                     }
                     else
@@ -1081,7 +1081,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
     }
     else
     {
-        msg_Info(s, "%s Playlist HLS protocol version: %d", p_sys->b_live ? "Live": "VOD", version);
+        msg_Dbg(s, "%s Playlist HLS protocol version: %d", p_sys->b_live ? "Live": "VOD", version);
 
         hls_stream_t *hls = NULL;
         if (p_sys->b_meta)
@@ -1353,7 +1353,7 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
 {
     int count = vlc_array_count(hls_new->segments);
 
-    msg_Info(s, "updating hls stream (program-id=%d, bandwidth=%"PRIu64") has %d segments",
+    msg_Dbg(s, "updating hls stream (program-id=%d, bandwidth=%"PRIu64") has %d segments",
              hls_new->id, hls_new->bandwidth, count);
 
     vlc_mutex_lock(&hls_old->lock);
@@ -1425,7 +1425,7 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
                         p->sequence, l->sequence+1);
             }
             vlc_array_append(hls_old->segments, p);
-            msg_Info(s, "- segment %d appended", p->sequence);
+            msg_Dbg(s, "- segment %d appended", p->sequence);
 
             // Signal download thread otherwise the segment will not get downloaded
             *stream_appended = true;
@@ -1452,7 +1452,7 @@ static int hls_ReloadPlaylist(stream_t *s)
     if (hls_streams == NULL)
         return VLC_ENOMEM;
 
-    msg_Info(s, "Reloading HLS live meta playlist");
+    msg_Dbg(s, "Reloading HLS live meta playlist");
 
     if (get_HTTPLiveMetaPlaylist(s, &hls_streams) != VLC_SUCCESS)
     {
@@ -1481,14 +1481,14 @@ static int hls_ReloadPlaylist(stream_t *s)
         if (hls_old == NULL)
         {   /* new hls stream - append */
             vlc_array_append(p_sys->hls_stream, hls_new);
-            msg_Info(s, "new HLS stream appended (id=%d, bandwidth=%"PRIu64")",
+            msg_Dbg(s, "new HLS stream appended (id=%d, bandwidth=%"PRIu64")",
                      hls_new->id, hls_new->bandwidth);
 
             // New segment available -  signal download thread
             stream_appended = true;
         }
         else if (hls_UpdatePlaylist(s, hls_new, hls_old, &stream_appended) != VLC_SUCCESS)
-            msg_Info(s, "failed updating HLS stream (id=%d, bandwidth=%"PRIu64")",
+            msg_Warn(s, "failed updating HLS stream (id=%d, bandwidth=%"PRIu64")",
                      hls_new->id, hls_new->bandwidth);
     }
     vlc_array_destroy(hls_streams);
@@ -1588,7 +1588,7 @@ static int hls_DownloadSegmentData(stream_t *s, hls_stream_t *hls, segment_t *se
 
     vlc_mutex_unlock(&segment->lock);
 
-    msg_Info(s, "downloaded segment %d from stream %d",
+    msg_Dbg(s, "downloaded segment %d from stream %d",
                 segment->sequence, *cur_stream);
 
     uint64_t bw = segment->size * 8 * 1000000 / __MAX(1, duration); /* bits / s */
@@ -1600,7 +1600,7 @@ static int hls_DownloadSegmentData(stream_t *s, hls_stream_t *hls, segment_t *se
         /* FIXME: we need an average here */
         if ((newstream >= 0) && (newstream != *cur_stream))
         {
-            msg_Info(s, "detected %s bandwidth (%"PRIu64") stream",
+            msg_Dbg(s, "detected %s bandwidth (%"PRIu64") stream",
                      (bw >= hls->bandwidth) ? "faster" : "lower", bw);
             *cur_stream = newstream;
         }
@@ -2275,7 +2275,7 @@ static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
         }
 
         if (segment->size == segment->data->i_buffer)
-            msg_Info(s, "playing segment %d from stream %d",
+            msg_Dbg(s, "playing segment %d from stream %d",
                      segment->sequence, p_sys->playback.stream);
 
         ssize_t len = -1;
@@ -2583,7 +2583,7 @@ static int segment_Seek(stream_t *s, const uint64_t pos)
         vlc_cond_signal(&p_sys->download.wait);
 
         /* Wait for download to be finished */
-        msg_Info(s, "seek to segment %d", p_sys->playback.segment);
+        msg_Dbg(s, "seek to segment %d", p_sys->playback.segment);
         while ((p_sys->download.seek != -1) ||
            ((p_sys->download.segment - p_sys->playback.segment < 3) &&
                 (p_sys->download.segment < count)))
