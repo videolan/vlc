@@ -2567,7 +2567,6 @@ static void InputSourceClean( input_source_t *in )
 static void InputSourceMeta( input_thread_t *p_input,
                              input_source_t *p_source, vlc_meta_t *p_meta )
 {
-    stream_t *p_stream = p_source->p_stream;
     demux_t *p_demux = p_source->p_demux;
 
     /* XXX Remember that checking against p_item->p_meta->i_status & ITEM_PREPARSED

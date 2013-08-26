@@ -1268,8 +1268,6 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
 
     while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
     {
-        audio_output_t *p_aout = p_owner->p_aout;
-
         if( DecoderIsExitRequested( p_dec ) )
         {
             /* It prevent freezing VLC in case of broken decoder */
@@ -2187,7 +2185,6 @@ static vout_thread_t *aout_request_vout( void *p_private,
 static int aout_update_format( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
-    block_t *p_buffer;
 
     if( p_owner->p_aout
      && !AOUT_FMTS_IDENTICAL(&p_dec->fmt_out.audio, &p_owner->audio) )
