@@ -486,5 +486,6 @@ int DirControl( access_t *p_access, int i_query, va_list args )
         default:
             return VLC_EGENERIC;
     }
+    (void) p_access;
     return VLC_SUCCESS;
 }
