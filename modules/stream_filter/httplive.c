@@ -147,6 +147,11 @@ struct stream_sys_t
     bool        b_live;     /* live stream? or vod? */
     bool        b_error;    /* parsing error */
     bool        b_aesmsg;   /* only print one time that the media is encrypted */
+
+    /* Shared data */
+    vlc_cond_t   wait;
+    vlc_mutex_t  lock;
+    bool         paused;
 };
 
 /****************************************************************************
@@ -1799,7 +1804,13 @@ static int Prefetch(stream_t *s, int *current)
  ****************************************************************************/
 static int hls_Download(stream_t *s, segment_t *segment)
 {
+    stream_sys_t *p_sys = s->p_sys;
     assert(segment);
+
+    vlc_mutex_lock(&p_sys->lock);
+    while (p_sys->paused)
+        vlc_cond_wait(&p_sys->wait, &p_sys->lock);
+    vlc_mutex_unlock(&p_sys->lock);
 
     stream_t *p_ts = stream_UrlNew(s, segment->url);
     if (p_ts == NULL)
@@ -2007,6 +2018,11 @@ static int Open(vlc_object_t *p_this)
     s->pf_peek = Peek;
     s->pf_control = Control;
 
+    p_sys->paused = false;
+
+    vlc_cond_init(&p_sys->wait);
+    vlc_mutex_init(&p_sys->lock);
+
     /* Parse HLS m3u8 content. */
     uint8_t *buffer = NULL;
     ssize_t len = read_M3U8_from_stream(s->p_source, &buffer);
@@ -2085,6 +2101,9 @@ fail:
     }
     vlc_array_destroy(p_sys->hls_stream);
 
+    vlc_mutex_destroy(&p_sys->lock);
+    vlc_cond_destroy(&p_sys->wait);
+
     /* */
     free(p_sys->m3u8);
     free(p_sys);
@@ -2100,6 +2119,11 @@ static void Close(vlc_object_t *p_this)
     stream_sys_t *p_sys = s->p_sys;
 
     assert(p_sys->hls_stream);
+
+    vlc_mutex_lock(&p_sys->lock);
+    p_sys->paused = false;
+    vlc_cond_signal(&p_sys->wait);
+    vlc_mutex_unlock(&p_sys->lock);
 
     /* */
     vlc_mutex_lock(&p_sys->download.lock_wait);
@@ -2128,6 +2152,10 @@ static void Close(vlc_object_t *p_this)
     vlc_array_destroy(p_sys->hls_stream);
 
     /* */
+
+    vlc_mutex_destroy(&p_sys->lock);
+    vlc_cond_destroy(&p_sys->wait);
+
     free(p_sys->m3u8);
     if (p_sys->peeked)
         block_Release (p_sys->peeked);
@@ -2610,15 +2638,25 @@ static int Control(stream_t *s, int i_query, va_list args)
             *(va_arg (args, bool *)) = hls_MaySeek(s);
             break;
         case STREAM_CAN_CONTROL_PACE:
+        case STREAM_CAN_PAUSE:
             *(va_arg (args, bool *)) = true;
             break;
         case STREAM_CAN_FASTSEEK:
-        case STREAM_CAN_PAUSE: /* TODO */
             *(va_arg (args, bool *)) = false;
             break;
         case STREAM_GET_POSITION:
             *(va_arg (args, uint64_t *)) = p_sys->playback.offset;
             break;
+        case STREAM_SET_PAUSE_STATE:
+        {
+            bool paused = va_arg (args, unsigned);
+
+            vlc_mutex_lock(&p_sys->lock);
+            p_sys->paused = paused;
+            vlc_cond_signal(&p_sys->wait);
+            vlc_mutex_unlock(&p_sys->lock);
+            break;
+        }
         case STREAM_SET_POSITION:
             if (hls_MaySeek(s))
             {
