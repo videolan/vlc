@@ -76,7 +76,6 @@ static bool       ControlIsSeekRequest( int i_type );
 static bool       Control( input_thread_t *, int, vlc_value_t );
 
 static int  UpdateTitleSeekpointFromAccess( input_thread_t * );
-static void UpdateGenericFromAccess( input_thread_t * );
 
 static int  UpdateTitleSeekpointFromDemux( input_thread_t * );
 static void UpdateGenericFromDemux( input_thread_t * );
@@ -584,7 +583,6 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, bool *pb_d
                 i_ret = UpdateTitleSeekpointFromAccess( p_input );
                 *pb_changed = true;
             }
-            UpdateGenericFromAccess( p_input );
         }
     }
 
@@ -2026,9 +2024,6 @@ static bool Control( input_thread_t *p_input,
                     p_meta = vlc_meta_New();
                     if( p_meta )
                     {
-                        if( slave->p_stream != NULL )
-                            stream_Control( slave->p_stream,
-                                            STREAM_GET_META, p_meta );
                         demux_Control( slave->p_demux, DEMUX_GET_META, p_meta );
                         InputUpdateMeta( p_input, p_meta );
                     }
@@ -2274,23 +2269,6 @@ static int UpdateTitleSeekpointFromAccess( input_thread_t *p_input )
                                      p_access->info.i_title,
                                      p_access->info.i_seekpoint );
     return 1;
-}
-static void UpdateGenericFromAccess( input_thread_t *p_input )
-{
-    stream_t *p_stream = p_input->p->input.p_stream;
-    access_t *p_access = p_input->p->input.p_access;
-
-    if( p_access->info.i_update & INPUT_UPDATE_META )
-    {
-        /* TODO maybe multi - access ? */
-        vlc_meta_t *p_meta = vlc_meta_New();
-        if( p_meta )
-        {
-            stream_Control( p_stream, STREAM_GET_META, p_meta );
-            InputUpdateMeta( p_input, p_meta );
-        }
-        p_access->info.i_update &= ~INPUT_UPDATE_META;
-    }
 }
 
 /*****************************************************************************
@@ -2665,11 +2643,6 @@ static void InputSourceMeta( input_thread_t *p_input,
      * is a bad idea */
 
     bool has_meta = false;
-
-    /* Read access meta */
-    if( p_stream != NULL
-     && !stream_Control( p_stream, STREAM_GET_META, p_meta ) )
-        has_meta = true;
 
     /* Read demux meta */
     if( !demux_Control( p_demux, DEMUX_GET_META, p_meta ) )

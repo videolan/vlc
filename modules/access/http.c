@@ -878,7 +878,7 @@ static int ReadICYMeta( access_t *p_access )
             p_sys->psz_icy_title = EnsureUTF8( psz_tmp );
             if( !p_sys->psz_icy_title )
                 free( psz_tmp );
-            p_access->info.i_update |= INPUT_UPDATE_META;
+            //p_access->info.i_update |= INPUT_UPDATE_META; FIXME
 
             msg_Dbg( p_access, "New Title=%s", p_sys->psz_icy_title );
         }

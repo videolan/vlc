@@ -530,6 +530,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             return VLC_EGENERIC;
 
+        case DEMUX_GET_META:
+            return stream_Control( p_demux->s, STREAM_GET_META, args );
+
         case DEMUX_GET_FPS:
         default:
             return VLC_EGENERIC;

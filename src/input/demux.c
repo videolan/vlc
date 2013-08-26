@@ -307,9 +307,11 @@ int demux_vaControlHelper( stream_t *s,
             }
             return VLC_EGENERIC;
 
+        case DEMUX_GET_META:
+            return stream_Control( s, STREAM_GET_META, args );
+
         case DEMUX_GET_PTS_DELAY:
         case DEMUX_GET_FPS:
-        case DEMUX_GET_META:
         case DEMUX_HAS_UNSUPPORTED_META:
         case DEMUX_SET_NEXT_DEMUX_TIME:
         case DEMUX_GET_TITLE_INFO:
