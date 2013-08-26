@@ -1700,14 +1700,15 @@ static void* hls_Reload(void *p_this)
 
     int canc = vlc_savecancel();
 
-    double wait = 0.5;
+    double wait = 1.0;
     while (vlc_object_alive(s))
     {
         mtime_t now = mdate();
         if (now >= p_sys->playlist.wakeup)
         {
-            /* reload the m3u8 */
-            if (hls_ReloadPlaylist(s) != VLC_SUCCESS)
+            /* reload the m3u8 if there are less than 2 segments what aren't downloaded */
+            if ( ( p_sys->download.segment - p_sys->playback.segment < 2 ) &&
+                 ( hls_ReloadPlaylist(s) != VLC_SUCCESS) )
             {
                 /* No change in playlist, then backoff */
                 p_sys->playlist.tries++;
@@ -1725,7 +1726,7 @@ static void* hls_Reload(void *p_this)
             else
             {
                 p_sys->playlist.tries = 0;
-                wait = 0.5;
+                wait = 1.0;
             }
 
             hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->download.stream);
