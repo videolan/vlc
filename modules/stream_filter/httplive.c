@@ -739,7 +739,9 @@ static int parse_MediaSequence(stream_t *s, hls_stream_t *hls, char *p_read)
         if (s->p_sys->b_live)
         {
             hls_stream_t *last = hls_GetLast(s->p_sys->hls_stream);
-            if ((last->sequence < sequence) && (sequence - last->sequence != 1))
+            segment_t *last_segment = segment_GetSegment( last, vlc_array_count( last->segments ) - 1 );
+            if ( ( last_segment->sequence < sequence) &&
+                 ( sequence - last_segment->sequence >= 1 ))
                 msg_Err(s, "EXT-X-MEDIA-SEQUENCE gap in playlist (new=%d, old=%d)",
                             sequence, last->sequence);
         }
