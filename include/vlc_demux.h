@@ -138,6 +138,8 @@ enum demux_query_e
     DEMUX_CAN_RECORD,           /* arg1=bool*   res=can fail(assume false) */
     DEMUX_SET_RECORD_STATE,     /* arg1=bool    res=can fail */
 
+    DEMUX_GET_SIGNAL, /* arg1=double *pf_quality, arg2=double *pf_strength
+                         res=can fail */
 
     /* II. Specific access_demux queries */
     /* PAUSE you are ensured that it is never called twice with the same state */

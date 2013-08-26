@@ -1202,8 +1202,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         p_sys->b_start_record = b_bool;
         return VLC_SUCCESS;
 
-    case DEMUX_GET_FPS:
-    case DEMUX_SET_TIME:
+    case DEMUX_GET_SIGNAL:
+        return stream_Control( p_demux->s, STREAM_GET_SIGNAL, args );
+
     default:
         return VLC_EGENERIC;
     }

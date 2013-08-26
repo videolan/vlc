@@ -521,11 +521,6 @@ static block_t *Read (access_t *access)
 
     block->i_buffer = val;
 
-    /* Fetch the signal levels every so often. Some devices do not like this
-     * to be requested too frequently, e.g. due to low bandwidth I²C bus. */
-    if ((sys->signal_poll++) == 0)
-        access->info.i_update |= INPUT_UPDATE_SIGNAL;
-
     return block;
 }
 
@@ -555,6 +550,11 @@ static int Control (access_t *access, int query, va_list args)
             break;
 
         case ACCESS_GET_SIGNAL:
+            /* Fetch the signal levels only every so often to avoid stressing
+             * the device bus. */
+            if ((sys->signal_poll++))
+                return VLC_EGENERIC;
+
             *va_arg (args, double *) = dvb_get_snr (dev);
             *va_arg (args, double *) = dvb_get_signal_strength (dev);
             return VLC_SUCCESS;
