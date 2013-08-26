@@ -2140,7 +2140,10 @@ static int AVI_IndexFind_idx1( demux_t *p_demux,
     avi_chunk_list_t *p_movi = AVI_ChunkFind( p_riff, AVIFOURCC_movi, 0);
     uint64_t i_first_pos = UINT64_MAX;
     for( unsigned i = 0; i < __MIN( p_idx1->i_entry_count, 100 ); i++ )
-        i_first_pos = __MIN( i_first_pos, p_idx1->entry[i].i_pos );
+    {
+        if ( p_idx1->entry[i].i_length > 0 )
+            i_first_pos = __MIN( i_first_pos, p_idx1->entry[i].i_pos );
+    }
 
     const uint64_t i_movi_content = p_movi->i_chunk_pos + 8;
     if( i_first_pos < i_movi_content )
