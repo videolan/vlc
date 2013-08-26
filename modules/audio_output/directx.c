@@ -676,7 +676,7 @@ static int FillBuffer( audio_output_t *p_aout, block_t *p_buffer )
     if( IDirectSoundBuffer_GetCurrentPosition( p_aout->sys->p_dsbuffer, (LPDWORD) &i_read, NULL) ==  DS_OK )
     {
         /* Compute the outer interval between the write and read pointers within the ring buffer */
-        i_buf = (mtime_t)p_aout->sys->i_write - (mtime_t)i_read;
+        i_buf = (mtime_t)i_read - (mtime_t)p_aout->sys->i_write;
         if( i_buf <= 0 )
             i_buf += DS_BUF_SIZE;
     }
