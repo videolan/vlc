@@ -1494,9 +1494,9 @@ static int hls_ReloadPlaylist(stream_t *s)
     // Must signal the download thread otherwise new segments will not be downloaded at all!
     if (stream_appended == true)
     {
-	vlc_mutex_lock(&p_sys->download.lock_wait);
-	vlc_cond_signal(&p_sys->download.wait);
-	vlc_mutex_unlock(&p_sys->download.lock_wait);
+        vlc_mutex_lock(&p_sys->download.lock_wait);
+        vlc_cond_signal(&p_sys->download.wait);
+        vlc_mutex_unlock(&p_sys->download.lock_wait);
     }
 
     return VLC_SUCCESS;
