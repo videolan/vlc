@@ -49,6 +49,7 @@
 VLCProxyModel::VLCProxyModel( QObject *parent )
     : QSortFilterProxyModel( parent ), VLCModelSubInterface()
 {
+    for ( int i = 0; i <= SQLML_MODEL ; i++ ) sourcemodels[ i ] = NULL;
     /* Because we can't directly plug the signal without mapping
        the index to the proxy model, we need a conversion step.
     */
