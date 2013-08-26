@@ -104,14 +104,8 @@ struct access_t
     /* Access has to maintain them uptodate */
     struct
     {
-        unsigned int i_update;  /* Access sets them on change,
-                                   Input removes them once take into account*/
-
         uint64_t     i_pos;     /* idem */
         bool         b_eof;     /* idem */
-
-        int          i_title;    /* idem, start from 0 (could be menu) */
-        int          i_seekpoint;/* idem, start from 0 */
     } info;
     access_sys_t *p_sys;
 
@@ -146,11 +140,8 @@ static inline uint64_t access_GetSize( access_t *p_access )
 
 static inline void access_InitFields( access_t *p_a )
 {
-    p_a->info.i_update = 0;
     p_a->info.i_pos = 0;
     p_a->info.b_eof = false;
-    p_a->info.i_title = 0;
-    p_a->info.i_seekpoint = 0;
 }
 
 /**

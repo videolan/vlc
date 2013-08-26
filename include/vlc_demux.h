@@ -77,6 +77,11 @@ struct demux_t
     input_thread_t *p_input;
 };
 
+/* demux_t.info.i_update field */
+#define INPUT_UPDATE_TITLE      0x0010
+#define INPUT_UPDATE_SEEKPOINT  0x0020
+#define INPUT_UPDATE_META       0x0040
+#define INPUT_UPDATE_TITLE_LIST 0x0100
 
 /* demux_meta_t is returned by "meta reader" module to the demuxer */
 typedef struct demux_meta_t

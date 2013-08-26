@@ -161,8 +161,6 @@ static int Open( vlc_object_t *p_this )
     p_access->pf_control = Control;
     p_access->info.i_pos = 0;
     p_access->info.b_eof = false;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
     p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;

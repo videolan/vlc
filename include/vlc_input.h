@@ -202,12 +202,6 @@ static inline void vlc_input_attachment_Delete( input_attachment_t *a )
  * input defines/constants.
  *****************************************************************************/
 
-/* i_update field of access_t/demux_t */
-#define INPUT_UPDATE_TITLE      0x0010
-#define INPUT_UPDATE_SEEKPOINT  0x0020
-#define INPUT_UPDATE_META       0x0040
-#define INPUT_UPDATE_TITLE_LIST 0x0100
-
 /**
  * This defines private core storage for an input.
  */
