@@ -125,6 +125,7 @@ struct access_sys_t
 
     /* cut marks */
     input_title_t *p_marks;
+    unsigned cur_seekpoint;
     float fps;
 
     /* file format: true=TS, false=PES */
@@ -192,6 +193,7 @@ static int Open( vlc_object_t *p_this )
     access_sys_t *p_sys;
     STANDARD_READ_ACCESS_INIT;
     p_sys->fd = -1;
+    p_sys->cur_seekpoint = 0;
     p_sys->fps = var_InheritFloat( p_access, "vdr-fps" );
     ARRAY_INIT( p_sys->file_sizes );
 
@@ -296,13 +298,20 @@ static int Control( access_t *p_access, int i_query, va_list args )
             **ppp_title = vlc_input_title_Duplicate( p_sys->p_marks );
             break;
 
+        case ACCESS_GET_TITLE:
+            *va_arg( args, unsigned * ) = 0;
+            break;
+
+        case ACCESS_GET_SEEKPOINT:
+            *va_arg( args, unsigned * ) = p_sys->cur_seekpoint;
+            break;
+
         case ACCESS_SET_TITLE:
             /* ignore - only one title */
             break;
 
         case ACCESS_SET_SEEKPOINT:
             i = va_arg( args, int );
-            /* Seek updates p_access->info */
             return Seek( p_access, p_sys->p_marks->seekpoint[i]->i_byte_offset );
 
         case ACCESS_GET_META:
@@ -408,28 +417,23 @@ static void FindSeekpoint( access_t *p_access )
     if( !p_sys->p_marks )
         return;
 
-    int i_new_seekpoint = p_access->info.i_seekpoint;
+    int new_seekpoint = p_sys->cur_seekpoint;
     if( p_access->info.i_pos < (uint64_t)p_sys->p_marks->
-        seekpoint[ p_access->info.i_seekpoint ]->i_byte_offset )
+        seekpoint[p_sys->cur_seekpoint]->i_byte_offset )
     {
         /* i_pos moved backwards, start fresh */
-        i_new_seekpoint = 0;
+        new_seekpoint = 0;
     }
 
     /* only need to check the following seekpoints */
-    while( i_new_seekpoint + 1 < p_sys->p_marks->i_seekpoint &&
+    while( new_seekpoint + 1 < p_sys->p_marks->i_seekpoint &&
         p_access->info.i_pos >= (uint64_t)p_sys->p_marks->
-        seekpoint[ i_new_seekpoint + 1 ]->i_byte_offset )
+        seekpoint[new_seekpoint + 1]->i_byte_offset )
     {
-        i_new_seekpoint++;
+        new_seekpoint++;
     }
 
-    /* avoid unnecessary events */
-    if( p_access->info.i_seekpoint != i_new_seekpoint )
-    {
-        p_access->info.i_seekpoint = i_new_seekpoint;
-        p_access->info.i_update |= INPUT_UPDATE_SEEKPOINT;
-    }
+    p_sys->cur_seekpoint = new_seekpoint;
 }
 
 /*****************************************************************************
