@@ -242,7 +242,7 @@ VCDSeek( access_t * p_access, uint64_t i_pos )
     if (!p_access || !p_access->p_sys) return VLC_EGENERIC;
     {
         vcdplayer_t         *p_vcdplayer = (vcdplayer_t *)p_vcd_access->p_sys;
-        const input_title_t *t = p_vcdplayer->p_title[p_access->info.i_title];
+        const input_title_t *t = p_vcdplayer->p_title[p_vcdplayer->i_cur_title];
         unsigned int         i_entry = VCDINFO_INVALID_ENTRY;
         int i_seekpoint;
 
@@ -297,13 +297,10 @@ VCDSeek( access_t * p_access, uint64_t i_pos )
         }
  
         /* Update current seekpoint */
-        if( i_seekpoint != p_access->info.i_seekpoint )
-        {
-            dbg_print( (INPUT_DBG_SEEK), "seekpoint change %lu",
-                       (long unsigned int) i_seekpoint );
-            p_access->info.i_update |= INPUT_UPDATE_SEEKPOINT;
-            p_access->info.i_seekpoint = i_seekpoint;
-        }
+        if( p_vcdplayer->i_cur_chapter != i_seekpoint )
+            dbg_print( (INPUT_DBG_SEEK), "seekpoint change %d",
+                       i_seekpoint );
+        p_vcdplayer->i_cur_chapter = i_seekpoint;
     }
     p_access->info.b_eof = false;
     return VLC_SUCCESS;
@@ -672,7 +669,7 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
     case VCDINFO_ITEM_TYPE_ENTRY:
         VCDUpdateVar( p_access, p_itemid->num, VLC_VAR_SETVALUE,
                       "chapter", _("Entry"), "Setting entry/segment");
-        p_access->info.i_title     = i_track-1;
+        p_vcdplayer->i_cur_title = i_track - 1;
         if (p_vcdplayer->b_track_length)
         {
             p_vcdplayer->size = p_vcdplayer->p_title[i_track-1]->i_size;
@@ -685,7 +682,7 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
         }
         dbg_print( (INPUT_DBG_LSN|INPUT_DBG_PBC), "size: %"PRIu64", pos: %"PRIu64,
                    p_vcdplayer->size, p_access->info.i_pos );
-        p_access->info.i_seekpoint = p_itemid->num;
+        p_vcdplayer->i_cur_chapter = p_itemid->num;
         break;
 
     case VCDINFO_ITEM_TYPE_SEGMENT:
@@ -695,18 +692,18 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
            and they must here. The segment seekpoints are stored after
            the entry seekpoints and (zeroed) lid seekpoints.
         */
-        p_access->info.i_title     = p_vcdplayer->i_titles - 1;
+        p_vcdplayer->i_cur_title   = p_vcdplayer->i_titles - 1;
         p_vcdplayer->size          = 0; /* No seeking on stills, please. */
         p_access->info.i_pos       = 0;
-        p_access->info.i_seekpoint = p_vcdplayer->i_entries
+        p_vcdplayer->i_cur_chapter = p_vcdplayer->i_entries
                                    + p_vcdplayer->i_lids + p_itemid->num;
         break;
 
     case VCDINFO_ITEM_TYPE_TRACK:
-        p_access->info.i_title     = i_track-1;
-        p_vcdplayer->size          = p_vcdplayer->p_title[i_track-1]->i_size;
+        p_vcdplayer->i_cur_title   = i_track - 1;
+        p_vcdplayer->size          = p_vcdplayer->p_title[i_track - 1]->i_size;
         p_access->info.i_pos       = 0;
-        p_access->info.i_seekpoint = vcdinfo_track_get_entry(p_vcdplayer->vcd,
+        p_vcdplayer->i_cur_chapter = vcdinfo_track_get_entry(p_vcdplayer->vcd,
                                                              i_track);
         break;
 
@@ -714,8 +711,6 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
         msg_Warn( p_access, "can't set origin for play type %d",
                   p_vcdplayer->play_item.type );
     }
-
-    p_access->info.i_update = INPUT_UPDATE_TITLE|INPUT_UPDATE_SEEKPOINT;
 
     VCDUpdateTitle( p_access );
 
@@ -854,8 +849,6 @@ VCDOpen ( vlc_object_t *p_this )
 
     p_access->info.i_pos       = 0;
     p_access->info.b_eof       = false;
-    p_access->info.i_title     = 0;
-    p_access->info.i_seekpoint = 0;
 
     p_vcdplayer = malloc( sizeof(vcdplayer_t) );
 
@@ -893,6 +886,8 @@ VCDOpen ( vlc_object_t *p_this )
 //    p_vcdplayer->p_meta            = vlc_meta_New();
     p_vcdplayer->p_segments        = NULL;
     p_vcdplayer->p_entries         = NULL;
+    p_vcdplayer->i_cur_title       = 0;
+    p_vcdplayer->i_cur_chapter     = 0;
 
     /* set up input  */
 
@@ -1082,14 +1077,22 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
             if( p_vcdplayer->p_title[i] )
                 (*ppp_title)[i] =
                            vlc_input_title_Duplicate(p_vcdplayer->p_title[i]);
+        break;
     }
-    break;
+
+    case ACCESS_GET_TITLE:
+        *va_arg( args, unsigned * ) = p_vcdplayer->i_cur_title;
+        break;
+
+    case ACCESS_GET_SEEKPOINT:
+        *va_arg( args, unsigned * ) = p_vcdplayer->i_cur_chapter;
+        break;
 
     case ACCESS_SET_TITLE:
         i = (int)va_arg( args, int );
 
         dbg_print( INPUT_DBG_EVENT, "set title %d" , i);
-        if( i != p_access->info.i_title )
+        if( i != p_vcdplayer->i_cur_title )
         {
             vcdinfo_itemid_t itemid;
             track_t          i_track = i+1;
@@ -1123,13 +1126,13 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
 
     case ACCESS_SET_SEEKPOINT:
     {
-        input_title_t *t = p_vcdplayer->p_title[p_access->info.i_title];
+        input_title_t *t = p_vcdplayer->p_title[p_vcdplayer->i_cur_title];
         unsigned int i = (unsigned int)va_arg( args, unsigned int );
 
         dbg_print( INPUT_DBG_EVENT, "set seekpoint %d", i );
         if( t->i_seekpoint > 0 )
         {
-            track_t i_track = p_access->info.i_title+1;
+            track_t i_track = p_vcdplayer->i_cur_title + 1;
             lsn_t lsn;
 
             /* FIXME! For now we are assuming titles are only tracks and
