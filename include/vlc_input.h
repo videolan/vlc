@@ -77,7 +77,7 @@ static inline seekpoint_t *vlc_seekpoint_Duplicate( const seekpoint_t *src )
 /*****************************************************************************
  * Title:
  *****************************************************************************/
-typedef struct
+typedef struct input_title_t
 {
     char        *psz_name;
 

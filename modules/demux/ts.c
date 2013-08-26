@@ -1019,6 +1019,7 @@ static int Demux( demux_t *p_demux )
                    p_sys->i_ts_read * p_sys->i_packet_size );
     }
 
+    demux_UpdateTitleFromStream( p_demux );
     return 1;
 }
 
@@ -1188,6 +1189,22 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
         return VLC_SUCCESS;
     }
+
+    case DEMUX_GET_TITLE_INFO:
+    {
+        struct input_title_t ***v = va_arg( args, struct input_title_t*** );
+        int *c = va_arg( args, int * );
+
+        *va_arg( args, int* ) = 0; /* Title offset */
+        *va_arg( args, int* ) = 0; /* Chapter offset */
+        return stream_Control( p_demux->s, STREAM_GET_TITLE_INFO, v, c );
+    }
+
+    case DEMUX_SET_TITLE:
+        return stream_Control( p_demux->s, STREAM_SET_TITLE, args );
+
+    case DEMUX_SET_SEEKPOINT:
+        return stream_Control( p_demux->s, STREAM_SET_SEEKPOINT, args );
 
     case DEMUX_GET_META:
         return stream_Control( p_demux->s, STREAM_GET_META, args );

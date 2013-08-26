@@ -172,6 +172,26 @@ enum demux_query_e
 
 VLC_API int demux_vaControlHelper( stream_t *, int64_t i_start, int64_t i_end, int64_t i_bitrate, int i_align, int i_query, va_list args );
 
+static inline void demux_UpdateTitleFromStream( demux_t *demux )
+{
+    stream_t *s = demux->s;
+    unsigned title, seekpoint;
+
+    if( stream_Control( s, STREAM_GET_TITLE, &title ) == VLC_SUCCESS
+     && title != (unsigned)demux->info.i_title )
+    {
+        demux->info.i_title = title;
+        demux->info.i_update = INPUT_UPDATE_TITLE;
+    }
+
+    if( stream_Control( s, STREAM_GET_SEEKPOINT, &seekpoint ) == VLC_SUCCESS
+     && seekpoint != (unsigned)demux->info.i_seekpoint )
+    {
+        demux->info.i_seekpoint = seekpoint;
+        demux->info.i_update = INPUT_UPDATE_SEEKPOINT;
+    }
+}
+
 /*************************************************************************
  * Miscellaneous helpers for demuxers
  *************************************************************************/
