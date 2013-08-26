@@ -47,15 +47,14 @@ enum access_query_e
 
     /* */
     ACCESS_GET_PTS_DELAY = 0x101,/* arg1= int64_t*       cannot fail */
-    /* */
-    ACCESS_GET_TITLE_INFO,  /* arg1=input_title_t*** arg2=int*      res=can fail */
+    ACCESS_GET_TITLE_INFO,  /* arg1=input_title_t*** arg2=int*  res=can fail */
+    ACCESS_GET_TITLE,       /* arg1=unsigned * res=can fail */
+    ACCESS_GET_SEEKPOINT,   /* arg1=unsigned * res=can fail */
+
     /* Meta data */
-    ACCESS_GET_META,        /* arg1= vlc_meta_t **                  res=can fail */
+    ACCESS_GET_META,        /* arg1= vlc_meta_t ** res=can fail */
+    ACCESS_GET_CONTENT_TYPE,/* arg1=char **ppsz_content_type res=can fail */
 
-    /* */
-    ACCESS_GET_CONTENT_TYPE,/* arg1=char **ppsz_content_type                       res=can fail */
-
-    /* */
     ACCESS_GET_SIGNAL,      /* arg1=double *pf_quality, arg2=double *pf_strength   res=can fail */
 
     /* */

@@ -123,6 +123,8 @@ static int Control( stream_t *s, int i_query, va_list args )
             break;
 
         case STREAM_GET_TITLE_INFO:
+        case STREAM_GET_TITLE:
+        case STREAM_GET_SEEKPOINT:
         case STREAM_GET_META:
         case STREAM_GET_CONTENT_TYPE:
         case STREAM_GET_SIGNAL:

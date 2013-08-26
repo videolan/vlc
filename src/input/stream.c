@@ -555,6 +555,8 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
     static_control_match(CAN_PAUSE);
     static_control_match(CAN_CONTROL_PACE);
     static_control_match(GET_TITLE_INFO);
+    static_control_match(GET_TITLE);
+    static_control_match(GET_SEEKPOINT);
     static_control_match(GET_META);
     static_control_match(GET_CONTENT_TYPE);
     static_control_match(GET_SIGNAL);
@@ -572,6 +574,8 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
         case STREAM_CAN_PAUSE:
         case STREAM_CAN_CONTROL_PACE:
         case STREAM_GET_TITLE_INFO:
+        case STREAM_GET_TITLE:
+        case STREAM_GET_SEEKPOINT:
         case STREAM_GET_META:
         case STREAM_GET_CONTENT_TYPE:
         case STREAM_GET_SIGNAL:
