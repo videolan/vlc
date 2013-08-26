@@ -295,26 +295,13 @@ static int Control(access_t *p_access, int i_query, va_list args)
             pb_bool = (bool*)va_arg(args, bool*);
             *pb_bool = false;
             break;
-
-        /* */
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg(args, int64_t *);
             *pi_64 =
                 INT64_C(1000) * var_InheritInteger(p_access, "live-caching");
             break;
-
-        case ACCESS_SET_PAUSE_STATE:
-        case ACCESS_GET_TITLE_INFO:
-        case ACCESS_SET_TITLE:
-        case ACCESS_SET_SEEKPOINT:
-        case ACCESS_SET_PRIVATE_ID_STATE:
-        case ACCESS_GET_CONTENT_TYPE:
-            return VLC_EGENERIC;
-
         default:
-            msg_Warn(p_access, "unimplemented query in control");
             return VLC_EGENERIC;
-
     }
     return VLC_SUCCESS;
 }

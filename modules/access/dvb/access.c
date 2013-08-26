@@ -378,7 +378,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
     switch( i_query )
     {
-        /* */
         case ACCESS_CAN_SEEK:
         case ACCESS_CAN_FASTSEEK:
         case ACCESS_CAN_PAUSE:
@@ -386,19 +385,11 @@ static int Control( access_t *p_access, int i_query, va_list args )
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = false;
             break;
-        /* */
+
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             *pi_64 = DEFAULT_PTS_DELAY;
             break;
-
-        /* */
-        case ACCESS_SET_PAUSE_STATE:
-        case ACCESS_GET_TITLE_INFO:
-        case ACCESS_SET_TITLE:
-        case ACCESS_SET_SEEKPOINT:
-        case ACCESS_GET_CONTENT_TYPE:
-            return VLC_EGENERIC;
 
         case ACCESS_GET_SIGNAL:
             pf1 = (double*)va_arg( args, double * );
@@ -410,14 +401,9 @@ static int Control( access_t *p_access, int i_query, va_list args )
                 *pf1 = (double)stat.i_snr / 65535.0;
                 *pf2 = (double)stat.i_signal_strenth / 65535.0;
             }
-            return VLC_SUCCESS;
-
-        case ACCESS_SET_PRIVATE_ID_STATE:
-        case ACCESS_SET_PRIVATE_ID_CA:
-            return VLC_EGENERIC;
+            break;
 
         default:
-            msg_Warn( p_access, "unimplemented query in control" );
             return VLC_EGENERIC;
 
     }

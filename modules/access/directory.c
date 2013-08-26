@@ -469,7 +469,6 @@ int DirControl( access_t *p_access, int i_query, va_list args )
 {
     switch( i_query )
     {
-        /* */
         case ACCESS_CAN_SEEK:
         case ACCESS_CAN_FASTSEEK:
             *va_arg( args, bool* ) = false;
@@ -480,23 +479,11 @@ int DirControl( access_t *p_access, int i_query, va_list args )
             *va_arg( args, bool* ) = true;
             break;
 
-        /* */
         case ACCESS_GET_PTS_DELAY:
             *va_arg( args, int64_t * ) = DEFAULT_PTS_DELAY * 1000;
             break;
 
-        /* */
-        case ACCESS_SET_PAUSE_STATE:
-        case ACCESS_GET_TITLE_INFO:
-        case ACCESS_SET_TITLE:
-        case ACCESS_SET_SEEKPOINT:
-        case ACCESS_SET_PRIVATE_ID_STATE:
-        case ACCESS_GET_CONTENT_TYPE:
-        case ACCESS_GET_META:
-            return VLC_EGENERIC;
-
         default:
-            msg_Warn( p_access, "unimplemented query in control" );
             return VLC_EGENERIC;
     }
     return VLC_SUCCESS;

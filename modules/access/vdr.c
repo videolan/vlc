@@ -312,12 +312,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
             vlc_meta_Merge( p_meta, p_sys->p_meta );
             break;
 
-        case ACCESS_SET_PRIVATE_ID_STATE:
-        case ACCESS_GET_CONTENT_TYPE:
-            return VLC_EGENERIC;
-
         default:
-            msg_Warn( p_access, "unimplemented query in control" );
             return VLC_EGENERIC;
     }
     return VLC_SUCCESS;

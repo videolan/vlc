@@ -301,17 +301,11 @@ static int Control( access_t *p_access, int i_query, va_list args )
                 p_access->info.i_pos = (uint64_t)(p_sys->i_sector -
                     p_sys->p_sectors[1+p_access->info.i_title]) *VCD_DATA_SIZE;
             }
-            return VLC_SUCCESS;
+            break;
         }
 
-        case ACCESS_SET_PRIVATE_ID_STATE:
-        case ACCESS_GET_CONTENT_TYPE:
-            return VLC_EGENERIC;
-
         default:
-            msg_Warn( p_access, "unimplemented query in control" );
             return VLC_EGENERIC;
-
     }
     return VLC_SUCCESS;
 }

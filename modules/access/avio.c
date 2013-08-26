@@ -447,15 +447,6 @@ static int Control(access_t *access, int query, va_list args)
             return VLC_EGENERIC;
         return VLC_SUCCESS;
     }
-    case ACCESS_GET_TITLE_INFO:
-    case ACCESS_GET_META:
-    case ACCESS_GET_CONTENT_TYPE:
-    case ACCESS_GET_SIGNAL:
-    case ACCESS_SET_TITLE:
-    case ACCESS_SET_SEEKPOINT:
-    case ACCESS_SET_PRIVATE_ID_STATE:
-    case ACCESS_SET_PRIVATE_ID_CA:
-    case ACCESS_GET_PRIVATE_ID_STATE:
     default:
         return VLC_EGENERIC;
     }

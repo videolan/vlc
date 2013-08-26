@@ -1011,12 +1011,12 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
 
     switch( i_query )
     {
+#if 0
         /* Pass back a copy of meta information that was gathered when we
            during the Open/Initialize call.
          */
     case ACCESS_GET_META:
         dbg_print( INPUT_DBG_EVENT, "get meta info" );
-#if 0
         if( p_vcdplayer->p_meta )
         {
             vlc_meta_t **pp_meta = (vlc_meta_t**)va_arg(args,vlc_meta_t**);
@@ -1025,30 +1025,25 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
             dbg_print( INPUT_DBG_META, "%s", "Meta copied" );
         }
         else
-#endif
             msg_Warn( p_access, "tried to copy NULL meta info" );
-
         return VLC_SUCCESS;
-
+#endif
     case ACCESS_CAN_SEEK:
     case ACCESS_CAN_FASTSEEK:
     case ACCESS_CAN_PAUSE:
     case ACCESS_CAN_CONTROL_PACE:
-
         dbg_print( INPUT_DBG_EVENT,
                    "seek/fastseek/pause/can_control_pace" );
         *((bool*)va_arg( args, bool* )) = true;
-        return VLC_SUCCESS;
+        break;
 
-    /* */
     case ACCESS_GET_PTS_DELAY:
         *(int64_t*)va_arg(args,int64_t *) = INT64_C(1000) *
                                 var_InheritInteger( p_access, "disc-caching" );
-        return VLC_SUCCESS;
+        break;
 
-        /* */
     case ACCESS_SET_PAUSE_STATE:
-        return VLC_SUCCESS;
+        break;
 
     case ACCESS_GET_TITLE_INFO:
     {
@@ -1076,7 +1071,7 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
         if( p_vcdplayer->i_titles == 0 )
         {
             *pi_int = 0; ppp_title = NULL;
-            return VLC_SUCCESS;
+            break;
         }
         *pi_int = p_vcdplayer->i_titles;
         *ppp_title = malloc(sizeof(input_title_t **)*p_vcdplayer->i_titles);
@@ -1163,17 +1158,11 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
             VCDSetOrigin(p_access,vcdinfo_get_entry_lsn(p_vcdplayer->vcd,i),
                          i_track,&(p_vcdplayer->play_item));
         }
-        return VLC_SUCCESS;
+        break;
     }
 
-    case ACCESS_SET_PRIVATE_ID_STATE:
-        dbg_print( INPUT_DBG_EVENT, "set private id" );
-        return VLC_EGENERIC;
-
     default:
-        msg_Warn( p_access, "unimplemented query in control" );
         return VLC_EGENERIC;
-
     }
     return VLC_SUCCESS;
 }
