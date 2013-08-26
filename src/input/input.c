@@ -346,7 +346,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->p_item = p_item;
 
     /* Init Input fields */
-    p_input->p->input.p_access = NULL;
     p_input->p->input.p_stream = NULL;
     p_input->p->input.p_demux  = NULL;
     p_input->p->input.b_title_demux = false;
@@ -1331,7 +1330,6 @@ error:
     /* Mark them deleted */
     p_input->p->input.p_demux = NULL;
     p_input->p->input.p_stream = NULL;
-    p_input->p->input.p_access = NULL;
     p_input->p->p_es_out = NULL;
     p_input->p->p_sout = NULL;
 
@@ -1813,7 +1811,7 @@ static bool Control( input_thread_t *p_input,
                 !p_input->p->b_can_pace_control && p_input->p->b_can_rate_control )
             {
                 int i_ret;
-                if( p_input->p->input.p_access )
+                if( p_input->p->input.p_stream != NULL )
                 {
                     i_ret = VLC_EGENERIC;
                 }
@@ -2474,7 +2472,6 @@ static int InputSourceInit( input_thread_t *p_input,
                 in->b_title_demux = true;
             }
         }
-        in->p_access = p_access; /* <- TODO: remove this nasty pointer */
     }
 
     free( psz_var_demux );
