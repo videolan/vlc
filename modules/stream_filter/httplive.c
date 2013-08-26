@@ -449,8 +449,9 @@ static int ChooseSegment(stream_t *s, const int current)
     int duration = 0;
     int sequence = 0;
     int count = vlc_array_count(hls->segments);
-    int i = p_sys->b_live ? count - 1 : 0;
+    int i = p_sys->b_live ? count - 1 : -1;
 
+    /* We do while loop only with live case, otherwise return 0*/
     while((i >= 0) && (i < count))
     {
         segment_t *segment = segment_GetSegment(hls, i);
@@ -466,15 +467,12 @@ static int ChooseSegment(stream_t *s, const int current)
         if (duration >= 3 * hls->duration)
         {
             /* Start point found */
-            wanted = p_sys->b_live ? i : 0;
+            wanted = i;
             sequence = segment->sequence;
             break;
         }
 
-        if (p_sys->b_live)
-            i-- ;
-        else
-            i++;
+        i-- ;
     }
 
     msg_Dbg(s, "Choose segment %d/%d (sequence=%d)", wanted, count, sequence);
@@ -748,7 +746,7 @@ static int parse_MediaSequence(stream_t *s, hls_stream_t *hls, char *p_read)
             if ( ( last_segment->sequence < sequence) &&
                  ( sequence - last_segment->sequence >= 1 ))
                 msg_Err(s, "EXT-X-MEDIA-SEQUENCE gap in playlist (new=%d, old=%d)",
-                            sequence, last->sequence);
+                            sequence, last_segment->sequence);
         }
         else
             msg_Err(s, "EXT-X-MEDIA-SEQUENCE already present in playlist (new=%d, old=%d)",
