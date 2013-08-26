@@ -786,10 +786,13 @@ void StandardPLPanel::activate( const QModelIndex &index )
         {
             playlist_Lock( THEPL );
             playlist_item_t *p_item = playlist_ItemGetById( THEPL, model->itemId( index, PLAYLIST_ID ) );
-            p_item->i_flags |= PLAYLIST_SUBITEM_STOP_FLAG;
-            lastActivatedPLItemId = p_item->i_id;
+            if ( p_item )
+            {
+                p_item->i_flags |= PLAYLIST_SUBITEM_STOP_FLAG;
+                lastActivatedPLItemId = p_item->i_id;
+            }
             playlist_Unlock( THEPL );
-            if ( index.isValid() )
+            if ( p_item && index.isValid() )
                 model->activateItem( index );
         }
     }
