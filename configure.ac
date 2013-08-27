@@ -3688,7 +3688,7 @@ AC_ARG_ENABLE(qt, [
   ])
 ])
 AS_IF([test "${enable_qt}" != "no"], [
-  PKG_CHECK_MODULES([QT], [QtCore >= 5 QtWidgets QtGui],, [
+  PKG_CHECK_MODULES([QT], [Qt5Core >= 5 Qt5Widgets Qt5Gui],, [
     PKG_CHECK_MODULES([QT], [QtCore QtGui >= 4.6.0],, [
       AS_IF([test -n "${enable_qt}"],[
         AC_MSG_ERROR([${QT_PKG_ERRORS}.])
