@@ -363,6 +363,9 @@ static void* DStreamThread( void *obj )
             break;
     }
 
+    /* Explicit kludge: the stream is destroyed by the owner of the
+     * streamDemux, not here. */
+    p_demux->s = NULL;
     demux_Delete( p_demux );
 
     return NULL;

@@ -213,14 +213,18 @@ demux_t *demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
  *****************************************************************************/
 void demux_Delete( demux_t *p_demux )
 {
-    module_unneed( p_demux, p_demux->p_module );
+    stream_t *s;
 
+    module_unneed( p_demux, p_demux->p_module );
     free( p_demux->psz_file );
     free( p_demux->psz_location );
     free( p_demux->psz_demux );
     free( p_demux->psz_access );
 
+    s = p_demux->s;
     vlc_object_release( p_demux );
+    if( s != NULL )
+        stream_Delete( s );
 }
 
 /*****************************************************************************

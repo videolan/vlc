@@ -2426,6 +2426,7 @@ static int InputSourceInit( input_thread_t *p_input,
 
         if( in->p_demux == NULL )
         {
+            stream_Delete( in->p_stream );
             if( vlc_object_alive( p_input ) )
             {
                 msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
@@ -2513,9 +2514,6 @@ error:
     if( in->p_demux )
         demux_Delete( in->p_demux );
 
-    if( in->p_stream )
-        stream_Delete( in->p_stream );
-
     free( psz_var_demux );
     free( psz_dup );
 
@@ -2531,9 +2529,6 @@ static void InputSourceClean( input_source_t *in )
 
     if( in->p_demux )
         demux_Delete( in->p_demux );
-
-    if( in->p_stream )
-        stream_Delete( in->p_stream );
 
     if( in->i_title > 0 )
     {
