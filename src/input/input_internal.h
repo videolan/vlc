@@ -39,9 +39,7 @@
 /* input_source_t: gathers all information per input source */
 typedef struct
 {
-    /* Access/Stream/Demux plugins */
-    stream_t *p_stream VLC_DEPRECATED;
-    demux_t  *p_demux;
+    demux_t  *p_demux; /**< Demux plugin instance */
 
     /* Title infos for that input */
     bool         b_title_demux; /* Titles/Seekpoints provided by demux */

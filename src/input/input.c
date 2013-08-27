@@ -346,7 +346,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->p_item = p_item;
 
     /* Init Input fields */
-    p_input->p->input.p_stream = NULL;
     p_input->p->input.p_demux  = NULL;
     p_input->p->input.b_title_demux = false;
     p_input->p->input.i_title  = 0;
@@ -1328,7 +1327,6 @@ error:
 
     /* Mark them deleted */
     p_input->p->input.p_demux = NULL;
-    p_input->p->input.p_stream = NULL;
     p_input->p->p_es_out = NULL;
     p_input->p->p_sout = NULL;
 
@@ -1577,12 +1575,12 @@ static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
 
     if( p_input->p->b_can_pause )
     {
-        if( p_input->p->input.p_stream != NULL )
-            i_ret = stream_Control( p_input->p->input.p_stream,
-                                    STREAM_SET_PAUSE_STATE, true );
+        demux_t *p_demux = p_input->p->input.p_demux;
+
+        if( p_demux->s != NULL )
+            i_ret = stream_Control( p_demux->s, STREAM_SET_PAUSE_STATE, true );
         else
-            i_ret = demux_Control( p_input->p->input.p_demux,
-                                   DEMUX_SET_PAUSE_STATE, true );
+            i_ret = demux_Control( p_demux, DEMUX_SET_PAUSE_STATE, true );
 
         if( i_ret )
         {
@@ -1611,12 +1609,12 @@ static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
 
     if( p_input->p->b_can_pause )
     {
-        if( p_input->p->input.p_stream )
-            i_ret = stream_Control( p_input->p->input.p_stream,
-                                    STREAM_SET_PAUSE_STATE, false );
+        demux_t *p_demux = p_input->p->input.p_demux;
+
+        if( p_demux->s != NULL )
+            i_ret = stream_Control( p_demux->s, STREAM_SET_PAUSE_STATE, false );
         else
-            i_ret = demux_Control( p_input->p->input.p_demux,
-                                   DEMUX_SET_PAUSE_STATE, false );
+            i_ret = demux_Control( p_demux, DEMUX_SET_PAUSE_STATE, false );
         if( i_ret )
         {
             /* FIXME What to do ? */
@@ -1809,12 +1807,10 @@ static bool Control( input_thread_t *p_input,
             if( i_rate != p_input->p->i_rate &&
                 !p_input->p->b_can_pace_control && p_input->p->b_can_rate_control )
             {
-                int i_ret;
-                if( p_input->p->input.p_stream != NULL )
-                {
-                    i_ret = VLC_EGENERIC;
-                }
-                else
+                demux_t *p_demux = p_input->p->input.p_demux;
+                int i_ret = VLC_EGENERIC;
+
+                if( p_demux->s == NULL )
                 {
                     if( !p_input->p->input.b_rescale_ts )
                         es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
@@ -2373,7 +2369,7 @@ static int InputSourceInit( input_thread_t *p_input,
             TAB_APPEND( i_input_list, ppsz_input_list, NULL );
 
         /* Create the stream_t */
-        in->p_stream = stream_AccessNew( p_access, ppsz_input_list );
+        stream_t *p_stream = stream_AccessNew( p_access, ppsz_input_list );
         if( ppsz_input_list )
         {
             for( int i = 0; ppsz_input_list[i] != NULL; i++ )
@@ -2381,7 +2377,7 @@ static int InputSourceInit( input_thread_t *p_input,
             TAB_CLEAN( i_input_list, ppsz_input_list );
         }
 
-        if( in->p_stream == NULL )
+        if( p_stream == NULL )
         {
             msg_Warn( p_input, "cannot create a stream_t from access" );
             goto error;
@@ -2390,21 +2386,20 @@ static int InputSourceInit( input_thread_t *p_input,
         /* Add stream filters */
         char *psz_stream_filter = var_GetNonEmptyString( p_input,
                                                          "stream-filter" );
-        in->p_stream = stream_FilterChainNew( in->p_stream,
-                                              psz_stream_filter,
-                                              var_GetBool( p_input, "input-record-native" ) );
+        p_stream = stream_FilterChainNew( p_stream, psz_stream_filter,
+                               var_GetBool( p_input, "input-record-native" ) );
         free( psz_stream_filter );
 
         if( !p_input->b_preparsing )
         {
             bool b;
 
-            stream_Control( in->p_stream, STREAM_CAN_CONTROL_PACE,
+            stream_Control( p_stream, STREAM_CAN_CONTROL_PACE,
                             &in->b_can_pace_control );
             in->b_can_rate_control = in->b_can_pace_control;
             in->b_rescale_ts = true;
 
-            stream_Control( in->p_stream, STREAM_CAN_PAUSE, &in->b_can_pause );
+            stream_Control( p_stream, STREAM_CAN_PAUSE, &in->b_can_pause );
             var_SetBool( p_input, "can-pause",
                          in->b_can_pause || !in->b_can_pace_control ); /* XXX temporary because of es_out_timeshift*/
             var_SetBool( p_input, "can-rate",
@@ -2412,7 +2407,7 @@ static int InputSourceInit( input_thread_t *p_input,
             var_SetBool( p_input, "can-rewind",
                          !in->b_rescale_ts && !in->b_can_pace_control );
 
-            stream_Control( in->p_stream, STREAM_CAN_SEEK, &b );
+            stream_Control( p_stream, STREAM_CAN_SEEK, &b );
             var_SetBool( p_input, "can-seek", b );
 
             in->b_title_demux = false;
@@ -2420,13 +2415,13 @@ static int InputSourceInit( input_thread_t *p_input,
 
         in->p_demux = demux_New( p_input, p_input, psz_access, psz_demux,
                    /* Take access/stream redirections into account: */
-                   in->p_stream->psz_path ? in->p_stream->psz_path : psz_path,
-                                 in->p_stream, p_input->p->p_es_out,
+                            p_stream->psz_path ? p_stream->psz_path : psz_path,
+                                 p_stream, p_input->p->p_es_out,
                                  p_input->b_preparsing );
 
         if( in->p_demux == NULL )
         {
-            stream_Delete( in->p_stream );
+            stream_Delete( p_stream );
             if( vlc_object_alive( p_input ) )
             {
                 msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
