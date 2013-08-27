@@ -669,8 +669,7 @@ static void MainLoopInterface( input_thread_t *p_input )
     /* update current bookmark */
     vlc_mutex_lock( &p_input->p->p_item->lock );
     p_input->p->bookmark.i_time_offset = i_time;
-    if( p_input->p->input.p_stream )
-        p_input->p->bookmark.i_byte_offset = stream_Tell( p_input->p->input.p_stream );
+    p_input->p->bookmark.i_byte_offset = -1;
     vlc_mutex_unlock( &p_input->p->p_item->lock );
 }
 
@@ -2044,41 +2043,24 @@ static bool Control( input_thread_t *p_input,
 
         case INPUT_CONTROL_SET_BOOKMARK:
         {
-            seekpoint_t bookmark;
-
-            bookmark.i_time_offset = -1;
-            bookmark.i_byte_offset = -1;
+            mtime_t time_offset = -1;
 
             vlc_mutex_lock( &p_input->p->p_item->lock );
             if( val.i_int >= 0 && val.i_int < p_input->p->i_bookmark )
             {
                 const seekpoint_t *p_bookmark = p_input->p->pp_bookmark[val.i_int];
-                bookmark.i_time_offset = p_bookmark->i_time_offset;
-                bookmark.i_byte_offset = p_bookmark->i_byte_offset;
+                time_offset = p_bookmark->i_time_offset;
             }
             vlc_mutex_unlock( &p_input->p->p_item->lock );
 
-            if( bookmark.i_time_offset < 0 && bookmark.i_byte_offset < 0 )
+            if( time_offset < 0 )
             {
                 msg_Err( p_input, "invalid bookmark %"PRId64, val.i_int );
                 break;
             }
 
-            if( bookmark.i_time_offset >= 0 )
-            {
-                val.i_time = bookmark.i_time_offset;
-                b_force_update = Control( p_input, INPUT_CONTROL_SET_TIME, val );
-            }
-            else if( bookmark.i_byte_offset >= 0 &&
-                     p_input->p->input.p_stream )
-            {
-                const uint64_t i_size = stream_Size( p_input->p->input.p_stream );
-                if( i_size > 0 && (uint64_t)bookmark.i_byte_offset <= i_size )
-                {
-                    val.f_float = (double)bookmark.i_byte_offset / i_size;
-                    b_force_update = Control( p_input, INPUT_CONTROL_SET_POSITION, val );
-                }
-            }
+            val.i_time = time_offset;
+            b_force_update = Control( p_input, INPUT_CONTROL_SET_TIME, val );
             break;
         }
 
