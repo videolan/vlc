@@ -141,7 +141,7 @@ void BookmarksDialog::update()
         // List with the differents elements of the row
         QStringList row;
         row << QString( qfu( pp_bookmarks[i]->psz_name ) );
-        row << QString::number( pp_bookmarks[i]->i_byte_offset );
+        row << qfu("-");
         int total = pp_bookmarks[i]->i_time_offset/ 1000000;
         int hour = total / (60*60);
         int min = (total - hour*60*60) / 60;
@@ -240,8 +240,6 @@ void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
         free( p_seekpoint->psz_name );
         p_seekpoint->psz_name = strdup( qtu( item->text( column ) ) );
     }
-    else if( column == 1 )
-        p_seekpoint->i_byte_offset = atoi( qtu( item->text( column ) ) );
     else if( column == 2 )
     {
         fields = item->text( column ).split( ":", QString::SkipEmptyParts );
