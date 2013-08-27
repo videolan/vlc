@@ -1003,8 +1003,6 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
 
         /* M3U8 Meta Index file */
         do {
-            bool failed_to_download_stream_m3u8 = false;
-
             /* Next line */
             line = ReadLine(p_begin, &p_read, p_end - p_begin);
             if (line == NULL)
@@ -1043,7 +1041,6 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
                             if (len < 0)
                             {
                                 msg_Warn(s, "failed to read %s, continue for other streams", hls->url);
-                                failed_to_download_stream_m3u8 = true;
 
                                 /* remove stream just added */
                                 if (new_stream_added)
