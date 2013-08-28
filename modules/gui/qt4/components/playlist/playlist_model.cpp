@@ -1007,7 +1007,7 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
 
     case ACTION_ENQUEUEFILE:
         foreach( const QString &uri, a.uris )
-            playlist_Add( THEPL, uri.toAscii().constData(),
+            playlist_Add( THEPL, uri.toLatin1().constData(),
                           NULL, PLAYLIST_APPEND | PLAYLIST_PREPARSE,
                           PLAYLIST_END,
                           getPLRootType() == ROOTTYPE_CURRENT_PLAYING,
@@ -1016,7 +1016,7 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
 
     case ACTION_ENQUEUEDIR:
         if( a.uris.isEmpty() ) break;
-        p_input = input_item_New( a.uris.first().toAscii().constData(), NULL );
+        p_input = input_item_New( a.uris.first().toLatin1().constData(), NULL );
         if( unlikely( p_input == NULL ) ) break;
 
         /* FIXME: playlist_AddInput() can fail */

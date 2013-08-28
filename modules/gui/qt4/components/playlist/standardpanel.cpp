@@ -296,7 +296,7 @@ void StandardPLPanel::popupAction( QAction *action )
     case VLCModelSubInterface::ACTION_EXPLORE:
         /* locally handled only */
         temp = model->getURI( index );
-        if( ! temp.isEmpty() ) path = make_path( temp.toAscii().constData() );
+        if( ! temp.isEmpty() ) path = make_path( temp.toLatin1().constData() );
         if( path == NULL ) return;
         QDesktopServices::openUrl(
                     QUrl::fromLocalFile( QFileInfo( qfu( path ) ).absolutePath() ) );
