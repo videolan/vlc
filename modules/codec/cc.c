@@ -305,6 +305,8 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
     if( i_pts <= VLC_TS_INVALID )
     {
         msg_Warn( p_dec, "subtitle without a date" );
+        free( psz_subtitle );
+        free( psz_html );
         return NULL;
     }
 
