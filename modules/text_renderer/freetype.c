@@ -122,6 +122,7 @@
 # include <shlobj.h>
 # define HAVE_STYLES
 # undef HAVE_FONTCONFIG
+# include <vlc_charset.h>                                     /* FromT */
 #endif
 
 /* FontConfig */
