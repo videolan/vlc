@@ -325,19 +325,18 @@ struct filter_sys_t
     FT_Stroker     p_stroker;
 
     int            i_font_size;
-    uint8_t        i_font_alpha;
+    int            i_font_alpha;
     int            i_style_flags;
 
     int            i_outline_color;
-    uint8_t        i_outline_alpha;
+    int            i_outline_alpha;
 
     float          f_shadow_vector_x;
     float          f_shadow_vector_y;
     int            i_shadow_color;
-    uint8_t        i_shadow_alpha;
+    int            i_shadow_alpha;
 
     int            i_default_font_size;
-    int            i_display_height;
 
     char*          psz_fontfamily;
     char*          psz_monofontfamily;
@@ -426,7 +425,6 @@ static int GetFontSize( filter_t *p_filter )
         if( i_ratio > 0 )
         {
             i_size = (int)p_filter->fmt_out.video.i_height / i_ratio;
-            p_filter->p_sys->i_display_height = p_filter->fmt_out.video.i_height;
         }
     }
     if( i_size <= 0 )
@@ -1314,7 +1312,7 @@ static int ProcessNodes( filter_t *p_filter,
         uint32_t i_font_size = p_sys->i_font_size;
         uint32_t i_font_color = var_InheritInteger( p_filter, "freetype-color" );
         i_font_color = VLC_CLIP( i_font_color, 0, 0xFFFFFF );
-        uint32_t i_font_alpha = p_sys->i_font_alpha;
+        int i_font_alpha = p_sys->i_font_alpha;
         rv = PushFont( &p_fonts,
                        p_sys->psz_fontfamily,
                        i_font_size,
@@ -2330,7 +2328,6 @@ static int Create( vlc_object_t *p_this )
     p_sys->p_face           = 0;
     p_sys->p_library        = 0;
     p_sys->i_font_size      = 0;
-    p_sys->i_display_height = 0;
 
     /*
      * The following variables should not be cached, as they might be changed on-the-fly:
