@@ -1288,7 +1288,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
 
         /* Duplicate local title infos */
         *pi_int = p_sys->i_title;
-        *ppp_title = malloc(p_sys->i_title * sizeof(input_title_t **));
+        *ppp_title = malloc(p_sys->i_title * sizeof(input_title_t *));
         for (unsigned int i = 0; i < p_sys->i_title; i++)
             (*ppp_title)[i] = vlc_input_title_Duplicate(p_sys->pp_title[i]);
 
