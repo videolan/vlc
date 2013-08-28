@@ -487,7 +487,6 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, QWidget *parent )
 
 SpeedLabel::~SpeedLabel()
 {
-    delete speedControl;
     delete speedControlMenu;
 }
 
