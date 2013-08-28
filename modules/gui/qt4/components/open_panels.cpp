@@ -1074,8 +1074,8 @@ void CaptureOpenPanel::initialize()
                             2, 0, 1, 1 );
 
     /* PVR CONNECTs */
-    CuMRL( pvrDevice, textChanged( const QString& ) );
-    CuMRL( pvrAudioDevice, textChanged( const QString& ) );
+    CuMRL( pvrDevice, editTextChanged( const QString& ) );
+    CuMRL( pvrAudioDevice, editTextChanged( const QString& ) );
     CuMRL( pvrFreq, valueChanged ( int ) );
     CuMRL( pvrNormBox, currentIndexChanged ( int ) );
     }
