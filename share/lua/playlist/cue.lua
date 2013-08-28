@@ -31,7 +31,15 @@ function probe()
 end
 
 -- Helpers
+function is_utf8( src )
+    return vlc.strings.from_charset( "UTF-8", src ) == src
+end
+
 function cue_string( src )
+	if not is_utf8( src ) then
+		-- Convert to UTF-8 since it's probably Latin1
+		src = vlc.strings.from_charset( "ISO_8859-1", src )
+	end
 	local sub = string.match( src, "^\"(.*)\".*$" );
 	if( sub ) then
 		return sub
