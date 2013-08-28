@@ -60,6 +60,11 @@ text_style_t *CreateStyle( char *psz_fontname, int i_font_size,
                            uint32_t i_font_color, uint32_t i_karaoke_bg_color,
                            int i_style_flags );
 
+text_style_t *GetStyleFromFontStack( filter_t *p_filter,
+                                     font_stack_t **p_fonts,
+                                     text_style_t *style,
+                                     int i_style_flags );
+
 #ifdef __OS2__
 typedef uint16_t uni_char_t;
 # define FREETYPE_TO_UCS    "UCS-2LE"

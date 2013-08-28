@@ -1245,26 +1245,6 @@ static inline int RenderAXYZ( filter_t *p_filter,
 }
 
 
-static text_style_t *GetStyleFromFontStack( filter_t *p_filter,
-                                            font_stack_t **p_fonts,
-                                            int i_style_flags )
-{
-    char       *psz_fontname = NULL;
-    uint32_t    i_font_color = var_InheritInteger( p_filter, "freetype-color" );
-    i_font_color = VLC_CLIP( i_font_color, 0, 0xFFFFFF );
-    i_font_color = i_font_color & 0x00ffffff;
-    int         i_font_size  = p_filter->p_sys->style.i_font_size;
-    uint32_t    i_karaoke_bg_color = i_font_color;
-
-    if( PeekFont( p_fonts, &psz_fontname, &i_font_size,
-                  &i_font_color, &i_karaoke_bg_color ) )
-        return NULL;
-
-    return CreateStyle( psz_fontname, i_font_size, i_font_color,
-                        i_karaoke_bg_color,
-                        i_style_flags );
-}
-
 
 static int ProcessNodes( filter_t *p_filter,
                          uni_char_t *psz_text,
@@ -1365,6 +1345,7 @@ static int ProcessNodes( filter_t *p_filter,
                                                 "\n",
                                                 GetStyleFromFontStack( p_filter,
                                                                        &p_fonts,
+                                                                       &p_sys->style,
                                                                        i_style_flags ),
                                                 i_k_date );
                 }
@@ -1396,6 +1377,7 @@ static int ProcessNodes( filter_t *p_filter,
                                             psz_node,
                                             GetStyleFromFontStack( p_filter,
                                                                    &p_fonts,
+                                                                   &p_sys->style,
                                                                    i_style_flags ),
                                             i_k_date );
                 free( psz_node );
