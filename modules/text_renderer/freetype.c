@@ -326,7 +326,7 @@ struct filter_sys_t
 
     int            i_font_size;
     uint8_t        i_font_alpha;
-    bool           b_font_bold;
+    int            i_style_flags;
 
     int            i_outline_color;
     uint8_t        i_outline_alpha;
@@ -1322,7 +1322,7 @@ static int ProcessNodes( filter_t *p_filter,
                           ((i_font_alpha & 0xff) << 24),
                        0x00ffffff );
     }
-    if( p_sys->b_font_bold )
+    if( p_sys->i_style_flags & STYLE_BOLD )
         i_style_flags |= STYLE_BOLD;
 
     if( rv != VLC_SUCCESS )
@@ -2214,7 +2214,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
                                    ((p_sys->i_font_alpha & 0xff) << 24),
                                    0x00ffffff, 0);
         }
-        if( p_sys->b_font_bold )
+        if( p_sys->i_style_flags & STYLE_BOLD )
             p_style->i_style_flags |= STYLE_BOLD;
 
         i_text_length = SetupText( p_filter,
@@ -2344,7 +2344,8 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_default_font_size = var_InheritInteger( p_filter, "freetype-fontsize" );
     p_sys->i_font_alpha = var_InheritInteger( p_filter,"freetype-opacity" );
     p_sys->i_font_alpha = VLC_CLIP( p_sys->i_font_alpha, 0, 255 );
-    p_sys->b_font_bold = var_InheritBool( p_filter, "freetype-bold" );
+    if( var_InheritBool( p_filter, "freetype-bold" ) )
+        p_sys->i_style_flags |= STYLE_BOLD;
 
     double f_outline_thickness = var_InheritInteger( p_filter, "freetype-outline-thickness" ) / 100.0;
     f_outline_thickness = VLC_CLIP( f_outline_thickness, 0.0, 0.5 );
