@@ -53,7 +53,7 @@ VLCModel::VLCModel( intf_thread_t *_p_intf, QObject *parent )
 {
     /* Icons initialization */
 #define ADD_ICON(type, x) icons[ITEM_TYPE_##type] = QIcon( x )
-    ADD_ICON( UNKNOWN , type_unknown_xpm );
+    ADD_ICON( UNKNOWN , QPixmap( type_unknown_xpm ) );
     ADD_ICON( FILE, ":/type/file" );
     ADD_ICON( DIRECTORY, ":/type/directory" );
     ADD_ICON( DISC, ":/type/disc" );
