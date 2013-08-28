@@ -2406,11 +2406,10 @@ static int Create( vlc_object_t *p_this )
                                           &monofontindex );
 #elif defined(__APPLE__)
 #if !TARGET_OS_IPHONE
-    psz_fontfile = MacLegacy_Select( p_filter, psz_fontname, false, false, 0, &fontindex );
+    psz_fontfile = MacLegacy_Select( p_filter, psz_fontname, false, false, -1, &fontindex );
 #endif
 #elif defined(_WIN32)
-    psz_fontfile = Win32_Select( p_filter, psz_fontname, false, false,
-                                 p_sys->i_default_font_size, &fontindex );
+    psz_fontfile = Win32_Select( p_filter, psz_fontname, false, false, -1, &fontindex );
 
 #endif
     msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontname, psz_fontfile );
