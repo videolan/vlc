@@ -14,6 +14,7 @@ $(TARBALLS)/regex-$(REGEX_VERSION).tar.gz:
 
 regex: regex-$(REGEX_VERSION).tar.gz .sum-regex
 	$(UNPACK)
+	$(APPLY) $(SRC)/regex/no-docs.patch
 	$(MOVE)
 
 .regex: regex

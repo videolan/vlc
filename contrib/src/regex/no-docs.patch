@@ -1,0 +1,11 @@
+--- regex/Makefile.in.orig	2013-08-28 05:27:27.729372586 +0200
++++ regex/Makefile.in	2013-08-28 05:27:37.377372917 +0200
+@@ -43,7 +43,7 @@
+ 
+ SHELL = /bin/sh
+ 
+-subdirs = doc test
++subdirs =
+ 
+ default all:: regex.o
+ .PHONY: default all
