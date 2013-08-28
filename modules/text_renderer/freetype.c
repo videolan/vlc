@@ -338,7 +338,7 @@ struct filter_sys_t
 
     int            i_default_font_size;
 
-    char*          psz_fontfamily;
+    char*          psz_fontname;
     char*          psz_monofontfamily;
 #ifdef _WIN32
     char*          psz_win_fonts_path;
@@ -1291,7 +1291,7 @@ static int ProcessNodes( filter_t *p_filter,
     {
         /* If the font is not specified in the style, assume the system font */
         if(!p_font_style->psz_fontname)
-             p_font_style->psz_fontname = strdup(p_sys->psz_fontfamily);
+             p_font_style->psz_fontname = strdup(p_sys->psz_fontname);
 
         rv = PushFont( &p_fonts,
                p_font_style->psz_fontname,
@@ -1314,7 +1314,7 @@ static int ProcessNodes( filter_t *p_filter,
         i_font_color = VLC_CLIP( i_font_color, 0, 0xFFFFFF );
         int i_font_alpha = p_sys->i_font_alpha;
         rv = PushFont( &p_fonts,
-                       p_sys->psz_fontfamily,
+                       p_sys->psz_fontname,
                        i_font_size,
                        (i_font_color & 0xffffff) |
                           ((i_font_alpha & 0xff) << 24),
@@ -2192,7 +2192,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
         text_style_t *p_style;
         if( p_region_in->p_style )
             p_style = CreateStyle( p_region_in->p_style->psz_fontname ? p_region_in->p_style->psz_fontname
-                                                                      : p_sys->psz_fontfamily,
+                                                                      : p_sys->psz_fontname,
                                    p_region_in->p_style->i_font_size > 0 ? p_region_in->p_style->i_font_size
                                                                          : p_sys->i_font_size,
                                    (p_region_in->p_style->i_font_color & 0xffffff) |
@@ -2206,7 +2206,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
         {
             uint32_t i_font_color = var_InheritInteger( p_filter, "freetype-color" );
             i_font_color = VLC_CLIP( i_font_color, 0, 0xFFFFFF );
-            p_style = CreateStyle( p_sys->psz_fontfamily,
+            p_style = CreateStyle( p_sys->psz_fontname,
                                    p_sys->i_font_size,
                                    (i_font_color & 0xffffff) |
                                    ((p_sys->i_font_alpha & 0xff) << 24),
@@ -2313,7 +2313,7 @@ static int Create( vlc_object_t *p_this )
     filter_t      *p_filter = (filter_t *)p_this;
     filter_sys_t  *p_sys;
     char          *psz_fontfile   = NULL;
-    char          *psz_fontfamily = NULL;
+    char          *psz_fontname = NULL;
     char          *psz_monofontfile   = NULL;
     char          *psz_monofontfamily = NULL;
     int            i_error = 0, fontindex = 0, monofontindex = 0;
@@ -2323,7 +2323,7 @@ static int Create( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->psz_fontfamily   = NULL;
+    p_sys->psz_fontname   = NULL;
     p_sys->p_xml            = NULL;
     p_sys->p_face           = 0;
     p_sys->p_library        = 0;
@@ -2336,7 +2336,7 @@ static int Create( vlc_object_t *p_this )
      *
      */
 
-    psz_fontfamily = var_InheritString( p_filter, "freetype-font" );
+    psz_fontname = var_InheritString( p_filter, "freetype-font" );
     psz_monofontfamily = var_InheritString( p_filter, "freetype-monofont" );
     p_sys->i_default_font_size = var_InheritInteger( p_filter, "freetype-fontsize" );
     p_sys->i_font_alpha = var_InheritInteger( p_filter,"freetype-opacity" );
@@ -2372,58 +2372,58 @@ static int Create( vlc_object_t *p_this )
     p_sys->psz_win_fonts_path = FromWide( wdir );
 #endif
 
-    /* Set default psz_fontfamily */
-    if( !psz_fontfamily || !*psz_fontfamily )
+    /* Set default psz_fontname */
+    if( !psz_fontname || !*psz_fontname )
     {
-        free( psz_fontfamily );
+        free( psz_fontname );
 #ifdef HAVE_STYLES
-        psz_fontfamily = strdup( DEFAULT_FAMILY );
+        psz_fontname = strdup( DEFAULT_FAMILY );
 #else
 # ifdef _WIN32
-        if( asprintf( &psz_fontfamily, "%s"DEFAULT_FONT_FILE, p_sys->psz_win_fonts_path ) == -1 )
+        if( asprintf( &psz_fontname, "%s"DEFAULT_FONT_FILE, p_sys->psz_win_fonts_path ) == -1 )
         {
-            psz_fontfamily = NULL;
+            psz_fontname = NULL;
             goto error;
         }
 # else
-        psz_fontfamily = strdup( DEFAULT_FONT_FILE );
+        psz_fontname = strdup( DEFAULT_FONT_FILE );
 # endif
-        msg_Err( p_filter,"User specified an empty fontfile, using %s", psz_fontfamily );
+        msg_Err( p_filter,"User specified an empty fontfile, using %s", psz_fontname );
 #endif
     }
 
     /* Set the current font file */
-    p_sys->psz_fontfamily = psz_fontfamily;
+    p_sys->psz_fontname = psz_fontname;
 #ifdef HAVE_STYLES
 #ifdef HAVE_FONTCONFIG
     FontConfig_BuildCache( p_filter );
 
     /* */
-    psz_fontfile = FontConfig_Select( NULL, psz_fontfamily, false, false,
+    psz_fontfile = FontConfig_Select( NULL, psz_fontname, false, false,
                                       p_sys->i_default_font_size, &fontindex );
     psz_monofontfile = FontConfig_Select( NULL, psz_monofontfamily, false,
                                           false, p_sys->i_default_font_size,
                                           &monofontindex );
 #elif defined(__APPLE__)
 #if !TARGET_OS_IPHONE
-    psz_fontfile = MacLegacy_Select( p_filter, psz_fontfamily, false, false, 0, &fontindex );
+    psz_fontfile = MacLegacy_Select( p_filter, psz_fontname, false, false, 0, &fontindex );
 #endif
 #elif defined(_WIN32)
-    psz_fontfile = Win32_Select( p_filter, psz_fontfamily, false, false,
+    psz_fontfile = Win32_Select( p_filter, psz_fontname, false, false,
                                  p_sys->i_default_font_size, &fontindex );
 
 #endif
-    msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily, psz_fontfile );
+    msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontname, psz_fontfile );
 
     /* If nothing is found, use the default family */
     if( !psz_fontfile )
-        psz_fontfile = strdup( psz_fontfamily );
+        psz_fontfile = strdup( psz_fontname );
     if( !psz_monofontfile )
         psz_monofontfile = strdup( psz_monofontfamily );
 
 #else /* !HAVE_STYLES */
     /* Use the default file */
-    psz_fontfile = psz_fontfamily;
+    psz_fontfile = psz_fontname;
     psz_monofontfile = psz_monofontfamily;
 #endif
     p_sys->psz_monofontfamily = psz_monofontfamily;
@@ -2491,7 +2491,7 @@ error:
     free( psz_fontfile );
     free( psz_monofontfile );
 #endif
-    free( psz_fontfamily );
+    free( psz_fontname );
     free( psz_monofontfamily );
     free( p_sys );
     return VLC_EGENERIC;
@@ -2516,7 +2516,7 @@ static void Destroy( vlc_object_t *p_this )
     }
 
     if( p_sys->p_xml ) xml_ReaderDelete( p_sys->p_xml );
-    free( p_sys->psz_fontfamily );
+    free( p_sys->psz_fontname );
     free( p_sys->psz_monofontfamily );
 
 #ifdef _WIN32
