@@ -1285,8 +1285,8 @@ more_input:
         convert_h264_to_annexb( p_header->pBuffer, p_header->nFilledLen,
                                 p_sys->i_nal_size_length, &convert_state );
 #ifdef OMXIL_EXTRA_DEBUG
-        msg_Dbg( p_dec, "EmptyThisBuffer %p, %p, %i", p_header, p_header->pBuffer,
-                 (int)p_header->nFilledLen );
+        msg_Dbg( p_dec, "EmptyThisBuffer %p, %p, %i, %"PRId64, p_header, p_header->pBuffer,
+                 (int)p_header->nFilledLen, FromOmxTicks(p_header->nTimeStamp) );
 #endif
         OMX_EmptyThisBuffer(p_sys->omx_handle, p_header);
         p_sys->in.b_flushed = false;
@@ -1660,8 +1660,8 @@ static OMX_ERRORTYPE OmxFillBufferDone( OMX_HANDLETYPE omx_handle,
     (void)omx_handle;
 
 #ifdef OMXIL_EXTRA_DEBUG
-    msg_Dbg( p_dec, "OmxFillBufferDone %p, %p, %i", omx_header, omx_header->pBuffer,
-             (int)omx_header->nFilledLen );
+    msg_Dbg( p_dec, "OmxFillBufferDone %p, %p, %i, %"PRId64, omx_header, omx_header->pBuffer,
+             (int)omx_header->nFilledLen, FromOmxTicks(omx_header->nTimeStamp) );
 #endif
 
     if(omx_header->pInputPortPrivate)
