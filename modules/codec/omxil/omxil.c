@@ -815,7 +815,7 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
     p_sys->out.p_fmt = &p_dec->fmt_out;
     p_sys->ports = 2;
     p_sys->p_ports = &p_sys->in;
-    p_sys->b_use_pts = 0;
+    p_sys->b_use_pts = 1;
 
     msg_Dbg(p_dec, "fmt in:%4.4s, out: %4.4s", (char *)&p_dec->fmt_in.i_codec,
             (char *)&p_dec->fmt_out.i_codec);
@@ -1002,14 +1002,9 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
     if(p_sys->b_error) goto error;
 
     p_dec->b_need_packetized = true;
-    if (!strcmp(p_sys->psz_component, "OMX.TI.DUCATI1.VIDEO.DECODER"))
-        p_sys->b_use_pts = 1;
 
-    if (!strcmp(p_sys->psz_component, "OMX.STM.Video.Decoder"))
-        p_sys->b_use_pts = 1;
-
-    if (p_sys->b_use_pts)
-        msg_Dbg( p_dec, "using pts timestamp mode for %s", p_sys->psz_component);
+    if (!p_sys->b_use_pts)
+        msg_Dbg( p_dec, "using dts timestamp mode for %s", p_sys->psz_component);
 
     return VLC_SUCCESS;
 
