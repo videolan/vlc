@@ -1232,12 +1232,6 @@ int libvlc_media_player_will_play( libvlc_media_player_t *p_mi )
 
 int libvlc_media_player_set_rate( libvlc_media_player_t *p_mi, float rate )
 {
-    if (rate < 0.)
-    {
-        libvlc_printerr ("Playing backward not supported");
-        return -1;
-    }
-
     var_SetFloat (p_mi, "rate", rate);
 
     input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi );
