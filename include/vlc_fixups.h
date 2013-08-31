@@ -218,8 +218,10 @@ int posix_memalign (void **, size_t, size_t);
 
 /* locale.h */
 #ifndef HAVE_USELOCALE
+#define LC_ALL_MASK      0
 #define LC_NUMERIC_MASK  0
 #define LC_MESSAGES_MASK 0
+#define LC_GLOBAL_LOCALE ((locale_t)(uintptr_t)1)
 typedef void *locale_t;
 static inline locale_t uselocale(locale_t loc)
 {
