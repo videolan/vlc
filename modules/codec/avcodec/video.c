@@ -126,19 +126,22 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
                                             AVCodecContext *p_context )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    int aligns[AV_NUM_DATA_POINTERS];
+    int width = p_context->coded_width;
+    int height = p_context->coded_height;
 
-    if( p_context->coded_width != p_context->width ||
-        p_context->coded_height != p_context->height )
+    avcodec_align_dimensions2(p_context, &width, &height, aligns);
+
+    if( width == 0 || height == 0)
+        return NULL; /* invalid display size */
+
+    p_dec->fmt_out.video.i_width = width;
+    p_dec->fmt_out.video.i_height = height;
+
+    if( width != p_context->width || height != p_context->height )
     {
         p_dec->fmt_out.video.i_visible_width = p_context->width;
         p_dec->fmt_out.video.i_visible_height = p_context->height;
-    }
-    p_dec->fmt_out.video.i_width = p_context->coded_width;
-    p_dec->fmt_out.video.i_height = p_context->coded_height;
-
-    if( !p_context->width || !p_context->height )
-    {
-        return NULL; /* invalid display size */
     }
 
     if( !p_sys->p_va && GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) )
