@@ -196,6 +196,8 @@ local strrep, gsub, strsub, strbyte, strchar, strfind, strlen, strformat =
       string.rep, string.gsub, string.sub, string.byte, string.char,
       string.find, string.len, string.format
 local concat = table.concat
+local common = require ("common")
+local us_tostring = common.us_tostring
 
 if _VERSION == 'Lua 5.1' then
   local function noglobals (s,k,v) error ("global access: " .. k, 2) end
@@ -367,7 +369,7 @@ encode2 = function (value, indent, level, buffer, buflen, tables, globalorder)
       -- This is the behaviour of the original JSON implementation.
       s = "null"
     else
-      s = tostring (value)
+      s = us_tostring (value)
     end
     buflen = buflen + 1
     buffer[buflen] = s
