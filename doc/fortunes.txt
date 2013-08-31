@@ -1003,3 +1003,9 @@ reactor leaks ionizing radiations."
 < funman> that might be the most beautiful thing i was ever told <3
  -- #videolan, BDSM and Litote
 %
+<etix> Who's Barack Obama on the etherpad?
+<TypX> etix: the president of the USA
+<No_se> etix: You really should have heard of him
+<etix> Yeah of course
+ -- #videolan, unexpected attendee to technical discussions at VDD13
+%
