@@ -80,7 +80,7 @@
  *****************************************************************************/
 
 /* Maximum gap allowed between two CRs. */
-#define CR_MAX_GAP (INT64_C(2000000)*100/9)
+#define CR_MAX_GAP (60 * CLOCK_FREQ)
 
 /* Latency introduced on DVDs with CR == 0 on chapter change - this is from
  * my dice --Meuuh */
