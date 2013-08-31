@@ -1,0 +1,172 @@
+From e643e0259df0736022d484c68a6781c3a380dd06 Mon Sep 17 00:00:00 2001
+Message-Id: <e643e0259df0736022d484c68a6781c3a380dd06.1372366053.git.brad.king@kitware.com>
+From: Brad King <brad.king@kitware.com>
+Date: Thu, 27 Jun 2013 16:44:08 -0400
+Subject: [PATCH] cmcurl: Backport curl bug 1192 fix (#14250)
+
+LLVM headers define strlcat as a macro rather than as a function.
+See upstream Curl issue:
+
+ http://curl.haxx.se/bug/view.cgi?id=1192
+
+It was addressed by removing use of strlcat altogether.  Port the
+upstream fix to CMake's curl.
+---
+ Utilities/cmcurl/CMakeLists.txt               |    2 --
+ Utilities/cmcurl/Platforms/WindowsCache.cmake |    1 -
+ Utilities/cmcurl/Platforms/config-aix.h       |    3 --
+ Utilities/cmcurl/config.h.in                  |    3 --
+ Utilities/cmcurl/socks.c                      |   11 +++++--
+ Utilities/cmcurl/strequal.c                   |   42 -------------------------
+ Utilities/cmcurl/strequal.h                   |    5 ---
+ 7 files changed, 9 insertions(+), 58 deletions(-)
+
+diff --git a/Utilities/cmcurl/CMakeLists.txt b/Utilities/cmcurl/CMakeLists.txt
+index ef000a1..320612c 100644
+--- a/Utilities/cmcurl/CMakeLists.txt
++++ b/Utilities/cmcurl/CMakeLists.txt
+@@ -376,7 +376,6 @@ MARK_AS_ADVANCED(RANDOM_FILE)
+ #sigaction \
+ #signal \
+ #getpass_r \
+-#strlcat \
+ #getpwuid \
+ #geteuid \
+ #dlopen \
+@@ -428,7 +427,6 @@ CHECK_SYMBOL_EXISTS(closesocket   "${CURL_INCLUDES}" HAVE_CLOSESOCKET)
+ CHECK_SYMBOL_EXISTS(setvbuf       "${CURL_INCLUDES}" HAVE_SETVBUF)
+ CHECK_SYMBOL_EXISTS(sigsetjmp     "${CURL_INCLUDES}" HAVE_SIGSETJMP)
+ CHECK_SYMBOL_EXISTS(getpass_r     "${CURL_INCLUDES}" HAVE_GETPASS_R)
+-CHECK_SYMBOL_EXISTS(strlcat       "${CURL_INCLUDES}" HAVE_STRLCAT)
+ CHECK_SYMBOL_EXISTS(getpwuid      "${CURL_INCLUDES}" HAVE_GETPWUID)
+ CHECK_SYMBOL_EXISTS(geteuid       "${CURL_INCLUDES}" HAVE_GETEUID)
+ CHECK_SYMBOL_EXISTS(utime         "${CURL_INCLUDES}" HAVE_UTIME)
+diff --git a/Utilities/cmcurl/Platforms/WindowsCache.cmake b/Utilities/cmcurl/Platforms/WindowsCache.cmake
+index b4515ce..57ab30b 100644
+--- a/Utilities/cmcurl/Platforms/WindowsCache.cmake
++++ b/Utilities/cmcurl/Platforms/WindowsCache.cmake
+@@ -76,7 +76,6 @@ IF(NOT UNIX)
+     SET(HAVE_SETVBUF 0)
+     SET(HAVE_SIGSETJMP 0)
+     SET(HAVE_GETPASS_R 0)
+-    SET(HAVE_STRLCAT 0)
+     SET(HAVE_GETPWUID 0)
+     SET(HAVE_GETEUID 0)
+     SET(HAVE_UTIME 1)
+diff --git a/Utilities/cmcurl/Platforms/config-aix.h b/Utilities/cmcurl/Platforms/config-aix.h
+index 86d1093..c98b10f 100644
+--- a/Utilities/cmcurl/Platforms/config-aix.h
++++ b/Utilities/cmcurl/Platforms/config-aix.h
+@@ -343,9 +343,6 @@
+ /* Define to 1 if you have the <string.h> header file. */
+ #define HAVE_STRING_H 1
+ 
+-/* Define to 1 if you have the `strlcat' function. */
+-/* #undef HAVE_STRLCAT */
+-
+ /* Define to 1 if you have the `strlcpy' function. */
+ /* #undef HAVE_STRLCPY */
+ 
+diff --git a/Utilities/cmcurl/config.h.in b/Utilities/cmcurl/config.h.in
+index e18af8f..148722b 100644
+--- a/Utilities/cmcurl/config.h.in
++++ b/Utilities/cmcurl/config.h.in
+@@ -441,9 +441,6 @@
+ /* Define to 1 if you have the <string.h> header file. */
+ #cmakedefine HAVE_STRING_H ${HAVE_STRING_H}
+ 
+-/* Define to 1 if you have the `strlcat' function. */
+-#cmakedefine HAVE_STRLCAT ${HAVE_STRLCAT}
+-
+ /* Define to 1 if you have the `strlcpy' function. */
+ #cmakedefine HAVE_STRLCPY ${HAVE_STRLCPY}
+ 
+diff --git a/Utilities/cmcurl/socks.c b/Utilities/cmcurl/socks.c
+index 3319e69..e0e947b 100644
+--- a/Utilities/cmcurl/socks.c
++++ b/Utilities/cmcurl/socks.c
+@@ -199,8 +199,15 @@ CURLcode Curl_SOCKS4(const char *proxy_name,
+    * This is currently not supporting "Identification Protocol (RFC1413)".
+    */
+   socksreq[8] = 0; /* ensure empty userid is NUL-terminated */
+-  if (proxy_name)
+-    strlcat((char*)socksreq + 8, proxy_name, sizeof(socksreq) - 8);
++  if(proxy_name) {
++    size_t plen = strlen(proxy_name);
++    if(plen >= sizeof(socksreq) - 8) {
++      failf(data, "Too long SOCKS proxy name, can't use!\n");
++      return CURLE_COULDNT_CONNECT;
++    }
++    /* copy the proxy name WITH trailing zero */
++    memcpy(socksreq + 8, proxy_name, plen+1);
++  }
+ 
+   /*
+    * Make connection
+diff --git a/Utilities/cmcurl/strequal.c b/Utilities/cmcurl/strequal.c
+index 76ad524..83796f6 100644
+--- a/Utilities/cmcurl/strequal.c
++++ b/Utilities/cmcurl/strequal.c
+@@ -99,45 +99,3 @@ char *Curl_strcasestr(const char *haystack, const char *needle)
+   }
+   return NULL;
+ }
+-
+-#ifndef HAVE_STRLCAT
+-/*
+- * The strlcat() function appends the NUL-terminated string src to the end
+- * of dst. It will append at most size - strlen(dst) - 1 bytes, NUL-termi-
+- * nating the result.
+- *
+- * The strlcpy() and strlcat() functions return the total length of the
+- * string they tried to create.  For strlcpy() that means the length of src.
+- * For strlcat() that means the initial length of dst plus the length of
+- * src. While this may seem somewhat confusing it was done to make trunca-
+- * tion detection simple.
+- *
+- *
+- */
+-size_t Curl_strlcat(char *dst, const char *src, size_t siz)
+-{
+-  char *d = dst;
+-  const char *s = src;
+-  size_t n = siz;
+-  size_t dlen;
+-
+-  /* Find the end of dst and adjust bytes left but don't go past end */
+-  while (n-- != 0 && *d != '\0')
+-    d++;
+-  dlen = d - dst;
+-  n = siz - dlen;
+-
+-  if (n == 0)
+-    return(dlen + strlen(s));
+-  while (*s != '\0') {
+-    if (n != 1) {
+-      *d++ = *s;
+-      n--;
+-    }
+-    s++;
+-  }
+-  *d = '\0';
+-
+-  return(dlen + (s - src));     /* count does not include NUL */
+-}
+-#endif
+diff --git a/Utilities/cmcurl/strequal.h b/Utilities/cmcurl/strequal.h
+index b3caa73..6718c3c0 100644
+--- a/Utilities/cmcurl/strequal.h
++++ b/Utilities/cmcurl/strequal.h
+@@ -35,9 +35,4 @@
+ /* case insensitive strstr() */
+ char *Curl_strcasestr(const char *haystack, const char *needle);
+ 
+-#ifndef HAVE_STRLCAT
+-#define strlcat(x,y,z) Curl_strlcat(x,y,z)
+-#endif
+-size_t strlcat(char *dst, const char *src, size_t siz);
+-
+ #endif
+-- 
+1.7.10.4
+
