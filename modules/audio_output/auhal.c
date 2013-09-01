@@ -198,7 +198,7 @@ static int Open(vlc_object_t *obj)
     p_aout->device_select = SwitchAudioDevice;
     p_sys->device_list = CFArrayCreate(kCFAllocatorDefault, NULL, 0, NULL);
 
-    /* Attach a Listener so that we are notified of a change in the Device setup */
+    /* Attach a listener so that we are notified of a change in the device setup */
     AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
     err = AudioObjectAddPropertyListener(kAudioObjectSystemObject, &audioDevicesAddress, DevicesListener, (void *)p_aout);
     if (err != noErr)
@@ -1490,7 +1490,7 @@ static OSStatus RenderCallbackSPDIF(AudioDeviceID inDevice,
 /*
  * Callback when device list changed
  */
-static OSStatus DevicesListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void*inClientData)
+static OSStatus DevicesListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void *inClientData)
 {
     VLC_UNUSED(inObjectID);
     VLC_UNUSED(inNumberAddresses);
@@ -1515,7 +1515,7 @@ static OSStatus DevicesListener(AudioObjectID inObjectID,  UInt32 inNumberAddres
 /*
  * Callback when current device is not alive anymore
  */
-static OSStatus DeviceAliveListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void*inClientData)
+static OSStatus DeviceAliveListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void *inClientData)
 {
     VLC_UNUSED(inObjectID);
     VLC_UNUSED(inNumberAddresses);
@@ -1534,7 +1534,7 @@ static OSStatus DeviceAliveListener(AudioObjectID inObjectID,  UInt32 inNumberAd
 /*
  * Callback when streams of any audio device changed (e.g. SPDIF gets (un)available)
  */
-static OSStatus StreamsChangedListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void*inClientData)
+static OSStatus StreamsChangedListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void *inClientData)
 {
     OSStatus                    err = noErr;
     UInt32                      i_param_size = 0;
@@ -1593,7 +1593,7 @@ static OSStatus StreamsChangedListener(AudioObjectID inObjectID,  UInt32 inNumbe
 /*
  * StreamListener: check whether the device's physical format changes on-the-fly (unlikely)
  */
-static OSStatus StreamListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void*inClientData)
+static OSStatus StreamListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void *inClientData)
 {
     OSStatus err = noErr;
     struct { vlc_mutex_t lock; vlc_cond_t cond; } * w = inClientData;
