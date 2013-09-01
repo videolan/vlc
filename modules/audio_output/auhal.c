@@ -80,6 +80,8 @@ struct aout_sys_t
     AudioObjectID               i_selected_dev;     /* DeviceID of the selected device */
     AudioObjectID               i_new_selected_dev; /* DeviceID of device which will be selected on start */
     bool                        b_selected_dev_is_digital;
+    bool                        b_selected_dev_is_default; /* true if the user selected the default audio device (id 0) */
+
     AudioDeviceIOProcID         i_procID;           /* DeviceID of current device */
     bool                        b_digital;          /* Are we running in digital mode? */
 
@@ -147,6 +149,7 @@ static OSStatus RenderCallbackSPDIF     (AudioDeviceID, const AudioTimeStamp *, 
 
 static OSStatus DevicesListener         (AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void *);
 static OSStatus DeviceAliveListener     (AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void *);
+static OSStatus DefaultDeviceChangedListener (AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void *);
 static OSStatus StreamsChangedListener  (AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void *);
 
 static OSStatus StreamListener          (AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void *);
@@ -189,6 +192,7 @@ static int Open(vlc_object_t *obj)
     vlc_cond_init(&p_sys->cond);
     p_sys->b_digital = false;
     p_sys->b_ignore_streams_changed_callback = false;
+    p_sys->b_selected_dev_is_default = false;
 
     p_aout->sys = p_sys;
     p_aout->start = Start;
@@ -203,6 +207,12 @@ static int Open(vlc_object_t *obj)
     err = AudioObjectAddPropertyListener(kAudioObjectSystemObject, &audioDevicesAddress, DevicesListener, (void *)p_aout);
     if (err != noErr)
         msg_Err(p_aout, "failed to add listener for audio device configuration [%4.4s]", (char *)&err);
+
+    /* Attach a listener to be notified about changes in default audio device */
+    AudioObjectPropertyAddress defaultDeviceAddress = { kAudioHardwarePropertyDefaultOutputDevice, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+    err = AudioObjectAddPropertyListener(kAudioObjectSystemObject, &defaultDeviceAddress, DefaultDeviceChangedListener, (void *)p_aout);
+    if (err != noErr)
+        msg_Err(p_aout, "failed to add listener for default audio device [%4.4s]", (char *)&err);
 
     RebuildDeviceList(p_aout);
 
@@ -231,6 +241,12 @@ static void Close(vlc_object_t *obj)
     err = AudioObjectRemovePropertyListener(kAudioObjectSystemObject, &audioDevicesAddress, DevicesListener, (void *)p_aout);
     if (err != noErr)
         msg_Err(p_aout, "AudioHardwareRemovePropertyListener failed [%4.4s]", (char *)&err);
+
+    /* remove listener to be notified about changes in default audio device */
+    AudioObjectPropertyAddress defaultDeviceAddress = { kAudioHardwarePropertyDefaultOutputDevice, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+    err = AudioObjectRemovePropertyListener(kAudioObjectSystemObject, &defaultDeviceAddress, DefaultDeviceChangedListener, (void *)p_aout);
+    if (err != noErr)
+        msg_Err(p_aout, "failed to remove listener for default audio device [%4.4s]", (char *)&err);
 
     vlc_mutex_lock(&p_sys->var_lock);
     /* remove streams callbacks */
@@ -309,7 +325,10 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
             msg_Warn(p_aout, "selected audio device is not alive, switching to default device");
     }
 
+    p_sys->b_selected_dev_is_default = false;
     if (!b_alive || p_sys->i_selected_dev == 0) {
+        p_sys->b_selected_dev_is_default = true;
+
         AudioObjectID defaultDeviceID = 0;
         UInt32 propertySize = 0;
         AudioObjectPropertyAddress defaultDeviceAddress = { kAudioHardwarePropertyDefaultOutputDevice, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
@@ -1532,7 +1551,30 @@ static OSStatus DeviceAliveListener(AudioObjectID inObjectID,  UInt32 inNumberAd
 }
 
 /*
- * Callback when streams of any audio device changed (e.g. SPDIF gets (un)available)
+ * Callback when current device is not alive anymore
+ */
+static OSStatus DefaultDeviceChangedListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void *inClientData)
+{
+    VLC_UNUSED(inObjectID);
+    VLC_UNUSED(inNumberAddresses);
+    VLC_UNUSED(inAddresses);
+
+    audio_output_t *p_aout = (audio_output_t *)inClientData;
+    if (!p_aout)
+        return -1;
+
+    if (!p_aout->sys->b_selected_dev_is_default)
+        return 0;
+
+    msg_Dbg(p_aout, "default device changed, resetting aout");
+    aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+
+    return noErr;
+}
+
+
+/*
+ * Callback when default audio device changed
  */
 static OSStatus StreamsChangedListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void *inClientData)
 {
