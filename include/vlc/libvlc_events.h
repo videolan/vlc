@@ -52,6 +52,7 @@ enum libvlc_event_e {
     libvlc_MediaParsedChanged,
     libvlc_MediaFreed,
     libvlc_MediaStateChanged,
+    libvlc_MediaSubItemTreeAdded,
 
     libvlc_MediaPlayerMediaChanged=0x100,
     libvlc_MediaPlayerNothingSpecial,
@@ -137,6 +138,10 @@ typedef struct libvlc_event_t
         {
             libvlc_state_t new_state;
         } media_state_changed;
+        struct
+        {
+            libvlc_media_t * item;
+        } media_subitemtree_added;
 
         /* media instance */
         struct

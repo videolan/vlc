@@ -120,6 +120,23 @@ static void input_item_subitem_added( const vlc_event_t *p_event,
 }
 
 /**************************************************************************
+ * input_item_subitemtree_added (Private) (vlc event Callback)
+ **************************************************************************/
+static void input_item_subitemtree_added( const vlc_event_t * p_event,
+                                          void * user_data )
+{
+    libvlc_media_t * p_md = user_data;
+    libvlc_event_t event;
+
+    /* Construct the event */
+    event.type = libvlc_MediaSubItemTreeAdded;
+    event.u.media_subitemtree_added.item = p_md;
+
+    /* Send the event */
+    libvlc_event_send( p_md->p_event_manager, &event );
+}
+
+/**************************************************************************
  * input_item_meta_changed (Private) (vlc event Callback)
  **************************************************************************/
 static void input_item_meta_changed( const vlc_event_t *p_event,
@@ -201,6 +218,10 @@ static void install_input_item_observer( libvlc_media_t *p_md )
                       vlc_InputItemPreparsedChanged,
                       input_item_preparsed_changed,
                       p_md );
+    vlc_event_attach( &p_md->p_input_item->event_manager,
+                      vlc_InputItemSubItemTreeAdded,
+                      input_item_subitemtree_added,
+                      p_md );
 }
 
 /**************************************************************************
@@ -223,6 +244,10 @@ static void uninstall_input_item_observer( libvlc_media_t *p_md )
     vlc_event_detach( &p_md->p_input_item->event_manager,
                       vlc_InputItemPreparsedChanged,
                       input_item_preparsed_changed,
+                      p_md );
+    vlc_event_detach( &p_md->p_input_item->event_manager,
+                      vlc_InputItemSubItemTreeAdded,
+                      input_item_subitemtree_added,
                       p_md );
 }
 
@@ -277,6 +302,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(
     libvlc_event_manager_register_event_type(em, libvlc_MediaDurationChanged);
     libvlc_event_manager_register_event_type(em, libvlc_MediaStateChanged);
     libvlc_event_manager_register_event_type(em, libvlc_MediaParsedChanged);
+    libvlc_event_manager_register_event_type(em, libvlc_MediaSubItemTreeAdded);
 
     vlc_gc_incref( p_md->p_input_item );
 
