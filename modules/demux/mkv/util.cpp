@@ -258,3 +258,94 @@ Cook_PrivateTrackData::~Cook_PrivateTrackData()
 
     free( p_subpackets );    
 }
+
+static inline void fill_wvpk_block(uint16_t version, uint32_t block_samples, uint32_t flags,
+                                   uint32_t crc, uint8_t * src, size_t srclen, uint8_t * dst)
+{
+    const uint8_t wvpk_header[] = {'w','v','p','k',         /* ckId */
+                                    0x0, 0x0, 0x0, 0x0,     /* ckSize */
+                                    0x0, 0x0,               /* version */
+                                    0x0,                    /* track_no */
+                                    0x0,                    /* index_no */
+                                    0xFF, 0xFF, 0xFF, 0xFF, /* total_samples */
+                                    0x0, 0x0, 0x0, 0x0 };   /* block_index */
+    memcpy( dst, wvpk_header, sizeof( wvpk_header ) );
+    SetDWLE( dst + 4, srclen + 24 );
+    SetWLE( dst + 8, version );
+    SetDWLE( dst + 20, block_samples );
+    SetDWLE( dst + 24, flags );
+    SetDWLE( dst + 28, crc );
+    memcpy( dst + 32, src, srclen ); 
+}
+
+block_t * packetize_wavpack( mkv_track_t * p_tk, uint8_t * buffer, size_t  size)
+{
+    uint16_t version = 0x403;
+    uint32_t block_samples;
+    uint32_t flags;
+    uint32_t crc;
+    block_t * p_block = NULL;
+    
+    if( p_tk->i_extra_data >= 2 )
+        version = GetWLE( p_tk->p_extra_data );
+
+    if( size < 12 )
+        return NULL;
+ 
+    block_samples = GetDWLE(buffer);
+    buffer += 4;
+    flags = GetDWLE(buffer);
+    size -= 4;
+
+    /* Check if WV_INITIAL_BLOCK and WV_FINAL_BLOCK are present */
+    if( ( flags & 0x1800 ) == 0x1800 )
+    {
+        crc = GetDWLE(buffer+4);
+        buffer += 8;
+        size -= 8;
+
+        p_block = block_Alloc( size + 32 );
+        if( !p_block )
+            return NULL;
+
+        fill_wvpk_block(version, block_samples, flags, crc, buffer, size, p_block->p_buffer);
+    }
+    else
+    {
+        /* Multiblock */
+        size_t total_size = 0; 
+
+        p_block = block_Alloc( 0 );
+        if( !p_block )
+            return NULL;
+
+        while(size >= 12)
+        {
+            flags = GetDWLE(buffer);
+            buffer += 4;
+            crc = GetDWLE(buffer);
+            buffer += 4;
+            uint32_t bsz = GetDWLE(buffer);
+            buffer+= 4;
+            size -= 12;
+
+            bsz = (bsz < size)?bsz:size;
+
+            total_size += bsz + 32;
+
+            assert(total_size >= p_block->i_buffer);
+
+            p_block = block_Realloc( p_block, 0, total_size );
+
+            if( !p_block )
+                return NULL;
+
+            fill_wvpk_block(version, block_samples, flags, crc, buffer, bsz,
+                            p_block->p_buffer + total_size - bsz - 32 );
+            buffer += bsz;
+            size -= bsz;
+        }
+    }
+
+    return p_block;
+}

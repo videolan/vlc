@@ -87,3 +87,5 @@ public:
     size_t   i_subpackets;
     size_t   i_subpacket;
 };
+
+block_t * packetize_wavpack( mkv_track_t *, uint8_t *, size_t);
