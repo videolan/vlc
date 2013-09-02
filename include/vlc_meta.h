@@ -125,6 +125,7 @@ VLC_API int input_item_WriteMeta(vlc_object_t *, input_item_t *);
 #define vlc_meta_SetEncodedBy( meta, b )   vlc_meta_Set( meta, vlc_meta_EncodedBy, b )
 #define vlc_meta_SetArtURL( meta, b )      vlc_meta_Set( meta, vlc_meta_ArtworkURL, b )
 #define vlc_meta_SetTrackID( meta, b )     vlc_meta_Set( meta, vlc_meta_TrackID, b )
+#define vlc_meta_SetTrackTotal( meta, b )  vlc_meta_Set( meta, vlc_meta_TrackTotal, b )
 
 #define VLC_META_TITLE              vlc_meta_TypeToLocalizedString( vlc_meta_Title )
 #define VLC_META_ARTIST             vlc_meta_TypeToLocalizedString( vlc_meta_Artist )

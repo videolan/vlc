@@ -434,7 +434,13 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
     if( !list.isEmpty() )                                                      \
         vlc_meta_Set##metaName( p_meta, (*list.begin()).toCString( true ) );
 
+    SET( "TRACKTOTAL", TrackTotal );
     SET( "COPYRIGHT", Copyright );
+    SET( "ORGANIZATION", Publisher );
+    SET( "DATE", Date );
+    SET( "ENCODER", EncodedBy );
+    SET( "RATING", Rating );
+    SET( "LANGUAGE", Language );
 #undef SET
 
     // Try now to get embedded art
@@ -846,7 +852,14 @@ static void WriteMetaToXiph( Ogg::XiphComment* tag, input_item_t* p_item )
     }                                                   \
     free( psz_meta );
 
+    WRITE( TrackNum, "TRACKNUMBER" );
+    WRITE( TrackTotal, "TRACKTOTAL" );
     WRITE( Copyright, "COPYRIGHT" );
+    WRITE( Publisher, "ORGANIZATION" );
+    WRITE( Date, "DATE" );
+    WRITE( EncodedBy, "ENCODER" );
+    WRITE( Rating, "RATING" );
+    WRITE( Language, "LANGUAGE" );
 
 #undef WRITE
 }
