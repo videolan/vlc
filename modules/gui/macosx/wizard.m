@@ -264,7 +264,7 @@ static VLCWizard *_o_sharedInstance = nil;
         "the best thing to do. Other computers can then access the stream at "
         "mms://yourip:8080 by default."), _NS("Use this to stream to several "
         "computers using the Microsoft MMS protocol. This protocol is used as "
-        "transport method by many Microsoft's softwares. Note that only a "
+        "transport method by many Microsoft's software. Note that only a "
         "small part of the MMS protocol is supported (MMS encapsulated in "
         "HTTP)."), nil];
     o_udp_uni = [NSArray arrayWithObjects:@"udp", @"UDP-Unicast", _NS("Enter "
