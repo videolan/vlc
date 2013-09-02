@@ -72,7 +72,6 @@ struct aout_sys_t
     pa_volume_t base_volume; /**< 0dB reference volume */
     pa_cvolume cvolume; /**< actual sink input volume */
     mtime_t first_pts; /**< Play time of buffer start */
-    mtime_t paused; /**< Time when (last) paused */
 
     pa_stream_flags_t flags_force; /**< Forced flags (stream must be NULL) */
     char *sink_force; /**< Forced sink name (stream must be NULL) */
@@ -271,8 +270,7 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     audio_output_t *aout = userdata;
     aout_sys_t *sys = aout->sys;
 
-    if (sys->paused != VLC_TS_INVALID)
-        return; /* nothing to do while paused */
+    /* This callback is _never_ called while paused. */
     if (sys->first_pts == VLC_TS_INVALID)
         return; /* nothing to do if buffers are (still) empty */
     if (pa_stream_is_corked(s) > 0)
@@ -514,8 +512,6 @@ static void Play(audio_output_t *aout, block_t *block)
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
 
-    assert (sys->paused == VLC_TS_INVALID);
-
     const void *ptr = data_convert(&block);
     if (unlikely(ptr == NULL))
         return;
@@ -562,19 +558,16 @@ static void Pause(audio_output_t *aout, bool paused, mtime_t date)
     pa_threaded_mainloop_lock(sys->mainloop);
 
     if (paused) {
-        sys->paused = date;
+        pa_stream_set_latency_update_callback(s, NULL, NULL);
         stream_stop(s, aout);
     } else {
-        assert (sys->paused != VLC_TS_INVALID);
-        date -= sys->paused;
-        msg_Dbg(aout, "resuming after %"PRId64" us", date);
-        sys->paused = VLC_TS_INVALID;
-
+        pa_stream_set_latency_update_callback(s, stream_latency_cb, aout);
         if (likely(sys->first_pts != VLC_TS_INVALID))
             stream_start_now(s, aout);
     }
 
     pa_threaded_mainloop_unlock(sys->mainloop);
+    (void) date;
 }
 
 /**
@@ -821,7 +814,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     sys->stream = NULL;
     sys->trigger = NULL;
     sys->first_pts = VLC_TS_INVALID;
-    sys->paused = VLC_TS_INVALID;
 
     /* Channel volume */
     sys->base_volume = PA_VOLUME_NORM;
