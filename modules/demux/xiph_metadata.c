@@ -154,14 +154,14 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
 
     /* */
     bool hasTitle        = false;
-    bool hasAlbum        = false;
-    bool hasTrackTotal   = false;
     bool hasArtist       = false;
-    bool hasCopyright    = false;
-    bool hasDescription  = false;
     bool hasGenre        = false;
+    bool hasCopyright    = false;
+    bool hasAlbum        = false;
+    bool hasDescription  = false;
     bool hasDate         = false;
     bool hasPublisher    = false;
+    bool hasTrackTotal   = false;
 
     for( ; i_comment > 0; i_comment-- )
     {
@@ -196,6 +196,9 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
         has##var = true; \
     }
         IF_EXTRACT("TITLE=", Title )
+        else IF_EXTRACT("ARTIST=", Artist )
+        else IF_EXTRACT("GENRE=", Genre )
+        else IF_EXTRACT("COPYRIGHT=", Copyright )
         else IF_EXTRACT("ALBUM=", Album )
         else if( !strncasecmp(psz_comment, "TRACKNUMBER=", strlen("TRACKNUMBER=" ) ) )
         {
@@ -218,13 +221,10 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
         else if( !strncasecmp(psz_comment, "TOTALTRACKS=", strlen("TOTALTRACKS=")))
             vlc_meta_Set( p_meta, vlc_meta_TrackTotal, &psz_comment[strlen("TOTALTRACKS=")] );
         else IF_EXTRACT("TOTALTRACKS=", TrackTotal )
-        else IF_EXTRACT("ARTIST=", Artist )
-        else IF_EXTRACT("COPYRIGHT=", Copyright )
-        else IF_EXTRACT("ORGANIZATION=", Publisher )
         else IF_EXTRACT("DESCRIPTION=", Description )
         else IF_EXTRACT("COMMENTS=", Description )
-        else IF_EXTRACT("GENRE=", Genre )
         else IF_EXTRACT("DATE=", Date )
+        else IF_EXTRACT("ORGANIZATION=", Publisher )
         else if( !strncasecmp( psz_comment, "METADATA_BLOCK_PICTURE=", strlen("METADATA_BLOCK_PICTURE=")))
         {
             if( attachments == NULL )
