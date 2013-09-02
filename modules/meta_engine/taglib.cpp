@@ -69,6 +69,10 @@
 # endif
 #endif
 
+#if TAGLIB_VERSION >= VERSION_INT(1,9,0)
+# include <opusfile.h>
+#endif
+
 #include <apetag.h>
 #include <flacfile.h>
 #include <mpcfile.h>
@@ -643,6 +647,10 @@ static int ReadMeta( vlc_object_t* p_this)
             ReadMetaFromXiph( ogg_speex->tag(), p_demux_meta, p_meta );
         else if( Ogg::Vorbis::File* ogg_vorbis = dynamic_cast<Ogg::Vorbis::File*>(f.file()) )
             ReadMetaFromXiph( ogg_vorbis->tag(), p_demux_meta, p_meta );
+#if defined(TAGLIB_OPUSFILE_H)
+        else if( Ogg::Opus::File* ogg_opus = dynamic_cast<Ogg::Opus::File*>(f.file()) )
+            ReadMetaFromXiph( ogg_opus->tag(), p_demux_meta, p_meta );
+#endif
     }
     else if( dynamic_cast<RIFF::File*>(f.file()) )
     {
@@ -952,6 +960,10 @@ static int WriteMeta( vlc_object_t *p_this )
             WriteMetaToXiph( ogg_speex->tag(), p_item );
         else if( Ogg::Vorbis::File* ogg_vorbis = dynamic_cast<Ogg::Vorbis::File*>(f.file()) )
             WriteMetaToXiph( ogg_vorbis->tag(), p_item );
+#if defined(TAGLIB_OPUSFILE_H)
+        else if( Ogg::Opus::File* ogg_opus = dynamic_cast<Ogg::Opus::File*>(f.file()) )
+            WriteMetaToXiph( ogg_opus->tag(), p_item );
+#endif
     }
     else if( dynamic_cast<RIFF::File*>(f.file()) )
     {
