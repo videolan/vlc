@@ -166,7 +166,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     description_text = new QTextEdit;
     description_text->setAcceptRichText( false );
     metaLayout->addWidget( description_text, line, 0, 1, 7 );
-    // CONNECT( description_text, textChanged(), this, enterEditMode() ); //FIXME
+    CONNECT( description_text, textChanged(), this, enterEditMode() );
     line++;
 
     /* VLC_META_SETTING: Useless */
@@ -238,7 +238,10 @@ void MetaPanel::update( input_item_t *p_item )
     UPDATE_META( Genre, genre_text );
     UPDATE_META( Copyright, copyright_text );
     UPDATE_META( Album, collection_text );
+    disconnect( description_text, SIGNAL(textChanged()), this,
+                SLOT(enterEditMode()) );
     UPDATE_META( Description, description_text );
+    CONNECT( description_text, textChanged(), this, enterEditMode() );
     UPDATE_META( Language, language_text );
     UPDATE_META( NowPlaying, nowplaying_text );
     UPDATE_META( Publisher, publisher_text );
@@ -341,7 +344,10 @@ void MetaPanel::clear()
     collection_text->clear();
     seqnum_text->clear();
     seqtot_text->clear();
+    disconnect( description_text, SIGNAL(textChanged()), this,
+                SLOT(enterEditMode()) );
     description_text->clear();
+    CONNECT( description_text, textChanged(), this, enterEditMode() );
     date_text->clear();
     language_text->clear();
     nowplaying_text->clear();
