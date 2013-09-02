@@ -704,16 +704,12 @@ void NetOpenPanel::updateMRL()
 
 QValidator::State UrlValidator::validate( QString& str, int& ) const
 {
+    str = str.trimmed();
     if( str.contains( ' ' ) )
         return QValidator::Invalid;
     if( !str.contains( "://" ) )
         return QValidator::Intermediate;
     return QValidator::Acceptable;
-}
-
-void UrlValidator::fixup( QString& str ) const
-{
-    str = str.trimmed();
 }
 
 /**************************************************************************
