@@ -570,10 +570,8 @@ static void Pause(audio_output_t *aout, bool paused, mtime_t date)
         msg_Dbg(aout, "resuming after %"PRId64" us", date);
         sys->paused = VLC_TS_INVALID;
 
-        if (sys->first_pts != VLC_TS_INVALID) {
-            sys->first_pts += date;
-            stream_start(s, aout);
-        }
+        if (likely(sys->first_pts != VLC_TS_INVALID))
+            stream_start_now(s, aout);
     }
 
     pa_threaded_mainloop_unlock(sys->mainloop);
