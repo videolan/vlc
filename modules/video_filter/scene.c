@@ -30,6 +30,8 @@
 # include "config.h"
 #endif
 
+#include <limits.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_block.h>
@@ -112,8 +114,8 @@ vlc_module_begin ()
                  REPLACE_TEXT, REPLACE_LONGTEXT, false )
 
     /* Snapshot method */
-    add_integer( CFG_PREFIX "ratio", 50,
-                 RATIO_TEXT, RATIO_LONGTEXT, false )
+    add_integer_with_range( CFG_PREFIX "ratio", 50, 1, INT_MAX,
+                            RATIO_TEXT, RATIO_LONGTEXT, false )
 
     set_callbacks( Create, Destroy )
 vlc_module_end ()
@@ -188,6 +190,8 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_width = var_CreateGetInteger( p_this, CFG_PREFIX "width" );
     p_sys->i_height = var_CreateGetInteger( p_this, CFG_PREFIX "height" );
     p_sys->i_ratio = var_CreateGetInteger( p_this, CFG_PREFIX "ratio" );
+    if( p_sys->i_ratio <= 0)
+        p_sys->i_ratio = 1;
     p_sys->b_replace = var_CreateGetBool( p_this, CFG_PREFIX "replace" );
     p_sys->psz_prefix = var_CreateGetString( p_this, CFG_PREFIX "prefix" );
     p_sys->psz_path = var_GetNonEmptyString( p_this, CFG_PREFIX "path" );
