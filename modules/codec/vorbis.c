@@ -569,14 +569,11 @@ static void ParseVorbisComments( decoder_t *p_dec )
             break;
         psz_name = psz_comment;
         psz_value = strchr( psz_comment, '=' );
-        if( psz_value )
+        /* Don't add empty values */
+        if( psz_value && psz_value[1] != '\0')
         {
             *psz_value = '\0';
             psz_value++;
-
-            /* Don't add empty values */
-            if( *psz_value == '\0' )
-                break;
 
             if( !strcasecmp( psz_name, "REPLAYGAIN_TRACK_GAIN" ) ||
                 !strcasecmp( psz_name, "RG_RADIO" ) )
