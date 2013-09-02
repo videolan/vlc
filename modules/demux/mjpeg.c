@@ -508,8 +508,13 @@ static int MimeDemux( demux_t *p_demux )
             }
         }
 
-        if( !strncmp( p_sys->psz_separator, (char *)(p_sys->p_peek + i + 2),
-                      strlen( p_sys->psz_separator ) ) )
+        /* Handle old and new style of separators */
+        if (!strncmp(p_sys->psz_separator, (char *)(p_sys->p_peek + i + 2),
+                     strlen( p_sys->psz_separator ))
+         || ((strlen(p_sys->psz_separator) > 4)
+          && !strncmp(p_sys->psz_separator, "--", 2)
+          && !strncmp(p_sys->psz_separator, (char *)(p_sys->p_peek + i),
+                      strlen( p_sys->psz_separator))))
         {
             break;
         }
