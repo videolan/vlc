@@ -429,12 +429,12 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_meta_t* p_demux_meta, vlc_
 static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta, vlc_meta_t* p_meta )
 {
     StringList list;
+    bool hasTrackTotal = false;
 #define SET( keyName, metaName )                                               \
     list = tag->fieldListMap()[keyName];                                       \
     if( !list.isEmpty() )                                                      \
         vlc_meta_Set##metaName( p_meta, (*list.begin()).toCString( true ) );
 
-    SET( "TRACKTOTAL", TrackTotal );
     SET( "COPYRIGHT", Copyright );
     SET( "ORGANIZATION", Publisher );
     SET( "DATE", Date );
@@ -442,6 +442,34 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
     SET( "RATING", Rating );
     SET( "LANGUAGE", Language );
 #undef SET
+
+    list = tag->fieldListMap()["TRACKNUMBER"];
+    if( !list.isEmpty() )
+    {
+        const char *psz_value;
+        unsigned short u_track;
+        unsigned short u_total;
+        psz_value = (*list.begin()).toCString( true );
+        if( sscanf( psz_value, "%hu/%hu", &u_track, &u_total ) == 2)
+        {
+            char str[6];
+            snprintf(str, 6, "%u", u_track);
+            vlc_meta_SetTrackNum( p_meta, str);
+            snprintf(str, 6, "%u", u_total);
+            vlc_meta_SetTrackTotal( p_meta, str);
+            hasTrackTotal = true;
+        }
+        else
+            vlc_meta_SetTrackNum( p_meta, psz_value);
+    }
+    if( !hasTrackTotal )
+    {
+        list = tag->fieldListMap()["TRACKTOTAL"];
+        if( list.isEmpty() )
+            list = tag->fieldListMap()["TOTALTRACKS"];
+        if( !list.isEmpty() )
+            vlc_meta_SetTrackTotal( p_meta, (*list.begin()).toCString( true ) );
+    }
 
     // Try now to get embedded art
     StringList mime_list = tag->fieldListMap()[ "COVERARTMIME" ];
