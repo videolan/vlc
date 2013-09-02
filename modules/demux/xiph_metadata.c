@@ -158,9 +158,13 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
     bool hasGenre        = false;
     bool hasCopyright    = false;
     bool hasAlbum        = false;
+    bool hasTrackNum     = false;
     bool hasDescription  = false;
+    bool hasRating       = false;
     bool hasDate         = false;
+    bool hasLanguage     = false;
     bool hasPublisher    = false;
+    bool hasEncodedBy    = false;
     bool hasTrackTotal   = false;
 
     for( ; i_comment > 0; i_comment-- )
@@ -195,12 +199,20 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
             vlc_meta_Set( p_meta, vlc_meta_ ## var, &psz_comment[strlen(txt)] ); \
         has##var = true; \
     }
+
+#define IF_EXTRACT_ONCE(txt,var) \
+    if( !strncasecmp(psz_comment, txt, strlen(txt)) && !has##var ) \
+    { \
+        vlc_meta_Set( p_meta, vlc_meta_ ## var, &psz_comment[strlen(txt)] ); \
+        has##var = true; \
+    }
+
         IF_EXTRACT("TITLE=", Title )
         else IF_EXTRACT("ARTIST=", Artist )
         else IF_EXTRACT("GENRE=", Genre )
         else IF_EXTRACT("COPYRIGHT=", Copyright )
         else IF_EXTRACT("ALBUM=", Album )
-        else if( !strncasecmp(psz_comment, "TRACKNUMBER=", strlen("TRACKNUMBER=" ) ) )
+        else if( !hasTrackNum && !strncasecmp(psz_comment, "TRACKNUMBER=", strlen("TRACKNUMBER=" ) ) )
         {
             /* Yeah yeah, such a clever idea, let's put xx/xx inside TRACKNUMBER
              * Oh, and let's not use TRACKTOTAL or TOTALTRACKS... */
@@ -208,23 +220,29 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
             if( sscanf( &psz_comment[strlen("TRACKNUMBER=")], "%hu/%hu", &u_track, &u_total ) == 2 )
             {
                 char str[6];
-                snprintf(str, 6, "%d", u_track);
+                snprintf(str, 6, "%u", u_track);
                 vlc_meta_Set( p_meta, vlc_meta_TrackNumber, str );
-                snprintf(str, 6, "%d", u_total);
+                hasTrackNum = true;
+                snprintf(str, 6, "%u", u_total);
                 vlc_meta_Set( p_meta, vlc_meta_TrackTotal, str );
+                hasTrackTotal = true;
             }
             else
+            {
                 vlc_meta_Set( p_meta, vlc_meta_TrackNumber, &psz_comment[strlen("TRACKNUMBER=")] );
+                hasTrackNum = true;
+            }
         }
-        else if( !strncasecmp(psz_comment, "TRACKTOTAL=", strlen("TRACKTOTAL=")))
-            vlc_meta_Set( p_meta, vlc_meta_TrackTotal, &psz_comment[strlen("TRACKTOTAL=")] );
-        else if( !strncasecmp(psz_comment, "TOTALTRACKS=", strlen("TOTALTRACKS=")))
-            vlc_meta_Set( p_meta, vlc_meta_TrackTotal, &psz_comment[strlen("TOTALTRACKS=")] );
-        else IF_EXTRACT("TOTALTRACKS=", TrackTotal )
+        else IF_EXTRACT_ONCE("TRACKTOTAL=", TrackTotal )
+        else IF_EXTRACT_ONCE("TOTALTRACKS=", TrackTotal )
         else IF_EXTRACT("DESCRIPTION=", Description )
+        else IF_EXTRACT("COMMENT=", Description )
         else IF_EXTRACT("COMMENTS=", Description )
+        else IF_EXTRACT("RATING=", Rating )
         else IF_EXTRACT("DATE=", Date )
+        else IF_EXTRACT("LANGUAGE=", Language )
         else IF_EXTRACT("ORGANIZATION=", Publisher )
+        else IF_EXTRACT("ENCODER=", EncodedBy )
         else if( !strncasecmp( psz_comment, "METADATA_BLOCK_PICTURE=", strlen("METADATA_BLOCK_PICTURE=")))
         {
             if( attachments == NULL )
