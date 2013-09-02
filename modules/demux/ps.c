@@ -542,13 +542,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
 
         case DEMUX_SET_TITLE:
-            return stream_Control( p_demux->s, STREAM_SET_TITLE, args );
+            return stream_vaControl( p_demux->s, STREAM_SET_TITLE, args );
 
         case DEMUX_SET_SEEKPOINT:
-            return stream_Control( p_demux->s, STREAM_SET_SEEKPOINT, args );
+            return stream_vaControl( p_demux->s, STREAM_SET_SEEKPOINT, args );
 
         case DEMUX_GET_META:
-            return stream_Control( p_demux->s, STREAM_GET_META, args );
+            return stream_vaControl( p_demux->s, STREAM_GET_META, args );
 
         case DEMUX_GET_FPS:
         default:
