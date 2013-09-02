@@ -298,6 +298,7 @@ void MetaPanel::saveMeta()
     input_item_SetTrackNum(  p_input, qtu( seqnum_text->text() ) );
     input_item_SetTrackTotal(  p_input, qtu( seqtot_text->text() ) );
     input_item_SetDate(  p_input, qtu( date_text->text() ) );
+    input_item_SetLanguage(  p_input, qtu( language_text->text() ) );
 
     input_item_SetCopyright( p_input, qtu( copyright_text->text() ) );
     input_item_SetPublisher( p_input, qtu( publisher_text->text() ) );
