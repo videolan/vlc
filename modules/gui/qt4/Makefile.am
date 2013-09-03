@@ -111,6 +111,7 @@ libqt4_plugin_la_SOURCES = \
 	util/qmenuview.cpp util/qmenuview.hpp \
 	util/qt_dirs.cpp util/qt_dirs.hpp \
 	util/pictureflow.cpp util/pictureflow.hpp \
+	util/validators.cpp util/validators.hpp \
 	util/buttons/BrowseButton.cpp util/buttons/BrowseButton.hpp \
 	util/buttons/DeckButtonsLayout.cpp util/buttons/DeckButtonsLayout.hpp \
 	util/buttons/RoundButton.cpp util/buttons/RoundButton.hpp \
@@ -199,6 +200,7 @@ nodist_libqt4_plugin_la_SOURCES = \
 	util/qmenuview.moc.cpp \
 	util/qvlcapp.moc.cpp \
 	util/pictureflow.moc.cpp \
+	util/validators.moc.cpp \
 	util/buttons/RoundButton.moc.cpp \
 	util/buttons/DeckButtonsLayout.moc.cpp \
 	util/buttons/BrowseButton.moc.cpp \

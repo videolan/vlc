@@ -35,6 +35,7 @@
 #include "dialogs/open.hpp"
 #include "dialogs_provider.hpp" /* Open Subtitle file */
 #include "util/qt_dirs.hpp"
+#include "util/validators.hpp"
 #include <vlc_intf_strings.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
@@ -700,16 +701,6 @@ void NetOpenPanel::updateMRL()
     QStringList qsl;
     if( !url.isEmpty() ) qsl << url;
     emit mrlUpdated( qsl, "" );
-}
-
-QValidator::State UrlValidator::validate( QString& str, int& ) const
-{
-    str = str.trimmed();
-    if( str.contains( ' ' ) )
-        return QValidator::Invalid;
-    if( !str.contains( "://" ) )
-        return QValidator::Intermediate;
-    return QValidator::Acceptable;
 }
 
 /**************************************************************************
