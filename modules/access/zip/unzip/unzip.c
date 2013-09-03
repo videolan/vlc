@@ -161,10 +161,10 @@ typedef struct
 */
 
 
-local int unzlocal_getByte OF((
+local int unzlocal_getByte (
     const zlib_filefunc_def* pzlib_filefunc_def,
     voidpf filestream,
-    int *pi));
+    int *pi);
 
 local int unzlocal_getByte(pzlib_filefunc_def,filestream,pi)
     const zlib_filefunc_def* pzlib_filefunc_def;
@@ -191,10 +191,10 @@ local int unzlocal_getByte(pzlib_filefunc_def,filestream,pi)
 /* ===========================================================================
    Reads a long in LSB order from the given gz_stream. Sets
 */
-local int unzlocal_getShort OF((
+local int unzlocal_getShort (
     const zlib_filefunc_def* pzlib_filefunc_def,
     voidpf filestream,
-    uLong *pX));
+    uLong *pX);
 
 local int unzlocal_getShort (pzlib_filefunc_def,filestream,pX)
     const zlib_filefunc_def* pzlib_filefunc_def;
@@ -219,10 +219,10 @@ local int unzlocal_getShort (pzlib_filefunc_def,filestream,pX)
     return err;
 }
 
-local int unzlocal_getLong OF((
+local int unzlocal_getLong (
     const zlib_filefunc_def* pzlib_filefunc_def,
     voidpf filestream,
-    uLong *pX));
+    uLong *pX);
 
 local int unzlocal_getLong (pzlib_filefunc_def,filestream,pX)
     const zlib_filefunc_def* pzlib_filefunc_def;
@@ -322,9 +322,9 @@ extern int ZEXPORT unzStringFileNameCompare (fileName1,fileName2,iCaseSensitivit
   Locate the Central directory of a zipfile (at the end, just before
     the global comment)
 */
-local uLong unzlocal_SearchCentralDir OF((
+local uLong unzlocal_SearchCentralDir (
     const zlib_filefunc_def* pzlib_filefunc_def,
-    voidpf filestream));
+    voidpf filestream);
 
 local uLong unzlocal_SearchCentralDir(pzlib_filefunc_def,filestream)
     const zlib_filefunc_def* pzlib_filefunc_def;
@@ -561,16 +561,16 @@ local void unzlocal_DosDateToTmuDate (ulDosDate, ptm)
 /*
   Get Info about the current file in the zipfile, with internal only info
 */
-local int unzlocal_GetCurrentFileInfoInternal OF((unzFile file,
-                                                  unz_file_info *pfile_info,
-                                                  unz_file_info_internal
-                                                  *pfile_info_internal,
-                                                  char *szFileName,
-                                                  uLong fileNameBufferSize,
-                                                  void *extraField,
-                                                  uLong extraFieldBufferSize,
-                                                  char *szComment,
-                                                  uLong commentBufferSize));
+local int unzlocal_GetCurrentFileInfoInternal (unzFile file,
+                                               unz_file_info *pfile_info,
+                                               unz_file_info_internal
+                                               *pfile_info_internal,
+                                               char *szFileName,
+                                               uLong fileNameBufferSize,
+                                               void *extraField,
+                                               uLong extraFieldBufferSize,
+                                               char *szComment,
+                                               uLong commentBufferSize);
 
 local int unzlocal_GetCurrentFileInfoInternal (file,
                                               pfile_info,
