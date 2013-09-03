@@ -174,6 +174,8 @@ struct vout_display_sys_t
         RGBQUAD    blue;
     };
 #endif
+
+    HDC affinityHDC; // DC for the selected GPU
 };
 
 /*****************************************************************************
