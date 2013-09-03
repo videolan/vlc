@@ -79,6 +79,13 @@ RequestExecutionLevel user
   ; Instfiles page
     !insertmacro MUI_PAGE_INSTFILES
   ; Finish page
+
+    Function AppExecAs
+      Exec '"$WINDIR\explorer.exe" "$INSTDIR\vlc.exe"'
+    FunctionEnd
+
+    !define MUI_FINISHPAGE_RUN
+    !define MUI_FINISHPAGE_RUN_FUNCTION AppExecAs
     !define MUI_FINISHPAGE_LINK $Link_VisitWebsite
     !define MUI_FINISHPAGE_LINK_LOCATION "http://www.videolan.org/vlc/"
     !define MUI_FINISHPAGE_NOREBOOTSUPPORT
