@@ -27,6 +27,7 @@
 
 #include "dialogs/openurl.hpp"
 #include "util/searchlineedit.hpp"
+#include "util/validators.hpp"
 
 #include <QPushButton>
 #include <QDialogButtonBox>
@@ -62,6 +63,7 @@ OpenUrlDialog::OpenUrlDialog( intf_thread_t *_p_intf,
 
     /* Info label and line edit */
     edit = new ClickLineEdit( qtr( "Enter URL here..." ), this );
+    edit->setValidator( new UrlValidator( edit ) );
 
     QLabel *info = new QLabel( qtr( "Please enter the URL or path "
                                     "to the media you want to play."),
