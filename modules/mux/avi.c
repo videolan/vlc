@@ -43,12 +43,37 @@
 static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
+#define SOUT_CFG_PREFIX "sout-avi-"
+
+#define CFG_ARTIST_TEXT     N_("Artist")
+#define CFG_DATE_TEXT       N_("Date")
+#define CFG_GENRE_TEXT      N_("Genre")
+#define CFG_COPYRIGHT_TEXT  N_("Copyright")
+#define CFG_COMMENT_TEXT    N_("Comment")
+#define CFG_NAME_TEXT       N_("Name")
+#define CFG_SUBJECT_TEXT    N_("Subject")
+#define CFG_ENCODER_TEXT    N_("Encoder")
+#define CFG_KEYWORDS_TEXT   N_("Keywords")
+
 vlc_module_begin ()
     set_description( N_("AVI muxer") )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_MUX )
     set_capability( "sout mux", 5 )
     add_shortcut( "avi" )
+
+    add_string( SOUT_CFG_PREFIX "artist", NULL,    CFG_ARTIST_TEXT, NULL, true )
+    add_string( SOUT_CFG_PREFIX "date",   NULL,    CFG_DATE_TEXT, NULL, true )
+    add_string( SOUT_CFG_PREFIX "genre",  NULL,    CFG_GENRE_TEXT, NULL, true )
+    add_string( SOUT_CFG_PREFIX "copyright", NULL, CFG_COPYRIGHT_TEXT, NULL, true )
+    add_string( SOUT_CFG_PREFIX "comment", NULL,   CFG_COMMENT_TEXT, NULL, true )
+    add_string( SOUT_CFG_PREFIX "name", NULL,      CFG_NAME_TEXT, NULL, true )
+    add_string( SOUT_CFG_PREFIX "subject", NULL,   CFG_SUBJECT_TEXT, NULL, true )
+    add_string( SOUT_CFG_PREFIX "encoder",
+                "VLC Media Player - " VERSION_MESSAGE,
+                                                   CFG_ENCODER_TEXT, NULL, true )
+    add_string( SOUT_CFG_PREFIX "keywords", NULL,  CFG_KEYWORDS_TEXT, NULL, true )
+
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -851,6 +876,47 @@ static int avi_HeaderAdd_strl( buffer_out_t *p_bo, avi_stream_t *p_stream )
     AVI_BOX_EXIT( 0 );
 }
 
+static int avi_HeaderAdd_meta( buffer_out_t *p_bo, const char psz_meta[4],
+                               const char *psz_data )
+{
+    if ( psz_data == NULL ) return 1;
+    const char *psz = psz_data;
+    AVI_BOX_ENTER( psz_meta );
+    while (*psz) bo_AddByte( p_bo, *psz++ );
+    bo_AddByte( p_bo, 0 );
+    AVI_BOX_EXIT( 0 );
+}
+
+static int avi_HeaderAdd_INFO( sout_mux_t *p_mux, buffer_out_t *p_bo )
+{
+    char *psz;
+
+#define APPLY_META(var, fourcc) \
+    psz = var_InheritString( p_mux, SOUT_CFG_PREFIX var );\
+    if ( psz )\
+    {\
+        avi_HeaderAdd_meta( p_bo, fourcc, psz );\
+        free( psz );\
+    }
+
+    AVI_BOX_ENTER_LIST( "INFO" );
+
+    APPLY_META( "artist",   "IART")
+    APPLY_META( "comment",  "ICMT")
+    APPLY_META( "copyright","ICOP")
+    APPLY_META( "date",     "ICRD")
+    APPLY_META( "genre",    "IGNR")
+    APPLY_META( "name",     "INAM")
+    APPLY_META( "keywords", "IKEY")
+    APPLY_META( "subject",  "ISBJ")
+    APPLY_META( "encoder",  "ISFT")
+    /* Some are missing, but are they really useful ?? */
+
+#undef APPLY_META
+
+    AVI_BOX_EXIT( 0 );
+}
+
 static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
 {
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
@@ -903,6 +969,8 @@ static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
     /* Now set hdrl size */
     bo_SetDWordLE( &bo, offsets.i_hdrllistsize, bo.i_buffer - offsets.i_hdrldatastart );
 
+    avi_HeaderAdd_INFO( p_mux, &bo );
+
     bo_AddFCC( &bo, "LIST" );
     bo_AddDWordLE( &bo, p_sys->i_movi_size + 4 );
     bo_AddFCC( &bo, "movi" );
@@ -941,4 +1009,3 @@ static block_t * avi_HeaderCreateidx1( sout_mux_t *p_mux )
 
     return( p_idx1 );
 }
-
