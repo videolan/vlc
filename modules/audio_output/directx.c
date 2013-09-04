@@ -384,7 +384,8 @@ static void Stop( audio_output_t *p_aout )
         IDirectSoundNotify_Release(p_sys->p_notify );
     p_sys->p_notify = NULL;
 
-    IDirectSoundBuffer_Stop( p_sys->p_dsbuffer );
+    if( p_sys->p_dsbuffer )
+        IDirectSoundBuffer_Stop( p_sys->p_dsbuffer );
     /* release the secondary buffer */
     DestroyDSBuffer( p_aout );
 
