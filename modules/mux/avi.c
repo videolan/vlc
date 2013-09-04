@@ -113,7 +113,7 @@ struct sout_mux_sys_t
 };
 
 // FIXME FIXME
-#define HDR_SIZE 10240
+#define HDR_MAX_SIZE 10240
 
 /* Flags in avih */
 #define AVIF_HASINDEX       0x00000010  // Index at end of file?
@@ -566,13 +566,20 @@ static void bo_Init( buffer_out_t *p_bo, int i_size, uint8_t *p_buffer )
     p_bo->i_buffer = 0;
     p_bo->p_buffer = p_buffer;
 }
+static void bo_SetByte( buffer_out_t *p_bo, int i_offset, uint8_t i )
+{
+    if( i_offset < p_bo->i_buffer_size )
+        p_bo->p_buffer[i_offset] = i;
+}
 static void bo_AddByte( buffer_out_t *p_bo, uint8_t i )
 {
-    if( p_bo->i_buffer < p_bo->i_buffer_size )
-    {
-        p_bo->p_buffer[p_bo->i_buffer] = i;
-    }
+    bo_SetByte( p_bo, p_bo->i_buffer, i );
     p_bo->i_buffer++;
+}
+static void bo_SetWordLE( buffer_out_t *p_bo, int i_offset, uint16_t i )
+{
+    bo_SetByte( p_bo, i_offset, i &0xff );
+    bo_SetByte( p_bo, i_offset + 1, ( ( i >> 8) &0xff ) );
 }
 static void bo_AddWordLE( buffer_out_t *p_bo, uint16_t i )
 {
@@ -583,6 +590,11 @@ static void bo_AddWordBE( buffer_out_t *p_bo, uint16_t i )
 {
     bo_AddByte( p_bo, ( ( i >> 8) &0xff ) );
     bo_AddByte( p_bo, i &0xff );
+}
+static void bo_SetDWordLE( buffer_out_t *p_bo, int i_offset, uint32_t i )
+{
+    bo_SetWordLE( p_bo, i_offset, i &0xffff );
+    bo_SetWordLE( p_bo, i_offset + 2, ( ( i >> 16) &0xffff ) );
 }
 static void bo_AddDWordLE( buffer_out_t *p_bo, uint32_t i )
 {
@@ -847,13 +859,20 @@ static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
     int                 i_junk;
     buffer_out_t        bo;
 
-    p_hdr = block_Alloc( HDR_SIZE );
-    memset( p_hdr->p_buffer, 0, HDR_SIZE );
+    struct
+    {
+        int i_riffsize;
+        int i_hdrllistsize;
+        int i_hdrldatastart;
+    } offsets;
 
-    bo_Init( &bo, HDR_SIZE, p_hdr->p_buffer );
+    p_hdr = block_Alloc( HDR_MAX_SIZE );
+
+    bo_Init( &bo, HDR_MAX_SIZE, p_hdr->p_buffer );
 
     bo_AddFCC( &bo, "RIFF" );
-    bo_AddDWordLE( &bo, p_sys->i_movi_size + HDR_SIZE - 8 + p_sys->i_idx1_size );
+    offsets.i_riffsize = bo.i_buffer;
+    bo_AddDWordLE( &bo, 0xEFBEADDE );
     bo_AddFCC( &bo, "AVI " );
 
     bo_AddFCC( &bo, "LIST" );
@@ -862,8 +881,10 @@ static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
      *  - 8 (hdr1 LIST tag and its size)
      *  - 12 (movi LIST tag, size, 'movi' listType )
      */
-    bo_AddDWordLE( &bo, HDR_SIZE - 12 - 8 - 12);
+    offsets.i_hdrllistsize = bo.i_buffer;
+    bo_AddDWordLE( &bo, 0xEFBEADDE );
     bo_AddFCC( &bo, "hdrl" );
+    offsets.i_hdrldatastart = bo.i_buffer;
 
     avi_HeaderAdd_avih( p_mux, &bo );
     for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
@@ -871,14 +892,25 @@ static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
         avi_HeaderAdd_strl( &bo, &p_sys->stream[i_stream] );
     }
 
-    i_junk = HDR_SIZE - bo.i_buffer - 8 - 12;
+    /* align on 16 bytes */
+    int i_align = ( ( bo.i_buffer + 12 + 0xE ) & ~ 0xF );
+    i_junk = i_align - bo.i_buffer;
     bo_AddFCC( &bo, "JUNK" );
     bo_AddDWordLE( &bo, i_junk );
-
+    memset( &bo.p_buffer[bo.i_buffer], 0, i_junk );
     bo.i_buffer += i_junk;
+
+    /* Now set hdrl size */
+    bo_SetDWordLE( &bo, offsets.i_hdrllistsize, bo.i_buffer - offsets.i_hdrldatastart );
+
     bo_AddFCC( &bo, "LIST" );
     bo_AddDWordLE( &bo, p_sys->i_movi_size + 4 );
     bo_AddFCC( &bo, "movi" );
+
+    p_hdr->i_buffer = bo.i_buffer;
+
+    /* Now set RIFF size */
+    bo_SetDWordLE( &bo, offsets.i_riffsize, bo.i_buffer - 8 + p_sys->i_movi_size + p_sys->i_idx1_size );
 
     return( p_hdr );
 }
