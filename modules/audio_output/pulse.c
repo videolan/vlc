@@ -794,12 +794,12 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 
     /* Stream parameters */
-    const pa_stream_flags_t flags = sys->flags_force
-                                  | PA_STREAM_START_CORKED
-                                  | PA_STREAM_INTERPOLATE_TIMING
-                                  | PA_STREAM_NOT_MONOTONIC
-                                  | PA_STREAM_AUTO_TIMING_UPDATE
-                                  | PA_STREAM_FIX_RATE;
+    pa_stream_flags_t flags = sys->flags_force
+                            | PA_STREAM_START_CORKED
+                            | PA_STREAM_INTERPOLATE_TIMING
+                            | PA_STREAM_NOT_MONOTONIC
+                            | PA_STREAM_AUTO_TIMING_UPDATE
+                            | PA_STREAM_FIX_RATE;
 
     struct pa_buffer_attr attr;
     attr.maxlength = -1;
@@ -831,6 +831,12 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         pa_format_info_set_channels(formatv[formatc], ss.channels);
         pa_format_info_set_channel_map(formatv[formatc], &map);
         formatc++;
+
+        /* FIX flags are only permitted for PCM, and there is no way to pass
+         * different flags for different formats... */
+        flags &= ~(PA_STREAM_FIX_FORMAT
+                 | PA_STREAM_FIX_RATE
+                 | PA_STREAM_FIX_CHANNELS);
     }
 
     /* Fallback to PCM */
