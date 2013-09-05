@@ -126,11 +126,15 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
                                             AVCodecContext *p_context )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int aligns[AV_NUM_DATA_POINTERS];
     int width = p_context->coded_width;
     int height = p_context->coded_height;
 
-    avcodec_align_dimensions2(p_context, &width, &height, aligns);
+    if( p_sys->p_va == NULL )
+    {
+        int aligns[AV_NUM_DATA_POINTERS];
+
+        avcodec_align_dimensions2(p_context, &width, &height, aligns);
+    }
 
     if( width == 0 || height == 0)
         return NULL; /* invalid display size */
