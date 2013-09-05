@@ -1,3 +1,4 @@
+AUTOMAKE_OPTIONS = subdir-objects
 basedir = mmx
 include $(top_srcdir)/modules/common.am
 

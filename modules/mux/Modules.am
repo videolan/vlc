@@ -1,3 +1,5 @@
+AUTOMAKE_OPTIONS = subdir-objects
+
 SOURCES_mux_dummy = dummy.c
 SOURCES_mux_avi = avi.c
 SOURCES_mux_ogg = ogg.c

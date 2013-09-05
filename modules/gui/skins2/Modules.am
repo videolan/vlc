@@ -1,3 +1,5 @@
+AUTOMAKE_OPTIONS = subdir-objects
+
 SOURCES_skins2 = \
 	commands/async_queue.cpp \
 	commands/async_queue.hpp \

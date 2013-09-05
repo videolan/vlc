@@ -1,3 +1,5 @@
+AUTOMAKE_OPTIONS = subdir-objects
+
 SOURCES_stream_out_dummy = dummy.c
 SOURCES_stream_out_delay = delay.c
 SOURCES_stream_out_description = description.c

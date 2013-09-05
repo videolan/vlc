@@ -1,3 +1,5 @@
+AUTOMAKE_OPTIONS = subdir-objects
+
 noinst_HEADERS =
 
 SOURCES_a52 = a52.c a52.h

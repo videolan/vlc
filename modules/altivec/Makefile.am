@@ -1,3 +1,4 @@
+AUTOMAKE_OPTIONS = subdir-objects
 basedir = altivec
 include $(top_srcdir)/modules/common.am
 

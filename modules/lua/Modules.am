@@ -1,3 +1,5 @@
+AUTOMAKE_OPTIONS = subdir-objects
+
 SOURCES_lua = \
 	extension.c \
 	extension.h \

@@ -1,3 +1,5 @@
+AUTOMAKE_OPTIONS = subdir-objects
+
 SOURCES_flacsys = flac.c xiph_metadata.h xiph_metadata.c
 SOURCES_ogg = ogg.c ogg.h oggseek.c oggseek.h xiph_metadata.h xiph.h xiph_metadata.c
 SOURCES_demuxdump = demuxdump.c

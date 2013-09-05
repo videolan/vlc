@@ -1,3 +1,4 @@
+AUTOMAKE_OPTIONS = subdir-objects
 basedir = sse2
 include $(top_srcdir)/modules/common.am
 

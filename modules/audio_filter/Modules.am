@@ -1,3 +1,5 @@
+AUTOMAKE_OPTIONS = subdir-objects
+
 SOURCES_equalizer = equalizer.c equalizer_presets.h
 SOURCES_compressor = compressor.c
 SOURCES_karaoke = karaoke.c

@@ -1,3 +1,5 @@
+AUTOMAKE_OPTIONS = subdir-objects
+
 SOURCES_goom = goom.c
 SOURCES_projectm = projectm.cpp
 
