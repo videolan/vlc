@@ -39,12 +39,20 @@
 
 #include "omxil.h"
 #include "omxil_core.h"
+#include "OMX_Broadcom.h"
 
 #ifndef NDEBUG
 # define OMXIL_EXTRA_DEBUG
 #endif
 
 #define SENTINEL_FLAG 0x10000
+
+/* Defined in the broadcom version of OMX_Index.h */
+#define OMX_IndexConfigRequestCallback 0x7f000063
+#define OMX_IndexParamBrcmPixelAspectRatio 0x7f00004d
+
+/* Defined in the broadcom version of OMX_Core.h */
+#define OMX_EventParamOrConfigChanged 0x7F000001
 
 /*****************************************************************************
  * Local prototypes
@@ -345,6 +353,34 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
     return omx_error;
 }
 
+
+/*****************************************************************************
+ * UpdatePixelAspect: Update vlc pixel aspect based on the aspect reported on
+ * the omx port - NOTE: Broadcom specific
+ *****************************************************************************/
+static OMX_ERRORTYPE UpdatePixelAspect(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    OMX_CONFIG_POINTTYPE pixel_aspect;
+    OMX_INIT_STRUCTURE(pixel_aspect);
+    OMX_ERRORTYPE omx_err;
+
+    if (strncmp(p_sys->psz_component, "OMX.broadcom.", 13))
+        return OMX_ErrorNotImplemented;
+
+    pixel_aspect.nPortIndex = p_sys->out.i_port_index;
+    omx_err = OMX_GetParameter(p_sys->omx_handle,
+            OMX_IndexParamBrcmPixelAspectRatio, &pixel_aspect);
+    if (omx_err != OMX_ErrorNone) {
+        msg_Warn(p_dec, "Failed to retrieve aspect ratio");
+    } else {
+        p_dec->fmt_out.video.i_sar_num = pixel_aspect.nX;
+        p_dec->fmt_out.video.i_sar_den = pixel_aspect.nY;
+    }
+
+    return omx_err;
+}
+
 /*****************************************************************************
  * GetPortDefinition: set vlc format based on the definition of the omx port
  *****************************************************************************/
@@ -430,6 +466,7 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
             def->format.video.nStride = p_port->i_frame_stride;
 #endif
         p_port->i_frame_stride = def->format.video.nStride;
+        UpdatePixelAspect(p_dec);
         break;
 
     case AUDIO_ES:
@@ -683,6 +720,23 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
         }
     }
 
+    if(!strncmp(p_sys->psz_component, "OMX.broadcom.", 13))
+    {
+        OMX_CONFIG_REQUESTCALLBACKTYPE notifications;
+        OMX_INIT_STRUCTURE(notifications);
+
+        notifications.nPortIndex = p_sys->out.i_port_index;
+        notifications.nIndex = OMX_IndexParamBrcmPixelAspectRatio;
+        notifications.bEnable = OMX_TRUE;
+
+        omx_error = OMX_SetParameter(omx_handle,
+                OMX_IndexConfigRequestCallback, &notifications);
+        if (omx_error == OMX_ErrorNone)
+            msg_Dbg(p_dec, "Enabled aspect ratio notifications");
+        else
+            msg_Dbg(p_dec, "Could not enable aspect ratio notifications");
+    }
+
     /* Set port definitions */
     for(i = 0; i < p_sys->ports; i++)
     {
@@ -796,6 +850,12 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
         p_dec->fmt_out.video = p_dec->fmt_in.video;
         p_dec->fmt_out.audio = p_dec->fmt_in.audio;
         p_dec->fmt_out.i_codec = 0;
+
+        /* set default aspect of 1, if parser did not set it */
+        if (p_dec->fmt_out.video.i_sar_num == 0)
+            p_dec->fmt_out.video.i_sar_num = 1;
+        if (p_dec->fmt_out.video.i_sar_den == 0)
+            p_dec->fmt_out.video.i_sar_den = 1;
     }
     p_sys->b_enc = b_encode;
     InitOmxEventQueue(&p_sys->event_queue);
@@ -1614,6 +1674,9 @@ static OMX_ERRORTYPE OmxEventHandler( OMX_HANDLETYPE omx_handle,
         {
             msg_Dbg( p_dec, "Unhandled setting change %x", (unsigned int)data_2 );
         }
+        break;
+    case OMX_EventParamOrConfigChanged:
+        UpdatePixelAspect(p_dec);
         break;
 
     default:
