@@ -573,6 +573,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             int64_t i_block = p_sys->pp_seekpoints[i_seekpoint]->i_time_offset * p_sys->i_bitrate / INT64_C(8000000);
             if( stream_Seek( p_demux->s, i_block ) )
                 return VLC_EGENERIC;
+            p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
+            p_demux->info.i_seekpoint = i_seekpoint;
             return VLC_SUCCESS;
         }
 
