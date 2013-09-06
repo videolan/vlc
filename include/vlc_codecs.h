@@ -235,6 +235,7 @@ ATTR_PACKED
 #define WAVE_FORMAT_MPEGLAYER3          0x0055 /* ISO/MPEG Layer3 Format Tag */
 #define WAVE_FORMAT_AMR_NB              0x0057 /* AMR NB */
 #define WAVE_FORMAT_AMR_WB              0x0058 /* AMR Wideband */
+#define WAVE_FORMAT_G726_ADPCM          0x0064 /* G.726 ADPCM  */
 #define WAVE_FORMAT_VOXWARE_RT29        0x0075 /* VoxWare MetaSound */
 #define WAVE_FORMAT_DOLBY_AC3_SPDIF     0x0092 /* Sonic Foundry */
 
@@ -358,6 +359,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_TRUESPEECH, VLC_CODEC_TRUESPEECH,             "Truespeech" },
     { WAVE_FORMAT_GSM610,     VLC_CODEC_GSM_MS,                 "Microsoft WAV GSM" },
     { WAVE_FORMAT_G726,       VLC_CODEC_ADPCM_G726,             "G.726 ADPCM" },
+    { WAVE_FORMAT_G726_ADPCM, VLC_CODEC_ADPCM_G726,             "G.726 ADPCM" },
     { WAVE_FORMAT_G723_1,     VLC_CODEC_G723_1,                 "G.723.1" },
     { WAVE_FORMAT_MSG723,     VLC_CODEC_G723_1,                 "Microsoft G.723 [G723.1]" },
     { WAVE_FORMAT_MPEGLAYER3, VLC_CODEC_MPGA,                   "Mpeg Audio" },
