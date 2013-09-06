@@ -137,8 +137,7 @@ struct sout_mux_sys_t
 
 };
 
-// FIXME FIXME
-#define HDR_MAX_SIZE 10240
+#define HDR_BASE_SIZE 512 /* single video&audio ~ 400 bytes header */
 
 /* Flags in avih */
 #define AVIF_HASINDEX       0x00000010  // Index at end of file?
@@ -580,26 +579,36 @@ static int Mux      ( sout_mux_t *p_mux )
 typedef struct buffer_out_s
 {
     int      i_buffer_size;
-    int      i_buffer;
-    uint8_t  *p_buffer;
-
+    block_t  *p_block;
 } buffer_out_t;
 
-static void bo_Init( buffer_out_t *p_bo, int i_size, uint8_t *p_buffer )
+static void bo_Init( buffer_out_t *p_bo, int i_size )
 {
+    p_bo->p_block = block_Alloc( i_size );
+    p_bo->p_block->i_buffer = 0;
     p_bo->i_buffer_size = i_size;
-    p_bo->i_buffer = 0;
-    p_bo->p_buffer = p_buffer;
 }
+
 static void bo_SetByte( buffer_out_t *p_bo, int i_offset, uint8_t i )
 {
-    if( i_offset < p_bo->i_buffer_size )
-        p_bo->p_buffer[i_offset] = i;
+    if( i_offset >= p_bo->i_buffer_size )
+    {
+        int i_growth = HDR_BASE_SIZE;
+        while( i_offset >= p_bo->i_buffer_size + i_growth )
+        {
+            i_growth += HDR_BASE_SIZE;
+        }
+        int i = p_bo->p_block->i_buffer; /* Realloc would set payload size == buffer size */
+        p_bo->p_block = block_Realloc( p_bo->p_block, 0, p_bo->i_buffer_size + i_growth );
+        p_bo->p_block->i_buffer = i;
+        p_bo->i_buffer_size += i_growth;
+    }
+    p_bo->p_block->p_buffer[i_offset] = i;
 }
 static void bo_AddByte( buffer_out_t *p_bo, uint8_t i )
 {
-    bo_SetByte( p_bo, p_bo->i_buffer, i );
-    p_bo->i_buffer++;
+    bo_SetByte( p_bo, p_bo->p_block->i_buffer, i );
+    p_bo->p_block->i_buffer++;
 }
 static void bo_SetWordLE( buffer_out_t *p_bo, int i_offset, uint16_t i )
 {
@@ -670,9 +679,9 @@ static void bo_AddMem( buffer_out_t *p_bo, int i_size, uint8_t *p_mem )
  ****************************************************************************
  ****************************************************************************/
 #define AVI_BOX_ENTER( fcc ) \
-    buffer_out_t _bo_sav_; \
+    int i_datasize_offset; \
     bo_AddFCC( p_bo, fcc ); \
-    _bo_sav_ = *p_bo; \
+    i_datasize_offset = p_bo->p_block->i_buffer; \
     bo_AddDWordLE( p_bo, 0 )
 
 #define AVI_BOX_ENTER_LIST( fcc ) \
@@ -680,8 +689,8 @@ static void bo_AddMem( buffer_out_t *p_bo, int i_size, uint8_t *p_mem )
     bo_AddFCC( p_bo, fcc )
 
 #define AVI_BOX_EXIT( i_err ) \
-    if( p_bo->i_buffer&0x01 ) bo_AddByte( p_bo, 0 ); \
-    bo_AddDWordLE( &_bo_sav_, p_bo->i_buffer - _bo_sav_.i_buffer - 4 ); \
+    if( p_bo->p_block->i_buffer&0x01 ) bo_AddByte( p_bo, 0 ); \
+    bo_SetDWordLE( p_bo, i_datasize_offset, p_bo->p_block->i_buffer - i_datasize_offset - 4 ); \
     return( i_err );
 
 static int avi_HeaderAdd_avih( sout_mux_t *p_mux,
@@ -920,7 +929,6 @@ static int avi_HeaderAdd_INFO( sout_mux_t *p_mux, buffer_out_t *p_bo )
 static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
 {
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
-    block_t       *p_hdr;
     int                 i_stream;
     int                 i_junk;
     buffer_out_t        bo;
@@ -932,12 +940,10 @@ static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
         int i_hdrldatastart;
     } offsets;
 
-    p_hdr = block_Alloc( HDR_MAX_SIZE );
-
-    bo_Init( &bo, HDR_MAX_SIZE, p_hdr->p_buffer );
+    bo_Init( &bo, HDR_BASE_SIZE );
 
     bo_AddFCC( &bo, "RIFF" );
-    offsets.i_riffsize = bo.i_buffer;
+    offsets.i_riffsize = bo.p_block->i_buffer;
     bo_AddDWordLE( &bo, 0xEFBEADDE );
     bo_AddFCC( &bo, "AVI " );
 
@@ -947,10 +953,10 @@ static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
      *  - 8 (hdr1 LIST tag and its size)
      *  - 12 (movi LIST tag, size, 'movi' listType )
      */
-    offsets.i_hdrllistsize = bo.i_buffer;
+    offsets.i_hdrllistsize = bo.p_block->i_buffer;
     bo_AddDWordLE( &bo, 0xEFBEADDE );
     bo_AddFCC( &bo, "hdrl" );
-    offsets.i_hdrldatastart = bo.i_buffer;
+    offsets.i_hdrldatastart = bo.p_block->i_buffer;
 
     avi_HeaderAdd_avih( p_mux, &bo );
     for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
@@ -959,15 +965,18 @@ static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
     }
 
     /* align on 16 bytes */
-    int i_align = ( ( bo.i_buffer + 12 + 0xE ) & ~ 0xF );
-    i_junk = i_align - bo.i_buffer;
+    int i_align = ( ( bo.p_block->i_buffer + 12 + 0xE ) & ~ 0xF );
+    i_junk = i_align - bo.p_block->i_buffer;
     bo_AddFCC( &bo, "JUNK" );
     bo_AddDWordLE( &bo, i_junk );
-    memset( &bo.p_buffer[bo.i_buffer], 0, i_junk );
-    bo.i_buffer += i_junk;
+    for( int i=0; i< i_junk; i++ )
+    {
+        bo_AddByte( &bo, 0 );
+    }
 
     /* Now set hdrl size */
-    bo_SetDWordLE( &bo, offsets.i_hdrllistsize, bo.i_buffer - offsets.i_hdrldatastart );
+    bo_SetDWordLE( &bo, offsets.i_hdrllistsize,
+                   bo.p_block->i_buffer - offsets.i_hdrldatastart );
 
     avi_HeaderAdd_INFO( p_mux, &bo );
 
@@ -975,27 +984,24 @@ static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
     bo_AddDWordLE( &bo, p_sys->i_movi_size + 4 );
     bo_AddFCC( &bo, "movi" );
 
-    p_hdr->i_buffer = bo.i_buffer;
-
     /* Now set RIFF size */
-    bo_SetDWordLE( &bo, offsets.i_riffsize, bo.i_buffer - 8 + p_sys->i_movi_size + p_sys->i_idx1_size );
+    bo_SetDWordLE( &bo, offsets.i_riffsize, bo.p_block->i_buffer - 8
+                   + p_sys->i_movi_size + p_sys->i_idx1_size );
 
-    return( p_hdr );
+    return( bo.p_block );
 }
 
 static block_t * avi_HeaderCreateidx1( sout_mux_t *p_mux )
 {
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
-    block_t             *p_idx1;
     uint32_t            i_idx1_size;
     buffer_out_t        bo;
 
     i_idx1_size = 16 * p_sys->idx1.i_entry_count + 8;
 
-    p_idx1 = block_Alloc( i_idx1_size);
-    memset( p_idx1->p_buffer, 0, i_idx1_size);
+    bo_Init( &bo, i_idx1_size );
+    memset( bo.p_block->p_buffer, 0, i_idx1_size);
 
-    bo_Init( &bo, i_idx1_size, p_idx1->p_buffer );
     bo_AddFCC( &bo, "idx1" );
     bo_AddDWordLE( &bo, i_idx1_size - 8);
 
@@ -1007,5 +1013,5 @@ static block_t * avi_HeaderCreateidx1( sout_mux_t *p_mux )
         bo_AddDWordLE( &bo, p_sys->idx1.entry[i].i_length );
     }
 
-    return( p_idx1 );
+    return( bo.p_block );
 }
