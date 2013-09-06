@@ -30,7 +30,6 @@
 #include <QVariant>
 #include <assert.h>
 
-
 /***
  * This is a simple view, like a QListView, but displayed as a QMenu
  * So far, this is quite limited.
@@ -41,7 +40,7 @@
  *       - deal with a root item
  ***/
 
-Q_DECLARE_METATYPE(QModelIndex); // So we can store it in a QVariant
+Q_DECLARE_METATYPE(QPersistentModelIndex); // So we can store it in a QVariant
 
 QMenuView::QMenuView( QWidget * parent, int _iMaxVisibleCount )
           : QMenu( parent ), iMaxVisibleCount( _iMaxVisibleCount )
@@ -107,7 +106,7 @@ QAction* QMenuView::createActionFromIndex( QModelIndex index )
     action->setEnabled( index.flags().testFlag( Qt::ItemIsEnabled ) );
 
     /* */
-    QVariant variant; variant.setValue( index );
+    QVariant variant; variant.setValue( QPersistentModelIndex( index ) );
     action->setData( variant );
 
     return action;
@@ -119,9 +118,9 @@ void QMenuView::activate( QAction* action )
     assert( m_model );
 
     QVariant variant = action->data();
-    if( variant.canConvert<QModelIndex>() )
+    if( variant.canConvert<QPersistentModelIndex>() )
     {
-        emit activated( variant.value<QModelIndex>());
+        emit activated( variant.value<QPersistentModelIndex>());
     }
 }
 
