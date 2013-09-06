@@ -108,6 +108,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     char *argv[argc + 3];
     BOOL crash_handling = TRUE;
     int j = 0;
+    char *lang = NULL;
 
     argv[j++] = FromWide( L"--media-library" );
     argv[j++] = FromWide( L"--no-ignore-config" );
@@ -117,6 +118,12 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         {
             crash_handling = FALSE;
             continue; /* don't give argument to libvlc */
+        }
+        if (!wcsncmp(wargv[i], L"--language", 10) )
+        {
+            if (i < argc - 1 && wcsncmp( wargv[i + 1], L"--", 2 ))
+                lang = FromWide (wargv[++i]);
+            continue;
         }
 
         argv[j++] = FromWide (wargv[i]);
@@ -140,6 +147,30 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
 
     _setmode( STDIN_FILENO, _O_BINARY ); /* Needed for pipes */
+
+    /* */
+    if (!lang)
+    {
+        HKEY h_key;
+        if( RegOpenKeyEx( HKEY_CURRENT_USER, TEXT("Software\\VideoLAN\\VLC\\"), 0, KEY_READ, &h_key )
+                == ERROR_SUCCESS )
+        {
+            TCHAR szData[256];
+            DWORD len = 256;
+            if( RegQueryValueEx( h_key, TEXT("Lang"), NULL, NULL, (LPBYTE) &szData, &len ) == ERROR_SUCCESS )
+                lang = FromWide( szData );
+        }
+    }
+
+    if (lang && strncmp( lang, "auto", 4 ) )
+    {
+        char *tmp;
+        if (asprintf(&tmp, "LANG=%s", lang) != -1 ) {
+            putenv(tmp);
+            free(tmp);
+        }
+    }
+    free(lang);
 
     /* Initialize libvlc */
     libvlc_instance_t *vlc;
