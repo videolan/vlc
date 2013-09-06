@@ -1110,7 +1110,7 @@ void VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
     PLModel *model = PLModel::getPLModel( p_intf );
     plMenu->setModel( model );
     CONNECT( plMenu, activated(const QModelIndex&),
-             model, activateItem(const QModelIndex&));
+             model->sigs, activateItemSlot(const QModelIndex&));
     menu->addMenu( plMenu );
 
     /* Static entries for ending, like open */
