@@ -164,11 +164,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     if (lang && strncmp( lang, "auto", 4 ) )
     {
-        char *tmp;
-        if (asprintf(&tmp, "LANG=%s", lang) != -1 ) {
-            putenv(tmp);
-            free(tmp);
-        }
+        char tmp[11];
+        snprintf(tmp, 11, "LANG=%s", lang);
+        putenv(tmp);
     }
     free(lang);
 
