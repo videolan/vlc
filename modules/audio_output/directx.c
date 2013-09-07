@@ -666,7 +666,7 @@ static int FillBuffer( audio_output_t *p_aout, block_t *p_buffer )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
-    size_t towrite = (p_buffer)?p_buffer->i_buffer:DS_BUF_SIZE;
+    size_t towrite = (p_buffer)? p_buffer->i_buffer : DS_BUF_SIZE;
     void *p_write_position, *p_wrap_around;
     unsigned long l_bytes1, l_bytes2;
     uint32_t i_read;
@@ -674,13 +674,18 @@ static int FillBuffer( audio_output_t *p_aout, block_t *p_buffer )
     mtime_t i_buf;
     HRESULT dsresult;
 
+    size_t toerase = p_sys->i_bytes_per_sample * p_sys->i_rate / 4;
+    mtime_t max = towrite;
+
     if( IDirectSoundBuffer_GetCurrentPosition( p_aout->sys->p_dsbuffer, (LPDWORD) &i_read, NULL) ==  DS_OK )
     {
-        /* Compute the outer interval between the write and read pointers within the ring buffer */
-        i_buf = (mtime_t)i_read - (mtime_t)p_aout->sys->i_write;
-        if( i_buf <= 0 )
-            i_buf += DS_BUF_SIZE;
+        max = (mtime_t)i_read - (mtime_t)p_aout->sys->i_write;
+        if( max <= 0 )
+            max += DS_BUF_SIZE;
     }
+
+    if( towrite + toerase <= max )
+        i_buf = towrite + toerase;
     else
         i_buf = towrite;
 
