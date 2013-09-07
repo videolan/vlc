@@ -96,6 +96,9 @@ public:
     virtual ~SPrefsPanel();
     void apply();
     void clean();
+#ifdef _WIN32
+    void cleanLang();
+#endif
 
 private:
     intf_thread_t *p_intf;
@@ -107,9 +110,12 @@ private:
     QStringList qs_filter;
     QButtonGroup *radioGroup;
 
+    char *lang;
+
 #ifdef _WIN32
     QList<QTreeWidgetItem *> listAsso;
     bool addType( const char * psz_ext, QTreeWidgetItem*, QTreeWidgetItem*, QVLCRegistry* );
+    void saveLang();
 #endif
 
 /* Display only the options for the selected audio output */
@@ -117,6 +123,7 @@ private slots:
     void lastfm_Changed( int );
     void updateAudioOptions( int );
     void updateAudioVolume( int );
+    void langChanged( int );
 #ifdef _WIN32
     void assoDialog();
     void saveAsso();
