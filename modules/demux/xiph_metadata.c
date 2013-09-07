@@ -280,7 +280,7 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
                 if( sscanf( p, "%d:%d:%d.%d", &h, &m, &s, &ms ) == 4 )
                 {
                     sk = vlc_seekpoint_New();
-                    sk->i_time_offset = ((h * 3600 + m * 60 + s) *1000 + ms) * 1000;
+                    sk->i_time_offset = (((int64_t)h * 3600 + (int64_t)m * 60 + (int64_t)s) * 1000 + ms) * 1000;
                     TAB_APPEND_CAST( (seekpoint_t**), *i_seekpoint, *ppp_seekpoint, sk );
                 }
             }
