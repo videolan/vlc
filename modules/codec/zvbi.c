@@ -362,7 +362,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         }
 
         if( i_lines > 0 )
-            vbi_decode( p_sys->p_vbi_dec, p_sliced, i_lines, (double)p_block->i_pts / 1000000 );
+            vbi_decode( p_sys->p_vbi_dec, p_sliced, i_lines, 0 );
     }
 
     /* */
