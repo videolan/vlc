@@ -570,9 +570,27 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
 
             Ogg_ResetStreamHelper( p_sys );
-            int64_t i_block = p_sys->pp_seekpoints[i_seekpoint]->i_time_offset * p_sys->i_bitrate / INT64_C(8000000);
-            if( stream_Seek( p_demux->s, i_block ) )
-                return VLC_EGENERIC;
+
+            if ( p_sys->i_bitrate == 0 )
+            {
+                /* we won't be able to find block by time
+                 * we'll need to bisect search from here
+                 * or use skeleton index if any (FIXME)
+                */
+                if ( p_sys->pp_stream[0]->fmt.i_codec == VLC_CODEC_OPUS )
+                {
+                    /* Granule = Freq * T + pre-skip */
+                    oggseek_find_frame ( p_demux, p_sys->pp_stream[0],
+                        ( p_sys->pp_seekpoints[i_seekpoint]->i_time_offset * 0.048 + p_sys->pp_stream[0]->i_pre_skip ) );
+                }
+                else return VLC_EGENERIC;
+            }
+            else
+            {
+                int64_t i_block = p_sys->pp_seekpoints[i_seekpoint]->i_time_offset * p_sys->i_bitrate / INT64_C(8000000);
+                if( stream_Seek( p_demux->s, i_block ) )
+                    return VLC_EGENERIC;
+            }
             p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
             p_demux->info.i_seekpoint = i_seekpoint;
             return VLC_SUCCESS;

@@ -38,7 +38,7 @@
 #include "ogg.h"
 #include "oggseek.h"
 
-
+//#define OGG_SEEK_DEBUG 1
 /************************************************************
 * index entries
 *************************************************************/
@@ -214,10 +214,6 @@ static int64_t get_data( demux_t *p_demux, int64_t i_bytes_to_read )
     return i_result;
 }
 
-
-
-
-
 /* Find the first first ogg page for p_stream between offsets i_pos1 and i_pos2,
    return file offset in bytes; -1 is returned on failure */
 
@@ -354,11 +350,6 @@ static int64_t find_first_page( demux_t *p_demux, int64_t i_pos1, int64_t i_pos2
         p_sys->i_input_position += i_result;
     }
 }
-
-
-
-
-
 
 
 
@@ -553,14 +544,20 @@ static int64_t ogg_seek( demux_t *p_demux, logical_stream_t *p_stream, int64_t i
             }
             break;
         }
-
-        if ( p_stream->fmt.i_codec == VLC_CODEC_THEORA )
+#ifdef OGG_SEEK_DEBUG
+        msg_Dbg( p_demux, "Bisecting startpos=%ld endpos=%ld kframe=%ld iframe=%ld",
+                 i_start_pos, i_end_pos, i_kframe, i_frame);
+#endif
+        if ( p_stream->fmt.i_codec == VLC_CODEC_THEORA || p_stream->fmt.i_codec == VLC_CODEC_OPUS )
         {
             i_pagepos = find_first_page( p_demux, i_start_pos, i_end_pos, p_stream,
                                          &i_kframe, &i_frame );
         }
         else return -1;
-
+#ifdef OGG_SEEK_DEBUG
+        msg_Dbg( p_demux, "Page Found startpos=%ld endpos=%ld kframe=%ld iframe=%ld pagepos=%ld",
+                 i_start_pos, i_end_pos, i_kframe, i_frame, i_pagepos);
+#endif
         if ( i_pagepos != -1 && i_kframe != -1 )
         {
             /* found a page */
@@ -588,7 +585,6 @@ static int64_t ogg_seek( demux_t *p_demux, logical_stream_t *p_stream, int64_t i
             }
 
             else i_start_pos = i_pagepos;
-
         }
         else
         {
@@ -635,7 +631,6 @@ static demux_index_entry_t *get_bounds_for ( logical_stream_t *p_stream, int64_t
 
     while ( idx != NULL )
     {
-
         if ( idx-> i_pagepos < 0 )
         {
             /* kframe was found to be invalid */
@@ -643,7 +638,7 @@ static demux_index_entry_t *get_bounds_for ( logical_stream_t *p_stream, int64_t
             continue;
         }
 
-        if ( p_stream->fmt.i_codec == VLC_CODEC_THEORA )
+        if ( p_stream->fmt.i_codec == VLC_CODEC_THEORA ||  p_stream->fmt.i_codec == VLC_CODEC_OPUS )
         {
             i_gpos = idx->i_value;
             i_kframe = i_gpos >> p_stream->i_granule_shift;
@@ -787,19 +782,31 @@ int oggseek_find_frame ( demux_t *p_demux, logical_stream_t *p_stream, int64_t i
     if ( fidx == NULL )
     {
         /* no exact match found; search the domain for highest keyframe <= i_cframe */
-
+#ifdef OGG_SEEK_DEBUG
+        msg_Dbg( p_demux, "Not found in index, searching");
+#endif
         i_granulepos = ogg_seek ( p_demux, p_stream, i_cframe, i_pos_lower, i_pos_upper,
                                   &i_pagepos, true );
         if ( i_granulepos == -1 )
         {
+#ifdef OGG_SEEK_DEBUG
+        msg_Err( p_demux, "Unable to find the requested frame");
+#endif
             return VLC_EGENERIC;
         }
-
     }
     else {
         i_granulepos = fidx->i_value;
     }
 
+    if ( p_stream->fmt.i_codec == VLC_CODEC_OPUS )
+    {
+#ifdef OGG_SEEK_DEBUG
+        msg_Dbg( p_demux, "OPUS seeks to granulepos %ld (%ld frames)", i_granulepos,  i_tframe - i_cframe );
+#endif
+        oggseek_theora_index_entry_add( p_stream, i_granulepos, p_sys->i_input_position );
+    }
+    else
     if ( p_stream->fmt.i_codec == VLC_CODEC_THEORA )
     {
         i_kframe = i_granulepos >> p_stream->i_granule_shift;
