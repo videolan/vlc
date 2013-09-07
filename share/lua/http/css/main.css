@@ -155,6 +155,8 @@ body{
 	background: none;
 	border: none;
 	display: inline-block;
+	list-style: none;
+	float:left;
 	cursor: pointer;
 	background-image: url("../images/buttons.png");
 	background-repeat: no-repeat;
