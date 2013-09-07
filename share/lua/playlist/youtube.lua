@@ -67,6 +67,83 @@ function get_fmt( fmt_list )
     return fmt
 end
 
+-- Descramble the URL signature using the javascript code that does that
+-- in the web page
+function js_descramble( sig, js_url )
+    -- Fetch javascript code
+    local js = vlc.stream( js_url )
+    if not js then
+        return sig
+    end
+    local lines = {}
+
+    -- Look for the descrambler function's name
+    local descrambler = nil
+    while not descrambler do
+        local line = js:readline()
+        if not line then
+            vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
+            return sig
+        end
+        -- Buffer lines for later, so we don't have to make a second
+        -- HTTP request later
+        table.insert( lines, line )
+        -- c&&(b.signature=ij(c));
+        descrambler = string.match( line, "%.signature=(.-)%(" )
+    end
+
+    -- Fetch the code of the descrambler function. Example:
+    -- function ij(a){a=a.split("");a=a.reverse();a=jj(a,12);a=jj(a,32);a=a.reverse();a=jj(a,34);a=a.slice(3);a=jj(a,35);a=jj(a,42);a=a.slice(2);return a.join("")}
+    local rules = nil
+    while not rules do
+        local line
+        if #lines > 0 then
+            line = table.remove( lines )
+        else
+            line = js:readline()
+            if not line then
+                vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
+                return sig
+            end
+        end
+        rules = string.match( line, "function "..descrambler.."%([^)]*%){(.-)}" )
+    end
+
+    -- Parse descrambling rules one by one and apply them on the
+    -- signature as we go
+    for rule in string.gmatch( rules, "[^;]+" ) do
+        -- a=a.reverse();
+        if string.match( rule, "%.reverse%(" ) then
+            sig = string.reverse( sig )
+        else
+
+        -- a=a.slice(3);
+        local len = string.match( rule, "%.slice%((%d+)%)" )
+        if len then
+            sig = string.sub( sig, len + 1 )
+        else
+
+        -- a=jj(a,32);
+        -- This is known to be a function swapping the first and nth
+        -- characters:
+        -- function jj(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c;return a}
+        local idx = string.match( rule, "=..%([^,]+,(%d+)%)" )
+        if idx then
+            idx = tonumber( idx )
+            if not idx then idx = 0 end
+            if idx > 1 then
+                sig = string.gsub( sig, "^(.)("..string.rep( ".", idx - 1 )..")(.)(.*)$", "%3%2%1%4" )
+            elseif idx == 1 then
+                sig = string.gsub( sig, "^(.)(.)", "%2%1" )
+            end
+        end end end
+
+        -- Simply ignore other statements, in particular initial split
+        -- and final join and return statements
+    end
+    return sig
+end
+
 function descramble81( sig )
     sig = string.reverse( sig )
     local s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13 =
@@ -74,21 +151,27 @@ function descramble81( sig )
     return s3..s2..s5..s4..s1..s6..s13..s8..s7..s10..s9..s12..s11
 end
 
-local descramblers = { [81] = descramble81 }
+local descramblers = {
+                       --[81] = descramble81
+                     }
 
-function descramble( sig )
+function descramble( sig, js_url )
     vlc.msg.dbg( "Found "..string.len( sig ).."-character scrambled signature for youtube video URL, attempting to descramble... " )
-    local descrambler = descramblers[string.len( sig )]
-    if descrambler then
-        sig = descrambler( sig )
+    if js_url then
+        sig = js_descramble( sig, js_url )
     else
-        vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
+        local descrambler = descramblers[string.len( sig )]
+        if descrambler then
+            sig = descrambler( sig )
+        else
+            vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
+        end
     end
     return sig
 end
 
 -- Parse and pick our video URL
-function pick_url( url_map, fmt )
+function pick_url( url_map, fmt, js_url )
     local path = nil
     for stream in string.gmatch( url_map, "[^,]+" ) do
         -- Apparently formats are listed in quality order,
@@ -104,7 +187,7 @@ function pick_url( url_map, fmt )
                     -- Scrambled signature
                     sig = string.match( stream, "s=([^&,]+)" )
                     if sig then
-                        sig = descramble( sig )
+                        sig = descramble( sig, js_url )
                     end
                 end
                 local signature = ""
@@ -176,6 +259,12 @@ function parse()
             -- JSON parameters, also formerly known as "swfConfig",
             -- "SWF_ARGS", "swfArgs", "PLAYER_CONFIG", "playerConfig" ...
             if string.match( line, "ytplayer%.config" ) then
+
+                local js_url = string.match( line, "\"js\": \"(.-)\"" )
+                if js_url then
+                    js_url = string.gsub( js_url, "\\/", "/" )
+                end
+
                 if not fmt then
                     fmt_list = string.match( line, "\"fmt_list\": \"(.-)\"" )
                     if fmt_list then
@@ -188,7 +277,7 @@ function parse()
                 if url_map then
                     -- FIXME: do this properly
                     url_map = string.gsub( url_map, "\\u0026", "&" )
-                    path = pick_url( url_map, fmt )
+                    path = pick_url( url_map, fmt, js_url )
                 end
 
                 if not path then
