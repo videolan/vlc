@@ -956,7 +956,7 @@ void SPrefsPanel::updateAudioOptions( int number)
         optionWidgets["alsaL"]->setVisible( ( value == "alsa" ) );
     }
 #endif
-    optionWidgets["fileW"]->setVisible( ( value == "aout_file" ) );
+    optionWidgets["fileW"]->setVisible( ( value == "afile" ) );
 }
 
 
