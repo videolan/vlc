@@ -427,6 +427,13 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             optionWidgets["directxW" ] = DirectXDevice;
             CONFIG_GENERIC_NO_UI( "directx-audio-device", StringList,
                     DirectXLabel, DirectXDevice );
+
+            audioControl( Waveout );
+            optionWidgets["waveoutL" ] = WaveoutLabel;
+            optionWidgets["waveoutW" ] = WaveoutDevice;
+            CONFIG_GENERIC_NO_UI( "waveout-audio-device", StringList,
+                    WaveoutLabel, WaveoutDevice );
+
 #elif defined( __OS2__ )
             audioControl( kai );
             optionWidgets["kaiL"] = kaiLabel;
@@ -940,6 +947,8 @@ void SPrefsPanel::updateAudioOptions( int number)
 #ifdef _WIN32
     optionWidgets["directxW"]->setVisible( ( value == "directsound" ) );
     optionWidgets["directxL"]->setVisible( ( value == "directsound" ) );
+    optionWidgets["waveoutW"]->setVisible( ( value == "waveout" ) );
+    optionWidgets["waveoutL"]->setVisible( ( value == "waveout" ) );
 #elif defined( __OS2__ )
     optionWidgets["kaiL"]->setVisible( ( value == "kai" ) );
     optionWidgets["kaiW"]->setVisible( ( value == "kai" ) );
