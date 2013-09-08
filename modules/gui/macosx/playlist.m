@@ -442,6 +442,7 @@
     playlist_t * p_playlist = pl_Get(VLCIntf);
 
     [super awakeFromNib];
+    [self initStrings];
 
     [o_outline_view setDoubleAction: @selector(playItem:)];
     [o_outline_view_other setDoubleAction: @selector(playItem:)];
