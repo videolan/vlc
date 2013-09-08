@@ -161,7 +161,7 @@
         </property>
         <layout class="QGridLayout" name="outputAudioLayout">
          <property name="bottomMargin">
-          <number>0</number>
+          <number>4</number>
          </property>
          <item row="1" column="0" colspan="2">
           <widget class="QWidget" name="fileControl" native="true">
