@@ -413,7 +413,7 @@ static int Open(vlc_object_t *this)
         enc->fmt_out.i_codec != VLC_CODEC_MPGV && !enc->b_force)
         return VLC_EGENERIC;
 
-    if (!enc->fmt_in.video.i_height || !enc->fmt_in.video.i_width ||
+    if (!enc->fmt_in.video.i_visible_height || !enc->fmt_in.video.i_visible_width ||
         !enc->fmt_in.video.i_frame_rate || !enc->fmt_in.video.i_frame_rate_base) {
         msg_Err(enc, "Framerate and picture dimensions must be non-zero");
         return VLC_EGENERIC;
@@ -458,8 +458,8 @@ static int Open(vlc_object_t *this)
     sys->params.mfx.FrameInfo.ChromaFormat  = MFX_CHROMAFORMAT_YUV420;
     sys->params.mfx.FrameInfo.Width         = QSV_ALIGN(16, enc->fmt_in.video.i_width);
     sys->params.mfx.FrameInfo.Height        = QSV_ALIGN(32, enc->fmt_in.video.i_height);
-    sys->params.mfx.FrameInfo.CropW         = enc->fmt_in.video.i_width;
-    sys->params.mfx.FrameInfo.CropH         = enc->fmt_in.video.i_height;
+    sys->params.mfx.FrameInfo.CropW         = enc->fmt_in.video.i_visible_width;
+    sys->params.mfx.FrameInfo.CropH         = enc->fmt_in.video.i_visible_height;
     sys->params.mfx.FrameInfo.PicStruct     = MFX_PICSTRUCT_UNKNOWN;
 
     /* Parsing options common to all RC methods and codecs */

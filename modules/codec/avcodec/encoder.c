@@ -421,18 +421,18 @@ int OpenEncoder( vlc_object_t *p_this )
 
     if( p_enc->fmt_in.i_cat == VIDEO_ES )
     {
-        if( !p_enc->fmt_in.video.i_width || !p_enc->fmt_in.video.i_height )
+        if( !p_enc->fmt_in.video.i_visible_width || !p_enc->fmt_in.video.i_visible_height )
         {
-            msg_Warn( p_enc, "invalid size %ix%i", p_enc->fmt_in.video.i_width,
-                      p_enc->fmt_in.video.i_height );
+            msg_Warn( p_enc, "invalid size %ix%i", p_enc->fmt_in.video.i_visible_width,
+                      p_enc->fmt_in.video.i_visible_height );
             free( p_sys );
             return VLC_EGENERIC;
         }
 
         p_context->codec_type = AVMEDIA_TYPE_VIDEO;
 
-        p_context->width = p_enc->fmt_in.video.i_width;
-        p_context->height = p_enc->fmt_in.video.i_height;
+        p_context->width = p_enc->fmt_in.video.i_visible_width;
+        p_context->height = p_enc->fmt_in.video.i_visible_height;
 
         p_context->time_base.num = p_enc->fmt_in.video.i_frame_rate_base;
         p_context->time_base.den = p_enc->fmt_in.video.i_frame_rate;
@@ -686,7 +686,7 @@ int OpenEncoder( vlc_object_t *p_this )
         //p_context->rc_max_rate = 24 * 1000 * 1000; //24M
         //p_context->rc_min_rate = 40 * 1000; // 40k
         /* seems that FFmpeg presets have 720p as divider for buffers */
-        if( p_enc->fmt_out.video.i_height >= 720 )
+        if( p_enc->fmt_out.video.i_visible_height >= 720 )
         {
             /* Check that we don't overrun users qmin/qmax values */
             if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "qmin" ) )

@@ -448,7 +448,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     }
 
     if( !p_enc->fmt_in.video.i_frame_rate || !p_enc->fmt_in.video.i_frame_rate_base ||
-        !p_enc->fmt_in.video.i_height || !p_enc->fmt_in.video.i_width )
+        !p_enc->fmt_in.video.i_visible_height || !p_enc->fmt_in.video.i_visible_width )
     {
         msg_Err( p_enc, "Framerate and picture dimensions must be non-zero" );
         return VLC_EGENERIC;
@@ -499,8 +499,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     dirac_encoder_context_init( &p_sys->ctx, guessed_video_fmt );
 
     /* constants set from the input video format */
-    p_sys->ctx.src_params.width = p_enc->fmt_in.video.i_width;
-    p_sys->ctx.src_params.height = p_enc->fmt_in.video.i_height;
+    p_sys->ctx.src_params.width = p_enc->fmt_in.video.i_visible_width;
+    p_sys->ctx.src_params.height = p_enc->fmt_in.video.i_visible_height;
     p_sys->ctx.src_params.frame_rate.numerator = p_enc->fmt_in.video.i_frame_rate;
     p_sys->ctx.src_params.frame_rate.denominator = p_enc->fmt_in.video.i_frame_rate_base;
     unsigned u_asr_num, u_asr_den;
@@ -519,19 +519,19 @@ static int OpenEncoder( vlc_object_t *p_this )
         p_enc->fmt_in.i_codec = VLC_CODEC_I420;
         p_enc->fmt_in.video.i_bits_per_pixel = 12;
         p_sys->ctx.src_params.chroma = format420;
-        p_sys->i_buffer_in = p_enc->fmt_in.video.i_width * p_enc->fmt_in.video.i_height * 3 / 2;
+        p_sys->i_buffer_in = p_enc->fmt_in.video.i_visible_width * p_enc->fmt_in.video.i_visible_height * 3 / 2;
     }
     else if( !strcmp( psz_tmp, "422" ) ) {
         p_enc->fmt_in.i_codec = VLC_CODEC_I422;
         p_enc->fmt_in.video.i_bits_per_pixel = 16;
         p_sys->ctx.src_params.chroma = format422;
-        p_sys->i_buffer_in = p_enc->fmt_in.video.i_width * p_enc->fmt_in.video.i_height * 2;
+        p_sys->i_buffer_in = p_enc->fmt_in.video.i_visible_width * p_enc->fmt_in.video.i_visible_height * 2;
     }
     else if( !strcmp( psz_tmp, "444" ) ) {
         p_enc->fmt_in.i_codec = VLC_CODEC_I444;
         p_enc->fmt_in.video.i_bits_per_pixel = 24;
         p_sys->ctx.src_params.chroma = format444;
-        p_sys->i_buffer_in = p_enc->fmt_in.video.i_width * p_enc->fmt_in.video.i_height * 3;
+        p_sys->i_buffer_in = p_enc->fmt_in.video.i_visible_width * p_enc->fmt_in.video.i_visible_height * 3;
     }
     else {
         msg_Err( p_enc, "Invalid chroma format: %s", psz_tmp );

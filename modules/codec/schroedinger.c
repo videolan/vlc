@@ -1072,7 +1072,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     }
 
     if( !p_enc->fmt_in.video.i_frame_rate || !p_enc->fmt_in.video.i_frame_rate_base ||
-        !p_enc->fmt_in.video.i_height || !p_enc->fmt_in.video.i_width )
+        !p_enc->fmt_in.video.i_visible_height || !p_enc->fmt_in.video.i_visible_width )
     {
         msg_Err( p_enc, "Framerate and picture dimensions must be non-zero" );
         return VLC_EGENERIC;
@@ -1138,8 +1138,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     schro_video_format_set_std_video_format( p_sys->p_format, guessed_video_fmt );
 
     /* constants set from the input video format */
-    p_sys->p_format->width                  = p_enc->fmt_in.video.i_width;
-    p_sys->p_format->height                 = p_enc->fmt_in.video.i_height;
+    p_sys->p_format->width                  = p_enc->fmt_in.video.i_visible_width;
+    p_sys->p_format->height                 = p_enc->fmt_in.video.i_visible_height;
     p_sys->p_format->frame_rate_numerator   = p_enc->fmt_in.video.i_frame_rate;
     p_sys->p_format->frame_rate_denominator = p_enc->fmt_in.video.i_frame_rate_base;
     unsigned u_asr_num, u_asr_den;

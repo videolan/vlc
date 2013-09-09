@@ -659,8 +659,8 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     th_info_init( &p_sys->ti );
 
-    p_sys->ti.frame_width = p_enc->fmt_in.video.i_width;
-    p_sys->ti.frame_height = p_enc->fmt_in.video.i_height;
+    p_sys->ti.frame_width = p_enc->fmt_in.video.i_visible_width;
+    p_sys->ti.frame_height = p_enc->fmt_in.video.i_visible_height;
 
     if( p_sys->ti.frame_width % 16 || p_sys->ti.frame_height % 16 )
     {
@@ -670,12 +670,12 @@ static int OpenEncoder( vlc_object_t *p_this )
         p_sys->ti.frame_height = (p_sys->ti.frame_height + 15) >> 4 << 4;
 
         msg_Dbg( p_enc, "padding video from %dx%d to %dx%d",
-                 p_enc->fmt_in.video.i_width, p_enc->fmt_in.video.i_height,
+                 p_enc->fmt_in.video.i_visible_width, p_enc->fmt_in.video.i_visible_height,
                  p_sys->ti.frame_width, p_sys->ti.frame_height );
     }
 
-    p_sys->ti.pic_width = p_enc->fmt_in.video.i_width;
-    p_sys->ti.pic_height = p_enc->fmt_in.video.i_height;
+    p_sys->ti.pic_width = p_enc->fmt_in.video.i_visible_width;
+    p_sys->ti.pic_height = p_enc->fmt_in.video.i_visible_height;
     p_sys->ti.pic_x = 0 /*frame_x_offset*/;
     p_sys->ti.pic_y = 0 /*frame_y_offset*/;
 

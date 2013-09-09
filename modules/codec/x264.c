@@ -885,8 +885,8 @@ static int  Open ( vlc_object_t *p_this )
     free( psz_preset );
     free( psz_tune );
     p_sys->param.i_csp = p_sys->i_colorspace;
-    p_sys->param.i_width  = p_enc->fmt_in.video.i_width;
-    p_sys->param.i_height = p_enc->fmt_in.video.i_height;
+    p_sys->param.i_width  = p_enc->fmt_in.video.i_visible_width;
+    p_sys->param.i_height = p_enc->fmt_in.video.i_visible_height;
     p_sys->param.vui.b_fullrange = fullrange;
 
     if( fabs(var_GetFloat( p_enc, SOUT_CFG_PREFIX "qcomp" ) - 0.60) > 0.005 )
