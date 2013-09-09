@@ -4045,7 +4045,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
             else
             {
                 msg_Dbg( p_demux, " * descriptor : registration %4.4s", p_dr->p_data );
-                if( !memcmp( p_dr->p_data, "HDMV", 4 ) )
+                if( !memcmp( p_dr->p_data, "HDMV", 4 ) || !memcmp( p_dr->p_data, "HDPR", 4 ) )
                     b_hdmv = true; /* Blu-Ray */
             }
             break;
