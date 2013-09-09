@@ -2887,10 +2887,10 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
         vlc_fourcc_GetDescription( p_fmt_es->i_cat, p_fmt_es->i_codec );
     const vlc_fourcc_t i_codec_fourcc = ( p_fmt_es->i_original_fourcc )?
                                p_fmt_es->i_original_fourcc : p_fmt_es->i_codec;
-    if( psz_codec_description )
+    if( psz_codec_description && *psz_codec_description )
         info_category_AddInfo( p_cat, _("Codec"), "%s (%.4s)",
                                psz_codec_description, (char*)&i_codec_fourcc );
-    else
+    else if ( i_codec_fourcc != VLC_FOURCC(0,0,0,0) )
         info_category_AddInfo( p_cat, _("Codec"), "%.4s",
                                (char*)&i_codec_fourcc );
 
