@@ -39,6 +39,7 @@ extern "C" {
 typedef struct
 {
     char *     psz_fontname;      /**< The name of the font */
+    char *     psz_monofontname;  /**< The name of the mono font */
     int        i_font_size;       /**< The font size in pixels */
     int        i_font_color;      /**< The color of the text 0xRRGGBB
                                        (native endianness) */

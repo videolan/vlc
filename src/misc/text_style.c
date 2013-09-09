@@ -37,6 +37,7 @@ text_style_t *text_style_New( void )
 
     /* initialize to default text style */
     p_style->psz_fontname = NULL;
+    p_style->psz_monofontname = NULL;
     p_style->i_font_size = 22;
     p_style->i_font_color = 0xffffff;
     p_style->i_font_alpha = 0xff;
@@ -67,6 +68,9 @@ text_style_t *text_style_Copy( text_style_t *p_dst, const text_style_t *p_src )
     if( p_src->psz_fontname )
         p_dst->psz_fontname = strdup( p_src->psz_fontname );
 
+    if( p_src->psz_monofontname )
+        p_dst->psz_monofontname = strdup( p_src->psz_fontname );
+
     return p_dst;
 }
 
@@ -85,6 +89,8 @@ void text_style_Delete( text_style_t *p_style )
 {
     if( p_style )
         free( p_style->psz_fontname );
+    if( p_style )
+        free( p_style->psz_monofontname );
     free( p_style );
 }
 
