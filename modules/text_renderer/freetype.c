@@ -332,7 +332,6 @@ struct filter_sys_t
     float          f_shadow_vector_x;
     float          f_shadow_vector_y;
     int            i_default_font_size;
-    char*          psz_monofontfamily;
 
     /* Attachments */
     input_attachment_t **pp_font_attachments;
@@ -1327,7 +1326,7 @@ static int ProcessNodes( filter_t *p_filter,
                 if( !strcasecmp( "font", node ) )
                     HandleFontAttributes( p_xml_reader, &p_fonts );
                 else if( !strcasecmp( "tt", node ) )
-                    HandleTT( &p_fonts, p_sys->psz_monofontfamily );
+                    HandleTT( &p_fonts, p_sys->style.psz_monofontname );
                 else if( !strcasecmp( "b", node ) )
                     i_style_flags |= STYLE_BOLD;
                 else if( !strcasecmp( "i", node ) )
@@ -2402,7 +2401,7 @@ static int Create( vlc_object_t *p_this )
     psz_fontfile = psz_fontname;
     psz_monofontfile = psz_monofontfamily;
 #endif
-    p_sys->psz_monofontfamily = psz_monofontfamily;
+    p_sys->style.psz_monofontname = psz_monofontfamily;
 
     /* */
     i_error = FT_Init_FreeType( &p_sys->p_library );
@@ -2493,7 +2492,6 @@ static void Destroy( vlc_object_t *p_this )
 
     if( p_sys->p_xml ) xml_ReaderDelete( p_sys->p_xml );
     free( p_sys->style.psz_fontname );
-    free( p_sys->psz_monofontfamily );
 
 #ifdef _WIN32
     free( p_sys->psz_win_fonts_path );
