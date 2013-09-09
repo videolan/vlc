@@ -88,3 +88,12 @@ unsigned SetupText( filter_t *p_filter,
 bool FaceStyleEquals( const text_style_t *p_style1,
                       const text_style_t *p_style2 );
 
+/* Parser */
+int ProcessNodes( filter_t *p_filter,
+                         uni_char_t *psz_text,
+                         text_style_t **pp_styles,
+                         uint32_t *pi_k_dates,
+                         int *pi_len,
+                         xml_reader_t *p_xml_reader,
+                         text_style_t *p_font_style,
+                         text_style_t *p_default_style );

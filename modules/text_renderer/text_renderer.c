@@ -34,6 +34,7 @@
 #include <vlc_filter.h>                                      /* filter_sys_t */
 #include <vlc_xml.h>                                         /* xml_reader */
 #include <vlc_charset.h>                                     /* ToCharset */
+#include <vlc_strings.h>                         /* resolve_xml_special_chars */
 
 #include "text_renderer.h"
 
@@ -521,6 +522,153 @@ text_style_t *GetStyleFromFontStack( filter_t *p_filter,
     return CreateStyle( psz_fontname, i_font_size, i_font_color,
                         i_karaoke_bg_color,
                         i_style_flags );
+}
+
+int ProcessNodes( filter_t *p_filter,
+                         uni_char_t *psz_text,
+                         text_style_t **pp_styles,
+                         uint32_t *pi_k_dates,
+                         int *pi_len,
+                         xml_reader_t *p_xml_reader,
+                         text_style_t *p_font_style,
+                         text_style_t *p_default_style )
+{
+    int           rv      = VLC_SUCCESS;
+    int i_text_length     = 0;
+    font_stack_t *p_fonts = NULL;
+    uint32_t i_k_date     = 0;
+
+    int i_style_flags = 0;
+
+    if( p_font_style )
+    {
+        /* If the font is not specified in the style, assume the system font */
+        if(!p_font_style->psz_fontname)
+             p_font_style->psz_fontname = strdup(p_default_style->psz_fontname);
+
+        rv = PushFont( &p_fonts,
+               p_font_style->psz_fontname,
+               p_font_style->i_font_size > 0 ? p_font_style->i_font_size
+                                             : p_default_style->i_font_size,
+               (p_font_style->i_font_color & 0xffffff) |
+                   ((p_font_style->i_font_alpha & 0xff) << 24),
+               (p_font_style->i_karaoke_background_color & 0xffffff) |
+                   ((p_font_style->i_karaoke_background_alpha & 0xff) << 24));
+
+        i_style_flags = p_font_style->i_style_flags & (STYLE_BOLD |
+                                                       STYLE_ITALIC |
+                                                       STYLE_UNDERLINE |
+                                                       STYLE_STRIKEOUT);
+    }
+    else
+    {
+        uint32_t i_font_size = p_default_style->i_font_size;
+        uint32_t i_font_color = var_InheritInteger( p_filter, "freetype-color" );
+        i_font_color = VLC_CLIP( i_font_color, 0, 0xFFFFFF );
+        int i_font_alpha = p_default_style->i_font_alpha;
+        rv = PushFont( &p_fonts,
+                       p_default_style->psz_fontname,
+                       i_font_size,
+                       (i_font_color & 0xffffff) |
+                          ((i_font_alpha & 0xff) << 24),
+                       0x00ffffff );
+    }
+    if( p_default_style->i_style_flags & STYLE_BOLD )
+        i_style_flags |= STYLE_BOLD;
+
+    if( rv != VLC_SUCCESS )
+        return rv;
+
+    const char *node;
+    int type;
+
+    while ( (type = xml_ReaderNextNode( p_xml_reader, &node )) > 0 )
+    {
+        switch ( type )
+        {
+            case XML_READER_ENDELEM:
+                if( !strcasecmp( "font", node ) )
+                    PopFont( &p_fonts );
+                else if( !strcasecmp( "tt", node ) )
+                    PopFont( &p_fonts );
+                else if( !strcasecmp( "b", node ) )
+                    i_style_flags &= ~STYLE_BOLD;
+               else if( !strcasecmp( "i", node ) )
+                    i_style_flags &= ~STYLE_ITALIC;
+                else if( !strcasecmp( "u", node ) )
+                    i_style_flags &= ~STYLE_UNDERLINE;
+                else if( !strcasecmp( "s", node ) )
+                    i_style_flags &= ~STYLE_STRIKEOUT;
+                break;
+
+            case XML_READER_STARTELEM:
+                if( !strcasecmp( "font", node ) )
+                    HandleFontAttributes( p_xml_reader, &p_fonts );
+                else if( !strcasecmp( "tt", node ) )
+                    HandleTT( &p_fonts, p_default_style->psz_monofontname );
+                else if( !strcasecmp( "b", node ) )
+                    i_style_flags |= STYLE_BOLD;
+                else if( !strcasecmp( "i", node ) )
+                    i_style_flags |= STYLE_ITALIC;
+                else if( !strcasecmp( "u", node ) )
+                    i_style_flags |= STYLE_UNDERLINE;
+                else if( !strcasecmp( "s", node ) )
+                    i_style_flags |= STYLE_STRIKEOUT;
+                else if( !strcasecmp( "br", node ) )
+                {
+                    i_text_length += SetupText( p_filter,
+                                                &psz_text[i_text_length],
+                                                &pp_styles[i_text_length],
+                                                pi_k_dates ? &pi_k_dates[i_text_length] : NULL,
+                                                "\n",
+                                                GetStyleFromFontStack( p_filter,
+                                                                       &p_fonts,
+                                                                       p_default_style,
+                                                                       i_style_flags ),
+                                                i_k_date );
+                }
+                else if( !strcasecmp( "k", node ) )
+                {
+                    /* Karaoke tags */
+                    const char *name, *value;
+                    while( (name = xml_ReaderNextAttr( p_xml_reader, &value )) != NULL )
+                    {
+                        if( !strcasecmp( "t", name ) && value )
+                            i_k_date += atoi( value );
+                    }
+                }
+                break;
+
+            case XML_READER_TEXT:
+            {
+                char *psz_node = strdup( node );
+                if( unlikely(!psz_node) )
+                    break;
+
+                HandleWhiteSpace( psz_node );
+                resolve_xml_special_chars( psz_node );
+
+                i_text_length += SetupText( p_filter,
+                                            &psz_text[i_text_length],
+                                            &pp_styles[i_text_length],
+                                            pi_k_dates ? &pi_k_dates[i_text_length] : NULL,
+                                            psz_node,
+                                            GetStyleFromFontStack( p_filter,
+                                                                   &p_fonts,
+                                                                   p_default_style,
+                                                                   i_style_flags ),
+                                            i_k_date );
+                free( psz_node );
+                break;
+            }
+        }
+    }
+
+    *pi_len = i_text_length;
+
+    while( VLC_SUCCESS == PopFont( &p_fonts ) );
+
+    return VLC_SUCCESS;
 }
 
 
