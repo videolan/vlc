@@ -466,8 +466,8 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
         es_format_t fmt;
 
         es_format_Init( &fmt, SPU_ES, fcc[i_channel] );
-        p_cc = CreateDecoder( VLC_OBJECT(p_dec), p_owner->p_input, &fmt,
-                              false, p_owner->p_resource, p_owner->p_sout );
+        p_cc = input_DecoderNew( p_owner->p_input, &fmt,
+                              p_dec->p_owner->p_clock, p_owner->p_sout );
         if( !p_cc )
         {
             msg_Err( p_dec, "could not create decoder" );
@@ -478,7 +478,7 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
         else if( !p_cc->p_module )
         {
             DecoderUnsupportedCodec( p_dec, fcc[i_channel] );
-            DeleteDecoder( p_cc );
+            input_DecoderDelete(p_cc);
             return VLC_EGENERIC;
         }
         p_cc->p_owner->p_clock = p_owner->p_clock;
@@ -497,10 +497,7 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
         vlc_mutex_unlock( &p_owner->lock );
 
         if( p_cc )
-        {
-            module_unneed( p_cc, p_cc->p_module );
-            DeleteDecoder( p_cc );
-        }
+            input_DecoderDelete(p_cc);
     }
     return VLC_SUCCESS;
 }
@@ -1341,10 +1338,9 @@ static void DecoderGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )
         if( !p_owner->cc.pp_decoder[i] )
             continue;
 
-        if( i_cc_decoder > 1 )
-            DecoderProcess( p_owner->cc.pp_decoder[i], block_Duplicate( p_cc ) );
-        else
-            DecoderProcess( p_owner->cc.pp_decoder[i], p_cc );
+        block_FifoPut( p_owner->cc.pp_decoder[i]->p_owner->p_fifo,
+            (i_cc_decoder > 1) ? block_Duplicate(p_cc) : p_cc);
+
         i_cc_decoder--;
         b_processed = true;
     }
