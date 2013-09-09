@@ -1251,10 +1251,10 @@ static int ProcessNodes( filter_t *p_filter,
                          uint32_t *pi_k_dates,
                          int *pi_len,
                          xml_reader_t *p_xml_reader,
-                         text_style_t *p_font_style )
+                         text_style_t *p_font_style,
+                         text_style_t *p_default_style )
 {
     int           rv      = VLC_SUCCESS;
-    filter_sys_t *p_sys   = p_filter->p_sys;
     int i_text_length     = 0;
     font_stack_t *p_fonts = NULL;
     uint32_t i_k_date     = 0;
@@ -1265,12 +1265,12 @@ static int ProcessNodes( filter_t *p_filter,
     {
         /* If the font is not specified in the style, assume the system font */
         if(!p_font_style->psz_fontname)
-             p_font_style->psz_fontname = strdup(p_sys->style.psz_fontname);
+             p_font_style->psz_fontname = strdup(p_default_style->psz_fontname);
 
         rv = PushFont( &p_fonts,
                p_font_style->psz_fontname,
                p_font_style->i_font_size > 0 ? p_font_style->i_font_size
-                                             : p_sys->style.i_font_size,
+                                             : p_default_style->i_font_size,
                (p_font_style->i_font_color & 0xffffff) |
                    ((p_font_style->i_font_alpha & 0xff) << 24),
                (p_font_style->i_karaoke_background_color & 0xffffff) |
@@ -1283,18 +1283,18 @@ static int ProcessNodes( filter_t *p_filter,
     }
     else
     {
-        uint32_t i_font_size = p_sys->style.i_font_size;
+        uint32_t i_font_size = p_default_style->i_font_size;
         uint32_t i_font_color = var_InheritInteger( p_filter, "freetype-color" );
         i_font_color = VLC_CLIP( i_font_color, 0, 0xFFFFFF );
-        int i_font_alpha = p_sys->style.i_font_alpha;
+        int i_font_alpha = p_default_style->i_font_alpha;
         rv = PushFont( &p_fonts,
-                       p_sys->style.psz_fontname,
+                       p_default_style->psz_fontname,
                        i_font_size,
                        (i_font_color & 0xffffff) |
                           ((i_font_alpha & 0xff) << 24),
                        0x00ffffff );
     }
-    if( p_sys->style.i_style_flags & STYLE_BOLD )
+    if( p_default_style->i_style_flags & STYLE_BOLD )
         i_style_flags |= STYLE_BOLD;
 
     if( rv != VLC_SUCCESS )
@@ -1326,7 +1326,7 @@ static int ProcessNodes( filter_t *p_filter,
                 if( !strcasecmp( "font", node ) )
                     HandleFontAttributes( p_xml_reader, &p_fonts );
                 else if( !strcasecmp( "tt", node ) )
-                    HandleTT( &p_fonts, p_sys->style.psz_monofontname );
+                    HandleTT( &p_fonts, p_default_style->psz_monofontname );
                 else if( !strcasecmp( "b", node ) )
                     i_style_flags |= STYLE_BOLD;
                 else if( !strcasecmp( "i", node ) )
@@ -1344,7 +1344,7 @@ static int ProcessNodes( filter_t *p_filter,
                                                 "\n",
                                                 GetStyleFromFontStack( p_filter,
                                                                        &p_fonts,
-                                                                       &p_sys->style,
+                                                                       p_default_style,
                                                                        i_style_flags ),
                                                 i_k_date );
                 }
@@ -1376,7 +1376,7 @@ static int ProcessNodes( filter_t *p_filter,
                                             psz_node,
                                             GetStyleFromFontStack( p_filter,
                                                                    &p_fonts,
-                                                                   &p_sys->style,
+                                                                   p_default_style,
                                                                    i_style_flags ),
                                             i_k_date );
                 free( psz_node );
@@ -2155,7 +2155,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
         {
             rv = ProcessNodes( p_filter,
                                psz_text, pp_styles, pi_k_durations, &i_text_length,
-                               p_xml_reader, p_region_in->p_style );
+                               p_xml_reader, p_region_in->p_style, &p_filter->p_sys->style );
         }
 
         if( p_xml_reader )
