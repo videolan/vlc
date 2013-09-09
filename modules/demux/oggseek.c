@@ -246,7 +246,6 @@ static bool OggSeekIndexFind ( logical_stream_t *p_stream, int64_t i_timestamp,
                                int64_t *pi_pos_lower, int64_t *pi_pos_upper )
 {
     demux_index_entry_t *idx = p_stream->idx;
-    *pi_pos_lower = *pi_pos_upper = -1;
 
     while ( idx != NULL )
     {
@@ -552,7 +551,6 @@ clean:
     ogg_sync_clear( &oy );
     ogg_stream_clear( &os );
 }
-
 
 /* convert a theora frame to a granulepos */
 
@@ -1273,6 +1271,54 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
  * public functions
  *************************************************************************/
 
+int Oggseek_BlindSeektoAbsoluteTime( demux_t *p_demux, logical_stream_t *p_stream,
+                                     int64_t i_time, bool b_fastseek )
+{
+    demux_sys_t *p_sys  = p_demux->p_sys;
+    int64_t i_pos = -1;
+    int64_t i_unusedpos = -1;
+    bool b_found = false;
+
+    /* Search in skeleton */
+    Ogg_GetBoundsUsingSkeletonIndex( p_stream, i_time, &i_pos, &i_unusedpos );
+    if ( i_pos != -1 ) b_found = true;
+
+    /* And also search in our own index */
+    if ( !b_found && OggSeekIndexFind( p_stream, i_time, &i_pos, &i_unusedpos ) )
+    {
+        b_found = true;
+    }
+
+    /* Or try to be smart with audio fixed bitrate streams */
+    if ( !b_found && p_stream->fmt.i_cat == AUDIO_ES && p_sys->i_streams == 1
+         && p_sys->i_bitrate && Ogg_GetKeyframeGranule( p_stream, 0xFF00FF00 ) == 0xFF00FF00 )
+    {
+        /* But only if there's no keyframe/preload requirements */
+        /* FIXME: add function to get preload time by codec, ex: opus */
+        i_pos = i_time * p_sys->i_bitrate / INT64_C(8000000);
+        b_found = true;
+    }
+
+    /* or search */
+    if ( !b_found && b_fastseek )
+    {
+        i_pos = OggBisectSearchByTime( p_demux, p_stream, i_time,
+                                                p_stream->i_data_start, p_sys->i_total_length );
+        b_found = ( i_pos != -1 );
+    }
+
+    if ( !b_found ) return -1;
+
+    if ( i_pos < p_stream->i_data_start || i_unusedpos > p_sys->i_total_length )
+        return -1;
+
+    /* And really do seek */
+    p_sys->i_input_position = i_pos;
+    seek_byte( p_demux, p_sys->i_input_position );
+    ogg_stream_reset( &p_stream->os );
+
+    return i_pos;
+}
 
 int Oggseek_BlindSeektoPosition( demux_t *p_demux, logical_stream_t *p_stream,
                                  double f, bool b_canfastseek )
@@ -1319,8 +1365,20 @@ int Oggseek_SeektoAbsolutetime( demux_t *p_demux, logical_stream_t *p_stream,
     demux_sys_t *p_sys  = p_demux->p_sys;
 
     OggDebug( msg_Dbg( p_demux, "=================== Seeking To Absolute Time %"PRId64, i_time ) );
-    int64_t i_offset_lower = p_stream->i_data_start;
-    int64_t i_offset_upper = p_sys->i_total_length;
+    int64_t i_offset_lower = -1;
+    int64_t i_offset_upper = -1;
+
+    if ( Ogg_GetBoundsUsingSkeletonIndex( p_stream, i_time, &i_offset_lower, &i_offset_upper ) )
+    {
+        /* Exact match */
+        OggDebug( msg_Dbg( p_demux, "Found keyframe at %"PRId64" using skeleton index", i_offset_lower ) );
+        if ( i_offset_lower == -1 ) i_offset_lower = p_stream->i_data_start;
+        p_sys->i_input_position = i_offset_lower;
+        seek_byte( p_demux, p_sys->i_input_position );
+        ogg_stream_reset( &p_stream->os );
+        return i_offset_lower;
+    }
+    OggDebug( msg_Dbg( p_demux, "Search bounds set to %"PRId64" %"PRId64" using skeleton index", i_offset_lower, i_offset_upper ) );
 
     OggNoDebug(
         OggSeekIndexFind( p_stream, i_time, &i_offset_lower, &i_offset_upper )
@@ -1419,5 +1477,4 @@ int64_t oggseek_read_page( demux_t *p_demux )
 
     return i_result + PAGE_HEADER_BYTES + i_nsegs;
 }
-
 

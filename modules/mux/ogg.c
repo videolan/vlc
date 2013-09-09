@@ -289,6 +289,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     p_stream->p_oggds_header = 0;
 
+    /* FIXME: https://trac.videolan.org/vlc/ticket/1412 */
     switch( p_input->p_fmt->i_cat )
     {
     case VIDEO_ES:

@@ -136,6 +136,13 @@ static void Ogg_ReadKateHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadFlacHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadAnnodexHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static bool Ogg_ReadDiracHeader( logical_stream_t *, ogg_packet * );
+static void Ogg_ReadSkeletonHeader( demux_t *, logical_stream_t *, ogg_packet * );
+
+/* Skeleton */
+static void Ogg_ReadSkeletonBones( demux_t *, ogg_packet * );
+static void Ogg_ReadSkeletonIndex( demux_t *, ogg_packet * );
+static void Ogg_FreeSkeleton( ogg_skeleton_t * );
+static void Ogg_ApplySkeleton( logical_stream_t * );
 
 static void fill_channels_info(audio_format_t *audio)
 {
@@ -286,10 +293,31 @@ static int Demux( demux_t * p_demux )
         if( Ogg_ReadPage( p_demux, &p_sys->current_page ) != VLC_SUCCESS )
             return 0; /* EOF */
         /* Test for End of Stream */
-        /* FIXME that eos handling is innapropriate with seeking and concatenated streams */
-        if( ogg_page_eos( &p_sys->current_page )
-            && ogg_page_granulepos( &p_sys->current_page ) != 0 ) /* skel workaround */
-            p_sys->i_eos++;
+        if( ogg_page_eos( &p_sys->current_page ) )
+        {
+            /* If we delayed restarting encoders/SET_ES_FMT for more
+             * skeleton provided configuration */
+            if ( p_sys->p_skelstream && p_sys->p_skelstream->i_serial_no == ogg_page_serialno(&p_sys->current_page) )
+            {
+                msg_Dbg( p_demux, "End of Skeleton" );
+                for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
+                {
+                    logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
+                    if ( p_stream->b_have_updated_format  )
+                    {
+                        p_stream->b_have_updated_format = false;
+                        if ( p_stream->p_skel ) Ogg_ApplySkeleton( p_stream );
+                        msg_Dbg( p_demux, "Resetting format for stream %d", i_stream );
+                        es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
+                                        p_stream->p_es, &p_stream->fmt );
+                    }
+                }
+            }
+
+            /* FIXME that eos handling is innapropriate with seeking and concatenated streams */
+            if ( ogg_page_granulepos( &p_sys->current_page ) != 0 ) /* skel workaround */
+                p_sys->i_eos++;
+        }
     }
 
     b_skipping = false;
@@ -564,7 +592,23 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_TIME:
-            return VLC_EGENERIC;
+            i64 = (int64_t)va_arg( args, int64_t );
+            logical_stream_t *p_stream = Ogg_GetSelectedStream( p_demux );
+            if ( !p_stream )
+            {
+                msg_Err( p_demux, "No selected seekable stream found" );
+                return VLC_EGENERIC;
+            }
+            stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
+            if ( Oggseek_BlindSeektoAbsoluteTime( p_demux, p_stream, i64, b ) )
+            {
+                Ogg_ResetStreamHelper( p_sys );
+                es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
+                                VLC_TS_0 + i64 );
+                return VLC_SUCCESS;
+            }
+            else
+                return VLC_EGENERIC;
 
         case DEMUX_GET_ATTACHMENTS:
         {
@@ -606,7 +650,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_EGENERIC;
             }
 
-            logical_stream_t *p_stream = Ogg_GetSelectedStream( p_demux );
+            p_stream = Ogg_GetSelectedStream( p_demux );
             if ( !p_stream )
             {
                 msg_Err( p_demux, "No selected seekable stream found" );
@@ -674,41 +718,30 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_SEEKPOINT:
         {
             const int i_seekpoint = (int)va_arg( args, int );
-            if( i_seekpoint > p_sys->i_seekpoints )
+            if( i_seekpoint > p_sys->i_seekpoints || p_sys->i_bos > 0 )
                 return VLC_EGENERIC;
-            if( p_sys->i_bos > 0 )
+
+            i64 = p_sys->pp_seekpoints[i_seekpoint]->i_time_offset;
+
+            p_stream = Ogg_GetSelectedStream( p_demux );
+            if ( !p_stream )
             {
+                msg_Err( p_demux, "No selected seekable stream found" );
                 return VLC_EGENERIC;
             }
 
-            Ogg_ResetStreamHelper( p_sys );
-
-            if ( p_sys->i_bitrate == 0 || p_sys->b_partial_bitrate )
+            stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
+            if ( Oggseek_BlindSeektoAbsoluteTime( p_demux, p_stream, i64, b ) )
             {
-                /* we won't be able to find block by time
-                 * we'll need to bisect search from here
-                 * or use skeleton index if any (FIXME)
-                */
-                logical_stream_t *p_stream = Ogg_GetSelectedStream( p_demux );
-                if ( !p_stream )
-                {
-                    msg_Err( p_demux, "No selected seekable stream found" );
-                    return VLC_EGENERIC;
-                }
-
-                Oggseek_SeektoAbsolutetime( p_demux, p_stream, p_sys->pp_seekpoints[i_seekpoint]->i_time_offset );
-
+                Ogg_ResetStreamHelper( p_sys );
+                es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
+                                VLC_TS_0 + i64 );
+                p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
+                p_demux->info.i_seekpoint = i_seekpoint;
                 return VLC_SUCCESS;
             }
             else
-            {
-                int64_t i_block = p_sys->pp_seekpoints[i_seekpoint]->i_time_offset * p_sys->i_bitrate / INT64_C(8000000);
-                if( stream_Seek( p_demux->s, i_block ) )
-                    return VLC_EGENERIC;
-            }
-            p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
-            p_demux->info.i_seekpoint = i_seekpoint;
-            return VLC_SUCCESS;
+                return VLC_EGENERIC;
         }
 
         default:
@@ -851,6 +884,18 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         /* it's an AnxData packet -- skip it (do nothing) */
         return;
     }
+    else if( p_oggpacket->bytes >= 8 &&
+        ! memcmp ( p_oggpacket->packet, "fisbone", 8 ) )
+    {
+        Ogg_ReadSkeletonBones( p_demux, p_oggpacket );
+        return;
+    }
+    else if( p_oggpacket->bytes >= 6 &&
+        ! memcmp ( p_oggpacket->packet, "index", 6 ) )
+    {
+        Ogg_ReadSkeletonIndex( p_demux, p_oggpacket );
+        return;
+    }
 
     if( p_stream->fmt.i_codec == VLC_CODEC_SUBT && p_oggpacket->bytes > 0 &&
         p_oggpacket->packet[0] & PACKET_TYPE_BITS ) return;
@@ -955,8 +1000,23 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                     p_stream->fmt.i_extra = 0;
 
                 if( Ogg_LogicalStreamResetEsFormat( p_demux, p_stream ) )
-                    es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
-                                    p_stream->p_es, &p_stream->fmt );
+                {
+                    if ( p_ogg->p_skelstream )
+                    {
+                        /* We delay until eos is reached on skeleton.
+                         * There should only be headers, as no data page is
+                         * allowed before skeleton's eos.
+                         * Skeleton data is appended to fmt on skeleton eos.
+                         */
+                        p_stream->b_have_updated_format = true;
+                    }
+                    else
+                    {
+                        /* Otherwise we set config from first headers */
+                        es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
+                                        p_stream->p_es, &p_stream->fmt );
+                    }
+                }
 
                 if( p_stream->i_headers > 0 )
                     Ogg_ExtractMeta( p_demux, & p_stream->fmt,
@@ -1657,14 +1717,14 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         p_ogg->i_streams--;
                     }
                 }
-                else if( oggpacket.bytes >= 7 &&
-                             ! memcmp( oggpacket.packet, "fishead", 7 ) )
+                else if( oggpacket.bytes >= 8 &&
+                             ! memcmp( oggpacket.packet, "fishead\0", 8 ) )
 
                 {
                     /* Skeleton */
                     msg_Dbg( p_demux, "stream %d is a skeleton",
                                 p_ogg->i_streams-1 );
-                    /* FIXME: https://trac.videolan.org/vlc/ticket/1412 */
+                    Ogg_ReadSkeletonHeader( p_demux, p_stream, &oggpacket );
                 }
                 else
                 {
@@ -1811,6 +1871,8 @@ static void Ogg_EndOfStream( demux_t *p_demux )
     p_ogg->i_bitrate = 0;
     p_ogg->i_streams = 0;
     p_ogg->pp_stream = NULL;
+    p_ogg->skeleton.major = 0;
+    p_ogg->skeleton.minor = 0;
 
     /* */
     if( p_ogg->p_meta )
@@ -1836,6 +1898,11 @@ static void Ogg_LogicalStreamDelete( demux_t *p_demux, logical_stream_t *p_strea
     {
         oggseek_index_entries_free( p_stream->idx );
     }
+
+    Ogg_FreeSkeleton( p_stream->p_skel );
+    p_stream->p_skel = NULL;
+    if ( p_demux->p_sys->p_skelstream == p_stream )
+        p_demux->p_sys->p_skelstream = NULL;
 
     free( p_stream );
 }
@@ -2321,6 +2388,76 @@ static void Ogg_ReadKateHeader( logical_stream_t *p_stream,
     }
 }
 
+static void Ogg_ApplyContentType( logical_stream_t *p_stream, const char* psz_value,
+                                  bool *b_force_backup, bool *b_packet_out )
+{
+    if( !strncmp(psz_value, "audio/x-wav", 11) )
+    {
+        /* n.b. WAVs are unsupported right now */
+        p_stream->fmt.i_cat = UNKNOWN_ES;
+        free( p_stream->fmt.psz_description );
+        p_stream->fmt.psz_description = strdup("WAV Audio (Unsupported)");
+    }
+    else if( !strncmp(psz_value, "audio/x-vorbis", 14) ||
+             !strncmp(psz_value, "audio/vorbis", 12) )
+    {
+        p_stream->fmt.i_cat = AUDIO_ES;
+        p_stream->fmt.i_codec = VLC_CODEC_VORBIS;
+
+        *b_force_backup = true;
+    }
+    else if( !strncmp(psz_value, "audio/x-speex", 13) ||
+             !strncmp(psz_value, "audio/speex", 11) )
+    {
+        p_stream->fmt.i_cat = AUDIO_ES;
+        p_stream->fmt.i_codec = VLC_CODEC_SPEEX;
+
+        *b_force_backup = true;
+    }
+    else if( !strncmp(psz_value, "audio/flac", 10) )
+    {
+        p_stream->fmt.i_cat = AUDIO_ES;
+        p_stream->fmt.i_codec = VLC_CODEC_FLAC;
+
+        *b_force_backup = true;
+    }
+    else if( !strncmp(psz_value, "video/x-theora", 14) ||
+             !strncmp(psz_value, "video/theora", 12) )
+    {
+        p_stream->fmt.i_cat = VIDEO_ES;
+        p_stream->fmt.i_codec = VLC_CODEC_THEORA;
+
+        *b_force_backup = true;
+    }
+    else if( !strncmp(psz_value, "video/x-xvid", 12) )
+    {
+        p_stream->fmt.i_cat = VIDEO_ES;
+        p_stream->fmt.i_codec = VLC_FOURCC( 'x','v','i','d' );
+
+        *b_force_backup = true;
+    }
+    else if( !strncmp(psz_value, "video/mpeg", 10) )
+    {
+        /* n.b. MPEG streams are unsupported right now */
+        p_stream->fmt.i_cat = VIDEO_ES;
+        p_stream->fmt.i_codec = VLC_CODEC_MPGV;
+    }
+    else if( !strncmp(psz_value, "text/x-cmml", 11) ||
+             !strncmp(psz_value, "text/cmml", 9) )
+    {
+        p_stream->fmt.i_cat = SPU_ES;
+        p_stream->fmt.i_codec = VLC_CODEC_CMML;
+        *b_packet_out = true;
+    }
+    else if( !strncmp(psz_value, "application/kate", 16) )
+    {
+        /* ??? */
+        p_stream->fmt.i_cat = UNKNOWN_ES;
+        free( p_stream->fmt.psz_description );
+        p_stream->fmt.psz_description = strdup("OGG Kate Overlay (Unsupported)");
+    }
+}
+
 static void Ogg_ReadAnnodexHeader( demux_t *p_demux,
                                    logical_stream_t *p_stream,
                                    ogg_packet *p_oggpacket )
@@ -2385,52 +2522,226 @@ static void Ogg_ReadAnnodexHeader( demux_t *p_demux,
         /* What type of file do we have?
          * strcmp is safe to use here because we've extracted
          * content_type_string from the stream manually */
-        if( !strncmp(content_type_string, "audio/x-wav", 11) )
-        {
-            /* n.b. WAVs are unsupported right now */
-            p_stream->fmt.i_cat = UNKNOWN_ES;
-        }
-        else if( !strncmp(content_type_string, "audio/x-vorbis", 14) )
-        {
-            p_stream->fmt.i_cat = AUDIO_ES;
-            p_stream->fmt.i_codec = VLC_CODEC_VORBIS;
+        bool b_dopacketout = false;
+        Ogg_ApplyContentType( p_stream, content_type_string,
+                              &p_stream->b_force_backup, &b_dopacketout );
+        if ( b_dopacketout ) ogg_stream_packetout( &p_stream->os, p_oggpacket );
+    }
+}
 
-            p_stream->b_force_backup = true;
-        }
-        else if( !strncmp(content_type_string, "audio/x-speex", 13) )
-        {
-            p_stream->fmt.i_cat = AUDIO_ES;
-            p_stream->fmt.i_codec = VLC_CODEC_SPEEX;
+static void Ogg_ReadSkeletonHeader( demux_t *p_demux, logical_stream_t *p_stream,
+                                    ogg_packet *p_oggpacket )
+{
+    p_demux->p_sys->p_skelstream = p_stream;
+    /* There can be only 1 skeleton for streams */
+    p_demux->p_sys->skeleton.major = GetWLE( &p_oggpacket->packet[8] );
+    p_demux->p_sys->skeleton.minor = GetWLE( &p_oggpacket->packet[10] );
+    if ( asprintf( & p_stream->fmt.psz_description,
+                        "OGG Skeleton version %" PRIu16 ".%" PRIu16,
+                        p_demux->p_sys->skeleton.major,
+                        p_demux->p_sys->skeleton.minor ) < 0 )
+        p_stream->fmt.psz_description = NULL;
+}
 
-            p_stream->b_force_backup = true;
-        }
-        else if( !strncmp(content_type_string, "video/x-theora", 14) )
-        {
-            p_stream->fmt.i_cat = VIDEO_ES;
-            p_stream->fmt.i_codec = VLC_CODEC_THEORA;
+static void Ogg_ReadSkeletonBones( demux_t *p_demux, ogg_packet *p_oggpacket )
+{
+    if ( p_demux->p_sys->skeleton.major < 3 || p_oggpacket->bytes < 52 ) return;
 
-            p_stream->b_force_backup = true;
-        }
-        else if( !strncmp(content_type_string, "video/x-xvid", 12) )
+    /* Find the matching stream for this skeleton data */
+    ogg_int32_t i_serialno = GetDWLE( &p_oggpacket->packet[12] );
+    logical_stream_t *p_target_stream = NULL;
+    for ( int i=0; i< p_demux->p_sys->i_streams; i++ )
+    {
+        if ( p_demux->p_sys->pp_stream[i]->i_serial_no == i_serialno )
         {
-            p_stream->fmt.i_cat = VIDEO_ES;
-            p_stream->fmt.i_codec = VLC_FOURCC( 'x','v','i','d' );
-
-            p_stream->b_force_backup = true;
-        }
-        else if( !strncmp(content_type_string, "video/mpeg", 10) )
-        {
-            /* n.b. MPEG streams are unsupported right now */
-            p_stream->fmt.i_cat = VIDEO_ES;
-            p_stream->fmt.i_codec = VLC_CODEC_MPGV;
-        }
-        else if( !strncmp(content_type_string, "text/x-cmml", 11) )
-        {
-            ogg_stream_packetout( &p_stream->os, p_oggpacket );
-            p_stream->fmt.i_cat = SPU_ES;
-            p_stream->fmt.i_codec = VLC_CODEC_CMML;
+            p_target_stream = p_demux->p_sys->pp_stream[i];
+            break;
         }
     }
+    if ( !p_target_stream ) return;
+
+    ogg_skeleton_t *p_skel = p_target_stream->p_skel;
+    if ( !p_skel )
+    {
+        p_skel = malloc( sizeof( ogg_skeleton_t ) );
+        if ( !p_skel ) return;
+        TAB_INIT( p_skel->i_messages, p_skel->ppsz_messages );
+        p_skel->p_index = NULL;
+        p_target_stream->p_skel = p_skel;
+    }
+
+    const unsigned char *p_messages = p_oggpacket->packet + 8 + GetDWLE( &p_oggpacket->packet[8] );
+    const unsigned char *p_boundary = p_oggpacket->packet + p_oggpacket->bytes;
+    const unsigned char *p = p_messages;
+    while ( p <= p_boundary - 1 && p > p_oggpacket->packet )
+    {
+        if ( *p == 0x0D && *(p+1) == 0x0A )
+        {
+            char *psz_message = strndup( (const char *) p_messages,
+                                         p - p_messages );
+            if ( psz_message )
+            {
+                msg_Dbg( p_demux, "stream %" PRId32 " [%s]", i_serialno, psz_message );
+                TAB_APPEND( p_skel->i_messages, p_skel->ppsz_messages, psz_message );
+            }
+            if ( p < p_boundary - 1 ) p_messages = p + 2;
+        }
+        p++;
+    }
+
+}
+
+/* Unpacks the 7bit variable encoding used in skeleton indexes */
+unsigned const char * Read7BitsVariableLE( unsigned const char *p_begin,
+                                           unsigned const char const *p_end,
+                                           uint64_t *pi_value )
+{
+    int i_shift = 0;
+    int64_t i_read = 0;
+    *pi_value = 0;
+
+    while ( p_begin < p_end )
+    {
+        i_read = *p_begin & 0x7F; /* High bit is start of integer */
+        *pi_value = *pi_value | ( i_read << i_shift );
+        i_shift += 7;
+        if ( (*p_begin++ & 0x80) == 0x80 ) break; /* see prev */
+    }
+
+    *pi_value = GetQWLE( pi_value );
+    return p_begin;
+}
+
+static void Ogg_ReadSkeletonIndex( demux_t *p_demux, ogg_packet *p_oggpacket )
+{
+    if ( p_demux->p_sys->skeleton.major < 4
+         || p_oggpacket->bytes < 44 /* Need at least 1 index value (42+1+1) */
+    ) return;
+
+    /* Find the matching stream for this skeleton data */
+    int32_t i_serialno = GetDWLE( &p_oggpacket->packet[6] );
+    logical_stream_t *p_stream = NULL;
+    for ( int i=0; i< p_demux->p_sys->i_streams; i++ )
+    {
+        if ( p_demux->p_sys->pp_stream[i]->i_serial_no == i_serialno )
+        {
+            p_stream = p_demux->p_sys->pp_stream[i];
+            break;
+        }
+    }
+    if ( !p_stream ) return;
+    uint64_t i_keypoints = GetQWLE( &p_oggpacket->packet[10] );
+    msg_Dbg( p_demux, "%" PRIi64 " index data for %" PRIi32, i_keypoints, i_serialno );
+    if ( !i_keypoints ) return;
+
+    p_stream->p_skel->i_indexstampden = GetQWLE( &p_oggpacket->packet[18] );
+    p_stream->p_skel->i_indexfirstnum = GetQWLE( &p_oggpacket->packet[24] );
+    p_stream->p_skel->i_indexlastnum = GetQWLE( &p_oggpacket->packet[32] );
+    unsigned const char *p_fwdbyte = &p_oggpacket->packet[42];
+    unsigned const char const *p_boundary = p_oggpacket->packet + p_oggpacket->bytes;
+    uint64_t i_offset = 0;
+    uint64_t i_time = 0;
+    uint64_t i_keypoints_found = 0;
+
+    while( p_fwdbyte < p_boundary && i_keypoints_found < i_keypoints )
+    {
+        uint64_t i_val;
+        p_fwdbyte = Read7BitsVariableLE( p_fwdbyte, p_boundary, &i_val );
+        i_offset += i_val;
+        p_fwdbyte = Read7BitsVariableLE( p_fwdbyte, p_boundary, &i_val );
+        i_time += i_val * p_stream->p_skel->i_indexstampden;
+        i_keypoints_found++;
+    }
+
+    if ( i_keypoints_found != i_keypoints )
+    {
+        msg_Warn( p_demux, "Invalid Index: missing entries" );
+        return;
+    }
+
+    p_stream->p_skel->p_index = malloc( p_oggpacket->bytes - 42 );
+    if ( !p_stream->p_skel->p_index ) return;
+    memcpy( p_stream->p_skel->p_index, &p_oggpacket->packet[42],
+            p_oggpacket->bytes - 42 );
+    p_stream->p_skel->i_index = i_keypoints_found;
+    p_stream->p_skel->i_index_size = p_oggpacket->bytes - 42;
+}
+
+static void Ogg_FreeSkeleton( ogg_skeleton_t *p_skel )
+{
+    if ( !p_skel ) return;
+    for ( int i=0; i< p_skel->i_messages; i++ )
+        free( p_skel->ppsz_messages[i] );
+    TAB_CLEAN( p_skel->i_messages, p_skel->ppsz_messages );
+    free( p_skel->p_index );
+    free( p_skel );
+}
+
+static void Ogg_ApplySkeleton( logical_stream_t *p_stream )
+{
+    if ( !p_stream->p_skel ) return;
+    for ( int i=0; i< p_stream->p_skel->i_messages; i++ )
+    {
+        const char *psz_message = p_stream->p_skel->ppsz_messages[i];
+        if ( ! strncmp( "Name: ", psz_message, 6 ) )
+        {
+            free( p_stream->fmt.psz_description );
+            p_stream->fmt.psz_description = strdup( psz_message + 6 );
+        }
+        else if ( ! strncmp("Content-Type: ", psz_message, 14 ) )
+        {
+            bool b_foo;
+            Ogg_ApplyContentType( p_stream, psz_message + 14, &b_foo, &b_foo );
+        }
+    }
+}
+
+/* Return true if there's a skeleton exact match */
+bool Ogg_GetBoundsUsingSkeletonIndex( logical_stream_t *p_stream, int64_t i_time,
+                                      int64_t *pi_lower, int64_t *pi_upper )
+{
+    if ( !p_stream || !p_stream->p_skel || !p_stream->p_skel->p_index )
+        return false;
+
+    /* Validate range */
+    if ( i_time < p_stream->p_skel->i_indexfirstnum
+                * p_stream->p_skel->i_indexstampden ||
+         i_time > p_stream->p_skel->i_indexlastnum
+                * p_stream->p_skel->i_indexstampden ) return false;
+
+    /* Then Lookup its index */
+    unsigned const char *p_fwdbyte = p_stream->p_skel->p_index;
+    struct
+    {
+        int64_t i_pos;
+        int64_t i_time;
+    } current = { 0, 0 }, prev = { -1, -1 };
+
+    uint64_t i_keypoints_found = 0;
+
+    while( p_fwdbyte < p_fwdbyte + p_stream->p_skel->i_index_size
+           && i_keypoints_found < p_stream->p_skel->i_index )
+    {
+        uint64_t i_val;
+        p_fwdbyte = Read7BitsVariableLE( p_fwdbyte,
+                        p_fwdbyte + p_stream->p_skel->i_index_size, &i_val );
+        current.i_pos += i_val;
+        p_fwdbyte = Read7BitsVariableLE( p_fwdbyte,
+                        p_fwdbyte + p_stream->p_skel->i_index_size, &i_val );
+        current.i_time += i_val * p_stream->p_skel->i_indexstampden;
+        if ( current.i_pos < 0 || current.i_time < 0 ) break;
+
+        i_keypoints_found++;
+
+        if ( i_time <= current.i_time )
+        {
+            *pi_lower = prev.i_pos;
+            *pi_upper = current.i_pos;
+            return ( i_time == current.i_time );
+        }
+        prev = current;
+    }
+    return false;
 }
 
 static uint32_t dirac_uint( bs_t *p_bs )

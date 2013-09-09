@@ -41,6 +41,7 @@
 #define PACKET_IS_SYNCPOINT  0x08
 
 typedef struct oggseek_index_entry demux_index_entry_t;
+typedef struct ogg_skeleton_t ogg_skeleton_t;
 
 typedef struct logical_stream_s
 {
@@ -57,6 +58,7 @@ typedef struct logical_stream_s
      * data for the decoder. We back them up here in case we need to re-feed
      * them to the decoder. */
     bool             b_force_backup;
+    bool             b_have_updated_format;
     int              i_packets_backup;
     int32_t          i_extra_headers_packets;
     void             *p_headers;
@@ -85,6 +87,9 @@ typedef struct logical_stream_s
     /* keyframe index for seeking, created as we discover keyframes */
     demux_index_entry_t *idx;
 
+    /* Skeleton data */
+    ogg_skeleton_t *p_skel;
+
     /* skip some frames after a seek */
     int i_skip_frames;
 
@@ -99,12 +104,25 @@ typedef struct logical_stream_s
 
 } logical_stream_t;
 
+struct ogg_skeleton_t
+{
+    int            i_messages;
+    char         **ppsz_messages;
+    unsigned char *p_index;
+    uint64_t       i_index;
+    uint64_t       i_index_size;
+    int64_t        i_indexstampden;/* time denominator */
+    int64_t        i_indexfirstnum;/* first sample time numerator */
+    int64_t        i_indexlastnum;
+};
+
 struct demux_sys_t
 {
     ogg_sync_state oy;        /* sync and verify incoming physical bitstream */
 
     int i_streams;                           /* number of logical bitstreams */
     logical_stream_t **pp_stream;  /* pointer to an array of logical streams */
+    logical_stream_t *p_skelstream; /* pointer to skeleton stream if any */
 
     logical_stream_t *p_old_stream; /* pointer to a old logical stream to avoid recreating it */
 
@@ -140,6 +158,13 @@ struct demux_sys_t
     int                 i_seekpoints;
     seekpoint_t         **pp_seekpoints;
 
+    /* skeleton */
+    struct
+    {
+        uint16_t major;
+        uint16_t minor;
+    } skeleton;
+
     /* */
     int                 i_attachments;
     input_attachment_t  **attachments;
@@ -149,3 +174,10 @@ struct demux_sys_t
 
     DemuxDebug( bool b_seeked; )
 };
+
+
+unsigned const char * Read7BitsVariableLE( unsigned const char *,
+                                           unsigned const char const *,
+                                           uint64_t * );
+bool Ogg_GetBoundsUsingSkeletonIndex( logical_stream_t *p_stream, int64_t i_time,
+                                      int64_t *pi_lower, int64_t *pi_upper );
