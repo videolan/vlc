@@ -193,6 +193,16 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
           ? id->p_encoder->fmt_out.video.i_height
           : id->p_decoder->fmt_in.video.i_height
             ? id->p_decoder->fmt_in.video.i_height : 16;
+    id->p_encoder->fmt_in.video.i_visible_width =
+        id->p_encoder->fmt_out.video.i_visible_width
+          ? id->p_encoder->fmt_out.video.i_visible_width
+          : id->p_decoder->fmt_in.video.i_visible_width
+            ? id->p_decoder->fmt_in.video.i_visible_width : 16;
+    id->p_encoder->fmt_in.video.i_visible_height =
+        id->p_encoder->fmt_out.video.i_visible_height
+          ? id->p_encoder->fmt_out.video.i_visible_height
+          : id->p_decoder->fmt_in.video.i_visible_height
+            ? id->p_decoder->fmt_in.video.i_visible_height : 16;
     id->p_encoder->fmt_in.video.i_frame_rate = ENC_FRAMERATE;
     id->p_encoder->fmt_in.video.i_frame_rate_base = ENC_FRAMERATE_BASE;
 
@@ -346,6 +356,12 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
      * width/height of source */
     int i_src_visible_width = p_fmt_out->video.i_visible_width;
     int i_src_visible_height = p_fmt_out->video.i_visible_height;
+
+    if (i_src_visible_width == 0)
+        i_src_visible_width = p_fmt_out->video.i_width;
+    if (i_src_visible_height == 0)
+        i_src_visible_height = p_fmt_out->video.i_height;
+
 
     /* with/height scaling */
     float f_scale_width = 1;
