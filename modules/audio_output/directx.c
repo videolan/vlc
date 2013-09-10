@@ -861,17 +861,19 @@ static int DeviceSelect (audio_output_t *aout, const char *id)
 static int Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
+
+    HINSTANCE hdsound_dll = LoadLibrary(_T("DSOUND.DLL"));
+    if (hdsound_dll == NULL)
+    {
+        msg_Warn(aout, "cannot open DSOUND.DLL");
+        return VLC_EGENERIC;
+    }
+
     aout_sys_t *sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    sys->hdsound_dll = LoadLibrary(_T("DSOUND.DLL"));
-    if (sys->hdsound_dll == NULL)
-    {
-        msg_Warn(aout, "cannot open DSOUND.DLL");
-        free(sys);
-        return VLC_EGENERIC;
-    }
+    sys->hdsound_dll = hdsound_dll;
 
     aout->sys = sys;
     aout->start = Start;
