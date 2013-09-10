@@ -112,6 +112,42 @@ error:
     return p_attachment;
 }
 
+typedef struct chapter_entry_t
+{
+    int   i_index;
+    seekpoint_t *p_seekpoint;
+} chapter_entry_t;
+
+typedef struct chapters_array_t
+{
+    int i_num;
+    chapter_entry_t ** pp_chapters;
+} chapters_array_t;
+
+static chapter_entry_t * getChapterEntry( int i_index, chapters_array_t *p_array )
+{
+    chapter_entry_t *p_chapter = NULL;
+    for( int i=0; i<p_array->i_num; i++ )
+    {
+        if ( p_array->pp_chapters[i]->i_index == i_index )
+        {
+            p_chapter = p_array->pp_chapters[i];
+            break;
+        }
+    }
+    if ( !p_chapter )
+    {
+        p_chapter = malloc( sizeof(chapter_entry_t) );
+        p_chapter->i_index = i_index;
+        p_chapter->p_seekpoint = vlc_seekpoint_New();
+        if ( i_index > p_array->i_num ) i_index = p_array->i_num;
+        if ( p_array->i_num == 0 ) i_index = 0;
+        /* FIXME or not.. : won't sort chapters if chapter00 is missing */
+        TAB_INSERT( p_array->i_num, p_array->pp_chapters, p_chapter, i_index );
+    }
+    return p_chapter;
+}
+
 void vorbis_ParseComment( vlc_meta_t **pp_meta,
         const uint8_t *p_data, int i_data,
         int *i_attachments, input_attachment_t ***attachments,
@@ -120,7 +156,6 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
 {
     int n;
     int i_comment;
-    seekpoint_t *sk = NULL;
 
     if( i_data < 8 )
         return;
@@ -166,6 +201,9 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
     bool hasPublisher    = false;
     bool hasEncodedBy    = false;
     bool hasTrackTotal   = false;
+
+    chapters_array_t chapters_array;
+    TAB_INIT( chapters_array.i_num, chapters_array.pp_chapters );
 
     for( ; i_comment > 0; i_comment-- )
     {
@@ -259,29 +297,28 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
                     *i_attachments, *attachments, p_attachment );
             }
         }
-        else if( !strncasecmp(psz_comment, "chapter", strlen("chapter")) )
+        else if( !strncmp(psz_comment, "CHAPTER", 7) )
         {
-            if( ppp_seekpoint == NULL )
-                continue;
-
             int i_chapt;
-            if( strstr( psz_comment, "name") && sscanf( psz_comment, "chapter%i=", &i_chapt ) == 1 )
+            chapter_entry_t *p_chapter = NULL;
+
+            if( strstr( psz_comment, "NAME=" ) &&
+                    sscanf( psz_comment, "CHAPTER%iNAME=", &i_chapt ) == 1 )
             {
                 char *p = strchr( psz_comment, '=' );
-                *p++ = '\0';
-                sk->psz_name = strdup( p );
+                p_chapter = getChapterEntry( i_chapt, &chapters_array );
+                if ( ! p_chapter->p_seekpoint->psz_name )
+                    p_chapter->p_seekpoint->psz_name = strdup( ++p );
             }
-            else if( sscanf( psz_comment, "chapter %i=", &i_chapt ) == 1 )
+            else if( sscanf( psz_comment, "CHAPTER%i=", &i_chapt ) == 1 )
             {
                 int h, m, s, ms;
                 char *p = strchr( psz_comment, '=' );
-                *p++ = '\0';
-
-                if( sscanf( p, "%d:%d:%d.%d", &h, &m, &s, &ms ) == 4 )
+                if( p && sscanf( ++p, "%d:%d:%d.%d", &h, &m, &s, &ms ) == 4 )
                 {
-                    sk = vlc_seekpoint_New();
-                    sk->i_time_offset = (((int64_t)h * 3600 + (int64_t)m * 60 + (int64_t)s) * 1000 + ms) * 1000;
-                    TAB_APPEND_CAST( (seekpoint_t**), *i_seekpoint, *ppp_seekpoint, sk );
+                    p_chapter = getChapterEntry( i_chapt, &chapters_array );
+                    p_chapter->p_seekpoint->i_time_offset =
+                      (((int64_t)h * 3600 + (int64_t)m * 60 + (int64_t)s) * 1000 + ms) * 1000;
                 }
             }
         }
@@ -302,6 +339,14 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
         free( psz_comment );
     }
 #undef RM
+
+    for ( int i=0; i<chapters_array.i_num; i++ )
+    {
+        TAB_APPEND_CAST( (seekpoint_t**), *i_seekpoint, *ppp_seekpoint,
+                         chapters_array.pp_chapters[i]->p_seekpoint );
+        free(chapters_array.pp_chapters[i]);
+    }
+    TAB_CLEAN( chapters_array.i_num, chapters_array.pp_chapters );
 }
 
 const char *FindKateCategoryName( const char *psz_tag )
