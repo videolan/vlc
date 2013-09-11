@@ -2384,24 +2384,24 @@ AS_IF([test "${enable_vda}" != "no"], [
   if test "${SYS}" = "darwin"; then
   AS_IF([test "x${have_avcodec}" = "xyes"], [
     AC_CHECK_HEADERS(VideoDecodeAcceleration/VDADecoder.h,
-      [
-        AC_CHECK_HEADERS(libavcodec/vda.h, [
-           have_avcodec_vda="yes"
-        ],[
-	AS_IF([test "${enable_vda}" = "yes"],
-	      [AC_MSG_ERROR([vda is present but libavcodec/vda.h is missing])],
-              [AC_MSG_WARN([vda is present but libavcodec/vda.h is missing ])])
-        ])
-  ],[
-	AS_IF([test "${enable_vda}" = "yes"],
-              [AC_MSG_ERROR([Could not find required VideoDecodeAcceleration/VDADecoder.h])],
-              [AC_MSG_WARN([VideoDecodeAcceleration/VDADecoder.h not found])])
+    [
+      PKG_CHECK_EXISTS([libavcodec >= 55.19.0], [
+        have_avcodec_vda="yes"
+      ],[
+        AS_IF([test "${enable_vda}" = "yes"],
+         [AC_MSG_ERROR([libavcodec >= 55.19.0 is required for VDA decoding])],
+         [AC_MSG_WARN([libavcodec >= 55.19.0 is required for VDA decoding])])
       ])
+    ],[
+	AS_IF([test "${enable_vda}" = "yes"],
+      [AC_MSG_ERROR([Could not find required VideoDecodeAcceleration/VDADecoder.h])],
+      [AC_MSG_WARN([VideoDecodeAcceleration/VDADecoder.h not found])])
+    ])
   ],[
     AS_IF([test "x${enable_vda}" != "x"], [
       AC_MSG_ERROR([--enable-vda and --disable-avcodec options are mutually exclusive.])
     ])
- ])
+  ])
   fi
 ])
 AM_CONDITIONAL([HAVE_AVCODEC_VDA], [test "${have_avcodec_vda}" = "yes"])
