@@ -125,6 +125,7 @@ struct vout_display_sys_t
     HGLRC                 hGLRC;
     vlc_gl_t              gl;
     vout_display_opengl_t *vgl;
+    HDC                   affinityHDC; // DC for the selected GPU
 #endif
 
 #ifdef MODULE_NAME_IS_direct2d
@@ -151,6 +152,7 @@ struct vout_display_sys_t
     D3DCAPS9                d3dcaps;
     LPDIRECT3DDEVICE9       d3ddev;
     D3DPRESENT_PARAMETERS   d3dpp;
+
     // scene objects
     LPDIRECT3DTEXTURE9      d3dtex;
     LPDIRECT3DVERTEXBUFFER9 d3dvtc;
@@ -186,8 +188,6 @@ struct vout_display_sys_t
         RGBQUAD    blue;
     };
 #endif
-
-    HDC affinityHDC; // DC for the selected GPU
 };
 
 /*****************************************************************************
