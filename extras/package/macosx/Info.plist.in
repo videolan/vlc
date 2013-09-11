@@ -1343,7 +1343,7 @@
 		</dict>
 	</array>
 	<key>SUFeedURL</key>
-	<string>http://update-test.videolan.org/vlc/sparkle/vlc.xml</string>
+	<string>http://update.videolan.org/vlc/sparkle/vlc.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
 	<key>CFBundleExecutable</key>
