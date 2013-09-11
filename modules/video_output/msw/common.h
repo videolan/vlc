@@ -22,6 +22,19 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef MODULE_NAME_IS_directdraw
+# include <ddraw.h>
+#endif
+#ifdef MODULE_NAME_IS_direct3d
+# include <d3d9.h>
+#endif
+#ifdef MODULE_NAME_IS_glwin32
+# include "../opengl.h"
+#endif
+#ifdef MODULE_NAME_IS_direct2d
+# include <d2d1.h>
+#endif
+
 /*****************************************************************************
  * event_thread_t: event thread
  *****************************************************************************/
