@@ -12,9 +12,9 @@ DEPS_postproc = ffmpeg
 
 ifdef ENABLE_SMALL
 POSTPROCCONF += --enable-small
-ifdef HAVE_ARMV7A
-FFMPEGCONF += --enable-thumb
 endif
+ifdef HAVE_ARMV7A
+POSTPROCCONF += --enable-thumb
 endif
 
 ifdef HAVE_CROSS_COMPILE
