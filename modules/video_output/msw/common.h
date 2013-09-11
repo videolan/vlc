@@ -60,7 +60,6 @@ struct vout_display_sys_t
 
     /* size of the display */
     RECT         rect_display;
-    int          display_depth;
 
     /* size of the overall window (including black bands) */
     RECT         rect_parent;
