@@ -34,19 +34,20 @@
  * display video in window mode.
  *
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
 #include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_playlist.h>   /* needed for wallpaper */
-#include <vlc_charset.h>
+#include <vlc_charset.h>    /* FromT */
 
 #include <windows.h>
-#include <winuser.h>
 #include <ddraw.h>
 #include <commctrl.h>       /* ListView_(Get|Set)* */
 
@@ -61,7 +62,6 @@
 #else
 # define DIRECTDRAWENUMERATEEX_NAME "DirectDrawEnumerateExA"
 #endif
-
 
 /*****************************************************************************
  * Module descriptor
