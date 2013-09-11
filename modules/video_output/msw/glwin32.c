@@ -29,18 +29,11 @@
 #include <vlc_vout_display.h>
 
 #include <windows.h>
-#include <ddraw.h>
-#include <commctrl.h>
-
-#undef GetSystemMetrics
-
-#ifndef MONITOR_DEFAULTTONEAREST
-#   define MONITOR_DEFAULTTONEAREST 2
-#endif
 
 #define GLEW_STATIC
 #include "../opengl.h"
 #include <GL/wglew.h>
+
 #include "common.h"
 
 /*****************************************************************************
