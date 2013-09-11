@@ -36,13 +36,8 @@
 #include <vlc_vout_display.h>
 
 #include <windows.h>
-#include <commctrl.h>
 
 #include "common.h"
-
-#ifndef WS_NONAVDONEBUTTON
-#   define WS_NONAVDONEBUTTON 0
-#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -129,6 +124,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
     VLC_UNUSED(count);
     return vd->sys->pool;
 }
+
 static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -172,6 +168,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     CommonDisplay(vd);
 }
+
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     switch (query) {
@@ -183,6 +180,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
     }
 
 }
+
 static void Manage(vout_display_t *vd)
 {
     CommonManage(vd);
