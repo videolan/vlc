@@ -1804,7 +1804,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
         QuickTimeGenericRTPSource::QTState &qtState = qtRTPSource->qtState;
         uint8_t *sdAtom = (uint8_t*)&qtState.sdAtom[4];
 
-        /* Get codec informations from the quicktime atoms :
+        /* Get codec information from the quicktime atoms :
          * http://developer.apple.com/quicktime/icefloe/dispatch026.html */
         if( tk->fmt.i_cat == VIDEO_ES ) {
             if( qtState.sdAtomSize < 16 + 32 )

@@ -128,7 +128,7 @@ struct  demux_sys_t
     unsigned int        i_current_clip;
     input_title_t       **pp_title;
 
-    /* Meta informations */
+    /* Meta information */
     const META_DL       *p_meta;
 
     /* Menus */

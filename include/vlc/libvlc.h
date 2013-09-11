@@ -215,7 +215,7 @@ void libvlc_set_user_agent( libvlc_instance_t *p_instance,
                             const char *name, const char *http );
 
 /**
- * Sets some meta-informations about the application.
+ * Sets some meta-information about the application.
  * See also libvlc_set_user_agent().
  *
  * \param p_instance LibVLC instance
@@ -353,7 +353,7 @@ enum libvlc_log_level
 typedef struct vlc_log_t libvlc_log_t;
 
 /**
- * Gets debugging informations about a log message: the name of the VLC module
+ * Gets debugging information about a log message: the name of the VLC module
  * emitting the message and the message location within the source code.
  *
  * The returned module name and file name will be NULL if unknown.
@@ -372,9 +372,9 @@ LIBVLC_API void libvlc_log_get_context(const libvlc_log_t *ctx,
                        const char **module, const char **file, unsigned *line);
 
 /**
- * Gets VLC object informations about a log message: the type name of the VLC
+ * Gets VLC object information about a log message: the type name of the VLC
  * object emitting the message, the object header if any and a temporaly-unique
- * object identifier. These informations are mainly meant for <b>manual</b>
+ * object identifier. These information are mainly meant for <b>manual</b>
  * troubleshooting.
  *
  * The returned type name may be "generic" if unknown, but it cannot be NULL.
@@ -399,7 +399,7 @@ LIBVLC_API void libvlc_log_get_object(const libvlc_log_t *ctx,
  * Callback prototype for LibVLC log message handler.
  * \param data data pointer as given to libvlc_log_set()
  * \param level message level (@ref enum libvlc_log_level)
- * \param ctx message context (meta-informations about the message)
+ * \param ctx message context (meta-information about the message)
  * \param fmt printf() format string (as defined by ISO C11)
  * \param args variable argument list for the format
  * \note Log message handlers <b>must</b> be thread-safe.
