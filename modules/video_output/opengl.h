@@ -26,6 +26,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef VLC_OPENGL_H
+#define VLC_OPENGL_H
+
 #include <vlc_common.h>
 #include <vlc_picture_pool.h>
 #include <vlc_opengl.h>
@@ -90,3 +93,5 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                                 picture_t *picture, subpicture_t *subpicture);
 int vout_display_opengl_Display(vout_display_opengl_t *vgl,
                                 const video_format_t *source);
+
+#endif
