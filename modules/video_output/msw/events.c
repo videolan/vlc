@@ -21,24 +21,22 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-
 /*****************************************************************************
  * Preamble: This file contains the functions related to the creation of
  *             a window and the handling of its messages (events).
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include <vlc_common.h>
 #include <vlc_vout_display.h>
-#include <vlc_vout_window.h>
 
 #include <windows.h>
 #include <windowsx.h>                                        /* GET_X_LPARAM */
 #include <shellapi.h>                                         /* ExtractIcon */
 
-#include <vlc_keys.h>
 #include "common.h"
 
 /*****************************************************************************

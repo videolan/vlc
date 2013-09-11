@@ -29,28 +29,12 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_vout_display.h>
-#include <vlc_vout_window.h>
 
 #include <windows.h>
-#include <windowsx.h>
-#include <shellapi.h>
-
-#ifdef MODULE_NAME_IS_directdraw
-#include <ddraw.h>
-#endif
-#ifdef MODULE_NAME_IS_direct3d
-#include <d3d9.h>
-#endif
-#ifdef MODULE_NAME_IS_glwin32
-#include "../opengl.h"
-#endif
-#ifdef MODULE_NAME_IS_direct2d
-#include <d2d1.h>
-#endif
+#include <assert.h>
 
 #include "common.h"
 
