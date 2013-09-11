@@ -78,7 +78,7 @@ void FirstRun::buildPrivDialog()
         "Internet-based services. This includes cover art, track names, "
         "artist names and other meta-data."
         "</p>\n"
-        "Consequently, this may entail identifying some of your media files to third party "
+        "<p>Consequently, this may entail identifying some of your media files to third party "
         "entities. Therefore the <i>VLC</i> developers require your express "
         "consent for the media player to access the Internet automatically."
         "</p>\n"
