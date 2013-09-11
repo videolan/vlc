@@ -1292,7 +1292,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     if (!can_hwaccel)
         goto end;
 
-    /* Profile and level information are needed now.
+    /* Profile and level information is needed now.
      * TODO: avoid code duplication with avcodec.c */
     if( p_context->profile != FF_PROFILE_UNKNOWN)
         p_dec->fmt_in.i_profile = p_context->profile;

@@ -374,7 +374,7 @@ LIBVLC_API void libvlc_log_get_context(const libvlc_log_t *ctx,
 /**
  * Gets VLC object information about a log message: the type name of the VLC
  * object emitting the message, the object header if any and a temporaly-unique
- * object identifier. These information are mainly meant for <b>manual</b>
+ * object identifier. This information is mainly meant for <b>manual</b>
  * troubleshooting.
  *
  * The returned type name may be "generic" if unknown, but it cannot be NULL.
