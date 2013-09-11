@@ -367,17 +367,18 @@ clear:
 
     if (!p_input)
         return 0;
-    else if (input_Control(p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, &i_bookmarks) != VLC_SUCCESS) {
-        vlc_object_release(p_input);
+
+    int returnValue = input_Control(p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, &i_bookmarks);
+    vlc_object_release(p_input);
+
+    if (returnValue != VLC_SUCCESS)
         return 0;
-    } else {
-        vlc_object_release(p_input);
-        // Clear the bookmark list
-        for (int i = 0; i < i_bookmarks; i++)
-            vlc_seekpoint_Delete(pp_bookmarks[i]);
-        free(pp_bookmarks);
-        return i_bookmarks;
-    }
+
+    for (int i = 0; i < i_bookmarks; i++)
+        vlc_seekpoint_Delete(pp_bookmarks[i]);
+    free(pp_bookmarks);
+
+    return i_bookmarks;
 }
 
 - (id)tableView:(NSTableView *)theDataTable objectValueForTableColumn: (NSTableColumn *)theTableColumn row: (NSInteger)row
