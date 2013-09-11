@@ -186,7 +186,6 @@ fi
 
 ../bootstrap --host=${TARGET} --build="i686-apple-darwin10" --prefix=${VLCROOT}/contrib/${TARGET}-${ARCH} --disable-gpl \
     --disable-disc --disable-sout \
-    --enable-small \
     --disable-sdl \
     --disable-SDL_image \
     --disable-iconv \
