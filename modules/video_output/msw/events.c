@@ -1,5 +1,5 @@
 /*****************************************************************************
- * events.c: Windows DirectX video output events handler
+ * events.c: Windows video output events handler
  *****************************************************************************
  * Copyright (C) 2001-2009 VLC authors and VideoLAN
  * $Id$
@@ -35,22 +35,20 @@
 #include <vlc_vout_window.h>
 
 #include <windows.h>
-#include <windowsx.h>
-#include <shellapi.h>
-
-#include <ctype.h>
+#include <windowsx.h>                                        /* GET_X_LPARAM */
+#include <shellapi.h>                                         /* ExtractIcon */
 
 #ifdef MODULE_NAME_IS_directdraw
-#include <ddraw.h>
+# include <ddraw.h>
 #endif
 #ifdef MODULE_NAME_IS_direct3d
-#include <d3d9.h>
+# include <d3d9.h>
 #endif
 #ifdef MODULE_NAME_IS_glwin32
-#include "../opengl.h"
+# include "../opengl.h"
 #endif
 #ifdef MODULE_NAME_IS_direct2d
-#include <d2d1.h>
+# include <d2d1.h>
 #endif
 
 #include <vlc_keys.h>
@@ -106,11 +104,11 @@ struct event_thread_t
     bool has_moved;
 };
 
-static int  DirectXCreateWindow( event_thread_t * );
-static void DirectXCloseWindow ( event_thread_t * );
-static long FAR PASCAL DirectXEventProc( HWND, UINT, WPARAM, LPARAM );
+static int  Win32VoutCreateWindow( event_thread_t * );
+static void Win32VoutCloseWindow ( event_thread_t * );
+static long FAR PASCAL WinVoutEventProc( HWND, UINT, WPARAM, LPARAM );
 
-static int DirectXConvertKey( int i_key );
+static int Win32VoutConvertKey( int i_key );
 
 static inline bool isMouseEvent( WPARAM type )
 {
@@ -209,7 +207,7 @@ static void *EventThread( void *p_this )
     /* Create a window for the video */
     /* Creating a window under Windows also initializes the thread's event
      * message queue */
-    if( DirectXCreateWindow( p_event ) )
+    if( Win32VoutCreateWindow( p_event ) )
         p_event->b_error = true;
 
     p_event->b_ready = true;
@@ -337,7 +335,7 @@ static void *EventThread( void *p_this )
             /* The key events are first processed here and not translated
              * into WM_CHAR events because we need to know the status of the
              * modifier keys. */
-            int i_key = DirectXConvertKey( msg.wParam );
+            int i_key = Win32VoutConvertKey( msg.wParam );
             if( !i_key )
             {
                 /* This appears to be a "normal" (ascii) key */
@@ -438,9 +436,9 @@ static void *EventThread( void *p_this )
         p_event->hwnd = NULL; /* Window already destroyed */
     }
 
-    msg_Dbg( vd, "DirectXEventThread terminating" );
+    msg_Dbg( vd, "Win32 Vout EventThread terminating" );
 
-    DirectXCloseWindow( p_event );
+    Win32VoutCloseWindow( p_event );
     vlc_restorecancel(canc);
     return NULL;
 }
@@ -486,13 +484,13 @@ static HWND GetDesktopHandle(vout_display_t *vd)
 /* following functions are local */
 
 /*****************************************************************************
- * DirectXCreateWindow: create a window for the video.
+ * Win32VoutCreateWindow: create a window for the video.
  *****************************************************************************
  * Before creating a direct draw surface, we need to create a window in which
  * the video will be displayed. This window will also allow us to capture the
  * events.
  *****************************************************************************/
-static int DirectXCreateWindow( event_thread_t *p_event )
+static int Win32VoutCreateWindow( event_thread_t *p_event )
 {
     vout_display_t *vd = p_event->vd;
     HINSTANCE  hInstance;
@@ -502,7 +500,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
     TCHAR      vlc_path[MAX_PATH+1];
     int        i_style, i_stylex;
 
-    msg_Dbg( vd, "DirectXCreateWindow" );
+    msg_Dbg( vd, "Win32VoutCreateWindow" );
 
     /* Get this module's instance */
     hInstance = GetModuleHandle(NULL);
@@ -537,7 +535,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
 
     /* Fill in the window class structure */
     wc.style         = CS_OWNDC|CS_DBLCLKS;          /* style: dbl click */
-    wc.lpfnWndProc   = (WNDPROC)DirectXEventProc;       /* event handler */
+    wc.lpfnWndProc   = (WNDPROC)WinVoutEventProc;       /* event handler */
     wc.cbClsExtra    = 0;                         /* no extra class data */
     wc.cbWndExtra    = 0;                        /* no extra window data */
     wc.hInstance     = hInstance;                            /* instance */
@@ -554,7 +552,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
         if( p_event->vlc_icon )
             DestroyIcon( p_event->vlc_icon );
 
-        msg_Err( vd, "DirectXCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
+        msg_Err( vd, "Win32VoutCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
         return VLC_EGENERIC;
     }
 
@@ -564,7 +562,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
     wc.hbrBackground = NULL; /* no background color */
     if( !RegisterClass(&wc) )
     {
-        msg_Err( vd, "DirectXCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
+        msg_Err( vd, "Win32VoutCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
         return VLC_EGENERIC;
     }
 
@@ -611,7 +609,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
     p_event->hwnd =
         CreateWindowEx( WS_EX_NOPARENTNOTIFY | i_stylex,
                     p_event->class_main,             /* name of window class */
-                    _T(VOUT_TITLE) _T(" (DirectX Output)"),  /* window title */
+                    _T(VOUT_TITLE) _T(" (VLC Video Output)"),  /* window title */
                     i_style,                                 /* window style */
                     (!p_event->wnd_cfg.x) ? (UINT)CW_USEDEFAULT :
                         (UINT)p_event->wnd_cfg.x,   /* default X coordinate */
@@ -626,7 +624,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
 
     if( !p_event->hwnd )
     {
-        msg_Warn( vd, "DirectXCreateWindow create window FAILED (err=%lu)", GetLastError() );
+        msg_Warn( vd, "Win32VoutCreateWindow create window FAILED (err=%lu)", GetLastError() );
         return VLC_EGENERIC;
     }
 
@@ -645,7 +643,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
         /* Create our fullscreen window */
         p_event->hfswnd =
             CreateWindowEx( WS_EX_APPWINDOW, p_event->class_main,
-                            _T(VOUT_TITLE) _T(" (DirectX Output)"),
+                            _T(VOUT_TITLE) _T(" (VLC Fullscreen Video Output)"),
                             WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN|WS_SIZEBOX,
                             CW_USEDEFAULT, CW_USEDEFAULT,
                             CW_USEDEFAULT, CW_USEDEFAULT,
@@ -688,14 +686,14 @@ static int DirectXCreateWindow( event_thread_t *p_event )
 }
 
 /*****************************************************************************
- * DirectXCloseWindow: close the window created by DirectXCreateWindow
+ * Win32VoutCloseWindow: close the window created by Win32VoutCreateWindow
  *****************************************************************************
- * This function returns all resources allocated by DirectXCreateWindow.
+ * This function returns all resources allocated by Win32VoutCreateWindow.
  *****************************************************************************/
-static void DirectXCloseWindow( event_thread_t *p_event )
+static void Win32VoutCloseWindow( event_thread_t *p_event )
 {
     vout_display_t *vd = p_event->vd;
-    msg_Dbg( vd, "DirectXCloseWindow" );
+    msg_Dbg( vd, "Win32VoutCloseWindow" );
 
     DestroyWindow( p_event->hwnd );
     if( p_event->hfswnd )
@@ -718,7 +716,7 @@ static void DirectXCloseWindow( event_thread_t *p_event )
 }
 
 /*****************************************************************************
- * DirectXEventProc: This is the window event processing function.
+ * WinVoutEventProc: This is the window event processing function.
  *****************************************************************************
  * On Windows, when you create a window you have to attach an event processing
  * function to it. The aim of this function is to manage "Queued Messages" and
@@ -728,7 +726,7 @@ static void DirectXCloseWindow( event_thread_t *p_event )
  * Nonqueued Messages are those that Windows will send directly to this
  * procedure (like WM_DESTROY, WM_WINDOWPOSCHANGED...)
  *****************************************************************************/
-static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
+static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
                                          WPARAM wParam, LPARAM lParam )
 {
     event_thread_t *p_event;
@@ -935,7 +933,7 @@ static struct
     { 0, 0 }
 };
 
-static int DirectXConvertKey( int i_key )
+static int Win32VoutConvertKey( int i_key )
 {
     int i;
 
