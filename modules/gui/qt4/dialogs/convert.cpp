@@ -129,7 +129,8 @@ void ConvertDialog::fileBrowse()
 
     QString fileName = QFileDialog::getSaveFileName( this, qtr( "Save file..." ),
         p_intf->p_sys->filepath,
-        QString( qtr( "Containers (*" ) + fileExtension + ")" ) );
+        QString( "%1 (*%2);;%3 (*.*)" ).arg( qtr( "Containers" ) )
+            .arg( fileExtension ).arg( qtr("All") ) );
     fileLine->setText( toNativeSeparators( fileName ) );
     setDestinationFileExtension();
 }
@@ -174,13 +175,10 @@ void ConvertDialog::setDestinationFileExtension()
     if( !fileLine->text().isEmpty() && profile->isEnabled() )
     {
         QString newFileExtension = "." + profile->getMux();
-        QString newFileName;
-        int index = fileLine->text().lastIndexOf( "." );
-        if( index != -1 ) {
-            newFileName = fileLine->text().left( index ).append( newFileExtension );
-        } else {
-            newFileName = fileLine->text().append( newFileExtension );
+        if( fileLine->text().lastIndexOf( "." ) == -1 )
+        {
+            QString newFileName = fileLine->text().append( newFileExtension );
+            fileLine->setText( toNativeSeparators( newFileName ) );
         }
-        fileLine->setText( toNativeSeparators( newFileName ) );
     }
 }
