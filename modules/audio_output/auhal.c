@@ -1565,9 +1565,32 @@ static OSStatus DefaultDeviceChangedListener(AudioObjectID inObjectID,  UInt32 i
         return -1;
 
     if (!p_aout->sys->b_selected_dev_is_default)
-        return 0;
+        return noErr;
 
-    msg_Dbg(p_aout, "default device changed, resetting aout");
+    AudioObjectID defaultDeviceID = 0;
+    UInt32 propertySize = sizeof(AudioObjectID);
+    AudioObjectPropertyAddress defaultDeviceAddress = { kAudioHardwarePropertyDefaultOutputDevice, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
+    propertySize = sizeof(AudioObjectID);
+    OSStatus err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &defaultDeviceAddress, 0, NULL, &propertySize, &defaultDeviceID);
+    if (err != noErr) {
+        msg_Err(p_aout, "could not get default audio device [%4.4s]", (char *)&err);
+        return -1;
+    }
+
+    msg_Dbg(p_aout, "default device changed to %i", defaultDeviceID);
+
+    /* 
+     * The default device id changes to 0 when switching to SPDIF for whatever reason.
+     * We need to ignore that.
+     */
+    if(defaultDeviceID == 0)
+        return noErr;
+
+    /* Also ignore events which announce the same device id */
+    if(defaultDeviceID == p_aout->sys->i_selected_dev)
+        return noErr;
+
+    msg_Dbg(p_aout, "default device actually changed, resetting aout");
     aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
 
     return noErr;
