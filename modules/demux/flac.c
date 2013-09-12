@@ -582,7 +582,7 @@ static void ParseComment( demux_t *p_demux, const uint8_t *p_data, int i_data )
 
     vorbis_ParseComment( &p_sys->p_meta, &p_data[4], i_data - 4,
         &p_sys->i_attachments, &p_sys->attachments,
-        &p_sys->i_cover_score, &p_sys->i_cover_idx, NULL, NULL );
+        &p_sys->i_cover_score, &p_sys->i_cover_idx, NULL, NULL, NULL, NULL );
 }
 
 static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, int i_data )

@@ -36,7 +36,9 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
         const uint8_t *p_data, int i_data,
         int *i_attachments, input_attachment_t ***attachments,
         int *i_cover_score, int *i_cover_idx,
-        int *i_seekpoint, seekpoint_t ***ppp_seekpoint );
+        int *i_seekpoint, seekpoint_t ***ppp_seekpoint,
+        float (* ppf_replay_gain)[AUDIO_REPLAY_GAIN_MAX],
+        float (* ppf_replay_peak)[AUDIO_REPLAY_GAIN_MAX] );
 
 static const struct {
   const char *psz_tag;

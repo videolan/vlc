@@ -148,7 +148,9 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
         const uint8_t *p_data, int i_data,
         int *i_attachments, input_attachment_t ***attachments,
         int *i_cover_score, int *i_cover_idx,
-        int *i_seekpoint, seekpoint_t ***ppp_seekpoint )
+        int *i_seekpoint, seekpoint_t ***ppp_seekpoint,
+        float (* ppf_replay_gain)[AUDIO_REPLAY_GAIN_MAX],
+        float (* ppf_replay_peak)[AUDIO_REPLAY_GAIN_MAX] )
 {
     int n;
     int i_comment;
@@ -290,6 +292,40 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
             {
                 TAB_APPEND_CAST( (input_attachment_t**),
                     *i_attachments, *attachments, p_attachment );
+            }
+        }
+        else if ( ppf_replay_gain && ppf_replay_peak && !strncmp(psz_comment, "REPLAYGAIN_", 11) )
+        {
+            char *p = strchr( psz_comment, '=' );
+            char *psz_val;
+            if (!p) continue;
+            if ( !strncmp(psz_comment, "REPLAYGAIN_TRACK_GAIN=", 22) )
+            {
+                psz_val = malloc( strlen(p+1) + 1 );
+                if (!psz_val) continue;
+                if( sscanf( ++p, "%s dB", psz_val ) == 1 )
+                {
+                    (*ppf_replay_gain)[AUDIO_REPLAY_GAIN_TRACK] = us_atof( psz_val );
+                    free( psz_val );
+                }
+            }
+            else if ( !strncmp(psz_comment, "REPLAYGAIN_ALBUM_GAIN=", 22) )
+            {
+                psz_val = malloc( strlen(p+1) + 1 );
+                if (!psz_val) continue;
+                if( sscanf( ++p, "%s dB", psz_val ) == 1 )
+                {
+                    (*ppf_replay_gain)[AUDIO_REPLAY_GAIN_ALBUM] = us_atof( psz_val );
+                    free( psz_val );
+                }
+            }
+            else if ( !strncmp(psz_comment, "REPLAYGAIN_ALBUM_PEAK=", 22) )
+            {
+                (*ppf_replay_peak)[AUDIO_REPLAY_GAIN_ALBUM] = us_atof( ++p );
+            }
+            else if ( !strncmp(psz_comment, "REPLAYGAIN_TRACK_PEAK=", 22) )
+            {
+                (*ppf_replay_peak)[AUDIO_REPLAY_GAIN_TRACK] = us_atof( ++p );
             }
         }
         else if( !strncmp(psz_comment, "CHAPTER", 7) )

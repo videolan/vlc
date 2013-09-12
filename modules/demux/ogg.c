@@ -133,7 +133,7 @@ static void Ogg_LogicalStreamDelete( demux_t *p_demux, logical_stream_t *p_strea
 static bool Ogg_LogicalStreamResetEsFormat( demux_t *p_demux, logical_stream_t *p_stream );
 
 /* */
-static void Ogg_ExtractMeta( demux_t *p_demux, vlc_fourcc_t i_codec, const uint8_t *p_headers, int i_headers );
+static void Ogg_ExtractMeta( demux_t *p_demux, es_format_t *p_fmt, const uint8_t *p_headers, int i_headers );
 static int64_t Ogg_GetLastPacket( demux_t *p_demux, logical_stream_t *p_stream, double f_rate );
 
 /* Logical bitstream headers */
@@ -848,7 +848,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                                     p_stream->p_es, &p_stream->fmt );
 
                 if( p_stream->i_headers > 0 )
-                    Ogg_ExtractMeta( p_demux, p_stream->fmt.i_codec,
+                    Ogg_ExtractMeta( p_demux, & p_stream->fmt,
                                      p_stream->p_headers, p_stream->i_headers );
 
                 /* we're not at BOS anymore for this logical stream */
@@ -1863,7 +1863,8 @@ static bool Ogg_LogicalStreamResetEsFormat( demux_t *p_demux, logical_stream_t *
 
     return !b_compatible;
 }
-static void Ogg_ExtractXiphMeta( demux_t *p_demux, const void *p_headers, unsigned i_headers, unsigned i_skip )
+static void Ogg_ExtractXiphMeta( demux_t *p_demux, es_format_t *p_fmt,
+                                 const void *p_headers, unsigned i_headers, unsigned i_skip )
 {
     demux_sys_t *p_ogg = p_demux->p_sys;
 
@@ -1878,16 +1879,40 @@ static void Ogg_ExtractXiphMeta( demux_t *p_demux, const void *p_headers, unsign
     {
         int i_cover_score = 0;
         int i_cover_idx = 0;
+        float pf_replay_gain[AUDIO_REPLAY_GAIN_MAX];
+        float pf_replay_peak[AUDIO_REPLAY_GAIN_MAX];
+        for(int i=0; i< AUDIO_REPLAY_GAIN_MAX; i++ )
+        {
+            pf_replay_gain[i] = 0;
+            pf_replay_peak[i] = 0;
+        }
         vorbis_ParseComment( &p_ogg->p_meta, (uint8_t*)pp_data[1] + i_skip, pi_size[1] - i_skip,
                              &p_ogg->i_attachments, &p_ogg->attachments,
                              &i_cover_score, &i_cover_idx,
-                             &p_ogg->i_seekpoints, &p_ogg->pp_seekpoints );
+                             &p_ogg->i_seekpoints, &p_ogg->pp_seekpoints,
+                             &pf_replay_gain, &pf_replay_peak );
         if( p_ogg->p_meta != NULL && i_cover_idx < p_ogg->i_attachments )
         {
             char psz_url[128];
             snprintf( psz_url, sizeof(psz_url), "attachment://%s",
                 p_ogg->attachments[i_cover_idx]->psz_name );
             vlc_meta_Set( p_ogg->p_meta, vlc_meta_ArtworkURL, psz_url );
+        }
+
+        for ( int i=0; i<AUDIO_REPLAY_GAIN_MAX;i++ )
+        {
+            if ( pf_replay_gain[i] != 0 )
+            {
+                p_fmt->audio_replay_gain.pb_gain[i] = true;
+                p_fmt->audio_replay_gain.pf_gain[i] = pf_replay_gain[i];
+                msg_Dbg( p_demux, "setting replay gain %d to %f", i, pf_replay_gain[i] );
+            }
+            if ( pf_replay_peak[i] != 0 )
+            {
+                p_fmt->audio_replay_gain.pb_peak[i] = true;
+                p_fmt->audio_replay_gain.pf_peak[i] = pf_replay_peak[i];
+                msg_Dbg( p_demux, "setting replay peak %d to %f", i, pf_replay_gain[i] );
+            }
         }
     }
 
@@ -1899,33 +1924,33 @@ static void Ogg_ExtractXiphMeta( demux_t *p_demux, const void *p_headers, unsign
     for( unsigned i = 0; i < i_count; i++ )
         free( pp_data[i] );
 }
-static void Ogg_ExtractMeta( demux_t *p_demux, vlc_fourcc_t i_codec, const uint8_t *p_headers, int i_headers )
+static void Ogg_ExtractMeta( demux_t *p_demux, es_format_t *p_fmt, const uint8_t *p_headers, int i_headers )
 {
     demux_sys_t *p_ogg = p_demux->p_sys;
 
-    switch( i_codec )
+    switch( p_fmt->i_codec )
     {
     /* 3 headers with the 2° one being the comments */
     case VLC_CODEC_VORBIS:
     case VLC_CODEC_THEORA:
-        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+6 );
+        Ogg_ExtractXiphMeta( p_demux, p_fmt, p_headers, i_headers, 1+6 );
         break;
     case VLC_CODEC_OPUS:
-        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 8 );
+        Ogg_ExtractXiphMeta( p_demux, p_fmt, p_headers, i_headers, 8 );
         break;
     case VLC_CODEC_SPEEX:
-        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 0 );
+        Ogg_ExtractXiphMeta( p_demux, p_fmt, p_headers, i_headers, 0 );
         break;
 
     /* N headers with the 2° one being the comments */
     case VLC_CODEC_KATE:
         /* 1 byte for header type, 7 bytes for magic, 1 reserved zero byte */
-        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+7+1 );
+        Ogg_ExtractXiphMeta( p_demux, p_fmt, p_headers, i_headers, 1+7+1 );
         break;
 
     /* TODO */
     case VLC_CODEC_FLAC:
-        msg_Warn( p_demux, "Ogg_ExtractMeta does not support %4.4s", (const char*)&i_codec );
+        msg_Warn( p_demux, "Ogg_ExtractMeta does not support %4.4s", (const char*)&p_fmt->i_codec );
         break;
 
     /* No meta data */
