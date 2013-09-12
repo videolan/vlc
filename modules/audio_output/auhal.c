@@ -330,7 +330,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         p_sys->b_selected_dev_is_default = true;
 
         AudioObjectID defaultDeviceID = 0;
-        UInt32 propertySize = 0;
+        UInt32 propertySize = sizeof(AudioObjectID);
         AudioObjectPropertyAddress defaultDeviceAddress = { kAudioHardwarePropertyDefaultOutputDevice, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
         propertySize = sizeof(AudioObjectID);
         err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &defaultDeviceAddress, 0, NULL, &propertySize, &defaultDeviceID);
@@ -1062,6 +1062,7 @@ static void Stop(audio_output_t *p_aout)
         if (p_sys->b_changed_mixing && p_sys->sfmt_revert.mFormatID != kAudioFormat60958AC3) {
             int b_mix;
             Boolean b_writeable = false;
+            i_param_size = sizeof(int);
             /* Revert mixable to true if we are allowed to */
             AudioObjectPropertyAddress audioDeviceSupportsMixingAddress = { kAudioDevicePropertySupportsMixing , kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
             err = AudioObjectIsPropertySettable(p_sys->i_selected_dev, &audioDeviceSupportsMixingAddress, &b_writeable);
