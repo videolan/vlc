@@ -1156,13 +1156,6 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 TAB_APPEND( p_ogg->i_streams, p_ogg->pp_stream, p_stream );
 
                 memset( p_stream, 0, sizeof(logical_stream_t) );
-                p_stream->p_headers = 0;
-                p_stream->i_secondary_header_packets = 0;
-
-                p_stream->i_keyframe_offset = 0;
-                p_stream->i_skip_frames = 0;
-
-                p_stream->i_data_start = 0;
 
                 es_format_Init( &p_stream->fmt, 0, 0 );
                 es_format_Init( &p_stream->fmt_old, 0, 0 );
