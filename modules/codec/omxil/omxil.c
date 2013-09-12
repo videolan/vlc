@@ -50,6 +50,7 @@
 /* Defined in the broadcom version of OMX_Index.h */
 #define OMX_IndexConfigRequestCallback 0x7f000063
 #define OMX_IndexParamBrcmPixelAspectRatio 0x7f00004d
+#define OMX_IndexParamBrcmVideoDecodeErrorConcealment 0x7f000080
 
 /* Defined in the broadcom version of OMX_Core.h */
 #define OMX_EventParamOrConfigChanged 0x7F000001
@@ -743,6 +744,21 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
         omx_error = SetPortDefinition(p_dec, &p_sys->p_ports[i],
                                       p_sys->p_ports[i].p_fmt);
         if(omx_error != OMX_ErrorNone) goto error;
+    }
+
+    if(!strncmp(p_sys->psz_component, "OMX.broadcom.", 13) &&
+        p_sys->in.p_fmt->i_codec == VLC_CODEC_H264)
+    {
+        OMX_PARAM_BRCMVIDEODECODEERRORCONCEALMENTTYPE concanParam;
+        OMX_INIT_STRUCTURE(concanParam);
+        concanParam.bStartWithValidFrame = OMX_FALSE;
+
+        omx_error = OMX_SetParameter(omx_handle,
+                OMX_IndexParamBrcmVideoDecodeErrorConcealment, &concanParam);
+        if (omx_error == OMX_ErrorNone)
+            msg_Dbg(p_dec, "StartWithValidFrame disabled.");
+        else
+            msg_Dbg(p_dec, "Could not disable StartWithValidFrame.");
     }
 
     /* Allocate our array for the omx buffers and enable ports */
