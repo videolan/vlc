@@ -201,6 +201,8 @@ struct sout_access_out_sys_t
 
 static int LoadCryptFile( sout_access_out_t *p_access);
 static int CryptSetup( sout_access_out_t *p_access, char *keyfile );
+static int CheckSegmentChange( sout_access_out_t *p_access, block_t *p_buffer );
+static ssize_t writeSegment( sout_access_out_t *p_access );
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
@@ -891,6 +893,103 @@ static ssize_t openNextFile( sout_access_out_t *p_access, sout_access_out_sys_t 
     p_sys->i_segment = i_newseg;
     return fd;
 }
+/*****************************************************************************
+ * CheckSegmentChange: Check if segment needs to be closed and new opened
+ *****************************************************************************/
+static int CheckSegmentChange( sout_access_out_t *p_access, block_t *p_buffer )
+{
+    sout_access_out_sys_t *p_sys = p_access->p_sys;
+    block_t *output = p_sys->block_buffer;
+
+    if( p_sys->i_handle > 0 &&
+        ( ( p_buffer->i_dts - p_sys->i_opendts +
+          ( p_buffer->i_length * CLOCK_FREQ / INT64_C(1000000) )
+        ) >= p_sys->i_seglenm ) )
+     {
+        closeCurrentSegment( p_access, p_sys, false );
+     }
+
+    if ( p_sys->i_handle < 0 )
+    {
+        p_sys->i_opendts = output ? output->i_dts : p_buffer->i_dts;
+        //For first segment we can get negative duration otherwise...?
+        if( ( p_sys->i_opendts != VLC_TS_INVALID ) &&
+            ( p_buffer->i_dts < p_sys->i_opendts ) )
+            p_sys->i_opendts = p_buffer->i_dts;
+
+        if ( openNextFile( p_access, p_sys ) < 0 )
+           return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
+static ssize_t writeSegment( sout_access_out_t *p_access )
+{
+    sout_access_out_sys_t *p_sys = p_access->p_sys;
+    block_t *output = p_sys->block_buffer;
+    p_sys->block_buffer = NULL;
+    ssize_t i_write=0;
+    bool crypted = false;
+    while( output )
+    {
+        if( p_sys->key_uri && !crypted )
+        {
+            if( p_sys->stuffing_size )
+            {
+                output = block_Realloc( output, p_sys->stuffing_size, output->i_buffer );
+                if( unlikely(!output ) )
+                    return VLC_ENOMEM;
+                memcpy( output->p_buffer, p_sys->stuffing_bytes, p_sys->stuffing_size );
+                p_sys->stuffing_size = 0;
+            }
+            size_t original = output->i_buffer;
+            size_t padded = (output->i_buffer + 15 ) & ~15;
+            size_t pad = padded - original;
+            if( pad )
+            {
+                p_sys->stuffing_size = 16-pad;
+                output->i_buffer -= p_sys->stuffing_size;
+                memcpy(p_sys->stuffing_bytes, &output->p_buffer[output->i_buffer], p_sys->stuffing_size);
+            }
+
+            gcry_error_t err = gcry_cipher_encrypt( p_sys->aes_ctx,
+                                output->p_buffer, output->i_buffer, NULL, 0 );
+            if( err )
+            {
+                msg_Err( p_access, "Encryption failure: %s ", gpg_strerror(err) );
+                return -1;
+            }
+            crypted=true;
+
+        }
+        ssize_t val = write( p_sys->i_handle, output->p_buffer, output->i_buffer );
+        if ( val == -1 )
+        {
+           if ( errno == EINTR )
+              continue;
+           return -1;
+        }
+
+        p_sys->f_seglen =
+            (float)(output->i_length / INT64_C(1000000) ) +
+            (float)(output->i_dts - p_sys->i_opendts) / CLOCK_FREQ;
+
+        if ( (size_t)val >= output->i_buffer )
+        {
+           block_t *p_next = output->p_next;
+           block_Release (output);
+           output = p_next;
+           crypted=false;
+        }
+        else
+        {
+           output->p_buffer += val;
+           output->i_buffer -= val;
+        }
+        i_write += val;
+    }
+    return i_write;
+}
 
 /*****************************************************************************
  * Write: standard write on a file descriptor.
@@ -900,91 +999,23 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
     size_t i_write = 0;
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     block_t *p_temp;
-
     while( p_buffer )
     {
-        if ( ( p_sys->b_splitanywhere || ( p_buffer->i_flags & BLOCK_FLAG_HEADER ) ) )
+        if( ( p_sys->b_splitanywhere  || ( p_buffer->i_flags & BLOCK_FLAG_HEADER ) ) )
         {
-            bool crypted = false;
-            block_t *output = p_sys->block_buffer;
-            p_sys->block_buffer = NULL;
-
-
-            if( p_sys->i_handle > 0 &&
-                ( p_buffer->i_dts - p_sys->i_opendts +
-                  p_buffer->i_length * CLOCK_FREQ / INT64_C(1000000)
-                ) >= p_sys->i_seglenm )
-                closeCurrentSegment( p_access, p_sys, false );
-
-            if ( p_sys->i_handle < 0 )
+            if( unlikely( CheckSegmentChange( p_access, p_buffer ) != VLC_SUCCESS ) )
             {
-                p_sys->i_opendts = output ? output->i_dts : p_buffer->i_dts;
-                //For first segment we can get negative duration otherwise...?
-                if( ( p_sys->i_opendts != VLC_TS_INVALID ) &&
-                    ( p_buffer->i_dts < p_sys->i_opendts ) )
-                    p_sys->i_opendts = p_buffer->i_dts;
-                if ( openNextFile( p_access, p_sys ) < 0 )
-                   return -1;
+                block_ChainRelease ( p_buffer );
+                return -1;
             }
 
-            while( output )
+            ssize_t writevalue = writeSegment( p_access );
+            if( unlikely( writevalue < 0 ) )
             {
-                if( p_sys->key_uri && !crypted )
-                {
-                    if( p_sys->stuffing_size )
-                    {
-                        output = block_Realloc( output, p_sys->stuffing_size, output->i_buffer );
-                        if( unlikely(!output ) )
-                            return VLC_ENOMEM;
-                        memcpy( output->p_buffer, p_sys->stuffing_bytes, p_sys->stuffing_size );
-                        p_sys->stuffing_size = 0;
-                    }
-                    size_t original = output->i_buffer;
-                    size_t padded = (output->i_buffer + 15 ) & ~15;
-                    size_t pad = padded - original;
-                    if( pad )
-                    {
-                        p_sys->stuffing_size = 16-pad;
-                        output->i_buffer -= p_sys->stuffing_size;
-                        memcpy(p_sys->stuffing_bytes, &output->p_buffer[output->i_buffer], p_sys->stuffing_size);
-                    }
-
-                    gcry_error_t err = gcry_cipher_encrypt( p_sys->aes_ctx,
-                                        output->p_buffer, output->i_buffer, NULL, 0 );
-                    if( err )
-                    {
-                        msg_Err( p_access, "Encryption failure: %s ", gpg_strerror(err) );
-                        return -1;
-                    }
-                    crypted=true;
-
-                }
-                ssize_t val = write( p_sys->i_handle, output->p_buffer, output->i_buffer );
-                if ( val == -1 )
-                {
-                   if ( errno == EINTR )
-                      continue;
-                   block_ChainRelease ( p_buffer );
-                   return -1;
-                }
-                p_sys->f_seglen =
-                    (float)output->i_length / INT64_C(1000000) +
-                    (float)(output->i_dts - p_sys->i_opendts) / CLOCK_FREQ;
-
-                if ( (size_t)val >= output->i_buffer )
-                {
-                   block_t *p_next = output->p_next;
-                   block_Release (output);
-                   output = p_next;
-                   crypted=false;
-                }
-                else
-                {
-                   output->p_buffer += val;
-                   output->i_buffer -= val;
-                }
-                i_write += val;
+                block_ChainRelease ( p_buffer );
+                return -1;
             }
+            i_write += writevalue;
         }
 
         p_temp = p_buffer->p_next;
