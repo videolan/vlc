@@ -203,6 +203,7 @@ static int LoadCryptFile( sout_access_out_t *p_access);
 static int CryptSetup( sout_access_out_t *p_access, char *keyfile );
 static int CheckSegmentChange( sout_access_out_t *p_access, block_t *p_buffer );
 static ssize_t writeSegment( sout_access_out_t *p_access );
+static ssize_t openNextFile( sout_access_out_t *p_access, sout_access_out_sys_t *p_sys );
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
@@ -731,66 +732,41 @@ static void Close( vlc_object_t * p_this )
 {
     sout_access_out_t *p_access = (sout_access_out_t*)p_this;
     sout_access_out_sys_t *p_sys = p_access->p_sys;
+    block_t *output_block = p_sys->block_buffer;
+    p_sys->block_buffer = NULL;
 
-    msg_Dbg( p_access, "Flushing buffer to last file");
-    bool crypted = false;
-    while( p_sys->block_buffer )
+    while( output_block )
     {
-        if( p_sys->key_uri && !crypted)
-        {
-            if( p_sys->stuffing_size )
-            {
-                p_sys->block_buffer = block_Realloc( p_sys->block_buffer, p_sys->stuffing_size, p_sys->block_buffer->i_buffer );
-                if( unlikely(!p_sys->block_buffer) )
-                    return;
-                memcpy( p_sys->block_buffer->p_buffer, p_sys->stuffing_bytes, p_sys->stuffing_size );
-                p_sys->stuffing_size = 0;
-            }
-            size_t original = p_sys->block_buffer->i_buffer;
-            size_t padded = (original + 15 ) & ~15;
-            size_t pad = padded - original;
-            if( pad )
-            {
-                p_sys->stuffing_size = 16 - pad;
-                p_sys->block_buffer->i_buffer -= p_sys->stuffing_size;
-                memcpy( p_sys->stuffing_bytes, &p_sys->block_buffer->p_buffer[p_sys->block_buffer->i_buffer], p_sys->stuffing_size );
-            }
+        block_t *p_next = output_block->p_next;
+        output_block->p_next = NULL;
 
-            gcry_error_t err = gcry_cipher_encrypt( p_sys->aes_ctx,
-                                p_sys->block_buffer->p_buffer, p_sys->block_buffer->i_buffer, NULL, 0 );
-            if( err )
+        /* Since we are flushing, check the segment change by hand and don't wait
+         * possible keyframe*/
+        if( ((float)(output_block->i_length * CLOCK_FREQ / INT64_C(1000000) ) +
+            (float)(output_block->i_dts - p_sys->i_opendts)) >= p_sys->i_seglenm )
+        {
+            closeCurrentSegment( p_access, p_sys, false );
+            if( unlikely(openNextFile( p_access, p_sys ) < 0 ) )
             {
-                msg_Err( p_access, "Encryption failure: %s ", gpg_strerror(err) );
-                break;
-            }
-            crypted = true;
-        }
-        ssize_t val = write( p_sys->i_handle, p_sys->block_buffer->p_buffer, p_sys->block_buffer->i_buffer );
-        if ( val == -1 )
-        {
-           if ( errno == EINTR )
-              continue;
-           block_ChainRelease ( p_sys->block_buffer);
-           break;
-        }
-        if( !p_sys->block_buffer->p_next )
-        {
-            p_sys->f_seglen = (float)( p_sys->block_buffer->i_length / (1000000)) +
-                               (float)(p_sys->block_buffer->i_dts - p_sys->i_opendts) / CLOCK_FREQ;
-        }
+                block_ChainRelease( output_block );
+                output_block = NULL;
+                block_ChainRelease( p_next );
 
-        if ( likely( (size_t)val >= p_sys->block_buffer->i_buffer ) )
-        {
-           block_t *p_next = p_sys->block_buffer->p_next;
-           block_Release (p_sys->block_buffer);
-           p_sys->block_buffer = p_next;
-           crypted=false;
+                /* Jump out of the loop so we can close rest of the stuff*/
+                continue;
+            }
+            p_sys->i_opendts = p_sys->block_buffer ? p_sys->block_buffer->i_dts : output_block->i_dts;
         }
-        else
-        {
-           p_sys->block_buffer->p_buffer += val;
-           p_sys->block_buffer->i_buffer -= val;
-        }
+        Write( p_access, output_block );
+        output_block = p_next;
+    }
+
+    ssize_t writevalue = writeSegment( p_access );
+    msg_Dbg( p_access, "Writing.. %"PRId64,writevalue);
+    if( unlikely( writevalue < 0 ) )
+    {
+        block_ChainRelease( p_sys->block_buffer );
+        p_sys->block_buffer = NULL;
     }
 
     closeCurrentSegment( p_access, p_sys, true );
