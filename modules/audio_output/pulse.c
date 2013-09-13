@@ -32,7 +32,7 @@
 #include <vlc_cpu.h>
 
 #include <pulse/pulseaudio.h>
-#include "vlcpulse.h"
+#include "../vlcpulse.h"
 #if !PA_CHECK_VERSION(0,9,22)
 # include <vlc_xlib.h>
 #endif

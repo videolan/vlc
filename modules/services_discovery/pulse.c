@@ -31,7 +31,7 @@
 #include <vlc_plugin.h>
 #include <vlc_services_discovery.h>
 #include <pulse/pulseaudio.h>
-#include "../audio_output/vlcpulse.h"
+#include "../vlcpulse.h"
 
 static int Open (vlc_object_t *);
 static void Close (vlc_object_t *);
