@@ -47,13 +47,12 @@ libvdpau_chroma_plugin_la_CFLAGS = $(AM_CFLAGS) # dummy
 libvdpau_chroma_plugin_la_LIBADD = $(AM_LIBADD)
 libvlc_LTLIBRARIES += libvdpau_chroma_plugin.la
 
-libvdpau_display_plugin_la_SOURCES = \
-	../../video_output/xcb/events.c \
-	display.c
+libvdpau_display_plugin_la_SOURCES = display.c
 libvdpau_display_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(srcdir)/../../video_output/xcb
 libvdpau_display_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS)
-libvdpau_display_plugin_la_LIBADD = $(AM_LIBADD) \
-	$(X_LIBS) $(X_PRE_LIBS) -lX11 $(XCB_LIBS)
+libvdpau_display_plugin_la_LIBADD = \
+	../../video_output/libvlc_xcb_events.la \
+	$(AM_LIBADD) $(X_LIBS) $(X_PRE_LIBS) -lX11 $(XCB_LIBS)
 libvlc_LTLIBRARIES += libvdpau_display_plugin.la
