@@ -1008,6 +1008,19 @@ AS_IF([test "${enable_optimizations}" != "no"], [
   ])
 ])
 
+VLC_SAVE_FLAGS
+LDFLAGS="${LDFLAGS} -Wl,-Bsymbolic"
+AC_CACHE_CHECK([if linker supports -Bsymbolic], [ac_cv_ld_bsymbolic], [
+  AC_TRY_LINK([],, [
+    ac_cv_ld_bsymbolic="-Wl,-Bsymbolic"
+  ], [
+    ac_cv_ld_bsymbolic=""
+  ])
+])
+VLC_RESTORE_FLAGS
+SYMBOLIC_LDFLAGS="${ac_cv_ld_bsymbolic}"
+AC_SUBST(SYMBOLIC_LDFLAGS)
+
 dnl Check for Darwin plugin linking flags
 AS_IF([test "${SYS}" = "darwin"], [
   VLC_SAVE_FLAGS
@@ -2273,13 +2286,6 @@ AC_ARG_ENABLE(merge-ffmpeg,
 ])
 AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
 
-VLC_SAVE_FLAGS
-LDFLAGS="${LDFLAGS} -Wl,-Bsymbolic"
-AC_CACHE_CHECK([if linker supports -Bsymbolic],
-  [ac_cv_ld_bsymbolic],
-  [AC_TRY_LINK([],,ac_cv_ld_bsymbolic=yes,ac_cv_ld_bsymbolic=no)])
-VLC_RESTORE_FLAGS
-
 dnl
 dnl  avcodec decoder/encoder plugin
 dnl
@@ -2297,8 +2303,8 @@ AS_IF([test "${enable_avcodec}" != "no"], [
     AC_CHECK_HEADERS(libavutil/avutil.h)
     VLC_ADD_PLUGIN([avcodec])
     VLC_ADD_LIBS([avcodec],[$AVCODEC_LIBS])
-    AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
-      VLC_ADD_LIBS([avcodec],[-Wl,-Bsymbolic])
+    AS_IF([test -n "${ac_cv_ld_bsymbolic}"], [
+      VLC_ADD_LIBS([avcodec],[${ac_cv_ld_bsymbolic}])
     ])
     VLC_ADD_CFLAGS([avcodec],[$AVCODEC_CFLAGS])
     VLC_RESTORE_FLAGS
@@ -2436,8 +2442,8 @@ then
         VLC_ADD_PLUGIN([avformat access_avio])
         VLC_ADD_LIBS([access_avio],[$AVFORMAT_LIBS $AVUTIL_LIBS])
         VLC_ADD_CFLAGS([access_avio],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
-        AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
-          VLC_ADD_LDFLAGS([avformat access_avio],[-Wl,-Bsymbolic])
+        AS_IF([test -n "${ac_cv_ld_bsymbolic}"], [
+          VLC_ADD_LDFLAGS([avformat access_avio],[${ac_cv_ld_bsymbolic}])
         ])
       ], [
         VLC_ADD_LIBS([avcodec],[$AVFORMAT_LIBS $AVUTIL_LIBS])
@@ -2467,8 +2473,8 @@ then
       VLC_ADD_PLUGIN([swscale])
       VLC_ADD_LIBS([swscale],[$SWSCALE_LIBS])
       VLC_ADD_CFLAGS([swscale],[$SWSCALE_CFLAGS])
-      AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
-        VLC_ADD_LIBS([swscale],[-Wl,-Bsymbolic])
+      AS_IF([test -n "${ac_cv_ld_bsymbolic}"], [
+        VLC_ADD_LIBS([swscale],[${ac_cv_ld_bsymbolic}])
       ])
       VLC_RESTORE_FLAGS
     ],[
@@ -2758,8 +2764,8 @@ AC_ARG_WITH(x262-tree,
     PKG_CHECK_MODULES(X262, x262, [
         VLC_ADD_PLUGIN([x262])
         VLC_ADD_LDFLAGS([x262],[${X262_LIBS}])
-        AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
-          VLC_ADD_LIBS([x262],[-Wl,-Bsymbolic])
+        AS_IF([test -n "${ac_cv_ld_bsymbolic}"], [
+          VLC_ADD_LIBS([x262],[${av_cv_ld_bsymbolic}])
         ])
         VLC_ADD_CFLAGS([x262],[${X262_CFLAGS}])
         if echo ${X262_LIBS} |grep -q 'pthreadGC2'; then
@@ -2812,8 +2818,8 @@ AC_ARG_WITH(x26410b-tree,
     PKG_CHECK_MODULES(X26410B, x26410b, [
         VLC_ADD_PLUGIN([x26410b])
         VLC_ADD_LIBS([x26410b],[${X26410B_LIBS}])
-        AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
-          VLC_ADD_LDFLAGS([x26410b],[-Wl,-Bsymbolic])
+        AS_IF([test -n "${ac_cv_ld_bsymbolic}"], [
+          VLC_ADD_LDFLAGS([x26410b],[${ac_cv_ld_bsymbolic}])
         ])
         VLC_ADD_CFLAGS([x26410b],[${X26410B_CFLAGS}])
         if echo ${X26410B_LIBS} |grep -q 'pthreadGC2'; then
@@ -2871,8 +2877,8 @@ if test "${enable_x264}" != "no"; then
         VLC_ADD_PLUGIN([x264])
         VLC_ADD_LIBS([x264],[${X264_LIBS}])
 
-        AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
-          VLC_ADD_LDFLAGS([x264],[-Wl,-Bsymbolic])
+        AS_IF([test -n "${ac_cv_ld_bsymbolic}"], [
+          VLC_ADD_LDFLAGS([x264],[${ac_cv_ld_bsymbolic}])
         ])
 
         VLC_ADD_CFLAGS([x264],[${X264_CFLAGS}])
