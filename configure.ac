@@ -655,7 +655,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom rotate noise grain scene kate lua chorus_flanger freetype avcodec swscale postproc faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a audiobargraph_v speex opus mono colorthres extract ball access_imem hotkeys mosaic gaussianblur x262 x26410b hqdn3d anaglyph oldrc ncurses oldmovie glspectrum],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom rotate noise grain scene kate lua chorus_flanger freetype swscale postproc faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a audiobargraph_v speex opus mono colorthres extract ball access_imem hotkeys mosaic gaussianblur x262 x26410b hqdn3d anaglyph oldrc ncurses oldmovie glspectrum],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -2301,12 +2301,6 @@ AS_IF([test "${enable_avcodec}" != "no"], [
     CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
     AC_CHECK_HEADERS(libavcodec/avcodec.h)
     AC_CHECK_HEADERS(libavutil/avutil.h)
-    VLC_ADD_PLUGIN([avcodec])
-    VLC_ADD_LIBS([avcodec],[$AVCODEC_LIBS])
-    AS_IF([test -n "${ac_cv_ld_bsymbolic}"], [
-      VLC_ADD_LIBS([avcodec],[${ac_cv_ld_bsymbolic}])
-    ])
-    VLC_ADD_CFLAGS([avcodec],[$AVCODEC_CFLAGS])
     VLC_RESTORE_FLAGS
     have_avcodec="yes"
   ],[
@@ -2315,6 +2309,7 @@ AS_IF([test "${enable_avcodec}" != "no"], [
 ], [
   have_avcodec="no"
 ])
+AM_CONDITIONAL([HAVE_AVCODEC], [test "${have_avcodec}" != "no"])
 
 dnl
 dnl libva needs avcodec
@@ -2440,9 +2435,6 @@ AS_IF([test "${enable_avformat}" != "no"], [
       AC_CHECK_HEADERS(libavutil/avutil.h)
       AS_IF([test "$enable_merge_ffmpeg" = "no"], [
         have_avformat="no"
-      ], [
-        VLC_ADD_LIBS([avcodec],[$AVFORMAT_LIBS $AVUTIL_LIBS])
-        VLC_ADD_CFLAGS([avcodec],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
       ])
       VLC_RESTORE_FLAGS
     ],[

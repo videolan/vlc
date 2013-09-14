@@ -19,10 +19,10 @@ libvlc_LTLIBRARIES =
 
 libvdpau_avcodec_plugin_la_SOURCES = avcodec.c picture.c
 libvdpau_avcodec_plugin_la_CFLAGS = $(AM_CFLAGS) \
-	$(X_CFLAGS) $(CFLAGS_avcodec)
+	$(X_CFLAGS) $(AVCODEC_CFLAGS)
 libvdpau_avcodec_plugin_la_LIBADD = $(AM_LIBADD) \
-	$(X_LIBS) $(X_PRE_LIBS) -lX11 $(LIBS_avcodec)
-libvdpau_avcodec_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_avcodec)
+	$(X_LIBS) $(X_PRE_LIBS) -lX11 $(AVCODEC_LIBS)
+# FIXME: hwdummy only needs libavutil, and only if avcodec < 55.13.0
 if HAVE_AVCODEC_VDPAU
 libvlc_LTLIBRARIES += libvdpau_avcodec_plugin.la
 endif
