@@ -1,4 +1,3 @@
-AUTOMAKE_OPTIONS = subdir-objects
 basedir = vdpau
 include $(top_srcdir)/modules/common.am
 

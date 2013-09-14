@@ -1,4 +1,3 @@
-AUTOMAKE_OPTIONS = subdir-objects
 SUBDIRS = rtp
 noinst_LTLIBRARIES =
 

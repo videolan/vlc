@@ -5,6 +5,8 @@
 #
 # Authors: Sam Hocevar <sam@zoy.org>
 
+AUTOMAKE_OPTIONS = subdir-objects
+
 NULL =
 libvlcdir = $(vlclibdir)/plugins/$(basedir)
 BUILT_SOURCES =

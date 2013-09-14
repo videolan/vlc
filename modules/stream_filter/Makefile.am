@@ -1,4 +1,3 @@
-AUTOMAKE_OPTIONS = subdir-objects
 basedir = stream_filter
 include $(top_srcdir)/modules/common.am
 libvlc_LTLIBRARIES =

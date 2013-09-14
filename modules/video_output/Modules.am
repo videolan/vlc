@@ -1,4 +1,3 @@
-AUTOMAKE_OPTIONS = subdir-objects
 AM_LIBTOOLFLAGS=--tag=CC
 noinst_LTLIBRARIES =
 

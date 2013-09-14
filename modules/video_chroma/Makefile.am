@@ -1,8 +1,6 @@
 basedir = video_chroma
 include $(top_srcdir)/modules/common.am
 
-AUTOMAKE_OPTIONS = subdir-objects
-
 libchain_plugin_la_SOURCES = chain.c
 libchain_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 

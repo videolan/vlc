@@ -1,5 +1,3 @@
-AUTOMAKE_OPTIONS = subdir-objects
-
 SOURCES_dummy = dummy.c
 SOURCES_gestures = gestures.c
 SOURCES_netsync = netsync.c

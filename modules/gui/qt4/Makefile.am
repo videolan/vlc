@@ -13,7 +13,6 @@ include $(top_srcdir)/modules/common.am
 # For each ressource (icon, png, ...)
 #   - Add it to DEPS_res
 
-AUTOMAKE_OPTIONS = subdir-objects
 SUFFIXES = .ui .h .hpp .moc.cpp
 
 libqt4_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS)

@@ -1,5 +1,3 @@
-AUTOMAKE_OPTIONS = subdir-objects
-
 SOURCES_upnp = upnp.cpp upnp.hpp
 SOURCES_bonjour = bonjour.c
 SOURCES_podcast = podcast.c

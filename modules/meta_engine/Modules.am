@@ -1,5 +1,3 @@
-AUTOMAKE_OPTIONS = subdir-objects
-
 SOURCES_folder = folder.c
 SOURCES_taglib = taglib.cpp ../demux/xiph_metadata.h ../demux/xiph_metadata.c
 
