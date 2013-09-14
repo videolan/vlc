@@ -24,7 +24,6 @@ EXTRA_SUBDIRS = \
 	access_output \
 	mux \
 	stream_out \
-	mmx \
 	sse2 \
 	altivec \
 	arm_neon \
@@ -35,9 +34,6 @@ SUBDIRS = . $(BASE_SUBDIRS)
 DIST_SUBDIRS = . $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 if ENABLE_SOUT
 SUBDIRS += access_output mux stream_out
-endif
-if HAVE_MMX
-SUBDIRS += mmx
 endif
 if HAVE_SSE2
 SUBDIRS += sse2
