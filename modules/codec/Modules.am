@@ -1,19 +1,11 @@
 noinst_HEADERS =
 
-SOURCES_a52 = a52.c a52.h
-SOURCES_dts = dts.c dts_header.h dts_header.c
 SOURCES_flac = flac.c
-SOURCES_lpcm = lpcm.c
-SOURCES_araw = araw.c
-SOURCES_g711 = g711.c
 SOURCES_vorbis = vorbis.c
 SOURCES_theora = theora.c
 SOURCES_tremor = vorbis.c
 SOURCES_speex = speex.c
-SOURCES_adpcm = adpcm.c
 SOURCES_opus = opus.c opus_header.c opus_header.h
-SOURCES_uleaddvaudio = uleaddvaudio.c
-SOURCES_mpeg_audio = mpeg_audio.c
 SOURCES_shine = shine/shine_mod.c shine/enc_base.h
 EXTRA_DIST += shine/shine.c
 SOURCES_wma_fixed = \
@@ -47,7 +39,6 @@ SOURCES_cc = cc.c cc.h substext.h
 SOURCES_kate = kate.c
 SOURCES_schroedinger = schroedinger.c
 SOURCES_libass = libass.c
-SOURCES_aes3 = aes3.c
 SOURCES_subsdec = subsdec.c substext.h
 SOURCES_subsusf = subsusf.c
 SOURCES_t140 = t140.c
@@ -62,20 +53,11 @@ SOURCES_scte27 = scte27.c
 SOURCES_qsv = qsv.c
 
 libvlc_LTLIBRARIES += \
-	liba52_plugin.la \
-	libadpcm_plugin.la \
-	libuleaddvaudio_plugin.la \
-	libaes3_plugin.la \
-	libaraw_plugin.la \
 	libcc_plugin.la \
 	libcdg_plugin.la \
 	libcvdsub_plugin.la \
 	libddummy_plugin.la \
-	libdts_plugin.la \
 	libdvbsub_plugin.la \
-	libg711_plugin.la \
-	liblpcm_plugin.la \
-	libmpeg_audio_plugin.la \
 	librawvideo_plugin.la \
 	libspudec_plugin.la \
 	libsvcdsub_plugin.la \
@@ -90,6 +72,46 @@ libvlc_LTLIBRARIES += \
 	libt140_plugin.la \
 	libedummy_plugin.la
 endif
+
+### Audio codecs ###
+
+liba52_plugin_la_SOURCES = a52.c a52.h
+liba52_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+
+libadpcm_plugin_la_SOURCES = adpcm.c
+libadpcm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+
+libaes3_plugin_la_SOURCES = aes3.c
+libaes3_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+
+libaraw_plugin_la_SOURCES = araw.c
+libaraw_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+
+libdts_plugin_la_SOURCES = dts.c dts_header.h dts_header.c
+libdts_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+
+libg711_plugin_la_SOURCES = g711.c
+libg711_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+
+liblpcm_plugin_la_SOURCES = lpcm.c
+liblpcm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+
+libmpeg_audio_plugin_la_SOURCES = mpeg_audio.c
+libmpeg_audio_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+
+libuleaddvaudio_plugin_la_SOURCES = uleaddvaudio.c
+libuleaddvaudio_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+
+libvlc_LTLIBRARIES += \
+	liba52_plugin.la \
+	libadpcm_plugin.la \
+	libaes3_plugin.la \
+	libaraw_plugin.la \
+	libdts_plugin.la \
+	libg711_plugin.la \
+	liblpcm_plugin.la \
+	libmpeg_audio_plugin.la \
+	libuleaddvaudio_plugin.la
 
 ### FFmpeg/libav ###
 libavcodec_plugin_la_SOURCES = \
