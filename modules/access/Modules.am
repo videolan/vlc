@@ -70,7 +70,6 @@ SOURCES_linsys_hdsdi = \
 SOURCES_access_jack = jack.c
 SOURCES_access_mtp = mtp.c
 SOURCES_access_imem = imem.c
-SOURCES_access_avio = avio.c avio.h ../codec/avcodec/cpu.c
 SOURCES_access_attachment = attachment.c
 SOURCES_access_vdr = vdr.c
 SOURCES_libbluray = bluray.c
@@ -357,3 +356,11 @@ libaccess_realrtsp_plugin_la_DEPENDENCIES = libaccess_realrtsp_plugin.rc.o
 endif
 libvlc_LTLIBRARIES += $(LTLIBaccess_realrtsp)
 EXTRA_LTLIBRARIES += libaccess_realrtsp_plugin.la
+
+libavio_plugin_la_SOURCES = avio.c avio.h ../codec/avcodec/cpu.c
+libavio_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVFORMAT_CFLAGS) $(AVUTIL_CFLAGS)
+libavio_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(SYMBOLIC_LDFLAGS)
+libavio_plugin_la_LIBADD = $(AM_LIBADD) $(AVFORMAT_LIBS) $(AVUTIL_LIBS) $(LIBM)
+if HAVE_AVFORMAT
+libvlc_LTLIBRARIES += libavio_plugin.la
+endif

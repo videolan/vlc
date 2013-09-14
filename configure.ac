@@ -655,7 +655,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom rotate noise grain scene kate lua chorus_flanger freetype avcodec access_avio swscale postproc faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a audiobargraph_v speex opus mono colorthres extract ball access_imem hotkeys mosaic gaussianblur x262 x26410b hqdn3d anaglyph oldrc ncurses oldmovie glspectrum],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom rotate noise grain scene kate lua chorus_flanger freetype avcodec swscale postproc faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a audiobargraph_v speex opus mono colorthres extract ball access_imem hotkeys mosaic gaussianblur x262 x26410b hqdn3d anaglyph oldrc ncurses oldmovie glspectrum],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -2429,22 +2429,17 @@ AC_ARG_ENABLE(avformat,
 [  --enable-avformat       libavformat containers (default enabled)],, [
   enable_avformat="${have_avcodec}"
 ])
-if test "${enable_avformat}" != "no"
-then
-  PKG_CHECK_MODULES(AVFORMAT,[libavformat >= 53.21.0 libavcodec libavutil],
-    [
+have_avformat="no"
+AS_IF([test "${enable_avformat}" != "no"], [
+  PKG_CHECK_MODULES(AVFORMAT,[libavformat >= 53.21.0 libavcodec libavutil], [
+      have_avformat="yes"
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${AVFORMAT_CFLAGS}"
       CFLAGS="${CFLAGS} ${AVFORMAT_CFLAGS}"
       AC_CHECK_HEADERS(libavformat/avformat.h libavformat/avio.h)
       AC_CHECK_HEADERS(libavutil/avutil.h)
       AS_IF([test "$enable_merge_ffmpeg" = "no"], [
-        VLC_ADD_PLUGIN([avformat access_avio])
-        VLC_ADD_LIBS([access_avio],[$AVFORMAT_LIBS $AVUTIL_LIBS])
-        VLC_ADD_CFLAGS([access_avio],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
-        AS_IF([test -n "${ac_cv_ld_bsymbolic}"], [
-          VLC_ADD_LDFLAGS([avformat access_avio],[${ac_cv_ld_bsymbolic}])
-        ])
+        have_avformat="no"
       ], [
         VLC_ADD_LIBS([avcodec],[$AVFORMAT_LIBS $AVUTIL_LIBS])
         VLC_ADD_CFLAGS([avcodec],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
@@ -2453,7 +2448,8 @@ then
     ],[
       AC_MSG_ERROR([${AVFORMAT_PKG_ERRORS}. Pass --disable-avformat to ignore this error.])
   ])
-fi
+])
+AM_CONDITIONAL([HAVE_AVFORMAT], [test "${enable_avformat}" != "no"])
 
 dnl
 dnl  swscale image scaling and conversion plugin
