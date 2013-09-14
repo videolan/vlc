@@ -63,8 +63,8 @@ endif
 
 # MMX
 libi420_rgb_mmx_plugin_la_SOURCES = i420_rgb.c i420_rgb.h \
-	i420_rgb16.c i420_rgb_mmx.h
-libi420_rgb_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+	i420_rgb16_x86.c i420_rgb_mmx.h
+libi420_rgb_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMMX
 
 libi420_yuy2_mmx_plugin_la_SOURCES = i420_yuy2.c i420_yuy2.h
 libi420_yuy2_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
@@ -81,8 +81,8 @@ endif
 
 # SSE2
 libi420_rgb_sse2_plugin_la_SOURCES = i420_rgb.c i420_rgb.h \
-	i420_rgb16.c i420_rgb_sse2.h
-libi420_rgb_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+	i420_rgb16_x86.c i420_rgb_sse2.h
+libi420_rgb_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DSSE2
 
 libi420_yuy2_sse2_plugin_la_SOURCES = i420_yuy2.c i420_yuy2.h
 libi420_yuy2_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)

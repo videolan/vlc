@@ -21,6 +21,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#if !defined (SSE2) && !defined (MMX)
+# define PLAIN
+#endif
+
 /** Number of entries in RGB palette/colormap */
 #define CMAP_RGB2_SIZE 256
 
@@ -35,7 +39,7 @@ struct filter_sys_t
     uint8_t  *p_buffer;
     int *p_offset;
 
-#ifdef MODULE_NAME_IS_i420_rgb
+#ifdef PLAIN
     /**< Pre-calculated conversion tables */
     void *p_base;                      /**< base for all conversion tables */
     uint8_t   *p_rgb8;                 /**< RGB 8 bits table */
@@ -55,12 +59,11 @@ struct filter_sys_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifdef MODULE_NAME_IS_i420_rgb
+#ifdef PLAIN
 void I420_RGB8         ( filter_t *, picture_t *, picture_t * );
-void I420_RGB16_dither ( filter_t *, picture_t *, picture_t * );
 void I420_RGB16        ( filter_t *, picture_t *, picture_t * );
 void I420_RGB32        ( filter_t *, picture_t *, picture_t * );
-#else // if defined(MODULE_NAME_IS_i420_rgb_mmx)
+#else
 void I420_R5G5B5       ( filter_t *, picture_t *, picture_t * );
 void I420_R5G6B5       ( filter_t *, picture_t *, picture_t * );
 void I420_A8R8G8B8     ( filter_t *, picture_t *, picture_t * );

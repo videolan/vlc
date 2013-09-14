@@ -38,19 +38,22 @@
 #include <vlc_cpu.h>
 
 #include "i420_rgb.h"
-#if defined (MODULE_NAME_IS_i420_rgb)
-#   include "i420_rgb_c.h"
-    static picture_t *I420_RGB8_Filter         ( filter_t *, picture_t * );
-//    static picture_t *I420_RGB16_dither_Filter ( filter_t *, picture_t * );
-    static picture_t *I420_RGB16_Filter        ( filter_t *, picture_t * );
-    static picture_t *I420_RGB32_Filter        ( filter_t *, picture_t * );
+#ifdef PLAIN
+# include "i420_rgb_c.h"
+static picture_t *I420_RGB8_Filter( filter_t *, picture_t * );
+static picture_t *I420_RGB16_Filter( filter_t *, picture_t * );
+static picture_t *I420_RGB32_Filter( filter_t *, picture_t * );
+
+static void SetGammaTable( int *pi_table, double f_gamma );
+static void SetYUV( filter_t * );
+static void Set8bppPalette( filter_t *, uint8_t * );
 #else
-    static picture_t *I420_R5G5B5_Filter       ( filter_t *, picture_t * );
-    static picture_t *I420_R5G6B5_Filter       ( filter_t *, picture_t * );
-    static picture_t *I420_A8R8G8B8_Filter     ( filter_t *, picture_t * );
-    static picture_t *I420_R8G8B8A8_Filter     ( filter_t *, picture_t * );
-    static picture_t *I420_B8G8R8A8_Filter     ( filter_t *, picture_t * );
-    static picture_t *I420_A8B8G8R8_Filter     ( filter_t *, picture_t * );
+static picture_t *I420_R5G5B5_Filter( filter_t *, picture_t * );
+static picture_t *I420_R5G6B5_Filter( filter_t *, picture_t * );
+static picture_t *I420_A8R8G8B8_Filter( filter_t *, picture_t * );
+static picture_t *I420_R8G8B8A8_Filter( filter_t *, picture_t * );
+static picture_t *I420_B8G8R8A8_Filter( filter_t *, picture_t * );
+static picture_t *I420_A8B8G8R8_Filter( filter_t *, picture_t * );
 #endif
 
 /*****************************************************************************
@@ -65,36 +68,27 @@
                        << p_filter->fmt_out.video.i_lbshift))
 
 /*****************************************************************************
- * Local and extern prototypes.
+ * Module descriptor.
  *****************************************************************************/
 static int  Activate   ( vlc_object_t * );
 static void Deactivate ( vlc_object_t * );
 
-#if defined (MODULE_NAME_IS_i420_rgb)
-static void SetGammaTable       ( int *pi_table, double f_gamma );
-static void SetYUV              ( filter_t * );
-static void Set8bppPalette      ( filter_t *, uint8_t * );
-#endif
-
-/*****************************************************************************
- * Module descriptor.
- *****************************************************************************/
 vlc_module_begin ()
-#if defined (MODULE_NAME_IS_i420_rgb)
-    set_description( N_("I420,IYUV,YV12 to "
-                       "RGB2,RV15,RV16,RV24,RV32 conversions") )
-    set_capability( "video filter2", 80 )
-# define vlc_CPU_capable() (true)
-#elif defined (MODULE_NAME_IS_i420_rgb_mmx)
-    set_description( N_( "MMX I420,IYUV,YV12 to "
-                        "RV15,RV16,RV24,RV32 conversions") )
-    set_capability( "video filter2", 100 )
-# define vlc_CPU_capable() vlc_CPU_MMX()
-#elif defined (MODULE_NAME_IS_i420_rgb_sse2)
+#if defined (SSE2)
     set_description( N_( "SSE2 I420,IYUV,YV12 to "
                         "RV15,RV16,RV24,RV32 conversions") )
     set_capability( "video filter2", 120 )
 # define vlc_CPU_capable() vlc_CPU_SSE2()
+#elif defined (MMX)
+    set_description( N_( "MMX I420,IYUV,YV12 to "
+                        "RV15,RV16,RV24,RV32 conversions") )
+    set_capability( "video filter2", 100 )
+# define vlc_CPU_capable() vlc_CPU_MMX()
+#else
+    set_description( N_("I420,IYUV,YV12 to "
+                       "RGB2,RV15,RV16,RV24,RV32 conversions") )
+    set_capability( "video filter2", 80 )
+# define vlc_CPU_capable() (true)
 #endif
     set_callbacks( Activate, Deactivate )
 vlc_module_end ()
@@ -107,7 +101,7 @@ vlc_module_end ()
 static int Activate( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-#if defined (MODULE_NAME_IS_i420_rgb)
+#ifdef PLAIN
     size_t i_tables_size;
 #endif
 
@@ -125,14 +119,9 @@ static int Activate( vlc_object_t *p_this )
         case VLC_CODEC_I420:
             switch( p_filter->fmt_out.video.i_chroma )
             {
-#if defined (MODULE_NAME_IS_i420_rgb)
-                case VLC_CODEC_RGB8:
-                    p_filter->pf_video_filter = I420_RGB8_Filter;
-                    break;
-#endif
+#ifndef PLAIN
                 case VLC_CODEC_RGB15:
                 case VLC_CODEC_RGB16:
-#if ! defined (MODULE_NAME_IS_i420_rgb)
                     /* If we don't have support for the bitmasks, bail out */
                     if( ( p_filter->fmt_out.video.i_rmask == 0x7c00
                        && p_filter->fmt_out.video.i_gmask == 0x03e0
@@ -152,19 +141,8 @@ static int Activate( vlc_object_t *p_this )
                     }
                     else
                         return VLC_EGENERIC;
-#else
-                    // generic C chroma converter */
-                    p_filter->pf_video_filter = I420_RGB16_Filter;
-#endif
                     break;
-
-#if 0
-                /* Hmmm, is there only X11 using 32bits per pixel for RV24 ? */
-                case VLC_CODEC_RGB24:
-#endif
-
                 case VLC_CODEC_RGB32:
-#if ! defined (MODULE_NAME_IS_i420_rgb)
                     /* If we don't have support for the bitmasks, bail out */
                     if( p_filter->fmt_out.video.i_rmask == 0x00ff0000
                      && p_filter->fmt_out.video.i_gmask == 0x0000ff00
@@ -200,12 +178,19 @@ static int Activate( vlc_object_t *p_this )
                     }
                     else
                         return VLC_EGENERIC;
-#else
-                    /* generic C chroma converter */
-                    p_filter->pf_video_filter = I420_RGB32_Filter;
-#endif
                     break;
-
+#else
+                case VLC_CODEC_RGB8:
+                    p_filter->pf_video_filter = I420_RGB8_Filter;
+                    break;
+                case VLC_CODEC_RGB15:
+                case VLC_CODEC_RGB16:
+                    p_filter->pf_video_filter = I420_RGB16_Filter;
+                    break;
+                case VLC_CODEC_RGB32:
+                    p_filter->pf_video_filter = I420_RGB32_Filter;
+                    break;
+#endif
                 default:
                     return VLC_EGENERIC;
             }
@@ -223,22 +208,19 @@ static int Activate( vlc_object_t *p_this )
 
     switch( p_filter->fmt_out.video.i_chroma )
     {
-#if defined (MODULE_NAME_IS_i420_rgb)
+#ifdef PLAIN
         case VLC_CODEC_RGB8:
             p_filter->p_sys->p_buffer = malloc( VOUT_MAX_WIDTH );
             break;
 #endif
-
         case VLC_CODEC_RGB15:
         case VLC_CODEC_RGB16:
             p_filter->p_sys->p_buffer = malloc( VOUT_MAX_WIDTH * 2 );
             break;
-
         case VLC_CODEC_RGB24:
         case VLC_CODEC_RGB32:
             p_filter->p_sys->p_buffer = malloc( VOUT_MAX_WIDTH * 4 );
             break;
-
         default:
             p_filter->p_sys->p_buffer = NULL;
             break;
@@ -261,7 +243,7 @@ static int Activate( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-#if defined (MODULE_NAME_IS_i420_rgb)
+#ifdef PLAIN
     switch( p_filter->fmt_out.video.i_chroma )
     {
     case VLC_CODEC_RGB8:
@@ -300,7 +282,7 @@ static void Deactivate( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
 
-#if defined (MODULE_NAME_IS_i420_rgb)
+#ifdef PLAIN
     free( p_filter->p_sys->p_base );
 #endif
     free( p_filter->p_sys->p_offset );
@@ -308,21 +290,18 @@ static void Deactivate( vlc_object_t *p_this )
     free( p_filter->p_sys );
 }
 
-#if defined (MODULE_NAME_IS_i420_rgb)
-VIDEO_FILTER_WRAPPER( I420_RGB8 )
-VIDEO_FILTER_WRAPPER( I420_RGB16 )
-//VIDEO_FILTER_WRAPPER( I420_RGB16_dither )
-VIDEO_FILTER_WRAPPER( I420_RGB32 )
-#else
+#ifndef PLAIN
 VIDEO_FILTER_WRAPPER( I420_R5G5B5 )
 VIDEO_FILTER_WRAPPER( I420_R5G6B5 )
 VIDEO_FILTER_WRAPPER( I420_A8R8G8B8 )
 VIDEO_FILTER_WRAPPER( I420_R8G8B8A8 )
 VIDEO_FILTER_WRAPPER( I420_B8G8R8A8 )
 VIDEO_FILTER_WRAPPER( I420_A8B8G8R8 )
-#endif
+#else
+VIDEO_FILTER_WRAPPER( I420_RGB8 )
+VIDEO_FILTER_WRAPPER( I420_RGB16 )
+VIDEO_FILTER_WRAPPER( I420_RGB32 )
 
-#if defined (MODULE_NAME_IS_i420_rgb)
 /*****************************************************************************
  * SetGammaTable: return intensity table transformed by gamma curve.
  *****************************************************************************
@@ -538,6 +517,4 @@ static void Set8bppPalette( filter_t *p_filter, uint8_t *p_rgb8 )
         }
     }
 }
-
 #endif
-
