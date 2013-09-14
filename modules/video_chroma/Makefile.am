@@ -54,6 +54,15 @@ libvlc_LTLIBRARIES = \
 
 EXTRA_LTLIBRARIES = libswscale_plugin.la libchroma_omx_plugin.la
 
+# AltiVec
+libi420_yuy2_altivec_plugin_la_SOURCES = i420_yuy2.c i420_yuy2.h
+libi420_yuy2_altivec_plugin_la_CFLAGS = $(AM_CFLAGS) $(ALTIVEC_CFLAGS)
+
+if HAVE_ALTIVEC
+libvlc_LTLIBRARIES += \
+	libi420_yuy2_altivec_plugin.la
+endif
+
 # MMX
 libi420_rgb_mmx_plugin_la_SOURCES = i420_rgb.c i420_rgb.h \
 	i420_rgb16.c i420_rgb_mmx.h

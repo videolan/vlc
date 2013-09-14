@@ -24,7 +24,6 @@ EXTRA_SUBDIRS = \
 	access_output \
 	mux \
 	stream_out \
-	altivec \
 	arm_neon \
 	hw/vdpau \
 	lua
@@ -33,9 +32,6 @@ SUBDIRS = . $(BASE_SUBDIRS)
 DIST_SUBDIRS = . $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 if ENABLE_SOUT
 SUBDIRS += access_output mux stream_out
-endif
-if HAVE_ALTIVEC
-SUBDIRS += altivec
 endif
 if HAVE_NEON
 SUBDIRS += arm_neon

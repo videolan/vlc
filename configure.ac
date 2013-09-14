@@ -1378,6 +1378,7 @@ AC_ARG_ENABLE(altivec,
         [enable_altivec=yes], [enable_altivec=no])
 ])
 have_altivec="no"
+ALTIVEC_CFLAGS=""
 AS_IF([test "${enable_altivec}" = "yes"], [
   ARCH="${ARCH} altivec";
   VLC_SAVE_FLAGS
@@ -1395,8 +1396,8 @@ AS_IF([test "${enable_altivec}" = "yes"], [
     AC_DEFINE(CAN_COMPILE_ALTIVEC, 1,
               [Define to 1 if AltiVec inline assembly is available.])
     AS_IF([test "${ac_cv_altivec_inline}" != "yes"], [
+      ALTIVEC_CFLAGS="${ac_cv_altivec_inline}"
       VLC_ADD_CFLAGS([memcpyaltivec],[${ac_cv_altivec_inline}])
-      VLC_ADD_CFLAGS([i420_yuy2_altivec],[${ac_cv_altivec_inline}])
       VLC_ADD_CFLAGS([libvlccore],[${ac_cv_altivec_inline}])
     ])
     have_altivec="yes"
@@ -1454,7 +1455,8 @@ dnl - Others: test should fail
     CPPFLAGS="${CPPFLAGS} ${ac_cv_c_altivec}"
     AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, [Define to 1 if C AltiVec extensions are available.])
     VLC_ADD_CFLAGS([libvlccore],[${ac_cv_c_altivec}])
-    VLC_ADD_CFLAGS([i420_yuy2_altivec memcpyaltivec deinterlace],[${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}])
+    ALTIVEC_CFLAGS="$ALTIVEC_FLAGS ${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}"
+    VLC_ADD_CFLAGS([memcpyaltivec deinterlace],[${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}])
     have_altivec="yes"
   ])
   AC_CHECK_HEADERS(altivec.h)
@@ -1469,6 +1471,7 @@ dnl - Others: test should fail
     VLC_ADD_LIBS([libvlccore memcpyaltivec],[-Wl,-framework,vecLib])
   ])
 ])
+AC_SUBST(ALTIVEC_CFLAGS)
 AM_CONDITIONAL([HAVE_ALTIVEC], [test "$have_altivec" = "yes"])
 
 dnl
@@ -4277,7 +4280,6 @@ AC_CONFIG_FILES([
   modules/video_output/Makefile
   modules/video_splitter/Makefile
   modules/visualization/Makefile
-  modules/altivec/Makefile
   modules/arm_neon/Makefile
   modules/hw/vdpau/Makefile
 ])
