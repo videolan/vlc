@@ -71,3 +71,21 @@ libvlc_LTLIBRARIES += \
 	libi420_yuy2_mmx_plugin.la \
 	libi422_yuy2_mmx_plugin.la
 endif
+
+# SSE2
+libi420_rgb_sse2_plugin_la_SOURCES = i420_rgb.c i420_rgb.h \
+	i420_rgb16.c i420_rgb_sse2.h
+libi420_rgb_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+
+libi420_yuy2_sse2_plugin_la_SOURCES = i420_yuy2.c i420_yuy2.h
+libi420_yuy2_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+
+libi422_yuy2_sse2_plugin_la_SOURCES = i422_yuy2.c i422_yuy2.h
+libi422_yuy2_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+
+if HAVE_SSE2
+libvlc_LTLIBRARIES += \
+	libi420_rgb_sse2_plugin.la \
+	libi420_yuy2_sse2_plugin.la \
+	libi422_yuy2_sse2_plugin.la
+endif

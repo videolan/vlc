@@ -4277,7 +4277,6 @@ AC_CONFIG_FILES([
   modules/video_output/Makefile
   modules/video_splitter/Makefile
   modules/visualization/Makefile
-  modules/sse2/Makefile
   modules/altivec/Makefile
   modules/arm_neon/Makefile
   modules/hw/vdpau/Makefile
