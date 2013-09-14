@@ -1,4 +1,5 @@
 noinst_HEADERS =
+noinst_LTLIBRARIES =
 
 SOURCES_flac = flac.c
 SOURCES_vorbis = vorbis.c
@@ -87,8 +88,13 @@ libaes3_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libaraw_plugin_la_SOURCES = araw.c
 libaraw_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
-libdts_plugin_la_SOURCES = dts.c dts_header.h dts_header.c
+libdts_plugin_la_SOURCES = dts.c
 libdts_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libdts_plugin_la_LIBADD = libvlc_dts_header.la $(AM_LIBADD)
+
+libvlc_dts_header_la_SOURCES = dts_header.c dts_header.h
+libvlc_dts_header_la_LDFLAGS = -static
+noinst_LTLIBRARIES += libvlc_dts_header.la
 
 libg711_plugin_la_SOURCES = g711.c
 libg711_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)

@@ -73,9 +73,9 @@ if HAVE_AVFORMAT
 libvlc_LTLIBRARIES += libavformat_plugin.la
 endif
 
-libes_plugin_la_SOURCES  = mpeg/es.c ../codec/dts_header.c ../codec/dts_header.h ../codec/a52.h
+libes_plugin_la_SOURCES  = mpeg/es.c
 libes_plugin_la_CFLAGS = $(AM_CFLAGS)
-libes_plugin_la_LIBADD = $(AM_LIBADD)
+libes_plugin_la_LIBADD = ../codec/libvlc_dts_header.la $(AM_LIBADD)
 if HAVE_WIN32
 libes_plugin_la_DEPENDENCIES = libes_plugin.rc.o
 endif
