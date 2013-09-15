@@ -2078,7 +2078,6 @@ if test "${enable_mkv}" != "no" -a "${CXX}" != ""; then
              #endif],
             [AC_MSG_RESULT([yes])
               AC_CHECK_HEADERS(matroska/KaxAttachments.h)
-              VLC_ADD_CXXFLAGS([mkv],[])
               AC_CHECK_LIB(ebml_pic, main, [
                 VLC_ADD_PLUGIN([mkv])
                 VLC_ADD_LIBS([mkv],[-lmatroska -lebml_pic])
