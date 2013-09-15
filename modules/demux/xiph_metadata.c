@@ -328,12 +328,13 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
                 (*ppf_replay_peak)[AUDIO_REPLAY_GAIN_TRACK] = us_atof( ++p );
             }
         }
-        else if( !strncmp(psz_comment, "CHAPTER", 7) )
+        else if( !strncasecmp(psz_comment, "CHAPTER", 7) )
         {
             unsigned int i_chapt;
             seekpoint_t *p_seekpoint = NULL;
-            if( strstr( psz_comment, "NAME=" ) &&
-                    sscanf( psz_comment, "CHAPTER%uNAME=", &i_chapt ) == 1 )
+            if( strcasestr( psz_comment, "NAME=" ) &&
+                ( sscanf( psz_comment, "CHAPTER%uNAME=", &i_chapt ) == 1 ||
+                  sscanf( psz_comment, "chapter%name=", &i_chapt ) == 1 ) )
             {
                 char *p = strchr( psz_comment, '=' );
                 p_seekpoint = getChapterEntry( i_chapt, &chapters_array );
@@ -341,7 +342,8 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
                 if ( ! p_seekpoint->psz_name )
                     p_seekpoint->psz_name = strdup( ++p );
             }
-            else if( sscanf( psz_comment, "CHAPTER%u=", &i_chapt ) == 1 )
+            else if( sscanf( psz_comment, "CHAPTER%u=", &i_chapt ) == 1 ||
+                     sscanf( psz_comment, "chapter%u=", &i_chapt ) == 1 )
             {
                 unsigned int h, m, s, ms;
                 char *p = strchr( psz_comment, '=' );
