@@ -8,7 +8,6 @@ BASE_SUBDIRS = \
 	audio_output \
 	control \
 	gui \
-	meta_engine \
 	misc \
 	notify \
 	packetizer \
@@ -59,6 +58,7 @@ include common.am
 include access/Makefile.am
 include codec/Makefile.am
 include demux/Makefile.am
+include meta_engine/Makefile.am
 
 BUILT_SOURCES += dummy.cpp
 

@@ -4225,7 +4225,6 @@ AC_CONFIG_FILES([
   modules/gui/qt4/Makefile
   modules/gui/skins2/Makefile
   modules/lua/Makefile
-  modules/meta_engine/Makefile
   modules/misc/Makefile
   modules/mux/Makefile
   modules/notify/Makefile
