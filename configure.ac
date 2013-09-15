@@ -106,7 +106,6 @@ case "${host_os}" in
   bsdi*)
     SYS=bsdi
     CFLAGS="${CFLAGS} -pthread"
-    VLC_ADD_LIBS([vcd cdda vcdx],[-ldvd])
     ;;
   freebsd*)
     SYS=freebsd
@@ -233,7 +232,6 @@ case "${host_os}" in
         VLC_ADD_LIBS([libvlccore],[-lwinmm])
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
         VLC_ADD_LIBS([win32text],[-lgdi32])
-        VLC_ADD_LIBS([vcdx],[-lwinmm])
         AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
         ac_default_prefix="`pwd`/_win32"
         DESTDIR="`pwd`/_win32/"
@@ -606,7 +604,7 @@ AC_CHECK_FUNCS([if_nameindex if_nametoindex])
 VLC_RESTORE_FLAGS
 
 AS_IF([test -n "$SOCKET_LIBS"], [
-  VLC_ADD_LIBS([access_http access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout sap stream_out_standard stream_out_rtp stream_out_raop vod_rtsp rtp oldrc netsync gnutls ts audioscrobbler lua remoteosd zvbi audiobargraph_a],[${SOCKET_LIBS}])
+  VLC_ADD_LIBS([access_rtmp access_output_udp access_output_shout sap stream_out_standard stream_out_rtp stream_out_raop vod_rtsp rtp oldrc netsync gnutls ts audioscrobbler lua remoteosd zvbi audiobargraph_a],[${SOCKET_LIBS}])
 ])
 AC_SUBST(SOCKET_LIBS)
 
@@ -655,7 +653,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom rotate noise grain scene kate lua chorus_flanger freetype swscale postproc faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a audiobargraph_v speex opus mono colorthres extract ball access_imem hotkeys mosaic gaussianblur x262 x26410b hqdn3d anaglyph oldrc ncurses oldmovie glspectrum],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom rotate noise grain scene kate lua chorus_flanger freetype swscale postproc faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a audiobargraph_v speex opus mono colorthres extract ball hotkeys mosaic gaussianblur x262 x26410b hqdn3d anaglyph oldrc ncurses oldmovie glspectrum],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -778,7 +776,7 @@ AC_CHECK_HEADERS(zlib.h, [ have_zlib=yes ], [ have_zlib=no ])
 AM_CONDITIONAL(HAVE_ZLIB, [ test "${have_zlib}" = "yes" ])
 if test "${have_zlib}" = "yes"
 then
-  VLC_ADD_LIBS([access_http skins2 sap unzip zip],[-lz])
+  VLC_ADD_LIBS([skins2 sap unzip zip],[-lz])
   PKG_CHECK_MODULES([MINIZIP], [minizip] , [ have_minizip=yes ], [
     AC_CHECK_HEADERS([unzip.h], [
       have_minizip=yes
@@ -1707,15 +1705,14 @@ dnl
 AC_ARG_ENABLE(linsys,
   [AS_HELP_STRING([--enable-linsys],
     [Linux Linear Systems Ltd. SDI and HD-SDI input cards (default enabled)])])
-if test "$SYS" = "linux" -a "${enable_linsys}" != "no"; then
+AS_IF([test "$SYS" = "linux" -a "${enable_linsys}" != "no"], [
   VLC_ADD_PLUGIN([linsys_hdsdi])
-  PKG_CHECK_MODULES(LINSYS_SDI, [zvbi-0.2 >= 0.2.28],
-    [ VLC_ADD_LIBS([linsys_sdi],[$LINSYS_SDI_LIBS])
-      VLC_ADD_CFLAGS([linsys_sdi],[$LINSYS_SDI_CFLAGS])
-      VLC_ADD_PLUGIN([linsys_sdi]) ],
-    [AC_MSG_WARN([${LINSYS_SDI_PKG_ERRORS}.])]
-  )
-fi
+  PKG_CHECK_MODULES(LINSYS_SDI, [zvbi-0.2 >= 0.2.28], [
+    VLC_ADD_PLUGIN([linsys_sdi])
+  ], [
+    AC_MSG_WARN([${LINSYS_SDI_PKG_ERRORS}.])
+  ])
+])
 
 dnl
 dnl dvdread module: check for libdvdread
@@ -1728,12 +1725,9 @@ dnl
 AC_ARG_ENABLE(dvdnav,
   [AS_HELP_STRING([--disable-dvdnav],
     [disable DVD navigation with libdvdnav (default auto)])])
-if test "${enable_dvdnav}" != "no"
-then
+AS_IF([test "${enable_dvdnav}" != "no"], [
   PKG_CHECK_MODULES(DVDNAV, dvdnav, [
     VLC_ADD_PLUGIN([dvdnav])
-    VLC_ADD_CFLAGS([dvdnav],[${DVDNAV_CFLAGS}])
-    VLC_ADD_LIBS([dvdnav],[${DVDNAV_LIBS}])
     AC_CHECK_LIB(dvdnav, dvdnav_get_video_resolution,
       AC_DEFINE(HAVE_DVDNAV_GET_VIDEO_RESOLUTION, 1, [Define if you have dvdnav_get_video_resolution.]),
         [], [${LIBS_dvdnav}])
@@ -1741,7 +1735,7 @@ then
       AC_DEFINE(HAVE_DVDNAV_DESCRIBE_TITLE_CHAPTERS, 1, [Define if you have dvdnav_describe_title_chapters.]),
         [], [${LIBS_dvdnav}])],
       [AC_MSG_WARN([${DVDNAV_PKG_ERRORS}.])])
-fi
+])
 
 dnl
 dnl  Blu-ray Disc Support with libbluray
@@ -1757,7 +1751,7 @@ PKG_ENABLE_MODULES_VLC([OPENCV], [opencv_example opencv_wrapper], [opencv > 2.0]
 dnl
 dnl  libsmbclient plugin
 dnl
-PKG_ENABLE_MODULES_VLC([SMBCLIENT], [access_smb], [smbclient], (SMB/CIFS support), [auto])
+PKG_ENABLE_MODULES_VLC([SMBCLIENT], [smb], [smbclient], (SMB/CIFS support), [auto])
 AS_IF([test "${SYS}" = "mingw32"], [ VLC_ADD_PLUGIN([access_smb]) ])
 
 
@@ -1812,7 +1806,7 @@ AM_CONDITIONAL(HAVE_DECKLINK, [ test "${have_decklink}" != "no" ])
 dnl
 dnl  gnomeVFS access module
 dnl
-PKG_ENABLE_MODULES_VLC([GNOMEVFS], [access_gnomevfs], [gnome-vfs-2.0], [GnomeVFS access module], [auto])
+PKG_ENABLE_MODULES_VLC([GNOMEVFS], [gnomevfs], [gnome-vfs-2.0], [GnomeVFS access module], [auto])
 
 dnl
 dnl  VCDX modules
@@ -1867,7 +1861,6 @@ then
   then
     VLC_ADD_PLUGIN([vcd cdda])
     VLC_ADD_LIBS([vcd vcdx cdda],[-Wl,-framework,IOKit,-framework,CoreFoundation])
-    VLC_ADD_LIBS([vcdx cdda],[-liconv])
   fi
 
   if test "$enable_libcddb" != "no"; then
@@ -1919,11 +1912,11 @@ AM_CONDITIONAL(HAVE_MAC_SCREEN, [test "${SYS}" = "darwin" -a "x${enable_screen}"
 dnl
 dnl  VNC/RFB access module
 dnl
-PKG_ENABLE_MODULES_VLC([LIBVNC], [libvnc], [libvncclient >= 0.9.9], (VNC/rfb client support), [auto])
+PKG_ENABLE_MODULES_VLC([VNC], [vnc], [libvncclient >= 0.9.9], (VNC/rfb client support), [auto])
 
 dnl  RDP/Remote Desktop access module
 dnl
-PKG_ENABLE_MODULES_VLC([LIBFREERDP], [rdp], [freerdp >= 1.0.1], (RDP/Remote Desktop client support) )
+PKG_ENABLE_MODULES_VLC([FREERDP], [rdp], [freerdp >= 1.0.1], (RDP/Remote Desktop client support) )
 
 dnl
 dnl  Real RTSP plugin
@@ -1941,7 +1934,6 @@ AC_ARG_ENABLE(macosx-eyetv,
 if test "x${enable_macosx_eyetv}" != "xno" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_eyetv}" = "yes")
 then
-  VLC_ADD_LIBS([access_eyetv], [-Wl,-framework,Foundation])
   VLC_ADD_PLUGIN([access_eyetv])
 fi
 
