@@ -1,6 +1,6 @@
 noinst_LTLIBRARIES =
 BASE_SUBDIRS = \
-	access \
+	access/rtp \
 	audio_filter \
 	audio_mixer \
 	audio_output \
@@ -54,6 +54,9 @@ libvlc_pulse_la_LIBADD = $(PULSE_LIBS)
 if HAVE_PULSE
 noinst_LTLIBRARIES += libvlc_pulse.la
 endif
+
+include common.am
+include access/Makefile.am
 
 if HAVE_WIN32
 module.rc: $(top_builddir)/modules/module.rc.in $(top_builddir)/config.status
