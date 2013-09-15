@@ -72,17 +72,9 @@ SOURCES_ball = ball.c
 SOURCES_opencv_wrapper = opencv_wrapper.c
 SOURCES_opencv_example = opencv_example.cpp filter_event_info.h
 
-if HAVE_DARWIN
-motion_extra = ../control/unimotion.c ../control/unimotion.h
-else
-motion_extra = $(NULL)
-endif
-SOURCES_rotate = \
-	rotate.c \
-	../control/motionlib.c \
-	../control/motionlib.h \
-	$(motion_extra) \
-	$(NULL)
+librotate_plugin_la_SOURCES = rotate.c
+librotate_plugin_la_LIBADD = ../control/libvlc_motion.la $(LIBM)
+video_filter_LTLIBRARIES += librotate_plugin.la
 
 SOURCES_colorthres = colorthres.c
 SOURCES_extract = extract.c
@@ -157,7 +149,6 @@ video_filter_LTLIBRARIES += \
 	libposterize_plugin.la \
 	libpsychedelic_plugin.la \
 	libripple_plugin.la \
-	librotate_plugin.la \
 	librss_plugin.la \
 	libscale_plugin.la \
 	libscene_plugin.la \
