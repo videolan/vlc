@@ -1,12 +1,12 @@
 noinst_LTLIBRARIES =
 noinst_HEADERS =
+
 BASE_SUBDIRS = \
 	access/rtp \
 	audio_filter \
 	audio_mixer \
 	audio_output \
 	control \
-	demux \
 	gui \
 	meta_engine \
 	misc \
@@ -58,6 +58,12 @@ endif
 include common.am
 include access/Makefile.am
 include codec/Makefile.am
+include demux/Makefile.am
+
+BUILT_SOURCES += dummy.cpp
+
+dummy.cpp:
+	touch dummy.cpp
 
 if HAVE_WIN32
 module.rc: $(top_builddir)/modules/module.rc.in $(top_builddir)/config.status

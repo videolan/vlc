@@ -26,13 +26,8 @@ codec_LTLIBRARIES += libaes3_plugin.la
 libaraw_plugin_la_SOURCES = codec/araw.c
 codec_LTLIBRARIES += libaraw_plugin.la
 
-libdts_plugin_la_SOURCES = codec/dts.c
-libdts_plugin_la_LIBADD = libvlc_dts_header.la
+libdts_plugin_la_SOURCES = codec/dts.c codec/dts_header.c codec/dts_header.h
 codec_LTLIBRARIES += libdts_plugin.la
-
-libvlc_dts_header_la_SOURCES = codec/dts_header.c codec/dts_header.h
-libvlc_dts_header_la_LDFLAGS = -static
-noinst_LTLIBRARIES += libvlc_dts_header.la
 
 libfaad_plugin_la_SOURCES = codec/faad.c
 libfaad_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_faad)

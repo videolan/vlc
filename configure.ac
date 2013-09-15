@@ -4220,7 +4220,6 @@ AC_CONFIG_FILES([
   modules/audio_mixer/Makefile
   modules/audio_output/Makefile
   modules/control/Makefile
-  modules/demux/Makefile
   modules/gui/Makefile
   modules/gui/macosx/Makefile
   modules/gui/minimal_macosx/Makefile
