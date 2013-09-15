@@ -51,8 +51,7 @@ libvlc_la_SOURCES = \
 	media_list_path.h \
 	media_list_player.c \
 	media_library.c \
-	media_discoverer.c \
-	../src/revision.c
+	media_discoverer.c
 EXTRA_DIST = libvlc.pc.in libvlc.sym ../include/vlc/libvlc_version.h.in
 
 libvlc_la_LIBADD = \
