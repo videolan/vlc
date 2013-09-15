@@ -5,18 +5,18 @@ libchain_plugin_la_SOURCES = chain.c
 
 libchroma_omx_plugin_la_SOURCES = omxdl.c
 libchroma_omx_plugin_la_CFLAGS = $(AM_CFLAGS) $(OMXIP_CFLAGS)
-libchroma_omx_plugin_la_LIBADD = $(AM_LIBADD) $(OMXIP_LIBS)
+libchroma_omx_plugin_la_LIBADD = $(OMXIP_LIBS)
 
 libswscale_plugin_la_SOURCES = swscale.c ../codec/avcodec/chroma.c
 libswscale_plugin_la_CFLAGS = $(AM_CFLAGS) $(SWSCALE_CFLAGS)
-libswscale_plugin_la_LIBADD = $(AM_LIBADD) $(SWSCALE_LIBS)
+libswscale_plugin_la_LIBADD = $(SWSCALE_LIBS)
 libswscale_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(chromadir)'
 
 libgrey_yuv_plugin_la_SOURCES = grey_yuv.c
 
 libi420_rgb_plugin_la_SOURCES = i420_rgb.c i420_rgb.h \
 	i420_rgb8.c i420_rgb16.c i420_rgb_c.h
-libi420_rgb_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
+libi420_rgb_plugin_la_LIBADD = $(LIBM)
 
 libi420_yuy2_plugin_la_SOURCES = i420_yuy2.c i420_yuy2.h
 libi420_yuy2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \

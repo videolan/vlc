@@ -11,7 +11,7 @@ libwall_plugin_la_SOURCES = wall.c
 
 libpanoramix_plugin_la_SOURCES = panoramix.c
 libpanoramix_plugin_la_CFLAGS = $(AM_CFLAGS)
-libpanoramix_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
+libpanoramix_plugin_la_LIBADD = $(LIBM)
 if HAVE_WIN32
 splitter_LTLIBRARIES += libpanoramix_plugin.la
 else

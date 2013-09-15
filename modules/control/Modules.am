@@ -37,7 +37,7 @@ libdbus_plugin_la_SOURCES = \
 	dbus/dbus_tracklist.c dbus/dbus_tracklist.h \
 	dbus/dbus.c
 libdbus_plugin_la_CFLAGS = $(AM_CFLAGS) $(DBUS_CFLAGS)
-libdbus_plugin_la_LIBADD = $(AM_LIBADD) $(DBUS_LIBS) $(LIBM)
+libdbus_plugin_la_LIBADD = $(DBUS_LIBS) $(LIBM)
 if HAVE_DBUS
 control_LTLIBRARIES += libdbus_plugin.la
 endif
@@ -45,13 +45,12 @@ endif
 libxcb_hotkeys_plugin_la_SOURCES = globalhotkeys/xcb.c
 libxcb_hotkeys_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_KEYSYMS_CFLAGS) $(XCB_CFLAGS)
-libxcb_hotkeys_plugin_la_LIBADD = $(AM_LIBADD) $(XCB_KEYSYMS_LIBS) $(XCB_LIBS)
+libxcb_hotkeys_plugin_la_LIBADD = $(XCB_KEYSYMS_LIBS) $(XCB_LIBS)
 libxcb_hotkeys_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(controldir)'
 EXTRA_LTLIBRARIES += libxcb_hotkeys_plugin.la
 control_LTLIBRARIES += $(LTLIBxcb_hotkeys)
 
 libwin_hotkeys_plugin_la_SOURCES = globalhotkeys/win32.c
-libwin_hotkeys_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 control_LTLIBRARIES += libwin_hotkeys_plugin.la
 endif

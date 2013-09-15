@@ -7,32 +7,20 @@ SOURCES_audiounit_ios = TPCircularBuffer.h TPCircularBuffer.c audiounit_ios.c
 SOURCES_audioqueue = audioqueue.c
 
 libopensles_android_plugin_la_SOURCES = opensles_android.c
-libopensles_android_plugin_la_LIBADD = $(AM_LIBADD) -ldl -lm
+libopensles_android_plugin_la_LIBADD = $(LIBDL) $(LIBM)
 
 libandroid_audiotrack_plugin_la_SOURCES = audiotrack.c
-libandroid_audiotrack_plugin_la_LIBADD = $(AM_LIBADD) -ldl
+libandroid_audiotrack_plugin_la_LIBADD = $(LIBDL)
 
 if HAVE_ANDROID
 aout_LTLIBRARIES += libandroid_audiotrack_plugin.la libopensles_android_plugin.la
 endif
 
 libadummy_plugin_la_SOURCES = adummy.c
-libadummy_plugin_la_LIBADD = $(AM_LIBADD)
-if HAVE_WIN32
-libadummy_plugin_la_DEPENDENCIES = libadummy_plugin.rc.o
-endif
 
 libafile_plugin_la_SOURCES = file.c
-libafile_plugin_la_LIBADD = $(AM_LIBADD)
-if HAVE_WIN32
-libafile_plugin_la_DEPENDENCIES = libafile_plugin.rc.o
-endif
 
 libamem_plugin_la_SOURCES = amem.c
-libamem_plugin_la_LIBADD = $(AM_LIBADD)
-if HAVE_WIN32
-libamem_plugin_la_DEPENDENCIES = libamem_plugin.rc.o
-endif
 
 aout_LTLIBRARIES += \
 	libadummy_plugin.la \
@@ -40,35 +28,34 @@ aout_LTLIBRARIES += \
 	libamem_plugin.la
 
 liboss_plugin_la_SOURCES = oss.c volume.h
-liboss_plugin_la_LIBADD = $(AM_LIBADD) $(OSS_LIBS) $(LIBM)
+liboss_plugin_la_LIBADD = $(OSS_LIBS) $(LIBM)
 if HAVE_OSS
 aout_LTLIBRARIES += liboss_plugin.la
 endif
 
 libalsa_plugin_la_SOURCES = alsa.c volume.h
 libalsa_plugin_la_CFLAGS = $(AM_CFLAGS) $(ALSA_CFLAGS)
-libalsa_plugin_la_LIBADD = $(AM_LIBADD) $(ALSA_LIBS) $(LIBM)
+libalsa_plugin_la_LIBADD = $(ALSA_LIBS) $(LIBM)
 if HAVE_ALSA
 aout_LTLIBRARIES += libalsa_plugin.la
 endif
 
 libpulse_plugin_la_SOURCES = pulse.c
 libpulse_plugin_la_CFLAGS = $(AM_CFLAGS) $(PULSE_CFLAGS)
-libpulse_plugin_la_LIBADD = ../libvlc_pulse.la \
-	$(AM_LIBADD) $(PULSE_LIBS) $(LIBM)
+libpulse_plugin_la_LIBADD = ../libvlc_pulse.la $(PULSE_LIBS) $(LIBM)
 if HAVE_PULSE
 aout_LTLIBRARIES += libpulse_plugin.la
 endif
 
 libjack_plugin_la_SOURCES = jack.c volume.h
 libjack_plugin_la_CFLAGS = $(AM_CFLAGS) $(JACK_CFLAGS)
-libjack_plugin_la_LIBADD = $(AM_LIBADD) $(JACK_LIBS) $(LIBM)
+libjack_plugin_la_LIBADD = $(JACK_LIBS) $(LIBM)
 if HAVE_JACK
 aout_LTLIBRARIES += libjack_plugin.la
 endif
 
 libmmdevice_plugin_la_SOURCES = mmdevice.c mmdevice.h wasapi.c
-libmmdevice_plugin_la_LIBADD = $(AM_LIBADD) -lole32 -lksuser
+libmmdevice_plugin_la_LIBADD = -lole32 -lksuser
 if HAVE_WIN32
 libmmdevice_plugin_la_DEPENDENCIES = libmmdevice_plugin.rc.o
 endif
@@ -77,7 +64,7 @@ aout_LTLIBRARIES += libmmdevice_plugin.la
 endif
 
 libdirectsound_plugin_la_SOURCES = directx.c windows_audio_common.h
-libdirectsound_plugin_la_LIBADD = $(AM_LIBADD) -lole32
+libdirectsound_plugin_la_LIBADD = -lole32
 if HAVE_WIN32
 libdirectsound_plugin_la_DEPENDENCIES = libdirectsound_plugin.rc.o
 endif
@@ -86,13 +73,13 @@ aout_LTLIBRARIES += libdirectsound_plugin.la
 endif
 
 libkai_plugin_la_SOURCES = kai.c
-libkai_plugin_la_LIBADD = $(AM_LIBADD) $(KAI_LIBS)
+libkai_plugin_la_LIBADD = $(KAI_LIBS)
 if HAVE_KAI
 aout_LTLIBRARIES += libkai_plugin.la
 endif
 
 libsndio_plugin_la_SOURCES = sndio.c
-libsndio_plugin_la_LIBADD = $(AM_LIBADD) -lsndio
+libsndio_plugin_la_LIBADD = -lsndio
 if HAVE_SNDIO
 aout_LTLIBRARIES += libsndio_plugin.la
 endif

@@ -12,9 +12,8 @@ libattachment_plugin_la_SOURCES = attachment.c
 access_LTLIBRARIES += libattachment_plugin.la
 
 libfilesystem_plugin_la_SOURCES = fs.h file.c directory.c fs.c
-libfilesystem_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
-libfilesystem_plugin_la_LIBADD += -lshlwapi
+libfilesystem_plugin_la_LIBADD = -lshlwapi
 endif
 access_LTLIBRARIES += libfilesystem_plugin.la
 
@@ -22,7 +21,7 @@ libidummy_plugin_la_SOURCES = idummy.c
 access_LTLIBRARIES += libidummy_plugin.la
 
 libimem_plugin_la_SOURCES = imem.c
-libimem_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
+libimem_plugin_la_LIBADD = $(LIBM)
 access_LTLIBRARIES += libimem_plugin.la
 
 librar_plugin_la_SOURCES = rar/rar.c rar/rar.h \
@@ -40,7 +39,7 @@ access_LTLIBRARIES += libvdr_plugin.la
 
 libzip_plugin_la_SOURCES = zip/zip.h zip/zipstream.c zip/zipaccess.c
 libzip_plugin_la_CFLAGS = $(AM_CFLAGS) $(MINIZIP_CFLAGS)
-libzip_plugin_la_LIBADD = $(AM_LIBADD) $(MINIZIP_LIBS)
+libzip_plugin_la_LIBADD = $(MINIZIP_LIBS)
 libunzip_la_SOURCES = zip/unzip/unzip.c zip/unzip/unzip.h zip/unzip/crypt.h \
 	zip/unzip/ioapi.c zip/unzip/ioapi.h
 libunzip_la_LIBADD = -lz
@@ -59,27 +58,27 @@ endif
 
 libaccess_alsa_plugin_la_SOURCES = alsa.c
 libaccess_alsa_plugin_la_CFLAGS = $(AM_CFLAGS) $(ALSA_CFLAGS)
-libaccess_alsa_plugin_la_LIBADD = $(AM_LIBADD) $(ALSA_LIBS)
+libaccess_alsa_plugin_la_LIBADD = $(ALSA_LIBS)
 if HAVE_ALSA
 access_LTLIBRARIES += libaccess_alsa_plugin.la
 endif
 
 libaccess_oss_plugin_la_SOURCES = oss.c
-libaccess_oss_plugin_la_LIBADD = $(AM_LIBADD) $(OSS_LIBS)
+libaccess_oss_plugin_la_LIBADD = $(OSS_LIBS)
 if HAVE_OSS
 access_LTLIBRARIES += libaccess_oss_plugin.la
 endif
 
 libaccess_jack_plugin_la_SOURCES = jack.c
 libaccess_jack_plugin_la_CFLAGS = $(AM_CFLAGS) $(JACK_CFLAGS)
-libaccess_jack_plugin_la_LIBADD = $(AM_LIBADD) $(JACK_LIBS)
+libaccess_jack_plugin_la_LIBADD = $(JACK_LIBS)
 if HAVE_JACK
 access_LTLIBRARIES += libaccess_jack_plugin.la
 endif
 
 libpulsesrc_plugin_la_SOURCES = pulse.c
 libpulsesrc_plugin_la_CFLAGS= $(AM_CFLAGS) $(PULSE_CFLAGS)
-libpulsesrc_plugin_la_LIBADD = ../libvlc_pulse.la $(AM_LIBADD) $(PULSE_LIBS)
+libpulsesrc_plugin_la_LIBADD = ../libvlc_pulse.la $(PULSE_LIBS)
 if HAVE_PULSE
 access_LTLIBRARIES += libpulsesrc_plugin.la
 endif
@@ -102,14 +101,14 @@ endif
 
 libdc1394_plugin_la_SOURCES = dc1394.c
 libdc1394_plugin_la_CFLAGS = $(AM_CFLAGS) $(DC1394_CFLAGS)
-libdc1394_plugin_la_LIBADD = $(AM_LIBADD) $(DC1394_LIBS)
+libdc1394_plugin_la_LIBADD = $(DC1394_LIBS)
 libdc1394_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBdc1394)
 EXTRA_LTLIBRARIES += libdc1394_plugin.la
 
 libdv1394_plugin_la_SOURCES = dv.c
 libdv1394_plugin_la_CFLAGS = $(AM_CFLAGS) $(DV1394_CFLAGS)
-libdv1394_plugin_la_LIBADD = $(AM_LIBADD) $(DV1394_LIBS)
+libdv1394_plugin_la_LIBADD = $(DV1394_LIBS)
 libdv1394_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBdv1394)
 EXTRA_LTLIBRARIES += libdv1394_plugin.la
@@ -121,20 +120,20 @@ liblinsys_hdsdi_plugin_la_SOURCES = \
 liblinsys_hdsdi_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 liblinsys_sdi_plugin_la_SOURCES = linsys/linsys_sdi.c linsys/linsys_sdi.h
 liblinsys_sdi_plugin_la_CFLAGS = $(AM_CFLAGS) $(LINSYS_SDI_CFLAGS)
-liblinsys_sdi_plugin_la_LIBADD = $(AM_LIBADD) $(LINSYS_SDI_LIBS)
+liblinsys_sdi_plugin_la_LIBADD = $(LINSYS_SDI_LIBS)
 liblinsys_sdi_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBlinsys_hdsdi) $(LTLIBlinsys_sdi)
 EXTRA_LTLIBRARIES += liblinsys_hdsdi_plugin.la liblinsys_sdi_plugin.la
 
 libdecklink_plugin_la_SOURCES = decklink.cpp
 libdecklink_plugin_la_CXXFLAGS = $(AM_CFLAGS) $(CPPFLAGS_decklink)
-libdecklink_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_decklink) -ldl
+libdecklink_plugin_la_LIBADD = $(LIBS_decklink) -ldl
 if HAVE_DECKLINK
 access_LTLIBRARIES += libdecklink_plugin.la
 endif
 
 libshm_plugin_la_SOURCES = shm.c
-libshm_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
+libshm_plugin_la_LIBADD = $(LIBM)
 if HAVE_WIN32
 libshm_plugin_la_DEPENDENCIES = libshm_plugin.rc.o
 endif
@@ -162,14 +161,14 @@ libv4l2_plugin_la_SOURCES = \
 	v4l2/v4l2.h
 libv4l2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/v4l2
 libv4l2_plugin_la_CFLAGS = $(AM_CFLAGS) $(ZVBI_CFLAGS)
-libv4l2_plugin_la_LIBADD = $(AM_LIBADD) $(LIBDL) $(LIBM) $(ZVBI_LIBS)
+libv4l2_plugin_la_LIBADD = $(LIBDL) $(LIBM) $(ZVBI_LIBS)
 if HAVE_V4L2
 access_LTLIBRARIES += libv4l2_plugin.la
 endif
 
 libdshow_plugin_la_SOURCES = dshow/vlc_dshow.h dshow/dshow.cpp dshow/access.h \
 	dshow/filter.cpp dshow/filter.h dshow/crossbar.cpp
-libdshow_plugin_la_LIBADD = $(AM_LIBADD) -lole32 -loleaut32 -luuid -lstrmiids -lksuser
+libdshow_plugin_la_LIBADD = -lole32 -loleaut32 -luuid -lstrmiids -lksuser
 if HAVE_WIN32
 access_LTLIBRARIES += libdshow_plugin.la
 libdshow_plugin_la_DEPENDENCIES = libdshow_plugin.rc.o
@@ -181,38 +180,35 @@ endif
 libxcb_screen_plugin_la_SOURCES = screen/xcb.c
 libxcb_screen_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(XCB_COMPOSITE_CFLAGS) $(XCB_SHM_CFLAGS)
-libxcb_screen_plugin_la_LIBADD = $(AM_LIBADD) \
-	$(XCB_LIBS) $(XCB_COMPOSITE_LIBS) $(XCB_SHM_LIBS)
+libxcb_screen_plugin_la_LIBADD = $(XCB_LIBS) $(XCB_COMPOSITE_LIBS) $(XCB_SHM_LIBS)
 if HAVE_XCB
 access_LTLIBRARIES += libxcb_screen_plugin.la
 endif
 
 libscreen_plugin_la_SOURCES = screen/screen.c screen/screen.h
-libscreen_plugin_la_LIBADD = $(AM_LIBADD)
+libscreen_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 if HAVE_WIN32
 libscreen_plugin_la_SOURCES += screen/win32.c
-libscreen_plugin_la_LDFLAGS = $(AM_LDFLAGS)
-libscreen_plugin_la_LIBADD += -lgdi32
+libscreen_plugin_la_LIBADD = -lgdi32
 access_LTLIBRARIES += libscreen_plugin.la
 libscreen_plugin_la_DEPENDENCIES = libscreen_plugin.rc.o
 endif
 if HAVE_MAC_SCREEN
 libscreen_plugin_la_SOURCES += screen/mac.c
-libscreen_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 libscreen_plugin_la_LDFLAGS += "-Wl,-framework,OpenGL,-framework,ApplicationServices"
 access_LTLIBRARIES += libscreen_plugin.la
 endif
 
 librdp_plugin_la_SOURCES = rdp.c
 librdp_plugin_la_CFLAGS = $(AM_CFLAGS) $(FREERDP_CFLAGSp)
-librdp_plugin_la_LIBADD = $(AM_LIBADD) $(FREERDP_LIBS)
+librdp_plugin_la_LIBADD = $(FREERDP_LIBS)
 librdp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBrdp)
 EXTRA_LTLIBRARIES += librdp_plugin.la
 
 libvnc_plugin_la_SOURCES = vnc.c
 libvnc_plugin_la_CFLAGS = $(AM_CFLAGS) $(VNC_CFLAGS)
-libvnc_plugin_la_LIBADD = $(AM_LIBADD) $(VNC_LIBS)
+libvnc_plugin_la_LIBADD = $(VNC_LIBS)
 libvnc_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBvnc)
 EXTRA_LTLIBRARIES += libvnc_plugin.la
@@ -221,18 +217,16 @@ EXTRA_LTLIBRARIES += libvnc_plugin.la
 ### Optical media ###
 
 libcdda_plugin_la_SOURCES = cdda.c vcd/cdrom.c vcd/cdrom.h vcd/cdrom_internals.h
-libcdda_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_DARWIN
-libcdda_plugin_la_LIBADD += -liconv
+libcdda_plugin_la_LIBADD = -liconv
 endif
 libcdda_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 EXTRA_LTLIBRARIES += libcdda_plugin.la
 access_LTLIBRARIES += $(LTLIBcdda)
 
 libvcd_plugin_la_SOURCES = vcd/vcd.c vcd/cdrom.c vcd/cdrom.h vcd/cdrom_internals.h
-libvcd_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_DARWIN
-libvcd_plugin_la_LIBADD += -liconv
+libvcd_plugin_la_LIBADD = -liconv
 endif
 libvcd_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 EXTRA_LTLIBRARIES += libvcd_plugin.la
@@ -244,9 +238,8 @@ libvcdx_plugin_la_SOURCES = \
 	vcdx/vcdplayer.h vcdx/vcdplayer.c \
 	vcdx/info.c vcdx/info.h
 libvcdx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
-libvcdx_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
-libvcdx_plugin_la_LIBADD += -lwinmm
+libvcdx_plugin_la_LIBADD = -lwinmm
 endif
 libvcdx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 EXTRA_LTLIBRARIES += libvcdx_plugin.la
@@ -254,27 +247,26 @@ access_LTLIBRARIES += $(LTLIBvcdx)
 
 libdvdnav_plugin_la_SOURCES = dvdnav.c
 libdvdnav_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVDNAV_CFLAGS)
-libdvdnav_plugin_la_LIBADD = $(AM_LIBADD) $(DVDNAV_LIBS)
+libdvdnav_plugin_la_LIBADD = $(DVDNAV_LIBS)
 libdvdnav_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBdvdnav)
 EXTRA_LTLIBRARIES += libdvdnav_plugin.la
 
 libdvdread_plugin_la_SOURCES = dvdread.c
 libdvdread_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVDREAD_CFLAGS)
-libdvdread_plugin_la_LIBADD = $(AM_LIBADD) $(DVDREAD_LIBS)
+libdvdread_plugin_la_LIBADD = $(DVDREAD_LIBS)
 libdvdread_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBdvdread)
 EXTRA_LTLIBRARIES += libdvdread_plugin.la
 
 liblibbluray_plugin_la_SOURCES = bluray.c
 liblibbluray_plugin_la_CFLAGS = $(AM_CFLAGS) $(BLURAY_CFLAGS)
-liblibbluray_plugin_la_LIBADD = $(AM_LIBADD) $(BLURAY_LIBS)
+liblibbluray_plugin_la_LIBADD = $(BLURAY_LIBS)
 liblibbluray_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBlibbluray)
 EXTRA_LTLIBRARIES += liblibbluray_plugin.la
 
 libaccess_bd_plugin_la_SOURCES = bd/bd.c bd/mpls.c bd/mpls.h bd/clpi.c bd/clpi.h
-libaccess_bd_plugin_la_LIBADD = $(AM_LIBADD)
 access_LTLIBRARIES += libaccess_bd_plugin.la
 if HAVE_WIN32
 libaccess_bd_plugin_la_DEPENDENCIES = libaccess_bd_plugin.rc.o
@@ -287,7 +279,6 @@ libdtv_plugin_la_SOURCES = \
 	dtv/dtv.h \
 	dtv/access.c
 libdtv_plugin_la_CFLAGS = $(AM_CFLAGS)
-libdtv_plugin_la_LIBADD = $(AM_LIBADD)
 
 if HAVE_LINUX_DVB
 libdtv_plugin_la_SOURCES += dtv/linux.c
@@ -295,7 +286,7 @@ libdtv_plugin_la_CFLAGS += -DHAVE_LINUX_DVB
 if HAVE_DVBPSI
 libdtv_plugin_la_SOURCES += dtv/en50221.c dtv/en50221.h ../mux/mpeg/dvbpsi_compat.h
 libdtv_plugin_la_CFLAGS += -DHAVE_DVBPSI $(DVBPSI_CFLAGS)
-libdtv_plugin_la_LIBADD += $(DVBPSI_LIBS)
+libdtv_plugin_la_LIBADD = $(DVBPSI_LIBS)
 endif
 access_LTLIBRARIES += libdtv_plugin.la
 endif
@@ -309,7 +300,7 @@ libbda_la_LIBADD = -lstrmiids -lole32 -loleaut32 -luuid
 noinst_LTLIBRARIES += libbda.la
 
 libdtv_plugin_la_DEPENDENCIES = libbda.la libdtv_plugin.rc.o
-libdtv_plugin_la_LIBADD += libbda.la -lstdc++
+libdtv_plugin_la_LIBADD = libbda.la -lstdc++
 access_LTLIBRARIES += libdtv_plugin.la
 endif
 
@@ -320,13 +311,12 @@ libdvb_plugin_la_SOURCES = \
 	dvb/scan.c dvb/scan.h \
 	dvb/dvb.h
 libdvb_plugin_la_CFLAGS = $(AM_CFLAGS)
-libdvb_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_LINUX_DVB
 if HAVE_DVBPSI
 libdvb_plugin_la_SOURCES += ../mux/mpeg/dvbpsi_compat.h
 access_LTLIBRARIES += libdvb_plugin.la
 libdvb_plugin_la_CFLAGS += $(DVBPSI_CFLAGS)
-libdvb_plugin_la_LIBADD += $(DVBPSI_LIBS)
+libdvb_plugin_la_LIBADD = $(DVBPSI_LIBS)
 endif
 endif
 
@@ -340,11 +330,11 @@ EXTRA_LTLIBRARIES += libaccess_eyetv_plugin.la
 ### Network streams ###
 
 libftp_plugin_la_SOURCES = ftp.c
-libftp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
+libftp_plugin_la_LIBADD = $(SOCKET_LIBS)
 access_LTLIBRARIES += libftp_plugin.la
 
 libhttp_plugin_la_SOURCES = http.c
-libhttp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
+libhttp_plugin_la_LIBADD = $(SOCKET_LIBS)
 if HAVE_ZLIB
 libhttp_plugin_la_LIBADD += -lz
 endif
@@ -352,7 +342,7 @@ access_LTLIBRARIES += libhttp_plugin.la
 
 liblive555_plugin_la_SOURCES = live555.cpp mms/asf.c mms/buffer.c
 liblive555_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CXXFLAGS_live555)
-liblive555_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_live555)
+liblive555_plugin_la_LIBADD = $(LIBS_live555)
 liblive555_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)' \
 	$(LDFLAGS_live555)
 access_LTLIBRARIES += $(LTLIBlive555)
@@ -366,12 +356,12 @@ libaccess_mms_plugin_la_SOURCES = \
 	mms/asf.h mms/asf.c \
 	../demux/asf/libasf_guid.h
 libaccess_mms_plugin_la_CFLAGS = $(AM_CFLAGS)
-libaccess_mms_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
+libaccess_mms_plugin_la_LIBADD = $(SOCKET_LIBS)
 access_LTLIBRARIES += libaccess_mms_plugin.la
 
 libsmb_plugin_la_SOURCES = smb.c
 libsmb_plugin_la_CFLAGS = $(AM_CFLAGS) $(SMBCLIENT_CFLAGS)
-libsmb_plugin_la_LIBADD = $(AM_LIBADD) $(SMBCLIENT_LIBS)
+libsmb_plugin_la_LIBADD = $(SMBCLIENT_LIBS)
 if HAVE_WIN32
 libsmb_plugin_la_LIBADD += -lmpr
 endif
@@ -380,16 +370,16 @@ access_LTLIBRARIES += $(LTLIBsmb)
 EXTRA_LTLIBRARIES += libsmb_plugin.la
 
 libtcp_plugin_la_SOURCES = tcp.c
-libtcp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
+libtcp_plugin_la_LIBADD = $(SOCKET_LIBS)
 access_LTLIBRARIES += libtcp_plugin.la
 
 libudp_plugin_la_SOURCES = udp.c
-libudp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
+libudp_plugin_la_LIBADD = $(SOCKET_LIBS)
 access_LTLIBRARIES += libudp_plugin.la
 
 libsftp_plugin_la_SOURCES = sftp.c
 libsftp_plugin_la_CFLAGS = $(AM_CFLAGS) $(SFTP_CFLAGS)
-libsftp_plugin_la_LIBADD = $(AM_LIBADD) $(SFTP_LIBS)
+libsftp_plugin_la_LIBADD = $(SFTP_LIBS)
 libsftp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBsftp)
 EXTRA_LTLIBRARIES += libsftp_plugin.la
@@ -401,7 +391,7 @@ libaccess_realrtsp_plugin_la_SOURCES = \
 	rtsp/real_rmff.c rtsp/real_rmff.h \
 	rtsp/real_sdpplin.c rtsp/real_sdpplin.h \
 	rtsp/real_asmrp.c
-libaccess_realrtsp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
+libaccess_realrtsp_plugin_la_LIBADD = $(SOCKET_LIBS)
 libaccess_realrtsp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBaccess_realrtsp)
 EXTRA_LTLIBRARIES += libaccess_realrtsp_plugin.la
@@ -409,7 +399,7 @@ EXTRA_LTLIBRARIES += libaccess_realrtsp_plugin.la
 libavio_plugin_la_SOURCES = avio.c avio.h ../codec/avcodec/cpu.c
 libavio_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVFORMAT_CFLAGS) $(AVUTIL_CFLAGS)
 libavio_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(SYMBOLIC_LDFLAGS)
-libavio_plugin_la_LIBADD = $(AM_LIBADD) $(AVFORMAT_LIBS) $(AVUTIL_LIBS) $(LIBM)
+libavio_plugin_la_LIBADD = $(AVFORMAT_LIBS) $(AVUTIL_LIBS) $(LIBM)
 if HAVE_AVFORMAT
 access_LTLIBRARIES += libavio_plugin.la
 endif
@@ -419,14 +409,14 @@ endif
 
 libgnomevfs_plugin_la_SOURCES = gnomevfs.c
 libgnomevfs_plugin_la_CFLAGS = $(AM_CFLAGS) $(GNOMEVFS_CFLAGS)
-libgnomevfs_plugin_la_LIBADD = $(AM_LIBADD) $(GNOMEVFS_LIBS)
+libgnomevfs_plugin_la_LIBADD = $(GNOMEVFS_LIBS)
 libgnomevfs_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBgnomevfs)
 EXTRA_LTLIBRARIES += libgnomevfs_plugin.la
 
 libaccess_mtp_plugin_la_SOURCES = mtp.c
 libaccess_mtp_plugin_la_CFLAGS = $(AM_CFLAGS) $(MTP_CFLAGS)
-libaccess_mtp_plugin_la_LIBADD = $(AM_LIBADD) $(MTP_LIBS)
+libaccess_mtp_plugin_la_LIBADD = $(MTP_LIBS)
 libaccess_mtp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBaccess_mtp)
 EXTRA_LTLIBRARIES += libaccess_mtp_plugin.la

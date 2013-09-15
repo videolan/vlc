@@ -49,7 +49,7 @@ lib${mod}_plugin_la_CPPFLAGS = \$(AM_CPPFLAGS) \$(CPPFLAGS_${mod}) \
 lib${mod}_plugin_la_CFLAGS = \$(AM_CFLAGS) \$(CFLAGS_${mod})
 lib${mod}_plugin_la_CXXFLAGS = \$(AM_CXXFLAGS) \$(CXXFLAGS_${mod})
 lib${mod}_plugin_la_OBJCFLAGS = \$(AM_OBJCFLAGS) \$(OBJCFLAGS_${mod})
-lib${mod}_plugin_la_LIBADD = \$(AM_LIBADD) \$(LIBS_${mod})
+lib${mod}_plugin_la_LIBADD = \$(LIBS_${mod})
 lib${mod}_plugin_la_LDFLAGS = \$(AM_LDFLAGS) -rpath '\$(${basedir}dir)' \$(LDFLAGS_${mod})
 EOF
     case " ${plugins} " in

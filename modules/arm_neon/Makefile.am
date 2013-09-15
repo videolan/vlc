@@ -6,7 +6,6 @@ libsimple_channel_mixer_neon_plugin_la_SOURCES = \
 	simple_channel_mixer.S \
 	simple_channel_mixer.c
 libsimple_channel_mixer_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
-libsimple_channel_mixer_neon_plugin_la_LIBADD = $(AM_LIBADD)
 libsimple_channel_mixer_neon_plugin_la_DEPENDENCIES =
 
 libchroma_yuv_neon_plugin_la_SOURCES = \
@@ -15,11 +14,9 @@ libchroma_yuv_neon_plugin_la_SOURCES = \
 	yuyv_i422.S \
 	chroma_yuv.c chroma_neon.h
 libchroma_yuv_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
-libchroma_yuv_neon_plugin_la_LIBADD = $(AM_LIBADD)
 
 libvolume_neon_plugin_la_SOURCES = volume.c amplify.S
 libvolume_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
-libvolume_neon_plugin_la_LIBADD = $(AM_LIBADD)
 
 libyuv_rgb_neon_plugin_la_SOURCES = \
 	i420_rgb.S \
@@ -28,7 +25,6 @@ libyuv_rgb_neon_plugin_la_SOURCES = \
 	nv12_rgb.S \
 	yuv_rgb.c
 libyuv_rgb_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
-libyuv_rgb_neon_plugin_la_LIBADD = $(AM_LIBADD)
 
 neon_LTLIBRARIES = \
 	libsimple_channel_mixer_neon_plugin.la \

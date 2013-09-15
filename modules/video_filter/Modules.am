@@ -25,7 +25,6 @@ libdeinterlace_plugin_la_SOURCES = \
 	deinterlace/algo_ivtc.c deinterlace/algo_ivtc.h
 # inline ASM doesn't build with -O0
 libdeinterlace_plugin_la_CFLAGS = $(AM_CFLAGS) -O2
-libdeinterlace_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_NEON
 libdeinterlace_plugin_la_SOURCES += deinterlace/merge_arm.S
 libdeinterlace_plugin_la_CFLAGS += -DCAN_COMPILE_ARM
@@ -41,14 +40,13 @@ libdynamicoverlay_plugin_la_SOURCES = \
 	dynamicoverlay/dynamicoverlay_list.c \
 	dynamicoverlay/dynamicoverlay_commands.c \
 	dynamicoverlay/dynamicoverlay.c dynamicoverlay/dynamicoverlay.h
-libdynamicoverlay_plugin_la_LIBADD = $(AM_LIBADD)
 if !HAVE_WIN32
 video_filter_LTLIBRARIES += libdynamicoverlay_plugin.la
 endif
 
 libremoteosd_plugin_la_SOURCES = remoteosd.c remoteosd_rfbproto.h
 libremoteosd_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
-libremoteosd_plugin_la_LIBADD = $(AM_LIBADD) $(GCRYPT_LIBS) $(LIBS_remoteosd)
+libremoteosd_plugin_la_LIBADD = $(GCRYPT_LIBS) $(LIBS_remoteosd)
 if HAVE_WIN32
 libremoteosd_plugin_la_DEPENDENCIES = libremoteosd_plugin.rc.o
 endif
@@ -62,10 +60,6 @@ libpuzzle_plugin_la_SOURCES = \
 	puzzle_lib.c puzzle_lib.h \
 	puzzle_mgt.c puzzle_mgt.h \
 	puzzle_pce.c puzzle_pce.h
-libpuzzle_plugin_la_LIBADD = $(AM_LIBADD)
-if HAVE_WIN32
-libpuzzle_plugin_la_DEPENDENCIES = libpuzzle_plugin.rc.o
-endif
 video_filter_LTLIBRARIES += libpuzzle_plugin.la
 
 SOURCES_magnify = magnify.c

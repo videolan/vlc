@@ -9,7 +9,7 @@ SOURCES_mediadirs = mediadirs.c
 
 libsap_plugin_la_SOURCES = sap.c
 libsap_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_sap)
-libsap_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_sap) $(SOCKET_LIBS)
+libsap_plugin_la_LIBADD = $(LIBS_sap) $(SOCKET_LIBS)
 if HAVE_WIN32
 libsap_plugin_la_DEPENDENCIES = libsap_plugin.rc.o
 endif
@@ -17,15 +17,14 @@ sd_LTLIBRARIES += libsap_plugin.la
 
 libpulselist_plugin_la_SOURCES = pulse.c
 libpulselist_plugin_la_CFLAGS = $(AM_CFLAGS) $(PULSE_CFLAGS)
-libpulselist_plugin_la_LIBADD = ../libvlc_pulse.la \
-	$(AM_LIBADD) $(PULSE_LIBS)
+libpulselist_plugin_la_LIBADD = ../libvlc_pulse.la $(PULSE_LIBS)
 if HAVE_PULSE
 sd_LTLIBRARIES += libpulselist_plugin.la
 endif
 
 libudev_plugin_la_SOURCES = udev.c
 libudev_plugin_la_CFLAGS = $(AM_CFLAGS) $(UDEV_CFLAGS)
-libudev_plugin_la_LIBADD = $(AM_LIBADD) $(UDEV_LIBS)
+libudev_plugin_la_LIBADD = $(UDEV_LIBS)
 if HAVE_ALSA
 libudev_plugin_la_CFLAGS += $(ALSA_CFLAGS) -DHAVE_ALSA
 libudev_plugin_la_LIBADD += $(ALSA_LIBS)
@@ -36,20 +35,18 @@ sd_LTLIBRARIES += $(LTLIBudev)
 
 libxcb_apps_plugin_la_SOURCES = xcb_apps.c
 libxcb_apps_plugin_la_CFLAGS = $(AM_CFLAGS) $(XCB_CFLAGS)
-libxcb_apps_plugin_la_LIBADD = $(AM_LIBADD) $(XCB_LIBS)
+libxcb_apps_plugin_la_LIBADD = $(XCB_LIBS)
 if HAVE_XCB
 sd_LTLIBRARIES += libxcb_apps_plugin.la
 endif
 
 libwindrive_plugin_la_SOURCES = windrive.c
-libwindrive_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 sd_LTLIBRARIES += libwindrive_plugin.la
 libwindrive_plugin_la_DEPENDENCIES = libwindrive_plugin.rc.o
 endif
 
 libos2drive_plugin_la_SOURCES = os2drive.c
-libos2drive_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_OS2
 sd_LTLIBRARIES += libos2drive_plugin.la
 endif

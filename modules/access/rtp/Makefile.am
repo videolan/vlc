@@ -10,7 +10,7 @@ librtp_plugin_la_SOURCES = \
 	session.c \
 	xiph.c
 librtp_plugin_la_CFLAGS = $(AM_CFLAGS)
-librtp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
+librtp_plugin_la_LIBADD = $(SOCKET_LIBS)
 
 # Secure RTP library
 libvlc_srtp_la_SOURCES = srtp.c
