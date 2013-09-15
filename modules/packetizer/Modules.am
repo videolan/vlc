@@ -10,7 +10,7 @@ SOURCES_packetizer_flac = flac.c
 
 noinst_HEADERS = packetizer_helper.h
 
-libvlc_LTLIBRARIES += \
+packetizer_LTLIBRARIES += \
 	libpacketizer_mpegvideo_plugin.la \
 	libpacketizer_mpeg4video_plugin.la \
 	libpacketizer_mpeg4audio_plugin.la \
@@ -21,5 +21,5 @@ libvlc_LTLIBRARIES += \
 	libpacketizer_flac_plugin.la \
 	$(NULL)
 if ENABLE_SOUT
-libvlc_LTLIBRARIES += libpacketizer_copy_plugin.la
+packetizer_LTLIBRARIES += libpacketizer_copy_plugin.la
 endif

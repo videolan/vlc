@@ -25,7 +25,7 @@ libstream_out_transcode_plugin_la_DEPENDENCIES = libstream_out_transcode_plugin.
 endif
 
 
-libvlc_LTLIBRARIES += \
+stream_out_LTLIBRARIES += \
 	libstream_out_dummy_plugin.la \
 	libstream_out_delay_plugin.la \
 	libstream_out_description_plugin.la \
@@ -44,7 +44,7 @@ libvlc_LTLIBRARIES += \
 	libstream_out_transcode_plugin.la
 
 # RTP plugin
-libvlc_LTLIBRARIES += \
+stream_out_LTLIBRARIES += \
 	libstream_out_rtp_plugin.la
 libstream_out_rtp_plugin_la_SOURCES = \
 	rtp.c rtp.h rtpfmt.c rtcp.c rtsp.c vod.c
@@ -69,7 +69,7 @@ if HAVE_WIN32
 libstream_out_raop_plugin_la_DEPENDENCIES = libstream_out_raop_plugin.rc.o
 endif
 if HAVE_GCRYPT
-libvlc_LTLIBRARIES += libstream_out_raop_plugin.la
+stream_out_LTLIBRARIES += libstream_out_raop_plugin.la
 endif
 
 BUILT_SOURCES += dummy.cpp

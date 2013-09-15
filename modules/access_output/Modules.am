@@ -4,7 +4,7 @@ SOURCES_access_output_udp = udp.c
 SOURCES_access_output_http = http.c bonjour.c bonjour.h
 SOURCES_access_output_shout = shout.c
 
-libvlc_LTLIBRARIES += \
+access_output_LTLIBRARIES += \
 	libaccess_output_dummy_plugin.la \
 	libaccess_output_file_plugin.la \
 	libaccess_output_udp_plugin.la \
@@ -18,5 +18,5 @@ libaccess_output_livehttp_plugin_la_LIBADD = $(AM_LIBADD) $(GCRYPT_LIBS) -lgpg-e
 if HAVE_WIN32
 libaccess_output_livehttp_plugin_la_DEPENDENCIES = libaccess_output_livehttp_plugin.rc.o
 endif
-libvlc_LTLIBRARIES += libaccess_output_livehttp_plugin.la
+access_output_LTLIBRARIES += libaccess_output_livehttp_plugin.la
 endif

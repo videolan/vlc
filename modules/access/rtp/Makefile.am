@@ -1,8 +1,8 @@
-basedir = access
 include $(top_srcdir)/modules/common.am
+accessdir = $(pluginsdir)/access
 
 # RTP plugin
-libvlc_LTLIBRARIES = librtp_plugin.la
+access_LTLIBRARIES = librtp_plugin.la
 librtp_plugin_la_SOURCES = \
 	rtp.c \
 	rtp.h \

@@ -1,5 +1,7 @@
-AM_LIBTOOLFLAGS=--tag=CC
+voutdir = $(pluginsdir)/video_output
+
 noinst_LTLIBRARIES =
+vout_LTLIBRARIES =
 
 SOURCES_aa = aa.c
 SOURCES_fb = fb.c
@@ -16,7 +18,7 @@ if HAVE_DECKLINK
 libdecklinkoutput_plugin_la_SOURCES = decklink.cpp
 libdecklinkoutput_plugin_la_CXXFLAGS = $(AM_CFLAGS) $(CPPFLAGS_decklinkoutput)
 libdecklinkoutput_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_decklink) $(LIBDL)
-libvlc_LTLIBRARIES += libdecklinkoutput_plugin.la
+vout_LTLIBRARIES += libdecklinkoutput_plugin.la
 endif
 
 ### OpenGL ###
@@ -24,30 +26,20 @@ endif
 libgles2_plugin_la_SOURCES = opengl.c opengl.h gl.c
 libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES=2
 libgles2_plugin_la_LIBADD = $(AM_LIBADD) $(GLES2_LIBS)
-if HAVE_WIN32
-libgles2_plugin_la_DEPENDENCIES = libgles2_plugin.rc.o
-endif
+libgles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
 libgles1_plugin_la_SOURCES = opengl.c opengl.h gl.c
 libgles1_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES1_CFLAGS) -DUSE_OPENGL_ES=1
 libgles1_plugin_la_LIBADD = $(AM_LIBADD) $(GLES1_LIBS)
-if HAVE_WIN32
-libgles1_plugin_la_DEPENDENCIES = libgles1_plugin.rc.o
-endif
+libgles1_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
 libgl_plugin_la_SOURCES = opengl.c opengl.h gl.c
 libgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
 libgl_plugin_la_LIBADD = $(AM_LIBADD) $(GL_LIBS)
-if HAVE_WIN32
-libgl_plugin_la_DEPENDENCIES = libgl_plugin.rc.o
-endif
+libgl_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
-EXTRA_LTLIBRARIES += \
-	libgles2_plugin.la \
-	libgles1_plugin.la \
-	libgl_plugin.la
-libvlc_LTLIBRARIES += \
-	$(LTLIBgles2) $(LTLIBgles1) $(LTLIBgl)
+EXTRA_LTLIBRARIES += libgles2_plugin.la libgles1_plugin.la libgl_plugin.la
+vout_LTLIBRARIES += $(LTLIBgles2) $(LTLIBgles1) $(LTLIBgl)
 
 
 ### XCB ###
@@ -72,6 +64,7 @@ libxcb_xv_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS) $(XCB_XV_CFLAGS)
 libxcb_xv_plugin_la_LIBADD = libvlc_xcb_events.la $(AM_LIBADD) \
 	$(XCB_LIBS) $(XCB_SHM_LIBS) $(XCB_XV_LIBS)
+libxcb_xv_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
 libxcb_glx_plugin_la_SOURCES = \
 	opengl.c opengl.h \
@@ -80,6 +73,7 @@ libxcb_glx_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(GL_CFLAGS)
 libxcb_glx_plugin_la_LIBADD = libvlc_xcb_events.la $(AM_LIBADD) \
 	$(XCB_LIBS) $(GL_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
+libxcb_glx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
 libxcb_window_plugin_la_SOURCES = xcb/window.c xcb/keys.c xcb/keysym.h xcb/xcb_keysym.h
 libxcb_window_plugin_la_CFLAGS = $(AM_CFLAGS) \
@@ -94,58 +88,44 @@ libxcb_window_plugin_la_LIBADD = $(AM_LIBADD) \
 
 if HAVE_XCB
 noinst_LTLIBRARIES += libvlc_xcb_events.la
-libvlc_LTLIBRARIES += \
+vout_LTLIBRARIES += \
 	libxcb_x11_plugin.la \
 	libxcb_window_plugin.la
 endif
-EXTRA_LTLIBRARIES += \
-	libxcb_xv_plugin.la \
-	libxcb_glx_plugin.la
-libvlc_LTLIBRARIES += \
-	$(LTLIBxcb_xv) \
-	$(LTLIBxcb_glx)
+EXTRA_LTLIBRARIES += libxcb_xv_plugin.la libxcb_glx_plugin.la
+vout_LTLIBRARIES += $(LTLIBxcb_xv) $(LTLIBxcb_glx)
 
 ### Win32 ###
 libdirect2d_plugin_la_SOURCES = msw/direct2d.c \
 	msw/common.c msw/common.h msw/events.c msw/events.h
 libdirect2d_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdirect2d_plugin_la_LIBADD = $(AM_LIBADD) -lgdi32 -lole32 -luuid
-if HAVE_WIN32
-libdirect2d_plugin_la_DEPENDENCIES = libdirect2d_plugin.rc.o
-endif
-libvlc_LTLIBRARIES += $(LTLIBdirect2d)
+libdirect2d_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+vout_LTLIBRARIES += $(LTLIBdirect2d)
 EXTRA_LTLIBRARIES += libdirect2d_plugin.la
 
 libdirect3d_plugin_la_SOURCES = msw/direct3d.c \
 	msw/common.c msw/common.h msw/events.c msw/events.h
 libdirect3d_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdirect3d_plugin_la_LIBADD = $(AM_LIBADD) -lgdi32 -lole32 -luuid
-if HAVE_WIN32
-libdirect3d_plugin_la_DEPENDENCIES = libdirect3d_plugin.rc.o
-endif
-libvlc_LTLIBRARIES += $(LTLIBdirect3d)
+libdirect3d_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+vout_LTLIBRARIES += $(LTLIBdirect3d)
 EXTRA_LTLIBRARIES += libdirect3d_plugin.la
 
 libdirectdraw_plugin_la_SOURCES = msw/directx.c \
 	msw/common.c msw/common.h msw/events.c msw/events.h
 libdirectdraw_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdirectdraw_plugin_la_LIBADD = $(AM_LIBADD) -luser32 -lgdi32 -lole32 -luuid
-if HAVE_WIN32
-libdirectdraw_plugin_la_DEPENDENCIES = libdirectdraw_plugin.rc.o
-endif
-
 if HAVE_DIRECTX
-libvlc_LTLIBRARIES += libdirectdraw_plugin.la
+vout_LTLIBRARIES += libdirectdraw_plugin.la
 endif
 
 libglwin32_plugin_la_SOURCES = msw/glwin32.c opengl.c opengl.h \
 	msw/common.c msw/common.h msw/events.c msw/events.h
 libglwin32_plugin_la_CFLAGS = $(AM_CFLAGS)
 libglwin32_plugin_la_LIBADD = $(AM_LIBADD) -lopengl32 -lgdi32 -lole32 -luuid
-if HAVE_WIN32
-libglwin32_plugin_la_DEPENDENCIES = libglwin32_plugin.rc.o
-endif
-libvlc_LTLIBRARIES += $(LTLIBglwin32)
+libglwin32_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+vout_LTLIBRARIES += $(LTLIBglwin32)
 EXTRA_LTLIBRARIES += libglwin32_plugin.la
 
 libwingdi_plugin_la_SOURCES = msw/wingdi.c \
@@ -153,7 +133,7 @@ libwingdi_plugin_la_SOURCES = msw/wingdi.c \
 libwingdi_plugin_la_CFLAGS = $(AM_CFLAGS)
 libwingdi_plugin_la_LIBADD = $(AM_LIBADD) -lgdi32 -lole32 -luuid
 if HAVE_WIN32
-libvlc_LTLIBRARIES += libwingdi_plugin.la
+vout_LTLIBRARIES += libwingdi_plugin.la
 libwingdi_plugin_la_DEPENDENCIES = libwingdi_plugin.rc.o
 endif
 
@@ -161,20 +141,20 @@ libdrawable_plugin_la_SOURCES = drawable.c
 libdrawable_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdrawable_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
-libvlc_LTLIBRARIES += libdrawable_plugin.la
+vout_LTLIBRARIES += libdrawable_plugin.la
 libdrawable_plugin_la_DEPENDENCIES = libdrawable_plugin.rc.o
 endif
 
 ### OS/2 ###
 if HAVE_OS2
-libvlc_LTLIBRARIES += libdrawable_plugin.la
+vout_LTLIBRARIES += libdrawable_plugin.la
 endif
 
 libkva_plugin_la_SOURCES = kva.c
 libkva_plugin_la_CFLAGS = $(AM_CFLAGS)
 libkva_plugin_la_LIBADD = $(AM_LIBADD) $(KVA_LIBS)
 if HAVE_KVA
-libvlc_LTLIBRARIES += libkva_plugin.la
+vout_LTLIBRARIES += libkva_plugin.la
 endif
 
 ### EGL ###
@@ -185,11 +165,10 @@ if !HAVE_WIN32
 if !HAVE_DARWIN
 libegl_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIBS) -lX11
 endif
-else
-libegl_plugin_la_DEPENDENCIES = libegl_plugin.rc.o
 endif
+libegl_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 EXTRA_LTLIBRARIES += libegl_plugin.la
-libvlc_LTLIBRARIES += $(LTLIBegl)
+vout_LTLIBRARIES += $(LTLIBegl)
 
 ### GLX ###
 libglx_plugin_la_SOURCES = glx.c
@@ -198,8 +177,9 @@ libglx_plugin_la_LIBADD = $(AM_LIBADD) $(GL_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
 if HAVE_WIN32
 libglx_plugin_la_DEPENDENCIES = libglx_plugin.rc.o
 endif
+libglx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 EXTRA_LTLIBRARIES += libglx_plugin.la
-libvlc_LTLIBRARIES += $(LTLIBglx)
+vout_LTLIBRARIES += $(LTLIBglx)
 
 ### Coloured ASCII art ###
 libcaca_plugin_la_SOURCES = caca.c
@@ -209,11 +189,10 @@ if !HAVE_WIN32
 if !HAVE_DARWIN
 libcaca_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIBS) -lX11
 endif
-else
-libcaca_plugin_la_DEPENDENCIES = libcaca_plugin.rc.o
 endif
+libcaca_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 EXTRA_LTLIBRARIES += libcaca_plugin.la
-libvlc_LTLIBRARIES += $(LTLIBcaca)
+vout_LTLIBRARIES += $(LTLIBcaca)
 
 ### Common ###
 libvdummy_plugin_la_SOURCES = vdummy.c
@@ -223,7 +202,7 @@ if HAVE_WIN32
 libvdummy_plugin_la_DEPENDENCIES = libvdummy_plugin.rc.o
 endif
 
-libvlc_LTLIBRARIES += \
+vout_LTLIBRARIES += \
 	libvdummy_plugin.la \
 	libvmem_plugin.la \
 	libyuv_plugin.la

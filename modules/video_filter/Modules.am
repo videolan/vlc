@@ -33,7 +33,7 @@ endif
 if HAVE_WIN32
 libdeinterlace_plugin_la_DEPENDENCIES = libdeinterlace_plugin.rc.o
 endif
-libvlc_LTLIBRARIES += libdeinterlace_plugin.la
+video_filter_LTLIBRARIES += libdeinterlace_plugin.la
 
 libdynamicoverlay_plugin_la_SOURCES = \
 	dynamicoverlay/dynamicoverlay_buffer.c \
@@ -44,7 +44,7 @@ libdynamicoverlay_plugin_la_SOURCES = \
 libdynamicoverlay_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdynamicoverlay_plugin_la_LIBADD = $(AM_LIBADD)
 if !HAVE_WIN32
-libvlc_LTLIBRARIES += libdynamicoverlay_plugin.la
+video_filter_LTLIBRARIES += libdynamicoverlay_plugin.la
 endif
 
 libremoteosd_plugin_la_SOURCES = remoteosd.c remoteosd_rfbproto.h
@@ -54,7 +54,7 @@ if HAVE_WIN32
 libremoteosd_plugin_la_DEPENDENCIES = libremoteosd_plugin.rc.o
 endif
 if HAVE_GCRYPT
-libvlc_LTLIBRARIES += libremoteosd_plugin.la
+video_filter_LTLIBRARIES += libremoteosd_plugin.la
 endif
 
 libpuzzle_plugin_la_SOURCES = \
@@ -68,7 +68,7 @@ libpuzzle_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libpuzzle_plugin_la_DEPENDENCIES = libpuzzle_plugin.rc.o
 endif
-libvlc_LTLIBRARIES += libpuzzle_plugin.la
+video_filter_LTLIBRARIES += libpuzzle_plugin.la
 
 SOURCES_magnify = magnify.c
 SOURCES_wave = wave.c
@@ -138,7 +138,7 @@ SOURCES_vhs = vhs.c
 SOURCES_freeze = freeze.c
 noinst_HEADERS = filter_picture.h
 
-libvlc_LTLIBRARIES += \
+video_filter_LTLIBRARIES += \
 	libadjust_plugin.la \
 	libalphamask_plugin.la \
 	libaudiobargraph_v_plugin.la \

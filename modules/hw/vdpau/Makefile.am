@@ -1,5 +1,5 @@
-basedir = vdpau
 include $(top_srcdir)/modules/common.am
+vdpaudir = $(pluginsdir)/vdpau
 
 AM_CFLAGS += $(VDPAU_CFLAGS)
 AM_LIBADD += libvlc_vdpau.la
@@ -14,7 +14,7 @@ libvlc_vdpau_la_LDFLAGS = \
 	-version-info 0:0:0
 pkglib_LTLIBRARIES = libvlc_vdpau.la
 
-libvlc_LTLIBRARIES =
+vdpau_LTLIBRARIES =
 
 libvdpau_avcodec_plugin_la_SOURCES = avcodec.c picture.c
 libvdpau_avcodec_plugin_la_CFLAGS = $(AM_CFLAGS) \
@@ -23,28 +23,28 @@ libvdpau_avcodec_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(X_LIBS) $(X_PRE_LIBS) -lX11 $(AVCODEC_LIBS)
 # FIXME: hwdummy only needs libavutil, and only if avcodec < 55.13.0
 if HAVE_AVCODEC_VDPAU
-libvlc_LTLIBRARIES += libvdpau_avcodec_plugin.la
+vdpau_LTLIBRARIES += libvdpau_avcodec_plugin.la
 endif
 
 libvdpau_deinterlace_plugin_la_SOURCES = deinterlace.c picture.c
 libvdpau_deinterlace_plugin_la_CFLAGS = $(AM_CFLAGS) # dummy
 libvdpau_deinterlace_plugin_la_LIBADD = $(AM_LIBADD)
-libvlc_LTLIBRARIES += libvdpau_deinterlace_plugin.la
+vdpau_LTLIBRARIES += libvdpau_deinterlace_plugin.la
 
 libvdpau_adjust_plugin_la_SOURCES = adjust.c picture.c
 libvdpau_adjust_plugin_la_CFLAGS = $(AM_CFLAGS) # dummy
 libvdpau_adjust_plugin_la_LIBADD = $(AM_LIBADD)
-libvlc_LTLIBRARIES += libvdpau_adjust_plugin.la
+vdpau_LTLIBRARIES += libvdpau_adjust_plugin.la
 
 libvdpau_sharpen_plugin_la_SOURCES = sharpen.c picture.c
 libvdpau_sharpen_plugin_la_CFLAGS = $(AM_CFLAGS) # dummy
 libvdpau_sharpen_plugin_la_LIBADD = $(AM_LIBADD)
-libvlc_LTLIBRARIES += libvdpau_sharpen_plugin.la
+vdpau_LTLIBRARIES += libvdpau_sharpen_plugin.la
 
 libvdpau_chroma_plugin_la_SOURCES = chroma.c picture.c
 libvdpau_chroma_plugin_la_CFLAGS = $(AM_CFLAGS) # dummy
 libvdpau_chroma_plugin_la_LIBADD = $(AM_LIBADD)
-libvlc_LTLIBRARIES += libvdpau_chroma_plugin.la
+vdpau_LTLIBRARIES += libvdpau_chroma_plugin.la
 
 libvdpau_display_plugin_la_SOURCES = display.c
 libvdpau_display_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
@@ -54,4 +54,4 @@ libvdpau_display_plugin_la_CFLAGS = $(AM_CFLAGS) \
 libvdpau_display_plugin_la_LIBADD = \
 	../../video_output/libvlc_xcb_events.la \
 	$(AM_LIBADD) $(X_LIBS) $(X_PRE_LIBS) -lX11 $(XCB_LIBS)
-libvlc_LTLIBRARIES += libvdpau_display_plugin.la
+vdpau_LTLIBRARIES += libvdpau_display_plugin.la

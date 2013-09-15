@@ -16,7 +16,7 @@ SOURCES_spatializer = \
 	spatializer/revmodel.cpp spatializer/revmodel.hpp \
 	spatializer/spatializer.cpp
 
-libvlc_LTLIBRARIES += \
+audio_filter_LTLIBRARIES += \
 	libaudiobargraph_a_plugin.la \
 	libchorus_flanger_plugin.la \
 	libcompressor_plugin.la \
@@ -37,7 +37,7 @@ SOURCES_dolby_surround_decoder = channel_mixer/dolby.c
 SOURCES_mono = channel_mixer/mono.c
 SOURCES_remap = channel_mixer/remap.c
 
-libvlc_LTLIBRARIES += \
+audio_filter_LTLIBRARIES += \
 	libdolby_surround_decoder_plugin.la \
 	libheadphone_channel_mixer_plugin.la \
 	libmono_plugin.la \
@@ -58,7 +58,7 @@ if HAVE_WIN32
 libaudio_format_plugin_la_DEPENDENCIES = libaudio_format_plugin.rc.o
 endif
 
-libvlc_LTLIBRARIES += \
+audio_filter_LTLIBRARIES += \
 	liba52tospdif_plugin.la \
 	libaudio_format_plugin.la \
 	libdtstospdif_plugin.la
@@ -69,7 +69,7 @@ SOURCES_bandlimited_resampler = \
 SOURCES_ugly_resampler = resampler/ugly.c
 SOURCES_samplerate = resampler/src.c
 
-libvlc_LTLIBRARIES += \
+audio_filter_LTLIBRARIES += \
 	libugly_resampler_plugin.la
 EXTRA_LTLIBRARIES += \
 	libbandlimited_resampler_plugin.la
@@ -81,5 +81,5 @@ if HAVE_WIN32
 libspeex_resampler_plugin_la_DEPENDENCIES = libspeex_resampler_plugin.rc.o
 endif
 if HAVE_SPEEXDSP
-libvlc_LTLIBRARIES += libspeex_resampler_plugin.la
+audio_filter_LTLIBRARIES += libspeex_resampler_plugin.la
 endif

@@ -1,12 +1,13 @@
-basedir = stream_filter
 include $(top_srcdir)/modules/common.am
-libvlc_LTLIBRARIES =
+stream_filterdir = $(pluginsdir)/stream_filter
+
+stream_filter_LTLIBRARIES =
 
 libdecomp_plugin_la_SOURCES = decomp.c
 libdecomp_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdecomp_plugin_la_LIBADD = $(AM_LIBADD)
 if !HAVE_WIN32
-libvlc_LTLIBRARIES += libdecomp_plugin.la
+stream_filter_LTLIBRARIES += libdecomp_plugin.la
 endif
 
 libdash_plugin_la_SOURCES = \
@@ -94,7 +95,7 @@ libdash_plugin_la_SOURCES = \
     dash/Helper.h
 libdash_plugin_la_CXXFLAGS = $(AM_CFLAGS) -I$(srcdir)/dash
 libdash_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
-libvlc_LTLIBRARIES += libdash_plugin.la
+stream_filter_LTLIBRARIES += libdash_plugin.la
 if HAVE_WIN32
 libdash_plugin_la_DEPENDENCIES = libdash_plugin.rc.o
 endif
@@ -109,7 +110,7 @@ libsmooth_plugin_la_CFLAGS = $(AM_CFLAGS)
 if HAVE_WIN32
 libsmooth_plugin_la_DEPENDENCIES = libsmooth_plugin.rc.o
 endif
-libvlc_LTLIBRARIES += libsmooth_plugin.la
+stream_filter_LTLIBRARIES += libsmooth_plugin.la
 
 libhttplive_plugin_la_SOURCES = httplive.c
 libhttplive_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
@@ -118,7 +119,7 @@ if HAVE_WIN32
 libhttplive_plugin_la_DEPENDENCIES = libhttplive_plugin.rc.o
 endif
 if HAVE_GCRYPT
-libvlc_LTLIBRARIES += libhttplive_plugin.la
+stream_filter_LTLIBRARIES += libhttplive_plugin.la
 endif
 
 librecord_plugin_la_SOURCES = record.c
@@ -127,4 +128,4 @@ librecord_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 librecord_plugin_la_DEPENDENCIES = librecord_plugin.rc.o
 endif
-libvlc_LTLIBRARIES += librecord_plugin.la
+stream_filter_LTLIBRARIES += librecord_plugin.la

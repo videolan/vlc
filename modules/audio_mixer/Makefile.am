@@ -1,5 +1,5 @@
-basedir = audio_mixer
 include $(top_srcdir)/modules/common.am
+audio_mixerdir = $(pluginsdir)/audio_mixer
 
 libfloat_mixer_plugin_la_SOURCES = float.c
 libfloat_mixer_plugin_la_CFLAGS = $(AM_CFLAGS)
@@ -15,6 +15,6 @@ if HAVE_WIN32
 libinteger_mixer_plugin_la_DEPENDENCIES = libinteger_mixer_plugin.rc.o
 endif
 
-libvlc_LTLIBRARIES = \
+audio_mixer_LTLIBRARIES = \
 	libfloat_mixer_plugin.la \
 	libinteger_mixer_plugin.la

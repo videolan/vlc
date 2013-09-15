@@ -1,5 +1,5 @@
-basedir = video_chroma
 include $(top_srcdir)/modules/common.am
+chromadir = $(pluginsdir)/video_chroma
 
 libchain_plugin_la_SOURCES = chain.c
 libchain_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
@@ -11,6 +11,7 @@ libchroma_omx_plugin_la_LIBADD = $(AM_LIBADD) $(OMXIP_LIBS)
 libswscale_plugin_la_SOURCES = swscale.c ../codec/avcodec/chroma.c
 libswscale_plugin_la_CFLAGS = $(AM_CFLAGS) $(SWSCALE_CFLAGS)
 libswscale_plugin_la_LIBADD = $(AM_LIBADD) $(SWSCALE_LIBS)
+libswscale_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(chromadir)'
 
 libgrey_yuv_plugin_la_SOURCES = grey_yuv.c
 libgrey_yuv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
@@ -38,7 +39,7 @@ libyuy2_i420_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libyuy2_i422_plugin_la_SOURCES = yuy2_i422.c
 libyuy2_i422_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
-libvlc_LTLIBRARIES = \
+chroma_LTLIBRARIES = \
 	libi420_rgb_plugin.la \
 	libi420_yuy2_plugin.la \
 	libi422_i420_plugin.la \
@@ -57,7 +58,7 @@ libi420_yuy2_altivec_plugin_la_SOURCES = i420_yuy2.c i420_yuy2.h
 libi420_yuy2_altivec_plugin_la_CFLAGS = $(AM_CFLAGS) $(ALTIVEC_CFLAGS)
 
 if HAVE_ALTIVEC
-libvlc_LTLIBRARIES += \
+chroma_LTLIBRARIES += \
 	libi420_yuy2_altivec_plugin.la
 endif
 
@@ -73,7 +74,7 @@ libi422_yuy2_mmx_plugin_la_SOURCES = i422_yuy2.c i422_yuy2.h
 libi422_yuy2_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 if HAVE_MMX
-libvlc_LTLIBRARIES += \
+chroma_LTLIBRARIES += \
 	libi420_rgb_mmx_plugin.la \
 	libi420_yuy2_mmx_plugin.la \
 	libi422_yuy2_mmx_plugin.la
@@ -91,7 +92,7 @@ libi422_yuy2_sse2_plugin_la_SOURCES = i422_yuy2.c i422_yuy2.h
 libi422_yuy2_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 if HAVE_SSE2
-libvlc_LTLIBRARIES += \
+chroma_LTLIBRARIES += \
 	libi420_rgb_sse2_plugin.la \
 	libi420_yuy2_sse2_plugin.la \
 	libi422_yuy2_sse2_plugin.la

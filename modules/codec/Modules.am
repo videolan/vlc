@@ -52,7 +52,7 @@ SOURCES_fdkaac = fdkaac.c
 SOURCES_scte27 = scte27.c
 SOURCES_qsv = qsv.c
 
-libvlc_LTLIBRARIES += \
+codec_LTLIBRARIES += \
 	libcc_plugin.la \
 	libcdg_plugin.la \
 	libcvdsub_plugin.la \
@@ -68,7 +68,7 @@ libvlc_LTLIBRARIES += \
 	$(NULL)
 
 if ENABLE_SOUT
-libvlc_LTLIBRARIES += \
+codec_LTLIBRARIES += \
 	libt140_plugin.la \
 	libedummy_plugin.la
 endif
@@ -107,7 +107,7 @@ libmpeg_audio_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libuleaddvaudio_plugin_la_SOURCES = uleaddvaudio.c
 libuleaddvaudio_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
-libvlc_LTLIBRARIES += \
+codec_LTLIBRARIES += \
 	liba52_plugin.la \
 	libadpcm_plugin.la \
 	libaes3_plugin.la \
@@ -153,7 +153,7 @@ endif
 libavcodec_plugin_la_CFLAGS += -DMERGE_FFMPEG
 endif
 if HAVE_AVCODEC
-libvlc_LTLIBRARIES += libavcodec_plugin.la
+codec_LTLIBRARIES += libavcodec_plugin.la
 endif
 
 ### avcodec hardware acceleration ###
@@ -166,7 +166,7 @@ libvaapi_plugin_la_CFLAGS = $(AM_CFLAGS) \
 libvaapi_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(LIBVA_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
 if HAVE_AVCODEC_VAAPI
-libvlc_LTLIBRARIES += libvaapi_plugin.la
+codec_LTLIBRARIES += libvaapi_plugin.la
 endif
 
 libdxva2_plugin_la_SOURCES = \
@@ -174,7 +174,7 @@ libdxva2_plugin_la_SOURCES = \
 	avcodec/dxva2.c
 libdxva2_plugin_la_LIBADD = $(AM_LIBADD) -lole32 -lshlwapi -luuid
 if HAVE_AVCODEC_DXVA2
-libvlc_LTLIBRARIES += libdxva2_plugin.la
+codec_LTLIBRARIES += libdxva2_plugin.la
 endif
 libdxva2_plugin_la_DEPENDENCIES = libdxva2_plugin.rc.o
 
@@ -184,7 +184,7 @@ libvda_plugin_la_SOURCES = \
 libvda_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVCODEC_CFLAGS)
 libvda_plugin_la_LDFLAGS = -Wl,-framework,CoreFoundation,-framework,VideoDecodeAcceleration,-framework,QuartzCore
 if HAVE_AVCODEC_VDA
-libvlc_LTLIBRARIES += libvda_plugin.la
+codec_LTLIBRARIES += libvda_plugin.la
 endif
 
 libhwdummy_plugin_la_SOURCES = avcodec/hwdummy.c
@@ -192,7 +192,7 @@ libhwdummy_plugin_la_CFLAGS = $(AM_CFLAGS) $(VDPAU_CFLAGS) $(AVCODEC_CFLAGS)
 libhwdummy_plugin_la_LIBADD = $(AM_LIBADD) $(AVCODEC_LIBS)
 # FIXME: hwdummy only needs libavutil, and only if avcodec < 55.13.0
 if HAVE_AVCODEC_VDPAU
-libvlc_LTLIBRARIES += libhwdummy_plugin.la
+codec_LTLIBRARIES += libhwdummy_plugin.la
 endif
 if HAVE_WIN32
 libhwdummy_plugin_la_DEPENDENCIES = libhwdummy_plugin.rc.o
@@ -202,10 +202,8 @@ endif
 libxwd_plugin_la_SOURCES = xwd.c
 libxwd_plugin_la_CFLAGS = $(AM_CFLAGS) $(XPROTO_CFLAGS)
 libxwd_plugin_la_LIBADD = $(AM_LIBADD) $(XPROTO_LIBS)
-if HAVE_WIN32
-libxwd_plugin_la_DEPENDENCIES = libxwd_plugin.rc.o
-endif
-libvlc_LTLIBRARIES += $(LTLIBxwd)
+libxwd_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+codec_LTLIBRARIES += $(LTLIBxwd)
 EXTRA_LTLIBRARIES += libxwd_plugin.la
 
 ### OpenMAX ###
@@ -228,10 +226,12 @@ libomxil_plugin_la_SOURCES = \
 	omxil/omxil.c omxil/omxil.h omxil/omxil_core.c omxil/omxil_core.h
 libomxil_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/omxil $(CFLAGS_omxil)
 libomxil_plugin_la_LIBADD = $(AM_LIBADD) $(LIBDL)
+libomxil_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 
 libomxil_vout_plugin_la_SOURCES = omxil/vout.c omxil/omxil_core.c omxil/utils.c omxil/qcom.c
 libomxil_vout_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/omxil $(CFLAGS_omxil_vout)
 libomxil_vout_plugin_la_LIBADD = $(AM_LIBADD) $(LIBDL)
+libomxil_vout_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 
 libiomx_plugin_la_SOURCES = $(libomxil_plugin_la_SOURCES)
 libiomx_plugin_la_CPPFLAGS = $(libomxil_plugin_la_CPPFLAGS) -DUSE_IOMX
@@ -240,9 +240,8 @@ libiomx_plugin_la_LIBADD = $(libomxil_plugin_la_LIBADD)
 libmediacodec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/omxil
 libmediacodec_plugin_la_SOURCES = omxil/android_mediacodec.c omxil/utils.c
 
-libvlc_LTLIBRARIES += $(LTLIBomxil) $(LTLIBomxil_vout)
+codec_LTLIBRARIES += $(LTLIBomxil) $(LTLIBomxil_vout)
 EXTRA_LTLIBRARIES += libomxil_plugin.la libomxil_vout_plugin.la
 if HAVE_ANDROID
-libvlc_LTLIBRARIES += libiomx_plugin.la libmediacodec_plugin.la
+codec_LTLIBRARIES += libiomx_plugin.la libmediacodec_plugin.la
 endif
-

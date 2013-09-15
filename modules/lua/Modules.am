@@ -40,4 +40,4 @@ if HAVE_WIN32
 SOURCES_lua += libs/win.c
 endif
 
-libvlc_LTLIBRARIES += liblua_plugin.la
+lua_LTLIBRARIES += liblua_plugin.la

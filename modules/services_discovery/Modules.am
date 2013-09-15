@@ -1,3 +1,6 @@
+sddir = $(pluginsdir)/services_discovery
+sd_LTLIBRARIES =
+
 SOURCES_upnp = upnp.cpp upnp.hpp
 SOURCES_bonjour = bonjour.c
 SOURCES_podcast = podcast.c
@@ -10,13 +13,14 @@ libsap_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_sap) $(SOCKET_LIBS)
 if HAVE_WIN32
 libsap_plugin_la_DEPENDENCIES = libsap_plugin.rc.o
 endif
+sd_LTLIBRARIES += libsap_plugin.la
 
 libpulselist_plugin_la_SOURCES = pulse.c
 libpulselist_plugin_la_CFLAGS = $(AM_CFLAGS) $(PULSE_CFLAGS)
 libpulselist_plugin_la_LIBADD = ../libvlc_pulse.la \
 	$(AM_LIBADD) $(PULSE_LIBS)
 if HAVE_PULSE
-libvlc_LTLIBRARIES += libpulselist_plugin.la
+sd_LTLIBRARIES += libpulselist_plugin.la
 endif
 
 libudev_plugin_la_SOURCES = udev.c
@@ -26,6 +30,9 @@ if HAVE_ALSA
 libudev_plugin_la_CFLAGS += $(ALSA_CFLAGS) -DHAVE_ALSA
 libudev_plugin_la_LIBADD += $(ALSA_LIBS)
 endif
+libudev_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(sddir)'
+EXTRA_LTLIBRARIES += libudev_plugin.la
+sd_LTLIBRARIES += $(LTLIBudev)
 
 libxcb_apps_plugin_la_SOURCES = xcb_apps.c
 libxcb_apps_plugin_la_CFLAGS = $(AM_CFLAGS) \
@@ -33,14 +40,14 @@ libxcb_apps_plugin_la_CFLAGS = $(AM_CFLAGS) \
 libxcb_apps_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_LIBS)
 if HAVE_XCB
-libvlc_LTLIBRARIES += libxcb_apps_plugin.la
+sd_LTLIBRARIES += libxcb_apps_plugin.la
 endif
 
 libwindrive_plugin_la_SOURCES = windrive.c
 libwindrive_plugin_la_CFLAGS = $(AM_CFLAGS)
 libwindrive_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
-libvlc_LTLIBRARIES += libwindrive_plugin.la
+sd_LTLIBRARIES += libwindrive_plugin.la
 libwindrive_plugin_la_DEPENDENCIES = libwindrive_plugin.rc.o
 endif
 
@@ -48,13 +55,9 @@ libos2drive_plugin_la_SOURCES = os2drive.c
 libos2drive_plugin_la_CFLAGS = $(AM_CFLAGS)
 libos2drive_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_OS2
-libvlc_LTLIBRARIES += libos2drive_plugin.la
+sd_LTLIBRARIES += libos2drive_plugin.la
 endif
 
-EXTRA_LTLIBRARIES += \
-	libudev_plugin.la
-libvlc_LTLIBRARIES += \
+services_discovery_LTLIBRARIES += \
 	libmediadirs_plugin.la \
-	libpodcast_plugin.la \
-	libsap_plugin.la \
-	$(LTLIBudev)
+	libpodcast_plugin.la

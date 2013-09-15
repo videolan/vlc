@@ -17,7 +17,7 @@ SOURCES_motion = \
         $(motion_extra) \
         $(NULL)
 
-libvlc_LTLIBRARIES += \
+control_LTLIBRARIES += \
 	libdummy_plugin.la \
 	libgestures_plugin.la \
 	libnetsync_plugin.la \
@@ -25,9 +25,9 @@ libvlc_LTLIBRARIES += \
 	liboldrc_plugin.la
 
 if HAVE_WIN32
-libvlc_LTLIBRARIES += libntservice_plugin.la
+control_LTLIBRARIES += libntservice_plugin.la
 else
-libvlc_LTLIBRARIES += libmotion_plugin.la
+control_LTLIBRARIES += libmotion_plugin.la
 endif
 
 libdbus_plugin_la_SOURCES = \
@@ -39,19 +39,20 @@ libdbus_plugin_la_SOURCES = \
 libdbus_plugin_la_CFLAGS = $(AM_CFLAGS) $(DBUS_CFLAGS)
 libdbus_plugin_la_LIBADD = $(AM_LIBADD) $(DBUS_LIBS) $(LIBM)
 if HAVE_DBUS
-libvlc_LTLIBRARIES += libdbus_plugin.la
+control_LTLIBRARIES += libdbus_plugin.la
 endif
 
 libxcb_hotkeys_plugin_la_SOURCES = globalhotkeys/xcb.c
 libxcb_hotkeys_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_KEYSYMS_CFLAGS) $(XCB_CFLAGS)
 libxcb_hotkeys_plugin_la_LIBADD = $(AM_LIBADD) $(XCB_KEYSYMS_LIBS) $(XCB_LIBS)
+libxcb_hotkeys_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(controldir)'
 EXTRA_LTLIBRARIES += libxcb_hotkeys_plugin.la
-libvlc_LTLIBRARIES += $(LTLIBxcb_hotkeys)
+control_LTLIBRARIES += $(LTLIBxcb_hotkeys)
 
 libwin_hotkeys_plugin_la_SOURCES = globalhotkeys/win32.c
 libwin_hotkeys_plugin_la_CFLAGS = $(AM_CFLAGS)
 libwin_hotkeys_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
-libvlc_LTLIBRARIES += libwin_hotkeys_plugin.la
+control_LTLIBRARIES += libwin_hotkeys_plugin.la
 endif

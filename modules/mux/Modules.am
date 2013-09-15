@@ -6,7 +6,7 @@ SOURCES_mux_asf = asf.c ../demux/asf/libasf_guid.h
 SOURCES_mux_wav = wav.c
 SOURCES_mux_mpjpeg = mpjpeg.c
 
-libvlc_LTLIBRARIES += \
+mux_LTLIBRARIES += \
 	libmux_dummy_plugin.la \
 	libmux_avi_plugin.la \
 	libmux_mp4_plugin.la \
@@ -23,7 +23,7 @@ libmux_ps_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libmux_ps_plugin_la_DEPENDENCIES = libmux_ps_plugin.rc.o
 endif
-libvlc_LTLIBRARIES += libmux_ps_plugin.la
+mux_LTLIBRARIES += libmux_ps_plugin.la
 
 libmux_ts_plugin_la_SOURCES = \
 	mpeg/pes.c mpeg/pes.h \
@@ -35,5 +35,5 @@ if HAVE_WIN32
 libmux_ts_plugin_la_DEPENDENCIES = libmux_ts_plugin.rc.o
 endif
 if HAVE_DVBPSI
-libvlc_LTLIBRARIES += libmux_ts_plugin.la
+mux_LTLIBRARIES += libmux_ts_plugin.la
 endif

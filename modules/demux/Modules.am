@@ -70,7 +70,7 @@ if HAVE_WIN32
 libavformat_plugin_la_DEPENDENCIES = libavformat_plugin.rc.o
 endif
 if HAVE_AVFORMAT
-libvlc_LTLIBRARIES += libavformat_plugin.la
+demux_LTLIBRARIES += libavformat_plugin.la
 endif
 
 libes_plugin_la_SOURCES  = mpeg/es.c
@@ -100,15 +100,12 @@ libmkv_plugin_la_SOURCES = \
 	mp4/libmp4.c vobsub.h \
 	mkv/mkv.hpp mkv/mkv.cpp
 libmkv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libmkv_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
 libmkv_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_mkv)
-libmkv_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 if HAVE_ZLIB
 libmkv_plugin_la_LIBADD += -lz
 endif
-if HAVE_WIN32
-libmkv_plugin_la_DEPENDENCIES = libmkv_plugin.rc.o
-endif
-libvlc_LTLIBRARIES += $(LTLIBmkv)
+demux_LTLIBRARIES += $(LTLIBmkv)
 EXTRA_LTLIBRARIES += libmkv_plugin.la
 
 libmp4_plugin_la_SOURCES = mp4/mp4.c mp4/libmp4.c mp4/libmp4.h mp4/id3genres.h
@@ -161,10 +158,10 @@ if HAVE_WIN32
 libts_plugin_la_DEPENDENCIES = libts_plugin.rc.o
 endif
 if HAVE_DVBPSI
-libvlc_LTLIBRARIES += libts_plugin.la
+demux_LTLIBRARIES += libts_plugin.la
 endif
 
-libvlc_LTLIBRARIES += \
+demux_LTLIBRARIES += \
 	libaiff_plugin.la \
 	libasf_plugin.la \
 	libau_plugin.la \

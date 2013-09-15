@@ -4,4 +4,4 @@ SOURCES_svg = svg.c
 SOURCES_tdummy = tdummy.c
 SOURCES_win32text = win32text.c
 
-libvlc_LTLIBRARIES += libtdummy_plugin.la
+text_renderer_LTLIBRARIES += libtdummy_plugin.la

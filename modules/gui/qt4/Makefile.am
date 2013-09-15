@@ -1,6 +1,5 @@
-basedir = gui
-
 include $(top_srcdir)/modules/common.am
+guidir = $(pluginsdir)/gui
 
 ## Howto
 # For each Q_OBJECT:
@@ -17,7 +16,7 @@ SUFFIXES = .ui .h .hpp .moc.cpp
 
 libqt4_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS)
 libqt4_plugin_la_LIBADD = $(AM_LIBADD) $(QT_LIBS)
-libqt4_plugin_la_LDFLAGS = $(AM_LDFLAGS)
+libqt4_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)'
 if HAVE_OS2
 else
 if HAVE_WIN32
@@ -31,7 +30,7 @@ if HAVE_DARWIN
 libqt4_plugin_la_LDFLAGS += -Wl,-framework,Cocoa
 endif
 
-libvlc_LTLIBRARIES =  $(LTLIBqt4)
+gui_LTLIBRARIES =  $(LTLIBqt4)
 EXTRA_LTLIBRARIES = libqt4_plugin.la
 
 libqt4_plugin_la_SOURCES = \
