@@ -604,7 +604,7 @@ AC_CHECK_FUNCS([if_nameindex if_nametoindex])
 VLC_RESTORE_FLAGS
 
 AS_IF([test -n "$SOCKET_LIBS"], [
-  VLC_ADD_LIBS([access_rtmp access_output_udp access_output_shout sap stream_out_standard stream_out_rtp stream_out_raop vod_rtsp rtp oldrc netsync gnutls ts audioscrobbler lua remoteosd zvbi audiobargraph_a],[${SOCKET_LIBS}])
+  VLC_ADD_LIBS([access_rtmp access_output_udp access_output_shout sap stream_out_standard stream_out_rtp stream_out_raop vod_rtsp rtp oldrc netsync gnutls ts audioscrobbler lua remoteosd audiobargraph_a],[${SOCKET_LIBS}])
 ])
 AC_SUBST(SOCKET_LIBS)
 
@@ -653,7 +653,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom rotate noise grain scene kate lua chorus_flanger freetype swscale postproc faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a audiobargraph_v speex opus mono colorthres extract ball hotkeys mosaic gaussianblur x262 x26410b hqdn3d anaglyph oldrc ncurses oldmovie glspectrum],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom rotate noise grain scene lua chorus_flanger freetype swscale postproc equalizer spatializer param_eq samplerate freetype mpc qt4 compressor headphone_channel_mixer normvol audiobargraph_a audiobargraph_v mono colorthres extract ball hotkeys mosaic gaussianblur x262 x26410b hqdn3d anaglyph oldrc ncurses oldmovie glspectrum],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -2658,7 +2658,6 @@ if test "${enable_tremor}" = "yes"
 then
   AC_CHECK_HEADERS(tremor/ivorbiscodec.h, [
     VLC_ADD_PLUGIN([tremor])
-    VLC_ADD_LIBS([tremor],[-lvorbisidec -logg])
    ],[])
 fi
 
@@ -2706,7 +2705,6 @@ AC_CHECK_HEADERS(png.h, [
   VLC_SAVE_FLAGS
   LDFLAGS="${LDFLAGS} -lz $LIBM"
   AC_CHECK_LIB(png, png_set_rows, [
-    VLC_ADD_LIBS([png],[-lpng -lz $LIBM])
     VLC_ADD_PLUGIN([png])
   ], [], [-lz $LIBM])
   VLC_RESTORE_FLAGS
@@ -2875,7 +2873,7 @@ fi
 dnl
 dnl Intel QuickSync (aka MediaSDK) H264/H262 encoder
 dnl
-PKG_ENABLE_MODULES_VLC([QUICKSYNC], [qsv], [libmfx], [Intel QuickSync MPEG4-Part10/MPEG2 (aka H.264/H.262) encoder], [auto])
+PKG_ENABLE_MODULES_VLC([MFX], [qsv], [libmfx], [Intel QuickSync MPEG4-Part10/MPEG2 (aka H.264/H.262) encoder], [auto])
 
 dnl
 dnl libfluidsynth (MIDI synthetizer) plugin
@@ -2898,11 +2896,6 @@ AC_ARG_ENABLE(telx,
 AS_IF( [test "${enable_zvbi}" != "no"],[
     PKG_CHECK_MODULES(ZVBI, [zvbi-0.2 >= 0.2.28],
         [
-          VLC_ADD_LIBS([zvbi],[$ZVBI_LIBS])
-          if test "${SYS}" = "mingw32"; then
-              VLC_ADD_LIBS([zvbi],[ -lpthreadGC2])
-          fi
-          VLC_ADD_CFLAGS([zvbi],[$ZVBI_CFLAGS])
           VLC_ADD_PLUGIN([zvbi])
           AC_DEFINE(ZVBI_COMPILED, 1, [Define if the zvbi module is built])
           AS_IF( [test "${enable_telx}" = "yes"],[
@@ -2924,8 +2917,6 @@ AC_ARG_ENABLE(libass,
 AS_IF( [test "${enable_libass}" != "no"], [
   PKG_CHECK_MODULES(LIBASS, [libass >= 0.9.8],
       [
-        VLC_ADD_LIBS([libass],[$LIBASS_LIBS])
-        VLC_ADD_CFLAGS([libass],[$LIBASS_CFLAGS])
         VLC_ADD_PLUGIN([libass])
 
         AC_CHECK_HEADERS(fontconfig/fontconfig.h,
@@ -2949,9 +2940,7 @@ AC_ARG_ENABLE(tiger,
 [  --enable-tiger          Tiger rendering library for Kate streams (default auto)])
 AS_IF([test "${enable_tiger}" != "no"], [
   PKG_CHECK_MODULES(TIGER,[tiger >= 0.3.1], [
-      AC_DEFINE(HAVE_TIGER, 1, [Define if libtiger is available.])
-      VLC_ADD_CFLAGS([kate],[$TIGER_CFLAGS])
-      VLC_ADD_LIBS([kate],[$TIGER_LIBS]) ],[
+      AC_DEFINE(HAVE_TIGER, 1, [Define if libtiger is available.])],[
         AS_IF([test -n "${enable_tiger}"], [
           AC_MSG_ERROR([${TIGER_PKG_ERRORS}.])
         ])
@@ -3132,9 +3121,7 @@ then
       # SDL_image
       AS_IF([ test "${enable_sdl_image}" != "no"],[
         PKG_CHECK_MODULES(SDL_IMAGE, [SDL_image >= 1.2.10], [
-          VLC_ADD_PLUGIN([sdl_image])
-          VLC_ADD_LIBS([sdl_image],[${SDL_IMAGE_LIBS}])
-          VLC_ADD_CFLAGS([sdl_image], [${SDL_IMAGE_CFLAGS}])],
+          VLC_ADD_PLUGIN([sdl_image])],
           [ AC_MSG_WARN([${SDL_IMAGE_PKG_ERRORS}. You should install it alongside your SDL package.])
           ])
       ])
@@ -4153,10 +4140,6 @@ AS_IF([test "${with_kde_solid}" != "no"], [
 ])
 AC_SUBST(soliddatadir)
 AM_CONDITIONAL(KDE_SOLID, [test "x${soliddatadir}" != "x"])
-
-dnl
-dnl  DMO codec
-AS_IF([test "${SYS}" = "mingw32"], [VLC_ADD_PLUGIN([dmo]) VLC_ADD_LIBS([dmo],[-lole32 -luuid]) ])
 
 EXTEND_HELP_STRING([Components:])
 
