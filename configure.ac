@@ -3636,7 +3636,8 @@ dnl
 AC_ARG_ENABLE(jack,
   [AS_HELP_STRING([--disable-jack],
     [do not use jack (default auto)])])
-if test "${enable_jack}" != "no" ; then
+have_jack="no"
+AS_IF([test "${enable_jack}" != "no"], [
     PKG_CHECK_MODULES(JACK, jack >= 1.9.7,
       [ have_jack=yes ],
       [
@@ -3650,12 +3651,8 @@ if test "${enable_jack}" != "no" ; then
          [AC_MSG_WARN([${JACK_PKG_ERRORS}.])])
       ])
     ])
-    if test "x${have_jack}" = "xyes" ;  then
-      VLC_ADD_PLUGIN([jack access_jack])
-      VLC_ADD_LIBS([jack access_jack],[$JACK_LIBS])
-      VLC_ADD_CFLAGS([jack access_jack],[$JACK_CFLAGS])
-    fi
-fi
+])
+AM_CONDITIONAL([HAVE_JACK], [test "${have_jack}" != "no"])
 
 dnl
 dnl  OpenSLES Android

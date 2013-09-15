@@ -66,8 +66,9 @@ endif
 libjack_plugin_la_SOURCES = jack.c volume.h
 libjack_plugin_la_CFLAGS = $(AM_CFLAGS) $(JACK_CFLAGS)
 libjack_plugin_la_LIBADD = $(AM_LIBADD) $(JACK_LIBS) $(LIBM)
-EXTRA_LTLIBRARIES += libjack_plugin.la
-libvlc_LTLIBRARIES += $(LTLIBjack)
+if HAVE_JACK
+libvlc_LTLIBRARIES += libjack_plugin.la
+endif
 
 libmmdevice_plugin_la_SOURCES = mmdevice.c mmdevice.h wasapi.c
 libmmdevice_plugin_la_CFLAGS = $(AM_CFLAGS)
