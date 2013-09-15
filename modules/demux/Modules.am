@@ -63,7 +63,7 @@ demux_LTLIBRARIES += libavformat_plugin.la
 endif
 
 libes_plugin_la_SOURCES  = mpeg/es.c
-libes_plugin_la_LIBADD = ../codec/libvlc_dts_header.la
+libes_plugin_la_LIBADD = ../libvlc_dts_header.la
 if HAVE_WIN32
 libes_plugin_la_DEPENDENCIES = libes_plugin.rc.o
 endif

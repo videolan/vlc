@@ -1,10 +1,10 @@
 noinst_LTLIBRARIES =
+noinst_HEADERS =
 BASE_SUBDIRS = \
 	access/rtp \
 	audio_filter \
 	audio_mixer \
 	audio_output \
-	codec \
 	control \
 	demux \
 	gui \
@@ -57,6 +57,7 @@ endif
 
 include common.am
 include access/Makefile.am
+include codec/Makefile.am
 
 if HAVE_WIN32
 module.rc: $(top_builddir)/modules/module.rc.in $(top_builddir)/config.status
