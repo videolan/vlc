@@ -84,6 +84,21 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
     if (obj != NULL && obj->i_flags & OBJECT_FLAGS_QUIET)
         return;
 
+    /* Get basename from the module filename */
+    char *p = strrchr(module, '/');
+    if (p != NULL)
+        module = p;
+    p = strchr(module, '.');
+
+    size_t modlen = (p != NULL) ? (p - module) : 1;
+    char modulebuf[modlen];
+    if (p != NULL)
+    {
+        memcpy(modulebuf, module, modlen);
+        modulebuf[modlen] = '\0';
+        module = modulebuf;
+    }
+
     /* C locale to get error messages in English in the logs */
     locale_t c = newlocale (LC_MESSAGES_MASK, "C", (locale_t)0);
     locale_t locale = uselocale (c);
