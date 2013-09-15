@@ -44,7 +44,8 @@ EOF
     cat >> "${makf}" << EOF
 
 lib${mod}_plugin_la_SOURCES = \$(SOURCES_${mod})
-lib${mod}_plugin_la_CPPFLAGS = \$(AM_CPPFLAGS) \$(CPPFLAGS_${mod})
+lib${mod}_plugin_la_CPPFLAGS = \$(AM_CPPFLAGS) \$(CPPFLAGS_${mod}) \
+	-DMODULE_NAME_IS_${mod}
 lib${mod}_plugin_la_CFLAGS = \$(AM_CFLAGS) \$(CFLAGS_${mod})
 lib${mod}_plugin_la_CXXFLAGS = \$(AM_CXXFLAGS) \$(CXXFLAGS_${mod})
 lib${mod}_plugin_la_OBJCFLAGS = \$(AM_OBJCFLAGS) \$(OBJCFLAGS_${mod})

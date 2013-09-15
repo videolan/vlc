@@ -22,13 +22,15 @@ libi420_rgb_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libi420_rgb_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
 
 libi420_yuy2_plugin_la_SOURCES = i420_yuy2.c i420_yuy2.h
-libi420_yuy2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libi420_yuy2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-DMODULE_NAME_IS_i420_yuy2
 
 libi422_i420_plugin_la_SOURCES = i422_i420.c
 libi422_i420_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 libi422_yuy2_plugin_la_SOURCES = i422_yuy2.c i422_yuy2.h
-libi422_yuy2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libi422_yuy2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-DMODULE_NAME_IS_i422_yuy2
 
 librv32_plugin_la_SOURCES = rv32.c
 librv32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
@@ -55,6 +57,8 @@ EXTRA_LTLIBRARIES = libswscale_plugin.la libchroma_omx_plugin.la
 
 # AltiVec
 libi420_yuy2_altivec_plugin_la_SOURCES = i420_yuy2.c i420_yuy2.h
+libi420_yuy2_altivec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-DMODULE_NAME_IS_i420_yuy2_altivec
 libi420_yuy2_altivec_plugin_la_CFLAGS = $(AM_CFLAGS) $(ALTIVEC_CFLAGS)
 
 if HAVE_ALTIVEC
@@ -68,10 +72,12 @@ libi420_rgb_mmx_plugin_la_SOURCES = i420_rgb.c i420_rgb.h \
 libi420_rgb_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMMX
 
 libi420_yuy2_mmx_plugin_la_SOURCES = i420_yuy2.c i420_yuy2.h
-libi420_yuy2_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libi420_yuy2_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-DMODULE_NAME_IS_i420_yuy2_mmx
 
 libi422_yuy2_mmx_plugin_la_SOURCES = i422_yuy2.c i422_yuy2.h
-libi422_yuy2_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libi422_yuy2_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-DMODULE_NAME_IS_i422_yuy2_mmx
 
 if HAVE_MMX
 chroma_LTLIBRARIES += \
@@ -86,10 +92,12 @@ libi420_rgb_sse2_plugin_la_SOURCES = i420_rgb.c i420_rgb.h \
 libi420_rgb_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DSSE2
 
 libi420_yuy2_sse2_plugin_la_SOURCES = i420_yuy2.c i420_yuy2.h
-libi420_yuy2_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libi420_yuy2_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-DMODULE_NAME_IS_i420_yuy2_sse2
 
 libi422_yuy2_sse2_plugin_la_SOURCES = i422_yuy2.c i422_yuy2.h
-libi422_yuy2_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libi422_yuy2_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-DMODULE_NAME_IS_i422_yuy2_sse2
 
 if HAVE_SSE2
 chroma_LTLIBRARIES += \
