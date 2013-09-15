@@ -51,26 +51,18 @@ if MAINTAINER_MODE
 \$(srcdir)/Makefile.am: \$(srcdir)/Modules.am \$(top_srcdir)/modules/genmf
 	\$(AM_V_GEN)cd \\\$(top_srcdir) && \\\$(SHELL) modules/genmf ${dir}
 endif
-
 EOF
   for mod in $mods
   do
     cat >> "${makf}" << EOF
-# The ${mod} plugin
-if HAVE_WIN32
-lib${mod}_plugin_la_DEPENDENCIES = lib${mod}_plugin.rc.o
-endif
+
 lib${mod}_plugin_la_SOURCES = \$(SOURCES_${mod})
-nodist_lib${mod}_plugin_la_SOURCES = \$(nodist_SOURCES_${mod})
-# Force per-target objects:
 lib${mod}_plugin_la_CPPFLAGS = \$(AM_CPPFLAGS) \$(CPPFLAGS_${mod})
 lib${mod}_plugin_la_CFLAGS = \$(AM_CFLAGS) \$(CFLAGS_${mod})
 lib${mod}_plugin_la_CXXFLAGS = \$(AM_CXXFLAGS) \$(CXXFLAGS_${mod})
 lib${mod}_plugin_la_OBJCFLAGS = \$(AM_OBJCFLAGS) \$(OBJCFLAGS_${mod})
-# Set LIBADD manually:
 lib${mod}_plugin_la_LIBADD = \$(AM_LIBADD) \$(LIBS_${mod})
 lib${mod}_plugin_la_LDFLAGS = \$(AM_LDFLAGS) \$(LDFLAGS_${mod})
-
 EOF
   done
 
