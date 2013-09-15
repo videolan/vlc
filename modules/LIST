@@ -196,7 +196,6 @@ $Id$
  * macosx_dialog_provider: Minimal Dialog Provider for Mac OS X
  * magnify: zoom video filter
  * marq: Overlays a marquee on the video
- * mash: OpenMash based decoder
  * mediacodec: Android Jelly Bean MediaCodec decoder module
  * mediadirs: Picture/Music/Video user directories as service discoveries
  * minimal_macosx: a minimal Mac OS X GUI, using the FrameWork

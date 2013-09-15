@@ -25,6 +25,7 @@ Visualizations:
 
 Removed modules:
  * ios video output: use ios2
+ * OpenMash H.261 video decoder
 
 
 Changes between 2.0.x and 2.1.0:
