@@ -56,6 +56,7 @@ vlc_module_begin();
     add_integer( DEMUX_CFG_PREFIX DEMUX_DTSOFFSET, 0,
                  DEMUX_DTSOFFSET_TEXT, DEMUX_DTSOFFSET_LONGTEXT, false )
     set_callbacks( Open, Close );
+    add_shortcut( "dirac" )
 vlc_module_end();
 
 /*****************************************************************************
