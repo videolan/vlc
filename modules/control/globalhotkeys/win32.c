@@ -49,6 +49,7 @@ vlc_module_begin()
     set_description( N_("Global Hotkeys interface") )
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
+    add_shortcut( "globalhotkeys" )
 vlc_module_end()
 
 struct intf_sys_t

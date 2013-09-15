@@ -3059,7 +3059,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
 
     dnl xcb-utils
     PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms >= 0.3.4], [
-      VLC_ADD_PLUGIN([globalhotkeys])
+      VLC_ADD_PLUGIN([xcb_hotkeys])
       VLC_ADD_CFLAGS([xcb_window], [-DHAVE_XCB_KEYSYMS])
     ], [
       AC_MSG_WARN([${XCB_KEYSYMS_PKG_ERRORS}. Hotkeys will not work.])

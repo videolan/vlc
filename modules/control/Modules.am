@@ -24,6 +24,12 @@ libvlc_LTLIBRARIES += \
 	libhotkeys_plugin.la \
 	liboldrc_plugin.la
 
+if HAVE_WIN32
+libvlc_LTLIBRARIES += libntservice_plugin.la
+else
+libvlc_LTLIBRARIES += libmotion_plugin.la
+endif
+
 libdbus_plugin_la_SOURCES = \
 	dbus/dbus_introspect.h dbus/dbus_common.h \
 	dbus/dbus_root.c dbus/dbus_root.h \
@@ -36,21 +42,16 @@ if HAVE_DBUS
 libvlc_LTLIBRARIES += libdbus_plugin.la
 endif
 
-if !HAVE_WIN32
-libglobalhotkeys_plugin_la_SOURCES = globalhotkeys/xcb.c
-libglobalhotkeys_plugin_la_CFLAGS = $(AM_CFLAGS) $(XCB_KEYSYMS_CFLAGS) $(XCB_CFLAGS)
-libglobalhotkeys_plugin_la_LIBADD = $(AM_LIBADD) $(XCB_KEYSYMS_LIBS) $(XCB_LIBS)
+libxcb_hotkeys_plugin_la_SOURCES = globalhotkeys/xcb.c
+libxcb_hotkeys_plugin_la_CFLAGS = $(AM_CFLAGS) \
+	$(XCB_KEYSYMS_CFLAGS) $(XCB_CFLAGS)
+libxcb_hotkeys_plugin_la_LIBADD = $(AM_LIBADD) $(XCB_KEYSYMS_LIBS) $(XCB_LIBS)
+EXTRA_LTLIBRARIES += libxcb_hotkeys_plugin.la
+libvlc_LTLIBRARIES += $(LTLIBxcb_hotkeys)
 
-libvlc_LTLIBRARIES += \
-	$(LTLIBglobalhotkeys) \
-	libmotion_plugin.la
-else
-libglobalhotkeys_plugin_la_SOURCES = globalhotkeys/win32.c
-libglobalhotkeys_plugin_la_CFLAGS = $(AM_CFLAGS)
-libglobalhotkeys_plugin_la_LIBADD = $(AM_LIBADD)
-libglobalhotkeys_plugin_la_DEPENDENCIES = libglobalhotkeys_plugin.rc.o
-
-libvlc_LTLIBRARIES += \
-	libglobalhotkeys_plugin.la \
-	libntservice_plugin.la
-endif	
+libwin_hotkeys_plugin_la_SOURCES = globalhotkeys/win32.c
+libwin_hotkeys_plugin_la_CFLAGS = $(AM_CFLAGS)
+libwin_hotkeys_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libvlc_LTLIBRARIES += libwin_hotkeys_plugin.la
+endif
