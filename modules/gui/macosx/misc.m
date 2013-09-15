@@ -165,10 +165,22 @@ static NSMapTable *VLCAdditions_userInfo = NULL;
 
 static NSMutableArray *blackoutWindows = NULL;
 
+static bool b_old_spaces_style = YES;
+
 + (void)load
 {
     /* init our fake object attribute */
     blackoutWindows = [[NSMutableArray alloc] initWithCapacity:1];
+
+    if (OSX_REDACTED) {
+        NSUserDefaults *userDefaults = [[NSUserDefaults alloc] init];
+        [userDefaults addSuiteNamed:@"com.apple.spaces"];
+        /* this is system settings -> mission control -> monitors using different spaces */
+        NSNumber *o_span_displays = [userDefaults objectForKey:@"spans-displays"];
+
+        b_old_spaces_style = [o_span_displays boolValue];
+        [userDefaults release];
+    }
 }
 
 + (NSScreen *)screenWithDisplayID: (CGDirectDisplayID)displayID
@@ -185,10 +197,10 @@ static NSMutableArray *blackoutWindows = NULL;
 
 - (BOOL)hasMenuBar
 {
-    if (OSX_REDACTED)
-        return YES;
-    else
+    if (b_old_spaces_style)
         return ([self displayID] == [[[NSScreen screens] objectAtIndex:0] displayID]);
+    else
+        return YES;
 }
 
 - (BOOL)hasDock
