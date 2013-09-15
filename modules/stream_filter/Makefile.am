@@ -4,7 +4,6 @@ stream_filterdir = $(pluginsdir)/stream_filter
 stream_filter_LTLIBRARIES =
 
 libdecomp_plugin_la_SOURCES = decomp.c
-libdecomp_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdecomp_plugin_la_LIBADD = $(AM_LIBADD)
 if !HAVE_WIN32
 stream_filter_LTLIBRARIES += libdecomp_plugin.la
@@ -123,9 +122,5 @@ stream_filter_LTLIBRARIES += libhttplive_plugin.la
 endif
 
 librecord_plugin_la_SOURCES = record.c
-librecord_plugin_la_CFLAGS = $(AM_CFLAGS)
 librecord_plugin_la_LIBADD = $(AM_LIBADD)
-if HAVE_WIN32
-librecord_plugin_la_DEPENDENCIES = librecord_plugin.rc.o
-endif
 stream_filter_LTLIBRARIES += librecord_plugin.la

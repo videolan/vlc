@@ -35,16 +35,13 @@ EXTRA_LTLIBRARIES += libudev_plugin.la
 sd_LTLIBRARIES += $(LTLIBudev)
 
 libxcb_apps_plugin_la_SOURCES = xcb_apps.c
-libxcb_apps_plugin_la_CFLAGS = $(AM_CFLAGS) \
-	$(XCB_CFLAGS)
-libxcb_apps_plugin_la_LIBADD = $(AM_LIBADD) \
-	$(XCB_LIBS)
+libxcb_apps_plugin_la_CFLAGS = $(AM_CFLAGS) $(XCB_CFLAGS)
+libxcb_apps_plugin_la_LIBADD = $(AM_LIBADD) $(XCB_LIBS)
 if HAVE_XCB
 sd_LTLIBRARIES += libxcb_apps_plugin.la
 endif
 
 libwindrive_plugin_la_SOURCES = windrive.c
-libwindrive_plugin_la_CFLAGS = $(AM_CFLAGS)
 libwindrive_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 sd_LTLIBRARIES += libwindrive_plugin.la
@@ -52,7 +49,6 @@ libwindrive_plugin_la_DEPENDENCIES = libwindrive_plugin.rc.o
 endif
 
 libos2drive_plugin_la_SOURCES = os2drive.c
-libos2drive_plugin_la_CFLAGS = $(AM_CFLAGS)
 libos2drive_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_OS2
 sd_LTLIBRARIES += libos2drive_plugin.la

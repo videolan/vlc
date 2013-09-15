@@ -5,11 +5,7 @@ libvisual_plugin_la_SOURCES = \
 	visual/visual.c visual/visual.h \
 	visual/effects.c \
 	visual/fft.c visual/fft.h
-libvisual_plugin_la_CFLAGS = $(AM_CFLAGS)
 libvisual_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
-if HAVE_WIN32
-libvisual_plugin_la_DEPENDENCIES = libvisual_plugin.rc.o
-endif
 visualization_LTLIBRARIES += libvisual_plugin.la
 
 SOURCES_vsxu = vsxu.cpp cyclic_buffer.h

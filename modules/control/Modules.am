@@ -51,7 +51,6 @@ EXTRA_LTLIBRARIES += libxcb_hotkeys_plugin.la
 control_LTLIBRARIES += $(LTLIBxcb_hotkeys)
 
 libwin_hotkeys_plugin_la_SOURCES = globalhotkeys/win32.c
-libwin_hotkeys_plugin_la_CFLAGS = $(AM_CFLAGS)
 libwin_hotkeys_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 control_LTLIBRARIES += libwin_hotkeys_plugin.la

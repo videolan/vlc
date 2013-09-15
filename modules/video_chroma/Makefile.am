@@ -2,7 +2,6 @@ include $(top_srcdir)/modules/common.am
 chromadir = $(pluginsdir)/video_chroma
 
 libchain_plugin_la_SOURCES = chain.c
-libchain_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 libchroma_omx_plugin_la_SOURCES = omxdl.c
 libchroma_omx_plugin_la_CFLAGS = $(AM_CFLAGS) $(OMXIP_CFLAGS)
@@ -14,11 +13,9 @@ libswscale_plugin_la_LIBADD = $(AM_LIBADD) $(SWSCALE_LIBS)
 libswscale_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(chromadir)'
 
 libgrey_yuv_plugin_la_SOURCES = grey_yuv.c
-libgrey_yuv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 libi420_rgb_plugin_la_SOURCES = i420_rgb.c i420_rgb.h \
 	i420_rgb8.c i420_rgb16.c i420_rgb_c.h
-libi420_rgb_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libi420_rgb_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
 
 libi420_yuy2_plugin_la_SOURCES = i420_yuy2.c i420_yuy2.h
@@ -26,20 +23,16 @@ libi420_yuy2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_i420_yuy2
 
 libi422_i420_plugin_la_SOURCES = i422_i420.c
-libi422_i420_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 libi422_yuy2_plugin_la_SOURCES = i422_yuy2.c i422_yuy2.h
 libi422_yuy2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_i422_yuy2
 
 librv32_plugin_la_SOURCES = rv32.c
-librv32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 libyuy2_i420_plugin_la_SOURCES = yuy2_i420.c
-libyuy2_i420_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 libyuy2_i422_plugin_la_SOURCES = yuy2_i422.c
-libyuy2_i422_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 chroma_LTLIBRARIES = \
 	libi420_rgb_plugin.la \

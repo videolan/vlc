@@ -76,19 +76,14 @@ endif
 ### Audio codecs ###
 
 liba52_plugin_la_SOURCES = a52.c a52.h
-liba52_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 libadpcm_plugin_la_SOURCES = adpcm.c
-libadpcm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 libaes3_plugin_la_SOURCES = aes3.c
-libaes3_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 libaraw_plugin_la_SOURCES = araw.c
-libaraw_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 libdts_plugin_la_SOURCES = dts.c
-libdts_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libdts_plugin_la_LIBADD = libvlc_dts_header.la $(AM_LIBADD)
 
 libvlc_dts_header_la_SOURCES = dts_header.c dts_header.h
@@ -96,16 +91,12 @@ libvlc_dts_header_la_LDFLAGS = -static
 noinst_LTLIBRARIES += libvlc_dts_header.la
 
 libg711_plugin_la_SOURCES = g711.c
-libg711_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 liblpcm_plugin_la_SOURCES = lpcm.c
-liblpcm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 libmpeg_audio_plugin_la_SOURCES = mpeg_audio.c
-libmpeg_audio_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 libuleaddvaudio_plugin_la_SOURCES = uleaddvaudio.c
-libuleaddvaudio_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 codec_LTLIBRARIES += \
 	liba52_plugin.la \

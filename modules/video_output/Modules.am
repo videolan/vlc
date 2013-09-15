@@ -143,7 +143,6 @@ libwingdi_plugin_la_DEPENDENCIES = libwingdi_plugin.rc.o
 endif
 
 libdrawable_plugin_la_SOURCES = drawable.c
-libdrawable_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdrawable_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 vout_LTLIBRARIES += libdrawable_plugin.la
@@ -156,7 +155,6 @@ vout_LTLIBRARIES += libdrawable_plugin.la
 endif
 
 libkva_plugin_la_SOURCES = kva.c
-libkva_plugin_la_CFLAGS = $(AM_CFLAGS)
 libkva_plugin_la_LIBADD = $(AM_LIBADD) $(KVA_LIBS)
 if HAVE_KVA
 vout_LTLIBRARIES += libkva_plugin.la
@@ -201,7 +199,6 @@ vout_LTLIBRARIES += $(LTLIBcaca)
 
 ### Common ###
 libvdummy_plugin_la_SOURCES = vdummy.c
-libvdummy_plugin_la_CFLAGS = $(AM_CFLAGS)
 libvdummy_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libvdummy_plugin_la_DEPENDENCIES = libvdummy_plugin.rc.o

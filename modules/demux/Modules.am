@@ -32,14 +32,12 @@ SOURCES_image = image.c mxpeg_helper.h
 SOURCES_demux_stl = stl.c
 
 libasf_plugin_la_SOURCES = asf/asf.c asf/libasf.c asf/libasf.h asf/libasf_guid.h
-libasf_plugin_la_CFLAGS = $(AM_CFLAGS)
 libasf_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libasf_plugin_la_DEPENDENCIES = libasf_plugin.rc.o
 endif
 
 libavi_plugin_la_SOURCES = avi/avi.c avi/libavi.c avi/libavi.h
-libavi_plugin_la_CFLAGS = $(AM_CFLAGS)
 libavi_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libavi_plugin_la_DEPENDENCIES = libavi_plugin.rc.o
@@ -74,14 +72,12 @@ demux_LTLIBRARIES += libavformat_plugin.la
 endif
 
 libes_plugin_la_SOURCES  = mpeg/es.c
-libes_plugin_la_CFLAGS = $(AM_CFLAGS)
 libes_plugin_la_LIBADD = ../codec/libvlc_dts_header.la $(AM_LIBADD)
 if HAVE_WIN32
 libes_plugin_la_DEPENDENCIES = libes_plugin.rc.o
 endif
 
 libh264_plugin_la_SOURCES = mpeg/h264.c
-libh264_plugin_la_CFLAGS = $(AM_CFLAGS)
 libh264_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libh264_plugin_la_DEPENDENCIES = libh264_plugin.rc.o
@@ -109,7 +105,6 @@ demux_LTLIBRARIES += $(LTLIBmkv)
 EXTRA_LTLIBRARIES += libmkv_plugin.la
 
 libmp4_plugin_la_SOURCES = mp4/mp4.c mp4/libmp4.c mp4/libmp4.h mp4/id3genres.h
-libmp4_plugin_la_CFLAGS = $(AM_CFLAGS)
 libmp4_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
 libmp4_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 if HAVE_ZLIB
@@ -120,7 +115,6 @@ libmp4_plugin_la_DEPENDENCIES = libmp4_plugin.rc.o
 endif
 
 libmpgv_plugin_la_SOURCES = mpeg/mpgv.c
-libmpgv_plugin_la_CFLAGS = $(AM_CFLAGS)
 libmpgv_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libmpgv_plugin_la_DEPENDENCIES = libmpgv_plugin.rc.o
@@ -145,7 +139,6 @@ libplaylist_plugin_la_SOURCES = \
 	playlist/xspf.c \
 	playlist/zpl.c \
 	playlist/playlist.c playlist/playlist.h
-libplaylist_plugin_la_CFLAGS = $(AM_CFLAGS)
 libplaylist_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libplaylist_plugin_la_DEPENDENCIES = libplaylist_plugin.rc.o

@@ -41,7 +41,6 @@ libdynamicoverlay_plugin_la_SOURCES = \
 	dynamicoverlay/dynamicoverlay_list.c \
 	dynamicoverlay/dynamicoverlay_commands.c \
 	dynamicoverlay/dynamicoverlay.c dynamicoverlay/dynamicoverlay.h
-libdynamicoverlay_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdynamicoverlay_plugin_la_LIBADD = $(AM_LIBADD)
 if !HAVE_WIN32
 video_filter_LTLIBRARIES += libdynamicoverlay_plugin.la
@@ -63,7 +62,6 @@ libpuzzle_plugin_la_SOURCES = \
 	puzzle_lib.c puzzle_lib.h \
 	puzzle_mgt.c puzzle_mgt.h \
 	puzzle_pce.c puzzle_pce.h
-libpuzzle_plugin_la_CFLAGS = $(AM_CFLAGS)
 libpuzzle_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libpuzzle_plugin_la_DEPENDENCIES = libpuzzle_plugin.rc.o

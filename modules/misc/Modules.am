@@ -13,7 +13,6 @@ libexport_plugin_la_SOURCES = \
 	playlist/m3u.c \
 	playlist/xspf.c \
 	playlist/export.c
-libexport_plugin_la_CFLAGS = $(AM_CFLAGS)
 libexport_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libexport_plugin_la_DEPENDENCIES = libexport_plugin.rc.o
@@ -31,7 +30,6 @@ EXTRA_LTLIBRARIES += libgnutls_plugin.la
 misc_LTLIBRARIES += $(LTLIBgnutls)
 
 libxdg_screensaver_plugin_la_SOURCES = inhibit/xdg.c
-libxdg_screensaver_plugin_la_CFLAGS = $(AM_CFLAGS)
 libxdg_screensaver_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_XCB
 misc_LTLIBRARIES += \
@@ -46,7 +44,6 @@ misc_LTLIBRARIES += libdbus_screensaver_plugin.la
 endif
 
 liblogger_plugin_la_SOURCES = logger.c
-liblogger_plugin_la_CFLAGS = $(AM_CFLAGS)
 liblogger_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_ANDROID
 liblogger_plugin_la_LIBADD += -llog
@@ -56,7 +53,6 @@ liblogger_plugin_la_DEPENDENCIES = liblogger_plugin.rc.o
 endif
 
 libstats_plugin_la_SOURCES = stats.c
-libstats_plugin_la_CFLAGS = $(AM_CFLAGS)
 libstats_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libstats_plugin_la_DEPENDENCIES = libstats_plugin.rc.o

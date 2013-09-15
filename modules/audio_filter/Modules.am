@@ -52,11 +52,7 @@ SOURCES_dtstospdif = converter/dtstospdif.c
 SOURCES_dtstofloat32 = converter/dtstofloat32.c
 SOURCES_mpgatofixed32 = converter/mpgatofixed32.c
 libaudio_format_plugin_la_SOURCES = converter/format.c
-libaudio_format_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaudio_format_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
-if HAVE_WIN32
-libaudio_format_plugin_la_DEPENDENCIES = libaudio_format_plugin.rc.o
-endif
 
 audio_filter_LTLIBRARIES += \
 	liba52tospdif_plugin.la \

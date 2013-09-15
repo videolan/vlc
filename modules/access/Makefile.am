@@ -9,11 +9,9 @@ accessdir = $(pluginsdir)/access
 ### Files ###
 
 libattachment_plugin_la_SOURCES = attachment.c
-libattachment_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 access_LTLIBRARIES += libattachment_plugin.la
 
 libfilesystem_plugin_la_SOURCES = fs.h file.c directory.c fs.c
-libfilesystem_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libfilesystem_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libfilesystem_plugin_la_LIBADD += -lshlwapi
@@ -21,29 +19,23 @@ endif
 access_LTLIBRARIES += libfilesystem_plugin.la
 
 libidummy_plugin_la_SOURCES = idummy.c
-libidummy_plugin_la_CFLAGS = $(AM_CFLAGS)
 access_LTLIBRARIES += libidummy_plugin.la
 
 libimem_plugin_la_SOURCES = imem.c
-libimem_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libimem_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
 access_LTLIBRARIES += libimem_plugin.la
 
 librar_plugin_la_SOURCES = rar/rar.c rar/rar.h \
 	rar/access.c rar/stream.c rar/module.c
-librar_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 access_LTLIBRARIES += librar_plugin.la
 
 libsdp_plugin_la_SOURCES = sdp.c
-libsdp_plugin_la_CFLAGS = $(AM_CFLAGS)
 access_LTLIBRARIES += libsdp_plugin.la
 
 libtimecode_plugin_la_SOURCES = timecode.c
-libtimecode_plugin_la_CFLAGS = $(AM_CFLAGS)
 access_LTLIBRARIES += libtimecode_plugin.la
 
 libvdr_plugin_la_SOURCES = vdr.c
-libvdr_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 access_LTLIBRARIES += libvdr_plugin.la
 
 libzip_plugin_la_SOURCES = zip/zip.h zip/zipstream.c zip/zipaccess.c
@@ -73,7 +65,6 @@ access_LTLIBRARIES += libaccess_alsa_plugin.la
 endif
 
 libaccess_oss_plugin_la_SOURCES = oss.c
-libaccess_oss_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaccess_oss_plugin_la_LIBADD = $(AM_LIBADD) $(OSS_LIBS)
 if HAVE_OSS
 access_LTLIBRARIES += libaccess_oss_plugin.la
@@ -127,7 +118,6 @@ liblinsys_hdsdi_plugin_la_SOURCES = \
 	linsys/linsys_sdiaudio.h \
 	linsys/linsys_sdivideo.h \
 	linsys/linsys_hdsdi.c
-liblinsys_hdsdi_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 liblinsys_hdsdi_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 liblinsys_sdi_plugin_la_SOURCES = linsys/linsys_sdi.c linsys/linsys_sdi.h
 liblinsys_sdi_plugin_la_CFLAGS = $(AM_CFLAGS) $(LINSYS_SDI_CFLAGS)
@@ -144,7 +134,6 @@ access_LTLIBRARIES += libdecklink_plugin.la
 endif
 
 libshm_plugin_la_SOURCES = shm.c
-libshm_plugin_la_CFLAGS = $(AM_CFLAGS)
 libshm_plugin_la_LIBADD = $(AM_LIBADD) $(LIBM)
 if HAVE_WIN32
 libshm_plugin_la_DEPENDENCIES = libshm_plugin.rc.o
@@ -180,7 +169,6 @@ endif
 
 libdshow_plugin_la_SOURCES = dshow/vlc_dshow.h dshow/dshow.cpp dshow/access.h \
 	dshow/filter.cpp dshow/filter.h dshow/crossbar.cpp
-libdshow_plugin_la_CXXFLAGS = $(AM_CXXFLAGS)
 libdshow_plugin_la_LIBADD = $(AM_LIBADD) -lole32 -loleaut32 -luuid -lstrmiids -lksuser
 if HAVE_WIN32
 access_LTLIBRARIES += libdshow_plugin.la
@@ -200,7 +188,6 @@ access_LTLIBRARIES += libxcb_screen_plugin.la
 endif
 
 libscreen_plugin_la_SOURCES = screen/screen.c screen/screen.h
-libscreen_plugin_la_CFLAGS = $(AM_CFLAGS)
 libscreen_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_WIN32
 libscreen_plugin_la_SOURCES += screen/win32.c
@@ -233,14 +220,8 @@ EXTRA_LTLIBRARIES += libvnc_plugin.la
 
 ### Optical media ###
 
-libvlc_cdrom_la_SOURCES = vcd/cdrom.c vcd/cdrom.h vcd/cdrom_internals.h
-libvlc_cdrom_la_CPPFLAGS = -DMODULE_STRING=\"cdrom\"
-libvlc_cdrom_la_LDFLAGS = -static
-EXTRA_LTLIBRARIES += libvlc_cdrom.la
-
-libcdda_plugin_la_SOURCES = cdda.c
-libcdda_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
-libcdda_plugin_la_LIBADD = libvlc_cdrom.la $(AM_LIBADD)
+libcdda_plugin_la_SOURCES = cdda.c vcd/cdrom.c vcd/cdrom.h vcd/cdrom_internals.h
+libcdda_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_DARWIN
 libcdda_plugin_la_LIBADD += -liconv
 endif
@@ -248,9 +229,8 @@ libcdda_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 EXTRA_LTLIBRARIES += libcdda_plugin.la
 access_LTLIBRARIES += $(LTLIBcdda)
 
-libvcd_plugin_la_SOURCES = vcd/vcd.c
-libvcd_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
-libvcd_plugin_la_LIBADD = libvlc_cdrom.la $(AM_LIBADD)
+libvcd_plugin_la_SOURCES = vcd/vcd.c vcd/cdrom.c vcd/cdrom.h vcd/cdrom_internals.h
+libvcd_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_DARWIN
 libvcd_plugin_la_LIBADD += -liconv
 endif
@@ -294,7 +274,6 @@ access_LTLIBRARIES += $(LTLIBlibbluray)
 EXTRA_LTLIBRARIES += liblibbluray_plugin.la
 
 libaccess_bd_plugin_la_SOURCES = bd/bd.c bd/mpls.c bd/mpls.h bd/clpi.c bd/clpi.h
-libaccess_bd_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaccess_bd_plugin_la_LIBADD = $(AM_LIBADD)
 access_LTLIBRARIES += libaccess_bd_plugin.la
 if HAVE_WIN32
@@ -325,7 +304,6 @@ if HAVE_WIN32
 # Work-around automake bug:
 # Use an import library for C++ to retain C linker on other platforms.
 libbda_la_SOURCES = dtv/bdadefs.h dtv/bdagraph.cpp dtv/bdagraph.hpp
-libbda_la_CXXFLAGS = $(AM_CXXFLAGS)
 libbda_la_LDFLAGS = -static
 libbda_la_LIBADD = -lstrmiids -lole32 -loleaut32 -luuid
 noinst_LTLIBRARIES += libbda.la
@@ -353,7 +331,6 @@ endif
 endif
 
 libaccess_eyetv_plugin_la_SOURCES = eyetv.m
-libaccess_eyetv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libaccess_eyetv_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)' \
 	-Wl,-framework,Foundation
 access_LTLIBRARIES += $(LTLIBaccess_eyetv)
@@ -363,12 +340,10 @@ EXTRA_LTLIBRARIES += libaccess_eyetv_plugin.la
 ### Network streams ###
 
 libftp_plugin_la_SOURCES = ftp.c
-libftp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libftp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
 access_LTLIBRARIES += libftp_plugin.la
 
 libhttp_plugin_la_SOURCES = http.c
-libhttp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libhttp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
 if HAVE_ZLIB
 libhttp_plugin_la_LIBADD += -lz
@@ -376,7 +351,6 @@ endif
 access_LTLIBRARIES += libhttp_plugin.la
 
 liblive555_plugin_la_SOURCES = live555.cpp mms/asf.c mms/buffer.c
-liblive555_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 liblive555_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CXXFLAGS_live555)
 liblive555_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_live555)
 liblive555_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)' \
@@ -406,12 +380,10 @@ access_LTLIBRARIES += $(LTLIBsmb)
 EXTRA_LTLIBRARIES += libsmb_plugin.la
 
 libtcp_plugin_la_SOURCES = tcp.c
-libtcp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libtcp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
 access_LTLIBRARIES += libtcp_plugin.la
 
 libudp_plugin_la_SOURCES = udp.c
-libudp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libudp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
 access_LTLIBRARIES += libudp_plugin.la
 
@@ -429,7 +401,6 @@ libaccess_realrtsp_plugin_la_SOURCES = \
 	rtsp/real_rmff.c rtsp/real_rmff.h \
 	rtsp/real_sdpplin.c rtsp/real_sdpplin.h \
 	rtsp/real_asmrp.c
-libaccess_realrtsp_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaccess_realrtsp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
 libaccess_realrtsp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBaccess_realrtsp)
