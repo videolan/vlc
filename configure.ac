@@ -4057,8 +4057,6 @@ AC_ARG_ENABLE(taglib,
 AS_IF([test "${enable_taglib}" != "no"], [
   PKG_CHECK_MODULES(TAGLIB, taglib >= 1.6.1, [
     VLC_ADD_PLUGIN([taglib])
-    VLC_ADD_LIBS([taglib],[$TAGLIB_LIBS -lz])
-    VLC_ADD_CXXFLAGS([taglib],[$TAGLIB_CFLAGS])
   ], [
     AC_MSG_WARN([${TAGLIB_PKG_ERRORS}.])])
 ])
