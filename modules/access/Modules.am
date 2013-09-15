@@ -55,7 +55,6 @@ libzip_plugin_la_DEPENDENCIES += libzip_plugin.rc.o
 endif
 endif
 
-SOURCES_access_directory = directory.c
 SOURCES_access_gnomevfs = gnomevfs.c
 SOURCES_access_eyetv = eyetv.m
 SOURCES_dc1394 = dc1394.c
