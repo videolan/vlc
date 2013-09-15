@@ -21,9 +21,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -39,24 +36,6 @@
 
 #include "rar.h"
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
-
-vlc_module_begin()
-    set_category(CAT_INPUT)
-    set_subcategory(SUBCAT_INPUT_STREAM_FILTER)
-    set_description(N_("Uncompressed RAR"))
-    set_capability("access", 0)
-    set_callbacks(Open, Close)
-    add_shortcut("rar")
-vlc_module_end()
-
-/*****************************************************************************
- * Local definitions/prototypes
- *****************************************************************************/
 struct access_sys_t {
     stream_t               *s;
     rar_file_t             *file;
@@ -160,7 +139,7 @@ static int Control(access_t *access, int query, va_list args)
     }
 }
 
-static int Open(vlc_object_t *object)
+int RarAccessOpen(vlc_object_t *object)
 {
     access_t *access = (access_t*)object;
 
@@ -219,7 +198,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static void Close(vlc_object_t *object)
+void RarAccessClose(vlc_object_t *object)
 {
     access_t *access = (access_t*)object;
     access_sys_t *sys = access->p_sys;
@@ -229,4 +208,3 @@ static void Close(vlc_object_t *object)
     RarFileDelete(sys->file);
     free(sys);
 }
-

@@ -72,8 +72,9 @@ SOURCES_access_attachment = attachment.c
 SOURCES_access_vdr = vdr.c
 SOURCES_libbluray = bluray.c
 
-SOURCES_access_rar = rar/rar.c rar/rar.h rar/access.c
-SOURCES_stream_filter_rar = rar/rar.c rar/rar.h rar/stream.c
+librar_plugin_la_SOURCES = rar/rar.c rar/rar.h \
+	rar/access.c rar/stream.c rar/module.c
+librar_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 if HAVE_DECKLINK
 libdecklink_plugin_la_SOURCES = decklink.cpp
@@ -119,10 +120,9 @@ libvlc_LTLIBRARIES += \
 	libaccess_ftp_plugin.la \
 	libaccess_imem_plugin.la \
 	libaccess_attachment_plugin.la \
+	librar_plugin.la \
         libsdp_plugin.la \
 	libtimecode_plugin.la \
-	libaccess_rar_plugin.la \
-	libstream_filter_rar_plugin.la \
 	libaccess_vdr_plugin.la \
 	$(NULL)
 

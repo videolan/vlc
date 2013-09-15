@@ -21,9 +21,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -38,24 +35,6 @@
 
 #include "rar.h"
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
-
-vlc_module_begin()
-    set_category(CAT_INPUT)
-    set_subcategory(SUBCAT_INPUT_STREAM_FILTER)
-    set_description(N_("Uncompressed RAR"))
-    set_capability("stream_filter", 1)
-    set_callbacks(Open, Close)
-    add_shortcut("rar")
-vlc_module_end()
-
-/****************************************************************************
- * Local definitions/prototypes
- ****************************************************************************/
 struct stream_sys_t {
     stream_t *payload;
 };
@@ -83,7 +62,7 @@ static int Control(stream_t *s, int query, va_list args)
     }
 }
 
-static int Open(vlc_object_t *object)
+int RarStreamOpen(vlc_object_t *object)
 {
     stream_t *s = (stream_t*)object;
 
@@ -152,7 +131,7 @@ static int Open(vlc_object_t *object)
 
     char *tmp;
     if (asprintf(&tmp, "%s.m3u", s->psz_path) < 0) {
-        Close(object);
+        RarStreamClose(object);
         return VLC_ENOMEM;
     }
     free(s->psz_path);
@@ -161,7 +140,7 @@ static int Open(vlc_object_t *object)
     return VLC_SUCCESS;
 }
 
-static void Close(vlc_object_t *object)
+void RarStreamClose(vlc_object_t *object)
 {
     stream_t *s = (stream_t*)object;
     stream_sys_t *sys = s->p_sys;
@@ -169,4 +148,3 @@ static void Close(vlc_object_t *object)
     stream_Delete(sys->payload);
     free(sys);
 }
-

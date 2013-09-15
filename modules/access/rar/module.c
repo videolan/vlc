@@ -1,10 +1,7 @@
 /*****************************************************************************
- * rar.h: uncompressed RAR parser
+ * stream.c: uncompressed RAR stream filter
  *****************************************************************************
  * Copyright (C) 2008-2010 Laurent Aimar
- * $Id$
- *
- * Author: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -21,28 +18,22 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-typedef struct {
-    char     *mrl;
-    uint64_t offset;
-    uint64_t size;
-    uint64_t cummulated_size;
-} rar_file_chunk_t;
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-typedef struct {
-    char     *name;
-    uint64_t size;
-    bool     is_complete;
+#include <vlc_common.h>
+#include <vlc_plugin.h>
 
-    int              chunk_count;
-    rar_file_chunk_t **chunk;
-    uint64_t         real_size;  /* Gathered size */
-} rar_file_t;
+#include "rar.h"
 
-int  RarProbe(stream_t *);
-void RarFileDelete(rar_file_t *);
-int  RarParse(stream_t *, int *, rar_file_t ***);
-
-int RarAccessOpen(vlc_object_t *);
-void RarAccessClose(vlc_object_t *);
-int RarStreamOpen(vlc_object_t *);
-void RarStreamClose(vlc_object_t *);
+vlc_module_begin()
+    set_category(CAT_INPUT)
+    set_subcategory(SUBCAT_INPUT_STREAM_FILTER)
+    set_description(N_("Uncompressed RAR"))
+    set_capability("access", 0)
+    set_callbacks(RarAccessOpen, RarAccessClose)
+    add_submodule()
+    set_capability("stream_filter", 1)
+    set_callbacks(RarStreamOpen, RarStreamClose)
+vlc_module_end()
