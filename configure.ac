@@ -2971,6 +2971,7 @@ PKG_CHECK_MODULES([GL], [gl], [
     have_gl="no"
   ])
 ])
+AM_CONDITIONAL([HAVE_GL], [test "${have_gl}" = "yes"])
 
 dnl OpenGL ES 2: depends on EGL 1.1
 PKG_ENABLE_MODULES_VLC([GLES2], [], [glesv2], [OpenGL ES v2 support], [disabled])
@@ -2983,7 +2984,6 @@ AC_ARG_ENABLE(egl,
 ])
 AS_IF([test "$enable_egl" != "no"], [
   PKG_CHECK_MODULES([EGL], [egl], [
-    VLC_ADD_PLUGIN([gl])
     VLC_ADD_PLUGIN([egl])
   ])
 ])
@@ -3016,49 +3016,32 @@ AC_ARG_ENABLE(glx,
 ])
 
 have_xcb="no"
+have_xcb_keysyms="no"
 have_xcb_randr="no"
+have_xcb_xvideo="no"
 AS_IF([test "${enable_xcb}" != "no"], [
   dnl libxcb
   PKG_CHECK_MODULES(XCB, [xcb >= 1.6])
   have_xcb="yes"
   PKG_CHECK_MODULES(XCB_SHM, [xcb-shm])
   PKG_CHECK_MODULES(XCB_COMPOSITE, [xcb-composite])
+  PKG_CHECK_MODULES(XPROTO, [xproto])
 
   AS_IF([test "${enable_xvideo}" != "no"], [
-    PKG_CHECK_MODULES(XCB_XV, [xcb-xv >= 1.1.90.1], [
-      VLC_ADD_PLUGIN([xcb_xv])
-    ])
+    PKG_CHECK_MODULES(XCB_XV, [xcb-xv >= 1.1.90.1], [have_xcb_xvideo="yes"])
   ])
 
-  PKG_CHECK_MODULES(XCB_RANDR, [xcb-randr >= 1.3], [
-    have_xcb_randr="yes"
-  ])
+  PKG_CHECK_MODULES(XCB_RANDR, [xcb-randr >= 1.3], [have_xcb_randr="yes"])
 
-  PKG_CHECK_MODULES(XPROTO, [xproto], [
-    VLC_ADD_PLUGIN([xwd])
-
-    dnl xcb-utils
-    PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms >= 0.3.4], [
-      VLC_ADD_PLUGIN([xcb_hotkeys])
-      VLC_ADD_CFLAGS([xcb_window], [-DHAVE_XCB_KEYSYMS])
-    ], [
-      AC_MSG_WARN([${XCB_KEYSYMS_PKG_ERRORS}. Hotkeys will not work.])
-    ])
-  ], [
-    AC_MSG_WARN([${XPROTO_PKG_ERRORS}. Hotkeys and XWD will not work.])
-  ])
-
-  AS_IF([test "${enable_glx}" != "no"], [
-    AS_IF([test "${have_gl}" != "yes"], [
-      AC_MSG_ERROR([${GL_PKG_ERRORS}. Pass --disable-glx if you do not need OpenGL X11 support.])
-    ])
-    VLC_ADD_PLUGIN([xcb_glx])
-    VLC_ADD_PLUGIN([glx])
-    VLC_ADD_PLUGIN([gl])
+  dnl xcb-utils
+  PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms >= 0.3.4], [have_xcb_keysyms="yes"], [
+    AC_MSG_WARN([${XCB_KEYSYMS_PKG_ERRORS}. Hotkeys will not work.])
   ])
 ])
 AM_CONDITIONAL([HAVE_XCB], [test "${have_xcb}" = "yes"])
+AM_CONDITIONAL([HAVE_XCB_KEYSYMS], [test "${have_xcb_keysyms}" = "yes"])
 AM_CONDITIONAL([HAVE_XCB_RANDR], [test "${have_xcb_randr}" = "yes"])
+AM_CONDITIONAL([HAVE_XCB_XVIDEO], [test "${have_xcb_xvideo}" = "yes"])
 
 
 dnl

@@ -46,9 +46,9 @@ libxcb_hotkeys_plugin_la_SOURCES = globalhotkeys/xcb.c
 libxcb_hotkeys_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_KEYSYMS_CFLAGS) $(XCB_CFLAGS)
 libxcb_hotkeys_plugin_la_LIBADD = $(XCB_KEYSYMS_LIBS) $(XCB_LIBS)
-libxcb_hotkeys_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(controldir)'
-EXTRA_LTLIBRARIES += libxcb_hotkeys_plugin.la
-control_LTLIBRARIES += $(LTLIBxcb_hotkeys)
+if HAVE_XCB_KEYSYMS
+control_LTLIBRARIES += libxcb_hotkeys_plugin.la
+endif
 
 libwin_hotkeys_plugin_la_SOURCES = globalhotkeys/win32.c
 if HAVE_WIN32

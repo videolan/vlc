@@ -111,8 +111,9 @@ libxwd_plugin_la_SOURCES = codec/xwd.c
 libxwd_plugin_la_CFLAGS = $(AM_CFLAGS) $(XPROTO_CFLAGS)
 libxwd_plugin_la_LIBADD = $(XPROTO_LIBS)
 libxwd_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-codec_LTLIBRARIES += $(LTLIBxwd)
-EXTRA_LTLIBRARIES += libxwd_plugin.la
+if HAVE_XCB
+codec_LTLIBRARIES += libxwd_plugin.la
+endif
 
 
 ### SPU ###

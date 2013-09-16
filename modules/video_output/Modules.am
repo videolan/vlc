@@ -33,13 +33,15 @@ libgles1_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES1_CFLAGS) -DUSE_OPENGL_ES=1
 libgles1_plugin_la_LIBADD = $(GLES1_LIBS)
 libgles1_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
+EXTRA_LTLIBRARIES += libgles2_plugin.la libgles1_plugin.la
+vout_LTLIBRARIES += $(LTLIBgles2) $(LTLIBgles1)
+
 libgl_plugin_la_SOURCES = opengl.c opengl.h gl.c
 libgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
 libgl_plugin_la_LIBADD = $(GL_LIBS)
-libgl_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-
-EXTRA_LTLIBRARIES += libgles2_plugin.la libgles1_plugin.la libgl_plugin.la
-vout_LTLIBRARIES += $(LTLIBgles2) $(LTLIBgles1) $(LTLIBgl)
+if HAVE_GL
+vout_LTLIBRARIES += libgl_plugin.la
+endif
 
 
 ### XCB ###
@@ -64,7 +66,6 @@ libxcb_xv_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS) $(XCB_XV_CFLAGS)
 libxcb_xv_plugin_la_LIBADD = libvlc_xcb_events.la \
 	$(XCB_LIBS) $(XCB_SHM_LIBS) $(XCB_XV_LIBS)
-libxcb_xv_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
 libxcb_glx_plugin_la_SOURCES = \
 	opengl.c opengl.h \
@@ -73,7 +74,6 @@ libxcb_glx_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(GL_CFLAGS)
 libxcb_glx_plugin_la_LIBADD = libvlc_xcb_events.la \
 	$(XCB_LIBS) $(GL_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
-libxcb_glx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
 libxcb_window_plugin_la_SOURCES = xcb/window.c xcb/keys.c xcb/keysym.h xcb/xcb_keysym.h
 libxcb_window_plugin_la_CFLAGS = $(AM_CFLAGS) \
@@ -83,12 +83,18 @@ libxcb_window_plugin_la_LIBADD = $(XPROTO_LIBS) $(XCB_LIBS) $(XCB_KEYSYMS_LIBS)
 
 if HAVE_XCB
 noinst_LTLIBRARIES += libvlc_xcb_events.la
-vout_LTLIBRARIES += \
-	libxcb_x11_plugin.la \
-	libxcb_window_plugin.la
+vout_LTLIBRARIES += libxcb_x11_plugin.la libxcb_window_plugin.la
+if HAVE_XCB_KEYSYMS
+libxcb_window_plugin_la_CFLAGS += -DHAVE_XCB_KEYSYMS
 endif
-EXTRA_LTLIBRARIES += libxcb_xv_plugin.la libxcb_glx_plugin.la
-vout_LTLIBRARIES += $(LTLIBxcb_xv) $(LTLIBxcb_glx)
+if HAVE_XCB_XVIDEO
+vout_LTLIBRARIES += libxcb_xv_plugin.la
+endif
+if HAVE_GL
+vout_LTLIBRARIES += libxcb_glx_plugin.la libglx_plugin.la
+endif
+endif
+
 
 ### Win32 ###
 libdirect2d_plugin_la_SOURCES = msw/direct2d.c \
@@ -169,9 +175,6 @@ vout_LTLIBRARIES += $(LTLIBegl)
 libglx_plugin_la_SOURCES = glx.c
 libglx_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
 libglx_plugin_la_LIBADD = $(GL_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
-libglx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-EXTRA_LTLIBRARIES += libglx_plugin.la
-vout_LTLIBRARIES += $(LTLIBglx)
 
 ### Coloured ASCII art ###
 libcaca_plugin_la_SOURCES = caca.c
