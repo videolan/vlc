@@ -83,19 +83,15 @@ EXTRA_LTLIBRARIES += libmpc_plugin.la
 demux_LTLIBRARIES += $(LTLIBmpc)
 
 libtta_plugin_la_SOURCES = demux/tta.c
-libtta_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
 demux_LTLIBRARIES += libtta_plugin.la
 
 libvc1_plugin_la_SOURCES = demux/vc1.c
-libvc1_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
 demux_LTLIBRARIES += libvc1_plugin.la
 
 libdemux_cdg_plugin_la_SOURCES = demux/cdg.c
-libdemux_cdg_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
 demux_LTLIBRARIES += libdemux_cdg_plugin.la
 
 libsmf_plugin_la_SOURCES = demux/smf.c
-libsmf_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
 demux_LTLIBRARIES += libsmf_plugin.la
 
 libgme_plugin_la_SOURCES = demux/gme.c dummy.cpp
