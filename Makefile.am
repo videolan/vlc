@@ -82,6 +82,7 @@ SUFFIXES =
 DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-fast-install \
 	--disable-a52 \
+	--disable-alsa \
 	--disable-avcodec --disable-avformat \
 	--disable-postproc --disable-swscale \
 	--disable-dbus \
