@@ -8,6 +8,9 @@ Access:
 Decoders:
  * Partial support for Voxware MetaSound
 
+Encoder:
+ * Support for MPEG-2 encoding using x262
+
 Video Output:
  * Direct rendering and filtering for VDPAU hardware acceleration
  * New CoreGraphics video output module for NPAPI plugins

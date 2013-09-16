@@ -392,8 +392,9 @@ $Id$
  * windrive: Windows logical disc drives
  * wingdi: WIN 32 / WIN CE GDI video output
  * wma_fixed: wma decoder using integer decoder from Rockbox
- * x26410b: H264 10 bit video encoder using X264
- * x264: H264 video encoder using X264
+ * x262: MPEG-2 video encoder using x262
+ * x26410b: H264 10 bit video encoder using x264
+ * x264: H264 video encoder using x264
  * xa: XA demuxer
  * xcb_apps: List the application windows using XCB
  * xcb_glx: a opengl provider using XCB OpenGL
