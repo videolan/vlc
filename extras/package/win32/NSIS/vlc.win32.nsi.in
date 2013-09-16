@@ -81,7 +81,11 @@ RequestExecutionLevel user
   ; Finish page
 
     Function AppExecAs
+    ${If} ${AtLeastWinVista}
       Exec '"$WINDIR\explorer.exe" "$INSTDIR\vlc.exe"'
+    ${Else}
+      Exec '$INSTDIR\vlc.exe'
+    ${Endif}
     FunctionEnd
 
     !define MUI_FINISHPAGE_RUN
