@@ -238,6 +238,7 @@ ATTR_PACKED
 #define WAVE_FORMAT_G726_ADPCM          0x0064 /* G.726 ADPCM  */
 #define WAVE_FORMAT_VOXWARE_RT29        0x0075 /* VoxWare MetaSound */
 #define WAVE_FORMAT_DOLBY_AC3_SPDIF     0x0092 /* Sonic Foundry */
+#define WAVE_FORMAT_VIVOG723            0x0111 /* Vivo G.723.1 */
 
 #define WAVE_FORMAT_AAC                 0x00FF /* */
 #define WAVE_FORMAT_AAC_MS              0xa106 /* Microsoft AAC */
@@ -362,6 +363,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_G726_ADPCM, VLC_CODEC_ADPCM_G726,             "G.726 ADPCM" },
     { WAVE_FORMAT_G723_1,     VLC_CODEC_G723_1,                 "G.723.1" },
     { WAVE_FORMAT_MSG723,     VLC_CODEC_G723_1,                 "Microsoft G.723 [G723.1]" },
+    { WAVE_FORMAT_VIVOG723,   VLC_CODEC_G723_1,                 "Vivo G.723.1" },
     { WAVE_FORMAT_MPEGLAYER3, VLC_CODEC_MPGA,                   "Mpeg Audio" },
     { WAVE_FORMAT_MPEG,       VLC_CODEC_MPGA,                   "Mpeg Audio" },
     { WAVE_FORMAT_AMR_NB,     VLC_CODEC_AMR_NB,                 "AMR NB" },
