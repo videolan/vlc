@@ -285,6 +285,7 @@ libvda_plugin_la_SOURCES = \
 	codec/avcodec/vda.c
 libvda_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVCODEC_CFLAGS)
 libvda_plugin_la_LDFLAGS = -Wl,-framework,CoreFoundation,-framework,VideoDecodeAcceleration,-framework,QuartzCore
+libvda_plugin_la_LIBADD = $(AVCODEC_LIBS)
 if HAVE_AVCODEC_VDA
 codec_LTLIBRARIES += libvda_plugin.la
 endif
