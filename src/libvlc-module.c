@@ -2292,8 +2292,15 @@ vlc_module_begin ()
 #   define KEY_NAV_LEFT           "Left"
 #   define KEY_NAV_RIGHT          "Right"
 #   define KEY_QUIT               "Ctrl+q"
+
+#ifdef _WIN32 /* On Windows, people expect volume keys to control the master */
+#   define KEY_VOL_UP             "Ctrl+Up"
+#   define KEY_VOL_DOWN           "Ctrl+Down"
+#else
 #   define KEY_VOL_UP             "Ctrl+Up\tVolume Up"
 #   define KEY_VOL_DOWN           "Ctrl+Down\tVolume Down"
+#endif
+
 #   define KEY_VOL_MUTE           "m\tVolume Mute"
 #   define KEY_SUBDELAY_UP        "h"
 #   define KEY_SUBDELAY_DOWN      "g"
