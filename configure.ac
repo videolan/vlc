@@ -782,7 +782,7 @@ then
       MINIZIP_LIBS="-lminizip -lz"
     ], [
       VLC_ADD_CPPFLAGS([skins2], [-I\\\$(top_srcdir)/modules/access/zip/unzip])
-      VLC_ADD_LIBS([skins2], [\\\$(top_builddir)/modules/access/libunzip.la])
+      VLC_ADD_LIBS([skins2], [\\\$(top_builddir)/modules/libunzip.la])
       have_minizip=no
     ])
   ])
