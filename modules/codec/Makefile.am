@@ -425,7 +425,7 @@ codec_LTLIBRARIES += libdmo_plugin.la
 endif
 
 libquicktime_plugin_la_SOURCES = codec/quicktime.c
-libquicktime_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdirt)'
+libquicktime_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libquicktime_plugin_la_LIBADD = $(LIBM)
 EXTRA_LTLIBRARIES += libquicktime_plugin.la
 codec_LTLIBRARIES += $(LTLIBquicktime)
