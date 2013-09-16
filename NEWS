@@ -11,6 +11,11 @@ Decoders:
 Encoder:
  * Support for MPEG-2 encoding using x262
 
+Streaming:
+ * WebM streaming, including live sources, compatible with all major browsers
+    vlc <your-source> vlc://quit --sout  '#transcode{vcodec=VP80,vb=1000,acodec=vorb,ab=128}
+    :std{access=http{mime=video/webm},mux=webm,dst=:4212}'
+
 Video Output:
  * Direct rendering and filtering for VDPAU hardware acceleration
  * New CoreGraphics video output module for NPAPI plugins
