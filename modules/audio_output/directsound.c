@@ -357,7 +357,7 @@ static int VolumeSet( audio_output_t *p_aout, float volume )
     int ret = 0;
 
     /* millibels from linear amplification map 200% on DSBVOLUME_MAX */
-    LONG mb = lroundf( 5000.f * log10f( volume / 2.f ));
+    LONG mb = lroundf( 6000.f * log10f( volume / 2.f ));
 
     /* Clamp to allowed DirectSound range */
     static_assert( DSBVOLUME_MIN < DSBVOLUME_MAX, "DSBVOLUME_* confused" );
