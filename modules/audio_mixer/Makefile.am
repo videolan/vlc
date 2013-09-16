@@ -3,9 +3,6 @@ audio_mixerdir = $(pluginsdir)/audio_mixer
 
 libfloat_mixer_plugin_la_SOURCES = float.c
 libfloat_mixer_plugin_la_LIBADD = $(LIBM)
-if HAVE_WIN32
-libfloat_mixer_plugin_la_DEPENDENCIES = libfloat_mixer_plugin.rc.o
-endif
 
 libinteger_mixer_plugin_la_SOURCES = integer.c
 

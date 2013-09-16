@@ -146,9 +146,6 @@ endif
 if HAVE_DARWIN
 libavformat_plugin_la_LDFLAGS += -Wl,-read_only_relocs,suppress
 endif
-if HAVE_WIN32
-libavformat_plugin_la_DEPENDENCIES = libavformat_plugin.rc.o
-endif
 if HAVE_AVFORMAT
 demux_LTLIBRARIES += libavformat_plugin.la
 endif
@@ -215,9 +212,6 @@ demux_LTLIBRARIES += libplaylist_plugin.la
 libts_plugin_la_SOURCES = demux/ts.c mux/mpeg/csa.c mux/mpeg/dvbpsi_compat.h demux/dvb-text.h
 libts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)
 libts_plugin_la_LIBADD = $(DVBPSI_LIBS) $(SOCKET_LIBS)
-if HAVE_WIN32
-libts_plugin_la_DEPENDENCIES = libts_plugin.rc.o
-endif
 if HAVE_DVBPSI
 demux_LTLIBRARIES += libts_plugin.la
 endif

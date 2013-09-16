@@ -245,9 +245,6 @@ endif
 libavcodec_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVCODEC_CFLAGS)
 libavcodec_plugin_la_LIBADD = $(AVCODEC_LIBS) $(LIBM)
 libavcodec_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(SYMBOLIC_LDFLAGS)
-if HAVE_WIN32
-libavcodec_plugin_la_DEPENDENCIES = libavcodec_plugin.rc.o
-endif
 
 if MERGE_FFMPEG
 libavcodec_plugin_la_SOURCES += demux/avformat/demux.c access/avio.c
@@ -281,7 +278,6 @@ libdxva2_plugin_la_LIBADD = -lole32 -lshlwapi -luuid
 if HAVE_AVCODEC_DXVA2
 codec_LTLIBRARIES += libdxva2_plugin.la
 endif
-libdxva2_plugin_la_DEPENDENCIES = libdxva2_plugin.rc.o
 
 libvda_plugin_la_SOURCES = \
 	codec/avcodec/copy.c codec/avcodec/copy.h \
@@ -298,9 +294,6 @@ libhwdummy_plugin_la_LIBADD = $(AVCODEC_LIBS)
 # FIXME: hwdummy only needs libavutil, and only if avcodec < 55.13.0
 if HAVE_AVCODEC_VDPAU
 codec_LTLIBRARIES += libhwdummy_plugin.la
-endif
-if HAVE_WIN32
-libhwdummy_plugin_la_DEPENDENCIES = libhwdummy_plugin.rc.o
 endif
 
 

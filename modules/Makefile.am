@@ -66,6 +66,17 @@ dummy.cpp:
 	touch dummy.cpp
 
 if HAVE_WIN32
-module.rc: $(top_builddir)/modules/module.rc.in $(top_builddir)/config.status
+BUILT_SOURCES += module.rc.lo
+CLEANFILES += module.rc
+#noinst_DATA = module.rc.lo
+
+module.rc: module.rc.in $(top_builddir)/config.status
 	$(AM_V_GEN) cd "$(top_builddir)" && $(SHELL) ./config.status --file="modules/$@"
+
+module.rc.lo: module.rc
+	$(AM_V_GEN) $(LIBTOOL) --tag=RC --mode=compile $(WINDRES) \
+		--include-dir $(top_srcdir)/share \
+		--include-dir $(top_srcdir)/extras/package/win32 \
+		-i $< -o $@
+	echo HELLO
 endif

@@ -134,13 +134,11 @@ libwingdi_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 libwingdi_plugin_la_LIBADD = -lgdi32 -lole32 -luuid
 if HAVE_WIN32
 vout_LTLIBRARIES += libwingdi_plugin.la
-libwingdi_plugin_la_DEPENDENCIES = libwingdi_plugin.rc.o
 endif
 
 libdrawable_plugin_la_SOURCES = drawable.c
 if HAVE_WIN32
 vout_LTLIBRARIES += libdrawable_plugin.la
-libdrawable_plugin_la_DEPENDENCIES = libdrawable_plugin.rc.o
 endif
 
 ### OS/2 ###
@@ -171,9 +169,6 @@ vout_LTLIBRARIES += $(LTLIBegl)
 libglx_plugin_la_SOURCES = glx.c
 libglx_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
 libglx_plugin_la_LIBADD = $(GL_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
-if HAVE_WIN32
-libglx_plugin_la_DEPENDENCIES = libglx_plugin.rc.o
-endif
 libglx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 EXTRA_LTLIBRARIES += libglx_plugin.la
 vout_LTLIBRARIES += $(LTLIBglx)

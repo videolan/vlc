@@ -46,9 +46,6 @@ libstream_out_rtp_plugin_la_SOURCES = \
 	rtp.c rtp.h rtpfmt.c rtcp.c rtsp.c vod.c
 libstream_out_rtp_plugin_la_CFLAGS = $(AM_CFLAGS)
 libstream_out_rtp_plugin_la_LIBADD = $(SOCKET_LIBS)
-if HAVE_WIN32
-libstream_out_rtp_plugin_la_DEPENDENCIES = libstream_out_rtp_plugin.rc.o
-endif
 if HAVE_GCRYPT
 SRTP_CFLAGS = -I$(top_srcdir)/modules/access/rtp
 SRTP_LIBS = $(top_builddir)/modules/access/rtp/libvlc_srtp.la
@@ -61,9 +58,6 @@ endif
 libstream_out_raop_plugin_la_SOURCES = raop.c
 libstream_out_raop_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
 libstream_out_raop_plugin_la_LIBADD = $(GCRYPT_LIBS) -lgpg-error $(LIBS_stream_out_raop)
-if HAVE_WIN32
-libstream_out_raop_plugin_la_DEPENDENCIES = libstream_out_raop_plugin.rc.o
-endif
 if HAVE_GCRYPT
 stream_out_LTLIBRARIES += libstream_out_raop_plugin.la
 endif

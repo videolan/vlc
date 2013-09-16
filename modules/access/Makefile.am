@@ -132,9 +132,6 @@ endif
 
 libshm_plugin_la_SOURCES = access/shm.c
 libshm_plugin_la_LIBADD = $(LIBM)
-if HAVE_WIN32
-libshm_plugin_la_DEPENDENCIES = libshm_plugin.rc.o
-endif
 access_LTLIBRARIES += libshm_plugin.la
 
 libqtcapture_plugin_la_SOURCES = access/qtcapture.m
@@ -169,7 +166,6 @@ libdshow_plugin_la_SOURCES = access/dshow/vlc_dshow.h access/dshow/dshow.cpp acc
 libdshow_plugin_la_LIBADD = -lole32 -loleaut32 -luuid -lstrmiids -lksuser
 if HAVE_WIN32
 access_LTLIBRARIES += libdshow_plugin.la
-libdshow_plugin_la_DEPENDENCIES = libdshow_plugin.rc.o
 endif
 
 
@@ -189,7 +185,6 @@ if HAVE_WIN32
 libscreen_plugin_la_SOURCES += access/screen/win32.c
 libscreen_plugin_la_LIBADD = -lgdi32
 access_LTLIBRARIES += libscreen_plugin.la
-libscreen_plugin_la_DEPENDENCIES = libscreen_plugin.rc.o
 endif
 if HAVE_MAC_SCREEN
 libscreen_plugin_la_SOURCES += access/screen/mac.c
@@ -266,9 +261,6 @@ EXTRA_LTLIBRARIES += liblibbluray_plugin.la
 
 libaccess_bd_plugin_la_SOURCES = access/bd/bd.c access/bd/mpls.c access/bd/mpls.h access/bd/clpi.c access/bd/clpi.h
 access_LTLIBRARIES += libaccess_bd_plugin.la
-if HAVE_WIN32
-libaccess_bd_plugin_la_DEPENDENCIES = libaccess_bd_plugin.rc.o
-endif
 
 
 ### Digital TV ###
@@ -297,7 +289,7 @@ libbda_la_LDFLAGS = -static
 libbda_la_LIBADD = -lstrmiids -lole32 -loleaut32 -luuid
 noinst_LTLIBRARIES += libbda.la
 
-libdtv_plugin_la_DEPENDENCIES = libbda.la libdtv_plugin.rc.o
+libdtv_plugin_la_DEPENDENCIES = libbda.la
 libdtv_plugin_la_LIBADD = libbda.la -lstdc++
 access_LTLIBRARIES += libdtv_plugin.la
 endif

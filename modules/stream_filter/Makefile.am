@@ -94,9 +94,6 @@ libdash_plugin_la_SOURCES = \
 libdash_plugin_la_CXXFLAGS = $(AM_CFLAGS) -I$(srcdir)/dash
 libdash_plugin_la_LIBADD = $(SOCKET_LIBS)
 stream_filter_LTLIBRARIES += libdash_plugin.la
-if HAVE_WIN32
-libdash_plugin_la_DEPENDENCIES = libdash_plugin.rc.o
-endif
 
 libsmooth_plugin_la_SOURCES = \
     smooth/smooth.c \
@@ -105,17 +102,11 @@ libsmooth_plugin_la_SOURCES = \
     smooth/smooth.h
 
 libsmooth_plugin_la_CFLAGS = $(AM_CFLAGS)
-if HAVE_WIN32
-libsmooth_plugin_la_DEPENDENCIES = libsmooth_plugin.rc.o
-endif
 stream_filter_LTLIBRARIES += libsmooth_plugin.la
 
 libhttplive_plugin_la_SOURCES = httplive.c
 libhttplive_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
 libhttplive_plugin_la_LIBADD = $(GCRYPT_LIBS) -lgpg-error
-if HAVE_WIN32
-libhttplive_plugin_la_DEPENDENCIES = libhttplive_plugin.rc.o
-endif
 if HAVE_GCRYPT
 stream_filter_LTLIBRARIES += libhttplive_plugin.la
 endif

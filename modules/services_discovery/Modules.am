@@ -10,9 +10,6 @@ SOURCES_mediadirs = mediadirs.c
 libsap_plugin_la_SOURCES = sap.c
 libsap_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_sap)
 libsap_plugin_la_LIBADD = $(LIBS_sap) $(SOCKET_LIBS)
-if HAVE_WIN32
-libsap_plugin_la_DEPENDENCIES = libsap_plugin.rc.o
-endif
 sd_LTLIBRARIES += libsap_plugin.la
 
 libpulselist_plugin_la_SOURCES = pulse.c
@@ -43,7 +40,6 @@ endif
 libwindrive_plugin_la_SOURCES = windrive.c
 if HAVE_WIN32
 sd_LTLIBRARIES += libwindrive_plugin.la
-libwindrive_plugin_la_DEPENDENCIES = libwindrive_plugin.rc.o
 endif
 
 libos2drive_plugin_la_SOURCES = os2drive.c

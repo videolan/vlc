@@ -41,9 +41,6 @@ liblogger_plugin_la_SOURCES = logger.c
 if HAVE_ANDROID
 liblogger_plugin_la_LIBADD = -llog
 endif
-if HAVE_WIN32
-liblogger_plugin_la_DEPENDENCIES = liblogger_plugin.rc.o
-endif
 
 libstats_plugin_la_SOURCES = stats.c
 
