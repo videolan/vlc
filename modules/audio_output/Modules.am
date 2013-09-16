@@ -60,7 +60,7 @@ if HAVE_WASAPI
 aout_LTLIBRARIES += libmmdevice_plugin.la
 endif
 
-libdirectsound_plugin_la_SOURCES = directx.c windows_audio_common.h
+libdirectsound_plugin_la_SOURCES = directsound.c windows_audio_common.h
 libdirectsound_plugin_la_LIBADD = -lole32
 if HAVE_DIRECTX
 aout_LTLIBRARIES += libdirectsound_plugin.la

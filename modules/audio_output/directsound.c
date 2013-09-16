@@ -1,5 +1,5 @@
 /*****************************************************************************
- * directx.c: Windows DirectX audio output method
+ * directsound.c: DirectSound audio output plugin for VLC
  *****************************************************************************
  * Copyright (C) 2001-2009 VLC authors and VideoLAN
  * $Id$
