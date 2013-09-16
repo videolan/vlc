@@ -2,7 +2,7 @@
 
 X264_GITURL := git://git.videolan.org/x264.git
 X264_SNAPURL := http://git.videolan.org/?p=x264.git;a=snapshot;h=HEAD;sf=tgz
-X262_GITURL := https://github.com/kierank/x262.git
+X262_GITURL := git://git.videolan.org/x262.git
 
 ifdef BUILD_ENCODERS
 ifdef GPL
