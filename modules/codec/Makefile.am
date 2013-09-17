@@ -342,6 +342,14 @@ endif
 
 ### X26x encoders ###
 
+libx265_plugin_la_SOURCES = codec/x265.c
+libx265_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libx265_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_x265)
+libx265_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_x265) -rpath '$(codecdir)'
+libx265_plugin_la_LIBADD = $(LIBS_x265)
+EXTRA_LTLIBRARIES += libx265_plugin.la
+codec_LTLIBRARIES += $(LTLIBx265)
+
 libx262_plugin_la_SOURCES = codec/x264.c
 libx262_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMODULE_NAME_IS_x262
 libx262_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_x262)

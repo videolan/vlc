@@ -395,6 +395,7 @@ $Id$
  * x262: MPEG-2 video encoder using x262
  * x26410b: H264 10 bit video encoder using x264
  * x264: H264 video encoder using x264
+ * x265: H265 video encoder using x265
  * xa: XA demuxer
  * xcb_apps: List the application windows using XCB
  * xcb_glx: a opengl provider using XCB OpenGL
