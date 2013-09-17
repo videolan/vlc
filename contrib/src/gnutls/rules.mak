@@ -1,6 +1,6 @@
 # GnuTLS
 
-GNUTLS_VERSION := 3.1.12
+GNUTLS_VERSION := 3.1.14
 GNUTLS_URL := ftp://ftp.gnutls.org/gcrypt/gnutls/v3.1/gnutls-$(GNUTLS_VERSION).tar.xz
 
 ifdef BUILD_NETWORK
@@ -47,8 +47,8 @@ GNUTLS_CONF := \
 DEPS_gnutls = nettle $(DEPS_nettle)
 
 .gnutls: gnutls
-ifdef HAVE_ANDROID
 	$(RECONF)
+ifdef HAVE_ANDROID
 	cd $< && $(HOSTVARS) gl_cv_header_working_stdint_h=yes ./configure $(GNUTLS_CONF)
 else
 	cd $< && $(HOSTVARS) ./configure $(GNUTLS_CONF)
