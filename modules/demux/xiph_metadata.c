@@ -299,7 +299,7 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
             char *p = strchr( psz_comment, '=' );
             char *psz_val;
             if (!p) continue;
-            if ( !strncmp(psz_comment, "REPLAYGAIN_TRACK_GAIN=", 22) )
+            if ( !strncasecmp(psz_comment, "REPLAYGAIN_TRACK_GAIN=", 22) )
             {
                 psz_val = malloc( strlen(p+1) + 1 );
                 if (!psz_val) continue;
@@ -309,7 +309,7 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
                     free( psz_val );
                 }
             }
-            else if ( !strncmp(psz_comment, "REPLAYGAIN_ALBUM_GAIN=", 22) )
+            else if ( !strncasecmp(psz_comment, "REPLAYGAIN_ALBUM_GAIN=", 22) )
             {
                 psz_val = malloc( strlen(p+1) + 1 );
                 if (!psz_val) continue;
@@ -319,11 +319,11 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
                     free( psz_val );
                 }
             }
-            else if ( !strncmp(psz_comment, "REPLAYGAIN_ALBUM_PEAK=", 22) )
+            else if ( !strncasecmp(psz_comment, "REPLAYGAIN_ALBUM_PEAK=", 22) )
             {
                 (*ppf_replay_peak)[AUDIO_REPLAY_GAIN_ALBUM] = us_atof( ++p );
             }
-            else if ( !strncmp(psz_comment, "REPLAYGAIN_TRACK_PEAK=", 22) )
+            else if ( !strncasecmp(psz_comment, "REPLAYGAIN_TRACK_PEAK=", 22) )
             {
                 (*ppf_replay_peak)[AUDIO_REPLAY_GAIN_TRACK] = us_atof( ++p );
             }
@@ -332,9 +332,13 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
         {
             unsigned int i_chapt;
             seekpoint_t *p_seekpoint = NULL;
-            if( strcasestr( psz_comment, "NAME=" ) &&
-                ( sscanf( psz_comment, "CHAPTER%uNAME=", &i_chapt ) == 1 ||
-                  sscanf( psz_comment, "chapter%name=", &i_chapt ) == 1 ) )
+
+            for( int i = 0; psz_comment[i] && psz_comment[i] != '='; i++ )
+                if( psz_comment[i] >= 'a' && psz_comment[i] <= 'z' )
+                    psz_comment[i] -= 'a' - 'A';
+
+            if( strstr( psz_comment, "NAME=" ) &&
+                    sscanf( psz_comment, "CHAPTER%uNAME=", &i_chapt ) == 1 )
             {
                 char *p = strchr( psz_comment, '=' );
                 p_seekpoint = getChapterEntry( i_chapt, &chapters_array );
@@ -342,8 +346,7 @@ void vorbis_ParseComment( vlc_meta_t **pp_meta,
                 if ( ! p_seekpoint->psz_name )
                     p_seekpoint->psz_name = strdup( ++p );
             }
-            else if( sscanf( psz_comment, "CHAPTER%u=", &i_chapt ) == 1 ||
-                     sscanf( psz_comment, "chapter%u=", &i_chapt ) == 1 )
+            else if( sscanf( psz_comment, "CHAPTER%u=", &i_chapt ) == 1 )
             {
                 unsigned int h, m, s, ms;
                 char *p = strchr( psz_comment, '=' );
