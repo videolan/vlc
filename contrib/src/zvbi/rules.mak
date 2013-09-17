@@ -1,6 +1,6 @@
 # zvbi
 
-ZVBI_VERSION := 0.2.34
+ZVBI_VERSION := 0.2.35
 ZVBI_URL := $(SF)/zapping/zvbi-$(ZVBI_VERSION).tar.bz2
 
 PKGS += zvbi
