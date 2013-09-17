@@ -120,6 +120,7 @@ typedef struct chapters_array_t
 
 static seekpoint_t * getChapterEntry( unsigned int i_index, chapters_array_t *p_array )
 {
+    if ( i_index > 4096 ) return NULL;
     if ( i_index >= p_array->i_size )
     {
         unsigned int i_newsize = p_array->i_size;
