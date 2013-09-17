@@ -571,7 +571,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             Ogg_ResetStreamHelper( p_sys );
 
-            if ( p_sys->i_bitrate == 0 )
+            if ( p_sys->i_bitrate == 0 || p_sys->b_partial_bitrate )
             {
                 /* we won't be able to find block by time
                  * we'll need to bisect search from here
@@ -1653,7 +1653,12 @@ static int Ogg_BeginningOfStream( demux_t *p_demux )
             es_out_Control( p_demux->out, ES_OUT_SET_ES, p_stream->p_es );
         }
 
-        p_ogg->i_bitrate += p_stream->fmt.i_bitrate;
+        if ( p_stream->fmt.i_bitrate == 0  &&
+             ( p_stream->fmt.i_cat == VIDEO_ES ||
+               p_stream->fmt.i_cat == AUDIO_ES ) )
+            p_ogg->b_partial_bitrate = true;
+        else
+            p_ogg->i_bitrate += p_stream->fmt.i_bitrate;
 
         p_stream->i_pcr = p_stream->i_previous_pcr =
             p_stream->i_interpolated_pcr = -1;

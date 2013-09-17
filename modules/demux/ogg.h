@@ -102,6 +102,7 @@ struct demux_sys_t
 
     /* bitrate */
     int     i_bitrate;
+    bool    b_partial_bitrate;
 
     /* after reading all headers, the first data page is stuffed into the relevant stream, ready to use */
     bool    b_page_waiting;
