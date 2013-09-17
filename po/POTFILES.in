@@ -326,7 +326,7 @@ modules/audio_output/audioqueue.c
 modules/audio_output/audiotrack.c
 modules/audio_output/audiounit_ios.c
 modules/audio_output/auhal.c
-modules/audio_output/directx.c
+modules/audio_output/directsound.c
 modules/audio_output/file.c
 modules/audio_output/jack.c
 modules/audio_output/kai.c
