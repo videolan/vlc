@@ -1851,15 +1851,9 @@ then
     AC_MSG_RESULT(no)
   ])
 
-  if test "${SYS}" = "bsdi" -o "${SYS}" = "mingw32" -o "${SYS}" = "os2"
+  if test "${SYS}" = "bsdi" -o "${SYS}" = "mingw32" -o "${SYS}" = "os2" -o "${SYS}" = "darwin"
   then
     VLC_ADD_PLUGIN([vcd cdda])
-  fi
-
-  if test "${SYS}" = "darwin"
-  then
-    VLC_ADD_PLUGIN([vcd cdda])
-    VLC_ADD_LIBS([vcd vcdx cdda],[-Wl,-framework,IOKit,-framework,CoreFoundation])
   fi
 
   if test "$enable_libcddb" != "no"; then
