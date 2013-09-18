@@ -2344,6 +2344,7 @@ static void Destroy( vlc_object_t *p_this )
 
     if( p_sys->p_xml ) xml_ReaderDelete( p_sys->p_xml );
     free( p_sys->style.psz_fontname );
+    free( p_sys->style.psz_monofontname );
 
 #ifdef _WIN32
     free( p_sys->psz_win_fonts_path );
