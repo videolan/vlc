@@ -68,6 +68,9 @@ SOURCES_opencv_example = opencv_example.cpp filter_event_info.h
 
 librotate_plugin_la_SOURCES = rotate.c
 librotate_plugin_la_LIBADD = ../control/libvlc_motion.la $(LIBM)
+if HAVE_DARWIN
+librotate_plugin_la_LDFLAGS = -Wl,-framework,IOKit,-framework,CoreFoundation
+endif
 video_filter_LTLIBRARIES += librotate_plugin.la
 
 SOURCES_colorthres = colorthres.c
