@@ -26,6 +26,20 @@
  * Definitions of structures and functions used by this plugin
  *****************************************************************************/
 
+//#define OGG_DEMUX_DEBUG 1
+#ifdef OGG_DEMUX_DEBUG
+  #define DemuxDebug(code) code
+#else
+  #define DemuxDebug(code)
+#endif
+
+/* Some defines from OggDS http://svn.xiph.org/trunk/oggds/ */
+#define PACKET_TYPE_HEADER   0x01
+#define PACKET_TYPE_BITS     0x07
+#define PACKET_LEN_BITS01    0xc0
+#define PACKET_LEN_BITS2     0x02
+#define PACKET_IS_SYNCPOINT  0x08
+
 typedef struct oggseek_index_entry demux_index_entry_t;
 
 typedef struct logical_stream_s
@@ -57,6 +71,7 @@ typedef struct logical_stream_s
 
     /* Misc */
     bool b_reinit;
+    bool b_oggds;
     int i_granule_shift;
 
     /* Opus has a starting offset in the headers. */
@@ -65,7 +80,7 @@ typedef struct logical_stream_s
     int i_end_trim;
 
     /* offset of first keyframe for theora; can be 0 or 1 depending on version number */
-    int64_t i_keyframe_offset;
+    int8_t i_keyframe_offset;
 
     /* keyframe index for seeking, created as we discover keyframes */
     demux_index_entry_t *idx;
@@ -131,4 +146,6 @@ struct demux_sys_t
 
     /* Length, if available. */
     int64_t i_length;
+
+    DemuxDebug( bool b_seeked; )
 };

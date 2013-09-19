@@ -104,14 +104,6 @@ typedef struct
     } sh;
 } stream_header_t;
 
-
-/* Some defines from OggDS */
-#define PACKET_TYPE_HEADER   0x01
-#define PACKET_TYPE_BITS     0x07
-#define PACKET_LEN_BITS01    0xc0
-#define PACKET_LEN_BITS2     0x02
-#define PACKET_IS_SYNCPOINT  0x08
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -288,12 +280,18 @@ static int Demux( demux_t * p_demux )
          */
         if( Ogg_ReadPage( p_demux, &p_sys->current_page ) != VLC_SUCCESS )
             return 0; /* EOF */
-
         /* Test for End of Stream */
-        if( ogg_page_eos( &p_sys->current_page ) )
+        /* FIXME that eos handling is innapropriate with seeking and concatenated streams */
+        if( ogg_page_eos( &p_sys->current_page )
+            && ogg_page_granulepos( &p_sys->current_page ) != 0 ) /* skel workaround */
             p_sys->i_eos++;
     }
 
+    b_skipping = false;
+    for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
+    {
+        b_skipping |= p_sys->pp_stream[i_stream]->i_skip_frames;
+    }
 
     for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
@@ -322,6 +320,16 @@ static int Demux( demux_t * p_demux )
 
         }
 
+        DemuxDebug(
+            if ( p_stream->fmt.i_cat == VIDEO_ES )
+                msg_Dbg(p_demux, "DEMUX READ pageno %ld g%"PRId64" (%d packets) cont %d %ld bytes eos %d ",
+                    ogg_page_pageno( &p_sys->current_page ),
+                    ogg_page_granulepos( &p_sys->current_page ),
+                    ogg_page_packets( &p_sys->current_page ),
+                    ogg_page_continued(&p_sys->current_page),
+                    p_sys->current_page.body_len, p_sys->i_eos )
+        );
+
         while( ogg_stream_packetout( &p_stream->os, &oggpacket ) > 0 )
         {
             /* Read info from any secondary header packets, if there are any */
@@ -348,19 +356,27 @@ static int Demux( demux_t * p_demux )
 
                 /* update start of data pointer */
                 p_stream->i_data_start = stream_Tell( p_demux->s );
-
             }
 
             /* If any streams have i_skip_frames, only decode (pre-roll)
-             *  for those streams */
-            if ( b_skipping && p_stream->i_skip_frames == 0 ) continue;
-
+             *  for those streams, but don't skip headers */
+            if ( b_skipping && p_stream->i_skip_frames == 0
+                 && p_stream->i_secondary_header_packets ) continue;
 
             if( p_stream->b_reinit )
             {
-                /* If synchro is re-initialized we need to drop all the packets
-                 * until we find a new dated one. */
-                Ogg_UpdatePCR( p_stream, &oggpacket );
+                if ( Oggseek_PacketPCRFixup( p_stream, &p_sys->current_page,
+                                         &oggpacket ) )
+                {
+                    DemuxDebug( msg_Dbg( p_demux, "PCR fixup for %"PRId64,
+                             ogg_page_granulepos( &p_sys->current_page ) ) );
+                }
+                else
+                {
+                    /* If synchro is re-initialized we need to drop all the packets
+                         * until we find a new dated one. */
+                    Ogg_UpdatePCR( p_stream, &oggpacket );
+                }
 
                 if( p_stream->i_pcr >= 0 )
                 {
@@ -394,6 +410,12 @@ static int Demux( demux_t * p_demux )
                 }
                 else
                 {
+                    DemuxDebug(
+                        msg_Dbg(p_demux, "DEMUX DROPS PACKET (? / %d) pageno %ld granule %"PRId64,
+                            ogg_page_packets( &p_sys->current_page ),
+                            ogg_page_pageno( &p_sys->current_page ), oggpacket.granulepos );
+                    );
+
                     p_stream->i_interpolated_pcr = -1;
                     p_stream->i_previous_granulepos = -1;
                     continue;
@@ -418,8 +440,23 @@ static int Demux( demux_t * p_demux )
                 }
             }
 
+            DemuxDebug( if ( p_sys->b_seeked )
+            {
+                if ( Ogg_IsKeyFrame( p_stream, &oggpacket ) )
+                     msg_Dbg(p_demux, "** DEMUX ON KEYFRAME **" );
+
+                ogg_int64_t iframe = ogg_page_granulepos( &p_sys->current_page ) >> p_stream->i_granule_shift;
+                ogg_int64_t pframe = ogg_page_granulepos( &p_sys->current_page ) - ( iframe << p_stream->i_granule_shift );
+
+                msg_Dbg(p_demux, "DEMUX PACKET (size %d) IS at iframe %"PRId64" pageno %ld pframe %"PRId64" OFFSET %"PRId64" PACKET NO %"PRId64" skipleft=%d",
+                        ogg_page_packets( &p_sys->current_page ),
+                        iframe, ogg_page_pageno( &p_sys->current_page ), pframe, p_sys->i_input_position, oggpacket.packetno, p_stream->i_skip_frames );
+            })
+
             Ogg_DecodePacket( p_demux, p_stream, &oggpacket );
         }
+
+        DemuxDebug( p_sys->b_seeked = false; )
 
         if( !p_sys->b_page_waiting )
             break;
@@ -464,6 +501,34 @@ static void Ogg_ResetStreamHelper( demux_sys_t *p_sys )
     ogg_sync_reset( &p_sys->oy );
 }
 
+static logical_stream_t * Ogg_GetSelectedStream( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    logical_stream_t *p_stream = NULL;
+    for( int i=0; i<p_sys->i_streams; i++ )
+    {
+        logical_stream_t *p_candidate = p_sys->pp_stream[i];
+
+        bool b_selected = false;
+        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
+                        p_candidate->p_es, &b_selected );
+        if ( !b_selected ) continue;
+
+        if ( !p_stream && p_candidate->fmt.i_cat == AUDIO_ES )
+        {
+            p_stream = p_candidate;
+            continue; /* Try to find video anyway */
+        }
+
+        if ( p_candidate->fmt.i_cat == VIDEO_ES )
+        {
+            p_stream = p_candidate;
+            break;
+        }
+    }
+    return p_stream;
+}
+
 /*****************************************************************************
  * Control:
  *****************************************************************************/
@@ -471,8 +536,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     vlc_meta_t *p_meta;
-    int64_t *pi64;
-    bool *pb_bool;
+    int64_t *pi64, i64;
+    double *pf, f;
+    bool *pb_bool, b;
 
     switch( i_query )
     {
@@ -511,6 +577,21 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
         }
 
+        case DEMUX_GET_POSITION:
+            pf = (double*)va_arg( args, double * );
+            if( p_sys->i_length > 0 )
+            {
+                *pf =  (double) p_sys->i_pcr /
+                       (double) ( p_sys->i_length * (mtime_t)1000000 );
+            }
+            else if( stream_Size( p_demux->s ) > 0 )
+            {
+                i64 = stream_Tell( p_demux->s );
+                *pf = (double) i64 / stream_Size( p_demux->s );
+            }
+            else *pf = 0.0;
+            return VLC_SUCCESS;
+
         case DEMUX_SET_POSITION:
             /* forbid seeking if we haven't initialized all logical bitstreams yet;
                if we allowed, some headers would not get backed up and decoder init
@@ -520,9 +601,35 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_EGENERIC;
             }
 
+            logical_stream_t *p_stream = Ogg_GetSelectedStream( p_demux );
+            if ( !p_stream )
+            {
+                msg_Err( p_demux, "No selected seekable stream found" );
+                return VLC_EGENERIC;
+            }
+
+            stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
+
+            f = (double)va_arg( args, double );
+            if ( p_sys->i_length <= 0 || !b /* || ! ACCESS_CAN_FASTSEEK */ )
+            {
+                Ogg_ResetStreamHelper( p_sys );
+                Oggseek_BlindSeektoPosition( p_demux, p_stream, f, b );
+                return VLC_SUCCESS;
+            }
+
+            assert( p_sys->i_length > 0 );
+            i64 = (mtime_t)(1000000.0 * p_sys->i_length * f );
             Ogg_ResetStreamHelper( p_sys );
-            return demux_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
-                                          1, i_query, args );
+            if ( Oggseek_SeektoAbsolutetime( p_demux, p_stream, i64 ) >= 0 )
+            {
+                es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
+                                VLC_TS_0 + i64 );
+                return VLC_SUCCESS;
+            }
+
+            return VLC_EGENERIC;
+
         case DEMUX_GET_LENGTH:
             if ( p_sys->i_length < 0 )
                 return demux_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
@@ -577,13 +684,16 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                  * we'll need to bisect search from here
                  * or use skeleton index if any (FIXME)
                 */
-                if ( p_sys->pp_stream[0]->fmt.i_codec == VLC_CODEC_OPUS )
+                logical_stream_t *p_stream = Ogg_GetSelectedStream( p_demux );
+                if ( !p_stream )
                 {
-                    /* Granule = Freq * T + pre-skip */
-                    oggseek_find_frame ( p_demux, p_sys->pp_stream[0],
-                        ( p_sys->pp_seekpoints[i_seekpoint]->i_time_offset * 0.048 + p_sys->pp_stream[0]->i_pre_skip ) );
+                    msg_Err( p_demux, "No selected seekable stream found" );
+                    return VLC_EGENERIC;
                 }
-                else return VLC_EGENERIC;
+
+                Oggseek_SeektoAbsolutetime( p_demux, p_stream, p_sys->pp_seekpoints[i_seekpoint]->i_time_offset );
+
+                return VLC_SUCCESS;
             }
             else
             {
@@ -636,25 +746,16 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
                            ogg_packet *p_oggpacket )
 {
     p_stream->i_end_trim = 0;
+
     /* Convert the granulepos into a pcr */
     if( p_oggpacket->granulepos >= 0 )
     {
         if( p_stream->fmt.i_codec == VLC_CODEC_THEORA ||
-            p_stream->fmt.i_codec == VLC_CODEC_KATE )
+            p_stream->fmt.i_codec == VLC_CODEC_KATE ||
+            p_stream->fmt.i_codec == VLC_CODEC_DIRAC )
         {
-            ogg_int64_t iframe = p_oggpacket->granulepos >>
-              p_stream->i_granule_shift;
-            ogg_int64_t pframe = p_oggpacket->granulepos -
-              ( iframe << p_stream->i_granule_shift );
-
-            p_stream->i_pcr = ( iframe + pframe - p_stream->i_keyframe_offset )
-              * INT64_C(1000000) / p_stream->f_rate;
-        }
-        else if( p_stream->fmt.i_codec == VLC_CODEC_DIRAC )
-        {
-            ogg_int64_t i_dts = p_oggpacket->granulepos >> 31;
-            /* NB, OggDirac granulepos values are in units of 2*picturerate */
-            p_stream->i_pcr = (i_dts/2) * INT64_C(1000000) / p_stream->f_rate;
+            p_stream->i_pcr = Oggseek_GranuleToAbsTimestamp( p_stream,
+                                                p_oggpacket->granulepos, true );
         }
         else
         {
@@ -1310,12 +1411,13 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     Ogg_ReadKateHeader( p_stream, &oggpacket );
                     msg_Dbg( p_demux, "found kate header" );
                 }
+                /* Check for OggDS */
                 else if( oggpacket.bytes >= 142 &&
                          !memcmp( &oggpacket.packet[1],
                                    "Direct Show Samples embedded in Ogg", 35 ))
                 {
                     /* Old header type */
-
+                    p_stream->b_oggds = true;
                     /* Check for video header (old format) */
                     if( GetDWLE((oggpacket.packet+96)) == 0x05589f80 &&
                         oggpacket.bytes >= 184 )
@@ -1415,11 +1517,14 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         p_ogg->i_streams--;
                     }
                 }
+                /* Check for OggDS */
                 else if( oggpacket.bytes >= 44+1 &&
                          (*oggpacket.packet & PACKET_TYPE_BITS ) == PACKET_TYPE_HEADER )
                 {
                     stream_header_t tmp;
                     stream_header_t *st = &tmp;
+
+                    p_stream->b_oggds = true;
 
                     memcpy( st->streamtype, &oggpacket.packet[1+0], 8 );
                     memcpy( st->subtype, &oggpacket.packet[1+8], 4 );
