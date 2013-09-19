@@ -344,6 +344,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_toggleSidebar setTitle: _NS("Show Sidebar")];
     [o_mi_toggleSidebar setState: config_GetInt(VLCIntf, "macosx-show-sidebar")];
     [o_mu_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
+    [o_mi_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
 
     [o_mu_controls setTitle: _NS("Playback")];
     [o_mi_play setTitle: _NS("Play")];

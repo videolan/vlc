@@ -2,7 +2,7 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">12F36</string>
+    <string key="IBDocument.SystemVersion">12F37</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
     <string key="IBDocument.AppKitVersion">1187.39</string>
     <string key="IBDocument.HIToolboxVersion">626.00</string>
@@ -21,11 +21,11 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="5238"/>
-      <integer value="2461"/>
-      <integer value="5260"/>
       <integer value="4850"/>
       <integer value="2730"/>
+      <integer value="2461"/>
+      <integer value="29"/>
+      <integer value="5260"/>
       <integer value="21"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
@@ -8444,6 +8444,14 @@ LCAuLi4</string>
           </object>
           <int key="connectionID">5596</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_playlistTableColumns</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="709859089"/>
+          </object>
+          <int key="connectionID">5597</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -12789,9 +12797,9 @@ LCAuLi4</string>
           <string>{{479, 492}, {137, 103}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{1036, 57}, {604, 310}}</string>
+          <string>{{760, 57}, {604, 310}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{1036, 57}, {604, 310}}</string>
+          <string>{{760, 57}, {604, 310}}</string>
           <boolean value="YES"/>
           <boolean value="YES"/>
           <boolean value="NO"/>
@@ -13664,7 +13672,7 @@ LCAuLi4</string>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">5596</int>
+      <int key="maxID">5597</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -14818,6 +14826,7 @@ LCAuLi4</string>
               <string>o_mi_play</string>
               <string>o_mi_player</string>
               <string>o_mi_playlist</string>
+              <string>o_mi_playlistTableColumns</string>
               <string>o_mi_prefs</string>
               <string>o_mi_previous</string>
               <string>o_mi_program</string>
@@ -14927,6 +14936,7 @@ LCAuLi4</string>
               <string>NSMenuItem</string>
               <string>NSMenuItem</string>
               <string>id</string>
+              <string>NSMenuItem</string>
               <string>NSMenuItem</string>
               <string>NSMenuItem</string>
               <string>NSMenuItem</string>
@@ -15153,6 +15163,7 @@ LCAuLi4</string>
               <string>o_mi_play</string>
               <string>o_mi_player</string>
               <string>o_mi_playlist</string>
+              <string>o_mi_playlistTableColumns</string>
               <string>o_mi_prefs</string>
               <string>o_mi_previous</string>
               <string>o_mi_program</string>
@@ -15518,6 +15529,10 @@ LCAuLi4</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_mi_playlist</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_playlistTableColumns</string>
                 <string key="candidateClassName">NSMenuItem</string>
               </object>
               <object class="IBToOneOutletInfo">

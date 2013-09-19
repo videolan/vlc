@@ -83,6 +83,7 @@
     IBOutlet NSMenuItem * o_mi_toggleEffectsButton;
     IBOutlet NSMenuItem * o_mi_toggleSidebar;
     IBOutlet NSMenu * o_mu_playlistTableColumns;
+    IBOutlet NSMenuItem * o_mi_playlistTableColumns;
     NSMenu * o_mu_playlistTableColumnsContextMenu;
 
     IBOutlet NSMenu * o_mu_controls;
