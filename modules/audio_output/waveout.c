@@ -505,7 +505,7 @@ static int OpenWaveOut( audio_output_t *p_aout, uint32_t i_device_id, int i_form
                  waveformat.Samples.wValidBitsPerSample);
         msg_Dbg( p_aout,"waveformat.Samples.wSamplesPerBlock = %d",
                  waveformat.Samples.wSamplesPerBlock);
-        msg_Dbg( p_aout,"waveformat.dwChannelMask          = %lx",
+        msg_Dbg( p_aout,"waveformat.dwChannelMask          = %u",
                  waveformat.dwChannelMask);
     }
 

@@ -79,11 +79,13 @@ ATTR_PACKED
 _WAVEFORMATEXTENSIBLE {
     WAVEFORMATEX Format;
     union {
-        uint16_t wValidBitsPerSample;
-        uint16_t wSamplesPerBlock;
-        uint16_t wReserved;
+        uint16_t wValidBitsPerSample;       /* bits of precision  */
+        uint16_t wSamplesPerBlock;          /* valid if wBitsPerSample==0 */
+        uint16_t wReserved;                 /* If neither applies, set to zero. */
     } Samples;
-    uint32_t     dwChannelMask;
+
+    uint32_t     dwChannelMask;             /* Channels present */
+
     GUID SubFormat;
 } WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
 #endif /* _WAVEFORMATEXTENSIBLE_ */
