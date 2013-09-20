@@ -30,16 +30,13 @@
 # include "config.h"
 #endif
 
-#include <stdio.h>
 #include <math.h>
-#include <wchar.h>
 
 #define UNICODE
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
-#include <vlc_charset.h> /* FromWide() */
-#include <vlc_atomic.h>
+#include <vlc_charset.h>              /* FromWide() */
 
 #include "windows_audio_common.h"
 
