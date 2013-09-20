@@ -1,9 +1,0 @@
---- libbluray-0.3.0/src/libbluray.pc.in.orig	2013-05-26 12:05:07.233864756 +0200
-+++ libbluray-0.3.0/src/libbluray.pc.in	2013-05-26 12:07:43.552878009 +0200
-@@ -7,5 +7,5 @@
- Description: library supporting Blu-ray playback
- Version: @PACKAGE_VERSION@
- Libs: -L${libdir} -lbluray
--Libs.private: @DLOPEN_LIBS@
-+Libs.private: @DLOPEN_LIBS@ @LIBXML2_LIBS@
- Cflags: -I${includedir}
