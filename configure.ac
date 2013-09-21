@@ -2974,6 +2974,10 @@ PKG_CHECK_MODULES([GL], [gl], [
     have_gl="yes"
     GL_CFLAGS=""
     AS_IF([test "${SYS}" = "mingw32"], [
+      AC_CHECK_HEADER([GL/glew.h], [
+      ], [
+        have_gl="no"
+      ])
       GL_LIBS="-lopengl32"
     ], [
       GL_LIBS="-lGL"
