@@ -5,15 +5,8 @@ $Id$
  * a52tospdif: Audio converter module to encapsulate A/52 into S/PDIF
  * aa: Ascii art video output
  * access_alsa: Alsa access module
- * access_attachment: Attachment access module
- * access_avio: Access and Stream output module using libavformat network
  * access_bd: Blu-Ray Disc access
- * access_directory: Access module to read files in a directory
  * access_eyetv: Access module to connect to our plugin running within EyeTV
- * access_ftp: FTP Network access module
- * access_gnomevfs: GnomeVFS access
- * access_http: HTTP Network access module
- * access_imem: memory input access module
  * access_jack: JACK audio input module
  * access_mms: MMS over TCP, UDP and HTTP access module
  * access_mtp: MTP access module
@@ -24,13 +17,7 @@ $Id$
  * access_output_livehttp: Live HTTP stream output
  * access_output_shout: Shoutcast access output
  * access_output_udp: UDP Network access_output module
- * access_rar: RAR access
  * access_realrtsp: Real RTSP access
- * access_sftp: SFTP network access module
- * access_smb: SMB shares access module
- * access_tcp: TCP Network access module
- * access_udp: UDP Network access module
- * access_vdr: VDR access module
  * adjust: Contrast/Hue/saturation/Brightness adjust module
  * adpcm: ADPCM audio decoder
  * adummy: dummy audio output
@@ -47,6 +34,7 @@ $Id$
  * araw: Pseudo audio decoder for raw PCM
  * asf: ASF demuxer
  * atmo: Ambilight-like video-output
+ * attachment: Attachment access module
  * au: AU file demuxer
  * audio_format: helper module for audio transcoding
  * audiobargraph_a: audiobargraph audio plugin
@@ -59,6 +47,7 @@ $Id$
  * avcodec: libavcodec audio/video decoder
  * avformat: libavformat demuxer
  * avi: AVI file stream demuxer
+ * avio: Access and Stream output module using libavformat network
  * ball: Augmented reality ball video filter module
  * bandlimited_resampler: Bandlimited interpolation audio resampler
  * blend: a picture filter that blends two pictures
@@ -77,7 +66,6 @@ $Id$
  * clone: Clone video filter
  * colorthres:  Theshold color based on similarity to reference color Video filter
  * compressor: Dynamic range compressor
- * coregraphicslayer: CoreGraphics video output for NPAPI plugins
  * croppadd: Crop/Padd image filter
  * crystalhd: crystalhd decoder
  * cvdsub: CVD subtitles decoder
@@ -94,6 +82,7 @@ $Id$
  * demux_stl: EBU STL subtitles demuxer
  * demuxdump: Pseudo-demuxer that dumps the stream
  * dirac: BBC Dirac codec
+ * diracsys: BBC Dirac demuxer
  * direct2d: video output module using the Direct2D API
  * direct3d: video output module using the Direct3D API
  * directdraw: video output module using the DirectDraw API
@@ -134,6 +123,7 @@ $Id$
  * folder: folder meta data and art finder
  * freetype: Utility to put text on video using freetype2
  * freeze: picture freezing video filter
+ * ftp: FTP Network access module
  * g711: G.711 audio codec
  * gain: Gain audio filter
  * gaussianblur: gaussian blur video filter
@@ -141,11 +131,11 @@ $Id$
  * gl: OpenGL video output using the generic OpenGL provider
  * gles1: OpenGL ES video output using the generic OpenGL provider
  * gles2: OpenGL ES2 video output using the generic OpenGL provider
- * globalhotkeys: module to catch hotkeys when application doesn't have the focus
  * glspectrum: 3D OpenGL spectrum visualization
  * glwin32: a opengl provider using DirectX OpenGL
  * glx: GLX extension for OpenGL
  * gme: old console games music playback using Game Music Emu
+ * gnomevfs: GnomeVFS access
  * gnutls: GNU TLS encryption/decryption module
  * goom: visualisation plugin based on goom
  * gradfun: Gradfun video effects filter
@@ -157,6 +147,7 @@ $Id$
  * headphone_channel_mixer:  headphone channel mixer with virtual spatialization effect
  * hotkeys: hotkeys control module
  * hqdn3d: High Quality denoising filter
+ * http: HTTP Network access module
  * httplive: HTTP Live streaming for playback
  * hwdummy: dummy hardware video decoding
  * i420_rgb: planar YUV to packed RGB conversion functions
@@ -172,6 +163,7 @@ $Id$
  * i422_yuy2_sse2: sse2 accelerated version of i422_yuy2
  * idummy: dummy input
  * image: Image file video output
+ * imem: memory input access module
  * integer_mixer: Integer audio mixer
  * invert: inverse video filter
  * iomx: IPC/OpenMaxIL for Android
@@ -183,7 +175,6 @@ $Id$
  * libass: Subtitle renderers using libass
  * libbluray: Library to access Blu-Ray drives
  * libmpeg2: Mpeg2 video decoder using libmpeg2
- * libvnc: VNC/rfb view only access module
  * linsys_hdsdi: Linsys HDSDI cards access module
  * linsys_sdi: Linsys SDI cards access module
  * lirc: Linux infrared control module
@@ -273,6 +264,7 @@ $Id$
  * qtsound: Quicktime Audio Capture
  * quartztext: Text renderer using native Mac OS X API
  * quicktime: Quicktime decoder that uses the QT library
+ * rar: RAR access and stream filter
  * rawaud: raw audio input module for vlc
  * rawdv: Raw DV demuxer
  * rawvid: raw video input module for vlc
@@ -298,6 +290,7 @@ $Id$
  * sdl_image: SDL-based image decoder
  * sdp: SDP fake access
  * sepia: Sepia video filter
+ * sftp: SFTP network access module
  * sharpen: Sharpen video filter
  * shine: MP3 encoder using Shine, a fixed point implementation
  * shm: Shared memory framebuffer access module
@@ -305,6 +298,7 @@ $Id$
  * simple_channel_mixer: channel mixer
  * simple_channel_mixer_neon: channel mixer using NEON assembly
  * skins2: Skinnable interface, new generation
+ * smb: SMB shares access module
  * smf: Standard MIDI file demuxer
  * smooth: Microsoft Smooth Streaming input
  * sndio: OpenBSD sndio audio output
@@ -315,7 +309,6 @@ $Id$
  * stats: Stats encoder function
  * stereo_widen: Enhances stereo effect
  * stl: EBU STL decoder
- * stream_filter_rar: Stream filter to read inside Rar files
  * stream_out_autodel: monitor mux inputs and automatically add/delete streams
  * stream_out_bridge: "exchange" streams between sout instances. To be used with VLM
  * stream_out_chromaprint: Audio fingerprinter
@@ -344,6 +337,7 @@ $Id$
  * swscale: Video scaling filter
  * t140: T.140 text encoder
  * taglib: Taglib tags parser and writer
+ * tcp: TCP Network access module
  * tdummy: dummy text renderer
  * telx: teletext subtitles decoder
  * theora: a theora video decoder/packetizer/encoder using the libtheora
@@ -356,6 +350,7 @@ $Id$
  * twolame: a mp1 mp2 audio encoder based on twolame
  * ty: TY demuxer
  * udev: udev probing module
+ * udp: UDP Network access module
  * ugly_resampler: Ugly audio resampler
  * uleaddvaudio: codec for DV Audio from Ulead
  * upnp: libupnp UPNP service discovery
@@ -371,15 +366,18 @@ $Id$
  * vdpau_deinterlace: VDPAU deinterlacing video filter
  * vdpau_display: VDPAU video display
  * vdpau_sharpen: VDPAU sharpen/blur video filter
+ * vdr: VDR access module
  * vdummy: dummy video display
  * vhs: vhs style video filter
  * visual: visualisation system
  * vmem: video memory output
+ * vnc: VNC/rfb view only access module
  * vobsub: VobSUB subtitles demuxer
  * voc: VOC demuxer
  * vod_rtsp: RTSP VoD module
  * volume_neon: audio volume optimized for ARM NEON
  * vorbis: a vorbis audio decoder/packetizer using the libvorbis library
+ * vout_coregraphicslayer: CoreGraphics video output for NPAPI plugins
  * vout_ios2: iOS video provider using OpenGL ES 2
  * vout_macosx: Mac OS X OpenGL provider
  * vout_sdl: video output module using the SDL library
@@ -389,6 +387,7 @@ $Id$
  * wave: Wave video effect
  * waveout: simple audio output module for Windows
  * win32text: Text renderer using native Win32 API
+ * win_hotkeys: module to catch hotkeys when application doesn't have the focus
  * windrive: Windows logical disc drives
  * wingdi: WIN 32 / WIN CE GDI video output
  * wma_fixed: wma decoder using integer decoder from Rockbox
@@ -399,6 +398,7 @@ $Id$
  * xa: XA demuxer
  * xcb_apps: List the application windows using XCB
  * xcb_glx: a opengl provider using XCB OpenGL
+ * xcb_hotkeys: module to catch hotkeys when application doesn't have the focus
  * xcb_screen: input module that takes screenshots of the primary monitor
  * xcb_window: XCB window provider
  * xcb_x11: a X11 video output using XCB
