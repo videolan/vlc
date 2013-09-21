@@ -10,6 +10,7 @@ libopensles_android_plugin_la_SOURCES = opensles_android.c
 libopensles_android_plugin_la_LIBADD = $(LIBDL) $(LIBM)
 
 libandroid_audiotrack_plugin_la_SOURCES = audiotrack.c
+libandroid_audiotrack_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libandroid_audiotrack_plugin_la_LIBADD = $(LIBDL)
 
 if HAVE_ANDROID
@@ -19,6 +20,7 @@ endif
 libadummy_plugin_la_SOURCES = adummy.c
 
 libafile_plugin_la_SOURCES = file.c
+libafile_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 libamem_plugin_la_SOURCES = amem.c
 
