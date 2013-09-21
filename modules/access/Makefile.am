@@ -10,7 +10,6 @@ libattachment_plugin_la_SOURCES = access/attachment.c
 access_LTLIBRARIES += libattachment_plugin.la
 
 libfilesystem_plugin_la_SOURCES = access/fs.h access/file.c access/directory.c access/fs.c
-libfilesystem_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMODULE_NAME_IS_filesystem
 if HAVE_WIN32
 libfilesystem_plugin_la_LIBADD = -lshlwapi
 endif
@@ -25,7 +24,6 @@ access_LTLIBRARIES += libimem_plugin.la
 
 librar_plugin_la_SOURCES = access/rar/rar.c access/rar/rar.h \
 	access/rar/access.c access/rar/stream.c access/rar/module.c
-librar_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMODULE_NAME_IS_rar
 access_LTLIBRARIES += librar_plugin.la
 
 libsdp_plugin_la_SOURCES = access/sdp.c
@@ -390,7 +388,6 @@ libaccess_realrtsp_plugin_la_SOURCES = \
 	access/rtsp/real_rmff.c access/rtsp/real_rmff.h \
 	access/rtsp/real_sdpplin.c access/rtsp/real_sdpplin.h \
 	access/rtsp/real_asmrp.c
-libaccess_realrtsp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMODULE_NAME_IS_access_realrtsp
 libaccess_realrtsp_plugin_la_LIBADD = $(SOCKET_LIBS)
 libaccess_realrtsp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBaccess_realrtsp)
