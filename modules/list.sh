@@ -5,7 +5,7 @@ LANG=C
 export LANG
 
 TEMPFILE=/tmp/vlclist.tmp.$$
-LISTFILE=LIST
+LISTFILE=MODULES_LIST
 
 
 rm -f $TEMPFILE

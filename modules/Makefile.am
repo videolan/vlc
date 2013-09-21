@@ -43,7 +43,7 @@ SUBDIRS += lua
 endif
 
 dist_noinst_SCRIPTS = genmf list.sh module.rc.in
-dist_noinst_DATA = LIST
+dist_noinst_DATA = MODULES_LIST
 
 libvlc_pulse_la_SOURCES = vlcpulse.c vlcpulse.h
 libvlc_pulse_la_CPPFLAGS = -DMODULE_STRING=\"pulse\"
