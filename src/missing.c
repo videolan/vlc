@@ -161,9 +161,9 @@ httpd_stream_t *httpd_StreamNew (httpd_host_t *host,
     assert (0);
 }
 
-int httpd_StreamSend (httpd_stream_t *stream, uint8_t *data, int count)
+int httpd_StreamSend (httpd_stream_t *stream, const block_t *p_block)
 {
-    (void) stream; (void) data; (void) count;
+    (void) stream; (void) p_block;
     assert (0);
 }
 
