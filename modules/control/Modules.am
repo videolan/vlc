@@ -16,8 +16,9 @@ noinst_LTLIBRARIES = libvlc_motion.la
 
 libmotion_plugin_la_SOURCES = motion.c
 libmotion_plugin_la_LIBADD = libvlc_motion.la
+libmotion_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(controldir)'
 if HAVE_DARWIN
-libmotion_plugin_la_LDFLAGS = -Wl,-framework,IOKit,-framework,CoreFoundation
+libmotion_plugin_la_LDFLAGS += -Wl,-framework,IOKit,-framework,CoreFoundation
 endif
 
 control_LTLIBRARIES += \
