@@ -2,6 +2,7 @@ demuxdir = $(pluginsdir)/demux
 demux_LTLIBRARIES =
 
 libflacsys_plugin_la_SOURCES = demux/flac.c demux/xiph_metadata.h demux/xiph_metadata.c
+libflacsys_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMODULE_NAME_IS_flacsys
 demux_LTLIBRARIES += libflacsys_plugin.la
 
 libogg_plugin_la_SOURCES = demux/ogg.c demux/ogg.h demux/oggseek.c demux/oggseek.h \
@@ -89,6 +90,7 @@ libvc1_plugin_la_SOURCES = demux/vc1.c
 demux_LTLIBRARIES += libvc1_plugin.la
 
 libdemux_cdg_plugin_la_SOURCES = demux/cdg.c
+libdemux_cdg_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMODULE_NAME_IS_demux_cdg
 demux_LTLIBRARIES += libdemux_cdg_plugin.la
 
 libsmf_plugin_la_SOURCES = demux/smf.c
@@ -108,12 +110,14 @@ EXTRA_LTLIBRARIES += libsid_plugin.la
 demux_LTLIBRARIES += $(LTLIBsid)
 
 libdiracsys_plugin_la_SOURCES = demux/dirac.c
+libdiracsys_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMODULE_NAME_IS_diracsys
 demux_LTLIBRARIES += libdiracsys_plugin.la
 
 libimage_plugin_la_SOURCES = demux/image.c demux/mxpeg_helper.h
 demux_LTLIBRARIES += libimage_plugin.la
 
 libdemux_stl_plugin_la_SOURCES = demux/stl.c
+libdemux_stl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMODULE_NAME_IS_demux_stl
 demux_LTLIBRARIES += libdemux_stl_plugin.la
 
 libasf_plugin_la_SOURCES = demux/asf/asf.c demux/asf/libasf.c demux/asf/libasf.h demux/asf/libasf_guid.h
