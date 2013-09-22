@@ -29,7 +29,7 @@
 #include <vlc_demux.h>
 #include <vlc_plugin.h>
 #include <pulse/pulseaudio.h>
-#include "../vlcpulse.h"
+#include "audio_output/vlcpulse.h"
 
 #define HELP_TEXT N_( \
     "Pass pulse:// to open the default PulseAudio source, " \

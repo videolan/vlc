@@ -43,15 +43,6 @@ endif
 dist_noinst_SCRIPTS = genmf list.sh module.rc.in
 dist_noinst_DATA = MODULES_LIST
 
-libvlc_pulse_la_SOURCES = vlcpulse.c vlcpulse.h
-libvlc_pulse_la_CPPFLAGS = -DMODULE_STRING=\"pulse\"
-libvlc_pulse_la_CFLAGS = $(AM_CFLAGS) $(PULSE_CFLAGS)
-libvlc_pulse_la_LDFLAGS = -static
-libvlc_pulse_la_LIBADD = $(PULSE_LIBS)
-if HAVE_PULSE
-noinst_LTLIBRARIES += libvlc_pulse.la
-endif
-
 include common.am
 include access/Makefile.am
 include audio_output/Makefile.am

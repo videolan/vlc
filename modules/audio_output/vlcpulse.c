@@ -27,7 +27,7 @@
 #include <vlc_common.h>
 #include <pulse/pulseaudio.h>
 
-#include "vlcpulse.h"
+#include "audio_output/vlcpulse.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <locale.h>
