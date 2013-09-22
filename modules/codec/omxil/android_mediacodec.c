@@ -398,6 +398,11 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, int loo
         int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_output_buffer,
                                           p_sys->buffer_info, (jlong) 0);
         if (index >= 0) {
+            if (!p_sys->pixel_format) {
+                msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
+                (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, index, false);
+                continue;
+            }
             jobject buf = (*env)->GetObjectArrayElement(env, p_sys->output_buffers, index);
             jsize buf_size = (*env)->GetDirectBufferCapacity(env, buf);
             uint8_t *ptr = (*env)->GetDirectBufferAddress(env, buf);
