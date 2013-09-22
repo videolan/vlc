@@ -1,5 +1,10 @@
 SOURCES_goom = goom.c
-SOURCES_projectm = projectm.cpp
+
+libprojectm_plugin_la_SOURCES = projectm.cpp
+libprojectm_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(PROJECTM_CFLAGS)
+libprojectm_plugin_la_LIBADD = $(PROJECTM_LIBS)
+EXTRA_LTLIBRARIES += libprojectm_plugin.la
+visualization_LTLIBRARIES += $(LTLIBprojectm)
 
 libvisual_plugin_la_SOURCES = \
 	visual/visual.c visual/visual.h \
