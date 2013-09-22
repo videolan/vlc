@@ -3556,18 +3556,6 @@ AS_IF([test "$enable_wasapi" != "no"], [
 AM_CONDITIONAL([HAVE_WASAPI], [test "${have_wasapi}" = "yes"])
 
 dnl
-dnl  win32 waveOut plugin
-dnl
-AC_ARG_ENABLE(waveout,
-  [  --enable-waveout        Win32 waveOut module (default enabled on Win32)])
-if test "${enable_waveout}" != "no"; then
-  if test "${SYS}" = "mingw32"; then
-    VLC_ADD_PLUGIN([waveout])
-    VLC_ADD_LIBS([waveout],[-lwinmm])
-  fi
-fi
-
-dnl
 dnl  CoreAudio plugin
 dnl
 AC_ARG_ENABLE(macosx-audio,
@@ -3577,7 +3565,6 @@ if test "x${enable_macosx_audio}" != "xno" &&
 then
   AC_CHECK_HEADER([CoreAudio/CoreAudio.h],
     [ VLC_ADD_PLUGIN([auhal])
-      VLC_ADD_LIBS([auhal],[-Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,CoreServices])
     ], [ AC_MSG_ERROR([cannot find CoreAudio headers]) ])
 fi
 
@@ -3590,7 +3577,6 @@ if test "${enable_ios_audio}" = "yes"
 then
   AC_CHECK_HEADER([AudioUnit/AudioUnit.h],
     [ VLC_ADD_PLUGIN([audiounit_ios])
-      VLC_ADD_LIBS([audiounit_ios],[-Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,CoreServices])
     ], [ AC_MSG_ERROR([cannot find AudioUnit headers]) ])
 fi
 
@@ -3602,7 +3588,6 @@ AC_ARG_ENABLE(audioqueue,
 if test "${enable_audioqueue}" = "yes"
 then
   VLC_ADD_PLUGIN([audioqueue])
-  VLC_ADD_LIBS([audioqueue], [-Wl,-framework,AudioToolbox,-framework,CoreFoundation])
 fi
 
 dnl

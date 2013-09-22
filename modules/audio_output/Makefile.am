@@ -1,10 +1,8 @@
 aoutdir = $(pluginsdir)/audio_output
 aout_LTLIBRARIES =
+EXTRA_LTLIBRARIES =
 
-SOURCES_waveout = waveout.c windows_audio_common.h
-SOURCES_auhal = TPCircularBuffer.h TPCircularBuffer.c auhal.c
-SOURCES_audiounit_ios = TPCircularBuffer.h TPCircularBuffer.c audiounit_ios.c
-SOURCES_audioqueue = audioqueue.c
+include ../common.am
 
 libopensles_android_plugin_la_SOURCES = opensles_android.c
 libopensles_android_plugin_la_LIBADD = $(LIBDL) $(LIBM)
@@ -79,3 +77,18 @@ libsndio_plugin_la_LIBADD = -lsndio
 if HAVE_SNDIO
 aout_LTLIBRARIES += libsndio_plugin.la
 endif
+
+libwaveout_plugin_la_SOURCES = waveout.c windows_audio_common.h
+libwaveout_plugin_la_LIBADD = -lwinmm
+if HAVE_WIN32
+aout_LTLIBRARIES += libwaveout_plugin.la
+endif
+
+libauhal_plugin_la_SOURCES = TPCircularBuffer.h TPCircularBuffer.c auhal.c
+libauhal_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,CoreServices -rpath '$(aoutdir)'
+libaudiounit_ios_plugin_la_SOURCES = TPCircularBuffer.h TPCircularBuffer.c audiounit_ios.c
+libaudiounit_ios_plugin_la_LDFLAGS = $(libauhal_plugin_la_LDFLAGS)
+libaudioqueue_plugin_la_SOURCES = audioqueue.c
+libaudioqueue_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,CoreServices -rpath '$(aoutdir)'
+EXTRA_LTLIBRARIES += libauhal_plugin.la libaudiounit_ios_plugin.la libaudioqueue_plugin.la
+aout_LTLIBRARIES += $(LTLIBauhal) $(LTLIBaudiounit_ios) $(LTLIBaudioqueue)
