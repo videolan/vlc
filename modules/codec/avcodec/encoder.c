@@ -758,10 +758,25 @@ int OpenEncoder( vlc_object_t *p_this )
         if( p_enc->fmt_in.i_cat != AUDIO_ES ||
                 (p_context->channels <= 2 && i_codec_id != AV_CODEC_ID_MP2
                  && i_codec_id != AV_CODEC_ID_MP3) )
+errmsg:
         {
-            msg_Err( p_enc, "cannot open encoder" );
+            static const char types[][12] = {
+                [UNKNOWN_ES] = N_("unknown"), [VIDEO_ES] = N_("video"),
+                [AUDIO_ES] = N_("audio"), [SPU_ES] = N_("subpicture"),
+            };
+            const char *type = types[0];
+            union
+            {
+                vlc_fourcc_t value;
+                char txt[4];
+            } fcc = { .value = p_enc->fmt_out.i_codec };
+
+            if (likely((unsigned)p_enc->fmt_in.i_cat < sizeof (types) / sizeof (types[0])))
+                type = types[p_enc->fmt_in.i_cat];
+            msg_Err( p_enc, "cannot open %4.4s %s encoder", fcc.txt, type );
             dialog_Fatal( p_enc, _("Streaming / Transcoding failed"),
-                    "%s", _("VLC could not open the encoder.") );
+                          _("VLC could not open the %4.4s %s encoder."),
+                          fcc.txt, vlc_gettext(type) );
             av_dict_free(&options);
             goto error;
         }
@@ -810,14 +825,7 @@ int OpenEncoder( vlc_object_t *p_this )
         ret = avcodec_open2( p_context, p_codec, options ? &options : NULL );
         vlc_avcodec_unlock();
         if( ret )
-        {
-            msg_Err( p_enc, "cannot open encoder" );
-            dialog_Fatal( p_enc,
-                    _("Streaming / Transcoding failed"),
-                    "%s", _("VLC could not open the encoder.") );
-            av_dict_free(&options);
-            goto error;
-        }
+            goto errmsg;
     }
 
     av_dict_free(&options);
