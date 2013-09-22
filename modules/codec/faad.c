@@ -179,7 +179,9 @@ static int Open( vlc_object_t *p_this )
     {
         /* Will be initalised from first frame */
         p_dec->fmt_out.audio.i_rate = 0;
-        p_dec->fmt_out.audio.i_channels = 0;
+        /*FIXME: Try to guess channel count, so transcode module doesn't burb and do funny stuff
+            Revert back to 0 when transcode module/audio encoders can reinit stuff after Open()*/
+        p_dec->fmt_out.audio.i_channels = p_dec->fmt_in.audio.i_channels;
     }
 
     /* Set the faad config */
