@@ -605,9 +605,8 @@ int OpenEncoder( vlc_object_t *p_this )
     else if( p_enc->fmt_in.i_cat == AUDIO_ES )
     {
         /* work around bug in libmp3lame encoding */
-        if( i_codec_id == AV_CODEC_ID_MP3 && p_enc->fmt_in.audio.i_channels > 2 )
-            p_enc->fmt_in.audio.i_channels = 2;
-
+        if( i_codec_id == AV_CODEC_ID_MP3 && p_enc->fmt_out.audio.i_channels  > 2 )
+            p_enc->fmt_out.audio.i_channels = 2;
         p_context->codec_type  = AVMEDIA_TYPE_AUDIO;
         p_context->sample_fmt  = p_codec->sample_fmts ?
                                     p_codec->sample_fmts[0] :
@@ -653,7 +652,7 @@ int OpenEncoder( vlc_object_t *p_this )
         date_Set( &p_sys->buffer_date, 0 );
         p_context->time_base.num = 1;
         p_context->time_base.den = p_context->sample_rate;
-        p_context->channels    = p_enc->fmt_out.audio.i_channels;
+        p_context->channels      = p_enc->fmt_out.audio.i_channels;
 #if LIBAVUTIL_VERSION_CHECK( 52, 2, 6, 0, 0)
         p_context->channel_layout = av_get_default_channel_layout( p_context->channels );
 #endif
@@ -878,7 +877,8 @@ errmsg:
         p_sys->i_frame_size = p_context->frame_size > 1 ?
                                     p_context->frame_size :
                                     FF_MIN_BUFFER_SIZE;
-        p_sys->p_buffer = malloc( p_sys->i_frame_size * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels);
+        p_sys->i_buffer_out = p_sys->i_frame_size * p_sys->i_sample_bytes * p_sys->p_context->channels;
+        p_sys->p_buffer = malloc( p_sys->i_buffer_out );
         if ( unlikely( p_sys->p_buffer == NULL ) )
         {
             goto error;
@@ -888,7 +888,6 @@ errmsg:
         //b_variable tells if we can feed any size frames to encoder
         p_sys->b_variable = p_context->frame_size ? false : true;
 
-        p_sys->i_buffer_out = p_sys->i_frame_size * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels;
 
         if( p_sys->b_planar )
         {
@@ -1127,9 +1126,10 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     int got_packet,i_out;
     size_t buffer_delay = 0, i_samples_left = 0;
 
+
     //i_bytes_left is amount of bytes we get
     i_samples_left = p_aout_buf ? p_aout_buf->i_nb_samples : 0;
-    buffer_delay = p_sys->i_samples_delay * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels;
+    buffer_delay = p_sys->i_samples_delay * p_sys->i_sample_bytes * p_sys->p_context->channels;
 
     //p_sys->i_buffer_out = p_sys->i_frame_size * chan * p_sys->i_sample_bytes
     //Calculate how many bytes we would need from current buffer to fill frame
@@ -1146,7 +1146,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
          )
     {
         //How much we need to copy from new packet
-        const int leftover = leftover_samples * p_enc->fmt_in.audio.i_channels * p_sys->i_sample_bytes;
+        const int leftover = leftover_samples * p_sys->p_context->channels * p_sys->i_sample_bytes;
 
 #if LIBAVUTIL_VERSION_CHECK( 51,27,2,46,100 )
         const int align = 0;
@@ -1169,7 +1169,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             // We need to deinterleave from p_aout_buf to p_buffer the leftover bytes
             if( p_sys->b_planar )
                 aout_Deinterleave( p_sys->p_interleave_buf, p_sys->p_buffer,
-                    p_sys->i_frame_size, p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.i_codec );
+                    p_sys->i_frame_size, p_sys->p_context->channels, p_enc->fmt_in.i_codec );
             else
                 memcpy( p_sys->p_buffer + buffer_delay, p_aout_buf->p_buffer, leftover);
 
@@ -1186,7 +1186,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             memset( p_sys->p_buffer + (leftover+buffer_delay), 0, padding_size );
             buffer_delay += padding_size;
         }
-        if( avcodec_fill_audio_frame( p_sys->frame, p_enc->fmt_in.audio.i_channels,
+        if( avcodec_fill_audio_frame( p_sys->frame, p_sys->p_context->channels,
                 p_sys->p_context->sample_fmt, p_sys->b_planar ? p_sys->p_interleave_buf : p_sys->p_buffer,
                 leftover + buffer_delay,
                 align) < 0 )
@@ -1277,11 +1277,11 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         if( p_sys->b_planar )
         {
             aout_Deinterleave( p_sys->p_buffer, p_aout_buf->p_buffer,
-                               p_sys->frame->nb_samples, p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.i_codec );
+                               p_sys->frame->nb_samples, p_sys->p_context->channels, p_enc->fmt_in.i_codec );
 
         }
 
-        if( avcodec_fill_audio_frame( p_sys->frame, p_enc->fmt_in.audio.i_channels,
+        if( avcodec_fill_audio_frame( p_sys->frame, p_sys->p_context->channels,
                                     p_sys->p_context->sample_fmt,
                                     p_sys->b_planar ? p_sys->p_buffer : p_aout_buf->p_buffer,
                                     __MIN(p_sys->i_buffer_out, p_aout_buf->i_buffer),
@@ -1291,8 +1291,8 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
                  p_sys->frame->nb_samples = 0;
         }
 
-        p_aout_buf->p_buffer     += (p_sys->frame->nb_samples * p_enc->fmt_in.audio.i_channels * p_sys->i_sample_bytes);
-        p_aout_buf->i_buffer     -= (p_sys->frame->nb_samples * p_enc->fmt_in.audio.i_channels * p_sys->i_sample_bytes);
+        p_aout_buf->p_buffer     += (p_sys->frame->nb_samples * p_sys->p_context->channels * p_sys->i_sample_bytes);
+        p_aout_buf->i_buffer     -= (p_sys->frame->nb_samples * p_sys->p_context->channels * p_sys->i_sample_bytes);
         p_aout_buf->i_nb_samples -= p_sys->frame->nb_samples;
         date_Increment( &p_sys->buffer_date, p_sys->frame->nb_samples );
 
@@ -1332,7 +1332,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     if( p_aout_buf->i_nb_samples > 0 )
     {
        memcpy( p_sys->p_buffer + buffer_delay, p_aout_buf->p_buffer,
-               p_aout_buf->i_nb_samples * p_sys->i_sample_bytes * p_enc->fmt_in.audio.i_channels);
+               p_aout_buf->i_nb_samples * p_sys->i_sample_bytes * p_sys->p_context->channels);
        p_sys->i_samples_delay += p_aout_buf->i_nb_samples;
     }
 
