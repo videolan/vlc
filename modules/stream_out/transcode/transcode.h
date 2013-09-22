@@ -25,6 +25,7 @@ struct sout_stream_sys_t
 
     /* Audio */
     vlc_fourcc_t    i_acodec;   /* codec audio (0 if not transcode) */
+    audio_sample_format_t   fmt_audio;
     char            *psz_aenc;
     char            *psz_alang;
     config_chain_t  *p_audio_cfg;
