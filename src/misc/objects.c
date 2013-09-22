@@ -543,7 +543,7 @@ bool vlc_object_alive(vlc_object_t *obj)
 
 #undef vlc_list_children
 /**
- * Gets the list of children of an objects, and increment their reference
+ * Gets the list of children of an object, and increment their reference
  * count.
  * @return a list (possibly empty) or NULL in case of error.
  */
