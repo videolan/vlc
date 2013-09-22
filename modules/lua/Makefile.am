@@ -1,0 +1,41 @@
+include ../common.am
+
+luadir = $(pluginsdir)/lua
+
+liblua_plugin_la_SOURCES = \
+	extension.c extension.h \
+	extension_thread.c \
+	intf.c \
+	meta.c \
+	demux.c \
+	services_discovery.c \
+	vlc.c vlc.h \
+	libs.h \
+	libs/configuration.c \
+	libs/equalizer.c \
+	libs/gettext.c \
+	libs/dialog.c \
+	libs/httpd.c \
+	libs/input.c libs/input.h \
+	libs/messages.c \
+	libs/misc.c libs/misc.h \
+	libs/net.c \
+	libs/objects.c libs/objects.h \
+	libs/osd.c \
+	libs/playlist.c libs/playlist.h \
+	libs/sd.c \
+	libs/stream.c \
+	libs/strings.c \
+	libs/variables.c libs/variables.h \
+	libs/video.c \
+	libs/vlm.c \
+	libs/volume.c \
+	libs/xml.c
+if HAVE_WIN32
+liblua_plugin_la_SOURCES += libs/win.c
+endif
+liblua_plugin_la_CFLAGS = $(AM_CFLAGS) $(LUA_CFLAGS)
+liblua_plugin_la_LIBADD = $(LUA_LIBS) $(SOCKET_LIBS) $(LIBDL) $(LIBM)
+#if BUILD_LUA
+lua_LTLIBRARIES = liblua_plugin.la
+#endif
