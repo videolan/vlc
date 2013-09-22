@@ -906,7 +906,7 @@ static int dvbt2_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
     uint32_t fec = var_InheritCodeRate (obj, "dvb-fec");
     uint32_t guard = var_InheritGuardInterval (obj);
     uint32_t bw = var_InheritInteger (obj, "dvb-bandwidth");
-    uint32_t plp = var_InheritInteger (obj, "dvd-plp-id");
+    uint32_t plp = var_InheritInteger (obj, "dvb-plp-id");
     int tx = var_InheritInteger (obj, "dvb-transmission");
 
     return dvb_set_dvbt2 (dev, freq, mod, fec, bw, tx, guard, plp);
