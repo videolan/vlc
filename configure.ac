@@ -602,7 +602,7 @@ AC_CHECK_FUNCS([if_nameindex if_nametoindex])
 VLC_RESTORE_FLAGS
 
 AS_IF([test -n "$SOCKET_LIBS"], [
-  VLC_ADD_LIBS([access_rtmp access_output_shout sap stream_out_standard stream_out_rtp stream_out_raop vod_rtsp rtp oldrc netsync gnutls ts audioscrobbler remoteosd audiobargraph_a],[${SOCKET_LIBS}])
+  VLC_ADD_LIBS([access_rtmp access_output_shout sap stream_out_standard stream_out_rtp stream_out_raop vod_rtsp rtp oldrc netsync gnutls ts remoteosd audiobargraph_a],[${SOCKET_LIBS}])
 ])
 AC_SUBST(SOCKET_LIBS)
 
@@ -3656,10 +3656,9 @@ dnl  chromaprint audio track fingerprinter
 dnl
 m4_pushdef([libchromaprint_version], 0.6.0)
 PKG_WITH_MODULES([CHROMAPRINT],[libchromaprint >= libchromaprint_version],
-    VLC_ADD_PLUGIN([stream_out_chromaprint fingerprinter])
+    VLC_ADD_PLUGIN([stream_out_chromaprint])
     VLC_ADD_CFLAGS([stream_out_chromaprint],[${CHROMAPRINT_CFLAGS}] [-I./webservices -I../stream_out])
     VLC_ADD_LIBS([stream_out_chromaprint],[${CHROMAPRINT_LIBS}])
-    VLC_ADD_LIBS([fingerprinter],[-lm]),
     AS_IF([test "${enable_chromaprint}" = "yes"],
         [AC_MSG_ERROR(Library [libchromaprint >= libchromaprint_version] needed for [chromaprint] was not found)],
         [AC_MSG_WARN(Library [libchromaprint >= libchromaprint_version] needed for [chromaprint] was not found)]

@@ -1,12 +1,10 @@
 SOURCES_vod_rtsp = rtsp.c
-SOURCES_audioscrobbler = audioscrobbler.c
-SOURCES_fingerprinter = fingerprinter.c \
-	webservices/acoustid.c \
-	webservices/acoustid.h \
-	webservices/json.c \
-	webservices/json.h
 
 SOURCES_xml = xml/libxml.c
+
+libaudioscrobbler_plugin_la_SOURCES = audioscrobbler.c
+libaudioscrobbler_plugin_la_LIBADD = $(SOCKET_LIBS)
+misc_LTLIBRARIES += libaudioscrobbler_plugin.la
 
 libexport_plugin_la_SOURCES = \
 	playlist/html.c \
@@ -14,6 +12,12 @@ libexport_plugin_la_SOURCES = \
 	playlist/xspf.c \
 	playlist/export.c
 misc_LTLIBRARIES += libexport_plugin.la
+
+libfingerprinter_plugin_la_SOURCES = fingerprinter.c \
+	webservices/acoustid.c webservices/acoustid.h \
+	webservices/json.c webservices/json.h
+libfingerprinter_plugin_la_LIBADD = $(LIBM)
+misc_LTLIBRARIES += libfingerprinter_plugin.la
 
 libgnutls_plugin_la_SOURCES = gnutls.c dhparams.h
 libgnutls_plugin_la_CFLAGS = $(AM_CFLAGS) $(GNUTLS_CFLAGS)
@@ -45,7 +49,6 @@ endif
 libstats_plugin_la_SOURCES = stats.c
 
 misc_LTLIBRARIES += \
-	libaudioscrobbler_plugin.la \
 	liblogger_plugin.la \
 	libstats_plugin.la
 
