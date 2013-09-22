@@ -356,8 +356,13 @@ static int VolumeSet( audio_output_t *p_aout, float volume )
     aout_sys_t *sys = p_aout->sys;
     int ret = 0;
 
-    /* millibels from linear amplification map 200% on DSBVOLUME_MAX */
-    LONG mb = lroundf( 6000.f * log10f( volume / 2.f ));
+    /* Directsound doesn't support amplification, so we use software
+       gain if we need it and only for this */
+    float gain = volume > 1.f ? volume * volume * volume : 1.f;
+    aout_GainRequest( p_aout, gain );
+
+    /* millibels from linear amplification */
+    LONG mb = lroundf( 6000.f * log10f( __MIN( volume, 1.f ) ));
 
     /* Clamp to allowed DirectSound range */
     static_assert( DSBVOLUME_MIN < DSBVOLUME_MAX, "DSBVOLUME_* confused" );
@@ -527,7 +532,6 @@ static int CreateDSBuffer( audio_output_t *p_aout, int i_format,
             waveformat.Format.wBitsPerSample;
         waveformat.Format.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
         waveformat.SubFormat = _KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
-        aout_GainRequest(p_aout, 8.f);
         break;
 
     case VLC_CODEC_S16N:
@@ -536,7 +540,6 @@ static int CreateDSBuffer( audio_output_t *p_aout, int i_format,
             waveformat.Format.wBitsPerSample;
         waveformat.Format.wFormatTag = WAVE_FORMAT_PCM;
         waveformat.SubFormat = _KSDATAFORMAT_SUBTYPE_PCM;
-        aout_GainRequest(p_aout, 8.f);
         break;
     }
 
