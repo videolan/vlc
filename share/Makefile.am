@@ -148,7 +148,6 @@ nobase_vlclib_DATA = \
 	lua/playlist/youtube.luac \
 	lua/playlist/youtube_homepage.luac \
 	lua/playlist/zapiks.luac \
-	lua/sd/assembleenationale.luac \
 	lua/sd/fmc.luac \
 	lua/sd/icecast.luac \
 	lua/sd/jamendo.luac \
@@ -240,7 +239,6 @@ EXTRA_DIST += \
 	lua/playlist/youtube_homepage.lua \
 	lua/playlist/zapiks.lua \
 	lua/sd/README.txt \
-	lua/sd/assembleenationale.lua \
 	lua/sd/fmc.lua \
 	lua/sd/icecast.lua \
 	lua/sd/jamendo.lua \
