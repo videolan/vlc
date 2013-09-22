@@ -75,7 +75,7 @@ static int  TimeGet      ( audio_output_t *, mtime_t * );
 static int  Process      ( jack_nframes_t i_frames, void *p_arg );
 static int  GraphChange  ( void *p_arg );
 
-#include "volume.h"
+#include "audio_output/volume.h"
 
 #define AUTO_CONNECT_OPTION "jack-auto-connect"
 #define AUTO_CONNECT_TEXT N_("Automatically connect to writable clients")

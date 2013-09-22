@@ -5,7 +5,6 @@ BASE_SUBDIRS = \
 	access/rtp \
 	audio_filter \
 	audio_mixer \
-	audio_output \
 	control \
 	gui \
 	misc \
@@ -56,6 +55,7 @@ endif
 
 include common.am
 include access/Makefile.am
+include audio_output/Makefile.am
 include codec/Makefile.am
 include demux/Makefile.am
 include meta_engine/Makefile.am

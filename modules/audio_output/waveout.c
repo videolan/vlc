@@ -38,7 +38,7 @@
 #include <vlc_aout.h>
 #include <vlc_charset.h>              /* FromWide() */
 
-#include "windows_audio_common.h"
+#include "audio_output/windows_audio_common.h"
 
 #define FRAME_SIZE 4096              /* The size is in samples, not in bytes */
 

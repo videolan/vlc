@@ -122,7 +122,7 @@ struct aout_sys_t {
 };
 
 /* Soft volume helper */
-#include "volume.h"
+#include "audio_output/volume.h"
 
 static void *InitLibrary(struct aout_sys_t *p_sys);
 

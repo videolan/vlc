@@ -6,7 +6,7 @@
 //  Copyright 2011-2012 A Tasty Pixel. All rights reserved.
 
 
-#include "TPCircularBuffer.h"
+#include "audio_output/TPCircularBuffer.h"
 #include <mach/mach.h>
 #include <stdio.h>
 

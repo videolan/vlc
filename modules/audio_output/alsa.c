@@ -53,7 +53,7 @@ struct aout_sys_t
     char *device;
 };
 
-#include "volume.h"
+#include "audio_output/volume.h"
 
 #define A52_FRAME_NB 1536
 

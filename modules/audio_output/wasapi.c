@@ -32,7 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
-#include "mmdevice.h"
+#include "audio_output/mmdevice.h"
 
 static LARGE_INTEGER freq; /* performance counters frequency */
 

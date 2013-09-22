@@ -84,7 +84,7 @@ static void DestroyBuffer( audio_output_t * );
 static int  ReadBuffer   ( audio_output_t *, uint8_t *, int );
 static int  WriteBuffer  ( audio_output_t *, uint8_t *, int );
 
-#include "volume.h"
+#include "audio_output/volume.h"
 
 /*****************************************************************************
  * Module descriptor
