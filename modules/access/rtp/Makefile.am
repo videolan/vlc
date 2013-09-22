@@ -10,14 +10,14 @@ librtp_plugin_la_SOURCES = \
 	session.c \
 	xiph.c
 librtp_plugin_la_CFLAGS = $(AM_CFLAGS)
-librtp_plugin_la_LIBADD = $(SOCKET_LIBS)
+librtp_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBPTHREAD)
 
 # Secure RTP library
 libvlc_srtp_la_SOURCES = srtp.c
 libvlc_srtp_la_CPPFLAGS =
 libvlc_srtp_la_CFLAGS = $(GCRYPT_CFLAGS)
 libvlc_srtp_la_LDFLAGS = -static
-libvlc_srtp_la_LIBADD = $(GCRYPT_LIBS)
+libvlc_srtp_la_LIBADD = $(GCRYPT_LIBS) $(LIBPTHREAD)
 srtp_test_recv_CPPFLAGS =
 srtp_test_recv_LDADD = libvlc_srtp.la
 srtp_test_aes_CPPFLAGS =

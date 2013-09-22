@@ -4,6 +4,7 @@ stream_filterdir = $(pluginsdir)/stream_filter
 stream_filter_LTLIBRARIES =
 
 libdecomp_plugin_la_SOURCES = decomp.c
+libdecomp_plugin_la_LIBADD = $(LIBPTHREAD)
 if !HAVE_WIN32
 stream_filter_LTLIBRARIES += libdecomp_plugin.la
 endif

@@ -43,7 +43,7 @@ endif
 
 libremoteosd_plugin_la_SOURCES = remoteosd.c remoteosd_rfbproto.h
 libremoteosd_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
-libremoteosd_plugin_la_LIBADD = $(GCRYPT_LIBS) $(LIBS_remoteosd)
+libremoteosd_plugin_la_LIBADD = $(GCRYPT_LIBS) $(LIBS_remoteosd) $(LIBPTHREAD)
 if HAVE_GCRYPT
 video_filter_LTLIBRARIES += libremoteosd_plugin.la
 endif

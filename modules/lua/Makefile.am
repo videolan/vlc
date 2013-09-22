@@ -35,7 +35,7 @@ if HAVE_WIN32
 liblua_plugin_la_SOURCES += libs/win.c
 endif
 liblua_plugin_la_CFLAGS = $(AM_CFLAGS) $(LUA_CFLAGS)
-liblua_plugin_la_LIBADD = $(LUA_LIBS) $(SOCKET_LIBS) $(LIBDL) $(LIBM)
+liblua_plugin_la_LIBADD = $(LUA_LIBS) $(SOCKET_LIBS) $(LIBDL) $(LIBM) $(LIBPTHREAD)
 #if BUILD_LUA
 lua_LTLIBRARIES = liblua_plugin.la
 #endif
