@@ -3658,7 +3658,7 @@ m4_pushdef([libchromaprint_version], 0.6.0)
 PKG_WITH_MODULES([CHROMAPRINT],[libchromaprint >= libchromaprint_version],
     VLC_ADD_PLUGIN([stream_out_chromaprint])
     VLC_ADD_CFLAGS([stream_out_chromaprint],[${CHROMAPRINT_CFLAGS}] [-I./webservices -I../stream_out])
-    VLC_ADD_LIBS([stream_out_chromaprint],[${CHROMAPRINT_LIBS}])
+    VLC_ADD_LIBS([stream_out_chromaprint],[${CHROMAPRINT_LIBS}]),
     AS_IF([test "${enable_chromaprint}" = "yes"],
         [AC_MSG_ERROR(Library [libchromaprint >= libchromaprint_version] needed for [chromaprint] was not found)],
         [AC_MSG_WARN(Library [libchromaprint >= libchromaprint_version] needed for [chromaprint] was not found)]
