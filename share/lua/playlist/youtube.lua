@@ -128,6 +128,12 @@ function js_descramble( sig, js_url )
         -- characters:
         -- function jj(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c;return a}
         local idx = string.match( rule, "=..%([^,]+,(%d+)%)" )
+        -- This swapping function may also appear inlined:
+        -- var b=a[0];a[0]=a[59%a.length];a[59]=b;
+        -- In that case we only catch one of the three rules.
+        if not idx then
+            idx = string.match( rule, ".%[(%d+)%]=." )
+        end
         if idx then
             idx = tonumber( idx )
             if not idx then idx = 0 end
