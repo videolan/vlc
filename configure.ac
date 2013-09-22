@@ -4209,7 +4209,6 @@ AC_CONFIG_FILES([
   modules/mux/Makefile
   modules/notify/Makefile
   modules/packetizer/Makefile
-  modules/services_discovery/Makefile
   modules/stream_filter/Makefile
   modules/stream_out/Makefile
   modules/text_renderer/Makefile

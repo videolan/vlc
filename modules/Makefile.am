@@ -10,7 +10,6 @@ BASE_SUBDIRS = \
 	misc \
 	notify \
 	packetizer \
-	services_discovery \
 	stream_filter \
 	text_renderer \
 	video_chroma \
@@ -59,6 +58,7 @@ include audio_output/Makefile.am
 include codec/Makefile.am
 include demux/Makefile.am
 include meta_engine/Makefile.am
+include services_discovery/Makefile.am
 
 BUILT_SOURCES += dummy.cpp
 

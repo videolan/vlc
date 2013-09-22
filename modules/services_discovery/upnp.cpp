@@ -32,7 +32,7 @@
 # include "config.h"
 #endif
 
-#include "upnp.hpp"
+#include "services_discovery/upnp.hpp"
 
 #include <vlc_plugin.h>
 #include <vlc_services_discovery.h>
