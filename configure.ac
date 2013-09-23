@@ -2643,7 +2643,7 @@ AM_CONDITIONAL([HAVE_SPEEXDSP], [test "$have_speexdsp" = "yes"])
 dnl
 dnl  Opus plugin
 dnl
-PKG_ENABLE_MODULES_VLC([OPUS], [], [ogg opus], [Opus support], [auto])
+PKG_ENABLE_MODULES_VLC([OPUS], [], [ogg opus >= 1.0.3], [Opus support], [auto])
 
 dnl
 dnl  theora decoder plugin

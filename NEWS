@@ -11,6 +11,7 @@ Decoders:
 Encoder:
  * Support for MPEG-2 encoding using x262
  * Support for HEVC/H.265 encoding using x265
+ * Support for Opus encoding using libopus
 
 Streaming:
  * WebM streaming, including live sources, compatible with all major browsers

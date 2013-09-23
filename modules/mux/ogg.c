@@ -361,6 +361,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     case AUDIO_ES:
         switch( p_stream->i_fourcc )
         {
+        case VLC_CODEC_OPUS:
+            msg_Dbg( p_mux, "opus stream" );
+            break;
+
         case VLC_CODEC_VORBIS:
             msg_Dbg( p_mux, "vorbis stream" );
             break;
@@ -626,6 +630,7 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
 
             if( p_stream->i_fourcc == VLC_CODEC_VORBIS ||
                 p_stream->i_fourcc == VLC_CODEC_SPEEX ||
+                p_stream->i_fourcc == VLC_CODEC_OPUS ||
                 p_stream->i_fourcc == VLC_CODEC_THEORA )
             {
                 /* First packet in order: vorbis/speex/theora info */
@@ -713,6 +718,7 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
 
         if( p_stream->i_fourcc == VLC_CODEC_VORBIS ||
             p_stream->i_fourcc == VLC_CODEC_SPEEX ||
+            p_stream->i_fourcc == VLC_CODEC_OPUS ||
             p_stream->i_fourcc == VLC_CODEC_THEORA )
         {
             unsigned pi_size[XIPH_MAX_HEADER_COUNT];
@@ -977,6 +983,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     if( p_stream->i_fourcc != VLC_CODEC_VORBIS &&
         p_stream->i_fourcc != VLC_CODEC_FLAC &&
         p_stream->i_fourcc != VLC_CODEC_SPEEX &&
+        p_stream->i_fourcc != VLC_CODEC_OPUS &&
         p_stream->i_fourcc != VLC_CODEC_THEORA &&
         p_stream->i_fourcc != VLC_CODEC_DIRAC )
     {
@@ -995,6 +1002,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     {
         if( p_stream->i_fourcc == VLC_CODEC_VORBIS ||
             p_stream->i_fourcc == VLC_CODEC_FLAC ||
+            p_stream->i_fourcc == VLC_CODEC_OPUS ||
             p_stream->i_fourcc == VLC_CODEC_SPEEX )
         {
             /* number of sample from begining + current packet */

@@ -54,6 +54,10 @@
  *****************************************************************************/
 static int  OpenDecoder   ( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
+#ifdef ENABLE_SOUT
+static int  OpenEncoder   ( vlc_object_t * );
+static void CloseEncoder  ( vlc_object_t * );
+#endif
 
 vlc_module_begin ()
     set_category( CAT_INPUT )
@@ -63,6 +67,14 @@ vlc_module_begin ()
     set_capability( "decoder", 100 )
     set_shortname( N_("Opus") )
     set_callbacks( OpenDecoder, CloseDecoder )
+
+#ifdef ENABLE_SOUT
+    add_submodule ()
+    set_description( N_("Opus audio encoder") )
+    set_capability( "encoder", 150 )
+    set_shortname( N_("Opus") )
+    set_callbacks( OpenEncoder, CloseEncoder )
+#endif
 
 vlc_module_end ()
 
@@ -433,3 +445,238 @@ static void CloseDecoder( vlc_object_t *p_this )
 
     free( p_sys );
 }
+
+#ifdef ENABLE_SOUT
+
+/* only ever encode 20 ms at a time, going longer doesn't yield much compression
+   gain, shorter does have a compression loss, and doesn't matter so much in
+   Ogg, unless you really need low latency, which would also require muxing one
+   packet per page. */
+static const unsigned OPUS_FRAME_SIZE = 960; /* 48000 * 20 / 1000 */
+
+struct encoder_sys_t
+{
+    OpusMSEncoder *enc;
+    float *buffer;
+    unsigned i_nb_samples;
+    int i_samples_delay;
+    block_t *padding;
+    int nb_streams;
+};
+
+static unsigned fill_buffer(encoder_t *enc, unsigned src_start, block_t *src,
+                            unsigned samples)
+{
+    encoder_sys_t *p_sys = enc->p_sys;
+    const unsigned channels = enc->fmt_out.audio.i_channels;
+    const float *src_buf = ((const float *) src->p_buffer) + src_start;
+    float *dest_buf = p_sys->buffer + (p_sys->i_nb_samples * channels);
+    const unsigned len = samples * channels;
+
+    memcpy(dest_buf, src_buf, len * sizeof(float));
+
+    p_sys->i_nb_samples += samples;
+    src_start += len;
+
+    src->i_nb_samples -= samples;
+    return src_start;
+}
+
+static block_t *Encode(encoder_t *enc, block_t *buf)
+{
+    encoder_sys_t *sys = enc->p_sys;
+
+    if (!buf)
+        return NULL;
+
+    mtime_t i_pts = buf->i_pts -
+                (mtime_t) CLOCK_FREQ * (mtime_t) sys->i_samples_delay /
+                (mtime_t) enc->fmt_in.audio.i_rate;
+
+    sys->i_samples_delay += buf->i_nb_samples;
+
+    block_t *result = NULL;
+    unsigned src_start = 0;
+    unsigned padding_start = 0;
+    /* The maximum Opus frame size is 1275 bytes + TOC sequence length. */
+    const unsigned OPUS_MAX_ENCODED_BYTES = ((1275 + 3) * sys->nb_streams) - 2;
+
+    while (sys->i_nb_samples + buf->i_nb_samples >= OPUS_FRAME_SIZE)
+    {
+        block_t *out_block = block_Alloc(OPUS_MAX_ENCODED_BYTES);
+
+        /* add padding to beginning */
+        if (sys->padding)
+        {
+            const size_t leftover_space = OPUS_FRAME_SIZE - sys->i_nb_samples;
+            padding_start = fill_buffer(enc, padding_start, sys->padding,
+                    __MIN(sys->padding->i_nb_samples, leftover_space));
+            if (sys->padding->i_nb_samples <= 0)
+            {
+                block_Release(sys->padding);
+                sys->padding = NULL;
+            }
+        }
+
+        /* padding may have been freed either before or inside previous
+         * if-statement */
+        if (!sys->padding)
+        {
+            const size_t leftover_space = OPUS_FRAME_SIZE - sys->i_nb_samples;
+            src_start = fill_buffer(enc, src_start, buf,
+                    __MIN(buf->i_nb_samples, leftover_space));
+        }
+
+        opus_int32 bytes_encoded = opus_multistream_encode_float(sys->enc, sys->buffer,
+                OPUS_FRAME_SIZE, out_block->p_buffer, out_block->i_buffer);
+
+        if (bytes_encoded < 0)
+        {
+            block_Release(out_block);
+        }
+        else
+        {
+            out_block->i_length = (mtime_t) CLOCK_FREQ *
+                (mtime_t) OPUS_FRAME_SIZE / (mtime_t) enc->fmt_in.audio.i_rate;
+
+            out_block->i_dts = out_block->i_pts = i_pts;
+
+            sys->i_samples_delay -= OPUS_FRAME_SIZE;
+
+            i_pts += out_block->i_length;
+
+            sys->i_nb_samples = 0;
+
+            out_block->i_buffer = bytes_encoded;
+            block_ChainAppend(&result, out_block);
+        }
+    }
+
+    /* put leftover samples at beginning of buffer */
+    if (buf->i_nb_samples > 0)
+        fill_buffer(enc, src_start, buf, buf->i_nb_samples);
+
+    return result;
+}
+
+static int OpenEncoder(vlc_object_t *p_this)
+{
+    encoder_t *enc = (encoder_t *)p_this;
+
+    if (enc->fmt_out.i_codec != VLC_CODEC_OPUS)
+        return VLC_EGENERIC;
+
+    encoder_sys_t *sys = malloc(sizeof(*sys));
+    if (!sys)
+        return VLC_ENOMEM;
+
+    int status = VLC_SUCCESS;
+    sys->buffer = NULL;
+    sys->enc = NULL;
+
+    enc->pf_encode_audio = Encode;
+    enc->fmt_in.i_codec = VLC_CODEC_FL32;
+    enc->fmt_in.audio.i_rate = /* Only 48kHz */
+    enc->fmt_out.audio.i_rate = 48000;
+    enc->fmt_out.audio.i_channels = enc->fmt_in.audio.i_channels;
+
+    OpusHeader header;
+
+    if (opus_prepare_header(enc->fmt_out.audio.i_channels,
+            enc->fmt_out.audio.i_rate,
+            &header))
+    {
+        msg_Err(enc, "Failed to prepare header.");
+        status = VLC_ENOMEM;
+        goto error;
+    }
+
+    /* needed for max encoded size calculation */
+    sys->nb_streams = header.nb_streams;
+
+    int err;
+    sys->enc =
+        opus_multistream_surround_encoder_create(enc->fmt_in.audio.i_rate,
+                enc->fmt_in.audio.i_channels, header.channel_mapping,
+                &header.nb_streams, &header.nb_coupled, header.stream_map,
+                OPUS_APPLICATION_AUDIO, &err);
+
+    if (err != OPUS_OK)
+    {
+        msg_Err(enc, "Could not create encoder: error %d", err);
+        sys->enc = NULL;
+        status = VLC_EGENERIC;
+        goto error;
+    }
+
+    /* TODO: vbr, bitrate, fec */
+
+    /* Buffer for incoming audio, since opus only accepts frame sizes that are
+       multiples of 2.5ms */
+    enc->p_sys = sys;
+    sys->buffer = malloc(OPUS_FRAME_SIZE * header.channels * sizeof(float));
+    if (!sys->buffer) {
+        status = VLC_ENOMEM;
+        goto error;
+    }
+
+    sys->i_nb_samples = 0;
+
+    sys->i_samples_delay = 0;
+    int ret = opus_multistream_encoder_ctl(enc->p_sys->enc,
+            OPUS_GET_LOOKAHEAD(&sys->i_samples_delay));
+    if (ret != OPUS_OK)
+        msg_Err(enc, "Unable to get number of lookahead samples: %s\n",
+                opus_strerror(ret));
+
+    header.preskip = sys->i_samples_delay;
+
+    /* Now that we have preskip, we can write the header to extradata */
+    if (opus_write_header((uint8_t **) &enc->fmt_out.p_extra,
+                          &enc->fmt_out.i_extra, &header))
+    {
+        msg_Err(enc, "Failed to write header.");
+        status = VLC_ENOMEM;
+        goto error;
+    }
+
+    if (sys->i_samples_delay > 0)
+    {
+        const unsigned padding_samples = sys->i_samples_delay *
+            enc->fmt_out.audio.i_channels;
+        sys->padding = block_Alloc(padding_samples * sizeof(float));
+        if (!sys->padding) {
+            status = VLC_ENOMEM;
+            goto error;
+        }
+        sys->padding->i_nb_samples = sys->i_samples_delay;
+        float *pad_ptr = (float *) sys->padding->p_buffer;
+        memset(pad_ptr, 0, padding_samples * sizeof(float));
+    }
+    else
+    {
+        sys->padding = NULL;
+    }
+
+    return status;
+
+error:
+    if (sys->enc)
+        opus_multistream_encoder_destroy(sys->enc);
+    free(sys->buffer);
+    free(sys);
+    return status;
+}
+
+static void CloseEncoder(vlc_object_t *p_this)
+{
+    encoder_t *enc = (encoder_t *)p_this;
+    encoder_sys_t *sys = enc->p_sys;
+
+    opus_multistream_encoder_destroy(sys->enc);
+    if (sys->padding)
+        block_Release(sys->padding);
+    free(sys->buffer);
+    free(sys);
+}
+#endif /* ENABLE_SOUT */
