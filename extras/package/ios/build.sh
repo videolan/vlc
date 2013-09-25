@@ -48,7 +48,6 @@ do
              ;;
          s)
              PLATFORM=Simulator
-             SDK_VERSION=${SDK_MIN}
              ;;
          k)
              SDK_VERSION=$OPTARG
