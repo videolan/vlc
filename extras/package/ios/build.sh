@@ -13,7 +13,7 @@ cat << EOF
 usage: $0 [-s] [-k sdk]
 
 OPTIONS
-   -k <sdk>      Specify which sdk to use ('xcodebuild -showsdks', current: ${SDK})
+   -k <sdk version>      Specify which sdk to use ('xcodebuild -showsdks', current: ${SDK_VERSION})
    -s            Build for simulator
    -a <arch>     Specify which arch to use (current: ${ARCH})
 EOF
@@ -48,10 +48,10 @@ do
              ;;
          s)
              PLATFORM=Simulator
-             SDK=${SDK_MIN}
+             SDK_VERSION=${SDK_MIN}
              ;;
          k)
-             SDK=$OPTARG
+             SDK_VERSION=$OPTARG
              ;;
          a)
              ARCH=$OPTARG
