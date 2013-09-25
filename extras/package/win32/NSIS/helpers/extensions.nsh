@@ -75,34 +75,34 @@ NoOwn:
     DeleteRegKey HKLM "Software\Clients\Media\VLC\Capabilities\FileAssociations\VLC$R0" ; for vista
 FunctionEnd
 
-!macro RegisterExtensionSection EXT
-  Section ${EXT}
+!macro RegisterExtensionSection TYPE EXT
+  ${MementoSection} ${EXT} SEC_EXT_${TYPE}_${EXT}
     SectionIn 1 3
     Push $R0
     StrCpy $R0 ${EXT}
     Call RegisterExtension
     Pop $R0
-  SectionEnd
+  ${MementoSectionEnd}
 !macroend
 
-!macro RegisterSkinExtensionSection EXT
-  Section /o ${EXT}
+!macro RegisterSkinExtensionSection TYPE EXT
+  ${MementoUnselectedSection} ${EXT} SEC_EXT_SKIN_${EXT}
     SectionIn 1 3
     Push $R0
     StrCpy $R0 ${EXT}
     Call RegisterSkinExtension
     Pop $R0
-  SectionEnd
+  ${MementoSectionEnd}
 !macroend
 
-!macro UnRegisterExtensionSection EXT
+!macro UnRegisterExtensionSection TYPE EXT
   Push $R0
   StrCpy $R0 ${EXT}
   Call un.RegisterExtension
   Pop $R0
 !macroend
 
-!macro WriteRegStrSupportedTypes EXT
+!macro WriteRegStrSupportedTypes TYPE EXT
   WriteRegStr HKCR Applications\vlc.exe\SupportedTypes ${EXT} ""
 !macroend
 
@@ -112,131 +112,131 @@ FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 !macro MacroAudioExtensions _action
-  !insertmacro ${_action} ".3ga"
-  !insertmacro ${_action} ".669"
-  !insertmacro ${_action} ".a52"
-  !insertmacro ${_action} ".aac"
-  !insertmacro ${_action} ".ac3"
-  !insertmacro ${_action} ".adt"
-  !insertmacro ${_action} ".adts"
-  !insertmacro ${_action} ".aif"
-  !insertmacro ${_action} ".aifc"
-  !insertmacro ${_action} ".aiff"
-  !insertmacro ${_action} ".au"
-  !insertmacro ${_action} ".amr"
-  !insertmacro ${_action} ".aob"
-  !insertmacro ${_action} ".ape"
-  !insertmacro ${_action} ".caf"
-  !insertmacro ${_action} ".cda"
-  !insertmacro ${_action} ".dts"
-  !insertmacro ${_action} ".flac"
-  !insertmacro ${_action} ".it"
-  !insertmacro ${_action} ".m4a"
-  !insertmacro ${_action} ".m4p"
-  !insertmacro ${_action} ".mid"
-  !insertmacro ${_action} ".mka"
-  !insertmacro ${_action} ".mlp"
-  !insertmacro ${_action} ".mod"
-  !insertmacro ${_action} ".mp1"
-  !insertmacro ${_action} ".mp2"
-  !insertmacro ${_action} ".mp3"
-  !insertmacro ${_action} ".mpc"
-  !insertmacro ${_action} ".mpga"
-  !insertmacro ${_action} ".oga"
-  !insertmacro ${_action} ".oma"
-  !insertmacro ${_action} ".opus"
-  !insertmacro ${_action} ".qcp"
-  !insertmacro ${_action} ".ra"
-  !insertmacro ${_action} ".rmi"
-  !insertmacro ${_action} ".snd"
-  !insertmacro ${_action} ".s3m"
-  !insertmacro ${_action} ".spx"
-  !insertmacro ${_action} ".tta"
-  !insertmacro ${_action} ".voc"
-  !insertmacro ${_action} ".vqf"
-  !insertmacro ${_action} ".w64"
-  !insertmacro ${_action} ".wav"
-  !insertmacro ${_action} ".wma"
-  !insertmacro ${_action} ".wv"
-  !insertmacro ${_action} ".xa"
-  !insertmacro ${_action} ".xm"
+  !insertmacro ${_action} Audio ".3ga"
+  !insertmacro ${_action} Audio ".669"
+  !insertmacro ${_action} Audio ".a52"
+  !insertmacro ${_action} Audio ".aac"
+  !insertmacro ${_action} Audio ".ac3"
+  !insertmacro ${_action} Audio ".adt"
+  !insertmacro ${_action} Audio ".adts"
+  !insertmacro ${_action} Audio ".aif"
+  !insertmacro ${_action} Audio ".aifc"
+  !insertmacro ${_action} Audio ".aiff"
+  !insertmacro ${_action} Audio ".au"
+  !insertmacro ${_action} Audio ".amr"
+  !insertmacro ${_action} Audio ".aob"
+  !insertmacro ${_action} Audio ".ape"
+  !insertmacro ${_action} Audio ".caf"
+  !insertmacro ${_action} Audio ".cda"
+  !insertmacro ${_action} Audio ".dts"
+  !insertmacro ${_action} Audio ".flac"
+  !insertmacro ${_action} Audio ".it"
+  !insertmacro ${_action} Audio ".m4a"
+  !insertmacro ${_action} Audio ".m4p"
+  !insertmacro ${_action} Audio ".mid"
+  !insertmacro ${_action} Audio ".mka"
+  !insertmacro ${_action} Audio ".mlp"
+  !insertmacro ${_action} Audio ".mod"
+  !insertmacro ${_action} Audio ".mp1"
+  !insertmacro ${_action} Audio ".mp2"
+  !insertmacro ${_action} Audio ".mp3"
+  !insertmacro ${_action} Audio ".mpc"
+  !insertmacro ${_action} Audio ".mpga"
+  !insertmacro ${_action} Audio ".oga"
+  !insertmacro ${_action} Audio ".oma"
+  !insertmacro ${_action} Audio ".opus"
+  !insertmacro ${_action} Audio ".qcp"
+  !insertmacro ${_action} Audio ".ra"
+  !insertmacro ${_action} Audio ".rmi"
+  !insertmacro ${_action} Audio ".snd"
+  !insertmacro ${_action} Audio ".s3m"
+  !insertmacro ${_action} Audio ".spx"
+  !insertmacro ${_action} Audio ".tta"
+  !insertmacro ${_action} Audio ".voc"
+  !insertmacro ${_action} Audio ".vqf"
+  !insertmacro ${_action} Audio ".w64"
+  !insertmacro ${_action} Audio ".wav"
+  !insertmacro ${_action} Audio ".wma"
+  !insertmacro ${_action} Audio ".wv"
+  !insertmacro ${_action} Audio ".xa"
+  !insertmacro ${_action} Audio ".xm"
 !macroend
 
 !macro MacroVideoExtensions _action
-  !insertmacro ${_action} ".3g2"
-  !insertmacro ${_action} ".3gp"
-  !insertmacro ${_action} ".3gp2"
-  !insertmacro ${_action} ".3gpp"
-  !insertmacro ${_action} ".amv"
-  !insertmacro ${_action} ".asf"
-  !insertmacro ${_action} ".avi"
-  !insertmacro ${_action} ".divx"
-  !insertmacro ${_action} ".drc"
-  !insertmacro ${_action} ".dv"
-  !insertmacro ${_action} ".f4v"
-  !insertmacro ${_action} ".flv"
-  !insertmacro ${_action} ".gvi"
-  !insertmacro ${_action} ".gxf"
-  !insertmacro ${_action} ".m1v"
-  !insertmacro ${_action} ".m2t"
-  !insertmacro ${_action} ".m2v"
-  !insertmacro ${_action} ".m2ts"
-  !insertmacro ${_action} ".m4v"
-  !insertmacro ${_action} ".mkv"
-  !insertmacro ${_action} ".mov"
-  !insertmacro ${_action} ".mp2"
-  !insertmacro ${_action} ".mp2v"
-  !insertmacro ${_action} ".mp4"
-  !insertmacro ${_action} ".mp4v"
-  !insertmacro ${_action} ".mpa"
-  !insertmacro ${_action} ".mpe"
-  !insertmacro ${_action} ".mpeg"
-  !insertmacro ${_action} ".mpeg1"
-  !insertmacro ${_action} ".mpeg2"
-  !insertmacro ${_action} ".mpeg4"
-  !insertmacro ${_action} ".mpg"
-  !insertmacro ${_action} ".mpv2"
-  !insertmacro ${_action} ".mts"
-  !insertmacro ${_action} ".mtv"
-  !insertmacro ${_action} ".mxf"
-  !insertmacro ${_action} ".nsv"
-  !insertmacro ${_action} ".nuv"
-  !insertmacro ${_action} ".ogg"
-  !insertmacro ${_action} ".ogm"
-  !insertmacro ${_action} ".ogx"
-  !insertmacro ${_action} ".ogv"
-  !insertmacro ${_action} ".rec"
-  !insertmacro ${_action} ".rm"
-  !insertmacro ${_action} ".rmvb"
-  !insertmacro ${_action} ".tod"
-  !insertmacro ${_action} ".ts"
-  !insertmacro ${_action} ".tts"
-  !insertmacro ${_action} ".vob"
-  !insertmacro ${_action} ".vro"
-  !insertmacro ${_action} ".webm"
-  !insertmacro ${_action} ".wmv"
-  !insertmacro ${_action} ".xesc"
+  !insertmacro ${_action} Video ".3g2"
+  !insertmacro ${_action} Video ".3gp"
+  !insertmacro ${_action} Video ".3gp2"
+  !insertmacro ${_action} Video ".3gpp"
+  !insertmacro ${_action} Video ".amv"
+  !insertmacro ${_action} Video ".asf"
+  !insertmacro ${_action} Video ".avi"
+  !insertmacro ${_action} Video ".divx"
+  !insertmacro ${_action} Video ".drc"
+  !insertmacro ${_action} Video ".dv"
+  !insertmacro ${_action} Video ".f4v"
+  !insertmacro ${_action} Video ".flv"
+  !insertmacro ${_action} Video ".gvi"
+  !insertmacro ${_action} Video ".gxf"
+  !insertmacro ${_action} Video ".m1v"
+  !insertmacro ${_action} Video ".m2t"
+  !insertmacro ${_action} Video ".m2v"
+  !insertmacro ${_action} Video ".m2ts"
+  !insertmacro ${_action} Video ".m4v"
+  !insertmacro ${_action} Video ".mkv"
+  !insertmacro ${_action} Video ".mov"
+  !insertmacro ${_action} Video ".mp2"
+  !insertmacro ${_action} Video ".mp2v"
+  !insertmacro ${_action} Video ".mp4"
+  !insertmacro ${_action} Video ".mp4v"
+  !insertmacro ${_action} Video ".mpa"
+  !insertmacro ${_action} Video ".mpe"
+  !insertmacro ${_action} Video ".mpeg"
+  !insertmacro ${_action} Video ".mpeg1"
+  !insertmacro ${_action} Video ".mpeg2"
+  !insertmacro ${_action} Video ".mpeg4"
+  !insertmacro ${_action} Video ".mpg"
+  !insertmacro ${_action} Video ".mpv2"
+  !insertmacro ${_action} Video ".mts"
+  !insertmacro ${_action} Video ".mtv"
+  !insertmacro ${_action} Video ".mxf"
+  !insertmacro ${_action} Video ".nsv"
+  !insertmacro ${_action} Video ".nuv"
+  !insertmacro ${_action} Video ".ogg"
+  !insertmacro ${_action} Video ".ogm"
+  !insertmacro ${_action} Video ".ogx"
+  !insertmacro ${_action} Video ".ogv"
+  !insertmacro ${_action} Video ".rec"
+  !insertmacro ${_action} Video ".rm"
+  !insertmacro ${_action} Video ".rmvb"
+  !insertmacro ${_action} Video ".tod"
+  !insertmacro ${_action} Video ".ts"
+  !insertmacro ${_action} Video ".tts"
+  !insertmacro ${_action} Video ".vob"
+  !insertmacro ${_action} Video ".vro"
+  !insertmacro ${_action} Video ".webm"
+  !insertmacro ${_action} Video ".wmv"
+  !insertmacro ${_action} Video ".xesc"
 !macroend
 
 !macro MacroOtherExtensions _action
-  !insertmacro ${_action} ".asx"
-  !insertmacro ${_action} ".b4s"
-  !insertmacro ${_action} ".bin"
-  !insertmacro ${_action} ".cue"
-  !insertmacro ${_action} ".ifo"
-  !insertmacro ${_action} ".m3u"
-  !insertmacro ${_action} ".m3u8"
-  !insertmacro ${_action} ".pls"
-  !insertmacro ${_action} ".ram"
-  !insertmacro ${_action} ".sdp"
-  !insertmacro ${_action} ".vlc"
-  !insertmacro ${_action} ".wvx"
-  !insertmacro ${_action} ".xspf"
+  !insertmacro ${_action} Other ".asx"
+  !insertmacro ${_action} Other ".b4s"
+  !insertmacro ${_action} Other ".bin"
+  !insertmacro ${_action} Other ".cue"
+  !insertmacro ${_action} Other ".ifo"
+  !insertmacro ${_action} Other ".m3u"
+  !insertmacro ${_action} Other ".m3u8"
+  !insertmacro ${_action} Other ".pls"
+  !insertmacro ${_action} Other ".ram"
+  !insertmacro ${_action} Other ".sdp"
+  !insertmacro ${_action} Other ".vlc"
+  !insertmacro ${_action} Other ".wvx"
+  !insertmacro ${_action} Other ".xspf"
 !macroend
 
 !macro MacroSkinExtensions _action
-  !insertmacro ${_action} ".vlt"
-  !insertmacro ${_action} ".wsz"
+  !insertmacro ${_action} Skin ".vlt"
+  !insertmacro ${_action} Skin ".wsz"
 !macroend
 
 ; One macro to rule them all
@@ -255,7 +255,7 @@ FunctionEnd
   WriteRegStr HKCR ${EXT}\shell\AddToPlaylistVLC\command "" '"$INSTDIR\vlc.exe" --started-from-file --playlist-enqueue "%1"'
 !macroend
 
-!macro AddContextMenu EXT
+!macro AddContextMenu TYPE EXT
   Push $R0
   ReadRegStr $R0 HKCR ${EXT} ""
   !insertmacro AddContextMenuExt $R0
@@ -267,7 +267,7 @@ FunctionEnd
   DeleteRegKey HKCR ${EXT}\shell\AddToPlaylistVLC
 !macroend
 
-!macro DeleteContextMenu EXT
+!macro DeleteContextMenu TYPE EXT
   Push $R0
   ReadRegStr $R0 HKCR ${EXT} ""
   !insertmacro DeleteContextMenuExt $R0
