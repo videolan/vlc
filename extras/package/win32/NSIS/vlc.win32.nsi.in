@@ -23,6 +23,14 @@
 !define INSTALL_ACTIVEX
 !define INSTALL_MOZILLA
 
+Var ReinstallType
+Var ReinstallUninstallBtn
+Var PerformUpdate
+Var PreviousVersion
+Var PreviousVersionState
+Var PreviousInstallDir
+Var UninstallLog
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ; General configuration ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -50,13 +58,15 @@ RequestExecutionLevel user
 !addplugindir NSIS
 !include UAC.nsh
 !include WinVer.nsh
+!include FileFunc.nsh
+!include MUI2.nsh
+
+!insertmacro GetParameters
+!insertmacro GetOptions
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; NSIS Modern User Interface configuration ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; MUI 1.67 compatible ------
-  !include "MUI.nsh"
 
 ; MUI Settings
   !define MUI_ABORTWARNING
@@ -68,13 +78,18 @@ RequestExecutionLevel user
   ; Welcome page
     !define MUI_WELCOMEPAGE_TITLE_3LINES
     !insertmacro MUI_PAGE_WELCOME
+  ; Optional update page
+    Page custom PageReinstall PageLeaveReinstall
   ; License page
     !define MUI_LICENSEPAGE_BUTTON $(^NextBtn)
     !define MUI_LICENSEPAGE_TEXT_BOTTOM $License_NextText
+    !define MUI_PAGE_CUSTOMFUNCTION_PRE PageSkipPre
     !insertmacro MUI_PAGE_LICENSE "COPYING.txt"
   ; Components page
+    !define MUI_PAGE_CUSTOMFUNCTION_PRE PageComponentsPre
     !insertmacro MUI_PAGE_COMPONENTS
   ; Directory page
+    !define MUI_PAGE_CUSTOMFUNCTION_PRE PageDirectoryPre
     !insertmacro MUI_PAGE_DIRECTORY
   ; Instfiles page
     !insertmacro MUI_PAGE_INSTFILES
@@ -135,7 +150,6 @@ RequestExecutionLevel user
 
 ; Reserve files for solid compression
   !insertmacro MUI_RESERVEFILE_LANGDLL
-  !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
 
 ; MUI end ------
 
@@ -481,6 +495,25 @@ UAC_Success:
     StrCmp 3 $1 0 UAC_ElevationAborted
     MessageBox mb_iconstop "This installer requires admin access, try again"
     goto UAC_Elevate
+
+  ; /update argument
+  Call ParseCommandline
+
+  ; See if previous version exists
+  Call ReadPreviousVersion
+
+  ${If} $PreviousVersion == ""
+    StrCpy $PerformUpdate 0
+  ${Else}
+    Push "${VERSION}"
+    Push $PreviousVersion
+    Call VersionCompare
+
+    ${If} $PreviousVersionState != "newer"
+      StrCpy $PerformUpdate 0
+    ${EndIf}
+  ${EndIf}
+
   !insertmacro MUI_LANGDLL_DISPLAY
 
   !include "languages\english.nsh"
@@ -593,18 +626,295 @@ UAC_Success:
   !include "languages\brazilian_portuguese.nsh"
   EndLanguageCmp:
 
-  ReadRegStr $R0  ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
-  "UninstallString"
-  StrCmp $R0 "" done
+  ;;ReadRegStr $R0  ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
+  ;;"UninstallString"
+  ;;StrCmp $R0 "" finished
 
-  MessageBox MB_YESNO|MB_ICONEXCLAMATION $Message_AlreadyInstalled /SD IDNO IDNO done
+  ;;MessageBox MB_YESNO|MB_ICONEXCLAMATION $Message_AlreadyInstalled /SD IDNO IDNO finished
 
   ;Run the uninstaller
   ;uninst:
     ClearErrors
     ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
-  done:
+  finished:
 
+FunctionEnd
+
+Function ParseCommandline
+  ${GetParameters} $R0
+
+  ${GetOptions} $R0 "/update" $R1
+
+  ${If} ${Errors}
+    StrCpy $PerformUpdate 0
+  ${Else}
+    StrCpy $PerformUpdate 1
+  ${EndIf}
+FunctionEnd
+
+Function PageReinstall
+  ${If} $PreviousVersion == ""
+    Abort
+  ${EndIf}
+
+  ${If} $PerformUpdate == 1
+    StrCpy $ReinstallType 1
+    Abort
+  ${EndIf}
+
+  nsDialogs::Create /NOUNLOAD 1018
+  Pop $0
+
+  ${If} $PreviousVersionState == "newer"
+
+    !insertmacro MUI_HEADER_TEXT "Already Installed" "Choose how you want to install VLC."
+    nsDialogs::CreateItem /NOUNLOAD STATIC ${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 0 0 100% 40 "An older version of VLC is installed on your system. Select the operation you want to perform and click Next to continue."
+    Pop $R0
+    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_VCENTER}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS}|${WS_GROUP}|${WS_TABSTOP} 0 10 55 100% 30 "Upgrade VLC using previous settings (recommended)"
+    Pop $ReinstallUninstallBtn
+    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_TOP}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 10 85 100% 50 "Change settings (advanced)"
+    Pop $R0
+
+    ${If} $ReinstallType == ""
+      StrCpy $ReinstallType 1
+    ${EndIf}
+
+  ${ElseIf} $PreviousVersionState == "older"
+
+    !insertmacro MUI_HEADER_TEXT "Already Installed" "Choose how you want to install VLC."
+    nsDialogs::CreateItem /NOUNLOAD STATIC ${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 0 0 100% 40 "A newer version of VLC is already installed! It is not recommended that you downgrade to an older version. Select the operation you want to perform and click Next to continue."
+    Pop $R0
+    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_VCENTER}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS}|${WS_GROUP}|${WS_TABSTOP} 0 10 55 100% 30 "Downgrade VLC using previous settings (recommended)"
+    Pop $ReinstallUninstallBtn
+    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_TOP}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 10 85 100% 50 "Change settings (advanced)"
+    Pop $R0
+
+    ${If} $ReinstallType == ""
+      StrCpy $ReinstallType 1
+    ${EndIf}
+
+  ${ElseIf} $PreviousVersionState == "same"
+
+    !insertmacro MUI_HEADER_TEXT "Already Installed" "Choose the maintenance option to perform."
+    nsDialogs::CreateItem /NOUNLOAD STATIC ${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 0 0 100% 40 "VLC ${VERSION} is already installed. Select the operation you want to perform and click Next to continue."
+    Pop $R0
+    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_VCENTER}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS}|${WS_GROUP}|${WS_TABSTOP} 0 10 55 100% 30 "Add/Remove/Reinstall components"
+    Pop $R0
+    nsDialogs::CreateItem /NOUNLOAD BUTTON ${BS_AUTORADIOBUTTON}|${BS_TOP}|${BS_MULTILINE}|${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 10 85 100% 50 "Uninstall VLC"
+    Pop $ReinstallUninstallBtn
+
+    ${If} $ReinstallType == ""
+      StrCpy $ReinstallType 2
+    ${EndIf}
+
+  ${Else}
+
+    MessageBox MB_ICONSTOP "Unknown value of PreviousVersionState, aborting" /SD IDOK
+    Abort
+
+  ${EndIf}
+
+  ${If} $ReinstallType == "1"
+    SendMessage $ReinstallUninstallBtn ${BM_SETCHECK} 1 0
+  ${Else}
+    SendMessage $R0 ${BM_SETCHECK} 1 0
+  ${EndIf}
+
+  nsDialogs::Show
+
+FunctionEnd
+
+Function PageLeaveReinstall
+
+  SendMessage $ReinstallUninstallBtn ${BM_GETCHECK} 0 0 $R0
+  ${If} $R0 == 1
+    ; Option to uninstall old version selected
+    StrCpy $ReinstallType 1
+  ${Else}
+    ; Custom up/downgrade or add/remove/reinstall
+    StrCpy $ReinstallType 2
+  ${EndIf}
+
+  ${If} $ReinstallType == 1
+
+    ${If} $PreviousVersionState == "same"
+
+      Call RunUninstaller
+      Quit
+
+    ${EndIf}
+
+  ${EndIf}
+
+FunctionEnd
+
+Function ReadPreviousVersion
+
+  ReadRegStr $PreviousInstallDir HKLM "${PRODUCT_DIR_REGKEY}" "InstallDir"
+
+  Call CheckPrevInstallDirExists
+
+  ${If} $PreviousInstallDir != ""
+    ;Detect version
+    ReadRegStr $PreviousVersion HKLM "${PRODUCT_DIR_REGKEY}" "Version"
+  ${EndIf}
+
+FunctionEnd
+
+Function CheckPrevInstallDirExists
+
+  ${If} $PreviousInstallDir != ""
+
+    ; Make sure directory is valid
+    Push $R0
+    Push $R1
+    StrCpy $R0 "$PreviousInstallDir" "" -1
+    ${If} $R0 == '\'
+    ${OrIf} $R0 == '/'
+      StrCpy $R0 $PreviousInstallDir*.*
+    ${Else}
+      StrCpy $R0 $PreviousInstallDir\*.*
+    ${EndIf}
+    ${IfNot} ${FileExists} $R0
+      StrCpy $PreviousInstallDir ""
+    ${EndIf}
+    Pop $R1
+    Pop $R0
+
+  ${EndIf}
+
+FunctionEnd
+
+Function VersionCompare
+
+  Exch $1
+  Exch
+  Exch $0
+
+  Push $2
+  Push $3
+  Push $4
+
+versioncomparebegin:
+  ${If} $0 == ""
+  ${AndIf} $1 == ""
+    StrCpy $PreviousVersionState "same"
+    goto versioncomparedone
+  ${EndIf}
+
+  StrCpy $2 0
+  StrCpy $3 0
+
+  ; Parse rc / beta suffixes for segments
+  StrCpy $4 $0 2
+  ${If} $4 == "rc"
+    StrCpy $2 100
+    StrCpy $0 $0 "" 2
+  ${Else}
+    StrCpy $4 $0 4
+    ${If} $4 == "beta"
+      StrCpy $0 $0 "" 4
+    ${Else}
+      StrCpy $2 10000
+    ${EndIf}
+  ${EndIf}
+
+  StrCpy $4 $1 2
+  ${If} $4 == "rc"
+    StrCpy $3 100
+    StrCpy $1 $1 "" 2
+  ${Else}
+    StrCpy $4 $1 4
+    ${If} $4 == "beta"
+      StrCpy $1 $1 "" 4
+    ${Else}
+      StrCpy $3 10000
+    ${EndIf}
+  ${EndIf}
+
+split1loop:
+  StrCmp $0 "" split1loopdone
+  StrCpy $4 $0 1
+  StrCpy $0 $0 "" 1
+  StrCmp $4 "." split1loopdone
+  StrCmp $4 "-" split1loopdone
+  StrCpy $2 $2$4
+  goto split1loop
+split1loopdone:
+
+split2loop:
+  StrCmp $1 "" split2loopdone
+  StrCpy $4 $1 1
+  StrCpy $1 $1 "" 1
+  StrCmp $4 "." split2loopdone
+  StrCmp $4 "-" split2loopdone
+  StrCpy $3 $3$4
+  goto split2loop
+split2loopdone:
+
+  ${If} $2 > $3
+    StrCpy $PreviousVersionState "newer"
+  ${ElseIf} $3 > $2
+    StrCpy $PreviousVersionState "older"
+  ${Else}
+    goto versioncomparebegin
+  ${EndIf}
+
+versioncomparedone:
+
+  Pop $4
+  Pop $3
+  Pop $2
+  Pop $1
+  Pop $0
+
+FunctionEnd
+
+Function RunUninstaller
+  ReadRegStr $R1 ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString"
+  ${If} $R1 == ""
+    Return
+  ${EndIf}
+
+  ;Run uninstaller
+  HideWindow
+  ClearErrors
+
+  ExecWait '$R1 _?=$INSTDIR'
+
+  IfErrors no_remove_uninstaller
+
+  IfFileExists "$INSTDIR\uninstall.exe" 0 no_remove_uninstaller
+    Delete "$R1"
+    RMDir $INSTDIR
+
+  no_remove_uninstaller:
+FunctionEnd
+
+Function PageSkipPre
+  ${If} $PerformUpdate == 1
+    Abort
+  ${ElseIf} $PreviousVersion != ""
+    Abort
+  ${EndIf}
+FunctionEnd
+
+Function PageFastUpdatePre
+  ${If} $PerformUpdate == 1
+    Abort
+  ${EndIf}
+FunctionEnd
+
+Function PageComponentsPre
+  ${If} $ReinstallType == 1
+    Abort
+  ${EndIf}
+FunctionEnd
+
+Function PageDirectoryPre
+  ${If} $ReinstallType != ""
+    Abort
+  ${EndIf}
 FunctionEnd
 
 Function .OnInstFailed
