@@ -80,6 +80,7 @@ RequestExecutionLevel user
 
 ; Installer pages
   ; Welcome page
+    !define MUI_PAGE_CUSTOMFUNCTION_PRE PageFastUpdatePre
     !define MUI_WELCOMEPAGE_TITLE_3LINES
     !insertmacro MUI_PAGE_WELCOME
   ; Optional update page
@@ -107,6 +108,7 @@ RequestExecutionLevel user
     ${Endif}
     FunctionEnd
 
+    !define MUI_PAGE_CUSTOMFUNCTION_PRE PageFastUpdatePre
     !define MUI_FINISHPAGE_RUN
     !define MUI_FINISHPAGE_RUN_FUNCTION AppExecAs
     !define MUI_FINISHPAGE_LINK $Link_VisitWebsite
