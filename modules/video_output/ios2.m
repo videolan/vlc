@@ -485,7 +485,7 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
 - (void)applicationStateChanged:(NSNotification *)notification
 {
-    if ([[notification name] isEqualToString: UIApplicationWillResignActiveNotification])
+    if ([[notification name] isEqualToString:UIApplicationWillResignActiveNotification] || [[o_notification name] isEqualToString:UIApplicationDidEnterBackgroundNotification] || [[o_notification name] isEqualToString:UIApplicationWillTerminateNotification])
         _appActive = NO;
     else
         _appActive = YES;
