@@ -883,7 +883,12 @@ void _drawFrameInRect(NSRect frameRect)
 
 - (NSString*)stringForObjectValue:(id)obj
 {
-    return obj;
+    if([obj isKindOfClass:[NSString class]])
+        return obj;
+    if([obj isKindOfClass:[NSNumber class]])
+        return [obj stringValue];
+
+    return nil;
 }
 
 - (BOOL)getObjectValue:(id*)obj forString:(NSString*)string errorDescription:(NSString**)error
