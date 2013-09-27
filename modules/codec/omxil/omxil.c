@@ -732,9 +732,10 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
 
         omx_error = OMX_SetParameter(omx_handle,
                 OMX_IndexConfigRequestCallback, &notifications);
-        if (omx_error == OMX_ErrorNone)
+        if (omx_error == OMX_ErrorNone) {
             msg_Dbg(p_dec, "Enabled aspect ratio notifications");
-        else
+            p_sys->b_aspect_ratio_handled = true;
+        } else
             msg_Dbg(p_dec, "Could not enable aspect ratio notifications");
     }
 
@@ -1243,6 +1244,19 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         }
         p_sys->in.b_flushed = true;
         return NULL;
+    }
+
+    /* Use the aspect ratio provided by the input (ie read from packetizer).
+     * In case the we get aspect ratio info from the decoder (as in the
+     * broadcom OMX implementation on RPi), don't let the packetizer values
+     * override what the decoder says, if anything - otherwise always update
+     * even if it already is set (since it can change within a stream). */
+    if((p_dec->fmt_in.video.i_sar_num != 0 && p_dec->fmt_in.video.i_sar_den != 0) &&
+       (p_dec->fmt_out.video.i_sar_num == 0 || p_dec->fmt_out.video.i_sar_den == 0 ||
+             !p_sys->b_aspect_ratio_handled))
+    {
+        p_dec->fmt_out.video.i_sar_num = p_dec->fmt_in.video.i_sar_num;
+        p_dec->fmt_out.video.i_sar_den = p_dec->fmt_in.video.i_sar_den;
     }
 
     /* Take care of decoded frames first */

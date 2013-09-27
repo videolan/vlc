@@ -94,6 +94,8 @@ struct decoder_sys_t
 
     bool b_error;
 
+    bool b_aspect_ratio_handled;
+
     date_t end_date;
 
     size_t i_nal_size_length; /* Length of the NAL size field for H264 */
