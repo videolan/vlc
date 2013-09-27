@@ -749,9 +749,17 @@ Function PageFastUpdatePre
 FunctionEnd
 
 Function PageComponentsPre
+  ClearErrors
+  ReadRegStr $0 ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` MementoSectionUsed
+  ; Backward compatibility:
+  ; Don't skip the components page until Memento was able to save the user choices.
+  IfErrors done
+
   ${If} $ReinstallType == 1
     Abort
   ${EndIf}
+
+done:
 FunctionEnd
 
 Function PageDirectoryPre
