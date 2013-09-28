@@ -4186,7 +4186,6 @@ AC_CONFIG_FILES([
   lib/Makefile
   bin/Makefile
   test/Makefile
-  modules/access/rtp/Makefile
   modules/access_output/Makefile
   modules/audio_filter/Makefile
   modules/control/Makefile

@@ -1,8 +1,8 @@
 noinst_LTLIBRARIES =
 noinst_HEADERS =
+check_PROGRAMS =
 
 BASE_SUBDIRS = \
-	access/rtp \
 	audio_filter \
 	control \
 	gui \
@@ -27,11 +27,14 @@ if HAVE_VDPAU
 SUBDIRS += hw/vdpau
 endif
 
+TESTS =
+
 dist_noinst_SCRIPTS = genmf list.sh module.rc.in
 dist_noinst_DATA = MODULES_LIST
 
 include common.am
 include access/Makefile.am
+include access/rtp/Makefile.am
 include arm_neon/Makefile.am
 include audio_mixer/Makefile.am
 include audio_output/Makefile.am
