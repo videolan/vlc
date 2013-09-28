@@ -4189,7 +4189,6 @@ AC_CONFIG_FILES([
   modules/access/rtp/Makefile
   modules/access_output/Makefile
   modules/audio_filter/Makefile
-  modules/audio_mixer/Makefile
   modules/control/Makefile
   modules/gui/Makefile
   modules/gui/macosx/Makefile

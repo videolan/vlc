@@ -4,7 +4,6 @@ noinst_HEADERS =
 BASE_SUBDIRS = \
 	access/rtp \
 	audio_filter \
-	audio_mixer \
 	control \
 	gui \
 	misc \
@@ -42,6 +41,7 @@ dist_noinst_DATA = MODULES_LIST
 include common.am
 include access/Makefile.am
 include arm_neon/Makefile.am
+include audio_mixer/Makefile.am
 include audio_output/Makefile.am
 include codec/Makefile.am
 include demux/Makefile.am
