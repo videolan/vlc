@@ -8,7 +8,6 @@ BASE_SUBDIRS = \
 	gui \
 	misc \
 	packetizer \
-	stream_filter \
 	text_renderer \
 	video_chroma \
 	video_filter \
@@ -44,6 +43,7 @@ include lua/Makefile.am
 include meta_engine/Makefile.am
 include notify/Makefile.am
 include services_discovery/Makefile.am
+include stream_filter/Makefile.am
 
 BUILT_SOURCES += dummy.cpp
 

@@ -1,116 +1,115 @@
-include $(top_srcdir)/modules/common.am
 stream_filterdir = $(pluginsdir)/stream_filter
 
 stream_filter_LTLIBRARIES =
 
-libdecomp_plugin_la_SOURCES = decomp.c
+libdecomp_plugin_la_SOURCES = stream_filter/decomp.c
 libdecomp_plugin_la_LIBADD = $(LIBPTHREAD)
 if !HAVE_WIN32
 stream_filter_LTLIBRARIES += libdecomp_plugin.la
 endif
 
 libdash_plugin_la_SOURCES = \
-    dash/adaptationlogic/AbstractAdaptationLogic.cpp \
-    dash/adaptationlogic/AbstractAdaptationLogic.h \
-    dash/adaptationlogic/AdaptationLogicFactory.cpp \
-    dash/adaptationlogic/AdaptationLogicFactory.h \
-    dash/adaptationlogic/AlwaysBestAdaptationLogic.cpp \
-    dash/adaptationlogic/AlwaysBestAdaptationLogic.h \
-    dash/adaptationlogic/IAdaptationLogic.h \
-    dash/adaptationlogic/IDownloadRateObserver.h \
-    dash/adaptationlogic/RateBasedAdaptationLogic.h \
-    dash/adaptationlogic/RateBasedAdaptationLogic.cpp \
-    dash/buffer/BlockBuffer.cpp \
-    dash/buffer/BlockBuffer.h \
-    dash/buffer/IBufferObserver.h \
-    dash/http/Chunk.cpp \
-    dash/http/Chunk.h \
-    dash/http/HTTPConnection.cpp \
-    dash/http/HTTPConnection.h \
-    dash/http/HTTPConnectionManager.cpp \
-    dash/http/HTTPConnectionManager.h \
-    dash/http/IHTTPConnection.h \
-    dash/http/PersistentConnection.cpp \
-    dash/http/PersistentConnection.h \
-    dash/mpd/AdaptationSet.cpp \
-    dash/mpd/AdaptationSet.h \
-    dash/mpd/BaseUrl.h \
-    dash/mpd/BasicCMManager.cpp \
-    dash/mpd/BasicCMManager.h \
-    dash/mpd/BasicCMParser.cpp \
-    dash/mpd/BasicCMParser.h \
-    dash/mpd/CommonAttributesElements.cpp \
-    dash/mpd/CommonAttributesElements.h \
-    dash/mpd/ContentDescription.cpp \
-    dash/mpd/ContentDescription.h \
-    dash/mpd/IMPDManager.h \
-    dash/mpd/IMPDParser.h \
-    dash/mpd/IsoffMainParser.cpp \
-    dash/mpd/IsoffMainParser.h \
-    dash/mpd/IsoffMainManager.cpp \
-    dash/mpd/IsoffMainManager.h \
-    dash/mpd/MPD.cpp \
-    dash/mpd/MPD.h \
-    dash/mpd/MPDFactory.cpp \
-    dash/mpd/MPDFactory.h \
-    dash/mpd/MPDManagerFactory.cpp \
-    dash/mpd/MPDManagerFactory.h \
-    dash/mpd/Period.cpp \
-    dash/mpd/Period.h \
-    dash/mpd/ProgramInformation.cpp \
-    dash/mpd/ProgramInformation.h \
-    dash/mpd/Representation.cpp \
-    dash/mpd/Representation.h \
-    dash/mpd/Segment.cpp \
-    dash/mpd/Segment.h \
-    dash/mpd/SegmentBase.cpp \
-    dash/mpd/SegmentBase.h \
-    dash/mpd/SegmentInfo.cpp \
-    dash/mpd/SegmentInfo.h \
-    dash/mpd/SegmentInfoCommon.cpp \
-    dash/mpd/SegmentInfoCommon.h \
-    dash/mpd/SegmentInfoDefault.cpp \
-    dash/mpd/SegmentInfoDefault.h \
-    dash/mpd/SegmentList.cpp \
-    dash/mpd/SegmentList.h \
-    dash/mpd/SegmentTemplate.cpp \
-    dash/mpd/SegmentTemplate.h \
-    dash/mpd/SegmentTimeline.cpp \
-    dash/mpd/SegmentTimeline.h \
-    dash/mpd/TrickModeType.cpp \
-    dash/mpd/TrickModeType.h \
-    dash/xml/DOMHelper.cpp \
-    dash/xml/DOMHelper.h \
-    dash/xml/DOMParser.cpp \
-    dash/xml/DOMParser.h \
-    dash/xml/Node.cpp \
-    dash/xml/Node.h \
-    dash/dash.cpp \
-    dash/DASHDownloader.cpp \
-    dash/DASHDownloader.h \
-    dash/DASHManager.cpp \
-    dash/DASHManager.h \
-    dash/Helper.cpp \
-    dash/Helper.h
-libdash_plugin_la_CXXFLAGS = $(AM_CFLAGS) -I$(srcdir)/dash
+    stream_filter/dash/adaptationlogic/AbstractAdaptationLogic.cpp \
+    stream_filter/dash/adaptationlogic/AbstractAdaptationLogic.h \
+    stream_filter/dash/adaptationlogic/AdaptationLogicFactory.cpp \
+    stream_filter/dash/adaptationlogic/AdaptationLogicFactory.h \
+    stream_filter/dash/adaptationlogic/AlwaysBestAdaptationLogic.cpp \
+    stream_filter/dash/adaptationlogic/AlwaysBestAdaptationLogic.h \
+    stream_filter/dash/adaptationlogic/IAdaptationLogic.h \
+    stream_filter/dash/adaptationlogic/IDownloadRateObserver.h \
+    stream_filter/dash/adaptationlogic/RateBasedAdaptationLogic.h \
+    stream_filter/dash/adaptationlogic/RateBasedAdaptationLogic.cpp \
+    stream_filter/dash/buffer/BlockBuffer.cpp \
+    stream_filter/dash/buffer/BlockBuffer.h \
+    stream_filter/dash/buffer/IBufferObserver.h \
+    stream_filter/dash/http/Chunk.cpp \
+    stream_filter/dash/http/Chunk.h \
+    stream_filter/dash/http/HTTPConnection.cpp \
+    stream_filter/dash/http/HTTPConnection.h \
+    stream_filter/dash/http/HTTPConnectionManager.cpp \
+    stream_filter/dash/http/HTTPConnectionManager.h \
+    stream_filter/dash/http/IHTTPConnection.h \
+    stream_filter/dash/http/PersistentConnection.cpp \
+    stream_filter/dash/http/PersistentConnection.h \
+    stream_filter/dash/mpd/AdaptationSet.cpp \
+    stream_filter/dash/mpd/AdaptationSet.h \
+    stream_filter/dash/mpd/BaseUrl.h \
+    stream_filter/dash/mpd/BasicCMManager.cpp \
+    stream_filter/dash/mpd/BasicCMManager.h \
+    stream_filter/dash/mpd/BasicCMParser.cpp \
+    stream_filter/dash/mpd/BasicCMParser.h \
+    stream_filter/dash/mpd/CommonAttributesElements.cpp \
+    stream_filter/dash/mpd/CommonAttributesElements.h \
+    stream_filter/dash/mpd/ContentDescription.cpp \
+    stream_filter/dash/mpd/ContentDescription.h \
+    stream_filter/dash/mpd/IMPDManager.h \
+    stream_filter/dash/mpd/IMPDParser.h \
+    stream_filter/dash/mpd/IsoffMainParser.cpp \
+    stream_filter/dash/mpd/IsoffMainParser.h \
+    stream_filter/dash/mpd/IsoffMainManager.cpp \
+    stream_filter/dash/mpd/IsoffMainManager.h \
+    stream_filter/dash/mpd/MPD.cpp \
+    stream_filter/dash/mpd/MPD.h \
+    stream_filter/dash/mpd/MPDFactory.cpp \
+    stream_filter/dash/mpd/MPDFactory.h \
+    stream_filter/dash/mpd/MPDManagerFactory.cpp \
+    stream_filter/dash/mpd/MPDManagerFactory.h \
+    stream_filter/dash/mpd/Period.cpp \
+    stream_filter/dash/mpd/Period.h \
+    stream_filter/dash/mpd/ProgramInformation.cpp \
+    stream_filter/dash/mpd/ProgramInformation.h \
+    stream_filter/dash/mpd/Representation.cpp \
+    stream_filter/dash/mpd/Representation.h \
+    stream_filter/dash/mpd/Segment.cpp \
+    stream_filter/dash/mpd/Segment.h \
+    stream_filter/dash/mpd/SegmentBase.cpp \
+    stream_filter/dash/mpd/SegmentBase.h \
+    stream_filter/dash/mpd/SegmentInfo.cpp \
+    stream_filter/dash/mpd/SegmentInfo.h \
+    stream_filter/dash/mpd/SegmentInfoCommon.cpp \
+    stream_filter/dash/mpd/SegmentInfoCommon.h \
+    stream_filter/dash/mpd/SegmentInfoDefault.cpp \
+    stream_filter/dash/mpd/SegmentInfoDefault.h \
+    stream_filter/dash/mpd/SegmentList.cpp \
+    stream_filter/dash/mpd/SegmentList.h \
+    stream_filter/dash/mpd/SegmentTemplate.cpp \
+    stream_filter/dash/mpd/SegmentTemplate.h \
+    stream_filter/dash/mpd/SegmentTimeline.cpp \
+    stream_filter/dash/mpd/SegmentTimeline.h \
+    stream_filter/dash/mpd/TrickModeType.cpp \
+    stream_filter/dash/mpd/TrickModeType.h \
+    stream_filter/dash/xml/DOMHelper.cpp \
+    stream_filter/dash/xml/DOMHelper.h \
+    stream_filter/dash/xml/DOMParser.cpp \
+    stream_filter/dash/xml/DOMParser.h \
+    stream_filter/dash/xml/Node.cpp \
+    stream_filter/dash/xml/Node.h \
+    stream_filter/dash/dash.cpp \
+    stream_filter/dash/DASHDownloader.cpp \
+    stream_filter/dash/DASHDownloader.h \
+    stream_filter/dash/DASHManager.cpp \
+    stream_filter/dash/DASHManager.h \
+    stream_filter/dash/Helper.cpp \
+    stream_filter/dash/Helper.h
+libdash_plugin_la_CXXFLAGS = $(AM_CFLAGS) -I$(srcdir)/stream_filter/dash
 libdash_plugin_la_LIBADD = $(SOCKET_LIBS)
 stream_filter_LTLIBRARIES += libdash_plugin.la
 
 libsmooth_plugin_la_SOURCES = \
-    smooth/smooth.c \
-    smooth/utils.c \
-    smooth/downloader.c \
-    smooth/smooth.h
+    stream_filter/smooth/smooth.c \
+    stream_filter/smooth/utils.c \
+    stream_filter/smooth/downloader.c \
+    stream_filter/smooth/smooth.h
 
 libsmooth_plugin_la_CFLAGS = $(AM_CFLAGS)
 stream_filter_LTLIBRARIES += libsmooth_plugin.la
 
-libhttplive_plugin_la_SOURCES = httplive.c
+libhttplive_plugin_la_SOURCES = stream_filter/httplive.c
 libhttplive_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
 libhttplive_plugin_la_LIBADD = $(GCRYPT_LIBS) -lgpg-error
 if HAVE_GCRYPT
 stream_filter_LTLIBRARIES += libhttplive_plugin.la
 endif
 
-librecord_plugin_la_SOURCES = record.c
+librecord_plugin_la_SOURCES = stream_filter/record.c
 stream_filter_LTLIBRARIES += librecord_plugin.la

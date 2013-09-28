@@ -4199,7 +4199,6 @@ AC_CONFIG_FILES([
   modules/misc/Makefile
   modules/mux/Makefile
   modules/packetizer/Makefile
-  modules/stream_filter/Makefile
   modules/stream_out/Makefile
   modules/text_renderer/Makefile
   modules/video_chroma/Makefile
