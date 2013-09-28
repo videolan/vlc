@@ -64,7 +64,7 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
         volumeControlWidget = NULL;
 
         /* And add the label */
-        layout->addWidget( volMuteLabel, 0, Qt::AlignBottom );
+        layout->addWidget( volMuteLabel, 0, b_shiny? Qt::AlignBottom : Qt::AlignCenter );
     }
     else
     {
@@ -105,7 +105,7 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     if( b_special )
         subLayout->addWidget( volumeSlider );
     else
-        layout->addWidget( volumeSlider, 0, Qt::AlignBottom  );
+        layout->addWidget( volumeSlider, 0, b_shiny? Qt::AlignBottom : Qt::AlignCenter );
 
     /* Set the volume from the config */
     float volume = playlist_VolumeGet( THEPL );
