@@ -1,33 +1,36 @@
-AM_LIBTOOLFLAGS=--tag=CC
-include $(top_srcdir)/modules/common.am
 neondir = $(pluginsdir)/arm_neon
 
 libsimple_channel_mixer_neon_plugin_la_SOURCES = \
-	simple_channel_mixer.S \
-	simple_channel_mixer.c
+	arm_neon/simple_channel_mixer.S \
+	arm_neon/simple_channel_mixer.c
 libsimple_channel_mixer_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
-libsimple_channel_mixer_neon_plugin_la_DEPENDENCIES =
+libsimple_channel_mixer_neon_plugin_LIBTOOLFLAGS = --tag=CC
 
 libchroma_yuv_neon_plugin_la_SOURCES = \
-	i420_yuyv.S \
-	i422_yuyv.S \
-	yuyv_i422.S \
-	chroma_yuv.c chroma_neon.h
+	arm_neon/i420_yuyv.S \
+	arm_neon/i422_yuyv.S \
+	arm_neon/yuyv_i422.S \
+	arm_neon/chroma_yuv.c arm_neon/chroma_neon.h
 libchroma_yuv_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
+libchroma_yuv_neon_plugin_LIBTOOLFLAGS = --tag=CC
 
-libvolume_neon_plugin_la_SOURCES = volume.c amplify.S
+libvolume_neon_plugin_la_SOURCES = arm_neon/volume.c arm_neon/amplify.S
 libvolume_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
+libvolume_neon_plugin_LIBTOOLFLAGS = --tag=CC
 
 libyuv_rgb_neon_plugin_la_SOURCES = \
-	i420_rgb.S \
-	i420_rv16.S \
-	nv21_rgb.S \
-	nv12_rgb.S \
-	yuv_rgb.c
+	arm_neon/i420_rgb.S \
+	arm_neon/i420_rv16.S \
+	arm_neon/nv21_rgb.S \
+	arm_neon/nv12_rgb.S \
+	arm_neon/yuv_rgb.c
 libyuv_rgb_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
+libyuv_rgb_neon_plugin_LIBTOOLFLAGS = --tag=CC
 
+if HAVE_NEON
 neon_LTLIBRARIES = \
 	libsimple_channel_mixer_neon_plugin.la \
 	libchroma_yuv_neon_plugin.la \
 	libvolume_neon_plugin.la \
 	libyuv_rgb_neon_plugin.la
+endif

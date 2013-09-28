@@ -21,7 +21,6 @@ EXTRA_SUBDIRS = \
 	access_output \
 	mux \
 	stream_out \
-	arm_neon \
 	hw/vdpau \
 	lua
 
@@ -29,9 +28,6 @@ SUBDIRS = . $(BASE_SUBDIRS)
 DIST_SUBDIRS = . $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 if ENABLE_SOUT
 SUBDIRS += access_output mux stream_out
-endif
-if HAVE_NEON
-SUBDIRS += arm_neon
 endif
 if HAVE_VDPAU
 SUBDIRS += hw/vdpau
@@ -45,6 +41,7 @@ dist_noinst_DATA = MODULES_LIST
 
 include common.am
 include access/Makefile.am
+include arm_neon/Makefile.am
 include audio_output/Makefile.am
 include codec/Makefile.am
 include demux/Makefile.am
