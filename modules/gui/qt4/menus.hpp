@@ -122,7 +122,7 @@ private:
     static QMenu *VideoMenu( intf_thread_t *p_intf, QWidget *parent ) {
         return VideoMenu( p_intf, new QMenu( parent ) );
     }
-    static QMenu *SubtitleMenu( intf_thread_t *, QMenu *current);
+    static QMenu *SubtitleMenu( intf_thread_t *, QMenu *current, bool b_popup = false );
     static QMenu *SubtitleMenu( intf_thread_t *p_intf, QWidget *parent) {
         return SubtitleMenu( p_intf, new QMenu( parent ) );
     }

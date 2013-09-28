@@ -626,13 +626,13 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 }
 
 /* Subtitles */
-QMenu *VLCMenuBar::SubtitleMenu( intf_thread_t *p_intf, QMenu *current )
+QMenu *VLCMenuBar::SubtitleMenu( intf_thread_t *p_intf, QMenu *current, bool b_popup )
 {
     input_thread_t *p_input;
     QVector<vlc_object_t *> objects;
     QVector<const char *> varnames;
 
-    if( current->isEmpty() )
+    if( current->isEmpty() || b_popup )
     {
         addDPStaticEntry( current, qtr( "Add &Subtitle File..." ), "",
                 SLOT( loadSubtitlesFile() ) );
@@ -1046,9 +1046,11 @@ void VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
         if( action->menu()->isEmpty() )
             action->setEnabled( false );
 
-        submenu = SubtitleMenu( p_intf, menu );
-        submenu->setTitle( qtr( "Subti&tle") );
-        UpdateItem( p_intf, menu, "spu-es", VLC_OBJECT(p_input), true );
+        /* Subtitles menu */
+        submenu = new QMenu( menu );
+        action = menu->addMenu( SubtitleMenu( p_intf, submenu, true ) );
+        action->setText( qtr( "Subti&tle") );
+        UpdateItem( p_intf, submenu, "spu-es", VLC_OBJECT(p_input), true );
 
         /* Playback menu for chapters */
         submenu = new QMenu( menu );
