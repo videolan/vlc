@@ -482,7 +482,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             module_exists( name ) && ( !psz_aout || !strcmp( psz_aout, name ) || !strcmp( psz_aout, "any" ) )
 
 #if defined( _WIN32 )
-            if( get_vol_aout( "directx" ) )
+            if( get_vol_aout( "directsound" ) )
                 i_volume = config_GetFloat( p_intf, "directx-volume") * 100 + 0.5;
             else if( get_vol_aout( "waveout" ) )
                 i_volume = config_GetFloat( p_intf, "waveout-volume") * 100 + 0.5;
@@ -1074,7 +1074,7 @@ void SPrefsPanel::apply()
         //FIXME this is moot
 #if defined( _WIN32 )
         VLC_UNUSED( f_gain );
-        if( save_vol_aout( "directx" ) )
+        if( save_vol_aout( "directsound" ) )
             config_PutFloat( p_intf, "directx-volume", i_volume / 100.f );
         if( save_vol_aout( "waveout" ) )
             config_PutFloat( p_intf, "waveout-volume", i_volume / 100.f );
