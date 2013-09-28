@@ -16,16 +16,12 @@ EXTRA_SUBDIRS = \
 	access_output \
 	mux \
 	stream_out \
-	hw/vdpau \
 	hw/mmal
 
 SUBDIRS = . $(BASE_SUBDIRS)
 DIST_SUBDIRS = . $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 if ENABLE_SOUT
 SUBDIRS += access_output mux stream_out
-endif
-if HAVE_VDPAU
-SUBDIRS += hw/vdpau
 endif
 if HAVE_MMAL
 SUBDIRS += hw/mmal
@@ -45,6 +41,7 @@ include audio_mixer/Makefile.am
 include audio_output/Makefile.am
 include codec/Makefile.am
 include demux/Makefile.am
+include hw/vdpau/Makefile.am
 include lua/Makefile.am
 include meta_engine/Makefile.am
 include notify/Makefile.am
