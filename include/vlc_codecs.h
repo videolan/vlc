@@ -257,6 +257,7 @@ ATTR_PACKED
 #define WAVE_FORMAT_ATRAC3              0x0270 /* Atrac3, != from MSDN doc */
 #define WAVE_FORMAT_SONY_ATRAC3         0x0272 /* Atrac3, != from MSDN doc */
 
+#define WAVE_FORMAT_IMC                 0x0401
 #define WAVE_FORMAT_INDEO_AUDIO         0x0402 /* Indeo Audio Coder */
 
 #define WAVE_FORMAT_AAC_2               0x1601 /* Other AAC */
@@ -409,6 +410,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_GSM_AMR,    VLC_CODEC_AMR_NB,                 "GSM-AMR Audio VBR, SID" },
     { WAVE_FORMAT_ULEAD_DV_AUDIO_NTSC, VLC_CODEC_ULEAD_DV_AUDIO_NTSC, "Ulead DV audio NTSC" },
     { WAVE_FORMAT_ULEAD_DV_AUDIO_PAL, VLC_CODEC_ULEAD_DV_AUDIO_PAL, "Ulead DV audio PAL" },
+    { WAVE_FORMAT_IMC,        VLC_CODEC_IMC,                    "IMC" },
     { WAVE_FORMAT_INDEO_AUDIO, VLC_CODEC_INDEO_AUDIO, "Indeo Audio Coder" },
     { WAVE_FORMAT_VOXWARE_RT29,VLC_CODEC_METASOUND,             "VoxWare MetaSound" },
 
