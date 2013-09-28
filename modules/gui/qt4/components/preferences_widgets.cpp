@@ -1228,11 +1228,11 @@ void KeySelectorControl::finish()
             treeItem->setData( ACTION_COL, Qt::UserRole,
                                QVariant( qfu( p_config_item->psz_name ) ) );
 
-            QString keys = qfu( p_config_item->value.psz );
+            QString keys = qfu(p_config_item->value.psz ? _(p_config_item->value.psz) : "");
             treeItem->setText( HOTKEY_COL, keys );
             treeItem->setToolTip( HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
             treeItem->setToolTip( GLOBAL_HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
-            treeItem->setData( HOTKEY_COL, Qt::UserRole, QVariant( keys ) );
+            treeItem->setData( HOTKEY_COL, Qt::UserRole, QVariant( p_config_item->value.psz ) );
             table->addTopLevelItem( treeItem );
             continue;
         }
@@ -1313,7 +1313,7 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
 
     if( d->result() == QDialog::Accepted )
     {
-        QString newKey = VLCKeyToString( d->keyValue );
+        QString newKey = VLCKeyToString( d->keyValue, false );
 
         /* In case of conflict, reset other keys*/
         if( d->conflicts )
@@ -1331,7 +1331,7 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
             }
         }
 
-        keyItem->setText( column, newKey );
+        keyItem->setText( column, VLCKeyToString( d->keyValue, true ) );
         keyItem->setData( column, Qt::UserRole, newKey );
     }
     else if( d->result() == 2 )
@@ -1448,7 +1448,7 @@ void KeyInputDialog::setExistingkeysSet( const QSet<QString> *keyset )
 void KeyInputDialog::checkForConflicts( int i_vlckey, const QString &sequence )
 {
     QList<QTreeWidgetItem *> conflictList =
-        table->findItems( VLCKeyToString( i_vlckey ), Qt::MatchExactly,
+        table->findItems( VLCKeyToString( i_vlckey, true ), Qt::MatchExactly,
                           b_global ? 2 : 1 );
 
     if( conflictList.count() &&
@@ -1491,7 +1491,7 @@ void KeyInputDialog::keyPressEvent( QKeyEvent *e )
     int i_vlck = qtEventToVLCKey( e );
     QKeySequence sequence( e->key() | e->modifiers() );
     selected->setText( qtr( "Key or combination: " )
-                + QString("<b>%1</b>").arg( VLCKeyToString( i_vlck ) ) );
+                + QString("<b>%1</b>").arg( VLCKeyToString( i_vlck, true ) ) );
     checkForConflicts( i_vlck, sequence.toString() );
     keyValue = i_vlck;
 }
@@ -1499,7 +1499,7 @@ void KeyInputDialog::keyPressEvent( QKeyEvent *e )
 void KeyInputDialog::wheelEvent( QWheelEvent *e )
 {
     int i_vlck = qtWheelEventToVLCKey( e );
-    selected->setText( qtr( "Key: " ) + VLCKeyToString( i_vlck ) );
+    selected->setText( qtr( "Key: " ) + VLCKeyToString( i_vlck, true ) );
     checkForConflicts( i_vlck, QString() );
     keyValue = i_vlck;
 }
