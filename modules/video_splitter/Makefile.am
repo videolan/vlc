@@ -1,15 +1,14 @@
-include $(top_srcdir)/modules/common.am
 splitterdir = $(pluginsdir)/video_splitter
 
 splitter_LTLIBRARIES = \
 	libclone_plugin.la \
 	libwall_plugin.la
 
-libclone_plugin_la_SOURCES = clone.c
+libclone_plugin_la_SOURCES = video_splitter/clone.c
 
-libwall_plugin_la_SOURCES = wall.c
+libwall_plugin_la_SOURCES = video_splitter/wall.c
 
-libpanoramix_plugin_la_SOURCES = panoramix.c
+libpanoramix_plugin_la_SOURCES = video_splitter/panoramix.c
 libpanoramix_plugin_la_CFLAGS = $(AM_CFLAGS)
 libpanoramix_plugin_la_LIBADD = $(LIBM)
 if HAVE_WIN32

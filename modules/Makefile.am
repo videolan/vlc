@@ -11,7 +11,6 @@ BASE_SUBDIRS = \
 	text_renderer \
 	video_filter \
 	video_output \
-	video_splitter \
 	visualization
 EXTRA_SUBDIRS = \
 	access_output \
@@ -44,6 +43,7 @@ include notify/Makefile.am
 include services_discovery/Makefile.am
 include stream_filter/Makefile.am
 include video_chroma/Makefile.am
+include video_splitter/Makefile.am
 
 BUILT_SOURCES += dummy.cpp
 
