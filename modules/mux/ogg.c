@@ -989,6 +989,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     op.b_o_s    = 0;
     op.e_o_s    = 0;
     op.packetno = p_stream->i_packet_no++;
+    op.granulepos = -1;
 
     if( p_stream->i_cat == AUDIO_ES )
     {
