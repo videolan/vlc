@@ -133,23 +133,6 @@ typedef enum {
     ZVBI_KEY_INDEX  = 'i' << 16,
 } ttxt_key_id;
 
-typedef enum {
-    DATA_UNIT_EBU_TELETEXT_NON_SUBTITLE     = 0x02,
-    DATA_UNIT_EBU_TELETEXT_SUBTITLE         = 0x03,
-    DATA_UNIT_EBU_TELETEXT_INVERTED         = 0x0C,
-
-    DATA_UNIT_ZVBI_WSS_CPR1204              = 0xB4,
-    DATA_UNIT_ZVBI_CLOSED_CAPTION_525       = 0xB5,
-    DATA_UNIT_ZVBI_MONOCHROME_SAMPLES_525   = 0xB6,
-
-    DATA_UNIT_VPS                           = 0xC3,
-    DATA_UNIT_WSS                           = 0xC4,
-    DATA_UNIT_CLOSED_CAPTION                = 0xC5,
-    DATA_UNIT_MONOCHROME_SAMPLES            = 0xC6,
-
-    DATA_UNIT_STUFFING                      = 0xFF,
-} data_unit_id;
-
 #define MAX_SLICES 32
 
 struct decoder_sys_t
