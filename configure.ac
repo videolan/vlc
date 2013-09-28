@@ -1016,24 +1016,6 @@ VLC_RESTORE_FLAGS
 SYMBOLIC_LDFLAGS="${ac_cv_ld_bsymbolic}"
 AC_SUBST(SYMBOLIC_LDFLAGS)
 
-dnl Check for Darwin plugin linking flags
-AS_IF([test "${SYS}" = "darwin"], [
-  VLC_SAVE_FLAGS
-  CFLAGS="${CFLAGS} -bundle -undefined error"
-  AC_CACHE_CHECK([if $CC accepts -bundle -undefined error],
-    [ac_cv_ld_darwin], [
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
-      ac_cv_ld_darwin=yes
-    ], [
-      ac_cv_ld_darwin=no
-    ])
-  ])
-  AS_IF([test "${ac_cv_ld_darwin}" != "no"], [
-    VLC_ADD_LDFLAGS([plugin],[-bundle -undefined error])
-  ])
-  VLC_RESTORE_FLAGS
-])
-
 dnl Checks for __attribute__(aligned()) directive
 VLC_SAVE_FLAGS
 CFLAGS="${CFLAGS} -Werror"
