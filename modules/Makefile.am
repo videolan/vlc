@@ -7,7 +7,6 @@ BASE_SUBDIRS = \
 	control \
 	gui \
 	misc \
-	notify \
 	packetizer \
 	stream_filter \
 	text_renderer \
@@ -43,6 +42,7 @@ include codec/Makefile.am
 include demux/Makefile.am
 include lua/Makefile.am
 include meta_engine/Makefile.am
+include notify/Makefile.am
 include services_discovery/Makefile.am
 
 BUILT_SOURCES += dummy.cpp
