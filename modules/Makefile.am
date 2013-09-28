@@ -20,8 +20,7 @@ EXTRA_SUBDIRS = \
 	access_output \
 	mux \
 	stream_out \
-	hw/vdpau \
-	lua
+	hw/vdpau
 
 SUBDIRS = . $(BASE_SUBDIRS)
 DIST_SUBDIRS = . $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
@@ -30,9 +29,6 @@ SUBDIRS += access_output mux stream_out
 endif
 if HAVE_VDPAU
 SUBDIRS += hw/vdpau
-endif
-if BUILD_LUA
-SUBDIRS += lua
 endif
 
 dist_noinst_SCRIPTS = genmf list.sh module.rc.in
@@ -45,6 +41,7 @@ include audio_mixer/Makefile.am
 include audio_output/Makefile.am
 include codec/Makefile.am
 include demux/Makefile.am
+include lua/Makefile.am
 include meta_engine/Makefile.am
 include services_discovery/Makefile.am
 

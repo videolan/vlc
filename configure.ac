@@ -4196,7 +4196,6 @@ AC_CONFIG_FILES([
   modules/gui/macosx_dialog_provider/Makefile
   modules/gui/qt4/Makefile
   modules/gui/skins2/Makefile
-  modules/lua/Makefile
   modules/misc/Makefile
   modules/mux/Makefile
   modules/notify/Makefile
