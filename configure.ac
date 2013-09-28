@@ -4201,7 +4201,6 @@ AC_CONFIG_FILES([
   modules/packetizer/Makefile
   modules/stream_out/Makefile
   modules/text_renderer/Makefile
-  modules/video_chroma/Makefile
   modules/video_filter/Makefile
   modules/video_output/Makefile
   modules/video_splitter/Makefile
