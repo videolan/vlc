@@ -35,6 +35,7 @@
 
 #include "playlist.h"
 #include <vlc_xml.h>
+#include <vlc_strings.h>
 
 /* duplicate from modules/services_discovery/shout.c */
 #define SHOUTCAST_BASE_URL "http/shout-winamp://www.shoutcast.com/sbin/newxml.phtml"
@@ -169,6 +170,7 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
                                   psz_name ) != -1 )
                     {
                         input_item_t *p_input;
+                        resolve_xml_special_chars( psz_mrl );
                         p_input = input_item_New( psz_mrl, psz_name );
                         input_item_CopyOptions( p_input_node->p_item, p_input );
                         free( psz_mrl );
@@ -313,6 +315,7 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
 
                     /* Create the item */
                     input_item_t *p_input;
+                    resolve_xml_special_chars( psz_mrl );
                     p_input = input_item_New( psz_mrl, psz_name );
                     input_item_CopyOptions( p_input_node->p_item, p_input );
                     free( psz_mrl );

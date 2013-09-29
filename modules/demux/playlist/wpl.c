@@ -30,6 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_demux.h>
+#include <vlc_strings.h>
 
 #include "playlist.h"
 
@@ -97,6 +98,7 @@ static int Demux( demux_t *p_demux )
                 input_item_t *p_input;
 
                 *psz_parse = '\0';
+                resolve_xml_special_chars( psz_uri );
                 psz_uri = ProcessMRL( psz_uri, p_demux->p_sys->psz_prefix );
                 p_input = input_item_NewExt( psz_uri, psz_uri,
                                         0, NULL, 0, -1 );
