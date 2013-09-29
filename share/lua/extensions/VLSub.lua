@@ -286,7 +286,7 @@ function descriptor()
 		version = "0.9.10",
 		author = "exebetche",
 		url = 'http://www.opensubtitles.org/',
-		shortdesc = "VLsub";
+		shortdesc = "Download Subtitles";
 		description = options.translation.int_descr,
 		capabilities = {"menu", "input-listener" }
 	}
