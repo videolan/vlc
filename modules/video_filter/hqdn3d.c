@@ -51,13 +51,9 @@ static picture_t *Filter (filter_t *, picture_t *);
 #define FILTER_PREFIX       "hqdn3d-"
 
 #define LUMA_SPAT_TEXT          N_("Spatial luma strength (0-254)")
-#define LUMA_SPAT_LONGTEXT      N_("Spatial luma strength (default 4)")
 #define CHROMA_SPAT_TEXT        N_("Spatial chroma strength (0-254)")
-#define CHROMA_SPAT_LONGTEXT    N_("Spatial chroma strength (default 3)")
 #define LUMA_TEMP_TEXT          N_("Temporal luma strength (0-254)")
-#define LUMA_TEMP_LONGTEXT      N_("Temporal luma strength (default 6)")
 #define CHROMA_TEMP_TEXT        N_("Temporal chroma strength (0-254)")
-#define CHROMA_TEMP_LONGTEXT    N_("Temporal chroma strength (default 4.5)")
 
 vlc_module_begin()
     set_shortname(N_("HQ Denoiser 3D"))
@@ -67,13 +63,13 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VFILTER)
 
     add_float_with_range(FILTER_PREFIX "luma-spat", 4.0, 0.0, 254.0,
-            LUMA_SPAT_TEXT, LUMA_SPAT_LONGTEXT, false)
+            LUMA_SPAT_TEXT, LUMA_SPAT_TEXT, false)
     add_float_with_range(FILTER_PREFIX "chroma-spat", 3.0, 0.0, 254.0,
-            CHROMA_SPAT_TEXT, CHROMA_SPAT_LONGTEXT, false)
+            CHROMA_SPAT_TEXT, CHROMA_SPAT_TEXT, false)
     add_float_with_range(FILTER_PREFIX "luma-temp", 6.0, 0.0, 254.0,
-            LUMA_TEMP_TEXT, LUMA_TEMP_LONGTEXT, false)
+            LUMA_TEMP_TEXT, LUMA_TEMP_TEXT, false)
     add_float_with_range(FILTER_PREFIX "chroma-temp", 4.5, 0.0, 254.0,
-            CHROMA_TEMP_TEXT, CHROMA_TEMP_LONGTEXT, false)
+            CHROMA_TEMP_TEXT, CHROMA_TEMP_TEXT, false)
 
     add_shortcut("hqdn3d")
 
