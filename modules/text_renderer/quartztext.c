@@ -593,7 +593,11 @@ static void setFontAttibutes(char *psz_fontname, int i_font_size, uint32_t i_fon
                                     slant);
     CFRelease(slant);
 
-    // Handle foreground colour
+    // fetch invalid colors
+    if (i_font_color == 0xFFFFFFFF)
+        i_font_color = 0x00FFFFFF;
+
+    // Handle foreground color
     CGColorSpaceRef rgbColorSpace = CGColorSpaceCreateDeviceRGB();
     CGFloat components[] = { (float)((i_font_color & 0x00ff0000) >> 16) / 255.0,
                              (float)((i_font_color & 0x0000ff00) >>  8) / 255.0,
