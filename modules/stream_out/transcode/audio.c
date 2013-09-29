@@ -208,7 +208,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
             if (i_drift > MASTER_SYNC_MAX_DRIFT || i_drift < -MASTER_SYNC_MAX_DRIFT)
             {
                 msg_Dbg( p_stream,
-                    "drift is too high (%"PRId64"), resetting master sync",
+                    "audio drift is too high (%"PRId64"), resetting master sync",
                     i_drift );
                 date_Set( &id->interpolated_pts, p_audio_buf->i_pts );
                 i_pts = p_audio_buf->i_pts + 1;

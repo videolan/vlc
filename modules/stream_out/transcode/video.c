@@ -664,7 +664,7 @@ static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, bool b_need
               || i_video_drift < -MASTER_SYNC_MAX_DRIFT ) )
         {
             msg_Dbg( p_stream,
-                "drift is too high (%"PRId64"), resetting master sync",
+                "video drift is too high (%"PRId64"), resetting master sync",
                 i_video_drift );
             date_Set( &id->interpolated_pts, p_pic->date );
             i_pts = p_pic->date + 1;
@@ -765,7 +765,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                   || i_video_drift < -MASTER_SYNC_MAX_DRIFT ) )
             {
                 msg_Dbg( p_stream,
-                    "drift is too high (%"PRId64", resetting master sync",
+                    "video drift is too high (%"PRId64", resetting master sync",
                     i_video_drift );
                 date_Set( &id->interpolated_pts, p_pic->date );
                 i_pts = p_pic->date + 1;
