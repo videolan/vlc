@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>550</width>
-    <height>327</height>
+    <width>654</width>
+    <height>345</height>
    </rect>
   </property>
   <property name="currentIndex">
@@ -1554,8 +1554,101 @@
    <attribute name="title">
     <string>Advanced</string>
    </attribute>
-   <layout class="QGridLayout" name="gridLayout_12">
-    <item row="3" column="0" rowspan="3">
+   <layout class="QGridLayout" name="gridLayout_7">
+    <item row="2" column="1" rowspan="2">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QCheckBox" name="anaglyphEnable">
+        <property name="text">
+         <string>Anaglyph 3D</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="mirrorEnable">
+        <property name="text">
+         <string>Mirror</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="psychedelicEnable">
+        <property name="text">
+         <string>Psychedelic</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="waveEnable">
+        <property name="text">
+         <string>Waves</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="rippleEnable">
+        <property name="text">
+         <string>Water effect</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="motiondetectEnable">
+        <property name="text">
+         <string>Motion detect</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="2" column="0">
+     <widget class="QGroupBox" name="gaussianblurEnable">
+      <property name="title">
+       <string>Spatial blur</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_17">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_35">
+         <property name="text">
+          <string>Sigma</string>
+         </property>
+         <property name="buddy">
+          <cstring>blurFactorSlider</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QSlider" name="gaussianblurSigmaSlider">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>127</number>
+         </property>
+         <property name="value">
+          <number>80</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="tickPosition">
+          <enum>QSlider::TicksBelow</enum>
+         </property>
+         <property name="tickInterval">
+          <number>16</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="0">
      <widget class="QGroupBox" name="motionblurEnable">
       <property name="title">
        <string>Motion blur</string>
@@ -1602,34 +1695,7 @@
       </layout>
      </widget>
     </item>
-    <item row="3" column="2">
-     <widget class="QCheckBox" name="motiondetectEnable">
-      <property name="text">
-       <string>Motion detect</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="2">
-     <widget class="QCheckBox" name="psychedelicEnable">
-      <property name="text">
-       <string>Psychedelic</string>
-      </property>
-     </widget>
-    </item>
-    <item row="9" column="0">
-     <spacer name="verticalSpacer_4">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="2" column="0">
+    <item row="0" column="0">
      <widget class="QGroupBox" name="antiflickerEnable">
       <property name="title">
        <string>Anti-Flickering</string>
@@ -1676,16 +1742,10 @@
       </layout>
      </widget>
     </item>
-    <item row="2" column="2">
-     <widget class="QGroupBox" name="cloneEnable">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
+    <item row="0" column="1" rowspan="2">
+     <widget class="QGroupBox" name="hqdn3dEnable">
       <property name="title">
-       <string>Clone</string>
+       <string>Denoiser</string>
       </property>
       <property name="checkable">
        <bool>true</bool>
@@ -1693,61 +1753,115 @@
       <property name="checked">
        <bool>false</bool>
       </property>
-      <layout class="QGridLayout" name="gridLayout_7">
+      <layout class="QGridLayout" name="gridLayout_12">
        <item row="0" column="0">
-        <widget class="QLabel" name="label_9">
+        <widget class="QLabel" name="label_44">
          <property name="text">
-          <string>Number of clones</string>
-         </property>
-         <property name="buddy">
-          <cstring>cloneCountSpin</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QSpinBox" name="cloneCountSpin">
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="value">
-          <number>2</number>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="4" column="2">
-     <widget class="QCheckBox" name="rippleEnable">
-      <property name="text">
-       <string>Water effect</string>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="0" rowspan="2">
-     <widget class="QGroupBox" name="gaussianblurEnable">
-      <property name="title">
-       <string>Spatial blur</string>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-      <property name="checked">
-       <bool>false</bool>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_17">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_35">
-         <property name="text">
-          <string>Sigma</string>
+          <string>Spatial luma strength</string>
          </property>
          <property name="buddy">
           <cstring>blurFactorSlider</cstring>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QSlider" name="gaussianbluSigmaSlider">
+       <item row="0" column="1" colspan="2">
+        <widget class="QSlider" name="hqdn3dLumaSpatSlider">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>127</number>
+         </property>
+         <property name="value">
+          <number>80</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="tickPosition">
+          <enum>QSlider::TicksBelow</enum>
+         </property>
+         <property name="tickInterval">
+          <number>16</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QLabel" name="label_45">
+         <property name="text">
+          <string>Temporal luma strength</string>
+         </property>
+         <property name="buddy">
+          <cstring>blurFactorSlider</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QSlider" name="hqdn3dLumaTempSlider">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>127</number>
+         </property>
+         <property name="value">
+          <number>80</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="tickPosition">
+          <enum>QSlider::TicksBelow</enum>
+         </property>
+         <property name="tickInterval">
+          <number>16</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QLabel" name="label_46">
+         <property name="text">
+          <string>Spatial chroma strength</string>
+         </property>
+         <property name="buddy">
+          <cstring>blurFactorSlider</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QSlider" name="hqdn3dChromaSpatSlider">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>127</number>
+         </property>
+         <property name="value">
+          <number>80</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="tickPosition">
+          <enum>QSlider::TicksBelow</enum>
+         </property>
+         <property name="tickInterval">
+          <number>16</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_47">
+         <property name="text">
+          <string>Temporal chroma strength</string>
+         </property>
+         <property name="buddy">
+          <cstring>blurFactorSlider</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="QSlider" name="hqdn3dChromaTempSlider">
          <property name="minimum">
           <number>1</number>
          </property>
@@ -1771,25 +1885,45 @@
       </layout>
      </widget>
     </item>
-    <item row="6" column="2">
-     <widget class="QCheckBox" name="mirrorEnable">
-      <property name="text">
-       <string>Mirror</string>
+    <item row="3" column="0">
+     <widget class="QGroupBox" name="cloneEnable">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-     </widget>
-    </item>
-    <item row="7" column="2">
-     <widget class="QCheckBox" name="waveEnable">
-      <property name="text">
-       <string>Waves</string>
+      <property name="title">
+       <string>Clone</string>
       </property>
-     </widget>
-    </item>
-    <item row="8" column="2">
-     <widget class="QCheckBox" name="anaglyphEnable">
-      <property name="text">
-       <string>Anaglyph 3D</string>
+      <property name="checkable">
+       <bool>true</bool>
       </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Number of clones</string>
+         </property>
+         <property name="buddy">
+          <cstring>cloneCountSpin</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QSpinBox" name="cloneCountSpin">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="value">
+          <number>2</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>

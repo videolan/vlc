@@ -203,10 +203,16 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER( mirror )
 
     SETUP_VFILTER( gaussianblur )
-    SETUP_VFILTER_OPTION( gaussianbluSigmaSlider, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( gaussianblurSigmaSlider, valueChanged( int ) )
 
     SETUP_VFILTER( antiflicker )
     SETUP_VFILTER_OPTION( antiflickerSofteningSizeSlider, valueChanged( int ) )
+
+    SETUP_VFILTER( hqdn3d )
+    SETUP_VFILTER_OPTION( hqdn3dLumaSpatSlider, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( hqdn3dLumaTempSlider, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( hqdn3dChromaSpatSlider, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( hqdn3dChromaTempSlider, valueChanged( int ) )
 
 
     if( module_exists( "atmo" ) )
@@ -585,9 +591,9 @@ void ExtVideo::setWidgetValue( QObject *widget )
 void ExtVideo::updateFilterOptions()
 {
     QString module = ModuleFromWidgetName( sender()->parent() );
-    //std::cout << "Module name: " << module.toStdString() << std::endl;
+    //msg_Dbg( p_intf, "Module name: %s", qtu( module ) );
     QString option = OptionFromWidgetName( sender() );
-    //std::cout << "Option name: " << option.toStdString() << std::endl;
+    //msg_Dbg( p_intf, "Option name: %s", qtu( option ) );
 
     vlc_object_t *p_obj = ( vlc_object_t * )
         vlc_object_find_name( p_intf->p_libvlc, qtu( module ) );
