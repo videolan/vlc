@@ -121,7 +121,7 @@ static void I422_VYUY (filter_t *filter, picture_t *src, picture_t *dst)
 VIDEO_FILTER_WRAPPER (I422_VYUY)
 
 
-/* Packedr YUV422 to planar YUV422 */
+/* Packed YUV422 to planar YUV422 */
 static void YUYV_I422 (filter_t *filter, picture_t *src, picture_t *dst)
 {
     DEFINE_PLANES(out, dst);
