@@ -45,6 +45,15 @@ vlc_module_end ()
     struct yuv_planes planes = { \
         (pict)->Y_PIXELS, (pict)->V_PIXELS, (pict)->U_PIXELS, (pict)->Y_PITCH }
 
+#define DEFINE_UV_PLANES(planes, pict) \
+    struct uv_planes planes = { \
+        (pict)->U_PIXELS, (pict)->V_PIXELS, (pict)->U_PITCH }
+#define DEFINE_UV_PLANES_SWAP(planes, pict) \
+    struct uv_planes planes = { \
+        (pict)->V_PIXELS, (pict)->U_PIXELS, (pict)->U_PITCH }
+#define DEFINE_UV_PACK(pack, pict) \
+    struct yuv_pack pack = { (pict)->U_PIXELS, (pict)->U_PITCH }
+
 /* Planar YUV420 to packed YUV422 */
 static void I420_YUYV (filter_t *filter, picture_t *src, picture_t *dst)
 {
@@ -81,6 +90,52 @@ static void I420_VYUY (filter_t *filter, picture_t *src, picture_t *dst)
                     filter->fmt_in.video.i_height);
 }
 VIDEO_FILTER_WRAPPER (I420_VYUY)
+
+
+/* Semiplanar NV12/21/16/24 to planar I420/YV12/I422/I444 */
+static void copy_y_plane(filter_t *filter, picture_t *src, picture_t *dst)
+{
+    uint8_t *src_y = src->Y_PIXELS;
+    uint8_t *dst_y = dst->Y_PIXELS;
+    if (src->Y_PITCH == dst->Y_PITCH) {
+        memcpy(dst_y, src_y, dst->Y_PITCH * filter->fmt_in.video.i_height);
+    } else {
+        for (unsigned y = 0; y < filter->fmt_in.video.i_height;
+                y++, dst_y += dst->Y_PITCH, src_y += src->Y_PITCH)
+            memcpy(dst_y, src_y, filter->fmt_in.video.i_width);
+    }
+}
+
+#define SEMIPLANAR_FILTERS(name, h_subsamp, v_subsamp)                    \
+static void name (filter_t *filter, picture_t *src,                       \
+                  picture_t *dst)                                         \
+{                                                                         \
+    DEFINE_UV_PLANES(out, dst);                                           \
+    DEFINE_UV_PACK(in, src);                                              \
+    copy_y_plane (filter, src, dst);                                      \
+    deinterleave_chroma_neon (&out, &in,                                  \
+                              filter->fmt_in.video.i_width  / h_subsamp,  \
+                              filter->fmt_in.video.i_height / v_subsamp); \
+}                                                                         \
+VIDEO_FILTER_WRAPPER (name)                                               \
+
+#define SEMIPLANAR_FILTERS_SWAP(name, h_subsamp, v_subsamp)               \
+static void name (filter_t *filter, picture_t *src,                       \
+                  picture_t *dst)                                         \
+{                                                                         \
+    DEFINE_UV_PLANES_SWAP(out, dst);                                      \
+    DEFINE_UV_PACK(in, src);                                              \
+    copy_y_plane (filter, src, dst);                                      \
+    deinterleave_chroma_neon (&out, &in,                                  \
+                              filter->fmt_in.video.i_width  / h_subsamp,  \
+                              filter->fmt_in.video.i_height / v_subsamp); \
+}                                                                         \
+VIDEO_FILTER_WRAPPER (name)                                               \
+
+SEMIPLANAR_FILTERS (Semiplanar_Planar_420, 2, 2)
+SEMIPLANAR_FILTERS_SWAP (Semiplanar_Planar_420_Swap, 2, 2)
+SEMIPLANAR_FILTERS (Semiplanar_Planar_422, 2, 1)
+SEMIPLANAR_FILTERS (Semiplanar_Planar_444, 1, 1)
 
 
 /* Planar YUV422 to packed YUV422 */
@@ -225,6 +280,57 @@ static int Open (vlc_object_t *obj)
                     break;
                 case VLC_CODEC_VYUY:
                     filter->pf_video_filter = I422_VYUY_Filter;
+                    break;
+                default:
+                    return VLC_EGENERIC;
+            }
+            break;
+
+        /* Semiplanar to planar */
+        case VLC_CODEC_NV12:
+            switch (filter->fmt_out.video.i_chroma)
+            {
+                case VLC_CODEC_I420:
+                    filter->pf_video_filter = Semiplanar_Planar_420_Filter;
+                    break;
+                case VLC_CODEC_YV12:
+                    filter->pf_video_filter = Semiplanar_Planar_420_Swap_Filter;
+                    break;
+                default:
+                    return VLC_EGENERIC;
+            }
+            break;
+
+        case VLC_CODEC_NV21:
+            switch (filter->fmt_out.video.i_chroma)
+            {
+                case VLC_CODEC_I420:
+                    filter->pf_video_filter = Semiplanar_Planar_420_Swap_Filter;
+                    break;
+                case VLC_CODEC_YV12:
+                    filter->pf_video_filter = Semiplanar_Planar_420_Filter;
+                    break;
+                default:
+                    return VLC_EGENERIC;
+            }
+            break;
+
+        case VLC_CODEC_NV16:
+            switch (filter->fmt_out.video.i_chroma)
+            {
+                case VLC_CODEC_I422:
+                    filter->pf_video_filter = Semiplanar_Planar_422_Filter;
+                    break;
+                default:
+                    return VLC_EGENERIC;
+            }
+            break;
+
+        case VLC_CODEC_NV24:
+            switch (filter->fmt_out.video.i_chroma)
+            {
+                case VLC_CODEC_I444:
+                    filter->pf_video_filter = Semiplanar_Planar_444_Filter;
                     break;
                 default:
                     return VLC_EGENERIC;

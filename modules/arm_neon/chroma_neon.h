@@ -30,6 +30,14 @@ struct yuv_planes
     size_t pitch;
 };
 
+/* Planar chroma buffers.
+ * Pitch is in bytes. */
+struct uv_planes
+{
+    void *u, *v;
+    size_t pitch;
+};
+
 /* Packed picture buffer. Pitch is in bytes (_not_ pixels). */
 struct yuv_pack
 {
@@ -66,6 +74,11 @@ void yuyv_i422_neon (struct yuv_planes *const out,
 void uyvy_i422_neon (struct yuv_planes *const out,
                      const struct yuv_pack *const in,
                      int width, int height) asm("uyvy_i422_neon");
+
+/* Semiplanar to planar conversion. */
+void deinterleave_chroma_neon (struct uv_planes *const out,
+                               const struct yuv_pack *const in,
+                               int width, int height) asm("deinterleave_chroma_neon");
 
 /* I420 to RGBA conversion. */
 void i420_rgb_neon (struct yuv_pack *const out,

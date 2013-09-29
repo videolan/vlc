@@ -7,6 +7,7 @@ libsimple_channel_mixer_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
 libsimple_channel_mixer_neon_plugin_LIBTOOLFLAGS = --tag=CC
 
 libchroma_yuv_neon_plugin_la_SOURCES = \
+	arm_neon/deinterleave_chroma.S \
 	arm_neon/i420_yuyv.S \
 	arm_neon/i422_yuyv.S \
 	arm_neon/yuyv_i422.S \
