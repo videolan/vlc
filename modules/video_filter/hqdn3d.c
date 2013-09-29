@@ -43,6 +43,9 @@
 static int  Open         (vlc_object_t *);
 static void Close        (vlc_object_t *);
 static picture_t *Filter (filter_t *, picture_t *);
+static int DenoiseCallback( vlc_object_t *p_this, char const *psz_var,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data );
 
 /*****************************************************************************
  * Module descriptor
@@ -162,6 +165,11 @@ static int Open(vlc_object_t *this)
     PrecalcCoefs(cfg->Coefs[2], sys->chroma_spat);
     PrecalcCoefs(cfg->Coefs[3], sys->chroma_temp);
 
+    var_AddCallback( filter, FILTER_PREFIX "luma-spat", DenoiseCallback, cfg );
+    var_AddCallback( filter, FILTER_PREFIX "chroma-spat", DenoiseCallback, cfg );
+    var_AddCallback( filter, FILTER_PREFIX "luma-temp", DenoiseCallback, cfg );
+    var_AddCallback( filter, FILTER_PREFIX "chroma-temp", DenoiseCallback, cfg );
+
     return VLC_SUCCESS;
 }
 
@@ -218,4 +226,25 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
             cfg->Coefs[3]);
 
     return CopyInfoAndRelease(dst, src);
+}
+
+
+static int DenoiseCallback( vlc_object_t *p_this, char const *psz_var,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data )
+{
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
+
+    struct vf_priv_s *cfg = (struct vf_priv_s *)p_data;
+
+    if( !strcmp( psz_var, FILTER_PREFIX "luma-spat" ) )
+        PrecalcCoefs(cfg->Coefs[0], newval.f_float);
+    else if( !strcmp( psz_var, FILTER_PREFIX "luma-temp" ) )
+        PrecalcCoefs(cfg->Coefs[1], newval.f_float);
+    else if( !strcmp( psz_var, FILTER_PREFIX "chroma-spat") )
+        PrecalcCoefs(cfg->Coefs[2], newval.f_float);
+    else if( !strcmp( psz_var, FILTER_PREFIX "chroma-temp") )
+        PrecalcCoefs(cfg->Coefs[3], newval.f_float);
+
+    return VLC_SUCCESS;
 }
