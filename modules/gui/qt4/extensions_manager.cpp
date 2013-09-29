@@ -153,7 +153,9 @@ void ExtensionsManager::menu( QMenu *current )
 
         if( b_Active && extension_HasMenu( p_extensions_manager, p_ext ) )
         {
-            QMenu *submenu = new QMenu( qfu( p_ext->psz_title ), current );
+            QMenu *submenu = new QMenu(
+                    qfu( p_ext->psz_shortdescription ? p_ext->psz_shortdescription: p_ext->psz_title ),
+                    current );
             char **ppsz_titles = NULL;
             uint16_t *pi_ids = NULL;
             size_t i_num = 0;
@@ -198,7 +200,8 @@ void ExtensionsManager::menu( QMenu *current )
         }
         else
         {
-            action = current->addAction( qfu( p_ext->psz_title ) );
+            action = current->addAction(
+                    qfu( p_ext->psz_shortdescription ? p_ext->psz_shortdescription: p_ext->psz_title ) );
             menuMapper->setMapping( action, MENU_MAP( 0, i_ext ) );
             CONNECT( action, triggered(), menuMapper, map() );
 
