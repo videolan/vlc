@@ -91,11 +91,6 @@ struct filter_sys_t
     const vlc_chroma_description_t *chroma;
     int w[3], h[3];
 
-    float luma_spat;
-    float chroma_spat;
-    float luma_temp;
-    float chroma_temp;
-
     struct vf_priv_s cfg;
 };
 
@@ -151,19 +146,19 @@ static int Open(vlc_object_t *this)
     config_ChainParse(filter, FILTER_PREFIX, filter_options,
                       filter->p_cfg);
 
-    sys->luma_spat =
+    float luma_spat =
             var_CreateGetFloatCommand(filter, FILTER_PREFIX "luma-spat");
-    sys->chroma_spat =
+    float chroma_spat =
             var_CreateGetFloatCommand(filter, FILTER_PREFIX "chroma-spat");
-    sys->luma_temp =
+    float luma_temp =
             var_CreateGetFloatCommand(filter, FILTER_PREFIX "luma-temp");
-    sys->chroma_temp =
+    float chroma_temp =
             var_CreateGetFloatCommand(filter, FILTER_PREFIX "chroma-temp");
 
-    PrecalcCoefs(cfg->Coefs[0], sys->luma_spat);
-    PrecalcCoefs(cfg->Coefs[1], sys->luma_temp);
-    PrecalcCoefs(cfg->Coefs[2], sys->chroma_spat);
-    PrecalcCoefs(cfg->Coefs[3], sys->chroma_temp);
+    PrecalcCoefs(cfg->Coefs[0], luma_spat);
+    PrecalcCoefs(cfg->Coefs[1], luma_temp);
+    PrecalcCoefs(cfg->Coefs[2], chroma_spat);
+    PrecalcCoefs(cfg->Coefs[3], chroma_temp);
 
     var_AddCallback( filter, FILTER_PREFIX "luma-spat", DenoiseCallback, cfg );
     var_AddCallback( filter, FILTER_PREFIX "chroma-spat", DenoiseCallback, cfg );
