@@ -534,8 +534,11 @@ static void setFontAttibutes(char *psz_fontname, int i_font_size, uint32_t i_fon
     CFStringRef p_cfString;
     CTFontRef   p_font;
 
-    // Handle font name and size
-    p_cfString = CFStringCreateWithCString(NULL,
+    // fallback on default
+    if (!psz_fontname)
+        psz_fontname = (char *)DEFAULT_FONT;
+
+    p_cfString = CFStringCreateWithCString(kCFAllocatorDefault,
                                             psz_fontname,
                                             kCFStringEncodingUTF8);
     p_font     = CTFontCreateWithName(p_cfString,
