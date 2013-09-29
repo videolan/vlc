@@ -813,6 +813,10 @@
             return;
         }
 
+        /* Make sure video view gets visible in case the playlist was visible before */
+        b_video_view_was_hidden = [o_video_view isHidden];
+        [o_video_view setHidden: NO];
+
         /* Make sure we don't see the o_video_view disappearing of the screen during this operation */
         NSDisableScreenUpdates();
         [o_video_view retain];
@@ -1016,6 +1020,8 @@
     [o_video_view setFrame:[o_temp_view frame]];
     if ([[o_video_view subviews] count] > 0)
         [self makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
+
+    [o_video_view setHidden: b_video_view_was_hidden];
 
     [super makeKeyAndOrderFront:self]; /* our version (in main window) contains a workaround */
 

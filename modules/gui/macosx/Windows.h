@@ -105,6 +105,8 @@ static const float f_min_video_height = 70.0;
     BOOL              b_window_is_invisible;
     NSInteger i_originalLevel;
 
+    BOOL              b_video_view_was_hidden;
+
     NSTimer *t_hide_mouse_timer;
 
     // true when the window is in transition for entering lion fullscreen
