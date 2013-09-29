@@ -1157,12 +1157,17 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         AVPacket packet = {0};
         avcodec_get_frame_defaults( p_sys->frame );
         p_sys->frame->format     = p_sys->p_context->sample_fmt;
-        p_sys->frame->pts        = date_Get( &p_sys->buffer_date );
         p_sys->frame->nb_samples = leftover_samples + p_sys->i_samples_delay;
-        date_Increment( &p_sys->buffer_date, p_sys->i_frame_size );
 
+        if( unlikely( p_aout_buf && ( p_aout_buf->i_pts > VLC_TS_INVALID ) &&
+            (p_aout_buf->i_pts != date_Get( &p_sys->buffer_date ) ) ) )
+            date_Set( &p_sys->buffer_date, p_aout_buf->i_pts );
+
+        p_sys->frame->pts        = date_Get( &p_sys->buffer_date );
+        date_Increment( &p_sys->buffer_date, p_sys->i_frame_size );
         if( likely( p_aout_buf ) )
         {
+
             p_aout_buf->i_nb_samples -= leftover_samples;
             memcpy( p_sys->p_buffer+buffer_delay, p_aout_buf->p_buffer, leftover );
 
@@ -1177,6 +1182,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             p_aout_buf->i_buffer     -= leftover;
             p_aout_buf->i_pts         = date_Get( &p_sys->buffer_date );
         }
+
         if(unlikely( ( (leftover + buffer_delay) < p_sys->i_buffer_out ) &&
                      !(p_sys->p_codec->capabilities & CODEC_CAP_SMALL_LAST_FRAME ))
           )
@@ -1261,10 +1267,6 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
 #else
         const int align = 1;
 #endif
-
-        if( unlikely( p_aout_buf->i_pts > VLC_TS_INVALID &&
-                      p_aout_buf->i_pts != date_Get( &p_sys->buffer_date ) ) )
-            date_Set( &p_sys->buffer_date, p_aout_buf->i_pts );
 
         avcodec_get_frame_defaults( p_sys->frame );
         if( p_sys->b_variable )
