@@ -52,7 +52,7 @@
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
-#define DEFAULT_FONT           "Arial Black"
+#define DEFAULT_FONT           "Helvetica-Neue"
 #define DEFAULT_FONT_COLOR     0xffffff
 #define DEFAULT_REL_FONT_SIZE  16
 
