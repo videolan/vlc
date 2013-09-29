@@ -52,7 +52,6 @@ function strsplit(text, delimiter)
     end
     local i=1
     while 1 do
-        i=i+1
         local first, last = strfind(text, delimiter, pos)
         if first then -- found?
             tinsert(list,i, strsub(text, pos, first-1))
@@ -61,6 +60,7 @@ function strsplit(text, delimiter)
             tinsert(list,i, strsub(text, pos))
             break
         end
+        i = i+1
     end
     return list
 end
