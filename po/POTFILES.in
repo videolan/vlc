@@ -441,6 +441,7 @@ modules/demux/avformat/mux.c
 modules/demux/avi/avi.c
 modules/demux/avi/libavi.c
 modules/demux/avi/libavi.h
+modules/demux/caf.c
 modules/demux/cdg.c
 modules/demux/demuxdump.c
 modules/demux/dirac.c

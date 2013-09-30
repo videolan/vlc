@@ -13,6 +13,9 @@ Encoder:
  * Support for HEVC/H.265 encoding using x265
  * Support for Opus encoding using libopus
 
+Demuxer:
+ * New CAF format module
+
 Streaming:
  * WebM streaming, including live sources, compatible with all major browsers
     vlc <your-source> vlc://quit --sout  '#transcode{vcodec=VP80,vb=1000,acodec=vorb,ab=128}

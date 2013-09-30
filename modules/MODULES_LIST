@@ -1,4 +1,4 @@
-List of vlc plugins (413)
+List of vlc plugins (414)
 $Id$
  * a52: A/52 basic parser/packetizer
  * a52tofloat32: A/52 audio converter & decoder plugin, using liba52
@@ -55,6 +55,7 @@ $Id$
  * bluescreen: Bluescreen (weather channel like) video filter
  * bonjour: Zeroconf services discovery
  * caca: color ASCII art video output using libcaca
+ * caf: CAF demuxer
  * canvas: Automatically resize and padd a video
  * cc: CC 608/708 subtitles decoder
  * cdda: input module to read audio CDs

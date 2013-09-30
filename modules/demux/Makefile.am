@@ -126,6 +126,10 @@ demux_LTLIBRARIES += libasf_plugin.la
 libavi_plugin_la_SOURCES = demux/avi/avi.c demux/avi/libavi.c demux/avi/libavi.h
 demux_LTLIBRARIES += libavi_plugin.la
 
+libcaf_plugin_la_SOURCES = demux/caf.c
+libcaf_plugin_la_LIBADD = $(LIBM)
+demux_LTLIBRARIES += libcaf_plugin.la
+
 libavformat_plugin_la_SOURCES = demux/avformat/demux.c \
 	codec/avcodec/fourcc.c \
 	codec/avcodec/chroma.c \
