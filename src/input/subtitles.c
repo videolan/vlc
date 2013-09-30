@@ -59,7 +59,7 @@ static const char const sub_exts[][6] = {
     "usf", "jss",  "cdg",
     "psb", "mpsub","mpl2",
     "pjs", "dks", "stl",
-    ""
+    "vtt",""
 };
 
 static void strcpy_trim( char *d, const char *s )

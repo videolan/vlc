@@ -62,7 +62,7 @@ static const char *const ppsz_sub_type[] =
     "auto", "microdvd", "subrip", "subviewer", "ssa1",
     "ssa2-4", "ass", "vplayer", "sami", "dvdsubtitle", "mpl2",
     "aqt", "pjs", "mpsub", "jacosub", "psb", "realtext", "dks",
-    "subviewer1"
+    "subviewer1","vtt"
 };
 
 vlc_module_begin ()
@@ -111,8 +111,9 @@ enum
     SUB_TYPE_PSB,
     SUB_TYPE_RT,
     SUB_TYPE_DKS,
-    SUB_TYPE_SUBVIEW1 /* SUBVIEWER 1 - mplayer calls it subrip09,
+    SUB_TYPE_SUBVIEW1, /* SUBVIEWER 1 - mplayer calls it subrip09,
                          and Gnome subtitles SubViewer 1.0 */
+    SUB_TYPE_VTT
 };
 
 typedef struct
@@ -185,6 +186,7 @@ static int  ParsePSB        ( demux_t *, subtitle_t *, int );
 static int  ParseRealText   ( demux_t *, subtitle_t *, int );
 static int  ParseDKS        ( demux_t *, subtitle_t *, int );
 static int  ParseSubViewer1 ( demux_t *, subtitle_t *, int );
+static int  ParseVTT        ( demux_t *, subtitle_t *, int );
 
 static const struct
 {
@@ -213,6 +215,7 @@ static const struct
     { "realtext",   SUB_TYPE_RT,          "RealText",    ParseRealText },
     { "dks",        SUB_TYPE_DKS,         "DKS",         ParseDKS },
     { "subviewer1", SUB_TYPE_SUBVIEW1,    "Subviewer 1", ParseSubViewer1 },
+    { "text/vtt",   SUB_TYPE_VTT,         "WebVTT",      ParseVTT },
     { NULL,         SUB_TYPE_UNKNOWN,     "Unknown",     NULL }
 };
 /* When adding support for more formats, be sure to add their file extension
@@ -442,6 +445,11 @@ static int Open ( vlc_object_t *p_this )
             else if( strcasestr( s, "<time" ) )
             {
                 p_sys->i_type = SUB_TYPE_RT;
+                break;
+            }
+            else if( !strncasecmp( s, "WEBVTT",6 ) )
+            {
+                p_sys->i_type = SUB_TYPE_VTT;
                 break;
             }
 
@@ -2078,4 +2086,75 @@ static int ParseSubViewer1( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx 
 
     return VLC_SUCCESS;
 }
+/*Parsing WebVTT */
+static int  ParseVTT( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
+{
+    VLC_UNUSED( i_idx );
 
+    demux_sys_t *p_sys = p_demux->p_sys;
+    text_t      *txt = &p_sys->txt;
+    char        *psz_text;
+
+    for( ;; )
+    {
+        const char *s = TextGetLine( txt );
+        int h1 = 0, m1 = 0, s1 = 0, d1 = 0;
+        int h2 = 0, m2 = 0, s2 = 0, d2 = 0;
+
+        if( !s )
+            return VLC_EGENERIC;
+
+        if( sscanf( s,"%d:%d:%d.%d --> %d:%d:%d.%d",
+                    &h1, &m1, &s1, &d1,
+                    &h2, &m2, &s2, &d2 ) == 8 ||
+            sscanf( s,"%d:%d:%d.%d --> %d:%d.%d",
+                    &h1, &m1, &s1, &d1,
+                         &m2, &s2, &d2 ) == 7 ||
+            sscanf( s,"%d:%d.%d --> %d:%d:%d.%d",
+                         &m1, &s1, &d1,
+                    &h2, &m2, &s2, &d2 ) == 7 ||
+            sscanf( s,"%d:%d.%d --> %d:%d.%d",
+                         &m1, &s1, &d1,
+                         &m2, &s2, &d2 ) == 6 )
+        {
+            p_subtitle->i_start = ( (int64_t)h1 * 3600 * 1000 +
+                                    (int64_t)m1 * 60 * 1000 +
+                                    (int64_t)s1 * 1000 +
+                                    (int64_t)d1 ) * 1000;
+
+            p_subtitle->i_stop  = ( (int64_t)h2 * 3600 * 1000 +
+                                    (int64_t)m2 * 60 * 1000 +
+                                    (int64_t)s2 * 1000 +
+                                    (int64_t)d2 ) * 1000;
+            if( p_subtitle->i_start < p_subtitle->i_stop )
+                break;
+        }
+    }
+
+    /* Now read text until an empty line */
+    psz_text = strdup("");
+    if( !psz_text )
+        return VLC_ENOMEM;
+
+    for( ;; )
+    {
+        const char *s = TextGetLine( txt );
+        int i_len;
+        int i_old;
+
+        i_len = s ? strlen( s ) : 0;
+        if( i_len <= 0 )
+        {
+            p_subtitle->psz_text = psz_text;
+            return VLC_SUCCESS;
+        }
+
+        i_old = strlen( psz_text );
+        psz_text = realloc_or_free( psz_text, i_old + i_len + 1 + 1 );
+        if( !psz_text )
+            return VLC_ENOMEM;
+
+        strcat( psz_text, s );
+        strcat( psz_text, "\n" );
+    }
+}
