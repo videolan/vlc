@@ -199,7 +199,6 @@ static const luaL_Reg p_reg[] = { { NULL, NULL } };
 static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
-    intf_sys_t *p_sys;
     lua_State *L;
 
     config_ChainParse( p_intf, "lua-", ppsz_intf_options, p_intf->p_cfg );
@@ -215,14 +214,17 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
         /* Cleaned up by vlc_object_release() */
         p_intf->psz_header = strdup( name );
 
-    p_intf->p_sys = (intf_sys_t*)malloc( sizeof(intf_sys_t) );
-    if( !p_intf->p_sys )
+    intf_sys_t *p_sys = malloc( sizeof(*p_sys) );
+    if( unlikely(p_sys == NULL) )
     {
         free( p_intf->psz_header );
         p_intf->psz_header = NULL;
         return VLC_ENOMEM;
     }
-    p_sys = p_intf->p_sys;
+    p_intf->p_sys = p_sys;
+
+    vlclua_fd_init( p_sys );
+
     p_sys->psz_filename = vlclua_find_file( "intf", name );
     if( !p_sys->psz_filename )
     {
@@ -399,6 +401,7 @@ void Close_LuaIntf( vlc_object_t *p_this )
 
     lua_close( p_sys->L );
     close( p_sys->fd[0] );
+    vlclua_fd_destroy( p_sys );
     free( p_sys->psz_filename );
     free( p_sys );
 }

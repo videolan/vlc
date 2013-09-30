@@ -161,9 +161,13 @@ struct intf_sys_t
 #ifndef _WIN32
     int fd[2];
 #endif
+    int fds[64];
 
     vlc_thread_t thread;
 };
+
+void vlclua_fd_init( struct intf_sys_t * );
+void vlclua_fd_destroy( struct intf_sys_t * );
 
 #endif /* VLC_LUA_H */
 
