@@ -243,7 +243,7 @@ ${MementoSection} $Name_Section02a SEC02a
     "$INSTDIR\NEWS.txt" ""
   CreateShortCut "$SMPROGRAMS\VideoLAN\${PRODUCT_GROUP} Website.lnk" \
     "$INSTDIR\${PRODUCT_GROUP} Website.url"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\Reset VLC media player preferences and cache files.lnk" \
+  CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player - reset preferences and cache files.lnk" \
     "$INSTDIR\vlc.exe" "--reset-config --reset-plugins-cache vlc://quit"
 ${MementoSectionEnd}
 
