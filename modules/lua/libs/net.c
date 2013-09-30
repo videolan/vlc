@@ -345,6 +345,7 @@ static int vlclua_net_poll( lua_State *L )
         luafds[i] = luaL_checkinteger( L, -2 );
         p_fds[i].fd = vlclua_fd_get( L, luafds[i] );
         p_fds[i].events = luaL_checkinteger( L, -1 );
+        p_fds[i].events &= POLLIN | POLLOUT | POLLPRI;
         lua_pop( L, 1 );
         i++;
     }
