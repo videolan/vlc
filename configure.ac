@@ -186,16 +186,11 @@ case "${host_os}" in
       [AS_HELP_STRING([--with-macosx-version-min=VERSION],
         [compile for Mac OS X VERSION and above])])
     if test "${with_macosx_version_min}" != "" ; then
-        MACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}
         CPP="${CPP} -mmacosx-version-min=${with_macosx_version_min}"
         CC="${CC} -mmacosx-version-min=${with_macosx_version_min}"
         CXX="${CXX} -mmacosx-version-min=${with_macosx_version_min}"
         OBJC="${OBJC} -mmacosx-version-min=${with_macosx_version_min}"
         LD="${LD} -mmacosx_version_min=${with_macosx_version_min}"
-        CFLAGS="${CFLAGS} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"
-        CXXFLAGS="${CXXFLAGS} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"
-        OBJCFLAGS="${OBJCFLAGS} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"
-        export MACOSX_DEPLOYMENT_TARGET
     fi
     ;;
   *mingw32* | *cygwin* | *wince* | *mingwce*)
