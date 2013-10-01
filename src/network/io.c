@@ -461,7 +461,7 @@ char *net_Gets(vlc_object_t *obj, int fd, const v_socket_t *vs)
     {
         if (buflen == bufsize)
         {
-            if (unlikely(bufsize >= (1 << 10)))
+            if (unlikely(bufsize >= (1 << 16)))
                 goto error; /* put sane buffer size limit */
 
             char *newbuf = realloc(buf, bufsize + 1024);
