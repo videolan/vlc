@@ -221,7 +221,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( unlikely( !( p_sys = malloc ( sizeof( *p_sys ) ) ) ) )
+    if( unlikely( !( p_sys = calloc ( 1, sizeof( *p_sys ) ) ) ) )
         return VLC_ENOMEM;
 
     p_sys->i_seglen = var_GetInteger( p_access, SOUT_CFG_PREFIX "seglen" );
@@ -828,11 +828,9 @@ static ssize_t openNextFile( sout_access_out_t *p_access, sout_access_out_sys_t 
     uint32_t i_newseg = p_sys->i_segment + 1;
 
     /* Create segment and fill it info that we can (everything excluding duration */
-    output_segment_t *segment = (output_segment_t*)malloc(sizeof(output_segment_t));
+    output_segment_t *segment = (output_segment_t*)calloc(1, sizeof(output_segment_t));
     if( unlikely( !segment ) )
         return -1;
-
-    memset( segment, 0 , sizeof( output_segment_t ) );
 
     segment->i_segment_number = i_newseg;
     segment->psz_filename = formatSegmentPath( p_access->psz_path, i_newseg, true );
