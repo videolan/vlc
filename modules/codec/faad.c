@@ -147,7 +147,6 @@ static int Open( vlc_object_t *p_this )
     p_dec->fmt_out.i_cat = AUDIO_ES;
 
     p_dec->fmt_out.i_codec = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_S16N;
-    p_dec->pf_decode_audio = DecodeBlock;
 
     p_dec->fmt_out.audio.i_physical_channels =
         p_dec->fmt_out.audio.i_original_channels = 0;
@@ -195,6 +194,8 @@ static int Open( vlc_object_t *p_this )
     p_dec->b_need_packetized = true;
 
     p_sys->b_sbr = p_sys->b_ps = false;
+
+    p_dec->pf_decode_audio = DecodeBlock;
     return VLC_SUCCESS;
 }
 
