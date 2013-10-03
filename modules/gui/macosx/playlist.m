@@ -127,6 +127,12 @@
  * This class the superclass of the VLCPlaylist and VLCPlaylistWizard.
  * It contains the common methods and elements of these 2 entities.
  *****************************************************************************/
+@interface VLCPlaylistCommon ()
+{
+    playlist_item_t * p_current_root_item;
+}
+@end
+
 @implementation VLCPlaylistCommon
 
 - (id)init
@@ -401,7 +407,19 @@
 /*****************************************************************************
  * VLCPlaylist implementation
  *****************************************************************************/
-@interface VLCPlaylist (Internal)
+@interface VLCPlaylist ()
+{
+    NSImage *o_descendingSortingImage;
+    NSImage *o_ascendingSortingImage;
+
+    NSMutableArray *o_nodes_array;
+    NSMutableArray *o_items_array;
+
+    BOOL b_selected_item_met;
+    BOOL b_isSortDescending;
+    id o_tc_sortColumn;
+}
+
 - (void)saveTableColumns;
 @end
 
