@@ -242,7 +242,6 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     /* init strings */
     [o_window setTitle: _NS("Errors and Warnings")];
     [o_cleanup_button setTitle: _NS("Clean up")];
-    [o_messages_btn setTitle: _NS("Show Details")];
 }
 
 -(void)dealloc
@@ -282,11 +281,6 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     [o_errors removeAllObjects];
     [o_icons removeAllObjects];
     [o_error_table reloadData];
-}
-
--(IBAction)showMessages:(id)sender
-{
-    [[VLCMain sharedInstance] showMessagesPanel: sender];
 }
 
 /*----------------------------------------------------------------------------
