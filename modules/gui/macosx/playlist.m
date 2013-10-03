@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.m: MacOS X interface module
  *****************************************************************************
-* Copyright (C) 2002-2012 VLC authors and VideoLAN
+* Copyright (C) 2002-2013 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -51,7 +51,6 @@
 
 #include <vlc_keys.h>
 #import <vlc_interface.h>
-
 #include <vlc_url.h>
 
 /*****************************************************************************
@@ -98,18 +97,18 @@
     return NO;
 }
 
-- (BOOL) acceptsFirstResponder
+- (BOOL)acceptsFirstResponder
 {
     return YES;
 }
 
-- (BOOL) becomeFirstResponder
+- (BOOL)becomeFirstResponder
 {
     [self setNeedsDisplay:YES];
     return YES;
 }
 
-- (BOOL) resignFirstResponder
+- (BOOL)resignFirstResponder
 {
     [self setNeedsDisplay:YES];
     return YES;
@@ -880,9 +879,6 @@
 
     NSUInteger indexes[i_count];
     if (i_count == [o_outline_view numberOfRows]) {
-#ifndef NDEBUG
-        msg_Dbg(p_intf, "user selected entire list, deleting current playlist root instead of individual items");
-#endif
         PL_LOCK;
         playlist_NodeDelete(p_playlist, [self currentPlaylistRoot], true, false);
         PL_UNLOCK;
@@ -900,10 +896,6 @@
             PL_UNLOCK;
             continue;
         }
-#ifndef NDEBUG
-        msg_Dbg(p_intf, "deleting item %i (of %i) with id \"%i\", pointerValue \"%p\" and %i children", i+1, i_count,
-                p_item->p_input->i_id, [o_item pointerValue], p_item->i_children +1);
-#endif
 
         if (p_item->i_children != -1) {
         //is a node and not an item
