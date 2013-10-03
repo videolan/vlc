@@ -138,8 +138,8 @@ AR=xcrun ar
 LD=xcrun ld
 STRIP=xcrun strip
 RANLIB=xcrun ranlib
-EXTRA_CFLAGS += -isysroot $(SDKROOT)  -miphoneos-version-min=5.0
-EXTRA_LDFLAGS += -Wl,-syslibroot,$(SDKROOT) -isysroot $(SDKROOT) -miphoneos-version-min=5.0
+EXTRA_CFLAGS += -isysroot $(SDKROOT)
+EXTRA_LDFLAGS += -Wl,-syslibroot,$(SDKROOT) -isysroot $(SDKROOT)
 endif
 
 ifdef HAVE_WIN32
