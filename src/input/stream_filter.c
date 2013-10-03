@@ -111,8 +111,7 @@ stream_t *stream_FilterChainNew( stream_t *p_source,
     /* Add record filter if useful */
     if( b_record )
     {
-        stream_t *p_filter = stream_FilterNew( p_source,
-                                               "stream_filter_record" );
+        stream_t *p_filter = stream_FilterNew( p_source, "record" );
         if( p_filter )
             p_source = p_filter;
     }
