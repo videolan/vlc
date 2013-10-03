@@ -3,8 +3,7 @@ set -e
 
 PLATFORM=OS
 VERBOSE=no
-SDK_VERSION=6.1
-SDK_MIN=5.1
+SDK_VERSION=7.0
 ARCH=armv7
 
 usage()
@@ -73,6 +72,12 @@ if [ "$VERBOSE" = "yes" ]; then
    out="/dev/stdout"
 fi
 
+if [ "$ARCH" = "armv7" ]; then
+SDK_MIN=5.1
+else
+SDK_MIN=7.0
+fi
+
 info "Building libvlc for iOS"
 
 if [ "$PLATFORM" = "Simulator" ]; then
@@ -133,11 +138,11 @@ export STRIP="xcrun strip"
 
 
 export SDKROOT
-if [ "$PLATFORM" = "OS" ]; then
-export CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -mcpu=cortex-a8 -miphoneos-version-min=${SDK_MIN} ${OPTIM}"
-else
-export CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -miphoneos-version-min=${SDK_MIN} ${OPTIM}"
+CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -miphoneos-version-min=${SDK_MIN} ${OPTIM}"
+if [ "$ARCH" = "armv7" -o "$ARCH" = "armv7s" ]; then
+CFLAGS+="-mcpu=cortex-a8"
 fi
+export CFLAGS
 export CPPFLAGS="${CFLAGS}"
 export CXXFLAGS="${CFLAGS}"
 export OBJCFLAGS="${CFLAGS}"
@@ -159,8 +164,8 @@ else
 fi
 
 if [ "$PLATFORM" = "OS" ]; then
-    EXTRA_CFLAGS="-arch ${ARCH} -mcpu=cortex-a8"
-    EXTRA_LDFLAGS="-arch ${ARCH}"
+    EXTRA_CFLAGS="-arch ${ARCH} ${CFLAGS}"
+    EXTRA_LDFLAGS="-arch ${ARCH} ${LDFLAGS}"
 else
     EXTRA_CFLAGS="-m32"
     EXTRA_LDFLAGS="-m32"
