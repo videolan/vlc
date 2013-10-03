@@ -140,7 +140,7 @@ export STRIP="xcrun strip"
 export SDKROOT
 CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -miphoneos-version-min=${SDK_MIN} ${OPTIM}"
 if [ "$ARCH" = "armv7" -o "$ARCH" = "armv7s" ]; then
-CFLAGS+="-mcpu=cortex-a8"
+CFLAGS+=" -mcpu=cortex-a8"
 fi
 export CFLAGS
 export CPPFLAGS="${CFLAGS}"
