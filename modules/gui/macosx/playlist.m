@@ -418,6 +418,7 @@
     BOOL b_selected_item_met;
     BOOL b_isSortDescending;
     id o_tc_sortColumn;
+    NSInteger retainedRowSelection;
 }
 
 - (void)saveTableColumns;
