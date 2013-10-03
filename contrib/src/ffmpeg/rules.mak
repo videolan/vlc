@@ -56,7 +56,9 @@ endif
 
 # ARM stuff
 ifeq ($(ARCH),arm)
+ifndef HAVE_DARWIN_OS
 FFMPEGCONF += --arch=arm
+endif
 ifdef HAVE_NEON
 FFMPEGCONF += --enable-neon
 endif
