@@ -337,7 +337,7 @@
     if (!([self styleMask] & NSTitledWindowMask)) {
         [[NSNotificationCenter defaultCenter] postNotificationName:NSWindowWillCloseNotification object:self];
 
-        [self orderOut: sender];
+        [self close];
     } else
         [super performClose: sender];
 }
