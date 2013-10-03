@@ -550,6 +550,8 @@
     [[[[VLCMain sharedInstance] wizard] playlistWizard] reloadOutlineView];
     [[[[VLCMain sharedInstance] bookmarks] dataTable] reloadData];
 
+    [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:retainedRowSelection] byExtendingSelection:NO];
+
     [self outlineViewSelectionDidChange: nil];
     [[VLCMain sharedInstance] updateMainWindow];
 }
@@ -892,6 +894,7 @@
 
     o_selected_indexes = [o_outline_view selectedRowIndexes];
     i_count = [o_selected_indexes count];
+    retainedRowSelection = [o_selected_indexes firstIndex];
 
     p_playlist = pl_Get(p_intf);
 
