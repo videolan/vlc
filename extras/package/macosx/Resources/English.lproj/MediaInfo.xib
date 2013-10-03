@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">11C74</string>
+    <string key="IBDocument.SystemVersion">12F37</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1138.23</string>
-    <string key="IBDocument.HIToolboxVersion">567.00</string>
+    <string key="IBDocument.AppKitVersion">1187.39</string>
+    <string key="IBDocument.HIToolboxVersion">626.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <object class="NSArray" key="dict.sortedKeys">
@@ -21,7 +21,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="422"/>
+      <integer value="421"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -71,7 +71,7 @@
                 <object class="BGHUDTabViewItem" id="943983233">
                   <string key="NSIdentifier">1</string>
                   <object class="NSView" key="NSView" id="537375861">
-                    <reference key="NSNextResponder" ref="267010932"/>
+                    <nil key="NSNextResponder"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -82,7 +82,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="462575477">
-                          <int key="NSCellFlags">-1804468671</int>
+                          <int key="NSCellFlags">-1804599231</int>
                           <int key="NSCellFlags2">272794624</int>
                           <string key="NSContents"/>
                           <object class="NSFont" key="NSSupport" id="26">
@@ -103,6 +103,7 @@
                           <reference key="NSTextColor" ref="792230567"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="384274076">
                         <reference key="NSNextResponder" ref="537375861"/>
@@ -111,7 +112,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="522566992">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Title</string>
                           <object class="NSFont" key="NSSupport" id="96587716">
@@ -131,6 +132,7 @@
                           </object>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSTextField" id="290294541">
@@ -140,7 +142,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="604389831">
-                          <int key="NSCellFlags">-2072904127</int>
+                          <int key="NSCellFlags">-2073034687</int>
                           <int key="NSCellFlags2">272794624</int>
                           <string key="NSContents"/>
                           <reference key="NSSupport" ref="26"/>
@@ -149,6 +151,7 @@
                           <reference key="NSTextColor" ref="792230567"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="824286379">
                         <reference key="NSNextResponder" ref="537375861"/>
@@ -157,7 +160,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="842755195">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Location</string>
                           <reference key="NSSupport" ref="96587716"/>
@@ -165,6 +168,7 @@
                           <reference key="NSBackgroundColor" ref="974955767"/>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSTextField" id="960295893">
@@ -174,7 +178,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="973683275">
-                          <int key="NSCellFlags">-1804468671</int>
+                          <int key="NSCellFlags">-1804599231</int>
                           <int key="NSCellFlags2">272794624</int>
                           <string key="NSContents"/>
                           <reference key="NSSupport" ref="26"/>
@@ -183,6 +187,7 @@
                           <reference key="NSTextColor" ref="792230567"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="1001995492">
                         <reference key="NSNextResponder" ref="537375861"/>
@@ -191,7 +196,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="584635935">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Artist</string>
                           <reference key="NSSupport" ref="96587716"/>
@@ -199,6 +204,7 @@
                           <reference key="NSBackgroundColor" ref="974955767"/>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSTextField" id="219116650">
@@ -208,7 +214,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="408524113">
-                          <int key="NSCellFlags">-1804468671</int>
+                          <int key="NSCellFlags">-1804599231</int>
                           <int key="NSCellFlags2">272794624</int>
                           <string key="NSContents"/>
                           <reference key="NSSupport" ref="26"/>
@@ -217,6 +223,7 @@
                           <reference key="NSTextColor" ref="792230567"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="396874405">
                         <reference key="NSNextResponder" ref="537375861"/>
@@ -225,7 +232,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="29701042">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Date</string>
                           <reference key="NSSupport" ref="96587716"/>
@@ -233,6 +240,7 @@
                           <reference key="NSBackgroundColor" ref="974955767"/>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSTextField" id="549422693">
@@ -242,7 +250,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="191204279">
-                          <int key="NSCellFlags">-1804468671</int>
+                          <int key="NSCellFlags">-1804599231</int>
                           <int key="NSCellFlags2">272794624</int>
                           <string key="NSContents"/>
                           <reference key="NSSupport" ref="26"/>
@@ -251,6 +259,7 @@
                           <reference key="NSTextColor" ref="792230567"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="564085294">
                         <reference key="NSNextResponder" ref="537375861"/>
@@ -259,7 +268,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="1014528589">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Album</string>
                           <reference key="NSSupport" ref="96587716"/>
@@ -267,6 +276,7 @@
                           <reference key="NSBackgroundColor" ref="974955767"/>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSTextField" id="478086893">
@@ -276,7 +286,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="801895536">
-                          <int key="NSCellFlags">-1804468671</int>
+                          <int key="NSCellFlags">-1804599231</int>
                           <int key="NSCellFlags2">272794624</int>
                           <string key="NSContents"/>
                           <reference key="NSSupport" ref="26"/>
@@ -285,6 +295,7 @@
                           <reference key="NSTextColor" ref="792230567"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="469251612">
                         <reference key="NSNextResponder" ref="537375861"/>
@@ -293,7 +304,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="705407006">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Track Number</string>
                           <reference key="NSSupport" ref="96587716"/>
@@ -301,6 +312,7 @@
                           <reference key="NSBackgroundColor" ref="974955767"/>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSTextField" id="196139401">
@@ -310,7 +322,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="919790548">
-                          <int key="NSCellFlags">-1804468671</int>
+                          <int key="NSCellFlags">-1804599231</int>
                           <int key="NSCellFlags2">272794624</int>
                           <string key="NSContents"/>
                           <reference key="NSSupport" ref="26"/>
@@ -319,6 +331,7 @@
                           <reference key="NSTextColor" ref="792230567"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="287058532">
                         <reference key="NSNextResponder" ref="537375861"/>
@@ -327,7 +340,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="946646706">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Genre</string>
                           <reference key="NSSupport" ref="96587716"/>
@@ -335,6 +348,7 @@
                           <reference key="NSBackgroundColor" ref="974955767"/>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSTextField" id="784351663">
@@ -344,7 +358,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="973609086">
-                          <int key="NSCellFlags">-1804468671</int>
+                          <int key="NSCellFlags">-1804599231</int>
                           <int key="NSCellFlags2">272794624</int>
                           <string key="NSContents"/>
                           <reference key="NSSupport" ref="26"/>
@@ -353,6 +367,7 @@
                           <reference key="NSTextColor" ref="792230567"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="324707670">
                         <reference key="NSNextResponder" ref="537375861"/>
@@ -361,7 +376,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="352056434">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Now Playing</string>
                           <reference key="NSSupport" ref="96587716"/>
@@ -369,6 +384,7 @@
                           <reference key="NSBackgroundColor" ref="974955767"/>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSTextField" id="563490969">
@@ -378,7 +394,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="266285959">
-                          <int key="NSCellFlags">-1804468671</int>
+                          <int key="NSCellFlags">-1804599231</int>
                           <int key="NSCellFlags2">272794624</int>
                           <string key="NSContents"/>
                           <reference key="NSSupport" ref="26"/>
@@ -387,6 +403,7 @@
                           <reference key="NSTextColor" ref="792230567"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="238409727">
                         <reference key="NSNextResponder" ref="537375861"/>
@@ -395,7 +412,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="553240454">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Publisher</string>
                           <reference key="NSSupport" ref="96587716"/>
@@ -403,6 +420,7 @@
                           <reference key="NSBackgroundColor" ref="974955767"/>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSTextField" id="741803865">
@@ -412,7 +430,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="286035259">
-                          <int key="NSCellFlags">-1804468671</int>
+                          <int key="NSCellFlags">-1804599231</int>
                           <int key="NSCellFlags2">272794624</int>
                           <string key="NSContents"/>
                           <reference key="NSSupport" ref="26"/>
@@ -421,6 +439,7 @@
                           <reference key="NSTextColor" ref="792230567"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="489091867">
                         <reference key="NSNextResponder" ref="537375861"/>
@@ -429,7 +448,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="657696434">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Encoded by</string>
                           <reference key="NSSupport" ref="96587716"/>
@@ -437,6 +456,7 @@
                           <reference key="NSBackgroundColor" ref="974955767"/>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSTextField" id="26897698">
@@ -446,7 +466,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="663671021">
-                          <int key="NSCellFlags">-1804468671</int>
+                          <int key="NSCellFlags">-1804599231</int>
                           <int key="NSCellFlags2">272794624</int>
                           <string key="NSContents"/>
                           <reference key="NSSupport" ref="26"/>
@@ -455,6 +475,7 @@
                           <reference key="NSTextColor" ref="792230567"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="198650750">
                         <reference key="NSNextResponder" ref="537375861"/>
@@ -463,7 +484,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="18182298">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Copyright</string>
                           <reference key="NSSupport" ref="96587716"/>
@@ -471,6 +492,7 @@
                           <reference key="NSBackgroundColor" ref="974955767"/>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSTextField" id="249789211">
@@ -480,7 +502,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="80568599">
-                          <int key="NSCellFlags">-1804468671</int>
+                          <int key="NSCellFlags">-1804599231</int>
                           <int key="NSCellFlags2">272794624</int>
                           <string key="NSContents"/>
                           <reference key="NSSupport" ref="26"/>
@@ -489,6 +511,7 @@
                           <reference key="NSTextColor" ref="792230567"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="945582426">
                         <reference key="NSNextResponder" ref="537375861"/>
@@ -497,7 +520,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="1629437">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Description</string>
                           <reference key="NSSupport" ref="96587716"/>
@@ -505,6 +528,7 @@
                           <reference key="NSBackgroundColor" ref="974955767"/>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSTextField" id="634179593">
@@ -514,7 +538,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="584250681">
-                          <int key="NSCellFlags">-1804468671</int>
+                          <int key="NSCellFlags">-1804599231</int>
                           <int key="NSCellFlags2">272794624</int>
                           <string key="NSContents"/>
                           <reference key="NSSupport" ref="26"/>
@@ -523,6 +547,7 @@
                           <reference key="NSTextColor" ref="792230567"/>
                           <string key="themeKey">gradientTheme</string>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                       <object class="BGHUDLabel" id="867392108">
                         <reference key="NSNextResponder" ref="537375861"/>
@@ -531,7 +556,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="719964920">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Language</string>
                           <reference key="NSSupport" ref="96587716"/>
@@ -539,6 +564,7 @@
                           <reference key="NSBackgroundColor" ref="974955767"/>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSImageView" id="433583698">
@@ -560,7 +586,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSImageCell" key="NSCell" id="820610216">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67108864</int>
                           <int key="NSCellFlags2">33685504</int>
                           <object class="NSCustomResource" key="NSContents">
                             <string key="NSClassName">NSImage</string>
@@ -572,6 +598,7 @@
                           <int key="NSStyle">0</int>
                           <bool key="NSAnimates">NO</bool>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <bool key="NSEditable">YES</bool>
                       </object>
                       <object class="NSButton" id="33949750">
@@ -581,7 +608,7 @@
                         <reference key="NSSuperview" ref="537375861"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDButtonCell" key="NSCell" id="158952318">
-                          <int key="NSCellFlags">604110336</int>
+                          <int key="NSCellFlags">603979776</int>
                           <int key="NSCellFlags2">134217728</int>
                           <string key="NSContents">Save Metadata</string>
                           <object class="NSFont" key="NSSupport" id="505687478">
@@ -590,7 +617,7 @@
                             <int key="NSfFlags">16</int>
                           </object>
                           <reference key="NSControlView" ref="33949750"/>
-                          <int key="NSButtonFlags">-2038284033</int>
+                          <int key="NSButtonFlags">-2038284288</int>
                           <int key="NSButtonFlags2">36</int>
                           <reference key="NSAlternateImage" ref="505687478"/>
                           <string key="NSAlternateContents"/>
@@ -600,10 +627,10 @@
                           <string key="themeKey">gradientTheme</string>
                           <int key="BGButtonType">7</int>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {542, 436}}</string>
-                    <reference key="NSSuperview" ref="267010932"/>
                   </object>
                   <string key="NSLabel">General</string>
                   <reference key="NSColor" ref="974955767"/>
@@ -612,7 +639,7 @@
                 <object class="BGHUDTabViewItem" id="1011674879">
                   <string key="NSIdentifier">2</string>
                   <object class="NSView" key="NSView" id="206785829">
-                    <nil key="NSNextResponder"/>
+                    <reference key="NSNextResponder" ref="267010932"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -629,9 +656,11 @@
                               <object class="BGHUDOutlineView" id="744158692">
                                 <reference key="NSNextResponder" ref="300959683"/>
                                 <int key="NSvFlags">4352</int>
-                                <string key="NSFrameSize">{506, 458}</string>
+                                <string key="NSFrameSize">{506, 434}</string>
                                 <reference key="NSSuperview" ref="300959683"/>
                                 <bool key="NSEnabled">YES</bool>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <bool key="NSControlAllowsExpansionToolTips">YES</bool>
                                 <object class="BGHUDTableCornerView" key="NSCornerView">
                                   <nil key="NSNextResponder"/>
                                   <int key="NSvFlags">256</int>
@@ -645,7 +674,7 @@
                                     <double key="NSMinWidth">16</double>
                                     <double key="NSMaxWidth">1000</double>
                                     <object class="BGHUDTableViewHeaderCell" key="NSHeaderCell">
-                                      <int key="NSCellFlags">75628096</int>
+                                      <int key="NSCellFlags">75497536</int>
                                       <int key="NSCellFlags2">2048</int>
                                       <string key="NSContents"/>
                                       <reference key="NSSupport" ref="26"/>
@@ -658,7 +687,7 @@
                                       <reference key="NSTextColor" ref="792230567"/>
                                     </object>
                                     <object class="NSTextFieldCell" key="NSDataCell" id="398842776">
-                                      <int key="NSCellFlags">337772096</int>
+                                      <int key="NSCellFlags">337641536</int>
                                       <int key="NSCellFlags2">2048</int>
                                       <string key="NSContents">Text Cell</string>
                                       <object class="NSFont" key="NSSupport" id="14426234">
@@ -689,11 +718,11 @@
                                   </object>
                                   <object class="NSTableColumn" id="794583007">
                                     <string key="NSIdentifier">1</string>
-                                    <double key="NSWidth">252</double>
+                                    <double key="NSWidth">258</double>
                                     <double key="NSMinWidth">10</double>
                                     <double key="NSMaxWidth">3.4028234663852886e+38</double>
                                     <object class="BGHUDTableViewHeaderCell" key="NSHeaderCell">
-                                      <int key="NSCellFlags">75628096</int>
+                                      <int key="NSCellFlags">75497536</int>
                                       <int key="NSCellFlags2">2048</int>
                                       <string key="NSContents"/>
                                       <reference key="NSSupport" ref="26"/>
@@ -701,7 +730,7 @@
                                       <reference key="NSTextColor" ref="792230567"/>
                                     </object>
                                     <object class="NSTextFieldCell" key="NSDataCell" id="574068619">
-                                      <int key="NSCellFlags">337772096</int>
+                                      <int key="NSCellFlags">337641536</int>
                                       <int key="NSCellFlags2">2048</int>
                                       <string key="NSContents">Text Cell</string>
                                       <reference key="NSSupport" ref="14426234"/>
@@ -742,7 +771,7 @@
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
-                            <string key="NSFrame">{{1, 1}, {506, 458}}</string>
+                            <string key="NSFrame">{{1, 1}, {506, 434}}</string>
                             <reference key="NSSuperview" ref="788794540"/>
                             <reference key="NSNextKeyView" ref="744158692"/>
                             <reference key="NSDocView" ref="744158692"/>
@@ -754,6 +783,7 @@
                             <int key="NSvFlags">-2147483392</int>
                             <string key="NSFrame">{{-100, -100}, {15, 458}}</string>
                             <reference key="NSSuperview" ref="788794540"/>
+                            <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                             <reference key="NSTarget" ref="788794540"/>
                             <string key="NSAction">_doScroller:</string>
                             <double key="NSPercent">0.96724890829694321</double>
@@ -762,15 +792,16 @@
                           <object class="BGHUDScroller" id="736841380">
                             <reference key="NSNextResponder" ref="788794540"/>
                             <int key="NSvFlags">-2147483392</int>
-                            <string key="NSFrame">{{1, 444}, {506, 15}}</string>
+                            <string key="NSFrame">{{1, 420}, {500.6953125, 15}}</string>
                             <reference key="NSSuperview" ref="788794540"/>
+                            <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                             <reference key="NSTarget" ref="788794540"/>
                             <string key="NSAction">_doScroller:</string>
                             <double key="NSPercent">0.99802761341222879</double>
                             <string key="themeKey">gradientTheme</string>
                           </object>
                         </object>
-                        <string key="NSFrame">{{17, -30}, {508, 460}}</string>
+                        <string key="NSFrame">{{17, -3}, {508, 436}}</string>
                         <reference key="NSSuperview" ref="206785829"/>
                         <reference key="NSNextKeyView" ref="300959683"/>
                         <int key="NSsFlags">133682</int>
@@ -778,10 +809,14 @@
                         <reference key="NSHScroller" ref="736841380"/>
                         <reference key="NSContentView" ref="300959683"/>
                         <bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
+                        <double key="NSMinMagnification">0.25</double>
+                        <double key="NSMaxMagnification">4</double>
+                        <double key="NSMagnification">1</double>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                     </object>
-                    <string key="NSFrame">{{10, 33}, {542, 434.05500000000001}}</string>
+                    <string key="NSFrame">{{10, 33}, {542, 436}}</string>
+                    <reference key="NSSuperview" ref="267010932"/>
                   </object>
                   <string key="NSLabel">Codec Details</string>
                   <reference key="NSColor" ref="974955767"/>
@@ -811,7 +846,7 @@
                                 <reference key="NSSuperview" ref="955957030"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="737324434">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">272761856</int>
                                   <string key="NSContents">Read at media</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -819,6 +854,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="438384771">
@@ -828,7 +864,7 @@
                                 <reference key="NSSuperview" ref="955957030"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="666433822">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">71435264</int>
                                   <string key="NSContents">1000 kB</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -836,6 +872,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="446298501">
@@ -845,7 +882,7 @@
                                 <reference key="NSSuperview" ref="955957030"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="243406176">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">272761856</int>
                                   <string key="NSContents">Input bitrate</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -853,6 +890,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="373001305">
@@ -862,7 +900,7 @@
                                 <reference key="NSSuperview" ref="955957030"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="62423387">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">71435264</int>
                                   <string key="NSContents">1000 kB/s</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -870,6 +908,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="907635383">
@@ -879,7 +918,7 @@
                                 <reference key="NSSuperview" ref="955957030"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="435445194">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">272761856</int>
                                   <string key="NSContents">Demuxed</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -887,6 +926,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="642436902">
@@ -896,7 +936,7 @@
                                 <reference key="NSSuperview" ref="955957030"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="847795008">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">71435264</int>
                                   <string key="NSContents">1000 kB</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -904,6 +944,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="660058837">
@@ -913,7 +954,7 @@
                                 <reference key="NSSuperview" ref="955957030"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="221374705">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">272761856</int>
                                   <string key="NSContents">Stream bitrate</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -921,6 +962,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="618243223">
@@ -930,7 +972,7 @@
                                 <reference key="NSSuperview" ref="955957030"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="19397806">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">71435264</int>
                                   <string key="NSContents">1000 kB/s</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -938,6 +980,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
@@ -949,7 +992,7 @@
                         <reference key="NSSuperview" ref="571784830"/>
                         <string key="NSOffsets">{0, 0}</string>
                         <object class="NSTextFieldCell" key="NSTitleCell">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67108864</int>
                           <int key="NSCellFlags2">0</int>
                           <string key="NSContents">Box</string>
                           <reference key="NSSupport" ref="26"/>
@@ -990,7 +1033,7 @@
                         <reference key="NSSuperview" ref="571784830"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="60086444">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Input</string>
                           <reference key="NSSupport" ref="26"/>
@@ -998,6 +1041,7 @@
                           <reference key="NSBackgroundColor" ref="974955767"/>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="BGHUDBox" id="149805983">
@@ -1017,7 +1061,7 @@
                                 <reference key="NSSuperview" ref="856651951"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="285682765">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">272761856</int>
                                   <string key="NSContents">Decoded blocks</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1025,6 +1069,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="638896850">
@@ -1034,7 +1079,7 @@
                                 <reference key="NSSuperview" ref="856651951"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="61712883">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">71435264</int>
                                   <string key="NSContents">1000</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1042,6 +1087,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="883548649">
@@ -1051,7 +1097,7 @@
                                 <reference key="NSSuperview" ref="856651951"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="855181759">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">272761856</int>
                                   <string key="NSContents">Displayed frames</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1059,6 +1105,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="833853365">
@@ -1068,7 +1115,7 @@
                                 <reference key="NSSuperview" ref="856651951"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="949350788">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">71435264</int>
                                   <string key="NSContents">1000/s</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1076,6 +1123,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="888685062">
@@ -1085,7 +1133,7 @@
                                 <reference key="NSSuperview" ref="856651951"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="79894181">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">272761856</int>
                                   <string key="NSContents">Lost frames</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1093,6 +1141,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="755389250">
@@ -1102,7 +1151,7 @@
                                 <reference key="NSSuperview" ref="856651951"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="133494370">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">71435264</int>
                                   <string key="NSContents">1000</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1110,6 +1159,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
@@ -1121,7 +1171,7 @@
                         <reference key="NSSuperview" ref="571784830"/>
                         <string key="NSOffsets">{0, 0}</string>
                         <object class="NSTextFieldCell" key="NSTitleCell">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67108864</int>
                           <int key="NSCellFlags2">0</int>
                           <string key="NSContents">Box</string>
                           <reference key="NSSupport" ref="26"/>
@@ -1162,7 +1212,7 @@
                         <reference key="NSSuperview" ref="571784830"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="774614160">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Video</string>
                           <reference key="NSSupport" ref="26"/>
@@ -1170,6 +1220,7 @@
                           <reference key="NSBackgroundColor" ref="974955767"/>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="BGHUDBox" id="682333347">
@@ -1189,7 +1240,7 @@
                                 <reference key="NSSuperview" ref="789338001"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="540610514">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">272761856</int>
                                   <string key="NSContents">Sent packets</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1197,6 +1248,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="397386062">
@@ -1206,7 +1258,7 @@
                                 <reference key="NSSuperview" ref="789338001"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="479972688">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">71435264</int>
                                   <string key="NSContents">1000</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1214,6 +1266,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="16553861">
@@ -1223,7 +1276,7 @@
                                 <reference key="NSSuperview" ref="789338001"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="995210708">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">272761856</int>
                                   <string key="NSContents">Sent bytes</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1231,6 +1284,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="271488835">
@@ -1240,7 +1294,7 @@
                                 <reference key="NSSuperview" ref="789338001"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="51502627">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">71435264</int>
                                   <string key="NSContents">1000 kB</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1248,6 +1302,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="309941063">
@@ -1257,7 +1312,7 @@
                                 <reference key="NSSuperview" ref="789338001"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="379914139">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">272761856</int>
                                   <string key="NSContents">Send rate</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1265,6 +1320,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="701785620">
@@ -1274,7 +1330,7 @@
                                 <reference key="NSSuperview" ref="789338001"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="384044360">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">71435264</int>
                                   <string key="NSContents">1000 kB</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1282,6 +1338,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
@@ -1293,7 +1350,7 @@
                         <reference key="NSSuperview" ref="571784830"/>
                         <string key="NSOffsets">{0, 0}</string>
                         <object class="NSTextFieldCell" key="NSTitleCell">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67108864</int>
                           <int key="NSCellFlags2">0</int>
                           <string key="NSContents">Box</string>
                           <reference key="NSSupport" ref="26"/>
@@ -1334,7 +1391,7 @@
                         <reference key="NSSuperview" ref="571784830"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="849218050">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Streaming</string>
                           <reference key="NSSupport" ref="26"/>
@@ -1342,6 +1399,7 @@
                           <reference key="NSBackgroundColor" ref="974955767"/>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="BGHUDBox" id="1046779445">
@@ -1361,7 +1419,7 @@
                                 <reference key="NSSuperview" ref="199826627"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="586689593">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">272761856</int>
                                   <string key="NSContents">Decoded blocks</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1369,6 +1427,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="928992652">
@@ -1378,7 +1437,7 @@
                                 <reference key="NSSuperview" ref="199826627"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="450272646">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">71435264</int>
                                   <string key="NSContents">1000</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1386,6 +1445,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="94739041">
@@ -1395,7 +1455,7 @@
                                 <reference key="NSSuperview" ref="199826627"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="349407235">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">272761856</int>
                                   <string key="NSContents">Played buffer</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1403,6 +1463,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="559541096">
@@ -1412,7 +1473,7 @@
                                 <reference key="NSSuperview" ref="199826627"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="645904826">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">71435264</int>
                                   <string key="NSContents">1000</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1420,6 +1481,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="301549329">
@@ -1429,7 +1491,7 @@
                                 <reference key="NSSuperview" ref="199826627"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="722120933">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">272761856</int>
                                   <string key="NSContents">Lost buffers</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1437,6 +1499,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="467739347">
@@ -1446,7 +1509,7 @@
                                 <reference key="NSSuperview" ref="199826627"/>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="NSTextFieldCell" key="NSCell" id="717744051">
-                                  <int key="NSCellFlags">68288064</int>
+                                  <int key="NSCellFlags">68157504</int>
                                   <int key="NSCellFlags2">71435264</int>
                                   <string key="NSContents">1000</string>
                                   <reference key="NSSupport" ref="26"/>
@@ -1454,6 +1517,7 @@
                                   <reference key="NSBackgroundColor" ref="974955767"/>
                                   <reference key="NSTextColor" ref="792230567"/>
                                 </object>
+                                <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
@@ -1465,7 +1529,7 @@
                         <reference key="NSSuperview" ref="571784830"/>
                         <string key="NSOffsets">{0, 0}</string>
                         <object class="NSTextFieldCell" key="NSTitleCell">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67108864</int>
                           <int key="NSCellFlags2">0</int>
                           <string key="NSContents">Box</string>
                           <reference key="NSSupport" ref="26"/>
@@ -1506,7 +1570,7 @@
                         <reference key="NSSuperview" ref="571784830"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="799858101">
-                          <int key="NSCellFlags">68288064</int>
+                          <int key="NSCellFlags">68157504</int>
                           <int key="NSCellFlags2">272761856</int>
                           <string key="NSContents">Audio</string>
                           <reference key="NSSupport" ref="26"/>
@@ -1514,6 +1578,7 @@
                           <reference key="NSBackgroundColor" ref="974955767"/>
                           <reference key="NSTextColor" ref="792230567"/>
                         </object>
+                        <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                     </object>
@@ -1524,7 +1589,7 @@
                   <reference key="NSTabView" ref="267010932"/>
                 </object>
               </object>
-              <reference key="NSSelectedTabViewItem" ref="943983233"/>
+              <reference key="NSSelectedTabViewItem" ref="1011674879"/>
               <reference key="NSFont" ref="14426234"/>
               <int key="NSTvFlags">0</int>
               <bool key="NSAllowTruncatedLabels">YES</bool>
@@ -1532,7 +1597,7 @@
               <nil key="themeKey"/>
               <object class="NSMutableArray" key="NSSubviews">
                 <bool key="EncodedWithXMLCoder">YES</bool>
-                <reference ref="537375861"/>
+                <reference ref="206785829"/>
               </object>
             </object>
           </object>
@@ -3612,7 +3677,7 @@
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">P4AAAL+AAADAQAAAw+OAAA</bytes>
+            <bytes key="NSTransformStruct">P4AAAL+AAADAQAAAw+GAAA</bytes>
           </object>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
@@ -3815,10 +3880,45 @@
         <bool key="EncodedWithXMLCoder">YES</bool>
         <object class="IBPartialClassDescription">
           <string key="className">NSApplication</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBProjectSource</string>
+            <string key="minorKey">../../../modules/gui/macosx/applescript.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSApplication</string>
           <string key="superclassName">NSResponder</string>
           <object class="IBClassDescriptionSource" key="sourceIdentifier">
             <string key="majorKey">IBUserSource</string>
             <string key="minorKey"/>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBProjectSource</string>
+            <string key="minorKey">../../../modules/gui/macosx/AppleRemote.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBProjectSource</string>
+            <string key="minorKey">../../../modules/gui/macosx/PXSourceListDelegate.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBProjectSource</string>
+            <string key="minorKey">../../../modules/gui/macosx/SPInvocationGrabbing.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBProjectSource</string>
+            <string key="minorKey">../../../modules/gui/macosx/SPMediaKeyTap.h</string>
           </object>
         </object>
         <object class="IBPartialClassDescription">
@@ -3837,94 +3937,19 @@
           </object>
         </object>
         <object class="IBPartialClassDescription">
-          <string key="className">VLCInfo</string>
-          <string key="superclassName">NSObject</string>
-          <object class="NSMutableDictionary" key="actions">
-            <bool key="EncodedWithXMLCoder">YES</bool>
-            <object class="NSArray" key="dict.sortedKeys">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>createOutlineGroup:</string>
-              <string>deleteOutlineGroup:</string>
-            </object>
-            <object class="NSMutableArray" key="dict.values">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>id</string>
-              <string>id</string>
-            </object>
-          </object>
-          <object class="NSMutableDictionary" key="actionInfosByName">
-            <bool key="EncodedWithXMLCoder">YES</bool>
-            <object class="NSArray" key="dict.sortedKeys">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>createOutlineGroup:</string>
-              <string>deleteOutlineGroup:</string>
-            </object>
-            <object class="NSMutableArray" key="dict.values">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <object class="IBActionInfo">
-                <string key="name">createOutlineGroup:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">deleteOutlineGroup:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-            </object>
-          </object>
-          <object class="NSMutableDictionary" key="outlets">
-            <bool key="EncodedWithXMLCoder">YES</bool>
-            <object class="NSArray" key="dict.sortedKeys">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>o_audio_box</string>
-              <string>o_input_box</string>
-              <string>o_sout_box</string>
-              <string>o_video_box</string>
-            </object>
-            <object class="NSMutableArray" key="dict.values">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-            </object>
-          </object>
-          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
-            <bool key="EncodedWithXMLCoder">YES</bool>
-            <object class="NSArray" key="dict.sortedKeys">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>o_audio_box</string>
-              <string>o_input_box</string>
-              <string>o_sout_box</string>
-              <string>o_video_box</string>
-            </object>
-            <object class="NSMutableArray" key="dict.values">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_audio_box</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_input_box</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_sout_box</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_video_box</string>
-                <string key="candidateClassName">id</string>
-              </object>
-            </object>
-          </object>
+          <string key="className">NSView</string>
           <object class="IBClassDescriptionSource" key="sourceIdentifier">
-            <string key="majorKey">IBUserSource</string>
-            <string key="minorKey"/>
+            <string key="majorKey">IBProjectSource</string>
+            <string key="minorKey">../../../modules/gui/macosx/misc.h</string>
           </object>
         </object>
-      </object>
-      <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
-        <bool key="EncodedWithXMLCoder">YES</bool>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSWindow</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBProjectSource</string>
+            <string key="minorKey">../../../modules/gui/macosx/CompatibilityFixes.h</string>
+          </object>
+        </object>
         <object class="IBPartialClassDescription">
           <string key="className">VLCInfo</string>
           <string key="superclassName">NSObject</string>
@@ -4413,8 +4438,746 @@
             </object>
           </object>
           <object class="IBClassDescriptionSource" key="sourceIdentifier">
-            <string key="majorKey">IBDocumentRelativeSource</string>
-            <string key="minorKey">../../../../../modules/gui/macosx/playlistinfo.h</string>
+            <string key="majorKey">IBProjectSource</string>
+            <string key="minorKey">../../../modules/gui/macosx/playlistinfo.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCInfo</string>
+          <string key="superclassName">NSObject</string>
+          <object class="NSMutableDictionary" key="actions">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>createOutlineGroup:</string>
+              <string>deleteOutlineGroup:</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="actionInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>createOutlineGroup:</string>
+              <string>deleteOutlineGroup:</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBActionInfo">
+                <string key="name">createOutlineGroup:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">deleteOutlineGroup:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="outlets">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_audio_box</string>
+              <string>o_input_box</string>
+              <string>o_sout_box</string>
+              <string>o_video_box</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_audio_box</string>
+              <string>o_input_box</string>
+              <string>o_sout_box</string>
+              <string>o_video_box</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_sout_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBUserSource</string>
+            <string key="minorKey"/>
+          </object>
+        </object>
+      </object>
+      <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.2+">
+        <bool key="EncodedWithXMLCoder">YES</bool>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSActionCell</string>
+          <string key="superclassName">NSCell</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSActionCell.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSApplication</string>
+          <string key="superclassName">NSResponder</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="713618182">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSApplication.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSApplication</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="924117519">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSApplicationScripting.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSApplication</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="14147170">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSColorPanel.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSApplication</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSHelpManager.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSApplication</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSPageLayout.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSApplication</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSUserInterfaceItemSearching.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSApplication</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="175461270">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSWindowRestoration.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSBox</string>
+          <string key="superclassName">NSView</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSBox.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSButton</string>
+          <string key="superclassName">NSControl</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSButton.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSButtonCell</string>
+          <string key="superclassName">NSActionCell</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSButtonCell.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSCell</string>
+          <string key="superclassName">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSCell.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSControl</string>
+          <string key="superclassName">NSView</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="1046202125">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSControl.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSControl</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="62308265">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSLayoutConstraint.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSFormatter</string>
+          <string key="superclassName">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSFormatter.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSImageCell</string>
+          <string key="superclassName">NSCell</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSImageCell.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSImageView</string>
+          <string key="superclassName">NSControl</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSImageView.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSMenu</string>
+          <string key="superclassName">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="958408096">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSMenu.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSAccessibility.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <reference key="sourceIdentifier" ref="713618182"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <reference key="sourceIdentifier" ref="924117519"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <reference key="sourceIdentifier" ref="14147170"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <reference key="sourceIdentifier" ref="1046202125"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSDictionaryController.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSDragging.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSFontManager.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSFontPanel.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSKeyValueBinding.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <reference key="sourceIdentifier" ref="958408096"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSNibLoading.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSPasteboard.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSSavePanel.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="737799805">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSTableView.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSToolbarItem.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="755348019">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSView.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSArchiver.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSClassDescription.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSError.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSFileManager.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSKeyValueCoding.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSKeyValueObserving.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSKeyedArchiver.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSObject.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSObjectScripting.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSPortCoder.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSRunLoop.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSScriptClassDescription.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSScriptKeyValueCoding.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSScriptObjectSpecifiers.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSScriptWhoseTests.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSThread.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">Foundation.framework/Headers/NSURL.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">PrintCore.framework/Headers/PDEPluginInterface.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">QTKit.framework/Headers/QTCaptureDecompressedAudioOutput.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">QTKit.framework/Headers/QTCaptureDecompressedVideoOutput.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">QTKit.framework/Headers/QTCaptureFileOutput.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">QTKit.framework/Headers/QTCaptureVideoPreviewOutput.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">QTKit.framework/Headers/QTCaptureView.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">QTKit.framework/Headers/QTMovie.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">QTKit.framework/Headers/QTMovieView.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">WebKit.framework/Headers/WebDownload.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">WebKit.framework/Headers/WebEditingDelegate.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">WebKit.framework/Headers/WebFrameLoadDelegate.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">WebKit.framework/Headers/WebJavaPlugIn.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">WebKit.framework/Headers/WebPlugin.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">WebKit.framework/Headers/WebPluginContainer.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">WebKit.framework/Headers/WebPolicyDelegate.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">WebKit.framework/Headers/WebResourceLoadDelegate.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">WebKit.framework/Headers/WebScriptObject.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">WebKit.framework/Headers/WebUIDelegate.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSOutlineView</string>
+          <string key="superclassName">NSTableView</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSOutlineView.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSPanel</string>
+          <string key="superclassName">NSWindow</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSPanel.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSResponder</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSInterfaceStyle.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSResponder</string>
+          <string key="superclassName">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSResponder.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSResponder</string>
+          <reference key="sourceIdentifier" ref="175461270"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSScrollView</string>
+          <string key="superclassName">NSView</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSScrollView.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSScroller</string>
+          <string key="superclassName">NSControl</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSScroller.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSTabView</string>
+          <string key="superclassName">NSView</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSTabView.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSTabViewItem</string>
+          <string key="superclassName">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSTabViewItem.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSTableColumn</string>
+          <string key="superclassName">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSTableColumn.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSTableView</string>
+          <string key="superclassName">NSControl</string>
+          <reference key="sourceIdentifier" ref="737799805"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSTextField</string>
+          <string key="superclassName">NSControl</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSTextField.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSTextFieldCell</string>
+          <string key="superclassName">NSActionCell</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSTextFieldCell.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSView</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSClipView.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSView</string>
+          <reference key="sourceIdentifier" ref="62308265"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSView</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSMenuItem.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSView</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSOpenGLView.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSView</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSRulerView.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSView</string>
+          <string key="superclassName">NSResponder</string>
+          <reference key="sourceIdentifier" ref="755348019"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSWindow</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSDrawer.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSWindow</string>
+          <reference key="sourceIdentifier" ref="62308265"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSWindow</string>
+          <string key="superclassName">NSResponder</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSWindow.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSWindow</string>
+          <reference key="sourceIdentifier" ref="175461270"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSWindow</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBFrameworkSource</string>
+            <string key="minorKey">AppKit.framework/Headers/NSWindowScripting.h</string>
           </object>
         </object>
       </object>
