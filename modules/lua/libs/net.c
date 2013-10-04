@@ -49,18 +49,17 @@
 
 void vlclua_fd_init( intf_sys_t *sys )
 {
-    for( unsigned i = 0; i < (sizeof(sys->fds)/sizeof(sys->fds[0])); i++ )
-        sys->fds[i] = -1;
+    sys->fdv = NULL;
+    sys->fdc = 0;
 }
 
 /** Releases all (leaked) VLC Lua file descriptors. */
 void vlclua_fd_destroy( intf_sys_t *sys )
 {
-    for( unsigned i = 0; i < (sizeof(sys->fds)/sizeof(sys->fds[0])); i++ )
-        if( sys->fds[i] != -1 )
-            net_Close( sys->fds[i] );
+    for( unsigned i = 0; i < sys->fdc; i++ )
+         net_Close( sys->fdv[i] );
+    free( sys->fdv );
 }
-
 
 /** Maps an OS file descriptor to a VLC Lua file descriptor */
 static int vlclua_fd_map( lua_State *L, int fd )
@@ -72,17 +71,22 @@ static int vlclua_fd_map( lua_State *L, int fd )
         return -1;
 
 #ifndef NDEBUG
-    for( unsigned i = 0; i < (sizeof(sys->fds)/sizeof(sys->fds[0])); i++ )
-        assert( sys->fds[i] != fd );
+    for( unsigned i = 0; i < sys->fdc; i++ )
+        assert( sys->fdv[i] != fd );
 #endif
-    for( unsigned i = 0; i < (sizeof(sys->fds)/sizeof(sys->fds[0])); i++ )
-        if( sys->fds[i] == -1 )
-        {
-            sys->fds[i] = fd;
-            return 3 + i;
-        }
 
-    return -1;
+    if( sys->fdc >= 64 )
+        return -1;
+
+    int *fdv = realloc( sys->fdv, (sys->fdc + 1) * sizeof (sys->fdv[0]) );
+    if( unlikely(fdv == NULL) )
+        return -1;
+
+    sys->fdv = fdv;
+    sys->fdv[sys->fdc] = fd;
+    fd = 3 + sys->fdc;
+    sys->fdc++;
+    return fd;
 }
 
 static int vlclua_fd_map_safe( lua_State *L, int fd )
@@ -102,9 +106,7 @@ static int vlclua_fd_get( lua_State *L, unsigned idx )
     if( idx < 3u )
         return idx;
     idx -= 3;
-    if( sizeof(sys->fds[0]) * idx < sizeof(sys->fds) )
-        return sys->fds[idx];
-    return -1;
+    return (idx < sys->fdc) ? sys->fdv[idx] : -1;
 }
 
 /** Gets the VLC Lua file descriptor mapped from an OS file descriptor */
@@ -115,8 +117,8 @@ static int vlclua_fd_get_lua( lua_State *L, int fd )
 
     if( (unsigned)fd < 3u )
         return fd;
-    for( unsigned i = 0; i < (sizeof(sys->fds)/sizeof(sys->fds[0])); i++ )
-        if( sys->fds[i] == fd )
+    for( unsigned i = 0; i < sys->fdc; i++ )
+        if( sys->fdv[i] == fd )
             return 3 + i;
     return -1;
 }
@@ -132,17 +134,17 @@ static void vlclua_fd_unmap( lua_State *L, unsigned idx )
         return; /* Never close stdin/stdout/stderr. */
 
     idx -= 3;
-    if( idx < (sizeof(sys->fds)/sizeof(sys->fds[0])) )
-    {
-        fd = sys->fds[idx];
-        sys->fds[idx] = -1;
-    }
-
-    if( fd == -1 )
+    if( idx >= sys->fdc )
         return;
+
+    fd = sys->fdv[idx];
+    sys->fdc--;
+    memmove( sys->fdv + idx, sys->fdv + idx + 1,
+             (sys->fdc - idx) * sizeof (sys->fdv[0]) );
+    /* realloc() not really needed */
 #ifndef NDEBUG
-    for( unsigned i = 0; i < (sizeof(sys->fds)/sizeof(sys->fds[0])); i++ )
-        assert( sys->fds[i] != fd );
+    for( unsigned i = 0; i < sys->fdc; i++ )
+        assert( sys->fdv[i] != fd );
 #endif
 }
 

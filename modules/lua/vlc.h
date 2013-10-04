@@ -161,7 +161,8 @@ struct intf_sys_t
 #ifndef _WIN32
     int fd[2];
 #endif
-    int fds[64];
+    int *fdv;
+    unsigned fdc;
 
     vlc_thread_t thread;
 };
