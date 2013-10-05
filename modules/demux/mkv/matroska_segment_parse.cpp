@@ -1524,6 +1524,11 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         p_tk->fmt.i_codec = VLC_CODEC_MP4A;
         fill_extra_data( p_tk, 0 );
     }
+    else if( !strcmp( p_tk->psz_codec, "A_ALAC" ) )
+    {
+        p_tk->fmt.i_codec =  VLC_CODEC_ALAC;
+        fill_extra_data( p_tk, 0 );
+    }
     else if( !strcmp( p_tk->psz_codec, "A_WAVPACK4" ) )
     {
         p_tk->fmt.i_codec = VLC_CODEC_WAVPACK;
