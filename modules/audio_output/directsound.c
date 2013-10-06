@@ -182,110 +182,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
         goto error;
     }
 
-    if( i == 0 )
-    {
-        DWORD ui_speaker_config;
-        int i_channels = 2; /* Default to stereo */
-        int i_orig_channels = aout_FormatNbChannels( fmt );
-
-        /* Check the speaker configuration to determine which channel config
-         * should be the default */
-        if( FAILED( IDirectSound_GetSpeakerConfig( p_aout->sys->p_dsobject,
-                                              &ui_speaker_config ) ) )
-        {
-            ui_speaker_config = DSSPEAKER_STEREO;
-            msg_Dbg( p_aout, "GetSpeakerConfig failed" );
-        }
-
-        const char *name = "Unknown";
-        switch( DSSPEAKER_CONFIG(ui_speaker_config) )
-        {
-        case DSSPEAKER_7POINT1:
-        case DSSPEAKER_7POINT1_SURROUND:
-            name = "7.1";
-            i_channels = 8;
-            break;
-        case DSSPEAKER_5POINT1:
-        case DSSPEAKER_5POINT1_SURROUND:
-            name = "5.1";
-            i_channels = 6;
-            break;
-        case DSSPEAKER_QUAD:
-            name = "Quad";
-            i_channels = 4;
-            break;
-#if 0 /* Lots of people just get their settings wrong and complain that
-       * this is a problem with VLC so just don't ever set mono by default. */
-        case DSSPEAKER_MONO:
-            name = "Mono";
-            fmt->i_physical_channels = AOUT_CHAN_CENTER;
-            break;
-#endif
-        case DSSPEAKER_SURROUND:
-            name = "Surround";
-            i_channels = 4;
-            break;
-        case DSSPEAKER_STEREO:
-            name = "Stereo";
-            i_channels = 2;
-            break;
-        }
-
-        i_channels = ( i_channels < i_orig_channels )? i_channels: i_orig_channels;
-
-        msg_Dbg( p_aout, "%s speaker config: %s and stream has %d channels, using %d channels",
-                 "Windows", name, i_orig_channels, i_channels );
-
-        switch( i_channels )
-        {
-        case 8:
-            fmt->i_physical_channels = AOUT_CHANS_7_1;
-            break;
-        case 7:
-        case 6:
-            fmt->i_physical_channels = AOUT_CHANS_5_1;
-            break;
-        case 5:
-        case 4:
-            fmt->i_physical_channels = AOUT_CHANS_4_0;
-            break;
-        default:
-            fmt->i_physical_channels = AOUT_CHANS_2_0;
-            break;
-        }
-    }
-    else
-    {   /* Overriden speaker configuration */
-        const char *name = "Non-existant";
-        switch( i )
-        {
-        case 1: /* Mono */
-            name = "Mono";
-            fmt->i_physical_channels = AOUT_CHAN_CENTER;
-            break;
-        case 2: /* Stereo */
-            name = "Stereo";
-            fmt->i_physical_channels = AOUT_CHANS_2_0;
-            break;
-        case 3: /* Quad */
-            name = "Quad";
-            fmt->i_physical_channels = AOUT_CHANS_4_0;
-            break;
-        case 4: /* 5.1 */
-            name = "5.1";
-            fmt->i_physical_channels = AOUT_CHANS_5_1;
-            break;
-        case 5: /* 7.1 */
-            name = "7.1";
-            fmt->i_physical_channels = AOUT_CHANS_7_1;
-            break;
-        }
-        msg_Dbg( p_aout, "%s speaker config: %s", "VLC", name );
-    }
-
-    /* Open the device */
-    if ( AOUT_FMT_SPDIF( fmt )
-     && var_InheritBool( p_aout, "spdif" )
+    if ( AOUT_FMT_SPDIF( fmt ) && var_InheritBool( p_aout, "spdif" )
      && CreateDSBuffer( p_aout, VLC_CODEC_SPDIFL, fmt->i_physical_channels,
                         aout_FormatNbChannels( fmt ), fmt->i_rate, true )
                                                                == VLC_SUCCESS )
@@ -299,6 +196,110 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     }
     else
     {
+        if( i == 0 )
+        {
+            DWORD ui_speaker_config;
+            int i_channels = 2; /* Default to stereo */
+            int i_orig_channels = aout_FormatNbChannels( fmt );
+
+            /* Check the speaker configuration to determine which channel
+             * config should be the default */
+            if( FAILED( IDirectSound_GetSpeakerConfig( p_aout->sys->p_dsobject,
+                                                       &ui_speaker_config ) ) )
+            {
+                ui_speaker_config = DSSPEAKER_STEREO;
+                msg_Dbg( p_aout, "GetSpeakerConfig failed" );
+            }
+
+            const char *name = "Unknown";
+            switch( DSSPEAKER_CONFIG(ui_speaker_config) )
+            {
+                case DSSPEAKER_7POINT1:
+                case DSSPEAKER_7POINT1_SURROUND:
+                    name = "7.1";
+                    i_channels = 8;
+                    break;
+                case DSSPEAKER_5POINT1:
+                case DSSPEAKER_5POINT1_SURROUND:
+                    name = "5.1";
+                    i_channels = 6;
+                    break;
+                case DSSPEAKER_QUAD:
+                    name = "Quad";
+                    i_channels = 4;
+                    break;
+#if 0 /* Lots of people just get their settings wrong and complain that
+       * this is a problem with VLC so just don't ever set mono by default. */
+                case DSSPEAKER_MONO:
+                    name = "Mono";
+                    i_channels = 1;
+                    break;
+#endif
+                case DSSPEAKER_SURROUND:
+                    name = "Surround";
+                    i_channels = 4;
+                    break;
+                case DSSPEAKER_STEREO:
+                    name = "Stereo";
+                    i_channels = 2;
+                    break;
+            }
+
+            if( i_channels >= i_orig_channels )
+                i_channels = i_orig_channels;
+
+            msg_Dbg( p_aout, "%s speaker config: %s and stream has "
+                     "%d channels, using %d channels", "Windows", name,
+                     i_orig_channels, i_channels );
+
+            switch( i_channels )
+            {
+                case 8:
+                    fmt->i_physical_channels = AOUT_CHANS_7_1;
+                    break;
+                case 7:
+                case 6:
+                    fmt->i_physical_channels = AOUT_CHANS_5_1;
+                    break;
+                case 5:
+                case 4:
+                    fmt->i_physical_channels = AOUT_CHANS_4_0;
+                    break;
+                default:
+                    fmt->i_physical_channels = AOUT_CHANS_2_0;
+                    break;
+            }
+        }
+        else
+        {   /* Overriden speaker configuration */
+            const char *name = "Non-existant";
+            switch( i )
+            {
+                case 1: /* Mono */
+                    name = "Mono";
+                    fmt->i_physical_channels = AOUT_CHAN_CENTER;
+                    break;
+                case 2: /* Stereo */
+                    name = "Stereo";
+                    fmt->i_physical_channels = AOUT_CHANS_2_0;
+                    break;
+                case 3: /* Quad */
+                    name = "Quad";
+                    fmt->i_physical_channels = AOUT_CHANS_4_0;
+                    break;
+                case 4: /* 5.1 */
+                    name = "5.1";
+                    fmt->i_physical_channels = AOUT_CHANS_5_1;
+                    break;
+                case 5: /* 7.1 */
+                    name = "7.1";
+                    fmt->i_physical_channels = AOUT_CHANS_7_1;
+                    break;
+            }
+            msg_Dbg( p_aout, "%s speaker config: %s", "VLC", name );
+        }
+
+        /* Open the device */
         aout_FormatPrepare( fmt );
 
         if( CreateDSBufferPCM( p_aout, &fmt->i_format,
