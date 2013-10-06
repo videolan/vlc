@@ -103,7 +103,7 @@ static bool isSmoothStreaming( stream_t *s )
         }
         peeked = FromCharset( encoding, peeked, 512 );
 
-        if( strstr( peeked, needle ) != NULL )
+        if( peeked != NULL && strstr( peeked, needle ) != NULL )
             ret = true;
     }
     free( peeked );
