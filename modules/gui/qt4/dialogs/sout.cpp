@@ -155,16 +155,10 @@ void SoutDialog::addDest( )
     updateMRL();
 }
 
-void SoutDialog::ok()
+void SoutDialog::done( int r )
 {
     mrl = ui.mrlEdit->toPlainText();
-    accept();
-}
-
-void SoutDialog::cancel()
-{
-    mrl.clear();
-    reject();
+    QWizard::done(r);
 }
 
 void SoutDialog::updateMRL()

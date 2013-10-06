@@ -120,6 +120,8 @@ public:
 
     QString getMrl(){ return mrl; }
 
+protected:
+    virtual void done( int );
 private:
     Ui::Sout ui;
 
@@ -132,8 +134,6 @@ public slots:
     void updateMRL();
 
 private slots:
-    void ok();
-    void cancel();
     void closeTab( int );
     void addDest();
 };
