@@ -293,9 +293,12 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 msg_Info( p_dec, "MLP channels: %d samplerate: %d",
                           p_sys->mlp.i_channels, p_sys->mlp.i_rate );
 
-                const mtime_t i_end_date = date_Get( &p_sys->end_date );
-                date_Init( &p_sys->end_date, p_sys->mlp.i_rate, 1 );
-                date_Set( &p_sys->end_date, i_end_date );
+                if( p_sys->mlp.i_rate > 0 )
+                {
+                    const mtime_t i_end_date = date_Get( &p_sys->end_date );
+                    date_Init( &p_sys->end_date, p_sys->mlp.i_rate, 1 );
+                    date_Set( &p_sys->end_date, i_end_date );
+                }
             }
 
             p_dec->fmt_out.audio.i_rate     = p_sys->mlp.i_rate;
