@@ -1263,6 +1263,14 @@ void matroska_segment_c::ParseCluster( bool b_update_start_time )
 int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
 {
     es_format_t *p_fmt = &p_tk->fmt;
+
+    if( p_tk->psz_codec == NULL )
+    {
+        msg_Err( &sys.demuxer, "Empty codec id" );
+        p_tk->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+        return 0;
+    }
+
     if( !strcmp( p_tk->psz_codec, "V_MS/VFW/FOURCC" ) )
     {
         if( p_tk->i_extra_data < (int)sizeof( VLC_BITMAPINFOHEADER ) )
