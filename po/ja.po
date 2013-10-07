@@ -15975,7 +15975,7 @@ msgstr ""
 
 #: modules/gui/macosx/about.m:115
 msgid "Compiled by %s with %@"
-msgstr "%@を使って%sによってコンパイルされました"
+msgstr "%2$@を使って%1$sによってコンパイルされました"
 
 #: modules/gui/macosx/about.m:132 modules/gui/qt4/dialogs/help.cpp:94
 msgid ""
