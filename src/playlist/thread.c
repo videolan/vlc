@@ -372,7 +372,7 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
     {
         bool b_loop = var_GetBool( p_playlist, "loop" );
         bool b_repeat = var_GetBool( p_playlist, "repeat" );
-        bool b_playstop = var_GetBool( p_playlist, "play-and-stop" );
+        bool b_playstop = var_InheritBool( p_playlist, "play-and-stop" );
 
         /* Repeat and play/stop */
         if( b_repeat && get_current_status_item( p_playlist ) )

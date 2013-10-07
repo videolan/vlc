@@ -483,7 +483,6 @@ static void VariablesInit( playlist_t *p_playlist )
 
     /* Variables to control playback */
     var_Create( p_playlist, "playlist-autostart", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_playlist, "play-and-stop", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_playlist, "play-and-exit", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_playlist, "random", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_AddCallback( p_playlist, "random", RandomCallback, NULL );
