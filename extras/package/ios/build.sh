@@ -167,9 +167,12 @@ if [ "$PLATFORM" = "OS" ]; then
     EXTRA_CFLAGS="-arch ${ARCH} ${CFLAGS}"
     EXTRA_LDFLAGS="-arch ${ARCH} ${LDFLAGS}"
 else
-    EXTRA_CFLAGS="-m32"
-    EXTRA_LDFLAGS="-m32"
+    EXTRA_CFLAGS="-arch ${ARCH}"
+    EXTRA_LDFLAGS="-arch ${ARCH}"
 fi
+
+EXTRA_CFLAGS+=" -miphoneos-version-min=${SDK_MIN}"
+EXTRA_LDFLAGS+=" -miphoneos-version-min=${SDK_MIN}"
 
 info "LD FLAGS SELECTED = '${LDFLAGS}'"
 
