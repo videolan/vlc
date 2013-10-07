@@ -18,7 +18,6 @@ $(TARBALLS)/modplug-xmms-git-$(MODPLUG_GIT_HASH).zip:
 
 libmodplug: modplug-xmms-git-$(MODPLUG_GIT_HASH).zip .sum-modplug
 	$(UNPACK)
-	$(APPLY) $(SRC)/modplug/long.patch
 	$(call pkg_static,"libmodplug/libmodplug.pc.in")
 	$(MOVE)
 
