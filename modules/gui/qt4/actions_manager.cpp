@@ -105,7 +105,7 @@ void ActionsManager::doAction( int id_action )
 
 void ActionsManager::play()
 {
-    if( THEPL->current.i_size == 0 )
+    if( THEPL->current.i_size == 0 && THEPL->items.i_size == 0 )
     {
         /* The playlist is empty, open a file requester */
         THEDP->openFileDialog();
