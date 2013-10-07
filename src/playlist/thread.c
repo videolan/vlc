@@ -510,7 +510,7 @@ static void LoopRequest( playlist_t *p_playlist, int i_status )
     msg_Dbg( p_playlist, "nothing to play" );
     p_sys->status.i_status = PLAYLIST_STOPPED;
 
-    if( var_GetBool( p_playlist, "play-and-exit" ) )
+    if( var_InheritBool( p_playlist, "play-and-exit" ) )
     {
         msg_Info( p_playlist, "end of playlist, exiting" );
         libvlc_Quit( p_playlist->p_libvlc );
