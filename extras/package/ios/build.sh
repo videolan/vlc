@@ -137,7 +137,6 @@ export LD="xcrun ld"
 export STRIP="xcrun strip"
 
 
-export SDKROOT
 CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -miphoneos-version-min=${SDK_MIN} ${OPTIM}"
 if [ "$ARCH" = "armv7" -o "$ARCH" = "armv7s" ]; then
 CFLAGS+=" -mcpu=cortex-a8"
@@ -157,11 +156,7 @@ if [ "$PLATFORM" = "Simulator" ]; then
     export OBJCFLAGS="-fobjc-abi-version=2 -fobjc-legacy-dispatch ${OBJCFLAGS}"
 fi
 
-if [ "$PLATFORM" = "OS" ]; then
-  export LDFLAGS="-L${SDKROOT}/usr/lib -arch ${ARCH} -isysroot ${SDKROOT} -miphoneos-version-min=${SDK_MIN}"
-else
-  export LDFLAGS="-syslibroot=${SDKROOT}/ -arch ${ARCH} -miphoneos-version-min=${SDK_MIN}"
-fi
+export LDFLAGS="-L${SDKROOT}/usr/lib -arch ${ARCH} -isysroot ${SDKROOT} -miphoneos-version-min=${SDK_MIN}"
 
 if [ "$PLATFORM" = "OS" ]; then
     EXTRA_CFLAGS="-arch ${ARCH} ${CFLAGS}"

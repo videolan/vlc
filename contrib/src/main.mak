@@ -138,8 +138,8 @@ AR=xcrun ar
 LD=xcrun ld
 STRIP=xcrun strip
 RANLIB=xcrun ranlib
-EXTRA_CFLAGS += -isysroot $(SDKROOT)
-EXTRA_LDFLAGS += -Wl,-syslibroot,$(SDKROOT) -isysroot $(SDKROOT)
+EXTRA_CFLAGS += $(CFLAGS)
+EXTRA_LDFLAGS += $(LDFLAGS)
 endif
 
 ifdef HAVE_WIN32
