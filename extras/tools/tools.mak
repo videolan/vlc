@@ -68,7 +68,6 @@ cmake: cmake-$(CMAKE_VERSION).tar.gz
 	$(MOVE)
 
 .cmake: cmake
-	$(APPLY) cmake-backport-curl-bug-1192.patch
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
 	touch $@
 
