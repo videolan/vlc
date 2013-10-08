@@ -95,7 +95,7 @@ int Import_M3U( vlc_object_t *p_this )
 
         p_peek += offset;
 
-        if( !memcmp( p_peek, "RTSPtext", 8 ) ) /* QuickTime */
+        if( !strncasecmp( (const char *)p_peek, "RTSPtext", 8 ) ) /* QuickTime */
             pf_dup = CheckUnicode; /* UTF-8 */
         else
         if( !memcmp( p_peek, "#EXTM3U", 7 ) )
