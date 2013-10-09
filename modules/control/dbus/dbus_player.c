@@ -179,10 +179,7 @@ DBUS_METHOD( VolumeSet )
     if( VLC_SUCCESS != DemarshalSetPropertyValue( p_from, &d_dbus_vol ) )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
-    d_dbus_vol *= AOUT_VOLUME_DEFAULT;
-    if( d_dbus_vol < 0. )
-        d_dbus_vol = 0.;
-    playlist_VolumeSet( PL, d_dbus_vol );
+    playlist_VolumeSet( PL, fmaxf( d_dbus_vol, 0.f ) );
 
     REPLY_SEND;
 }
