@@ -407,9 +407,8 @@ static int ScanParametersDvbC( access_t *p_access, scan_parameter_t *p_scan )
         ? p_frontend->info.frequency_stepsize : 166667;
     p_scan->frequency.i_count = (p_scan->frequency.i_max-p_scan->frequency.i_min)/p_scan->frequency.i_step;
 
-    /* if user supplies modulation or frontend can do auto, don't scan them */
-    if( var_GetInteger( p_access, "dvb-modulation" ) ||
-        p_frontend->info.caps & FE_CAN_QAM_AUTO )
+    /* if frontend can do auto, don't scan them */
+    if( p_frontend->info.caps & FE_CAN_QAM_AUTO )
     {
         p_scan->b_modulation_set = true;
     } else {
@@ -628,41 +627,6 @@ static fe_spectral_inversion_t DecodeInversion( access_t *p_access )
     return fe_inversion;
 }
 
-static fe_code_rate_t DecodeFEC( access_t *p_access, const char *varname )
-{
-    switch( var_GetInteger(p_access, varname) )
-    {
-        case 0:  return FEC_NONE;
-        case 1:  return FEC_1_2;
-        case 2:  return FEC_2_3;
-        case 3:  return FEC_3_4;
-        case 4:  return FEC_4_5;
-        case 5:  return FEC_5_6;
-        case 6:  return FEC_6_7;
-        case 7:  return FEC_7_8;
-        case 8:  return FEC_8_9;
-        case 9:  return FEC_AUTO;
-        default: return FEC_NONE;
-    }
-}
-
-static fe_modulation_t DecodeModulation( access_t *p_access,
-                                         fe_modulation_t def )
-{
-    switch( var_GetInteger( p_access, "dvb-modulation" ) )
-    {
-        case -1:    return QPSK;
-        case 0:     return QAM_AUTO;
-        case 8:     return VSB_8;
-        case 16:    return QAM_16;
-        case 32:    return QAM_32;
-        case 64:    return QAM_64;
-        case 128:   return QAM_128;
-        case 256:   return QAM_256;
-        default:    return def;
-    }
-}
-
 /*****************************************************************************
  * FrontendSetQPSK : controls the FE device
  *****************************************************************************/
@@ -868,7 +832,7 @@ static int FrontendSetQPSK( access_t *p_access )
 
     fep.u.qpsk.symbol_rate = var_GetInteger( p_access, "dvb-srate" );
 
-    fep.u.qpsk.fec_inner = DecodeFEC( p_access, "dvb-fec" );
+    fep.u.qpsk.fec_inner = FEC_NONE;
 
     if( DoDiseqc( p_access ) < 0 )
     {
@@ -919,9 +883,9 @@ static int FrontendSetQAM( access_t *p_access )
         i_val > p_frontend->info.symbol_rate_min )
         fep.u.qam.symbol_rate = i_val;
 
-    fep.u.qam.fec_inner = DecodeFEC( p_access, "dvb-fec" );
+    fep.u.qam.fec_inner = FEC_NONE;
 
-    fep.u.qam.modulation = DecodeModulation( p_access, QAM_AUTO );
+    fep.u.qam.modulation = QAM_AUTO;
 
     /* Empty the event queue */
     for( ; ; )
@@ -986,28 +950,6 @@ static fe_transmit_mode_t DecodeTransmission( access_t *p_access )
     return fe_transmission;
 }
 
-static fe_guard_interval_t DecodeGuardInterval( access_t *p_access )
-{
-    fe_guard_interval_t fe_guard = 0;
-    int i_guard = var_GetInteger( p_access, "dvb-guard" );
-
-    msg_Dbg( p_access, "using guard=%d", i_guard );
-
-    switch( i_guard )
-    {
-        case 0: fe_guard = GUARD_INTERVAL_AUTO; break;
-        case 4: fe_guard = GUARD_INTERVAL_1_4; break;
-        case 8: fe_guard = GUARD_INTERVAL_1_8; break;
-        case 16: fe_guard = GUARD_INTERVAL_1_16; break;
-        case 32: fe_guard = GUARD_INTERVAL_1_32; break;
-        default:
-            msg_Dbg( p_access, "terrestrial dvb has guard interval not set, using auto");
-            fe_guard = GUARD_INTERVAL_AUTO;
-            break;
-    }
-    return fe_guard;
-}
-
 static fe_hierarchy_t DecodeHierarchy( access_t *p_access )
 {
     fe_hierarchy_t      fe_hierarchy = 0;
@@ -1042,11 +984,11 @@ static int FrontendSetOFDM( access_t * p_access )
     fep.inversion = DecodeInversion( p_access );
 
     fep.u.ofdm.bandwidth = DecodeBandwidth( p_access );
-    fep.u.ofdm.code_rate_HP = DecodeFEC( p_access, "dvb-code-rate-hp" );
-    fep.u.ofdm.code_rate_LP = DecodeFEC( p_access, "dvb-code-rate-lp" );
-    fep.u.ofdm.constellation = DecodeModulation( p_access, QAM_AUTO );
+    fep.u.ofdm.code_rate_HP = FEC_NONE;
+    fep.u.ofdm.code_rate_LP = FEC_NONE;
+    fep.u.ofdm.constellation = QAM_AUTO;
     fep.u.ofdm.transmission_mode = DecodeTransmission( p_access );
-    fep.u.ofdm.guard_interval = DecodeGuardInterval( p_access );
+    fep.u.ofdm.guard_interval = GUARD_INTERVAL_AUTO;
     fep.u.ofdm.hierarchy_information = DecodeHierarchy( p_access );
 
     /* Empty the event queue */
@@ -1079,8 +1021,7 @@ static int FrontendSetATSC( access_t *p_access )
     /* Prepare the fep structure */
 
     fep.frequency = var_GetInteger( p_access, "dvb-frequency" );
-
-    fep.u.vsb.modulation = DecodeModulation( p_access, VSB_8 );
+    fep.u.vsb.modulation = VSB_8;
 
     /* Empty the event queue */
     for( ; ; )

@@ -125,11 +125,6 @@ static int Open( vlc_object_t *p_this )
     if( ParseMRL( p_access ) )
     {
         free( p_sys );
-        var_Destroy( p_access, "dvb-modulation" );
-        var_Destroy( p_access, "dvb-fec" );
-        var_Destroy( p_access, "dvb-code-rate-hp" );
-        var_Destroy( p_access, "dvb-code-rate-lp" );
-        var_Destroy( p_access, "dvb-guard" );
         return VLC_EGENERIC;
     }
 
@@ -236,16 +231,8 @@ static block_t *BlockScan( access_t *p_access )
     var_SetInteger( p_access, "dvb-frequency", cfg.i_frequency );
     msg_Dbg( p_access, " bandwidth %d", cfg.i_bandwidth );
     var_SetInteger( p_access, "dvb-bandwidth", cfg.i_bandwidth );
-    if ( cfg.i_fec )
-    {
-        msg_Dbg( p_access, " FEC %d", cfg.i_fec );
-        var_SetInteger( p_access, "dvb-fec", cfg.i_fec );
-    }
     if ( cfg.c_polarization )
         var_SetInteger( p_access, "dvb-voltage", cfg.c_polarization == 'H' ? 18 : 13 );
-
-    if ( cfg.i_modulation )
-        var_SetInteger( p_access, "dvb-modulation", cfg.i_modulation );
 
     if ( cfg.i_symbolrate )
         var_SetInteger( p_access, "dvb-srate", cfg.i_symbolrate );
@@ -467,13 +454,6 @@ static void FilterUnset( access_t *p_access, int i_max )
  *****************************************************************************/
 static void VarInit( access_t *p_access )
 {
-    var_Destroy( p_access, "dvb-modulation" );
-    var_Destroy( p_access, "dvb-fec" );
-    var_Destroy( p_access, "dvb-code-rate-hp" );
-    var_Destroy( p_access, "dvb-code-rate-lp" );
-    var_Destroy( p_access, "dvb-guard" );
-
-    /* */
     var_Create( p_access, "dvb-adapter", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-device", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-frequency", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -486,21 +466,14 @@ static void VarInit( access_t *p_access )
     var_Create( p_access, "dvb-voltage", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-high-voltage", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-tone", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-fec", VLC_VAR_INTEGER );
     var_Create( p_access, "dvb-srate", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-lnb-lof1", VLC_VAR_INTEGER );
     var_Create( p_access, "dvb-lnb-lof2", VLC_VAR_INTEGER );
     var_Create( p_access, "dvb-lnb-slof", VLC_VAR_INTEGER );
 
     /* */
-    var_Create( p_access, "dvb-modulation", VLC_VAR_INTEGER );
-
-    /* */
-    var_Create( p_access, "dvb-code-rate-hp", VLC_VAR_INTEGER );
-    var_Create( p_access, "dvb-code-rate-lp", VLC_VAR_INTEGER );
     var_Create( p_access, "dvb-bandwidth", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-transmission", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-guard", VLC_VAR_INTEGER );
     var_Create( p_access, "dvb-hierarchy", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 }
 
@@ -553,19 +526,13 @@ static int ParseMRL( access_t *p_access )
         else GET_OPTION_BOOL("high-voltage")
         else GET_OPTION_INT("tone")
         else GET_OPTION_INT("satno")
-        else GET_OPTION_INT("fec")
         else GET_OPTION_INT("srate")
         else GET_OPTION_INT("lnb-lof1")
         else GET_OPTION_INT("lnb-lof2")
         else GET_OPTION_INT("lnb-slof")
 
-        else GET_OPTION_INT("modulation")
-
-        else GET_OPTION_INT("code-rate-hp")
-        else GET_OPTION_INT("code-rate-lp")
         else GET_OPTION_INT("bandwidth")
         else GET_OPTION_INT("transmission")
-        else GET_OPTION_INT("guard")
         else GET_OPTION_INT("hierarchy")
 
         /* Redundant with voltage but much easier to use */

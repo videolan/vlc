@@ -598,8 +598,6 @@ static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf
     p_cfg->i_modulation = p_scan->parameter.i_modulation;
     if( !p_cfg->i_symbolrate )
         p_cfg->i_symbolrate = var_GetInteger( p_scan->p_obj, "dvb-srate" );
-    if( !p_cfg->i_modulation )
-        p_cfg->i_modulation = var_GetInteger( p_scan->p_obj, "dvb-modulation" );
 
     if( p_scan->parameter.b_exhaustive )
         return ScanDvbNextExhaustive( p_scan, p_cfg, pf_pos );
