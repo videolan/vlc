@@ -29,7 +29,7 @@
 #include <vlc_network.h>
 
 #include <CoreFoundation/CoreFoundation.h>
-#include <CFNetwork/CFProxySupport.h>
+#include <CoreServices/CoreServices.h>
 
 /**
  * Determines the network proxy server to use (if any).
