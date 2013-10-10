@@ -322,6 +322,8 @@ do { \
         default:
         {
             unsigned size = aout_BitsPerSample( fourcc ) / 8;
+            assert( size != 0 );
+
             const size_t frames = bytes / (size * channels);
             unsigned char *buf = ptr;
 
