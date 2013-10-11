@@ -864,8 +864,8 @@ int64_t oggseek_read_page( demux_t *p_demux )
     demux_sys_t *p_ogg = p_demux->p_sys  ;
     uint8_t header[PAGE_HEADER_BYTES+255];
     int i_nsegs;
-    int i_in_pos;
     int i;
+    int64_t i_in_pos;
     int64_t i_result;
     int i_page_size;
     char *buf;
@@ -919,8 +919,8 @@ int64_t oggseek_read_page( demux_t *p_demux )
 
     if ( ogg_sync_pageout( &p_ogg->oy, &p_ogg->current_page ) != 1 )
     {
-        msg_Err( p_demux , "Got invalid packet, read %"PRId64" of %i: %s",i_result,i_page_size,
-                 buf );
+        msg_Err( p_demux , "Got invalid packet, read %"PRId64" of %i: %s %"PRId64,
+                 i_result, i_page_size, buf, i_in_pos );
         return 0;
     }
 
