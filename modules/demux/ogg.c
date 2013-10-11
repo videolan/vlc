@@ -760,9 +760,14 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         switch( p_stream->fmt.i_codec )
         {
         case VLC_CODEC_VORBIS:
-        case VLC_CODEC_SPEEX:
         case VLC_CODEC_THEORA:
             if( p_stream->i_packets_backup == 3 )
+                p_stream->b_force_backup = false;
+            b_xiph = true;
+            break;
+
+        case VLC_CODEC_SPEEX:
+            if( p_stream->i_packets_backup == 2 + p_stream->i_extra_headers_packets )
                 p_stream->b_force_backup = false;
             b_xiph = true;
             break;
@@ -2098,6 +2103,10 @@ static void Ogg_ReadSpeexHeader( logical_stream_t *p_stream,
     p_stream->fmt.audio.i_channels = oggpack_read( &opb, 32 );
     fill_channels_info(&p_stream->fmt.audio);
     p_stream->fmt.i_bitrate = oggpack_read( &opb, 32 );
+    oggpack_adv( &opb, 32 ); /* frame_size */
+    oggpack_adv( &opb, 32 ); /* vbr */
+    oggpack_adv( &opb, 32 ); /* frames_per_packet */
+    p_stream->i_extra_headers_packets = oggpack_read( &opb, 32 ); /* extra_headers */
 }
 
 static void Ogg_ReadOpusHeader( demux_t *p_demux,

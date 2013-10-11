@@ -44,6 +44,7 @@ typedef struct logical_stream_s
      * them to the decoder. */
     bool             b_force_backup;
     int              i_packets_backup;
+    int32_t          i_extra_headers_packets;
     void             *p_headers;
     int              i_headers;
     ogg_int64_t      i_previous_granulepos;
