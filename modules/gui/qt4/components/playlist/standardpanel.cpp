@@ -51,6 +51,12 @@
     I_DIR_OR_FOLDER( N_( "Enter name for new directory:" ), \
                      N_( "Enter name for new folder:" ) )
 
+#define I_RENAME_DIR \
+    I_DIR_OR_FOLDER( N_("Rename Directory"), N_( "Rename Folder" ) )
+#define I_RENAME_DIR_NAME \
+    I_DIR_OR_FOLDER( N_( "Enter a new name for the directory:" ), \
+                     N_( "Enter a new name for the folder:" ) )
+
 #include <QHeaderView>
 #include <QMenu>
 #include <QKeyEvent>
@@ -198,6 +204,9 @@ bool StandardPLPanel::popup( const QPoint &point )
     ADD_MENU_ENTRY( addIcon, qtr(I_POP_NEWFOLDER),
                     VLCModelSubInterface::ACTION_CREATENODE )
 
+    ADD_MENU_ENTRY( QIcon(), qtr(I_POP_RENAMEFOLDER),
+                    VLCModelSubInterface::ACTION_RENAMENODE )
+
     menu.addSeparator();
     /* In PL or ML, allow to add a file/folder */
     ADD_MENU_ENTRY( addIcon, qtr(I_PL_ADDF),
@@ -323,6 +332,14 @@ void StandardPLPanel::popupAction( QAction *action )
             QLineEdit::Normal, QString(), &ok);
         if ( !ok ) return;
         model->createNode( index, temp );
+        break;
+
+    case VLCModelSubInterface::ACTION_RENAMENODE:
+        temp = QInputDialog::getText( PlaylistDialog::getInstance( p_intf ),
+            qtr( I_RENAME_DIR ), qtr( I_RENAME_DIR_NAME ),
+            QLineEdit::Normal, model->getTitle( index ), &ok);
+        if ( !ok ) return;
+        model->renameNode( index, temp );
         break;
 
     case VLCModelSubInterface::ACTION_ENQUEUEFILE:

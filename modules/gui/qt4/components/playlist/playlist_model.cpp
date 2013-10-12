@@ -957,6 +957,19 @@ void PLModel::createNode( QModelIndex index, QString name )
     PL_UNLOCK;
 }
 
+void PLModel::renameNode( QModelIndex index, QString name )
+{
+    if( name.isEmpty() || !index.isValid() ) return;
+
+    PL_LOCK;
+    if ( !index.isValid() ) index = rootIndex();
+    input_item_t* p_input = this->getInputItem( index );
+    input_item_SetName( p_input, qtu( name ) );
+    playlist_t *p_playlist = pl_Get( p_intf );
+    input_item_WriteMeta( VLC_OBJECT(p_playlist), p_input );
+    PL_UNLOCK;
+}
+
 bool PLModel::action( QAction *action, const QModelIndexList &indexes )
 {
     QModelIndex index;
@@ -1077,6 +1090,9 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
             return getURI( index ).startsWith( "file://" );
     case ACTION_CREATENODE:
         return ( canEdit() && isTree() );
+    case ACTION_RENAMENODE:
+        return ( index != rootIndex() ) && !isLeaf( index );
+        break;
     case ACTION_CLEAR:
         return rowCount() && canEdit();
     case ACTION_ENQUEUEFILE:

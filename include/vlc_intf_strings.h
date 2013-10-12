@@ -67,6 +67,8 @@
 #define I_POP_INFO N_("Information...")
 #define I_POP_NEWFOLDER I_DIR_OR_FOLDER( N_("Create Directory..."), \
                                          N_("Create Folder...") )
+#define I_POP_RENAMEFOLDER I_DIR_OR_FOLDER( N_("Rename Directory..."), \
+                                         N_("Rename Folder...") )
 #define I_POP_EXPLORE I_DIR_OR_FOLDER( N_("Show Containing Directory..."), \
                                        N_("Show Containing Folder...") )
 #define I_POP_STREAM N_("Stream...")

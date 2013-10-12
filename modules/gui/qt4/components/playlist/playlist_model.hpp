@@ -76,6 +76,7 @@ public:
     virtual void rebuild( playlist_item_t * p = NULL ) { model()->rebuild( p ); }
     virtual void doDelete( QModelIndexList list ) { model()->doDelete( mapListToSource( list ) ); }
     virtual void createNode( QModelIndex a, QString b ) { model()->createNode( mapToSource( a ), b ); }
+    virtual void renameNode( QModelIndex a, QString b ) { model()->renameNode( mapToSource( a ), b ); }
     virtual void removeAll() { model()->removeAll(); }
 
     virtual QModelIndex rootIndex() const { return mapFromSource( model()->rootIndex() ); }
@@ -165,6 +166,7 @@ public:
     virtual void rebuild( playlist_item_t * p = NULL );
     virtual void doDelete( QModelIndexList selected );
     virtual void createNode( QModelIndex index, QString name );
+    virtual void renameNode( QModelIndex index, QString name );
     virtual void removeAll();
 
     /* Lookups */

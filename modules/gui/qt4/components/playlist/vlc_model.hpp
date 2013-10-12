@@ -65,6 +65,7 @@ public:
     virtual void rebuild( playlist_item_t * p = NULL ) = 0;
     virtual void doDelete( QModelIndexList ) = 0;
     virtual void createNode( QModelIndex, QString ) = 0;
+    virtual void renameNode( QModelIndex, QString ) = 0;
     virtual void removeAll() = 0;
 
     virtual QModelIndex rootIndex() const = 0;
@@ -89,6 +90,7 @@ public:
         ACTION_SORT,
         ACTION_EXPLORE,
         ACTION_CREATENODE,
+        ACTION_RENAMENODE,
         ACTION_CLEAR,
         ACTION_ENQUEUEFILE,
         ACTION_ENQUEUEDIR,
