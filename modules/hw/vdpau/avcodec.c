@@ -42,7 +42,7 @@ static int Open(vlc_va_t *, int, const es_format_t *);
 static void Close(vlc_va_t *);
 
 vlc_module_begin()
-    set_description(N_("Video Decode and Presentation API for Unix (VDPAU)"))
+    set_description(N_("VDPAU hardware-accelerated decoder"))
     set_capability("hw decoder", 100)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
