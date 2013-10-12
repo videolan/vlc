@@ -247,50 +247,22 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     /* ***** libavcodec frame skipping ***** */
     p_sys->b_hurry_up = var_CreateGetBool( p_dec, "avcodec-hurry-up" );
 
-    switch( var_CreateGetInteger( p_dec, "avcodec-skip-frame" ) )
-    {
-        case -1:
-            p_sys->p_context->skip_frame = AVDISCARD_NONE;
-            break;
-        case 0:
-            p_sys->p_context->skip_frame = AVDISCARD_DEFAULT;
-            break;
-        case 1:
-            p_sys->p_context->skip_frame = AVDISCARD_NONREF;
-            break;
-        case 2:
-            p_sys->p_context->skip_frame = AVDISCARD_NONKEY;
-            break;
-        case 3:
-            p_sys->p_context->skip_frame = AVDISCARD_ALL;
-            break;
-        default:
-            p_sys->p_context->skip_frame = AVDISCARD_NONE;
-            break;
-    }
+    i_val = var_CreateGetInteger( p_dec, "avcodec-skip-frame" );
+    if( i_val >= 4 ) p_sys->p_context->skip_frame = AVDISCARD_ALL;
+    else if( i_val == 3 ) p_sys->p_context->skip_frame = AVDISCARD_NONKEY;
+    else if( i_val == 2 ) p_sys->p_context->skip_frame = AVDISCARD_BIDIR;
+    else if( i_val == 1 ) p_sys->p_context->skip_frame = AVDISCARD_NONREF;
+    else if( i_val == -1 ) p_sys->p_context->skip_frame = AVDISCARD_NONE;
+    else p_sys->p_context->skip_frame = AVDISCARD_DEFAULT;
     p_sys->i_skip_frame = p_sys->p_context->skip_frame;
 
-    switch( var_CreateGetInteger( p_dec, "avcodec-skip-idct" ) )
-    {
-        case -1:
-            p_sys->p_context->skip_idct = AVDISCARD_NONE;
-            break;
-        case 0:
-            p_sys->p_context->skip_idct = AVDISCARD_DEFAULT;
-            break;
-        case 1:
-            p_sys->p_context->skip_idct = AVDISCARD_NONREF;
-            break;
-        case 2:
-            p_sys->p_context->skip_idct = AVDISCARD_NONKEY;
-            break;
-        case 3:
-            p_sys->p_context->skip_idct = AVDISCARD_ALL;
-            break;
-        default:
-            p_sys->p_context->skip_idct = AVDISCARD_NONE;
-            break;
-    }
+    i_val = var_CreateGetInteger( p_dec, "avcodec-skip-idct" );
+    if( i_val >= 4 ) p_sys->p_context->skip_idct = AVDISCARD_ALL;
+    else if( i_val == 3 ) p_sys->p_context->skip_idct = AVDISCARD_NONKEY;
+    else if( i_val == 2 ) p_sys->p_context->skip_idct = AVDISCARD_BIDIR;
+    else if( i_val == 1 ) p_sys->p_context->skip_idct = AVDISCARD_NONREF;
+    else if( i_val == -1 ) p_sys->p_context->skip_idct = AVDISCARD_NONE;
+    else p_sys->p_context->skip_idct = AVDISCARD_DEFAULT;
     p_sys->i_skip_idct = p_sys->p_context->skip_idct;
 
     /* ***** libavcodec direct rendering ***** */
