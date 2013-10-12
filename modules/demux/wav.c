@@ -349,6 +349,10 @@ static int Open( vlc_object_t * p_this )
         p_sys->fmt.i_codec =
             vlc_fourcc_GetCodecAudio( p_sys->fmt.i_codec,
                                       p_sys->fmt.audio.i_bitspersample );
+        if( p_sys->fmt.i_codec == 0 ) {
+            msg_Err( p_demux, "Unrecognized codec" );
+            goto error;
+        }
         break;
     case VLC_CODEC_ADPCM_MS:
     /* FIXME not sure at all FIXME */
