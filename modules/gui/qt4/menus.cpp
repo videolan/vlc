@@ -374,7 +374,7 @@ QMenu *VLCMenuBar::FileMenu( intf_thread_t *p_intf, QWidget *parent, MainInterfa
     }
     menu->addSeparator();
 
-    addDPStaticEntry( menu, qtr( I_PL_SAVE ), "", SLOT( saveAPlaylist() ),
+    addDPStaticEntry( menu, qtr( I_PL_SAVE ), "", SLOT( savePlayingToPlaylist() ),
         "Ctrl+Y" );
 
 #ifdef ENABLE_SOUT
@@ -1626,6 +1626,7 @@ void VLCMenuBar::updateRecents( intf_thread_t *p_intf )
 
             recentsMenu->addSeparator();
             recentsMenu->addAction( qtr("&Clear"), rmrl, SLOT( clear() ) );
+            addDPStaticEntry( recentsMenu, qtr("&Save To Playlist"), "", SLOT( saveRecentsToPlaylist() ), "" );
             recentsMenu->setEnabled( true );
         }
     }

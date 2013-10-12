@@ -149,3 +149,20 @@ void RecentsMRL::save()
     getSettings()->setValue( "RecentsMRL/list", *stack );
 }
 
+playlist_item_t *RecentsMRL::toPlaylist(int length)
+{
+    playlist_item_t *p_node_recent = playlist_NodeCreate(THEPL, _("Recently Played"), THEPL->p_root, PLAYLIST_END, PLAYLIST_RO_FLAG, NULL);
+
+    if ( p_node_recent == NULL )  return NULL;
+
+    if (length == 0 || stack->count() < length)
+        length = stack->count();
+
+    for (int i = 0; i < length; i++)
+    {
+        input_item_t *p_input = input_item_New(qtu(stack->at(i)), NULL);
+        playlist_NodeAddInput(THEPL, p_input, p_node_recent, PLAYLIST_APPEND, PLAYLIST_END, false);
+    }
+
+    return p_node_recent;
+}

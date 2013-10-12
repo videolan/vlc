@@ -52,7 +52,7 @@ public:
 
     void addRecent( const QString & );
     QStringList recents();
-
+    playlist_item_t *toPlaylist(int length);
     QSignalMapper *signalMapper;
 
 private:
