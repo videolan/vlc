@@ -36,6 +36,8 @@
 #include <ogg/ogg.h>
 #include <limits.h>
 
+#include <assert.h>
+
 #include "ogg.h"
 #include "oggseek.h"
 
@@ -460,68 +462,96 @@ static int64_t find_first_page( demux_t *p_demux, int64_t i_pos1, int64_t i_pos2
     }
 }
 
-
-
-/* Find the last frame for p_stream,
-   -1 is returned on failure */
-
-static int64_t find_last_frame (demux_t *p_demux, logical_stream_t *p_stream)
+void Oggseek_ProbeEnd( demux_t *p_demux )
 {
+    /* Temporary state */
+    ogg_stream_state os;
+    ogg_sync_state oy;
+    ogg_page page;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int64_t i_pos, i_startpos, i_result, i_granule, i_lowerbound;
+    int64_t i_length = 0;
+    int64_t i_backup_pos = stream_Tell( p_demux->s );
+    int64_t i_upperbound = stream_Size( p_demux->s );
+    unsigned int i_backoffset = OGGSEEK_BYTES_TO_READ;
+    assert( OGGSEEK_BYTES_TO_READ < UINT_MAX );
 
-    int64_t i_page_pos;
-    int64_t i_start_pos;
-    int64_t i_frame = -1;
-    int64_t i_last_frame = -1;
-    int64_t i_kframe = 0;
-    int64_t i_pos1;
-    int64_t i_pos2;
+    const char *buffer;
 
-    demux_sys_t *p_sys  = p_demux->p_sys;
+    ogg_stream_init( &os, -1 );
+    ogg_sync_init( &oy );
 
-    i_pos1 = p_stream->i_data_start;
-    i_pos2 = p_sys->i_total_length;
+    /* Try to lookup last granule from each logical stream */
+    i_lowerbound = stream_Size( p_demux->s ) - p_sys->i_streams * MAX_PAGE_SIZE * 2;
+    i_lowerbound = __MAX( 0, i_lowerbound );
 
-    i_start_pos = i_pos2 - OGGSEEK_BYTES_TO_READ;
+    i_pos = i_startpos = __MAX( i_lowerbound, i_upperbound - i_backoffset );
 
-
-    while( 1 )
+    if ( stream_Seek( p_demux->s, i_pos ) )
     {
-        if ( i_start_pos < i_pos1 ) i_start_pos = i_pos1;
+        ogg_sync_clear( &oy );
+        ogg_stream_clear( &os );
+        return;
+    }
 
-        i_page_pos = find_first_page( p_demux, i_start_pos, i_pos2, p_stream, &i_kframe, &i_frame );
+    while( i_pos >= i_lowerbound )
+    {
 
-        if ( i_frame == -1 )
+        while( i_pos < i_upperbound )
         {
-            /* no pages found in range */
-            if ( i_last_frame >= 0 )
-            {
-                /* No more pages in range -> return last one */
-                return i_last_frame;
-            }
-            if ( i_start_pos <= i_pos1 )
-            {
-                return -1;
-            }
+            if ( oy.unsynced )
+                i_result = ogg_sync_pageseek( &oy, &page );
 
-            /* Go back a bit */
-            i_pos2 -= i_start_pos;
-            i_start_pos -= OGGSEEK_BYTES_TO_READ;
-            if ( i_start_pos < i_pos1 ) i_start_pos = i_pos1;
-            i_pos2 += i_start_pos;
+            buffer = ogg_sync_buffer( &oy, OGGSEEK_BYTES_TO_READ );
+            if ( buffer == NULL ) goto clean;
+            i_result = stream_Read( p_demux->s, (void*) buffer, OGGSEEK_BYTES_TO_READ );
+            if ( i_result < 1 ) goto clean;
+            i_pos += i_result;
+            ogg_sync_wrote( &oy, i_result );
+
+            while( ogg_sync_pageout( &oy, &page ) == 1 )
+            {
+                i_granule = ogg_page_granulepos( &page );
+                if ( i_granule == -1 ) continue;
+
+                for ( int i=0; i< p_sys->i_streams; i++ )
+                {
+                    if ( p_sys->pp_stream[i]->i_serial_no != ogg_page_serialno( &page ) )
+                        continue;
+
+                    i_length = Oggseek_GranuleToAbsTimestamp( p_sys->pp_stream[i], i_granule, false );
+                    p_sys->i_length = __MAX( p_sys->i_length, i_length / 1000000 );
+                    break;
+                }
+            }
+            if ( i_length > 0 ) break;
+        }
+
+        /* We found at least a page with valid granule */
+        if ( i_length > 0 ) break;
+
+        /* Otherwise increase read size, starting earlier */
+        if ( i_backoffset <= ( UINT_MAX >> 1 ) )
+        {
+            i_backoffset <<= 1;
+            i_startpos = i_upperbound - i_backoffset;
         }
         else
         {
-            /* found a page, see if we can find another one */
-            i_last_frame = i_frame;
-            i_start_pos = i_page_pos + 1;
+            i_startpos -= i_backoffset;
         }
+        i_pos = i_startpos;
+
+        if ( stream_Seek( p_demux->s, i_pos ) )
+            break;
     }
-    return -1;
+
+clean:
+    stream_Seek( p_demux->s, i_backup_pos );
+
+    ogg_sync_clear( &oy );
+    ogg_stream_clear( &os );
 }
-
-
-
-
 
 
 /* convert a theora frame to a granulepos */
@@ -1238,66 +1268,11 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
     return bestlower.i_pos;
 }
 
-/* get highest frame in theora and opus streams */
-
-static int64_t get_last_frame ( demux_t *p_demux, logical_stream_t *p_stream )
-{
-    demux_sys_t *p_sys  = p_demux->p_sys;
-    int64_t i_frame;
-    ogg_stream_state os;
-
-    /* Backup the stream state. We get called during header processing, and our
-     * caller expects its header packet to remain valid after the call. If we
-     * let find_last_frame() reuse the same stream state, then it will
-     * invalidate the pointers in that packet. */
-    memcpy(&os, &p_stream->os, sizeof(os));
-    ogg_stream_init( &p_stream->os, p_stream->i_serial_no );
-
-    i_frame = find_last_frame ( p_demux, p_stream );
-
-    /* We need to reset back to the start here, otherwise packets cannot be decoded.
-     * I think this is due to the fact that we seek to the end and then we must reset
-     * all logical streams, which causes remaining headers not to be read correctly.
-     * Seeking to 0 is the only value which seems to work, and it appears to have no
-     * adverse effects. */
-
-    seek_byte( p_demux, 0 );
-    /* Reset stream states */
-    p_sys->i_streams = 0;
-    ogg_stream_clear( &p_stream->os );
-    memcpy( &p_stream->os, &os, sizeof(os) );
-
-    return i_frame;
-}
-
-
 
 /************************************************************************
  * public functions
  *************************************************************************/
 
-
-
-
-/* return highest frame number for p_stream (which must be a theora, dirac or opus stream) */
-
-int64_t oggseek_get_last_frame ( demux_t *p_demux, logical_stream_t *p_stream )
-{
-    int64_t i_frame = -1;
-
-    if ( p_stream->fmt.i_codec == VLC_CODEC_THEORA ||
-         p_stream->fmt.i_codec == VLC_CODEC_VORBIS ||
-         p_stream->fmt.i_codec == VLC_CODEC_OPUS )
-    {
-        i_frame = get_last_frame ( p_demux, p_stream );
-
-        if ( i_frame < 0 ) return -1;
-        return i_frame;
-    }
-
-    /* unhandled video format */
-    return -1;
-}
 
 int Oggseek_BlindSeektoPosition( demux_t *p_demux, logical_stream_t *p_stream,
                                  double f, bool b_canfastseek )

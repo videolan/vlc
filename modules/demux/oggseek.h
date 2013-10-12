@@ -58,14 +58,13 @@ bool    Oggseek_PacketPCRFixup ( logical_stream_t *p_stream, ogg_page *, ogg_pac
 int     Oggseek_BlindSeektoPosition ( demux_t *, logical_stream_t *, double f, bool );
 int     Oggseek_SeektoAbsolutetime ( demux_t *, logical_stream_t *, int64_t i_granulepos );
 const demux_index_entry_t *OggSeek_IndexAdd ( logical_stream_t *, int64_t, int64_t );
+void    Oggseek_ProbeEnd( demux_t * );
 
 const demux_index_entry_t *oggseek_theora_index_entry_add ( logical_stream_t *,
                                                             int64_t i_granule,
                                                             int64_t i_pagepos );
 
 void oggseek_index_entries_free ( demux_index_entry_t * );
-
-int64_t oggseek_get_last_frame ( demux_t *, logical_stream_t *);
 
 int oggseek_find_frame ( demux_t *, logical_stream_t *, int64_t i_tframe );
 

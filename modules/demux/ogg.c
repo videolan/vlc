@@ -126,13 +126,12 @@ static bool Ogg_LogicalStreamResetEsFormat( demux_t *p_demux, logical_stream_t *
 
 /* */
 static void Ogg_ExtractMeta( demux_t *p_demux, es_format_t *p_fmt, const uint8_t *p_headers, int i_headers );
-static int64_t Ogg_GetLastPacket( demux_t *p_demux, logical_stream_t *p_stream, double f_rate );
 
 /* Logical bitstream headers */
-static void Ogg_ReadTheoraHeader( demux_t *, logical_stream_t *, ogg_packet * );
-static void Ogg_ReadVorbisHeader( demux_t *, logical_stream_t *, ogg_packet * );
+static void Ogg_ReadTheoraHeader( logical_stream_t *, ogg_packet * );
+static void Ogg_ReadVorbisHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadSpeexHeader( logical_stream_t *, ogg_packet * );
-static void Ogg_ReadOpusHeader( demux_t *, logical_stream_t *, ogg_packet * );
+static void Ogg_ReadOpusHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadKateHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadFlacHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadAnnodexHeader( demux_t *, logical_stream_t *, ogg_packet * );
@@ -234,6 +233,7 @@ static int Demux( demux_t * p_demux )
     ogg_packet  oggpacket;
     int         i_stream;
     bool b_skipping = false;
+    bool b_canseek;
 
 
     if( p_sys->i_eos == p_sys->i_streams )
@@ -254,6 +254,11 @@ static int Demux( demux_t * p_demux )
         p_sys->i_eos = 0;
         if( Ogg_BeginningOfStream( p_demux ) != VLC_SUCCESS )
             return 0;
+
+        /* Find the real duration */
+        stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_canseek );
+        if ( b_canseek )
+            Oggseek_ProbeEnd( p_demux );
 
         msg_Dbg( p_demux, "beginning of a group of logical streams" );
         es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 );
@@ -339,14 +344,14 @@ static int Demux( demux_t * p_demux )
                         oggpacket.bytes >= 7 &&
                         ! memcmp( oggpacket.packet, "\x80theora", 7 ) )
                 {
-                    Ogg_ReadTheoraHeader( p_demux, p_stream, &oggpacket );
+                    Ogg_ReadTheoraHeader( p_stream, &oggpacket );
                     p_stream->i_secondary_header_packets = 0;
                 }
                 else if( p_stream->fmt.i_codec == VLC_CODEC_VORBIS &&
                         oggpacket.bytes >= 7 &&
                         ! memcmp( oggpacket.packet, "\x01vorbis", 7 ) )
                 {
-                    Ogg_ReadVorbisHeader( p_demux, p_stream, &oggpacket );
+                    Ogg_ReadVorbisHeader( p_stream, &oggpacket );
                     p_stream->i_secondary_header_packets = 0;
                 }
                 else if( p_stream->fmt.i_codec == VLC_CODEC_CMML )
@@ -1287,7 +1292,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 if( oggpacket.bytes >= 7 &&
                     ! memcmp( oggpacket.packet, "\x01vorbis", 7 ) )
                 {
-                    Ogg_ReadVorbisHeader( p_demux, p_stream, &oggpacket );
+                    Ogg_ReadVorbisHeader( p_stream, &oggpacket );
                     msg_Dbg( p_demux, "found vorbis header" );
                 }
                 /* Check for Speex header */
@@ -1304,7 +1309,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 else if( oggpacket.bytes >= 8 &&
                     ! memcmp( oggpacket.packet, "OpusHead", 8 ) )
                 {
-                    Ogg_ReadOpusHeader( p_demux, p_stream, &oggpacket );
+                    Ogg_ReadOpusHeader( p_stream, &oggpacket );
                     msg_Dbg( p_demux, "found opus header, channels: %i, "
                              "pre-skip: %i",
                              p_stream->fmt.audio.i_channels,
@@ -1348,7 +1353,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 else if( oggpacket.bytes >= 7 &&
                          ! memcmp( oggpacket.packet, "\x80theora", 7 ) )
                 {
-                    Ogg_ReadTheoraHeader( p_demux, p_stream, &oggpacket );
+                    Ogg_ReadTheoraHeader( p_stream, &oggpacket );
 
                     msg_Dbg( p_demux,
                              "found theora header, bitrate: %i, rate: %f",
@@ -2071,14 +2076,7 @@ static void Ogg_ExtractMeta( demux_t *p_demux, es_format_t *p_fmt, const uint8_t
         p_demux->info.i_update |= INPUT_UPDATE_META;
 }
 
-static int64_t Ogg_GetLastPacket( demux_t *p_demux, logical_stream_t *p_stream,
-                                  double f_rate )
-{
-    int64_t last_packet = oggseek_get_last_frame( p_demux, p_stream );
-    return ( last_packet >= 0 ) ? last_packet / f_rate : -1;
-}
-
-static void Ogg_ReadTheoraHeader( demux_t *p_demux, logical_stream_t *p_stream,
+static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
                                   ogg_packet *p_oggpacket )
 {
     bs_t bitstream;
@@ -2144,16 +2142,9 @@ static void Ogg_ReadTheoraHeader( demux_t *p_demux, logical_stream_t *p_stream,
     {
         p_stream->i_keyframe_offset = 1;
     }
-    if ( p_demux->p_sys->i_length < 0 )
-    {
-        int64_t last_packet = Ogg_GetLastPacket( p_demux, p_stream, p_stream->f_rate );
-        if ( last_packet >= 0 )
-            p_demux->p_sys->i_length = last_packet;
-    }
-
 }
 
-static void Ogg_ReadVorbisHeader( demux_t *p_demux, logical_stream_t *p_stream,
+static void Ogg_ReadVorbisHeader( logical_stream_t *p_stream,
                                   ogg_packet *p_oggpacket )
 {
     oggpack_buffer opb;
@@ -2175,13 +2166,6 @@ static void Ogg_ReadVorbisHeader( demux_t *p_demux, logical_stream_t *p_stream,
         oggpack_read( &opb, 32 );
     oggpack_adv( &opb, 32 );
     p_stream->fmt.i_bitrate = oggpack_read( &opb, 32 );
-
-    if ( p_demux->p_sys->i_length < 0 )
-    {
-        int64_t last_packet = Ogg_GetLastPacket( p_demux, p_stream, p_stream->f_rate );
-        if ( last_packet >= 0 )
-            p_demux->p_sys->i_length = last_packet;
-    }
 }
 
 static void Ogg_ReadSpeexHeader( logical_stream_t *p_stream,
@@ -2214,8 +2198,7 @@ static void Ogg_ReadSpeexHeader( logical_stream_t *p_stream,
     p_stream->i_extra_headers_packets = oggpack_read( &opb, 32 ); /* extra_headers */
 }
 
-static void Ogg_ReadOpusHeader( demux_t *p_demux,
-                                logical_stream_t *p_stream,
+static void Ogg_ReadOpusHeader( logical_stream_t *p_stream,
                                 ogg_packet *p_oggpacket )
 {
     oggpack_buffer opb;
@@ -2240,13 +2223,6 @@ static void Ogg_ReadOpusHeader( demux_t *p_demux,
     p_stream->fmt.audio.i_channels = oggpack_read( &opb, 8 );
     fill_channels_info(&p_stream->fmt.audio);
     p_stream->i_pre_skip = oggpack_read( &opb, 16 );
-
-    if ( p_demux->p_sys->i_length < 0 )
-    {
-        int64_t last_packet = Ogg_GetLastPacket( p_demux, p_stream, p_stream->f_rate );
-        if ( last_packet >= 0 )
-            p_demux->p_sys->i_length = last_packet;
-    }
 }
 
 static void Ogg_ReadFlacHeader( demux_t *p_demux, logical_stream_t *p_stream,
@@ -2359,7 +2335,7 @@ static void Ogg_ReadAnnodexHeader( demux_t *p_demux,
         uint64_t timebase_numerator;
         uint64_t timebase_denominator;
 
-        Ogg_ReadTheoraHeader( p_demux, p_stream, p_oggpacket );
+        Ogg_ReadTheoraHeader( p_stream, p_oggpacket );
 
         oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes);
         oggpack_adv( &opb, 8*8 ); /* "Annodex\0" header */
