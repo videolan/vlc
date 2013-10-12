@@ -2309,14 +2309,14 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                             EsOutIsExtraBufferingAllowed( out ),
                             i_pcr, mdate() );
 
-        if( p_pgrm == p_sys->p_pgrm )
+        if( p_sys->b_buffering )
         {
-            if( p_sys->b_buffering )
-            {
-                /* Check buffering state on master clock update */
-                EsOutDecodersStopBuffering( out, false );
-            }
-            else if( b_late && ( !p_sys->p_input->p->p_sout ||
+            /* Check buffering state on master clock update */
+            EsOutDecodersStopBuffering( out, false );
+        }
+        else if( p_pgrm == p_sys->p_pgrm )
+        {
+            if( b_late && ( !p_sys->p_input->p->p_sout ||
                                  !p_sys->p_input->p->b_out_pace_control ) )
             {
                 const mtime_t i_pts_delay_base = p_sys->i_pts_delay - p_sys->i_pts_jitter;
@@ -2330,19 +2330,23 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                              "ES_OUT_SET_(GROUP_)PCR  is called too late (jitter of %d ms ignored)",
                              (int)(i_pts_delay - i_pts_delay_base) / 1000 );
                     i_pts_delay = p_sys->i_pts_delay;
+
+                    /* reset clock */
+                    for( int i = 0; i < p_sys->i_pgrm; i++ )
+                      input_clock_Reset( p_sys->pgrm[i]->p_clock );
                 }
                 else
                 {
                     msg_Err( p_sys->p_input,
                              "ES_OUT_SET_(GROUP_)PCR  is called too late (pts_delay increased to %d ms)",
                              (int)(i_pts_delay/1000) );
+
+                    /* Force a rebufferization when we are too late */
+
+                    /* It is not really good, as we throw away already buffered data
+                     * TODO have a mean to correctly reenter bufferization */
+                    es_out_Control( out, ES_OUT_RESET_PCR );
                 }
-
-                /* Force a rebufferization when we are too late */
-
-                /* It is not really good, as we throw away already buffered data
-                 * TODO have a mean to correctly reenter bufferization */
-                es_out_Control( out, ES_OUT_RESET_PCR );
 
                 es_out_SetJitter( out, i_pts_delay_base, i_pts_delay - i_pts_delay_base, p_sys->i_cr_average );
             }
