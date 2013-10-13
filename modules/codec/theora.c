@@ -105,6 +105,8 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict );
   "Enforce a quality between 1 (low) and 10 (high), instead " \
   "of specifying a particular bitrate. This will produce a VBR stream." )
 
+#define ENC_POSTPROCESS_TEXT N_("Post processing quality")
+
 vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
@@ -113,6 +115,8 @@ vlc_module_begin ()
     set_capability( "decoder", 100 )
     set_callbacks( OpenDecoder, CloseDecoder )
     add_shortcut( "theora" )
+#   define DEC_CFG_PREFIX "theora-"
+    add_integer( DEC_CFG_PREFIX "postproc", -1, ENC_POSTPROCESS_TEXT, NULL, true )
 
     add_submodule ()
     set_description( N_("Theora video packetizer") )
@@ -236,6 +240,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     ogg_packet oggpacket;
     th_setup_info *ts = NULL; /* theora setup information */
+    int i_max_pp, i_pp;
 
     unsigned pi_size[XIPH_MAX_HEADER_COUNT];
     void     *pp_data[XIPH_MAX_HEADER_COUNT];
@@ -374,6 +379,21 @@ static int ProcessHeaders( decoder_t *p_dec )
             msg_Err( p_dec, "Could not allocate Theora decoder" );
             goto error;
         }
+
+        i_pp = var_InheritInteger( p_dec, DEC_CFG_PREFIX "postproc" );
+        if ( i_pp >= 0 && !th_decode_ctl( p_sys->tcx,
+                    TH_DECCTL_GET_PPLEVEL_MAX, &i_max_pp, sizeof(int) ) )
+        {
+            i_pp = __MIN( i_pp, i_max_pp );
+            if ( th_decode_ctl( p_sys->tcx, TH_DECCTL_SET_PPLEVEL,
+                                &i_pp, sizeof(int) ) )
+                msg_Err( p_dec, "Failed to set post processing level to %d",
+                         i_pp );
+            else
+                msg_Dbg( p_dec, "Set post processing level to %d / %d",
+                         i_pp, i_max_pp );
+        }
+
     }
     else
     {
