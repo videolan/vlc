@@ -1215,7 +1215,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             /* Check blocks validity to protect againts broken files */
             if( BlockFindTrackIndex( &i_tk, pp_block , pp_simpleblock ) )
             {
-                delete pp_block;
+                ep->Unkeep();
                 pp_simpleblock = NULL;
                 pp_block = NULL;
                 continue;
@@ -1361,6 +1361,9 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                     {
                         msg_Err( &sys.demuxer, "Error while reading %s... upping level", typeid(*el).name());
                         ep->Up();
+                        ep->Unkeep();
+                        pp_simpleblock = NULL;
+                        pp_block = NULL;
                         break;
                     }
                     if( MKV_IS_ID( el, KaxBlock ) )
@@ -1414,6 +1417,9 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         {
             msg_Err( &sys.demuxer, "Error while reading %s... upping level", typeid(*el).name());
             ep->Up();
+            ep->Unkeep();
+            pp_simpleblock = NULL;
+            pp_block = NULL;
         }
     }
 }

@@ -121,6 +121,11 @@ void EbmlParser::Keep( void )
     mb_keep = true;
 }
 
+void EbmlParser::Unkeep()
+{
+    mb_keep = false;
+}
+
 int EbmlParser::GetLevel( void ) const
 {
     return mi_user_level;
