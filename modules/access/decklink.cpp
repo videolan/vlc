@@ -115,7 +115,7 @@ vlc_module_begin ()
         change_string_list(ppsz_videoconns, ppsz_videoconns_text)
     add_string("decklink-aspect-ratio", NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, true)
-    add_bool("decklink-tenbits", true, N_("10 bits"), N_("10 bits"), true)
+    add_bool("decklink-tenbits", false, N_("10 bits"), N_("10 bits"), true)
 
     add_shortcut("decklink")
     set_capability("access_demux", 10)
