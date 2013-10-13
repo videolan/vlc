@@ -649,7 +649,7 @@ int OpenEncoder( vlc_object_t *p_this )
 
         p_context->sample_rate = p_enc->fmt_out.audio.i_rate;
         date_Init( &p_sys->buffer_date, p_enc->fmt_out.audio.i_rate, 1 );
-        date_Set( &p_sys->buffer_date, 0 );
+        date_Set( &p_sys->buffer_date, AV_NOPTS_VALUE );
         p_context->time_base.num = 1;
         p_context->time_base.den = p_context->sample_rate;
         p_context->channels      = p_enc->fmt_out.audio.i_channels;
@@ -1187,7 +1187,8 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
 
             p_aout_buf->p_buffer     += leftover;
             p_aout_buf->i_buffer     -= leftover;
-            p_aout_buf->i_pts         = date_Get( &p_sys->buffer_date );
+            if( likely( p_sys->frame->pts != (int64_t)AV_NOPTS_VALUE) )
+                p_aout_buf->i_pts         = date_Get( &p_sys->buffer_date );
         }
 
         if(unlikely( ( (leftover + buffer_delay) < p_sys->i_buffer_out ) &&
@@ -1234,7 +1235,10 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             (mtime_t)p_sys->frame->nb_samples /
             (mtime_t)p_sys->p_context->sample_rate;
 
-        p_block->i_dts = p_block->i_pts = packet.pts;
+        if( likely( packet.pts != (int64_t)AV_NOPTS_VALUE ) )
+            p_block->i_dts = p_block->i_pts = packet.pts;
+        else
+            p_block->i_dts = p_block->i_pts = VLC_TS_INVALID;
 
         block_ChainAppend( &p_chain, p_block );
     }
@@ -1256,7 +1260,10 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
              (mtime_t)p_sys->i_frame_size /
              (mtime_t)p_sys->p_context->sample_rate;
 
-            p_block->i_dts = p_block->i_pts = packet.pts;
+            if( likely( packet.pts != (int64_t)AV_NOPTS_VALUE ) )
+                p_block->i_dts = p_block->i_pts = packet.pts;
+            else
+                p_block->i_dts = p_block->i_pts = VLC_TS_INVALID;
 
             if( i_out >= 0 && got_packet )
                 block_ChainAppend( &p_chain, p_block );
@@ -1305,7 +1312,6 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         p_aout_buf->i_nb_samples -= p_sys->frame->nb_samples;
         date_Increment( &p_sys->buffer_date, p_sys->frame->nb_samples );
 
-
         p_block = block_Alloc( p_sys->i_buffer_out );
         av_init_packet( &packet );
         packet.data = p_block->p_buffer;
@@ -1331,7 +1337,10 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             (mtime_t)p_sys->frame->nb_samples /
             (mtime_t)p_sys->p_context->sample_rate;
 
-        p_block->i_dts = p_block->i_pts = packet.pts;
+        if( likely( packet.pts != (int64_t)AV_NOPTS_VALUE ) )
+            p_block->i_dts = p_block->i_pts = packet.pts;
+        else
+            p_block->i_dts = p_block->i_pts = VLC_TS_INVALID;
 
         block_ChainAppend( &p_chain, p_block );
     }
