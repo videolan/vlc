@@ -1135,6 +1135,14 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     //Calculate how many bytes we would need from current buffer to fill frame
     size_t leftover_samples = __MAX(0,__MIN((ssize_t)i_samples_left, (ssize_t)(p_sys->i_frame_size - p_sys->i_samples_delay)));
 
+    if( ( p_aout_buf && ( p_aout_buf->i_pts > VLC_TS_INVALID ) &&
+        ((p_aout_buf->i_pts - p_sys->i_samples_delay) != date_Get( &p_sys->buffer_date ) ) ) )
+    {
+        date_Set( &p_sys->buffer_date, p_aout_buf->i_dts );
+        /* take back amount we have leftover from previous buffer*/
+        date_Decrement( &p_sys->buffer_date, p_sys->i_samples_delay );
+    }
+
     // Check if we have enough samples in delay_buffer and current p_aout_buf to fill frame
     // Or if we are cleaning up
     if( ( buffer_delay > 0 ) &&
@@ -1159,12 +1167,11 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         p_sys->frame->format     = p_sys->p_context->sample_fmt;
         p_sys->frame->nb_samples = leftover_samples + p_sys->i_samples_delay;
 
-        if( unlikely( p_aout_buf && ( p_aout_buf->i_pts > VLC_TS_INVALID ) &&
-            (p_aout_buf->i_pts != date_Get( &p_sys->buffer_date ) ) ) )
-            date_Set( &p_sys->buffer_date, p_aout_buf->i_pts );
 
         p_sys->frame->pts        = date_Get( &p_sys->buffer_date );
-        date_Increment( &p_sys->buffer_date, p_sys->i_frame_size );
+        if( likely( p_sys->frame->pts != (int64_t)AV_NOPTS_VALUE) )
+            date_Increment( &p_sys->buffer_date, p_sys->i_frame_size );
+
         if( likely( p_aout_buf ) )
         {
 
