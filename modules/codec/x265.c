@@ -70,6 +70,8 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
     encoder_sys_t *p_sys = p_enc->p_sys;
     x265_picture_t pic;
 
+    x265_picture_init(&p_sys->param, &pic);
+
     if (likely(p_pict)) {
         if (unlikely(p_sys->initial_date == 0)) {
             p_sys->initial_date = p_pict->date;
@@ -119,6 +121,19 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
 
     p_block->i_pts = p_sys->initial_date + pic.poc * p_block->i_length;
     p_block->i_dts = p_sys->initial_date + p_sys->dts++ * p_block->i_length;
+
+    switch (pic.sliceType)
+    {
+    case X265_TYPE_I:
+        p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+        break;
+    case X265_TYPE_P:
+        p_block->i_flags |= BLOCK_FLAG_TYPE_P;
+        break;
+    case X265_TYPE_B:
+        p_block->i_flags |= BLOCK_FLAG_TYPE_B;
+        break;
+    }
 
 #ifndef NDEBUG
     msg_Dbg(p_enc, "%zu bytes (frame %"PRId64", %.2ffps)", p_block->i_buffer,
