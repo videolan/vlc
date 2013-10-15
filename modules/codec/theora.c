@@ -433,6 +433,7 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
         /* Don't send the the first packet after a discontinuity to
          * theora_decode, otherwise we get purple/green display artifacts
          * appearing in the video output */
+        block_Release(p_block);
         return NULL;
     }
 
