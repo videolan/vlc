@@ -953,9 +953,9 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         frame->top_field_first = !!p_pict->b_top_field_first;
 
         /* Set the pts of the frame being encoded */
-        frame->pts = p_pict->date ? p_pict->date : (int64_t)AV_NOPTS_VALUE;
+        frame->pts = p_pict->date ? p_pict->date : AV_NOPTS_VALUE;
 
-        if ( p_sys->b_hurry_up && frame->pts != (int64_t)AV_NOPTS_VALUE )
+        if ( p_sys->b_hurry_up && frame->pts != AV_NOPTS_VALUE )
         {
             mtime_t current_date = mdate();
 
@@ -992,7 +992,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             }
         }
 
-        if ( frame->pts != (int64_t)AV_NOPTS_VALUE && frame->pts != 0 )
+        if ( frame->pts != AV_NOPTS_VALUE && frame->pts != 0 )
         {
             if ( p_sys->i_last_pts == frame->pts )
             {
@@ -1059,7 +1059,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             p_block->i_dts = p_pict->date;
         p_block->i_pts = p_block->i_dts;
     }
-    else if( p_sys->p_context->coded_frame->pts != (int64_t)AV_NOPTS_VALUE &&
+    else if( p_sys->p_context->coded_frame->pts != AV_NOPTS_VALUE &&
         p_sys->p_context->coded_frame->pts != 0 &&
         p_sys->i_buggy_pts_detect != p_sys->p_context->coded_frame->pts )
     {
@@ -1169,7 +1169,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
 
 
         p_sys->frame->pts        = date_Get( &p_sys->buffer_date );
-        if( likely( p_sys->frame->pts != (int64_t)AV_NOPTS_VALUE) )
+        if( likely( p_sys->frame->pts != AV_NOPTS_VALUE) )
             date_Increment( &p_sys->buffer_date, p_sys->i_frame_size );
 
         if( likely( p_aout_buf ) )
@@ -1187,7 +1187,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
 
             p_aout_buf->p_buffer     += leftover;
             p_aout_buf->i_buffer     -= leftover;
-            if( likely( p_sys->frame->pts != (int64_t)AV_NOPTS_VALUE) )
+            if( likely( p_sys->frame->pts != AV_NOPTS_VALUE) )
                 p_aout_buf->i_pts         = date_Get( &p_sys->buffer_date );
         }
 
@@ -1235,7 +1235,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             (mtime_t)p_sys->frame->nb_samples /
             (mtime_t)p_sys->p_context->sample_rate;
 
-        if( likely( packet.pts != (int64_t)AV_NOPTS_VALUE ) )
+        if( likely( packet.pts != AV_NOPTS_VALUE ) )
             p_block->i_dts = p_block->i_pts = packet.pts;
         else
             p_block->i_dts = p_block->i_pts = VLC_TS_INVALID;
@@ -1260,7 +1260,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
              (mtime_t)p_sys->i_frame_size /
              (mtime_t)p_sys->p_context->sample_rate;
 
-            if( likely( packet.pts != (int64_t)AV_NOPTS_VALUE ) )
+            if( likely( packet.pts != AV_NOPTS_VALUE ) )
                 p_block->i_dts = p_block->i_pts = packet.pts;
             else
                 p_block->i_dts = p_block->i_pts = VLC_TS_INVALID;
@@ -1337,7 +1337,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             (mtime_t)p_sys->frame->nb_samples /
             (mtime_t)p_sys->p_context->sample_rate;
 
-        if( likely( packet.pts != (int64_t)AV_NOPTS_VALUE ) )
+        if( likely( packet.pts != AV_NOPTS_VALUE ) )
             p_block->i_dts = p_block->i_pts = packet.pts;
         else
             p_block->i_dts = p_block->i_pts = VLC_TS_INVALID;
