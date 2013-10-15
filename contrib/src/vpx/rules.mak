@@ -1,6 +1,6 @@
 # libvpx
 
-VPX_VERSION := v1.2.0
+VPX_VERSION := v1.1.0
 VPX_URL := http://webm.googlecode.com/files/libvpx-$(VPX_VERSION).tar.bz2
 
 $(TARBALLS)/libvpx-$(VPX_VERSION).tar.bz2:
@@ -12,12 +12,13 @@ libvpx: libvpx-$(VPX_VERSION).tar.bz2 .sum-vpx
 	$(UNPACK)
 	$(APPLY) $(SRC)/vpx/libvpx-no-cross.patch
 	$(APPLY) $(SRC)/vpx/libvpx-no-abi.patch
-	$(APPLY) $(SRC)/vpx/libvpx-mac.patch
-ifdef HAVE_WIN32
-	$(APPLY) $(SRC)/vpx/win32.patch
-endif
+	$(APPLY) $(SRC)/vpx/windows.patch
 ifdef HAVE_MACOSX
+	$(APPLY) $(SRC)/vpx/libvpx-mac.patch
 	$(APPLY) $(SRC)/vpx/libvpx-mac-mountain-lion.patch
+endif
+ifdef HAVE_WIN32
+	$(APPLY) $(SRC)/vpx/libvpx-win32.patch
 endif
 ifneq ($(which bash),/bin/bash)
 	sed -i.orig \

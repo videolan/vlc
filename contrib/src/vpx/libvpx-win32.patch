@@ -1,0 +1,11 @@
+--- libvpx/vp8/common/generic/systemdependent.c	2013-03-14 15:39:20.284261976 +0100
++++ libvpx.new/vp8/common/generic/systemdependent.c	2013-03-14 15:39:01.423974364 +0100
+@@ -87,7 +87,7 @@
+ #endif
+ 
+ 
+-#if HAVE_PTHREAD_H
++#if HAVE_PTHREAD_H && !defined(_WIN32)
+ #include <pthread.h>
+ static void once(void (*func)(void))
+ {
