@@ -146,7 +146,7 @@
 
 - (IBAction)mute:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setMute: YES];
+    [[VLCCoreInteraction sharedInstance] toggleMute];
 }
 
 - (IBAction)volumeSliderUpdated:(id)sender
