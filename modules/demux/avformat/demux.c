@@ -304,6 +304,7 @@ int OpenDemux( vlc_object_t *p_this )
         case AVMEDIA_TYPE_VIDEO:
             es_format_Init( &fmt, VIDEO_ES, fcc );
 
+            fmt.video.i_bits_per_pixel = cc->bits_per_coded_sample;
             /* Special case for raw video data */
             if( cc->codec_id == AV_CODEC_ID_RAWVIDEO )
             {
