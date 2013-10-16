@@ -422,6 +422,9 @@ bool input_DecoderIsEmpty( decoder_t * p_dec )
     assert( !p_owner->b_buffering );
 
     bool b_empty = block_FifoCount( p_dec->p_owner->p_fifo ) <= 0;
+    if (p_owner->buffer.i_count) /* buffered frames */
+        b_empty = false;
+
     if( b_empty )
     {
         vlc_mutex_lock( &p_owner->lock );
@@ -923,7 +926,10 @@ static void *DecoderThread( void *p_data )
 
         /* Make sure there is no cancellation point other than this one^^.
          * If you need one, be sure to push cleanup of p_block. */
-        DecoderSignalBuffering( p_dec, p_block == NULL );
+        bool end_buffering = !p_block || p_block->i_flags & BLOCK_FLAG_CORE_EOS;
+        DecoderSignalBuffering( p_dec, end_buffering );
+        if (end_buffering)
+            input_DecoderStopBuffering( p_dec );
 
         if( p_block )
         {
@@ -1164,7 +1170,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
     audio_output_t *p_aout = p_owner->p_aout;
 
     /* */
-    if( p_audio->i_pts <= VLC_TS_INVALID ) // FIXME --VLC_TS_INVALID verify audio_output/*
+    if( p_audio && p_audio->i_pts <= VLC_TS_INVALID ) // FIXME --VLC_TS_INVALID verify audio_output/*
     {
         msg_Warn( p_dec, "non-dated audio buffer received" );
         *pi_lost_sum += 1;
@@ -1175,7 +1181,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
     /* */
     vlc_mutex_lock( &p_owner->lock );
 
-    if( p_owner->b_buffering || p_owner->buffer.p_audio )
+    if( p_audio && (p_owner->b_buffering || p_owner->buffer.p_audio) )
     {
         p_audio->p_next = NULL;
 
@@ -1213,6 +1219,9 @@ static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
             if( !b_has_more )
                 p_owner->buffer.pp_audio_next = &p_owner->buffer.p_audio;
         }
+
+        if (!p_audio)
+            break;
 
         /* */
         int i_rate = INPUT_RATE_DEFAULT;
@@ -1263,7 +1272,11 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
     int i_lost = 0;
     int i_played = 0;
 
-    while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
+    if (!p_block) {
+        /* Play a NULL block to output buffered frames */
+        DecoderPlayAudio( p_dec, NULL, &i_played, &i_lost );
+    }
+    else while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
     {
         if( DecoderIsExitRequested( p_dec ) )
         {
@@ -1889,7 +1902,7 @@ static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block, bool b_flus
                 DecoderDecodeAudio( p_dec, p_null );
         }
     }
-    else if( p_block )
+    else
     {
         DecoderDecodeAudio( p_dec, p_block );
     }
