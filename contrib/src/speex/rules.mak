@@ -25,6 +25,7 @@ speex: speex-$(SPEEX_VERSION).tar.gz .sum-speex
 	mkdir -p $@-git
 	$(ZCAT) "$<" | (cd $@-git && tar xv --strip-components=1)
 	$(APPLY) $(SRC)/speex/no-ogg.patch
+	$(APPLY) $(SRC)/speex/automake.patch
 	$(APPLY) $(SRC)/speex/neon.patch
 	$(MOVE)
 
