@@ -430,8 +430,8 @@ static int PLItemChanged(vlc_object_t *p_this, const char *psz_var,
      * and other issues, we need to wait for -PlaylistItemChanged to finish and
      * then -informInputChanged on this non-main thread. */
     [o_plItemChangedLock lock];
-    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(PlaylistItemChanged) withObject:nil waitUntilDone:YES];
-    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(informInputChanged) withObject:nil waitUntilDone:YES];
+    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(PlaylistItemChanged) withObject:nil waitUntilDone:YES]; // MUST BE ON MAIN THREAD
+    [[VLCMain sharedInstance] informInputChanged]; // DO NOT MOVE TO MAIN THREAD
     [o_plItemChangedLock unlock];
 
     [o_pool release];
