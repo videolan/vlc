@@ -510,15 +510,6 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     playlist_MuteToggle(pl_Get(p_intf));
 }
 
-- (void)setMute:(BOOL)b_value
-{
-    intf_thread_t *p_intf = VLCIntf;
-    if (!p_intf)
-        return;
-
-    playlist_MuteSet(pl_Get(p_intf), b_value);
-}
-
 - (BOOL)mute
 {
     intf_thread_t *p_intf = VLCIntf;

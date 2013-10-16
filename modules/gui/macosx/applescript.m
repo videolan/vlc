@@ -87,7 +87,7 @@
     else if ([o_command isEqualToString:@"fullscreen"])
         [[VLCCoreInteraction sharedInstance] toggleFullscreen];
     else if ([o_command isEqualToString:@"mute"])
-        [[VLCCoreInteraction sharedInstance] setMute: YES];
+        [[VLCCoreInteraction sharedInstance] toggleMute];
     else if ([o_command isEqualToString:@"volumeUp"])
         [[VLCCoreInteraction sharedInstance] volumeUp];
     else if ([o_command isEqualToString:@"volumeDown"])
