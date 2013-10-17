@@ -48,6 +48,8 @@
 #include "../utils/ustring.hpp"
 
 #include <vlc_keys.h>
+#include <vlc_input.h>
+#include <vlc_url.h>
 #include <list>
 
 
@@ -277,12 +279,27 @@ void TopWindow::processEvent( EvtDragDrop &rEvtDragDrop )
     }
     else
     {
+        input_thread_t *pInput = getIntf()->p_sys->p_input;
+        bool is_subtitle = false;
         list<string> files = rEvtDragDrop.getFiles();
-        list<string>::const_iterator it = files.begin();
-        for( bool first = true; it != files.end(); ++it, first = false )
+        if( files.size() == 1 && pInput != NULL )
         {
-            bool playOnDrop = m_playOnDrop && first;
-            CmdAddItem( getIntf(), it->c_str(), playOnDrop ).execute();
+            list<string>::const_iterator it = files.begin();
+            char* psz_file = make_path( it->c_str() );
+            if( psz_file )
+            {
+                is_subtitle = !input_AddSubtitle( pInput, psz_file, true );
+                free( psz_file );
+            }
+        }
+        if( !is_subtitle )
+        {
+            list<string>::const_iterator it = files.begin();
+            for( bool first = true; it != files.end(); ++it, first = false )
+            {
+                bool playOnDrop = m_playOnDrop && first;
+                CmdAddItem( getIntf(), it->c_str(), playOnDrop ).execute();
+            }
         }
     }
     m_pDragControl = NULL;
