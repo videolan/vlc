@@ -1265,8 +1265,10 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             else
                 p_block->i_dts = p_block->i_pts = VLC_TS_INVALID;
 
-            if( i_out >= 0 && got_packet )
+            if( likely(i_out >= 0 && got_packet ))
                 block_ChainAppend( &p_chain, p_block );
+            else
+                block_Release( p_block );
         } while( got_packet && (i_out>=0) );
         return p_chain;
     }
