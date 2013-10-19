@@ -1310,7 +1310,8 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         p_aout_buf->p_buffer     += (p_sys->frame->nb_samples * p_sys->p_context->channels * p_sys->i_sample_bytes);
         p_aout_buf->i_buffer     -= (p_sys->frame->nb_samples * p_sys->p_context->channels * p_sys->i_sample_bytes);
         p_aout_buf->i_nb_samples -= p_sys->frame->nb_samples;
-        date_Increment( &p_sys->buffer_date, p_sys->frame->nb_samples );
+        if( likely( p_sys->frame->pts != AV_NOPTS_VALUE) )
+            date_Increment( &p_sys->buffer_date, p_sys->frame->nb_samples );
 
         p_block = block_Alloc( p_sys->i_buffer_out );
         av_init_packet( &packet );
