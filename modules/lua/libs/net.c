@@ -369,6 +369,7 @@ static int vlclua_net_poll( lua_State *L )
         i_ret = luaL_error( L, "Interrupted." );
     else
         i_ret = 1;
+    free( luafds );
     free( p_fds );
 
     return i_ret;
