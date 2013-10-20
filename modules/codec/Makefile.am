@@ -392,9 +392,9 @@ libfdkaac_plugin_la_LIBADD = $(FDKAAC_LIBS)
 EXTRA_LTLIBRARIES += libfdkaac_plugin.la
 codec_LTLIBRARIES += $(LTLIBfdkaac)
 
-libshine_plugin_la_SOURCES = codec/shine/shine_mod.c codec/shine/enc_base.h
-EXTRA_libshine_plugin_la_SOURCES = codec/shine/shine.c
-libshine_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+libshine_plugin_la_SOURCES = codec/shine.c
+libshine_plugin_la_CFLAGS = $(AM_CFLAGS) $(SHINE_CFLAGS)
+libshine_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)' $(SHINE_LIBS)
 EXTRA_LTLIBRARIES += libshine_plugin.la
 codec_LTLIBRARIES += $(LTLIBshine)
 

@@ -33,18 +33,17 @@
 #include <vlc_block.h>
 #include <vlc_block_helper.h>
 #include <vlc_bits.h>
+#include <vlc_aout.h>
 
 #include <assert.h>
 #include <inttypes.h>
 
-/* shine.c uses a lot of static variables, so we include the C file to keep
- * the scope.
- * Note that it makes this decoder non reentrant, this is why we have the
- * struct entrant below */
-#include "shine.c"
+#include <shine/layer3.h>
 
 struct encoder_sys_t
 {
+    shine_t s;
+    unsigned int samples_per_frame;
     block_fifo_t *p_fifo;
 
     unsigned int i_buffer;
@@ -121,11 +120,29 @@ static int OpenEncoder( vlc_object_t *p_this )
         goto enomem;
     }
 
-    init_mp3_encoder_engine( p_enc->fmt_out.audio.i_rate,
-        p_enc->fmt_out.audio.i_channels, p_enc->fmt_out.i_bitrate / 1000 );
+    shine_config_t cfg = {
+        .wave = {
+            .channels = p_enc->fmt_out.audio.i_channels,
+            .samplerate = p_enc->fmt_out.audio.i_rate,
+        },
+    };
+
+    shine_set_config_mpeg_defaults(&cfg.mpeg);
+    cfg.mpeg.bitr = p_enc->fmt_out.i_bitrate / 1000;
+ 
+    if (shine_check_config(cfg.wave.samplerate, cfg.mpeg.bitr) == -1) {
+        msg_Err(p_enc, "Invalid bitrate %d\n", cfg.mpeg.bitr);
+        free(p_sys);
+        return VLC_EGENERIC;
+    }
+
+    p_sys->s = shine_initialise(&cfg);
+    p_sys->samples_per_frame = shine_samples_per_pass(p_sys->s);
 
     p_enc->pf_encode_audio = EncodeFrame;
     p_enc->fmt_out.i_cat = AUDIO_ES;
+
+    p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
 
     return VLC_SUCCESS;
 
@@ -136,7 +153,7 @@ enomem:
     return VLC_ENOMEM;
 }
 
-/* We split/pack PCM blocks to a fixed size: pcm_chunk_size bytes */
+/* We split/pack PCM blocks to a fixed size: p_sys->samples_per_frame * 4 bytes */
 static block_t *GetPCM( encoder_t *p_enc, block_t *p_block )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
@@ -145,10 +162,10 @@ static block_t *GetPCM( encoder_t *p_enc, block_t *p_block )
     if( !p_block ) goto buffered; /* just return a block if we can */
 
     /* Put the PCM samples sent by VLC in the Fifo */
-    while( p_sys->i_buffer + p_block->i_buffer >= pcm_chunk_size )
+    while( p_sys->i_buffer + p_block->i_buffer >= p_sys->samples_per_frame * 4 )
     {
         unsigned int i_buffer = 0;
-        p_pcm_block = block_Alloc( pcm_chunk_size );
+        p_pcm_block = block_Alloc( p_sys->samples_per_frame * 4 );
         if( !p_pcm_block )
             break;
 
@@ -162,10 +179,10 @@ static block_t *GetPCM( encoder_t *p_enc, block_t *p_block )
         }
 
         memcpy( p_pcm_block->p_buffer + i_buffer,
-                    p_block->p_buffer, pcm_chunk_size - i_buffer );
-        p_block->p_buffer += pcm_chunk_size - i_buffer;
+                    p_block->p_buffer, p_sys->samples_per_frame * 4 - i_buffer );
+        p_block->p_buffer += p_sys->samples_per_frame * 4 - i_buffer;
 
-        p_block->i_buffer -= pcm_chunk_size - i_buffer;
+        p_block->i_buffer -= p_sys->samples_per_frame * 4 - i_buffer;
 
         block_FifoPut( p_sys->p_fifo, p_pcm_block );
     }
@@ -202,6 +219,10 @@ buffered:
 
 static block_t *EncodeFrame( encoder_t *p_enc, block_t *p_block )
 {
+    if (!p_block) /* TODO: flush */
+        return NULL;
+
+    encoder_sys_t *p_sys = p_enc->p_sys;
     block_t *p_pcm_block;
     block_t *p_chain = NULL;
     unsigned int i_samples = p_block->i_buffer >> 2 /* s16l stereo */;
@@ -216,28 +237,35 @@ static block_t *EncodeFrame( encoder_t *p_enc, block_t *p_block )
             break;
 
         p_block = NULL; /* we don't need it anymore */
+        int16_t pcm_planar_buf[SHINE_MAX_SAMPLES * 2];
+        int16_t *pcm_planar_buf_chans[2] = {
+            &pcm_planar_buf[0],
+            &pcm_planar_buf[p_sys->samples_per_frame],
+        };
+        aout_Deinterleave( pcm_planar_buf, p_pcm_block->p_buffer,
+                p_sys->samples_per_frame, p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.i_codec);
 
-        uint32_t enc_buffer[16384]; /* storage for 65536 Bytes XXX: too much */
-        struct enc_chunk_hdr *chunk = (void*) enc_buffer;
-        chunk->enc_data = ENC_CHUNK_SKIP_HDR(chunk->enc_data, chunk);
-
-        encode_frame( (char*)p_pcm_block->p_buffer, chunk );
+        long written;
+        unsigned char *buf = shine_encode_buffer(p_sys->s, pcm_planar_buf_chans, &written);
         block_Release( p_pcm_block );
 
-        block_t *p_mp3_block = block_Alloc( chunk->enc_size );
+        if (written <= 0)
+            break;
+
+        block_t *p_mp3_block = block_Alloc( written );
         if( !p_mp3_block )
             break;
 
-        memcpy( p_mp3_block->p_buffer, chunk->enc_data, chunk->enc_size );
+        memcpy( p_mp3_block->p_buffer, buf, written );
 
         /* date management */
-        p_mp3_block->i_length = SAMP_PER_FRAME1 * 1000000 /
+        p_mp3_block->i_length = p_sys->samples_per_frame * 1000000 /
             p_enc->fmt_out.audio.i_rate;
 
         start_date += p_mp3_block->i_length;
         p_mp3_block->i_dts = p_mp3_block->i_pts = start_date;
 
-        p_mp3_block->i_nb_samples = SAMP_PER_FRAME1;
+        p_mp3_block->i_nb_samples = p_sys->samples_per_frame;
 
         block_ChainAppend( &p_chain, p_mp3_block );
 
@@ -258,6 +286,8 @@ static void CloseEncoder( vlc_object_t *p_this )
      * But we don't know if other blocks will come before it's too late */
     if( p_sys->i_buffer )
         free( p_sys->p_buffer );
+
+    shine_close(p_sys->s);
 
     block_FifoRelease( p_sys->p_fifo );
     free( p_sys );

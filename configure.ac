@@ -2107,14 +2107,10 @@ then
 fi
 
 dnl
-dnl shine fixed point mp3 encoder
+dnl shine encoder plugin
 dnl
-AC_ARG_ENABLE(shine,
-  [  --enable-shine          shine mp3 encoding module (default disabled)])
-if test "${enable_shine}" = "yes"
-then
-  VLC_ADD_PLUGIN([shine])
-fi
+PKG_ENABLE_MODULES_VLC([SHINE], [], [shine >= 3.0.0], [MPEG Audio Layer 3 encoder], [auto], [], [], [])
+
 
 dnl
 dnl openmax il codec plugin
