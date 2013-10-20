@@ -285,9 +285,9 @@ static int TPDUSend( cam_t * p_cam, uint8_t i_slot, uint8_t i_tag,
 
         if ( i_length )
             memcpy( p, p_content, i_length );
-            i_size = i_length + (p - p_data);
-        }
+        i_size = i_length + (p - p_data);
         break;
+    }
 
     default:
         break;
