@@ -597,7 +597,12 @@ static int WriteXSPF( char **pp_buffer, vlc_array_t *p_filenames,
             char *psz_path = strdup( psz_pathtozip );
             char *psz_escapedName;
             escapeToXml( &psz_escapedName, psz_name );
-            if( astrcatf( &psz_path, "%s", psz_escapedName ) < 0 ) return -1;
+            if( astrcatf( &psz_path, "%s", psz_escapedName ) < 0 )
+            {
+                free( psz_escapedName );
+                return -1;
+            }
+            free( psz_escapedName );
 
             /* Track information */
             if( astrcatf( pp_buffer,
