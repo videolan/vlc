@@ -129,6 +129,7 @@ static int Open(vlc_object_t * p_this)
     p_sys->i_width = var_InheritInteger(p_filter, "glspectrum-width");
     p_sys->i_height = var_InheritInteger(p_filter, "glspectrum-height");
     p_sys->i_channels = aout_FormatNbChannels(&p_filter->fmt_in.audio);
+    p_sys->i_prev_nb_samples = 0;
     p_sys->p_prev_s16_buff = NULL;
 
     p_sys->f_rotationAngle = 0;
