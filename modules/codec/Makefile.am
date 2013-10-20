@@ -398,6 +398,14 @@ libshine_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 EXTRA_LTLIBRARIES += libshine_plugin.la
 codec_LTLIBRARIES += $(LTLIBshine)
 
+libvpx_plugin_la_SOURCES = codec/vpx.c
+libvpx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libvpx_plugin_la_CFLAGS = $(AM_CFLAGS) $(VPX_CFLAGS) $(CPPFLAGS_vpx)
+libvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+libvpx_plugin_la_LIBADD = $(VPX_LIBS)
+EXTRA_LTLIBRARIES += libvpx_plugin.la
+codec_LTLIBRARIES += $(LTLIBvpx)
+
 libtwolame_plugin_la_SOURCES = codec/twolame.c
 libtwolame_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DLIBTWOLAME_STATIC
 libtwolame_plugin_la_CFLAGS = $(AM_CFLAGS) $(TWOLAME_CFLAGS)

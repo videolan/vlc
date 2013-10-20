@@ -2497,6 +2497,25 @@ if test "${enable_faad}" != "no"; then
 fi
 
 dnl
+dnl libvpx decoder plugin
+dnl
+AC_ARG_ENABLE(vpx,
+    AS_HELP_STRING([--enable-vpx],[libvpx VP8/VP9 decoder (default auto)]))
+AS_IF([test "${enable_vpx}" != "no"],[
+    PKG_CHECK_MODULES([VPX], [vpx] , [
+        VLC_ADD_PLUGIN([vpx])
+        VLC_ADD_CPPFLAGS([vpx], [${VPX_CFLAGS}])
+        VLC_ADD_LIBS([vpx], [${VPX_LIBS}])
+        AC_CHECK_LIB([vpx],[vpx_codec_vp9_dx], [
+            VLC_ADD_CPPFLAGS([vpx], [-DENABLE_VP9_DECODER])
+        ], [], [${VPX_LIBS}])
+    ], [
+    AS_IF([test "${enable_vpx}" = "yes"],[
+        AC_MSG_ERROR([libvpx was not found])
+    ])])
+])
+
+dnl
 dnl twolame encoder plugin
 dnl
 PKG_ENABLE_MODULES_VLC([TWOLAME], [], [twolame], [MPEG Audio Layer 2 encoder], [auto], [], [], [ -DLIBTWOLAME_STATIC])
