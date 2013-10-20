@@ -651,7 +651,6 @@ aviindex:
         const avi_track_t *tk = p_sys->track[i];
         if( tk->i_cat == VIDEO_ES && tk->idx.p_entry )
             i_idx_totalframes = __MAX(i_idx_totalframes, tk->idx.i_size);
-            continue;
     }
     if( i_idx_totalframes != p_avih->i_totalframes &&
         p_sys->i_length < (mtime_t)p_avih->i_totalframes *
