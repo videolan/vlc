@@ -184,7 +184,6 @@ static const struct
     { VLC_CODEC_INDEO5, AV_CODEC_ID_INDEO5, VIDEO_ES },
 
     { VLC_CODEC_VP8, AV_CODEC_ID_VP8, VIDEO_ES },
-    { VLC_CODEC_VP9, AV_CODEC_ID_VP9, VIDEO_ES },
 
     { VLC_CODEC_LAGARITH, AV_CODEC_ID_LAGARITH, VIDEO_ES },
 
@@ -224,6 +223,10 @@ static const struct
 
 #ifdef AV_CODEC_ID_H265 // FFmpeg 55.37.100
     { VLC_CODEC_HEVC, AV_CODEC_ID_HEVC, VIDEO_ES },
+#endif
+
+#if LIBAVCODEC_VERSION_CHECK( 54, 41, 0, 89, 100 )
+    { VLC_CODEC_VP9, AV_CODEC_ID_VP9, VIDEO_ES },
 #endif
 
     /* Videogames Codecs */
