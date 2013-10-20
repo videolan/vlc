@@ -423,7 +423,7 @@ static void *Thread( void *p_data )
         const unsigned xscale[] = {0,1,2,3,4,5,6,7,8,11,15,20,27,
                                    36,47,62,82,107,141,184,255};
 
-        fft_state *p_state; /* internal FFT data */
+        fft_state *p_state = NULL; /* internal FFT data */
 
         unsigned i, j;
         float p_output[FFT_BUFFER_SIZE];           /* Raw FFT Result  */
@@ -531,6 +531,7 @@ static void *Thread( void *p_data )
         }
 
 release:
+        fft_close(p_state);
         block_Release(block);
         vlc_restorecancel(canc);
     }
