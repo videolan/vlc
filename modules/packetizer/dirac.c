@@ -128,9 +128,6 @@ struct decoder_sys_t
      * completed encapsulation units from the front */
     block_t *p_outqueue;
     block_t **pp_outqueue_last;
-    /* p_out_dts points to an element in p_outqueue.  It is used for VLC's
-     * fake pts hidden in DTS hack, as used by AVI */
-    block_t *p_out_dts;
 
     uint32_t u_tg_last_picnum; /*< most recent picturenumber output from RoB */
     bool b_tg_last_picnum; /*< u_tg_last_picnum valid */
@@ -1144,9 +1141,6 @@ static int dirac_TimeGenPush( decoder_t *p_dec, block_t *p_block_in )
     if( p_sys->b_dts == p_sys->b_pts )
         return 0;
 
-    if( !p_sys->p_out_dts )
-        p_sys->p_out_dts = p_sys->p_outqueue;
-
     /* model the reorder buffer */
     block_t *p_block = dirac_Reorder( p_dec, p_block_in, u_picnum );
     if( !p_block )
@@ -1182,24 +1176,6 @@ static int dirac_TimeGenPush( decoder_t *p_dec, block_t *p_block_in )
     }
     p_sys->b_tg_last_picnum = true;
     p_sys->u_tg_last_picnum = u_picnum;
-
-    if( !p_sys->b_pts )
-    {
-        /* some demuxers (eg, AVI) will provide a series of fake dts values,
-         * which are actually inorder pts values (ie, what should be seen at
-         * the output of a decoder.  A main reason for simulating the reorder
-         * buffer is to turn the inorder fakedts into an out-of-order pts */
-        p_block->i_pts = p_sys->p_out_dts->i_dts;
-        p_sys->p_out_dts->i_dts = VLC_TS_INVALID;
-    }
-
-    /* If pts was copied from dts, the dts needs to be corrected to account for reordering*/
-    /* If dts has never been seen, the same needs to happen */
-    p_sys->p_out_dts->i_dts = p_block->i_pts - p_sys->i_pts_offset;
-
-    /* move dts pointer */
-    if( p_sys->p_out_dts )
-        p_sys->p_out_dts = p_sys->p_out_dts->p_next;
 
     return 0;
 }
@@ -1314,7 +1290,6 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         dirac_ReorderInit( &p_sys->reorder_buf );
 
         assert( p_sys->p_outqueue == NULL );
-        p_sys->p_out_dts = NULL;
     }
 
     /* perform sanity check:
