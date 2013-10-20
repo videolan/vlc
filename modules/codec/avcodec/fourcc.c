@@ -61,9 +61,6 @@ static const struct
 
     { VLC_CODEC_SVQ1, AV_CODEC_ID_SVQ1, VIDEO_ES },
     { VLC_CODEC_SVQ3, AV_CODEC_ID_SVQ3, VIDEO_ES },
-#ifdef AV_CODEC_ID_H265
-    { VLC_CODEC_HEVC, AV_CODEC_ID_HEVC, VIDEO_ES },
-#endif
     { VLC_CODEC_H264, AV_CODEC_ID_H264, VIDEO_ES },
     { VLC_CODEC_H263, AV_CODEC_ID_H263, VIDEO_ES },
     { VLC_CODEC_H263I, AV_CODEC_ID_H263I,VIDEO_ES },
@@ -222,6 +219,10 @@ static const struct
 
 #if LIBAVCODEC_VERSION_CHECK( 54, 27, 0, 55, 100 )
     { VLC_CODEC_MSS2, AV_CODEC_ID_MSS2, VIDEO_ES },
+#endif
+
+#ifdef AV_CODEC_ID_H265 // FFmpeg 55.37.100
+    { VLC_CODEC_HEVC, AV_CODEC_ID_HEVC, VIDEO_ES },
 #endif
 
     /* Videogames Codecs */
