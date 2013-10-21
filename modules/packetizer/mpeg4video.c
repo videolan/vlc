@@ -533,7 +533,7 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
     return VLC_SUCCESS;
 }
 
-/* look at ffmpeg av_log2 ;) */
+/* look at libavutil av_log2 ;) */
 static int vlc_log2( unsigned int v )
 {
     int n = 0;

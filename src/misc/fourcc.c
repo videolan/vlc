@@ -189,8 +189,8 @@ static const staticentry_t p_list_video[] = {
         E("hdx4", "Jomigo HDX4 (MPEG-4 Video)"),
         E("SMP4", "Samsung SMP4 (MPEG-4 Video)"),
         E("smp4", "Samsung SMP4 (MPEG-4 Video)"),
-        E("fvfw", "FFmpeg MPEG-4"),
-        E("FVFW", "FFmpeg MPEG-4"),
+        E("fvfw", "libavcodec MPEG-4"),
+        E("FVFW", "libavcodec MPEG-4"),
         E("FFDS", "FFDShow MPEG-4"),
         E("VIDM", "vidm 4.01 codec"),
         E("DP02", "DynaPel MPEG-4 codec"),
@@ -547,8 +547,8 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_ASV2, "Asus V2 Video"),
         A("ASV2"),
 
-    /* FFMPEG Video 1 (lossless codec) */
-    B(VLC_CODEC_FFV1, "FFMpeg Video 1"),
+    /* FF video codec 1 (lossless codec) */
+    B(VLC_CODEC_FFV1, "FF video codec 1"),
         A("FFV1"),
 
     /* ATI VCR1 */

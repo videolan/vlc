@@ -265,7 +265,7 @@ ATTR_PACKED
 
 #define WAVE_FORMAT_A52                 0x2000 /* a52 */
 #define WAVE_FORMAT_DTS                 0x2001 /* DTS */
-#define WAVE_FORMAT_FFMPEG_AAC          0x706D
+#define WAVE_FORMAT_AVCODEC_AAC          0x706D
 #define WAVE_FORMAT_DIVIO_AAC           0x4143 /* Divio's AAC */
 
 #define WAVE_FORMAT_GSM_AMR_FIXED       0x7A21 /* Fixed bitrate, no SID */
@@ -275,7 +275,7 @@ ATTR_PACKED
 #define WAVE_FORMAT_DK3                 0x0061
 #define WAVE_FORMAT_DK4                 0x0062
 
-/* At least FFmpeg use that ID: from libavformat/riff.c ('Vo' == 0x566f)
+/* At least libavformat use that ID: from libavformat/riff.c ('Vo' == 0x566f)
  * { CODEC_ID_VORBIS, ('V'<<8)+'o' }, //HACK/FIXME, does vorbis in WAV/AVI have an (in)official id?
  */
 #define WAVE_FORMAT_VORBIS              0x566f
@@ -395,7 +395,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_AAC,        VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_AAC_2,      VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_AAC_LATM,   VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
-    { WAVE_FORMAT_FFMPEG_AAC, VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
+    { WAVE_FORMAT_AVCODEC_AAC, VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_AAC_MS,     VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_VORBIS,     VLC_CODEC_VORBIS,                 "Vorbis Audio" },
     { WAVE_FORMAT_VORB_1,     VLC_FOURCC( 'v', 'o', 'r', '1' ), "Vorbis 1 Audio" },

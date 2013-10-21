@@ -38,7 +38,7 @@
  */
 struct video_palette_t
 {
-    int i_entries;      /**< to keep the compatibility with ffmpeg's palette */
+    int i_entries;      /**< to keep the compatibility with libavcodec's palette */
     uint8_t palette[256][4];                   /**< 4-byte RGBA/YUVA palette */
 };
 
