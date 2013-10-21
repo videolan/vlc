@@ -552,7 +552,7 @@ static int Open(vlc_va_t *external, int codec_id, const es_format_t *fmt)
     return VLC_SUCCESS;
 
 error:
-    Close(va);
+    Close(external);
     return VLC_EGENERIC;
 }
 /* */
