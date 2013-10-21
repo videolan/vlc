@@ -268,6 +268,17 @@ net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
     ufd[1].events = POLLIN;
 
     size_t i_total = 0;
+#if VLC_WINSTORE_APP
+    /* With winrtsock winsocks emulation library, the first call to read()
+     * before poll() starts an asynchronous transfer and returns 0.
+     * Always call poll() first.
+     *
+     * However if we have a virtual socket handler, try to read() first.
+     * See bug #8972 for details.
+     */
+    if (vs == NULL)
+        goto do_poll;
+#endif
     do
     {
         ssize_t n;
@@ -325,7 +336,9 @@ net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
             errno = EINTR;
             return -1;
         }
-
+#if VLC_WINSTORE_APP
+do_poll:
+#endif
         /* Wait for more data */
         if (poll (ufd, sizeof (ufd) / sizeof (ufd[0]), -1) < 0)
         {
