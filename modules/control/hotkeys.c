@@ -286,18 +286,24 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             break;
         }
         case ACTIONID_VOL_MUTE:
-            if( playlist_MuteToggle( p_playlist ) == 0 )
+        {
+            int mute = playlist_MuteGet( p_playlist );
+            if( mute < 0 )
+                break;
+            mute = !mute;
+            if( playlist_MuteSet( p_playlist, mute ) )
+                break;
+
+            float vol = playlist_VolumeGet( p_playlist );
+            if( mute || vol == 0.f )
             {
-                float vol = playlist_VolumeGet( p_playlist );
-                if( playlist_MuteGet( p_playlist ) > 0 || vol == 0.f )
-                {
-                    ClearChannels( p_intf, p_vout );
-                    DisplayIcon( p_vout, OSD_MUTE_ICON );
-                }
-                else
-                    DisplayVolume( p_intf, p_vout, vol );
+                ClearChannels( p_intf, p_vout );
+                DisplayIcon( p_vout, OSD_MUTE_ICON );
             }
+            else
+                DisplayVolume( p_intf, p_vout, vol );
             break;
+        }
 
         case ACTIONID_AUDIODEVICE_CYCLE:
         {
