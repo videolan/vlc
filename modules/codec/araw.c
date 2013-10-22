@@ -733,7 +733,6 @@ static block_t *Encode( encoder_t *enc, block_t *in )
     out->i_dts        = in->i_dts;
     out->i_pts        = in->i_pts;
     out->i_length     = in->i_length;
-    out->i_nb_samples = in->i_nb_samples;
 
     void (*encode)(void *, const uint8_t *, unsigned) = (void *)enc->p_sys;
     if( encode != NULL )
