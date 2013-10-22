@@ -167,6 +167,8 @@
 #define ATOM_avcC VLC_FOURCC( 'a', 'v', 'c', 'C' )
 #define ATOM_m4ds VLC_FOURCC( 'm', '4', 'd', 's' )
 
+#define ATOM_hvcC VLC_FOURCC( 'h', 'v', 'c', 'C' )
+
 #define ATOM_dvc  VLC_FOURCC( 'd', 'v', 'c', ' ' )
 #define ATOM_dvp  VLC_FOURCC( 'd', 'v', 'p', ' ' )
 #define ATOM_dv5n VLC_FOURCC( 'd', 'v', '5', 'n' )
@@ -1149,6 +1151,12 @@ typedef struct
     uint8_t  *CodecPrivateData;
 } MP4_Box_data_stra_t;
 
+typedef struct
+{
+    uint32_t i_hvcC;
+    uint8_t *p_hvcC;
+} MP4_Box_data_hvcC_t;
+
 /*
 typedef struct MP4_Box_data__s
 {
@@ -1233,6 +1241,7 @@ typedef union MP4_Box_data_s
 
     MP4_Box_data_tfrf_t *p_tfrf;
     MP4_Box_data_tfxd_t *p_tfxd;
+    MP4_Box_data_hvcC_t *p_hvcC;
 
     void                *p_data; /* for unknow type */
 } MP4_Box_data_t;
