@@ -528,7 +528,7 @@ static void ProcessEvents( intf_thread_t *p_intf,
             TrackChange( p_intf );
 
             // rate depends on current item
-            if( !vlc_dictionary_has_key( &tracklist_properties, "Rate" ) )
+            if( !vlc_dictionary_has_key( &player_properties, "Rate" ) )
                 vlc_dictionary_insert( &player_properties, "Rate", NULL );
 
             vlc_dictionary_insert( &player_properties, "Metadata", NULL );
