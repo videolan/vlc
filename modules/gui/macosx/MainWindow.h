@@ -119,8 +119,6 @@
 - (void)toggleLeftSubSplitView;
 - (void)showDropZone;
 - (void)hideDropZone;
-- (void)showSplitView;
-- (void)hideSplitView;
 - (void)updateTimeSlider;
 - (void)updateWindow;
 - (void)updateName;
