@@ -606,8 +606,8 @@ static int VolumeSet(audio_output_t *aout, float vol)
     vol *= PA_VOLUME_NORM;
     if (unlikely(vol >= PA_VOLUME_MAX))
         vol = PA_VOLUME_MAX;
-    pa_volume_t volume = pa_sw_volume_multiply(lround(vol), sys->base_volume);
 
+    pa_volume_t volume = pa_sw_volume_multiply(lroundf(vol), sys->base_volume);
     /* Preserve the balance (VLC does not support it). */
     pa_cvolume cvolume = sys->cvolume;
     pa_cvolume_scale(&cvolume, PA_VOLUME_NORM);
