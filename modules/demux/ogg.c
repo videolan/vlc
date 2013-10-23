@@ -242,10 +242,16 @@ static int Demux( demux_t * p_demux )
     bool b_skipping = false;
     bool b_canseek;
 
-
-    if( p_sys->i_eos == p_sys->i_streams )
+    int i_active_streams = p_sys->i_streams;
+    for ( int i; i < p_sys->i_streams; i++ )
     {
-        if( p_sys->i_eos )
+        if ( p_sys->pp_stream[i]->b_finished )
+            i_active_streams--;
+    }
+
+    if ( i_active_streams == 0 )
+    {
+        if ( p_sys->i_streams ) /* All finished */
         {
             msg_Dbg( p_demux, "end of a group of logical streams" );
             /* We keep the ES to try reusing it in Ogg_BeginningOfStream
@@ -258,7 +264,6 @@ static int Demux( demux_t * p_demux )
             Ogg_EndOfStream( p_demux );
         }
 
-        p_sys->i_eos = 0;
         if( Ogg_BeginningOfStream( p_demux ) != VLC_SUCCESS )
             return 0;
 
@@ -314,9 +319,14 @@ static int Demux( demux_t * p_demux )
                 }
             }
 
-            /* FIXME that eos handling is innapropriate with seeking and concatenated streams */
-            if ( ogg_page_granulepos( &p_sys->current_page ) != 0 ) /* skel workaround */
-                p_sys->i_eos++;
+            for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
+            {
+                if ( p_sys->pp_stream[i_stream]->i_serial_no == ogg_page_serialno( &p_sys->current_page ) )
+                {
+                    p_sys->pp_stream[i_stream]->b_finished = true;
+                    break;
+                }
+            }
         }
     }
 
@@ -346,12 +356,16 @@ static int Demux( demux_t * p_demux )
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0);
             }
 
+            /* Does fail if serialno differs */
             if( ogg_stream_pagein( &p_stream->os, &p_sys->current_page ) != 0 )
             {
                 continue;
             }
 
         }
+
+        /* clear the finished flag if pages after eos (ex: after a seek) */
+        if ( ! ogg_page_eos( &p_sys->current_page ) ) p_stream->b_finished = false;
 
         DemuxDebug(
             if ( p_stream->fmt.i_cat == VIDEO_ES )
@@ -645,9 +659,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             /* forbid seeking if we haven't initialized all logical bitstreams yet;
                if we allowed, some headers would not get backed up and decoder init
                would fail, making that logical stream unusable */
-            if( p_sys->i_bos > 0 )
+            for ( int i=0; i< p_sys->i_streams; i++ )
             {
-                return VLC_EGENERIC;
+                if ( p_sys->pp_stream[i]->b_initializing )
+                    return VLC_EGENERIC;
             }
 
             p_stream = Ogg_GetSelectedStream( p_demux );
@@ -718,8 +733,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_SEEKPOINT:
         {
             const int i_seekpoint = (int)va_arg( args, int );
-            if( i_seekpoint > p_sys->i_seekpoints || p_sys->i_bos > 0 )
+            if( i_seekpoint > p_sys->i_seekpoints )
                 return VLC_EGENERIC;
+
+            for ( int i=0; i< p_sys->i_streams; i++ )
+            {
+                if ( p_sys->pp_stream[i]->b_initializing )
+                    return VLC_EGENERIC;
+            }
 
             i64 = p_sys->pp_seekpoints[i_seekpoint]->i_time_offset;
 
@@ -1023,7 +1044,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                                      p_stream->p_headers, p_stream->i_headers );
 
                 /* we're not at BOS anymore for this logical stream */
-                p_ogg->i_bos--;
+                p_stream->b_initializing = false;
             }
         }
 
@@ -1734,19 +1755,12 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     p_ogg->i_streams--;
                 }
 
+                /* we'll need to get all headers */
+                p_ogg->pp_stream[i_stream]->b_initializing |= p_ogg->pp_stream[i_stream]->b_force_backup;
+
                 if( Ogg_ReadPage( p_demux, &p_ogg->current_page ) != VLC_SUCCESS )
                     return VLC_EGENERIC;
             }
-
-            /* we'll need to get all headers for all of those streams
-               that we have to backup headers for */
-            p_ogg->i_bos = 0;
-            for( i_stream = 0; i_stream < p_ogg->i_streams; i_stream++ )
-            {
-                if( p_ogg->pp_stream[i_stream]->b_force_backup )
-                    p_ogg->i_bos++;
-            }
-
 
             /* This is the first data page, which means we are now finished
              * with the initial pages. We just need to store it in the relevant

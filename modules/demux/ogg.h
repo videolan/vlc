@@ -72,6 +72,8 @@ typedef struct logical_stream_s
     mtime_t          i_previous_pcr;
 
     /* Misc */
+    bool b_initializing;
+    bool b_finished;
     bool b_reinit;
     bool b_oggds;
     int i_granule_shift;
@@ -129,10 +131,6 @@ struct demux_sys_t
     /* program clock reference (in units of 90kHz) derived from the pcr of
      * the sub-streams */
     mtime_t i_pcr;
-
-    /* stream state */
-    int     i_bos; /* Begnning of stream, tell the demux to look for elementary streams. */
-    int     i_eos;
 
     /* bitrate */
     int     i_bitrate;
