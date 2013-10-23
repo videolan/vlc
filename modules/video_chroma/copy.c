@@ -412,5 +412,5 @@ void CopyFromYv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
      CopyPlane(dst->p[1].p_pixels, dst->p[1].i_pitch,
                src[1], src_pitch[1], width / 2, height / 2);
      CopyPlane(dst->p[2].p_pixels, dst->p[2].i_pitch,
-               src[1], src_pitch[2], width / 2, height / 2);
+               src[2], src_pitch[2], width / 2, height / 2);
 }
