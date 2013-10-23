@@ -60,6 +60,7 @@ struct sink
 {
     struct sink *next;
     uint32_t index;
+    pa_volume_t base_volume;
     char name[1];
 };
 
@@ -89,6 +90,14 @@ static void VolumeReport(audio_output_t *aout)
 }
 
 /*** Sink ***/
+static struct sink *sink_find(aout_sys_t *sys, uint32_t index)
+{
+    for (struct sink *sink = sys->sinks; sink != NULL; sink = sink->next)
+        if (sink->index == index)
+            return sink;
+    return NULL;
+}
+
 static void sink_add_cb(pa_context *ctx, const pa_sink_info *i, int eol,
                         void *userdata)
 {
@@ -110,6 +119,15 @@ static void sink_add_cb(pa_context *ctx, const pa_sink_info *i, int eol,
 
     sink->next = sys->sinks;
     sink->index = i->index;
+    /* PulseAudio flat volume NORM / 100% / 0dB corresponds to no software
+     * amplification and maximum hardware amplification.
+     * VLC maps DEFAULT / 100% to no gain at all (software/hardware).
+     * Thus we need to use the sink base_volume as a multiplier,
+     * if and only if flat volume is active for our current sink. */
+    if (i->flags & PA_SINK_FLAT_VOLUME)
+        sink->base_volume = i->base_volume;
+    else
+        sink->base_volume = PA_VOLUME_NORM;
     memcpy(sink->name, i->name, namelen + 1);
     sys->sinks = sink;
 }
@@ -118,6 +136,7 @@ static void sink_mod_cb(pa_context *ctx, const pa_sink_info *i, int eol,
                         void *userdata)
 {
     audio_output_t *aout = userdata;
+    aout_sys_t *sys = aout->sys;
 
     if (eol)
         return;
@@ -126,6 +145,15 @@ static void sink_mod_cb(pa_context *ctx, const pa_sink_info *i, int eol,
     msg_Dbg(aout, "changing sink %"PRIu32": %s (%s)", i->index, i->name,
             i->description);
     aout_HotplugReport(aout, i->name, i->description);
+
+    struct sink *sink = sink_find(sys, i->index);
+    if (unlikely(sink == NULL))
+        return;
+
+    if (i->flags & PA_SINK_FLAT_VOLUME)
+        sink->base_volume = i->base_volume;
+    else
+        sink->base_volume = PA_VOLUME_NORM;
 }
 
 static void sink_del(uint32_t index, audio_output_t *aout)
@@ -167,36 +195,6 @@ static void sink_event(pa_context *ctx, unsigned type, uint32_t idx,
     }
     if (op != NULL)
         pa_operation_unref(op);
-}
-
-static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
-                         void *userdata)
-{
-    audio_output_t *aout = userdata;
-    aout_sys_t *sys = aout->sys;
-    pa_stream *s = sys->stream;
-
-    if (eol)
-        return;
-    if (unlikely(s == NULL))
-        return; /* race condition: stream stopped already */
-    if (unlikely(pa_stream_get_device_index(s) != i->index))
-        return; /* race condition: stream moved again already */
-    (void) c;
-
-    /* PulseAudio flat volume NORM / 100% / 0dB corresponds to no software
-     * amplification and maximum hardware amplification.
-     * VLC maps DEFAULT / 100% to no gain at all (software/hardware).
-     * Thus we need to use the sink base_volume as a multiplier,
-     * if and only if flat volume is active for our current sink. */
-    if (i->flags & PA_SINK_FLAT_VOLUME)
-        sys->base_volume = i->base_volume;
-    else
-        sys->base_volume = PA_VOLUME_NORM;
-    msg_Dbg(aout, "base volume: %"PRIu32, sys->base_volume);
-
-    if (pa_cvolume_valid(&sys->cvolume))
-        VolumeReport(aout);
 }
 
 
@@ -347,15 +345,16 @@ static void stream_moved_cb(pa_stream *s, void *userdata)
     audio_output_t *aout = userdata;
     aout_sys_t *sys = aout->sys;
     const char *name = pa_stream_get_device_name(s);
-    pa_operation *op;
+    struct sink *sink = sink_find(sys, pa_stream_get_device_index(s));
 
     msg_Dbg(aout, "connected to sink %s", name);
     aout_DeviceReport(aout, name);
 
-    op = pa_context_get_sink_info_by_name(sys->context, name, sink_info_cb,
-                                          aout);
-    if (likely(op != NULL))
-        pa_operation_unref(op);
+    sys->base_volume = likely(sink != NULL) ? sink->base_volume
+                                            : PA_VOLUME_INVALID;
+    msg_Dbg(aout, "base volume: %"PRIu32, sys->base_volume);
+    if (pa_cvolume_valid(&sys->cvolume))
+        VolumeReport(aout);
 }
 
 static void stream_overflow_cb(pa_stream *s, void *userdata)
