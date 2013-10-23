@@ -811,7 +811,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     attr.minreq = pa_usec_to_bytes(AOUT_MIN_PREPARE_TIME, &ss);
     attr.fragsize = 0; /* not used for output */
 
-    sys->stream = NULL;
     sys->trigger = NULL;
     sys->first_pts = VLC_TS_INVALID;
 
@@ -872,6 +871,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         vlc_pa_error(aout, "stream creation failure", sys->context);
         return VLC_EGENERIC;
     }
+    assert(sys->stream == NULL);
     sys->stream = s;
     pa_stream_set_state_callback(s, stream_state_cb, sys->mainloop);
     pa_stream_set_buffer_attr_callback(s, stream_buffer_attr_cb, aout);
