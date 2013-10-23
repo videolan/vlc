@@ -74,6 +74,7 @@ struct aout_sys_t
     pa_cvolume cvolume; /**< actual sink input volume */
     mtime_t first_pts; /**< Play time of buffer start */
 
+    pa_volume_t volume_force; /**< Forced volume (stream must be NULL) */
     pa_stream_flags_t flags_force; /**< Forced flags (stream must be NULL) */
     char *sink_force; /**< Forced sink name (stream must be NULL) */
 
@@ -94,6 +95,14 @@ static struct sink *sink_find(aout_sys_t *sys, uint32_t index)
 {
     for (struct sink *sink = sys->sinks; sink != NULL; sink = sink->next)
         if (sink->index == index)
+            return sink;
+    return NULL;
+}
+
+static struct sink *sink_find_by_name(aout_sys_t *sys, const char *name)
+{
+    for (struct sink *sink = sys->sinks; sink != NULL; sink = sink->next)
+        if (!strcmp(sink->name, name))
             return sink;
     return NULL;
 }
@@ -611,12 +620,6 @@ static int VolumeSet(audio_output_t *aout, float vol)
     pa_operation *op;
     int ret = -1;
 
-    if (s == NULL)
-    {
-        msg_Err (aout, "cannot change volume while not playing");
-        return -1;
-    }
-
     /* VLC provides the software volume so convert directly to PulseAudio
      * software volume, pa_volume_t. This is not a linear amplification factor
      * so do not use PulseAudio linear amplification! */
@@ -631,6 +634,16 @@ static int VolumeSet(audio_output_t *aout, float vol)
         msg_Err(aout, "cannot change volume without base");
         goto out;
     }
+
+    pa_volume_t volume = pa_sw_volume_multiply(lroundf(vol), sys->base_volume);
+
+    if (s == NULL)
+    {
+        sys->volume_force = volume;
+        ret = 0;
+        goto out;
+    }
+
     if (!pa_cvolume_valid(&sys->cvolume))
     {
         const pa_sample_spec *ss = pa_stream_get_sample_spec(s);
@@ -639,7 +652,6 @@ static int VolumeSet(audio_output_t *aout, float vol)
         pa_cvolume_set(&sys->cvolume, ss->channels, PA_VOLUME_NORM);
     }
 
-    pa_volume_t volume = pa_sw_volume_multiply(lroundf(vol), sys->base_volume);
     /* Preserve the balance (VLC does not support it). */
     pa_cvolume cvolume = sys->cvolume;
     pa_cvolume_scale(&cvolume, PA_VOLUME_NORM);
@@ -688,6 +700,10 @@ static int StreamMove(audio_output_t *aout, const char *name)
 
     if (sys->stream == NULL)
     {
+        struct sink *sink = sink_find_by_name(sys, name);
+
+        sys->base_volume = likely(sink != NULL) ? sink->base_volume
+                                                : PA_VOLUME_INVALID;
         msg_Dbg(aout, "will connect to sink %s", name);
         free(sys->sink_force);
         sys->sink_force = strdup(name);
@@ -843,8 +859,14 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     attr.minreq = pa_usec_to_bytes(AOUT_MIN_PREPARE_TIME, &ss);
     attr.fragsize = 0; /* not used for output */
 
+    pa_cvolume *cvolume = NULL, cvolumebuf;
+    if (PA_VOLUME_IS_VALID(sys->volume_force))
+    {
+        cvolume = &cvolumebuf;
+        pa_cvolume_set(cvolume, ss.channels, sys->volume_force);
+    }
+
     sys->trigger = NULL;
-    sys->base_volume = PA_VOLUME_INVALID;
     pa_cvolume_init(&sys->cvolume);
     sys->first_pts = VLC_TS_INVALID;
 
@@ -913,12 +935,13 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     pa_stream_set_suspended_callback(s, stream_suspended_cb, aout);
     pa_stream_set_underflow_callback(s, stream_underflow_cb, aout);
 
-    if (pa_stream_connect_playback(s, sys->sink_force, &attr, flags, NULL,
-                                   NULL) < 0
+    if (pa_stream_connect_playback(s, sys->sink_force, &attr, flags,
+                                   cvolume, NULL) < 0
      || stream_wait(s, sys->mainloop)) {
         vlc_pa_error(aout, "stream connection failure", sys->context);
         goto fail;
     }
+    sys->volume_force = PA_VOLUME_INVALID;
     sys->flags_force = PA_STREAM_NOFLAGS;
     free(sys->sink_force);
     sys->sink_force = NULL;
@@ -979,6 +1002,7 @@ static void Stop(audio_output_t *aout)
 
     pa_stream_unref(s);
     sys->stream = NULL;
+    sys->base_volume = PA_VOLUME_INVALID;
     pa_threaded_mainloop_unlock(sys->mainloop);
 }
 
@@ -1004,6 +1028,7 @@ static int Open(vlc_object_t *obj)
     }
     sys->stream = NULL;
     sys->context = ctx;
+    sys->volume_force = PA_VOLUME_INVALID;
     sys->flags_force = PA_STREAM_NOFLAGS;
     sys->sink_force = NULL;
     sys->sinks = NULL;
