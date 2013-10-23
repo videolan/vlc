@@ -96,7 +96,7 @@ static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
         if( i_size > 0 )
         {
             p_context->extradata =
-                malloc( i_size + FF_INPUT_BUFFER_PADDING_SIZE );
+                av_malloc( i_size + FF_INPUT_BUFFER_PADDING_SIZE );
             if( p_context->extradata )
             {
                 uint8_t *p_dst = p_context->extradata;
@@ -234,7 +234,7 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( ffmpeg_OpenCodec( p_dec ) < 0 )
     {
         msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
-        free( p_sys->p_context->extradata );
+        av_free( p_sys->p_context->extradata );
         free( p_sys );
         return VLC_EGENERIC;
     }

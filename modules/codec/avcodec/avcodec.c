@@ -359,7 +359,7 @@ static void CloseDecoder( vlc_object_t *p_this )
 
     if( p_sys->p_context )
     {
-        free( p_sys->p_context->extradata );
+        av_free( p_sys->p_context->extradata );
         p_sys->p_context->extradata = NULL;
 
         if( !p_sys->b_delayed_open )
