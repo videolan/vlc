@@ -79,6 +79,14 @@ struct aout_sys_t
     struct sink *sinks; /**< Locally-cached list of sinks */
 };
 
+static void VolumeReport(audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+    pa_volume_t volume = pa_cvolume_max(&sys->cvolume);
+
+    volume = pa_sw_volume_divide(volume, sys->base_volume);
+    aout_VolumeReport(aout, (float)volume / PA_VOLUME_NORM);
+}
 
 /*** Sink ***/
 static void sink_add_cb(pa_context *ctx, const pa_sink_info *i, int eol,
@@ -166,9 +174,14 @@ static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
 {
     audio_output_t *aout = userdata;
     aout_sys_t *sys = aout->sys;
+    pa_stream *s = sys->stream;
 
     if (eol)
         return;
+    if (unlikely(s == NULL))
+        return; /* race condition: stream stopped already */
+    if (unlikely(pa_stream_get_device_index(s) != i->index))
+        return; /* race condition: stream moved again already */
     (void) c;
 
     /* PulseAudio flat volume NORM / 100% / 0dB corresponds to no software
@@ -181,6 +194,9 @@ static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
     else
         sys->base_volume = PA_VOLUME_NORM;
     msg_Dbg(aout, "base volume: %"PRIu32, sys->base_volume);
+
+    if (pa_cvolume_valid(&sys->cvolume))
+        VolumeReport(aout);
 }
 
 
@@ -405,10 +421,8 @@ static void sink_input_info_cb(pa_context *ctx, const pa_sink_input_info *i,
     (void) ctx;
 
     sys->cvolume = i->volume; /* cache volume for balance preservation */
-
-    pa_volume_t volume = pa_cvolume_max(&i->volume);
-    volume = pa_sw_volume_divide(volume, sys->base_volume);
-    aout_VolumeReport(aout, (float)volume / PA_VOLUME_NORM);
+    if (PA_VOLUME_IS_VALID(sys->base_volume))
+        VolumeReport(aout);
     aout_MuteReport(aout, i->mute);
 }
 
@@ -594,7 +608,11 @@ static void Flush(audio_output_t *aout, bool wait)
 static int VolumeSet(audio_output_t *aout, float vol)
 {
     aout_sys_t *sys = aout->sys;
-    if (sys->stream == NULL)
+    pa_stream *s = sys->stream;
+    pa_operation *op;
+    int ret = -1;
+
+    if (s == NULL)
     {
         msg_Err (aout, "cannot change volume while not playing");
         return -1;
@@ -607,6 +625,21 @@ static int VolumeSet(audio_output_t *aout, float vol)
     if (unlikely(vol >= PA_VOLUME_MAX))
         vol = PA_VOLUME_MAX;
 
+    pa_threaded_mainloop_lock(sys->mainloop);
+
+    if (!PA_VOLUME_IS_VALID(sys->base_volume))
+    {
+        msg_Err(aout, "cannot change volume without base");
+        goto out;
+    }
+    if (!pa_cvolume_valid(&sys->cvolume))
+    {
+        const pa_sample_spec *ss = pa_stream_get_sample_spec(s);
+
+        msg_Warn(aout, "balance clobbered by volume change");
+        pa_cvolume_set(&sys->cvolume, ss->channels, PA_VOLUME_NORM);
+    }
+
     pa_volume_t volume = pa_sw_volume_multiply(lroundf(vol), sys->base_volume);
     /* Preserve the balance (VLC does not support it). */
     pa_cvolume cvolume = sys->cvolume;
@@ -614,16 +647,16 @@ static int VolumeSet(audio_output_t *aout, float vol)
     pa_sw_cvolume_multiply_scalar(&cvolume, &cvolume, volume);
     assert(pa_cvolume_valid(&cvolume));
 
-    pa_operation *op;
-    uint32_t idx = pa_stream_get_index(sys->stream);
-    pa_threaded_mainloop_lock(sys->mainloop);
-    op = pa_context_set_sink_input_volume(sys->context, idx, &cvolume,
-                                          NULL, NULL);
+    op = pa_context_set_sink_input_volume(sys->context, pa_stream_get_index(s),
+                                          &cvolume, NULL, NULL);
     if (likely(op != NULL))
+    {
         pa_operation_unref(op);
+        ret = 0;
+    }
+out:
     pa_threaded_mainloop_unlock(sys->mainloop);
-
-    return 0;
+    return ret;
 }
 
 static int MuteSet(audio_output_t *aout, bool mute)
@@ -812,11 +845,9 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     attr.fragsize = 0; /* not used for output */
 
     sys->trigger = NULL;
+    sys->base_volume = PA_VOLUME_INVALID;
+    pa_cvolume_init(&sys->cvolume);
     sys->first_pts = VLC_TS_INVALID;
-
-    /* Channel volume */
-    sys->base_volume = PA_VOLUME_NORM;
-    pa_cvolume_set(&sys->cvolume, ss.channels, PA_VOLUME_NORM);
 
 #if PA_CHECK_VERSION(1,0,0)
     pa_format_info *formatv[2];
