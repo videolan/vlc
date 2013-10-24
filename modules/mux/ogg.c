@@ -73,6 +73,10 @@ static block_t *OggCreateFooter( sout_mux_t * );
  * Misc declarations
  *****************************************************************************/
 
+/* Skeleton */
+#define FISBONE_BASE_SIZE 52
+#define FISBONE_BASE_OFFSET 44
+
 /* Structures used for OggDS headers used in ogm files */
 
 #define PACKET_TYPE_HEADER   0x01
@@ -126,7 +130,7 @@ typedef struct
 typedef struct
 {
     int i_cat;
-    int i_fourcc;
+    vlc_fourcc_t i_fourcc;
 
     int b_new;
 
@@ -142,6 +146,7 @@ typedef struct
     ogg_stream_state os;
 
     oggds_header_t *p_oggds_header;
+    bool b_fisbone_done;
 
 } ogg_stream_t;
 
@@ -158,6 +163,16 @@ struct sout_mux_sys_t
     /* logical streams pending to be deleted */
     int i_del_streams;
     ogg_stream_t **pp_del_streams;
+
+    /* Skeleton */
+    struct
+    {
+        bool b_create;
+        int i_serial_no;
+        int i_packet_no;
+        ogg_stream_state os;
+        bool b_head_done;
+    } skeleton;
 };
 
 static void OggSetDate( block_t *, mtime_t , mtime_t  );
@@ -548,6 +563,142 @@ static block_t *OggStreamPageOut( sout_mux_t *p_mux,
     return OggStreamGetPage( p_mux, p_os, i_pts, false );
 }
 
+static void OggGetSkeletonFisbone( uint8_t **pp_buffer, long *pi_size,
+                                   sout_input_t *p_input, sout_mux_t *p_mux )
+{
+    uint8_t *psz_header;
+    uint8_t *p_buffer;
+    const char *psz_value = NULL;
+    ogg_stream_t *p_stream = (ogg_stream_t *) p_input->p_sys;
+    struct
+    {
+        char *psz_content_type;
+        char *psz_role;
+        long int i_size;
+        unsigned int i_count;
+    } headers = { NULL, NULL, 0, 0 };
+    *pi_size = 0;
+
+    switch( p_stream->i_fourcc )
+    {
+        case VLC_CODEC_VORBIS:
+            psz_value = "audio/vorbis";
+            break;
+        case VLC_CODEC_THEORA:
+            psz_value = "video/theora";
+            break;
+        case VLC_CODEC_SPEEX:
+            psz_value = "audio/speex";
+            break;
+        case VLC_CODEC_FLAC:
+            psz_value = "audio/flac";
+            break;
+        case VLC_CODEC_CMML:
+            psz_value = "text/cmml";
+            break;
+        case VLC_CODEC_KATE:
+            psz_value = "application/kate";
+            break;
+        default:
+            psz_value = "application/octet-stream";
+            msg_Warn( p_mux, "Unkown fourcc for stream %s, setting Content-Type to %s",
+                  vlc_fourcc_GetDescription( p_stream->i_cat, p_stream->i_fourcc ),
+                  psz_value );
+    }
+
+    /* Content Type Header */
+    if ( asprintf( &headers.psz_content_type, "Content-Type: %s\r\n", psz_value ) != -1 )
+    {
+        headers.i_size += strlen( headers.psz_content_type );
+        headers.i_count++;
+    }
+
+    /* Set Role Header */
+    if ( p_input->p_fmt->i_priority > ES_PRIORITY_NOT_SELECTABLE )
+    {
+        int i_max_prio = ES_PRIORITY_MIN;
+        for ( int i=0; i< p_mux->i_nb_inputs; i++ )
+        {
+            if ( p_mux->pp_inputs[i]->p_fmt->i_cat != p_input->p_fmt->i_cat ) continue;
+            i_max_prio = __MAX( p_mux->pp_inputs[i]->p_fmt->i_priority, i_max_prio );
+        }
+
+        psz_value = NULL;
+        if ( p_input->p_fmt->i_cat == AUDIO_ES || p_input->p_fmt->i_cat == VIDEO_ES )
+        {
+            if ( p_input->p_fmt->i_priority == i_max_prio && i_max_prio >= ES_PRIORITY_SELECTABLE_MIN )
+                psz_value = ( p_input->p_fmt->i_cat == VIDEO_ES ) ?
+                            "video/main" : "audio/main";
+            else
+                psz_value = ( p_input->p_fmt->i_cat == VIDEO_ES ) ?
+                            "video/alternate" : "audio/alternate";
+        }
+        else if ( p_input->p_fmt->i_cat == SPU_ES )
+        {
+            psz_value = ( p_input->p_fmt->i_codec == VLC_CODEC_KATE ) ?
+                        "text/karaoke" : "text/subtitle";
+        }
+
+        if ( psz_value && asprintf( &headers.psz_role, "Role: %s\r\n", psz_value ) != -1 )
+        {
+            headers.i_size += strlen( headers.psz_role );
+            headers.i_count++;
+        }
+    }
+
+    *pp_buffer = calloc( FISBONE_BASE_SIZE + headers.i_size, sizeof(uint8_t) );
+    if ( !*pp_buffer ) return;
+    p_buffer = *pp_buffer;
+
+    memcpy( p_buffer, "fisbone", 8 );
+    SetDWLE( &p_buffer[8], FISBONE_BASE_OFFSET ); /* offset to message headers */
+    SetDWLE( &p_buffer[12], p_stream->i_serial_no );
+    SetDWLE( &p_buffer[16], headers.i_count );
+
+    /* granulerate den */
+    switch ( p_input->p_fmt->i_cat )
+    {
+        case VIDEO_ES:
+            SetQWLE( &(*pp_buffer)[20], p_input->p_fmt->video.i_frame_rate );
+            SetQWLE( &(*pp_buffer)[28], p_input->p_fmt->video.i_frame_rate_base );
+        break;
+        case AUDIO_ES:
+            SetQWLE( &(*pp_buffer)[20], p_input->p_fmt->audio.i_rate );
+            SetQWLE( &(*pp_buffer)[28], 1 );
+        break;
+        default:
+            SetQWLE( &(*pp_buffer)[20], 1000 );
+            SetQWLE( &(*pp_buffer)[28], 1 );
+    }
+
+    /* preroll */
+    if ( p_input->p_fmt->p_extra )
+        SetDWLE( &(*pp_buffer)[44], xiph_CountHeaders( p_input->p_fmt->p_extra ) );
+
+    psz_header = *pp_buffer + FISBONE_BASE_SIZE;
+    memcpy( psz_header, headers.psz_content_type, strlen( headers.psz_content_type ) );
+    psz_header += strlen( headers.psz_content_type );
+    if ( headers.psz_role )
+        memcpy( psz_header, headers.psz_role, strlen( headers.psz_role ) );
+
+    *pi_size = FISBONE_BASE_SIZE + headers.i_size;
+
+    free( headers.psz_content_type );
+    free( headers.psz_role );
+}
+
+static void OggFillSkeletonFishead( uint8_t *p_buffer, sout_mux_t *p_mux )
+{
+    VLC_UNUSED( p_mux );
+    memcpy( p_buffer, "fishead", 8 );
+    SetWLE( &p_buffer[8], 4 );
+    SetWLE( &p_buffer[10], 0 );
+    SetQWLE( &p_buffer[20], 1000 );
+    SetQWLE( &p_buffer[36], 1000 );
+    SetQWLE( &p_buffer[64], 0 );
+    SetQWLE( &p_buffer[72], 0 );
+}
+
 static int32_t OggFillDsHeader( uint8_t *p_buffer, oggds_header_t *p_oggds_header, int i_cat )
 {
     int index = 0;
@@ -607,7 +758,49 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
     block_t *p_hdr = NULL;
     block_t *p_og = NULL;
     ogg_packet op;
+    ogg_stream_t *p_stream;
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
     int i;
+    p_sys->skeleton.b_create = !! p_mux->i_nb_inputs;
+
+    /* no skeleton for solo vorbis/speex/opus tracks */
+    if ( p_mux->i_nb_inputs == 1 && p_mux->pp_inputs[0]->p_fmt->i_cat == AUDIO_ES )
+    {
+        p_sys->skeleton.b_create = false;
+    }
+    else
+    {
+        for ( int i=0; i< p_mux->i_nb_inputs; i++ )
+        {
+            p_stream = (ogg_stream_t*) p_mux->pp_inputs[i]->p_sys;
+            if ( p_stream->p_oggds_header )
+            {
+                /* We don't want skeleton for OggDS */
+                p_sys->skeleton.b_create = false;
+                break;
+            }
+        }
+    }
+
+    /* Skeleton's Fishead must be the first page of the stream */
+    if ( p_sys->skeleton.b_create && !p_sys->skeleton.b_head_done )
+    {
+        msg_Dbg( p_mux, "creating header for skeleton" );
+        p_sys->skeleton.i_serial_no = p_sys->i_next_serial_no++;
+        ogg_stream_init( &p_sys->skeleton.os, p_sys->skeleton.i_serial_no );
+        op.bytes = 80;
+        op.packet = calloc( 1, op.bytes );
+        if ( op.packet == NULL ) return NULL;
+        op.b_o_s = 1;
+        op.e_o_s = 0;
+        op.granulepos = 0;
+        op.packetno = 0;
+        OggFillSkeletonFishead( op.packet, p_mux );
+        ogg_stream_packetin( &p_sys->skeleton.os, &op );
+        p_og = OggStreamFlush( p_mux, &p_sys->skeleton.os, 0 );
+        block_ChainAppend( &p_hdr, p_og );
+        p_sys->skeleton.b_head_done = true;
+    }
 
     /* Write header for each stream. All b_o_s (beginning of stream) packets
      * must appear first in the ogg stream so we take care of them first. */
@@ -616,7 +809,7 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
         for( i = 0; i < p_mux->i_nb_inputs; i++ )
         {
             sout_input_t *p_input = p_mux->pp_inputs[i];
-            ogg_stream_t *p_stream = (ogg_stream_t*)p_input->p_sys;
+            p_stream = (ogg_stream_t*)p_input->p_sys;
 
             bool video = ( p_stream->i_fourcc == VLC_CODEC_THEORA || p_stream->i_fourcc == VLC_CODEC_DIRAC );
             if( ( ( pass == 0 && !video ) || ( pass == 1 && video ) ) )
@@ -708,6 +901,27 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
         }
     }
 
+    /* Create fisbones if any */
+    if ( p_sys->skeleton.b_create )
+    {
+        for( i = 0; i < p_mux->i_nb_inputs; i++ )
+        {
+            sout_input_t *p_input = p_mux->pp_inputs[i];
+            ogg_stream_t *p_stream = (ogg_stream_t*)p_input->p_sys;
+            if ( p_stream->b_fisbone_done ) continue;
+            OggGetSkeletonFisbone( &op.packet, &op.bytes, p_input, p_mux );
+            if ( op.packet == NULL ) return NULL;
+            op.b_o_s = 0;
+            op.e_o_s = 0;
+            op.granulepos = 0;
+            op.packetno = p_sys->skeleton.i_packet_no++;
+            ogg_stream_packetin( &p_sys->skeleton.os, &op );
+            p_og = OggStreamFlush( p_mux, &p_sys->skeleton.os, 0 );
+            block_ChainAppend( &p_hdr, p_og );
+            p_stream->b_fisbone_done = true;
+        }
+    }
+
     /* Take care of the non b_o_s headers */
     for( i = 0; i < p_mux->i_nb_inputs; i++ )
     {
@@ -740,7 +954,7 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
                 op.granulepos = 0;
                 op.packetno = p_stream->i_packet_no++;
                 ogg_stream_packetin( &p_stream->os, &op );
-
+                msg_Dbg( p_mux, "adding non bos, secondary header" );
                 if( i == i_count - 1 )
                     p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
                 else
@@ -811,6 +1025,20 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
         }
     }
 
+    if ( p_sys->skeleton.b_create )
+    {
+        msg_Dbg( p_mux, "ending skeleton" );
+        op.packet = NULL;
+        op.bytes = 0;
+        op.b_o_s = 0;
+        op.e_o_s = 1;
+        op.granulepos = 0;
+        op.packetno = p_sys->skeleton.i_packet_no++;
+        ogg_stream_packetin( &p_sys->skeleton.os, &op );
+        p_og = OggStreamFlush( p_mux, &p_sys->skeleton.os, 0 );
+        block_ChainAppend( &p_hdr, p_og );
+    }
+
     /* set HEADER flag */
     for( p_og = p_hdr; p_og != NULL; p_og = p_og->p_next )
     {
@@ -831,6 +1059,8 @@ static block_t *OggCreateFooter( sout_mux_t *p_mux )
     for( i = 0; i < p_mux->i_nb_inputs; i++ )
     {
         ogg_stream_t *p_stream = p_mux->pp_inputs[i]->p_sys;
+
+        p_stream->b_fisbone_done = false;
 
         /* skip newly added streams */
         if( p_stream->b_new ) continue;
@@ -927,6 +1157,8 @@ static int Mux( sout_mux_t *p_mux )
         {
             /* Close current ogg stream */
             int i;
+
+            p_sys->skeleton.b_head_done = false;
 
             msg_Dbg( p_mux, "writing footer" );
             block_ChainAppend( &p_og, OggCreateFooter( p_mux ) );

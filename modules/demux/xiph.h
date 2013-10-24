@@ -24,6 +24,11 @@
 #include <assert.h>
 #define XIPH_MAX_HEADER_COUNT (256)
 
+static inline unsigned int xiph_CountHeaders( const void *extra )
+{
+    return *( (const uint8_t*) extra ) + 1;
+}
+
 static inline int xiph_SplitHeaders(unsigned packet_size[], void *packet[], unsigned *packet_count,
                                     unsigned extra_size, void *extra)
 {
@@ -33,7 +38,7 @@ static inline int xiph_SplitHeaders(unsigned packet_size[], void *packet[], unsi
         return VLC_EGENERIC;
 
     /* Parse the packet count and their sizes */
-    const unsigned count = 1 + *current++;
+    const unsigned count = xiph_CountHeaders( current++ );
     if (packet_count)
         *packet_count = count;
     unsigned size = 0;
