@@ -98,6 +98,7 @@
     IBOutlet id _customize_subs_overlay_ckb;
 
     IBOutlet id _stream_panel;
+    IBOutlet id _stream_cancel_btn;
     IBOutlet id _stream_ok_btn;
     IBOutlet id _stream_destination_lbl;
     IBOutlet id _stream_announcement_lbl;

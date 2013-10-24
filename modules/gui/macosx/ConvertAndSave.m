@@ -190,7 +190,8 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_customize_aud_samplerate_lbl setStringValue: _NS("Samplerate")];
     [_customize_subs_ckb setTitle: _NS("Subtitles")];
     [_customize_subs_overlay_ckb setTitle: _NS("Overlay subtitles on the video")];
-    [_stream_ok_btn setTitle:_NS("OK")];
+    [_stream_ok_btn setTitle: _NS("Apply")];
+    [_stream_cancel_btn setTitle: _NS("Cancel")];
     [_stream_destination_lbl setStringValue:_NS("Stream Destination")];
     [_stream_announcement_lbl setStringValue:_NS("Stream Announcement")];
     [_stream_type_lbl setStringValue:_NS("Type")];
@@ -457,6 +458,12 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (IBAction)closeStreamPanel:(id)sender
 {
+    [_stream_panel orderOut:sender];
+    [NSApp endSheet: _stream_panel];
+
+    if (sender == _stream_cancel_btn)
+        return;
+
     /* provide a summary of the user selections */
     NSMutableString * labelContent = [[NSMutableString alloc] initWithFormat:_NS("%@ stream to %@:%@"), [_stream_type_pop titleOfSelectedItem], [_stream_address_fld stringValue], [_stream_port_fld stringValue]];
 
@@ -491,9 +498,6 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     /* store destination for further reference and update UI */
     [self setOutputDestination: [_stream_address_fld stringValue]];
     [self updateOKButton];
-
-    [_stream_panel orderOut:sender];
-    [NSApp endSheet: _stream_panel];
 }
 
 - (IBAction)streamTypeToggle:(id)sender

@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1060</int>
-    <string key="IBDocument.SystemVersion">12E55</string>
+    <string key="IBDocument.SystemVersion">12F45</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1187.39</string>
+    <string key="IBDocument.AppKitVersion">1187.40</string>
     <string key="IBDocument.HIToolboxVersion">626.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12,8 +12,8 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="387"/>
       <integer value="132"/>
+      <integer value="387"/>
       <integer value="309"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
@@ -47,7 +47,7 @@
         <string key="NSWindowContentMaxSize">{663, 490}</string>
         <string key="NSWindowContentMinSize">{663, 490}</string>
         <object class="NSView" key="NSWindowView" id="1006">
-          <reference key="NSNextResponder"/>
+          <nil key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -78,7 +78,6 @@
                       </object>
                       <string key="NSFrame">{{256, 63}, {112, 112}}</string>
                       <reference key="NSSuperview" ref="370005935"/>
-                      <reference key="NSWindow"/>
                       <string key="NSReuseIdentifierKey">_NS:2165</string>
                       <bool key="NSEnabled">YES</bool>
                       <object class="NSImageCell" key="NSCell" id="624480290">
@@ -102,7 +101,6 @@
                       <int key="NSvFlags">303</int>
                       <string key="NSFrame">{{15, 181}, {597, 22}}</string>
                       <reference key="NSSuperview" ref="370005935"/>
-                      <reference key="NSWindow"/>
                       <bool key="NSEnabled">YES</bool>
                       <object class="NSTextFieldCell" key="NSCell" id="425578110">
                         <int key="NSCellFlags">68157504</int>
@@ -140,7 +138,6 @@
                       <int key="NSvFlags">301</int>
                       <string key="NSFrame">{{236, 20}, {153, 32}}</string>
                       <reference key="NSSuperview" ref="370005935"/>
-                      <reference key="NSWindow"/>
                       <bool key="NSEnabled">YES</bool>
                       <object class="NSButtonCell" key="NSCell" id="963202121">
                         <int key="NSCellFlags">67108864</int>
@@ -165,13 +162,11 @@
                   </object>
                   <string key="NSFrame">{{1, 1}, {627, 215}}</string>
                   <reference key="NSSuperview" ref="90126139"/>
-                  <reference key="NSWindow"/>
                   <string key="NSReuseIdentifierKey">_NS:21</string>
                 </object>
               </object>
               <string key="NSFrame">{{17, 255}, {629, 217}}</string>
               <reference key="NSSuperview" ref="1006"/>
-              <reference key="NSWindow"/>
               <string key="NSReuseIdentifierKey">_NS:18</string>
               <string key="NSOffsets">{0, 0}</string>
               <object class="NSTextFieldCell" key="NSTitleCell">
@@ -215,7 +210,6 @@
                       <int key="NSvFlags">303</int>
                       <string key="NSFrame">{{15, 56}, {597, 22}}</string>
                       <reference key="NSSuperview" ref="376558750"/>
-                      <reference key="NSWindow"/>
                       <bool key="NSEnabled">YES</bool>
                       <object class="NSTextFieldCell" key="NSCell" id="505049724">
                         <int key="NSCellFlags">68157504</int>
@@ -233,7 +227,6 @@
                       <int key="NSvFlags">268</int>
                       <string key="NSFrame">{{144, 19}, {223, 26}}</string>
                       <reference key="NSSuperview" ref="376558750"/>
-                      <reference key="NSWindow"/>
                       <string key="NSReuseIdentifierKey">_NS:791</string>
                       <bool key="NSEnabled">YES</bool>
                       <object class="NSPopUpButtonCell" key="NSCell" id="219049436">
@@ -309,7 +302,6 @@
                       <int key="NSvFlags">268</int>
                       <string key="NSFrame">{{366, 15}, {120, 32}}</string>
                       <reference key="NSSuperview" ref="376558750"/>
-                      <reference key="NSWindow"/>
                       <string key="NSReuseIdentifierKey">_NS:610</string>
                       <bool key="NSEnabled">YES</bool>
                       <object class="NSButtonCell" key="NSCell" id="724098160">
@@ -331,13 +323,11 @@
                   </object>
                   <string key="NSFrame">{{1, 1}, {627, 90}}</string>
                   <reference key="NSSuperview" ref="1053913655"/>
-                  <reference key="NSWindow"/>
                   <string key="NSReuseIdentifierKey">_NS:21</string>
                 </object>
               </object>
               <string key="NSFrame">{{17, 161}, {629, 92}}</string>
               <reference key="NSSuperview" ref="1006"/>
-              <reference key="NSWindow"/>
               <string key="NSReuseIdentifierKey">_NS:18</string>
               <string key="NSOffsets">{0, 0}</string>
               <object class="NSTextFieldCell" key="NSTitleCell">
@@ -372,7 +362,6 @@
                       <int key="NSvFlags">303</int>
                       <string key="NSFrame">{{15, 64}, {597, 22}}</string>
                       <reference key="NSSuperview" ref="446951149"/>
-                      <reference key="NSWindow"/>
                       <bool key="NSEnabled">YES</bool>
                       <object class="NSTextFieldCell" key="NSCell" id="302648704">
                         <int key="NSCellFlags">68157504</int>
@@ -390,7 +379,6 @@
                       <int key="NSvFlags">301</int>
                       <string key="NSFrame">{{160, 15}, {153, 32}}</string>
                       <reference key="NSSuperview" ref="446951149"/>
-                      <reference key="NSWindow"/>
                       <bool key="NSEnabled">YES</bool>
                       <object class="NSButtonCell" key="NSCell" id="475795629">
                         <int key="NSCellFlags">67108864</int>
@@ -413,7 +401,6 @@
                       <int key="NSvFlags">301</int>
                       <string key="NSFrame">{{313, 15}, {153, 32}}</string>
                       <reference key="NSSuperview" ref="446951149"/>
-                      <reference key="NSWindow"/>
                       <bool key="NSEnabled">YES</bool>
                       <object class="NSButtonCell" key="NSCell" id="806715934">
                         <int key="NSCellFlags">67108864</int>
@@ -436,7 +423,6 @@
                       <int key="NSvFlags">268</int>
                       <string key="NSFrame">{{12, 17}, {32, 32}}</string>
                       <reference key="NSSuperview" ref="446951149"/>
-                      <reference key="NSWindow"/>
                       <string key="NSReuseIdentifierKey">_NS:4108</string>
                       <bool key="NSEnabled">YES</bool>
                       <object class="NSButtonCell" key="NSCell" id="493857121">
@@ -458,13 +444,11 @@
                   </object>
                   <string key="NSFrame">{{1, 1}, {627, 98}}</string>
                   <reference key="NSSuperview" ref="960318313"/>
-                  <reference key="NSWindow"/>
                   <string key="NSReuseIdentifierKey">_NS:21</string>
                 </object>
               </object>
               <string key="NSFrame">{{17, 58}, {629, 100}}</string>
               <reference key="NSSuperview" ref="1006"/>
-              <reference key="NSWindow"/>
               <string key="NSReuseIdentifierKey">_NS:18</string>
               <string key="NSOffsets">{0, 0}</string>
               <object class="NSTextFieldCell" key="NSTitleCell">
@@ -489,7 +473,6 @@
               <int key="NSvFlags">268</int>
               <string key="NSFrame">{{541, 13}, {108, 32}}</string>
               <reference key="NSSuperview" ref="1006"/>
-              <reference key="NSWindow"/>
               <string key="NSReuseIdentifierKey">_NS:610</string>
               <bool key="NSEnabled">YES</bool>
               <object class="NSButtonCell" key="NSCell" id="94756638">
@@ -510,8 +493,6 @@
             </object>
           </object>
           <string key="NSFrameSize">{663, 490}</string>
-          <reference key="NSSuperview"/>
-          <reference key="NSWindow"/>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
         <string key="NSMinSize">{663, 512}</string>
@@ -3134,7 +3115,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               <object class="NSButtonCell" key="NSCell" id="873992339">
                 <int key="NSCellFlags">67108864</int>
                 <int key="NSCellFlags2">134217728</int>
-                <string key="NSContents">Close</string>
+                <string key="NSContents">Apply</string>
                 <reference key="NSSupport" ref="1024428774"/>
                 <string key="NSCellIdentifier">_NS:610</string>
                 <reference key="NSControlView" ref="524920181"/>
@@ -3142,6 +3123,29 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <int key="NSButtonFlags2">129</int>
                 <string key="NSAlternateContents"/>
                 <string type="base64-UTF8" key="NSKeyEquivalent">DQ</string>
+                <int key="NSPeriodicDelay">200</int>
+                <int key="NSPeriodicInterval">25</int>
+              </object>
+              <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+            </object>
+            <object class="NSButton" id="606173151">
+              <reference key="NSNextResponder" ref="575278109"/>
+              <int key="NSvFlags">289</int>
+              <string key="NSFrame">{{314, 12}, {108, 32}}</string>
+              <reference key="NSSuperview" ref="575278109"/>
+              <string key="NSReuseIdentifierKey">_NS:610</string>
+              <bool key="NSEnabled">YES</bool>
+              <object class="NSButtonCell" key="NSCell" id="365227636">
+                <int key="NSCellFlags">67108864</int>
+                <int key="NSCellFlags2">134217728</int>
+                <string key="NSContents">Cancel</string>
+                <reference key="NSSupport" ref="1024428774"/>
+                <string key="NSCellIdentifier">_NS:610</string>
+                <reference key="NSControlView" ref="606173151"/>
+                <int key="NSButtonFlags">-2038284288</int>
+                <int key="NSButtonFlags2">129</int>
+                <string key="NSAlternateContents"/>
+                <string type="base64-UTF8" key="NSKeyEquivalent">Gw</string>
                 <int key="NSPeriodicDelay">200</int>
                 <int key="NSPeriodicInterval">25</int>
               </object>
@@ -4338,6 +4342,22 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           </object>
           <int key="connectionID">531</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_stream_cancel_btn</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="606173151"/>
+          </object>
+          <int key="connectionID">535</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">closeStreamPanel:</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="606173151"/>
+          </object>
+          <int key="connectionID">536</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -5019,6 +5039,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               <reference ref="200204793"/>
               <reference ref="696647107"/>
               <reference ref="524920181"/>
+              <reference ref="606173151"/>
             </object>
             <reference key="parent" ref="939593274"/>
           </object>
@@ -6126,6 +6147,20 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <reference key="object" ref="700824889"/>
             <reference key="parent" ref="46797329"/>
           </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">532</int>
+            <reference key="object" ref="606173151"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="365227636"/>
+            </object>
+            <reference key="parent" ref="575278109"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">533</int>
+            <reference key="object" ref="365227636"/>
+            <reference key="parent" ref="606173151"/>
+          </object>
         </object>
       </object>
       <object class="NSMutableDictionary" key="flattenedProperties">
@@ -6475,6 +6510,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>524.IBPluginDependency</string>
           <string>524.IBViewBoundsToFrameTransform</string>
           <string>53.IBPluginDependency</string>
+          <string>532.IBPluginDependency</string>
+          <string>532.IBViewBoundsToFrameTransform</string>
+          <string>533.IBPluginDependency</string>
           <string>54.IBPluginDependency</string>
           <string>6.IBPluginDependency</string>
           <string>6.IBViewBoundsToFrameTransform</string>
@@ -6791,9 +6829,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <bytes key="NSTransformStruct">P4AAAL+AAABDyIAAwkQAAA</bytes>
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{576, 183}, {532, 368}}</string>
+          <string>{{274, 205}, {532, 368}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{576, 183}, {532, 368}}</string>
+          <string>{{274, 205}, {532, 368}}</string>
           <boolean value="NO"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -6994,6 +7032,11 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABDVAAAw0QAAA</bytes>
+          </object>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABBcAAAw0kAAA</bytes>
@@ -7023,7 +7066,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">531</int>
+      <int key="maxID">536</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -7821,6 +7864,761 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string key="className">VLCDropEnabledImageView</string>
           <string key="superclassName">NSImageView</string>
           <reference key="sourceIdentifier" ref="327021570"/>
+        </object>
+      </object>
+      <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
+        <bool key="EncodedWithXMLCoder">YES</bool>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCConvertAndSave</string>
+          <string key="superclassName">NSObject</string>
+          <object class="NSMutableDictionary" key="actions">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>audioSettingsChanged:</string>
+              <string>browseFileDestination:</string>
+              <string>cancelDestination:</string>
+              <string>closeCustomizationSheet:</string>
+              <string>closeStreamPanel:</string>
+              <string>customizeProfile:</string>
+              <string>finalizePanel:</string>
+              <string>iWantAFile:</string>
+              <string>iWantAStream:</string>
+              <string>newProfileAction:</string>
+              <string>openMedia:</string>
+              <string>sdpFileLocationSelector:</string>
+              <string>showStreamPanel:</string>
+              <string>streamAnnouncementToggle:</string>
+              <string>streamTypeToggle:</string>
+              <string>subSettingsChanged:</string>
+              <string>switchProfile:</string>
+              <string>videoSettingsChanged:</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="actionInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>audioSettingsChanged:</string>
+              <string>browseFileDestination:</string>
+              <string>cancelDestination:</string>
+              <string>closeCustomizationSheet:</string>
+              <string>closeStreamPanel:</string>
+              <string>customizeProfile:</string>
+              <string>finalizePanel:</string>
+              <string>iWantAFile:</string>
+              <string>iWantAStream:</string>
+              <string>newProfileAction:</string>
+              <string>openMedia:</string>
+              <string>sdpFileLocationSelector:</string>
+              <string>showStreamPanel:</string>
+              <string>streamAnnouncementToggle:</string>
+              <string>streamTypeToggle:</string>
+              <string>subSettingsChanged:</string>
+              <string>switchProfile:</string>
+              <string>videoSettingsChanged:</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBActionInfo">
+                <string key="name">audioSettingsChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">browseFileDestination:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">cancelDestination:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">closeCustomizationSheet:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">closeStreamPanel:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">customizeProfile:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">finalizePanel:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">iWantAFile:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">iWantAStream:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">newProfileAction:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">openMedia:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">sdpFileLocationSelector:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">showStreamPanel:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">streamAnnouncementToggle:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">streamTypeToggle:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">subSettingsChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">switchProfile:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">videoSettingsChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="outlets">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>_customize_aud_bitrate_fld</string>
+              <string>_customize_aud_bitrate_lbl</string>
+              <string>_customize_aud_channels_fld</string>
+              <string>_customize_aud_channels_lbl</string>
+              <string>_customize_aud_ckb</string>
+              <string>_customize_aud_codec_lbl</string>
+              <string>_customize_aud_codec_pop</string>
+              <string>_customize_aud_keep_ckb</string>
+              <string>_customize_aud_samplerate_lbl</string>
+              <string>_customize_aud_samplerate_pop</string>
+              <string>_customize_aud_settings_box</string>
+              <string>_customize_cancel_btn</string>
+              <string>_customize_encap_matrix</string>
+              <string>_customize_newProfile_btn</string>
+              <string>_customize_ok_btn</string>
+              <string>_customize_panel</string>
+              <string>_customize_subs_ckb</string>
+              <string>_customize_subs_overlay_ckb</string>
+              <string>_customize_subs_pop</string>
+              <string>_customize_tabview</string>
+              <string>_customize_vid_bitrate_fld</string>
+              <string>_customize_vid_bitrate_lbl</string>
+              <string>_customize_vid_ckb</string>
+              <string>_customize_vid_codec_lbl</string>
+              <string>_customize_vid_codec_pop</string>
+              <string>_customize_vid_framerate_fld</string>
+              <string>_customize_vid_framerate_lbl</string>
+              <string>_customize_vid_height_fld</string>
+              <string>_customize_vid_height_lbl</string>
+              <string>_customize_vid_keep_ckb</string>
+              <string>_customize_vid_res_box</string>
+              <string>_customize_vid_res_lbl</string>
+              <string>_customize_vid_scale_lbl</string>
+              <string>_customize_vid_scale_pop</string>
+              <string>_customize_vid_settings_box</string>
+              <string>_customize_vid_width_fld</string>
+              <string>_customize_vid_width_lbl</string>
+              <string>_destination_box</string>
+              <string>_destination_browse_btn</string>
+              <string>_destination_cancel_btn</string>
+              <string>_destination_filename_lbl</string>
+              <string>_destination_filename_stub_lbl</string>
+              <string>_destination_icon_view</string>
+              <string>_destination_itwantafile_btn</string>
+              <string>_destination_itwantafile_view</string>
+              <string>_destination_itwantastream_btn</string>
+              <string>_destination_itwantastream_view</string>
+              <string>_destination_lbl</string>
+              <string>_destination_stream_btn</string>
+              <string>_destination_stream_lbl</string>
+              <string>_drop_box</string>
+              <string>_drop_btn</string>
+              <string>_drop_image_view</string>
+              <string>_drop_lbl</string>
+              <string>_dropin_icon_view</string>
+              <string>_dropin_media_lbl</string>
+              <string>_dropin_view</string>
+              <string>_ok_btn</string>
+              <string>_profile_btn</string>
+              <string>_profile_lbl</string>
+              <string>_profile_pop</string>
+              <string>_stream_address_fld</string>
+              <string>_stream_address_lbl</string>
+              <string>_stream_announcement_lbl</string>
+              <string>_stream_cancel_btn</string>
+              <string>_stream_channel_fld</string>
+              <string>_stream_destination_lbl</string>
+              <string>_stream_ok_btn</string>
+              <string>_stream_panel</string>
+              <string>_stream_port_fld</string>
+              <string>_stream_port_lbl</string>
+              <string>_stream_sap_ckb</string>
+              <string>_stream_sdp_browsefile_btn</string>
+              <string>_stream_sdp_fld</string>
+              <string>_stream_sdp_matrix</string>
+              <string>_stream_ttl_fld</string>
+              <string>_stream_ttl_lbl</string>
+              <string>_stream_ttl_stepper</string>
+              <string>_stream_type_lbl</string>
+              <string>_stream_type_pop</string>
+              <string>_window</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>_customize_aud_bitrate_fld</string>
+              <string>_customize_aud_bitrate_lbl</string>
+              <string>_customize_aud_channels_fld</string>
+              <string>_customize_aud_channels_lbl</string>
+              <string>_customize_aud_ckb</string>
+              <string>_customize_aud_codec_lbl</string>
+              <string>_customize_aud_codec_pop</string>
+              <string>_customize_aud_keep_ckb</string>
+              <string>_customize_aud_samplerate_lbl</string>
+              <string>_customize_aud_samplerate_pop</string>
+              <string>_customize_aud_settings_box</string>
+              <string>_customize_cancel_btn</string>
+              <string>_customize_encap_matrix</string>
+              <string>_customize_newProfile_btn</string>
+              <string>_customize_ok_btn</string>
+              <string>_customize_panel</string>
+              <string>_customize_subs_ckb</string>
+              <string>_customize_subs_overlay_ckb</string>
+              <string>_customize_subs_pop</string>
+              <string>_customize_tabview</string>
+              <string>_customize_vid_bitrate_fld</string>
+              <string>_customize_vid_bitrate_lbl</string>
+              <string>_customize_vid_ckb</string>
+              <string>_customize_vid_codec_lbl</string>
+              <string>_customize_vid_codec_pop</string>
+              <string>_customize_vid_framerate_fld</string>
+              <string>_customize_vid_framerate_lbl</string>
+              <string>_customize_vid_height_fld</string>
+              <string>_customize_vid_height_lbl</string>
+              <string>_customize_vid_keep_ckb</string>
+              <string>_customize_vid_res_box</string>
+              <string>_customize_vid_res_lbl</string>
+              <string>_customize_vid_scale_lbl</string>
+              <string>_customize_vid_scale_pop</string>
+              <string>_customize_vid_settings_box</string>
+              <string>_customize_vid_width_fld</string>
+              <string>_customize_vid_width_lbl</string>
+              <string>_destination_box</string>
+              <string>_destination_browse_btn</string>
+              <string>_destination_cancel_btn</string>
+              <string>_destination_filename_lbl</string>
+              <string>_destination_filename_stub_lbl</string>
+              <string>_destination_icon_view</string>
+              <string>_destination_itwantafile_btn</string>
+              <string>_destination_itwantafile_view</string>
+              <string>_destination_itwantastream_btn</string>
+              <string>_destination_itwantastream_view</string>
+              <string>_destination_lbl</string>
+              <string>_destination_stream_btn</string>
+              <string>_destination_stream_lbl</string>
+              <string>_drop_box</string>
+              <string>_drop_btn</string>
+              <string>_drop_image_view</string>
+              <string>_drop_lbl</string>
+              <string>_dropin_icon_view</string>
+              <string>_dropin_media_lbl</string>
+              <string>_dropin_view</string>
+              <string>_ok_btn</string>
+              <string>_profile_btn</string>
+              <string>_profile_lbl</string>
+              <string>_profile_pop</string>
+              <string>_stream_address_fld</string>
+              <string>_stream_address_lbl</string>
+              <string>_stream_announcement_lbl</string>
+              <string>_stream_cancel_btn</string>
+              <string>_stream_channel_fld</string>
+              <string>_stream_destination_lbl</string>
+              <string>_stream_ok_btn</string>
+              <string>_stream_panel</string>
+              <string>_stream_port_fld</string>
+              <string>_stream_port_lbl</string>
+              <string>_stream_sap_ckb</string>
+              <string>_stream_sdp_browsefile_btn</string>
+              <string>_stream_sdp_fld</string>
+              <string>_stream_sdp_matrix</string>
+              <string>_stream_ttl_fld</string>
+              <string>_stream_ttl_lbl</string>
+              <string>_stream_ttl_stepper</string>
+              <string>_stream_type_lbl</string>
+              <string>_stream_type_pop</string>
+              <string>_window</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_aud_bitrate_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_aud_bitrate_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_aud_channels_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_aud_channels_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_aud_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_aud_codec_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_aud_codec_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_aud_keep_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_aud_samplerate_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_aud_samplerate_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_aud_settings_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_cancel_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_encap_matrix</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_newProfile_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_ok_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_panel</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_subs_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_subs_overlay_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_subs_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_tabview</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_bitrate_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_bitrate_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_codec_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_codec_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_framerate_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_framerate_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_height_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_height_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_keep_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_res_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_res_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_scale_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_scale_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_settings_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_width_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_customize_vid_width_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_destination_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_destination_browse_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_destination_cancel_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_destination_filename_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_destination_filename_stub_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_destination_icon_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_destination_itwantafile_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_destination_itwantafile_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_destination_itwantastream_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_destination_itwantastream_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_destination_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_destination_stream_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_destination_stream_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_drop_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_drop_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_drop_image_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_drop_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_dropin_icon_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_dropin_media_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_dropin_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_ok_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_profile_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_profile_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_profile_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_address_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_address_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_announcement_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_cancel_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_channel_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_destination_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_ok_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_panel</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_port_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_port_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_sap_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_sdp_browsefile_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_sdp_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_sdp_matrix</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_ttl_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_ttl_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_ttl_stepper</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_type_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_stream_type_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">_window</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="498396924">
+            <string key="majorKey">IBDocumentRelativeSource</string>
+            <string key="minorKey">../../../../../modules/gui/macosx/ConvertAndSave.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCDropEnabledBox</string>
+          <string key="superclassName">NSBox</string>
+          <reference key="sourceIdentifier" ref="498396924"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCDropEnabledButton</string>
+          <string key="superclassName">NSButton</string>
+          <reference key="sourceIdentifier" ref="498396924"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCDropEnabledImageView</string>
+          <string key="superclassName">NSImageView</string>
+          <reference key="sourceIdentifier" ref="498396924"/>
         </object>
       </object>
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.2+">
