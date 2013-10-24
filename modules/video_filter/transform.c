@@ -145,6 +145,22 @@ static void Plane_VFlip(plane_t *restrict dst, const plane_t *restrict src)
     }
 }
 
+#define I422(f) \
+static void Plane422_##f(plane_t *restrict dst, const plane_t *restrict src) \
+{ \
+    for (int y = 0; y < dst->i_visible_lines; y += 2) { \
+        for (int x = 0; x < dst->i_visible_pitch; x++) { \
+            int sx, sy, uv; \
+            (f)(&sx, &sy, dst->i_visible_pitch, dst->i_visible_lines / 2, \
+                x, y / 2); \
+            uv = (1 + src->p_pixels[2 * sy * src->i_pitch + sx] + \
+                src->p_pixels[(2 * sy + 1) * src->i_pitch + sx]) / 2; \
+            dst->p_pixels[y * dst->i_pitch + x] = uv; \
+            dst->p_pixels[(y + 1) * dst->i_pitch + x] = uv; \
+        } \
+    } \
+}
+
 #define YUY2(f) \
 static void PlaneYUY2_##f(plane_t *restrict dst, const plane_t *restrict src) \
 { \
@@ -193,6 +209,14 @@ PLANES(R90)
 PLANES(R180)
 PLANES(R270)
 
+#define Plane422_HFlip Plane16_HFlip
+#define Plane422_VFlip Plane_VFlip
+#define Plane422_R180  Plane16_R180
+I422(Transpose)
+I422(AntiTranspose)
+I422(R90)
+I422(R270)
+
 #define PlaneYUY2_HFlip Plane32_HFlip
 #define PlaneYUY2_VFlip Plane_VFlip
 #define PlaneYUY2_R180  Plane32_R180
@@ -208,11 +232,13 @@ typedef struct {
     void      (*plane8) (plane_t *dst, const plane_t *src);
     void      (*plane16)(plane_t *dst, const plane_t *src);
     void      (*plane32)(plane_t *dst, const plane_t *src);
+    void      (*i422)(plane_t *dst, const plane_t *src);
     void      (*yuyv)(plane_t *dst, const plane_t *src);
 } transform_description_t;
 
 #define DESC(str, f, invf) \
-    { str, f, invf, Plane8_##f, Plane16_##f, Plane32_##f, PlaneYUY2_##f }
+    { str, f, invf, Plane8_##f, Plane16_##f, Plane32_##f, \
+      Plane422_##f, PlaneYUY2_##f }
 
 static const transform_description_t descriptions[] = {
     DESC("90",            R90,           R270),
@@ -326,12 +352,19 @@ static int Open(vlc_object_t *object)
     sys->convert = dsc->convert;
 
     if (dsc_is_rotated(dsc)) {
-        for (unsigned i = 0; i < chroma->plane_count; i++) {
-            if (chroma->p[i].w.num * chroma->p[i].h.den
-             != chroma->p[i].h.num * chroma->p[i].w.den) {
-                msg_Err(filter, "Format rotation not possible (chroma %4.4s)",
-                        (char *)&src->i_chroma); /* I422... */
-                goto error;
+        switch (src->i_chroma) {
+            case VLC_CODEC_I422:
+            case VLC_CODEC_J422:
+                sys->plane[2] = sys->plane[1] = dsc->i422;
+                break;
+            default:
+                for (unsigned i = 0; i < chroma->plane_count; i++) {
+                    if (chroma->p[i].w.num * chroma->p[i].h.den
+                     != chroma->p[i].h.num * chroma->p[i].w.den) {
+                        msg_Err(filter, "Format rotation not possible "
+                                "(chroma %4.4s)", (char *)&src->i_chroma);
+                        goto error;
+                    }
             }
         }
 
