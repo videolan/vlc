@@ -234,7 +234,7 @@ static const size_t n_transforms =
 
 struct filter_sys_t {
     const vlc_chroma_description_t *chroma;
-    void (*plane)(plane_t *, const plane_t *);
+    void (*plane[PICTURE_PLANE_MAX])(plane_t *, const plane_t *);
     convert_t convert;
 };
 
@@ -250,7 +250,7 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
 
     const vlc_chroma_description_t *chroma = sys->chroma;
     for (unsigned i = 0; i < chroma->plane_count; i++)
-         sys->plane(&dst->p[i], &src->p[i]);
+         (sys->plane[i])(&dst->p[i], &src->p[i]);
 
     picture_CopyProperties(dst, src);
     picture_Release(src);
@@ -307,13 +307,13 @@ static int Open(vlc_object_t *object)
 
     switch (chroma->pixel_size) {
         case 1:
-            sys->plane = dsc->plane8;
+            sys->plane[0] = dsc->plane8;
             break;
         case 2:
-            sys->plane = dsc->plane16;
+            sys->plane[0] = dsc->plane16;
             break;
         case 4:
-            sys->plane = dsc->plane32;
+            sys->plane[0] = dsc->plane32;
             break;
         default:
             msg_Err(filter, "Unsupported pixel size %u (chroma %4.4s)",
@@ -321,7 +321,10 @@ static int Open(vlc_object_t *object)
             goto error;
     }
 
+    for (unsigned i = 1; i < PICTURE_PLANE_MAX; i++)
+        sys->plane[i] = sys->plane[0];
     sys->convert = dsc->convert;
+
     if (dsc_is_rotated(dsc)) {
         for (unsigned i = 0; i < chroma->plane_count; i++) {
             if (chroma->p[i].w.num * chroma->p[i].h.den
@@ -357,7 +360,7 @@ static int Open(vlc_object_t *object)
             /* fallthrough */
         case VLC_CODEC_YUYV:
         case VLC_CODEC_YVYU:
-            sys->plane = dsc->yuyv; /* 32-bits, not 16-bits! */
+            sys->plane[0] = dsc->yuyv; /* 32-bits, not 16-bits! */
             break;
         case VLC_CODEC_NV12:
         case VLC_CODEC_NV21:
