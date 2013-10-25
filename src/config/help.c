@@ -168,7 +168,6 @@ static void Help (vlc_object_t *p_this, char const *psz_help_name)
     if( psz_help_name && !strcmp( psz_help_name, "help" ) )
     {
         utf8_fprintf( stdout, _(vlc_usage), "vlc" );
-        Usage( p_this, "=help" );
         Usage( p_this, "=main" );
         print_help_on_full_help();
     }
@@ -296,11 +295,6 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
     size_t count;
     module_t **list = module_list_get (&count);
 
-    /* Ugly hack to make sure that the help options always come first
-     * (part 1) */
-    if( !psz_search )
-        Usage( p_this, "help" );
-
     /* Enumerate the config for each module */
     for (size_t i = 0; i < count; i++)
     {
@@ -309,7 +303,6 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
         module_config_t *p_section = NULL;
         module_config_t *p_end = p_parser->p_config + p_parser->confsize;
         const char *objname = module_get_object (p_parser);
-        bool b_help_module;
 
         if( psz_search &&
             ( b_strict ? strcmp( objname, psz_search )
@@ -332,12 +325,6 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
         {
             continue;
         }
-
-        b_help_module = !strcmp( "help", objname );
-        /* Ugly hack to make sure that the help options always come first
-         * (part 2) */
-        if( !psz_search && b_help_module )
-            continue;
 
         /* Ignore modules with only advanced config options if requested */
         if( !b_advanced )
@@ -509,11 +496,8 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
                                     b_description );
                 p_section = NULL;
                 psz_bra = ""; psz_type = ""; psz_ket = "";
-                if( !b_help_module )
-                {
-                    psz_suf = p_item->value.i ? _(" (default enabled)") :
-                                                _(" (default disabled)");
-                }
+                psz_suf = p_item->value.i ? _(" (default enabled)") :
+                                            _(" (default disabled)");
                 break;
             }
 
@@ -536,8 +520,7 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
                  - strlen( psz_bra ) - strlen( psz_type )
                  - strlen( psz_ket ) - 1;
 
-            if( CONFIG_CLASS(p_item->i_type) == CONFIG_ITEM_BOOL
-             && !b_help_module )
+            if( CONFIG_CLASS(p_item->i_type) == CONFIG_ITEM_BOOL )
             {
                 psz_prefix =  ", --no-";
                 i -= strlen( p_item->psz_name ) + strlen( psz_prefix );
@@ -553,8 +536,7 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
                 psz_spaces[i] = '\0';
             }
 
-            if( CONFIG_CLASS(p_item->i_type) == CONFIG_ITEM_BOOL
-             && !b_help_module )
+            if( CONFIG_CLASS(p_item->i_type) == CONFIG_ITEM_BOOL )
             {
                 utf8_fprintf( stdout, psz_format_bool, psz_short,
                               p_item->psz_name, psz_prefix, p_item->psz_name,
