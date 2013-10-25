@@ -66,8 +66,7 @@ static int DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 static int MuxBlock ( sout_mux_t *, sout_input_t * );
 
-static block_t *OggCreateHeader( sout_mux_t * );
-static block_t *OggCreateFooter( sout_mux_t * );
+static block_t *OggCreateHeaders( sout_mux_t * );
 
 /*****************************************************************************
  * Misc declarations
@@ -147,6 +146,8 @@ typedef struct
 
     oggds_header_t *p_oggds_header;
     bool b_fisbone_done;
+    bool b_started;
+    bool b_finished;
 
 } ogg_stream_t;
 
@@ -159,6 +160,7 @@ struct sout_mux_sys_t
 
     /* number of logical streams pending to be added */
     int i_add_streams;
+    bool b_can_add_streams;
 
     /* logical streams pending to be deleted */
     int i_del_streams;
@@ -177,6 +179,7 @@ struct sout_mux_sys_t
 
 static void OggSetDate( block_t *, mtime_t , mtime_t  );
 static block_t *OggStreamFlush( sout_mux_t *, ogg_stream_state *, mtime_t );
+static block_t *OggCreateStreamFooter( sout_mux_t *p_mux, ogg_stream_t *p_stream );
 
 /*****************************************************************************
  * Open: Open muxer
@@ -193,6 +196,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_sys->i_streams      = 0;
     p_sys->i_add_streams  = 0;
+    p_sys->b_can_add_streams = true;
     p_sys->i_del_streams  = 0;
     p_sys->pp_del_streams = 0;
 
@@ -229,11 +233,16 @@ static void Close( vlc_object_t * p_this )
 
         /* Close the current ogg stream */
         msg_Dbg( p_mux, "writing footer" );
-        block_ChainAppend( &p_og, OggCreateFooter( p_mux ) );
+
+        for(int i = 0; i < p_mux->i_nb_inputs; i++ )
+        {
+            block_ChainAppend( &p_og, OggCreateStreamFooter( p_mux, (ogg_stream_t *) p_mux->pp_inputs[i]->p_sys ) );
+        }
 
         /* Remove deleted logical streams */
         for(int i = 0; i < p_sys->i_del_streams; i++ )
         {
+            block_ChainAppend( &p_og, OggCreateStreamFooter( p_mux, p_sys->pp_del_streams[i] ) );
             ogg_stream_clear( &p_sys->pp_del_streams[i]->os );
             FREENULL( p_sys->pp_del_streams[i]->p_oggds_header );
             FREENULL( p_sys->pp_del_streams[i] );
@@ -753,7 +762,7 @@ static int32_t OggFillDsHeader( uint8_t *p_buffer, oggds_header_t *p_oggds_heade
     return index;
 }
 
-static block_t *OggCreateHeader( sout_mux_t *p_mux )
+static block_t *OggCreateHeaders( sout_mux_t *p_mux )
 {
     block_t *p_hdr = NULL;
     block_t *p_og = NULL;
@@ -821,6 +830,7 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
             ogg_stream_init( &p_stream->os, p_stream->i_serial_no );
             p_stream->b_new = false;
             p_stream->i_packet_no = 0;
+            p_stream->b_started = true;
 
             if( p_stream->i_fourcc == VLC_CODEC_VORBIS ||
                 p_stream->i_fourcc == VLC_CODEC_SPEEX ||
@@ -1047,66 +1057,30 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
     return p_hdr;
 }
 
-static block_t *OggCreateFooter( sout_mux_t *p_mux )
+static block_t *OggCreateStreamFooter( sout_mux_t *p_mux, ogg_stream_t *p_stream )
 {
-    sout_mux_sys_t *p_sys = p_mux->p_sys;
-    block_t *p_hdr = NULL;
-    block_t *p_og;
-    ogg_packet    op;
-    int     i;
+    block_t *p_og, *p_hdr = NULL;
+    ogg_packet op;
 
-    /* flush all remaining data */
-    for( i = 0; i < p_mux->i_nb_inputs; i++ )
+    p_stream->b_fisbone_done = false;
+
+    /* Write eos packet for stream. */
+    op.packet = NULL;
+    op.bytes  = 0;
+    op.b_o_s  = 0;
+    op.e_o_s  = 1;
+    op.granulepos = p_stream->u_last_granulepos;
+    op.packetno = p_stream->i_packet_no++;
+    ogg_stream_packetin( &p_stream->os, &op );
+
+    /* flush it with all remaining data */
+    if( ( p_og = OggStreamFlush( p_mux, &p_stream->os, 0 ) ) )
     {
-        ogg_stream_t *p_stream = p_mux->pp_inputs[i]->p_sys;
-
-        p_stream->b_fisbone_done = false;
-
-        /* skip newly added streams */
-        if( p_stream->b_new ) continue;
-
-        if( ( p_og = OggStreamFlush( p_mux, &p_stream->os, 0 ) ) )
-        {
-            OggSetDate( p_og, p_stream->i_dts, p_stream->i_length );
-            sout_AccessOutWrite( p_mux->p_access, p_og );
-        }
-    }
-
-    /* Write eos packets for each stream. */
-    for( i = 0; i < p_mux->i_nb_inputs; i++ )
-    {
-        ogg_stream_t *p_stream = p_mux->pp_inputs[i]->p_sys;
-
-        /* skip newly added streams */
-        if( p_stream->b_new ) continue;
-
-        op.packet = NULL;
-        op.bytes  = 0;
-        op.b_o_s  = 0;
-        op.e_o_s  = 1;
-        op.granulepos = p_stream->u_last_granulepos;
-        op.packetno = p_stream->i_packet_no++;
-        ogg_stream_packetin( &p_stream->os, &op );
-
-        p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
+        OggSetDate( p_og, p_stream->i_dts, p_stream->i_length );
         block_ChainAppend( &p_hdr, p_og );
-        ogg_stream_clear( &p_stream->os );
     }
 
-    for( i = 0; i < p_sys->i_del_streams; i++ )
-    {
-        op.packet = NULL;
-        op.bytes  = 0;
-        op.b_o_s  = 0;
-        op.e_o_s  = 1;
-        op.granulepos = p_sys->pp_del_streams[i]->u_last_granulepos;
-        op.packetno = p_sys->pp_del_streams[i]->i_packet_no++;
-        ogg_stream_packetin( &p_sys->pp_del_streams[i]->os, &op );
-
-        p_og = OggStreamFlush( p_mux, &p_sys->pp_del_streams[i]->os, 0 );
-        block_ChainAppend( &p_hdr, p_og );
-        ogg_stream_clear( &p_sys->pp_del_streams[i]->os );
-    }
+    ogg_stream_clear( &p_stream->os );
 
     return p_hdr;
 }
@@ -1144,51 +1118,76 @@ static int Mux( sout_mux_t *p_mux )
     block_t        *p_og = NULL;
     mtime_t        i_dts;
 
-    if( p_sys->i_add_streams || p_sys->i_del_streams )
+    /* End any stream that ends in that group */
+    if ( p_sys->i_del_streams )
     {
+        /* Remove deleted logical streams */
+        for( int i = 0; i < p_sys->i_del_streams; i++ )
+        {
+            block_ChainAppend( &p_og, OggCreateStreamFooter( p_mux, p_sys->pp_del_streams[i] ) );
+            FREENULL( p_sys->pp_del_streams[i]->p_oggds_header );
+            FREENULL( p_sys->pp_del_streams[i] );
+        }
+        FREENULL( p_sys->pp_del_streams );
+    }
+
+    if ( p_sys->i_streams == 0 )
+    {
+        /* All streams have been deleted, or none have ever been created
+           From this point, we are allowed to start a new group of logical streams */
+        p_sys->skeleton.b_head_done = false;
+        p_sys->b_can_add_streams = true;
+    }
+
+    if ( p_sys->i_add_streams )
+    {
+        if ( !p_sys->b_can_add_streams )
+        {
+            msg_Warn( p_mux, "Can't add new stream: Considerer increasing sout-mux-caching variable");
+            msg_Warn( p_mux, "Resetting and setting new identity to current streams");
+            p_sys->skeleton.b_head_done = false;
+            /* resetting all active streams */
+            for ( int i=0; i < p_mux->p_sys->i_streams; i++ )
+            {
+                ogg_stream_t * p_stream = (ogg_stream_t *) p_mux->pp_inputs[i]->p_sys;
+                if ( p_stream->b_finished || !p_stream->b_started ) continue;
+                block_ChainAppend( &p_og, OggCreateStreamFooter( p_mux, p_stream ) );
+                p_stream->i_serial_no = p_sys->i_next_serial_no++;
+                p_stream->i_packet_no = 0;
+                p_stream->b_finished = true;
+            }
+            p_sys->b_can_add_streams = true;
+            sout_AccessOutWrite( p_mux->p_access, p_og );
+            p_og = NULL;
+        }
+
         /* Open new ogg stream */
         if( sout_MuxGetStream( p_mux, 1, &i_dts) < 0 )
         {
             msg_Dbg( p_mux, "waiting for data..." );
             return VLC_SUCCESS;
         }
-
-        if( p_sys->i_streams )
-        {
-            /* Close current ogg stream */
-            int i;
-
-            p_sys->skeleton.b_head_done = false;
-
-            msg_Dbg( p_mux, "writing footer" );
-            block_ChainAppend( &p_og, OggCreateFooter( p_mux ) );
-
-            /* Remove deleted logical streams */
-            for( i = 0; i < p_sys->i_del_streams; i++ )
-            {
-                FREENULL( p_sys->pp_del_streams[i]->p_oggds_header );
-                FREENULL( p_sys->pp_del_streams[i] );
-            }
-            FREENULL( p_sys->pp_del_streams );
-            p_sys->i_streams = 0;
-        }
-
-        msg_Dbg( p_mux, "writing header" );
+        msg_Dbg( p_mux, "writing streams headers" );
         p_sys->i_start_dts = i_dts;
         p_sys->i_streams = p_mux->i_nb_inputs;
         p_sys->i_del_streams = 0;
         p_sys->i_add_streams = 0;
-        block_t *p_header = OggCreateHeader( p_mux );
+        block_t *p_header = OggCreateHeaders( p_mux );
         if( !p_header )
             return VLC_ENOMEM;
         block_ChainAppend( &p_og, p_header );
 
-        /* Write header and/or footer */
+        /* Since we started sending secondaryheader or data pages,
+             * we're no longer allowed to create new streams, until all streams end */
+        p_sys->b_can_add_streams = false;
+
+        /* Write header */
         OggSetDate( p_og, i_dts, 0 );
         sout_AccessOutWrite( p_mux->p_access, p_og );
         p_og = NULL;
     }
 
+    /* Do the regular data mux thing */
     for( ;; )
     {
         int i_stream = sout_MuxGetStream( p_mux, 1, NULL );
