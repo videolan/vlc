@@ -881,7 +881,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     int returnedValue = 0;
 
     /* always exit fullscreen on quit, otherwise we get ugly artifacts on the next launch */
-    if (b_nativeFullscreenMode) {
+    if (b_nativeFullscreenMode && [o_mainwindow fullscreen]) {
         [o_mainwindow toggleFullScreen: self];
         [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
     }
