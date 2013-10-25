@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <wchar.h>
+#include <wctype.h>
 
 #include <vlc_common.h>
 #include <vlc_charset.h>
@@ -37,6 +39,7 @@
 #if defined( _WIN32 ) && !VLC_WINSTORE_APP
 static void ShowConsole (void);
 static void PauseConsole (void);
+# define wcwidth(cp) (cp, 1) /* LOL */
 #else
 # define ShowConsole() (void)0
 # define PauseConsole() (void)0
@@ -249,60 +252,88 @@ static void print_section(const module_t *m, const module_config_t **sect,
                module_gettext(m, item->psz_longtext));
 }
 
-static void print_desc(/*const XXX*/ char *text, unsigned margin, bool color)
+static void print_desc(const char *str, unsigned margin, bool color)
 {
     unsigned width = ConsoleWidth() - margin;
-    size_t i_cur_width = width;
 
-    if (text[0] == '\0')
-        strcpy(text, " ");
+    if (color)
+        fputs(BLUE, stdout);
 
-    while (*text)
+    const char *word = str;
+    int wordlen = 0, wordwidth = 0;
+    unsigned offset = 0;
+    bool newline = true;
+
+    while (str[0])
     {
-        char *psz_parser, *psz_word;
-        size_t i_end = strlen(text);
-
-        /* If the remaining text fits in a line, print it. */
-        if( i_end <= i_cur_width )
-        {
-            printf(color ? BLUE"%s\n"GRAY : "%s\n", text);
+        uint32_t cp;
+        size_t charlen = vlc_towc(str, &cp);
+        if (unlikely(charlen == (size_t)-1))
             break;
-        }
 
-        /* Otherwise, eat as many words as possible */
-        psz_parser = text;
-        do
+        int charwidth = wcwidth(cp);
+        if (charwidth < 0)
+            charwidth = 0;
+
+        str += charlen;
+
+        if (iswspace(cp))
         {
-            psz_word = psz_parser;
-            psz_parser = strchr( psz_word, ' ' );
-            /* If no space was found, we reached the end of the text
-             * block; otherwise, we skip the space we just found. */
-            psz_parser = psz_parser ? psz_parser + 1 : text + i_end;
-
-        }
-        while( (size_t)(psz_parser - text) <= i_cur_width );
-
-        /* We cut a word in one of these cases:
-         *  - it's the only word in the line and it's too long.
-         *  - we used less than 80% of the width and the word we are
-         *    going to wrap is longer than 40% of the width, and even
-         *    if the word would have fit in the next line. */
-        if( psz_word == text
-         || ( (size_t)(psz_word - text) < 80 * i_cur_width / 100
-          && (size_t)(psz_parser - psz_word) > 40 * i_cur_width / 100 ) )
-        {
-            char c = text[i_cur_width];
-            text[i_cur_width] = '\0';
-            printf(color ? BLUE"%s\n%*s"GRAY : "%s\n%*s", text, margin, "");
-            text += i_cur_width;
-            text[0] = c;
+            if (!newline)
+            {
+                fputc(' ', stdout); /* insert space */
+                charwidth = 1;
+            }
+            fwrite(word, 1, wordlen, stdout); /* write complete word */
+            word = str;
+            wordlen = 0;
+            wordwidth = 0;
+            newline = false;
         }
         else
         {
-            psz_word[-1] = '\0';
-            printf(color ? BLUE"%s\n%*s"GRAY : "%s\n%*s", text, margin, "");
-            text = psz_word;
+            wordlen += charlen;
+            wordwidth += charwidth;
         }
+
+        offset += charwidth;
+        if (offset >= width)
+        {
+            if (newline)
+            {   /* overflow (word wider than line) */
+                fwrite(word, 1, wordlen - charlen, stdout);
+                word = str - charlen;
+                wordlen = charlen;
+                wordwidth = charwidth;
+            }
+            printf("\n%*s", margin, ""); /* new line */
+            offset = wordwidth;
+            newline = true;
+        }
+    }
+
+    if (!newline)
+        fputc(' ', stdout);
+    printf(color ? "%s\n"GRAY : "%s\n", word);
+}
+
+static int vlc_swidth(const char *str)
+{
+    for (int total = 0;;)
+    {
+        uint32_t cp;
+        size_t charlen = vlc_towc(str, &cp);
+
+        if (charlen == 0)
+            return total;
+        if (charlen == (size_t)-1)
+            return -1;
+        str += charlen;
+
+        int w = wcwidth(cp);
+        if (w == -1)
+            return -1;
+        total += w;
     }
 }
 
@@ -423,9 +454,9 @@ static void print_item(const module_t *m, const module_config_t *item,
 
     /* Wrap description */
     int offset = PADDING_SPACES - strlen(item->psz_name)
-               - strlen(bra) - strlen(type) - strlen(ket) - 1;
+               - strlen(bra) - vlc_swidth(type) - strlen(ket) - 1;
     if (CONFIG_CLASS(item->i_type) == CONFIG_ITEM_BOOL)
-        offset -= strlen(item->psz_name) + strlen(prefix);
+        offset -= strlen(item->psz_name) + vlc_swidth(prefix);
     if (offset < 0)
     {
         fputc('\n', stdout);
