@@ -29,7 +29,6 @@
 #include <wctype.h>
 
 #include <vlc_common.h>
-#include <vlc_charset.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
 #include "modules/modules.h"
@@ -37,6 +36,7 @@
 #include "libvlc.h"
 
 #if defined( _WIN32 ) && !VLC_WINSTORE_APP
+# include <vlc_charset.h>
 static void ShowConsole (void);
 static void PauseConsole (void);
 # define wcwidth(cp) (cp, 1) /* LOL */
@@ -152,8 +152,8 @@ bool config_PrintHelp (vlc_object_t *obj)
  *****************************************************************************/
 static inline void print_help_on_full_help( void )
 {
-    utf8_fprintf( stdout, "\n" );
-    utf8_fprintf( stdout, "%s\n", _("To get exhaustive help, use '-H'.") );
+    putchar('\n');
+    puts(_("To get exhaustive help, use '-H'."));
 }
 
 static const char vlc_usage[] = N_(
@@ -196,19 +196,19 @@ static void Help (vlc_object_t *p_this, char const *psz_help_name)
 
     if( psz_help_name && !strcmp( psz_help_name, "help" ) )
     {
-        utf8_fprintf( stdout, _(vlc_usage), "vlc" );
+        printf(_(vlc_usage), "vlc");
         Usage( p_this, "=main" );
         print_help_on_full_help();
     }
     else if( psz_help_name && !strcmp( psz_help_name, "longhelp" ) )
     {
-        utf8_fprintf( stdout, _(vlc_usage), "vlc" );
+        printf(_(vlc_usage), "vlc");
         Usage( p_this, NULL );
         print_help_on_full_help();
     }
     else if( psz_help_name && !strcmp( psz_help_name, "full-help" ) )
     {
-        utf8_fprintf( stdout, _(vlc_usage), "vlc" );
+        printf(_(vlc_usage), "vlc");
         Usage( p_this, NULL );
     }
     else if( psz_help_name )
@@ -281,7 +281,7 @@ static void print_desc(const char *str, unsigned margin, bool color)
         {
             if (!newline)
             {
-                fputc(' ', stdout); /* insert space */
+                putchar(' '); /* insert space */
                 charwidth = 1;
             }
             fwrite(word, 1, wordlen, stdout); /* write complete word */
@@ -313,7 +313,7 @@ static void print_desc(const char *str, unsigned margin, bool color)
     }
 
     if (!newline)
-        fputc(' ', stdout);
+        putchar(' ');
     printf(color ? "%s\n"GRAY : "%s\n", word);
 }
 
@@ -459,7 +459,7 @@ static void print_item(const module_t *m, const module_config_t *item,
         offset -= strlen(item->psz_name) + vlc_swidth(prefix);
     if (offset < 0)
     {
-        fputc('\n', stdout);
+        putchar('\n');
         offset = PADDING_SPACES + LINE_START;
     }
     printf("%*s", offset, "");
@@ -612,14 +612,12 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
  *****************************************************************************/
 static void ListModules (vlc_object_t *p_this, bool b_verbose)
 {
-    bool b_color = var_InheritBool( p_this, "color" );
+    bool color = false;
 
     ShowConsole();
-#ifdef _WIN32
-    b_color = false; // don't put color control codes in a .txt file
-#else
-    if( !isatty( 1 ) )
-        b_color = false;
+#ifndef _WIN32
+    if (isatty(STDOUT_FILENO))
+        color = var_InheritBool(p_this, "color");
 #endif
 
     /* List all modules */
@@ -631,39 +629,19 @@ static void ListModules (vlc_object_t *p_this, bool b_verbose)
     {
         module_t *p_parser = list[j];
         const char *objname = module_get_object (p_parser);
-        if( b_color )
-            utf8_fprintf( stdout, GREEN"  %-22s "WHITE"%s\n"GRAY, objname,
-                          module_gettext( p_parser, p_parser->psz_longname ) );
-        else
-            utf8_fprintf( stdout, "  %-22s %s\n", objname,
-                          module_gettext( p_parser, p_parser->psz_longname ) );
+        printf(color ? GREEN"  %-22s "WHITE"%s\n"GRAY : "  %-22s %s\n",
+               objname, module_gettext(p_parser, p_parser->psz_longname));
 
         if( b_verbose )
         {
             char *const *pp_shortcuts = p_parser->pp_shortcuts;
             for( unsigned i = 0; i < p_parser->i_shortcuts; i++ )
-            {
                 if( strcmp( pp_shortcuts[i], objname ) )
-                {
-                    if( b_color )
-                        utf8_fprintf( stdout, CYAN"   s %s\n"GRAY,
-                                      pp_shortcuts[i] );
-                    else
-                        utf8_fprintf( stdout, "   s %s\n",
-                                      pp_shortcuts[i] );
-                }
-            }
-            if( p_parser->psz_capability )
-            {
-                if( b_color )
-                    utf8_fprintf( stdout, MAGENTA"   c %s (%d)\n"GRAY,
-                                  p_parser->psz_capability,
-                                  p_parser->i_score );
-                else
-                    utf8_fprintf( stdout, "   c %s (%d)\n",
-                                  p_parser->psz_capability,
-                                  p_parser->i_score );
-            }
+                    printf(color ? CYAN"   s %s\n"GRAY : "   s %s\n",
+                           pp_shortcuts[i]);
+            if (p_parser->psz_capability != NULL)
+                printf(color ? MAGENTA"   c %s (%d)\n"GRAY : "   c %s (%d)\n",
+                       p_parser->psz_capability, p_parser->i_score);
         }
     }
     module_list_free (list);
@@ -678,12 +656,11 @@ static void ListModules (vlc_object_t *p_this, bool b_verbose)
 static void Version( void )
 {
     ShowConsole();
-    utf8_fprintf( stdout, _("VLC version %s (%s)\n"), VERSION_MESSAGE,
-                  psz_vlc_changeset );
-    utf8_fprintf( stdout, _("Compiled by %s on %s (%s)\n"),
-             VLC_CompileBy(), VLC_CompileHost(), __DATE__" "__TIME__ );
-    utf8_fprintf( stdout, _("Compiler: %s\n"), VLC_Compiler() );
-    utf8_fprintf( stdout, "%s", LICENSE_MSG );
+    printf(_("VLC version %s (%s)\n"), VERSION_MESSAGE, psz_vlc_changeset);
+    printf(_("Compiled by %s on %s (%s)\n"), VLC_CompileBy(),
+           VLC_CompileHost(), __DATE__" "__TIME__ );
+    printf(_("Compiler: %s\n"), VLC_Compiler());
+    fputs(LICENSE_MSG, stdout);
     PauseConsole();
 }
 
