@@ -155,7 +155,12 @@
 
     // TODO: find a cleaner way for "start in fullscreen"
     // Start in fs, because either prefs settings, or fullscreen button was pressed before
-    if (var_InheritBool(VLCIntf, "fullscreen") || var_GetBool(pl_Get(VLCIntf), "fullscreen")) {
+
+    char *psz_splitter = var_GetString(pl_Get(VLCIntf), "video-splitter");
+    BOOL b_have_splitter = psz_splitter != NULL && *psz_splitter != '\0';
+    free(psz_splitter);
+
+    if (!b_have_splitter && (var_InheritBool(VLCIntf, "fullscreen") || var_GetBool(pl_Get(VLCIntf), "fullscreen"))) {
 
         // this is not set when we start in fullscreen because of
         // fullscreen settings in video prefs the second time
