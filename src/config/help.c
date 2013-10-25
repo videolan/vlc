@@ -695,8 +695,6 @@ static void Version( void )
  *****************************************************************************/
 static void ShowConsole( void )
 {
-    FILE *f_help = NULL;
-
     if( getenv( "PWD" ) ) return; /* Cygwin shell or Wine */
 
     if( !AllocConsole() ) return;
@@ -710,14 +708,13 @@ static void ShowConsole( void )
     freopen( "CONOUT$", "w", stderr );
     freopen( "CONIN$", "r", stdin );
 
-    f_help = fopen( "vlc-help.txt", "wt" );
-    if( f_help != NULL )
+    if( freopen( "vlc-help.txt", "wt", stdout ) != NULL )
     {
-        fclose( f_help );
-        freopen( "vlc-help.txt", "wt", stdout );
-        utf8_fprintf( stderr, _("\nDumped content to vlc-help.txt file.\n") );
+        fputs( "\xEF\xBB\xBF", stdout );
+        fprintf( stderr, _("\nDumped content to vlc-help.txt file.\n") );
     }
-    else freopen( "CONOUT$", "w", stdout );
+    else
+        freopen( "CONOUT$", "w", stdout );
 }
 
 /*****************************************************************************
