@@ -251,8 +251,10 @@
 
     [o_vout_dict removeObjectForKey:o_key];
 
-    if ([o_vout_dict count] == 0)
+    if ([o_vout_dict count] == 0) {
         [[VLCMain sharedInstance] setActiveVideoPlayback:NO];
+        i_statusLevelWindowCounter = 0;
+    }
 }
 
 
@@ -274,7 +276,9 @@
         i_statusLevelWindowCounter++;
         [self updateWindowLevelForHelperWindows:i_level];
     } else {
-        i_statusLevelWindowCounter--;
+        if (i_statusLevelWindowCounter > 0)
+            i_statusLevelWindowCounter--;
+
         if (i_statusLevelWindowCounter == 0) {
             [self updateWindowLevelForHelperWindows:i_level];
         }
