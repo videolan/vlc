@@ -41,13 +41,39 @@ static void PauseConsole (void);
 # define ShowConsole() (void)0
 # define PauseConsole() (void)0
 # include <unistd.h>
+# include <sys/ioctl.h>
 #endif
 
 static void Help (vlc_object_t *, const char *);
 static void Usage (vlc_object_t *, const char *);
 static void Version (void);
 static void ListModules (vlc_object_t *, bool);
-static int ConsoleWidth (void);
+
+/**
+ * Returns the console width or a best guess.
+ */
+static unsigned ConsoleWidth(void)
+{
+#ifdef TIOCGWINSZ
+    struct winsize ws;
+
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == 0)
+        return ws.ws_col;
+#endif
+#ifdef WIOCGETD
+    struct uwdata uw;
+
+    if (ioctl(STDOUT_FILENO, WIOCGETD, &uw) == 0)
+        return uw.uw_height / uw.uw_vs;
+#endif
+#if defined (_WIN32) && !VLC_WINSTORE_APP
+    CONSOLE_SCREEN_BUFFER_INFO buf;
+
+    if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &buf))
+        return buf.dwSize.X;
+#endif
+    return 80;
+}
 
 /**
  * Checks for help command line options such as --help or --version.
@@ -819,31 +845,3 @@ static void PauseConsole( void )
     fclose( stdout );
 }
 #endif
-
-/*****************************************************************************
- * ConsoleWidth: Return the console width in characters
- *****************************************************************************
- * We use the stty shell command to get the console width; if this fails or
- * if the width is less than 80, we default to 80.
- *****************************************************************************/
-static int ConsoleWidth( void )
-{
-    unsigned i_width = 80;
-
-#ifndef _WIN32
-    FILE *file = popen( "stty size 2>/dev/null", "r" );
-    if (file != NULL)
-    {
-        if (fscanf (file, "%*u %u", &i_width) <= 0)
-            i_width = 80;
-        pclose( file );
-    }
-#elif !VLC_WINSTORE_APP
-    CONSOLE_SCREEN_BUFFER_INFO buf;
-
-    if (GetConsoleScreenBufferInfo (GetStdHandle (STD_OUTPUT_HANDLE), &buf))
-        i_width = buf.dwSize.X;
-#endif
-
-    return i_width;
-}
