@@ -347,16 +347,13 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
         b_found = true;
 
         /* Print name of module */
-        if( strcmp( "main", objname ) )
-        {
-            if( b_color )
-                utf8_fprintf( stdout, "\n " GREEN "%s" GRAY " (%s)\n",
-                              module_gettext( p_parser, p_parser->psz_longname ),
-                              objname );
-            else
-                utf8_fprintf( stdout, "\n %s\n",
-                              module_gettext(p_parser, p_parser->psz_longname ) );
-        }
+        if( b_color )
+            utf8_fprintf( stdout, "\n " GREEN "%s" GRAY " (%s)\n",
+                          module_gettext( p_parser, p_parser->psz_longname ),
+                          objname );
+        else
+            utf8_fprintf( stdout, "\n %s\n",
+                          module_gettext(p_parser, p_parser->psz_longname ) );
         if( p_parser->psz_help )
         {
             if( b_color )
