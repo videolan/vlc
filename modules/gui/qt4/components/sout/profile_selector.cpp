@@ -675,6 +675,8 @@ void VLCProfileEditor::fillProfile( const QString& qs )
             {
                 QComboBox *box = qobject_cast<QComboBox *>( object );
                 box->setCurrentIndex( box->findData( value ) );
+                if ( box->lineEdit() && box->currentIndex() == -1 )
+                    box->lineEdit()->setText( value );
             }
             else if( object->inherits( "QLineEdit" ) )
             {
@@ -809,6 +811,7 @@ QString VLCProfileEditor::transcodeValue()
         {
             const QComboBox *box = qobject_cast<const QComboBox *>( object );
             value = currentData( box ).toString();
+            if ( value.isEmpty() && box->lineEdit() ) value = box->lineEdit()->text();
         }
         else if( object->inherits( "QLineEdit" ) )
         {
