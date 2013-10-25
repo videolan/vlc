@@ -230,65 +230,226 @@ static void Help (vlc_object_t *p_this, char const *psz_help_name)
 #   define CYAN    COL(36)
 #   define WHITE   COL(0)
 #   define GRAY    "\033[0m"
-static void
-print_help_section( const module_t *m, const module_config_t *p_item,
-                    bool b_color, bool b_description )
+#   define LINE_START      8
+#   define PADDING_SPACES 25
+
+static void print_section(const module_t *m, const module_config_t **sect,
+                          bool color, bool desc)
 {
-    if( !p_item ) return;
-    if( b_color )
+    const module_config_t *item = *sect;
+
+    if (item == NULL)
+        return;
+    *sect = NULL;
+
+    printf(color ? RED"   %s:\n"GRAY : "   %s:\n",
+           module_gettext(m, item->psz_text));
+    if (desc && item->psz_longtext != NULL)
+        printf(color ? MAGENTA"   %s\n"GRAY : "   %s\n",
+               module_gettext(m, item->psz_longtext));
+}
+
+static void print_desc(/*const XXX*/ char *text, unsigned margin, bool color)
+{
+    unsigned width = ConsoleWidth() - margin;
+    size_t i_cur_width = width;
+
+    if (text[0] == '\0')
+        strcpy(text, " ");
+
+    while (*text)
     {
-        utf8_fprintf( stdout, RED"   %s:\n"GRAY,
-                      module_gettext( m, p_item->psz_text ) );
-        if( b_description && p_item->psz_longtext )
-            utf8_fprintf( stdout, MAGENTA"   %s\n"GRAY,
-                          module_gettext( m, p_item->psz_longtext ) );
-    }
-    else
-    {
-        utf8_fprintf( stdout, "   %s:\n",
-                      module_gettext( m, p_item->psz_text ) );
-        if( b_description && p_item->psz_longtext )
-            utf8_fprintf( stdout, "   %s\n",
-                          module_gettext(m, p_item->psz_longtext ) );
+        char *psz_parser, *psz_word;
+        size_t i_end = strlen(text);
+
+        /* If the remaining text fits in a line, print it. */
+        if( i_end <= i_cur_width )
+        {
+            printf(color ? BLUE"%s\n"GRAY : "%s\n", text);
+            break;
+        }
+
+        /* Otherwise, eat as many words as possible */
+        psz_parser = text;
+        do
+        {
+            psz_word = psz_parser;
+            psz_parser = strchr( psz_word, ' ' );
+            /* If no space was found, we reached the end of the text
+             * block; otherwise, we skip the space we just found. */
+            psz_parser = psz_parser ? psz_parser + 1 : text + i_end;
+
+        }
+        while( (size_t)(psz_parser - text) <= i_cur_width );
+
+        /* We cut a word in one of these cases:
+         *  - it's the only word in the line and it's too long.
+         *  - we used less than 80% of the width and the word we are
+         *    going to wrap is longer than 40% of the width, and even
+         *    if the word would have fit in the next line. */
+        if( psz_word == text
+         || ( (size_t)(psz_word - text) < 80 * i_cur_width / 100
+          && (size_t)(psz_parser - psz_word) > 40 * i_cur_width / 100 ) )
+        {
+            char c = text[i_cur_width];
+            text[i_cur_width] = '\0';
+            printf(color ? BLUE"%s\n%*s"GRAY : "%s\n%*s", text, margin, "");
+            text += i_cur_width;
+            text[0] = c;
+        }
+        else
+        {
+            psz_word[-1] = '\0';
+            printf(color ? BLUE"%s\n%*s"GRAY : "%s\n%*s", text, margin, "");
+            text = psz_word;
+        }
     }
 }
 
+static void print_item(const module_t *m, const module_config_t *item,
+                       const module_config_t **section, bool color, bool desc)
+{
+#ifndef _WIN32
+# define OPTION_VALUE_SEP " "
+#else
+# define OPTION_VALUE_SEP "="
+#endif
+    const char *bra = OPTION_VALUE_SEP "<", *type, *ket = ">";
+    const char *prefix = NULL, *suffix = "";
+    char psz_buffer[10000]; // XXX
+
+    switch (CONFIG_CLASS(item->i_type))
+    {
+        case 0: // hint class
+            switch (item->i_type)
+            {
+                case CONFIG_HINT_CATEGORY:
+                case CONFIG_HINT_USAGE:
+                    printf(color ? GREEN "\n %s\n" GRAY : "\n %s\n",
+                           module_gettext(m, item->psz_text));
+
+                    if (desc && item->psz_longtext != NULL)
+                        printf(color ? CYAN " %s\n" GRAY : " %s\n",
+                               module_gettext(m, item->psz_longtext));
+                    break;
+
+                case CONFIG_SECTION:
+                    *section = item;
+                    break;
+            }
+            return;
+
+        case CONFIG_ITEM_STRING:
+            type = _("string");
+            if (item->list_count > 0)
+            {
+                bra = OPTION_VALUE_SEP "{";
+                type = psz_buffer;
+                psz_buffer[0] = '\0';
+
+                for (unsigned i = 0; i < item->list_count; i++)
+                {
+                    if (i > 0)
+                        strcat(psz_buffer, ",");
+                    strcat(psz_buffer, item->list.psz[i]);
+                }
+                ket = "}";
+            }
+            break;
+
+        case CONFIG_ITEM_INTEGER:
+            type = _("integer");
+            if (item->min.i != 0 || item->max.i != 0)
+            {
+                sprintf (psz_buffer, "%s [%"PRId64" .. %"PRId64"]",
+                         type, item->min.i, item->max.i);
+                type = psz_buffer;
+            }
+            if (item->list_count > 0)
+            {
+                bra = OPTION_VALUE_SEP "{";
+                type = psz_buffer;
+                psz_buffer[0] = '\0';
+
+                for (unsigned i = 0; i < item->list_count; i++)
+                {
+                    if (i != 0)
+                        strcat(psz_buffer, ", ");
+                    sprintf(psz_buffer + strlen(psz_buffer), "%i (%s)",
+                            item->list.i[i],
+                            module_gettext(m, item->list_text[i]));
+                }
+                ket = "}";
+            }
+            break;
+
+        case CONFIG_ITEM_FLOAT:
+            type = _("float");
+            if (item->min.f != 0.f || item->max.f != 0.f)
+            {
+                sprintf(psz_buffer, "%s [%f .. %f]", type,
+                        item->min.f, item->max.f);
+                type = psz_buffer;
+            }
+            break;
+
+        case CONFIG_ITEM_BOOL:
+            bra = type = ket = "";
+            prefix = ", --no-";
+            suffix = item->value.i ? _(" (default enabled)")
+                                   : _(" (default disabled)");
+            break;
+       default:
+            return;
+    }
+
+    print_section(m, section, color, desc);
+
+    /* Add short option if any */
+    char shortopt[4];
+    if (item->i_short != '\0')
+        sprintf(shortopt, "-%c,", item->i_short);
+    else
+        strcpy(shortopt, "   ");
+
+    if (CONFIG_CLASS(item->i_type) == CONFIG_ITEM_BOOL)
+        printf(color ? WHITE"  %s --%s"      "%s%s%s%s%s "GRAY
+                     : "  %s --%s%s%s%s%s%s ", shortopt, item->psz_name,
+               prefix, item->psz_name, bra, type, ket);
+    else
+        printf(color ? WHITE"  %s --%s"YELLOW"%s%s%s%s%s "GRAY
+                     : "  %s --%s%s%s%s%s%s ", shortopt, item->psz_name,
+               "", "",  /* XXX */      bra, type, ket);
+
+    /* Wrap description */
+    int offset = PADDING_SPACES - strlen(item->psz_name)
+               - strlen(bra) - strlen(type) - strlen(ket) - 1;
+    if (CONFIG_CLASS(item->i_type) == CONFIG_ITEM_BOOL)
+        offset -= strlen(item->psz_name) + strlen(prefix);
+    if (offset < 0)
+    {
+        fputc('\n', stdout);
+        offset = PADDING_SPACES + LINE_START;
+    }
+    printf("%*s", offset, "");
+
+    sprintf(psz_buffer, "%s%s", module_gettext(m, item->psz_text), suffix);
+    print_desc(psz_buffer, PADDING_SPACES + LINE_START, color);
+
+    if (desc && (item->psz_longtext != NULL && item->psz_longtext[0]))
+    {   /* Wrap long description */
+        printf("%*s", LINE_START + 2, "");
+        sprintf(psz_buffer, "%s%s", module_gettext(m, item->psz_longtext),
+                suffix);
+        print_desc(psz_buffer, LINE_START + 2, false);
+    }
+}
+
+
 static void Usage (vlc_object_t *p_this, char const *psz_search)
 {
-#define FORMAT_STRING "  %s --%s%s%s%s%s%s%s "
-    /* short option ------'    | | | | | | |
-     * option name ------------' | | | | | |
-     * <bra ---------------------' | | | | |
-     * option type or "" ----------' | | | |
-     * ket> -------------------------' | | |
-     * padding spaces -----------------' | |
-     * comment --------------------------' |
-     * comment suffix ---------------------'
-     *
-     * The purpose of having bra and ket is that we might i18n them as well.
-     */
-
-#define COLOR_FORMAT_STRING (WHITE"  %s --%s"YELLOW"%s%s%s%s%s%s "GRAY)
-#define COLOR_FORMAT_STRING_BOOL (WHITE"  %s --%s%s%s%s%s%s%s "GRAY)
-
-#define LINE_START 8
-#define PADDING_SPACES 25
-#ifdef _WIN32
-#   define OPTION_VALUE_SEP "="
-#else
-#   define OPTION_VALUE_SEP " "
-#endif
-    char psz_spaces_text[PADDING_SPACES+LINE_START+1];
-    char psz_spaces_longtext[LINE_START+3];
-    char psz_format[sizeof(COLOR_FORMAT_STRING)];
-    char psz_format_bool[sizeof(COLOR_FORMAT_STRING_BOOL)];
-    char psz_buffer[10000];
-    char psz_short[4];
-    int i_width = ConsoleWidth() - (PADDING_SPACES+LINE_START+1);
-    int i_width_description = i_width + PADDING_SPACES - 1;
     bool b_advanced    = var_InheritBool( p_this, "advanced" );
     bool b_description = var_InheritBool( p_this, "help-verbose" );
-    bool b_description_hack;
     bool b_color       = var_InheritBool( p_this, "color" );
     bool b_has_advanced = false;
     bool b_found       = false;
@@ -297,25 +458,10 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
     bool b_strict = psz_search && *psz_search == '=';
     if( b_strict ) psz_search++;
 
-    memset( psz_spaces_text, ' ', PADDING_SPACES+LINE_START );
-    psz_spaces_text[PADDING_SPACES+LINE_START] = '\0';
-    memset( psz_spaces_longtext, ' ', LINE_START+2 );
-    psz_spaces_longtext[LINE_START+2] = '\0';
 #ifndef _WIN32
     if( !isatty( 1 ) )
 #endif
         b_color = false; // don't put color control codes in a .txt file
-
-    if( b_color )
-    {
-        strcpy( psz_format, COLOR_FORMAT_STRING );
-        strcpy( psz_format_bool, COLOR_FORMAT_STRING_BOOL );
-    }
-    else
-    {
-        strcpy( psz_format, FORMAT_STRING );
-        strcpy( psz_format_bool, FORMAT_STRING );
-    }
 
     /* List all modules */
     size_t count;
@@ -326,7 +472,7 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
     {
         module_t *p_parser = list[i];
         module_config_t *p_item = NULL;
-        module_config_t *p_section = NULL;
+        const module_config_t *section = NULL;
         module_config_t *p_end = p_parser->p_config + p_parser->confsize;
         const char *objname = module_get_object (p_parser);
 
@@ -395,284 +541,16 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
              p_item < p_end;
              p_item++ )
         {
-            char *psz_text, *psz_spaces = psz_spaces_text;
-            const char *psz_bra = NULL, *psz_type = NULL, *psz_ket = NULL;
-            const char *psz_suf = "", *psz_prefix = NULL;
-            signed int i;
-            size_t i_cur_width;
-
-            /* Skip removed options */
             if( p_item->b_removed )
-            {
-                continue;
-            }
-            /* Skip advanced options if requested */
+                continue; /* Skip removed options */
+
             if( p_item->b_advanced && !b_advanced )
-            {
+            {   /* Skip advanced options unless requested */
                 b_has_advanced = true;
                 continue;
             }
 
-            switch( CONFIG_CLASS(p_item->i_type) )
-            {
-            case 0: // hint class
-                switch( p_item->i_type )
-                {
-                case CONFIG_HINT_CATEGORY:
-                case CONFIG_HINT_USAGE:
-                    if( !strcmp( "main", objname ) )
-                    {
-                        if( b_color )
-                            utf8_fprintf( stdout, GREEN "\n %s\n" GRAY,
-                                          module_gettext( p_parser, p_item->psz_text ) );
-                        else
-                            utf8_fprintf( stdout, "\n %s\n",
-                                          module_gettext( p_parser, p_item->psz_text ) );
-                    }
-                    if( b_description && p_item->psz_longtext )
-                    {
-                        if( b_color )
-                            utf8_fprintf( stdout, CYAN " %s\n" GRAY,
-                                          module_gettext( p_parser, p_item->psz_longtext ) );
-                        else
-                            utf8_fprintf( stdout, " %s\n",
-                                          module_gettext( p_parser, p_item->psz_longtext ) );
-                }
-                break;
-
-                case CONFIG_SECTION:
-                    p_section = p_item;
-                    break;
-                }
-                break;
-
-            case CONFIG_ITEM_STRING:
-                print_help_section( p_parser, p_section, b_color,
-                                    b_description );
-                p_section = NULL;
-                psz_bra = OPTION_VALUE_SEP "<";
-                psz_type = _("string");
-                psz_ket = ">";
-
-                if( p_item->list_count )
-                {
-                    psz_bra = OPTION_VALUE_SEP "{";
-                    psz_type = psz_buffer;
-                    psz_buffer[0] = '\0';
-                    for( i = 0; i < p_item->list_count; i++ )
-                    {
-                        if( i ) strcat( psz_buffer, "," );
-                        strcat( psz_buffer, p_item->list.psz[i] );
-                    }
-                    psz_ket = "}";
-                }
-                break;
-            case CONFIG_ITEM_INTEGER:
-                print_help_section( p_parser, p_section, b_color,
-                                    b_description );
-                p_section = NULL;
-                psz_bra = OPTION_VALUE_SEP "<";
-                psz_type = _("integer");
-                psz_ket = ">";
-
-                if( p_item->min.i || p_item->max.i )
-                {
-                    sprintf( psz_buffer, "%s [%"PRId64" .. %"PRId64"]",
-                             psz_type, p_item->min.i, p_item->max.i );
-                    psz_type = psz_buffer;
-                }
-
-                if( p_item->list_count )
-                {
-                    psz_bra = OPTION_VALUE_SEP "{";
-                    psz_type = psz_buffer;
-                    psz_buffer[0] = '\0';
-                    for( i = 0; i < p_item->list_count; i++ )
-                    {
-                        if( i ) strcat( psz_buffer, ", " );
-                        sprintf( psz_buffer + strlen(psz_buffer), "%i (%s)",
-                                 p_item->list.i[i],
-                                 module_gettext( p_parser, p_item->list_text[i] ) );
-                    }
-                    psz_ket = "}";
-                }
-                break;
-            case CONFIG_ITEM_FLOAT:
-                print_help_section( p_parser, p_section, b_color,
-                                    b_description );
-                p_section = NULL;
-                psz_bra = OPTION_VALUE_SEP "<";
-                psz_type = _("float");
-                psz_ket = ">";
-                if( p_item->min.f || p_item->max.f )
-                {
-                    sprintf( psz_buffer, "%s [%f .. %f]", psz_type,
-                             p_item->min.f, p_item->max.f );
-                    psz_type = psz_buffer;
-                }
-                break;
-            case CONFIG_ITEM_BOOL:
-                print_help_section( p_parser, p_section, b_color,
-                                    b_description );
-                p_section = NULL;
-                psz_bra = ""; psz_type = ""; psz_ket = "";
-                psz_suf = p_item->value.i ? _(" (default enabled)") :
-                                            _(" (default disabled)");
-                break;
-            }
-
-            if( !psz_type )
-            {
-                continue;
-            }
-
-            /* Add short option if any */
-            if( p_item->i_short )
-            {
-                sprintf( psz_short, "-%c,", p_item->i_short );
-            }
-            else
-            {
-                strcpy( psz_short, "   " );
-            }
-
-            i = PADDING_SPACES - strlen( p_item->psz_name )
-                 - strlen( psz_bra ) - strlen( psz_type )
-                 - strlen( psz_ket ) - 1;
-
-            if( CONFIG_CLASS(p_item->i_type) == CONFIG_ITEM_BOOL )
-            {
-                psz_prefix =  ", --no-";
-                i -= strlen( p_item->psz_name ) + strlen( psz_prefix );
-            }
-
-            if( i < 0 )
-            {
-                psz_spaces[0] = '\n';
-                i = 0;
-            }
-            else
-            {
-                psz_spaces[i] = '\0';
-            }
-
-            if( CONFIG_CLASS(p_item->i_type) == CONFIG_ITEM_BOOL )
-            {
-                utf8_fprintf( stdout, psz_format_bool, psz_short,
-                              p_item->psz_name, psz_prefix, p_item->psz_name,
-                              psz_bra, psz_type, psz_ket, psz_spaces );
-            }
-            else
-            {
-                utf8_fprintf( stdout, psz_format, psz_short, p_item->psz_name,
-                         "", "", psz_bra, psz_type, psz_ket, psz_spaces );
-            }
-
-            psz_spaces[i] = ' ';
-
-            /* We wrap the rest of the output */
-            sprintf( psz_buffer, "%s%s", module_gettext( p_parser, p_item->psz_text ),
-                     psz_suf );
-            b_description_hack = b_description;
-
- description:
-            psz_text = psz_buffer;
-            i_cur_width = b_description && !b_description_hack
-                          ? i_width_description
-                          : i_width;
-            if( !*psz_text ) strcpy(psz_text, " ");
-            while( *psz_text )
-            {
-                char *psz_parser, *psz_word;
-                size_t i_end = strlen( psz_text );
-
-                /* If the remaining text fits in a line, print it. */
-                if( i_end <= i_cur_width )
-                {
-                    if( b_color )
-                    {
-                        if( !b_description || b_description_hack )
-                            utf8_fprintf( stdout, BLUE"%s\n"GRAY, psz_text );
-                        else
-                            utf8_fprintf( stdout, "%s\n", psz_text );
-                    }
-                    else
-                    {
-                        utf8_fprintf( stdout, "%s\n", psz_text );
-                    }
-                    break;
-                }
-
-                /* Otherwise, eat as many words as possible */
-                psz_parser = psz_text;
-                do
-                {
-                    psz_word = psz_parser;
-                    psz_parser = strchr( psz_word, ' ' );
-                    /* If no space was found, we reached the end of the text
-                     * block; otherwise, we skip the space we just found. */
-                    psz_parser = psz_parser ? psz_parser + 1
-                                            : psz_text + i_end;
-
-                } while( (size_t)(psz_parser - psz_text) <= i_cur_width );
-
-                /* We cut a word in one of these cases:
-                 *  - it's the only word in the line and it's too long.
-                 *  - we used less than 80% of the width and the word we are
-                 *    going to wrap is longer than 40% of the width, and even
-                 *    if the word would have fit in the next line. */
-                if( psz_word == psz_text
-             || ( (size_t)(psz_word - psz_text) < 80 * i_cur_width / 100
-             && (size_t)(psz_parser - psz_word) > 40 * i_cur_width / 100 ) )
-                {
-                    char c = psz_text[i_cur_width];
-                    psz_text[i_cur_width] = '\0';
-                    if( b_color )
-                    {
-                        if( !b_description || b_description_hack )
-                            utf8_fprintf( stdout, BLUE"%s\n%s"GRAY,
-                                          psz_text, psz_spaces );
-                        else
-                            utf8_fprintf( stdout, "%s\n%s",
-                                          psz_text, psz_spaces );
-                    }
-                    else
-                    {
-                        utf8_fprintf( stdout, "%s\n%s", psz_text, psz_spaces );
-                    }
-                    psz_text += i_cur_width;
-                    psz_text[0] = c;
-                }
-                else
-                {
-                    psz_word[-1] = '\0';
-                    if( b_color )
-                    {
-                        if( !b_description || b_description_hack )
-                            utf8_fprintf( stdout, BLUE"%s\n%s"GRAY,
-                                          psz_text, psz_spaces );
-                        else
-                            utf8_fprintf( stdout, "%s\n%s",
-                                          psz_text, psz_spaces );
-                    }
-                    else
-                    {
-                        utf8_fprintf( stdout, "%s\n%s", psz_text, psz_spaces );
-                    }
-                    psz_text = psz_word;
-                }
-            }
-
-            if( b_description_hack && p_item->psz_longtext )
-            {
-                sprintf( psz_buffer, "%s%s",
-                         module_gettext( p_parser, p_item->psz_longtext ),
-                         psz_suf );
-                b_description_hack = false;
-                psz_spaces = psz_spaces_longtext;
-                utf8_fprintf( stdout, "%s", psz_spaces );
-                goto description;
-            }
+            print_item(p_parser, p_item, &section, b_color, b_description);
         }
     }
 
