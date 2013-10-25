@@ -1877,6 +1877,7 @@ vlc_module_begin ()
     add_string( "input-title-format", "$Z", INPUT_TITLE_FORMAT_TEXT, INPUT_TITLE_FORMAT_LONGTEXT, false );
 
 /* Decoder options */
+    set_subcategory( SUBCAT_INPUT_VCODEC )
     add_category_hint( N_("Decoders"), CODEC_CAT_LONGTEXT , true )
     add_string( "codec", NULL, CODEC_TEXT,
                 CODEC_LONGTEXT, true )
