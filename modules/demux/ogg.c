@@ -243,7 +243,7 @@ static int Demux( demux_t * p_demux )
     bool b_canseek;
 
     int i_active_streams = p_sys->i_streams;
-    for ( int i; i < p_sys->i_streams; i++ )
+    for ( int i=0; i < p_sys->i_streams; i++ )
     {
         if ( p_sys->pp_stream[i]->b_finished )
             i_active_streams--;
@@ -1323,7 +1323,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
 {
     demux_sys_t *p_ogg = p_demux->p_sys  ;
     ogg_packet oggpacket;
-    int i_stream;
+    int i_stream = 0;
 
     p_ogg->i_total_length = stream_Size ( p_demux->s );
     msg_Dbg( p_demux, "File length is %"PRId64" bytes", p_ogg->i_total_length );
