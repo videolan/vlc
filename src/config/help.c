@@ -445,23 +445,66 @@ static void print_item(const module_t *m, const module_config_t *item,
     }
 }
 
+static bool module_match(const module_t *m, const char *pattern, bool strict)
+{
+    if (pattern == NULL)
+        return true;
+
+    const char *objname = module_get_object(m);
+
+    if (strict ? (strcmp(objname, pattern) == 0)
+               : (strstr(objname, pattern) != NULL))
+        return true;
+
+    for (unsigned i = 0; i < m->i_shortcuts; i++)
+    {
+        const char *shortcut = m->pp_shortcuts[i];
+
+        if (strict ? (strcmp(shortcut, pattern) == 0)
+                   : (strstr(shortcut, pattern) != NULL))
+            return true;
+    }
+    return false;
+}
+
+static bool module_show(const module_t *m, bool advanced)
+{
+    for (size_t i = 0; i < m->confsize; i++)
+    {
+        const module_config_t *item = m->p_config + i;
+
+        if (!CONFIG_ITEM(item->i_type))
+            continue;
+        if (item->b_removed)
+            continue;
+        if ((!advanced) && item->b_advanced)
+            continue;
+        return true;
+    }
+    return false;
+}
 
 static void Usage (vlc_object_t *p_this, char const *psz_search)
 {
-    bool b_advanced    = var_InheritBool( p_this, "advanced" );
-    bool b_description = var_InheritBool( p_this, "help-verbose" );
-    bool b_color       = var_InheritBool( p_this, "color" );
     bool b_has_advanced = false;
-    bool b_found       = false;
+    bool found = false;
     unsigned i_only_advanced = 0; /* Number of modules ignored because they
                                * only have advanced options */
-    bool b_strict = psz_search && *psz_search == '=';
-    if( b_strict ) psz_search++;
+    bool strict = false;
+    if (psz_search != NULL && psz_search[0] == '=')
+    {
+        strict = true;
+        psz_search++;
+    }
 
+    bool color = false;
 #ifndef _WIN32
-    if( !isatty( 1 ) )
+    if (isatty(STDOUT_FILENO))
+        color = var_InheritBool(p_this, "color");
 #endif
-        b_color = false; // don't put color control codes in a .txt file
+
+    const bool desc = var_InheritBool(p_this, "help-verbose");
+    const bool advanced = var_InheritBool(p_this, "advanced");
 
     /* List all modules */
     size_t count;
@@ -470,124 +513,61 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
     /* Enumerate the config for each module */
     for (size_t i = 0; i < count; i++)
     {
-        module_t *p_parser = list[i];
-        module_config_t *p_item = NULL;
+        const module_t *m = list[i];
         const module_config_t *section = NULL;
-        module_config_t *p_end = p_parser->p_config + p_parser->confsize;
-        const char *objname = module_get_object (p_parser);
+        const char *objname = module_get_object(m);
 
-        if( psz_search &&
-            ( b_strict ? strcmp( objname, psz_search )
-                       : !strstr( objname, psz_search ) ) )
-        {
-            char *const *pp_shortcuts = p_parser->pp_shortcuts;
-            unsigned i;
-            for( i = 0; i < p_parser->i_shortcuts; i++ )
-            {
-                if( b_strict ? !strcmp( psz_search, pp_shortcuts[i] )
-                             : !!strstr( pp_shortcuts[i], psz_search ) )
-                    break;
-            }
-            if( i == p_parser->i_shortcuts )
-                continue;
-        }
+        if (m->i_config_items == 0)
+            continue; /* Ignore modules without config options */
+        if (!module_match(m, psz_search, strict))
+            continue;
+        found = true;
 
-        /* Ignore modules without config options */
-        if( !p_parser->i_config_items )
-        {
+        if (!module_show(m, advanced))
+        {   /* Ignore modules with only advanced config options if requested */
+            i_only_advanced++;
             continue;
         }
 
-        /* Ignore modules with only advanced config options if requested */
-        if( !b_advanced )
-        {
-            for( p_item = p_parser->p_config;
-                 p_item < p_end;
-                 p_item++ )
-            {
-                if( CONFIG_ITEM(p_item->i_type) &&
-                    !p_item->b_advanced && !p_item->b_removed ) break;
-            }
-
-            if( p_item == p_end )
-            {
-                i_only_advanced++;
-                continue;
-            }
-        }
-
-        b_found = true;
-
         /* Print name of module */
-        if( b_color )
-            utf8_fprintf( stdout, "\n " GREEN "%s" GRAY " (%s)\n",
-                          module_gettext( p_parser, p_parser->psz_longname ),
-                          objname );
-        else
-            utf8_fprintf( stdout, "\n %s\n",
-                          module_gettext(p_parser, p_parser->psz_longname ) );
-        if( p_parser->psz_help )
-        {
-            if( b_color )
-                utf8_fprintf( stdout, CYAN" %s\n"GRAY,
-                              module_gettext( p_parser, p_parser->psz_help ) );
-            else
-                utf8_fprintf( stdout, " %s\n",
-                              module_gettext( p_parser, p_parser->psz_help ) );
-        }
+        printf(color ? "\n " GREEN "%s" GRAY " (%s)\n" : "\n %s\n",
+               module_gettext(m, m->psz_longname), objname);
+        if (m->psz_help != NULL)
+            printf(color ? CYAN" %s\n"GRAY : " %s\n",
+                   module_gettext(m, m->psz_help));
 
         /* Print module options */
-        for( p_item = p_parser->p_config;
-             p_item < p_end;
-             p_item++ )
+        for (size_t i = 0; i < m->confsize; i++)
         {
-            if( p_item->b_removed )
-                continue; /* Skip removed options */
+            const module_config_t *item = m->p_config + i;
 
-            if( p_item->b_advanced && !b_advanced )
+            if (item->b_removed)
+                continue; /* Skip removed options */
+            if (item->b_advanced && !advanced)
             {   /* Skip advanced options unless requested */
                 b_has_advanced = true;
                 continue;
             }
-
-            print_item(p_parser, p_item, &section, b_color, b_description);
+            print_item(m, item, &section, color, desc);
         }
     }
 
     if( b_has_advanced )
-    {
-        if( b_color )
-            utf8_fprintf( stdout, "\n" WHITE "%s" GRAY " %s\n", _( "Note:" ),
-           _( "add --advanced to your command line to see advanced options."));
-        else
-            utf8_fprintf( stdout, "\n%s %s\n", _( "Note:" ),
-           _( "add --advanced to your command line to see advanced options."));
-    }
-
+        printf(color ? "\n" WHITE "%s" GRAY " %s\n"
+                     : "\n%s %s\n", _( "Note:" ), _( "add --advanced to your "
+                                     "command line to see advanced options."));
     if( i_only_advanced > 0 )
     {
-        if( b_color )
-            utf8_fprintf( stdout, "\n" WHITE "%s" GRAY " ", _( "Note:" ) );
-        else
-            utf8_fprintf( stdout, "\n%s ", _( "Note:" ) );
-
-        utf8_fprintf( stdout, vlc_ngettext("%u module was not displayed "
-                                     "because it only has advanced options.\n",
-                                           "%u modules were not displayed "
-                                  "because they only have advanced options.\n",
-                      i_only_advanced ), i_only_advanced );
+        printf(color ? "\n" WHITE "%s" GRAY " " : "\n%s ", _( "Note:" ) );
+        printf(vlc_ngettext("%u module was not displayed because it only has "
+               "advanced options.\n", "%u modules were not displayed because "
+               "they only have advanced options.\n", i_only_advanced),
+               i_only_advanced);
     }
-    else if( !b_found )
-    {
-        if( b_color )
-            utf8_fprintf( stdout, "\n" WHITE "%s" GRAY "\n",
-                       _( "No matching module found. Use --list or " \
-                          "--list-verbose to list available modules." ) );
-        else
-            utf8_fprintf( stdout, "\n%s\n",
-                       _( "No matching module found. Use --list or " \
-                          "--list-verbose to list available modules." ) );
-    }
+    else if (!found)
+        printf(color ? "\n" WHITE "%s" GRAY "\n" : "\n%s\n",
+               _("No matching module found. Use --list or "
+                 "--list-verbose to list available modules."));
 
     /* Release the module list */
     module_list_free (list);
