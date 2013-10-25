@@ -38,7 +38,7 @@
 
 enum vlc_inhibit_api
 {
-    FDO_SS, /**< KDE >= 4 and GNOME >= 3.6 */
+    FDO_SS, /**< KDE >= 4 and GNOME >= 3.10 */
     FDO_PM, /**< KDE and GNOME <= 2.26 */
     MATE,  /**< >= 1.0 */
     GNOME, /**< GNOME 2.26..3.4 */
