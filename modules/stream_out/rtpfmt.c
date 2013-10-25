@@ -65,23 +65,16 @@ static int rtp_xiph_pack_headers(size_t room, void *p_extra, size_t i_extra,
     unsigned packet_size[XIPH_MAX_HEADER_COUNT];
     void *packet[XIPH_MAX_HEADER_COUNT];
     unsigned packet_count;
-    int val = xiph_SplitHeaders(packet_size, packet, &packet_count,
-                                i_extra, p_extra);
-    if (val != VLC_SUCCESS)
-        return val;
+    if (xiph_SplitHeaders(packet_size, packet, &packet_count,
+                                i_extra, p_extra))
+        return VLC_EGENERIC;;
     if (packet_count < 3)
-    {
-        val = VLC_EGENERIC;
-        goto free;
-    }
+        return VLC_EGENERIC;;
 
     if (theora_pixel_fmt != NULL)
     {
         if (packet_size[0] < 42)
-        {
-            val = VLC_EGENERIC;
-            goto free;
-        }
+            return VLC_EGENERIC;
         *theora_pixel_fmt = (((uint8_t *)packet[0])[41] >> 3) & 0x03;
     }
 
@@ -100,10 +93,7 @@ static int rtp_xiph_pack_headers(size_t room, void *p_extra, size_t i_extra,
                 + packet_size[0] + packet_size[1] + packet_size[2];
     *p_buffer = malloc(*i_buffer);
     if (*p_buffer == NULL)
-    {
-        val = VLC_ENOMEM;
-        goto free;
-    }
+        return VLC_ENOMEM;
 
     uint8_t *p = *p_buffer + room;
     /* Number of headers */
@@ -126,12 +116,7 @@ static int rtp_xiph_pack_headers(size_t room, void *p_extra, size_t i_extra,
         p += packet_size[i];
     }
 
-    val = VLC_SUCCESS;
-free:
-    for (unsigned i = 0; i < packet_count; i++)
-        free(packet[i]);
-
-    return val;
+    return VLC_SUCCESS;
 }
 
 static char *rtp_xiph_b64_oob_config(void *p_extra, size_t i_extra,

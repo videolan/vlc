@@ -326,7 +326,7 @@ static int ProcessHeaders( decoder_t *p_dec )
                            p_dec->fmt_in.i_extra, p_dec->fmt_in.p_extra) )
         return VLC_EGENERIC;
     if( i_count < 2 )
-        goto error;
+        return VLC_EGENERIC;;
 
     oggpacket.granulepos = -1;
     oggpacket.e_o_s = 0;
@@ -339,7 +339,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     if( ProcessInitialHeader( p_dec, &oggpacket ) != VLC_SUCCESS )
     {
         msg_Err( p_dec, "initial Speex header is corrupted" );
-        goto error;
+        return VLC_EGENERIC;;
     }
 
     /* The next packet in order is the comments header */
@@ -357,14 +357,7 @@ static int ProcessHeaders( decoder_t *p_dec )
                 p_dec->fmt_in.p_extra, p_dec->fmt_out.i_extra );
     }
 
-    for( unsigned i = 0; i < i_count; i++ )
-        free( pp_data[i] );
     return VLC_SUCCESS;
-
-error:
-    for( unsigned i = 0; i < i_count; i++ )
-        free( pp_data[i] );
-    return VLC_EGENERIC;
 }
 
 /*****************************************************************************

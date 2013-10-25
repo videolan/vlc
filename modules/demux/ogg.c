@@ -1949,10 +1949,6 @@ static bool Ogg_IsVorbisFormatCompatible( const es_format_t *p_new, const es_for
             b_match = false;
     }
 
-    for( unsigned i = 0; i < i_new_count; i++ )
-        free( pp_new_data[i] );
-    for( unsigned i = 0; i < i_old_count; i++ )
-        free( pp_old_data[i] );
     return b_match;
 }
 
@@ -2033,10 +2029,7 @@ static bool Ogg_IsOpusFormatCompatible( const es_format_t *p_new,
                   memcmp(p_old_map, p_new_map,
                       i_new_channel_count*sizeof(*p_new_map)) == 0;
     }
-    for( unsigned i = 0; i < i_new_count; i++ )
-        free( pp_new_data[i] );
-    for( unsigned i = 0; i < i_old_count; i++ )
-        free( pp_old_data[i] );
+
     return b_match;
 }
 
@@ -2114,9 +2107,6 @@ static void Ogg_ExtractXiphMeta( demux_t *p_demux, es_format_t *p_fmt,
     {
         p_demux->info.i_update |= INPUT_UPDATE_TITLE_LIST;
     }
-
-    for( unsigned i = 0; i < i_count; i++ )
-        free( pp_data[i] );
 }
 static void Ogg_ExtractMeta( demux_t *p_demux, es_format_t *p_fmt, const uint8_t *p_headers, int i_headers )
 {

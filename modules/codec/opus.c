@@ -241,13 +241,12 @@ static int ProcessHeaders( decoder_t *p_dec )
     unsigned pi_size[XIPH_MAX_HEADER_COUNT];
     void     *pp_data[XIPH_MAX_HEADER_COUNT];
     unsigned i_count;
-    int ret = VLC_EGENERIC;
 
     if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
                            p_dec->fmt_in.i_extra, p_dec->fmt_in.p_extra) )
         return VLC_EGENERIC;
     if( i_count < 2 )
-        goto end;
+        return VLC_EGENERIC;;
 
     oggpacket.granulepos = -1;
     oggpacket.e_o_s = 0;
@@ -257,14 +256,10 @@ static int ProcessHeaders( decoder_t *p_dec )
     oggpacket.b_o_s = 1; /* yes this actually is a b_o_s packet :) */
     oggpacket.bytes  = pi_size[0];
     oggpacket.packet = pp_data[0];
-    ret = ProcessInitialHeader( p_dec, &oggpacket );
+    int ret = ProcessInitialHeader( p_dec, &oggpacket );
 
     if (ret != VLC_SUCCESS)
         msg_Err( p_dec, "initial Opus header is corrupted" );
-
-end:
-    for( unsigned i = 0; i < i_count; i++ )
-        free( pp_data[i] );
 
     return ret;
 }

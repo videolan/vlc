@@ -664,9 +664,6 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
                     p_stream->i_keyframe_granule_shift =
                         ( (op.packet[40] & 0x03) << 3 ) | ( (op.packet[41] & 0xe0) >> 5 );
                 }
-
-                for( unsigned i = 0; i < i_count; i++ )
-                    free( pp_data[i] );
             }
             else if( p_stream->i_fourcc == VLC_CODEC_DIRAC )
             {
@@ -751,8 +748,6 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
                 if( p_og )
                     block_ChainAppend( &p_hdr, p_og );
             }
-            for( unsigned i = 0; i < i_count; i++ )
-                free( pp_data[i] );
         }
         else if( p_stream->i_fourcc != VLC_CODEC_FLAC &&
                  p_stream->i_fourcc != VLC_CODEC_DIRAC )

@@ -249,7 +249,7 @@ static int ProcessHeaders( decoder_t *p_dec )
                            p_dec->fmt_in.i_extra, p_dec->fmt_in.p_extra) )
         return VLC_EGENERIC;
     if( i_count < 3 )
-        goto error;
+        return VLC_EGENERIC;
 
     oggpacket.granulepos = -1;
     oggpacket.e_o_s = 0;
@@ -404,15 +404,11 @@ static int ProcessHeaders( decoder_t *p_dec )
                 p_dec->fmt_in.p_extra, p_dec->fmt_out.i_extra );
     }
 
-    for( unsigned i = 0; i < i_count; i++ )
-        free( pp_data[i] );
     /* Clean up the decoder setup info... we're done with it */
     th_setup_free( ts );
     return VLC_SUCCESS;
 
 error:
-    for( unsigned i = 0; i < i_count; i++ )
-        free( pp_data[i] );
     /* Clean up the decoder setup info... we're done with it */
     th_setup_free( ts );
     return VLC_EGENERIC;
