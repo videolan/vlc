@@ -417,9 +417,6 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
                 }
                 break;
 
-                case CONFIG_HINT_SUBCATEGORY:
-                    if( strcmp( "main", objname ) )
-                        break;
                 case CONFIG_SECTION:
                     p_section = p_item;
                     break;

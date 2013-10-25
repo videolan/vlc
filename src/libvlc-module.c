@@ -1440,7 +1440,6 @@ static const char *const mouse_wheel_texts[] =
  * Quick usage guide for the configuration options:
  *
  * add_category_hint( N_(text), N_(longtext), b_advanced_option )
- * add_subcategory_hint( N_(text), N_(longtext), b_advanced_option )
  * add_usage_hint( N_(text), b_advanced_option )
  * add_string( option_name, value, N_(text), N_(longtext),
                b_advanced_option )

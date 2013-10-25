@@ -110,8 +110,6 @@ enum vlc_module_properties
 
 /* Configuration hint types */
 #define CONFIG_HINT_CATEGORY                0x02  /* Start of new category */
-#define CONFIG_HINT_SUBCATEGORY             0x03  /* Start of sub-category */
-#define CONFIG_HINT_SUBCATEGORY_END         0x04  /* End of sub-category */
 #define CONFIG_HINT_USAGE                   0x05  /* Usage information */
 
 #define CONFIG_CATEGORY                     0x06 /* Set category */
@@ -361,12 +359,6 @@ VLC_METADATA_EXPORTS
 
 #define add_category_hint( text, longtext, advc ) \
     add_typeadv_inner( CONFIG_HINT_CATEGORY, text, longtext, advc )
-
-#define add_subcategory_hint( text, longtext ) \
-    add_typedesc_inner( CONFIG_HINT_SUBCATEGORY, text, longtext )
-
-#define end_subcategory_hint \
-    add_type_inner( CONFIG_HINT_SUBCATEGORY_END )
 
 #define add_usage_hint( text ) \
     add_typedesc_inner( CONFIG_HINT_USAGE, text, NULL )
