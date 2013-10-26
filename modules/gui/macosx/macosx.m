@@ -36,6 +36,8 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
 
+#include "CompatibilityFixes.h"
+
 /*****************************************************************************
  * External prototypes
  *****************************************************************************/
@@ -139,9 +141,11 @@ vlc_module_begin()
     set_subcategory(SUBCAT_INTERFACE_MAIN)
     cannot_unload_broken_library()
 
+    BOOL b_have_mavericks = OSX_REDACTED;
+
     set_section(N_("Appearance"), 0)
         add_bool("macosx-interfacestyle", false, INTERFACE_STYLE_TEXT, INTERFACE_STYLE_LONGTEXT, false)
-        add_bool("macosx-nativefullscreenmode", false, NATIVE_FULLSCREEN_MODE_ON_LION_TEXT, NATIVE_FULLSCREEN_MODE_ON_LION_LONGTEXT, false)
+        add_bool("macosx-nativefullscreenmode", b_have_mavericks, NATIVE_FULLSCREEN_MODE_ON_LION_TEXT, NATIVE_FULLSCREEN_MODE_ON_LION_LONGTEXT, false)
         add_bool("macosx-icon-change", true, ICONCHANGE_TEXT, ICONCHANGE_LONGTEXT, true)
         add_bool("macosx-show-playback-buttons", false, JUMPBUTTONS_TEXT, JUMPBUTTONS_LONGTEXT, false)
         add_bool("macosx-show-playmode-buttons", false, PLAYMODEBUTTONS_TEXT, PLAYMODEBUTTONS_LONGTEXT, false)
