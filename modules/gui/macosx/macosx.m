@@ -141,7 +141,7 @@ vlc_module_begin()
     set_subcategory(SUBCAT_INTERFACE_MAIN)
     cannot_unload_broken_library()
 
-    BOOL b_have_mavericks = OSX_REDACTED;
+    BOOL b_have_mavericks = OSX_MAVERICKS;
 
     set_section(N_("Appearance"), 0)
         add_bool("macosx-interfacestyle", false, INTERFACE_STYLE_TEXT, INTERFACE_STYLE_LONGTEXT, false)
