@@ -29,7 +29,13 @@
 #include <vlc_network.h>
 
 #include <CoreFoundation/CoreFoundation.h>
+
+#import <TargetConditionals.h>
+#if TARGET_OS_IPHONE
+#include <CFNetwork/CFProxySupport.h>
+#else
 #include <CoreServices/CoreServices.h>
+#endif
 
 /**
  * Determines the network proxy server to use (if any).
