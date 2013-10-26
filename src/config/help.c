@@ -44,6 +44,7 @@ static void PauseConsole (void);
 # define ShowConsole() (void)0
 # define PauseConsole() (void)0
 # include <unistd.h>
+# include <termios.h>
 # include <sys/ioctl.h>
 #endif
 
