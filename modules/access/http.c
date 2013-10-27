@@ -584,13 +584,6 @@ connect:
         free( p_access->psz_demux );
         p_access->psz_demux = strdup( "podcast" );
     }
-    else if( p_sys->psz_mime &&
-             !strncasecmp( p_sys->psz_mime, "application/xspf+xml", 20 ) &&
-             ( memchr( " ;\t", p_sys->psz_mime[20], 4 ) != NULL ) )
-    {
-        free( p_access->psz_demux );
-        p_access->psz_demux = strdup( "xspf-open" );
-    }
 
     if( p_sys->b_reconnect ) msg_Dbg( p_access, "auto re-connect enabled" );
 
