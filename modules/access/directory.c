@@ -198,10 +198,7 @@ int DirInit (access_t *p_access, DIR *handle)
     p_access->pf_read  = NULL;
     p_access->pf_block = DirBlock;
     p_access->pf_seek  = NULL;
-    p_access->pf_control= DirControl;
-    free (p_access->psz_demux);
-    p_access->psz_demux = strdup ("xspf-open");
-
+    p_access->pf_control = DirControl;
     return VLC_SUCCESS;
 
 error:
@@ -482,6 +479,10 @@ int DirControl( access_t *p_access, int i_query, va_list args )
         case ACCESS_GET_PTS_DELAY:
             *va_arg( args, int64_t * ) = DEFAULT_PTS_DELAY * 1000;
             break;
+
+        case ACCESS_GET_CONTENT_TYPE:
+            *va_arg( args, char** ) = strdup("application/xspf+xml");
+            return VLC_SUCCESS;
 
         default:
             return VLC_EGENERIC;
