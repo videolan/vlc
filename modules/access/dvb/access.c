@@ -172,8 +172,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Set up access */
-    free( p_access->psz_demux );
-    p_access->psz_demux = strdup( "m3u8" );
     p_access->pf_read = NULL;
     p_access->pf_control = Control;
     p_access->pf_seek = NULL;
@@ -372,6 +370,10 @@ static int Control( access_t *p_access, int i_query, va_list args )
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = false;
             break;
+
+        case ACCESS_GET_CONTENT_TYPE:
+            *va_arg( args, char** ) = strdup("application/vnd.apple.mpegurl"); // m3u8
+            return VLC_SUCCESS;
 
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
