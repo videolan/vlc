@@ -514,15 +514,15 @@ void luaopen_net_intf( lua_State *L )
 {
     lua_newtable( L );
     luaL_register( L, NULL, vlclua_net_intf_reg );
-#define ADD_CONSTANT( name, value )    \
-    lua_pushinteger( L, value ); \
-    lua_setfield( L, -2, name );
-    ADD_CONSTANT( "POLLIN", POLLIN )
-    ADD_CONSTANT( "POLLPRI", POLLPRI )
-    ADD_CONSTANT( "POLLOUT", POLLOUT )
-    ADD_CONSTANT( "POLLERR", POLLERR )
-    ADD_CONSTANT( "POLLHUP", POLLHUP )
-    ADD_CONSTANT( "POLLNVAL", POLLNVAL )
+#define ADD_CONSTANT( value )    \
+    lua_pushinteger( L, POLL##value ); \
+    lua_setfield( L, -2, "POLL"#value );
+    ADD_CONSTANT( IN )
+    ADD_CONSTANT( PRI )
+    ADD_CONSTANT( OUT )
+    ADD_CONSTANT( ERR )
+    ADD_CONSTANT( HUP )
+    ADD_CONSTANT( NVAL )
     lua_setfield( L, -2, "net" );
 }
 
