@@ -255,7 +255,7 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
     luaopen_input( L );
     luaopen_msg( L );
     luaopen_misc( L );
-    luaopen_net( L );
+    luaopen_net_intf( L );
     luaopen_object( L );
     luaopen_osd( L );
     luaopen_playlist( L );

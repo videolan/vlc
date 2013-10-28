@@ -491,8 +491,7 @@ static int vlclua_opendir( lua_State *L )
 /*****************************************************************************
  *
  *****************************************************************************/
-static const luaL_Reg vlclua_net_reg[] = {
-    { "url_parse", vlclua_url_parse },
+static const luaL_Reg vlclua_net_intf_reg[] = {
     { "listen_tcp", vlclua_net_listen_tcp },
     { "connect_tcp", vlclua_net_connect_tcp },
     { "close", vlclua_net_close },
@@ -503,15 +502,18 @@ static const luaL_Reg vlclua_net_reg[] = {
     { "read", vlclua_fd_read },
     { "write", vlclua_fd_write },
 #endif
+    /* The following functions do not depend on intf_thread_t and do not really
+     * belong in net.* but are left here for backward compatibility: */
+    { "url_parse", vlclua_url_parse },
     { "stat", vlclua_stat }, /* Not really "net" */
     { "opendir", vlclua_opendir }, /* Not really "net" */
     { NULL, NULL }
 };
 
-void luaopen_net( lua_State *L )
+void luaopen_net_intf( lua_State *L )
 {
     lua_newtable( L );
-    luaL_register( L, NULL, vlclua_net_reg );
+    luaL_register( L, NULL, vlclua_net_intf_reg );
 #define ADD_CONSTANT( name, value )    \
     lua_pushinteger( L, value ); \
     lua_setfield( L, -2, name );
@@ -521,5 +523,19 @@ void luaopen_net( lua_State *L )
     ADD_CONSTANT( "POLLERR", POLLERR )
     ADD_CONSTANT( "POLLHUP", POLLHUP )
     ADD_CONSTANT( "POLLNVAL", POLLNVAL )
+    lua_setfield( L, -2, "net" );
+}
+
+static const luaL_Reg vlclua_net_generic_reg[] = {
+    { "url_parse", vlclua_url_parse },
+    { "stat", vlclua_stat }, /* Not really "net" */
+    { "opendir", vlclua_opendir }, /* Not really "net" */
+    { NULL, NULL }
+};
+
+void luaopen_net_generic( lua_State *L )
+{
+    lua_newtable( L );
+    luaL_register( L, NULL, vlclua_net_generic_reg );
     lua_setfield( L, -2, "net" );
 }
