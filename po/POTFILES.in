@@ -389,7 +389,7 @@ modules/codec/quicktime.c
 modules/codec/rawvideo.c
 modules/codec/schroedinger.c
 modules/codec/sdl_image.c
-modules/codec/shine/shine_mod.c
+modules/codec/shine.c
 modules/codec/speex.c
 modules/codec/spudec/parse.c
 modules/codec/spudec/spudec.c
