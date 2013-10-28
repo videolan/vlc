@@ -35,17 +35,21 @@
 #include "config/configuration.h"
 #include "libvlc.h"
 
-#if defined( _WIN32 ) && !VLC_WINSTORE_APP
+#if defined( _WIN32 )
 # include <vlc_charset.h>
-static void ShowConsole (void);
-static void PauseConsole (void);
 # define wcwidth(cp) (cp, 1) /* LOL */
 #else
-# define ShowConsole() (void)0
-# define PauseConsole() (void)0
 # include <unistd.h>
 # include <termios.h>
 # include <sys/ioctl.h>
+#endif
+
+#if defined( _WIN32 ) && !VLC_WINSTORE_APP
+static void ShowConsole (void);
+static void PauseConsole (void);
+#else
+# define ShowConsole() (void)0
+# define PauseConsole() (void)0
 #endif
 
 static void Help (vlc_object_t *, const char *);
