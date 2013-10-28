@@ -73,7 +73,8 @@ static int transcode_audio_initialize_filters( sout_stream_t *p_stream, sout_str
         id->p_decoder->p_module = NULL;
         return VLC_EGENERIC;
     }
-    memcpy( fmt_last, &p_sys->fmt_audio, sizeof( audio_sample_format_t ) );
+    p_sys->fmt_audio.i_rate = fmt_last->i_rate;
+    p_sys->fmt_audio.i_physical_channels = fmt_last->i_physical_channels;
     return VLC_SUCCESS;
 }
 
@@ -227,11 +228,17 @@ int transcode_audio_process( sout_stream_t *p_stream,
         p_audio_buf->i_dts = p_audio_buf->i_pts;
 
         /* Check if audio format has changed, and filters need reinit */
-        if( unlikely( AOUT_FMTS_IDENTICAL( &id->p_decoder->fmt_out.audio, &p_sys->fmt_audio ) ) )
+        if( unlikely( ( id->p_decoder->fmt_out.audio.i_rate != p_sys->fmt_audio.i_rate ) ||
+                      ( id->p_decoder->fmt_out.audio.i_physical_channels != p_sys->fmt_audio.i_physical_channels ) ) )
         {
-            msg_Dbg( p_stream, "Audio changed, trying to reinitialize filters" );
+            msg_Info( p_stream, "Audio changed, trying to reinitialize filters" );
             if( id->p_af_chain != NULL )
                 aout_FiltersDelete( (vlc_object_t *)NULL, id->p_af_chain );
+
+            /* decoders don't set audio.i_format, but audio filters use it */
+            id->p_decoder->fmt_out.audio.i_format = id->p_decoder->fmt_out.i_codec;
+            aout_FormatPrepare( &id->p_decoder->fmt_out.audio );
+
             if( transcode_audio_initialize_filters( p_stream, id, p_sys, &id->p_decoder->fmt_out.audio ) != VLC_SUCCESS )
                 return VLC_EGENERIC;
 
