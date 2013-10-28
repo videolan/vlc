@@ -781,6 +781,12 @@ static void Close( vlc_object_t * p_this )
     {
         output_segment_t *segment = vlc_array_item_at_index( p_sys->segments_t, 0 );
         vlc_array_remove( p_sys->segments_t, 0 );
+        if( p_sys->b_delsegs && p_sys->i_numsegs && segment->psz_filename )
+        {
+            msg_Dbg( p_access, "Removing segment number %d name %s", segment->i_segment_number, segment->psz_filename );
+            vlc_unlink( segment->psz_filename );
+        }
+
         destroySegment( segment );
     }
     vlc_array_destroy( p_sys->segments_t );
