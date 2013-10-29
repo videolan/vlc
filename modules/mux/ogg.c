@@ -44,8 +44,17 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define INDEXINTVL_TEXT N_("Index interval")
+#define INDEXINTVL_LONGTEXT N_("Minimal index interval, in microseconds. " \
+    "Set to 0 to disable index creation.")
+#define INDEXRATIO_TEXT N_("Index size ratio")
+#define INDEXRATIO_LONGTEXT N_(\
+    "Set index size ratio. Alters default (60min content) or estimated size." )
+
 static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
+
+#define SOUT_CFG_PREFIX "sout-ogg-"
 
 vlc_module_begin ()
     set_description( N_("Ogg/OGM muxer") )
@@ -53,6 +62,10 @@ vlc_module_begin ()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_MUX )
     add_shortcut( "ogg", "ogm" )
+    add_integer_with_range( SOUT_CFG_PREFIX "indexintvl", 1000, 0, INT_MAX,
+                            INDEXINTVL_TEXT, INDEXINTVL_LONGTEXT, true )
+    add_float_with_range( SOUT_CFG_PREFIX "indexratio", 1.0, 1.0, 1000,
+                          INDEXRATIO_TEXT, INDEXRATIO_LONGTEXT, true )
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -66,7 +79,8 @@ static int DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 static int MuxBlock ( sout_mux_t *, sout_input_t * );
 
-static block_t *OggCreateHeaders( sout_mux_t * );
+static bool OggCreateHeaders( sout_mux_t * );
+static void OggFillSkeletonFishead( uint8_t *p_buffer, sout_mux_t *p_mux );
 
 /*****************************************************************************
  * Misc declarations
@@ -75,6 +89,7 @@ static block_t *OggCreateHeaders( sout_mux_t * );
 /* Skeleton */
 #define FISBONE_BASE_SIZE 52
 #define FISBONE_BASE_OFFSET 44
+#define INDEX_BASE_SIZE 42
 
 /* Structures used for OggDS headers used in ogm files */
 
@@ -145,10 +160,26 @@ typedef struct
     ogg_stream_state os;
 
     oggds_header_t *p_oggds_header;
-    bool b_fisbone_done;
     bool b_started;
     bool b_finished;
 
+    struct
+    {
+         bool b_fisbone_done;
+         bool b_index_done;
+         /* Skeleton index storage */
+         unsigned char *p_index;
+         uint64_t i_index_size;
+         uint64_t i_index_payload; /* real index size */
+         uint64_t i_index_count;
+         /* backup values for rewriting index page later */
+         uint64_t i_index_offset;  /* sout offset of the index page */
+         int64_t i_index_packetno;  /* index packet no */
+         int i_index_pageno;
+         /* index creation tracking values */
+         uint64_t i_last_keyframe_pos;
+         uint64_t i_last_keyframe_time;
+    } skeleton;
 } ogg_stream_t;
 
 struct sout_mux_sys_t
@@ -174,12 +205,23 @@ struct sout_mux_sys_t
         int i_packet_no;
         ogg_stream_state os;
         bool b_head_done;
+        /* backup values for rewriting fishead page later */
+        uint64_t i_fishead_offset;  /* sout offset of the fishead page */
+        int i_index_intvl;
+        float i_index_ratio;
     } skeleton;
+
+    /* access position */
+    ssize_t i_pos;
+    ssize_t i_data_start;
+    ssize_t i_segment_start;
 };
 
 static void OggSetDate( block_t *, mtime_t , mtime_t  );
 static block_t *OggStreamFlush( sout_mux_t *, ogg_stream_state *, mtime_t );
-static block_t *OggCreateStreamFooter( sout_mux_t *p_mux, ogg_stream_t *p_stream );
+static void OggCreateStreamFooter( sout_mux_t *p_mux, ogg_stream_t *p_stream );
+static void OggRewriteFisheadPage( sout_mux_t *p_mux );
+static bool AllocateIndex( sout_mux_t *p_mux, sout_input_t *p_input );
 
 /*****************************************************************************
  * Open: Open muxer
@@ -199,7 +241,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_can_add_streams = true;
     p_sys->i_del_streams  = 0;
     p_sys->pp_del_streams = 0;
-
+    p_sys->i_pos = 0;
+    p_sys->skeleton.i_index_intvl =
+            var_InheritInteger( p_this, SOUT_CFG_PREFIX "indexintvl" );
+    p_sys->skeleton.i_index_ratio =
+            var_InheritFloat( p_this, SOUT_CFG_PREFIX "indexratio" );
     p_mux->p_sys        = p_sys;
     p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;
@@ -223,36 +269,38 @@ static void Close( vlc_object_t * p_this )
 {
     sout_mux_t     *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys = p_mux->p_sys;
+    ogg_stream_t *p_stream;
 
     msg_Info( p_mux, "Close" );
 
     if( p_sys->i_del_streams )
     {
-        block_t *p_og = NULL;
-        mtime_t i_dts = p_sys->pp_del_streams[p_sys->i_del_streams - 1]->i_dts;
-
         /* Close the current ogg stream */
-        msg_Dbg( p_mux, "writing footer" );
+        msg_Dbg( p_mux, "writing footers" );
 
         for(int i = 0; i < p_mux->i_nb_inputs; i++ )
         {
-            block_ChainAppend( &p_og, OggCreateStreamFooter( p_mux, (ogg_stream_t *) p_mux->pp_inputs[i]->p_sys ) );
+            p_stream = (ogg_stream_t *) p_mux->pp_inputs[i]->p_sys;
+            OggCreateStreamFooter( p_mux, p_stream );
+            free( p_stream->skeleton.p_index );
         }
 
         /* Remove deleted logical streams */
         for(int i = 0; i < p_sys->i_del_streams; i++ )
         {
-            block_ChainAppend( &p_og, OggCreateStreamFooter( p_mux, p_sys->pp_del_streams[i] ) );
-            ogg_stream_clear( &p_sys->pp_del_streams[i]->os );
-            FREENULL( p_sys->pp_del_streams[i]->p_oggds_header );
-            FREENULL( p_sys->pp_del_streams[i] );
+            OggCreateStreamFooter( p_mux, p_sys->pp_del_streams[i] );
+            free( p_sys->pp_del_streams[i]->p_oggds_header );
+            free( p_sys->pp_del_streams[i] );
+            free( p_sys->pp_del_streams[i]->skeleton.p_index );
         }
-        FREENULL( p_sys->pp_del_streams );
+        free( p_sys->pp_del_streams );
         p_sys->i_streams -= p_sys->i_del_streams;
+    }
 
-        /* Write footer */
-        OggSetDate( p_og, i_dts, 0 );
-        sout_AccessOutWrite( p_mux->p_access, p_og );
+    /* rewrite fishead with final values */
+    if ( p_sys->skeleton.b_create && p_sys->skeleton.b_head_done )
+    {
+        OggRewriteFisheadPage( p_mux );
     }
 
     free( p_sys );
@@ -313,7 +361,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     p_stream->p_oggds_header = 0;
 
-    /* FIXME: https://trac.videolan.org/vlc/ticket/1412 */
     switch( p_input->p_fmt->i_cat )
     {
     case VIDEO_ES:
@@ -505,7 +552,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
             ( p_og = OggStreamFlush( p_mux, &p_stream->os, 0 ) ) )
         {
             OggSetDate( p_og, p_stream->i_dts, p_stream->i_length );
-            sout_AccessOutWrite( p_mux->p_access, p_og );
+            p_mux->p_sys->i_pos += sout_AccessOutWrite( p_mux->p_access, p_og );
         }
 
         /* move input in delete queue */
@@ -527,6 +574,75 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_input->p_sys = NULL;
 
     return 0;
+}
+
+/*****************************************************************************
+ * Ogg Skeleton helpers
+ *****************************************************************************/
+static int WriteQWVariableLE( uint64_t i_64, uint64_t i_offset,
+                              uint8_t *p_buffer, int i_buffer_size )
+{
+    uint8_t *p_dest = p_buffer + i_offset;
+    int i_written = 0;
+
+    for(;;)
+    {
+        if ( p_dest - p_buffer >= i_buffer_size ) return -1;
+
+        *p_dest = (uint8_t) ( i_64 & 0x7F );
+        i_64 >>= 7;
+        i_written++;
+
+        if ( i_64 == 0 )
+        {
+            *p_dest |= 0x80;
+            return i_written;
+        }
+
+        p_dest++;
+    }
+}
+
+static bool AddIndexEntry( sout_mux_t *p_mux, uint64_t i_time, sout_input_t *p_input )
+{
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
+    ogg_stream_t *p_stream = (ogg_stream_t *) p_input->p_sys;
+    uint64_t i_posdelta;
+    uint64_t i_timedelta;
+    if ( !p_sys->skeleton.b_create || p_mux->p_sys->skeleton.i_index_intvl == 0
+         || !p_stream->skeleton.p_index )
+        return false;
+
+    if ( p_stream->skeleton.i_last_keyframe_pos == 0 )
+        p_stream->skeleton.i_last_keyframe_pos = p_sys->i_segment_start;
+    i_posdelta = p_sys->i_pos - p_stream->skeleton.i_last_keyframe_pos;
+    i_timedelta = i_time - p_stream->skeleton.i_last_keyframe_time;
+
+    if ( i_timedelta <= ( (unsigned int) p_mux->p_sys->skeleton.i_index_intvl * 1000 )
+         || i_posdelta <= 0xFFFF )
+        return false;
+
+    /* do inserts */
+    int i_ret;
+    if ( !p_stream->skeleton.p_index ) return false;
+    uint64_t i_offset = p_stream->skeleton.i_index_payload;
+    i_ret = WriteQWVariableLE( i_posdelta, i_offset, p_stream->skeleton.p_index,
+                               p_stream->skeleton.i_index_size );
+    if ( i_ret == -1 ) return false;
+    i_offset += i_ret;
+    i_ret = WriteQWVariableLE( i_timedelta, i_offset, p_stream->skeleton.p_index,
+                               p_stream->skeleton.i_index_size );
+    if ( i_ret == -1 ) return false;
+    p_stream->skeleton.i_index_payload = i_offset + i_ret;
+    p_stream->skeleton.i_index_count++;
+
+    /* update diff points */
+    p_stream->skeleton.i_last_keyframe_pos = p_sys->i_pos;
+    p_stream->skeleton.i_last_keyframe_time = i_time;
+    msg_Dbg( p_mux, "Added index on stream %d entry %"PRId64" %"PRId64,
+             p_stream->i_serial_no, p_sys->i_pos - p_sys->i_segment_start, i_time );
+
+    return true;
 }
 
 /*****************************************************************************
@@ -570,6 +686,22 @@ static block_t *OggStreamPageOut( sout_mux_t *p_mux,
                                   ogg_stream_state *p_os, mtime_t i_pts )
 {
     return OggStreamGetPage( p_mux, p_os, i_pts, false );
+}
+
+static void OggGetSkeletonIndex( uint8_t **pp_buffer, long *pi_size, ogg_stream_t *p_stream )
+{
+    uint8_t *p_buffer = *pp_buffer;
+    p_buffer = calloc( INDEX_BASE_SIZE + p_stream->skeleton.i_index_size, sizeof(uint8_t) );
+    if ( !p_buffer ) return;
+    *pp_buffer = p_buffer;
+
+    memcpy( p_buffer, "index", 6 );
+    SetDWLE( &p_buffer[6], p_stream->i_serial_no );
+    SetQWLE( &p_buffer[10], p_stream->skeleton.i_index_count ); /* num keypoints */
+    SetQWLE( &p_buffer[18], 1000000 );
+    SetQWLE( &p_buffer[34], p_stream->i_length );
+    memcpy( p_buffer + INDEX_BASE_SIZE, p_stream->skeleton.p_index, p_stream->skeleton.i_index_payload );
+    *pi_size = INDEX_BASE_SIZE + p_stream->skeleton.i_index_size;
 }
 
 static void OggGetSkeletonFisbone( uint8_t **pp_buffer, long *pi_size,
@@ -698,14 +830,13 @@ static void OggGetSkeletonFisbone( uint8_t **pp_buffer, long *pi_size,
 
 static void OggFillSkeletonFishead( uint8_t *p_buffer, sout_mux_t *p_mux )
 {
-    VLC_UNUSED( p_mux );
     memcpy( p_buffer, "fishead", 8 );
     SetWLE( &p_buffer[8], 4 );
     SetWLE( &p_buffer[10], 0 );
     SetQWLE( &p_buffer[20], 1000 );
     SetQWLE( &p_buffer[36], 1000 );
-    SetQWLE( &p_buffer[64], 0 );
-    SetQWLE( &p_buffer[72], 0 );
+    SetQWLE( &p_buffer[64], p_mux->p_sys->i_pos - p_mux->p_sys->i_segment_start ); /* segment length */
+    SetQWLE( &p_buffer[72], p_mux->p_sys->i_data_start - p_mux->p_sys->i_segment_start ); /* data start offset */
 }
 
 static int32_t OggFillDsHeader( uint8_t *p_buffer, oggds_header_t *p_oggds_header, int i_cat )
@@ -762,7 +893,7 @@ static int32_t OggFillDsHeader( uint8_t *p_buffer, oggds_header_t *p_oggds_heade
     return index;
 }
 
-static block_t *OggCreateHeaders( sout_mux_t *p_mux )
+static bool OggCreateHeaders( sout_mux_t *p_mux )
 {
     block_t *p_hdr = NULL;
     block_t *p_og = NULL;
@@ -770,7 +901,15 @@ static block_t *OggCreateHeaders( sout_mux_t *p_mux )
     ogg_stream_t *p_stream;
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     int i;
-    p_sys->skeleton.b_create = !! p_mux->i_nb_inputs;
+
+    if( sout_AccessOutControl( p_mux->p_access,
+                               ACCESS_OUT_CAN_SEEK,
+                               &p_sys->skeleton.b_create ) )
+    {
+        p_sys->skeleton.b_create = false;
+    }
+
+    p_sys->skeleton.b_create &= !! p_mux->i_nb_inputs;
 
     /* no skeleton for solo vorbis/speex/opus tracks */
     if ( p_mux->i_nb_inputs == 1 && p_mux->pp_inputs[0]->p_fmt->i_cat == AUDIO_ES )
@@ -799,7 +938,7 @@ static block_t *OggCreateHeaders( sout_mux_t *p_mux )
         ogg_stream_init( &p_sys->skeleton.os, p_sys->skeleton.i_serial_no );
         op.bytes = 80;
         op.packet = calloc( 1, op.bytes );
-        if ( op.packet == NULL ) return NULL;
+        if ( op.packet == NULL ) return false;
         op.b_o_s = 1;
         op.e_o_s = 0;
         op.granulepos = 0;
@@ -809,6 +948,7 @@ static block_t *OggCreateHeaders( sout_mux_t *p_mux )
         p_og = OggStreamFlush( p_mux, &p_sys->skeleton.os, 0 );
         block_ChainAppend( &p_hdr, p_og );
         p_sys->skeleton.b_head_done = true;
+        p_sys->skeleton.i_fishead_offset = p_sys->i_pos;
     }
 
     /* Write header for each stream. All b_o_s (beginning of stream) packets
@@ -896,7 +1036,7 @@ static block_t *OggCreateHeaders( sout_mux_t *p_mux )
                 /* ds header */
                 op.packet = malloc( sizeof(*p_stream->p_oggds_header) + p_stream->p_oggds_header->i_size );
                 if( !op.packet )
-                    return NULL;
+                    return false;
                 op.bytes  = OggFillDsHeader( op.packet, p_stream->p_oggds_header, p_stream->i_cat );
                 op.b_o_s  = 1;
                 op.e_o_s  = 0;
@@ -918,9 +1058,9 @@ static block_t *OggCreateHeaders( sout_mux_t *p_mux )
         {
             sout_input_t *p_input = p_mux->pp_inputs[i];
             ogg_stream_t *p_stream = (ogg_stream_t*)p_input->p_sys;
-            if ( p_stream->b_fisbone_done ) continue;
+            if ( p_stream->skeleton.b_fisbone_done ) continue;
             OggGetSkeletonFisbone( &op.packet, &op.bytes, p_input, p_mux );
-            if ( op.packet == NULL ) return NULL;
+            if ( op.packet == NULL ) return false;
             op.b_o_s = 0;
             op.e_o_s = 0;
             op.granulepos = 0;
@@ -928,7 +1068,43 @@ static block_t *OggCreateHeaders( sout_mux_t *p_mux )
             ogg_stream_packetin( &p_sys->skeleton.os, &op );
             p_og = OggStreamFlush( p_mux, &p_sys->skeleton.os, 0 );
             block_ChainAppend( &p_hdr, p_og );
-            p_stream->b_fisbone_done = true;
+            p_stream->skeleton.b_fisbone_done = true;
+        }
+    }
+
+    /* Write previous headers */
+    p_mux->p_sys->i_pos += sout_AccessOutWrite( p_mux->p_access, p_hdr );
+    p_hdr = NULL;
+
+    /* Create indexes if any */
+    for( i = 0; i < p_mux->i_nb_inputs; i++ )
+    {
+        sout_input_t *p_input = p_mux->pp_inputs[i];
+        ogg_stream_t *p_stream = (ogg_stream_t*)p_input->p_sys;
+        /* flush stream && save offset */
+        if ( p_sys->skeleton.b_create && !p_stream->skeleton.b_index_done )
+        {
+            if ( !p_stream->skeleton.p_index ) AllocateIndex( p_mux, p_input );
+            if ( p_stream->skeleton.p_index )
+            {
+                msg_Dbg( p_mux, "Creating index for stream %d", p_stream->i_serial_no );
+                OggGetSkeletonIndex( &op.packet, &op.bytes, p_stream );
+                if ( op.packet == NULL ) return false;
+                op.b_o_s = 0;
+                op.e_o_s = 0;
+                op.granulepos = 0;
+                op.packetno = p_sys->skeleton.i_packet_no++;
+
+                /* backup some values */
+                p_stream->skeleton.i_index_offset = p_mux->p_sys->i_pos;
+                p_stream->skeleton.i_index_packetno = p_sys->skeleton.os.packetno;
+                p_stream->skeleton.i_index_pageno = p_sys->skeleton.os.pageno;
+
+                ogg_stream_packetin( &p_sys->skeleton.os, &op );
+                p_og = OggStreamFlush( p_mux, &p_sys->skeleton.os, 0 );
+                p_mux->p_sys->i_pos += sout_AccessOutWrite( p_mux->p_access, p_og );
+            }
+            p_stream->skeleton.b_index_done = true;
         }
     }
 
@@ -1054,15 +1230,56 @@ static block_t *OggCreateHeaders( sout_mux_t *p_mux )
     {
         p_og->i_flags |= BLOCK_FLAG_HEADER;
     }
-    return p_hdr;
+
+    /* Write previous headers */
+    p_mux->p_sys->i_pos += sout_AccessOutWrite( p_mux->p_access, p_hdr );
+
+    return true;
 }
 
-static block_t *OggCreateStreamFooter( sout_mux_t *p_mux, ogg_stream_t *p_stream )
+static void OggCreateStreamFooter( sout_mux_t *p_mux, ogg_stream_t *p_stream )
 {
-    block_t *p_og, *p_hdr = NULL;
+    block_t *p_og;
     ogg_packet op;
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
 
-    p_stream->b_fisbone_done = false;
+    /* as stream is finished, overwrite the index, if there was any */
+    if ( p_sys->skeleton.b_create && p_stream->skeleton.p_index
+         && p_stream->skeleton.i_index_payload )
+    {
+        sout_AccessOutSeek( p_mux->p_access, p_stream->skeleton.i_index_offset );
+        OggGetSkeletonIndex( &op.packet, &op.bytes, p_stream );
+        if ( op.packet != NULL )
+        {
+            msg_Dbg(p_mux, "Rewriting index at %"PRId64, p_stream->skeleton.i_index_offset );
+            ogg_stream_reset_serialno( &p_sys->skeleton.os, p_sys->skeleton.i_serial_no );
+            op.b_o_s = 0;
+            op.e_o_s = 0;
+            op.granulepos = 0;
+            op.packetno = p_stream->skeleton.i_index_packetno + 1;
+            /* fake our stream state */
+            p_sys->skeleton.os.pageno = p_stream->skeleton.i_index_pageno;
+            p_sys->skeleton.os.packetno = p_stream->skeleton.i_index_packetno;
+            p_sys->skeleton.os.granulepos = 0;
+            p_sys->skeleton.os.b_o_s = 1;
+            p_sys->skeleton.os.e_o_s = 0;
+            ogg_stream_packetin( &p_sys->skeleton.os, &op );
+            p_og = OggStreamFlush( p_mux, &p_sys->skeleton.os, 0 );
+            sout_AccessOutWrite( p_mux->p_access, p_og );
+        }
+        sout_AccessOutSeek( p_mux->p_access, p_sys->i_pos );
+    }
+
+    /* clear skeleton */
+    p_stream->skeleton.b_fisbone_done = false;
+    p_stream->skeleton.b_index_done = false;
+    p_stream->skeleton.i_index_offset = 0;
+    p_stream->skeleton.i_index_payload = 0;
+    p_stream->skeleton.i_last_keyframe_pos = 0;
+    p_stream->skeleton.i_last_keyframe_time = 0;
+    /* clear accounting */
+    p_stream->i_num_frames = 0;
+    p_stream->i_num_keyframes = 0;
 
     /* Write eos packet for stream. */
     op.packet = NULL;
@@ -1076,13 +1293,12 @@ static block_t *OggCreateStreamFooter( sout_mux_t *p_mux, ogg_stream_t *p_stream
     /* flush it with all remaining data */
     if( ( p_og = OggStreamFlush( p_mux, &p_stream->os, 0 ) ) )
     {
+        /* Write footer */
         OggSetDate( p_og, p_stream->i_dts, p_stream->i_length );
-        block_ChainAppend( &p_hdr, p_og );
+        p_mux->p_sys->i_pos += sout_AccessOutWrite( p_mux->p_access, p_og );
     }
 
     ogg_stream_clear( &p_stream->os );
-
-    return p_hdr;
 }
 
 static void OggSetDate( block_t *p_og, mtime_t i_dts, mtime_t i_length )
@@ -1109,13 +1325,90 @@ static void OggSetDate( block_t *p_og, mtime_t i_dts, mtime_t i_length )
     }
 }
 
+static void OggRewriteFisheadPage( sout_mux_t *p_mux )
+{
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
+    ogg_packet op;
+    op.bytes = 80;
+    op.packet = calloc( 1, op.bytes );
+    if ( op.packet != NULL )
+    {
+        op.b_o_s = 1;
+        op.e_o_s = 0;
+        op.granulepos = 0;
+        op.packetno = 0;
+        ogg_stream_reset_serialno( &p_sys->skeleton.os, p_sys->skeleton.i_serial_no );
+        OggFillSkeletonFishead( op.packet, p_mux );
+        ogg_stream_packetin( &p_sys->skeleton.os, &op );
+        msg_Dbg( p_mux, "rewriting fishead at %"PRId64, p_mux->p_sys->skeleton.i_fishead_offset );
+        sout_AccessOutSeek( p_mux->p_access, p_mux->p_sys->skeleton.i_fishead_offset );
+        sout_AccessOutWrite( p_mux->p_access,
+                             OggStreamFlush( p_mux, &p_sys->skeleton.os, 0 ) );
+        sout_AccessOutSeek( p_mux->p_access, p_mux->p_sys->i_pos );
+    }
+}
+
+static bool AllocateIndex( sout_mux_t *p_mux, sout_input_t *p_input )
+{
+    ogg_stream_t *p_stream = (ogg_stream_t *) p_input->p_sys;
+    size_t i_size;
+
+    if ( p_stream->i_length )
+    {
+        uint64_t i_interval = p_mux->p_sys->skeleton.i_index_intvl * 1000;
+        uint64_t i;
+
+        if( p_input->p_fmt->i_cat == VIDEO_ES &&
+                p_input->p_fmt->video.i_frame_rate )
+        {
+            /* optimize for fps < 1 */
+            i_interval= __MAX( p_mux->p_sys->skeleton.i_index_intvl * 1000,
+                       INT64_C(10000000) *
+                       p_input->p_fmt->video.i_frame_rate_base /
+                       p_input->p_fmt->video.i_frame_rate );
+        }
+
+        size_t i_tuple_size = 0;
+        /* estimate length of pos value */
+        if ( p_input->p_fmt->i_bitrate )
+        {
+            i = i_interval * p_input->p_fmt->i_bitrate / 1000000;
+            while ( i <<= 1 ) i_tuple_size++;
+        }
+        else
+        {
+            /* Likely 64KB<<keyframe interval<<16MB */
+            /* We can't really guess due to muxing */
+            i_tuple_size = 24 / 8;
+        }
+
+        /* add length of interval value */
+        i = i_interval;
+        while ( i <<= 1 ) i_tuple_size++;
+
+        i_size = i_tuple_size * ( p_stream->i_length / i_interval + 2 );
+    }
+    else
+    {
+        i_size = ( INT64_C(3600) * 11.2 * 1000 / p_mux->p_sys->skeleton.i_index_intvl )
+                * p_mux->p_sys->skeleton.i_index_ratio;
+        msg_Dbg( p_mux, "No stream length, using default allocation for index" );
+    }
+    i_size *= ( 8.0 / 7 ); /* 7bits encoding overhead */
+    msg_Dbg( p_mux, "allocating %"PRId64" bytes for index", i_size );
+    p_stream->skeleton.p_index = calloc( i_size, sizeof(uint8_t) );
+    if ( !p_stream->skeleton.p_index ) return false;
+    p_stream->skeleton.i_index_size = i_size;
+    p_stream->skeleton.i_index_payload = 0;
+    return true;
+}
+
 /*****************************************************************************
  * Mux: multiplex available data in input fifos into the Ogg bitstream
  *****************************************************************************/
 static int Mux( sout_mux_t *p_mux )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    block_t        *p_og = NULL;
     mtime_t        i_dts;
 
     /* End any stream that ends in that group */
@@ -1124,11 +1417,12 @@ static int Mux( sout_mux_t *p_mux )
         /* Remove deleted logical streams */
         for( int i = 0; i < p_sys->i_del_streams; i++ )
         {
-            block_ChainAppend( &p_og, OggCreateStreamFooter( p_mux, p_sys->pp_del_streams[i] ) );
+            OggCreateStreamFooter( p_mux, p_sys->pp_del_streams[i] );
             FREENULL( p_sys->pp_del_streams[i]->p_oggds_header );
             FREENULL( p_sys->pp_del_streams[i] );
         }
         FREENULL( p_sys->pp_del_streams );
+        p_sys->i_del_streams = 0;
     }
 
     if ( p_sys->i_streams == 0 )
@@ -1137,28 +1431,36 @@ static int Mux( sout_mux_t *p_mux )
            From this point, we are allowed to start a new group of logical streams */
         p_sys->skeleton.b_head_done = false;
         p_sys->b_can_add_streams = true;
+        p_sys->i_segment_start = p_sys->i_pos;
     }
 
     if ( p_sys->i_add_streams )
     {
         if ( !p_sys->b_can_add_streams )
         {
-            msg_Warn( p_mux, "Can't add new stream: Considerer increasing sout-mux-caching variable");
+            msg_Warn( p_mux, "Can't add new stream %d/%d: Considerer increasing sout-mux-caching variable", p_sys->i_del_streams, p_mux->p_sys->i_streams);
             msg_Warn( p_mux, "Resetting and setting new identity to current streams");
-            p_sys->skeleton.b_head_done = false;
+
             /* resetting all active streams */
             for ( int i=0; i < p_mux->p_sys->i_streams; i++ )
             {
                 ogg_stream_t * p_stream = (ogg_stream_t *) p_mux->pp_inputs[i]->p_sys;
                 if ( p_stream->b_finished || !p_stream->b_started ) continue;
-                block_ChainAppend( &p_og, OggCreateStreamFooter( p_mux, p_stream ) );
+                OggCreateStreamFooter( p_mux, p_stream );
                 p_stream->i_serial_no = p_sys->i_next_serial_no++;
                 p_stream->i_packet_no = 0;
                 p_stream->b_finished = true;
             }
+
+            /* rewrite fishead with final values */
+            if ( p_sys->skeleton.b_head_done )
+            {
+                OggRewriteFisheadPage( p_mux );
+            }
+
             p_sys->b_can_add_streams = true;
-            sout_AccessOutWrite( p_mux->p_access, p_og );
-            p_og = NULL;
+            p_sys->skeleton.b_head_done = false;
+            p_sys->i_segment_start = p_sys->i_pos;
         }
 
         /* Open new ogg stream */
@@ -1172,19 +1474,21 @@ static int Mux( sout_mux_t *p_mux )
         p_sys->i_streams = p_mux->i_nb_inputs;
         p_sys->i_del_streams = 0;
         p_sys->i_add_streams = 0;
-        block_t *p_header = OggCreateHeaders( p_mux );
-        if( !p_header )
+        p_sys->skeleton.b_create = true;
+
+        if ( ! OggCreateHeaders( p_mux ) )
             return VLC_ENOMEM;
-        block_ChainAppend( &p_og, p_header );
+
+        /* If we're switching to end of headers, then that's data start */
+        if ( p_sys->b_can_add_streams )
+        {
+            msg_Dbg( p_mux, "data starts from %"PRId64, p_sys->i_pos );
+            p_sys->i_data_start = p_sys->i_pos;
+        }
 
         /* Since we started sending secondaryheader or data pages,
              * we're no longer allowed to create new streams, until all streams end */
         p_sys->b_can_add_streams = false;
-
-        /* Write header */
-        OggSetDate( p_og, i_dts, 0 );
-        sout_AccessOutWrite( p_mux->p_access, p_og );
-        p_og = NULL;
     }
 
     /* Do the regular data mux thing */
@@ -1206,6 +1510,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     block_t *p_data = block_FifoGet( p_input->p_fifo );
     block_t *p_og = NULL;
     ogg_packet op;
+    uint64_t i_time;
 
     if( p_stream->i_fourcc != VLC_CODEC_VORBIS &&
         p_stream->i_fourcc != VLC_CODEC_FLAC &&
@@ -1236,6 +1541,9 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
             op.granulepos =
                 ( p_data->i_dts - p_sys->i_start_dts + p_data->i_length ) *
                 (mtime_t)p_input->p_fmt->audio.i_rate / INT64_C(1000000);
+
+            i_time = p_data->i_dts - p_sys->i_start_dts;
+            AddIndexEntry( p_mux, i_time, p_input );
         }
         else if( p_stream->p_oggds_header )
         {
@@ -1253,6 +1561,11 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
             {
                 p_stream->i_num_keyframes++;
                 p_stream->i_last_keyframe = p_stream->i_num_frames;
+
+                /* presentation time */
+                i_time = INT64_C(1000000) * ( p_stream->i_num_frames - 1 ) *
+                         p_input->p_fmt->video.i_frame_rate_base /  p_input->p_fmt->video.i_frame_rate;
+                AddIndexEntry( p_mux, i_time, p_input );
             }
 
             op.granulepos = (p_stream->i_last_keyframe << p_stream->i_keyframe_granule_shift )
@@ -1273,6 +1586,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
             mtime_t dist = dt - p_stream->i_last_keyframe;
             op.granulepos = dt << 31 | (dist&0xff00) << 14
                           | (delay&0x1fff) << 9 | (dist&0xff);
+            AddIndexEntry( p_mux, dt, p_input );
         }
         else if( p_stream->p_oggds_header )
             op.granulepos = ( p_data->i_dts - p_sys->i_start_dts ) * INT64_C(10) /
@@ -1311,7 +1625,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         p_stream->i_dts = -1;
         p_stream->i_length = 0;
 
-        sout_AccessOutWrite( p_mux->p_access, p_og );
+        p_mux->p_sys->i_pos += sout_AccessOutWrite( p_mux->p_access, p_og );
     }
     else
     {
