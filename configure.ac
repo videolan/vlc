@@ -1387,53 +1387,18 @@ AS_IF([test "${enable_altivec}" = "yes"], [
     have_altivec="yes"
   ])
 
-dnl The AltiVec C extensions
-dnl
-dnl There are several possible cases:
-dnl - OS X PPC, gcc 4.x: use -mpim-altivec -force_cpusubtype_ALL, don't
-dnl                      need <altivec.h>
-dnl - OS X PPC, gcc 3.x: need -faltivec, don't need <altivec.h>
-dnl - Linux PPC, gcc 3.4, 4.x: need <altivec.h> which requires -maltivec
-dnl - Linux PPC, gcc 3.3: need <altivec.h> and -maltivec -mabi=altivec
-dnl - Linux PPC, gcc 3.x: need <altivec.h> and -fvec
-dnl - Others: test should fail
   VLC_SAVE_FLAGS
   AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
-  [ac_cv_c_altivec],
-  [# OS X/PPC test (gcc 4.x)
-   CFLAGS="${CFLAGS} -mpim-altivec -force_cpusubtype_ALL"
-   AC_TRY_COMPILE([vector unsigned char foo;],
-     [vec_ld(0, (unsigned char *)0);],
-     [ac_cv_c_altivec="-mpim-altivec -force_cpusubtype_ALL"],
-     [# OS X/PPC test (gcc 3.x)
-      CFLAGS="${CFLAGS} -faltivec"
-      AC_TRY_COMPILE([vector unsigned char foo;],
-        [vec_ld(1 * sizeof(vector float), (unsigned char *)0);],
-        [ac_cv_c_altivec="-faltivec"],
-        dnl Below this are the Linux tests
-        [# Linux/PPC test (gcc 4.x)
-         CFLAGS="${CFLAGS} -maltivec"
-         AC_TRY_COMPILE([#include <altivec.h>],
-           [vec_ld(0, (unsigned char *)0);],
-           [ac_cv_c_altivec="-maltivec"],
-           [# Linux/PPC test (gcc 3.3)
-            CFLAGS="${CFLAGS} -maltivec -mabi=altivec"
-            AC_TRY_COMPILE([#include <altivec.h>],
-              [vec_ld(0, (unsigned char *)0);],
-              [ac_cv_c_altivec=""
-               ac_cv_c_altivec_abi="-maltivec -mabi=altivec"],
-              [# Linux/PPC test (gcc 3.3)
-               CFLAGS="${CFLAGS} -fvec"
-               AC_TRY_COMPILE([#include <altivec.h>],
-                 [vec_ld(0, (unsigned char *)0);],
-                 [ac_cv_c_altivec="-fvec"],
-                 [ac_cv_c_altivec=no])
-              ])
-           ])
-        ])
-     ])
+  [ac_cv_c_altivec], [
+    CFLAGS="${CFLAGS} -maltivec"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+[#include <altivec.h>]], [
+[vec_ld(0, (unsigned char *)0);]])], [
+      ac_cv_c_altivec="-maltivec"
+    ], [
+      ac_cv_c_altivec="no"
+    ])
   ])
-
   VLC_RESTORE_FLAGS
   AS_IF([test "${ac_cv_c_altivec}" != "no"], [
     CPPFLAGS="${CPPFLAGS} ${ac_cv_c_altivec}"
