@@ -22,6 +22,11 @@ GCRYPT_CONF = \
 ifdef HAVE_WIN64
 GCRYPT_CONF += --disable-asm
 endif
+ifdef HAVE_IOS
+GCRYPT_EXTRA_CFLAGS = -fheinous-gnu-extensions
+else
+GCRYPT_EXTRA_CFLAGS =
+endif
 ifdef HAVE_MACOSX
 GCRYPT_CONF += --disable-aesni-support
 else
@@ -37,6 +42,6 @@ endif
 
 .gcrypt: libgcrypt
 	#$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GCRYPT_CONF)
+	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) $(GCRYPT_EXTRA_CFLAGS)" ./configure $(HOSTCONF) $(GCRYPT_CONF)
 	cd $< && $(MAKE) install
 	touch $@
