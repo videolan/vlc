@@ -217,7 +217,7 @@ fi
     --disable-fontconfig \
     --disable-gpg-error \
     --disable-lua \
-    --disable-taglib > ${out}
+    --enable-taglib > ${out}
 
 echo "EXTRA_CFLAGS += ${EXTRA_CFLAGS}" >> config.mak
 echo "EXTRA_LDFLAGS += ${EXTRA_LDFLAGS}" >> config.mak
@@ -313,7 +313,7 @@ ${VLCROOT}/configure \
     --enable-flac \
     --disable-screen \
     --enable-freetype \
-    --disable-taglib \
+    --enable-taglib \
     --disable-mmx \
     --disable-mad > ${out} # MMX and SSE support requires llvm which is broken on Simulator
 fi
