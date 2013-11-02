@@ -61,6 +61,7 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
     memset(&window->handle, 0, sizeof(window->handle));
     window->control = NULL;
     window->sys = NULL;
+    window->type = cfg->type;
 
     const char *type;
     switch (cfg->type) {

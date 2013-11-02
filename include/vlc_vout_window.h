@@ -80,6 +80,8 @@ typedef struct {
 struct vout_window_t {
     VLC_COMMON_MEMBERS
 
+    unsigned type; /**< Window handle type */
+
     /* window handle (mandatory)
      *
      * It must be filled in the open function.
