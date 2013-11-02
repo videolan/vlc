@@ -110,24 +110,19 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
 {
     vlc_gl_t *gl = (vlc_gl_t *)obj;
 
-    /* <EGL/eglplatform.h> defines the list and order of platforms */
+    /* http://www.khronos.org/registry/egl/api/EGL/eglplatform.h defines the
+     * list and order of EGL platforms. */
 #if defined(_WIN32) || defined(__VC32__) \
- && !defined(__CYGWIN__) && !defined(__SCITECH_SNAP__)
+ && !defined(__CYGWIN__) && !defined(__SCITECH_SNAP__) /* Win32 and WinCE */
 # define vlc_eglGetWindow(w) ((w)->handle.hwnd)
 
 #elif defined(__WINSCW__) || defined(__SYMBIAN32__)  /* Symbian */
 # error Symbian EGL not supported.
 
-#elif defined(WL_EGL_PLATFORM)
-# error Wayland EGL not supported.
-
-#elif defined(__GBM__)
-# error Glamor EGL not supported.
-
-#elif defined(ANDROID)
+#elif defined(__ANDROID__) || defined(ANDROID)
 # error Android EGL not supported
 
-#elif defined(__unix__) /* X11 */
+#elif defined(__unix__) /* X11 (tentative) */
 # define vlc_eglGetWindow(w) ((w)->handle.xid)
     /* EGL can only use the default X11 display */
     if (gl->surface->display.x11 != NULL)

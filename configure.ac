@@ -2926,6 +2926,13 @@ EXTEND_HELP_STRING([Video plugins:])
 dnl
 dnl  OpenGL
 dnl
+PKG_CHECK_MODULES([EGL], [egl], [
+  have_egl="yes"
+], [
+  have_egl="no"
+])
+AM_CONDITIONAL([HAVE_EGL], [test "${have_egl}" = "yes"])
+
 PKG_CHECK_MODULES([GL], [gl], [
   have_gl="yes"
 ], [
@@ -2951,16 +2958,6 @@ dnl OpenGL ES 2: depends on EGL 1.1
 PKG_ENABLE_MODULES_VLC([GLES2], [], [glesv2], [OpenGL ES v2 support], [disabled])
 dnl OpenGL ES 1: depends on EGL 1.0
 PKG_ENABLE_MODULES_VLC([GLES1], [], [glesv1_cm], [OpenGL ES v1 support], [disabled])
-
-AC_ARG_ENABLE(egl,
-  [  --enable-egl            OpenGL support through EGL (default disabled)],, [
-  enable_egl="no"
-])
-AS_IF([test "$enable_egl" != "no"], [
-  PKG_CHECK_MODULES([EGL], [egl], [
-    VLC_ADD_PLUGIN([egl])
-  ])
-])
 
 dnl
 dnl  Xlib

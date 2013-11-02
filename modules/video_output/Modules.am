@@ -81,6 +81,10 @@ libxcb_window_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XPROTO_CFLAGS) $(XCB_CFLAGS) $(XCB_KEYSYMS_CFLAGS)
 libxcb_window_plugin_la_LIBADD = $(XPROTO_LIBS) $(XCB_LIBS) $(XCB_KEYSYMS_LIBS)
 
+libglx_plugin_la_SOURCES = glx.c
+libglx_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
+libglx_plugin_la_LIBADD = $(GL_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
+
 if HAVE_XCB
 noinst_LTLIBRARIES += libvlc_xcb_events.la
 vout_LTLIBRARIES += libxcb_x11_plugin.la libxcb_window_plugin.la
@@ -163,18 +167,13 @@ libegl_plugin_la_SOURCES = egl.c
 libegl_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS)
 libegl_plugin_la_LIBADD = $(EGL_LIBS)
 if !HAVE_WIN32
-if !HAVE_DARWIN
+if !HAVE_ANDROID
 libegl_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIBS) -lX11
 endif
 endif
-libegl_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-EXTRA_LTLIBRARIES += libegl_plugin.la
-vout_LTLIBRARIES += $(LTLIBegl)
-
-### GLX ###
-libglx_plugin_la_SOURCES = glx.c
-libglx_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
-libglx_plugin_la_LIBADD = $(GL_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
+if HAVE_EGL
+vout_LTLIBRARIES += libegl_plugin.la
+endif
 
 ### Coloured ASCII art ###
 libcaca_plugin_la_SOURCES = caca.c
