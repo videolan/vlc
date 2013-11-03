@@ -32,7 +32,7 @@
 #include <vlc_plugin.h>
 #include <vlc_opengl.h>
 #include <vlc_vout_window.h>
-#ifdef __unix__
+#ifdef USE_PLATFORM_X11
 # include <vlc_xlib.h>
 #endif
 
@@ -106,66 +106,74 @@ struct gl_api
    EGLint     attr[3];
 };
 
+/* See http://www.khronos.org/registry/egl/api/EGL/eglplatform.h *
+ * for list and order of default EGL platforms. */
+#if defined (_WIN32) || defined (__VC32__) \
+ && !defined (__CYGWIN__) && !defined (__SCITECH_SNAP__) /* Win32 and WinCE */
+
+#elif defined (__WINSCW__) || defined (__SYMBIAN32__)  /* Symbian */
+# error Symbian EGL not supported.
+#elif defined (__ANDROID__) || defined (ANDROID)
+# error Android EGL not supported.
+#elif defined (__unix__) /* X11 (tentative) */
+
+#else
+# error EGL platform not recognized.
+#endif
+
 /**
  * Probe EGL display availability
  */
 static int Open (vlc_object_t *obj, const struct gl_api *api)
 {
     vlc_gl_t *gl = (vlc_gl_t *)obj;
+    vout_window_t *wnd = gl->surface;
+    EGLNativeWindowType window;
 
-    /* http://www.khronos.org/registry/egl/api/EGL/eglplatform.h defines the
-     * list and order of EGL platforms. */
-#if defined(_WIN32) || defined(__VC32__) \
- && !defined(__CYGWIN__) && !defined(__SCITECH_SNAP__) /* Win32 and WinCE */
-# define vlc_eglGetWindow(w) ((w)->handle.hwnd)
-
-#elif defined(__WINSCW__) || defined(__SYMBIAN32__)  /* Symbian */
-# error Symbian EGL not supported.
-
-#elif defined(__ANDROID__) || defined(ANDROID)
-# error Android EGL not supported
-
-#elif defined(__unix__) /* X11 (tentative) */
-# define vlc_eglGetWindow(w) ((w)->handle.xid)
-    /* EGL can only use the default X11 display */
-    if (gl->surface->display.x11 != NULL)
-        return VLC_EGENERIC;
-    if (!vlc_xlib_init (obj))
-        return VLC_EGENERIC;
-
-#else
-# error EGL platform not recognized.
-#endif
-
-    /* Initialize EGL display */
-    /* TODO: support various display types */
-    EGLDisplay dpy = eglGetDisplay (EGL_DEFAULT_DISPLAY);
-    if (dpy == EGL_NO_DISPLAY)
-        return VLC_EGENERIC;
-
-    vlc_gl_sys_t *sys = malloc (sizeof (*sys));
+    vlc_gl_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
+
     gl->sys = sys;
-    sys->display = dpy;
+    sys->display = EGL_NO_DISPLAY;
 
-    EGLint major, minor;
-    if (eglInitialize (dpy, &major, &minor) != EGL_TRUE)
-    {
-        /* No need to call eglTerminate() in this case */
-        free (sys);
-        return VLC_EGENERIC;
-    }
-
-    if (major != 1 || minor < api->min_minor || !CheckAPI (dpy, api->name))
+#ifdef USE_PLATFORM_X11
+    if (wnd->type != VOUT_WINDOW_TYPE_XID || wnd->display.x11 != NULL
+     || !vlc_xlib_init(obj))
         goto error;
 
-    msg_Dbg (obj, "EGL version %s by %s", eglQueryString (dpy, EGL_VERSION),
-             eglQueryString (dpy, EGL_VENDOR));
+    sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    window = wnd->handle.xid;
+
+#elif defined (USE_PLATFORM_WIN32)
+    if (wnd->type != VOUT_WINDOW_TYPE_HWND)
+        goto error;
+
+    sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    window = wnd->handle.hwnd;
+
+#endif
+
+    if (sys->display == EGL_NO_DISPLAY)
+        goto error;
+
+    /* Initialize EGL display */
+    EGLint major, minor;
+    if (eglInitialize(sys->display, &major, &minor) != EGL_TRUE)
+        goto error;
+    msg_Dbg(obj, "EGL version %s by %s",
+            eglQueryString(sys->display, EGL_VERSION),
+            eglQueryString(sys->display, EGL_VENDOR));
+
+    const char *ext = eglQueryString(sys->display, EGL_EXTENSIONS);
+    if (*ext)
+        msg_Dbg(obj, " extensions: %s", ext);
+
+    if (major != 1 || minor < api->min_minor
+     || !CheckAPI(sys->display, api->name))
     {
-        const char *ext = eglQueryString (dpy, EGL_EXTENSIONS);
-        if (*ext)
-            msg_Dbg (obj, " extensions: %s", ext);
+        msg_Err(obj, "cannot select %s API", api->name);
+        goto error;
     }
 
     const EGLint conf_attr[] = {
@@ -178,7 +186,7 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     EGLConfig cfgv[1];
     EGLint cfgc;
 
-    if (eglChooseConfig (dpy, conf_attr, cfgv, 1, &cfgc) != EGL_TRUE
+    if (eglChooseConfig(sys->display, conf_attr, cfgv, 1, &cfgc) != EGL_TRUE
      || cfgc == 0)
     {
         msg_Err (obj, "cannot choose EGL configuration");
@@ -186,14 +194,12 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     }
 
     /* Create a drawing surface */
-    EGLNativeWindowType win = vlc_eglGetWindow(gl->surface);
-    EGLSurface surface = eglCreateWindowSurface (dpy, cfgv[0], win, NULL);
-    if (surface == EGL_NO_SURFACE)
+    sys->surface = eglCreateWindowSurface(sys->display, cfgv[0], window, NULL);
+    if (sys->surface == EGL_NO_SURFACE)
     {
         msg_Err (obj, "cannot create EGL window surface");
         goto error;
     }
-    sys->surface = surface;
 
     if (eglBindAPI (api->api) != EGL_TRUE)
     {
@@ -201,8 +207,8 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
         goto error;
     }
 
-    EGLContext ctx = eglCreateContext (dpy, cfgv[0], EGL_NO_CONTEXT,
-                                       api->attr);
+    EGLContext ctx = eglCreateContext(sys->display, cfgv[0], EGL_NO_CONTEXT,
+                                      api->attr);
     if (ctx == EGL_NO_CONTEXT)
     {
         msg_Err (obj, "cannot create EGL context");
@@ -211,7 +217,6 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     sys->context = ctx;
 
     /* Initialize OpenGL callbacks */
-    gl->sys = sys;
     gl->makeCurrent = MakeCurrent;
     gl->releaseCurrent = ReleaseCurrent;
     gl->swap = SwapBuffers;
@@ -257,7 +262,8 @@ static void Close (vlc_object_t *obj)
     vlc_gl_t *gl = (vlc_gl_t *)obj;
     vlc_gl_sys_t *sys = gl->sys;
 
-    eglTerminate (sys->display);
+    if (sys->display != EGL_NO_DISPLAY)
+        eglTerminate(sys->display);
     free (sys);
 }
 
