@@ -79,25 +79,33 @@ static void ReleaseCurrent (vlc_gl_t *);
 static void SwapBuffers (vlc_gl_t *);
 static void *GetSymbol(vlc_gl_t *, const char *);
 
+static bool CheckToken(const char *haystack, const char *needle)
+{
+    size_t len = strlen(needle);
+
+    while (haystack != NULL)
+    {
+        while (*haystack == ' ')
+            haystack++;
+        if (!strncmp(haystack, needle, len)
+         && (memchr(" ", haystack[len], 2) != NULL))
+            return true;
+
+        haystack = strchr(haystack, ' ');
+    }
+    return false;
+}
+
 static bool CheckAPI (EGLDisplay dpy, const char *api)
 {
     const char *apis = eglQueryString (dpy, EGL_CLIENT_APIS);
-    size_t apilen = strlen (api);
+    return CheckToken(apis, api);
+}
 
-    /* Cannot use strtok_r() on constant string... */
-    do
-    {
-        while (*apis == ' ')
-            apis++;
-        if (!strncmp (apis, api, apilen)
-          && (memchr (" ", apis[apilen], 2) != NULL))
-            return true;
-
-        apis = strchr (apis, ' ');
-    }
-    while (apis != NULL);
-
-    return false;
+static bool CheckClientExt(const char *name)
+{
+    const char *exts = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
+    return CheckToken(exts, name);
 }
 
 struct gl_api
