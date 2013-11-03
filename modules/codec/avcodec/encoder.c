@@ -1299,7 +1299,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         if( avcodec_fill_audio_frame( p_sys->frame, p_sys->p_context->channels,
                                     p_sys->p_context->sample_fmt,
                                     p_sys->b_planar ? p_sys->p_buffer : p_aout_buf->p_buffer,
-                                    __MIN(p_sys->i_buffer_out, p_aout_buf->i_buffer),
+                                    p_sys->b_planar ? p_sys->i_buffer_out : p_aout_buf->i_buffer,
                                     align) < 0 )
         {
                  msg_Err( p_enc, "filling error on encode" );
