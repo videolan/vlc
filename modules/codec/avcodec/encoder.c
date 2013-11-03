@@ -1115,6 +1115,103 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     return p_block;
 }
 
+static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, int buffer_delay, block_t *p_aout_buf, int leftover_samples )
+{
+    block_t *p_block,*p_chain = NULL;
+    //How much we need to copy from new packet
+    const int leftover = leftover_samples * p_sys->p_context->channels * p_sys->i_sample_bytes;
+    int got_packet,i_out;
+
+#if LIBAVUTIL_VERSION_CHECK( 51,27,2,46,100 )
+    const int align = 0;
+#else
+    const int align = 1;
+#endif
+
+    AVPacket packet = {0};
+    avcodec_get_frame_defaults( p_sys->frame );
+    p_sys->frame->format     = p_sys->p_context->sample_fmt;
+    p_sys->frame->nb_samples = leftover_samples + p_sys->i_samples_delay;
+    p_sys->frame->format     = p_sys->p_context->sample_fmt;
+
+
+    p_sys->frame->pts        = date_Get( &p_sys->buffer_date );
+    if( likely( p_sys->frame->pts != AV_NOPTS_VALUE) )
+        date_Increment( &p_sys->buffer_date, p_sys->i_frame_size );
+
+    if( likely( p_aout_buf ) )
+    {
+
+        p_aout_buf->i_nb_samples -= leftover_samples;
+        memcpy( p_sys->p_buffer+buffer_delay, p_aout_buf->p_buffer, leftover );
+
+        // We need to deinterleave from p_aout_buf to p_buffer the leftover bytes
+        if( p_sys->b_planar )
+            aout_Deinterleave( p_sys->p_interleave_buf, p_sys->p_buffer,
+                p_sys->i_frame_size, p_sys->p_context->channels, p_enc->fmt_in.i_codec );
+        else
+            memcpy( p_sys->p_buffer + buffer_delay, p_aout_buf->p_buffer, leftover);
+
+        p_aout_buf->p_buffer     += leftover;
+        p_aout_buf->i_buffer     -= leftover;
+        if( likely( p_sys->frame->pts != AV_NOPTS_VALUE) )
+            p_aout_buf->i_pts         = date_Get( &p_sys->buffer_date );
+    }
+
+    if(unlikely( ( (leftover + buffer_delay) < p_sys->i_buffer_out ) &&
+                 !(p_sys->p_codec->capabilities & CODEC_CAP_SMALL_LAST_FRAME ))
+      )
+    {
+        msg_Dbg( p_enc, "No small last frame support, padding");
+        size_t padding_size = p_sys->i_buffer_out - (leftover+buffer_delay);
+        memset( p_sys->p_buffer + (leftover+buffer_delay), 0, padding_size );
+        buffer_delay += padding_size;
+    }
+    if( avcodec_fill_audio_frame( p_sys->frame, p_sys->p_context->channels,
+            p_sys->p_context->sample_fmt, p_sys->b_planar ? p_sys->p_interleave_buf : p_sys->p_buffer,
+            p_sys->i_buffer_out,
+            align) < 0 )
+    {
+        msg_Err( p_enc, "filling error on fillup" );
+        p_sys->frame->nb_samples = 0;
+    }
+
+
+    p_sys->i_samples_delay = 0;
+
+    p_block = block_Alloc( p_sys->i_buffer_out );
+    av_init_packet( &packet );
+    packet.data = p_block->p_buffer;
+    packet.size = p_block->i_buffer;
+
+    i_out = avcodec_encode_audio2( p_sys->p_context, &packet, p_sys->frame, &got_packet );
+
+    if( unlikely( !got_packet || ( i_out < 0 ) || !packet.size ) )
+    {
+        if( i_out < 0 )
+        {
+            msg_Err( p_enc,"Encoding problem..");
+            return p_chain;
+        }
+        block_Release( p_block );
+        return NULL;
+    }
+
+    p_block->i_buffer = packet.size;
+    p_block->i_length = (mtime_t)1000000 *
+        (mtime_t)p_sys->frame->nb_samples /
+        (mtime_t)p_sys->p_context->sample_rate;
+
+    if( likely( packet.pts != AV_NOPTS_VALUE ) )
+        p_block->i_dts = p_block->i_pts = packet.pts;
+    else
+        p_block->i_dts = p_block->i_pts = VLC_TS_INVALID;
+
+    block_ChainAppend( &p_chain, p_block );
+
+    return p_chain;
+}
+
 /****************************************************************************
  * EncodeAudio: the whole thing
  ****************************************************************************/
@@ -1150,98 +1247,14 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             ( ( p_aout_buf && ( leftover_samples <= p_aout_buf->i_nb_samples ) &&
                ( (leftover_samples + p_sys->i_samples_delay ) >= p_sys->i_frame_size )
               ) ||
-             ( !p_aout_buf ) 
+             ( !p_aout_buf )
             )
          )
     {
-        //How much we need to copy from new packet
-        const int leftover = leftover_samples * p_sys->p_context->channels * p_sys->i_sample_bytes;
-
-#if LIBAVUTIL_VERSION_CHECK( 51,27,2,46,100 )
-        const int align = 0;
-#else
-        const int align = 1;
-#endif
-
-        AVPacket packet = {0};
-        avcodec_get_frame_defaults( p_sys->frame );
-        p_sys->frame->format     = p_sys->p_context->sample_fmt;
-        p_sys->frame->nb_samples = leftover_samples + p_sys->i_samples_delay;
-
-
-        p_sys->frame->pts        = date_Get( &p_sys->buffer_date );
-        if( likely( p_sys->frame->pts != AV_NOPTS_VALUE) )
-            date_Increment( &p_sys->buffer_date, p_sys->i_frame_size );
-
-        if( likely( p_aout_buf ) )
-        {
-
-            p_aout_buf->i_nb_samples -= leftover_samples;
-            memcpy( p_sys->p_buffer+buffer_delay, p_aout_buf->p_buffer, leftover );
-
-            // We need to deinterleave from p_aout_buf to p_buffer the leftover bytes
-            if( p_sys->b_planar )
-                aout_Deinterleave( p_sys->p_interleave_buf, p_sys->p_buffer,
-                    p_sys->i_frame_size, p_sys->p_context->channels, p_enc->fmt_in.i_codec );
-            else
-                memcpy( p_sys->p_buffer + buffer_delay, p_aout_buf->p_buffer, leftover);
-
-            p_aout_buf->p_buffer     += leftover;
-            p_aout_buf->i_buffer     -= leftover;
-            if( likely( p_sys->frame->pts != AV_NOPTS_VALUE) )
-                p_aout_buf->i_pts         = date_Get( &p_sys->buffer_date );
-        }
-
-        if(unlikely( ( (leftover + buffer_delay) < p_sys->i_buffer_out ) &&
-                     !(p_sys->p_codec->capabilities & CODEC_CAP_SMALL_LAST_FRAME ))
-          )
-        {
-            msg_Dbg( p_enc, "No small last frame support, padding");
-            size_t padding_size = p_sys->i_buffer_out - (leftover+buffer_delay);
-            memset( p_sys->p_buffer + (leftover+buffer_delay), 0, padding_size );
-            buffer_delay += padding_size;
-        }
-        if( avcodec_fill_audio_frame( p_sys->frame, p_sys->p_context->channels,
-                p_sys->p_context->sample_fmt, p_sys->b_planar ? p_sys->p_interleave_buf : p_sys->p_buffer,
-                p_sys->i_buffer_out,
-                align) < 0 )
-        {
-            msg_Err( p_enc, "filling error on fillup" );
-            p_sys->frame->nb_samples = 0;
-        }
-
+        p_chain = handle_delay_buffer( p_enc, p_sys, buffer_delay, p_aout_buf, leftover_samples );
         buffer_delay = 0;
-        p_sys->i_samples_delay = 0;
-
-        p_block = block_Alloc( p_sys->i_buffer_out );
-        av_init_packet( &packet );
-        packet.data = p_block->p_buffer;
-        packet.size = p_block->i_buffer;
-
-        i_out = avcodec_encode_audio2( p_sys->p_context, &packet, p_sys->frame, &got_packet );
-
-        if( unlikely( !got_packet || ( i_out < 0 ) || !packet.size ) )
-        {
-            if( i_out < 0 )
-            {
-                msg_Err( p_enc,"Encoding problem..");
-                return p_chain;
-            }
-            block_Release( p_block );
+        if( unlikely( !p_chain ) )
             return NULL;
-        }
-
-        p_block->i_buffer = packet.size;
-        p_block->i_length = (mtime_t)1000000 *
-            (mtime_t)p_sys->frame->nb_samples /
-            (mtime_t)p_sys->p_context->sample_rate;
-
-        if( likely( packet.pts != AV_NOPTS_VALUE ) )
-            p_block->i_dts = p_block->i_pts = packet.pts;
-        else
-            p_block->i_dts = p_block->i_pts = VLC_TS_INVALID;
-
-        block_ChainAppend( &p_chain, p_block );
     }
 
     if( unlikely( !p_aout_buf ) )
