@@ -228,7 +228,7 @@ vlc_module_begin ()
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
-    "urls", "x", "y", "position", "color", "size", "speed", "length",
+    "urls", "x", "y", "position", "opacity", "color", "size", "speed", "length",
     "ttl", "images", "title", NULL
 };
 
