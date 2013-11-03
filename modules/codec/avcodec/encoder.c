@@ -1115,12 +1115,44 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     return p_block;
 }
 
+static block_t *encode_audio_buffer( encoder_t *p_enc, encoder_sys_t *p_sys,  AVFrame *frame )
+{
+    int got_packet, i_out;
+    got_packet=i_out=0;
+    AVPacket packet = {0};
+    block_t *p_block = block_Alloc( p_sys->i_buffer_out );
+    av_init_packet( &packet );
+    packet.data = p_block->p_buffer;
+    packet.size = p_block->i_buffer;
+
+    i_out = avcodec_encode_audio2( p_sys->p_context, &packet, frame, &got_packet );
+    if( unlikely( !got_packet || ( i_out < 0 ) ) )
+    {
+        if( i_out < 0 )
+        {
+            msg_Err( p_enc,"Encoding problem..");
+        }
+        block_Release( p_block );
+        return NULL;
+    }
+    p_block->i_buffer = packet.size;
+
+    p_block->i_length = (mtime_t)1000000 *
+     (mtime_t)p_sys->i_frame_size /
+     (mtime_t)p_sys->p_context->sample_rate;
+
+    if( likely( packet.pts != AV_NOPTS_VALUE ) )
+        p_block->i_dts = p_block->i_pts = packet.pts;
+    else
+        p_block->i_dts = p_block->i_pts = VLC_TS_INVALID;
+    return p_block;
+}
+
 static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, int buffer_delay, block_t *p_aout_buf, int leftover_samples )
 {
-    block_t *p_block,*p_chain = NULL;
+    block_t *p_block = NULL;
     //How much we need to copy from new packet
     const int leftover = leftover_samples * p_sys->p_context->channels * p_sys->i_sample_bytes;
-    int got_packet,i_out;
 
 #if LIBAVUTIL_VERSION_CHECK( 51,27,2,46,100 )
     const int align = 0;
@@ -1128,11 +1160,9 @@ static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, int
     const int align = 1;
 #endif
 
-    AVPacket packet = {0};
     avcodec_get_frame_defaults( p_sys->frame );
     p_sys->frame->format     = p_sys->p_context->sample_fmt;
     p_sys->frame->nb_samples = leftover_samples + p_sys->i_samples_delay;
-    p_sys->frame->format     = p_sys->p_context->sample_fmt;
 
 
     p_sys->frame->pts        = date_Get( &p_sys->buffer_date );
@@ -1159,8 +1189,7 @@ static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, int
     }
 
     if(unlikely( ( (leftover + buffer_delay) < p_sys->i_buffer_out ) &&
-                 !(p_sys->p_codec->capabilities & CODEC_CAP_SMALL_LAST_FRAME ))
-      )
+                 !(p_sys->p_codec->capabilities & CODEC_CAP_SMALL_LAST_FRAME )))
     {
         msg_Dbg( p_enc, "No small last frame support, padding");
         size_t padding_size = p_sys->i_buffer_out - (leftover+buffer_delay);
@@ -1179,37 +1208,9 @@ static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, int
 
     p_sys->i_samples_delay = 0;
 
-    p_block = block_Alloc( p_sys->i_buffer_out );
-    av_init_packet( &packet );
-    packet.data = p_block->p_buffer;
-    packet.size = p_block->i_buffer;
+    p_block = encode_audio_buffer( p_enc, p_sys, p_sys->frame );
 
-    i_out = avcodec_encode_audio2( p_sys->p_context, &packet, p_sys->frame, &got_packet );
-
-    if( unlikely( !got_packet || ( i_out < 0 ) || !packet.size ) )
-    {
-        if( i_out < 0 )
-        {
-            msg_Err( p_enc,"Encoding problem..");
-            return p_chain;
-        }
-        block_Release( p_block );
-        return NULL;
-    }
-
-    p_block->i_buffer = packet.size;
-    p_block->i_length = (mtime_t)1000000 *
-        (mtime_t)p_sys->frame->nb_samples /
-        (mtime_t)p_sys->p_context->sample_rate;
-
-    if( likely( packet.pts != AV_NOPTS_VALUE ) )
-        p_block->i_dts = p_block->i_pts = packet.pts;
-    else
-        p_block->i_dts = p_block->i_pts = VLC_TS_INVALID;
-
-    block_ChainAppend( &p_chain, p_block );
-
-    return p_chain;
+    return p_block;
 }
 
 /****************************************************************************
@@ -1220,7 +1221,6 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     block_t *p_block, *p_chain = NULL;
-    int got_packet,i_out;
     size_t buffer_delay = 0, i_samples_left = 0;
 
 
@@ -1261,29 +1261,12 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     {
         msg_Dbg(p_enc,"Flushing..");
         do {
-            AVPacket packet = {0};
-            p_block = block_Alloc( p_sys->i_buffer_out );
-            av_init_packet( &packet );
-            packet.data = p_block->p_buffer;
-            packet.size = p_block->i_buffer;
-
-            i_out = avcodec_encode_audio2( p_sys->p_context, &packet, NULL, &got_packet );
-            p_block->i_buffer = packet.size;
-
-            p_block->i_length = (mtime_t)1000000 *
-             (mtime_t)p_sys->i_frame_size /
-             (mtime_t)p_sys->p_context->sample_rate;
-
-            if( likely( packet.pts != AV_NOPTS_VALUE ) )
-                p_block->i_dts = p_block->i_pts = packet.pts;
-            else
-                p_block->i_dts = p_block->i_pts = VLC_TS_INVALID;
-
-            if( likely(i_out >= 0 && got_packet ))
+            p_block = encode_audio_buffer( p_enc, p_sys, NULL );
+            if( likely( p_block ) )
+            {
                 block_ChainAppend( &p_chain, p_block );
-            else
-                block_Release( p_block );
-        } while( got_packet && (i_out>=0) );
+            }
+        } while( p_block );
         return p_chain;
     }
 
@@ -1329,37 +1312,9 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         if( likely( p_sys->frame->pts != AV_NOPTS_VALUE) )
             date_Increment( &p_sys->buffer_date, p_sys->frame->nb_samples );
 
-        p_block = block_Alloc( p_sys->i_buffer_out );
-        av_init_packet( &packet );
-        packet.data = p_block->p_buffer;
-        packet.size = p_block->i_buffer;
-
-        i_out = avcodec_encode_audio2( p_sys->p_context, &packet, p_sys->frame, &got_packet );
-        p_block->i_buffer = packet.size;
-
-        if( unlikely( !got_packet || ( i_out < 0 ) ) )
-        {
-            if( i_out < 0 )
-            {
-                msg_Err( p_enc,"Encoding problem..");
-                return p_chain;
-            }
-            block_Release( p_block );
-            continue;
-        }
-
-        p_block->i_buffer = packet.size;
-
-        p_block->i_length = (mtime_t)1000000 *
-            (mtime_t)p_sys->frame->nb_samples /
-            (mtime_t)p_sys->p_context->sample_rate;
-
-        if( likely( packet.pts != AV_NOPTS_VALUE ) )
-            p_block->i_dts = p_block->i_pts = packet.pts;
-        else
-            p_block->i_dts = p_block->i_pts = VLC_TS_INVALID;
-
-        block_ChainAppend( &p_chain, p_block );
+        p_block = encode_audio_buffer( p_enc, p_sys, p_sys->frame );
+        if( likely( p_block ) )
+            block_ChainAppend( &p_chain, p_block );
     }
 
     // We have leftover samples that don't fill frame_size, and libavcodec doesn't seem to like
