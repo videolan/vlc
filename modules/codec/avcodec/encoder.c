@@ -1140,7 +1140,8 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     {
         date_Set( &p_sys->buffer_date, p_aout_buf->i_dts );
         /* take back amount we have leftover from previous buffer*/
-        date_Decrement( &p_sys->buffer_date, p_sys->i_samples_delay );
+        if( p_sys->i_samples_delay > 0 )
+            date_Decrement( &p_sys->buffer_date, p_sys->i_samples_delay );
     }
 
     // Check if we have enough samples in delay_buffer and current p_aout_buf to fill frame
