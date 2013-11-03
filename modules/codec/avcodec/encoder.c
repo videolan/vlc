@@ -1167,7 +1167,7 @@ static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, int
 
     p_sys->frame->pts        = date_Get( &p_sys->buffer_date );
     if( likely( p_sys->frame->pts != AV_NOPTS_VALUE) )
-        date_Increment( &p_sys->buffer_date, p_sys->i_frame_size );
+        date_Increment( &p_sys->buffer_date, p_sys->frame->nb_samples );
 
     if( likely( p_aout_buf ) )
     {
