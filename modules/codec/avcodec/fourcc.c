@@ -221,7 +221,7 @@ static const struct
     { VLC_CODEC_MSS2, AV_CODEC_ID_MSS2, VIDEO_ES },
 #endif
 
-#ifdef AV_CODEC_ID_H265 // FFmpeg 55.37.100
+#if LIBAVCODEC_VERSION_CHECK( 55, 24, 0, 37, 100 )
     { VLC_CODEC_HEVC, AV_CODEC_ID_HEVC, VIDEO_ES },
 #endif
 
