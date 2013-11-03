@@ -1400,7 +1400,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                 BYTE *pSCC= (BYTE *)CoTaskMemAlloc(piSize);
                 if( NULL != pSCC )
                 {
-                    int i_priority = -1;
+                    int i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
                     for( int i=0; i<piCount; ++i )
                     {
                         if( SUCCEEDED(pSC->GetStreamCaps(i, &p_mt, pSCC)) )
@@ -1581,7 +1581,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                         }
                     }
                     CoTaskMemFree( (LPVOID)pSCC );
-                    if( i_priority >= 0 )
+                    if( i_priority >= ES_PRIORITY_SELECTABLE_MIN )
                         msg_Dbg( p_this, "EnumDeviceCaps: input pin default format configured");
                 }
             }

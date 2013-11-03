@@ -296,7 +296,7 @@ void es_format_Init( es_format_t *fmt,
     fmt->i_level                = -1;
     fmt->i_id                   = -1;
     fmt->i_group                = 0;
-    fmt->i_priority             = 0;
+    fmt->i_priority             = ES_PRIORITY_SELECTABLE_MIN;
     fmt->psz_language           = NULL;
     fmt->psz_description        = NULL;
 

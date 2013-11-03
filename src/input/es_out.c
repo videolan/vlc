@@ -1716,7 +1716,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
     int i_cat = es->fmt.i_cat;
 
     if( !p_sys->b_active ||
-        ( !b_force && es->fmt.i_priority < 0 ) )
+        ( !b_force && es->fmt.i_priority < ES_PRIORITY_SELECTABLE_MIN ) )
     {
         return;
     }

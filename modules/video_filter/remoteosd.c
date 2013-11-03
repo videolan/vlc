@@ -308,7 +308,7 @@ static int CreateFilter ( vlc_object_t *p_this )
     var_AddCallback( p_filter->p_libvlc, "key-pressed", KeyEvent, p_this );
 
     es_format_Init( &p_filter->fmt_out, SPU_ES, VLC_CODEC_SPU );
-    p_filter->fmt_out.i_priority = 0;
+    p_filter->fmt_out.i_priority = ES_PRIORITY_SELECTABLE_MIN;
 
     vlc_gcrypt_init();
 

@@ -3527,7 +3527,8 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
 
             /* */
             const ts_teletext_page_t *p = &p_page[i];
-            p_es->fmt.i_priority = (p->i_type == 0x02 || p->i_type == 0x05) ? 0 : -1;
+            p_es->fmt.i_priority = (p->i_type == 0x02 || p->i_type == 0x05) ?
+                      ES_PRIORITY_SELECTABLE_MIN : ES_PRIORITY_NOT_DEFAULTABLE;
             p_es->fmt.psz_language = strndup( p->p_iso639, 3 );
             p_es->fmt.psz_description = strdup(vlc_gettext(ppsz_teletext_type[p->i_type]));
             p_es->fmt.subs.teletext.i_magazine = p->i_magazine;
@@ -3922,7 +3923,7 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pid_t *pid,
     int type = p_decoded->code[0].i_audio_type;
     pid->es->fmt.psz_description = GetAudioTypeDesc(p_demux, type);
     if (type == 0)
-        pid->es->fmt.i_priority = 1; // prioritize normal audio tracks
+        pid->es->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 1; // prioritize normal audio tracks
 
     pid->es->fmt.i_extra_languages = p_decoded->i_code_count-1;
     if( pid->es->fmt.i_extra_languages > 0 )

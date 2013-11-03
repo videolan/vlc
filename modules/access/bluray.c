@@ -525,11 +525,11 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
     switch (fmt.i_cat) {
     case VIDEO_ES:
         if (p_sys->i_video_stream != -1 && p_sys->i_video_stream != p_fmt->i_id)
-            fmt.i_priority = -2;
+            fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
         break ;
     case AUDIO_ES:
         if (p_sys->i_audio_stream != -1 && p_sys->i_audio_stream != p_fmt->i_id)
-            fmt.i_priority = -2;
+            fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
         break ;
     case SPU_ES:
         break ;

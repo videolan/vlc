@@ -1255,7 +1255,7 @@ static es_out_id_t *EsOutAdd( es_out_t *p_out, const es_format_t *p_fmt )
     es_format_t fmt;
 
     es_format_Copy( &fmt, p_fmt );
-    fmt.i_priority = -2;
+    fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
 
     for( int i = 0; i < p_item->i_stream; i++ )
     {
@@ -1267,7 +1267,7 @@ static es_out_id_t *EsOutAdd( es_out_t *p_out, const es_format_t *p_fmt )
         /* TODO improved priority for higher quality stream ?
          * if so, extending stream attributes parsing might be a good idea
          */
-        fmt.i_priority = 0;
+        fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN;
 
 #if 0
         /* Useless, and beside not sure it is the right thing to do */
@@ -1297,7 +1297,7 @@ static es_out_id_t *EsOutAdd( es_out_t *p_out, const es_format_t *p_fmt )
         }
         break;
     }
-    if( fmt.i_priority < 0 )
+    if( fmt.i_priority < ES_PRIORITY_SELECTABLE_MIN )
         msg_Dbg( p_demux, "Hiding one stream (pid=%d)", fmt.i_id );
 
     /* */

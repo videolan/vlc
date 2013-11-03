@@ -427,7 +427,7 @@ int OpenDemux( vlc_object_t *p_this )
             fmt.psz_language = strdup( language->value );
 
         if( s->disposition & AV_DISPOSITION_DEFAULT )
-            fmt.i_priority = 1000;
+            fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 1000;
 
 #ifdef HAVE_AVUTIL_CODEC_ATTACHMENT
         if( cc->codec_type != AVMEDIA_TYPE_ATTACHMENT )

@@ -1119,13 +1119,13 @@ void matroska_segment_c::ComputeTrackPriority()
             b_has_default_audio = true;
         }
         if( unlikely( !p_tk->b_enabled ) )
-            p_tk->fmt.i_priority = -2;
+            p_tk->fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
         else if( p_tk->b_forced )
-            p_tk->fmt.i_priority = 2;
+            p_tk->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 2;
         else if( p_tk->b_default )
-            p_tk->fmt.i_priority = 1;
+            p_tk->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 1;
         else
-            p_tk->fmt.i_priority = 0;
+            p_tk->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN;
 
         /* Avoid multivideo tracks when unnecessary */
         if( p_tk->fmt.i_cat == VIDEO_ES )

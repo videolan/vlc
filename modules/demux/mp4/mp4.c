@@ -2505,7 +2505,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     p_track->b_enable =
         ( ( p_tkhd->data.p_tkhd->i_flags&MP4_TRACK_ENABLED ) != 0 );
     if( !p_track->b_enable )
-        p_track->fmt.i_priority = -1;
+        p_track->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
 
     p_track->i_track_ID = p_tkhd->data.p_tkhd->i_track_ID;
 
@@ -2666,7 +2666,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
         msg_Warn( p_demux, "Enabling track[Id 0x%x] (buggy file without enabled track)",
                   p_track->i_track_ID );
         p_track->b_enable = true;
-        p_track->fmt.i_priority = 0;
+        p_track->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN;
     }
 
     p_track->p_es = NULL;
