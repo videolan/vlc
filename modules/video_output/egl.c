@@ -68,6 +68,9 @@ typedef struct vlc_gl_sys_t
     EGLDisplay display;
     EGLSurface surface;
     EGLContext context;
+#if defined (USE_PLATFORM_X11)
+    Display *x11;
+#endif
 } vlc_gl_sys_t;
 
 /* OpenGL callbacks */
@@ -138,12 +141,28 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     sys->display = EGL_NO_DISPLAY;
 
 #ifdef USE_PLATFORM_X11
-    if (wnd->type != VOUT_WINDOW_TYPE_XID || wnd->display.x11 != NULL
-     || !vlc_xlib_init(obj))
+    sys->x11 = NULL;
+
+    if (wnd->type != VOUT_WINDOW_TYPE_XID || !vlc_xlib_init(obj))
         goto error;
 
-    sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    window = wnd->handle.xid;
+    sys->x11 = XOpenDisplay(wnd->display.x11);
+    if (sys->x11 == NULL)
+        goto error;
+
+    int snum;
+    {
+        XWindowAttributes wa;
+
+        if (!XGetWindowAttributes(sys->x11, wnd->handle.xid, &wa))
+            goto error;
+        snum = XScreenNumberOfScreen(wa.screen);
+    }
+    if (snum == XDefaultScreen(sys->x11))
+    {
+        sys->display = eglGetDisplay(sys->x11);
+        window = wnd->handle.xid;
+    }
 
 #elif defined (USE_PLATFORM_WIN32)
     if (wnd->type != VOUT_WINDOW_TYPE_HWND)
@@ -264,6 +283,10 @@ static void Close (vlc_object_t *obj)
 
     if (sys->display != EGL_NO_DISPLAY)
         eglTerminate(sys->display);
+#ifdef USE_PLATFORM_X11
+    if (sys->x11 != NULL)
+        XCloseDisplay(sys->x11);
+#endif
     free (sys);
 }
 
