@@ -282,7 +282,7 @@ static void Flush (audio_output_t *aout, bool wait)
 
     if (wait)
         return; /* drain is implicit with OSS */
-    ioctl (fd, SNDCTL_DSP_HALT_OUTPUT, NULL);
+    ioctl (fd, SNDCTL_DSP_HALT, NULL);
 }
 
 static int VolumeSync (audio_output_t *aout)
