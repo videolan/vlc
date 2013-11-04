@@ -75,6 +75,8 @@ struct decoder_sys_t
 
     int started;
     int decoded;
+
+    ArchitectureSpecificCopyData architecture_specific_data;
 };
 
 enum Types
@@ -389,6 +391,7 @@ static void CloseDecoder(vlc_object_t *p_this)
     (*myVm)->DetachCurrentThread(myVm);
 
     free(p_sys->name);
+    ArchitectureSpecificCopyHooksDestroy(p_sys->pixel_format, &p_sys->architecture_specific_data);
     free(p_sys);
 }
 
@@ -422,7 +425,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, int loo
                 GetVlcChromaSizes(p_dec->fmt_out.i_codec, p_dec->fmt_out.video.i_width,
                                   p_dec->fmt_out.video.i_height, NULL, NULL, &chroma_div);
                 CopyOmxPicture(p_sys->pixel_format, p_pic, p_sys->slice_height, p_sys->stride,
-                               ptr, chroma_div);
+                               ptr, chroma_div, &p_sys->architecture_specific_data);
             }
             (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, index, false);
             jthrowable exception = (*env)->ExceptionOccurred(env);
@@ -452,6 +455,8 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, int loo
             msg_Dbg(p_dec, "output format changed: %.*s", format_len, format_ptr);
             (*env)->ReleaseStringUTFChars(env, format_string, format_ptr);
 
+            ArchitectureSpecificCopyHooksDestroy(p_sys->pixel_format, &p_sys->architecture_specific_data);
+
             int width           = GET_INTEGER(format, "width");
             int height          = GET_INTEGER(format, "height");
             p_sys->stride       = GET_INTEGER(format, "stride");
@@ -476,6 +481,9 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, int loo
                 p_sys->slice_height = height;
             if ((*env)->ExceptionOccurred(env))
                 (*env)->ExceptionClear(env);
+
+            ArchitectureSpecificCopyHooks(p_dec, p_sys->pixel_format, p_sys->slice_height,
+                                          p_sys->stride, &p_sys->architecture_specific_data);
             if (p_sys->pixel_format == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar) {
                 p_sys->slice_height -= p_sys->crop_top/2;
                 /* Reset crop top/left here, since the offset parameter already includes this.

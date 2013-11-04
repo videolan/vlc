@@ -1271,7 +1271,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                                    p_pic, p_sys->out.definition.format.video.nSliceHeight,
                                    p_sys->out.i_frame_stride,
                                    p_header->pBuffer + p_header->nOffset,
-                                   p_sys->out.i_frame_stride_chroma_div);
+                                   p_sys->out.i_frame_stride_chroma_div, NULL);
             }
 
             if (p_pic)
