@@ -21,8 +21,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_AVCODEC_COPY_H
-#define _VLC_AVCODEC_COPY_H 1
+#ifndef _VLC_VIDEOCHROMA_COPY_H
+#define _VLC_VIDEOCHROMA_COPY_H 1
 
 typedef struct {
 # ifdef CAN_COMPILE_SSE2
@@ -42,4 +42,3 @@ void CopyFromYv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
                   copy_cache_t *cache);
 
 #endif
-

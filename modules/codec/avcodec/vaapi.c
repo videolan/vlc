@@ -39,7 +39,7 @@
 
 #include "avcodec.h"
 #include "va.h"
-#include "copy.h"
+#include "../../video_chroma/copy.h"
 
 #ifndef VA_SURFACE_ATTRIB_SETTABLE
 #define vaCreateSurfaces(d, f, w, h, s, ns, a, na) \

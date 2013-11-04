@@ -49,7 +49,7 @@
 
 #include "avcodec.h"
 #include "va.h"
-#include "copy.h"
+#include "../../video_chroma/copy.h"
 
 static int Open(vlc_va_t *, int, const es_format_t *);
 static void Close(vlc_va_t *);

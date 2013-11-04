@@ -263,7 +263,7 @@ endif
 ### avcodec hardware acceleration ###
 
 libvaapi_plugin_la_SOURCES = \
-	codec/avcodec/copy.c codec/avcodec/copy.h \
+	video_chroma/copy.c video_chroma/copy.h \
 	codec/avcodec/vaapi.c
 libvaapi_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(LIBVA_CFLAGS) $(X_CFLAGS) $(AVCODEC_CFLAGS)
@@ -273,7 +273,7 @@ codec_LTLIBRARIES += libvaapi_plugin.la
 endif
 
 libdxva2_plugin_la_SOURCES = \
-	codec/avcodec/copy.c codec/avcodec/copy.h \
+	video_chroma/copy.c video_chroma/copy.h \
 	codec/avcodec/dxva2.c
 libdxva2_plugin_la_LIBADD = -lole32 -lshlwapi -luuid
 if HAVE_AVCODEC_DXVA2
@@ -281,7 +281,7 @@ codec_LTLIBRARIES += libdxva2_plugin.la
 endif
 
 libvda_plugin_la_SOURCES = \
-	codec/avcodec/copy.c codec/avcodec/copy.h \
+	video_chroma/copy.c video_chroma/copy.h \
 	codec/avcodec/vda.c
 libvda_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVCODEC_CFLAGS)
 libvda_plugin_la_LDFLAGS = -Wl,-framework,CoreFoundation,-framework,VideoDecodeAcceleration,-framework,QuartzCore

@@ -34,7 +34,7 @@
 
 #include "avcodec.h"
 #include "va.h"
-#include "copy.h"
+#include "../../video_chroma/copy.h"
 
 #include <libavcodec/vda.h>
 #include <VideoDecodeAcceleration/VDADecoder.h>
