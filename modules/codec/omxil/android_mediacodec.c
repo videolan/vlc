@@ -395,10 +395,10 @@ static void CloseDecoder(vlc_object_t *p_this)
     free(p_sys);
 }
 
-static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, int loop)
+static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    do {
+    while (1) {
         int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_output_buffer,
                                           p_sys->buffer_info, (jlong) 0);
         if (index >= 0) {
@@ -438,13 +438,13 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, int loo
                 }
             }
             (*env)->DeleteLocalRef(env, buf);
+            return;
         } else if (index == INFO_OUTPUT_BUFFERS_CHANGED) {
             msg_Dbg(p_dec, "output buffers changed");
             (*env)->DeleteGlobalRef(env, p_sys->output_buffers);
             p_sys->output_buffers = (*env)->CallObjectMethod(env, p_sys->codec,
                                                              p_sys->get_output_buffers);
             p_sys->output_buffers = (*env)->NewGlobalRef(env, p_sys->output_buffers);
-            continue;
         } else if (index == INFO_OUTPUT_FORMAT_CHANGED) {
 
             jobject format = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_output_format);
@@ -497,11 +497,10 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, int loo
                 p_sys->stride = p_dec->fmt_out.video.i_width;
             }
 
-            continue;
         } else {
-            break;
+            return;
         }
-    } while (loop);
+    }
 }
 
 static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
@@ -536,7 +535,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     while (true) {
         int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_input_buffer, timeout);
         if (index < 0) {
-            GetOutput(p_dec, env, &p_pic, 0);
+            GetOutput(p_dec, env, &p_pic);
             if (p_pic) {
                 /* If we couldn't get an available input buffer but a
                  * decoded frame is available, we return the frame
@@ -567,7 +566,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         break;
     }
     if (!p_pic)
-        GetOutput(p_dec, env, &p_pic, 0);
+        GetOutput(p_dec, env, &p_pic);
     (*myVm)->DetachCurrentThread(myVm);
 
     block_Release(p_block);
