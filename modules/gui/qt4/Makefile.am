@@ -12,7 +12,7 @@ guidir = $(pluginsdir)/gui
 # For each ressource (icon, png, ...)
 #   - Add it to DEPS_res
 
-SUFFIXES = .ui .h .hpp .moc.cpp
+SUFFIXES += .ui .h .hpp .moc.cpp
 
 libqt4_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS)
 libqt4_plugin_la_LIBADD = $(QT_LIBS)

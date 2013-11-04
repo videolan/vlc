@@ -12,36 +12,24 @@ AC_DEFUN([DOLT], [
 AC_REQUIRE([AC_CANONICAL_HOST])
 # dolt, a replacement for libtool
 # Josh Triplett <josh@freedesktop.org>
-AC_PATH_PROG(DOLT_BASH, bash)
+AC_PATH_PROG([DOLT_BASH], [bash])
 AC_MSG_CHECKING([if dolt supports this host])
 dolt_supported=yes
-if test x$DOLT_BASH = x; then
-    dolt_supported=no
-fi
-if test x$GCC != xyes; then
-    dolt_supported=no
-fi
-case $host in
-*-*-linux* \
-|amd64-*-freebsd*|i?86-*-freebsd*|ia64-*-freebsd*)
-    pic_options='-fPIC'
-    ;;
-*-apple-darwin*)
-    pic_options='-fno-common'
-    ;;
-*mingw*|*nacl*)
-    pic_options=''
-    ;;
-*)
-    dolt_supported=no
-    ;;
-esac
-if test x$dolt_supported = xno ; then
+AS_IF([test x$DOLT_BASH = x], [dolt_supported=no])
+AS_IF([test x$GCC != xyes], [dolt_supported=no])
+
+AS_CASE([$host],
+    [*-*-linux*|*-*-freebsd*], [pic_options='-fPIC'],
+    [*-apple-darwin*],         [pic_options='-fno-common'],
+    [*mingw*|*nacl*],          [pic_options='']
+    [*],                       [dolt_supported=no]
+)
+AS_IF([test x$dolt_supported = xno], [
     AC_MSG_RESULT([no, falling back to libtool])
     LTCOMPILE='$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(COMPILE)'
     LTCXXCOMPILE='$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXXCOMPILE)'
     m4_pattern_allow([AM_V_lt])
-else
+], [
     AC_MSG_RESULT([yes, replacing libtool])
 
 dnl Start writing out doltcompile.
@@ -85,7 +73,13 @@ pic_object="$libobjdir/$objbase.o"
 args@<:@$objarg@:>@="$pic_object"
 __DOLTCOMPILE__EOF__
     cat <<__DOLTCOMPILE__EOF__ >>doltcompile
-"\${args@<:@@@:>@}" $pic_options -DPIC || exit \$?
+    pic_options="$pic_options"
+    if test x\$passthrough = xtrue; then
+        pic_options=""
+    fi
+__DOLTCOMPILE__EOF__
+    cat <<'__DOLTCOMPILE__EOF__' >>doltcompile
+${args@<:@@@:>@} $pic_options -DPIC || exit $?
 __DOLTCOMPILE__EOF__
     fi
 
@@ -161,6 +155,7 @@ for arg in "$[]@"; do
     case "$arg" in
         --mode=compile) modeok=true ;;
         --tag=CC|--tag=CXX) tagok=true ;;
+        --tag=ASM|--tag=YASM) tagok=true; passthrough=true;;
         --silent|--quiet) ;;
         *) args@<:@${#args[@]}@:>@="$arg" ;;
     esac
@@ -175,7 +170,10 @@ __DOLTLIBTOOL__EOF__
 dnl Done writing out doltlibtool; substitute it for libtool.
     chmod +x doltlibtool
     LIBTOOL='$(top_builddir)/doltlibtool'
-fi
+
+DOLT_CLEANFILES="doltlibtool doltcompile"
+AC_SUBST(DOLT_CLEANFILES)
+])
 AC_SUBST(LTCOMPILE)
 AC_SUBST(LTCXXCOMPILE)
 # end dolt

@@ -73,6 +73,7 @@ AM_PROG_AS
 
 AC_ARG_VAR([DESKTOP_FILE_VALIDATE], [Validator for desktop entry files])
 AC_CHECK_PROGS(DESKTOP_FILE_VALIDATE, [${DESKTOP_FILE_VALIDATE} desktop-file-validate], :)
+AC_CHECK_PROGS(YASM, yasm)
 
 dnl Check for compiler properties
 AC_C_CONST
@@ -96,6 +97,18 @@ dnl
 dnl  Check the operating system
 dnl
 HAVE_WIN64="0"
+
+YASMFLAGS=""
+case "${host}" in
+    i?86*)
+    YASMFLAGS="-f elf32"
+        ;;
+    x86_64*)
+    YASMFLAGS="-f elf64"
+        ;;
+esac
+
+
 case "${host_os}" in
   "")
     SYS=unknown
@@ -131,6 +144,7 @@ case "${host_os}" in
     case "${host}" in
       i?86*)
         ARCH_flag="-arch i386"
+        YASMFLAGS="-f macho32"
       ;;
       ppc64*)
         ARCH_flag="-arch ppc64"
@@ -140,6 +154,7 @@ case "${host_os}" in
       ;;
       x86_64*)
         ARCH_flag="-arch x86_64"
+        YASMFLAGS="-f macho64"
       ;;
       arm*)
         ac_cv_c_bigendian="no"
@@ -237,10 +252,12 @@ case "${host_os}" in
                 HAVE_WIN64="1"
                 WINDOWS_ARCH="x64"
                 PROGRAMFILES="PROGRAMFILES64"
+                YASMFLAGS="-f win64"
             ;;
             *)
                 WINDOWS_ARCH="x86"
                 PROGRAMFILES="PROGRAMFILES"
+                YASMFLAGS="-f win32"
             ;;
         esac
         AC_SUBST(WINDOWS_ARCH)
@@ -274,6 +291,8 @@ AM_CONDITIONAL(HAVE_OS2,     test "${SYS}" = "os2")
 AM_CONDITIONAL(HAVE_WIN32,   test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1")
 AM_CONDITIONAL(HAVE_SYMBIAN, test "${SYS}" = "symbian")
+
+AC_SUBST(YASMFLAGS)
 
 dnl
 dnl Sadly autoconf does not think about testing foo.exe when ask to test
