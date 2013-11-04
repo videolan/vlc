@@ -536,7 +536,16 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     while (true) {
         int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_input_buffer, timeout);
         if (index < 0) {
-            GetOutput(p_dec, env, &p_pic, timeout > 0);
+            GetOutput(p_dec, env, &p_pic, 0);
+            if (p_pic) {
+                /* If we couldn't get an available input buffer but a
+                 * decoded frame is available, we return the frame
+                 * without assigning NULL to *pp_block. The next call
+                 * to DecodeVideo will try to send the input packet again.
+                 */
+                (*myVm)->DetachCurrentThread(myVm);
+                return p_pic;
+            }
             timeout = 30;
             continue;
         }
