@@ -147,13 +147,8 @@ static int Open (vlc_object_t *obj)
           case 32:
             if (fmt->bits_per_pixel != 32)
                 continue;
-#ifdef FIXED_VLC_RGBA_MASK
-            fmt_pic.i_chroma = VLC_CODEC_RGBA;
+            fmt_pic.i_chroma = VLC_CODEC_ARGB;
             break;
-#else
-            msg_Dbg (vd, "X11 visual with alpha-channel not supported");
-            continue;
-#endif
           case 24:
             if (fmt->bits_per_pixel == 32)
                 fmt_pic.i_chroma = VLC_CODEC_RGB32;
