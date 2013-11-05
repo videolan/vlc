@@ -1277,8 +1277,6 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     while( ( p_aout_buf->i_nb_samples >= p_sys->i_frame_size ) ||
            ( p_sys->b_variable && p_aout_buf->i_nb_samples ) )
     {
-        AVPacket packet = {0};
-
         avcodec_get_frame_defaults( p_sys->frame );
         if( p_sys->b_variable )
             p_sys->frame->nb_samples = p_aout_buf->i_nb_samples;
