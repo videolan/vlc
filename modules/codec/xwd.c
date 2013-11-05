@@ -112,7 +112,7 @@ static picture_t *Decode (decoder_t *dec, block_t **pp)
             break;
         case 32:
             if (ntohl(hdr->bits_per_pixel) == 32)
-                chroma = VLC_CODEC_RGBA;
+                chroma = VLC_CODEC_ARGB;
             break;
     }
     /* TODO: check image endianess, set RGB mask */
