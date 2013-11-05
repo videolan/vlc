@@ -192,6 +192,13 @@ static const uint16_t mpeg4_default_non_intra_matrix[64] = {
  23, 24, 25, 27, 28, 30, 31, 33,
 };
 
+#if LIBAVUTIL_VERSION_CHECK( 51, 27, 2, 46, 100 )
+static const int DEFAULT_ALIGN = 0;
+#else
+static const int DEFAULT_ALIGN = 1;
+#endif
+
+
 /*****************************************************************************
  * OpenEncoder: probe the encoder
  *****************************************************************************/
@@ -877,7 +884,9 @@ errmsg:
         p_sys->i_frame_size = p_context->frame_size > 1 ?
                                     p_context->frame_size :
                                     FF_MIN_BUFFER_SIZE;
-        p_sys->i_buffer_out = p_sys->i_frame_size * p_sys->i_sample_bytes * p_sys->p_context->channels;
+        p_sys->i_buffer_out = av_samples_get_buffer_size(NULL,
+                p_sys->p_context->channels, p_sys->i_frame_size,
+                p_sys->p_context->sample_fmt, DEFAULT_ALIGN);
         p_sys->p_buffer = malloc( p_sys->i_buffer_out );
         if ( unlikely( p_sys->p_buffer == NULL ) )
         {
@@ -1275,11 +1284,6 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
            ( p_sys->b_variable && p_aout_buf->i_nb_samples ) )
     {
         AVPacket packet = {0};
-#if LIBAVUTIL_VERSION_CHECK( 51,27,2,46,100 )
-        const int align = 0;
-#else
-        const int align = 1;
-#endif
 
         avcodec_get_frame_defaults( p_sys->frame );
         if( p_sys->b_variable )
@@ -1289,25 +1293,32 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         p_sys->frame->format     = p_sys->p_context->sample_fmt;
         p_sys->frame->pts        = date_Get( &p_sys->buffer_date );
 
+        const int in_bytes = p_sys->frame->nb_samples *
+            p_sys->p_context->channels * p_sys->i_sample_bytes;
+
         if( p_sys->b_planar )
         {
             aout_Deinterleave( p_sys->p_buffer, p_aout_buf->p_buffer,
                                p_sys->frame->nb_samples, p_sys->p_context->channels, p_enc->fmt_in.i_codec );
 
         }
+        else
+        {
+            memcpy(p_sys->p_buffer, p_aout_buf->p_buffer, in_bytes);
+        }
 
         if( avcodec_fill_audio_frame( p_sys->frame, p_sys->p_context->channels,
                                     p_sys->p_context->sample_fmt,
-                                    p_sys->b_planar ? p_sys->p_buffer : p_aout_buf->p_buffer,
-                                    p_sys->b_planar ? p_sys->i_buffer_out : p_aout_buf->i_buffer,
-                                    align) < 0 )
+                                    p_sys->p_buffer,
+                                    p_sys->i_buffer_out,
+                                    DEFAULT_ALIGN) < 0 )
         {
                  msg_Err( p_enc, "filling error on encode" );
                  p_sys->frame->nb_samples = 0;
         }
 
-        p_aout_buf->p_buffer     += (p_sys->frame->nb_samples * p_sys->p_context->channels * p_sys->i_sample_bytes);
-        p_aout_buf->i_buffer     -= (p_sys->frame->nb_samples * p_sys->p_context->channels * p_sys->i_sample_bytes);
+        p_aout_buf->p_buffer     += in_bytes;
+        p_aout_buf->i_buffer     -= in_bytes;
         p_aout_buf->i_nb_samples -= p_sys->frame->nb_samples;
         if( likely( p_sys->frame->pts != AV_NOPTS_VALUE) )
             date_Increment( &p_sys->buffer_date, p_sys->frame->nb_samples );
