@@ -66,7 +66,8 @@ static int Open( vlc_object_t *p_this )
      * (if scaling is required another filter can do it) */
     if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_YUVP ||
         ( p_filter->fmt_out.video.i_chroma != VLC_CODEC_YUVA &&
-          p_filter->fmt_out.video.i_chroma != VLC_CODEC_RGBA ) ||
+          p_filter->fmt_out.video.i_chroma != VLC_CODEC_RGBA &&
+          p_filter->fmt_out.video.i_chroma != VLC_CODEC_ARGB ) ||
         p_filter->fmt_in.video.i_width  != p_filter->fmt_out.video.i_width ||
         p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height )
     {
@@ -138,12 +139,11 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             }
         }
     }
-    else
+    else if( p_filter->fmt_out.video.i_chroma == VLC_CODEC_RGBA )
     {
-        assert( p_filter->fmt_out.video.i_chroma == VLC_CODEC_RGBA );
+        video_palette_t rgbp;
 
         /* Create a RGBA palette */
-        video_palette_t rgbp;
         rgbp.i_entries = p_yuvp->i_entries;
         for( int i = 0; i < p_yuvp->i_entries; i++ )
         {
@@ -152,7 +152,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             rgbp.palette[i][3] = p_yuvp->palette[i][3];
         }
 
-        /* */
         for( unsigned int y = 0; y < p_filter->fmt_in.video.i_height; y++ )
         {
             const uint8_t *p_line = &p_pic->p->p_pixels[y*p_pic->p->i_pitch];
@@ -171,6 +170,40 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 p_rgba[4*x+3] = rgbp.palette[v][3];
             }
         }
+    }
+    else
+    {
+        video_palette_t rgbp;
+
+        assert( p_filter->fmt_out.video.i_chroma == VLC_CODEC_ARGB );
+        /* Create a RGBA palette */
+        rgbp.i_entries = p_yuvp->i_entries;
+        for( int i = 0; i < p_yuvp->i_entries; i++ )
+        {
+            Yuv2Rgb( &rgbp.palette[i][1], &rgbp.palette[i][2], &rgbp.palette[i][3],
+                     p_yuvp->palette[i][0], p_yuvp->palette[i][1], p_yuvp->palette[i][2] );
+            rgbp.palette[i][0] = p_yuvp->palette[i][3];
+        }
+
+        for( unsigned int y = 0; y < p_filter->fmt_in.video.i_height; y++ )
+        {
+            const uint8_t *p_line = &p_pic->p->p_pixels[y*p_pic->p->i_pitch];
+            uint8_t *p_rgba = &p_out->p->p_pixels[y*p_out->p->i_pitch];
+
+            for( unsigned int x = 0; x < p_filter->fmt_in.video.i_width; x++ )
+            {
+                const int v = p_line[x];
+
+                if( v >= rgbp.i_entries )  /* maybe assert ? */
+                    continue;
+
+                p_rgba[4*x+0] = rgbp.palette[v][0];
+                p_rgba[4*x+1] = rgbp.palette[v][1];
+                p_rgba[4*x+2] = rgbp.palette[v][2];
+                p_rgba[4*x+3] = rgbp.palette[v][3];
+            }
+        }
+
     }
 
     picture_CopyProperties( p_out, p_pic );
