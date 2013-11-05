@@ -522,7 +522,7 @@ static es_out_id_t *InitES (demux_t *demux, uint_fast16_t width,
         {
             case 32:
                 if (fmt->bits_per_pixel == 32)
-                    chroma = VLC_CODEC_RGBA;
+                    chroma = VLC_CODEC_ARGB;
                 break;
             case 24:
                 if (fmt->bits_per_pixel == 32)
