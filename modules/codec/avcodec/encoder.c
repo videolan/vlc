@@ -1163,12 +1163,6 @@ static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, int
     //How much we need to copy from new packet
     const int leftover = leftover_samples * p_sys->p_context->channels * p_sys->i_sample_bytes;
 
-#if LIBAVUTIL_VERSION_CHECK( 51,27,2,46,100 )
-    const int align = 0;
-#else
-    const int align = 1;
-#endif
-
     avcodec_get_frame_defaults( p_sys->frame );
     p_sys->frame->format     = p_sys->p_context->sample_fmt;
     p_sys->frame->nb_samples = leftover_samples + p_sys->i_samples_delay;
@@ -1208,7 +1202,7 @@ static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, int
     if( avcodec_fill_audio_frame( p_sys->frame, p_sys->p_context->channels,
             p_sys->p_context->sample_fmt, p_sys->b_planar ? p_sys->p_interleave_buf : p_sys->p_buffer,
             p_sys->i_buffer_out,
-            align) < 0 )
+            DEFAULT_ALIGN) < 0 )
     {
         msg_Err( p_enc, "filling error on fillup" );
         p_sys->frame->nb_samples = 0;
