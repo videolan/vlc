@@ -266,6 +266,10 @@ static void FixParameters( int *pi_fmt, bool *pb_has_a, bool *pb_swap_uv, vlc_fo
         *pi_fmt = PIX_FMT_BGR32;
         *pb_has_a = true;
         break;
+    case VLC_CODEC_ARGB:
+        *pi_fmt = PIX_FMT_BGR32_1;
+        *pb_has_a = true;
+        break;
     case VLC_CODEC_YV12:
         *pi_fmt = PIX_FMT_YUV420P;
         *pb_swap_uv = true;
@@ -480,25 +484,29 @@ static void GetPixels( uint8_t *pp_pixel[4], int pi_pitch[4],
     }
 }
 
-static void ExtractA( picture_t *p_dst, const picture_t *p_src, unsigned i_width, unsigned i_height )
+static void ExtractA( picture_t *p_dst, const picture_t *restrict p_src,
+                      unsigned i_width, unsigned i_height, unsigned offset )
 {
     plane_t *d = &p_dst->p[0];
     const plane_t *s = &p_src->p[0];
 
     for( unsigned y = 0; y < i_height; y++ )
         for( unsigned x = 0; x < i_width; x++ )
-            d->p_pixels[y*d->i_pitch+x] = s->p_pixels[y*s->i_pitch+4*x+OFFSET_A];
+            d->p_pixels[y*d->i_pitch+x] = s->p_pixels[y*s->i_pitch+4*x+offset];
 }
-static void InjectA( picture_t *p_dst, const picture_t *p_src, unsigned i_width, unsigned i_height )
+
+static void InjectA( picture_t *p_dst, const picture_t *restrict p_src,
+                     unsigned i_width, unsigned i_height, unsigned offset )
 {
     plane_t *d = &p_dst->p[0];
     const plane_t *s = &p_src->p[0];
 
     for( unsigned y = 0; y < i_height; y++ )
         for( unsigned x = 0; x < i_width; x++ )
-            d->p_pixels[y*d->i_pitch+4*x+OFFSET_A] = s->p_pixels[y*s->i_pitch+x];
+            d->p_pixels[y*d->i_pitch+4*x+offset] = s->p_pixels[y*s->i_pitch+x];
 }
-static void FillA( plane_t *d, int i_offset )
+
+static void FillA( plane_t *d, unsigned i_offset )
 {
     for( int y = 0; y < d->i_visible_lines; y++ )
         for( int x = 0; x < d->i_visible_pitch; x += d->i_pixel_pitch )
@@ -609,13 +617,17 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     {
         /* We extract the A plane to rescale it, and then we reinject it. */
         if( p_fmti->i_chroma == VLC_CODEC_RGBA )
-            ExtractA( p_sys->p_src_a, p_src, p_fmti->i_width * p_sys->i_extend_factor, p_fmti->i_height );
+            ExtractA( p_sys->p_src_a, p_src, p_fmti->i_width * p_sys->i_extend_factor, p_fmti->i_height, OFFSET_A );
+        else if( p_fmti->i_chroma == VLC_CODEC_ARGB )
+            ExtractA( p_sys->p_src_a, p_src, p_fmti->i_width * p_sys->i_extend_factor, p_fmti->i_height, 0 );
         else
             plane_CopyPixels( p_sys->p_src_a->p, p_src->p+A_PLANE );
 
         Convert( p_filter, p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a, p_fmti->i_height, 0, 1, false, false );
         if( p_fmto->i_chroma == VLC_CODEC_RGBA )
-            InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_width * p_sys->i_extend_factor, p_fmto->i_height );
+            InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_width * p_sys->i_extend_factor, p_fmto->i_height, OFFSET_A );
+        else if( p_fmto->i_chroma == VLC_CODEC_ARGB )
+            InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_width * p_sys->i_extend_factor, p_fmto->i_height, 0 );
         else
             plane_CopyPixels( p_dst->p+A_PLANE, p_sys->p_dst_a->p );
     }
@@ -624,6 +636,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         /* We inject a complete opaque alpha plane */
         if( p_fmto->i_chroma == VLC_CODEC_RGBA )
             FillA( &p_dst->p[0], OFFSET_A );
+        else if( p_fmto->i_chroma == VLC_CODEC_ARGB )
+            FillA( &p_dst->p[0], 0 );
         else
             FillA( &p_dst->p[A_PLANE], 0 );
     }
