@@ -207,6 +207,8 @@
 #define VLC_CODEC_RGB32           VLC_FOURCC('R','V','3','2')
 /* 32 bits RGBA */
 #define VLC_CODEC_RGBA            VLC_FOURCC('R','G','B','A')
+/* 32 bits ARGB */
+#define VLC_CODEC_ARGB            VLC_FOURCC('A','R','G','B')
 /* 8 bits grey */
 #define VLC_CODEC_GREY            VLC_FOURCC('G','R','E','Y')
 /* Packed YUV 4:2:2, U:Y:V:Y */

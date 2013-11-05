@@ -227,6 +227,7 @@ static sout_stream_id_t *AddVideo( sout_stream_t *p_stream, es_format_t *p_fmt )
     {
         case VLC_CODEC_RGB32:
         case VLC_CODEC_RGBA:
+        case VLC_CODEC_ARGB:
             i_bits_per_pixel = 32;
             break;
         case VLC_CODEC_I444:

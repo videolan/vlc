@@ -125,6 +125,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_CODEC_RGB8:
         case VLC_CODEC_RGBP:
         case VLC_CODEC_RGBA:
+        case VLC_CODEC_ARGB:
             break;
 
         default:
