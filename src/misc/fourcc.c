@@ -355,6 +355,7 @@ static const staticentry_t p_list_video[] = {
         A("JPEG"),
         A("JFIF"),
         A("JPGL"),
+        A("LJPG"),
         A("AVDJ"),
         A("MMJP"),
         A("FLJP"),
