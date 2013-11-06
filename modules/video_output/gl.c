@@ -97,37 +97,28 @@ static int Control (vout_display_t *, int, va_list);
 
 static vout_window_t *MakeWindow (vout_display_t *vd)
 {
-    vout_window_cfg_t wnd_cfg;
+    vout_window_cfg_t cfg = {
+        .x = var_InheritInteger (vd, "video-x"),
+        .y = var_InheritInteger (vd, "video-y"),
+        .width = vd->cfg->display.width,
+        .height = vd->cfg->display.height,
+    };
+    vout_window_t *wnd;
 
-    memset (&wnd_cfg, 0, sizeof (wnd_cfg));
-
-    /* Please keep this in sync with egl.c */
-    /* <EGL/eglplatform.h> defines the list and order of platforms */
-#if defined(_WIN32) || defined(__VC32__) \
- && !defined(__CYGWIN__) && !defined(__SCITECH_SNAP__)
-    wnd_cfg.type = VOUT_WINDOW_TYPE_HWND;
-#elif defined(__WINSCW__) || defined(__SYMBIAN32__)  /* Symbian */
-# warning Symbian not supported.
-#elif defined(WL_EGL_PLATFORM)
-# error Wayland not supported.
-#elif defined(__GBM__)
-# error Glamor not supported.
-#elif defined(ANDROID)
-# error Android not supported.
-#elif defined(__unix__) /* X11 */
-    wnd_cfg.type = VOUT_WINDOW_TYPE_XID;
-#else
-# error Platform not recognized.
+#ifdef _WIN32
+    cfg.type = VOUT_WINDOW_TYPE_HWND;
+    wnd = vout_display_NewWindow (vd, &cfg);
+    if (wnd != NULL)
+        return wnd;
 #endif
-    wnd_cfg.x = var_InheritInteger (vd, "video-x");
-    wnd_cfg.y = var_InheritInteger (vd, "video-y");
-    wnd_cfg.width  = vd->cfg->display.width;
-    wnd_cfg.height = vd->cfg->display.height;
 
-    vout_window_t *wnd = vout_display_NewWindow (vd, &wnd_cfg);
-    if (wnd == NULL)
-        msg_Err (vd, "parent window not available");
-    return wnd;
+    cfg.type = VOUT_WINDOW_TYPE_XID;
+    wnd = vout_display_NewWindow (vd, &cfg);
+    if (wnd != NULL)
+        return wnd;
+
+    msg_Err (vd, "parent window not available");
+    return NULL;
 }
 
 /**
