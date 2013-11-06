@@ -65,6 +65,8 @@
 #define KEY_MENU             0x00370000
 #define KEY_PAGEUP           0x00390000
 #define KEY_PAGEDOWN         0x003A0000
+#define KEY_PRINT            0x003B0000
+#define KEY_PAUSE            0x003D0000
 
 #define KEY_BROWSER_BACK     0x003F0000
 #define KEY_BROWSER_FORWARD  0x00400000

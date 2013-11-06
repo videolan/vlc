@@ -108,6 +108,8 @@ static const struct key_descriptor_s vlc_keys[] =
     { N_("Mouse Wheel Up"),    KEY_MOUSEWHEELUP      },
     { N_("Page Down"),         KEY_PAGEDOWN          },
     { N_("Page Up"),           KEY_PAGEUP            },
+    { N_("Pause"),             KEY_PAUSE             },
+    { N_("Print"),             KEY_PRINT             },
     { N_("Right"),             KEY_RIGHT             },
     { N_("Space"),             ' '                   },
     { N_("Tab"),               KEY_TAB               },
