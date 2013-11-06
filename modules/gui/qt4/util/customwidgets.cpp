@@ -135,8 +135,8 @@ static const vlc_qt_key_t keys[] =
     { Qt::Key_Enter,                 '\r' }, // numeric pad
     { Qt::Key_Insert,                KEY_INSERT },
     { Qt::Key_Delete,                KEY_DELETE },
-    // Qt::Key_Pause
-    // Qt::Key_Print
+    { Qt::Key_Pause,                 KEY_PAUSE },
+    { Qt::Key_Print,                 KEY_PRINT },
     // Qt::Key_SysReq
     // Qt::Key_Clear
     { Qt::Key_Home,                  KEY_HOME },
