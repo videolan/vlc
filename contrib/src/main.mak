@@ -130,10 +130,11 @@ CC=xcrun clang
 CXX=xcrun clang++
 ifeq ($(ARCH), arm)
 AS=perl $(abspath ../../extras/tools/build/bin/gas-preprocessor.pl) $(CC)
+CCAS=gas-preprocessor.pl $(CC) -c
 else
+CCAS=$(CC) -c
 AS=xcrun as
 endif
-CCAS=gas-preprocessor.pl $(CC) -c
 AR=xcrun ar
 LD=xcrun ld
 STRIP=xcrun strip
