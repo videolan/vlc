@@ -1,6 +1,6 @@
 # matroska
 
-MATROSKA_VERSION := 1.4.0
+MATROSKA_VERSION := 1.4.1
 MATROSKA_URL := http://dl.matroska.org/downloads/libmatroska/libmatroska-$(MATROSKA_VERSION).tar.bz2
 #MATROSKA_URL := $(CONTRIB_VIDEOLAN)/libmatroska-$(MATROSKA_VERSION).tar.bz2
 
@@ -15,7 +15,6 @@ $(TARBALLS)/libmatroska-$(MATROSKA_VERSION).tar.bz2:
 libmatroska: libmatroska-$(MATROSKA_VERSION).tar.bz2 .sum-matroska
 	$(UNPACK)
 	$(APPLY) $(SRC)/matroska/matroska-pic.patch
-	$(APPLY) $(SRC)/matroska/no-ansi.patch
 	$(MOVE)
 
 .matroska: libmatroska
