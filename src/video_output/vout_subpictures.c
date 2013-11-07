@@ -1449,11 +1449,13 @@ subpicture_t *spu_Render(spu_t *spu,
     static const vlc_fourcc_t chroma_list_default_yuv[] = {
         VLC_CODEC_YUVA,
         VLC_CODEC_RGBA,
+        VLC_CODEC_ARGB,
         VLC_CODEC_YUVP,
         0,
     };
     static const vlc_fourcc_t chroma_list_default_rgb[] = {
         VLC_CODEC_RGBA,
+        VLC_CODEC_ARGB,
         VLC_CODEC_YUVA,
         VLC_CODEC_YUVP,
         0,
