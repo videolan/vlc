@@ -844,6 +844,8 @@ static void SpuRenderRegion(spu_t *spu,
             {
                 scale->fmt_in.video  = picture->format;
                 scale->fmt_out.video = picture->format;
+                if (using_palette)
+                    scale->fmt_in.video.i_chroma = chroma_list[0];
                 if (convert_chroma)
                     scale->fmt_out.i_codec        =
                     scale->fmt_out.video.i_chroma = chroma_list[0];
