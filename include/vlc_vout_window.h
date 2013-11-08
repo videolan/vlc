@@ -45,6 +45,7 @@ enum {
     VOUT_WINDOW_TYPE_XID,
     VOUT_WINDOW_TYPE_HWND,
     VOUT_WINDOW_TYPE_NSOBJECT,
+    VOUT_WINDOW_TYPE_ANDROID_NATIVE,
 };
 
 /**
@@ -87,9 +88,10 @@ struct vout_window_t {
      * It must be filled in the open function.
      */
     union {
-        void     *hwnd;     /* Win32 window handle */
-        uint32_t xid;       /* X11 windows ID */
-        void     *nsobject; /* Mac OSX view object */
+        void     *hwnd;          /* Win32 window handle */
+        uint32_t xid;            /* X11 windows ID */
+        void     *nsobject;      /* Mac OSX view object */
+        void     *anativewindow; /* Android native window. */
     } handle;
 
     /* display server (mandatory) */
