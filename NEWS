@@ -25,6 +25,7 @@ Streaming:
 Video Output:
  * Direct rendering and filtering for VDPAU hardware acceleration
  * New CoreGraphics video output module for NPAPI plugins
+ * New OpenGL ES 2.0 through EGL video output module for Android
 
 Video Filter:
  * New Oldmovie effect filter
