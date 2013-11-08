@@ -182,12 +182,19 @@ endif
 
 ### Android ###
 
+libegl_android_plugin_la_SOURCES = egl.c
+libegl_android_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) -DUSE_PLATFORM_ANDROID=1
+libegl_android_plugin_la_LIBADD = $(EGL_LIBS)
+
 libandroid_native_window_plugin_la_SOURCES = android/nativewindow.c
 libandroid_native_window_plugin_la_CFLAGS = $(AM_CFLAGS)
 libandroid_native_window_plugin_la_LIBADD = -ldl
 
 if HAVE_ANDROID
 vout_LTLIBRARIES += libandroid_native_window_plugin.la
+if HAVE_EGL
+vout_LTLIBRARIES += libegl_android_plugin.la
+endif
 endif
 
 ### Coloured ASCII art ###

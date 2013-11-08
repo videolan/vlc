@@ -209,6 +209,15 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     window.native = wnd->handle.hwnd;
 # endif
 
+#elif defined (USE_PLATFORM_ANDROID)
+    if (wnd->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
+        goto error;
+
+# if USE_DEFAULT_PLATFORM
+    sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    window.native = wnd->handle.anativewindow;
+# endif
+
 #endif
 
     if (sys->display == EGL_NO_DISPLAY)

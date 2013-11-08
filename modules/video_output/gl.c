@@ -105,14 +105,14 @@ static vout_window_t *MakeWindow (vout_display_t *vd)
     };
     vout_window_t *wnd;
 
-#ifdef _WIN32
+#if defined(_WIN32)
     cfg.type = VOUT_WINDOW_TYPE_HWND;
-    wnd = vout_display_NewWindow (vd, &cfg);
-    if (wnd != NULL)
-        return wnd;
+#elif defined(__ANDROID__)
+    cfg.type = VOUT_WINDOW_TYPE_ANDROID_NATIVE;
+#else
+    cfg.type = VOUT_WINDOW_TYPE_XID;
 #endif
 
-    cfg.type = VOUT_WINDOW_TYPE_XID;
     wnd = vout_display_NewWindow (vd, &cfg);
     if (wnd != NULL)
         return wnd;
