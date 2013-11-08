@@ -825,8 +825,10 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
             }
         } else {
             const int i_chunks = bs_read(&s, 4);
+#if 0
             int pi_program[16];
             int pi_layer[16];
+#endif
 
             msg_Err(p_dec, "latm without same time frameing not yet supported, please send a sample");
 
@@ -836,8 +838,10 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
                 const int i_program = st->i_program;
                 const int i_layer = st->i_layer;
 
+#if 0
                 pi_program[i_chunk] = i_program;
                 pi_layer[i_chunk] = i_layer;
+#endif
 
                 if (st->i_frame_length_type == 0) {
                     int i_payload = 0;
@@ -857,12 +861,14 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
                     bs_read(&s, 2); // muxSlotLengthCoded
                 }
             }
+#if 0
             for (int i_chunk = 0; i_chunk < i_chunks; i_chunk++) {
                 //const int i_program = pi_program[i_chunk];
                 //const int i_layer = pi_layer[i_chunk];
 
                 /* TODO ? Payload */
             }
+#endif
         }
     }
 
