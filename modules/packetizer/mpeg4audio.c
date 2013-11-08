@@ -895,163 +895,153 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
 
     block_BytestreamPush(&p_sys->bytestream, *pp_block);
 
-    for (;;)
-    {
-        switch(p_sys->i_state)
-        {
+    for (;;) switch(p_sys->i_state) {
+    case STATE_NOSYNC:
+        while (block_PeekBytes(&p_sys->bytestream, p_header, 2) == VLC_SUCCESS) {
+            /* Look for sync word - should be 0xfff(adts) or 0x2b7(loas) */
+            if (p_header[0] == 0xff && (p_header[1] & 0xf6) == 0xf0) {
+                if (p_sys->i_type != TYPE_ADTS)
+                    msg_Dbg(p_dec, "detected ADTS format");
 
-        case STATE_NOSYNC:
-            while (block_PeekBytes(&p_sys->bytestream, p_header, 2)
-                   == VLC_SUCCESS)
-            {
-                /* Look for sync word - should be 0xfff(adts) or 0x2b7(loas) */
-                if (p_header[0] == 0xff && (p_header[1] & 0xf6) == 0xf0) {
-                    if (p_sys->i_type != TYPE_ADTS)
-                        msg_Dbg(p_dec, "detected ADTS format");
+                p_sys->i_state = STATE_SYNC;
+                p_sys->i_type = TYPE_ADTS;
+                break;
+            } else if (p_header[0] == 0x56 && (p_header[1] & 0xe0) == 0xe0) {
+                if (p_sys->i_type != TYPE_LOAS)
+                    msg_Dbg(p_dec, "detected LOAS format");
 
-                    p_sys->i_state = STATE_SYNC;
-                    p_sys->i_type = TYPE_ADTS;
-                    break;
-                } else if (p_header[0] == 0x56 && (p_header[1] & 0xe0) == 0xe0) {
-                    if (p_sys->i_type != TYPE_LOAS)
-                        msg_Dbg(p_dec, "detected LOAS format");
-
-                    p_sys->i_state = STATE_SYNC;
-                    p_sys->i_type = TYPE_LOAS;
-                    break;
-                }
-                block_SkipByte(&p_sys->bytestream);
-            }
-            if (p_sys->i_state != STATE_SYNC) {
-                block_BytestreamFlush(&p_sys->bytestream);
-
-                /* Need more data */
-                return NULL;
-            }
-
-        case STATE_SYNC:
-            /* New frame, set the Presentation Time Stamp */
-            p_sys->i_pts = p_sys->bytestream.p_block->i_pts;
-            if (p_sys->i_pts > VLC_TS_INVALID &&
-                p_sys->i_pts != date_Get(&p_sys->end_date))
-                date_Set(&p_sys->end_date, p_sys->i_pts);
-            p_sys->i_state = STATE_HEADER;
-            break;
-
-        case STATE_HEADER:
-            if (p_sys->i_type == TYPE_ADTS) {
-                /* Get ADTS frame header (ADTS_HEADER_SIZE bytes) */
-                if (block_PeekBytes(&p_sys->bytestream, p_header,
-                                     ADTS_HEADER_SIZE) != VLC_SUCCESS)
-                    return NULL; /* Need more data */
-
-                /* Check if frame is valid and get frame info */
-                p_sys->i_frame_size = ADTSSyncInfo(p_dec, p_header,
-                                                    &p_sys->i_channels,
-                                                    &p_sys->i_rate,
-                                                    &p_sys->i_frame_length,
-                                                    &p_sys->i_header_size);
-            } else {
-                assert(p_sys->i_type == TYPE_LOAS);
-                /* Get LOAS frame header (LOAS_HEADER_SIZE bytes) */
-                if (block_PeekBytes(&p_sys->bytestream, p_header,
-                                     LOAS_HEADER_SIZE) != VLC_SUCCESS)
-                    return NULL; /* Need more data */
-
-                /* Check if frame is valid and get frame info */
-                p_sys->i_frame_size = LOASSyncInfo(p_header, &p_sys->i_header_size);
-            }
-
-            if (p_sys->i_frame_size <= 0) {
-                msg_Dbg(p_dec, "emulated sync word");
-                block_SkipByte(&p_sys->bytestream);
-                p_sys->i_state = STATE_NOSYNC;
+                p_sys->i_state = STATE_SYNC;
+                p_sys->i_type = TYPE_LOAS;
                 break;
             }
-
-            p_sys->i_state = STATE_NEXT_SYNC;
-
-        case STATE_NEXT_SYNC:
-            /* TODO: If p_block == NULL, flush the buffer without checking the
-             * next sync word */
-            if (p_sys->bytestream.p_block == NULL) {
-                p_sys->i_state = STATE_NOSYNC;
-                block_BytestreamFlush(&p_sys->bytestream);
-                return NULL;
-            }
-
-            /* Check if next expected frame contains the sync word */
-            if (block_PeekOffsetBytes(&p_sys->bytestream, p_sys->i_frame_size
-                   + p_sys->i_header_size, p_header, 2) != VLC_SUCCESS)
-                return NULL; /* Need more data */
-
-            assert((p_sys->i_type == TYPE_ADTS) || (p_sys->i_type == TYPE_LOAS));
-            if (((p_sys->i_type == TYPE_ADTS) &&
-                  (p_header[0] != 0xff || (p_header[1] & 0xf6) != 0xf0)) ||
-                ((p_sys->i_type == TYPE_LOAS) &&
-                  (p_header[0] != 0x56 || (p_header[1] & 0xe0) != 0xe0))) {
-                msg_Dbg(p_dec, "emulated sync word "
-                         "(no sync on following frame)");
-                p_sys->i_state = STATE_NOSYNC;
-                block_SkipByte(&p_sys->bytestream);
-                break;
-            }
-
-            p_sys->i_state = STATE_SEND_DATA;
-            break;
-
-        case STATE_GET_DATA:
-            /* Make sure we have enough data.
-             * (Not useful if we went through NEXT_SYNC) */
-            if (block_WaitBytes(&p_sys->bytestream, p_sys->i_frame_size +
-                                 p_sys->i_header_size) != VLC_SUCCESS)
-                return NULL; /* Need more data */
-            p_sys->i_state = STATE_SEND_DATA;
-
-        case STATE_SEND_DATA:
-            /* When we reach this point we already know we have enough
-             * data available. */
-
-            p_out_buffer = block_Alloc(p_sys->i_frame_size);
-            if (!p_out_buffer) {
-                //p_dec->b_error = true;
-                return NULL;
-            }
-            p_buf = p_out_buffer->p_buffer;
-
-            /* Skip the ADTS/LOAS header */
-            block_SkipBytes(&p_sys->bytestream, p_sys->i_header_size);
-
-            if (p_sys->i_type == TYPE_ADTS) {
-                /* Copy the whole frame into the buffer */
-                block_GetBytes(&p_sys->bytestream, p_buf, p_sys->i_frame_size);
-            } else {
-                assert(p_sys->i_type == TYPE_LOAS);
-                /* Copy the whole frame into the buffer and parse/extract it */
-                block_GetBytes(&p_sys->bytestream, p_buf, p_sys->i_frame_size);
-                p_out_buffer->i_buffer = LOASParse(p_dec, p_buf, p_sys->i_frame_size);
-                if (p_out_buffer->i_buffer <= 0) {
-                    if (!p_sys->b_latm_cfg)
-                        msg_Warn(p_dec, "waiting for header");
-
-                    block_Release(p_out_buffer);
-                    p_out_buffer = NULL;
-                    p_sys->i_state = STATE_NOSYNC;
-                    break;
-                }
-            }
-            SetupOutput(p_dec, p_out_buffer);
-            /* Make sure we don't reuse the same pts twice */
-            if (p_sys->i_pts == p_sys->bytestream.p_block->i_pts)
-                p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
-
-            /* So p_block doesn't get re-added several times */
-            *pp_block = block_BytestreamPop(&p_sys->bytestream);
-
-            p_sys->i_state = STATE_NOSYNC;
-
-            return p_out_buffer;
+            block_SkipByte(&p_sys->bytestream);
         }
+        if (p_sys->i_state != STATE_SYNC) {
+            block_BytestreamFlush(&p_sys->bytestream);
+
+            /* Need more data */
+            return NULL;
+        }
+
+    case STATE_SYNC:
+        /* New frame, set the Presentation Time Stamp */
+        p_sys->i_pts = p_sys->bytestream.p_block->i_pts;
+        if (p_sys->i_pts > VLC_TS_INVALID &&
+                p_sys->i_pts != date_Get(&p_sys->end_date))
+            date_Set(&p_sys->end_date, p_sys->i_pts);
+        p_sys->i_state = STATE_HEADER;
+        break;
+
+    case STATE_HEADER:
+        if (p_sys->i_type == TYPE_ADTS) {
+            /* Get ADTS frame header (ADTS_HEADER_SIZE bytes) */
+            if (block_PeekBytes(&p_sys->bytestream, p_header,
+                        ADTS_HEADER_SIZE) != VLC_SUCCESS)
+                return NULL; /* Need more data */
+
+            /* Check if frame is valid and get frame info */
+            p_sys->i_frame_size = ADTSSyncInfo(p_dec, p_header,
+                    &p_sys->i_channels,
+                    &p_sys->i_rate,
+                    &p_sys->i_frame_length,
+                    &p_sys->i_header_size);
+        } else {
+            assert(p_sys->i_type == TYPE_LOAS);
+            /* Get LOAS frame header (LOAS_HEADER_SIZE bytes) */
+            if (block_PeekBytes(&p_sys->bytestream, p_header,
+                        LOAS_HEADER_SIZE) != VLC_SUCCESS)
+                return NULL; /* Need more data */
+
+            /* Check if frame is valid and get frame info */
+            p_sys->i_frame_size = LOASSyncInfo(p_header, &p_sys->i_header_size);
+        }
+
+        if (p_sys->i_frame_size <= 0) {
+            msg_Dbg(p_dec, "emulated sync word");
+            block_SkipByte(&p_sys->bytestream);
+            p_sys->i_state = STATE_NOSYNC;
+            break;
+        }
+
+        p_sys->i_state = STATE_NEXT_SYNC;
+
+    case STATE_NEXT_SYNC:
+        /* TODO: If p_block == NULL, flush the buffer without checking the
+         * next sync word */
+        if (p_sys->bytestream.p_block == NULL) {
+            p_sys->i_state = STATE_NOSYNC;
+            block_BytestreamFlush(&p_sys->bytestream);
+            return NULL;
+        }
+
+        /* Check if next expected frame contains the sync word */
+        if (block_PeekOffsetBytes(&p_sys->bytestream, p_sys->i_frame_size
+                    + p_sys->i_header_size, p_header, 2) != VLC_SUCCESS)
+            return NULL; /* Need more data */
+
+        assert((p_sys->i_type == TYPE_ADTS) || (p_sys->i_type == TYPE_LOAS));
+        if (((p_sys->i_type == TYPE_ADTS) &&
+                    (p_header[0] != 0xff || (p_header[1] & 0xf6) != 0xf0)) ||
+                ((p_sys->i_type == TYPE_LOAS) &&
+                 (p_header[0] != 0x56 || (p_header[1] & 0xe0) != 0xe0))) {
+            msg_Dbg(p_dec, "emulated sync word "
+                    "(no sync on following frame)");
+            p_sys->i_state = STATE_NOSYNC;
+            block_SkipByte(&p_sys->bytestream);
+            break;
+        }
+
+        p_sys->i_state = STATE_SEND_DATA;
+        break;
+
+    case STATE_GET_DATA:
+        /* Make sure we have enough data.
+         * (Not useful if we went through NEXT_SYNC) */
+        if (block_WaitBytes(&p_sys->bytestream, p_sys->i_frame_size +
+                    p_sys->i_header_size) != VLC_SUCCESS)
+            return NULL; /* Need more data */
+        p_sys->i_state = STATE_SEND_DATA;
+
+    case STATE_SEND_DATA:
+        /* When we reach this point we already know we have enough
+         * data available. */
+
+        p_out_buffer = block_Alloc(p_sys->i_frame_size);
+        if (!p_out_buffer) {
+            //p_dec->b_error = true;
+            return NULL;
+        }
+        p_buf = p_out_buffer->p_buffer;
+
+        /* Skip the ADTS/LOAS header */
+        block_SkipBytes(&p_sys->bytestream, p_sys->i_header_size);
+
+        /* Copy the whole frame into the buffer */
+        block_GetBytes(&p_sys->bytestream, p_buf, p_sys->i_frame_size);
+        if (p_sys->i_type != TYPE_ADTS) { /* parse/extract the whole frame */
+            assert(p_sys->i_type == TYPE_LOAS);
+            p_out_buffer->i_buffer = LOASParse(p_dec, p_buf, p_sys->i_frame_size);
+            if (p_out_buffer->i_buffer <= 0) {
+                if (!p_sys->b_latm_cfg)
+                    msg_Warn(p_dec, "waiting for header");
+
+                block_Release(p_out_buffer);
+                p_out_buffer = NULL;
+                p_sys->i_state = STATE_NOSYNC;
+                break;
+            }
+        }
+        SetupOutput(p_dec, p_out_buffer);
+        /* Make sure we don't reuse the same pts twice */
+        if (p_sys->i_pts == p_sys->bytestream.p_block->i_pts)
+            p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
+
+        /* So p_block doesn't get re-added several times */
+        *pp_block = block_BytestreamPop(&p_sys->bytestream);
+
+        p_sys->i_state = STATE_NOSYNC;
+
+        return p_out_buffer;
     }
 
     return NULL;
