@@ -98,7 +98,7 @@ struct demux_sys_t
     int64_t             i_data_end;
 
     bool                b_index;
-    unsigned int        i_seek_track;
+    uint8_t             i_seek_track;
     unsigned int        i_wait_keyframe;
 
     vlc_meta_t          *meta;
@@ -391,7 +391,7 @@ static mtime_t GetMoviePTS( demux_sys_t *p_sys )
     return i_time;
 }
 
-static inline int GetValue2b(int *var, const uint8_t *p, int *skip, int left, int bits)
+static inline int GetValue2b(uint32_t *var, const uint8_t *p, unsigned int *skip, int left, int bits)
 {
     switch(bits&0x03)
     {
@@ -418,17 +418,17 @@ static inline int GetValue2b(int *var, const uint8_t *p, int *skip, int left, in
 
 struct asf_packet_t
 {
-    int property;
-    int length;
-    int padding_length;
+    uint32_t property;
+    uint32_t length;
+    uint32_t padding_length;
     uint32_t send_time;
     bool multiple;
     int length_type;
 
     /* buffer handling for this ASF packet */
-    int i_skip;
+    uint32_t i_skip;
     const uint8_t *p_peek;
-    int left;
+    uint32_t left;
 };
 
 static void SendPacket(demux_t *p_demux, asf_track_t *tk)
@@ -449,7 +449,7 @@ static void SendPacket(demux_t *p_demux, asf_track_t *tk)
 }
 
 static int DemuxSubPayload(demux_t *p_demux, asf_track_t *tk,
-        int i_sub_payload_data_length, mtime_t i_pts, int i_media_object_offset)
+        uint32_t i_sub_payload_data_length, mtime_t i_pts, uint32_t i_media_object_offset)
 {
     /* FIXME I don't use i_media_object_number, sould I ? */
     if( tk->p_frame && i_media_object_offset == 0 )
@@ -473,37 +473,66 @@ static int DemuxSubPayload(demux_t *p_demux, asf_track_t *tk,
     return 0;
 }
 
+static uint32_t SkipBytes( stream_t *s, uint32_t i_bytes )
+{
+    int i_read;
+    int i_to_read = __MIN(i_bytes, INT_MAX);
+    uint32_t i_bytes_read = 0;
+
+    while( i_bytes )
+    {
+        i_read = stream_Read( s, NULL, i_to_read );
+        i_bytes -= i_read;
+        i_bytes_read += i_read;
+        if ( i_read < i_to_read || i_bytes == 0 )
+        {
+            /* end of stream */
+            return i_bytes_read;
+        }
+        i_to_read = __MIN(i_bytes, INT_MAX);
+    }
+
+    return i_bytes_read;
+}
+
 static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payload)
 {
+#ifndef ASF_DEBUG
+    VLC_UNUSED( i_payload );
+#endif
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( pkt->i_skip >= pkt->left )
+    if( ! pkt->left || pkt->i_skip >= pkt->left )
         return -1;
 
-    int i_packet_keyframe = pkt->p_peek[pkt->i_skip] >> 7;
-    unsigned int i_stream_number = pkt->p_peek[pkt->i_skip++] & 0x7f;
+    bool b_packet_keyframe = pkt->p_peek[pkt->i_skip] >> 7;
+    uint8_t i_stream_number = pkt->p_peek[pkt->i_skip++] & 0x7f;
 
-    int i_media_object_number = 0;
+    uint32_t i_media_object_number = 0;
     if (GetValue2b(&i_media_object_number, pkt->p_peek, &pkt->i_skip, pkt->left - pkt->i_skip, pkt->property >> 4) < 0)
         return -1;
-    int i_media_object_offset = 0;
+    uint32_t i_media_object_offset = 0;
     if (GetValue2b(&i_media_object_offset, pkt->p_peek, &pkt->i_skip, pkt->left - pkt->i_skip, pkt->property >> 2) < 0)
         return -1;
-    int i_replicated_data_length = 0;
+    uint32_t i_replicated_data_length = 0;
     if (GetValue2b(&i_replicated_data_length, pkt->p_peek, &pkt->i_skip, pkt->left - pkt->i_skip, pkt->property) < 0)
         return -1;
 
     mtime_t i_pts;
+    /* Non compressed */
     if( i_replicated_data_length > 1 ) // should be at least 8 bytes
     {
         i_pts = (mtime_t)GetDWLE( pkt->p_peek + pkt->i_skip + 4 );
         pkt->i_skip += i_replicated_data_length;
 
-        if( pkt->i_skip >= pkt->left )
+        if( ! pkt->left || pkt->i_skip >= pkt->left )
             return -1;
     }
+    /* Compressed sub payload */
     else if( i_replicated_data_length == 1 )
     {
+        /* i_media_object_offset is presentation time */
+        /* Next byte is Presentation Time Delta */
         i_pts = (mtime_t)i_media_object_offset + (mtime_t)pkt->p_peek[pkt->i_skip] * i_payload;
         pkt->i_skip++;
         i_media_object_offset = 0;
@@ -517,19 +546,22 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     if (i_pts < 0) i_pts = 0; // FIXME?
     i_pts *= 1000; // FIXME ?
 
-    int i_payload_data_length = 0;
+    uint32_t i_payload_data_length = 0;
+    uint32_t i_temp_payload_length = 0;
     if( pkt->multiple ) {
-        if (GetValue2b(&i_payload_data_length, pkt->p_peek, &pkt->i_skip, pkt->left - pkt->i_skip, pkt->length_type) < 0)
+        if (GetValue2b(&i_temp_payload_length, pkt->p_peek, &pkt->i_skip, pkt->left - pkt->i_skip, pkt->length_type) < 0)
             return -1;
     } else
-        i_payload_data_length = pkt->length - pkt->padding_length - pkt->i_skip;
+        i_temp_payload_length = pkt->length - pkt->padding_length - pkt->i_skip;
 
-    if( i_payload_data_length < 0 || i_payload_data_length > pkt->left )
+    if( ! i_temp_payload_length || i_temp_payload_length > pkt->left )
         return -1;
+    else
+        i_payload_data_length = i_temp_payload_length;
 
 #ifdef ASF_DEBUG
      msg_Dbg( p_demux,
-              "payload(%d) stream_number:%d media_object_number:%d media_object_offset:%d replicated_data_length:%d payload_data_length %d",
+              "payload(%d) stream_number:%"PRIu8" media_object_number:%d media_object_offset:%"PRIu32" replicated_data_length:%"PRIu32" payload_data_length %"PRIu32,
               i_payload + 1, i_stream_number, i_media_object_number,
               i_media_object_offset, i_replicated_data_length, i_payload_data_length );
 #endif
@@ -542,7 +574,7 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     }
 
     if( p_sys->i_wait_keyframe && !i_media_object_offset &&
-        (i_stream_number != p_sys->i_seek_track || !i_packet_keyframe) )
+        (i_stream_number != p_sys->i_seek_track || !b_packet_keyframe) )
     {
         p_sys->i_wait_keyframe--;
         goto skip;
@@ -554,27 +586,38 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
 
     while (i_payload_data_length)
     {
-        int i_sub_payload_data_length = i_payload_data_length;
+        uint32_t i_sub_payload_data_length = i_payload_data_length;
         if( i_replicated_data_length == 1 )
         {
             i_sub_payload_data_length = pkt->p_peek[pkt->i_skip++];
             i_payload_data_length--;
         }
 
-        stream_Read(p_demux->s, NULL, pkt->i_skip);
+        SkipBytes( p_demux->s, pkt->i_skip );
 
         if (DemuxSubPayload(p_demux, tk, i_sub_payload_data_length, i_pts,
                             i_media_object_offset) < 0)
             return -1;
 
-        pkt->left -= pkt->i_skip + i_sub_payload_data_length;
+        if ( pkt->left > pkt->i_skip + i_sub_payload_data_length )
+            pkt->left -= pkt->i_skip + i_sub_payload_data_length;
+        else
+            pkt->left = 0;
         pkt->i_skip = 0;
-        if( pkt->left > 0 && stream_Peek( p_demux->s, &pkt->p_peek, pkt->left ) < pkt->left ) {
+        if( pkt->left > 0 )
+        {
+            int i_return = stream_Peek( p_demux->s, &pkt->p_peek, __MIN(pkt->left, INT_MAX) );
+            if ( i_return <= 0 || (unsigned int) i_return < __MIN(pkt->left, INT_MAX) )
+            {
             msg_Warn( p_demux, "cannot peek, EOF ?" );
             return -1;
+            }
         }
 
-        i_payload_data_length -= i_sub_payload_data_length;
+        if ( i_sub_payload_data_length <= i_payload_data_length )
+            i_payload_data_length -= i_sub_payload_data_length;
+        else
+            i_payload_data_length = 0;
     }
 
     return 0;
@@ -588,15 +631,16 @@ static int DemuxPacket( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    int i_data_packet_min = p_sys->p_fp->i_min_data_packet_size;
+    uint32_t i_data_packet_min = p_sys->p_fp->i_min_data_packet_size;
 
     const uint8_t *p_peek;
-    if( stream_Peek( p_demux->s, &p_peek,i_data_packet_min)<i_data_packet_min )
+    int i_return = stream_Peek( p_demux->s, &p_peek,i_data_packet_min );
+    if( i_return <= 0 || ((unsigned int) i_return) < i_data_packet_min )
     {
         msg_Warn( p_demux, "cannot peek while getting new packet, EOF ?" );
         return 0;
     }
-    int i_skip = 0;
+    unsigned int i_skip = 0;
 
     /* *** parse error correction if present *** */
     if( p_peek[0]&0x80 )
@@ -632,7 +676,7 @@ static int DemuxPacket( demux_t *p_demux )
 
     if (GetValue2b(&pkt.length, p_peek, &i_skip, i_data_packet_min - i_skip, i_packet_flags >> 5) < 0)
         goto loop_error_recovery;
-    int i_packet_sequence;
+    uint32_t i_packet_sequence;
     if (GetValue2b(&i_packet_sequence, p_peek, &i_skip, i_data_packet_min - i_skip, i_packet_flags >> 1) < 0)
         goto loop_error_recovery;
     if (GetValue2b(&pkt.padding_length, p_peek, &i_skip, i_data_packet_min - i_skip, i_packet_flags >> 3) < 0)
@@ -654,7 +698,8 @@ static int DemuxPacket( demux_t *p_demux )
     pkt.send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
     /* uint16_t i_packet_duration = GetWLE( p_peek + i_skip ); */ i_skip += 2;
 
-    if( pkt.length <= 0 || stream_Peek( p_demux->s, &p_peek, pkt.length ) < pkt.length)
+    i_return = stream_Peek( p_demux->s, &p_peek, pkt.length );
+    if( i_return <= 0 || pkt.length == 0 || (unsigned int)i_return < pkt.length )
     {
         msg_Warn( p_demux, "cannot peek, EOF ?" );
         return 0;
@@ -685,13 +730,14 @@ static int DemuxPacket( demux_t *p_demux )
     {
 #ifdef ASF_DEBUG
         if( pkt.left > pkt.padding_length )
-            msg_Warn( p_demux, "Didn't read %d bytes in the packet",
+            msg_Warn( p_demux, "Didn't read %"PRIu32" bytes in the packet",
                             pkt.left - pkt.padding_length );
         else if( pkt.left < pkt.padding_length )
-            msg_Warn( p_demux, "Read %d too much bytes in the packet",
+            msg_Warn( p_demux, "Read %"PRIu32" too much bytes in the packet",
                             pkt.padding_length - pkt.left );
 #endif
-        if( stream_Read( p_demux->s, NULL, pkt.left ) < pkt.left )
+        int i_return = stream_Read( p_demux->s, NULL, pkt.left );
+        if( i_return < 0 || (unsigned int) i_return < pkt.left )
         {
             msg_Err( p_demux, "cannot skip data, EOF ?" );
             return 0;
@@ -707,7 +753,8 @@ loop_error_recovery:
         msg_Err( p_demux, "unsupported packet header, fatal error" );
         return -1;
     }
-    if( stream_Read( p_demux->s, NULL, i_data_packet_min ) != i_data_packet_min )
+    i_return = stream_Read( p_demux->s, NULL, i_data_packet_min );
+    if( i_return <= 0 || (unsigned int) i_return != i_data_packet_min )
     {
         msg_Warn( p_demux, "cannot skip data, EOF ?" );
         return 0;
@@ -875,11 +922,11 @@ static int DemuxInit( demux_t *p_demux )
 
         /* Check (in case of mms) if this track is selected (ie will receive data) */
         if( !stream_Control( p_demux->s, STREAM_GET_PRIVATE_ID_STATE,
-                             p_sp->i_stream_number, &b_access_selected ) &&
+                             (int) p_sp->i_stream_number, &b_access_selected ) &&
             !b_access_selected )
         {
             tk->i_cat = UNKNOWN_ES;
-            msg_Dbg( p_demux, "ignoring not selected stream(ID:%d) (by access)",
+            msg_Dbg( p_demux, "ignoring not selected stream(ID:%u) (by access)",
                      p_sp->i_stream_number );
             continue;
         }
