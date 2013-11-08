@@ -180,6 +180,16 @@ if HAVE_KVA
 vout_LTLIBRARIES += libkva_plugin.la
 endif
 
+### Android ###
+
+libandroid_native_window_plugin_la_SOURCES = android/nativewindow.c
+libandroid_native_window_plugin_la_CFLAGS = $(AM_CFLAGS)
+libandroid_native_window_plugin_la_LIBADD = -ldl
+
+if HAVE_ANDROID
+vout_LTLIBRARIES += libandroid_native_window_plugin.la
+endif
+
 ### Coloured ASCII art ###
 libcaca_plugin_la_SOURCES = caca.c
 libcaca_plugin_la_CFLAGS = $(AM_CFLAGS) $(CACA_CFLAGS)
