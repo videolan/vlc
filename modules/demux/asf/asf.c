@@ -83,7 +83,6 @@ typedef struct
     mtime_t i_time;
 
     block_t         *p_frame; /* use to gather complete frame */
-
 } asf_track_t;
 
 struct demux_sys_t
@@ -213,6 +212,9 @@ static int Demux( demux_t *p_demux )
     p_sys->i_time = GetMoviePTS( p_sys );
     if( p_sys->i_time >= 0 )
     {
+#ifdef ASF_DEBUG
+        msg_Dbg( p_demux, "Setting PCR to %"PRId64, p_sys->i_time );
+#endif
         es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time+1 );
     }
 
@@ -514,19 +516,17 @@ static void SendPacket(demux_t *p_demux, asf_track_t *tk)
 
     block_t *p_gather = block_ChainGather( tk->p_frame );
 
-    if( p_gather->i_pts > VLC_TS_INVALID )
-        tk->i_time = p_gather->i_pts - VLC_TS_0;
-
-    if( p_sys->i_time < 0 )
+    if( p_sys->i_time < VLC_TS_0 && tk->i_time > VLC_TS_INVALID )
     {
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_gather->i_pts );
+        p_sys->i_time = tk->i_time;
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time );
 #ifdef ASF_DEBUG
-        msg_Dbg( p_demux, "setting PCR to %"PRId64, p_gather->i_pts );
+        msg_Dbg( p_demux, "    setting PCR to %"PRId64, p_sys->i_time );
 #endif
     }
 
 #ifdef ASF_DEBUG
-    msg_Dbg( p_demux, "sending packet dts %"PRId64" %"PRId64, p_gather->i_dts, p_gather->i_pts );
+    msg_Dbg( p_demux, "    sending packet dts %"PRId64" pts %"PRId64" pcr %"PRId64, p_gather->i_dts, p_gather->i_pts, p_sys->i_time );
 #endif
 
     es_out_Send( p_demux->out, tk->p_es, p_gather );
@@ -664,9 +664,13 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
 
     mtime_t i_base_pts;
     uint8_t i_pts_delta = 0;
+    uint32_t i_payload_data_length = 0;
+    uint32_t i_temp_payload_length = 0;
+
     /* Non compressed */
-    if( i_replicated_data_length > 1 ) // should be at least 8 bytes
+    if( i_replicated_data_length > 7 ) // should be at least 8 bytes
     {
+        /* Followed by 2 optional DWORDS, offset in media and presentation time */
         i_base_pts = (mtime_t)GetDWLE( pkt->p_peek + pkt->i_skip + 4 );
 
         /* Parsing extensions, See 7.3.1 */
@@ -679,7 +683,12 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
         if( ! pkt->left || pkt->i_skip >= pkt->left )
             return -1;
     }
-    /* Compressed sub payload */
+    else if ( i_replicated_data_length == 0 )
+    {
+        /* optional DWORDS missing */
+        i_base_pts = (mtime_t)pkt->send_time;
+    }
+    /* Compressed payload */
     else if( i_replicated_data_length == 1 )
     {
         /* i_media_object_offset is presentation time */
@@ -692,24 +701,22 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     }
     else
     {
-        i_base_pts = (mtime_t)pkt->send_time;
+        /* >1 && <8 Invalid replicated length ! */
+        msg_Warn( p_demux, "Invalid replicated data length detected." );
+        i_payload_data_length = pkt->length - pkt->padding_length - pkt->i_skip;
+        goto skip;
     }
 
     if (i_base_pts < 0) i_base_pts = 0; // FIXME?
     i_base_pts *= 1000;
 
-    uint32_t i_payload_data_length = 0;
-    uint32_t i_temp_payload_length = 0;
     if( pkt->multiple ) {
         if (GetValue2b(&i_temp_payload_length, pkt->p_peek, &pkt->i_skip, pkt->left - pkt->i_skip, pkt->length_type) < 0)
             return -1;
     } else
         i_temp_payload_length = pkt->length - pkt->padding_length - pkt->i_skip;
 
-    if( ! i_temp_payload_length || i_temp_payload_length > pkt->left )
-        return -1;
-    else
-        i_payload_data_length = i_temp_payload_length;
+    i_payload_data_length = i_temp_payload_length;
 
 #ifdef ASF_DEBUG
      msg_Dbg( p_demux,
@@ -719,6 +726,12 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
      msg_Dbg( p_demux,
               "   pts=%"PRId64" st=%"PRIu32, i_base_pts, pkt->send_time );
 #endif
+
+     if( ! i_payload_data_length || i_payload_data_length > pkt->left )
+     {
+         msg_Dbg( p_demux, "  payload length problem %d %"PRIu32" %"PRIu32, pkt->multiple, i_payload_data_length, pkt->left );
+         return -1;
+     }
 
     asf_track_t *tk = p_sys->track[i_stream_number];
     if( tk == NULL )
@@ -745,6 +758,10 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
 
     if( !tk->p_es )
         goto skip;
+
+    tk->i_time = INT64_C(1000) * pkt->send_time;
+    tk->i_time -= p_sys->p_fp->i_preroll * 1000;
+    tk->i_time -= tk->p_sp->i_time_offset * 10;
 
     uint32_t i_subpayload_count = 0;
     while (i_payload_data_length)
@@ -896,7 +913,10 @@ static int DemuxPacket( demux_t *p_demux )
 
     for( int i_payload = 0; i_payload < i_payload_count ; i_payload++ )
         if (DemuxPayload(p_demux, &pkt, i_payload) < 0)
+        {
+            msg_Warn( p_demux, "payload err %d / %d", i_payload + 1, i_payload_count );
             return 0;
+        }
 
     if( pkt.left > 0 )
     {
@@ -1320,6 +1340,7 @@ static int DemuxInit( demux_t *p_demux )
             msg_Dbg( p_demux, "ignoring unknown stream(ID:%d)",
                      p_sp->i_stream_number );
         }
+
         es_format_Clean( &fmt );
     }
 
