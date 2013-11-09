@@ -169,7 +169,7 @@ static int Open (vlc_object_t *obj)
         {
             if (snum == 0)
             {
-               scr = i.data;
+                scr = i.data;
                 break;
             }
             snum--;
