@@ -1008,16 +1008,23 @@ static inline void BlendRGBAPixel( picture_t *p_picture,
 
 static void FillARGBPicture(picture_t *pic, int a, int r, int g, int b)
 {
-    for (int dy = 0; dy < pic->p->i_visible_lines; dy++)
+    if (a == 0)
+        r = g = b = 0;
+    if (a == r && a == b && a == g)
+    {   /* fast path */
+        memset(pic->p->p_pixels, a, pic->p->i_visible_lines * pic->p->i_pitch);
+        return;
+    }
+
+    uint_fast32_t pixel = VLC_FOURCC(a, r, g, b);
+    uint8_t *line = pic->p->p_pixels;
+
+    for (unsigned lines = pic->p->i_visible_lines; lines > 0; lines--)
     {
-        for (int dx = 0; dx < pic->p->i_visible_pitch; dx += 4)
-        {
-            uint8_t *rgba = &pic->p->p_pixels[dy * pic->p->i_pitch + dx];
-            rgba[0] = a;
-            rgba[1] = r;
-            rgba[2] = g;
-            rgba[3] = b;
-        }
+        uint32_t *pixels = (uint32_t *)line;
+        for (unsigned cols = pic->p->i_visible_pitch; cols > 0; cols -= 4)
+            *(pixels++) = pixel;
+        line += pic->p->i_pitch;
     }
 }
 
