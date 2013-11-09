@@ -40,6 +40,8 @@
 # include <pthread.h>
 #endif
 #include <unistd.h>
+#include <TargetConditionals.h>
+#import <CoreFoundation/CoreFoundation.h>
 
 extern void vlc_enable_override (void);
 
@@ -154,6 +156,37 @@ int main( int i_argc, const char *ppsz_argv[] )
 
     argv[argc++] = "--no-ignore-config";
     argv[argc++] = "--media-library";
+
+    /* overwrite system language on Mac */
+#if !TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR // TARGET_OS_MAC is unspecific
+    char *lang = NULL;
+
+    for (int i = 0; i < i_argc; i++) {
+        if (!strncmp(ppsz_argv[i], "--language", 10)) {
+            lang = strstr(ppsz_argv[i], "=");
+            ppsz_argv++, i_argc--;
+            continue;
+        }
+    }
+
+    if (!lang) {
+        CFStringRef language;
+        language = (CFStringRef)CFPreferencesCopyAppValue(CFSTR("language"),
+                                                          kCFPreferencesCurrentApplication);
+        if (language) {
+            if (CFStringGetLength(language) > 0)
+                lang = (char *)CFStringGetCStringPtr(language, kCFStringEncodingUTF8);
+            CFRelease(language);
+        }
+    }
+
+    if (lang && strncmp( lang, "auto", 4 )) {
+        char tmp[11];
+        snprintf(tmp, 11, "LANG%s", lang);
+        putenv(tmp);
+    }
+#endif
+
     ppsz_argv++; i_argc--; /* skip executable path */
 
     /* When VLC.app is run by double clicking in Mac OS X, the 2nd arg

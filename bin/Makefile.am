@@ -33,6 +33,9 @@ vlc_wrapper_SOURCES = rootwrap.c
 vlc_wrapper_LDADD = $(SOCKET_LIBS)
 
 vlc_LDFLAGS = $(LDFLAGS_vlc)
+if HAVE_DARWIN
+vlc_LDFLAGS += -Wl,-framework,CoreFoundation
+endif
 vlc_LDADD = ../lib/libvlc.la $(LIBPTHREAD)
 
 vlc_static_SOURCES = $(vlc_SOURCES)
