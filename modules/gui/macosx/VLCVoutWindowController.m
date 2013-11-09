@@ -276,10 +276,18 @@
 
 - (void)setWindowLevel:(NSInteger)i_level forWindow:(vout_window_t *)p_wnd
 {
+    VLCVideoWindowCommon *o_window = [o_vout_dict objectForKey:[NSValue valueWithPointer:p_wnd]];
+    if (!o_window) {
+        msg_Err(VLCIntf, "Cannot set level for nonexisting window");
+        return;
+    }
+
     // only set level for helper windows to normal if no status vout window exist anymore
     if(i_level == NSStatusWindowLevel) {
         i_statusLevelWindowCounter++;
-        [self updateWindowLevelForHelperWindows:i_level];
+        // window level need to stay on normal in fullscreen mode
+        if (![o_window fullscreen])
+            [self updateWindowLevelForHelperWindows:i_level];
     } else {
         if (i_statusLevelWindowCounter > 0)
             i_statusLevelWindowCounter--;
@@ -289,15 +297,8 @@
         }
     }
 
-    VLCVideoWindowCommon *o_window = [o_vout_dict objectForKey:[NSValue valueWithPointer:p_wnd]];
-    if (!o_window) {
-        msg_Err(VLCIntf, "Cannot set size for nonexisting window");
-        return;
-    }
-
     [o_window setWindowLevel:i_level];
 }
-
 
 - (void)setFullscreen:(int)i_full forWindow:(vout_window_t *)p_wnd
 {

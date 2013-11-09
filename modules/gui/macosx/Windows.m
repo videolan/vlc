@@ -465,8 +465,14 @@
     if (var_InheritBool(VLCIntf, "video-wallpaper") || [self level] < NSNormalWindowLevel)
         return;
 
-    [self setLevel: i_state];
-
+    if (!b_fullscreen)
+        [self setLevel: i_state];
+    else {
+        // only save it for restore
+        // TODO this does not handle the case when level is
+        // changed in the middle of a fullscreen animation
+        i_originalLevel = i_state;
+    }
 }
 
 - (NSRect)getWindowRectForProposedVideoViewSize:(NSSize)size
@@ -628,6 +634,7 @@
         [[VLCMainWindow sharedInstance] recreateHideMouseTimer];
 
     i_originalLevel = [self level];
+    // b_fullscreen must not be true yet
     [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
     [self setLevel:NSNormalWindowLevel];
 
@@ -764,9 +771,9 @@
 
     /* Make sure we don't see the window flashes in float-on-top mode */
     i_originalLevel = [self level];
+    // b_fullscreen must not be true yet
     [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
     [self setLevel:NSNormalWindowLevel];
-
 
     /* Only create the o_fullscreen_window if we are not in the middle of the zooming animation */
     if (!o_fullscreen_window) {
@@ -1037,6 +1044,7 @@
 
     [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: i_originalLevel];
     [self setLevel:i_originalLevel];
+
     [self setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
 
     // if we quit fullscreen because there is no video anymore, make sure non-embedded window is not visible
