@@ -622,12 +622,12 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     }
     else
     {
-        i_base_pts = (mtime_t)pkt->send_time * 1000;
+        i_base_pts = (mtime_t)pkt->send_time;
     }
 
     i_base_pts -= p_sys->p_fp->i_preroll;
     if (i_base_pts < 0) i_base_pts = 0; // FIXME?
-    i_base_pts *= 1000; // FIXME ?
+    i_base_pts *= 1000;
 
     uint32_t i_payload_data_length = 0;
     uint32_t i_temp_payload_length = 0;
