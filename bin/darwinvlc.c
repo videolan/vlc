@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc.c: the VLC player
+ * darwinvlc.c: the darwin-specific VLC player
  *****************************************************************************
  * Copyright (C) 1998-2013 the VideoLAN team
  * $Id$
@@ -41,44 +41,6 @@
 #endif
 #include <unistd.h>
 
-#ifdef __OS2__
-# include <iconv.h>
-
-# define pthread_t      int
-# define pthread_self() _gettid()
-
-static char *FromSystem(const void *str)
-{
-    iconv_t handle = iconv_open ("UTF-8", "");
-    if (handle == (iconv_t)(-1))
-        return NULL;
-
-    size_t str_len = strlen (str);
-    char *out = NULL;
-    for (unsigned mul = 4; mul < 8; mul++)
-    {
-        size_t in_size = str_len;
-        const char *in = str;
-        size_t out_max = mul * str_len;
-        char *tmp = out = malloc (1 + out_max);
-        if (!out)
-            break;
-
-        if (iconv (handle, &in, &in_size, &tmp, &out_max) != (size_t)(-1)) {
-            *tmp = '\0';
-            break;
-        }
-        free(out);
-        out = NULL;
-
-        if (errno != E2BIG)
-            break;
-    }
-    iconv_close(handle);
-    return out;
-}
-#endif
-
 extern void vlc_enable_override (void);
 
 static bool signal_ignored (int signum)
@@ -93,14 +55,8 @@ static bool signal_ignored (int signum)
 
 static void vlc_kill (void *data)
 {
-#ifndef __OS2__
     pthread_t *ps = data;
-
     pthread_kill (*ps, SIGTERM);
-#else
-    // send a signal to the main thread
-    kill (getpid(), SIGTERM);
-#endif
 }
 
 static void exit_timeout (int signum)
@@ -125,20 +81,12 @@ int main( int i_argc, const char *ppsz_argv[] )
 #ifndef NDEBUG
     /* Activate malloc checking routines to detect heap corruptions. */
     setenv ("MALLOC_CHECK_", "2", 1);
-
-    /* Disable the ugly Gnome crash dialog so that we properly segfault */
-    setenv ("GNOME_DISABLE_CRASH_DIALOG", "1", 1);
 #endif
 
 #ifdef TOP_BUILDDIR
     setenv ("VLC_PLUGIN_PATH", TOP_BUILDDIR"/modules", 1);
     setenv ("VLC_DATA_PATH", TOP_SRCDIR"/share", 1);
 #endif
-
-    /* Clear the X.Org startup notification ID. Otherwise the UI might try to
-     * change the environment while the process is multi-threaded. That could
-     * crash. Screw you X.Org. Next time write a thread-safe specification. */
-    unsetenv ("DESKTOP_STARTUP_ID");
 
 #ifndef ALLOW_RUN_AS_ROOT
     if (geteuid () == 0)
@@ -208,18 +156,15 @@ int main( int i_argc, const char *ppsz_argv[] )
     argv[argc++] = "--media-library";
     ppsz_argv++; i_argc--; /* skip executable path */
 
-#ifdef __OS2__
-    for (int i = 0; i < i_argc; i++)
-        if ((argv[argc++] = FromSystem (ppsz_argv[i])) == NULL)
-        {
-            fprintf (stderr, "Converting '%s' to UTF-8 failed.\n",
-                     ppsz_argv[i]);
-            return 1;
-        }
-#else
+    /* When VLC.app is run by double clicking in Mac OS X, the 2nd arg
+     * is the PSN - process serial number (a unique PID-ish thingie)
+     * still ok for real Darwin & when run from command line
+     * for example -psn_0_9306113 */
+    if (i_argc >= 1 && !strncmp (*ppsz_argv, "-psn" , 4))
+        ppsz_argv++, i_argc--;
+
     memcpy (argv + argc, ppsz_argv, i_argc * sizeof (*argv));
     argc += i_argc;
-#endif
     argv[argc] = NULL;
 
     vlc_enable_override ();
@@ -235,12 +180,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     libvlc_set_user_agent (vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
 
     libvlc_add_intf (vlc, "hotkeys,none");
-#if !defined (__OS2__)
-    libvlc_add_intf (vlc, "globalhotkeys,none");
-#endif
-#ifdef HAVE_DBUS
-    libvlc_add_intf (vlc, "dbus,none");
-#endif
+
     if (libvlc_add_intf (vlc, NULL))
         goto out;
 
@@ -273,9 +213,6 @@ int main( int i_argc, const char *ppsz_argv[] )
     /* Cleanup */
 out:
     libvlc_release (vlc);
-#ifdef __OS2__
-    for (int i = 2; i < argc; i++)
-        free (argv[i]);
-#endif
+
     return ret;
 }

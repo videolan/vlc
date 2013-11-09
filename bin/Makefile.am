@@ -20,10 +20,13 @@ bin_PROGRAMS += vlc-wrapper
 vlc_SOURCES = vlc.c override.c
 endif
 
-EXTRA_vlc_SOURCES = vlc.c winvlc.c
+EXTRA_vlc_SOURCES = vlc.c winvlc.c darwinvlc.c
 if HAVE_WIN32
 vlc_SOURCES = winvlc.c
 noinst_DATA += vlc_win32_rc.rc
+endif
+if HAVE_DARWIN
+vlc_SOURCES = darwinvlc.c override.c
 endif
 
 vlc_wrapper_SOURCES = rootwrap.c
