@@ -673,6 +673,7 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
         ParsePayloadExtensions( p_demux, p_sys->track[i_stream_number], pkt,
                                 i_replicated_data_length, &b_packet_keyframe );
 
+        i_base_pts -= p_sys->p_fp->i_preroll;
         pkt->i_skip += i_replicated_data_length;
 
         if( ! pkt->left || pkt->i_skip >= pkt->left )
@@ -685,6 +686,7 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
         /* Next byte is Presentation Time Delta */
         i_pts_delta = pkt->p_peek[pkt->i_skip];
         i_base_pts = (mtime_t)i_media_object_offset;
+        i_base_pts -= p_sys->p_fp->i_preroll;
         pkt->i_skip++;
         i_media_object_offset = 0;
     }
@@ -693,7 +695,6 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
         i_base_pts = (mtime_t)pkt->send_time;
     }
 
-    i_base_pts -= p_sys->p_fp->i_preroll;
     if (i_base_pts < 0) i_base_pts = 0; // FIXME?
     i_base_pts *= 1000;
 
