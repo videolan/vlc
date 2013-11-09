@@ -514,14 +514,22 @@ static void SendPacket(demux_t *p_demux, asf_track_t *tk)
 
     block_t *p_gather = block_ChainGather( tk->p_frame );
 
-    if( p_gather->i_dts > VLC_TS_INVALID )
-        tk->i_time = p_gather->i_dts - VLC_TS_0;
+    if( p_gather->i_pts > VLC_TS_INVALID )
+        tk->i_time = p_gather->i_pts - VLC_TS_0;
 
     if( p_sys->i_time < 0 )
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_gather->i_dts );
+    {
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_gather->i_pts );
+#ifdef ASF_DEBUG
+        msg_Dbg( p_demux, "setting PCR to %"PRId64, p_gather->i_pts );
+#endif
+    }
+
+#ifdef ASF_DEBUG
+    msg_Dbg( p_demux, "sending packet dts %"PRId64" %"PRId64, p_gather->i_dts, p_gather->i_pts );
+#endif
 
     es_out_Send( p_demux->out, tk->p_es, p_gather );
-
     tk->p_frame = NULL;
 }
 
@@ -641,6 +649,8 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
               "payload(%d) stream_number:%"PRIu8" media_object_number:%d media_object_offset:%"PRIu32" replicated_data_length:%"PRIu32" payload_data_length %"PRIu32,
               i_payload + 1, i_stream_number, i_media_object_number,
               i_media_object_offset, i_replicated_data_length, i_payload_data_length );
+     msg_Dbg( p_demux,
+              "   pts=%"PRId64" st=%"PRIu32, i_pts, pkt->send_time );
 #endif
 
     asf_track_t *tk = p_sys->track[i_stream_number];
