@@ -365,6 +365,7 @@ static void RGBFromRGB( uint32_t i_argb,
     *pi_g = ( i_argb & 0x0000ff00 ) >>  8;
     *pi_b = ( i_argb & 0x000000ff );
 }
+
 /*****************************************************************************
  * Make any TTF/OTF fonts present in the attachments of the media file
  * and store them for later use by the FreeType Engine
@@ -1001,6 +1002,47 @@ static inline void BlendRGBAPixel( picture_t *p_picture,
             p_rgba[0] = ( p_rgba[0] * i_ao * (255 - i_an) / 255 + i_r * i_an ) / p_rgba[3];
             p_rgba[1] = ( p_rgba[1] * i_ao * (255 - i_an) / 255 + i_g * i_an ) / p_rgba[3];
             p_rgba[2] = ( p_rgba[2] * i_ao * (255 - i_an) / 255 + i_b * i_an ) / p_rgba[3];
+        }
+    }
+}
+
+static void FillARGBPicture(picture_t *pic, int a, int r, int g, int b)
+{
+    for (int dy = 0; dy < pic->p->i_visible_lines; dy++)
+    {
+        for (int dx = 0; dx < pic->p->i_visible_pitch; dx += 4)
+        {
+            uint8_t *rgba = &pic->p->p_pixels[dy * pic->p->i_pitch + dx];
+            rgba[0] = a;
+            rgba[1] = r;
+            rgba[2] = g;
+            rgba[3] = b;
+        }
+    }
+}
+
+static inline void BlendARGBPixel(picture_t *pic, int pic_x, int pic_y,
+                                  int a, int r, int g, int b, int alpha)
+{
+    uint8_t *rgba = &pic->p->p_pixels[pic_y * pic->p->i_pitch + 4 * pic_x];
+    int an = a * alpha / 255;
+    int ao = rgba[3];
+
+    if (ao == 0)
+    {
+        rgba[0] = an;
+        rgba[1] = r;
+        rgba[2] = g;
+        rgba[3] = b;
+    }
+    else
+    {
+        rgba[0] = 255 - (255 - rgba[0]) * (255 - an) / 255;
+        if (rgba[0] != 0)
+        {
+            rgba[1] = (rgba[1] * ao * (255 - an) / 255 + r * an ) / rgba[0];
+            rgba[2] = (rgba[2] * ao * (255 - an) / 255 + g * an ) / rgba[0];
+            rgba[3] = (rgba[3] * ao * (255 - an) / 255 + b * an ) / rgba[0];
         }
     }
 }
@@ -2092,6 +2134,11 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
                                  RGBFromRGB,
                                  FillRGBAPicture,
                                  BlendRGBAPixel );
+            else if( *p_chroma == VLC_CODEC_ARGB )
+                rv = RenderAXYZ( p_filter, p_region_out, p_lines, &bbox,
+                                 i_margin, *p_chroma, RGBFromRGB,
+                                 FillARGBPicture, BlendARGBPixel );
+
             if( !rv )
                 break;
         }
