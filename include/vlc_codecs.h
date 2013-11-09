@@ -271,9 +271,8 @@ ATTR_PACKED
 #define WAVE_FORMAT_GSM_AMR_FIXED       0x7A21 /* Fixed bitrate, no SID */
 #define WAVE_FORMAT_GSM_AMR             0x7A22 /* Variable bitrate, including SID */
 
-/* Need to check these */
-#define WAVE_FORMAT_DK3                 0x0061
-#define WAVE_FORMAT_DK4                 0x0062
+#define WAVE_FORMAT_DK3                 0x0062
+#define WAVE_FORMAT_DK4                 0x0061
 
 /* At least libavformat use that ID: from libavformat/riff.c ('Vo' == 0x566f)
  * { CODEC_ID_VORBIS, ('V'<<8)+'o' }, //HACK/FIXME, does vorbis in WAV/AVI have an (in)official id?
@@ -387,8 +386,8 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_WMAS,       VLC_CODEC_WMAS,                   "Window Media Audio 9 Speech" },
     { WAVE_FORMAT_ATRAC3,     VLC_CODEC_ATRAC3,                 "Sony Atrac3" },
     { WAVE_FORMAT_SONY_ATRAC3,VLC_CODEC_ATRAC3,                 "Sony Atrac3" },
-    { WAVE_FORMAT_DK3,        VLC_FOURCC( 'm', 's', 0x00,0x61), "Duck DK3" },
-    { WAVE_FORMAT_DK4,        VLC_FOURCC( 'm', 's', 0x00,0x62), "Duck DK4" },
+    { WAVE_FORMAT_DK3,        VLC_CODEC_ADPCM_DK3,              "Duck DK3" },
+    { WAVE_FORMAT_DK4,        VLC_CODEC_ADPCM_DK4,              "Duck DK4" },
     { WAVE_FORMAT_DTS,        VLC_CODEC_DTS,                    "DTS Coherent Acoustics" },
     { WAVE_FORMAT_DTS_MS,     VLC_CODEC_DTS,                    "DTS Coherent Acoustics" },
     { WAVE_FORMAT_DIVIO_AAC,  VLC_CODEC_MP4A,                   "MPEG-4 Audio (Divio)" },

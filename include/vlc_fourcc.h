@@ -306,6 +306,8 @@
 #define VLC_CODEC_ADPCM_IMA_AMV              VLC_FOURCC('i','m','a','v')
 #define VLC_CODEC_ADPCM_IMA_QT               VLC_FOURCC('i','m','a','4')
 #define VLC_CODEC_ADPCM_YAMAHA               VLC_FOURCC('m','s',0x00,0x20)
+#define VLC_CODEC_ADPCM_DK3                  VLC_FOURCC('m','s',0x00,0x62)
+#define VLC_CODEC_ADPCM_DK4                  VLC_FOURCC('m','s',0x00,0x61)
 #define VLC_CODEC_G723_1                     VLC_FOURCC('g','7','2', 0x31)
 #define VLC_CODEC_G729                       VLC_FOURCC('g','7','2','9')
 #define VLC_CODEC_VMDAUDIO                   VLC_FOURCC('v','m','d','a')

@@ -1169,6 +1169,12 @@ static const staticentry_t p_list_audio[] = {
     B(VLC_CODEC_ADPCM_YAMAHA, "Yamaha ADPCM Audio" ),
         A("ms\x00\x20"),
 
+    B(VLC_CODEC_ADPCM_DK3, "Duck DK3 ADPCM"),
+        A("ms\x00\x62"),
+
+    B(VLC_CODEC_ADPCM_DK4, "Duck DK4 ADPCM"),
+        A("ms\x00\x61"),
+
     /* AMR */
     B(VLC_CODEC_AMR_NB, "AMR narrow band"),
         A("samr"),

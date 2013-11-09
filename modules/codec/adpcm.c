@@ -141,8 +141,8 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_FOURCC('i','m','a', '4'): /* IMA ADPCM */
         case VLC_FOURCC('m','s',0x00,0x02): /* MS ADPCM */
         case VLC_FOURCC('m','s',0x00,0x11): /* IMA ADPCM */
-        case VLC_FOURCC('m','s',0x00,0x61): /* Duck DK4 ADPCM */
-        case VLC_FOURCC('m','s',0x00,0x62): /* Duck DK3 ADPCM */
+        case VLC_CODEC_ADPCM_DK3:
+        case VLC_CODEC_ADPCM_DK4:
         case VLC_FOURCC('X','A','J', 0): /* EA ADPCM */
             break;
         default:
@@ -179,10 +179,10 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_CODEC_ADPCM_MS: /* MS ADPCM */
             p_sys->codec = ADPCM_MS;
             break;
-        case VLC_FOURCC('m','s',0x00,0x61): /* Duck DK4 ADPCM */
+        case VLC_CODEC_ADPCM_DK4: /* Duck DK4 ADPCM */
             p_sys->codec = ADPCM_DK4;
             break;
-        case VLC_FOURCC('m','s',0x00,0x62): /* Duck DK3 ADPCM */
+        case VLC_CODEC_ADPCM_DK3: /* Duck DK3 ADPCM */
             p_sys->codec = ADPCM_DK3;
             break;
         case VLC_FOURCC('X','A','J', 0): /* EA ADPCM */
