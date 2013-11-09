@@ -693,8 +693,6 @@
     [NSCursor setHiddenUntilMouseMoves: NO];
     [[[VLCMainWindow sharedInstance] fsPanel] setNonActive: nil];
 
-    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: i_originalLevel];
-    [self setLevel:i_originalLevel];
 
     if (b_dark_interface) {
         NSRect winrect;
@@ -723,6 +721,12 @@
     }
 
     [self setMovableByWindowBackground: YES];
+}
+
+- (void)windowDidExitFullScreen:(NSNotification *)notification
+{
+    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: i_originalLevel];
+    [self setLevel:i_originalLevel];
 }
 
 #pragma mark -
