@@ -499,10 +499,8 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         msg_Err( p_demux, "unknown track number" );
         return;
     }
-    if( i_pts + i_duration < p_sys->i_start_pts && tk->fmt.i_cat == AUDIO_ES )
-    {
-        return; /* discard audio packets that shouldn't be rendered */
-    }
+
+    i_pts -= tk->i_codec_delay;
 
     if ( tk->fmt.i_cat != NAV_ES )
     {
@@ -592,9 +590,10 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         {
             memcpy( p_block->p_buffer, tk->p_compression_data->GetBuffer(), tk->p_compression_data->GetSize() );
         }
-
-        if( tk->fmt.i_codec == VLC_CODEC_COOK ||
-            tk->fmt.i_codec == VLC_CODEC_ATRAC3 )
+        switch( tk->fmt.i_codec )
+        {
+        case VLC_CODEC_COOK:
+        case VLC_CODEC_ATRAC3:
         {
             handle_real_audio(p_demux, tk, p_block, i_pts);
             block_Release(p_block);
@@ -602,6 +601,27 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                 i_pts + ( mtime_t )( tk->i_default_duration / 1000 ):
                 VLC_TS_INVALID;
             continue;
+         }
+         case VLC_CODEC_SPU:
+            if( strcmp( tk->psz_codec, "S_VOBSUB" ) )
+                p_block->i_length = i_duration * tk-> f_timecodescale *
+                    (double) p_segment->i_timescale / 1000.0;
+            break;
+         case VLC_CODEC_OPUS:
+            if( i_duration > 0 )
+            {
+                mtime_t i_length = i_duration * tk-> f_timecodescale *
+                    (double) p_segment->i_timescale / 1000.0;
+                p_block->i_nb_samples = i_length * tk->fmt.audio.i_rate
+                     / CLOCK_FREQ;
+                break;
+            }
+            else if( i_duration < 0 )
+            {
+                /* Opus uses p_block->i_length to handle discard padding */
+                p_block->i_length = -1 * i_duration * tk->fmt.audio.i_rate
+                    / CLOCK_FREQ;
+            }
         }
 
         if ( tk->fmt.i_cat == NAV_ES )
@@ -643,11 +663,6 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
 #if 0
 msg_Dbg( p_demux, "block i_dts: %"PRId64" / i_pts: %"PRId64, p_block->i_dts, p_block->i_pts);
 #endif
-        if( strcmp( tk->psz_codec, "S_VOBSUB" ) )
-        {
-            p_block->i_length = i_duration * tk-> f_timecodescale * (double) p_segment->i_timescale / 1000.0;
-        }
-
         /* FIXME remove when VLC_TS_INVALID work is done */
         if( i == 0 || p_block->i_dts > VLC_TS_INVALID )
             p_block->i_dts += VLC_TS_0;

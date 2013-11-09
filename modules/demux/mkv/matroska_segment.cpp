@@ -929,10 +929,22 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     /* now parse until key frame */
     const int es_types[3] = { VIDEO_ES, AUDIO_ES, SPU_ES };
     i_cat = es_types[0];
+    mtime_t i_seek_preroll = 0;
     for( int i = 0; i < 2; i_cat = es_types[++i] )
     {
         for( i_track = 0; i_track < tracks.size(); i_track++ )
         {
+            if( tracks[i_track]->i_seek_preroll )
+            {
+                bool b_enabled;
+                if( es_out_Control( sys.demuxer.out,
+                                    ES_OUT_GET_ES_STATE,
+                                    tracks[i_track]->p_es,
+                                    &b_enabled ) == VLC_SUCCESS &&
+                    b_enabled )
+                    i_seek_preroll = __MAX( i_seek_preroll,
+                                            tracks[i_track]->i_seek_preroll );
+            }
             if( tracks[i_track]->fmt.i_cat == i_cat )
             {
                 spoint * seekpoint = new spoint(i_track, i_seek_time, i_seek_position, i_seek_position);
@@ -968,7 +980,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
         es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
         return;
     }
-
+    i_date -= i_seek_preroll;
     for(;;)
     {
         do
@@ -1201,6 +1213,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
     *pb_key_picture         = true;
     *pb_discardable_picture = false;
     size_t i_tk;
+    *pi_duration = 0;
 
     for( ;; )
     {
@@ -1407,6 +1420,13 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                             }
                         }
                     }
+#if LIBMATROSKA_VERSION >= 0x010401
+                    else if( MKV_IS_ID( el, KaxDiscardPadding ) )
+                    {
+                        KaxDiscardPadding &dp = *(KaxDiscardPadding*) el;
+                        *pi_duration -= int64(dp);
+                    }
+#endif
                     break;
                 default:
                     msg_Err( &sys.demuxer, "invalid level = %d", i_level );

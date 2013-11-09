@@ -386,6 +386,11 @@ static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     if(spp>0)spp*=opus_packet_get_samples_per_frame(p_oggpacket->packet,48000);
     if(spp<120||spp>120*48)return NULL;
 
+    /* Since the information isn't always available at the demux level
+     * use the packet's sample number */
+    if(!i_nb_samples)
+        i_nb_samples = spp;
+
     block_t *p_aout_buffer=decoder_NewAudioBuffer( p_dec, spp );
     if ( !p_aout_buffer )
     {

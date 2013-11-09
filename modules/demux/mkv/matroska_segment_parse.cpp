@@ -30,6 +30,7 @@
 
 extern "C" {
 #include "../vobsub.h"
+#include "../xiph.h"
 }
 
 #include <vlc_codecs.h>
@@ -401,6 +402,21 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 
             msg_Dbg( &sys.demuxer, "|   |   |   + Track Overlay=%u", uint32( tovr ) );
         }
+#if LIBMATROSKA_VERSION >= 0x010401
+        else if( MKV_IS_ID( l, KaxCodecDelay ) )
+        {
+            KaxCodecDelay &codecdelay = *(KaxCodecDelay*)l;
+            tk->i_codec_delay = uint64_t( codecdelay ) / 1000;
+            msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Delay =%"PRIu64,
+                     tk->i_codec_delay );
+        }
+        else if( MKV_IS_ID( l, KaxSeekPreRoll ) )
+        {
+            KaxSeekPreRoll &spr = *(KaxSeekPreRoll*)l;
+            tk->i_seek_preroll = uint64_t(spr) / 1000;
+            msg_Dbg( &sys.demuxer, "|   |   |   + Track Seek Preroll =%"PRIu64, tk->i_seek_preroll );
+        }
+#endif
         else if( MKV_IS_ID( l, KaxContentEncodings ) )
         {
             EbmlMaster *cencs = static_cast<EbmlMaster*>(l);
@@ -1476,6 +1492,26 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
     {
         p_tk->fmt.i_codec = VLC_CODEC_VORBIS;
         fill_extra_data( p_tk, 0 );
+    }
+    else if( !strncmp( p_tk->psz_codec, "A_OPUS", 6 ) )
+    {
+        p_tk->fmt.i_codec = VLC_CODEC_OPUS;
+        if( !p_tk->fmt.audio.i_rate )
+        {
+            msg_Err( &sys.demuxer,"No sampling rate, defaulting to 48kHz");
+            p_tk->fmt.audio.i_rate = 48000;
+        }
+        const uint8_t tags[16] = {'O','p','u','s','T','a','g','s',
+                                   0, 0, 0, 0, 0, 0, 0, 0};
+        unsigned ps[2] = { p_tk->i_extra_data, 16 };
+        const void *pkt[2] = { (const void *)p_tk->p_extra_data,
+                              (const void *) tags };
+
+        if( xiph_PackHeaders( &p_tk->fmt.i_extra,
+                              &p_tk->fmt.p_extra,
+                              ps, pkt, 2 ) )
+            msg_Err( &sys.demuxer, "Couldn't pack OPUS headers");
+
     }
     else if( !strncmp( p_tk->psz_codec, "A_AAC/MPEG2/", strlen( "A_AAC/MPEG2/" ) ) ||
              !strncmp( p_tk->psz_codec, "A_AAC/MPEG4/", strlen( "A_AAC/MPEG4/" ) ) )

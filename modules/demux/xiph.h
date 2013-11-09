@@ -60,7 +60,7 @@ static inline unsigned int xiph_CountHeaders( const void *extra, unsigned int i_
 static inline int xiph_SplitHeaders(unsigned packet_size[], void * packet[], unsigned *packet_count,
                                     unsigned extra_size, const void *extra)
 {
-    const uint8_t *current = extra;
+    const uint8_t *current = (const uint8_t *)extra;
     const uint8_t *end = &current[extra_size];
     if (extra_size < 1)
         return VLC_EGENERIC;

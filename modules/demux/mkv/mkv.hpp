@@ -188,8 +188,6 @@ public:
 
 struct mkv_track_t
 {
-//    ~mkv_track_t();
-
     bool         b_default;
     bool         b_enabled;
     bool         b_forced;
@@ -236,6 +234,10 @@ struct mkv_track_t
     int                    i_compression_type;
     uint32_t               i_encoding_scope;
     KaxContentCompSettings *p_compression_data;
+
+    /* Matroska 4 new elements used by Opus */
+    mtime_t i_seek_preroll;
+    mtime_t i_codec_delay;
 
 };
 
