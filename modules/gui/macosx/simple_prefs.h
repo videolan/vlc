@@ -84,6 +84,8 @@
     IBOutlet id o_input_urlhandler_btn;
     IBOutlet id o_input_view;
 
+    IBOutlet id o_intf_language_pop;
+    IBOutlet id o_intf_language_txt;
     IBOutlet id o_intf_style_txt;
     IBOutlet id o_intf_style_dark_bcell;
     IBOutlet id o_intf_style_bright_bcell;

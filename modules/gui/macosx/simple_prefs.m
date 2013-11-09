@@ -40,6 +40,135 @@
 
 #import <Sparkle/Sparkle.h>                        //for o_intf_last_update_lbl
 
+static const char *const ppsz_language[] =
+{
+    "auto",
+    "en",
+    "ar",
+    "bn",
+    "pt_BR",
+    "en_GB",
+    "el",
+    "bg",
+    "ca",
+    "zh_TW",
+    "cs",
+    "cy",
+    "da",
+    "nl",
+    "fi",
+    "et",
+    "eu",
+    "fr",
+    "ga",
+    "gd",
+    "gl",
+    "ka",
+    "de",
+    "he",
+    "hr",
+    "hu",
+    "hy",
+    "is",
+    "id",
+    "it",
+    "ja",
+    "ko",
+    "lt",
+    "mn",
+    "ms",
+    "nb",
+    "nn",
+    "kk",
+    "km",
+    "ne",
+    "oc",
+    "fa",
+    "pl",
+    "pt_PT",
+    "pa",
+    "ro",
+    "ru",
+    "zh_CN",
+    "si",
+    "sr",
+    "sk",
+    "sl",
+    "ckb",
+    "es",
+    "sv",
+    "te",
+    "tr",
+    "uk",
+    "vi",
+    "wa",
+    NULL,
+};
+
+static const char *const ppsz_language_text[] =
+{
+    N_("Auto"),
+    "American English",
+    "ﻉﺮﺒﻳ",
+    "বাংলা",
+    "Português Brasileiro",
+    "British English",
+    "Νέα Ελληνικά",
+    "български език",
+    "Català",
+    "正體中文",
+    "Čeština",
+    "Cymraeg",
+    "Dansk",
+    "Nederlands",
+    "Suomi",
+    "eesti keel",
+    "Euskara",
+    "Français",
+    "Gaeilge",
+    "Gàidhlig",
+    "Galego",
+    "ქართული",
+    "Deutsch",
+    "עברית",
+    "hrvatski",
+    "Magyar",
+    "հայերեն",
+    "íslenska",
+    "Bahasa Indonesia",
+    "Italiano",
+    "日本語",
+    "한국어",
+    "lietuvių",
+    "Монгол хэл",
+    "Melayu",
+    "Bokmål",
+    "Nynorsk",
+    "Қазақ тілі",
+    "ភាសាខ្មែរ",
+    "नेपाली",
+    "Occitan",
+    "ﻑﺍﺮﺳی",
+    "Polski",
+    "Português",
+    "ਪੰਜਾਬੀ",
+    "Română",
+    "Русский",
+    "简体中文",
+    "සිංහල",
+    "српски",
+    "Slovensky",
+    "slovenščina",
+    "کوردیی سۆرانی",
+    "Español",
+    "Svenska",
+    "తెలుగు",
+    "Türkçe",
+    "украї́нська мо́ва",
+    "tiếng Việt",
+    "Walon",
+};
+
 static NSString* VLCSPrefsToolbarIdentifier = @"Our Simple Preferences Toolbar Identifier";
 static NSString* VLCIntfSettingToolbarIdentifier = @"Intf Settings Item Identifier";
 static NSString* VLCAudioSettingToolbarIdentifier = @"Audio Settings Item Identifier";
@@ -223,6 +352,7 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     [o_urlhandler_cancel_btn setTitle: _NS("Cancel")];
 
     /* interface */
+    [o_intf_language_txt setStringValue: _NS("Language")];
     [o_intf_style_txt setStringValue: _NS("Interface style")];
     [o_intf_style_dark_bcell setTitle: _NS("Dark")];
     [o_intf_style_bright_bcell setTitle: _NS("Bright")];
@@ -422,6 +552,18 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     /**********************
      * interface settings *
      **********************/
+    NSUInteger sel = 0;
+    const char *pref = NULL;
+    pref = [[[NSUserDefaults standardUserDefaults] objectForKey:@"language"] UTF8String];
+    for (int x = 0; ppsz_language[x] != NULL; x++) {
+        [o_intf_language_pop addItemWithTitle:[NSString stringWithUTF8String:ppsz_language_text[x]]];
+        if (pref) {
+            if (!strcmp(ppsz_language[x], pref))
+                sel = x;
+        }
+    }
+    [o_intf_language_pop selectItemAtIndex:sel];
+
     [self setupButton: o_intf_art_pop forIntList: "album-art"];
 
     [self setupButton: o_intf_fspanel_ckb forBoolValue: "macosx-fspanel"];
@@ -802,6 +944,11 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
      * interface settings *
      **********************/
     if (b_intfSettingChanged) {
+        NSUInteger index = [o_intf_language_pop indexOfSelectedItem];
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setObject:[NSString stringWithUTF8String:ppsz_language[index]] forKey:@"language"];
+        [defaults synchronize];
+
         SaveIntList(o_intf_art_pop, "album-art");
 
         config_PutInt(p_intf, "macosx-fspanel", [o_intf_fspanel_ckb state]);
