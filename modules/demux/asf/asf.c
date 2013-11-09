@@ -534,7 +534,7 @@ static void SendPacket(demux_t *p_demux, asf_track_t *tk)
 }
 
 static int DemuxSubPayload(demux_t *p_demux, asf_track_t *tk,
-        uint32_t i_sub_payload_data_length, mtime_t i_pts, uint32_t i_media_object_offset)
+        uint32_t i_sub_payload_data_length, mtime_t i_pts, mtime_t i_dts, uint32_t i_media_object_offset)
 {
     /* FIXME I don't use i_media_object_number, sould I ? */
     if( tk->p_frame && i_media_object_offset == 0 )
@@ -546,12 +546,8 @@ static int DemuxSubPayload(demux_t *p_demux, asf_track_t *tk,
         return -1;
     }
 
-    if( tk->p_frame == NULL ) {
-        p_frag->i_pts = VLC_TS_0 + i_pts;
-        p_frag->i_dts = VLC_TS_0 + p_frag->i_pts; //FIXME: VLC_TS_0 * 2 ?
-        if( tk->i_cat == VIDEO_ES )
-            p_frag->i_pts = VLC_TS_INVALID;
-    }
+    p_frag->i_pts = VLC_TS_0 + i_pts;
+    p_frag->i_dts = VLC_TS_0 + i_dts;
 
     block_ChainAppend( &tk->p_frame, p_frag );
 
@@ -603,11 +599,12 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     if (GetValue2b(&i_replicated_data_length, pkt->p_peek, &pkt->i_skip, pkt->left - pkt->i_skip, pkt->property) < 0)
         return -1;
 
-    mtime_t i_pts;
+    mtime_t i_base_pts;
+    uint8_t i_pts_delta = 0;
     /* Non compressed */
     if( i_replicated_data_length > 1 ) // should be at least 8 bytes
     {
-        i_pts = (mtime_t)GetDWLE( pkt->p_peek + pkt->i_skip + 4 );
+        i_base_pts = (mtime_t)GetDWLE( pkt->p_peek + pkt->i_skip + 4 );
         pkt->i_skip += i_replicated_data_length;
 
         if( ! pkt->left || pkt->i_skip >= pkt->left )
@@ -618,18 +615,19 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     {
         /* i_media_object_offset is presentation time */
         /* Next byte is Presentation Time Delta */
-        i_pts = (mtime_t)i_media_object_offset + (mtime_t)pkt->p_peek[pkt->i_skip] * i_payload;
+        i_pts_delta = pkt->p_peek[pkt->i_skip];
+        i_base_pts = (mtime_t)i_media_object_offset;
         pkt->i_skip++;
         i_media_object_offset = 0;
     }
     else
     {
-        i_pts = (mtime_t)pkt->send_time * 1000;
+        i_base_pts = (mtime_t)pkt->send_time * 1000;
     }
 
-    i_pts -= p_sys->p_fp->i_preroll;
-    if (i_pts < 0) i_pts = 0; // FIXME?
-    i_pts *= 1000; // FIXME ?
+    i_base_pts -= p_sys->p_fp->i_preroll;
+    if (i_base_pts < 0) i_base_pts = 0; // FIXME?
+    i_base_pts *= 1000; // FIXME ?
 
     uint32_t i_payload_data_length = 0;
     uint32_t i_temp_payload_length = 0;
@@ -650,7 +648,7 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
               i_payload + 1, i_stream_number, i_media_object_number,
               i_media_object_offset, i_replicated_data_length, i_payload_data_length );
      msg_Dbg( p_demux,
-              "   pts=%"PRId64" st=%"PRIu32, i_pts, pkt->send_time );
+              "   pts=%"PRId64" st=%"PRIu32, i_base_pts, pkt->send_time );
 #endif
 
     asf_track_t *tk = p_sys->track[i_stream_number];
@@ -679,6 +677,7 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     if( !tk->p_es )
         goto skip;
 
+    uint32_t i_subpayload_count = 0;
     while (i_payload_data_length)
     {
         uint32_t i_sub_payload_data_length = i_payload_data_length;
@@ -690,9 +689,14 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
 
         SkipBytes( p_demux->s, pkt->i_skip );
 
+        mtime_t i_payload_pts = i_base_pts + (mtime_t)i_pts_delta * i_subpayload_count * 1000;
+        i_payload_pts -= tk->p_sp->i_time_offset * 10;
+        mtime_t i_payload_dts = INT64_C(1000) * pkt->send_time;
+        i_payload_dts -= tk->p_sp->i_time_offset * 10;
+
         if ( i_sub_payload_data_length &&
-             DemuxSubPayload(p_demux, tk, i_sub_payload_data_length, i_pts,
-                            i_media_object_offset) < 0)
+             DemuxSubPayload(p_demux, tk, i_sub_payload_data_length,
+                        i_payload_pts, i_payload_dts, i_media_object_offset) < 0)
             return -1;
 
         if ( pkt->left > pkt->i_skip + i_sub_payload_data_length )
@@ -714,6 +718,8 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
             i_payload_data_length -= i_sub_payload_data_length;
         else
             i_payload_data_length = 0;
+
+        i_subpayload_count++;
     }
 
     return 0;
