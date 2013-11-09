@@ -180,11 +180,17 @@ static int Activate( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    i_fmt_in_aspect = (int64_t)p_filter->fmt_in.video.i_sar_num *
+    if( p_filter->fmt_in.video.i_sar_num )
+        i_fmt_in_aspect = (int64_t)p_filter->fmt_in.video.i_sar_num *
                       p_filter->fmt_in.video.i_width *
                       VOUT_ASPECT_FACTOR /
                       p_filter->fmt_in.video.i_sar_den /
                       p_filter->fmt_in.video.i_height;
+    else
+        i_fmt_in_aspect = (int64_t)p_filter->fmt_in.video.i_width *
+                      VOUT_ASPECT_FACTOR /
+                      p_filter->fmt_in.video.i_height;
+
     psz_aspect = var_CreateGetNonEmptyString( p_filter, CFG_PREFIX "aspect" );
     if( psz_aspect )
     {
