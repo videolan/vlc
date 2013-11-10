@@ -638,7 +638,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_mainmenu = [[VLCMainMenu alloc] init];
     o_coreinteraction = [[VLCCoreInteraction alloc] init];
     o_eyetv = [[VLCEyeTVController alloc] init];
-    o_mainwindow = [[VLCMainWindow alloc] init];
 
     /* announce our launch to a potential eyetv plugin */
     [[NSDistributedNotificationCenter defaultCenter] postNotificationName: @"VLCOSXGUIInit"
@@ -752,6 +751,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     PL_LOCK;
     items_at_launch = p_playlist->p_local_category->i_children;
     PL_UNLOCK;
+
+    [NSBundle loadNibNamed:@"MainWindow" owner: NSApp];
+    o_playlist = [[VLCPlaylist alloc] init];
+    o_mainwindow = [[VLCMainWindow alloc] init];
+    [o_mainwindow makeKeyAndOrderFront:nil];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification

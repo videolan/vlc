@@ -69,6 +69,7 @@
     IBOutlet NSMenuItem * o_mi_open_recent;
     IBOutlet NSMenuItem * o_mi_open_wizard;
     IBOutlet NSMenuItem * o_mi_convertandsave;
+    IBOutlet NSMenuItem * o_mi_save_playlist;
 
     IBOutlet NSMenu * o_mu_edit;
     IBOutlet NSMenuItem * o_mi_cut;
@@ -240,6 +241,7 @@
 - (IBAction)intfOpenDisc:(id)sender;
 - (IBAction)intfOpenNet:(id)sender;
 - (IBAction)intfOpenCapture:(id)sender;
+- (IBAction)savePlaylist:(id)sender;
 
 - (IBAction)toggleEffectsButton:(id)sender;
 - (IBAction)toggleJumpButtons:(id)sender;
@@ -288,6 +290,8 @@
 - (IBAction)openDonate:(id)sender;
 - (IBAction)viewErrorsAndWarnings:(id)sender;
 - (IBAction)showMessagesPanel:(id)showMessagesPanel;
+- (IBAction)showMainWindow:(id)sender;
+- (IBAction)showPlaylist:(id)sender;
 
 - (void)setPlay;
 - (void)setPause;

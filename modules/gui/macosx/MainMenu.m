@@ -327,6 +327,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_open_recent setTitle: _NS("Open Recent")];
     [o_mi_open_wizard setTitle: _NS("Streaming/Exporting Wizard...")];
     [o_mi_convertandsave setTitle: _NS("Convert / Stream...")];
+    [o_mi_save_playlist setTitle: _NS("Save Playlist...")];
 
     [o_mu_edit setTitle: _NS("Edit")];
     [o_mi_cut setTitle: _NS("Cut")];
@@ -1050,6 +1051,11 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [[[VLCMain sharedInstance] wizard] showWizard];
 }
 
+- (IBAction)savePlaylist:(id)sender
+{
+    [[[VLCMain sharedInstance] playlist] savePlaylist:sender];
+}
+
 - (IBAction)showConvertAndSave:(id)sender
 {
     if (o_convertandsave == nil)
@@ -1108,6 +1114,16 @@ static VLCMainMenu *_o_sharedInstance = nil;
 - (IBAction)showMessagesPanel:(id)showMessagesPanel
 {
     [[VLCDebugMessageVisualizer sharedInstance] showPanel];
+}
+
+- (IBAction)showMainWindow:(id)sender
+{
+    [[VLCMainWindow sharedInstance] makeKeyAndOrderFront:sender];
+}
+
+- (IBAction)showPlaylist:(id)sender
+{
+    [[VLCMainWindow sharedInstance] togglePlaylist:sender];
 }
 
 #pragma mark -
