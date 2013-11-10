@@ -2666,6 +2666,10 @@ static int Control(stream_t *s, int i_query, va_list args)
         case STREAM_GET_SIZE:
             *(va_arg (args, uint64_t *)) = GetStreamSize(s);
             break;
+        case STREAM_GET_PTS_DELAY:
+            *va_arg (args, int64_t *) =
+                var_InheritInteger(s, "network-caching");
+             break;
         default:
             return VLC_EGENERIC;
     }
