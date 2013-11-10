@@ -110,15 +110,6 @@ struct intf_sys_t
     IBOutlet VLCControls * o_controls;     /* VLCControls    */
     IBOutlet VLCPlaylist * o_playlist;     /* VLCPlaylist    */
 
-    /* messages panel */
-    IBOutlet NSWindow * o_msgs_panel;           /* messages panel */
-    NSMutableArray * o_msg_arr;                 /* messages array */
-    NSLock * o_msg_lock;                        /* messages lock */
-    BOOL b_msg_arr_changed;                     /* did the array change? */
-    IBOutlet NSButton * o_msgs_save_btn;        /* save the log as rtf */
-    IBOutlet NSButton * o_msgs_refresh_btn;     /* update the panel */
-    IBOutlet id o_msgs_table;
-
     AppleRemote * o_remote;
     BOOL b_remote_button_hold; /* true as long as the user holds the left,right,plus or minus on the remote control */
 
@@ -186,10 +177,6 @@ struct intf_sys_t
 - (void)showFullscreenController;
 - (void)updateDelays;
 - (void)initStrings;
-
-- (IBAction)saveDebugLog:(id)sender;
-- (IBAction)showMessagesPanel:(id)sender;
-- (IBAction)updateMessagesPanel:(id)sender;
 
 - (void)processReceivedlibvlcMessage:(const vlc_log_t *) item ofType: (int)type withStr: (char *)str;
 

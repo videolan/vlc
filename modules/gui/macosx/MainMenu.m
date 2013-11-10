@@ -44,6 +44,7 @@
 #import "ControlsBar.h"
 #import "ExtensionsManager.h"
 #import "ConvertAndSave.h"
+#import "DebugMessageVisualizer.h"
 
 @implementation VLCMainMenu
 static VLCMainMenu *_o_sharedInstance = nil;
@@ -1102,6 +1103,11 @@ static VLCMainMenu *_o_sharedInstance = nil;
 {
     NSInteger i_level = [[[VLCMain sharedInstance] voutController] currentWindowLevel];
     [[[VLCMain sharedInstance] simplePreferences] showSimplePrefsWithLevel:i_level];
+}
+
+- (IBAction)showMessagesPanel:(id)showMessagesPanel
+{
+    [[VLCDebugMessageVisualizer sharedInstance] showPanel];
 }
 
 #pragma mark -

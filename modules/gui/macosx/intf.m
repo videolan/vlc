@@ -82,8 +82,6 @@ static void updateProgressPanel (void *, const char *, float);
 static bool checkProgressPanel (void *);
 static void destroyProgressPanel (void *);
 
-static void MsgCallback(void *data, int type, const vlc_log_t *item, const char *format, va_list ap);
-
 static int InputEvent(vlc_object_t *, const char *,
                       vlc_value_t, vlc_value_t, void *);
 static int PLItemChanged(vlc_object_t *, const char *,
@@ -318,29 +316,6 @@ static void Run(intf_thread_t *p_intf)
 #pragma mark -
 #pragma mark Variables Callback
 
-/*****************************************************************************
- * MsgCallback: Callback triggered by the core once a new debug message is
- * ready to be displayed. We store everything in a NSArray in our Cocoa part
- * of this file.
- *****************************************************************************/
-static void MsgCallback(void *data, int type, const vlc_log_t *item, const char *format, va_list ap)
-{
-    int canc = vlc_savecancel();
-    char *str;
-
-    if (vasprintf(&str, format, ap) == -1) {
-        vlc_restorecancel(canc);
-        return;
-    }
-
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-    [[VLCMain sharedInstance] processReceivedlibvlcMessage: item ofType: type withStr: str];
-    [o_pool release];
-
-    vlc_restorecancel(canc);
-    free(str);
-}
-
 static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
@@ -413,7 +388,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
             break;
 
         default:
-            //msg_Warn(p_this, "unhandled input event (%lld)", new_val.i_int);
             break;
     }
 
@@ -658,9 +632,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     p_intf = NULL;
     p_current_input = p_input_changed = NULL;
 
-    o_msg_lock = [[NSLock alloc] init];
-    o_msg_arr = [[NSMutableArray arrayWithCapacity: 600] retain];
-
     o_open = [[VLCOpen alloc] init];
     o_coredialogs = [[VLCCoreDialogProvider alloc] init];
     o_info = [[VLCInfo alloc] init];
@@ -705,9 +676,6 @@ static VLCMain *_o_sharedMainInstance = nil;
      because VLCMain is the owner */
     if (nib_main_loaded)
         return;
-
-    [o_msgs_panel setExcludedFromWindowsMenu: YES];
-    [o_msgs_panel setDelegate: self];
 
     p_playlist = pl_Get(p_intf);
 
@@ -754,8 +722,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_remote setClickCountEnabledButtons: kRemoteButtonPlay];
     [o_remote setDelegate: _o_sharedMainInstance];
 
-    [o_msgs_refresh_btn setImage: [NSImage imageNamed: NSImageNameRefreshTemplate]];
-
     /* yeah, we are done */
     b_nativeFullscreenMode = NO;
 #ifdef MAC_OS_X_VERSION_10_7
@@ -776,8 +742,6 @@ static VLCMain *_o_sharedMainInstance = nil;
         if (dayOfYear >= 354)
             [[VLCApplication sharedApplication] setApplicationIconImage: [NSImage imageNamed:@"vlc-xmas"]];
     }
-
-    [self initStrings];
 
     nib_main_loaded = TRUE;
 }
@@ -831,16 +795,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     PL_UNLOCK;
     if (kidsAround && var_GetBool(p_playlist, "playlist-autostart"))
         [[self playlist] playItem:nil];
-}
-
-- (void)initStrings
-{
-    if (!p_intf)
-        return;
-
-    /* messages panel */
-    [o_msgs_panel setTitle: _NS("Messages")];
-    [o_msgs_save_btn setTitle: _NS("Save this Log...")];
 }
 
 #pragma mark -
@@ -944,19 +898,13 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* unsubscribe from libvlc's debug messages */
     vlc_LogSet(p_intf->p_libvlc, NULL, NULL);
 
-    [o_msg_arr removeAllObjects];
-    [o_msg_arr release];
-    o_msg_arr = NULL;
     [o_usedHotkeys release];
     o_usedHotkeys = NULL;
 
     [o_mediaKeyController release];
 
-    [o_msg_lock release];
-
     /* write cached user defaults to disk */
     [[NSUserDefaults standardUserDefaults] synchronize];
-
 
     [o_mainmenu release];
 
@@ -1799,123 +1747,6 @@ static VLCMain *_o_sharedMainInstance = nil;
         return;
     }
     execl(path, path, NULL);
-}
-
-#pragma mark -
-#pragma mark Errors, warnings and messages
-- (IBAction)updateMessagesPanel:(id)sender
-{
-    [self windowDidBecomeKey:nil];
-}
-
-- (IBAction)showMessagesPanel:(id)sender
-{
-    /* subscribe to LibVLCCore's messages */
-    vlc_LogSet(p_intf->p_libvlc, MsgCallback, NULL);
-
-    /* show panel */
-    [o_msgs_panel makeKeyAndOrderFront: sender];
-}
-
-- (void)windowDidBecomeKey:(NSNotification *)o_notification
-{
-    [o_msgs_table reloadData];
-    [o_msgs_table scrollRowToVisible: [o_msg_arr count] - 1];
-}
-
-- (void)windowWillClose:(NSNotification *)o_notification
-{
-    /* unsubscribe from LibVLCCore's messages */
-    vlc_LogSet( p_intf->p_libvlc, NULL, NULL );
-}
-
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
-{
-    if (aTableView == o_msgs_table)
-        return [o_msg_arr count];
-    return 0;
-}
-
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
-{
-    NSMutableAttributedString *result = NULL;
-
-    [o_msg_lock lock];
-    if (rowIndex < [o_msg_arr count])
-        result = [o_msg_arr objectAtIndex:rowIndex];
-    [o_msg_lock unlock];
-
-    if (result != NULL)
-        return result;
-    else
-        return @"";
-}
-
-- (void)processReceivedlibvlcMessage:(const vlc_log_t *) item ofType: (int)i_type withStr: (char *)str
-{
-    if (o_msg_arr) {
-        NSColor *o_white = [NSColor whiteColor];
-        NSColor *o_red = [NSColor redColor];
-        NSColor *o_yellow = [NSColor yellowColor];
-        NSColor *o_gray = [NSColor grayColor];
-        NSString * firstString, * secondString;
-
-        NSColor * pp_color[4] = { o_white, o_red, o_yellow, o_gray };
-        static const char * ppsz_type[4] = { ": ", " error: ", " warning: ", " debug: " };
-
-        NSDictionary *o_attr;
-        NSMutableAttributedString *o_msg_color;
-
-        [o_msg_lock lock];
-
-        if ([o_msg_arr count] > 600) {
-            [o_msg_arr removeObjectAtIndex: 0];
-            [o_msg_arr removeObjectAtIndex: 1];
-        }
-        if (!item->psz_module)
-            return;
-        if (!str)
-            return;
-
-        firstString = [NSString stringWithFormat:@"%s%s", item->psz_module, ppsz_type[i_type]];
-        secondString = [NSString stringWithFormat:@"%@%s\n", firstString, str];
-
-        o_attr = [NSDictionary dictionaryWithObject: pp_color[i_type]  forKey: NSForegroundColorAttributeName];
-        o_msg_color = [[NSMutableAttributedString alloc] initWithString: secondString attributes: o_attr];
-        o_attr = [NSDictionary dictionaryWithObject: pp_color[3] forKey: NSForegroundColorAttributeName];
-        [o_msg_color setAttributes: o_attr range: NSMakeRange(0, [firstString length])];
-        [o_msg_arr addObject: [o_msg_color autorelease]];
-
-        b_msg_arr_changed = YES;
-        [o_msg_lock unlock];
-    }
-}
-
-- (IBAction)saveDebugLog:(id)sender
-{
-    NSSavePanel * saveFolderPanel = [[NSSavePanel alloc] init];
-
-    [saveFolderPanel setCanSelectHiddenExtension: NO];
-    [saveFolderPanel setCanCreateDirectories: YES];
-    [saveFolderPanel setAllowedFileTypes: [NSArray arrayWithObject:@"rtf"]];
-    [saveFolderPanel setNameFieldStringValue:[NSString stringWithFormat: _NS("VLC Debug Log (%s).rtf"), VERSION_MESSAGE]];
-    [saveFolderPanel beginSheetModalForWindow: o_msgs_panel completionHandler:^(NSInteger returnCode) {
-        if (returnCode == NSOKButton) {
-            NSUInteger count = [o_msg_arr count];
-            NSMutableAttributedString * string = [[NSMutableAttributedString alloc] init];
-            for (NSUInteger i = 0; i < count; i++)
-                [string appendAttributedString: [o_msg_arr objectAtIndex:i]];
-
-            NSData *data = [string RTFFromRange:NSMakeRange(0, [string length])
-                             documentAttributes:[NSDictionary dictionaryWithObject: NSRTFTextDocumentType forKey: NSDocumentTypeDocumentAttribute]];
-
-            if ([data writeToFile: [[saveFolderPanel URL] path] atomically: YES] == NO)
-                msg_Warn(p_intf, "Error while saving the debug log");
-
-            [string release];
-        }
-    }];
-    [saveFolderPanel release];
 }
 
 #pragma mark -

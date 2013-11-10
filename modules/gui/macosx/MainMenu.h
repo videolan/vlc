@@ -287,6 +287,7 @@
 - (IBAction)openForum:(id)sender;
 - (IBAction)openDonate:(id)sender;
 - (IBAction)viewErrorsAndWarnings:(id)sender;
+- (IBAction)showMessagesPanel:(id)showMessagesPanel;
 
 - (void)setPlay;
 - (void)setPause;
