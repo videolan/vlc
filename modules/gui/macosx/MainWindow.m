@@ -146,6 +146,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     [o_sidebaritems release];
+    [o_fspanel release];
 
     [super dealloc];
 }
