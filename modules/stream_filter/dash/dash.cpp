@@ -281,6 +281,11 @@ static int  Control         (stream_t *p_stream, int i_query, va_list args)
             }
             break;
         }
+        case STREAM_GET_PTS_DELAY:
+            *va_arg (args, int64_t *) =
+                var_InheritInteger(p_stream, "network-caching");
+             break;
+
         default:
             return VLC_EGENERIC;
     }
