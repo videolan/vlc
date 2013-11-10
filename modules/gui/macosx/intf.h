@@ -115,22 +115,9 @@ struct intf_sys_t
     NSMutableArray * o_msg_arr;                 /* messages array */
     NSLock * o_msg_lock;                        /* messages lock */
     BOOL b_msg_arr_changed;                     /* did the array change? */
-    IBOutlet NSButton * o_msgs_crashlog_btn;    /* messages open crashlog */
     IBOutlet NSButton * o_msgs_save_btn;        /* save the log as rtf */
     IBOutlet NSButton * o_msgs_refresh_btn;     /* update the panel */
     IBOutlet id o_msgs_table;
-
-    /* CrashReporter panel */
-    IBOutlet NSButton * o_crashrep_dontSend_btn;
-    IBOutlet NSButton * o_crashrep_send_btn;
-    IBOutlet NSTextView * o_crashrep_fld;
-    IBOutlet NSTextField * o_crashrep_title_txt;
-    IBOutlet NSTextField * o_crashrep_desc_txt;
-    IBOutlet NSWindow * o_crashrep_win;
-    IBOutlet NSButton * o_crashrep_includeEmail_ckb;
-    IBOutlet NSButton * o_crashrep_dontaskagain_ckb;
-    IBOutlet NSTextField * o_crashrep_includeEmail_txt;
-    NSURLConnection * crashLogURLConnection;
 
     AppleRemote * o_remote;
     BOOL b_remote_button_hold; /* true as long as the user holds the left,right,plus or minus on the remote control */
@@ -200,8 +187,6 @@ struct intf_sys_t
 - (void)updateDelays;
 - (void)initStrings;
 
-- (IBAction)crashReporterAction:(id)sender;
-- (IBAction)openCrashLog:(id)sender;
 - (IBAction)saveDebugLog:(id)sender;
 - (IBAction)showMessagesPanel:(id)sender;
 - (IBAction)updateMessagesPanel:(id)sender;

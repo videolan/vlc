@@ -83,5 +83,7 @@ SOURCES_macosx = \
 	ControlsBar.h \
 	VLCVoutWindowController.m \
 	VLCVoutWindowController.h \
+	CrashReporter.m \
+	CrashReporter.h \
 	iTunes.h \
 	$(NULL)

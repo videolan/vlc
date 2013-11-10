@@ -64,11 +64,11 @@
 #import "TrackSynchronization.h"
 #import "VLCVoutWindowController.h"
 #import "ExtensionsManager.h"
+#import "CrashReporter.h"
 
 #import "VideoEffects.h"
 #import "AudioEffects.h"
 
-#import <AddressBook/AddressBook.h>         /* for crashlog send mechanism */
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
 
 #import "iTunes.h"
@@ -618,7 +618,7 @@ audio_output_t *getAout(void)
 #pragma mark -
 #pragma mark Private
 
-@interface VLCMain ()
+@interface VLCMain () <VLCCrashReporterDelegate>
 - (void)removeOldPreferences;
 @end
 
@@ -815,7 +815,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(computerWillSleep:)
            name:NSWorkspaceWillSleepNotification object:nil];
 
-    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(lookForCrashLog) withObject:nil waitUntilDone:NO];
+    [self performSelector:@selector(lookForCrashLog) withObject:nil afterDelay:1.5];
 
     /* we will need this, so let's load it here so the interface appears to be more responsive */
     nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner: NSApp];
@@ -840,18 +840,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* messages panel */
     [o_msgs_panel setTitle: _NS("Messages")];
-    [o_msgs_crashlog_btn setTitle: _NS("Open CrashLog...")];
     [o_msgs_save_btn setTitle: _NS("Save this Log...")];
-
-    /* crash reporter panel */
-    [o_crashrep_send_btn setTitle: _NS("Send")];
-    [o_crashrep_dontSend_btn setTitle: _NS("Don't Send")];
-    [o_crashrep_title_txt setStringValue: _NS("VLC crashed previously")];
-    [o_crashrep_win setTitle: _NS("VLC crashed previously")];
-    [o_crashrep_desc_txt setStringValue: _NS("Do you want to send details on the crash to VLC's development team?\n\nIf you want, you can enter a few lines on what you did before VLC crashed along with other helpful information: a link to download a sample file, a URL of a network stream, ...")];
-    [o_crashrep_includeEmail_ckb setTitle: _NS("I agree to be possibly contacted about this bugreport.")];
-    [o_crashrep_includeEmail_txt setStringValue: _NS("Only your default E-Mail address will be submitted, including no further information.")];
-    [o_crashrep_dontaskagain_ckb setTitle: _NS("Don't ask again")];
 }
 
 #pragma mark -
@@ -948,9 +937,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     if (o_wizard)
         [o_wizard release];
-
-    [crashLogURLConnection cancel];
-    [crashLogURLConnection release];
 
     [o_coredialogs release];
     [o_eyetv release];
@@ -1730,152 +1716,18 @@ static VLCMain *_o_sharedMainInstance = nil;
 }
 
 #pragma mark -
-#pragma mark Crash Log
-- (void)sendCrashLog:(NSString *)crashLog withUserComment:(NSString *)userComment
-{
-    NSString *urlStr = @"http://crash.videolan.org/crashlog/sendcrashreport.php";
-    NSURL *url = [NSURL URLWithString:urlStr];
-
-    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
-    [req setHTTPMethod:@"POST"];
-
-    NSString * email;
-    if ([o_crashrep_includeEmail_ckb state] == NSOnState) {
-        ABPerson * contact = [[ABAddressBook sharedAddressBook] me];
-        ABMultiValue *emails = [contact valueForProperty:kABEmailProperty];
-        email = [emails valueAtIndex:[emails indexForIdentifier:
-                    [emails primaryIdentifier]]];
-    }
-    else
-        email = [NSString string];
-
-    NSString *postBody;
-    postBody = [NSString stringWithFormat:@"CrashLog=%@&Comment=%@&Email=%@\r\n",
-            [crashLog stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],
-            [userComment stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],
-            [email stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-
-    [req setHTTPBody:[postBody dataUsingEncoding:NSUTF8StringEncoding]];
-
-    /* Released from delegate */
-    crashLogURLConnection = [[NSURLConnection alloc] initWithRequest:req delegate:self];
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
-{
-    msg_Dbg(p_intf, "crash report successfully sent");
-    [crashLogURLConnection release];
-    crashLogURLConnection = nil;
-}
-
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
-{
-    msg_Warn (p_intf, "Error when sending the crash report: %s (%li)", [[error localizedDescription] UTF8String], [error code]);
-    [crashLogURLConnection release];
-    crashLogURLConnection = nil;
-}
-
-- (NSString *)latestCrashLogPathPreviouslySeen:(BOOL)previouslySeen
-{
-    NSString * crashReporter;
-    if (OSX_MOUNTAIN_LION || OSX_MAVERICKS)
-        crashReporter = [@"~/Library/Logs/DiagnosticReports" stringByExpandingTildeInPath];
-    else
-        crashReporter = [@"~/Library/Logs/CrashReporter" stringByExpandingTildeInPath];
-    NSDirectoryEnumerator *direnum = [[NSFileManager defaultManager] enumeratorAtPath:crashReporter];
-    NSString *fname;
-    NSString * latestLog = nil;
-    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
-    int year  = !previouslySeen ? [defaults integerForKey:@"LatestCrashReportYear"] : 0;
-    int month = !previouslySeen ? [defaults integerForKey:@"LatestCrashReportMonth"]: 0;
-    int day   = !previouslySeen ? [defaults integerForKey:@"LatestCrashReportDay"]  : 0;
-    int hours = !previouslySeen ? [defaults integerForKey:@"LatestCrashReportHours"]: 0;
-
-    while (fname = [direnum nextObject]) {
-        [direnum skipDescendents];
-        if ([fname hasPrefix:@"VLC"] && [fname hasSuffix:@"crash"]) {
-            NSArray * compo = [fname componentsSeparatedByString:@"_"];
-            if ([compo count] < 3)
-                continue;
-            compo = [[compo objectAtIndex:1] componentsSeparatedByString:@"-"];
-            if ([compo count] < 4)
-                continue;
-
-            // Dooh. ugly.
-            if (year < [[compo objectAtIndex:0] intValue] ||
-                (year ==[[compo objectAtIndex:0] intValue] &&
-                 (month < [[compo objectAtIndex:1] intValue] ||
-                  (month ==[[compo objectAtIndex:1] intValue] &&
-                   (day   < [[compo objectAtIndex:2] intValue] ||
-                    (day   ==[[compo objectAtIndex:2] intValue] &&
-                      hours < [[compo objectAtIndex:3] intValue])))))) {
-                year  = [[compo objectAtIndex:0] intValue];
-                month = [[compo objectAtIndex:1] intValue];
-                day   = [[compo objectAtIndex:2] intValue];
-                hours = [[compo objectAtIndex:3] intValue];
-                latestLog = [crashReporter stringByAppendingPathComponent:fname];
-            }
-        }
-    }
-
-    if (!(latestLog && [[NSFileManager defaultManager] fileExistsAtPath:latestLog]))
-        return nil;
-
-    if (!previouslySeen) {
-        [defaults setInteger:year  forKey:@"LatestCrashReportYear"];
-        [defaults setInteger:month forKey:@"LatestCrashReportMonth"];
-        [defaults setInteger:day   forKey:@"LatestCrashReportDay"];
-        [defaults setInteger:hours forKey:@"LatestCrashReportHours"];
-    }
-    return latestLog;
-}
-
-- (NSString *)latestCrashLogPath
-{
-    return [self latestCrashLogPathPreviouslySeen:YES];
-}
+#pragma mark Crash Log handling
 
 - (void)lookForCrashLog
 {
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-    // This pref key doesn't exists? this VLC is an upgrade, and this crash log come from previous version
-    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
-    BOOL areCrashLogsTooOld = ![defaults integerForKey:@"LatestCrashReportYear"];
-    NSString * latestLog = [self latestCrashLogPathPreviouslySeen:NO];
-    if (latestLog && !areCrashLogsTooOld) {
-        if ([defaults integerForKey:@"AlwaysSendCrashReports"] > 0)
-            [self sendCrashLog:[NSString stringWithContentsOfFile: [self latestCrashLogPath] encoding: NSUTF8StringEncoding error: NULL] withUserComment: [o_crashrep_fld string]];
-        else if ([defaults integerForKey:@"AlwaysSendCrashReports"] == 0)
-            [NSApp runModalForWindow: o_crashrep_win];
-        // bail out, the user doesn't want us to send reports
-    }
-
-    [o_pool release];
+    VLCCrashReporter *reporter = [[VLCCrashReporter alloc] init];
+    reporter.delegate = self;
+    [reporter showDialogAndSendLogIfDesired];
 }
 
-- (IBAction)crashReporterAction:(id)sender
+- (void)reporterFinishedAction:(VLCCrashReporter *)reporter
 {
-    if (sender == o_crashrep_send_btn) {
-        [self sendCrashLog:[NSString stringWithContentsOfFile: [self latestCrashLogPath] encoding: NSUTF8StringEncoding error: NULL] withUserComment: [o_crashrep_fld string]];
-        if ([o_crashrep_dontaskagain_ckb state])
-            [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"AlwaysSendCrashReports"];
-    } else {
-        if ([o_crashrep_dontaskagain_ckb state])
-            [[NSUserDefaults standardUserDefaults] setInteger:-1 forKey:@"AlwaysSendCrashReports"];
-    }
-
-    [NSApp stopModal];
-    [o_crashrep_win orderOut: sender];
-}
-
-- (IBAction)openCrashLog:(id)sender
-{
-    NSString * latestLog = [self latestCrashLogPath];
-    if (latestLog) {
-        [[NSWorkspace sharedWorkspace] openFile: latestLog withApplication: @"Console"];
-    } else {
-        NSBeginInformationalAlertSheet(_NS("No CrashLog found"), _NS("Continue"), nil, nil, o_msgs_panel, self, NULL, NULL, nil, @"%@", _NS("Couldn't find any trace of a previous crash."));
-    }
+    [reporter release];
 }
 
 #pragma mark -
