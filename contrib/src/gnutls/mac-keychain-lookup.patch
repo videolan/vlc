@@ -1,20 +1,20 @@
-diff -ru gnutls-plain/lib/Makefile.am gnutls/lib/Makefile.am
---- gnutls-plain/lib/Makefile.am	2013-06-02 19:33:57.000000000 +0200
-+++ gnutls/lib/Makefile.am	2013-11-10 13:04:36.000000000 +0100
+diff -ru gnutls-old/lib/Makefile.am gnutls/lib/Makefile.am
+--- gnutls-old/lib/Makefile.am	2013-06-02 19:33:57.000000000 +0200
++++ gnutls/lib/Makefile.am	2013-11-10 13:28:18.000000000 +0100
 @@ -152,6 +152,10 @@
  DISTCLEANFILES += $(defexec_DATA)
  endif
  
 +if MACOSX
-+libgnutls_la_LDFLAGS += -Wl,-framework,Security,-framework,CoreFoundation
++libgnutls_la_LDFLAGS +=  -Wl,-framework,Security,-framework,CoreFoundation
 +endif
 +
  if WINDOWS
  thirdparty_libadd += -lcrypt32
  endif
-diff -ru gnutls-plain/lib/system.c gnutls/lib/system.c
---- gnutls-plain/lib/system.c	2013-04-10 22:25:51.000000000 +0200
-+++ gnutls/lib/system.c	2013-11-10 13:01:47.000000000 +0100
+diff -ru gnutls-old/lib/system.c gnutls/lib/system.c
+--- gnutls-old/lib/system.c	2013-04-10 22:25:51.000000000 +0200
++++ gnutls/lib/system.c	2013-11-10 13:30:31.000000000 +0100
 @@ -57,6 +57,15 @@
  #undef send
  #undef select
@@ -31,7 +31,7 @@ diff -ru gnutls-plain/lib/system.c gnutls/lib/system.c
  /* System specific function wrappers.
   */
  
-@@ -550,6 +559,46 @@
+@@ -550,6 +559,40 @@
  
    return r;
  }
@@ -42,15 +42,11 @@ diff -ru gnutls-plain/lib/system.c gnutls/lib/system.c
 +{
 +    CFArrayRef anchors;
 +    int ret = 0;
-+    printf("add_system_trust\n");
-+    if (SecTrustCopyAnchorCertificates(&anchors) != 0) {
-+        printf("failure one\n");
++    if (SecTrustCopyAnchorCertificates(&anchors) != 0)
 +        return -1;
-+    }
 +
 +    CFIndex count = CFArrayGetCount(anchors);
 +    for (int i = 0; i < count; i++) {
-+        printf("looping %i\n", i);
 +        SecCertificateRef certref = (SecCertificateRef)CFArrayGetValueAtIndex(anchors, i);
 +
 +        CSSM_DATA certData;
@@ -66,8 +62,6 @@ diff -ru gnutls-plain/lib/system.c gnutls/lib/system.c
 +            ret++;
 +    }
 +    CFRelease(anchors);
-+
-+    printf("will return %i\n", ret);
 +
 +    return ret;
 +}
