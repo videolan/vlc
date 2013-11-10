@@ -242,6 +242,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_del_streams  = 0;
     p_sys->pp_del_streams = 0;
     p_sys->i_pos = 0;
+    p_sys->skeleton.b_create = false;
+    p_sys->skeleton.b_head_done = false;
     p_sys->skeleton.i_index_intvl =
             var_InheritInteger( p_this, SOUT_CFG_PREFIX "indexintvl" );
     p_sys->skeleton.i_index_ratio =
