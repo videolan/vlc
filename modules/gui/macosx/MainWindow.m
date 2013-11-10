@@ -319,6 +319,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [o_sidebar_view expandItem: libraryItem expandChildren: YES];
 
+    o_fspanel = [[VLCFSPanel alloc] initWithContentRect:NSMakeRect(110.,267.,549.,87.)
+                                              styleMask:NSTexturedBackgroundWindowMask
+                                                backing:NSBackingStoreBuffered
+                                                  defer:YES];
+
     /* make sure we display the desired default appearance when VLC launches for the first time */
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     if (![defaults objectForKey:@"VLCFirstRun"]) {

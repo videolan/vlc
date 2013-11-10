@@ -48,6 +48,7 @@
                     defer:(BOOL)flag
 {
     id win = [super initWithContentRect:contentRect styleMask:NSTexturedBackgroundWindowMask backing:bufferingType defer:flag];
+    self.contentView = [[VLCFSPanelView alloc] initWithFrame:contentRect];
     [win setOpaque:NO];
     [win setHasShadow: NO];
     [win setBackgroundColor:[NSColor clearColor]];

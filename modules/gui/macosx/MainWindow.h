@@ -59,7 +59,7 @@
     IBOutlet id o_dropzone_lbl;
     IBOutlet id o_dropzone_box;
 
-    IBOutlet VLCFSPanel *o_fspanel;
+    VLCFSPanel *o_fspanel;
 
     IBOutlet id o_podcast_view;
     IBOutlet id o_podcast_add_btn;
