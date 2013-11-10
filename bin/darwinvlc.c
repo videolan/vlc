@@ -168,22 +168,28 @@ int main( int i_argc, const char *ppsz_argv[] )
             continue;
         }
     }
+    if (lang && strncmp( lang, "auto", 4 )) {
+        char tmp[11];
+        snprintf(tmp, 11, "LANG%s", lang);
+        putenv(tmp);
+    }
 
     if (!lang) {
         CFStringRef language;
         language = (CFStringRef)CFPreferencesCopyAppValue(CFSTR("language"),
                                                           kCFPreferencesCurrentApplication);
         if (language) {
-            if (CFStringGetLength(language) > 0)
-                lang = (char *)CFStringGetCStringPtr(language, kCFStringEncodingUTF8);
+            CFIndex length = CFStringGetLength(language) + 1;
+            if (length > 0) {
+                CFIndex maxSize = CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8);
+                lang = (char *)malloc(maxSize);
+                CFStringGetCString(language, lang, maxSize - 1, kCFStringEncodingUTF8);
+            }
+            char tmp[11];
+            snprintf(tmp, 11, "LANG=%s", lang);
+            putenv(tmp);
             CFRelease(language);
         }
-    }
-
-    if (lang && strncmp( lang, "auto", 4 )) {
-        char tmp[11];
-        snprintf(tmp, 11, "LANG%s", lang);
-        putenv(tmp);
     }
 #endif
 
