@@ -465,12 +465,10 @@
     if (var_InheritBool(VLCIntf, "video-wallpaper") || [self level] < NSNormalWindowLevel)
         return;
 
-    if (!b_fullscreen)
+    if (!b_fullscreen && !b_entering_fullscreen_transition)
         [self setLevel: i_state];
     else {
         // only save it for restore
-        // TODO this does not handle the case when level is
-        // changed in the middle of a fullscreen animation
         i_originalLevel = i_state;
     }
 }
@@ -618,6 +616,11 @@
     // workaround, see #6668
     [NSApp setPresentationOptions:(NSApplicationPresentationFullScreen | NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
 
+    i_originalLevel = [self level];
+    // b_fullscreen and b_entering_fullscreen_transition must not be true yet
+    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
+    [self setLevel:NSNormalWindowLevel];
+
     b_entering_fullscreen_transition = YES;
 
     var_SetBool(pl_Get(VLCIntf), "fullscreen", true);
@@ -632,11 +635,6 @@
 
     if ([self hasActiveVideo])
         [[VLCMainWindow sharedInstance] recreateHideMouseTimer];
-
-    i_originalLevel = [self level];
-    // b_fullscreen must not be true yet
-    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
-    [self setLevel:NSNormalWindowLevel];
 
     if (b_dark_interface) {
         [o_titlebar_view removeFromSuperviewWithoutNeedingDisplay];
@@ -890,6 +888,8 @@
 
     [o_fullscreen_anim1 startAnimation];
     /* fullscreenAnimation will be unlocked when animation ends */
+
+    b_entering_fullscreen_transition = YES;
 }
 
 - (void)hasBecomeFullscreen
@@ -907,6 +907,7 @@
     if ([self isVisible])
         [self orderOut: self];
 
+    b_entering_fullscreen_transition = NO;
     [self setFullscreen:YES];
 }
 
