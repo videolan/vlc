@@ -89,6 +89,7 @@ struct stream_sys_t
     int          read_fd;
     bool         can_pace;
     bool         can_pause;
+    int64_t      pts_delay;
 };
 
 extern char **environ;
@@ -275,6 +276,9 @@ static int Control (stream_t *stream, int query, va_list args)
         case STREAM_GET_SIZE:
             *(va_arg (args, uint64_t *)) = 0;
             break;
+        case STREAM_GET_PTS_DELAY:
+            *va_arg (args, int64_t *) = p_sys->pts_delay;
+            break;
         case STREAM_SET_PAUSE_STATE:
         {
             bool paused = va_arg (args, unsigned);
@@ -316,6 +320,7 @@ static int Open (stream_t *stream, const char *path)
     stream_Control (stream->p_source, STREAM_CAN_PAUSE, &p_sys->can_pause);
     stream_Control (stream->p_source, STREAM_CAN_CONTROL_PACE,
                     &p_sys->can_pace);
+    stream_Control (stream->p_source, STREAM_GET_PTS_DELAY, &p_sys->pts_delay);
 
     /* I am not a big fan of the pyramid style, but I cannot think of anything
      * better here. There are too many failure cases. */
