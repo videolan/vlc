@@ -101,35 +101,64 @@ static void* EncoderThread( void *obj )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t*)obj;
     sout_stream_id_t *id = p_sys->id_video;
-    picture_t *p_pic;
+    picture_t *p_pic = NULL;
     int canc = vlc_savecancel ();
+    block_t *p_block = NULL;
 
     for( ;; )
     {
-        block_t *p_block;
 
         vlc_mutex_lock( &p_sys->lock_out );
         while( !p_sys->b_abort &&
                (p_pic = picture_fifo_Pop( p_sys->pp_pics )) == NULL )
             vlc_cond_wait( &p_sys->cond, &p_sys->lock_out );
 
-        if( p_sys->b_abort )
+        if( p_sys->b_abort && !p_pic )
         {
             vlc_mutex_unlock( &p_sys->lock_out );
             break;
         }
         vlc_mutex_unlock( &p_sys->lock_out );
 
-        p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
+        if( p_pic )
+        {
+            p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
+
+            vlc_mutex_lock( &p_sys->lock_out );
+            block_ChainAppend( &p_sys->p_buffers, p_block );
+
+            vlc_mutex_unlock( &p_sys->lock_out );
+            picture_Release( p_pic );
+        }
 
         vlc_mutex_lock( &p_sys->lock_out );
+        if( p_sys->b_abort )
+        {
+            vlc_mutex_unlock( &p_sys->lock_out );
+            break;
+        }
+            vlc_mutex_unlock( &p_sys->lock_out );
+    }
+
+    /*Encode what we have in the buffer on closing*/
+    vlc_mutex_lock( &p_sys->lock_out );
+    while( (p_pic = picture_fifo_Pop( p_sys->pp_pics )) != NULL )
+    {
+        p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
+
         block_ChainAppend( &p_sys->p_buffers, p_block );
 
-        vlc_mutex_unlock( &p_sys->lock_out );
         picture_Release( p_pic );
     }
 
-    block_ChainRelease( p_sys->p_buffers );
+    /*Now flush encoder*/
+    do {
+       p_block = id->p_encoder->pf_encode_video(id->p_encoder, NULL );
+       block_ChainAppend( &p_sys->p_buffers, p_block );
+    } while( p_block );
+
+    vlc_mutex_unlock( &p_sys->lock_out );
+
 
     vlc_restorecancel (canc);
     return NULL;
@@ -580,6 +609,7 @@ void transcode_video_close( sout_stream_t *p_stream,
         vlc_cond_destroy( &p_stream->p_sys->cond );
 
         picture_fifo_Delete( p_stream->p_sys->pp_pics );
+        block_ChainRelease( p_stream->p_sys->p_buffers );
         p_stream->p_sys->pp_pics = NULL;
     }
 
@@ -716,7 +746,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     bool b_need_duplicate = false;
-    picture_t *p_pic;
+    picture_t *p_pic = NULL;
     *out = NULL;
 
     if( unlikely( in == NULL ) )
@@ -731,10 +761,19 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
         }
         else
         {
-            /*
-             * FIXME: we need EncoderThread() to flush buffers and signal us
-             * when it's done so we can send the last frames to the chain
-             */
+            msg_Dbg( p_stream, "Flushing thread and waiting that");
+            vlc_mutex_lock( &p_stream->p_sys->lock_out );
+            p_stream->p_sys->b_abort = true;
+            vlc_cond_signal( &p_stream->p_sys->cond );
+            vlc_mutex_unlock( &p_stream->p_sys->lock_out );
+
+            vlc_join( p_stream->p_sys->thread, NULL );
+            vlc_mutex_lock( &p_sys->lock_out );
+            *out = p_sys->p_buffers;
+            p_sys->p_buffers = NULL;
+            vlc_mutex_unlock( &p_sys->lock_out );
+
+            msg_Dbg( p_stream, "Flushing done");
         }
         return VLC_SUCCESS;
     }
