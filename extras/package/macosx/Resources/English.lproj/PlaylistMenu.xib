@@ -1,0 +1,938 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
+  <data>
+    <int key="IBDocument.SystemTarget">1060</int>
+    <string key="IBDocument.SystemVersion">12F45</string>
+    <string key="IBDocument.InterfaceBuilderVersion">851</string>
+    <string key="IBDocument.AppKitVersion">1187.40</string>
+    <string key="IBDocument.HIToolboxVersion">626.00</string>
+    <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
+      <string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
+      <string key="NS.object.0">851</string>
+    </object>
+    <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
+      <bool key="EncodedWithXMLCoder">YES</bool>
+      <integer value="1"/>
+    </object>
+    <object class="NSArray" key="IBDocument.PluginDependencies">
+      <bool key="EncodedWithXMLCoder">YES</bool>
+      <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+    </object>
+    <object class="NSMutableDictionary" key="IBDocument.Metadata">
+      <bool key="EncodedWithXMLCoder">YES</bool>
+      <object class="NSArray" key="dict.sortedKeys" id="0">
+        <bool key="EncodedWithXMLCoder">YES</bool>
+      </object>
+      <object class="NSMutableArray" key="dict.values">
+        <bool key="EncodedWithXMLCoder">YES</bool>
+      </object>
+    </object>
+    <object class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
+      <bool key="EncodedWithXMLCoder">YES</bool>
+      <object class="NSCustomObject" id="1001">
+        <string key="NSClassName">VLCPlaylist</string>
+      </object>
+      <object class="NSCustomObject" id="1003">
+        <string key="NSClassName">FirstResponder</string>
+      </object>
+      <object class="NSCustomObject" id="1004">
+        <string key="NSClassName">NSApplication</string>
+      </object>
+      <object class="NSMenu" id="537614450">
+        <string key="NSTitle">Menu</string>
+        <object class="NSMutableArray" key="NSMenuItems">
+          <bool key="EncodedWithXMLCoder">YES</bool>
+          <object class="NSMenuItem" id="95651051">
+            <reference key="NSMenu" ref="537614450"/>
+            <string key="NSTitle">Play</string>
+            <string key="NSKeyEquiv"/>
+            <int key="NSKeyEquivModMask">1048576</int>
+            <int key="NSMnemonicLoc">2147483647</int>
+            <object class="NSCustomResource" key="NSOnImage" id="549133455">
+              <string key="NSClassName">NSImage</string>
+              <string key="NSResourceName">NSMenuCheckmark</string>
+            </object>
+            <object class="NSCustomResource" key="NSMixedImage" id="257917014">
+              <string key="NSClassName">NSImage</string>
+              <string key="NSResourceName">NSMenuMixedState</string>
+            </object>
+          </object>
+          <object class="NSMenuItem" id="342844318">
+            <reference key="NSMenu" ref="537614450"/>
+            <string key="NSTitle">Delete</string>
+            <string key="NSKeyEquiv"/>
+            <int key="NSKeyEquivModMask">1048576</int>
+            <int key="NSMnemonicLoc">2147483647</int>
+            <reference key="NSOnImage" ref="549133455"/>
+            <reference key="NSMixedImage" ref="257917014"/>
+          </object>
+          <object class="NSMenuItem" id="356560501">
+            <reference key="NSMenu" ref="537614450"/>
+            <bool key="NSIsDisabled">YES</bool>
+            <bool key="NSIsSeparator">YES</bool>
+            <string key="NSTitle"/>
+            <string key="NSKeyEquiv"/>
+            <int key="NSKeyEquivModMask">1048576</int>
+            <int key="NSMnemonicLoc">2147483647</int>
+            <reference key="NSOnImage" ref="549133455"/>
+            <reference key="NSMixedImage" ref="257917014"/>
+          </object>
+          <object class="NSMenuItem" id="977074465">
+            <reference key="NSMenu" ref="537614450"/>
+            <string key="NSTitle">Select All</string>
+            <string key="NSKeyEquiv"/>
+            <int key="NSKeyEquivModMask">1048576</int>
+            <int key="NSMnemonicLoc">2147483647</int>
+            <reference key="NSOnImage" ref="549133455"/>
+            <reference key="NSMixedImage" ref="257917014"/>
+          </object>
+          <object class="NSMenuItem" id="830112311">
+            <reference key="NSMenu" ref="537614450"/>
+            <bool key="NSIsDisabled">YES</bool>
+            <bool key="NSIsSeparator">YES</bool>
+            <string key="NSTitle"/>
+            <string key="NSKeyEquiv"/>
+            <int key="NSKeyEquivModMask">1048576</int>
+            <int key="NSMnemonicLoc">2147483647</int>
+            <reference key="NSOnImage" ref="549133455"/>
+            <reference key="NSMixedImage" ref="257917014"/>
+          </object>
+          <object class="NSMenuItem" id="1039698537">
+            <reference key="NSMenu" ref="537614450"/>
+            <string key="NSTitle">Expand Node</string>
+            <string key="NSKeyEquiv"/>
+            <int key="NSKeyEquivModMask">1048576</int>
+            <int key="NSMnemonicLoc">2147483647</int>
+            <reference key="NSOnImage" ref="549133455"/>
+            <reference key="NSMixedImage" ref="257917014"/>
+          </object>
+          <object class="NSMenuItem" id="922790560">
+            <reference key="NSMenu" ref="537614450"/>
+            <string key="NSTitle">Sort Node by Name</string>
+            <string key="NSKeyEquiv"/>
+            <int key="NSKeyEquivModMask">1048576</int>
+            <int key="NSMnemonicLoc">2147483647</int>
+            <reference key="NSOnImage" ref="549133455"/>
+            <reference key="NSMixedImage" ref="257917014"/>
+          </object>
+          <object class="NSMenuItem" id="912150775">
+            <reference key="NSMenu" ref="537614450"/>
+            <string key="NSTitle">Sort Node by Author</string>
+            <string key="NSKeyEquiv"/>
+            <int key="NSKeyEquivModMask">1048576</int>
+            <int key="NSMnemonicLoc">2147483647</int>
+            <reference key="NSOnImage" ref="549133455"/>
+            <reference key="NSMixedImage" ref="257917014"/>
+          </object>
+          <object class="NSMenuItem" id="78349211">
+            <reference key="NSMenu" ref="537614450"/>
+            <bool key="NSIsDisabled">YES</bool>
+            <bool key="NSIsSeparator">YES</bool>
+            <string key="NSTitle"/>
+            <string key="NSKeyEquiv"/>
+            <int key="NSKeyEquivModMask">1048576</int>
+            <int key="NSMnemonicLoc">2147483647</int>
+            <reference key="NSOnImage" ref="549133455"/>
+            <reference key="NSMixedImage" ref="257917014"/>
+          </object>
+          <object class="NSMenuItem" id="622765054">
+            <reference key="NSMenu" ref="537614450"/>
+            <string key="NSTitle">Media Information...</string>
+            <string key="NSKeyEquiv"/>
+            <int key="NSKeyEquivModMask">1048576</int>
+            <int key="NSMnemonicLoc">2147483647</int>
+            <reference key="NSOnImage" ref="549133455"/>
+            <reference key="NSMixedImage" ref="257917014"/>
+          </object>
+          <object class="NSMenuItem" id="335927004">
+            <reference key="NSMenu" ref="537614450"/>
+            <string key="NSTitle">Preparse</string>
+            <string key="NSKeyEquiv"/>
+            <int key="NSKeyEquivModMask">1048576</int>
+            <int key="NSMnemonicLoc">2147483647</int>
+            <reference key="NSOnImage" ref="549133455"/>
+            <reference key="NSMixedImage" ref="257917014"/>
+          </object>
+          <object class="NSMenuItem" id="72995398">
+            <reference key="NSMenu" ref="537614450"/>
+            <string key="NSTitle">Download Cover Art</string>
+            <string key="NSKeyEquiv"/>
+            <int key="NSKeyEquivModMask">1048576</int>
+            <int key="NSMnemonicLoc">2147483647</int>
+            <reference key="NSOnImage" ref="549133455"/>
+            <reference key="NSMixedImage" ref="257917014"/>
+          </object>
+          <object class="NSMenuItem" id="906944543">
+            <reference key="NSMenu" ref="537614450"/>
+            <string key="NSTitle">Reveal in Finder</string>
+            <string key="NSKeyEquiv"/>
+            <int key="NSKeyEquivModMask">1048576</int>
+            <int key="NSMnemonicLoc">2147483647</int>
+            <reference key="NSOnImage" ref="549133455"/>
+            <reference key="NSMixedImage" ref="257917014"/>
+          </object>
+        </object>
+        <string key="NSName"/>
+        <bool key="NSNoAutoenable">YES</bool>
+      </object>
+    </object>
+    <object class="IBObjectContainer" key="IBDocument.Objects">
+      <object class="NSMutableArray" key="connectionRecords">
+        <bool key="EncodedWithXMLCoder">YES</bool>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_ctx_menu</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="537614450"/>
+          </object>
+          <int key="connectionID">15</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_play</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="95651051"/>
+          </object>
+          <int key="connectionID">16</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_delete</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="342844318"/>
+          </object>
+          <int key="connectionID">17</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_dl_cover_art</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="72995398"/>
+          </object>
+          <int key="connectionID">18</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_info</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="622765054"/>
+          </object>
+          <int key="connectionID">19</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_preparse</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="335927004"/>
+          </object>
+          <int key="connectionID">20</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_recursive_expand</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="1039698537"/>
+          </object>
+          <int key="connectionID">21</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_revealInFinder</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="906944543"/>
+          </object>
+          <int key="connectionID">22</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_sort_name</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="922790560"/>
+          </object>
+          <int key="connectionID">23</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_sort_author</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="912150775"/>
+          </object>
+          <int key="connectionID">24</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_selectall</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="977074465"/>
+          </object>
+          <int key="connectionID">25</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">playItem:</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="95651051"/>
+          </object>
+          <int key="connectionID">26</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">deleteItem:</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="342844318"/>
+          </object>
+          <int key="connectionID">27</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">selectAll:</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="977074465"/>
+          </object>
+          <int key="connectionID">28</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">recursiveExpandNode:</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="1039698537"/>
+          </object>
+          <int key="connectionID">29</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">sortNodeByName:</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="922790560"/>
+          </object>
+          <int key="connectionID">31</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">sortNodeByAuthor:</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="912150775"/>
+          </object>
+          <int key="connectionID">32</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">preparseItem:</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="335927004"/>
+          </object>
+          <int key="connectionID">33</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">downloadCoverArt:</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="72995398"/>
+          </object>
+          <int key="connectionID">34</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">revealItemInFinder:</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="906944543"/>
+          </object>
+          <int key="connectionID">35</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">showInfoPanel:</string>
+            <reference key="source" ref="1001"/>
+            <reference key="destination" ref="622765054"/>
+          </object>
+          <int key="connectionID">36</int>
+        </object>
+      </object>
+      <object class="IBMutableOrderedSet" key="objectRecords">
+        <object class="NSArray" key="orderedObjects">
+          <bool key="EncodedWithXMLCoder">YES</bool>
+          <object class="IBObjectRecord">
+            <int key="objectID">0</int>
+            <reference key="object" ref="0"/>
+            <reference key="children" ref="1000"/>
+            <nil key="parent"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">-2</int>
+            <reference key="object" ref="1001"/>
+            <reference key="parent" ref="0"/>
+            <string key="objectName">File's Owner</string>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">-1</int>
+            <reference key="object" ref="1003"/>
+            <reference key="parent" ref="0"/>
+            <string key="objectName">First Responder</string>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">-3</int>
+            <reference key="object" ref="1004"/>
+            <reference key="parent" ref="0"/>
+            <string key="objectName">Application</string>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">1</int>
+            <reference key="object" ref="537614450"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="72995398"/>
+              <reference ref="906944543"/>
+              <reference ref="335927004"/>
+              <reference ref="1039698537"/>
+              <reference ref="912150775"/>
+              <reference ref="922790560"/>
+              <reference ref="830112311"/>
+              <reference ref="622765054"/>
+              <reference ref="78349211"/>
+              <reference ref="356560501"/>
+              <reference ref="95651051"/>
+              <reference ref="342844318"/>
+              <reference ref="977074465"/>
+            </object>
+            <reference key="parent" ref="0"/>
+            <string key="objectName">PlaylistMenu</string>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">2</int>
+            <reference key="object" ref="72995398"/>
+            <reference key="parent" ref="537614450"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">3</int>
+            <reference key="object" ref="906944543"/>
+            <reference key="parent" ref="537614450"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">4</int>
+            <reference key="object" ref="335927004"/>
+            <reference key="parent" ref="537614450"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5</int>
+            <reference key="object" ref="1039698537"/>
+            <reference key="parent" ref="537614450"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">6</int>
+            <reference key="object" ref="912150775"/>
+            <reference key="parent" ref="537614450"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">7</int>
+            <reference key="object" ref="922790560"/>
+            <reference key="parent" ref="537614450"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">8</int>
+            <reference key="object" ref="830112311"/>
+            <reference key="parent" ref="537614450"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">9</int>
+            <reference key="object" ref="622765054"/>
+            <reference key="parent" ref="537614450"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">10</int>
+            <reference key="object" ref="78349211"/>
+            <reference key="parent" ref="537614450"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">11</int>
+            <reference key="object" ref="356560501"/>
+            <reference key="parent" ref="537614450"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">12</int>
+            <reference key="object" ref="95651051"/>
+            <reference key="parent" ref="537614450"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">13</int>
+            <reference key="object" ref="342844318"/>
+            <reference key="parent" ref="537614450"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">14</int>
+            <reference key="object" ref="977074465"/>
+            <reference key="parent" ref="537614450"/>
+          </object>
+        </object>
+      </object>
+      <object class="NSMutableDictionary" key="flattenedProperties">
+        <bool key="EncodedWithXMLCoder">YES</bool>
+        <object class="NSArray" key="dict.sortedKeys">
+          <bool key="EncodedWithXMLCoder">YES</bool>
+          <string>-1.IBPluginDependency</string>
+          <string>-2.IBPluginDependency</string>
+          <string>-3.IBPluginDependency</string>
+          <string>1.IBEditorWindowLastContentRect</string>
+          <string>1.IBPluginDependency</string>
+          <string>1.ImportedFromIB2</string>
+          <string>10.IBPluginDependency</string>
+          <string>10.ImportedFromIB2</string>
+          <string>11.IBPluginDependency</string>
+          <string>11.ImportedFromIB2</string>
+          <string>12.IBPluginDependency</string>
+          <string>12.ImportedFromIB2</string>
+          <string>13.IBPluginDependency</string>
+          <string>13.ImportedFromIB2</string>
+          <string>14.IBPluginDependency</string>
+          <string>14.ImportedFromIB2</string>
+          <string>2.IBPluginDependency</string>
+          <string>2.ImportedFromIB2</string>
+          <string>3.IBPluginDependency</string>
+          <string>3.ImportedFromIB2</string>
+          <string>4.IBPluginDependency</string>
+          <string>4.ImportedFromIB2</string>
+          <string>5.IBPluginDependency</string>
+          <string>5.ImportedFromIB2</string>
+          <string>6.IBPluginDependency</string>
+          <string>6.ImportedFromIB2</string>
+          <string>7.IBPluginDependency</string>
+          <string>7.ImportedFromIB2</string>
+          <string>8.IBPluginDependency</string>
+          <string>8.ImportedFromIB2</string>
+          <string>9.IBPluginDependency</string>
+          <string>9.ImportedFromIB2</string>
+        </object>
+        <object class="NSMutableArray" key="dict.values">
+          <bool key="EncodedWithXMLCoder">YES</bool>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>{{159, 272}, {205, 233}}</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <boolean value="YES"/>
+        </object>
+      </object>
+      <object class="NSMutableDictionary" key="unlocalizedProperties">
+        <bool key="EncodedWithXMLCoder">YES</bool>
+        <reference key="dict.sortedKeys" ref="0"/>
+        <object class="NSMutableArray" key="dict.values">
+          <bool key="EncodedWithXMLCoder">YES</bool>
+        </object>
+      </object>
+      <nil key="activeLocalization"/>
+      <object class="NSMutableDictionary" key="localizations">
+        <bool key="EncodedWithXMLCoder">YES</bool>
+        <reference key="dict.sortedKeys" ref="0"/>
+        <object class="NSMutableArray" key="dict.values">
+          <bool key="EncodedWithXMLCoder">YES</bool>
+        </object>
+      </object>
+      <nil key="sourceID"/>
+      <int key="maxID">36</int>
+    </object>
+    <object class="IBClassDescriber" key="IBDocument.Classes">
+      <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
+        <bool key="EncodedWithXMLCoder">YES</bool>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCPlaylist</string>
+          <string key="superclassName">VLCPlaylistCommon</string>
+          <object class="NSMutableDictionary" key="actions">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>deleteItem:</string>
+              <string>downloadCoverArt:</string>
+              <string>playItem:</string>
+              <string>preparseItem:</string>
+              <string>recursiveExpandNode:</string>
+              <string>revealItemInFinder:</string>
+              <string>savePlaylist:</string>
+              <string>searchItem:</string>
+              <string>selectAll:</string>
+              <string>showInfoPanel:</string>
+              <string>sortNodeByAuthor:</string>
+              <string>sortNodeByName:</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="actionInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>deleteItem:</string>
+              <string>downloadCoverArt:</string>
+              <string>playItem:</string>
+              <string>preparseItem:</string>
+              <string>recursiveExpandNode:</string>
+              <string>revealItemInFinder:</string>
+              <string>savePlaylist:</string>
+              <string>searchItem:</string>
+              <string>selectAll:</string>
+              <string>showInfoPanel:</string>
+              <string>sortNodeByAuthor:</string>
+              <string>sortNodeByName:</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBActionInfo">
+                <string key="name">deleteItem:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">downloadCoverArt:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">playItem:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">preparseItem:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">recursiveExpandNode:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">revealItemInFinder:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">savePlaylist:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">searchItem:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">selectAll:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">showInfoPanel:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">sortNodeByAuthor:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">sortNodeByName:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="outlets">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_btn_playlist</string>
+              <string>o_controller</string>
+              <string>o_ctx_menu</string>
+              <string>o_mi_delete</string>
+              <string>o_mi_dl_cover_art</string>
+              <string>o_mi_info</string>
+              <string>o_mi_play</string>
+              <string>o_mi_preparse</string>
+              <string>o_mi_recursive_expand</string>
+              <string>o_mi_revealInFinder</string>
+              <string>o_mi_save_playlist</string>
+              <string>o_mi_selectall</string>
+              <string>o_mi_sort_author</string>
+              <string>o_mi_sort_name</string>
+              <string>o_mm_mi_revealInFinder</string>
+              <string>o_playlist_header</string>
+              <string>o_playlist_view</string>
+              <string>o_playlist_wizard</string>
+              <string>o_save_accessory_popup</string>
+              <string>o_save_accessory_text</string>
+              <string>o_save_accessory_view</string>
+              <string>o_search_field</string>
+              <string>o_search_field_other</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_btn_playlist</string>
+              <string>o_controller</string>
+              <string>o_ctx_menu</string>
+              <string>o_mi_delete</string>
+              <string>o_mi_dl_cover_art</string>
+              <string>o_mi_info</string>
+              <string>o_mi_play</string>
+              <string>o_mi_preparse</string>
+              <string>o_mi_recursive_expand</string>
+              <string>o_mi_revealInFinder</string>
+              <string>o_mi_save_playlist</string>
+              <string>o_mi_selectall</string>
+              <string>o_mi_sort_author</string>
+              <string>o_mi_sort_name</string>
+              <string>o_mm_mi_revealInFinder</string>
+              <string>o_playlist_header</string>
+              <string>o_playlist_view</string>
+              <string>o_playlist_wizard</string>
+              <string>o_save_accessory_popup</string>
+              <string>o_save_accessory_text</string>
+              <string>o_save_accessory_view</string>
+              <string>o_search_field</string>
+              <string>o_search_field_other</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_btn_playlist</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_controller</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_ctx_menu</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_delete</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_dl_cover_art</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_info</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_play</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_preparse</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_recursive_expand</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_revealInFinder</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_save_playlist</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_selectall</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_sort_author</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_sort_name</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mm_mi_revealInFinder</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_playlist_header</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_playlist_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_playlist_wizard</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_save_accessory_popup</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_save_accessory_text</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_save_accessory_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_search_field</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_search_field_other</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="109269535">
+            <string key="majorKey">IBDocumentRelativeSource</string>
+            <string key="minorKey">../../../../../modules/gui/macosx/playlist.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCPlaylistCommon</string>
+          <string key="superclassName">NSObject</string>
+          <object class="NSMutableDictionary" key="outlets">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_outline_view</string>
+              <string>o_outline_view_other</string>
+              <string>o_tc_author_other</string>
+              <string>o_tc_duration_other</string>
+              <string>o_tc_name_other</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>VLCPlaylistView</string>
+              <string>VLCPlaylistView</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_outline_view</string>
+              <string>o_outline_view_other</string>
+              <string>o_tc_author_other</string>
+              <string>o_tc_duration_other</string>
+              <string>o_tc_name_other</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_outline_view</string>
+                <string key="candidateClassName">VLCPlaylistView</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_outline_view_other</string>
+                <string key="candidateClassName">VLCPlaylistView</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_tc_author_other</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_tc_duration_other</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_tc_name_other</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <reference key="sourceIdentifier" ref="109269535"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCPlaylistView</string>
+          <string key="superclassName">NSOutlineView</string>
+          <reference key="sourceIdentifier" ref="109269535"/>
+        </object>
+      </object>
+    </object>
+    <int key="IBDocument.localizationMode">0</int>
+    <string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
+    <object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
+      <string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.InterfaceBuilder3</string>
+      <integer value="3000" key="NS.object.0"/>
+    </object>
+    <bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
+    <nil key="IBDocument.LastKnownRelativeProjectPath"/>
+    <int key="IBDocument.defaultPropertyAccessControl">3</int>
+    <object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
+      <bool key="EncodedWithXMLCoder">YES</bool>
+      <object class="NSArray" key="dict.sortedKeys">
+        <bool key="EncodedWithXMLCoder">YES</bool>
+        <string>NSMenuCheckmark</string>
+        <string>NSMenuMixedState</string>
+      </object>
+      <object class="NSMutableArray" key="dict.values">
+        <bool key="EncodedWithXMLCoder">YES</bool>
+        <string>{11, 11}</string>
+        <string>{10, 3}</string>
+      </object>
+    </object>
+  </data>
+</archive>

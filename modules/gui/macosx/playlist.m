@@ -419,6 +419,9 @@
     BOOL b_isSortDescending;
     id o_tc_sortColumn;
     NSInteger retainedRowSelection;
+
+    BOOL b_playlistmenu_nib_loaded;
+    BOOL b_view_setup;
 }
 
 - (void)saveTableColumns;
@@ -457,6 +460,9 @@
 
 - (void)awakeFromNib
 {
+    if (b_view_setup)
+        return;
+
     playlist_t * p_playlist = pl_Get(VLCIntf);
 
     [super awakeFromNib];
@@ -498,6 +504,8 @@
     }
 
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
+
+    b_view_setup = YES;
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification
@@ -886,6 +894,11 @@
     [o_outline_view selectAll: nil];
 }
 
+- (IBAction)showInfoPanel:(id)sender
+{
+    [[[VLCMain sharedInstance] info] initPanel];
+}
+
 - (IBAction)deleteItem:(id)sender
 {
     int i_count;
@@ -1226,6 +1239,9 @@
 
 - (NSMenu *)menuForEvent:(NSEvent *)o_event
 {
+    if (!b_playlistmenu_nib_loaded)
+        b_playlistmenu_nib_loaded = [NSBundle loadNibNamed:@"PlaylistMenu" owner:self];
+
     NSPoint pt;
     bool b_rows;
     bool b_item_sel;
@@ -1247,7 +1263,7 @@
     [o_mi_sort_name setEnabled: b_item_sel];
     [o_mi_sort_author setEnabled: b_item_sel];
 
-    return(o_ctx_menu);
+    return o_ctx_menu;
 }
 
 - (void)outlineView: (NSOutlineView *)o_tv didClickTableColumn:(NSTableColumn *)o_tc

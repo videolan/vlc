@@ -129,6 +129,7 @@
 - (IBAction)sortNodeByName:(id)sender;
 - (IBAction)sortNodeByAuthor:(id)sender;
 - (IBAction)recursiveExpandNode:(id)sender;
+- (IBAction)showInfoPanel:(id)sender;
 
 - (id)playingItem;
 - (NSArray *)draggedItems;

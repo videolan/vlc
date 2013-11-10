@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		7D8BB0B21830244B00FAE9B7 /* CrashReporter.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B01830244B00FAE9B7 /* CrashReporter.xib */; };
 		7D8BB0B71830311300FAE9B7 /* DebugMessageVisualizer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */; };
+		7D8BB0BA1830367200FAE9B7 /* PlaylistMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */; };
 		7DFFA16C16124F38001AF89F /* effects-one-button-pressed-dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DFFA16A16124F38001AF89F /* effects-one-button-pressed-dark.png */; };
 		7DFFA16D16124F38001AF89F /* effects-one-button-pressed-dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DFFA16B16124F38001AF89F /* effects-one-button-pressed-dark@2x.png */; };
 		CC04323D13B246DF00D7D52E /* effects-double-buttons_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04321313B246DF00D7D52E /* effects-double-buttons_dark.png */; };
@@ -474,6 +475,7 @@
 		7D8BB0B318302AC000FAE9B7 /* DebugMessageVisualizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DebugMessageVisualizer.h; path = ../../../modules/gui/macosx/DebugMessageVisualizer.h; sourceTree = "<group>"; };
 		7D8BB0B418302AC000FAE9B7 /* DebugMessageVisualizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DebugMessageVisualizer.m; path = ../../../modules/gui/macosx/DebugMessageVisualizer.m; sourceTree = "<group>"; };
 		7D8BB0B61830311300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/DebugMessageVisualizer.xib; sourceTree = "<group>"; };
+		7D8BB0B91830367200FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PlaylistMenu.xib; sourceTree = "<group>"; };
 		7DFFA16A16124F38001AF89F /* effects-one-button-pressed-dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed-dark.png"; path = "Resources/mainwindow_dark/effects-one-button-pressed-dark.png"; sourceTree = "<group>"; };
 		7DFFA16B16124F38001AF89F /* effects-one-button-pressed-dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed-dark@2x.png"; path = "Resources/mainwindow_dark/effects-one-button-pressed-dark@2x.png"; sourceTree = "<group>"; };
 		8E49720006417F6800370C9F /* playlistinfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = playlistinfo.h; path = ../../../modules/gui/macosx/playlistinfo.h; sourceTree = SOURCE_ROOT; };
@@ -1790,6 +1792,7 @@
 				CC461F73160084A10022423C /* SharedDialogs.xib */,
 				7D8BB0B01830244B00FAE9B7 /* CrashReporter.xib */,
 				7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */,
+				7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */,
 			);
 			name = xibs;
 			sourceTree = "<group>";
@@ -2175,6 +2178,7 @@
 				CC91908F159B4BB800E634A7 /* playlist-blue_dark@2x.png in Resources */,
 				CC919090159B4BB800E634A7 /* playlist-blue-pressed_dark@2x.png in Resources */,
 				CC919091159B4BB800E634A7 /* effects-double-buttons_dark@2x.png in Resources */,
+				7D8BB0BA1830367200FAE9B7 /* PlaylistMenu.xib in Resources */,
 				CC919092159B4BB800E634A7 /* effects-double-buttons-pressed_dark@2x.png in Resources */,
 				CC919093159B4BB800E634A7 /* effects-one-button_dark@2x.png in Resources */,
 				CC919094159B4BB800E634A7 /* effects-one-button-blue_dark@2x.png in Resources */,
@@ -2287,6 +2291,14 @@
 				7D8BB0B61830311300FAE9B7 /* English */,
 			);
 			name = DebugMessageVisualizer.xib;
+			sourceTree = "<group>";
+		};
+		7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7D8BB0B91830367200FAE9B7 /* English */,
+			);
+			name = PlaylistMenu.xib;
 			sourceTree = "<group>";
 		};
 		CC0663371566CD5A003A411C /* ConvertAndSave.xib */ = {
