@@ -296,6 +296,10 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
             return VLC_SUCCESS;
         }
 
+        case STREAM_GET_PTS_DELAY:
+            *va_arg( args, int64_t * ) = DEFAULT_PTS_DELAY;
+            return VLC_SUCCESS;
+
         case STREAM_GET_TITLE_INFO:
         case STREAM_GET_TITLE:
         case STREAM_GET_SEEKPOINT:

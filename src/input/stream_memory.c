@@ -122,6 +122,10 @@ static int Control( stream_t *s, int i_query, va_list args )
             p_sys->i_pos = i_64;
             break;
 
+        case STREAM_GET_PTS_DELAY:
+            *va_arg( args, int64_t * ) = 0;
+            break;
+
         case STREAM_GET_TITLE_INFO:
         case STREAM_GET_TITLE:
         case STREAM_GET_SEEKPOINT:
