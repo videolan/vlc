@@ -232,8 +232,8 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
           ? id->p_encoder->fmt_out.video.i_visible_height
           : id->p_decoder->fmt_in.video.i_visible_height
             ? id->p_decoder->fmt_in.video.i_visible_height : id->p_encoder->fmt_in.video.i_height;
-    id->p_encoder->fmt_in.video.i_frame_rate = ENC_FRAMERATE;
-    id->p_encoder->fmt_in.video.i_frame_rate_base = ENC_FRAMERATE_BASE;
+    id->p_encoder->fmt_in.video.i_frame_rate = id->p_decoder->fmt_out.video.i_frame_rate;
+    id->p_encoder->fmt_in.video.i_frame_rate_base = id->p_decoder->fmt_out.video.i_frame_rate_base;
 
     id->p_encoder->i_threads = p_sys->i_threads;
     id->p_encoder->p_cfg = p_sys->p_video_cfg;
@@ -524,9 +524,28 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
     id->p_encoder->fmt_in.video.i_frame_rate_base =
         id->p_encoder->fmt_out.video.i_frame_rate_base;
 
+    vlc_ureduce( &id->p_encoder->fmt_in.video.i_frame_rate,
+        &id->p_encoder->fmt_in.video.i_frame_rate_base,
+        id->p_encoder->fmt_in.video.i_frame_rate,
+        id->p_encoder->fmt_in.video.i_frame_rate_base,
+        0 );
+     msg_Dbg( p_stream, "source fps %d/%d, destination %d/%d",
+        id->p_decoder->fmt_out.video.i_frame_rate,
+        id->p_decoder->fmt_out.video.i_frame_rate_base,
+        id->p_encoder->fmt_in.video.i_frame_rate,
+        id->p_encoder->fmt_in.video.i_frame_rate_base );
+
+    id->i_output_frame_interval = id->p_encoder->fmt_out.video.i_frame_rate_base * CLOCK_FREQ / id->p_encoder->fmt_out.video.i_frame_rate;
+    id->i_input_frame_interval = id->p_decoder->fmt_out.video.i_frame_rate_base * CLOCK_FREQ / id->p_decoder->fmt_out.video.i_frame_rate;
+    msg_Info( p_stream, "input interval %d (base %d)  output interval %d (base %d)", id->i_input_frame_interval, id->p_decoder->fmt_out.video.i_frame_rate_base,
+                        id->i_output_frame_interval, id->p_encoder->fmt_in.video.i_frame_rate_base );
+
     date_Init( &id->interpolated_pts,
-               id->p_encoder->fmt_out.video.i_frame_rate,
-               id->p_encoder->fmt_out.video.i_frame_rate_base );
+               id->p_decoder->fmt_out.video.i_frame_rate,
+               1 );
+    date_Init( &id->next_output_pts,
+               id->p_encoder->fmt_in.video.i_frame_rate,
+               1 );
 
     /* Check whether a particular aspect ratio was requested */
     if( id->p_encoder->fmt_out.video.i_sar_num <= 0 ||
@@ -632,14 +651,29 @@ void transcode_video_close( sout_stream_t *p_stream,
         filter_chain_Delete( id->p_uf_chain );
 }
 
-static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, bool b_need_duplicate, sout_stream_t *p_stream, sout_stream_id_t *id, block_t **out )
+static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, sout_stream_t *p_stream, sout_stream_id_t *id, block_t **out )
 {
+
     picture_t *p_pic2 = NULL;
+    bool b_need_duplicate=false;
+    /* If input pts + input_frame_interval is lower than next_output_pts - output_frame_interval
+     * Then the future input frame should fit better and we can drop this one 
+     *
+     * Duplication need is checked in OutputFrame */
+    if( ( p_pic->date + (mtime_t)id->i_input_frame_interval ) <
+        ( date_Get( &id->next_output_pts ) ) )
+    {
+#if 0
+        msg_Dbg( p_stream, "dropping frame (%"PRId64" + %"PRId64" vs %"PRId64")",
+                 p_pic->date, id->i_input_frame_interval, date_Get(&id->next_output_pts) );
+#endif
+        picture_Release( p_pic );
+        return;
+    }
 
     /*
      * Encoding
      */
-
     /* Check if we have a subpicture to overlay */
     if( p_sys->p_spu )
     {
@@ -677,6 +711,8 @@ static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, bool b_need
             subpicture_Delete( p_subpic );
         }
     }
+    /*This pts is handled, increase clock to next one*/
+    date_Increment( &id->next_output_pts, id->p_encoder->fmt_in.video.i_frame_rate_base );
 
     if( p_sys->i_threads == 0 )
     {
@@ -686,66 +722,66 @@ static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, bool b_need
         block_ChainAppend( out, p_block );
     }
 
-    if( p_sys->b_master_sync )
+    /* we need to duplicate while next_output_pts + output_frame_interval < input_pts (next input pts)*/
+    b_need_duplicate = ( date_Get( &id->next_output_pts ) + id->i_output_frame_interval ) <
+                       ( date_Get( &id->interpolated_pts ) );
+
+    if( p_sys->i_threads )
     {
-        mtime_t i_pts = date_Get( &id->interpolated_pts ) + 1;
-        mtime_t i_video_drift = p_pic->date - i_pts;
-        if (unlikely ( i_video_drift  > MASTER_SYNC_MAX_DRIFT
-              || i_video_drift < -MASTER_SYNC_MAX_DRIFT ) )
+        if( unlikely (p_sys->b_master_sync && b_need_duplicate ))
         {
-            msg_Dbg( p_stream,
-                "video drift is too high (%"PRId64"), resetting master sync",
-                i_video_drift );
-            date_Set( &id->interpolated_pts, p_pic->date );
-            i_pts = p_pic->date + 1;
+            p_pic2 = video_new_buffer_encoder( id->p_encoder );
+            if( likely( p_pic2 != NULL ) )
+                picture_Copy( p_pic2, p_pic );
         }
-        date_Increment( &id->interpolated_pts, 1 );
-
-        if( unlikely( b_need_duplicate ) )
-        {
-
-           if( p_sys->i_threads >= 1 )
-           {
-               /* We can't modify the picture, we need to duplicate it */
-               p_pic2 = video_new_buffer_encoder( id->p_encoder );
-               if( likely( p_pic2 != NULL ) )
-               {
-                   picture_Copy( p_pic2, p_pic );
-                   p_pic2->date = i_pts;
-               }
-           }
-           else
-           {
-               block_t *p_block;
-               p_pic->date = i_pts;
-               p_block = id->p_encoder->pf_encode_video(id->p_encoder, p_pic);
-               block_ChainAppend( out, p_block );
-           }
-       }
-    }
-
-    if( p_sys->i_threads == 0 )
-    {
-        picture_Release( p_pic );
-    }
-    else
-    {
         vlc_mutex_lock( &p_sys->lock_out );
         picture_fifo_Push( p_sys->pp_pics, p_pic );
-        if( p_pic2 != NULL )
-        {
-            picture_fifo_Push( p_sys->pp_pics, p_pic2 );
-        }
         vlc_cond_signal( &p_sys->cond );
         vlc_mutex_unlock( &p_sys->lock_out );
     }
+
+    while( (p_sys->b_master_sync && b_need_duplicate ))
+    {
+        if( p_sys->i_threads >= 1 )
+        {
+            picture_t *p_tmp = NULL;
+            /* We can't modify the picture, we need to duplicate it */
+            p_tmp = video_new_buffer_encoder( id->p_encoder );
+            if( likely( p_tmp != NULL ) )
+            {
+                picture_Copy( p_tmp, p_pic2 );
+                p_tmp->date = date_Get( &id->next_output_pts );
+                vlc_mutex_lock( &p_sys->lock_out );
+                picture_fifo_Push( p_sys->pp_pics, p_tmp );
+                vlc_cond_signal( &p_sys->cond );
+                vlc_mutex_unlock( &p_sys->lock_out );
+            }
+        }
+        else
+        {
+            block_t *p_block;
+            p_pic->date = date_Get( &id->next_output_pts );
+            p_block = id->p_encoder->pf_encode_video(id->p_encoder, p_pic);
+            block_ChainAppend( out, p_block );
+        }
+#if 0
+        msg_Dbg( p_stream, "duplicated frame");
+#endif
+        date_Increment( &id->next_output_pts, id->p_encoder->fmt_in.video.i_frame_rate_base );
+        b_need_duplicate = ( date_Get( &id->next_output_pts ) + id->i_output_frame_interval ) <
+                           ( date_Get( &id->interpolated_pts ) );
+    }
+
+    if( p_sys->i_threads > 0 )
+        picture_Release( p_pic2 );
+    else
+        picture_Release( p_pic );
 }
 
 int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                                     block_t *in, block_t **out )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    bool b_need_duplicate = false;
     picture_t *p_pic = NULL;
     *out = NULL;
 
@@ -785,54 +821,15 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
         if( p_stream->p_sout->i_out_pace_nocontrol && p_sys->b_hurry_up )
         {
             mtime_t current_date = mdate();
-            if( unlikely( current_date + 50000 > p_pic->date ) )
+            if( unlikely( (current_date - 50000) > p_pic->date ) )
             {
                 msg_Dbg( p_stream, "late picture skipped (%"PRId64")",
-                         current_date + 50000 - p_pic->date );
+                         current_date - 50000 - p_pic->date );
                 picture_Release( p_pic );
                 continue;
             }
         }
 
-        if( p_sys->b_master_sync )
-        {
-            mtime_t i_master_drift = p_sys->i_master_drift;
-            mtime_t i_pts = date_Get( &id->interpolated_pts ) + 1;
-            mtime_t i_video_drift = p_pic->date - i_pts;
-
-            if ( unlikely( i_video_drift > MASTER_SYNC_MAX_DRIFT
-                  || i_video_drift < -MASTER_SYNC_MAX_DRIFT ) )
-            {
-                msg_Dbg( p_stream,
-                    "video drift is too high (%"PRId64", resetting master sync",
-                    i_video_drift );
-                date_Set( &id->interpolated_pts, p_pic->date );
-                i_pts = p_pic->date + 1;
-            }
-            i_video_drift = p_pic->date - i_pts;
-            b_need_duplicate = false;
-
-            /* Set the pts of the frame being encoded */
-            p_pic->date = i_pts;
-
-            if( unlikely( i_video_drift < (i_master_drift - 50000) ) )
-            {
-#if 0
-                msg_Dbg( p_stream, "dropping frame (%i)",
-                         (int)(i_video_drift - i_master_drift) );
-#endif
-                picture_Release( p_pic );
-                continue;
-            }
-            else if( unlikely( i_video_drift > (i_master_drift + 50000) ) )
-            {
-#if 0
-                msg_Dbg( p_stream, "adding frame (%i)",
-                         (int)(i_video_drift - i_master_drift) );
-#endif
-                b_need_duplicate = true;
-            }
-        }
         if( unlikely (
              id->p_encoder->p_module &&
              !video_format_IsSimilar( &p_sys->fmt_input_video, &id->p_decoder->fmt_out.video )
@@ -885,6 +882,63 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
             }
         }
 
+        /*Input lipsync and drop check */
+        if( p_sys->b_master_sync )
+        {
+            /* How much audio has drifted */
+            mtime_t i_master_drift = p_sys->i_master_drift;
+
+            /* This is the pts input should have now with constant frame rate */
+            mtime_t i_pts = date_Get( &id->interpolated_pts );
+
+            /* How much input pts has drifted */
+            mtime_t i_video_drift = p_pic->date - i_pts;
+
+            /* Check that we are having lipsync with input here */
+            if( unlikely ( ( (i_video_drift - i_master_drift ) > MASTER_SYNC_MAX_DRIFT
+                          || (i_video_drift + i_master_drift ) < -MASTER_SYNC_MAX_DRIFT ) ) )
+            {
+                msg_Warn( p_stream,
+                    "video drift too big, resetting sync %"PRId64" to %"PRId64,
+                    (i_video_drift + i_master_drift),
+                    p_pic->date
+                    );
+                date_Set( &id->interpolated_pts, p_pic->date );
+                date_Set( &id->next_output_pts, p_pic->date );
+                i_pts = date_Get( &id->interpolated_pts );
+            }
+
+            /* Set the pts of the frame being encoded */
+            p_pic->date = i_pts;
+
+            /* now take next input pts, pts dates are only enabled if p_module is set*/
+            date_Increment( &id->interpolated_pts, id->p_decoder->fmt_out.video.i_frame_rate_base );
+
+
+            /* If input pts + input_frame_interval is lower than next_output_pts - output_frame_interval
+             * Then the future input frame should fit better and we can drop this one 
+             *
+             * Duplication need is checked in OutputFrame */
+            if( ( p_pic->date + (mtime_t)id->i_input_frame_interval ) <
+                ( date_Get( &id->next_output_pts ) ) )
+            {
+#if 0
+                msg_Dbg( p_stream, "dropping frame (%"PRId64" + %"PRId64" vs %"PRId64")",
+                         p_pic->date, id->i_input_frame_interval, date_Get(&id->next_output_pts) );
+#endif
+                picture_Release( p_pic );
+                continue;
+            }
+#if 0
+            msg_Dbg( p_stream, "not dropping frame");
+#endif
+
+            /* input calculated pts isn't necessary what pts output should be, so use output pts*/
+            p_pic->date = date_Get( &id->next_output_pts );
+
+
+        }
+
         /* Run the filter and output chains; first with the picture,
          * and then with NULL as many times as we need until they
          * stop outputting frames.
@@ -907,8 +961,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                 if( !p_user_filtered_pic )
                     break;
 
-                OutputFrame( p_sys, p_user_filtered_pic, b_need_duplicate, p_stream, id, out );
-                b_need_duplicate = false;
+                OutputFrame( p_sys, p_user_filtered_pic, p_stream, id, out );
 
                 p_filtered_pic = NULL;
             }

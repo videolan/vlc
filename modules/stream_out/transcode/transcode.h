@@ -11,6 +11,7 @@
 
 #include <vlc_picture_fifo.h>
 
+/*100ms is around the limit where people are noticing lipsync issues*/
 #define MASTER_SYNC_MAX_DRIFT 100000
 
 struct sout_stream_sys_t
@@ -99,7 +100,10 @@ struct sout_stream_id_t
     encoder_t       *p_encoder;
 
     /* Sync */
-    date_t          interpolated_pts;
+    date_t          interpolated_pts; /**< Incoming calculated PTS */
+    date_t          next_output_pts; /**< output calculated PTS */
+    int             i_output_frame_interval;
+    int             i_input_frame_interval;
 };
 
 /* OSD */
