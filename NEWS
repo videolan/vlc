@@ -42,46 +42,117 @@ Removed modules:
  * ios video output: use ios2
  * OpenMash H.261 video decoder
 
+Changes between 2.1.0 and 2.1.1:
+--------------------------------
 
-Changes between 2.0.x and 2.1.0:
+Core:
+ * Fix random and reshuffling behaviour
+ * Fix recording
+ * Fix some subtitles track selection
+
+Decoders:
+ * VP9 support in WebM
+ * HEVC/H.265 support in MKV, MP4 and raw files
+ * Fix GPU decoding under Windows (DxVA2) crashes
+
+Demuxers:
+ * Fix crashes on wav, mlp and mkv and modplug files
+ * Support Speex in ogg files
+ * Fix some .mov playlists support
+ * Support Alac in mkv
+ * Fix WMV3 and palette in AVI
+ * Fix FLAC packetizer issues in some files
+
+Access:
+ * Fix DVB options parsing
+ * Fix DeckLink HDMI input
+ * Fix HTTPS connectivity on OS X by loading root certificates from Keychain
+
+Audio output:
+ * Fixes for DirectSound pass-through
+ * Fixes for OSS output, notably on BSD
+
+Interfaces:
+ * Fix HTTP interface infinite loop
+ * Fix D-Bus volume setting
+
+Qt:
+ * Reinstore right click subtitle menu to open a subtitle
+ * Fix saving the hotkeys in preferences
+ * Fix saving the audio volume on Win32, using DirectSound
+ * Fix play after drag'n drop
+ * Fix streaming options edition and scale parameter
+
+Stream out:
+ * Fix transcoding audio drift issues
+ * Fix numerous audio encoding issues
+
+Win32 installer:
+ * Important rewrite to fix numerous bugs, notably about updates
+ * Simplification of the upgrade mechanism
+
+Mac OS X interface:
+ * Reintroduce the language selector known from pre-2.1 releases
+ * Fix fullscreen behaviour and various crashes
+ * Fix about dialog crash in Japanese
+ * Fix crashes on proxy lookups
+ * Fixes on the playlist and information behaviours
+ * Fixes on the streaming dialogs
+ * Improves interface resizings
+
+Translations:
+ * Update of Arabic, Basque, Belarusian, Czech, Danish, Dutch, French,
+   Galician, Gujarati, Hindi, hungarian, Icelandic, Italian, Japanese, Korean,
+   Lithuanian, Marathi, Modern Greek, Norwegian Bokmål, Occitan, Persian,
+   Polish, Portuguese, Punjabi, Romanian, Sinhala, Slovak, Slovenian, Spanish,
+   Swedish, Telugu, Thai, Traditional Chinese, Turkish, Ukrainian, Uzbek
+   translations
+
+
+Changes between 2.0.9 and 2.1.0:
 --------------------------------
 
 Important changes:
  * The licenses of numerous modules have changed from GPLv2+ to LGPLv2.1+
- * Discontinued support for PowerPC-based and 32bit Intel-based Macs
-   VLC requires Mac OS X 10.6 or later now on 64bit hardware
- * The --with-tuning and --without-tuning options are removed. To tune
-   compilation for a specific processor type, set CFLAGS manually.
+ * Discontinued support for PowerPC-based Macs; VLC now requires Mac OS X 10.6+
+   Moreover, the official builds will be 64bit only
+ * The --with-tuning and --without-tuning options are removed; to tune
+   compilation for a specific processor type, set CFLAGS manually
 
 3rd party libraries (contrib):
- * /extras/contrib has been replaced by a cleaner system in /contrib
+ * /extras/contrib has been replaced by a cleaner build system in /contrib
 
 Core:
- * Audio core rewrite
+ * Audio core rewrite, supporting higher samplerates, better volume management,
+   better device selection, new channel layouts and new output capabilities
  * Fix support for .001, .00x split files on Windows
  * Full support for UNICODE Windows mode
- * Partial support for Windows Store App
- * Removed SQL support
- * Add an audio fingerprinter
- * Disabled and marked obsolete --language selection
+ * Disable and mark obsolete --language selection
+ * Port to Android
+ * Port to iOS
+ * Partial support for Windows Store App / WinRT
+ * Add an audio fingerprinter, using AcoustID!
+ * Remove SQL support
 
 Decoders:
- * Support for OPUS via libopus.
- * Support for CDXL, Ut Video, VBLE, Dxtory codecs via libavcodec.
- * Numerous improvements on the OpenMAX IL codec
+ * Support for CDXL, Ut Video, VBLE, Dxtory codecs via libavcodec
+ * Numerous improvements on the OpenMAX IL codec module
  * Support for Ulead DV audio
  * Support for TechSmith Screen Codec 2, Microsoft Expression Encoder Screen,
    Microsoft Application Screen Decoder 1 (MSS1) and 2 (MSS2)
  * Support for Indeo Audio Coder, RealAudio Lossless
  * Add Hardware Acceleration support on OS X for H.264 based upon VDADecoder
  * Add Hardware Acceleration support on Android Jelly Bean using MediaCodec
+ * Add Hardware Acceleration support on Linux using VDPAU
  * Support for SCTE-27 subtitles
- * Support for VDPAU hardware video decoding acceleration on Linux
  * Split G.711 decoder from Araw decoder
+ * X Window system raster image dump pseudo-decoder
+ * Support for Webinar GoToMeeting 4 (G2M4)
 
 Encoders:
  * high10, high422 and high444 encoding support in h264
  * QuickSyncVideo Encoding (Intel Media SDK) support using Intel GPU on Windows
+ * New AAC encoder using the fdk-aac library (non-free)
 
 Access:
  * Screen: add support for OS X Lion and later,
@@ -96,7 +167,8 @@ Access:
  * Add support for Remote Desktop/RDP in view only mode
  * Timecode: generate a clock/timecode as a subtitle track
    vlc video.mkv --input-slave timecode:// --timecode-fps 30/1001
- * New video capture module for OS X based on AVFoundation
+ * New video capture module for OS X based on AVFoundation, named AVcapture
+ * New shared memory framebuffer access module, named shm
 
 Demuxers:
  * MP4: partial support for fragmented MP4
@@ -110,22 +182,21 @@ Demuxers:
  * Support for more MJPEG streams
  * Add support for liveleak streams
  * Add support for Wave/RF64 files
- * Prevent numerous uncaught exceptions in MKV causing the 
-   program to terminate.
- * Add protection against several heap buffer overflow in libebml
+ * Prevent numerous uncaught exceptions in MKV
+ * Add protection against several potential heap buffer overflow in libebml
 
 Audio output:
  * Windows Audio Session API audio output support
  * OpenBSD sndio audio output support
- * Important improvements on the Android OpenSL ES module
+ * Important improvements on the Android OpenSL ES audio output
  * Android AudioTrack audio output support
  * OS X Auhal output support for 6.1, 7.1, 8.0 and 8.1 playback and layouts
  * Rewrite of OSS module to support OSSv4
  * OS X Auhal output support for multi-buffer output devices
    This fix was facilitated through a hardware lending by TEAC Europe GmbH
    distributing such devices under the brand "TASCAM" (US-122, US-144, etc.).
- * Rewrite of AudioQueue module for iOS (and OS X)
- * New, simplified AudioUnit output module for iOS
+ * Rewrite of the AudioQueue output for iOS (and OS X)
+ * New, simplified AudioUnit output for iOS
 
 Audio Filters:
  * New remapping channel filter
@@ -133,20 +204,22 @@ Audio Filters:
  * New VSXu visualization plugin
  * ARM NEON acceleration of volume filter
  * Rewrite of the simple downmixer filter
+ * New gain audio filter
 
 Video Outputs:
- * New module to output using Decklink Blackmagic cards
- * New module using OpenMAX IL to output video
+ * New output for Decklink Blackmagic cards
+ * New output using OpenMAX IL hardware acceleration API
  * OpenGL: use glsl instead of ARB to do the YUV->RGB conversions
  * OpenGLES: add support for color conversation shaders on Android and iOS
- * Fix and enable the OpenGL ES1 and ES2 modules
-   Also, subpictures now work in the OpenGL ES2 module
+ * Fix and enable the OpenGL ES1 and ES2 outputs
+ * Support for subpictures in the OpenGL ES2 output
  * Fix the power management issue on Windows for standby management
  * New output module for iOS using OpenGL ES2
+ * Fix performance issue on Macs with multiple graphics cards
 
 Video Filters:
  * New anaglyph video filter which transforms side by side 3D video streams in
-   anaglyph glasses (aka red/blue) compatible images.
+   anaglyph glasses (aka red/blue) compatible images
  * Support in deinterlacing filter for most 4:2:0, 4:2:2, 4:4:4 YUV formats
    and for bits depth higher than 8bits (like 10bits)
  * Improvements on the transform filter, to support 10bits and RGB formats
@@ -166,12 +239,14 @@ Fingerprinters:
  * Add AcoustID/Musicbrainz based fingerprinter
 
 Interfaces:
- * configurable password for the HTTP server.
- * .hosts removed from the HTTP server.
- * fix Lua command line interface console mode under Windows.
+ * configurable password for the HTTP server
+ * .hosts removed from the HTTP server
+ * fix Lua command line interface console mode under Windows
  * Better support for MCE remotes on Windows
  * Hotkey support for TS program selection
  * Rewrite of D-Bus inhibit interface
+ * Improvements on motion sensing interface, fix orientation, move out
+   rotate mode into the rotate video filter
 
 Services discovery:
  * UPnP A/V subtitles
@@ -183,8 +258,8 @@ OS X Interface:
    controller
  * Add a GUI to manage podcasts
  * Add a new panel for media conversation and streaming
- * Add a GUI for the QTSound access module to process audio captured locally
-   - This also allows to capture input from a webcam and a mic at the same time.
+ * Add a GUI for the QTSound access input to process audio captured locally
+   - This also allows to capture input from a webcam and a mic at the same time
  * Add a GUI to capture QTSound data along with the current screen content
  * Add an option to let the Apple Remote control the system volume instead of
    VLC's internal volume level
@@ -217,7 +292,7 @@ OS X Interface:
  * Add support for the Video Title option
  * Add support for the Boss Key
  * The Streaming/Transcoding wizard and the open dialog's output panel are
-   deprecated now and will be removed in a future release.
+   deprecated now and will be removed in a future release
 
 Qt:
  * Partial support for Qt5.0
@@ -231,11 +306,9 @@ Qt:
  * Preferences hotkeys management fixes
  * Display playlist total duration
  * Support for a Maximum volume in the UI
- * Numerous fixes
  * Add audio track fingerprinting from media info
- * Remove language preference
- * New profiles format and dialog to handle filters and quality.
-   Added new profiles.
+ * New profiles format and dialog to handle filters and quality
+ * Numerous fixes
 
 Skins2:
  * Port to OS/2
@@ -275,6 +348,46 @@ Removed modules:
  * SQL Media Library (broken and unmaintained)
  * SQL Lite (only used as SQL Media library backend)
  * htcpcp :)
+
+Translations:
+ * Update of all translations
+
+
+Changes between 2.0.8 and 2.0.9:
+--------------------------------
+
+Demux:
+ * Improve handling of corrupt ASF files
+ * Fix buffer overflow in the mp4a packetizer
+
+Contribs:
+ * Fix modplug security issues
+
+
+Changes between 2.0.7 and 2.0.8:
+--------------------------------
+
+Access:
+ * Fix ISDB-S tuning
+ * Fix crash in QTsound
+ * Fix screen mouse file location
+ * Fix invalid memcpy in MMS access
+
+Demux:
+ * Fix use after free in sgimb
+ * Improve resistance and checking against malformed MKV files
+
+Decoders:
+ * Fix crash in the libavcodec module
+
+Mac OS X:
+ * Fix interface crashes
+ * Fix autostart playback option
+ * Respect "playlist-autostart" option
+
+Translations:
+ * update Welsh translation
+ * New Kannada translation
 
 
 Changes between 2.0.6 and 2.0.7:
