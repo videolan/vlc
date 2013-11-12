@@ -483,7 +483,7 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
                                  mtime_t i_pts )
 {
     video_format_t fmt;
-    subpicture_t *p_spu;
+    subpicture_t *p_spu=NULL;
 
     /* If there is a page or sub to render, then we do that here */
     /* Create the subpicture unit */
