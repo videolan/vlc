@@ -50,6 +50,7 @@
 #include <libzvbi.h>
 
 #include <vlc_codec.h>
+#include "substext.h"
 
 /*****************************************************************************
  * Module descriptor.
@@ -379,7 +380,8 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                                 i_align, p_block->i_pts );
             if( !p_spu )
                 goto error;
-            p_spu->p_region->psz_text = strdup("");
+            subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+            p_spu_sys->text = strdup("");
 
             p_sys->b_update = true;
             p_sys->i_last_page = i_wanted_page;
@@ -431,7 +433,12 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         while( offset < i_total && isspace( p_text[offset] ) )
            offset++;
 
-        p_spu->p_region->psz_text = strdup( &p_text[offset] );
+        subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+        p_spu_sys->text = strdup( &p_text[offset] );
+
+        p_spu_sys->align = i_align;
+        p_spu_sys->i_font_height_percent = 5;
+
 #ifdef ZVBI_DEBUG
         msg_Info( p_dec, "page %x-%x(%d)\n\"%s\"", p_page.pgno, p_page.subno, i_total, &p_text[offset] );
 #endif
@@ -487,7 +494,10 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
 
     /* If there is a page or sub to render, then we do that here */
     /* Create the subpicture unit */
-    p_spu = decoder_NewSubpicture( p_dec, NULL );
+    if( b_text )
+        p_spu = decoder_NewSubpictureText( p_dec );
+    else
+        p_spu = decoder_NewSubpicture( p_dec, NULL );
     if( !p_spu )
     {
         msg_Warn( p_dec, "can't get spu buffer" );
@@ -525,13 +535,11 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
     p_spu->i_stop = i_pts + 10000000;
     p_spu->b_ephemer = true;
     p_spu->b_absolute = b_text ? false : true;
-    p_spu->p_region->i_align = i_align;
 
     if( !b_text )
-    {
-        p_spu->i_original_picture_width = fmt.i_width;
-        p_spu->i_original_picture_height = fmt.i_height;
-    }
+        p_spu->p_region->i_align = i_align;
+    p_spu->i_original_picture_width = fmt.i_width;
+    p_spu->i_original_picture_height = fmt.i_height;
 
     /* */
     *p_fmt = fmt;
