@@ -509,12 +509,12 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
 
     p_spu->p_region->i_x = 0;
     p_spu->p_region->i_y = 0;
-    p_spu->p_region->i_align = i_align;
 
     p_spu->i_start = i_pts;
-    p_spu->i_stop = 0;
+    p_spu->i_stop = i_pts + 10000000;
     p_spu->b_ephemer = true;
-    p_spu->b_absolute = true;
+    p_spu->b_absolute = b_text ? false : true;
+    p_spu->p_region->i_align = i_align;
 
     if( !b_text )
     {
