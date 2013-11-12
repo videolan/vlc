@@ -192,28 +192,30 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( !pp_block || !*pp_block ) return NULL;
 
-    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    block_t *p_block = *pp_block;
+
+    if( p_block->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
-        if( (*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED )
+        if( p_block->i_flags&BLOCK_FLAG_CORRUPTED )
         {
             p_sys->i_state = STATE_NOSYNC;
             block_BytestreamEmpty( &p_sys->bytestream );
         }
         date_Set( &p_sys->end_date, 0 );
-        block_Release( *pp_block );
+        block_Release( p_block );
         p_sys->b_discontinuity = true;
         return NULL;
     }
 
-    if( !date_Get( &p_sys->end_date ) && (*pp_block)->i_pts <= VLC_TS_INVALID )
+    if( !date_Get( &p_sys->end_date ) && p_block->i_pts <= VLC_TS_INVALID )
     {
         /* We've just started the stream, wait for the first PTS. */
         msg_Dbg( p_dec, "waiting for PTS" );
-        block_Release( *pp_block );
+        block_Release( p_block );
         return NULL;
     }
 
-    block_BytestreamPush( &p_sys->bytestream, *pp_block );
+    block_BytestreamPush( &p_sys->bytestream, p_block );
 
     while( 1 )
     {
