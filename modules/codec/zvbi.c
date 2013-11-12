@@ -194,7 +194,6 @@ static int Open( vlc_object_t *p_this )
     if( p_dec->fmt_in.i_codec != VLC_CODEC_TELETEXT )
         return VLC_EGENERIC;
 
-    p_dec->pf_decode_sub = Decode;
     p_sys = p_dec->p_sys = calloc( 1, sizeof(decoder_sys_t) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
@@ -261,6 +260,8 @@ static int Open( vlc_object_t *p_this )
         p_dec->fmt_out.video.i_chroma = VLC_CODEC_TEXT;
     else
         p_dec->fmt_out.video.i_chroma = VLC_CODEC_RGBA;
+
+    p_dec->pf_decode_sub = Decode;
     return VLC_SUCCESS;
 }
 
