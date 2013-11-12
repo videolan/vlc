@@ -438,6 +438,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
         p_spu_sys->align = i_align;
         p_spu_sys->i_font_height_percent = 5;
+        p_spu_sys->renderbg = b_opaque;
 
 #ifdef ZVBI_DEBUG
         msg_Info( p_dec, "page %x-%x(%d)\n\"%s\"", p_page.pgno, p_page.subno, i_total, &p_text[offset] );
