@@ -63,8 +63,8 @@ static void Close( vlc_object_t * );
         "Default page is index 100")
 
 #define OPAQUE_TEXT N_("Teletext transparency")
-#define OPAQUE_LONGTEXT N_("Setting vbi-opaque to false " \
-        "makes the boxed text transparent." )
+#define OPAQUE_LONGTEXT N_("Setting vbi-opaque to true " \
+        "makes the text to be boxed and maybe easier to read." )
 
 #define POS_TEXT N_("Teletext alignment")
 #define POS_LONGTEXT N_( \
@@ -91,7 +91,7 @@ vlc_module_begin ()
 
     add_integer( "vbi-page", 100,
                  PAGE_TEXT, PAGE_LONGTEXT, false )
-    add_bool( "vbi-opaque", true,
+    add_bool( "vbi-opaque", false,
                  OPAQUE_TEXT, OPAQUE_LONGTEXT, false )
     add_integer( "vbi-position", 8, POS_TEXT, POS_LONGTEXT, false )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions );
