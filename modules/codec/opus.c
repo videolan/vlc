@@ -404,10 +404,12 @@ static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     }
     if( spp > i_nb_samples )
     {
+        p_aout_buffer->i_buffer = (i_nb_samples - i_end_trim) *
+                                  p_sys->header.channels * sizeof(float);
         memmove(p_aout_buffer->p_buffer,
             p_aout_buffer->p_buffer
             + (spp - i_nb_samples)*p_sys->header.channels*sizeof(float),
-            (i_nb_samples - i_end_trim)*p_sys->header.channels*sizeof(float));
+            p_aout_buffer->i_buffer);
     }
     i_nb_samples -= i_end_trim;
 
