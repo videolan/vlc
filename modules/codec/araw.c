@@ -738,8 +738,10 @@ static block_t *Encode( encoder_t *enc, block_t *in )
     if( encode != NULL )
         encode( out->p_buffer, in->p_buffer, in->i_nb_samples
                                              * enc->fmt_out.audio.i_channels );
-    else
+    else {
+        assert( out->i_buffer >= in->i_buffer );
         memcpy( out->p_buffer, in->p_buffer, in->i_buffer );
+    }
     return out;
 }
 
