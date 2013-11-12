@@ -190,32 +190,33 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     uint8_t *p_buf;
     block_t *p_out_buffer;
 
-    if( !pp_block || !*pp_block ) return NULL;
+    block_t *p_block = pp_block ? *pp_block : NULL;
 
-    block_t *p_block = *pp_block;
-
-    if( p_block->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
-    {
-        if( p_block->i_flags&BLOCK_FLAG_CORRUPTED )
+    if (p_block) {
+        if( p_block->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
         {
-            p_sys->i_state = STATE_NOSYNC;
-            block_BytestreamEmpty( &p_sys->bytestream );
+            if( p_block->i_flags&BLOCK_FLAG_CORRUPTED )
+            {
+                p_sys->i_state = STATE_NOSYNC;
+                block_BytestreamEmpty( &p_sys->bytestream );
+            }
+            date_Set( &p_sys->end_date, 0 );
+            block_Release( p_block );
+            p_sys->b_discontinuity = true;
+            return NULL;
         }
-        date_Set( &p_sys->end_date, 0 );
-        block_Release( p_block );
-        p_sys->b_discontinuity = true;
-        return NULL;
-    }
 
-    if( !date_Get( &p_sys->end_date ) && p_block->i_pts <= VLC_TS_INVALID )
-    {
-        /* We've just started the stream, wait for the first PTS. */
-        msg_Dbg( p_dec, "waiting for PTS" );
-        block_Release( p_block );
-        return NULL;
-    }
+        if( !date_Get( &p_sys->end_date ) && p_block->i_pts <= VLC_TS_INVALID )
+        {
+            /* We've just started the stream, wait for the first PTS. */
+            msg_Dbg( p_dec, "waiting for PTS" );
+            block_Release( p_block );
+            return NULL;
+        }
 
-    block_BytestreamPush( &p_sys->bytestream, p_block );
+        block_BytestreamPush( &p_sys->bytestream, p_block );
+    } else
+        p_sys->i_state = STATE_SEND_DATA; /* return all the data we have left */
 
     while( 1 )
     {
@@ -470,7 +471,11 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
 
             /* So p_block doesn't get re-added several times */
-            *pp_block = block_BytestreamPop( &p_sys->bytestream );
+            p_block = block_BytestreamPop( &p_sys->bytestream );
+            if (pp_block)
+                *pp_block = p_block;
+            else if (p_block)
+                block_Release(p_block);
 
             return p_out_buffer;
         }
