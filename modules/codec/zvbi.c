@@ -90,7 +90,7 @@ vlc_module_begin ()
                  PAGE_TEXT, PAGE_LONGTEXT, false )
     add_bool( "vbi-opaque", true,
                  OPAQUE_TEXT, OPAQUE_LONGTEXT, false )
-    add_integer( "vbi-position", 4, POS_TEXT, POS_LONGTEXT, false )
+    add_integer( "vbi-position", 8, POS_TEXT, POS_LONGTEXT, false )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions );
     add_bool( "vbi-text", false,
               TELX_TEXT, TELX_LONGTEXT, false )
