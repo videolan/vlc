@@ -42,6 +42,8 @@
 # include "config.h"
 #endif
 
+#include <ctype.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <assert.h>
@@ -414,15 +416,24 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     if( p_sys->b_text )
     {
         unsigned int i_textsize = 7000;
-        int i_total;
+        int i_total,offset;
         char p_text[i_textsize+1];
 
         i_total = vbi_print_page_region( &p_page, p_text, i_textsize,
                         "UTF-8", 0, 0, 0, i_first_row, p_page.columns, i_num_rows );
-        p_text[i_total] = '\0';
-        p_spu->p_region->psz_text = strdup( p_text );
+
+        for( offset=1; offset<i_total && isspace( p_text[i_total-offset ] ); offset++)
+           p_text[i_total-offset] = '\0';
+
+        i_total -= offset;
+
+        offset=0;
+        while( offset < i_total && isspace( p_text[offset] ) )
+           offset++;
+
+        p_spu->p_region->psz_text = strdup( &p_text[offset] );
 #ifdef ZVBI_DEBUG
-        msg_Info( p_dec, "page %x-%x(%d)\n%s", p_page.pgno, p_page.subno, i_total, p_text );
+        msg_Info( p_dec, "page %x-%x(%d)\n\"%s\"", p_page.pgno, p_page.subno, i_total, &p_text[offset] );
 #endif
     }
     else
