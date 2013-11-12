@@ -448,10 +448,12 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_sys->i_free_frame_size = p_sys->i_frame_size;
             }
 
-            /* Copy the whole frame into the buffer. When we reach this point
-             * we already know we have enough data available. */
-            block_GetBytes( &p_sys->bytestream,
-                            p_buf, __MIN( (unsigned)p_sys->i_frame_size, p_out_buffer->i_buffer ) );
+            /* Copy the whole frame into the buffer. */
+            if (block_GetBytes( &p_sys->bytestream,
+                            p_buf, __MIN( (unsigned)p_sys->i_frame_size, p_out_buffer->i_buffer ) )) {
+                block_Release(p_out_buffer);
+                return NULL;
+            }
 
             /* Get beginning of next frame for libmad */
             if( !p_sys->b_packetizer )
