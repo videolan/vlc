@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dbus_root.h : dbus control module (mpris v1.0) - root object
+ * dbus_root.h : dbus control module (mpris v2.2) - Root object
  *****************************************************************************
  * Copyright © 2006-2008 Rafaël Carré
  * Copyright © 2007-2010 Mirsal Ennaime

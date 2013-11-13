@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dbus_player.h : dbus control module (mpris v1.0) - /Player object
+ * dbus_player.h : dbus control module (mpris v2.2) - Player object
  *****************************************************************************
  * Copyright © 2006-2008 Rafaël Carré
  * Copyright © 2007-2010 Mirsal Ennaime
