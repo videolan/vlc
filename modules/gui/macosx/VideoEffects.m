@@ -520,8 +520,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     psz_string = config_GetPsz(p_intf, psz_filter_type);
 
     if (b_on) {
-        if (!psz_string) {
-            free(psz_string);
+        if (psz_string == NULL) {
             psz_string = strdup(psz_name);
         } else if (strstr(psz_string, psz_name) == NULL) {
             char *psz_tmp = strdup([[NSString stringWithFormat: @"%s:%s", psz_string, psz_name] UTF8String]);
