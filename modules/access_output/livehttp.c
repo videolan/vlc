@@ -104,6 +104,9 @@ static void Close( vlc_object_t * );
 #define RANDOMIV_TEXT N_("Use randomized IV for encryption")
 #define RANDOMIV_LONGTEXT N_("Generate IV instead using segment-number as IV")
 
+#define INTITIAL_SEG_TEXT N_("Number of first segment")
+#define INITIAL_SEG_LONGTEXT N_("The number of the segmented generated")
+
 vlc_module_begin ()
     set_description( N_("HTTP Live streaming output") )
     set_shortname( N_("LiveHTTP" ))
@@ -113,6 +116,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_ACO )
     add_integer( SOUT_CFG_PREFIX "seglen", 10, SEGLEN_TEXT, SEGLEN_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "numsegs", 0, NUMSEGS_TEXT, NUMSEGS_LONGTEXT, false )
+    add_integer( SOUT_CFG_PREFIX "initial-segment-number", 1, INTITIAL_SEG_TEXT, INITIAL_SEG_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX "splitanywhere", false,
               SPLITANYWHERE_TEXT, SPLITANYWHERE_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "delsegs", true,
@@ -153,6 +157,7 @@ static const char *const ppsz_sout_options[] = {
     "key-file",
     "key-loadfile",
     "generate-iv",
+    "initial-segment-number",
     NULL
 };
 
@@ -186,6 +191,7 @@ struct sout_access_out_sys_t
     block_t *block_buffer;
     int i_handle;
     unsigned i_numsegs;
+    unsigned i_initial_segment;
     bool b_delsegs;
     bool b_ratecontrol;
     bool b_splitanywhere;
@@ -230,6 +236,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->block_buffer = NULL;
 
     p_sys->i_numsegs = var_GetInteger( p_access, SOUT_CFG_PREFIX "numsegs" );
+    p_sys->i_initial_segment = var_GetInteger( p_access, SOUT_CFG_PREFIX "initial-segment-number" );
     p_sys->b_splitanywhere = var_GetBool( p_access, SOUT_CFG_PREFIX "splitanywhere" );
     p_sys->b_delsegs = var_GetBool( p_access, SOUT_CFG_PREFIX "delsegs" );
     p_sys->b_ratecontrol = var_GetBool( p_access, SOUT_CFG_PREFIX "ratecontrol") ;
@@ -282,7 +289,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys->i_handle = -1;
-    p_sys->i_segment = 0;
+    p_sys->i_segment = p_sys->i_initial_segment > 0 ? p_sys->i_initial_segment -1 : 0;
     p_sys->psz_cursegPath = NULL;
 
     p_access->pf_write = Write;
@@ -514,8 +521,8 @@ static uint32_t segmentAmountNeeded( sout_access_out_sys_t *p_sys )
 
 
 /************************************************************************
- * isFirstItemRemovable: Check for draft 11 section 6.2.2 
- * check that the first item has been around outside playlist 
+ * isFirstItemRemovable: Check for draft 11 section 6.2.2
+ * check that the first item has been around outside playlist
  * segment->f_seglength + (p_sys->i_numsegs * p_sys->i_seglen) before it is removed.
  ************************************************************************/
 static bool isFirstItemRemovable( sout_access_out_sys_t *p_sys, uint32_t i_firstseg, uint32_t i_index_offset )
@@ -544,8 +551,11 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
     uint32_t i_firstseg;
     unsigned i_index_offset = 0;
 
-    if ( p_sys->i_numsegs == 0 || p_sys->i_segment < p_sys->i_numsegs )
-        i_firstseg = 1;
+    if ( p_sys->i_numsegs == 0 ||
+         p_sys->i_segment < ( p_sys->i_numsegs + p_sys->i_initial_segment ) )
+    {
+        i_firstseg = p_sys->i_initial_segment == 0 ? 1 : p_sys->i_initial_segment;
+    }
     else
     {
         unsigned numsegs = segmentAmountNeeded( p_sys );
