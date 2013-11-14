@@ -178,8 +178,8 @@ typedef enum vlc_dialog {
 
 #define EXTENSIONS_AUDIO_CSV "3ga", "669", "a52", "aac", "ac3", "adt", "adts", "aif", "aifc", "aiff", \
                          "amr", "aob", "ape", "awb", "caf", "dts", "flac", "it", "kar", \
-                         "m4a", "m4p", "m5p", "mka", "mlp", "mod", "mpa", "mp1", "mp2", "mp3", "mpc", "mpga", \
-                         "oga", "ogg", "oma", "opus", "qcp", "ra", "rmi", "s3m", "spx", "thd", "tta", \
+                         "m4a", "m4p", "m5p", "mka", "mlp", "mod", "mpa", "mp1", "mp2", "mp3", "mpc", "mpga", "mus", \
+                         "oga", "ogg", "oma", "opus", "qcp", "ra", "rmi", "s3m", "sid", "spx", "thd", "tta", \
                          "voc", "vqf", "w64", "wav", "wma", "wv", "xa", "xm"
 
 #define EXTENSIONS_VIDEO_CSV "3g2", "3gp", "3gp2", "3gpp", "amv", "asf", "avi", "divx", "drc", "dv", \
@@ -224,6 +224,7 @@ typedef enum vlc_dialog {
     "*.mp3;" \
     "*.mpc;" \
     "*.mpga;" \
+    "*.mus;" \
     "*.oga;" \
     "*.ogg;" \
     "*.oma;" \
@@ -232,6 +233,7 @@ typedef enum vlc_dialog {
     "*.ra;" \
     "*.rmi;" \
     "*.s3m;" \
+    "*.sid;" \
     "*.spx;" \
     "*.thd;" \
     "*.tta;" \
