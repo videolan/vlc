@@ -61,6 +61,7 @@ Release HOWTO
  * "Check for updates" functionality
   - edit update.videolan.org/vlc/status
   - gpg -t --sign --detach --armor
+  - for i in *asc;do gpg --verify $i || echo $i;done
 
  * Mirrors (if necessary)
   - Forwarn the mirror admins
