@@ -524,8 +524,9 @@ static VLCVideoEffects *_o_sharedInstance = nil;
             free(psz_string);
             psz_string = strdup(psz_name);
         } else if (strstr(psz_string, psz_name) == NULL) {
+            char *psz_tmp = strdup([[NSString stringWithFormat: @"%s:%s", psz_string, psz_name] UTF8String]);
             free(psz_string);
-            psz_string = strdup([[NSString stringWithFormat: @"%s:%s", psz_string, psz_name] UTF8String]);
+            psz_string = psz_tmp;
         }
     } else {
         if (!psz_string)
