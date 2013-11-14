@@ -516,11 +516,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_sys->i_num_pmt = 1;
 
-    p_mux->pf_control   = Control;
-    p_mux->pf_addstream = AddStream;
-    p_mux->pf_delstream = DelStream;
-    p_mux->pf_mux       = Mux;
-    p_mux->p_sys        = p_sys;
 
 #if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
     p_sys->p_dvbpsi = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
@@ -728,6 +723,12 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_use_key_frames = var_GetBool( p_mux, SOUT_CFG_PREFIX "use-key-frames" );
 
     p_sys->csa = csaSetup(p_this);
+
+    p_mux->pf_control   = Control;
+    p_mux->pf_addstream = AddStream;
+    p_mux->pf_delstream = DelStream;
+    p_mux->pf_mux       = Mux;
+    p_mux->p_sys        = p_sys;
 
     return VLC_SUCCESS;
 }
