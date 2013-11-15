@@ -73,8 +73,8 @@ struct decoder_sys_t
     int crop_top, crop_left;
     char *name;
 
-    int started;
-    int decoded;
+    bool started;
+    bool decoded;
 
     ArchitectureSpecificCopyData architecture_specific_data;
 };
@@ -347,7 +347,7 @@ static int OpenDecoder(vlc_object_t *p_this)
         (*env)->ExceptionClear(env);
         goto error;
     }
-    p_sys->started = 1;
+    p_sys->started = true;
 
     p_sys->input_buffers = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_input_buffers);
     p_sys->output_buffers = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_output_buffers);
@@ -526,7 +526,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
                 (*env)->ExceptionClear(env);
             }
         }
-        p_sys->decoded = 0;
+        p_sys->decoded = false;
         (*myVm)->DetachCurrentThread(myVm);
         return NULL;
     }
@@ -562,7 +562,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             ts = p_block->i_dts;
         (*env)->CallVoidMethod(env, p_sys->codec, p_sys->queue_input_buffer, index, 0, size, ts, 0);
         (*env)->DeleteLocalRef(env, buf);
-        p_sys->decoded = 1;
+        p_sys->decoded = true;
         break;
     }
     if (!p_pic)
