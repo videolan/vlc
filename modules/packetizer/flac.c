@@ -145,8 +145,12 @@ static void ProcessHeader(decoder_t *p_dec)
     p_sys->b_stream_info = true;
 
     p_dec->fmt_out.i_extra = i_extra;
-    p_dec->fmt_out.p_extra = xrealloc(p_dec->fmt_out.p_extra, i_extra);
-    memcpy(p_dec->fmt_out.p_extra, p_extra, i_extra);
+    free(p_dec->fmt_out.p_extra);
+    p_dec->fmt_out.p_extra = malloc(i_extra);
+    if (p_dec->fmt_out.p_extra)
+        memcpy(p_dec->fmt_out.p_extra, p_extra, i_extra);
+    else
+        p_dec->fmt_out.i_extra = 0;
 }
 
 /* Will return 0xffffffffffffffff for an invalid utf-8 sequence */
