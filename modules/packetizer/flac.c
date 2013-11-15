@@ -436,124 +436,118 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 
     block_BytestreamPush(&p_sys->bytestream, in);
 
-    while (1) {
-        switch (p_sys->i_state) {
-        case STATE_NOSYNC:
-            while (block_PeekBytes(&p_sys->bytestream, p_header, 2)
-                   == VLC_SUCCESS) {
-                if (p_header[0] == 0xFF && (p_header[1] & 0xFE) == 0xF8) {
-                    p_sys->i_state = STATE_SYNC;
-                    break;
-                }
-                block_SkipByte(&p_sys->bytestream);
-            }
-            if (p_sys->i_state != STATE_SYNC) {
-                block_BytestreamFlush(&p_sys->bytestream);
-                return NULL; /* Need more data */
-            }
-
-        case STATE_SYNC:
-            /* New frame, set the Presentation Time Stamp */
-            p_sys->i_pts = p_sys->bytestream.p_block->i_pts;
-            if (p_sys->i_pts > VLC_TS_INVALID &&
-                p_sys->i_pts != date_Get(&p_sys->end_date))
-                date_Set(&p_sys->end_date, p_sys->i_pts);
-            p_sys->i_state = STATE_HEADER;
-
-        case STATE_HEADER:
-            /* Get FLAC frame header (MAX_FLAC_HEADER_SIZE bytes) */
-            if (block_PeekBytes(&p_sys->bytestream, p_header,
-                                 MAX_FLAC_HEADER_SIZE) != VLC_SUCCESS)
-                return NULL; /* Need more data */
-
-            /* Check if frame is valid and get frame info */
-            p_sys->i_frame_length = SyncInfo(p_dec, p_header,
-                                              &p_sys->i_channels,
-                                              &p_sys->i_rate,
-                                              &p_sys->i_bits_per_sample);
-            if (!p_sys->i_frame_length) {
-                msg_Dbg(p_dec, "emulated sync word");
-                block_SkipByte(&p_sys->bytestream);
-                p_sys->i_state = STATE_NOSYNC;
+    while (1) switch (p_sys->i_state) {
+    case STATE_NOSYNC:
+        while (!block_PeekBytes(&p_sys->bytestream, p_header, 2)) {
+            if (p_header[0] == 0xFF && (p_header[1] & 0xFE) == 0xF8) {
+                p_sys->i_state = STATE_SYNC;
                 break;
             }
-            if (p_sys->i_rate != p_dec->fmt_out.audio.i_rate) {
-                p_dec->fmt_out.audio.i_rate = p_sys->i_rate;
-                const mtime_t i_end_date = date_Get(&p_sys->end_date);
-                date_Init(&p_sys->end_date, p_sys->i_rate, 1);
-                date_Set(&p_sys->end_date, i_end_date);
-            }
-            p_sys->i_state = STATE_NEXT_SYNC;
-            p_sys->i_frame_size = p_sys->b_stream_info && p_sys->stream_info.min_framesize > 0 ?
-                                                            p_sys->stream_info.min_framesize : 1;
+            block_SkipByte(&p_sys->bytestream);
+        }
+        if (p_sys->i_state != STATE_SYNC) {
+            block_BytestreamFlush(&p_sys->bytestream);
+            return NULL; /* Need more data */
+        }
 
-        case STATE_NEXT_SYNC:
-            /* TODO: If pp_block == NULL, flush the buffer without checking the
-             * next sync word */
+    case STATE_SYNC:
+        /* New frame, set the Presentation Time Stamp */
+        p_sys->i_pts = p_sys->bytestream.p_block->i_pts;
+        if (p_sys->i_pts > VLC_TS_INVALID &&
+            p_sys->i_pts != date_Get(&p_sys->end_date))
+            date_Set(&p_sys->end_date, p_sys->i_pts);
+        p_sys->i_state = STATE_HEADER;
 
-            /* Check if next expected frame contains the sync word */
-            while (block_PeekOffsetBytes(&p_sys->bytestream,
-                                          p_sys->i_frame_size, p_header,
-                                          MAX_FLAC_HEADER_SIZE)
-                   == VLC_SUCCESS) {
-                if (p_header[0] == 0xFF && (p_header[1] & 0xFE) == 0xF8) {
-                    /* Check if frame is valid and get frame info */
-                    int i_frame_length =
-                        SyncInfo(p_dec, p_header,
-                                  &p_sys->i_channels,
-                                  &p_sys->i_rate,
-                                  &p_sys->i_bits_per_sample);
+    case STATE_HEADER:
+        /* Get FLAC frame header (MAX_FLAC_HEADER_SIZE bytes) */
+        if (block_PeekBytes(&p_sys->bytestream, p_header, MAX_FLAC_HEADER_SIZE))
+            return NULL; /* Need more data */
 
-                    if (i_frame_length) {
-                        p_sys->i_state = STATE_SEND_DATA;
-                        break;
-                    }
+        /* Check if frame is valid and get frame info */
+        p_sys->i_frame_length = SyncInfo(p_dec, p_header,
+                                          &p_sys->i_channels,
+                                          &p_sys->i_rate,
+                                          &p_sys->i_bits_per_sample);
+        if (!p_sys->i_frame_length) {
+            msg_Dbg(p_dec, "emulated sync word");
+            block_SkipByte(&p_sys->bytestream);
+            p_sys->i_state = STATE_NOSYNC;
+            break;
+        }
+        if (p_sys->i_rate != p_dec->fmt_out.audio.i_rate) {
+            p_dec->fmt_out.audio.i_rate = p_sys->i_rate;
+            const mtime_t i_end_date = date_Get(&p_sys->end_date);
+            date_Init(&p_sys->end_date, p_sys->i_rate, 1);
+            date_Set(&p_sys->end_date, i_end_date);
+        }
+        p_sys->i_state = STATE_NEXT_SYNC;
+        p_sys->i_frame_size = p_sys->b_stream_info && p_sys->stream_info.min_framesize > 0 ?
+                                                        p_sys->stream_info.min_framesize : 1;
+
+    case STATE_NEXT_SYNC:
+        /* TODO: If pp_block == NULL, flush the buffer without checking the
+         * next sync word */
+
+        /* Check if next expected frame contains the sync word */
+        while (!block_PeekOffsetBytes(&p_sys->bytestream, p_sys->i_frame_size,
+                    p_header, MAX_FLAC_HEADER_SIZE)) {
+            if (p_header[0] == 0xFF && (p_header[1] & 0xFE) == 0xF8) {
+                /* Check if frame is valid and get frame info */
+                int i_frame_length =
+                    SyncInfo(p_dec, p_header,
+                              &p_sys->i_channels,
+                              &p_sys->i_rate,
+                              &p_sys->i_bits_per_sample);
+
+                if (i_frame_length) {
+                    p_sys->i_state = STATE_SEND_DATA;
+                    break;
                 }
-                p_sys->i_frame_size++;
             }
+            p_sys->i_frame_size++;
+        }
 
-            if (p_sys->i_state != STATE_SEND_DATA) {
-                if (p_sys->b_stream_info && p_sys->stream_info.max_framesize > 0 &&
-                    p_sys->i_frame_size > p_sys->stream_info.max_framesize) {
-                    block_SkipByte(&p_sys->bytestream);
-                    p_sys->i_state = STATE_NOSYNC;
-                    return NULL;
-                }
-                /* Need more data */
+        if (p_sys->i_state != STATE_SEND_DATA) {
+            if (p_sys->b_stream_info && p_sys->stream_info.max_framesize > 0 &&
+                p_sys->i_frame_size > p_sys->stream_info.max_framesize) {
+                block_SkipByte(&p_sys->bytestream);
+                p_sys->i_state = STATE_NOSYNC;
                 return NULL;
             }
-
-        case STATE_SEND_DATA:
-            out = block_Alloc(p_sys->i_frame_size);
-
-            /* Copy the whole frame into the buffer. When we reach this point
-             * we already know we have enough data available. */
-            block_GetBytes(&p_sys->bytestream, out->p_buffer,
-                            p_sys->i_frame_size);
-
-            /* Make sure we don't reuse the same pts twice */
-            if (p_sys->i_pts == p_sys->bytestream.p_block->i_pts)
-                p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
-
-            p_dec->fmt_out.audio.i_channels = p_sys->i_channels;
-            p_dec->fmt_out.audio.i_physical_channels =
-                p_dec->fmt_out.audio.i_original_channels =
-                    pi_channels_maps[p_sys->stream_info.channels];
-
-            /* So p_block doesn't get re-added several times */
-            *pp_block = block_BytestreamPop(&p_sys->bytestream);
-
-            p_sys->i_state = STATE_NOSYNC;
-
-            /* Date management */
-            out->i_pts =
-                out->i_dts = date_Get(&p_sys->end_date);
-            date_Increment(&p_sys->end_date, p_sys->i_frame_length);
-            out->i_length =
-                date_Get(&p_sys->end_date) - out->i_pts;
-
-            return out;
+            /* Need more data */
+            return NULL;
         }
+
+    case STATE_SEND_DATA:
+        out = block_Alloc(p_sys->i_frame_size);
+
+        /* Copy the whole frame into the buffer. When we reach this point
+         * we already know we have enough data available. */
+        block_GetBytes(&p_sys->bytestream, out->p_buffer,
+                        p_sys->i_frame_size);
+
+        /* Make sure we don't reuse the same pts twice */
+        if (p_sys->i_pts == p_sys->bytestream.p_block->i_pts)
+            p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
+
+        p_dec->fmt_out.audio.i_channels = p_sys->i_channels;
+        p_dec->fmt_out.audio.i_physical_channels =
+            p_dec->fmt_out.audio.i_original_channels =
+                pi_channels_maps[p_sys->stream_info.channels];
+
+        /* So p_block doesn't get re-added several times */
+        *pp_block = block_BytestreamPop(&p_sys->bytestream);
+
+        p_sys->i_state = STATE_NOSYNC;
+
+        /* Date management */
+        out->i_pts =
+            out->i_dts = date_Get(&p_sys->end_date);
+        date_Increment(&p_sys->end_date, p_sys->i_frame_length);
+        out->i_length =
+            date_Get(&p_sys->end_date) - out->i_pts;
+
+        return out;
     }
 
     return NULL;
