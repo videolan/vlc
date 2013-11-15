@@ -247,9 +247,6 @@ static int SyncInfo(decoder_t *p_dec, uint8_t *p_buf,
                      unsigned int * pi_bits_per_sample)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_header, i_temp, i_read;
-    unsigned i_blocksize = 0;
-    int i_blocksize_hint = 0, i_sample_rate_hint = 0;
 
     /* Check syncword */
     if (p_buf[0] != 0xFF || (p_buf[1] & 0xFE) != 0xF8)
@@ -260,184 +257,111 @@ static int SyncInfo(decoder_t *p_dec, uint8_t *p_buf,
         return 0;
 
     /* Find blocksize (framelength) */
-    switch (i_temp = p_buf[2] >> 4) {
-    case 0:
+    int blocksize_hint = 0;
+    unsigned blocksize = p_buf[2] >> 4;
+    if (blocksize >= 8) {
+        blocksize = 256 << (blocksize - 8);
+    } else if (blocksize == 0) { /* value 0 is reserved */
         if (p_sys->b_stream_info &&
             p_sys->stream_info.min_blocksize == p_sys->stream_info.max_blocksize)
-            i_blocksize = p_sys->stream_info.min_blocksize;
-        else return 0; /* We can't do anything with this */
-        break;
-
-    case 1:
-        i_blocksize = 192;
-        break;
-
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-        i_blocksize = 576 << (i_temp - 2);
-        break;
-
-    case 6:
-    case 7:
-        i_blocksize_hint = i_temp;
-        break;
-
-    case 8:
-    case 9:
-    case 10:
-    case 11:
-    case 12:
-    case 13:
-    case 14:
-    case 15:
-        i_blocksize = 256 << (i_temp - 8);
-        break;
+            blocksize = p_sys->stream_info.min_blocksize;
+        else
+            return 0; /* We can't do anything with this */
+    } else if (blocksize == 1) {
+        blocksize = 192;
+    } else if (blocksize == 6 || blocksize == 7) {
+        blocksize_hint = blocksize;
+        blocksize = 0;
+    } else /* 2, 3, 4, 5 */ {
+        blocksize = 576 << (blocksize - 2);
     }
-    if (p_sys->b_stream_info &&
-        (i_blocksize < p_sys->stream_info.min_blocksize ||
-          i_blocksize > p_sys->stream_info.max_blocksize))
-        return 0;
+
+    if (p_sys->b_stream_info)
+        if (blocksize < p_sys->stream_info.min_blocksize ||
+            blocksize > p_sys->stream_info.max_blocksize)
+            return 0;
 
     /* Find samplerate */
-    switch (i_temp = p_buf[2] & 0x0f) {
-    case 0:
+    int samplerate_hint = p_buf[2] & 0xf;;
+    unsigned int samplerate;
+    if (samplerate_hint == 0) {
         if (p_sys->b_stream_info)
-            *pi_sample_rate = p_sys->stream_info.sample_rate;
-        else return 0; /* We can't do anything with this */
-        break;
-
-    case 1:
-        *pi_sample_rate = 88200;
-        break;
-
-    case 2:
-        *pi_sample_rate = 176400;
-        break;
-
-    case 3:
-        *pi_sample_rate = 192000;
-        break;
-
-    case 4:
-        *pi_sample_rate = 8000;
-        break;
-
-    case 5:
-        *pi_sample_rate = 16000;
-        break;
-
-    case 6:
-        *pi_sample_rate = 22050;
-        break;
-
-    case 7:
-        *pi_sample_rate = 24000;
-        break;
-
-    case 8:
-        *pi_sample_rate = 32000;
-        break;
-
-    case 9:
-        *pi_sample_rate = 44100;
-        break;
-
-    case 10:
-        *pi_sample_rate = 48000;
-        break;
-
-    case 11:
-        *pi_sample_rate = 96000;
-        break;
-
-    case 12:
-    case 13:
-    case 14:
-        i_sample_rate_hint = i_temp;
-        break;
-
-    case 15:
-        return 0;
+            samplerate = p_sys->stream_info.sample_rate;
+        else
+            return 0; /* We can't do anything with this */
+    } else if (samplerate_hint == 15) {
+        return 0; /* invalid */
+    } else if (samplerate_hint < 12) {
+        static const int16_t flac_samplerate[12] = {
+            0,    8820, 17640, 19200,
+            800,  1600, 2205,  2400,
+            3200, 4410, 4800,  9600, 
+        };
+        samplerate = flac_samplerate[samplerate_hint] * 10;
+    } else {
+        samplerate = 0; /* at end of header */
     }
 
     /* Find channels */
-    i_temp = (unsigned)(p_buf[3] >> 4);
-    if (i_temp & 8) {
-        if ((i_temp & 7) >= 3)
+    unsigned channels = p_buf[3] >> 4;
+    if (channels >= 8) {
+        if (channels >= 11) /* reserved */
             return 0;
-        *pi_channels = 2;
+        channels = 2;
     } else
-        *pi_channels = i_temp + 1;
+        channels++;
+
 
     /* Find bits per sample */
-    switch (i_temp = (unsigned)(p_buf[3] & 0x0e) >> 1) {
-    case 0:
+    static const int8_t flac_bits_per_sample[8] = {
+        0, 8, 12, -1, 16, 20, 24, -1
+    };
+    int bits_per_sample = flac_bits_per_sample[(p_buf[3] & 0x0e) >> 1];
+    if (bits_per_sample == 0) {
         if (p_sys->b_stream_info)
-            *pi_bits_per_sample = p_sys->stream_info.bits_per_sample;
+            bits_per_sample = p_sys->stream_info.bits_per_sample;
         else
             return 0;
-        break;
-
-    case 1:
-        *pi_bits_per_sample = 8;
-        break;
-
-    case 2:
-        *pi_bits_per_sample = 12;
-        break;
-
-    case 4:
-        *pi_bits_per_sample = 16;
-        break;
-
-    case 5:
-        *pi_bits_per_sample = 20;
-        break;
-
-    case 6:
-        *pi_bits_per_sample = 24;
-        break;
-
-    case 3:
-    case 7:
+    } else if (bits_per_sample < 0)
         return 0;
-        break;
-    }
 
-    /* Zero padding bit */
-    if (p_buf[3] & 0x01) return 0;
+
+    /* reserved for future use */
+    if (p_buf[3] & 0x01)
+        return 0;
 
     /* End of fixed size header */
-    i_header = 4;
+    int i_header = 4;
 
     /* Check Sample/Frame number */
+    int i_read;
     if (read_utf8(&p_buf[i_header++], &i_read) == INT64_C(0xffffffffffffffff))
         return 0;
 
     i_header += i_read;
 
     /* Read blocksize */
-    if (i_blocksize_hint) {
-        int i_val1 = p_buf[i_header++];
-        if (i_blocksize_hint == 7) {
-            int i_val2 = p_buf[i_header++];
-            i_val1 = (i_val1 << 8) | i_val2;
+    if (blocksize_hint) {
+        blocksize = p_buf[i_header++];
+        if (blocksize_hint == 7) {
+            blocksize <<= 8;
+            blocksize |= p_buf[i_header++];
         }
-        i_blocksize = i_val1 + 1;
+        blocksize++;
     }
 
     /* Read sample rate */
-    if (i_sample_rate_hint) {
-        int i_val1 = p_buf[i_header++];
-        if (i_sample_rate_hint != 12) {
-            int i_val2 = p_buf[i_header++];
-            i_val1 = (i_val1 << 8) | i_val2;
+    if (samplerate == 0) {
+        samplerate = p_buf[i_header++];
+        if (samplerate_hint != 12) { /* 16 bits */
+            samplerate <<= 8;
+            samplerate |= p_buf[i_header++];
         }
-        if (i_sample_rate_hint == 12) *pi_sample_rate = i_val1 * 1000;
-        else if (i_sample_rate_hint == 13) *pi_sample_rate = i_val1;
-        else *pi_sample_rate = i_val1 * 10;
+
+        if (samplerate_hint == 12)
+            samplerate *= 1000;
+        else if (samplerate_hint == 14)
+            samplerate *= 10;
     }
 
     /* Check the CRC-8 byte */
@@ -446,15 +370,20 @@ static int SyncInfo(decoder_t *p_dec, uint8_t *p_buf,
 
     /* Sanity check using stream info header when possible */
     if (p_sys->b_stream_info) {
-        if (i_blocksize < p_sys->stream_info.min_blocksize ||
-            i_blocksize > p_sys->stream_info.max_blocksize)
+        if (blocksize < p_sys->stream_info.min_blocksize ||
+            blocksize > p_sys->stream_info.max_blocksize)
             return 0;
-        if (*pi_bits_per_sample != p_sys->stream_info.bits_per_sample)
+        if ((unsigned)bits_per_sample != p_sys->stream_info.bits_per_sample)
             return 0;
-        if (*pi_sample_rate != p_sys->stream_info.sample_rate)
+        if (samplerate != p_sys->stream_info.sample_rate)
             return 0;
     }
-    return i_blocksize;
+
+    *pi_bits_per_sample = bits_per_sample;
+    *pi_sample_rate = samplerate;
+    *pi_channels = channels;
+
+    return blocksize;
 }
 
 /* */
