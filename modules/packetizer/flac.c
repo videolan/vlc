@@ -421,11 +421,13 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         return NULL;
     }
 
-    if (!date_Get(&p_sys->end_date) && in->i_pts <= VLC_TS_INVALID) {
-        /* We've just started the stream, wait for the first PTS. */
-        block_Release(in);
-        return NULL;
-    } else if (!date_Get(&p_sys->end_date)) {
+    if (!date_Get(&p_sys->end_date)) {
+        if (in->i_pts <= VLC_TS_INVALID) {
+            /* We've just started the stream, wait for the first PTS. */
+            block_Release(in);
+            return NULL;
+        }
+
         /* The first PTS is as good as anything else. */
         p_sys->i_rate = p_dec->fmt_out.audio.i_rate;
         date_Init(&p_sys->end_date, p_sys->i_rate, 1);
