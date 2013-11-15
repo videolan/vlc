@@ -395,13 +395,15 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t p_header[MAX_FLAC_HEADER_SIZE];
-    block_t *p_sout_block;
+    block_t *out;
 
     if (!pp_block || !*pp_block)
         return NULL;
 
-    if ((*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
-        if ((*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED) {
+    block_t *in = *pp_block;
+
+    if (in->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
+        if (in->i_flags&BLOCK_FLAG_CORRUPTED) {
             p_sys->i_state = STATE_NOSYNC;
             block_BytestreamEmpty(&p_sys->bytestream);
         }
@@ -418,18 +420,18 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         return NULL;
     }
 
-    if (!date_Get(&p_sys->end_date) && (*pp_block)->i_pts <= VLC_TS_INVALID) {
+    if (!date_Get(&p_sys->end_date) && in->i_pts <= VLC_TS_INVALID) {
         /* We've just started the stream, wait for the first PTS. */
-        block_Release(*pp_block);
+        block_Release(in);
         return NULL;
     } else if (!date_Get(&p_sys->end_date)) {
         /* The first PTS is as good as anything else. */
         p_sys->i_rate = p_dec->fmt_out.audio.i_rate;
         date_Init(&p_sys->end_date, p_sys->i_rate, 1);
-        date_Set(&p_sys->end_date, (*pp_block)->i_pts);
+        date_Set(&p_sys->end_date, in->i_pts);
     }
 
-    block_BytestreamPush(&p_sys->bytestream, *pp_block);
+    block_BytestreamPush(&p_sys->bytestream, in);
 
     while (1) {
         switch (p_sys->i_state) {
@@ -519,11 +521,11 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             }
 
         case STATE_SEND_DATA:
-            p_sout_block = block_Alloc(p_sys->i_frame_size);
+            out = block_Alloc(p_sys->i_frame_size);
 
             /* Copy the whole frame into the buffer. When we reach this point
              * we already know we have enough data available. */
-            block_GetBytes(&p_sys->bytestream, p_sout_block->p_buffer,
+            block_GetBytes(&p_sys->bytestream, out->p_buffer,
                             p_sys->i_frame_size);
 
             /* Make sure we don't reuse the same pts twice */
@@ -541,13 +543,13 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             p_sys->i_state = STATE_NOSYNC;
 
             /* Date management */
-            p_sout_block->i_pts =
-                p_sout_block->i_dts = date_Get(&p_sys->end_date);
+            out->i_pts =
+                out->i_dts = date_Get(&p_sys->end_date);
             date_Increment(&p_sys->end_date, p_sys->i_frame_length);
-            p_sout_block->i_length =
-                date_Get(&p_sys->end_date) - p_sout_block->i_pts;
+            out->i_length =
+                date_Get(&p_sys->end_date) - out->i_pts;
 
-            return p_sout_block;
+            return out;
         }
     }
 
