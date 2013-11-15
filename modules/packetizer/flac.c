@@ -41,15 +41,15 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
+static int  Open (vlc_object_t *);
+static void Close(vlc_object_t *);
 
 vlc_module_begin()
-    set_category( CAT_SOUT )
-    set_subcategory( SUBCAT_SOUT_PACKETIZER )
-    set_description( N_("Flac audio packetizer") )
-    set_capability( "packetizer", 50 )
-    set_callbacks( Open, Close )
+    set_category(CAT_SOUT)
+    set_subcategory(SUBCAT_SOUT_PACKETIZER)
+    set_description(N_("Flac audio packetizer"))
+    set_capability("packetizer", 50)
+    set_callbacks(Open, Close)
 vlc_module_end()
 
 /*****************************************************************************
@@ -114,35 +114,35 @@ static const int pi_channels_maps[9] =
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static block_t *Packetize( decoder_t *, block_t ** );
+static block_t *Packetize(decoder_t *, block_t **);
 
-static int SyncInfo( decoder_t *, uint8_t *, unsigned int *,
-                     unsigned int *, unsigned int * );
+static int SyncInfo(decoder_t *, uint8_t *, unsigned int *,
+                     unsigned int *, unsigned int *);
 
-static uint64_t read_utf8( const uint8_t *p_buf, int *pi_read );
-static uint8_t flac_crc8( const uint8_t *data, unsigned len );
+static uint64_t read_utf8(const uint8_t *p_buf, int *pi_read);
+static uint8_t flac_crc8(const uint8_t *data, unsigned len);
 
-static int Open( vlc_object_t *p_this )
+static int Open(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_FLAC )
+    if (p_dec->fmt_in.i_codec != VLC_CODEC_FLAC)
         return VLC_EGENERIC;
 
     /* */
     p_dec->p_sys = p_sys = malloc(sizeof(*p_sys));
-    if( !p_sys )
+    if (!p_sys)
         return VLC_ENOMEM;
 
-    date_Set( &p_sys->end_date, 0 );
+    date_Set(&p_sys->end_date, 0);
     p_sys->i_state       = STATE_NOSYNC;
     p_sys->b_stream_info = false;
     p_sys->i_pts         = VLC_TS_INVALID;
-    block_BytestreamInit( &p_sys->bytestream );
+    block_BytestreamInit(&p_sys->bytestream);
 
     /* */
-    es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
+    es_format_Copy(&p_dec->fmt_out, &p_dec->fmt_in);
     p_dec->fmt_out.i_cat   = AUDIO_ES;
     p_dec->fmt_out.i_codec = VLC_CODEC_FLAC;
 
@@ -153,19 +153,19 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-static void Close( vlc_object_t *p_this )
+static void Close(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    block_BytestreamRelease( &p_sys->bytestream );
-    free( p_sys );
+    block_BytestreamRelease(&p_sys->bytestream);
+    free(p_sys);
 }
 
 /*****************************************************************************
  * ProcessHeader: process Flac header.
  *****************************************************************************/
-static void ProcessHeader( decoder_t *p_dec )
+static void ProcessHeader(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -178,134 +178,115 @@ static void ProcessHeader( decoder_t *p_dec )
         p_extra += 8;
     }
 
-    if( p_dec->fmt_in.i_extra < 14 )
+    if (p_dec->fmt_in.i_extra < 14)
         return;
 
-    bs_init( &bs, p_extra, i_extra);
+    bs_init(&bs, p_extra, i_extra);
 
-    p_sys->stream_info.min_blocksize = bs_read( &bs, 16 );
-    p_sys->stream_info.max_blocksize = bs_read( &bs, 16 );
+    p_sys->stream_info.min_blocksize = bs_read(&bs, 16);
+    p_sys->stream_info.max_blocksize = bs_read(&bs, 16);
 
-    p_sys->stream_info.min_framesize = bs_read( &bs, 24 );
-    p_sys->stream_info.max_framesize = bs_read( &bs, 24 );
+    p_sys->stream_info.min_framesize = bs_read(&bs, 24);
+    p_sys->stream_info.max_framesize = bs_read(&bs, 24);
 
-    p_sys->stream_info.sample_rate = bs_read( &bs, 20 );
-    p_sys->stream_info.channels = bs_read( &bs, 3 ) + 1;
-    p_sys->stream_info.bits_per_sample = bs_read( &bs, 5 ) + 1;
+    p_sys->stream_info.sample_rate = bs_read(&bs, 20);
+    p_sys->stream_info.channels = bs_read(&bs, 3) + 1;
+    p_sys->stream_info.bits_per_sample = bs_read(&bs, 5) + 1;
 
     p_sys->b_stream_info = true;
 
     p_dec->fmt_out.i_extra = i_extra;
-    p_dec->fmt_out.p_extra = xrealloc( p_dec->fmt_out.p_extra, i_extra );
-    memcpy( p_dec->fmt_out.p_extra, p_extra, i_extra );
+    p_dec->fmt_out.p_extra = xrealloc(p_dec->fmt_out.p_extra, i_extra);
+    memcpy(p_dec->fmt_out.p_extra, p_extra, i_extra);
 }
 
 /* */
-static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
+static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t p_header[MAX_FLAC_HEADER_SIZE];
     block_t *p_sout_block;
 
-    if( !pp_block || !*pp_block ) return NULL;
+    if (!pp_block || !*pp_block)
+        return NULL;
 
-    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
-    {
-        if( (*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED )
-        {
+    if ((*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
+        if ((*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED) {
             p_sys->i_state = STATE_NOSYNC;
-            block_BytestreamEmpty( &p_sys->bytestream );
+            block_BytestreamEmpty(&p_sys->bytestream);
         }
-        date_Set( &p_sys->end_date, 0 );
-        block_Release( *pp_block );
+        date_Set(&p_sys->end_date, 0);
+        block_Release(*pp_block);
         return NULL;
     }
 
-    if( !p_sys->b_stream_info )
-        ProcessHeader( p_dec );
+    if (!p_sys->b_stream_info)
+        ProcessHeader(p_dec);
 
-    if( p_sys->stream_info.channels > 8 )
-    {
-        msg_Err( p_dec, "This stream uses too many audio channels" );
+    if (p_sys->stream_info.channels > 8) {
+        msg_Err(p_dec, "This stream uses too many audio channels");
         return NULL;
     }
 
-    if( !date_Get( &p_sys->end_date ) && (*pp_block)->i_pts <= VLC_TS_INVALID )
-    {
+    if (!date_Get(&p_sys->end_date) && (*pp_block)->i_pts <= VLC_TS_INVALID) {
         /* We've just started the stream, wait for the first PTS. */
-        block_Release( *pp_block );
+        block_Release(*pp_block);
         return NULL;
-    }
-    else if( !date_Get( &p_sys->end_date ) )
-    {
+    } else if (!date_Get(&p_sys->end_date)) {
         /* The first PTS is as good as anything else. */
         p_sys->i_rate = p_dec->fmt_out.audio.i_rate;
-        date_Init( &p_sys->end_date, p_sys->i_rate, 1 );
-        date_Set( &p_sys->end_date, (*pp_block)->i_pts );
+        date_Init(&p_sys->end_date, p_sys->i_rate, 1);
+        date_Set(&p_sys->end_date, (*pp_block)->i_pts);
     }
 
-    block_BytestreamPush( &p_sys->bytestream, *pp_block );
+    block_BytestreamPush(&p_sys->bytestream, *pp_block);
 
-    while( 1 )
-    {
-        switch( p_sys->i_state )
-        {
+    while (1) {
+        switch (p_sys->i_state) {
         case STATE_NOSYNC:
-            while( block_PeekBytes( &p_sys->bytestream, p_header, 2 )
-                   == VLC_SUCCESS )
-            {
-                if( p_header[0] == 0xFF && (p_header[1] & 0xFE) == 0xF8 )
-                {
+            while (block_PeekBytes(&p_sys->bytestream, p_header, 2)
+                   == VLC_SUCCESS) {
+                if (p_header[0] == 0xFF && (p_header[1] & 0xFE) == 0xF8) {
                     p_sys->i_state = STATE_SYNC;
                     break;
                 }
-                block_SkipByte( &p_sys->bytestream );
+                block_SkipByte(&p_sys->bytestream);
             }
-            if( p_sys->i_state != STATE_SYNC )
-            {
-                block_BytestreamFlush( &p_sys->bytestream );
-
-                /* Need more data */
-                return NULL;
+            if (p_sys->i_state != STATE_SYNC) {
+                block_BytestreamFlush(&p_sys->bytestream);
+                return NULL; /* Need more data */
             }
 
         case STATE_SYNC:
             /* New frame, set the Presentation Time Stamp */
             p_sys->i_pts = p_sys->bytestream.p_block->i_pts;
-            if( p_sys->i_pts > VLC_TS_INVALID &&
-                p_sys->i_pts != date_Get( &p_sys->end_date ) )
-            {
-                date_Set( &p_sys->end_date, p_sys->i_pts );
-            }
+            if (p_sys->i_pts > VLC_TS_INVALID &&
+                p_sys->i_pts != date_Get(&p_sys->end_date))
+                date_Set(&p_sys->end_date, p_sys->i_pts);
             p_sys->i_state = STATE_HEADER;
 
         case STATE_HEADER:
             /* Get FLAC frame header (MAX_FLAC_HEADER_SIZE bytes) */
-            if( block_PeekBytes( &p_sys->bytestream, p_header,
-                                 MAX_FLAC_HEADER_SIZE ) != VLC_SUCCESS )
-            {
-                /* Need more data */
-                return NULL;
-            }
+            if (block_PeekBytes(&p_sys->bytestream, p_header,
+                                 MAX_FLAC_HEADER_SIZE) != VLC_SUCCESS)
+                return NULL; /* Need more data */
 
             /* Check if frame is valid and get frame info */
-            p_sys->i_frame_length = SyncInfo( p_dec, p_header,
+            p_sys->i_frame_length = SyncInfo(p_dec, p_header,
                                               &p_sys->i_channels,
                                               &p_sys->i_rate,
-                                              &p_sys->i_bits_per_sample );
-            if( !p_sys->i_frame_length )
-            {
-                msg_Dbg( p_dec, "emulated sync word" );
-                block_SkipByte( &p_sys->bytestream );
+                                              &p_sys->i_bits_per_sample);
+            if (!p_sys->i_frame_length) {
+                msg_Dbg(p_dec, "emulated sync word");
+                block_SkipByte(&p_sys->bytestream);
                 p_sys->i_state = STATE_NOSYNC;
                 break;
             }
-            if( p_sys->i_rate != p_dec->fmt_out.audio.i_rate )
-            {
+            if (p_sys->i_rate != p_dec->fmt_out.audio.i_rate) {
                 p_dec->fmt_out.audio.i_rate = p_sys->i_rate;
-                const mtime_t i_end_date = date_Get( &p_sys->end_date );
-                date_Init( &p_sys->end_date, p_sys->i_rate, 1 );
-                date_Set( &p_sys->end_date, i_end_date );
+                const mtime_t i_end_date = date_Get(&p_sys->end_date);
+                date_Init(&p_sys->end_date, p_sys->i_rate, 1);
+                date_Set(&p_sys->end_date, i_end_date);
             }
             p_sys->i_state = STATE_NEXT_SYNC;
             p_sys->i_frame_size = p_sys->b_stream_info && p_sys->stream_info.min_framesize > 0 ?
@@ -316,22 +297,19 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
              * next sync word */
 
             /* Check if next expected frame contains the sync word */
-            while( block_PeekOffsetBytes( &p_sys->bytestream,
+            while (block_PeekOffsetBytes(&p_sys->bytestream,
                                           p_sys->i_frame_size, p_header,
-                                          MAX_FLAC_HEADER_SIZE )
-                   == VLC_SUCCESS )
-            {
-                if( p_header[0] == 0xFF && (p_header[1] & 0xFE) == 0xF8 )
-                {
+                                          MAX_FLAC_HEADER_SIZE)
+                   == VLC_SUCCESS) {
+                if (p_header[0] == 0xFF && (p_header[1] & 0xFE) == 0xF8) {
                     /* Check if frame is valid and get frame info */
                     int i_frame_length =
-                        SyncInfo( p_dec, p_header,
+                        SyncInfo(p_dec, p_header,
                                   &p_sys->i_channels,
                                   &p_sys->i_rate,
-                                  &p_sys->i_bits_per_sample );
+                                  &p_sys->i_bits_per_sample);
 
-                    if( i_frame_length )
-                    {
+                    if (i_frame_length) {
                         p_sys->i_state = STATE_SEND_DATA;
                         break;
                     }
@@ -339,12 +317,10 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 p_sys->i_frame_size++;
             }
 
-            if( p_sys->i_state != STATE_SEND_DATA )
-            {
-                if( p_sys->b_stream_info && p_sys->stream_info.max_framesize > 0 &&
-                    p_sys->i_frame_size > p_sys->stream_info.max_framesize )
-                {
-                    block_SkipByte( &p_sys->bytestream );
+            if (p_sys->i_state != STATE_SEND_DATA) {
+                if (p_sys->b_stream_info && p_sys->stream_info.max_framesize > 0 &&
+                    p_sys->i_frame_size > p_sys->stream_info.max_framesize) {
+                    block_SkipByte(&p_sys->bytestream);
                     p_sys->i_state = STATE_NOSYNC;
                     return NULL;
                 }
@@ -353,15 +329,15 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             }
 
         case STATE_SEND_DATA:
-            p_sout_block = block_Alloc( p_sys->i_frame_size );
+            p_sout_block = block_Alloc(p_sys->i_frame_size);
 
             /* Copy the whole frame into the buffer. When we reach this point
              * we already know we have enough data available. */
-            block_GetBytes( &p_sys->bytestream, p_sout_block->p_buffer,
-                            p_sys->i_frame_size );
+            block_GetBytes(&p_sys->bytestream, p_sout_block->p_buffer,
+                            p_sys->i_frame_size);
 
             /* Make sure we don't reuse the same pts twice */
-            if( p_sys->i_pts == p_sys->bytestream.p_block->i_pts )
+            if (p_sys->i_pts == p_sys->bytestream.p_block->i_pts)
                 p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
 
             p_dec->fmt_out.audio.i_channels = p_sys->i_channels;
@@ -370,16 +346,16 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                     pi_channels_maps[p_sys->stream_info.channels];
 
             /* So p_block doesn't get re-added several times */
-            *pp_block = block_BytestreamPop( &p_sys->bytestream );
+            *pp_block = block_BytestreamPop(&p_sys->bytestream);
 
             p_sys->i_state = STATE_NOSYNC;
 
             /* Date management */
             p_sout_block->i_pts =
-                p_sout_block->i_dts = date_Get( &p_sys->end_date );
-            date_Increment( &p_sys->end_date, p_sys->i_frame_length );
+                p_sout_block->i_dts = date_Get(&p_sys->end_date);
+            date_Increment(&p_sys->end_date, p_sys->i_frame_length);
             p_sout_block->i_length =
-                date_Get( &p_sys->end_date ) - p_sout_block->i_pts;
+                date_Get(&p_sys->end_date) - p_sout_block->i_pts;
 
             return p_sout_block;
         }
@@ -391,10 +367,10 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 /*****************************************************************************
  * SyncInfo: parse FLAC sync info
  *****************************************************************************/
-static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
+static int SyncInfo(decoder_t *p_dec, uint8_t *p_buf,
                      unsigned int * pi_channels,
                      unsigned int * pi_sample_rate,
-                     unsigned int * pi_bits_per_sample )
+                     unsigned int * pi_bits_per_sample)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_header, i_temp, i_read;
@@ -402,17 +378,18 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
     int i_blocksize_hint = 0, i_sample_rate_hint = 0;
 
     /* Check syncword */
-    if( p_buf[0] != 0xFF || (p_buf[1] & 0xFE) != 0xF8 ) return 0;
+    if (p_buf[0] != 0xFF || (p_buf[1] & 0xFE) != 0xF8)
+        return 0;
 
     /* Check there is no emulated sync code in the rest of the header */
-    if( p_buf[2] == 0xff || p_buf[3] == 0xFF ) return 0;
+    if (p_buf[2] == 0xff || p_buf[3] == 0xFF)
+        return 0;
 
     /* Find blocksize (framelength) */
-    switch( i_temp = p_buf[2] >> 4 )
-    {
+    switch (i_temp = p_buf[2] >> 4) {
     case 0:
-        if( p_sys->b_stream_info &&
-            p_sys->stream_info.min_blocksize == p_sys->stream_info.max_blocksize )
+        if (p_sys->b_stream_info &&
+            p_sys->stream_info.min_blocksize == p_sys->stream_info.max_blocksize)
             i_blocksize = p_sys->stream_info.min_blocksize;
         else return 0; /* We can't do anything with this */
         break;
@@ -444,16 +421,15 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
         i_blocksize = 256 << (i_temp - 8);
         break;
     }
-    if( p_sys->b_stream_info &&
-        ( i_blocksize < p_sys->stream_info.min_blocksize ||
-          i_blocksize > p_sys->stream_info.max_blocksize ) )
+    if (p_sys->b_stream_info &&
+        (i_blocksize < p_sys->stream_info.min_blocksize ||
+          i_blocksize > p_sys->stream_info.max_blocksize))
         return 0;
 
     /* Find samplerate */
-    switch( i_temp = p_buf[2] & 0x0f )
-    {
+    switch (i_temp = p_buf[2] & 0x0f) {
     case 0:
-        if( p_sys->b_stream_info )
+        if (p_sys->b_stream_info)
             *pi_sample_rate = p_sys->stream_info.sample_rate;
         else return 0; /* We can't do anything with this */
         break;
@@ -514,22 +490,17 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
 
     /* Find channels */
     i_temp = (unsigned)(p_buf[3] >> 4);
-    if( i_temp & 8 )
-    {
-        if( ( i_temp & 7 ) >= 3 )
+    if (i_temp & 8) {
+        if ((i_temp & 7) >= 3)
             return 0;
         *pi_channels = 2;
-    }
-    else
-    {
+    } else
         *pi_channels = i_temp + 1;
-    }
 
     /* Find bits per sample */
-    switch( i_temp = (unsigned)(p_buf[3] & 0x0e) >> 1 )
-    {
+    switch (i_temp = (unsigned)(p_buf[3] & 0x0e) >> 1) {
     case 0:
-        if( p_sys->b_stream_info )
+        if (p_sys->b_stream_info)
             *pi_bits_per_sample = p_sys->stream_info.bits_per_sample;
         else
             return 0;
@@ -562,23 +533,21 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
     }
 
     /* Zero padding bit */
-    if( p_buf[3] & 0x01 ) return 0;
+    if (p_buf[3] & 0x01) return 0;
 
     /* End of fixed size header */
     i_header = 4;
 
     /* Check Sample/Frame number */
-    if( read_utf8( &p_buf[i_header++], &i_read ) == INT64_C(0xffffffffffffffff) )
+    if (read_utf8(&p_buf[i_header++], &i_read) == INT64_C(0xffffffffffffffff))
         return 0;
 
     i_header += i_read;
 
     /* Read blocksize */
-    if( i_blocksize_hint )
-    {
+    if (i_blocksize_hint) {
         int i_val1 = p_buf[i_header++];
-        if( i_blocksize_hint == 7 )
-        {
+        if (i_blocksize_hint == 7) {
             int i_val2 = p_buf[i_header++];
             i_val1 = (i_val1 << 8) | i_val2;
         }
@@ -586,88 +555,67 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
     }
 
     /* Read sample rate */
-    if( i_sample_rate_hint )
-    {
+    if (i_sample_rate_hint) {
         int i_val1 = p_buf[i_header++];
-        if( i_sample_rate_hint != 12 )
-        {
+        if (i_sample_rate_hint != 12) {
             int i_val2 = p_buf[i_header++];
             i_val1 = (i_val1 << 8) | i_val2;
         }
-        if( i_sample_rate_hint == 12 ) *pi_sample_rate = i_val1 * 1000;
-        else if( i_sample_rate_hint == 13 ) *pi_sample_rate = i_val1;
+        if (i_sample_rate_hint == 12) *pi_sample_rate = i_val1 * 1000;
+        else if (i_sample_rate_hint == 13) *pi_sample_rate = i_val1;
         else *pi_sample_rate = i_val1 * 10;
     }
 
     /* Check the CRC-8 byte */
-    if( flac_crc8( p_buf, i_header ) != p_buf[i_header] )
-    {
+    if (flac_crc8(p_buf, i_header) != p_buf[i_header])
         return 0;
-    }
 
     /* Sanity check using stream info header when possible */
-    if( p_sys->b_stream_info )
-    {
-        if( i_blocksize < p_sys->stream_info.min_blocksize ||
-            i_blocksize > p_sys->stream_info.max_blocksize )
+    if (p_sys->b_stream_info) {
+        if (i_blocksize < p_sys->stream_info.min_blocksize ||
+            i_blocksize > p_sys->stream_info.max_blocksize)
             return 0;
-        if( *pi_bits_per_sample != p_sys->stream_info.bits_per_sample )
+        if (*pi_bits_per_sample != p_sys->stream_info.bits_per_sample)
             return 0;
-        if( *pi_sample_rate != p_sys->stream_info.sample_rate )
+        if (*pi_sample_rate != p_sys->stream_info.sample_rate)
             return 0;
     }
     return i_blocksize;
 }
 
 /* Will return 0xffffffffffffffff for an invalid utf-8 sequence */
-static uint64_t read_utf8( const uint8_t *p_buf, int *pi_read )
+static uint64_t read_utf8(const uint8_t *p_buf, int *pi_read)
 {
     uint64_t i_result = 0;
-    unsigned i, j;
+    unsigned i;
 
-    if( !(p_buf[0] & 0x80) ) /* 0xxxxxxx */
-    {
+    if (!(p_buf[0] & 0x80)) { /* 0xxxxxxx */
         i_result = p_buf[0];
         i = 0;
-    }
-    else if( p_buf[0] & 0xC0 && !(p_buf[0] & 0x20) ) /* 110xxxxx */
-    {
+    } else if (p_buf[0] & 0xC0 && !(p_buf[0] & 0x20)) { /* 110xxxxx */
         i_result = p_buf[0] & 0x1F;
         i = 1;
-    }
-    else if( p_buf[0] & 0xE0 && !(p_buf[0] & 0x10) ) /* 1110xxxx */
-    {
+    } else if (p_buf[0] & 0xE0 && !(p_buf[0] & 0x10)) { /* 1110xxxx */
         i_result = p_buf[0] & 0x0F;
         i = 2;
-    }
-    else if( p_buf[0] & 0xF0 && !(p_buf[0] & 0x08) ) /* 11110xxx */
-    {
+    } else if (p_buf[0] & 0xF0 && !(p_buf[0] & 0x08)) { /* 11110xxx */
         i_result = p_buf[0] & 0x07;
         i = 3;
-    }
-    else if( p_buf[0] & 0xF8 && !(p_buf[0] & 0x04) ) /* 111110xx */
-    {
+    } else if (p_buf[0] & 0xF8 && !(p_buf[0] & 0x04)) { /* 111110xx */
         i_result = p_buf[0] & 0x03;
         i = 4;
-    }
-    else if( p_buf[0] & 0xFC && !(p_buf[0] & 0x02) ) /* 1111110x */
-    {
+    } else if (p_buf[0] & 0xFC && !(p_buf[0] & 0x02)) { /* 1111110x */
         i_result = p_buf[0] & 0x01;
         i = 5;
-    }
-    else if( p_buf[0] & 0xFE && !(p_buf[0] & 0x01) ) /* 11111110 */
-    {
+    } else if (p_buf[0] & 0xFE && !(p_buf[0] & 0x01)) { /* 11111110 */
         i_result = 0;
         i = 6;
-    }
-    else {
+    } else {
         return INT64_C(0xffffffffffffffff);
     }
 
-    for( j = 1; j <= i; j++ )
-    {
-        if( !(p_buf[j] & 0x80) || (p_buf[j] & 0x40) ) /* 10xxxxxx */
-        {
+    for (unsigned j = 1; j <= i; j++) {
+        if (!(p_buf[j] & 0x80) || (p_buf[j] & 0x40)) { /* 10xxxxxx */
             return INT64_C(0xffffffffffffffff);
         }
         i_result <<= 6;
@@ -714,13 +662,12 @@ static const uint8_t flac_crc8_table[256] = {
         0xE6, 0xE1, 0xE8, 0xEF, 0xFA, 0xFD, 0xF4, 0xF3
 };
 
-static uint8_t flac_crc8( const uint8_t *data, unsigned len )
+static uint8_t flac_crc8(const uint8_t *data, unsigned len)
 {
     uint8_t crc = 0;
 
-    while(len--)
+    while (len--)
         crc = flac_crc8_table[crc ^ *data++];
 
     return crc;
 }
-
