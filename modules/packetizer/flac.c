@@ -248,7 +248,6 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 
     while( 1 )
     {
-        int previous_size;
         switch( p_sys->i_state )
         {
         case STATE_NOSYNC:
@@ -316,8 +315,6 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             /* TODO: If pp_block == NULL, flush the buffer without checking the
              * next sync word */
 
-            previous_size = 0; /* Try to return the biggest frame */
-
             /* Check if next expected frame contains the sync word */
             while( block_PeekOffsetBytes( &p_sys->bytestream,
                                           p_sys->i_frame_size, p_header,
@@ -333,27 +330,13 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                                   &p_sys->i_rate,
                                   &p_sys->i_bits_per_sample );
 
-                    if( i_frame_length ) {
-                        if( !p_sys->b_stream_info || p_sys->stream_info.max_framesize <= 0 ) {
-                            /* Stop immediately if we don't know the maximum framesize */
-                            p_sys->i_state = STATE_SEND_DATA;
-                            break;
-                        }
-                        previous_size = p_sys->i_frame_size;
+                    if( i_frame_length )
+                    {
+                        p_sys->i_state = STATE_SEND_DATA;
+                        break;
                     }
                 }
                 p_sys->i_frame_size++;
-
-                if( p_sys->b_stream_info && p_sys->stream_info.max_framesize > 0 &&
-                    p_sys->i_frame_size > p_sys->stream_info.max_framesize )
-                    break;
-            }
-
-            if (previous_size)
-            {
-                /* Use the largest frame size */
-                p_sys->i_frame_size = previous_size;
-                p_sys->i_state = STATE_SEND_DATA;
             }
 
             if( p_sys->i_state != STATE_SEND_DATA )
