@@ -548,7 +548,10 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     {
         int i_sub_payload_data_length = i_payload_data_length;
         if( i_replicated_data_length == 1 )
+        {
             i_sub_payload_data_length = pkt->p_peek[pkt->i_skip++];
+            i_payload_data_length--;
+        }
 
         stream_Read(p_demux->s, NULL, pkt->i_skip);
 
