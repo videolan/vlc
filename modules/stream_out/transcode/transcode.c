@@ -8,6 +8,7 @@
  *          Gildas Bazin <gbazin@videolan.org>
  *          Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
  *          Antoine Cellerier <dionoea at videolan dot org>
+ *          Ilkka Ollakka <ileoo at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
