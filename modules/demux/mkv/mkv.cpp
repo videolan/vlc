@@ -622,22 +622,32 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                 p_block->i_length = -1 * i_duration * tk->fmt.audio.i_rate
                     / CLOCK_FREQ;
             }
+            break;
         }
 
-        if ( tk->fmt.i_cat == NAV_ES )
-        {
-            // TODO handle the start/stop times of this packet
-            p_sys->p_ev->SetPci( (const pci_t *)&p_block->p_buffer[1]);
-            block_Release( p_block );
-            return;
-        }
-        // correct timestamping when B frames are used
+        
         if( tk->fmt.i_cat != VIDEO_ES )
         {
+            if ( tk->fmt.i_cat == NAV_ES )
+            {
+                // TODO handle the start/stop times of this packet
+                p_sys->p_ev->SetPci( (const pci_t *)&p_block->p_buffer[1]);
+                block_Release( p_block );
+                return;
+            }
+            else if( tk->fmt.i_cat == AUDIO_ES )
+            {
+                if( tk->i_chans_to_reorder )
+                    aout_ChannelReorder( p_block->p_buffer, p_block->i_buffer,
+                                         tk->fmt.audio.i_channels,
+                                         tk->pi_chan_table, tk->fmt.i_codec );
+
+            }
             p_block->i_dts = p_block->i_pts = i_pts;
         }
         else
         {
+            // correct timestamping when B frames are used
             if( tk->b_dts_only )
             {
                 p_block->i_pts = VLC_TS_INVALID;

@@ -35,6 +35,8 @@
 #include <vlc_aout.h>
 #include <vlc_codecs.h>
 
+#include "windows_audio_commons.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -79,17 +81,6 @@ static int FrameInfo_IMA_ADPCM( unsigned int *, int *, const es_format_t * );
 static int FrameInfo_MS_ADPCM ( unsigned int *, int *, const es_format_t * );
 static int FrameInfo_PCM      ( unsigned int *, int *, const es_format_t * );
 static int FrameInfo_MSGSM    ( unsigned int *, int *, const es_format_t * );
-
-static const uint32_t pi_channels_src[] =
-    { WAVE_SPEAKER_FRONT_LEFT, WAVE_SPEAKER_FRONT_RIGHT,
-      WAVE_SPEAKER_FRONT_CENTER, WAVE_SPEAKER_LOW_FREQUENCY,
-      WAVE_SPEAKER_BACK_LEFT, WAVE_SPEAKER_BACK_RIGHT, WAVE_SPEAKER_BACK_CENTER,
-      WAVE_SPEAKER_SIDE_LEFT, WAVE_SPEAKER_SIDE_RIGHT, 0 };
-static const uint32_t pi_channels_in[] =
-    { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
-      AOUT_CHAN_CENTER, AOUT_CHAN_LFE,
-      AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, AOUT_CHAN_REARCENTER,
-      AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT, 0 };
 
 /*****************************************************************************
  * Open: check file and initializes structures
@@ -230,20 +221,7 @@ static int Open( vlc_object_t * p_this )
         if( i_channel_mask )
         {
             int i_match = 0;
-            for( unsigned i = 0; i < sizeof(pi_channels_src)/sizeof(*pi_channels_src); i++ )
-            {
-                if( i_channel_mask & pi_channels_src[i] )
-                {
-                    if( !( p_sys->i_channel_mask & pi_channels_in[i] ) )
-                        i_match++;
-
-                    i_channel_mask &= ~pi_channels_src[i];
-                    p_sys->i_channel_mask |= pi_channels_in[i];
-
-                    if( i_match >= p_sys->fmt.audio.i_channels )
-                        break;
-                }
-            }
+            p_sys->i_channel_mask = getChannelMask( &i_channel_mask, p_sys->fmt.audio.i_channels, &i_match );
             if( i_channel_mask )
                 msg_Warn( p_demux, "Some channels are unrecognized or uselessly specified (0x%x)", i_channel_mask );
             if( i_match < p_sys->fmt.audio.i_channels )
@@ -269,11 +247,11 @@ static int Open( vlc_object_t * p_this )
                     }
                 }
                 /* Well fill up with what we can */
-                for( unsigned i = 0; i < sizeof(pi_channels_in)/sizeof(*pi_channels_in) && i_missing > 0; i++ )
+                for( unsigned i = 0; i < sizeof(pi_channels_aout)/sizeof(*pi_channels_aout) && i_missing > 0; i++ )
                 {
-                    if( !( p_sys->i_channel_mask & pi_channels_in[i] ) )
+                    if( !( p_sys->i_channel_mask & pi_channels_aout[i] ) )
                     {
-                        p_sys->i_channel_mask |= pi_channels_in[i];
+                        p_sys->i_channel_mask |= pi_channels_aout[i];
                         i_missing--;
 
                         if( i_missing <= 0 )
@@ -294,7 +272,7 @@ static int Open( vlc_object_t * p_this )
              p_sys->fmt.audio.i_channels > 2 && p_sys->fmt.audio.i_channels <= 9 )
     {
         for( int i = 0; i < p_sys->fmt.audio.i_channels; i++ )
-            p_sys->i_channel_mask |= pi_channels_in[i];
+            p_sys->i_channel_mask |= pi_channels_aout[i];
     }
 
     if( p_sys->i_channel_mask )
@@ -302,7 +280,7 @@ static int Open( vlc_object_t * p_this )
         if( p_sys->fmt.i_codec == VLC_FOURCC('a','r','a','w') ||
             p_sys->fmt.i_codec == VLC_FOURCC('a','f','l','t') )
             p_sys->i_chans_to_reorder =
-                aout_CheckChannelReorder( pi_channels_in, NULL,
+                aout_CheckChannelReorder( pi_channels_aout, NULL,
                                           p_sys->i_channel_mask,
                                           p_sys->pi_chan_table );
 

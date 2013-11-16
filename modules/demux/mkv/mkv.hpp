@@ -53,6 +53,7 @@
 #include <vlc_charset.h>
 #include <vlc_input.h>
 #include <vlc_demux.h>
+#include <vlc_aout.h> /* For reordering */
 
 #include <iostream>
 #include <cassert>
@@ -211,6 +212,9 @@ struct mkv_track_t
 
     /* audio */
     unsigned int i_original_rate;
+    uint8_t i_chans_to_reorder;            /* do we need channel reordering */
+    uint8_t pi_chan_table[AOUT_CHAN_MAX];
+
 
     /* Private track paramters */
     PrivateTrackData *p_sys;

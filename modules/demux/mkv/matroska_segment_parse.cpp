@@ -31,6 +31,7 @@
 extern "C" {
 #include "../vobsub.h"
 #include "../xiph.h"
+#include "../windows_audio_commons.h"
 }
 
 #include <vlc_codecs.h>
@@ -1429,18 +1430,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         else
         {
             WAVEFORMATEX *p_wf = (WAVEFORMATEX*)p_tk->p_extra_data;
-            if( p_wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE && 
-                p_tk->i_extra_data >= sizeof(WAVEFORMATEXTENSIBLE) )
-            {
-                WAVEFORMATEXTENSIBLE * p_wext = (WAVEFORMATEXTENSIBLE*) p_wf;
-                sf_tag_to_fourcc( &p_wext->SubFormat,  &p_tk->fmt.i_codec, NULL);
-                /* FIXME should we use Samples and dwChannelMask?*/
-            }
-            else
-                wf_tag_to_fourcc( GetWLE( &p_wf->wFormatTag ), &p_tk->fmt.i_codec, NULL );
 
-            if( p_tk->fmt.i_codec == VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
-                msg_Err( &sys.demuxer, "Unrecognized wf tag: 0x%x", GetWLE( &p_wf->wFormatTag ) );
             p_tk->fmt.audio.i_channels   = GetWLE( &p_wf->nChannels );
             p_tk->fmt.audio.i_rate = GetDWLE( &p_wf->nSamplesPerSec );
             p_tk->fmt.i_bitrate    = GetDWLE( &p_wf->nAvgBytesPerSec ) * 8;
@@ -1451,8 +1441,46 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             if( p_tk->fmt.i_extra > 0 )
             {
                 p_tk->fmt.p_extra = xmalloc( p_tk->fmt.i_extra );
-                memcpy( p_tk->fmt.p_extra, &p_wf[1], p_tk->fmt.i_extra );
+                if( p_tk->fmt.p_extra )
+                    memcpy( p_tk->fmt.p_extra, &p_wf[1], p_tk->fmt.i_extra );
+                else
+                    p_tk->fmt.i_extra = 0;
             }
+
+            if( p_wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE && 
+                p_tk->i_extra_data >= sizeof(WAVEFORMATEXTENSIBLE) )
+            {
+                WAVEFORMATEXTENSIBLE * p_wext = (WAVEFORMATEXTENSIBLE*) p_wf;
+                sf_tag_to_fourcc( &p_wext->SubFormat,  &p_tk->fmt.i_codec, NULL);
+                /* FIXME should we use Samples */
+
+                if( p_tk->fmt.audio.i_channels > 2 &&
+                    ( p_tk->fmt.i_codec != VLC_FOURCC( 'u', 'n', 'd', 'f' ) ) ) 
+                {
+                    uint32_t wfextcm = GetDWLE( &p_wext->dwChannelMask );
+                    int match;
+                    unsigned i_channel_mask = getChannelMask( &wfextcm,
+                                                              p_tk->fmt.audio.i_channels,
+                                                              &match );
+                    p_tk->fmt.i_codec = vlc_fourcc_GetCodecAudio( p_tk->fmt.i_codec,
+                                                                  p_tk->fmt.audio.i_bitspersample );
+                    if( i_channel_mask )
+                    {
+                        p_tk->i_chans_to_reorder = aout_CheckChannelReorder(
+                            pi_channels_aout, NULL,
+                            i_channel_mask,
+                            p_tk->pi_chan_table );
+
+                        p_tk->fmt.audio.i_physical_channels =
+                        p_tk->fmt.audio.i_original_channels = i_channel_mask;
+                    }
+                }
+            }
+            else
+                wf_tag_to_fourcc( GetWLE( &p_wf->wFormatTag ), &p_tk->fmt.i_codec, NULL );
+
+            if( p_tk->fmt.i_codec == VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
+                msg_Err( &sys.demuxer, "Unrecognized wf tag: 0x%x", GetWLE( &p_wf->wFormatTag ) );
         }
     }
     else if( !strcmp( p_tk->psz_codec, "A_MPEG/L3" ) ||
