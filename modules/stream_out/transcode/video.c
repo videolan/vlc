@@ -728,7 +728,7 @@ static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, sout_stream
 
     if( p_sys->i_threads )
     {
-        if( unlikely (p_sys->b_master_sync && b_need_duplicate ))
+        if( p_sys->b_master_sync )
         {
             p_pic2 = video_new_buffer_encoder( id->p_encoder );
             if( likely( p_pic2 != NULL ) )
@@ -772,7 +772,7 @@ static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, sout_stream
                            ( date_Get( &id->interpolated_pts ) );
     }
 
-    if( p_sys->i_threads > 0 )
+    if( p_sys->i_threads && p_sys->b_master_sync && p_pic2 )
         picture_Release( p_pic2 );
     else
         picture_Release( p_pic );
