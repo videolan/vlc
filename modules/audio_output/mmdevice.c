@@ -546,7 +546,6 @@ static int DevicesEnum(audio_output_t *aout)
     IMMDeviceCollection_Release(devs);
     return n;
 }
-#endif /* !VLC_WINSTORE_APP */
 
 /**
  * Opens the selected audio output device.
@@ -556,12 +555,6 @@ static HRESULT OpenDevice(audio_output_t *aout, const char *devid)
     aout_sys_t *sys = aout->sys;
     assert(sys->dev == NULL);
 
-#if VLC_WINSTORE_APP
-    (void)devid;
-    assert(!devid);
-    sys->dev = var_InheritAddress(aout, "mmdevice-audioclient");
-    return S_OK;
-#else
     HRESULT hr;
     if (devid != NULL) /* Device selected explicitly */
     {
@@ -615,7 +608,6 @@ out:
     SetEvent(sys->device_changed);
     WaitForSingleObject(sys->device_ready, INFINITE);
     return hr;
-#endif /* ! VLC_WINSTORE_APP */
 }
 
 /**
@@ -626,7 +618,6 @@ static void CloseDevice(audio_output_t *aout)
     aout_sys_t *sys = aout->sys;
 
     assert(sys->dev != NULL);
-#if !VLC_WINSTORE_APP
     if (sys->manager != NULL)
     {
         IAudioSessionManager_Release(sys->manager);
@@ -634,11 +625,52 @@ static void CloseDevice(audio_output_t *aout)
     }
 
     IMMDevice_Release(sys->dev);
-#else
-    free(sys->dev);
-#endif
     sys->dev = NULL;
 }
+
+/**
+ * Callback for aout_stream_t to create a stream on the device.
+ * This can instantiate an IAudioClient or IDirectSound(8) object.
+ */
+static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
+                              void **restrict pv)
+{
+    IMMDevice *dev = opaque;
+    return IMMDevice_Activate(dev, iid, CLSCTX_ALL, actparms, pv);
+}
+
+#else /* VLC_WINSTORE_APP */
+
+static HRESULT OpenDevice(audio_output_t *aout, const char *devid)
+{
+    aout_sys_t *sys = aout->sys;
+    assert(sys->dev == NULL);
+
+    (void)devid;
+    assert(!devid);
+    sys->dev = var_InheritAddress(aout, "mmdevice-audioclient");
+    return S_OK;
+}
+
+static void CloseDevice(audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+
+    assert(sys->dev != NULL);
+    free(sys->dev);
+    sys->dev = NULL;
+}
+
+static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
+                              void **restrict pv)
+{
+    IMMDevice *dev = opaque;
+    (void)iid; (void)actparms;
+    *pv = dev;
+    return S_OK;
+}
+#endif /* !VLC_WINSTORE_APP */
+
 
 static int DeviceSelect(audio_output_t *aout, const char *id)
 {
@@ -660,23 +692,6 @@ static int DeviceSelect(audio_output_t *aout, const char *id)
         /* Request restart of stream with the new device */
         aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
     return FAILED(hr) ? -1 : 0;
-}
-
-/**
- * Callback for aout_stream_t to create a stream on the device.
- * This can instantiate an IAudioClient or IDirectSound(8) object.
- */
-static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
-                              void **restrict pv)
-{
-    IMMDevice *dev = opaque;
-#if VLC_WINSTORE_APP
-    (void)iid; (void)actparms;
-    *pv = dev;
-    return S_OK;
-#else
-    return IMMDevice_Activate(dev, iid, CLSCTX_ALL, actparms, pv);
-#endif
 }
 
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
