@@ -2372,6 +2372,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         unsigned dpb_size;
         switch( p_dec->fmt_in.i_codec )
         {
+        case VLC_CODEC_HEVC:
         case VLC_CODEC_H264:
         case VLC_CODEC_DIRAC: /* FIXME valid ? */
             dpb_size = 18;
