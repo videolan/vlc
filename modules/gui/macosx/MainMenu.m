@@ -707,7 +707,12 @@ static VLCMainMenu *_o_sharedInstance = nil;
 {
     BOOL b_value = !config_GetInt(VLCIntf, "macosx-show-playback-buttons");
     config_PutInt(VLCIntf, "macosx-show-playback-buttons", b_value);
+
     [[[[VLCMain sharedInstance] mainWindow] controlsBar] toggleJumpButtons];
+    [[[VLCMain sharedInstance] voutController] updateWindowsUsingBlock:^(VLCVideoWindowCommon *o_window) {
+        [[o_window controlsBar] toggleForwardBackwardMode: b_value];
+    }];
+
     [o_mi_toggleJumpButtons setState: b_value];
 }
 

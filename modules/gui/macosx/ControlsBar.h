@@ -71,6 +71,7 @@
 @property (readonly) id bottomBarView;
 
 - (CGFloat)height;
+- (void)toggleForwardBackwardMode:(BOOL)b_alt;
 
 - (IBAction)play:(id)sender;
 - (IBAction)bwd:(id)sender;

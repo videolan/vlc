@@ -156,11 +156,34 @@
         [o_fullscreen_btn removeFromSuperviewWithoutNeedingDisplay];
     }
 
+    if (config_GetInt(VLCIntf, "macosx-show-playback-buttons"))
+        [self toggleForwardBackwardMode: YES];
+
 }
 
 - (CGFloat)height
 {
     return [o_bottombar_view frame].size.height;
+}
+
+- (void)toggleForwardBackwardMode:(BOOL)b_alt
+{
+    if (b_alt == YES) {
+        /* change the accessibility help for the backward/forward buttons accordingly */
+        [[o_bwd_btn cell] accessibilitySetOverrideValue:_NS("Click and hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+        [[o_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click and hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+
+        [o_fwd_btn setAction:@selector(alternateForward:)];
+        [o_bwd_btn setAction:@selector(alternateBackward:)];
+
+    } else {
+        /* change the accessibility help for the backward/forward buttons accordingly */
+        [[o_bwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item. Hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+        [[o_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item. Hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+
+        [o_fwd_btn setAction:@selector(fwd:)];
+        [o_bwd_btn setAction:@selector(bwd:)];
+    }
 }
 
 #pragma mark -
@@ -239,6 +262,17 @@
                        afterDelay:0.40];
         }
     }
+}
+
+// alternative actions for forward / backward buttons when next / prev are activated
+- (IBAction)alternateForward:(id)sender
+{
+    [[VLCCoreInteraction sharedInstance] forwardExtraShort];
+}
+
+- (IBAction)alternateBackward:(id)sender
+{
+    [[VLCCoreInteraction sharedInstance] backwardExtraShort];
 }
 
 - (IBAction)timeSliderAction:(id)sender
@@ -740,10 +774,6 @@ else \
         [o_next_btn setAlternateImage: [NSImage imageNamed:@"next-6btns-pressed"]];
     }
 
-    /* change the accessibility help for the backward/forward buttons accordingly */
-    [[o_bwd_btn cell] accessibilitySetOverrideValue:_NS("Click and hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[o_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click and hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
-
     NSRect frame;
     frame = [o_bwd_btn frame];
     frame.size.width--;
@@ -804,8 +834,7 @@ else \
         [o_bottombar_view performSelector:@selector(addSubview:) withObject:o_next_btn afterDelay:.2];
     }
 
-    [o_fwd_btn setAction:@selector(forward:)];
-    [o_bwd_btn setAction:@selector(backward:)];
+    [self toggleForwardBackwardMode: YES];
 }
 
 - (void)removeJumpButtons:(BOOL)b_fast
@@ -826,10 +855,6 @@ else \
     o_prev_btn = NULL;
     [o_next_btn release];
     o_next_btn = NULL;
-
-    /* change the accessibility help for the backward/forward buttons accordingly */
-    [[o_bwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item. Hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[o_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item. Hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
 
     NSRect frame;
     frame = [o_bwd_btn frame];
@@ -879,10 +904,9 @@ else \
         [[o_bwd_btn animator] setAlternateImage:[NSImage imageNamed:@"backward-3btns-pressed"]];
     }
 
-    [o_bottombar_view setNeedsDisplay:YES];
+    [self toggleForwardBackwardMode: NO];
 
-    [o_fwd_btn setAction:@selector(fwd:)];
-    [o_bwd_btn setAction:@selector(bwd:)];
+    [o_bottombar_view setNeedsDisplay:YES];
 }
 
 - (void)togglePlaymodeButtons
@@ -972,17 +996,6 @@ else \
 - (IBAction)next:(id)sender
 {
     [[VLCCoreInteraction sharedInstance] next];
-}
-
-// alternative actions for forward / backward buttons when next / prev are activated
-- (IBAction)forward:(id)sender
-{
-    [[VLCCoreInteraction sharedInstance] forwardExtraShort];
-}
-
-- (IBAction)backward:(id)sender
-{
-    [[VLCCoreInteraction sharedInstance] backwardExtraShort];
 }
 
 - (void)setRepeatOne
