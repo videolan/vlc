@@ -174,7 +174,8 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
         }
         p_container->common.p_last = p_chk;
 
-        if( i_ret = AVI_ChunkRead( s, p_chk, p_container ) )
+        i_ret = AVI_ChunkRead( s, p_chk, p_container );
+        if( i_ret )
         {
             break;
         }
