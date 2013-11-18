@@ -35,8 +35,7 @@ end
 -- Probe function.
 function probe()
     return vlc.access == "http"
-        and string.match( vlc.path, "dailymotion." )
-        and string.match( vlc.peek( 2048 ), "<!DOCTYPE.*video_type" )
+        and string.match( vlc.path, "www.dailymotion.com/video" )
 end
 
 function find( haystack, needle )
@@ -53,7 +52,7 @@ function parse()
         if not line then
             break
         end
-        if string.match( line, "\"sequence\"")
+        if string.match( line, "sequence=")
         then
             line = vlc.strings.decode_uri(line):gsub("\\/", "/")
 
@@ -67,9 +66,10 @@ function parse()
                 description = string.gsub( description, "+", " " )
             end
 
-            for _,param in ipairs({ "hd1080URL", "hd720URL", "hqURL", "sdURL" }) do
+            for _,param in ipairs({ "hd1080URL", "hd720URL", "hqURL", "sdURL", "video_url" }) do
                 path = string.match( line, "\""..param.."\":\"([^\"]*)\"" )
                 if path then
+                    path = vlc.strings.decode_uri(path)
                     if prefres < 0 then
                         break
                     end
