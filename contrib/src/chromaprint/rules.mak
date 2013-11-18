@@ -1,7 +1,7 @@
 # chromaprint
 
 CHROMAPRINT_VERSION := 0.7
-CHROMAPRINT_URL := https://bitbucket.org/acoustid/chromaprint/downloads/chromaprint-$(CHROMAPRINT_VERSION).tar.gz
+CHROMAPRINT_URL := http://bitbucket.org/acoustid/chromaprint/downloads/chromaprint-$(CHROMAPRINT_VERSION).tar.gz
 
 PKGS += chromaprint
 ifeq ($(call need_pkg,"libchromaprint"),)
