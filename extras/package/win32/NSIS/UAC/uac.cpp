@@ -360,7 +360,7 @@ DWORD SyncVars(HWND hwndNSIS)
 	if (!g.UseIPC)return NO_ERROR;
 	g.NSISStrLen=NSIS::StrSize;
 	TRACEF("SyncVars: g.NSISStrLen=%d\n",g.NSISStrLen);ASSERT(g.NSISStrLen>10);
-	DWORD cbStruct=FIELD_OFFSET(IPC_SYNCVAR,buf[g.NSISStrLen+1]);
+	DWORD cbStruct=FIELD_OFFSET(IPC_SYNCVAR,buf);
 	pSV=(IPC_SYNCVAR*)MemAlloc(cbStruct);
 	if (!pSV)
 		goto die_GLE;
@@ -503,7 +503,7 @@ void HandleExecExport(bool CreateProc,bool Wait,HWND&hwndNSIS,int&StrSize,NSISCH
 	cch+=lstrlen(pSIParams->text)+1;
 	cch+=lstrlen(pSIWorkDir->text)+1;
 	if (pSIVerb)cch+=lstrlen(pSIVerb->text)+1;
-	cbStruct=FIELD_OFFSET( IPC_SHEXEC, buf[cch*sizeof(TCHAR)] );
+	cbStruct=FIELD_OFFSET( IPC_SHEXEC, buf );
 	pISE=(IPC_SHEXEC*)NSIS::MemAlloc(cbStruct);
 	if (!pISE)ec=GetLastError();
 	if (!ec) 
