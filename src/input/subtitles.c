@@ -51,7 +51,7 @@
 /**
  * The possible extensions for subtitle files we support
  */
-static const char const sub_exts[][6] = {
+static const char sub_exts[][6] = {
     "idx", "sub",  "srt",
     "ssa", "ass",  "smi",
     "utf", "utf8", "utf-8",

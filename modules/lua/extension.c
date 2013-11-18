@@ -49,7 +49,7 @@ static const luaL_Reg p_reg[] =
  * Extensions capabilities
  * Note: #define and ppsz_capabilities must be in sync
  */
-static const char const caps[][20] = {
+static const char caps[][20] = {
 #define EXT_HAS_MENU          (1 << 0)   ///< Hook: menu
     "menu",
 #define EXT_TRIGGER_ONLY      (1 << 1)   ///< Hook: trigger. Not activable

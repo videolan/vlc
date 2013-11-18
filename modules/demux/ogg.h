@@ -175,7 +175,7 @@ struct demux_sys_t
 
 
 unsigned const char * Read7BitsVariableLE( unsigned const char *,
-                                           unsigned const char const *,
+                                           unsigned const char *,
                                            uint64_t * );
 bool Ogg_GetBoundsUsingSkeletonIndex( logical_stream_t *p_stream, int64_t i_time,
                                       int64_t *pi_lower, int64_t *pi_upper );

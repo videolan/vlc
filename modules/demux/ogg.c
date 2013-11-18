@@ -2597,7 +2597,7 @@ static void Ogg_ReadSkeletonBones( demux_t *p_demux, ogg_packet *p_oggpacket )
 
 /* Unpacks the 7bit variable encoding used in skeleton indexes */
 unsigned const char * Read7BitsVariableLE( unsigned const char *p_begin,
-                                           unsigned const char const *p_end,
+                                           unsigned const char *p_end,
                                            uint64_t *pi_value )
 {
     int i_shift = 0;
@@ -2642,7 +2642,7 @@ static void Ogg_ReadSkeletonIndex( demux_t *p_demux, ogg_packet *p_oggpacket )
     p_stream->p_skel->i_indexfirstnum = GetQWLE( &p_oggpacket->packet[24] );
     p_stream->p_skel->i_indexlastnum = GetQWLE( &p_oggpacket->packet[32] );
     unsigned const char *p_fwdbyte = &p_oggpacket->packet[42];
-    unsigned const char const *p_boundary = p_oggpacket->packet + p_oggpacket->bytes;
+    unsigned const char *p_boundary = p_oggpacket->packet + p_oggpacket->bytes;
     uint64_t i_offset = 0;
     uint64_t i_time = 0;
     uint64_t i_keypoints_found = 0;

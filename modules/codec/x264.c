@@ -441,7 +441,7 @@ static const char *const direct_pred_list[] =
 static const char *const direct_pred_list_text[] =
   { N_("None"), N_("Spatial"), N_("Temporal"), N_("Auto") };
 
-static const int const framepacking_list[] =
+static const int framepacking_list[] =
   { -1, 0, 1, 2, 3, 4, 5 };
 static const char *const framepacking_list_text[] =
   { "", N_("checkerboard"), N_("column alternation"), N_("row alternation"), N_("side by side"), N_("top bottom"), N_("frame alternation") };

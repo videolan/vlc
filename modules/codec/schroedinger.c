@@ -342,7 +342,7 @@ static const char *const enc_profile_list_text[] =
     N_("Main Profile"),
   };
 
-static const char *const const ppsz_enc_options[] = {
+static const char *const ppsz_enc_options[] = {
     ENC_RATE_CONTROL, ENC_GOP_STRUCTURE, ENC_QUALITY, ENC_NOISE_THRESHOLD, ENC_BITRATE,
     ENC_MIN_BITRATE, ENC_MAX_BITRATE, ENC_AU_DISTANCE, ENC_CHROMAFMT,
     ENC_PREFILTER, ENC_PREFILTER_STRENGTH, ENC_CODINGMODE, ENC_MCBLK_SIZE,
