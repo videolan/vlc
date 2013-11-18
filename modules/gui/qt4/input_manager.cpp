@@ -167,6 +167,7 @@ void InputManager::delInput()
 
     /* Reset all InfoPanels but stats */
     emit artChanged( NULL );
+    emit artChanged( "" );
     emit infoChanged( NULL );
     emit currentMetaChanged( (input_item_t *)NULL );
 
