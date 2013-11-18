@@ -1103,7 +1103,7 @@ static void BdExtract( block_t *p_aout_buffer, block_t *p_block,
                        unsigned i_channels, unsigned i_channels_padding,
                        unsigned i_bits )
 {
-    if( i_channels_padding > 0 )
+    if( i_bits != 16 || i_channels_padding > 0 )
     {
         uint8_t *p_src = p_block->p_buffer;
         uint8_t *p_dst = p_aout_buffer->p_buffer;
