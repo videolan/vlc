@@ -204,6 +204,9 @@ static const char msg_type[4][9] = { "", " error", " warning", " debug" };
 #define GRAY    "\033[0m"
 static const char msg_color[4][8] = { WHITE, RED, YELLOW, GRAY };
 
+/* Display size of a pointer */
+static const int ptr_width = 2 * /* hex digits */ sizeof(uintptr_t);
+
 static void PrintColorMsg (void *d, int type, const vlc_log_t *p_item,
                            const char *format, va_list ap)
 {
@@ -216,7 +219,7 @@ static void PrintColorMsg (void *d, int type, const vlc_log_t *p_item,
     int canc = vlc_savecancel ();
 
     flockfile (stream);
-    fprintf (stream, "["GREEN"%p"GRAY"] ", (void *)p_item->i_object_id);
+    fprintf (stream, "["GREEN"%0*"PRIxPTR""GRAY"] ", ptr_width, p_item->i_object_id);
     if (p_item->psz_header != NULL)
         utf8_fprintf (stream, "[%s] ", p_item->psz_header);
     utf8_fprintf (stream, "%s %s%s: %s", p_item->psz_module,
@@ -242,7 +245,7 @@ static void PrintMsg (void *d, int type, const vlc_log_t *p_item,
     int canc = vlc_savecancel ();
 
     flockfile (stream);
-    fprintf (stream, "[%p] ", (void *)p_item->i_object_id);
+    fprintf (stream, "[%0*"PRIxPTR"] ", ptr_width, p_item->i_object_id);
     if (p_item->psz_header != NULL)
         utf8_fprintf (stream, "[%s] ", p_item->psz_header);
     utf8_fprintf (stream, "%s %s%s: ", p_item->psz_module,
