@@ -1115,7 +1115,7 @@ static void BdExtract( block_t *p_aout_buffer, block_t *p_block,
             memcpy( p_dst, p_src, i_channels * i_bits / 8 );
 #else
             if (i_bits == 16) {
-                swab( p_dst, p_src, (i_channels + i_channels_padding) * i_bits / 8 );
+                swab( p_src, p_dst, (i_channels + i_channels_padding) * i_bits / 8 );
             } else {
                 p_dst[0] = 0;
                 p_dst[1] = p_src[2];
