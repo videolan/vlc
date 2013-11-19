@@ -1,10 +1,11 @@
 --[[
  $Id$
 
- Copyright © 2009 the VideoLAN team
+ Copyright © 2009-2013 the VideoLAN team
 
  Authors: Konstantin Pavlov (thresh@videolan.org)
           François Revol (revol@free.fr)
+          Pierre Ynard
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -34,92 +35,58 @@ end
 
 -- Probe function.
 function probe()
-    return vlc.access == "http"
-        and string.match( vlc.path, "vimeo.com/%d+$" )
+    return ( vlc.access == "http" or vlc.access == "https" )
+        and ( string.match( vlc.path, "vimeo%.com/%d+$" )
+              or string.match( vlc.path, "player%.vimeo%.com" ) )
         -- do not match other addresses,
         -- else we'll also try to decode the actual video url
 end
 
 -- Parse function.
 function parse()
-    agent = vlc.var.inherit(nil,"http-user-agent")
+    if not string.match( vlc.path, "player%.vimeo%.com" ) then -- Web page URL
+        while true do
+            local line = vlc.readline()
+            if not line then break end
+            path = string.match( line, "data%-config%-url=\"(.-)\"" )
+            if path then
+                path = vlc.strings.resolve_xml_special_chars( path )
+                return { { path = path } }
+            end
+        end
 
-    if string.match( string.lower(agent), ".*vlc.*" ) then
-        vlc.msg.dbg("Wrong agent, adapting...")
-        return { { path = vlc.access .. "://" .. vlc.path; options = {":http-user-agent=Mozilla/5.0" } } }
-    end
+        vlc.msg.err( "Couldn't extract vimeo video URL, please check for updates to this script" )
+        return { }
 
-    _,_,id = string.find( vlc.path, "vimeo.com/([0-9]*)")
-    prefres = get_prefres()
-    ishd = false
-    quality = "sd"
-    codec = nil
-    line2 = ""
-    while true do
-        line = vlc.readline()
-        if not line then break end
-        if string.match( line, "{config:.*") then
-                line2 = line;
-                while not string.match( line2, "}};") do
-                        line2 = vlc.readline()
-                        if not line2 then break end
-                        line = line .. line2;
+    else -- API URL
+
+        local prefres = get_prefres()
+        local line = vlc.readline() -- data is on one line only
+
+        for stream in string.gmatch( line, "{([^}]*\"profile\":[^}]*)}" ) do
+            local url = string.match( stream, "\"url\":\"(.-)\"" )
+            if url then
+                path = url
+                if prefres < 0 then
+                    break
                 end
+                local height = string.match( stream, "\"height\":(%d+)[,}]" )
+                if not height or tonumber(height) <= prefres then
+                    break
+                end
+            end
         end
-        -- Try to find the video's title
-        if string.match( line, "<meta property=\"og:title\"" ) then
-            _,_,name = string.find (line, "content=\"(.*)\">" )
-        end
-        if string.match( line, "{config:.*\"title\":\"" ) then
-            _,_,name = string.find (line, "\"title\":\"([^\"]*)\"," )
-        end
-        -- Try to find image for thumbnail
-        if string.match( line, "<meta property=\"og:image\"" ) then
-            _,_,arturl = string.find (line, "content=\"(.*)\">" )
-        end
-        if string.match( line, "<meta itemprop=\"thumbnailUrl\"" ) then
-            _,_,arturl = string.find (line, "content=\"(.*)\">" )
-        end
-        -- Try to find duration
-        if string.match( line, "{config:.*\"duration\":" ) then
-            _,_,duration = string.find (line, "\"duration\":([0-9]*)," )
-        end
-        -- Try to find request signature (needed to construct video url)
-        if string.match( line, "{config:.*\"signature\":" ) then
-            _,_,rsig = string.find (line, "\"signature\":\"([0-9a-f]*)\"," )
-        end
-        -- Try to find request signature time (needed to construct video url)
-        if string.match( line, "{config:.*\"timestamp\":" ) then
-            _,_,tstamp = string.find (line, "\"timestamp\":([0-9]*)," )
-        end
-        -- Try to find the available codecs
-        if string.match( line, "{config:.*,\"files\":{\"vp6\":" ) then
-            codec = "vp6"
-        end
-        if string.match( line, "{config:.*,\"files\":{\"vp8\":" ) then
-            codec = "vp8"
-        end
-        if string.match( line, "{config:.*,\"files\":{\"h264\":" ) then
-            codec = "h264"
-        end
-        -- Try to find whether video is HD actually
-        if string.match( line, "{config:.*,\"hd\":1" ) then
-            ishd = true
-        end
-        if string.match( line, "{config:.*\"height\":" ) then
-            _,_,height = string.find (line, "\"height\":([0-9]*)," )
-        end
-        if not line2 then break end
-    end
 
-    if not codec then
-        vlc.msg.err("unable to find codec info")
-        return {}
-    end
+        if not path then
+            vlc.msg.err( "Couldn't extract vimeo video URL, please check for updates to this script" )
+            return { }
+        end
 
-    if ishd and ( not height or prefres < 0 or prefres >= tonumber(height) ) then
-        quality = "hd"
+        local name = string.match( line, "\"title\":\"(.-)\"" )
+        local artist = string.match( line, "\"owner\":{[^}]-\"name\":\"(.-)\"" )
+        local arturl = string.match( line, "\"thumbs\":{\"[^\"]+\":\"(.-)\"" )
+        local duration = string.match( line, "\"duration\":(%d+)[,}]" )
+
+        return { { path = path; name = name; artist = artist; arturl = arturl; duration = duration } }
     end
-    path = "http://player.vimeo.com/play_redirect?quality="..quality.."&codecs="..codec.."&clip_id="..id.."&time="..tstamp.."&sig="..rsig.."&type=html5_desktop_local"
-    return { { path = path; name = name; arturl = arturl; duration = duration } }
 end
