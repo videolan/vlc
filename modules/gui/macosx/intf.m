@@ -1288,8 +1288,11 @@ static VLCMain *_o_sharedMainInstance = nil;
             var_AddCallback(p_current_input, "intf-event", InputEvent, [VLCMain sharedInstance]);
             [self playbackStatusUpdated];
             [o_mainmenu setRateControlsEnabled: YES];
-            if ([self activeVideoPlayback] && [[o_mainwindow videoView] isHidden])
-                [o_mainwindow performSelectorOnMainThread:@selector(togglePlaylist:) withObject: nil waitUntilDone:NO];
+
+            if ([self activeVideoPlayback] && [[o_mainwindow videoView] isHidden]) {
+                [o_mainwindow performSelectorOnMainThread:@selector(togglePlaylist:) withObject: [NSNumber numberWithInt:1] waitUntilDone:NO];
+            }
+
             p_input_changed = vlc_object_hold(p_current_input);
         }
     }

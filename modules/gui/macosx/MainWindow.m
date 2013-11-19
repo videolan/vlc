@@ -412,17 +412,21 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)resizePlaylistAfterCollapse
 {
+    // no animation here since we might be in the middle of another resize animation
     NSRect plrect;
     plrect = [o_playlist_table frame];
-    plrect.size.height = i_lastSplitViewHeight - 20.0; // actual pl top bar height, which differs from its frame
-    [[o_playlist_table animator] setFrame: plrect];
+    plrect.size.height = [o_split_view frame].size.height - 20.0; // actual pl top bar height, which differs from its frame
+    [o_playlist_table setFrame: plrect];
+    [o_playlist_table setNeedsDisplay: YES];
 
     NSRect rightSplitRect;
     rightSplitRect = [o_right_split_view frame];
     plrect = [o_dropzone_box frame];
     plrect.origin.x = (rightSplitRect.size.width - plrect.size.width) / 2;
     plrect.origin.y = (rightSplitRect.size.height - plrect.size.height) / 2;
-    [[o_dropzone_box animator] setFrame: plrect];
+    [o_dropzone_view setFrame: [o_playlist_table frame]];
+    [o_dropzone_box setFrame: plrect];
+    [o_dropzone_view setNeedsDisplay: YES];
 }
 
 - (void)makeSplitViewVisible
@@ -473,6 +477,21 @@ static VLCMainWindow *_o_sharedInstance = nil;
 // only exception for an controls bar button action
 - (IBAction)togglePlaylist:(id)sender
 {
+    // Beware, this code is really ugly
+
+    /*
+     * sender can be:
+     * - nil if video playback is started or stopped
+     * - NSNumber with 1 if playlist item changes --> show video view
+     * - sender object if triggered through menu item or button
+     */
+    BOOL b_unhide_videoview = NO;
+    if([sender isKindOfClass: [NSNumber class]] && [sender intValue] == 1) {
+        b_unhide_videoview = YES;
+        sender = nil;
+    }
+
+    msg_Dbg(VLCIntf, "toggle playlist from state: removed splitview %i, minimized view %i. Sender is %p, unhide video view %i", b_splitview_removed, b_minimized_view, sender, b_unhide_videoview);
     if (![self isVisible] && sender != nil) {
         [self makeKeyAndOrderFront: sender];
         return;
@@ -493,12 +512,15 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (!(b_nativeFullscreenMode && b_fullscreen) && !b_splitview_removed && ((b_have_alt_key && b_activeVideo)
                                                                               || (b_nonembedded && sender != nil)
                                                                               || (!b_activeVideo && sender != nil)
-                                                                              || b_minimized_view))
+                                                                              || (b_minimized_view && sender == nil && b_unhide_videoview == NO))) {
+        // for starting playback, window is resized through resized events
+        // for stopping playback, resize through reset to previous frame
         [self hideSplitView: sender != nil];
-    else {
+        b_minimized_view = NO;
+    } else {
         if (b_splitview_removed) {
             if (!b_nonembedded || (sender != nil && b_nonembedded))
-                [self showSplitView: sender != nil];
+                [self showSplitView: sender != nil || b_unhide_videoview];
 
             if (sender == nil)
                 b_minimized_view = YES;
@@ -520,6 +542,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [o_video_view setHidden: YES];
         }
     }
+
+    msg_Dbg(VLCIntf, "toggle playlist to state: removed splitview %i, minimized view %i", b_splitview_removed, b_minimized_view);
 }
 
 - (IBAction)dropzoneButtonAction:(id)sender
@@ -758,8 +782,15 @@ static VLCMainWindow *_o_sharedInstance = nil;
     BOOL b_videoPlayback = [[VLCMain sharedInstance] activeVideoPlayback];
         
     if (!b_videoPlayback) {
-        if (!b_nonembedded && (!b_nativeFullscreenMode || (b_nativeFullscreenMode && !b_fullscreen)) && frameBeforePlayback.size.width > 0 && frameBeforePlayback.size.height > 0)
-            [[self animator] setFrame:frameBeforePlayback display:YES];
+        if (!b_nonembedded && (!b_nativeFullscreenMode || (b_nativeFullscreenMode && !b_fullscreen)) && frameBeforePlayback.size.width > 0 && frameBeforePlayback.size.height > 0) {
+
+            // only resize back to minimum view of this is still desired final state
+            float f_threshold_height = f_min_video_height + [o_controls_bar height];
+            if(frameBeforePlayback.size.height > f_threshold_height || b_minimized_view)
+                [[self animator] setFrame:frameBeforePlayback display:YES];
+        }
+
+        frameBeforePlayback = NSMakeRect(0, 0, 0, 0);
 
         // update fs button to reflect state for next startup
         if (var_InheritBool(VLCIntf, "fullscreen") || var_GetBool(pl_Get(VLCIntf), "fullscreen")) {
