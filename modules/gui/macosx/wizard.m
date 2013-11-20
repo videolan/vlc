@@ -1097,7 +1097,7 @@ static VLCWizard *_o_sharedInstance = nil;
                 NSMutableArray * tempArray = [[NSMutableArray alloc] init];
                 int x = 0;
                 int y = [[o_userSelections objectForKey:@"pathToStrm"] count];
-                NSMutableString * tempString = [[NSMutableString alloc] init];
+                NSString * tempString = [[NSString alloc] init];
                 while( x != y)
                 {
                     NSString * fileNameToUse;
