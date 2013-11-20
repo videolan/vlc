@@ -105,7 +105,7 @@ struct intf_sys_t
     BOOL b_active_videoplayback;
     BOOL b_nativeFullscreenMode;
 
-    VLCMainWindow *o_mainwindow;            /* VLCMainWindow */
+    IBOutlet VLCMainWindow *o_mainwindow;            /* VLCMainWindow */
 
     IBOutlet VLCControls * o_controls;     /* VLCControls    */
     IBOutlet VLCPlaylist * o_playlist;     /* VLCPlaylist    */

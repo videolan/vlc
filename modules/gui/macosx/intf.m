@@ -752,9 +752,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     items_at_launch = p_playlist->p_local_category->i_children;
     PL_UNLOCK;
 
-    [NSBundle loadNibNamed:@"MainWindow" owner: NSApp];
-    o_playlist = [[VLCPlaylist alloc] init];
-    o_mainwindow = [[VLCMainWindow alloc] init];
+    [NSBundle loadNibNamed:@"MainWindow" owner: self];
     [o_mainwindow makeKeyAndOrderFront:nil];
 }
 
@@ -914,7 +912,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     libvlc_Quit(p_intf->p_libvlc);
 
-    [o_mainwindow release];
     o_mainwindow = NULL;
 
     [self setIntf:nil];
