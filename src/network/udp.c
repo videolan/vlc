@@ -95,15 +95,6 @@ static int net_SetupDgramSocket (vlc_object_t *p_obj, int fd,
     setsockopt (fd, SOL_SOCKET, SO_REUSEPORT, &(int){ 1 }, sizeof (int));
 #endif
 
-#ifdef SO_RCVBUF
-    /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s)
-     * to avoid packet loss caused in case of scheduling hiccups */
-    setsockopt (fd, SOL_SOCKET, SO_RCVBUF,
-                (void *)&(int){ 0x80000 }, sizeof (int));
-    setsockopt (fd, SOL_SOCKET, SO_SNDBUF,
-                (void *)&(int){ 0x80000 }, sizeof (int));
-#endif
-
 #if defined (_WIN32)
     if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen)
      && (sizeof (struct sockaddr_storage) >= ptr->ai_addrlen))
@@ -527,11 +518,6 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
                              ptr->ai_protocol);
         if (fd == -1)
             continue;
-
-        /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s)
-        * to avoid packet loss caused by scheduling problems */
-        setsockopt (fd, SOL_SOCKET, SO_RCVBUF, &(int){ 0x80000 }, sizeof (int));
-        setsockopt (fd, SOL_SOCKET, SO_SNDBUF, &(int){ 0x80000 }, sizeof (int));
 
         /* Allow broadcast sending */
         setsockopt (fd, SOL_SOCKET, SO_BROADCAST, &(int){ 1 }, sizeof (int));
