@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Iðtrina anksèiau ádiegtos VLC leistuvës nuostatas ir podëlio rinkmenas"
 
-StrCpy $Message_AlreadyInstalled  \
-"VLC leistuvë jau ádiegta. $\nAr paðalinti \
-anksèiau ádiegtà versijà prieð diegiant $(^Name) ?"
-
 StrCpy $Name_Section91 "Paðalinti"
 StrCpy $Name_Section92 "Iðtrinti nustatymus ir podëlá"
 

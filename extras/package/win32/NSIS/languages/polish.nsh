@@ -29,9 +29,6 @@ StrCpy $Desc_Section07 \
     "Dodaje nowe pozycje do menu kontekstowego ('Odtwórz w VLC' i 'Dodaj do listy odtwarzania VLC')"
 StrCpy $Desc_Section08 \
     "Usuwa ustawienia odtwarzacza VLC media player i pamiêci podrêcznej poprzednich instalacji"
-StrCpy $Message_AlreadyInstalled  \
-"VLC media player zosta³ ju¿ zainstalowany. $\nCzy chcesz usun¹æ \
-poprzedni¹ wersjê przed zainstalowaniem $(^Name) ?"
 
 StrCpy $Name_Section91 "Odinstaluj"
 StrCpy $Name_Section92 "Wyczyœciæ pamiêæ podrêczn¹ i usun¹æ ustawienia"

@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Exclui os arquivos de preferências e temporários do VLC, deixados pelas instalações anteriores"
 
-StrCpy $Message_AlreadyInstalled  \
-"O reprodutor de mídias VLC já está instalado. $\nDeseja remover \
-a versão anterior antes de instalar a $(^Name) ?"
-
 StrCpy $Name_Section91 "Desinstalar"
 StrCpy $Name_Section92 "Excluir arquivos de preferências e temporários"
 

@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "VLC multimedia irakurgailuaren aurreko ezarpenen hobespenak eta katxe agiriak kentzen ditu"
 
-StrCpy $Message_AlreadyInstalled  \
-"VLC multimedia irakurgailua jadanik ezarrita dago. $\nAurreko bertsioa \
-kentzea nahi duzu $(^Name) ezarri aurretik ?"
-
 StrCpy $Name_Section91 "Kendu"
 StrCpy $Name_Section92 "Ezabatu hobespenak eta katxea"
 

@@ -31,10 +31,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Deletes VLC media player preferences and cache files leftover from previous installations"
 
-StrCpy $Message_AlreadyInstalled  \
-"VLC media player has already been installed. $\nDo you want to remove \
-the previous version before installing $(^Name) ?"
-
 StrCpy $Name_Section91 "Uninstall"
 StrCpy $Name_Section92 "Delete preferences and cache"
 

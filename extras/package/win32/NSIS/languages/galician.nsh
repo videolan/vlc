@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Elimina as preferencias e a caché do reprodutor multimedia VLC que pertenzan a versións previas"
 
-StrCpy $Message_AlreadyInstalled  \
-"O reprodutor multimedia VLC xa está instalado. $\nQuere eliminar \
-a versión anterior antes de instalar $(^Name)?"
-
 StrCpy $Name_Section91 "Desinstalar"
 StrCpy $Name_Section92 "Eliminar as preferencias e a caché"
 

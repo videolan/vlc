@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Poistaa VLC-mediasoittimen asetukset ja v‰limuistit joita on j‰‰nyt vanhoista asennuksista"
 
-StrCpy $Message_AlreadyInstalled  \
-"VLC-mediasoitin on jo asennettu. $\nHaluatko poistaa \
-edellisen version ennen kuin asennat ohjelman $(^Name) ?"
-
 StrCpy $Name_Section91 "Poista asennus"
 StrCpy $Name_Section92 "Poista asetukset ja v‰limuisti"
 

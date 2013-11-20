@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "ویستراوەکان و پەڕگەکانی کاشی لێدەری ڕەنگاڵەی VLC دەسڕێتەوە بۆ هەمیشە کە پێشتر دامەزراوە"
 
-StrCpy $Message_AlreadyInstalled  \
-"لێدەری ڕەنگاڵەی VLC پێشتر دامەزراوە. $\nئەتەوێت \
-وەشانی پێشوو بسڕیتەوە پێش دامەزراندنی $(^Name) ؟"
-
 StrCpy $Name_Section91 "سڕینەوە"
 StrCpy $Name_Section92 "ویستراوەکان و کاش بسڕەوە"
 

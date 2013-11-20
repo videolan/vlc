@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Verwijdert voorkeuren en bufferbestanden die van vorige installaties van VLC Media Player overgebleven zijn"
 
-StrCpy $Message_AlreadyInstalled  \
-"VLC Media Player is al geïnstalleerd. $\nWilt u de vorige versie \
-verwijderen voordat u $(^Name) installeert ?"
-
 StrCpy $Name_Section91 "Deïnstalleren"
 StrCpy $Name_Section92 "Voorkeuren en buffers wissen"
 

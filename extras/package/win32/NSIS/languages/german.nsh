@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Löscht die VLC media player Einstellungen und übergebliebenen Cache-Dateien der alten Installation"
 
-StrCpy $Message_AlreadyInstalled  \
-"Der VLC Media Player ist schon installiert. $\nWollen Sie vor \
-dem Installieren des $(^Name) die alte Version entfernen?"
-
 StrCpy $Name_Section91 "Deinstallieren"
 StrCpy $Name_Section92 "Einstellungen und Cache löschen"
 

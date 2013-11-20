@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Брисање подешавања и кеш фајлова VLC медиа плејера остали из претходних инсталација"
 
-StrCpy $Message_AlreadyInstalled  \
-"VLC медија плејер је већ инсталиран. $\nДа ли желиш да уклониш \
-претходну верзију пре инсталације $(^Name) ?"
-
 StrCpy $Name_Section91 "Уклони"
 StrCpy $Name_Section92 "Обриши подешавање и кеш"
 

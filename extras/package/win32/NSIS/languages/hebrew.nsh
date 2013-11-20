@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "מחיקת ההעדפות וקובצי המטמון של נגן המדיה VLC שנשארו מהתקנות קודמות"
 
-StrCpy $Message_AlreadyInstalled  \
-"נגן המדיה VLC כבר מותקן. $\nהאם ברצונך להסיר את הגרסה הקודמת בטרם \
-התקנת $(^Name) ?"
-
 StrCpy $Name_Section91 "הסרה"
 StrCpy $Name_Section92 "מחיקת ההעדפות והמטמון"
 

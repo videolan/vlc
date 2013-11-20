@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Izbriše lastnosti in datoteke predpomnilnika predhodne namestitve predvajalnika"
 
-StrCpy $Message_AlreadyInstalled  \
-"Predvajalnik VLC je že nameščen. $\nAli želite odstraniti \
-predhodno različico pred nameščanjem $(^Name) ?"
-
 StrCpy $Name_Section91 "Odstrani namestitev"
 StrCpy $Name_Section92 "Izbriši vsebino predpomnilnika"
 

@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
 	"Efface les préférences de VLC et les fichiers cache laissés par une précédente installation"
 
-StrCpy $Message_AlreadyInstalled  \
-"Le lecteur multimédia VLC est déjà installé. $\nSouhaitez-vous désinstaller \
-l'ancienne version avant d'installer $(^Name) ?"
-
 StrCpy $Name_Section91 "Désinstaller"
 StrCpy $Name_Section92 "Effacer les préférences et les fichiers cache"
 

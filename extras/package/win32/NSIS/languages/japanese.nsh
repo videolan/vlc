@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "前回のインストール以降に残っているVLCメディアプレイヤーの設定とキャッシュファイルを削除"
 
-StrCpy $Message_AlreadyInstalled  \
-"VLCメディアプレイヤーは既にインストールされています。$\n \
-$(^Name)のインストールの前に以前のバージョンを削除しますか？"
-
 StrCpy $Name_Section91 "アンインストール"
 StrCpy $Name_Section92 "設定とキャッシュの削除"
 

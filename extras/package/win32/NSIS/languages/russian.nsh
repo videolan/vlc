@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Удаляет настройки и кэш медиа-проигрывателя VLC, оставшиеся после предыдущей установки"
 
-StrCpy $Message_AlreadyInstalled  \
-"Медиа-проигрыватель VLC уже установлен. $\nЖелаете удалить \
-предыдущую версию перед установкой $(^Name) ?"
-
 StrCpy $Name_Section91 "Деинсталляция"
 StrCpy $Name_Section92 "Удалить настройки и кэш"
 

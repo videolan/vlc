@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Kustutab VLC meediaesitaja eelistused ja puhverfailid eelmisest paigaldusest"
 
-StrCpy $Message_AlreadyInstalled  \
-"VLC meediaesitaja on juba paigaldatud. $\nKas soovid eelmise \
-versiooni eemaldada enne $(^Name) paigaldamist?"
-
 StrCpy $Name_Section91 "Eemalda"
 StrCpy $Name_Section92 "Kustuta eelistused ja puhver"
 

@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Törli a VLC médialejátszó elõzõ telepítésbõl maradt beállításait és gyorsítótár-fájljait"
 
-StrCpy $Message_AlreadyInstalled  \
-"A VLC médialejátszó már telepítve van. $\nEl kívánja távolítani az \
-elõzõ verziót a $(^Name) telepítése elõtt?"
-
 StrCpy $Name_Section91 "Eltávolítás"
 StrCpy $Name_Section92 "Beállítások és gyorsítótár törlése"
 

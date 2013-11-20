@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Tar bort inställningar och cachefiler för Mediaspelaren VLC som lämnats kvar från tidigare installationer"
 
-StrCpy $Message_AlreadyInstalled  \
-"Mediaspelaren VLC är redan installerad. $\nVill du ta bort \
-den tidigare versionen innan du installerar $(^Name) ?"
-
 StrCpy $Name_Section91 "Avinstallera"
 StrCpy $Name_Section92 "Ta bort inställningar och cache"
 

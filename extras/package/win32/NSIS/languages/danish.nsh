@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Sletter VLC Media Player præferencer og cache filer, levn fra tidligere installationer"
 
-StrCpy $Message_AlreadyInstalled  \
-"VLC Media Player er allerede blevet installeret. $\nVil du fjerne \
-den tidligere version, før du installerer $(^Name) ?"
-
 StrCpy $Name_Section91 "Afinstaller"
 StrCpy $Name_Section92 "Slet præferencer og cache"
 

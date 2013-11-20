@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Vymae nastavenia prehrávaèa VLC media player a vyrovnávaciu pamä"
 
-StrCpy $Message_AlreadyInstalled  \
-"VLC media player u bol nainštalovanı. $\nChcete odstráni \
-predchádzajúcu verziu pred nainštalovaním novej verzie: $(^Name) ?"
-
 StrCpy $Name_Section91 "Odinštalova"
 StrCpy $Name_Section92 "Vymaza nastavenia a vyrovnávaciu pamä"
 

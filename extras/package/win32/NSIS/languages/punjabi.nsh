@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "VLC ਮੀਡਿਆ ਪਲੇਅਰ ਪਸੰਦ ਅਤੇ ਕੈਸ਼ ਨੂੰ ਹਟਾਓ, ਜੋ ਕਿ ਪਿਛਲੀ ਇੰਸਟਾਲੇਸ਼ਨ ਤੋਂ ਬਚੀ ਹੈ"
 
-StrCpy $Message_AlreadyInstalled  \
-"VLC ਮੀਡਿਆ ਪਲੇਅਰ ਪਹਿਲਾਂ ਹੀ ਇੰਸਟਾਲ ਹੈ।$\nਕੀ ਤੁਸੀਂ ਪਿਛਲੇ ਵਰਜਨ ਨੂੰ \
-$(^Name) ਇੰਸਟਾਲ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ ਹਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?"
-
 StrCpy $Name_Section91 "ਅਣ-ਇੰਸਟਾਲ ਕਰੋ"
 StrCpy $Name_Section92 "ਪਸੰਦ ਅਤੇ ਕੈਸ਼ ਹਟਾਓ"
 

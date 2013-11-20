@@ -22,8 +22,6 @@ Var Desc_Section06
 Var Desc_Section07
 Var Desc_Section08
 
-Var Message_AlreadyInstalled
-
 Var Name_Section91
 Var Name_Section92
 Var Desc_Section91

@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "删除先前安装版本所留下的 VLC media player 首选项与缓存文件"
 
-StrCpy $Message_AlreadyInstalled  \
-"已经安装过 VLC media player。$\n是否希望在安装 $(^Name) \
-之前移除旧版?"
-
 StrCpy $Name_Section91 "卸载"
 StrCpy $Name_Section92 "删除首选项与缓存"
 

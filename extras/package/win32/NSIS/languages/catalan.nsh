@@ -30,9 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Elimina les preferències del VLC i els fitxers de la memòria cau deixats en instal·lacions anteriors"
 
-StrCpy $Message_AlreadyInstalled  \
-"El reproductor VLC s'ha instal·lat.$\nVoleu eliminar la versió anterior instal·lada prèviament $(^Name) ?" 
-
 StrCpy $Name_Section91 "Desinstal·la"
 StrCpy $Name_Section92 "Elimina les preferències i la memòria cau"
 

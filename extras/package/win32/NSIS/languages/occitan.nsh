@@ -30,10 +30,6 @@ StrCpy $Desc_Section07 \
 StrCpy $Desc_Section08 \
     "Suprimir las preferéncias de VLC media player e los fichièrs cache de las ancianas versions"
 
-StrCpy $Message_AlreadyInstalled  \
-"VLC media player es ja installat. $\nVolètz suprimir l'anciana version \
-abans d'installar aquela : $(^Name) ?"
-
 StrCpy $Name_Section91 "Desinstallar"
 StrCpy $Name_Section92 "Suprimir las preferéncias e lo cache"
 
