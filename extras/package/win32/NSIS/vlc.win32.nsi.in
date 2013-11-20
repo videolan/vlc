@@ -601,18 +601,6 @@ UAC_Success:
   !include "languages\brazilian_portuguese.nsh"
   EndLanguageCmp:
 
-  ;;ReadRegStr $R0  ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
-  ;;"UninstallString"
-  ;;StrCmp $R0 "" finished
-
-  ;;MessageBox MB_YESNO|MB_ICONEXCLAMATION $Message_AlreadyInstalled /SD IDNO IDNO finished
-
-  ;Run the uninstaller
-  ;uninst:
-    ClearErrors
-    ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
-  finished:
-
 FunctionEnd
 
 ;;; Page to upgrade / downgrade or customize the installation
