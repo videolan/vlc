@@ -48,3 +48,15 @@ Var Action_OnArrivalMusicFiles
 Var Action_OnArrivalDVDAudio
 
 Var License_NextText
+
+Var Reinstall_Headline
+Var Reinstall_HeadlineInstall
+Var Reinstall_HeadlineMaintenance
+Var Reinstall_MessageOlder
+Var Reinstall_MessageNewer
+Var Reinstall_MessageSame
+Var Reinstall_OptionUpgrade
+Var Reinstall_OptionDowngrade
+Var Reinstall_OptionComponents
+Var Reinstall_OptionAdvanced
+Var Reinstall_OptionUninstall
