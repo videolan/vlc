@@ -772,9 +772,9 @@ static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, sout_stream
                            ( date_Get( &id->interpolated_pts ) );
     }
 
-    if( p_sys->i_threads && p_sys->b_master_sync && p_pic2 )
+    if( p_sys->i_threads && p_pic2 )
         picture_Release( p_pic2 );
-    else
+    else if ( p_sys->i_threads == 0 )
         picture_Release( p_pic );
 }
 
