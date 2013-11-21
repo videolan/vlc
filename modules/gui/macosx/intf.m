@@ -1685,10 +1685,24 @@ static VLCMain *_o_sharedMainInstance = nil;
 #pragma mark -
 #pragma mark Remove old prefs
 
+
+static NSString * kVLCPreferencesVersion = @"VLCPreferencesVersion";
+static const int kCurrentPreferencesVersion = 3;
+
+- (void)resetAndReinitializeUserDefaults
+{
+    // note that [NSUserDefaults resetStandardUserDefaults] will NOT correctly reset to the defaults
+
+    NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
+    [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
+
+    // set correct version to avoid question about outdated config
+    [[NSUserDefaults standardUserDefaults] setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 - (void)removeOldPreferences
 {
-    static NSString * kVLCPreferencesVersion = @"VLCPreferencesVersion";
-    static const int kCurrentPreferencesVersion = 3;
     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
     int version = [defaults integerForKey:kVLCPreferencesVersion];
     if (version >= kCurrentPreferencesVersion)
@@ -1705,10 +1719,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     } else if (version == 2) {
         /* version 2 (used by VLC 2.0.x and early versions of 2.1) can lead to exceptions within 2.1 or later
          * so we reset the OS X specific prefs here - in practice, no user will notice */
-        [NSUserDefaults resetStandardUserDefaults];
+        [self resetAndReinitializeUserDefaults];
 
-        [defaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
-        [defaults synchronize];
     } else {
         NSArray *libraries = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
             NSUserDomainMask, YES);

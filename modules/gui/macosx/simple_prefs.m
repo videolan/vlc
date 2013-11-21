@@ -861,8 +861,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
         config_SaveConfigFile(p_intf);
 
         /* reset OS X defaults */
-        [NSUserDefaults resetStandardUserDefaults];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+        [[VLCMain sharedInstance] resetAndReinitializeUserDefaults];
 
         /* Relaunch now */
         const char * path = [[[NSBundle mainBundle] executablePath] UTF8String];

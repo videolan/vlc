@@ -180,6 +180,9 @@ struct intf_sys_t
 - (void)updateTogglePlaylistState;
 
 - (void)mediaKeyTap:(SPMediaKeyTap*)keyTap receivedMediaKeyEvent:(NSEvent*)event;
+
+- (void)resetAndReinitializeUserDefaults;
+
 @end
 
 
