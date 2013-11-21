@@ -1742,16 +1742,17 @@ static const int kCurrentPreferencesVersion = 3;
             return;
         }
 
-        NSArray * ourPreferences = [NSArray arrayWithObjects:@"org.videolan.vlc.plist", @"VLC", @"org.videolan.vlc", nil];
+        // Do NOT add the current plist file here as this would conflict with caching.
+        // Instead, just reset below.
+        NSArray * ourPreferences = [NSArray arrayWithObjects:@"org.videolan.vlc", @"VLC", nil];
 
-        /* Move the file to trash so that user can find them later */
-        [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:preferences destination:nil files:ourPreferences tag:0];
+        /* Move the file to trash one by one. Using above array the method would stop after first file
+           not found. */
+        for (NSString *file in ourPreferences) {
+            [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:preferences destination:@"" files:[NSArray arrayWithObject:file] tag:nil];
+        }
 
-        /* really reset the defaults from now on */
-        [NSUserDefaults resetStandardUserDefaults];
-
-        [defaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
-        [defaults synchronize];
+        [self resetAndReinitializeUserDefaults];
     }
 
     /* Relaunch now */
