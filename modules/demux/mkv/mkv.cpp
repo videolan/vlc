@@ -602,11 +602,6 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                 VLC_TS_INVALID;
             continue;
          }
-         case VLC_CODEC_SPU:
-            if( strcmp( tk->psz_codec, "S_VOBSUB" ) )
-                p_block->i_length = i_duration * tk-> f_timecodescale *
-                    (double) p_segment->i_timescale / 1000.0;
-            break;
          case VLC_CODEC_OPUS:
             if( i_duration > 0 )
             {
@@ -673,6 +668,12 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
 #if 0
 msg_Dbg( p_demux, "block i_dts: %"PRId64" / i_pts: %"PRId64, p_block->i_dts, p_block->i_pts);
 #endif
+        if( !tk->b_no_duration )
+        {
+            p_block->i_length = i_duration * tk-> f_timecodescale *
+                (double) p_segment->i_timescale / 1000.0;
+        }
+
         /* FIXME remove when VLC_TS_INVALID work is done */
         if( i == 0 || p_block->i_dts > VLC_TS_INVALID )
             p_block->i_dts += VLC_TS_0;

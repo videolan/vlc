@@ -222,6 +222,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     tk->psz_codec              = NULL;
     tk->b_dts_only             = false;
     tk->i_default_duration     = 0;
+    tk->b_no_duration          = false;
     tk->f_timecodescale        = 1.0;
 
     tk->b_inited               = false;
@@ -1748,6 +1749,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
     else if( !strcmp( p_tk->psz_codec, "S_VOBSUB" ) )
     {
         p_tk->fmt.i_codec = VLC_CODEC_SPU;
+        p_tk->b_no_duration = true;
         if( p_tk->i_extra_data )
         {
             char *psz_start;

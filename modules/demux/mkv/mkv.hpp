@@ -201,6 +201,7 @@ struct mkv_track_t
     bool         b_dts_only;
     bool         b_pts_only;
 
+    bool         b_no_duration;
     uint64_t     i_default_duration;
     float        f_timecodescale;
     mtime_t      i_last_dts;
