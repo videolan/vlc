@@ -11701,7 +11701,7 @@ msgstr "Datgodiwr isdeitlau testun"
 #: modules/codec/subsdec.c:295 modules/demux/avi/avi.c:96
 msgctxt "GetACP"
 msgid "CP1252"
-msgstr "CP1252 [ GetACP ]"
+msgstr "CP1252"
 
 #: modules/codec/subsusf.c:46
 msgid "USFSubs"

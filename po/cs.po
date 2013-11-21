@@ -11528,7 +11528,7 @@ msgstr ""
 #. languages using the Latin alphabet.
 #: modules/codec/subsdec.c:97
 msgid "Default (Windows-1252)"
-msgstr "Výchozí (Windows-1252)"
+msgstr "Výchozí (Windows-1250)"
 
 #: modules/codec/subsdec.c:98
 msgid "System codeset"
@@ -11746,7 +11746,7 @@ msgstr ""
 #: modules/codec/subsdec.c:295 modules/demux/avi/avi.c:96
 msgctxt "GetACP"
 msgid "CP1252"
-msgstr "CP1252"
+msgstr "CP1250"
 
 #: modules/codec/subsusf.c:46
 msgid "USFSubs"
