@@ -261,7 +261,13 @@ static int SeekIndex( demux_t *p_demux, mtime_t i_date, float f_pos )
 
     uint64_t i_offset = (uint64_t)p_index->index_entry[i_entry].i_packet_number *
                         p_sys->p_fp->i_min_data_packet_size;
-    return stream_Seek( p_demux->s, p_sys->i_data_begin + i_offset );
+
+    if ( stream_Seek( p_demux->s, p_sys->i_data_begin + i_offset ) == VLC_SUCCESS )
+    {
+        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TS_0 + i_date );
+        return VLC_SUCCESS;
+    }
+    else return VLC_EGENERIC;
 }
 
 static void SeekPrepare( demux_t *p_demux )
