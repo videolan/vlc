@@ -1241,6 +1241,13 @@ static void ASF_FreeObject_marker( asf_object_t *p_obj)
     FREENULL( p_mk->name );
 }
 
+static int ASF_ReadObject_Raw(stream_t *s, asf_object_t *p_obj)
+{
+    VLC_UNUSED(s);
+    VLC_UNUSED(p_obj);
+    return VLC_SUCCESS;
+}
+
 #if 0
 static int ASF_ReadObject_XXX(stream_t *s, asf_object_t *p_obj)
 {
@@ -1318,6 +1325,12 @@ static const struct
     { &asf_object_extended_content_description, ASF_OBJECT_OTHER,
       ASF_ReadObject_extended_content_description,
       ASF_FreeObject_extended_content_description },
+    { &asf_object_content_encryption_guid, ASF_OBJECT_OTHER,
+      ASF_ReadObject_Raw, ASF_FreeObject_Null },
+    { &asf_object_advanced_content_encryption_guid, ASF_OBJECT_OTHER,
+      ASF_ReadObject_Raw, ASF_FreeObject_Null },
+    { &asf_object_extended_content_encryption_guid, ASF_OBJECT_OTHER,
+      ASF_ReadObject_Raw, ASF_FreeObject_Null },
 
     { &asf_object_null_guid, 0, NULL, NULL }
 };
@@ -1468,6 +1481,9 @@ static const struct
     { &asf_object_advanced_mutual_exclusion, "Advanced Mutual Exclusion" },
     { &asf_object_stream_prioritization, "Stream Prioritization" },
     { &asf_object_extended_content_description, "Extended content description"},
+    { &asf_object_content_encryption_guid, "Content Encryption"},
+    { &asf_object_advanced_content_encryption_guid, "Advanced Content Encryption"},
+    { &asf_object_extended_content_encryption_guid, "Entended Content Encryption"},
 
     { NULL, "Unknown" },
 };

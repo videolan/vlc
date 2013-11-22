@@ -755,6 +755,17 @@ static int DemuxInit( demux_t *p_demux )
         goto error;
     }
 
+    if ( ASF_FindObject( p_sys->p_root->p_hdr,
+                         &asf_object_content_encryption_guid, 0 ) != NULL
+         || ASF_FindObject( p_sys->p_root->p_hdr,
+                            &asf_object_extended_content_encryption_guid, 0 ) != NULL
+         || ASF_FindObject( p_sys->p_root->p_hdr,
+                         &asf_object_advanced_content_encryption_guid, 0 ) != NULL )
+    {
+        msg_Warn( p_demux, "ASF plugin discarded (DRM encumbered content)" );
+        goto error;
+    }
+
     p_sys->i_track = ASF_CountObject( p_sys->p_root->p_hdr,
                                       &asf_object_stream_properties_guid );
     if( p_sys->i_track <= 0 )
