@@ -133,9 +133,9 @@ static int ASF_ReadObjectCommon( stream_t *s, asf_object_t *p_obj )
 
 #ifdef ASF_DEBUG
     msg_Dbg( s,
-             "found object guid: " GUID_FMT " size:%"PRId64,
+             "found object guid: " GUID_FMT " size:%"PRId64" at %"PRId64,
              GUID_PRINT( p_common->i_object_id ),
-             p_common->i_object_size );
+             p_common->i_object_size, p_common->i_object_pos );
 #endif
 
     return VLC_SUCCESS;
