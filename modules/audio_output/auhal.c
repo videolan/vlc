@@ -202,6 +202,19 @@ static int Open(vlc_object_t *obj)
     p_aout->device_select = SwitchAudioDevice;
     p_sys->device_list = CFArrayCreate(kCFAllocatorDefault, NULL, 0, NULL);
 
+    /*
+     * Force an own run loop for callbacks.
+     *
+     * According to rtaudio, this is absolutely necessary since 10.6 to get correct notifications.
+     * It might fix issues when using the module as a library where a proper loop is not setup already.
+     */
+    CFRunLoopRef theRunLoop = NULL;
+    AudioObjectPropertyAddress property = { kAudioHardwarePropertyRunLoop, kAudioObjectPropertyScopeGlobal,kAudioObjectPropertyElementMaster };
+    err = AudioObjectSetPropertyData(kAudioObjectSystemObject, &property, 0, NULL, sizeof(CFRunLoopRef), &theRunLoop);
+    if (err != noErr) {
+        msg_Err(p_aout, "failed to set the run loop property [%4.4s]", (char *)&err);
+    }
+
     /* Attach a listener so that we are notified of a change in the device setup */
     AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
     err = AudioObjectAddPropertyListener(kAudioObjectSystemObject, &audioDevicesAddress, DevicesListener, (void *)p_aout);
