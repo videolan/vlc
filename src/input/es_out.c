@@ -193,7 +193,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced );
 static char *LanguageGetName( const char *psz_code );
 static char *LanguageGetCode( const char *psz_lang );
 static char **LanguageSplit( const char *psz_langs, bool b_default_any );
-static int LanguageArrayIndex( char **ppsz_langs, char *psz_lang );
+static int LanguageArrayIndex( char **ppsz_langs, const char *psz_lang );
 
 static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm );
 
@@ -2818,7 +2818,7 @@ static char **LanguageSplit( const char *psz_langs, bool b_default_any )
     return ppsz;
 }
 
-static int LanguageArrayIndex( char **ppsz_langs, char *psz_lang )
+static int LanguageArrayIndex( char **ppsz_langs, const char *psz_lang )
 {
     if( !ppsz_langs || !psz_lang )
         return -1;
