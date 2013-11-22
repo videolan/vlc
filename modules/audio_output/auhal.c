@@ -1581,12 +1581,12 @@ static OSStatus DefaultDeviceChangedListener(AudioObjectID inObjectID,  UInt32 i
 
     msg_Dbg(p_aout, "default device changed to %i", defaultDeviceID);
 
-    /* 
-     * The default device id changes to 0 when switching to SPDIF for whatever reason.
-     * We need to ignore that.
-     */
-    if(defaultDeviceID == 0)
+    /* Default device is changed by the os to allow other apps to play sound while in digital
+       mode. But this should not affect ourself. */
+    if (p_aout->sys->b_digital) {
+        msg_Dbg(p_aout, "ignore, as digital mode is active");
         return noErr;
+    }
 
     /* Also ignore events which announce the same device id */
     if(defaultDeviceID == p_aout->sys->i_selected_dev)
