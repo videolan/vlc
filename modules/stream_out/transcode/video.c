@@ -894,7 +894,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
             /* This is the pts input should have now with constant frame rate */
             mtime_t i_pts = date_Get( &id->interpolated_pts );
 
-            /* How much input pts has drifted */
+            /* How much video pts is ahead of calculated pts */
             mtime_t i_video_drift = p_pic->date - i_pts;
 
             /* Check that we are having lipsync with input here */

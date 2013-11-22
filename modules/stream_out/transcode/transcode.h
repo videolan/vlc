@@ -71,6 +71,7 @@ struct sout_stream_sys_t
 
     /* Sync */
     bool            b_master_sync;
+    /* i_master drift is how much audio buffer is ahead of calculated pts */
     mtime_t         i_master_drift;
 };
 
