@@ -238,9 +238,10 @@ int transcode_audio_process( sout_stream_t *p_stream,
                     i_drift );
                 date_Set( &id->interpolated_pts, p_audio_buf->i_pts );
                 i_pts = date_Get( &id->interpolated_pts );
+                if( likely(p_audio_buf->i_pts != VLC_TS_INVALID ) )
+                    i_drift = p_audio_buf->i_pts - i_pts;
             }
-            if( likely(p_audio_buf->i_pts != VLC_TS_INVALID ) )
-                p_sys->i_master_drift = p_audio_buf->i_pts - i_pts;
+            p_sys->i_master_drift = i_drift;
             date_Increment( &id->interpolated_pts, p_audio_buf->i_nb_samples );
         }
 
