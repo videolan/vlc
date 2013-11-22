@@ -1554,7 +1554,7 @@ static OSStatus DeviceAliveListener(AudioObjectID inObjectID,  UInt32 inNumberAd
 }
 
 /*
- * Callback when current device is not alive anymore
+ * Callback when default audio device changed
  */
 static OSStatus DefaultDeviceChangedListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void *inClientData)
 {
@@ -1598,9 +1598,8 @@ static OSStatus DefaultDeviceChangedListener(AudioObjectID inObjectID,  UInt32 i
     return noErr;
 }
 
-
 /*
- * Callback when default audio device changed
+ * Callback when physical formats for device change
  */
 static OSStatus StreamsChangedListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void *inClientData)
 {
@@ -1659,7 +1658,7 @@ static OSStatus StreamsChangedListener(AudioObjectID inObjectID,  UInt32 inNumbe
 }
 
 /*
- * StreamListener: check whether the device's physical format changes on-the-fly (unlikely)
+ * StreamListener: check whether the device's physical format change is complete
  */
 static OSStatus StreamListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void *inClientData)
 {
