@@ -172,6 +172,7 @@ static void SSE_SplitUV(uint8_t *dstu, size_t dstu_pitch,
                         const uint8_t *src, size_t src_pitch,
                         unsigned width, unsigned height, unsigned cpu)
 {
+    VLC_UNUSED(cpu);
     const uint8_t shuffle[] = { 0, 2, 4, 6, 8, 10, 12, 14,
                                 1, 3, 5, 7, 9, 11, 13, 15 };
     const uint8_t mask[] = { 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00,

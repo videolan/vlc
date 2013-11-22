@@ -125,6 +125,7 @@ static void input_item_subitem_added( const vlc_event_t *p_event,
 static void input_item_subitemtree_added( const vlc_event_t * p_event,
                                           void * user_data )
 {
+    VLC_UNUSED( p_event );
     libvlc_media_t * p_md = user_data;
     libvlc_event_t event;
 
