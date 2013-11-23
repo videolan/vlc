@@ -749,6 +749,30 @@ static void ASF_fillup_es_priorities_ex( demux_sys_t *p_sys, void *p_hdr,
     }
 }
 
+/* Fills up our bitrate exclusion list */
+static void ASF_fillup_es_bitrate_priorities_ex( demux_sys_t *p_sys, void *p_hdr,
+                                                 asf_es_priorities_t *p_prios )
+{
+    /* Find bitrate exclusions */
+    asf_object_bitrate_mutual_exclusion_t *p_bitrate_mutex =
+            ASF_FindObject( p_hdr, &asf_object_bitrate_mutual_exclusion_guid, 0 );
+    if (! p_bitrate_mutex ) return;
+
+    p_prios->pi_stream_numbers = malloc( p_sys->i_track * sizeof( asf_es_priorities_t ) );
+    if ( !p_prios->pi_stream_numbers ) return;
+
+    if ( p_bitrate_mutex->i_stream_number_count )
+    {
+        /* Just remove < highest */
+        for ( int16_t i = 1; i < p_bitrate_mutex->i_stream_number_count; i++ )
+        {
+            if ( p_prios->i_count + 1 == INT_MAX ) break; /* FIXME: fix all types */
+            if ( (unsigned int) p_prios->i_count > p_sys->i_track ) break;
+            p_prios->pi_stream_numbers[ p_prios->i_count++ ] = p_bitrate_mutex->pi_stream_numbers[ i ];
+        }
+    }
+
+}
 
 static int DemuxInit( demux_t *p_demux )
 {
@@ -819,6 +843,7 @@ static int DemuxInit( demux_t *p_demux )
 
     asf_object_language_list_t *p_languages = NULL;
     asf_es_priorities_t fmt_priorities_ex = { NULL, 0 };
+    asf_es_priorities_t fmt_priorities_bitrate_ex = { NULL, 0 };
 
     if( p_hdr_ext )
     {
@@ -1062,6 +1087,14 @@ static int DemuxInit( demux_t *p_demux )
                     break;
                 }
             }
+            for( int16_t i = 0; i < fmt_priorities_bitrate_ex.i_count; i++ )
+            {
+                if ( fmt_priorities_bitrate_ex.pi_stream_numbers[i] == p_sp->i_stream_number )
+                {
+                    i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
+                    break;
+                }
+            }
             fmt.i_priority = i_priority;
 
             tk->p_es = es_out_Add( p_demux->out, &fmt );
@@ -1075,6 +1108,7 @@ static int DemuxInit( demux_t *p_demux )
     }
 
     free( fmt_priorities_ex.pi_stream_numbers );
+    free( fmt_priorities_bitrate_ex.pi_stream_numbers );
 
     p_sys->i_data_begin = p_sys->p_root->p_data->i_object_pos + 50;
     if( p_sys->p_root->p_data->i_object_size != 0 )
