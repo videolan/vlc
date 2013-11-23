@@ -1066,6 +1066,59 @@ static void ASF_FreeObject_stream_prioritization( asf_object_t *p_obj)
     FREENULL( p_sp->pi_priority_flag );
 }
 
+static int ASF_ReadObject_bitrate_mutual_exclusion( stream_t *s, asf_object_t *p_obj )
+{
+    asf_object_bitrate_mutual_exclusion_t *p_ex = &p_obj->bitrate_mutual_exclusion;
+    const uint8_t *p_peek, *p_data;
+    int i_peek;
+
+    if( ( i_peek = stream_Peek( s, &p_peek, p_ex->i_object_size ) ) < 42 )
+       return VLC_EGENERIC;
+
+    p_data = &p_peek[24];
+
+    if( !ASF_HAVE( 16 + 2 * sizeof(uint16_t) ) ) /* at least one entry */
+        return VLC_EGENERIC;
+
+    if ( guidcmp( (const guid_t *) p_data, &asf_guid_mutex_language ) )
+        p_ex->exclusion_type = LANGUAGE;
+    else if ( guidcmp( (const guid_t *) p_data, &asf_guid_mutex_bitrate ) )
+        p_ex->exclusion_type = BITRATE;
+    ASF_SKIP( 16 );
+
+    p_ex->i_stream_number_count = ASF_READ2();
+    p_ex->pi_stream_numbers = calloc( p_ex->i_stream_number_count, sizeof(uint16_t) );
+    if ( ! p_ex->pi_stream_numbers )
+    {
+        p_ex->i_stream_number_count = 0;
+        return VLC_ENOMEM;
+    }
+
+    for( uint16_t i = 0; i < p_ex->i_stream_number_count; i++ )
+    {
+        if( !ASF_HAVE(2) )
+            break;
+        p_ex->pi_stream_numbers[i] = ASF_READ2();
+    }
+
+#ifdef ASF_DEBUG
+    msg_Dbg( s, "read \"bitrate exclusion object\" type %s",
+             p_ex->exclusion_type == LANGUAGE ? "Language" :
+             ( p_ex->exclusion_type == BITRATE ) ? "Bitrate" : "Unknown"
+    );
+    for( uint16_t i = 0; i < p_ex->i_stream_number_count; i++ )
+        msg_Dbg( s, "  - stream=%i", p_ex->pi_stream_numbers[i] );
+#endif
+
+    return VLC_SUCCESS;
+}
+static void ASF_FreeObject_bitrate_mutual_exclusion( asf_object_t *p_obj)
+{
+    asf_object_bitrate_mutual_exclusion_t *p_ex = &p_obj->bitrate_mutual_exclusion;
+
+    FREENULL( p_ex->pi_stream_numbers );
+    p_ex->i_stream_number_count = 0;
+}
 
 static int ASF_ReadObject_extended_content_description( stream_t *s,
                                                         asf_object_t *p_obj)
@@ -1323,6 +1376,9 @@ static const struct
     { &asf_object_stream_prioritization, ASF_OBJECT_OTHER,
       ASF_ReadObject_stream_prioritization,
       ASF_FreeObject_stream_prioritization },
+    { &asf_object_bitrate_mutual_exclusion_guid, ASF_OBJECT_OTHER,
+      ASF_ReadObject_bitrate_mutual_exclusion,
+      ASF_FreeObject_bitrate_mutual_exclusion },
     { &asf_object_extended_content_description, ASF_OBJECT_OTHER,
       ASF_ReadObject_extended_content_description,
       ASF_FreeObject_extended_content_description },
@@ -1481,6 +1537,7 @@ static const struct
     { &asf_object_extended_stream_properties_guid, "Extended Stream Properties" },
     { &asf_object_advanced_mutual_exclusion, "Advanced Mutual Exclusion" },
     { &asf_object_stream_prioritization, "Stream Prioritization" },
+    { &asf_object_bitrate_mutual_exclusion_guid, "Bitrate Mutual Exclusion" },
     { &asf_object_extended_content_description, "Extended content description"},
     { &asf_object_content_encryption_guid, "Content Encryption"},
     { &asf_object_advanced_content_encryption_guid, "Advanced Content Encryption"},

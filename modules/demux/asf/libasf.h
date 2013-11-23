@@ -306,6 +306,15 @@ typedef struct
 {
     ASF_OBJECT_COMMON
 
+    asf_exclusion_type_t exclusion_type;
+    uint16_t i_stream_number_count;
+    uint16_t *pi_stream_numbers;
+} asf_object_bitrate_mutual_exclusion_t;
+
+typedef struct
+{
+    ASF_OBJECT_COMMON
+
     int i_count;
     char **ppsz_name;
     char **ppsz_value;
@@ -353,6 +362,7 @@ typedef union asf_object_u
     asf_object_content_description_t content_description;
     asf_object_advanced_mutual_exclusion_t advanced_mutual_exclusion;
     asf_object_stream_prioritization_t stream_prioritization;
+    asf_object_bitrate_mutual_exclusion_t bitrate_mutual_exclusion;
     asf_object_extended_content_description_t extended_content_description;
 
 } asf_object_t;
