@@ -217,6 +217,9 @@ int transcode_audio_process( sout_stream_t *p_stream,
             if( transcode_audio_initialize_filters( p_stream, id, p_sys, &id->p_decoder->fmt_out.audio ) != VLC_SUCCESS )
                 return VLC_EGENERIC;
 
+            /* Set interpolated_pts to run with new samplerate */
+            date_Change( &id->interpolated_pts, p_sys->fmt_audio.i_rate, 1 );
+
         }
 
         if( p_sys->b_master_sync )
