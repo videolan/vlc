@@ -1128,7 +1128,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (IBAction)showPlaylist:(id)sender
 {
-    [[VLCMainWindow sharedInstance] togglePlaylist:sender];
+    [[VLCMainWindow sharedInstance] changePlaylistState: psUserMenuEvent];
 }
 
 #pragma mark -

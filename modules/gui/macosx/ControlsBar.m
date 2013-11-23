@@ -1062,6 +1062,11 @@ else \
     [self setShuffle];
 }
 
+- (IBAction)togglePlaylist:(id)sender
+{
+    [[[VLCMain sharedInstance] mainWindow] changePlaylistState: psUserEvent];
+}
+
 - (IBAction)volumeAction:(id)sender
 {
     if (sender == o_volume_sld)

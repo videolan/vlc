@@ -1268,7 +1268,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 #pragma mark -
 #pragma mark Interface updaters
-
+// This must be called on main thread
 - (void)PlaylistItemChanged
 {
     if (p_current_input && (p_current_input->b_dead || !vlc_object_alive(p_current_input))) {
@@ -1287,7 +1287,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             [o_mainmenu setRateControlsEnabled: YES];
 
             if ([self activeVideoPlayback] && [[o_mainwindow videoView] isHidden]) {
-                [o_mainwindow performSelectorOnMainThread:@selector(togglePlaylist:) withObject: [NSNumber numberWithInt:1] waitUntilDone:NO];
+                [o_mainwindow changePlaylistState: psPlaylistItemChangedEvent];
             }
 
             p_input_changed = vlc_object_hold(p_current_input);
@@ -1538,7 +1538,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     b_active_videoplayback = b_value;
     if (o_mainwindow) {
         [o_mainwindow performSelectorOnMainThread:@selector(setVideoplayEnabled) withObject:nil waitUntilDone:YES];
-        [o_mainwindow performSelectorOnMainThread:@selector(togglePlaylist:) withObject:nil waitUntilDone:NO];
     }
 
     // update sleep blockers

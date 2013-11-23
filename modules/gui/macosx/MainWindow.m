@@ -476,35 +476,28 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
 }
 
-// only exception for an controls bar button action
-- (IBAction)togglePlaylist:(id)sender
+
+- (void)changePlaylistState:(VLCPlaylistStateEvent)event
 {
     // Beware, this code is really ugly
 
-    /*
-     * sender can be:
-     * - nil if video playback is started or stopped
-     * - NSNumber with 1 if playlist item changes --> show video view
-     * - sender object if triggered through menu item or button
-     */
-    BOOL b_unhide_videoview = NO;
-    if([sender isKindOfClass: [NSNumber class]] && [sender intValue] == 1) {
-        b_unhide_videoview = YES;
-        sender = nil;
-    }
-
-    msg_Dbg(VLCIntf, "toggle playlist from state: removed splitview %i, minimized view %i. Sender is %p, unhide video view %i", b_splitview_removed, b_minimized_view, sender, b_unhide_videoview);
-    if (![self isVisible] && sender != nil) {
-        [self makeKeyAndOrderFront: sender];
+    msg_Dbg(VLCIntf, "toggle playlist from state: removed splitview %i, minimized view %i. Event %i", b_splitview_removed, b_minimized_view, event);
+    if (![self isVisible] && event == psUserMenuEvent) {
+        [self makeKeyAndOrderFront: nil];
         return;
     }
 
     BOOL b_activeVideo = [[VLCMain sharedInstance] activeVideoPlayback];
     BOOL b_restored = NO;
 
+    // ignore alt if triggered through main menu shortcut
     BOOL b_have_alt_key = ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0;
-    if (sender && [sender isKindOfClass: [NSMenuItem class]])
+    if (event == psUserMenuEvent)
         b_have_alt_key = NO;
+
+    // eUserMenuEvent is now handled same as eUserEvent
+    if(event == psUserMenuEvent)
+        event = psUserEvent;
 
     if (b_dropzone_active && b_have_alt_key) {
         [self hideDropZone];
@@ -512,19 +505,19 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     if (!(b_nativeFullscreenMode && b_fullscreen) && !b_splitview_removed && ((b_have_alt_key && b_activeVideo)
-                                                                              || (b_nonembedded && sender != nil)
-                                                                              || (!b_activeVideo && sender != nil)
-                                                                              || (b_minimized_view && sender == nil && b_unhide_videoview == NO))) {
+                                                                              || (b_nonembedded && event == psUserEvent)
+                                                                              || (!b_activeVideo && event == psUserEvent)
+                                                                              || (b_minimized_view && event == psVideoStartedOrStoppedEvent))) {
         // for starting playback, window is resized through resized events
         // for stopping playback, resize through reset to previous frame
-        [self hideSplitView: sender != nil];
+        [self hideSplitView: event != psVideoStartedOrStoppedEvent];
         b_minimized_view = NO;
     } else {
         if (b_splitview_removed) {
-            if (!b_nonembedded || (sender != nil && b_nonembedded))
-                [self showSplitView: sender != nil || b_unhide_videoview];
+            if (!b_nonembedded || (event == psUserEvent && b_nonembedded))
+                [self showSplitView: event != psVideoStartedOrStoppedEvent];
 
-            if (sender == nil)
+            if (event != psUserEvent)
                 b_minimized_view = YES;
             else
                 b_minimized_view = NO;
@@ -534,7 +527,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         }
 
         if (!b_nonembedded) {
-            if (([o_video_view isHidden] && b_activeVideo) || b_restored || (b_activeVideo && sender == nil))
+            if (([o_video_view isHidden] && b_activeVideo) || b_restored || (b_activeVideo && event != psUserEvent))
                 [self makeSplitViewHidden];
             else
                 [self makeSplitViewVisible];
@@ -815,6 +808,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [o_fspanel setNonActive: nil];
         }
     }
+
+    [self changePlaylistState: psVideoStartedOrStoppedEvent];
 }
 
 #pragma mark -

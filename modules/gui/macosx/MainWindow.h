@@ -42,6 +42,13 @@
 @class VLCMainWindowControlsBar;
 @class VLCVoutView;
 
+typedef enum {
+    psUserEvent,
+    psUserMenuEvent,
+    psVideoStartedOrStoppedEvent,
+    psPlaylistItemChangedEvent
+} VLCPlaylistStateEvent;
+
 @interface VLCMainWindow : VLCVideoWindowCommon <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate> {
 
     IBOutlet id o_search_fld;
@@ -105,7 +112,7 @@
 
 - (VLCMainWindowControlsBar *)controlsBar;
 
-- (IBAction)togglePlaylist:(id)sender;
+- (void)changePlaylistState:(VLCPlaylistStateEvent)event;
 
 - (IBAction)dropzoneButtonAction:(id)sender;
 

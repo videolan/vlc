@@ -145,6 +145,8 @@
 - (void)setShuffle;
 - (IBAction)shuffle:(id)sender;
 
+- (IBAction)togglePlaylist:(id)sender;
+
 - (void)toggleEffectsButton;
 - (void)toggleJumpButtons;
 - (void)togglePlaymodeButtons;
