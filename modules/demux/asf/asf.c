@@ -37,6 +37,8 @@
 #include <vlc_access.h>                /* GET_PRIVATE_ID_STATE */
 #include <vlc_codecs.h>                /* VLC_BITMAPINFOHEADER, WAVEFORMATEX */
 
+#include <limits.h>
+
 #include "libasf.h"
 
 /* TODO
@@ -717,6 +719,37 @@ loop_error_recovery:
 /*****************************************************************************
  *
  *****************************************************************************/
+typedef struct asf_es_priorities_t
+{
+    int16_t *pi_stream_numbers;
+    int16_t i_count;
+} asf_es_priorities_t;
+
+/* Fills up our exclusion list */
+static void ASF_fillup_es_priorities_ex( demux_sys_t *p_sys, void *p_hdr,
+                                         asf_es_priorities_t *p_prios )
+{
+    /* Find stream exclusions */
+    asf_object_advanced_mutual_exclusion_t *p_mutex =
+            ASF_FindObject( p_hdr, &asf_object_advanced_mutual_exclusion, 0 );
+    if (! p_mutex ) return;
+
+    p_prios->pi_stream_numbers = malloc( p_sys->i_track * sizeof( asf_es_priorities_t ) );
+    if ( !p_prios->pi_stream_numbers ) return;
+
+    if ( p_mutex->i_stream_number_count )
+    {
+        /* Just set highest prio on highest in the group */
+        for ( int16_t i = 1; i < p_mutex->i_stream_number_count; i++ )
+        {
+            if ( p_prios->i_count + 1 == INT_MAX ) break; /* FIXME: fix all types */
+            if ( (unsigned int) p_prios->i_count > p_sys->i_track ) break;
+            p_prios->pi_stream_numbers[ p_prios->i_count++ ] = p_mutex->pi_stream_number[ i ];
+        }
+    }
+}
+
+
 static int DemuxInit( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -785,8 +818,15 @@ static int DemuxInit( demux_t *p_demux )
                                               &asf_object_header_extension_guid, 0 );
 
     asf_object_language_list_t *p_languages = NULL;
+    asf_es_priorities_t fmt_priorities_ex = { NULL, 0 };
+
     if( p_hdr_ext )
+    {
         p_languages = ASF_FindObject( p_hdr_ext, &asf_object_language_list, 0 );
+
+        ASF_fillup_es_priorities_ex( p_sys, p_hdr_ext, &fmt_priorities_ex );
+        ASF_fillup_es_bitrate_priorities_ex( p_sys, p_hdr_ext, &fmt_priorities_bitrate_ex );
+    }
 
     for( unsigned i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
     {
@@ -1012,6 +1052,18 @@ static int DemuxInit( demux_t *p_demux )
             if(!p_sys->i_seek_track && fmt.i_cat == VIDEO_ES)
                 p_sys->i_seek_track = p_sp->i_stream_number;
 
+            /* Set our priority so we won't get multiple videos */
+            int i_priority = ES_PRIORITY_SELECTABLE_MIN;
+            for( int16_t i = 0; i < fmt_priorities_ex.i_count; i++ )
+            {
+                if ( fmt_priorities_ex.pi_stream_numbers[i] == p_sp->i_stream_number )
+                {
+                    i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
+                    break;
+                }
+            }
+            fmt.i_priority = i_priority;
+
             tk->p_es = es_out_Add( p_demux->out, &fmt );
         }
         else
@@ -1021,6 +1073,8 @@ static int DemuxInit( demux_t *p_demux )
         }
         es_format_Clean( &fmt );
     }
+
+    free( fmt_priorities_ex.pi_stream_numbers );
 
     p_sys->i_data_begin = p_sys->p_root->p_data->i_object_pos + 50;
     if( p_sys->p_root->p_data->i_object_size != 0 )
