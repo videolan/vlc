@@ -275,11 +275,19 @@ typedef struct
     asf_object_stream_properties_t *p_sp;
 } asf_object_extended_stream_properties_t;
 
+#define ASF_MAX_EXCLUSION_TYPE 2
+typedef enum
+{
+    LANGUAGE = ASF_MAX_EXCLUSION_TYPE,
+    BITRATE = 1,
+    UNKNOWN = 0
+} asf_exclusion_type_t;
+
 typedef struct
 {
     ASF_OBJECT_COMMON
 
-    guid_t  type;
+    asf_exclusion_type_t exclusion_type;
     int16_t i_stream_number_count;
     int16_t *pi_stream_number;
 

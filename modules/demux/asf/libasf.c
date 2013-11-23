@@ -976,16 +976,14 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
 
     p_data = &p_peek[24];
 
-    ASF_GetGUID( &p_ae->type, &p_data[0] );
+    if( !ASF_HAVE( 16 + 2 * sizeof(uint16_t) ) ) /* at least one entry */
+        return VLC_EGENERIC;
+
+    if ( guidcmp( (const guid_t *) p_data, &asf_guid_mutex_language ) )
+        p_ae->exclusion_type = LANGUAGE;
+    else if ( guidcmp( (const guid_t *) p_data, &asf_guid_mutex_bitrate ) )
+        p_ae->exclusion_type = BITRATE;
     ASF_SKIP( 16 );
-#ifdef ASF_DEBUG
-    if( guidcmp( &p_ae->type, &asf_guid_mutex_language ) )
-        msg_Dbg( s, "Language exclusion" );
-    else if( guidcmp( &p_ae->type, &asf_guid_mutex_bitrate ) )
-        msg_Dbg( s, "Bitrate exclusion" );
-    else
-        msg_Warn(s, "Unknown exclusion type" );
-#endif
 
     p_ae->i_stream_number_count = ASF_READ2();
     p_ae->pi_stream_number = calloc( p_ae->i_stream_number_count, sizeof(int) );
@@ -999,7 +997,10 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
     p_ae->i_stream_number_count = i;
 
 #ifdef ASF_DEBUG
-    msg_Dbg( s, "read \"advanced mutual exclusion object\"" );
+    msg_Dbg( s, "read \"advanced mutual exclusion object\" type %s",
+             p_ae->exclusion_type == LANGUAGE ? "Language" :
+             ( p_ae->exclusion_type == BITRATE ) ? "Bitrate" : "Unknown"
+    );
     for( i = 0; i < p_ae->i_stream_number_count; i++ )
         msg_Dbg( s, "  - stream=%d", p_ae->pi_stream_number[i] );
 #endif
