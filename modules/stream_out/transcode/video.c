@@ -300,7 +300,7 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
 static void transcode_video_filter_init( sout_stream_t *p_stream,
                                          sout_stream_id_t *id )
 {
-    const es_format_t *p_fmt_out = &id->p_decoder->fmt_out;
+    es_format_t *p_fmt_out = &id->p_decoder->fmt_out;
     id->p_encoder->fmt_in.video.i_chroma = id->p_encoder->fmt_in.i_codec;
 
     id->p_f_chain = filter_chain_New( p_stream, "video filter2",
@@ -322,15 +322,20 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
         p_fmt_out = filter_chain_GetFmtOut( id->p_f_chain );
     }
 
+    /* Check that we have visible_width/height*/
+    if( !p_fmt_out->video.i_visible_height )
+        p_fmt_out->video.i_visible_height = p_fmt_out->video.i_height;
+    if( !p_fmt_out->video.i_visible_width )
+        p_fmt_out->video.i_visible_width = p_fmt_out->video.i_width;
+
     if( p_stream->p_sys->psz_vf2 )
     {
-        const es_format_t *p_fmt_out;
         id->p_uf_chain = filter_chain_New( p_stream, "video filter2",
                                           true,
                            transcode_video_filter_allocation_init,
                            transcode_video_filter_allocation_clear,
                            p_stream->p_sys );
-        filter_chain_Reset( id->p_uf_chain, &id->p_encoder->fmt_in,
+        filter_chain_Reset( id->p_uf_chain, p_fmt_out,
                             &id->p_encoder->fmt_in );
         filter_chain_AppendFromString( id->p_uf_chain, p_stream->p_sys->psz_vf2 );
         p_fmt_out = filter_chain_GetFmtOut( id->p_uf_chain );
