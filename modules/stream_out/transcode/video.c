@@ -347,16 +347,14 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
 
 }
 
-/* Take care of the scaling and chroma conversions.
- *
- * XXX: Shouldn't this really be after p_uf_chain, not p_f_chain,
- * in case p_uf_chain changes the format?
- */
+/* Take care of the scaling and chroma conversions. */
 static void conversion_video_filter_append( sout_stream_id_t *id )
 {
     const es_format_t *p_fmt_out = &id->p_decoder->fmt_out;
     if( id->p_f_chain )
         p_fmt_out = filter_chain_GetFmtOut( id->p_f_chain );
+    if( id->p_uf_chain )
+        p_fmt_out = filter_chain_GetFmtOut( id->p_uf_chain );
 
     if( ( p_fmt_out->video.i_chroma != id->p_encoder->fmt_in.video.i_chroma ) ||
         ( p_fmt_out->video.i_width != id->p_encoder->fmt_in.video.i_width ) ||
