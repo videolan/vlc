@@ -185,9 +185,11 @@ int main( int i_argc, const char *ppsz_argv[] )
                 lang = (char *)malloc(maxSize);
                 CFStringGetCString(language, lang, maxSize - 1, kCFStringEncodingUTF8);
             }
-            char tmp[11];
-            snprintf(tmp, 11, "LANG=%s", lang);
-            putenv(tmp);
+            if (strncmp( lang, "auto", 4 )) {
+                char tmp[11];
+                snprintf(tmp, 11, "LANG=%s", lang);
+                putenv(tmp);
+            }
             CFRelease(language);
         }
     }
