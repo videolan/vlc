@@ -371,6 +371,7 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     [o_intf_pauseminimized_ckb setTitle: _NS("Pause the video playback when minimized")];
     [o_intf_luahttp_box setTitle:_NS("Lua HTTP")];
     [o_intf_luahttppwd_lbl setStringValue:_NS("Password")];
+    [o_intf_pauseitunes_lbl setStringValue:_NS("Control iTunes during playback")];
 
     /* Subtitles and OSD */
     [o_osd_encoding_txt setStringValue: _NS("Default Encoding")];
@@ -604,6 +605,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     [self setupButton: o_intf_autoresize_ckb forBoolValue: "macosx-video-autoresize"];
     [self setupButton: o_intf_pauseminimized_ckb forBoolValue: "macosx-pause-minimized"];
     [self setupField: o_intf_luahttppwd_fld forOption: "http-password"];
+    [self setupButton: o_intf_pauseitunes_pop forIntList: "macosx-control-itunes"];
 
     /******************
      * audio settings *
@@ -981,6 +983,8 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
             }
         }
         config_PutPsz(p_intf, "http-password", [[o_intf_luahttppwd_fld stringValue] UTF8String]);
+
+        SaveIntList(o_intf_pauseitunes_pop, "macosx-control-itunes");
 
         /* activate stuff without restart */
         if ([o_intf_appleremote_ckb state] == YES)
