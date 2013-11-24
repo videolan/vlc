@@ -29,6 +29,7 @@
 #import "applescript.h"
 #import "CoreInteraction.h"
 #import "playlist.h"
+#import <vlc_url.h>
 
 /*****************************************************************************
  * VLGetURLScriptCommand implementation
@@ -46,12 +47,31 @@
             if (o_url != nil)
                 [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: o_url];
 
-            NSArray *o_result = [NSArray arrayWithObject:[NSDictionary dictionaryWithObject:o_urlString forKey: @"ITEM_URL"]];
+            input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+            BOOL b_returned = NO;
+
+            if (p_input) {
+                b_returned = input_AddSubtitle(p_input, [o_urlString UTF8String], true);
+                vlc_object_release(p_input);
+                if (!b_returned)
+                    return nil;
+            }
+
+            char *psz_uri = vlc_path2uri([o_urlString UTF8String], NULL);
+            if (!psz_uri)
+                return nil;
+
+            NSDictionary *o_dic;
+            NSArray *o_array;
+            o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
+            free(psz_uri);
+
+            o_array = [NSArray arrayWithObject: o_dic];
 
             if (b_autoplay)
-                [[[VLCMain sharedInstance] playlist] appendArray: o_result atPos: -1 enqueue: NO];
+                [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue: NO];
             else
-                [[[VLCMain sharedInstance] playlist] appendArray: o_result atPos: -1 enqueue: YES];
+                [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue: YES];
         }
     }
     return nil;
