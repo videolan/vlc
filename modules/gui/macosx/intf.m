@@ -999,7 +999,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)application:(NSApplication *)o_app openFiles:(NSArray *)o_names
 {
-    char *psz_uri = vlc_path2uri([[o_names objectAtIndex:0] UTF8String], "file");
+    char *psz_uri = vlc_path2uri([[o_names objectAtIndex:0] UTF8String], NULL);
 
     if (launched == NO) {
         if (items_at_launch) {
@@ -1017,7 +1017,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         input_thread_t * p_input = pl_CurrentInput(VLCIntf);
         if (p_input) {
             BOOL b_returned = NO;
-            b_returned = input_AddSubtitle(p_input, psz_uri, true);
+            b_returned = input_AddSubtitle(p_input, [[o_names objectAtIndex:0] UTF8String], true);
             vlc_object_release(p_input);
             if (!b_returned) {
                 free(psz_uri);
