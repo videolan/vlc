@@ -2015,7 +2015,11 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
                                             strlen( p_region_in->psz_html ),
                                             true );
         if( unlikely(p_sub == NULL) )
+        {
+            free( psz_text );
+            free( pp_styles );
             return VLC_SUCCESS;
+        }
 
         xml_reader_t *p_xml_reader = p_filter->p_sys->p_xml;
         if( !p_xml_reader )
