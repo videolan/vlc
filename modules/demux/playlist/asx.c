@@ -312,6 +312,8 @@ static int Demux( demux_t *p_demux )
     char *psz_entryref = NULL;
 
     xml_reader_t *p_xml_reader = NULL;
+    input_item_t *p_current_input = GetCurrentItem( p_demux );
+    input_item_node_t *p_subitems = NULL;
 
     bool b_first_node = false;
     int i_type;
@@ -324,8 +326,7 @@ static int Demux( demux_t *p_demux )
         goto error;
     }
 
-    input_item_t *p_current_input = GetCurrentItem( p_demux );
-    input_item_node_t *p_subitems = input_item_node_Create( p_current_input );
+    p_subitems = input_item_node_Create( p_current_input );
 
     do
     {
@@ -424,17 +425,22 @@ static int Demux( demux_t *p_demux )
     }
     while( i_type != XML_READER_ENDELEM || strncasecmp( psz_node, "ASX", 3 ) );
 
+    input_item_node_PostAndDelete( p_subitems );
+    p_subitems = NULL;
+
+
+error:
     free( psz_base );
     free( psz_title_asx );
     free( psz_entryref );
     free( psz_txt );
 
-    input_item_node_PostAndDelete( p_subitems );
-    vlc_gc_decref( p_current_input );
-
-error:
     if( p_xml_reader)
         xml_ReaderDelete( p_xml_reader );
+    if( p_subitems )
+        input_item_node_Delete( p_subitems );
+
+    vlc_gc_decref( p_current_input );
 
     return 0;
 }
