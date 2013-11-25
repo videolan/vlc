@@ -343,6 +343,7 @@ static bool GetUpdateFile( update_t *p_update )
         p_hash[1] != sign.hash_verification[1] )
     {
         msg_Warn( p_update->p_libvlc, "Bad SHA1 hash for status file" );
+        free( p_hash );
         goto error;
     }
 
@@ -350,6 +351,7 @@ static bool GetUpdateFile( update_t *p_update )
             != VLC_SUCCESS )
     {
         msg_Err( p_update->p_libvlc, "BAD SIGNATURE for status file" );
+        free( p_hash );
         goto error;
     }
 
