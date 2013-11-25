@@ -1517,6 +1517,7 @@ static const struct
     const char *psz_name;
 } ASF_ObjectDumpDebugInfo[] =
 {
+    { &vlc_object_root_guid, "Root" },
     { &asf_object_header_guid, "Header" },
     { &asf_object_data_guid, "Data" },
     { &asf_object_index_guid, "Index" },
@@ -1607,7 +1608,7 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
         return NULL;
 
     p_root->i_type = ASF_OBJECT_ROOT;
-    memcpy( &p_root->i_object_id, &asf_object_null_guid, sizeof( guid_t ) );
+    memcpy( &p_root->i_object_id, &vlc_object_root_guid, sizeof( guid_t ) );
     p_root->i_object_pos = stream_Tell( s );
     p_root->i_object_size = 0;
     p_root->p_first = NULL;
