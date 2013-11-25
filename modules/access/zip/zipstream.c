@@ -717,7 +717,9 @@ static node* findOrCreateParentNode( node *root, const char *fullpath )
         if( !strcmp( current->name, folder ) )
         {
             /* We found the folder, go recursively deeper */
-            return findOrCreateParentNode( current, sep );
+            node *parentNode = findOrCreateParentNode( current, sep );
+            free( path );
+            return parentNode;
         }
         current = current->next;
     }
