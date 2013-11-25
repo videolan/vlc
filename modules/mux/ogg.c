@@ -692,8 +692,7 @@ static block_t *OggStreamPageOut( sout_mux_t *p_mux,
 
 static void OggGetSkeletonIndex( uint8_t **pp_buffer, long *pi_size, ogg_stream_t *p_stream )
 {
-    uint8_t *p_buffer = *pp_buffer;
-    p_buffer = calloc( INDEX_BASE_SIZE + p_stream->skeleton.i_index_size, sizeof(uint8_t) );
+    uint8_t *p_buffer = calloc( INDEX_BASE_SIZE + p_stream->skeleton.i_index_size, sizeof(uint8_t) );
     if ( !p_buffer ) return;
     *pp_buffer = p_buffer;
 
