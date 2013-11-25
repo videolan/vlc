@@ -951,11 +951,8 @@ void InputManager::setAtoB()
 /* Function called regularly when in an AtoB loop */
 void InputManager::AtoBLoop( float, int64_t i_time, int )
 {
-    if( timeB )
-    {
-        if( i_time >= timeB || i_time < timeA )
-            var_SetTime( THEMIM->getInput(), "time" , timeA );
-    }
+    if( timeB && i_time >= timeB )
+        var_SetTime( THEMIM->getInput(), "time" , timeA );
 }
 
 /**********************************************************************
