@@ -620,7 +620,7 @@ static bool AddIndexEntry( sout_mux_t *p_mux, uint64_t i_time, sout_input_t *p_i
     i_posdelta = p_sys->i_pos - p_stream->skeleton.i_last_keyframe_pos;
     i_timedelta = i_time - p_stream->skeleton.i_last_keyframe_time;
 
-    if ( i_timedelta <= ( (unsigned int) p_mux->p_sys->skeleton.i_index_intvl * 1000 )
+    if ( i_timedelta <= ( (uint64_t) p_mux->p_sys->skeleton.i_index_intvl * 1000 )
          || i_posdelta <= 0xFFFF )
         return false;
 
@@ -1356,7 +1356,7 @@ static bool AllocateIndex( sout_mux_t *p_mux, sout_input_t *p_input )
 
     if ( p_stream->i_length )
     {
-        uint64_t i_interval = p_mux->p_sys->skeleton.i_index_intvl * 1000;
+        uint64_t i_interval = (uint64_t)p_mux->p_sys->skeleton.i_index_intvl * 1000;
         uint64_t i;
 
         if( p_input->p_fmt->i_cat == VIDEO_ES &&
