@@ -94,6 +94,7 @@
         BOOL b_no_video_deco_only = !b_video_wallpaper;
         o_new_video_window = [[VLCVideoWindowCommon alloc] initWithContentRect:window_rect styleMask:mask backing:NSBackingStoreBuffered defer:YES];
         [o_new_video_window setDelegate:o_new_video_window];
+        [o_new_video_window setReleasedWhenClosed: NO];
 
         if (b_video_wallpaper)
             [o_new_video_window setLevel:CGWindowLevelForKey(kCGDesktopWindowLevelKey) + 1];
