@@ -187,10 +187,9 @@
     }
 
     if (!b_video_wallpaper) {
-        // set window size
-
+        // set (only!) window origin if specified
         if (b_nonembedded) {
-            NSRect window_rect = [o_new_video_window getWindowRectForProposedVideoViewSize:videoViewSize];
+            NSRect window_rect = [o_new_video_window frame];
             if (videoViewPosition.origin.x > 0.)
                 window_rect.origin.x = videoViewPosition.origin.x;
             if (videoViewPosition.origin.y > 0.)
@@ -212,6 +211,7 @@
             [o_new_video_window setFrameTopLeftPoint: top_left_point];
         }
 
+        // resize window
         [o_new_video_window setNativeVideoSize:videoViewSize];
 
         [o_new_video_window makeKeyAndOrderFront: self];
