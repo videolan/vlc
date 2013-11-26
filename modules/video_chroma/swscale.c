@@ -200,9 +200,11 @@ static int OpenScaler( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_filter, "%ix%i chroma: %4.4s -> %ix%i chroma: %4.4s with scaling using %s",
+    msg_Dbg( p_filter, "%ix%i (%ix%i) chroma: %4.4s -> %ix%i (%ix%i) chroma: %4.4s with scaling using %s",
+             p_filter->fmt_in.video.i_visible_width, p_filter->fmt_in.video.i_visible_height,
              p_filter->fmt_in.video.i_width, p_filter->fmt_in.video.i_height,
              (char *)&p_filter->fmt_in.video.i_chroma,
+             p_filter->fmt_out.video.i_visible_width, p_filter->fmt_out.video.i_visible_height,
              p_filter->fmt_out.video.i_width, p_filter->fmt_out.video.i_height,
              (char *)&p_filter->fmt_out.video.i_chroma,
              ppsz_mode_descriptions[i_sws_mode] );
@@ -326,8 +328,8 @@ static int GetParameters( ScalerConfiguration *p_cfg,
         p_cfg->b_has_a = b_has_ai && b_has_ao;
         p_cfg->b_add_a = (!b_has_ai) && b_has_ao;
         p_cfg->b_copy = i_fmti == i_fmto &&
-                        p_fmti->i_width == p_fmto->i_width &&
-                        p_fmti->i_height == p_fmto->i_height;
+                        p_fmti->i_visible_width == p_fmto->i_visible_width &&
+                        p_fmti->i_visible_height == p_fmto->i_visible_height;
         p_cfg->b_swap_uvi = b_swap_uvi;
         p_cfg->b_swap_uvo = b_swap_uvo;
         p_cfg->i_sws_flags = i_sws_flags;
@@ -360,27 +362,30 @@ static int Init( filter_t *p_filter )
         msg_Err( p_filter, "format not supported" );
         return VLC_EGENERIC;
     }
-    if( p_fmti->i_width <= 0 || p_fmto->i_width <= 0 )
+    if( p_fmti->i_visible_width <= 0 || p_fmti->i_visible_height <= 0 ||
+        p_fmto->i_visible_width <= 0 || p_fmto->i_visible_height <= 0 )
     {
-        msg_Err( p_filter, "0 width not supported" );
+        msg_Err( p_filter, "invalid scaling: %ix%i -> %ix%i",
+                 p_fmti->i_visible_width, p_fmti->i_visible_height,
+                 p_fmto->i_visible_width, p_fmto->i_visible_height);
         return VLC_EGENERIC;
     }
 
     /* swscale does not like too small width */
     p_sys->i_extend_factor = 1;
-    while( __MIN( p_fmti->i_width, p_fmto->i_width ) * p_sys->i_extend_factor < MINIMUM_WIDTH)
+    while( __MIN( p_fmti->i_visible_width, p_fmto->i_visible_width ) * p_sys->i_extend_factor < MINIMUM_WIDTH)
         p_sys->i_extend_factor++;
 
-    const unsigned i_fmti_width = p_fmti->i_width * p_sys->i_extend_factor;
-    const unsigned i_fmto_width = p_fmto->i_width * p_sys->i_extend_factor;
+    const unsigned i_fmti_visible_width = p_fmti->i_visible_width * p_sys->i_extend_factor;
+    const unsigned i_fmto_visible_width = p_fmto->i_visible_width * p_sys->i_extend_factor;
     for( int n = 0; n < (cfg.b_has_a ? 2 : 1); n++ )
     {
         const int i_fmti = n == 0 ? cfg.i_fmti : PIX_FMT_GRAY8;
         const int i_fmto = n == 0 ? cfg.i_fmto : PIX_FMT_GRAY8;
         struct SwsContext *ctx;
 
-        ctx = sws_getContext( i_fmti_width, p_fmti->i_height, i_fmti,
-                              i_fmto_width, p_fmto->i_height, i_fmto,
+        ctx = sws_getContext( i_fmti_visible_width, p_fmti->i_visible_height, i_fmti,
+                              i_fmto_visible_width, p_fmto->i_visible_height, i_fmto,
                               cfg.i_sws_flags | p_sys->i_cpu_mask,
                               p_sys->p_src_filter, p_sys->p_dst_filter, 0 );
         if( n == 0 )
@@ -390,13 +395,13 @@ static int Init( filter_t *p_filter )
     }
     if( p_sys->ctxA )
     {
-        p_sys->p_src_a = picture_New( VLC_CODEC_GREY, i_fmti_width, p_fmti->i_height, 0, 1 );
-        p_sys->p_dst_a = picture_New( VLC_CODEC_GREY, i_fmto_width, p_fmto->i_height, 0, 1 );
+        p_sys->p_src_a = picture_New( VLC_CODEC_GREY, i_fmti_visible_width, p_fmti->i_visible_height, 0, 1 );
+        p_sys->p_dst_a = picture_New( VLC_CODEC_GREY, i_fmto_visible_width, p_fmto->i_visible_height, 0, 1 );
     }
     if( p_sys->i_extend_factor != 1 )
     {
-        p_sys->p_src_e = picture_New( p_fmti->i_chroma, i_fmti_width, p_fmti->i_height, 0, 1 );
-        p_sys->p_dst_e = picture_New( p_fmto->i_chroma, i_fmto_width, p_fmto->i_height, 0, 1 );
+        p_sys->p_src_e = picture_New( p_fmti->i_chroma, i_fmti_visible_width, p_fmti->i_visible_height, 0, 1 );
+        p_sys->p_dst_e = picture_New( p_fmto->i_chroma, i_fmto_visible_width, p_fmto->i_visible_height, 0, 1 );
 
         if( p_sys->p_src_e )
             memset( p_sys->p_src_e->p[0].p_pixels, 0, p_sys->p_src_e->p[0].i_pitch * p_sys->p_src_e->p[0].i_lines );
@@ -420,11 +425,10 @@ static int Init( filter_t *p_filter )
     p_sys->b_swap_uvi = cfg.b_swap_uvi;
     p_sys->b_swap_uvo = cfg.b_swap_uvo;
 
-    video_format_ScaleCropAr( p_fmto, p_fmti );
 #if 0
-    msg_Dbg( p_filter, "%ix%i chroma: %4.4s -> %ix%i chroma: %4.4s extend by %d",
-             p_fmti->i_width, p_fmti->i_height, (char *)&p_fmti->i_chroma,
-             p_fmto->i_width, p_fmto->i_height, (char *)&p_fmto->i_chroma,
+    msg_Dbg( p_filter, "%ix%i (%ix%i) chroma: %4.4s -> %ix%i (%ix%i) chroma: %4.4s extend by %d",
+             p_fmti->i_visible_width, p_fmti->i_visible_height, p_fmti->i_width, p_fmti->i_height, (char *)&p_fmti->i_chroma,
+             p_fmto->i_visible_width, p_fmto->i_visible_height, p_fmto->i_width, p_fmto->i_height, (char *)&p_fmto->i_chroma,
              p_sys->i_extend_factor );
 #endif
     return VLC_SUCCESS;
@@ -605,23 +609,23 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     else if( p_sys->b_copy )
         SwapUV( p_dst, p_src );
     else
-        Convert( p_filter, p_sys->ctx, p_dst, p_src, p_fmti->i_height, 0, 3,
+        Convert( p_filter, p_sys->ctx, p_dst, p_src, p_fmti->i_visible_height, 0, 3,
                  p_sys->b_swap_uvi, p_sys->b_swap_uvo );
     if( p_sys->ctxA )
     {
         /* We extract the A plane to rescale it, and then we reinject it. */
         if( p_fmti->i_chroma == VLC_CODEC_RGBA )
-            ExtractA( p_sys->p_src_a, p_src, p_fmti->i_width * p_sys->i_extend_factor, p_fmti->i_height, OFFSET_A );
+            ExtractA( p_sys->p_src_a, p_src, p_fmti->i_visible_width * p_sys->i_extend_factor, p_fmti->i_visible_height, OFFSET_A );
         else if( p_fmti->i_chroma == VLC_CODEC_ARGB )
-            ExtractA( p_sys->p_src_a, p_src, p_fmti->i_width * p_sys->i_extend_factor, p_fmti->i_height, 0 );
+            ExtractA( p_sys->p_src_a, p_src, p_fmti->i_visible_width * p_sys->i_extend_factor, p_fmti->i_visible_height, 0 );
         else
             plane_CopyPixels( p_sys->p_src_a->p, p_src->p+A_PLANE );
 
-        Convert( p_filter, p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a, p_fmti->i_height, 0, 1, false, false );
+        Convert( p_filter, p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a, p_fmti->i_visible_height, 0, 1, false, false );
         if( p_fmto->i_chroma == VLC_CODEC_RGBA )
-            InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_width * p_sys->i_extend_factor, p_fmto->i_height, OFFSET_A );
+            InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_visible_width * p_sys->i_extend_factor, p_fmto->i_visible_height, OFFSET_A );
         else if( p_fmto->i_chroma == VLC_CODEC_ARGB )
-            InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_width * p_sys->i_extend_factor, p_fmto->i_height, 0 );
+            InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_visible_width * p_sys->i_extend_factor, p_fmto->i_visible_height, 0 );
         else
             plane_CopyPixels( p_dst->p+A_PLANE, p_sys->p_dst_a->p );
     }
