@@ -1197,7 +1197,6 @@ static int Demux( demux_t *p_demux )
     TaskToken      task;
 
     bool            b_send_pcr = true;
-    int64_t         i_pcr = 0;
     int             i;
 
     /* Check if we need to send the server a Keep-A-Live signal */
@@ -1252,16 +1251,6 @@ static int Demux( demux_t *p_demux )
 
         if( tk->b_asf || tk->b_muxed )
             b_send_pcr = false;
-#if 0
-        if( i_pcr == 0 )
-        {
-            i_pcr = tk->i_pts;
-        }
-        else if( tk->i_pts != 0 && i_pcr > tk->i_pts )
-        {
-            i_pcr = tk->i_pts ;
-        }
-#endif
     }
     if( p_sys->i_pcr > 0 )
     {
@@ -1308,7 +1297,6 @@ static int Demux( demux_t *p_demux )
             tk->f_npt = 0.;
             p_sys->i_pcr = 0;
             p_sys->f_npt = 0.;
-            i_pcr = 0;
         }
     }
 
