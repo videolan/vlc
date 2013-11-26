@@ -314,6 +314,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         return VLC_SUCCESS;
 
     case DEMUX_SET_TIME:
+        if ( p_sys->p_fp &&
+             ! ( p_sys->p_fp->i_flags & ASF_FILE_PROPERTIES_SEEKABLE ) )
+            return VLC_EGENERIC;
+
         SeekPrepare( p_demux );
 
         if( p_sys->b_index && p_sys->i_length > 0 )
@@ -342,6 +346,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                        i_query, args );
 
     case DEMUX_SET_POSITION:
+        if ( p_sys->p_fp &&
+             ! ( p_sys->p_fp->i_flags & ASF_FILE_PROPERTIES_SEEKABLE ) )
+            return VLC_EGENERIC;
+
         SeekPrepare( p_demux );
 
         if( p_sys->b_index && p_sys->i_length > 0 )
@@ -360,6 +368,16 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
         vlc_meta_Merge( p_meta, p_sys->meta );
         return VLC_SUCCESS;
+
+    case DEMUX_CAN_SEEK:
+        if ( p_sys->p_fp &&
+             ! ( p_sys->p_fp->i_flags & ASF_FILE_PROPERTIES_SEEKABLE ) )
+        {
+            bool *pb_bool = (bool*)va_arg( args, bool * );
+            *pb_bool = false;
+            return VLC_SUCCESS;
+        }
+        // ft
 
     default:
         return demux_vaControlHelper( p_demux->s, p_sys->i_data_begin,
