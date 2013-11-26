@@ -103,9 +103,6 @@ struct aout_sys_t
     bool                        b_revert;           /* Whether we need to revert the stream format */
     bool                        b_changed_mixing;   /* Whether we need to set the mixing mode back */
 
-
-    bool                        b_got_first_sample; /* did the aout core provide something to render? */
-
     int                         i_rate;             /* media sample rate */
     int                         i_bytes_per_sample;
 
@@ -828,7 +825,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     TPCircularBufferInit(&p_sys->circular_buffer, AUDIO_BUFFER_SIZE_IN_SECONDS *
                          fmt->i_rate * fmt->i_bytes_per_frame);
 
-    p_sys->b_got_first_sample = false;
+    verify_noerr(AudioOutputUnitStart(p_sys->au_unit));
 
     /* Set volume for output unit */
     VolumeSet(p_aout, p_sys->f_volume);
@@ -1345,12 +1342,6 @@ static void Play(audio_output_t * p_aout, block_t * p_block)
     struct aout_sys_t *p_sys = p_aout->sys;
 
     if (p_block->i_nb_samples > 0) {
-        if (!p_sys->b_got_first_sample) {
-            /* Start the AU */
-            verify_noerr(AudioOutputUnitStart(p_sys->au_unit));
-            p_sys->b_got_first_sample = true;
-        }
-
         /* Do the channel reordering */
         if (p_sys->chans_to_reorder && !p_sys->b_digital) {
            aout_ChannelReorder(p_block->p_buffer,
@@ -1404,10 +1395,7 @@ static void Flush(audio_output_t *p_aout, bool wait)
         vlc_mutex_unlock(&p_sys->lock);
 
     } else {
-        p_sys->b_got_first_sample = false;
-
         /* flush circular buffer */
-        AudioOutputUnitStop(p_aout->sys->au_unit);
         TPCircularBufferClear(&p_aout->sys->circular_buffer);
     }
 }
