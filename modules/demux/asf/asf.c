@@ -1162,6 +1162,7 @@ static int DemuxInit( demux_t *p_demux )
     { /* local file */
         p_sys->i_data_end = p_sys->p_root->p_data->i_object_pos +
                                     p_sys->p_root->p_data->i_object_size;
+        p_sys->i_data_end = __MIN( stream_Size( p_demux->s ), p_sys->i_data_end );
     }
     else
     { /* live/broacast */
