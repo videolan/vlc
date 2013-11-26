@@ -368,6 +368,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_YAMAHA_ADPCM, VLC_CODEC_ADPCM_YAMAHA,         "Yamaha ADPCM" },
     { WAVE_FORMAT_TRUESPEECH, VLC_CODEC_TRUESPEECH,             "Truespeech" },
     { WAVE_FORMAT_GSM610,     VLC_CODEC_GSM_MS,                 "Microsoft WAV GSM" },
+    { WAVE_FORMAT_MSNAUDIO,   VLC_CODEC_GSM_MS,                 "Microsoft MSN Audio" },
     { WAVE_FORMAT_G726,       VLC_CODEC_ADPCM_G726,             "G.726 ADPCM" },
     { WAVE_FORMAT_G726_ADPCM, VLC_CODEC_ADPCM_G726,             "G.726 ADPCM" },
     { WAVE_FORMAT_G723_1,     VLC_CODEC_G723_1,                 "G.723.1" },
