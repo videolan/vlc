@@ -330,14 +330,14 @@ static void SeekPrepare( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    p_sys->i_time = -1;
+    p_sys->i_time = VLC_TS_INVALID;
     for( int i = 0; i < 128 ; i++ )
     {
         asf_track_t *tk = p_sys->track[i];
         if( !tk )
             continue;
 
-        tk->i_time = 1;
+        tk->i_time = VLC_TS_INVALID;
         if( tk->p_frame )
             block_ChainRelease( tk->p_frame );
         tk->p_frame = NULL;
