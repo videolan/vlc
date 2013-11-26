@@ -781,7 +781,7 @@ static void ASF_fillup_es_priorities_ex( demux_sys_t *p_sys, void *p_hdr,
             ASF_FindObject( p_hdr, &asf_object_advanced_mutual_exclusion, 0 );
     if (! p_mutex ) return;
 
-    p_prios->pi_stream_numbers = malloc( p_sys->i_track * sizeof( asf_es_priorities_t ) );
+    p_prios->pi_stream_numbers = malloc( p_sys->i_track * sizeof( int16_t ) );
     if ( !p_prios->pi_stream_numbers ) return;
 
     if ( p_mutex->i_stream_number_count )
@@ -805,7 +805,7 @@ static void ASF_fillup_es_bitrate_priorities_ex( demux_sys_t *p_sys, void *p_hdr
             ASF_FindObject( p_hdr, &asf_object_bitrate_mutual_exclusion_guid, 0 );
     if (! p_bitrate_mutex ) return;
 
-    p_prios->pi_stream_numbers = malloc( p_sys->i_track * sizeof( asf_es_priorities_t ) );
+    p_prios->pi_stream_numbers = malloc( p_sys->i_track * sizeof( int16_t ) );
     if ( !p_prios->pi_stream_numbers ) return;
 
     if ( p_bitrate_mutex->i_stream_number_count )
