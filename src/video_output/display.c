@@ -1292,13 +1292,8 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     }
     owner.sys = osys;
 
-    /* */
+    /* keep a reference to the source before display */
     video_format_t source = *source_org;
-
-    source.i_x_offset = 0;
-    source.i_y_offset = 0;
-    source.i_visible_width  = source.i_width;
-    source.i_visible_height = source.i_height;
 
     vout_display_t *p_display = vout_display_New(VLC_OBJECT(vout),
                                                  module, !is_wrapper,
