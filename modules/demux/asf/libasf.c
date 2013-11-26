@@ -1661,7 +1661,7 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
         }
 
         /* Set a limit to avoid junk when possible */
-        if ( !guidcmp( &p_obj->common.i_object_id, &asf_object_file_properties_guid ) )
+        if ( guidcmp( &p_obj->common.i_object_id, &asf_object_file_properties_guid ) )
         {
             i_boundary = p_obj->file_properties.i_file_size;
         }
