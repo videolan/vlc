@@ -1550,6 +1550,9 @@ static const struct
     { &asf_object_content_encryption_guid, "Content Encryption"},
     { &asf_object_advanced_content_encryption_guid, "Advanced Content Encryption"},
     { &asf_object_extended_content_encryption_guid, "Entended Content Encryption"},
+    /* Non Readable from this point */
+    { &nonasf_object_index_placeholder_guid, "Index Placeholder"},
+    { &nonasf_object_compatibility, "Object Compatibility"},
 
     { NULL, "Unknown" },
 };
