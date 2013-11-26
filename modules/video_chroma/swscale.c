@@ -247,12 +247,6 @@ static int GetSwsCpuMask(void)
 
     return i_sws_cpu;
 }
-static bool IsFmtSimilar( const video_format_t *p_fmt1, const video_format_t *p_fmt2 )
-{
-    return p_fmt1->i_chroma == p_fmt2->i_chroma &&
-           p_fmt1->i_width  == p_fmt2->i_width &&
-           p_fmt1->i_height == p_fmt2->i_height;
-}
 
 static void FixParameters( int *pi_fmt, bool *pb_has_a, bool *pb_swap_uv, vlc_fourcc_t fmt )
 {
@@ -351,8 +345,8 @@ static int Init( filter_t *p_filter )
     const video_format_t *p_fmti = &p_filter->fmt_in.video;
     video_format_t       *p_fmto = &p_filter->fmt_out.video;
 
-    if( IsFmtSimilar( p_fmti, &p_sys->fmt_in ) &&
-        IsFmtSimilar( p_fmto, &p_sys->fmt_out ) &&
+    if( video_format_IsSimilar( p_fmti, &p_sys->fmt_in ) &&
+        video_format_IsSimilar( p_fmto, &p_sys->fmt_out ) &&
         p_sys->ctx )
     {
         return VLC_SUCCESS;
