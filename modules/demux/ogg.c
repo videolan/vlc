@@ -1680,7 +1680,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                             p_stream->fmt.i_extra = i_extra_size;
                             p_stream->fmt.p_extra = malloc( p_stream->fmt.i_extra );
                             if( p_stream->fmt.p_extra )
-                                memcpy( p_stream->fmt.p_extra, st + 1,
+                                memcpy( p_stream->fmt.p_extra, oggpacket.packet + 57,
                                         p_stream->fmt.i_extra );
                             else
                                 p_stream->fmt.i_extra = 0;
