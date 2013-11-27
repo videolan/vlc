@@ -60,7 +60,6 @@ static void       DeleteDecoder( decoder_t * );
 
 static void      *DecoderThread( void * );
 static void       DecoderProcess( decoder_t *, block_t * );
-static void       DecoderError( decoder_t *p_dec, block_t *p_block );
 static void       DecoderOutputChangePause( decoder_t *, bool b_paused, mtime_t i_date );
 static void       DecoderFlush( decoder_t * );
 static void       DecoderSignalBuffering( decoder_t *, bool );
@@ -943,10 +942,7 @@ static void *DecoderThread( void *p_data )
                 p_block = NULL;
             }
 
-            if( p_dec->b_error )
-                DecoderError( p_dec, p_block );
-            else
-                DecoderProcess( p_dec, p_block );
+            DecoderProcess( p_dec, p_block );
 
             vlc_restorecancel( canc );
         }
@@ -1993,6 +1989,13 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
     decoder_owner_sys_t *p_owner = (decoder_owner_sys_t *)p_dec->p_owner;
     const bool b_flush_request = p_block && (p_block->i_flags & BLOCK_FLAG_CORE_FLUSH);
 
+    if( p_dec->b_error )
+    {
+        if( p_block )
+            block_Release( p_block );
+        goto flush;
+    }
+
     if( p_block && p_block->i_buffer <= 0 )
     {
         assert( !b_flush_request );
@@ -2043,22 +2046,10 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
     }
 
     /* */
+flush:
     if( b_flush_request )
         DecoderProcessOnFlush( p_dec );
 }
-
-static void DecoderError( decoder_t *p_dec, block_t *p_block )
-{
-    const bool b_flush_request = p_block && (p_block->i_flags & BLOCK_FLAG_CORE_FLUSH);
-
-    /* */
-    if( p_block )
-        block_Release( p_block );
-
-    if( b_flush_request )
-        DecoderProcessOnFlush( p_dec );
-}
-
 
 /**
  * Destroys a decoder object
