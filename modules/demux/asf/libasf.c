@@ -319,8 +319,8 @@ static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
     p_fp->i_send_duration = GetQWLE( p_peek + 72 );
     p_fp->i_preroll = GetQWLE( p_peek + 80 );
     p_fp->i_flags = GetDWLE( p_peek + 88 );
-    p_fp->i_min_data_packet_size = GetDWLE( p_peek + 92 );
-    p_fp->i_max_data_packet_size = GetDWLE( p_peek + 96 );
+    p_fp->i_min_data_packet_size = __MAX( GetDWLE( p_peek + 92 ), (uint32_t) 1 );
+    p_fp->i_max_data_packet_size = __MAX( GetDWLE( p_peek + 96 ), (uint32_t) 1 );
     p_fp->i_max_bitrate = GetDWLE( p_peek + 100 );
 
 #ifdef ASF_DEBUG
