@@ -381,9 +381,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     default:
         return demux_vaControlHelper( p_demux->s, p_sys->i_data_begin,
-                                       p_sys->i_data_end, p_sys->i_bitrate,
-                                       p_sys->p_fp->i_min_data_packet_size,
-                                       i_query, args );
+                    p_sys->i_data_end, p_sys->i_bitrate,
+                    ( p_sys->p_fp ) ? p_sys->p_fp->i_min_data_packet_size : 1,
+                    i_query, args );
     }
 }
 
