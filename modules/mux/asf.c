@@ -975,7 +975,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
         bo_addle_u64( &bo, 0 );
         bo_addle_u64( &bo, 0 );
         bo_addle_u32( &bo, p_fmt->i_bitrate );  /* Bitrate */
-        bo_addle_u32( &bo, 0 );                 /* Buffer size */
+        bo_addle_u32( &bo, p_sys->i_preroll_time ); /* Buffer size */
         bo_addle_u32( &bo, 0 );                 /* Initial buffer fullness */
         bo_addle_u32( &bo, p_fmt->i_bitrate );  /* Alternate Bitrate */
         bo_addle_u32( &bo, 0 );                 /* Alternate Buffer size */
