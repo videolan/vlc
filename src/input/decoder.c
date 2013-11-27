@@ -1018,7 +1018,7 @@ static bool DecoderIsFlushing( decoder_t *p_dec )
     return b_flushing;
 }
 
-static void DecoderWaitUnblock( decoder_t *p_dec, bool *pb_reject )
+static bool DecoderWaitUnblock( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
@@ -1046,8 +1046,7 @@ static void DecoderWaitUnblock( decoder_t *p_dec, bool *pb_reject )
         vlc_cond_wait( &p_owner->wait_request, &p_owner->lock );
     }
 
-    if( pb_reject )
-        *pb_reject = p_owner->b_flushing;
+    return p_owner->b_flushing;
 }
 
 static void DecoderOutputChangePause( decoder_t *p_dec, bool b_paused, mtime_t i_date )
@@ -1195,9 +1194,9 @@ static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
 
     for( ;; )
     {
-        bool b_has_more = false, b_paused, b_reject;
+        bool b_has_more = false, b_paused;
 
-        DecoderWaitUnblock( p_dec, &b_reject );
+        bool b_reject = DecoderWaitUnblock( p_dec );
         if( p_owner->b_buffering )
             break;
 
@@ -1398,9 +1397,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
     {
         bool b_has_more = false;
 
-        bool b_reject;
-
-        DecoderWaitUnblock( p_dec, &b_reject );
+        bool b_reject = DecoderWaitUnblock( p_dec );
 
         if( p_owner->b_buffering && !p_owner->buffer.b_first )
         {
@@ -1575,8 +1572,7 @@ static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic )
     for( ;; )
     {
         bool b_has_more = false;
-        bool b_reject;
-        DecoderWaitUnblock( p_dec, &b_reject );
+        bool b_reject = DecoderWaitUnblock( p_dec );
 
         if( p_owner->b_buffering )
         {
@@ -1650,8 +1646,7 @@ static void DecoderPlaySout( decoder_t *p_dec, block_t *p_sout_block )
     for( ;; )
     {
         bool b_has_more = false;
-        bool b_reject;
-        DecoderWaitUnblock( p_dec, &b_reject );
+        bool b_reject = DecoderWaitUnblock( p_dec );
 
         if( p_owner->b_buffering )
         {
