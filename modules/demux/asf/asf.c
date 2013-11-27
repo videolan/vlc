@@ -99,6 +99,7 @@ struct demux_sys_t
     int64_t             i_data_end;
 
     bool                b_index;
+    bool                b_canfastseek;
     uint8_t             i_seek_track;
     unsigned int        i_wait_keyframe;
 
@@ -233,7 +234,28 @@ static void Close( vlc_object_t * p_this )
 static int SeekPercent( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    p_sys->i_wait_keyframe = p_sys->i_seek_track ? 50 : 0;
+    if ( p_sys->i_seek_track )
+    {
+        /* Skip forward at least 1 min */
+        asf_track_t *tk = p_sys->track[p_sys->i_seek_track];
+        if ( tk->p_esp && tk->p_esp->i_average_time_per_frame )
+        {
+            /* 1 min if fastseek, otherwise 5 sec */
+            /* That's a guess for bandwidth */
+            uint64_t i_maxwaittime = ( p_sys->b_canfastseek ) ? 600000000 : 50000000;
+            i_maxwaittime /= tk->p_esp->i_average_time_per_frame;
+            p_sys->i_wait_keyframe = __MIN( i_maxwaittime, UINT_MAX );
+        }
+        else
+        {
+            p_sys->i_wait_keyframe = ( p_sys->b_canfastseek ) ? 25 * 30 : 25 * 5;
+        }
+    }
+    else
+    {
+        p_sys->i_wait_keyframe = 0;
+    }
+    msg_Dbg( p_demux, "seek with percent: waiting %i frames", p_sys->i_wait_keyframe );
     return demux_vaControlHelper( p_demux->s, p_sys->i_data_begin,
                                    p_sys->i_data_end, p_sys->i_bitrate,
                                    p_sys->p_fp->i_min_data_packet_size,
@@ -592,13 +614,21 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
         goto skip;
     }
 
-    if( p_sys->i_wait_keyframe && !i_media_object_offset &&
-        (i_stream_number != p_sys->i_seek_track || !b_packet_keyframe) )
+    if( p_sys->i_wait_keyframe )
     {
-        p_sys->i_wait_keyframe--;
-        goto skip;
+        if ( i_stream_number == p_sys->i_seek_track )
+        {
+            if ( !b_packet_keyframe )
+            {
+                p_sys->i_wait_keyframe--;
+                goto skip;
+            }
+            else
+                p_sys->i_wait_keyframe = 0;
+        }
+        else
+            goto skip;
     }
-    p_sys->i_wait_keyframe = 0;
 
     if( !tk->p_es )
         goto skip;
@@ -864,9 +894,8 @@ static int DemuxInit( demux_t *p_demux )
     p_sys->meta         = NULL;
 
     /* Now load all object ( except raw data ) */
-    bool b_seekable;
-    stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_seekable );
-    if( !(p_sys->p_root = ASF_ReadObjectRoot(p_demux->s, b_seekable)) )
+    stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &p_sys->b_canfastseek );
+    if( !(p_sys->p_root = ASF_ReadObjectRoot(p_demux->s, p_sys->b_canfastseek)) )
     {
         msg_Warn( p_demux, "ASF plugin discarded (not a valid file)" );
         return VLC_EGENERIC;
