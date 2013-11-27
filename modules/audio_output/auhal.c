@@ -112,6 +112,7 @@ struct aout_sys_t
 
     float                       f_volume;
     bool                        b_mute;
+    bool                        b_paused;
 
     vlc_mutex_t                 lock;
     vlc_cond_t                  cond;
@@ -190,6 +191,7 @@ static int Open(vlc_object_t *obj)
     p_sys->b_digital = false;
     p_sys->b_ignore_streams_changed_callback = false;
     p_sys->b_selected_dev_is_default = false;
+    p_sys->b_paused = false;
 
     p_aout->sys = p_sys;
     p_aout->start = Start;
@@ -311,6 +313,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_sys->b_revert = false;
     p_sys->b_changed_mixing = false;
     p_sys->i_bytes_per_sample = 0;
+    p_sys->b_paused = false;
 
     vlc_mutex_lock(&p_sys->var_lock);
     p_sys->i_selected_dev = p_sys->i_new_selected_dev;
@@ -1367,17 +1370,9 @@ static void Pause(audio_output_t *p_aout, bool pause, mtime_t date)
     struct aout_sys_t * p_sys = p_aout->sys;
     VLC_UNUSED(date);
 
-    if (p_aout->sys->b_digital) {
-        if (pause)
-            AudioDeviceStop(p_sys->i_selected_dev, p_sys->i_procID);
-        else
-            AudioDeviceStart(p_sys->i_selected_dev, p_sys->i_procID);
-    } else {
-        if (pause)
-            AudioOutputUnitStop(p_sys->au_unit);
-        else
-            AudioOutputUnitStart(p_sys->au_unit);
-    }
+    vlc_mutex_lock(&p_sys->lock);
+    p_sys->b_paused = pause;
+    vlc_mutex_unlock(&p_sys->lock);
 }
 
 static void Flush(audio_output_t *p_aout, bool wait)
@@ -1444,7 +1439,7 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
     Float32 *buffer = TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
 
     /* check if we have enough data */
-    if (!availableBytes) {
+    if (!availableBytes || p_sys->b_paused) {
         /* return an empty buffer so silence is played until we have data */
         memset(targetBuffer, 0, ioData->mBuffers[0].mDataByteSize);
     } else {
@@ -1490,7 +1485,7 @@ static OSStatus RenderCallbackSPDIF(AudioDeviceID inDevice,
     char *buffer = TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
 
     /* check if we have enough data */
-    if (!availableBytes) {
+    if (!availableBytes || p_sys->b_paused) {
         /* return an empty buffer so silence is played until we have data */
         memset(targetBuffer, 0, outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize);
     } else {
