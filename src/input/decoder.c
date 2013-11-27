@@ -2116,9 +2116,7 @@ static void DeleteDecoder( decoder_t * p_dec )
 
     if( p_dec->fmt_out.i_cat == SPU_ES )
     {
-        vout_thread_t *p_vout;
-
-        p_vout = input_resource_HoldVout( p_owner->p_resource );
+        vout_thread_t *p_vout = input_resource_HoldVout( p_owner->p_resource );
         if( p_vout )
         {
             if( p_owner->p_spu_vout == p_vout )
@@ -2520,4 +2518,3 @@ static void spu_del_buffer( decoder_t *p_dec, subpicture_t *p_subpic )
 
     vlc_object_release( p_vout );
 }
-
