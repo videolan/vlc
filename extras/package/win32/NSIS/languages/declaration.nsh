@@ -47,6 +47,11 @@ Var Action_OnArrivalDVDAudio
 
 Var License_NextText
 
+Var Detail_CheckProcesses
+Var MessageBox_VLCRunning
+Var MessageBox_VLCUnableToClose
+Var MessageBox_InstallAborted
+
 Var Reinstall_Headline
 Var Reinstall_HeadlineInstall
 Var Reinstall_HeadlineMaintenance

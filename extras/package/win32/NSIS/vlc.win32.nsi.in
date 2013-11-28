@@ -60,6 +60,7 @@ RequestExecutionLevel user
 !addincludedir NSIS
 !addplugindir NSIS
 !include UAC.nsh
+!include nsProcess.nsh
 !include WinVer.nsh
 !include FileFunc.nsh
 !include MUI2.nsh
@@ -166,6 +167,9 @@ ${MementoSection} $Name_Section01 SEC01
   SectionIn 1 2 3 RO
   SetShellVarContext all
   SetOutPath "$INSTDIR"
+
+  DetailPrint $Detail_CheckProcesses
+  Call CheckRunningProcesses
 
   !insertmacro OpenUninstallLog
 

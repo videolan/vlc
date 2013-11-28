@@ -59,6 +59,11 @@ StrCpy $Action_OnArrivalDVDAudio "Play audio DVD"
 
 StrCpy $License_NextText "You are now aware of your rights. Click Next to continue."
 
+StrCpy $Detail_CheckProcesses "Checking processes..."
+StrCpy $MessageBox_VLCRunning "VLC appears to be running and will now be closed."
+StrCpy $MessageBox_VLCUnableToClose "This installer was unable to close VLC, please do it manually."
+StrCpy $MessageBox_InstallAborted "Installation aborted!"
+
 StrCpy $Reinstall_Headline "Already Installed"
 StrCpy $Reinstall_HeadlineInstall "Choose how you want to install VLC."
 StrCpy $Reinstall_HeadlineMaintenance "Choose the maintenance option to perform."

@@ -240,3 +240,30 @@ Function un.RemoveEmptyDirs
   FindClose $0
   !undef Index
 FunctionEnd
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Check if VLC is running and kill it if necessary ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+Function CheckRunningProcesses
+    ${nsProcess::FindProcess} "vlc.exe" $R0
+    StrCmp $R0 0 0 end
+    IfSilent +3
+    BringToFront
+    MessageBox MB_OKCANCEL|MB_ICONQUESTION $MessageBox_VLCRunning IDCANCEL stop
+
+    ${nsProcess::CloseProcess} "vlc.exe" $R0
+    IfSilent end
+    StrCmp $R0 0 end 0      ; Success
+    StrCmp $R0 603 end 0    ; Not running
+    MessageBox MB_OK|MB_ICONEXCLAMATION $MessageBox_VLCUnableToClose
+    goto end
+
+    stop:
+    ${nsProcess::Unload}
+    MessageBox MB_OK|MB_ICONEXCLAMATION $MessageBox_InstallAborted
+    Quit
+
+    end:
+    ${nsProcess::Unload}
+FunctionEnd
