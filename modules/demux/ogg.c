@@ -2183,7 +2183,8 @@ static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
     bs_read( &bitstream, 8 ); /* y offset */
 
     i_fps_numerator = bs_read( &bitstream, 32 );
-    i_fps_denominator = __MAX( bs_read( &bitstream, 32 ), (uint32_t) 1 );
+    i_fps_denominator = bs_read( &bitstream, 32 );
+    i_fps_denominator = __MAX( i_fps_denominator, 1 );
     bs_read( &bitstream, 24 ); /* aspect_numerator */
     bs_read( &bitstream, 24 ); /* aspect_denominator */
 
