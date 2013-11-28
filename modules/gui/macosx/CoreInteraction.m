@@ -557,7 +557,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 }
 
 #pragma mark -
-#pragma mark drag and drop support for VLCVoutView, VLBrushedMetalImageView and VLCThreePartDropView
+#pragma mark drag and drop support for VLCVoutView, VLCDragDropView and VLCThreePartDropView
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
     NSPasteboard *o_paste = [sender draggingPasteboard];

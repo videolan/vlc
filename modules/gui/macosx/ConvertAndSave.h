@@ -171,18 +171,3 @@
 - (void)updateDropView;
 
 @end
-
-@interface VLCDropEnabledBox : NSBox
-{
-    BOOL b_activeDragAndDrop;
-}
-
-@end
-
-@interface VLCDropEnabledImageView : NSImageView
-
-@end
-
-@interface VLCDropEnabledButton : NSButton
-
-@end

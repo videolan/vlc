@@ -70,12 +70,32 @@
 - (void)setNonFullscreenPresentationOptions;
 @end
 
-
 /*****************************************************************************
- * VLBrushedMetalImageView
+ * VLCDragDropView
+ *
+ * Disables default drag / drop behaviour of an NSImageView.
+ * set it for all sub image views withing an VLCDragDropView.
  *****************************************************************************/
 
-@interface VLBrushedMetalImageView : NSImageView
+
+@interface VLCDropDisabledImageView : NSImageView
+
+@end
+
+/*****************************************************************************
+ * VLCDragDropView
+ *****************************************************************************/
+
+@interface VLCDragDropView : NSView
+{
+    bool b_activeDragAndDrop;
+
+    id _dropHandler;
+}
+
+@property (nonatomic, assign) id dropHandler;
+
+- (void)enablePlaylistItems;
 
 @end
 

@@ -12,8 +12,10 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="132"/>
       <integer value="387"/>
+      <integer value="3"/>
+      <integer value="132"/>
+      <integer value="25"/>
       <integer value="309"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
@@ -47,7 +49,7 @@
         <string key="NSWindowContentMaxSize">{663, 490}</string>
         <string key="NSWindowContentMinSize">{663, 490}</string>
         <object class="NSView" key="NSWindowView" id="1006">
-          <nil key="NSNextResponder"/>
+          <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -61,103 +63,114 @@
                   <int key="NSvFlags">274</int>
                   <object class="NSMutableArray" key="NSSubviews">
                     <bool key="EncodedWithXMLCoder">YES</bool>
-                    <object class="NSImageView" id="57114548">
+                    <object class="NSCustomView" id="595691694">
                       <reference key="NSNextResponder" ref="370005935"/>
-                      <int key="NSvFlags">268</int>
-                      <object class="NSMutableSet" key="NSDragTypes">
+                      <int key="NSvFlags">274</int>
+                      <object class="NSMutableArray" key="NSSubviews">
                         <bool key="EncodedWithXMLCoder">YES</bool>
-                        <object class="NSArray" key="set.sortedObjects">
-                          <bool key="EncodedWithXMLCoder">YES</bool>
-                          <string>Apple PDF pasteboard type</string>
-                          <string>Apple PICT pasteboard type</string>
-                          <string>Apple PNG pasteboard type</string>
-                          <string>NSFilenamesPboardType</string>
-                          <string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
-                          <string>NeXT TIFF v4.0 pasteboard type</string>
-                        </object>
-                      </object>
-                      <string key="NSFrame">{{256, 63}, {112, 112}}</string>
-                      <reference key="NSSuperview" ref="370005935"/>
-                      <string key="NSReuseIdentifierKey">_NS:2165</string>
-                      <bool key="NSEnabled">YES</bool>
-                      <object class="NSImageCell" key="NSCell" id="624480290">
-                        <int key="NSCellFlags">0</int>
-                        <int key="NSCellFlags2">33554432</int>
-                        <object class="NSCustomResource" key="NSContents">
-                          <string key="NSClassName">NSImage</string>
-                          <string key="NSResourceName">dropzone</string>
-                        </object>
-                        <string key="NSCellIdentifier">_NS:2165</string>
-                        <int key="NSAlign">0</int>
-                        <int key="NSScale">0</int>
-                        <int key="NSStyle">0</int>
-                        <bool key="NSAnimates">NO</bool>
-                      </object>
-                      <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
-                      <bool key="NSEditable">YES</bool>
-                    </object>
-                    <object class="NSTextField" id="807070215">
-                      <reference key="NSNextResponder" ref="370005935"/>
-                      <int key="NSvFlags">303</int>
-                      <string key="NSFrame">{{15, 181}, {597, 22}}</string>
-                      <reference key="NSSuperview" ref="370005935"/>
-                      <bool key="NSEnabled">YES</bool>
-                      <object class="NSTextFieldCell" key="NSCell" id="425578110">
-                        <int key="NSCellFlags">68157504</int>
-                        <int key="NSCellFlags2">4195328</int>
-                        <string key="NSContents">Drop Media here</string>
-                        <object class="NSFont" key="NSSupport" id="439159890">
-                          <string key="NSName">LucidaGrande</string>
-                          <double key="NSSize">18</double>
-                          <int key="NSfFlags">16</int>
-                        </object>
-                        <reference key="NSControlView" ref="807070215"/>
-                        <object class="NSColor" key="NSBackgroundColor" id="382902660">
-                          <int key="NSColorSpace">6</int>
-                          <string key="NSCatalogName">System</string>
-                          <string key="NSColorName">controlColor</string>
-                          <object class="NSColor" key="NSColor">
-                            <int key="NSColorSpace">3</int>
-                            <bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
+                        <object class="NSButton" id="775178384">
+                          <reference key="NSNextResponder" ref="595691694"/>
+                          <int key="NSvFlags">301</int>
+                          <string key="NSFrame">{{231.13671875, 15.53515625}, {153, 32}}</string>
+                          <reference key="NSSuperview" ref="595691694"/>
+                          <bool key="NSEnabled">YES</bool>
+                          <object class="NSButtonCell" key="NSCell" id="963202121">
+                            <int key="NSCellFlags">67108864</int>
+                            <int key="NSCellFlags2">134217728</int>
+                            <string key="NSContents">Open media...</string>
+                            <object class="NSFont" key="NSSupport" id="1024428774">
+                              <string key="NSName">LucidaGrande</string>
+                              <double key="NSSize">13</double>
+                              <int key="NSfFlags">1040</int>
+                            </object>
+                            <reference key="NSControlView" ref="775178384"/>
+                            <int key="NSButtonFlags">-2038284288</int>
+                            <int key="NSButtonFlags2">129</int>
+                            <reference key="NSAlternateImage" ref="1024428774"/>
+                            <string key="NSAlternateContents"/>
+                            <string key="NSKeyEquivalent"/>
+                            <int key="NSPeriodicDelay">200</int>
+                            <int key="NSPeriodicInterval">25</int>
                           </object>
+                          <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
                         </object>
-                        <object class="NSColor" key="NSTextColor" id="954313256">
-                          <int key="NSColorSpace">6</int>
-                          <string key="NSCatalogName">System</string>
-                          <string key="NSColorName">headerColor</string>
-                          <object class="NSColor" key="NSColor" id="1031268248">
-                            <int key="NSColorSpace">3</int>
-                            <bytes key="NSWhite">MQA</bytes>
+                        <object class="NSTextField" id="807070215">
+                          <reference key="NSNextResponder" ref="595691694"/>
+                          <int key="NSvFlags">303</int>
+                          <string key="NSFrame">{{10.13671875, 176.53515625}, {597, 22}}</string>
+                          <reference key="NSSuperview" ref="595691694"/>
+                          <bool key="NSEnabled">YES</bool>
+                          <object class="NSTextFieldCell" key="NSCell" id="425578110">
+                            <int key="NSCellFlags">68157504</int>
+                            <int key="NSCellFlags2">4195328</int>
+                            <string key="NSContents">Drop Media here</string>
+                            <object class="NSFont" key="NSSupport" id="439159890">
+                              <string key="NSName">LucidaGrande</string>
+                              <double key="NSSize">18</double>
+                              <int key="NSfFlags">16</int>
+                            </object>
+                            <reference key="NSControlView" ref="807070215"/>
+                            <object class="NSColor" key="NSBackgroundColor" id="382902660">
+                              <int key="NSColorSpace">6</int>
+                              <string key="NSCatalogName">System</string>
+                              <string key="NSColorName">controlColor</string>
+                              <object class="NSColor" key="NSColor">
+                                <int key="NSColorSpace">3</int>
+                                <bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
+                              </object>
+                            </object>
+                            <object class="NSColor" key="NSTextColor" id="954313256">
+                              <int key="NSColorSpace">6</int>
+                              <string key="NSCatalogName">System</string>
+                              <string key="NSColorName">headerColor</string>
+                              <object class="NSColor" key="NSColor" id="1031268248">
+                                <int key="NSColorSpace">3</int>
+                                <bytes key="NSWhite">MQA</bytes>
+                              </object>
+                            </object>
                           </object>
+                          <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                        </object>
+                        <object class="NSImageView" id="57114548">
+                          <reference key="NSNextResponder" ref="595691694"/>
+                          <int key="NSvFlags">268</int>
+                          <object class="NSMutableSet" key="NSDragTypes">
+                            <bool key="EncodedWithXMLCoder">YES</bool>
+                            <object class="NSArray" key="set.sortedObjects">
+                              <bool key="EncodedWithXMLCoder">YES</bool>
+                              <string>Apple PDF pasteboard type</string>
+                              <string>Apple PICT pasteboard type</string>
+                              <string>Apple PNG pasteboard type</string>
+                              <string>NSFilenamesPboardType</string>
+                              <string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
+                              <string>NeXT TIFF v4.0 pasteboard type</string>
+                            </object>
+                          </object>
+                          <string key="NSFrame">{{251.13671875, 58.53515625}, {112, 112}}</string>
+                          <reference key="NSSuperview" ref="595691694"/>
+                          <string key="NSReuseIdentifierKey">_NS:2165</string>
+                          <bool key="NSEnabled">YES</bool>
+                          <object class="NSImageCell" key="NSCell" id="624480290">
+                            <int key="NSCellFlags">0</int>
+                            <int key="NSCellFlags2">33554432</int>
+                            <object class="NSCustomResource" key="NSContents">
+                              <string key="NSClassName">NSImage</string>
+                              <string key="NSResourceName">dropzone</string>
+                            </object>
+                            <string key="NSCellIdentifier">_NS:2165</string>
+                            <int key="NSAlign">0</int>
+                            <int key="NSScale">0</int>
+                            <int key="NSStyle">0</int>
+                            <bool key="NSAnimates">NO</bool>
+                          </object>
+                          <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                          <bool key="NSEditable">YES</bool>
                         </object>
                       </object>
-                      <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
-                    </object>
-                    <object class="NSButton" id="775178384">
-                      <reference key="NSNextResponder" ref="370005935"/>
-                      <int key="NSvFlags">301</int>
-                      <string key="NSFrame">{{236, 20}, {153, 32}}</string>
+                      <string key="NSFrame">{{4.86328125, 4.46484375}, {617.3515625, 207.67578125}}</string>
                       <reference key="NSSuperview" ref="370005935"/>
-                      <bool key="NSEnabled">YES</bool>
-                      <object class="NSButtonCell" key="NSCell" id="963202121">
-                        <int key="NSCellFlags">67108864</int>
-                        <int key="NSCellFlags2">134217728</int>
-                        <string key="NSContents">Open media...</string>
-                        <object class="NSFont" key="NSSupport" id="1024428774">
-                          <string key="NSName">LucidaGrande</string>
-                          <double key="NSSize">13</double>
-                          <int key="NSfFlags">1040</int>
-                        </object>
-                        <reference key="NSControlView" ref="775178384"/>
-                        <int key="NSButtonFlags">-2038284288</int>
-                        <int key="NSButtonFlags2">129</int>
-                        <reference key="NSAlternateImage" ref="1024428774"/>
-                        <string key="NSAlternateContents"/>
-                        <string key="NSKeyEquivalent"/>
-                        <int key="NSPeriodicDelay">200</int>
-                        <int key="NSPeriodicInterval">25</int>
-                      </object>
-                      <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                      <string key="NSReuseIdentifierKey">_NS:1109</string>
+                      <string key="NSClassName">VLCDragDropView</string>
                     </object>
                   </object>
                   <string key="NSFrame">{{1, 1}, {627, 215}}</string>
@@ -493,6 +506,7 @@
             </object>
           </object>
           <string key="NSFrameSize">{663, 490}</string>
+          <reference key="NSSuperview"/>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
         <string key="NSMinSize">{663, 512}</string>
@@ -500,7 +514,7 @@
         <bool key="NSWindowIsRestorable">YES</bool>
       </object>
       <object class="NSCustomView" id="494472580">
-        <nil key="NSNextResponder"/>
+        <reference key="NSNextResponder"/>
         <int key="NSvFlags">268</int>
         <object class="NSMutableArray" key="NSSubviews">
           <bool key="EncodedWithXMLCoder">YES</bool>
@@ -564,6 +578,7 @@
           </object>
         </object>
         <string key="NSFrameSize">{478, 129}</string>
+        <reference key="NSSuperview"/>
         <string key="NSReuseIdentifierKey">_NS:1109</string>
         <string key="NSClassName">NSView</string>
       </object>
@@ -3384,14 +3399,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
-            <string key="label">_drop_box</string>
-            <reference key="source" ref="203744709"/>
-            <reference key="destination" ref="90126139"/>
-          </object>
-          <int key="connectionID">110</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
             <string key="label">_drop_btn</string>
             <reference key="source" ref="203744709"/>
             <reference key="destination" ref="775178384"/>
@@ -4358,6 +4365,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           </object>
           <int key="connectionID">536</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">_drop_box</string>
+            <reference key="source" ref="203744709"/>
+            <reference key="destination" ref="595691694"/>
+          </object>
+          <int key="connectionID">538</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -4413,53 +4428,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <reference key="object" ref="90126139"/>
             <object class="NSMutableArray" key="children">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="807070215"/>
-              <reference ref="775178384"/>
-              <reference ref="57114548"/>
+              <reference ref="595691694"/>
             </object>
             <reference key="parent" ref="1006"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">4</int>
-            <reference key="object" ref="57114548"/>
-            <object class="NSMutableArray" key="children">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="624480290"/>
-            </object>
-            <reference key="parent" ref="90126139"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">5</int>
-            <reference key="object" ref="624480290"/>
-            <reference key="parent" ref="57114548"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">6</int>
-            <reference key="object" ref="807070215"/>
-            <object class="NSMutableArray" key="children">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="425578110"/>
-            </object>
-            <reference key="parent" ref="90126139"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">7</int>
-            <reference key="object" ref="775178384"/>
-            <object class="NSMutableArray" key="children">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="963202121"/>
-            </object>
-            <reference key="parent" ref="90126139"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">8</int>
-            <reference key="object" ref="963202121"/>
-            <reference key="parent" ref="775178384"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">9</int>
-            <reference key="object" ref="425578110"/>
-            <reference key="parent" ref="807070215"/>
           </object>
           <object class="IBObjectRecord">
             <int key="objectID">10</int>
@@ -6161,6 +6132,59 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <reference key="object" ref="365227636"/>
             <reference key="parent" ref="606173151"/>
           </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">537</int>
+            <reference key="object" ref="595691694"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="775178384"/>
+              <reference ref="807070215"/>
+              <reference ref="57114548"/>
+            </object>
+            <reference key="parent" ref="90126139"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">4</int>
+            <reference key="object" ref="57114548"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="624480290"/>
+            </object>
+            <reference key="parent" ref="595691694"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">5</int>
+            <reference key="object" ref="624480290"/>
+            <reference key="parent" ref="57114548"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">6</int>
+            <reference key="object" ref="807070215"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="425578110"/>
+            </object>
+            <reference key="parent" ref="595691694"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">9</int>
+            <reference key="object" ref="425578110"/>
+            <reference key="parent" ref="807070215"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">7</int>
+            <reference key="object" ref="775178384"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="963202121"/>
+            </object>
+            <reference key="parent" ref="595691694"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">8</int>
+            <reference key="object" ref="963202121"/>
+            <reference key="parent" ref="775178384"/>
+          </object>
         </object>
       </object>
       <object class="NSMutableDictionary" key="flattenedProperties">
@@ -6351,6 +6375,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>25.IBEditorWindowLastContentRect</string>
           <string>25.IBPluginDependency</string>
           <string>25.IBViewBoundsToFrameTransform</string>
+          <string>26.CustomClassName</string>
           <string>26.IBPluginDependency</string>
           <string>26.IBViewBoundsToFrameTransform</string>
           <string>27.IBPluginDependency</string>
@@ -6367,7 +6392,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>294.IBPluginDependency</string>
           <string>294.IBViewBoundsToFrameTransform</string>
           <string>295.IBPluginDependency</string>
-          <string>3.CustomClassName</string>
           <string>3.IBPluginDependency</string>
           <string>3.IBViewBoundsToFrameTransform</string>
           <string>300.IBPluginDependency</string>
@@ -6513,10 +6537,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>532.IBPluginDependency</string>
           <string>532.IBViewBoundsToFrameTransform</string>
           <string>533.IBPluginDependency</string>
+          <string>537.IBPluginDependency</string>
           <string>54.IBPluginDependency</string>
           <string>6.IBPluginDependency</string>
           <string>6.IBViewBoundsToFrameTransform</string>
-          <string>7.CustomClassName</string>
           <string>7.IBPluginDependency</string>
           <string>7.IBViewBoundsToFrameTransform</string>
           <string>8.IBPluginDependency</string>
@@ -6787,9 +6811,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <bytes key="NSTransformStruct">P4AAAL+AAABBYAAAw4GAAA</bytes>
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{810, 1072}, {478, 129}}</string>
+          <string>{{591, 680}, {478, 129}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform"/>
+          <string>VLCDropDisabledImageView</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">AUNfAABCNAAAA</bytes>
@@ -6814,7 +6839,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <bytes key="NSTransformStruct">P4AAAL+AAABBYAAAwigAAA</bytes>
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>VLCDropEnabledBox</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">AUGIAABDkigAA</bytes>
@@ -6966,10 +6990,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <bytes key="NSTransformStruct">P4AAAL+AAABDbAAAwlAAAA</bytes>
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>VLCDropEnabledImageView</string>
+          <string>VLCDropDisabledImageView</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">AUOAgABCogAAA</bytes>
+            <bytes key="NSTransformStruct">AUOAAABCfAAAA</bytes>
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
@@ -7038,10 +7062,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABBcAAAw0kAAA</bytes>
           </object>
-          <string>VLCDropEnabledButton</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABDbAAAwkgAAA</bytes>
@@ -7066,7 +7090,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">536</int>
+      <int key="maxID">538</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -7108,7 +7132,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         </object>
         <object class="IBPartialClassDescription">
           <string key="className">NSView</string>
-          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="387002814">
             <string key="majorKey">IBProjectSource</string>
             <string key="minorKey">../../../modules/gui/macosx/misc.h</string>
           </object>
@@ -7120,754 +7144,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <string key="minorKey">../../../modules/gui/macosx/CompatibilityFixes.h</string>
           </object>
         </object>
-        <object class="IBPartialClassDescription">
-          <string key="className">VLCConvertAndSave</string>
-          <string key="superclassName">NSObject</string>
-          <object class="NSMutableDictionary" key="actions">
-            <bool key="EncodedWithXMLCoder">YES</bool>
-            <object class="NSArray" key="dict.sortedKeys">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>audioSettingsChanged:</string>
-              <string>browseFileDestination:</string>
-              <string>cancelDestination:</string>
-              <string>closeCustomizationSheet:</string>
-              <string>closeStreamPanel:</string>
-              <string>customizeProfile:</string>
-              <string>finalizePanel:</string>
-              <string>iWantAFile:</string>
-              <string>iWantAStream:</string>
-              <string>newProfileAction:</string>
-              <string>openMedia:</string>
-              <string>sdpFileLocationSelector:</string>
-              <string>showStreamPanel:</string>
-              <string>streamAnnouncementToggle:</string>
-              <string>streamTypeToggle:</string>
-              <string>subSettingsChanged:</string>
-              <string>switchProfile:</string>
-              <string>videoSettingsChanged:</string>
-            </object>
-            <object class="NSMutableArray" key="dict.values">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-            </object>
-          </object>
-          <object class="NSMutableDictionary" key="actionInfosByName">
-            <bool key="EncodedWithXMLCoder">YES</bool>
-            <object class="NSArray" key="dict.sortedKeys">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>audioSettingsChanged:</string>
-              <string>browseFileDestination:</string>
-              <string>cancelDestination:</string>
-              <string>closeCustomizationSheet:</string>
-              <string>closeStreamPanel:</string>
-              <string>customizeProfile:</string>
-              <string>finalizePanel:</string>
-              <string>iWantAFile:</string>
-              <string>iWantAStream:</string>
-              <string>newProfileAction:</string>
-              <string>openMedia:</string>
-              <string>sdpFileLocationSelector:</string>
-              <string>showStreamPanel:</string>
-              <string>streamAnnouncementToggle:</string>
-              <string>streamTypeToggle:</string>
-              <string>subSettingsChanged:</string>
-              <string>switchProfile:</string>
-              <string>videoSettingsChanged:</string>
-            </object>
-            <object class="NSMutableArray" key="dict.values">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <object class="IBActionInfo">
-                <string key="name">audioSettingsChanged:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">browseFileDestination:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">cancelDestination:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">closeCustomizationSheet:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">closeStreamPanel:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">customizeProfile:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">finalizePanel:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">iWantAFile:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">iWantAStream:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">newProfileAction:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">openMedia:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">sdpFileLocationSelector:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">showStreamPanel:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">streamAnnouncementToggle:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">streamTypeToggle:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">subSettingsChanged:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">switchProfile:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">videoSettingsChanged:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-            </object>
-          </object>
-          <object class="NSMutableDictionary" key="outlets">
-            <bool key="EncodedWithXMLCoder">YES</bool>
-            <object class="NSArray" key="dict.sortedKeys">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>_customize_aud_bitrate_fld</string>
-              <string>_customize_aud_bitrate_lbl</string>
-              <string>_customize_aud_channels_fld</string>
-              <string>_customize_aud_channels_lbl</string>
-              <string>_customize_aud_ckb</string>
-              <string>_customize_aud_codec_lbl</string>
-              <string>_customize_aud_codec_pop</string>
-              <string>_customize_aud_keep_ckb</string>
-              <string>_customize_aud_samplerate_lbl</string>
-              <string>_customize_aud_samplerate_pop</string>
-              <string>_customize_aud_settings_box</string>
-              <string>_customize_cancel_btn</string>
-              <string>_customize_encap_matrix</string>
-              <string>_customize_newProfile_btn</string>
-              <string>_customize_ok_btn</string>
-              <string>_customize_panel</string>
-              <string>_customize_subs_ckb</string>
-              <string>_customize_subs_overlay_ckb</string>
-              <string>_customize_subs_pop</string>
-              <string>_customize_tabview</string>
-              <string>_customize_vid_bitrate_fld</string>
-              <string>_customize_vid_bitrate_lbl</string>
-              <string>_customize_vid_ckb</string>
-              <string>_customize_vid_codec_lbl</string>
-              <string>_customize_vid_codec_pop</string>
-              <string>_customize_vid_framerate_fld</string>
-              <string>_customize_vid_framerate_lbl</string>
-              <string>_customize_vid_height_fld</string>
-              <string>_customize_vid_height_lbl</string>
-              <string>_customize_vid_keep_ckb</string>
-              <string>_customize_vid_res_box</string>
-              <string>_customize_vid_res_lbl</string>
-              <string>_customize_vid_scale_lbl</string>
-              <string>_customize_vid_scale_pop</string>
-              <string>_customize_vid_settings_box</string>
-              <string>_customize_vid_width_fld</string>
-              <string>_customize_vid_width_lbl</string>
-              <string>_destination_box</string>
-              <string>_destination_browse_btn</string>
-              <string>_destination_cancel_btn</string>
-              <string>_destination_filename_lbl</string>
-              <string>_destination_filename_stub_lbl</string>
-              <string>_destination_icon_view</string>
-              <string>_destination_itwantafile_btn</string>
-              <string>_destination_itwantafile_view</string>
-              <string>_destination_itwantastream_btn</string>
-              <string>_destination_itwantastream_view</string>
-              <string>_destination_lbl</string>
-              <string>_destination_stream_btn</string>
-              <string>_destination_stream_lbl</string>
-              <string>_drop_box</string>
-              <string>_drop_btn</string>
-              <string>_drop_image_view</string>
-              <string>_drop_lbl</string>
-              <string>_dropin_icon_view</string>
-              <string>_dropin_media_lbl</string>
-              <string>_dropin_view</string>
-              <string>_ok_btn</string>
-              <string>_profile_btn</string>
-              <string>_profile_lbl</string>
-              <string>_profile_pop</string>
-              <string>_stream_address_fld</string>
-              <string>_stream_address_lbl</string>
-              <string>_stream_announcement_lbl</string>
-              <string>_stream_channel_fld</string>
-              <string>_stream_destination_lbl</string>
-              <string>_stream_ok_btn</string>
-              <string>_stream_panel</string>
-              <string>_stream_port_fld</string>
-              <string>_stream_port_lbl</string>
-              <string>_stream_sap_ckb</string>
-              <string>_stream_sdp_browsefile_btn</string>
-              <string>_stream_sdp_fld</string>
-              <string>_stream_sdp_matrix</string>
-              <string>_stream_ttl_fld</string>
-              <string>_stream_ttl_lbl</string>
-              <string>_stream_ttl_stepper</string>
-              <string>_stream_type_lbl</string>
-              <string>_stream_type_pop</string>
-              <string>_window</string>
-            </object>
-            <object class="NSMutableArray" key="dict.values">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-            </object>
-          </object>
-          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
-            <bool key="EncodedWithXMLCoder">YES</bool>
-            <object class="NSArray" key="dict.sortedKeys">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>_customize_aud_bitrate_fld</string>
-              <string>_customize_aud_bitrate_lbl</string>
-              <string>_customize_aud_channels_fld</string>
-              <string>_customize_aud_channels_lbl</string>
-              <string>_customize_aud_ckb</string>
-              <string>_customize_aud_codec_lbl</string>
-              <string>_customize_aud_codec_pop</string>
-              <string>_customize_aud_keep_ckb</string>
-              <string>_customize_aud_samplerate_lbl</string>
-              <string>_customize_aud_samplerate_pop</string>
-              <string>_customize_aud_settings_box</string>
-              <string>_customize_cancel_btn</string>
-              <string>_customize_encap_matrix</string>
-              <string>_customize_newProfile_btn</string>
-              <string>_customize_ok_btn</string>
-              <string>_customize_panel</string>
-              <string>_customize_subs_ckb</string>
-              <string>_customize_subs_overlay_ckb</string>
-              <string>_customize_subs_pop</string>
-              <string>_customize_tabview</string>
-              <string>_customize_vid_bitrate_fld</string>
-              <string>_customize_vid_bitrate_lbl</string>
-              <string>_customize_vid_ckb</string>
-              <string>_customize_vid_codec_lbl</string>
-              <string>_customize_vid_codec_pop</string>
-              <string>_customize_vid_framerate_fld</string>
-              <string>_customize_vid_framerate_lbl</string>
-              <string>_customize_vid_height_fld</string>
-              <string>_customize_vid_height_lbl</string>
-              <string>_customize_vid_keep_ckb</string>
-              <string>_customize_vid_res_box</string>
-              <string>_customize_vid_res_lbl</string>
-              <string>_customize_vid_scale_lbl</string>
-              <string>_customize_vid_scale_pop</string>
-              <string>_customize_vid_settings_box</string>
-              <string>_customize_vid_width_fld</string>
-              <string>_customize_vid_width_lbl</string>
-              <string>_destination_box</string>
-              <string>_destination_browse_btn</string>
-              <string>_destination_cancel_btn</string>
-              <string>_destination_filename_lbl</string>
-              <string>_destination_filename_stub_lbl</string>
-              <string>_destination_icon_view</string>
-              <string>_destination_itwantafile_btn</string>
-              <string>_destination_itwantafile_view</string>
-              <string>_destination_itwantastream_btn</string>
-              <string>_destination_itwantastream_view</string>
-              <string>_destination_lbl</string>
-              <string>_destination_stream_btn</string>
-              <string>_destination_stream_lbl</string>
-              <string>_drop_box</string>
-              <string>_drop_btn</string>
-              <string>_drop_image_view</string>
-              <string>_drop_lbl</string>
-              <string>_dropin_icon_view</string>
-              <string>_dropin_media_lbl</string>
-              <string>_dropin_view</string>
-              <string>_ok_btn</string>
-              <string>_profile_btn</string>
-              <string>_profile_lbl</string>
-              <string>_profile_pop</string>
-              <string>_stream_address_fld</string>
-              <string>_stream_address_lbl</string>
-              <string>_stream_announcement_lbl</string>
-              <string>_stream_channel_fld</string>
-              <string>_stream_destination_lbl</string>
-              <string>_stream_ok_btn</string>
-              <string>_stream_panel</string>
-              <string>_stream_port_fld</string>
-              <string>_stream_port_lbl</string>
-              <string>_stream_sap_ckb</string>
-              <string>_stream_sdp_browsefile_btn</string>
-              <string>_stream_sdp_fld</string>
-              <string>_stream_sdp_matrix</string>
-              <string>_stream_ttl_fld</string>
-              <string>_stream_ttl_lbl</string>
-              <string>_stream_ttl_stepper</string>
-              <string>_stream_type_lbl</string>
-              <string>_stream_type_pop</string>
-              <string>_window</string>
-            </object>
-            <object class="NSMutableArray" key="dict.values">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_aud_bitrate_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_aud_bitrate_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_aud_channels_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_aud_channels_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_aud_ckb</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_aud_codec_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_aud_codec_pop</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_aud_keep_ckb</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_aud_samplerate_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_aud_samplerate_pop</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_aud_settings_box</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_cancel_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_encap_matrix</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_newProfile_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_ok_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_panel</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_subs_ckb</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_subs_overlay_ckb</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_subs_pop</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_tabview</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_bitrate_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_bitrate_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_ckb</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_codec_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_codec_pop</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_framerate_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_framerate_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_height_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_height_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_keep_ckb</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_res_box</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_res_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_scale_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_scale_pop</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_settings_box</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_width_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_customize_vid_width_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_destination_box</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_destination_browse_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_destination_cancel_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_destination_filename_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_destination_filename_stub_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_destination_icon_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_destination_itwantafile_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_destination_itwantafile_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_destination_itwantastream_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_destination_itwantastream_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_destination_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_destination_stream_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_destination_stream_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_drop_box</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_drop_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_drop_image_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_drop_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_dropin_icon_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_dropin_media_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_dropin_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_ok_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_profile_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_profile_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_profile_pop</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_address_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_address_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_announcement_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_channel_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_destination_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_ok_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_panel</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_port_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_port_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_sap_ckb</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_sdp_browsefile_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_sdp_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_sdp_matrix</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_ttl_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_ttl_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_ttl_stepper</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_type_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_stream_type_pop</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">_window</string>
-                <string key="candidateClassName">id</string>
-              </object>
-            </object>
-          </object>
-          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="327021570">
-            <string key="majorKey">IBProjectSource</string>
-            <string key="minorKey">../../../modules/gui/macosx/ConvertAndSave.h</string>
-          </object>
-        </object>
-        <object class="IBPartialClassDescription">
-          <string key="className">VLCDropEnabledBox</string>
-          <string key="superclassName">NSBox</string>
-          <reference key="sourceIdentifier" ref="327021570"/>
-        </object>
-        <object class="IBPartialClassDescription">
-          <string key="className">VLCDropEnabledButton</string>
-          <string key="superclassName">NSButton</string>
-          <reference key="sourceIdentifier" ref="327021570"/>
-        </object>
-        <object class="IBPartialClassDescription">
-          <string key="className">VLCDropEnabledImageView</string>
-          <string key="superclassName">NSImageView</string>
-          <reference key="sourceIdentifier" ref="327021570"/>
-        </object>
-      </object>
-      <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
-        <bool key="EncodedWithXMLCoder">YES</bool>
         <object class="IBPartialClassDescription">
           <string key="className">VLCConvertAndSave</string>
           <string key="superclassName">NSObject</string>
@@ -8600,25 +7876,20 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               </object>
             </object>
           </object>
-          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="498396924">
-            <string key="majorKey">IBDocumentRelativeSource</string>
-            <string key="minorKey">../../../../../modules/gui/macosx/ConvertAndSave.h</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBProjectSource</string>
+            <string key="minorKey">../../../modules/gui/macosx/ConvertAndSave.h</string>
           </object>
         </object>
         <object class="IBPartialClassDescription">
-          <string key="className">VLCDropEnabledBox</string>
-          <string key="superclassName">NSBox</string>
-          <reference key="sourceIdentifier" ref="498396924"/>
+          <string key="className">VLCDragDropView</string>
+          <string key="superclassName">NSView</string>
+          <reference key="sourceIdentifier" ref="387002814"/>
         </object>
         <object class="IBPartialClassDescription">
-          <string key="className">VLCDropEnabledButton</string>
-          <string key="superclassName">NSButton</string>
-          <reference key="sourceIdentifier" ref="498396924"/>
-        </object>
-        <object class="IBPartialClassDescription">
-          <string key="className">VLCDropEnabledImageView</string>
+          <string key="className">VLCDropDisabledImageView</string>
           <string key="superclassName">NSImageView</string>
-          <reference key="sourceIdentifier" ref="498396924"/>
+          <reference key="sourceIdentifier" ref="387002814"/>
         </object>
       </object>
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.2+">

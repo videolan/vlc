@@ -300,10 +300,30 @@ static bool b_old_spaces_style = YES;
 @end
 
 /*****************************************************************************
- * VLBrushedMetalImageView
+ * VLCDragDropView
  *****************************************************************************/
 
-@implementation VLBrushedMetalImageView
+@implementation VLCDropDisabledImageView
+
+- (void)awakeFromNib
+{
+    [self unregisterDraggedTypes];
+}
+
+@end
+
+/*****************************************************************************
+ * VLCDragDropView
+ *****************************************************************************/
+
+@implementation VLCDragDropView
+
+@synthesize dropHandler=_dropHandler;
+
+- (void)enablePlaylistItems
+{
+    [self registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
+}
 
 - (BOOL)mouseDownCanMoveWindow
 {
@@ -319,17 +339,30 @@ static bool b_old_spaces_style = YES;
 - (void)awakeFromNib
 {
     [self registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
-    [self setImageScaling: NSScaleToFit];
-    [self setImageFrameStyle: NSImageFrameNone];
-    [self setImageAlignment: NSImageAlignCenter];
 }
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
-    if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) == NSDragOperationGeneric)
-        return NSDragOperationGeneric;
+    if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) == NSDragOperationGeneric) {
+        b_activeDragAndDrop = YES;
+        [self setNeedsDisplay:YES];
+
+        return NSDragOperationCopy;
+    }
 
     return NSDragOperationNone;
+}
+
+- (void)draggingEnded:(id < NSDraggingInfo >)sender
+{
+    b_activeDragAndDrop = NO;
+    [self setNeedsDisplay:YES];
+}
+
+- (void)draggingExited:(id < NSDraggingInfo >)sender
+{
+    b_activeDragAndDrop = NO;
+    [self setNeedsDisplay:YES];
 }
 
 - (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
@@ -340,7 +373,11 @@ static bool b_old_spaces_style = YES;
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
     BOOL b_returned;
-    b_returned = [[VLCCoreInteraction sharedInstance] performDragOperation: sender];
+
+    if (_dropHandler && [_dropHandler respondsToSelector:@selector(performDragOperation:)])
+        b_returned = [_dropHandler performDragOperation: sender];
+    else // default
+        b_returned = [[VLCCoreInteraction sharedInstance] performDragOperation: sender];
 
     [self setNeedsDisplay:YES];
     return b_returned;
@@ -349,6 +386,19 @@ static bool b_old_spaces_style = YES;
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender
 {
     [self setNeedsDisplay:YES];
+}
+
+- (void)drawRect:(NSRect)dirtyRect
+{
+
+    if (b_activeDragAndDrop) {
+        NSRect frameRect = [self bounds];
+
+        [[NSColor selectedControlColor] set];
+        NSFrameRectWithWidthUsingOperation(frameRect, 2., NSCompositeHighlight);
+    }
+
+    [super drawRect:dirtyRect];
 }
 
 @end

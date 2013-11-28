@@ -261,6 +261,10 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
     [_ok_btn setEnabled: NO];
 
+    // setup drop view
+    [_drop_box enablePlaylistItems];
+    [_drop_box setDropHandler: self];
+
     [self resetCustomizationSheetBasedOnProfile:[self.profileValueList objectAtIndex:0]];
 }
 
@@ -1054,133 +1058,6 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_profile_pop addItemWithTitle:_NS("Organize Profiles...")];
     [[_profile_pop lastItem] setTarget: self];
     [[_profile_pop lastItem] setAction: @selector(deleteProfileAction:)];
-}
-
-@end
-
-# pragma mark -
-# pragma mark Drag and drop handling
-
-@implementation VLCDropEnabledBox
-
-- (void)awakeFromNib
-{
-    [self registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
-}
-
-- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
-{
-    b_activeDragAndDrop = YES;
-    [self setNeedsDisplay:YES];
-
-    [[NSCursor dragCopyCursor] set];
-
-    if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) == NSDragOperationGeneric)
-        return NSDragOperationGeneric;
-
-    return NSDragOperationNone;
-}
-
-- (void)draggingEnded:(id < NSDraggingInfo >)sender
-{
-    [[NSCursor arrowCursor] set];
-    b_activeDragAndDrop = NO;
-    [self setNeedsDisplay:YES];
-}
-
-- (void)draggingExited:(id < NSDraggingInfo >)sender
-{
-    [[NSCursor arrowCursor] set];
-    b_activeDragAndDrop = NO;
-    [self setNeedsDisplay:YES];
-}
-
-- (void)drawRect:(NSRect)dirtyRect
-{
-    if (b_activeDragAndDrop) {
-        [[NSColor colorWithCalibratedRed:(.154/.255) green:(.154/.255) blue:(.154/.255) alpha:1.] setFill];
-        NSRect frameRect = [[self contentView] bounds];
-        frameRect.origin.x += 10;
-        frameRect.origin.y += 10;
-        frameRect.size.width -= 17;
-        frameRect.size.height -= 17;
-        NSFrameRectWithWidthUsingOperation(frameRect, 4., NSCompositeHighlight);
-    }
-
-    [super drawRect:dirtyRect];
-}
-
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
-{
-    return YES;
-}
-
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
-{
-    return [[VLCConvertAndSave sharedInstance] performDragOperation: sender];
-}
-
-- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
-{
-    [self setNeedsDisplay:YES];
-}
-
-@end
-
-@implementation VLCDropEnabledImageView
-
-- (void)awakeFromNib
-{
-    [self registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
-}
-
-- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
-{
-    return [[[self superview] superview] draggingEntered:sender];
-}
-
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
-{
-    return YES;
-}
-
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
-{
-    return [[VLCConvertAndSave sharedInstance] performDragOperation: sender];
-}
-
-- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
-{
-    [self setNeedsDisplay:YES];
-}
-
-@end
-
-@implementation VLCDropEnabledButton
-
-- (void)awakeFromNib
-{
-    [self registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
-}
-
-- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
-{
-    return [[[self superview] superview] draggingEntered:sender];
-}
-
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
-{
-    return YES;
-}
-
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
-{
-    return [[VLCConvertAndSave sharedInstance] performDragOperation: sender];
-}
-
-- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
-{
-    [self setNeedsDisplay:YES];
 }
 
 @end
