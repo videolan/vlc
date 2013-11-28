@@ -132,9 +132,18 @@ else
 	$(CXX) $^ -D_WIN32_IE=0x0601 -D__forceinline=inline -shared -o $@ -lole32 -static-libstdc++ -static-libgcc
 	$(STRIP) $@
 endif
+$(win32_destdir)/NSIS/nsProcess.dll: extras/package/win32/NSIS/nsProcess/nsProcess.c extras/package/win32/NSIS/nsProcess/pluginapi.c
+	mkdir -p "$(win32_destdir)/NSIS/"
+if HAVE_WIN64
+	i686-w64-mingw32-gcc $^ -shared -o $@ -lole32 -static-libgcc
+	i686-w64-mingw32-strip $@
+else
+	$(CC) $^ -D_WIN32_IE=0x0601 -shared -o $@ -lole32 -static-libgcc
+	$(STRIP) $@
+endif
 
 
-package-win32-exe: package-win-strip $(win32_destdir)/NSIS/UAC.dll
+package-win32-exe: package-win-strip $(win32_destdir)/NSIS/UAC.dll $(win32_destdir)/NSIS/nsProcess.dll
 # Script installer
 	cp    $(top_builddir)/extras/package/win32/NSIS/vlc.win32.nsi "$(win32_destdir)/"
 	cp    $(top_builddir)/extras/package/win32/NSIS/spad.nsi      "$(win32_destdir)/"
@@ -142,6 +151,7 @@ package-win32-exe: package-win-strip $(win32_destdir)/NSIS/UAC.dll
 	cp -r $(srcdir)/extras/package/win32/NSIS/helpers      "$(win32_destdir)/"
 	mkdir -p "$(win32_destdir)/NSIS/"
 	cp "$(top_srcdir)/extras/package/win32/NSIS/UAC.nsh" "$(win32_destdir)/NSIS/"
+	cp "$(top_srcdir)/extras/package/win32/NSIS/nsProcess.nsh" "$(win32_destdir)/NSIS/"
 
 # Create package
 	if makensis -VERSION >/dev/null 2>&1; then \
