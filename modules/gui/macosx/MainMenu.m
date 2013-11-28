@@ -325,6 +325,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_open_net setTitle: _NS("Open Network...")];
     [o_mi_open_capture setTitle: _NS("Open Capture Device...")];
     [o_mi_open_recent setTitle: _NS("Open Recent")];
+    [o_mi_close_window setTitle: _NS("Close Window")];
     [o_mi_open_wizard setTitle: _NS("Streaming/Exporting Wizard...")];
     [o_mi_convertandsave setTitle: _NS("Convert / Stream...")];
     [o_mi_save_playlist setTitle: _NS("Save Playlist...")];
@@ -432,8 +433,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_teletext_blue setTitle: _NS("Blue")];
 
     [o_mu_window setTitle: _NS("Window")];
-    [o_mi_minimize setTitle: _NS("Minimize Window")];
-    [o_mi_close_window setTitle: _NS("Close Window")];
+    [o_mi_minimize setTitle: _NS("Minimize")];
+    [o_mi_zoom_window setTitle: _NS("Zoom")];
     [o_mi_player setTitle: _NS("Player...")];
     [o_mi_controller setTitle: _NS("Main Window...")];
     [o_mi_audioeffects setTitle: _NS("Audio Effects...")];

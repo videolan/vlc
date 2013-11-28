@@ -67,6 +67,7 @@
     IBOutlet NSMenuItem * o_mi_open_net;
     IBOutlet NSMenuItem * o_mi_open_capture;
     IBOutlet NSMenuItem * o_mi_open_recent;
+    IBOutlet NSMenuItem * o_mi_close_window;
     IBOutlet NSMenuItem * o_mi_open_wizard;
     IBOutlet NSMenuItem * o_mi_convertandsave;
     IBOutlet NSMenuItem * o_mi_save_playlist;
@@ -180,7 +181,7 @@
 
     IBOutlet NSMenu * o_mu_window;
     IBOutlet NSMenuItem * o_mi_minimize;
-    IBOutlet NSMenuItem * o_mi_close_window;
+    IBOutlet NSMenuItem * o_mi_zoom_window;
     IBOutlet NSMenuItem * o_mi_player;
     IBOutlet NSMenuItem * o_mi_controller;
     IBOutlet NSMenuItem * o_mi_audioeffects;
