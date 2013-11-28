@@ -821,23 +821,24 @@ static void Close(vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
 
+#if !VLC_WINSTORE_APP
     EnterMTA(); /* enter MTA before thread leaves MTA */
     if (sys->dev != NULL)
         CloseDevice(aout);
 
-#if !VLC_WINSTORE_APP
     IMMDeviceEnumerator_Release(sys->it);
     sys->it = NULL;
 
     SetEvent(sys->device_changed);
     vlc_join(sys->thread, NULL);
-#endif
 
     LeaveMTA();
 
-#if !VLC_WINSTORE_APP
     CloseHandle(sys->device_ready);
     CloseHandle(sys->device_changed);
+#else
+    if (sys->dev != NULL)
+        CloseDevice(aout);
 #endif
     free(sys);
 }
