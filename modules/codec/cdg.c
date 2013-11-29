@@ -329,8 +329,8 @@ static int DecodeScroll( decoder_sys_t *p_cdg, const uint8_t *p_data, int b_copy
             }
             else
             {
-                if( dy < 0 || dy >= CDG_SCREEN_HEIGHT ||
-                    dx < 0 || dx >= CDG_SCREEN_WIDTH )
+                if( dy < 0 || (unsigned)dy >= CDG_SCREEN_HEIGHT ||
+                    dx < 0 || (unsigned)dx >= CDG_SCREEN_WIDTH )
                     continue;
             }
             p_cdg->screen[dy*CDG_SCREEN_PITCH+dx] = copy[y*CDG_SCREEN_PITCH+x];
