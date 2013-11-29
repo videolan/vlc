@@ -71,8 +71,10 @@ static inline void vlc_rewinddir( DIR *dir )
 # ifndef fstat
 #  define fstat _fstati64
 # endif
-# undef lseek
-# define lseek _lseeki64
+# ifndef _MSC_VER
+#  undef lseek
+#  define lseek _lseeki64
+# endif
 #endif
 
 #ifdef __ANDROID__
