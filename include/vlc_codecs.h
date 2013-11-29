@@ -47,7 +47,7 @@ typedef GUID guid_t;
 
 #ifdef HAVE_ATTRIBUTE_PACKED
 #   define ATTR_PACKED __attribute__((__packed__))
-#elif defined(__SUNPRO_C)
+#elif defined(__SUNPRO_C) || defined(_MSC_VER)
 #   pragma pack(1)
 #   define ATTR_PACKED
 #elif defined(__APPLE__)
@@ -210,7 +210,7 @@ ATTR_PACKED
 } VIDEOINFO;
 #endif
 
-#if defined(__SUNPRO_C)
+#if defined(__SUNPRO_C) || defined(_MSC_VER)
 #   pragma pack()
 #elif defined(__APPLE__) && !HAVE_ATTRIBUTE_PACKED
 #   pragma pack(pop)
