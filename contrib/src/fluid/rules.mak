@@ -10,6 +10,8 @@ ifeq ($(call need_pkg,"fluidsynth >= 1.1.2"),)
 PKGS_FOUND += fluid
 endif
 
+DEPS_fluid = glib $(DEPS_glib)
+
 $(TARBALLS)/fluidsynth-$(FLUID_VERSION).tar.bz2:
 	$(call download,$(FLUID_URL))
 
