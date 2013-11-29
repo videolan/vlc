@@ -80,7 +80,7 @@ static block_t *Decode(decoder_t *dec, block_t **block_ptr)
         return NULL;
     }
 
-    const int block_size = sys->is_pal ? 8640 : 7200;
+    const unsigned int block_size = sys->is_pal ? 8640 : 7200;
     if (block->i_buffer >= block_size) {
         uint8_t *src = block->p_buffer;
 
