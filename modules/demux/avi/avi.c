@@ -2559,7 +2559,7 @@ static void AVI_MetaLoad( demux_t *p_demux,
 
 static void AVI_DvHandleAudio( demux_t *p_demux, avi_track_t *tk, block_t *p_frame )
 {
-    size_t i_offset = 80*6+80*16*3 + 3;
+    size_t i_offset = 80 * 6 + 80 * 16 * 3 + 3;
     if( p_frame->i_buffer < i_offset + 5 )
         return;
 
@@ -2569,7 +2569,7 @@ static void AVI_DvHandleAudio( demux_t *p_demux, avi_track_t *tk, block_t *p_fra
     es_format_t fmt;
     dv_get_audio_format( &fmt, &p_frame->p_buffer[i_offset + 1] );
 
-    if( tk->p_es_dv_audio && tk->i_dv_audio_rate != fmt.audio.i_rate )
+    if( tk->p_es_dv_audio && tk->i_dv_audio_rate != (int)fmt.audio.i_rate )
     {
         es_out_Del( p_demux->out, tk->p_es_dv_audio );
         tk->p_es_dv_audio = es_out_Add( p_demux->out, &fmt );
