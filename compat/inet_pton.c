@@ -30,6 +30,7 @@
 # include <sys/socket.h>
 #else
 # include <winsock2.h>
+# undef EAFNOSUPPORT
 # define EAFNOSUPPORT WSAEAFNOSUPPORT
 #endif
 

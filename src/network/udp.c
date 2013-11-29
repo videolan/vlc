@@ -39,6 +39,7 @@
 #include <vlc_network.h>
 
 #ifdef _WIN32
+#   undef EAFNOSUPPORT
 #   define EAFNOSUPPORT WSAEAFNOSUPPORT
 #else
 #   include <unistd.h>
