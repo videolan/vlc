@@ -19,15 +19,9 @@ NoBackup:
   WriteRegStr HKCR "VLC$R0\shell\Open\command" "" '"$INSTDIR\vlc.exe" --started-from-file "%1"'
   WriteRegStr HKCR "VLC$R0\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 
-;;; Vista Only part
-  ; Vista and above detection
-  ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
-  StrCpy $R2 $R1 1
-  StrCmp $R2 '6' ForVista ToEnd
-ForVista:
-  WriteRegStr HKLM "Software\Clients\Media\VLC\Capabilities\FileAssociations" "$R0" "VLC$R0"
-
-ToEnd:
+  ${If} ${AtLeastWinVista}
+    WriteRegStr HKLM "Software\Clients\Media\VLC\Capabilities\FileAssociations" "$R0" "VLC$R0"
+  ${EndIf}
 FunctionEnd
 
 ;; Function that registers one skin extension for VLC
@@ -46,15 +40,9 @@ NoBackup:
   WriteRegStr HKCR "VLC$R0\shell\Open\command" "" '"$INSTDIR\vlc.exe" -Iskins --skins2-last "%1"'
   WriteRegStr HKCR "VLC$R0\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 
-;;; Vista Only part
-  ; Vista and above detection
-  ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
-  StrCpy $R2 $R1 1
-  StrCmp $R2 '6' ForVista ToEnd
-ForVista:
-  WriteRegStr HKLM "Software\Clients\Media\VLC\Capabilities\FileAssociations" "$R0" "VLC$R0"
-
-ToEnd:
+  ${If} ${AtLeastWinVista}
+    WriteRegStr HKLM "Software\Clients\Media\VLC\Capabilities\FileAssociations" "$R0" "VLC$R0"
+  ${EndIf}
 FunctionEnd
 
 ;; Function that removes one extension that VLC owns.
