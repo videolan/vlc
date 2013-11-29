@@ -83,7 +83,7 @@ static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
         {
             static const uint8_t p_pattern[] = { 0, 0, 0, 36, 'a', 'l', 'a', 'c' };
             /* Find alac atom XXX it is a bit ugly */
-            for( i_offset = 0; i_offset < p_dec->fmt_in.i_extra - sizeof(p_pattern); i_offset++ )
+            for( i_offset = 0; i_offset < i_size - (int)sizeof(p_pattern); i_offset++ )
             {
                 if( !memcmp( &p_src[i_offset], p_pattern, sizeof(p_pattern) ) )
                     break;
