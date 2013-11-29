@@ -2004,7 +2004,7 @@ static const struct
         VLC_CODEC_VDPAU_VIDEO_444,
         VLC_CODEC_VDPAU_OUTPUT, 0 },           FAKE_FMT() },
 
-    { {0}, { 0, {}, 0, 0 } }
+    { {0}, { 0, { 0 }, 0, 0 } }
 };
 
 #undef PACKED_FMT
