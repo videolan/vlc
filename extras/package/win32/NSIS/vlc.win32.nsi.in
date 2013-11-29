@@ -56,7 +56,7 @@ InstType $Name_InstTypeRecommended
 InstType $Name_InstTypeMinimum
 InstType $Name_InstTypeFull
 
-RequestExecutionLevel user
+RequestExecutionLevel admin
 !addincludedir NSIS
 !addplugindir NSIS
 !include UAC.nsh
