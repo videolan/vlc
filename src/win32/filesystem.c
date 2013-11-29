@@ -44,6 +44,11 @@
 #include <vlc_fs.h>
 #include "libvlc.h" /* vlc_mkdir */
 
+#ifdef _MSC_VER
+# define __STDC__ 1
+# include <io.h> /* _pipe */
+#endif
+
 static wchar_t *widen_path (const char *path)
 {
     wchar_t *wpath;
