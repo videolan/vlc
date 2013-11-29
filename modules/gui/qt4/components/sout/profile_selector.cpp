@@ -287,10 +287,6 @@ void VLCProfileSelector::updateOptions( int i )
             HASHPICK( "vcodec", "height" );
             if ( !value.isEmpty() && value.toInt() > 0 )
                 smrl.option( "height", value );
-        } else {
-            HASHPICK( "video", "copy" );
-            if ( ! value.isEmpty() )
-                smrl.option( "vcodec", "copy" );
         }
     } else {
         smrl.option( "vcodec", "none" );
@@ -320,10 +316,6 @@ void VLCProfileSelector::updateOptions( int i )
                 smrl.option( "afilter", valuesList.join( ":" ) );
             }
 
-        } else {
-            HASHPICK( "audio", "copy" );
-            if ( ! value.isEmpty() )
-                smrl.option( "acodec", "copy" );
         }
     } else {
         smrl.option( "acodec", "none" );
