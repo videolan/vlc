@@ -85,7 +85,7 @@ static inline int xiph_SplitHeaders(unsigned packet_size[], void * packet[], uns
     }
     else
     {
-        unsigned size = 0;
+        int size = 0;
         for (unsigned i = 0; i < count - 1; i++) {
             packet_size[i] = 0;
             for (;;) {
