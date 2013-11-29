@@ -2151,7 +2151,7 @@ vlc_module_begin ()
 #   define KEY_TOGGLE_FULLSCREEN  "Command+f"
 #   define KEY_LEAVE_FULLSCREEN   "Esc"
 #   define KEY_PLAY_PAUSE         "Space"
-#   define KEY_PAUSE              NULL
+#   define KEY_SIMPLE_PAUSE       NULL
 #   define KEY_PLAY               NULL
 #   define KEY_FASTER             "Command+="
 #   define KEY_SLOWER             "Command+-"
@@ -2266,7 +2266,7 @@ vlc_module_begin ()
 #   define KEY_TOGGLE_FULLSCREEN  "f"
 #   define KEY_LEAVE_FULLSCREEN   "Esc"
 #   define KEY_PLAY_PAUSE         "Space\tMedia Play Pause"
-#   define KEY_PAUSE              "Browser Stop"
+#   define KEY_SIMPLE_PAUSE       "Browser Stop"
 #   define KEY_PLAY               "Browser Refresh"
 #   define KEY_FASTER             "+"
 #   define KEY_SLOWER             "-"
@@ -2392,7 +2392,7 @@ vlc_module_begin ()
              LEAVE_FULLSCREEN_KEY_LONGTEXT, false )
     add_key( "key-play-pause", KEY_PLAY_PAUSE, PLAY_PAUSE_KEY_TEXT,
              PLAY_PAUSE_KEY_LONGTEXT, false )
-    add_key( "key-pause", KEY_PAUSE, PAUSE_KEY_TEXT,
+    add_key( "key-pause", KEY_SIMPLE_PAUSE, PAUSE_KEY_TEXT,
              PAUSE_KEY_LONGTEXT, true )
     add_key( "key-play", KEY_PLAY, PLAY_KEY_TEXT,
              PLAY_KEY_LONGTEXT, true )
