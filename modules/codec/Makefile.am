@@ -45,6 +45,9 @@ libfluidsynth_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libfluidsynth_plugin_la_LIBADD = $(FLUIDSYNTH_LIBS)
 EXTRA_LTLIBRARIES += libfluidsynth_plugin.la
 codec_LTLIBRARIES += $(LTLIBfluidsynth)
+if HAVE_DARWIN
+libfluidsynth_plugin_la_LDFLAGS += -Wl,-framework,CoreFoundation,-framework,CoreServices
+endif
 
 liblpcm_plugin_la_SOURCES = codec/lpcm.c
 codec_LTLIBRARIES += liblpcm_plugin.la
