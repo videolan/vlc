@@ -803,7 +803,7 @@ VLC_API bool vlc_ureduce( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t )
 #include <AvailabilityMacros.h>
 #endif
 
-#ifdef _WIN32
+#ifdef __MINGW32__
 # define vlc_memalign(align, size) (__mingw_aligned_malloc(size, align))
 # define vlc_free(base)            (__mingw_aligned_free(base))
 #elif defined(__APPLE__) && !defined(MAC_OS_X_VERSION_10_6)

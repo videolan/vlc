@@ -30,7 +30,9 @@
 #endif
 #include <vlc_common.h>
 
-#include <w32api.h>
+#ifdef __MINGW32__
+# include <w32api.h>
+#endif
 #include <direct.h>
 #include <shlobj.h>
 
