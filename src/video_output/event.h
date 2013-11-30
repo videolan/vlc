@@ -54,7 +54,7 @@ static inline void vout_SendEventMouseMoved(vout_thread_t *vout, int x, int y)
 }
 static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
 {
-    int key;
+    int key = KEY_UNSET;
     var_OrInteger(vout, "mouse-button-down", 1 << button);
 
     switch (button)
