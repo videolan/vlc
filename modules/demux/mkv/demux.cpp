@@ -684,9 +684,8 @@ bool demux_sys_t::PreloadLinked()
                 // TODO use a name for each edition, let the TITLE deal with a codec name
                 if ( p_title->psz_name == NULL )
                 {
-                    const char* psz_tmp = p_ved->GetMainName().c_str();
-                    if( *psz_tmp != '\0' )
-                        p_title->psz_name = strdup( psz_tmp );
+                    if( p_ved->GetMainName().length() )
+                        p_title->psz_name = strdup( p_ved->GetMainName().c_str() );
                     else
                     {
                         /* Check in tags if the edition has a name */
