@@ -136,6 +136,8 @@ export CXX="xcrun clang++"
 export LD="xcrun ld"
 export STRIP="xcrun strip"
 
+export PLATFORM=$PLATFORM
+export SDK_VERSION=$SDK_VERSION
 
 CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -miphoneos-version-min=${SDK_MIN} ${OPTIM}"
 if [ "$ARCH" = "armv7" -o "$ARCH" = "armv7s" ]; then
