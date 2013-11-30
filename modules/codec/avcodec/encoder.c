@@ -441,8 +441,10 @@ int OpenEncoder( vlc_object_t *p_this )
         p_context->width = p_enc->fmt_in.video.i_visible_width;
         p_context->height = p_enc->fmt_in.video.i_visible_height;
 
-        p_context->time_base.num = p_enc->fmt_in.video.i_frame_rate_base;
-        p_context->time_base.den = p_enc->fmt_in.video.i_frame_rate;
+        /* if we don't have i_frame_rate_base, we are probing and just checking if we can find codec
+         * so set fps to 25 as some codecs (DIV3 atleast) needs time_base data */
+        p_context->time_base.num = p_enc->fmt_in.video.i_frame_rate_base ? p_enc->fmt_in.video.i_frame_rate_base : 1;
+        p_context->time_base.den = p_enc->fmt_in.video.i_frame_rate_base ? p_enc->fmt_in.video.i_frame_rate : 25 ;
         if( p_codec->supported_framerates )
         {
             AVRational target = {
@@ -454,6 +456,7 @@ int OpenEncoder( vlc_object_t *p_this )
             p_context->time_base.num = p_codec->supported_framerates[idx].den;
             p_context->time_base.den = p_codec->supported_framerates[idx].num;
         }
+        msg_Dbg( p_enc, "Time base set to %d/%d", p_context->time_base.num, p_context->time_base.den );
 
         /* Defaults from ffmpeg.c */
         p_context->qblur = 0.5;
