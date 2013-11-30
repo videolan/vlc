@@ -597,11 +597,15 @@ int OpenEncoder( vlc_object_t *p_this )
         else
         {
             p_context->rc_qsquish = 1.0;
-            if( p_sys->i_rc_buffer_size )
+            /* Default to 1/2 second buffer for given bitrate unless defined otherwise*/
+            if( !p_sys->i_rc_buffer_size )
             {
-                p_context->rc_max_rate = p_enc->fmt_out.i_bitrate;
-                p_context->rc_min_rate = p_enc->fmt_out.i_bitrate;
+                p_sys->i_rc_buffer_size = p_enc->fmt_out.i_bitrate * 8 / 2;
             }
+            msg_Dbg( p_enc, "rc buffer size %d bits", p_sys->i_rc_buffer_size );
+            /* Set maxrate/minrate to bitrate to try to get CBR */
+            p_context->rc_max_rate = p_enc->fmt_out.i_bitrate;
+            p_context->rc_min_rate = p_enc->fmt_out.i_bitrate;
             p_context->rc_buffer_size = p_sys->i_rc_buffer_size;
             /* This is from ffmpeg's ffmpeg.c : */
             p_context->rc_initial_buffer_occupancy
