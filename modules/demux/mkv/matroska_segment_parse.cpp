@@ -1036,16 +1036,14 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
                 else if( MKV_IS_ID( l, KaxChapterLanguage ) )
                 {
                     KaxChapterLanguage &lang =*(KaxChapterLanguage*)l;
-                    const char *psz = string( lang ).c_str();
-
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   |    + ChapterLanguage '%s'", psz );
+                    msg_Dbg( &sys.demuxer, "|   |   |   |   |    + ChapterLanguage '%s'",
+                             string( lang ).c_str() );
                 }
                 else if( MKV_IS_ID( l, KaxChapterCountry ) )
                 {
                     KaxChapterCountry &ct =*(KaxChapterCountry*)l;
-                    const char *psz = string( ct ).c_str();
-
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   |    + ChapterCountry '%s'", psz );
+                    msg_Dbg( &sys.demuxer, "|   |   |   |   |    + ChapterCountry '%s'",
+                             string( ct ).c_str() );
                 }
             }
         }
