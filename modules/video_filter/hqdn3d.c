@@ -92,6 +92,9 @@ struct filter_sys_t
     int w[3], h[3];
 
     struct vf_priv_s cfg;
+    bool   b_recalc_coefs;
+    vlc_mutex_t coefs_mutex;
+    float  luma_spat, luma_temp, chroma_spat, chroma_temp;
 };
 
 /*****************************************************************************
@@ -140,30 +143,24 @@ static int Open(vlc_object_t *this)
         return VLC_ENOMEM;
     }
 
-    filter->p_sys = sys;
-    filter->pf_video_filter = Filter;
-
     config_ChainParse(filter, FILTER_PREFIX, filter_options,
                       filter->p_cfg);
 
-    float luma_spat =
-            var_CreateGetFloatCommand(filter, FILTER_PREFIX "luma-spat");
-    float chroma_spat =
-            var_CreateGetFloatCommand(filter, FILTER_PREFIX "chroma-spat");
-    float luma_temp =
-            var_CreateGetFloatCommand(filter, FILTER_PREFIX "luma-temp");
-    float chroma_temp =
-            var_CreateGetFloatCommand(filter, FILTER_PREFIX "chroma-temp");
 
-    PrecalcCoefs(cfg->Coefs[0], luma_spat);
-    PrecalcCoefs(cfg->Coefs[1], luma_temp);
-    PrecalcCoefs(cfg->Coefs[2], chroma_spat);
-    PrecalcCoefs(cfg->Coefs[3], chroma_temp);
+    vlc_mutex_init( &sys->coefs_mutex );
+    sys->b_recalc_coefs = true;
+    sys->luma_spat = var_CreateGetFloatCommand(filter, FILTER_PREFIX "luma-spat");
+    sys->chroma_spat = var_CreateGetFloatCommand(filter, FILTER_PREFIX "chroma-spat");
+    sys->luma_temp = var_CreateGetFloatCommand(filter, FILTER_PREFIX "luma-temp");
+    sys->chroma_temp = var_CreateGetFloatCommand(filter, FILTER_PREFIX "chroma-temp");
 
-    var_AddCallback( filter, FILTER_PREFIX "luma-spat", DenoiseCallback, cfg );
-    var_AddCallback( filter, FILTER_PREFIX "chroma-spat", DenoiseCallback, cfg );
-    var_AddCallback( filter, FILTER_PREFIX "luma-temp", DenoiseCallback, cfg );
-    var_AddCallback( filter, FILTER_PREFIX "chroma-temp", DenoiseCallback, cfg );
+    filter->p_sys = sys;
+    filter->pf_video_filter = Filter;
+
+    var_AddCallback( filter, FILTER_PREFIX "luma-spat", DenoiseCallback, sys );
+    var_AddCallback( filter, FILTER_PREFIX "chroma-spat", DenoiseCallback, sys );
+    var_AddCallback( filter, FILTER_PREFIX "luma-temp", DenoiseCallback, sys );
+    var_AddCallback( filter, FILTER_PREFIX "chroma-temp", DenoiseCallback, sys );
 
     return VLC_SUCCESS;
 }
@@ -176,6 +173,13 @@ static void Close(vlc_object_t *this)
     filter_t *filter = (filter_t *)this;
     filter_sys_t *sys = filter->p_sys;
     struct vf_priv_s *cfg = &sys->cfg;
+
+    var_DelCallback( filter, FILTER_PREFIX "luma-spat", DenoiseCallback, sys );
+    var_DelCallback( filter, FILTER_PREFIX "chroma-spat", DenoiseCallback, sys );
+    var_DelCallback( filter, FILTER_PREFIX "luma-temp", DenoiseCallback, sys );
+    var_DelCallback( filter, FILTER_PREFIX "chroma-temp", DenoiseCallback, sys );
+
+    vlc_mutex_destroy( &sys->coefs_mutex );
 
     for (int i = 0; i < 3; ++i) {
         free(cfg->Frame[i]);
@@ -192,6 +196,7 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
     picture_t *dst;
     filter_sys_t *sys = filter->p_sys;
     struct vf_priv_s *cfg = &sys->cfg;
+    bool recalc = false;
 
     if (!src) return NULL;
 
@@ -200,6 +205,20 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
         picture_Release(src);
         return NULL;
     }
+    vlc_mutex_lock( &sys->coefs_mutex );
+    recalc = sys->b_recalc_coefs;
+    sys->b_recalc_coefs = false;
+
+    if( unlikely( recalc ) )
+    {
+        msg_Dbg( filter, "Changing coefs to %.2f %.2f %.2f %.2f",
+                            sys->luma_spat, sys->luma_temp, sys->chroma_spat, sys->chroma_temp );
+        PrecalcCoefs(cfg->Coefs[0], sys->luma_spat);
+        PrecalcCoefs(cfg->Coefs[1], sys->luma_temp);
+        PrecalcCoefs(cfg->Coefs[2], sys->chroma_spat);
+        PrecalcCoefs(cfg->Coefs[3], sys->chroma_temp);
+    }
+    vlc_mutex_unlock( &sys->coefs_mutex );
 
     deNoise(src->p[0].p_pixels, dst->p[0].p_pixels,
             cfg->Line, &cfg->Frame[0], sys->w[0], sys->h[0],
@@ -230,16 +249,21 @@ static int DenoiseCallback( vlc_object_t *p_this, char const *psz_var,
 {
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
 
-    struct vf_priv_s *cfg = (struct vf_priv_s *)p_data;
+    filter_sys_t *sys = (filter_sys_t*)p_data;
 
-    if( !strcmp( psz_var, FILTER_PREFIX "luma-spat" ) )
-        PrecalcCoefs(cfg->Coefs[0], newval.f_float);
-    else if( !strcmp( psz_var, FILTER_PREFIX "luma-temp" ) )
-        PrecalcCoefs(cfg->Coefs[1], newval.f_float);
-    else if( !strcmp( psz_var, FILTER_PREFIX "chroma-spat") )
-        PrecalcCoefs(cfg->Coefs[2], newval.f_float);
+    /* Just take values and flag for recalc so we don't block UI thread calling this
+     * and don't right thread safety calcing coefs in here without mutex*/
+    vlc_mutex_lock( &sys->coefs_mutex );
+    if( !strcmp( psz_var, FILTER_PREFIX "luma-spat") )
+        sys->luma_spat = newval.f_float;
+    else if( !strcmp( psz_var, FILTER_PREFIX "luma-temp") )
+        sys->luma_temp = newval.f_float;
     else if( !strcmp( psz_var, FILTER_PREFIX "chroma-temp") )
-        PrecalcCoefs(cfg->Coefs[3], newval.f_float);
+        sys->chroma_spat = newval.f_float;
+    else if( !strcmp( psz_var, FILTER_PREFIX "chroma-spat") )
+        sys->chroma_temp = newval.f_float;
+    sys->b_recalc_coefs = true;
+    vlc_mutex_unlock( &sys->coefs_mutex );
 
     return VLC_SUCCESS;
 }
