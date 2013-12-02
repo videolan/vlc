@@ -396,7 +396,7 @@ static OSStatus RenderCallback(vlc_object_t *p_obj,
     Float32 *buffer = TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
 
     /* check if we have enough data */
-    if (!availableBytes || p_sys->b_paused) {
+    if (!availableBytes || p_sys->b_paused ||!buffer) {
         /* return an empty buffer so silence is played until we have data */
         memset(targetBuffer, 0, ioData->mBuffers[0].mDataByteSize);
     } else {
