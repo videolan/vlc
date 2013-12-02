@@ -534,7 +534,8 @@ static void SendPacket(demux_t *p_demux, asf_track_t *tk)
 }
 
 static int DemuxSubPayload(demux_t *p_demux, asf_track_t *tk,
-        uint32_t i_sub_payload_data_length, mtime_t i_pts, mtime_t i_dts, uint32_t i_media_object_offset)
+        uint32_t i_sub_payload_data_length, mtime_t i_pts, mtime_t i_dts,
+        uint32_t i_media_object_offset, bool b_keyframe )
 {
     /* FIXME I don't use i_media_object_number, sould I ? */
     if( tk->p_frame && i_media_object_offset == 0 )
@@ -548,6 +549,8 @@ static int DemuxSubPayload(demux_t *p_demux, asf_track_t *tk,
 
     p_frag->i_pts = VLC_TS_0 + i_pts;
     p_frag->i_dts = VLC_TS_0 + i_dts;
+    if ( b_keyframe )
+        p_frag->i_flags |= BLOCK_FLAG_TYPE_I;
 
     block_ChainAppend( &tk->p_frame, p_frag );
 
@@ -574,6 +577,66 @@ static uint32_t SkipBytes( stream_t *s, uint32_t i_bytes )
     }
 
     return i_bytes_read;
+}
+
+static void ParsePayloadExtensions(demux_t *p_demux, asf_track_t *tk,
+                                   const struct asf_packet_t *pkt,
+                                   uint32_t i_length, bool *b_keyframe )
+{
+    if ( !tk || !tk->p_esp || !tk->p_esp->p_ext ) return;
+    const uint8_t *p_data = pkt->p_peek + pkt->i_skip + 8;
+    i_length -= 8;
+    uint16_t i_payload_extensions_size;
+    asf_payload_extension_system_t *p_ext = NULL;
+
+    /* Extensions always come in the declared order */
+    for ( int i=0; i< tk->p_esp->i_payload_extension_system_count; i++ )
+    {
+        asf_payload_extension_system_t *p_ext = &tk->p_esp->p_ext[i];
+        if ( p_ext->i_data_size == 0xFFFF ) /* Variable length extension data */
+        {
+            if ( i_length < 2 ) return;
+            i_payload_extensions_size = GetWLE( p_data );
+            p_data += 2;
+            i_length -= 2;
+            i_payload_extensions_size = 0;
+        }
+        else
+        {
+            i_payload_extensions_size = p_ext->i_data_size;
+        }
+
+        if ( i_length < i_payload_extensions_size ) return;
+
+        if ( guidcmp( &p_ext->i_extension_id, &mfasf_sampleextension_outputcleanpoint_guid ) )
+        {
+            if ( i_payload_extensions_size != sizeof(uint8_t) ) goto sizeerror;
+            *b_keyframe |= *p_data;
+        }
+        else if ( guidcmp( &p_ext->i_extension_id, &asf_dvr_sampleextension_videoframe_guid ) )
+        {
+            if ( i_payload_extensions_size != sizeof(uint32_t) ) goto sizeerror;
+
+            uint32_t i_val = GetDWLE( p_data );
+            /* Valid keyframe must be a split frame start fragment */
+            *b_keyframe = i_val & ASF_EXTENSION_VIDEOFRAME_NEWFRAME;
+            if ( *b_keyframe )
+            {
+                /* And flagged as IFRAME */
+                *b_keyframe |= ( ( i_val & ASF_EXTENSION_VIDEOFRAME_TYPE_MASK )
+                                 == ASF_EXTENSION_VIDEOFRAME_IFRAME );
+            }
+        }
+
+        i_length -= i_payload_extensions_size;
+        p_data += i_payload_extensions_size;
+    }
+
+    return;
+
+sizeerror:
+    msg_Warn( p_demux, "Unknown extension " GUID_FMT " data size of %u",
+              GUID_PRINT( p_ext->i_extension_id ), i_payload_extensions_size );
 }
 
 static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payload)
@@ -605,6 +668,11 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     if( i_replicated_data_length > 1 ) // should be at least 8 bytes
     {
         i_base_pts = (mtime_t)GetDWLE( pkt->p_peek + pkt->i_skip + 4 );
+
+        /* Parsing extensions, See 7.3.1 */
+        ParsePayloadExtensions( p_demux, p_sys->track[i_stream_number], pkt,
+                                i_replicated_data_length, &b_packet_keyframe );
+
         pkt->i_skip += i_replicated_data_length;
 
         if( ! pkt->left || pkt->i_skip >= pkt->left )
@@ -696,7 +764,8 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
 
         if ( i_sub_payload_data_length &&
              DemuxSubPayload(p_demux, tk, i_sub_payload_data_length,
-                        i_payload_pts, i_payload_dts, i_media_object_offset) < 0)
+                        i_payload_pts, i_payload_dts, i_media_object_offset,
+                        b_packet_keyframe ) < 0)
             return -1;
 
         if ( pkt->left > pkt->i_skip + i_sub_payload_data_length )

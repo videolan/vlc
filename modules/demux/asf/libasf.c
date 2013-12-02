@@ -904,12 +904,28 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
     }
     p_esp->i_stream_name_count = i;
 
-    for( i = 0; i < p_esp->i_payload_extension_system_count; i++ )
+    p_esp->p_ext = calloc( p_esp->i_payload_extension_system_count,
+                           sizeof( asf_payload_extension_system_t ) );
+    if ( p_esp->p_ext )
     {
-        ASF_SKIP( 16 );   // GUID
-        ASF_SKIP( 2 );
-        ASF_SKIP( ASF_READ4() );
-    }
+        for( i = 0; i < p_esp->i_payload_extension_system_count; i++ )
+        {
+            asf_payload_extension_system_t *p_ext = & p_esp->p_ext[i];
+            if( !ASF_HAVE( 16+2+4 ) ) break;
+            ASF_GetGUID( &p_ext->i_extension_id, p_data );
+            ASF_SKIP( 16 );   // GUID
+            p_ext->i_data_size = ASF_READ2();
+            p_ext->i_info_length = ASF_READ4();
+            if ( p_ext->i_info_length )
+            {
+                if( !ASF_HAVE( p_ext->i_info_length ) ) break;
+                p_ext->pi_info = malloc( p_ext->i_info_length );
+                if ( p_ext->pi_info )
+                    memcpy( p_ext->pi_info, p_data, p_ext->i_info_length );
+                ASF_SKIP( p_ext->i_info_length );
+            }
+        }
+    } else p_esp->i_payload_extension_system_count = 0;
 
     p_esp->p_sp = NULL;
     if( p_data < &p_peek[i_peek] )
@@ -956,6 +972,9 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
                  p_esp->ppsz_stream_name[i] );
     msg_Dbg( s, "  - payload extension system count=%d",
              p_esp->i_payload_extension_system_count );
+    for( i = 0; i < p_esp->i_payload_extension_system_count; i++ )
+        msg_Dbg( s, "  - %d  - payload extension: " GUID_FMT, i,
+                 GUID_PRINT( p_esp->p_ext[i].i_extension_id ) );
 #endif
     return VLC_SUCCESS;
 }
@@ -963,6 +982,12 @@ static void ASF_FreeObject_extended_stream_properties( asf_object_t *p_obj)
 {
     asf_object_extended_stream_properties_t *p_esp = &p_obj->ext_stream;
 
+    if ( p_esp->p_ext )
+    {
+        for( int i = 0; i < p_esp->i_payload_extension_system_count; i++ )
+            free( p_esp->p_ext[i].pi_info );
+        FREENULL( p_esp->p_ext );
+    }
     for( int i = 0; i < p_esp->i_stream_name_count; i++ )
         FREENULL( p_esp->ppsz_stream_name[i] );
     FREENULL( p_esp->pi_stream_name_language );

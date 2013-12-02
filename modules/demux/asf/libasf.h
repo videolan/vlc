@@ -247,6 +247,18 @@ typedef struct
     } bitrate[128];
 } asf_object_stream_bitrate_properties_t;
 
+
+typedef struct
+{
+    guid_t   i_extension_id;
+    uint16_t i_data_size;
+    uint32_t i_info_length;
+    char     *pi_info;
+} asf_payload_extension_system_t;
+#define ASF_EXTENSION_VIDEOFRAME_NEWFRAME  0x08
+#define ASF_EXTENSION_VIDEOFRAME_IFRAME    0x01
+#define ASF_EXTENSION_VIDEOFRAME_TYPE_MASK 0x07
+
 typedef struct
 {
     ASF_OBJECT_COMMON
@@ -267,7 +279,9 @@ typedef struct
     int64_t i_average_time_per_frame;
 
     int     i_stream_name_count;
+
     int     i_payload_extension_system_count;
+    asf_payload_extension_system_t *p_ext;
 
     int     *pi_stream_name_language;
     char    **ppsz_stream_name;
