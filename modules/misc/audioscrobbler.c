@@ -542,6 +542,7 @@ static int Handshake(intf_thread_t *p_this)
     psz_scrobbler_url = var_InheritString(p_this, "scrobbler-url");
     if (!psz_scrobbler_url)
     {
+        free(psz_auth_token);
         free(psz_username);
         return VLC_ENOMEM;
     }
@@ -550,6 +551,7 @@ static int Handshake(intf_thread_t *p_this)
     "http://%s/?hs=true&p=1.2&c="CLIENT_NAME"&v="CLIENT_VERSION"&u=%s&t=%s&a=%s"
     , psz_scrobbler_url, psz_username, psz_timestamp, psz_auth_token);
 
+    free(psz_auth_token);
     free(psz_scrobbler_url);
     free(psz_username);
     if (i_ret == -1)
