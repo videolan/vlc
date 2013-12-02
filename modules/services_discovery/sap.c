@@ -1251,7 +1251,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                 {
                     msg_Dbg (p_obj, "SDP origin not supported: %s", data);
                     /* Or maybe out-of-range, but this looks suspicious */
-                    return NULL;
+                    goto error;
                 }
                 EnsureUTF8 (p_sdp->orig_host);
                 break;
