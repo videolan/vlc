@@ -224,3 +224,29 @@ char *ProcessMRL( const char *psz_mrl, const char *psz_prefix )
 uri:
     return vlc_path2uri( psz_mrl, NULL );
 }
+
+/**
+ * Checks stream Content-Type against a known one
+ */
+bool CheckContentType( stream_t * p_stream, const char * psz_ctype )
+{
+    char *psz_check = stream_ContentType( p_stream );
+    if( !psz_check ) return false;
+
+    int i_len = strlen( psz_check );
+    if ( i_len == 0 )
+    {
+        free( psz_check );
+        return false;
+    }
+
+    /* check for Content-Type: foo-type; charset=... */
+    const char * psz_sep = index( psz_check, ';' );
+    if ( psz_sep )
+        i_len = __MIN( i_len, psz_sep - psz_check );
+
+    int i_res = strncasecmp( psz_check, psz_ctype, i_len );
+    free( psz_check );
+
+    return ( i_res == 0 ) ? true : false;
+}

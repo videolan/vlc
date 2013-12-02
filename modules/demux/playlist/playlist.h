@@ -81,6 +81,8 @@ void Close_ZPL ( vlc_object_t * );
 
 extern input_item_t * GetCurrentItem(demux_t *p_demux);
 
+bool CheckContentType( stream_t * p_stream, const char * psz_ctype );
+
 #define STANDARD_DEMUX_INIT_MSG( msg ) do { \
     DEMUX_INIT_COMMON();                    \
     msg_Dbg( p_demux, "%s", msg ); } while(0)

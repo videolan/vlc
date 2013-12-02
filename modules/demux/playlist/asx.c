@@ -134,6 +134,13 @@ static void ReadElement( xml_reader_t *p_xml_reader, char **ppsz_txt )
      */
 }
 
+static bool PeekASX( demux_t *p_demux )
+{
+    const uint8_t *p_peek;
+    return ( stream_Peek( p_demux->s, &p_peek, 12 ) == 12
+             && !memcmp( p_peek, "<asx version", 12 ) );
+}
+
 /*****************************************************************************
  * Import_ASX: main import function
  *****************************************************************************/
@@ -145,6 +152,9 @@ int Import_ASX( vlc_object_t *p_this )
     if( demux_IsPathExtension( p_demux, ".asx" ) ||
         demux_IsPathExtension( p_demux, ".wax" ) ||
         demux_IsPathExtension( p_demux, ".wvx" ) ||
+        (
+          CheckContentType( p_demux->s, "video/x-ms-asf" ) && PeekASX( p_demux )
+        ) ||
         demux_IsForced( p_demux, "asx-open" ) )
     {
         STANDARD_DEMUX_INIT_MSG( "found valid ASX playlist" );
