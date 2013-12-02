@@ -1176,6 +1176,7 @@ static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, int
 
 
     p_sys->frame->pts        = date_Get( &p_sys->buffer_date );
+
     if( likely( p_sys->frame->pts != AV_NOPTS_VALUE) )
         date_Increment( &p_sys->buffer_date, p_sys->frame->nb_samples );
 
@@ -1242,10 +1243,9 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     //Calculate how many bytes we would need from current buffer to fill frame
     size_t leftover_samples = __MAX(0,__MIN((ssize_t)i_samples_left, (ssize_t)(p_sys->i_frame_size - p_sys->i_samples_delay)));
 
-    if( ( p_aout_buf && ( p_aout_buf->i_pts > VLC_TS_INVALID ) &&
-        ((p_aout_buf->i_pts - p_sys->i_samples_delay) != date_Get( &p_sys->buffer_date ) ) ) )
+    if( p_aout_buf && ( p_aout_buf->i_pts > VLC_TS_INVALID ) )
     {
-        date_Set( &p_sys->buffer_date, p_aout_buf->i_dts );
+        date_Set( &p_sys->buffer_date, p_aout_buf->i_pts );
         /* take back amount we have leftover from previous buffer*/
         if( p_sys->i_samples_delay > 0 )
             date_Decrement( &p_sys->buffer_date, p_sys->i_samples_delay );
