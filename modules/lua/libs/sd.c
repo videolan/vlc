@@ -347,7 +347,6 @@ static int vlclua_node_add_subitem( lua_State *L )
                 lua_pushvalue( L, -2 );
                 vlclua_read_options( p_sd, L, &i_options, &ppsz_options );
 
-                input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
                 input_item_t *p_input = input_item_NewExt( psz_path,
                                                            psz_path, i_options,
                                                            (const char **)ppsz_options,
@@ -356,6 +355,8 @@ static int vlclua_node_add_subitem( lua_State *L )
 
                 if( p_input )
                 {
+                    input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
+
                     vlclua_read_meta_data( p_sd, L, p_input );
                     /* This one is to be tested... */
                     vlclua_read_custom_meta_data( p_sd, L, p_input );
@@ -406,7 +407,6 @@ static int vlclua_node_add_subnode( lua_State *L )
             if( lua_isstring( L, -1 ) )
             {
                 const char *psz_name = lua_tostring( L, -1 );
-                input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
                 input_item_t *p_input = input_item_NewWithType( "vlc://nop",
                                                                 psz_name, 0, NULL, 0,
                                                                 -1, ITEM_TYPE_NODE );
@@ -414,6 +414,8 @@ static int vlclua_node_add_subnode( lua_State *L )
 
                 if( p_input )
                 {
+                    input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
+
                     lua_getfield( L, -1, "arturl" );
                     if( lua_isstring( L, -1 ) && strcmp( lua_tostring( L, -1 ), "" ) )
                     {
