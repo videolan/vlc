@@ -642,13 +642,14 @@ notsupp:
     if( !p_sys )
         return VLC_ENOMEM;
 
+    p_sys->chroma = chroma;
+
     config_ChainParse( p_filter, FILTER_CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
     char *psz_mode = var_InheritString( p_filter, FILTER_CFG_PREFIX "mode" );
     SetFilterMethod( p_filter, psz_mode, packed );
     free( psz_mode );
 
-    p_sys->chroma = chroma;
     for( int i = 0; i < METADATA_SIZE; i++ )
     {
         p_sys->meta.pi_date[i] = VLC_TS_INVALID;
