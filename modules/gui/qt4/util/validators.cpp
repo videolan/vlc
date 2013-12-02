@@ -24,12 +24,27 @@
 
 #include "validators.hpp"
 
+#include <QUrl>
+
 QValidator::State UrlValidator::validate( QString& str, int& ) const
 {
-    str = str.trimmed();
-    if( str.contains( ' ' ) )
+    if( str.startsWith( ' ' ) )
         return QValidator::Invalid;
-    if( !str.contains( "://" ) )
+
+    if ( str.isEmpty() )
         return QValidator::Intermediate;
-    return QValidator::Acceptable;
+
+    QUrl url( str );
+    if ( url.scheme().isEmpty() )
+        return QValidator::Intermediate;
+
+    return ( url.isValid() ) ? QValidator::Acceptable : QValidator::Intermediate;
+}
+
+void UrlValidator::fixup( QString & input ) const
+{
+    while( input.startsWith( ' ' ) )
+        input.chop( 1 );
+    QUrl fixed( input, QUrl::TolerantMode );
+    input = fixed.toString();
 }

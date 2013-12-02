@@ -29,6 +29,7 @@ class UrlValidator : public QValidator
 public:
    UrlValidator( QObject *parent ) : QValidator( parent ) { }
    virtual QValidator::State validate( QString&, int& ) const;
+   virtual void fixup ( QString & input ) const;
 };
 
 #endif // VALIDATORS_HPP
