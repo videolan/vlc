@@ -75,6 +75,7 @@ typedef struct
     es_out_id_t     *p_es;
 
     asf_object_stream_properties_t *p_sp;
+    asf_object_extended_stream_properties_t *p_esp;
 
     mtime_t i_time;
 
@@ -937,6 +938,7 @@ static int DemuxInit( demux_t *p_demux )
         tk->i_time = -1;
         tk->p_sp = p_sp;
         tk->p_es = NULL;
+        tk->p_esp = NULL;
         tk->p_frame = NULL;
 
         /* Check (in case of mms) if this track is selected (ie will receive data) */
@@ -963,6 +965,7 @@ static int DemuxInit( demux_t *p_demux )
                 if( p_tmp->ext_stream.i_stream_number == p_sp->i_stream_number )
                 {
                     p_esp = &p_tmp->ext_stream;
+                    tk->p_esp = p_esp;
                     break;
                 }
             }
