@@ -251,15 +251,15 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
         return false;
     }
 
-    /* AU initiliaze */
+    /* AU init */
     status = AudioUnitInitialize(p_sys->au_unit);
     if (status != noErr) {
         msg_Err(p_aout, "failed to init AudioUnit (%li)", status);
         return false;
     }
 
-    status = AudioOutputUnitStart(p_sys->au_unit);
-    msg_Dbg(p_aout, "audio output unit started: %li", status);
+    /* setup circular buffer */
+    TPCircularBufferInit(&p_sys->circular_buffer, AUDIO_BUFFER_SIZE_IN_SECONDS * fmt->i_rate * fmt->i_bytes_per_frame);
 
     /* start audio session so playback continues if mute switch is on */
     AudioSessionInitialize (NULL,
@@ -272,8 +272,8 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 	AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(sessionCategory),&sessionCategory);
 	AudioSessionSetActive(true);
 
-    /* setup circular buffer */
-    TPCircularBufferInit(&p_sys->circular_buffer, AUDIO_BUFFER_SIZE_IN_SECONDS * fmt->i_rate * fmt->i_bytes_per_frame);
+    status = AudioOutputUnitStart(p_sys->au_unit);
+    msg_Dbg(p_aout, "audio output unit started: %li", status);
 
     return true;
 }
@@ -396,7 +396,7 @@ static OSStatus RenderCallback(vlc_object_t *p_obj,
     Float32 *buffer = TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
 
     /* check if we have enough data */
-    if (!availableBytes || p_sys->b_paused ||!buffer) {
+    if (!availableBytes || p_sys->b_paused) {
         /* return an empty buffer so silence is played until we have data */
         memset(targetBuffer, 0, ioData->mBuffers[0].mDataByteSize);
     } else {
