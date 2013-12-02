@@ -493,18 +493,10 @@ static int Handshake(intf_thread_t *p_this)
     intf_sys_t          *p_sys                  = p_this->p_sys;
 
     psz_username = var_InheritString(p_this, "lastfm-username");
-    if (!psz_username)
-        return VLC_ENOMEM;
-
     psz_password = var_InheritString(p_this, "lastfm-password");
-    if (!psz_password)
-    {
-        free(psz_username);
-        return VLC_ENOMEM;
-    }
 
     /* username or password have not been setup */
-    if (!*psz_username || !*psz_password)
+    if (EMPTY_STR(psz_username) || EMPTY_STR(psz_password))
     {
         free(psz_username);
         free(psz_password);
