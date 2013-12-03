@@ -3,7 +3,6 @@ GLIB_VERSION := 2.38
 GLIB_MINOR_VERSION := 2.38.2
 GLIB_URL := http://ftp.gnome.org/pub/gnome/sources/glib/$(GLIB_VERSION)/glib-$(GLIB_MINOR_VERSION).tar.xz
 
-PKGS += glib
 ifeq ($(call need_pkg,"glib-2.0 gthread-2.0"),)
 PKGS_FOUND += glib
 endif
