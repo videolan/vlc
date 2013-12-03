@@ -137,7 +137,7 @@ static void* EncoderThread( void *obj )
             vlc_mutex_unlock( &p_sys->lock_out );
             break;
         }
-            vlc_mutex_unlock( &p_sys->lock_out );
+        vlc_mutex_unlock( &p_sys->lock_out );
     }
 
     /*Encode what we have in the buffer on closing*/
