@@ -241,7 +241,7 @@ bool CheckContentType( stream_t * p_stream, const char * psz_ctype )
     }
 
     /* check for Content-Type: foo-type; charset=... */
-    const char * psz_sep = index( psz_check, ';' );
+    const char * psz_sep = strchr( psz_check, ';' );
     if ( psz_sep )
         i_len = __MIN( i_len, psz_sep - psz_check );
 
