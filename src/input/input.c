@@ -1856,6 +1856,8 @@ static bool Control( input_thread_t *p_input,
             /* No need to force update, es_out does it if needed */
             es_out_Control( p_input->p->p_es_out_display,
                             ES_OUT_SET_ES_BY_ID, (int)val.i_int );
+
+            demux_Control( p_input->p->input.p_demux, DEMUX_SET_ES, (int)val.i_int );
             break;
 
         case INPUT_CONTROL_RESTART_ES:

@@ -115,11 +115,12 @@ enum demux_query_e
     DEMUX_SET_TITLE,            /* arg1= int            can fail */
     DEMUX_SET_SEEKPOINT,        /* arg1= int            can fail */
 
-    /* DEMUX_SET_GROUP only a hint for demuxer (mainly DVB) to allow not
+    /* DEMUX_SET_GROUP/SET_ES only a hint for demuxer (mainly DVB) to allow not
      * reading everything (you should not use this to call es_out_Control)
      * if you don't know what to do with it, just IGNORE it, it is safe(r)
      * -1 means all group, 0 default group (first es added) */
     DEMUX_SET_GROUP,            /* arg1= int, arg2=const vlc_list_t *   can fail */
+    DEMUX_SET_ES,               /* arg1= int                            can fail */
 
     /* Ask the demux to demux until the given date at the next pf_demux call
      * but not more (and not less, at the precision available of course).
