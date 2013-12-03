@@ -342,6 +342,8 @@ static void SeekPrepare( demux_t *p_demux )
             block_ChainRelease( tk->p_frame );
         tk->p_frame = NULL;
     }
+
+    es_out_Control( p_demux->out, ES_OUT_RESET_PCR, VLC_TS_INVALID );
 }
 
 /*****************************************************************************
