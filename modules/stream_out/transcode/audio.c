@@ -202,6 +202,34 @@ int transcode_audio_process( sout_stream_t *p_stream,
     while( (p_audio_buf = id->p_decoder->pf_decode_audio( id->p_decoder,
                                                           &in )) )
     {
+
+        if( unlikely( !id->p_encoder->p_module ) )
+        {
+            /* Complete destination format */
+            id->p_encoder->fmt_out.i_codec = p_sys->i_acodec;
+            id->p_encoder->fmt_out.audio.i_rate = p_sys->i_sample_rate > 0 ?
+                p_sys->i_sample_rate : id->p_decoder->fmt_out.audio.i_rate;
+            id->p_encoder->fmt_out.i_bitrate = p_sys->i_abitrate;
+            id->p_encoder->fmt_out.audio.i_bitspersample =
+                id->p_decoder->fmt_out.audio.i_bitspersample;
+            id->p_encoder->fmt_out.audio.i_channels = p_sys->i_channels > 0 ?
+                p_sys->i_channels : id->p_decoder->fmt_out.audio.i_channels;
+            /* Sanity check for audio channels */
+            id->p_encoder->fmt_out.audio.i_channels =
+                __MIN( id->p_encoder->fmt_out.audio.i_channels,
+                       id->p_decoder->fmt_out.audio.i_channels );
+            id->p_encoder->fmt_out.audio.i_original_channels =
+                id->p_decoder->fmt_in.audio.i_physical_channels;
+            id->p_encoder->fmt_out.audio.i_physical_channels =
+                pi_channels_maps[id->p_encoder->fmt_out.audio.i_channels];
+            if( transcode_audio_new( p_stream, id ) )
+            {
+                msg_Err( p_stream, "cannot create audio chain" );
+                return VLC_EGENERIC;
+            }
+            date_Init( &id->interpolated_pts, id->p_decoder->fmt_out.audio.i_rate, 1 );
+
+        }
         /* Check if audio format has changed, and filters need reinit */
         if( unlikely( ( id->p_decoder->fmt_out.audio.i_rate != p_sys->fmt_audio.i_rate ) ||
                       ( id->p_decoder->fmt_out.audio.i_physical_channels != p_sys->fmt_audio.i_physical_channels ) ) )
@@ -307,6 +335,15 @@ bool transcode_audio_add( sout_stream_t *p_stream, es_format_t *p_fmt,
         transcode_audio_close( id );
         return false;
     }
+
+    module_unneed( id->p_encoder, id->p_encoder->p_module );
+    if( id->p_encoder->fmt_out.p_extra )
+    {
+        free( id->p_encoder->fmt_out.p_extra );
+        id->p_encoder->fmt_out.p_extra = NULL;
+        id->p_encoder->fmt_out.i_extra = 0;
+    }
+    id->p_encoder->p_module = NULL;
 
     date_Init( &id->interpolated_pts, p_fmt->audio.i_rate, 1 );
 
