@@ -229,11 +229,30 @@ static void Close( vlc_object_t * p_this )
 }
 
 /*****************************************************************************
- * SeekIndex: goto to i_date or i_percent
+ * WaitKeyframe: computes the number of frames to wait for a keyframe
  *****************************************************************************/
-static int SeekPercent( demux_t *p_demux, int i_query, va_list args )
+static void WaitKeyframe( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    if ( ! p_sys->i_seek_track )
+    {
+        for ( int i=0; i<128; i++ )
+        {
+            asf_track_t *tk = p_sys->track[i];
+            if ( tk && tk->p_sp && tk->i_cat == VIDEO_ES )
+            {
+                bool b_selected = false;
+                es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
+                                tk->p_es, &b_selected );
+                if ( b_selected )
+                {
+                    p_sys->i_seek_track = tk->p_sp->i_stream_number;
+                    break;
+                }
+            }
+        }
+    }
+
     if ( p_sys->i_seek_track )
     {
         /* Skip forward at least 1 min */
@@ -255,6 +274,18 @@ static int SeekPercent( demux_t *p_demux, int i_query, va_list args )
     {
         p_sys->i_wait_keyframe = 0;
     }
+
+}
+
+/*****************************************************************************
+ * SeekIndex: goto to i_date or i_percent
+ *****************************************************************************/
+static int SeekPercent( demux_t *p_demux, int i_query, va_list args )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    WaitKeyframe( p_demux );
+
     msg_Dbg( p_demux, "seek with percent: waiting %i frames", p_sys->i_wait_keyframe );
     return demux_vaControlHelper( p_demux->s, p_sys->i_data_begin,
                                    p_sys->i_data_end, p_sys->i_bitrate,
@@ -282,7 +313,7 @@ static int SeekIndex( demux_t *p_demux, mtime_t i_date, float f_pos )
         return VLC_EGENERIC;
     }
 
-    p_sys->i_wait_keyframe = p_sys->i_seek_track ? 50 : 0;
+    WaitKeyframe( p_demux );
 
     uint64_t i_offset = (uint64_t)p_index->index_entry[i_entry].i_packet_number *
                         p_sys->p_fp->i_min_data_packet_size;
@@ -1170,10 +1201,6 @@ static int DemuxInit( demux_t *p_demux )
                 if( fmt.psz_language && (p = strchr( fmt.psz_language, '-' )) )
                     *p = '\0';
             }
-
-            /* Set the track on which we'll do our seeking to the first video track */
-            if(!p_sys->i_seek_track && fmt.i_cat == VIDEO_ES)
-                p_sys->i_seek_track = p_sp->i_stream_number;
 
             /* Set our priority so we won't get multiple videos */
             int i_priority = ES_PRIORITY_SELECTABLE_MIN;
