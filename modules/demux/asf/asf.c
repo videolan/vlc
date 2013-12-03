@@ -360,6 +360,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     vlc_meta_t  *p_meta;
     int64_t     i64, *pi64;
+    int         i;
     double      f, *pf;
 
     switch( i_query )
@@ -393,6 +394,20 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_SUCCESS;
         }
         return SeekPercent( p_demux, i_query, args );
+
+    case DEMUX_SET_ES:
+    {
+        i = (int)va_arg( args, int );
+        int i_ret = stream_Control( p_demux->s,
+                                    STREAM_SET_PRIVATE_ID_STATE, i, true );
+        if ( i_ret == VLC_SUCCESS )
+        {
+            SeekPrepare( p_demux );
+            p_sys->i_seek_track = 0;
+            WaitKeyframe( p_demux );
+        }
+        return i_ret;
+    }
 
     case DEMUX_GET_POSITION:
         if( p_sys->i_time < 0 ) return VLC_EGENERIC;
@@ -1144,15 +1159,18 @@ static int DemuxInit( demux_t *p_demux )
         tk->p_esp = NULL;
         tk->p_frame = NULL;
 
-        /* Check (in case of mms) if this track is selected (ie will receive data) */
-        if( !stream_Control( p_demux->s, STREAM_GET_PRIVATE_ID_STATE,
-                             (int) p_sp->i_stream_number, &b_access_selected ) &&
-            !b_access_selected )
+        if ( strncmp( p_demux->psz_access, "mms", 3 ) )
         {
-            tk->i_cat = UNKNOWN_ES;
-            msg_Dbg( p_demux, "ignoring not selected stream(ID:%u) (by access)",
-                     p_sp->i_stream_number );
-            continue;
+            /* Check (not mms) if this track is selected (ie will receive data) */
+            if( !stream_Control( p_demux->s, STREAM_GET_PRIVATE_ID_STATE,
+                                 (int) p_sp->i_stream_number, &b_access_selected ) &&
+                !b_access_selected )
+            {
+                tk->i_cat = UNKNOWN_ES;
+                msg_Dbg( p_demux, "ignoring not selected stream(ID:%u) (by access)",
+                         p_sp->i_stream_number );
+                continue;
+            }
         }
 
         /* Find the associated extended_stream_properties if any */
@@ -1379,6 +1397,11 @@ static int DemuxInit( demux_t *p_demux )
                 }
             }
             fmt.i_priority = i_priority;
+
+            if ( i_stream <= INT_MAX )
+                fmt.i_id = i_stream;
+            else
+                msg_Warn( p_demux, "Can't set fmt.i_id to match stream id %u", i_stream );
 
             tk->p_es = es_out_Add( p_demux->out, &fmt );
         }
