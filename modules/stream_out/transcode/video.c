@@ -852,8 +852,8 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
             id->p_uf_chain = NULL;
 
             /* Reinitialize filters */
-            id->p_encoder->fmt_out.video.i_width  = p_sys->i_width & ~1;
-            id->p_encoder->fmt_out.video.i_height = p_sys->i_height & ~1;
+            id->p_encoder->fmt_out.video.i_visible_width  = p_sys->i_width & ~1;
+            id->p_encoder->fmt_out.video.i_visible_height = p_sys->i_height & ~1;
             id->p_encoder->fmt_out.video.i_sar_num = id->p_encoder->fmt_out.video.i_sar_den = 0;
 
             transcode_video_filter_init( p_stream, id );
@@ -996,8 +996,8 @@ bool transcode_video_add( sout_stream_t *p_stream, es_format_t *p_fmt,
 
     /* Complete destination format */
     id->p_encoder->fmt_out.i_codec = p_sys->i_vcodec;
-    id->p_encoder->fmt_out.video.i_width  = p_sys->i_width & ~1;
-    id->p_encoder->fmt_out.video.i_height = p_sys->i_height & ~1;
+    id->p_encoder->fmt_out.video.i_visible_width  = p_sys->i_width & ~1;
+    id->p_encoder->fmt_out.video.i_visible_height = p_sys->i_height & ~1;
     id->p_encoder->fmt_out.i_bitrate = p_sys->i_vbitrate;
 
     /* Build decoder -> filter -> encoder chain */
