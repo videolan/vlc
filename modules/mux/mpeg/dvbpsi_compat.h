@@ -74,7 +74,6 @@ static void dvbpsi_messages(dvbpsi_t *p_dvbpsi, const dvbpsi_msg_level_t level, 
         case DVBPSI_MSG_ERROR: msg_Err( obj, "%s", msg ); break;
         case DVBPSI_MSG_WARN:  msg_Warn( obj, "%s", msg ); break;
         case DVBPSI_MSG_DEBUG: msg_Dbg( obj, "%s", msg ); break;
-        default: msg_Info( obj, "%s", msg ); break;
     }
 }
 #endif
