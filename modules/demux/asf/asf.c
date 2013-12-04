@@ -68,6 +68,8 @@ vlc_module_end ()
 static int Demux  ( demux_t * );
 static int Control( demux_t *, int i_query, va_list args );
 
+#define MAX_ASF_TRACKS 128
+
 typedef struct
 {
     int i_cat;
@@ -93,7 +95,7 @@ struct demux_sys_t
     asf_object_file_properties_t *p_fp;
 
     unsigned int        i_track;
-    asf_track_t         *track[128]; /* track number is stored on 7 bits */
+    asf_track_t         *track[MAX_ASF_TRACKS]; /* track number is stored on 7 bits */
 
     int64_t             i_data_begin;
     int64_t             i_data_end;
@@ -140,7 +142,6 @@ static int Open( vlc_object_t * p_this )
     }
     return VLC_SUCCESS;
 }
-
 
 /*****************************************************************************
  * Demux: read packet and send them to decoders
@@ -236,7 +237,7 @@ static void WaitKeyframe( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     if ( ! p_sys->i_seek_track )
     {
-        for ( int i=0; i<128; i++ )
+        for ( int i=0; i<MAX_ASF_TRACKS; i++ )
         {
             asf_track_t *tk = p_sys->track[i];
             if ( tk && tk->p_sp && tk->i_cat == VIDEO_ES )
@@ -331,7 +332,7 @@ static void SeekPrepare( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     p_sys->i_time = VLC_TS_INVALID;
-    for( int i = 0; i < 128 ; i++ )
+    for( int i = 0; i < MAX_ASF_TRACKS ; i++ )
     {
         asf_track_t *tk = p_sys->track[i];
         if( !tk )
@@ -451,7 +452,7 @@ static mtime_t GetMoviePTS( demux_sys_t *p_sys )
     mtime_t i_time = -1;
     int     i;
 
-    for( i = 0; i < 128 ; i++ )
+    for( i = 0; i < MAX_ASF_TRACKS ; i++ )
     {
         asf_track_t *tk = p_sys->track[i];
 
@@ -918,7 +919,7 @@ static int DemuxInit( demux_t *p_demux )
     p_sys->i_track  = 0;
     p_sys->i_seek_track = 0;
     p_sys->i_wait_keyframe = 0;
-    for( int i = 0; i < 128; i++ )
+    for( int i = 0; i < MAX_ASF_TRACKS; i++ )
     {
         p_sys->track[i] = NULL;
     }
@@ -1310,7 +1311,7 @@ static int DemuxInit( demux_t *p_demux )
     }
     /// \tood Fix Child meta for ASF tracks
 #if 0
-    for( i_stream = 0, i = 0; i < 128; i++ )
+    for( i_stream = 0, i = 0; i < MAX_ASF_TRACKS; i++ )
     {
         asf_object_codec_list_t *p_cl = ASF_FindObject( p_sys->p_root->p_hdr,
                                                         &asf_object_codec_list_guid, 0 );
@@ -1363,7 +1364,7 @@ static void DemuxEnd( demux_t *p_demux )
         p_sys->meta = NULL;
     }
 
-    for( int i = 0; i < 128; i++ )
+    for( int i = 0; i < MAX_ASF_TRACKS; i++ )
     {
         asf_track_t *tk = p_sys->track[i];
 
