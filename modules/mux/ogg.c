@@ -292,8 +292,8 @@ static void Close( vlc_object_t * p_this )
         {
             OggCreateStreamFooter( p_mux, p_sys->pp_del_streams[i] );
             free( p_sys->pp_del_streams[i]->p_oggds_header );
-            free( p_sys->pp_del_streams[i] );
             free( p_sys->pp_del_streams[i]->skeleton.p_index );
+            free( p_sys->pp_del_streams[i] );
         }
         free( p_sys->pp_del_streams );
         p_sys->i_streams -= p_sys->i_del_streams;
