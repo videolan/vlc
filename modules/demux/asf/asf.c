@@ -67,6 +67,7 @@ vlc_module_end ()
  *****************************************************************************/
 static int Demux  ( demux_t * );
 static int Control( demux_t *, int i_query, va_list args );
+static void FlushRemainingPackets( demux_t *p_demux );
 
 #define MAX_ASF_TRACKS 128
 
@@ -194,6 +195,7 @@ static int Demux( demux_t *p_demux )
         /* Read and demux a packet */
         if( ( i_result = DemuxPacket( p_demux ) ) <= 0 )
         {
+            FlushRemainingPackets( p_demux );
             return i_result;
         }
         if( i_time_begin == -1 )
@@ -1346,6 +1348,22 @@ error:
     ASF_FreeObjectRoot( p_demux->s, p_sys->p_root );
     return VLC_EGENERIC;
 }
+
+/*****************************************************************************
+ * FlushRemainingPackets: flushes tail packets
+ *****************************************************************************/
+
+static void FlushRemainingPackets( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    for ( unsigned int i = 0; i < MAX_ASF_TRACKS; i++ )
+    {
+        asf_track_t *tk = p_sys->track[i];
+        if( tk && tk->p_frame )
+            SendPacket( p_demux, tk );
+    }
+}
+
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -1372,6 +1390,7 @@ static void DemuxEnd( demux_t *p_demux )
         {
             if( tk->p_frame )
             {
+                msg_Warn( p_demux, "Still one frame for track %u, something is wrong", i );
                 block_ChainRelease( tk->p_frame );
             }
             if( tk->p_es )
