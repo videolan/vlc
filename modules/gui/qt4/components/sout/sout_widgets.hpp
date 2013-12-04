@@ -31,6 +31,7 @@
 class QLineEdit;
 class QLabel;
 class QSpinBox;
+class QGridLayout;
 
 class SoutInputBox : public QGroupBox
 {
@@ -48,10 +49,14 @@ class VirtualDestBox : public QWidget
 {
     Q_OBJECT
     public:
-        VirtualDestBox( QWidget *_parent = NULL ) : QWidget( _parent ){}
+        VirtualDestBox( QWidget *_parent = NULL );
         virtual QString getMRL( const QString& ) = 0;
+        virtual ~VirtualDestBox();
     protected:
         QString mrl;
+    protected:
+        QLabel *label;
+        QGridLayout *layout;
     signals:
         void mrlUpdated();
 };
