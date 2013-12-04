@@ -78,6 +78,49 @@ static int transcode_audio_initialize_filters( sout_stream_t *p_stream, sout_str
     return VLC_SUCCESS;
 }
 
+static int transcode_audio_initialize_encoder( sout_stream_id_t *id, sout_stream_t *p_stream )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    /* Initialization of encoder format structures */
+    es_format_Init( &id->p_encoder->fmt_in, id->p_decoder->fmt_in.i_cat,
+                    id->p_decoder->fmt_out.i_codec );
+    id->p_encoder->fmt_in.audio.i_format = id->p_decoder->fmt_out.i_codec;
+    id->p_encoder->fmt_in.audio.i_rate = id->p_encoder->fmt_out.audio.i_rate;
+    id->p_encoder->fmt_in.audio.i_physical_channels =
+        id->p_encoder->fmt_out.audio.i_physical_channels;
+    aout_FormatPrepare( &id->p_encoder->fmt_in.audio );
+
+    id->p_encoder->p_cfg = p_stream->p_sys->p_audio_cfg;
+    id->p_encoder->p_module =
+        module_need( id->p_encoder, "encoder", p_sys->psz_aenc, true );
+    if( !id->p_encoder->p_module )
+    {
+        msg_Err( p_stream, "cannot find audio encoder (module:%s fourcc:%4.4s). Take a look few lines earlier to see possible reason.",
+                 p_sys->psz_aenc ? p_sys->psz_aenc : "any",
+                 (char *)&p_sys->i_acodec );
+        module_unneed( id->p_decoder, id->p_decoder->p_module );
+        id->p_decoder->p_module = NULL;
+        return VLC_EGENERIC;
+    }
+
+    id->p_encoder->fmt_out.i_codec =
+        vlc_fourcc_GetCodec( AUDIO_ES, id->p_encoder->fmt_out.i_codec );
+
+    /* Fix input format */
+    id->p_encoder->fmt_in.audio.i_format = id->p_encoder->fmt_in.i_codec;
+    if( !id->p_encoder->fmt_in.audio.i_physical_channels
+     || !id->p_encoder->fmt_in.audio.i_original_channels )
+    {
+        if( id->p_encoder->fmt_in.audio.i_channels < 6 )
+            id->p_encoder->fmt_in.audio.i_physical_channels =
+            id->p_encoder->fmt_in.audio.i_original_channels =
+                      pi_channels_maps[id->p_encoder->fmt_in.audio.i_channels];
+    }
+    aout_FormatPrepare( &id->p_encoder->fmt_in.audio );
+
+    return VLC_SUCCESS;
+}
+
 int transcode_audio_new( sout_stream_t *p_stream,
                                 sout_stream_id_t *id )
 {
@@ -116,43 +159,8 @@ int transcode_audio_new( sout_stream_t *p_stream,
     /*
      * Open encoder
      */
-
-    /* Initialization of encoder format structures */
-    es_format_Init( &id->p_encoder->fmt_in, id->p_decoder->fmt_in.i_cat,
-                    id->p_decoder->fmt_out.i_codec );
-    id->p_encoder->fmt_in.audio.i_format = id->p_decoder->fmt_out.i_codec;
-    id->p_encoder->fmt_in.audio.i_rate = id->p_encoder->fmt_out.audio.i_rate;
-    id->p_encoder->fmt_in.audio.i_physical_channels =
-        id->p_encoder->fmt_out.audio.i_physical_channels;
-    aout_FormatPrepare( &id->p_encoder->fmt_in.audio );
-
-    id->p_encoder->p_cfg = p_stream->p_sys->p_audio_cfg;
-    id->p_encoder->p_module =
-        module_need( id->p_encoder, "encoder", p_sys->psz_aenc, true );
-    if( !id->p_encoder->p_module )
-    {
-        msg_Err( p_stream, "cannot find audio encoder (module:%s fourcc:%4.4s). Take a look few lines earlier to see possible reason.",
-                 p_sys->psz_aenc ? p_sys->psz_aenc : "any",
-                 (char *)&p_sys->i_acodec );
-        module_unneed( id->p_decoder, id->p_decoder->p_module );
-        id->p_decoder->p_module = NULL;
-        return VLC_EGENERIC;
-    }
-
-    id->p_encoder->fmt_out.i_codec =
-        vlc_fourcc_GetCodec( AUDIO_ES, id->p_encoder->fmt_out.i_codec );
-
-    /* Fix input format */
-    id->p_encoder->fmt_in.audio.i_format = id->p_encoder->fmt_in.i_codec;
-    if( !id->p_encoder->fmt_in.audio.i_physical_channels
-     || !id->p_encoder->fmt_in.audio.i_original_channels )
-    {
-        if( id->p_encoder->fmt_in.audio.i_channels < 6 )
-            id->p_encoder->fmt_in.audio.i_physical_channels =
-            id->p_encoder->fmt_in.audio.i_original_channels =
-                      pi_channels_maps[id->p_encoder->fmt_in.audio.i_channels];
-    }
-    aout_FormatPrepare( &id->p_encoder->fmt_in.audio );
+    if( transcode_audio_initialize_encoder( id, p_stream ) == VLC_EGENERIC )
+	return VLC_EGENERIC;
 
     if( unlikely( transcode_audio_initialize_filters( p_stream, id, p_sys, &fmt_last ) != VLC_SUCCESS ) )
         return VLC_EGENERIC;
@@ -222,11 +230,13 @@ int transcode_audio_process( sout_stream_t *p_stream,
                 id->p_decoder->fmt_in.audio.i_physical_channels;
             id->p_encoder->fmt_out.audio.i_physical_channels =
                 pi_channels_maps[id->p_encoder->fmt_out.audio.i_channels];
-            if( transcode_audio_new( p_stream, id ) )
+            if( transcode_audio_initialize_encoder( id, p_stream ) )
             {
                 msg_Err( p_stream, "cannot create audio chain" );
                 return VLC_EGENERIC;
             }
+            if( unlikely( transcode_audio_initialize_filters( p_stream, id, p_sys, &id->p_decoder->fmt_out.audio ) != VLC_SUCCESS ) )
+                return VLC_EGENERIC;
             date_Init( &id->interpolated_pts, id->p_decoder->fmt_out.audio.i_rate, 1 );
 
         }
