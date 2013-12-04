@@ -360,14 +360,15 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
 
     *pp_block = NULL; /* To avoid being fed the same packet again */
 
-    {
-        block_t *p_aout_buffer = DecodePacket( p_dec, p_oggpacket,
-                                               p_block->i_nb_samples,
-                                               (int)p_block->i_length );
+    if( !p_block )
+        return NULL;
 
-        block_Release( p_block );
-        return p_aout_buffer;
-    }
+    block_t *p_aout_buffer = DecodePacket( p_dec, p_oggpacket,
+                                           p_block->i_nb_samples,
+                                           (int)p_block->i_length );
+
+    block_Release( p_block );
+    return p_aout_buffer;
 }
 
 /*****************************************************************************
