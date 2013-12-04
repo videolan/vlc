@@ -28,7 +28,7 @@ demux_LTLIBRARIES += libau_plugin.la
 librawaud_plugin_la_SOURCES = demux/rawaud.c
 demux_LTLIBRARIES += librawaud_plugin.la
 
-libwav_plugin_la_SOURCES = demux/wav.c
+libwav_plugin_la_SOURCES = demux/wav.c demux/windows_audio_commons.h
 demux_LTLIBRARIES += libwav_plugin.la
 
 libnsv_plugin_la_SOURCES = demux/nsv.c
@@ -171,7 +171,8 @@ libmkv_plugin_la_SOURCES = \
 	demux/mkv/chapter_command.hpp demux/mkv/chapter_command.cpp \
 	demux/mkv/stream_io_callback.hpp demux/mkv/stream_io_callback.cpp \
 	demux/mp4/libmp4.c demux/vobsub.h \
-	demux/mkv/mkv.hpp demux/mkv/mkv.cpp
+	demux/mkv/mkv.hpp demux/mkv/mkv.cpp \
+	demux/windows_audio_commons.h
 libmkv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libmkv_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
 libmkv_plugin_la_LIBADD = $(LIBS_mkv)
