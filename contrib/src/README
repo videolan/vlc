@@ -68,6 +68,10 @@ should be listed in the PKGS special variable. See some examples:
 	PKGS += x264
 	endif
 
+If a package is a dependency of another package, but it is not a
+direct dependency of VLC, then it should NOT be added to PKGS. The
+build system will automatically build it via dependencies (see below).
+
 Some packages may be provided by the target system. This is especially
 common when building natively on Linux or BSD. When this situation is
 detected, the package name should be added to the PKGS_FOUND special
@@ -79,7 +83,7 @@ variable. The build system will then skip building this package:
 	endif
 
 Note: The need_pkg function always return 1 during cross-compilation.
-This is a bug.
+This is a known bug.
 
 
 Dependencies
