@@ -281,16 +281,16 @@ typedef struct {
     const char *format;
     int start;
     int stop;
+    bool b_extonly;
 } rar_pattern_t;
 
-static const rar_pattern_t *FindVolumePattern(const char *location)
+static const rar_pattern_t *FindVolumePattern(const char *location, bool b_extonly )
 {
     static const rar_pattern_t patterns[] = {
-        { ".part1.rar",   "%s.part%.1d.rar", 2,   9 },
-        { ".part01.rar",  "%s.part%.2d.rar", 2,  99, },
-        { ".part001.rar", "%s.part%.3d.rar", 2, 999 },
-        { ".rar",         "%s.%c%.2d",       0, 999 },
-        { NULL, NULL, 0, 0 },
+        { ".part01.rar",  "%s.part%.2d.rar", 2,  99, false }, // new naming
+        { ".part001.rar", "%s.part%.3d.rar", 2, 999, false }, // new
+        { ".rar",         "%s.%c%.2d",       0, 999, true },  // old
+        { NULL, NULL, 0, 0, false },
     };
 
     const size_t location_size = strlen(location);
@@ -299,18 +299,22 @@ static const rar_pattern_t *FindVolumePattern(const char *location)
 
         if (location_size < match_size)
             continue;
+
+        if ( b_extonly && !patterns[i].b_extonly )
+            continue;
+
         if (!strcmp(&location[location_size - match_size], patterns[i].match))
             return &patterns[i];
     }
     return NULL;
 }
 
-int RarParse(stream_t *s, int *count, rar_file_t ***file)
+int RarParse(stream_t *s, int *count, rar_file_t ***file, bool b_extonly)
 {
     *count = 0;
     *file = NULL;
 
-    const rar_pattern_t *pattern = FindVolumePattern(s->psz_path);
+    const rar_pattern_t *pattern = FindVolumePattern(s->psz_path, b_extonly);
     int volume_offset = 0;
 
     char *volume_mrl;

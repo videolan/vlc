@@ -156,10 +156,14 @@ int RarAccessOpen(vlc_object_t *object)
     stream_t *s = stream_UrlNew(access, base);
     if (!s)
         goto error;
-    int count;
+    int count = 0;
     rar_file_t **files;
-    if (RarProbe(s) || RarParse(s, &count, &files) || count <= 0)
-        goto error;
+     if ( RarProbe(s) || (
+            RarParse(s, &count, &files, false ) &&
+            RarParse(s, &count, &files, true )
+          ) ||
+          count <= 0 )
+         goto error;
     rar_file_t *file = NULL;
     for (int i = 0; i < count; i++) {
         if (!file && !strcmp(files[i]->name, name))
