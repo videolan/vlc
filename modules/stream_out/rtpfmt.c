@@ -496,6 +496,11 @@ int rtp_get_fmt( vlc_object_t *obj, es_format_t *p_fmt, const char *mux,
             rtp_fmt->clock_rate = 1000;
             rtp_fmt->pf_packetize = rtp_packetize_t140;
             break;
+        case VLC_CODEC_GSM:
+            rtp_fmt->payload_type = 3;
+            rtp_fmt->ptname = "GSM";
+            rtp_fmt->pf_packetize = rtp_packetize_split;
+            break;
 
         default:
             msg_Err( obj, "cannot add this stream (unsupported "
