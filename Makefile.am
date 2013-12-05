@@ -547,13 +547,6 @@ EXTRA_DIST += \
 	extras/package/macosx/configure.sh \
 	extras/package/macosx/dmg_setup.scpt \
 	extras/package/macosx/vlc.xcodeproj/project.pbxproj \
-	extras/package/macosx/Delete_Preferences.app/Contents/Info.plist \
-	extras/package/macosx/Delete_Preferences.app/Contents/PkgInfo \
-	extras/package/macosx/Delete_Preferences.app/Contents/MacOS/applet \
-	extras/package/macosx/Delete_Preferences.app/Contents/Resources/description.rtfd/TXT.rtf \
-	extras/package/macosx/Delete_Preferences.app/Contents/Resources/applet.icns \
-	extras/package/macosx/Delete_Preferences.app/Contents/Resources/applet.rsrc \
-	extras/package/macosx/Delete_Preferences.app/Contents/Resources/Scripts/main.scpt \
 	extras/package/macosx/eyetvplugin/EyeTVPluginDefs.h \
 	extras/package/macosx/eyetvplugin/Info.plist \
 	extras/package/macosx/eyetvplugin/eyetvplugin.c \
