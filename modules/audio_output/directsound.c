@@ -184,7 +184,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 
     if ( AOUT_FMT_SPDIF( fmt ) && var_InheritBool( p_aout, "spdif" )
      && CreateDSBuffer( p_aout, VLC_CODEC_SPDIFL, fmt->i_physical_channels,
-                        aout_FormatNbChannels( fmt ), fmt->i_rate, true )
+                        aout_FormatNbChannels( fmt ), fmt->i_rate, false )
                                                                == VLC_SUCCESS )
     {
         msg_Dbg( p_aout, "using A/52 pass-through over S/PDIF" );
@@ -579,6 +579,10 @@ static int CreateDSBuffer( audio_output_t *p_aout, int i_format,
 
     dsbdesc.dwBufferBytes = DS_BUF_SIZE; /* buffer size */
     dsbdesc.lpwfxFormat = (WAVEFORMATEX *)&waveformat;
+
+    /* CreateSoundBuffer doesn't allow volume control for non-PCM buffers */
+    if ( i_format == VLC_CODEC_SPDIFL )
+        dsbdesc.dwFlags &= ~DSBCAPS_CTRLVOLUME;
 
     if FAILED( IDirectSound_CreateSoundBuffer(
                    p_aout->sys->p_dsobject, &dsbdesc,
