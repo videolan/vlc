@@ -1369,7 +1369,7 @@ static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
     {
         input_item_SetArtURL( p_item, psz_arturl );
 
-        if( !strncmp( psz_arturl, "attachment://", strlen("attachment") ) )
+        if( !strncmp( psz_arturl, "attachment://", 13 ) )
         {
             /* Don't look for art cover if sout
              * XXX It can change when sout has meta data support */
