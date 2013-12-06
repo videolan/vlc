@@ -26,8 +26,6 @@
 
 // Pretend we are a builtin module
 #define MODULE_NAME main
-#define MODULE_PATH main
-
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
