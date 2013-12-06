@@ -572,6 +572,11 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         p_sys->i_frame_size = p_sys->b_stream_info && p_sys->stream_info.min_framesize > 0 ?
                                                         p_sys->stream_info.min_framesize : 1;
 
+    case STATE_NEXT_SYNC:
+        /* TODO: If pp_block == NULL, flush the buffer without checking the
+         * next sync word */
+
+    {
         /* Calculate the initial CRC for the minimal frame size,
          * We'll update it as we look for the next start code. */
         uint8_t *buf = malloc(p_sys->i_frame_size);
@@ -588,10 +593,8 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             crc = flac_crc16(crc, buf[i]);
         free(buf);
         p_sys->crc = crc;
+    }
 
-    case STATE_NEXT_SYNC:
-        /* TODO: If pp_block == NULL, flush the buffer without checking the
-         * next sync word */
 
         /* Check if next expected frame contains the sync word */
         while (!block_PeekOffsetBytes(&p_sys->bytestream, p_sys->i_frame_size,
