@@ -107,8 +107,9 @@ enum {
     SUB_FORCED = 0x01,
     SUB_CANFAIL = 0x02,
 };
-static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, unsigned i_flags );
 
+static void input_SubtitleAdd( input_thread_t *, const char *, unsigned );
+static void input_SubtitleFileAdd( input_thread_t *, char *, unsigned );
 static void input_ChangeState( input_thread_t *p_input, int i_state ); /* TODO fix name */
 
 #undef input_Create
@@ -983,7 +984,7 @@ static void LoadSubtitles( input_thread_t *p_input )
     if( psz_subtitle != NULL )
     {
         msg_Dbg( p_input, "forced subtitle: %s", psz_subtitle );
-        SubtitleAdd( p_input, psz_subtitle, i_flags );
+        input_SubtitleFileAdd( p_input, psz_subtitle, i_flags );
         i_flags = SUB_NOFLAG;
     }
 
@@ -999,7 +1000,7 @@ static void LoadSubtitles( input_thread_t *p_input )
             if( !psz_subtitle || strcmp( psz_subtitle, ppsz_subs[i] ) )
             {
                 i_flags |= SUB_CANFAIL;
-                SubtitleAdd( p_input, ppsz_subs[i], i_flags );
+                input_SubtitleFileAdd( p_input, ppsz_subs[i], i_flags );
                 i_flags = SUB_NOFLAG;
             }
 
@@ -1037,7 +1038,7 @@ static void LoadSubtitles( input_thread_t *p_input )
         {
             var_SetString( p_input, "sub-description", a->psz_description ? a->psz_description : "");
 
-            SubtitleAdd( p_input, psz_mrl, i_flags );
+            input_SubtitleAdd( p_input, psz_mrl, i_flags );
 
             i_flags = SUB_NOFLAG;
             free( psz_mrl );
@@ -1946,7 +1947,7 @@ static bool Control( input_thread_t *p_input,
 
         case INPUT_CONTROL_ADD_SUBTITLE:
             if( val.psz_string )
-                SubtitleAdd( p_input, val.psz_string, true );
+                input_SubtitleFileAdd( p_input, val.psz_string, true );
             break;
 
         case INPUT_CONTROL_ADD_SLAVE:
@@ -2984,19 +2985,56 @@ static void MRLSections( const char *p,
 /*****************************************************************************
  * input_AddSubtitles: add a subtitle file and enable it
  *****************************************************************************/
-static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, unsigned i_flags )
+static void input_SubtitleAdd( input_thread_t *p_input,
+                               const char *url, unsigned i_flags )
 {
-    input_source_t *sub;
-    vlc_value_t count;
-    vlc_value_t list;
-    char *psz_path, *psz_extension;
+    input_source_t *sub = InputSourceNew( p_input );
+    if( sub == NULL )
+        return;
 
+    vlc_value_t count;
+
+    var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &count, NULL );
+
+    if( InputSourceInit( p_input, sub, url, "subtitle",
+                         (i_flags & SUB_CANFAIL) ) )
+    {
+        free( sub );
+        return;
+    }
+    TAB_APPEND( p_input->p->i_slave, p_input->p->slave, sub );
+
+    if( !(i_flags & SUB_FORCED) )
+        return;
+
+    /* Select the ES */
+    vlc_value_t list;
+
+    if( var_Change( p_input, "spu-es", VLC_VAR_GETLIST, &list, NULL ) )
+        return;
+    if( count.i_int == 0 )
+        count.i_int++;
+    /* if it was first one, there is disable too */
+
+    if( count.i_int < list.p_list->i_count )
+    {
+        const int i_id = list.p_list->p_values[count.i_int].i_int;
+
+        es_out_Control( p_input->p->p_es_out_display, ES_OUT_SET_ES_DEFAULT_BY_ID, i_id );
+        es_out_Control( p_input->p->p_es_out_display, ES_OUT_SET_ES_BY_ID, i_id );
+    }
+    var_FreeList( &list, NULL );
+}
+
+static void input_SubtitleFileAdd( input_thread_t *p_input, char *psz_subtitle,
+                                   unsigned i_flags )
+{
     /* if we are provided a subtitle.sub file,
      * see if we don't have a subtitle.idx and use it instead */
-    psz_path = strdup( psz_subtitle );
-    if( psz_path )
+    char *psz_path = strdup( psz_subtitle );
+    if( likely(psz_path != NULL) )
     {
-        psz_extension = strrchr( psz_path, '.');
+        char *psz_extension = strrchr( psz_path, '.');
         if( psz_extension && strcmp( psz_extension, ".sub" ) == 0 )
         {
             struct stat st;
@@ -3007,43 +3045,18 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, unsigned i
             {
                 msg_Dbg( p_input, "using %s as subtitle file instead of %s",
                          psz_path, psz_subtitle );
-                strcpy( psz_subtitle, psz_path );
+                strcpy( psz_subtitle, psz_path ); /* <- FIXME! constify */
             }
         }
         free( psz_path );
     }
 
     char *url = vlc_path2uri( psz_subtitle, NULL );
-
-    var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &count, NULL );
-
-    sub = InputSourceNew( p_input );
-    if( !sub || !url
-     || InputSourceInit( p_input, sub, url, "subtitle", (i_flags & SUB_CANFAIL) ) )
-    {
-        free( sub );
-        free( url );
+    if( url == NULL )
         return;
-    }
+
+    input_SubtitleAdd( p_input, url, i_flags );
     free( url );
-    TAB_APPEND( p_input->p->i_slave, p_input->p->slave, sub );
-
-    /* Select the ES */
-    if( (i_flags & SUB_FORCED) && !var_Change( p_input, "spu-es", VLC_VAR_GETLIST, &list, NULL ) )
-    {
-        if( count.i_int == 0 )
-            count.i_int++;
-        /* if it was first one, there is disable too */
-
-        if( count.i_int < list.p_list->i_count )
-        {
-            const int i_id = list.p_list->p_values[count.i_int].i_int;
-
-            es_out_Control( p_input->p->p_es_out_display, ES_OUT_SET_ES_DEFAULT_BY_ID, i_id );
-            es_out_Control( p_input->p->p_es_out_display, ES_OUT_SET_ES_BY_ID, i_id );
-        }
-        var_FreeList( &list, NULL );
-    }
 }
 
 /*****************************************************************************
