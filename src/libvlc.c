@@ -137,8 +137,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     system_Init();
 
     /* Initialize the module bank and load the configuration of the
-     * main module. We need to do this at this stage to be able to display
-     * a short help if required by the user. (short help == main module
+     * core module. We need to do this at this stage to be able to display
+     * a short help if required by the user. (short help == core module
      * options) */
     module_InitBank ();
 

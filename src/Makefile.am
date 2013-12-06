@@ -163,7 +163,7 @@ EXTRA_DIST += libvlc_win32_rc.rc.in
 lib_LTLIBRARIES = libvlccore.la
 
 AM_CPPFLAGS = $(INCICONV) $(IDN_CFLAGS) \
-	-DMODULE_STRING=\"main\" \
+	-DMODULE_STRING=\"core\" \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DPKGDATADIR=\"$(vlcdatadir)\" \
 	-DPKGLIBDIR=\"$(vlclibdir)\"

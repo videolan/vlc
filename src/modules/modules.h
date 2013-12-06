@@ -49,8 +49,8 @@ typedef void *module_handle_t;
 /** Plugin entry point prototype */
 typedef int (*vlc_plugin_cb) (int (*)(void *, void *, int, ...), void *);
 
-/** Main module */
-int vlc_entry__main (int (*)(void *, void *, int, ...), void *);
+/** Core module */
+int vlc_entry__core (int (*)(void *, void *, int, ...), void *);
 
 /**
  * Internal module descriptor

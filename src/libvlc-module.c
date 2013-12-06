@@ -1,5 +1,5 @@
 /*****************************************************************************
- * libvlc-module.c: Options for the main (libvlc itself) module
+ * libvlc-module.c: Options for the core (libvlc itself) module
  *****************************************************************************
  * Copyright (C) 1998-2009 VLC authors and VideoLAN
  * $Id$
@@ -25,7 +25,7 @@
  *****************************************************************************/
 
 // Pretend we are a builtin module
-#define MODULE_NAME main
+#define MODULE_NAME core
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -47,7 +47,7 @@ static const char *const ppsz_snap_formats[] =
 { "png", "jpg", "tiff" };
 
 /*****************************************************************************
- * Configuration options for the main program. Each module will also separatly
+ * Configuration options for the core module. Each module will also separatly
  * define its own configuration options.
  * Look into configuration.h if you need to know more about the following
  * macros.
@@ -2696,7 +2696,7 @@ vlc_module_begin ()
    /* Usage (mainly useful for cmd line stuff) */
     /* add_usage_hint( PLAYLIST_USAGE ) */
 
-    set_description( N_("main program") )
+    set_description( N_("core program") )
 vlc_module_end ()
 
 /*****************************************************************************
