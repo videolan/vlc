@@ -219,7 +219,7 @@ static void PrintColorMsg (void *d, int type, const vlc_log_t *p_item,
     int canc = vlc_savecancel ();
 
     flockfile (stream);
-    fprintf (stream, "["GREEN"%0*"PRIxPTR""GRAY"] ", ptr_width, p_item->i_object_id);
+    utf8_fprintf (stream, "["GREEN"%0*"PRIxPTR""GRAY"] ", ptr_width, p_item->i_object_id);
     if (p_item->psz_header != NULL)
         utf8_fprintf (stream, "[%s] ", p_item->psz_header);
     utf8_fprintf (stream, "%s %s%s: %s", p_item->psz_module,
@@ -245,7 +245,7 @@ static void PrintMsg (void *d, int type, const vlc_log_t *p_item,
     int canc = vlc_savecancel ();
 
     flockfile (stream);
-    fprintf (stream, "[%0*"PRIxPTR"] ", ptr_width, p_item->i_object_id);
+    utf8_fprintf (stream, "[%0*"PRIxPTR"] ", ptr_width, p_item->i_object_id);
     if (p_item->psz_header != NULL)
         utf8_fprintf (stream, "[%s] ", p_item->psz_header);
     utf8_fprintf (stream, "%s %s%s: ", p_item->psz_module,
