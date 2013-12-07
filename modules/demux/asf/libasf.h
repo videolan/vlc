@@ -230,7 +230,7 @@ typedef struct
 typedef struct
 {
     ASF_OBJECT_COMMON
-    int  i_language;
+    uint16_t  i_language;
     char **ppsz_language;
 
 } asf_object_language_list_t;
@@ -275,7 +275,7 @@ typedef struct
 
     int32_t i_flags;
     int16_t i_stream_number;
-    int16_t i_language_index;
+    uint16_t i_language_index;
     int64_t i_average_time_per_frame;
 
     int     i_stream_name_count;

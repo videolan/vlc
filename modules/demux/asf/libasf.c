@@ -769,7 +769,7 @@ static int ASF_ReadObject_language_list(stream_t *s, asf_object_t *p_obj)
     asf_object_language_list_t *p_ll = &p_obj->language_list;
     const uint8_t *p_peek, *p_data;
     int i_peek;
-    int i;
+    uint16_t i;
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_ll->i_object_size ) ) < 26 )
        return VLC_EGENERIC;
@@ -793,7 +793,7 @@ static int ASF_ReadObject_language_list(stream_t *s, asf_object_t *p_obj)
     }
 
 #ifdef ASF_DEBUG
-    msg_Dbg( s, "read \"language list object\" %d entries",
+    msg_Dbg( s, "read \"language list object\" %u entries",
              p_ll->i_language );
     for( i = 0; i < p_ll->i_language; i++ )
         msg_Dbg( s, "  - '%s'",
@@ -805,7 +805,7 @@ static int ASF_ReadObject_language_list(stream_t *s, asf_object_t *p_obj)
 static void ASF_FreeObject_language_list( asf_object_t *p_obj)
 {
     asf_object_language_list_t *p_ll = &p_obj->language_list;
-    int i;
+    uint16_t i;
 
     for( i = 0; i < p_ll->i_language; i++ )
         FREENULL( p_ll->ppsz_language[i] );

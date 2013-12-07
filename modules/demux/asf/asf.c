@@ -1312,7 +1312,6 @@ static int DemuxInit( demux_t *p_demux )
         if( fmt.i_cat != UNKNOWN_ES )
         {
             if( p_esp && p_languages &&
-                p_esp->i_language_index >= 0 &&
                 p_esp->i_language_index < p_languages->i_language )
             {
                 fmt.psz_language = strdup( p_languages->ppsz_language[p_esp->i_language_index] );
