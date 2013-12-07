@@ -1291,7 +1291,7 @@ static int ASF_ReadObject_marker(stream_t *s, asf_object_t *p_obj)
         if( !p_mk->marker )
             return VLC_ENOMEM;
 
-        for( unsigned i = 0; i < p_mk->i_count; i++ )
+        for( uint32_t i = 0; i < p_mk->i_count; i++ )
         {
             asf_marker_t *p_marker = &p_mk->marker[i];
 
@@ -1320,7 +1320,7 @@ static void ASF_FreeObject_marker( asf_object_t *p_obj)
 {
     asf_object_marker_t *p_mk = (asf_object_marker_t *)p_obj;
 
-    for( unsigned i = 0; i < p_mk->i_count; i++ )
+    for( uint32_t i = 0; i < p_mk->i_count; i++ )
     {
         FREENULL( p_mk->marker[i].p_marker_description  );
     }
