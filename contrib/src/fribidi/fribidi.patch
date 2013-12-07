@@ -86,17 +86,3 @@ diff -u fribidi.orig/configure.ac fribidi/configure.ac
  Version: @VERSION@
  Libs: -L${libdir} -lfribidi
  Cflags: -I${includedir}/@PACKAGE@
---- fribidi.orig/lib/fribidi-common.h	2008-02-04 21:30:46.000000000 +0000
-+++ fribidi/lib/fribidi-common.h	2008-02-04 21:32:25.000000000 +0000
-@@ -53,11 +53,7 @@
- 
- /* FRIBIDI_ENTRY is a macro used to declare library entry points. */
- #ifndef FRIBIDI_ENTRY
--# if (defined(WIN32)) || (defined(_WIN32_WCE))
--#  define FRIBIDI_ENTRY __declspec(dllimport)
--# else /* !WIN32 */
- #  define FRIBIDI_ENTRY		/* empty */
--# endif	/* !WIN32 */
- #endif /* !FRIBIDI_ENTRY */
- 
- #if FRIBIDI_USE_GLIB+0
