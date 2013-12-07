@@ -3,7 +3,9 @@
 #SPEEX_VERSION := 1.2rc1
 #SPEEX_URL := http://downloads.us.xiph.org/releases/speex/speex-$(SPEEX_VERSION).tar.gz
 SPEEX_VERSION := git
-SPEEX_GITURL := http://git.xiph.org/?p=speex.git;a=snapshot;h=HEAD;sf=tgz
+SPEEX_HASH := a6d05eb
+#SPEEX_HASH := HEAD
+SPEEX_GITURL := http://git.xiph.org/?p=speex.git;a=snapshot;h=$(SPEEX_HASH);sf=tgz
 
 PKGS += speex
 ifeq ($(call need_pkg,"speex >= 1.0.5"),)
