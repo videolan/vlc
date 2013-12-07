@@ -1159,7 +1159,7 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
                                         &p_obj->extended_content_description;
     const uint8_t *p_peek, *p_data;
     int i_peek;
-    int i;
+    uint16_t i;
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_ec->i_object_size ) ) < 26 )
        return VLC_EGENERIC;
@@ -1258,7 +1258,7 @@ static void ASF_FreeObject_extended_content_description( asf_object_t *p_obj)
     asf_object_extended_content_description_t *p_ec =
                                         &p_obj->extended_content_description;
 
-    for( int i = 0; i < p_ec->i_count; i++ )
+    for( uint16_t i = 0; i < p_ec->i_count; i++ )
     {
         FREENULL( p_ec->ppsz_name[i] );
         FREENULL( p_ec->ppsz_value[i] );

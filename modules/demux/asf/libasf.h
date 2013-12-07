@@ -329,7 +329,7 @@ typedef struct
 {
     ASF_OBJECT_COMMON
 
-    int i_count;
+    uint16_t i_count;
     char **ppsz_name;
     char **ppsz_value;
 } asf_object_extended_content_description_t;
