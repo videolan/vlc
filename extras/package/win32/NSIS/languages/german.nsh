@@ -1,6 +1,7 @@
-StrCpy $Name_Section01 "Media-Player (benötigt)"
-StrCpy $Name_Section02a "Symbole im Startmenü"
+StrCpy $Name_Section01 "Media-Player (benÃ¶tigt)"
+StrCpy $Name_Section02a "Symbole im StartmenÃ¼"
 StrCpy $Name_Section02b "Desktopsymbol"
+StrCpy $Name_Section34 "Web-Plugins"
 StrCpy $Name_Section03 "Mozilla-Plugin"
 StrCpy $Name_Section04 "ActiveX-Plugin"
 StrCpy $Name_Section05 "DVD- und CD-Wiedergabe"
@@ -8,15 +9,15 @@ StrCpy $Name_Section06 "Dateitypzuordnungen"
 StrCpy $Name_SectionGroupAudio "Audiodateien"
 StrCpy $Name_SectionGroupVideo "Videodateien"
 StrCpy $Name_SectionGroupOther "Andere"
-StrCpy $Name_Section07 "Kontextmenü"
-StrCpy $Name_Section08 "Lösche die Einstellungen und den Cache"
+StrCpy $Name_Section07 "KontextmenÃ¼"
+StrCpy $Name_Section08 "LÃ¶sche die Einstellungen und den Cache"
 
 StrCpy $Desc_Section01 \
     "Der Media Player"
 StrCpy $Desc_Section02a \
-    "Fügt Symbole im Startmenü für leichten Zugang hinzu"
+    "FÃ¼gt Symbole im StartmenÃ¼ fÃ¼r leichten Zugang hinzu"
 StrCpy $Desc_Section02b \
-    "Fügt ein Desktopsymbol für leichten Zugang ein"
+    "FÃ¼gt ein Desktopsymbol fÃ¼r leichten Zugang ein"
 StrCpy $Desc_Section03 \
     "Das VLC Mozilla und Mozilla-Firefox Plugin"
 StrCpy $Desc_Section04 \
@@ -24,25 +25,25 @@ StrCpy $Desc_Section04 \
 StrCpy $Desc_Section05 \
     "DVD und CD Wiedergabe Registrierung"
 StrCpy $Desc_Section06 \
-    "Setzt den VLC Media-Player als Standard-Anwendung für die ausgewählten Dateitypen"
+    "Setzt den VLC media player als Standard-Anwendung fÃ¼r die ausgewÃ¤hlten Dateitypen"
 StrCpy $Desc_Section07 \
-    "Fügt Kontextmenü-Einträge hinzu ('Wiedergabe mit VLC' und 'Zur VLC-Wiedergabeliste hinzufügen')"
+    "FÃ¼gt KontextmenÃ¼-EintrÃ¤ge hinzu ('Wiedergabe mit VLC' und 'Zur VLC-Wiedergabeliste hinzufÃ¼gen')"
 StrCpy $Desc_Section08 \
-    "Löscht die VLC media player Einstellungen und übergebliebenen Cache-Dateien der alten Installation"
+    "LÃ¶scht die VLC media player Einstellungen und Ã¼bergebliebenen Cache-Dateien der alten Installation"
 
 StrCpy $Name_Section91 "Deinstallieren"
-StrCpy $Name_Section92 "Einstellungen und Cache löschen"
+StrCpy $Name_Section92 "Einstellungen und Cache lÃ¶schen"
 
 StrCpy $Desc_Section91 \
-"VLC Media Player und alle Komponenten deinstallieren"
+"VLC media player und alle Komponenten deinstallieren"
 StrCpy $Desc_Section92 \
-"VLC Media Player Einstellungen und Cache-Dateien löschen"
+"VLC media player Einstellungen und Cache-Dateien lÃ¶schen"
 
 StrCpy $ShellAssociation_Play "Wiedergabe"
-StrCpy $ContextMenuEntry_PlayWith "Mit VLC Media Player wiedergeben"
-StrCpy $ContextMenuEntry_AddToPlaylist "Zur VLC Media Player Wiedergabeliste hinzufügen"
+StrCpy $ContextMenuEntry_PlayWith "Mit VLC media player wiedergeben"
+StrCpy $ContextMenuEntry_AddToPlaylist "Zur VLC media player Wiedergabeliste hinzufÃ¼gen"
 
-StrCpy $Link_VisitWebsite "Besuchen Sie die VideoLAN VLC Media Player Webseite"
+StrCpy $Link_VisitWebsite "Besuchen Sie die VideoLAN VLC media player Webseite"
 
 StrCpy $Name_InstTypeRecommended "Empfohlen"
 StrCpy $Name_InstTypeMinimum "Minimal"
@@ -55,3 +56,22 @@ StrCpy $Action_OnArrivalSVCDMovie "SVCD-Video wiedergeben"
 StrCpy $Action_OnArrivalVideoFiles "Videodateien wiedergeben"
 StrCpy $Action_OnArrivalMusicFiles "Audiodateien wiedergeben"
 StrCpy $Action_OnArrivalDVDAudio "Audio-DVD wiedergeben"
+
+StrCpy $License_NextText "Jetzt sind Sie Ã¼ber Ihre Rechte informiert. Klicken Sie auf Weiter."
+
+StrCpy $Detail_CheckProcesses "ÃœberprÃ¼fen der Prozesse..."
+StrCpy $MessageBox_VLCRunning "VLC scheint ausgefÃ¼hrt zu werden und wird nun geschlossen."
+StrCpy $MessageBox_VLCUnableToClose "Dieses Installationsprogramm konnte VLC nicht schlieÃŸen, tun Sie es bitte manuell."
+StrCpy $MessageBox_InstallAborted "Installation abgebrochen!"
+
+StrCpy $Reinstall_Headline "Bereits installiert"
+StrCpy $Reinstall_HeadlineInstall "WÃ¤hlen Sie, wie Sie den VLC media player installieren mÃ¶chten."
+StrCpy $Reinstall_HeadlineMaintenance "WÃ¤hlen Sie die durchgefÃ¼hrte Wartungsoption aus."
+StrCpy $Reinstall_MessageOlder "Eine Ã¤ltere Version des VLC media players ist auf dem System installiert. WÃ¤hlen Sie die durchgefÃ¼hrte Operation aus und klicken Sie auf Weiter, um fortzufahren."
+StrCpy $Reinstall_MessageNewer "Eine neuere Version des VLC media players ist bereits installiert! Es wird nicht empfohlen, auf eine Ã¤ltere Version downzugraden. WÃ¤hlen Sie die durchgefÃ¼hrte Operation aus und klicken Sie auf Weiter, um fortzufahren."
+StrCpy $Reinstall_MessageSame "VLC ${VERSION} ist bereits installiert. WÃ¤hlen Sie die durchgefÃ¼hrte Operation aus und klicken Sie auf Weiter, um fortzufahren."
+StrCpy $Reinstall_OptionUpgrade "Aktualisieren Sie den VLC media player mit vorherigen Einstellungen (empfohlen)"
+StrCpy $Reinstall_OptionDowngrade "Ein Downgrade des VLC media players mit vorherigen Einstellungen (empfohlen)"
+StrCpy $Reinstall_OptionComponents "HinzufÃ¼gen/Entfernen/Installieren von Komponenten"
+StrCpy $Reinstall_OptionAdvanced "Einstellungen Ã¤ndern (erweitert)"
+StrCpy $Reinstall_OptionUninstall "Deinstallieren des VLC media players"
