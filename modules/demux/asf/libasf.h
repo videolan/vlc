@@ -154,8 +154,8 @@ typedef struct
     uint16_t    i_type;
     char        *psz_name;
 
-    int64_t i_val;
-    int i_data;
+    uint64_t i_val;
+    uint16_t i_data;
     uint8_t *p_data;
 
 } asf_metadata_record_t;
@@ -239,10 +239,10 @@ typedef struct
 {
     ASF_OBJECT_COMMON
 
-    int i_bitrate;
+    uint16_t i_bitrate;
     struct
     {
-        int      i_stream_number;
+        uint8_t  i_stream_number;
         uint32_t i_avg_bitrate;
     } bitrate[128];
 } asf_object_stream_bitrate_properties_t;
@@ -263,27 +263,27 @@ typedef struct
 {
     ASF_OBJECT_COMMON
 
-    int64_t i_start_time;
-    int64_t i_end_time;
-    int32_t i_data_bitrate;
-    int32_t i_buffer_size;
-    int32_t i_initial_buffer_fullness;
-    int32_t i_alternate_data_bitrate;
-    int32_t i_alternate_buffer_size;
-    int32_t i_alternate_initial_buffer_fullness;
-    int32_t i_maximum_object_size;
+    uint64_t i_start_time;
+    uint64_t i_end_time;
+    uint32_t i_data_bitrate;
+    uint32_t i_buffer_size;
+    uint32_t i_initial_buffer_fullness;
+    uint32_t i_alternate_data_bitrate;
+    uint32_t i_alternate_buffer_size;
+    uint32_t i_alternate_initial_buffer_fullness;
+    uint32_t i_maximum_object_size;
 
-    int32_t i_flags;
-    int16_t i_stream_number;
+    uint32_t i_flags;
+    uint16_t i_stream_number;
     uint16_t i_language_index;
-    int64_t i_average_time_per_frame;
+    uint64_t i_average_time_per_frame;
 
-    int     i_stream_name_count;
+    uint16_t i_stream_name_count;
 
-    int     i_payload_extension_system_count;
+    uint16_t i_payload_extension_system_count;
     asf_payload_extension_system_t *p_ext;
 
-    int     *pi_stream_name_language;
+    uint16_t *pi_stream_name_language;
     char    **ppsz_stream_name;
 
     asf_object_stream_properties_t *p_sp;

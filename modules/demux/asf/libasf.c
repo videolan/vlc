@@ -345,7 +345,7 @@ static void ASF_FreeObject_metadata( asf_object_t *p_obj )
 {
     asf_object_metadata_t *p_meta = &p_obj->metadata;
 
-    for( unsigned int i = 0; i < p_meta->i_record_entries_count; i++ )
+    for( uint32_t i = 0; i < p_meta->i_record_entries_count; i++ )
     {
         free( p_meta->record[i].psz_name );
         free( p_meta->record[i].p_data );
@@ -358,7 +358,7 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
     asf_object_metadata_t *p_meta = &p_obj->metadata;
 
     int i_peek;
-    unsigned int i;
+    uint32_t i;
     const uint8_t *p_peek, *p_data;
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_meta->i_object_size ) ) <
@@ -377,8 +377,8 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
     for( i = 0; i < p_meta->i_record_entries_count; i++ )
     {
         asf_metadata_record_t *p_record = &p_meta->record[i];
-        int i_name;
-        int i_data;
+        uint16_t i_name;
+        uint32_t i_data;
 
         if( !ASF_HAVE( 2+2+2+2+4 ) )
             break;
@@ -438,9 +438,9 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
 
 #ifdef ASF_DEBUG
     msg_Dbg( s,
-            "read \"metadata object\" %d entries",
+             "read \"metadata object\" %"PRIu32" entries",
             p_meta->i_record_entries_count );
-    for( unsigned int j = 0; j < p_meta->i_record_entries_count; j++ )
+    for( uint32_t j = 0; j < p_meta->i_record_entries_count; j++ )
     {
         asf_metadata_record_t *p_rec = &p_meta->record[j];
 
@@ -448,10 +448,10 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
             msg_Dbg( s, "  - %s=%s",
                      p_rec->psz_name, p_rec->p_data );
         else if( p_rec->i_type == ASF_METADATA_TYPE_BYTE )
-            msg_Dbg( s, "  - %s (%i bytes)",
+            msg_Dbg( s, "  - %s (%u bytes)",
                      p_rec->psz_name, p_rec->i_data );
         else
-            msg_Dbg( s, "  - %s=%"PRId64,
+            msg_Dbg( s, "  - %s=%"PRIu64,
                      p_rec->psz_name, p_rec->i_val );
     }
 #endif
@@ -493,7 +493,7 @@ static int ASF_ReadObject_header_extension( stream_t *s, asf_object_t *p_obj )
 #ifdef ASF_DEBUG
     msg_Dbg( s,
             "read \"header extension object\" reserved1:" GUID_FMT
-            " reserved2:%d header_extension_size:%d",
+            " reserved2:%u header_extension_size:%"PRIu32,
             GUID_PRINT( p_he->i_reserved1 ), p_he->i_reserved2,
             p_he->i_header_extension_size );
 #endif
@@ -585,8 +585,8 @@ static int ASF_ReadObject_stream_properties( stream_t *s, asf_object_t *p_obj )
 #ifdef ASF_DEBUG
     msg_Dbg( s,
             "read \"stream Properties object\" stream_type:" GUID_FMT
-            " error_correction_type:" GUID_FMT " time_offset:%"PRId64
-            " type_specific_data_length:%d error_correction_data_length:%d"
+            " error_correction_type:" GUID_FMT " time_offset:%"PRIu64
+            " type_specific_data_length:%"PRIu32" error_correction_data_length:%"PRIu32
             " flags:0x%x stream_number:%d",
             GUID_PRINT( p_sp->i_stream_type ),
             GUID_PRINT( p_sp->i_error_correction_type ),
@@ -615,7 +615,7 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
     int     i_peek;
     const uint8_t *p_peek, *p_data;
 
-    unsigned int i_codec;
+    uint32_t i_codec;
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_cl->i_object_size ) ) < 44 )
        return VLC_EGENERIC;
@@ -675,8 +675,8 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
     {
         const asf_codec_entry_t *p_codec = &p_cl->codec[i_codec];
 
-        msg_Dbg( s, "  - codec[%d] %s name:\"%s\" "
-                 "description:\"%s\" information_length:%d",
+        msg_Dbg( s, "  - codec[%"PRIu32"] %s name:\"%s\" "
+                 "description:\"%s\" information_length:%u",
                  i_codec, ( p_codec->i_type == ASF_CODEC_TYPE_VIDEO ) ?
                  "video" : ( ( p_codec->i_type == ASF_CODEC_TYPE_AUDIO ) ?
                  "audio" : "unknown" ),
@@ -692,7 +692,7 @@ static void ASF_FreeObject_codec_list( asf_object_t *p_obj )
 {
     asf_object_codec_list_t *p_cl = &p_obj->codec_list;
 
-    for( unsigned int i_codec = 0; i_codec < p_cl->i_codec_entries_count; i_codec++ )
+    for( uint32_t i_codec = 0; i_codec < p_cl->i_codec_entries_count; i_codec++ )
     {
         asf_codec_entry_t *p_codec = &p_cl->codec[i_codec];
 
@@ -717,7 +717,8 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
 {
     asf_object_content_description_t *p_cd = &p_obj->content_description;
     const uint8_t *p_peek, *p_data;
-    int i_peek, i_title, i_artist, i_copyright, i_description, i_rating;
+    int i_peek;
+    uint16_t i_title, i_artist, i_copyright, i_description, i_rating;
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_cd->i_object_size ) ) < 34 )
        return VLC_EGENERIC;
@@ -819,7 +820,7 @@ static int ASF_ReadObject_stream_bitrate_properties( stream_t *s,
     asf_object_stream_bitrate_properties_t *p_sb = &p_obj->stream_bitrate;
     const uint8_t *p_peek, *p_data;
     int i_peek;
-    int i;
+    uint16_t i;
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_sb->i_object_size ) ) < 26 )
        return VLC_EGENERIC;
@@ -833,7 +834,7 @@ static int ASF_ReadObject_stream_bitrate_properties( stream_t *s,
     {
         if( !ASF_HAVE(2 + 4) )
             break;
-        p_sb->bitrate[i].i_stream_number = ASF_READ2()& 0x7f;
+        p_sb->bitrate[i].i_stream_number = (uint8_t) ASF_READ2()& 0x7f;
         p_sb->bitrate[i].i_avg_bitrate = ASF_READ4();
     }
     p_sb->i_bitrate = i;
@@ -842,7 +843,7 @@ static int ASF_ReadObject_stream_bitrate_properties( stream_t *s,
     msg_Dbg( s,"read \"stream bitrate properties object\"" );
     for( i = 0; i < p_sb->i_bitrate; i++ )
     {
-        msg_Dbg( s,"  - stream=%d bitrate=%d",
+        msg_Dbg( s,"  - stream=%u bitrate=%"PRIu32,
                  p_sb->bitrate[i].i_stream_number,
                  p_sb->bitrate[i].i_avg_bitrate );
     }
@@ -859,7 +860,8 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
 {
     asf_object_extended_stream_properties_t *p_esp = &p_obj->ext_stream;
     const uint8_t *p_peek, *p_data;
-    int i_peek, i;
+    int i_peek;
+    uint16_t i;
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_esp->i_object_size ) ) < 88 )
        return VLC_EGENERIC;
@@ -885,7 +887,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
     p_data += 64;
 
     p_esp->pi_stream_name_language = calloc( p_esp->i_stream_name_count,
-                                             sizeof(int) );
+                                             sizeof(uint16_t) );
     p_esp->ppsz_stream_name = calloc( p_esp->i_stream_name_count,
                                       sizeof(char*) );
     if( !p_esp->pi_stream_name_language ||
@@ -949,31 +951,31 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
 
 #ifdef ASF_DEBUG
     msg_Dbg( s, "read \"extended stream properties object\":" );
-    msg_Dbg( s, "  - start=%"PRId64" end=%"PRId64,
+    msg_Dbg( s, "  - start=%"PRIu64" end=%"PRIu64,
              p_esp->i_start_time, p_esp->i_end_time );
-    msg_Dbg( s, "  - data bitrate=%d buffer=%d initial fullness=%d",
+    msg_Dbg( s, "  - data bitrate=%"PRId32" buffer=%"PRId32" initial fullness=%"PRId32,
              p_esp->i_data_bitrate,
              p_esp->i_buffer_size,
              p_esp->i_initial_buffer_fullness );
-    msg_Dbg( s, "  - alternate data bitrate=%d buffer=%d initial fullness=%d",
+    msg_Dbg( s, "  - alternate data bitrate=%"PRId32" buffer=%"PRId32" initial fullness=%"PRId32,
              p_esp->i_alternate_data_bitrate,
              p_esp->i_alternate_buffer_size,
              p_esp->i_alternate_initial_buffer_fullness );
-    msg_Dbg( s, "  - maximum object size=%d", p_esp->i_maximum_object_size );
+    msg_Dbg( s, "  - maximum object size=%"PRId32, p_esp->i_maximum_object_size );
     msg_Dbg( s, "  - flags=0x%x", p_esp->i_flags );
-    msg_Dbg( s, "  - stream number=%d language=%d",
+    msg_Dbg( s, "  - stream number=%u language=%u",
              p_esp->i_stream_number, p_esp->i_language_index );
-    msg_Dbg( s, "  - average time per frame=%"PRId64,
+    msg_Dbg( s, "  - average time per frame=%"PRIu64,
              p_esp->i_average_time_per_frame );
-    msg_Dbg( s, "  - stream name count=%d", p_esp->i_stream_name_count );
+    msg_Dbg( s, "  - stream name count=%u", p_esp->i_stream_name_count );
     for( i = 0; i < p_esp->i_stream_name_count; i++ )
-        msg_Dbg( s, "     - lang id=%d name=%s",
+        msg_Dbg( s, "     - lang id=%u name=%s",
                  p_esp->pi_stream_name_language[i],
                  p_esp->ppsz_stream_name[i] );
-    msg_Dbg( s, "  - payload extension system count=%d",
+    msg_Dbg( s, "  - payload extension system count=%u",
              p_esp->i_payload_extension_system_count );
     for( i = 0; i < p_esp->i_payload_extension_system_count; i++ )
-        msg_Dbg( s, "  - %d  - payload extension: " GUID_FMT, i,
+        msg_Dbg( s, "  - %u  - payload extension: " GUID_FMT, i,
                  GUID_PRINT( p_esp->p_ext[i].i_extension_id ) );
 #endif
     return VLC_SUCCESS;
@@ -984,11 +986,11 @@ static void ASF_FreeObject_extended_stream_properties( asf_object_t *p_obj)
 
     if ( p_esp->p_ext )
     {
-        for( int i = 0; i < p_esp->i_payload_extension_system_count; i++ )
+        for( uint16_t i = 0; i < p_esp->i_payload_extension_system_count; i++ )
             free( p_esp->p_ext[i].pi_info );
         FREENULL( p_esp->p_ext );
     }
-    for( int i = 0; i < p_esp->i_stream_name_count; i++ )
+    for( uint16_t i = 0; i < p_esp->i_stream_name_count; i++ )
         FREENULL( p_esp->ppsz_stream_name[i] );
     FREENULL( p_esp->pi_stream_name_language );
     FREENULL( p_esp->ppsz_stream_name );
@@ -1177,8 +1179,8 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
     }
     for( i = 0; i < p_ec->i_count; i++ )
     {
-        int i_size;
-        int i_type;
+        uint16_t i_size;
+        uint16_t i_type;
 
         if( !ASF_HAVE(2 + 2+2) )
             break;
@@ -1309,7 +1311,7 @@ static int ASF_ReadObject_marker(stream_t *s, asf_object_t *p_obj)
     }
 
 #ifdef ASF_DEBUG
-    msg_Dbg( s, "Read \"marker object\": %i chapters: %s", p_mk->i_count, p_mk->name );
+    msg_Dbg( s, "Read \"marker object\": %"PRIu32" chapters: %s", p_mk->i_count, p_mk->name );
 
     for( unsigned i = 0; i < p_mk->i_count; i++ )
         msg_Dbg( s, "New chapter named: %s", p_mk->marker[i].p_marker_description );
