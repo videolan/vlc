@@ -72,6 +72,6 @@ StrCpy $Reinstall_MessageNewer "Nowsza wersja VLC jest już zainstalowana! Nie z
 StrCpy $Reinstall_MessageSame "VLC ${VERSION} jest już zainstalowany. Wybierz operację do wykonania, a następnie kliknij przycisk Dalej, aby kontynuować."
 StrCpy $Reinstall_OptionUpgrade "Uaktualnij VLC używając poprzednich ustawień (zalecane)"
 StrCpy $Reinstall_OptionDowngrade "Zainstaluj starszą wersję VLC używając poprzednich ustawień (zalecane)"
-StrCpy $Reinstall_OptionComponents "Dodaj/Usuń/Zainstaluj komponenty
+StrCpy $Reinstall_OptionComponents "Dodaj/Usuń/Zainstaluj komponenty"
 StrCpy $Reinstall_OptionAdvanced "Zmień ustawienia (zaawansowane)"
 StrCpy $Reinstall_OptionUninstall "Odinstaluj VLC"
