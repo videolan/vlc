@@ -806,6 +806,9 @@ VLC_API bool vlc_ureduce( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t )
 #ifdef __MINGW32__
 # define vlc_memalign(align, size) (__mingw_aligned_malloc(size, align))
 # define vlc_free(base)            (__mingw_aligned_free(base))
+#elif defined(_MSC_VER)
+# define vlc_memalign(align, size) (_aligned_malloc(size, align))
+# define vlc_free(base)            (_aligned_free(base))
 #elif defined(__APPLE__) && !defined(MAC_OS_X_VERSION_10_6)
 static inline void *vlc_memalign(size_t align, size_t size)
 {
