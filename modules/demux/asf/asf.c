@@ -89,7 +89,7 @@ struct demux_sys_t
 {
     mtime_t             i_time;     /* s */
     mtime_t             i_length;   /* length of file file */
-    int64_t             i_bitrate;  /* global file bitrate */
+    uint64_t            i_bitrate;  /* global file bitrate */
 
     asf_object_root_t            *p_root;
     asf_object_file_properties_t *p_fp;
@@ -97,8 +97,8 @@ struct demux_sys_t
     unsigned int        i_track;
     asf_track_t         *track[MAX_ASF_TRACKS]; /* track number is stored on 7 bits */
 
-    int64_t             i_data_begin;
-    int64_t             i_data_end;
+    uint64_t            i_data_begin;
+    uint64_t            i_data_end;
 
     bool                b_index;
     bool                b_canfastseek;
@@ -292,9 +292,10 @@ static int SeekPercent( demux_t *p_demux, int i_query, va_list args )
     WaitKeyframe( p_demux );
 
     msg_Dbg( p_demux, "seek with percent: waiting %i frames", p_sys->i_wait_keyframe );
-    return demux_vaControlHelper( p_demux->s, p_sys->i_data_begin,
-                                   p_sys->i_data_end, p_sys->i_bitrate,
-                                   p_sys->p_fp->i_min_data_packet_size,
+    return demux_vaControlHelper( p_demux->s, __MIN( INT64_MAX, p_sys->i_data_begin ),
+                                   __MIN( INT64_MAX, p_sys->i_data_end ),
+                                   __MIN( INT64_MAX, p_sys->i_bitrate ),
+                                   __MIN( INT16_MAX, p_sys->p_fp->i_min_data_packet_size ),
                                    i_query, args );
 }
 
@@ -401,9 +402,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pf = p_sys->i_time / (double)p_sys->i_length;
             return VLC_SUCCESS;
         }
-        return demux_vaControlHelper( p_demux->s, p_sys->i_data_begin,
-                                       p_sys->i_data_end, p_sys->i_bitrate,
-                                       p_sys->p_fp->i_min_data_packet_size,
+        return demux_vaControlHelper( p_demux->s,
+                                       __MIN( INT64_MAX, p_sys->i_data_begin ),
+                                       __MIN( INT64_MAX, p_sys->i_data_end ),
+                                       __MIN( INT64_MAX, p_sys->i_bitrate ),
+                                       __MIN( INT16_MAX, p_sys->p_fp->i_min_data_packet_size ),
                                        i_query, args );
 
     case DEMUX_SET_POSITION:
@@ -441,9 +444,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         // ft
 
     default:
-        return demux_vaControlHelper( p_demux->s, p_sys->i_data_begin,
-                    p_sys->i_data_end, p_sys->i_bitrate,
-                    ( p_sys->p_fp ) ? p_sys->p_fp->i_min_data_packet_size : 1,
+        return demux_vaControlHelper( p_demux->s,
+                                      __MIN( INT64_MAX, p_sys->i_data_begin ),
+                                      __MIN( INT64_MAX, p_sys->i_data_end),
+                                      __MIN( INT64_MAX, p_sys->i_bitrate ),
+                    ( p_sys->p_fp ) ? __MIN( INT_MAX, p_sys->p_fp->i_min_data_packet_size ) : 1,
                     i_query, args );
     }
 }
@@ -881,7 +886,7 @@ static int DemuxPacket( demux_t *p_demux )
 
     if( pkt.padding_length > pkt.length )
     {
-        msg_Warn( p_demux, "Too large padding: %d", pkt.padding_length );
+        msg_Warn( p_demux, "Too large padding: %"PRIu32, pkt.padding_length );
         goto loop_error_recovery;
     }
 
@@ -968,8 +973,8 @@ loop_error_recovery:
  *****************************************************************************/
 typedef struct asf_es_priorities_t
 {
-    int16_t *pi_stream_numbers;
-    int16_t i_count;
+    uint16_t *pi_stream_numbers;
+    uint16_t i_count;
 } asf_es_priorities_t;
 
 /* Fills up our exclusion list */
@@ -981,16 +986,15 @@ static void ASF_fillup_es_priorities_ex( demux_sys_t *p_sys, void *p_hdr,
             ASF_FindObject( p_hdr, &asf_object_advanced_mutual_exclusion, 0 );
     if (! p_mutex ) return;
 
-    p_prios->pi_stream_numbers = malloc( p_sys->i_track * sizeof( int16_t ) );
+    p_prios->pi_stream_numbers = malloc( p_sys->i_track * sizeof( uint16_t ) );
     if ( !p_prios->pi_stream_numbers ) return;
 
     if ( p_mutex->i_stream_number_count )
     {
         /* Just set highest prio on highest in the group */
-        for ( int16_t i = 1; i < p_mutex->i_stream_number_count; i++ )
+        for ( uint16_t i = 1; i < p_mutex->i_stream_number_count; i++ )
         {
-            if ( p_prios->i_count + 1 == INT_MAX ) break; /* FIXME: fix all types */
-            if ( (unsigned int) p_prios->i_count > p_sys->i_track ) break;
+            if ( p_prios->i_count > p_sys->i_track ) break;
             p_prios->pi_stream_numbers[ p_prios->i_count++ ] = p_mutex->pi_stream_number[ i ];
         }
     }
@@ -1005,16 +1009,15 @@ static void ASF_fillup_es_bitrate_priorities_ex( demux_sys_t *p_sys, void *p_hdr
             ASF_FindObject( p_hdr, &asf_object_bitrate_mutual_exclusion_guid, 0 );
     if (! p_bitrate_mutex ) return;
 
-    p_prios->pi_stream_numbers = malloc( p_sys->i_track * sizeof( int16_t ) );
+    p_prios->pi_stream_numbers = malloc( p_sys->i_track * sizeof( uint16_t ) );
     if ( !p_prios->pi_stream_numbers ) return;
 
     if ( p_bitrate_mutex->i_stream_number_count )
     {
         /* Just remove < highest */
-        for ( int16_t i = 1; i < p_bitrate_mutex->i_stream_number_count; i++ )
+        for ( uint16_t i = 1; i < p_bitrate_mutex->i_stream_number_count; i++ )
         {
-            if ( p_prios->i_count + 1 == INT_MAX ) break; /* FIXME: fix all types */
-            if ( (unsigned int) p_prios->i_count > p_sys->i_track ) break;
+            if ( p_prios->i_count > p_sys->i_track ) break;
             p_prios->pi_stream_numbers[ p_prios->i_count++ ] = p_bitrate_mutex->pi_stream_numbers[ i ];
         }
     }
@@ -1039,8 +1042,8 @@ static int DemuxInit( demux_t *p_demux )
     {
         p_sys->track[i] = NULL;
     }
-    p_sys->i_data_begin = -1;
-    p_sys->i_data_end   = -1;
+    p_sys->i_data_begin = 0;
+    p_sys->i_data_end   = 0;
     p_sys->meta         = NULL;
 
     /* Now load all object ( except raw data ) */
@@ -1071,12 +1074,12 @@ static int DemuxInit( demux_t *p_demux )
 
     p_sys->i_track = ASF_CountObject( p_sys->p_root->p_hdr,
                                       &asf_object_stream_properties_guid );
-    if( p_sys->i_track <= 0 )
+    if( p_sys->i_track == 0 )
     {
         msg_Warn( p_demux, "ASF plugin discarded (cannot find any stream!)" );
         goto error;
     }
-    msg_Dbg( p_demux, "found %d streams", p_sys->i_track );
+    msg_Dbg( p_demux, "found %u streams", p_sys->i_track );
 
     /* check if index is available */
     asf_object_index_t *p_index = ASF_FindObject( p_sys->p_root,
@@ -1161,6 +1164,7 @@ static int DemuxInit( demux_t *p_demux )
             es_format_Init( &fmt, AUDIO_ES, 0 );
             i_format = GetWLE( &p_data[0] );
             wf_tag_to_fourcc( i_format, &fmt.i_codec, NULL );
+            /* FIXME: check values range first */
             fmt.audio.i_channels        = GetWLE(  &p_data[2] );
             fmt.audio.i_rate            = GetDWLE( &p_data[4] );
             fmt.i_bitrate               = GetDWLE( &p_data[8] ) * 8;
@@ -1174,6 +1178,7 @@ static int DemuxInit( demux_t *p_demux )
                 fmt.i_extra = __MIN( GetWLE( &p_data[16] ),
                                      p_sp->i_type_specific_data_length -
                                      sizeof( WAVEFORMATEX ) );
+                if ( fmt.i_extra < 0 ) fmt.i_extra = 0;
                 fmt.p_extra = malloc( fmt.i_extra );
                 memcpy( fmt.p_extra, &p_data[sizeof( WAVEFORMATEX )],
                         fmt.i_extra );
@@ -1192,6 +1197,7 @@ static int DemuxInit( demux_t *p_demux )
             es_format_Init( &fmt, VIDEO_ES,
                             VLC_FOURCC( p_data[16], p_data[17],
                                         p_data[18], p_data[19] ) );
+            /* FIXME: check values range first */
             fmt.video.i_width = GetDWLE( p_data + 4 );
             fmt.video.i_height= GetDWLE( p_data + 8 );
 
@@ -1214,6 +1220,7 @@ static int DemuxInit( demux_t *p_demux )
                 fmt.i_extra = __MIN( GetDWLE( p_data ),
                                      p_sp->i_type_specific_data_length - 11 -
                                      sizeof( VLC_BITMAPINFOHEADER ) );
+                if ( fmt.i_extra < 0 ) fmt.i_extra = 0;
                 fmt.p_extra = malloc( fmt.i_extra );
                 memcpy( fmt.p_extra, &p_data[sizeof( VLC_BITMAPINFOHEADER )],
                         fmt.i_extra );
@@ -1223,9 +1230,9 @@ static int DemuxInit( demux_t *p_demux )
             if( p_sys->p_root->p_metadata )
             {
                 asf_object_metadata_t *p_meta = p_sys->p_root->p_metadata;
-                int i_aspect_x = 0, i_aspect_y = 0;
-                unsigned int i;
-
+                unsigned int i_aspect_x = 0, i_aspect_y = 0;
+                uint32_t i;
+                /* FIXME: check values range first */
                 for( i = 0; i < p_meta->i_record_entries_count; i++ )
                 {
                     if( !strcmp( p_meta->record[i].psz_name, "AspectRatioX" ) )
@@ -1269,13 +1276,14 @@ static int DemuxInit( demux_t *p_demux )
             if( guidcmp( p_ref, &asf_object_extended_stream_type_audio ) &&
                 i_data >= sizeof( WAVEFORMATEX ) - 2)
             {
-                int      i_format;
+                uint16_t i_format;
                 es_format_Init( &fmt, AUDIO_ES, 0 );
                 i_format = GetWLE( &p_data[0] );
                 if( i_format == 0 )
                     fmt.i_codec = VLC_CODEC_A52;
                 else
                     wf_tag_to_fourcc( i_format, &fmt.i_codec, NULL );
+                /* FIXME: check values range first */
                 fmt.audio.i_channels        = GetWLE(  &p_data[2] );
                 fmt.audio.i_rate            = GetDWLE( &p_data[4] );
                 fmt.i_bitrate               = GetDWLE( &p_data[8] ) * 8;
@@ -1290,6 +1298,7 @@ static int DemuxInit( demux_t *p_demux )
                     fmt.i_extra = __MIN( GetWLE( &p_data[16] ),
                                          p_sp->i_type_specific_data_length -
                                          sizeof( WAVEFORMATEX ) );
+                    if ( fmt.i_extra < 0 ) fmt.i_extra = 0;
                     fmt.p_extra = malloc( fmt.i_extra );
                     memcpy( fmt.p_extra, &p_data[sizeof( WAVEFORMATEX )],
                         fmt.i_extra );
@@ -1322,7 +1331,7 @@ static int DemuxInit( demux_t *p_demux )
 
             /* Set our priority so we won't get multiple videos */
             int i_priority = ES_PRIORITY_SELECTABLE_MIN;
-            for( int16_t i = 0; i < fmt_priorities_ex.i_count; i++ )
+            for( uint16_t i = 0; i < fmt_priorities_ex.i_count; i++ )
             {
                 if ( fmt_priorities_ex.pi_stream_numbers[i] == p_sp->i_stream_number )
                 {
@@ -1330,7 +1339,7 @@ static int DemuxInit( demux_t *p_demux )
                     break;
                 }
             }
-            for( int16_t i = 0; i < fmt_priorities_bitrate_ex.i_count; i++ )
+            for( uint16_t i = 0; i < fmt_priorities_bitrate_ex.i_count; i++ )
             {
                 if ( fmt_priorities_bitrate_ex.pi_stream_numbers[i] == p_sp->i_stream_number )
                 {
@@ -1359,11 +1368,11 @@ static int DemuxInit( demux_t *p_demux )
     { /* local file */
         p_sys->i_data_end = p_sys->p_root->p_data->i_object_pos +
                                     p_sys->p_root->p_data->i_object_size;
-        p_sys->i_data_end = __MIN( stream_Size( p_demux->s ), p_sys->i_data_end );
+        p_sys->i_data_end = __MIN( (uint64_t)stream_Size( p_demux->s ), p_sys->i_data_end );
     }
     else
     { /* live/broacast */
-        p_sys->i_data_end = -1;
+        p_sys->i_data_end = 0;
     }
 
     /* go to first packet */
@@ -1372,8 +1381,8 @@ static int DemuxInit( demux_t *p_demux )
     /* try to calculate movie time */
     if( p_sys->p_fp->i_data_packets_count > 0 )
     {
-        int64_t i_count;
-        int64_t i_size = stream_Size( p_demux->s );
+        uint64_t i_count;
+        uint64_t i_size = stream_Size( p_demux->s );
 
         if( p_sys->i_data_end > 0 && i_size > p_sys->i_data_end )
         {
@@ -1393,7 +1402,7 @@ static int DemuxInit( demux_t *p_demux )
 
         if( p_sys->i_length > 0 )
         {
-            p_sys->i_bitrate = 8 * i_size * (int64_t)1000000 / p_sys->i_length;
+            p_sys->i_bitrate = 8 * i_size * 1000000 / p_sys->i_length;
         }
     }
 
