@@ -302,8 +302,8 @@ typedef struct
     ASF_OBJECT_COMMON
 
     asf_exclusion_type_t exclusion_type;
-    int16_t i_stream_number_count;
-    int16_t *pi_stream_number;
+    uint16_t i_stream_number_count;
+    uint16_t *pi_stream_number;
 
 } asf_object_advanced_mutual_exclusion_t;
 

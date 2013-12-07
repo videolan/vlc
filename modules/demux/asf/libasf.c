@@ -1001,7 +1001,7 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
     asf_object_advanced_mutual_exclusion_t *p_ae = &p_obj->advanced_mutual_exclusion;
     const uint8_t *p_peek, *p_data;
     int i_peek;
-    int i;
+    uint16_t i;
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_ae->i_object_size ) ) < 42 )
        return VLC_EGENERIC;
@@ -1018,7 +1018,7 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
     ASF_SKIP( 16 );
 
     p_ae->i_stream_number_count = ASF_READ2();
-    p_ae->pi_stream_number = calloc( p_ae->i_stream_number_count, sizeof(int) );
+    p_ae->pi_stream_number = calloc( p_ae->i_stream_number_count, sizeof(uint16_t) );
 
     for( i = 0; i < p_ae->i_stream_number_count; i++ )
     {
