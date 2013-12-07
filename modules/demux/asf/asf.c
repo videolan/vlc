@@ -667,7 +667,7 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     uint32_t i_payload_data_length = 0;
     uint32_t i_temp_payload_length = 0;
     bool b_preroll_done = false;
-    p_sys->p_fp->i_preroll = __MIN( p_sys->p_fp->i_preroll, __INT64_MAX__ );
+    p_sys->p_fp->i_preroll = __MIN( p_sys->p_fp->i_preroll, INT64_MAX );
 
     /* Non compressed */
     if( i_replicated_data_length > 7 ) // should be at least 8 bytes
