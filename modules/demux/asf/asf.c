@@ -666,6 +666,8 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     uint8_t i_pts_delta = 0;
     uint32_t i_payload_data_length = 0;
     uint32_t i_temp_payload_length = 0;
+    bool b_preroll_done = false;
+    p_sys->p_fp->i_preroll = __MIN( p_sys->p_fp->i_preroll, __INT64_MAX__ );
 
     /* Non compressed */
     if( i_replicated_data_length > 7 ) // should be at least 8 bytes
@@ -677,6 +679,7 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
         ParsePayloadExtensions( p_demux, p_sys->track[i_stream_number], pkt,
                                 i_replicated_data_length, &b_packet_keyframe );
 
+        b_preroll_done = ( i_base_pts > (int64_t)p_sys->p_fp->i_preroll );
         i_base_pts -= p_sys->p_fp->i_preroll;
         pkt->i_skip += i_replicated_data_length;
 
@@ -687,6 +690,7 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     {
         /* optional DWORDS missing */
         i_base_pts = (mtime_t)pkt->send_time;
+        b_preroll_done = ( i_base_pts > (int64_t)p_sys->p_fp->i_preroll );
     }
     /* Compressed payload */
     else if( i_replicated_data_length == 1 )
@@ -695,6 +699,7 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
         /* Next byte is Presentation Time Delta */
         i_pts_delta = pkt->p_peek[pkt->i_skip];
         i_base_pts = (mtime_t)i_media_object_offset;
+        b_preroll_done = ( i_base_pts > (int64_t)p_sys->p_fp->i_preroll );
         i_base_pts -= p_sys->p_fp->i_preroll;
         pkt->i_skip++;
         i_media_object_offset = 0;
@@ -759,9 +764,12 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     if( !tk->p_es )
         goto skip;
 
-    tk->i_time = INT64_C(1000) * pkt->send_time;
-    tk->i_time -= p_sys->p_fp->i_preroll * 1000;
-    tk->i_time -= tk->p_sp->i_time_offset * 10;
+    if ( b_preroll_done )
+    {
+        tk->i_time = INT64_C(1000) * pkt->send_time;
+        tk->i_time -= p_sys->p_fp->i_preroll * 1000;
+        tk->i_time -= tk->p_sp->i_time_offset * 10;
+    }
 
     uint32_t i_subpayload_count = 0;
     while (i_payload_data_length)
