@@ -311,9 +311,9 @@ typedef struct
 {
     ASF_OBJECT_COMMON
 
-    int i_priority_count;
-    int *pi_priority_flag;
-    int *pi_priority_stream_number;
+    uint16_t i_priority_count;
+    uint16_t *pi_priority_flag;
+    uint16_t *pi_priority_stream_number;
 } asf_object_stream_prioritization_t;
 
 typedef struct

@@ -1052,7 +1052,7 @@ static int ASF_ReadObject_stream_prioritization( stream_t *s,
     asf_object_stream_prioritization_t *p_sp = &p_obj->stream_prioritization;
     const uint8_t *p_peek, *p_data;
     int i_peek;
-    int i;
+    uint16_t i;
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_sp->i_object_size ) ) < 26 )
        return VLC_EGENERIC;
@@ -1061,9 +1061,9 @@ static int ASF_ReadObject_stream_prioritization( stream_t *s,
 
     p_sp->i_priority_count = ASF_READ2();
 
-    p_sp->pi_priority_flag = calloc( p_sp->i_priority_count, sizeof(int) );
+    p_sp->pi_priority_flag = calloc( p_sp->i_priority_count, sizeof(uint16_t) );
     p_sp->pi_priority_stream_number =
-                             calloc( p_sp->i_priority_count, sizeof(int) );
+                             calloc( p_sp->i_priority_count, sizeof(uint16_t) );
 
     if( !p_sp->pi_priority_flag || !p_sp->pi_priority_stream_number )
     {
@@ -1084,7 +1084,7 @@ static int ASF_ReadObject_stream_prioritization( stream_t *s,
 #ifdef ASF_DEBUG
     msg_Dbg( s, "read \"stream prioritization object\"" );
     for( i = 0; i < p_sp->i_priority_count; i++ )
-        msg_Dbg( s, "  - Stream:%d flags=0x%x",
+        msg_Dbg( s, "  - Stream:%u flags=0x%x",
                  p_sp->pi_priority_stream_number[i],
                  p_sp->pi_priority_flag[i] );
 #endif
