@@ -1,4 +1,4 @@
-From 9faa77ebb077e629ad5c5e1a84fa637cda30538d Mon Sep 17 00:00:00 2001
+From b1654a302361ec9f612fca84da941ae99c669795 Mon Sep 17 00:00:00 2001
 From: Jyri Sarha <jsarha@ti.com>
 Date: Thu, 1 Sep 2011 15:30:27 +0300
 Subject: [PATCH 1/4] resample: Calculate full sinc table (e.g. no sinc
@@ -16,15 +16,15 @@ configure.ac: Add --enable-resample-full-sinc-table conf flag
 
 Use this flag to enable resampling with full sinc table.
 ---
- configure.ac        |    5 +++++
- libspeex/resample.c |    4 ++++
- 2 files changed, 9 insertions(+), 0 deletions(-)
+ configure.ac           | 5 +++++
+ libspeexdsp/resample.c | 4 ++++
+ 2 files changed, 9 insertions(+)
 
 diff --git a/configure.ac b/configure.ac
-index 3179521..2f87461 100644
+index 2ba0b13..9ce4f97 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -198,6 +198,11 @@ AC_ARG_ENABLE(fixed-point-debug, [  --enable-fixed-point-debug  Debug fixed-poin
+@@ -168,6 +168,11 @@ AC_ARG_ENABLE(fixed-point-debug, [  --enable-fixed-point-debug  Debug fixed-poin
    AC_DEFINE([FIXED_DEBUG], , [Debug fixed-point implementation])
  fi])
  
@@ -36,10 +36,10 @@ index 3179521..2f87461 100644
  AC_ARG_ENABLE(ti-c55x, [  --enable-ti-c55x        Enable support for TI C55X DSP],
  [if test "$enableval" = yes; then
    has_char16=yes;
-diff --git a/libspeex/resample.c b/libspeex/resample.c
-index 7b5a308..3829715 100644
---- a/libspeex/resample.c
-+++ b/libspeex/resample.c
+diff --git a/libspeexdsp/resample.c b/libspeexdsp/resample.c
+index 7121445..3588f7b 100644
+--- a/libspeexdsp/resample.c
++++ b/libspeexdsp/resample.c
 @@ -585,7 +585,11 @@ static void update_filter(SpeexResamplerState *st)
     }
     
@@ -47,15 +47,15 @@ index 7b5a308..3829715 100644
 +#ifdef RESAMPLE_FULL_SINC_TABLE
 +   if (1) 
 +#else
-    if (st->den_rate <= st->oversample)
+    if (st->filt_len*st->den_rate <= st->filt_len*st->oversample+8)
 +#endif
     {
        spx_uint32_t i;
        if (!st->sinc_table)
 -- 
-1.7.8.3
+1.8.3.2
 
-From 3da94c7da3357438e39b5b6d110529fdd6796c25 Mon Sep 17 00:00:00 2001
+From 6a882b92234b0715d0227777217e4b869a2fade1 Mon Sep 17 00:00:00 2001
 From: Jyri Sarha <jsarha@ti.com>
 Date: Thu, 1 Sep 2011 15:30:30 +0300
 Subject: [PATCH 2/4] configure.ac: Add ARM NEON support
@@ -63,14 +63,14 @@ Subject: [PATCH 2/4] configure.ac: Add ARM NEON support
 Use --enable-neon to force NEON optimization on. The auto detection
 should also work if your CFLAGS supports NEON.
 ---
- configure.ac |   30 ++++++++++++++++++++++++++++++
- 1 files changed, 30 insertions(+), 0 deletions(-)
+ configure.ac | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
 diff --git a/configure.ac b/configure.ac
-index 2f87461..08d3d5f 100644
+index 9ce4f97..d851a52 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -89,6 +89,23 @@ has_sse=no
+@@ -81,6 +81,23 @@ has_sse=no
  )
  AC_MSG_RESULT($has_sse)  
  
@@ -94,7 +94,7 @@ index 2f87461..08d3d5f 100644
  SAVE_CFLAGS="$CFLAGS"
  CFLAGS="$CFLAGS -fvisibility=hidden"
  AC_MSG_CHECKING(for ELF visibility)
-@@ -148,6 +165,15 @@ has_sse=no
+@@ -123,6 +140,15 @@ has_sse=no
  fi
  ])
  
@@ -110,7 +110,7 @@ index 2f87461..08d3d5f 100644
  
  FFT=smallft
  
-@@ -165,6 +191,10 @@ if test "$has_sse" = yes; then
+@@ -140,6 +166,10 @@ if test "$has_sse" = yes; then
    AC_DEFINE([_USE_SSE], , [Enable SSE support])
  fi
  
@@ -122,9 +122,9 @@ index 2f87461..08d3d5f 100644
  [if test "$enableval" = no; then
    AC_DEFINE([DISABLE_FLOAT_API], , [Disable all parts of the API that are using floats])
 -- 
-1.7.8.3
+1.8.3.2
 
-From bf0e909164995b820066111d401c793e121d55ac Mon Sep 17 00:00:00 2001
+From fcb1b3668d6efbf52bc229da0769d66edc19d483 Mon Sep 17 00:00:00 2001
 From: Jyri Sarha <jsarha@ti.com>
 Date: Thu, 1 Sep 2011 15:30:29 +0300
 Subject: [PATCH 3/4] resample: Add NEON optimized inner_product_single for
@@ -140,18 +140,18 @@ does pretty much the same thing as SATURATE32(PSHR32(x, shift), a),
 but it avoids over flowing in rounding up phase in the rare occasion
 where x has already been saturated. It should also be slightly faster.
 ---
- libspeex/arch.h          |    1 +
- libspeex/fixed_generic.h |    4 ++
- libspeex/resample.c      |   10 ++++-
- libspeex/resample_neon.h |  100 ++++++++++++++++++++++++++++++++++++++++++++++
+ libspeexdsp/arch.h          |   1 +
+ libspeexdsp/fixed_generic.h |   4 ++
+ libspeexdsp/resample.c      |  10 ++++-
+ libspeexdsp/resample_neon.h | 100 ++++++++++++++++++++++++++++++++++++++++++++
  4 files changed, 113 insertions(+), 2 deletions(-)
- create mode 100644 libspeex/resample_neon.h
+ create mode 100644 libspeexdsp/resample_neon.h
 
-diff --git a/libspeex/arch.h b/libspeex/arch.h
-index 3b47ed9..daa72a7 100644
---- a/libspeex/arch.h
-+++ b/libspeex/arch.h
-@@ -171,6 +171,7 @@ typedef float spx_word32_t;
+diff --git a/libspeexdsp/arch.h b/libspeexdsp/arch.h
+index 18446dd..535d308 100644
+--- a/libspeexdsp/arch.h
++++ b/libspeexdsp/arch.h
+@@ -163,6 +163,7 @@ typedef float spx_word32_t;
  #define VSHR32(a,shift) (a)
  #define SATURATE16(x,a) (x)
  #define SATURATE32(x,a) (x)
@@ -159,10 +159,10 @@ index 3b47ed9..daa72a7 100644
  
  #define PSHR(a,shift)       (a)
  #define SHR(a,shift)       (a)
-diff --git a/libspeex/fixed_generic.h b/libspeex/fixed_generic.h
+diff --git a/libspeexdsp/fixed_generic.h b/libspeexdsp/fixed_generic.h
 index 3fb096e..0e012e9 100644
---- a/libspeex/fixed_generic.h
-+++ b/libspeex/fixed_generic.h
+--- a/libspeexdsp/fixed_generic.h
++++ b/libspeexdsp/fixed_generic.h
 @@ -52,6 +52,10 @@
  #define SATURATE16(x,a) (((x)>(a) ? (a) : (x)<-(a) ? -(a) : (x)))
  #define SATURATE32(x,a) (((x)>(a) ? (a) : (x)<-(a) ? -(a) : (x)))
@@ -174,10 +174,10 @@ index 3fb096e..0e012e9 100644
  #define SHR(a,shift) ((a) >> (shift))
  #define SHL(a,shift) ((spx_word32_t)(a) << (shift))
  #define PSHR(a,shift) (SHR((a)+((EXTEND32(1)<<((shift))>>1)),shift))
-diff --git a/libspeex/resample.c b/libspeex/resample.c
-index 3829715..7957c61 100644
---- a/libspeex/resample.c
-+++ b/libspeex/resample.c
+diff --git a/libspeexdsp/resample.c b/libspeexdsp/resample.c
+index 3588f7b..ad59b97 100644
+--- a/libspeexdsp/resample.c
++++ b/libspeexdsp/resample.c
 @@ -99,6 +99,10 @@ static void speex_free (void *ptr) {free(ptr);}
  #include "resample_sse.h"
  #endif
@@ -218,11 +218,11 @@ index 3829715..7957c61 100644
        last_sample += int_advance;
        samp_frac_num += frac_advance;
        if (samp_frac_num >= den_rate)
-diff --git a/libspeex/resample_neon.h b/libspeex/resample_neon.h
+diff --git a/libspeexdsp/resample_neon.h b/libspeexdsp/resample_neon.h
 new file mode 100644
 index 0000000..ba93e41
 --- /dev/null
-+++ b/libspeex/resample_neon.h
++++ b/libspeexdsp/resample_neon.h
 @@ -0,0 +1,100 @@
 +/* Copyright (C) 2007-2008 Jean-Marc Valin
 + * Copyright (C) 2008 Thorvald Natvig
@@ -325,9 +325,9 @@ index 0000000..ba93e41
 +}
 +#endif
 -- 
-1.7.8.3
+1.8.3.2
 
-From e2127a3db9e43b4336e79e5746f3053c0c799562 Mon Sep 17 00:00:00 2001
+From 9864346021128b8a985542811612225d7b4acee7 Mon Sep 17 00:00:00 2001
 From: Jyri Sarha <jsarha@ti.com>
 Date: Thu, 1 Sep 2011 15:30:31 +0300
 Subject: [PATCH 4/4] resample: Add NEON optimized inner_product_single for
@@ -336,13 +336,13 @@ Subject: [PATCH 4/4] resample: Add NEON optimized inner_product_single for
 Also adds inline asm implementations of WORD2INT(x) macro for fixed
 and floating point.
 ---
- libspeex/resample_neon.h |  101 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 101 insertions(+), 0 deletions(-)
+ libspeexdsp/resample_neon.h | 101 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 101 insertions(+)
 
-diff --git a/libspeex/resample_neon.h b/libspeex/resample_neon.h
+diff --git a/libspeexdsp/resample_neon.h b/libspeexdsp/resample_neon.h
 index ba93e41..e7e981e 100644
---- a/libspeex/resample_neon.h
-+++ b/libspeex/resample_neon.h
+--- a/libspeexdsp/resample_neon.h
++++ b/libspeexdsp/resample_neon.h
 @@ -39,6 +39,30 @@
  #include <arm_neon.h>
  
@@ -457,5 +457,5 @@ index ba93e41..e7e981e 100644
 +}
  #endif
 -- 
-1.7.8.3
+1.8.3.2
 
