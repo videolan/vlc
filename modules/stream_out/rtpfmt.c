@@ -53,6 +53,7 @@ static int rtp_packetize_g726_24 (sout_stream_id_t *, block_t *);
 static int rtp_packetize_g726_32 (sout_stream_id_t *, block_t *);
 static int rtp_packetize_g726_40 (sout_stream_id_t *, block_t *);
 static int rtp_packetize_xiph (sout_stream_id_t *, block_t *);
+static int rtp_packetize_vp8 (sout_stream_id_t *, block_t *);
 
 #define XIPH_IDENT (0)
 
@@ -515,6 +516,10 @@ int rtp_get_fmt( vlc_object_t *obj, es_format_t *p_fmt, const char *mux,
             rtp_fmt->channels = 2;
             if (p_fmt->audio.i_channels == 2)
                 rtp_fmt->fmtp = strdup( "sprop-stereo=1" );
+            break;
+        case VLC_CODEC_VP8:
+            rtp_fmt->ptname = "VP8";
+            rtp_fmt->pf_packetize = rtp_packetize_vp8;
             break;
 
         default:
@@ -1374,4 +1379,50 @@ static int rtp_packetize_g726_32( sout_stream_id_t *id, block_t *in )
 static int rtp_packetize_g726_40( sout_stream_id_t *id, block_t *in )
 {
     return rtp_packetize_g726( id, in, 8 );
+}
+
+#define RTP_VP8_HEADER_SIZE 1
+#define RTP_VP8_PAYLOAD_START (12 + RTP_VP8_HEADER_SIZE)
+
+static int rtp_packetize_vp8( sout_stream_id_t *id, block_t *in )
+{
+    int     i_max   = rtp_mtu (id) - RTP_VP8_HEADER_SIZE;
+    int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
+
+    uint8_t *p_data = in->p_buffer;
+    int     i_data  = in->i_buffer;
+
+    if ( i_max <= 0 )
+        return VLC_EGENERIC;
+
+    for( int i = 0; i < i_count; i++ )
+    {
+        int i_payload = __MIN( i_max, i_data );
+        block_t *out = block_Alloc( RTP_VP8_PAYLOAD_START + i_payload );
+        if ( out == NULL )
+            return VLC_ENOMEM;
+
+        /* VP8 payload header */
+        /* All frames are marked as reference ones */
+        if (i == 0)
+            out->p_buffer[12] = 0x10; // partition start
+        else
+            out->p_buffer[12] = 0;
+
+        /* rtp common header */
+        rtp_packetize_common( id, out, (i == i_count - 1),
+                      (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts) );
+        memcpy( &out->p_buffer[RTP_VP8_PAYLOAD_START], p_data, i_payload );
+
+        out->i_buffer = RTP_VP8_PAYLOAD_START + i_payload;
+        out->i_dts    = in->i_dts + i * in->i_length / i_count;
+        out->i_length = in->i_length / i_count;
+
+        rtp_packetize_send( id, out );
+
+        p_data += i_payload;
+        i_data -= i_payload;
+    }
+
+    return VLC_SUCCESS;
 }
