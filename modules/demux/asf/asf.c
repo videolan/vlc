@@ -1024,6 +1024,18 @@ static void ASF_fillup_es_bitrate_priorities_ex( demux_sys_t *p_sys, void *p_hdr
 
 }
 
+#define GET_CHECKED( target, getter, maxtarget, temp ) \
+{\
+    temp i_temp = getter;\
+    if ( i_temp > maxtarget ) {\
+        msg_Warn( p_demux, "rejecting stream %u : " #target " overflow", i_stream );\
+        es_format_Clean( &fmt );\
+        goto error;\
+    } else {\
+        target = i_temp;\
+    }\
+}
+
 static int DemuxInit( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -1164,10 +1176,13 @@ static int DemuxInit( demux_t *p_demux )
             es_format_Init( &fmt, AUDIO_ES, 0 );
             i_format = GetWLE( &p_data[0] );
             wf_tag_to_fourcc( i_format, &fmt.i_codec, NULL );
-            /* FIXME: check values range first */
-            fmt.audio.i_channels        = GetWLE(  &p_data[2] );
-            fmt.audio.i_rate            = GetDWLE( &p_data[4] );
-            fmt.i_bitrate               = GetDWLE( &p_data[8] ) * 8;
+
+            GET_CHECKED( fmt.audio.i_channels,      GetWLE( &p_data[2] ),
+                                                        255, uint16_t );
+            GET_CHECKED( fmt.audio.i_rate,          GetDWLE( &p_data[4] ),
+                                                        UINT_MAX, uint32_t );
+            GET_CHECKED( fmt.i_bitrate,             GetDWLE( &p_data[8] ) * 8,
+                                                        UINT_MAX, uint32_t );
             fmt.audio.i_blockalign      = GetWLE(  &p_data[12] );
             fmt.audio.i_bitspersample   = GetWLE(  &p_data[14] );
 
@@ -1175,10 +1190,10 @@ static int DemuxInit( demux_t *p_demux )
                 i_format != WAVE_FORMAT_MPEGLAYER3 &&
                 i_format != WAVE_FORMAT_MPEG )
             {
-                fmt.i_extra = __MIN( GetWLE( &p_data[16] ),
+                GET_CHECKED( fmt.i_extra, __MIN( GetWLE( &p_data[16] ),
                                      p_sp->i_type_specific_data_length -
-                                     sizeof( WAVEFORMATEX ) );
-                if ( fmt.i_extra < 0 ) fmt.i_extra = 0;
+                                     sizeof( WAVEFORMATEX ) ),
+                             INT_MAX, uint32_t );
                 fmt.p_extra = malloc( fmt.i_extra );
                 memcpy( fmt.p_extra, &p_data[sizeof( WAVEFORMATEX )],
                         fmt.i_extra );
@@ -1197,14 +1212,18 @@ static int DemuxInit( demux_t *p_demux )
             es_format_Init( &fmt, VIDEO_ES,
                             VLC_FOURCC( p_data[16], p_data[17],
                                         p_data[18], p_data[19] ) );
-            /* FIXME: check values range first */
-            fmt.video.i_width = GetDWLE( p_data + 4 );
-            fmt.video.i_height= GetDWLE( p_data + 8 );
+
+            GET_CHECKED( fmt.video.i_width,      GetDWLE( p_data + 4 ),
+                                                     UINT_MAX, uint32_t );
+            GET_CHECKED( fmt.video.i_height,     GetDWLE( p_data + 8 ),
+                                                     UINT_MAX, uint32_t );
 
             if( p_esp && p_esp->i_average_time_per_frame > 0 )
             {
                 fmt.video.i_frame_rate = 10000000;
-                fmt.video.i_frame_rate_base = p_esp->i_average_time_per_frame;
+                GET_CHECKED( fmt.video.i_frame_rate_base,
+                             p_esp->i_average_time_per_frame,
+                             UINT_MAX, uint64_t );
             }
 
             if( fmt.i_codec == VLC_FOURCC( 'D','V','R',' ') )
@@ -1217,10 +1236,10 @@ static int DemuxInit( demux_t *p_demux )
             if( p_sp->i_type_specific_data_length > 11 +
                 sizeof( VLC_BITMAPINFOHEADER ) )
             {
-                fmt.i_extra = __MIN( GetDWLE( p_data ),
+                GET_CHECKED( fmt.i_extra, __MIN( GetDWLE( p_data ),
                                      p_sp->i_type_specific_data_length - 11 -
-                                     sizeof( VLC_BITMAPINFOHEADER ) );
-                if ( fmt.i_extra < 0 ) fmt.i_extra = 0;
+                                     sizeof( VLC_BITMAPINFOHEADER ) ),
+                             UINT_MAX, uint32_t );
                 fmt.p_extra = malloc( fmt.i_extra );
                 memcpy( fmt.p_extra, &p_data[sizeof( VLC_BITMAPINFOHEADER )],
                         fmt.i_extra );
@@ -1232,7 +1251,6 @@ static int DemuxInit( demux_t *p_demux )
                 asf_object_metadata_t *p_meta = p_sys->p_root->p_metadata;
                 unsigned int i_aspect_x = 0, i_aspect_y = 0;
                 uint32_t i;
-                /* FIXME: check values range first */
                 for( i = 0; i < p_meta->i_record_entries_count; i++ )
                 {
                     if( !strcmp( p_meta->record[i].psz_name, "AspectRatioX" ) )
@@ -1240,14 +1258,16 @@ static int DemuxInit( demux_t *p_demux )
                         if( (!i_aspect_x && !p_meta->record[i].i_stream) ||
                             p_meta->record[i].i_stream ==
                             p_sp->i_stream_number )
-                            i_aspect_x = p_meta->record[i].i_val;
+                            GET_CHECKED( i_aspect_x, p_meta->record[i].i_val,
+                                         UINT_MAX, uint64_t );
                     }
                     if( !strcmp( p_meta->record[i].psz_name, "AspectRatioY" ) )
                     {
                         if( (!i_aspect_y && !p_meta->record[i].i_stream) ||
                             p_meta->record[i].i_stream ==
                             p_sp->i_stream_number )
-                            i_aspect_y = p_meta->record[i].i_val;
+                            GET_CHECKED( i_aspect_y, p_meta->record[i].i_val,
+                                         UINT_MAX, uint64_t );
                     }
                 }
 
@@ -1283,10 +1303,12 @@ static int DemuxInit( demux_t *p_demux )
                     fmt.i_codec = VLC_CODEC_A52;
                 else
                     wf_tag_to_fourcc( i_format, &fmt.i_codec, NULL );
-                /* FIXME: check values range first */
-                fmt.audio.i_channels        = GetWLE(  &p_data[2] );
-                fmt.audio.i_rate            = GetDWLE( &p_data[4] );
-                fmt.i_bitrate               = GetDWLE( &p_data[8] ) * 8;
+                GET_CHECKED( fmt.audio.i_channels,      GetWLE( &p_data[2] ),
+                                                            255, uint16_t );
+                GET_CHECKED( fmt.audio.i_rate,          GetDWLE( &p_data[4] ),
+                                                            UINT_MAX, uint32_t );
+                GET_CHECKED( fmt.i_bitrate,             GetDWLE( &p_data[8] ) * 8,
+                                                            UINT_MAX, uint32_t );
                 fmt.audio.i_blockalign      = GetWLE(  &p_data[12] );
                 fmt.audio.i_bitspersample   = GetWLE(  &p_data[14] );
                 fmt.b_packetized = true;
@@ -1295,10 +1317,10 @@ static int DemuxInit( demux_t *p_demux )
                     i_format != WAVE_FORMAT_MPEGLAYER3 &&
                     i_format != WAVE_FORMAT_MPEG )
                 {
-                    fmt.i_extra = __MIN( GetWLE( &p_data[16] ),
+                    GET_CHECKED( fmt.i_extra, __MIN( GetWLE( &p_data[16] ),
                                          p_sp->i_type_specific_data_length -
-                                         sizeof( WAVEFORMATEX ) );
-                    if ( fmt.i_extra < 0 ) fmt.i_extra = 0;
+                                         sizeof( WAVEFORMATEX ) ),
+                                 INT_MAX, uint32_t );
                     fmt.p_extra = malloc( fmt.i_extra );
                     memcpy( fmt.p_extra, &p_data[sizeof( WAVEFORMATEX )],
                         fmt.i_extra );
