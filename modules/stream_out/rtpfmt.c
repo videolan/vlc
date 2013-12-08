@@ -501,6 +501,21 @@ int rtp_get_fmt( vlc_object_t *obj, es_format_t *p_fmt, const char *mux,
             rtp_fmt->ptname = "GSM";
             rtp_fmt->pf_packetize = rtp_packetize_split;
             break;
+        case VLC_CODEC_OPUS:
+            if (p_fmt->audio.i_channels > 2)
+            {
+                msg_Err( obj, "Multistream opus not supported in RTP"
+                         " (having %d channels input)",
+                         p_fmt->audio.i_channels );
+                return VLC_EGENERIC;
+            }
+            rtp_fmt->ptname = "opus";
+            rtp_fmt->pf_packetize = rtp_packetize_split;
+            rtp_fmt->clock_rate = 48000;
+            rtp_fmt->channels = 2;
+            if (p_fmt->audio.i_channels == 2)
+                rtp_fmt->fmtp = strdup( "sprop-stereo=1" );
+            break;
 
         default:
             msg_Err( obj, "cannot add this stream (unsupported "
