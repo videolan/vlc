@@ -2309,6 +2309,9 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                             EsOutIsExtraBufferingAllowed( out ),
                             i_pcr, mdate() );
 
+        if( !p_sys->p_pgrm )
+            return VLC_SUCCESS;
+
         if( p_sys->b_buffering )
         {
             /* Check buffering state on master clock update */
