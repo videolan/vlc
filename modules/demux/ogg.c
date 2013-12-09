@@ -683,7 +683,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
 
             assert( p_sys->i_length > 0 );
-            i64 = (mtime_t)(1000000.0 * p_sys->i_length * f );
+            i64 = INT64_C(1000000) * p_sys->i_length * f;
             Ogg_ResetStreamHelper( p_sys );
             if ( Oggseek_SeektoAbsolutetime( p_demux, p_stream, i64 ) >= 0 )
             {
