@@ -597,7 +597,7 @@ static void ParsePayloadExtensions(demux_t *p_demux, asf_track_t *tk,
     /* Extensions always come in the declared order */
     for ( int i=0; i< tk->p_esp->i_payload_extension_system_count; i++ )
     {
-        asf_payload_extension_system_t *p_ext = &tk->p_esp->p_ext[i];
+        p_ext = &tk->p_esp->p_ext[i];
         if ( p_ext->i_data_size == 0xFFFF ) /* Variable length extension data */
         {
             if ( i_length < 2 ) return;
