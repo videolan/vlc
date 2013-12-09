@@ -312,6 +312,7 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
         int64_t i_delta_offset;
         int64_t i_next_time;
         int64_t i_next_offset;
+        uint32_t i_time_align = 1;
 
         if( i+1 < p_sys->i_seekpoint )
         {
@@ -325,14 +326,19 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
         }
 
         i_delta_offset = 0;
+
+        if ( INT64_MAX / i_delta_time < (i_next_offset - p_sys->seekpoint[i]->i_byte_offset) )
+            i_time_align = 1000000;
+
         if( i_next_time-p_sys->seekpoint[i]->i_time_offset > 0 )
-            i_delta_offset = (i_next_offset - p_sys->seekpoint[i]->i_byte_offset) * i_delta_time /
-                             (i_next_time-p_sys->seekpoint[i]->i_time_offset);
+            i_delta_offset = (i_next_offset - p_sys->seekpoint[i]->i_byte_offset) * (i_delta_time / i_time_align) /
+                             ((i_next_time-p_sys->seekpoint[i]->i_time_offset) / i_time_align);
 
         if( stream_Seek( p_demux->s, p_sys->seekpoint[i]->i_byte_offset+p_sys->i_data_pos + i_delta_offset ) )
             return VLC_EGENERIC;
 
         p_sys->i_pts_start = p_sys->i_pts;
+        i_delta_time = ( i_delta_time / i_time_align ) * i_time_align;
         p_sys->i_time_offset = (p_sys->seekpoint[i]->i_time_offset+i_delta_time) - p_sys->i_pts;
     }
     return VLC_SUCCESS;
