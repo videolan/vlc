@@ -1,13 +1,23 @@
 Changes between 2.1.x and 2.2.0-git:
 --------------------------------
 
+Important changes:
+ * The licenses of more modules have changed from GPLv2+ to LGPLv2.1+
+
+Core:
+ * Partial fix of playback of short audio samples
+
 Access:
  * Added TLS support for ftp access and sout access.
    New schemes for implicit (ftps) and explicit (ftpes) modes.
 
-Decoders:
+Decoder:
  * Partial support for Voxware MetaSound
  * libvpx decoder for VP8 and VP9
+ * Support MSN Audio, DK3, DK4, IMC, Vivo g723.1
+ * Teletext subtitles display improvements
+ * Mediacodec speed improvements on x86
+ * Support setting the post processing level in Theora
 
 Encoder:
  * Support for MPEG-2 encoding using x262
@@ -16,11 +26,18 @@ Encoder:
 
 Demuxer:
  * New CAF format module
+ * Important rework of the Ogg demuxer, notably for seeking
+ * Important rework of the ASF/WMV demuxer, notably for seeking
+ * Support microseconds in SubRip subtitles
+ * FLAC packets validation using CRC
+ * Support Opus in MKV
+ * Basic support for WebVTT
+ * Support HDPR TS files
+ * Improvements in metadata support in Ogg/Opus/Vorbis files
 
-Streaming:
- * WebM streaming, including live sources, compatible with all major browsers
-    vlc <your-source> vlc://quit --sout  '#transcode{vcodec=VP80,vb=1000,acodec=vorb,ab=128}
-    :std{access=http{mime=video/webm},mux=webm,dst=:4212}'
+Muxers:
+ * Important rework of the Ogg muxer, notably for skeleton
+ * Fixes for the AVI muxer for specification respect
 
 Video Output:
  * Direct rendering and filtering for VDPAU hardware acceleration
@@ -31,7 +48,19 @@ Video Filter:
  * New Oldmovie effect filter
  * New VHS effect filter
  * New Freeze effect filter
+ * Support I422 and J422 in transform
+ * NEON optimizations for deinterleaving chroma, notably NV12->I420
 
+Audio Output:
+ * Allow setting volume while not connected with PulseAudio
+
+Streaming:
+ * Important rework of the transcoding module to fix numerous bugs
+ * WebM streaming, including live sources, compatible with all major browsers
+    vlc <your-source> vlc://quit --sout  '#transcode{vcodec=VP80,vb=1000,acodec=vorb,ab=128}
+    :std{access=http{mime=video/webm},mux=webm,dst=:4212}'
+ * GSM, VP8, Opus RTP packetization
+ * Allow setting the first segment number in HLS
 libVLC:
  * add equalizer API libvlc_audio_equalizer_* functions
 
