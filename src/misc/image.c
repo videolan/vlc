@@ -174,6 +174,10 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         p_fmt_out->i_width = p_image->p_dec->fmt_out.video.i_width;
     if( !p_fmt_out->i_height )
         p_fmt_out->i_height = p_image->p_dec->fmt_out.video.i_height;
+    if( !p_fmt_out->i_visible_width )
+        p_fmt_out->i_visible_width = p_fmt_out->i_width;
+    if( !p_fmt_out->i_visible_height )
+        p_fmt_out->i_visible_height = p_fmt_out->i_height;
 
     /* Check if we need chroma conversion or resizing */
     if( p_image->p_dec->fmt_out.video.i_chroma != p_fmt_out->i_chroma ||
