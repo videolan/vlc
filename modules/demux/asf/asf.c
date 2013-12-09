@@ -1088,7 +1088,8 @@ static int DemuxInit( demux_t *p_demux )
          || ASF_FindObject( p_sys->p_root->p_hdr,
                          &asf_object_advanced_content_encryption_guid, 0 ) != NULL )
     {
-        msg_Warn( p_demux, "ASF plugin discarded (DRM encumbered content)" );
+        dialog_Fatal( p_demux, _("Could not demux ASF stream"), "%s",
+                        _("DRM protected streams are not supported.") );
         goto error;
     }
 
