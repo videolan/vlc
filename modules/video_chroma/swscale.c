@@ -254,6 +254,14 @@ static void FixParameters( int *pi_fmt, bool *pb_has_a, bool *pb_swap_uv, vlc_fo
 {
     switch( fmt )
     {
+    case VLC_CODEC_YUV422A:
+        *pi_fmt = PIX_FMT_YUV422P;
+        *pb_has_a = true;
+        break;
+    case VLC_CODEC_YUV420A:
+        *pi_fmt = PIX_FMT_YUV420P;
+        *pb_has_a = true;
+        break;
     case VLC_CODEC_YUVA:
         *pi_fmt = PIX_FMT_YUV444P;
         *pb_has_a = true;
