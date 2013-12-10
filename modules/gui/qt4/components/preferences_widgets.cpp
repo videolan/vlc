@@ -547,7 +547,7 @@ void ModuleConfigControl::finish( )
     {
         module_t *p_parser = p_list[i];
 
-        if( !strcmp( module_get_object( p_parser ), "main" ) ) continue;
+        if( !strcmp( module_get_object( p_parser ), "core" ) ) continue;
 
         unsigned confsize;
         module_config_t *p_config;
@@ -662,7 +662,7 @@ void ModuleListConfigControl::finish( bool bycat )
 
         if( bycat )
         {
-            if( !strcmp( module_get_object( p_parser ), "main" ) ) continue;
+            if( !strcmp( module_get_object( p_parser ), "core" ) ) continue;
 
             unsigned confsize;
             module_config_t *p_config = module_config_get (p_parser, &confsize);
