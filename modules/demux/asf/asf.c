@@ -36,6 +36,8 @@
 #include <vlc_meta.h>                  /* vlc_meta_Set*, vlc_meta_New */
 #include <vlc_access.h>                /* GET_PRIVATE_ID_STATE */
 #include <vlc_codecs.h>                /* VLC_BITMAPINFOHEADER, WAVEFORMATEX */
+#include <vlc_input.h>
+#include <vlc_vout.h>
 
 #include <limits.h>
 
@@ -76,6 +78,7 @@ typedef struct
     int i_cat;
 
     es_out_id_t     *p_es;
+    es_format_t     *p_fmt; /* format backup for video changes */
 
     asf_object_stream_properties_t *p_sp;
     asf_object_extended_stream_properties_t *p_esp;
@@ -647,7 +650,25 @@ static void ParsePayloadExtensions(demux_t *p_demux, asf_track_t *tk,
                                  == ASF_EXTENSION_VIDEOFRAME_IFRAME );
             }
         }
+        else if ( guidcmp( &p_ext->i_extension_id, &mfasf_sampleextension_pixelaspectratio_guid ) )
+        {
+            if ( i_payload_extensions_size != sizeof(uint16_t) ) goto sizeerror;
 
+            uint8_t i_ratio_x = *p_data;
+            uint8_t i_ratio_y = *(p_data + 1);
+            if ( tk->p_fmt->video.i_sar_num != i_ratio_x || tk->p_fmt->video.i_sar_den != i_ratio_y )
+            {
+                vout_thread_t *p_vout = input_GetVout( p_demux->p_input );
+                if ( p_vout )
+                {
+                    msg_Info( p_demux, "Changing aspect ratio to %i/%i", i_ratio_x, i_ratio_y );
+                    tk->p_fmt->video.i_sar_num = i_ratio_x;
+                    tk->p_fmt->video.i_sar_den = i_ratio_y;
+                    vout_ChangeAspectRatio( p_vout, i_ratio_x, i_ratio_y );
+                    vlc_object_release( p_vout );
+                }
+            }
+        }
         i_length -= i_payload_extensions_size;
         p_data += i_payload_extensions_size;
     }
@@ -1404,6 +1425,14 @@ static int DemuxInit( demux_t *p_demux )
             else
                 msg_Warn( p_demux, "Can't set fmt.i_id to match stream id %u", i_stream );
 
+            if ( fmt.i_cat == VIDEO_ES )
+            {
+                /* Backup our video format */
+                tk->p_fmt = malloc( sizeof( es_format_t ) );
+                if ( tk->p_fmt )
+                    es_format_Copy( tk->p_fmt, &fmt );
+            }
+
             tk->p_es = es_out_Add( p_demux->out, &fmt );
         }
         else
@@ -1574,6 +1603,11 @@ static void DemuxEnd( demux_t *p_demux )
             if( tk->p_es )
             {
                 es_out_Del( p_demux->out, tk->p_es );
+            }
+            if ( tk->p_fmt )
+            {
+                es_format_Clean( tk->p_fmt );
+                free( tk->p_fmt );
             }
             free( tk );
         }
