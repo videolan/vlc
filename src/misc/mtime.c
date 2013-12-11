@@ -217,7 +217,7 @@ mtime_t date_Decrement( date_t *p_date, uint32_t i_nb_samples )
     if( p_date->i_remainder < i_rem_adjust )
     {
         /* This is Bresenham algorithm. */
-        assert( p_date->i_remainder > -p_date->i_divider_num);
+        assert( p_date->i_remainder < p_date->i_divider_num);
         p_date->date -= 1;
         p_date->i_remainder += p_date->i_divider_num;
     }
