@@ -140,9 +140,6 @@ struct decoder_owner_sys_t
         bool b_full;
         int  i_count;
 
-        picture_t     *p_picture;
-        picture_t     **pp_picture_next;
-
         subpicture_t  *p_subpic;
         subpicture_t  **pp_subpic_next;
 
@@ -164,9 +161,6 @@ struct decoder_owner_sys_t
     /* Delay */
     mtime_t i_ts_delay;
 };
-
-#define DECODER_MAX_BUFFERING_COUNT (4)
-#define DECODER_MAX_BUFFERING_VIDEO_DURATION (1*CLOCK_FREQ)
 
 /* Pictures which are DECODER_BOGUS_VIDEO_DELAY or more in advance probably have
  * a bogus PTS and won't be displayed */
@@ -553,11 +547,8 @@ void input_DecoderStartBuffering( decoder_t *p_dec )
     p_owner->buffer.b_full = false;
     p_owner->buffer.i_count = 0;
 
-    assert( !p_owner->buffer.p_picture && !p_owner->buffer.p_subpic &&
+    assert( !p_owner->buffer.p_subpic &&
             !p_owner->buffer.p_block );
-
-    p_owner->buffer.p_picture = NULL;
-    p_owner->buffer.pp_picture_next = &p_owner->buffer.p_picture;
 
     p_owner->buffer.p_subpic = NULL;
     p_owner->buffer.pp_subpic_next = &p_owner->buffer.p_subpic;
@@ -875,7 +866,6 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->buffer.b_first = true;
     p_owner->buffer.b_full = false;
     p_owner->buffer.i_count = 0;
-    p_owner->buffer.p_picture = NULL;
     p_owner->buffer.p_subpic = NULL;
     p_owner->buffer.p_block = NULL;
 
@@ -1327,7 +1317,6 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     vout_thread_t  *p_vout = p_owner->p_vout;
-    bool b_first_buffered;
 
     if( p_picture->date <= VLC_TS_INVALID )
     {
@@ -1340,107 +1329,61 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
     /* */
     vlc_mutex_lock( &p_owner->lock );
 
-    if( ( p_owner->b_buffering && !p_owner->buffer.b_first ) || p_owner->buffer.p_picture )
+    if( p_owner->b_buffering && !p_owner->buffer.b_first )
     {
-        p_picture->p_next = NULL;
-
-        *p_owner->buffer.pp_picture_next = p_picture;
-        p_owner->buffer.pp_picture_next = &p_picture->p_next;
-
-        p_owner->buffer.i_count++;
-        if( p_owner->buffer.i_count > DECODER_MAX_BUFFERING_COUNT ||
-            p_picture->date - p_owner->buffer.p_picture->date > DECODER_MAX_BUFFERING_VIDEO_DURATION )
-        {
-            p_owner->buffer.b_full = true;
-            vlc_cond_signal( &p_owner->wait_acknowledge );
-        }
+        p_owner->buffer.b_full = true;
+        vlc_cond_signal( &p_owner->wait_acknowledge );
     }
-    b_first_buffered = p_owner->buffer.p_picture != NULL;
+    bool b_first_after_wait = p_owner->b_buffering && p_owner->buffer.b_full;
 
-    for( ;; b_first_buffered = false )
+    bool b_reject = DecoderWaitUnblock( p_dec );
+
+    if( p_owner->b_buffering )
     {
-        bool b_has_more = false;
+        assert( p_owner->buffer.b_first );
+        assert( !p_owner->buffer.i_count );
+        msg_Dbg( p_dec, "Received first picture" );
+        p_owner->buffer.b_first = false;
+        p_picture->b_force = true;
+    }
 
-        bool b_reject = DecoderWaitUnblock( p_dec );
+    const bool b_dated = p_picture->date > VLC_TS_INVALID;
+    int i_rate = INPUT_RATE_DEFAULT;
+    DecoderFixTs( p_dec, &p_picture->date, NULL, NULL,
+                  &i_rate, DECODER_BOGUS_VIDEO_DELAY );
 
-        if( p_owner->b_buffering && !p_owner->buffer.b_first )
+    vlc_mutex_unlock( &p_owner->lock );
+
+    /* */
+    if( !p_picture->b_force && p_picture->date <= VLC_TS_INVALID ) // FIXME --VLC_TS_INVALID verify video_output/*
+        b_reject = true;
+
+    if( !b_reject )
+    {
+        if( i_rate != p_owner->i_last_rate || b_first_after_wait )
         {
-            vlc_mutex_unlock( &p_owner->lock );
-            return;
+            /* Be sure to not display old picture after our own */
+            vout_Flush( p_vout, p_picture->date );
+            p_owner->i_last_rate = i_rate;
         }
-        bool b_buffering_first = p_owner->b_buffering;
-
-        /* */
-        if( p_owner->buffer.p_picture )
-        {
-            p_picture = p_owner->buffer.p_picture;
-
-            p_owner->buffer.p_picture = p_picture->p_next;
-            p_owner->buffer.i_count--;
-
-            b_has_more = p_owner->buffer.p_picture != NULL;
-            if( !b_has_more )
-                p_owner->buffer.pp_picture_next = &p_owner->buffer.p_picture;
-        }
-
-        /* */
-        if( b_buffering_first )
-        {
-            assert( p_owner->buffer.b_first );
-            assert( !p_owner->buffer.i_count );
-            msg_Dbg( p_dec, "Received first picture" );
-            p_owner->buffer.b_first = false;
-            p_picture->b_force = true;
-        }
-
-        const bool b_dated = p_picture->date > VLC_TS_INVALID;
-        int i_rate = INPUT_RATE_DEFAULT;
-        DecoderFixTs( p_dec, &p_picture->date, NULL, NULL,
-                      &i_rate, DECODER_BOGUS_VIDEO_DELAY );
-
-        vlc_mutex_unlock( &p_owner->lock );
-
-        /* */
-        if( !p_picture->b_force && p_picture->date <= VLC_TS_INVALID ) // FIXME --VLC_TS_INVALID verify video_output/*
-            b_reject = true;
-
-        if( !b_reject )
-        {
-            if( i_rate != p_owner->i_last_rate || b_first_buffered )
-            {
-                /* Be sure to not display old picture after our own */
-                vout_Flush( p_vout, p_picture->date );
-                p_owner->i_last_rate = i_rate;
-            }
-            vout_PutPicture( p_vout, p_picture );
-        }
+        vout_PutPicture( p_vout, p_picture );
+    }
+    else
+    {
+        if( b_dated )
+            msg_Warn( p_dec, "early picture skipped" );
         else
-        {
-            if( b_dated )
-                msg_Warn( p_dec, "early picture skipped" );
-            else
-                msg_Warn( p_dec, "non-dated video buffer received" );
+            msg_Warn( p_dec, "non-dated video buffer received" );
 
-            *pi_lost_sum += 1;
-            vout_ReleasePicture( p_vout, p_picture );
-        }
-        int i_tmp_display;
-        int i_tmp_lost;
-        vout_GetResetStatistic( p_vout, &i_tmp_display, &i_tmp_lost );
-
-        *pi_played_sum += i_tmp_display;
-        *pi_lost_sum += i_tmp_lost;
-
-        if( !b_has_more || b_buffering_first )
-            break;
-
-        vlc_mutex_lock( &p_owner->lock );
-        if( !p_owner->buffer.p_picture )
-        {
-            vlc_mutex_unlock( &p_owner->lock );
-            break;
-        }
+        *pi_lost_sum += 1;
+        vout_ReleasePicture( p_vout, p_picture );
     }
+    int i_tmp_display;
+    int i_tmp_lost;
+    vout_GetResetStatistic( p_vout, &i_tmp_display, &i_tmp_lost );
+
+    *pi_played_sum += i_tmp_display;
+    *pi_lost_sum += i_tmp_lost;
 }
 
 static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
@@ -1660,22 +1603,6 @@ static void DecoderFlushBuffering( decoder_t *p_dec )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     vlc_assert_locked( &p_owner->lock );
-
-    while( p_owner->buffer.p_picture )
-    {
-        picture_t *p_picture = p_owner->buffer.p_picture;
-
-        p_owner->buffer.p_picture = p_picture->p_next;
-        p_owner->buffer.i_count--;
-
-        if( p_owner->p_vout )
-        {
-            vout_ReleasePicture( p_owner->p_vout, p_picture );
-        }
-
-        if( !p_owner->buffer.p_picture )
-            p_owner->buffer.pp_picture_next = &p_owner->buffer.p_picture;
-    }
     while( p_owner->buffer.p_subpic )
     {
         subpicture_t *p_subpic = p_owner->buffer.p_subpic;
@@ -2326,8 +2253,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         p_vout = input_resource_RequestVout( p_owner->p_resource,
                                              p_vout, &fmt,
                                              dpb_size +
-                                             p_dec->i_extra_picture_buffers +
-                                             1 + DECODER_MAX_BUFFERING_COUNT,
+                                             p_dec->i_extra_picture_buffers + 1,
                                              true );
         vlc_mutex_lock( &p_owner->lock );
         p_owner->p_vout = p_vout;
