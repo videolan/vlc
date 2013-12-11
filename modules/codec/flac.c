@@ -389,7 +389,7 @@ static void ProcessHeader( decoder_t *p_dec )
 
     if (i_extra > 42 && !memcmp(p_dec->fmt_in.p_extra, header, 4))
         i_extra = 42;
-    else if (i_extra > 34 && !memcmp(p_dec->fmt_in.p_extra, header, 4))
+    else if (i_extra > 34 && memcmp(p_dec->fmt_in.p_extra, header, 4))
         i_extra = 34;
 
     switch (i_extra) {
