@@ -922,8 +922,8 @@ int download_signature( vlc_object_t *p_this, signature_packet_t *p_sig,
 
     if( packet_type( *p_buf ) != SIGNATURE_PACKET )
     {
-        free( p_buf );
         msg_Dbg( p_this, "Not a signature: %d", *p_buf );
+        free( p_buf );
         return VLC_EGENERIC;
     }
 
