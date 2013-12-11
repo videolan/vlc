@@ -850,6 +850,7 @@ static ssize_t openNextFile( sout_access_out_t *p_access, sout_access_out_sys_t 
     if ( unlikely( !segment->psz_filename ) )
     {
         msg_Err( p_access, "Format segmentpath failed");
+        destroySegment( segment );
         return -1;
     }
 
