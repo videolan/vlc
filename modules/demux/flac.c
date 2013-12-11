@@ -486,7 +486,10 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
                 return VLC_EGENERIC;
 
             if( stream_Read( p_demux->s, NULL, 4) < 4)
+            {
+                free( *pp_streaminfo );
                 return VLC_EGENERIC;
+            }
             if( stream_Read( p_demux->s, *pp_streaminfo, STREAMINFO_SIZE ) != STREAMINFO_SIZE )
             {
                 msg_Err( p_demux, "failed to read STREAMINFO metadata block" );
