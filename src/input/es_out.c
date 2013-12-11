@@ -491,7 +491,7 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record )
 
             p_es->p_dec_record = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_clock, p_sys->p_sout_record );
             if( p_es->p_dec_record && p_sys->b_buffering )
-                input_DecoderStartBuffering( p_es->p_dec_record );
+                input_DecoderStartWait( p_es->p_dec_record );
         }
     }
     else
@@ -576,10 +576,10 @@ static void EsOutChangePosition( es_out_t *out )
         if( !p_es->p_dec )
             continue;
 
-        input_DecoderStartBuffering( p_es->p_dec );
+        input_DecoderStartWait( p_es->p_dec );
 
         if( p_es->p_dec_record )
-            input_DecoderStartBuffering( p_es->p_dec_record );
+            input_DecoderStartWait( p_es->p_dec_record );
     }
 
     for( int i = 0; i < p_sys->i_pgrm; i++ )
@@ -646,12 +646,12 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
 
         if( !p_es->p_dec || p_es->fmt.i_cat == SPU_ES )
             continue;
-        input_DecoderWaitBuffering( p_es->p_dec );
+        input_DecoderWait( p_es->p_dec );
         if( p_es->p_dec_record )
-            input_DecoderWaitBuffering( p_es->p_dec_record );
+            input_DecoderWait( p_es->p_dec_record );
     }
 
-    msg_Dbg( p_sys->p_input, "Decoder buffering done in %d ms",
+    msg_Dbg( p_sys->p_input, "Decoder wait done in %d ms",
               (int)(mdate() - i_decoder_buffering_start)/1000 );
 
     /* Here is a good place to destroy unused vout with every demuxer */
@@ -671,9 +671,9 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
         if( !p_es->p_dec )
             continue;
 
-        input_DecoderStopBuffering( p_es->p_dec );
+        input_DecoderStopWait( p_es->p_dec );
         if( p_es->p_dec_record )
-            input_DecoderStopBuffering( p_es->p_dec_record );
+            input_DecoderStopWait( p_es->p_dec_record );
     }
 }
 static void EsOutDecodersChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
@@ -1558,13 +1558,13 @@ static void EsCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     if( p_es->p_dec )
     {
         if( p_sys->b_buffering )
-            input_DecoderStartBuffering( p_es->p_dec );
+            input_DecoderStartWait( p_es->p_dec );
 
         if( !p_es->p_master && p_sys->p_sout_record )
         {
             p_es->p_dec_record = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_clock, p_sys->p_sout_record );
             if( p_es->p_dec_record && p_sys->b_buffering )
-                input_DecoderStartBuffering( p_es->p_dec_record );
+                input_DecoderStartWait( p_es->p_dec_record );
         }
     }
 
