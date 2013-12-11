@@ -301,13 +301,14 @@ static int Open( vlc_object_t *p_this )
         /* Open the log file and remove any buffering for the stream */
         msg_Dbg( p_intf, "opening logfile `%s'", filename );
         p_sys->p_file = vlc_fopen( filename, "at" );
-        free( psz_file );
         if( p_sys->p_file == NULL )
         {
             msg_Err( p_intf, "error opening logfile `%s': %m", filename );
+            free( psz_file );
             free( p_sys );
             return VLC_EGENERIC;
         }
+        free( psz_file );
         setvbuf( p_sys->p_file, NULL, _IONBF, 0 );
         fputs( header, p_sys->p_file );
     }
