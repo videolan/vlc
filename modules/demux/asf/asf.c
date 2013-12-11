@@ -806,6 +806,7 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
         mtime_t i_payload_pts = i_base_pts + (mtime_t)i_pts_delta * i_subpayload_count * 1000;
         i_payload_pts -= tk->p_sp->i_time_offset * 10;
         mtime_t i_payload_dts = INT64_C(1000) * pkt->send_time;
+        i_payload_dts -= p_sys->p_fp->i_preroll * 1000;
         i_payload_dts -= tk->p_sp->i_time_offset * 10;
 
         if ( i_sub_payload_data_length &&
