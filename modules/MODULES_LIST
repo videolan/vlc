@@ -295,6 +295,7 @@ $Id$
  * scte27: SCTE-27/Digicipher subtitles decoder
  * sdl_image: SDL-based image decoder
  * sdp: SDP fake access
+ * securetransport: TLS module for OS X and iOS
  * sepia: Sepia video filter
  * sftp: SFTP network access module
  * sharpen: Sharpen video filter

@@ -80,6 +80,9 @@ Visualizations:
 Interaces:
  * Add support for subtitles drag 'n drop in skins2
 
+Misc:
+ * New module for TLS on OS X and iOS
+
 Removed modules:
  * ios video output: use ios2
  * OpenMash H.261 video decoder
