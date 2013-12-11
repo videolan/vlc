@@ -146,9 +146,6 @@ struct decoder_owner_sys_t
         subpicture_t  *p_subpic;
         subpicture_t  **pp_subpic_next;
 
-        block_t *p_audio;
-        block_t **pp_audio_next;
-
         block_t       *p_block;
         block_t       **pp_block_next;
     } buffer;
@@ -169,7 +166,6 @@ struct decoder_owner_sys_t
 };
 
 #define DECODER_MAX_BUFFERING_COUNT (4)
-#define DECODER_MAX_BUFFERING_AUDIO_DURATION (AOUT_MAX_PREPARE_TIME)
 #define DECODER_MAX_BUFFERING_VIDEO_DURATION (1*CLOCK_FREQ)
 
 /* Pictures which are DECODER_BOGUS_VIDEO_DELAY or more in advance probably have
@@ -558,16 +554,13 @@ void input_DecoderStartBuffering( decoder_t *p_dec )
     p_owner->buffer.i_count = 0;
 
     assert( !p_owner->buffer.p_picture && !p_owner->buffer.p_subpic &&
-            !p_owner->buffer.p_audio && !p_owner->buffer.p_block );
+            !p_owner->buffer.p_block );
 
     p_owner->buffer.p_picture = NULL;
     p_owner->buffer.pp_picture_next = &p_owner->buffer.p_picture;
 
     p_owner->buffer.p_subpic = NULL;
     p_owner->buffer.pp_subpic_next = &p_owner->buffer.p_subpic;
-
-    p_owner->buffer.p_audio = NULL;
-    p_owner->buffer.pp_audio_next = &p_owner->buffer.p_audio;
 
     p_owner->buffer.p_block = NULL;
     p_owner->buffer.pp_block_next = &p_owner->buffer.p_block;
@@ -884,7 +877,6 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->buffer.i_count = 0;
     p_owner->buffer.p_picture = NULL;
     p_owner->buffer.p_subpic = NULL;
-    p_owner->buffer.p_audio = NULL;
     p_owner->buffer.p_block = NULL;
 
     p_owner->b_flushing = false;
@@ -1176,44 +1168,19 @@ static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
     /* */
     vlc_mutex_lock( &p_owner->lock );
 
-    if( p_audio && (p_owner->b_buffering || p_owner->buffer.p_audio) )
+    if( p_audio && p_owner->b_buffering )
     {
-        p_audio->p_next = NULL;
-
-        *p_owner->buffer.pp_audio_next = p_audio;
-        p_owner->buffer.pp_audio_next = &p_audio->p_next;
-
-        p_owner->buffer.i_count++;
-        if( p_owner->buffer.i_count > DECODER_MAX_BUFFERING_COUNT ||
-            p_audio->i_pts - p_owner->buffer.p_audio->i_pts > DECODER_MAX_BUFFERING_AUDIO_DURATION )
-        {
-            p_owner->buffer.b_full = true;
-            vlc_cond_signal( &p_owner->wait_acknowledge );
-        }
+        p_owner->buffer.b_full = true;
+        vlc_cond_signal( &p_owner->wait_acknowledge );
     }
 
     for( ;; )
     {
-        bool b_has_more = false, b_paused;
+        bool b_paused;
 
         bool b_reject = DecoderWaitUnblock( p_dec );
-        if( p_owner->b_buffering )
-            break;
 
         b_paused = p_owner->b_paused;
-
-        /* */
-        if( p_owner->buffer.p_audio )
-        {
-            p_audio = p_owner->buffer.p_audio;
-
-            p_owner->buffer.p_audio = p_audio->p_next;
-            p_owner->buffer.i_count--;
-
-            b_has_more = p_owner->buffer.p_audio != NULL;
-            if( !b_has_more )
-                p_owner->buffer.pp_audio_next = &p_owner->buffer.p_audio;
-        }
 
         if (!p_audio)
             break;
@@ -1251,10 +1218,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
             block_Release( p_audio );
         }
 
-        if( !b_has_more )
-            break;
-        if( !p_owner->buffer.p_audio )
-            break;
+        break;
     }
     vlc_mutex_unlock( &p_owner->lock );
 }
@@ -1711,18 +1675,6 @@ static void DecoderFlushBuffering( decoder_t *p_dec )
 
         if( !p_owner->buffer.p_picture )
             p_owner->buffer.pp_picture_next = &p_owner->buffer.p_picture;
-    }
-    while( p_owner->buffer.p_audio )
-    {
-        block_t *p_audio = p_owner->buffer.p_audio;
-
-        p_owner->buffer.p_audio = p_audio->p_next;
-        p_owner->buffer.i_count--;
-
-        block_Release( p_audio );
-
-        if( !p_owner->buffer.p_audio )
-            p_owner->buffer.pp_audio_next = &p_owner->buffer.p_audio;
     }
     while( p_owner->buffer.p_subpic )
     {
