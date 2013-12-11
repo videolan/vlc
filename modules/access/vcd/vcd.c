@@ -264,7 +264,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
             *va_arg( args, int* ) = p_sys->i_titles;
 
             /* Duplicate title infos */
-            *ppp_title = malloc( sizeof(input_title_t **) * p_sys->i_titles );
+            *ppp_title = malloc( sizeof(input_title_t *) * p_sys->i_titles );
             for( int i = 0; i < p_sys->i_titles; i++ )
                 (*ppp_title)[i] = vlc_input_title_Duplicate( p_sys->title[i] );
             break;
