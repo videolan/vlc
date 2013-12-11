@@ -398,6 +398,7 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
         es_fmt.video.i_width = fmt.fmt.pix.bytesperline / selected->bpp;
     else
         es_fmt.video.i_width = fmt.fmt.pix.width;
+    es_fmt.video.i_visible_height =
     es_fmt.video.i_height = fmt.fmt.pix.height;
     es_fmt.video.i_frame_rate = parm.parm.capture.timeperframe.denominator;
     es_fmt.video.i_frame_rate_base = parm.parm.capture.timeperframe.numerator;
