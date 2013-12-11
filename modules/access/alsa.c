@@ -480,6 +480,7 @@ static int Open (vlc_object_t *obj)
     /* Kick recording */
     aout_FormatPrepare (&fmt.audio);
     sys->es = es_out_Add (demux->out, &fmt);
+    demux->p_sys = sys;
 
     if (vlc_clone (&sys->thread, Thread, demux, VLC_THREAD_PRIORITY_INPUT))
     {
@@ -487,7 +488,6 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
 
-    demux->p_sys = sys;
     demux->pf_demux = NULL;
     demux->pf_control = Control;
     return VLC_SUCCESS;
