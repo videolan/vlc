@@ -641,7 +641,7 @@ static bool AddIndexEntry( sout_mux_t *p_mux, uint64_t i_time, sout_input_t *p_i
     /* update diff points */
     p_stream->skeleton.i_last_keyframe_pos = p_sys->i_pos;
     p_stream->skeleton.i_last_keyframe_time = i_time;
-    msg_Dbg( p_mux, "Added index on stream %d entry %"PRId64" %"PRId64,
+    msg_Dbg( p_mux, "Added index on stream %d entry %zd %"PRIu64,
              p_stream->i_serial_no, p_sys->i_pos - p_sys->i_segment_start, i_time );
 
     return true;
@@ -1396,7 +1396,7 @@ static bool AllocateIndex( sout_mux_t *p_mux, sout_input_t *p_input )
         msg_Dbg( p_mux, "No stream length, using default allocation for index" );
     }
     i_size *= ( 8.0 / 7 ); /* 7bits encoding overhead */
-    msg_Dbg( p_mux, "allocating %"PRId64" bytes for index", i_size );
+    msg_Dbg( p_mux, "allocating %zu bytes for index", i_size );
     p_stream->skeleton.p_index = calloc( i_size, sizeof(uint8_t) );
     if ( !p_stream->skeleton.p_index ) return false;
     p_stream->skeleton.i_index_size = i_size;
@@ -1483,7 +1483,7 @@ static int Mux( sout_mux_t *p_mux )
         /* If we're switching to end of headers, then that's data start */
         if ( p_sys->b_can_add_streams )
         {
-            msg_Dbg( p_mux, "data starts from %"PRId64, p_sys->i_pos );
+            msg_Dbg( p_mux, "data starts from %zu", p_sys->i_pos );
             p_sys->i_data_start = p_sys->i_pos;
         }
 
