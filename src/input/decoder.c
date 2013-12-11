@@ -140,9 +140,6 @@ struct decoder_owner_sys_t
         bool b_full;
         int  i_count;
 
-        subpicture_t  *p_subpic;
-        subpicture_t  **pp_subpic_next;
-
         block_t       *p_block;
         block_t       **pp_block_next;
     } buffer;
@@ -547,11 +544,7 @@ void input_DecoderStartBuffering( decoder_t *p_dec )
     p_owner->buffer.b_full = false;
     p_owner->buffer.i_count = 0;
 
-    assert( !p_owner->buffer.p_subpic &&
-            !p_owner->buffer.p_block );
-
-    p_owner->buffer.p_subpic = NULL;
-    p_owner->buffer.pp_subpic_next = &p_owner->buffer.p_subpic;
+    assert( !p_owner->buffer.p_block );
 
     p_owner->buffer.p_block = NULL;
     p_owner->buffer.pp_block_next = &p_owner->buffer.p_block;
@@ -866,7 +859,6 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->buffer.b_first = true;
     p_owner->buffer.b_full = false;
     p_owner->buffer.i_count = 0;
-    p_owner->buffer.p_subpic = NULL;
     p_owner->buffer.p_block = NULL;
 
     p_owner->b_flushing = false;
@@ -1460,71 +1452,28 @@ static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic )
     /* */
     vlc_mutex_lock( &p_owner->lock );
 
-    if( p_owner->b_buffering || p_owner->buffer.p_subpic )
+    if( p_owner->b_buffering )
     {
-        p_subpic->p_next = NULL;
-
-        *p_owner->buffer.pp_subpic_next = p_subpic;
-        p_owner->buffer.pp_subpic_next = &p_subpic->p_next;
-
-        p_owner->buffer.i_count++;
-        /* XXX it is important to be full after the first one */
-        if( p_owner->buffer.i_count > 0 )
-        {
-            p_owner->buffer.b_full = true;
-            vlc_cond_signal( &p_owner->wait_acknowledge );
-        }
+        p_owner->buffer.b_full = true;
+        vlc_cond_signal( &p_owner->wait_acknowledge );
     }
 
-    for( ;; )
-    {
-        bool b_has_more = false;
-        bool b_reject = DecoderWaitUnblock( p_dec );
+    bool b_reject = DecoderWaitUnblock( p_dec );
 
-        if( p_owner->b_buffering )
-        {
-            vlc_mutex_unlock( &p_owner->lock );
-            return;
-        }
+    DecoderFixTs( p_dec, &p_subpic->i_start, &p_subpic->i_stop, NULL,
+                  NULL, INT64_MAX );
 
-        /* */
-        if( p_owner->buffer.p_subpic )
-        {
-            p_subpic = p_owner->buffer.p_subpic;
+    if( p_subpic->i_start <= VLC_TS_INVALID )
+        b_reject = true;
 
-            p_owner->buffer.p_subpic = p_subpic->p_next;
-            p_owner->buffer.i_count--;
+    DecoderWaitDate( p_dec, &b_reject,
+                     p_subpic->i_start - SPU_MAX_PREPARE_TIME );
+    vlc_mutex_unlock( &p_owner->lock );
 
-            b_has_more = p_owner->buffer.p_subpic != NULL;
-            if( !b_has_more )
-                p_owner->buffer.pp_subpic_next = &p_owner->buffer.p_subpic;
-        }
-
-        /* */
-        DecoderFixTs( p_dec, &p_subpic->i_start, &p_subpic->i_stop, NULL,
-                      NULL, INT64_MAX );
-
-        if( p_subpic->i_start <= VLC_TS_INVALID )
-            b_reject = true;
-
-        DecoderWaitDate( p_dec, &b_reject,
-                         p_subpic->i_start - SPU_MAX_PREPARE_TIME );
-        vlc_mutex_unlock( &p_owner->lock );
-
-        if( !b_reject )
-            vout_PutSubpicture( p_vout, p_subpic );
-        else
-            subpicture_Delete( p_subpic );
-
-        if( !b_has_more )
-            break;
-        vlc_mutex_lock( &p_owner->lock );
-        if( !p_owner->buffer.p_subpic )
-        {
-            vlc_mutex_unlock( &p_owner->lock );
-            break;
-        }
-    }
+    if( !b_reject )
+        vout_PutSubpicture( p_vout, p_subpic );
+    else
+        subpicture_Delete( p_subpic );
 }
 
 #ifdef ENABLE_SOUT
@@ -1603,18 +1552,6 @@ static void DecoderFlushBuffering( decoder_t *p_dec )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     vlc_assert_locked( &p_owner->lock );
-    while( p_owner->buffer.p_subpic )
-    {
-        subpicture_t *p_subpic = p_owner->buffer.p_subpic;
-
-        p_owner->buffer.p_subpic = p_subpic->p_next;
-        p_owner->buffer.i_count--;
-
-        subpicture_Delete( p_subpic );
-
-        if( !p_owner->buffer.p_subpic )
-            p_owner->buffer.pp_subpic_next = &p_owner->buffer.p_subpic;
-    }
     if( p_owner->buffer.p_block )
     {
         block_ChainRelease( p_owner->buffer.p_block );
