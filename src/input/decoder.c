@@ -63,7 +63,6 @@ static void       DecoderProcess( decoder_t *, block_t * );
 static void       DecoderOutputChangePause( decoder_t *, bool b_paused, mtime_t i_date );
 static void       DecoderFlush( decoder_t * );
 static void       DecoderSignalBuffering( decoder_t *, bool );
-static void       DecoderFlushBuffering( decoder_t * );
 
 static void       DecoderUnsupportedCodec( decoder_t *, vlc_fourcc_t );
 
@@ -1496,14 +1495,6 @@ static void DecoderPlaySout( decoder_t *p_dec, block_t *p_sout_block )
 }
 #endif
 
-/* */
-static void DecoderFlushBuffering( decoder_t *p_dec )
-{
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
-
-    vlc_assert_locked( &p_owner->lock );
-}
-
 #ifdef ENABLE_SOUT
 /* This function process a block for sout
  */
@@ -1720,7 +1711,6 @@ static void DecoderProcessOnFlush( decoder_t *p_dec )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     vlc_mutex_lock( &p_owner->lock );
-    DecoderFlushBuffering( p_dec );
 
     if( p_owner->b_flushing )
     {
@@ -1821,11 +1811,6 @@ static void DeleteDecoder( decoder_t * p_dec )
     /* Free all packets still in the decoder fifo. */
     block_FifoEmpty( p_owner->p_fifo );
     block_FifoRelease( p_owner->p_fifo );
-
-    /* */
-    vlc_mutex_lock( &p_owner->lock );
-    DecoderFlushBuffering( p_dec );
-    vlc_mutex_unlock( &p_owner->lock );
 
     /* Cleanup */
     if( p_owner->p_aout )
@@ -1944,7 +1929,6 @@ static int aout_update_format( decoder_t *p_dec )
 
         /* Parameters changed, restart the aout */
         vlc_mutex_lock( &p_owner->lock );
-        DecoderFlushBuffering( p_dec );
 
         aout_DecDelete( p_owner->p_aout );
         p_owner->p_aout = NULL;
@@ -2105,8 +2089,6 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 
         vlc_mutex_lock( &p_owner->lock );
 
-        DecoderFlushBuffering( p_dec );
-
         p_vout = p_owner->p_vout;
         p_owner->p_vout = NULL;
         vlc_mutex_unlock( &p_owner->lock );
@@ -2219,12 +2201,6 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
 
     if( p_owner->p_spu_vout != p_vout )
     {
-        vlc_mutex_lock( &p_owner->lock );
-
-        DecoderFlushBuffering( p_dec );
-
-        vlc_mutex_unlock( &p_owner->lock );
-
         p_owner->i_spu_channel = vout_RegisterSubpictureChannel( p_vout );
         p_owner->i_spu_order = 0;
         p_owner->p_spu_vout = p_vout;
