@@ -495,6 +495,7 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
 
         free( ppsz_properties[i] );
     }
+    free( ppsz_properties );
 
     if( !dbus_message_iter_close_container( &args, &changed_properties ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
@@ -505,8 +506,6 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
 
     if( !dbus_message_iter_close_container( &args, &invalidated_properties ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    free( ppsz_properties );
 
     SIGNAL_SEND;
 }
