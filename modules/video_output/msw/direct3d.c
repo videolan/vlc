@@ -142,6 +142,11 @@ static int Open(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
 
+    OSVERSIONINFO winVer;
+    winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    if(GetVersionEx(&winVer) && winVer.dwMajorVersion < 6 && !object->b_force)
+        return VLC_EGENERIC;
+
     /* Allocate structure */
     vd->sys = sys = calloc(1, sizeof(vout_display_sys_t));
     if (!sys)
