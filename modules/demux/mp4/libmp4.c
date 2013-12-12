@@ -3668,12 +3668,12 @@ static void MP4_BoxDumpStructure_Internal( stream_t *s,
         }
         if( MP4_BOX_TYPE_ASCII() )
             snprintf( &str[i_level * 4], sizeof(str) - 4*i_level,
-                      "+ %4.4s size %d",
-                        (char*)&p_box->i_type, (uint32_t)p_box->i_size );
+                      "+ %4.4s size %"PRIu64" offset %ld",
+                        (char*)&p_box->i_type, p_box->i_size, p_box->i_pos );
         else
             snprintf( &str[i_level * 4], sizeof(str) - 4*i_level,
-                      "+ c%3.3s size %d",
-                        (char*)&p_box->i_type+1, (uint32_t)p_box->i_size );
+                      "+ c%3.3s size %"PRIu64" offset %ld",
+                        (char*)&p_box->i_type+1, p_box->i_size, p_box->i_pos );
         msg_Dbg( s, "%s", str );
     }
     p_child = p_box->p_first;
