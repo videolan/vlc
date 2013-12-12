@@ -775,7 +775,7 @@ int64_t Oggseek_GranuleToAbsTimestamp( logical_stream_t *p_stream,
 
     if ( p_stream->b_oggds )
     {
-        i_timestamp = i_granule * INT64_C(1000000) / p_stream->f_rate;
+        i_timestamp = i_granule * CLOCK_FREQ / p_stream->f_rate;
     }
     else if( p_stream->fmt.i_codec == VLC_CODEC_THEORA ||
         p_stream->fmt.i_codec == VLC_CODEC_KATE )
@@ -784,21 +784,21 @@ int64_t Oggseek_GranuleToAbsTimestamp( logical_stream_t *p_stream,
         ogg_int64_t pframe = i_granule - ( iframe << p_stream->i_granule_shift );
         /* See Theora A.2.3 */
         if ( b_presentation ) pframe -= p_stream->i_keyframe_offset;
-        i_timestamp = ( iframe + pframe ) * INT64_C(1000000) / p_stream->f_rate;
+        i_timestamp = ( iframe + pframe ) * CLOCK_FREQ / p_stream->f_rate;
     }
     else if( p_stream->fmt.i_codec == VLC_CODEC_DIRAC )
     {
         ogg_int64_t i_dts = i_granule >> 31;
         /* NB, OggDirac granulepos values are in units of 2*picturerate */
-        i_timestamp = (i_dts/2) * INT64_C(1000000) / p_stream->f_rate;
+        i_timestamp = (i_dts/2) * CLOCK_FREQ / p_stream->f_rate;
     }
     else if( p_stream->fmt.i_codec == VLC_CODEC_OPUS )
     {
-        i_timestamp = p_stream->i_pre_skip + i_granule * INT64_C(1000000) / 48000;
+        i_timestamp = p_stream->i_pre_skip + i_granule * CLOCK_FREQ / 48000;
     }
     else if( p_stream->fmt.i_codec == VLC_CODEC_VORBIS )
     {
-        i_timestamp = i_granule * INT64_C(1000000) / p_stream->f_rate;
+        i_timestamp = i_granule * CLOCK_FREQ / p_stream->f_rate;
     }
 
     return i_timestamp;
@@ -821,7 +821,7 @@ bool Oggseek_PacketPCRFixup( logical_stream_t *p_stream, ogg_page *p_page,
         p_stream->i_pcr = Oggseek_GranuleToAbsTimestamp( p_stream,
                                         ogg_page_granulepos( p_page ), false );
         /* Computes the presentation time of the first packet on page */
-        p_stream->i_pcr -= INT64_C(1000000) *
+        p_stream->i_pcr -= CLOCK_FREQ *
                 ogg_page_packets( p_page ) / p_stream->f_rate;
         return true;
     }

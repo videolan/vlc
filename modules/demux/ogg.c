@@ -683,7 +683,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
 
             assert( p_sys->i_length > 0 );
-            i64 = INT64_C(1000000) * p_sys->i_length * f;
+            i64 = CLOCK_FREQ * p_sys->i_length * f;
             Ogg_ResetStreamHelper( p_sys );
             if ( Oggseek_SeektoAbsolutetime( p_demux, p_stream, i64 ) >= 0 )
             {
@@ -838,7 +838,7 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
                 sample -= p_stream->i_pre_skip;
             else
                 sample = 0;
-            p_stream->i_pcr = sample * INT64_C(1000000) / p_stream->f_rate;
+            p_stream->i_pcr = sample * CLOCK_FREQ / p_stream->f_rate;
         }
 
         p_stream->i_pcr += VLC_TS_0;
@@ -853,7 +853,7 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
          * If we can't then don't touch the old value. */
         if( p_stream->fmt.i_cat == VIDEO_ES )
             /* 1 frame per packet */
-            p_stream->i_interpolated_pcr += (INT64_C(1000000) / p_stream->f_rate);
+            p_stream->i_interpolated_pcr += (CLOCK_FREQ / p_stream->f_rate);
         else if( p_stream->fmt.i_codec == VLC_CODEC_OPUS &&
                  p_stream->i_previous_granulepos >= 0 &&
                  ( duration =
@@ -868,12 +868,12 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
             else
                 sample = 0;
             p_stream->i_interpolated_pcr =
-                VLC_TS_0 + sample * INT64_C(1000000) / p_stream->f_rate;
+                VLC_TS_0 + sample * CLOCK_FREQ / p_stream->f_rate;
         }
         else if( p_stream->fmt.i_bitrate )
         {
             p_stream->i_interpolated_pcr +=
-                ( p_oggpacket->bytes * INT64_C(1000000) /
+                ( p_oggpacket->bytes * CLOCK_FREQ /
                   p_stream->fmt.i_bitrate / 8 );
         }
     }
@@ -1141,7 +1141,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                 {
                     i_pts = VLC_TS_0 + (p_stream->i_previous_granulepos
                         - p_block->i_nb_samples - p_stream->i_pre_skip) *
-                        INT64_C(1000000) / p_stream->f_rate;
+                        CLOCK_FREQ / p_stream->f_rate;
                 }
                 p_stream->i_skip_frames = 0;
             }
@@ -1196,7 +1196,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
 
         /* granulepos for dirac is possibly broken, this value should be ignored */
         if( -1 != p_oggpacket->granulepos )
-            p_block->i_pts = u_pnum * INT64_C(1000000) / p_stream->f_rate / 2;
+            p_block->i_pts = u_pnum * CLOCK_FREQ / p_stream->f_rate / 2;
     }
     else
     {
