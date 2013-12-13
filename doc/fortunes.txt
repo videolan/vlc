@@ -1009,3 +1009,6 @@ reactor leaks ionizing radiations."
 <etix> Yeah of course
  -- #videolan, unexpected attendee to technical discussions at VDD13
 %
+< tmatth> cowboys and endianess
+< tmatth> flac over telegraph
+ -- #videolan, remembering good old times
