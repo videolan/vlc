@@ -246,7 +246,7 @@ libavcodec_plugin_la_SOURCES = \
 if ENABLE_SOUT
 libavcodec_plugin_la_SOURCES += codec/avcodec/encoder.c
 endif
-libavcodec_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVCODEC_CFLAGS)
+libavcodec_plugin_la_CFLAGS = $(AVCODEC_CFLAGS) $(AM_CFLAGS)
 libavcodec_plugin_la_LIBADD = $(AVCODEC_LIBS) $(LIBM)
 libavcodec_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(SYMBOLIC_LDFLAGS)
 
