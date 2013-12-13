@@ -10,7 +10,7 @@ StrCpy $Name_SectionGroupAudio "Pliki audio"
 StrCpy $Name_SectionGroupVideo "Pliki wideo"
 StrCpy $Name_SectionGroupOther "Inne"
 StrCpy $Name_Section07 "Menu kontekstowe"
-StrCpy $Name_Section08 "Wyczy¶ciæ pamiêæ podrêczn± i usun±æ ustawienia"
+StrCpy $Name_Section08 "Wyczyœciæ pamiêæ podrêczn¹ i usun¹æ ustawienia"
 
 StrCpy $Desc_Section01 \
     "Pliki samego odtwarzacza"
@@ -25,14 +25,14 @@ StrCpy $Desc_Section04 \
 StrCpy $Desc_Section05 \
     "Rejestracja VLC do odtwarzania p³yt DVD i CD"
 StrCpy $Desc_Section06 \
-    "Ustawia VLC media player jako domy¶ln± aplikacjê dla poszczególnego typu pliku"
+    "Ustawia VLC media player jako domyœln¹ aplikacjê dla poszczególnego typu pliku"
 StrCpy $Desc_Section07 \
     "Dodaje nowe pozycje do menu kontekstowego ('Odtwórz w VLC' i 'Dodaj do listy odtwarzania VLC')"
 StrCpy $Desc_Section08 \
     "Usuwa ustawienia odtwarzacza VLC media player i pamiêci podrêcznej poprzednich instalacji"
 
 StrCpy $Name_Section91 "Odinstaluj"
-StrCpy $Name_Section92 "Wyczy¶ciæ pamiêæ podrêczn± i usun±æ ustawienia"
+StrCpy $Name_Section92 "Wyczyœciæ pamiêæ podrêczn¹ i usun¹æ ustawienia"
 
 StrCpy $Desc_Section91 \
 "Odinstaluj VLC media player i wszystkie jego sk³adniki"
@@ -43,7 +43,7 @@ StrCpy $ShellAssociation_Play "Odtwórz"
 StrCpy $ContextMenuEntry_PlayWith "Odtwórz w VLC media player"
 StrCpy $ContextMenuEntry_AddToPlaylist "Dodaj do listy odtwarzania VLC media player"
 
-StrCpy $Link_VisitWebsite "Odwied¼ witrynê VideoLAN VLC media player"
+StrCpy $Link_VisitWebsite "OdwiedŸ witrynê VideoLAN VLC media player"
 
 StrCpy $Name_InstTypeRecommended "Zalecana"
 StrCpy $Name_InstTypeMinimum "Minimalna"
@@ -57,11 +57,11 @@ StrCpy $Action_OnArrivalVideoFiles "Odtwarzaj pliki wideo"
 StrCpy $Action_OnArrivalMusicFiles "Odtwarzaj pliki audio"
 StrCpy $Action_OnArrivalDVDAudio "Odtwarzaj DVD-Audio"
 
-StrCpy $License_NextText "Jeste¶ teraz ¶wiadomy swoich praw. Kliknij przycisk Dalej, aby kontynuowaæ."
+StrCpy $License_NextText "Jesteœ teraz œwiadomy swoich praw. Kliknij przycisk Dalej, aby kontynuowaæ."
 
 StrCpy $Detail_CheckProcesses "Procesy sprawdzania..."
 StrCpy $MessageBox_VLCRunning "VLC jest uruchomiony i zostanie teraz zamkniêty."
-StrCpy $MessageBox_VLCUnableToClose "Instalator nie mo¿e zamkn±æ VLC, musisz zrobiæ to rêcznie."
+StrCpy $MessageBox_VLCUnableToClose "Instalator nie mo¿e zamkn¹æ VLC, musisz zrobiæ to rêcznie."
 StrCpy $MessageBox_InstallAborted "Instalacja przerwana!"
 
 StrCpy $Reinstall_Headline "Ju¿ zainstalowany"
@@ -70,8 +70,8 @@ StrCpy $Reinstall_HeadlineMaintenance "Wybierz opcjê konserwacji do wykonania."
 StrCpy $Reinstall_MessageOlder "Starsza wersja VLC jest zainstalowana na Twoim systemie. Wybierz operacjê do wykonania, a nastêpnie kliknij przycisk Dalej, aby kontynuowaæ."
 StrCpy $Reinstall_MessageNewer "Nowsza wersja VLC jest ju¿ zainstalowana! Nie zaleca siê, instalowaæ i korzystaæ ze starszej wersji. Wybierz operacjê do wykonania, a nastêpnie kliknij przycisk Dalej, aby kontynuowaæ."
 StrCpy $Reinstall_MessageSame "VLC ${VERSION} jest ju¿ zainstalowany. Wybierz operacjê do wykonania, a nastêpnie kliknij przycisk Dalej, aby kontynuowaæ."
-StrCpy $Reinstall_OptionUpgrade "Uaktualnij VLC, u¿ywaj±c poprzednich ustawieñ (zalecane)"
-StrCpy $Reinstall_OptionDowngrade "Zainstaluj starsz± wersjê VLC, u¿ywaj±c poprzednich ustawieñ (zalecane)"
+StrCpy $Reinstall_OptionUpgrade "Uaktualnij VLC, u¿ywaj¹c poprzednich ustawieñ (zalecane)"
+StrCpy $Reinstall_OptionDowngrade "Zainstaluj starsz¹ wersjê VLC, u¿ywaj¹c poprzednich ustawieñ (zalecane)"
 StrCpy $Reinstall_OptionComponents "Dodaj/Usuñ/Zainstaluj komponenty"
 StrCpy $Reinstall_OptionAdvanced "Zmieñ ustawienia (zaawansowane)"
 StrCpy $Reinstall_OptionUninstall "Odinstaluj VLC"

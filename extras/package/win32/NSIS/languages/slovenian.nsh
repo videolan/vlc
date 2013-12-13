@@ -1,6 +1,6 @@
 StrCpy $Name_Section01 "VLC predvajalnik (obvezno)"
-StrCpy $Name_Section02a "Bli¾njica menija"
-StrCpy $Name_Section02b "Bli¾jica namizja"
+StrCpy $Name_Section02a "Bližnjica menija"
+StrCpy $Name_Section02b "Bližjica namizja"
 StrCpy $Name_Section03 "Vstavek Mozilla "
 StrCpy $Name_Section04 "Vstavek ActiveX"
 StrCpy $Name_Section05 "Predvajanje diskov"
@@ -9,12 +9,12 @@ StrCpy $Name_SectionGroupAudio "Zvoène datoteke"
 StrCpy $Name_SectionGroupVideo "Video datoteke"
 StrCpy $Name_SectionGroupOther "Drugo"
 StrCpy $Name_Section07 "Vsebinski meni"
-StrCpy $Name_Section08 "Izbri¹i lastnosti in predpomnilnik"
+StrCpy $Name_Section08 "Izbriši lastnosti in predpomnilnik"
 
 StrCpy $Desc_Section01 \
     "Sam predvajalnik VLC"
 StrCpy $Desc_Section02a \
-    "Doda ikone na osnovni meni za hitrej¹i dostop"
+    "Doda ikone na osnovni meni za hitrejši dostop"
 StrCpy $Desc_Section02b \
     "Doda ikone na namizje za hiter dostop"
 StrCpy $Desc_Section03 \
@@ -26,23 +26,23 @@ StrCpy $Desc_Section05 \
 StrCpy $Desc_Section06 \
     "Nastavi predvajalnik VLC kot privzeti program za zaganjanje doloèenih vrst datotek."
 StrCpy $Desc_Section07 \
-    "Doda mo¾nosti ('Predvajaj z VLC' in 'Dodaj seznamu predvajanja VLC')na vsebinski meni"
+    "Doda možnosti ('Predvajaj z VLC' in 'Dodaj seznamu predvajanja VLC')na vsebinski meni"
 StrCpy $Desc_Section08 \
-    "Izbri¹e lastnosti in datoteke predpomnilnika predhodne namestitve predvajalnika"
+    "Izbriše lastnosti in datoteke predpomnilnika predhodne namestitve predvajalnika"
 
 StrCpy $Name_Section91 "Odstrani namestitev"
-StrCpy $Name_Section92 "Izbri¹i vsebino predpomnilnika"
+StrCpy $Name_Section92 "Izbriši vsebino predpomnilnika"
 
 StrCpy $Desc_Section91 \
 "Odstrani namestitev predvajalnika VLC in vseh njegovih vkljuèkov."
 StrCpy $Desc_Section92 \
-"Izbri¹e lastnosti in datoteke predpomnilnika predvajalnika VLC."
+"Izbriše lastnosti in datoteke predpomnilnika predvajalnika VLC."
 
 StrCpy $ShellAssociation_Play "Predvajaj"
 StrCpy $ContextMenuEntry_PlayWith "Predvajaj s predvajalnikom VLC."
 StrCpy $ContextMenuEntry_AddToPlaylist "Dodaj na seznam predvajanja predvajalnika VLC."
 
-StrCpy $Link_VisitWebsite "Obi¹èite spleti¹èe predvajalnika VideoLAN VLC."
+StrCpy $Link_VisitWebsite "Obišèite spletišèe predvajalnika VideoLAN VLC."
 
 StrCpy $Name_InstTypeRecommended "Priporoèeno"
 StrCpy $Name_InstTypeMinimum "Osnovno"
