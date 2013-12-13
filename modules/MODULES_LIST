@@ -75,6 +75,7 @@ $Id$
  * dbus: D-Bus control interface
  * dbus_screensaver: preventing the computer from suspending
  * dc1394: IIDC (DCAM) FireWire input module
+ * dcp: Digital Cinema Package input
  * ddummy: dummy decoder
  * decklink: input module to read from a Blackmagic SDI card
  * decklinkoutput: output module to write to Blackmagic SDI card

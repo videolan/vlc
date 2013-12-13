@@ -185,6 +185,7 @@ modules/access/bd/bd.c
 modules/access/bluray.c
 modules/access/cdda.c
 modules/access/dc1394.c
+modules/access/dcp/dcp.cpp
 modules/access/decklink.cpp
 modules/access/directory.c
 modules/access/dshow/crossbar.cpp

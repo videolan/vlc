@@ -9,6 +9,13 @@ AM_CPPFLAGS += -I$(srcdir)/access
 libattachment_plugin_la_SOURCES = access/attachment.c
 access_LTLIBRARIES += libattachment_plugin.la
 
+libdcp_plugin_la_SOURCES = access/dcp/dcpparser.h access/dcp/dcp.cpp access/dcp/dcpparser.cpp
+libdcp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libdcp_plugin_la_LIBADD = $(AM_LIBADD) -lasdcp
+if HAVE_ASDCP
+access_LTLIBRARIES += libdcp_plugin.la
+endif
+
 libfilesystem_plugin_la_SOURCES = access/fs.h access/file.c access/directory.c access/fs.c
 libfilesystem_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 if HAVE_WIN32

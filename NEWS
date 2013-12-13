@@ -12,6 +12,7 @@ Access:
    New schemes for implicit (ftps) and explicit (ftpes) modes.
  * MMS audio selection on split audio streams
  * Blu-Ray: support overlays, preferred menu languages, region selection and navigation
+ * Digital Cinema Package support
 
 Decoder:
  * Partial support for Voxware MetaSound
