@@ -1541,7 +1541,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
             /* number of sample from begining + current packet */
             op.granulepos =
                 ( p_data->i_dts - p_sys->i_start_dts + p_data->i_length ) *
-                (mtime_t)p_input->p_fmt->audio.i_rate / INT64_C(1000000);
+                (mtime_t)p_input->p_fmt->audio.i_rate / CLOCK_FREQ;
 
             i_time = p_data->i_dts - p_sys->i_start_dts;
             AddIndexEntry( p_mux, i_time, p_input );
@@ -1550,7 +1550,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         {
             /* number of sample from begining */
             op.granulepos = ( p_data->i_dts - p_sys->i_start_dts ) *
-                p_stream->p_oggds_header->i_samples_per_unit / INT64_C(1000000);
+                p_stream->p_oggds_header->i_samples_per_unit / CLOCK_FREQ;
         }
     }
     else if( p_stream->i_cat == VIDEO_ES )
@@ -1564,7 +1564,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
                 p_stream->i_last_keyframe = p_stream->i_num_frames;
 
                 /* presentation time */
-                i_time = INT64_C(1000000) * ( p_stream->i_num_frames - 1 ) *
+                i_time = CLOCK_FREQ * ( p_stream->i_num_frames - 1 ) *
                          p_input->p_fmt->video.i_frame_rate_base /  p_input->p_fmt->video.i_frame_rate;
                 AddIndexEntry( p_mux, i_time, p_input );
             }
@@ -1577,11 +1577,11 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
             mtime_t dt = (p_data->i_dts - p_sys->i_start_dts + 1)
                        * p_input->p_fmt->video.i_frame_rate *2
                        / p_input->p_fmt->video.i_frame_rate_base
-                       / INT64_C(1000000);
+                       / CLOCK_FREQ;
             mtime_t delay = (p_data->i_pts - p_data->i_dts + 1)
                           * p_input->p_fmt->video.i_frame_rate *2
                           / p_input->p_fmt->video.i_frame_rate_base
-                          / INT64_C(1000000);
+                          / CLOCK_FREQ;
             if( p_data->i_flags & BLOCK_FLAG_TYPE_I )
                 p_stream->i_last_keyframe = dt;
             mtime_t dist = dt - p_stream->i_last_keyframe;
