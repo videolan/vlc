@@ -424,6 +424,8 @@ ${MementoSectionDone}
 ;;; Start function
 Function .onInit
 
+@HAVE_WIN64_TRUE@ SetRegView 64
+
 ${MementoSectionRestore}
 
 @HAVE_WIN64_TRUE@ !include "x64.nsh"
@@ -440,7 +442,6 @@ ${Else}
     Goto WinTooOld
 ${Endif}
 
-@HAVE_WIN64_TRUE@ SetRegView 64
 ReadRegStr $INSTDIR HKLM "${PRODUCT_DIR_REGKEY}" "InstallDir"
 StrCmp $INSTDIR "" 0 UAC_Elevate
 StrCpy $INSTDIR "$@PROGRAMFILES@\VideoLAN\VLC"
