@@ -328,12 +328,12 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             {
                  dbus_message_unref( msg );
                  msg = NULL;
+                 free( mrl );
+                 continue;
             }
-            free( mrl );
-            if( unlikely(msg == NULL) )
-                continue;
 
             msg_Dbg( p_libvlc, "Adds %s to the running media player", mrl );
+            free( mrl );
 
             /* send message and get a handle for a reply */
             DBusMessage *reply = dbus_connection_send_with_reply_and_block( conn, msg, -1,
