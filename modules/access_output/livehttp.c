@@ -624,6 +624,7 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
                 }
                 if( ret < 0 )
                 {
+                    free( psz_current_uri );
                     free( psz_idxTmp );
                     fclose( fp );
                     return -1;
@@ -633,6 +634,8 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
             val = fprintf( fp, "#EXTINF:%s,\n%s\n", segment->psz_duration, segment->psz_uri);
             if ( val < 0 )
             {
+                free( psz_current_uri );
+                free( psz_idxTmp );
                 fclose( fp );
                 return -1;
             }
