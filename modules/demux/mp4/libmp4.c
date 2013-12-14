@@ -1104,7 +1104,7 @@ static int MP4_ReadBox_stts( stream_t *p_stream, MP4_Box_t *p_box )
     p_box->data.p_stts->i_sample_count =
         calloc( p_box->data.p_stts->i_entry_count, sizeof(uint32_t) );
     p_box->data.p_stts->i_sample_delta =
-        calloc( p_box->data.p_stts->i_entry_count, sizeof(uint32_t) );
+        calloc( p_box->data.p_stts->i_entry_count, sizeof(int32_t) );
     if( p_box->data.p_stts->i_sample_count == NULL
      || p_box->data.p_stts->i_sample_delta == NULL )
     {
@@ -1143,7 +1143,7 @@ static int MP4_ReadBox_ctts( stream_t *p_stream, MP4_Box_t *p_box )
     p_box->data.p_ctts->i_sample_count =
         calloc( p_box->data.p_ctts->i_entry_count, sizeof(uint32_t) );
     p_box->data.p_ctts->i_sample_offset =
-        calloc( p_box->data.p_ctts->i_entry_count, sizeof(uint32_t) );
+        calloc( p_box->data.p_ctts->i_entry_count, sizeof(int32_t) );
     if( ( p_box->data.p_ctts->i_sample_count == NULL )
      || ( p_box->data.p_ctts->i_sample_offset == NULL ) )
     {
@@ -2221,7 +2221,7 @@ static int MP4_ReadBox_elst( stream_t *p_stream, MP4_Box_t *p_box )
     p_box->data.p_elst->i_segment_duration =
         calloc( p_box->data.p_elst->i_entry_count, sizeof(uint64_t) );
     p_box->data.p_elst->i_media_time =
-        calloc( p_box->data.p_elst->i_entry_count, sizeof(uint64_t) );
+        calloc( p_box->data.p_elst->i_entry_count, sizeof(int64_t) );
     p_box->data.p_elst->i_media_rate_integer =
         calloc( p_box->data.p_elst->i_entry_count, sizeof(uint16_t) );
     p_box->data.p_elst->i_media_rate_fraction =
