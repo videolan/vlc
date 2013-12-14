@@ -296,7 +296,7 @@ static int Open(vlc_object_t *p_this)
     vd->manage  = NULL;
 
     /* Create the associated picture */
-    pictures = calloc(sizeof(*pictures), p_sys->port.i_buffers);
+    pictures = calloc(p_sys->port.i_buffers, sizeof(*pictures));
     if (!pictures)
         goto error;
     for (unsigned int i = 0; i < p_sys->port.i_buffers; i++) {
