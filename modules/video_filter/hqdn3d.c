@@ -137,7 +137,7 @@ static int Open(vlc_object_t *this)
         if (sys->w[i] > wmax) wmax = sys->w[i];
         sys->h[i] = fmt_out->i_height * chroma->p[i].h.num / chroma->p[i].h.den;
     }
-    cfg->Line = malloc(wmax*sizeof(int));
+    cfg->Line = malloc(wmax*sizeof(unsigned int));
     if (!cfg->Line) {
         free(sys);
         return VLC_ENOMEM;
