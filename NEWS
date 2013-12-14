@@ -21,7 +21,7 @@ Decoder:
  * Mediacodec speed improvements on x86
  * Support setting the post processing level in Theora
  * OpenMax IL imrpovements, notably for RaspberryPi
- * Fix channel ordering of LGPL in m2ts files
+ * Fix channel ordering of LPCM codec in m2ts files
 
 Encoder:
  * Support for MPEG-2 encoding using x262
