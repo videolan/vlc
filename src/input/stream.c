@@ -340,7 +340,10 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
             access_t *p_tmp = access_New( p_access, p_access->p_input,
                                           p_access->psz_access, "", psz_name );
             if( !p_tmp )
+            {
+                free( psz_name );
                 continue;
+            }
 
             p_entry = malloc( sizeof(*p_entry) );
             if( p_entry )
