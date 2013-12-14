@@ -308,16 +308,23 @@ static int CryptSetup( sout_access_out_t *p_access, char *key_file )
     uint8_t key[16];
     char *keyfile = NULL;
 
-    if( key_file )
-        keyfile = strdup( key_file );
-    else
-        keyfile = var_InheritString( p_access, SOUT_CFG_PREFIX "key-file" );
-
     if( !p_sys->key_uri ) /*No key uri, assume no encryption wanted*/
     {
         msg_Dbg( p_access, "No key uri, no encryption");
         return VLC_SUCCESS;
     }
+
+    if( key_file )
+        keyfile = strdup( key_file );
+    else
+        keyfile = var_InheritString( p_access, SOUT_CFG_PREFIX "key-file" );
+
+    if( unlikely(keyfile == NULL) )
+    {
+        msg_Err( p_access, "No key-file, no encryption" );
+        return VLC_EGENERIC;
+    }
+
     vlc_gcrypt_init();
 
     /*Setup encryption cipher*/
@@ -326,12 +333,7 @@ static int CryptSetup( sout_access_out_t *p_access, char *key_file )
     if( err )
     {
         msg_Err( p_access, "Openin AES Cipher failed: %s", gpg_strerror(err));
-        return VLC_EGENERIC;
-    }
-
-    if( unlikely(keyfile == NULL) )
-    {
-        msg_Err( p_access, "No key-file, no encryption" );
+        free( key_file );
         return VLC_EGENERIC;
     }
 
@@ -340,6 +342,7 @@ static int CryptSetup( sout_access_out_t *p_access, char *key_file )
     {
         msg_Err( p_access, "Unable to open keyfile %s: %m", keyfile );
         free( keyfile );
+        gcry_cipher_close( p_sys->aes_ctx );
         return VLC_EGENERIC;
     }
     free( keyfile );
@@ -350,6 +353,7 @@ static int CryptSetup( sout_access_out_t *p_access, char *key_file )
     if( keylen < 16 )
     {
         msg_Err( p_access, "No key at least 16 octects (you provided %zd), no encryption", keylen );
+        gcry_cipher_close( p_sys->aes_ctx );
         return VLC_EGENERIC;
     }
 
@@ -357,7 +361,7 @@ static int CryptSetup( sout_access_out_t *p_access, char *key_file )
     if(err)
     {
         msg_Err(p_access, "Setting AES key failed: %s", gpg_strerror(err));
-        gcry_cipher_close( p_sys->aes_ctx);
+        gcry_cipher_close( p_sys->aes_ctx );
         return VLC_EGENERIC;
     }
 
