@@ -3131,7 +3131,10 @@ static int build_raw_avcC( uint8_t **p_extra, const uint8_t *CodecPrivateData,
         }
     }
     if( sps_len == 0 )
+    {
+        free( avcC );
         return 0;
+    }
     uint8_t *pps = sps + sps_len + 3;
     pps_len = cpd_len - sps_len - 4 * 2;
     memcpy( pps, CodecPrivateData + sps_len + 4, pps_len );
