@@ -29,6 +29,7 @@ $Id$
  * amem: audio memory output
  * anaglyph: anaglyph 3d video filter
  * android_audiotrack: audio output for Android, based on AudioTrack
+ * android_native_window: Android native window provider module
  * android_surface: video output for Android, based on Surface
  * antiflicker: anti-flicker video filter
  * araw: Pseudo audio decoder for raw PCM
@@ -106,7 +107,9 @@ $Id$
  * dxva2: DxVA2 hardware-accelerated decoding
  * dynamicoverlay: subpicture filter using shared memory that can be written to by external applications
  * edummy: dummy encoder
- * egl: EGL video output
+ * egl_android: Android EGL video output
+ * egl_win32: Windows EGL video output
+ * egl_x11: Unix/x11 EGL video output
  * equalizer: a equalizer audio filter
  * erase: Logo erase video filter
  * es: input module for MPEG ES decapsulation

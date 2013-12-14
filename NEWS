@@ -10,6 +10,8 @@ Core:
 Access:
  * Added TLS support for ftp access and sout access.
    New schemes for implicit (ftps) and explicit (ftpes) modes.
+ * MMS audio selection on split audio streams
+ * Blu-Ray: support overlays, preferred menu languages, region selection and navigation
 
 Decoder:
  * Partial support for Voxware MetaSound
@@ -18,6 +20,8 @@ Decoder:
  * Teletext subtitles display improvements
  * Mediacodec speed improvements on x86
  * Support setting the post processing level in Theora
+ * OpenMax IL imrpovements, notably for RaspberryPi
+ * Fix channel ordering of LGPL in m2ts files
 
 Encoder:
  * Support for MPEG-2 encoding using x262
@@ -32,8 +36,10 @@ Demuxer:
  * FLAC packets validation using CRC
  * Support Opus in MKV
  * Basic support for WebVTT
+ * Handle support for ISO/IEC 14496-3 Audio stream type in TS
  * Support HDPR TS files
  * Improvements in metadata support in Ogg/Opus/Vorbis files
+ * Fix encoding issues in some XML playlist formats
 
 Muxers:
  * Important rework of the Ogg muxer, notably for skeleton
@@ -43,6 +49,7 @@ Video Output:
  * Direct rendering and filtering for VDPAU hardware acceleration
  * New CoreGraphics video output module for NPAPI plugins
  * New OpenGL ES 2.0 through EGL video output module for Android
+ * New Android native window provider module
 
 Video Filter:
  * New Oldmovie effect filter
@@ -60,16 +67,21 @@ Streaming:
     vlc <your-source> vlc://quit --sout  '#transcode{vcodec=VP80,vb=1000,acodec=vorb,ab=128}
     :std{access=http{mime=video/webm},mux=webm,dst=:4212}'
  * GSM, VP8, Opus RTP packetization
- * Allow setting the first segment number in HLS
+ * HLS: Allow setting the first segment number and numerous improvements
+
 libVLC:
  * add equalizer API libvlc_audio_equalizer_* functions
 
 Visualizations:
  * Add a 3D OpenGL spectrum visualization.
 
+Interaces:
+ * Add support for subtitles drag 'n drop in skins2
+
 Removed modules:
  * ios video output: use ios2
  * OpenMash H.261 video decoder
+
 
 Changes between 2.1.0 and 2.1.1:
 --------------------------------
