@@ -2955,7 +2955,10 @@ AM_CONDITIONAL([HAVE_EGL], [test "${have_egl}" = "yes"])
 PKG_CHECK_MODULES([GL], [gl], [
   have_gl="yes"
 ], [
-  AC_CHECK_HEADER([GL/gl.h], [
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+    [#include <GL/gl.h>]], [
+    [int t0 = GL_TEXTURE0;]])
+  ], [
     have_gl="yes"
     GL_CFLAGS=""
     AS_IF([test "${SYS}" = "mingw32"], [
