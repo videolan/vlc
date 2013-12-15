@@ -337,6 +337,10 @@ struct filter_sys_t
     input_attachment_t **pp_font_attachments;
     int                  i_font_attachments;
 
+    char * (*pf_select) (filter_t *, const char* family,
+                               bool bold, bool italic, int size,
+                               int *index);
+
     /* Cache the Win32 font folder */
 #ifdef _WIN32
     char*          psz_win_fonts_path;
@@ -501,7 +505,7 @@ static void FontConfig_BuildCache( filter_t *p_filter )
 /***
  * \brief Selects a font matching family, bold, italic provided
  ***/
-static char* FontConfig_Select( FcConfig* config, const char* family,
+static char* FontConfig_Select( filter_t *p_filter, const char* family,
                           bool b_bold, bool b_italic, int i_size, int *i_idx )
 {
     FcResult result = FcResultMatch;
@@ -509,6 +513,8 @@ static char* FontConfig_Select( FcConfig* config, const char* family,
     FcChar8* val_s;
     FcBool val_b;
     char *ret = NULL;
+    FcConfig* config = NULL;
+    VLC_UNUSED(p_filter);
 
     /* Create a pattern and fills it */
     pat = FcPatternCreate();
@@ -1386,27 +1392,16 @@ static FT_Face LoadFace( filter_t *p_filter,
     {
         int  i_idx = 0;
         char *psz_fontfile = NULL;
-#ifdef HAVE_FONTCONFIG
-        psz_fontfile = FontConfig_Select( NULL,
-                                          p_style->psz_fontname,
-                                          (p_style->i_style_flags & STYLE_BOLD) != 0,
-                                          (p_style->i_style_flags & STYLE_ITALIC) != 0,
-                                          -1,
-                                          &i_idx );
-#elif defined( __APPLE__ )
-#if !TARGET_OS_IPHONE
-        psz_fontfile = MacLegacy_Select( p_filter, p_style->psz_fontname, false, false, -1, &i_idx );
-#endif
-#elif defined( _WIN32 )
-        psz_fontfile = Win32_Select( p_filter,
-                                    p_style->psz_fontname,
-                                    (p_style->i_style_flags & STYLE_BOLD) != 0,
-                                    (p_style->i_style_flags & STYLE_ITALIC) != 0,
-                                    -1,
-                                    &i_idx );
-#else
-        psz_fontfile = NULL;
-#endif
+        if( p_sys->pf_select )
+            psz_fontfile = p_sys->pf_select( p_filter,
+                                             p_style->psz_fontname,
+                                             (p_style->i_style_flags & STYLE_BOLD) != 0,
+                                             (p_style->i_style_flags & STYLE_ITALIC) != 0,
+                                             -1,
+                                             &i_idx );
+        else
+            psz_fontfile = NULL;
+
         if( !psz_fontfile )
             return NULL;
 
@@ -2345,26 +2340,33 @@ static int Create( vlc_object_t *p_this )
 #endif
     }
 
+
     /* Set the current font file */
     p_sys->style.psz_fontname = psz_fontname;
+
 #ifdef HAVE_STYLES
 #ifdef HAVE_FONTCONFIG
+    p_sys->pf_select = FontConfig_Select;
+#elif defined( __APPLE__ )
+#if !TARGET_OS_IPHONE
+    p_sys->pf_select = MacLegacy_Select;
+#endif
+#elif defined( _WIN32 )
+    p_sys->pf_select Win32_Select;
+#else
+# error selection not implemented
+#endif
+
+#ifdef HAVE_FONTCONFIG
     FontConfig_BuildCache( p_filter );
+#endif
 
     /* */
-    psz_fontfile = FontConfig_Select( NULL, psz_fontname, false, false,
+    psz_fontfile = p_sys->pf_select( p_filter, psz_fontname, false, false,
                                       p_sys->i_default_font_size, &fontindex );
-    psz_monofontfile = FontConfig_Select( NULL, psz_monofontfamily, false,
+    psz_monofontfile = p_sys->pf_select( p_filter, psz_monofontfamily, false,
                                           false, p_sys->i_default_font_size,
                                           &monofontindex );
-#elif defined(__APPLE__)
-#if !TARGET_OS_IPHONE
-    psz_fontfile = MacLegacy_Select( p_filter, psz_fontname, false, false, -1, &fontindex );
-#endif
-#elif defined(_WIN32)
-    psz_fontfile = Win32_Select( p_filter, psz_fontname, false, false, -1, &fontindex );
-
-#endif
     msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontname, psz_fontfile );
 
     /* If nothing is found, use the default family */
@@ -2375,6 +2377,7 @@ static int Create( vlc_object_t *p_this )
 
 #else /* !HAVE_STYLES */
     /* Use the default file */
+    p_sys->pf_select = NULL;
     psz_fontfile = psz_fontname;
     psz_monofontfile = psz_monofontfamily;
 #endif
