@@ -99,3 +99,7 @@ char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
 #endif
 #endif
 
+char* Dummy_Select( filter_t *p_filter, const char* family,
+                    bool b_bold, bool b_italic, int i_size, int *i_idx );
+
+#define File_Select(a) Dummy_Select(NULL, a, 0, 0, 0, NULL)

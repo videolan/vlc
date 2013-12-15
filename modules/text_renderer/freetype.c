@@ -56,26 +56,22 @@
  #define FT_MulFix(v, s) (((v)*(s))>>16)
 #endif
 
-/* apple stuff */
-#ifdef __APPLE__
-#include <TargetConditionals.h>
-#if !TARGET_OS_IPHONE
-#include <Carbon/Carbon.h>
-#endif
-#include <sys/param.h>                         /* for MAXPATHLEN */
-#undef HAVE_FONTCONFIG
-#define HAVE_STYLES
-#endif
-
 /* RTL */
 #if defined(HAVE_FRIBIDI)
 # include <fribidi/fribidi.h>
 #endif
 
-/* Win32 GDI */
-#ifdef _WIN32
-# define HAVE_STYLES
+/* apple stuff */
+#ifdef __APPLE__
+# include <TargetConditionals.h>
 # undef HAVE_FONTCONFIG
+# define HAVE_STYLES
+#endif
+
+/* Win32 */
+#ifdef _WIN32
+# undef HAVE_FONTCONFIG
+# define HAVE_STYLES
 #endif
 
 /* FontConfig */
@@ -1926,29 +1922,17 @@ static int Create( vlc_object_t *p_this )
 #ifdef HAVE_STYLES
         psz_fontname = strdup( DEFAULT_FAMILY );
 #else
-# ifdef _WIN32
-        /* Get Windows Font folder */
-        char *psz_win_fonts_path = GetWindowsFontPath();
-        if( asprintf( &psz_fontname, "%s"DEFAULT_FONT_FILE, psz_win_fonts_path ) == -1 )
-        {
-            psz_fontname = NULL;
-            goto error;
-        }
-        free(psz_win_fonts_path);
-# else
-        psz_fontname = strdup( DEFAULT_FONT_FILE );
-# endif
-        msg_Err( p_filter,"User specified an empty fontfile, using %s", psz_fontname );
+        psz_fontname = File_Select( DEFAULT_FONT_FILE );
 #endif
     }
 
-
     /* Set the current font file */
     p_sys->style.psz_fontname = psz_fontname;
+    p_sys->style.psz_monofontname = psz_monofontfamily;
 
-#ifdef HAVE_STYLES
 #ifdef HAVE_FONTCONFIG
     p_sys->pf_select = FontConfig_Select;
+    FontConfig_BuildCache( p_filter );
 #elif defined( __APPLE__ )
 #if !TARGET_OS_IPHONE
     p_sys->pf_select = MacLegacy_Select;
@@ -1956,11 +1940,7 @@ static int Create( vlc_object_t *p_this )
 #elif defined( _WIN32 )
     p_sys->pf_select = Win32_Select;
 #else
-# error selection not implemented
-#endif
-
-#ifdef HAVE_FONTCONFIG
-    FontConfig_BuildCache( p_filter );
+    p_sys->pf_select = Dummy_Select;
 #endif
 
     /* */
@@ -1970,20 +1950,13 @@ static int Create( vlc_object_t *p_this )
                                           false, p_sys->i_default_font_size,
                                           &monofontindex );
     msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontname, psz_fontfile );
+    msg_Dbg( p_filter, "Using %s as mono-font from file %s", psz_monofontfamily, psz_monofontfile );
 
     /* If nothing is found, use the default family */
     if( !psz_fontfile )
-        psz_fontfile = strdup( psz_fontname );
+        psz_fontfile = File_Select( psz_fontname );
     if( !psz_monofontfile )
-        psz_monofontfile = strdup( psz_monofontfamily );
-
-#else /* !HAVE_STYLES */
-    /* Use the default file */
-    p_sys->pf_select = NULL;
-    psz_fontfile = psz_fontname;
-    psz_monofontfile = psz_monofontfamily;
-#endif
-    p_sys->style.psz_monofontname = psz_monofontfamily;
+        psz_monofontfile = File_Select( psz_monofontfamily );
 
     if( Init_FT( p_this, psz_fontfile, fontindex, f_outline_thickness ) != VLC_SUCCESS )
         goto error;
@@ -1996,18 +1969,14 @@ static int Create( vlc_object_t *p_this )
 
     LoadFontsFromAttachments( p_filter );
 
-#ifdef HAVE_STYLES
     free( psz_fontfile );
     free( psz_monofontfile );
-#endif
 
     return VLC_SUCCESS;
 
 error:
-#ifdef HAVE_STYLES
     free( psz_fontfile );
     free( psz_monofontfile );
-#endif
     free( psz_fontname );
     free( psz_monofontfamily );
     free( p_sys );
