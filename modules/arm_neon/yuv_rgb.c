@@ -93,35 +93,35 @@ static void I420_RGBA (filter_t *filter, picture_t *src, picture_t *dst)
 {
     struct yuv_pack out = { dst->p->p_pixels, dst->p->i_pitch };
     struct yuv_planes in = { src->Y_PIXELS, src->U_PIXELS, src->V_PIXELS, src->Y_PITCH };
-    i420_rgb_neon (&out, &in, filter->fmt_in.video.i_width, filter->fmt_in.video.i_height);
+    i420_rgb_neon (&out, &in, filter->fmt_in.video.i_visible_width, filter->fmt_in.video.i_visible_height);
 }
 
 static void I420_RV16 (filter_t *filter, picture_t *src, picture_t *dst)
 {
     struct yuv_pack out = { dst->p->p_pixels, dst->p->i_pitch };
     struct yuv_planes in = { src->Y_PIXELS, src->U_PIXELS, src->V_PIXELS, src->Y_PITCH };
-    i420_rv16_neon (&out, &in, filter->fmt_in.video.i_width, filter->fmt_in.video.i_height);
+    i420_rv16_neon (&out, &in, filter->fmt_in.video.i_visible_width, filter->fmt_in.video.i_visible_height);
 }
 
 static void YV12_RGBA (filter_t *filter, picture_t *src, picture_t *dst)
 {
     struct yuv_pack out = { dst->p->p_pixels, dst->p->i_pitch };
     struct yuv_planes in = { src->Y_PIXELS, src->V_PIXELS, src->U_PIXELS, src->Y_PITCH };
-    i420_rgb_neon (&out, &in, filter->fmt_in.video.i_width, filter->fmt_in.video.i_height);
+    i420_rgb_neon (&out, &in, filter->fmt_in.video.i_visible_width, filter->fmt_in.video.i_visible_height);
 }
 
 static void NV21_RGBA (filter_t *filter, picture_t *src, picture_t *dst)
 {
     struct yuv_pack out = { dst->p->p_pixels, dst->p->i_pitch };
     struct yuv_planes in = { src->Y_PIXELS, src->U_PIXELS, src->V_PIXELS, src->Y_PITCH };
-    nv21_rgb_neon (&out, &in, filter->fmt_in.video.i_width, filter->fmt_in.video.i_height);
+    nv21_rgb_neon (&out, &in, filter->fmt_in.video.i_visible_width, filter->fmt_in.video.i_visible_height);
 }
 
 static void NV12_RGBA (filter_t *filter, picture_t *src, picture_t *dst)
 {
     struct yuv_pack out = { dst->p->p_pixels, dst->p->i_pitch };
     struct yuv_planes in = { src->Y_PIXELS, src->U_PIXELS, src->V_PIXELS, src->Y_PITCH };
-    nv12_rgb_neon (&out, &in, filter->fmt_in.video.i_width, filter->fmt_in.video.i_height);
+    nv12_rgb_neon (&out, &in, filter->fmt_in.video.i_visible_width, filter->fmt_in.video.i_visible_height);
 }
 
 VIDEO_FILTER_WRAPPER (I420_RGBA)
@@ -200,8 +200,8 @@ static int Open (vlc_object_t *obj)
     }*/
 
     msg_Dbg(filter, "%4.4s(%dx%d) to %4.4s(%dx%d)",
-            (char*)&filter->fmt_in.video.i_chroma, filter->fmt_in.video.i_width, filter->fmt_in.video.i_height,
-            (char*)&filter->fmt_out.video.i_chroma, filter->fmt_out.video.i_width, filter->fmt_out.video.i_height);
+            (char*)&filter->fmt_in.video.i_chroma, filter->fmt_in.video.i_visible_width, filter->fmt_in.video.i_visible_height,
+            (char*)&filter->fmt_out.video.i_chroma, filter->fmt_out.video.i_visible_width, filter->fmt_out.video.i_visible_height);
 
     return VLC_SUCCESS;
 }
