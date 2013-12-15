@@ -2380,7 +2380,7 @@ static int Create( vlc_object_t *p_this )
 #endif
     p_sys->style.psz_monofontname = psz_monofontfamily;
 
-    if( Init_FT( p_this, psz_fontname, fontindex, f_outline_thickness ) != VLC_SUCCESS )
+    if( Init_FT( p_this, psz_fontfile, fontindex, f_outline_thickness ) != VLC_SUCCESS )
         goto error;
 
     p_sys->pp_font_attachments = NULL;
