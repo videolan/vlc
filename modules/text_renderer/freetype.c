@@ -1966,6 +1966,18 @@ static int ProcessLines( filter_t *p_filter,
     return VLC_SUCCESS;
 }
 
+static xml_reader_t *GetXMLReader( filter_t *p_filter, stream_t *p_sub )
+{
+    xml_reader_t *p_xml_reader = p_filter->p_sys->p_xml;
+    if( !p_xml_reader )
+        p_xml_reader = xml_ReaderCreate( p_filter, p_sub );
+    else
+        p_xml_reader = xml_ReaderReset( p_xml_reader, p_sub );
+    p_filter->p_sys->p_xml = p_xml_reader;
+
+    return p_xml_reader;
+}
+
 /**
  * This function renders a text subpicture region into another one.
  * It also calculates the size needed for this string, and renders the
@@ -2022,12 +2034,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
             return VLC_SUCCESS;
         }
 
-        xml_reader_t *p_xml_reader = p_filter->p_sys->p_xml;
-        if( !p_xml_reader )
-            p_xml_reader = xml_ReaderCreate( p_filter, p_sub );
-        else
-            p_xml_reader = xml_ReaderReset( p_xml_reader, p_sub );
-        p_filter->p_sys->p_xml = p_xml_reader;
+        xml_reader_t *p_xml_reader = GetXMLReader( p_filter, p_sub );
 
         if( !p_xml_reader )
             rv = VLC_EGENERIC;
