@@ -1718,8 +1718,8 @@ static void* hls_Reload(void *p_this)
         mtime_t now = mdate();
         if (now >= p_sys->playlist.wakeup)
         {
-            /* reload the m3u8 if there are less than 2 segments what aren't downloaded */
-            if ( ( p_sys->download.segment - p_sys->playback.segment < 2 ) &&
+            /* reload the m3u8 if there are less than 3 segments what aren't downloaded */
+            if ( ( p_sys->download.segment - p_sys->playback.segment < 3 ) &&
                  ( hls_ReloadPlaylist(s) != VLC_SUCCESS) )
             {
                 /* No change in playlist, then backoff */
