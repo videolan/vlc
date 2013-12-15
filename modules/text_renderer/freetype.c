@@ -74,16 +74,12 @@
 
 /* Win32 GDI */
 #ifdef _WIN32
-# include <windows.h>
-# include <shlobj.h>
 # define HAVE_STYLES
 # undef HAVE_FONTCONFIG
-# include <vlc_charset.h>                                     /* FromT */
 #endif
 
 /* FontConfig */
 #ifdef HAVE_FONTCONFIG
-# include <fontconfig/fontconfig.h>
 # define HAVE_STYLES
 #endif
 
