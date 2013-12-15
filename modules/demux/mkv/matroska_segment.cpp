@@ -268,6 +268,8 @@ SimpleTag * matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag, int target_t
     EbmlElement *el;
     EbmlParser *ep = new EbmlParser( &es, tag, &sys.demuxer );
     SimpleTag * p_simple = new SimpleTag;
+    size_t max_size = tag->GetSize();
+    size_t size = 0;
 
     if( !p_simple )
     {
@@ -281,7 +283,7 @@ SimpleTag * matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag, int target_t
     msg_Dbg( &sys.demuxer, "|   + Simple Tag ");
     try
     {
-        while( ( el = ep->Get() ) != NULL )
+        while( ( el = ep->Get() ) != NULL && size < max_size)
         {
             if( unlikely( el->GetSize() >= SIZE_MAX ) )
             {
@@ -322,6 +324,7 @@ SimpleTag * matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag, int target_t
                     p_simple->sub_tags.push_back( p_st );
             }
             /*TODO Handle binary tags*/
+            size += el->HeadSize() + el->GetSize();
         }
     }
     catch(...)
@@ -339,7 +342,6 @@ SimpleTag * matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag, int target_t
         delete p_simple;
         return NULL;
     }
-
     for( int i = 0; metadata_map[i].key; i++ )
     {
         if( !strcmp( p_simple->psz_tag_name, metadata_map[i].key ) &&
