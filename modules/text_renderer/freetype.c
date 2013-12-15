@@ -342,11 +342,6 @@ struct filter_sys_t
                                bool bold, bool italic, int size,
                                int *index);
 
-    /* Cache the Win32 font folder */
-#ifdef _WIN32
-    char*          psz_win_fonts_path;
-#endif
-
 };
 
 /* */
@@ -1972,17 +1967,6 @@ static int Create( vlc_object_t *p_this )
     p_sys->f_shadow_vector_x = f_shadow_distance * cos(2 * M_PI * f_shadow_angle / 360);
     p_sys->f_shadow_vector_y = f_shadow_distance * sin(2 * M_PI * f_shadow_angle / 360);
 
-#ifdef _WIN32
-    /* Get Windows Font folder */
-    wchar_t wdir[MAX_PATH];
-    if( S_OK != SHGetFolderPathW( NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, wdir ) )
-    {
-        GetWindowsDirectoryW( wdir, MAX_PATH );
-        wcscat( wdir, L"\\fonts" );
-    }
-    p_sys->psz_win_fonts_path = FromWide( wdir );
-#endif
-
     /* Set default psz_fontname */
     if( !psz_fontname || !*psz_fontname )
     {
@@ -1991,11 +1975,14 @@ static int Create( vlc_object_t *p_this )
         psz_fontname = strdup( DEFAULT_FAMILY );
 #else
 # ifdef _WIN32
-        if( asprintf( &psz_fontname, "%s"DEFAULT_FONT_FILE, p_sys->psz_win_fonts_path ) == -1 )
+        /* Get Windows Font folder */
+        char *psz_win_fonts_path = GetWindowsFontPath();
+        if( asprintf( &psz_fontname, "%s"DEFAULT_FONT_FILE, psz_win_fonts_path ) == -1 )
         {
             psz_fontname = NULL;
             goto error;
         }
+        free(psz_win_fonts_path);
 # else
         psz_fontname = strdup( DEFAULT_FONT_FILE );
 # endif
@@ -2108,10 +2095,6 @@ static void Destroy( vlc_object_t *p_this )
     if( p_sys->p_xml ) xml_ReaderDelete( p_sys->p_xml );
     free( p_sys->style.psz_fontname );
     free( p_sys->style.psz_monofontname );
-
-#ifdef _WIN32
-    free( p_sys->psz_win_fonts_path );
-#endif
 
     Destroy_FT( p_this );
     free( p_sys );

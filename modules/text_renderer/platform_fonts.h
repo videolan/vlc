@@ -41,6 +41,7 @@ void FontConfig_BuildCache( filter_t *p_filter );
 
 
 #ifdef _WIN32
+char *GetWindowsFontPath();
 char* Win32_Select( filter_t *p_filter, const char* family,
                            bool b_bold, bool b_italic, int i_size, int *i_idx );
 

@@ -253,6 +253,18 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
     return GetFileFontByName( (LPCTSTR)lpelfe->elfFullName, (char **)lParam );
 }
 
+char *GetWindowsFontPath()
+{
+    wchar_t wdir[MAX_PATH];
+    if( S_OK != SHGetFolderPathW( NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, wdir ) )
+    {
+        GetWindowsDirectoryW( wdir, MAX_PATH );
+        wcscat( wdir, L"\\fonts" );
+    }
+    return FromWide( wdir );
+}
+
+
 char* Win32_Select( filter_t *p_filter, const char* family,
                            bool b_bold, bool b_italic, int i_size, int *i_idx )
 {
@@ -290,21 +302,27 @@ char* Win32_Select( filter_t *p_filter, const char* family,
             return psz_filename;
         else
         {
+            /* Get Windows Font folder */
+            char psz_win_fonts_path = GetWindowsFontPath();
             char *psz_tmp;
-            if( asprintf( &psz_tmp, "%s\\%s", p_filter->p_sys->psz_win_fonts_path, psz_filename ) == -1 )
+            if( asprintf( &psz_tmp, "%s\\%s", psz_win_fonts_path, psz_filename ) == -1 )
             {
                 free( psz_filename );
+                free( psz_win_fonts_path );
                 return NULL;
             }
             free( psz_filename );
+                free( psz_win_fonts_path );
+
             return psz_tmp;
         }
     }
     else /* Let's take any font we can */
 fail:
     {
+        char psz_win_fonts_path = GetWindowsFontPath();
         char *psz_tmp;
-        if( asprintf( &psz_tmp, "%s\\%s", p_filter->p_sys->psz_win_fonts_path, "arial.ttf" ) == -1 )
+        if( asprintf( &psz_tmp, "%s\\%s", psz_win_fonts_path, "arial.ttf" ) == -1 )
             return NULL;
         else
             return psz_tmp;
