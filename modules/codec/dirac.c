@@ -436,7 +436,7 @@ static mtime_t GetPicturePTS( encoder_t *p_enc, uint32_t u_pnum )
 static int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
-    encoder_sys_t *p_sys = p_enc->p_sys;
+    encoder_sys_t *p_sys;
     int i_tmp;
     float f_tmp;
     char *psz_tmp;

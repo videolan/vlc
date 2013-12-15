@@ -122,7 +122,7 @@ static const uint32_t pi_channels_guessed[MAX_CHANNEL_POSITIONS] =
 static int Open( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
-    decoder_sys_t *p_sys = p_dec->p_sys;
+    decoder_sys_t *p_sys;
     faacDecConfiguration *cfg;
 
     if( p_dec->fmt_in.i_codec != VLC_CODEC_MP4A )

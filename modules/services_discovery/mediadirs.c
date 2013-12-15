@@ -118,7 +118,7 @@ struct services_discovery_sys_t
 static int Open( vlc_object_t *p_this, enum type_e i_type )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
-    services_discovery_sys_t *p_sys = p_sd->p_sys;
+    services_discovery_sys_t *p_sys;
 
     p_sd->p_sys = p_sys = calloc( 1, sizeof( *p_sys) );
     if( !p_sys )
