@@ -2352,7 +2352,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->pf_select = MacLegacy_Select;
 #endif
 #elif defined( _WIN32 )
-    p_sys->pf_select Win32_Select;
+    p_sys->pf_select = Win32_Select;
 #else
 # error selection not implemented
 #endif
