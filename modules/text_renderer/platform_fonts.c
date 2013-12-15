@@ -252,7 +252,7 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
     return GetFileFontByName( (LPCTSTR)lpelfe->elfFullName, (char **)lParam );
 }
 
-char* GetWindowsFontPath()
+static char* GetWindowsFontPath()
 {
     wchar_t wdir[MAX_PATH];
     if( S_OK != SHGetFolderPathW( NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, wdir ) )
