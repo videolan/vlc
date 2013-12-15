@@ -66,7 +66,7 @@ void CAtmoTools::ShowShutdownColor(CAtmoDynData *pDynData)
 
        atmoConnection->SendData(packet);
 
-       delete (char *)packet;
+       delete [] packet;
 
 	}
 
@@ -150,7 +150,7 @@ EffectMode CAtmoTools::SwitchEffect(CAtmoDynData *pDynData, EffectMode newEffect
 
                  atmoConnection->SendData( packet );
 
-                 delete (char *)packet;
+                 delete [] packet;
 
                  break;
              }

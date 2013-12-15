@@ -121,7 +121,7 @@ DWORD CAtmoLiveView::Execute(void)
             if(PreviousPacket && (PreviousPacket->numColors == ColorPacket->numColors))
                 CopyColorPacket(ColorPacket, PreviousPacket)
             else {
-                delete (char *)PreviousPacket;
+                delete [] PreviousPacket;
                 DupColorPacket(PreviousPacket, ColorPacket )
             }
         } else {
@@ -196,7 +196,7 @@ DWORD CAtmoLiveView::Execute(void)
     pPacketQueue->ShowQueueStatus( m_pLog );
 #endif
 
-    delete (char *)PreviousPacket;
+    delete [] PreviousPacket;
 
     delete filter;
     return 0;
