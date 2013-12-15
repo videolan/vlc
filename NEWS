@@ -71,7 +71,7 @@ Streaming:
  * WebM streaming, including live sources, compatible with all major browsers
     vlc <your-source> vlc://quit --sout  '#transcode{vcodec=VP80,vb=1000,acodec=vorb,ab=128}
     :std{access=http{mime=video/webm},mux=webm,dst=:4212}'
- * GSM, VP8, Opus RTP packetization
+ * GSM, VP8, Opus and JPEG RTP packetization
  * HLS: Allow setting the first segment number and numerous improvements
 
 libVLC:
