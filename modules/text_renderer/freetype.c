@@ -65,18 +65,18 @@
 #ifdef __APPLE__
 # include <TargetConditionals.h>
 # undef HAVE_FONTCONFIG
-# define HAVE_STYLES
+# define HAVE_GET_FONT_BY_FAMILY_NAME
 #endif
 
 /* Win32 */
 #ifdef _WIN32
 # undef HAVE_FONTCONFIG
-# define HAVE_STYLES
+# define HAVE_GET_FONT_BY_FAMILY_NAME
 #endif
 
 /* FontConfig */
 #ifdef HAVE_FONTCONFIG
-# define HAVE_STYLES
+# define HAVE_GET_FONT_BY_FAMILY_NAME
 #endif
 
 #include <assert.h>
@@ -159,7 +159,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
 
-#ifdef HAVE_STYLES
+#ifdef HAVE_GET_FONT_BY_FAMILY_NAME
     add_font( "freetype-font", DEFAULT_FAMILY, FONT_TEXT, FAMILY_LONGTEXT, false )
     add_font( "freetype-monofont", DEFAULT_MONOSPACE_FAMILY, MONOSPACE_FONT_TEXT, FAMILY_LONGTEXT, false )
 #else
@@ -1919,7 +1919,7 @@ static int Create( vlc_object_t *p_this )
     if( !psz_fontname || !*psz_fontname )
     {
         free( psz_fontname );
-#ifdef HAVE_STYLES
+#ifdef HAVE_GET_FONT_BY_FAMILY_NAME
         psz_fontname = strdup( DEFAULT_FAMILY );
 #else
         psz_fontname = File_Select( DEFAULT_FONT_FILE );
