@@ -432,7 +432,10 @@ static int TextLoad( text_t *txt, stream_t *s )
         char **ppsz_new;
 
         if( psz == NULL || (n >= INT_MAX/sizeof(char *)) )
+        {
+            free( psz );
             break;
+        }
 
         ppsz_new = realloc( lines, (n + 1) * sizeof (char *) );
         if( ppsz_new == NULL )
