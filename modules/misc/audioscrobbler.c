@@ -697,7 +697,7 @@ static void *Run(void *data)
 
     /* data about audioscrobbler session */
     mtime_t                 next_exchange = -1; /**< when can we send data  */
-    unsigned int            i_interval;         /**< waiting interval (secs)*/
+    unsigned int            i_interval = 0;     /**< waiting interval (secs)*/
 
     intf_sys_t *p_sys = p_intf->p_sys;
 
