@@ -333,7 +333,7 @@ static int CryptSetup( sout_access_out_t *p_access, char *key_file )
     if( err )
     {
         msg_Err( p_access, "Openin AES Cipher failed: %s", gpg_strerror(err));
-        free( key_file );
+        free( keyfile );
         return VLC_EGENERIC;
     }
 
