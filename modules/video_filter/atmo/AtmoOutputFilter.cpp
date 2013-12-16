@@ -31,16 +31,16 @@ CAtmoOutputFilter::CAtmoOutputFilter(CAtmoConfig *atmoConfig )
 CAtmoOutputFilter::~CAtmoOutputFilter(void)
 {
   if(m_percent_filter_output_old)
-     delete (char *)m_percent_filter_output_old;
+     delete[] m_percent_filter_output_old;
 
   if(m_mean_filter_output_old)
-     delete (char *)m_mean_filter_output_old;
+     delete[] m_mean_filter_output_old;
 
   if(m_mean_values)
-     delete (char *)m_mean_values;
+     delete[] m_mean_values;
 
   if(m_mean_sums)
-     delete (char *)m_mean_sums;
+     delete[] m_mean_sums;
 }
 
 void CAtmoOutputFilter::ResetFilter(void)
@@ -76,13 +76,13 @@ pColorPacket CAtmoOutputFilter::PercentFilter(pColorPacket filter_input, ATMO_BO
   if (init) // Initialization
   {
     if(m_percent_filter_output_old)
-       delete (char *)m_percent_filter_output_old;
+       delete[] m_percent_filter_output_old;
     m_percent_filter_output_old = NULL;
     return(NULL);
   }
 
   if(!m_percent_filter_output_old || (m_percent_filter_output_old->numColors!=filter_input->numColors)) {
-     delete m_percent_filter_output_old;
+     delete[] m_percent_filter_output_old;
      AllocColorPacket(m_percent_filter_output_old, filter_input->numColors);
      ZeroColorPacket(m_percent_filter_output_old);
   }
@@ -106,7 +106,7 @@ pColorPacket CAtmoOutputFilter::PercentFilter(pColorPacket filter_input, ATMO_BO
 
   CopyColorPacket( filter_output, m_percent_filter_output_old );
 
-  delete (char *)filter_input;
+  delete[] filter_input;
 
   return filter_output;
 }
@@ -124,33 +124,33 @@ pColorPacket CAtmoOutputFilter::MeanFilter(pColorPacket filter_input, ATMO_BOOL 
   if (init) // Initialization
   {
     if(m_mean_filter_output_old)
-       delete (char *)m_mean_filter_output_old;
+       delete[] m_mean_filter_output_old;
     m_mean_filter_output_old = NULL;
 
     if(m_mean_values)
-       delete (char *)m_mean_values;
+       delete[] m_mean_values;
     m_mean_values = NULL;
 
     if(m_mean_sums)
-       delete (char *)m_mean_sums;
+       delete[] m_mean_sums;
     m_mean_sums = NULL;
     return (NULL);
   }
 
   if(!m_mean_filter_output_old || (m_mean_filter_output_old->numColors!=filter_input->numColors)) {
-        delete m_mean_filter_output_old;
+        delete[] m_mean_filter_output_old;
         AllocColorPacket(m_mean_filter_output_old, filter_input->numColors);
         ZeroColorPacket(m_mean_filter_output_old);
   }
 
   if(!m_mean_values || (m_mean_values->numColors!=filter_input->numColors)) {
-        delete m_mean_values;
+        delete[] m_mean_values;
         AllocColorPacket(m_mean_values, filter_input->numColors);
         ZeroColorPacket(m_mean_values);
   }
 
   if(!m_mean_sums || (m_mean_sums->numColors!=filter_input->numColors)) {
-        delete m_mean_sums;
+        delete[] m_mean_sums;
         AllocLongColorPacket(m_mean_sums, filter_input->numColors);
         ZeroLongColorPacket(m_mean_sums);
   }
@@ -248,7 +248,7 @@ pColorPacket CAtmoOutputFilter::MeanFilter(pColorPacket filter_input, ATMO_BOOL 
 
   CopyColorPacket(filter_output, m_mean_filter_output_old);
 
-  delete (char *)filter_input;
+  delete[] filter_input;
 
   return(filter_output);
 }
