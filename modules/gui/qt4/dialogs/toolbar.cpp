@@ -555,10 +555,6 @@ void DroppingController::createAndAddWidget( QBoxLayout *newControlLayout,
                                              buttonType_e i_type,
                                              int i_option )
 {
-    doubleInt *value = new doubleInt;
-    value->i_type = i_type;
-    value->i_option = i_option;
-
     /* Special case for SPACERS, who aren't QWidgets */
     if( i_type == WIDGET_SPACER || i_type == WIDGET_SPACER_EXTEND )
     {
@@ -627,6 +623,10 @@ void DroppingController::createAndAddWidget( QBoxLayout *newControlLayout,
 
     /* QList and QBoxLayout don't act the same with insert() */
     if( i_index < 0 ) i_index = newControlLayout->count() - 1;
+
+    doubleInt *value = new doubleInt;
+    value->i_type = i_type;
+    value->i_option = i_option;
 
     widgetList.insert( i_index, value );
 }
