@@ -779,7 +779,7 @@ static void Close( vlc_object_t * p_this )
     }
 
     ssize_t writevalue = writeSegment( p_access );
-    msg_Dbg( p_access, "Writing.. %"PRId64,writevalue);
+    msg_Dbg( p_access, "Writing.. %zd", writevalue );
     if( unlikely( writevalue < 0 ) )
     {
         block_ChainRelease( p_sys->block_buffer );
