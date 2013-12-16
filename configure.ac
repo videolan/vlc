@@ -2744,11 +2744,11 @@ AC_ARG_ENABLE(x265,
 AS_IF( [test "${enable_x265}" != "no"],[
   AC_PREPROC_IFELSE([AC_LANG_SOURCE([
 #include <x265.h>
-#if X265_BUILD != 1
+#if X265_BUILD != 4
 # error Fail
 #endif
   ])], [
-    AC_CHECK_LIB([x265],[x265_encoder_open_1], [
+    AC_CHECK_LIB([x265],[x265_encoder_open_4], [
       VLC_ADD_PLUGIN([x265])
       VLC_ADD_LIBS([x265], [-lx265 -lstdc++ -lm -lpthread])
     ], [

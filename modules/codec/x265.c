@@ -51,8 +51,8 @@ vlc_module_end ()
 
 struct encoder_sys_t
 {
-    x265_t          *h;
-    x265_param_t    param;
+    x265_encoder    *h;
+    x265_param      param;
 
     bool            write_headers;
 
@@ -68,7 +68,7 @@ struct encoder_sys_t
 static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
-    x265_picture_t pic;
+    x265_picture pic;
 
     x265_picture_init(&p_sys->param, &pic);
 
@@ -86,8 +86,8 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
         }
     }
 
-    x265_nal_t *nal;
-    int i_nal = 0;
+    x265_nal *nal;
+    uint32_t i_nal = 0;
     x265_encoder_encode(p_sys->h, &nal, &i_nal,
             likely(p_pict) ? &pic : NULL, &pic);
 
@@ -95,8 +95,8 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
         return NULL;
 
     int i_out = 0;
-    for (int i = 0; i < i_nal; i++)
-        i_out += nal[i].i_payload;
+    for (uint32_t i = 0; i < i_nal; i++)
+        i_out += nal[i].sizeBytes;
 
     int i_extra = 0;
     if (unlikely(p_sys->write_headers)) {
@@ -112,7 +112,7 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
        memcpy(p_block->p_buffer, p_enc->fmt_out.p_extra, i_extra);
 
     /* all payloads are sequentially laid out in memory */
-    memcpy(p_block->p_buffer + i_extra, nal[0].p_payload, i_out);
+    memcpy(p_block->p_buffer + i_extra, nal[0].payload, i_out);
 
     /* This isn't really valid for streams with B-frames */
     p_block->i_length = CLOCK_FREQ *
@@ -159,7 +159,7 @@ static int  Open (vlc_object_t *p_this)
 
     p_enc->fmt_in.i_codec = VLC_CODEC_I420;
 
-    x265_param_t *param = &p_sys->param;
+    x265_param *param = &p_sys->param;
     x265_param_default(param);
 
     param->frameNumThreads = vlc_GetCPUCount();
@@ -195,8 +195,8 @@ static int  Open (vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
-    x265_nal_t *nal;
-    int i_nal;
+    x265_nal *nal;
+    uint32_t i_nal;
     if (x265_encoder_headers(p_sys->h, &nal, &i_nal)) {
         msg_Err(p_enc, "cannot get x265 headers");
         Close(VLC_OBJECT(p_enc));
@@ -204,8 +204,8 @@ static int  Open (vlc_object_t *p_this)
     }
 
     size_t i_extra = 0;
-    for (int i = 0; i < i_nal; i++)
-        i_extra += nal[i].i_payload;
+    for (uint32_t i = 0; i < i_nal; i++)
+        i_extra += nal[i].sizeBytes;
 
     p_enc->fmt_out.i_extra = i_extra;
 
@@ -215,9 +215,9 @@ static int  Open (vlc_object_t *p_this)
         return VLC_ENOMEM;
     }
 
-    for (int i = 0; i < i_nal; i++) {
-        memcpy(p_extra, nal[i].p_payload, nal[i].i_payload);
-        p_extra += nal[i].i_payload;
+    for (uint32_t i = 0; i < i_nal; i++) {
+        memcpy(p_extra, nal[i].payload, nal[i].sizeBytes);
+        p_extra += nal[i].sizeBytes;
     }
 
     p_sys->dts = 0;
@@ -236,7 +236,7 @@ static void Close(vlc_object_t *p_this)
     encoder_t     *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
-    x265_encoder_close(p_sys->h, NULL);
+    x265_encoder_close(p_sys->h);
 
     free(p_sys);
 }
