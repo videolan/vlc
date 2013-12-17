@@ -891,6 +891,8 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                 id->b_transcode = false;
                 return VLC_EGENERIC;
             }
+            date_Set( &id->interpolated_pts, p_pic->date );
+            date_Set( &id->next_output_pts, p_pic->date );
         }
 
         /*Input lipsync and drop check */
