@@ -382,6 +382,7 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
     case VLC_CODEC_SVQ3:
     case VLC_CODEC_H263:
     case VLC_CODEC_H264:
+    case VLC_CODEC_HEVC:
     case VLC_CODEC_AMR_NB:
     case VLC_CODEC_AMR_WB:
     case VLC_CODEC_YV12:
@@ -752,6 +753,16 @@ static bo_t *GetD263Tag(void)
     return d263;
 }
 
+static bo_t *GetHvcCTag(mp4_stream_t *p_stream)
+{
+    bo_t *hvcC = box_new("hvcC");
+
+    if (p_stream->fmt.i_extra > 0)
+        bo_add_mem(hvcC, p_stream->fmt.i_extra, p_stream->fmt.p_extra);
+
+    return hvcC;
+}
+
 static bo_t *GetAvcCTag(mp4_stream_t *p_stream)
 {
     bo_t    *avcC = NULL;
@@ -988,6 +999,7 @@ static bo_t *GetVideBox(mp4_stream_t *p_stream)
     case VLC_CODEC_SVQ3: memcpy(fcc, "SVQ3", 4); break;
     case VLC_CODEC_H263: memcpy(fcc, "s263", 4); break;
     case VLC_CODEC_H264: memcpy(fcc, "avc1", 4); break;
+    case VLC_CODEC_HEVC: memcpy(fcc, "hvc1", 4); break;
     case VLC_CODEC_YV12: memcpy(fcc, "yv12", 4); break;
     case VLC_CODEC_YUYV: memcpy(fcc, "yuy2", 4); break;
     default:
@@ -1039,6 +1051,10 @@ static bo_t *GetVideBox(mp4_stream_t *p_stream)
 
     case VLC_CODEC_H264:
         box_gather(vide, GetAvcCTag(p_stream));
+        break;
+
+    case VLC_CODEC_HEVC:
+        box_gather(vide, GetHvcCTag(p_stream));
         break;
     }
 
