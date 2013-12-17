@@ -167,6 +167,9 @@ struct demux_sys_t
     int                 i_attachments;
     input_attachment_t  **attachments;
 
+    /* preparsing info */
+    bool b_preparsing_done;
+
     /* Length, if available. */
     int64_t i_length;
 

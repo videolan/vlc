@@ -194,6 +194,7 @@ static int Open( vlc_object_t * p_this )
         return VLC_ENOMEM;
 
     p_sys->i_length = -1;
+    p_sys->b_preparsing_done = false;
 
     /* Set exported functions */
     p_demux->pf_demux = Demux;
@@ -204,6 +205,10 @@ static int Open( vlc_object_t * p_this )
 
     /* */
     TAB_INIT( p_sys->i_seekpoints, p_sys->pp_seekpoints );
+
+
+    while ( !p_sys->b_preparsing_done && p_demux->pf_demux( p_demux ) > 0 )
+    {}
 
     return VLC_SUCCESS;
 }
@@ -265,6 +270,9 @@ static int Demux( demux_t * p_demux )
         if( Ogg_BeginningOfStream( p_demux ) != VLC_SUCCESS )
             return 0;
 
+        if ( ! p_sys->skeleton.major )
+            p_sys->b_preparsing_done = true;
+
         /* Find the real duration */
         stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_canseek );
         if ( b_canseek )
@@ -300,22 +308,27 @@ static int Demux( demux_t * p_demux )
         {
             /* If we delayed restarting encoders/SET_ES_FMT for more
              * skeleton provided configuration */
-            if ( p_sys->p_skelstream && p_sys->p_skelstream->i_serial_no == ogg_page_serialno(&p_sys->current_page) )
+            if ( p_sys->p_skelstream )
             {
-                msg_Dbg( p_demux, "End of Skeleton" );
-                for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
+                if ( p_sys->p_skelstream->i_serial_no == ogg_page_serialno(&p_sys->current_page) )
                 {
-                    logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
-                    if ( p_stream->b_have_updated_format  )
+                    msg_Dbg( p_demux, "End of Skeleton" );
+                    p_sys->b_preparsing_done = true;
+                    for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
                     {
-                        p_stream->b_have_updated_format = false;
-                        if ( p_stream->p_skel ) Ogg_ApplySkeleton( p_stream );
-                        msg_Dbg( p_demux, "Resetting format for stream %d", i_stream );
-                        es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
-                                        p_stream->p_es, &p_stream->fmt );
+                        logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
+                        if ( p_stream->b_have_updated_format  )
+                        {
+                            p_stream->b_have_updated_format = false;
+                            if ( p_stream->p_skel ) Ogg_ApplySkeleton( p_stream );
+                            msg_Dbg( p_demux, "Resetting format for stream %d", i_stream );
+                            es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
+                                            p_stream->p_es, &p_stream->fmt );
+                        }
                     }
                 }
             }
+
 
             for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
             {
@@ -509,6 +522,8 @@ static int Demux( demux_t * p_demux )
 
     /* if a page was waiting, it's now processed */
     p_sys->b_page_waiting = false;
+
+    p_sys->b_preparsing_done = true;
 
     p_sys->i_pcr = -1;
     for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
@@ -1264,6 +1279,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     memcpy( p_block->p_buffer, p_oggpacket->packet + i_header_len,
             p_oggpacket->bytes - i_header_len );
 
+    assert( p_ogg->b_preparsing_done );
     es_out_Send( p_demux->out, p_stream->p_es, p_block );
 }
 
