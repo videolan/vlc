@@ -40,6 +40,7 @@
 #ifdef HAVE_LIBAVUTIL_AVUTIL_H
 # include <libavutil/avutil.h>
 # include <libavutil/dict.h>
+# include <libavutil/log.h>
 
 #define AV_OPTIONS_TEXT     "Advanced options"
 #define AV_OPTIONS_LONGTEXT "Advanced options, in the form {opt=val,opt2=val2}."
@@ -58,15 +59,40 @@ static inline AVDictionary *vlc_av_get_options(const char *psz_opts)
     }
     return options;
 }
+
+static inline void vlc_init_avutil(vlc_object_t *obj)
+{
+    int level = AV_LOG_QUIET;
+
+    if (!var_InheritBool(obj, "quiet")) {
+        int64_t verbose = var_InheritInteger(obj, "verbose");
+        if (verbose >= 0) switch(verbose + VLC_MSG_ERR) {
+        case VLC_MSG_ERR:
+            level = AV_LOG_ERROR;
+            break;
+        case VLC_MSG_WARN:
+            level = AV_LOG_WARNING;
+            break;
+        case VLC_MSG_DBG:
+            level = AV_LOG_DEBUG;
+        default:
+            break;
+        }
+    }
+
+    av_log_set_level(level);
+}
 #endif
 
 unsigned GetVlcDspMask( void );
 
 #ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
 # include <libavformat/avformat.h>
-static inline void vlc_init_avformat(void)
+static inline void vlc_init_avformat(vlc_object_t *obj)
 {
     vlc_avcodec_lock();
+
+    vlc_init_avutil(obj);
 
 #if LIBAVUTIL_VERSION_CHECK(51, 25, 0, 42, 100)
     av_set_cpu_flags_mask( INT_MAX & ~GetVlcDspMask() );
@@ -80,9 +106,11 @@ static inline void vlc_init_avformat(void)
 
 #ifdef HAVE_LIBAVCODEC_AVCODEC_H
 # include <libavcodec/avcodec.h>
-static inline void vlc_init_avcodec(void)
+static inline void vlc_init_avcodec(vlc_object_t *obj)
 {
     vlc_avcodec_lock();
+
+    vlc_init_avutil(obj);
 
 #if LIBAVCODEC_VERSION_MAJOR < 54
     avcodec_init();

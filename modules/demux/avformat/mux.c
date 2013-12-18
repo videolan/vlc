@@ -83,7 +83,7 @@ int OpenMux( vlc_object_t *p_this )
     sout_mux_sys_t *p_sys;
     char *psz_mux;
 
-    vlc_init_avformat();
+    vlc_init_avformat(p_this);
 
     config_ChainParse( p_mux, "sout-avformat-", ppsz_mux_options, p_mux->p_cfg );
 

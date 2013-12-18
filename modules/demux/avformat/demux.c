@@ -129,7 +129,7 @@ int OpenDemux( vlc_object_t *p_this )
     }
     stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_can_seek );
 
-    vlc_init_avformat();
+    vlc_init_avformat(p_this);
 
     char *psz_format = var_InheritString( p_this, "avformat-format" );
     if( psz_format )

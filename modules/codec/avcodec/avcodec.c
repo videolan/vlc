@@ -269,7 +269,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Initialization must be done before avcodec_find_decoder() */
-    vlc_init_avcodec();
+    vlc_init_avcodec(p_this);
 
     /* *** ask ffmpeg for a decoder *** */
     char *psz_decoder = var_CreateGetString( p_this, "avcodec-codec" );

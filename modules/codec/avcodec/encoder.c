@@ -216,7 +216,7 @@ int OpenEncoder( vlc_object_t *p_this )
     char *psz_val;
 
     /* Initialization must be done before avcodec_find_encoder() */
-    vlc_init_avcodec();
+    vlc_init_avcodec(p_this);
 
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 

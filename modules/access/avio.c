@@ -140,7 +140,7 @@ int OpenAvio(vlc_object_t *object)
     }
 
     /* */
-    vlc_init_avformat();
+    vlc_init_avformat(object);
 
     int ret;
 #if LIBAVFORMAT_VERSION_MAJOR < 54
@@ -224,7 +224,7 @@ int OutOpenAvio(vlc_object_t *object)
     sys->context = NULL;
 
     /* */
-    vlc_init_avformat();
+    vlc_init_avformat(object);
 
     if (!access->psz_path)
         goto error;
