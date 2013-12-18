@@ -333,14 +333,7 @@ static int Open( vlc_object_t *p_this )
 
     psz_access = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "access" );
     if( !psz_access )
-    {
-        if( !strcmp( p_stream->psz_name, "http" ) )
-            psz_access = strdup("http");
-        else if (!strcmp (p_stream->psz_name, "udp"))
-            psz_access = strdup("udp");
-        else if (!strcmp (p_stream->psz_name, "file"))
-            psz_access = strdup("file");
-    }
+        psz_access = strdup(p_stream->psz_name);
 
     psz_url = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "dst" );
     if (!psz_url)
