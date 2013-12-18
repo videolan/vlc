@@ -37,6 +37,29 @@
 #include "avcommon_compat.h"
 
 
+#ifdef HAVE_LIBAVUTIL_AVUTIL_H
+# include <libavutil/avutil.h>
+# include <libavutil/dict.h>
+
+#define AV_OPTIONS_TEXT     "Advanced options"
+#define AV_OPTIONS_LONGTEXT "Advanced options, in the form {opt=val,opt2=val2}."
+
+static inline AVDictionary *vlc_av_get_options(const char *psz_opts)
+{
+    AVDictionary *options = NULL;
+    config_chain_t *cfg = NULL;
+    config_ChainParseOptions(&cfg, psz_opts);
+    while (cfg) {
+        config_chain_t *next = cfg->p_next;
+        av_dict_set(&options, cfg->psz_name, cfg->psz_value,
+            AV_DICT_DONT_STRDUP_KEY | AV_DICT_DONT_STRDUP_VAL);
+        free(cfg);
+        cfg = next;
+    }
+    return options;
+}
+#endif
+
 unsigned GetVlcDspMask( void );
 
 #ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
@@ -67,29 +90,6 @@ static inline void vlc_init_avcodec(void)
     avcodec_register_all();
 
     vlc_avcodec_unlock();
-}
-#endif
-
-#ifdef HAVE_LIBAVUTIL_AVUTIL_H
-# include <libavutil/avutil.h>
-# include <libavutil/dict.h>
-
-#define AV_OPTIONS_TEXT     "Advanced options"
-#define AV_OPTIONS_LONGTEXT "Advanced options, in the form {opt=val,opt2=val2}."
-
-static inline AVDictionary *vlc_av_get_options(const char *psz_opts)
-{
-    AVDictionary *options = NULL;
-    config_chain_t *cfg = NULL;
-    config_ChainParseOptions(&cfg, psz_opts);
-    while (cfg) {
-        config_chain_t *next = cfg->p_next;
-        av_dict_set(&options, cfg->psz_name, cfg->psz_value,
-            AV_DICT_DONT_STRDUP_KEY | AV_DICT_DONT_STRDUP_VAL);
-        free(cfg);
-        cfg = next;
-    }
-    return options;
 }
 #endif
 
