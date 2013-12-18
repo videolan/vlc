@@ -685,6 +685,8 @@ static int SessionsSetup( demux_t *p_demux )
     unsigned int   i_receive_buffer = 0;
     int            i_frame_buffer = DEFAULT_FRAME_BUFFER_SIZE;
     unsigned const thresh = 200000; /* RTP reorder threshold .2 second (default .1) */
+    const char     *p_sess_lang = NULL;
+    const char     *p_lang;
 
     b_rtsp_tcp    = var_CreateGetBool( p_demux, "rtsp-tcp" ) ||
                     var_GetBool( p_demux, "rtsp-http" );
@@ -697,6 +699,20 @@ static int SessionsSetup( demux_t *p_demux )
         msg_Err( p_demux, "Could not create the RTSP Session: %s",
             p_sys->env->getResultMsg() );
         return VLC_EGENERIC;
+    }
+
+    if( strcmp( p_sys->p_sdp, "m=" ) != 0 )
+    {
+        const char *p_sess_attr_end;
+
+        p_sess_attr_end = strstr( p_sys->p_sdp, "\nm=" );
+        if( !p_sess_attr_end )
+            p_sess_attr_end = strstr( p_sys->p_sdp, "\rm=" );
+
+        p_sess_lang = p_sess_attr_end ? strstr( p_sys->p_sdp, "a=lang:" ) : NULL;
+        if( p_sess_lang &&
+            p_sess_lang - p_sys->p_sdp > p_sess_attr_end - p_sys->p_sdp )
+            p_sess_lang = NULL;
     }
 
     /* Initialise each media subsession */
@@ -1084,6 +1100,19 @@ static int SessionsSetup( demux_t *p_demux )
                 {
                     tk->fmt.i_codec = VLC_CODEC_ITU_T140;
                 }
+            }
+
+            /* Try and parse a=lang: attribute */
+            p_lang = strstr( sub->savedSDPLines(), "a=lang:" );
+            if( !p_lang )
+                p_lang = p_sess_lang;
+
+            if( p_lang )
+            {
+                unsigned i_lang_len;
+                p_lang += 7;
+                i_lang_len = strcspn( p_lang, " \r\n" );
+                tk->fmt.psz_language = strndup( p_lang, i_lang_len );
             }
 
             if( !tk->b_quicktime && !tk->b_muxed && !tk->b_asf )
