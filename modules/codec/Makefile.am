@@ -103,6 +103,12 @@ libpng_plugin_la_LIBADD = -lpng -lz $(LIBM)
 EXTRA_LTLIBRARIES += libpng_plugin.la
 codec_LTLIBRARIES += $(LTLIBpng)
 
+libjpeg_plugin_la_SOURCES = codec/jpeg.c
+libjpeg_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+libjpeg_plugin_la_LIBADD = -ljpeg
+EXTRA_LTLIBRARIES += libjpeg_plugin.la
+codec_LTLIBRARIES += $(LTLIBjpeg)
+
 libsdl_image_plugin_la_SOURCES = codec/sdl_image.c
 libsdl_image_plugin_la_CFLAGS = $(AM_CFLAGS) $(SDL_IMAGE_CFLAGS)
 libsdl_image_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'

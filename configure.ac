@@ -2694,6 +2694,17 @@ AC_CHECK_HEADERS(png.h, [
 ])
 
 dnl
+dnl  JPEG decoder module
+dnl
+AC_ARG_ENABLE(jpeg,
+  [  --enable-jpeg           JPEG support (default enabled)])
+AS_IF([test "${enable_jpeg}" != "no"], [
+AC_CHECK_HEADERS(jpeglib.h, [
+  VLC_ADD_PLUGIN([jpeg])
+  ])
+])
+
+dnl
 dnl H262 encoder plugin (lib262)
 dnl
 AC_ARG_ENABLE(x262,
