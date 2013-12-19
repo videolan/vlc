@@ -19,10 +19,8 @@ harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.bz2 .sum-harfbuzz
 
 DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
 
-HARFBUZZ_CONF=
-
 .harfbuzz: harfbuzz
 	cd $< && env NOCONFIGURE=1 sh autogen.sh
-	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS)" ./configure $(HOSTCONF) $(HARFBUZZ_CONF)
+	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS)" ./configure $(HOSTCONF) --with-icu=no
 	cd $< && $(MAKE) install
 	touch $@
