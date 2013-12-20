@@ -104,6 +104,7 @@ typedef struct logical_stream_s
     /* for Annodex logical bitstreams */
     int i_secondary_header_packets;
 
+    block_t *p_preparse_block;
 } logical_stream_t;
 
 struct ogg_skeleton_t

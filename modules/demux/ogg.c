@@ -116,6 +116,7 @@ static void Ogg_UpdatePCR    ( logical_stream_t *, ogg_packet * );
 static void Ogg_DecodePacket ( demux_t *, logical_stream_t *, ogg_packet * );
 static int  Ogg_OpusPacketDuration( logical_stream_t *, ogg_packet * );
 
+static void Ogg_CreateES( demux_t *p_demux );
 static int Ogg_BeginningOfStream( demux_t *p_demux );
 static int Ogg_FindLogicalStreams( demux_t *p_demux );
 static void Ogg_EndOfStream( demux_t *p_demux );
@@ -270,9 +271,6 @@ static int Demux( demux_t * p_demux )
         if( Ogg_BeginningOfStream( p_demux ) != VLC_SUCCESS )
             return 0;
 
-        if ( ! p_sys->skeleton.major )
-            p_sys->b_preparsing_done = true;
-
         /* Find the real duration */
         stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_canseek );
         if ( b_canseek )
@@ -280,6 +278,18 @@ static int Demux( demux_t * p_demux )
 
         msg_Dbg( p_demux, "beginning of a group of logical streams" );
         es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 );
+    }
+
+    if ( p_sys->b_preparsing_done )
+    {
+        for ( int i=0; i < p_sys->i_streams; i++ )
+        {
+            if ( !p_sys->pp_stream[i]->p_es )
+            {
+                Ogg_CreateES( p_demux );
+                break;
+            }
+        }
     }
 
     /*
@@ -317,7 +327,7 @@ static int Demux( demux_t * p_demux )
                     for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
                     {
                         logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
-                        if ( p_stream->b_have_updated_format  )
+                        if ( p_stream->b_have_updated_format && p_stream->p_es )
                         {
                             p_stream->b_have_updated_format = false;
                             if ( p_stream->p_skel ) Ogg_ApplySkeleton( p_stream );
@@ -328,7 +338,6 @@ static int Demux( demux_t * p_demux )
                     }
                 }
             }
-
 
             for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
             {
@@ -529,6 +538,12 @@ static int Demux( demux_t * p_demux )
     for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
         logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
+
+        if ( p_stream->b_force_backup )
+        {
+            /* We have 1 or more streams needing more than 1 page for preparsing */
+            p_sys->b_preparsing_done = false;
+        }
 
         if( p_stream->fmt.i_cat == SPU_ES )
             continue;
@@ -937,8 +952,11 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         p_oggpacket->packet[0] & PACKET_TYPE_BITS ) return;
 
     /* Check the ES is selected */
-    es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
-                    p_stream->p_es, &b_selected );
+    if ( !p_stream->p_es )
+        b_selected = true;
+    else
+        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
+                        p_stream->p_es, &b_selected );
 
     if( p_stream->b_force_backup )
     {
@@ -1048,6 +1066,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                     }
                     else
                     {
+                        if ( p_stream->p_es )
                         /* Otherwise we set config from first headers */
                         es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
                                         p_stream->p_es, &p_stream->fmt );
@@ -1279,8 +1298,18 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     memcpy( p_block->p_buffer, p_oggpacket->packet + i_header_len,
             p_oggpacket->bytes - i_header_len );
 
-    assert( p_ogg->b_preparsing_done );
-    es_out_Send( p_demux->out, p_stream->p_es, p_block );
+    if ( p_stream->p_es )
+    {
+        /* Because ES creation is delayed for preparsing */
+        if ( p_stream->p_preparse_block )
+        {
+            es_out_Send( p_demux->out, p_stream->p_es, p_stream->p_preparse_block );
+            p_stream->p_preparse_block = NULL;
+        }
+        es_out_Send( p_demux->out, p_stream->p_es, p_block );
+    }
+    else
+        block_ChainAppend( & p_stream->p_preparse_block, p_block );
 }
 
 /* Re-implemented to avoid linking against libopus from the demuxer. */
@@ -1798,13 +1827,70 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
 }
 
 /****************************************************************************
+ * Ogg_CreateES: Creates all Elementary streams once headers are parsed
+ ****************************************************************************/
+static void Ogg_CreateES( demux_t *p_demux )
+{
+    demux_sys_t *p_ogg = p_demux->p_sys;
+    logical_stream_t *p_old_stream = p_ogg->p_old_stream;
+    int i_stream;
+
+    for( i_stream = 0 ; i_stream < p_ogg->i_streams; i_stream++ )
+    {
+        logical_stream_t *p_stream = p_ogg->pp_stream[i_stream];
+
+        if ( p_stream->p_es == NULL )
+        {
+            /* Better be safe than sorry when possible with ogm */
+            if( p_stream->fmt.i_codec == VLC_CODEC_MPGA ||
+                p_stream->fmt.i_codec == VLC_CODEC_A52 )
+                p_stream->fmt.b_packetized = false;
+
+            /* Try first to reuse an old ES */
+            if( p_old_stream &&
+                p_old_stream->fmt.i_cat == p_stream->fmt.i_cat &&
+                p_old_stream->fmt.i_codec == p_stream->fmt.i_codec )
+            {
+                msg_Dbg( p_demux, "will reuse old stream to avoid glitch" );
+
+                p_stream->p_es = p_old_stream->p_es;
+                es_format_Copy( &p_stream->fmt_old, &p_old_stream->fmt );
+
+                p_old_stream->p_es = NULL;
+                p_old_stream = NULL;
+                es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
+                                p_stream->p_es, &p_stream->fmt );
+            }
+            else
+            {
+                p_stream->p_es = es_out_Add( p_demux->out, &p_stream->fmt );
+            }
+
+            // TODO: something to do here ?
+            if( p_stream->fmt.i_codec == VLC_CODEC_CMML )
+            {
+                /* Set the CMML stream active */
+                es_out_Control( p_demux->out, ES_OUT_SET_ES, p_stream->p_es );
+            }
+        }
+    }
+
+    if( p_ogg->p_old_stream )
+    {
+        if( p_ogg->p_old_stream->p_es )
+            msg_Dbg( p_demux, "old stream not reused" );
+        Ogg_LogicalStreamDelete( p_demux, p_ogg->p_old_stream );
+        p_ogg->p_old_stream = NULL;
+    }
+}
+
+/****************************************************************************
  * Ogg_BeginningOfStream: Look for Beginning of Stream ogg pages and add
  *                        Elementary streams.
  ****************************************************************************/
 static int Ogg_BeginningOfStream( demux_t *p_demux )
 {
     demux_sys_t *p_ogg = p_demux->p_sys  ;
-    logical_stream_t *p_old_stream = p_ogg->p_old_stream;
     int i_stream;
 
     /* Find the logical streams embedded in the physical stream and
@@ -1826,37 +1912,6 @@ static int Ogg_BeginningOfStream( demux_t *p_demux )
         /* initialise kframe index */
         p_stream->idx=NULL;
 
-        /* Try first to reuse an old ES */
-        if( p_old_stream &&
-            p_old_stream->fmt.i_cat == p_stream->fmt.i_cat &&
-            p_old_stream->fmt.i_codec == p_stream->fmt.i_codec )
-        {
-            msg_Dbg( p_demux, "will reuse old stream to avoid glitch" );
-
-            p_stream->p_es = p_old_stream->p_es;
-            es_format_Copy( &p_stream->fmt_old, &p_old_stream->fmt );
-
-            p_old_stream->p_es = NULL;
-            p_old_stream = NULL;
-        }
-
-        if( !p_stream->p_es )
-        {
-            /* Better be safe than sorry when possible with ogm */
-            if( p_stream->fmt.i_codec == VLC_CODEC_MPGA ||
-                p_stream->fmt.i_codec == VLC_CODEC_A52 )
-                p_stream->fmt.b_packetized = false;
-
-            p_stream->p_es = es_out_Add( p_demux->out, &p_stream->fmt );
-        }
-
-        // TODO: something to do here ?
-        if( p_stream->fmt.i_codec == VLC_CODEC_CMML )
-        {
-            /* Set the CMML stream active */
-            es_out_Control( p_demux->out, ES_OUT_SET_ES, p_stream->p_es );
-        }
-
         if ( p_stream->fmt.i_bitrate == 0  &&
              ( p_stream->fmt.i_cat == VIDEO_ES ||
                p_stream->fmt.i_cat == AUDIO_ES ) )
@@ -1868,15 +1923,6 @@ static int Ogg_BeginningOfStream( demux_t *p_demux )
             p_stream->i_interpolated_pcr = -1;
         p_stream->b_reinit = false;
     }
-
-    if( p_ogg->p_old_stream )
-    {
-        if( p_ogg->p_old_stream->p_es )
-            msg_Dbg( p_demux, "old stream not reused" );
-        Ogg_LogicalStreamDelete( p_demux, p_ogg->p_old_stream );
-        p_ogg->p_old_stream = NULL;
-    }
-
 
     /* get total frame count for video stream; we will need this for seeking */
     p_ogg->i_total_frames = 0;
@@ -1902,6 +1948,7 @@ static void Ogg_EndOfStream( demux_t *p_demux )
     p_ogg->pp_stream = NULL;
     p_ogg->skeleton.major = 0;
     p_ogg->skeleton.minor = 0;
+    p_ogg->b_preparsing_done = false;
 
     /* */
     if( p_ogg->p_meta )
@@ -1940,6 +1987,13 @@ static void Ogg_LogicalStreamDelete( demux_t *p_demux, logical_stream_t *p_strea
     p_stream->p_skel = NULL;
     if ( p_demux->p_sys->p_skelstream == p_stream )
         p_demux->p_sys->p_skelstream = NULL;
+
+    /* Shouldn't happen */
+    if ( unlikely( p_stream->p_preparse_block ) )
+    {
+        block_ChainRelease( p_stream->p_preparse_block );
+        p_stream->p_preparse_block = NULL;
+    }
 
     free( p_stream );
 }
