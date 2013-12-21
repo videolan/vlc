@@ -224,8 +224,6 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->p_old_stream )
         Ogg_LogicalStreamDelete( p_demux, p_sys->p_old_stream );
 
-    TAB_CLEAN( p_sys->i_seekpoints, p_sys->pp_seekpoints );
-
     free( p_sys );
 }
 
@@ -716,7 +714,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 input_title_t *p_title = (*ppp_title)[0] = vlc_input_title_New();
                 for( int i = 0; i < p_sys->i_seekpoints; i++ )
                 {
-                    TAB_APPEND( p_title->i_seekpoint, p_title->seekpoint, p_sys->pp_seekpoints[i] );
+                    seekpoint_t *p_seekpoint_copy = vlc_seekpoint_Duplicate( p_sys->pp_seekpoints[i] );
+                    if ( likely( p_seekpoint_copy ) )
+                        TAB_APPEND( p_title->i_seekpoint, p_title->seekpoint, p_seekpoint_copy );
                 }
                 *pi_title_offset = 0;
                 *pi_seekpoint_offset = 0;
@@ -1038,7 +1038,6 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                                         p_stream->p_es, &p_stream->fmt );
                     }
                 }
-
                 if( p_stream->i_headers > 0 )
                     Ogg_ExtractMeta( p_demux, & p_stream->fmt,
                                      p_stream->p_headers, p_stream->i_headers );
@@ -1892,6 +1891,14 @@ static void Ogg_EndOfStream( demux_t *p_demux )
     if( p_ogg->p_meta )
         vlc_meta_Delete( p_ogg->p_meta );
     p_ogg->p_meta = NULL;
+
+    for ( int i=0; i < p_ogg->i_seekpoints; i++ )
+    {
+        if ( p_ogg->pp_seekpoints[i] )
+            vlc_seekpoint_Delete( p_ogg->pp_seekpoints[i] );
+    }
+    TAB_CLEAN( p_ogg->i_seekpoints, p_ogg->pp_seekpoints );
+    p_ogg->i_seekpoints = 0;
 }
 
 /**
