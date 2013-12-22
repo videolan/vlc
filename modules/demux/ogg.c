@@ -266,6 +266,7 @@ static int Demux( demux_t * p_demux )
                 TAB_CLEAN( p_sys->i_streams, p_sys->pp_stream );
             }
             Ogg_EndOfStream( p_demux );
+            p_sys->b_chained_boundary = true;
         }
 
         if( Ogg_BeginningOfStream( p_demux ) != VLC_SUCCESS )
@@ -277,7 +278,13 @@ static int Demux( demux_t * p_demux )
             Oggseek_ProbeEnd( p_demux );
 
         msg_Dbg( p_demux, "beginning of a group of logical streams" );
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 );
+        if ( p_sys->b_chained_boundary )
+        {
+            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+            p_sys->b_chained_boundary = false;
+        }
+        else
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 );
     }
 
     if ( p_sys->b_preparsing_done )
@@ -1287,6 +1294,12 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             p_block->i_buffer = 0;
     }
 
+    if ( p_stream->b_reusing )
+    {
+        p_stream->b_reusing = false;
+        p_block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+    }
+
     if( p_stream->fmt.i_codec == VLC_CODEC_TARKIN )
     {
         /* FIXME: the biggest hack I've ever done */
@@ -1854,6 +1867,10 @@ static void Ogg_CreateES( demux_t *p_demux )
                 msg_Dbg( p_demux, "will reuse old stream to avoid glitch" );
 
                 p_stream->p_es = p_old_stream->p_es;
+                p_stream->b_finished = false;
+                p_stream->b_reinit = false;
+                p_stream->b_initializing = false;
+                p_stream->b_reusing = true;
                 es_format_Copy( &p_stream->fmt_old, &p_old_stream->fmt );
 
                 p_old_stream->p_es = NULL;

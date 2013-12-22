@@ -75,6 +75,7 @@ typedef struct logical_stream_s
     bool b_initializing;
     bool b_finished;
     bool b_reinit;
+    bool b_reusing;
     bool b_oggds;
     int i_granule_shift;
 
@@ -132,6 +133,9 @@ struct demux_sys_t
     /* program clock reference (in units of 90kHz) derived from the pcr of
      * the sub-streams */
     mtime_t i_pcr;
+
+    /* new stream or starting from a chain */
+    bool b_chained_boundary;
 
     /* bitrate */
     int     i_bitrate;
