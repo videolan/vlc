@@ -272,19 +272,21 @@ static int Demux( demux_t * p_demux )
         if( Ogg_BeginningOfStream( p_demux ) != VLC_SUCCESS )
             return 0;
 
-        /* Find the real duration */
-        stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_canseek );
-        if ( b_canseek )
-            Oggseek_ProbeEnd( p_demux );
-
         msg_Dbg( p_demux, "beginning of a group of logical streams" );
-        if ( p_sys->b_chained_boundary )
+
+        if ( !p_sys->b_chained_boundary )
+        {
+            /* Find the real duration */
+            stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_canseek );
+            if ( b_canseek )
+                Oggseek_ProbeEnd( p_demux );
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 );
+        }
+        else
         {
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
             p_sys->b_chained_boundary = false;
         }
-        else
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 );
     }
 
     if ( p_sys->b_preparsing_done )
