@@ -18,14 +18,14 @@ Links:
 ======
 
 
-The VLC web site  . . . . . http://www.videolan.org/
-Support . . . . . . . . . . http://www.videolan.org/support/
-Forums  . . . . . . . . . . http://forum.videolan.org/
-Wiki  . . . . . . . . . . . http://wiki.videolan.org/
-The Developers site . . . . http://wiki.videolan.org/Developers_Corner
-VLC hacking guide . . . . . http://wiki.videolan.org/Hacker_Guide
-Bugtracker  . . . . . . . . http://trac.videolan.org/vlc/
-The VideoLAN web site . . . http://www.videolan.org/
+* The VLC web site  . . . . . http://www.videolan.org/vlc
+* Support . . . . . . . . . . http://www.videolan.org/support/
+* Forums  . . . . . . . . . . http://forum.videolan.org/
+* Wiki  . . . . . . . . . . . http://wiki.videolan.org/
+* The Developers site . . . . http://wiki.videolan.org/Developers_Corner
+* VLC hacking guide . . . . . http://wiki.videolan.org/Hacker_Guide
+* Bugtracker  . . . . . . . . http://trac.videolan.org/vlc/
+* The VideoLAN web site . . . http://www.videolan.org/
 
 
 Source Code Content:
