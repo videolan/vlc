@@ -324,6 +324,7 @@ int demux_vaControlHelper( stream_t *s,
         case DEMUX_GET_ATTACHMENTS:
         case DEMUX_CAN_RECORD:
         case DEMUX_SET_RECORD_STATE:
+        case DEMUX_GET_SIGNAL:
             return VLC_EGENERIC;
 
         default:
