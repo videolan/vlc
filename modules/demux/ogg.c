@@ -1296,9 +1296,9 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             p_block->i_buffer = 0;
     }
 
-    if ( p_stream->b_reusing )
+    if ( p_stream->b_reusing_with_other_fmt )
     {
-        p_stream->b_reusing = false;
+        p_stream->b_reusing_with_other_fmt = false;
         p_block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
     }
 
@@ -1872,13 +1872,19 @@ static void Ogg_CreateES( demux_t *p_demux )
                 p_stream->b_finished = false;
                 p_stream->b_reinit = false;
                 p_stream->b_initializing = false;
-                p_stream->b_reusing = true;
+
                 es_format_Copy( &p_stream->fmt_old, &p_old_stream->fmt );
+
+                if ( !es_format_IsSimilar( &p_stream->fmt_old, &p_old_stream->fmt ) )
+                {
+                    msg_Dbg( p_demux, "recreating decoders using SET_FMT" );
+                    es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
+                                    p_stream->p_es, &p_stream->fmt );
+                    p_stream->b_reusing_with_other_fmt = true;
+                }
 
                 p_old_stream->p_es = NULL;
                 p_old_stream = NULL;
-                es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
-                                p_stream->p_es, &p_stream->fmt );
             }
             else
             {
@@ -1902,6 +1908,8 @@ static void Ogg_CreateES( demux_t *p_demux )
         p_ogg->p_old_stream = NULL;
     }
 }
+
+
 
 /****************************************************************************
  * Ogg_BeginningOfStream: Look for Beginning of Stream ogg pages and add
