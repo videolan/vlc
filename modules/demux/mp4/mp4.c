@@ -1925,6 +1925,10 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             p_track->fmt.i_codec = p_enda && p_enda->data.p_enda->i_little_endian == 1 ?
                                     VLC_FOURCC('4','2','n','i') : VLC_FOURCC('i','n','2','4');
             break;
+        case VLC_FOURCC('i','n','3','2'):
+            p_track->fmt.i_codec = p_enda && p_enda->data.p_enda->i_little_endian == 1 ?
+                                    VLC_CODEC_S32L : VLC_CODEC_S32B;
+            break;
         case VLC_FOURCC('f','l','3','2'):
             p_track->fmt.i_codec = p_enda && p_enda->data.p_enda->i_little_endian == 1 ?
                                     VLC_CODEC_F32L : VLC_CODEC_F32B;
