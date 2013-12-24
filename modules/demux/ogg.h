@@ -75,7 +75,7 @@ typedef struct logical_stream_s
     bool b_initializing;
     bool b_finished;
     bool b_reinit;
-    bool b_reusing_with_other_fmt;
+    bool b_reusing;
     bool b_oggds;
     int i_granule_shift;
 
