@@ -112,7 +112,7 @@ static int  Control( demux_t *, int, va_list );
 
 /* Bitstream manipulation */
 static int  Ogg_ReadPage     ( demux_t *, ogg_page * );
-static void Ogg_UpdatePCR    ( logical_stream_t *, ogg_packet * );
+static void Ogg_UpdatePCR    ( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_DecodePacket ( demux_t *, logical_stream_t *, ogg_packet * );
 static int  Ogg_OpusPacketDuration( logical_stream_t *, ogg_packet * );
 
@@ -451,7 +451,7 @@ static int Demux( demux_t * p_demux )
                 {
                     /* If synchro is re-initialized we need to drop all the packets
                          * until we find a new dated one. */
-                    Ogg_UpdatePCR( p_stream, &oggpacket );
+                    Ogg_UpdatePCR( p_demux, p_stream, &oggpacket );
                 }
 
                 if( p_stream->i_pcr >= 0 )
@@ -840,9 +840,10 @@ static int Ogg_ReadPage( demux_t *p_demux, ogg_page *p_oggpage )
  * Ogg_UpdatePCR: update the PCR (90kHz program clock reference) for the
  *                current stream.
  ****************************************************************************/
-static void Ogg_UpdatePCR( logical_stream_t *p_stream,
+static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
                            ogg_packet *p_oggpacket )
 {
+    demux_sys_t *p_ogg = p_demux->p_sys;
     p_stream->i_end_trim = 0;
 
     /* Convert the granulepos into a pcr */
@@ -880,7 +881,10 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
             p_stream->i_pcr = sample * CLOCK_FREQ / p_stream->f_rate;
         }
 
-        p_stream->i_pcr += VLC_TS_0;
+        if ( !p_ogg->i_pcr_offset )
+            p_stream->i_pcr += VLC_TS_0;
+        else
+            p_stream->i_pcr += p_ogg->i_pcr_offset;
         p_stream->i_interpolated_pcr = p_stream->i_pcr;
     }
     else
@@ -908,12 +912,14 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
                 sample = 0;
             p_stream->i_interpolated_pcr =
                 VLC_TS_0 + sample * CLOCK_FREQ / p_stream->f_rate;
+            p_stream->i_interpolated_pcr += p_ogg->i_pcr_offset;
         }
         else if( p_stream->fmt.i_bitrate )
         {
             p_stream->i_interpolated_pcr +=
                 ( p_oggpacket->bytes * CLOCK_FREQ /
                   p_stream->fmt.i_bitrate / 8 );
+            p_stream->i_interpolated_pcr += p_ogg->i_pcr_offset;
         }
     }
     p_stream->i_previous_granulepos = p_oggpacket->granulepos;
@@ -1121,7 +1127,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
 
     /* Convert the granulepos into the next pcr */
     i_interpolated_pts = p_stream->i_interpolated_pcr;
-    Ogg_UpdatePCR( p_stream, p_oggpacket );
+    Ogg_UpdatePCR( p_demux, p_stream, p_oggpacket );
 
     /* SPU streams are typically discontinuous, do not mind large gaps */
     if( p_stream->fmt.i_cat != SPU_ES )
@@ -1968,6 +1974,7 @@ static void Ogg_EndOfStream( demux_t *p_demux )
     p_ogg->skeleton.major = 0;
     p_ogg->skeleton.minor = 0;
     p_ogg->b_preparsing_done = false;
+    p_ogg->i_pcr_offset = p_ogg->i_pcr;
 
     /* */
     if( p_ogg->p_meta )

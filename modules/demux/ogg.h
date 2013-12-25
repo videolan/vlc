@@ -133,6 +133,7 @@ struct demux_sys_t
     /* program clock reference (in units of 90kHz) derived from the pcr of
      * the sub-streams */
     mtime_t i_pcr;
+    mtime_t i_pcr_offset;
 
     /* new stream or starting from a chain */
     bool b_chained_boundary;
