@@ -23,6 +23,7 @@ Decoder:
  * Support setting the post processing level in Theora
  * OpenMax IL imrpovements, notably for RaspberryPi
  * Fix channel ordering of LPCM codec in m2ts files
+ * New jpeg image decoder
 
 Encoder:
  * Support for MPEG-2 encoding using x262
