@@ -336,13 +336,16 @@ static int Demux( demux_t * p_demux )
                     for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
                     {
                         logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
-                        if ( p_stream->b_have_updated_format && p_stream->p_es )
+                        if ( p_stream->b_have_updated_format )
                         {
                             p_stream->b_have_updated_format = false;
                             if ( p_stream->p_skel ) Ogg_ApplySkeleton( p_stream );
-                            msg_Dbg( p_demux, "Resetting format for stream %d", i_stream );
-                            es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
-                                            p_stream->p_es, &p_stream->fmt );
+                            if ( p_stream->p_es )
+                            {
+                                msg_Dbg( p_demux, "Resetting format for stream %d", i_stream );
+                                es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
+                                                p_stream->p_es, &p_stream->fmt );
+                            }
                         }
                     }
                 }
