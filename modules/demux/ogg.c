@@ -398,12 +398,12 @@ static int Demux( demux_t * p_demux )
 
         DemuxDebug(
             if ( p_stream->fmt.i_cat == VIDEO_ES )
-                msg_Dbg(p_demux, "DEMUX READ pageno %ld g%"PRId64" (%d packets) cont %d %ld bytes eos %d ",
+                msg_Dbg(p_demux, "DEMUX READ pageno %ld g%"PRId64" (%d packets) cont %d %ld bytes",
                     ogg_page_pageno( &p_sys->current_page ),
                     ogg_page_granulepos( &p_sys->current_page ),
                     ogg_page_packets( &p_sys->current_page ),
                     ogg_page_continued(&p_sys->current_page),
-                    p_sys->current_page.body_len, p_sys->i_eos )
+                    p_sys->current_page.body_len )
         );
 
         while( ogg_stream_packetout( &p_stream->os, &oggpacket ) > 0 )
