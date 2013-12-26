@@ -1445,9 +1445,11 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
     } else {
         int32_t bytesToCopy = __MIN(bytesRequested, availableBytes);
 
-        memcpy(targetBuffer, buffer, bytesToCopy);
-        TPCircularBufferConsume(&p_sys->circular_buffer, bytesToCopy);
-        ioData->mBuffers[0].mDataByteSize = bytesToCopy;
+        if (likely(bytesToCopy > 0)) {
+            memcpy(targetBuffer, buffer, bytesToCopy);
+            TPCircularBufferConsume(&p_sys->circular_buffer, bytesToCopy);
+            ioData->mBuffers[0].mDataByteSize = bytesToCopy;
+        }
     }
 
     vlc_cond_signal(&p_sys->cond);
