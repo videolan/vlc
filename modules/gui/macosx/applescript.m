@@ -57,15 +57,9 @@
                     return nil;
             }
 
-            char *psz_uri = vlc_path2uri([o_urlString UTF8String], NULL);
-            if (!psz_uri)
-                return nil;
-
             NSDictionary *o_dic;
             NSArray *o_array;
-            o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
-            free(psz_uri);
-
+            o_dic = [NSDictionary dictionaryWithObject:o_urlString forKey:@"ITEM_URL"];
             o_array = [NSArray arrayWithObject: o_dic];
 
             if (b_autoplay)
