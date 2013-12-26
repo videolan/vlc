@@ -22,7 +22,7 @@ $(TARBALLS)/speex-git.tar.gz:
 	touch $@
 
 speex: speex-$(SPEEX_VERSION).tar.gz .sum-speex
-	rm -Rf $@-git
+	rm -Rf $@-git $@
 	mkdir -p $@-git
 	$(ZCAT) "$<" | (cd $@-git && tar xv --strip-components=1)
 	$(APPLY) $(SRC)/speex/0001-Add-disable-binaries-option-to-build-only-the-librar.patch

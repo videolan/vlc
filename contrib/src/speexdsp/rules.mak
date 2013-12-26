@@ -17,7 +17,7 @@ $(TARBALLS)/speexdsp-git.tar.gz:
 	touch $@
 
 speexdsp: speexdsp-$(SPEEXDSP_VERSION).tar.gz .sum-speexdsp
-	rm -Rf $@-git
+	rm -Rf $@-git $@
 	mkdir -p $@-git
 	$(ZCAT) "$<" | (cd $@-git && tar xv --strip-components=1)
 	$(APPLY) $(SRC)/speexdsp/neon.patch
