@@ -1,13 +1,14 @@
 /*****************************************************************************
  * thread.c : pthread back-end for LibVLC
  *****************************************************************************
- * Copyright (C) 1999-2009 VLC authors and VideoLAN
+ * Copyright (C) 1999-2013 VLC authors and VideoLAN
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
  *          Clément Sténac
  *          Rémi Denis-Courmont
+ *          Felix Paul Kühne <fkuehne # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -43,75 +44,14 @@
 #include <pthread.h>
 #include <sched.h>
 
-#ifdef __linux__
-# include <sys/syscall.h> /* SYS_gettid */
-#endif
-#ifdef HAVE_EXECINFO_H
-# include <execinfo.h>
-#endif
-#if defined(__SunOS)
-# include <sys/processor.h>
-# include <sys/pset.h>
-#endif
+#include <mach/mach_init.h> /* mach_task_self in semaphores */
 
-#if !defined (_POSIX_TIMERS)
-# define _POSIX_TIMERS (-1)
-#endif
-#if !defined (_POSIX_CLOCK_SELECTION)
-/* Clock selection was defined in 2001 and became mandatory in 2008. */
-# define _POSIX_CLOCK_SELECTION (-1)
-#endif
-#if !defined (_POSIX_MONOTONIC_CLOCK)
-# define _POSIX_MONOTONIC_CLOCK (-1)
-#endif
+#include <execinfo.h>
 
-#if (_POSIX_TIMERS > 0)
-static unsigned vlc_clock_prec;
+#include <sys/time.h> /* gettimeofday() */
 
-# if (_POSIX_MONOTONIC_CLOCK > 0) && (_POSIX_CLOCK_SELECTION > 0)
-/* Compile-time POSIX monotonic clock support */
-#  define vlc_clock_id (CLOCK_MONOTONIC)
-
-# elif (_POSIX_MONOTONIC_CLOCK == 0) && (_POSIX_CLOCK_SELECTION > 0)
-/* Run-time POSIX monotonic clock support (see clock_setup() below) */
-static clockid_t vlc_clock_id;
-
-# else
-/* No POSIX monotonic clock support */
-#   define vlc_clock_id (CLOCK_REALTIME)
-#   warning Monotonic clock not available. Expect timing issues.
-
-# endif /* _POSIX_MONOTONIC_CLOKC */
-
-static void vlc_clock_setup_once (void)
-{
-# if (_POSIX_MONOTONIC_CLOCK == 0)
-    long val = sysconf (_SC_MONOTONIC_CLOCK);
-    assert (val != 0);
-    vlc_clock_id = (val < 0) ? CLOCK_REALTIME : CLOCK_MONOTONIC;
-# endif
-
-    struct timespec res;
-    if (unlikely(clock_getres (vlc_clock_id, &res) != 0 || res.tv_sec != 0))
-        abort ();
-    vlc_clock_prec = (res.tv_nsec + 500) / 1000;
-}
-
-static pthread_once_t vlc_clock_once = PTHREAD_ONCE_INIT;
-
-# define vlc_clock_setup() \
-    pthread_once(&vlc_clock_once, vlc_clock_setup_once)
-
-#else /* _POSIX_TIMERS */
-
-# include <sys/time.h> /* gettimeofday() */
-# if defined (HAVE_DECL_NANOSLEEP) && !HAVE_DECL_NANOSLEEP
-int nanosleep (struct timespec *, struct timespec *);
-# endif
-
-# define vlc_clock_setup() (void)0
-# warning Monotonic clock not available. Expect timing issues.
-#endif /* _POSIX_TIMERS */
+#define vlc_clock_setup() (void)0
+#warning Monotonic clock not available. Expect timing issues.
 
 static struct timespec mtime_to_ts (mtime_t date)
 {
@@ -138,16 +78,9 @@ void vlc_trace (const char *fn, const char *file, unsigned line)
 
 static inline unsigned long vlc_threadid (void)
 {
-#if defined (__linux__)
-     /* glibc does not provide a call for this */
-     return syscall (__NR_gettid);
-
-#else
      union { pthread_t th; unsigned long int i; } v = { };
      v.th = pthread_self ();
      return v.i;
-
-#endif
 }
 
 #ifndef NDEBUG
@@ -163,13 +96,6 @@ vlc_thread_fatal (const char *action, int error,
              action, error, vlc_threadid ());
     vlc_trace (function, file, line);
 
-    /* Sometimes strerror_r() crashes too, so make sure we print an error
-     * message before we invoke it */
-#ifdef __GLIBC__
-    /* Avoid the strerror_r() prototype brain damage in glibc */
-    errno = error;
-    fprintf (stderr, " Error message: %m\n");
-#else
     char buf[1000];
     const char *msg;
 
@@ -186,7 +112,6 @@ vlc_thread_fatal (const char *action, int error,
             break;
     }
     fprintf (stderr, " Error message: %s\n", msg);
-#endif
     fflush (stderr);
 
     vlc_restorecancel (canc);
@@ -324,10 +249,7 @@ void vlc_cond_init (vlc_cond_t *p_condvar)
 
     if (unlikely(pthread_condattr_init (&attr)))
         abort ();
-#if (_POSIX_CLOCK_SELECTION > 0)
-    vlc_clock_setup ();
-    pthread_condattr_setclock (&attr, vlc_clock_id);
-#endif
+
     if (unlikely(pthread_cond_init (p_condvar, &attr)))
         abort ();
     pthread_condattr_destroy (&attr);
@@ -352,6 +274,28 @@ void vlc_cond_init_daytime (vlc_cond_t *p_condvar)
 void vlc_cond_destroy (vlc_cond_t *p_condvar)
 {
     int val = pthread_cond_destroy( p_condvar );
+
+    /* due to a faulty pthread implementation within Darwin 11 and
+     * later condition variables cannot be destroyed without
+     * terminating the application immediately.
+     * This Darwin kernel issue is still present in version 13
+     * and might not be resolved prior to Darwin 15.
+     * radar://12496249
+     *
+     * To work-around this, we are just leaking the condition variable
+     * which is acceptable due to VLC's low number of created variables
+     * and its usually limited runtime.
+     * Ideally, we should implement a re-useable pool.
+     */
+    if (val != 0) {
+        #ifndef NDEBUG
+        printf("pthread_cond_destroy returned %i\n", val);
+        #endif
+
+        if (val == EBUSY)
+            return;
+    }
+
     VLC_THREAD_ASSERT ("destroying condition");
 }
 
@@ -442,7 +386,7 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
  */
 void vlc_sem_init (vlc_sem_t *sem, unsigned value)
 {
-    if (unlikely(sem_init (sem, 0, value)))
+    if (unlikely(semaphore_create(mach_task_self(), sem, SYNC_POLICY_FIFO, value) != KERN_SUCCESS))
         abort ();
 }
 
@@ -453,10 +397,10 @@ void vlc_sem_destroy (vlc_sem_t *sem)
 {
     int val;
 
-    if (likely(sem_destroy (sem) == 0))
+    if (likely(semaphore_destroy(mach_task_self(), *sem) == KERN_SUCCESS))
         return;
 
-    val = errno;
+    val = EINVAL;
 
     VLC_THREAD_ASSERT ("destroying semaphore");
 }
@@ -469,10 +413,10 @@ int vlc_sem_post (vlc_sem_t *sem)
 {
     int val;
 
-    if (likely(sem_post (sem) == 0))
+    if (likely(semaphore_signal(*sem) == KERN_SUCCESS))
         return 0;
 
-    val = errno;
+    val = EINVAL;
 
     if (unlikely(val != EOVERFLOW))
         VLC_THREAD_ASSERT ("unlocking semaphore");
@@ -487,10 +431,10 @@ void vlc_sem_wait (vlc_sem_t *sem)
 {
     int val;
 
-    do
-        if (likely(sem_wait (sem) == 0))
-            return;
-    while ((val = errno) == EINTR);
+    if (likely(semaphore_wait(*sem) == KERN_SUCCESS))
+        return;
+
+    val = EINVAL;
 
     VLC_THREAD_ASSERT ("locking semaphore");
 }
@@ -596,11 +540,8 @@ void vlc_threads_setup (libvlc_int_t *p_libvlc)
      * just once per process. */
     if (!initialized)
     {
-        if (var_InheritBool (p_libvlc, "rt-priority"))
-        {
-            rt_offset = var_InheritInteger (p_libvlc, "rt-offset");
-            rt_priorities = true;
-        }
+        rt_offset = var_InheritInteger (p_libvlc, "rt-offset");
+        rt_priorities = true;
         initialized = true;
     }
     vlc_mutex_unlock (&lock);
@@ -635,25 +576,7 @@ static int vlc_clone_attr (vlc_thread_t *th, pthread_attr_t *attr,
         pthread_sigmask (SIG_BLOCK, &set, &oldset);
     }
 
-#if defined (_POSIX_PRIORITY_SCHEDULING) && (_POSIX_PRIORITY_SCHEDULING >= 0) \
- && defined (_POSIX_THREAD_PRIORITY_SCHEDULING) \
- && (_POSIX_THREAD_PRIORITY_SCHEDULING >= 0)
-    if (rt_priorities)
-    {
-        struct sched_param sp = { .sched_priority = priority + rt_offset, };
-        int policy;
-
-        if (sp.sched_priority <= 0)
-            sp.sched_priority += sched_get_priority_max (policy = SCHED_OTHER);
-        else
-            sp.sched_priority += sched_get_priority_min (policy = SCHED_RR);
-
-        pthread_attr_setschedpolicy (attr, policy);
-        pthread_attr_setschedparam (attr, &sp);
-    }
-#else
     (void) priority;
-#endif
 
     /* The thread stack size.
      * The lower the value, the less address space per thread, the highest
@@ -765,25 +688,7 @@ int vlc_clone_detach (vlc_thread_t *th, void *(*entry) (void *), void *data,
 
 int vlc_set_priority (vlc_thread_t th, int priority)
 {
-#if defined (_POSIX_PRIORITY_SCHEDULING) && (_POSIX_PRIORITY_SCHEDULING >= 0) \
- && defined (_POSIX_THREAD_PRIORITY_SCHEDULING) \
- && (_POSIX_THREAD_PRIORITY_SCHEDULING >= 0)
-    if (rt_priorities)
-    {
-        struct sched_param sp = { .sched_priority = priority + rt_offset, };
-        int policy;
-
-        if (sp.sched_priority <= 0)
-            sp.sched_priority += sched_get_priority_max (policy = SCHED_OTHER);
-        else
-            sp.sched_priority += sched_get_priority_min (policy = SCHED_RR);
-
-        if (pthread_setschedparam (th, policy, &sp))
-            return VLC_EGENERIC;
-    }
-#else
     (void) th; (void) priority;
-#endif
     return VLC_SUCCESS;
 }
 
@@ -872,23 +777,11 @@ void vlc_control_cancel (int cmd, ...)
  */
 mtime_t mdate (void)
 {
-#if (_POSIX_TIMERS > 0)
-    struct timespec ts;
-
-    vlc_clock_setup ();
-    if (unlikely(clock_gettime (vlc_clock_id, &ts) != 0))
-        abort ();
-
-    return (INT64_C(1000000) * ts.tv_sec) + (ts.tv_nsec / 1000);
-
-#else
     struct timeval tv;
 
     if (unlikely(gettimeofday (&tv, NULL) != 0))
         abort ();
     return (INT64_C(1000000) * tv.tv_sec) + tv.tv_usec;
-
-#endif
 }
 
 #undef mwait
@@ -898,22 +791,9 @@ mtime_t mdate (void)
  */
 void mwait (mtime_t deadline)
 {
-#if (_POSIX_CLOCK_SELECTION > 0)
-    vlc_clock_setup ();
-    /* If the deadline is already elapsed, or within the clock precision,
-     * do not even bother the system timer. */
-    deadline -= vlc_clock_prec;
-
-    struct timespec ts = mtime_to_ts (deadline);
-
-    while (clock_nanosleep (vlc_clock_id, TIMER_ABSTIME, &ts, NULL) == EINTR);
-
-#else
     deadline -= mdate ();
     if (deadline > 0)
         msleep (deadline);
-
-#endif
 }
 
 #undef msleep
@@ -925,15 +805,8 @@ void msleep (mtime_t delay)
 {
     struct timespec ts = mtime_to_ts (delay);
 
-#if (_POSIX_CLOCK_SELECTION > 0)
-    vlc_clock_setup ();
-    while (clock_nanosleep (vlc_clock_id, 0, &ts, &ts) == EINTR);
-
-#else
     while (nanosleep (&ts, &ts) == -1)
         assert (errno == EINTR);
-
-#endif
 }
 
 
@@ -943,39 +816,5 @@ void msleep (mtime_t delay)
  */
 unsigned vlc_GetCPUCount(void)
 {
-#if defined(HAVE_SCHED_GETAFFINITY)
-    cpu_set_t cpu;
-
-    CPU_ZERO(&cpu);
-    if (sched_getaffinity (0, sizeof (cpu), &cpu) < 0)
-        return 1;
-
-    return CPU_COUNT (&cpu);
-
-#elif defined(__SunOS)
-    unsigned count = 0;
-    int type;
-    u_int numcpus;
-    processor_info_t cpuinfo;
-
-    processorid_t *cpulist = malloc (sizeof (*cpulist) * sysconf(_SC_NPROCESSORS_MAX));
-    if (unlikely(cpulist == NULL))
-        return 1;
-
-    if (pset_info(PS_MYID, &type, &numcpus, cpulist) == 0)
-    {
-        for (u_int i = 0; i < numcpus; i++)
-            if (processor_info (cpulist[i], &cpuinfo) == 0)
-                count += (cpuinfo.pi_state == P_ONLINE);
-    }
-    else
-        count = sysconf (_SC_NPROCESSORS_ONLN);
-    free (cpulist);
-    return count ? count : 1;
-#elif defined(_SC_NPROCESSORS_CONF)
     return sysconf(_SC_NPROCESSORS_CONF);
-#else
-#   warning "vlc_GetCPUCount is not implemented for your platform"
-    return 1;
-#endif
 }

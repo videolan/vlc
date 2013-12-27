@@ -248,7 +248,7 @@ SOURCES_libvlc_darwin = \
 	darwin/dirs.c \
 	posix/filesystem.c \
 	posix/plugin.c \
-	posix/thread.c \
+	darwin/thread.c \
 	posix/timer.c \
 	darwin/specific.c \
 	posix/rand.c \
