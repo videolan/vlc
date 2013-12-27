@@ -1845,12 +1845,16 @@ static void Ogg_CreateES( demux_t *p_demux )
                 p_stream->b_finished = false;
                 p_stream->b_reinit = false;
                 p_stream->b_initializing = false;
+                bool b_resetdecoder = Ogg_LogicalStreamResetEsFormat( p_demux, p_stream );
                 es_format_Copy( &p_stream->fmt_old, &p_old_stream->fmt );
 
                 p_old_stream->p_es = NULL;
                 p_old_stream = NULL;
-                es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
-                                p_stream->p_es, &p_stream->fmt );
+                if ( b_resetdecoder )
+                {
+                    es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
+                                    p_stream->p_es, &p_stream->fmt );
+                }
             }
             else
             {
