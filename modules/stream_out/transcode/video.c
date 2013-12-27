@@ -337,6 +337,13 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
                            p_stream->p_sys );
         filter_chain_Reset( id->p_uf_chain, p_fmt_out,
                             &id->p_encoder->fmt_in );
+        if( p_fmt_out->video.i_chroma != id->p_encoder->fmt_in.video.i_chroma )
+        {
+            filter_chain_AppendFilter( id->p_uf_chain,
+                                   NULL, NULL,
+                                   p_fmt_out,
+                                   &id->p_encoder->fmt_in );
+        }
         filter_chain_AppendFromString( id->p_uf_chain, p_stream->p_sys->psz_vf2 );
         p_fmt_out = filter_chain_GetFmtOut( id->p_uf_chain );
         es_format_Copy( &id->p_encoder->fmt_in, p_fmt_out );
