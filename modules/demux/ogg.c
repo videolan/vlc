@@ -544,14 +544,17 @@ static int Demux( demux_t * p_demux )
     /* if a page was waiting, it's now processed */
     p_sys->b_page_waiting = false;
 
-    p_sys->b_preparsing_done = true;
+    if ( p_sys->p_skelstream && !p_sys->p_skelstream->b_finished )
+        p_sys->b_preparsing_done = false;
+    else
+        p_sys->b_preparsing_done = true;
 
     p_sys->i_pcr = -1;
     for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
         logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
 
-        if ( p_stream->b_force_backup )
+        if ( p_sys->b_preparsing_done && p_stream->b_initializing )
         {
             /* We have 1 or more streams needing more than 1 page for preparsing */
             p_sys->b_preparsing_done = false;
