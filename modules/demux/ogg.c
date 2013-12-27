@@ -1252,11 +1252,6 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             p_block->i_buffer = 0;
     }
 
-    if ( p_stream->b_reusing )
-    {
-        p_stream->b_reusing = false;
-        p_block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-    }
 
     if( p_stream->fmt.i_codec == VLC_CODEC_TARKIN )
     {
@@ -1829,7 +1824,6 @@ static void Ogg_CreateES( demux_t *p_demux )
                 p_stream->b_finished = false;
                 p_stream->b_reinit = false;
                 p_stream->b_initializing = false;
-                p_stream->b_reusing = true;
                 es_format_Copy( &p_stream->fmt_old, &p_old_stream->fmt );
 
                 p_old_stream->p_es = NULL;
