@@ -1086,19 +1086,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     {
         if( p_stream->i_pcr >= 0 )
         {
-            /* This is for streams where the granulepos of the header packets
-             * doesn't match these of the data packets (eg. ogg web radios). */
-            if( p_stream->i_previous_pcr == 0 &&
-                p_stream->i_pcr  > 3 * DEFAULT_PTS_DELAY )
-            {
-
-                /* Call the pace control */
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR,
-                                VLC_TS_0 + p_stream->i_pcr );
-            }
-
             p_stream->i_previous_pcr = p_stream->i_pcr;
-
             /* The granulepos is the end date of the sample */
             i_pts = p_stream->i_pcr;
         }
@@ -1107,23 +1095,6 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     /* Convert the granulepos into the next pcr */
     i_interpolated_pts = p_stream->i_interpolated_pcr;
     Ogg_UpdatePCR( p_demux, p_stream, p_oggpacket );
-
-    /* SPU streams are typically discontinuous, do not mind large gaps */
-    if( p_stream->fmt.i_cat != SPU_ES )
-    {
-        if( p_stream->i_pcr >= 0 )
-        {
-            /* This is for streams where the granulepos of the header packets
-             * doesn't match these of the data packets (eg. ogg web radios). */
-            if( p_stream->i_previous_pcr == 0 &&
-                p_stream->i_pcr  > 3 * DEFAULT_PTS_DELAY )
-            {
-
-                /* Call the pace control */
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_stream->i_pcr );
-            }
-        }
-    }
 
     if( p_stream->fmt.i_codec != VLC_CODEC_VORBIS &&
         p_stream->fmt.i_codec != VLC_CODEC_SPEEX &&
