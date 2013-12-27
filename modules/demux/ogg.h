@@ -58,7 +58,6 @@ typedef struct logical_stream_s
      * data for the decoder. We back them up here in case we need to re-feed
      * them to the decoder. */
     bool             b_force_backup;
-    bool             b_have_updated_format;
     int              i_packets_backup;
     int32_t          i_extra_headers_packets;
     void             *p_headers;

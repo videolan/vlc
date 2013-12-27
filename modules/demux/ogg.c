@@ -336,17 +336,7 @@ static int Demux( demux_t * p_demux )
                     for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
                     {
                         logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
-                        if ( p_stream->b_have_updated_format )
-                        {
-                            p_stream->b_have_updated_format = false;
-                            if ( p_stream->p_skel ) Ogg_ApplySkeleton( p_stream );
-                            if ( p_stream->p_es )
-                            {
-                                msg_Dbg( p_demux, "Resetting format for stream %d", i_stream );
-                                es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
-                                                p_stream->p_es, &p_stream->fmt );
-                            }
-                        }
+                        Ogg_ApplySkeleton( p_stream );
                     }
                 }
             }
@@ -1074,25 +1064,6 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                 else
                     p_stream->fmt.i_extra = 0;
 
-                if( Ogg_LogicalStreamResetEsFormat( p_demux, p_stream ) )
-                {
-                    if ( p_ogg->p_skelstream )
-                    {
-                        /* We delay until eos is reached on skeleton.
-                         * There should only be headers, as no data page is
-                         * allowed before skeleton's eos.
-                         * Skeleton data is appended to fmt on skeleton eos.
-                         */
-                        p_stream->b_have_updated_format = true;
-                    }
-                    else
-                    {
-                        if ( p_stream->p_es )
-                        /* Otherwise we set config from first headers */
-                        es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
-                                        p_stream->p_es, &p_stream->fmt );
-                    }
-                }
                 if( p_stream->i_headers > 0 )
                     Ogg_ExtractMeta( p_demux, & p_stream->fmt,
                                      p_stream->p_headers, p_stream->i_headers );
@@ -1424,6 +1395,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
 
                 es_format_Init( &p_stream->fmt, 0, 0 );
                 es_format_Init( &p_stream->fmt_old, 0, 0 );
+                p_stream->b_initializing = true;
 
                 /* Setup the logical stream */
                 p_stream->i_serial_no = ogg_page_serialno( &p_ogg->current_page );
@@ -1829,7 +1801,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 }
 
                 /* we'll need to get all headers */
-                p_ogg->pp_stream[i_stream]->b_initializing |= p_ogg->pp_stream[i_stream]->b_force_backup;
+                p_ogg->pp_stream[i_stream]->b_initializing &= p_ogg->pp_stream[i_stream]->b_force_backup;
 
                 if( Ogg_ReadPage( p_demux, &p_ogg->current_page ) != VLC_SUCCESS )
                     return VLC_EGENERIC;
