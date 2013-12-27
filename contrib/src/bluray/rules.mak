@@ -3,7 +3,7 @@
 ifdef BUILD_DISCS
 PKGS += bluray
 endif
-ifeq ($(call need_pkg,"libbluray >= 0.2.1"),)
+ifeq ($(call need_pkg,"libbluray >= 0.3.0"),)
 PKGS_FOUND += bluray
 endif
 
