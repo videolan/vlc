@@ -173,6 +173,10 @@ static void fill_channels_info(audio_format_t *audio)
         audio->i_original_channels = pi_channels_map[chans];
 }
 
+/* Special TS value: don't send or derive any pts/pcr from it.
+   Represents TS state prior first known valid timestamp */
+#define VLC_TS_UNKNOWN (VLC_TS_INVALID - 1)
+
 /*****************************************************************************
  * Open: initializes ogg demux structures
  *****************************************************************************/
@@ -280,11 +284,9 @@ static int Demux( demux_t * p_demux )
             stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_canseek );
             if ( b_canseek )
                 Oggseek_ProbeEnd( p_demux );
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 );
         }
         else
         {
-            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
             p_sys->b_chained_boundary = false;
         }
     }
@@ -372,8 +374,8 @@ static int Demux( demux_t * p_demux )
                 ogg_stream_reset_serialno( &p_stream->os, ogg_page_serialno( &p_sys->current_page ) );
 
                 p_stream->b_reinit = true;
-                p_stream->i_pcr = VLC_TS_0;
-                p_stream->i_interpolated_pcr = VLC_TS_0;
+                p_stream->i_pcr = VLC_TS_UNKNOWN;
+                p_stream->i_interpolated_pcr = VLC_TS_UNKNOWN;
                 p_stream->i_previous_granulepos = -1;
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0);
             }
@@ -539,7 +541,10 @@ static int Demux( demux_t * p_demux )
     else
         p_sys->b_preparsing_done = true;
 
-    p_sys->i_pcr = -1;
+    /* We will consider the lowest PCR among tracks, because the audio core badly
+     * handles PCR rewind (mute)
+     */
+    mtime_t i_pcr_candidate = VLC_TS_INVALID;
     for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
         logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
@@ -552,15 +557,24 @@ static int Demux( demux_t * p_demux )
 
         if( p_stream->fmt.i_cat == SPU_ES )
             continue;
-        if( p_stream->i_interpolated_pcr < 0 )
+        if( p_stream->i_interpolated_pcr < VLC_TS_0 )
+            continue;
+        if ( p_stream->b_finished || p_stream->b_initializing )
             continue;
 
-        if( p_sys->i_pcr < 0 || p_stream->i_interpolated_pcr < p_sys->i_pcr )
-            p_sys->i_pcr = p_stream->i_interpolated_pcr;
+        if( i_pcr_candidate < VLC_TS_0
+            || p_stream->i_interpolated_pcr <= i_pcr_candidate )
+        {
+            i_pcr_candidate = p_stream->i_interpolated_pcr;
+        }
     }
 
-    if( p_sys->i_pcr >= 0 && ! b_skipping )
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
+    if ( i_pcr_candidate > VLC_TS_INVALID && p_sys->i_pcr != i_pcr_candidate )
+    {
+        p_sys->i_pcr = i_pcr_candidate;
+        if( ! b_skipping )
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr );
+    }
 
     return 1;
 }
@@ -573,8 +587,8 @@ static void Ogg_ResetStreamHelper( demux_sys_t *p_sys )
 
         /* we'll trash all the data until we find the next pcr */
         p_stream->b_reinit = true;
-        p_stream->i_pcr = -1;
-        p_stream->i_interpolated_pcr = -1;
+        p_stream->i_pcr = VLC_TS_UNKNOWN;
+        p_stream->i_interpolated_pcr = VLC_TS_UNKNOWN;
         p_stream->i_previous_granulepos = -1;
         ogg_stream_reset( &p_stream->os );
     }
@@ -843,7 +857,13 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
     p_stream->i_end_trim = 0;
 
     /* Convert the granulepos into a pcr */
-    if( p_oggpacket->granulepos >= 0 )
+    if ( p_oggpacket->granulepos == 0 )
+    {
+        /* We're in headers, and we haven't parsed 1st data packet yet */
+        p_stream->i_pcr = VLC_TS_UNKNOWN;
+        p_stream->i_interpolated_pcr = VLC_TS_UNKNOWN;
+    }
+    else if( p_oggpacket->granulepos > 0 )
     {
         if( p_stream->fmt.i_codec == VLC_CODEC_THEORA ||
             p_stream->fmt.i_codec == VLC_CODEC_KATE ||
@@ -886,7 +906,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
     else
     {
         int duration;
-        p_stream->i_pcr = -1;
+        p_stream->i_pcr = VLC_TS_INVALID;
 
         /* no granulepos available, try to interpolate the pcr.
          * If we can't then don't touch the old value. */
@@ -910,7 +930,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
                 VLC_TS_0 + sample * CLOCK_FREQ / p_stream->f_rate;
             p_stream->i_interpolated_pcr += p_ogg->i_pcr_offset;
         }
-        else if( p_stream->fmt.i_bitrate )
+        else if( p_stream->fmt.i_bitrate && p_stream->i_pcr > VLC_TS_UNKNOWN )
         {
             p_stream->i_interpolated_pcr +=
                 ( p_oggpacket->bytes * CLOCK_FREQ /
@@ -931,7 +951,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     block_t *p_block;
     bool b_selected;
     int i_header_len = 0;
-    mtime_t i_pts = -1, i_interpolated_pts;
+    mtime_t i_pts = VLC_TS_UNKNOWN, i_interpolated_pts;
     demux_sys_t *p_ogg = p_demux->p_sys;
 
     if( p_oggpacket->bytes >= 7 &&
@@ -1084,7 +1104,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         p_stream->fmt.i_codec == VLC_CODEC_OPUS ||
         p_stream->fmt.i_codec == VLC_CODEC_FLAC )
     {
-        if( p_stream->i_pcr >= 0 )
+        if( p_stream->i_pcr > VLC_TS_INVALID )
         {
             p_stream->i_previous_pcr = p_stream->i_pcr;
             /* The granulepos is the end date of the sample */
@@ -1153,14 +1173,9 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     else if( p_stream->fmt.i_codec == VLC_CODEC_OPUS )
         p_block->i_nb_samples = Ogg_OpusPacketDuration( p_stream, p_oggpacket );
 
-
     /* Normalize PTS */
-    if( i_pts == VLC_TS_INVALID ) i_pts = VLC_TS_0;
-    else if( i_pts == -1 && i_interpolated_pts == VLC_TS_INVALID )
-        i_pts = VLC_TS_0;
-    else if( i_pts == -1 && (p_stream->fmt.i_cat == VIDEO_ES || p_stream->fmt.i_codec == VLC_CODEC_OPUS) )
-        i_pts = i_interpolated_pts; /* FIXME : why is this incorrect for vorbis? */
-    else if( i_pts == -1 ) i_pts = VLC_TS_INVALID;
+    if( i_pts == VLC_TS_UNKNOWN )
+        i_pts = VLC_TS_INVALID;
 
     if( p_stream->fmt.i_cat == AUDIO_ES )
     {
@@ -1263,6 +1278,12 @@ static void Ogg_DecodePacket( demux_t *p_demux,
 
     memcpy( p_block->p_buffer, p_oggpacket->packet + i_header_len,
             p_oggpacket->bytes - i_header_len );
+
+    if ( p_ogg->i_streams == 1 && p_block->i_pts > VLC_TS_INVALID && p_ogg->i_pcr < VLC_TS_0 )
+    {
+        p_ogg->i_pcr = p_block->i_pts;
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_ogg->i_pcr );
+    }
 
     if ( p_stream->p_es )
     {
@@ -1890,7 +1911,7 @@ static int Ogg_BeginningOfStream( demux_t *p_demux )
             p_ogg->i_bitrate += p_stream->fmt.i_bitrate;
 
         p_stream->i_pcr = p_stream->i_previous_pcr =
-            p_stream->i_interpolated_pcr = -1;
+            p_stream->i_interpolated_pcr = VLC_TS_UNKNOWN;
         p_stream->b_reinit = false;
     }
 
