@@ -27,16 +27,17 @@
 
 #include <assert.h>
 #include <limits.h>                         /* PATH_MAX */
+
 #if defined (HAVE_MNTENT_H) && defined(HAVE_SYS_STAT_H)
-#include <mntent.h>
-#include <sys/stat.h>
+# include <mntent.h>
+# include <sys/stat.h>
 #endif
 
 #ifdef __APPLE__
-#include <sys/stat.h>
-#include <sys/param.h>
-#include <sys/ucred.h>
-#include <sys/mount.h>
+# include <sys/stat.h>
+# include <sys/param.h>
+# include <sys/ucred.h>
+# include <sys/mount.h>
 #endif
 
 #include <vlc_common.h>
