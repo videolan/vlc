@@ -328,7 +328,6 @@ static int blurayOpen(vlc_object_t *object)
             BLURAY_ERROR(_("This Blu-ray Disc needs a library for AACS decoding"
                       ", and your system does not have it."));
         if (!disc_info->aacs_handled) {
-#ifdef BD_AACS_CORRUPTED_DISC
             if (disc_info->aacs_error_code) {
                 switch (disc_info->aacs_error_code) {
                 case BD_AACS_CORRUPTED_DISC:
@@ -345,11 +344,6 @@ static int blurayOpen(vlc_object_t *object)
                     BLURAY_ERROR(_("AACS MMC failed."));
                 }
             }
-#else
-            /* libbluray < 0.2.3 */
-            BLURAY_ERROR(_("Your system AACS decoding library does not work. "
-                      "Missing keys?"));
-#endif /* BD_AACS_CORRUPTED_DISC */
         }
     }
 
