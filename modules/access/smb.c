@@ -219,8 +219,8 @@ static int Open( vlc_object_t *p_this )
 #endif
     if( (i_smb = smbc_open( psz_uri, O_RDONLY, 0 )) < 0 )
     {
-        msg_Err( p_access, "open failed for '%s' (%m)",
-                 p_access->psz_location );
+        msg_Err( p_access, "open failed for '%s' (%s)",
+                 p_access->psz_location, vlc_strerror_c(errno) );
         free( psz_uri );
         return VLC_EGENERIC;
     }
@@ -232,7 +232,7 @@ static int Open( vlc_object_t *p_this )
     if( i_ret )
     {
         errno = i_ret;
-        msg_Err( p_access, "stat failed (%m)" );
+        msg_Err( p_access, "stat failed (%s)", vlc_strerror_c(errno) );
     }
     else
         p_sys->size = filestat.st_size;
@@ -272,7 +272,7 @@ static int Seek( access_t *p_access, uint64_t i_pos )
     i_ret = smbc_lseek( p_sys->i_smb, i_pos, SEEK_SET );
     if( i_ret == -1 )
     {
-        msg_Err( p_access, "seek failed (%m)" );
+        msg_Err( p_access, "seek failed (%s)", vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
 
@@ -295,7 +295,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     i_read = smbc_read( p_sys->i_smb, p_buffer, i_len );
     if( i_read < 0 )
     {
-        msg_Err( p_access, "read failed (%m)" );
+        msg_Err( p_access, "read failed (%s)", vlc_strerror_c(errno) );
         return -1;
     }
 
