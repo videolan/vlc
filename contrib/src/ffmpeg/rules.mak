@@ -1,9 +1,16 @@
 # FFmpeg
 
-HASH=HEAD
+#Uncomment the one you want
+#USE_LIBAV ?= 1
+#USE_FFMPEG ?= 1
 
-#FFMPEG_SNAPURL := http://git.videolan.org/?p=ffmpeg.git;a=snapshot;h=$(HASH);sf=tgz
+ifdef USE_FFMPEG
+HASH=HEAD
+FFMPEG_SNAPURL := http://git.videolan.org/?p=ffmpeg.git;a=snapshot;h=$(HASH);sf=tgz
+else
+HASH=HEAD
 FFMPEG_SNAPURL := http://git.libav.org/?p=libav.git;a=snapshot;h=$(HASH);sf=tgz
+endif
 
 FFMPEGCONF = \
 	--cc="$(CC)" \
@@ -18,12 +25,16 @@ FFMPEGCONF = \
 	--disable-avfilter \
 	--disable-filters \
 	--disable-bsfs \
-	--disable-bzlib
+	--disable-bzlib \
+	--disable-programs \
+	--disable-avresample
 
-# Those tools are named differently in FFmpeg and Libav
-#	--disable-ffserver \
-#	--disable-ffplay \
-#	--disable-ffprobe
+ifdef USE_FFMPEG
+FFMPEGCONF += \
+	--disable-swresample \
+	--disable-iconv
+endif
+
 DEPS_ffmpeg = zlib gsm openjpeg
 
 # Optional dependencies
