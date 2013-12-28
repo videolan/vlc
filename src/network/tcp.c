@@ -349,17 +349,14 @@ static int SocksNegotiate( vlc_object_t *p_obj,
         return VLC_SUCCESS;
 
     /* We negotiate authentication */
-
-    if( ( psz_socks_user == NULL ) && ( psz_socks_passwd == NULL ) )
-        b_auth = true;
-
     buffer[0] = i_socks_version;    /* SOCKS version */
-    if( b_auth )
+    if( psz_socks_user != NULL && psz_socks_passwd != NULL )
     {
         buffer[1] = 2;                  /* Number of methods */
         buffer[2] = 0x00;               /* - No auth required */
         buffer[3] = 0x02;               /* - USer/Password */
         i_len = 4;
+        b_auth = true;
     }
     else
     {
