@@ -368,9 +368,10 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     else
     {
         /* abort on read error */
-        msg_Err( p_access, "failed to read (%m)" );
-        dialog_Fatal( p_access, _("File reading failed"), "%s (%m)",
-                      _("VLC could not read the file.") );
+        msg_Err( p_access, "failed to read (%s)", vlc_strerror_c(errno) );
+        dialog_Fatal( p_access, _("File reading failed"),
+                      _("VLC could not read the file (%s)."),
+                      vlc_strerror(errno) );
         SwitchFile( p_access, -1 );
         return 0;
     }
@@ -464,7 +465,8 @@ static bool ImportNextFile( access_t *p_access )
     struct stat st;
     if( vlc_stat( psz_path, &st ) )
     {
-        msg_Dbg( p_access, "could not stat %s: %m", psz_path );
+        msg_Dbg( p_access, "could not stat %s: %s", psz_path,
+                 vlc_strerror_c(errno) );
         free( psz_path );
         return false;
     }
@@ -514,7 +516,8 @@ static bool SwitchFile( access_t *p_access, unsigned i_file )
 
     if( p_sys->fd == -1 )
     {
-        msg_Err( p_access, "Failed to open %s: %m", psz_path );
+        msg_Err( p_access, "Failed to open %s: %s", psz_path,
+                 vlc_strerror_c(errno) );
         goto error;
     }
 
@@ -534,7 +537,7 @@ static bool SwitchFile( access_t *p_access, unsigned i_file )
 
 error:
     dialog_Fatal (p_access, _("File reading failed"), _("VLC could not"
-        " open the file \"%s\". (%m)"), psz_path);
+        " open the file \"%s\" (%s)."), psz_path, vlc_strerror(errno) );
     if( p_sys->fd != -1 )
     {
         close( p_sys->fd );
@@ -599,7 +602,8 @@ static FILE *OpenRelativeFile( access_t *p_access, const char *psz_file )
 
     FILE *file = vlc_fopen( psz_path, "rb" );
     if( !file )
-        msg_Warn( p_access, "Failed to open %s: %m", psz_path );
+        msg_Warn( p_access, "Failed to open %s: %s", psz_path,
+                  vlc_strerror_c(errno) );
     free( psz_path );
 
     return file;
