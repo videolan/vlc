@@ -166,8 +166,8 @@ static void Close( vlc_object_t * p_this )
 
     close ( p_sys->fd );
     if(	vlc_unlink( p_access->psz_filepath ) != 0 )
-        msg_Err( p_access, "Error deleting file %s, %m",
-                 p_access->psz_filepath );
+        msg_Err( p_access, "Error deleting file %s, %s",
+                 p_access->psz_filepath, vlc_strerror_c(errno) );
     free( p_sys );
 }
 
@@ -191,9 +191,10 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
                 break;
 
             default:
-                msg_Err( p_access, "read failed (%m)" );
-                dialog_Fatal( p_access, _( "File reading failed" ), "%s (%m)",
-                                _( "VLC could not read the file." ) );
+                msg_Err( p_access, "read failed: %s", vlc_strerror_c(errno) );
+                dialog_Fatal( p_access, _( "File reading failed" ),
+                              _( "VLC could not read the file: %s" ),
+                              vlc_strerror(errno) );
                 p_access->info.b_eof = true;
                 return 0;
         }
@@ -248,7 +249,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
             struct stat st;
             if( fstat( sys->fd, &st ) )
             {
-                msg_Err( p_access, "fstat error: %m" );
+                msg_Err( p_access, "fstat error: %s", vlc_strerror_c(errno) );
                 return VLC_EGENERIC;
             }
             *s = st.st_size;
@@ -280,9 +281,11 @@ static int open_file( access_t *p_access, const char *path )
     int fd = vlc_open( path, O_RDONLY | O_NONBLOCK );
     if( fd == -1 )
     {
-        msg_Err( p_access, "cannot open file %s (%m)", path );
+        msg_Err( p_access, "cannot open file %s: %s", path,
+                 vlc_strerror_c(errno) );
         dialog_Fatal( p_access, _( "File reading failed" ),
-                        _( "VLC could not open the file \"%s\". (%m)" ), path );
+                      _( "VLC could not open the file \"%s\": %s" ), path,
+                      vlc_strerror(errno) );
         return -1;
     }
 #ifdef F_RDAHEAD
