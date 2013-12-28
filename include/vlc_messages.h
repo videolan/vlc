@@ -81,6 +81,9 @@ VLC_API void vlc_vaLog(vlc_object_t *, int,
 # define MODULE_STRING __FILE__
 #endif
 
+VLC_API const char *vlc_strerror(int);
+VLC_API const char *vlc_strerror_c(int);
+
 /**
  * @}
  */

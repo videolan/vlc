@@ -270,6 +270,7 @@ SOURCES_libvlc_android = \
 
 SOURCES_libvlc_linux = \
 	posix/dirs.c \
+	posix/error.c \
 	posix/filesystem.c \
 	posix/netconf.c \
 	posix/plugin.c \
@@ -312,6 +313,7 @@ SOURCES_libvlc_os2 = \
 
 SOURCES_libvlc_other = \
 	posix/dirs.c \
+	posix/error.c \
 	posix/filesystem.c \
 	posix/netconf.c \
 	posix/thread.c \

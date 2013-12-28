@@ -255,6 +255,8 @@ vlc_module_unload
 vlc_Log
 vlc_LogSet
 vlc_vaLog
+vlc_strerror
+vlc_strerror_c
 msleep
 mstrtime
 mwait
