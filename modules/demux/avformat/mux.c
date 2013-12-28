@@ -340,8 +340,8 @@ static int Mux( sout_mux_t *p_mux )
         av_dict_free(&options);
         if( error < 0 )
         {
-            errno = AVUNERROR(error);
-            msg_Err( p_mux, "could not write header: %m" );
+            msg_Err( p_mux, "could not write header: %s",
+                     vlc_strerror_c(AVUNERROR(error)) );
             p_sys->b_write_header = false;
             p_sys->b_error = true;
             return VLC_EGENERIC;

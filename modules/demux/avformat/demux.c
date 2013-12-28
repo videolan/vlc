@@ -223,8 +223,8 @@ int OpenDemux( vlc_object_t *p_this )
 
     if( error < 0 )
     {
-        errno = AVUNERROR(error);
-        msg_Err( p_demux, "Could not open %s: %m", psz_url );
+        msg_Err( p_demux, "Could not open %s: %s", psz_url,
+                 vlc_strerror_c(AVUNERROR(error)) );
         p_sys->ic = NULL;
         free( psz_url );
         CloseDemux( p_this );
@@ -266,8 +266,8 @@ int OpenDemux( vlc_object_t *p_this )
 
     if( error < 0 )
     {
-        errno = AVUNERROR(error);
-        msg_Warn( p_demux, "Could not find stream info: %m" );
+        msg_Warn( p_demux, "Could not find stream info: %s",
+                  vlc_strerror_c(AVUNERROR(error)) );
     }
 
     for( i = 0; i < p_sys->ic->nb_streams; i++ )

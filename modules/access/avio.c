@@ -163,8 +163,8 @@ int OpenAvio(vlc_object_t *object)
     av_dict_free(&options);
 #endif
     if (ret < 0) {
-        errno = AVUNERROR(ret);
-        msg_Err(access, "Failed to open %s: %m", url);
+        msg_Err(access, "Failed to open %s: %s", url,
+                vlc_strerror_c(AVUNERROR(ret)));
         free(url);
         goto error;
     }
@@ -319,22 +319,20 @@ static ssize_t Write(sout_access_out_t *p_access, block_t *p_buffer)
 {
     access_sys_t *p_sys = (access_sys_t*)p_access->p_sys;
     size_t i_write = 0;
+    int val;
 
     while (p_buffer != NULL) {
         block_t *p_next = p_buffer->p_next;
 
 #if LIBAVFORMAT_VERSION_MAJOR < 54
-        int written = url_write(p_sys->context, p_buffer->p_buffer, p_buffer->i_buffer);
-        if (written < 0) {
-            errno = AVUNERROR(written);
+        val = url_write(p_sys->context, p_buffer->p_buffer, p_buffer->i_buffer);
+        if (val < 0)
             goto error;
-        }
         i_write += written;
 #else
         avio_write(p_sys->context, p_buffer->p_buffer, p_buffer->i_buffer);
         avio_flush(p_sys->context);
-        if (p_sys->context->error) {
-            errno = AVUNERROR(p_sys->context->error);
+        if ((val = p_sys->context->error) != 0) {
             p_sys->context->error = 0; /* FIXME? */
             goto error;
         }
@@ -349,7 +347,8 @@ static ssize_t Write(sout_access_out_t *p_access, block_t *p_buffer)
     return i_write;
 
 error:
-    msg_Err(p_access, "Wrote only %zu bytes (%m)", i_write);
+    msg_Err(p_access, "Wrote only %zu bytes: %s", i_write,
+            vlc_strerror_c(AVUNERROR(val)));
     block_ChainRelease( p_buffer );
     return i_write;
 }
@@ -368,8 +367,8 @@ static int Seek(access_t *access, uint64_t position)
     else
         ret = avio_seek(sys->context, position, SEEK_SET);
     if (ret < 0) {
-        errno = AVUNERROR(ret);
-        msg_Err(access, "Seek to %"PRIu64" failed: %m", position);
+        msg_Err(access, "Seek to %"PRIu64" failed: %s", position,
+                vlc_strerror_c(AVUNERROR(ret)));
         if (sys->size == 0 || position != sys->size)
             return VLC_EGENERIC;
     }
