@@ -232,6 +232,11 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( var_CreateGetBool( p_dec, "grayscale" ) )
         p_sys->p_context->flags |= CODEC_FLAG_GRAY;
 
+    /* ***** Output always the frames ***** */
+#if LIBAVCODEC_VERSION_CHECK(55, 23, 1, 40, 101)
+    p_sys->p_context->flags |= CODEC_FLAG_OUTPUT_CORRUPT;
+#endif
+
     i_val = var_CreateGetInteger( p_dec, "avcodec-vismv" );
     if( i_val ) p_sys->p_context->debug_mv = i_val;
 
