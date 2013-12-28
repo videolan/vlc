@@ -294,7 +294,7 @@ static block_t *BlockScan( access_t *p_access )
             if( errno == EINTR )
                 continue;
 
-            msg_Err( p_access, "poll error: %m" );
+            msg_Err( p_access, "poll error: %s", vlc_strerror_c(errno) );
             scan_session_Destroy( p_scan, session );
 
             p_access->info.b_eof = true;
@@ -328,7 +328,7 @@ static block_t *BlockScan( access_t *p_access )
             if( ( i_ret = read( p_sys->i_handle, p_block->p_buffer,
                                 i_read_once * TS_PACKET_SIZE ) ) <= 0 )
             {
-                msg_Warn( p_access, "read failed (%m)" );
+                msg_Warn( p_access, "read failed: %s", vlc_strerror_c(errno) );
                 block_Release( p_block );
                 continue;
             }

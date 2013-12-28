@@ -97,7 +97,8 @@ int FrontendOpen( access_t *p_access )
     msg_Dbg( p_access, "Opening device %s", frontend );
     if( (p_sys->i_frontend_handle = vlc_open(frontend, O_RDWR | O_NONBLOCK)) < 0 )
     {
-        msg_Err( p_access, "FrontEndOpen: opening device failed (%m)" );
+        msg_Err( p_access, "FrontEndOpen: opening device failed: %s",
+                 vlc_strerror_c(errno) );
         free( p_frontend );
         return VLC_EGENERIC;
     }
@@ -278,7 +279,8 @@ void FrontendPoll( access_t *p_access )
         if( ioctl( p_sys->i_frontend_handle, FE_GET_EVENT, &event ) < 0 )
         {
             if( errno != EWOULDBLOCK )
-                msg_Err( p_access, "frontend event error: %m" );
+                msg_Err( p_access, "frontend event error: %s",
+                         vlc_strerror_c(errno) );
             return;
         }
 
@@ -481,7 +483,8 @@ static int FrontendInfo( access_t *p_access )
     /* Determine type of frontend */
     if( ioctl( p_sys->i_frontend_handle, FE_GET_INFO, &p_frontend->info ) < 0 )
     {
-        msg_Err( p_access, "frontend info request error: %m" );
+        msg_Err( p_access, "frontend info request error: %s",
+                 vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
 
@@ -685,14 +688,15 @@ static int DoDiseqc( access_t *p_access )
     /* Switch off continuous tone. */
     if( ioctl( p_sys->i_frontend_handle, FE_SET_TONE, SEC_TONE_OFF ) < 0 )
     {
-        msg_Err( p_access, "switching tone %s error: %m", "off" );
+        msg_Err( p_access, "switching tone %s error: %s", "off",
+                 vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
 
     /* Configure LNB voltage. */
     if( ioctl( p_sys->i_frontend_handle, FE_SET_VOLTAGE, fe_voltage ) < 0 )
     {
-        msg_Err( p_access, "voltage error: %m" );
+        msg_Err( p_access, "voltage error: %s", vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
 
@@ -700,7 +704,8 @@ static int DoDiseqc( access_t *p_access )
     if( ioctl( p_sys->i_frontend_handle,
                FE_ENABLE_HIGH_LNB_VOLTAGE, b_val ) < 0 && b_val )
     {
-        msg_Err( p_access, "high LNB voltage error: %m" );
+        msg_Err( p_access, "high LNB voltage error: %s",
+                 vlc_strerror_c(errno) );
     }
 
     /* Wait for at least 15 ms. */
@@ -727,7 +732,8 @@ static int DoDiseqc( access_t *p_access )
         if( ioctl( p_sys->i_frontend_handle, FE_DISEQC_SEND_MASTER_CMD,
                    &cmd.cmd ) )
         {
-            msg_Err( p_access, "master command sending error: %m" );
+            msg_Err( p_access, "master command sending error: %s",
+                     vlc_strerror_c(errno) );
             return VLC_EGENERIC;
         }
 
@@ -737,7 +743,8 @@ static int DoDiseqc( access_t *p_access )
         if( ioctl( p_sys->i_frontend_handle, FE_DISEQC_SEND_BURST,
                   ((i_val - 1) % 2) ? SEC_MINI_B : SEC_MINI_A ) )
         {
-            msg_Err( p_access, "burst sending error: %m" );
+            msg_Err( p_access, "burst sending error: %s",
+                     vlc_strerror_c(errno) );
             return VLC_EGENERIC;
         }
 
@@ -746,8 +753,9 @@ static int DoDiseqc( access_t *p_access )
 
     if( ioctl( p_sys->i_frontend_handle, FE_SET_TONE, fe_tone ) )
     {
-        msg_Err( p_access, "switching tone %s error: %m",
-                 (fe_tone == SEC_TONE_ON) ? "on" : "off" );
+        msg_Err( p_access, "switching tone %s error: %s",
+                 (fe_tone == SEC_TONE_ON) ? "on" : "off",
+                 vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
 
@@ -851,7 +859,7 @@ static int FrontendSetQPSK( access_t *p_access )
     /* Now send it all to the frontend device */
     if( ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep ) < 0 )
     {
-        msg_Err( p_access, "frontend error: %m" );
+        msg_Err( p_access, "frontend error: %s", vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
 
@@ -899,7 +907,7 @@ static int FrontendSetQAM( access_t *p_access )
     /* Now send it all to the frontend device */
     if( ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep ) < 0 )
     {
-        msg_Err( p_access, "frontend error: %m" );
+        msg_Err( p_access, "frontend error: %s", vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
 
@@ -1003,7 +1011,7 @@ static int FrontendSetOFDM( access_t * p_access )
     /* Now send it all to the frontend device */
     if( ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep ) < 0 )
     {
-        msg_Err( p_access, "frontend error: %m" );
+        msg_Err( p_access, "frontend error: %s", vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
 
@@ -1035,7 +1043,7 @@ static int FrontendSetATSC( access_t *p_access )
     /* Now send it all to the frontend device */
     if( ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep ) < 0 )
     {
-        msg_Err( p_access, "frontend error: %m" );
+        msg_Err( p_access, "frontend error: %s", vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
 
@@ -1069,7 +1077,8 @@ int DMXSetFilter( access_t * p_access, int i_pid, int * pi_fd, int i_type )
     msg_Dbg( p_access, "Opening device %s", dmx );
     if( (*pi_fd = vlc_open(dmx, O_RDWR)) < 0 )
     {
-        msg_Err( p_access, "DMXSetFilter: opening device failed (%m)" );
+        msg_Err( p_access, "DMXSetFilter: opening device failed: %s",
+                 vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
 
@@ -1175,7 +1184,8 @@ int DMXSetFilter( access_t * p_access, int i_pid, int * pi_fd, int i_type )
     /* We then give the order to the device : */
     if( ioctl( *pi_fd, DMX_SET_PES_FILTER, &s_filter_params ) )
     {
-        msg_Err( p_access, "setting demux PES filter failed: %m" );
+        msg_Err( p_access, "setting demux PES filter failed: %s",
+                 vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -1188,7 +1198,8 @@ int DMXUnsetFilter( access_t * p_access, int i_fd )
 {
     if( ioctl( i_fd, DMX_STOP ) < 0 )
     {
-        msg_Err( p_access, "stopping demux failed: %m" );
+        msg_Err( p_access, "stopping demux failed: %s",
+                 vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
 
@@ -1224,13 +1235,15 @@ int DVROpen( access_t * p_access )
     msg_Dbg( p_access, "Opening device %s", dvr );
     if( (p_sys->i_handle = vlc_open(dvr, O_RDONLY)) < 0 )
     {
-        msg_Err( p_access, "DVROpen: opening device failed (%m)" );
+        msg_Err( p_access, "DVROpen: opening device failed: %s",
+                 vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
 
     if( fcntl( p_sys->i_handle, F_SETFL, O_NONBLOCK ) == -1 )
     {
-        msg_Warn( p_access, "DVROpen: couldn't set non-blocking mode (%m)" );
+        msg_Warn( p_access, "DVROpen: couldn't set non-blocking mode: %s",
+                  vlc_strerror_c(errno) );
     }
 
     return VLC_SUCCESS;
