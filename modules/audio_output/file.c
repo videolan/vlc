@@ -30,6 +30,9 @@
 # include "config.h"
 #endif
 
+#include <stdio.h>
+#include <errno.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
@@ -254,7 +257,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
         if( fwrite( wh, sizeof(WAVEHEADER), 1,
                     p_aout->sys->p_file ) != 1 )
         {
-            msg_Err( p_aout, "write error (%m)" );
+            msg_Err( p_aout, "write error: %s", vlc_strerror_c(errno) );
         }
     }
 
@@ -277,7 +280,7 @@ static void Stop( audio_output_t *p_aout )
         /* Write Wave Header */
         if( fseek( p_aout->sys->p_file, 0, SEEK_SET ) )
         {
-            msg_Err( p_aout, "seek error (%m)" );
+            msg_Err( p_aout, "seek error: %s", vlc_strerror_c(errno) );
         }
 
         /* Header -> little endian format */
@@ -289,7 +292,7 @@ static void Stop( audio_output_t *p_aout )
         if( fwrite( &p_aout->sys->waveh, sizeof(WAVEHEADER), 1,
                     p_aout->sys->p_file ) != 1 )
         {
-            msg_Err( p_aout, "write error (%m)" );
+            msg_Err( p_aout, "write error: %s", vlc_strerror_c(errno) );
         }
     }
 
@@ -306,7 +309,7 @@ static void Play( audio_output_t * p_aout, block_t *p_buffer )
     if( fwrite( p_buffer->p_buffer, p_buffer->i_buffer, 1,
                 p_aout->sys->p_file ) != 1 )
     {
-        msg_Err( p_aout, "write error (%m)" );
+        msg_Err( p_aout, "write error: %s", vlc_strerror_c(errno) );
     }
 
     if( p_aout->sys->b_add_wav_header )
@@ -321,7 +324,7 @@ static void Play( audio_output_t * p_aout, block_t *p_buffer )
 static void Flush( audio_output_t *aout, bool wait )
 {
     if( fflush( aout->sys->p_file ) )
-        msg_Err( aout, "flush error (%m)" );
+        msg_Err( aout, "flush error: %s", vlc_strerror_c(errno) );
     (void) wait;
 }
 

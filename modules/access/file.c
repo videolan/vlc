@@ -172,9 +172,11 @@ int FileOpen( vlc_object_t *p_this )
         fd = vlc_open (path, O_RDONLY | O_NONBLOCK);
         if (fd == -1)
         {
-            msg_Err (p_access, "cannot open file %s (%m)", path);
+            msg_Err (p_access, "cannot open file %s (%s)", path,
+                     vlc_strerror_c(errno));
             dialog_Fatal (p_access, _("File reading failed"),
-                          _("VLC could not open the file \"%s\" (%m)."), path);
+                          _("VLC could not open the file \"%s\" (%s)."), path,
+                          vlc_strerror(errno));
         }
     }
     if (fd == -1)
@@ -183,7 +185,7 @@ int FileOpen( vlc_object_t *p_this )
     struct stat st;
     if (fstat (fd, &st))
     {
-        msg_Err (p_access, "failed to read (%m)");
+        msg_Err (p_access, "read error: %s", vlc_strerror_c(errno));
         goto error;
     }
 
@@ -295,9 +297,10 @@ static ssize_t FileRead (access_t *p_access, uint8_t *p_buffer, size_t i_len)
                 return -1;
         }
 
-        msg_Err (p_access, "read error: %m");
+        msg_Err (p_access, "read error: %s", vlc_strerror_c(errno));
         dialog_Fatal (p_access, _("File reading failed"),
-                      _("VLC could not read the file (%m)."));
+                      _("VLC could not read the file (%s)."),
+                      vlc_strerror(errno));
         val = 0;
     }
 
@@ -348,7 +351,7 @@ static ssize_t StreamRead (access_t *p_access, uint8_t *p_buffer, size_t i_len)
             case EAGAIN:
                 return -1;
         }
-        msg_Err (p_access, "read error: %m");
+        msg_Err (p_access, "read error: %s", vlc_strerror_c(errno));
         val = 0;
     }
 

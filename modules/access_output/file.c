@@ -149,7 +149,8 @@ static int Open( vlc_object_t *p_this )
         fd = vlc_dup (fd);
         if (fd == -1)
         {
-            msg_Err (p_access, "cannot use file descriptor: %m");
+            msg_Err (p_access, "cannot use file descriptor: %s",
+                     vlc_strerror_c(errno));
             return VLC_EGENERIC;
         }
     }
@@ -162,7 +163,8 @@ static int Open( vlc_object_t *p_this )
         fd = vlc_dup (STDOUT_FILENO);
         if (fd == -1)
         {
-            msg_Err (p_access, "cannot use standard output: %m");
+            msg_Err (p_access, "cannot use standard output: %s",
+                     vlc_strerror_c(errno));
             return VLC_EGENERIC;
         }
         msg_Dbg( p_access, "using stdout" );
@@ -194,7 +196,8 @@ static int Open( vlc_object_t *p_this )
             if (fd != -1)
                 break;
             if (fd == -1)
-                msg_Err (p_access, "cannot create %s: %m", path);
+                msg_Err (p_access, "cannot create %s: %s", path,
+                         vlc_strerror_c(errno));
             if (overwrite || errno != EEXIST)
                 break;
             flags &= ~O_EXCL;
@@ -293,7 +296,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
             if (errno == EINTR)
                 continue;
             block_ChainRelease (p_buffer);
-            msg_Err( p_access, "cannot write: %m" );
+            msg_Err( p_access, "cannot write: %s", vlc_strerror_c(errno) );
             return -1;
         }
 
