@@ -123,7 +123,8 @@ int InitVideo (access_t *access, int fd, uint32_t caps)
         struct v4l2_format fmt = { .type = V4L2_BUF_TYPE_VIDEO_CAPTURE };
         if (v4l2_ioctl (fd, VIDIOC_G_FMT, &fmt) < 0)
         {
-            msg_Err (access, "cannot get default format: %m");
+            msg_Err (access, "cannot get default format: %s",
+                     vlc_strerror_c(errno));
             return -1;
         }
         pixfmt = fmt.fmt.pix.pixelformat;
@@ -210,7 +211,7 @@ static int AccessPoll (access_t *access)
         case 0:
             /* FIXME: kill this case (arbitrary timeout) */
                 return -1;
-            msg_Err (access, "poll error: %m");
+            msg_Err (access, "poll error: %s", vlc_strerror_c(errno));
             access->info.b_eof = true;
             return -1;
     }
@@ -249,7 +250,7 @@ static block_t *ReadBlock (access_t *access)
     if (val < 0)
     {
         block_Release (block);
-        msg_Err (access, "cannot read buffer: %m");
+        msg_Err (access, "cannot read buffer: %s", vlc_strerror_c(errno));
         access->info.b_eof = true;
         return NULL;
     }

@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <assert.h>
+#include <errno.h>
 #include <sys/ioctl.h>
 
 #include <vlc_common.h>
@@ -176,7 +177,7 @@ static int ControlSetCallback (vlc_object_t *obj, const char *var,
 
     if (ret)
     {
-        msg_Err (obj, "cannot set control %s: %m", var);
+        msg_Err (obj, "cannot set control %s: %s", var, vlc_strerror_c(errno));
         return VLC_EGENERIC;
     }
     (void) old;

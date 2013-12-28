@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
+#include <errno.h>
 #include <sys/types.h>
 #include <fcntl.h>
 
@@ -470,14 +470,16 @@ int OpenDevice (vlc_object_t *obj, const char *path, uint32_t *restrict caps)
     int rawfd = vlc_open (path, O_RDWR);
     if (rawfd == -1)
     {
-        msg_Err (obj, "cannot open device '%s': %m", path);
+        msg_Err (obj, "cannot open device '%s': %s", path,
+                 vlc_strerror_c(errno));
         return -1;
     }
 
     int fd = v4l2_fd_open (rawfd, 0);
     if (fd == -1)
     {
-        msg_Warn (obj, "cannot initialize user-space library: %m");
+        msg_Warn (obj, "cannot initialize user-space library: %s",
+                  vlc_strerror_c(errno));
         /* fallback to direct kernel mode anyway */
         fd = rawfd;
     }
@@ -486,7 +488,8 @@ int OpenDevice (vlc_object_t *obj, const char *path, uint32_t *restrict caps)
     struct v4l2_capability cap;
     if (v4l2_ioctl (fd, VIDIOC_QUERYCAP, &cap) < 0)
     {
-        msg_Err (obj, "cannot get device capabilities: %m");
+        msg_Err (obj, "cannot get device capabilities: %s",
+                 vlc_strerror_c(errno));
         v4l2_close (fd);
         return -1;
     }
