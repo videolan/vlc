@@ -1090,7 +1090,7 @@ static int NetFillBuffer( access_t *p_access )
 
     if( i_ret < 0 )
     {
-        msg_Err( p_access, "network poll error (%m)" );
+        msg_Err( p_access, "network poll error: %s", vlc_strerror_c(errno) );
         return -1;
     }
 
