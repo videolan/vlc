@@ -94,7 +94,7 @@ struct aout_sys_t
 
 /* NOTE: The Core Audio API documentation totally fails to specify the thread
  * safety (or lack thereof) of the interfaces. This code takes the most
- * restrictive assumption, no thread safety: The background thread (MMThread)
+ * restrictive assumption: no thread safety. The background thread (MMThread)
  * only runs at specified times, namely between the device_ready and
  * device_changed events (effectively, a thread barrier but only Windows 8
  * provides thread barriers natively).
