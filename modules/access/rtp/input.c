@@ -30,6 +30,7 @@
 #include <vlc_network.h>
 
 #include <limits.h>
+#include <errno.h>
 #include <unistd.h>
 #ifdef HAVE_POLL
 # include <poll.h>
@@ -136,7 +137,8 @@ void *rtp_dgram_thread (void *opaque)
             }
             else
             {
-                msg_Warn (demux, "RTP network error: %m");
+                msg_Warn (demux, "RTP network error: %s",
+                          vlc_strerror_c(errno));
                 block_Release (block);
             }
         }

@@ -1039,12 +1039,13 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         }
 
         char *salt = var_GetNonEmptyString (p_stream, SOUT_CFG_PREFIX"salt");
-        errno = srtp_setkeystring (id->srtp, key, salt ? salt : "");
+        int val = srtp_setkeystring (id->srtp, key, salt ? salt : "");
         free (salt);
         free (key);
-        if (errno)
+        if (val)
         {
-            msg_Err (p_stream, "bad SRTP key/salt combination (%m)");
+            msg_Err (p_stream, "bad SRTP key/salt combination (%s)",
+                     vlc_strerror_c(val));
             goto error;
         }
         id->i_sequence = 0; /* FIXME: awful hack for libvlc_srtp */
@@ -1329,8 +1330,8 @@ static int FileSetup( sout_stream_t *p_stream )
 
     if( ( f = vlc_fopen( p_sys->psz_sdp_file, "wt" ) ) == NULL )
     {
-        msg_Err( p_stream, "cannot open file '%s' (%m)",
-                 p_sys->psz_sdp_file );
+        msg_Err( p_stream, "cannot open file '%s' (%s)",
+                 p_sys->psz_sdp_file, vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
 
@@ -1421,8 +1422,8 @@ static void* ThreadSend( void *data )
             vlc_restorecancel (canc);
             if( val )
             {
-                errno = val;
-                msg_Dbg( id->p_stream, "SRTP sending error: %m" );
+                msg_Dbg( id->p_stream, "SRTP sending error: %s",
+                         vlc_strerror_c(val) );
                 block_Release( out );
                 out = NULL;
             }
