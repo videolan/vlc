@@ -46,6 +46,7 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>
 #include <stdlib.h>                                                /* free() */
+#include <errno.h>
 
 #include "config/vlc_getopt.h"
 
@@ -235,8 +236,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             }
             else
             {
-                msg_Err( p_libvlc, "cannot open pid file for writing: %s (%m)",
-                         psz_pidfile );
+                msg_Err( p_libvlc, "cannot open pid file %s for writing: %s",
+                         psz_pidfile, vlc_strerror_c(errno) );
             }
         }
         free( psz_pidfile );
@@ -562,8 +563,8 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
             msg_Dbg( p_libvlc, "removing pid file %s", psz_pidfile );
             if( unlink( psz_pidfile ) == -1 )
             {
-                msg_Dbg( p_libvlc, "removing pid file %s: %m",
-                        psz_pidfile );
+                msg_Dbg( p_libvlc, "removing pid file %s: %s",
+                        psz_pidfile, vlc_strerror_c(errno) );
             }
         }
         free( psz_pidfile );

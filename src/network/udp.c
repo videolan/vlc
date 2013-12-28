@@ -113,7 +113,7 @@ static int net_SetupDgramSocket (vlc_object_t *p_obj, int fd,
 #endif
     if (bind (fd, ptr->ai_addr, ptr->ai_addrlen))
     {
-        msg_Err( p_obj, "socket bind error (%m)" );
+        msg_Err( p_obj, "socket bind error: %s", vlc_strerror_c(net_errno) );
         net_Close (fd);
         return -1;
     }
@@ -152,7 +152,7 @@ static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
                              ptr->ai_protocol);
         if (fd == -1)
         {
-            msg_Dbg (obj, "socket error: %m");
+            msg_Dbg (obj, "socket error: %s", vlc_strerror_c(net_errno));
             continue;
         }
 
@@ -208,7 +208,7 @@ static int net_SetMcastHopLimit( vlc_object_t *p_this,
 
         default:
             errno = EAFNOSUPPORT;
-            msg_Warn( p_this, "%m" );
+            msg_Warn( p_this, "%s", vlc_strerror_c(EAFNOSUPPORT) );
             return VLC_EGENERIC;
     }
 
@@ -217,11 +217,13 @@ static int net_SetMcastHopLimit( vlc_object_t *p_this,
         /* BSD compatibility */
         unsigned char buf;
 
-        msg_Dbg( p_this, "cannot set hop limit (%d): %m", hlim );
+        msg_Dbg( p_this, "cannot set hop limit (%d): %s", hlim,
+                 vlc_strerror_c(net_errno) );
         buf = (unsigned char)(( hlim > 255 ) ? 255 : hlim);
         if( setsockopt( fd, proto, cmd, &buf, sizeof( buf ) ) )
         {
-            msg_Err( p_this, "cannot set hop limit (%d): %m", hlim );
+            msg_Err( p_this, "cannot set hop limit (%d): %s", hlim,
+                     vlc_strerror_c(net_errno) );
             return VLC_EGENERIC;
         }
     }
@@ -263,7 +265,8 @@ static int net_SetMcastOut (vlc_object_t *p_this, int fd, int family,
         default:
             errno = EAFNOSUPPORT;
     }
-    msg_Err (p_this, "cannot force multicast interface %s: %m", iface);
+    msg_Err (p_this, "cannot force multicast interface %s: %s", iface,
+             vlc_strerror_c(errno));
     return -1;
 }
 
@@ -360,7 +363,8 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
     }
 
 #endif
-    msg_Err (obj, "cannot join source multicast group: %m");
+    msg_Err (obj, "cannot join source multicast group: %s",
+             vlc_strerror_c(net_errno));
     msg_Warn (obj, "trying ASM instead of SSM...");
     return net_Subscribe (obj, fd, grp, grplen);
 }
@@ -444,7 +448,8 @@ int net_Subscribe (vlc_object_t *obj, int fd,
     }
 
 #endif
-    msg_Err (obj, "cannot join multicast group: %m");
+    msg_Err (obj, "cannot join multicast group: %s",
+             vlc_strerror_c(net_errno));
     return -1;
 }
 
@@ -549,7 +554,8 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
 #endif
             b_unreach = true;
         else
-            msg_Warn( p_this, "%s port %d : %m", psz_host, i_port);
+            msg_Warn( p_this, "%s port %d : %s", psz_host, i_port,
+                      vlc_strerror_c(errno) );
         net_Close( fd );
     }
 
@@ -630,8 +636,8 @@ int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
                                      ptr->ai_addr, ptr->ai_addrlen)
               : connect (fd, ptr2->ai_addr, ptr2->ai_addrlen))
             {
-                msg_Err (obj, "cannot connect to %s port %d: %m",
-                         psz_server, i_server);
+                msg_Err (obj, "cannot connect to %s port %d: %s",
+                         psz_server, i_server, vlc_strerror_c(net_errno));
                 continue;
             }
             val = fd;

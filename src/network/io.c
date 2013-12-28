@@ -85,7 +85,8 @@ int net_Socket (vlc_object_t *p_this, int family, int socktype,
     if (fd == -1)
     {
         if (net_errno != EAFNOSUPPORT)
-            msg_Err (p_this, "cannot create socket: %m");
+            msg_Err (p_this, "cannot create socket: %s",
+                     vlc_strerror_c(net_errno));
         return -1;
     }
 
@@ -158,7 +159,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
                              ptr->ai_protocol);
         if (fd == -1)
         {
-            msg_Dbg (p_this, "socket error: %m");
+            msg_Dbg (p_this, "socket error: %s", vlc_strerror_c(net_errno));
             continue;
         }
 
@@ -198,7 +199,8 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
             else
 #endif
             {
-                msg_Err (p_this, "socket bind error (%m)");
+                msg_Err (p_this, "socket bind error: %s",
+                         vlc_strerror_c(net_errno));
                 continue;
             }
         }
@@ -223,7 +225,8 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
 #endif
                 if (listen (fd, INT_MAX))
                 {
-                    msg_Err (p_this, "socket listen error (%m)");
+                    msg_Err (p_this, "socket listen error: %s",
+                             vlc_strerror_c(net_errno));
                     net_Close (fd);
                     continue;
                 }
@@ -360,7 +363,7 @@ do_poll:
 
     return i_total;
 error:
-    msg_Err (p_this, "read error: %m");
+    msg_Err (p_this, "read error: %s", vlc_strerror_c(errno));
     return -1;
 }
 
@@ -400,7 +403,7 @@ ssize_t net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
         {
             if (errno == EINTR)
                 continue;
-            msg_Err (p_this, "Polling error: %m");
+            msg_Err (p_this, "Polling error: %s", vlc_strerror_c(errno));
             return -1;
         }
 
@@ -435,7 +438,7 @@ ssize_t net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
         {
             if (errno == EINTR)
                 continue;
-            msg_Err (p_this, "Write error: %m");
+            msg_Err (p_this, "Write error: %s", vlc_strerror_c(errno));
             break;
         }
 

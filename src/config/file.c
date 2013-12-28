@@ -84,8 +84,8 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
     FILE *p_stream = vlc_fopen( psz_filename, "rt" );
     if( p_stream == NULL && errno != ENOENT )
     {
-        msg_Err( p_obj, "cannot open config file (%s): %m",
-                 psz_filename );
+        msg_Err( p_obj, "cannot open config file (%s): %s",
+                 psz_filename, vlc_strerror_c(errno) );
 
     }
 #if !( defined(_WIN32) || defined(__APPLE__) || defined(__OS2__) )
@@ -229,8 +229,9 @@ int config_LoadConfigFile( vlc_object_t *p_this )
                 if ((l > item->max.i) || (l < item->min.i))
                     errno = ERANGE;
                 if (errno)
-                    msg_Warn (p_this, "Integer value (%s) for %s: %m",
-                              psz_option_value, psz_option_name);
+                    msg_Warn (p_this, "Integer value (%s) for %s: %s",
+                              psz_option_value, psz_option_name,
+                              vlc_strerror_c(errno));
                 else
                     item->value.i = l;
                 break;
@@ -253,7 +254,8 @@ int config_LoadConfigFile( vlc_object_t *p_this )
 
     if (ferror (file))
     {
-        msg_Err (p_this, "error reading configuration: %m");
+        msg_Err (p_this, "error reading configuration: %s",
+                 vlc_strerror_c(errno));
         clearerr (file);
     }
     fclose (file);
@@ -300,7 +302,8 @@ int config_CreateDir( vlc_object_t *p_this, const char *psz_dirname )
         }
     }
 
-    msg_Warn( p_this, "could not create %s: %m", psz_dirname );
+    msg_Warn( p_this, "could not create %s: %s", psz_dirname,
+              vlc_strerror_c(errno) );
     return -1;
 }
 
@@ -399,7 +402,8 @@ int config_SaveConfigFile (vlc_object_t *p_this)
     FILE *file = fdopen (fd, "wt");
     if (file == NULL)
     {
-        msg_Err (p_this, "cannot create configuration file: %m");
+        msg_Err (p_this, "cannot create configuration file: %s",
+                 vlc_strerror_c(errno));
         vlc_rwlock_unlock (&config_lock);
         close (fd);
         vlc_mutex_unlock (&lock);

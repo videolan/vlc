@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -57,8 +58,8 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename,
     p_export->psz_filename = psz_filename;
     p_export->p_file = vlc_fopen( psz_filename, "wt" );
     if( p_export->p_file == NULL )
-        msg_Err( p_export, "could not create playlist file %s (%m)",
-                 psz_filename );
+        msg_Err( p_export, "could not create playlist file %s: %s",
+                 psz_filename, vlc_strerror_c(errno) );
     else
     {
         module_t *p_module;

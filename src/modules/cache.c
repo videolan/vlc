@@ -245,8 +245,8 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
     file = vlc_fopen( psz_filename, "rb" );
     if( !file )
     {
-        msg_Warn( p_this, "cannot read %s (%m)",
-                  psz_filename );
+        msg_Warn( p_this, "cannot read %s: %s", psz_filename,
+                  vlc_strerror_c(errno) );
         free( psz_filename );
         return 0;
     }
@@ -499,13 +499,15 @@ void CacheSave (vlc_object_t *p_this, const char *dir,
     if (file == NULL)
     {
         if (errno != EACCES && errno != ENOENT)
-            msg_Warn (p_this, "cannot create %s (%m)", tmpname);
+            msg_Warn (p_this, "cannot create %s: %s", tmpname,
+                      vlc_strerror_c(errno));
         goto out;
     }
 
     if (CacheSaveBank (file, entries, n))
     {
-        msg_Warn (p_this, "cannot write %s (%m)", tmpname);
+        msg_Warn (p_this, "cannot write %s: %s", tmpname,
+                  vlc_strerror_c(errno));
         clearerr (file);
         fclose (file);
         vlc_unlink (tmpname);

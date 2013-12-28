@@ -1052,7 +1052,7 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
 
     if( vlc_object_waitpipe( VLC_OBJECT( host ) ) == -1 )
     {
-        msg_Err( host, "signaling pipe error: %m" );
+        msg_Err( host, "signaling pipe error: %s", vlc_strerror_c(errno) );
         goto error;
     }
 
@@ -2292,7 +2292,8 @@ static void* httpd_HostThread( void *data )
                 if (errno != EINTR)
                 {
                     /* Kernel on low memory or a bug: pace */
-                    msg_Err( host, "polling error: %m" );
+                    msg_Err( host, "polling error: %s",
+                             vlc_strerror_c(errno) );
                     msleep( 100000 );
                 }
             case 0:

@@ -158,7 +158,7 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
                              ptr->ai_socktype, ptr->ai_protocol );
         if( fd == -1 )
         {
-            msg_Dbg( p_this, "socket error: %m" );
+            msg_Dbg( p_this, "socket error: %s", vlc_strerror_c(net_errno) );
             continue;
         }
 
@@ -168,7 +168,8 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
 
             if( net_errno != EINPROGRESS && net_errno != EINTR )
             {
-                msg_Err( p_this, "connection failed: %m" );
+                msg_Err( p_this, "connection failed: %s",
+                         vlc_strerror_c(net_errno) );
                 goto next_ai;
             }
 
@@ -185,7 +186,8 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
             switch (val)
             {
                  case -1: /* error */
-                     msg_Err (p_this, "connection polling error: %m");
+                     msg_Err (p_this, "polling error: %s",
+                              vlc_strerror_c(net_errno));
                      goto next_ai;
 
                  case 0: /* timeout */
@@ -202,8 +204,8 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
             if (getsockopt (fd, SOL_SOCKET, SO_ERROR, &val,
                             &(socklen_t){ sizeof (val) }) || val)
             {
-                errno = val;
-                msg_Err (p_this, "connection failed: %m");
+                msg_Err (p_this, "connection failed: %s",
+                         vlc_strerror_c(val));
                 goto next_ai;
             }
         }
@@ -250,7 +252,8 @@ int net_AcceptSingle (vlc_object_t *obj, int lfd)
     if (fd == -1)
     {
         if (net_errno != EAGAIN && net_errno != EWOULDBLOCK)
-            msg_Err (obj, "accept failed (from socket %d): %m", lfd);
+            msg_Err (obj, "accept failed (from socket %d): %s", lfd,
+                     vlc_strerror_c(net_errno));
         return -1;
     }
 
@@ -297,7 +300,7 @@ int net_Accept (vlc_object_t *p_this, int *pi_fd)
         {
             if (net_errno != EINTR)
             {
-                msg_Err (p_this, "poll error: %m");
+                msg_Err (p_this, "poll error: %s", vlc_strerror_c(net_errno));
                 return -1;
             }
         }
