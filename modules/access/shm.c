@@ -26,6 +26,7 @@
 
 #include <stdarg.h>
 #include <math.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 #ifdef HAVE_SYS_SHM_H
@@ -182,7 +183,8 @@ static int Open (vlc_object_t *obj)
     {
         sys->fd = vlc_open (path, O_RDONLY);
         if (sys->fd == -1)
-            msg_Err (demux, "cannot open file %s: %m", path);
+            msg_Err (demux, "cannot open file %s: %s", path,
+                     vlc_strerror_c(errno));
         free (path);
         if (sys->fd == -1)
             goto error;
@@ -204,7 +206,8 @@ static int Open (vlc_object_t *obj)
 
         if (mem == (const void *)(-1))
         {
-            msg_Err (demux, "cannot attach segment %d: %m", id);
+            msg_Err (demux, "cannot attach segment %d: %s", id,
+                     vlc_strerror_c(errno));
             goto error;
         }
         sys->mem.addr = mem;
