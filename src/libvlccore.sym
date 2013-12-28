@@ -593,6 +593,7 @@ vlm_MessageDelete
 vlm_MessageNew
 vlm_MessageSimpleNew
 vlm_New
+vout_ChangeAspectRatio
 vout_Close
 vout_GetPicture
 vout_PutPicture
