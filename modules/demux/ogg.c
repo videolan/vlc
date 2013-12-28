@@ -1101,6 +1101,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
 
         b_selected = false; /* Discard the header packet */
     }
+    else
+        p_stream->b_initializing = false;
 
     /* Convert the pcr into a pts */
     if( p_stream->fmt.i_codec == VLC_CODEC_VORBIS ||
