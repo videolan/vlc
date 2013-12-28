@@ -204,7 +204,8 @@ dvb_device_t *dvb_open (vlc_object_t *obj)
     d->dir = dvb_open_adapter (adapter);
     if (d->dir == -1)
     {
-        msg_Err (obj, "cannot access adapter %"PRIu8": %m", adapter);
+        msg_Err (obj, "cannot access adapter %"PRIu8": %s", adapter,
+                 vlc_strerror_c(errno));
         free (d);
         return NULL;
     }
@@ -221,14 +222,16 @@ dvb_device_t *dvb_open (vlc_object_t *obj)
        d->demux = dvb_open_node (d, "demux", O_RDONLY);
        if (d->demux == -1)
        {
-           msg_Err (obj, "cannot access demultiplexer: %m");
+           msg_Err (obj, "cannot access demultiplexer: %s",
+                    vlc_strerror_c(errno));
            close (d->dir);
            free (d);
            return NULL;
        }
 
        if (ioctl (d->demux, DMX_SET_BUFFER_SIZE, 1 << 20) < 0)
-           msg_Warn (obj, "cannot expand demultiplexing buffer: %m");
+           msg_Warn (obj, "cannot expand demultiplexing buffer: %s",
+                     vlc_strerror_c(errno));
 
        /* We need to filter at least one PID. The tap for TS demultiplexing
         * cannot be configured otherwise. So add the PAT. */
@@ -241,7 +244,8 @@ dvb_device_t *dvb_open (vlc_object_t *obj)
         param.flags = DMX_IMMEDIATE_START;
         if (ioctl (d->demux, DMX_SET_PES_FILTER, &param) < 0)
         {
-            msg_Err (obj, "cannot setup TS demultiplexer: %m");
+            msg_Err (obj, "cannot setup TS demultiplexer: %s",
+                     vlc_strerror_c(errno));
             goto error;
         }
 #ifndef USE_DMX
@@ -253,7 +257,7 @@ dvb_device_t *dvb_open (vlc_object_t *obj)
         d->demux = dvb_open_node (d, "dvr", O_RDONLY);
         if (d->demux == -1)
         {
-            msg_Err (obj, "cannot access DVR: %m");
+            msg_Err (obj, "cannot access DVR: %s", vlc_strerror_c(errno));
             close (d->dir);
             free (d);
             return NULL;
@@ -270,7 +274,8 @@ dvb_device_t *dvb_open (vlc_object_t *obj)
             close (ca);
     }
     else
-        msg_Dbg (obj, "conditional access module not available (%m)");
+        msg_Dbg (obj, "conditional access module not available: %s",
+                 vlc_strerror_c(errno));
 #endif
     return d;
 
@@ -339,7 +344,8 @@ ssize_t dvb_read (dvb_device_t *d, void *buf, size_t len)
                 msg_Err (d->obj, "cannot dequeue events fast enough!");
                 return -1;
             }
-            msg_Err (d->obj, "cannot dequeue frontend event: %m");
+            msg_Err (d->obj, "cannot dequeue frontend event: %s",
+                     vlc_strerror_c(errno));
             return 0;
         }
 
@@ -356,7 +362,7 @@ ssize_t dvb_read (dvb_device_t *d, void *buf, size_t len)
                 msg_Err (d->obj, "cannot demux data fast enough!");
                 return -1;
             }
-            msg_Err (d->obj, "cannot demux: %m");
+            msg_Err (d->obj, "cannot demux: %s", vlc_strerror_c(errno));
             return 0;
         }
         return val;
@@ -405,7 +411,8 @@ int dvb_add_pid (dvb_device_t *d, uint16_t pid)
     errno = EMFILE;
 error:
 #endif
-    msg_Err (d->obj, "cannot add PID 0x%04"PRIu16": %m", pid);
+    msg_Err (d->obj, "cannot add PID 0x%04"PRIu16": %s", pid,
+             vlc_strerror_c(errno));
     return -1;
 }
 
@@ -437,7 +444,7 @@ static int dvb_open_frontend (dvb_device_t *d)
     int fd = dvb_open_node (d, "frontend", O_RDWR);
     if (fd == -1)
     {
-        msg_Err (d->obj, "cannot access frontend: %m");
+        msg_Err (d->obj, "cannot access frontend: %s", vlc_strerror_c(errno));
         return -1;
     }
 
@@ -466,7 +473,8 @@ unsigned dvb_enum_systems (dvb_device_t *d)
 
     if (ioctl (d->frontend, FE_GET_PROPERTY, &props) < 0)
     {
-         msg_Err (d->obj, "cannot enumerate frontend systems: %m");
+         msg_Err (d->obj, "cannot enumerate frontend systems: %s",
+                  vlc_strerror_c(errno));
          goto legacy;
     }
 
@@ -525,7 +533,8 @@ legacy:
 #endif
     if (ioctl (d->frontend, FE_GET_PROPERTY, &props) < 0)
     {
-        msg_Err (d->obj, "unsupported kernel DVB version 3 or older (%m)");
+        msg_Err (d->obj, "unsupported kernel DVB version 3 or older (%s)",
+                 vlc_strerror_c(errno));
         return 0;
     }
 
@@ -544,7 +553,8 @@ legacy:
     struct dvb_frontend_info info;
     if (ioctl (d->frontend, FE_GET_INFO, &info) < 0)
     {
-        msg_Err (d->obj, "cannot get frontend info: %m");
+        msg_Err (d->obj, "cannot get frontend info: %s",
+                 vlc_strerror_c(errno));
         return 0;
     }
     msg_Dbg (d->obj, " name %s", info.name);
@@ -635,7 +645,8 @@ static int dvb_vset_props (dvb_device_t *d, size_t n, va_list ap)
 
     if (ioctl (d->frontend, FE_SET_PROPERTY, &props) < 0)
     {
-        msg_Err (d->obj, "cannot set frontend tuning parameters: %m");
+        msg_Err (d->obj, "cannot set frontend tuning parameters: %s",
+                 vlc_strerror_c(errno));
         return -1;
     }
     return 0;
@@ -715,7 +726,8 @@ int dvb_set_sec (dvb_device_t *d, uint64_t freq_Hz, char pol,
     /* Always try to configure high voltage, but only warn on enable failure */
     int val = var_InheritBool (d->obj, "dvb-high-voltage");
     if (ioctl (d->frontend, FE_ENABLE_HIGH_LNB_VOLTAGE, &val) < 0 && val)
-        msg_Err (d->obj, "cannot enable high LNB voltage: %m");
+        msg_Err (d->obj, "cannot enable high LNB voltage: %s",
+                 vlc_strerror_c(errno));
 
     /* Windows BDA exposes a higher-level API covering LNB oscillators.
      * So lets pretend this is platform-specific stuff and do it here. */
@@ -810,7 +822,8 @@ known:
           uncmd.msg_len = 4; /* length */
           if (ioctl (d->frontend, FE_DISEQC_SEND_MASTER_CMD, &uncmd) < 0)
           {
-              msg_Err (d->obj, "cannot send uncommitted DiSEqC command: %m");
+              msg_Err (d->obj, "cannot send uncommitted DiSEqC command: %s",
+                       vlc_strerror_c(errno));
               return -1;
           }
           /* Repeat uncommitted command */
@@ -818,14 +831,16 @@ known:
           if (ioctl (d->frontend, FE_DISEQC_SEND_MASTER_CMD, &uncmd) < 0)
           {
               msg_Err (d->obj,
-                       "cannot send repeated uncommitted DiSEqC command: %m");
+                       "cannot send repeated uncommitted DiSEqC command: %s",
+                       vlc_strerror_c(errno));
               return -1;
           }
           msleep(125000); /* wait 125 ms before committed DiSEqC command */
         }
         if (ioctl (d->frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) < 0)
         {
-            msg_Err (d->obj, "cannot send committed DiSEqC command: %m");
+            msg_Err (d->obj, "cannot send committed DiSEqC command: %s",
+                     vlc_strerror_c(errno));
             return -1;
         }
         msleep (54000 + 15000);
@@ -835,7 +850,8 @@ known:
         if (ioctl (d->frontend, FE_DISEQC_SEND_BURST,
                    satno ? SEC_MINI_B : SEC_MINI_A) < 0)
         {
-            msg_Err (d->obj, "cannot send Mini-DiSEqC tone burst: %m");
+            msg_Err (d->obj, "cannot send Mini-DiSEqC tone burst: %s",
+                     vlc_strerror_c(errno));
             return -1;
         }
         msleep (15000);
