@@ -339,7 +339,8 @@ static int OpenAudioDevOss( demux_t *p_demux )
 
     if( i_fd < 0 )
     {
-        msg_Err( p_demux, "cannot open OSS audio device (%m)" );
+        msg_Err( p_demux, "cannot open OSS audio device (%s)",
+                 vlc_strerror_c(errno) );
         goto adev_fail;
     }
 
@@ -348,21 +349,24 @@ static int OpenAudioDevOss( demux_t *p_demux )
         || i_format != AFMT_S16_LE )
     {
         msg_Err( p_demux,
-                 "cannot set audio format (16b little endian) (%m)" );
+                 "cannot set audio format (16b little endian) (%s)",
+                 vlc_strerror_c(errno) );
         goto adev_fail;
     }
 
     if( ioctl( i_fd, SNDCTL_DSP_STEREO,
                &p_demux->p_sys->b_stereo ) < 0 )
     {
-        msg_Err( p_demux, "cannot set audio channels count (%m)" );
+        msg_Err( p_demux, "cannot set audio channels count (%s)",
+                 vlc_strerror_c(errno) );
         goto adev_fail;
     }
 
     if( ioctl( i_fd, SNDCTL_DSP_SPEED,
                &p_demux->p_sys->i_sample_rate ) < 0 )
     {
-        msg_Err( p_demux, "cannot set audio sample rate (%m)" );
+        msg_Err( p_demux, "cannot set audio sample rate (%s)",
+                 vlc_strerror_c(errno) );
         goto adev_fail;
     }
 
@@ -415,14 +419,16 @@ static bool ProbeAudioDevOss( demux_t *p_demux, const char *psz_device )
 
     if( i_fd < 0 )
     {
-        msg_Err( p_demux, "cannot open device %s for OSS audio (%m)", psz_device );
+        msg_Err( p_demux, "cannot open device %s for OSS audio (%s)",
+                 psz_device, vlc_strerror_c(errno) );
         goto open_failed;
     }
 
     /* this will fail if the device is video */
     if( ioctl( i_fd, SNDCTL_DSP_GETCAPS, &i_caps ) < 0 )
     {
-        msg_Err( p_demux, "cannot get audio caps (%m)" );
+        msg_Err( p_demux, "cannot get audio caps (%s)",
+                 vlc_strerror_c(errno) );
         goto open_failed;
     }
 
