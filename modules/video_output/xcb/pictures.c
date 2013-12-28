@@ -26,6 +26,7 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include <errno.h>
 
 #include <sys/types.h>
 #ifdef HAVE_SYS_SHM_H
@@ -90,7 +91,8 @@ int XCB_picture_Alloc (vout_display_t *vd, picture_resource_t *res,
     int id = shmget (IPC_PRIVATE, size, IPC_CREAT | S_IRWXU);
     if (id == -1)
     {
-        msg_Err (vd, "shared memory allocation error: %m");
+        msg_Err (vd, "shared memory allocation error: %s",
+                 vlc_strerror_c(errno));
         return -1;
     }
 
@@ -98,7 +100,8 @@ int XCB_picture_Alloc (vout_display_t *vd, picture_resource_t *res,
     void *shm = shmat (id, NULL, 0 /* read/write */);
     if (-1 == (intptr_t)shm)
     {
-        msg_Err (vd, "shared memory attachment error: %m");
+        msg_Err (vd, "shared memory attachment error: %s",
+                 vlc_strerror_c(errno));
         shmctl (id, IPC_RMID, 0);
         return -1;
     }

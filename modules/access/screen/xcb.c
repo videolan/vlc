@@ -25,6 +25,7 @@
 #endif
 #include <stdarg.h>
 #include <assert.h>
+#include <errno.h>
 #include <xcb/xcb.h>
 #include <xcb/composite.h>
 #ifdef HAVE_SYS_SHM_H
@@ -438,7 +439,8 @@ discard:
         int id = shmget (IPC_PRIVATE, size, IPC_CREAT | 0777);
         if (id == -1) /* XXX: fallback */
         {
-            msg_Err (demux, "shared memory allocation error: %m");
+            msg_Err (demux, "shared memory allocation error: %s",
+                     vlc_strerror_c(errno));
             goto noshm;
         }
 
@@ -465,7 +467,8 @@ discard:
         shmctl (id, IPC_RMID, 0);
         if (-1 == (intptr_t)shm)
         {
-            msg_Err (demux, "shared memory attachment error: %m");
+            msg_Err (demux, "shared memory attachment error: %s",
+                     vlc_strerror_c(errno));
             return;
         }
 
