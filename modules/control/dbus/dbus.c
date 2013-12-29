@@ -820,7 +820,7 @@ static void *Run( void *data )
 
         if( -1 == i_pollres )
         { /* XXX: What should we do when poll() fails ? */
-            msg_Err( p_intf, "poll() failed: %m" );
+            msg_Err( p_intf, "poll() failed: %s", vlc_strerror_c(errno) );
             vlc_restorecancel( canc );
             continue;
         }
@@ -887,7 +887,8 @@ static void   wakeup_main_loop( void *p_data )
     intf_thread_t *p_intf = (intf_thread_t*) p_data;
 
     if( !write( p_intf->p_sys->p_pipe_fds[PIPE_IN], "\0", 1 ) )
-        msg_Err( p_intf, "Could not wake up the main loop: %m" );
+        msg_Err( p_intf, "Could not wake up the main loop: %s",
+                 vlc_strerror_c(errno) );
 }
 
 /* Flls a callback_info_t data structure in response
