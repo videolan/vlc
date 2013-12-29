@@ -34,20 +34,9 @@
 
 #include <stdlib.h>
 #include <stdarg.h>                                       /* va_list for BSD */
-#ifdef __APPLE__
-# include <xlocale.h>
-#elif defined(HAVE_LOCALE_H)
-# include <locale.h>
-#endif
-#include <errno.h>                                                  /* errno */
-#include <assert.h>
-#include <unistd.h>
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
-#ifdef _WIN32
-#   include <vlc_network.h>          /* 'net_strerror' and 'WSAGetLastError' */
-#endif
 #include <vlc_charset.h>
 #include "../libvlc.h"
 
@@ -99,66 +88,6 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
         module = modulebuf;
     }
 
-    /* C locale to get error messages in English in the logs */
-    locale_t c = newlocale (LC_MESSAGES_MASK, "C", (locale_t)0);
-    locale_t locale = uselocale (c);
-
-#ifndef __GLIBC__
-    /* Expand %m to strerror(errno) - only once */
-    char buf[strlen(format) + 2001], *ptr;
-    strcpy (buf, format);
-    ptr = (char*)buf;
-    format = (const char*) buf;
-
-    for( ;; )
-    {
-        ptr = strchr( ptr, '%' );
-        if( ptr == NULL )
-            break;
-
-        if( ptr[1] == 'm' )
-        {
-            char errbuf[2001];
-            size_t errlen;
-
-#ifndef _WIN32
-            strerror_r( errno, errbuf, 1001 );
-#else
-            int sockerr = WSAGetLastError( );
-            if( sockerr )
-            {
-                strncpy( errbuf, net_strerror( sockerr ), 1001 );
-                WSASetLastError( sockerr );
-            }
-            if ((sockerr == 0)
-             || (strcmp ("Unknown network stack error", errbuf) == 0))
-                strncpy( errbuf, strerror( errno ), 1001 );
-#endif
-            errbuf[1000] = 0;
-
-            /* Escape '%' from the error string */
-            for( char *percent = strchr( errbuf, '%' );
-                 percent != NULL;
-                 percent = strchr( percent + 2, '%' ) )
-            {
-                memmove( percent + 1, percent, strlen( percent ) + 1 );
-            }
-
-            errlen = strlen( errbuf );
-            memmove( ptr + errlen, ptr + 2, strlen( ptr + 2 ) + 1 );
-            memcpy( ptr, errbuf, errlen );
-            break; /* Only once, so we don't overflow */
-        }
-
-        /* Looks for conversion specifier... */
-        do
-            ptr++;
-        while( *ptr && ( strchr( "diouxXeEfFgGaAcspn%", *ptr ) == NULL ) );
-        if( *ptr )
-            ptr++; /* ...and skip it */
-    }
-#endif
-
     /* Fill message information fields */
     vlc_log_t msg;
 
@@ -190,9 +119,6 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
         priv->log.cb (priv->log.opaque, type, &msg, format, args);
         vlc_rwlock_unlock (&priv->log.lock);
     }
-
-    uselocale (locale);
-    freelocale (c);
 }
 
 static const char msg_type[4][9] = { "", " error", " warning", " debug" };
