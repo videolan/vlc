@@ -551,7 +551,8 @@ static char *ReadPasswordFile( vlc_object_t *p_this, const char *psz_path )
     p_file = vlc_fopen( psz_path, "rt" );
     if ( p_file == NULL )
     {
-        msg_Err( p_this, "Unable to open password file '%s': %m", psz_path );
+        msg_Err( p_this, "Unable to open password file '%s': %s", psz_path,
+                 vlc_strerror_c(errno) );
         goto error;
     }
 
@@ -560,7 +561,8 @@ static char *ReadPasswordFile( vlc_object_t *p_this, const char *psz_path )
     {
         if ( ferror( p_file ) )
         {
-            msg_Err( p_this, "Error reading '%s': %m", psz_path );
+            msg_Err( p_this, "Error reading '%s': %s", psz_path,
+                     vlc_strerror_c(errno) );
             goto error;
         }
 
@@ -1442,8 +1444,8 @@ static int Open( vlc_object_t *p_this )
                                           RAOP_PORT );
     if ( p_sys->i_control_fd < 0 )
     {
-        msg_Err( p_this, "Cannot establish control connection to %s:%d (%m)",
-                 p_sys->psz_host, RAOP_PORT );
+        msg_Err( p_this, "Cannot establish control connection to %s:%d (%s)",
+                 p_sys->psz_host, RAOP_PORT, vlc_strerror_c(errno) );
         i_err = VLC_EGENERIC;
         goto error;
     }
@@ -1526,8 +1528,9 @@ static int Open( vlc_object_t *p_this )
                                          p_sys->i_server_port );
     if ( p_sys->i_stream_fd < 0 )
     {
-        msg_Err( p_this, "Cannot establish stream connection to %s:%d (%m)",
-                 p_sys->psz_host, p_sys->i_server_port );
+        msg_Err( p_this, "Cannot establish stream connection to %s:%d (%s)",
+                 p_sys->psz_host, p_sys->i_server_port,
+                 vlc_strerror_c(errno)  );
         i_err = VLC_EGENERIC;
         goto error;
     }
