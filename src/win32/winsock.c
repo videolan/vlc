@@ -23,17 +23,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <errno.h>
 #include <vlc_network.h>
-
-const char *net_strerror( int value )
-{
-    /* There doesn't seem to be any portable error message generation for
-     * Winsock errors. Some old versions had s_error, but it appears to be
-     * gone, and is not documented.
-     */
-    return vlc_strerror(value);
-}
 
 #if 0
 ssize_t vlc_sendmsg (int s, struct msghdr *hdr, int flags)
