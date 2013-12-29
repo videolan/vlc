@@ -217,7 +217,8 @@ static int  Read            (stream_t *p_stream, void *p_ptr, unsigned int i_len
             case EAGAIN:
                 break;
             default:
-                msg_Dbg(p_stream, "DASH Read: failed to read (%m)");
+                msg_Dbg(p_stream, "DASH Read: failed to read (%s)",
+                        vlc_strerror_c(errno));
                 return 0;
         }
         return 0;
