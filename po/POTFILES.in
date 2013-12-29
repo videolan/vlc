@@ -74,6 +74,7 @@ src/config/file.c
 src/config/help.c
 src/config/intf.c
 src/config/keys.c
+src/darwin/error.c
 src/extras/libc.c
 src/extras/tdestroy.c
 src/input/access.c

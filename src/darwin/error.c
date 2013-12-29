@@ -30,14 +30,14 @@
 
 const char *vlc_strerror_c(int errnum)
 {
-    /* C run-time errors */
+    /* We cannot simply use strerror() here, since it is not thread-safe. */
     if ((unsigned)errnum < (unsigned)sys_nerr)
         return sys_errlist[errnum];
 
-    return "Unknown error";
+    return _("Unknown error");
 }
 
 const char *vlc_strerror(int errnum)
 {
-    return vlc_gettext(vlc_strerror_c(errnum));
+    return vlc_strerror_c(errnum);
 }
