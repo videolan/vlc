@@ -34,12 +34,7 @@
 
 #include <errno.h>
 #include <sys/types.h>
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#elif defined( _WIN32 )
-#   include <io.h>
-#endif
-
+#include <unistd.h>
 #include <sys/poll.h>
 
 #include <libraw1394/raw1394.h>

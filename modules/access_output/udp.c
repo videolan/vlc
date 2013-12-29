@@ -33,15 +33,12 @@
 #include <vlc_plugin.h>
 
 #include <sys/types.h>
+#include <unistd.h>
 #include <assert.h>
 #include <errno.h>
 
 #include <vlc_sout.h>
 #include <vlc_block.h>
-
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
 
 #ifdef _WIN32
 #   include <winsock2.h>

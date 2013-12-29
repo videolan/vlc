@@ -28,9 +28,7 @@
 
 #include <fcntl.h>
 #include <sys/stat.h>
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
+#include <unistd.h>
 
 #include <vlc_common.h>
 #include <vlc_fs.h>

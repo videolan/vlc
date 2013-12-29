@@ -48,10 +48,8 @@
 
 #include "rtp.h"
 
-#ifdef HAVE_UNISTD_H
-#   include <sys/types.h>
-#   include <unistd.h>
-#endif
+#include <sys/types.h>
+#include <unistd.h>
 #ifdef HAVE_ARPA_INET_H
 #   include <arpa/inet.h>
 #endif
@@ -683,9 +681,7 @@ static void Close( vlc_object_t * p_this )
 
     if( p_sys->psz_sdp_file != NULL )
     {
-#ifdef HAVE_UNISTD_H
         unlink( p_sys->psz_sdp_file );
-#endif
         free( p_sys->psz_sdp_file );
     }
     free( p_sys->psz_vod_session );

@@ -38,9 +38,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
-#endif
+#include <unistd.h>
 
 /**
  * Opens a FILE pointer.

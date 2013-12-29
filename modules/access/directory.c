@@ -37,12 +37,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#   include <fcntl.h>
-#elif defined( _WIN32 )
-#   include <io.h>
-#endif
+#include <unistd.h>
+#include <fcntl.h>
 
 #include <vlc_fs.h>
 #include <vlc_url.h>

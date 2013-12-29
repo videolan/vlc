@@ -31,9 +31,7 @@
 #include <sys/stat.h>
 #include <assert.h>
 #include <errno.h>
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
-#endif
+#include <unistd.h>
 #include <fcntl.h>
 
 #include <vlc_common.h>

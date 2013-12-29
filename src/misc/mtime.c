@@ -36,9 +36,7 @@
 #include <vlc_common.h>
 #include <assert.h>
 
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
-#endif
+#include <unistd.h>
 #if !defined (_POSIX_TIMERS) || defined (_WIN32)
 # define _POSIX_TIMERS (-1)
 #endif

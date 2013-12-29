@@ -42,10 +42,8 @@
 #   define INCL_DOSDEVIOCTL
 #endif
 
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
 #include <sys/types.h>
+#include <unistd.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #ifdef HAVE_ARPA_INET_H

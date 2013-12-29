@@ -32,9 +32,7 @@
 #endif
 
 #include <ctype.h> /* isalnum() */
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
+#include <unistd.h>
 #include <sys/stat.h>
 
 #include <vlc_common.h>

@@ -34,10 +34,7 @@
 
 #include <errno.h>
 #include <assert.h>
-
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
+#include <unistd.h>
 #ifdef HAVE_POLL
 # include <poll.h>
 #endif

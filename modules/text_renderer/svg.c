@@ -35,12 +35,7 @@
 #include <vlc_filter.h>
 
 #include <sys/types.h>
-
-#ifdef HAVE_UNISTD_H
-#    include <unistd.h>
-#elif defined( _WIN32 )
-#   include <io.h>
-#endif
+#include <unistd.h>
 
 #include <glib.h>
 #include <glib/gstdio.h>

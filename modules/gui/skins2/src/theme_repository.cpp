@@ -25,11 +25,7 @@
 #include "os_factory.hpp"
 #include "../commands/async_queue.hpp"
 #include "../commands/cmd_dialogs.hpp"
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#elif defined( _WIN32 )
-#   include <direct.h>
-#endif
+#include <unistd.h>
 
 #include <fstream>
 

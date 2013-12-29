@@ -48,11 +48,7 @@ See http://www.vdr-wiki.de/ and http://www.tvdr.de/ for more information.
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#elif defined( _WIN32 )
-#   include <io.h>
-#endif
+#include <unistd.h>
 
 #include <ctype.h>
 #include <time.h>

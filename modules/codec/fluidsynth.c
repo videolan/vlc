@@ -28,9 +28,7 @@
 #include <vlc_codec.h>
 #include <vlc_dialog.h>
 
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
-#endif
+#include <unistd.h>
 #ifdef _POSIX_VERSION
 # include <glob.h>
 #endif

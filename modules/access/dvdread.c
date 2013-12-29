@@ -50,11 +50,8 @@
 
 #include "../demux/ps.h"
 
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
-
 #include <sys/types.h>
+#include <unistd.h>
 
 #include <dvdread/dvd_reader.h>
 #include <dvdread/ifo_types.h>

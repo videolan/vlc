@@ -44,10 +44,8 @@
 #include <vlc_playlist.h>
 #include <vlc_keys.h>
 
-#ifdef HAVE_UNISTD_H
-#    include <unistd.h>
-#endif
 #include <sys/types.h>
+#include <unistd.h>
 
 #include <vlc_network.h>
 #include <vlc_url.h>

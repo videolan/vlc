@@ -34,11 +34,9 @@
 #include <vlc_services_discovery.h>
 #include <vlc_playlist.h>
 #include <vlc_network.h>
-#include <assert.h>
 
-#ifdef HAVE_UNISTD_H
-#    include <unistd.h>
-#endif
+#include <assert.h>
+#include <unistd.h>
 
 /************************************************************************
  * Macros and definitions

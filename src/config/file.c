@@ -35,9 +35,7 @@
 #elif defined(HAVE_USELOCALE)
 #include <locale.h>
 #endif
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
-#endif
+#include <unistd.h>
 
 #include <vlc_common.h>
 #include "../libvlc.h"
