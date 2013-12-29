@@ -566,7 +566,8 @@ static int gnutls_AddCA (vlc_tls_creds_t *crd, const char *path)
     block_t *block = block_FilePath (path);
     if (block == NULL)
     {
-        msg_Err (crd, "cannot read trusted CA from %s: %m", path);
+        msg_Err (crd, "cannot read trusted CA from %s: %s", path,
+                 vlc_strerror_c(errno));
         return VLC_EGENERIC;
     }
 
@@ -605,7 +606,8 @@ static int gnutls_AddCRL (vlc_tls_creds_t *crd, const char *path)
     block_t *block = block_FilePath (path);
     if (block == NULL)
     {
-        msg_Err (crd, "cannot read CRL from %s: %m", path);
+        msg_Err (crd, "cannot read CRL from %s: %s", path,
+                 vlc_strerror_c(errno));
         return VLC_EGENERIC;
     }
 
@@ -661,14 +663,16 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
     block_t *certblock = block_FilePath (cert);
     if (certblock == NULL)
     {
-        msg_Err (crd, "cannot read certificate chain from %s: %m", cert);
+        msg_Err (crd, "cannot read certificate chain from %s: %s", cert,
+                 vlc_strerror_c(errno));
         return VLC_EGENERIC;
     }
 
     block_t *keyblock = block_FilePath (key);
     if (keyblock == NULL)
     {
-        msg_Err (crd, "cannot read private key from %s: %m", key);
+        msg_Err (crd, "cannot read private key from %s: %s", key,
+                 vlc_strerror_c(errno));
         block_Release (certblock);
         return VLC_EGENERIC;
     }
