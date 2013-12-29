@@ -40,6 +40,7 @@
 #include <wchar.h>
 #include <sys/stat.h>
 #include <math.h>
+#include <errno.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -274,7 +275,8 @@ static void ReadDir(intf_thread_t *intf)
 
     DIR *current_dir = vlc_opendir(sys->current_dir);
     if (!current_dir) {
-        msg_Warn(intf, "cannot open directory `%s' (%m)", sys->current_dir);
+        msg_Warn(intf, "cannot open directory `%s' (%s)", sys->current_dir,
+                 vlc_strerror_c(errno));
         return;
     }
 
@@ -1853,7 +1855,7 @@ static int Open(vlc_object_t *p_this)
 
     /* Stop printing errors to the console */
     if (!freopen("/dev/null", "wb", stderr))
-        msg_Err(intf, "Couldn't close stderr (%m)");
+        msg_Err(intf, "Couldn't close stderr (%s)", vlc_strerror_c(errno));
 
     ReadDir(intf);
     PL_LOCK;
