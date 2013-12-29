@@ -162,31 +162,7 @@ vlc_thread_fatal (const char *action, int error,
     fprintf (stderr, "LibVLC fatal error %s (%d) in thread %lu ",
              action, error, vlc_threadid ());
     vlc_trace (function, file, line);
-
-    /* Sometimes strerror_r() crashes too, so make sure we print an error
-     * message before we invoke it */
-#ifdef __GLIBC__
-    /* Avoid the strerror_r() prototype brain damage in glibc */
-    errno = error;
-    fprintf (stderr, " Error message: %m\n");
-#else
-    char buf[1000];
-    const char *msg;
-
-    switch (strerror_r (error, buf, sizeof (buf)))
-    {
-        case 0:
-            msg = buf;
-            break;
-        case ERANGE: /* should never happen */
-            msg = "unknown (too big to display)";
-            break;
-        default:
-            msg = "unknown (invalid error number)";
-            break;
-    }
-    fprintf (stderr, " Error message: %s\n", msg);
-#endif
+    perror ("Thread error");
     fflush (stderr);
 
     vlc_restorecancel (canc);
