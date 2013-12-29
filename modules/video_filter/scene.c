@@ -31,6 +31,7 @@
 #endif
 
 #include <limits.h>
+#include <errno.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -334,7 +335,8 @@ static void SavePicture( filter_t *p_filter, picture_t *p_pic )
         i_ret = vlc_rename( psz_temp, psz_filename );
         if( i_ret == -1 )
         {
-            msg_Err( p_filter, "could not rename snapshot %s %m", psz_filename );
+            msg_Err( p_filter, "could not rename snapshot %s: %s",
+                     psz_filename, vlc_strerror_c(errno) );
             goto error;
         }
     }
