@@ -252,6 +252,7 @@ SOURCES_libvlc_darwin = \
 	posix/timer.c \
 	darwin/specific.c \
 	posix/rand.c \
+	darwin/error.c \
 	darwin/netconf.c \
 	$(NULL)
 
