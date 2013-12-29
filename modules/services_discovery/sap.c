@@ -40,6 +40,7 @@
 #include <vlc_network.h>
 #include <vlc_charset.h>
 
+#include <errno.h>
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
 #endif
@@ -557,7 +558,8 @@ static void *Run( void *data )
                     i_read = net_Read (p_sd, ufd[i].fd, NULL, p_buffer,
                                        MAX_SAP_BUFFER, false);
                     if (i_read < 0)
-                        msg_Warn (p_sd, "receive error: %m");
+                        msg_Warn (p_sd, "receive error: %s",
+                                  vlc_strerror_c(errno));
                     if (i_read > 6)
                     {
                         /* Parse the packet */

@@ -34,6 +34,7 @@
 
 #include <sys/types.h>
 #include <assert.h>
+#include <errno.h>
 
 #include <vlc_sout.h>
 #include <vlc_block.h>
@@ -443,7 +444,7 @@ static void* ThreadWrite( void *data )
             i_to_send = i_group;
         }
         if ( send( p_sys->i_handle, p_pk->p_buffer, p_pk->i_buffer, 0 ) == -1 )
-            msg_Warn( p_access, "send error: %m" );
+            msg_Warn( p_access, "send error: %s", vlc_strerror_c(errno) );
         vlc_cleanup_pop();
 
         if( i_dropped_packets )
