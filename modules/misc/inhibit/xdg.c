@@ -26,7 +26,6 @@
 #include <vlc_plugin.h>
 #include <vlc_inhibit.h>
 #include <assert.h>
-#include <errno.h>
 #include <signal.h>
 #include <spawn.h>
 #include <sys/wait.h>
@@ -69,10 +68,8 @@ static void Timer (void *data)
         while (waitpid (pid, &status, 0) == -1);
     }
     else
-    {
-        errno = err;
-        msg_Warn (ih, "error starting xdg-screensaver: %m");
-    }
+        msg_Warn (ih, "error starting xdg-screensaver: %s",
+                  vlc_strerror_c(err));
 }
 
 static void Inhibit (vlc_inhibit_t *ih, unsigned mask)
