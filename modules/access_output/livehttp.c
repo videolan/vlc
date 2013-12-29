@@ -340,7 +340,8 @@ static int CryptSetup( sout_access_out_t *p_access, char *key_file )
     int keyfd = vlc_open( keyfile, O_RDONLY | O_NONBLOCK );
     if( unlikely( keyfd == -1 ) )
     {
-        msg_Err( p_access, "Unable to open keyfile %s: %m", keyfile );
+        msg_Err( p_access, "Unable to open keyfile %s: %s", keyfile,
+                 vlc_strerror_c(errno) );
         free( keyfile );
         gcry_cipher_close( p_sys->aes_ctx );
         return VLC_EGENERIC;
@@ -384,7 +385,8 @@ static int LoadCryptFile( sout_access_out_t *p_access )
 
     if( unlikely( stream == NULL ) )
     {
-        msg_Err( p_access, "Unable to open keyloadfile %s: %m", p_sys->psz_keyfile );
+        msg_Err( p_access, "Unable to open keyloadfile %s: %s",
+                 p_sys->psz_keyfile, vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
 
@@ -393,7 +395,8 @@ static int LoadCryptFile( sout_access_out_t *p_access )
     ssize_t len = getline( &key_uri, &(size_t){0}, stream );
     if( unlikely( len == -1 ) )
     {
-        msg_Err( p_access, "Cannot read %s: %m", p_sys->psz_keyfile );
+        msg_Err( p_access, "Cannot read %s: %s", p_sys->psz_keyfile,
+                 vlc_strerror_c(errno) );
         clearerr( stream );
         fclose( stream );
         free( key_uri );
@@ -405,7 +408,8 @@ static int LoadCryptFile( sout_access_out_t *p_access )
     len = getline( &key_file, &(size_t){0}, stream );
     if( unlikely( len == -1 ) )
     {
-        msg_Err( p_access, "Cannot read %s: %m", p_sys->psz_keyfile );
+        msg_Err( p_access, "Cannot read %s: %s", p_sys->psz_keyfile,
+                 vlc_strerror_c(errno) );
         clearerr( stream );
         fclose( stream );
 
@@ -865,7 +869,8 @@ static ssize_t openNextFile( sout_access_out_t *p_access, sout_access_out_sys_t 
                      O_TRUNC, 0666 );
     if ( fd == -1 )
     {
-        msg_Err( p_access, "cannot open `%s' (%m)", segment->psz_filename );
+        msg_Err( p_access, "cannot open `%s' (%s)", segment->psz_filename,
+                 vlc_strerror_c(errno) );
         destroySegment( segment );
         return -1;
     }
