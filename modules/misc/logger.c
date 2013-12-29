@@ -37,6 +37,7 @@
 
 #include <stdarg.h>
 #include <assert.h>
+#include <errno.h>
 
 #ifdef __ANDROID__
 # include <android/log.h>
@@ -303,7 +304,8 @@ static int Open( vlc_object_t *p_this )
         p_sys->p_file = vlc_fopen( filename, "at" );
         if( p_sys->p_file == NULL )
         {
-            msg_Err( p_intf, "error opening logfile `%s': %m", filename );
+            msg_Err( p_intf, "error opening logfile `%s': %s", filename,
+                     vlc_strerror_c(errno) );
             free( psz_file );
             free( p_sys );
             return VLC_EGENERIC;
