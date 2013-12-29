@@ -185,6 +185,11 @@ struct intf_sys_t
     bool            color;
     bool            exit;
 
+    /* rgb values for the color yellow */
+    short           yellow_r;
+    short           yellow_g;
+    short           yellow_b;
+
     int             box_type;
     int             box_y;            // start of box content
     int             box_height;
@@ -529,8 +534,10 @@ static void FindIndex(intf_sys_t *sys, playlist_t *p_playlist)
 
 static void start_color_and_pairs(intf_thread_t *intf)
 {
+    intf_sys_t *sys = intf->p_sys;
+
     if (!has_colors()) {
-        intf->p_sys->color = false;
+        sys->color = false;
         msg_Warn(intf, "Terminal doesn't support colors");
         return;
     }
@@ -540,8 +547,10 @@ static void start_color_and_pairs(intf_thread_t *intf)
         init_pair(i, color_pairs[i].f, color_pairs[i].b);
 
     /* untested, in all my terminals, !can_change_color() --funman */
-    if (can_change_color())
+    if (can_change_color()) {
+        color_content(COLOR_YELLOW, &sys->yellow_r, &sys->yellow_g, &sys->yellow_b);
         init_color(COLOR_YELLOW, 960, 500, 0); /* YELLOW -> ORANGE */
+    }
 }
 
 static void DrawBox(int y, int h, bool color, const char *title)
@@ -1884,6 +1893,10 @@ static void Close(vlc_object_t *p_this)
 
     if (sys->p_input)
         vlc_object_release(sys->p_input);
+
+    if (can_change_color())
+        /* Restore yellow to its original color */
+        init_color(COLOR_YELLOW, sys->yellow_r, sys->yellow_g, sys->yellow_b);
 
     endwin();   /* Close the ncurses interface */
 
