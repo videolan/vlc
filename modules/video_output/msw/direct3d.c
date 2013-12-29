@@ -1264,8 +1264,10 @@ static void Direct3DImportSubpicture(vout_display_t *vd,
                         d3dr->width, d3dr->height, hr);
                 continue;
             }
+#ifndef NDEBUG
             msg_Dbg(vd, "Created %dx%d texture for OSD",
                     r->fmt.i_visible_width, r->fmt.i_visible_height);
+#endif
         }
 
         D3DLOCKED_RECT lock;
