@@ -32,6 +32,7 @@
 #endif
 
 #include <limits.h>
+#include <errno.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -308,7 +309,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         p_sys->iconv_handle = vlc_iconv_open ("UTF-8", encoding);
         if (p_sys->iconv_handle == (vlc_iconv_t)(-1))
-            msg_Err (p_dec, "cannot convert from %s: %m", encoding);
+            msg_Err (p_dec, "cannot convert from %s: %s", encoding,
+                     vlc_strerror_c(errno));
     }
     free (var);
 

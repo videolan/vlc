@@ -29,6 +29,7 @@
 # include "config.h"
 #endif
 
+#include <errno.h>
 #include <vlc_common.h>
 #include <vlc_variables.h>
 #include <vlc_filter.h>                                      /* filter_sys_t */
@@ -468,7 +469,8 @@ unsigned SetupText( filter_t *p_filter,
     }
     else
     {
-        msg_Warn( p_filter, "failed to convert string to unicode (%m)" );
+        msg_Warn( p_filter, "failed to convert string to unicode (%s)",
+                  vlc_strerror_c(errno) );
         i_string_length = 0;
     }
 
