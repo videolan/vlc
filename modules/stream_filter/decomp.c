@@ -155,7 +155,8 @@ static void *Thread (void *data)
             {
                 if (j == 0)
                     errno = EPIPE;
-                msg_Err (stream, "cannot write data (%m)");
+                msg_Err (stream, "cannot write data: %s",
+                         vlc_strerror_c(errno));
                 error = true;
                 break;
             }
@@ -355,7 +356,7 @@ static int Open (stream_t *stream, const char *path)
                 }
                 else
                 {
-                    msg_Err (stream, "Cannot execute %s", path);
+                    msg_Err (stream, "cannot execute %s", path);
                     p_sys->pid = -1;
                 }
                 posix_spawn_file_actions_destroy (&actions);
@@ -364,7 +365,7 @@ static int Open (stream_t *stream, const char *path)
             switch (p_sys->pid = fork ())
             {
                 case -1:
-                    msg_Err (stream, "Cannot fork (%m)");
+                    msg_Err (stream, "cannot fork: %s", vlc_strerror_c(errno));
                     break;
                 case 0:
                     dup2 (comp[0], 0);
