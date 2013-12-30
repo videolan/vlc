@@ -42,8 +42,8 @@ int SeekStyle::pixelMetric( PixelMetric metric, const QStyleOption *option, cons
 {
     const QStyleOptionSlider *slider;
 
-    if ( metric == PM_SliderLength && ( slider = qstyleoption_cast<const QStyleOptionSlider *>( option ) ) )
-        return slider->rect.height();
+    if ( widget && metric == QStyle::PM_SliderThickness && ( slider = qstyleoption_cast<const QStyleOptionSlider *>( option ) ) )
+        return widget->minimumSize().height();
     else
         return QProxyStyle::pixelMetric( metric, option, widget );
 }
