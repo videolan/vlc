@@ -71,7 +71,7 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
         /* Special view, click on button shows the slider */
         b_shiny = false;
 
-        volumeControlWidget = new QFrame;
+        volumeControlWidget = new QFrame( this );
         subLayout = new QVBoxLayout( volumeControlWidget );
         subLayout->setContentsMargins( 4, 4, 4, 4 );
         volumeMenu = new QMenu( this );
@@ -120,12 +120,6 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     CONNECT( this, valueReallyChanged( int ), this, userUpdateVolume( int ) );
     CONNECT( THEMIM, volumeChanged( float ), this, libUpdateVolume( float ) );
     CONNECT( THEMIM, soundMuteChanged( bool ), this, updateMuteStatus( bool ) );
-}
-
-SoundWidget::~SoundWidget()
-{
-    delete volumeSlider;
-    delete volumeControlWidget;
 }
 
 void SoundWidget::refreshLabels()

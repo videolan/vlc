@@ -99,7 +99,6 @@ class SoundWidget : public QWidget
 public:
     SoundWidget( QWidget *parent, intf_thread_t  *_p_i, bool,
                  bool b_special = false );
-    virtual ~SoundWidget();
     void setMuted( bool );
 
 protected:
