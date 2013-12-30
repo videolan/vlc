@@ -291,16 +291,10 @@ static int Demux( demux_t * p_demux )
         }
     }
 
-    if ( p_sys->b_preparsing_done )
+    if ( p_sys->b_preparsing_done && !p_sys->b_es_created )
     {
-        for ( int i=0; i < p_sys->i_streams; i++ )
-        {
-            if ( !p_sys->pp_stream[i]->p_es )
-            {
-                Ogg_CreateES( p_demux );
-                break;
-            }
-        }
+        Ogg_CreateES( p_demux );
+        p_sys->b_es_created = true;
     }
 
     /*
@@ -1944,6 +1938,7 @@ static void Ogg_EndOfStream( demux_t *p_demux )
     p_ogg->skeleton.major = 0;
     p_ogg->skeleton.minor = 0;
     p_ogg->b_preparsing_done = false;
+    p_ogg->b_es_created = false;
     p_ogg->i_pcr_offset = p_ogg->i_pcr;
 
     /* */

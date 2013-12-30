@@ -173,6 +173,7 @@ struct demux_sys_t
 
     /* preparsing info */
     bool b_preparsing_done;
+    bool b_es_created;
 
     /* Length, if available. */
     int64_t i_length;
