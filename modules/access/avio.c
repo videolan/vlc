@@ -328,7 +328,7 @@ static ssize_t Write(sout_access_out_t *p_access, block_t *p_buffer)
         val = url_write(p_sys->context, p_buffer->p_buffer, p_buffer->i_buffer);
         if (val < 0)
             goto error;
-        i_write += written;
+        i_write += val;
 #else
         avio_write(p_sys->context, p_buffer->p_buffer, p_buffer->i_buffer);
         avio_flush(p_sys->context);
