@@ -596,6 +596,7 @@ static logical_stream_t * Ogg_GetSelectedStream( demux_t *p_demux )
     for( int i=0; i<p_sys->i_streams; i++ )
     {
         logical_stream_t *p_candidate = p_sys->pp_stream[i];
+        if ( !p_candidate->p_es ) continue;
 
         bool b_selected = false;
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
@@ -1821,7 +1822,7 @@ static void Ogg_CreateES( demux_t *p_demux )
     {
         logical_stream_t *p_stream = p_ogg->pp_stream[i_stream];
 
-        if ( p_stream->p_es == NULL )
+        if ( p_stream->p_es == NULL && !p_stream->b_finished )
         {
             /* Better be safe than sorry when possible with ogm */
             if( p_stream->fmt.i_codec == VLC_CODEC_MPGA ||
