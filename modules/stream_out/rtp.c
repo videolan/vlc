@@ -1155,6 +1155,9 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         case VLC_CODEC_S16L:
             rtp_set_ptime (id, 20, 2);
             break;
+        case VLC_CODEC_S24B:
+            rtp_set_ptime (id, 20, 3);
+            break;
         default:
             break;
     }
