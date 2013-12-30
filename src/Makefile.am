@@ -305,6 +305,7 @@ SOURCES_libvlc_symbian = \
 SOURCES_libvlc_os2 = \
 	os2/getaddrinfo.c \
 	os2/dirs.c \
+	darwin/error.c \
 	os2/filesystem.c \
 	os2/netconf.c \
 	os2/plugin.c \
