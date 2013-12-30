@@ -34,6 +34,7 @@
 
 #include <stdlib.h>
 #include <stdarg.h>                                       /* va_list for BSD */
+#include <unistd.h>
 
 #include <vlc_common.h>
 #include <vlc_interface.h>

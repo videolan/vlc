@@ -37,6 +37,7 @@
 # include "config.h"
 #endif
 
+#include <unistd.h>
 #include <assert.h>
 
 #include <vlc_common.h>
