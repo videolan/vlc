@@ -151,7 +151,9 @@ if HAVE_DARWIN
 libavformat_plugin_la_LDFLAGS += -Wl,-read_only_relocs,suppress
 endif
 if HAVE_AVFORMAT
+if !MERGE_FFMPEG
 demux_LTLIBRARIES += libavformat_plugin.la
+endif
 endif
 
 libes_plugin_la_SOURCES  = demux/mpeg/es.c codec/dts_header.c codec/dts_header.h

@@ -408,7 +408,9 @@ libavio_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVFORMAT_CFLAGS) $(AVUTIL_CFLAGS)
 libavio_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(SYMBOLIC_LDFLAGS)
 libavio_plugin_la_LIBADD = $(AVFORMAT_LIBS) $(AVUTIL_LIBS) $(LIBM)
 if HAVE_AVFORMAT
+if !MERGE_FFMPEG
 access_LTLIBRARIES += libavio_plugin.la
+endif
 endif
 
 
