@@ -39,11 +39,21 @@
 
 #include <pthread.h>
 #include <mach/mach_init.h> /* mach_task_self in semaphores */
+#include <mach/mach_time.h>
 #include <execinfo.h>
-#include <sys/time.h> /* gettimeofday() */
 
-#define vlc_clock_setup() (void)0
-#warning Monotonic clock not available. Expect timing issues.
+static mach_timebase_info_data_t vlc_clock_conversion_factor;
+
+static void vlc_clock_setup_once (void)
+{
+    if (unlikely(mach_timebase_info (&vlc_clock_conversion_factor) != 0))
+        abort ();
+}
+
+static pthread_once_t vlc_clock_once = PTHREAD_ONCE_INIT;
+
+#define vlc_clock_setup() \
+    pthread_once(&vlc_clock_once, vlc_clock_setup_once)
 
 static struct timespec mtime_to_ts (mtime_t date)
 {
@@ -213,6 +223,12 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
     VLC_THREAD_ASSERT ("unlocking mutex");
 }
 
+enum
+{
+    VLC_CLOCK_MONOTONIC = 0,
+    VLC_CLOCK_REALTIME,
+};
+
 /* Initialize a condition variable. */
 void vlc_cond_init (vlc_cond_t *p_condvar)
 {
@@ -221,9 +237,10 @@ void vlc_cond_init (vlc_cond_t *p_condvar)
     if (unlikely(pthread_condattr_init (&attr)))
         abort ();
 
-    if (unlikely(pthread_cond_init (p_condvar, &attr)))
+    if (unlikely(pthread_cond_init (&p_condvar->cond, &attr)))
         abort ();
     pthread_condattr_destroy (&attr);
+    p_condvar->clock = VLC_CLOCK_MONOTONIC;
 }
 
 /* Initialize a condition variable.
@@ -231,8 +248,10 @@ void vlc_cond_init (vlc_cond_t *p_condvar)
  * the vlc_cond_timedwait() time-out parameter. */
 void vlc_cond_init_daytime (vlc_cond_t *p_condvar)
 {
-    if (unlikely(pthread_cond_init (p_condvar, NULL)))
+    if (unlikely(pthread_cond_init (&p_condvar->cond, NULL)))
         abort ();
+    p_condvar->clock = VLC_CLOCK_REALTIME;
+
 }
 
 /* Destroys a condition variable. No threads shall be waiting or signaling the
@@ -240,7 +259,7 @@ void vlc_cond_init_daytime (vlc_cond_t *p_condvar)
  * parameter: p_condvar condition variable to destroy */
 void vlc_cond_destroy (vlc_cond_t *p_condvar)
 {
-    int val = pthread_cond_destroy( p_condvar );
+    int val = pthread_cond_destroy (&p_condvar->cond);
 
     /* due to a faulty pthread implementation within Darwin 11 and
      * later condition variables cannot be destroyed without
@@ -270,7 +289,7 @@ void vlc_cond_destroy (vlc_cond_t *p_condvar)
  * parameter: p_condvar condition variable */
 void vlc_cond_signal (vlc_cond_t *p_condvar)
 {
-    int val = pthread_cond_signal( p_condvar );
+    int val = pthread_cond_signal (&p_condvar->cond);
     VLC_THREAD_ASSERT ("signaling condition variable");
 }
 
@@ -278,7 +297,7 @@ void vlc_cond_signal (vlc_cond_t *p_condvar)
  * parameter: p_cond condition variable */
 void vlc_cond_broadcast (vlc_cond_t *p_condvar)
 {
-    pthread_cond_broadcast (p_condvar);
+    pthread_cond_broadcast (&p_condvar->cond);
 }
 
 /* Wait for a condition variable. The calling thread will be suspended until
@@ -311,7 +330,7 @@ void vlc_cond_broadcast (vlc_cond_t *p_condvar)
  *                then locked again when waking up. */
 void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
 {
-    int val = pthread_cond_wait( p_condvar, p_mutex );
+    int val = pthread_cond_wait (&p_condvar->cond, p_mutex);
     VLC_THREAD_ASSERT ("waiting on condition");
 }
 
@@ -332,8 +351,44 @@ void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
 int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
                         mtime_t deadline)
 {
-    struct timespec ts = mtime_to_ts (deadline);
-    int val = pthread_cond_timedwait (p_condvar, p_mutex, &ts);
+    int val = 0;
+
+    /*
+     * Note that both pthread_cond_timedwait_relative_np and pthread_cond_timedwait
+     * convert the given timeout to a mach absolute deadline, with system startup
+     * as the time origin. There is no way you can change this behaviour.
+     *
+     * For more details, see: https://devforums.apple.com/message/931605
+     */
+
+    if (p_condvar->clock == VLC_CLOCK_MONOTONIC) {
+
+        /* 
+         * mdate() is the monotonic clock, pthread_cond_timedwait expects
+         * origin of gettimeofday(). Use timedwait_relative_np() instead.
+         */
+        mtime_t base = mdate();
+        deadline -= base;
+        if (deadline < 0)
+            deadline = 0;
+        struct timespec ts = mtime_to_ts(deadline);
+
+        val = pthread_cond_timedwait_relative_np(&p_condvar->cond, p_mutex, &ts);
+
+    } else {
+        /* variant for vlc_cond_init_daytime */
+        assert (p_condvar->clock == VLC_CLOCK_REALTIME);
+
+        /* 
+         * FIXME: It is assumed, that in this case the system waits until the real
+         * time deadline is passed, even if the real time is adjusted in between.
+         * This is not fulfilled, as described above.
+         */
+        struct timespec ts = mtime_to_ts(deadline);
+
+        val = pthread_cond_timedwait(&p_condvar->cond, p_mutex, &ts);
+    }
+    
     if (val != ETIMEDOUT)
         VLC_THREAD_ASSERT ("timed-waiting on condition");
     return val;
@@ -698,11 +753,19 @@ void vlc_control_cancel (int cmd, ...)
  * returns a timestamp in microseconds. */
 mtime_t mdate (void)
 {
-    struct timeval tv;
+    vlc_clock_setup();
+    uint64_t date = mach_absolute_time();
 
-    if (unlikely(gettimeofday (&tv, NULL) != 0))
-        abort ();
-    return (INT64_C(1000000) * tv.tv_sec) + tv.tv_usec;
+    /* denom is uint32_t, switch to 64 bits to prevent overflow. */
+    uint64_t denom = vlc_clock_conversion_factor.denom;
+
+    /* Switch to microsecs */
+    denom *= 1000LL;
+
+    /* Split the division to prevent overflow */
+    lldiv_t d = lldiv (vlc_clock_conversion_factor.numer, denom);
+
+    return (d.quot * date) + ((d.rem * date) / denom);
 }
 
 #undef mwait
@@ -722,10 +785,11 @@ void msleep (mtime_t delay)
 {
     struct timespec ts = mtime_to_ts (delay);
 
+    /* nanosleep uses mach_absolute_time and mach_wait_until internally,
+       but also handles kernel errors. Thus we use just this. */
     while (nanosleep (&ts, &ts) == -1)
         assert (errno == EINTR);
 }
-
 
 /* Count CPUs.
  * returns the number of available (logical) CPUs. */
