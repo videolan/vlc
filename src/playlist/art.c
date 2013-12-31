@@ -26,20 +26,17 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
 #include <sys/stat.h>
 #include <errno.h>
 
 #include <vlc_common.h>
-#include <vlc_playlist.h>
+#include <vlc_input_item.h>
 #include <vlc_fs.h>
 #include <vlc_strings.h>
-#include <vlc_stream.h>
 #include <vlc_url.h>
 #include <vlc_md5.h>
 
-#include "../libvlc.h"
-#include "playlist_internal.h"
+#include "art.h"
 
 static void ArtCacheCreateDir( const char *psz_dir )
 {

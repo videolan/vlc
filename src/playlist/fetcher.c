@@ -25,20 +25,20 @@
 # include "config.h"
 #endif
 
+#include <limits.h>
 #include <assert.h>
 
 #include <vlc_common.h>
-#include <vlc_playlist.h>
 #include <vlc_stream.h>
-#include <limits.h>
 #include <vlc_art_finder.h>
 #include <vlc_memory.h>
 #include <vlc_demux.h>
 #include <vlc_modules.h>
 
+#include "libvlc.h"
 #include "art.h"
 #include "fetcher.h"
-#include "playlist_internal.h"
+#include "input/input_interface.h"
 
 /*****************************************************************************
  * Structures/definitions

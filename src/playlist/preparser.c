@@ -26,13 +26,10 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_playlist.h>
 
-#include "art.h"
 #include "fetcher.h"
 #include "preparser.h"
-#include "../input/input_interface.h"
-
+#include "input/input_interface.h"
 
 /*****************************************************************************
  * Structures/definitions
