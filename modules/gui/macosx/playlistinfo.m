@@ -212,7 +212,7 @@ static VLCInfo *_o_sharedInstance = nil;
         [o_image_well setImage: [NSImage imageNamed: @"noart.png"]];
     } else {
         if (!input_item_IsPreparsed(p_item))
-            playlist_PreparseEnqueue(pl_Get(VLCIntf), p_item);
+            libvlc_MetaRequest(VLCIntf->p_libvlc, p_item);
 
         /* fill uri info */
         char * psz_url = decode_URI(input_item_GetURI(p_item));

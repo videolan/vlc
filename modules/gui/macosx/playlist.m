@@ -860,7 +860,7 @@
 
         if (p_item) {
             if (p_item->i_children == -1)
-                playlist_PreparseEnqueue(p_playlist, p_item->p_input);
+                libvlc_MetaRequest(p_intf->p_libvlc, p_item->p_input);
             else
                 msg_Dbg(p_intf, "preparsing nodes not implemented");
         }
