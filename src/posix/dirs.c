@@ -181,11 +181,12 @@ static char *config_GetTypeDir (const char *xdg_name)
                 {
                     free (path);
                     path = NULL;
-                    continue;
+                    break;
                 }
                 *(out++) = *(ptr++);
             }
-            *out = '\0';
+            if (path != NULL)
+                *out = '\0';
             break;
         }
         free (linebuf);
