@@ -42,6 +42,7 @@
 
 #include "modules/modules.h"
 #include "config/configuration.h"
+#include "playlist/preparser.h"
 
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>
@@ -367,6 +368,11 @@ dbus_out:
      */
     priv->actions = vlc_InitActions( p_libvlc );
 
+    /*
+     * Meta data handling
+     */
+    priv->parser = playlist_preparser_New(VLC_OBJECT(p_libvlc));
+
     /* Create a variable for showing the fullscreen interface */
     var_Create( p_libvlc, "intf-toggle-fscontrol", VLC_VAR_BOOL );
     var_SetBool( p_libvlc, "intf-toggle-fscontrol", true );
@@ -569,6 +575,9 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     }
 #endif
 
+    if (priv->parser != NULL)
+        playlist_preparser_Delete(priv->parser);
+
     vlc_DeinitActions( p_libvlc, priv->actions );
 
     /* Save the configuration */
@@ -674,4 +683,34 @@ static void GetFilenames( libvlc_int_t *p_vlc, unsigned n,
                          VLC_INPUT_OPTION_TRUSTED, true, pl_Unlocked );
         free( mrl );
     }
+}
+
+/**
+ * Requests extraction of the meta data for an input item (a.k.a. preparsing).
+ * The actual extraction is asynchronous.
+ */
+int libvlc_MetaRequest(libvlc_int_t *libvlc, input_item_t *item)
+{
+    libvlc_priv_t *priv = libvlc_priv(libvlc);
+
+    if (unlikely(priv->parser == NULL))
+        return VLC_ENOMEM;
+
+    playlist_preparser_Push(priv->parser, item);
+    return VLC_SUCCESS;
+}
+
+/**
+ * Requests retrieving/downloading art for an input item.
+ * The retrieval is performed asynchronously.
+ */
+int libvlc_ArtRequest(libvlc_int_t *libvlc, input_item_t *item)
+{
+    libvlc_priv_t *priv = libvlc_priv(libvlc);
+
+    if (unlikely(priv->parser == NULL))
+        return VLC_ENOMEM;
+
+    playlist_preparser_fetcher_Push(priv->parser, item);
+    return VLC_SUCCESS;
 }
