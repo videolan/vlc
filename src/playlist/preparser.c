@@ -56,15 +56,17 @@ static void *Thread( void * );
 /*****************************************************************************
  * Public functions
  *****************************************************************************/
-playlist_preparser_t *playlist_preparser_New( vlc_object_t *parent,
-                                              playlist_fetcher_t *p_fetcher )
+playlist_preparser_t *playlist_preparser_New( vlc_object_t *parent )
 {
     playlist_preparser_t *p_preparser = malloc( sizeof(*p_preparser) );
     if( !p_preparser )
         return NULL;
 
     p_preparser->object = parent;
-    p_preparser->p_fetcher = p_fetcher;
+    p_preparser->p_fetcher = playlist_fetcher_New( parent );
+    if( unlikely(p_preparser->p_fetcher == NULL) )
+        msg_Err( parent, "cannot create fetcher" );
+
     vlc_mutex_init( &p_preparser->lock );
     vlc_cond_init( &p_preparser->wait );
     p_preparser->b_live = false;
@@ -93,6 +95,13 @@ void playlist_preparser_Push( playlist_preparser_t *p_preparser, input_item_t *p
     vlc_mutex_unlock( &p_preparser->lock );
 }
 
+void playlist_preparser_fetcher_Push( playlist_preparser_t *p_preparser,
+                                      input_item_t *p_item )
+{
+    if( p_preparser->p_fetcher != NULL )
+        playlist_fetcher_Push( p_preparser->p_fetcher, p_item );
+}
+
 void playlist_preparser_Delete( playlist_preparser_t *p_preparser )
 {
     vlc_mutex_lock( &p_preparser->lock );
@@ -110,6 +119,9 @@ void playlist_preparser_Delete( playlist_preparser_t *p_preparser )
     /* Destroy the item preparser */
     vlc_cond_destroy( &p_preparser->wait );
     vlc_mutex_destroy( &p_preparser->lock );
+
+    if( p_preparser->p_fetcher != NULL )
+        playlist_fetcher_Delete( p_preparser->p_fetcher );
     free( p_preparser );
 }
 

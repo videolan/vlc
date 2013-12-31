@@ -233,13 +233,8 @@ static playlist_t *playlist_Create( vlc_object_t *p_parent )
     pl_priv(p_playlist)->b_auto_preparse =
         var_InheritBool( p_parent, "auto-preparse" );
 
-    /* Fetcher */
-    p->p_fetcher = playlist_fetcher_New( VLC_OBJECT(p_playlist) );
-    if( unlikely(p->p_fetcher == NULL) )
-        msg_Err( p_playlist, "cannot create fetcher" );
-   /* Preparser */
-   p->p_preparser = playlist_preparser_New( VLC_OBJECT(p_playlist),
-                                            p->p_fetcher );
+   /* Preparser (and meta retriever) */
+   p->p_preparser = playlist_preparser_New( VLC_OBJECT(p_playlist) );
    if( unlikely(p->p_preparser == NULL) )
        msg_Err( p_playlist, "cannot create preparser" );
 
@@ -341,8 +336,6 @@ void playlist_Destroy( playlist_t *p_playlist )
     playlist_Deactivate( p_playlist );
     if( p_sys->p_preparser )
         playlist_preparser_Delete( p_sys->p_preparser );
-    if( p_sys->p_fetcher )
-        playlist_fetcher_Delete( p_sys->p_fetcher );
 
     /* Release input resources */
     assert( p_sys->p_input == NULL );
