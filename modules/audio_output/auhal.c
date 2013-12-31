@@ -1446,12 +1446,11 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
         memset(targetBuffer, 0, bytesRequested);
     } else {
         int32_t bytesToCopy = __MIN(bytesRequested, availableBytes);
+        assert(bytesToCopy > 0);
 
-        if (likely(bytesToCopy > 0)) {
-            memcpy(targetBuffer, buffer, bytesToCopy);
-            TPCircularBufferConsume(&p_sys->circular_buffer, bytesToCopy);
-            ioData->mBuffers[0].mDataByteSize = bytesToCopy;
-        }
+        memcpy(targetBuffer, buffer, bytesToCopy);
+        TPCircularBufferConsume(&p_sys->circular_buffer, bytesToCopy);
+        ioData->mBuffers[0].mDataByteSize = bytesToCopy;
     }
 
     vlc_cond_signal(&p_sys->cond);
@@ -1494,6 +1493,7 @@ static OSStatus RenderCallbackSPDIF(AudioDeviceID inDevice,
         memset(targetBuffer, 0, bytesRequested);
     } else {
         int32_t bytesToCopy = __MIN(bytesRequested, availableBytes);
+        assert(bytesToCopy > 0);
 
         memcpy(targetBuffer, buffer, bytesToCopy);
         TPCircularBufferConsume(&p_sys->circular_buffer, bytesToCopy);
