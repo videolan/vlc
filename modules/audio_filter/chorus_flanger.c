@@ -394,9 +394,7 @@ static int reallocate_buffer( filter_t *p_filter,  filter_sys_t *p_sys )
         msg_Err( p_filter, "Couldnt reallocate buffer for new delay." );
         return 0;
     }
-    free( p_sys->p_delayLineStart );
     p_sys->p_delayLineStart = temp;
     p_sys->p_delayLineEnd = p_sys->p_delayLineStart + p_sys->i_bufferLength;
-    free( temp );
     return 1;
 }
