@@ -253,11 +253,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     setVisible( !b_hideAfterCreation );
 
-    computeMinimumSize();
-
     /* Switch to minimal view if needed, must be called after the show() */
     if( b_minimalView )
         toggleMinimalView( true );
+
+    computeMinimumSize();
 }
 
 MainInterface::~MainInterface()
@@ -316,9 +316,9 @@ MainInterface::~MainInterface()
 
 void MainInterface::computeMinimumSize()
 {
-    int minWidth = 30;
+    int minWidth = 80;
     if( menuBar()->isVisible() )
-        minWidth += __MAX( controls->sizeHint().width(), menuBar()->sizeHint().width() );
+        minWidth += controls->sizeHint().width();
 
     setMinimumWidth( minWidth );
 }
@@ -519,6 +519,12 @@ inline void MainInterface::createStatusBar()
 void MainInterface::debug()
 {
 #ifdef DEBUG_INTF
+    if( controls ) {
+        msg_Dbg( p_intf, "Controls size: %i - %i", controls->size().height(), controls->size().width() );
+        msg_Dbg( p_intf, "Controls minimumsize: %i - %i", controls->minimumSize().height(), controls->minimumSize().width() );
+        msg_Dbg( p_intf, "Controls sizeHint: %i - %i", controls->sizeHint().height(), controls->sizeHint().width() );
+    }
+
     msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
     msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
     msg_Dbg( p_intf, "minimumsize: %i - %i", minimumSize().height(), minimumSize().width() );
