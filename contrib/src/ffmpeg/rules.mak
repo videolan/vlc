@@ -103,6 +103,7 @@ endif
 ifdef HAVE_IOS
 ifeq ($(ARCH),arm)
 FFMPEGCONF += --enable-pic --as="$(AS)"
+FFMPEGCONF += --extra-cflags='-no-integrated-as'
 endif
 endif
 ifdef HAVE_MACOSX
