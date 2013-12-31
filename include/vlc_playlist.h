@@ -295,9 +295,6 @@ VLC_API void playlist_Clear( playlist_t *, bool );
 /** Enqueue an input item for preparsing */
 VLC_API int playlist_PreparseEnqueue(playlist_t *, input_item_t * );
 
-/** Request the art for an input item to be fetched */
-VLC_API int playlist_AskForArtEnqueue(playlist_t *, input_item_t * );
-
 /* Playlist sorting */
 VLC_API int playlist_TreeMove( playlist_t *, playlist_item_t *, playlist_item_t *, int );
 VLC_API int playlist_TreeMoveMany( playlist_t *, int, playlist_item_t **, playlist_item_t *, int );

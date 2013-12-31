@@ -885,7 +885,7 @@
         p_item = [[o_outline_view itemAtRow: indexes[i]] pointerValue];
 
         if (p_item && p_item->i_children == -1)
-            playlist_AskForArtEnqueue(p_playlist, p_item->p_input);
+            libvlc_ArtRequest(p_intf->p_libvlc, p_item->p_input);
     }
     [self playlistUpdated];
 }

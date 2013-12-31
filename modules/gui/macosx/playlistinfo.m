@@ -364,7 +364,7 @@ error:
 - (IBAction)downloadCoverArt:(id)sender
 {
     playlist_t * p_playlist = pl_Get(VLCIntf);
-    if (p_item) playlist_AskForArtEnqueue(p_playlist, p_item);
+    if (p_item) libvlc_ArtRequest(VLCIntf->p_libvlc, p_item);
 }
 
 - (input_item_t *)item

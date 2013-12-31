@@ -309,7 +309,6 @@ plane_CopyPixels
 playlist_Add
 playlist_AddExt
 playlist_AddInput
-playlist_AskForArtEnqueue
 playlist_AssertLocked
 playlist_ChildSearchName
 playlist_Clear

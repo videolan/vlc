@@ -654,7 +654,7 @@ void InputManager::requestArtUpdate( input_item_t *p_item )
             if ( status & ( ITEM_ART_NOTFOUND|ITEM_ART_FETCHED ) )
                 return;
         }
-        playlist_AskForArtEnqueue( pl_Get(p_intf), p_item );
+        libvlc_ArtRequest( p_intf->p_libvlc, p_item );
         /* No input will signal the cover art to update,
              * let's do it ourself */
         if ( b_current_item )

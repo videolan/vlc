@@ -174,13 +174,3 @@ int playlist_PreparseEnqueue( playlist_t *p_playlist, input_item_t *p_item )
     playlist_preparser_Push( p_sys->p_preparser, p_item );
     return VLC_SUCCESS;
 }
-
-int playlist_AskForArtEnqueue( playlist_t *p_playlist, input_item_t *p_item )
-{
-    playlist_private_t *p_sys = pl_priv(p_playlist);
-
-    if( unlikely(p_sys->p_preparser == NULL) )
-        return VLC_ENOMEM;
-    playlist_preparser_fetcher_Push( p_sys->p_preparser, p_item );
-    return VLC_SUCCESS;
-}
