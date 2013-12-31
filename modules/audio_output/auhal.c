@@ -1443,7 +1443,7 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
     /* check if we have enough data */
     if (!availableBytes || p_sys->b_paused) {
         /* return an empty buffer so silence is played until we have data */
-        memset(targetBuffer, 0, ioData->mBuffers[0].mDataByteSize);
+        memset(targetBuffer, 0, bytesRequested);
     } else {
         int32_t bytesToCopy = __MIN(bytesRequested, availableBytes);
 
@@ -1491,7 +1491,7 @@ static OSStatus RenderCallbackSPDIF(AudioDeviceID inDevice,
     /* check if we have enough data */
     if (!availableBytes || p_sys->b_paused) {
         /* return an empty buffer so silence is played until we have data */
-        memset(targetBuffer, 0, outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize);
+        memset(targetBuffer, 0, bytesRequested);
     } else {
         int32_t bytesToCopy = __MIN(bytesRequested, availableBytes);
 
