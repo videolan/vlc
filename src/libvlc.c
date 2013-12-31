@@ -550,8 +550,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     if( p_playlist != NULL )
         playlist_Destroy( p_playlist );
 
-    msg_Dbg( p_libvlc, "removing stats" );
-
 #if !defined( _WIN32 ) && !defined( __OS2__ )
     char* psz_pidfile = NULL;
 
