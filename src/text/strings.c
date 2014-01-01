@@ -42,7 +42,7 @@
 /* Needed by str_format_meta */
 #include <vlc_input.h>
 #include <vlc_meta.h>
-#include <vlc_playlist.h>
+#include <vlc_aout.h>
 
 #include <vlc_strings.h>
 #include <vlc_charset.h>
@@ -526,13 +526,12 @@ static void format_duration (char *buf, size_t len, int64_t duration)
                         memcpy( dst+d, string, len );               \
                         d += len;                                   \
                     }
-char *str_format_meta( playlist_t *p_playlist, const char *s )
+char *str_format_meta( input_thread_t *p_input, const char *s )
 {
     char *dst = strdup( s );
     if( unlikely(dst == NULL) )
         return NULL;
 
-    input_thread_t *p_input = playlist_CurrentInput( p_playlist );
     input_item_t *p_item = p_input ? input_GetItem(p_input) : NULL;
     size_t i_size = strlen( s ) + 1; /* +1 to store '\0' */
     size_t d = 0;
@@ -730,11 +729,17 @@ char *str_format_meta( playlist_t *p_playlist, const char *s )
                     break;
                 case 'V':
                 {
-                    float vol = playlist_VolumeGet( p_object );
+                    float vol = 0.f;
+
+                    if( p_input )
+                    {
+                        audio_output_t *aout = input_GetAout( p_input );
+                        if( aout )
+                            vol = aout_VolumeGet( aout );
+                    }
                     if( vol >= 0.f )
                     {
-                        snprintf( buf, 10, "%ld",
-                                  lroundf(vol * AOUT_VOLUME_DEFAULT ) );
+                        snprintf( buf, 10, "%ld", lroundf(vol * 256.f) );
                         INSERT_STRING_NO_FREE( buf );
                     }
                     else

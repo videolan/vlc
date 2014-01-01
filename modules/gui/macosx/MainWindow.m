@@ -663,7 +663,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         if (!config_GetPsz(VLCIntf, "video-title")) {
             char *format = var_InheritString(VLCIntf, "input-title-format");
-            char *formated = str_format_meta(pl_Get(VLCIntf), format);
+            char *formated = str_format_meta(p_input, format);
             free(format);
             aString = [NSString stringWithUTF8String:formated];
             free(formated);

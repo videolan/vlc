@@ -3105,6 +3105,8 @@ void input_UpdateStatistic( input_thread_t *p_input,
 /* TODO FIXME nearly the same logic that snapshot code */
 char *input_CreateFilename( vlc_object_t *p_obj, const char *psz_path, const char *psz_prefix, const char *psz_extension )
 {
+    playlist_t *pl = pl_Get(p_obj);
+    input_thread_t *input = playlist_CurrentInput(pl);
     char *psz_file;
     DIR *path;
 
@@ -3113,7 +3115,7 @@ char *input_CreateFilename( vlc_object_t *p_obj, const char *psz_path, const cha
     {
         closedir( path );
 
-        char *psz_tmp = str_format( pl_Get(p_obj), psz_prefix );
+        char *psz_tmp = str_format( input, psz_prefix );
         if( !psz_tmp )
             return NULL;
 
@@ -3129,9 +3131,8 @@ char *input_CreateFilename( vlc_object_t *p_obj, const char *psz_path, const cha
     }
     else
     {
-        psz_file = str_format( pl_Get(p_obj), psz_path );
+        psz_file = str_format( input, psz_path );
         path_sanitize( psz_file );
         return psz_file;
     }
 }
-

@@ -45,12 +45,12 @@ VLC_API size_t vlc_b64_decode_binary( uint8_t **pp_dst, const char *psz_src );
 VLC_API char * vlc_b64_decode( const char *psz_src );
 
 VLC_API char * str_format_time( const char * );
-VLC_API char * str_format_meta( playlist_t *, const char * );
+VLC_API char * str_format_meta( input_thread_t *, const char * );
 
-static inline char *str_format( playlist_t *pl, const char *fmt )
+static inline char *str_format( input_thread_t *input, const char *fmt )
 {
     char *s1 = str_format_time( fmt );
-    char *s2 = str_format_meta( pl, s1 );
+    char *s2 = str_format_meta( input, s1 );
     free( s1 );
     return s2;
 }
