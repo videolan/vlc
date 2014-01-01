@@ -454,14 +454,6 @@ dbus_out:
     free( psz_modules );
     free( psz_control );
 
-    if( var_InheritBool( p_libvlc, "file-logging" )
-#ifdef HAVE_SYSLOG_H
-        && !var_InheritBool( p_libvlc, "syslog" )
-#endif
-        )
-    {
-        intf_Create( p_libvlc, "logger,none" );
-    }
 #ifdef HAVE_SYSLOG_H
     if( var_InheritBool( p_libvlc, "syslog" ) )
     {
@@ -476,7 +468,10 @@ dbus_out:
         }
         var_Destroy( p_libvlc, "logmode" );
     }
+    else
 #endif
+    if( var_InheritBool( p_libvlc, "file-logging" ) )
+        intf_Create( p_libvlc, "logger,none" );
 
     if( var_InheritBool( p_libvlc, "network-synchronisation") )
     {
