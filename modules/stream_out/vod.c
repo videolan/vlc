@@ -314,15 +314,13 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
         RtspUnsetup(p_media->rtsp);
     }
 
-    while( p_media->i_es )
+    for( int i = 0; i < p_media->i_es; i++ )
     {
-        media_es_t *p_es = p_media->es[0];
-        TAB_REMOVE( p_media->i_es, p_media->es, p_es );
-        free( p_es->rtp_fmt.fmtp );
-        free( p_es );
+        free( p_media->es[i]->rtp_fmt.fmtp );
+        free( p_media->es[i] );
     }
+    free( p_media->es );
 
-    TAB_CLEAN( p_media->i_es, p_media->es );
     free( p_media );
 }
 
