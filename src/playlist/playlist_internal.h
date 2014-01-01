@@ -48,6 +48,7 @@ typedef struct playlist_private_t
 {
     playlist_t           public_data;
     playlist_preparser_t *p_preparser;  /**< Preparser data */
+    struct intf_thread_t *interface; /**< Linked-list of interfaces */
 
     playlist_item_array_t items_to_delete; /**< Array of items and nodes to
             delete... At the very end. This sucks. */

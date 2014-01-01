@@ -90,8 +90,7 @@ struct intf_dialog_args_t
     struct interaction_dialog_t *p_dialog;
 };
 
-VLC_API int intf_Create( vlc_object_t *, const char * );
-#define intf_Create(a,b) intf_Create(VLC_OBJECT(a),b)
+VLC_API int intf_Create( playlist_t *, const char * );
 
 VLC_API void libvlc_Quit( libvlc_int_t * );
 

@@ -447,7 +447,7 @@ dbus_out:
         }
         if( asprintf( &psz_temp, "%s,none", psz_module ) != -1)
         {
-            intf_Create( p_libvlc, psz_temp );
+            libvlc_InternalAddIntf( p_libvlc, psz_temp );
             free( psz_temp );
         }
     }
@@ -459,7 +459,7 @@ dbus_out:
     {
         char *logmode = var_CreateGetNonEmptyString( p_libvlc, "logmode" );
         var_SetString( p_libvlc, "logmode", "syslog" );
-        intf_Create( p_libvlc, "logger,none" );
+        libvlc_InternalAddIntf( p_libvlc, "logger,none" );
 
         if( logmode )
         {
@@ -471,12 +471,10 @@ dbus_out:
     else
 #endif
     if( var_InheritBool( p_libvlc, "file-logging" ) )
-        intf_Create( p_libvlc, "logger,none" );
+        libvlc_InternalAddIntf( p_libvlc, "logger,none" );
 
     if( var_InheritBool( p_libvlc, "network-synchronisation") )
-    {
-        intf_Create( p_libvlc, "netsync,none" );
-    }
+        libvlc_InternalAddIntf( p_libvlc, "netsync,none" );
 
 #ifdef __APPLE__
     var_Create( p_libvlc, "drawable-view-top", VLC_VAR_INTEGER );
@@ -591,13 +589,14 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
  */
 int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, const char *name )
 {
-    int ret;
-
     if( !p_libvlc )
         return VLC_EGENERIC;
 
+    playlist_t *playlist = pl_Get(p_libvlc);
+    int ret;
+
     if( name != NULL )
-        ret = intf_Create( p_libvlc, name );
+        ret = intf_Create( playlist, name );
     else
     {   /* Default interface */
         char *intf = var_InheritString( p_libvlc, "intf" );
@@ -611,7 +610,7 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, const char *name )
                           _("Running vlc with the default interface. "
                             "Use 'cvlc' to use vlc without interface.") );
         }
-        ret = intf_Create( p_libvlc, intf );
+        ret = intf_Create( playlist, intf );
         name = "default";
     }
     if( ret )

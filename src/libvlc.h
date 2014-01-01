@@ -166,9 +166,6 @@ typedef struct libvlc_priv_t
     struct playlist_preparser_t *parser; ///< Input item meta data handler
     struct vlc_actions *actions; ///< Hotkeys handler
 
-    /* Interfaces */
-    struct intf_thread_t *p_intf; ///< Interfaces linked-list
-
     /* Objects tree */
     vlc_mutex_t        structure_lock;
 
