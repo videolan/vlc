@@ -101,8 +101,6 @@ int intf_Create( vlc_object_t *p_this, const char *chain )
 
     var_AddCallback( p_intf, "intf-add", AddIntfCallback, NULL );
 
-    /* Attach interface to LibVLC */
-
     /* Choose the best module */
     p_intf->p_cfg = NULL;
     char *psz_parser = *chain == '$'
