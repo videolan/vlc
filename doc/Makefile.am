@@ -36,6 +36,7 @@ CHANGELOGS = \
 	ChangeLog-2011 \
 	ChangeLog-2012 \
 	ChangeLog-2013 \
+	ChangeLog-2014 \
 	$(NULL)
 
 man1_MANS = \
@@ -83,7 +84,7 @@ $(CHANGELOGS): Makefile.am
 	fi
 
 # This one needs to be rebuilt all the time :)
-.PHONY: ChangeLog-2013 changelogs doc
+.PHONY: ChangeLog-2014 changelogs doc
 
 changelogs: $(CHANGELOGS)
 
