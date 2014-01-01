@@ -444,7 +444,7 @@ static int Open( vlc_object_t *p_this )
         char *psz_next;
 
         psz_next = config_ChainCreate( &p_sys->psz_osdenc,
-                                   &p_sys->p_osd_cfg, strdup( "dvbsub") );
+                                   &p_sys->p_osd_cfg, "dvbsub" );
         free( psz_next );
 
         p_sys->i_osdcodec = VLC_CODEC_YUVP;
