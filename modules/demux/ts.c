@@ -1240,6 +1240,7 @@ static int UserPmt( demux_t *p_demux, const char *psz_fmt )
     char *psz = psz_dup;
     int  i_pid;
     int  i_number;
+    ts_prg_psi_t *prg = NULL;
 
     if( !psz_dup )
         return VLC_ENOMEM;
@@ -1256,7 +1257,6 @@ static int UserPmt( demux_t *p_demux, const char *psz_fmt )
 
     /* */
     ts_pid_t *pmt = &p_sys->pid[i_pid];
-    ts_prg_psi_t *prg;
 
     msg_Dbg( p_demux, "user pmt specified (pid=%d,number=%d)", i_pid, i_number );
     PIDInit( pmt, true, NULL );
