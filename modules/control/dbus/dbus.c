@@ -512,8 +512,7 @@ static int UpdateTimeouts( intf_thread_t *p_intf, mtime_t i_loop_interval )
 static void ProcessEvents( intf_thread_t *p_intf,
                            callback_info_t **p_events, int i_events )
 {
-    playlist_t *p_playlist = p_intf->p_sys->p_playlist;
-    bool        b_can_play = p_intf->p_sys->b_can_play;
+    bool b_can_play = p_intf->p_sys->b_can_play;
 
     vlc_dictionary_t player_properties, tracklist_properties, root_properties;
     vlc_dictionary_init( &player_properties,    0 );
@@ -536,6 +535,8 @@ static void ProcessEvents( intf_thread_t *p_intf,
         case SIGNAL_INTF_CHANGE:
         case SIGNAL_PLAYLIST_ITEM_APPEND:
         case SIGNAL_PLAYLIST_ITEM_DELETED:
+        {
+            playlist_t *p_playlist = p_intf->p_sys->p_playlist;
             PL_LOCK;
             b_can_play = playlist_CurrentSize( p_playlist ) > 0;
             PL_UNLOCK;
@@ -549,6 +550,7 @@ static void ProcessEvents( intf_thread_t *p_intf,
             if( !vlc_dictionary_has_key( &tracklist_properties, "Tracks" ) )
                 vlc_dictionary_insert( &tracklist_properties, "Tracks", NULL );
             break;
+        }
         case SIGNAL_VOLUME_MUTED:
         case SIGNAL_VOLUME_CHANGE:
             vlc_dictionary_insert( &player_properties, "Volume", NULL );
@@ -571,7 +573,7 @@ static void ProcessEvents( intf_thread_t *p_intf,
             break;
         case SIGNAL_INPUT_METADATA:
         {
-            input_thread_t *p_input = playlist_CurrentInput( p_playlist );
+            input_thread_t *p_input = pl_CurrentInput( p_intf );
             input_item_t   *p_item;
             if( p_input )
             {
@@ -594,7 +596,7 @@ static void ProcessEvents( intf_thread_t *p_intf,
         {
             input_thread_t *p_input;
             input_item_t *p_item;
-            p_input = playlist_CurrentInput( p_intf->p_sys->p_playlist );
+            p_input = pl_CurrentInput( p_intf );
             if( p_input )
             {
                 p_item = input_GetItem( p_input );
@@ -1063,7 +1065,6 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
 static int TrackChange( intf_thread_t *p_intf )
 {
     intf_sys_t          *p_sys      = p_intf->p_sys;
-    playlist_t          *p_playlist = p_sys->p_playlist;
     input_thread_t      *p_input    = NULL;
     input_item_t        *p_item     = NULL;
 
@@ -1081,7 +1082,7 @@ static int TrackChange( intf_thread_t *p_intf )
 
     p_sys->b_meta_read = false;
 
-    p_input = playlist_CurrentInput( p_playlist );
+    p_input = pl_CurrentInput( p_intf );
     if( !p_input )
     {
         return VLC_SUCCESS;
