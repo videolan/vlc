@@ -82,20 +82,20 @@ int intf_Create( vlc_object_t *p_this, const char *chain )
     if( isatty( 0 ) )
 #endif
     {
-        val.psz_string = (char *)"rc";
+        val.psz_string = (char *)"rc,none";
         text.psz_string = (char *)_("Console");
         var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
     }
-    val.psz_string = (char *)"telnet";
+    val.psz_string = (char *)"telnet,none";
     text.psz_string = (char *)_("Telnet");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = (char *)"http";
+    val.psz_string = (char *)"http,none";
     text.psz_string = (char *)_("Web");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = (char *)"logger";
+    val.psz_string = (char *)"logger,none";
     text.psz_string = (char *)_("Debug logging");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = (char *)"gestures";
+    val.psz_string = (char *)"gestures,none";
     text.psz_string = (char *)_("Mouse Gestures");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
 
@@ -163,14 +163,8 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     (void)psz_cmd; (void)oldval; (void)p_data;
-    char* psz_intf;
 
-    /* Try to create the interface */
-    if( asprintf( &psz_intf, "%s,none", newval.psz_string ) == -1 )
-        return VLC_ENOMEM;
-
-    int ret = intf_Create( VLC_OBJECT(p_this->p_libvlc), psz_intf );
-    free( psz_intf );
+    int ret = intf_Create( VLC_OBJECT(p_this->p_libvlc), newval.psz_string );
     if( ret )
         msg_Err( p_this, "interface \"%s\" initialization failed",
                  newval.psz_string );
