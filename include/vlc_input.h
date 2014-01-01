@@ -607,7 +607,7 @@ VLC_API void input_DecoderDecode( decoder_t *, block_t *, bool b_do_pace );
 /**
  * This function creates a sane filename path.
  */
-VLC_API char * input_CreateFilename( vlc_object_t *, const char *psz_path, const char *psz_prefix, const char *psz_extension ) VLC_USED;
+VLC_API char * input_CreateFilename( input_thread_t *, const char *psz_path, const char *psz_prefix, const char *psz_extension ) VLC_USED;
 
 /**
  * It creates an empty input resource handler.

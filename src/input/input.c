@@ -55,7 +55,6 @@
 #include <vlc_fs.h>
 #include <vlc_strings.h>
 #include <vlc_modules.h>
-#include <vlc_playlist.h> // FIXME
 
 /*****************************************************************************
  * Local prototypes
@@ -3103,10 +3102,8 @@ void input_UpdateStatistic( input_thread_t *p_input,
 
 /**/
 /* TODO FIXME nearly the same logic that snapshot code */
-char *input_CreateFilename( vlc_object_t *p_obj, const char *psz_path, const char *psz_prefix, const char *psz_extension )
+char *input_CreateFilename( input_thread_t *input, const char *psz_path, const char *psz_prefix, const char *psz_extension )
 {
-    playlist_t *pl = pl_Get(p_obj);
-    input_thread_t *input = playlist_CurrentInput(pl);
     char *psz_file;
     DIR *path;
 

@@ -461,7 +461,7 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record )
 
         if( !psz_sout && psz_path )
         {
-            char *psz_file = input_CreateFilename( VLC_OBJECT(p_input), psz_path, INPUT_RECORD_PREFIX, NULL );
+            char *psz_file = input_CreateFilename( p_input, psz_path, INPUT_RECORD_PREFIX, NULL );
             if( psz_file )
             {
                 if( asprintf( &psz_sout, "#record{dst-prefix='%s'}", psz_file ) < 0 )
