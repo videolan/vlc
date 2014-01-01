@@ -53,8 +53,6 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
 
 int libvlc_add_intf( libvlc_instance_t *p_instance, const char *name )
 {
-    pl_Get (p_instance->p_libvlc_int);
-
     if( libvlc_InternalAddIntf( p_instance->p_libvlc_int, name ))
     {
         if( name != NULL )
