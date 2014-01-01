@@ -33,6 +33,8 @@ extern "C" {
 
 TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t)
 
+struct intf_thread_t;
+
 /**
  * \file
  * This file contain structures and function prototypes related
@@ -392,10 +394,9 @@ VLC_API void playlist_EnableAudioFilter( playlist_t *, const char *, bool );
  * Inline functions
  ***********************************************************************/
 /** Small helper tp get current playing input or NULL. Release the input after use. */
-#define pl_CurrentInput(a) __pl_CurrentInput( VLC_OBJECT(a) )
-static  inline input_thread_t * __pl_CurrentInput( vlc_object_t * p_this )
+static inline input_thread_t *pl_CurrentInput( struct intf_thread_t *intf )
 {
-    return playlist_CurrentInput( pl_Get( p_this ) );
+    return playlist_CurrentInput( pl_Get( (vlc_object_t *)intf ) );
 }
 
 /** Tell if the playlist is empty */
