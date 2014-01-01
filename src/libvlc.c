@@ -79,14 +79,6 @@
 #include <assert.h>
 
 /*****************************************************************************
- * The evil global variables. We handle them with care, don't worry.
- *****************************************************************************/
-
-#if !defined(_WIN32) && !defined(__OS2__)
-static bool b_daemon = false;
-#endif
-
-/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static void GetFilenames  ( libvlc_int_t *, unsigned, const char *const [] );
@@ -210,8 +202,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Check for daemon mode */
     if( var_InheritBool( p_libvlc, "daemon" ) )
     {
-        char *psz_pidfile = NULL;
-
         if( daemon( 1, 0) != 0 )
         {
             msg_Err( p_libvlc, "Unable to fork vlc to daemon mode" );
@@ -219,29 +209,28 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             vlc_LogDeinit (p_libvlc);
             return VLC_ENOMEM;
         }
-        b_daemon = true;
 
         /* lets check if we need to write the pidfile */
-        psz_pidfile = var_CreateGetNonEmptyString( p_libvlc, "pidfile" );
-        if( psz_pidfile != NULL )
+        char *pidfile = var_InheritString( p_libvlc, "pidfile" );
+        if( pidfile != NULL )
         {
-            FILE *pidfile;
-            pid_t i_pid = getpid ();
-            msg_Dbg( p_libvlc, "PID is %d, writing it to %s",
-                               i_pid, psz_pidfile );
-            pidfile = vlc_fopen( psz_pidfile,"w" );
-            if( pidfile != NULL )
+            FILE *stream = vlc_fopen( pidfile, "w" );
+            if( stream != NULL )
             {
-                utf8_fprintf( pidfile, "%d", (int)i_pid );
-                fclose( pidfile );
+                fprintf( stream, "%d", (int)getpid() );
+                fclose( stream );
+                msg_Dbg( p_libvlc, "written PID file %s", pidfile );
             }
             else
-            {
-                msg_Err( p_libvlc, "cannot open pid file %s for writing: %s",
-                         psz_pidfile, vlc_strerror_c(errno) );
-            }
+                msg_Err( p_libvlc, "cannot write PID file %s: %s",
+                         pidfile, vlc_strerror_c(errno) );
+            free( pidfile );
         }
-        free( psz_pidfile );
+    }
+    else
+    {
+        var_Create( p_libvlc, "pidfile", VLC_VAR_STRING );
+        var_SetString( p_libvlc, "pidfile", "" );
     }
 #endif
 
@@ -557,21 +546,14 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         playlist_Destroy( p_playlist );
 
 #if !defined( _WIN32 ) && !defined( __OS2__ )
-    char* psz_pidfile = NULL;
-
-    if( b_daemon )
+    char *pidfile = var_InheritString( p_libvlc, "pidfile" );
+    if( pidfile != NULL )
     {
-        psz_pidfile = var_CreateGetNonEmptyString( p_libvlc, "pidfile" );
-        if( psz_pidfile != NULL )
-        {
-            msg_Dbg( p_libvlc, "removing pid file %s", psz_pidfile );
-            if( unlink( psz_pidfile ) == -1 )
-            {
-                msg_Dbg( p_libvlc, "removing pid file %s: %s",
-                        psz_pidfile, vlc_strerror_c(errno) );
-            }
-        }
-        free( psz_pidfile );
+        msg_Dbg( p_libvlc, "removing PID file %s", pidfile );
+        if( unlink( pidfile ) )
+            msg_Warn( p_libvlc, "cannot remove PID file %s: %s",
+                      pidfile, vlc_strerror_c(errno) );
+        free( pidfile );
     }
 #endif
 
@@ -617,24 +599,21 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
     if( !p_libvlc )
         return VLC_EGENERIC;
 
-    if( !psz_module ) /* requesting the default interface */
+    if( psz_module == NULL ) /* requesting the default interface */
     {
-        char *psz_interface = var_CreateGetNonEmptyString( p_libvlc, "intf" );
-        if( !psz_interface ) /* "intf" has not been set */
+        char *intf = var_InheritString( p_libvlc, "intf" );
+        if( intf != NULL ) /* "intf" has not been set */
+            free( intf );
+        else
         {
-#if !defined( _WIN32 ) && !defined( __OS2__ )
-            if( b_daemon )
-                 /* Daemon mode hack.
-                  * We prefer the dummy interface if none is specified. */
-                psz_module = "dummy";
+            char *pidfile = var_InheritString( p_libvlc, "pidfile" );
+            if( pidfile != NULL )
+                free( pidfile );
             else
-#endif
                 msg_Info( p_libvlc, "%s",
                           _("Running vlc with the default interface. "
                             "Use 'cvlc' to use vlc without interface.") );
         }
-        free( psz_interface );
-        var_Destroy( p_libvlc, "intf" );
     }
 
     /* Try to create the interface */
