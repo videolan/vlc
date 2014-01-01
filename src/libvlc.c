@@ -594,17 +594,19 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
 /**
  * Add an interface plugin and run it
  */
-int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
+int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, const char *name )
 {
+    int ret;
+
     if( !p_libvlc )
         return VLC_EGENERIC;
 
-    if( psz_module == NULL ) /* requesting the default interface */
-    {
+    if( name != NULL )
+        ret = intf_Create( p_libvlc, name );
+    else
+    {   /* Default interface */
         char *intf = var_InheritString( p_libvlc, "intf" );
-        if( intf != NULL ) /* "intf" has not been set */
-            free( intf );
-        else
+        if( intf == NULL ) /* "intf" has not been set */
         {
             char *pidfile = var_InheritString( p_libvlc, "pidfile" );
             if( pidfile != NULL )
@@ -614,13 +616,11 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
                           _("Running vlc with the default interface. "
                             "Use 'cvlc' to use vlc without interface.") );
         }
+        ret = intf_Create( p_libvlc, intf );
+        name = "default";
     }
-
-    /* Try to create the interface */
-    int ret = intf_Create( p_libvlc, psz_module ? psz_module : "$intf" );
     if( ret )
-        msg_Err( p_libvlc, "interface \"%s\" initialization failed",
-                 psz_module ? psz_module : "default" );
+        msg_Err( p_libvlc, "interface \"%s\" initialization failed", name );
     return ret;
 }
 

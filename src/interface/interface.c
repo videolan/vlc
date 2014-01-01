@@ -102,15 +102,10 @@ int intf_Create( vlc_object_t *p_this, const char *chain )
     var_AddCallback( p_intf, "intf-add", AddIntfCallback, NULL );
 
     /* Choose the best module */
-    p_intf->p_cfg = NULL;
-    char *psz_parser = *chain == '$'
-                     ? var_CreateGetString(p_intf, chain+1)
-                     : strdup( chain );
     char *module;
-    char *psz_tmp = config_ChainCreate( &module, &p_intf->p_cfg,
-                                        psz_parser );
-    free( psz_tmp );
-    free( psz_parser );
+
+    p_intf->p_cfg = NULL;
+    free( config_ChainCreate( &module, &p_intf->p_cfg, chain ) );
     p_intf->p_module = module_need( p_intf, "interface", module, true );
     free(module);
     if( p_intf->p_module == NULL )
