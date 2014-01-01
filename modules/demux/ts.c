@@ -2021,7 +2021,7 @@ static int Seek( demux_t *p_demux, double f_percent )
     mtime_t i_target_pcr = (p_sys->i_last_pcr - p_sys->i_first_pcr) * f_percent + p_sys->i_first_pcr;
 
     int64_t i_head_pos = 0;
-    int64_t i_tail_pos = stream_Size( p_demux->s );
+    int64_t i_tail_pos;
     {
         mtime_t i_adjust = 0;
         int i;
