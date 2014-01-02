@@ -34,228 +34,6 @@
 #define TEMPO_MIN  20
 #define TEMPO_MAX 250 /* Beats per minute */
 
-static int  Open  (vlc_object_t *);
-static void Close (vlc_object_t *);
-
-vlc_module_begin ()
-    set_description (N_("SMF demuxer"))
-    set_category (CAT_INPUT)
-    set_subcategory (SUBCAT_INPUT_DEMUX)
-    set_capability ("demux", 20)
-    set_callbacks (Open, Close)
-vlc_module_end ()
-
-static int Demux   (demux_t *);
-static int Control (demux_t *, int i_query, va_list args);
-
-typedef struct smf_track_t
-{
-    int64_t  offset; /* Read offset in the file (stream_Tell) */
-    int64_t  end;    /* End offset in the file */
-    uint64_t next;   /* Time of next message (in term of pulses) */
-    uint8_t  running_event; /* Running (previous) event */
-} mtrk_t;
-
-static int ReadDeltaTime (stream_t *s, mtrk_t *track);
-
-struct demux_sys_t
-{
-    es_out_id_t *es;
-    date_t       pts;
-    uint64_t     pulse; /* Pulses counter */
-
-    unsigned     ppqn;   /* Pulses Per Quarter Note */
-    /* by the way, "quarter note" is "noire" in French */
-
-    unsigned     trackc; /* Number of tracks */
-    mtrk_t       trackv[]; /* Track states */
-};
-
-/*****************************************************************************
- * Open: check file and initializes structures
- *****************************************************************************/
-static int Open (vlc_object_t * p_this)
-{
-    demux_t       *p_demux = (demux_t *)p_this;
-    stream_t      *stream = p_demux->s;
-    demux_sys_t   *p_sys;
-    const uint8_t *peek;
-    unsigned       tracks, ppqn;
-    bool     multitrack;
-
-    /* (Try to) parse the SMF header */
-    /* Header chunk always has 6 bytes payload */
-    if (stream_Peek (stream, &peek, 14) < 14)
-        return VLC_EGENERIC;
-
-    /* Skip RIFF MIDI header if present */
-    if (!memcmp (peek, "RIFF", 4) && !memcmp (peek + 8, "RMID", 4))
-    {
-        uint32_t riff_len = GetDWLE (peek + 4);
-
-        msg_Dbg (p_this, "detected RIFF MIDI file (%u bytes)",
-                 (unsigned)riff_len);
-        if ((stream_Read (stream, NULL, 12) < 12))
-            return VLC_EGENERIC;
-
-        /* Look for the RIFF data chunk */
-        for (;;)
-        {
-            char chnk_hdr[8];
-            uint32_t chnk_len;
-
-            if ((riff_len < 8)
-             || (stream_Read (stream, chnk_hdr, 8) < 8))
-                return VLC_EGENERIC;
-
-            riff_len -= 8;
-            chnk_len = GetDWLE (chnk_hdr + 4);
-            if (riff_len < chnk_len)
-                return VLC_EGENERIC;
-            riff_len -= chnk_len;
-
-            if (!memcmp (chnk_hdr, "data", 4))
-                break; /* found! */
-
-            if (stream_Read (stream, NULL, chnk_len) < (ssize_t)chnk_len)
-                return VLC_EGENERIC;
-        }
-
-        /* Read real SMF header. Assume RIFF data chunk length is proper. */
-        if (stream_Peek (stream, &peek, 14) < 14)
-            return VLC_EGENERIC;
-    }
-
-    if (memcmp (peek, "MThd\x00\x00\x00\x06", 8))
-        return VLC_EGENERIC;
-    peek += 8;
-
-    /* First word: SMF type */
-    switch (GetWBE (peek))
-    {
-        case 0:
-            multitrack = false;
-            break;
-        case 1:
-            multitrack = true;
-            break;
-        default:
-            /* We don't implement SMF2 (as do many) */
-            msg_Err (p_this, "unsupported SMF file type %u", GetWBE (peek));
-            return VLC_EGENERIC;
-    }
-    peek += 2;
-
-    /* Second word: number of tracks */
-    tracks = GetWBE (peek);
-    peek += 2;
-    if (!multitrack && (tracks != 1))
-    {
-        msg_Err (p_this, "invalid SMF type 0 file");
-        return VLC_EGENERIC;
-    }
-
-    msg_Dbg (p_this, "detected Standard MIDI File (type %u) with %u track(s)",
-             multitrack, tracks);
-
-    /* Third/last word: timing */
-    ppqn = GetWBE (peek);
-    if (ppqn & 0x8000)
-    {
-        /* FIXME */
-        msg_Err (p_this, "SMPTE timestamps not implemented");
-        return VLC_EGENERIC;
-    }
-    else
-    {
-        msg_Dbg (p_this, " %u pulses per quarter note", ppqn);
-    }
-
-    p_sys = malloc (sizeof (*p_sys) + (sizeof (mtrk_t) * tracks));
-    if (unlikely(p_sys == NULL))
-        return VLC_ENOMEM;
-
-    /* We've had a valid SMF header - now skip it*/
-    if (stream_Read (stream, NULL, 14) < 14)
-        goto error;
-
-    /* Default SMF tempo is 120BPM, i.e. half a second per quarter note */
-    date_Init (&p_sys->pts, ppqn * 2, 1);
-    date_Set (&p_sys->pts, 0);
-    p_sys->pulse        = 0;
-    p_sys->ppqn         = ppqn;
-
-    p_sys->trackc       = tracks;
-    /* Prefetch track offsets */
-    for (unsigned i = 0; i < tracks; i++)
-    {
-        uint8_t head[8];
-
-        if (i > 0)
-        {
-            /* Seeking screws streaming up, but there is no way around this,
-             * as SMF1 tracks are performed simultaneously.
-             * Not a big deal as SMF1 are usually only a few kbytes anyway. */
-            if (stream_Seek (stream, p_sys->trackv[i - 1].end))
-            {
-                msg_Err (p_this, "cannot build SMF index (corrupted file?)");
-                goto error;
-            }
-        }
-
-        for (;;)
-        {
-            if (stream_Read (stream, head, 8) < 8)
-            {
-                /* FIXME: don't give up if we have at least one valid track */
-                msg_Err (p_this, "incomplete SMF chunk, file is corrupted");
-                goto error;
-            }
-
-            if (memcmp (head, "MTrk", 4) == 0)
-                break;
-
-            msg_Dbg (p_this, "skipping unknown SMF chunk");
-            stream_Read (stream, NULL, GetDWBE (head + 4));
-        }
-
-        p_sys->trackv[i].offset = stream_Tell (stream);
-        p_sys->trackv[i].end = p_sys->trackv[i].offset + GetDWBE (head + 4);
-        p_sys->trackv[i].next = 0;
-        ReadDeltaTime (stream, p_sys->trackv + i);
-        p_sys->trackv[i].running_event = 0xF6;
-        /* Why 0xF6 (Tuning Calibration)?
-         * Because it has zero bytes of data, so the parser will detect the
-         * error if the first event uses running status. */
-    }
-
-    es_format_t  fmt;
-    es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MIDI);
-    fmt.audio.i_channels = 2;
-    fmt.audio.i_rate = 44100; /* dummy value */
-    p_sys->es = es_out_Add (p_demux->out, &fmt);
-
-    p_demux->pf_demux   = Demux;
-    p_demux->pf_control = Control;
-    p_demux->p_sys      = p_sys;
-    return VLC_SUCCESS;
-
-error:
-    free (p_sys);
-    return VLC_EGENERIC;
-}
-
-/**
- * Releases allocate resources.
- */
-static void Close (vlc_object_t * p_this)
-{
-    demux_t *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    free (p_sys);
-}
-
 /**
  * Reads MIDI variable length (7, 14, 21 or 28 bits) integer.
  * @return read value, or -1 on EOF/error.
@@ -278,6 +56,13 @@ static int32_t ReadVarInt (stream_t *s)
     return -1;
 }
 
+typedef struct smf_track_t
+{
+    int64_t  offset; /* Read offset in the file (stream_Tell) */
+    int64_t  end;    /* End offset in the file */
+    uint64_t next;   /* Time of next message (in term of pulses) */
+    uint8_t  running_event; /* Running (previous) event */
+} mtrk_t;
 
 /**
  * Reads (delta) time from the next event of a given track.
@@ -305,6 +90,18 @@ static int ReadDeltaTime (stream_t *s, mtrk_t *track)
     return 0;
 }
 
+struct demux_sys_t
+{
+    es_out_id_t *es;
+    date_t       pts;
+    uint64_t     pulse; /* Pulses counter */
+
+    unsigned     ppqn;   /* Pulses Per Quarter Note */
+    /* by the way, "quarter note" is "noire" in French */
+
+    unsigned     trackc; /* Number of tracks */
+    mtrk_t       trackv[]; /* Track states */
+};
 
 /**
  * Non-MIDI Meta events handler
@@ -452,8 +249,6 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
     free (payload);
     return ret;
 }
-
-
 
 static
 int HandleMessage (demux_t *p_demux, mtrk_t *tr)
@@ -617,7 +412,6 @@ static int Demux (demux_t *p_demux)
     return 1;
 }
 
-
 /*****************************************************************************
  * Control:
  *****************************************************************************/
@@ -642,3 +436,192 @@ static int Control (demux_t *p_demux, int i_query, va_list args)
     }
     return VLC_EGENERIC;
 }
+
+/**
+ * Probes file format and starts demuxing.
+ */
+static int Open (vlc_object_t *obj)
+{
+    demux_t *demux = (demux_t *)obj;
+    stream_t *stream = demux->s;
+    const uint8_t *peek;
+    bool multitrack;
+
+    /* (Try to) parse the SMF header */
+    /* Header chunk always has 6 bytes payload */
+    if (stream_Peek (stream, &peek, 14) < 14)
+        return VLC_EGENERIC;
+
+    /* Skip RIFF MIDI header if present */
+    if (!memcmp (peek, "RIFF", 4) && !memcmp (peek + 8, "RMID", 4))
+    {
+        uint32_t riff_len = GetDWLE (peek + 4);
+
+        msg_Dbg (demux, "detected RIFF MIDI file (%"PRIu32" bytes)", riff_len);
+        if ((stream_Read (stream, NULL, 12) < 12))
+            return VLC_EGENERIC;
+
+        /* Look for the RIFF data chunk */
+        for (;;)
+        {
+            char chnk_hdr[8];
+            uint32_t chnk_len;
+
+            if ((riff_len < 8)
+             || (stream_Read (stream, chnk_hdr, 8) < 8))
+                return VLC_EGENERIC;
+
+            riff_len -= 8;
+            chnk_len = GetDWLE (chnk_hdr + 4);
+            if (riff_len < chnk_len)
+                return VLC_EGENERIC;
+            riff_len -= chnk_len;
+
+            if (!memcmp (chnk_hdr, "data", 4))
+                break; /* found! */
+
+            if (stream_Read (stream, NULL, chnk_len) < (ssize_t)chnk_len)
+                return VLC_EGENERIC;
+        }
+
+        /* Read real SMF header. Assume RIFF data chunk length is proper. */
+        if (stream_Peek (stream, &peek, 14) < 14)
+            return VLC_EGENERIC;
+    }
+
+    if (memcmp (peek, "MThd\x00\x00\x00\x06", 8))
+        return VLC_EGENERIC;
+    peek += 8;
+
+    /* First word: SMF type */
+    switch (GetWBE (peek))
+    {
+        case 0:
+            multitrack = false;
+            break;
+        case 1:
+            multitrack = true;
+            break;
+        default:
+            /* We don't implement SMF2 (as do many) */
+            msg_Err (demux, "unsupported SMF file type %u", GetWBE (peek));
+            return VLC_EGENERIC;
+    }
+    peek += 2;
+
+    /* Second word: number of tracks */
+    unsigned tracks = GetWBE (peek);
+    peek += 2;
+    if (!multitrack && (tracks != 1))
+    {
+        msg_Err (demux, "invalid SMF type 0 file");
+        return VLC_EGENERIC;
+    }
+
+    msg_Dbg (demux, "detected Standard MIDI File (type %u) with %u track(s)",
+             multitrack, tracks);
+
+    /* Third/last word: timing */
+    unsigned ppqn = GetWBE (peek);
+    if (ppqn & 0x8000)
+    {   /* FIXME */
+        msg_Err (demux, "SMPTE timestamps not implemented");
+        return VLC_EGENERIC;
+    }
+    else
+    {
+        msg_Dbg (demux, " %u pulses per quarter note", ppqn);
+    }
+
+    demux_sys_t *sys = malloc (sizeof (*sys) + (sizeof (mtrk_t) * tracks));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
+    /* We've had a valid SMF header - now skip it*/
+    if (stream_Read (stream, NULL, 14) < 14)
+        goto error;
+
+    /* Default SMF tempo is 120BPM, i.e. half a second per quarter note */
+    date_Init (&sys->pts, ppqn * 2, 1);
+    date_Set (&sys->pts, 0);
+    sys->pulse = 0;
+    sys->ppqn = ppqn;
+
+    sys->trackc       = tracks;
+    /* Prefetch track offsets */
+    for (unsigned i = 0; i < tracks; i++)
+    {
+        uint8_t head[8];
+
+        if (i > 0)
+        {
+            /* Seeking screws streaming up, but there is no way around this,
+             * as SMF1 tracks are performed simultaneously.
+             * Not a big deal as SMF1 are usually only a few kbytes anyway. */
+            if (stream_Seek (stream, sys->trackv[i - 1].end))
+            {
+                msg_Err (demux, "cannot build SMF index (corrupted file?)");
+                goto error;
+            }
+        }
+
+        for (;;)
+        {
+            if (stream_Read (stream, head, 8) < 8)
+            {
+                /* FIXME: don't give up if we have at least one valid track */
+                msg_Err (demux, "incomplete SMF chunk, file is corrupted");
+                goto error;
+            }
+
+            if (memcmp (head, "MTrk", 4) == 0)
+                break;
+
+            msg_Dbg (demux, "skipping unknown SMF chunk");
+            stream_Read (stream, NULL, GetDWBE (head + 4));
+        }
+
+        sys->trackv[i].offset = stream_Tell (stream);
+        sys->trackv[i].end = sys->trackv[i].offset + GetDWBE (head + 4);
+        sys->trackv[i].next = 0;
+        ReadDeltaTime (stream, sys->trackv + i);
+        sys->trackv[i].running_event = 0xF6;
+        /* Why 0xF6 (Tuning Calibration)?
+         * Because it has zero bytes of data, so the parser will detect the
+         * error if the first event uses running status. */
+    }
+
+    es_format_t  fmt;
+    es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MIDI);
+    fmt.audio.i_channels = 2;
+    fmt.audio.i_rate = 44100; /* dummy value */
+    sys->es = es_out_Add (demux->out, &fmt);
+
+    demux->pf_demux = Demux;
+    demux->pf_control = Control;
+    demux->p_sys = sys;
+    return VLC_SUCCESS;
+
+error:
+    free (sys);
+    return VLC_EGENERIC;
+}
+
+/**
+ * Releases allocate resources.
+ */
+static void Close (vlc_object_t * p_this)
+{
+    demux_t *p_demux = (demux_t *)p_this;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    free (p_sys);
+}
+
+vlc_module_begin ()
+    set_description (N_("SMF demuxer"))
+    set_category (CAT_INPUT)
+    set_subcategory (SUBCAT_INPUT_DEMUX)
+    set_capability ("demux", 20)
+    set_callbacks (Open, Close)
+vlc_module_end ()
