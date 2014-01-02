@@ -143,7 +143,7 @@ MessagesDialog::~MessagesDialog()
 
 void MessagesDialog::changeVerbosity( int i_verbosity )
 {
-    vlc_atomic_set( &this->verbosity, i_verbosity );
+    atomic_store( &this->verbosity, i_verbosity );
 }
 
 void MessagesDialog::updateConfig()
@@ -337,7 +337,7 @@ void MessagesDialog::MsgCallback( void *self, int type, const vlc_log_t *item,
 {
     MessagesDialog *dialog = (MessagesDialog *)self;
     char *str;
-    int verbosity = vlc_atomic_get( &dialog->verbosity );
+    int verbosity = atomic_load( &dialog->verbosity );
 
     if( verbosity < 0 || verbosity < (type - VLC_MSG_ERR)
      || unlikely(vasprintf( &str, format, ap ) == -1) )

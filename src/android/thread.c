@@ -170,7 +170,7 @@ struct vlc_thread
     void *(*entry)(void*);
     void *data;
 
-    vlc_atomic_t killed;
+    atomic_bool killed;
     bool killable;
 };
 
@@ -374,7 +374,7 @@ static int vlc_clone_attr (vlc_thread_t *th, void *(*entry) (void *),
 
 
     vlc_sem_init(&thread->finished, 0);
-    vlc_atomic_set(&thread->killed, false);
+    atomic_store(&thread->killed, false);
     thread->killable = true;
     thread->cond = NULL;
     thread->entry = entry;
@@ -434,7 +434,7 @@ void vlc_cancel (vlc_thread_t thread_id)
 {
     pthread_cond_t *cond;
 
-    vlc_atomic_set(&thread_id->killed, true);
+    atomic_store(&thread_id->killed, true);
 
     vlc_mutex_lock(&thread_id->lock);
     cond = thread_id->cond;
@@ -467,7 +467,7 @@ void vlc_testcancel (void)
         return;
     if (!thread->killable)
         return;
-    if (!vlc_atomic_get(&thread->killed))
+    if (!atomic_load(&thread->killed))
         return;
 
     pthread_exit(NULL);

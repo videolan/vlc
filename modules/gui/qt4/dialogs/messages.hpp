@@ -55,7 +55,7 @@ private:
     void sinkMessage( const MsgEvent * );
     bool matchFilter( const QString& );
 
-    vlc_atomic_t verbosity;
+    atomic_uint verbosity;
     static void MsgCallback( void *, int, const vlc_log_t *, const char *,
                              va_list );
 

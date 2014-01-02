@@ -141,7 +141,7 @@ void update_Delete( update_t *p_update )
 
     if( p_update->p_download )
     {
-        vlc_atomic_set( &p_update->p_download->aborted, 1 );
+        atomic_store( &p_update->p_download->aborted, true );
         vlc_join( p_update->p_download->thread, NULL );
         vlc_object_release( p_update->p_download );
     }
@@ -494,7 +494,7 @@ void update_Download( update_t *p_update, const char *psz_destdir )
     // If the object already exist, destroy it
     if( p_update->p_download )
     {
-        vlc_atomic_set( &p_update->p_download->aborted, 1 );
+        atomic_store( &p_update->p_download->aborted, true );
         vlc_join( p_update->p_download->thread, NULL );
         vlc_object_release( p_update->p_download );
     }
@@ -509,7 +509,7 @@ void update_Download( update_t *p_update, const char *psz_destdir )
     p_update->p_download = p_udt;
     p_udt->psz_destdir = psz_destdir ? strdup( psz_destdir ) : NULL;
 
-    vlc_atomic_set(&p_udt->aborted, 0);
+    atomic_store(&p_udt->aborted, false);
     vlc_clone( &p_udt->thread, update_DownloadReal, p_udt, VLC_THREAD_PRIORITY_LOW );
 }
 
@@ -590,7 +590,7 @@ static void* update_DownloadReal( void *obj )
     if( p_progress == NULL )
         goto end;
 
-    while( !vlc_atomic_get( &p_udt->aborted ) &&
+    while( !atomic_load( &p_udt->aborted ) &&
            ( i_read = stream_Read( p_stream, p_buffer, 1 << 10 ) ) &&
            !dialog_ProgressCancelled( p_progress ) )
     {
@@ -618,7 +618,7 @@ static void* update_DownloadReal( void *obj )
     fclose( p_file );
     p_file = NULL;
 
-    if( !vlc_atomic_get( &p_udt->aborted ) &&
+    if( !atomic_load( &p_udt->aborted ) &&
         !dialog_ProgressCancelled( p_progress ) )
     {
         dialog_ProgressDestroy( p_progress );

@@ -387,65 +387,17 @@ typedef         uintmax_t atomic_uintmax_t;
 # endif
 # endif
 
-/**
- * Memory storage space for an atom. Never access it directly.
- */
-typedef union
-{
-    atomic_uintptr_t u;
-} vlc_atomic_t;
-
-/** Static initializer for \ref vlc_atomic_t */
-# define VLC_ATOMIC_INIT(val) { (val) }
-
-/* All functions return the atom value _after_ the operation. */
-static inline uintptr_t vlc_atomic_get(vlc_atomic_t *atom)
-{
-    return atomic_load(&atom->u);
-}
-
-static inline uintptr_t vlc_atomic_set(vlc_atomic_t *atom, uintptr_t v)
-{
-    atomic_store(&atom->u, v);
-    return v;
-}
-
-static inline uintptr_t vlc_atomic_add(vlc_atomic_t *atom, uintptr_t v)
-{
-    return atomic_fetch_add(&atom->u, v) + v;
-}
-
-static inline uintptr_t vlc_atomic_sub (vlc_atomic_t *atom, uintptr_t v)
-{
-    return atomic_fetch_sub (&atom->u, v) - v;
-}
-
-static inline uintptr_t vlc_atomic_inc (vlc_atomic_t *atom)
-{
-    return vlc_atomic_add (atom, 1);
-}
-
-static inline uintptr_t vlc_atomic_dec (vlc_atomic_t *atom)
-{
-    return vlc_atomic_sub (atom, 1);
-}
-
-static inline uintptr_t vlc_atomic_swap(vlc_atomic_t *atom, uintptr_t v)
-{
-    return atomic_exchange(&atom->u, v);
-}
-
-static inline uintptr_t vlc_atomic_compare_swap(vlc_atomic_t *atom,
-                                                uintptr_t u, uintptr_t v)
-{
-    atomic_compare_exchange_strong(&atom->u, &u, v);
-    return u;
-}
-
 typedef atomic_uint_least32_t vlc_atomic_float;
 
+static inline void vlc_atomic_init_float(vlc_atomic_float *var, float f)
+{
+    union { float f; uint32_t i; } u;
+    u.f = f;
+    atomic_init(var, u.i);
+}
+
 /** Helper to retrieve a single precision from an atom. */
-static inline float vlc_atomic_loadf(vlc_atomic_float *atom)
+static inline float vlc_atomic_load_float(vlc_atomic_float *atom)
 {
     union { float f; uint32_t i; } u;
     u.i = atomic_load(atom);
@@ -453,7 +405,7 @@ static inline float vlc_atomic_loadf(vlc_atomic_float *atom)
 }
 
 /** Helper to store a single precision into an atom. */
-static inline void vlc_atomic_storef(vlc_atomic_float *atom, float f)
+static inline void vlc_atomic_store_float(vlc_atomic_float *atom, float f)
 {
     union { float f; uint32_t i; } u;
     u.f = f;

@@ -153,7 +153,7 @@ typedef struct
     VLC_COMMON_MEMBERS
 
     vlc_thread_t thread;
-    vlc_atomic_t aborted;
+    atomic_bool aborted;
     update_t *p_update;
     char *psz_destdir;
 } update_download_thread_t;

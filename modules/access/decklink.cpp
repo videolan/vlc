@@ -154,19 +154,19 @@ class DeckLinkCaptureDelegate : public IDeckLinkInputCallback
 public:
     DeckLinkCaptureDelegate(demux_t *demux) : demux_(demux)
     {
-        vlc_atomic_set(&m_ref_, 1);
+        atomic_store(&m_ref, 1);
     }
 
     virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID, LPVOID *) { return E_NOINTERFACE; }
 
     virtual ULONG STDMETHODCALLTYPE AddRef(void)
     {
-        return vlc_atomic_inc(&m_ref_);
+        return atomic_fetch_add(&m_ref, 1);
     }
 
     virtual ULONG STDMETHODCALLTYPE Release(void)
     {
-        uintptr_t new_ref = vlc_atomic_dec(&m_ref_);
+        uintptr_t new_ref = atomic_fetch_sub(&m_ref_, 1);
         if (new_ref == 0)
             delete this;
         return new_ref;
@@ -181,7 +181,7 @@ public:
     virtual HRESULT STDMETHODCALLTYPE VideoInputFrameArrived(IDeckLinkVideoInputFrame*, IDeckLinkAudioInputPacket*);
 
 private:
-    vlc_atomic_t m_ref_;
+    atomic_uint m_ref_;
     demux_t *demux_;
 };
 

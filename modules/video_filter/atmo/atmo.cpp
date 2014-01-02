@@ -703,7 +703,7 @@ typedef struct
 {
     filter_t *p_filter;
     vlc_thread_t thread;
-    vlc_atomic_t abort;
+    atomic_bool abort;
 
     /* tell the thread which color should be the target of fading */
     uint8_t ui_red;
@@ -1120,7 +1120,7 @@ static void Atmo_Shutdown(filter_t *p_filter)
           p_sys->p_fadethread->i_steps  = 1;
         else
           p_sys->p_fadethread->i_steps  = p_sys->i_endfadesteps;
-        vlc_atomic_set(&p_sys->p_fadethread->abort, 0);
+        atomic_store(&p_sys->p_fadethread->abort, false);
 
         if( vlc_clone( &p_sys->p_fadethread->thread,
                        FadeToColorThread,
@@ -2390,7 +2390,7 @@ static void *FadeToColorThread(void *obj)
             /* send the same pixel data again... to unlock the buffer! */
             AtmoSendPixelData( p_fadethread->p_filter );
 
-            while( (!vlc_atomic_get (&p_fadethread->abort)) &&
+            while( (!atomic_load (&p_fadethread->abort)) &&
                 (i_steps_done < p_fadethread->i_steps))
             {
                 p_transfer = AtmoLockTransferBuffer( p_fadethread->p_filter );
@@ -2403,7 +2403,7 @@ static void *FadeToColorThread(void *obj)
                 thread improvements wellcome!
                 */
                 for(i_index = 0;
-                    (i_index < i_size) && (!vlc_atomic_get (&p_fadethread->abort));
+                    (i_index < i_size) && (!atomic_load (&p_fadethread->abort));
                     i_index+=4)
                 {
                     i_src_blue  = p_source[i_index+0];
@@ -2459,7 +2459,7 @@ static void CheckAndStopFadeThread(filter_t *p_filter)
     {
         msg_Dbg(p_filter, "kill still running fadeing thread...");
 
-        vlc_atomic_set(&p_sys->p_fadethread->abort, 1);
+        atomic_store(&p_sys->p_fadethread->abort, true);
 
         vlc_join(p_sys->p_fadethread->thread, NULL);
         free(p_sys->p_fadethread);
@@ -2507,7 +2507,7 @@ static int StateCallback( vlc_object_t *, char const *,
                 p_sys->p_fadethread->ui_green = p_sys->ui_pausecolor_green;
                 p_sys->p_fadethread->ui_blue  = p_sys->ui_pausecolor_blue;
                 p_sys->p_fadethread->i_steps  = p_sys->i_fadesteps;
-                vlc_atomic_set(&p_sys->p_fadethread->abort, 0);
+                atomic_store(&p_sys->p_fadethread->abort, false);
 
                 if( vlc_clone( &p_sys->p_fadethread->thread,
                                FadeToColorThread,

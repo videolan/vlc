@@ -33,35 +33,11 @@
 
 struct filter_sys_t
 {
-    atomic_uint_fast32_t brightness;
-    atomic_uint_fast32_t contrast;
-    atomic_uint_fast32_t saturation;
-    atomic_uint_fast32_t hue;
+    vlc_atomic_float brightness;
+    vlc_atomic_float contrast;
+    vlc_atomic_float saturation;
+    vlc_atomic_float hue;
 };
-
-static inline void vlc_atomic_init_float(atomic_uint_fast32_t *var, float val)
-{
-    union { uint32_t u; float f; } u;
-
-    u.f = val;
-    atomic_init(var, u.u);
-}
-
-static inline void vlc_atomic_store_float(atomic_uint_fast32_t *var, float val)
-{
-    union { uint32_t u; float f; } u;
-
-    u.f = val;
-    atomic_store(var, u.u);
-}
-
-static inline float vlc_atomic_load_float(atomic_uint_fast32_t *var)
-{
-    union { uint32_t u; float f; } u;
-
-    u.u = atomic_load(var);
-    return u.f;
-}
 
 static float vlc_to_vdp_brightness(float brightness)
 {
