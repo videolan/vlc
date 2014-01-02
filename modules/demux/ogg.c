@@ -912,7 +912,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
             /* 1 frame per packet */
             p_stream->i_interpolated_pcr += (CLOCK_FREQ / p_stream->f_rate);
         else if( p_stream->fmt.i_codec == VLC_CODEC_OPUS &&
-                 p_stream->i_previous_granulepos >= 0 &&
+                 p_stream->i_previous_granulepos > 0 &&
                  ( duration =
                      Ogg_OpusPacketDuration( p_stream, p_oggpacket ) ) > 0 )
         {
