@@ -160,9 +160,7 @@ static void *RunIntf( void *data )
         if( b_change )
         {
 #warning FIXME: refactor this plugin as a video filter!
-            input_thread_t *p_input;
-
-            p_input = playlist_CurrentInput( pl_Get( p_intf ) );
+            input_thread_t *p_input = pl_CurrentInput( p_intf );
             if( p_input )
             {
                 vout_thread_t *p_vout;
