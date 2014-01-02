@@ -1002,7 +1002,7 @@ int dvb_set_dvbt2 (dvb_device_t *d, uint32_t freq, const char *modstr,
 
     if (dvb_find_frontend (d, DVB_T2))
         return -1;
-    return dvb_set_props (d, 8, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_DVBT2,
+    return dvb_set_props (d, 9, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_DVBT2,
                           DTV_FREQUENCY, freq, DTV_MODULATION, mod,
                           DTV_INNER_FEC, fec, DTV_BANDWIDTH_HZ, bandwidth,
                           DTV_TRANSMISSION_MODE, transmit_mode,
