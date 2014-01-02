@@ -66,12 +66,6 @@ static int  CreateFilter    ( vlc_object_t * );
 static void DestroyFilter   ( vlc_object_t * );
 static picture_t * Filter( filter_t *, picture_t *);
 
-/* callback for global variable state pause / continue / stop events */
-static void AddStateVariableCallback( filter_t *);
-static void DelStateVariableCallback( filter_t *);
-static int StateCallback(vlc_object_t *, char const *,
-                         vlc_value_t, vlc_value_t, void *);
-
 /* callback for atmo settings variables whose change
    should be immediately realized and applied to output
 */
@@ -752,13 +746,6 @@ struct filter_sys_t
     uint32_t ui_frame_counter;
     char sz_framepath[MAX_PATH];
 #endif
-
-    /* light color durring movie pause ... */
-    bool  b_usepausecolor;
-    uint8_t ui_pausecolor_red;
-    uint8_t ui_pausecolor_green;
-    uint8_t ui_pausecolor_blue;
-    int i_fadesteps;
 
     /* light color on movie finish ... */
     uint8_t ui_endcolor_red;
@@ -1791,30 +1778,6 @@ static void Atmo_SetupParameters(filter_t *p_filter)
 
 
     /*
-    because atmowin could also be used for lighten up the room - I think if you
-    pause the video it would be useful to get a little bit more light into to
-    your living room? - instead switching on a lamp?
-    */
-    p_sys->b_usepausecolor = var_CreateGetBoolCommand( p_filter,
-        CFG_PREFIX "usepausecolor" );
-    p_sys->ui_pausecolor_red = (uint8_t)var_CreateGetIntegerCommand( p_filter,
-        CFG_PREFIX "pcolor-red");
-    p_sys->ui_pausecolor_green = (uint8_t)var_CreateGetIntegerCommand( p_filter,
-        CFG_PREFIX "pcolor-green");
-    p_sys->ui_pausecolor_blue = (uint8_t)var_CreateGetIntegerCommand( p_filter,
-        CFG_PREFIX "pcolor-blue");
-    p_sys->i_fadesteps = var_CreateGetIntegerCommand( p_filter,
-        CFG_PREFIX "fadesteps");
-    if(p_sys->i_fadesteps < 1)
-        p_sys->i_fadesteps = 1;
-    msg_Dbg(p_filter,"use pause color %d, RGB: %d, %d, %d, Fadesteps: %d",
-        (int)p_sys->b_usepausecolor,
-        p_sys->ui_pausecolor_red,
-        p_sys->ui_pausecolor_green,
-        p_sys->ui_pausecolor_blue,
-        p_sys->i_fadesteps);
-
-    /*
     this color is use on shutdown of the filter - the define the
     final light after playback... may be used to dim up the light -
     how it happens in the cinema...
@@ -1955,8 +1918,6 @@ static int CreateFilter( vlc_object_t *p_this )
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
-    AddStateVariableCallback(p_filter);
-
     AddAtmoSettingsVariablesCallbacks(p_filter);
 
     Atmo_SetupParameters(p_filter);
@@ -1979,8 +1940,6 @@ static void DestroyFilter( vlc_object_t *p_this )
     filter_sys_t *p_sys =  p_filter->p_sys;
 
     msg_Dbg( p_filter, "Destroy Atmo Filter");
-
-    DelStateVariableCallback(p_filter);
 
     DelAtmoSettingsVariablesCallbacks(p_filter);
 
@@ -2466,106 +2425,6 @@ static void CheckAndStopFadeThread(filter_t *p_filter)
         p_sys->p_fadethread = NULL;
     }
     vlc_mutex_unlock( &p_sys->filter_lock );
-}
-
-/*****************************************************************************
-* StateCallback: Callback for the inputs variable "State" to get notified
-* about Pause and Continue Playback events.
-*****************************************************************************/
-static int StateCallback( vlc_object_t *, char const *,
-                         vlc_value_t oldval, vlc_value_t newval,
-                         void *p_data )
-{
-    filter_t *p_filter = (filter_t *)p_data;
-    filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
-
-    if(p_sys->b_usepausecolor && p_sys->b_enabled)
-    {
-        msg_Dbg(p_filter, "state change from: %"PRId64" to %"PRId64, oldval.i_int,
-            newval.i_int);
-
-        if((newval.i_int == PAUSE_S) && (oldval.i_int == PLAYING_S))
-        {
-            /* tell the other thread to stop sending images to light
-               controller */
-            p_sys->b_pause_live = true;
-
-            // clean up old thread - should not happen....
-            CheckAndStopFadeThread( p_filter );
-
-            // perpare spawn fadeing thread
-            vlc_mutex_lock( &p_sys->filter_lock );
-            /*
-            launch only a new thread if there is none active!
-            or waiting for cleanup
-            */
-            if(p_sys->p_fadethread == NULL)
-            {
-                p_sys->p_fadethread = (fadethread_t *)calloc( 1, sizeof(fadethread_t) );
-                p_sys->p_fadethread->p_filter = p_filter;
-                p_sys->p_fadethread->ui_red   = p_sys->ui_pausecolor_red;
-                p_sys->p_fadethread->ui_green = p_sys->ui_pausecolor_green;
-                p_sys->p_fadethread->ui_blue  = p_sys->ui_pausecolor_blue;
-                p_sys->p_fadethread->i_steps  = p_sys->i_fadesteps;
-                atomic_store(&p_sys->p_fadethread->abort, false);
-
-                if( vlc_clone( &p_sys->p_fadethread->thread,
-                               FadeToColorThread,
-                               p_sys->p_fadethread,
-                               VLC_THREAD_PRIORITY_LOW ) )
-                {
-                    msg_Err( p_filter, "cannot create FadeToColorThread" );
-                    free( p_sys->p_fadethread );
-                    p_sys->p_fadethread = NULL;
-                }
-            }
-            vlc_mutex_unlock( &p_sys->filter_lock );
-        }
-
-        if((newval.i_int == PLAYING_S) && (oldval.i_int == PAUSE_S))
-        {
-            /* playback continues check thread state */
-            CheckAndStopFadeThread( p_filter );
-            /* reactivate the Render function... to do its normal work */
-            p_sys->b_pause_live = false;
-        }
-    }
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
-* AddPlaylistInputThreadStateCallback: Setup call back on "State" Variable
-*****************************************************************************
-* Add Callback function to the "state" variable of the input thread..
-* first find the PlayList and get the input thread from there to attach
-* my callback?
-*****************************************************************************/
-static void AddStateVariableCallback(filter_t *p_filter)
-{
-    input_thread_t *p_input = playlist_CurrentInput( pl_Get( p_filter ) );
-    if(p_input)
-    {
-        var_AddCallback( p_input, "state", StateCallback, p_filter );
-        vlc_object_release( p_input );
-    }
-}
-
-/*****************************************************************************
-* DelPlaylistInputThreadStateCallback: Remove call back on "State" Variable
-*****************************************************************************
-* Delete the callback function to the "state" variable of the input thread...
-* first find the PlayList and get the input thread from there to attach
-* my callback.
-*****************************************************************************/
-static void DelStateVariableCallback( filter_t *p_filter )
-{
-    input_thread_t *p_input = playlist_CurrentInput( pl_Get ( p_filter ) );
-    if(p_input)
-    {
-        var_DelCallback( p_input, "state", StateCallback, p_filter );
-        vlc_object_release( p_input );
-    }
 }
 
 /****************************************************************************
