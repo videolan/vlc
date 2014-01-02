@@ -132,6 +132,9 @@ struct demux_sys_t
      * the sub-streams */
     mtime_t i_pcr;
     mtime_t i_pcr_offset;
+    /* informative only */
+    mtime_t i_pcr_jitter;
+    int64_t i_access_delay;
 
     /* new stream or starting from a chain */
     bool b_chained_boundary;

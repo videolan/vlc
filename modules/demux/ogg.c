@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_access.h>
 #include <vlc_demux.h>
 #include <vlc_meta.h>
 #include <vlc_input.h>
@@ -201,6 +202,8 @@ static int Open( vlc_object_t * p_this )
 
     p_sys->i_length = -1;
     p_sys->b_preparsing_done = false;
+
+    stream_Control( p_demux->s, ACCESS_GET_PTS_DELAY, & p_sys->i_access_delay );
 
     /* Set exported functions */
     p_demux->pf_demux = Demux;
@@ -567,6 +570,17 @@ static int Demux( demux_t * p_demux )
 
     if ( i_pcr_candidate > VLC_TS_INVALID && p_sys->i_pcr != i_pcr_candidate )
     {
+        if ( p_sys->i_streams == 1 && p_sys->i_access_delay )
+        {
+            int64_t i_pcr_jitter = i_pcr_candidate - p_sys->i_pcr;
+            if ( i_pcr_jitter > p_sys->i_pcr_jitter )
+            {
+                p_sys->i_pcr_jitter = i_pcr_jitter;
+                if ( p_sys->i_access_delay < i_pcr_jitter )
+                    msg_Warn( p_demux, "Consider increasing access caching variable from %"PRId64" to >%"PRId64,
+                              p_sys->i_access_delay / 1000, i_pcr_jitter / 1000 );
+            }
+        }
         p_sys->i_pcr = i_pcr_candidate;
         if( ! b_skipping )
             es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr );
