@@ -188,8 +188,42 @@ void libvlc_InternalPlay(libvlc_int_t *libvlc)
 }
 
 /**
- * Stops and destroys all interfaces
- * @param p_libvlc the LibVLC instance
+ * Starts an interface plugin.
+ */
+int libvlc_InternalAddIntf(libvlc_int_t *libvlc, const char *name)
+{
+    playlist_t *playlist = intf_GetPlaylist(libvlc);
+    int ret;
+
+    if (unlikely(playlist == NULL))
+        ret = VLC_ENOMEM;
+    else
+    if (name != NULL)
+        ret = intf_Create(playlist, name);
+    else
+    {   /* Default interface */
+        char *intf = var_InheritString(libvlc, "intf");
+        if (intf == NULL) /* "intf" has not been set */
+        {
+            char *pidfile = var_InheritString(libvlc, "pidfile");
+            if (pidfile != NULL)
+                free(pidfile);
+            else
+                msg_Info(libvlc, _("Running vlc with the default interface. "
+                         "Use 'cvlc' to use vlc without interface."));
+        }
+        ret = intf_Create(playlist, intf);
+        name = "default";
+    }
+    if (ret != VLC_SUCCESS)
+        msg_Err(libvlc, "interface \"%s\" initialization failed", name);
+    return ret;
+}
+
+/**
+ * Stops and destroys all interfaces, then the playlist.
+ * @warning FIXME
+ * @param libvlc the LibVLC instance
  */
 void intf_DestroyAll(libvlc_int_t *libvlc)
 {
@@ -213,8 +247,13 @@ void intf_DestroyAll(libvlc_int_t *libvlc)
 
             vlc_mutex_lock(&lock);
         }
+
+        libvlc_priv(libvlc)->playlist = NULL;
     }
     vlc_mutex_unlock(&lock);
+
+    if (playlist != NULL)
+        playlist_Destroy(playlist);
 }
 
 /* Following functions are local */

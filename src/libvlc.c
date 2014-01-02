@@ -532,11 +532,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     }
 #endif
 
-    /* Free playlist now, all threads are gone */
-    playlist_t *p_playlist = libvlc_priv (p_libvlc)->playlist;
-    if( p_playlist != NULL )
-        playlist_Destroy( p_playlist );
-
 #if !defined( _WIN32 ) && !defined( __OS2__ )
     char *pidfile = var_InheritString( p_libvlc, "pidfile" );
     if( pidfile != NULL )
@@ -581,40 +576,6 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
 
     assert( atomic_load(&(vlc_internals(p_libvlc)->refs)) == 1 );
     vlc_object_release( p_libvlc );
-}
-
-/**
- * Add an interface plugin and run it
- */
-int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, const char *name )
-{
-    if( !p_libvlc )
-        return VLC_EGENERIC;
-
-    playlist_t *playlist = pl_Get(p_libvlc);
-    int ret;
-
-    if( name != NULL )
-        ret = intf_Create( playlist, name );
-    else
-    {   /* Default interface */
-        char *intf = var_InheritString( p_libvlc, "intf" );
-        if( intf == NULL ) /* "intf" has not been set */
-        {
-            char *pidfile = var_InheritString( p_libvlc, "pidfile" );
-            if( pidfile != NULL )
-                free( pidfile );
-            else
-                msg_Info( p_libvlc, "%s",
-                          _("Running vlc with the default interface. "
-                            "Use 'cvlc' to use vlc without interface.") );
-        }
-        ret = intf_Create( playlist, intf );
-        name = "default";
-    }
-    if( ret )
-        msg_Err( p_libvlc, "interface \"%s\" initialization failed", name );
-    return ret;
 }
 
 /*****************************************************************************
