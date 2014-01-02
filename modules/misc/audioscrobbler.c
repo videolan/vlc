@@ -157,16 +157,13 @@ static void DeleteSong(audioscrobbler_song_t* p_song)
  *****************************************************************************/
 static void ReadMetaData(intf_thread_t *p_this)
 {
-    input_thread_t      *p_input;
-    input_item_t        *p_item;
+    intf_sys_t *p_sys = p_this->p_sys;
 
-    intf_sys_t          *p_sys = p_this->p_sys;
-
-    p_input = playlist_CurrentInput(pl_Get(p_this));
+    input_thread_t *p_input = pl_CurrentInput(p_this);
     if (!p_input)
         return;
 
-    p_item = input_GetItem(p_input);
+    input_item_t *p_item = input_GetItem(p_input);
     if (!p_item)
     {
         vlc_object_release(p_input);
@@ -357,10 +354,8 @@ static int PlayingChange(vlc_object_t *p_this, const char *psz_var,
 static int ItemChange(vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data)
 {
-    input_thread_t      *p_input;
     intf_thread_t       *p_intf     = (intf_thread_t*) p_data;
     intf_sys_t          *p_sys      = p_intf->p_sys;
-    input_item_t        *p_item;
 
     VLC_UNUSED(p_this); VLC_UNUSED(psz_var);
     VLC_UNUSED(oldval); VLC_UNUSED(newval);
@@ -369,12 +364,11 @@ static int ItemChange(vlc_object_t *p_this, const char *psz_var,
     p_sys->b_meta_read      = false;
     p_sys->b_submit         = false;
 
-    p_input = playlist_CurrentInput(pl_Get(p_intf));
-
+    input_thread_t *p_input = pl_CurrentInput(p_intf);
     if (!p_input || p_input->b_dead)
         return VLC_SUCCESS;
 
-    p_item = input_GetItem(p_input);
+    input_item_t *p_item = input_GetItem(p_input);
     if (!p_item)
     {
         vlc_object_release(p_input);
