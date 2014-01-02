@@ -735,7 +735,10 @@ char *str_format_meta( input_thread_t *p_input, const char *s )
                     {
                         audio_output_t *aout = input_GetAout( p_input );
                         if( aout )
+                        {
                             vol = aout_VolumeGet( aout );
+                            vlc_object_release( aout );
+                        }
                     }
                     if( vol >= 0.f )
                     {
@@ -796,9 +799,6 @@ char *str_format_meta( input_thread_t *p_input, const char *s )
         s++;
     }
     *(dst+d) = '\0';
-
-    if( p_input )
-        vlc_object_release( p_input );
 
     return dst;
 }
