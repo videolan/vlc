@@ -183,7 +183,7 @@ static int Open(vlc_object_t *obj)
 
     i = var_CreateGetIntegerCommand(filter, "hue");
     var_AddCallback(filter, "hue", HueCallback, &sys->hue);
-    vlc_atomic_init_float(&sys->saturation, vlc_to_vdp_saturation(i));
+    vlc_atomic_init_float(&sys->hue, vlc_to_vdp_hue(i));
 
     return VLC_SUCCESS;
 }
