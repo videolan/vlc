@@ -304,6 +304,8 @@ typedef         uintmax_t atomic_uintmax_t;
 
 # elif defined (_MSC_VER)
 
+# include <windows.h>
+
 /*** Use the Interlocked API. ***/
 
 /* Define macros in order to dispatch to the correct function depending on the type.
