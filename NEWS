@@ -37,6 +37,7 @@ Demuxer:
  * Support microseconds in SubRip subtitles
  * FLAC packets validation using CRC
  * Support Opus in MKV
+ * Support VP8 in OGG
  * Basic support for WebVTT
  * Handle support for ISO/IEC 14496-3 Audio stream type in TS
  * Support HDPR TS files

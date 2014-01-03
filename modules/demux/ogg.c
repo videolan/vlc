@@ -137,6 +137,7 @@ static void Ogg_ReadKateHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadFlacHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadAnnodexHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static bool Ogg_ReadDiracHeader( logical_stream_t *, ogg_packet * );
+static bool Ogg_ReadVP8Header( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadSkeletonHeader( demux_t *, logical_stream_t *, ogg_packet * );
 
 /* Skeleton */
@@ -490,6 +491,7 @@ static int Demux( demux_t * p_demux )
                 if( p_stream->fmt.i_codec == VLC_CODEC_VORBIS ||
                     p_stream->fmt.i_codec == VLC_CODEC_SPEEX ||
                     p_stream->fmt.i_codec == VLC_CODEC_OPUS ||
+                    p_stream->fmt.i_codec == VLC_CODEC_VP8 ||
                     p_stream->fmt.i_codec == VLC_CODEC_FLAC )
                 {
                     if( ogg_stream_packetout( &p_stream->os, &oggpacket ) > 0 )
@@ -862,6 +864,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
     {
         if( p_stream->fmt.i_codec == VLC_CODEC_THEORA ||
             p_stream->fmt.i_codec == VLC_CODEC_KATE ||
+            p_stream->fmt.i_codec == VLC_CODEC_VP8 ||
             p_stream->fmt.i_codec == VLC_CODEC_DIRAC )
         {
             p_stream->i_pcr = Oggseek_GranuleToAbsTimestamp( p_stream,
@@ -971,6 +974,13 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         ! memcmp ( p_oggpacket->packet, "index", 6 ) )
     {
         Ogg_ReadSkeletonIndex( p_demux, p_oggpacket );
+        return;
+    }
+    else if( p_stream->fmt.i_codec == VLC_CODEC_VP8 &&
+             p_oggpacket->bytes >= 7 &&
+             !memcmp( p_oggpacket->packet, "OVP80\x02\x20", 7 ) )
+    {
+        Ogg_ReadVP8Header( p_demux, p_stream, p_oggpacket );
         return;
     }
 
@@ -1097,6 +1107,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     if( p_stream->fmt.i_codec == VLC_CODEC_VORBIS ||
         p_stream->fmt.i_codec == VLC_CODEC_SPEEX ||
         p_stream->fmt.i_codec == VLC_CODEC_OPUS ||
+        p_stream->fmt.i_codec == VLC_CODEC_VP8 ||
         p_stream->fmt.i_codec == VLC_CODEC_FLAC )
     {
         if( p_stream->i_pcr > VLC_TS_INVALID )
@@ -1114,6 +1125,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     if( p_stream->fmt.i_codec != VLC_CODEC_VORBIS &&
         p_stream->fmt.i_codec != VLC_CODEC_SPEEX &&
         p_stream->fmt.i_codec != VLC_CODEC_OPUS &&
+        p_stream->fmt.i_codec != VLC_CODEC_VP8 &&
         p_stream->fmt.i_codec != VLC_CODEC_FLAC &&
         p_stream->i_pcr >= 0 )
     {
@@ -1206,6 +1218,15 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         if( -1 != p_oggpacket->granulepos )
             p_block->i_pts = u_pnum * CLOCK_FREQ / p_stream->f_rate / 2;
     }
+    else if( p_stream->fmt.i_codec == VLC_CODEC_VP8 )
+    {
+        p_block->i_pts = p_stream->i_interpolated_pcr;
+        p_block->i_dts = p_block->i_pts;
+        if( p_oggpacket->granulepos > 0 && Ogg_IsKeyFrame( p_stream, p_oggpacket ) )
+        {
+            p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+        }
+    }
     else
     {
         p_block->i_dts = i_pts;
@@ -1215,6 +1236,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     if( p_stream->fmt.i_codec != VLC_CODEC_VORBIS &&
         p_stream->fmt.i_codec != VLC_CODEC_SPEEX &&
         p_stream->fmt.i_codec != VLC_CODEC_OPUS &&
+        p_stream->fmt.i_codec != VLC_CODEC_VP8 &&
         p_stream->fmt.i_codec != VLC_CODEC_FLAC &&
         p_stream->fmt.i_codec != VLC_CODEC_TARKIN &&
         p_stream->fmt.i_codec != VLC_CODEC_THEORA &&
@@ -1501,6 +1523,19 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     msg_Dbg( p_demux,
                              "found tarkin header, bitrate: %i, rate: %f",
                              p_stream->fmt.i_bitrate, p_stream->f_rate );
+                }
+                /* Check for VP8 header */
+                else if( oggpacket.bytes >= 26 &&
+                         ! memcmp( oggpacket.packet, "OVP80", 5 ) )
+                {
+                    if ( Ogg_ReadVP8Header( p_demux, p_stream, &oggpacket ) )
+                        msg_Dbg( p_demux, "found VP8 header "
+                             "fps: %f, width:%i; height:%i",
+                             p_stream->f_rate,
+                             p_stream->fmt.video.i_width,
+                             p_stream->fmt.video.i_height );
+                    else
+                        p_stream->fmt.i_cat = UNKNOWN_ES;
                 }
                 /* Check for Annodex header */
                 else if( oggpacket.bytes >= 7 &&
@@ -2201,7 +2236,9 @@ static void Ogg_ExtractMeta( demux_t *p_demux, es_format_t *p_fmt, const uint8_t
     case VLC_CODEC_SPEEX:
         Ogg_ExtractXiphMeta( p_demux, p_fmt, p_headers, i_headers, 0 );
         break;
-
+    case VLC_CODEC_VP8:
+        Ogg_ExtractComments( p_demux, p_fmt, p_headers, i_headers );
+        break;
     /* N headers with the 2° one being the comments */
     case VLC_CODEC_KATE:
         /* 1 byte for header type, 7 bytes for magic, 1 reserved zero byte */
@@ -2469,6 +2506,37 @@ static void Ogg_ReadKateHeader( logical_stream_t *p_stream,
     }
 }
 
+static bool Ogg_ReadVP8Header( demux_t *p_demux, logical_stream_t *p_stream,
+                               ogg_packet *p_oggpacket )
+{
+    switch( p_oggpacket->packet[5] )
+    {
+    /* STREAMINFO */
+    case 0x01:
+        /* Mapping version */
+        if ( p_oggpacket->packet[6] != 0x01 || p_oggpacket->packet[7] != 0x00 )
+            return false;
+        p_stream->fmt.i_cat = VIDEO_ES;
+        p_stream->fmt.i_codec = VLC_CODEC_VP8;
+        p_stream->i_granule_shift = 32;
+        p_stream->fmt.video.i_width = GetWBE( &p_oggpacket->packet[8] );
+        p_stream->fmt.video.i_height = GetWBE( &p_oggpacket->packet[10] );
+        p_stream->fmt.video.i_sar_num = GetDWBE( &p_oggpacket->packet[12 - 1] ) & 0x0FFF;
+        p_stream->fmt.video.i_sar_den = GetDWBE( &p_oggpacket->packet[15 - 1] ) & 0x0FFF;
+        p_stream->fmt.video.i_frame_rate = GetDWBE( &p_oggpacket->packet[18] );
+        p_stream->fmt.video.i_frame_rate_base = GetDWBE( &p_oggpacket->packet[22] );
+        p_stream->f_rate = (double) p_stream->fmt.video.i_frame_rate / p_stream->fmt.video.i_frame_rate_base;
+        return true;
+    /* METADATA */
+    case 0x02:
+        Ogg_ExtractMeta( p_demux, & p_stream->fmt,
+                         p_oggpacket->packet + 7, p_oggpacket->bytes - 7 );
+        return true;
+    default:
+        return false;
+    }
+}
+
 static void Ogg_ApplyContentType( logical_stream_t *p_stream, const char* psz_value,
                                   bool *b_force_backup, bool *b_packet_out )
 {
@@ -2536,6 +2604,11 @@ static void Ogg_ApplyContentType( logical_stream_t *p_stream, const char* psz_va
         p_stream->fmt.i_cat = UNKNOWN_ES;
         free( p_stream->fmt.psz_description );
         p_stream->fmt.psz_description = strdup("OGG Kate Overlay (Unsupported)");
+    }
+    else if( !strncmp(psz_value, "video/x-vp8", 11) )
+    {
+        p_stream->fmt.i_cat = VIDEO_ES;
+        p_stream->fmt.i_codec = VLC_CODEC_VP8;
     }
 }
 

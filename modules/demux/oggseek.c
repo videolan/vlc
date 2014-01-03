@@ -561,6 +561,10 @@ bool Ogg_IsKeyFrame( logical_stream_t *p_stream, ogg_packet *p_packet )
         else
             return !( p_packet->packet[0] & THEORA_FTYPE_INTERFRAME );
     }
+    else if ( p_stream->fmt.i_codec == VLC_CODEC_VP8 )
+    {
+        return ( ( ( p_packet->granulepos >> 3 ) & 0x07FFFFFF ) == 0 );
+    }
     return true;
 }
 
@@ -786,6 +790,12 @@ int64_t Oggseek_GranuleToAbsTimestamp( logical_stream_t *p_stream,
         if ( b_presentation ) pframe -= p_stream->i_keyframe_offset;
         i_timestamp = ( iframe + pframe ) * CLOCK_FREQ / p_stream->f_rate;
     }
+    else if ( p_stream->fmt.i_codec == VLC_CODEC_VP8 )
+    {
+        ogg_int64_t frame = i_granule >> p_stream->i_granule_shift;
+        if ( b_presentation ) frame--;
+        i_timestamp = frame * CLOCK_FREQ / p_stream->f_rate;
+    }
     else if( p_stream->fmt.i_codec == VLC_CODEC_DIRAC )
     {
         ogg_int64_t i_dts = i_granule >> 31;
@@ -824,6 +834,12 @@ bool Oggseek_PacketPCRFixup( logical_stream_t *p_stream, ogg_page *p_page,
         p_stream->i_pcr -= CLOCK_FREQ *
                 ogg_page_packets( p_page ) / p_stream->f_rate;
         return true;
+    }
+    else if ( p_stream->fmt.i_codec == VLC_CODEC_VP8 )
+    {
+        ogg_int64_t frame = ogg_page_granulepos( p_page ) >> p_stream->i_granule_shift;
+        frame -= ogg_page_packets( p_page );
+        p_stream->i_pcr = frame * CLOCK_FREQ / p_stream->f_rate;
     }
 
     return false;
