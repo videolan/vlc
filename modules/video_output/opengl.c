@@ -896,6 +896,8 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
             glr->bottom = -2.0 * (r->i_y + r->fmt.i_visible_height) / subpicture->i_original_picture_height + 1.0;
 
             glr->texture = 0;
+            /* Try to recycle the textures allocated by the previous
+               call to this function. */
             for (int j = 0; j < last_count; j++) {
                 if (last[j].texture &&
                     last[j].width  == glr->width &&
@@ -911,11 +913,13 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
             const int pixels_offset = r->fmt.i_y_offset * r->p_picture->p->i_pitch +
                                       r->fmt.i_x_offset * r->p_picture->p->i_pixel_pitch;
             if (glr->texture) {
+                /* A texture was successfully recycled, reuse it. */
                 glBindTexture(GL_TEXTURE_2D, glr->texture);
                 Upload(vgl, r->fmt.i_visible_width, r->fmt.i_visible_height, glr->width, glr->height, 1, 1, 1, 1,
                        r->p_picture->p->i_pitch, r->p_picture->p->i_pixel_pitch, 0,
                        &r->p_picture->p->p_pixels[pixels_offset], GL_TEXTURE_2D, glr->format, glr->type);
             } else {
+                /* Could not recycle a previous texture, generate a new one. */
                 glGenTextures(1, &glr->texture);
                 glBindTexture(GL_TEXTURE_2D, glr->texture);
 #if !USE_OPENGL_ES
@@ -1064,6 +1068,17 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
             scale_w = 1.0;
             scale_h = 1.0;
         }
+        /* Warning: if NPOT is not supported a larger texture is
+           allocated. This will cause right and bottom coordinates to
+           land on the edge of two texels with the texels to the
+           right/bottom uninitialized by the call to
+           glTexSubImage2D. This might cause a green line to appear on
+           the right/bottom of the display.
+           There are two possible solutions:
+           - Manually mirror the edges of the texture.
+           - Add a "-1" when computing right and bottom, however the
+           last row/column might not be displayed at all.
+        */
         left[j]   = (source->i_x_offset +                       0 ) * scale_w;
         top[j]    = (source->i_y_offset +                       0 ) * scale_h;
         right[j]  = (source->i_x_offset + source->i_visible_width ) * scale_w;
