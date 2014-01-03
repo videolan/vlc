@@ -804,7 +804,7 @@ int64_t Oggseek_GranuleToAbsTimestamp( logical_stream_t *p_stream,
     }
     else if( p_stream->fmt.i_codec == VLC_CODEC_OPUS )
     {
-        i_timestamp = p_stream->i_pre_skip + i_granule * CLOCK_FREQ / 48000;
+        i_timestamp = ( i_granule - p_stream->i_pre_skip ) * CLOCK_FREQ / 48000;
     }
     else if( p_stream->fmt.i_codec == VLC_CODEC_VORBIS )
     {
