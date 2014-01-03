@@ -565,8 +565,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     /* Texture size */
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-        int w = vgl->fmt.i_width  * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den;
-        int h = vgl->fmt.i_height * vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den;
+        int w = vgl->fmt.i_visible_width  * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den;
+        int h = vgl->fmt.i_visible_height * vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den;
         if (vgl->supports_npot) {
             vgl->tex_width[j]  = w;
             vgl->tex_height[j] = h;
