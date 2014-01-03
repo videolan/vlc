@@ -35,6 +35,6 @@ endif
 DEPS_dvdread = dvdcss
 
 .dvdread: dvdread .dvdcss
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-libdvdcss
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --with-libdvdcss
 	cd $< && $(MAKE) install
 	touch $@
