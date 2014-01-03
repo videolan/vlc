@@ -324,17 +324,17 @@ typedef         uintmax_t atomic_uintmax_t;
 /* Define macros in order to dispatch to the correct function depending on the type.
    Several ranges are need because some operations are not implemented for all types. */
 #  define atomic_type_dispatch_32_64(operation, object, ...) \
-    (sizeof(*object) == 4 ? operation(object, __VA_ARGS__) : \
-     sizeof(*object) == 8 ? operation##64(object, __VA_ARGS__) : \
-     (abort(), 0))
+    (sizeof(*object) == 4 ? operation((LONG *)object, __VA_ARGS__) : \
+    sizeof(*object) == 8 ? operation##64((LONGLONG *)object, __VA_ARGS__) : \
+    (abort(), 0))
 
 #  define atomic_type_dispatch_16_64(operation, object, ...) \
-    (sizeof(*object) == 2 ? operation##16(object, __VA_ARGS__) : \
-     atomic_type_dispatch_32_64(operation, object, __VA_ARGS__))
+    (sizeof(*object) == 2 ? operation##16((short *)object, __VA_ARGS__) : \
+    atomic_type_dispatch_32_64(operation, object, __VA_ARGS__))
 
 #  define atomic_type_dispatch_8_64(operation, object, ...) \
-    (sizeof(*object) == 1 ? operation##8(object, __VA_ARGS__) : \
-     atomic_type_dispatch_16_64(operation, object, __VA_ARGS__))
+    (sizeof(*object) == 1 ? operation##8((char *)object, __VA_ARGS__) : \
+    atomic_type_dispatch_16_64(operation, object, __VA_ARGS__))
 
 #  define atomic_store(object,desired) \
     atomic_type_dispatch_8_64(InterlockedExchange, object, desired)
@@ -347,12 +347,12 @@ typedef         uintmax_t atomic_uintmax_t;
     atomic_load(object)
 
 #  define atomic_exchange(object,desired) \
-    atomic_type_dispatch_8_64(InterlockedExchange, object, desired)
+    atomic_type_dispatch_16_64(InterlockedExchange, object, desired)
 #  define atomic_exchange_explicit(object,desired,order) \
     atomic_exchange(object, desired)
 
 #  define atomic_compare_exchange_strong(object,expected,desired) \
-    atomic_type_dispatch_16_64(InterlockedCompareExchange, object, expected, desired) == expected
+    atomic_type_dispatch_16_64(InterlockedCompareExchange, object, *expected, desired) == *expected
 #  define atomic_compare_exchange_strong_explicit(object,expected,desired,order) \
     atomic_compare_exchange_strong(object, expected, desired)
 #  define atomic_compare_exchange_weak(object,expected,desired) \
@@ -366,7 +366,7 @@ typedef         uintmax_t atomic_uintmax_t;
     atomic_fetch_add(object, operand)
 
 #  define atomic_fetch_sub(object,operand) \
-    atomic_type_dispatch_32_64(InterlockedExchangeAdd, object, -operand)
+    atomic_type_dispatch_32_64(InterlockedExchangeAdd, object, -(LONGLONG)operand)
 #  define atomic_fetch_sub_explicit(object,operand,order) \
     atomic_fetch_sub(object, operand)
 
