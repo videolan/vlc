@@ -57,6 +57,18 @@
  * unsigned equivalents, i.e. 4-bytes and 8-bytes types, although GCC also
  * supports 1 and 2-bytes types. Some non-x86 architectures do not support
  * 8-byte atomic types (or not efficiently). */
+#  if defined (_MSC_VER)
+/* Some atomic operations of the Interlocked API are only
+   available for desktop apps. Thus we define the atomic types to
+   be at least 32 bits wide. */
+typedef      int_least32_t atomic_flag;
+typedef      int_least32_t atomic_bool;
+typedef      int_least32_t atomic_char;
+typedef      int_least32_t atomic_schar;
+typedef     uint_least32_t atomic_uchar;
+typedef      int_least32_t atomic_short;
+typedef     uint_least32_t atomic_ushort;
+#  else
 typedef          bool      atomic_flag;
 typedef          bool      atomic_bool;
 typedef          char      atomic_char;
@@ -64,6 +76,7 @@ typedef   signed char      atomic_schar;
 typedef unsigned char      atomic_uchar;
 typedef          short     atomic_short;
 typedef unsigned short     atomic_ushort;
+#  endif
 typedef          int       atomic_int;
 typedef unsigned int       atomic_uint;
 typedef          long      atomic_long;
