@@ -2119,56 +2119,46 @@ static bool Ogg_LogicalStreamResetEsFormat( demux_t *p_demux, logical_stream_t *
 
     return !b_compatible;
 }
-static void Ogg_ExtractXiphMeta( demux_t *p_demux, es_format_t *p_fmt,
-                                 const void *p_headers, unsigned i_headers, unsigned i_skip )
+
+static void Ogg_ExtractComments( demux_t *p_demux, es_format_t *p_fmt,
+                                 const void *p_headers, unsigned i_headers )
 {
     demux_sys_t *p_ogg = p_demux->p_sys;
-
-    unsigned pi_size[XIPH_MAX_HEADER_COUNT];
-    void     *pp_data[XIPH_MAX_HEADER_COUNT];
-    unsigned i_count;
-    if( xiph_SplitHeaders( pi_size, pp_data, &i_count, i_headers, p_headers ) )
-        return;
-
-    /* TODO how to handle multiple comments properly ? */
-    if( i_count >= 2 && pi_size[1] > i_skip )
+    int i_cover_score = 0;
+    int i_cover_idx = 0;
+    float pf_replay_gain[AUDIO_REPLAY_GAIN_MAX];
+    float pf_replay_peak[AUDIO_REPLAY_GAIN_MAX];
+    for(int i=0; i< AUDIO_REPLAY_GAIN_MAX; i++ )
     {
-        int i_cover_score = 0;
-        int i_cover_idx = 0;
-        float pf_replay_gain[AUDIO_REPLAY_GAIN_MAX];
-        float pf_replay_peak[AUDIO_REPLAY_GAIN_MAX];
-        for(int i=0; i< AUDIO_REPLAY_GAIN_MAX; i++ )
-        {
-            pf_replay_gain[i] = 0;
-            pf_replay_peak[i] = 0;
-        }
-        vorbis_ParseComment( &p_ogg->p_meta, (uint8_t*)pp_data[1] + i_skip, pi_size[1] - i_skip,
-                             &p_ogg->i_attachments, &p_ogg->attachments,
-                             &i_cover_score, &i_cover_idx,
-                             &p_ogg->i_seekpoints, &p_ogg->pp_seekpoints,
-                             &pf_replay_gain, &pf_replay_peak );
-        if( p_ogg->p_meta != NULL && i_cover_idx < p_ogg->i_attachments )
-        {
-            char psz_url[128];
-            snprintf( psz_url, sizeof(psz_url), "attachment://%s",
-                p_ogg->attachments[i_cover_idx]->psz_name );
-            vlc_meta_Set( p_ogg->p_meta, vlc_meta_ArtworkURL, psz_url );
-        }
+        pf_replay_gain[i] = 0;
+        pf_replay_peak[i] = 0;
+    }
+    vorbis_ParseComment( &p_ogg->p_meta, p_headers, i_headers,
+                         &p_ogg->i_attachments, &p_ogg->attachments,
+                         &i_cover_score, &i_cover_idx,
+                         &p_ogg->i_seekpoints, &p_ogg->pp_seekpoints,
+                         &pf_replay_gain, &pf_replay_peak );
+    if( p_ogg->p_meta != NULL && i_cover_idx < p_ogg->i_attachments )
+    {
+        char psz_url[128];
+        snprintf( psz_url, sizeof(psz_url), "attachment://%s",
+                  p_ogg->attachments[i_cover_idx]->psz_name );
+        vlc_meta_Set( p_ogg->p_meta, vlc_meta_ArtworkURL, psz_url );
+    }
 
-        for ( int i=0; i<AUDIO_REPLAY_GAIN_MAX;i++ )
+    for ( int i=0; i<AUDIO_REPLAY_GAIN_MAX;i++ )
+    {
+        if ( pf_replay_gain[i] != 0 )
         {
-            if ( pf_replay_gain[i] != 0 )
-            {
-                p_fmt->audio_replay_gain.pb_gain[i] = true;
-                p_fmt->audio_replay_gain.pf_gain[i] = pf_replay_gain[i];
-                msg_Dbg( p_demux, "setting replay gain %d to %f", i, pf_replay_gain[i] );
-            }
-            if ( pf_replay_peak[i] != 0 )
-            {
-                p_fmt->audio_replay_gain.pb_peak[i] = true;
-                p_fmt->audio_replay_gain.pf_peak[i] = pf_replay_peak[i];
-                msg_Dbg( p_demux, "setting replay peak %d to %f", i, pf_replay_gain[i] );
-            }
+            p_fmt->audio_replay_gain.pb_gain[i] = true;
+            p_fmt->audio_replay_gain.pf_gain[i] = pf_replay_gain[i];
+            msg_Dbg( p_demux, "setting replay gain %d to %f", i, pf_replay_gain[i] );
+        }
+        if ( pf_replay_peak[i] != 0 )
+        {
+            p_fmt->audio_replay_gain.pb_peak[i] = true;
+            p_fmt->audio_replay_gain.pf_peak[i] = pf_replay_peak[i];
+            msg_Dbg( p_demux, "setting replay peak %d to %f", i, pf_replay_gain[i] );
         }
     }
 
@@ -2177,6 +2167,23 @@ static void Ogg_ExtractXiphMeta( demux_t *p_demux, es_format_t *p_fmt,
         p_demux->info.i_update |= INPUT_UPDATE_TITLE_LIST;
     }
 }
+
+static void Ogg_ExtractXiphMeta( demux_t *p_demux, es_format_t *p_fmt,
+                                 const void *p_headers, unsigned i_headers, unsigned i_skip )
+{
+    unsigned pi_size[XIPH_MAX_HEADER_COUNT];
+    void     *pp_data[XIPH_MAX_HEADER_COUNT];
+    unsigned i_count;
+
+    if( xiph_SplitHeaders( pi_size, pp_data, &i_count, i_headers, p_headers ) )
+        return;
+    /* TODO how to handle multiple comments properly ? */
+    if( i_count >= 2 && pi_size[1] > i_skip )
+    {
+        Ogg_ExtractComments( p_demux, p_fmt, (uint8_t*)pp_data[1] + i_skip, pi_size[1] - i_skip );
+    }
+}
+
 static void Ogg_ExtractMeta( demux_t *p_demux, es_format_t *p_fmt, const uint8_t *p_headers, int i_headers )
 {
     demux_sys_t *p_ogg = p_demux->p_sys;
