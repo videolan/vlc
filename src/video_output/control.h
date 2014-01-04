@@ -49,7 +49,7 @@ enum {
     VOUT_CONTROL_STEP,                  /* time_ptr */
 
     VOUT_CONTROL_FULLSCREEN,            /* bool */
-    VOUT_CONTROL_ON_TOP,                /* bool */
+    VOUT_CONTROL_WINDOW_STATE,          /* unsigned */
     VOUT_CONTROL_DISPLAY_FILLED,        /* bool */
     VOUT_CONTROL_ZOOM,                  /* pair */
 

@@ -499,10 +499,9 @@ void vout_ControlChangeFullscreen(vout_thread_t *vout, bool fullscreen)
     vout_control_PushBool(&vout->p->control, VOUT_CONTROL_FULLSCREEN,
                           fullscreen);
 }
-void vout_ControlChangeOnTop(vout_thread_t *vout, bool is_on_top)
+void vout_ControlChangeWindowState(vout_thread_t *vout, unsigned st)
 {
-    vout_control_PushBool(&vout->p->control, VOUT_CONTROL_ON_TOP,
-                          is_on_top);
+    vout_control_PushInteger(&vout->p->control, VOUT_CONTROL_WINDOW_STATE, st);
 }
 void vout_ControlChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
 {
@@ -1254,11 +1253,9 @@ static void ThreadChangeFullscreen(vout_thread_t *vout, bool fullscreen)
     vout_SetDisplayFullscreen(vout->p->display.vd, fullscreen);
 }
 
-static void ThreadChangeOnTop(vout_thread_t *vout, bool is_on_top)
+static void ThreadChangeWindowState(vout_thread_t *vout, unsigned state)
 {
-    vout_SetWindowState(vout->p->display.vd,
-                        is_on_top ? VOUT_WINDOW_STATE_ABOVE :
-                                    VOUT_WINDOW_STATE_NORMAL);
+    vout_SetWindowState(vout->p->display.vd, state);
 }
 
 static void ThreadChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
@@ -1499,8 +1496,8 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
     case VOUT_CONTROL_FULLSCREEN:
         ThreadChangeFullscreen(vout, cmd.u.boolean);
         break;
-    case VOUT_CONTROL_ON_TOP:
-        ThreadChangeOnTop(vout, cmd.u.boolean);
+    case VOUT_CONTROL_WINDOW_STATE:
+        ThreadChangeWindowState(vout, cmd.u.integer);
         break;
     case VOUT_CONTROL_DISPLAY_FILLED:
         ThreadChangeDisplayFilled(vout, cmd.u.boolean);

@@ -59,7 +59,7 @@ static int ScaleCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
 static int ZoomCallback( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
-static int OnTopCallback( vlc_object_t *, char const *,
+static int AboveCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
 static int FullscreenCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
@@ -273,7 +273,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
                 | VLC_VAR_ISCOMMAND );
     text.psz_string = _("Always on top");
     var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text, NULL );
-    var_AddCallback( p_vout, "video-on-top", OnTopCallback, NULL );
+    var_AddCallback( p_vout, "video-on-top", AboveCallback, NULL );
 
     /* Add a variable to indicate whether we want window decoration or not */
     var_Create( p_vout, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -622,13 +622,12 @@ static int ZoomCallback( vlc_object_t *obj, char const *name,
     return var_SetFloat( obj, "scale", cur.f_float );
 }
 
-static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int AboveCallback( vlc_object_t *obj, char const *name,
+                          vlc_value_t prev, vlc_value_t cur, void *data )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    (void)psz_cmd; (void)oldval; (void)p_data;
-
-    vout_ControlChangeOnTop( p_vout, newval.b_bool );
+    vout_ControlChangeWindowState( (vout_thread_t *)obj,
+        cur.b_bool ? VOUT_WINDOW_STATE_ABOVE : VOUT_WINDOW_STATE_NORMAL );
+    (void) name; (void) prev; (void) data;
     return VLC_SUCCESS;
 }
 
