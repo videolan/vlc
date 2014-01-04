@@ -210,11 +210,14 @@ static QAction * FindActionWithVar( QMenu *menu, const char *psz_var )
 /*****************************************************************************
  * Definitions of variables for the dynamic menus
  *****************************************************************************/
-#define PUSH_VAR( var ) varnames.append( var ); \
-    objects.append( VLC_OBJECT(p_object) )
+#define PUSH_OBJVAR(object,var) \
+    do { \
+        varnames.append(var); \
+        objects.append(VLC_OBJECT(object)); \
+    } while (0)
 
-#define PUSH_INPUTVAR( var ) varnames.append( var ); \
-    objects.append( VLC_OBJECT(p_input) );
+#define PUSH_VAR(var) PUSH_OBJVAR(p_object, var)
+#define PUSH_INPUTVAR(var) PUSH_OBJVAR(p_input, var)
 
 static int InputAutoMenuBuilder( input_thread_t *p_object,
         QVector<vlc_object_t *> &objects,
