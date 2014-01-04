@@ -218,6 +218,7 @@ static QAction * FindActionWithVar( QMenu *menu, const char *psz_var )
 
 #define PUSH_VAR(var) PUSH_OBJVAR(p_object, var)
 #define PUSH_INPUTVAR(var) PUSH_OBJVAR(p_input, var)
+#define PUSH_PLVAR(var) PUSH_OBJVAR(pl, var)
 
 static int InputAutoMenuBuilder( input_thread_t *p_input,
         QVector<vlc_object_t *> &objects, QVector<const char *> &varnames )
@@ -230,14 +231,14 @@ static int InputAutoMenuBuilder( input_thread_t *p_input,
     return VLC_SUCCESS;
 }
 
-static int VideoAutoMenuBuilder( input_thread_t *p_input,
+static int VideoAutoMenuBuilder( playlist_t *pl, input_thread_t *p_input,
         QVector<vlc_object_t *> &objects, QVector<const char *> &varnames )
 {
     vout_thread_t *p_object = p_input ? input_GetVout( p_input ) : NULL;
 
     PUSH_INPUTVAR( "video-es" );
-    PUSH_VAR( "fullscreen" );
-    PUSH_VAR( "video-on-top" );
+    PUSH_PLVAR( "fullscreen" );
+    PUSH_PLVAR( "video-on-top" );
     PUSH_VAR( "video-wallpaper" );
     PUSH_VAR( "video-snapshot" );
     PUSH_VAR( "zoom" );
@@ -691,7 +692,7 @@ QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 
     p_input = THEMIM->getInput();
 
-    VideoAutoMenuBuilder( p_input, objects, varnames );
+    VideoAutoMenuBuilder( THEPL, p_input, objects, varnames );
 
     return Populate( p_intf, current, varnames, objects );
 }
@@ -941,7 +942,7 @@ void VLCMenuBar::VideoPopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
     if( p_input )
-        VideoAutoMenuBuilder( p_input, objects, varnames );
+        VideoAutoMenuBuilder( THEPL, p_input, objects, varnames );
     CREATE_POPUP
 }
 
@@ -1010,7 +1011,7 @@ void VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
                 val.b_bool = false;
                 CreateAndConnect( menu, "fullscreen",
                         qtr( "Leave Fullscreen" ),"" , ITEM_NORMAL,
-                        VLC_OBJECT(p_vout), val, VLC_VAR_BOOL, b_isFullscreen );
+                        VLC_OBJECT(THEPL), val, VLC_VAR_BOOL, b_isFullscreen );
             }
             vlc_object_release( p_vout );
 
@@ -1524,15 +1525,26 @@ void VLCMenuBar::DoAction( QObject *data )
     const char *var = itemData->psz_var;
     vlc_value_t val = itemData->val;
 
-    /* Preserve settings across vouts via the playlist object: */
-    if( !strcmp( var, "fullscreen" )
-     || !strcmp( var, "video-on-top" ) )
-        var_Set( pl_Get( p_object ), var, val );
-
     if ((var_Type( p_object, var) & VLC_VAR_CLASS) == VLC_VAR_VOID)
         var_TriggerCallback( p_object, var );
     else
         var_Set( p_object, var, val );
+
+    if( !strcmp( var, "fullscreen" )
+     || !strcmp( var, "video-on-top" ) ) /* FIXME: reverse abstraction */
+    {   /* Apply playlist variables to current existing vout too */
+        input_thread_t *input = playlist_CurrentInput((playlist_t *)p_object);
+        if( input != NULL )
+        {
+            vout_thread_t *vout = input_GetVout( input );
+            vlc_object_release( input );
+            if( vout != NULL )
+            {
+                var_Set( vout, var, val ); /* never void class */
+                vlc_object_release( vout );
+            }
+        }
+    }
 }
 
 void VLCMenuBar::updateAudioDevice( intf_thread_t * p_intf, audio_output_t *p_aout, QMenu *current )
