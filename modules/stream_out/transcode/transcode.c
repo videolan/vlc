@@ -282,9 +282,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_acodec = 0;
     if( psz_string && *psz_string )
     {
-        char fcc[4] = "    ";
+        char fcc[5] = "    \0";
         memcpy( fcc, psz_string, __MIN( strlen( psz_string ), 4 ) );
-        p_sys->i_acodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
+        p_sys->i_acodec = vlc_fourcc_GetCodecFromString( AUDIO_ES, fcc );
+        msg_Dbg( p_stream, "Checking codec mapping for %s got %4.4s ", fcc, (char*)&p_sys->i_acodec);
     }
     free( psz_string );
 
