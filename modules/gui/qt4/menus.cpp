@@ -219,22 +219,22 @@ static QAction * FindActionWithVar( QMenu *menu, const char *psz_var )
 #define PUSH_VAR(var) PUSH_OBJVAR(p_object, var)
 #define PUSH_INPUTVAR(var) PUSH_OBJVAR(p_input, var)
 
-static int InputAutoMenuBuilder( input_thread_t *p_object,
-        QVector<vlc_object_t *> &objects,
-        QVector<const char *> &varnames )
+static int InputAutoMenuBuilder( input_thread_t *p_input,
+        QVector<vlc_object_t *> &objects, QVector<const char *> &varnames )
 {
-    PUSH_VAR( "bookmark" );
-    PUSH_VAR( "title" );
-    PUSH_VAR( "chapter" );
-    PUSH_VAR( "program" );
+    PUSH_INPUTVAR( "bookmark" );
+    PUSH_INPUTVAR( "title" );
+    PUSH_INPUTVAR( "chapter" );
+    PUSH_INPUTVAR( "program" );
+
     return VLC_SUCCESS;
 }
 
-static int VideoAutoMenuBuilder( vout_thread_t *p_object,
-        input_thread_t *p_input,
-        QVector<vlc_object_t *> &objects,
-        QVector<const char *> &varnames )
+static int VideoAutoMenuBuilder( input_thread_t *p_input,
+        QVector<vlc_object_t *> &objects, QVector<const char *> &varnames )
 {
+    vout_thread_t *p_object = p_input ? input_GetVout( p_input ) : NULL;
+
     PUSH_INPUTVAR( "video-es" );
     PUSH_VAR( "fullscreen" );
     PUSH_VAR( "video-on-top" );
@@ -248,28 +248,30 @@ static int VideoAutoMenuBuilder( vout_thread_t *p_object,
     PUSH_VAR( "deinterlace-mode" );
     PUSH_VAR( "postprocess" );
 
+    if( p_object )
+        vlc_object_release( p_object );
     return VLC_SUCCESS;
 }
 
-static int SubsAutoMenuBuilder( input_thread_t *p_object,
-        QVector<vlc_object_t *> &objects,
-        QVector<const char *> &varnames )
+static int SubsAutoMenuBuilder( input_thread_t *p_input,
+        QVector<vlc_object_t *> &objects, QVector<const char *> &varnames )
 {
-    PUSH_VAR( "spu-es" );
+    PUSH_INPUTVAR( "spu-es" );
 
     return VLC_SUCCESS;
 }
 
-
-
-static int AudioAutoMenuBuilder( audio_output_t *p_object,
-        input_thread_t *p_input,
-        QVector<vlc_object_t *> &objects,
-        QVector<const char *> &varnames )
+static int AudioAutoMenuBuilder( input_thread_t *p_input,
+        QVector<vlc_object_t *> &objects, QVector<const char *> &varnames )
 {
+    audio_output_t *p_object = p_input ? input_GetAout( p_input ) : NULL;
+
     PUSH_INPUTVAR( "audio-es" );
     PUSH_VAR( "stereo-mode" );
     PUSH_VAR( "visual" );
+
+    if( p_object )
+        vlc_object_release( p_object );
     return VLC_SUCCESS;
 }
 
@@ -618,7 +620,7 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     p_input = THEMIM->getInput();
     p_aout = THEMIM->getAout();
     EnableStaticEntries( current, ( p_aout != NULL ) );
-    AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
+    AudioAutoMenuBuilder( p_input, objects, varnames );
     updateAudioDevice( p_intf, p_aout, audioDeviceMenu );
     if( p_aout )
     {
@@ -655,7 +657,6 @@ QMenu *VLCMenuBar::SubtitleMenu( intf_thread_t *p_intf, QMenu *current, bool b_p
  **/
 QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 {
-    vout_thread_t *p_vout;
     input_thread_t *p_input;
     QVector<vlc_object_t *> objects;
     QVector<const char *> varnames;
@@ -690,11 +691,7 @@ QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 
     p_input = THEMIM->getInput();
 
-    p_vout = THEMIM->getVout();
-    VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
-
-    if( p_vout )
-        vlc_object_release( p_vout );
+    VideoAutoMenuBuilder( p_input, objects, varnames );
 
     return Populate( p_intf, current, varnames, objects );
 }
@@ -944,14 +941,7 @@ void VLCMenuBar::VideoPopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
     if( p_input )
-    {
-        vout_thread_t *p_vout = THEMIM->getVout();
-        if( p_vout )
-        {
-            VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
-            vlc_object_release( p_vout );
-        }
-    }
+        VideoAutoMenuBuilder( p_input, objects, varnames );
     CREATE_POPUP
 }
 
@@ -960,12 +950,7 @@ void VLCMenuBar::AudioPopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
     if( p_input )
-    {
-        audio_output_t *p_aout = THEMIM->getAout();
-        AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
-        if( p_aout )
-            vlc_object_release( p_aout );
-    }
+        AudioAutoMenuBuilder( p_input, objects, varnames );
     CREATE_POPUP
 }
 
