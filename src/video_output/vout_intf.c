@@ -61,6 +61,8 @@ static int ZoomCallback( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 static int AboveCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
+static int WallPaperCallback( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t, void * );
 static int FullscreenCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
 static int SnapshotCallback( vlc_object_t *, char const *,
@@ -275,6 +277,11 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_vout, "video-on-top", AboveCallback, NULL );
 
+    /* Add a variable to indicate if the window should be below all others */
+    var_Create( p_vout, "video-wallpaper", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_AddCallback( p_vout, "video-wallpaper", WallPaperCallback,
+                     (void *)(uintptr_t)VOUT_WINDOW_STATE_BELOW );
+
     /* Add a variable to indicate whether we want window decoration or not */
     var_Create( p_vout, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
@@ -327,6 +334,7 @@ void vout_IntfReinit( vout_thread_t *p_vout )
     var_TriggerCallback( p_vout, "aspect-ratio" );
 
     var_TriggerCallback( p_vout, "video-on-top" );
+    var_TriggerCallback( p_vout, "video-wallpaper" );
 
     var_TriggerCallback( p_vout, "video-filter" );
     var_TriggerCallback( p_vout, "sub-source" );
@@ -627,6 +635,25 @@ static int AboveCallback( vlc_object_t *obj, char const *name,
 {
     vout_ControlChangeWindowState( (vout_thread_t *)obj,
         cur.b_bool ? VOUT_WINDOW_STATE_ABOVE : VOUT_WINDOW_STATE_NORMAL );
+    (void) name; (void) prev; (void) data;
+    return VLC_SUCCESS;
+}
+
+static int WallPaperCallback( vlc_object_t *obj, char const *name,
+                              vlc_value_t prev, vlc_value_t cur, void *data )
+{
+    vout_thread_t *vout = (vout_thread_t *)obj;
+
+    if( cur.b_bool )
+    {
+        vout_ControlChangeWindowState( vout, VOUT_WINDOW_STATE_BELOW );
+        vout_ControlChangeFullscreen( vout, true );
+    }
+    else
+    {
+        var_TriggerCallback( obj, "fullscreen" );
+        var_TriggerCallback( obj, "video-on-top" );
+    }
     (void) name; (void) prev; (void) data;
     return VLC_SUCCESS;
 }

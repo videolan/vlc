@@ -574,7 +574,8 @@ void vout_ControlChangeSubMargin(vout_thread_t *vout, int margin)
 static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, const char *title)
 {
     /* Load configuration */
-    cfg->is_fullscreen = var_CreateGetBool(vout, "fullscreen");
+    cfg->is_fullscreen = var_CreateGetBool(vout, "fullscreen")
+                         || var_InheritBool(vout, "video-wallpaper");
     cfg->display.title = title;
     const int display_width = var_CreateGetInteger(vout, "width");
     const int display_height = var_CreateGetInteger(vout, "height");
@@ -1324,9 +1325,15 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
 
     vout_display_state_t state_default;
     if (!state) {
+        var_Create(vout, "video-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
         VoutGetDisplayCfg(vout, &state_default.cfg, vout->p->display.title);
-        state_default.wm_state = var_CreateGetBool(vout, "video-on-top") ? VOUT_WINDOW_STATE_ABOVE :
-                                                                           VOUT_WINDOW_STATE_NORMAL;
+
+        bool below = var_InheritBool(vout, "video-wallpaper");
+        bool above = var_CreateGetBool(vout, "video-on-top");
+
+        state_default.wm_state = below ? VOUT_WINDOW_STATE_BELOW
+                               : above ? VOUT_WINDOW_STATE_ABOVE
+                               : VOUT_WINDOW_STATE_NORMAL;
         state_default.sar.num = 0;
         state_default.sar.den = 0;
 
