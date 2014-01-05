@@ -38,7 +38,6 @@
 #include "../vlc.h"
 #include "../libs.h"
 #include "objects.h"
-#include "playlist.h"
 #include "input.h"
 
 /*****************************************************************************

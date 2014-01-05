@@ -41,7 +41,6 @@
 
 #include "../vlc.h"
 #include "input.h"
-#include "playlist.h"
 #include "../libs.h"
 #include "../extension.h"
 

@@ -20,7 +20,7 @@ liblua_plugin_la_SOURCES = \
 	lua/libs/net.c \
 	lua/libs/objects.c lua/libs/objects.h \
 	lua/libs/osd.c \
-	lua/libs/playlist.c lua/libs/playlist.h \
+	lua/libs/playlist.c \
 	lua/libs/sd.c \
 	lua/libs/stream.c \
 	lua/libs/strings.c \

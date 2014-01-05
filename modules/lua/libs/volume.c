@@ -41,7 +41,6 @@
 
 #include "../vlc.h"
 #include "../libs.h"
-#include "playlist.h"
 
 /*****************************************************************************
  * Volume related

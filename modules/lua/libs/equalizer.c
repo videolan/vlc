@@ -40,7 +40,6 @@
 #include "input.h"
 #include "../libs.h"
 #include "../vlc.h"
-#include "playlist.h"
 #include "../../audio_filter/equalizer_presets.h"
 
 #if !defined _WIN32

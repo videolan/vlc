@@ -40,17 +40,7 @@
 #include "../vlc.h"
 #include "../libs.h"
 #include "input.h"
-#include "playlist.h"
 #include "variables.h"
-
-/*****************************************************************************
- * Internal lua<->vlc utils
- *****************************************************************************/
-playlist_t *vlclua_get_playlist_internal( lua_State *L )
-{
-    vlc_object_t *p_this = vlclua_get_this( L );
-    return pl_Get( p_this );
-}
 
 static int vlclua_playlist_prev( lua_State * L )
 {

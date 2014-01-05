@@ -113,6 +113,9 @@ void vlclua_set_this( lua_State *, vlc_object_t * );
 #define vlclua_set_this(a, b) vlclua_set_this(a, VLC_OBJECT(b))
 vlc_object_t * vlclua_get_this( lua_State * );
 
+void vlclua_set_playlist_internal( lua_State *, playlist_t * );
+playlist_t * vlclua_get_playlist_internal( lua_State * );
+
 /*****************************************************************************
  * Lua function bridge
  *****************************************************************************/
