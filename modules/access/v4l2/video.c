@@ -198,7 +198,7 @@ int SetupTuner (vlc_object_t *obj, int fd, uint32_t idx)
         struct v4l2_frequency frequency = {
             .tuner = idx,
             .type = tuner.type,
-            .frequency = freq * 125 / 2
+            .frequency = freq * 2 / 125,
         };
 
         if (v4l2_ioctl (fd, VIDIOC_S_FREQUENCY, &frequency) < 0)
