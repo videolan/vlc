@@ -550,10 +550,18 @@ static int st_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
        certificates */
 
     /* this has effect only on iOS 5 and OSX 10.8 or later ... */
-    SSLSetSessionOption (sys->p_context, kSSLSessionOptionBreakOnServerAuth, true);
+    ret = SSLSetSessionOption (sys->p_context, kSSLSessionOptionBreakOnServerAuth, true);
+    if(ret != noErr) {
+        msg_Err (session, "cannot set session option");
+        goto error;
+    }
 #if !TARGET_OS_IPHONE
     /* ... thus calling this for earlier osx versions, which is not available on iOS in turn */
-    SSLSetEnableCertVerify (sys->p_context, false);
+    ret = SSLSetEnableCertVerify (sys->p_context, false);
+    if(ret != noErr) {
+        msg_Err (session, "error setting enable cert verify");
+        goto error;
+    }
 #endif
 
     return VLC_SUCCESS;
