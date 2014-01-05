@@ -59,6 +59,7 @@
     [win setLevel:NSModalPanelWindowLevel];
     i_device = config_GetInt(VLCIntf, "macosx-vdev");
     hideAgainTimer = fadeTimer = nil;
+    [self setFrameAutosaveName:@"fspanel"];
     [self setNonActive:nil];
     return win;
 }
