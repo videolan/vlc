@@ -432,17 +432,15 @@ static int Open(vlc_object_t *p_this)
  *****************************************************************************/
 static void Close(vlc_object_t *p_this)
 {
-    playlist_t                  *p_playlist = pl_Get(p_this);
-    input_thread_t              *p_input;
     intf_thread_t               *p_intf = (intf_thread_t*) p_this;
     intf_sys_t                  *p_sys  = p_intf->p_sys;
 
-    var_DelCallback(p_playlist, "activity", ItemChange, p_intf);
+    var_DelCallback(pl_Get(p_intf), "activity", ItemChange, p_intf);
 
     vlc_cancel(p_sys->thread);
     vlc_join(p_sys->thread, NULL);
 
-    p_input = playlist_CurrentInput(p_playlist);
+    input_thread_t *p_input = pl_CurrentInput(p_intf);
     if (p_input)
     {
         if (p_sys->b_state_cb)
