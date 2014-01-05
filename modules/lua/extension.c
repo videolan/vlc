@@ -36,6 +36,7 @@
 
 #include <vlc_common.h>
 #include <vlc_input.h>
+#include <vlc_interface.h>
 #include <vlc_events.h>
 #include <vlc_dialog.h>
 
@@ -808,7 +809,8 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
             return NULL;
         }
         vlclua_set_this( L, p_mgr );
-        vlclua_set_playlist_internal( L, pl_Get(p_mgr) );
+        vlclua_set_playlist_internal( L,
+            pl_Get((intf_thread_t *)(p_mgr->p_parent)) );
         vlclua_extension_set( L, p_ext );
 
         luaL_openlibs( L );

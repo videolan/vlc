@@ -350,7 +350,6 @@ playlist_VolumeSet
 playlist_VolumeUp
 playlist_MuteSet
 playlist_MuteGet
-pl_Get
 resolve_xml_special_chars
 sdp_AddAttribute
 sdp_AddMedia

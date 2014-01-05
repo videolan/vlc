@@ -94,6 +94,17 @@ VLC_API int intf_Create( playlist_t *, const char * );
 
 VLC_API void libvlc_Quit( libvlc_int_t * );
 
+static inline playlist_t *pl_Get( struct intf_thread_t *intf )
+{
+    return (playlist_t *)(intf->p_parent);
+}
+
+/**
+ * Retrieves the current input thread from the playlist.
+ * @note The returned object must be released with vlc_object_release().
+ */
+#define pl_CurrentInput(intf) (playlist_CurrentInput(pl_Get(intf)))
+
 /**
  * \defgroup vlc_subscription Log messages subscription
  * These functions deal with log messages.

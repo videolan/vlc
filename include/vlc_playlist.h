@@ -253,9 +253,6 @@ enum pl_locked_state
 #define PL_UNLOCK playlist_Unlock( p_playlist )
 #define PL_ASSERT_LOCKED playlist_AssertLocked( p_playlist )
 
-VLC_API playlist_t * pl_Get( vlc_object_t * );
-#define pl_Get( a ) pl_Get( VLC_OBJECT(a) )
-
 /* Playlist control */
 #define playlist_Play(p) playlist_Control(p,PLAYLIST_PLAY, pl_Unlocked )
 #define playlist_Pause(p) playlist_Control(p,PLAYLIST_PAUSE, pl_Unlocked )
@@ -393,12 +390,6 @@ VLC_API void playlist_EnableAudioFilter( playlist_t *, const char *, bool );
 /***********************************************************************
  * Inline functions
  ***********************************************************************/
-/** Small helper tp get current playing input or NULL. Release the input after use. */
-static inline input_thread_t *pl_CurrentInput( struct intf_thread_t *intf )
-{
-    return playlist_CurrentInput( pl_Get( (vlc_object_t *)intf ) );
-}
-
 /** Tell if the playlist is empty */
 static inline bool playlist_IsEmpty( playlist_t *p_playlist )
 {

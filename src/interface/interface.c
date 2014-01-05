@@ -155,14 +155,6 @@ static playlist_t *intf_GetPlaylist(libvlc_int_t *libvlc)
     return playlist;
 }
 
-playlist_t *(pl_Get)(vlc_object_t *obj)
-{
-    playlist_t *pl = intf_GetPlaylist(obj->p_libvlc);
-    if (unlikely(pl == NULL))
-        abort();
-    return pl;
-}
-
 /**
  * Inserts an item in the playlist used by interfaces.
  * @note This function may <b>not</b> be called at the same time as
