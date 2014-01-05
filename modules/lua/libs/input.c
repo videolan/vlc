@@ -267,7 +267,7 @@ static int vlclua_input_item_get( lua_State *L, input_item_t *p_item )
 static int vlclua_input_item_get_current( lua_State *L )
 {
     input_thread_t *p_input = vlclua_get_input_internal( L );
-    input_item_t *p_item = ( p_input && p_input->p ) ? input_GetItem( p_input ) : NULL;
+    input_item_t *p_item = p_input ? input_GetItem( p_input ) : NULL;
     if( !p_item )
     {
         lua_pushnil( L );
