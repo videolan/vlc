@@ -327,7 +327,7 @@ static void Abort( void *obj )
 }
 #endif
 
-static void RegisterIntf( vlc_object_t *p_this )
+static void RegisterIntf( intf_thread_t *p_this )
 {
     playlist_t *pl = pl_Get(p_this);
     var_Create (pl, "qt4-iface", VLC_VAR_ADDRESS);
@@ -390,9 +390,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 
 #ifndef Q_OS_MAC
     if( !isDialogProvider )
-    {
-        RegisterIntf( p_this );
-    }
+        RegisterIntf( p_intf );
 #endif
 
     return VLC_SUCCESS;
@@ -417,7 +415,7 @@ static void Close( vlc_object_t *p_this )
 
     if( !p_sys->b_isDialogProvider )
     {
-        playlist_t *pl = pl_Get(p_this);
+        playlist_t *pl = pl_Get(p_intf);
 
         var_Destroy (pl, "window");
         var_Destroy (pl, "qt4-iface");
@@ -530,7 +528,7 @@ static void *Thread( void *obj )
     /* We took over main thread, register and start here */
     if( !p_intf->p_sys->b_isDialogProvider )
     {
-        RegisterIntf( (vlc_object_t *)p_intf );
+        RegisterIntf( p_intf );
         playlist_Play( THEPL );
     }
 #endif
