@@ -111,7 +111,7 @@ int vlclua_push_vlc_object( lua_State *L, vlc_object_t *p_obj )
 }
 static int vlclua_get_vout( lua_State *L )
 {
-    input_thread_t *p_input= vlclua_get_input_internal( L );
+    input_thread_t *p_input = vlclua_get_input_internal( L );
     if( p_input )
     {
         vout_thread_t *p_vout = input_GetVout( p_input );
