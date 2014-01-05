@@ -426,6 +426,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             msg_Dbg( p_mux, "theora stream" );
             break;
 
+        case VLC_CODEC_VP8:
+            msg_Dbg( p_mux, "VP8 stream" );
+            break;
+
         default:
             FREENULL( p_input->p_sys );
             return VLC_EGENERIC;
@@ -741,6 +745,9 @@ static void OggGetSkeletonFisbone( uint8_t **pp_buffer, long *pi_size,
         case VLC_CODEC_KATE:
             psz_value = "application/kate";
             break;
+        case VLC_CODEC_VP8:
+            psz_value = "video/x-vp8";
+            break;
         default:
             psz_value = "application/octet-stream";
             msg_Warn( p_mux, "Unkown fourcc for stream %s, setting Content-Type to %s",
@@ -894,6 +901,17 @@ static int32_t OggFillDsHeader( uint8_t *p_buffer, oggds_header_t *p_oggds_heade
     return index;
 }
 
+static void OggFillVP8Header( uint8_t *p_buffer, sout_input_t *p_input )
+{
+    memcpy( p_buffer, "OVP80\x01\x01\x00", 8 );
+    SetWBE( &p_buffer[8], p_input->p_fmt->video.i_width );
+    SetDWBE( &p_buffer[14], p_input->p_fmt->video.i_sar_den );/* 24 bits, 15~ */
+    SetDWBE( &p_buffer[11], p_input->p_fmt->video.i_sar_num );/* 24 bits, 12~ */
+    SetWBE( &p_buffer[10], p_input->p_fmt->video.i_height );
+    SetDWBE( &p_buffer[18], p_input->p_fmt->video.i_frame_rate );
+    SetDWBE( &p_buffer[22], p_input->p_fmt->video.i_frame_rate_base );
+}
+
 static bool OggCreateHeaders( sout_mux_t *p_mux )
 {
     block_t *p_hdr = NULL;
@@ -1031,6 +1049,22 @@ static bool OggCreateHeaders( sout_mux_t *p_mux )
                 op.packetno = p_stream->i_packet_no++;
                 ogg_stream_packetin( &p_stream->os, &op );
                 p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
+            }
+            else if( p_stream->i_fourcc == VLC_CODEC_VP8 )
+            {
+                /* VP8 Header */
+                op.packet = malloc( 26 );
+                if( !op.packet )
+                    return false;
+                op.bytes = 26;
+                OggFillVP8Header( op.packet, p_input );
+                op.b_o_s = 1;
+                op.e_o_s = 0;
+                op.granulepos = 0;
+                op.packetno = p_stream->i_packet_no++;
+                ogg_stream_packetin( &p_stream->os, &op );
+                p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
+                free( op.packet );
             }
             else if( p_stream->p_oggds_header )
             {
@@ -1518,6 +1552,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         p_stream->i_fourcc != VLC_CODEC_SPEEX &&
         p_stream->i_fourcc != VLC_CODEC_OPUS &&
         p_stream->i_fourcc != VLC_CODEC_THEORA &&
+        p_stream->i_fourcc != VLC_CODEC_VP8 &&
         p_stream->i_fourcc != VLC_CODEC_DIRAC )
     {
         p_data = block_Realloc( p_data, 1, p_data->i_buffer );
@@ -1588,6 +1623,22 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
             op.granulepos = dt << 31 | (dist&0xff00) << 14
                           | (delay&0x1fff) << 9 | (dist&0xff);
             AddIndexEntry( p_mux, dt, p_input );
+        }
+        if( p_stream->i_fourcc == VLC_CODEC_VP8 )
+        {
+            p_stream->i_num_frames++;
+            if( p_data->i_flags & BLOCK_FLAG_TYPE_I )
+            {
+                p_stream->i_num_keyframes++;
+                p_stream->i_last_keyframe = p_stream->i_num_frames;
+
+                /* presentation time */
+                i_time = CLOCK_FREQ * ( p_stream->i_num_frames - 1 ) *
+                         p_input->p_fmt->video.i_frame_rate_base /  p_input->p_fmt->video.i_frame_rate;
+                AddIndexEntry( p_mux, i_time, p_input );
+            }
+            op.granulepos = ( ((int64_t)p_stream->i_num_frames) << 32 ) |
+            ( ( ( p_stream->i_num_frames - p_stream->i_last_keyframe ) & 0x07FFFFFF ) << 3 );
         }
         else if( p_stream->p_oggds_header )
             op.granulepos = ( p_data->i_dts - p_sys->i_start_dts ) * INT64_C(10) /

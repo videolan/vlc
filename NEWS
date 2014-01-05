@@ -47,6 +47,7 @@ Demuxer:
 Muxers:
  * Important rework of the Ogg muxer, notably for skeleton
  * Fixes for the AVI muxer for specification respect
+ * Support VP8 in OGG
 
 Video Output:
  * Direct rendering and filtering for VDPAU hardware acceleration
