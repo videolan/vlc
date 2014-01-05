@@ -27,11 +27,9 @@
 
 #define UNICODE
 #include <vlc_common.h>
-#include "../libvlc.h"
-#include <vlc_playlist.h>
-#include <vlc_url.h>
-
-#include "../config/vlc_getopt.h"
+#include "libvlc.h"
+#include "../lib/libvlc_internal.h"
+#include "config/vlc_getopt.h"
 
 #include <mmsystem.h>
 #include <winsock.h>
@@ -67,12 +65,8 @@ void system_Init(void)
 /*****************************************************************************
  * system_Configure: check for system specific configuration options.
  *****************************************************************************/
-static unsigned __stdcall IPCHelperThread( void * );
-LRESULT CALLBACK WMCOPYWNDPROC( HWND, UINT, WPARAM, LPARAM );
-static vlc_object_t *p_helper = NULL;
-static unsigned long hIPCHelper;
-static HANDLE hIPCHelperReady;
 
+/* Must be same as in modules/control/win_msg.c */
 typedef struct
 {
     int argc;
@@ -120,25 +114,7 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
 
         if( GetLastError() != ERROR_ALREADY_EXISTS )
         {
-            /* We are the 1st instance. */
-            p_helper =
-                vlc_custom_create( p_this, sizeof(*p_helper), "ipc helper" );
-
-            /* Run the helper thread */
-            hIPCHelperReady = CreateEvent( NULL, FALSE, FALSE, NULL );
-            hIPCHelper = _beginthreadex( NULL, 0, IPCHelperThread, p_helper,
-                                         0, NULL );
-            if( hIPCHelper )
-                WaitForSingleObject( hIPCHelperReady, INFINITE );
-            else
-            {
-                msg_Err( p_this, "one instance mode DISABLED "
-                         "(IPC helper thread couldn't be created)" );
-                vlc_object_release (p_helper);
-                p_helper = NULL;
-            }
-            CloseHandle( hIPCHelperReady );
-
+            libvlc_InternalAddIntf( p_this, "win32msg,none" );
             /* Initialization done.
              * Release the mutex to unblock other instances */
             ReleaseMutex( hmutex );
@@ -212,133 +188,12 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
 #endif
 }
 
-#if !VLC_WINSTORE_APP
-static unsigned __stdcall IPCHelperThread( void *data )
-{
-    vlc_object_t *p_this = data;
-    HWND ipcwindow;
-    MSG message;
-
-    ipcwindow =
-        CreateWindow( L"STATIC",                     /* name of window class */
-                  L"VLC ipc " TEXT(VERSION),               /* window title bar text */
-                  0,                                         /* window style */
-                  0,                                 /* default X coordinate */
-                  0,                                 /* default Y coordinate */
-                  0,                                         /* window width */
-                  0,                                        /* window height */
-                  NULL,                                  /* no parent window */
-                  NULL,                            /* no menu in this window */
-                  GetModuleHandle(NULL),  /* handle of this program instance */
-                  NULL );                               /* sent to WM_CREATE */
-
-    SetWindowLongPtr( ipcwindow, GWLP_WNDPROC, (LRESULT)WMCOPYWNDPROC );
-    SetWindowLongPtr( ipcwindow, GWLP_USERDATA, (LONG_PTR)p_this );
-
-    /* Signal the creation of the thread and events queue */
-    SetEvent( hIPCHelperReady );
-
-    while( GetMessage( &message, NULL, 0, 0 ) )
-    {
-        TranslateMessage( &message );
-        DispatchMessage( &message );
-    }
-    return 0;
-}
-
-LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
-                                LPARAM lParam )
-{
-    if( uMsg == WM_QUIT  )
-    {
-        PostQuitMessage( 0 );
-    }
-    else if( uMsg == WM_COPYDATA )
-    {
-        COPYDATASTRUCT *pwm_data = (COPYDATASTRUCT*)lParam;
-        vlc_object_t *p_this;
-        playlist_t *p_playlist;
-
-        p_this = (vlc_object_t *)
-            (uintptr_t)GetWindowLongPtr( hwnd, GWLP_USERDATA );
-
-        if( !p_this ) return 0;
-
-        /* Add files to the playlist */
-        p_playlist = pl_Get( p_this );
-
-        if( pwm_data->lpData )
-        {
-            char **ppsz_argv;
-            vlc_ipc_data_t *p_data = (vlc_ipc_data_t *)pwm_data->lpData;
-            size_t i_data = 0;
-            int i_argc = p_data->argc, i_opt, i_options;
-
-            ppsz_argv = (char **)malloc( i_argc * sizeof(char *) );
-            for( i_opt = 0; i_opt < i_argc; i_opt++ )
-            {
-                ppsz_argv[i_opt] = p_data->data + i_data + sizeof(size_t);
-                i_data += sizeof(size_t) + *((size_t *)(p_data->data + i_data));
-            }
-
-            for( i_opt = 0; i_opt < i_argc; i_opt++ )
-            {
-                i_options = 0;
-
-                /* Count the input options */
-                while( i_opt + i_options + 1 < i_argc &&
-                        *ppsz_argv[ i_opt + i_options + 1 ] == ':' )
-                {
-                    i_options++;
-                }
-
-#warning URI conversion must be done in calling process instead!
-                /* FIXME: This breaks relative paths if calling vlc.exe is
-                 * started from a different working directory. */
-                char *psz_URI = NULL;
-                if( strstr( ppsz_argv[i_opt], "://" ) == NULL )
-                    psz_URI = vlc_path2uri( ppsz_argv[i_opt], NULL );
-                playlist_AddExt( p_playlist,
-                        (psz_URI != NULL) ? psz_URI : ppsz_argv[i_opt],
-                        NULL, PLAYLIST_APPEND |
-                        ( ( i_opt || p_data->enqueue ) ? 0 : PLAYLIST_GO ),
-                        PLAYLIST_END, -1,
-                        i_options,
-                        (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
-                        VLC_INPUT_OPTION_TRUSTED,
-                        true, pl_Unlocked );
-
-                i_opt += i_options;
-                free( psz_URI );
-            }
-
-            free( ppsz_argv );
-        }
-    }
-
-    return DefWindowProc( hwnd, uMsg, wParam, lParam );
-}
-#endif
-
 /**
  * Cleans up after system_Init() and system_Configure().
  */
 void system_End(void)
 {
 #if !VLC_WINSTORE_APP
-    HWND ipcwindow;
-
-    /* FIXME: thread-safety... */
-    if (p_helper)
-    {
-        if( ( ipcwindow = FindWindow( 0, L"VLC ipc " TEXT(VERSION) ) ) != 0 )
-        {
-            SendMessage( ipcwindow, WM_QUIT, 0, 0 );
-        }
-        vlc_object_release (p_helper);
-        p_helper = NULL;
-    }
-
     timeEndPeriod(5);
 #endif
 
