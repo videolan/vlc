@@ -232,14 +232,8 @@ enum
 /* Initialize a condition variable. */
 void vlc_cond_init (vlc_cond_t *p_condvar)
 {
-    pthread_condattr_t attr;
-
-    if (unlikely(pthread_condattr_init (&attr)))
+    if (unlikely(pthread_cond_init (&p_condvar->cond, NULL)))
         abort ();
-
-    if (unlikely(pthread_cond_init (&p_condvar->cond, &attr)))
-        abort ();
-    pthread_condattr_destroy (&attr);
     p_condvar->clock = VLC_CLOCK_MONOTONIC;
 }
 
