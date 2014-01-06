@@ -2350,7 +2350,8 @@ static void Ogg_ReadVorbisHeader( logical_stream_t *p_stream,
     p_stream->f_rate = p_stream->fmt.audio.i_rate =
         oggpack_read( &opb, 32 );
     oggpack_adv( &opb, 32 );
-    p_stream->fmt.i_bitrate = oggpack_read( &opb, 32 );
+    p_stream->fmt.i_bitrate = oggpack_read( &opb, 32 ); /* is signed 32 */
+    if( p_stream->fmt.i_bitrate > INT32_MAX ) p_stream->fmt.i_bitrate = 0;
 }
 
 static void Ogg_ReadSpeexHeader( logical_stream_t *p_stream,
