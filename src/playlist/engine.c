@@ -195,7 +195,7 @@ static int VideoSplitterCallback( vlc_object_t *p_this, char const *psz_cmd,
  * \param p_parent the vlc object that is to be the parent of this playlist
  * \return a pointer to the created playlist, or NULL on error
  */
-static playlist_t *playlist_Create( vlc_object_t *p_parent )
+playlist_t *playlist_Create( vlc_object_t *p_parent )
 {
     playlist_t *p_playlist;
     playlist_private_t *p;
@@ -372,26 +372,6 @@ void playlist_Destroy( playlist_t *p_playlist )
     ARRAY_RESET( p_playlist->current );
 
     vlc_object_release( p_playlist );
-}
-
-#undef pl_Get
-playlist_t *pl_Get (vlc_object_t *obj)
-{
-    static vlc_mutex_t lock = VLC_STATIC_MUTEX;
-    libvlc_int_t *p_libvlc = obj->p_libvlc;
-    playlist_t *pl;
-
-    vlc_mutex_lock (&lock);
-    pl = libvlc_priv (p_libvlc)->p_playlist;
-    if (unlikely(pl == NULL))
-    {
-        pl = playlist_Create (VLC_OBJECT(p_libvlc));
-        if (unlikely(pl == NULL))
-            abort();
-        libvlc_priv (p_libvlc)->p_playlist = pl;
-    }
-    vlc_mutex_unlock (&lock);
-    return pl;
 }
 
 /** Get current playing input.

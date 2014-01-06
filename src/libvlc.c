@@ -101,7 +101,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
         return NULL;
 
     priv = libvlc_priv (p_libvlc);
-    priv->p_playlist = NULL;
+    priv->playlist = NULL;
     priv->p_dialog_provider = NULL;
     priv->p_vlm = NULL;
 
@@ -536,7 +536,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 #endif
 
     /* Free playlist now, all threads are gone */
-    playlist_t *p_playlist = libvlc_priv (p_libvlc)->p_playlist;
+    playlist_t *p_playlist = libvlc_priv (p_libvlc)->playlist;
     if( p_playlist != NULL )
         playlist_Destroy( p_playlist );
 

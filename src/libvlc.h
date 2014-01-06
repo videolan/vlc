@@ -157,12 +157,12 @@ typedef struct libvlc_priv_t
     bool               b_stats;     ///< Whether to collect stats
 
     /* Singleton objects */
-    playlist_t        *p_playlist; ///< the playlist singleton
     vlm_t             *p_vlm;  ///< the VLM singleton (or NULL)
     vlc_object_t      *p_dialog_provider; ///< dialog provider
 #ifdef ENABLE_SOUT
     sap_handler_t     *p_sap; ///< SAP SDP advertiser
 #endif
+    struct playlist_t *playlist; ///< Playlist for interfaces
     struct playlist_preparser_t *parser; ///< Input item meta data handler
     struct vlc_actions *actions; ///< Hotkeys handler
 
