@@ -42,6 +42,8 @@
 
 typedef struct vlc_sd_internal_t vlc_sd_internal_t;
 
+void playlist_ServicesDiscoveryKillAll( playlist_t *p_playlist );
+
 typedef struct playlist_private_t
 {
     playlist_t           public_data;
