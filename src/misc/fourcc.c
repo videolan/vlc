@@ -1065,18 +1065,21 @@ static const staticentry_t p_list_audio[] = {
     B(VLC_CODEC_SIPR, "RealAudio Sipr"),
         A("sipr"),
 
-    /* MPEG Audio layer 1/2/3 */
-    B(VLC_CODEC_MPGA, "MPEG Audio layer 1/2/3"),
+    /* MPEG Audio layer 1/2 */
+    B(VLC_CODEC_MPGA, "MPEG Audio layer 1/2"),
         A("mpga"),
         A("mp2a"),
         A(".mp1"),
         A(".mp2"),
-        A("mp3 "),
-        A(".mp3"),
-        A("MP3 "),
         A("LAME"),
         A("ms\x00\x50"),
         A("ms\x00\x55"),
+
+    /* MPEG Audio layer 3 */
+    B(VLC_CODEC_MP3, "MPEG Audio layer 3"),
+        A("mp3 "),
+        A(".mp3"),
+        A("MP3 "),
 
     /* A52 Audio (aka AC3) */
     B(VLC_CODEC_A52, "A52 Audio (aka AC3)"),
