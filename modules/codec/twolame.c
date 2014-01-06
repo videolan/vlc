@@ -261,13 +261,29 @@ static void Bufferize( encoder_t *p_enc, int16_t *p_in, int i_nb_samples )
 static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
+    block_t *p_chain = NULL;
 
-    /* FIXME:p_aout_buf is NULL when it's time to flush, does twolame has buffer to flush?*/
-    if( unlikely( !p_aout_buf ) ) return NULL;
+    if( unlikely( !p_aout_buf ) ) {
+        int i_used = 0;
+
+        i_used = twolame_encode_flush_interleaved( p_sys->p_twolame,
+                                p_sys->p_out_buffer, MAX_CODED_FRAME_SIZE );
+
+        if( i_used < 0 )
+            return NULL;
+
+        p_block = block_Alloc( i_used );
+        memcpy( p_block->p_buffer, p_sys->p_out_buffer, i_used );
+        p_block->i_length = (mtime_t)1000000 *
+                (mtime_t)MPEG_FRAME_SIZE / (mtime_t)p_enc->fmt_out.audio.i_rate;
+        p_block->i_dts = p_block->i_pts = p_sys->i_pts;
+        p_sys->i_pts += p_block->i_length;
+
+        return p_block;
+    }
 
     int16_t *p_buffer = (int16_t *)p_aout_buf->p_buffer;
     int i_nb_samples = p_aout_buf->i_nb_samples;
-    block_t *p_chain = NULL;
 
     p_sys->i_pts = p_aout_buf->i_pts -
                 (mtime_t)1000000 * (mtime_t)p_sys->i_nb_samples /
