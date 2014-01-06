@@ -220,19 +220,7 @@ int OpenEncoder( vlc_object_t *p_this )
 
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
-    if( p_enc->fmt_out.i_codec == VLC_CODEC_MP3 )
-    {
-        i_cat = AUDIO_ES;
-        i_codec_id = AV_CODEC_ID_MP3;
-        psz_namecodec = "MPEG I/II Layer 3";
-    }
-    else if( p_enc->fmt_out.i_codec == VLC_CODEC_MP2 )
-    {
-        i_cat = AUDIO_ES;
-        i_codec_id = AV_CODEC_ID_MP2;
-        psz_namecodec = "MPEG I/II Layer 2";
-    }
-    else if( p_enc->fmt_out.i_codec == VLC_CODEC_MP1V )
+    if( p_enc->fmt_out.i_codec == VLC_CODEC_MP1V )
     {
         i_cat = VIDEO_ES;
         i_codec_id = AV_CODEC_ID_MPEG1VIDEO;

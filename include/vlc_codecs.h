@@ -374,7 +374,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_G723_1,     VLC_CODEC_G723_1,                 "G.723.1" },
     { WAVE_FORMAT_MSG723,     VLC_CODEC_G723_1,                 "Microsoft G.723 [G723.1]" },
     { WAVE_FORMAT_VIVOG723,   VLC_CODEC_G723_1,                 "Vivo G.723.1" },
-    { WAVE_FORMAT_MPEGLAYER3, VLC_CODEC_MPGA,                   "Mpeg Audio" },
+    { WAVE_FORMAT_MPEGLAYER3, VLC_CODEC_MP3,                    "Mpeg Audio Layer 3" },
     { WAVE_FORMAT_MPEG,       VLC_CODEC_MPGA,                   "Mpeg Audio" },
     { WAVE_FORMAT_AMR_NB,     VLC_CODEC_AMR_NB,                 "AMR NB" },
     { WAVE_FORMAT_AMR_WB,     VLC_CODEC_AMR_WB,                 "AMR Wideband" },
