@@ -372,12 +372,12 @@ static int ProcessHeaders( decoder_t *p_dec )
     p_dec->fmt_out.audio.i_physical_channels =
         p_dec->fmt_out.audio.i_original_channels =
             pi_channels_maps[p_sys->vi.channels];
-    p_dec->fmt_out.i_bitrate = p_sys->vi.bitrate_nominal;
+    p_dec->fmt_out.i_bitrate = __MAX( 0, (int32_t) p_sys->vi.bitrate_nominal );
 
     date_Init( &p_sys->end_date, p_sys->vi.rate, 1 );
 
     msg_Dbg( p_dec, "channels:%d samplerate:%ld bitrate:%ld",
-             p_sys->vi.channels, p_sys->vi.rate, p_sys->vi.bitrate_nominal );
+             p_sys->vi.channels, p_sys->vi.rate, p_dec->fmt_out.i_bitrate );
 
     /* The next packet in order is the comments header */
     oggpacket.b_o_s  = 0;
