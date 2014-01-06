@@ -420,15 +420,20 @@ static int Demux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t     *p_block;
     const int64_t i_pos = stream_Tell( p_demux->s );
+    unsigned int i_read_size = p_sys->i_frame_size;
 
-    if( p_sys->i_data_size > 0 &&
-        i_pos >= p_sys->i_data_pos + p_sys->i_data_size )
+    if( p_sys->i_data_size > 0 )
     {
-        /* EOF */
-        return 0;
+        int64_t i_end = p_sys->i_data_pos + p_sys->i_data_size;
+        if ( i_pos >= i_end )
+            return 0;  /* EOF */
+
+        /* Don't read past data chunk boundary */
+        if ( i_end < i_pos + i_read_size )
+            i_read_size = i_end - i_pos;
     }
 
-    if( ( p_block = stream_Block( p_demux->s, p_sys->i_frame_size ) ) == NULL )
+    if( ( p_block = stream_Block( p_demux->s, i_read_size ) ) == NULL )
     {
         msg_Warn( p_demux, "cannot read data" );
         return 0;
