@@ -163,6 +163,18 @@ playlist_t *(pl_Get)(vlc_object_t *obj)
 }
 
 /**
+ * Inserts an item in the playlist used by interfaces.
+ * @note This function may <b>not</b> be called at the same time as
+ * intf_DestroyAll().
+ */
+void intf_InsertItem(libvlc_int_t *libvlc, const char *mrl, unsigned optc,
+                     const char *const *optv, unsigned flags)
+{
+    playlist_AddExt(intf_GetPlaylist(libvlc), mrl, NULL, PLAYLIST_INSERT,
+                    0, -1, optc, optv, flags, true, pl_Unlocked);
+}
+
+/**
  * Stops and destroys all interfaces
  * @param p_libvlc the LibVLC instance
  */

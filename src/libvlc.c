@@ -504,8 +504,7 @@ dbus_out:
     psz_val = var_InheritString( p_libvlc, "open" );
     if ( psz_val != NULL )
     {
-        playlist_AddExt( pl_Get(p_libvlc), psz_val, NULL, PLAYLIST_INSERT, 0,
-                         -1, 0, NULL, 0, true, pl_Unlocked );
+        intf_InsertItem( p_libvlc, psz_val, 0, NULL, 0 );
         free( psz_val );
     }
 
@@ -650,10 +649,9 @@ static void GetFilenames( libvlc_int_t *p_vlc, unsigned n,
                 continue;
         }
 
-        playlist_AddExt( pl_Get( p_vlc ), (mrl != NULL) ? mrl : args[n], NULL,
-                         PLAYLIST_INSERT, 0, -1, i_options,
+        intf_InsertItem( p_vlc, (mrl != NULL) ? mrl : args[n], i_options,
                          ( i_options ? &args[n + 1] : NULL ),
-                         VLC_INPUT_OPTION_TRUSTED, true, pl_Unlocked );
+                         VLC_INPUT_OPTION_TRUSTED );
         free( mrl );
     }
 }
