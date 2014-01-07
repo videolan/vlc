@@ -49,6 +49,7 @@ VLC_API void libvlc_InternalCleanup( libvlc_int_t * );
 VLC_API void libvlc_InternalDestroy( libvlc_int_t * );
 
 VLC_API int libvlc_InternalAddIntf( libvlc_int_t *, const char * );
+VLC_API void libvlc_InternalPlay( libvlc_int_t * );
 VLC_API void libvlc_InternalWait( libvlc_int_t * );
 VLC_API void libvlc_SetExitHandler( libvlc_int_t *, void (*) (void *), void * );
 

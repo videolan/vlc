@@ -46,6 +46,7 @@
 #include <vlc_playlist.h>
 #include "libvlc.h"
 #include "playlist/playlist_internal.h"
+#include "../lib/libvlc_internal.h"
 
 static int AddIntfCallback( vlc_object_t *, char const *,
                             vlc_value_t , vlc_value_t , void * );
@@ -172,6 +173,18 @@ void intf_InsertItem(libvlc_int_t *libvlc, const char *mrl, unsigned optc,
 {
     playlist_AddExt(intf_GetPlaylist(libvlc), mrl, NULL, PLAYLIST_INSERT,
                     0, -1, optc, optv, flags, true, pl_Unlocked);
+}
+
+void libvlc_InternalPlay(libvlc_int_t *libvlc)
+{
+    playlist_t *pl;
+
+    vlc_mutex_lock(&lock);
+    pl = libvlc_priv(libvlc)->playlist;
+    vlc_mutex_unlock(&lock);
+
+    if (pl != NULL && var_GetBool(pl, "playlist-autostart"))
+        playlist_Control(pl, PLAYLIST_PLAY, false);
 }
 
 /**
