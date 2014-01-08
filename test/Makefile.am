@@ -23,7 +23,8 @@ check_PROGRAMS = \
         $(NULL)
 
 check_SCRIPTS = \
-    modules/lua/telnet.sh
+	modules/lua/telnet.sh \
+	check_POTFILES.sh
 
 # Disabled test:
 # meta: No suitable test file
@@ -37,7 +38,7 @@ EXTRA_DIST = samples/empty.voc samples/image.jpg $(check_SCRIPTS)
 
 check_HEADERS = libvlc/test.h libvlc/libvlc_additions.h
 
-TESTS = $(check_PROGRAMS)
+TESTS = $(check_PROGRAMS) check_POTFILES.sh
 
 DISTCLEANFILES = samples/test.sample samples/meta.sample
 
