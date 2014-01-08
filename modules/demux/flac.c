@@ -298,7 +298,7 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
     i_delta_time = i_time - p_sys->seekpoint[i]->i_time_offset;
 
     /* XXX We do exact seek if it's not too far away(45s) */
-    if( i_delta_time < 45*INT64_C(1000000) )
+    if( i_delta_time < CLOCK_FREQ * 45 )
     {
         if( stream_Seek( p_demux->s, p_sys->seekpoint[i]->i_byte_offset+p_sys->i_data_pos ) )
             return VLC_EGENERIC;
@@ -328,7 +328,7 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
         i_delta_offset = 0;
 
         if ( INT64_MAX / i_delta_time < (i_next_offset - p_sys->seekpoint[i]->i_byte_offset) )
-            i_time_align = 1000000;
+            i_time_align = CLOCK_FREQ;
 
         if( i_next_time-p_sys->seekpoint[i]->i_time_offset > 0 )
             i_delta_offset = (i_next_offset - p_sys->seekpoint[i]->i_byte_offset) * (i_delta_time / i_time_align) /
@@ -500,7 +500,7 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
             /* */
             ParseStreamInfo( &i_sample_rate, &i_sample_count, *pp_streaminfo );
             if( i_sample_rate > 0 )
-                p_sys->i_length = i_sample_count * INT64_C(1000000)/i_sample_rate;
+                p_sys->i_length = i_sample_count * CLOCK_FREQ /i_sample_rate;
             continue;
         }
         else if( i_type == META_SEEKTABLE )
