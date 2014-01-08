@@ -259,6 +259,7 @@ SOURCES_libvlc_darwin = \
 SOURCES_libvlc_android = \
 	android/dirs.c \
 	android/thread.c \
+	android/error.c \
 	posix/filesystem.c \
 	android/netconf.c \
 	posix/plugin.c \
