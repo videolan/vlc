@@ -94,7 +94,8 @@ public:
         ACTION_CLEAR,
         ACTION_ENQUEUEFILE,
         ACTION_ENQUEUEDIR,
-        ACTION_ENQUEUEGENERIC
+        ACTION_ENQUEUEGENERIC,
+        ACTION_SAVETOPLAYLIST
     };
     struct actionsContainerType
     {

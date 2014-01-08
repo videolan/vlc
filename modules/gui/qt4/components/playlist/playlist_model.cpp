@@ -1099,6 +1099,8 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
     case ACTION_ENQUEUEDIR:
     case ACTION_ENQUEUEGENERIC:
         return canEdit();
+    case ACTION_SAVETOPLAYLIST:
+        return rowCount() > 0;
     default:
         return false;
     }

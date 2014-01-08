@@ -222,6 +222,10 @@ bool StandardPLPanel::popup( const QPoint &point )
                     VLCModelSubInterface::ACTION_ADDTOPLAYLIST );
 
     menu.addSeparator();
+    ADD_MENU_ENTRY( QIcon(), qtr( I_PL_SAVE ),
+                    VLCModelSubInterface::ACTION_SAVETOPLAYLIST );
+
+    menu.addSeparator();
 
     /* Item removal */
 
@@ -375,6 +379,9 @@ void StandardPLPanel::popupAction( QAction *action )
                 RecentsMRL::getInstance( p_intf )->addRecent( file );
         break;
 
+    case VLCModelSubInterface::ACTION_SAVETOPLAYLIST:
+        THEDP->savePlayingToPlaylist();
+        break;
     default:
         model->action( action, list );
     }
