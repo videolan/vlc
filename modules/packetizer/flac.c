@@ -82,8 +82,8 @@ struct decoder_sys_t
     /*
      * Common properties
      */
-    date_t  end_date;
     mtime_t i_pts;
+    mtime_t i_duration;
 
     int i_frame_length;
     size_t i_frame_size;
@@ -154,10 +154,12 @@ static void ProcessHeader(decoder_t *p_dec)
         p_dec->fmt_out.i_extra = 0;
 }
 
-/* Will return 0xffffffffffffffff for an invalid utf-8 sequence */
-static uint64_t read_utf8(const uint8_t *p_buf, int *pi_read)
+/* Will return INT64_MAX for an invalid utf-8 sequence */
+static int64_t read_utf8(const uint8_t *p_buf, int *pi_read)
 {
-    uint64_t i_result = 0;
+    /* Max coding bits is 56 - 8 */
+    /* Value max precision is 36 bits */
+    int64_t i_result = 0;
     unsigned i;
 
     if (!(p_buf[0] & 0x80)) { /* 0xxxxxxx */
@@ -182,12 +184,12 @@ static uint64_t read_utf8(const uint8_t *p_buf, int *pi_read)
         i_result = 0;
         i = 6;
     } else {
-        return INT64_C(0xffffffffffffffff);
+        return INT64_MAX;
     }
 
     for (unsigned j = 1; j <= i; j++) {
         if (!(p_buf[j] & 0x80) || (p_buf[j] & 0x40)) { /* 10xxxxxx */
-            return INT64_C(0xffffffffffffffff);
+            return INT64_MAX;
         }
         i_result <<= 6;
         i_result |= (p_buf[j] & 0x3F);
@@ -336,7 +338,9 @@ static uint16_t flac_crc16_undo(uint16_t crc, const uint8_t last_byte)
 static int SyncInfo(decoder_t *p_dec, uint8_t *p_buf,
                      unsigned int * pi_channels,
                      unsigned int * pi_sample_rate,
-                     unsigned int * pi_bits_per_sample)
+                     unsigned int * pi_bits_per_sample,
+                     mtime_t * pi_pts,
+                     mtime_t * pi_duration )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -427,7 +431,8 @@ static int SyncInfo(decoder_t *p_dec, uint8_t *p_buf,
 
     /* Check Sample/Frame number */
     int i_read;
-    if (read_utf8(&p_buf[i_header++], &i_read) == INT64_C(0xffffffffffffffff))
+    int64_t i_fsnumber = read_utf8(&p_buf[i_header++], &i_read);
+    if ( i_fsnumber == INT64_MAX )
         return 0;
 
     i_header += i_read;
@@ -471,6 +476,19 @@ static int SyncInfo(decoder_t *p_dec, uint8_t *p_buf,
             return 0;
     }
 
+    if( pi_pts )
+    {
+        *pi_pts = VLC_TS_0;
+        if ( (p_buf[1] & 0x01) == 0  ) /* Fixed blocksize stream / Frames */
+            *pi_pts += CLOCK_FREQ * blocksize * i_fsnumber / samplerate;
+        else /* Variable blocksize stream / Samples */
+            *pi_pts += CLOCK_FREQ * i_fsnumber / samplerate;
+        msg_Err( p_dec, "PTS %ld", *pi_pts );
+    }
+
+    if ( pi_duration )
+        *pi_duration = CLOCK_FREQ * blocksize / samplerate;
+
     *pi_bits_per_sample = bits_per_sample;
     *pi_sample_rate = samplerate;
     *pi_channels = channels;
@@ -495,7 +513,6 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             p_sys->i_state = STATE_NOSYNC;
             block_BytestreamEmpty(&p_sys->bytestream);
         }
-        date_Set(&p_sys->end_date, 0);
         block_Release(*pp_block);
         return NULL;
     }
@@ -509,17 +526,15 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         return NULL;
     }
 
-    if (!date_Get(&p_sys->end_date)) {
-        if (in->i_pts <= VLC_TS_INVALID) {
+    if ( p_sys->i_pts <= VLC_TS_INVALID )
+    {
+        if ( in->i_pts == p_sys->i_pts )
+        {
             /* We've just started the stream, wait for the first PTS. */
             block_Release(in);
             return NULL;
         }
-
-        /* The first PTS is as good as anything else. */
         p_sys->i_rate = p_dec->fmt_out.audio.i_rate;
-        date_Init(&p_sys->end_date, p_sys->i_rate, 1);
-        date_Set(&p_sys->end_date, in->i_pts);
     }
 
     block_BytestreamPush(&p_sys->bytestream, in);
@@ -539,11 +554,6 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         }
 
     case STATE_SYNC:
-        /* New frame, set the Presentation Time Stamp */
-        p_sys->i_pts = p_sys->bytestream.p_block->i_pts;
-        if (p_sys->i_pts > VLC_TS_INVALID &&
-            p_sys->i_pts != date_Get(&p_sys->end_date))
-            date_Set(&p_sys->end_date, p_sys->i_pts);
         p_sys->i_state = STATE_HEADER;
 
     case STATE_HEADER:
@@ -555,7 +565,9 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         p_sys->i_frame_length = SyncInfo(p_dec, p_header,
                                           &p_sys->i_channels,
                                           &p_sys->i_rate,
-                                          &p_sys->i_bits_per_sample);
+                                          &p_sys->i_bits_per_sample,
+                                          &p_sys->i_pts,
+                                          &p_sys->i_duration );
         if (!p_sys->i_frame_length) {
             msg_Dbg(p_dec, "emulated sync word");
             block_SkipByte(&p_sys->bytestream);
@@ -564,9 +576,6 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         }
         if (p_sys->i_rate != p_dec->fmt_out.audio.i_rate) {
             p_dec->fmt_out.audio.i_rate = p_sys->i_rate;
-            const mtime_t i_end_date = date_Get(&p_sys->end_date);
-            date_Init(&p_sys->end_date, p_sys->i_rate, 1);
-            date_Set(&p_sys->end_date, i_end_date);
         }
         p_sys->i_state = STATE_NEXT_SYNC;
         p_sys->i_frame_size = p_sys->b_stream_info && p_sys->stream_info.min_framesize > 0 ?
@@ -605,7 +614,8 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
                     SyncInfo(p_dec, p_header,
                               &p_sys->i_channels,
                               &p_sys->i_rate,
-                              &p_sys->i_bits_per_sample);
+                              &p_sys->i_bits_per_sample,
+                              NULL, NULL );
 
                 if (i_frame_length) {
                     uint8_t crc_bytes[2];
@@ -651,10 +661,6 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         block_GetBytes(&p_sys->bytestream, out->p_buffer,
                         p_sys->i_frame_size);
 
-        /* Make sure we don't reuse the same pts twice */
-        if (p_sys->i_pts == p_sys->bytestream.p_block->i_pts)
-            p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
-
         p_dec->fmt_out.audio.i_channels = p_sys->i_channels;
         p_dec->fmt_out.audio.i_physical_channels =
             p_dec->fmt_out.audio.i_original_channels =
@@ -665,12 +671,8 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 
         p_sys->i_state = STATE_NOSYNC;
 
-        /* Date management */
-        out->i_pts =
-            out->i_dts = date_Get(&p_sys->end_date);
-        date_Increment(&p_sys->end_date, p_sys->i_frame_length);
-        out->i_length =
-            date_Get(&p_sys->end_date) - out->i_pts;
+        out->i_dts = out->i_pts = p_sys->i_pts;
+        out->i_length = p_sys->i_duration;
 
         return out;
     }
@@ -691,7 +693,6 @@ static int Open(vlc_object_t *p_this)
     if (!p_sys)
         return VLC_ENOMEM;
 
-    date_Set(&p_sys->end_date, 0);
     p_sys->i_state       = STATE_NOSYNC;
     p_sys->b_stream_info = false;
     p_sys->i_pts         = VLC_TS_INVALID;
