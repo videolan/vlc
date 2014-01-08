@@ -73,9 +73,7 @@ struct demux_sys_t
 
     vlc_meta_t *p_meta;
 
-    int64_t i_time_offset;
     int64_t i_pts;
-    int64_t i_pts_start;
 
     int64_t i_length; /* Length from stream info */
     int64_t i_data_pos;
@@ -128,9 +126,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->b_start = true;
     p_sys->p_meta = NULL;
     p_sys->i_length = 0;
-    p_sys->i_time_offset = 0;
     p_sys->i_pts = 0;
-    p_sys->i_pts_start = 0;
     p_sys->p_es = NULL;
     TAB_INIT( p_sys->i_seekpoint, p_sys->seekpoint );
     TAB_INIT( p_sys->i_attachments, p_sys->attachments);
@@ -224,11 +220,7 @@ static int Demux( demux_t *p_demux )
                 p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_out);
             }
 
-            p_sys->i_pts = p_block_out->i_dts - VLC_TS_0;
-
-            /* Correct timestamp */
-            p_block_out->i_pts += p_sys->i_time_offset;
-            p_block_out->i_dts += p_sys->i_time_offset;
+            p_sys->i_pts = p_block_out->i_dts;
 
             /* set PCR */
             es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
@@ -273,7 +265,7 @@ static int64_t ControlGetLength( demux_t *p_demux )
 static int64_t ControlGetTime( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    return __MAX(p_sys->i_pts, p_sys->i_pts_start) + p_sys->i_time_offset;
+    return p_sys->i_pts;
 }
 
 static int ControlSetTime( demux_t *p_demux, int64_t i_time )
@@ -303,9 +295,7 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
         if( stream_Seek( p_demux->s, p_sys->seekpoint[i]->i_byte_offset+p_sys->i_data_pos ) )
             return VLC_EGENERIC;
 
-        p_sys->i_time_offset = p_sys->seekpoint[i]->i_time_offset - p_sys->i_pts;
-        p_sys->i_pts_start = p_sys->i_pts+i_delta_time;
-        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, p_sys->i_pts_start + p_sys->i_time_offset );
+        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_time );
     }
     else
     {
@@ -336,10 +326,6 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
 
         if( stream_Seek( p_demux->s, p_sys->seekpoint[i]->i_byte_offset+p_sys->i_data_pos + i_delta_offset ) )
             return VLC_EGENERIC;
-
-        p_sys->i_pts_start = p_sys->i_pts;
-        i_delta_time = ( i_delta_time / i_time_align ) * i_time_align;
-        p_sys->i_time_offset = (p_sys->seekpoint[i]->i_time_offset+i_delta_time) - p_sys->i_pts;
     }
     return VLC_SUCCESS;
 }
