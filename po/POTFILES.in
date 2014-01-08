@@ -939,7 +939,6 @@ modules/lua/libs/objects.c
 modules/lua/libs/objects.h
 modules/lua/libs/osd.c
 modules/lua/libs/playlist.c
-modules/lua/libs/playlist.h
 modules/lua/libs/sd.c
 modules/lua/libs/stream.c
 modules/lua/libs/strings.c
