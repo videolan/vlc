@@ -158,9 +158,9 @@ char *vlc_readdir( DIR *dir )
 
     long len = fpathconf (dirfd (dir), _PC_NAME_MAX);
     /* POSIX says there shall we room for NAME_MAX bytes at all times */
-    if (/*len == -1 ||*/ len < NAME_MAX)
+    if (len == -1 || len < NAME_MAX)
         len = NAME_MAX;
-    len += offsetof (struct dirent, d_name) + 1;
+    len += sizeof (*ent) + 1 - sizeof (ent->d_name);
 
     struct dirent *buf = malloc (len);
     if (unlikely(buf == NULL))
