@@ -134,7 +134,11 @@ static void ProcessHeader(decoder_t *p_dec)
     bs_init(&bs, p_extra, i_extra);
 
     p_sys->stream_info.min_blocksize = bs_read(&bs, 16);
+    p_sys->stream_info.min_blocksize =
+            __MIN( __MAX( p_sys->stream_info.min_blocksize, 16 ), 65535 );
     p_sys->stream_info.max_blocksize = bs_read(&bs, 16);
+    p_sys->stream_info.max_blocksize =
+                __MAX( __MIN( p_sys->stream_info.max_blocksize, 65535 ), 16 );
 
     p_sys->stream_info.min_framesize = bs_read(&bs, 24);
     p_sys->stream_info.max_framesize = bs_read(&bs, 24);
