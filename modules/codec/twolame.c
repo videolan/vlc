@@ -266,8 +266,9 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
 
     if( unlikely( !p_aout_buf ) ) {
         int i_used = 0;
+        block_t *p_block;
 
-        i_used = twolame_encode_flush_interleaved( p_sys->p_twolame,
+        i_used = twolame_encode_flush( p_sys->p_twolame,
                                 p_sys->p_out_buffer, MAX_CODED_FRAME_SIZE );
 
         if( i_used < 0 )
