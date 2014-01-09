@@ -136,6 +136,9 @@
 #define VLC_CODEC_G2M2            VLC_FOURCC('G','2','M','2')
 #define VLC_CODEC_G2M3            VLC_FOURCC('G','2','M','3')
 #define VLC_CODEC_G2M4            VLC_FOURCC('G','2','M','4')
+#define VLC_CODEC_BINKVIDEO       VLC_FOURCC('B','I','K','f')
+#define VLC_CODEC_BINKAUDIO_DCT   VLC_FOURCC('B','A','U','1')
+#define VLC_CODEC_BINKAUDIO_RDFT  VLC_FOURCC('B','A','U','2')
 
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9             VLC_FOURCC('Y','V','U','9')

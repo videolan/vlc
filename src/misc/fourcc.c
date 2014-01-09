@@ -678,6 +678,12 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_AMV, "AMV"),
 
+    B(VLC_CODEC_BINKVIDEO, "Bink Video"),
+
+    B(VLC_CODEC_BINKAUDIO_DCT, "Bink Audio (DCT)"),
+
+    B(VLC_CODEC_BINKAUDIO_RDFT, "Bink Audio (RDFT)"),
+
     /* */
     B(VLC_CODEC_DNXHD, "DNxHD"),
         A("AVdn"),
