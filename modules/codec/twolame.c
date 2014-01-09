@@ -161,7 +161,6 @@ static int OpenEncoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_enc->p_sys = p_sys;
 
-    p_enc->pf_encode_audio = Encode;
     p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
 
     p_enc->fmt_out.i_cat = AUDIO_ES;
@@ -237,6 +236,8 @@ static int OpenEncoder( vlc_object_t *p_this )
         msg_Err( p_enc, "twolame initialization failed" );
         return -VLC_EGENERIC;
     }
+
+    p_enc->pf_encode_audio = Encode;
 
     p_sys->i_nb_samples = 0;
 
