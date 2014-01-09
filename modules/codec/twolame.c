@@ -101,7 +101,7 @@ struct encoder_sys_t
     /*
      * Input properties
      */
-    float p_buffer[MPEG_FRAME_SIZE * 2];
+    int16_t p_buffer[MPEG_FRAME_SIZE * 2];
     int i_nb_samples;
     mtime_t i_pts;
 
@@ -161,7 +161,8 @@ static int OpenEncoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_enc->p_sys = p_sys;
 
-    p_enc->fmt_in.i_codec = VLC_CODEC_FL32;
+    p_enc->pf_encode_audio = Encode;
+    p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
 
     p_enc->fmt_out.i_cat = AUDIO_ES;
     p_enc->fmt_out.i_codec = VLC_CODEC_MPGA;
@@ -238,7 +239,6 @@ static int OpenEncoder( vlc_object_t *p_this )
     }
 
     p_sys->i_nb_samples = 0;
-    p_enc->pf_encode_audio = Encode;
 
     return VLC_SUCCESS;
 }
@@ -248,26 +248,25 @@ static int OpenEncoder( vlc_object_t *p_this )
  ****************************************************************************
  * This function spits out MPEG packets.
  ****************************************************************************/
-static void Bufferize( encoder_t *p_enc, float *p_in, int i_nb_samples )
+static void Bufferize( encoder_t *p_enc, int16_t *p_in, int i_nb_samples )
 {
-    float *p_buffer = (float *)p_enc->p_sys->p_buffer
+    int16_t *p_buffer = p_enc->p_sys->p_buffer
                          + (p_enc->p_sys->i_nb_samples
                              * p_enc->fmt_in.audio.i_channels);
 
     memcpy( p_buffer, p_in, i_nb_samples * p_enc->fmt_in.audio.i_channels
-                             * sizeof(float) );
+                             * sizeof(int16_t) );
 }
 
 static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
     block_t *p_chain = NULL;
-    block_t *p_block;
 
     if( unlikely( !p_aout_buf ) ) {
         int i_used = 0;
 
-        i_used = twolame_encode_flush( p_sys->p_twolame,
+        i_used = twolame_encode_flush_interleaved( p_sys->p_twolame,
                                 p_sys->p_out_buffer, MAX_CODED_FRAME_SIZE );
 
         if( i_used < 0 )
@@ -283,7 +282,7 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
         return p_block;
     }
 
-    float *p_buffer = (float*)p_aout_buf->p_buffer;
+    int16_t *p_buffer = (int16_t *)p_aout_buf->p_buffer;
     int i_nb_samples = p_aout_buf->i_nb_samples;
 
     p_sys->i_pts = p_aout_buf->i_pts -
@@ -293,12 +292,13 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
     while ( p_sys->i_nb_samples + i_nb_samples >= MPEG_FRAME_SIZE )
     {
         int i_used;
+        block_t *p_block;
 
         Bufferize( p_enc, p_buffer, MPEG_FRAME_SIZE - p_sys->i_nb_samples );
         i_nb_samples -= MPEG_FRAME_SIZE - p_sys->i_nb_samples;
         p_buffer += (MPEG_FRAME_SIZE - p_sys->i_nb_samples) * 2;
 
-        i_used = twolame_encode_buffer_float32_interleaved( p_sys->p_twolame,
+        i_used = twolame_encode_buffer_interleaved( p_sys->p_twolame,
                                p_sys->p_buffer, MPEG_FRAME_SIZE,
                                p_sys->p_out_buffer, MAX_CODED_FRAME_SIZE );
         p_sys->i_nb_samples = 0;
