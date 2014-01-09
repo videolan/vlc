@@ -376,7 +376,7 @@ static int ProcessHeaders( decoder_t *p_dec )
 
     date_Init( &p_sys->end_date, p_sys->vi.rate, 1 );
 
-    msg_Dbg( p_dec, "channels:%d samplerate:%ld bitrate:%ld",
+    msg_Dbg( p_dec, "channels:%d samplerate:%ld bitrate:%ud",
              p_sys->vi.channels, p_sys->vi.rate, p_dec->fmt_out.i_bitrate );
 
     /* The next packet in order is the comments header */
