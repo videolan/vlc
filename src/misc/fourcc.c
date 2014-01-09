@@ -1224,6 +1224,9 @@ static const staticentry_t p_list_audio[] = {
         A("atrc"),
         A("\x70\x02\x00\x00"),
 
+    B(VLC_CODEC_ATRAC3P, "atrac 3+"),
+        A("atrp"),
+
     B(VLC_CODEC_IMC, "IMC" ),
         A("\x01\x04\x00\x00"),
 
