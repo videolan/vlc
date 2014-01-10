@@ -64,6 +64,7 @@
 #import "TrackSynchronization.h"
 #import "VLCVoutWindowController.h"
 #import "ExtensionsManager.h"
+#import "BWQuincyManager.h"
 
 #import "VideoEffects.h"
 #import "AudioEffects.h"
@@ -762,6 +763,17 @@ static VLCMain *_o_sharedMainInstance = nil;
     if (!p_intf)
         return;
 
+    NSString *appVersion = [[[NSBundle mainBundle] infoDictionary] valueForKey: @"CFBundleVersion"];
+    NSRange endRande = [appVersion rangeOfString:@"-"];
+    if (endRande.location != NSNotFound)
+        appVersion = [appVersion substringToIndex:endRande.location];
+
+    BWQuincyManager *quincyManager = [BWQuincyManager sharedQuincyManager];
+    [quincyManager setApplicationVersion:appVersion];
+    [quincyManager setSubmissionURL:@"http://crash.videolan.org/crash_v200.php"];
+    [quincyManager setDelegate:self];
+    [quincyManager setCompanyName:@"VideoLAN"];
+
     [self updateCurrentlyUsedHotkeys];
 
     /* init media key support */
@@ -779,8 +791,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* Handle sleep notification */
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(computerWillSleep:)
            name:NSWorkspaceWillSleepNotification object:nil];
-
-    [self performSelector:@selector(lookForCrashLog) withObject:nil afterDelay:1.5];
 
     /* we will need this, so let's load it here so the interface appears to be more responsive */
     nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner: NSApp];

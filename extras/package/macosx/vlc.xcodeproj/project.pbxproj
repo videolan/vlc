@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7D3F6525188051F2005776C4 /* BWQuincyMain.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D3F6523188051F2005776C4 /* BWQuincyMain.xib */; };
 		7D8BB0B71830311300FAE9B7 /* DebugMessageVisualizer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */; };
 		7D8BB0BA1830367200FAE9B7 /* PlaylistMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */; };
 		7D8BB0C01830393300FAE9B7 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0BE1830393300FAE9B7 /* MainWindow.xib */; };
@@ -469,6 +470,11 @@
 		5CCED71314C0D4A90057F8D1 /* ExtensionsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExtensionsManager.m; path = ../../../modules/gui/macosx/ExtensionsManager.m; sourceTree = SOURCE_ROOT; };
 		5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCUIWidgets.h; path = ../../../modules/gui/macosx/VLCUIWidgets.h; sourceTree = SOURCE_ROOT; };
 		5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCUIWidgets.m; path = ../../../modules/gui/macosx/VLCUIWidgets.m; sourceTree = SOURCE_ROOT; };
+		7D3F6524188051F2005776C4 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/BWQuincyMain.xib; sourceTree = "<group>"; };
+		7D3F652618805297005776C4 /* BWQuincyManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BWQuincyManager.h; path = ../../../modules/gui/macosx/BWQuincyManager.h; sourceTree = "<group>"; };
+		7D3F652718805297005776C4 /* BWQuincyManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BWQuincyManager.m; path = ../../../modules/gui/macosx/BWQuincyManager.m; sourceTree = "<group>"; };
+		7D3F652818805297005776C4 /* BWQuincyUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BWQuincyUI.h; path = ../../../modules/gui/macosx/BWQuincyUI.h; sourceTree = "<group>"; };
+		7D3F652918805297005776C4 /* BWQuincyUI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BWQuincyUI.m; path = ../../../modules/gui/macosx/BWQuincyUI.m; sourceTree = "<group>"; };
 		7D7DC2CA182E86D9008C9E3E /* darwinvlc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = darwinvlc.c; path = ../../../bin/darwinvlc.c; sourceTree = "<group>"; };
 		7D8BB0B318302AC000FAE9B7 /* DebugMessageVisualizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DebugMessageVisualizer.h; path = ../../../modules/gui/macosx/DebugMessageVisualizer.h; sourceTree = "<group>"; };
 		7D8BB0B418302AC000FAE9B7 /* DebugMessageVisualizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DebugMessageVisualizer.m; path = ../../../modules/gui/macosx/DebugMessageVisualizer.m; sourceTree = "<group>"; };
@@ -1172,6 +1178,17 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		7D3F652A1880529C005776C4 /* QuincyKit */ = {
+			isa = PBXGroup;
+			children = (
+				7D3F652618805297005776C4 /* BWQuincyManager.h */,
+				7D3F652718805297005776C4 /* BWQuincyManager.m */,
+				7D3F652818805297005776C4 /* BWQuincyUI.h */,
+				7D3F652918805297005776C4 /* BWQuincyUI.m */,
+			);
+			name = QuincyKit;
+			sourceTree = "<group>";
+		};
 		8E445F86047289E50059A3A7 /* fileicons */ = {
 			isa = PBXGroup;
 			children = (
@@ -1511,6 +1528,7 @@
 		CC0CD0E513DE0FC600B0D90D /* Imported Code */ = {
 			isa = PBXGroup;
 			children = (
+				7D3F652A1880529C005776C4 /* QuincyKit */,
 				CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */,
 				CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */,
 				CC0CD0E413DE0EB500B0D90D /* PXSourceList */,
@@ -1792,6 +1810,7 @@
 				7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */,
 				7D8BB0BE1830393300FAE9B7 /* MainWindow.xib */,
 				7DE88F281831396A00CD9DA2 /* PlaylistAccessoryView.xib */,
+				7D3F6523188051F2005776C4 /* BWQuincyMain.xib */,
 			);
 			name = xibs;
 			sourceTree = "<group>";
@@ -1854,6 +1873,7 @@
 				CC402EB90E00ABBB006A4BA4 /* vlc.scriptSuite in Resources */,
 				CC402EBA0E00ABBB006A4BA4 /* vlc.scriptTerminology in Resources */,
 				CC402EBB0E00ABBB006A4BA4 /* README.MacOSX.rtf in Resources */,
+				7D3F6525188051F2005776C4 /* BWQuincyMain.xib in Resources */,
 				CC402F3C0E00ABBB006A4BA4 /* noart.png in Resources */,
 				CC04323D13B246DF00D7D52E /* effects-double-buttons_dark.png in Resources */,
 				CC04323E13B246DF00D7D52E /* effects-double-buttons-blue_dark.png in Resources */,
@@ -2277,6 +2297,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		7D3F6523188051F2005776C4 /* BWQuincyMain.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7D3F6524188051F2005776C4 /* English */,
+			);
+			name = BWQuincyMain.xib;
+			sourceTree = "<group>";
+		};
 		7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */ = {
 			isa = PBXVariantGroup;
 			children = (

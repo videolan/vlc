@@ -85,5 +85,9 @@ SOURCES_macosx = \
 	VLCVoutWindowController.h \
 	DebugMessageVisualizer.m \
 	DebugMessageVisualizer.h \
+	BWQuincyManager.h \
+	BWQuincyManager.m \
+	BWQuincyUI.h \
+	BWQuincyUI.m \
 	iTunes.h \
 	$(NULL)
