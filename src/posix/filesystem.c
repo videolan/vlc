@@ -157,7 +157,7 @@ char *vlc_readdir( DIR *dir )
     char *path = NULL;
 
     long len = fpathconf (dirfd (dir), _PC_NAME_MAX);
-    /* POSIX says there shall we room for NAME_MAX bytes at all times */
+    /* POSIX says there shall be room for NAME_MAX bytes at all times */
     if (len == -1 || len < NAME_MAX)
         len = NAME_MAX;
     len += sizeof (*ent) + 1 - sizeof (ent->d_name);
