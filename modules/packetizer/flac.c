@@ -507,20 +507,20 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t p_header[MAX_FLAC_HEADER_SIZE];
-    block_t *out;
+    block_t *out, *in = NULL;
 
-    if (!pp_block || !*pp_block)
-        return NULL;
+    if ( pp_block && *pp_block)
+    {
+        in = *pp_block;
 
-    block_t *in = *pp_block;
-
-    if (in->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
-        if (in->i_flags&BLOCK_FLAG_CORRUPTED) {
-            p_sys->i_state = STATE_NOSYNC;
-            block_BytestreamEmpty(&p_sys->bytestream);
+        if (in->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
+            if (in->i_flags&BLOCK_FLAG_CORRUPTED) {
+                p_sys->i_state = STATE_NOSYNC;
+                block_BytestreamEmpty(&p_sys->bytestream);
+            }
+            block_Release(*pp_block);
+            return NULL;
         }
-        block_Release(*pp_block);
-        return NULL;
     }
 
     if (!p_sys->b_stream_info)
@@ -534,7 +534,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 
     if ( p_sys->i_pts <= VLC_TS_INVALID )
     {
-        if ( in->i_pts == p_sys->i_pts )
+        if ( in && in->i_pts == p_sys->i_pts )
         {
             /* We've just started the stream, wait for the first PTS. */
             block_Release(in);
@@ -543,7 +543,8 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         p_sys->i_rate = p_dec->fmt_out.audio.i_rate;
     }
 
-    block_BytestreamPush(&p_sys->bytestream, in);
+    if ( in )
+        block_BytestreamPush(&p_sys->bytestream, in);
 
     while (1) switch (p_sys->i_state) {
     case STATE_NOSYNC:
@@ -596,9 +597,6 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
          * it would appear in data, so we also need to check next frame header CRC
          */
     case STATE_NEXT_SYNC:
-        /* TODO: If pp_block == NULL, flush the buffer without checking the
-         * next sync word */
-
     {
         /* Calculate the initial CRC for the minimal frame size,
          * We'll update it as we look for the next start code. */
@@ -616,8 +614,6 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             crc = flac_crc16(crc, buf[i]);
         free(buf);
         p_sys->crc = crc;
-    }
-
 
         /* Check if next expected frame contains the sync word */
         while (!block_PeekOffsetBytes(&p_sys->bytestream, p_sys->i_frame_size,
@@ -663,10 +659,48 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
                 p_sys->i_state = STATE_NOSYNC;
                 return NULL;
             }
-            /* Need more data */
-            return NULL;
-        }
 
+            if ( !in )
+            {
+                /* There's no following frame, so we need to read current
+                 * data until the frame footer matches (crc16) == stream crc.
+                 * In the worst case, if crc might be a false positive and data
+                 * will be truncated. */
+                uint8_t crc_bytes[2];
+                if ( !block_PeekOffsetBytes(&p_sys->bytestream,
+                                    p_sys->i_frame_size - 2, crc_bytes, 2) )
+                {
+                    while ( true )
+                    {
+                        /* Read the frame CRC */
+                        uint16_t stream_crc = (crc_bytes[0] << 8) | crc_bytes[1];
+                        /* Calculate the frame CRC: remove the last 2 bytes */
+                        uint16_t crc = flac_crc16_undo(p_sys->crc, crc_bytes[1]);
+                                 crc = flac_crc16_undo(crc,        crc_bytes[0]);
+                        if (stream_crc == crc)
+                        {
+                            p_sys->i_state = STATE_SEND_DATA;
+                            break;
+                        }
+                        p_sys->i_frame_size++;
+                        if ( block_PeekOffsetBytes(&p_sys->bytestream,
+                                                   p_sys->i_frame_size - 2, crc_bytes, 2) )
+                            break;
+                        /* Update current crc */
+                        p_sys->crc = flac_crc16(p_sys->crc, crc_bytes[1]);
+                    }
+                }
+
+                if ( p_sys->i_state != STATE_SEND_DATA )
+                    return NULL;
+            }
+            else
+            {
+                /* Need more data */
+                return NULL;
+            }
+        }
+    }
     case STATE_SEND_DATA:
         out = block_Alloc(p_sys->i_frame_size);
 
@@ -681,7 +715,10 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
                 pi_channels_maps[p_sys->stream_info.channels];
 
         /* So p_block doesn't get re-added several times */
-        *pp_block = block_BytestreamPop(&p_sys->bytestream);
+        if ( in )
+            *pp_block = block_BytestreamPop(&p_sys->bytestream);
+        else
+            block_BytestreamFlush(&p_sys->bytestream);
 
         p_sys->i_state = STATE_NOSYNC;
 
