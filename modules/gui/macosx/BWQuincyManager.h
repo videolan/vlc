@@ -94,12 +94,10 @@ typedef enum CrashReportStatus {
 
 @protocol BWQuincyManagerDelegate <NSObject>
 
-@required
+@optional
 
 // Invoked once the modal sheets are gone
 - (void) showMainApplicationWindow;
-
-@optional
 
 // Return the description the crashreport should contain, empty by default. The string will automatically be wrapped into <[DATA[ ]]>, so make sure you don't do that in your string.
 -(NSString *) crashReportDescription;
@@ -164,6 +162,7 @@ typedef enum CrashReportStatus {
 
 - (NSString *) applicationName;
 - (NSString *) applicationVersionString;
+- (void)setApplicationVersion:(NSString *)appVersion;
 - (NSString *) applicationVersion;
 
 @end

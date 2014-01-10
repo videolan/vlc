@@ -592,7 +592,7 @@ audio_output_t *getAout(void)
 #pragma mark -
 #pragma mark Private
 
-@interface VLCMain ()
+@interface VLCMain () <BWQuincyManagerDelegate>
 - (void)removeOldPreferences;
 @end
 
