@@ -64,7 +64,6 @@
 #import "TrackSynchronization.h"
 #import "VLCVoutWindowController.h"
 #import "ExtensionsManager.h"
-#import "CrashReporter.h"
 
 #import "VideoEffects.h"
 #import "AudioEffects.h"
@@ -592,7 +591,7 @@ audio_output_t *getAout(void)
 #pragma mark -
 #pragma mark Private
 
-@interface VLCMain () <VLCCrashReporterDelegate>
+@interface VLCMain ()
 - (void)removeOldPreferences;
 @end
 
@@ -1664,21 +1663,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (BOOL)activeVideoPlayback
 {
     return b_active_videoplayback;
-}
-
-#pragma mark -
-#pragma mark Crash Log handling
-
-- (void)lookForCrashLog
-{
-    VLCCrashReporter *reporter = [[VLCCrashReporter alloc] init];
-    reporter.delegate = self;
-    [reporter showDialogAndSendLogIfDesired];
-}
-
-- (void)reporterFinishedAction:(VLCCrashReporter *)reporter
-{
-    [reporter release];
 }
 
 #pragma mark -

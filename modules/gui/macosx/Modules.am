@@ -83,8 +83,6 @@ SOURCES_macosx = \
 	ControlsBar.h \
 	VLCVoutWindowController.m \
 	VLCVoutWindowController.h \
-	CrashReporter.m \
-	CrashReporter.h \
 	DebugMessageVisualizer.m \
 	DebugMessageVisualizer.h \
 	iTunes.h \

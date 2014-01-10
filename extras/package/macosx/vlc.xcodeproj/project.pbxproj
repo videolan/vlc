@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7D8BB0B21830244B00FAE9B7 /* CrashReporter.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B01830244B00FAE9B7 /* CrashReporter.xib */; };
 		7D8BB0B71830311300FAE9B7 /* DebugMessageVisualizer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */; };
 		7D8BB0BA1830367200FAE9B7 /* PlaylistMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */; };
 		7D8BB0C01830393300FAE9B7 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0BE1830393300FAE9B7 /* MainWindow.xib */; };
@@ -470,10 +469,7 @@
 		5CCED71314C0D4A90057F8D1 /* ExtensionsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExtensionsManager.m; path = ../../../modules/gui/macosx/ExtensionsManager.m; sourceTree = SOURCE_ROOT; };
 		5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCUIWidgets.h; path = ../../../modules/gui/macosx/VLCUIWidgets.h; sourceTree = SOURCE_ROOT; };
 		5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCUIWidgets.m; path = ../../../modules/gui/macosx/VLCUIWidgets.m; sourceTree = SOURCE_ROOT; };
-		7D5B7B1F182FDA0300DB4869 /* CrashReporter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CrashReporter.h; path = ../../../modules/gui/macosx/CrashReporter.h; sourceTree = "<group>"; };
-		7D5B7B20182FDA0300DB4869 /* CrashReporter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CrashReporter.m; path = ../../../modules/gui/macosx/CrashReporter.m; sourceTree = "<group>"; };
 		7D7DC2CA182E86D9008C9E3E /* darwinvlc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = darwinvlc.c; path = ../../../bin/darwinvlc.c; sourceTree = "<group>"; };
-		7D8BB0B11830244B00FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/CrashReporter.xib; sourceTree = "<group>"; };
 		7D8BB0B318302AC000FAE9B7 /* DebugMessageVisualizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DebugMessageVisualizer.h; path = ../../../modules/gui/macosx/DebugMessageVisualizer.h; sourceTree = "<group>"; };
 		7D8BB0B418302AC000FAE9B7 /* DebugMessageVisualizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DebugMessageVisualizer.m; path = ../../../modules/gui/macosx/DebugMessageVisualizer.m; sourceTree = "<group>"; };
 		7D8BB0B61830311300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/DebugMessageVisualizer.xib; sourceTree = "<group>"; };
@@ -1077,8 +1073,6 @@
 				8ED6C27D03E2EB1C0059A3A7 /* intf.m */,
 				7D8BB0B318302AC000FAE9B7 /* DebugMessageVisualizer.h */,
 				7D8BB0B418302AC000FAE9B7 /* DebugMessageVisualizer.m */,
-				7D5B7B1F182FDA0300DB4869 /* CrashReporter.h */,
-				7D5B7B20182FDA0300DB4869 /* CrashReporter.m */,
 				CC448A5A13B61D49009F72E0 /* MainMenu.h */,
 				CC448A5B13B61D49009F72E0 /* MainMenu.m */,
 				CC448A6013B68A0B009F72E0 /* CoreInteraction.h */,
@@ -1794,7 +1788,6 @@
 				CCD83E2B13FE9B90004F1652 /* MainMenu.xib */,
 				CC0663371566CD5A003A411C /* ConvertAndSave.xib */,
 				CC461F73160084A10022423C /* SharedDialogs.xib */,
-				7D8BB0B01830244B00FAE9B7 /* CrashReporter.xib */,
 				7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */,
 				7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */,
 				7D8BB0BE1830393300FAE9B7 /* MainWindow.xib */,
@@ -2254,7 +2247,6 @@
 				CC166FE115F5136B0088201B /* previous-6btns-dark-pressed.png in Resources */,
 				CC166FE215F5136B0088201B /* previous-6btns-dark-pressed@2x.png in Resources */,
 				CC166FE315F5136B0088201B /* previous-6btns-dark.png in Resources */,
-				7D8BB0B21830244B00FAE9B7 /* CrashReporter.xib in Resources */,
 				7D8BB0C01830393300FAE9B7 /* MainWindow.xib in Resources */,
 				CC166FE415F5136B0088201B /* previous-6btns-dark@2x.png in Resources */,
 				CC166FE915F517660088201B /* backward-6btns-pressed.png in Resources */,
@@ -2285,14 +2277,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		7D8BB0B01830244B00FAE9B7 /* CrashReporter.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				7D8BB0B11830244B00FAE9B7 /* English */,
-			);
-			name = CrashReporter.xib;
-			sourceTree = "<group>";
-		};
 		7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
