@@ -2987,16 +2987,17 @@ PKG_CHECK_MODULES([GL], [gl], [
     [#include <GL/gl.h>]], [
     [int t0 = GL_TEXTURE0;]])
   ], [
-    have_gl="yes"
     GL_CFLAGS=""
-    AS_IF([test "${SYS}" = "mingw32"], [
+    AS_IF([test "${SYS}" != "mingw32"], [
+      have_gl="yes"
+      GL_LIBS="-lGL"
+    ], [
       AC_CHECK_HEADER([GL/glew.h], [
+        have_gl="yes"
       ], [
         have_gl="no"
       ])
       GL_LIBS="-lopengl32"
-    ], [
-      GL_LIBS="-lGL"
     ])
   ], [
     have_gl="no"
