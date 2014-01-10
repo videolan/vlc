@@ -27,6 +27,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#import "intf.h"
 #import "BWQuincyUI.h"
 #import "BWQuincyManager.h"
 #import <sys/sysctl.h>
@@ -73,6 +74,14 @@ const CGFloat kDetailsHeight = 285;
 	crashLogTextView.editable = NO;
 	crashLogTextView.selectable = NO;
 	crashLogTextView.automaticSpellingCorrectionEnabled = NO;
+
+    [showButton setTitle:_NS("Show Details")];
+    [hideButton setTitle:_NS("Hide Details")];
+    [cancelButton setTitle:_NS("Cancel")];
+    [submitButton setTitle:_NS("Send")];
+    [titleText setStringValue:[NSString stringWithFormat:_NS("%@ unexpectedly quit the last time it was run. Would you like to send a crash report to %@?"), _applicationName, _companyName]];
+    [commentsText setStringValue:_NS("Comments")];
+    [detailsText setStringValue:_NS("Problem details and system configuration")];
 }
 
 
@@ -163,10 +172,10 @@ const CGFloat kDetailsHeight = 285;
 - (void) askCrashReportDetails {
   NSError *error;
 
-  [[self window] setTitle:[NSString stringWithFormat:NSLocalizedString(@"Problem Report for %@", @"Window title"), _applicationName]];
+   [[self window] setTitle:[NSString stringWithFormat:_NS("Problem Report for %@"), _applicationName]];
 
-  [[descriptionTextField cell] setPlaceholderString:NSLocalizedString(@"Please describe any steps needed to trigger the problem", @"User description placeholder")];
-  [noteText setStringValue:NSLocalizedString(@"No personal information will be sent with this report.", @"Note text")];
+   [[descriptionTextField cell] setPlaceholderString:_NS("Please describe any steps needed to trigger the problem")];
+   [noteText setStringValue:_NS("No personal information will be sent with this report.")];
 
   // get the crash log
   NSString *crashLogs = [NSString stringWithContentsOfFile:_crashFile encoding:NSUTF8StringEncoding error:&error];
@@ -200,8 +209,6 @@ const CGFloat kDetailsHeight = 285;
 
   [crashLogTextView setString:[NSString stringWithFormat:@"%@\n\n%@", _crashLogContent, _consoleContent]];
 
-
-  NSBeep();
   [NSApp runModalForWindow:[self window]];
 }
 

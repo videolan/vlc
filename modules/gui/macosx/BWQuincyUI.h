@@ -35,12 +35,15 @@
   IBOutlet NSTextField  *descriptionTextField;
   IBOutlet NSTextView   *crashLogTextView;
 
-  IBOutlet NSTextField  *noteText;
+    IBOutlet NSTextField  *noteText;
+    IBOutlet NSTextField  *titleText;
+    IBOutlet NSTextField  *commentsText;
+    IBOutlet NSTextField  *detailsText;
 
-  IBOutlet NSButton   *showButton;
-  IBOutlet NSButton   *hideButton;
-  IBOutlet NSButton   *cancelButton;
-  IBOutlet NSButton   *submitButton;
+    IBOutlet NSButton   *showButton;
+    IBOutlet NSButton   *hideButton;
+    IBOutlet NSButton   *cancelButton;
+    IBOutlet NSButton   *submitButton;
 
   BWQuincyManager   *_quincyManager;
 
