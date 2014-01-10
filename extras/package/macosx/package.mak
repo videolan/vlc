@@ -37,6 +37,7 @@ VLC-tmp: vlc
 	REVISION=`(git --git-dir=$(srcdir)/.git describe --always || echo exported)` && \
 	    sed "s/#REVISION#/$$REVISION/g" $(top_builddir)/extras/package/macosx/Info.plist \
         > $(top_builddir)/tmp/extras/package/macosx/Info.plist
+	xcrun plutil -convert binary1 $(top_builddir)/tmp/extras/package/macosx/Info.plist
 	cp -R $(top_builddir)/extras/package/macosx/Resources $(top_builddir)/tmp/extras/package/macosx/
 	cd "$(srcdir)"; cp AUTHORS COPYING THANKS $(abs_top_builddir)/tmp/
 	mkdir -p $(top_builddir)/tmp/modules/audio_output
