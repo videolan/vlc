@@ -56,6 +56,7 @@ vlc_module_end()
  * decoder_sys_t : FLAC decoder descriptor
  *****************************************************************************/
 #define MAX_FLAC_HEADER_SIZE 16
+#define MIN_FLAC_FRAME_SIZE ((48+(8 + 4 + 1*4)+16)/8)
 struct decoder_sys_t
 {
     /*
@@ -141,6 +142,8 @@ static void ProcessHeader(decoder_t *p_dec)
                 __MAX( __MIN( p_sys->stream_info.max_blocksize, 65535 ), 16 );
 
     p_sys->stream_info.min_framesize = bs_read(&bs, 24);
+    p_sys->stream_info.min_framesize =
+            __MAX( p_sys->stream_info.min_framesize, MIN_FLAC_FRAME_SIZE );
     p_sys->stream_info.max_framesize = bs_read(&bs, 24);
 
     p_sys->stream_info.sample_rate = bs_read(&bs, 20);
@@ -584,8 +587,8 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             p_dec->fmt_out.audio.i_rate = p_sys->i_rate;
         }
         p_sys->i_state = STATE_NEXT_SYNC;
-        p_sys->i_frame_size = p_sys->b_stream_info && p_sys->stream_info.min_framesize > 0 ?
-                                                        p_sys->stream_info.min_framesize : 1;
+        p_sys->i_frame_size = ( p_sys->b_stream_info ) ? p_sys->stream_info.min_framesize :
+                                                         MIN_FLAC_FRAME_SIZE;
 
         /* We have to read until next frame sync code to compute current frame size
          * from that boundary.
