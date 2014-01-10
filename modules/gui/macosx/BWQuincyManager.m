@@ -34,7 +34,15 @@
 #define SDK_NAME @"Quincy"
 #define SDK_VERSION @"2.1.6"
 
+@interface BWQuincyManager ()
+{
+    NSString *_customAppVersion;
+}
+
+@end
+
 @interface BWQuincyManager(private)
+
 - (void) startManager;
 
 - (void) _postXML:(NSString*)xml toURL:(NSURL*)url;
@@ -86,6 +94,8 @@
 
   [_crashFile release];
   [_quincyUI release];
+  if (_customAppVersion)
+       [_customAppVersion release];
 
   [super dealloc];
 }
@@ -422,7 +432,16 @@
   return string;
 }
 
+- (void)setApplicationVersion:(NSString *)appVersion
+{
+    _customAppVersion = appVersion;
+    [_customAppVersion retain];
+}
+
 - (NSString *) applicationVersion {
+    if (_customAppVersion)
+        return _customAppVersion;
+
   NSString* string = [[[NSBundle mainBundle] localizedInfoDictionary] valueForKey: @"CFBundleVersion"];
 
   if (!string)
