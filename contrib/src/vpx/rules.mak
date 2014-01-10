@@ -1,6 +1,6 @@
 # libvpx
 
-VPX_VERSION := v1.1.0
+VPX_VERSION := v1.3.0
 VPX_URL := http://webm.googlecode.com/files/libvpx-$(VPX_VERSION).tar.bz2
 
 $(TARBALLS)/libvpx-$(VPX_VERSION).tar.bz2:
@@ -11,14 +11,9 @@ $(TARBALLS)/libvpx-$(VPX_VERSION).tar.bz2:
 libvpx: libvpx-$(VPX_VERSION).tar.bz2 .sum-vpx
 	$(UNPACK)
 	$(APPLY) $(SRC)/vpx/libvpx-no-cross.patch
-	$(APPLY) $(SRC)/vpx/libvpx-no-abi.patch
 	$(APPLY) $(SRC)/vpx/windows.patch
 ifdef HAVE_MACOSX
 	$(APPLY) $(SRC)/vpx/libvpx-mac.patch
-	$(APPLY) $(SRC)/vpx/libvpx-mac-mountain-lion.patch
-endif
-ifdef HAVE_WIN32
-	$(APPLY) $(SRC)/vpx/libvpx-win32.patch
 endif
 ifneq ($(which bash),/bin/bash)
 	sed -i.orig \
@@ -83,10 +78,9 @@ endif
 VPX_CONF := \
 	--enable-runtime-cpu-detect \
 	--disable-install-bins \
-	--disable-install-srcs \
-	--disable-install-libs \
 	--disable-install-docs \
 	--disable-examples \
+	--disable-unit-tests \
 	--disable-vp8-decoder
 ifndef HAVE_WIN32
 VPX_CONF += --enable-pic
@@ -100,15 +94,6 @@ endif
 
 .vpx: libvpx
 	cd $< && CROSS=$(VPX_CROSS) ./configure --target=$(VPX_TARGET) \
-		$(VPX_CONF)
+		$(VPX_CONF) --prefix=$(PREFIX)
 	cd $< && $(MAKE) install
-	rm -Rf -- "$(PREFIX)/include/vpx/"
-	mkdir -p -- "$(PREFIX)/include/vpx/"
-	# Of course! Why the hell would it be listed or in make install?
-	cp $</vpx/*.h $</vpx_ports/*.h "$(PREFIX)/include/vpx/"
-	rm -f -- "$(PREFIX)/include/vpx/config.h"
-	$(RANLIB) $</libvpx.a
-	# Of course! Why the hell would it be listed or in make install?
-	mkdir -p -- "$(PREFIX)/lib"
-	install -- $</libvpx.a "$(PREFIX)/lib/libvpx.a"
 	touch $@
