@@ -483,7 +483,6 @@ static int SyncInfo(decoder_t *p_dec, uint8_t *p_buf,
             *pi_pts += CLOCK_FREQ * blocksize * i_fsnumber / samplerate;
         else /* Variable blocksize stream / Samples */
             *pi_pts += CLOCK_FREQ * i_fsnumber / samplerate;
-        msg_Err( p_dec, "PTS %ld", *pi_pts );
     }
 
     if ( pi_duration )
