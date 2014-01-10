@@ -554,6 +554,9 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         }
 
     case STATE_SYNC:
+        /* Sync state is unverified until we have read frame header and checked CRC
+           Once validated, we'll send data from NEXT_SYNC state where we'll
+           compute frame size */
         p_sys->i_state = STATE_HEADER;
 
     case STATE_HEADER:
@@ -581,6 +584,11 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         p_sys->i_frame_size = p_sys->b_stream_info && p_sys->stream_info.min_framesize > 0 ?
                                                         p_sys->stream_info.min_framesize : 1;
 
+        /* We have to read until next frame sync code to compute current frame size
+         * from that boundary.
+         * The confusing part below is that sync code needs to be verified in case
+         * it would appear in data, so we also need to check next frame header CRC
+         */
     case STATE_NEXT_SYNC:
         /* TODO: If pp_block == NULL, flush the buffer without checking the
          * next sync word */
