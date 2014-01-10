@@ -379,7 +379,7 @@ static int SyncInfo(decoder_t *p_dec, uint8_t *p_buf,
         blocksize = 576 << (blocksize - 2);
     }
 
-    if (p_sys->b_stream_info)
+    if (p_sys->b_stream_info && !blocksize_hint )
         if (blocksize < p_sys->stream_info.min_blocksize ||
             blocksize > p_sys->stream_info.max_blocksize)
             return 0;
