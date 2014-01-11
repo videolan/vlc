@@ -142,6 +142,7 @@
 #define VLC_CODEC_XAN_WC4         VLC_FOURCC('X','x','a','n')
 #define VLC_CODEC_LCL_MSZH        VLC_FOURCC('M','S','Z','H')
 #define VLC_CODEC_LCL_ZLIB        VLC_FOURCC('Z','L','I','B')
+#define VLC_CODEC_THP             VLC_FOURCC('T','H','P','0')
 
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9             VLC_FOURCC('Y','V','U','9')
@@ -317,6 +318,7 @@
 #define VLC_CODEC_ADPCM_YAMAHA               VLC_FOURCC('m','s',0x00,0x20)
 #define VLC_CODEC_ADPCM_DK3                  VLC_FOURCC('m','s',0x00,0x62)
 #define VLC_CODEC_ADPCM_DK4                  VLC_FOURCC('m','s',0x00,0x61)
+#define VLC_CODEC_ADPCM_THP                  VLC_FOURCC('T','H','P','A')
 #define VLC_CODEC_G723_1                     VLC_FOURCC('g','7','2', 0x31)
 #define VLC_CODEC_G729                       VLC_FOURCC('g','7','2','9')
 #define VLC_CODEC_VMDAUDIO                   VLC_FOURCC('v','m','d','a')

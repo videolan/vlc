@@ -1008,6 +1008,8 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_LCL_ZLIB, "Loss-Less Codec Library AVIzlib"),
         A("ZLIB"),
 
+    B(VLC_CODEC_THP, "GameCube THP video"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
@@ -1192,6 +1194,8 @@ static const staticentry_t p_list_audio[] = {
 
     B(VLC_CODEC_ADPCM_DK4, "Duck DK4 ADPCM"),
         A("ms\x00\x61"),
+
+    B(VLC_CODEC_ADPCM_THP, "GameCube THP ADPCM"),
 
     /* AMR */
     B(VLC_CODEC_AMR_NB, "AMR narrow band"),
