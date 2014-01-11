@@ -1002,6 +1002,12 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_XAN_WC4, "Wing Commander IV Xan video"),
         A("Xxan"),
 
+    B(VLC_CODEC_LCL_MSZH, "Loss-Less Codec Library AVImszh"),
+        A("MSZH"),
+
+    B(VLC_CODEC_LCL_ZLIB, "Loss-Less Codec Library AVIzlib"),
+        A("ZLIB"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
