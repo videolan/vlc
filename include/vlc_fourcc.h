@@ -139,6 +139,7 @@
 #define VLC_CODEC_BINKVIDEO       VLC_FOURCC('B','I','K','f')
 #define VLC_CODEC_BINKAUDIO_DCT   VLC_FOURCC('B','A','U','1')
 #define VLC_CODEC_BINKAUDIO_RDFT  VLC_FOURCC('B','A','U','2')
+#define VLC_CODEC_XAN_WC4         VLC_FOURCC('X','x','a','n')
 
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9             VLC_FOURCC('Y','V','U','9')

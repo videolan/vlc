@@ -999,6 +999,9 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_MTS2, "Microsoft Expression Encoder Screen"),
         A("MTS2"),
 
+    B(VLC_CODEC_XAN_WC4, "Wing Commander IV Xan video"),
+        A("Xxan"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
