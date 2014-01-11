@@ -158,7 +158,7 @@ static const struct
     /* AV_CODEC_ID_C93 */
     /* AV_CODEC_ID_BETHSOFTVID */
     /* AV_CODEC_ID_PTX */
-    /* AV_CODEC_ID_TXD */
+    { VLC_CODEC_TXD, AV_CODEC_ID_TXD, VIDEO_ES },
     { VLC_CODEC_VP6A, AV_CODEC_ID_VP6A, VIDEO_ES },
     { VLC_CODEC_AMV, AV_CODEC_ID_AMV, VIDEO_ES },
     /* AV_CODEC_ID_VB */

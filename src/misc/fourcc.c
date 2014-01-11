@@ -1010,6 +1010,8 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_THP, "GameCube THP video"),
 
+    B(VLC_CODEC_TXD, "RenderWare TXD"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
