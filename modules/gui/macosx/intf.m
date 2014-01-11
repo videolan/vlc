@@ -754,6 +754,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [NSBundle loadNibNamed:@"MainWindow" owner: self];
     [o_mainwindow makeKeyAndOrderFront:nil];
+
+    [[SUUpdater sharedUpdater] setDelegate:self];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -934,6 +936,15 @@ static VLCMain *_o_sharedMainInstance = nil;
     [NSApp activateIgnoringOtherApps:YES];
     [o_remote stopListening: self];
     [[VLCCoreInteraction sharedInstance] stop];
+}
+
+/* don't be enthusiastic about an update if we currently play a video */
+- (BOOL)updaterMayCheckForUpdates:(SUUpdater *)bundle
+{
+    if ([self activeVideoPlayback])
+        return NO;
+
+    return YES;
 }
 
 #pragma mark -
