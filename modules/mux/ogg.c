@@ -180,6 +180,11 @@ typedef struct
          uint64_t i_last_keyframe_pos;
          uint64_t i_last_keyframe_time;
     } skeleton;
+
+    int             i_dirac_last_pt;
+    int             i_dirac_last_dt;
+    mtime_t         i_baseptsdelay;
+
 } ogg_stream_t;
 
 struct sout_mux_sys_t
@@ -364,6 +369,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_stream->i_num_frames = 0;
 
     p_stream->p_oggds_header = 0;
+
+    p_stream->i_baseptsdelay = -1;
+    p_stream->i_dirac_last_pt = -1;
+    p_stream->i_dirac_last_dt = -1;
 
     switch( p_input->p_fmt->i_cat )
     {
@@ -1561,6 +1570,9 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         p_data->p_buffer[0] = PACKET_IS_SYNCPOINT;      // FIXME
     }
 
+    if ( p_stream->i_fourcc == VLC_CODEC_DIRAC && p_stream->i_baseptsdelay < 0 )
+        p_stream->i_baseptsdelay = p_data->i_pts - p_data->i_dts;
+
     op.packet   = p_data->p_buffer;
     op.bytes    = p_data->i_buffer;
     op.b_o_s    = 0;
@@ -1611,22 +1623,56 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         }
         else if( p_stream->i_fourcc == VLC_CODEC_DIRAC )
         {
-            mtime_t dt = (p_data->i_dts - p_sys->i_start_dts + 1)
-                       * p_input->p_fmt->video.i_frame_rate *2
-                       / p_input->p_fmt->video.i_frame_rate_base
-                       / CLOCK_FREQ;
-            mtime_t delay = (p_data->i_pts - p_data->i_dts + 1)
-                          * p_input->p_fmt->video.i_frame_rate *2
-                          / p_input->p_fmt->video.i_frame_rate_base
-                          / CLOCK_FREQ;
+
+#define FRAME_ROUND(a) \
+    if ( ( a + 5000 / CLOCK_FREQ ) > ( a / CLOCK_FREQ ) )\
+        a += 5000;\
+    a /= CLOCK_FREQ;
+
+            mtime_t dt = (p_data->i_dts - p_sys->i_start_dts) * p_input->p_fmt->video.i_frame_rate / p_input->p_fmt->video.i_frame_rate_base;
+            FRAME_ROUND( dt );
+
+            mtime_t pt = (p_data->i_pts - p_sys->i_start_dts - p_stream->i_baseptsdelay ) * p_input->p_fmt->video.i_frame_rate / p_input->p_fmt->video.i_frame_rate_base;
+            FRAME_ROUND( pt );
+
+            /* (shro) some PTS could be repeated within 1st frames */
+            if ( pt == p_stream->i_dirac_last_pt )
+                pt++;
+            else
+                p_stream->i_dirac_last_pt = pt;
+
+            /* (shro) some DTS could be repeated within 1st frames */
+            if ( dt == p_stream->i_dirac_last_dt )
+                dt++;
+            else
+                p_stream->i_dirac_last_dt = dt;
+
             if( p_data->i_flags & BLOCK_FLAG_TYPE_I )
                 p_stream->i_last_keyframe = dt;
             mtime_t dist = dt - p_stream->i_last_keyframe;
-            op.granulepos = dt << 31 | (dist&0xff00) << 14
+
+            /* Everything increments by two for progressive */
+            if ( true )
+            {
+                pt *=2;
+                dt *=2;
+            }
+
+            mtime_t delay = pt - dt;
+            if ( delay < 0 ) delay *= -1;
+
+            op.granulepos = (pt - delay) << 31 | (dist&0xff00) << 14
                           | (delay&0x1fff) << 9 | (dist&0xff);
+#ifndef NDEBUG
+            msg_Dbg( p_mux, "dts %"PRId64" pts %"PRId64" dt %"PRId64" pt %"PRId64" delay %"PRId64" granule %"PRId64,
+                     (p_data->i_dts - p_sys->i_start_dts),
+                     (p_data->i_pts - p_sys->i_start_dts ),
+                     dt, pt, delay, op.granulepos );
+#endif
+
             AddIndexEntry( p_mux, dt, p_input );
         }
-        if( p_stream->i_fourcc == VLC_CODEC_VP8 )
+        else if( p_stream->i_fourcc == VLC_CODEC_VP8 )
         {
             p_stream->i_num_frames++;
             if( p_data->i_flags & BLOCK_FLAG_TYPE_I )
@@ -1678,7 +1724,6 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         OggSetDate( p_og, p_stream->i_dts, p_stream->i_length );
         p_stream->i_dts = -1;
         p_stream->i_length = 0;
-
         p_mux->p_sys->i_pos += sout_AccessOutWrite( p_mux->p_access, p_og );
     }
     else
