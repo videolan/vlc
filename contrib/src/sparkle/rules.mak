@@ -18,6 +18,7 @@ $(TARBALLS)/sparkle-git.tar.xz:
 sparkle: sparkle-git.tar.xz .sum-sparkle
 	$(UNPACK)
 	$(APPLY) $(SRC)/sparkle/sparkle-fix-formatstring.patch
+	$(APPLY) $(SRC)/sparkle/sparkle-fix-xcode-project-for-current-releases.patch
 	$(MOVE)
 
 .sparkle: sparkle
