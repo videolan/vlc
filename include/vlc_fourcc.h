@@ -143,6 +143,7 @@
 #define VLC_CODEC_LCL_MSZH        VLC_FOURCC('M','S','Z','H')
 #define VLC_CODEC_LCL_ZLIB        VLC_FOURCC('Z','L','I','B')
 #define VLC_CODEC_THP             VLC_FOURCC('T','H','P','0')
+#define VLC_CODEC_ESCAPE124       VLC_FOURCC('E','1','2','4')
 
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9             VLC_FOURCC('Y','V','U','9')

@@ -1012,6 +1012,8 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_TXD, "RenderWare TXD"),
 
+    B(VLC_CODEC_ESCAPE124, "Escape 124 video"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
