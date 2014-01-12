@@ -1,5 +1,5 @@
 --[[
- Gets an artwork from amazon
+ Gets an artwork from the Cover Art Archive or Amazon
 
  $Id$
  Copyright © 2007-2010 the VideoLAN team
@@ -19,17 +19,22 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]]
 
-function try_query(query)
-    local s = vlc.stream( query )
+function try_query(mbid)
+    local relquery = "http://mb.videolan.org/ws/2/release/" .. mbid
+    local s = vlc.stream( relquery )
     if not s then return nil end
     local page = s:read( 65653 )
 
+    found, _ = string.find( page, "<artwork>true</artwork>" )
+    if found then
+        return "http://coverartarchive.org/release/"..mbid.."/front-500"
+    end
     -- FIXME: multiple results may be available
     _, _, asin = string.find( page, "<asin>(%w+)</asin>" )
     if asin then
         return "http://images.amazon.com/images/P/"..asin..".01._SCLZZZZZZZ_.jpg"
     end
-    vlc.msg.dbg("ASIN not found")
+    vlc.msg.dbg("Neither coverartarchive.org nor amazon have cover art for this release")
     return nil
 end
 
@@ -69,8 +74,7 @@ function fetch_art()
         releaseid = get_releaseid( recquery )
     end
     if releaseid then
-        relquery = "http://mb.videolan.org/ws/2/release/" .. releaseid
-        return try_query( relquery )
+        return try_query( releaseid )
     else
         return nil
     end
