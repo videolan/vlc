@@ -43,7 +43,7 @@ Demuxer:
  * Support HDPR TS files
  * Improvements in metadata support in Ogg/Opus/Vorbis files
  * Fix encoding issues in some XML playlist formats
- * Support THP Wii/Gamecube, RenderWare video files
+ * Support THP Wii/Gamecube, RenderWare and Escape Replay game video files
 
 Muxers:
  * Important rework of the Ogg muxer, notably for skeleton
