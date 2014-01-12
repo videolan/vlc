@@ -63,7 +63,13 @@ function fetch_art()
 
     local releaseid = nil
 
-    if meta["artist"] and meta["album"] then
+    for _, k in ipairs({"MUSICBRAINZ_ALBUMID", "MusicBrainz Album Id"}) do
+        if meta[k] then
+            releaseid = meta[k]
+        end
+    end
+
+    if not releaseid and meta["artist"] and meta["album"] then
         query = "artist:\"" .. meta["artist"] .. "\" AND release:\"" .. meta["album"] .. "\""
         relquery = "http://mb.videolan.org/ws/2/release/?query=" .. vlc.strings.encode_uri_component( query )
         releaseid = get_releaseid( relquery )
