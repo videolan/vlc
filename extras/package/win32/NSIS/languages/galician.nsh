@@ -1,6 +1,7 @@
 StrCpy $Name_Section01 "Reprodutor multimedia (requirido)"
 StrCpy $Name_Section02a "Atallo do menú de inicio"
 StrCpy $Name_Section02b "Atallo de escritorio"
+StrCpy $Name_Section34 "Plugins para a web"
 StrCpy $Name_Section03 "Plugin para Mozilla"
 StrCpy $Name_Section04 "Plugin para ActiveX"
 StrCpy $Name_Section05 "Reprodución de discos"
@@ -10,50 +11,46 @@ StrCpy $Name_SectionGroupVideo "Ficheiros de vídeo"
 StrCpy $Name_SectionGroupOther "Outros"
 StrCpy $Name_Section07 "Menús contextuais"
 StrCpy $Name_Section08 "Eliminar as preferencias e a caché"
-
-StrCpy $Desc_Section01 \
-    "O propio reprodutor multimedia"
-StrCpy $Desc_Section02a \
-    "Engade iconas no seu menú de inicio para un acceso máis fácil"
-StrCpy $Desc_Section02b \
-    "Engade unha icona no seu escritorio para un acceso máis fácil"
-StrCpy $Desc_Section03 \
-    "O plugin de VLC para Mozilla e Mozilla Firefoz"
-StrCpy $Desc_Section04 \
-    "O plugin de VLC para ActiveX"
-StrCpy $Desc_Section05 \
-    "O rexistro de DVD e de reprodución de CD"
-StrCpy $Desc_Section06 \
-    "Define o reprodutor multimedia VLC como o aplicativo predeterminado para o tipo de ficheiro especificado"
-StrCpy $Desc_Section07 \
-    "Engadir entradas de menú contextual («Reproducir co VLC» e «Engadir á lista de reprodución do VLC»)"
-StrCpy $Desc_Section08 \
-    "Elimina as preferencias e a caché do reprodutor multimedia VLC que pertenzan a versións previas"
-
+StrCpy $Desc_Section01 "O propio reprodutor multimedia"
+StrCpy $Desc_Section02a "Engade iconas no seu menú de inicio para un acceso máis fácil"
+StrCpy $Desc_Section02b "Engade unha icona no seu escritorio para un acceso máis fácil"
+StrCpy $Desc_Section03 "O plugin de VLC para Mozilla e Mozilla Firefox"
+StrCpy $Desc_Section04 "O plugin de VLC para ActiveX"
+StrCpy $Desc_Section05 "O rexistro de reprodución de CD e DVD"
+StrCpy $Desc_Section06 "Define o reprodutor multimedia VLC como o aplicativo predeterminado para o tipo de ficheiro especificado"
+StrCpy $Desc_Section07 "Engadir entradas de menú contextual («Reproducir co VLC» e «Engadir á lista de reprodución do VLC»)"
+StrCpy $Desc_Section08 "Elimina as preferencias e a caché do reprodutor multimedia VLC que pertenzan a versións previas"
 StrCpy $Name_Section91 "Desinstalar"
 StrCpy $Name_Section92 "Eliminar as preferencias e a caché"
-
-StrCpy $Desc_Section91 \
-"Desinstalar o reprodutor multimedia VLC e todos os seus compoñentes"
-StrCpy $Desc_Section92 \
-"Elimina as preferencias do reprodutor multimedia VLC e os ficheiros da caché"
-
+StrCpy $Desc_Section91 "Desinstalar o reprodutor multimedia VLC e todos os seus compoñentes"
+StrCpy $Desc_Section92 "Elimina as preferencias do reprodutor multimedia VLC e os ficheiros da caché"
 StrCpy $ShellAssociation_Play "Reproducir"
-StrCpy $ContextMenuEntry_PlayWith "Reproducir co VLC"
-StrCpy $ContextMenuEntry_AddToPlaylist "Engadir á lista de reprodución do VLC"
-
+StrCpy $ContextMenuEntry_PlayWith "Reproducir co VLC media player"
+StrCpy $ContextMenuEntry_AddToPlaylist "Engadir á lista de reprodución do VLC media player"
 StrCpy $Link_VisitWebsite "Visitar a web do reprodutor multimedia VideoLAN VLC"
-
 StrCpy $Name_InstTypeRecommended "Recomendada"
 StrCpy $Name_InstTypeMinimum "Mínima"
 StrCpy $Name_InstTypeFull "Completa"
-
 StrCpy $Action_OnArrivalDVD "Reproducir filmes en DVD"
 StrCpy $Action_OnArrivalAudioCD "Reproducir os CD de audio"
 StrCpy $Action_OnArrivalVCDMovie "Reproducir filmes en VCD"
 StrCpy $Action_OnArrivalSVCDMovie "Reproducir filmes en SVCD"
-StrCpy $Action_OnArrivalVideoFiles "Reproducir ficheiros de video"
-StrCpy $Action_OnArrivalMusicFiles "Reproducir ficheiros de audio"
+StrCpy $Action_OnArrivalVideoFiles "Reproducir os ficheiros de vídeo"
+StrCpy $Action_OnArrivalMusicFiles "Reproducir os ficheiros de audio"
 StrCpy $Action_OnArrivalDVDAudio "Reproducir os DVD de audio"
-
-StrCpy $License_NextText "Agora xa está informado/a dos seus dereitos. Prema en «Seguinte» para continuar."
+StrCpy $License_NextText "Agora xa está informado dos seus dereitos. Prema en «Seguinte» para continuar."
+StrCpy $Detail_CheckProcesses "Verificando os procesos..."
+StrCpy $MessageBox_VLCRunning "Semella que o VLC está a ser executado e será pechado agora."
+StrCpy $MessageBox_VLCUnableToClose "Este instalador non foi quen de pechar o VLC. Fágao manualmente."
+StrCpy $MessageBox_InstallAborted "A instalación foi cancelada!"
+StrCpy $Reinstall_Headline "Xa está instalado"
+StrCpy $Reinstall_HeadlineInstall "Escolla como quere instalar o VLC."
+StrCpy $Reinstall_HeadlineMaintenance "Seleccione a opción de mantemento que quere realizar."
+StrCpy $Reinstall_MessageOlder "No seu sistema xa está instalada unha versión máis vella do VLC. Seleccione a operación que quere realizar e prema en «Seguinte» para continuar."
+StrCpy $Reinstall_MessageNewer "Xa está instalada unha versión máis nova do VLC! Non se recomenda a desactualización a unha versión máis vella. Seleccione a operación que quere realizar e prema en «Seguinte» para continuar."
+StrCpy $Reinstall_MessageSame "A versión ${VERSION} do VLC xa está instalada. Seleccione a operación que quere realizar e prema en «Seguinte» para continuar."
+StrCpy $Reinstall_OptionUpgrade "Actualizar o VLC usando a configuración anterior (recomendado)"
+StrCpy $Reinstall_OptionDowngrade "Desactualizar o VLC usando a configuración anterior (recomendado)"
+StrCpy $Reinstall_OptionComponents "Engadir/Eliminar/Reinstalar componentes"
+StrCpy $Reinstall_OptionAdvanced "Cambiar a configuración (avanzado)"
+StrCpy $Reinstall_OptionUninstall "Desinstalar o VLC"

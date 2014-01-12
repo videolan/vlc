@@ -1,6 +1,7 @@
 StrCpy $Name_Section01 "Médialejátszó (szükséges)"
 StrCpy $Name_Section02a "Start menü ikon"
 StrCpy $Name_Section02b "Asztali ikon"
+StrCpy $Name_Section34 "Webes bõvítmények"
 StrCpy $Name_Section03 "Mozilla bõvítmény"
 StrCpy $Name_Section04 "ActiveX bõvítmény"
 StrCpy $Name_Section05 "Lemezek lejátszása"
@@ -10,43 +11,46 @@ StrCpy $Name_SectionGroupVideo "Videofájlok"
 StrCpy $Name_SectionGroupOther "Egyéb"
 StrCpy $Name_Section07 "Helyi menük"
 StrCpy $Name_Section08 "Beállítások és gyorsítótár törlése"
-
-StrCpy $Desc_Section01 \
-    "Maga a médialejátszó"
-StrCpy $Desc_Section02a \
-    "Ikonokat tesz a Start menübe az egyszerû eléréshez"
-StrCpy $Desc_Section02b \
-    "Ikonokat tesz az Asztalra az egyszerû eléréshez"
-StrCpy $Desc_Section03 \
-    "A VLC Mozilla és Mozilla Firefox bõvítmény"
-StrCpy $Desc_Section04 \
-    "A VLC ActiveX bõvítmény"
-StrCpy $Desc_Section05 \
-    "DVD és CD lejátszásának bejegyzése"
-StrCpy $Desc_Section06 \
-    "Beállítja a VLC médialejátszót a megadott fájltípus alapértelmezett alkalmazásaként"
-StrCpy $Desc_Section07 \
-    "Bejegyzések a helyi menübe (Lejátszás a VLC médialejátszóval és Hozzáadás a VLC lejátszólistájához)"
-StrCpy $Desc_Section08 \
-    "Törli a VLC médialejátszó elõzõ telepítésbõl maradt beállításait és gyorsítótár-fájljait"
-
+StrCpy $Desc_Section01 "Maga a médialejátszó"
+StrCpy $Desc_Section02a "Ikonokat tesz a Start menübe az egyszerû eléréshez"
+StrCpy $Desc_Section02b "Ikonokat tesz az Asztalra az egyszerû eléréshez"
+StrCpy $Desc_Section03 "A VLC Mozilla és Mozilla Firefox bõvítmény"
+StrCpy $Desc_Section04 "A VLC ActiveX bõvítmény"
+StrCpy $Desc_Section05 "DVD és CD lejátszásának bejegyzése"
+StrCpy $Desc_Section06 "Beállítja a VLC médialejátszót a megadott fájltípus alapértelmezett alkalmazásaként"
+StrCpy $Desc_Section07 "Bejegyzések a helyi menübe (Lejátszás a VLC médialejátszóval és Hozzáadás a VLC lejátszólistájához)"
+StrCpy $Desc_Section08 "Törli a VLC médialejátszó elõzõ telepítésbõl maradt beállításait és gyorsítótár-fájljait"
 StrCpy $Name_Section91 "Eltávolítás"
 StrCpy $Name_Section92 "Beállítások és gyorsítótár törlése"
-
-StrCpy $Desc_Section91 \
-"A VLC médialejátszó és minden összetevõjének eltávolítása"
-StrCpy $Desc_Section92 \
-"Törli a VLC médialejátszó beállításait és gyorsítótár-fájljait"
-
+StrCpy $Desc_Section91 "A VLC médialejátszó és minden összetevõjének eltávolítása"
+StrCpy $Desc_Section92 "Törli a VLC médialejátszó beállításait és gyorsítótár-fájljait"
 StrCpy $ShellAssociation_Play "Lejátszás"
 StrCpy $ContextMenuEntry_PlayWith "Lejátszás a VLC médialejátszóval"
 StrCpy $ContextMenuEntry_AddToPlaylist "Hozzáadás a VLC lejátszólistájához"
-
 StrCpy $Link_VisitWebsite "A VideoLAN VLC médialejátszó weboldalának felkeresése"
-
 StrCpy $Name_InstTypeRecommended "Javasolt"
 StrCpy $Name_InstTypeMinimum "Minimális"
 StrCpy $Name_InstTypeFull "Teljes"
-
 StrCpy $Action_OnArrivalDVD "DVD film lejátszása"
 StrCpy $Action_OnArrivalAudioCD "Hang CD lejátszása"
+StrCpy $Action_OnArrivalVCDMovie "VCD film lejátszása"
+StrCpy $Action_OnArrivalSVCDMovie "SVCD film lejátszása"
+StrCpy $Action_OnArrivalVideoFiles "Videofájlok lejátszása"
+StrCpy $Action_OnArrivalMusicFiles "Hangfájlok lejátszása"
+StrCpy $Action_OnArrivalDVDAudio "Hang DVD lejátszása"
+StrCpy $License_NextText "Most már tisztában van jogaival. A folytatáshoz nyomja meg a Tovább gombot."
+StrCpy $Detail_CheckProcesses "Folyamatok ellenõrzése..."
+StrCpy $MessageBox_VLCRunning "Úgy tûnik, a VLC fut, most bezárásra kerül."
+StrCpy $MessageBox_VLCUnableToClose "A telepítõ nem tudta bezárni a VLC-t, tegye meg saját kezûleg."
+StrCpy $MessageBox_InstallAborted "Telepítés megszakítva"
+StrCpy $Reinstall_Headline "Már telepítve van"
+StrCpy $Reinstall_HeadlineInstall "Válassza ki, hogyan szeretné telepíteni a VLC-t."
+StrCpy $Reinstall_HeadlineMaintenance "Válassza ki a végrehajtandó karbantartási lehetõséget."
+StrCpy $Reinstall_MessageOlder "A rendszerre már telepítve van a VLC egy régebbi verziója. Válassza ki a végrehajtandó mûveletet, és nyomja meg a Tovább gombot."
+StrCpy $Reinstall_MessageNewer "A VLC egy újabb verziója már telepítve van. Nem javasolt régebbi verzió telepítése. Válassza ki a végrehajtandó mûveletet, és nyomja meg a Tovább gombot."
+StrCpy $Reinstall_MessageSame "Már telepítve van a VLC ${VERSION} verziója. Válassza ki a végrehajtandó mûveletet, és nyomja meg a Tovább gombot."
+StrCpy $Reinstall_OptionUpgrade "A VLC frissítése korábbi beállítások használatával (javasolt)"
+StrCpy $Reinstall_OptionDowngrade "A VLC visszafejlesztése korábbi beállítások használatával (javasolt)"
+StrCpy $Reinstall_OptionComponents "Összetevõk hozzáadása/eltávolítása/újratelepítése"
+StrCpy $Reinstall_OptionAdvanced "Beállítások módosítása (speciális)"
+StrCpy $Reinstall_OptionUninstall "VLC eltávolítása"

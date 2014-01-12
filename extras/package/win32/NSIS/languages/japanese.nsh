@@ -1,53 +1,36 @@
-StrCpy $Name_Section01 "メディアプレイヤー(必須)"
-StrCpy $Name_Section02a "スタートメニュー・ショートカット"
-StrCpy $Name_Section02b "デスクトップ・ショートカット"
-StrCpy $Name_Section03 "モジラ・プラグイン"
+StrCpy $Name_Section01 "メディアプレイヤー (必須)"
+StrCpy $Name_Section02a "スタートメニューショートカット"
+StrCpy $Name_Section02b "デスクトップショートカット"
+StrCpy $Name_Section34 "ウェブプラグイン"
+StrCpy $Name_Section03 "Mozillaプラグイン"
 StrCpy $Name_Section04 "ActiveXプラグイン"
-StrCpy $Name_Section05 "ディスクの再生"
+StrCpy $Name_Section05 "ディスク再生"
 StrCpy $Name_Section06 "ファイルタイプの関連付け"
-StrCpy $Name_SectionGroupAudio "オーディオ・ファイル"
-StrCpy $Name_SectionGroupVideo "ビデオ・ファイル"
+StrCpy $Name_SectionGroupAudio "オーディオファイル"
+StrCpy $Name_SectionGroupVideo "ビデオファイル"
 StrCpy $Name_SectionGroupOther "その他"
-StrCpy $Name_Section07 "コンテキスト・メニュー"
+StrCpy $Name_Section07 "コンテキストメニュー"
 StrCpy $Name_Section08 "設定とキャッシュを削除"
-
-StrCpy $Desc_Section01 \
-    "メディアプレイヤー自身"
-StrCpy $Desc_Section02a \
-    "スタートメニューにアイコンを追加"
-StrCpy $Desc_Section02b \
-    "デスクトップにアイコンを追加"
-StrCpy $Desc_Section03 \
-    "モジラとモジラFirefoxのプラグイン"
-StrCpy $Desc_Section04 \
-    "VLC ActiveXプラグイン"
-StrCpy $Desc_Section05 \
-    "DVDとCD再生の登録"
-StrCpy $Desc_Section06 \
-    "VLCメディアプレイヤーを指定されたファイルタイプのデフォルトアプリケーションとして設定"
-StrCpy $Desc_Section07 \
-    "コンテキストメニューに項目として追加('VLCで再生'と'VLCプレイリストに追加')"
-StrCpy $Desc_Section08 \
-    "前回のインストール以降に残っているVLCメディアプレイヤーの設定とキャッシュファイルを削除"
-
+StrCpy $Desc_Section01 "メディアプレイヤー自身"
+StrCpy $Desc_Section02a "簡単なアクセスのためにスタートメニューにアイコンを追加"
+StrCpy $Desc_Section02b "簡単なアクセスのためにデスクトップにアイコンを追加"
+StrCpy $Desc_Section03 "VLC MozillaとFirefoxプラグイン"
+StrCpy $Desc_Section04 "VLC ActiveXプラグイン"
+StrCpy $Desc_Section05 "DVDとCD再生の登録"
+StrCpy $Desc_Section06 "指定されたファイルタイプのデフォルトアプリケーションとしてVLCメディアプレイヤーを設定"
+StrCpy $Desc_Section07 "コンテキストメニューを追加 (\'VLCで再生\'と\'VLCのプレイリストに追加\')"
+StrCpy $Desc_Section08 "前回のインストール時から残っているVLCメディアプレイヤーの設定とキャッシュを削除"
 StrCpy $Name_Section91 "アンインストール"
-StrCpy $Name_Section92 "設定とキャッシュの削除"
-
-StrCpy $Desc_Section91 \
-"VLCメディアプレイヤーとすべてのコンポーネントのアンインストール"
-StrCpy $Desc_Section92 \
-"VLCメディアプレイヤーの設定とキャッシュファイルの削除"
-
+StrCpy $Name_Section92 "設定とキャッシュを削除"
+StrCpy $Desc_Section91 "VLCメディアプレイヤーとすべてのコンポーネントをアンインストール"
+StrCpy $Desc_Section92 "VLCメディアプレイヤーの設定とキャッシュファイルを削除"
 StrCpy $ShellAssociation_Play "再生"
 StrCpy $ContextMenuEntry_PlayWith "VLCメディアプレイヤーで再生"
 StrCpy $ContextMenuEntry_AddToPlaylist "VLCメディアプレイヤーのプレイリストに追加"
-
-StrCpy $Link_VisitWebsite "VideoLAN VLCメディアプレイヤーのウェブサイトを開く"
-
+StrCpy $Link_VisitWebsite "VideoLAN VLCメディアプレイヤーのウェブサイトを訪問"
 StrCpy $Name_InstTypeRecommended "推奨"
 StrCpy $Name_InstTypeMinimum "最小"
 StrCpy $Name_InstTypeFull "すべて"
-
 StrCpy $Action_OnArrivalDVD "DVDムービー再生"
 StrCpy $Action_OnArrivalAudioCD "オーディオCD再生"
 StrCpy $Action_OnArrivalVCDMovie "VCDムービー再生"
@@ -55,5 +38,19 @@ StrCpy $Action_OnArrivalSVCDMovie "SVCDムービー再生"
 StrCpy $Action_OnArrivalVideoFiles "ビデオファイル再生"
 StrCpy $Action_OnArrivalMusicFiles "オーディオファイル再生"
 StrCpy $Action_OnArrivalDVDAudio "オーディオDVD再生"
-
-StrCpy $License_NextText "あなたはあなたの権利について確認しました。次をクリックして継続してください。"
+StrCpy $License_NextText "あなたの権利について確認したら、次へをクリックしてください。"
+StrCpy $Detail_CheckProcesses "チェック中..."
+StrCpy $MessageBox_VLCRunning "VLCが再生中です、閉じられます"
+StrCpy $MessageBox_VLCUnableToClose "インストーラーはVLCを閉じることができません、手動で行ってください"
+StrCpy $MessageBox_InstallAborted "インストールが異常終了しました!"
+StrCpy $Reinstall_Headline "すでにインストールされています"
+StrCpy $Reinstall_HeadlineInstall "VLCをどのようにインストールか選択してください"
+StrCpy $Reinstall_HeadlineMaintenance "処理したいメンテナンスオプションを選択してください"
+StrCpy $Reinstall_MessageOlder "古いバージョンのVLCがシステムにインストールされています。処理したいオペレーションを選択して次へをクリックしてください。"
+StrCpy $Reinstall_MessageNewer "新しいバージョンのVLCが既にインストールされています。古いバージョンへのダウングレードは推奨されていません。処理したいオペレーションを選択して次へをクリックしてください。"
+StrCpy $Reinstall_MessageSame "VLC ${VERSION} は既にインストールされています。処理したいオペレーションを選択して次へをクリックしてください。"
+StrCpy $Reinstall_OptionUpgrade "以前の設定を使ってVLCをアップグレード (推奨)"
+StrCpy $Reinstall_OptionDowngrade "以前の設定を使ってVLCをダウングレード (推奨)"
+StrCpy $Reinstall_OptionComponents "コンポーネントの追加/削除/再インストール"
+StrCpy $Reinstall_OptionAdvanced "設定の変更 (詳細)"
+StrCpy $Reinstall_OptionUninstall "VLCのアンインストール"
