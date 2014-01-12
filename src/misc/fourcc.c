@@ -1017,6 +1017,9 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_KGV1, "Kega Game Video (KGV1)"),
         A("KGV1"),
 
+    B(VLC_CODEC_CLLC, "Canopus Lossless"),
+        A("CLLC"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
