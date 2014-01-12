@@ -176,7 +176,7 @@ static const struct
     /* AV_CODEC_ID_TGV */
     /* AV_CODEC_ID_TGQ */
     /* AV_CODEC_ID_TQI */
-    /* AV_CODEC_ID_AURA */
+    { VLC_CODEC_AURA, AV_CODEC_ID_AURA, VIDEO_ES },
     /* AV_CODEC_ID_AURA2 */
     /* AV_CODEC_ID_V210X */
     /* AV_CODEC_ID_TMV */

@@ -1020,6 +1020,9 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_CLLC, "Canopus Lossless"),
         A("CLLC"),
 
+    B(VLC_CODEC_AURA, "Auravision Aura"),
+        A("AURA"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
