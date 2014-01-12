@@ -193,7 +193,7 @@ static const struct
 #endif
     /* AV_CODEC_ID_IFF_ILBM */
     /* AV_CODEC_ID_IFF_BYTERUN1 */
-    /* AV_CODEC_ID_KGV1 */
+    { VLC_CODEC_KGV1, AV_CODEC_ID_KGV1, VIDEO_ES },
     /* AV_CODEC_ID_YOP */
     { VLC_CODEC_VP8, AV_CODEC_ID_VP8, VIDEO_ES },
     /* AV_CODEC_ID_PICTOR */
