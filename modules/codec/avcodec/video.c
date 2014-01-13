@@ -430,7 +430,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     int b_null_size = false;
     block_t *p_block;
 
-    if( !pp_block || !*pp_block )
+    if( !pp_block )
         return NULL;
 
     if( !p_context->extradata_size && p_dec->fmt_in.i_extra )
@@ -444,33 +444,40 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     }
 
     p_block = *pp_block;
+    if(!p_block && !(p_sys->p_codec->capabilities & CODEC_CAP_DELAY) )
+        return NULL;
+
     if( p_sys->b_delayed_open )
     {
-        block_Release( p_block );
+        if( p_block )
+            block_Release( p_block );
         return NULL;
     }
 
-    if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    if( p_block)
     {
-        p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
+        if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+        {
+            p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
 
-        p_sys->i_late_frames = 0;
+            p_sys->i_late_frames = 0;
 
-        post_mt( p_sys );
-        if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
-            avcodec_flush_buffers( p_context );
-        wait_mt( p_sys );
+            post_mt( p_sys );
+            if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+                avcodec_flush_buffers( p_context );
+            wait_mt( p_sys );
 
-        block_Release( p_block );
-        return NULL;
-    }
+            block_Release( p_block );
+            return NULL;
+        }
 
-    if( p_block->i_flags & BLOCK_FLAG_PREROLL )
-    {
-        /* Do not care about late frames when prerolling
-         * TODO avoid decoding of non reference frame
-         * (ie all B except for H264 where it depends only on nal_ref_idc) */
-        p_sys->i_late_frames = 0;
+        if( p_block->i_flags & BLOCK_FLAG_PREROLL )
+        {
+            /* Do not care about late frames when prerolling
+             * TODO avoid decoding of non reference frame
+             * (ie all B except for H264 where it depends only on nal_ref_idc) */
+            p_sys->i_late_frames = 0;
+        }
     }
 
     if( !p_dec->b_pace_control && (p_sys->i_late_frames > 0) &&
@@ -482,7 +489,8 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                      "dropping frame (computer too slow ?)" );
             p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
         }
-        block_Release( p_block );
+        if( p_block )
+            block_Release( p_block );
         p_sys->i_late_frames--;
         return NULL;
     }
@@ -504,7 +512,8 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             /* picture too late, won't decode
              * but break picture until a new I, and for mpeg4 ...*/
             p_sys->i_late_frames--; /* needed else it will never be decrease */
-            block_Release( p_block );
+            if( p_block )
+                block_Release( p_block );
             return NULL;
         }
     }
@@ -512,7 +521,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     {
         if( p_sys->b_hurry_up )
             p_context->skip_frame = p_sys->i_skip_frame;
-        if( !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
+        if( !p_block || !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
             b_drawpicture = 1;
         else
             b_drawpicture = 0;
@@ -540,7 +549,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
     /* Don't forget that libavcodec requires a little more bytes
      * that the real frame size */
-    if( p_block->i_buffer > 0 )
+    if( p_block && p_block->i_buffer > 0 )
     {
         p_sys->b_flush = ( p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE ) != 0;
 
@@ -554,7 +563,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 FF_INPUT_BUFFER_PADDING_SIZE );
     }
 
-    while( p_block->i_buffer > 0 || p_sys->b_flush )
+    while( !p_block || p_block->i_buffer > 0 || p_sys->b_flush )
     {
         int i_used, b_gotpicture;
         picture_t *p_pic;
@@ -563,10 +572,19 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         post_mt( p_sys );
 
         av_init_packet( &pkt );
-        pkt.data = p_block->p_buffer;
-        pkt.size = p_block->i_buffer;
-        pkt.pts = p_block->i_pts;
-        pkt.dts = p_block->i_dts;
+        if( p_block )
+        {
+            pkt.data = p_block->p_buffer;
+            pkt.size = p_block->i_buffer;
+            pkt.pts = p_block->i_pts;
+            pkt.dts = p_block->i_dts;
+        }
+        else
+        {
+            /* Return delayed frames if codec has CODEC_CAP_DELAY */
+            pkt.data = NULL;
+            pkt.size = 0;
+        }
 
 #if LIBAVCODEC_VERSION_MAJOR >= 54
         if( !p_sys->palette_sent )
@@ -580,8 +598,11 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 #endif
 
         /* Make sure we don't reuse the same timestamps twice */
-        p_block->i_pts =
-        p_block->i_dts = VLC_TS_INVALID;
+        if( p_block )
+        {
+            p_block->i_pts =
+            p_block->i_dts = VLC_TS_INVALID;
+        }
 
         i_used = avcodec_decode_video2( p_context, p_sys->p_ff_pic,
                                        &b_gotpicture, &pkt );
@@ -601,26 +622,29 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         if( p_sys->b_flush )
             p_sys->b_first_frame = true;
 
-        if( p_block->i_buffer <= 0 )
-            p_sys->b_flush = false;
-
-        if( i_used < 0 )
+        if( p_block )
         {
-            if( b_drawpicture )
-                msg_Warn( p_dec, "cannot decode one frame (%zu bytes)",
-                          p_block->i_buffer );
-            block_Release( p_block );
-            return NULL;
-        }
-        else if( (unsigned)i_used > p_block->i_buffer ||
-                 p_context->thread_count > 1 )
-        {
-            i_used = p_block->i_buffer;
-        }
+            if( p_block->i_buffer <= 0 )
+                p_sys->b_flush = false;
 
-        /* Consumed bytes */
-        p_block->i_buffer -= i_used;
-        p_block->p_buffer += i_used;
+            if( i_used < 0 )
+            {
+                if( b_drawpicture )
+                    msg_Warn( p_dec, "cannot decode one frame (%zu bytes)",
+                            p_block->i_buffer );
+                block_Release( p_block );
+                return NULL;
+            }
+            else if( (unsigned)i_used > p_block->i_buffer ||
+                    p_context->thread_count > 1 )
+            {
+                i_used = p_block->i_buffer;
+            }
+
+            /* Consumed bytes */
+            p_block->i_buffer -= i_used;
+            p_block->p_buffer += i_used;
+        }
 
         /* Nothing to display */
         if( !b_gotpicture )
@@ -673,7 +697,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
         /* Update frame late count (except when doing preroll) */
         mtime_t i_display_date = 0;
-        if( !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
+        if( !p_block || !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
             i_display_date = decoder_GetDisplayDate( p_dec, i_pts );
 
         if( i_display_date > 0 && i_display_date <= mdate() )
@@ -696,7 +720,8 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_pic = ffmpeg_NewPictBuf( p_dec, p_context );
             if( !p_pic )
             {
-                block_Release( p_block );
+                if( p_block )
+                    block_Release( p_block );
                 return NULL;
             }
 
@@ -749,7 +774,8 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         }
     }
 
-    block_Release( p_block );
+    if( p_block )
+        block_Release( p_block );
     return NULL;
 }
 
