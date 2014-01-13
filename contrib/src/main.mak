@@ -217,6 +217,12 @@ else
 download = $(error Neither curl nor wget found!)
 endif
 
+ifeq ($(shell which bzcat >/dev/null 2>&1 || echo FAIL),)
+BZCAT = bzcat
+else
+BZCAT ?= $(error Bunzip2 client (bzcat) not found!)
+endif
+
 ifeq ($(shell gzcat --version >/dev/null 2>&1 || echo FAIL),)
 ZCAT = gzcat
 else ifeq ($(shell zcat --version >/dev/null 2>&1 || echo FAIL),)
