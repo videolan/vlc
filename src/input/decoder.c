@@ -1591,7 +1591,7 @@ static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block, bool b_flus
                 DecoderDecodeVideo( p_dec, p_null );
         }
     }
-    else if( p_block )
+    else
     {
         DecoderDecodeVideo( p_dec, p_block );
     }
