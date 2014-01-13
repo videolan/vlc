@@ -2750,28 +2750,7 @@ AC_ARG_WITH(x262-tree,
 fi
 
 dnl x265 encoder
-AC_ARG_ENABLE(x265,
-  AS_HELP_STRING([--enable-x265],[H265 / HEVC encoding support with libx265 (default enabled)]))
-AS_IF( [test "${enable_x265}" != "no"],[
-  AC_PREPROC_IFELSE([AC_LANG_SOURCE([
-#include <x265.h>
-#if X265_BUILD != 4
-# error Fail
-#endif
-  ])], [
-    AC_CHECK_LIB([x265],[x265_encoder_open_4], [
-      VLC_ADD_PLUGIN([x265])
-      VLC_ADD_LIBS([x265], [-lx265 -lstdc++ -lm -lpthread])
-    ], [
-      AC_MSG_ERROR([x265 library not found])
-    ], [-lstdc++ -lm -lpthread])
-  ], [
-    AS_IF([test "${enable_x265}" = "yes"], [
-        AC_MSG_ERROR([x265.h not found])
-    ])
-  ])
-])
-
+PKG_ENABLE_MODULES_VLC([X265],, [x265], [HEVC/H.265 encoder], [auto])
 
 dnl
 dnl H264 encoder plugin (10-bit lib264)
