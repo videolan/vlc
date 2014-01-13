@@ -122,7 +122,6 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/Bookmarks.xib \
 	extras/package/macosx/Resources/English.lproj/ConvertAndSave.xib \
 	extras/package/macosx/Resources/English.lproj/CoreDialogs.xib \
-	extras/package/macosx/Resources/English.lproj/CrashReporter.xib \
 	extras/package/macosx/Resources/English.lproj/DebugMessageVisualizer.xib \
 	extras/package/macosx/Resources/English.lproj/DetachedVideoWindow.xib \
 	extras/package/macosx/Resources/English.lproj/ErrorPanel.xib \
