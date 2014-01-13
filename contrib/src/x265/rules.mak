@@ -20,6 +20,8 @@ $(TARBALLS)/x265-git.tar.xz:
 $(TARBALLS)/x265-$(X265_VERSION).tar.bz2:
 	$(call download,$(X265_SNAPURL))
 
+.sum-x265: x265-$(X265_VERSION).tar.bz2
+
 x265: x265-$(X265_VERSION).tar.bz2 .sum-x265
 	rm -Rf $@-$(X265_VERSION)
 	mkdir -p $@-$(X265_VERSION)
