@@ -297,9 +297,29 @@ public:
     void merge(unsigned dx, const CPixel &spx, unsigned a, bool)
     {
         uint8_t *dst = getPointer(dx);
-        ::merge(&dst[offset_r], spx.i, a);
-        ::merge(&dst[offset_g], spx.j, a);
-        ::merge(&dst[offset_b], spx.k, a);
+        if (has_alpha) {
+            // Handle different cases of existing alpha in the
+            // destination buffer. If the existing alpha is 0,
+            // the RGB components should be copied as is and
+            // alpha set to 'a'. If the existing alpha is 255,
+            // this should behave just as the non-alpha case below.
+
+            // First blend the existing color based on its
+            // alpha with the incoming color.
+            ::merge(&dst[offset_r], spx.i, 255 - dst[offset_a]);
+            ::merge(&dst[offset_g], spx.j, 255 - dst[offset_a]);
+            ::merge(&dst[offset_b], spx.k, 255 - dst[offset_a]);
+            // Now blend in the new color on top with the normal formulas.
+            ::merge(&dst[offset_r], spx.i, a);
+            ::merge(&dst[offset_g], spx.j, a);
+            ::merge(&dst[offset_b], spx.k, a);
+            // Finally set dst_a = (255 * src_a + prev_a * (255 - src_a))/255.
+            ::merge(&dst[offset_a], 255, a);
+        } else {
+            ::merge(&dst[offset_r], spx.i, a);
+            ::merge(&dst[offset_g], spx.j, a);
+            ::merge(&dst[offset_b], spx.k, a);
+        }
     }
     void nextLine()
     {
@@ -543,6 +563,7 @@ static const struct {
     RGB(VLC_CODEC_RGB16,    CPictureRGB16,    convertRgbToRgbSmall),
     RGB(VLC_CODEC_RGB24,    CPictureRGB24,    convertNone),
     RGB(VLC_CODEC_RGB32,    CPictureRGB32,    convertNone),
+    RGB(VLC_CODEC_RGBA,     CPictureRGBA,     convertNone),
 
     YUV(VLC_CODEC_YV9,      CPictureYV9,      convertNone),
     YUV(VLC_CODEC_I410,     CPictureI410_8,   convertNone),
