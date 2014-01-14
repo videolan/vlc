@@ -2504,6 +2504,9 @@ AS_IF([test "${enable_vpx}" != "no"],[
         VLC_ADD_PLUGIN([vpx])
         VLC_ADD_CPPFLAGS([vpx], [${VPX_CFLAGS}])
         VLC_ADD_LIBS([vpx], [${VPX_LIBS}])
+        AC_CHECK_LIB([vpx],[vpx_codec_vp8_dx], [
+            VLC_ADD_CPPFLAGS([vpx], [-DENABLE_VP8_DECODER])
+        ], [], [${VPX_LIBS}])
         AC_CHECK_LIB([vpx],[vpx_codec_vp9_dx], [
             VLC_ADD_CPPFLAGS([vpx], [-DENABLE_VP9_DECODER])
         ], [], [${VPX_LIBS}])

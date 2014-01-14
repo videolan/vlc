@@ -158,10 +158,12 @@ static int Open(vlc_object_t *p_this)
 
     switch (dec->fmt_in.i_codec)
     {
+#ifdef ENABLE_VP8_DECODER
     case VLC_CODEC_VP8:
         iface = &vpx_codec_vp8_dx_algo;
         vp_version = 8;
         break;
+#endif
 #ifdef ENABLE_VP9_DECODER
     case VLC_CODEC_VP9:
         iface = &vpx_codec_vp9_dx_algo;
