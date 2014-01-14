@@ -18,7 +18,7 @@ StrCpy $Desc_Section03 "VLC-udvidelsesmodulet til Mozilla og Mozilla Firefox"
 StrCpy $Desc_Section04 "VLC-udvidelsesmodulet for ActiveX"
 StrCpy $Desc_Section05 "Registrering af DVD- og CD-afspilning"
 StrCpy $Desc_Section06 "Angiver VLC-medieafspilleren som standardprogram til den angive filtype"
-StrCpy $Desc_Section07 "Tilføj elementer i kontekstmenu (\"Afspil med VLC\" og \"Tilføj til VLCs afspilningsliste\")"
+StrCpy $Desc_Section07 'Tilføj elementer i kontekstmenu ("Afspil med VLC" og "Tilføj til VLCs afspilningsliste")'
 StrCpy $Desc_Section08 "Sletter resterende filer af VLC-medieafspillerens præferencer og cache fra tidligere installationer"
 StrCpy $Name_Section91 "Afinstallér"
 StrCpy $Name_Section92 "Slet præferencer og cache"
