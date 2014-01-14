@@ -12,7 +12,7 @@ SOURCES_yuv = yuv.c
 SOURCES_vout_macosx = macosx.m opengl.h opengl.c
 SOURCES_vout_coregraphicslayer = coregraphicslayer.m
 SOURCES_vout_ios2 = ios2.m opengl.h opengl.c
-SOURCES_android_surface = android/surface.c
+SOURCES_android_surface = android/surface.c android/utils.c
 
 if HAVE_DECKLINK
 libdecklinkoutput_plugin_la_SOURCES = decklink.cpp
@@ -186,7 +186,7 @@ libegl_android_plugin_la_SOURCES = egl.c
 libegl_android_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) -DUSE_PLATFORM_ANDROID=1
 libegl_android_plugin_la_LIBADD = $(EGL_LIBS)
 
-libandroid_native_window_plugin_la_SOURCES = android/nativewindow.c
+libandroid_native_window_plugin_la_SOURCES = android/nativewindow.c android/utils.c
 libandroid_native_window_plugin_la_CFLAGS = $(AM_CFLAGS)
 libandroid_native_window_plugin_la_LIBADD = -ldl
 

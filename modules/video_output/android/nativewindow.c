@@ -33,13 +33,9 @@
 #include <vlc_vout_window.h>
 
 #include <dlfcn.h>
-#include <android/native_window.h>
 #include <jni.h>
-#include <android/native_window_jni.h>
 
-
-typedef ANativeWindow* (*ptr_ANativeWindow_fromSurface)(JNIEnv*, jobject);
-typedef void (*ptr_ANativeWindow_release)(ANativeWindow*);
+#include "utils.h"
 
 extern JavaVM *myVm;
 extern jobject jni_LockAndGetAndroidJavaSurface();
@@ -66,37 +62,10 @@ vlc_module_end()
 struct vout_window_sys_t
 {
     void *p_library;
-
-    ptr_ANativeWindow_fromSurface s_winFromSurface;
-    ptr_ANativeWindow_release s_winRelease;
+    native_window_api_t native_window;
 
     ANativeWindow *window;
 };
-
-
-/**
- * Dynamically load the libandroid library and the needed symbols.
- */
-static void *InitLibrary(vout_window_sys_t *p_sys)
-{
-    void *p_library = dlopen("libandroid.so", RTLD_NOW);
-    if (!p_library)
-        return NULL;
-
-    p_sys->s_winFromSurface =
-        (ptr_ANativeWindow_fromSurface)(dlsym(p_library, "ANativeWindow_fromSurface"));
-    p_sys->s_winRelease =
-        (ptr_ANativeWindow_release)(dlsym(p_library, "ANativeWindow_release"));
-
-    if (p_sys->s_winFromSurface == NULL || p_sys->s_winRelease == NULL)
-    {
-        dlclose(p_sys->p_library);
-        return NULL;
-    }
-
-    return p_library;
-}
-
 
 /**
  * Create an Android native window.
@@ -107,7 +76,7 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     if (p_sys == NULL)
         return VLC_ENOMEM;
 
-    p_sys->p_library = InitLibrary(p_sys);
+    p_sys->p_library = LoadNativeWindowAPI(&p_sys->native_window);
     if (p_sys->p_library == NULL)
     {
         free(p_sys);
@@ -121,7 +90,7 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
     JNIEnv *p_env;
     (*myVm)->AttachCurrentThread(myVm, &p_env, NULL);
-    p_sys->window = p_sys->s_winFromSurface(p_env, javaSurface); // ANativeWindow_fromSurface call.
+    p_sys->window = p_sys->native_window.winFromSurface(p_env, javaSurface); // ANativeWindow_fromSurface call.
     (*myVm)->DetachCurrentThread(myVm);
 
     jni_UnlockAndroidSurface();
@@ -151,7 +120,7 @@ error:
 static void Close(vout_window_t *wnd)
 {
     vout_window_sys_t *p_sys = wnd->sys;
-    p_sys->s_winRelease(p_sys->window); // Release the native window.
+    p_sys->native_window.winRelease(p_sys->window); // Release the native window.
     dlclose(p_sys->p_library); // Close the library.
     free (p_sys);
 }

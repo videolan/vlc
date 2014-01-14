@@ -32,9 +32,9 @@
 #include <vlc_picture_pool.h>
 
 #include <dlfcn.h>
-#include <android/native_window.h>
 #include <jni.h>
-#include <android/native_window_jni.h>
+
+#include "utils.h"
 
 #ifndef ANDROID_SYM_S_LOCK
 # define ANDROID_SYM_S_LOCK "_ZN7android7Surface4lockEPNS0_11SurfaceInfoEb"
@@ -86,11 +86,6 @@ typedef void (*Surface_lock2)(void *, void *, void *);
 // _ZN7android7Surface13unlockAndPostEv
 typedef void (*Surface_unlockAndPost)(void *);
 
-typedef ANativeWindow* (*ptr_ANativeWindow_fromSurface)(JNIEnv*, jobject);
-typedef void (*ptr_ANativeWindow_release)(ANativeWindow*);
-typedef int32_t (*ptr_ANativeWindow_lock)(ANativeWindow*, ANativeWindow_Buffer*, ARect*);
-// Just using the normal Surface_unlockAndPost as prototype for ANativeWindow_unlockAndPost
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -117,9 +112,7 @@ struct vout_display_sys_t {
     Surface_lock s_lock;
     Surface_lock2 s_lock2;
     Surface_unlockAndPost s_unlockAndPost;
-    ptr_ANativeWindow_fromSurface s_winFromSurface;
-    ptr_ANativeWindow_release s_winRelease;
-    ptr_ANativeWindow_lock s_winLock;
+    native_window_api_t native_window;
 
     jobject jsurf;
     ANativeWindow *window;
@@ -177,33 +170,6 @@ static void *InitLibrary(vout_display_sys_t *sys)
     return NULL;
 }
 
-static void *InitLibrary2(vout_display_sys_t *sys)
-{
-    void *p_library = dlopen("libandroid.so", RTLD_NOW);
-    if (!p_library)
-        return NULL;
-
-    sys->s_winFromSurface =
-        (ptr_ANativeWindow_fromSurface)(dlsym(p_library, "ANativeWindow_fromSurface"));
-    sys->s_winRelease =
-        (ptr_ANativeWindow_release)(dlsym(p_library, "ANativeWindow_release"));
-    sys->s_winLock =
-        (ptr_ANativeWindow_lock)(dlsym(p_library, "ANativeWindow_lock"));
-    sys->s_unlockAndPost =
-        (Surface_unlockAndPost)(dlsym(p_library, "ANativeWindow_unlockAndPost"));
-
-    if (sys->s_winFromSurface && sys->s_winRelease && sys->s_winLock && sys->s_unlockAndPost)
-        return p_library;
-
-    sys->s_winFromSurface = NULL;
-    sys->s_winRelease = NULL;
-    sys->s_winLock = NULL;
-    sys->s_unlockAndPost = NULL;
-
-    dlclose(p_library);
-    return NULL;
-}
-
 static int Open(vlc_object_t *p_this)
 {
     vout_display_t *vd = (vout_display_t *)p_this;
@@ -222,7 +188,8 @@ static int Open(vlc_object_t *p_this)
     }
 
     /* */
-    sys->p_library = InitLibrary2(sys);
+    sys->p_library = LoadNativeWindowAPI(&sys->native_window);
+    sys->s_unlockAndPost = (Surface_unlockAndPost)sys->native_window.unlockAndPost;
     if (!sys->p_library)
         sys->p_library = InitLibrary(sys);
     if (!sys->p_library) {
@@ -328,7 +295,7 @@ static void Close(vlc_object_t *p_this)
 
     picture_pool_Delete(sys->pool);
     if (sys->window)
-        sys->s_winRelease(sys->window);
+        sys->native_window.winRelease(sys->window);
     dlclose(sys->p_library);
     free(sys);
     vlc_mutex_unlock(&single_instance);
@@ -380,21 +347,21 @@ static int  AndroidLockSurface(picture_t *picture)
     sw = sys->fmt.i_width;
     sh = sys->fmt.i_height;
 
-    if (sys->s_winFromSurface) {
+    if (sys->native_window.winFromSurface) {
         jobject jsurf = jni_LockAndGetAndroidJavaSurface();
         if (unlikely(!jsurf)) {
             jni_UnlockAndroidSurface();
             return VLC_EGENERIC;
         }
         if (sys->window && jsurf != sys->jsurf) {
-            sys->s_winRelease(sys->window);
+            sys->native_window.winRelease(sys->window);
             sys->window = NULL;
         }
         sys->jsurf = jsurf;
         if (!sys->window) {
             JNIEnv *p_env;
             (*myVm)->AttachCurrentThread(myVm, &p_env, NULL);
-            sys->window = sys->s_winFromSurface(p_env, jsurf);
+            sys->window = sys->native_window.winFromSurface(p_env, jsurf);
             (*myVm)->DetachCurrentThread(myVm);
         }
         // Using sys->window instead of the native surface object
@@ -409,9 +376,9 @@ static int  AndroidLockSurface(picture_t *picture)
     }
     info = &picsys->info;
 
-    if (sys->s_winLock) {
+    if (sys->native_window.winLock) {
         ANativeWindow_Buffer buf = { 0 };
-        sys->s_winLock(sys->window, &buf, NULL);
+        sys->native_window.winLock(sys->window, &buf, NULL);
         info->w      = buf.width;
         info->h      = buf.height;
         info->bits   = buf.bits;
