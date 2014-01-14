@@ -109,7 +109,7 @@ static int st_Error (vlc_tls_t *obj, int val)
             errno = ECONNRESET;
             break;
         default:
-            msg_Err (obj, "Found error %d", val);
+            msg_Err(obj, "Found error %d", val);
             errno = ECONNRESET;
     }
     return -1;
@@ -133,14 +133,14 @@ static OSStatus st_SocketReadFunc (SSLConnectionRef connection,
     OSStatus retValue = noErr;
     ssize_t val;
 
-    for(;;) {
+    for (;;) {
         val = read(sys->i_fd, currData, bytesToGo);
         if (val <= 0) {
-            if(val == 0) {
+            if (val == 0) {
                 msg_Dbg(session, "found eof");
                 retValue = errSSLClosedGraceful;
             } else { /* do the switch */
-                switch(errno) {
+                switch (errno) {
                     case ENOENT:
                         /* connection closed */
                         retValue = errSSLClosedGraceful;
@@ -165,7 +165,7 @@ static OSStatus st_SocketReadFunc (SSLConnectionRef connection,
             currData += val;
         }
 
-        if(bytesToGo == 0) {
+        if (bytesToGo == 0) {
             /* filled buffer with incoming data, done */
             break;
         }
@@ -196,7 +196,7 @@ static OSStatus st_SocketWriteFunc (SSLConnectionRef connection,
         val = write(sys->i_fd, (char *)data + bytesSent, dataLen - bytesSent);
     } while (val >= 0 && (bytesSent += val) < dataLen);
 
-    if(val < 0) {
+    if (val < 0) {
         switch(errno) {
             case EAGAIN:
                 retValue = errSSLWouldBlock;
@@ -225,7 +225,7 @@ static int st_validateServerCertificate (vlc_tls_t *session, const char *hostnam
     SecCertificateRef leaf_cert = NULL;
 
     SecTrustRef trust = NULL;
-    OSStatus ret = SSLCopyPeerTrust (sys->p_context, &trust);
+    OSStatus ret = SSLCopyPeerTrust(sys->p_context, &trust);
     if (ret != noErr || trust == NULL) {
         msg_Err(session, "error getting certifictate chain");
         return -1;
@@ -237,7 +237,7 @@ static int st_validateServerCertificate (vlc_tls_t *session, const char *hostnam
 
 
     /* enable default root / anchor certificates */
-    ret = SecTrustSetAnchorCertificates (trust, NULL);
+    ret = SecTrustSetAnchorCertificates(trust, NULL);
     if (ret != noErr) {
         msg_Err(session, "error setting anchor certificates");
         result = -1;
@@ -247,7 +247,7 @@ static int st_validateServerCertificate (vlc_tls_t *session, const char *hostnam
     SecTrustResultType trust_eval_result = 0;
 
     ret = SecTrustEvaluate(trust, &trust_eval_result);
-    if(ret != noErr) {
+    if (ret != noErr) {
         msg_Err(session, "error calling SecTrustEvaluate");
         result = -1;
         goto out;
@@ -270,44 +270,44 @@ static int st_validateServerCertificate (vlc_tls_t *session, const char *hostnam
     /* SSLCopyPeerCertificates is only available on OSX 10.5 or later */
 #if !TARGET_OS_IPHONE
     CFArrayRef cert_chain = NULL;
-    ret = SSLCopyPeerCertificates (sys->p_context, &cert_chain);
+    ret = SSLCopyPeerCertificates(sys->p_context, &cert_chain);
     if (ret != noErr || !cert_chain) {
         result = -1;
         goto out;
     }
 
-    if (CFArrayGetCount (cert_chain) == 0) {
-        CFRelease (cert_chain);
+    if (CFArrayGetCount(cert_chain) == 0) {
+        CFRelease(cert_chain);
         result = -1;
         goto out;
     }
 
-    leaf_cert = (SecCertificateRef)CFArrayGetValueAtIndex (cert_chain, 0);
-    CFRetain (leaf_cert);
-    CFRelease (cert_chain);
+    leaf_cert = (SecCertificateRef)CFArrayGetValueAtIndex(cert_chain, 0);
+    CFRetain(leaf_cert);
+    CFRelease(cert_chain);
 #else
     /* SecTrustGetCertificateAtIndex is only available on 10.7 or iOS */
-    if (SecTrustGetCertificateCount (trust) == 0) {
+    if (SecTrustGetCertificateCount(trust) == 0) {
         result = -1;
         goto out;
     }
 
-    leaf_cert = SecTrustGetCertificateAtIndex (trust, 0);
-    CFRetain (leaf_cert);
+    leaf_cert = SecTrustGetCertificateAtIndex(trust, 0);
+    CFRetain(leaf_cert);
 #endif
 
 
     /* check if leaf already accepted */
-    CFIndex max = CFArrayGetCount (sys->p_cred->whitelist);
+    CFIndex max = CFArrayGetCount(sys->p_cred->whitelist);
     for (CFIndex i = 0; i < max; ++i) {
-        CFDictionaryRef dict = CFArrayGetValueAtIndex (sys->p_cred->whitelist, i);
-        CFStringRef knownHost = (CFStringRef)CFDictionaryGetValue (dict, cfKeyHost);
-        SecCertificateRef knownCert = (SecCertificateRef)CFDictionaryGetValue (dict, cfKeyCertificate);
+        CFDictionaryRef dict = CFArrayGetValueAtIndex(sys->p_cred->whitelist, i);
+        CFStringRef knownHost = (CFStringRef)CFDictionaryGetValue(dict, cfKeyHost);
+        SecCertificateRef knownCert = (SecCertificateRef)CFDictionaryGetValue(dict, cfKeyCertificate);
 
         if (!knownHost || !knownCert)
             continue;
 
-        if (CFEqual (knownHost, cfHostname) && CFEqual (knownCert, leaf_cert)) {
+        if (CFEqual(knownHost, cfHostname) && CFEqual(knownCert, leaf_cert)) {
             msg_Warn(session, "certificate already accepted, continuing");
             result = 0;
             goto out;
@@ -331,27 +331,27 @@ static int st_validateServerCertificate (vlc_tls_t *session, const char *hostnam
              "This problem may be caused by a configuration error "
              "or an attempt to breach your security or your privacy.\n\n"
              "If in doubt, abort now.\n");
-    int answer = dialog_Question (session, _("Insecure site"), vlc_gettext (msg),
+    int answer = dialog_Question(session, _("Insecure site"), vlc_gettext (msg),
                                   _("Abort"), _("Accept certificate temporarily"), NULL, hostname);
 
-    if(answer == 2) {
+    if (answer == 2) {
         msg_Warn(session, "Proceeding despite of failed certificate validation");
 
         /* save leaf certificate in whitelist */
         const void *keys[] = {cfKeyHost, cfKeyCertificate};
         const void *values[] = {cfHostname, leaf_cert};
-        CFDictionaryRef dict = CFDictionaryCreate (kCFAllocatorDefault,
+        CFDictionaryRef dict = CFDictionaryCreate(kCFAllocatorDefault,
                                                    keys, values, 2,
                                                    &kCFTypeDictionaryKeyCallBacks,
                                                    &kCFTypeDictionaryValueCallBacks);
-        if(!dict) {
-            msg_Err (session, "error creating dict");
+        if (!dict) {
+            msg_Err(session, "error creating dict");
             result = -1;
             goto out;
         }
 
-        CFArrayAppendValue (sys->p_cred->whitelist, dict);
-        CFRelease (dict);
+        CFArrayAppendValue(sys->p_cred->whitelist, dict);
+        CFRelease(dict);
 
         result = 0;
         goto out;
@@ -362,12 +362,12 @@ static int st_validateServerCertificate (vlc_tls_t *session, const char *hostnam
     }
 
 out:
-    CFRelease (trust);
+    CFRelease(trust);
 
     if (cfHostname)
-        CFRelease (cfHostname);
+        CFRelease(cfHostname);
     if (leaf_cert)
-        CFRelease (leaf_cert);
+        CFRelease(leaf_cert);
 
     return result;
 }
@@ -400,7 +400,7 @@ static int st_Handshake (vlc_tls_t *session, const char *host,
             return 0;
 
         case errSSLServerAuthCompleted:
-            return st_Handshake (session, host, service);
+            return st_Handshake(session, host, service);
 
         case errSSLConnectionRefused:
             msg_Err(session, "connection was refused");
@@ -483,7 +483,7 @@ static int st_Recv (void *opaque, void *buf, size_t length)
     size_t actualSize;
     OSStatus ret = SSLRead(sys->p_context, buf, length, &actualSize);
 
-    if(ret == errSSLWouldBlock && actualSize)
+    if (ret == errSSLWouldBlock && actualSize)
         return actualSize;
 
     /* peer performed shutdown */
@@ -516,12 +516,12 @@ static void st_SessionClose (vlc_tls_creds_t *crd, vlc_tls_t *session) {
 #if TARGET_OS_IPHONE
         CFRelease(sys->p_context);
 #else
-        if(SSLDisposeContext(sys->p_context) != noErr) {
+        if (SSLDisposeContext(sys->p_context) != noErr) {
             msg_Err(session, "error deleting context");
         }
 #endif
     }
-    free (sys);
+    free(sys);
 }
 
 /**
@@ -531,7 +531,7 @@ static void st_SessionClose (vlc_tls_creds_t *crd, vlc_tls_t *session) {
 static int st_SessionOpenCommon (vlc_tls_creds_t *crd, vlc_tls_t *session,
                                  int fd, bool b_server) {
 
-    vlc_tls_sys_t *sys = malloc (sizeof (*session->sys));
+    vlc_tls_sys_t *sys = malloc(sizeof(*session->sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
@@ -564,14 +564,14 @@ static int st_SessionOpenCommon (vlc_tls_creds_t *crd, vlc_tls_t *session,
 
     sys->p_context = p_context;
 
-    OSStatus ret = SSLSetIOFuncs (p_context, st_SocketReadFunc, st_SocketWriteFunc);
-    if(ret != noErr) {
+    OSStatus ret = SSLSetIOFuncs(p_context, st_SocketReadFunc, st_SocketWriteFunc);
+    if (ret != noErr) {
         msg_Err(session, "cannot set io functions");
         return -1;
     }
 
-    ret = SSLSetConnection (p_context, session);
-    if(ret != noErr) {
+    ret = SSLSetConnection(p_context, session);
+    if (ret != noErr) {
         msg_Err(session, "cannot set connection");
         return -1;
     }
@@ -601,16 +601,16 @@ static int st_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
        certificates */
 
     /* this has effect only on iOS 5 and OSX 10.8 or later ... */
-    ret = SSLSetSessionOption (sys->p_context, kSSLSessionOptionBreakOnServerAuth, true);
-    if(ret != noErr) {
+    ret = SSLSetSessionOption(sys->p_context, kSSLSessionOptionBreakOnServerAuth, true);
+    if (ret != noErr) {
         msg_Err (session, "cannot set session option");
         goto error;
     }
 #if !TARGET_OS_IPHONE
     /* ... thus calling this for earlier osx versions, which is not available on iOS in turn */
-    ret = SSLSetEnableCertVerify (sys->p_context, false);
-    if(ret != noErr) {
-        msg_Err (session, "error setting enable cert verify");
+    ret = SSLSetEnableCertVerify(sys->p_context, false);
+    if (ret != noErr) {
+        msg_Err(session, "error setting enable cert verify");
         goto error;
     }
 #endif
@@ -651,7 +651,7 @@ static void CloseClient (vlc_tls_creds_t *crd) {
     if (sys->whitelist)
         CFRelease(sys->whitelist);
 
-    free (sys);
+    free(sys);
 }
 
 /* Begin of server-side methods */
@@ -718,14 +718,14 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key) 
     ret = SecKeychainSearchCreateFromAttributes(NULL, kSecCertificateItemClass,
                                                  &attrList, &searchReference);
     if (ret != noErr || searchReference == NULL) {
-        msg_Err (crd, "Cannot find certificate with alias %s", cert);
+        msg_Err(crd, "Cannot find certificate with alias %s", cert);
         return VLC_EGENERIC;
     }
 
     SecKeychainItemRef itemRef = NULL;
     ret = SecKeychainSearchCopyNext(searchReference, &itemRef);
     if (ret != noErr) {
-        msg_Err (crd, "Cannot get certificate with alias %s, error: %d", cert, ret);
+        msg_Err(crd, "Cannot get certificate with alias %s, error: %d", cert, ret);
         return VLC_EGENERIC;
     }
     CFRelease(searchReference);
