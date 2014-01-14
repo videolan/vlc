@@ -829,7 +829,8 @@ static const char *const ppsz_prefres[] = {
 
 #define HTTP_CERT_TEXT N_("HTTP/TLS server certificate")
 #define CERT_LONGTEXT N_( \
-   "This X.509 certicate file (PEM format) is used for server-side TLS." )
+   "This X.509 certicate file (PEM format) is used for server-side TLS. " \
+   "On OS X, the string is used as a label to search the certificate in the keychain." )
 
 #define HTTP_KEY_TEXT N_("HTTP/TLS server private key")
 #define KEY_LONGTEXT N_( \
