@@ -41,6 +41,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_sout.h>
+#include <vlc_picture.h>
 
 #include <libdirac_encoder/dirac_encoder.h>
 
@@ -519,19 +520,16 @@ static int OpenEncoder( vlc_object_t *p_this )
         p_enc->fmt_in.i_codec = VLC_CODEC_I420;
         p_enc->fmt_in.video.i_bits_per_pixel = 12;
         p_sys->ctx.src_params.chroma = format420;
-        p_sys->i_buffer_in = p_enc->fmt_in.video.i_visible_width * p_enc->fmt_in.video.i_visible_height * 3 / 2;
     }
     else if( !strcmp( psz_tmp, "422" ) ) {
         p_enc->fmt_in.i_codec = VLC_CODEC_I422;
         p_enc->fmt_in.video.i_bits_per_pixel = 16;
         p_sys->ctx.src_params.chroma = format422;
-        p_sys->i_buffer_in = p_enc->fmt_in.video.i_visible_width * p_enc->fmt_in.video.i_visible_height * 2;
     }
     else if( !strcmp( psz_tmp, "444" ) ) {
         p_enc->fmt_in.i_codec = VLC_CODEC_I444;
         p_enc->fmt_in.video.i_bits_per_pixel = 24;
         p_sys->ctx.src_params.chroma = format444;
-        p_sys->i_buffer_in = p_enc->fmt_in.video.i_visible_width * p_enc->fmt_in.video.i_visible_height * 3;
     }
     else {
         msg_Err( p_enc, "Invalid chroma format: %s", psz_tmp );
@@ -539,6 +537,26 @@ static int OpenEncoder( vlc_object_t *p_this )
         goto error;
     }
     free( psz_tmp );
+
+    picture_t picture;
+    picture_Setup( &picture, p_enc->fmt_in.i_codec,
+                   p_enc->fmt_in.video.i_width,
+                   p_enc->fmt_in.video.i_height,
+                   p_enc->fmt_in.video.i_sar_num,
+                   p_enc->fmt_in.video.i_sar_den );
+
+    switch( p_enc->fmt_in.i_codec )
+    {
+    case VLC_CODEC_I420:
+        p_sys->i_buffer_in = picture.format.i_visible_width * picture.format.i_visible_height * 3 / 2;
+        break;
+    case VLC_CODEC_I422:
+        p_sys->i_buffer_in = picture.format.i_visible_width * picture.format.i_visible_height * 2;
+        break;
+    case VLC_CODEC_I444:
+        p_sys->i_buffer_in = picture.format.i_visible_width * picture.format.i_visible_height * 3;
+        break;
+    }
 
     p_sys->ctx.enc_params.qf = var_GetFloat( p_enc, ENC_CFG_PREFIX ENC_QUALITY_FACTOR );
 
