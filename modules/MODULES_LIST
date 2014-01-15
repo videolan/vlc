@@ -84,7 +84,6 @@ $Id$
  * demux_cdg: Demuxer for CD-G files (Karaoke)
  * demux_stl: EBU STL subtitles demuxer
  * demuxdump: Pseudo-demuxer that dumps the stream
- * dirac: BBC Dirac codec
  * diracsys: BBC Dirac demuxer
  * direct2d: video output module using the Direct2D API
  * direct3d: video output module using the Direct3D API

@@ -361,7 +361,6 @@ modules/codec/cdg.c
 modules/codec/crystalhd.c
 modules/codec/cvdsub.c
 modules/codec/ddummy.c
-modules/codec/dirac.c
 modules/codec/dmo/buffer.c
 modules/codec/dmo/dmo.c
 modules/codec/dmo/dmo.h

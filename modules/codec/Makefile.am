@@ -388,13 +388,6 @@ codec_LTLIBRARIES += $(LTLIBx26410b)
 
 ### Misc encoders ###
 
-libdirac_plugin_la_SOURCES = codec/dirac.c
-libdirac_plugin_la_CFLAGS = $(AM_CFLAGS) $(DIRAC_CFLAGS)
-libdirac_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-libdirac_plugin_la_LIBADD = $(DIRAC_LIBS)
-EXTRA_LTLIBRARIES += libdirac_plugin.la
-codec_LTLIBRARIES += $(LTLIBdirac)
-
 libfdkaac_plugin_la_SOURCES = codec/fdkaac.c
 libfdkaac_plugin_la_CFLAGS = $(AM_CFLAGS) $(FDKAAC_CFLAGS)
 libfdkaac_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
