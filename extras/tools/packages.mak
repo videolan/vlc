@@ -32,7 +32,7 @@ XZ_URL=http://tukaani.org/xz/xz-$(XZ_VERSION).tar.bz2
 OPENSSL_VERSION=1.0.0e
 OPENSSL_URL=http://www.openssl.org/source/openssl-$(OPENSSL_VERSION).tar.gz
 
-GAS_VERSION=35de474
+GAS_VERSION=940274b
 GAS_URL=http://git.libav.org/?p=gas-preprocessor.git;a=snapshot;h=$(GAS_VERSION);sf=tgz
 
 RAGEL_VERSION=6.8
