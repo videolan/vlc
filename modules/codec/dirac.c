@@ -500,8 +500,6 @@ static int OpenEncoder( vlc_object_t *p_this )
     dirac_encoder_context_init( &p_sys->ctx, guessed_video_fmt );
 
     /* constants set from the input video format */
-    p_sys->ctx.src_params.width = p_enc->fmt_in.video.i_visible_width;
-    p_sys->ctx.src_params.height = p_enc->fmt_in.video.i_visible_height;
     p_sys->ctx.src_params.frame_rate.numerator = p_enc->fmt_in.video.i_frame_rate;
     p_sys->ctx.src_params.frame_rate.denominator = p_enc->fmt_in.video.i_frame_rate_base;
     unsigned u_asr_num, u_asr_den;
@@ -557,6 +555,9 @@ static int OpenEncoder( vlc_object_t *p_this )
         p_sys->i_buffer_in = picture.format.i_visible_width * picture.format.i_visible_height * 3;
         break;
     }
+
+    p_sys->ctx.src_params.width = picture.format.i_visible_width;
+    p_sys->ctx.src_params.height = picture.format.i_visible_height;
 
     p_sys->ctx.enc_params.qf = var_GetFloat( p_enc, ENC_CFG_PREFIX ENC_QUALITY_FACTOR );
 
