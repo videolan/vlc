@@ -1596,10 +1596,8 @@ static void DemuxEnd( demux_t *p_demux )
         if( tk )
         {
             if( tk->p_frame )
-            {
-                msg_Warn( p_demux, "Still one frame for track %u, something is wrong", i );
                 block_ChainRelease( tk->p_frame );
-            }
+
             if( tk->p_es )
             {
                 es_out_Del( p_demux->out, tk->p_es );
