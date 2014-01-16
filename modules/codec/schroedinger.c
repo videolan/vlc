@@ -1553,7 +1553,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
                         return NULL;
                     memcpy( p_enc->fmt_out.p_extra, p_block->p_buffer, len );
                     memcpy( (uint8_t*)p_enc->fmt_out.p_extra + len, eos, sizeof( eos ) );
-                    SetDWBE( (uint8_t*)p_enc->fmt_out.p_extra + len + 10, len );
+                    SetDWBE( (uint8_t*)p_enc->fmt_out.p_extra + len + sizeof(eos) - 4, len );
                     p_enc->fmt_out.i_extra = len + sizeof( eos );
                 }
             }
