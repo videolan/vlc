@@ -248,6 +248,8 @@ static int Open( vlc_object_t *p_this )
             var_InheritInteger( p_this, SOUT_CFG_PREFIX "indexintvl" );
     p_sys->skeleton.i_index_ratio =
             var_InheritFloat( p_this, SOUT_CFG_PREFIX "indexratio" );
+    p_sys->i_data_start = 0;
+    p_sys->i_segment_start = 0;
     p_mux->p_sys        = p_sys;
     p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;
