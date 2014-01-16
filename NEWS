@@ -89,6 +89,7 @@ Misc:
 Removed modules:
  * ios video output: use ios2
  * OpenMash H.261 video decoder
+ * dirac encoder: use schroedinger
 
 
 Changes between 2.1.0 and 2.1.1:
