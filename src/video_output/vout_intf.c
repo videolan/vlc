@@ -431,7 +431,7 @@ static void VoutSaveSnapshot( vout_thread_t *p_vout )
     char *psz_filename;
     int  i_sequence;
     if (vout_snapshot_SaveImage( &psz_filename, &i_sequence,
-                                 p_image, VLC_OBJECT(p_vout), &cfg ) )
+                                 p_image, p_vout, &cfg ) )
         goto exit;
     if( cfg.is_sequential )
         var_SetInteger( p_vout, "snapshot-num", i_sequence + 1 );

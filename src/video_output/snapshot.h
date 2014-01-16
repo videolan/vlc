@@ -77,7 +77,7 @@ typedef struct {
  */
 int vout_snapshot_SaveImage(char **name, int *sequential,
                             const block_t *image,
-                            vlc_object_t *object,
+                            vout_thread_t *p_vout,
                             const vout_snapshot_save_cfg_t *cfg);
 
 #endif

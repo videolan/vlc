@@ -26,6 +26,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/time.h>
@@ -36,8 +37,10 @@
 #include <vlc_fs.h>
 #include <vlc_strings.h>
 #include <vlc_block.h>
+#include <vlc_vout.h>
 
 #include "snapshot.h"
+#include "vout_internal.h"
 
 /* */
 void vout_snapshot_Init(vout_snapshot_t *snap)
@@ -137,12 +140,13 @@ char *vout_snapshot_GetDirectory(void)
 /* */
 int vout_snapshot_SaveImage(char **name, int *sequential,
                              const block_t *image,
-                             vlc_object_t *object,
+                             vout_thread_t *p_vout,
                              const vout_snapshot_save_cfg_t *cfg)
 {
     /* */
     char *filename;
     DIR *pathdir = vlc_opendir(cfg->path);
+    input_thread_t *input = (input_thread_t*)p_vout->p->input;
     if (pathdir != NULL) {
         /* The use specified a directory path */
         closedir(pathdir);
@@ -150,7 +154,7 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
         /* */
         char *prefix = NULL;
         if (cfg->prefix_fmt)
-            prefix = str_format_time(cfg->prefix_fmt);
+            prefix = str_format(input, cfg->prefix_fmt);
         if (prefix)
             filename_sanitize(prefix);
         else {
@@ -194,7 +198,7 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
         free(prefix);
     } else {
         /* The user specified a full path name (including file name) */
-        filename = str_format_time(cfg->path);
+        filename = str_format(input, cfg->path);
         path_sanitize(filename);
     }
 
@@ -204,12 +208,12 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
     /* Save the snapshot */
     FILE *file = vlc_fopen(filename, "wb");
     if (!file) {
-        msg_Err(object, "Failed to open '%s'", filename);
+        msg_Err(p_vout, "Failed to open '%s'", filename);
         free(filename);
         goto error;
     }
     if (fwrite(image->p_buffer, image->i_buffer, 1, file) != 1) {
-        msg_Err(object, "Failed to write to '%s'", filename);
+        msg_Err(p_vout, "Failed to write to '%s'", filename);
         fclose(file);
         free(filename);
         goto error;
@@ -225,7 +229,7 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
     return VLC_SUCCESS;
 
 error:
-    msg_Err(object, "could not save snapshot");
+    msg_Err(p_vout, "could not save snapshot");
     return VLC_EGENERIC;
 }
 
