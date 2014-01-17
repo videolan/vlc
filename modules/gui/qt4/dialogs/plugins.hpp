@@ -183,8 +183,11 @@ public:
                         const QModelIndex &index ) const;
     virtual QSize sizeHint( const QStyleOptionViewItem &option,
                             const QModelIndex &index ) const;
+    virtual void initStyleOption( QStyleOptionViewItem *option,
+                                  const QModelIndex &index ) const;
 
 private:
+    QMargins margins;
     QListView *view;
     intf_thread_t *p_intf;
 };

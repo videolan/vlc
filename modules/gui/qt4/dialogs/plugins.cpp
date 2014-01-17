@@ -430,6 +430,7 @@ ExtensionItemDelegate::ExtensionItemDelegate( intf_thread_t *p_intf,
                                               QListView *view )
         : QStyledItemDelegate( view ), view( view ), p_intf( p_intf )
 {
+    margins = QMargins( 4, 4, 4, 4 );
 }
 
 ExtensionItemDelegate::~ExtensionItemDelegate()
@@ -440,78 +441,71 @@ void ExtensionItemDelegate::paint( QPainter *painter,
                                    const QStyleOptionViewItem &option,
                                    const QModelIndex &index ) const
 {
-    int width = option.rect.width();
-
-    // Pixmap: buffer where to draw
-    QPixmap pix(option.rect.size());
+    QStyleOptionViewItemV4 opt = option;
+    initStyleOption( &opt, index );
 
     // Draw background
-    pix.fill( Qt::transparent ); // FIXME
-
-    // ItemView primitive style
-    QApplication::style()->drawPrimitive( QStyle::PE_PanelItemViewItem,
-                                          &option,
-                                          painter );
-
-    // Painter on the pixmap
-    QPainter *pixpaint = new QPainter(&pix);
-
-    // Text font & pen
-    QFont font = painter->font();
-    QPen pen = painter->pen();
-    if( view->selectionModel()->selectedIndexes().contains( index ) )
-    {
-        pen.setBrush( option.palette.highlightedText() );
-    }
-    else
-    {
-        pen.setBrush( option.palette.text() );
-    }
-    pixpaint->setPen( pen );
-    QFontMetrics metrics = option.fontMetrics;
+    if ( opt.state & QStyle::State_Selected )
+        painter->fillRect( opt.rect, opt.palette.highlight() );
 
     // Icon
     QPixmap icon = index.data( Qt::DecorationRole ).value<QPixmap>();
     if( !icon.isNull() )
     {
-        pixpaint->drawPixmap( 7, 7, 2*metrics.height(), 2*metrics.height(),
-                              icon );
+        painter->drawPixmap( opt.rect.left() + margins.left(),
+                             opt.rect.top() + margins.top(),
+                             icon.scaled( opt.decorationSize,
+                                          Qt::KeepAspectRatio,
+                                          Qt::SmoothTransformation )
+        );
     }
 
-    // Title: bold
-    pixpaint->setRenderHint( QPainter::TextAntialiasing );
+    painter->save();
+    painter->setRenderHint( QPainter::TextAntialiasing );
+
+    if ( opt.state & QStyle::State_Selected )
+        painter->setPen( opt.palette.highlightedText().color() );
+
+    QFont font( option.font );
     font.setBold( true );
-    pixpaint->setFont( font );
-    pixpaint->drawText( QRect( 17 + 2 * metrics.height(), 7,
-                               width - 40 - 2 * metrics.height(),
-                               metrics.height() ),
-                        Qt::AlignLeft, index.data( Qt::DisplayRole ).toString() );
+    painter->setFont( font );
+    QRect textrect( opt.rect );
+    textrect.adjust( 2 * margins.left() + margins.right() + opt.decorationSize.width(),
+                     margins.top(),
+                     - margins.right(),
+                     - margins.bottom() - opt.fontMetrics.height() );
 
-    // Short description: normal
+    painter->drawText( textrect, Qt::AlignLeft,
+                       index.data( Qt::DisplayRole ).toString() );
+
     font.setBold( false );
-    pixpaint->setFont( font );
-    pixpaint->drawText( QRect( 17 + 2 * metrics.height(),
-                               7 + metrics.height(), width - 40,
-                               metrics.height() ),
-                        Qt::AlignLeft, index.data( ExtensionListModel::DescriptionRole ).toString() );
+    painter->setFont( font );
+    painter->drawText( textrect.translated( 0, option.fontMetrics.height() ),
+                       Qt::AlignLeft,
+                       index.data( ExtensionListModel::DescriptionRole ).toString() );
 
-    // Flush paint operations
-    delete pixpaint;
-
-    // Draw it on the screen!
-    painter->drawPixmap( option.rect, pix );
+    painter->restore();
 }
 
 QSize ExtensionItemDelegate::sizeHint( const QStyleOptionViewItem &option,
                                        const QModelIndex &index ) const
 {
-    if (index.isValid() && index.column() == 0)
+    if ( index.isValid() )
     {
-        QFontMetrics metrics = option.fontMetrics;
-        return QSize( 200, 14 + 2 * metrics.height() );
+        return QSize( 200, 2 * option.fontMetrics.height()
+                      + margins.top() + margins.bottom() );
     }
     else
         return QSize();
+}
+
+void ExtensionItemDelegate::initStyleOption( QStyleOptionViewItem *option,
+                                             const QModelIndex &index ) const
+{
+    QStyledItemDelegate::initStyleOption( option, index );
+    option->decorationSize = QSize( option->rect.height(), option->rect.height() );
+    option->decorationSize -= QSize( margins.left() + margins.right(),
+                                     margins.top() + margins.bottom() );
 }
 
 /* "More information" dialog */
