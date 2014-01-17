@@ -545,7 +545,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
                 (*myVm)->DetachCurrentThread(myVm);
                 return p_pic;
             }
-            timeout = 30;
+            timeout = 30*1000;
             continue;
         }
         jobject buf = (*env)->GetObjectArrayElement(env, p_sys->input_buffers, index);
