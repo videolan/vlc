@@ -175,7 +175,7 @@ private:
 class ExtensionItemDelegate : public QStyledItemDelegate
 {
 public:
-    ExtensionItemDelegate( intf_thread_t *p_intf, QListView *view );
+    ExtensionItemDelegate( QObject *parent );
     virtual ~ExtensionItemDelegate();
 
     virtual void paint( QPainter *painter,
@@ -188,8 +188,6 @@ public:
 
 private:
     QMargins margins;
-    QListView *view;
-    intf_thread_t *p_intf;
 };
 
 class ExtensionInfoDialog : public QVLCDialog

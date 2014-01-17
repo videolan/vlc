@@ -219,8 +219,7 @@ ExtensionTab::ExtensionTab( intf_thread_t *p_intf_ )
     layout->addWidget( extList );
 
     // List item delegate
-    ExtensionItemDelegate *itemDelegate = new ExtensionItemDelegate( p_intf,
-                                                                     extList );
+    ExtensionItemDelegate *itemDelegate = new ExtensionItemDelegate( extList );
     extList->setItemDelegate( itemDelegate );
 
     // Extension list look & feeling
@@ -426,9 +425,8 @@ QModelIndex ExtensionListModel::index( int row, int column,
 
 
 /* Extension List Widget Item */
-ExtensionItemDelegate::ExtensionItemDelegate( intf_thread_t *p_intf,
-                                              QListView *view )
-        : QStyledItemDelegate( view ), view( view ), p_intf( p_intf )
+ExtensionItemDelegate::ExtensionItemDelegate( QObject *parent )
+        : QStyledItemDelegate( parent )
 {
     margins = QMargins( 4, 4, 4, 4 );
 }
