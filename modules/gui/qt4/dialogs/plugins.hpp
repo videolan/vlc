@@ -146,7 +146,7 @@ public:
         QPixmap *icon;
     };
 
-    ExtensionListModel( QListView *view, intf_thread_t *p_intf );
+    ExtensionListModel( QObject *parent, intf_thread_t *p_intf );
     virtual ~ExtensionListModel();
 
     enum

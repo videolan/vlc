@@ -336,8 +336,8 @@ QVariant ExtensionListModel::ExtensionCopy::data( int role ) const
 
 /* Extensions list model for the QListView */
 
-ExtensionListModel::ExtensionListModel( QListView *view, intf_thread_t *intf )
-        : QAbstractListModel( view ), p_intf( intf )
+ExtensionListModel::ExtensionListModel( QObject *parent, intf_thread_t *intf )
+        : QAbstractListModel( parent ), p_intf( intf )
 {
     // Connect to ExtensionsManager::extensionsUpdated()
     ExtensionsManager* EM = ExtensionsManager::getInstance( p_intf );
