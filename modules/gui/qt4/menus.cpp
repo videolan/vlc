@@ -610,7 +610,8 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     if( current->isEmpty() )
     {
         addActionWithSubmenu( current, "audio-es", qtr( "Audio &Track" ) );
-        audioDeviceMenu = current->addMenu( qtr( "Audio &Device" ) );
+        audioDeviceMenu = new QMenu( qtr( "Audio &Device" ) );
+        current->addMenu( audioDeviceMenu );
         addActionWithSubmenu( current, "stereo-mode", qtr( "&Stereo Mode" ) );
         current->addSeparator();
 
