@@ -793,7 +793,7 @@ static void WriteMetaToAPE( APE::Tag* tag, input_item_t* p_item )
     WRITE( Copyright, "COPYRIGHT" );
     WRITE( Language, "LANGUAGE" );
     WRITE( Publisher, "PUBLISHER" );
-
+    WRITE( TrackID, "MUSICBRAINZ_TRACKID" );
 #undef WRITE
 }
 
@@ -825,34 +825,40 @@ static void WriteMetaToId3v2( ID3v2::Tag* tag, input_item_t* p_item )
     WRITE( Publisher, "TPUB" );
 
 #undef WRITE
-    /* Track Total as Custom Field */
-    psz_meta = input_item_GetTrackTotal( p_item );
-    if ( psz_meta )
-    {
-        ID3v2::FrameList list = tag->frameListMap()["TXXX"];
-        ID3v2::UserTextIdentificationFrame *p_txxx;
-        for( ID3v2::FrameList::Iterator iter = list.begin(); iter != list.end(); iter++ )
-        {
-            p_txxx = dynamic_cast<ID3v2::UserTextIdentificationFrame*>(*iter);
-            if( !p_txxx )
-                continue;
-            if( !strcmp( p_txxx->description().toCString( true ), "TRACKTOTAL" ) )
-            {
-                p_txxx->setText( psz_meta );
-                FREENULL( psz_meta );
-                break;
-            }
-        }
-        if( psz_meta ) /* not found in existing custom fields */
-        {
-            ByteVector p_byte( "TXXX", 4 );
-            p_txxx = new ID3v2::UserTextIdentificationFrame( p_byte );
-            p_txxx->setDescription( "TRACKTOTAL" );
-            p_txxx->setText( psz_meta );
-            free( psz_meta );
-            tag->addFrame( p_txxx );
-        }
+    /* Known TXXX frames */
+    ID3v2::FrameList list = tag->frameListMap()["TXXX"];
+
+#define WRITETXXX( metaName, txxName )\
+    psz_meta = input_item_Get##metaName( p_item );                                       \
+    if ( psz_meta )                                                                      \
+    {                                                                                    \
+        ID3v2::UserTextIdentificationFrame *p_txxx;                                      \
+        for( ID3v2::FrameList::Iterator iter = list.begin(); iter != list.end(); iter++ )\
+        {                                                                                \
+            p_txxx = dynamic_cast<ID3v2::UserTextIdentificationFrame*>(*iter);           \
+            if( !p_txxx )                                                                \
+                continue;                                                                \
+            if( !strcmp( p_txxx->description().toCString( true ), txxName ) )            \
+            {                                                                            \
+                p_txxx->setText( psz_meta );                                             \
+                FREENULL( psz_meta );                                                    \
+                break;                                                                   \
+            }                                                                            \
+        }                                                                                \
+        if( psz_meta ) /* not found in existing custom fields */                         \
+        {                                                                                \
+            ByteVector p_byte( "TXXX", 4 );                                              \
+            p_txxx = new ID3v2::UserTextIdentificationFrame( p_byte );                   \
+            p_txxx->setDescription( txxName );                                           \
+            p_txxx->setText( psz_meta );                                                 \
+            free( psz_meta );                                                            \
+            tag->addFrame( p_txxx );                                                     \
+        }                                                                                \
     }
+
+    WRITETXXX( TrackTotal, "TRACKTOTAL" );
+
+#undef WRITETXXX
 
     /* Write album art */
     char *psz_url = input_item_GetArtworkURL( p_item );
@@ -952,7 +958,7 @@ static void WriteMetaToXiph( Ogg::XiphComment* tag, input_item_t* p_item )
     WRITE( EncodedBy, "ENCODER" );
     WRITE( Rating, "RATING" );
     WRITE( Language, "LANGUAGE" );
-
+    WRITE( TrackID, "MUSICBRAINZ_TRACKID" );
 #undef WRITE
 }
 
