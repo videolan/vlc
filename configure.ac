@@ -3234,6 +3234,8 @@ if test "${enable_android_surface}" = "yes"; then
   if test "${HAVE_ANDROID}" = "1"; then
      VLC_ADD_PLUGIN([android_surface])
      VLC_ADD_LIBS([android_surface], [-ldl])
+     VLC_ADD_PLUGIN([android_opaque])
+     VLC_ADD_LIBS([android_opaque], [-ldl])
   fi
 fi
 

@@ -55,6 +55,7 @@ Video Output:
  * New CoreGraphics video output module for NPAPI plugins
  * New OpenGL ES 2.0 through EGL video output module for Android
  * New Android native window provider module
+ * Direct rendering for MediaCodec Android hardware acceleration
 
 Video Filter:
  * New Oldmovie effect filter
