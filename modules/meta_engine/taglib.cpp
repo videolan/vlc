@@ -177,6 +177,7 @@ static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
     SET( "COPYRIGHT", Copyright );
     SET( "LANGUAGE", Language );
     SET( "PUBLISHER", Publisher );
+    SET( "MUSICBRAINZ_TRACKID", TrackID );
 
 #undef SET
 
@@ -189,7 +190,6 @@ static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
 }
 
 
-#ifdef TAGLIB_HAVE_ASFPICTURE_H
 /**
  * Read meta information from APE tags
  * @param tag: the APE tag
@@ -198,8 +198,22 @@ static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
  */
 static void ReadMetaFromASF( ASF::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta_t* p_meta )
 {
+
+    ASF::AttributeList list;
+#define SET( keyName, metaName )                                                     \
+    if( tag->attributeListMap().contains(keyName) )                                  \
+    {                                                                                \
+        list = tag->attributeListMap()[keyName];                                     \
+        vlc_meta_Set##metaName( p_meta, list.front().toString().toCString( true ) ); \
+    }
+
+    SET("MusicBrainz/Track Id", TrackID );
+
+#undef SET
+
+#ifdef TAGLIB_HAVE_ASFPICTURE_H
     // List the pictures
-    ASF::AttributeList list = tag->attributeListMap()["WM/Picture"];
+    list = tag->attributeListMap()["WM/Picture"];
     ASF::AttributeList::Iterator iter;
     for( iter = list.begin(); iter != list.end(); iter++ )
     {
@@ -237,8 +251,8 @@ static void ReadMetaFromASF( ASF::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
         vlc_meta_SetArtURL( p_meta, psz_url );
         free( psz_url );
     }
-}
 #endif
+}
 
 
 /**
@@ -441,6 +455,7 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
     SET( "ENCODER", EncodedBy );
     SET( "RATING", Rating );
     SET( "LANGUAGE", Language );
+    SET( "MUSICBRAINZ_TRACKID", TrackID );
 #undef SET
 
     list = tag->fieldListMap()["TRACKNUMBER"];
@@ -538,6 +553,18 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
  */
 static void ReadMetaFromMP4( MP4::Tag* tag, demux_meta_t *p_demux_meta, vlc_meta_t* p_meta )
 {
+    MP4::Item list;
+#define SET( keyName, metaName )                                                             \
+    if( tag->itemListMap().contains(keyName) )                                               \
+    {                                                                                        \
+        list = tag->itemListMap()[keyName];                                                  \
+        vlc_meta_Set##metaName( p_meta, list.toStringList().front().toCString( true ) );     \
+    }
+
+    SET("----:com.apple.iTunes:MusicBrainz Track Id", TrackID );
+
+#undef SET
+
     if( tag->itemListMap().contains("covr") )
     {
         MP4::CoverArtList list = tag->itemListMap()["covr"].toCoverArtList();
@@ -639,7 +666,7 @@ static int ReadMeta( vlc_object_t* p_this)
     }
     else
 #endif
-#ifdef TAGLIB_HAVE_ASFPICTURE_H
+#ifdef TAGLIB_WITH_ASF
     if( ASF::File* asf = dynamic_cast<ASF::File*>(f.file()) )
     {
         if( asf->tag() )
