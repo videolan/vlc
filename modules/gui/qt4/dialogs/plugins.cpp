@@ -227,7 +227,8 @@ ExtensionTab::ExtensionTab( intf_thread_t *p_intf_ )
     extList->setSelectionMode( QAbstractItemView::SingleSelection );
 
     // Model
-    ExtensionListModel *model = new ExtensionListModel( extList, p_intf );
+    ExtensionListModel *model =
+      new ExtensionListModel( extList, ExtensionsManager::getInstance( p_intf ) );
     extList->setModel( model );
 
     // Buttons' layout
@@ -336,11 +337,10 @@ QVariant ExtensionListModel::ExtensionCopy::data( int role ) const
 
 /* Extensions list model for the QListView */
 
-ExtensionListModel::ExtensionListModel( QObject *parent, intf_thread_t *intf )
-        : QAbstractListModel( parent ), p_intf( intf )
+ExtensionListModel::ExtensionListModel( QObject *parent, ExtensionsManager* EM_ )
+        : QAbstractListModel( parent ), EM( EM_ )
 {
     // Connect to ExtensionsManager::extensionsUpdated()
-    ExtensionsManager* EM = ExtensionsManager::getInstance( p_intf );
     CONNECT( EM, extensionsUpdated(), this, updateList() );
 
     // Load extensions now if not already loaded
@@ -366,7 +366,6 @@ void ExtensionListModel::updateList()
     }
 
     // Find new extensions
-    ExtensionsManager *EM = ExtensionsManager::getInstance( p_intf );
     extensions_manager_t *p_mgr = EM->getManager();
     if( !p_mgr )
         return;
@@ -388,7 +387,6 @@ void ExtensionListModel::updateList()
 int ExtensionListModel::rowCount( const QModelIndex& ) const
 {
     int count = 0;
-    ExtensionsManager *EM = ExtensionsManager::getInstance( p_intf );
     extensions_manager_t *p_mgr = EM->getManager();
     if( !p_mgr )
         return 0;

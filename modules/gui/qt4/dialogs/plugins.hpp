@@ -49,7 +49,7 @@ class ExtensionTab;
 class ExtensionListItem;
 class SearchLineEdit;
 class ExtensionCopy;
-
+class ExtensionsManager;
 
 class PluginDialog : public QVLCFrame, public Singleton<PluginDialog>
 {
@@ -146,7 +146,7 @@ public:
         QPixmap *icon;
     };
 
-    ExtensionListModel( QObject *parent, intf_thread_t *p_intf );
+    ExtensionListModel( QObject *parent, ExtensionsManager *EM );
     virtual ~ExtensionListModel();
 
     enum
@@ -168,7 +168,7 @@ private slots:
 
 private:
 
-    intf_thread_t *p_intf;
+    ExtensionsManager *EM;
     QList<ExtensionCopy*> extensions;
 };
 
