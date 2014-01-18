@@ -2050,7 +2050,51 @@ else\
     } /* FOR i_module_index */
     module_list_free(p_list);
 
-    mainFrame.size.height = 30 + 20 * [o_modulearray count];
+
+    // First, initialize and draw the table view to get its height
+    NSRect s_rc = NSMakeRect(12, 10, mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN, 50);
+    // height is automatically increased as needed
+    NSTableView *o_tableview;
+    o_tableview = [[NSTableView alloc] initWithFrame : s_rc];
+    [o_tableview setUsesAlternatingRowBackgroundColors:YES];
+    [o_tableview setHeaderView:nil];
+    /* FIXME: support for multiple selection... */
+    //    [o_tableview setAllowsMultipleSelection:YES];
+
+    NSCell *o_headerCell = [[NSCell alloc] initTextCell:@"Enabled"];
+    NSCell *o_dataCell = [[NSButtonCell alloc] init];
+    [(NSButtonCell*)o_dataCell setButtonType:NSSwitchButton];
+    [o_dataCell setTitle:@""];
+    [o_dataCell setFont:[NSFont systemFontOfSize:0]];
+    NSTableColumn *o_tableColumn = [[NSTableColumn alloc]
+                                    initWithIdentifier:@"Enabled"];
+    [o_tableColumn setHeaderCell: o_headerCell];
+    [o_tableColumn setDataCell: o_dataCell];
+    [o_tableColumn setWidth:17];
+    [o_tableview addTableColumn: o_tableColumn];
+
+    o_headerCell = [[NSCell alloc] initTextCell:@"Module Name"];
+    o_dataCell = [[NSTextFieldCell alloc] init];
+    [o_dataCell setFont:[NSFont systemFontOfSize:12]];
+    o_tableColumn = [[NSTableColumn alloc]
+                     initWithIdentifier:@"Module"];
+    [o_tableColumn setHeaderCell: o_headerCell];
+    [o_tableColumn setDataCell: o_dataCell];
+    [o_tableColumn setWidth:s_rc.size.width - 34];
+    [o_tableview addTableColumn: o_tableColumn];
+    [o_tableview registerForDraggedTypes:[NSArray arrayWithObject:@"VLC media player module"]];
+
+    [o_tableview setDataSource:self];
+    [o_tableview setTarget: self];
+    [o_tableview setAction: @selector(tableChanged:)];
+    [o_tableview sendActionOn:NSLeftMouseUpMask | NSLeftMouseDownMask |
+     NSLeftMouseDraggedMask];
+
+    [o_tableview reloadData];
+
+    CGFloat tableview_height = [o_tableview frame].size.height;
+
+    mainFrame.size.height = 40 + tableview_height;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
@@ -2079,60 +2123,7 @@ else\
         [o_textfield setAutoresizingMask:NSViewWidthSizable ];
         [self addSubview: o_textfield];
 
-
-        {
-            NSRect s_rc = mainFrame;
-            s_rc.size.height = mainFrame.size.height - 30;
-            s_rc.size.width = mainFrame.size.width - 12;
-            s_rc.origin.x = 12;
-            s_rc.origin.y = 0;
-            o_scrollview = [[[NSScrollView alloc] initWithFrame: s_rc] retain];
-            [o_scrollview setDrawsBackground: NO];
-            [o_scrollview setBorderType: NSBezelBorder];
-            [o_scrollview setAutohidesScrollers:YES];
-
-            NSTableView *o_tableview;
-            o_tableview = [[NSTableView alloc] initWithFrame : s_rc];
-            [o_tableview setUsesAlternatingRowBackgroundColors:YES];
-            [o_tableview setHeaderView:nil];
-            /* TODO: find a good way to fix the row height and text size*/
-            /* FIXME: support for multiple selection... */
-            //    [o_tableview setAllowsMultipleSelection:YES];
-
-            NSCell *o_headerCell = [[NSCell alloc] initTextCell:@"Enabled"];
-            NSCell *o_dataCell = [[NSButtonCell alloc] init];
-            [(NSButtonCell*)o_dataCell setButtonType:NSSwitchButton];
-            [o_dataCell setTitle:@""];
-            [o_dataCell setFont:[NSFont systemFontOfSize:0]];
-            NSTableColumn *o_tableColumn = [[NSTableColumn alloc]
-                                            initWithIdentifier:@"Enabled"];
-            [o_tableColumn setHeaderCell: o_headerCell];
-            [o_tableColumn setDataCell: o_dataCell];
-            [o_tableColumn setWidth:17];
-            [o_tableview addTableColumn: o_tableColumn];
-
-            o_headerCell = [[NSCell alloc] initTextCell:@"Module Name"];
-            o_dataCell = [[NSTextFieldCell alloc] init];
-            [o_dataCell setFont:[NSFont systemFontOfSize:12]];
-            o_tableColumn = [[NSTableColumn alloc]
-                             initWithIdentifier:@"Module"];
-            [o_tableColumn setHeaderCell: o_headerCell];
-            [o_tableColumn setDataCell: o_dataCell];
-            [o_tableColumn setWidth:s_rc.size.width - 34];
-            [o_tableview addTableColumn: o_tableColumn];
-            [o_tableview registerForDraggedTypes:[NSArray arrayWithObject:@"VLC media player module"]];
-
-            [o_tableview setDataSource:self];
-            [o_tableview setTarget: self];
-            [o_tableview setAction: @selector(tableChanged:)];
-            [o_tableview sendActionOn:NSLeftMouseUpMask | NSLeftMouseDownMask |
-             NSLeftMouseDraggedMask];
-            [o_scrollview setDocumentView: o_tableview];
-        }
-        [o_scrollview setAutoresizingMask:NSViewWidthSizable ];
-        [o_scrollview setAutohidesScrollers:YES];
-        [self addSubview: o_scrollview];
-
+        [self addSubview: o_tableview];
     }
     return self;
 }
