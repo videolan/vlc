@@ -1958,9 +1958,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
 {
-    if (_p_item->i_type == CONFIG_ITEM_MODULE_LIST)
-        //TODO....
-        return nil;
+    BOOL b_by_cat = _p_item->i_type == CONFIG_ITEM_MODULE_LIST_CAT;
 
     //Fill our array to know how may items we have...
     module_t *p_parser, **p_list;
@@ -1979,56 +1977,77 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
         if (module_is_main(p_parser))
             continue;
 
-        unsigned int confsize;
-        module_config_t *p_configlist = module_config_get(p_parser, &confsize);
+        if (b_by_cat) {
+            unsigned int confsize;
+            module_config_t *p_configlist = module_config_get(p_parser, &confsize);
 
-        for (i = 0; i < confsize; i++) {
-            unsigned int unused;
-            module_config_t *p_config = &p_configlist[i];
-            NSString *o_modulelongname, *o_modulename;
-            NSNumber *o_moduleenabled = nil;
+            for (i = 0; i < confsize; i++) {
+                unsigned int unused;
+                module_config_t *p_config = &p_configlist[i];
+                NSString *o_modulelongname, *o_modulename;
+                NSNumber *o_moduleenabled = nil;
 
-            /* Hack: required subcategory is stored in i_min */
-            if (p_config->i_type == CONFIG_SUBCATEGORY &&
-               p_config->value.i == _p_item->min.i) {
-                o_modulelongname = [NSString stringWithUTF8String:module_get_name(p_parser, TRUE)];
-                o_modulename = [NSString stringWithUTF8String:module_get_object(p_parser)];
+                /* Hack: required subcategory is stored in i_min */
+                if (p_config->i_type == CONFIG_SUBCATEGORY &&
+                    p_config->value.i == _p_item->min.i) {
 
-                if (_p_item->value.psz &&
-                   strstr(_p_item->value.psz, module_get_object(p_parser)))
-                    o_moduleenabled = [NSNumber numberWithBool:YES];
-                else
-                    o_moduleenabled = [NSNumber numberWithBool:NO];
+                    o_modulelongname = [NSString stringWithUTF8String:module_get_name(p_parser, TRUE)];
+                    o_modulename = [NSString stringWithUTF8String:module_get_object(p_parser)];
 
-                [o_modulearray addObject:[NSMutableArray
-                                          arrayWithObjects: o_modulename, o_modulelongname,
-                                          o_moduleenabled, nil]];
-            }
+                    if (_p_item->value.psz &&
+                        strstr(_p_item->value.psz, module_get_object(p_parser)))
+                        o_moduleenabled = [NSNumber numberWithBool:YES];
+                    else
+                        o_moduleenabled = [NSNumber numberWithBool:NO];
 
-            /* Parental Advisory HACK:
-             * Selecting HTTP, RC and Telnet interfaces is difficult now
-             * since they are just the lua interface module */
-            if (p_config->i_type == CONFIG_SUBCATEGORY &&
-               !strcmp(module_get_object(p_parser), "lua") &&
-               !strcmp(_p_item->psz_name, "extraintf") &&
-               p_config->value.i == _p_item->min.i) {
+                    [o_modulearray addObject:[NSMutableArray
+                                              arrayWithObjects: o_modulename, o_modulelongname,
+                                              o_moduleenabled, nil]];
+                }
+
+                /* Parental Advisory HACK:
+                 * Selecting HTTP, RC and Telnet interfaces is difficult now
+                 * since they are just the lua interface module */
+                if (p_config->i_type == CONFIG_SUBCATEGORY &&
+                    !strcmp(module_get_object(p_parser), "lua") &&
+                    !strcmp(_p_item->psz_name, "extraintf") &&
+                    p_config->value.i == _p_item->min.i) {
 
 #define addLuaIntf(shortname, longname) \
-                if (_p_item->value.psz && strstr(_p_item->value.psz, shortname))\
-                    o_moduleenabled = [NSNumber numberWithBool:YES];\
-                else\
-                    o_moduleenabled = [NSNumber numberWithBool:NO];\
-                [o_modulearray addObject:[NSMutableArray arrayWithObjects: @shortname, _NS(longname), o_moduleenabled, nil]]
+if (_p_item->value.psz && strstr(_p_item->value.psz, shortname))\
+    o_moduleenabled = [NSNumber numberWithBool:YES];\
+else\
+    o_moduleenabled = [NSNumber numberWithBool:NO];\
+    [o_modulearray addObject:[NSMutableArray arrayWithObjects: @shortname, _NS(longname), o_moduleenabled, nil]]
 
-                addLuaIntf("http", "Web");
-                addLuaIntf("telnet", "Telnet");
-                addLuaIntf("cli", "Console");
-
+                    addLuaIntf("http", "Web");
+                    addLuaIntf("telnet", "Telnet");
+                    addLuaIntf("cli", "Console");
 #undef addLuaIntf
+                }
+
             }
+            module_config_free(p_configlist);
+
+
+        } else if (module_provides(p_parser, _p_item->psz_type)) {
+
+            NSString *o_modulelongname = toNSStr(module_get_name(p_parser, TRUE));
+            NSString *o_modulename = toNSStr(module_get_object(p_parser));
+
+            NSNumber *o_moduleenabled = nil;
+            if (_p_item->value.psz &&
+                strstr(_p_item->value.psz, module_get_object(p_parser)))
+                o_moduleenabled = [NSNumber numberWithBool:YES];
+            else
+                o_moduleenabled = [NSNumber numberWithBool:NO];
+
+            [o_modulearray addObject:[NSMutableArray
+                                      arrayWithObjects: o_modulename, o_modulelongname,
+                                      o_moduleenabled, nil]];
         }
-        module_config_free(p_configlist);
-    }
+
+    } /* FOR i_module_index */
     module_list_free(p_list);
 
     mainFrame.size.height = 30 + 20 * [o_modulearray count];
