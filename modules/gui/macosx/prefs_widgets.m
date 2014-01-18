@@ -2052,7 +2052,7 @@ else\
 
 
     // First, initialize and draw the table view to get its height
-    NSRect s_rc = NSMakeRect(12, 10, mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN, 50);
+    NSRect s_rc = NSMakeRect(12, 10, mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN - 12, 50);
     // height is automatically increased as needed
     NSTableView *o_tableview;
     o_tableview = [[NSTableView alloc] initWithFrame : s_rc];
