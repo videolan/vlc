@@ -783,6 +783,10 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
                     withView: o_parent_view];
         break;
     case CONFIG_ITEM_MODULE:
+            p_control = [[StringListConfigControl alloc]
+                         initWithItem: _p_item
+                         withView: o_parent_view];
+            break;
     case CONFIG_ITEM_MODULE_CAT:
         p_control = [[ModuleConfigControl alloc]
                     initWithItem: _p_item
@@ -994,7 +998,10 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     mainFrame.origin.y = 0;
 
     if ([super initWithFrame: mainFrame item: _p_item] != nil) {
-        i_view_type = CONFIG_ITEM_STRING_LIST;
+        if (p_item->i_type == CONFIG_ITEM_STRING)
+            i_view_type = CONFIG_ITEM_STRING_LIST;
+        else
+            i_view_type = CONFIG_ITEM_MODULE;
 
         o_textfieldTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
 
@@ -1013,21 +1020,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
         [o_popup setAutoresizingMask:NSViewWidthSizable];
 
         /* add items */
-        for (int i_index = 0; i_index < p_item->list_count; i_index++) {
-            NSString *o_text;
-            if (p_item->list_text && p_item->list_text[i_index])
-                o_text = _NS((char *)p_item->list_text[i_index]);
-            else
-                o_text = _NS((char *)p_item->list.psz[i_index]);
-            [o_popup addItemWithTitle: o_text];
-
-            /* select default item */
-            if (!p_item->value.psz && !p_item->list.psz[i_index])
-                [o_popup selectItemAtIndex: i_index];
-            else if (p_item->value.psz && p_item->list.psz[i_index] &&
-                     !strcmp(p_item->value.psz, p_item->list.psz[i_index]))
-                [o_popup selectItemAtIndex: i_index];
-        }
+        [self resetValues];
 
         [self addSubview: o_popup];
     }
@@ -1056,27 +1049,41 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
 
 - (char *)stringValue
 {
-    if ([o_popup indexOfSelectedItem] >= 0) {
-        if (p_item->list.psz[[o_popup indexOfSelectedItem]] != NULL)
-            return strdup(p_item->list.psz[[o_popup indexOfSelectedItem]]);
-    }
+    if ([o_popup indexOfSelectedItem] < 0)
+        return NULL;
 
-    return NULL;
+    NSString *o_data = [[o_popup selectedItem] representedObject];
+    return strdup([o_data UTF8String]);
 }
 
 - (void)resetValues
 {
+    [o_popup removeAllItems];
+
     char *psz_value = config_GetPsz(VLCIntf, p_item->psz_name);
 
-    for (int i_index = 0; i_index < p_item->list_count; i_index++) {
-        if (!psz_value && !p_item->list.psz[i_index])
-            [o_popup selectItemAtIndex: i_index];
-        else if (psz_value && p_item->list.psz[i_index] &&
-            !strcmp(psz_value, p_item->list.psz[i_index]))
-            [o_popup selectItemAtIndex: i_index];
+    char **values, **texts;
+    ssize_t count = config_GetPszChoices(VLC_OBJECT(VLCIntf), p_item->psz_name,
+                                         &values, &texts);
+    for (ssize_t i = 0; i < count && texts; i++) {
+        if (texts[i] == NULL || values[i] == NULL)
+            continue;
+
+        [o_popup addItemWithTitle: toNSStr(texts[i])];
+        NSMenuItem *lastItem = [o_popup lastItem];
+        [lastItem setRepresentedObject: toNSStr(values[i])];
+
+        if (!strcmp(psz_value ? psz_value : "", values[i]))
+            [o_popup selectItem: [o_popup lastItem]];
+
+        free(texts[i]);
+        free(values[i]);
     }
+    free(texts);
+    free(values);
 
     free(psz_value);
+
     [super resetValues];
 }
 @end
@@ -1253,30 +1260,20 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     for (i_module_index = 0; i_module_index < count; i_module_index++) {
         p_parser = p_list[i_module_index];
 
-        if (p_item->i_type == CONFIG_ITEM_MODULE) {
-            if (module_provides(p_parser, p_item->psz_type)) {
+        if (module_is_main(p_parser))
+            continue;
+
+        unsigned int confsize;
+        module_config_t *p_config = module_config_get(p_parser, &confsize);
+        for (size_t i = 0; i < confsize; i++) {
+            module_config_t *p_cfg = p_config + i;
+            /* Hack: required subcategory is stored in i_min */
+            if (p_cfg->i_type == CONFIG_SUBCATEGORY &&
+                p_cfg->value.i == p_cfg->min.i) {
                 NSString *o_description = _NS(module_get_name(p_parser, TRUE));
                 if ([newval isEqualToString: o_description]) {
                     returnval = strdup(module_get_object(p_parser));
                     break;
-                }
-            }
-        } else {
-            if (module_is_main(p_parser))
-                continue;
-
-            unsigned int confsize;
-            module_config_t *p_config = module_config_get(p_parser, &confsize);
-            for (size_t i = 0; i < confsize; i++) {
-                module_config_t *p_cfg = p_config + i;
-                /* Hack: required subcategory is stored in i_min */
-                if (p_cfg->i_type == CONFIG_SUBCATEGORY &&
-                    p_cfg->value.i == p_cfg->min.i) {
-                    NSString *o_description = _NS(module_get_name(p_parser, TRUE));
-                    if ([newval isEqualToString: o_description]) {
-                        returnval = strdup(module_get_object(p_parser));
-                        break;
-                    }
                 }
             }
             module_config_free(p_config);
@@ -1300,39 +1297,25 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     for (size_t i_index = 0; i_index < count; i_index++) {
         p_parser = p_list[i_index];
 
-        if (p_item->i_type == CONFIG_ITEM_MODULE) {
-            if (module_provides(p_parser, p_item->psz_type)) {
+        if (module_is_main(p_parser))
+            continue;
+        unsigned int confsize;
+
+        module_config_t *p_configlist = module_config_get(p_parser, &confsize);
+        for (size_t i = 0; i < confsize; i++) {
+            module_config_t *p_config = &p_configlist[i];
+            /* Hack: required subcategory is stored in i_min */
+            if (p_config->i_type == CONFIG_SUBCATEGORY &&
+                p_config->value.i == p_item->min.i) {
                 NSString *o_description = _NS(module_get_name(p_parser, TRUE));
                 [o_popup addItemWithTitle: o_description];
-                char *psz_value = config_GetPsz(VLCIntf, p_item->psz_name);
 
-                if (psz_value &&
-                    !strcmp(psz_value, module_get_object(p_parser)))
+                if (p_item->value.psz && !strcmp(p_item->value.psz,
+                                                 module_get_object(p_parser)))
                     [o_popup selectItem:[o_popup lastItem]];
-
-                free(psz_value);
             }
-        } else {
-            if (module_is_main(p_parser))
-                continue;
-            unsigned int confsize;
-
-            module_config_t *p_configlist = module_config_get(p_parser, &confsize);
-            for (size_t i = 0; i < confsize; i++) {
-                module_config_t *p_config = &p_configlist[i];
-                /* Hack: required subcategory is stored in i_min */
-                if (p_config->i_type == CONFIG_SUBCATEGORY &&
-                    p_config->value.i == p_item->min.i) {
-                    NSString *o_description = _NS(module_get_name(p_parser, TRUE));
-                    [o_popup addItemWithTitle: o_description];
-
-                    if (p_item->value.psz && !strcmp(p_item->value.psz,
-                                            module_get_object(p_parser)))
-                        [o_popup selectItem:[o_popup lastItem]];
-                }
-            }
-            module_config_free(p_configlist);
         }
+        module_config_free(p_configlist);
     }
     module_list_free(p_list);
     [super resetValues];
