@@ -83,7 +83,7 @@ static void OpenglSwap (vlc_gl_t *gl);
 vlc_module_begin ()
     /* Will be loaded even without interface module. see voutgl.m */
     set_shortname ("Mac OS X")
-    set_description (N_("Mac OS X OpenGL video output (requires drawable-nsobject)"))
+    set_description (N_("Mac OS X OpenGL video output"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("vout display", 300)
