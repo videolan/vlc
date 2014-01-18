@@ -450,28 +450,47 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
 
     [object removeAllItems];
     p_item = config_FindConfig(VLC_OBJECT(p_intf), name);
-
     /* serious problem, if no item found */
     assert(p_item);
 
-    for (int i = 0; i < p_item->list_count; i++) {
-        NSMenuItem *mi;
-        if (p_item->list_text != NULL)
-            mi = [[NSMenuItem alloc] initWithTitle: _NS(p_item->list_text[i]) action:NULL keyEquivalent: @""];
-        else if (p_item->list.psz[i] && strcmp(p_item->list.psz[i],"") == 0) {
-            [[object menu] addItem: [NSMenuItem separatorItem]];
-            continue;
-        }
-        else if (p_item->list.psz[i])
-            mi = [[NSMenuItem alloc] initWithTitle: [NSString stringWithUTF8String:p_item->list.psz[i]] action:NULL keyEquivalent: @""];
-        else
-            msg_Err(p_intf, "item %d of pref %s failed to be created", i, name);
-        [mi setRepresentedObject:[NSString stringWithUTF8String:p_item->list.psz[i]]];
-        [[object menu] addItem: [mi autorelease]];
-        if (p_item->value.psz && !strcmp(p_item->value.psz, p_item->list.psz[i]))
-            [object selectItem:[object lastItem]];
+    char **values, **texts;
+    ssize_t count = config_GetPszChoices(VLC_OBJECT(VLCIntf), name,
+                                         &values, &texts);
+    if (count < 0) {
+        msg_Err(p_intf, "Cannot get choices for %s", name);
+        return;
     }
-    [object setToolTip: _NS(p_item->psz_longtext)];
+    for (ssize_t i = 0; i < count && texts; i++) {
+        if (texts[i] == NULL || values[i] == NULL)
+            continue;
+
+        if (strcmp(texts[i], "") != 0) {
+            NSMenuItem *mi = [[NSMenuItem alloc] initWithTitle: toNSStr(texts[i]) action: NULL keyEquivalent: @""];
+            [mi setRepresentedObject: toNSStr(values[i])];
+            [[object menu] addItem: [mi autorelease]];
+
+            if (p_item->value.psz && !strcmp(p_item->value.psz, values[i]))
+                [object selectItem: [object lastItem]];
+            
+        } else {
+            [[object menu] addItem: [NSMenuItem separatorItem]];
+        }
+
+        free(texts[i]);
+        free(values[i]);
+    }
+
+    free(texts);
+    free(values);
+
+    if (p_item->psz_longtext)
+        [object setToolTip: _NS(p_item->psz_longtext)];
+}
+
+// just for clarification that this is a module list
+- (void)setupButton: (NSPopUpButton *)object forModuleList: (const char *)name
+{
+    [self setupButton: object forStringList: name];
 }
 
 - (void)setupButton: (NSPopUpButton *)object forIntList: (const char *)name
@@ -497,36 +516,6 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
         if (p_item->value.i == p_item->list.i[i])
             [object selectItem:[object lastItem]];
     }
-    [object setToolTip: _NS(p_item->psz_longtext)];
-}
-
-- (void)setupButton: (NSPopUpButton *)object forModuleList: (const char *)name
-{
-    module_config_t *p_item;
-    module_t *p_parser, **p_list;
-    int y = 0;
-
-    [object removeAllItems];
-
-    p_item = config_FindConfig(VLC_OBJECT(p_intf), name);
-    size_t count;
-    p_list = module_list_get(&count);
-    if (!p_item ||!p_list) {
-        if (p_list) module_list_free(p_list);
-        msg_Err(p_intf, "serious problem, item or list not found");
-        return;
-    }
-
-    [object addItemWithTitle: _NS("Default")];
-    for (size_t i_index = 0; i_index < count; i_index++) {
-        p_parser = p_list[i_index];
-        if (module_provides(p_parser, p_item->psz_type)) {
-            [object addItemWithTitle: [NSString stringWithUTF8String:_(module_GetLongName(p_parser)) ?: ""]];
-            if (p_item->value.psz && !strcmp(p_item->value.psz, module_get_name(p_parser, false)))
-                [object selectItem: [object lastItem]];
-        }
-    }
-    module_list_free(p_list);
     [object setToolTip: _NS(p_item->psz_longtext)];
 }
 
@@ -890,42 +879,9 @@ static inline void save_int_list(intf_thread_t * p_intf, id object, const char *
 static inline void save_string_list(intf_thread_t * p_intf, id object, const char * name)
 {
     NSString *p_stringobject;
-    module_config_t *p_item;
-    p_item = config_FindConfig(VLC_OBJECT(p_intf), name);
     p_stringobject = (NSString *)[[object selectedItem] representedObject];
     assert([p_stringobject isKindOfClass:[NSString class]]);
-    if (p_stringobject) {
-        config_PutPsz(p_intf, name, [p_stringobject UTF8String]);
-    }
-}
-
-static inline void save_module_list(intf_thread_t * p_intf, id object, const char * name)
-{
-    module_config_t *p_item;
-    module_t *p_parser, **p_list;
-    NSString * objectTitle = [[object selectedItem] title];
-
-    p_item = config_FindConfig(VLC_OBJECT(p_intf), name);
-
-    size_t count;
-    p_list = module_list_get(&count);
-    for (size_t i_module_index = 0; i_module_index < count; i_module_index++) {
-        p_parser = p_list[i_module_index];
-
-        if (p_item->i_type == CONFIG_ITEM_MODULE && module_provides(p_parser, p_item->psz_type)) {
-            if ([objectTitle isEqualToString: _NS(module_GetLongName(p_parser))]) {
-                config_PutPsz(p_intf, name, module_get_name(p_parser, false));
-                break;
-            }
-        }
-    }
-    module_list_free(p_list);
-    if ([objectTitle isEqualToString: _NS("Default")]) {
-        if (!strcmp(name, "vout"))
-            config_PutPsz(p_intf, name, "");
-        else
-            config_PutPsz(p_intf, name, "none");
-    }
+    config_PutPsz(p_intf, name, [p_stringobject UTF8String]);
 }
 
 - (void)saveChangedSettings
@@ -936,8 +892,7 @@ static inline void save_module_list(intf_thread_t * p_intf, id object, const cha
 #define SaveIntList(object, name) save_int_list(p_intf, object, name)
 
 #define SaveStringList(object, name) save_string_list(p_intf, object, name)
-
-#define SaveModuleList(object, name) save_module_list(p_intf, object, name)
+#define SaveModuleList(object, name) SaveStringList(object, name)
 
 #define getString(name) [NSString stringWithFormat:@"%s", config_GetPsz(p_intf, name)]
 
