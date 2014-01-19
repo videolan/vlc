@@ -602,9 +602,9 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
         sys->fb_cmap.start = 0;
         sys->fb_cmap.len = 256;
         sys->fb_cmap.red = sys->palette;
-        sys->fb_cmap.green = sys->palette + 256 * sizeof(uint16_t);
-        sys->fb_cmap.blue = sys->palette + 2 * 256 * sizeof(uint16_t);
-        sys->fb_cmap.transp = sys->palette + 3 * 256 * sizeof(uint16_t);
+        sys->fb_cmap.green = sys->palette + 256;
+        sys->fb_cmap.blue = sys->palette + 2 * 256;
+        sys->fb_cmap.transp = sys->palette + 3 * 256;
 
         /* Save the colormap */
         ioctl(sys->fd, FBIOGETCMAP, &sys->fb_cmap);
