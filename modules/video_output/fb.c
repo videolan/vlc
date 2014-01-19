@@ -591,7 +591,7 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
 
     switch (sys->var_info.bits_per_pixel) {
     case 8:
-        sys->palette = malloc(8 * 256 * sizeof(uint16_t));
+        sys->palette = malloc(4 * 256 * sizeof(uint16_t));
         if (!sys->palette) {
             /* Restore fb config */
             ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->old_info);
