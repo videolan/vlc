@@ -358,6 +358,9 @@ static bool GetUpdateFile( update_t *p_update )
     else
     {
         msg_Info( p_update->p_libvlc, "Status file authenticated" );
+        free( p_hash );
+        free( psz_version_line );
+        free( psz_update_data );
         return true;
     }
 
