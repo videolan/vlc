@@ -51,10 +51,10 @@ static void FilterS32N (audio_volume_t *vol, block_t *block, float volume)
     for (size_t n = block->i_buffer / sizeof (*p); n > 0; n--)
     {
         int64_t s = *p * (int64_t)mult;
-        if (s >= (INT32_MAX << INT64_C(24)))
+        if (s >= ((int64_t)INT32_MAX << INT64_C(24)))
             *p = INT32_MAX;
         else
-        if (s < (INT32_MIN << INT64_C(24)))
+        if (s < ((int64_t)INT32_MIN << INT64_C(24)))
             *p = INT32_MIN;
         else
             *p = s >> INT64_C(24);
