@@ -93,7 +93,7 @@ int PLItem::id( int type )
         return i_playlist_id;
     default:
     case MLMEDIA_ID:
-        assert( NULL );
+        assert( 0 );
         return -1;
     }
 }
