@@ -566,7 +566,7 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
         }
 
         /* Print name of module */
-        printf(color ? "\n " GREEN "%s" GRAY " (%s)\n" : "\n %s\n",
+        printf(color ? "\n " GREEN "%s" GRAY " (%s)\n" : "\n %s (%s)\n",
                module_gettext(m, m->psz_longname), objname);
         if (m->psz_help != NULL)
             printf(color ? CYAN" %s\n"GRAY : " %s\n",
