@@ -319,6 +319,7 @@ private:
     int i_mouse_last_move_y;
 
     bool isWideFSC;
+    int i_sensitivity;
 };
 
 #endif
