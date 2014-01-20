@@ -846,6 +846,7 @@ void VLCMenuBar::PopupMenuPlaylistEntries( QMenu *menu,
     action->setIcon( QIcon( ":/toolbar/record" ) );
     if( !p_input )
         action->setEnabled( false );
+    action->setData( ACTION_NO_CLEANUP + ACTION_DELETE_ON_REBUILD );
     menu->addSeparator();
 }
 
