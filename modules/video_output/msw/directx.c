@@ -57,7 +57,7 @@
 #endif
 
 #ifdef UNICODE
-# define DIRECTDRAWENUMERATEEX_NAME "DirectDrawEnumerateExW"
+# define DIRECTDRAWENUMERATEEX_NAME "DirectDrawEnumerateExA"
 #else
 # define DIRECTDRAWENUMERATEEX_NAME "DirectDrawEnumerateExA"
 #endif
@@ -453,8 +453,8 @@ static BOOL WINAPI DirectXOpenDDrawCallback(GUID *guid, LPTSTR desc,
     if (!hmon)
         return TRUE;
 
-    char *psz_drivername = FromT(drivername);
-    char *psz_desc = FromT(desc);
+    char *psz_drivername = (char*)drivername;
+    char *psz_desc = (char*)desc;
 
     msg_Dbg(vd, "DirectXEnumCallback: %s, %s", psz_desc, psz_drivername);
 
@@ -493,8 +493,6 @@ static BOOL WINAPI DirectXOpenDDrawCallback(GUID *guid, LPTSTR desc,
             *sys->display_driver = *guid;
     }
 
-    free(psz_drivername);
-    free(psz_desc);
     return TRUE;
 }
 /**
@@ -1420,7 +1418,7 @@ static BOOL WINAPI DirectXEnumCallback2(GUID *guid, LPTSTR desc,
 
     VLC_UNUSED(guid); VLC_UNUSED(desc); VLC_UNUSED(hmon);
 
-    char *psz_drivername = FromT(drivername);
+    char *psz_drivername = (char*)(drivername);
     ctx->values = xrealloc(ctx->values, (ctx->count + 1) * sizeof(char *));
     ctx->descs = xrealloc(ctx->descs, (ctx->count + 1) * sizeof(char *));
 
@@ -1428,7 +1426,6 @@ static BOOL WINAPI DirectXEnumCallback2(GUID *guid, LPTSTR desc,
     ctx->descs[ctx->count] = strdup(psz_drivername);
     ctx->count++;
 
-    free(psz_drivername);
     return TRUE; /* Keep enumerating */
 }
 
