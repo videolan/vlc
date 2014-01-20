@@ -190,7 +190,7 @@ void SoundWidget::showVolumeMenu( QPoint pos )
 void SoundWidget::setMuted( bool mute )
 {
     b_is_muted = mute;
-    playlist_t *p_playlist = pl_Get( p_intf );
+    playlist_t *p_playlist = THEPL;
     playlist_MuteSet( p_playlist, mute );
 }
 

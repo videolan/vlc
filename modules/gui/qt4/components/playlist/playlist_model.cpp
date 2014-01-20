@@ -965,7 +965,7 @@ void PLModel::renameNode( QModelIndex index, QString name )
     if ( !index.isValid() ) index = rootIndex();
     input_item_t* p_input = this->getInputItem( index );
     input_item_SetName( p_input, qtu( name ) );
-    playlist_t *p_playlist = pl_Get( p_intf );
+    playlist_t *p_playlist = THEPL;
     input_item_WriteMeta( VLC_OBJECT(p_playlist), p_input );
     PL_UNLOCK;
 }

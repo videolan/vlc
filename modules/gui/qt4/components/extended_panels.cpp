@@ -398,7 +398,7 @@ static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_
     /* Try to set on the fly */
     if( !strcmp( psz_filter_type, "video-splitter" ) )
     {
-        playlist_t *p_playlist = pl_Get( p_intf );
+        playlist_t *p_playlist = THEPL;
         var_SetString( p_playlist, psz_filter_type, psz_string );
     }
     else
@@ -714,7 +714,7 @@ void ExtV4l2::showEvent( QShowEvent *event )
 
 void ExtV4l2::Refresh( void )
 {
-    vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( pl_Get(p_intf), "v4l2" );
+    vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( THEPL, "v4l2" );
     help->hide();
     if( box )
     {
@@ -877,7 +877,7 @@ void ExtV4l2::ValueChange( bool value )
 void ExtV4l2::ValueChange( int value )
 {
     QObject *s = sender();
-    vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( pl_Get(p_intf), "v4l2" );
+    vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( THEPL, "v4l2" );
     if( p_obj )
     {
         QString var = s->objectName();

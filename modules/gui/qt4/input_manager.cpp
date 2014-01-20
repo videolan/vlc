@@ -987,7 +987,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
               im, setInput( input_thread_t * ) );
 
     /* initialize p_input (an input can already be running) */
-    p_input = playlist_CurrentInput( pl_Get(p_intf) );
+    p_input = playlist_CurrentInput( THEPL );
     if( p_input )
         emit inputChanged( p_input );
 
@@ -1055,7 +1055,7 @@ void MainInputManager::customEvent( QEvent *event )
 
     if( p_input != NULL )
         vlc_object_release( p_input );
-    p_input = playlist_CurrentInput( pl_Get(p_intf) );
+    p_input = playlist_CurrentInput( THEPL );
     emit inputChanged( p_input );
 }
 

@@ -334,7 +334,7 @@ static void Abort( void *obj )
 
 static void RegisterIntf( intf_thread_t *p_this )
 {
-    playlist_t *pl = pl_Get(p_this);
+    playlist_t *pl = p_this->p_sys->p_playlist;
     var_Create (pl, "qt4-iface", VLC_VAR_ADDRESS);
     var_SetAddress (pl, "qt4-iface", p_this);
     var_Create (pl, "window", VLC_VAR_STRING);
@@ -371,6 +371,12 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     p_intf->p_sys->b_isDialogProvider = isDialogProvider;
     p_sys->p_mi = NULL;
     p_sys->pl_model = NULL;
+
+    /* set up the playlist to work on */
+    if( isDialogProvider )
+        p_intf->p_sys->p_playlist = pl_Get( (intf_thread_t *)p_intf->p_parent );
+    else
+        p_intf->p_sys->p_playlist = pl_Get( p_intf );
 
     /* */
     vlc_sem_init (&ready, 0);
@@ -420,7 +426,7 @@ static void Close( vlc_object_t *p_this )
 
     if( !p_sys->b_isDialogProvider )
     {
-        playlist_t *pl = pl_Get(p_intf);
+        playlist_t *pl = THEPL;
 
         var_Destroy (pl, "window");
         var_Destroy (pl, "qt4-iface");

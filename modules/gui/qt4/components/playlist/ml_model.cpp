@@ -459,7 +459,7 @@ static void AddItemToPlaylist( int i_media_id, bool bPlay, media_library_t* p_ml
                  i_media_id );
         return;
     }
-    playlist_t *p_playlist = pl_Get( p_ml );
+    playlist_t *p_playlist = THEPL;
     playlist_item_t *p_playlist_item = NULL;
 
     playlist_Lock( p_playlist );
