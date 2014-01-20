@@ -503,20 +503,23 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     /* serious problem, if no item found */
     assert(p_item);
 
-    for (int i = 0; i < p_item->list_count; i++) {
-        NSMenuItem *mi;
-        if (p_item->list_text != NULL)
-            mi = [[NSMenuItem alloc] initWithTitle: _NS(p_item->list_text[i]) action:NULL keyEquivalent: @""];
-        else if (p_item->list.i[i])
-            mi = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%d", p_item->list.i[i]] action:NULL keyEquivalent: @""];
-        else
-            msg_Err(p_intf, "item %d of pref %s failed to be created", i, name);
-        [mi setRepresentedObject:[NSNumber numberWithInt:p_item->list.i[i]]];
+    int64_t *values;
+    char **texts;
+    ssize_t count = config_GetIntChoices(VLC_OBJECT(VLCIntf), name, &values, &texts);
+    for (ssize_t i = 0; i < count; i++) {
+        NSMenuItem *mi = [[NSMenuItem alloc] initWithTitle: toNSStr(texts[i]) action: NULL keyEquivalent: @""];
+        [mi setRepresentedObject:[NSNumber numberWithInt:values[i]]];
         [[object menu] addItem: [mi autorelease]];
-        if (p_item->value.i == p_item->list.i[i])
+
+        if (p_item->value.i == values[i])
             [object selectItem:[object lastItem]];
+
+        free(texts[i]);
     }
-    [object setToolTip: _NS(p_item->psz_longtext)];
+    free(texts);
+
+    if (p_item->psz_longtext)
+        [object setToolTip: _NS(p_item->psz_longtext)];
 }
 
 - (void)setupButton: (NSButton *)object forBoolValue: (const char *)name
@@ -869,8 +872,6 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
 static inline void save_int_list(intf_thread_t * p_intf, id object, const char * name)
 {
     NSNumber *p_valueobject;
-    module_config_t *p_item;
-    p_item = config_FindConfig(VLC_OBJECT(p_intf), name);
     p_valueobject = (NSNumber *)[[object selectedItem] representedObject];
     assert([p_valueobject isKindOfClass:[NSNumber class]]);
     if (p_valueobject) config_PutInt(p_intf, name, [p_valueobject intValue]);
