@@ -1424,8 +1424,8 @@ static BOOL WINAPI DirectXEnumCallback2(GUID *guid, LPTSTR desc,
     ctx->values = xrealloc(ctx->values, (ctx->count + 1) * sizeof(char *));
     ctx->descs = xrealloc(ctx->descs, (ctx->count + 1) * sizeof(char *));
 
-    ctx->values[ctx->count] = psz_drivername;
-    ctx->descs[ctx->count] = psz_drivername;
+    ctx->values[ctx->count] = strdup(psz_drivername);
+    ctx->descs[ctx->count] = strdup(psz_drivername);
     ctx->count++;
 
     free(psz_drivername);
