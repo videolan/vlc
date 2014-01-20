@@ -504,9 +504,9 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
     p_intf->p_sys->filepath = dir;
 
     const char *scheme = "directory";
-    if( dir.endsWith( "VIDEO_TS", Qt::CaseInsensitive ) )
+    if( dir.endsWith( DIR_SEP "VIDEO_TS", Qt::CaseInsensitive ) )
         scheme = "dvd";
-    else if( dir.endsWith( "BDMV", Qt::CaseInsensitive ) )
+    else if( dir.endsWith( DIR_SEP "BDMV", Qt::CaseInsensitive ) )
     {
         scheme = "bluray";
         dir.remove( "BDMV" );
@@ -539,9 +539,9 @@ QString DialogsProvider::getDirectoryDialog()
     p_intf->p_sys->filepath = dir;
 
     const char *scheme = "directory";
-    if( dir.endsWith( "/VIDEO_TS", Qt::CaseInsensitive ) )
+    if( dir.endsWith( DIR_SEP "VIDEO_TS", Qt::CaseInsensitive ) )
         scheme = "dvd";
-    else if( dir.endsWith( "/BDMV", Qt::CaseInsensitive ) )
+    else if( dir.endsWith( DIR_SEP "BDMV", Qt::CaseInsensitive ) )
     {
         scheme = "bluray";
         dir.remove( "BDMV" );
