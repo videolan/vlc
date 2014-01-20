@@ -729,7 +729,6 @@ void VlcProc::init_variables()
 
 void VlcProc::update_current_input()
 {
-    playlist_t* pPlaylist = getIntf()->p_sys->p_playlist;
     input_thread_t* pInput = getIntf()->p_sys->p_input;
     if( !pInput )
         return;
