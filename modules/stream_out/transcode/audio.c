@@ -52,7 +52,8 @@ static int audio_update_format( decoder_t *p_dec )
     return 0;
 }
 
-static int transcode_audio_initialize_filters( sout_stream_t *p_stream, sout_stream_id_t *id, sout_stream_sys_t *p_sys, audio_sample_format_t *fmt_last )
+static int transcode_audio_initialize_filters( sout_stream_t *p_stream, sout_stream_id_t *id,
+                                               sout_stream_sys_t *p_sys, audio_sample_format_t *fmt_last )
 {
     /* Load user specified audio filters */
     /* XXX: These variable names come kinda out of nowhere... */
@@ -95,7 +96,8 @@ static int transcode_audio_initialize_encoder( sout_stream_id_t *id, sout_stream
         module_need( id->p_encoder, "encoder", p_sys->psz_aenc, true );
     if( !id->p_encoder->p_module )
     {
-        msg_Err( p_stream, "cannot find audio encoder (module:%s fourcc:%4.4s). Take a look few lines earlier to see possible reason.",
+        msg_Err( p_stream, "cannot find audio encoder (module:%s fourcc:%4.4s). "
+                           "Take a look few lines earlier to see possible reason.",
                  p_sys->psz_aenc ? p_sys->psz_aenc : "any",
                  (char *)&p_sys->i_acodec );
         module_unneed( id->p_decoder, id->p_decoder->p_module );
@@ -138,7 +140,6 @@ int transcode_audio_new( sout_stream_t *p_stream,
     id->p_decoder->pf_decode_audio = NULL;
     id->p_decoder->pf_aout_format_update = audio_update_format;
     /* id->p_decoder->p_cfg = p_sys->p_audio_cfg; */
-
     id->p_decoder->p_module =
         module_need( id->p_decoder, "decoder", "$codec", false );
     if( !id->p_decoder->p_module )
@@ -160,9 +161,10 @@ int transcode_audio_new( sout_stream_t *p_stream,
      * Open encoder
      */
     if( transcode_audio_initialize_encoder( id, p_stream ) == VLC_EGENERIC )
-	return VLC_EGENERIC;
+        return VLC_EGENERIC;
 
-    if( unlikely( transcode_audio_initialize_filters( p_stream, id, p_sys, &fmt_last ) != VLC_SUCCESS ) )
+    if( unlikely( transcode_audio_initialize_filters( p_stream, id, p_sys,
+                                                      &fmt_last ) != VLC_SUCCESS ) )
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;
@@ -210,7 +212,6 @@ int transcode_audio_process( sout_stream_t *p_stream,
     while( (p_audio_buf = id->p_decoder->pf_decode_audio( id->p_decoder,
                                                           &in )) )
     {
-
         if( unlikely( !id->p_encoder->p_module ) )
         {
             /* Complete destination format */
@@ -235,11 +236,12 @@ int transcode_audio_process( sout_stream_t *p_stream,
                 msg_Err( p_stream, "cannot create audio chain" );
                 return VLC_EGENERIC;
             }
-            if( unlikely( transcode_audio_initialize_filters( p_stream, id, p_sys, &id->p_decoder->fmt_out.audio ) != VLC_SUCCESS ) )
+            if( unlikely( transcode_audio_initialize_filters( p_stream, id, p_sys,
+                          &id->p_decoder->fmt_out.audio ) != VLC_SUCCESS ) )
                 return VLC_EGENERIC;
             date_Init( &id->interpolated_pts, id->p_decoder->fmt_out.audio.i_rate, 1 );
-
         }
+
         /* Check if audio format has changed, and filters need reinit */
         if( unlikely( ( id->p_decoder->fmt_out.audio.i_rate != p_sys->fmt_audio.i_rate ) ||
                       ( id->p_decoder->fmt_out.audio.i_physical_channels != p_sys->fmt_audio.i_physical_channels ) ) )
@@ -252,12 +254,12 @@ int transcode_audio_process( sout_stream_t *p_stream,
             id->p_decoder->fmt_out.audio.i_format = id->p_decoder->fmt_out.i_codec;
             aout_FormatPrepare( &id->p_decoder->fmt_out.audio );
 
-            if( transcode_audio_initialize_filters( p_stream, id, p_sys, &id->p_decoder->fmt_out.audio ) != VLC_SUCCESS )
+            if( transcode_audio_initialize_filters( p_stream, id, p_sys,
+                          &id->p_decoder->fmt_out.audio ) != VLC_SUCCESS )
                 return VLC_EGENERIC;
 
             /* Set interpolated_pts to run with new samplerate */
             date_Change( &id->interpolated_pts, p_sys->fmt_audio.i_rate, 1 );
-
         }
 
         if( p_sys->b_master_sync )
@@ -330,7 +332,7 @@ bool transcode_audio_add( sout_stream_t *p_stream, es_format_t *p_fmt,
             pi_channels_maps[id->p_encoder->fmt_out.audio.i_channels];
 
     /* Build decoder -> filter -> encoder chain */
-    if( transcode_audio_new( p_stream, id ) )
+    if( transcode_audio_new( p_stream, id ) == VLC_EGENERIC )
     {
         msg_Err( p_stream, "cannot create audio chain" );
         return false;

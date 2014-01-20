@@ -948,8 +948,6 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
 
             /* input calculated pts isn't necessary what pts output should be, so use output pts*/
             p_pic->date = date_Get( &id->next_output_pts );
-
-
         }
 
         /* Run the filter and output chains; first with the picture,
