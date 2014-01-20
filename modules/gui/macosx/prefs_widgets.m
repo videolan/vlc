@@ -1446,17 +1446,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
         [o_popup setAutoresizingMask:NSViewWidthSizable ];
 
         /* add items */
-        for (int i_index = 0; i_index < p_item->list_count; i_index++) {
-            NSString *o_text;
-            if (p_item->list_text && p_item->list_text[i_index])
-                o_text = _NS((char *)p_item->list_text[i_index]);
-            else
-                o_text = [NSString stringWithFormat: @"%i", p_item->list.i[i_index]];
-            [o_popup addItemWithTitle: o_text];
-
-            if (p_item->value.i == p_item->list.i[i_index])
-                [o_popup selectItemAtIndex: i_index];
-        }
+        [self resetValues];
         
         [self addSubview: o_popup];
     }
@@ -1485,19 +1475,33 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
 
 - (int)intValue
 {
-    if ([o_popup indexOfSelectedItem] >= 0)
-        return p_item->list.i[[o_popup indexOfSelectedItem]];
-    else
-        return [o_popup intValue];
+    NSNumber *p_valueobject = (NSNumber *)[[o_popup selectedItem] representedObject];
+    if (p_valueobject) {
+        assert([p_valueobject isKindOfClass:[NSNumber class]]);
+        return [p_valueobject intValue];
+    } else
+        return 0;
 }
 
 -(void)resetValues
 {
-    for (int i_index = 0; i_index < p_item->list_count; i_index++) {
-        if (config_GetInt(VLCIntf, p_item->psz_name) == p_item->list.i[i_index])
-            [o_popup selectItemAtIndex: i_index];
-    }
+    [o_popup removeAllItems];
 
+    int i_current_selection = config_GetInt(VLCIntf, p_item->psz_name);
+    int64_t *values;
+    char **texts;
+    ssize_t count = config_GetIntChoices(VLC_OBJECT(VLCIntf), p_item->psz_name, &values, &texts);
+    for (ssize_t i = 0; i < count; i++) {
+        NSMenuItem *mi = [[NSMenuItem alloc] initWithTitle: toNSStr(texts[i]) action: NULL keyEquivalent: @""];
+        [mi setRepresentedObject:[NSNumber numberWithInt:values[i]]];
+        [[o_popup menu] addItem: [mi autorelease]];
+
+        if (i_current_selection == values[i])
+            [o_popup selectItem:[o_popup lastItem]];
+
+        free(texts[i]);
+    }
+    free(texts);
 }
 @end
 
