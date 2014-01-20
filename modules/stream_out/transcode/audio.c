@@ -346,14 +346,22 @@ bool transcode_audio_add( sout_stream_t *p_stream, es_format_t *p_fmt,
         return false;
     }
 
-    module_unneed( id->p_encoder, id->p_encoder->p_module );
-    if( id->p_encoder->fmt_out.p_extra )
+    /* Reinit encoder again later on, when all information from decoders
+     * is available. */
+    if( id->p_encoder->p_module )
     {
-        free( id->p_encoder->fmt_out.p_extra );
-        id->p_encoder->fmt_out.p_extra = NULL;
-        id->p_encoder->fmt_out.i_extra = 0;
+        module_unneed( id->p_encoder, id->p_encoder->p_module );
+        id->p_encoder->p_module = NULL;
+        if( id->p_encoder->fmt_out.p_extra )
+        {
+            free( id->p_encoder->fmt_out.p_extra );
+            id->p_encoder->fmt_out.p_extra = NULL;
+            id->p_encoder->fmt_out.i_extra = 0;
+        }
+        if( id->p_af_chain != NULL )
+            aout_FiltersDelete( (vlc_object_t *)NULL, id->p_af_chain );
+        id->p_af_chain = NULL;
     }
-    id->p_encoder->p_module = NULL;
 
     date_Init( &id->interpolated_pts, p_fmt->audio.i_rate, 1 );
 
