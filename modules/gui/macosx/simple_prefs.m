@@ -871,18 +871,20 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
 
 static inline void save_int_list(intf_thread_t * p_intf, id object, const char * name)
 {
-    NSNumber *p_valueobject;
-    p_valueobject = (NSNumber *)[[object selectedItem] representedObject];
-    assert([p_valueobject isKindOfClass:[NSNumber class]]);
-    if (p_valueobject) config_PutInt(p_intf, name, [p_valueobject intValue]);
+    NSNumber *p_valueobject = (NSNumber *)[[object selectedItem] representedObject];
+    if (p_valueobject) {
+        assert([p_valueobject isKindOfClass:[NSNumber class]]);
+        config_PutInt(p_intf, name, [p_valueobject intValue]);
+    }
 }
 
 static inline void save_string_list(intf_thread_t * p_intf, id object, const char * name)
 {
-    NSString *p_stringobject;
-    p_stringobject = (NSString *)[[object selectedItem] representedObject];
-    assert([p_stringobject isKindOfClass:[NSString class]]);
-    config_PutPsz(p_intf, name, [p_stringobject UTF8String]);
+    NSString *p_stringobject = (NSString *)[[object selectedItem] representedObject];
+    if (p_stringobject) {
+        assert([p_stringobject isKindOfClass:[NSString class]]);
+        config_PutPsz(p_intf, name, [p_stringobject UTF8String]);
+    }
 }
 
 - (void)saveChangedSettings
