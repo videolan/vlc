@@ -161,6 +161,7 @@ static int Open(vlc_object_t *object)
     sys->use_desktop = var_CreateGetBool(vd, "video-wallpaper");
     sys->reset_device = false;
     sys->reopen_device = false;
+    sys->lost_not_ready = false;
     sys->allow_hw_yuv = var_CreateGetBool(vd, "directx-hw-yuv");
     sys->desktop_save.is_fullscreen = vd->cfg->is_fullscreen;
     sys->desktop_save.is_on_top     = false;
@@ -283,6 +284,11 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         if (hr == D3DERR_DEVICENOTRESET && !sys->reset_device) {
             vout_display_SendEventPicturesInvalid(vd);
             sys->reset_device = true;
+            sys->lost_not_ready = false;
+        }
+        if (hr == D3DERR_DEVICELOST && !sys->lost_not_ready) {
+            /* Device is lost but not yet ready for reset. */
+            sys->lost_not_ready = true;
         }
         return;
     }
@@ -308,6 +314,13 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 {
     vout_display_sys_t *sys = vd->sys;
     LPDIRECT3DDEVICE9 d3ddev = sys->d3ddev;
+
+    if (sys->lost_not_ready) {
+        picture_Release(picture);
+        if (subpicture)
+            subpicture_Delete(subpicture);
+        return;
+    }
 
     // Present the back buffer contents to the display
     // No stretching should happen here !

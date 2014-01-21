@@ -164,6 +164,7 @@ struct vout_display_sys_t
     /* */
     bool                    reset_device;
     bool                    reopen_device;
+    bool                    lost_not_ready;
     bool                    clear_scene;
 
     /* It protects the following variables */
