@@ -27,12 +27,12 @@ VLC Lua SD modules should define two functions:
 
 
 User defined modules stored in the share/lua/modules/ directory are
-available. Read the 'Two pass Initialization section'
+available. Read the 'Lazy initialization' section
 
 Available VLC specific Lua modules: input, msg, net, object, sd,
 strings, variables, stream, gettext, xml. See lua/README.txt.
 
-## Two pass Initialization
+## Lazy Initialization
 
 SD Lua scripts are actually ran in two different contexts/interpreters. One of
 them is the one that will call your main() and search() functions. The other one
@@ -51,8 +51,9 @@ lazily_loaded = false
 dkjson        = nil
 
 function lazy_load()
-  if lazily_loaded ~= false then return nil end
+  if lazily_loaded then return nil end
   dkjson = require("dkjson")
+  lazily_loaded = true
 end
 
 function descriptor()

@@ -19,7 +19,14 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]]
-require "simplexml"
+
+lazily_loaded = false
+
+function lazy_load()
+    if lazily_loaded then return nil end
+    require "simplexml"
+    lazily_loaded = true
+end
 
 function descriptor()
     return { title="Icecast Radio Directory" }
@@ -30,6 +37,7 @@ function dropnil(s)
 end
 
 function main()
+    lazy_load()
     local tree = simplexml.parse_url("http://dir.xiph.org/yp.xml")
     for _, station in ipairs( tree.children ) do
         simplexml.add_name_maps( station )
