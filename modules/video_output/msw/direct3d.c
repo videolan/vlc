@@ -160,7 +160,7 @@ static int Open(vlc_object_t *object)
 
     sys->use_desktop = var_CreateGetBool(vd, "video-wallpaper");
     sys->reset_device = false;
-    sys->reset_device = false;
+    sys->reopen_device = false;
     sys->allow_hw_yuv = var_CreateGetBool(vd, "directx-hw-yuv");
     sys->desktop_save.is_fullscreen = vd->cfg->is_fullscreen;
     sys->desktop_save.is_on_top     = false;
