@@ -316,6 +316,7 @@ static int FillDescriptor( services_discovery_t *p_sd,
 
     /* Create a new lua thread */
     lua_State *L = luaL_newstate();
+
     if( luaL_dofile( L, p_sys->psz_filename ) )
     {
         msg_Err( p_sd, "Error loading script %s: %s", p_sys->psz_filename,
@@ -366,11 +367,15 @@ static int FillDescriptor( services_discovery_t *p_sd,
                     break;
                 }
             }
+
+            lua_pop( L, 1 );
+
             if( !psz_iter )
                 msg_Warn( p_sd, "Services discovery capability '%s' unknown in "
                                 "script '%s'", psz_cap, p_sys->psz_filename );
         }
     }
+
     lua_pop( L, 1 );
     i_ret = VLC_SUCCESS;
 
