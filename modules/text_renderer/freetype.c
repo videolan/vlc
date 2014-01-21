@@ -1882,6 +1882,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->p_face           = 0;
     p_sys->p_library        = 0;
     p_sys->style.i_font_size      = 0;
+    p_sys->style.i_style_flags = 0;
 
     /*
      * The following variables should not be cached, as they might be changed on-the-fly:
