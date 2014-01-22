@@ -29,7 +29,12 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_picture_pool.h>
+#include <vlc_filter.h>
+
+#include <dlfcn.h>
+
 #include "../codec/omxil/android_opaque.h"
+#include "utils.h"
 
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
@@ -44,6 +49,16 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 vlc_module_end()
 
+extern JavaVM *myVm;
+extern jobject jni_LockAndGetSubtitlesSurface();
+extern void  jni_UnlockAndroidSurface();
+
+static const vlc_fourcc_t subpicture_chromas[] =
+{
+    VLC_CODEC_RGBA,
+    0
+};
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -55,7 +70,64 @@ static int              Control(vout_display_t *, int, va_list);
 struct vout_display_sys_t
 {
     picture_pool_t *pool;
+
+    void *p_library;
+    native_window_api_t native_window;
+
+    jobject jsurf;
+    ANativeWindow *window;
+
+    video_format_t fmt;
+
+    filter_t *p_spu_blend;
+    picture_t *subtitles_picture;
+
+    bool b_has_subpictures;
 };
+
+static void DisplaySubpicture(vout_display_t *vd, subpicture_t *subpicture)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    jobject jsurf = jni_LockAndGetSubtitlesSurface();
+    if (sys->window && jsurf != sys->jsurf)
+    {
+        sys->native_window.winRelease(sys->window);
+        sys->window = NULL;
+    }
+    sys->jsurf = jsurf;
+    if (!sys->window)
+    {
+        JNIEnv *p_env;
+        (*myVm)->AttachCurrentThread(myVm, &p_env, NULL);
+        sys->window = sys->native_window.winFromSurface(p_env, jsurf);
+        (*myVm)->DetachCurrentThread(myVm);
+    }
+
+    ANativeWindow_Buffer buf = { 0 };
+    sys->native_window.winLock(sys->window, &buf, NULL);
+
+    if (buf.width >= sys->fmt.i_width && buf.height >= sys->fmt.i_height)
+    {
+        /* Wrap the NativeWindow corresponding to the subtitles surface in a picture_t */
+        picture_t *picture = sys->subtitles_picture;
+        picture->p[0].p_pixels = (uint8_t*)buf.bits;
+        picture->p[0].i_lines = buf.height;
+        picture->p[0].i_pitch = picture->p[0].i_pixel_pitch * buf.stride;
+        /* Clear the subtitles surface. */
+        memset(picture->p[0].p_pixels, 0, picture->p[0].i_pitch * picture->p[0].i_lines);
+        if (subpicture)
+        {
+            /* Allocate a blending filter if needed. */
+            if (unlikely(!sys->p_spu_blend))
+                sys->p_spu_blend = filter_NewBlend(VLC_OBJECT(vd), &picture->format);
+            picture_BlendSubpicture(picture, sys->p_spu_blend, subpicture);
+        }
+    }
+
+    sys->native_window.unlockAndPost(sys->window);
+    jni_UnlockAndroidSurface();
+}
 
 static int  LockSurface(picture_t *);
 static void UnlockSurface(picture_t *);
@@ -78,6 +150,22 @@ static int Open(vlc_object_t *p_this)
     vout_display_sys_t *sys = (struct vout_display_sys_t*)calloc(1, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
+
+    sys->p_library = LoadNativeWindowAPI(&sys->native_window);
+    if (!sys->p_library)
+    {
+        free(sys);
+        msg_Err(vd, "Could not initialize NativeWindow API.");
+        return VLC_EGENERIC;
+    }
+    sys->fmt = fmt;
+    video_format_t subpicture_format = sys->fmt;
+    subpicture_format.i_chroma = VLC_CODEC_RGBA;
+    /* Create a RGBA picture for rendering subtitles. */
+    sys->subtitles_picture = picture_NewFromFormat(&subpicture_format);
+
+    /* Export the subpicture capability of this vout. */
+    vd->info.subpicture_chromas = subpicture_chromas;
 
     int i_pictures = POOL_SIZE;
     picture_t** pictures = calloc(sizeof(*pictures), i_pictures);
@@ -141,6 +229,12 @@ static void Close(vlc_object_t *p_this)
     vout_display_sys_t *sys = vd->sys;
 
     picture_pool_Delete(sys->pool);
+    if (sys->window)
+        sys->native_window.winRelease(sys->window);
+    dlclose(sys->p_library);
+    picture_Release(sys->subtitles_picture);
+    if (sys->p_spu_blend)
+        filter_DeleteBlend(sys->p_spu_blend);
     free(sys);
 }
 
@@ -172,12 +266,32 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     VLC_UNUSED(subpicture);
 
     picture_sys_t *p_picsys = picture->p_sys;
+    vout_display_sys_t *sys = vd->sys;
     void (*display_callback)(picture_sys_t*) = p_picsys->pf_display_callback;
     if (display_callback)
         display_callback(p_picsys);
 
+    if (subpicture)
+	sys->b_has_subpictures = true;
+    /* As long as no subpicture was received, do not call
+       DisplaySubpicture since JNI calls and clearing the subtitles
+       surface are expensive operations. */
+    if (sys->b_has_subpictures)
+    {
+	DisplaySubpicture(vd, subpicture);
+        if (!subpicture)
+        {
+            /* The surface has been cleared and there is no new
+               subpicture to upload, do not clear again until a new
+               subpicture is received. */
+            sys->b_has_subpictures = false;
+        }
+    }
+
     /* refcount lowers to 0, and pool_cfg.unlock is called */
     picture_Release(picture);
+    if (subpicture)
+        subpicture_Delete(subpicture);
 }
 
 static int Control(vout_display_t *vd, int query, va_list args)
