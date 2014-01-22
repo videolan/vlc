@@ -128,7 +128,7 @@ CCAS=$(CC) -c
 ifdef HAVE_IOS
 CC=xcrun clang
 CXX=xcrun clang++
-ifeq ($(ARCH), arm)
+ifdef HAVE_NEON
 AS=perl $(abspath ../../extras/tools/build/bin/gas-preprocessor.pl) $(CC)
 CCAS=gas-preprocessor.pl $(CC) -c
 else
