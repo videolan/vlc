@@ -4,6 +4,7 @@ set -e
 PLATFORM=OS
 VERBOSE=no
 SDK_VERSION=7.0
+SDK_MIN=5.1
 ARCH=armv7
 
 usage()
@@ -72,17 +73,10 @@ if [ "$VERBOSE" = "yes" ]; then
    out="/dev/stdout"
 fi
 
-if [ "$ARCH" = "armv7" ]; then
-SDK_MIN=5.1
-else
-SDK_MIN=7.0
-fi
-
 info "Building libvlc for iOS"
 
 if [ "$PLATFORM" = "Simulator" ]; then
-    TARGET="i686-apple-darwin11"
-    ARCH="i386"
+    TARGET="${ARCH}-apple-darwin11"
     OPTIM="-O3 -g"
 else
     TARGET="arm-apple-darwin11"
@@ -115,9 +109,6 @@ PREFIX="${VLCROOT}/install-ios-${PLATFORM}/${ARCH}"
 
 export PATH="${VLCROOT}/extras/tools/build/bin:${VLCROOT}/contrib/${TARGET}/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin"
 
-# contains gas-processor.pl
-export PATH=$PATH:${VLCROOT}/extras/package/ios/resources
-
 info "Building tools"
 spushd "${VLCROOT}/extras/tools"
 ./bootstrap
@@ -139,11 +130,14 @@ export STRIP="xcrun strip"
 export PLATFORM=$PLATFORM
 export SDK_VERSION=$SDK_VERSION
 
-CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -miphoneos-version-min=${SDK_MIN} ${OPTIM}"
-if [ "$ARCH" = "armv7" -o "$ARCH" = "armv7s" ]; then
-CFLAGS+=" -mcpu=cortex-a8"
+if [ "$PLATFORM" = "OS" ]; then
+export CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -miphoneos-version-min=${SDK_MIN} ${OPTIM}"
+if [ "$ARCH" != "arm64" ]; then
+export CFLAGS="${CFLAGS} -mcpu=cortex-a8"
 fi
-export CFLAGS
+else
+export CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -miphoneos-version-min=${SDK_MIN} ${OPTIM}"
+fi
 export CPPFLAGS="${CFLAGS}"
 export CXXFLAGS="${CFLAGS}"
 export OBJCFLAGS="${CFLAGS}"
@@ -161,8 +155,11 @@ fi
 export LDFLAGS="-L${SDKROOT}/usr/lib -arch ${ARCH} -isysroot ${SDKROOT} -miphoneos-version-min=${SDK_MIN}"
 
 if [ "$PLATFORM" = "OS" ]; then
-    EXTRA_CFLAGS="-arch ${ARCH} ${CFLAGS}"
-    EXTRA_LDFLAGS="-arch ${ARCH} ${LDFLAGS}"
+    EXTRA_CFLAGS="-arch ${ARCH}"
+if [ "$ARCH" != "arm64" ]; then
+    EXTRA_CFLAGS+=" -mcpu=cortex-a8"
+fi
+    EXTRA_LDFLAGS="-arch ${ARCH}"
 else
     EXTRA_CFLAGS="-arch ${ARCH}"
     EXTRA_LDFLAGS="-arch ${ARCH}"
@@ -180,15 +177,18 @@ mkdir -p "${VLCROOT}/contrib/iPhone${PLATFORM}-${ARCH}"
 cd "${VLCROOT}/contrib/iPhone${PLATFORM}-${ARCH}"
 
 if [ "$PLATFORM" = "OS" ]; then
-      export AS="gas-preprocessor.pl ${CC}"
-      export ASCPP="gas-preprocessor.pl ${CC}"
-      export CCAS="gas-preprocessor.pl ${CC}"
+    export AS="gas-preprocessor.pl ${CC}"
+    export ASCPP="gas-preprocessor.pl ${CC}"
+    export CCAS="gas-preprocessor.pl ${CC}"
+    if [ "$ARCH" = "arm64" ]; then
+        export GASPP_FIX_XCODE5=1
+    fi
 else
-  export AS="xcrun as"
-  export ASCPP="xcrun as"
+    export AS="xcrun as"
+    export ASCPP="xcrun as"
 fi
 
-../bootstrap --host=${TARGET} --build="i686-apple-darwin10" --prefix=${VLCROOT}/contrib/${TARGET}-${ARCH} --disable-gpl \
+../bootstrap --host=x86_64-apple-darwin11 --build=${TARGET} --prefix=${VLCROOT}/contrib/${TARGET}-${ARCH} --disable-gpl \
     --disable-disc --disable-sout \
     --disable-sdl \
     --disable-SDL_image \
@@ -218,8 +218,7 @@ fi
     --disable-fontconfig \
     --disable-gpg-error \
     --disable-lua \
-    --enable-taglib \
-    --disable-gnutls > ${out}
+    --enable-taglib > ${out}
 
 echo "EXTRA_CFLAGS += ${EXTRA_CFLAGS}" >> config.mak
 echo "EXTRA_LDFLAGS += ${EXTRA_LDFLAGS}" >> config.mak
@@ -267,7 +266,6 @@ ${VLCROOT}/configure \
     --disable-macosx-avfoundation \
     --enable-audioqueue \
     --enable-ios-audio \
-    --enable-ios-vout \
     --enable-ios-vout2 \
     --disable-shared \
     --enable-macosx-quartztext \
