@@ -15,6 +15,7 @@ $(TARBALLS)/harfbuzz-$(HARFBUZZ_VERSION).tar.bz2:
 harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.bz2 .sum-harfbuzz
 	$(UNPACK)
 	$(UPDATE_AUTOCONFIG)
+	$(APPLY) $(SRC)/harfbuzz/harfbuzz-aarch64.patch
 	$(MOVE)
 
 DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
