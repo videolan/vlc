@@ -752,7 +752,7 @@ void VLMWrapper::ControlBroadcast( const QString& name, int BroadcastStatus,
         command += " stop";
         break;
     case ControlBroadcastSeek:
-        command += " seek" + seek;
+        command += " seek " + QString::number( seek );
         break;
     }
     vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
