@@ -592,7 +592,7 @@ EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
             ((uint8_t*)p_enc->fmt_out.p_extra)[4] |= 0x80;
         }
         p_sys->i_headers++;
-        return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
+        return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
     }
 
     p_block = block_Alloc( bytes );
@@ -610,7 +610,7 @@ EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
 
     block_ChainAppend( &p_sys->p_chain, p_block );
 
-    return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
+    return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
 }
 /*****************************************************************************
  * EncoderMetadataCallback: called by libflac to output metadata
