@@ -46,7 +46,7 @@ static const int rate_values[] = { 192000, 176400,
     32000, 22050, 24000, 16000,
     11025, 8000, 4000
 };
-static const const char *rate_names[] = { N_("192000 Hz"), N_("176400 Hz"),
+static const char *const rate_names[] = { N_("192000 Hz"), N_("176400 Hz"),
     N_("96000 Hz"), N_("88200 Hz"), N_("48000 Hz"), N_("44100 Hz"),
     N_("32000 Hz"), N_("22050 Hz"), N_("24000 Hz"), N_("16000 Hz"),
     N_("11025 Hz"), N_("8000 Hz"), N_("4000 Hz")
