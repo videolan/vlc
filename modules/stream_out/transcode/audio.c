@@ -240,6 +240,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
                           &id->p_decoder->fmt_out.audio ) != VLC_SUCCESS ) )
                 return VLC_EGENERIC;
             date_Init( &id->interpolated_pts, id->p_decoder->fmt_out.audio.i_rate, 1 );
+            date_Set( &id->interpolated_pts, p_audio_buf->i_pts );
         }
 
         /* Check if audio format has changed, and filters need reinit */
@@ -259,7 +260,8 @@ int transcode_audio_process( sout_stream_t *p_stream,
                 return VLC_EGENERIC;
 
             /* Set interpolated_pts to run with new samplerate */
-            date_Change( &id->interpolated_pts, p_sys->fmt_audio.i_rate, 1 );
+            date_Init( &id->interpolated_pts, p_sys->fmt_audio.i_rate, 1 );
+            date_Set( &id->interpolated_pts, p_audio_buf->i_pts );
         }
 
         if( p_sys->b_master_sync )
