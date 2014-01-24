@@ -63,6 +63,7 @@ int CommonInit(vout_display_t *vd)
     sys->is_on_top = false;
 
     var_Create(vd, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+    var_Create(vd, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 
     /* */
     sys->event = EventThreadCreate(vd);
@@ -98,7 +99,6 @@ int CommonInit(vout_display_t *vd)
             vout_display_SendEventFullscreen(vd, false);
     }
 
-    var_Create(vd, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     DisableScreensaver (vd);
 
     return VLC_SUCCESS;

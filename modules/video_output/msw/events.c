@@ -157,7 +157,8 @@ static void *EventThread( void *p_this )
     }
 
     /* Prevent monitor from powering off */
-    SetThreadExecutionState( ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED | ES_CONTINUOUS );
+    if (var_GetBool(vd, "disable-screensaver"))
+	SetThreadExecutionState( ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED | ES_CONTINUOUS );
 
     /* Main loop */
     /* GetMessage will sleep if there's no message in the queue */
@@ -919,13 +920,6 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
     }
     vout_display_t *vd = p_event->vd;
 
-    /* Catch the screensaver and the monitor turn-off */
-    if( message == WM_SYSCOMMAND &&
-        ( (wParam & 0xFFF0) == SC_SCREENSAVE || (wParam & 0xFFF0) == SC_MONITORPOWER ) )
-    {
-        //if( vd ) msg_Dbg( vd, "WinProc WM_SYSCOMMAND screensaver" );
-        return 0; /* this stops them from happening */
-    }
 #if 0
     if( message == WM_SETCURSOR )
     {
