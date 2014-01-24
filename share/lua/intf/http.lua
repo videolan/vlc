@@ -156,9 +156,13 @@ function callback_art(data, request, args)
         end
         local metas = item:metas()
         local filename = vlc.strings.decode_uri(string.gsub(metas["artwork_url"],"file://",""))
+        local windowsdrive = string.match(filename, "^/%a:/.+$")  --match windows drive letter
+        if windowsdrive then
+            filename = string.sub(filename, 2)  --remove starting forward slash before the drive letter
+        end
         local size = vlc.net.stat(filename).size
         local ext = string.match(filename,"%.([^%.]-)$")
-        local raw = io.open(filename):read("*a")
+        local raw = io.open(filename, 'rb'):read("*a")
         local content = [[Content-Type: ]]..mimes[ext]..[[
 
 Content-Length: ]]..size..[[
