@@ -2054,11 +2054,10 @@ else\
     } /* FOR i_module_index */
     module_list_free(p_list);
 
-
     // First, initialize and draw the table view to get its height
-    NSRect s_rc = NSMakeRect(12, 10, mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN - 12, 50);
+    // width is increased a little to fix horizontal auto-sizing
+    NSRect s_rc = NSMakeRect(12, 10, mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 18, 50);
     // height is automatically increased as needed
-    NSTableView *o_tableview;
     o_tableview = [[NSTableView alloc] initWithFrame : s_rc];
     [o_tableview setUsesAlternatingRowBackgroundColors:YES];
     [o_tableview setHeaderView:nil];
@@ -2095,6 +2094,7 @@ else\
      NSLeftMouseDraggedMask];
 
     [o_tableview reloadData];
+    [o_tableview setAutoresizingMask: NSViewWidthSizable];
 
     CGFloat tableview_height = [o_tableview frame].size.height;
 
@@ -2155,7 +2155,7 @@ else\
 
 - (void)dealloc
 {
-    [o_scrollview release];
+    [o_tableview release];
     [super dealloc];
 }
 

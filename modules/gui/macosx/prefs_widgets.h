@@ -199,7 +199,7 @@ static NSMenu   *o_keys_menu = nil;
 @interface ModuleListConfigControl : VLCConfigControl <NSTableViewDataSource>
 {
     NSTextField     *o_textfield;
-    NSScrollView    *o_scrollview;
+    NSTableView     *o_tableview;
     NSMutableArray  *o_modulearray;
 }
 
