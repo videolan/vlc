@@ -1,0 +1,10 @@
+--- libssh2-1.4.3/Makefile.am.orig	2014-01-24 18:42:51.602763926 +0100
++++ libssh2-1.4.3/Makefile.am	2014-01-24 18:42:58.522873002 +0100
+@@ -1,6 +1,6 @@
+ AUTOMAKE_OPTIONS = foreign nostdinc
+ 
+-SUBDIRS = src tests docs
++SUBDIRS = src docs
+ if BUILD_EXAMPLES
+ SUBDIRS += example
+ endif
