@@ -88,6 +88,7 @@ static void     Flush                   (audio_output_t *, bool);
 static int      TimeGet                 (audio_output_t *, mtime_t *);
 static OSStatus RenderCallback    (vlc_object_t *, AudioUnitRenderActionFlags *, const AudioTimeStamp *,
                                          UInt32 , UInt32, AudioBufferList *);
+
 vlc_module_begin ()
     set_shortname("audiounit_ios")
     set_description(N_("AudioUnit output for iOS"))
@@ -328,10 +329,21 @@ static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
     p_sys->b_paused = pause;
     vlc_mutex_unlock(&p_sys->lock);
 
-    if (pause)
+    /* we need to start / stop the audio unit here because otherwise
+     * the OS won't believe us that we stopped the audio output
+     * so in case of an interruption, our unit would be permanently
+     * silenced.
+     * in case of multi-tasking, the multi-tasking view would still
+     * show a playing state despite we are paused, same for lock screen */
+    if (pause) {
+        AudioOutputUnitStop(p_sys->au_unit);
         AudioSessionSetActive(false);
-    else
+    } else {
+        AudioOutputUnitStart(p_sys->au_unit);
+        UInt32 sessionCategory = kAudioSessionCategory_MediaPlayback;
+        AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(sessionCategory),&sessionCategory);
         AudioSessionSetActive(true);
+    }
 }
 
 static void Flush(audio_output_t *p_aout, bool wait)
