@@ -249,7 +249,7 @@
 
 @synthesize videoView=o_video_view;
 @synthesize controlsBar=o_controls_bar;
-@synthesize enteringFullscreenTransition=b_entering_fullscreen_transition;
+@synthesize inFullscreenTransition=b_in_fullscreen_transition;
 
 #pragma mark -
 #pragma mark Init
@@ -465,7 +465,7 @@
     if (var_InheritBool(VLCIntf, "video-wallpaper") || [self level] < NSNormalWindowLevel)
         return;
 
-    if (!b_fullscreen && !b_entering_fullscreen_transition)
+    if (!b_fullscreen && !b_in_fullscreen_transition)
         [self setLevel: i_state];
 
     // save it for restore if window is currently minimized or in fullscreen
@@ -516,7 +516,9 @@
 
 - (void)resizeWindow
 {
-    if ([self fullscreen])
+    // VOUT_WINDOW_SET_SIZE is triggered when exiting fullscreen. This event is ignored here
+    // to avoid interference with the animation.
+    if ([self fullscreen] || b_in_fullscreen_transition)
         return;
 
     NSRect window_rect = [self getWindowRectForProposedVideoViewSize:nativeVideoSize];
@@ -537,7 +539,7 @@
         return proposedFrameSize;
 
     // needed when entering lion fullscreen mode
-    if (b_entering_fullscreen_transition || [self fullscreen])
+    if (b_in_fullscreen_transition || [self fullscreen])
         return proposedFrameSize;
 
     if ([[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]) {
@@ -628,11 +630,11 @@
     [NSApp setPresentationOptions:(NSApplicationPresentationFullScreen | NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
 
     i_originalLevel = [self level];
-    // b_fullscreen and b_entering_fullscreen_transition must not be true yet
+    // b_fullscreen and b_in_fullscreen_transition must not be true yet
     [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
     [self setLevel:NSNormalWindowLevel];
 
-    b_entering_fullscreen_transition = YES;
+    b_in_fullscreen_transition = YES;
 
     var_SetBool(pl_Get(VLCIntf), "fullscreen", true);
 
@@ -674,7 +676,7 @@
     [NSApp activateIgnoringOtherApps:YES];
 
     [self setFullscreen: YES];
-    b_entering_fullscreen_transition = NO;
+    b_in_fullscreen_transition = NO;
 
     if ([self hasActiveVideo]) {
         [[[VLCMainWindow sharedInstance] fsPanel] setVoutWasUpdated: self];
@@ -694,6 +696,7 @@
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
 {
+    b_in_fullscreen_transition = YES;
     [self setFullscreen: NO];
 
     var_SetBool(pl_Get(VLCIntf), "fullscreen", false);
@@ -741,6 +744,8 @@
 
 - (void)windowDidExitFullScreen:(NSNotification *)notification
 {
+    b_in_fullscreen_transition = NO;
+
     [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: i_originalLevel];
     [self setLevel:i_originalLevel];
 }
@@ -900,7 +905,7 @@
     [o_fullscreen_anim1 startAnimation];
     /* fullscreenAnimation will be unlocked when animation ends */
 
-    b_entering_fullscreen_transition = YES;
+    b_in_fullscreen_transition = YES;
 }
 
 - (void)hasBecomeFullscreen
@@ -918,7 +923,7 @@
     if ([self isVisible])
         [self orderOut: self];
 
-    b_entering_fullscreen_transition = NO;
+    b_in_fullscreen_transition = NO;
     [self setFullscreen:YES];
 }
 
@@ -974,6 +979,8 @@
 
         return;
     }
+
+    b_in_fullscreen_transition = YES;
 
     [self setAlphaValue: 0.0];
     [self orderFront: self];
@@ -1032,6 +1039,7 @@
 - (void)hasEndedFullscreen
 {
     [self setFullscreen:NO];
+    b_in_fullscreen_transition = NO;
 
     /* This function is private and should be only triggered at the end of the fullscreen change animation */
     /* Make sure we don't see the o_video_view disappearing of the screen during this operation */

@@ -287,7 +287,7 @@
     if(i_level == NSStatusWindowLevel) {
         i_statusLevelWindowCounter++;
         // window level need to stay on normal in fullscreen mode
-        if (![o_window fullscreen] && ![o_window enteringFullscreenTransition])
+        if (![o_window fullscreen] && ![o_window inFullscreenTransition])
             [self updateWindowLevelForHelperWindows:i_level];
     } else {
         if (i_statusLevelWindowCounter > 0)
@@ -325,7 +325,7 @@
 
         // fullscreen might be triggered twice (vout event)
         // so ignore duplicate events here
-        if((b_fullscreen && !([o_current_window fullscreen] || [o_current_window enteringFullscreenTransition])) ||
+        if((b_fullscreen && !([o_current_window fullscreen] || [o_current_window inFullscreenTransition])) ||
            (!b_fullscreen && [o_current_window fullscreen])) {
 
             [o_current_window toggleFullScreen:self];

@@ -109,13 +109,13 @@ static const float f_min_video_height = 70.0;
 
     NSTimer *t_hide_mouse_timer;
 
-    // true when the window is in transition for entering lion fullscreen
-    BOOL b_entering_fullscreen_transition;
+    // true when the window is in transition for entering or exiting fullscreen
+    BOOL b_in_fullscreen_transition;
 }
 
 @property (nonatomic, assign) VLCVoutView* videoView;
 @property (readonly) VLCControlsBarCommon* controlsBar;
-@property (readonly) BOOL enteringFullscreenTransition;
+@property (readonly) BOOL inFullscreenTransition;
 
 - (void)setWindowLevel:(NSInteger)i_state;
 
