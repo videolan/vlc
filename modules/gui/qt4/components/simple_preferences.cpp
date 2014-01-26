@@ -515,6 +515,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "audio-language" , String , ui.langLabel,
                             preferredAudioLanguage );
 
+            CONFIG_BOOL( "spdif", spdifBox );
             CONFIG_GENERIC( "force-dolby-surround", IntegerList, ui.dolbyLabel,
                             detectionDolby );
 
@@ -543,6 +544,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.volumeValue->setButtonSymbols(QAbstractSpinBox::NoButtons);
             optionWidgets["volLW"] = ui.volumeValue;
             optionWidgets["headphoneB"] = ui.headphoneEffect;
+            optionWidgets["spdifChB"] = ui.spdifBox;
             optionWidgets["defaultVolume"] = ui.defaultVolume;
             optionWidgets["resetVolumeCheckbox"] = ui.resetVolumeCheckbox;
             updateAudioOptions( ui.outputModule->currentIndex() );
@@ -968,6 +970,8 @@ void SPrefsPanel::updateAudioOptions( int number)
     }
 #endif
     optionWidgets["fileW"]->setVisible( ( value == "afile" ) );
+    optionWidgets["spdifChB"]->setVisible( ( value == "alsa" || value == "oss" || value == "auhal" ||
+                                           value == "directsound" || value == "waveout" ) );
 }
 
 

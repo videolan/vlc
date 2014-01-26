@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>707</width>
-    <height>544</height>
+    <height>509</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -34,16 +34,7 @@
    <item>
     <widget class="QWidget" name="audioZone" native="true">
      <layout class="QVBoxLayout" name="audioZoneLayout">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
+      <property name="margin">
        <number>0</number>
       </property>
       <item>
@@ -64,16 +55,7 @@
             <property name="sizeConstraint">
              <enum>QLayout::SetDefaultConstraint</enum>
             </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
+            <property name="margin">
              <number>0</number>
             </property>
             <item>
@@ -163,22 +145,42 @@
          <property name="bottomMargin">
           <number>4</number>
          </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="outputLabel">
+           <property name="minimumSize">
+            <size>
+             <width>250</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Output module:</string>
+           </property>
+           <property name="buddy">
+            <cstring>outputModule</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="outputModule">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
          <item row="1" column="0" colspan="2">
           <widget class="QWidget" name="fileControl" native="true">
            <layout class="QHBoxLayout">
             <property name="spacing">
              <number>0</number>
             </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
+            <property name="margin">
              <number>0</number>
             </property>
             <item>
@@ -210,32 +212,16 @@
            </layout>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="outputLabel">
-           <property name="minimumSize">
-            <size>
-             <width>250</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Output module:</string>
-           </property>
-           <property name="buddy">
-            <cstring>outputModule</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="outputModule">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
+         <item row="3" column="1">
+          <widget class="QCheckBox" name="spdifBox">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Use S/PDIF when available</string>
            </property>
           </widget>
          </item>
@@ -465,16 +451,7 @@
             <bool>true</bool>
            </property>
            <layout class="QGridLayout" name="gridLayout_1">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
+            <property name="margin">
              <number>0</number>
             </property>
             <item row="0" column="1">
@@ -564,6 +541,7 @@
   <tabstop>outputModule</tabstop>
   <tabstop>fileName</tabstop>
   <tabstop>fileBrowseButton</tabstop>
+  <tabstop>spdifBox</tabstop>
   <tabstop>autoscaleBox</tabstop>
   <tabstop>volNormBox</tabstop>
   <tabstop>volNormSpin</tabstop>
