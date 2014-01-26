@@ -467,10 +467,9 @@
 
     if (!b_fullscreen && !b_entering_fullscreen_transition)
         [self setLevel: i_state];
-    else {
-        // only save it for restore
-        i_originalLevel = i_state;
-    }
+
+    // save it for restore if window is currently minimized or in fullscreen
+    i_originalLevel = i_state;
 }
 
 - (NSRect)getWindowRectForProposedVideoViewSize:(NSSize)size
@@ -556,6 +555,18 @@
     return proposedFrameSize;
 }
 
+- (void)windowWillMiniaturize:(NSNotification *)notification
+{
+    // Set level to normal as a workaround for Mavericks bug causing window
+    // to vanish from screen, see radar://15473716
+    i_originalLevel = [self level];
+    [self setLevel: NSNormalWindowLevel];
+}
+
+- (void)windowDidDeminiaturize:(NSNotification *)notification
+{
+    [self setLevel: i_originalLevel];
+}
 
 #pragma mark -
 #pragma mark Mouse cursor handling
