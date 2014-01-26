@@ -886,10 +886,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
         if (noErr == err)
             actualVolume = catalogInfo.volume;
         else
-            return NULL;
+            goto out;
     }
     else
-        return NULL;
+        goto out;
 
     GetVolParmsInfoBuffer volumeParms;
     err = FSGetVolumeParms(actualVolume, &volumeParms, sizeof(volumeParms));
@@ -897,66 +897,70 @@ static VLCOpen *_o_sharedMainInstance = nil;
     CFMutableDictionaryRef matchingDict;
     io_service_t service;
 
-    if (!volumeParms.vMDeviceID)
-        return NULL;
+    if (!volumeParms.vMDeviceID) {
+        goto out;
+    }
 
     matchingDict = IOBSDNameMatching(kIOMasterPortDefault, 0, volumeParms.vMDeviceID);
     service = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict);
 
-    NSString *returnValue;
+
+    NSString *returnValue = nil;
     if (IO_OBJECT_NULL != service) {
-        if (IOObjectConformsTo(service, kIOCDMediaClass)) {
+        if (IOObjectConformsTo(service, kIOCDMediaClass))
             returnValue = kVLCMediaAudioCD;
-        }
         else if (IOObjectConformsTo(service, kIODVDMediaClass))
             returnValue = kVLCMediaDVD;
         else if (IOObjectConformsTo(service, kIOBDMediaClass))
             returnValue = kVLCMediaBD;
-        else {
-            if ([mountPath rangeOfString:@"VIDEO_TS" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
-                returnValue = kVLCMediaVideoTSFolder;
-            else if ([mountPath rangeOfString:@"BDMV" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
-                returnValue = kVLCMediaBDMVFolder;
-            else {
-                // NSFileManager is not thread-safe, don't use defaultManager outside of the main thread
-                NSFileManager * fm = [[NSFileManager alloc] init];
+        IOObjectRelease(service);
 
-                NSArray *dirContents = [fm contentsOfDirectoryAtPath:mountPath error:nil];
-                for (int i = 0; i < [dirContents count]; i++) {
-                    NSString *currentFile = [dirContents objectAtIndex:i];
-                    NSString *fullPath = [mountPath stringByAppendingPathComponent:currentFile];
+        if (returnValue)
+            return returnValue;
+    }
 
-                    BOOL isDir;
-                    if ([fm fileExistsAtPath:fullPath isDirectory:&isDir] && isDir)
-                    {
-                        if ([currentFile caseInsensitiveCompare:@"SVCD"] == NSOrderedSame) {
-                            returnValue = kVLCMediaSVCD;
-                            break;
-                        }
-                        if ([currentFile caseInsensitiveCompare:@"VCD"] == NSOrderedSame) {
-                            returnValue = kVLCMediaVCD;
-                            break;
-                        }
-                        if ([currentFile caseInsensitiveCompare:@"BDMV"] == NSOrderedSame) {
-                            returnValue = kVLCMediaBDMVFolder;
-                            break;
-                        }
-                        if ([currentFile caseInsensitiveCompare:@"VIDEO_TS"] == NSOrderedSame) {
-                            returnValue = kVLCMediaVideoTSFolder;
-                            break;
-                        }
-                    }
+out:
+    if ([mountPath rangeOfString:@"VIDEO_TS" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
+        returnValue = kVLCMediaVideoTSFolder;
+    else if ([mountPath rangeOfString:@"BDMV" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
+        returnValue = kVLCMediaBDMVFolder;
+    else {
+        // NSFileManager is not thread-safe, don't use defaultManager outside of the main thread
+        NSFileManager * fm = [[NSFileManager alloc] init];
+
+        NSArray *dirContents = [fm contentsOfDirectoryAtPath:mountPath error:nil];
+        for (int i = 0; i < [dirContents count]; i++) {
+            NSString *currentFile = [dirContents objectAtIndex:i];
+            NSString *fullPath = [mountPath stringByAppendingPathComponent:currentFile];
+
+            BOOL isDir;
+            if ([fm fileExistsAtPath:fullPath isDirectory:&isDir] && isDir)
+            {
+                if ([currentFile caseInsensitiveCompare:@"SVCD"] == NSOrderedSame) {
+                    returnValue = kVLCMediaSVCD;
+                    break;
                 }
-
-                [fm release];
-
-                if (!returnValue)
+                if ([currentFile caseInsensitiveCompare:@"VCD"] == NSOrderedSame) {
+                    returnValue = kVLCMediaVCD;
+                    break;
+                }
+                if ([currentFile caseInsensitiveCompare:@"BDMV"] == NSOrderedSame) {
+                    returnValue = kVLCMediaBDMVFolder;
+                    break;
+                }
+                if ([currentFile caseInsensitiveCompare:@"VIDEO_TS"] == NSOrderedSame) {
                     returnValue = kVLCMediaVideoTSFolder;
+                    break;
+                }
             }
         }
 
-        IOObjectRelease(service);
+        [fm release];
+
+        if (!returnValue)
+            returnValue = kVLCMediaVideoTSFolder;
     }
+
     return returnValue;
 }
 
