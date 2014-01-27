@@ -317,10 +317,8 @@ static void *Thread( void *p_data )
 
     /* */
     video_format_Init( &fmt, 0 );
-    video_format_Setup( &fmt, VLC_CODEC_RGB32,
-                        p_sys->i_width, p_sys->i_height, 0, 1 );
-    fmt.i_sar_num = 1;
-    fmt.i_sar_den = 1;
+    video_format_Setup( &fmt, VLC_CODEC_RGB32, p_sys->i_width, p_sys->i_height,
+                        p_sys->i_width, p_sys->i_height, 1, 1 );
 
     vout_display_state_t state;
     memset( &state, 0, sizeof(state) );

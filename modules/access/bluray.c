@@ -919,7 +919,7 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
     if (!p_reg) {
         video_format_t fmt;
         video_format_Init(&fmt, 0);
-        video_format_Setup(&fmt, VLC_CODEC_YUVP, ov->w, ov->h, 1, 1);
+        video_format_Setup(&fmt, VLC_CODEC_YUVP, ov->w, ov->h, ov->w, ov->h, 1, 1);
 
         p_reg = subpicture_region_New(&fmt);
         p_reg->i_x = ov->x;
@@ -1007,7 +1007,7 @@ static void blurayInitArgbOverlay(demux_t *p_demux, int plane, int width, int he
     if (!p_sys->p_overlays[plane]->p_regions) {
         video_format_t fmt;
         video_format_Init(&fmt, 0);
-        video_format_Setup(&fmt, VLC_CODEC_RGBA, width, height, 1, 1);
+        video_format_Setup(&fmt, VLC_CODEC_RGBA, width, height, width, height, 1, 1);
 
         p_sys->p_overlays[plane]->p_regions = subpicture_region_New(&fmt);
     }

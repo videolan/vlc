@@ -766,7 +766,8 @@ static int OpenVideo(vlc_object_t *p_this)
             video_format_t in, dummy;
 
             video_format_Init(&in, 0);
-            video_format_Setup(&in, 0, vd->fmt.i_width, vd->fmt.i_height, 1, 1);
+            video_format_Setup(&in, 0, vd->fmt.i_width, vd->fmt.i_height,
+                    vd->fmt.i_width, vd->fmt.i_height, 1, 1);
 
             video_format_Init(&dummy, 0);
 

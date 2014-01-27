@@ -130,13 +130,14 @@ void video_format_FixRgb( video_format_t *p_fmt )
 
 void video_format_Setup( video_format_t *p_fmt, vlc_fourcc_t i_chroma,
                          int i_width, int i_height,
+                         int i_visible_width, int i_visible_height,
                          int i_sar_num, int i_sar_den )
 {
     p_fmt->i_chroma         = vlc_fourcc_GetCodec( VIDEO_ES, i_chroma );
-    p_fmt->i_width          =
-    p_fmt->i_visible_width  = i_width;
-    p_fmt->i_height         =
-    p_fmt->i_visible_height = i_height;
+    p_fmt->i_width          = i_width;
+    p_fmt->i_visible_width  = i_visible_width;
+    p_fmt->i_height         = i_height;
+    p_fmt->i_visible_height = i_visible_height;
     p_fmt->i_x_offset       =
     p_fmt->i_y_offset       = 0;
     vlc_ureduce( &p_fmt->i_sar_num, &p_fmt->i_sar_den,

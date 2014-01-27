@@ -175,6 +175,8 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Find out p_vdec->i_raw_size */
     video_format_Setup( &p_dec->fmt_out.video, p_dec->fmt_in.i_codec,
+                        p_dec->fmt_in.video.i_width,
+                        p_dec->fmt_in.video.i_height,
                         p_dec->fmt_in.video.i_visible_width,
                         p_dec->fmt_in.video.i_visible_height,
                         p_dec->fmt_in.video.i_sar_num,

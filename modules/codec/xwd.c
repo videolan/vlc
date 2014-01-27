@@ -121,6 +121,7 @@ static picture_t *Decode (decoder_t *dec, block_t **pp)
 
     video_format_Setup(&dec->fmt_out.video, chroma,
                        ntohl(hdr->pixmap_width), ntohl(hdr->pixmap_height),
+                       ntohl(hdr->pixmap_width), ntohl(hdr->pixmap_height),
                        dec->fmt_in.video.i_sar_num,
                        dec->fmt_in.video.i_sar_den);
 
