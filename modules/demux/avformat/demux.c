@@ -484,6 +484,34 @@ int OpenDemux( vlc_object_t *p_this )
                     fmt.p_extra = NULL;
                 }
             }
+#if LIBAVCODEC_VERSION_CHECK( 54, 29, 0, 17, 101 )
+            else if( cc->codec_id == AV_CODEC_ID_OPUS )
+            {
+                const uint8_t p_dummy_comment[] = {
+                    'O', 'p', 'u', 's',
+                    'T', 'a', 'g', 's',
+                    0, 0, 0, 0, /* Vendor String length */
+                                /* Vendor String */
+                    0, 0, 0, 0, /* User Comment List Length */
+
+                };
+                unsigned pi_size[2];
+                const void *pp_data[2];
+
+                pi_size[0] = i_extra;
+                pp_data[0] = p_extra;
+
+                pi_size[1] = sizeof(p_dummy_comment);
+                pp_data[1] = p_dummy_comment;
+
+                if( pi_size[0] > 0 && xiph_PackHeaders( &fmt.i_extra, &fmt.p_extra,
+                                                        pi_size, pp_data, 2 ) )
+                {
+                    fmt.i_extra = 0;
+                    fmt.p_extra = NULL;
+                }
+            }
+#endif
             else if( cc->extradata_size > 0 )
             {
                 fmt.p_extra = malloc( i_extra );
