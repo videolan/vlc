@@ -136,15 +136,14 @@ ThemeRepository::~ThemeRepository()
 
 void ThemeRepository::parseDirectory( const string &rDir_locale )
 {
-    DIR *pDir;
-    char *pszDirContent;
+    const char *pszDirContent;
     // Path separator
     const string &sep = OSFactory::instance( getIntf() )->getDirSeparator();
 
     // Open the dir
     // FIXME: parseDirectory should be invoked with UTF-8 input instead!!
     string rDir = sFromLocale( rDir_locale );
-    pDir = vlc_opendir( rDir.c_str() );
+    DIR *pDir = vlc_opendir( rDir.c_str() );
 
     if( pDir == NULL )
     {
@@ -174,8 +173,6 @@ void ThemeRepository::parseDirectory( const string &rDir_locale )
 
             msg_Dbg( getIntf(), "found skin %s", path.c_str() );
         }
-
-        free( pszDirContent );
     }
 
     closedir( pDir );

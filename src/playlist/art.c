@@ -173,7 +173,7 @@ int playlist_FindArtInCache( input_item_t *p_item )
     }
 
     bool b_found = false;
-    char *psz_filename;
+    const char *psz_filename;
     while( !b_found && (psz_filename = vlc_readdir( p_dir )) )
     {
         if( !strncmp( psz_filename, "art", 3 ) )
@@ -193,7 +193,6 @@ int playlist_FindArtInCache( input_item_t *p_item )
 
             b_found = true;
         }
-        free( psz_filename );
     }
 
     /* */

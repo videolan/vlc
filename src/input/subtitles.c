@@ -312,14 +312,11 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
 
         msg_Dbg( p_this, "looking for a subtitle file in %s", psz_dir );
 
-        char *psz_name;
+        const char *psz_name;
         while( (psz_name = vlc_readdir( dir )) && i_sub_count < MAX_SUBTITLE_FILES )
         {
             if( psz_name[0] == '.' || !subtitles_Filter( psz_name ) )
-            {
-                free( psz_name );
                 continue;
-            }
 
             char tmp_fname_noext[strlen( psz_name ) + 1];
             char tmp_fname_trim[strlen( psz_name ) + 1];
@@ -365,10 +362,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
 
                 sprintf( psz_path, "%s"DIR_SEP"%s", psz_dir, psz_name );
                 if( !strcmp( psz_path, psz_fname ) )
-                {
-                    free( psz_name );
                     continue;
-                }
 
                 if( !vlc_stat( psz_path, &st ) && S_ISREG( st.st_mode ) && result )
                 {
@@ -386,7 +380,6 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                              psz_path, i_prio );
                 }
             }
-            free( psz_name );
         }
         closedir( dir );
     }

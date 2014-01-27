@@ -129,17 +129,6 @@ char *vlc_getcwd (void)
 
 /* Under Windows, these wrappers return the list of drive letters
  * when called with an empty argument or just '\'. */
-typedef struct vlc_DIR
-{
-    _WDIR *wdir; /* MUST be first, see <vlc_fs.h> */
-    union
-    {
-        DWORD drives;
-        bool insert_dot_dot;
-    } u;
-} vlc_DIR;
-
-
 DIR *vlc_opendir (const char *dirname)
 {
     wchar_t *wpath = widen_path (dirname);
@@ -175,12 +164,15 @@ DIR *vlc_opendir (const char *dirname)
         return NULL;
     }
     p_dir->wdir = wdir;
+    p_dir->entry = NULL;
     return (void *)p_dir;
 }
 
 char *vlc_readdir (DIR *dir)
 {
     vlc_DIR *p_dir = (vlc_DIR *)dir;
+
+    free(p_dir->entry);
 
 #if !VLC_WINSTORE_APP
     /* Drive letters mode */
@@ -196,24 +188,23 @@ char *vlc_readdir (DIR *dir)
         p_dir->u.drives &= ~(1UL << i);
         assert (i < 26);
 
-        char *ret;
-        if (asprintf (&ret, "%c:\\", 'A' + i) == -1)
-            return NULL;
-        return ret;
+        if (asprintf (&p_dir->entry, "%c:\\", 'A' + i) == -1)
+            p_dir->entry = NULL;
     }
+    else
 #endif
-
     if (p_dir->u.insert_dot_dot)
     {
         /* Adds "..", gruik! */
         p_dir->u.insert_dot_dot = false;
-        return strdup ("..");
+        p_dir->entry = strdup ("..");
     }
-
-    struct _wdirent *ent = _wreaddir (p_dir->wdir);
-    if (ent == NULL)
-        return NULL;
-    return FromWide (ent->d_name);
+    else
+    {
+        struct _wdirent *ent = _wreaddir (p_dir->wdir);
+        p_dir->entry = (ent != NULL) ? FromWide (ent->d_name) : NULL;
+    }
+    return p_dir->entry;
 }
 
 int vlc_stat (const char *filename, struct stat *buf)

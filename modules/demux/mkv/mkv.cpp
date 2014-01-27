@@ -166,7 +166,7 @@ static int Open( vlc_object_t * p_this )
 
             if (p_src_dir != NULL)
             {
-                char *psz_file;
+                const char *psz_file;
                 while ((psz_file = vlc_readdir(p_src_dir)) != NULL)
                 {
                     if (strlen(psz_file) > 4)
@@ -179,7 +179,6 @@ static int Open( vlc_object_t * p_this )
                         if (!s_filename.compare(p_demux->psz_file))
 #endif
                         {
-                            free (psz_file);
                             continue; // don't reuse the original opened file
                         }
 
@@ -229,7 +228,6 @@ static int Open( vlc_object_t * p_this )
                             }
                         }
                     }
-                    free (psz_file);
                 }
                 closedir( p_src_dir );
             }

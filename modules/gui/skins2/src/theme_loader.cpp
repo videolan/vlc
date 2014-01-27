@@ -392,11 +392,10 @@ bool ThemeLoader::findFile( const string &rootDir, const string &rFileName,
     // Path separator
     const string &sep = OSFactory::instance( getIntf() )->getDirSeparator();
 
-    DIR *pCurrDir;
-    char *pszDirContent;
+    const char *pszDirContent;
 
     // Open the dir
-    pCurrDir = vlc_opendir( rootDir.c_str() );
+    DIR *pCurrDir = vlc_opendir( rootDir.c_str() );
 
     if( pCurrDir == NULL )
     {
@@ -428,7 +427,6 @@ bool ThemeLoader::findFile( const string &rootDir, const string &rFileName,
                 // Can we find the file in this subdirectory?
                 if( findFile( newURI, rFileName, themeFilePath ) )
                 {
-                    free( pszDirContent );
                     closedir( pCurrDir );
                     return true;
                 }
@@ -439,14 +437,11 @@ bool ThemeLoader::findFile( const string &rootDir, const string &rFileName,
                 if( rFileName == string( pszDirContent ) )
                 {
                     themeFilePath = newURI;
-                    free( pszDirContent );
                     closedir( pCurrDir );
                     return true;
                 }
             }
         }
-
-        free( pszDirContent );
     }
 
     closedir( pCurrDir );

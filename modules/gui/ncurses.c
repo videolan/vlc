@@ -287,23 +287,20 @@ static void ReadDir(intf_thread_t *intf)
 
     DirsDestroy(sys);
 
-    char *entry;
+    const char *entry;
     while ((entry = vlc_readdir(current_dir))) {
         if (!sys->show_hidden_files && *entry == '.' && strcmp(entry, ".."))
-            goto next;
+            continue;
 
         struct dir_entry_t *dir_entry = malloc(sizeof *dir_entry);
-        if (!dir_entry)
-            goto next;
+        if (unlikely(dir_entry == NULL))
+            continue;
 
         dir_entry->file = IsFile(sys->current_dir, entry);
-        dir_entry->path = entry;
+        dir_entry->path = xstrdup(entry);
         INSERT_ELEM(sys->dir_entries, sys->n_dir_entries,
              sys->n_dir_entries, dir_entry);
         continue;
-
-next:
-        free(entry);
     }
 
     qsort(sys->dir_entries, sys->n_dir_entries,

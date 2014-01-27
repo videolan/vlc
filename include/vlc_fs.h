@@ -46,11 +46,25 @@ VLC_API int vlc_rename( const char *oldpath, const char *newpath );
 VLC_API char *vlc_getcwd( void ) VLC_USED;
 
 #if defined( _WIN32 )
+typedef struct vlc_DIR
+{
+    _WDIR *wdir; /* MUST be first, see <vlc_fs.h> */
+    char *entry;
+    union
+    {
+        DWORD drives;
+        bool insert_dot_dot;
+    } u;
+} vlc_DIR;
+
 static inline int vlc_closedir( DIR *dir )
 {
-    _WDIR *wdir = *(_WDIR **)dir;
-    free( dir );
-    return wdir ? _wclosedir( wdir ) : 0;
+    vlc_DIR *vdir = (vlc_DIR *)dir;
+    _WDIR *wdir = vdir->wdir;
+
+    free( vdir->entry );
+    free( vdir );
+    return (wdir != NULL) ? _wclosedir( wdir ) : 0;
 }
 # undef closedir
 # define closedir vlc_closedir

@@ -145,14 +145,15 @@ DIR *vlc_opendir (const char *dirname)
  * @param dir directory handle as returned by vlc_opendir()
  *            (must not be used by another thread concurrently)
  *
- * @return a UTF-8 string of the directory entry. Use free() to release it.
+ * @return a UTF-8 string of the directory entry. The string is valid until
+ * the next call to vlc_readdir() or closedir() on the handle.
  * If there are no more entries in the directory, NULL is returned.
  * If an error occurs, errno is set and NULL is returned.
  */
 char *vlc_readdir( DIR *dir )
 {
     struct dirent *ent = readdir (dir);
-    return (ent != NULL) ? strdup (ent->d_name) : NULL;
+    return (ent != NULL) ? ent->d_name : NULL;
 }
 
 /**

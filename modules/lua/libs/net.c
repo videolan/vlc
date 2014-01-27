@@ -477,12 +477,11 @@ static int vlclua_opendir( lua_State *L )
     lua_newtable( L );
     for( ;; )
     {
-        char *psz_filename = vlc_readdir( p_dir );
+        const char *psz_filename = vlc_readdir( p_dir );
         if( !psz_filename ) break;
         i++;
         lua_pushstring( L, psz_filename );
         lua_rawseti( L, -2, i );
-        free( psz_filename );
     }
     closedir( p_dir );
     return 1;

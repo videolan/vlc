@@ -444,7 +444,7 @@ static void AllocatePluginDir (module_bank_t *bank, unsigned maxdepth,
 
         /* Skip ".", ".." */
         if (!strcmp (file, ".") || !strcmp (file, ".."))
-            goto skip;
+            continue;
 
         /* Compute path relative to plug-in base directory */
         if (reldir != NULL)
@@ -455,7 +455,7 @@ static void AllocatePluginDir (module_bank_t *bank, unsigned maxdepth,
         else
             relpath = strdup (file);
         if (unlikely(relpath == NULL))
-            goto skip;
+            continue;
 
         /* Compute absolute path */
         if (asprintf (&abspath, "%s"DIR_SEP"%s", bank->base, relpath) == -1)
@@ -493,7 +493,6 @@ static void AllocatePluginDir (module_bank_t *bank, unsigned maxdepth,
     skip:
         free (relpath);
         free (abspath);
-        free (file);
     }
     closedir (dh);
 }
