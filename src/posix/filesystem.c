@@ -142,7 +142,8 @@ DIR *vlc_opendir (const char *dirname)
 /**
  * Reads the next file name from an open directory.
  *
- * @param dir The directory that is being read
+ * @param dir directory handle as returned by vlc_opendir()
+ *            (must not be used by another thread concurrently)
  *
  * @return a UTF-8 string of the directory entry. Use free() to release it.
  * If there are no more entries in the directory, NULL is returned.
@@ -150,29 +151,8 @@ DIR *vlc_opendir (const char *dirname)
  */
 char *vlc_readdir( DIR *dir )
 {
-    /* Beware that readdir_r() assumes <buf> is large enough to hold the result
-     * dirent including the file name. A buffer overflow could occur otherwise.
-     * In particular, pathconf() and _POSIX_NAME_MAX cannot be used here. */
-    struct dirent *ent;
-    char *path = NULL;
-
-    long len = fpathconf (dirfd (dir), _PC_NAME_MAX);
-    /* POSIX says there shall be room for NAME_MAX bytes at all times */
-    if (len == -1 || len < NAME_MAX)
-        len = NAME_MAX;
-    len += sizeof (*ent) + 1 - sizeof (ent->d_name);
-
-    struct dirent *buf = malloc (len);
-    if (unlikely(buf == NULL))
-        return NULL;
-
-    int val = readdir_r (dir, buf, &ent);
-    if (val != 0)
-        errno = val;
-    else if (ent != NULL)
-        path = strdup (ent->d_name);
-    free (buf);
-    return path;
+    struct dirent *ent = readdir (dir);
+    return (ent != NULL) ? strdup (ent->d_name) : NULL;
 }
 
 /**
