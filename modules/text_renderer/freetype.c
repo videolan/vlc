@@ -1927,6 +1927,17 @@ static int Create( vlc_object_t *p_this )
 #endif
     }
 
+    /* set default psz_monofontname */
+    if( !psz_monofontfamily || !*psz_monofontfamily )
+    {
+        free( psz_monofontfamily );
+#ifdef HAVE_GET_FONT_BY_FAMILY_NAME
+        psz_monofontfamily = strdup( DEFAULT_MONOSPACE_FAMILY );
+#else
+        psz_monofontfamily = File_Select( DEFAULT_MONOSPACE_FONT_FILE );
+#endif
+    }
+
     /* Set the current font file */
     p_sys->style.psz_fontname = psz_fontname;
     p_sys->style.psz_monofontname = psz_monofontfamily;
