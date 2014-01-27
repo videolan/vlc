@@ -42,8 +42,6 @@ struct decoder_sys_t
     jmp_buf setjmp_buffer;
 
     decoder_t *p_dec;
-
-    bool b_error;
 };
 
 static int  OpenDecoder(vlc_object_t *);
@@ -99,7 +97,6 @@ static int OpenDecoder(vlc_object_t *p_this)
 static void user_error_exit(j_common_ptr p_jpeg)
 {
     decoder_sys_t *p_sys = (decoder_sys_t *)p_jpeg->err;
-    p_sys->b_error = true;
     p_sys->err.output_message(p_jpeg);
     longjmp(p_sys->setjmp_buffer, 1);
 }
@@ -134,7 +131,6 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     }
 
     p_block = *pp_block;
-    p_sys->b_error = false;
 
     if (p_block->i_flags & BLOCK_FLAG_DISCONTINUITY)
     {
@@ -154,30 +150,12 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     }
 
     jpeg_create_decompress(&p_jpeg);
-    if (p_sys->b_error)
-    {
-        goto error;
-    }
-
     jpeg_mem_src(&p_jpeg, p_block->p_buffer, p_block->i_buffer);
-    if (p_sys->b_error)
-    {
-        goto error;
-    }
-
     jpeg_read_header(&p_jpeg, TRUE);
-    if (p_sys->b_error)
-    {
-        goto error;
-    }
 
     p_jpeg.out_color_space = JCS_RGB;
 
     jpeg_start_decompress(&p_jpeg);
-    if (p_sys->b_error)
-    {
-        goto error;
-    }
 
     /* Set output properties */
     p_dec->fmt_out.i_codec = VLC_CODEC_RGB24;
@@ -210,10 +188,6 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     {
         jpeg_read_scanlines(&p_jpeg, p_row_pointers + p_jpeg.output_scanline,
                                      p_jpeg.output_height - p_jpeg.output_scanline);
-        if (p_sys->b_error)
-        {
-            goto error;
-        }
     }
 
     jpeg_finish_decompress(&p_jpeg);
