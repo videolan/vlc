@@ -38,6 +38,7 @@
 #include "avformat.h"
 #include "../../codec/avcodec/avcodec.h"
 #include "../../codec/avcodec/avcommon.h"
+#include "../xiph.h"
 
 
 //#define AVFORMAT_DEBUG 1
@@ -181,6 +182,21 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         return VLC_EGENERIC;
     }
 
+    unsigned opus_size[XIPH_MAX_HEADER_COUNT];
+    void     *opus_packet[XIPH_MAX_HEADER_COUNT];
+    if( fmt->i_codec == VLC_CODEC_OPUS )
+    {
+        unsigned count;
+        /* Only transmits the first packet (OpusHead) */
+        if( xiph_SplitHeaders(opus_size, opus_packet, &count, fmt->i_extra, fmt->p_extra ) ) {
+            count = 0;
+        }
+        if (count != 2 || opus_size[0] < 19) {
+            msg_Err(p_mux, "Invalid Opus header");
+            return VLC_EGENERIC;
+        }
+    }
+
     p_input->p_sys = malloc( sizeof( int ) );
     *((int *)p_input->p_sys) = p_sys->oc->nb_streams;
 
@@ -244,9 +260,18 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     if( fmt->i_extra )
     {
-        codec->extradata_size = fmt->i_extra;
-        codec->extradata = av_malloc( fmt->i_extra );
-        memcpy( codec->extradata, fmt->p_extra, fmt->i_extra );
+        if( fmt->i_codec == VLC_CODEC_OPUS )
+        {
+            codec->extradata_size = opus_size[0];
+            codec->extradata = av_malloc( opus_size[0] );
+            memcpy( codec->extradata, opus_packet[0], opus_size[0] );
+        }
+        else
+        {
+            codec->extradata_size = fmt->i_extra;
+            codec->extradata = av_malloc( fmt->i_extra );
+            memcpy( codec->extradata, fmt->p_extra, fmt->i_extra );
+        }
     }
 
     return VLC_SUCCESS;
