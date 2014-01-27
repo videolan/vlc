@@ -128,8 +128,7 @@ static int LCM( int a, int b )
     return a * b / GCD( a, b );
 }
 
-int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma,
-                   int i_width, int i_height, int i_sar_num, int i_sar_den )
+int picture_Setup( picture_t *p_picture, video_format_t *fmt )
 {
     /* Store default values */
     p_picture->i_planes = 0;
@@ -146,9 +145,9 @@ int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma,
 
     p_picture->i_nb_fields = 2;
 
-    video_format_Setup( &p_picture->format, i_chroma, i_width, i_height,
-                        i_width, i_height,
-                        i_sar_num, i_sar_den );
+    video_format_Setup( &p_picture->format, fmt->i_chroma, fmt->i_width, fmt->i_height,
+                        fmt->i_visible_width, fmt->i_visible_height,
+                        fmt->i_sar_num, fmt->i_sar_den );
 
     const vlc_chroma_description_t *p_dsc =
         vlc_fourcc_GetChromaDescription( p_picture->format.i_chroma );
@@ -173,17 +172,17 @@ int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma,
     }
     i_modulo_h = LCM( i_modulo_h, 32 );
 
-    const int i_width_aligned  = ( i_width  + i_modulo_w - 1 ) / i_modulo_w * i_modulo_w;
-    const int i_height_aligned = ( i_height + i_modulo_h - 1 ) / i_modulo_h * i_modulo_h;
+    const int i_width_aligned  = ( fmt->i_width  + i_modulo_w - 1 ) / i_modulo_w * i_modulo_w;
+    const int i_height_aligned = ( fmt->i_height + i_modulo_h - 1 ) / i_modulo_h * i_modulo_h;
     const int i_height_extra   = 2 * i_ratio_h; /* This one is a hack for some ASM functions */
     for( unsigned i = 0; i < p_dsc->plane_count; i++ )
     {
         plane_t *p = &p_picture->p[i];
 
         p->i_lines         = (i_height_aligned + i_height_extra ) * p_dsc->p[i].h.num / p_dsc->p[i].h.den;
-        p->i_visible_lines = i_height * p_dsc->p[i].h.num / p_dsc->p[i].h.den;
+        p->i_visible_lines = fmt->i_visible_height * p_dsc->p[i].h.num / p_dsc->p[i].h.den;
         p->i_pitch         = i_width_aligned * p_dsc->p[i].w.num / p_dsc->p[i].w.den * p_dsc->pixel_size;
-        p->i_visible_pitch = i_width * p_dsc->p[i].w.num / p_dsc->p[i].w.den * p_dsc->pixel_size;
+        p->i_visible_pitch = fmt->i_visible_width * p_dsc->p[i].w.num / p_dsc->p[i].w.den * p_dsc->pixel_size;
         p->i_pixel_pitch   = p_dsc->pixel_size;
 
         assert( (p->i_pitch % 16) == 0 );
@@ -217,8 +216,7 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
         return NULL;
 
     /* Make sure the real dimensions are a multiple of 16 */
-    if( picture_Setup( p_picture, fmt.i_chroma, fmt.i_width, fmt.i_height,
-                       fmt.i_sar_num, fmt.i_sar_den ) )
+    if( picture_Setup( p_picture, &fmt ) )
     {
         free( p_picture );
         return NULL;

@@ -235,7 +235,7 @@ VLC_API int picture_Export( vlc_object_t *p_obj, block_t **pp_image, video_forma
  *
  * It can be useful to get the properties of planes.
  */
-VLC_API int picture_Setup( picture_t *, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den );
+VLC_API int picture_Setup( picture_t *, video_format_t * );
 
 
 /**

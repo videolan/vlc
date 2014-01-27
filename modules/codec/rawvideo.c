@@ -182,21 +182,14 @@ static int OpenDecoder( vlc_object_t *p_this )
                         p_dec->fmt_in.video.i_sar_num,
                         p_dec->fmt_in.video.i_sar_den );
     picture_t picture;
-    picture_Setup( &picture, p_dec->fmt_out.i_codec,
-                   p_dec->fmt_in.video.i_width,
-                   p_dec->fmt_in.video.i_height, 0, 1 );
+    picture_Setup( &picture, &p_dec->fmt_out );
+
     p_sys->i_raw_size = 0;
     for( int i = 0; i < picture.i_planes; i++ )
     {
         p_sys->i_raw_size += picture.p[i].i_visible_pitch *
                              picture.p[i].i_visible_lines;
         p_sys->planes[i] = picture.p[i];
-    }
-
-    if( !p_dec->fmt_in.video.i_sar_num || !p_dec->fmt_in.video.i_sar_den )
-    {
-        p_dec->fmt_out.video.i_sar_num = 1;
-        p_dec->fmt_out.video.i_sar_den = 1;
     }
 
     /* Set callbacks */
@@ -361,9 +354,7 @@ static block_t *SendFrame( decoder_t *p_dec, block_t *p_block )
         int i, j;
 
         /* Fill in picture_t fields */
-        picture_Setup( &pic, p_dec->fmt_out.i_codec,
-                       p_dec->fmt_out.video.i_width,
-                       p_dec->fmt_out.video.i_height, 0, 1 );
+        picture_Setup( &pic, &p_dec->fmt_out );
 
         if( !pic.i_planes )
         {
