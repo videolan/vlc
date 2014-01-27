@@ -70,6 +70,10 @@ static char *config_GetLibPath (void)
         size_t len = strlen(psz_img_name);
         if( len >= 3 && !strcmp( psz_img_name + len - 3, "VLC") )
             return strdup( psz_img_name );
+
+        /* Do we end by "VLC-Plugin"? oh, we must be the NPAPI plugin */
+        if( len >= 10 && !strcmp( psz_img_name + len - 10, "VLC-Plugin") )
+            return strdup( psz_img_name );
     }
 
     /* We are not linked to the VLC.framework, let's use dladdr to figure
@@ -82,7 +86,7 @@ static char *config_GetLibPath (void)
     uint32_t path_len = sizeof(path) - 1;
 
     if ( !_NSGetExecutablePath(path, &path_len) )
-         return strdup(path);
+        return strdup(path);
     return NULL;
 }
 
