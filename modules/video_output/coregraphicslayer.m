@@ -255,6 +255,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
                                         kCGRenderingIntentPerceptual);
 
     CGDataProviderRelease(dataProvider);
+    CFRelease(dataRef);
 
     if (!newFrame)
         goto end;
@@ -289,6 +290,14 @@ static int Control(vout_display_t *vd, int query, va_list args)
     return self;
 }
 
+- (void) dealloc
+{
+    if (_lastFrame)
+        CGImageRelease(_lastFrame);
+
+    [super dealloc];
+}
+
 - (bool)locked
 {
     return lock;
@@ -302,8 +311,10 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return;
     }
 
-    _lastFrame = CGImageCreateCopy(lastFrame);
-    CGImageRelease(lastFrame);
+    if (_lastFrame)
+        CGImageRelease(_lastFrame);
+
+    _lastFrame = lastFrame;
     CGRect invalidRect = CGRectMake(0, 0, CGImageGetWidth(_lastFrame), CGImageGetHeight(_lastFrame));
     [CATransaction begin];
     [self setNeedsDisplayInRect:invalidRect];
