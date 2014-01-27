@@ -284,6 +284,7 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
                 free( psz_filename );
                 break;
             }
+            free( psz_filename );
         }
 
         closedir( p_dir );
