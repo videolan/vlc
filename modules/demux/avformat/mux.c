@@ -167,23 +167,24 @@ void CloseMux( vlc_object_t *p_this )
 static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
+    es_format_t *fmt = p_input->p_fmt;
     AVCodecContext *codec;
     AVStream *stream;
     unsigned i_codec_id;
 
     msg_Dbg( p_mux, "adding input" );
 
-    if( !GetFfmpegCodec( p_input->p_fmt->i_codec, 0, &i_codec_id, 0 ) )
+    if( !GetFfmpegCodec( fmt->i_codec, 0, &i_codec_id, 0 ) )
     {
         msg_Dbg( p_mux, "couldn't find codec for fourcc '%4.4s'",
-                 (char *)&p_input->p_fmt->i_codec );
+                 (char *)&fmt->i_codec );
         return VLC_EGENERIC;
     }
 
     p_input->p_sys = malloc( sizeof( int ) );
     *((int *)p_input->p_sys) = p_sys->oc->nb_streams;
 
-    if( p_input->p_fmt->i_cat != VIDEO_ES && p_input->p_fmt->i_cat != AUDIO_ES)
+    if( fmt->i_cat != VIDEO_ES && fmt->i_cat != AUDIO_ES)
     {
         msg_Warn( p_mux, "Unhandled ES category" );
         return VLC_EGENERIC;
@@ -199,40 +200,40 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     codec->opaque = p_mux;
 
-    switch( p_input->p_fmt->i_cat )
+    switch( fmt->i_cat )
     {
     case AUDIO_ES:
         codec->codec_type = AVMEDIA_TYPE_AUDIO;
-        codec->channels = p_input->p_fmt->audio.i_channels;
-        codec->sample_rate = p_input->p_fmt->audio.i_rate;
+        codec->channels = fmt->audio.i_channels;
+        codec->sample_rate = fmt->audio.i_rate;
         codec->time_base = (AVRational){1, codec->sample_rate};
-        codec->frame_size = p_input->p_fmt->audio.i_frame_length;
+        codec->frame_size = fmt->audio.i_frame_length;
         break;
 
     case VIDEO_ES:
-        if( !p_input->p_fmt->video.i_frame_rate ||
-            !p_input->p_fmt->video.i_frame_rate_base )
+        if( !fmt->video.i_frame_rate ||
+            !fmt->video.i_frame_rate_base )
         {
             msg_Warn( p_mux, "Missing frame rate, assuming 25fps" );
-            p_input->p_fmt->video.i_frame_rate = 25;
-            p_input->p_fmt->video.i_frame_rate_base = 1;
+            fmt->video.i_frame_rate = 25;
+            fmt->video.i_frame_rate_base = 1;
         }
         codec->codec_type = AVMEDIA_TYPE_VIDEO;
-        codec->width = p_input->p_fmt->video.i_width;
-        codec->height = p_input->p_fmt->video.i_height;
+        codec->width = fmt->video.i_width;
+        codec->height = fmt->video.i_height;
         av_reduce( &codec->sample_aspect_ratio.num,
                    &codec->sample_aspect_ratio.den,
-                   p_input->p_fmt->video.i_sar_num,
-                   p_input->p_fmt->video.i_sar_den, 1 << 30 /* something big */ );
+                   fmt->video.i_sar_num,
+                   fmt->video.i_sar_den, 1 << 30 /* something big */ );
         stream->sample_aspect_ratio.den = codec->sample_aspect_ratio.den;
         stream->sample_aspect_ratio.num = codec->sample_aspect_ratio.num;
-        codec->time_base.den = p_input->p_fmt->video.i_frame_rate;
-        codec->time_base.num = p_input->p_fmt->video.i_frame_rate_base;
+        codec->time_base.den = fmt->video.i_frame_rate;
+        codec->time_base.num = fmt->video.i_frame_rate_base;
         break;
 
     }
 
-    codec->bit_rate = p_input->p_fmt->i_bitrate;
+    codec->bit_rate = fmt->i_bitrate;
     codec->codec_tag = av_codec_get_tag( p_sys->oc->oformat->codec_tag, i_codec_id );
     if( !codec->codec_tag && i_codec_id == AV_CODEC_ID_MP2 )
     {
@@ -241,12 +242,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
     codec->codec_id = i_codec_id;
 
-    if( p_input->p_fmt->i_extra )
+    if( fmt->i_extra )
     {
-        codec->extradata_size = p_input->p_fmt->i_extra;
-        codec->extradata = av_malloc( p_input->p_fmt->i_extra );
-        memcpy( codec->extradata, p_input->p_fmt->p_extra,
-                p_input->p_fmt->i_extra );
+        codec->extradata_size = fmt->i_extra;
+        codec->extradata = av_malloc( fmt->i_extra );
+        memcpy( codec->extradata, fmt->p_extra, fmt->i_extra );
     }
 
     return VLC_SUCCESS;
