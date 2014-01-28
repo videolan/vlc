@@ -733,9 +733,13 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
 
         case ACTIONID_TOGGLE_FULLSCREEN:
         {
-            bool fs = var_ToggleBool( p_playlist, "fullscreen" );
             if( p_vout )
-                var_SetBool( p_vout, "fullscreen", fs );
+            {
+                bool fs = var_ToggleBool( p_vout, "fullscreen" );
+                var_SetBool( p_playlist, "fullscreen", fs );
+            }
+            else
+                var_ToggleBool( p_playlist, "fullscreen" );
             break;
         }
 
