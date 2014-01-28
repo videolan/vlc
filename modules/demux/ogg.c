@@ -963,7 +963,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     block_t *p_block;
     bool b_selected;
     int i_header_len = 0;
-    mtime_t i_pts = VLC_TS_UNKNOWN, i_interpolated_pts;
+    mtime_t i_pts = VLC_TS_UNKNOWN;
     demux_sys_t *p_ogg = p_demux->p_sys;
 
     if( p_oggpacket->bytes >= 7 &&
@@ -1133,7 +1133,6 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     }
 
     /* Convert the granulepos into the next pcr */
-    i_interpolated_pts = p_stream->i_interpolated_pcr;
     Ogg_UpdatePCR( p_demux, p_stream, p_oggpacket );
 
     if( p_stream->fmt.i_codec != VLC_CODEC_VORBIS &&
