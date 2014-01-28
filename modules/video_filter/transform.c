@@ -102,8 +102,8 @@ static void R90(int *sx, int *sy, int w, int h, int dx, int dy)
 }
 static void R180(int *sx, int *sy, int w, int h, int dx, int dy)
 {
-    *sx = w - dx;
-    *sy = h - dy;
+    *sx = w - 1 - dx;
+    *sy = h - 1 - dy;
 }
 static void R270(int *sx, int *sy, int w, int h, int dx, int dy)
 {
