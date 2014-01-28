@@ -28,7 +28,10 @@
 # include "config.h"
 #endif
 
+#ifndef UNICODE
 #define UNICODE
+#endif
+
 #include <vlc/vlc.h>
 #include <windows.h>
 #include <shellapi.h>
