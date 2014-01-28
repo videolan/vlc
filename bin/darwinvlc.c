@@ -151,11 +151,12 @@ int main( int i_argc, const char *ppsz_argv[] )
     pthread_t self = pthread_self ();
     pthread_sigmask (SIG_SETMASK, &set, NULL);
 
-    const char *argv[i_argc + 2];
+    const char *argv[i_argc + 3];
     int argc = 0;
 
     argv[argc++] = "--no-ignore-config";
     argv[argc++] = "--media-library";
+    argv[argc++] = "--stats";
 
     /* overwrite system language on Mac */
 #if !TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR // TARGET_OS_MAC is unspecific
