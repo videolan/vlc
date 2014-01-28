@@ -71,24 +71,25 @@ static void LeaveMTA(void)
 
 struct aout_sys_t
 {
-    audio_output_t *aout;
     aout_stream_t *stream; /**< Underlying audio output stream */
-
-    IMMDevice *dev; /**< Selected output device, NULL if none */
-
-    ISimpleAudioVolume *volume; /**< Volume setter */
-
 #if !VLC_WINSTORE_APP
+    audio_output_t *aout;
+
     IMMDeviceEnumerator *it; /**< Device enumerator, NULL when exiting */
     /*TODO: IMMNotificationClient*/
 
+    IMMDevice *dev; /**< Selected output device, NULL if none */
     IAudioSessionManager *manager; /**< Session for the output device */
+    ISimpleAudioVolume *volume; /**< Volume setter */
+
     struct IAudioSessionEvents session_events;
 
     LONG refs;
     HANDLE device_changed; /**< Event to reset thread */
     HANDLE device_ready; /**< Event when thread is reset */
     vlc_thread_t thread; /**< Thread for audio session control */
+#else
+    void *client;
 #endif
 };
 
@@ -170,6 +171,7 @@ static void Flush(audio_output_t *aout, bool wait)
 
 }
 
+#if !VLC_WINSTORE_APP
 static int VolumeSet(audio_output_t *aout, float vol)
 {
     ISimpleAudioVolume *volume = aout->sys->volume;
@@ -204,7 +206,6 @@ static int MuteSet(audio_output_t *aout, bool mute)
     return FAILED(hr) ? -1 : 0;
 }
 
-#if !VLC_WINSTORE_APP
 /*** Audio session events ***/
 static inline aout_sys_t *vlc_AudioSessionEvents_sys(IAudioSessionEvents *this)
 {
@@ -628,50 +629,6 @@ static void CloseDevice(audio_output_t *aout)
     sys->dev = NULL;
 }
 
-/**
- * Callback for aout_stream_t to create a stream on the device.
- * This can instantiate an IAudioClient or IDirectSound(8) object.
- */
-static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
-                              void **restrict pv)
-{
-    IMMDevice *dev = opaque;
-    return IMMDevice_Activate(dev, iid, CLSCTX_ALL, actparms, pv);
-}
-
-#else /* VLC_WINSTORE_APP */
-
-static HRESULT OpenDevice(audio_output_t *aout, const char *devid)
-{
-    aout_sys_t *sys = aout->sys;
-    assert(sys->dev == NULL);
-
-    (void)devid;
-    assert(!devid);
-    sys->dev = var_InheritAddress(aout, "mmdevice-audioclient");
-    return S_OK;
-}
-
-static void CloseDevice(audio_output_t *aout)
-{
-    aout_sys_t *sys = aout->sys;
-
-    assert(sys->dev != NULL);
-    free(sys->dev);
-    sys->dev = NULL;
-}
-
-static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
-                              void **restrict pv)
-{
-    IMMDevice *dev = opaque;
-    (void)iid; (void)actparms;
-    *pv = dev;
-    return S_OK;
-}
-#endif /* !VLC_WINSTORE_APP */
-
-
 static int DeviceSelect(audio_output_t *aout, const char *id)
 {
     aout_sys_t *sys = aout->sys;
@@ -694,15 +651,39 @@ static int DeviceSelect(audio_output_t *aout, const char *id)
     return FAILED(hr) ? -1 : 0;
 }
 
+/**
+ * Callback for aout_stream_t to create a stream on the device.
+ * This can instantiate an IAudioClient or IDirectSound(8) object.
+ */
+static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
+                              void **restrict pv)
+{
+    IMMDevice *dev = opaque;
+    return IMMDevice_Activate(dev, iid, CLSCTX_ALL, actparms, pv);
+}
+#else /* VLC_WINSTORE_APP */
+static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
+                              void **restrict pv)
+{
+    aout_sys_t *sys = opaque;
+
+    (void)iid; (void)actparms;
+    *pv = sys->client;
+    return S_OK;
+}
+#endif /* VLC_WINSTORE_APP */
+
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
     HRESULT hr;
 
     assert (sys->stream == NULL);
+#if !VLC_WINSTORE_APP
     /* Open the default device if required (to deal with restarts) */
     if (sys->dev == NULL && FAILED(DeviceSelect(aout, NULL)))
         return -1;
+#endif
 
     aout_stream_t *s = vlc_object_create(aout, sizeof (*s));
     if (unlikely(s == NULL))
@@ -749,11 +730,11 @@ static int Open(vlc_object_t *obj)
         return VLC_ENOMEM;
 
     aout->sys = sys;
-    sys->aout = aout;
     sys->stream = NULL;
-    sys->dev = NULL;
 #if !VLC_WINSTORE_APP
+    sys->aout = aout;
     sys->it = NULL;
+    sys->dev = NULL;
     sys->manager = NULL;
     sys->session_events.lpVtbl = &vlc_AudioSessionEvents;
     sys->refs = 1;
@@ -780,23 +761,22 @@ static int Open(vlc_object_t *obj)
     if (vlc_clone(&sys->thread, MMThread, aout, VLC_THREAD_PRIORITY_LOW))
         goto error;
     WaitForSingleObject(sys->device_ready, INFINITE);
-#endif
 
     DeviceSelect(aout, NULL); /* Get a device to start with */
     LeaveMTA(); /* leave MTA after thread has entered MTA */
-
+#else
+    sys->client = var_InheritAddress(aout, "mmdevice-audioclient");
+    assert(sys->client != NULL);
+#endif
     aout->start = Start;
     aout->stop = Stop;
     aout->time_get = TimeGet;
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
+#if !VLC_WINSTORE_APP
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
-#if VLC_WINSTORE_APP
-    aout->device_select = NULL;
-    return VLC_SUCCESS;
-#else
     aout->device_select = DeviceSelect;
     DevicesEnum(aout);
     return VLC_SUCCESS;
@@ -813,6 +793,8 @@ error:
         CloseHandle(sys->device_changed);
     free(sys);
     return VLC_EGENERIC;
+#else
+    return VLC_SUCCESS;
 #endif
 }
 
@@ -837,8 +819,7 @@ static void Close(vlc_object_t *obj)
     CloseHandle(sys->device_ready);
     CloseHandle(sys->device_changed);
 #else
-    if (sys->dev != NULL)
-        CloseDevice(aout);
+    free(sys->client);
 #endif
     free(sys);
 }
