@@ -146,10 +146,10 @@ struct sout_stream_id_t
 struct sout_stream_sys_t
 {
     vlc_mutex_t *p_lock;
-    void ( *pf_video_prerender_callback ) ( void* p_video_data, uint8_t** pp_pixel_buffer , int size );
-    void ( *pf_audio_prerender_callback ) ( void* p_audio_data, uint8_t** pp_pcm_buffer , unsigned int size );
-    void ( *pf_video_postrender_callback ) ( void* p_video_data, uint8_t* p_pixel_buffer, int width, int height, int pixel_pitch, int size, mtime_t pts );
-    void ( *pf_audio_postrender_callback ) ( void* p_audio_data, uint8_t* p_pcm_buffer, unsigned int channels, unsigned int rate, unsigned int nb_samples, unsigned int bits_per_sample, unsigned int size, mtime_t pts );
+    void ( *pf_video_prerender_callback ) ( void* p_video_data, uint8_t** pp_pixel_buffer, size_t size );
+    void ( *pf_audio_prerender_callback ) ( void* p_audio_data, uint8_t** pp_pcm_buffer, size_t size );
+    void ( *pf_video_postrender_callback ) ( void* p_video_data, uint8_t* p_pixel_buffer, int width, int height, int pixel_pitch, size_t size, mtime_t pts );
+    void ( *pf_audio_postrender_callback ) ( void* p_audio_data, uint8_t* p_pcm_buffer, unsigned int channels, unsigned int rate, unsigned int nb_samples, unsigned int bits_per_sample, size_t size, mtime_t pts );
     bool time_sync;
 };
 
@@ -173,19 +173,19 @@ static int Open( vlc_object_t *p_this )
     p_sys->time_sync = var_GetBool( p_stream, SOUT_CFG_PREFIX "time-sync" );
 
     psz_tmp = var_GetString( p_stream, SOUT_PREFIX_VIDEO "prerender-callback" );
-    p_sys->pf_video_prerender_callback = (void (*) (void *, uint8_t**, int))(intptr_t)atoll( psz_tmp );
+    p_sys->pf_video_prerender_callback = (void (*) (void *, uint8_t**, size_t))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
 
     psz_tmp = var_GetString( p_stream, SOUT_PREFIX_AUDIO "prerender-callback" );
-    p_sys->pf_audio_prerender_callback = (void (*) (void* , uint8_t**, unsigned int))(intptr_t)atoll( psz_tmp );
+    p_sys->pf_audio_prerender_callback = (void (*) (void* , uint8_t**, size_t))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
 
     psz_tmp = var_GetString( p_stream, SOUT_PREFIX_VIDEO "postrender-callback" );
-    p_sys->pf_video_postrender_callback = (void (*) (void*, uint8_t*, int, int, int, int, mtime_t))(intptr_t)atoll( psz_tmp );
+    p_sys->pf_video_postrender_callback = (void (*) (void*, uint8_t*, int, int, int, size_t, mtime_t))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
 
     psz_tmp = var_GetString( p_stream, SOUT_PREFIX_AUDIO "postrender-callback" );
-    p_sys->pf_audio_postrender_callback = (void (*) (void*, uint8_t*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, mtime_t))(intptr_t)atoll( psz_tmp );
+    p_sys->pf_audio_postrender_callback = (void (*) (void*, uint8_t*, unsigned int, unsigned int, unsigned int, unsigned int, size_t, mtime_t))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
 
     /* Setting stream out module callbacks */
@@ -312,7 +312,8 @@ static int SendVideo( sout_stream_t *p_stream, sout_stream_id_t *id,
                       block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    int i_line, i_line_size, i_size, i_pixel_pitch;
+    int i_line, i_line_size, i_pixel_pitch;
+    size_t i_size;
     uint8_t* p_pixels = NULL;
 
     if( id->format->video.i_bits_per_pixel > 0 )
@@ -327,7 +328,7 @@ static int SendVideo( sout_stream_t *p_stream, sout_stream_id_t *id,
         i_size = p_buffer->i_buffer;
     }
     /* Calling the prerender callback to get user buffer */
-    p_sys->pf_video_prerender_callback( id->p_data, &p_pixels , i_size );
+    p_sys->pf_video_prerender_callback( id->p_data, &p_pixels, i_size );
 
     if (!p_pixels)
     {
