@@ -180,7 +180,7 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     {
         goto error;
     }
-    for (int i = 0; i < (int)p_jpeg.output_height; i++) {
+    for (unsigned i = 0; i < p_jpeg.output_height; i++) {
         p_row_pointers[i] = p_pic->p->p_pixels + p_pic->p->i_pitch * i;
     }
 
