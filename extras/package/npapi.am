@@ -1,19 +1,33 @@
 #! /usr/bin/make -f
 
-build-npapi: stamp-npapi-build
+build-npapi: fetch-npapi
+	$(MAKE) install-npapi
 
-stamp-npapi-fetch:
-	rm -Rf npapi-vlc
-	git clone git://git.videolan.org/npapi-vlc.git npapi-vlc
-	touch $@
+fetch-npapi:
+	rm -f -- stamp-npapi.tmp
+	if test -d npapi-vlc; then \
+		cd npapi-vlc && \
+		git fetch origin && \
+		git reset --hard origin/master; \
+	else \
+		git clone git://git.videolan.org/npapi-vlc.git npapi-vlc ; \
+	fi
+	git --git-dir=npapi-vlc/.git describe --long --always > stamp-npapi.tmp
+	if diff stamp-npapi.tmp stamp-npapi >/dev/null 2>&1; then \
+		rm -f -- stamp-npapi.tmp ; \
+	else \
+		mv -f -- stamp-npapi.tmp stamp-npapi ; \
+	fi
 
-stamp-npapi-autogen: stamp-npapi-fetch
-# extras/package/npapi.am
+stamp-npapi:
+	$(MAKE) fetch-npapi
+
+npapi-vlc/configure: stamp-npapi
 	cd npapi-vlc && \
 	$(SHELL) ./autogen.sh
 	touch $@
 
-stamp-npapi-configure: stamp-npapi-autogen
+npapi-vlc/Makefile: npapi-vlc/configure
 	cd npapi-vlc && \
 	$(SHELL) ./configure \
 		--prefix=/ \
@@ -26,8 +40,9 @@ stamp-npapi-configure: stamp-npapi-autogen
 		PKG_CONFIG_LIBDIR="../$(srcdir)/extras/contrib/lib/pkgconfig:../lib"
 	touch $@
 
-stamp-npapi-build: stamp-npapi-configure
-	cd npapi-vlc && \
-	$(MAKE) all && \
-	$(MAKE) DESTDIR="$(abs_builddir)/npapi-vlc/installed" install
-	touch $@
+npapi-vlc/npapi/npvlc.la: npapi-vlc/Makefile
+	$(MAKE) -C npapi-vlc
+
+install-npapi: npapi-vlc/npapi/npvlc.la
+	$(MAKE) -C npapi-vlc \
+		DESTDIR="$(abs_builddir)/npapi-vlc/installed" install
