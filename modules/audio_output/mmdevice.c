@@ -77,9 +77,9 @@ struct aout_sys_t
 #if !VLC_WINSTORE_APP
     audio_output_t *aout;
     IMMDeviceEnumerator *it; /**< Device enumerator, NULL when exiting */
-    /*TODO: IMMNotificationClient*/
     IMMDevice *dev; /**< Selected output device, NULL if none */
 
+    struct IMMNotificationClient device_events;
     struct IAudioSessionEvents session_events;
 
     LONG refs;
@@ -365,6 +365,203 @@ static const struct IAudioSessionEventsVtbl vlc_AudioSessionEvents =
 };
 
 /*** Audio devices ***/
+
+/** Gets the user-readable device name */
+static char *DeviceName(IMMDevice *dev)
+{
+    IPropertyStore *props;
+    char *name = NULL;
+    PROPVARIANT v;
+    HRESULT hr;
+
+    hr = IMMDevice_OpenPropertyStore(dev, STGM_READ, &props);
+    if (FAILED(hr))
+        return NULL;
+
+    PropVariantInit(&v);
+    hr = IPropertyStore_GetValue(props, &PKEY_Device_FriendlyName, &v);
+    if (SUCCEEDED(hr))
+    {
+        name = FromWide(v.pwszVal);
+        PropVariantClear(&v);
+    }
+    IPropertyStore_Release(props);
+    return name;
+}
+
+/** Checks that a device is an output device */
+static bool DeviceIsRender(IMMDevice *dev)
+{
+    void *pv;
+
+    if (FAILED(IMMDevice_QueryInterface(dev, &IID_IMMEndpoint, &pv)))
+        return false;
+
+    IMMEndpoint *ep = pv;
+    EDataFlow flow;
+
+    if (FAILED(IMMEndpoint_GetDataFlow(ep, &flow)))
+        flow = eCapture;
+
+    IMMEndpoint_Release(ep);
+    return flow == eRender;
+}
+
+static HRESULT DeviceUpdated(audio_output_t *aout, LPCWSTR wid)
+{
+    aout_sys_t *sys = aout->sys;
+    HRESULT hr;
+
+    IMMDevice *dev;
+    hr = IMMDeviceEnumerator_GetDevice(sys->it, wid, &dev);
+    if (FAILED(hr))
+        return hr;
+
+    if (!DeviceIsRender(dev))
+    {
+        IMMDevice_Release(dev);
+        return S_OK;
+    }
+
+    char *id = FromWide(wid);
+    if (unlikely(id == NULL))
+    {
+        IMMDevice_Release(dev);
+        return E_OUTOFMEMORY;
+    }
+
+    char *name = DeviceName(dev);
+    IMMDevice_Release(dev);
+
+    aout_HotplugReport(aout, id, (name != NULL) ? name : id);
+    free(name);
+    free(id);
+    return S_OK;
+}
+
+static inline aout_sys_t *vlc_MMNotificationClient_sys(IMMNotificationClient *this)
+{
+    return (void *)(((char *)this) - offsetof(aout_sys_t, device_events));
+}
+
+static STDMETHODIMP
+vlc_MMNotificationClient_QueryInterface(IMMNotificationClient *this,
+                                        REFIID riid, void **ppv)
+{
+    if (IsEqualIID(riid, &IID_IUnknown)
+     || IsEqualIID(riid, &IID_IMMNotificationClient))
+    {
+        *ppv = this;
+        IUnknown_AddRef(this);
+        return S_OK;
+    }
+    else
+    {
+       *ppv = NULL;
+        return E_NOINTERFACE;
+    }
+}
+
+static STDMETHODIMP_(ULONG)
+vlc_MMNotificationClient_AddRef(IMMNotificationClient *this)
+{
+    aout_sys_t *sys = vlc_MMNotificationClient_sys(this);
+    return InterlockedIncrement(&sys->refs);
+}
+
+static STDMETHODIMP_(ULONG)
+vlc_MMNotificationClient_Release(IMMNotificationClient *this)
+{
+    aout_sys_t *sys = vlc_MMNotificationClient_sys(this);
+    return InterlockedDecrement(&sys->refs);
+}
+
+static STDMETHODIMP
+vlc_MMNotificationClient_OnDefaultDeviceChange(IMMNotificationClient *this,
+                                               EDataFlow flow, ERole role,
+                                               LPCWSTR wid)
+{
+    aout_sys_t *sys = vlc_MMNotificationClient_sys(this);
+    audio_output_t *aout = sys->aout;
+
+    if (flow != eRender)
+        return S_OK;
+    if (role != eConsole) /* FIXME? use eMultimedia instead */
+        return S_OK;
+
+    msg_Dbg(aout, "default device changed: %ls", wid); /* TODO? migrate */
+    return S_OK;
+}
+
+static STDMETHODIMP
+vlc_MMNotificationClient_OnDeviceAdded(IMMNotificationClient *this,
+                                       LPCWSTR wid)
+{
+    aout_sys_t *sys = vlc_MMNotificationClient_sys(this);
+    audio_output_t *aout = sys->aout;
+
+    msg_Dbg(aout, "device %ls added", wid);
+    return DeviceUpdated(aout, wid);
+}
+
+static STDMETHODIMP
+vlc_MMNotificationClient_OnDeviceRemoved(IMMNotificationClient *this,
+                                         LPCWSTR wid)
+{
+    aout_sys_t *sys = vlc_MMNotificationClient_sys(this);
+    audio_output_t *aout = sys->aout;
+    char *id = FromWide(wid);
+
+    msg_Dbg(aout, "device %ls removed", wid);
+    if (unlikely(id == NULL))
+        return E_OUTOFMEMORY;
+
+    aout_HotplugReport(aout, id, NULL);
+    free(id);
+    return S_OK;
+}
+
+static STDMETHODIMP
+vlc_MMNotificationClient_OnDeviceStateChanged(IMMNotificationClient *this,
+                                              LPCWSTR wid, DWORD state)
+{
+    aout_sys_t *sys = vlc_MMNotificationClient_sys(this);
+    audio_output_t *aout = sys->aout;
+
+    /* TODO: show device state / ignore missing devices */
+    msg_Dbg(aout, "device %ls state changed %08lx", wid, state);
+    return S_OK;
+}
+
+static STDMETHODIMP
+vlc_MMNotificationClient_OnDevicePropertyChanged(IMMNotificationClient *this,
+                                                 LPCWSTR wid,
+                                                 const PROPERTYKEY key)
+{
+    aout_sys_t *sys = vlc_MMNotificationClient_sys(this);
+    audio_output_t *aout = sys->aout;
+
+    if (key.pid == PKEY_Device_FriendlyName.pid)
+    {
+        msg_Dbg(aout, "device %ls name changed", wid);
+        return DeviceUpdated(aout, wid);
+    }
+    return S_OK;
+}
+
+static const struct IMMNotificationClientVtbl vlc_MMNotificationClient =
+{
+    vlc_MMNotificationClient_QueryInterface,
+    vlc_MMNotificationClient_AddRef,
+    vlc_MMNotificationClient_Release,
+
+    vlc_MMNotificationClient_OnDeviceStateChanged,
+    vlc_MMNotificationClient_OnDeviceAdded,
+    vlc_MMNotificationClient_OnDeviceRemoved,
+    vlc_MMNotificationClient_OnDefaultDeviceChange,
+    vlc_MMNotificationClient_OnDevicePropertyChanged,
+};
+
 static int DevicesEnum(audio_output_t *aout, IMMDeviceEnumerator *it)
 {
     HRESULT hr;
@@ -391,7 +588,7 @@ static int DevicesEnum(audio_output_t *aout, IMMDeviceEnumerator *it)
     for (UINT i = 0; i < count; i++)
     {
         IMMDevice *dev;
-        char *id, *name = NULL;
+        char *id, *name;
 
         hr = IMMDeviceCollection_Item(devs, i, &dev);
         if (FAILED(hr))
@@ -408,20 +605,7 @@ static int DevicesEnum(audio_output_t *aout, IMMDeviceEnumerator *it)
         id = FromWide(devid);
         CoTaskMemFree(devid);
 
-        /* User-readable device name */
-        IPropertyStore *props;
-        hr = IMMDevice_OpenPropertyStore(dev, STGM_READ, &props);
-        if (SUCCEEDED(hr))
-        {
-            PROPVARIANT v;
-
-            PropVariantInit(&v);
-            hr = IPropertyStore_GetValue(props, &PKEY_Device_FriendlyName, &v);
-            if (SUCCEEDED(hr))
-                name = FromWide(v.pwszVal);
-            PropVariantClear(&v);
-            IPropertyStore_Release(props);
-        }
+        name = DeviceName(dev);
         IMMDevice_Release(dev);
 
         aout_HotplugReport(aout, id, (name != NULL) ? name : id);
@@ -785,6 +969,8 @@ static int Open(vlc_object_t *obj)
     aout->mute_set = MuteSet;
     aout->device_select = DeviceSelect;
     EnterMTA();
+    IMMDeviceEnumerator_RegisterEndpointNotificationCallback(sys->it,
+                                                          &sys->device_events);
     DevicesEnum(aout, sys->it);
     LeaveMTA();
     return VLC_SUCCESS;
@@ -812,6 +998,8 @@ static void Close(vlc_object_t *obj)
     WakeConditionVariable(&sys->work);
     LeaveCriticalSection(&sys->lock);
 
+    IMMDeviceEnumerator_UnregisterEndpointNotificationCallback(it,
+                                                          &sys->device_events);
     IMMDeviceEnumerator_Release(it);
     LeaveMTA();
 
