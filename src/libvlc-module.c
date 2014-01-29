@@ -2264,7 +2264,6 @@ vlc_module_begin ()
      */
 #   define KEY_TOGGLE_FULLSCREEN  "f"
 #   define KEY_LEAVE_FULLSCREEN   "Esc"
-#   define KEY_PLAY_PAUSE         "Space\tMedia Play Pause"
 #   define KEY_SIMPLE_PAUSE       "Browser Stop"
 #   define KEY_PLAY               "Browser Refresh"
 #   define KEY_FASTER             "+"
@@ -2272,9 +2271,17 @@ vlc_module_begin ()
 #   define KEY_RATE_NORMAL        "="
 #   define KEY_RATE_FASTER_FINE   "]"
 #   define KEY_RATE_SLOWER_FINE   "["
+#ifdef _WIN32
+#   define KEY_PLAY_PAUSE         "Space"
+#   define KEY_NEXT               "n"
+#   define KEY_PREV               "p"
+#   define KEY_STOP               "s"
+#else
+#   define KEY_PLAY_PAUSE         "Space\tMedia Play Pause"
 #   define KEY_NEXT               "n\tMedia Next Track"
 #   define KEY_PREV               "p\tMedia Prev Track"
 #   define KEY_STOP               "s\tMedia Stop"
+#endif
 #   define KEY_POSITION           "t"
 #   define KEY_JUMP_MEXTRASHORT   "Shift+Left"
 #   define KEY_JUMP_PEXTRASHORT   "Shift+Right"
@@ -2284,7 +2291,6 @@ vlc_module_begin ()
 #   define KEY_JUMP_PMEDIUM       "Ctrl+Right"
 #   define KEY_JUMP_MLONG         "Ctrl+Alt+Left"
 #   define KEY_JUMP_PLONG         "Ctrl+Alt+Right"
-#   define KEY_FRAME_NEXT         "e\tBrowser Next"
 #   define KEY_NAV_ACTIVATE       "Enter"
 #   define KEY_NAV_UP             "Up"
 #   define KEY_NAV_DOWN           "Down"
@@ -2295,12 +2301,15 @@ vlc_module_begin ()
 #ifdef _WIN32 /* On Windows, people expect volume keys to control the master */
 #   define KEY_VOL_UP             "Ctrl+Up"
 #   define KEY_VOL_DOWN           "Ctrl+Down"
+#   define KEY_VOL_MUTE           "m"
+#   define KEY_FRAME_NEXT         "e"
 #else
 #   define KEY_VOL_UP             "Ctrl+Up\tVolume Up"
 #   define KEY_VOL_DOWN           "Ctrl+Down\tVolume Down"
+#   define KEY_VOL_MUTE           "m\tVolume Mute"
+#   define KEY_FRAME_NEXT         "e\tBrowser Next"
 #endif
 
-#   define KEY_VOL_MUTE           "m\tVolume Mute"
 #   define KEY_SUBDELAY_UP        "h"
 #   define KEY_SUBDELAY_DOWN      "g"
 #   define KEY_SUBPOS_DOWN        NULL
