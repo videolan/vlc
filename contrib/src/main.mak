@@ -410,6 +410,12 @@ endif
 endif
 ifdef HAVE_CROSS_COMPILE
 	echo "set(_CMAKE_TOOLCHAIN_PREFIX $(HOST)-)" >> $@
+ifdef HAVE_ANDROID
+# cmake will overwrite our --sysroot with a native (host) one on Darwin
+# Set it to "" right away to short-circuit this behaviour
+	echo "set(CMAKE_CXX_SYSROOT_FLAG \"\")" >> $@
+	echo "set(CMAKE_C_SYSROOT_FLAG \"\")" >> $@
+endif
 endif
 	echo "set(CMAKE_C_COMPILER $(CC))" >> $@
 	echo "set(CMAKE_CXX_COMPILER $(CXX))" >> $@
