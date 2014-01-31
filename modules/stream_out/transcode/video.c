@@ -722,6 +722,9 @@ static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, sout_stream
             subpicture_Delete( p_subpic );
         }
     }
+
+    /* set output pts*/
+    p_pic->date = date_Get( &id->next_output_pts );
     /*This pts is handled, increase clock to next one*/
     date_Increment( &id->next_output_pts, id->p_encoder->fmt_in.video.i_frame_rate_base );
 
@@ -946,8 +949,6 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
             msg_Dbg( p_stream, "not dropping frame");
 #endif
 
-            /* input calculated pts isn't necessary what pts output should be, so use output pts*/
-            p_pic->date = date_Get( &id->next_output_pts );
         }
 
         /* Run the filter and output chains; first with the picture,
