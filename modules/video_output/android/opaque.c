@@ -30,6 +30,7 @@
 #include <vlc_vout_display.h>
 #include <vlc_picture_pool.h>
 #include <vlc_filter.h>
+#include <vlc_md5.h>
 
 #include <dlfcn.h>
 
@@ -83,11 +84,35 @@ struct vout_display_sys_t
     picture_t *subtitles_picture;
 
     bool b_has_subpictures;
+
+    uint8_t hash[16];
 };
 
 static void DisplaySubpicture(vout_display_t *vd, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
+
+    struct md5_s hash;
+    InitMD5(&hash);
+    if (subpicture) {
+        for (subpicture_region_t *r = subpicture->p_region; r != NULL; r = r->p_next) {
+            AddMD5(&hash, &r->i_x, sizeof(r->i_x));
+            AddMD5(&hash, &r->i_y, sizeof(r->i_y));
+            AddMD5(&hash, &r->fmt.i_visible_width, sizeof(r->fmt.i_visible_width));
+            AddMD5(&hash, &r->fmt.i_visible_height, sizeof(r->fmt.i_visible_height));
+            AddMD5(&hash, &r->fmt.i_x_offset, sizeof(r->fmt.i_x_offset));
+            AddMD5(&hash, &r->fmt.i_y_offset, sizeof(r->fmt.i_y_offset));
+            const int pixels_offset = r->fmt.i_y_offset * r->p_picture->p->i_pitch +
+                                      r->fmt.i_x_offset * r->p_picture->p->i_pixel_pitch;
+
+            for (int y = 0; y < r->fmt.i_visible_height; y++)
+                AddMD5(&hash, &r->p_picture->p->p_pixels[pixels_offset + y*r->p_picture->p->i_pitch], r->fmt.i_visible_width);
+        }
+    }
+    EndMD5(&hash);
+    if (!memcmp(hash.buf, sys->hash, 16))
+        return;
+    memcpy(sys->hash, hash.buf, 16);
 
     jobject jsurf = jni_LockAndGetSubtitlesSurface();
     if (sys->window && jsurf != sys->jsurf)
