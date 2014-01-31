@@ -1,0 +1,79 @@
+diff -ru sparkle/SUAppcast.m sparkle-fixed/SUAppcast.m
+--- sparkle/SUAppcast.m	2013-12-09 15:23:42.000000000 +0100
++++ sparkle-fixed/SUAppcast.m	2014-01-31 13:23:11.000000000 +0100
+@@ -15,6 +15,12 @@
+ #import "SUConstants.h"
+ #import "SULog.h"
+ 
++#ifndef MAC_OS_X_VERSION_10_7
++enum {
++    NSXMLNodeLoadExternalEntitiesSameOriginOnly = 1UL << 15
++};
++#endif
++
+ @interface NSXMLElement (SUAppcastExtensions)
+ - (NSDictionary *)attributesAsDictionary;
+ @end
+@@ -32,7 +38,7 @@
+ }
+ @end
+ 
+-@interface SUAppcast () <NSURLDownloadDelegate>
++@interface SUAppcast () // implicit NSURLDownloadDelegate
+ - (void)reportError:(NSError *)error;
+ - (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes;
+ @end
+@@ -95,7 +101,7 @@
+ 	if (downloadFilename)
+ 	{
+         NSUInteger options = 0;
+-        if (NSAppKitVersionNumber < NSAppKitVersionNumber10_7) {
++        if (NSAppKitVersionNumber < 1115 && NSAppKitVersionNumber > 1038) { // Snow Leopard
+             // In order to avoid including external entities when parsing the appcast (a potential security vulnerability; see https://github.com/andymatuschak/Sparkle/issues/169), we ask NSXMLDocument to "tidy" the XML first. This happens to remove these external entities; it wouldn't be a future-proof approach, but it worked in these historical versions of OS X, and we have a more rigorous approach for 10.7+.
+             options = NSXMLDocumentTidyXML;
+         } else {
+diff -ru sparkle/SUBasicUpdateDriver.m sparkle-fixed/SUBasicUpdateDriver.m
+--- sparkle/SUBasicUpdateDriver.m	2013-12-09 15:23:42.000000000 +0100
++++ sparkle-fixed/SUBasicUpdateDriver.m	2014-01-31 13:23:36.000000000 +0100
+@@ -21,7 +21,7 @@
+ #import "SUCodeSigningVerifier.h"
+ #import "SUUpdater_Private.h"
+ 
+-@interface SUBasicUpdateDriver () <NSURLDownloadDelegate>; @end
++@interface SUBasicUpdateDriver (); @end // implicit NSURLDownloadDelegate
+ 
+ 
+ @implementation SUBasicUpdateDriver
+diff -ru sparkle/SUDiskImageUnarchiver.m sparkle-fixed/SUDiskImageUnarchiver.m
+--- sparkle/SUDiskImageUnarchiver.m	2013-12-09 15:23:42.000000000 +0100
++++ sparkle-fixed/SUDiskImageUnarchiver.m	2014-01-31 13:25:58.000000000 +0100
+@@ -12,6 +12,13 @@
+ #import "SULog.h"
+ #import <CoreServices/CoreServices.h>
+ 
++@interface SUDiskImageUnarchiver ()
++- (void)extractDMGWithPassword:(NSString *)password;
++- (BOOL)isEncrypted:(NSData*)resultData;
++- (void)continueWithPassword:(NSString *)password;
++- (void)requestPasswordFromDelegate;
++@end
++
+ @implementation SUDiskImageUnarchiver
+ 
+ + (BOOL)canUnarchivePath:(NSString *)path
+diff -ru sparkle/SUPasswordPrompt.m sparkle-fixed/SUPasswordPrompt.m
+--- sparkle/SUPasswordPrompt.m	2013-12-09 15:23:42.000000000 +0100
++++ sparkle-fixed/SUPasswordPrompt.m	2014-01-31 13:27:58.000000000 +0100
+@@ -8,6 +8,12 @@
+ 
+ #import "SUPasswordPrompt.h"
+ 
++@interface SUPasswordPrompt ()
++- (void)setName:(NSString*)name;
++- (void)setIcon:(NSImage*)icon;
++- (NSImage *)icon;
++- (void)setPassword:(NSString*)password;
++@end
+ 
+ @implementation SUPasswordPrompt
+ 
