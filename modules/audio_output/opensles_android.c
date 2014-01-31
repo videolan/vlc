@@ -41,6 +41,8 @@
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
 
+int aout_get_native_sample_rate(void);
+
 #define OPENSLES_BUFFERS 255 /* maximum number of buffers */
 #define OPENSLES_BUFLEN  10   /* ms */
 /*
@@ -385,9 +387,20 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     //create audio player
     const SLInterfaceID ids2[] = { sys->SL_IID_ANDROIDSIMPLEBUFFERQUEUE, sys->SL_IID_VOLUME };
     static const SLboolean req2[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
-    result = CreateAudioPlayer(sys->engineEngine, &sys->playerObject, &audioSrc,
+
+    if (aout_get_native_sample_rate() >= fmt->i_rate) {
+        result = CreateAudioPlayer(sys->engineEngine, &sys->playerObject, &audioSrc,
                                     &audioSnk, sizeof(ids2) / sizeof(*ids2),
                                     ids2, req2);
+    } else {
+        // Don't try to play back a sample rate higher than the native one,
+        // since OpenSL ES will try to use the fast path, which AudioFlinger
+        // will reject (fast path can't do resampling), and will end up with
+        // too small buffers for the resampling. See http://b.android.com/59453
+        // for details. This bug is still present in 4.4. If it is fixed later
+        // this workaround could be made conditional.
+        result = SL_RESULT_UNKNOWN_ERROR;
+    }
     if (unlikely(result != SL_RESULT_SUCCESS)) {
         /* Try again with a more sensible samplerate */
         fmt->i_rate = 44100;
