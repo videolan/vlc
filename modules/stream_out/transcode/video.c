@@ -670,7 +670,10 @@ static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, sout_stream
     /* If input pts + input_frame_interval is lower than next_output_pts - output_frame_interval
      * Then the future input frame should fit better and we can drop this one 
      *
-     * Duplication need is checked in OutputFrame */
+     * We check it here also because we can have case that video filters outputs multiple
+     * pictures but we don't need to use them all, for example yadif2x and outputting to some
+     * different fps value
+     */
     if( ( p_pic->date + (mtime_t)id->i_input_frame_interval ) <
         ( date_Get( &id->next_output_pts ) ) )
     {
@@ -933,6 +936,9 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
 
             /* If input pts + input_frame_interval is lower than next_output_pts - output_frame_interval
              * Then the future input frame should fit better and we can drop this one 
+             *
+             * We check this here as we don't need to run video filter at all for pictures
+             * we are going to drop anyway
              *
              * Duplication need is checked in OutputFrame */
             if( ( p_pic->date + (mtime_t)id->i_input_frame_interval ) <
