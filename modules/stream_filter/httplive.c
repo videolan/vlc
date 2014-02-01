@@ -83,6 +83,7 @@ typedef struct hls_stream_s
     int         version;    /* protocol version should be 1 */
     int         sequence;   /* media sequence number */
     int         duration;   /* maximum duration per segment (s) */
+    int         max_segment_length;   /* maximum duration segments */
     uint64_t    bandwidth;  /* bandwidth usage of segments (bits per second)*/
     uint64_t    size;       /* stream length is calculated by taking the sum
                                foreach segment of (segment->duration * hls->bandwidth/8) */
@@ -240,6 +241,7 @@ static hls_stream_t *hls_New(vlc_array_t *hls_stream, const int id, const uint64
     hls->id = id;
     hls->bandwidth = bw;
     hls->duration = -1;/* unknown */
+    hls->max_segment_length = -1;/* unknown */
     hls->size = 0;
     hls->sequence = 0; /* default is 0 */
     hls->version = 1;  /* default protocol version */
@@ -652,6 +654,8 @@ static int parse_SegmentInformation(hls_stream_t *hls, char *p_read, int *durati
             value = ((int)d);
         *duration = value;
     }
+    if( *duration > hls->max_segment_length)
+        hls->max_segment_length = *duration;
 
     /* Ignore the rest of the line */
     return VLC_SUCCESS;
@@ -1369,6 +1373,7 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
              hls_new->id, hls_new->bandwidth, count);
 
     vlc_mutex_lock(&hls_old->lock);
+    hls_old->max_segment_length=-1;
     for (int n = 0; n < count; n++)
     {
         segment_t *p = segment_GetSegment(hls_new, n);
@@ -1438,6 +1443,8 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
             }
             vlc_array_append(hls_old->segments, p);
             msg_Dbg(s, "- segment %d appended", p->sequence);
+            hls_old->max_segment_length = __MAX(hls_old->max_segment_length, l->duration);
+            msg_Dbg(s, " playlists new max duration %d", hls_old->max_segment_length);
 
             // Signal download thread otherwise the segment will not get downloaded
             *stream_appended = true;
@@ -1746,7 +1753,7 @@ static void* hls_Reload(void *p_this)
 
             /* determine next time to update playlist */
             p_sys->playlist.last = now;
-            p_sys->playlist.wakeup = now + ((mtime_t)(hls->duration * wait)
+            p_sys->playlist.wakeup = now + ((mtime_t)(hls->max_segment_length * wait)
                                                    * (mtime_t)1000000);
         }
 
