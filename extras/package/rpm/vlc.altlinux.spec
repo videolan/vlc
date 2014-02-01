@@ -9,7 +9,6 @@
 %def_disable upnp
 %def_disable gnomevfs
 %def_enable smb
-%def_enable dirac
 %def_disable dca
 %def_disable libid3tag
 %def_disable java_bindings
@@ -46,7 +45,6 @@ Provides: %name-interface = %version-%release
 %define matroska_ver 0.8.0
 %define cddb_ver 1.2.1-alt1
 %define seamonkey_ver 1.0.4-alt4
-%define dirac_ver 0.7.0-alt1
 
 Requires: lib%name = %version-%release
 
@@ -117,10 +115,6 @@ BuildRequires: libupnp-devel
 
 %if_enabled smb
 BuildRequires: libsmbclient-devel
-%endif
-
-%if_enabled dirac
-BuildPreReq: libdirac-devel = %dirac_ver
 %endif
 
 BuildRequires: libX11-devel libXv-devel libmesa-devel libXext-devel 
@@ -295,16 +289,6 @@ Requires: lib%name = %version-%release
 
 %description plugin-dv
 This package contains DC1394/DV (firewire) access plugin for VLC Media Player.
-
-%if_enabled dirac
-%package plugin-dirac
-Summary: Dirac codec plugin for VLC Media Player
-Group: Video
-Requires: lib%name = %version-%release
-
-%description plugin-dirac
-This package contains DIRAC codec plugin for VLC Media Player.
-%endif
 
 %if_enabled dca
 %package plugin-dca
@@ -813,9 +797,6 @@ Requires: vlc-plugin-loader vlc-plugin-realaudio
 %if_enabled smb
 Requires: vlc-plugin-smb
 %endif
-%if_enabled dirac
-Requires: vlc-plugin-dirac
-%endif
 %if_enabled gnomevfs
 Requires: vlc-plugin-gnomevfs
 %endif
@@ -864,7 +845,6 @@ export JAVA_HOME=%_libdir/j2se1.5-sun
 	--disable-cddax \
 	--enable-cmml \
 	--enable-dc1394 \
-	%{subst_enable dirac} \
 	--enable-dmo \
 	--enable-dv \
 	--enable-dvb \
@@ -1429,11 +1409,6 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 
 %files plugin-dvdread
 %_vlc_pluginsdir/access/libdvdread_plugin.so*
-
-%if_enabled dirac
-%files plugin-dirac
-%_vlc_pluginsdir/codec/libdirac_plugin.so*
-%endif
 
 %if_enabled dca
 %files plugin-dca
