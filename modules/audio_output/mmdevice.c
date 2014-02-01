@@ -74,10 +74,10 @@ static wchar_t default_device[1] = L"";
 struct aout_sys_t
 {
     aout_stream_t *stream; /**< Underlying audio output stream */
-    IMMDevice *dev; /**< Selected output device, NULL if none */
 #if !VLC_WINSTORE_APP
     audio_output_t *aout;
     IMMDeviceEnumerator *it; /**< Device enumerator, NULL when exiting */
+    IMMDevice *dev; /**< Selected output device, NULL if none */
 
     struct IMMNotificationClient device_events;
     struct IAudioSessionEvents session_events;
@@ -874,7 +874,11 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     if (unlikely(s == NULL))
         return -1;
 
+#if !VLC_WINSTORE_APP
     s->owner.device = sys->dev;
+#else
+    s->owner.device = sys->client;
+#endif
     s->owner.activate = ActivateDevice;
 
     EnterMTA();
