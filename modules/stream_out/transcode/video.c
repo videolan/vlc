@@ -930,8 +930,6 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
             /* Set the pts of the frame being encoded */
             p_pic->date = i_pts;
 
-            /* now take next input pts, pts dates are only enabled if p_module is set*/
-            date_Increment( &id->interpolated_pts, id->p_decoder->fmt_out.video.i_frame_rate_base );
 
 
             /* If input pts + input_frame_interval is lower than next_output_pts - output_frame_interval
@@ -978,6 +976,9 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                     p_user_filtered_pic = filter_chain_VideoFilter( id->p_uf_chain, p_user_filtered_pic );
                 if( !p_user_filtered_pic )
                     break;
+
+                /* now take next input pts, pts dates are only enabled if p_module is set*/
+                date_Increment( &id->interpolated_pts, id->p_decoder->fmt_out.video.i_frame_rate_base );
 
                 OutputFrame( p_sys, p_user_filtered_pic, p_stream, id, out );
 
