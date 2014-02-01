@@ -963,7 +963,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     if( ( state == PAUSE_S ) &&
         ( strcmp( psz_cmd, "pause" ) != 0 ) && (strcmp( psz_cmd,"frame") != 0 ) )
     {
-        msg_rc( "%s", _("Press menu select or pause to continue.") );
+        msg_rc( "%s", _("Press pause to continue.") );
     }
     else
     /* Parse commands that only require an input */
@@ -1189,7 +1189,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
 
         if( state == PAUSE_S )
         {
-            msg_rc( "%s", _("Type 'menu select' or 'pause' to continue.") );
+            msg_rc( "%s", _("Type 'pause' to continue.") );
             return VLC_EGENERIC;
         }
     }
@@ -1444,7 +1444,7 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
         vlc_object_release( p_input );
         if( state == PAUSE_S )
         {
-            msg_rc( "%s", _("Type 'menu select' or 'pause' to continue.") );
+            msg_rc( "%s", _("Type 'pause' to continue.") );
             return VLC_EGENERIC;
         }
     }
@@ -1488,7 +1488,7 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
     vlc_object_release( p_input );
     if( state == PAUSE_S )
     {
-        msg_rc( "%s", _("Type 'menu select' or 'pause' to continue.") );
+        msg_rc( "%s", _("Type 'pause' to continue.") );
         return VLC_EGENERIC;
     }
 
