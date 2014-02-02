@@ -357,7 +357,7 @@ static VLCInfo *_o_sharedInstance = nil;
 
 error:
     NSRunAlertPanel(_NS("Error while saving meta"),
-        _NS("VLC was unable to save the meta data."),
+        @"%@",_NS("VLC was unable to save the meta data."),
         _NS("OK"), nil, nil);
 }
 
