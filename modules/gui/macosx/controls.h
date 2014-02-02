@@ -50,7 +50,6 @@
 - (IBAction)random:(id)sender;
 - (IBAction)repeat:(id)sender;
 - (IBAction)loop:(id)sender;
-- (IBAction)quitAfterPlayback:(id)sender;
 
 - (IBAction)forward:(id)sender;
 - (IBAction)backward:(id)sender;

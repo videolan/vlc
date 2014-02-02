@@ -12,10 +12,10 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
+      <integer value="5132"/>
       <integer value="2730"/>
-      <integer value="24"/>
-      <integer value="5547"/>
       <integer value="2461"/>
+      <integer value="5547"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -3654,14 +3654,6 @@
         </object>
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
-            <string key="label">quitAfterPlayback:</string>
-            <reference key="source" ref="113811151"/>
-            <reference key="destination" ref="872694174"/>
-          </object>
-          <int key="connectionID">5172</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
             <string key="label">next:</string>
             <reference key="source" ref="113811151"/>
             <reference key="destination" ref="232322819"/>
@@ -4463,6 +4455,14 @@
             <reference key="destination" ref="526748719"/>
           </object>
           <int key="connectionID">5611</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">quitAfterPlayback:</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="872694174"/>
+          </object>
+          <int key="connectionID">5612</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -7010,7 +7010,7 @@
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{592, 420}, {222, 383}}</string>
+          <string>{{567, 353}, {222, 383}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -7181,7 +7181,7 @@
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">5611</int>
+      <int key="maxID">5612</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -7259,7 +7259,6 @@
               <string>next:</string>
               <string>play:</string>
               <string>prev:</string>
-              <string>quitAfterPlayback:</string>
               <string>random:</string>
               <string>repeat:</string>
               <string>showPosition:</string>
@@ -7270,7 +7269,6 @@
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -7302,7 +7300,6 @@
               <string>next:</string>
               <string>play:</string>
               <string>prev:</string>
-              <string>quitAfterPlayback:</string>
               <string>random:</string>
               <string>repeat:</string>
               <string>showPosition:</string>
@@ -7347,10 +7344,6 @@
               </object>
               <object class="IBActionInfo">
                 <string key="name">prev:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">quitAfterPlayback:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
@@ -7766,6 +7759,7 @@
               <string>openForum:</string>
               <string>openReadMe:</string>
               <string>openWebsite:</string>
+              <string>quitAfterPlayback:</string>
               <string>resizeVideoWindow:</string>
               <string>savePlaylist:</string>
               <string>setPlaybackRate:</string>
@@ -7848,6 +7842,7 @@
               <string>id</string>
               <string>id</string>
               <string>id</string>
+              <string>id</string>
             </object>
           </object>
           <object class="NSMutableDictionary" key="actionInfosByName">
@@ -7867,6 +7862,7 @@
               <string>openForum:</string>
               <string>openReadMe:</string>
               <string>openWebsite:</string>
+              <string>quitAfterPlayback:</string>
               <string>resizeVideoWindow:</string>
               <string>savePlaylist:</string>
               <string>setPlaybackRate:</string>
@@ -7953,6 +7949,10 @@
               </object>
               <object class="IBActionInfo">
                 <string key="name">openWebsite:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">quitAfterPlayback:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">

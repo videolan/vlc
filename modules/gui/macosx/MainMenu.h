@@ -252,6 +252,7 @@
 - (void)setPlaylistColumnTableState:(NSInteger)i_state forColumn:(NSString *)o_column;
 - (NSMenu *)setupPlaylistTableColumnsMenu;
 
+- (IBAction)quitAfterPlayback:(id)sender;
 - (IBAction)toggleRecord:(id)sender;
 - (void)updateRecordState:(BOOL)b_value;
 - (IBAction)setPlaybackRate:(id)sender;

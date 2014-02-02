@@ -756,6 +756,15 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 #pragma mark -
 #pragma mark Playback
+
+- (IBAction)quitAfterPlayback:(id)sender
+{
+    playlist_t *p_playlist = pl_Get(VLCIntf);
+    bool b_value = !var_CreateGetBool(p_playlist, "play-and-exit");
+    var_SetBool(p_playlist, "play-and-exit", b_value);
+    config_PutInt(p_intf, "play-and-exit", b_value);
+}
+
 - (IBAction)toggleRecord:(id)sender
 {
     [[VLCCoreInteraction sharedInstance] toggleRecord];
@@ -1502,8 +1511,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
         [o_mi setState: i_state];
     } else if ([o_title isEqualToString: _NS("Quit after Playback")]) {
         int i_state;
-        var_Get(p_playlist, "play-and-exit", &val);
-        i_state = val.b_bool ? NSOnState : NSOffState;
+        bool b_value = var_InheritBool(p_playlist, "play-and-exit");
+        i_state = b_value ? NSOnState : NSOffState;
         [o_mi setState: i_state];
     } else if ([o_title isEqualToString: _NS("Step Forward")] ||
                [o_title isEqualToString: _NS("Step Backward")] ||
