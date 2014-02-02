@@ -55,12 +55,6 @@ static bool signal_ignored (int signum)
             ? (void *)sa.sa_sigaction : (void *)sa.sa_handler) == SIG_IGN;
 }
 
-static void vlc_kill (void *data)
-{
-    pthread_t *ps = data;
-    pthread_kill (*ps, SIGTERM);
-}
-
 static void exit_timeout (int signum)
 {
     (void) signum;
@@ -148,7 +142,6 @@ int main( int i_argc, const char *ppsz_argv[] )
     sigaddset (&set, SIGCHLD);
 
     /* Block all these signals */
-    pthread_t self = pthread_self ();
     pthread_sigmask (SIG_SETMASK, &set, NULL);
 
     const char *argv[i_argc + 3];
@@ -217,7 +210,6 @@ int main( int i_argc, const char *ppsz_argv[] )
         return 1;
 
     int ret = 1;
-    libvlc_set_exit_handler (vlc, vlc_kill, &self);
     libvlc_set_app_id (vlc, "org.VideoLAN.VLC", PACKAGE_VERSION, PACKAGE_NAME);
     libvlc_set_user_agent (vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
 

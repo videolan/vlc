@@ -283,6 +283,13 @@ void WindowClose(vout_window_t *p_wnd)
     [o_pool release];
 }
 
+/* Used to abort the app.exec() on OSX after libvlc_Quit is called */
+#include "../../../lib/libvlc_internal.h" /* libvlc_SetExitHandler */
+static void QuitVLC( void *obj )
+{
+    [[VLCApplication sharedApplication] performSelectorOnMainThread:@selector(terminate:) withObject:nil waitUntilDone:NO];
+}
+
 /*****************************************************************************
  * Run: main loop
  *****************************************************************************/
@@ -297,6 +304,8 @@ static void Run(intf_thread_t *p_intf)
     o_appLock = [[NSLock alloc] init];
     o_plItemChangedLock = [[NSLock alloc] init];
     o_vout_provider_lock = [[NSLock alloc] init];
+
+    libvlc_SetExitHandler(p_intf->p_libvlc, QuitVLC, p_intf);
 
     [[VLCMain sharedInstance] setIntf: p_intf];
 
