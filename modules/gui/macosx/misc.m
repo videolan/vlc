@@ -984,3 +984,76 @@ void _drawFrameInRect(NSRect frameRect)
 }
 
 @end
+
+/*****************************************************************************
+ * VLCByteCountFormatter addition
+ *****************************************************************************/
+
+#ifndef MAC_OS_X_VERSION_10_8
+@interface NSByteCountFormatter (IntroducedInMountainLion)
++ (NSString *)stringFromByteCount:(long long)byteCount countStyle:(NSByteCountFormatterCountStyle)countStyle;
+@end
+#endif
+
+
+@implementation VLCByteCountFormatter
+
++ (NSString *)stringFromByteCount:(long long)byteCount countStyle:(NSByteCountFormatterCountStyle)countStyle
+{
+    if (OSX_MAVERICKS || OSX_MOUNTAIN_LION)
+        return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleFile];
+
+    float devider = 0.;
+    float returnValue = 0.;
+    NSString *suffix;
+
+    NSNumberFormatter *theFormatter = [[NSNumberFormatter alloc] init];
+    [theFormatter setLocale:[NSLocale currentLocale]];
+    [theFormatter setAllowsFloats:YES];
+
+    NSString *returnString = @"";
+
+    if (countStyle != NSByteCountFormatterCountStyleDecimal)
+        devider = 1024.;
+    else
+        devider = 1000.;
+
+    if (byteCount < 1000) {
+        returnValue = byteCount;
+        suffix = _NS("B");
+        [theFormatter setMaximumFractionDigits:0];
+        goto end;
+    }
+
+    if (byteCount < 1000000) {
+        returnValue = byteCount / devider;
+        suffix = _NS("KB");
+        [theFormatter setMaximumFractionDigits:0];
+        goto end;
+    }
+
+    if (byteCount < 1000000000) {
+        returnValue = byteCount / devider / devider;
+        suffix = _NS("MB");
+        [theFormatter setMaximumFractionDigits:1];
+        goto end;
+    }
+
+    [theFormatter setMaximumFractionDigits:2];
+    if (byteCount < 1000000000000) {
+        returnValue = byteCount / devider / devider / devider;
+        suffix = _NS("GB");
+        goto end;
+    }
+
+    returnValue = byteCount / devider / devider / devider / devider;
+    suffix = _NS("TB");
+
+end:
+    returnString = [NSString stringWithFormat:@"%@ %@", [theFormatter stringFromNumber:[NSNumber numberWithFloat:returnValue]], suffix];
+    [theFormatter release];
+
+    return returnString;
+}
+
+@end

@@ -375,7 +375,7 @@
                 if ([fileManager fileExistsAtPath:[url path]]) {
                     NSError *error;
                     NSDictionary *attributes = [fileManager attributesOfItemAtPath:[url path] error:&error];
-                    o_value = [NSByteCountFormatter stringFromByteCount:[attributes fileSize] countStyle:NSByteCountFormatterCountStyleDecimal];
+                    o_value = [VLCByteCountFormatter stringFromByteCount:[attributes fileSize] countStyle:NSByteCountFormatterCountStyleDecimal];
                 }
             }
             free(psz_value);
