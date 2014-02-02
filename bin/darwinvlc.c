@@ -226,8 +226,6 @@ int main( int i_argc, const char *ppsz_argv[] )
     if (libvlc_add_intf (vlc, NULL))
         goto out;
 
-    libvlc_playlist_play (vlc, -1, 0, NULL);
-
     /* Qt4 insists on catching SIGCHLD via signal handler. To work around that,
      * unblock it after all our child threads are created. */
     sigdelset (&set, SIGCHLD);
