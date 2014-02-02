@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.m: MacOS X interface module
  *****************************************************************************
-* Copyright (C) 2002-2013 VLC authors and VideoLAN
+* Copyright (C) 2002-2014 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -38,6 +38,8 @@
 #include <string.h>
 #include <math.h>
 #include <sys/mount.h>
+
+#import "CompatibilityFixes.h"
 
 #import "intf.h"
 #import "wizard.h"

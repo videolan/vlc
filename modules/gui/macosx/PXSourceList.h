@@ -7,7 +7,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "CompatibilityFixes.h"
 
 #import "PXSourceListDelegate.h"
 #import "PXSourceListDataSource.h"

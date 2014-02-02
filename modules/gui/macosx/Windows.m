@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Windows.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2012-2013 VLC authors and VideoLAN
+ * Copyright (C) 2012-2014 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -27,6 +27,7 @@
 #import "CoreInteraction.h"
 #import "ControlsBar.h"
 #import "VideoView.h"
+#import "CompatibilityFixes.h"
 
 /*****************************************************************************
  * VLCWindow

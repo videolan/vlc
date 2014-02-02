@@ -8,6 +8,7 @@
 //  GC-enabled code revised by Stefan Vogt http://byteproject.net
 //
 
+#import "CompatibilityFixes.h"
 #import "PXSourceList.h"
 #import "SideBarItem.h"
 

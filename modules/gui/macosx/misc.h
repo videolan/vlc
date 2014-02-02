@@ -1,7 +1,7 @@
 /*****************************************************************************
  * misc.h: code not specific to vlc
  *****************************************************************************
- * Copyright (C) 2003-2013 VLC authors and VideoLAN
+ * Copyright (C) 2003-2014 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "CompatibilityFixes.h"
 
 /*****************************************************************************
  * NSSound (VLCAdditions)
