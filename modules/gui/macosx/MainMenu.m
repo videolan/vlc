@@ -76,11 +76,13 @@ static VLCMainMenu *_o_sharedInstance = nil;
                       _NS("Date"),          DATE_COLUMN,
                       _NS("Language"),      LANGUAGE_COLUMN,
                       _NS("URI"),           URI_COLUMN,
+                      _NS("File Size"),     FILESIZE_COLUMN,
                       nil];
         // this array also assigns tags (index) to type of menu item
         o_ptc_menuorder = [[NSArray alloc] initWithObjects: TRACKNUM_COLUMN, TITLE_COLUMN,
                            ARTIST_COLUMN, DURATION_COLUMN, GENRE_COLUMN, ALBUM_COLUMN,
-                           DESCRIPTION_COLUMN, DATE_COLUMN, LANGUAGE_COLUMN, URI_COLUMN, nil];
+                           DESCRIPTION_COLUMN, DATE_COLUMN, LANGUAGE_COLUMN, URI_COLUMN,
+                           FILESIZE_COLUMN,nil];
     }
 
     return _o_sharedInstance;

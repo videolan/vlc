@@ -363,6 +363,22 @@
             free(psz_value);
         }
     }
+    else if ([o_identifier isEqualToString:FILESIZE_COLUMN]) {
+        psz_value = input_item_GetURI(p_item->p_input);
+        o_value = @"";
+        if (psz_value) {
+            NSURL *url = [NSURL URLWithString:[NSString stringWithUTF8String:psz_value]];
+            if ([url isFileURL]) {
+                NSFileManager *fileManager = [NSFileManager defaultManager];
+                if ([fileManager fileExistsAtPath:[url path]]) {
+                    NSError *error;
+                    NSDictionary *attributes = [fileManager attributesOfItemAtPath:[url path] error:&error];
+                    o_value = [NSByteCountFormatter stringFromByteCount:[attributes fileSize] countStyle:NSByteCountFormatterCountStyleDecimal];
+                }
+            }
+            free(psz_value);
+        }
+    }
     else if ([o_identifier isEqualToString:@"status"]) {
         if (input_item_HasErrorWhenReading(p_item->p_input)) {
             o_value = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kAlertCautionIcon)];
