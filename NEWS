@@ -77,6 +77,7 @@ Streaming:
     :std{access=http{mime=video/webm},mux=webm,dst=:4212}'
  * GSM, VP8, Opus and JPEG RTP packetization
  * HLS: Allow setting the first segment number and numerous improvements
+ * new stats module to output block timing values and md5 sums
 
 libVLC:
  * add equalizer API libvlc_audio_equalizer_* functions

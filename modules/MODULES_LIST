@@ -334,6 +334,7 @@ $Id$
  * stream_out_rtp: rtp stream output module
  * stream_out_setid: Set the ID/Lang of an ES when streaming
  * stream_out_smem: stream output module to a memory buffer
+ * stream_out_stats: Print timing values and md5 for sout blocks
  * stream_out_standard: standard stream output module
  * stream_out_transcode: audio & video transcoder
  * subsdec: a codec to output textual subtitles
