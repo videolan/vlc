@@ -830,7 +830,6 @@ static void Help( intf_thread_t *p_intf)
     msg_rc("%s", _("| snapshot . . . . . . . . . . . . take video snapshot"));
     msg_rc("%s", _("| strack [X] . . . . . . . . .  set/get subtitle track"));
     msg_rc("%s", _("| key [hotkey name] . . . . . .  simulate hotkey press"));
-    msg_rc("%s", _("| menu . . [on|off|up|down|left|right|select] use menu"));
     msg_rc(  "| ");
     msg_rc("%s", _("| help . . . . . . . . . . . . . . . this help message"));
     msg_rc("%s", _("| logout . . . . . . .  exit (if in socket connection)"));
