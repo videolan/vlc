@@ -739,6 +739,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self showDropZone];
     PL_UNLOCK;
     [o_sidebar_view setNeedsDisplay:YES];
+
+    [self _updatePlaylistTitle];
 }
 
 - (void)setPause
@@ -902,6 +904,47 @@ static VLCMainWindow *_o_sharedInstance = nil;
 }
 
 #pragma mark -
+#pragma mark private playlist magic
+- (void)_updatePlaylistTitle
+{
+    playlist_t * p_playlist = pl_Get(VLCIntf);
+    PL_LOCK;
+    playlist_item_t * currentPlaylistRoot = [[[VLCMain sharedInstance] playlist] currentPlaylistRoot];
+    PL_UNLOCK;
+    if (currentPlaylistRoot == p_playlist->p_local_category || currentPlaylistRoot == p_playlist->p_ml_category) {
+        if (currentPlaylistRoot == p_playlist->p_local_category)
+            [o_chosen_category_lbl setStringValue: [_NS("Playlist") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_local_category]]];
+        else
+            [o_chosen_category_lbl setStringValue: [_NS("Media Library") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_ml_category]]];
+    }
+}
+
+- (NSString *)_playbackDurationOfNode:(playlist_item_t*)node
+{
+    if (!node)
+        return @"";
+
+    playlist_t * p_playlist = pl_Get(VLCIntf);
+    PL_LOCK;
+    mtime_t mt_duration = playlist_GetNodeDuration( node );
+    PL_UNLOCK;
+
+    if (mt_duration < 1)
+        return @"";
+
+    mt_duration = mt_duration / 1000000;
+
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:mt_duration];
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"HH:mm:ss"];
+    [formatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+
+    NSString *playbackDuration = [NSString stringWithFormat:@" — %@",[formatter stringFromDate:date]];
+    [formatter release];
+    return playbackDuration;
+}
+
+#pragma mark -
 #pragma mark Side Bar Data handling
 /* taken under BSD-new from the PXSourceList sample project, adapted for VLC */
 - (NSUInteger)sourceList:(PXSourceList*)sourceList numberOfChildrenOfItem:(id)item
@@ -1040,7 +1083,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     NSIndexSet *selectedIndexes = [o_sidebar_view selectedRowIndexes];
     id item = [o_sidebar_view itemAtRow:[selectedIndexes firstIndex]];
 
-
     //Set the label text to represent the new selection
     if ([item sdtype] > -1 && [[item identifier] length] > 0) {
         BOOL sd_loaded = playlist_IsServicesDiscoveryLoaded(p_playlist, [[item identifier] UTF8String]);
@@ -1052,9 +1094,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     if ([[item identifier] isEqualToString:@"playlist"]) {
         [[[VLCMain sharedInstance] playlist] setPlaylistRoot:p_playlist->p_local_category];
+        [o_chosen_category_lbl setStringValue: [[o_chosen_category_lbl stringValue] stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_local_category]]];
     } else if ([[item identifier] isEqualToString:@"medialibrary"]) {
-        if (p_playlist->p_ml_category)
+        if (p_playlist->p_ml_category) {
             [[[VLCMain sharedInstance] playlist] setPlaylistRoot:p_playlist->p_ml_category];
+            [o_chosen_category_lbl setStringValue: [[o_chosen_category_lbl stringValue] stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_ml_category]]];
+        }
     } else {
         playlist_item_t * pl_item;
         PL_LOCK;
