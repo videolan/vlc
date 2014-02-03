@@ -57,11 +57,12 @@ if HAVE_JACK
 aout_LTLIBRARIES += libjack_plugin.la
 endif
 
-libmmdevice_plugin_la_SOURCES = audio_output/mmdevice.c audio_output/mmdevice.h \
-	audio_output/wasapi.c
-libmmdevice_plugin_la_LIBADD = -lole32 -lksuser
+libmmdevice_plugin_la_SOURCES = audio_output/mmdevice.c audio_output/mmdevice.h
+libmmdevice_plugin_la_LIBADD = -lole32
+libwasapi_plugin_la_SOURCES = audio_output/wasapi.c
+libwasapi_plugin_la_LIBADD = -lole32 -lksuser
 if HAVE_WASAPI
-aout_LTLIBRARIES += libmmdevice_plugin.la
+aout_LTLIBRARIES += libmmdevice_plugin.la libwasapi_plugin.la
 endif
 
 libdirectsound_plugin_la_SOURCES = audio_output/directsound.c \

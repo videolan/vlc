@@ -40,6 +40,7 @@ DEFINE_PROPERTYKEY(PKEY_Device_FriendlyName, 0xa45c254e, 0xdf1c, 0x4efd,
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_charset.h>
+#include <vlc_modules.h>
 #include "audio_output/mmdevice.h"
 
 DEFINE_GUID (GUID_VLC_AUD_OUT, 0x4533f59d, 0x59ee, 0x00c6,
@@ -74,6 +75,7 @@ static wchar_t default_device[1] = L"";
 struct aout_sys_t
 {
     aout_stream_t *stream; /**< Underlying audio output stream */
+    module_t *module;
 #if !VLC_WINSTORE_APP
     audio_output_t *aout;
     IMMDeviceEnumerator *it; /**< Device enumerator, NULL when exiting */
@@ -858,10 +860,27 @@ static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
 }
 #endif /* VLC_WINSTORE_APP */
 
+static int aout_stream_Start(void *func, va_list ap)
+{
+    aout_stream_start_t start = func;
+    aout_stream_t *s = va_arg(ap, aout_stream_t *);
+    audio_sample_format_t *fmt = va_arg(ap, audio_sample_format_t *);
+
+    return SUCCEEDED(start(s, fmt, &GUID_VLC_AUD_OUT))
+        ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
+static void aout_stream_Stop(void *func, va_list ap)
+{
+    aout_stream_stop_t stop = func;
+    aout_stream_t *s = va_arg(ap, aout_stream_t *);
+
+    stop(s);
+}
+
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
-    HRESULT hr;
 
     assert (sys->stream == NULL);
 #if !VLC_WINSTORE_APP
@@ -882,14 +901,18 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     s->owner.activate = ActivateDevice;
 
     EnterMTA();
-    hr = aout_stream_Start(s, fmt, &GUID_VLC_AUD_OUT);
-    if (SUCCEEDED(hr))
-        sys->stream = s;
-    else
-        vlc_object_release(s);
+    sys->module = vlc_module_load(s, "aout stream", NULL, false,
+                                  aout_stream_Start, s, fmt);
     LeaveMTA();
 
-    return vlc_FromHR(aout, hr);
+    if (sys->module == NULL)
+    {
+        vlc_object_release(s);
+        return -1;
+    }
+
+    sys->stream = s;
+    return 0;
 }
 
 static void Stop(audio_output_t *aout)
@@ -899,7 +922,7 @@ static void Stop(audio_output_t *aout)
     assert (sys->stream != NULL);
 
     EnterMTA();
-    aout_stream_Stop(sys->stream);
+    vlc_module_unload(sys->module, aout_stream_Stop, sys->stream);
     LeaveMTA();
 
     vlc_object_release(sys->stream);

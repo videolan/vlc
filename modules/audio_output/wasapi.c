@@ -32,6 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
+#include <vlc_plugin.h>
 #include "audio_output/mmdevice.h"
 
 static LARGE_INTEGER freq; /* performance counters frequency */
@@ -399,13 +400,11 @@ static void Stop(aout_stream_t *s)
     IAudioClient_Release(sys->client);
 }
 
-HRESULT aout_stream_Start(aout_stream_t *s,
-                          audio_sample_format_t *restrict fmt, const GUID *sid)
-{
-    return Start(s, fmt, sid);
-}
-
-void aout_stream_Stop(aout_stream_t *s)
-{
-    Stop(s);
-}
+vlc_module_begin()
+    set_shortname("WASAPI")
+    set_description(N_("Windows Audio Session API output"))
+    set_capability("aout stream", /*50*/0)
+    set_category(CAT_AUDIO)
+    set_subcategory(SUBCAT_AUDIO_AOUT)
+    set_callbacks(Start, Stop)
+vlc_module_end()
