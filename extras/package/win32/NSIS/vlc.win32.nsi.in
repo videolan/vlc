@@ -48,7 +48,7 @@ SetCompressor lzma
 SetCompressor /SOLID lzma
 !endif
 
-SetOverwrite ifnewer
+SetOverwrite ifdiff
 CRCCheck on
 BrandingText "${PRODUCT_GROUP} ${PRODUCT_NAME}"
 
