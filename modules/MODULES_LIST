@@ -59,6 +59,7 @@ $Id$
  * caca: color ASCII art video output using libcaca
  * caf: CAF demuxer
  * canvas: Automatically resize and padd a video
+ * caopengllayer: CoreAnimation OpenGL video output
  * cc: CC 608/708 subtitles decoder
  * cdda: input module to read audio CDs
  * cdg: CD-G decoder

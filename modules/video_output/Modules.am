@@ -22,6 +22,14 @@ libdecklinkoutput_plugin_la_LIBADD = $(LIBS_decklink) $(LIBDL)
 vout_LTLIBRARIES += libdecklinkoutput_plugin.la
 endif
 
+if HAVE_DARWIN
+libcaopengllayer_plugin_la_SOURCES = caopengllayer.m opengl.c opengl.h
+libcaopengllayer_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
+libcaopengllayer_plugin_la_LIBADD = $(GL_LIBS)
+libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' -Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
+vout_LTLIBRARIES += libcaopengllayer_plugin.la
+endif
+
 ### OpenGL ###
 # TODO: merge all three source files (?)
 libgles2_plugin_la_SOURCES = opengl.c opengl.h gl.c
