@@ -939,10 +939,6 @@ static int Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
 
-    if (!aout->b_force && var_InheritBool(aout, "spdif"))
-        /* Fallback to other plugin until pass-through is implemented */
-        return VLC_EGENERIC;
-
     aout_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -1047,7 +1043,7 @@ static void Close(vlc_object_t *obj)
 vlc_module_begin()
     set_shortname("MMDevice")
     set_description(N_("Windows Multimedia Device output"))
-    set_capability("audio output", /*150*/0)
+    set_capability("audio output", 150)
 #if VLC_WINSTORE_APP
     /* Pointer to the activated AudioClient* */
     add_integer("mmdevice-audioclient", 0x0, NULL, NULL, true);
