@@ -358,7 +358,9 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     jpeg_set_colorspace(&p_sys->p_jpeg, JCS_YCbCr);
 
     p_sys->p_jpeg.raw_data_in = TRUE;
+#if JPEG_LIB_VERSION >= 70
     p_sys->p_jpeg.do_fancy_downsampling = FALSE;
+#endif
 
     jpeg_set_quality(&p_sys->p_jpeg, p_sys->i_quality, TRUE);
 
