@@ -642,7 +642,7 @@ static int DeviceSelect(audio_output_t *aout, const char *id)
         SleepConditionVariableCS(&sys->ready, &sys->lock, INFINITE);
     LeaveCriticalSection(&sys->lock);
 
-    if (sys->stream != NULL)
+    if (sys->stream != NULL && sys->dev != NULL)
         /* Request restart of stream with the new device */
         aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
     return (sys->dev != NULL) ? 0 : -1;
@@ -865,9 +865,12 @@ static int aout_stream_Start(void *func, va_list ap)
     aout_stream_start_t start = func;
     aout_stream_t *s = va_arg(ap, aout_stream_t *);
     audio_sample_format_t *fmt = va_arg(ap, audio_sample_format_t *);
+    HRESULT *hr = va_arg(ap, HRESULT *);
 
-    return SUCCEEDED(start(s, fmt, &GUID_VLC_AUD_OUT))
-        ? VLC_SUCCESS : VLC_EGENERIC;
+    *hr = start(s, fmt, &GUID_VLC_AUD_OUT);
+    if (*hr == AUDCLNT_E_DEVICE_INVALIDATED)
+        return VLC_ETIMEOUT;
+    return SUCCEEDED(*hr) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 static void aout_stream_Stop(void *func, va_list ap)
@@ -881,13 +884,8 @@ static void aout_stream_Stop(void *func, va_list ap)
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
-
-    assert (sys->stream == NULL);
-#if !VLC_WINSTORE_APP
-    /* Open the default device if required (to deal with restarts) */
-    if (sys->dev == NULL && FAILED(DeviceSelect(aout, NULL)))
+    if (sys->dev == NULL)
         return -1;
-#endif
 
     aout_stream_t *s = vlc_object_create(aout, sizeof (*s));
     if (unlikely(s == NULL))
@@ -901,8 +899,15 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     s->owner.activate = ActivateDevice;
 
     EnterMTA();
-    sys->module = vlc_module_load(s, "aout stream", NULL, false,
-                                  aout_stream_Start, s, fmt);
+    for (;;)
+    {
+        HRESULT hr;
+
+        sys->module = vlc_module_load(s, "aout stream", NULL, false,
+                                      aout_stream_Start, s, fmt, &hr);
+        if (hr != AUDCLNT_E_DEVICE_INVALIDATED || DeviceSelect(aout, NULL))
+            break;
+    }
     LeaveMTA();
 
     if (sys->module == NULL)
@@ -911,6 +916,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         return -1;
     }
 
+    assert (sys->stream == NULL);
     sys->stream = s;
     return 0;
 }
