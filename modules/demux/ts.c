@@ -285,6 +285,9 @@ struct demux_sys_t
     /* TS packet size (188, 192, 204) */
     int         i_packet_size;
 
+    /* Additional TS packet header size (BluRay TS packets have 4-byte header before sync byte) */
+    int         i_packet_header_size;
+
     /* how many TS packet we read at once */
     int         i_ts_read;
 
@@ -385,12 +388,14 @@ static void SetPrgFilter( demux_t *, int i_prg, bool b_selected );
 #define TS_PACKET_SIZE_MAX 204
 #define TS_TOPFIELD_HEADER 1320
 
-static int DetectPacketSize( demux_t *p_demux )
+static int DetectPacketSize( demux_t *p_demux, int *pi_header_size )
 {
     const uint8_t *p_peek;
     if( stream_Peek( p_demux->s,
                      &p_peek, TS_PACKET_SIZE_MAX ) < TS_PACKET_SIZE_MAX )
         return -1;
+
+    *pi_header_size = 0;
 
     if( memcmp( p_peek, "TFrc", 4 ) == 0 )
     {
@@ -483,6 +488,10 @@ static int DetectPacketSize( demux_t *p_demux )
                  p_peek[i_sync + 2 * TS_PACKET_SIZE_192] == 0x47 &&
                  p_peek[i_sync + 3 * TS_PACKET_SIZE_192] == 0x47 )
         {
+            if( i_sync == 4 )
+            {
+                *pi_header_size = 4; /* BluRay TS packets have 4-byte header */
+            }
             return TS_PACKET_SIZE_192;
         }
         else if( p_peek[i_sync + 1 * TS_PACKET_SIZE_204] == 0x47 &&
@@ -554,12 +563,12 @@ static int Open( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
-    int          i_packet_size;
+    int          i_packet_size, i_packet_header_size = 0;
 
     ts_pid_t    *pat;
 
     /* Search first sync byte */
-    i_packet_size = DetectPacketSize( p_demux );
+    i_packet_size = DetectPacketSize( p_demux, &i_packet_header_size );
     if( i_packet_size < 0 )
         return VLC_EGENERIC;
 
@@ -595,6 +604,7 @@ static int Open( vlc_object_t *p_this )
     /* PID 8191 is padding */
     p_sys->pid[8191].b_seen = true;
     p_sys->i_packet_size = i_packet_size;
+    p_sys->i_packet_header_size = i_packet_header_size;
     p_sys->b_udp_out = false;
     p_sys->fd = -1;
     p_sys->i_ts_read = 50;
@@ -1880,6 +1890,13 @@ static block_t* ReadTSPacket( demux_t *p_demux )
         return NULL;
     }
 
+    /* Skip header (BluRay streams).
+     * re-sync logic would do this (by adjusting packet start), but this would result in losing first and last ts packets.
+     * First packet is usually PAT, and losing it means losing whole first GOP. This is fatal with still-image based menus.
+     */
+    p_pkt->p_buffer += p_sys->i_packet_header_size;
+    p_pkt->i_buffer -= p_sys->i_packet_header_size;
+
     /* Check sync byte and re-sync if needed */
     if( p_pkt->p_buffer[0] != 0x47 )
     {
@@ -1900,8 +1917,8 @@ static block_t* ReadTSPacket( demux_t *p_demux )
 
             while( i_skip < i_peek - p_sys->i_packet_size )
             {
-                if( p_peek[i_skip] == 0x47 &&
-                        p_peek[i_skip + p_sys->i_packet_size] == 0x47 )
+                if( p_peek[i_skip + p_sys->i_packet_header_size] == 0x47 &&
+                        p_peek[i_skip + p_sys->i_packet_header_size + p_sys->i_packet_size] == 0x47 )
                 {
                     break;
                 }
