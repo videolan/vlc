@@ -567,7 +567,6 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
     memset( p_sys, 0, sizeof( demux_sys_t ) );
-    p_sys->i_packet_size = i_packet_size;
     vlc_mutex_init( &p_sys->csa_lock );
 
     p_sys->buffer = NULL;
