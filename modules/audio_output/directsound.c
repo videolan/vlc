@@ -102,7 +102,6 @@ struct aout_sys_t
                                        * secondary buffers into the primary) */
 
     LPDIRECTSOUNDNOTIFY p_notify;
-    HANDLE hnotify_evt;
     struct
     {
         float            volume;
@@ -888,15 +887,6 @@ static int Open(vlc_object_t *obj)
     aout_VolumeReport(aout, sys->volume.volume );
     MuteSet(aout, var_InheritBool(aout, "mute"));
 
-    sys->hnotify_evt = CreateEvent(NULL, FALSE, TRUE, NULL);
-    if( !sys->hnotify_evt )
-    {
-        msg_Err(aout, "cannot create Event");
-        FreeLibrary(sys->hdsound_dll);
-        free(sys);
-        return VLC_EGENERIC;
-    }
-
     /* DirectSound does not support hot-plug events (unless with WASAPI) */
     char **ids, **names;
     int count = ReloadDirectXDevices(obj, NULL, &ids, &names);
@@ -925,7 +915,6 @@ static void Close(vlc_object_t *obj)
     aout_sys_t *sys = aout->sys;
 
     var_Destroy(aout, "directx-audio-device");
-    CloseHandle(sys->hnotify_evt);
     FreeLibrary(sys->hdsound_dll); /* free DSOUND.DLL */
     free(sys);
 }
