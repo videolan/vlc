@@ -37,11 +37,16 @@
 #include <vlc_charset.h>
 
 #include "audio_output/windows_audio_common.h"
+#include "audio_output/mmdevice.h"
+#include <mmdeviceapi.h>
 
 #define DS_BUF_SIZE (6*1024*1024)
 
 static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
+static HRESULT StreamStart( aout_stream_t *, audio_sample_format_t *,
+                            const GUID * );
+static HRESULT StreamStop( aout_stream_t * );
 static int ReloadDirectXDevices( vlc_object_t *, const char *,
                                  char ***, char *** );
 
@@ -84,6 +89,10 @@ vlc_module_begin ()
         change_integer_range( DSBVOLUME_MIN, DSBVOLUME_MAX )
 
     set_callbacks( Open, Close )
+
+    add_submodule()
+        set_capability( "aout stream", 30 )
+        set_callbacks( StreamStart, StreamStop )
 vlc_module_end ()
 
 typedef struct aout_stream_sys
@@ -141,6 +150,11 @@ static HRESULT TimeGet( aout_stream_sys_t *sys, mtime_t *delay )
 
     *delay = ( size / sys->i_bytes_per_sample ) * CLOCK_FREQ / sys->i_rate;
     return DS_OK;
+}
+
+static HRESULT StreamTimeGet( aout_stream_t *s, mtime_t *delay )
+{
+    return TimeGet( s->sys, delay );
 }
 
 static int OutputTimeGet( audio_output_t *aout, mtime_t *delay )
@@ -272,6 +286,11 @@ static HRESULT Play( vlc_object_t *obj, aout_stream_sys_t *sys,
     return dsresult;
 }
 
+static HRESULT StreamPlay( aout_stream_t *s, block_t *block )
+{
+    return Play( VLC_OBJECT(s), s->sys, block );
+}
+
 static void OutputPlay( audio_output_t *aout, block_t *block )
 {
     Play( VLC_OBJECT(aout), &aout->sys->s, block );
@@ -288,6 +307,11 @@ static HRESULT Pause( aout_stream_sys_t *sys, bool pause )
     return hr;
 }
 
+static HRESULT StreamPause( aout_stream_t *s, bool pause )
+{
+    return Pause( s->sys, pause );
+}
+
 static void OutputPause( audio_output_t *aout, bool pause, mtime_t date )
 {
     Pause( &aout->sys->s, pause );
@@ -297,6 +321,11 @@ static void OutputPause( audio_output_t *aout, bool pause, mtime_t date )
 static HRESULT Flush( aout_stream_sys_t *sys )
 {
     return IDirectSoundBuffer_Stop( sys->p_dsbuffer );
+}
+
+static HRESULT StreamFlush( aout_stream_t *s )
+{
+    return Flush( s->sys );
 }
 
 static void OutputFlush( audio_output_t *aout, bool drain )
@@ -509,6 +538,15 @@ static HRESULT Stop( aout_stream_sys_t *p_sys )
     return DS_OK;
 }
 
+static HRESULT StreamStop( aout_stream_t *s )
+{
+    HRESULT hr;
+
+    hr = Stop( s->sys );
+    free( s->sys );
+    return hr;
+}
+
 static void OutputStop( audio_output_t *aout )
 {
     msg_Dbg( aout, "closing audio device" );
@@ -702,6 +740,51 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
 
 error:
     Stop( sys );
+    return hr;
+}
+
+static HRESULT StreamStart( aout_stream_t *s,
+                            audio_sample_format_t *restrict fmt,
+                            const GUID *sid )
+{
+    aout_stream_sys_t *sys = malloc( sizeof( *sys ) );
+    if( unlikely(sys == NULL) )
+        return E_OUTOFMEMORY;
+
+    DIRECTX_AUDIO_ACTIVATION_PARAMS params = {
+        .cbDirectXAudioActivationParams = sizeof( params ),
+        .guidAudioSession = *sid,
+        .dwAudioStreamFlags = 0,
+    };
+    PROPVARIANT prop;
+
+    PropVariantInit( &prop );
+    prop.vt = VT_BLOB;
+    prop.blob.cbSize = sizeof( params );
+    prop.blob.pBlobData = (BYTE *)&params;
+
+    void *pv;
+    HRESULT hr = aout_stream_Activate( s, &IID_IDirectSound, &prop, &pv );
+    if( FAILED(hr) )
+        goto error;
+
+    sys->p_dsobject = pv;
+
+    hr = Start( VLC_OBJECT(s), sys, fmt );
+    if( FAILED(hr) )
+    {
+        IDirectSound_Release( sys->p_dsobject );
+        goto error;
+    }
+
+    s->sys = sys;
+    s->time_get = StreamTimeGet;
+    s->play = StreamPlay;
+    s->pause = StreamPause;
+    s->flush = StreamFlush;
+    return S_OK;
+error:
+    free( sys );
     return hr;
 }
 
