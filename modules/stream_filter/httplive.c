@@ -1443,8 +1443,8 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
             }
             vlc_array_append(hls_old->segments, p);
             msg_Dbg(s, "- segment %d appended", p->sequence);
-            hls_old->max_segment_length = __MAX(hls_old->max_segment_length, l->duration);
-            msg_Dbg(s, " playlists new max duration %d", hls_old->max_segment_length);
+            hls_old->max_segment_length = __MAX(hls_old->max_segment_length, p->duration);
+            msg_Dbg(s, "  - segments new max duration %d", hls_old->max_segment_length);
 
             // Signal download thread otherwise the segment will not get downloaded
             *stream_appended = true;
