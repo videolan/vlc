@@ -332,6 +332,10 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
 
+    if (unlikely(!p_pic))
+    {
+        return NULL;
+    }
     block_t *p_block = block_Alloc(p_sys->i_blocksize);
     if (p_block == NULL)
     {
