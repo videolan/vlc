@@ -2436,6 +2436,9 @@ static void PIDFillFormat( ts_es_t *es, int i_stream_type )
     case 0x1B:  /* H264 <- check transport syntax/needed descriptor */
         es_format_Init( fmt, VIDEO_ES, VLC_CODEC_H264 );
         break;
+    case 0x24:  /* HEVC */
+        es_format_Init( fmt, VIDEO_ES, VLC_CODEC_HEVC );
+        break;
     case 0x42:  /* CAVS (Chinese AVS) */
         es_format_Init( fmt, VIDEO_ES, VLC_CODEC_CAVS );
         break;
@@ -3671,6 +3674,11 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pid_t *pid,
         p_fmt->i_cat = AUDIO_ES;
         p_fmt->b_packetized = true;
         p_fmt->i_codec = VLC_CODEC_302M;
+    }
+    else if( PMTEsHasRegistration( p_demux, p_es, "HEVC" ) )
+    {
+        p_fmt->i_cat = VIDEO_ES;
+        p_fmt->i_codec = VLC_CODEC_HEVC;
     }
     else
     {
