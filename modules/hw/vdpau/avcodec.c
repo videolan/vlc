@@ -52,10 +52,10 @@ vlc_module_end()
 
 struct vlc_va_sys_t
 {
+    AVVDPAUContext *context;
     vdp_t *vdp;
     VdpDevice device;
     VdpDecoderProfile profile;
-    AVVDPAUContext context;
     uint16_t width;
     uint16_t height;
 };
@@ -130,16 +130,16 @@ static int Init(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
     }
 
     err = vdp_decoder_create(sys->vdp, sys->device, sys->profile, width,
-                             height, surfaces, &sys->context.decoder);
+                             height, surfaces, &sys->context->decoder);
     if (err != VDP_STATUS_OK)
     {
         msg_Err(va, "%s creation failure: %s", "decoder",
                 vdp_get_error_string(sys->vdp, err));
-        sys->context.decoder = VDP_INVALID_HANDLE;
+        sys->context->decoder = VDP_INVALID_HANDLE;
         return VLC_EGENERIC;
     }
 
-    *ctxp = &sys->context;
+    *ctxp = sys->context;
     /* TODO: select better chromas when appropriate */
     *chromap = VLC_CODEC_VDPAU_VIDEO_420;
     return VLC_SUCCESS;
@@ -149,10 +149,10 @@ static void Deinit(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
 
-    assert(sys->context.decoder != VDP_INVALID_HANDLE);
-    vdp_decoder_destroy(sys->vdp, sys->context.decoder);
+    assert(sys->context->decoder != VDP_INVALID_HANDLE);
+    vdp_decoder_destroy(sys->vdp, sys->context->decoder);
 #if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55, 13, 0))
-    av_freep(&sys->context.bitstream_buffers);
+    av_freep(&sys->context->bitstream_buffers);
 #endif
 }
 
@@ -161,12 +161,12 @@ static int Setup(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
 {
     vlc_va_sys_t *sys = va->sys;
 
-    if (sys->context.decoder != VDP_INVALID_HANDLE)
+    if (sys->context->decoder != VDP_INVALID_HANDLE)
     {
         if (sys->width == width && sys->height == height)
             return VLC_SUCCESS;
         Deinit(va);
-        sys->context.decoder = VDP_INVALID_HANDLE;
+        sys->context->decoder = VDP_INVALID_HANDLE;
     }
 
     return Init(va, ctxp, chromap, width, height);
@@ -279,13 +279,21 @@ static int Open(vlc_va_t *va, int codec, const es_format_t *fmt)
     if (unlikely(sys == NULL))
        return VLC_ENOMEM;
 
-    sys->profile = profile;
-    memset(&sys->context, 0, sizeof (sys->context));
-    sys->context.decoder = VDP_INVALID_HANDLE;
+#if (LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55, 26, 0))
+    sys->context = av_vdpau_alloc_context();
+#else
+    sys->context = calloc(1, sizeof (*sys->context));
+#endif
+    if (unlikely(sys->context == NULL))
+    {
+        free(sys);
+        return VLC_ENOMEM;
+    }
 
     err = vdp_get_x11(NULL, -1, &sys->vdp, &sys->device);
     if (err != VDP_STATUS_OK)
     {
+        free(sys->context);
         free(sys);
         return VLC_EGENERIC;
     }
@@ -295,7 +303,10 @@ static int Open(vlc_va_t *va, int codec, const es_format_t *fmt)
                                VDP_FUNC_ID_DECODER_RENDER, &func);
     if (err != VDP_STATUS_OK)
         goto error;
-    sys->context.render = func;
+
+    sys->context->decoder = VDP_INVALID_HANDLE;
+    sys->context->render = func;
+    sys->profile = profile;
 
     /* Check capabilities */
     VdpBool support;
@@ -349,6 +360,7 @@ static int Open(vlc_va_t *va, int codec, const es_format_t *fmt)
 
 error:
     vdp_release_x11(sys->vdp);
+    free(sys->context);
     free(sys);
     return VLC_EGENERIC;
 }
@@ -357,8 +369,9 @@ static void Close(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
 
-    if (sys->context.decoder != VDP_INVALID_HANDLE)
+    if (sys->context->decoder != VDP_INVALID_HANDLE)
         Deinit(va);
     vdp_release_x11(sys->vdp);
+    free(sys->context);
     free(sys);
 }
