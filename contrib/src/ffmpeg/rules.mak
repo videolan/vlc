@@ -101,8 +101,9 @@ FFMPEGCONF += --cpu=core2
 endif
 endif
 ifdef HAVE_IOS
-ifeq ($(ARCH),arm)
-FFMPEGCONF += --enable-pic --as="$(AS)"
+FFMPEGCONF += --enable-pic
+ifdef HAVE_NEON
+FFMPEGCONF += --as="$(AS)"
 endif
 endif
 ifdef HAVE_MACOSX
