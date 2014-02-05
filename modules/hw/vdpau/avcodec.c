@@ -37,6 +37,7 @@
 #include <vlc_xlib.h>
 #include "vlc_vdpau.h"
 #include "../../codec/avcodec/va.h"
+#include "../../codec/avcodec/avcommon_compat.h"
 
 static int Open(vlc_va_t *, int, const es_format_t *);
 static void Close(vlc_va_t *);
@@ -279,7 +280,7 @@ static int Open(vlc_va_t *va, int codec, const es_format_t *fmt)
     if (unlikely(sys == NULL))
        return VLC_ENOMEM;
 
-#if (LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55, 26, 0))
+#if LIBAVCODEC_VERSION_CHECK(55, 26, 0, 42, 100)
     sys->context = av_vdpau_alloc_context();
 #else
     sys->context = calloc(1, sizeof (*sys->context));
