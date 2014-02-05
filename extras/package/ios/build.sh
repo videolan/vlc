@@ -184,7 +184,6 @@ if [ "$PLATFORM" = "OS" ]; then
         export GASPP_FIX_XCODE5=1
     fi
 else
-    export AS="xcrun as"
     export ASCPP="xcrun as"
 fi
 

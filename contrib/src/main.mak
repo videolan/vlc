@@ -133,7 +133,6 @@ AS=perl $(abspath ../../extras/tools/build/bin/gas-preprocessor.pl) $(CC)
 CCAS=gas-preprocessor.pl $(CC) -c
 else
 CCAS=$(CC) -c
-AS=xcrun as
 endif
 AR=xcrun ar
 LD=xcrun ld
