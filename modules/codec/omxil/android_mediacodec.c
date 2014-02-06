@@ -619,9 +619,14 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic)
             int crop_bottom     = GET_INTEGER(format, "crop-bottom");
 
             const char *name = "unknown";
-            if (p_sys->direct_rendering)
-                jni_SetAndroidSurfaceSizeEnv(env, width, height, width, height, 1, 1);
-            else
+            if (p_sys->direct_rendering) {
+                int sar_num = 1, sar_den = 1;
+                if (p_dec->fmt_in.video.i_sar_num != 0 && p_dec->fmt_in.video.i_sar_den != 0) {
+                    sar_num = p_dec->fmt_in.video.i_sar_num;
+                    sar_den = p_dec->fmt_in.video.i_sar_den;
+                }
+                jni_SetAndroidSurfaceSizeEnv(env, width, height, width, height, sar_num, sar_den);
+            } else
                 GetVlcChromaFormat(p_sys->pixel_format, &p_dec->fmt_out.i_codec, &name);
 
             msg_Dbg(p_dec, "output: %d %s, %dx%d stride %d %d, crop %d %d %d %d",
