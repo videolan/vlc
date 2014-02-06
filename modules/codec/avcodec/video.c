@@ -363,6 +363,8 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     }
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
+    p_dec->fmt_out.video.orientation = p_dec->fmt_in.video.orientation;
+
 #if LIBAVCODEC_VERSION_MAJOR < 54
     /* Setup palette */
     memset( &p_sys->palette, 0, sizeof(p_sys->palette) );
