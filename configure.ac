@@ -1920,19 +1920,8 @@ AM_CONDITIONAL(HAVE_AVFOUNDATION, [test "${have_avfoundation}" != "no"])
 dnl
 dnl  DCP plugin (using asdcplib)
 dnl
-AC_ARG_ENABLE(dcp,
-  AS_HELP_STRING([--enable-dcp],[Digital Cinema Package support using asdcplib (default auto)]))
-have_asdcp="no"
-AS_IF([test "x${enable_dcp}" != "no"], [
-  AC_LANG_PUSH(C++)
-  AC_CHECK_HEADERS( [[AS@&t@_DCP.h]],
-    [have_asdcp="yes"],
-    [AS_IF( [test "x${enable_dcp}" = "yes"],
-      [AC_MSG_ERROR( [ ASDCP library cannot be found (needed for dcp module). Either use --enable-dcp=no or install asdcp library: http://www.cinecert.com/asdcplib/download/] )])
-     ])
-  AC_LANG_POP(C++)
-])
-AM_CONDITIONAL(HAVE_ASDCP, [test "${have_asdcp}" != "no"])
+PKG_WITH_MODULES([ASDCP], [asdcplib], [have_asdcp="yes"])
+AM_CONDITIONAL(HAVE_ASDCP, [test "${have_asdcp}" = "yes"])
 
 dnl
 dnl  Demux plugins
