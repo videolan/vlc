@@ -692,6 +692,15 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         return NULL;
     }
 
+    /* Use the aspect ratio provided by the input (ie read from packetizer).
+     * Don't check the current value of the aspect ratio in fmt_out, since we
+     * want to allow changes in it to propagate. */
+    if (p_dec->fmt_in.video.i_sar_num != 0 && p_dec->fmt_in.video.i_sar_den != 0)
+    {
+        p_dec->fmt_out.video.i_sar_num = p_dec->fmt_in.video.i_sar_num;
+        p_dec->fmt_out.video.i_sar_den = p_dec->fmt_in.video.i_sar_den;
+    }
+
     jlong timeout = 0;
     const int max_polling_attempts = 50;
     int attempts = 0;
