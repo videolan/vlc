@@ -315,6 +315,12 @@ static int Open(vlc_object_t *object)
 
     sys->chroma = chroma;
 
+    static const char *const ppsz_filter_options[] = {
+        "type", NULL
+    };
+
+    config_ChainParse(filter, CFG_PREFIX, ppsz_filter_options,
+                      filter->p_cfg);
     char *type_name = var_InheritString(filter, CFG_PREFIX"type");
     const transform_description_t *dsc = NULL;
 
