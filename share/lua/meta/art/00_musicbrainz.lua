@@ -63,10 +63,8 @@ function fetch_art()
 
     local releaseid = nil
 
-    for _, k in ipairs({"MUSICBRAINZ_ALBUMID", "MusicBrainz Album Id"}) do
-        if meta[k] then
-            releaseid = meta[k]
-        end
+    if meta["MB_ALBUMID"] then
+        releaseid = meta["MB_ALBUMID"]
     end
 
     if not releaseid and meta["artist"] and meta["album"] then
