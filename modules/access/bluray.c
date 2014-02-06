@@ -507,10 +507,28 @@ static int  findEsPairIndexByEs(demux_sys_t *p_sys, es_out_id_t *p_es)
     return -1;
 }
 
+static void setStreamLang(es_format_t *p_fmt,
+                          const BLURAY_STREAM_INFO *p_streams, int i_stream_count)
+{
+    for (int i = 0; i < i_stream_count; i++) {
+        if (p_fmt->i_id == p_streams[i].pid) {
+            free(p_fmt->psz_language);
+            p_fmt->psz_language = strndup(p_streams[i].lang, 3);
+            return;
+        }
+    }
+}
+
 static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
 {
     demux_sys_t *p_sys = p_out->p_sys->p_demux->p_sys;
+    BLURAY_TITLE_INFO *title_info = bd_get_playlist_info(p_sys->bluray, p_sys->i_playlist, 0);
+    BLURAY_CLIP_INFO *clip_info = NULL;
     es_format_t fmt;
+
+    if (title_info && p_sys->i_current_clip < title_info->clip_count) {
+        clip_info = &title_info->clips[p_sys->i_current_clip];
+    }
 
     es_format_Copy(&fmt, p_fmt);
     switch (fmt.i_cat) {
@@ -521,10 +539,17 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
     case AUDIO_ES:
         if (p_sys->i_audio_stream != -1 && p_sys->i_audio_stream != p_fmt->i_id)
             fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
+        if (clip_info)
+            setStreamLang(&fmt, clip_info->audio_streams, clip_info->audio_stream_count);
         break ;
     case SPU_ES:
+        if (clip_info)
+            setStreamLang(&fmt, clip_info->pg_streams, clip_info->pg_stream_count);
         break ;
     }
+
+    if (title_info)
+        bd_free_title_info(title_info);
 
     es_out_id_t *p_es = es_out_Add(p_out->p_sys->p_demux->out, &fmt);
     if (p_fmt->i_id >= 0) {
