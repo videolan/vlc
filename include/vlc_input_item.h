@@ -230,6 +230,11 @@ INPUT_META(EncodedBy)
 INPUT_META(ArtworkURL)
 INPUT_META(TrackID)
 INPUT_META(TrackTotal)
+INPUT_META(Director)
+INPUT_META(Season)
+INPUT_META(Episode)
+INPUT_META(ShowName)
+INPUT_META(Actors)
 
 #define input_item_SetTrackNum input_item_SetTrackNumber
 #define input_item_GetTrackNum input_item_GetTrackNumber
