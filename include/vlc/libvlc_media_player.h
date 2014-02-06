@@ -828,6 +828,15 @@ LIBVLC_API int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi );
  */
 LIBVLC_API int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi );
 
+/**
+ * Check if the current program is scrambled
+ *
+ * \param p_mi the media player
+ * \return true if the current program is scrambled
+ *
+ * \libvlc_return_bool
+ */
+LIBVLC_API int libvlc_media_player_program_scrambled( libvlc_media_player_t *p_mi );
 
 /**
  * Display the next frame (if supported)

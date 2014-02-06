@@ -49,6 +49,10 @@ input_pausable_changed( vlc_object_t * p_this, char const * psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval,
                         void * p_userdata );
 static int
+input_scrambled_changed( vlc_object_t * p_this, char const * psz_cmd,
+                        vlc_value_t oldval, vlc_value_t newval,
+                        void * p_userdata );
+static int
 input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval,
                      void * p_userdata );
@@ -117,6 +121,8 @@ static void release_input_thread( libvlc_media_player_t *p_mi, bool b_input_abor
                      input_seekable_changed, p_mi );
     var_DelCallback( p_input_thread, "can-pause",
                     input_pausable_changed, p_mi );
+    var_DelCallback( p_input_thread, "program-scrambled",
+                    input_scrambled_changed, p_mi );
     var_DelCallback( p_input_thread, "intf-event",
                      input_event_changed, p_mi );
 
@@ -206,6 +212,24 @@ input_pausable_changed( vlc_object_t * p_this, char const * psz_cmd,
 
     event.type = libvlc_MediaPlayerPausableChanged;
     event.u.media_player_pausable_changed.new_pausable = newval.b_bool;
+
+    libvlc_event_send( p_mi->p_event_manager, &event );
+    return VLC_SUCCESS;
+}
+
+static int
+input_scrambled_changed( vlc_object_t * p_this, char const * psz_cmd,
+                        vlc_value_t oldval, vlc_value_t newval,
+                        void * p_userdata )
+{
+    VLC_UNUSED(oldval);
+    VLC_UNUSED(p_this);
+    VLC_UNUSED(psz_cmd);
+    libvlc_media_player_t * p_mi = p_userdata;
+    libvlc_event_t event;
+
+    event.type = libvlc_MediaPlayerScrambledChanged;
+    event.u.media_player_scrambled_changed.new_scrambled = newval.b_bool;
 
     libvlc_event_send( p_mi->p_event_manager, &event );
     return VLC_SUCCESS;
@@ -507,6 +531,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     register_event(mp, PausableChanged);
 
     register_event(mp, Vout);
+    register_event(mp, ScrambledChanged);
 
     /* Snapshot initialization */
     register_event(mp, SnapshotTaken);
@@ -717,6 +742,7 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
 
     var_AddCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
     var_AddCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );
+    var_AddCallback( p_input_thread, "program-scrambled", input_scrambled_changed, p_mi );
     var_AddCallback( p_input_thread, "intf-event", input_event_changed, p_mi );
 
     if( input_Start( p_input_thread ) )
@@ -724,6 +750,7 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
         unlock_input(p_mi);
         var_DelCallback( p_input_thread, "intf-event", input_event_changed, p_mi );
         var_DelCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );
+        var_DelCallback( p_input_thread, "program-scrambled", input_scrambled_changed, p_mi );
         var_DelCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
         vlc_object_release( p_input_thread );
         libvlc_printerr( "Input initialization failure" );
@@ -1378,6 +1405,20 @@ int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi )
     vlc_object_release( p_input_thread );
 
     return b_can_pause;
+}
+
+int libvlc_media_player_program_scrambled( libvlc_media_player_t *p_mi )
+{
+    input_thread_t *p_input_thread;
+    bool b_program_scrambled;
+
+    p_input_thread = libvlc_get_input_thread ( p_mi );
+    if ( !p_input_thread )
+        return false;
+    b_program_scrambled = var_GetBool( p_input_thread, "program-scrambled" );
+    vlc_object_release( p_input_thread );
+
+    return b_program_scrambled;
 }
 
 void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi )

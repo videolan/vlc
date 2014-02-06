@@ -73,6 +73,7 @@ enum libvlc_event_e {
     libvlc_MediaPlayerSnapshotTaken,
     libvlc_MediaPlayerLengthChanged,
     libvlc_MediaPlayerVout,
+    libvlc_MediaPlayerScrambledChanged,
 
     libvlc_MediaListItemAdded=0x200,
     libvlc_MediaListWillAddItem,
@@ -168,6 +169,10 @@ typedef struct libvlc_event_t
         {
             int new_pausable;
         } media_player_pausable_changed;
+        struct
+        {
+            int new_scrambled;
+        } media_player_scrambled_changed;
         struct
         {
             int new_count;
