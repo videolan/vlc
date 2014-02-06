@@ -213,6 +213,8 @@ int main( int i_argc, const char *ppsz_argv[] )
     libvlc_set_app_id (vlc, "org.VideoLAN.VLC", PACKAGE_VERSION, PACKAGE_NAME);
     libvlc_set_user_agent (vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
 
+    libvlc_playlist_play (vlc, -1, 0, NULL);
+
     libvlc_add_intf (vlc, "hotkeys,none");
 
     if (libvlc_add_intf (vlc, NULL))
