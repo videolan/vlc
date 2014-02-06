@@ -533,7 +533,7 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
     p_spu->p_region->i_y = 0;
 
     p_spu->i_start = i_pts;
-    p_spu->i_stop = i_pts + 10000000;
+    p_spu->i_stop = b_text ? i_pts + 1000000 : 0;
     p_spu->b_ephemer = true;
     p_spu->b_absolute = b_text ? false : true;
 
