@@ -96,6 +96,16 @@ static block_t *BuildSsaFrame( const AVPacket *p_pkt, unsigned i_order );
 static void UpdateSeekPoint( demux_t *p_demux, int64_t i_time );
 static void ResetTime( demux_t *p_demux, int64_t i_time );
 
+static vlc_fourcc_t CodecTagToFourcc( uint32_t codec_tag )
+{
+    // convert from little-endian avcodec codec_tag to VLC native-endian fourcc
+#ifdef WORDS_BIGENDIAN
+    return bswap32(codec_tag);
+#else
+    return codec_tag;
+#endif
+}
+
 /*****************************************************************************
  * Open
  *****************************************************************************/
@@ -293,6 +303,7 @@ int OpenDemux( vlc_object_t *p_this )
         {
         case AVMEDIA_TYPE_AUDIO:
             es_format_Init( &fmt, AUDIO_ES, fcc );
+            fmt.i_original_fourcc = CodecTagToFourcc( cc->codec_tag );
             fmt.i_bitrate = cc->bit_rate;
             fmt.audio.i_channels = cc->channels;
             fmt.audio.i_rate = cc->sample_rate;
@@ -303,6 +314,7 @@ int OpenDemux( vlc_object_t *p_this )
 
         case AVMEDIA_TYPE_VIDEO:
             es_format_Init( &fmt, VIDEO_ES, fcc );
+            fmt.i_original_fourcc = CodecTagToFourcc( cc->codec_tag );
 
             fmt.video.i_bits_per_pixel = cc->bits_per_coded_sample;
             /* Special case for raw video data */
@@ -344,6 +356,7 @@ int OpenDemux( vlc_object_t *p_this )
 
         case AVMEDIA_TYPE_SUBTITLE:
             es_format_Init( &fmt, SPU_ES, fcc );
+            fmt.i_original_fourcc = CodecTagToFourcc( cc->codec_tag );
             if( strncmp( p_sys->ic->iformat->name, "matroska", 8 ) == 0 &&
                 cc->codec_id == AV_CODEC_ID_DVD_SUBTITLE &&
                 cc->extradata != NULL &&
@@ -391,6 +404,7 @@ int OpenDemux( vlc_object_t *p_this )
 
         default:
             es_format_Init( &fmt, UNKNOWN_ES, 0 );
+            fmt.i_original_fourcc = CodecTagToFourcc( cc->codec_tag );
 #ifdef HAVE_AVUTIL_CODEC_ATTACHMENT
             if( cc->codec_type == AVMEDIA_TYPE_ATTACHMENT )
             {
