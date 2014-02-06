@@ -2032,7 +2032,8 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         p_dec->fmt_out.video.i_y_offset != p_owner->video.i_y_offset  ||
         p_dec->fmt_out.i_codec != p_owner->video.i_chroma ||
         (int64_t)p_dec->fmt_out.video.i_sar_num * p_owner->video.i_sar_den !=
-        (int64_t)p_dec->fmt_out.video.i_sar_den * p_owner->video.i_sar_num )
+        (int64_t)p_dec->fmt_out.video.i_sar_den * p_owner->video.i_sar_num ||
+        p_dec->fmt_out.video.orientation != p_owner->video.orientation )
     {
         vout_thread_t *p_vout;
 
