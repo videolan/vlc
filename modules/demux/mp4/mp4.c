@@ -1050,6 +1050,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     SET( vlc_meta_SetPublisher );
                     break;
 
+                case ATOM_0xa9dir:
+                    SET( vlc_meta_SetDirector );
+                    break;
+
                 default:
                     break;
                 }
@@ -1060,7 +1064,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     { ATOM_0xa9com, N_("Composer") },
                     { ATOM_0xa9prd, N_("Producer") },
                     { ATOM_0xa9inf, N_("Information") },
-                    { ATOM_0xa9dir, N_("Director") },
                     { ATOM_0xa9dis, N_("Disclaimer") },
                     { ATOM_0xa9req, N_("Requirements") },
                     { ATOM_0xa9fmt, N_("Original Format") },
