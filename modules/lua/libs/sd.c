@@ -91,6 +91,11 @@ vlclua_item_meta(encodedby, EncodedBy)
 vlclua_item_meta(arturl, ArtworkURL)
 vlclua_item_meta(trackid, TrackID)
 vlclua_item_meta(tracktotal, TrackTotal)
+vlclua_item_meta(director  , Director  )
+vlclua_item_meta(season    , Season    )
+vlclua_item_meta(episode   , Episode   )
+vlclua_item_meta(showname  , ShowName  )
+vlclua_item_meta(actors    , Actors    )
 
 static const luaL_Reg vlclua_item_reg[] = {
     vlclua_item_luareg(title)
@@ -111,6 +116,11 @@ static const luaL_Reg vlclua_item_reg[] = {
     vlclua_item_luareg(arturl)
     vlclua_item_luareg(trackid)
     vlclua_item_luareg(tracktotal)
+    vlclua_item_luareg(director  )
+    vlclua_item_luareg(season    )
+    vlclua_item_luareg(episode   )
+    vlclua_item_luareg(showname  )
+    vlclua_item_luareg(actors    )
     { NULL, NULL }
 };
 

@@ -379,12 +379,17 @@ void vlclua_read_meta_data( vlc_object_t *p_this, lua_State *L,
     TRY_META( "date", Date );
     TRY_META( "setting", Setting );
     TRY_META( "url", URL );
-    TRY_META( "language", Language );
+    TRY_META( "language",  Language );
     TRY_META( "nowplaying", NowPlaying );
-    TRY_META( "publisher", Publisher );
-    TRY_META( "encodedby", EncodedBy );
-    TRY_META( "arturl", ArtURL );
-    TRY_META( "trackid", TrackID );
+    TRY_META( "publisher",  Publisher );
+    TRY_META( "encodedby",  EncodedBy );
+    TRY_META( "arturl",     ArtURL );
+    TRY_META( "trackid",    TrackID );
+    TRY_META( "director",   Director );
+    TRY_META( "season",     Season );
+    TRY_META( "episode",    Episode );
+    TRY_META( "show_name",  ShowName );
+    TRY_META( "actors",     Actors );
 }
 
 #undef vlclua_read_custom_meta_data
