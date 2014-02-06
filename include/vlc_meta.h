@@ -160,5 +160,6 @@ VLC_API int input_item_WriteMeta(vlc_object_t *, input_item_t *);
 #define VLC_META_SHOW_NAME          vlc_meta_TypeToLocalizedString( vlc_meta_ShowName )
 #define VLC_META_ACTORS             vlc_meta_TypeToLocalizedString( vlc_meta_Actors )
 
+#define VLC_META_EXTRA_MB_ALBUMID   "MB_ALBUMID"
 
 #endif
