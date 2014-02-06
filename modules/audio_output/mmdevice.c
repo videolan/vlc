@@ -825,15 +825,25 @@ static void *MMThread(void *data)
 {
     audio_output_t *aout = data;
     aout_sys_t *sys = aout->sys;
+    IMMDeviceEnumerator *it = sys->it;
 
     EnterMTA();
+    IMMDeviceEnumerator_RegisterEndpointNotificationCallback(it,
+                                                          &sys->device_events);
+    DevicesEnum(aout, it);
+
     EnterCriticalSection(&sys->lock);
 
-    while (sys->it != NULL)
-        if (FAILED(MMSession(aout, sys->it)))
+    do
+        if (FAILED(MMSession(aout, it)))
             SleepConditionVariableCS(&sys->work, &sys->lock, INFINITE);
+    while (sys->it != NULL);
 
     LeaveCriticalSection(&sys->lock);
+
+    IMMDeviceEnumerator_UnregisterEndpointNotificationCallback(it,
+                                                          &sys->device_events);
+    IMMDeviceEnumerator_Release(it);
     LeaveMTA();
     return NULL;
 }
@@ -997,11 +1007,6 @@ static int Open(vlc_object_t *obj)
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
     aout->device_select = DeviceSelect;
-    EnterMTA();
-    IMMDeviceEnumerator_RegisterEndpointNotificationCallback(sys->it,
-                                                          &sys->device_events);
-    DevicesEnum(aout, sys->it);
-    LeaveMTA();
     return VLC_SUCCESS;
 
 error:
@@ -1018,19 +1023,11 @@ static void Close(vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
 #if !VLC_WINSTORE_APP
-    IMMDeviceEnumerator *it = sys->it;
-
-    EnterMTA(); /* Enter MTA before thread leaves MTA */
     EnterCriticalSection(&sys->lock);
     sys->device = default_device; /* break out of MMSession() loop */
     sys->it = NULL; /* break out of MMThread() loop */
     WakeConditionVariable(&sys->work);
     LeaveCriticalSection(&sys->lock);
-
-    IMMDeviceEnumerator_UnregisterEndpointNotificationCallback(it,
-                                                          &sys->device_events);
-    IMMDeviceEnumerator_Release(it);
-    LeaveMTA();
 
     vlc_join(sys->thread, NULL);
     DeleteCriticalSection(&sys->lock);
