@@ -259,6 +259,9 @@ bool video_format_IsSimilar( const video_format_t *p_fmt1, const video_format_t 
     if( v1.i_sar_num * v2.i_sar_den != v2.i_sar_num * v1.i_sar_den )
         return false;
 
+    if( v1.orientation != v2.orientation)
+        return false;
+
     if( v1.i_chroma == VLC_CODEC_RGB15 ||
         v1.i_chroma == VLC_CODEC_RGB16 ||
         v1.i_chroma == VLC_CODEC_RGB24 ||
