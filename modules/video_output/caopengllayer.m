@@ -232,6 +232,9 @@ static void Close (vlc_object_t *p_this)
     if (sys->gl.sys != NULL)
         vout_display_opengl_Delete(sys->vgl);
 
+    if (sys->glContext)
+        CGLReleaseContext(sys->glContext);
+
     free(sys);
 }
 
@@ -442,6 +445,12 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
 
 - (CGLContextObj)copyCGLContextForPixelFormat:(CGLPixelFormatObj)pixelFormat
 {
+    // Only one opengl context is allowed for the module lifetime
+    if(_vd->sys->glContext) {
+        msg_Dbg(_vd, "Return existing context: %p", _vd->sys->glContext);
+        return _vd->sys->glContext;
+    }
+
     CGLContextObj context = [super copyCGLContextForPixelFormat:pixelFormat];
 
     // Swap buffers only during the vertical retrace of the monitor.
@@ -461,9 +470,7 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
 
 - (void)releaseCGLContext:(CGLContextObj)glContext
 {
-    @synchronized(self) {
-        _vd->sys->glContext = nil;
-    }
+    // do not release anything here, we do that when closing the module
 }
 
 @end
