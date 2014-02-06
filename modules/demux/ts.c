@@ -797,6 +797,12 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_pcrs = (mtime_t *)calloc( p_sys->i_pcrs_num, sizeof( mtime_t ) );
     p_sys->p_pos = (int64_t *)calloc( p_sys->i_pcrs_num, sizeof( int64_t ) );
 
+    if( !p_sys->p_pcrs || !p_sys->p_pos )
+    {
+        Close( p_this );
+        return VLC_ENOMEM;
+    }
+
     bool can_seek = false;
     stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &can_seek );
     if( can_seek  )
