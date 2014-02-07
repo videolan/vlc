@@ -29,6 +29,7 @@
 #define CONST_VTABLE
 
 #include <stdlib.h>
+#include <math.h>
 #include <assert.h>
 #include <audiopolicy.h>
 #include <mmdeviceapi.h>
@@ -181,6 +182,7 @@ static int VolumeSet(audio_output_t *aout, float vol)
 {
     aout_sys_t *sys = aout->sys;
 
+    vol = vol * vol * vol; /* ISimpleAudioVolume is tapered linearly. */
     EnterCriticalSection(&sys->lock);
     sys->volume = vol;
     WakeConditionVariable(&sys->work);
@@ -271,7 +273,7 @@ vlc_AudioSessionEvents_OnSimpleVolumeChanged(IAudioSessionEvents *this,
 
     msg_Dbg(aout, "simple volume changed: %f, muting %sabled", vol,
             mute ? "en" : "dis");
-    aout_VolumeReport(aout, vol);
+    aout_VolumeReport(aout, cbrtf(vol));
     aout_MuteReport(aout, mute == TRUE);
     (void) ctx;
     return S_OK;

@@ -58,7 +58,7 @@ aout_LTLIBRARIES += libjack_plugin.la
 endif
 
 libmmdevice_plugin_la_SOURCES = audio_output/mmdevice.c audio_output/mmdevice.h
-libmmdevice_plugin_la_LIBADD = -lole32
+libmmdevice_plugin_la_LIBADD = -lole32 $(LIBM)
 libwasapi_plugin_la_SOURCES = audio_output/wasapi.c
 libwasapi_plugin_la_LIBADD = -lole32 -lksuser
 if HAVE_WASAPI
