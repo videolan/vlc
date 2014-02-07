@@ -519,7 +519,7 @@ vlc_MMNotificationClient_OnDefaultDeviceChange(IMMNotificationClient *this,
 
     if (flow != eRender)
         return S_OK;
-    if (role != eConsole) /* FIXME? use eMultimedia instead */
+    if (role != eConsole)
         return S_OK;
 
     msg_Dbg(aout, "default device changed: %ls", wid); /* TODO? migrate */
@@ -725,7 +725,8 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
         hr = AUDCLNT_E_DEVICE_INVALIDATED;
 
     while (hr == AUDCLNT_E_DEVICE_INVALIDATED)
-    {   /* Default device selected by policy */
+    {   /* Default device selected by policy and with stream routing.
+         * "Do not use eMultimedia" says MSDN. */
         msg_Dbg(aout, "using default device");
         hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(it, eRender,
                                                          eConsole, &sys->dev);
