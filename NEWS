@@ -58,6 +58,7 @@ Video Output:
  * New OpenGL ES 2.0 through EGL video output module for Android
  * New Android native window provider module
  * Direct rendering for MediaCodec Android hardware acceleration
+ * Support for loading HLSL shaders in Direct3D video output
 
 Video Filter:
  * New Oldmovie effect filter

@@ -128,7 +128,7 @@ vout_LTLIBRARIES += $(LTLIBdirect2d)
 EXTRA_LTLIBRARIES += libdirect2d_plugin.la
 
 libdirect3d_plugin_la_SOURCES = msw/direct3d.c \
-	msw/common.c msw/common.h msw/events.c msw/events.h
+	msw/common.c msw/common.h msw/events.c msw/events.h msw/builtin_shaders.h
 libdirect3d_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_direct3d
 libdirect3d_plugin_la_LIBADD = -lgdi32 -lole32 -luuid

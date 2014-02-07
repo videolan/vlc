@@ -27,6 +27,7 @@
 #endif
 #ifdef MODULE_NAME_IS_direct3d
 # include <d3d9.h>
+# include <d3dx9effect.h>
 #endif
 #ifdef MODULE_NAME_IS_glwin32
 # include "../opengl.h"
@@ -147,6 +148,8 @@ struct vout_display_sys_t
 
     // core objects
     HINSTANCE               hd3d9_dll;       /* handle of the opened d3d9 dll */
+    HINSTANCE               hd3d9x_dll;      /* handle of the opened d3d9x dll */
+    IDirect3DPixelShader9*  d3dx_shader;
     LPDIRECT3D9             d3dobj;
     D3DCAPS9                d3dcaps;
     LPDIRECT3DDEVICE9       d3ddev;
