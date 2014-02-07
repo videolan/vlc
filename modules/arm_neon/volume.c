@@ -55,7 +55,7 @@ static int Probe(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
-void amplify_float_arm_neon(float *, const float *, size_t, float);
+void amplify_float_arm_neon(float *, const float *, size_t, float) asm("amplify_float_arm_neon");
 
 static void AmplifyFloat(audio_volume_t *volume, block_t *block, float amp)
 {
