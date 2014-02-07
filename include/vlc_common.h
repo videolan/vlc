@@ -335,6 +335,7 @@ typedef struct vlm_message_t vlm_message_t;
 /* misc */
 typedef struct vlc_meta_t    vlc_meta_t;
 typedef struct input_stats_t input_stats_t;
+typedef struct addon_entry_t addon_entry_t;
 
 /* Update */
 typedef struct update_t update_t;

@@ -475,6 +475,7 @@ SOURCES_libvlc_common = \
 	misc/xml.c \
 	extras/libc.c \
 	extras/tdestroy.c \
+	misc/addons.c \
 	misc/filter.c \
 	misc/filter_chain.c \
 	misc/http_auth.c \

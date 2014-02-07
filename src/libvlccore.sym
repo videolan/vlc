@@ -641,3 +641,12 @@ vlc_keycode2str
 vlc_str2keycode
 fingerprinter_Create
 fingerprinter_Destroy
+addons_manager_New
+addons_manager_Delete
+addons_manager_Gather
+addons_manager_LoadCatalog
+addons_manager_Install
+addons_manager_Remove
+addon_entry_New
+addon_entry_Hold
+addon_entry_Release
