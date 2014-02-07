@@ -17,7 +17,7 @@ Access:
 Decoder:
  * Partial support for Voxware MetaSound
  * libvpx decoder for VP8 and VP9
- * Support MSN Audio, DK3, DK4, IMC, Vivo g723.1
+ * Support MSN Audio, DK3, DK4, IMC, Vivo g723.1, Bink
  * Teletext subtitles display improvements
  * Mediacodec speed improvements on x86
  * Support setting the post processing level in Theora
@@ -29,6 +29,7 @@ Encoder:
  * Support for MPEG-2 encoding using x262
  * Support for HEVC/H.265 encoding using x265
  * Support for Opus encoding using libopus
+ * New jpeg image encoder using libjpeg
 
 Demuxer:
  * New CAF format module
