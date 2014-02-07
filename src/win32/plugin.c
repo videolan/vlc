@@ -58,13 +58,9 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
         return -1;
 
     module_handle_t handle;
-    /* FIXME: this is not thread-safe -- Courmisch */
-    UINT mode = SetErrorMode (SEM_FAILCRITICALERRORS);
-    SetErrorMode (mode|SEM_FAILCRITICALERRORS);
 
     handle = LoadLibraryW (wfile);
 
-    SetErrorMode (mode);
     free (wfile);
 
     if( handle == NULL )
