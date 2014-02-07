@@ -153,4 +153,9 @@
         <file alias="katsomo">pixmaps/playlist/sidebar-icons/sd/katsomo.png</file>
         <file alias="metachannels">pixmaps/playlist/sidebar-icons/sd/metachannels.png</file>
     </qresource>
+    <qresource prefix="/addons">
+        <file alias="default">pixmaps/addons/addon.png</file>
+        <file alias="broken">pixmaps/addons/addon_broken.png</file>
+        <file alias="score">pixmaps/addons/score.png</file>
+    </qresource>
 </RCC>

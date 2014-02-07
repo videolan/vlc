@@ -40,6 +40,7 @@ libqt4_plugin_la_SOURCES = \
 	input_manager.cpp input_manager.hpp \
 	actions_manager.cpp actions_manager.hpp \
 	extensions_manager.cpp extensions_manager.hpp \
+        managers/addons_manager.cpp managers/addons_manager.hpp \
 	recents.cpp recents.hpp \
 	adapters/seekpoints.cpp adapters/seekpoints.hpp \
 	adapters/chromaprint.cpp adapters/chromaprint.hpp \
@@ -141,6 +142,7 @@ nodist_libqt4_plugin_la_SOURCES = \
 	input_manager.moc.cpp \
 	actions_manager.moc.cpp \
 	extensions_manager.moc.cpp \
+        managers/addons_manager.moc.cpp \
 	recents.moc.cpp \
 	adapters/seekpoints.moc.cpp \
 	adapters/chromaprint.moc.cpp \
