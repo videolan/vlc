@@ -59,11 +59,13 @@ endif
 
 libstats_plugin_la_SOURCES = stats.c
 
+libaddonsvorepository_plugin_la_SOURCES = addons/vorepository.c addons/xmlreading.h
 libaddonsfsstorage_plugin_la_SOURCES = addons/fsstorage.c addons/xmlreading.h
 
 misc_LTLIBRARIES += \
 	liblogger_plugin.la \
 	libstats_plugin.la \
+        libaddonsvorepository_plugin.la \
         libaddonsfsstorage_plugin.la
 
 if ENABLE_SOUT
