@@ -154,14 +154,14 @@ class DeckLinkCaptureDelegate : public IDeckLinkInputCallback
 public:
     DeckLinkCaptureDelegate(demux_t *demux) : demux_(demux)
     {
-        atomic_store(&m_ref, 1);
+        atomic_store(&m_ref_, 1);
     }
 
     virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID, LPVOID *) { return E_NOINTERFACE; }
 
     virtual ULONG STDMETHODCALLTYPE AddRef(void)
     {
-        return atomic_fetch_add(&m_ref, 1);
+        return atomic_fetch_add(&m_ref_, 1);
     }
 
     virtual ULONG STDMETHODCALLTYPE Release(void)
