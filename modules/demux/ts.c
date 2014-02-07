@@ -823,6 +823,7 @@ static int Open( vlc_object_t *p_this )
     }
     if( p_sys->i_first_pcr < 0 || p_sys->i_last_pcr < 0 )
     {
+        msg_Dbg( p_demux, "Force Seek Per Percent: PCR's not found,");
         p_sys->b_force_seek_per_percent = true;
     }
 
@@ -831,7 +832,6 @@ static int Open( vlc_object_t *p_this )
         if( p_demux->pf_demux( p_demux ) != 1 )
             break;
     }
-
     return VLC_SUCCESS;
 }
 
@@ -1987,23 +1987,22 @@ static int SeekToPCR( demux_t *p_demux, int64_t i_pos )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     mtime_t i_pcr = -1;
-    int64_t i_initial_pos = stream_Tell( p_demux->s );
+    const int64_t i_initial_pos = stream_Tell( p_demux->s );
 
     if( i_pos < 0 )
         return VLC_EGENERIC;
 
-    int64_t i_last_pos = i_pos + p_sys->i_packet_size * 4500; //XXX
-    if( i_last_pos > stream_Size( p_demux->s ) - p_sys->i_packet_size )
-    {
-        i_last_pos = stream_Size( p_demux->s ) - p_sys->i_packet_size;
-    }
+    int64_t i_last_pos = stream_Size( p_demux->s ) - p_sys->i_packet_size;
+    if( i_pos > i_last_pos )
+        i_pos = i_last_pos;
 
     if( stream_Seek( p_demux->s, i_pos ) )
         return VLC_EGENERIC;
 
     while( vlc_object_alive( p_demux ) )
     {
-        block_t     *p_pkt;
+        block_t *p_pkt;
+
         if( !( p_pkt = ReadTSPacket( p_demux ) ) )
         {
             break;
@@ -2021,13 +2020,12 @@ static int SeekToPCR( demux_t *p_demux, int64_t i_pos )
     if( i_pcr < 0 )
     {
         stream_Seek( p_demux->s, i_initial_pos );
+        assert( i_initial_pos == stream_Tell( p_demux->s ) );
         return VLC_EGENERIC;
     }
-    else
-    {
-        p_sys->i_current_pcr = i_pcr;
-        return VLC_SUCCESS;
-    }
+
+    p_sys->i_current_pcr = i_pcr;
+    return VLC_SUCCESS;
 }
 
 static int Seek( demux_t *p_demux, double f_percent )
@@ -2063,7 +2061,10 @@ static int Seek( demux_t *p_demux, double f_percent )
     int i_cnt = 0;
     while( i_head_pos <= i_tail_pos )
     {
+        /* Round i_pos to a multiple of p_sys->i_packet_size */
         int64_t i_pos = i_head_pos + (i_tail_pos - i_head_pos) / 2;
+        int64_t i_div = i_pos % p_sys->i_packet_size;
+        i_pos -= i_div;
         if( SeekToPCR( p_demux, i_pos ) )
             break;
         p_sys->i_current_pcr = AdjustPCRWrapAround( p_demux, p_sys->i_current_pcr );
@@ -2110,6 +2111,7 @@ static void GetFirstPCR( demux_t *p_demux )
     while( vlc_object_alive (p_demux) )
     {
         block_t     *p_pkt;
+
         if( !( p_pkt = ReadTSPacket( p_demux ) ) )
         {
             break;
@@ -2132,12 +2134,19 @@ static void GetLastPCR( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    int64_t i_initial_pos = stream_Tell( p_demux->s );
+    const int64_t i_initial_pos = stream_Tell( p_demux->s );
     mtime_t i_initial_pcr = p_sys->i_current_pcr;
 
-    int64_t i_last_pos = stream_Size( p_demux->s ) - p_sys->i_packet_size;
+    int64_t i_stream_size = stream_Size( p_demux->s );
+    int64_t i_last_pos = i_stream_size - p_sys->i_packet_size;
+    /* Round i_pos to a multiple of p_sys->i_packet_size */
     int64_t i_pos = i_last_pos - p_sys->i_packet_size * 4500; /* FIXME if the value is not reasonable, please change it. */
-    if( i_pos < 0 )
+    int64_t i_div = i_pos % p_sys->i_packet_size;
+    i_pos -= i_div;
+
+    if( i_pos <= i_initial_pos && i_pos >= i_stream_size )
+        i_pos = i_initial_pos + p_sys->i_packet_size;
+    if( i_pos < 0 && i_pos >= i_stream_size )
         return;
 
     while( vlc_object_alive( p_demux ) )
@@ -2163,6 +2172,7 @@ static void GetLastPCR( demux_t *p_demux )
         }
     }
     stream_Seek( p_demux->s, i_initial_pos );
+    assert( i_initial_pos == stream_Tell( p_demux->s ) );
     p_sys->i_current_pcr = i_initial_pcr;
 }
 
@@ -2181,7 +2191,10 @@ static void CheckPCR( demux_t *p_demux )
 
     for( i = 1; i < p_sys->i_pcrs_num && vlc_object_alive( p_demux ); ++i )
     {
+        /* Round i_pos to a multiple of p_sys->i_packet_size */
         int64_t i_pos = i_size / p_sys->i_pcrs_num * i;
+        int64_t i_div = i_pos % p_sys->i_packet_size;
+        i_pos -= i_div;
         if( SeekToPCR( p_demux, i_pos ) )
             break;
         p_sys->p_pcrs[i] = p_sys->i_current_pcr;
