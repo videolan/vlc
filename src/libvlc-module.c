@@ -1030,10 +1030,6 @@ static const char *const ppsz_prefres[] = {
      "This option is useful if you want to lower the latency when " \
      "reading a stream")
 
-#define PLUGIN_PATH_LONGTEXT N_( \
-    "Additional path for VLC to look for its modules. You can add " \
-    "several paths by concatenating them using \" PATH_SEP \" as separator")
-
 #define VLM_CONF_TEXT N_("VLM configuration file")
 #define VLM_CONF_LONGTEXT N_( \
     "Read a VLM configuration file as soon as VLM is started." )
