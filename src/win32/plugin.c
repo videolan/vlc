@@ -57,10 +57,18 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
     if (wfile == NULL)
         return -1;
 
-    module_handle_t handle;
+    module_handle_t handle = NULL;
+#if (_WIN32_WINNT >= 0x601)
+    DWORD mode;
 
-    handle = LoadLibraryW (wfile);
-
+    if (SetThreadErrorMode (SEM_FAILCRITICALERRORS, &mode) == 0)
+#endif
+    {
+        handle = LoadLibraryW (wfile);
+#if (_WIN32_WINNT >= 0x601)
+        SetThreadErrorMode (mode, NULL);
+#endif
+    }
     free (wfile);
 
     if( handle == NULL )
