@@ -80,6 +80,7 @@ Streaming:
 
 libVLC:
  * add equalizer API libvlc_audio_equalizer_* functions
+ * add libvlc_media_player_program_scrambled function
 
 Visualizations:
  * Add a 3D OpenGL spectrum visualization.
