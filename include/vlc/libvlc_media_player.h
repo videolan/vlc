@@ -835,6 +835,7 @@ LIBVLC_API int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi );
  * \return true if the current program is scrambled
  *
  * \libvlc_return_bool
+ * \version LibVLC 2.2.0 or later
  */
 LIBVLC_API int libvlc_media_player_program_scrambled( libvlc_media_player_t *p_mi );
 
