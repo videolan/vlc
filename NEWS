@@ -84,6 +84,7 @@ libVLC:
 
 Visualizations:
  * Add a 3D OpenGL spectrum visualization.
+ * Allow setting the FFT windowing style for 3D and normal spectrum
 
 Interaces:
  * Add support for subtitles drag 'n drop in skins2
