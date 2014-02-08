@@ -145,6 +145,7 @@ struct  demux_sys_t
     es_out_t            *p_out;
     vlc_array_t         es;
     int                 i_audio_stream; /* Selected audio stream. -1 if default */
+    int                 i_spu_stream;   /* Selected subtitle stream. -1 if default */
     int                 i_video_stream;
     stream_t            *p_parser;
 
@@ -286,6 +287,7 @@ static int blurayOpen(vlc_object_t *object)
 
     p_sys->current_overlay = -1;
     p_sys->i_audio_stream = -1;
+    p_sys->i_spu_stream = -1;
     p_sys->i_video_stream = -1;
 
     /* init demux info fields */
@@ -543,6 +545,8 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
             setStreamLang(&fmt, clip_info->audio_streams, clip_info->audio_stream_count);
         break ;
     case SPU_ES:
+        if (p_sys->i_spu_stream != -1 && p_sys->i_spu_stream != p_fmt->i_id)
+            fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
         if (clip_info)
             setStreamLang(&fmt, clip_info->pg_streams, clip_info->pg_stream_count);
         break ;
@@ -1401,6 +1405,46 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     return VLC_SUCCESS;
 }
 
+static void blurayStreamSelect(demux_t *p_demux, uint32_t i_type, uint32_t i_id)
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int i_pid = -1;
+
+    if (p_sys->i_playlist < 0)
+        return;
+
+    BLURAY_TITLE_INFO *title_info = bd_get_playlist_info(p_sys->bluray, p_sys->i_playlist, 0);
+    if (title_info == NULL)
+        return;
+
+    if (p_sys->i_current_clip < title_info->clip_count) {
+        BLURAY_CLIP_INFO *clip_info = &title_info->clips[p_sys->i_current_clip];
+
+        /* The param we get is the real stream id, not an index, ie. it starts from 1 */
+        i_id--;
+        if (i_type == BD_EVENT_AUDIO_STREAM) {
+            if (i_id < clip_info->audio_stream_count) {
+                i_pid = clip_info->audio_streams[i_id].pid;
+                p_sys->i_audio_stream = i_pid;
+            }
+        } else if (i_type == BD_EVENT_PG_TEXTST_STREAM) {
+            if (i_id < clip_info->pg_stream_count) {
+                i_pid = clip_info->pg_streams[i_id].pid;
+                p_sys->i_spu_stream = i_pid;
+            }
+        }
+    }
+    bd_free_title_info(title_info);
+
+    if (i_pid > 0) {
+        int i_idx = findEsPairIndex(p_sys, i_pid);
+        if (i_idx >= 0) {
+            es_out_id_t *p_es = vlc_array_item_at_index(&p_sys->es, i_idx);
+            es_out_Control(p_demux->out, ES_OUT_SET_ES, p_es);
+        }
+    }
+}
+
 static void blurayUpdateCurrentClip(demux_t *p_demux, uint32_t clip)
 {
     if (clip == 0xFF)
@@ -1441,28 +1485,23 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
     case BD_EVENT_PLAYITEM:
         blurayUpdateCurrentClip(p_demux, e->param);
         break;
-    case BD_EVENT_AUDIO_STREAM:
-        if (e->param == 0xFF)
-            break ;
-        BLURAY_TITLE_INFO *info = bd_get_playlist_info(p_sys->bluray, p_sys->i_playlist, 0);
-        if (info == NULL)
-            break ;
-        /* The param we get is the real stream id, not an index, ie. it starts from 1 */
-        int pid = info->clips[p_sys->i_current_clip].audio_streams[e->param - 1].pid;
-        bd_free_title_info(info);
-        int idx = findEsPairIndex(p_sys, pid);
-        if (idx >= 0) {
-            es_out_id_t *p_es = vlc_array_item_at_index(&p_sys->es, idx);
-            es_out_Control(p_demux->out, ES_OUT_SET_ES, p_es);
-        }
-        p_sys->i_audio_stream = pid;
-        break ;
     case BD_EVENT_CHAPTER:
         p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
         p_demux->info.i_seekpoint = e->param;
         break;
     case BD_EVENT_ANGLE:
+        break;
+
+    /*
+     * stream selection events
+     */
+    case BD_EVENT_AUDIO_STREAM:
+    case BD_EVENT_PG_TEXTST_STREAM:
+        blurayStreamSelect(p_demux, e->event, e->param);
+        break;
     case BD_EVENT_IG_STREAM:
+        break;
+
     default:
         msg_Warn(p_demux, "event: %d param: %d", e->event, e->param);
         break;
