@@ -39,6 +39,8 @@
 
 #include "visual.h"
 
+#include "window_presets.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -55,6 +57,15 @@
 #define HEIGHT_TEXT N_( "Video height" )
 #define HEIGHT_LONGTEXT N_( \
       "The height of the effects video window, in pixels." )
+
+#define FFT_WINDOW_TEXT N_( "FFT window" )
+#define FFT_WINDOW_LONGTEXT N_( \
+      "The type of FFT window to use for spectrum-based visualizations." )
+
+#define KAISER_PARAMETER_TEXT N_( "Kaiser window parameter" )
+#define KAISER_PARAMETER_LONGTEXT N_( \
+      "The parameter alpha for the Kaiser window. Increasing alpha " \
+      "increases the main-lobe width and decreases the side-lobe amplitude. " )
 
 #define NBBANDS_TEXT N_( "Show 80 bands instead of 20" )
 #define SPNBBANDS_LONGTEXT N_( \
@@ -115,6 +126,11 @@ vlc_module_begin ()
              WIDTH_TEXT, WIDTH_LONGTEXT, false )
     add_integer("effect-height" , VOUT_HEIGHT ,
              HEIGHT_TEXT, HEIGHT_LONGTEXT, false )
+    add_string("effect-fft-window", "flat",
+            FFT_WINDOW_TEXT, FFT_WINDOW_LONGTEXT, true )
+        change_string_list( window_list, window_list_text )
+    add_float("effect-kaiser-param", 3.0f,
+            KAISER_PARAMETER_TEXT, KAISER_PARAMETER_LONGTEXT, true )
     set_section( N_("Spectrum analyser") , NULL )
     add_obsolete_integer( "visual-nbbands" ) /* Since 1.0.0 */
     add_bool("visual-80-bands", true,

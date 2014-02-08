@@ -10,7 +10,8 @@ visualization_LTLIBRARIES += $(LTLIBprojectm)
 libvisual_plugin_la_SOURCES = \
 	visual/visual.c visual/visual.h \
 	visual/effects.c \
-	visual/fft.c visual/fft.h
+	visual/fft.c visual/fft.h \
+	visual/window.c visual/window.h visual/window_presets.h
 libvisual_plugin_la_LIBADD = $(LIBM)
 visualization_LTLIBRARIES += libvisual_plugin.la
 
