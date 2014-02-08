@@ -25,8 +25,31 @@
 #include <QList>
 #include <QString>
 #include <QAbstractAnimation>
+#include <QPersistentModelIndex>
+
 class QWidget;
 class QPixmap;
+class QAbstractItemView;
+
+class BasicAnimator : public QAbstractAnimation
+{
+    Q_OBJECT
+
+public:
+    BasicAnimator( QObject *parent = 0 );
+    void setFps( int _fps ) { fps = _fps; interval = 1000.0 / fps; }
+    virtual int duration() const { return 1000; }
+
+signals:
+    void frameChanged();
+
+protected:
+    virtual void updateCurrentTime ( int msecs );
+    int fps;
+    int interval;
+    int lastframe_msecs;
+    int current_frame;
+};
 
 /** An animated pixmap
      * Use this widget to display an animated icon based on a series of
@@ -34,13 +57,12 @@ class QPixmap;
      * First, create the widget, add frames and then start playing. Looping
      * is supported.
      **/
-class PixmapAnimator : public QAbstractAnimation
+class PixmapAnimator : public BasicAnimator
 {
     Q_OBJECT
 
 public:
     PixmapAnimator( QWidget *parent, QList<QString> _frames );
-    void setFps( int _fps ) { fps = _fps; interval = 1000.0 / fps; }
     virtual int duration() const { return interval * pixmaps.count(); }
     virtual ~PixmapAnimator() { qDeleteAll( pixmaps ); }
     QPixmap *getPixmap() { return currentPixmap; }
@@ -48,12 +70,30 @@ protected:
     virtual void updateCurrentTime ( int msecs );
     QList<QPixmap *> pixmaps;
     QPixmap *currentPixmap;
-    int fps;
-    int interval;
-    int lastframe_msecs;
-    int current_frame;
 signals:
     void pixmapReady( const QPixmap & );
+};
+
+class DelegateAnimationHelper : public QObject
+{
+    Q_OBJECT
+
+public:
+    DelegateAnimationHelper( QAbstractItemView *view, BasicAnimator *animator = 0 );
+    void setIndex( const QModelIndex &index );
+    bool isRunning() const;
+    const QPersistentModelIndex & getIndex() const;
+
+public slots:
+    void run( bool );
+
+protected slots:
+    void updateDelegate();
+
+private:
+    BasicAnimator *animator;
+    QAbstractItemView *view;
+    QPersistentModelIndex index;
 };
 
 #endif // ANIMATORS_HPP

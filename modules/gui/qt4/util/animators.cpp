@@ -19,18 +19,36 @@
  *****************************************************************************/
 
 #include "animators.hpp"
+#include "qt4.hpp"
 
 #include <QWidget>
 #include <QPixmap>
+#include <QAbstractItemView>
+
+BasicAnimator::BasicAnimator( QObject *parent )
+    : QAbstractAnimation( parent ), current_frame( 0 )
+{
+    setLoopCount( -1 );
+}
+
+void BasicAnimator::updateCurrentTime( int msecs )
+{
+    msecs += (interval / 2);
+    int i = ( msecs / interval );
+    if ( i != current_frame )
+    {
+        current_frame = i;
+        emit frameChanged();
+    }
+}
 
 PixmapAnimator::PixmapAnimator( QWidget *parent, QList<QString> frames )
-    : QAbstractAnimation( parent ), current_frame( 0 )
+    : BasicAnimator( parent )
 {
     foreach( QString name, frames )
         pixmaps.append( new QPixmap( name ) );
     currentPixmap = pixmaps.at( 0 );
     setFps( frames.count() ); /* default to 1 sec loop */
-    setLoopCount( -1 );
 }
 
 void PixmapAnimator::updateCurrentTime( int msecs )
@@ -45,3 +63,55 @@ void PixmapAnimator::updateCurrentTime( int msecs )
     }
 }
 
+DelegateAnimationHelper::DelegateAnimationHelper( QAbstractItemView *view_,
+                                                  BasicAnimator *animator_ )
+    : QObject( view_ ), view( view_ ), animator( animator_ )
+{
+    if ( !animator )
+    {
+        animator = new BasicAnimator( this );
+        animator->setFps( 15 );
+        animator->setLoopCount( -1 );
+    }
+    setIndex( QModelIndex() );
+    CONNECT( animator, frameChanged(), this, updateDelegate() );
+}
+
+void DelegateAnimationHelper::setIndex( const QModelIndex &index_ )
+{
+    index = QPersistentModelIndex( index_ );
+}
+
+void DelegateAnimationHelper::run( bool b_run )
+{
+    if ( b_run )
+    {
+        if ( ! isRunning() ) animator->start();
+    }
+    else
+        animator->stop();
+}
+
+bool DelegateAnimationHelper::isRunning() const
+{
+    return ( animator->state() == QAbstractAnimation::Running );
+}
+
+const QPersistentModelIndex & DelegateAnimationHelper::getIndex() const
+{
+    return index;
+}
+
+void DelegateAnimationHelper::updateDelegate()
+{
+    /* Prevent running indefinitively if removed from model */
+    if ( !index.isValid() )
+        run( false );
+    else
+    {
+        if ( view->viewport() )
+            view->viewport()->update();
+        else
+            view->update( index );
+    }
+}
