@@ -17,4 +17,5 @@ visualization_LTLIBRARIES += libvisual_plugin.la
 
 SOURCES_vsxu = vsxu.cpp cyclic_buffer.h
 
-SOURCES_glspectrum = glspectrum.c visual/fft.c visual/fft.h
+SOURCES_glspectrum = glspectrum.c visual/fft.c visual/fft.h \
+	visual/window.c visual/window.h visual/window_presets.h

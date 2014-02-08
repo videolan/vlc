@@ -40,6 +40,7 @@
 #include <math.h>
 
 #include "visual/fft.h"
+#include "visual/window.h"
 
 
 /*****************************************************************************
@@ -94,6 +95,9 @@ struct filter_sys_t
     /* Window size */
     int i_width;
     int i_height;
+
+    /* FFT window parameters */
+    window_param wind_param;
 };
 
 
@@ -134,6 +138,9 @@ static int Open(vlc_object_t * p_this)
 
     p_sys->f_rotationAngle = 0;
     p_sys->f_rotationIncrement = ROTATION_INCREMENT;
+
+    /* Fetch the FFT window parameters */
+    window_get_param( VLC_OBJECT( p_filter ), &p_sys->wind_param );
 
     /* Create the FIFO for the audio data. */
     p_sys->fifo = block_FifoNew();
@@ -425,6 +432,7 @@ static void *Thread( void *p_data )
                                    36,47,62,82,107,141,184,255};
 
         fft_state *p_state = NULL; /* internal FFT data */
+        DEFINE_WIND_CONTEXT(wind_ctx); /* internal window data */
 
         unsigned i, j;
         float p_output[FFT_BUFFER_SIZE];           /* Raw FFT Result  */
@@ -471,6 +479,11 @@ static void *Thread( void *p_data )
             msg_Err(p_filter,"unable to initialize FFT transform");
             goto release;
         }
+        if (!window_init(FFT_BUFFER_SIZE, &p_sys->wind_param, &wind_ctx))
+        {
+            msg_Err(p_filter,"unable to initialize FFT window");
+            goto release;
+        }
         p_buffs = p_s16_buff;
         for (i = 0 ; i < FFT_BUFFER_SIZE; i++)
         {
@@ -481,6 +494,7 @@ static void *Thread( void *p_data )
             if (p_buffs >= &p_s16_buff[block->i_nb_samples * p_sys->i_channels])
                 p_buffs = p_s16_buff;
         }
+        window_scale_in_place (p_buffer1, &wind_ctx);
         fft_perform (p_buffer1, p_output, p_state);
 
         for (i = 0; i< FFT_BUFFER_SIZE; ++i)
@@ -532,6 +546,7 @@ static void *Thread( void *p_data )
         }
 
 release:
+        window_close(&wind_ctx);
         fft_close(p_state);
         block_Release(block);
         vlc_restorecancel(canc);
