@@ -254,6 +254,11 @@ static const struct
 #if LIBAVCODEC_VERSION_CHECK( 55, 24, 0, 37, 100 )
     { VLC_CODEC_HEVC, AV_CODEC_ID_HEVC, VIDEO_ES },
 #endif
+
+#if LIBAVCODEC_VERSION_CHECK( 55, 33, 0, 50, 100 )
+    { VLC_CODEC_FIC , AV_CODEC_ID_FIC, VIDEO_ES },
+#endif
+
     /* ffmpeg only: AV_CODEC_ID_BRENDER_PIX */
     /* ffmpeg only: AV_CODEC_ID_Y41P */
     /* ffmpeg only: AV_CODEC_ID_EXR */
