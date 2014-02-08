@@ -33,7 +33,7 @@
 #include "components/playlist/ml_model.hpp"       /* MLModel */
 #include "components/playlist/views.hpp"          /* 3 views */
 #include "components/playlist/selector.hpp"       /* PLSelector */
-#include "util/customwidgets.hpp"                 /* PixmapAnimator */
+#include "util/animators.hpp"                     /* PixmapAnimator */
 #include "menus.hpp"                              /* Popup */
 #include "input_manager.hpp"                      /* THEMIM */
 #include "dialogs_provider.hpp"                   /* THEDP */

@@ -34,10 +34,10 @@
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QList>
-#include <QTimer>
 #include <QToolButton>
-#include <QAbstractAnimation>
 #include <QDial>
+
+#include "animators.hpp"
 
 class QPixmap;
 class QWidget;
@@ -110,34 +110,6 @@ protected:
     virtual QString textFromValue( int ) const;
     /* QVLCDebugLevelSpinBox is read-only */
     virtual int valueFromText( const QString& ) const { return -1; }
-};
-
-/** An animated pixmap
-     * Use this widget to display an animated icon based on a series of
-     * pixmaps. The pixmaps will be stored in memory and should be kept small.
-     * First, create the widget, add frames and then start playing. Looping
-     * is supported.
-     **/
-class PixmapAnimator : public QAbstractAnimation
-{
-    Q_OBJECT
-
-public:
-    PixmapAnimator( QWidget *parent, QList<QString> _frames );
-    void setFps( int _fps ) { fps = _fps; interval = 1000.0 / fps; };
-    virtual int duration() const { return interval * pixmaps.count(); };
-    virtual ~PixmapAnimator() { qDeleteAll( pixmaps ); };
-    QPixmap *getPixmap() { return currentPixmap; }
-protected:
-    virtual void updateCurrentTime ( int msecs );
-    QList<QPixmap *> pixmaps;
-    QPixmap *currentPixmap;
-    int fps;
-    int interval;
-    int lastframe_msecs;
-    int current_frame;
-signals:
-    void pixmapReady( const QPixmap & );
 };
 
 /** This spinning icon, to the colors of the VLC cone, will show

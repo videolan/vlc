@@ -318,28 +318,6 @@ QString VLCKeyToString( unsigned val, bool locale )
     return r;
 }
 
-PixmapAnimator::PixmapAnimator( QWidget *parent, QList<QString> frames )
-    : QAbstractAnimation( parent ), current_frame( 0 )
-{
-    foreach( QString name, frames )
-        pixmaps.append( new QPixmap( name ) );
-    currentPixmap = pixmaps.at( 0 );
-    setFps( frames.count() ); /* default to 1 sec loop */
-    setLoopCount( -1 );
-}
-
-void PixmapAnimator::updateCurrentTime( int msecs )
-{
-    int i = msecs / interval;
-    if ( i >= pixmaps.count() ) i = pixmaps.count() - 1; /* roundings */
-    if ( i != current_frame )
-    {
-        current_frame = i;
-        currentPixmap = pixmaps.at( current_frame );
-        emit pixmapReady( *currentPixmap );
-    }
-}
-
 /* Animated Icon implementation */
 SpinningIcon::SpinningIcon( QWidget *parent ) : QLabel( parent )
 {

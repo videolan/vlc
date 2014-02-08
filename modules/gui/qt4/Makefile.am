@@ -100,6 +100,7 @@ libqt4_plugin_la_SOURCES = \
 		components/sout/profile_selector.hpp \
 	components/sout/sout_widgets.cpp components/sout/sout_widgets.hpp \
 		components/sout/profiles.hpp \
+	util/animators.cpp util/animators.hpp \
 	util/input_slider.cpp util/input_slider.hpp \
 	util/timetooltip.cpp util/timetooltip.hpp \
 	util/customwidgets.cpp util/customwidgets.hpp \
@@ -190,6 +191,7 @@ nodist_libqt4_plugin_la_SOURCES = \
 	components/playlist/ml_model.moc.cpp \
 	components/sout/profile_selector.moc.cpp \
 	components/sout/sout_widgets.moc.cpp \
+	util/animators.moc.cpp \
 	util/input_slider.moc.cpp \
 	util/timetooltip.moc.cpp \
 	util/customwidgets.moc.cpp \
