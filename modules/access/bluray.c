@@ -1331,8 +1331,8 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     case DEMUX_GET_POSITION:
     {
         double *pf_position = (double*)va_arg(args, double *);
-        *pf_position = p_demux->info.i_title < (int)p_sys->i_title ?
-                    (double)FROM_TICKS(bd_tell_time(p_sys->bluray))/CUR_LENGTH : 0.0;
+        *pf_position = p_demux->info.i_title < (int)p_sys->i_title && CUR_LENGTH > 0 ?
+                      (double)FROM_TICKS(bd_tell_time(p_sys->bluray))/CUR_LENGTH : 0.0;
         return VLC_SUCCESS;
     }
     case DEMUX_SET_POSITION:
