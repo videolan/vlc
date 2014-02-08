@@ -1119,6 +1119,11 @@ static bool OggCreateHeaders( sout_mux_t *p_mux )
     }
 
     /* Write previous headers */
+    for( p_og = p_hdr; p_og != NULL; p_og = p_og->p_next )
+    {
+        /* flag headers to be resent for streaming clients */
+        p_og->i_flags |= BLOCK_FLAG_HEADER;
+    }
     p_mux->p_sys->i_pos += sout_AccessOutWrite( p_mux->p_access, p_hdr );
     p_hdr = NULL;
 
@@ -1272,6 +1277,7 @@ static bool OggCreateHeaders( sout_mux_t *p_mux )
     }
 
     /* set HEADER flag */
+    /* flag headers to be resent for streaming clients */
     for( p_og = p_hdr; p_og != NULL; p_og = p_og->p_next )
     {
         p_og->i_flags |= BLOCK_FLAG_HEADER;
