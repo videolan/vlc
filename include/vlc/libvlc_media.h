@@ -67,7 +67,13 @@ typedef enum libvlc_meta_t {
     libvlc_meta_Publisher,
     libvlc_meta_EncodedBy,
     libvlc_meta_ArtworkURL,
-    libvlc_meta_TrackID
+    libvlc_meta_TrackID,
+    libvlc_meta_TrackTotal,
+    libvlc_meta_Director,
+    libvlc_meta_Season,
+    libvlc_meta_Episode,
+    libvlc_meta_ShowName,
+    libvlc_meta_Actors
     /* Add new meta types HERE */
 } libvlc_meta_t;
 

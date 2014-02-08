@@ -61,7 +61,13 @@ static const vlc_meta_type_t libvlc_to_vlc_meta[] =
     [libvlc_meta_Publisher]    = vlc_meta_Publisher,
     [libvlc_meta_EncodedBy]    = vlc_meta_EncodedBy,
     [libvlc_meta_ArtworkURL]   = vlc_meta_ArtworkURL,
-    [libvlc_meta_TrackID]      = vlc_meta_TrackID
+    [libvlc_meta_TrackID]      = vlc_meta_TrackID,
+    [libvlc_meta_TrackTotal]   = vlc_meta_TrackTotal,
+    [libvlc_meta_Director]     = vlc_meta_Director,
+    [libvlc_meta_Season]       = vlc_meta_Season,
+    [libvlc_meta_Episode]      = vlc_meta_Episode,
+    [libvlc_meta_ShowName]     = vlc_meta_ShowName,
+    [libvlc_meta_Actors]       = vlc_meta_Actors
 };
 
 static const libvlc_meta_t vlc_to_libvlc_meta[] =
@@ -82,7 +88,13 @@ static const libvlc_meta_t vlc_to_libvlc_meta[] =
     [vlc_meta_Publisher]    = libvlc_meta_Publisher,
     [vlc_meta_EncodedBy]    = libvlc_meta_EncodedBy,
     [vlc_meta_ArtworkURL]   = libvlc_meta_ArtworkURL,
-    [vlc_meta_TrackID]      = libvlc_meta_TrackID
+    [vlc_meta_TrackID]      = libvlc_meta_TrackID,
+    [vlc_meta_TrackTotal]   = libvlc_meta_TrackTotal,
+    [vlc_meta_Director]     = libvlc_meta_Director,
+    [vlc_meta_Season]       = libvlc_meta_Season,
+    [vlc_meta_Episode]      = libvlc_meta_Episode,
+    [vlc_meta_ShowName]     = libvlc_meta_ShowName,
+    [vlc_meta_Actors]       = libvlc_meta_Actors
 };
 
 /**************************************************************************
