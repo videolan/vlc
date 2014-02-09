@@ -614,7 +614,10 @@ static int OpenEncoder(vlc_object_t *p_this)
         goto error;
     }
 
-    /* TODO: vbr, bitrate, fec */
+    /* TODO: vbr, fec */
+
+    if( enc->fmt_out.i_bitrate )
+        opus_multistream_encoder_ctl(sys->enc, OPUS_SET_BITRATE( enc->fmt_out.i_bitrate ));
 
     /* Buffer for incoming audio, since opus only accepts frame sizes that are
        multiples of 2.5ms */
