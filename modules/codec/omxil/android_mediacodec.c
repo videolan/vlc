@@ -364,6 +364,7 @@ static int OpenDecoder(vlc_object_t *p_this)
             if ((*env)->ExceptionOccurred(env)) {
                 msg_Warn(p_dec, "Exception occurred in MediaCodec.configure with an output surface.");
                 (*env)->ExceptionClear(env);
+                jni_UnlockAndroidSurface();
                 goto error;
             }
             p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
