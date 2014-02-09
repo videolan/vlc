@@ -1299,6 +1299,7 @@ static const staticentry_t p_list_audio[] = {
 
     B(VLC_CODEC_OPUS, "Opus Audio"),
         A("Opus"),
+        A("opus"),
 
     B(VLC_CODEC_302M, "302M Audio"),
         A("302m"),
