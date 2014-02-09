@@ -337,9 +337,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_vcodec = 0;
     if( psz_string && *psz_string )
     {
-        char fcc[4] = "    ";
+        char fcc[5] = "    \0";
         memcpy( fcc, psz_string, __MIN( strlen( psz_string ), 4 ) );
-        p_sys->i_vcodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
+        p_sys->i_vcodec = vlc_fourcc_GetCodecFromString( VIDEO_ES, fcc );
+        msg_Dbg( p_stream, "Checking video codec mapping for %s got %4.4s ", fcc, (char*)&p_sys->i_vcodec);
     }
     free( psz_string );
 
@@ -551,7 +552,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     if( p_fmt->i_cat == AUDIO_ES && p_sys->i_acodec )
         success = transcode_audio_add(p_stream, p_fmt, id);
-    else if( p_fmt->i_cat == VIDEO_ES && (p_sys->i_vcodec || p_sys->psz_venc) )
+    else if( p_fmt->i_cat == VIDEO_ES && p_sys->i_vcodec )
         success = transcode_video_add(p_stream, p_fmt, id);
     else if( ( p_fmt->i_cat == SPU_ES ) &&
              ( p_sys->i_scodec || p_sys->psz_senc || p_sys->b_soverlay ) )
