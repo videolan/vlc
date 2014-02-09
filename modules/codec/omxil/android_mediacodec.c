@@ -223,6 +223,16 @@ static int OpenDecoder(vlc_object_t *p_this)
         msg_Dbg(p_dec, "codec %d not supported", p_dec->fmt_in.i_codec);
         return VLC_EGENERIC;
     }
+
+    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264) {
+        size_t i_profile = 0xFFFF;
+        h264_get_profile_level(&p_dec->fmt_in, &i_profile, NULL, NULL);
+        if (i_profile >= 110) {
+            msg_Err(p_dec, "H.264 profile is too high or unknown. Disabling Hardware Acceleration.");
+            return VLC_EGENERIC;
+        }
+    }
+
     /* Allocate the memory needed to store the decoder's structure */
     if ((p_dec->p_sys = p_sys = calloc(1, sizeof(*p_sys))) == NULL)
         return VLC_ENOMEM;
