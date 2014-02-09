@@ -641,7 +641,7 @@ static int LoadCatalog( addons_finder_t *p_finder )
     int i_filetype = -1;
 
     struct stat stat_;
-    if ( vlc_stat( psz_path, &stat_ ) || !stat_.st_blocks )
+    if ( vlc_stat( psz_path, &stat_ ) )
     {
         free( psz_path );
         return VLC_EGENERIC;
