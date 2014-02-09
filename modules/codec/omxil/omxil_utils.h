@@ -256,3 +256,8 @@ unsigned int GetAudioParamSize(OMX_INDEXTYPE index);
 #define QOMX_COLOR_FormatYUV420PackedSemiPlanar64x32Tile2m8ka 0x7FA30C03
 #define OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar32m 0x7FA30C04
 #define OMX_IndexVendorSetYUV420pMode 0x7f000003
+
+/*****************************************************************************
+ * H264 specific code
+ *****************************************************************************/
+bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile, size_t *p_level, size_t *p_nal_size);
