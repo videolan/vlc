@@ -362,7 +362,7 @@ static int OpenDecoder(vlc_object_t *p_this)
             // Configure MediaCodec with the Android surface.
             (*env)->CallVoidMethod(env, p_sys->codec, p_sys->configure, format, surf, NULL, 0);
             if ((*env)->ExceptionOccurred(env)) {
-                msg_Warn(p_dec, "Exception occurred in MediaCodec.configure");
+                msg_Warn(p_dec, "Exception occurred in MediaCodec.configure with an output surface.");
                 (*env)->ExceptionClear(env);
                 goto error;
             }
