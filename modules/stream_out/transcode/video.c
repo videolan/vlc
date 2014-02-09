@@ -547,13 +547,9 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
         id->p_encoder->fmt_in.video.i_frame_rate_base );
 
     id->i_output_frame_interval = id->p_encoder->fmt_out.video.i_frame_rate_base * CLOCK_FREQ / id->p_encoder->fmt_out.video.i_frame_rate;
-    id->i_input_frame_interval = id->p_decoder->fmt_out.video.i_frame_rate_base * CLOCK_FREQ / id->p_decoder->fmt_out.video.i_frame_rate;
-    msg_Info( p_stream, "input interval %d (base %d)  output interval %d (base %d)", id->i_input_frame_interval, id->p_decoder->fmt_out.video.i_frame_rate_base,
+    msg_Info( p_stream, "output interval %d (base %d)",
                         id->i_output_frame_interval, id->p_encoder->fmt_in.video.i_frame_rate_base );
 
-    date_Init( &id->interpolated_pts,
-               id->p_decoder->fmt_out.video.i_frame_rate,
-               1 );
     date_Init( &id->next_output_pts,
                id->p_encoder->fmt_in.video.i_frame_rate,
                1 );
@@ -666,6 +662,7 @@ static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, sout_stream
 {
 
     picture_t *p_pic2 = NULL;
+    mtime_t original_date = p_pic->date;
     bool b_need_duplicate=false;
     /* If input pts + input_frame_interval is lower than next_output_pts - output_frame_interval
      * Then the future input frame should fit better and we can drop this one 
@@ -674,7 +671,7 @@ static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, sout_stream
      * pictures but we don't need to use them all, for example yadif2x and outputting to some
      * different fps value
      */
-    if( ( p_pic->date + (mtime_t)id->i_input_frame_interval ) <
+    if( ( p_pic->date ) <
         ( date_Get( &id->next_output_pts ) ) )
     {
 #if 0
@@ -741,7 +738,7 @@ static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, sout_stream
 
     /* we need to duplicate while next_output_pts + output_frame_interval < input_pts (next input pts)*/
     b_need_duplicate = ( date_Get( &id->next_output_pts ) + id->i_output_frame_interval ) <
-                       ( date_Get( &id->interpolated_pts ) );
+                       ( original_date );
 
     if( p_sys->i_threads )
     {
@@ -786,7 +783,7 @@ static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, sout_stream
 #endif
         date_Increment( &id->next_output_pts, id->p_encoder->fmt_in.video.i_frame_rate_base );
         b_need_duplicate = ( date_Get( &id->next_output_pts ) + id->i_output_frame_interval ) <
-                           ( date_Get( &id->interpolated_pts ) );
+                           ( original_date );
     }
 
     if( p_sys->i_threads && p_pic2 )
@@ -897,41 +894,12 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                 id->b_transcode = false;
                 return VLC_EGENERIC;
             }
-            date_Set( &id->interpolated_pts, p_pic->date );
             date_Set( &id->next_output_pts, p_pic->date );
         }
 
         /*Input lipsync and drop check */
         if( p_sys->b_master_sync )
         {
-            /* How much audio has drifted */
-            mtime_t i_master_drift = p_sys->i_master_drift;
-
-            /* This is the pts input should have now with constant frame rate */
-            mtime_t i_pts = date_Get( &id->interpolated_pts );
-
-            /* How much video pts is ahead of calculated pts */
-            mtime_t i_video_drift = p_pic->date - i_pts;
-
-            /* Check that we are having lipsync with input here */
-            if( unlikely ( ( (i_video_drift - i_master_drift ) > MASTER_SYNC_MAX_DRIFT
-                          || (i_video_drift + i_master_drift ) < -MASTER_SYNC_MAX_DRIFT ) ) )
-            {
-                msg_Warn( p_stream,
-                    "video drift too big, resetting sync %"PRId64" to %"PRId64,
-                    (i_video_drift + i_master_drift),
-                    p_pic->date
-                    );
-                date_Set( &id->interpolated_pts, p_pic->date );
-                date_Set( &id->next_output_pts, p_pic->date );
-                i_pts = date_Get( &id->interpolated_pts );
-            }
-
-            /* Set the pts of the frame being encoded */
-            p_pic->date = i_pts;
-
-
-
             /* If input pts + input_frame_interval is lower than next_output_pts - output_frame_interval
              * Then the future input frame should fit better and we can drop this one 
              *
@@ -976,9 +944,6 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                     p_user_filtered_pic = filter_chain_VideoFilter( id->p_uf_chain, p_user_filtered_pic );
                 if( !p_user_filtered_pic )
                     break;
-
-                /* now take next input pts, pts dates are only enabled if p_module is set*/
-                date_Increment( &id->interpolated_pts, id->p_decoder->fmt_out.video.i_frame_rate_base );
 
                 OutputFrame( p_sys, p_user_filtered_pic, p_stream, id, out );
 
