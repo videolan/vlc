@@ -549,7 +549,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     bool success;
 
-    if( p_fmt->i_cat == AUDIO_ES && (p_sys->i_acodec || p_sys->psz_aenc) )
+    if( p_fmt->i_cat == AUDIO_ES && p_sys->i_acodec )
         success = transcode_audio_add(p_stream, p_fmt, id);
     else if( p_fmt->i_cat == VIDEO_ES && (p_sys->i_vcodec || p_sys->psz_venc) )
         success = transcode_video_add(p_stream, p_fmt, id);
