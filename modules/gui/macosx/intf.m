@@ -1046,7 +1046,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         input_thread_t * p_input = pl_CurrentInput(VLCIntf);
         if (p_input) {
             BOOL b_returned = NO;
-            b_returned = input_AddSubtitle(p_input, [[o_names objectAtIndex:0] UTF8String], true);
+            b_returned = input_AddSubtitleOSD(p_input, [[o_names objectAtIndex:0] UTF8String], true, true);
             vlc_object_release(p_input);
             if (!b_returned) {
                 free(psz_uri);

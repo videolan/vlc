@@ -36,6 +36,7 @@
 #include <vlc_epg.h>
 #include <vlc_events.h>
 #include <vlc_input_item.h>
+#include <vlc_vout_osd.h>
 
 #include <string.h>
 
@@ -526,14 +527,6 @@ static inline input_state_e input_GetState( input_thread_t * p_input )
     input_Control( p_input, INPUT_GET_STATE, &state );
     return state;
 }
-/**
- * It will add a new subtitle source to the input.
- * Provided for convenience.
- */
-static inline int input_AddSubtitle( input_thread_t *p_input, const char *psz_url, bool b_check_extension )
-{
-    return input_Control( p_input, INPUT_ADD_SUBTITLE, psz_url, b_check_extension );
-}
 
 /**
  * Return one of the video output (if any). If possible, you should use
@@ -557,6 +550,28 @@ static inline vout_thread_t *input_GetVout( input_thread_t *p_input )
      free( pp_vout );
      return p_vout;
 }
+
+/**
+ * It will add a new subtitle source to the input.
+ * Provided for convenience.
+ */
+static inline int input_AddSubtitleOSD( input_thread_t *p_input, const char *psz_url,
+        bool b_check_extension, bool b_osd )
+{
+    int i_result = input_Control( p_input, INPUT_ADD_SUBTITLE, psz_url, b_check_extension );
+    if( i_result != VLC_SUCCESS || !b_osd )
+        return i_result;
+
+    vout_thread_t *p_vout = input_GetVout( p_input );
+    if( p_vout )
+    {
+        vout_OSDMessage(p_vout, SPU_DEFAULT_CHANNEL, _("Subtitle track added") );
+        vlc_object_release( (vlc_object_t *)p_vout );
+    }
+    return i_result;
+}
+#define input_AddSubtitle(a, b, c) input_AddSubtitleOSD(a, b, c, false)
+
 
 /**
  * Return the audio output (if any) associated with an input.

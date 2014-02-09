@@ -288,7 +288,7 @@ void TopWindow::processEvent( EvtDragDrop &rEvtDragDrop )
             char* psz_file = make_path( it->c_str() );
             if( psz_file )
             {
-                is_subtitle = !input_AddSubtitle( pInput, psz_file, true );
+                is_subtitle = !input_AddSubtitleOSD( pInput, psz_file, true, true );
                 free( psz_file );
             }
         }

@@ -1597,7 +1597,7 @@
         BOOL b_returned = NO;
 
         if (count == 1 && p_input) {
-            b_returned = input_AddSubtitle(p_input, vlc_path2uri([[o_values objectAtIndex:0] UTF8String], NULL), true);
+            b_returned = input_AddSubtitleOSD(p_input, vlc_path2uri([[o_values objectAtIndex:0] UTF8String], NULL), true, true);
             vlc_object_release(p_input);
             if (!b_returned)
                 return YES;

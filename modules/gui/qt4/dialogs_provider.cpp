@@ -781,8 +781,8 @@ void DialogsProvider::loadSubtitlesFile()
     free( path2 );
     foreach( const QString &qsFile, qsl )
     {
-        if( input_AddSubtitle( p_input, qtu( toNativeSeparators( qsFile ) ),
-                    true ) )
+        if( input_AddSubtitleOSD( p_input, qtu( toNativeSeparators( qsFile ) ),
+                    true, true ) )
             msg_Warn( p_intf, "unable to load subtitles from '%s'",
                       qtu( qsFile ) );
     }
