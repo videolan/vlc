@@ -1540,6 +1540,10 @@ static int blurayDemux(demux_t *p_demux)
     } else {
         nread = bd_read_ext(p_sys->bluray, p_block->p_buffer,
                             NB_TS_PACKETS * BD_TS_PACKET_SIZE, &e);
+        while (e.event != BD_EVENT_NONE) {
+            blurayHandleEvent(p_demux, &e);
+            bd_get_event(p_sys->bluray, &e);
+        }
         if (nread < 0) {
             block_Release(p_block);
             return -1;
@@ -1547,8 +1551,6 @@ static int blurayDemux(demux_t *p_demux)
         if (nread == 0) {
             if (e.event == BD_EVENT_NONE)
                 msg_Info(p_demux, "We reached the end of a title");
-            else
-                blurayHandleEvent(p_demux, &e);
             block_Release(p_block);
             return 1;
         }
