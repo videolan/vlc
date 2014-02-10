@@ -108,7 +108,6 @@ nobase_vlclib_DATA = \
 	lua/intf/dummy.luac \
 	lua/intf/dumpmeta.luac \
 	lua/intf/luac.luac \
-	lua/intf/modules/common.luac \
 	lua/intf/modules/host.luac \
 	lua/intf/telnet.luac \
 	lua/meta/art/02_frenchtv.luac \
@@ -117,6 +116,7 @@ nobase_vlclib_DATA = \
 	lua/meta/art/00_musicbrainz.luac \
 	lua/meta/fetcher/tvrage.luac \
 	lua/meta/reader/filename.luac \
+	lua/modules/common.luac \
 	lua/modules/dkjson.luac \
 	lua/modules/sandbox.luac \
 	lua/modules/simplexml.luac \
@@ -193,7 +193,6 @@ EXTRA_DIST += \
 	lua/intf/dumpmeta.lua \
 	lua/intf/http.lua \
 	lua/intf/luac.lua \
-	lua/intf/modules/common.lua \
 	lua/intf/modules/host.lua \
 	lua/intf/modules/httprequests.lua \
 	lua/intf/telnet.lua \
@@ -206,6 +205,7 @@ EXTRA_DIST += \
 	lua/meta/fetcher/tvrage.lua \
 	lua/meta/reader/README.txt \
 	lua/meta/reader/filename.lua \
+	lua/modules/common.lua \
 	lua/modules/dkjson.lua \
 	lua/modules/sandbox.lua \
 	lua/modules/simplexml.lua \
