@@ -150,6 +150,7 @@ nobase_vlclib_DATA = \
 	lua/playlist/zapiks.luac \
 	lua/sd/fmc.luac \
 	lua/sd/icecast.luac \
+	lua/sd/icast.luac \
 	lua/sd/jamendo.luac \
 	lua/sd/metachannels.luac \
 	$(NULL)
@@ -170,6 +171,7 @@ nobase_doc_DATA = \
 	lua/playlist/youtube.lua \
 	lua/sd/README.txt \
 	lua/sd/icecast.lua \
+	lua/sd/icast.lua \
 	$(NULL)
 
 if BUILD_HTTPD
@@ -241,6 +243,7 @@ EXTRA_DIST += \
 	lua/sd/README.txt \
 	lua/sd/fmc.lua \
 	lua/sd/icecast.lua \
+	lua/sd/icast.lua \
 	lua/sd/jamendo.lua \
 	lua/sd/metachannels.lua
 
