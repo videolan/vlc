@@ -993,9 +993,6 @@ void AddonItemDelegate::paint( QPainter *painter,
     QStyleOptionViewItemV4 newopt = option;
     int i_state = index.data( AddonsListModel::StateRole ).toInt();
 
-    if ( option.state.testFlag( QStyle::State_Editing ) )
-        newopt.rect.setRight( option.rect.right() - 100 );
-
     ExtensionItemDelegate::paint( painter, newopt, index );
 
     initStyleOption( &newopt, index );
