@@ -60,6 +60,7 @@
 #include <QGraphicsColorizeEffect>
 #include <QProgressBar>
 #include <QTextEdit>
+#include <QUrl>
 
 static QPixmap *loadPixmapFromData( char *, int size );
 
@@ -298,7 +299,6 @@ void ExtensionTab::moreInformation()
     dlg.exec();
 }
 
-
 /* Add-ons tab */
 AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
 {
@@ -348,6 +348,12 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
     addonsView->setAlternatingRowColors( true );
     addonsView->setSelectionMode( QAbstractItemView::SingleSelection );
 
+    // Drop packages
+    addonsView->setAcceptDrops( true );
+    addonsView->setDefaultDropAction( Qt::CopyAction );
+    addonsView->setDropIndicatorShown( true );
+    addonsView->setDragDropMode( QAbstractItemView::DropOnly );
+
     // Model
     AddonsListModel *model = new AddonsListModel( AM, addonsView );
     addonsModel = new AddonsSortFilterProxyModel();
@@ -382,6 +388,9 @@ AddonsTab::~AddonsTab()
 
 bool AddonsTab::eventFilter( QObject *obj, QEvent *event )
 {
+    if ( obj != addonsView->viewport() )
+        return false;
+
     switch( event->type() )
     {
     case QEvent::Paint:
@@ -420,6 +429,39 @@ bool AddonsTab::eventFilter( QObject *obj, QEvent *event )
             AM->findNewAddons();
         }
         break;
+    case QEvent::DragEnter:
+    {
+        QDragEnterEvent *dragEvent = dynamic_cast<QDragEnterEvent *>(event);
+        QList<QUrl> urls = dragEvent->mimeData()->urls();
+        if ( dragEvent->proposedAction() != Qt::CopyAction
+          || urls.count() != 1
+          || urls.first().scheme() != "file"
+          || ! urls.first().path().endsWith(".vlp") )
+            return false;
+        dragEvent->acceptProposedAction();
+        return true;
+    }
+    case QEvent::DragMove:
+    {
+        QDragMoveEvent *moveEvent = dynamic_cast<QDragMoveEvent *>(event);
+        if ( moveEvent->proposedAction() != Qt::CopyAction )
+            return false;
+        moveEvent->acceptProposedAction();
+        return true;
+    }
+    case QEvent::Drop:
+    {
+        QDropEvent *dropEvent = dynamic_cast<QDropEvent *>(event);
+        if ( dropEvent->proposedAction() != Qt::CopyAction )
+            return false;
+        if ( dropEvent->mimeData()->urls().count() )
+        {
+            AddonsManager *AM = AddonsManager::getInstance( p_intf );
+            AM->findDesignatedAddon( dropEvent->mimeData()->urls().first().toString() );
+            dropEvent->acceptProposedAction();
+        }
+        return true;
+    }
     default:
         break;
     }
