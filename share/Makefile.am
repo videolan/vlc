@@ -64,7 +64,7 @@ DIST_skins2 = \
 	skins2/winamp2.xml
 
 skins2_default_vlt_FILES = \
-	    skins2/default/theme.xml \
+	skins2/default/theme.xml \
 	skins2/default/subX/about.png \
 	skins2/default/subX/eq.png \
 	skins2/default/subX/font.otf \
