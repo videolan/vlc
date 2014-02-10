@@ -337,7 +337,7 @@ typedef         uintmax_t atomic_uintmax_t;
     atomic_type_dispatch_16_64(operation, object, __VA_ARGS__))
 
 #  define atomic_store(object,desired) \
-    atomic_type_dispatch_8_64(InterlockedExchange, object, desired)
+    atomic_type_dispatch_16_64(InterlockedExchange, object, desired)
 #  define atomic_store_explicit(object,desired,order) \
     atomic_store(object, desired)
 
