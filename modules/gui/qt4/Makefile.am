@@ -288,6 +288,9 @@ DEPS_res = \
 	pixmaps/faster.png \
 	pixmaps/faster2.png \
 	pixmaps/go-next.png \
+	pixmaps/addons/addon.png \
+	pixmaps/addons/addon_broken.png \
+	pixmaps/addons/score.png \
 	pixmaps/menus/exit_16px.png \
 	pixmaps/menus/help_16px.png \
 	pixmaps/menus/info_16px.png \
