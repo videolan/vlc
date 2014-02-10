@@ -143,7 +143,7 @@ static VLCInfo *_o_sharedInstance = nil;
 
 - (void)initPanel
 {
-    b_stats = config_GetInt(VLCIntf, "stats");
+    b_stats = var_InheritBool(VLCIntf, "stats");
     if (!b_stats) {
         if ([o_tab_view numberOfTabViewItems] > 2)
             [o_tab_view removeTabViewItem: [o_tab_view tabViewItemAtIndex: 2]];
