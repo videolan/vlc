@@ -76,6 +76,7 @@ BOOL WINAPI DllMain(HINSTANCE dll, DWORD reason, LPVOID reserved)
 DEFINE_GUID (GUID_VLC_AUD_OUT, 0x4533f59d, 0x59ee, 0x00c6,
    0xad, 0xb2, 0xc6, 0x8b, 0x50, 0x1a, 0x66, 0x55);
 
+#if !VLC_WINSTORE_APP
 static int TryEnterMTA(vlc_object_t *obj)
 {
     HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
@@ -87,6 +88,7 @@ static int TryEnterMTA(vlc_object_t *obj)
     return 0;
 }
 #define TryEnterMTA(o) TryEnterMTA(VLC_OBJECT(o))
+#endif
 
 static void EnterMTA(void)
 {
@@ -100,7 +102,9 @@ static void LeaveMTA(void)
     CoUninitialize();
 }
 
+#if !VLC_WINSTORE_APP
 static wchar_t default_device[1] = L"";
+#endif
 
 struct aout_sys_t
 {
@@ -926,8 +930,10 @@ static void aout_stream_Stop(void *func, va_list ap)
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
+#if !VLC_WINSTORE_APP
     if (sys->dev == NULL)
         return -1;
+#endif
 
     aout_stream_t *s = vlc_object_create(aout, sizeof (*s));
     if (unlikely(s == NULL))
@@ -947,7 +953,11 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
         sys->module = vlc_module_load(s, "aout stream", NULL, false,
                                       aout_stream_Start, s, fmt, &hr);
-        if (hr != AUDCLNT_E_DEVICE_INVALIDATED || DeviceSelect(aout, NULL))
+        if (hr != AUDCLNT_E_DEVICE_INVALIDATED
+#if !VLC_WINSTORE_APP
+                || DeviceSelect(aout, NULL)
+#endif
+           )
             break;
     }
     LeaveMTA();
