@@ -29,6 +29,8 @@
 #include "window.h"
 #include "window_presets.h"
 
+#include <assert.h>
+
 /* Flat top window coefficients */
 #define FT_A0 1.000f
 #define FT_A1 1.930f
@@ -182,6 +184,7 @@ bool window_init( int i_buffer_size, window_param * p_param,
     }
     default:
         /* We should not reach here */
+        assert(0);
         break;
     }
 
