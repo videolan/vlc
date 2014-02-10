@@ -1502,6 +1502,11 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
     case BD_EVENT_IG_STREAM:
         break;
 
+    case BD_EVENT_DISCONTINUITY:
+        /* reset demuxer (partially decoded PES packets must be dropped) */
+        blurayResetParser(p_demux);
+        break;
+
     default:
         msg_Warn(p_demux, "event: %d param: %d", e->event, e->param);
         break;
