@@ -44,6 +44,8 @@ static int   Open ( vlc_object_t * );
 static void  Close ( vlc_object_t * );
 static int   Find ( addons_finder_t *p_finder );
 static int   Retrieve ( addons_finder_t *p_finder, addon_entry_t *p_entry );
+static int   OpenDesignated ( vlc_object_t * );
+static int   FindDesignated ( addons_finder_t *p_finder );
 
 #define ADDONS_MODULE_SHORTCUT "addons.vo"
 #define ADDONS_REPO_SCHEMEHOST "http://api.addons.videolan.org"
@@ -59,6 +61,14 @@ vlc_module_begin ()
     set_description(N_("addons.videolan.org addons finder"))
     set_capability("addons finder", 100)
     set_callbacks(Open, Close)
+add_submodule ()
+    set_category(CAT_ADVANCED)
+    set_subcategory(SUBCAT_ADVANCED_MISC)
+    set_shortname(N_("Videolan.org's single archive addons finder"))
+    add_shortcut(ADDONS_MODULE_SHORTCUT".vlp")
+    set_description(N_("single .vlp archive addons finder"))
+    set_capability("addons finder", 101)
+    set_callbacks(OpenDesignated, NULL)
 vlc_module_end ()
 
 struct addons_finder_sys_t
@@ -326,8 +336,12 @@ static int Find( addons_finder_t *p_finder )
 
 static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
 {
+    if ( !p_entry->psz_archive_uri )
+        return VLC_EGENERIC;
+
     /* get archive and parse manifest */
     stream_t *p_stream;
+
     if ( p_entry->psz_archive_uri[0] == '/' )
     {
         /* Relative path */
@@ -348,7 +362,7 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
     /* In case of pf_ reuse */
     if ( p_finder->p_sys->psz_tempfile )
     {
-        unlink( p_finder->p_sys->psz_tempfile );
+        vlc_unlink( p_finder->p_sys->psz_tempfile );
         FREENULL( p_finder->p_sys->psz_tempfile );
     }
 
@@ -403,6 +417,38 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
     return i_ret;
 }
 
+static int FindDesignated( addons_finder_t *p_finder )
+{
+    char *psz_manifest;
+    const char *psz_path = p_finder->psz_uri + 7; // remove scheme
+
+    if ( asprintf( &psz_manifest, "unzip://%s!/manifest.xml",
+                   psz_path ) < 1 )
+        return VLC_ENOMEM;
+
+    stream_t *p_stream = stream_UrlNew( p_finder, psz_manifest );
+    free( psz_manifest );
+    if ( !p_stream ) return VLC_EGENERIC;
+
+    if ( ParseCategoriesInfo( p_finder, p_stream ) )
+    {
+        /* Do archive uri fixup */
+        FOREACH_ARRAY( addon_entry_t *p_entry, p_finder->entries )
+        if ( likely( !p_entry->psz_archive_uri ) )
+                p_entry->psz_archive_uri = strdup( p_finder->psz_uri );
+        FOREACH_END()
+    }
+    else
+    {
+        stream_Delete( p_stream );
+        return VLC_EGENERIC;
+    }
+
+    stream_Delete( p_stream );
+
+    return VLC_SUCCESS;
+}
+
 static int Open(vlc_object_t *p_this)
 {
     addons_finder_t *p_finder = (addons_finder_t*) p_this;
@@ -411,7 +457,7 @@ static int Open(vlc_object_t *p_this)
     if ( !p_finder->p_sys )
         return VLC_ENOMEM;
     p_finder->p_sys->psz_tempfile = NULL;
-    /* We only support listing the whole repo for now */
+    /* We only support listing the whole repo */
     if ( p_finder->psz_uri )
         return VLC_EGENERIC;
 
@@ -429,4 +475,19 @@ static void Close(vlc_object_t *p_this)
         unlink( p_finder->p_sys->psz_tempfile );
         free( p_finder->p_sys );
     }
+}
+
+static int OpenDesignated(vlc_object_t *p_this)
+{
+    addons_finder_t *p_finder = (addons_finder_t*) p_this;
+    if ( !p_finder->psz_uri
+         || strncmp( "file://", p_finder->psz_uri, 7 )
+         || strncmp( ".vlp", p_finder->psz_uri + strlen( p_finder->psz_uri ) - 4, 4 )
+       )
+        return VLC_EGENERIC;
+
+    p_finder->pf_find = FindDesignated;
+    p_finder->pf_retrieve = Retrieve;
+
+    return VLC_SUCCESS;
 }
