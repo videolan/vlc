@@ -389,6 +389,9 @@ static int blurayOpen(vlc_object_t *object)
      */
     bd_get_event(p_sys->bluray, NULL);
 
+    /* Registering overlay event handler */
+    bd_register_overlay_proc(p_sys->bluray, p_demux, blurayOverlayProc);
+
     if (p_sys->b_menu) {
         p_sys->p_input = demux_GetParentInput(p_demux);
         if (unlikely(!p_sys->p_input)) {
@@ -404,8 +407,6 @@ static int blurayOpen(vlc_object_t *object)
         if (bd_play(p_sys->bluray) == 0)
             BLURAY_ERROR(_("Failed to start bluray playback. Please try without menu support."));
 
-        /* Registering overlay event handler */
-        bd_register_overlay_proc(p_sys->bluray, p_demux, blurayOverlayProc);
     } else {
         /* set start title number */
         if (bluraySetTitle(p_demux, p_sys->i_longest_title) != VLC_SUCCESS) {
@@ -1559,20 +1560,20 @@ static int blurayDemux(demux_t *p_demux)
             block_Release(p_block);
             return 1;
         }
+    }
 
-        if (p_sys->current_overlay != -1) {
-            bluray_overlay_t *ov = p_sys->p_overlays[p_sys->current_overlay];
-            vlc_mutex_lock(&ov->lock);
-            bool display = ov->status == ToDisplay;
-            vlc_mutex_unlock(&ov->lock);
-            if (display) {
-                if (p_sys->p_vout == NULL)
-                    p_sys->p_vout = input_GetVout(p_sys->p_input);
-                if (p_sys->p_vout != NULL) {
-                    var_AddCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
-                    var_AddCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
-                    bluraySendOverlayToVout(p_demux);
-                }
+    if (p_sys->current_overlay != -1) {
+        bluray_overlay_t *ov = p_sys->p_overlays[p_sys->current_overlay];
+        vlc_mutex_lock(&ov->lock);
+        bool display = ov->status == ToDisplay;
+        vlc_mutex_unlock(&ov->lock);
+        if (display) {
+            if (p_sys->p_vout == NULL)
+                p_sys->p_vout = input_GetVout(p_sys->p_input);
+            if (p_sys->p_vout != NULL) {
+                var_AddCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
+                var_AddCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
+                bluraySendOverlayToVout(p_demux);
             }
         }
     }
