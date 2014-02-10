@@ -50,6 +50,11 @@ void AddonsManager::findNewAddons()
     addons_manager_Gather( p_manager, NULL );
 }
 
+void AddonsManager::findDesignatedAddon( QString uri )
+{
+    addons_manager_Gather( p_manager, qtu(uri) );
+}
+
 void AddonsManager::findInstalled()
 {
     addons_manager_LoadCatalog( p_manager );

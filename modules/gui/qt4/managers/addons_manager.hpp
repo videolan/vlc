@@ -79,6 +79,7 @@ signals:
 
 public slots:
     void findNewAddons();
+    void findDesignatedAddon( QString uri );
     void findInstalled();
 
 private:
