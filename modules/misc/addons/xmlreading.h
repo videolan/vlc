@@ -45,7 +45,7 @@ struct
 } data_pointer = { {NULL}, TYPE_NONE };
 
 
-static int ReadType( const char *value )
+static inline int ReadType( const char *value )
 {
     if ( !strcmp( value, "playlist" ) )
         return ADDON_PLAYLIST_PARSER;
@@ -59,7 +59,7 @@ static int ReadType( const char *value )
         return ADDON_UNKNOWN;
 }
 
-static const char * getTypePsz( int i_type )
+static inline const char * getTypePsz( int i_type )
 {
     switch( i_type )
     {
