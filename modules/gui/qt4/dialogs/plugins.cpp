@@ -1320,6 +1320,10 @@ AddonInfoDialog::AddonInfoDialog( const QModelIndex &index,
                              .arg( qtr("Author") ).arg( author ) );
     }
 
+    // Summary
+    textContent->append( QString("%1<br/>\n")
+                .arg( index.data(AddonsListModel::SummaryRole).toString() ) );
+
     // Description
     QString description = index.data(AddonsListModel::DescriptionRole).toString();
     if ( !description.isEmpty() )
