@@ -1506,6 +1506,11 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
         /* reset demuxer (partially decoded PES packets must be dropped) */
         blurayResetParser(p_demux);
         break;
+    case BD_EVENT_IDLE:
+        /* nothing to do (ex. BD-J is preparing menus, waiting user input or running animation) */
+        /* avoid busy loop (bd_read() returns no data) */
+        msleep( 40000 );
+        break;
 
     default:
         msg_Warn(p_demux, "event: %d param: %d", e->event, e->param);
