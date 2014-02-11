@@ -2,8 +2,8 @@
 ; 1. File type associations ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Function that registers one extension for VLC
-Function RegisterExtension
+;; Function that associates one extension with VLC
+Function AssociateExtension
   ; back up old value for extension $R0 (eg. ".opt")
   ReadRegStr $1 HKCR "$R0" ""
   StrCmp $1 "" NoBackup
@@ -11,13 +11,17 @@ Function RegisterExtension
     WriteRegStr HKCR "$R0" "VLC.backup" $1
 NoBackup:
   WriteRegStr HKCR "$R0" "" "VLC$R0"
-  ReadRegStr $0 HKCR "VLC$R0" ""
+FunctionEnd
+
+;; Function that registers one extension for VLC
+Function RegisterExtension
   WriteRegStr HKCR "VLC$R0" "" "VLC media file ($R0)"
   WriteRegStr HKCR "VLC$R0\shell" "" "Open"
   WriteRegStr HKCR "VLC$R0\shell\Open" "" $ShellAssociation_Play
   WriteRegStr HKCR "VLC$R0\shell\Open" "MultiSelectModel" "Player"
   WriteRegStr HKCR "VLC$R0\shell\Open\command" "" '"$INSTDIR\vlc.exe" --started-from-file "%1"'
   WriteRegStr HKCR "VLC$R0\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
+  WriteRegStr HKCR "Applications\vlc.exe\SupportedTypes" ${EXT} ""
 
   ${If} ${AtLeastWinVista}
     WriteRegStr HKLM "Software\Clients\Media\VLC\Capabilities\FileAssociations" "$R0" "VLC$R0"
@@ -26,14 +30,6 @@ FunctionEnd
 
 ;; Function that registers one skin extension for VLC
 Function RegisterSkinExtension
-  ; back up old value for extension $R0 (eg. ".opt")
-  ReadRegStr $1 HKCR "$R0" ""
-  StrCmp $1 "" NoBackup
-    StrCmp $1 "VLC$R0" "NoBackup"
-    WriteRegStr HKCR "$R0" "VLC.backup" $1
-NoBackup:
-  WriteRegStr HKCR "$R0" "" "VLC$R0"
-  ReadRegStr $0 HKCR "VLC$R0" ""
   WriteRegStr HKCR "VLC$R0" "" "VLC skin file ($R0)"
   WriteRegStr HKCR "VLC$R0\shell" "" "Open"
   WriteRegStr HKCR "VLC$R0\shell\Open" "" ""
@@ -68,7 +64,7 @@ FunctionEnd
     SectionIn 1 3
     Push $R0
     StrCpy $R0 ${EXT}
-    Call RegisterExtension
+    Call AssociateExtension
     Pop $R0
   ${MementoSectionEnd}
 !macroend
@@ -78,9 +74,23 @@ FunctionEnd
     SectionIn 1 3
     Push $R0
     StrCpy $R0 ${EXT}
-    Call RegisterSkinExtension
+    Call AssociateExtension
     Pop $R0
   ${MementoSectionEnd}
+!macroend
+
+!macro RegisterExtensionMacro TYPE EXT
+  Push $R0
+  StrCpy $R0 ${EXT}
+  Call RegisterExtension
+  Pop $R0
+!macroend
+
+!macro RegisterSkinExtensionMacro TYPE EXT
+  Push $R0
+  StrCpy $R0 ${EXT}
+  Call RegisterSkinExtension
+  Pop $R0
 !macroend
 
 !macro UnRegisterExtensionSection TYPE EXT
@@ -88,10 +98,6 @@ FunctionEnd
   StrCpy $R0 ${EXT}
   Call un.RegisterExtension
   Pop $R0
-!macroend
-
-!macro WriteRegStrSupportedTypes TYPE EXT
-  WriteRegStr HKCR Applications\vlc.exe\SupportedTypes ${EXT} ""
 !macroend
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -247,10 +253,7 @@ FunctionEnd
 !macroend
 
 !macro AddContextMenu TYPE EXT
-  Push $R0
-  ReadRegStr $R0 HKCR ${EXT} ""
-  !insertmacro AddContextMenuExt $R0
-  Pop $R0
+  !insertmacro AddContextMenuExt VLC${EXT}
 !macroend
 
 !macro DeleteContextMenuExt EXT
@@ -259,10 +262,7 @@ FunctionEnd
 !macroend
 
 !macro DeleteContextMenu TYPE EXT
-  Push $R0
-  ReadRegStr $R0 HKCR ${EXT} ""
-  !insertmacro DeleteContextMenuExt $R0
-  Pop $R0
+  !insertmacro DeleteContextMenuExt VLC${EXT}
 !macroend
 
 

@@ -213,7 +213,8 @@ ${MementoSection} $Name_Section01 SEC01
   WriteRegStr HKCR Applications\vlc.exe "FriendlyAppName" "VLC media player"
   WriteRegStr HKCR Applications\vlc.exe\shell\Open "" $ContextMenuEntry_PlayWith
   WriteRegStr HKCR Applications\vlc.exe\shell\Open\command "" '"$INSTDIR\vlc.exe" --started-from-file "%1"'
-  !insertmacro MacroAllExtensions WriteRegStrSupportedTypes
+  !insertmacro MacroAllExtensions RegisterExtensionMacro
+  !insertmacro MacroSkinExtensions RegisterSkinExtensionMacro
 
   ; Windows default programs Registration
   ; Vista and above detection
