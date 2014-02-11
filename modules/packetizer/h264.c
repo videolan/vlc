@@ -165,7 +165,7 @@ static void PacketizeReset( void *p_private, bool b_broken );
 static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t * );
 static int PacketizeValidate( void *p_private, block_t * );
 
-static block_t *ParseNALBlock( decoder_t *, bool *pb_used_ts, block_t * );
+static block_t *ParseNALBlock( decoder_t *, bool *pb_ts_used, block_t * );
 static block_t *CreateAnnexbNAL( decoder_t *, const uint8_t *p, int );
 
 static block_t *OutputPicture( decoder_t *p_dec );
@@ -603,7 +603,7 @@ static inline int bs_read_se( bs_t *s )
  * ParseNALBlock: parses annexB type NALs
  * All p_frag blocks are required to start with 0 0 0 1 4-byte startcode
  *****************************************************************************/
-static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_used_ts, block_t *p_frag )
+static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic = NULL;
@@ -700,13 +700,13 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_used_ts, block_t *p_fr
     if( p_frag )
         block_ChainAppend( &p_sys->p_frame, p_frag );
 
-    *pb_used_ts = false;
+    *pb_ts_used = false;
     if( p_sys->i_frame_dts <= VLC_TS_INVALID &&
         p_sys->i_frame_pts <= VLC_TS_INVALID )
     {
         p_sys->i_frame_dts = i_frag_dts;
         p_sys->i_frame_pts = i_frag_pts;
-        *pb_used_ts = true;
+        *pb_ts_used = true;
     }
     return p_pic;
 }

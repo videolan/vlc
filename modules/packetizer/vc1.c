@@ -116,7 +116,7 @@ static void PacketizeReset( void *p_private, bool b_broken );
 static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t * );
 static int PacketizeValidate( void *p_private, block_t * );
 
-static block_t *ParseIDU( decoder_t *p_dec, bool *pb_used_ts, block_t *p_frag );
+static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag );
 
 static const uint8_t p_vc1_startcode[3] = { 0x00, 0x00, 0x01 };
 /*****************************************************************************
@@ -319,13 +319,13 @@ static void BuildExtraData( decoder_t *p_dec )
             p_sys->ep.p_ep->p_buffer, p_sys->ep.p_ep->i_buffer );
 }
 /* ParseIDU: parse an Independent Decoding Unit */
-static block_t *ParseIDU( decoder_t *p_dec, bool *pb_used_ts, block_t *p_frag )
+static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic;
     const idu_type_t idu = p_frag->p_buffer[3];
 
-    *pb_used_ts = false;
+    *pb_ts_used = false;
     if( !p_sys->b_sequence_header && idu != IDU_TYPE_SEQUENCE_HEADER )
     {
         msg_Warn( p_dec, "waiting for sequence header" );
@@ -406,7 +406,7 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_used_ts, block_t *p_frag )
     {
         p_sys->i_frame_dts = p_frag->i_dts;
         p_sys->i_frame_pts = p_frag->i_pts;
-        *pb_used_ts = true;
+        *pb_ts_used = true;
     }
 
     /* We will add back SH and EP on I frames */
