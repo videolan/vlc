@@ -162,6 +162,9 @@ demux_LTLIBRARIES += libes_plugin.la
 libh264_plugin_la_SOURCES = demux/mpeg/h264.c
 demux_LTLIBRARIES += libh264_plugin.la
 
+libhevc_plugin_la_SOURCES = demux/mpeg/hevc.c
+demux_LTLIBRARIES += libhevc_plugin.la
+
 libmkv_plugin_la_SOURCES = \
 	demux/mkv/util.hpp demux/mkv/util.cpp \
 	demux/mkv/virtual_segment.hpp demux/mkv/virtual_segment.cpp \
