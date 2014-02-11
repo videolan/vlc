@@ -435,13 +435,21 @@ static int InstallAllFiles( addons_storage_t *p_this, const addon_entry_t *p_ent
             if ( strstr( p_file->psz_filename, ".." ) )
                 return VLC_EGENERIC;
 
+            char *psz_translated_filename = strdup( p_file->psz_filename );
+            if ( !psz_translated_filename )
+                return VLC_ENOMEM;
+            char *tmp = psz_translated_filename;
+            while (*tmp++) if ( *tmp == '/' ) *tmp = DIR_SEP_CHAR;
+
             char *psz_dir = getAddonInstallDir( p_file->e_filetype );
             if ( !psz_dir || asprintf( &psz_dest, "%s"DIR_SEP"%s", psz_dir,
-                           p_file->psz_filename ) < 1 )
+                           psz_translated_filename ) < 1 )
             {
                 free( psz_dir );
+                free( psz_translated_filename );
                 return VLC_EGENERIC;
             }
+            free( psz_translated_filename );
             free( psz_dir );
 
             if ( InstallFile( p_this, p_file->psz_download_uri, psz_dest ) != VLC_SUCCESS )
@@ -803,14 +811,23 @@ static int Remove( addons_storage_t *p_storage, addon_entry_t *p_entry )
         case ADDON_SKIN2:
         {
             char *psz_dest;
+
+            char *psz_translated_filename = strdup( p_file->psz_filename );
+            if ( !psz_translated_filename )
+                return VLC_ENOMEM;
+            char *tmp = psz_translated_filename;
+            while (*tmp++) if ( *tmp == '/' ) *tmp = DIR_SEP_CHAR;
+
             char *psz_dir = getAddonInstallDir( p_file->e_filetype );
             if ( !psz_dir || asprintf( &psz_dest, "%s"DIR_SEP"%s", psz_dir,
-                                       p_file->psz_filename ) < 1 )
+                                       psz_translated_filename ) < 1 )
             {
                 free( psz_dir );
+                free( psz_translated_filename );
                 return VLC_EGENERIC;
             }
             free( psz_dir );
+            free( psz_translated_filename );
 
             vlc_unlink( psz_dest );
             msg_Dbg( p_storage, "removing %s", psz_dest );
