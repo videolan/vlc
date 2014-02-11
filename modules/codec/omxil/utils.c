@@ -1073,3 +1073,62 @@ bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile, size_t 
     if (p_level) *p_level = p[2];
     return true;
 }
+
+static const struct
+{
+    OMX_VIDEO_AVCPROFILETYPE omx_profile;
+    size_t                   profile_idc;
+} omx_to_profile_idc[] =
+{
+    { OMX_VIDEO_AVCProfileBaseline,  66 },
+    { OMX_VIDEO_AVCProfileMain,      77 },
+    { OMX_VIDEO_AVCProfileExtended,  88 },
+    { OMX_VIDEO_AVCProfileHigh,     100 },
+    { OMX_VIDEO_AVCProfileHigh10,   110 },
+    { OMX_VIDEO_AVCProfileHigh422,  122 },
+    { OMX_VIDEO_AVCProfileHigh444,  244 },
+};
+
+size_t convert_omx_to_profile_idc(OMX_VIDEO_AVCPROFILETYPE profile_type)
+{
+    size_t array_length = sizeof(omx_to_profile_idc)/sizeof(omx_to_profile_idc[0]);
+    for (size_t i = 0; i < array_length; ++i) {
+        if (omx_to_profile_idc[i].omx_profile == profile_type)
+            return omx_to_profile_idc[i].profile_idc;
+    }
+    return 0;
+}
+
+static const struct
+{
+    OMX_VIDEO_AVCLEVELTYPE omx_level;
+    size_t                 level_idc;
+} omx_to_level_idc[] =
+{
+    { OMX_VIDEO_AVCLevel1,  10 },
+    { OMX_VIDEO_AVCLevel1b,  9 },
+    { OMX_VIDEO_AVCLevel11, 11 },
+    { OMX_VIDEO_AVCLevel12, 12 },
+    { OMX_VIDEO_AVCLevel13, 13 },
+    { OMX_VIDEO_AVCLevel2,  20 },
+    { OMX_VIDEO_AVCLevel21, 21 },
+    { OMX_VIDEO_AVCLevel22, 22 },
+    { OMX_VIDEO_AVCLevel3,  30 },
+    { OMX_VIDEO_AVCLevel31, 31 },
+    { OMX_VIDEO_AVCLevel32, 32 },
+    { OMX_VIDEO_AVCLevel4,  40 },
+    { OMX_VIDEO_AVCLevel41, 41 },
+    { OMX_VIDEO_AVCLevel42, 42 },
+    { OMX_VIDEO_AVCLevel5,  50 },
+    { OMX_VIDEO_AVCLevel51, 51 },
+};
+
+size_t convert_omx_to_level_idc(OMX_VIDEO_AVCLEVELTYPE level_type)
+{
+    size_t array_length = sizeof(omx_to_level_idc)/sizeof(omx_to_level_idc[0]);
+    for (size_t i = 0; i < array_length; ++i) {
+        if (omx_to_level_idc[i].omx_level == level_type)
+            return omx_to_level_idc[i].level_idc;
+    }
+    return 0;
+}
