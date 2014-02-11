@@ -61,6 +61,7 @@
 #include <QProgressBar>
 #include <QTextEdit>
 #include <QUrl>
+#include <QMimeData>
 
 static QPixmap *loadPixmapFromData( char *, int size );
 
