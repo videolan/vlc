@@ -1033,7 +1033,10 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
-    DeviceSelect(aout, NULL);
+    EnterCriticalSection(&sys->lock);
+    while (sys->device != NULL)
+        SleepConditionVariableCS(&sys->ready, &sys->lock, INFINITE);
+    LeaveCriticalSection(&sys->lock);
     LeaveMTA(); /* Leave MTA after thread has entered MTA */
 #else
     sys->client = var_InheritAddress(aout, "mmdevice-audioclient");
