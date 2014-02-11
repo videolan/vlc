@@ -588,6 +588,7 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
                              rect_window.right - rect_window.left,
                              rect_window.bottom - rect_window.top, SWP_NOMOVE);
             }
+            return VLC_EGENERIC;
         }
         UpdateRects(vd, cfg, source, is_forced);
         return VLC_SUCCESS;
