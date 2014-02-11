@@ -93,6 +93,8 @@
 }
 
 @property (nonatomic, assign) id dropHandler;
+@property (nonatomic, assign) BOOL drawBorder;
+
 
 - (void)enablePlaylistItems;
 
@@ -212,12 +214,6 @@
 - (void)setImagesLeft:(NSImage *)left middle: (NSImage *)middle right:(NSImage *)right;
 @end
 
-/*****************************************************************************
- * VLCThreePartDropView interface
- *****************************************************************************/
-@interface VLCThreePartDropView : VLCThreePartImageView
-
-@end
 
 /*****************************************************************************
  * PositionFormatter interface

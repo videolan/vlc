@@ -320,6 +320,18 @@ static bool b_old_spaces_style = YES;
 @implementation VLCDragDropView
 
 @synthesize dropHandler=_dropHandler;
+@synthesize drawBorder;
+
+- (id)initWithFrame:(NSRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        // default value
+        [self setDrawBorder:YES];
+    }
+
+    return self;
+}
 
 - (void)enablePlaylistItems
 {
@@ -391,8 +403,7 @@ static bool b_old_spaces_style = YES;
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-
-    if (b_activeDragAndDrop) {
+    if ([self drawBorder] && b_activeDragAndDrop) {
         NSRect frameRect = [self bounds];
 
         [[NSColor selectedControlColor] set];
@@ -866,52 +877,6 @@ void _drawFrameInRect(NSRect frameRect)
 
 @end
 
-@implementation VLCThreePartDropView
-
-- (BOOL)mouseDownCanMoveWindow
-{
-    return YES;
-}
-
-- (void)dealloc
-{
-    [self unregisterDraggedTypes];
-    [super dealloc];
-}
-
-- (void)awakeFromNib
-{
-    [self registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
-}
-
-- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
-{
-    if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) == NSDragOperationGeneric)
-        return NSDragOperationGeneric;
-
-    return NSDragOperationNone;
-}
-
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
-{
-    return YES;
-}
-
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
-{
-    BOOL b_returned;
-    b_returned = [[VLCCoreInteraction sharedInstance] performDragOperation: sender];
-
-    [self setNeedsDisplay:YES];
-    return YES;
-}
-
-- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
-{
-    [self setNeedsDisplay:YES];
-}
-
-@end
 
 @implementation PositionFormatter
 
@@ -956,7 +921,6 @@ void _drawFrameInRect(NSRect frameRect)
         return YES;
     }
 }
-
 
 @end
 
