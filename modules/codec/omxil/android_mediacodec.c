@@ -57,7 +57,8 @@ struct decoder_sys_t
     jclass media_codec_list_class, media_codec_class, media_format_class;
     jclass buffer_info_class, byte_buffer_class;
     jmethodID tostring;
-    jmethodID get_codec_count, get_codec_info_at, is_encoder;
+    jmethodID get_codec_count, get_codec_info_at, is_encoder, get_capabilities_for_type;
+    jfieldID profile_levels_field, profile_field, level_field;
     jmethodID get_supported_types, get_name;
     jmethodID create_by_codec_name, configure, start, stop, flush, release;
     jmethodID get_output_format, get_input_buffers, get_output_buffers;
@@ -127,6 +128,11 @@ static const struct member members[] = {
     { "isEncoder", "()Z", "android/media/MediaCodecInfo", OFF(is_encoder), METHOD },
     { "getSupportedTypes", "()[Ljava/lang/String;", "android/media/MediaCodecInfo", OFF(get_supported_types), METHOD },
     { "getName", "()Ljava/lang/String;", "android/media/MediaCodecInfo", OFF(get_name), METHOD },
+    { "getCapabilitiesForType", "(Ljava/lang/String;)Landroid/media/MediaCodecInfo$CodecCapabilities;", "android/media/MediaCodecInfo", OFF(get_capabilities_for_type), METHOD },
+
+    { "profileLevels", "[Landroid/media/MediaCodecInfo$CodecProfileLevel;", "android/media/MediaCodecInfo$CodecCapabilities", OFF(profile_levels_field), FIELD },
+    { "profile", "I", "android.media.MediaCodecInfo$CodecProfileLevel", OFF(profile_field), FIELD },
+    { "level", "I", "android.media.MediaCodecInfo$CodecProfileLevel", OFF(level_field), FIELD },
 
     { "createByCodecName", "(Ljava/lang/String;)Landroid/media/MediaCodec;", "android/media/MediaCodec", OFF(create_by_codec_name), STATIC_METHOD },
     { "configure", "(Landroid/media/MediaFormat;Landroid/view/Surface;Landroid/media/MediaCrypto;I)V", "android/media/MediaCodec", OFF(configure), METHOD },
@@ -224,14 +230,9 @@ static int OpenDecoder(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
-    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264) {
-        size_t i_profile = 0xFFFF;
-        h264_get_profile_level(&p_dec->fmt_in, &i_profile, NULL, NULL);
-        if (i_profile >= 110) {
-            msg_Err(p_dec, "H.264 profile is too high or unknown. Disabling Hardware Acceleration.");
-            return VLC_EGENERIC;
-        }
-    }
+    size_t fmt_profile = 0;
+    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
+        h264_get_profile_level(&p_dec->fmt_in, &fmt_profile, NULL, NULL);
 
     /* Allocate the memory needed to store the decoder's structure */
     if ((p_dec->p_sys = p_sys = calloc(1, sizeof(*p_sys))) == NULL)
@@ -303,13 +304,37 @@ static int OpenDecoder(vlc_object_t *p_this)
             (*env)->DeleteLocalRef(env, info);
             continue;
         }
+
+	jobject codec_capabilities = (*env)->CallObjectMethod(env, info, p_sys->get_capabilities_for_type,
+							      (*env)->NewStringUTF(env, mime));
+	jobject profile_levels = (*env)->GetObjectField(env, codec_capabilities, p_sys->profile_levels_field);
+	int profile_levels_len = (*env)->GetArrayLength(env, profile_levels);
+
         jobject types = (*env)->CallObjectMethod(env, info, p_sys->get_supported_types);
         int num_types = (*env)->GetArrayLength(env, types);
         bool found = false;
         for (int j = 0; j < num_types && !found; j++) {
             jobject type = (*env)->GetObjectArrayElement(env, types, j);
-            if (!jstrcmp(env, type, mime))
-                found = true;
+            if (!jstrcmp(env, type, mime)) {
+                /* The mime type is matching for this component. We
+                   now check if the capabilities of the codec is
+                   matching the video format. */
+                if (p_dec->fmt_in.i_codec == VLC_CODEC_H264 && fmt_profile) {
+                    for (int i = 0; i < profile_levels_len && !found; ++i) {
+                        jobject profile_level = (*env)->GetObjectArrayElement(env, profile_levels, i);
+
+                        int omx_profile = (*env)->GetLongField(env, profile_level, p_sys->profile_field);
+                        size_t codec_profile = convert_omx_to_profile_idc(omx_profile);
+                        if (codec_profile != fmt_profile)
+                            continue;
+                        /* Some encoders set the level too high, thus we ignore it for the moment.
+                           We could try to guess the actual profile based on the resolution. */
+                        found = true;
+                    }
+                }
+                else
+                    found = true;
+            }
             (*env)->DeleteLocalRef(env, type);
         }
         if (found) {
