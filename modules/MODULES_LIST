@@ -18,6 +18,8 @@ $Id$
  * access_output_shout: Shoutcast access output
  * access_output_udp: UDP Network access_output module
  * access_realrtsp: Real RTSP access
+ * addonsfsstorage: Local storage extensions repository
+ * addonsvorepository: OpenDesktop extensions repository
  * adjust: Contrast/Hue/saturation/Brightness adjust module
  * adpcm: ADPCM audio decoder
  * adummy: dummy audio output
@@ -151,6 +153,7 @@ $Id$
  * growl: announce currently playing stream to growl
  * h264: H264 decoder
  * headphone_channel_mixer:  headphone channel mixer with virtual spatialization effect
+ * hevc: HEVC demuxer
  * hotkeys: hotkeys control module
  * hqdn3d: High Quality denoising filter
  * http: HTTP Network access module
@@ -245,6 +248,7 @@ $Id$
  * packetizer_dirac: Dirac video packetizer
  * packetizer_flac: FLAC audio packetizer
  * packetizer_h264: H264 video packetizer
+ * packetizer_hevc: H.265/HEVC video packetizer
  * packetizer_mlp: MLP/TrueHD audio packetizer
  * packetizer_mpeg4audio: MPEG4 audio packetizer
  * packetizer_mpeg4video: MPEG4 video packetizer
@@ -334,8 +338,8 @@ $Id$
  * stream_out_rtp: rtp stream output module
  * stream_out_setid: Set the ID/Lang of an ES when streaming
  * stream_out_smem: stream output module to a memory buffer
- * stream_out_stats: Print timing values and md5 for sout blocks
  * stream_out_standard: standard stream output module
+ * stream_out_stats: Print timing values and md5 for sout blocks
  * stream_out_transcode: audio & video transcoder
  * subsdec: a codec to output textual subtitles
  * subsdelay: subtitles delay filter
@@ -393,11 +397,13 @@ $Id$
  * vpx: WebM decoder (VP8/VP9)
  * vsxu: audio visualization using Vovoid VSXu
  * wall: image wall filter
+ * wasapi: Wasapi audio output module
  * wav: Wav demuxer
  * wave: Wave video effect
  * waveout: simple audio output module for Windows
  * win32text: Text renderer using native Win32 API
  * win_hotkeys: module to catch hotkeys when application doesn't have the focus
+ * win_msg: Windows Messages module
  * windrive: Windows logical disc drives
  * wingdi: WIN 32 / WIN CE GDI video output
  * wma_fixed: wma decoder using integer decoder from Rockbox
