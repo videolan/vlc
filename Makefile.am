@@ -118,6 +118,7 @@ EXTRA_DIST += \
 	extras/package/macosx/VLC.entitlements \
 	extras/package/macosx/Resources/dsa_pub.pem \
 	extras/package/macosx/Resources/English.lproj/About.xib \
+	extras/package/macosx/Resources/English.lproj/AddonManager.xib \
 	extras/package/macosx/Resources/English.lproj/AudioEffects.xib \
 	extras/package/macosx/Resources/English.lproj/Bookmarks.xib \
 	extras/package/macosx/Resources/English.lproj/ConvertAndSave.xib \

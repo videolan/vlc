@@ -45,6 +45,7 @@
 #import "ExtensionsManager.h"
 #import "ConvertAndSave.h"
 #import "DebugMessageVisualizer.h"
+#import "AddonManager.h"
 
 @implementation VLCMainMenu
 static VLCMainMenu *_o_sharedInstance = nil;
@@ -312,6 +313,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_prefs setTitle: _NS("Preferences...")];
     [o_mi_extensions setTitle: _NS("Extensions")];
     [o_mu_extensions setTitle: _NS("Extensions")];
+    [o_mi_addonManager setTitle: _NS("Addon Manager")];
     [o_mi_add_intf setTitle: _NS("Add Interface")];
     [o_mu_add_intf setTitle: _NS("Add Interface")];
     [o_mi_services setTitle: _NS("Services")];
@@ -1124,6 +1126,17 @@ static VLCMainMenu *_o_sharedInstance = nil;
 {
     NSInteger i_level = [[[VLCMain sharedInstance] voutController] currentWindowLevel];
     [[[VLCMain sharedInstance] simplePreferences] showSimplePrefsWithLevel:i_level];
+}
+
+- (IBAction)openAddonManager:(id)sender
+{
+    if (!o_addonManager)
+        o_addonManager = [[VLCAddonManager alloc] init];
+
+    if (!b_nib_addonmanager_loaded)
+        b_nib_addonmanager_loaded = [NSBundle loadNibNamed:@"AddonManager" owner:NSApp];
+
+    [o_addonManager showWindow];
 }
 
 - (IBAction)showMessagesPanel:(id)showMessagesPanel

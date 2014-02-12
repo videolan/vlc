@@ -11,6 +11,7 @@
 		7D8BB0B71830311300FAE9B7 /* DebugMessageVisualizer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */; };
 		7D8BB0BA1830367200FAE9B7 /* PlaylistMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */; };
 		7D8BB0C01830393300FAE9B7 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0BE1830393300FAE9B7 /* MainWindow.xib */; };
+		7DB65D5618ABD6490053B874 /* AddonManager.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DB65D5418ABD6490053B874 /* AddonManager.xib */; };
 		7DE88F2A1831396A00CD9DA2 /* PlaylistAccessoryView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DE88F281831396A00CD9DA2 /* PlaylistAccessoryView.xib */; };
 		7DFFA16C16124F38001AF89F /* effects-one-button-pressed-dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DFFA16A16124F38001AF89F /* effects-one-button-pressed-dark.png */; };
 		7DFFA16D16124F38001AF89F /* effects-one-button-pressed-dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DFFA16B16124F38001AF89F /* effects-one-button-pressed-dark@2x.png */; };
@@ -481,6 +482,9 @@
 		7D8BB0B61830311300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/DebugMessageVisualizer.xib; sourceTree = "<group>"; };
 		7D8BB0B91830367200FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PlaylistMenu.xib; sourceTree = "<group>"; };
 		7D8BB0BF1830393300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		7DB65D5218ABD6380053B874 /* AddonManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AddonManager.h; path = ../../../modules/gui/macosx/AddonManager.h; sourceTree = "<group>"; };
+		7DB65D5318ABD6380053B874 /* AddonManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddonManager.m; path = ../../../modules/gui/macosx/AddonManager.m; sourceTree = "<group>"; };
+		7DB65D5518ABD6490053B874 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/AddonManager.xib; sourceTree = "<group>"; };
 		7DE88F291831396A00CD9DA2 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PlaylistAccessoryView.xib; sourceTree = "<group>"; };
 		7DFFA16A16124F38001AF89F /* effects-one-button-pressed-dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed-dark.png"; path = "Resources/mainwindow_dark/effects-one-button-pressed-dark.png"; sourceTree = "<group>"; };
 		7DFFA16B16124F38001AF89F /* effects-one-button-pressed-dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed-dark@2x.png"; path = "Resources/mainwindow_dark/effects-one-button-pressed-dark@2x.png"; sourceTree = "<group>"; };
@@ -1095,6 +1099,8 @@
 				5CCED71114C0D4A90057F8D1 /* ExtensionsDialogProvider.m */,
 				5CCED71214C0D4A90057F8D1 /* ExtensionsManager.h */,
 				5CCED71314C0D4A90057F8D1 /* ExtensionsManager.m */,
+				7DB65D5218ABD6380053B874 /* AddonManager.h */,
+				7DB65D5318ABD6380053B874 /* AddonManager.m */,
 				5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */,
 				5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */,
 				8E6BC6FA041684EC0059A3A7 /* controls.h */,
@@ -1811,6 +1817,7 @@
 				7D8BB0BE1830393300FAE9B7 /* MainWindow.xib */,
 				7DE88F281831396A00CD9DA2 /* PlaylistAccessoryView.xib */,
 				7D3F6523188051F2005776C4 /* BWQuincyMain.xib */,
+				7DB65D5418ABD6490053B874 /* AddonManager.xib */,
 			);
 			name = xibs;
 			sourceTree = "<group>";
@@ -1870,6 +1877,7 @@
 			files = (
 				CC8062641021F8790021EB9A /* dsa_pub.pem in Resources */,
 				CC402EB80E00ABBB006A4BA4 /* InfoPlist.strings in Resources */,
+				7DB65D5618ABD6490053B874 /* AddonManager.xib in Resources */,
 				CC402EB90E00ABBB006A4BA4 /* vlc.scriptSuite in Resources */,
 				CC402EBA0E00ABBB006A4BA4 /* vlc.scriptTerminology in Resources */,
 				CC402EBB0E00ABBB006A4BA4 /* README.MacOSX.rtf in Resources */,
@@ -2327,6 +2335,14 @@
 				7D8BB0BF1830393300FAE9B7 /* English */,
 			);
 			name = MainWindow.xib;
+			sourceTree = "<group>";
+		};
+		7DB65D5418ABD6490053B874 /* AddonManager.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7DB65D5518ABD6490053B874 /* English */,
+			);
+			name = AddonManager.xib;
 			sourceTree = "<group>";
 		};
 		7DE88F281831396A00CD9DA2 /* PlaylistAccessoryView.xib */ = {
