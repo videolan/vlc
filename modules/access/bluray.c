@@ -791,10 +791,12 @@ static void blurayCloseOverlay(demux_t *p_demux, int plane)
             return;
 
     /* All overlays have been closed */
-    var_DelCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
-    var_DelCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
-    vlc_object_release(p_sys->p_vout);
-    p_sys->p_vout = NULL;
+    if (p_sys->p_vout != NULL) {
+        var_DelCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
+        var_DelCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
+        vlc_object_release(p_sys->p_vout);
+        p_sys->p_vout = NULL;
+    }
 }
 
 /*
