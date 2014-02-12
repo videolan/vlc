@@ -690,6 +690,9 @@ static int LoadCatalog( addons_finder_t *p_finder )
         {
             if ( ! strcmp( p_node, "addon" ) )
             {
+                if ( p_entry ) /* ?!? Unclosed tag */
+                    addon_entry_Release( p_entry );
+
                 p_entry = addon_entry_New();
                 //p_entry->psz_source_module = strdup( ADDONS_MODULE_SHORTCUT );
                 p_entry->e_flags = ADDON_MANAGEABLE;
@@ -796,6 +799,8 @@ static int LoadCatalog( addons_finder_t *p_finder )
     }
 
 end:
+   if ( p_entry ) /* ?!? Unclosed tag */
+       addon_entry_Release( p_entry );
    xml_ReaderDelete( p_xml_reader );
    stream_Delete( p_stream );
    return i_ret;
