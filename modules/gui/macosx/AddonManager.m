@@ -103,6 +103,10 @@ static VLCAddonManager *_o_sharedInstance = nil;
     [_localAddonsOnlyCheckbox setState:NSOffState];
     [_spinner setUsesThreadedAnimation:YES];
 
+    [_name setStringValue:@""];
+    [_author setStringValue:@""];
+    [_version setStringValue:@""];
+    [_description setString:@""];
     [_window setTitle:_NS("Addon Manager")];
 
     [[[_addonsTable tableColumnWithIdentifier:@"installed"] headerCell] setStringValue:_NS("Installed")];
@@ -123,7 +127,6 @@ static VLCAddonManager *_o_sharedInstance = nil;
 - (void)showWindow
 {
     [self _findNewAddons];
-    [_spinner startAnimation:nil];
     [_window makeKeyAndOrderFront:nil];
 }
 
@@ -137,23 +140,52 @@ static VLCAddonManager *_o_sharedInstance = nil;
     [self _refactorDataModel];
 }
 
-- (IBAction)tableAction:(id)sender
+- (IBAction)installSelection:(id)sender
 {
-    NSInteger clickedRow = [_addonsTable clickedRow];
-    if (clickedRow > _displayedAddons.count - 1 || clickedRow < 0)
+    NSInteger selectedRow = [_addonsTable selectedRow];
+    if (selectedRow > _displayedAddons.count - 1 || selectedRow < 0)
         return;
 
-    NSDictionary *currentItem = _displayedAddons[clickedRow];
+    NSDictionary *currentItem = _displayedAddons[selectedRow];
+    [self _installAddonWithID:[[currentItem objectForKey:@"uuid"] pointerValue]];
+}
 
-    if ([[currentItem objectForKey:@"state"] intValue] == ADDON_INSTALLED)
-        [self _removeAddonWithID:[[currentItem objectForKey:@"uuid"] pointerValue]];
-    else
-        [self _installAddonWithID:[[currentItem objectForKey:@"uuid"] pointerValue]];
+- (IBAction)uninstallSelection:(id)sender
+{
+    NSInteger selectedRow = [_addonsTable selectedRow];
+    if (selectedRow > _displayedAddons.count - 1 || selectedRow < 0)
+        return;
+
+    NSDictionary *currentItem = _displayedAddons[selectedRow];
+    [self _removeAddonWithID:[[currentItem objectForKey:@"uuid"] pointerValue]];
+}
+
+- (IBAction)refresh:(id)sender
+{
+    [self _findNewAddons];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
     return [_displayedAddons count];
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)aNotification
+{
+    NSInteger selectedRow = [_addonsTable selectedRow];
+    if (selectedRow > _displayedAddons.count - 1 || selectedRow < 0) {
+        [_name setStringValue:@""];
+        [_author setStringValue:@""];
+        [_version setStringValue:@""];
+        [_description setString:@""];
+        return;
+    }
+
+    NSDictionary *currentItem = _displayedAddons[selectedRow];
+    [_name setStringValue:[currentItem objectForKey:@"name"]];
+    [_author setStringValue:[currentItem objectForKey:@"author"]];
+    [_version setStringValue:[currentItem objectForKey:@"version"]];
+    [_description setString:[currentItem objectForKey:@"description"]];
 }
 
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
@@ -180,11 +212,11 @@ static VLCAddonManager *_o_sharedInstance = nil;
 
         NSDictionary *addonProperties = [NSDictionary dictionaryWithObjectsAndKeys:
                                          name, @"name",
-                                         [NSString stringWithUTF8String:p_entry->psz_description ? p_entry->psz_description : ""], @"description",
-                                         [NSString stringWithUTF8String:p_entry->psz_author ? p_entry->psz_author : ""], @"author",
-                                         [NSString stringWithUTF8String:p_entry->psz_source_uri ? p_entry->psz_source_uri : ""], @"uri",
-                                         [NSString stringWithUTF8String:p_entry->psz_version ? p_entry->psz_version : ""], @"version",
-                                         [NSString stringWithUTF8String:p_entry->psz_image_uri ? p_entry->psz_image_uri : ""], @"imageuri",
+                                         toNSStr(p_entry->psz_description), @"description",
+                                         toNSStr(p_entry->psz_author), @"author",
+                                         toNSStr(p_entry->psz_source_uri), @"uri",
+                                         toNSStr(p_entry->psz_version), @"version",
+                                         toNSStr(p_entry->psz_image_uri), @"imageuri",
                                          [NSNumber numberWithInt:p_entry->e_state], @"state",
                                          [NSNumber numberWithInt:p_entry->e_type], @"type",
                                          [NSValue valueWithPointer:&p_entry->uuid], @"uuid",
@@ -240,11 +272,13 @@ static VLCAddonManager *_o_sharedInstance = nil;
         [_displayedAddons release];
     _displayedAddons = [NSArray arrayWithArray:filteredItems];
     [_displayedAddons retain];
+    [filteredItems release];
     [_addonsTable reloadData];
 }
 
 - (void)_findNewAddons
 {
+    [_spinner startAnimation:nil];
     addons_manager_Gather(_manager, NULL);
 }
 
