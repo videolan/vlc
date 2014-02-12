@@ -263,6 +263,7 @@ static VLCInfo *_o_sharedInstance = nil;
     /* reload the advanced table */
     [rootItem refresh];
     [o_outline_view reloadData];
+    [o_outline_view expandItem:nil expandChildren:YES];
 
     /* update the stats once to display p_item change faster */
     [self updateStatistics];
