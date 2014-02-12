@@ -47,7 +47,6 @@ protected:
     virtual void updateCurrentTime ( int msecs );
     int fps;
     int interval;
-    int lastframe_msecs;
     int current_frame;
 };
 

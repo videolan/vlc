@@ -28,6 +28,7 @@
 BasicAnimator::BasicAnimator( QObject *parent )
     : QAbstractAnimation( parent ), current_frame( 0 )
 {
+    setFps( 15 );
     setLoopCount( -1 );
 }
 
