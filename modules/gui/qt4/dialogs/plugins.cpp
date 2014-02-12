@@ -425,6 +425,7 @@ bool AddonsTab::eventFilter( QObject *obj, QEvent *event )
         {
             AddonsManager *AM = AddonsManager::getInstance( p_intf );
             CONNECT( AM, discoveryEnded(), spinnerAnimation, stop() );
+            CONNECT( AM, discoveryEnded(), addonsView->viewport(), update() );
             spinnerAnimation->start();
             AM->findInstalled();
             AM->findNewAddons();
