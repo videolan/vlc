@@ -393,13 +393,13 @@ static int blurayOpen(vlc_object_t *object)
 
     /* Registering overlay event handler */
     bd_register_overlay_proc(p_sys->bluray, p_demux, blurayOverlayProc);
+    p_sys->p_input = demux_GetParentInput(p_demux);
+    if (unlikely(!p_sys->p_input)) {
+        msg_Err(p_demux, "Could not get parent input");
+        goto error;
+    }
 
     if (p_sys->b_menu) {
-        p_sys->p_input = demux_GetParentInput(p_demux);
-        if (unlikely(!p_sys->p_input)) {
-            msg_Err(p_demux, "Could not get parent input");
-            goto error;
-        }
 
         /* Register ARGB overlay handler for BD-J */
         if (disc_info->num_bdj_titles)
