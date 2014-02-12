@@ -520,7 +520,7 @@ static int WriteCatalog( addons_storage_t *p_storage,
 {
     addon_entry_t *p_entry;
     char *psz_file;
-    char *psz_tempstring = NULL;
+    char *psz_tempstring;
     char *psz_userdir = config_GetUserDir( VLC_DATA_DIR );
     if ( !psz_userdir ) return VLC_ENOMEM;
 
@@ -562,6 +562,8 @@ static int WriteCatalog( addons_storage_t *p_storage,
     {
         p_entry = pp_entries[i];
         vlc_mutex_lock( &p_entry->lock );
+        psz_tempstring = NULL;
+
         if ( ( p_entry->e_state != ADDON_INSTALLED ) ||
              !( p_entry->e_flags & ADDON_MANAGEABLE ) )
         {
