@@ -91,11 +91,15 @@
 - (IBAction)outputChanged:(id)sender;
 - (IBAction)outputSettings:(id)sender;
 - (IBAction)outputCloseSheet:(id)sender;
-- (void)outputMethodChanged:(NSNotification *)o_notification;
-- (void)outputInfoChanged:(NSNotification *)o_notification;
+- (IBAction)outputMethodChanged:(id)sender;
+- (IBAction)outputInfoChanged:(id)object;
 - (void)TTLChanged:(NSNotification *)o_notification;
 - (IBAction)outputFileBrowse:(id)sender;
-- (void)transcodeChanged:(NSNotification *)o_notification;
-- (void)transcodeInfoChanged:(NSNotification *)o_notification;
+- (IBAction)streamPortStepperChanged:(id)sender;
+- (IBAction)streamTTLStepperChanged:(id)sender;
+- (IBAction)transcodeChanged:(id)sender;
+- (IBAction)transcodeInfoChanged:(id)object;
 - (IBAction)announceChanged:(id)sender;
+
+- (IBAction)streamTTLStepperChanged:(id)sender;
 @end

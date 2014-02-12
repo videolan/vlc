@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">12E55</string>
+    <string key="IBDocument.SystemVersion">12F45</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1187.39</string>
+    <string key="IBDocument.AppKitVersion">1187.40</string>
     <string key="IBDocument.HIToolboxVersion">626.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12,9 +12,9 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="637"/>
       <integer value="2346"/>
       <integer value="1263"/>
+      <integer value="637"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -14522,10 +14522,22 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
               <string>outputChanged:</string>
               <string>outputCloseSheet:</string>
               <string>outputFileBrowse:</string>
+              <string>outputInfoChanged:</string>
+              <string>outputMethodChanged:</string>
               <string>outputSettings:</string>
+              <string>streamPortStepperChanged:</string>
+              <string>streamTTLStepperChanged:</string>
+              <string>transcodeChanged:</string>
+              <string>transcodeInfoChanged:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -14541,7 +14553,13 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
               <string>outputChanged:</string>
               <string>outputCloseSheet:</string>
               <string>outputFileBrowse:</string>
+              <string>outputInfoChanged:</string>
+              <string>outputMethodChanged:</string>
               <string>outputSettings:</string>
+              <string>streamPortStepperChanged:</string>
+              <string>streamTTLStepperChanged:</string>
+              <string>transcodeChanged:</string>
+              <string>transcodeInfoChanged:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
@@ -14562,7 +14580,31 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
+                <string key="name">outputInfoChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">outputMethodChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
                 <string key="name">outputSettings:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">streamPortStepperChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">streamTTLStepperChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">transcodeChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">transcodeInfoChanged:</string>
                 <string key="candidateClassName">id</string>
               </object>
             </object>
