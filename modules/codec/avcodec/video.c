@@ -147,6 +147,11 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         p_dec->fmt_out.video.i_visible_width = p_context->width;
         p_dec->fmt_out.video.i_visible_height = p_context->height;
     }
+    else
+    {
+        p_dec->fmt_out.video.i_visible_width = width;
+        p_dec->fmt_out.video.i_visible_height = height;
+    }
 
     if( !p_sys->p_va && GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) )
     {
