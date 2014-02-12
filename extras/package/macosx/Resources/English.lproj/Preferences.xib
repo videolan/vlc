@@ -12,9 +12,12 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="2265"/>
-      <integer value="2562"/>
       <integer value="2311"/>
+      <integer value="2562"/>
+      <integer value="2677"/>
+      <integer value="2265"/>
+      <integer value="3745"/>
+      <integer value="1530"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -38,7 +41,7 @@
       <object class="NSWindowTemplate" id="987576136">
         <int key="NSWindowStyleMask">9</int>
         <int key="NSWindowBacking">2</int>
-        <string key="NSWindowRect">{{531, 271}, {775, 485}}</string>
+        <string key="NSWindowRect">{{492, 373}, {775, 485}}</string>
         <int key="NSWTFlags">1886912512</int>
         <string key="NSWindowTitle">Preferences</string>
         <string key="NSWindowClass">NSPanel</string>
@@ -49,7 +52,7 @@
         <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <string key="NSWindowContentMinSize">{775, 485}</string>
         <object class="NSView" key="NSWindowView" id="669190984">
-          <nil key="NSNextResponder"/>
+          <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -342,8 +345,9 @@
             </object>
           </object>
           <string key="NSFrameSize">{775, 485}</string>
+          <reference key="NSSuperview"/>
         </object>
-        <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
+        <string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
         <string key="NSMinSize">{775, 507}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <string key="NSFrameAutosaveName">prefs</string>
@@ -355,7 +359,7 @@
       <object class="NSWindowTemplate" id="1060376317">
         <int key="NSWindowStyleMask">1</int>
         <int key="NSWindowBacking">2</int>
-        <string key="NSWindowRect">{{13, 675}, {570, 38}}</string>
+        <string key="NSWindowRect">{{105, 903}, {570, 38}}</string>
         <int key="NSWTFlags">1886912512</int>
         <string key="NSWindowTitle">Preferences</string>
         <string key="NSWindowClass">VLCSimplePrefsWindow</string>
@@ -505,7 +509,7 @@
           <string key="NSFrameSize">{570, 38}</string>
           <reference key="NSSuperview"/>
         </object>
-        <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
+        <string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <string key="NSFrameAutosaveName">sprefs</string>
         <bool key="NSWindowIsRestorable">YES</bool>
@@ -948,7 +952,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSSupport" ref="96267115"/>
                       <reference key="NSControlView" ref="243384014"/>
                       <int key="NSButtonFlags">1211912448</int>
-                      <int key="NSButtonFlags2">130</int>
+                      <int key="NSButtonFlags2">2</int>
                       <object class="NSCustomResource" key="NSNormalImage" id="487998105">
                         <string key="NSClassName">NSImage</string>
                         <string key="NSResourceName">NSSwitch</string>
@@ -1039,7 +1043,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <object class="NSButton" id="847215559">
             <reference key="NSNextResponder" ref="1006472879"/>
             <int key="NSvFlags">256</int>
-            <string key="NSFrame">{{18, 447}, {352, 18}}</string>
+            <string key="NSFrame">{{18, 447}, {534, 18}}</string>
             <reference key="NSSuperview" ref="1006472879"/>
             <bool key="NSEnabled">YES</bool>
             <object class="NSButtonCell" key="NSCell" id="116125620">
@@ -4688,7 +4692,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         <nil key="NSUserInterfaceItemIdentifier"/>
         <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <object class="NSView" key="NSWindowView" id="476990944">
-          <nil key="NSNextResponder"/>
+          <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -4793,6 +4797,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             </object>
           </object>
           <string key="NSFrameSize">{440, 170}</string>
+          <reference key="NSSuperview"/>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
@@ -4812,7 +4817,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         <nil key="NSUserInterfaceItemIdentifier"/>
         <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <object class="NSView" key="NSWindowView" id="613777167">
-          <nil key="NSNextResponder"/>
+          <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -5610,6 +5615,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             </object>
           </object>
           <string key="NSFrameSize">{485, 254}</string>
+          <reference key="NSSuperview"/>
           <string key="NSReuseIdentifierKey">_NS:122</string>
         </object>
         <string key="NSScreenRect">{{0, 0}, {2560, 1418}}</string>
@@ -11293,7 +11299,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>2674.ImportedFromIB2</string>
           <string>2675.IBPluginDependency</string>
           <string>2675.ImportedFromIB2</string>
+          <string>2677.IBEditorWindowLastContentRect</string>
           <string>2677.IBPluginDependency</string>
+          <string>2677.IBWindowTemplateEditedContentRect</string>
           <string>2677.ImportedFromIB2</string>
           <string>2678.IBPluginDependency</string>
           <string>2678.ImportedFromIB2</string>
@@ -11767,7 +11775,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <bytes key="NSTransformStruct">P4AAAL+AAABDSAAAwiwAAA</bytes>
           </object>
           <boolean value="YES"/>
-          <string>{{231, 212}, {570, 544}}</string>
+          <string>{{426, 199}, {570, 544}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform"/>
           <boolean value="YES"/>
@@ -12147,7 +12155,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
+          <string>{{0, 825}, {440, 170}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>{{0, 825}, {440, 170}}</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
@@ -12492,9 +12502,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           </object>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{340, 1120}, {485, 254}}</string>
+          <string>{{1195, 752}, {485, 254}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{340, 1120}, {485, 254}}</string>
+          <string>{{1195, 752}, {485, 254}}</string>
           <boolean value="NO"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
