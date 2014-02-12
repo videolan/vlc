@@ -55,6 +55,12 @@ static bool signal_ignored (int signum)
             ? (void *)sa.sa_sigaction : (void *)sa.sa_handler) == SIG_IGN;
 }
 
+static void vlc_kill (void *data)
+{
+    pthread_t *ps = data;
+    pthread_kill (*ps, SIGTERM);
+}
+
 static void exit_timeout (int signum)
 {
     (void) signum;
@@ -204,12 +210,15 @@ int main( int i_argc, const char *ppsz_argv[] )
 
     vlc_enable_override ();
 
+    pthread_t self = pthread_self ();
+
     /* Initialize libvlc */
     libvlc_instance_t *vlc = libvlc_new (argc, argv);
     if (vlc == NULL)
         return 1;
 
     int ret = 1;
+    libvlc_set_exit_handler (vlc, vlc_kill, &self);
     libvlc_set_app_id (vlc, "org.VideoLAN.VLC", PACKAGE_VERSION, PACKAGE_NAME);
     libvlc_set_user_agent (vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
 
