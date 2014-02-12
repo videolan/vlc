@@ -89,8 +89,9 @@ static VLCAddonManager *_o_sharedInstance = nil;
     [_typeSwitcher removeAllItems];
     [_typeSwitcher addItemWithTitle:_NS("All")];
     [[_typeSwitcher lastItem] setTag: -1];
+    /* no skins on OS X so far
     [_typeSwitcher addItemWithTitle:_NS("Skins")];
-    [[_typeSwitcher lastItem] setTag:ADDON_SKIN2];
+    [[_typeSwitcher lastItem] setTag:ADDON_SKIN2]; */
     [_typeSwitcher addItemWithTitle:_NS("Playlist parsers")];
     [[_typeSwitcher lastItem] setTag:ADDON_PLAYLIST_PARSER];
     [_typeSwitcher addItemWithTitle:_NS("Service discovery")];
@@ -188,7 +189,10 @@ static VLCAddonManager *_o_sharedInstance = nil;
                                          [NSNumber numberWithInt:p_entry->e_type], @"type",
                                          [NSValue valueWithPointer:&p_entry->uuid], @"uuid",
                                          nil];
-        [_addons addObject:addonProperties];
+
+        /* no skin support on OS X so far */
+        if ([[addonProperties objectForKey:@"type"] intValue] != ADDON_SKIN2)
+            [_addons addObject:addonProperties];
     }
 }
 
@@ -271,15 +275,15 @@ static VLCAddonManager *_o_sharedInstance = nil;
     switch (i_type)
     {
         case ADDON_SKIN2:
-            return @"Skins";
+            return _NS("Skins");
         case ADDON_PLAYLIST_PARSER:
-            return @"Playlist parsers";
+            return _NS("Playlist parsers");
         case ADDON_SERVICE_DISCOVERY:
-            return @"Service Discovery";
+            return _NS("Service Discovery");
         case ADDON_EXTENSION:
-            return @"Extensions";
+            return _NS("Extensions");
         default:
-            return @"Unknown";
+            return _NS("Unknown");
     }
 }
 
