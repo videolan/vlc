@@ -98,7 +98,6 @@ struct addon_entry_t
     /* custom data storage (if needed by module/source) */
     void * p_custom;
 };
-typedef struct addon_entry_t addon_entry_t;
 
 typedef struct addons_finder_t addons_finder_t;
 typedef struct addons_finder_sys_t addons_finder_sys_t;
