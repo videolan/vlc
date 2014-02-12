@@ -64,6 +64,9 @@ static int   OpenLister ( vlc_object_t * );
 static void  CloseLister ( vlc_object_t * );
 
 static int   LoadCatalog ( addons_finder_t * );
+static bool  FileBelongsToManagedAddon( addons_finder_t *p_finder,
+                                        const addon_type_t e_type,
+                                        const char *psz_file );
 /*****************************************************************************
  * Module descriptor
  ****************************************************************************/
@@ -207,6 +210,9 @@ static int ListSkins( addons_finder_t *p_finder )
         char *psz_file = ppsz_list[i];
         if( !psz_file )
             break;
+
+        if ( FileBelongsToManagedAddon( p_finder, ADDON_SKIN2, psz_file ) )
+             continue;
 
         char *psz_uri;
         if( asprintf( &psz_uri, "unzip://%s/%s!/theme.xml", psz_dir, psz_file ) >= 0)
