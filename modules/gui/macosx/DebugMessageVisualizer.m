@@ -201,7 +201,7 @@ static VLCDebugMessageVisualizer *_sharedMainInstance = nil;
 
         [_msg_lock lock];
 
-        if ([_msg_arr count] > 600) {
+        if ([_msg_arr count] > 10000) {
             [_msg_arr removeObjectAtIndex: 0];
             [_msg_arr removeObjectAtIndex: 1];
         }
