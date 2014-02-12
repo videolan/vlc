@@ -1594,7 +1594,7 @@ static FILE *GetTmpFile( char **ppsz_file, const char *psz_path )
 
     /* */
     *ppsz_file = NULL;
-    if( asprintf( &psz_name, "%s/vlc-timeshift.XXXXXX", psz_path ) < 0 )
+    if( asprintf( &psz_name, "%s"DIR_SEP"vlc-timeshift.XXXXXX", psz_path ) < 0 )
         return NULL;
 
     /* */
