@@ -601,7 +601,8 @@ static int WriteCatalog( addons_storage_t *p_storage,
         free( psz_uuid );
         free( psz_tempstring );
 
-        WRITE_WITH_ENTITIES( " version=\"%s\">\n", p_entry->psz_version )
+        WRITE_WITH_ENTITIES( " version=\"%s\"", p_entry->psz_version )
+        fprintf( p_catalog, ">\n" );
 
         WRITE_WITH_ENTITIES( "\t\t\t<name>%s</name>\n", p_entry->psz_name )
         WRITE_WITH_ENTITIES( "\t\t\t<summary>%s</summary>\n", p_entry->psz_summary )
