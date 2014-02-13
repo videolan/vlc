@@ -1182,9 +1182,8 @@ void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_de
         sar_den = dar_den * osys->source.i_visible_width;
         vlc_ureduce(&sar_num, &sar_den, sar_num, sar_den, 0);
     } else {
-        /* Assume 1:1 SAR if the information is missing */
-        sar_num = 1;
-        sar_den = 1;
+        sar_num = 0;
+        sar_den = 0;
     }
 
     if (osys->sar.num != sar_num || osys->sar.den != sar_den) {
