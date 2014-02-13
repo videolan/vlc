@@ -124,6 +124,9 @@ void WindowClose  (vout_window_t *);
 #define ITUNES_TEXT N_("Pause iTunes during VLC playback")
 #define ITUNES_LONGTEXT N_("Pauses iTunes playback when VLC playback starts. If selected, iTunes playback will be resumed again if VLC playback is finished.")
 
+#define SPOTIFY_TEXT N_("Pause Spotify during VLC playback")
+#define SPOTIFY_LONGTEXT N_("Pauses Spotify playback when VLC playback starts.")
+
 static const int itunes_list[] =
     { 0, 1, 2 };
 static const char *const itunes_list_text[] = {
@@ -161,6 +164,7 @@ vlc_module_begin()
         add_bool("macosx-pause-minimized", false, PAUSE_MINIMIZED_TEXT, PAUSE_MINIMIZED_LONGTEXT, false)
         add_bool("macosx-lock-aspect-ratio", true, LOCK_ASPECT_RATIO_TEXT, LOCK_ASPECT_RATIO_TEXT, true)
         add_integer("macosx-control-itunes", 1, ITUNES_TEXT, ITUNES_LONGTEXT, false)
+        add_bool("macosx-control-spotify", true, SPOTIFY_TEXT, SPOTIFY_LONGTEXT, false)
         change_integer_list(itunes_list, itunes_list_text)
 
     set_section(N_("Apple Remote and media keys"), 0)
