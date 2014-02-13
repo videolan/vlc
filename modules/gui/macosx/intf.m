@@ -1455,6 +1455,15 @@ static VLCMain *_o_sharedMainInstance = nil;
             }
         }
 
+        // pause Spotify
+        int i_control_spotify = var_InheritBool(p_intf, "macosx-control-spotify");
+        if (i_control_spotify) {
+            SBApplication *spotifyApp = [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
+            if ([spotifyApp isRunning] && [spotifyApp respondsToSelector:@selector(pause)]) {
+                msg_Dbg(p_intf, "Pause Spotify...");
+                [spotifyApp performSelector:@selector(pause)];
+            }
+        }
 
         /* Declare user activity.
          This wakes the display if it is off, and postpones display sleep according to the users system preferences
