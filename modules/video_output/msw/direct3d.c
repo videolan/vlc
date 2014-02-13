@@ -1519,7 +1519,8 @@ static void Direct3DImportSubpicture(vout_display_t *vd,
 }
 
 static int Direct3DRenderRegion(vout_display_t *vd,
-                                d3d_region_t *region)
+                                d3d_region_t *region,
+                                bool use_pixel_shader)
 {
     vout_display_sys_t *sys = vd->sys;
 
@@ -1555,7 +1556,10 @@ static int Direct3DRenderRegion(vout_display_t *vd,
     }
 
     if (sys->d3dx_shader) {
-        hr = IDirect3DDevice9_SetPixelShader(d3ddev, sys->d3dx_shader);
+        if (use_pixel_shader)
+            hr = IDirect3DDevice9_SetPixelShader(d3ddev, sys->d3dx_shader);
+        else /* Disable any existing pixel shader. */
+            hr = IDirect3DDevice9_SetPixelShader(d3ddev, NULL);
         if (FAILED(hr)) {
             msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
             return -1;
@@ -1618,14 +1622,14 @@ static void Direct3DRenderScene(vout_display_t *vd,
         return;
     }
 
-    Direct3DRenderRegion(vd, picture);
+    Direct3DRenderRegion(vd, picture, true);
 
     if (subpicture_count > 0)
         IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ALPHABLENDENABLE, TRUE);
     for (int i = 0; i < subpicture_count; i++) {
         d3d_region_t *r = &subpicture[i];
         if (r->texture)
-            Direct3DRenderRegion(vd, r);
+            Direct3DRenderRegion(vd, r, false);
     }
     if (subpicture_count > 0)
         IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ALPHABLENDENABLE, FALSE);
