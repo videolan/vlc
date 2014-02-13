@@ -683,6 +683,9 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     [self setupButton: o_video_deinterlace_pop forIntList: "deinterlace"];
     [self setupButton: o_video_deinterlace_mode_pop forStringList: "deinterlace-mode"];
 
+    // set lion fullscreen mode restrictions
+    [self enableLionFullscreenMode: [o_intf_nativefullscreen_ckb state]];
+
     /***************************
      * input & codecs settings *
      ***************************/
@@ -1117,8 +1120,30 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 #pragma mark -
 #pragma mark Specific actions
 
+// disables some video settings which do not work in lion mode
+- (void)enableLionFullscreenMode: (BOOL)b_value
+{
+    [o_video_videodeco_ckb setEnabled: !b_value];
+    [o_video_black_ckb setEnabled: !b_value];
+
+    if (b_value) {
+        [o_video_videodeco_ckb setState: NSOnState];
+        [o_video_black_ckb setState: NSOffState];
+
+        NSString *o_tooltipText = _NS("This setting cannot be changed because the native fullscreen mode is enabled.");
+        [o_video_videodeco_ckb setToolTip: o_tooltipText];
+        [o_video_black_ckb setToolTip: o_tooltipText];
+    } else {
+        [self setupButton: o_video_videodeco_ckb forBoolValue: "video-deco"];
+        [self setupButton: o_video_black_ckb forBoolValue: "macosx-black"];
+    }
+}
+
 - (IBAction)interfaceSettingChanged:(id)sender
 {
+    if (sender == o_intf_nativefullscreen_ckb)
+        [self enableLionFullscreenMode:[sender state]];
+
     b_intfSettingChanged = YES;
 }
 
