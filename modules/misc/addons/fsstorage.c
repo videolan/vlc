@@ -526,6 +526,7 @@ static int WriteCatalog( addons_storage_t *p_storage,
 {
     addon_entry_t *p_entry;
     char *psz_file;
+    char *psz_file_tmp;
     char *psz_tempstring;
     char *psz_userdir = config_GetUserDir( VLC_DATA_DIR );
     if ( !psz_userdir ) return VLC_ENOMEM;
@@ -537,10 +538,17 @@ static int WriteCatalog( addons_storage_t *p_storage,
     }
     free( psz_userdir );
 
+    if ( asprintf( &psz_file_tmp, "%s.tmp", psz_file ) < 1 )
+    {
+        free( psz_file );
+        return VLC_ENOMEM;
+    }
+
     char *psz_path = strdup( psz_file );
     if ( !psz_path )
     {
         free( psz_file );
+        free( psz_file_tmp );
         return VLC_ENOMEM;
     }
 
@@ -550,14 +558,16 @@ static int WriteCatalog( addons_storage_t *p_storage,
         *++psz_buf = '\0';
         /* ensure directory exists */
         if( !EMPTY_STR( psz_path ) ) recursive_mkdir( VLC_OBJECT(p_storage), psz_path );
-        free( psz_path );
     }
+    free( psz_path );
 
-    FILE *p_catalog = vlc_fopen( psz_file, "wt" );
-    free( psz_file );
-
+    FILE *p_catalog = vlc_fopen( psz_file_tmp, "wt" );
     if ( !p_catalog )
+    {
+        free( psz_file );
+        free( psz_file_tmp );
         return VLC_EGENERIC;
+    }
 
     /* write XML header */
     fprintf( p_catalog, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" );
@@ -624,6 +634,10 @@ static int WriteCatalog( addons_storage_t *p_storage,
 
         vlc_mutex_unlock( &p_entry->lock );
     }
+
+    vlc_rename( psz_file_tmp, psz_file );
+    free( psz_file );
+    free( psz_file_tmp );
 
     fprintf( p_catalog, "\t</addons>\n" );
     fprintf( p_catalog, "</videolan>\n" );
