@@ -136,6 +136,8 @@ struct  demux_sys_t
     bluray_overlay_t    *p_overlays[MAX_OVERLAY];
     int                 current_overlay; // -1 if no current overlay;
     bool                b_menu;
+    bool                b_menu_open;
+    bool                b_popup_available;
 
     /* */
     input_thread_t      *p_input;
@@ -1393,6 +1395,9 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     }
 
     case DEMUX_NAV_ACTIVATE:
+        if (p_sys->b_popup_available && !p_sys->b_menu_open) {
+            return sendKeyEvent(p_sys, BD_VK_POPUP);
+        }
         return sendKeyEvent(p_sys, BD_VK_ENTER);
     case DEMUX_NAV_UP:
         return sendKeyEvent(p_sys, BD_VK_UP);
@@ -1501,6 +1506,13 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
         p_demux->info.i_seekpoint = e->param;
         break;
     case BD_EVENT_ANGLE:
+        break;
+    case BD_EVENT_MENU:
+        p_sys->b_menu_open = e->param;
+        break;
+    case BD_EVENT_POPUP:
+        p_sys->b_popup_available = e->param;
+        /* TODO: show / hide pop-up menu button in gui ? */
         break;
 
     /*
