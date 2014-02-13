@@ -301,8 +301,8 @@ struct vout_display_owner_sys_t {
 
     bool ch_zoom;
     struct {
-        int  num;
-        int  den;
+        unsigned num;
+        unsigned den;
     } zoom;
 
     bool ch_wm_state;
@@ -1141,7 +1141,7 @@ void vout_SetDisplayFilled(vout_display_t *vd, bool is_filled)
     }
 }
 
-void vout_SetDisplayZoom(vout_display_t *vd, int num, int den)
+void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 

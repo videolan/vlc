@@ -86,7 +86,7 @@ VLC_API bool vout_ManageDisplay(vout_display_t *, bool allow_reset_pictures);
 
 VLC_API void vout_SetDisplayFullscreen(vout_display_t *, bool is_fullscreen);
 VLC_API void vout_SetDisplayFilled(vout_display_t *, bool is_filled);
-VLC_API void vout_SetDisplayZoom(vout_display_t *, int num, int den);
+VLC_API void vout_SetDisplayZoom(vout_display_t *, unsigned num, unsigned den);
 VLC_API void vout_SetWindowState(vout_display_t *, unsigned state);
 VLC_API void vout_SetDisplayAspect(vout_display_t *, unsigned dar_num, unsigned dar_den);
 VLC_API void vout_SetDisplayCrop(vout_display_t *, unsigned crop_num, unsigned crop_den, unsigned left, unsigned top, int right, int bottom);
