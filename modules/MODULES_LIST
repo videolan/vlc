@@ -19,7 +19,7 @@ $Id$
  * access_output_udp: UDP Network access_output module
  * access_realrtsp: Real RTSP access
  * addonsfsstorage: Local storage extensions repository
- * addonsvorepository: OpenDesktop extensions repository
+ * addonsvorepository: Videolan extensions repository
  * adjust: Contrast/Hue/saturation/Brightness adjust module
  * adpcm: ADPCM audio decoder
  * adummy: dummy audio output
