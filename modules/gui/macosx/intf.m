@@ -1435,7 +1435,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     int i_control_itunes = var_InheritInteger(p_intf, "macosx-control-itunes");
     // cancel itunes timer if next item starts playing
-    if (state > -1 && state != END_S && i_control_itunes > 0) {
+    if (state > -1 && state != END_S) {
         if (o_itunes_play_timer) {
             [o_itunes_play_timer invalidate];
             o_itunes_play_timer = nil;
