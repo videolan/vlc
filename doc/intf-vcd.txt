@@ -95,7 +95,7 @@ From: http://www.vcdhelp.com/xvcd.htm
 
  XVCD stands for eXtendedVCD. XVCD has same features as VCD but it is
  possible to use higher bitrates and higher resolution to get higher
- video quality. XVCD is basicly everything that uses MPEG1 video, is
+ video quality. XVCD is basically everything that uses MPEG1 video, is
  not within the VCD standard and burnt in "VCD"-Mode.
 
  XSVCD stands for eXtendedSVCD. XSVCD has same features as SVCD but it
@@ -113,8 +113,8 @@ generally has special keys or buttons. The author of a Video CD can
 assign what action to use when these buttons are pressed. They buttons
 are:
 
- RETURN: Often used to return to the previous menu or previouly
- interruped video segment. 
+ RETURN: Often used to return to the previous menu or previously
+ interrupted video segment. 
 
  DEFAULT: Possibly take the default selection value. This function can
  only be assigned when the LID refers to in a "Program Selection List"
@@ -178,7 +178,7 @@ MRLS:
 -----------------------------------------------------------------
 
 This vlc Video CD plugin, identifies itself in the vlc GUI preferences
-vcdx. It also registers itelf to handle a class of MRL's that start
+vcdx. It also registers itself to handle a class of MRL's that start
 with vcdx://.
 
 The VCDX MRL takes the following form:
@@ -206,7 +206,7 @@ After the optional device name or file name, you can name the kind of
 unit which preceded by an '@'. An MRL which ends in an @ is like
 not adding it at all: the default entry type and number is used. Items
 come in 4 flavors: "Track," "Entry," "Playback," and "Segment." See
-the preceding section for an explaination of these terms. These units
+the preceding section for an explanation of these terms. These units
 are indicated with the capital first letter of each type: T, E, P, S,
 s. 
 
@@ -393,7 +393,7 @@ Determination: start at step 5.
    debugging symbols put into the code. This is usually done by having
    the "-g" flag set when compiling the program.
 
-   You can get a strack trace the GNU debugger using the "where"
+   You can get a stack trace the GNU debugger using the "where"
    command. For example on this might work:
 
      gdb vlc *name-of-corefile*
@@ -407,10 +407,10 @@ Determination: start at step 5.
 
    When you run the vlc GUI, under Settings/Preferences you should see
    a "plugins" expandable list and under that another "access" list do
-   you see a expandalbe entry under "access" labeled "vcdx"? If so,
+   you see a expandable entry under "access" labeled "vcdx"? If so,
    skip on to step 2.
 
-   a) If no "vcdx" expandable list, thent the VCDX plugin isn't
+   a) If no "vcdx" expandable list, then the VCDX plugin isn't
    loaded. Does a shared object exist?  The plugin shared object is
    called "libvcdx_plugin.so" It should be in the directory that has
    ...vlc/access. If this isn't around you need to build and install
@@ -458,8 +458,8 @@ Determination: start at step 5.
    you should see your CD disk light go on if you have one. And the CD
    should be read. 
    
-   a. If not something's wrong like step 2. Another tack may be to try
-   to read a disk image of a Video CD and thus elimate any problems
+   a. If not something is wrong like step 2. Another tack may be to try
+   to read a disk image of a Video CD and thus eliminate any problems
    with hardware. You can get a test Video CD disk image to test here:
 
    http://www.vcdimager.org/pub/vcdimager/examples/test_svcd/test_svcd_pal.zip
@@ -503,7 +503,7 @@ going on dynamically. Various debugging settings will cause output to
 appear on vlc plugin log and/or "standard error" (assuming you've run
 xine in a way that you can capture this).
 
-You think of debug switches as a bit mask, that you specifiy as an
+You think of debug switches as a bit mask, that you specify as an
 integers the various "bit" values (given in decimal) are listed below.
 
    name        value       description
@@ -528,7 +528,7 @@ integers the various "bit" values (given in decimal) are listed below.
 The tool vcd-info from the cdio branch of vcdimager can be used to
 show the entire contents of a Video CD or selected portions of
 that. Until the cdio branch of vcdimager is completely merged with
-vcdimager, the cd-info branch vresion has a few more
+vcdimager, the cd-info branch version has a few more
 features. (However consult vcdimager for complete of the program).
 
 vcdxrip can be used to extract portions of a Video CD and or create an
