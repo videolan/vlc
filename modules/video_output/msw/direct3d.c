@@ -1439,6 +1439,7 @@ static void Direct3DImportSubpicture(vout_display_t *vd,
 #endif
                 *d3dr = *cache;
                 memset(cache, 0, sizeof(*cache));
+                break;
             }
         }
         if (!d3dr->texture) {
