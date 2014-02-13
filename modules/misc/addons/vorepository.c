@@ -32,6 +32,7 @@
 #include <vlc_addons.h>
 #include <vlc_xml.h>
 #include <vlc_fs.h>
+#include <vlc_url.h>
 #include "xmlreading.h"
 
 #include "assert.h"
@@ -77,7 +78,7 @@ struct addons_finder_sys_t
 };
 
 static int ParseManifest( addons_finder_t *p_finder, addon_entry_t *p_entry,
-                          const char *psz_tempfile, stream_t *p_stream )
+                          const char *psz_tempfileuri, stream_t *p_stream )
 {
     int i_num_entries_created = 0;
     const char *p_node;
@@ -164,8 +165,8 @@ static int ParseManifest( addons_finder_t *p_finder, addon_entry_t *p_entry,
                     addon_file_t *p_file = malloc( sizeof(addon_file_t) );
                     p_file->e_filetype = i_filetype;
                     p_file->psz_filename = strdup( psz_filename );
-                    if ( asprintf( & p_file->psz_download_uri, "unzip://%s!/%s",
-                                   psz_tempfile, psz_filename  ) > 0 )
+                    if ( asprintf( & p_file->psz_download_uri, "%s!/%s",
+                                   psz_tempfileuri, psz_filename  ) > 0 )
                     {
                         ARRAY_APPEND( p_entry->files, p_file );
                         msg_Dbg( p_finder, "manifest lists file %s extractable from %s",
@@ -404,20 +405,28 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
 
     msg_Dbg( p_finder, "Reading manifest from %s", p_finder->p_sys->psz_tempfile );
 
-    char *psz_manifest;
-    if ( asprintf( &psz_manifest, "unzip://%s!/manifest.xml",
-                   p_finder->p_sys->psz_tempfile ) < 1 )
+    char *psz_tempfileuri = vlc_path2uri( p_finder->p_sys->psz_tempfile, "unzip" );
+    if ( !psz_tempfileuri )
         return VLC_ENOMEM;
 
-    p_stream = stream_UrlNew( p_finder, psz_manifest );
-    free( psz_manifest );
+    char *psz_manifest_uri;
+    if ( asprintf( &psz_manifest_uri, "%s!/manifest.xml", psz_tempfileuri ) < 1 )
+    {
+        free( psz_tempfileuri );
+        return VLC_ENOMEM;
+    }
+
+    p_stream = stream_UrlNew( p_finder, psz_manifest_uri );
+    free( psz_manifest_uri );
     if ( !p_stream )
+    {
+        free( psz_tempfileuri );
         return VLC_EGENERIC;
+    }
 
-    int i_ret = ( ParseManifest( p_finder, p_entry,
-                                 p_finder->p_sys->psz_tempfile, p_stream ) > 0 )
+    int i_ret = ( ParseManifest( p_finder, p_entry, psz_tempfileuri, p_stream ) > 0 )
                     ? VLC_SUCCESS : VLC_EGENERIC;
-
+    free( psz_tempfileuri );
     stream_Delete( p_stream );
 
     return i_ret;

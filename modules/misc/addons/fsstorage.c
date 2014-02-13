@@ -34,6 +34,7 @@
 #include <vlc_fs.h>
 #include <vlc_strings.h>
 #include <vlc_xml.h>
+#include <vlc_url.h>
 #include "xmlreading.h"
 
 #include <sys/stat.h>
@@ -652,7 +653,7 @@ static int LoadCatalog( addons_finder_t *p_finder )
     char * psz_userdir = config_GetUserDir( VLC_DATA_DIR );
     if ( !psz_userdir ) return VLC_ENOMEM;
 
-    if ( asprintf( &psz_path, "file://%s%s", psz_userdir, ADDONS_CATALOG ) < 1 )
+    if ( asprintf( &psz_path, "%s%s", psz_userdir, ADDONS_CATALOG ) < 1 )
     {
         free( psz_userdir );
         return VLC_ENOMEM;
@@ -671,16 +672,20 @@ static int LoadCatalog( addons_finder_t *p_finder )
     char *psz_filename = NULL;
     int i_filetype = -1;
 
-    const char *psz_statpath = psz_path + 7; // + scheme
     struct stat stat_;
-    if ( vlc_stat( psz_statpath, &stat_ ) )
+    if ( vlc_stat( psz_path, &stat_ ) )
     {
         free( psz_path );
         return VLC_EGENERIC;
     }
 
-    stream_t *p_stream = stream_UrlNew( p_finder, psz_path );
+    char *psz_catalog_uri = vlc_path2uri( psz_path, "file" );
     free( psz_path );
+    if ( !psz_catalog_uri )
+        return VLC_EGENERIC;
+
+    stream_t *p_stream = stream_UrlNew( p_finder, psz_catalog_uri );
+    free( psz_catalog_uri );
     if (! p_stream ) return VLC_EGENERIC;
 
     xml_reader_t *p_xml_reader = xml_ReaderCreate( p_finder, p_stream );
