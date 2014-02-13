@@ -314,6 +314,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     d3d_region_t picture_region;
     if (!Direct3DImportPicture(vd, &picture_region, surface)) {
+        picture_region.width = picture->format.i_visible_width;
+        picture_region.height = picture->format.i_visible_height;
         int subpicture_region_count     = 0;
         d3d_region_t *subpicture_region = NULL;
         if (subpicture)
