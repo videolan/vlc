@@ -411,6 +411,8 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
 
     p_stream = stream_UrlNew( p_finder, psz_manifest );
     free( psz_manifest );
+    if ( !p_stream )
+        return VLC_EGENERIC;
 
     int i_ret = ( ParseManifest( p_finder, p_entry,
                                  p_finder->p_sys->psz_tempfile, p_stream ) > 0 )
