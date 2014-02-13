@@ -1559,7 +1559,15 @@ static int Direct3DRenderRegion(vout_display_t *vd,
 
     if (sys->d3dx_shader) {
         if (use_pixel_shader)
+        {
             hr = IDirect3DDevice9_SetPixelShader(d3ddev, sys->d3dx_shader);
+            float shader_data[4] = { region->width, region->height, 0, 0 };
+            hr = IDirect3DDevice9_SetPixelShaderConstantF(d3ddev, 0, shader_data, 1);
+            if (FAILED(hr)) {
+                msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+                return -1;
+            }
+        }
         else /* Disable any existing pixel shader. */
             hr = IDirect3DDevice9_SetPixelShader(d3ddev, NULL);
         if (FAILED(hr)) {
