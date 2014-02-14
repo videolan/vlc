@@ -637,13 +637,21 @@ static int WriteCatalog( addons_storage_t *p_storage,
         vlc_mutex_unlock( &p_entry->lock );
     }
 
-    vlc_rename( psz_file_tmp, psz_file );
-    free( psz_file );
-    free( psz_file_tmp );
-
     fprintf( p_catalog, "\t</addons>\n" );
     fprintf( p_catalog, "</videolan>\n" );
     fclose( p_catalog );
+
+    int i_ret = vlc_rename( psz_file_tmp, psz_file );
+    free( psz_file );
+    free( psz_file_tmp );
+
+    if( i_ret == -1 )
+    {
+        msg_Err( p_storage, "could not rename %s: %s",
+                 psz_file_tmp, vlc_strerror_c(errno) );
+        return VLC_EGENERIC;
+    }
+
     return VLC_SUCCESS;
 }
 
