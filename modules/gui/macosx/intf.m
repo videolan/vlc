@@ -72,6 +72,7 @@
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
 
 #import "iTunes.h"
+#import "Spotify.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -1411,18 +1412,28 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)resumeItunesPlayback:(id)sender
 {
-    if (b_has_itunes_paused && var_InheritInteger(p_intf, "macosx-control-itunes") > 1) {
-        iTunesApplication *iTunesApp = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
-        if (iTunesApp && [iTunesApp isRunning]) {
-            if ([iTunesApp playerState] == iTunesEPlSPaused) {
-                msg_Dbg(p_intf, "Unpause iTunes...");
-                [iTunesApp playpause];
+    if (var_InheritInteger(p_intf, "macosx-control-itunes") > 1) {
+        if (b_has_itunes_paused) {
+            iTunesApplication *iTunesApp = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
+            if (iTunesApp && [iTunesApp isRunning]) {
+                if ([iTunesApp playerState] == iTunesEPlSPaused) {
+                    msg_Dbg(p_intf, "Unpause iTunes...");
+                    [iTunesApp playpause];
+                }
             }
         }
 
+        if (b_has_spotify_paused) {
+            SpotifyApplication *spotifyApp = [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
+            if ([spotifyApp isRunning] && [spotifyApp playerState] == kSpotifyPlayerStatePaused) {
+                msg_Dbg(p_intf, "Unpause Spotify...");
+                [spotifyApp play];
+            }
+        }
     }
 
     b_has_itunes_paused = NO;
+    b_has_spotify_paused = NO;
     o_itunes_play_timer = nil;
 }
 
@@ -1443,18 +1454,29 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
 
     if (state == PLAYING_S) {
-        // pause iTunes
-        if (i_control_itunes > 0 && !b_has_itunes_paused) {
-            iTunesApplication *iTunesApp = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
-            if (iTunesApp && [iTunesApp isRunning]) {
-                if ([iTunesApp playerState] == iTunesEPlSPlaying) {
-                    msg_Dbg(p_intf, "Pause iTunes...");
-                    [iTunesApp pause];
-                    b_has_itunes_paused = YES;
+        if (i_control_itunes > 0) {
+            // pause iTunes
+            if (!b_has_itunes_paused) {
+                iTunesApplication *iTunesApp = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
+                if (iTunesApp && [iTunesApp isRunning]) {
+                    if ([iTunesApp playerState] == iTunesEPlSPlaying) {
+                        msg_Dbg(p_intf, "Pause iTunes...");
+                        [iTunesApp pause];
+                        b_has_itunes_paused = YES;
+                    }
+                }
+            }
+
+            // pause Spotify
+            if (!b_has_spotify_paused) {
+                SpotifyApplication *spotifyApp = [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
+                if ([spotifyApp isRunning] && [spotifyApp playerState] == kSpotifyPlayerStatePlaying) {
+                    msg_Dbg(p_intf, "Pause Spotify...");
+                    [spotifyApp pause];
+                    b_has_spotify_paused = YES;
                 }
             }
         }
-
 
         /* Declare user activity.
          This wakes the display if it is off, and postpones display sleep according to the users system preferences

@@ -371,7 +371,7 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     [o_intf_pauseminimized_ckb setTitle: _NS("Pause the video playback when minimized")];
     [o_intf_luahttp_box setTitle:_NS("Lua HTTP")];
     [o_intf_luahttppwd_lbl setStringValue:_NS("Password")];
-    [o_intf_pauseitunes_lbl setStringValue:_NS("Pause iTunes during VLC playback")];
+    [o_intf_pauseitunes_lbl setStringValue:_NS("Control external music players")];
 
     /* Subtitles and OSD */
     [o_osd_encoding_txt setStringValue: _NS("Default Encoding")];

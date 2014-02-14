@@ -125,8 +125,9 @@ struct intf_sys_t
 
     VLCVoutWindowController *o_vout_controller;
 
-    /* iTunes play/pause support */
+    /* iTunes/Spotify play/pause support */
     BOOL b_has_itunes_paused;
+    BOOL b_has_spotify_paused;
     NSTimer *o_itunes_play_timer;
 
     BOOL b_playlist_updated_selector_in_queue;

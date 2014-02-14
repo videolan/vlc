@@ -121,13 +121,13 @@ void WindowClose  (vout_window_t *);
 #define SIDEBAR_TEXT N_("Show Sidebar")
 #define SIDEBAR_LONGTEXT N_("Shows a sidebar in the main window listing media sources.")
 
-#define ITUNES_TEXT N_("Pause iTunes during VLC playback")
-#define ITUNES_LONGTEXT N_("Pauses iTunes playback when VLC playback starts. If selected, iTunes playback will be resumed again if VLC playback is finished.")
+#define ITUNES_TEXT N_("Control external music players")
+#define ITUNES_LONGTEXT N_("When a video starts playing, VLC will pause supported music players. If selected, external player will be resumed again when playback is finished.")
 
 static const int itunes_list[] =
     { 0, 1, 2 };
 static const char *const itunes_list_text[] = {
-    N_("Do nothing"), N_("Pause iTunes"), N_("Pause and resume iTunes")
+    N_("Do nothing"), N_("Pause iTunes / Spotify"), N_("Pause and resume iTunes / Spotify")
 };
 
 #define VOLUME_MAX_TEXT N_("Maximum Volume displayed")
