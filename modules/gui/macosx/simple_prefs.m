@@ -371,7 +371,7 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     [o_intf_pauseminimized_ckb setTitle: _NS("Pause the video playback when minimized")];
     [o_intf_luahttp_box setTitle:_NS("Lua HTTP")];
     [o_intf_luahttppwd_lbl setStringValue:_NS("Password")];
-    [o_intf_pauseitunes_lbl setStringValue:_NS("Control iTunes during playback")];
+    [o_intf_pauseitunes_lbl setStringValue:_NS("Pause iTunes during VLC playback")];
 
     /* Subtitles and OSD */
     [o_osd_encoding_txt setStringValue: _NS("Default Encoding")];
@@ -396,7 +396,7 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     [o_video_enable_ckb setTitle: _NS("Enable video")];
     [o_video_fullscreen_ckb setTitle: _NS("Fullscreen")];
     [o_video_videodeco_ckb setTitle: _NS("Window decorations")];
-    [o_video_onTop_ckb setTitle: _NS("Always on top")];
+    [o_video_onTop_ckb setTitle: _NS("Float on Top")];
     [o_video_output_txt setStringValue: _NS("Output module")];
     [o_video_skipFrames_ckb setTitle: _NS("Skip frames")];
     [o_video_snap_box setTitle: _NS("Video snapshots")];
