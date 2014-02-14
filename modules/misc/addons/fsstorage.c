@@ -647,8 +647,8 @@ static int WriteCatalog( addons_storage_t *p_storage,
 
     if( i_ret == -1 )
     {
-        msg_Err( p_storage, "could not rename %s: %s",
-                 psz_file_tmp, vlc_strerror_c(errno) );
+        msg_Err( p_storage, "could not rename temp catalog: %s",
+                 vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
 
