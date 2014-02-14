@@ -414,9 +414,8 @@ static vlc_threadvar_t thread_key;
 /** Per-thread data */
 struct vlc_thread
 {
-    atomic_uintptr_t id;
+    HANDLE         id;
 
-    bool           detached;
     bool           killable;
     atomic_bool    killed;
     vlc_cleanup_t *cleaners;
@@ -456,16 +455,8 @@ retry:
     }
     vlc_mutex_unlock (&super_mutex);
 
-    if (th->detached)
-    {
-        HANDLE h;
-        do
-            h = (HANDLE) atomic_load(&th->id);
-        while (unlikely(!h)); /* Loop until _beginthreadex has returned */
-
-        CloseHandle (h);
+    if (th->id == NULL) /* Detached thread */
         free (th);
-    }
 }
 
 static unsigned __stdcall vlc_entry (void *p)
@@ -487,37 +478,33 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
         return ENOMEM;
     th->entry = entry;
     th->data = data;
-    th->detached = detached;
     th->killable = false; /* not until vlc_entry() ! */
     atomic_store(&th->killed, false);
-    atomic_store(&th->id, (uintptr_t) NULL);
     th->cleaners = NULL;
 
-    HANDLE hThread;
     /* When using the MSVCRT C library you have to use the _beginthreadex
      * function instead of CreateThread, otherwise you'll end up with
      * memory leaks and the signal functions not working (see Microsoft
      * Knowledge Base, article 104641) */
-    uintptr_t h;
-
-    h = _beginthreadex (NULL, 0, vlc_entry, th, 0, NULL);
+    uintptr_t h = _beginthreadex (NULL, 0, vlc_entry, th, 0, NULL);
     if (h == 0)
     {
         int err = errno;
         free (th);
         return err;
     }
-    hThread = (HANDLE)h;
 
-    atomic_store(&th->id, (uintptr_t) hThread);
+    if (detached)
+        CloseHandle((HANDLE)h);
+    else
+        th->id = (HANDLE)h;
 
     if (p_handle != NULL)
         *p_handle = th;
 
-
 #if !VLC_WINSTORE_APP
     if (priority)
-        SetThreadPriority (hThread, priority);
+        SetThreadPriority (th->id, priority);
 #endif
 
     return 0;
@@ -531,15 +518,13 @@ int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
 
 void vlc_join (vlc_thread_t th, void **result)
 {
-    HANDLE h = (HANDLE) atomic_load(&th->id);
-
     do
         vlc_testcancel ();
-    while (vlc_WaitForSingleObject (h, INFINITE) == WAIT_IO_COMPLETION);
+    while (vlc_WaitForSingleObject (th->id, INFINITE) == WAIT_IO_COMPLETION);
 
     if (result != NULL)
         *result = th->data;
-    CloseHandle (h);
+    CloseHandle (th->id);
     free (th);
 }
 
@@ -577,7 +562,7 @@ void vlc_cancel (vlc_thread_t th)
 {
     atomic_store(&th->killed, true);
 #if !VLC_WINSTORE_APP
-    QueueUserAPC (dummy_apc, atomic_load(&th->id), 0);
+    QueueUserAPC (dummy_apc, th->id, 0);
 #endif
 }
 
