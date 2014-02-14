@@ -305,10 +305,11 @@ static int OpenDecoder(vlc_object_t *p_this)
             continue;
         }
 
-	jobject codec_capabilities = (*env)->CallObjectMethod(env, info, p_sys->get_capabilities_for_type,
-							      (*env)->NewStringUTF(env, mime));
-	jobject profile_levels = (*env)->GetObjectField(env, codec_capabilities, p_sys->profile_levels_field);
-	int profile_levels_len = (*env)->GetArrayLength(env, profile_levels);
+        jobject codec_capabilities = (*env)->CallObjectMethod(env, info, p_sys->get_capabilities_for_type,
+                                                              (*env)->NewStringUTF(env, mime));
+        jobject profile_levels = (*env)->GetObjectField(env, codec_capabilities, p_sys->profile_levels_field);
+        int profile_levels_len = profile_levels ? (*env)->GetArrayLength(env, profile_levels) : 0;
+        msg_Dbg(p_dec, "Number of profile levels: %d", profile_levels_len);
 
         jobject types = (*env)->CallObjectMethod(env, info, p_sys->get_supported_types);
         int num_types = (*env)->GetArrayLength(env, types);
@@ -319,7 +320,7 @@ static int OpenDecoder(vlc_object_t *p_this)
                 /* The mime type is matching for this component. We
                    now check if the capabilities of the codec is
                    matching the video format. */
-                if (p_dec->fmt_in.i_codec == VLC_CODEC_H264 && fmt_profile) {
+                if (p_dec->fmt_in.i_codec == VLC_CODEC_H264 && fmt_profile && profile_levels_len) {
                     for (int i = 0; i < profile_levels_len && !found; ++i) {
                         jobject profile_level = (*env)->GetObjectArrayElement(env, profile_levels, i);
 
