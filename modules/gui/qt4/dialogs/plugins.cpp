@@ -50,6 +50,7 @@
 #include <QVBoxLayout>
 #include <QSpacerItem>
 #include <QListView>
+#include <QListWidget>
 #include <QPainter>
 #include <QStyleOptionViewItem>
 #include <QKeyEvent>
@@ -61,6 +62,9 @@
 #include <QTextEdit>
 #include <QUrl>
 #include <QMimeData>
+#include <QSplitter>
+#include <QToolButton>
+#include <QStackedWidget>
 
 static QPixmap *loadPixmapFromData( char *, int size );
 
@@ -299,36 +303,123 @@ void ExtensionTab::moreInformation()
     dlg.exec();
 }
 
+static QPixmap hueRotate( QImage image, const QColor &source, const QColor &target )
+{
+    int distance = target.hue() - source.hue();
+    /* must be indexed as we alter palette, not a whole pic */
+    Q_ASSERT( image.numColors() );
+    if ( target.isValid() )
+    {
+        /* color 1 = transparency */
+        for ( int i=1; i < image.colorCount(); i++ )
+        {
+            QColor color = image.color( i );
+            int newhue = color.hue() + distance;
+            if ( newhue < 0 ) newhue += 255;
+            color.setHsv( newhue, color.saturation(), color.value(), color.alpha() );
+            image.setColor( i, color.rgba() );
+        }
+    }
+    return QPixmap::fromImage( image );
+}
+
 /* Add-ons tab */
 AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
 {
+    b_localdone = false;
+    QSplitter *splitter = new QSplitter( this );
+    setLayout( new QHBoxLayout() );
+    layout()->addWidget( splitter );
+
+    QWidget *leftPane = new QWidget();
+    splitter->addWidget( leftPane );
+    leftPane->setLayout( new QVBoxLayout() );
+
+    QWidget *rightPane = new QWidget();
+    splitter->addWidget( rightPane );
+
+    splitter->setCollapsible( 0, false );
+    splitter->setCollapsible( 1, false );
+    splitter->setSizeIncrement( 32, 1 );
+
     // Layout
-    QVBoxLayout *layout = new QVBoxLayout( this );
+    QVBoxLayout *layout = new QVBoxLayout( rightPane );
+
+    // Left Pane
+    leftPane->layout()->setMargin(0);
+    leftPane->layout()->setSpacing(0);
+
+    QToolButton * button;
+    QSignalMapper *mapper = new QSignalMapper();
+    QImage icon( ":/addons/default" );
+    QColor vlcorange( 0xEC, 0x83, 0x00 );
+#define ADD_CATEGORY( label, ltooltip, numb ) \
+    button = new QToolButton( this );\
+    button->setIcon( QIcon( hueRotate( icon, vlcorange, \
+                     AddonsListModel::getColorByAddonType( numb ) ) ) );\
+    button->setText( label );\
+    button->setToolTip( ltooltip );\
+    button->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );\
+    button->setIconSize( QSize( 32, 32 ) );\
+    button->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Maximum) ;\
+    button->setMinimumSize( 32, 32 );\
+    button->setAutoRaise( true );\
+    button->setCheckable( true );\
+    if ( numb == -1 ) button->setChecked( true );\
+    button->setAutoExclusive( true );\
+    CONNECT( button, clicked(), mapper, map() );\
+    mapper->setMapping( button, numb );\
+    leftPane->layout()->addWidget( button );
+
+    ADD_CATEGORY( qtr("All"), qtr("Interface Settings"),
+                  -1 );
+    ADD_CATEGORY( qtr("Skins"),
+                  qtr( "Skins customize player's appearance."
+                       " You can activate them through preferences." ),
+                  ADDON_SKIN2 );
+    ADD_CATEGORY( qtr("Playlist parsers"),
+                  qtr( "Playlist parsers add new capabilities to read"
+                       " internet streams or extract meta data." ),
+                  ADDON_PLAYLIST_PARSER );
+    ADD_CATEGORY( qtr("Service Discovery"),
+                  qtr( "Service discoveries adds new sources to your playlist"
+                       " such as web radios, video websites, ..." ),
+                  ADDON_SERVICE_DISCOVERY );
+    ADD_CATEGORY( qtr("Extensions"),
+                  qtr( "Extensions brings various enhancements."
+                       " Check descriptions for more details" ),
+                  ADDON_EXTENSION );
+
+    // Right Pane
+    rightPane->layout()->setMargin(0);
+    rightPane->layout()->setSpacing(0);
+
+    // Splitter sizes init
+    QList<int> sizes;
+    int width = leftPane->sizeHint().width();
+    sizes << width << size().width() - width;
+    splitter->setSizes( sizes );
 
     // Filters
-    QHBoxLayout *filtersLayout = new QHBoxLayout();
+    leftPane->layout()->addItem( new QSpacerItem( 0, 30 ) );
 
-    QLabel *addonsLabel = new QLabel( qtr("Addon type:") );
-    addonsLabel->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Preferred );
-    filtersLayout->addWidget( addonsLabel );
-    QComboBox *typeCombo = new QComboBox();
-    typeCombo->addItem( qtr("All"), -1 );
-    typeCombo->addItem( qtr("Skins"), ADDON_SKIN2 );
-    typeCombo->addItem( qtr("Playlist parsers"), ADDON_PLAYLIST_PARSER );
-    typeCombo->addItem( qtr("Service Discovery"), ADDON_SERVICE_DISCOVERY );
-    typeCombo->addItem( qtr("Extensions"), ADDON_EXTENSION );
-    CONNECT( typeCombo, currentIndexChanged(int), this, typeChanged( int ) );
-    filtersLayout->addWidget( typeCombo );
+    QStackedWidget *switchStack = new QStackedWidget();
+    switchStack->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Maximum );
+    leftPane->layout()->addWidget( switchStack );
 
-    QCheckBox *installedOnlyBox = new QCheckBox( qtr("Show Installed Only") );
-    filtersLayout->addWidget( installedOnlyBox );
+    QCheckBox *installedOnlyBox = new QCheckBox( qtr("Only installed") );
+    installedOnlyBox->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred );
+    switchStack->insertWidget( WITHONLINEADDONS, installedOnlyBox );
     CONNECT( installedOnlyBox, stateChanged(int), this, installChecked(int) );
 
-    layout->addLayout( filtersLayout );
+    QPushButton *reposyncButton = new QPushButton( QIcon( ":/update" ),
+                                              qtr("Find more addons online") );
+    reposyncButton->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred );
+    switchStack->insertWidget( ONLYLOCALADDONS, reposyncButton );
+    switchStack->setCurrentIndex( ONLYLOCALADDONS );
+    CONNECT( reposyncButton, clicked(), this, reposync() );
 
-    // Help Tab
-    helpLabel = new QLabel();
-    layout->addWidget( helpLabel );
+    leftPane->layout()->addItem( new QSpacerItem( 0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding ) );
 
     // Main View
     AddonsManager *AM = AddonsManager::getInstance( p_intf );
@@ -363,6 +454,8 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
     addonsModel->setSourceModel( model );
     addonsModel->setFilterRole( Qt::DisplayRole );
     addonsView->setModel( addonsModel );
+
+    CONNECT( mapper, mapped(int), addonsModel, setTypeFilter(int) );
 
     CONNECT( addonsView->selectionModel(), currentChanged(QModelIndex,QModelIndex),
              addonsView, edit(QModelIndex) );
@@ -424,14 +517,11 @@ bool AddonsTab::eventFilter( QObject *obj, QEvent *event )
         }
         break;
     case QEvent::Show:
-        if ( addonsView->model()->rowCount() < 1 )
+        if ( !b_localdone && addonsView->model()->rowCount() < 1 )
         {
+            b_localdone = true;
             AddonsManager *AM = AddonsManager::getInstance( p_intf );
-            CONNECT( AM, discoveryEnded(), spinnerAnimation, stop() );
-            CONNECT( AM, discoveryEnded(), addonsView->viewport(), update() );
-            spinnerAnimation->start();
             AM->findInstalled();
-            AM->findNewAddons();
         }
         break;
     case QEvent::DragEnter:
@@ -484,45 +574,26 @@ void AddonsTab::moreInformation()
     dlg.exec();
 }
 
-void AddonsTab::typeChanged( int i )
-{
-    QComboBox *combo = qobject_cast<QComboBox *>( sender() );
-    if ( !combo ) return;
-    int i_type = combo->itemData( i, Qt::UserRole ).toInt();
-    addonsModel->setTypeFilter( i_type );
-    QString help;
-    switch( i_type )
-    {
-    case ADDON_SKIN2:
-        help = qtr( "Skins customize player's appearance."
-                    " You can activate them through preferences." );
-        break;
-    case ADDON_PLAYLIST_PARSER:
-        help = qtr( "Playlist parsers add new capabilities to read"
-                    " internet streams or extract meta data." );
-        break;
-    case ADDON_SERVICE_DISCOVERY:
-        help = qtr( "Service discoveries adds new sources to your playlist"
-                    " such as web radios, video websites, ..." );
-        break;
-    case ADDON_EXTENSION:
-        help = qtr( "Extensions brings various enhancements."
-                    " Check descriptions for more details" );
-        break;
-    default:
-        helpLabel->setText("");
-        return;
-    }
-    helpLabel->setTextFormat( Qt::RichText );
-    helpLabel->setText( QString( "<img src=\":/menu/info\"/> %1" ).arg( help ) );
-}
-
 void AddonsTab::installChecked( int i )
 {
     if ( i == Qt::Checked )
         addonsModel->setStatusFilter( ADDON_INSTALLED );
     else
         addonsModel->setStatusFilter( 0 );
+}
+
+void AddonsTab::reposync()
+{
+    QStackedWidget *tab = qobject_cast<QStackedWidget *>(sender()->parent());
+    if ( tab )
+    {
+        tab->setCurrentIndex( WITHONLINEADDONS );
+        AddonsManager *AM = AddonsManager::getInstance( p_intf );
+        CONNECT( AM, discoveryEnded(), spinnerAnimation, stop() );
+        CONNECT( AM, discoveryEnded(), addonsView->viewport(), update() );
+        spinnerAnimation->start();
+        AM->findNewAddons();
+    }
 }
 
 /* Safe copy of the extension_t struct */

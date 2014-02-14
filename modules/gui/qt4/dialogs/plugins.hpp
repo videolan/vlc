@@ -132,19 +132,24 @@ class AddonsTab : public QVLCFrame
 
 private slots:
     void moreInformation();
-    void typeChanged( int );
     void installChecked( int );
+    void reposync();
 
 private:
     AddonsTab( intf_thread_t *p_intf );
     virtual ~AddonsTab();
     bool eventFilter ( QObject * watched, QEvent * event );
 
-    QLabel *helpLabel;
+    enum
+    {
+        ONLYLOCALADDONS = 0,
+        WITHONLINEADDONS
+    };
     QListView *addonsView;
     AddonsSortFilterProxyModel *addonsModel;
     /* Wait spinner */
     PixmapAnimator *spinnerAnimation;
+    bool b_localdone;
 };
 
 class PluginTreeItem : public QTreeWidgetItem
