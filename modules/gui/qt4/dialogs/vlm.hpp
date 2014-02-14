@@ -68,7 +68,7 @@ class VLMAWidget;
 class VLMWrapper;
 
 
-class VLMDialog : public QVLCDialog, public Singleton<VLMDialog>
+class VLMDialog : public QVLCFrame, public Singleton<VLMDialog>
 {
     Q_OBJECT
 
