@@ -376,6 +376,8 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
     case VLC_CODEC_MP4V:
     case VLC_CODEC_MPGA:
     case VLC_CODEC_MPGV:
+    case VLC_CODEC_MP2V:
+    case VLC_CODEC_MP1V:
     case VLC_CODEC_MJPG:
     case VLC_CODEC_MJPGB:
     case VLC_CODEC_SVQ1:
@@ -654,9 +656,13 @@ static bo_t *GetESDS(mp4_stream_t *p_stream)
     case VLC_CODEC_MP4V:
         i_object_type_indication = 0x20;
         break;
-    case VLC_CODEC_MPGV:
-        /* FIXME MPEG-I=0x6b, MPEG-II = 0x60 -> 0x65 */
-        i_object_type_indication = 0x60;
+    case VLC_CODEC_MP2V:
+        /* MPEG-I=0x6b, MPEG-II = 0x60 -> 0x65 */
+        i_object_type_indication = 0x65;
+        break;
+    case VLC_CODEC_MP1V:
+        /* MPEG-I=0x6b, MPEG-II = 0x60 -> 0x65 */
+        i_object_type_indication = 0x6b;
         break;
     case VLC_CODEC_MP4A:
         /* FIXME for mpeg2-aac == 0x66->0x68 */

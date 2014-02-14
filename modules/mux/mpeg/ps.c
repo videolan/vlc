@@ -273,6 +273,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     switch( p_input->p_fmt->i_codec )
     {
         case VLC_CODEC_MPGV:
+        case VLC_CODEC_MP2V:
+        case VLC_CODEC_MP1V:
             p_stream->i_stream_id =
                 StreamIdGet( p_sys->stream_id_mpgv, 0xe0, 0xef );
             p_stream->i_stream_type = 0x02; /* ISO/IEC 13818 Video */

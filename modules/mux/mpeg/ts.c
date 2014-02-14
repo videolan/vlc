@@ -895,6 +895,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     /* VIDEO */
 
     case VLC_CODEC_MPGV:
+    case VLC_CODEC_MP2V:
+    case VLC_CODEC_MP1V:
         /* TODO: do we need to check MPEG-I/II ? */
         p_stream->i_stream_type = 0x02;
         p_stream->i_stream_id = 0xe0;
