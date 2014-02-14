@@ -1278,6 +1278,10 @@ int (var_InheritURational)(vlc_object_t *object,
             n = 0;
             d = 0;
         }
+    } else if ( *next == '\0' ) {
+        /* plain integer given */
+        *num = n;
+        *den = 1;
     }
 
     if (n > 0 && d > 0)
