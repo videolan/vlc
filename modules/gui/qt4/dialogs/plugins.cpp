@@ -398,6 +398,7 @@ bool AddonsTab::eventFilter( QObject *obj, QEvent *event )
         if ( spinnerAnimation->state() == PixmapAnimator::Running )
         {
             QWidget *viewport = qobject_cast<QWidget *>( obj );
+            if ( !viewport ) break;
             QStylePainter painter( viewport );
             QPixmap *spinner = spinnerAnimation->getPixmap();
             QPoint point = viewport->geometry().center();
@@ -412,6 +413,7 @@ bool AddonsTab::eventFilter( QObject *obj, QEvent *event )
         else if ( addonsModel->rowCount() == 0 )
         {
             QWidget *viewport = qobject_cast<QWidget *>( obj );
+            if ( !viewport ) break;
             QStylePainter painter( viewport );
             QString text = qtr("No addons found");
             QSize size = fontMetrics().size( 0, text );
@@ -433,7 +435,8 @@ bool AddonsTab::eventFilter( QObject *obj, QEvent *event )
         break;
     case QEvent::DragEnter:
     {
-        QDragEnterEvent *dragEvent = dynamic_cast<QDragEnterEvent *>(event);
+        QDragEnterEvent *dragEvent = static_cast<QDragEnterEvent *>(event);
+        if ( !dragEvent ) break;
         QList<QUrl> urls = dragEvent->mimeData()->urls();
         if ( dragEvent->proposedAction() != Qt::CopyAction
           || urls.count() != 1
@@ -445,7 +448,8 @@ bool AddonsTab::eventFilter( QObject *obj, QEvent *event )
     }
     case QEvent::DragMove:
     {
-        QDragMoveEvent *moveEvent = dynamic_cast<QDragMoveEvent *>(event);
+        QDragMoveEvent *moveEvent = static_cast<QDragMoveEvent *>(event);
+        if ( !moveEvent ) break;
         if ( moveEvent->proposedAction() != Qt::CopyAction )
             return false;
         moveEvent->acceptProposedAction();
@@ -453,7 +457,8 @@ bool AddonsTab::eventFilter( QObject *obj, QEvent *event )
     }
     case QEvent::Drop:
     {
-        QDropEvent *dropEvent = dynamic_cast<QDropEvent *>(event);
+        QDropEvent *dropEvent = static_cast<QDropEvent *>(event);
+        if ( !dropEvent ) break;
         if ( dropEvent->proposedAction() != Qt::CopyAction )
             return false;
         if ( dropEvent->mimeData()->urls().count() )
@@ -481,6 +486,7 @@ void AddonsTab::moreInformation()
 void AddonsTab::typeChanged( int i )
 {
     QComboBox *combo = qobject_cast<QComboBox *>( sender() );
+    if ( !combo ) return;
     int i_type = combo->itemData( i, Qt::UserRole ).toInt();
     addonsModel->setTypeFilter( i_type );
     QString help;
@@ -640,8 +646,10 @@ QVariant ExtensionListModel::data( const QModelIndex& index, int role ) const
 
     ExtensionCopy * extension =
             static_cast<ExtensionCopy *>(index.internalPointer());
-
-    return extension->data( role );
+    if ( !extension )
+        return QVariant();
+    else
+        return extension->data( role );
 }
 
 QModelIndex ExtensionListModel::index( int row, int column,
@@ -1163,6 +1171,7 @@ void AddonItemDelegate::setAnimator( DelegateAnimationHelper *animator_ )
 void AddonItemDelegate::editButtonClicked()
 {
     QWidget *editor = qobject_cast<QWidget *>(sender()->parent());
+    if ( !editor ) return;
     int value = editor->property("Addon::state").toInt();
     if ( ( value == ADDON_INSTALLED ) )
         /* uninstall */
