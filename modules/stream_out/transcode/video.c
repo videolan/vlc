@@ -992,10 +992,10 @@ bool transcode_video_add( sout_stream_t *p_stream, es_format_t *p_fmt,
      * all the characteristics of the decoded stream yet */
     id->b_transcode = true;
 
-    if( p_sys->f_fps > 0 )
+    if( p_sys->fps_num )
     {
-        id->p_encoder->fmt_out.video.i_frame_rate = (p_sys->f_fps * ENC_FRAMERATE_BASE);
-        id->p_encoder->fmt_out.video.i_frame_rate_base = ENC_FRAMERATE_BASE;
+        id->p_encoder->fmt_out.video.i_frame_rate = (p_sys->fps_num );
+        id->p_encoder->fmt_out.video.i_frame_rate_base = (p_sys->fps_den ? p_sys->fps_den : 1);
     }
 
     return true;

@@ -168,7 +168,7 @@ vlc_module_begin ()
                  VB_LONGTEXT, false )
     add_float( SOUT_CFG_PREFIX "scale", 0, SCALE_TEXT,
                SCALE_LONGTEXT, false )
-    add_float( SOUT_CFG_PREFIX "fps", 0, FPS_TEXT,
+    add_string( SOUT_CFG_PREFIX "fps", NULL, FPS_TEXT,
                FPS_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX "hurry-up", false, HURRYUP_TEXT,
                HURRYUP_LONGTEXT, false )
@@ -349,7 +349,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->f_scale = var_GetFloat( p_stream, SOUT_CFG_PREFIX "scale" );
 
-    p_sys->f_fps = var_GetFloat( p_stream, SOUT_CFG_PREFIX "fps" );
+    p_sys->b_master_sync = var_InheritURational( p_stream, &p_sys->fps_num, &p_sys->fps_den, SOUT_CFG_PREFIX "fps" );
 
     p_sys->b_hurry_up = var_GetBool( p_stream, SOUT_CFG_PREFIX "hurry-up" );
 
@@ -467,8 +467,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Audio settings */
-    p_sys->b_master_sync = var_GetBool( p_stream, SOUT_CFG_PREFIX "audio-sync" );
-    if( p_sys->f_fps > 0 ) p_sys->b_master_sync = true;
+    p_sys->b_master_sync = __MAX( p_sys->b_master_sync == VLC_SUCCESS, var_GetBool( p_stream, SOUT_CFG_PREFIX "audio-sync" ) );
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;

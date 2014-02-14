@@ -43,7 +43,6 @@ struct sout_stream_sys_t
     config_chain_t  *p_video_cfg;
     int             i_vbitrate;
     double          f_scale;
-    double          f_fps;
     unsigned int    i_width, i_maxwidth;
     unsigned int    i_height, i_maxheight;
     bool            b_deinterlace;
@@ -52,6 +51,7 @@ struct sout_stream_sys_t
     int             i_threads;
     bool            b_high_priority;
     bool            b_hurry_up;
+    unsigned int    fps_num,fps_den;
 
     char            *psz_vf2;
 
