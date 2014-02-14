@@ -67,11 +67,13 @@ typedef struct
 /* */
 static const staticentry_t p_list_video[] = {
 
-    B(VLC_CODEC_MPGV, "MPEG-1/2 Video"),
-        A("mpgv"),
+    B(VLC_CODEC_MP1V, "MPEG-1 Video"),
         A("mp1v"),
-        A("mpeg"),
         A("mpg1"),
+
+    B(VLC_CODEC_MP2V, "MPEG-2 Video"),
+        A("mpgv"),
+        A("mpeg"),
         A("mp2v"),
         A("MPEG"),
         A("mpg2"),
