@@ -41,8 +41,6 @@
 #include <vlc_epg.h>
 #include <vlc_charset.h>   /* FromCharset, for EIT */
 
-#include <vlc_network.h>   /* net_ for ts-out mode */
-
 #include "../mux/mpeg/csa.h"
 
 /* Include dvbpsi headers */
@@ -146,10 +144,8 @@ vlc_module_begin ()
         change_safe()
     add_bool( "ts-es-id-pid", true, PID_TEXT, PID_LONGTEXT, true )
         change_safe()
-    add_string( "ts-out", NULL, TSOUT_TEXT, TSOUT_LONGTEXT, true )
-    add_integer( "ts-out-mtu", 1400, MTUOUT_TEXT,
-                 MTUOUT_LONGTEXT, true )
-
+    add_obsolete_string( "ts-out" ) /* since 2.2.0 */
+    add_obsolete_integer( "ts-out-mtu" ) /* since 2.2.0 */
     add_string( "ts-csa-ck", NULL, CSA_TEXT, CSA_LONGTEXT, true )
         change_safe()
     add_string( "ts-csa2-ck", NULL, CSA2_TEXT, CSA2_LONGTEXT, true )
@@ -316,9 +312,6 @@ struct demux_sys_t
     int         i_csa_pkt_size;
     bool        b_split_es;
 
-    bool        b_udp_out;
-    int         fd; /* udp socket */
-    uint8_t     *buffer;
     bool        b_trust_pcr;
 
     /* */
@@ -578,7 +571,6 @@ static int Open( vlc_object_t *p_this )
     memset( p_sys, 0, sizeof( demux_sys_t ) );
     vlc_mutex_init( &p_sys->csa_lock );
 
-    p_sys->buffer = NULL;
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
 
@@ -605,8 +597,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->pid[8191].b_seen = true;
     p_sys->i_packet_size = i_packet_size;
     p_sys->i_packet_header_size = i_packet_header_size;
-    p_sys->b_udp_out = false;
-    p_sys->fd = -1;
     p_sys->i_ts_read = 50;
     p_sys->csa = NULL;
     p_sys->b_start_record = false;
@@ -707,43 +697,8 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_trust_pcr = var_CreateGetBool( p_demux, "ts-trust-pcr" );
 
-    char* psz_string = var_CreateGetString( p_demux, "ts-out" );
-    if( psz_string && *psz_string )
-    {
-        char *psz = strchr( psz_string, ':' );
-        int   i_port = 0;
-
-        p_sys->b_udp_out = true;
-
-        if( psz )
-        {
-            *psz++ = '\0';
-            i_port = atoi( psz );
-        }
-        if( i_port <= 0 ) i_port  = 1234;
-        msg_Dbg( p_demux, "resend ts to '%s:%d'", psz_string, i_port );
-
-        p_sys->fd = net_ConnectUDP( VLC_OBJECT(p_demux), psz_string, i_port, -1 );
-        if( p_sys->fd < 0 )
-        {
-            msg_Err( p_demux, "failed to open udp socket, send disabled" );
-            p_sys->b_udp_out = false;
-        }
-        else
-        {
-            int i_mtu = var_CreateGetInteger( p_demux, "ts-out-mtu" );
-            p_sys->i_ts_read = i_mtu / p_sys->i_packet_size;
-            if( p_sys->i_ts_read <= 0 )
-            {
-                p_sys->i_ts_read = 1500 / p_sys->i_packet_size;
-            }
-            p_sys->buffer = xmalloc( p_sys->i_packet_size * p_sys->i_ts_read );
-        }
-    }
-    free( psz_string );
-
     /* We handle description of an extra PMT */
-    psz_string = var_CreateGetString( p_demux, "ts-extra-pmt" );
+    char* psz_string = var_CreateGetString( p_demux, "ts-extra-pmt" );
     p_sys->b_user_pmt = false;
     if( psz_string && *psz_string )
         UserPmt( p_demux, psz_string );
@@ -912,14 +867,6 @@ static void Close( vlc_object_t *p_this )
 
     free( p_sys->programs_list.p_values );
 
-    /* When streaming, close the port */
-    if( p_sys->fd > -1 )
-    {
-        net_Close( p_sys->fd );
-    }
-
-    free( p_sys->buffer );
-
     free( p_sys->p_pcrs );
     free( p_sys->p_pos );
 
@@ -974,12 +921,6 @@ static int Demux( demux_t *p_demux )
             p_sys->b_start_record = false;
         }
 
-        if( p_sys->b_udp_out )
-        {
-            memcpy( &p_sys->buffer[i_pkt * p_sys->i_packet_size],
-                    p_pkt->p_buffer, p_sys->i_packet_size );
-        }
-
         /* Parse the TS packet */
         ts_pid_t *p_pid = &p_sys->pid[PIDGet( p_pkt )];
 
@@ -1001,14 +942,9 @@ static int Demux( demux_t *p_demux )
                 }
                 block_Release( p_pkt );
             }
-            else if( !p_sys->b_udp_out )
-            {
-                b_frame = GatherData( p_demux, p_pid, p_pkt );
-            }
             else
             {
-                PCRHandle( p_demux, p_pid, p_pkt );
-                block_Release( p_pkt );
+                b_frame = GatherData( p_demux, p_pid, p_pkt );
             }
         }
         else
@@ -1025,13 +961,6 @@ static int Demux( demux_t *p_demux )
 
         if( b_frame || ( b_wait_es && p_sys->i_pmt_es > 0 ) )
             break;
-    }
-
-    if( p_sys->b_udp_out )
-    {
-        /* Send the complete block */
-        net_Write( p_demux, p_sys->fd, NULL, p_sys->buffer,
-                   p_sys->i_ts_read * p_sys->i_packet_size );
     }
 
     demux_UpdateTitleFromStream( p_demux );
@@ -2345,7 +2274,7 @@ static bool GatherData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 
     PCRHandle( p_demux, pid, p_bk );
 
-    if( i_skip >= 188 || pid->es->id == NULL || p_demux->p_sys->b_udp_out )
+    if( i_skip >= 188 || pid->es->id == NULL )
     {
         block_Release( p_bk );
         return i_ret;
@@ -4181,7 +4110,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
             msg_Dbg( p_demux, "  * es pid=%d type=%d *unknown*",
                      p_es->i_pid, p_es->i_type );
         }
-        else if( !p_sys->b_udp_out )
+        else
         {
             msg_Dbg( p_demux, "  * es pid=%d type=%d fcc=%4.4s",
                      p_es->i_pid, p_es->i_type, (char*)&pid->es->fmt.i_codec );
@@ -4239,8 +4168,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
                      (p_dr->p_data[0] << 8) | p_dr->p_data[1] );
         }
 
-        if( ProgramIsSelected( p_demux, prg->i_number ) &&
-            ( pid->es->id != NULL || p_sys->b_udp_out ) )
+        if( ProgramIsSelected( p_demux, prg->i_number ) && pid->es->id != NULL )
             SetPIDFilter( p_demux, p_es->i_pid, true ); /* Set demux filter */
     }
 

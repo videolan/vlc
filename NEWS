@@ -83,6 +83,8 @@ Streaming:
  * transcode module access fps values as rationals now, eg 30000/1001
  * VLC now streams all elementary streams, you can revert to previous behaviour
     with --no-sout-all
+ * --ts-out option has been removed, it has been superceded by --demux demuxdump 
+    --demuxdump-access udp --demuxdump-file 127.0.0.1:1234
 
 libVLC:
  * add equalizer API libvlc_audio_equalizer_* functions
