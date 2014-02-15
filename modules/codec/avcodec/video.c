@@ -492,13 +492,13 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     {
         if( p_sys->i_pts > VLC_TS_INVALID )
         {
-            msg_Err( p_dec, "more than 5 seconds of late video -> "
-                     "dropping frame (computer too slow ?)" );
             p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
         }
         if( p_block )
             block_Release( p_block );
         p_sys->i_late_frames--;
+        msg_Err( p_dec, "more than 5 seconds of late video -> "
+                 "dropping frame (computer too slow ?)" );
         return NULL;
     }
 
@@ -521,6 +521,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_late_frames--; /* needed else it will never be decrease */
             if( p_block )
                 block_Release( p_block );
+            msg_Warn( p_dec, "More than 4 late frames, dropping frame" );
             return NULL;
         }
     }
