@@ -59,10 +59,17 @@ endif
 
 libmmdevice_plugin_la_SOURCES = audio_output/mmdevice.c audio_output/mmdevice.h
 libmmdevice_plugin_la_LIBADD = -lole32 $(LIBM)
+libwinstore_plugin_la_SOURCES = audio_output/winstore.c audio_output/mmdevice.h
+libwinstore_plugin_la_LIBADD = -lole32
 libwasapi_plugin_la_SOURCES = audio_output/wasapi.c
 libwasapi_plugin_la_LIBADD = -lole32 -lksuser
 if HAVE_WASAPI
-aout_LTLIBRARIES += libmmdevice_plugin.la libwasapi_plugin.la
+aout_LTLIBRARIES += libwasapi_plugin.la
+if !HAVE_WINSTORE
+aout_LTLIBRARIES += libmmdevice_plugin.la
+else
+aout_LTLIBRARIES += libwinstore_plugin.la
+endif
 endif
 
 libdirectsound_plugin_la_SOURCES = audio_output/directsound.c \

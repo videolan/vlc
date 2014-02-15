@@ -487,6 +487,7 @@ AS_IF([test "${SYS}" = "mingw32" -a "${enable_winstore_app}" = "yes"], [
     VLC_ADD_LIBS([libvlccore], [-lole32 -lruntimeobject])
     ])
 AC_DEFINE_UNQUOTED(VLC_WINSTORE_APP, ${vlc_winstore_app}, [Define to 1 if you want to build for Windows Store apps])
+AM_CONDITIONAL([HAVE_WINSTORE], [test "$vlc_winstore_app" = "1"])
 
 
 dnl

@@ -72,9 +72,18 @@ static inline HRESULT aout_stream_Pause(aout_stream_t *s, bool paused)
     return (s->pause)(s, paused);
 }
 
-static inline HRESULT aout_stream_Flush(aout_stream_t *s)
+static inline HRESULT aout_stream_Flush(aout_stream_t *s, bool wait)
 {
-    return (s->flush)(s);
+    if (wait)
+    {   /* Loosy drain emulation */
+        mtime_t delay;
+
+        if (SUCCEEDED(aout_stream_TimeGet(s, &delay)))
+            Sleep((delay / (CLOCK_FREQ / 1000)) + 1);
+        return S_OK;
+    }
+    else
+        return (s->flush)(s);
 }
 
 static inline

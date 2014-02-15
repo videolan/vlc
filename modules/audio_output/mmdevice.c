@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mmdevice.c : Windows Multimedia Device API audio output plugin for VLC
  *****************************************************************************
- * Copyright (C) 2012 Rémi Denis-Courmont
+ * Copyright (C) 2012-2013 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -76,7 +76,6 @@ BOOL WINAPI DllMain(HINSTANCE dll, DWORD reason, LPVOID reserved)
 DEFINE_GUID (GUID_VLC_AUD_OUT, 0x4533f59d, 0x59ee, 0x00c6,
    0xad, 0xb2, 0xc6, 0x8b, 0x50, 0x1a, 0x66, 0x55);
 
-#if !VLC_WINSTORE_APP
 static int TryEnterMTA(vlc_object_t *obj)
 {
     HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
@@ -88,7 +87,6 @@ static int TryEnterMTA(vlc_object_t *obj)
     return 0;
 }
 #define TryEnterMTA(o) TryEnterMTA(VLC_OBJECT(o))
-#endif
 
 static void EnterMTA(void)
 {
@@ -102,15 +100,12 @@ static void LeaveMTA(void)
     CoUninitialize();
 }
 
-#if !VLC_WINSTORE_APP
 static wchar_t default_device[1] = L"";
-#endif
 
 struct aout_sys_t
 {
     aout_stream_t *stream; /**< Underlying audio output stream */
     module_t *module;
-#if !VLC_WINSTORE_APP
     audio_output_t *aout;
     IMMDeviceEnumerator *it; /**< Device enumerator, NULL when exiting */
     IMMDevice *dev; /**< Selected output device, NULL if none */
@@ -127,9 +122,6 @@ struct aout_sys_t
     CONDITION_VARIABLE work;
     CONDITION_VARIABLE ready;
     vlc_thread_t thread; /**< Thread for audio session control */
-#else
-    void *client;
-#endif
 };
 
 /* NOTE: The Core Audio API documentation totally fails to specify the thread
@@ -195,22 +187,11 @@ static void Flush(audio_output_t *aout, bool wait)
     aout_sys_t *sys = aout->sys;
 
     EnterMTA();
-
-    if (wait)
-    {   /* Loosy drain emulation */
-        mtime_t delay;
-
-        if (SUCCEEDED(aout_stream_TimeGet(sys->stream, &delay)))
-            Sleep((delay / (CLOCK_FREQ / 1000)) + 1);
-    }
-    else
-        aout_stream_Flush(sys->stream);
-
+    aout_stream_Flush(sys->stream, wait);
     LeaveMTA();
 
 }
 
-#if !VLC_WINSTORE_APP
 static int VolumeSet(audio_output_t *aout, float vol)
 {
     aout_sys_t *sys = aout->sys;
@@ -894,17 +875,6 @@ static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
     IMMDevice *dev = opaque;
     return IMMDevice_Activate(dev, iid, CLSCTX_ALL, actparms, pv);
 }
-#else /* VLC_WINSTORE_APP */
-static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
-                              void **restrict pv)
-{
-    aout_sys_t *sys = opaque;
-
-    (void)iid; (void)actparms;
-    *pv = sys->client;
-    return S_OK;
-}
-#endif /* VLC_WINSTORE_APP */
 
 static int aout_stream_Start(void *func, va_list ap)
 {
@@ -930,20 +900,15 @@ static void aout_stream_Stop(void *func, va_list ap)
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
-#if !VLC_WINSTORE_APP
+
     if (sys->dev == NULL)
         return -1;
-#endif
 
     aout_stream_t *s = vlc_object_create(aout, sizeof (*s));
     if (unlikely(s == NULL))
         return -1;
 
-#if !VLC_WINSTORE_APP
     s->owner.device = sys->dev;
-#else
-    s->owner.device = sys->client;
-#endif
     s->owner.activate = ActivateDevice;
 
     EnterMTA();
@@ -953,11 +918,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
         sys->module = vlc_module_load(s, "aout stream", NULL, false,
                                       aout_stream_Start, s, fmt, &hr);
-        if (hr != AUDCLNT_E_DEVICE_INVALIDATED
-#if !VLC_WINSTORE_APP
-                || DeviceSelect(aout, NULL)
-#endif
-           )
+        if (hr != AUDCLNT_E_DEVICE_INVALIDATED || DeviceSelect(aout, NULL))
             break;
     }
     LeaveMTA();
@@ -997,7 +958,6 @@ static int Open(vlc_object_t *obj)
 
     aout->sys = sys;
     sys->stream = NULL;
-#if !VLC_WINSTORE_APP
     sys->aout = aout;
     sys->it = NULL;
     sys->dev = NULL;
@@ -1038,17 +998,13 @@ static int Open(vlc_object_t *obj)
         SleepConditionVariableCS(&sys->ready, &sys->lock, INFINITE);
     LeaveCriticalSection(&sys->lock);
     LeaveMTA(); /* Leave MTA after thread has entered MTA */
-#else
-    sys->client = var_InheritAddress(aout, "mmdevice-audioclient");
-    assert(sys->client != NULL);
-#endif
+
     aout->start = Start;
     aout->stop = Stop;
     aout->time_get = TimeGet;
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
-#if !VLC_WINSTORE_APP
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
     aout->device_select = DeviceSelect;
@@ -1058,16 +1014,13 @@ error:
     DeleteCriticalSection(&sys->lock);
     free(sys);
     return VLC_EGENERIC;
-#else
-    return VLC_SUCCESS;
-#endif
 }
 
 static void Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
-#if !VLC_WINSTORE_APP
+
     EnterCriticalSection(&sys->lock);
     sys->device = default_device; /* break out of MMSession() loop */
     sys->it = NULL; /* break out of MMThread() loop */
@@ -1076,9 +1029,6 @@ static void Close(vlc_object_t *obj)
 
     vlc_join(sys->thread, NULL);
     DeleteCriticalSection(&sys->lock);
-#else
-    free(sys->client);
-#endif
     free(sys);
 }
 
@@ -1086,10 +1036,6 @@ vlc_module_begin()
     set_shortname("MMDevice")
     set_description(N_("Windows Multimedia Device output"))
     set_capability("audio output", 150)
-#if VLC_WINSTORE_APP
-    /* Pointer to the activated AudioClient* */
-    add_integer("mmdevice-audioclient", 0x0, NULL, NULL, true);
-#endif
     set_category(CAT_AUDIO)
     set_subcategory(SUBCAT_AUDIO_AOUT)
     add_shortcut("wasapi")
