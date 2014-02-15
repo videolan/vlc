@@ -625,6 +625,48 @@
     [[[VLCMainWindow sharedInstance] fsPanel] setNonActive:nil];
 }
 
+-(NSArray*)customWindowsToEnterFullScreenForWindow:(NSWindow *)window
+{
+    if (window == self) {
+        return [NSArray arrayWithObject:window];
+    }
+
+    return nil;
+}
+
+- (NSArray*)customWindowsToExitFullScreenForWindow:(NSWindow*)window
+{
+    if (window == self) {
+        return [NSArray arrayWithObject:window];
+    }
+
+    return nil;
+}
+
+- (void)window:window startCustomAnimationToEnterFullScreenWithDuration:(NSTimeInterval)duration
+{
+    [window setStyleMask:([window styleMask] | NSFullScreenWindowMask)];
+
+    NSScreen *screen = [window screen];
+    NSRect screenFrame = [screen frame];
+
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
+        [context setDuration:0.5 * duration];
+        [[window animator] setFrame:screenFrame display:YES];
+    } completionHandler:nil];
+}
+
+- (void)window:window startCustomAnimationToExitFullScreenWithDuration:(NSTimeInterval)duration
+{
+    [window setStyleMask:([window styleMask] & ~NSFullScreenWindowMask)];
+    [[window animator] setFrame:frameBeforeLionFullscreen display:YES animate:YES];
+
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
+        [context setDuration:0.5 * duration];
+        [[window animator] setFrame:frameBeforeLionFullscreen display:YES animate:YES];
+    } completionHandler:nil];
+}
+
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
     // workaround, see #6668
@@ -638,6 +680,8 @@
     b_in_fullscreen_transition = YES;
 
     var_SetBool(pl_Get(VLCIntf), "fullscreen", true);
+
+    frameBeforeLionFullscreen = [self frame];
 
     if ([self hasActiveVideo]) {
         vout_thread_t *p_vout = getVoutForActiveWindow();
@@ -665,7 +709,6 @@
     if (![o_video_view isHidden]) {
         [[o_controls_bar bottomBarView] setHidden: YES];
     }
-    
 
     [self setMovableByWindowBackground: NO];
 }

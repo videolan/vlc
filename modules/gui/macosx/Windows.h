@@ -110,6 +110,8 @@ static const float f_min_video_height = 70.0;
 
     // true when the window is in transition for entering or exiting fullscreen
     BOOL b_in_fullscreen_transition;
+
+    NSRect frameBeforeLionFullscreen;
 }
 
 @property (nonatomic, assign) VLCVoutView* videoView;
