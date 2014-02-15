@@ -249,9 +249,9 @@ static void WaitKeyframe( demux_t *p_demux )
             asf_track_t *tk = p_sys->track[i];
             if ( tk && tk->p_sp && tk->i_cat == VIDEO_ES )
             {
-                bool b_selected = false, b_error;
+                bool b_selected = false;
                 es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
-                                tk->p_es, &b_selected, &b_error );
+                                tk->p_es, &b_selected );
                 if ( b_selected )
                 {
                     p_sys->i_seek_track = tk->p_sp->i_stream_number;

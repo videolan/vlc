@@ -816,17 +816,18 @@ static int Demux_Seekable( demux_t *p_demux )
     /* cannot be more than 100 stream (dcXX or wbXX) */
     avi_track_toread_t toread[100];
 
+
     /* detect new selected/unselected streams */
     for( i_track = 0; i_track < p_sys->i_track; i_track++ )
     {
         avi_track_t *tk = p_sys->track[i_track];
-        bool  b, b_error;
+        bool  b;
 
-        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b, &b_error );
+        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
         if( tk->p_es_dv_audio )
         {
             bool b_extra;
-            es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es_dv_audio, &b_extra, &b_error );
+            es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es_dv_audio, &b_extra );
             b |= b_extra;
         }
         if( b && !tk->b_activated )
@@ -1174,13 +1175,13 @@ static int Demux_UnSeekable( demux_t *p_demux )
     for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
     {
         avi_track_t *tk = p_sys->track[i_stream];
-        bool  b, b_error;
+        bool  b;
 
-        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b, &b_error );
+        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
         if( tk->p_es_dv_audio )
         {
             bool b_extra;
-            es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es_dv_audio, &b_extra, b_error );
+            es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es_dv_audio, &b_extra );
             b |= b_extra;
         }
 

@@ -660,7 +660,7 @@ static int Demux( demux_t *p_demux )
          i_track++ )
     {
         mp4_track_t *tk = &p_sys->track[i_track];
-        bool b, b_error;
+        bool b;
 
         if( !tk->b_ok || tk->b_chapter ||
             ( tk->b_selected && tk->i_sample >= tk->i_sample_count ) )
@@ -668,7 +668,7 @@ static int Demux( demux_t *p_demux )
             continue;
         }
 
-        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b, &b_error );
+        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
 
         if( tk->b_selected && !b )
         {
@@ -2427,7 +2427,7 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
 static int TrackGotoChunkSample( demux_t *p_demux, mp4_track_t *p_track,
                                  unsigned int i_chunk, unsigned int i_sample )
 {
-    bool b_reselect = false, b_error = false;
+    bool b_reselect = false;
 
     /* now see if actual es is ok */
     if( p_track->i_chunk >= p_track->i_chunk_count ||
@@ -2438,7 +2438,7 @@ static int TrackGotoChunkSample( demux_t *p_demux, mp4_track_t *p_track,
                   p_track->i_track_ID );
 
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
-                        p_track->p_es, &b_reselect, &b_error );
+                        p_track->p_es, &b_reselect );
 
         es_out_Del( p_demux->out, p_track->p_es );
 
@@ -3674,12 +3674,12 @@ int DemuxFrg( demux_t *p_demux )
     for( i_track = 0, i_track_selected = 0; i_track < p_sys->i_tracks; i_track++ )
     {
         mp4_track_t *tk = &p_sys->track[i_track];
-        bool b, b_error;
+        bool b;
 
         if( !tk->b_ok || tk->b_chapter )
             continue;
 
-        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b, &b_error );
+        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
         msg_Dbg( p_demux, "track %u %s!", tk->i_track_ID, b ? "enabled" : "disabled" );
 
         if( tk->b_selected && !b )

@@ -251,10 +251,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = (int64_t*)va_arg( args, int64_t * );
             for( i = 0; i < p_sys->i_tracks; i++ )
             {
-                bool b_selected, b_error;
+                bool b_selected;
                 /* Check the ES is selected */
                 es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
-                                p_sys->track[i].p_es, &b_selected, &b_error );
+                                p_sys->track[i].p_es, &b_selected );
                 if( b_selected ) break;
             }
             if( i < p_sys->i_tracks && p_sys->track[i].i_current_subtitle < p_sys->track[i].i_subtitles )
@@ -284,10 +284,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pf = (double*)va_arg( args, double * );
             for( i = 0; i < p_sys->i_tracks; i++ )
             {
-                bool b_selected, b_error;
+                bool b_selected;
                 /* Check the ES is selected */
                 es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
-                                p_sys->track[i].p_es, &b_selected, &b_error );
+                                p_sys->track[i].p_es, &b_selected );
                 if( b_selected ) break;
             }
             if( p_sys->track[i].i_current_subtitle >= p_sys->track[i].i_subtitles )

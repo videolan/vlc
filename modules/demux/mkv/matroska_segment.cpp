@@ -937,11 +937,11 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
         {
             if( tracks[i_track]->i_seek_preroll )
             {
-                bool b_enabled, b_error;
+                bool b_enabled;
                 if( es_out_Control( sys.demuxer.out,
                                     ES_OUT_GET_ES_STATE,
                                     tracks[i_track]->p_es,
-                                    &b_enabled, &b_error ) == VLC_SUCCESS &&
+                                    &b_enabled ) == VLC_SUCCESS &&
                     b_enabled )
                     i_seek_preroll = __MAX( i_seek_preroll,
                                             tracks[i_track]->i_seek_preroll );

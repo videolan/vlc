@@ -614,9 +614,9 @@ static logical_stream_t * Ogg_GetSelectedStream( demux_t *p_demux )
         logical_stream_t *p_candidate = p_sys->pp_stream[i];
         if ( !p_candidate->p_es ) continue;
 
-        bool b_selected = false, b_error;
+        bool b_selected = false;
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
-                        p_candidate->p_es, &b_selected, &b_error );
+                        p_candidate->p_es, &b_selected );
         if ( !b_selected ) continue;
 
         if ( !p_stream && p_candidate->fmt.i_cat == AUDIO_ES )
@@ -961,7 +961,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                               ogg_packet *p_oggpacket )
 {
     block_t *p_block;
-    bool b_selected, b_error;
+    bool b_selected;
     int i_header_len = 0;
     mtime_t i_pts = VLC_TS_UNKNOWN;
     demux_sys_t *p_ogg = p_demux->p_sys;
@@ -1006,7 +1006,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         b_selected = true;
     else
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
-                        p_stream->p_es, &b_selected, &b_error );
+                        p_stream->p_es, &b_selected );
 
     if( p_stream->b_force_backup )
     {
