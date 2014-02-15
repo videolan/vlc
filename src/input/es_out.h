@@ -168,8 +168,6 @@ static inline void es_out_Eos( es_out_t *p_out )
     assert( !i_ret );
 }
 
-int es_out_GetEsState( es_out_t *p_out, const int i_cat, bool *b_selected, bool *b_error);
-
 es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );
 
 #endif

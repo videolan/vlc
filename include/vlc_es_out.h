@@ -45,9 +45,7 @@ enum es_out_query_e
 
     /* force selection/unselection of the ES (bypass current mode) */
     ES_OUT_SET_ES_STATE,/* arg1= es_out_id_t* arg2=bool   */
-    ES_OUT_GET_ES_STATE,/* arg1= es_out_id_t* arg2=bool* arg3=bool* res=can fail
-                         * arg2 is true if es has been selected, false otherwise,
-                         * arg3 is true if es has an error, false otherwise */
+    ES_OUT_GET_ES_STATE,/* arg1= es_out_id_t* arg2=bool*  */
 
     /* */
     ES_OUT_SET_GROUP,   /* arg1= int                            */

@@ -921,7 +921,7 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
         const char *name = av_get_pix_fmt_name( p_sys->p_context->pix_fmt );
         msg_Err( p_dec, "Unsupported decoded output format %d (%s)",
                  p_sys->p_context->pix_fmt, name ? name : "unknown" );
-        atomic_store( &p_dec->b_error, true );
+        p_dec->b_error = 1;
     }
 }
 

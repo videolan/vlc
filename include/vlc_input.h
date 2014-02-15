@@ -297,14 +297,6 @@ typedef enum input_state_e
     ERROR_S,
 } input_state_e;
 
-/* same order as es_out_state_es_e enum in vlc_es_out.h */
-typedef enum input_es_state_e
-{
-    INPUT_ES_STATE_DISABLED = 0,
-    INPUT_ES_STATE_ENABLED,
-    INPUT_ES_STATE_ERROR,
-} input_es_state_e;
-
 /**
  * Input rate.
  *
@@ -488,9 +480,6 @@ enum input_query_e
     /* External clock managments */
     INPUT_GET_PCR_SYSTEM,   /* arg1=mtime_t *, arg2=mtime_t *       res=can fail */
     INPUT_MODIFY_PCR_SYSTEM,/* arg1=int absolute, arg2=mtime_t      res=can fail */
-
-    /* Ask status of main ES objects */
-    INPUT_GET_ES_STATE,     /* arg1=int (AUDIO/VIDEO/SPU_ES), arg2=es_out state * res=can fail */
 };
 
 /** @}*/
@@ -617,17 +606,6 @@ static inline int input_GetPcrSystem( input_thread_t *p_input, mtime_t *pi_syste
 {
     return input_Control( p_input, INPUT_GET_PCR_SYSTEM, pi_system, pi_delay );
 }
-
-/**
- * It will return the state of the current selected elementary streams for this input.
- */
-static inline input_es_state_e input_GetEsState( input_thread_t *p_input, const int i_cat )
-{
-    input_es_state_e state = INPUT_ES_STATE_DISABLED;
-    input_Control( p_input, INPUT_GET_ES_STATE, i_cat, &state );
-    return state;
-}
-
 /**
  * \see input_clock_ChangeSystemOrigin
  */

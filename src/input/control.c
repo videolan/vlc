@@ -36,7 +36,6 @@
 #include "resource.h"
 #include "es_out.h"
 
-typedef enum input_es_state_e input_es_state_e;
 
 static void UpdateBookmarksOption( input_thread_t * );
 
@@ -495,24 +494,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             return es_out_ControlModifyPcrSystem( p_input->p->p_es_out_display, b_absolute, i_system );
         }
 
-        case INPUT_GET_ES_STATE:
-        {
-            int i_cat = (int)va_arg( args, int );
-            input_es_state_e *pi_state = (input_es_state_e *)va_arg( args, input_es_state_e* );
-
-            bool b_selected = false, b_error = false;
-            int ret = es_out_GetEsState( p_input->p->p_es_out_display, i_cat, &b_selected, &b_error);
-            if (ret != VLC_SUCCESS)
-            {
-                *pi_state = INPUT_ES_STATE_DISABLED;
-                return VLC_EGENERIC;
-            }
-
-            *pi_state = b_error ? INPUT_ES_STATE_ERROR :
-                               ( b_selected ? INPUT_ES_STATE_ENABLED : INPUT_ES_STATE_DISABLED );
-            return ret;
-        }
-
         default:
             msg_Err( p_input, "unknown query in input_vaControl" );
             return VLC_EGENERIC;
@@ -573,3 +554,4 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
 
     input_SendEventBookmark( p_input );
 }
+
