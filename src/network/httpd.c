@@ -645,6 +645,10 @@ struct httpd_stream_t
     uint8_t     *p_buffer;          /* buffer */
     int64_t     i_buffer_pos;       /* absolute position from begining */
     int64_t     i_buffer_last_pos;  /* a new connection will start with that */
+
+    /* custom headers */
+    size_t        i_http_headers;
+    httpd_header * p_http_headers;
 };
 
 static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
@@ -729,6 +733,25 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
 
         answer->i_status = 200;
 
+        bool b_has_content_type = false;
+        bool b_has_cache_control = false;
+
+        vlc_mutex_lock( &stream->lock );
+        for( size_t i = 0; i < stream->i_http_headers; i++ )
+        {
+            if( strncasecmp( stream->p_http_headers[i].name, "Content-Length", 14 ) )
+            {
+                httpd_MsgAdd( answer, stream->p_http_headers[i].name,
+                              stream->p_http_headers[i].value );
+
+                if( !strncasecmp( stream->p_http_headers[i].name, "Content-Type", 12 ) )
+                    b_has_content_type = true;
+                else if( !strncasecmp( stream->p_http_headers[i].name, "Cache-Control", 13 ) )
+                    b_has_cache_control = true;
+            }
+        }
+        vlc_mutex_unlock( &stream->lock );
+
         if( query->i_type != HTTPD_MSG_HEAD )
         {
             cl->b_stream_mode = true;
@@ -749,17 +772,17 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
         }
         else
         {
-            httpd_MsgAdd( answer, "Content-Length", "%d", 0 );
+            httpd_MsgAdd( answer, "Content-Length", "0" );
             answer->i_body_offset = 0;
         }
 
+        /* FIXME: move to http access_output */
         if( !strcmp( stream->psz_mime, "video/x-ms-asf-stream" ) )
         {
             bool b_xplaystream = false;
             int i;
 
-            httpd_MsgAdd( answer, "Content-type", "%s",
-                          "application/octet-stream" );
+            httpd_MsgAdd( answer, "Content-type", "application/octet-stream" );
             httpd_MsgAdd( answer, "Server", "Cougar 4.1.0.3921" );
             httpd_MsgAdd( answer, "Pragma", "no-cache" );
             httpd_MsgAdd( answer, "Pragma", "client-id=%lu",
@@ -767,10 +790,10 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
             httpd_MsgAdd( answer, "Pragma", "features=\"broadcast\"" );
 
             /* Check if there is a xPlayStrm=1 */
-            for( i = 0; i < query->i_name; i++ )
+            for( i = 0; i < query->i_headers; i++ )
             {
-                if( !strcasecmp( query->name[i],  "Pragma" ) &&
-                    strstr( query->value[i], "xPlayStrm=1" ) )
+                if( !strcasecmp( query->p_headers[i].name,  "Pragma" ) &&
+                    strstr( query->p_headers[i].value, "xPlayStrm=1" ) )
                 {
                     b_xplaystream = true;
                 }
@@ -781,11 +804,12 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
                 answer->i_body_offset = 0;
             }
         }
-        else
+        else if( !b_has_content_type )
         {
-            httpd_MsgAdd( answer, "Content-type",  "%s", stream->psz_mime );
+            httpd_MsgAdd( answer, "Content-type", stream->psz_mime );
         }
-        httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
+        if( !b_has_cache_control )
+            httpd_MsgAdd( answer, "Cache-Control", "no-cache" );
         return VLC_SUCCESS;
     }
 }
@@ -821,6 +845,8 @@ httpd_stream_t *httpd_StreamNew( httpd_host_t *host,
     stream->i_buffer_last_pos = 1;
     stream->b_has_keyframes = false;
     stream->i_last_keyframe_seen_pos = 0;
+    stream->i_http_headers = 0;
+    stream->p_http_headers = NULL;
 
     httpd_UrlCatch( stream->url, HTTPD_MSG_HEAD, httpd_StreamCallBack,
                     (httpd_callback_sys_t*)stream );
@@ -896,6 +922,12 @@ int httpd_StreamSend( httpd_stream_t *stream, const block_t *p_block )
 void httpd_StreamDelete( httpd_stream_t *stream )
 {
     httpd_UrlDelete( stream->url );
+    for( size_t i = 0; i < stream->i_http_headers; i++ )
+    {
+        free( stream->p_http_headers[i].name );
+        free( stream->p_http_headers[i].value );
+    }
+    free( stream->p_http_headers );
     vlc_mutex_destroy( &stream->lock );
     free( stream->psz_mime );
     free( stream->p_header );
@@ -1238,10 +1270,8 @@ static void httpd_MsgInit( httpd_message_t *msg )
     msg->psz_url    = NULL;
     msg->psz_args   = NULL;
 
-    msg->i_name     = 0;
-    msg->name       = NULL;
-    msg->i_value    = 0;
-    msg->value      = NULL;
+    msg->i_headers  = 0;
+    msg->p_headers  = NULL;
 
     msg->i_body_offset = 0;
     msg->i_body        = 0;
@@ -1252,22 +1282,25 @@ static void httpd_MsgClean( httpd_message_t *msg )
 {
     free( msg->psz_url );
     free( msg->psz_args );
-    for (int i = 0; i < msg->i_name; i++) {
-        free( msg->name[i] );
-        free( msg->value[i] );
+    for( size_t i = 0; i < msg->i_headers; i++ )
+    {
+        free( msg->p_headers[i].name );
+        free( msg->p_headers[i].value );
     }
-    free( msg->name );
-    free( msg->value );
+    free( msg->p_headers );
     free( msg->p_body );
     httpd_MsgInit( msg );
 }
 
 const char *httpd_MsgGet( const httpd_message_t *msg, const char *name )
 {
-    for (int i = 0; i < msg->i_name; i++ )
-        if( !strcasecmp( msg->name[i], name ))
-            return msg->value[i];
-
+    for( size_t i = 0; i < msg->i_headers; i++ )
+    {
+        if( !strcasecmp( msg->p_headers[i].name, name ))
+        {
+            return msg->p_headers[i].value;
+        }
+    }
     return NULL;
 }
 
@@ -1290,9 +1323,19 @@ void httpd_MsgAdd( httpd_message_t *msg, const char *name, const char *psz_value
         free( value );
         return;
     }
-
-    TAB_APPEND( msg->i_name,  msg->name,  (char*)name );
-    TAB_APPEND( msg->i_value, msg->value, value );
+    httpd_header * p_tmp = realloc( msg->p_headers, sizeof(httpd_header) * (msg->i_headers + 1));
+    if(p_tmp)
+    {
+        msg->p_headers = p_tmp;
+        msg->p_headers[msg->i_headers].name = name;
+        msg->p_headers[msg->i_headers].value = value;
+        msg->i_headers++;
+    }
+    else
+    {
+        free(name);
+        free(value);
+    }
 }
 
 static void httpd_ClientInit( httpd_client_t *cl, mtime_t now )
@@ -1687,23 +1730,16 @@ static void httpd_ClientRecv( httpd_client_t *cl )
 
                         if( ( colon = strchr( line, ':' ) ) )
                         {
-                            char *name;
-                            char *value;
-
                             *colon++ = '\0';
                             while( *colon == ' ' )
                             {
                                 colon++;
                             }
-                            name = strdup( line );
-                            value = strdup( colon );
+                            httpd_MsgAdd( &cl->query, line, colon );
 
-                            TAB_APPEND( cl->query.i_name, cl->query.name, name );
-                            TAB_APPEND( cl->query.i_value,cl->query.value,value);
-
-                            if( !strcasecmp( name, "Content-Length" ) )
+                            if( !strcasecmp( line, "Content-Length" ) )
                             {
-                                cl->query.i_body = atol( value );
+                                cl->query.i_body = atol( colon );
                             }
                         }
 
@@ -1820,10 +1856,10 @@ static void httpd_ClientSend( httpd_client_t *cl )
         const char *psz_status = httpd_ReasonFromCode( cl->answer.i_status );
 
         i_size = strlen( "HTTP/1.") + 10 + 10 + strlen( psz_status ) + 5;
-        for( i = 0; i < cl->answer.i_name; i++ )
+        for( i = 0; i < cl->answer.i_headers; i++ )
         {
-            i_size += strlen( cl->answer.name[i] ) + 2 +
-                      strlen( cl->answer.value[i] ) + 2;
+            i_size += strlen( cl->answer.p_headers[i].name ) + 2 +
+                      strlen( cl->answer.p_headers[i].value ) + 2;
         }
 
         if( cl->i_buffer_size < i_size )
@@ -1838,10 +1874,10 @@ static void httpd_ClientSend( httpd_client_t *cl )
                       cl->answer.i_proto ==  HTTPD_PROTO_HTTP ? "HTTP/1" : "RTSP/1",
                       cl->answer.i_version,
                       cl->answer.i_status, psz_status );
-        for( i = 0; i < cl->answer.i_name; i++ )
+        for( i = 0; i < cl->answer.i_headers; i++ )
         {
-            p += sprintf( p, "%s: %s\r\n", cl->answer.name[i],
-                          cl->answer.value[i] );
+            p += sprintf( p, "%s: %s\r\n", cl->answer.p_headers[i].name,
+                          cl->answer.p_headers[i].value );
         }
         p += sprintf( p, "\r\n" );
 
@@ -2323,4 +2359,58 @@ static void* httpd_HostThread( void *data )
         httpdLoop(host);
     vlc_mutex_unlock( &host->lock );
     return NULL;
+}
+
+int httpd_StreamSetHTTPHeaders(httpd_stream_t * p_stream, httpd_header * p_headers, size_t i_headers )
+{
+    if( !p_stream )
+        return VLC_EGENERIC;
+
+    vlc_mutex_lock( &p_stream->lock );
+    if( p_stream->p_http_headers )
+    {
+        for( size_t i = 0; i < p_stream->i_http_headers; i++)
+        {
+            free( p_stream->p_http_headers[i].name );
+            free( p_stream->p_http_headers[i].value );
+        }
+        free( p_stream->p_http_headers );
+        p_stream->p_http_headers = NULL;
+        p_stream->i_http_headers = 0;
+    }
+
+    if( !p_headers || !i_headers )
+    {
+        vlc_mutex_unlock( &p_stream->lock );
+        return VLC_SUCCESS;
+    }
+
+    p_stream->p_http_headers = malloc(sizeof(httpd_header) * i_headers );
+    if( !p_stream->p_http_headers )
+    {
+        vlc_mutex_unlock( &p_stream->lock );
+        return VLC_ENOMEM;
+    }
+
+    size_t j = 0;
+    for( size_t i = 0; i < i_headers; i++ )
+    {
+        if( unlikely( !p_headers[i].name || !p_headers[i].value ) )
+            continue;
+
+        p_stream->p_http_headers[j].name = strdup( p_headers[i].name );
+        p_stream->p_http_headers[j].value = strdup( p_headers[i].value );
+
+        if( unlikely( !p_stream->p_http_headers[j].name ||
+                      !p_stream->p_http_headers[j].value ) )
+        {
+            free( p_stream->p_http_headers[j].name );
+            free( p_stream->p_http_headers[j].value );
+            break;
+        }
+        j++;
+    }
+    p_stream->i_http_headers = j;
+    vlc_mutex_unlock( &p_stream->lock );
+    return VLC_SUCCESS;
 }
