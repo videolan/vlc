@@ -662,17 +662,17 @@ static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, sout_stream
 {
 
     picture_t *p_pic2 = NULL;
-    mtime_t original_date = p_pic->date;
+    const mtime_t original_date = p_pic->date;
     bool b_need_duplicate=false;
-    /* If input pts + input_frame_interval is lower than next_output_pts - output_frame_interval
+    /* If input pts is lower than next_output_pts - output_frame_interval
      * Then the future input frame should fit better and we can drop this one 
      *
      * We check it here also because we can have case that video filters outputs multiple
      * pictures but we don't need to use them all, for example yadif2x and outputting to some
      * different fps value
      */
-    if( ( p_pic->date ) <
-        ( date_Get( &id->next_output_pts ) ) )
+    if( ( original_date ) <
+        ( date_Get( &id->next_output_pts ) - (mtime_t)id->i_output_frame_interval ) )
     {
 #if 0
         msg_Dbg( p_stream, "dropping frame (%"PRId64" + %"PRId64" vs %"PRId64")",
@@ -900,15 +900,15 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
         /*Input lipsync and drop check */
         if( p_sys->b_master_sync )
         {
-            /* If input pts + input_frame_interval is lower than next_output_pts - output_frame_interval
+            /* If input pts lower than next_output_pts - output_frame_interval
              * Then the future input frame should fit better and we can drop this one 
              *
              * We check this here as we don't need to run video filter at all for pictures
              * we are going to drop anyway
              *
              * Duplication need is checked in OutputFrame */
-            if( ( p_pic->date + (mtime_t)id->i_input_frame_interval ) <
-                ( date_Get( &id->next_output_pts ) ) )
+            if( ( p_pic->date ) <
+                ( date_Get( &id->next_output_pts ) - (mtime_t)id->i_output_frame_interval ) )
             {
 #if 0
                 msg_Dbg( p_stream, "dropping frame (%"PRId64" + %"PRId64" vs %"PRId64")",
