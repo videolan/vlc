@@ -78,15 +78,4 @@ local item = vlc.input.item()
     end
   ?>
   </stats>
-  <es_state>
-  <?vlc
-    if item then
-      local stats = item:es_state()
-      for k,v in pairs(stats) do
-        local tag = string.gsub(k,"_","")
-        print("<"..httprequests.xmlString(tag)..">"..httprequests.xmlString(v).."</"..httprequests.xmlString(tag)..">\n")
-      end
-    end
-  ?>
-  </es_state>
 </root>
