@@ -81,9 +81,9 @@ static const char psz_delim_semicolon[] = ";";
 static int Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-static sout_stream_id_t *Add( sout_stream_t *, es_format_t * );
-static int Del( sout_stream_t *, sout_stream_id_t * );
-static int Send( sout_stream_t *, sout_stream_id_t *, block_t* );
+static sout_stream_id_sys_t *Add( sout_stream_t *, es_format_t * );
+static int Del( sout_stream_t *, sout_stream_id_sys_t * );
+static int Send( sout_stream_t *, sout_stream_id_sys_t *, block_t* );
 
 static int VolumeCallback( vlc_object_t *p_this, char const *psz_cmd,
                            vlc_value_t oldval, vlc_value_t newval,
@@ -104,7 +104,7 @@ struct sout_stream_sys_t
     int i_volume;
 
     /* Plugin status */
-    sout_stream_id_t *p_audio_stream;
+    sout_stream_id_sys_t *p_audio_stream;
     bool b_alac_warning;
     bool b_volume_callback;
 
@@ -133,7 +133,7 @@ struct sout_stream_sys_t
     uint8_t *p_sendbuf;
 };
 
-struct sout_stream_id_t
+struct sout_stream_id_sys_t
 {
     es_format_t fmt;
 };
@@ -211,7 +211,7 @@ static void FreeSys( vlc_object_t *p_this, sout_stream_sys_t *p_sys )
     free( p_sys );
 }
 
-static void FreeId( sout_stream_id_t *id )
+static void FreeId( sout_stream_id_sys_t *id )
 {
     free( id );
 }
@@ -1563,10 +1563,10 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Add:
  *****************************************************************************/
-static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_sys_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    sout_stream_id_t *id = NULL;
+    sout_stream_id_sys_t *id = NULL;
 
     id = calloc( 1, sizeof( *id ) );
     if ( id == NULL )
@@ -1624,7 +1624,7 @@ error:
 /*****************************************************************************
  * Del:
  *****************************************************************************/
-static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
+static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     int i_err = VLC_SUCCESS;
@@ -1641,7 +1641,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 /*****************************************************************************
  * Send:
  *****************************************************************************/
-static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
+static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                  block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;

@@ -52,7 +52,7 @@ static int audio_update_format( decoder_t *p_dec )
     return 0;
 }
 
-static int transcode_audio_initialize_filters( sout_stream_t *p_stream, sout_stream_id_t *id,
+static int transcode_audio_initialize_filters( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                                                sout_stream_sys_t *p_sys, audio_sample_format_t *fmt_last )
 {
     /* Load user specified audio filters */
@@ -79,7 +79,7 @@ static int transcode_audio_initialize_filters( sout_stream_t *p_stream, sout_str
     return VLC_SUCCESS;
 }
 
-static int transcode_audio_initialize_encoder( sout_stream_id_t *id, sout_stream_t *p_stream )
+static int transcode_audio_initialize_encoder( sout_stream_id_sys_t *id, sout_stream_t *p_stream )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     /* Initialization of encoder format structures */
@@ -125,7 +125,7 @@ static int transcode_audio_initialize_encoder( sout_stream_id_t *id, sout_stream
 }
 
 int transcode_audio_new( sout_stream_t *p_stream,
-                                sout_stream_id_t *id )
+                                sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     audio_sample_format_t fmt_last;
@@ -171,7 +171,7 @@ int transcode_audio_new( sout_stream_t *p_stream,
     return VLC_SUCCESS;
 }
 
-void transcode_audio_close( sout_stream_id_t *id )
+void transcode_audio_close( sout_stream_id_sys_t *id )
 {
     /* Close decoder */
     if( id->p_decoder->p_module )
@@ -193,7 +193,7 @@ void transcode_audio_close( sout_stream_id_t *id )
 }
 
 int transcode_audio_process( sout_stream_t *p_stream,
-                                    sout_stream_id_t *id,
+                                    sout_stream_id_sys_t *id,
                                     block_t *in, block_t **out )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -308,7 +308,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
 }
 
 bool transcode_audio_add( sout_stream_t *p_stream, es_format_t *p_fmt, 
-            sout_stream_id_t *id )
+            sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 

@@ -43,9 +43,9 @@
 static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );
 
-static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
-static int               Del ( sout_stream_t *, sout_stream_id_t * );
-static int               Send( sout_stream_t *, sout_stream_id_t *, block_t* );
+static sout_stream_id_sys_t *Add ( sout_stream_t *, es_format_t * );
+static int               Del ( sout_stream_t *, sout_stream_id_sys_t * );
+static int               Send( sout_stream_t *, sout_stream_id_sys_t *, block_t* );
 
 /*****************************************************************************
  * Module descriptor
@@ -63,7 +63,7 @@ struct sout_stream_sys_t
     mtime_t i_stream_start;
 };
 
-struct sout_stream_id_t
+struct sout_stream_id_sys_t
 {
 };
 
@@ -106,10 +106,10 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
-static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_sys_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    sout_stream_id_t *id;
+    sout_stream_id_sys_t *id;
     es_format_t *p_fmt_copy;
 
     msg_Dbg( p_stream, "Adding a stream" );
@@ -122,11 +122,11 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     if( p_sys->i_stream_start <= 0 )
         p_sys->i_stream_start = mdate();
 
-    id = malloc( sizeof( sout_stream_id_t ) );
+    id = malloc( sizeof( sout_stream_id_sys_t ) );
     return id;
 }
 
-static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
+static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     msg_Dbg( p_stream, "Removing a stream" );
 
@@ -134,7 +134,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     return VLC_SUCCESS;
 }
 
-static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
+static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                  block_t *p_buffer )
 {
     VLC_UNUSED(id);

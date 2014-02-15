@@ -39,7 +39,7 @@ struct sout_packetizer_input_t
 
     es_format_t         *p_fmt;
 
-    sout_stream_id_t    *id;
+    sout_stream_id_sys_t    *id;
 };
 
 sout_instance_t *sout_NewInstance( vlc_object_t *, const char * );

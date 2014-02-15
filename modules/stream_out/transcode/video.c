@@ -100,7 +100,7 @@ static void transcode_video_filter_allocation_clear( filter_t *p_filter )
 static void* EncoderThread( void *obj )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t*)obj;
-    sout_stream_id_t *id = p_sys->id_video;
+    sout_stream_id_sys_t *id = p_sys->id_video;
     picture_t *p_pic = NULL;
     int canc = vlc_savecancel ();
     block_t *p_block = NULL;
@@ -164,7 +164,7 @@ static void* EncoderThread( void *obj )
     return NULL;
 }
 
-int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
+int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
@@ -298,7 +298,7 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
 }
 
 static void transcode_video_filter_init( sout_stream_t *p_stream,
-                                         sout_stream_id_t *id )
+                                         sout_stream_id_sys_t *id )
 {
     es_format_t *p_fmt_out = &id->p_decoder->fmt_out;
     id->p_encoder->fmt_in.video.i_chroma = id->p_encoder->fmt_in.i_codec;
@@ -360,7 +360,7 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
 }
 
 /* Take care of the scaling and chroma conversions. */
-static void conversion_video_filter_append( sout_stream_id_t *id )
+static void conversion_video_filter_append( sout_stream_id_sys_t *id )
 {
     const es_format_t *p_fmt_out = &id->p_decoder->fmt_out;
     if( id->p_f_chain )
@@ -381,7 +381,7 @@ static void conversion_video_filter_append( sout_stream_id_t *id )
 }
 
 static void transcode_video_encoder_init( sout_stream_t *p_stream,
-                                          sout_stream_id_t *id )
+                                          sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
@@ -585,7 +585,7 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
 }
 
 static int transcode_video_encoder_open( sout_stream_t *p_stream,
-                                         sout_stream_id_t *id )
+                                         sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
@@ -621,7 +621,7 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
 }
 
 void transcode_video_close( sout_stream_t *p_stream,
-                                   sout_stream_id_t *id )
+                                   sout_stream_id_sys_t *id )
 {
     if( p_stream->p_sys->i_threads >= 1 )
     {
@@ -658,7 +658,7 @@ void transcode_video_close( sout_stream_t *p_stream,
         filter_chain_Delete( id->p_uf_chain );
 }
 
-static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, sout_stream_t *p_stream, sout_stream_id_t *id, block_t **out )
+static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, sout_stream_t *p_stream, sout_stream_id_sys_t *id, block_t **out )
 {
 
     picture_t *p_pic2 = NULL;
@@ -792,7 +792,7 @@ static void OutputFrame( sout_stream_sys_t *p_sys, picture_t *p_pic, sout_stream
         picture_Release( p_pic );
 }
 
-int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
+int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                                     block_t *in, block_t **out )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -967,7 +967,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
 }
 
 bool transcode_video_add( sout_stream_t *p_stream, es_format_t *p_fmt,
-                                sout_stream_id_t *id )
+                                sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 

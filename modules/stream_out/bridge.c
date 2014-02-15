@@ -140,13 +140,13 @@ static const char *const ppsz_sout_options_in[] = {
     NULL
 };
 
-static sout_stream_id_t *AddOut ( sout_stream_t *, es_format_t * );
-static int               DelOut ( sout_stream_t *, sout_stream_id_t * );
-static int               SendOut( sout_stream_t *, sout_stream_id_t *, block_t * );
+static sout_stream_id_sys_t *AddOut ( sout_stream_t *, es_format_t * );
+static int               DelOut ( sout_stream_t *, sout_stream_id_sys_t * );
+static int               SendOut( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
 
-static sout_stream_id_t *AddIn ( sout_stream_t *, es_format_t * );
-static int               DelIn ( sout_stream_t *, sout_stream_id_t * );
-static int               SendIn( sout_stream_t *, sout_stream_id_t *, block_t * );
+static sout_stream_id_sys_t *AddIn ( sout_stream_t *, es_format_t * );
+static int               DelIn ( sout_stream_t *, sout_stream_id_sys_t * );
+static int               SendIn( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
 
 typedef struct bridged_es_t
 {
@@ -156,7 +156,7 @@ typedef struct bridged_es_t
     bool b_empty;
 
     /* bridge in part */
-    sout_stream_id_t *id;
+    sout_stream_id_sys_t *id;
     mtime_t i_last;
     bool b_changed;
 } bridged_es_t;
@@ -233,7 +233,7 @@ static void CloseOut( vlc_object_t * p_this )
     free( p_sys );
 }
 
-static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_sys_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
     bridge_t *p_bridge;
@@ -292,10 +292,10 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     vlc_mutex_unlock( &lock );
 
-    return (sout_stream_id_t *)p_sys;
+    return (sout_stream_id_sys_t *)p_sys;
 }
 
-static int DelOut( sout_stream_t *p_stream, sout_stream_id_t *id )
+static int DelOut( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     VLC_UNUSED(id);
     out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
@@ -322,7 +322,7 @@ static int DelOut( sout_stream_t *p_stream, sout_stream_id_t *id )
     return VLC_SUCCESS;
 }
 
-static int SendOut( sout_stream_t *p_stream, sout_stream_id_t *id,
+static int SendOut( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                     block_t *p_buffer )
 {
     out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
@@ -365,9 +365,9 @@ typedef struct in_sout_stream_sys_t
     bool b_switch_on_iframe;
     int i_state;
     mtime_t i_placeholder_delay;
-    sout_stream_id_t *id_video;
+    sout_stream_id_sys_t *id_video;
     mtime_t i_last_video;
-    sout_stream_id_t *id_audio;
+    sout_stream_id_sys_t *id_audio;
     mtime_t i_last_audio;
 } in_sout_stream_sys_t;
 
@@ -449,17 +449,17 @@ static void CloseIn( vlc_object_t * p_this )
     free( p_sys );
 }
 
-struct sout_stream_id_t
+struct sout_stream_id_sys_t
 {
-    sout_stream_id_t *id;
+    sout_stream_id_sys_t *id;
     int i_cat; /* es category. Used for placeholder option */
 };
 
-static sout_stream_id_t * AddIn( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_sys_t * AddIn( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     in_sout_stream_sys_t *p_sys = (in_sout_stream_sys_t *)p_stream->p_sys;
 
-    sout_stream_id_t *id = malloc( sizeof( sout_stream_id_t ) );
+    sout_stream_id_sys_t *id = malloc( sizeof( sout_stream_id_sys_t ) );
     if( !id ) return NULL;
 
     id->id = p_stream->p_next->pf_add( p_stream->p_next, p_fmt );
@@ -490,7 +490,7 @@ static sout_stream_id_t * AddIn( sout_stream_t *p_stream, es_format_t *p_fmt )
     return id;
 }
 
-static int DelIn( sout_stream_t *p_stream, sout_stream_id_t *id )
+static int DelIn( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     in_sout_stream_sys_t *p_sys = (in_sout_stream_sys_t *)p_stream->p_sys;
 
@@ -503,7 +503,7 @@ static int DelIn( sout_stream_t *p_stream, sout_stream_id_t *id )
     return ret;
 }
 
-static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
+static int SendIn( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                    block_t *p_buffer )
 {
     in_sout_stream_sys_t *p_sys = (in_sout_stream_sys_t *)p_stream->p_sys;
@@ -608,7 +608,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
                 p_block->i_dts += p_sys->i_delay;
                 p_block = p_block->p_next;
             }
-            sout_stream_id_t *newid = NULL;
+            sout_stream_id_sys_t *newid = NULL;
             if( p_sys->b_placeholder )
             {
                 switch( p_bridge->pp_es[i]->fmt.i_cat )

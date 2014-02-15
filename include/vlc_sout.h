@@ -56,9 +56,9 @@ struct sout_instance_t
 };
 
 /****************************************************************************
- * sout_stream_id_t: opaque (private for all sout_stream_t)
+ * sout_stream_id_sys_t: opaque (private for all sout_stream_t)
  ****************************************************************************/
-typedef struct sout_stream_id_t  sout_stream_id_t;
+typedef struct sout_stream_id_sys_t  sout_stream_id_sys_t;
 
 /** Stream output access_output */
 struct sout_access_out_t
@@ -186,10 +186,10 @@ struct sout_stream_t
     sout_stream_t     *p_next;
 
     /* add, remove a stream */
-    sout_stream_id_t *(*pf_add)( sout_stream_t *, es_format_t * );
-    int               (*pf_del)( sout_stream_t *, sout_stream_id_t * );
+    sout_stream_id_sys_t *(*pf_add)( sout_stream_t *, es_format_t * );
+    int               (*pf_del)( sout_stream_t *, sout_stream_id_sys_t * );
     /* manage a packet */
-    int               (*pf_send)( sout_stream_t *, sout_stream_id_t *, block_t* );
+    int               (*pf_send)( sout_stream_t *, sout_stream_id_sys_t *, block_t* );
 
     sout_stream_sys_t *p_sys;
     bool pace_nocontrol;
@@ -199,15 +199,15 @@ VLC_API void sout_StreamChainDelete(sout_stream_t *p_first, sout_stream_t *p_las
 VLC_API sout_stream_t *sout_StreamChainNew(sout_instance_t *p_sout,
         char *psz_chain, sout_stream_t *p_next, sout_stream_t **p_last) VLC_USED;
 
-static inline sout_stream_id_t *sout_StreamIdAdd( sout_stream_t *s, es_format_t *fmt )
+static inline sout_stream_id_sys_t *sout_StreamIdAdd( sout_stream_t *s, es_format_t *fmt )
 {
     return s->pf_add( s, fmt );
 }
-static inline int sout_StreamIdDel( sout_stream_t *s, sout_stream_id_t *id )
+static inline int sout_StreamIdDel( sout_stream_t *s, sout_stream_id_sys_t *id )
 {
     return s->pf_del( s, id );
 }
-static inline int sout_StreamIdSend( sout_stream_t *s, sout_stream_id_t *id, block_t *b )
+static inline int sout_StreamIdSend( sout_stream_t *s, sout_stream_id_sys_t *id, block_t *b )
 {
     return s->pf_send( s, id, b );
 }

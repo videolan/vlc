@@ -49,7 +49,7 @@ static void spu_del_buffer( decoder_t *p_dec, subpicture_t *p_subpic )
     VLC_UNUSED( p_dec );
     subpicture_Delete( p_subpic );
 }
-int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
+int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
@@ -99,7 +99,7 @@ int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     return VLC_SUCCESS;
 }
 
-void transcode_spu_close( sout_stream_t *p_stream, sout_stream_id_t *id)
+void transcode_spu_close( sout_stream_t *p_stream, sout_stream_id_sys_t *id)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     /* Close decoder */
@@ -120,7 +120,7 @@ void transcode_spu_close( sout_stream_t *p_stream, sout_stream_id_t *id)
 }
 
 int transcode_spu_process( sout_stream_t *p_stream,
-                                  sout_stream_id_t *id,
+                                  sout_stream_id_sys_t *id,
                                   block_t *in, block_t **out )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -158,7 +158,7 @@ int transcode_spu_process( sout_stream_t *p_stream,
 }
 
 bool transcode_spu_add( sout_stream_t *p_stream, es_format_t *p_fmt,
-                        sout_stream_id_t *id )
+                        sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 

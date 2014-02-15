@@ -36,25 +36,25 @@
 
 #include <assert.h>
 
-static int rtp_packetize_mpa  (sout_stream_id_t *, block_t *);
-static int rtp_packetize_mpv  (sout_stream_id_t *, block_t *);
-static int rtp_packetize_ac3  (sout_stream_id_t *, block_t *);
-static int rtp_packetize_split(sout_stream_id_t *, block_t *);
-static int rtp_packetize_swab (sout_stream_id_t *, block_t *);
-static int rtp_packetize_mp4a (sout_stream_id_t *, block_t *);
-static int rtp_packetize_mp4a_latm (sout_stream_id_t *, block_t *);
-static int rtp_packetize_h263 (sout_stream_id_t *, block_t *);
-static int rtp_packetize_h264 (sout_stream_id_t *, block_t *);
-static int rtp_packetize_amr  (sout_stream_id_t *, block_t *);
-static int rtp_packetize_spx  (sout_stream_id_t *, block_t *);
-static int rtp_packetize_t140 (sout_stream_id_t *, block_t *);
-static int rtp_packetize_g726_16 (sout_stream_id_t *, block_t *);
-static int rtp_packetize_g726_24 (sout_stream_id_t *, block_t *);
-static int rtp_packetize_g726_32 (sout_stream_id_t *, block_t *);
-static int rtp_packetize_g726_40 (sout_stream_id_t *, block_t *);
-static int rtp_packetize_xiph (sout_stream_id_t *, block_t *);
-static int rtp_packetize_vp8 (sout_stream_id_t *, block_t *);
-static int rtp_packetize_jpeg (sout_stream_id_t *, block_t *);
+static int rtp_packetize_mpa  (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_mpv  (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_ac3  (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_split(sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_swab (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_mp4a (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_mp4a_latm (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_h263 (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_h264 (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_amr  (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_spx  (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_t140 (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_g726_16 (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_g726_24 (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_g726_32 (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_g726_40 (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_xiph (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_vp8 (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_jpeg (sout_stream_id_sys_t *, block_t *);
 
 #define XIPH_IDENT (0)
 
@@ -540,11 +540,11 @@ int rtp_get_fmt( vlc_object_t *obj, es_format_t *p_fmt, const char *mux,
 
 
 static int
-rtp_packetize_h264_nal( sout_stream_id_t *id,
+rtp_packetize_h264_nal( sout_stream_id_sys_t *id,
                         const uint8_t *p_data, int i_data, int64_t i_pts,
                         int64_t i_dts, bool b_last, int64_t i_length );
 
-int rtp_packetize_xiph_config( sout_stream_id_t *id, const char *fmtp,
+int rtp_packetize_xiph_config( sout_stream_id_sys_t *id, const char *fmtp,
                                int64_t i_pts )
 {
     if (fmtp == NULL)
@@ -622,7 +622,7 @@ int rtp_packetize_xiph_config( sout_stream_id_t *id, const char *fmtp,
 }
 
 /* rfc5215 */
-static int rtp_packetize_xiph( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_xiph( sout_stream_id_sys_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id) - 6; /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
@@ -677,7 +677,7 @@ static int rtp_packetize_xiph( sout_stream_id_t *id, block_t *in )
     return VLC_SUCCESS;
 }
 
-static int rtp_packetize_mpa( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_mpa( sout_stream_id_sys_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id) - 4; /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
@@ -713,7 +713,7 @@ static int rtp_packetize_mpa( sout_stream_id_t *id, block_t *in )
 }
 
 /* rfc2250 */
-static int rtp_packetize_mpv( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_mpv( sout_stream_id_sys_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id) - 4; /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
@@ -811,7 +811,7 @@ static int rtp_packetize_mpv( sout_stream_id_t *id, block_t *in )
     return VLC_SUCCESS;
 }
 
-static int rtp_packetize_ac3( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_ac3( sout_stream_id_sys_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id) - 2; /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
@@ -847,7 +847,7 @@ static int rtp_packetize_ac3( sout_stream_id_t *id, block_t *in )
     return VLC_SUCCESS;
 }
 
-static int rtp_packetize_split( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_split( sout_stream_id_sys_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id); /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
@@ -880,7 +880,7 @@ static int rtp_packetize_split( sout_stream_id_t *id, block_t *in )
 }
 
 /* split and convert from little endian to network byte order */
-static int rtp_packetize_swab( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_swab( sout_stream_id_sys_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id); /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
@@ -913,7 +913,7 @@ static int rtp_packetize_swab( sout_stream_id_t *id, block_t *in )
 }
 
 /* rfc3016 */
-static int rtp_packetize_mp4a_latm( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_mp4a_latm( sout_stream_id_sys_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id) - 2;              /* payload max in one packet */
     int     latmhdrsize = in->i_buffer / 0xff + 1;
@@ -965,7 +965,7 @@ static int rtp_packetize_mp4a_latm( sout_stream_id_t *id, block_t *in )
     return VLC_SUCCESS;
 }
 
-static int rtp_packetize_mp4a( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_mp4a( sout_stream_id_sys_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id) - 4; /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
@@ -1008,7 +1008,7 @@ static int rtp_packetize_mp4a( sout_stream_id_t *id, block_t *in )
 /* rfc2429 */
 #define RTP_H263_HEADER_SIZE (2)  // plen = 0
 #define RTP_H263_PAYLOAD_START (14)  // plen = 0
-static int rtp_packetize_h263( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_h263( sout_stream_id_sys_t *id, block_t *in )
 {
     uint8_t *p_data = in->p_buffer;
     int     i_data  = in->i_buffer;
@@ -1068,7 +1068,7 @@ static int rtp_packetize_h263( sout_stream_id_t *id, block_t *in )
 
 /* rfc3984 */
 static int
-rtp_packetize_h264_nal( sout_stream_id_t *id,
+rtp_packetize_h264_nal( sout_stream_id_sys_t *id,
                         const uint8_t *p_data, int i_data, int64_t i_pts,
                         int64_t i_dts, bool b_last, int64_t i_length )
 {
@@ -1138,7 +1138,7 @@ rtp_packetize_h264_nal( sout_stream_id_t *id,
     return VLC_SUCCESS;
 }
 
-static int rtp_packetize_h264( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_h264( sout_stream_id_sys_t *id, block_t *in )
 {
     const uint8_t *p_buffer = in->p_buffer;
     int i_buffer = in->i_buffer;
@@ -1178,7 +1178,7 @@ static int rtp_packetize_h264( sout_stream_id_t *id, block_t *in )
     return VLC_SUCCESS;
 }
 
-static int rtp_packetize_amr( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_amr( sout_stream_id_sys_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id) - 2; /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
@@ -1216,7 +1216,7 @@ static int rtp_packetize_amr( sout_stream_id_t *id, block_t *in )
     return VLC_SUCCESS;
 }
 
-static int rtp_packetize_t140( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_t140( sout_stream_id_sys_t *id, block_t *in )
 {
     const size_t   i_max  = rtp_mtu (id);
     const uint8_t *p_data = in->p_buffer;
@@ -1262,7 +1262,7 @@ static int rtp_packetize_t140( sout_stream_id_t *id, block_t *in )
 }
 
 
-static int rtp_packetize_spx( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_spx( sout_stream_id_sys_t *id, block_t *in )
 {
     uint8_t *p_buffer = in->p_buffer;
     int i_data_size, i_payload_size, i_payload_padding;
@@ -1336,7 +1336,7 @@ static int rtp_packetize_spx( sout_stream_id_t *id, block_t *in )
     return VLC_SUCCESS;
 }
 
-static int rtp_packetize_g726( sout_stream_id_t *id, block_t *in, int i_pad )
+static int rtp_packetize_g726( sout_stream_id_sys_t *id, block_t *in, int i_pad )
 {
     int     i_max   = (rtp_mtu( id )- 12 + i_pad - 1) & ~i_pad;
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
@@ -1368,22 +1368,22 @@ static int rtp_packetize_g726( sout_stream_id_t *id, block_t *in, int i_pad )
     return VLC_SUCCESS;
 }
 
-static int rtp_packetize_g726_16( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_g726_16( sout_stream_id_sys_t *id, block_t *in )
 {
     return rtp_packetize_g726( id, in, 4 );
 }
 
-static int rtp_packetize_g726_24( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_g726_24( sout_stream_id_sys_t *id, block_t *in )
 {
     return rtp_packetize_g726( id, in, 8 );
 }
 
-static int rtp_packetize_g726_32( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_g726_32( sout_stream_id_sys_t *id, block_t *in )
 {
     return rtp_packetize_g726( id, in, 2 );
 }
 
-static int rtp_packetize_g726_40( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_g726_40( sout_stream_id_sys_t *id, block_t *in )
 {
     return rtp_packetize_g726( id, in, 8 );
 }
@@ -1391,7 +1391,7 @@ static int rtp_packetize_g726_40( sout_stream_id_t *id, block_t *in )
 #define RTP_VP8_HEADER_SIZE 1
 #define RTP_VP8_PAYLOAD_START (12 + RTP_VP8_HEADER_SIZE)
 
-static int rtp_packetize_vp8( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_vp8( sout_stream_id_sys_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id) - RTP_VP8_HEADER_SIZE;
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
@@ -1434,7 +1434,7 @@ static int rtp_packetize_vp8( sout_stream_id_t *id, block_t *in )
     return VLC_SUCCESS;
 }
 
-static int rtp_packetize_jpeg( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_jpeg( sout_stream_id_sys_t *id, block_t *in )
 {
     uint8_t *p_data = in->p_buffer;
     int      i_data = in->i_buffer;

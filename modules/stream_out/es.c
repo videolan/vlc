@@ -119,9 +119,9 @@ static const char *const ppsz_sout_options[] = {
     NULL
 };
 
-static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
-static int               Del ( sout_stream_t *, sout_stream_id_t * );
-static int               Send( sout_stream_t *, sout_stream_id_t *, block_t* );
+static sout_stream_id_sys_t *Add ( sout_stream_t *, es_format_t * );
+static int               Del ( sout_stream_t *, sout_stream_id_sys_t * );
+static int               Send( sout_stream_t *, sout_stream_id_sys_t *, block_t* );
 
 struct sout_stream_sys_t
 {
@@ -202,7 +202,7 @@ static void Close( vlc_object_t * p_this )
     free( p_sys );
 }
 
-struct sout_stream_id_t
+struct sout_stream_id_sys_t
 {
     sout_input_t *p_input;
     sout_mux_t   *p_mux;
@@ -269,10 +269,10 @@ static char * es_print_url( const char *psz_fmt, vlc_fourcc_t i_fourcc, int i_co
     return( psz_dst );
 }
 
-static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_sys_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    sout_stream_id_t  *id;
+    sout_stream_id_sys_t  *id;
 
     const char        *psz_access;
     const char        *psz_mux;
@@ -384,7 +384,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     }
     free( psz_dst );
 
-    id = malloc( sizeof( sout_stream_id_t ) );
+    id = malloc( sizeof( sout_stream_id_sys_t ) );
     if( !id )
     {
         sout_MuxDelete( p_mux );
@@ -408,7 +408,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     return id;
 }
 
-static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
+static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     VLC_UNUSED(p_stream);
     sout_access_out_t *p_access = id->p_mux->p_access;
@@ -423,7 +423,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     return VLC_SUCCESS;
 }
 
-static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
+static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                  block_t *p_buffer )
 {
     VLC_UNUSED(p_stream);

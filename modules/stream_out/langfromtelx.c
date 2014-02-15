@@ -84,15 +84,15 @@ static const char *ppsz_sout_options[] = {
     "id", "magazine", "page", "row", NULL
 };
 
-static sout_stream_id_t *Add   ( sout_stream_t *, es_format_t * );
-static int               Del   ( sout_stream_t *, sout_stream_id_t * );
-static int               Send  ( sout_stream_t *, sout_stream_id_t *, block_t * );
+static sout_stream_id_sys_t *Add   ( sout_stream_t *, es_format_t * );
+static int               Del   ( sout_stream_t *, sout_stream_id_sys_t * );
+static int               Send  ( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
 
 struct sout_stream_sys_t
 {
     int i_id, i_magazine, i_page, i_row;
     char *psz_language, *psz_old_language;
-    sout_stream_id_t *p_id, *p_telx;
+    sout_stream_id_sys_t *p_id, *p_telx;
     int i_current_page;
 };
 
@@ -143,7 +143,7 @@ static void Close( vlc_object_t * p_this )
     free( p_sys );
 }
 
-static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
 
@@ -173,7 +173,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     return p_stream->p_next->pf_add( p_stream->p_next, p_fmt );
 }
 
-static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
+static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
 
@@ -303,7 +303,7 @@ static void HandleTelx( sout_stream_t *p_stream, block_t *p_block )
 /*****************************************************************************
  * Send:
  *****************************************************************************/
-static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
+static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                  block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;

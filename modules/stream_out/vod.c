@@ -505,7 +505,7 @@ const char *vod_get_mux(const vod_media_t *p_media)
 /* Match an RTP id to a VoD media ES and RTSP track to initialize it
  * with the data that was already set up */
 int vod_init_id(vod_media_t *p_media, const char *psz_session, int es_id,
-                sout_stream_id_t *sout_id, rtp_format_t *rtp_fmt,
+                sout_stream_id_sys_t *sout_id, rtp_format_t *rtp_fmt,
                 uint32_t *ssrc, uint16_t *seq_init)
 {
     media_es_t *p_es;
@@ -541,7 +541,7 @@ int vod_init_id(vod_media_t *p_media, const char *psz_session, int es_id,
 
 /* Remove references to the RTP id from its RTSP track */
 void vod_detach_id(vod_media_t *p_media, const char *psz_session,
-                   sout_stream_id_t *sout_id)
+                   sout_stream_id_sys_t *sout_id)
 {
     RtspTrackDetach(p_media->rtsp, psz_session, sout_id);
 }

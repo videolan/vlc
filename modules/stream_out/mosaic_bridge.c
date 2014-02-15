@@ -73,9 +73,9 @@ struct decoder_owner_sys_t
  *****************************************************************************/
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
-static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
-static int               Del ( sout_stream_t *, sout_stream_id_t * );
-static int               Send( sout_stream_t *, sout_stream_id_t *, block_t * );
+static sout_stream_id_sys_t *Add ( sout_stream_t *, es_format_t * );
+static int               Del ( sout_stream_t *, sout_stream_id_sys_t * );
+static int               Send( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
 
 inline static void video_del_buffer_decoder( decoder_t *, picture_t * );
 inline static void video_del_buffer_filter( filter_t *, picture_t * );
@@ -282,7 +282,7 @@ static int video_filter_buffer_allocation_init( filter_t *p_filter, void *p_data
     return VLC_SUCCESS;
 }
 
-static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     bridge_t *p_bridge;
@@ -416,10 +416,10 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         p_sys->p_vf2 = NULL;
     }
 
-    return (sout_stream_id_t *)p_sys;
+    return (sout_stream_id_sys_t *)p_sys;
 }
 
-static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
+static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     VLC_UNUSED(id);
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -510,7 +510,7 @@ static void PushPicture( sout_stream_t *p_stream, picture_t *p_picture )
     vlc_global_unlock( VLC_MOSAIC_MUTEX );
 }
 
-static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
+static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                  block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;

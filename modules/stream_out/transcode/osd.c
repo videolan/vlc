@@ -36,7 +36,7 @@
 /*
  * OSD menu
  */
-int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
+int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
@@ -97,7 +97,7 @@ int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     return VLC_EGENERIC;
 }
 
-void transcode_osd_close( sout_stream_t *p_stream, sout_stream_id_t *id)
+void transcode_osd_close( sout_stream_t *p_stream, sout_stream_id_sys_t *id)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
@@ -110,7 +110,7 @@ void transcode_osd_close( sout_stream_t *p_stream, sout_stream_id_t *id)
     p_sys->b_osd = false;
 }
 
-int transcode_osd_process( sout_stream_t *p_stream, sout_stream_id_t *id,
+int transcode_osd_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                                   block_t *in, block_t **out )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -154,7 +154,7 @@ int transcode_osd_process( sout_stream_t *p_stream, sout_stream_id_t *id,
 }
 
 bool transcode_osd_add( sout_stream_t *p_stream, es_format_t *p_fmt,
-                                sout_stream_id_t *id)
+                                sout_stream_id_sys_t *id)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 

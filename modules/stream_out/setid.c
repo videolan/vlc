@@ -95,10 +95,10 @@ static const char *ppsz_sout_options_lang[] = {
     "id", "lang", NULL
 };
 
-static sout_stream_id_t *AddId   ( sout_stream_t *, es_format_t * );
-static sout_stream_id_t *AddLang ( sout_stream_t *, es_format_t * );
-static int               Del     ( sout_stream_t *, sout_stream_id_t * );
-static int               Send    ( sout_stream_t *, sout_stream_id_t *, block_t * );
+static sout_stream_id_sys_t *AddId   ( sout_stream_t *, es_format_t * );
+static sout_stream_id_sys_t *AddLang ( sout_stream_t *, es_format_t * );
+static int               Del     ( sout_stream_t *, sout_stream_id_sys_t * );
+static int               Send    ( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
 
 struct sout_stream_sys_t
 {
@@ -185,7 +185,7 @@ static void Close( vlc_object_t * p_this )
     free( p_sys );
 }
 
-static sout_stream_id_t * AddId( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_sys_t * AddId( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
 
@@ -199,7 +199,7 @@ static sout_stream_id_t * AddId( sout_stream_t *p_stream, es_format_t *p_fmt )
     return p_stream->p_next->pf_add( p_stream->p_next, p_fmt );
 }
 
-static sout_stream_id_t * AddLang( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_sys_t * AddLang( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
 
@@ -214,12 +214,12 @@ static sout_stream_id_t * AddLang( sout_stream_t *p_stream, es_format_t *p_fmt )
     return p_stream->p_next->pf_add( p_stream->p_next, p_fmt );
 }
 
-static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
+static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     return p_stream->p_next->pf_del( p_stream->p_next, id );
 }
 
-static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
+static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                  block_t *p_buffer )
 {
     return p_stream->p_next->pf_send( p_stream->p_next, id, p_buffer );
