@@ -832,18 +832,6 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     while( (p_pic = id->p_decoder->pf_decode_video( id->p_decoder, &in )) )
     {
 
-        if( p_stream->p_sout->i_out_pace_nocontrol && p_sys->b_hurry_up )
-        {
-            mtime_t current_date = mdate();
-            if( unlikely( (current_date - 50000) > p_pic->date ) )
-            {
-                msg_Dbg( p_stream, "late picture skipped (%"PRId64")",
-                         current_date - 50000 - p_pic->date );
-                picture_Release( p_pic );
-                continue;
-            }
-        }
-
         if( unlikely (
              id->p_encoder->p_module &&
              !video_format_IsSimilar( &p_sys->fmt_input_video, &id->p_decoder->fmt_out.video )

@@ -137,9 +137,6 @@
     "This option will drop/duplicate video frames to synchronise the video " \
     "track on the audio track." )
 
-#define HURRYUP_TEXT N_( "Hurry up" )
-#define HURRYUP_LONGTEXT N_( "The transcoder will drop frames if your CPU " \
-                "can't keep up with the encoding rate." )
 
 static const char *const ppsz_deinterlace_type[] =
 {
@@ -170,8 +167,7 @@ vlc_module_begin ()
                SCALE_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "fps", NULL, FPS_TEXT,
                FPS_LONGTEXT, false )
-    add_bool( SOUT_CFG_PREFIX "hurry-up", false, HURRYUP_TEXT,
-               HURRYUP_LONGTEXT, false )
+    add_obsolete_bool( SOUT_CFG_PREFIX "hurry-up"); /* Since 2.2.0 */
     add_bool( SOUT_CFG_PREFIX "deinterlace", false, DEINTERLACE_TEXT,
               DEINTERLACE_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "deinterlace-module", "deinterlace",
@@ -232,7 +228,7 @@ vlc_module_end ()
 static const char *const ppsz_sout_options[] = {
     "venc", "vcodec", "vb",
     "scale", "fps", "width", "height", "vfilter", "deinterlace",
-    "deinterlace-module", "threads", "hurry-up", "aenc", "acodec", "ab", "alang",
+    "deinterlace-module", "threads", "aenc", "acodec", "ab", "alang",
     "afilter", "samplerate", "channels", "senc", "scodec", "soverlay",
     "sfilter", "osd", "audio-sync", "high-priority", "maxwidth", "maxheight",
     NULL
@@ -350,8 +346,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->f_scale = var_GetFloat( p_stream, SOUT_CFG_PREFIX "scale" );
 
     p_sys->b_master_sync = var_InheritURational( p_stream, &p_sys->fps_num, &p_sys->fps_den, SOUT_CFG_PREFIX "fps" );
-
-    p_sys->b_hurry_up = var_GetBool( p_stream, SOUT_CFG_PREFIX "hurry-up" );
 
     p_sys->i_width = var_GetInteger( p_stream, SOUT_CFG_PREFIX "width" );
 
