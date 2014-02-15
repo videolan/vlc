@@ -116,6 +116,8 @@ static int Open( vlc_object_t *p_this )
             free( p_sys );
             free( outputFile );
             return VLC_EGENERIC;
+        } else {
+            fprintf( p_sys->output,"#prefix\ttrack\ttype\tsegment_number\tdts_difference\tlength\tmd5\n");
         }
         free( outputFile );
     }
@@ -193,7 +195,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     msg_Dbg( p_stream, "%s: Removing track type:%s id:%d", p_sys->prefix, id->type, id->id );
     if( p_sys->output )
     {
-        fprintf( p_sys->output,"%s: final type:%s id:%d segments:%"PRIu64" md5:%16s\n",
+        fprintf( p_sys->output,"#%s: final type:%s id:%d segments:%"PRIu64" md5:%16s\n",
                p_sys->prefix, id->type, id->id, id->segment_number, outputhash );
     } else {
         msg_Info( p_stream, "%s: final type:%s id:%d segments:%"PRIu64" md5:%16s",
@@ -226,7 +228,8 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
          */
         if( p_sys->output )
         {
-            fprintf( p_sys->output, "%s: track:%d type:%s segment_number:%"PRIu64" dts_difference:%"PRId64" length:%"PRId64" md5:%16s\n",
+            /* Write data in a form that it's easy to plot for example with gnuplot*/
+            fprintf( p_sys->output, "%s\t%d\t%s\t%"PRIu64"\t%"PRId64"\t%"PRId64"\t%16s\n",
                   p_sys->prefix, id->id, id->type, ++id->segment_number, p_block->i_dts - id->previous_dts,
                   p_block->i_length, outputhash );
 
