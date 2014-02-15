@@ -83,7 +83,7 @@ struct sout_stream_id_sys_t
     uint64_t segment_number;
     void *next_id;
     const char *type;
-    mtime_t previous_dts;
+    mtime_t previous_dts,track_duration;
     struct md5_s hash;
 };
 
@@ -176,6 +176,7 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->next_id = NULL;
     id->segment_number = 0;
     id->previous_dts = VLC_TS_INVALID;
+    id->track_duration = 0;
     InitMD5( &id->hash );
 
     msg_Dbg( p_stream, "%s: Adding track type:%s id:%d", p_sys->prefix, id->type, id->id);
@@ -195,11 +196,11 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     msg_Dbg( p_stream, "%s: Removing track type:%s id:%d", p_sys->prefix, id->type, id->id );
     if( p_sys->output )
     {
-        fprintf( p_sys->output,"#%s: final type:%s id:%d segments:%"PRIu64" md5:%16s\n",
-               p_sys->prefix, id->type, id->id, id->segment_number, outputhash );
+        fprintf( p_sys->output,"#%s: final type:%s id:%d segments:%"PRIu64" total_duration:%"PRId64" md5:%16s\n",
+               p_sys->prefix, id->type, id->id, id->segment_number, id->track_duration, outputhash );
     } else {
-        msg_Info( p_stream, "%s: final type:%s id:%d segments:%"PRIu64" md5:%16s",
-               p_sys->prefix, id->type, id->id, id->segment_number, outputhash );
+        msg_Info( p_stream, "%s: final type:%s id:%d segments:%"PRIu64" total_duration:%"PRId64" md5:%16s",
+               p_sys->prefix, id->type, id->id, id->segment_number, id->track_duration, outputhash );
     }
     free( outputhash );
     if( id->next_id ) sout_StreamIdDel( p_stream->p_next, id->next_id );
@@ -241,6 +242,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                   p_sys->prefix, id->id, id->type, ++id->segment_number, dts_difference,
                   p_block->i_length, outputhash );
         }
+        id->track_duration += p_block->i_length ? p_block->i_length : dts_difference;
         free( outputhash );
         id->previous_dts = p_block->i_dts;
         p_block = p_block->p_next;
