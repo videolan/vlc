@@ -247,7 +247,6 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     p_sys->b_active = false;
     p_sys->i_mode   = ES_OUT_MODE_NONE;
 
-
     TAB_INIT( p_sys->i_pgrm, p_sys->pgrm );
 
     TAB_INIT( p_sys->i_es, p_sys->es );
@@ -296,6 +295,33 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     p_sys->i_preroll_end = -1;
 
     return out;
+}
+
+int es_out_GetEsState( es_out_t *out, const int i_cat, bool *b_selected, bool *b_error)
+{
+    if( !out && !out->p_sys )
+        return VLC_EGENERIC;
+
+    es_out_id_t *p_es;
+    switch( i_cat )
+    {
+        case VIDEO_ES:
+            p_es = out->p_sys->p_es_video;
+            break;
+        case AUDIO_ES:
+            p_es = out->p_sys->p_es_audio;
+            break;
+        case SPU_ES:
+            p_es = out->p_sys->p_es_sub;
+            break;
+        default:
+            p_es = NULL;
+            return VLC_EGENERIC;
+    }
+    if( !p_es )
+        return VLC_EGENERIC;
+
+    return es_out_Control( out, ES_OUT_GET_ES_STATE, p_es, b_selected, b_error );
 }
 
 /*****************************************************************************
@@ -591,8 +617,6 @@ static void EsOutChangePosition( es_out_t *out )
     p_sys->i_buffering_extra_system = 0;
     p_sys->i_preroll_end = -1;
 }
-
-
 
 static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
 {
@@ -1570,6 +1594,7 @@ static void EsCreateDecoder( es_out_t *out, es_out_id_t *p_es )
 
     EsOutDecoderChangeDelay( out, p_es );
 }
+
 static void EsDestroyDecoder( es_out_t *out, es_out_id_t *p_es )
 {
     VLC_UNUSED(out);
@@ -2132,8 +2157,10 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     {
         es_out_id_t *es = va_arg( args, es_out_id_t * );
         bool *pb = va_arg( args, bool * );
+        bool *pb_error = va_arg( args, bool *);
 
         *pb = EsIsSelected( es );
+        *pb_error = (es->p_dec ? atomic_load( &es->p_dec->b_error ) : false);
         return VLC_SUCCESS;
     }
 
@@ -2696,6 +2723,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         return VLC_EGENERIC;
     }
 }
+
 static int EsOutControl( es_out_t *out, int i_query, va_list args )
 {
     es_out_sys_t *p_sys = out->p_sys;

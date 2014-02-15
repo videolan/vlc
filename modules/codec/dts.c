@@ -310,7 +310,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             if( !(p_buf = GetOutBuffer( p_dec, &p_out_buffer )) )
             {
-                //p_dec->b_error = true;
+                //atomic_store( &p_dec->b_error, true );
                 return NULL;
             }
 

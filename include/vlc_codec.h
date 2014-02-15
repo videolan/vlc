@@ -24,6 +24,7 @@
 #ifndef VLC_CODEC_H
 #define VLC_CODEC_H 1
 
+#include <vlc_atomic.h>
 #include <vlc_block.h>
 #include <vlc_es.h>
 #include <vlc_picture.h>
@@ -131,7 +132,7 @@ struct decoder_t
     /* Private structure for the owner of the decoder */
     decoder_owner_sys_t *p_owner;
 
-    bool                b_error;
+    atomic_bool       b_error;
 };
 
 /**

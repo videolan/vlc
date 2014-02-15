@@ -729,6 +729,8 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_dec->pf_get_cc = NULL;
     p_dec->pf_packetize = NULL;
 
+    atomic_init( &p_dec->b_error, false );
+
     /* Initialize the decoder */
     p_dec->p_module = NULL;
 
@@ -1534,7 +1536,7 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
             {
                 msg_Err( p_dec, "cannot create packetizer output (%4.4s)",
                          (char *)&p_owner->sout.i_codec );
-                p_dec->b_error = true;
+                atomic_store( &p_dec->b_error, true );
 
                 block_ChainRelease(p_sout_block);
                 break;
@@ -1758,7 +1760,7 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
     decoder_owner_sys_t *p_owner = (decoder_owner_sys_t *)p_dec->p_owner;
     const bool b_flush_request = p_block && (p_block->i_flags & BLOCK_FLAG_CORE_FLUSH);
 
-    if( p_dec->b_error )
+    if( atomic_load( &p_dec->b_error ) )
     {
         if( p_block )
             block_Release( p_block );
@@ -1810,7 +1812,7 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
         else
         {
             msg_Err( p_dec, "unknown ES format" );
-            p_dec->b_error = true;
+            atomic_store( &p_dec->b_error, true );
         }
     }
 
@@ -2022,7 +2024,7 @@ static int aout_update_format( decoder_t *p_dec )
         if( p_aout == NULL )
         {
             msg_Err( p_dec, "failed to create audio output" );
-            p_dec->b_error = true;
+            atomic_store( &p_dec->b_error, true );
             return -1;
         }
 
@@ -2155,7 +2157,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         if( p_vout == NULL )
         {
             msg_Err( p_dec, "failed to create video output" );
-            p_dec->b_error = true;
+            atomic_store( &p_dec->b_error, true );
             return NULL;
         }
     }
@@ -2164,7 +2166,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
      */
     for( ;; )
     {
-        if( DecoderIsExitRequested( p_dec ) || p_dec->b_error )
+        if( DecoderIsExitRequested( p_dec ) || atomic_load( &p_dec->b_error ) )
             return NULL;
 
         picture_t *p_picture = vout_GetPicture( p_owner->p_vout );
@@ -2210,7 +2212,7 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
 
     while( i_attempts-- )
     {
-        if( DecoderIsExitRequested( p_dec ) || p_dec->b_error )
+        if( DecoderIsExitRequested( p_dec ) || atomic_load( &p_dec->b_error ) )
             break;
 
         p_vout = input_resource_HoldVout( p_owner->p_resource );

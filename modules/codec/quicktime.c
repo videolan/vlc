@@ -538,7 +538,7 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
         if( OpenAudio( p_dec ) )
         {
             /* Fatal */
-            p_dec->b_error = true;
+            atomic_store( &p_dec->b_error, true );
             return NULL;
         }
 
@@ -883,7 +883,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         if( OpenVideo( p_dec ) )
         {
             /* Fatal */
-            p_dec->b_error = true;
+            atomic_store( &p_dec->b_error, true );
             return NULL;
         }
         p_sys = p_dec->p_sys;
