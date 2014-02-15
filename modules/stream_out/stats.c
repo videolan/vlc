@@ -84,6 +84,7 @@ struct sout_stream_id_t
     void *next_id;
     const char *type;
     mtime_t previous_dts;
+    struct md5_s hash;
 };
 
 /*****************************************************************************
@@ -173,6 +174,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->next_id = NULL;
     id->segment_number = 0;
     id->previous_dts = VLC_TS_INVALID;
+    InitMD5( &id->hash );
 
     msg_Dbg( p_stream, "%s: Adding track type:%s id:%d", p_sys->prefix, id->type, id->id);
 
@@ -186,7 +188,18 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
 
+    EndMD5( &id->hash );
+    char *outputhash = psz_md5_hash( &id->hash );
     msg_Dbg( p_stream, "%s: Removing track type:%s id:%d", p_sys->prefix, id->type, id->id );
+    if( p_sys->output )
+    {
+        fprintf( p_sys->output,"%s: final type:%s id:%d segments:%"PRIu64" md5:%16s\n",
+               p_sys->prefix, id->type, id->id, id->segment_number, outputhash );
+    } else {
+        msg_Info( p_stream, "%s: final type:%s id:%d segments:%"PRIu64" md5:%16s",
+               p_sys->prefix, id->type, id->id, id->segment_number, outputhash );
+    }
+    free( outputhash );
     if( id->next_id ) sout_StreamIdDel( p_stream->p_next, id->next_id );
     free( id );
 
@@ -204,6 +217,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     {
         InitMD5( &hash );
         AddMD5( &hash, p_block->p_buffer, p_block->i_buffer );
+        AddMD5( &id->hash, p_block->p_buffer, p_block->i_buffer );
         EndMD5( &hash );
         char *outputhash = psz_md5_hash( &hash );
 
