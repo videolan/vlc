@@ -226,16 +226,19 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         /* We could just set p_sys->output to stdout and remove user of msg_Dbg
          * if we don't need ability to output info to gui modules (like qt4 messages window
          */
+        mtime_t dts_difference = VLC_TS_INVALID;
+        if( likely( id->previous_dts != VLC_TS_INVALID ) )
+            dts_difference = p_block->i_dts - id->previous_dts;
         if( p_sys->output )
         {
             /* Write data in a form that it's easy to plot for example with gnuplot*/
             fprintf( p_sys->output, "%s\t%d\t%s\t%"PRIu64"\t%"PRId64"\t%"PRId64"\t%16s\n",
-                  p_sys->prefix, id->id, id->type, ++id->segment_number, p_block->i_dts - id->previous_dts,
+                  p_sys->prefix, id->id, id->type, ++id->segment_number, dts_difference,
                   p_block->i_length, outputhash );
 
         } else {
             msg_Dbg( p_stream, "%s: track:%d type:%s segment_number:%"PRIu64" dts_difference:%"PRId64" length:%"PRId64" md5:%16s",
-                  p_sys->prefix, id->id, id->type, ++id->segment_number, p_block->i_dts - id->previous_dts,
+                  p_sys->prefix, id->id, id->type, ++id->segment_number, dts_difference,
                   p_block->i_length, outputhash );
         }
         free( outputhash );
