@@ -1242,8 +1242,8 @@ static int Demux( demux_t *p_demux )
 
         if( tk->p_es )
         {
-            bool b;
-            es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
+            bool b, b_error;
+            es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b, &b_error );
             if( !b && tk->b_selected )
             {
                 tk->b_selected = false;

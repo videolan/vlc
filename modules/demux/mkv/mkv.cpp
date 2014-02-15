@@ -502,8 +502,8 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
 
     if ( tk->fmt.i_cat != NAV_ES )
     {
-        bool b;
-        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
+        bool b, b_error;
+        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b, &b_error );
 
         if( !b )
         {

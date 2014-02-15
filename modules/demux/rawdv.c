@@ -252,7 +252,7 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     block_t     *p_block;
-    bool  b_audio = false;
+    bool  b_audio = false, b_error;
 
     if( p_sys->b_hurry_up )
     {
@@ -272,7 +272,7 @@ static int Demux( demux_t *p_demux )
     if( p_sys->p_es_audio )
     {
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
-                        p_sys->p_es_audio, &b_audio );
+                        p_sys->p_es_audio, &b_audio, &b_error );
     }
 
     p_block->i_dts =
