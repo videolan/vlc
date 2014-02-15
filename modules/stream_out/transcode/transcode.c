@@ -657,7 +657,11 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     switch( id->p_decoder->fmt_in.i_cat )
     {
     case AUDIO_ES:
-        transcode_audio_process( p_stream, id, p_buffer, &p_out );
+        if( transcode_audio_process( p_stream, id, p_buffer, &p_out )
+            != VLC_SUCCESS )
+        {
+            return VLC_EGENERIC;
+        }
         break;
 
     case VIDEO_ES:

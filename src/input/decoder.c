@@ -1467,7 +1467,7 @@ static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic )
 }
 
 #ifdef ENABLE_SOUT
-static void DecoderPlaySout( decoder_t *p_dec, block_t *p_sout_block )
+static int DecoderPlaySout( decoder_t *p_dec, block_t *p_sout_block )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
@@ -1490,9 +1490,15 @@ static void DecoderPlaySout( decoder_t *p_dec, block_t *p_sout_block )
     vlc_mutex_unlock( &p_owner->lock );
 
     if( !b_reject )
-        sout_InputSendBuffer( p_owner->p_sout_input, p_sout_block ); // FIXME --VLC_TS_INVALID inspect stream_output/*
+    {
+        /* FIXME --VLC_TS_INVALID inspect stream_output*/
+        return sout_InputSendBuffer( p_owner->p_sout_input, p_sout_block );
+    }
     else
+    {
         block_Release( p_sout_block );
+        return VLC_EGENERIC;
+    }
 }
 #endif
 
@@ -1541,7 +1547,16 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
 
             p_sout_block->p_next = NULL;
 
-            DecoderPlaySout( p_dec, p_sout_block );
+            if( DecoderPlaySout( p_dec, p_sout_block ) == VLC_EGENERIC )
+            {
+                msg_Err( p_dec, "cannot continue streaming due to errors" );
+
+                p_dec->b_error = true;
+
+                /* Cleanup */
+                block_ChainRelease( p_next );
+                return;
+            }
 
             p_sout_block = p_next;
         }

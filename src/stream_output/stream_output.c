@@ -512,7 +512,7 @@ void sout_MuxDeleteStream( sout_mux_t *p_mux, sout_input_t *p_input )
 /*****************************************************************************
  * sout_MuxSendBuffer:
  *****************************************************************************/
-void sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
+int sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
                          block_t *p_buffer )
 {
     block_FifoPut( p_input->p_fifo, p_buffer );
@@ -535,10 +535,10 @@ void sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
         /* Wait until we have enought data before muxing */
         if( p_mux->i_add_stream_start < 0 ||
             p_buffer->i_dts < p_mux->i_add_stream_start + i_caching )
-            return;
+            return VLC_SUCCESS;
         p_mux->b_waiting_stream = false;
     }
-    p_mux->pf_mux( p_mux );
+    return p_mux->pf_mux( p_mux );
 }
 
 

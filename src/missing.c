@@ -287,7 +287,7 @@ sout_mux_t *sout_MuxNew (sout_instance_t *instance, const char *mux,
     assert (0);
 }
 
-void sout_MuxSendBuffer (sout_mux_t *mux, sout_input_t *input, block_t *block)
+int sout_MuxSendBuffer (sout_mux_t *mux, sout_input_t *input, block_t *block)
 {
     assert (0);
 }
