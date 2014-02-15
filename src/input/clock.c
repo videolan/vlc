@@ -436,7 +436,7 @@ int input_clock_ConvertTS( input_clock_t *cl,
         *pi_ts0 += i_ts_delay;
     }
 
-    /* XXX we do not ipdate i_ts_max on purpose */
+    /* XXX we do not update i_ts_max on purpose */
     if( pi_ts1 && *pi_ts1 > VLC_TS_INVALID )
     {
         *pi_ts1 = ClockStreamToSystem( cl, *pi_ts1 + AvgGet( &cl->drift ) ) +
