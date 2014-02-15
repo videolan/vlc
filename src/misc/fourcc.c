@@ -71,6 +71,7 @@ static const staticentry_t p_list_video[] = {
         A("mp1v"),
         A("mpg1"),
 
+    B(VLC_CODEC_MPGV, "MPEG-1/2 Video"),
     B(VLC_CODEC_MP2V, "MPEG-2 Video"),
         A("mpgv"),
         A("mpeg"),
