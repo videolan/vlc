@@ -130,6 +130,15 @@ static const char *const itunes_list_text[] = {
     N_("Do nothing"), N_("Pause iTunes"), N_("Pause and resume iTunes")
 };
 
+#define SPOTIFY_TEXT N_("Pause Spotify during VLC playback")
+#define SPOTIFY_LONGTEXT N_("Pauses Spotify playback when VLC playback starts. If selected, Spotify playback will be resumed again if VLC playback is finished.")
+
+static const int spotify_list[] =
+    { 0, 1, 2 };
+static const char *const spotify_list_text[] = {
+    N_("Do nothing"), N_("Pause Spotify"), N_("Pause and resume Spotify")
+};
+
 #define VOLUME_MAX_TEXT N_("Maximum Volume displayed")
 
 
@@ -162,6 +171,8 @@ vlc_module_begin()
         add_bool("macosx-lock-aspect-ratio", true, LOCK_ASPECT_RATIO_TEXT, LOCK_ASPECT_RATIO_TEXT, true)
         add_integer("macosx-control-itunes", 1, ITUNES_TEXT, ITUNES_LONGTEXT, false)
         change_integer_list(itunes_list, itunes_list_text)
+        add_integer("macosx-control-spotify", 1, SPOTIFY_TEXT, SPOTIFY_LONGTEXT, false)
+        change_integer_list(spotify_list, spotify_list_text)
 
     set_section(N_("Apple Remote and media keys"), 0)
         add_bool("macosx-appleremote", true, USE_APPLE_REMOTE_TEXT, USE_APPLE_REMOTE_LONGTEXT, false)
