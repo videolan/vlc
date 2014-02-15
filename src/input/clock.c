@@ -446,9 +446,15 @@ int input_clock_ConvertTS( input_clock_t *cl,
     vlc_mutex_unlock( &cl->lock );
 
     /* Check ts validity */
-    if( i_ts_bound != INT64_MAX &&
-        *pi_ts0 > VLC_TS_INVALID && *pi_ts0 >= mdate() + i_ts_delay + i_ts_buffering + i_ts_bound )
-        return VLC_EGENERIC;
+    if (i_ts_bound != INT64_MAX && *pi_ts0 > VLC_TS_INVALID) {
+        if (*pi_ts0 >= mdate() + i_ts_delay + i_ts_buffering + i_ts_bound) {
+            vlc_Log(NULL, VLC_MSG_ERR, "clock",
+                "Timestamp conversion failed (delay %"PRId64", buffering "
+                "%"PRId64", bound %"PRId64")",
+                i_ts_delay, i_ts_buffering, i_ts_bound);
+            return VLC_EGENERIC;
+        }
+    }
 
     return VLC_SUCCESS;
 }
