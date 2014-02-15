@@ -5,7 +5,7 @@
  top_srcdir = @top_srcdir@
  ACLOCAL_AMFLAGS = -I m4
 -SUBDIRS = src examples misc
-+SUBDIRS = src misc
++SUBDIRS = src
  DIST_SUBDIRS = $(SUBDIRS) doc wince
  EXTRA_DIST = libdvbpsi.spec libdvbpsi.spec.in libdvbpsi.pc.in bootstrap
  pkgconfigdir = $(libdir)/pkgconfig
