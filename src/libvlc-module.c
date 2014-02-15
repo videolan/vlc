@@ -1905,7 +1905,7 @@ vlc_module_begin ()
                                 SOUT_DISPLAY_LONGTEXT, true )
     add_bool( "sout-keep", false, SOUT_KEEP_TEXT,
                                 SOUT_KEEP_LONGTEXT, true )
-    add_bool( "sout-all", 0, SOUT_ALL_TEXT,
+    add_bool( "sout-all", true, SOUT_ALL_TEXT,
                                 SOUT_ALL_LONGTEXT, true )
     add_bool( "sout-audio", 1, SOUT_AUDIO_TEXT,
                                 SOUT_AUDIO_LONGTEXT, true )
