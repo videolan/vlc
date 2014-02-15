@@ -51,7 +51,7 @@
 static struct
 {
     addon_type_t t;
-    const char const * psz_dir;
+    const char * const psz_dir;
 } const addons_dirs[] = {
     { ADDON_EXTENSION,           ADDONS_SCRIPTS_DIR DIR_SEP "extensions" },
     { ADDON_PLAYLIST_PARSER,     ADDONS_SCRIPTS_DIR DIR_SEP "playlist" },
