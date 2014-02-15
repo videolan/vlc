@@ -1,10 +1,9 @@
-diff -ru libdvbpsi/Makefile.in libdvbpsi/Makefile.in
---- libdvbpsi/Makefile.in	2011-11-03 16:55:02.000000000 +0100
-+++ dvb.fix/Makefile.in	2012-03-20 17:19:49.000000000 +0100
-@@ -245,7 +245,7 @@
- top_build_prefix = @top_build_prefix@
+--- libdvbpsi/Makefile.in	2013-11-10 14:17:53.000000000 +0200
++++ dvbpsi.fix/Makefile.in	2014-02-15 17:25:31.184012648 +0200
+@@ -349,7 +349,7 @@
  top_builddir = @top_builddir@
  top_srcdir = @top_srcdir@
+ ACLOCAL_AMFLAGS = -I m4
 -SUBDIRS = src examples misc
 +SUBDIRS = src misc
  DIST_SUBDIRS = $(SUBDIRS) doc wince
