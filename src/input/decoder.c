@@ -1530,12 +1530,7 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
                          (char *)&p_owner->sout.i_codec );
                 p_dec->b_error = true;
 
-                while( p_sout_block )
-                {
-                    block_t *p_next = p_sout_block->p_next;
-                    block_Release( p_sout_block );
-                    p_sout_block = p_next;
-                }
+                block_ChainRelease(p_sout_block);
                 break;
             }
         }
