@@ -193,14 +193,16 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 
     EndMD5( &id->hash );
     char *outputhash = psz_md5_hash( &id->hash );
+    unsigned int num,den;
+    vlc_ureduce( &num, &den, id->track_duration, id->segment_number, 0 );
     msg_Dbg( p_stream, "%s: Removing track type:%s id:%d", p_sys->prefix, id->type, id->id );
     if( p_sys->output )
     {
-        fprintf( p_sys->output,"#%s: final type:%s id:%d segments:%"PRIu64" total_duration:%"PRId64" md5:%16s\n",
-               p_sys->prefix, id->type, id->id, id->segment_number, id->track_duration, outputhash );
+        fprintf( p_sys->output,"#%s: final type:%s id:%d segments:%"PRIu64" total_duration:%"PRId64" avg_track:%d/%d md5:%16s\n",
+               p_sys->prefix, id->type, id->id, id->segment_number, id->track_duration, num, den, outputhash );
     } else {
-        msg_Info( p_stream, "%s: final type:%s id:%d segments:%"PRIu64" total_duration:%"PRId64" md5:%16s",
-               p_sys->prefix, id->type, id->id, id->segment_number, id->track_duration, outputhash );
+        msg_Info( p_stream, "%s: final type:%s id:%d segments:%"PRIu64" total_duration:%"PRId64" avg_track:%d/%d md5:%16s",
+               p_sys->prefix, id->type, id->id, id->segment_number, id->track_duration, num, den, outputhash );
     }
     free( outputhash );
     if( id->next_id ) sout_StreamIdDel( p_stream->p_next, id->next_id );
