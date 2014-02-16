@@ -92,4 +92,5 @@ SOURCES_macosx = \
 	BWQuincyUI.h \
 	BWQuincyUI.m \
 	iTunes.h \
+	Spotify.h \
 	$(NULL)
