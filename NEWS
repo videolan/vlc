@@ -22,7 +22,7 @@ Decoder:
  * Teletext subtitles display improvements
  * Mediacodec speed improvements on x86
  * Support setting the post processing level in Theora
- * OpenMax IL imrpovements, notably for RaspberryPi
+ * OpenMax IL improvements, notably for RaspberryPi
  * Fix channel ordering of LPCM codec in m2ts files
  * New jpeg image decoder
 
