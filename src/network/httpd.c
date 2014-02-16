@@ -1250,12 +1250,9 @@ static void httpd_MsgInit( httpd_message_t *msg )
 
 static void httpd_MsgClean( httpd_message_t *msg )
 {
-    int i;
-
     free( msg->psz_url );
     free( msg->psz_args );
-    for( i = 0; i < msg->i_name; i++ )
-    {
+    for (int i = 0; i < msg->i_name; i++) {
         free( msg->name[i] );
         free( msg->value[i] );
     }
@@ -1267,15 +1264,10 @@ static void httpd_MsgClean( httpd_message_t *msg )
 
 const char *httpd_MsgGet( const httpd_message_t *msg, const char *name )
 {
-    int i;
-
-    for( i = 0; i < msg->i_name; i++ )
-    {
+    for (int i = 0; i < msg->i_name; i++ )
         if( !strcasecmp( msg->name[i], name ))
-        {
             return msg->value[i];
-        }
-    }
+
     return NULL;
 }
 
