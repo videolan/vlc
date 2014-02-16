@@ -71,6 +71,7 @@ Video Filter:
 
 Audio Output:
  * Allow setting volume while not connected with PulseAudio
+ * Audio device notifications for WASAPI
 
 Streaming:
  * Important rework of the transcoding module to fix numerous bugs
@@ -94,11 +95,14 @@ Visualizations:
  * Add a 3D OpenGL spectrum visualization.
  * Allow setting the FFT windowing style for 3D and normal spectrum
 
-Interaces:
+Interfaces:
  * Add support for subtitles drag 'n drop in skins2
+ * Add record button in Qt menus
+ * Fixes for advanced preferences on OS X
 
 Misc:
  * New module for TLS on OS X and iOS
+ * Windows installer will kill running instance before installing
 
 Removed modules:
  * ios video output: use ios2
