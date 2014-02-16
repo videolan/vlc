@@ -88,19 +88,8 @@ struct filter_sys_t
 #define MSG_LONGTEXT N_( \
     "Marquee text to display. " \
     "(Available format strings: " \
-    "Time related: %Y = year, %m = month, %d = day, %H = hour, " \
-    "%M = minute, %S = second, ... " \
-    "Meta data related: $a = artist, $b = album, $c = copyright, " \
-    "$d = description, $e = encoded by, $g = genre, " \
-    "$l = language, $n = track num, $p = now playing, " \
-    "$r = rating, $s = subtitles language, $t = title, "\
-    "$u = url, $A = date, " \
-    "$B = audio bitrate (in kb/s), $C = chapter," \
-    "$D = duration, $F = full name with path, $I = title, "\
-    "$L = time left, " \
-    "$N = name, $O = audio language, $P = position (in %), $R = rate, " \
-    "$S = audio sample rate (in kHz), " \
-    "$T = time, $U = publisher, $V = volume, $_ = new line) ")
+    "%Y = year, %m = month, %d = day, %H = hour, " \
+    "%M = minute, %S = second, ...)" )
 #define FILE_TEXT N_("Text file")
 #define FILE_LONGTEXT N_("File to read the marquee text from.")
 #define POSX_TEXT N_("X offset")
