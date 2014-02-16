@@ -1915,7 +1915,7 @@ static void httpd_ClientTlsHandshake( httpd_client_t *cl )
     }
 }
 
-static bool httpdAuthOk(const char *b64, const char *user, const char *pass)
+static bool httpdAuthOk(const char *user, const char *pass, const char *b64)
 {
     if (!*user && !*pass)
         return true;
