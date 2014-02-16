@@ -30,6 +30,8 @@
 # include "config.h"
 #endif
 
+#include "../../control/win32touch.h"
+
 #include <vlc_common.h>
 #include <vlc_vout_display.h>
 
@@ -66,6 +68,9 @@ struct event_thread_t
     HCURSOR cursor_arrow;
     HCURSOR cursor_empty;
     unsigned button_pressed;
+
+    /* Gestures */
+    win32_gesture_sys_t *p_gesture;
 
     /* Title */
     char *psz_title;
@@ -797,6 +802,8 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
         return VLC_EGENERIC;
     }
 
+    InitGestures( p_event->hwnd, &p_event->p_gesture );
+
     if( p_event->hparent )
     {
         LONG i_style;
@@ -882,6 +889,8 @@ static void Win32VoutCloseWindow( event_thread_t *p_event )
         DestroyIcon( p_event->vlc_icon );
 
     DestroyCursor( p_event->cursor_empty );
+
+    CloseGestures( p_event->p_gesture);
 }
 
 /*****************************************************************************
@@ -1034,6 +1043,9 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
 
     case WM_SETFOCUS:
         return 0;
+
+    case WM_GESTURE:
+        return DecodeGesture( VLC_OBJECT(vd), p_event->p_gesture, hwnd, message, wParam, lParam );
 
     default:
         //msg_Dbg( vd, "WinProc WM Default %i", message );

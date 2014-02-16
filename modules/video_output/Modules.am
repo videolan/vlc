@@ -119,7 +119,8 @@ endif
 
 ### Win32 ###
 libdirect2d_plugin_la_SOURCES = msw/direct2d.c \
-	msw/common.c msw/common.h msw/events.c msw/events.h
+	msw/common.c msw/common.h msw/events.c msw/events.h \
+	../control/win32touch.c ../control/win32touch.h
 libdirect2d_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_direct2d
 libdirect2d_plugin_la_LIBADD = -lgdi32 -lole32 -luuid
@@ -128,7 +129,8 @@ vout_LTLIBRARIES += $(LTLIBdirect2d)
 EXTRA_LTLIBRARIES += libdirect2d_plugin.la
 
 libdirect3d_plugin_la_SOURCES = msw/direct3d.c \
-	msw/common.c msw/common.h msw/events.c msw/events.h msw/builtin_shaders.h
+	msw/common.c msw/common.h msw/events.c msw/events.h msw/builtin_shaders.h \
+	../control/win32touch.c ../control/win32touch.h
 libdirect3d_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_direct3d
 libdirect3d_plugin_la_LIBADD = -lgdi32 -lole32 -luuid
@@ -137,7 +139,8 @@ vout_LTLIBRARIES += $(LTLIBdirect3d)
 EXTRA_LTLIBRARIES += libdirect3d_plugin.la
 
 libdirectdraw_plugin_la_SOURCES = msw/directx.c \
-	msw/common.c msw/common.h msw/events.c msw/events.h
+	msw/common.c msw/common.h msw/events.c msw/events.h \
+	../control/win32touch.c ../control/win32touch.h
 libdirectdraw_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_directdraw
 libdirectdraw_plugin_la_LIBADD = -luser32 -lgdi32 -lole32 -luuid
@@ -146,7 +149,8 @@ vout_LTLIBRARIES += libdirectdraw_plugin.la
 endif
 
 libglwin32_plugin_la_SOURCES = msw/glwin32.c opengl.c opengl.h \
-	msw/common.c msw/common.h msw/events.c msw/events.h
+	msw/common.c msw/common.h msw/events.c msw/events.h \
+	../control/win32touch.c ../control/win32touch.h
 libglwin32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_glwin32
 libglwin32_plugin_la_LIBADD = -lopengl32 -lgdi32 -lole32 -luuid
@@ -155,7 +159,8 @@ vout_LTLIBRARIES += $(LTLIBglwin32)
 EXTRA_LTLIBRARIES += libglwin32_plugin.la
 
 libwingdi_plugin_la_SOURCES = msw/wingdi.c \
-	msw/common.c msw/common.h msw/events.c msw/events.h
+	msw/common.c msw/common.h msw/events.c msw/events.h \
+	../control/win32touch.c ../control/win32touch.h
 libwingdi_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_wingdi
 libwingdi_plugin_la_LIBADD = -lgdi32 -lole32 -luuid
