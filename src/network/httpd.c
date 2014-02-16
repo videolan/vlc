@@ -1732,26 +1732,22 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                      * mark the end of the body (probably only RTSP) */
                     cl->query.p_body = malloc( cl->query.i_body );
                     cl->i_buffer = 0;
-                    if ( cl->query.p_body == NULL )
-                    {
-                        switch (cl->query.i_proto)
-                        {
-                            case HTTPD_PROTO_HTTP:
-                            {
-                                const uint8_t sorry[] =
-                            "HTTP/1.1 413 Request Entity Too Large\r\n\r\n";
-                                httpd_NetSend( cl, sorry, sizeof( sorry ) - 1 );
-                                break;
-                            }
-                            case HTTPD_PROTO_RTSP:
-                            {
-                                const uint8_t sorry[] =
-                            "RTSP/1.0 413 Request Entity Too Large\r\n\r\n";
-                                httpd_NetSend( cl, sorry, sizeof( sorry ) - 1 );
-                                break;
-                            }
-                            default:
-                                assert( 0 );
+                    if ( cl->query.p_body == NULL ) {
+                        switch (cl->query.i_proto) {
+                        case HTTPD_PROTO_HTTP: {
+                            const uint8_t sorry[] =
+                        "HTTP/1.1 413 Request Entity Too Large\r\n\r\n";
+                            httpd_NetSend( cl, sorry, sizeof( sorry ) - 1 );
+                            break;
+                        }
+                        case HTTPD_PROTO_RTSP: {
+                            const uint8_t sorry[] =
+                        "RTSP/1.0 413 Request Entity Too Large\r\n\r\n";
+                            httpd_NetSend( cl, sorry, sizeof( sorry ) - 1 );
+                            break;
+                        }
+                        default:
+                            assert( 0 );
                         }
                         i_len = 0; /* drop */
                     }
@@ -1919,23 +1915,11 @@ static void httpd_ClientSend( httpd_client_t *cl )
 
 static void httpd_ClientTlsHandshake( httpd_client_t *cl )
 {
-    switch( vlc_tls_SessionHandshake( cl->p_tls, NULL, NULL ) )
-    {
-        case 0:
-            cl->i_state = HTTPD_CLIENT_RECEIVING;
-            break;
-
-        case -1:
-            cl->i_state = HTTPD_CLIENT_DEAD;
-            break;
-
-        case 1:
-            cl->i_state = HTTPD_CLIENT_TLS_HS_IN;
-            break;
-
-        case 2:
-            cl->i_state = HTTPD_CLIENT_TLS_HS_OUT;
-            break;
+    switch( vlc_tls_SessionHandshake( cl->p_tls, NULL, NULL ) ) {
+        case -1: cl->i_state = HTTPD_CLIENT_DEAD;       break;
+        case 0:  cl->i_state = HTTPD_CLIENT_RECEIVING;  break;
+        case 1:  cl->i_state = HTTPD_CLIENT_TLS_HS_IN;  break;
+        case 2:  cl->i_state = HTTPD_CLIENT_TLS_HS_OUT; break;
     }
 }
 
@@ -1971,6 +1955,7 @@ static void* httpd_HostThread( void *data )
 
         for(int i_client = 0; i_client < host->i_client; i_client++ )
         {
+            int64_t i_offset;
             httpd_client_t *cl = host->client[i_client];
             if( cl->i_ref < 0 || ( cl->i_ref == 0 &&
                 ( cl->i_state == HTTPD_CLIENT_DEAD ||
@@ -1990,33 +1975,32 @@ static void* httpd_HostThread( void *data )
             pufd->fd = cl->fd;
             pufd->events = pufd->revents = 0;
 
-            if( ( cl->i_state == HTTPD_CLIENT_RECEIVING )
-                  || ( cl->i_state == HTTPD_CLIENT_TLS_HS_IN ) )
-            {
+            switch (cl->i_state) {
+            case HTTPD_CLIENT_RECEIVING:
+            case HTTPD_CLIENT_TLS_HS_IN:
                 pufd->events = POLLIN;
-            }
-            else if( ( cl->i_state == HTTPD_CLIENT_SENDING )
-                  || ( cl->i_state == HTTPD_CLIENT_TLS_HS_OUT ) )
-            {
+                break;
+
+            case HTTPD_CLIENT_SENDING:
+            case HTTPD_CLIENT_TLS_HS_OUT:
                 pufd->events = POLLOUT;
-            }
-            else if( cl->i_state == HTTPD_CLIENT_RECEIVE_DONE )
+                break;
+
+            case HTTPD_CLIENT_RECEIVE_DONE:
             {
                 httpd_message_t *answer = &cl->answer;
                 httpd_message_t *query  = &cl->query;
-                int i_msg = query->i_type;
 
                 httpd_MsgInit( answer );
 
                 /* Handle what we received */
-                if( i_msg == HTTPD_MSG_ANSWER )
-                {
+                switch (query->i_type) {
+                case HTTPD_MSG_ANSWER:
                     cl->url     = NULL;
                     cl->i_state = HTTPD_CLIENT_DEAD;
-                }
-                else if( i_msg == HTTPD_MSG_OPTIONS )
-                {
+                    break;
 
+                case HTTPD_MSG_OPTIONS:
                     answer->i_type   = HTTPD_MSG_ANSWER;
                     answer->i_proto  = query->i_proto;
                     answer->i_status = 200;
@@ -2028,58 +2012,50 @@ static void* httpd_HostThread( void *data )
 
                     switch( query->i_proto )
                     {
-                        case HTTPD_PROTO_HTTP:
-                            answer->i_version = 1;
-                            httpd_MsgAdd( answer, "Allow",
-                                          "GET,HEAD,POST,OPTIONS" );
-                            break;
+                    case HTTPD_PROTO_HTTP:
+                        answer->i_version = 1;
+                        httpd_MsgAdd(answer, "Allow", "GET,HEAD,POST,OPTIONS");
+                        break;
 
-                        case HTTPD_PROTO_RTSP:
-                        {
-                            const char *p;
-                            answer->i_version = 0;
+                    case HTTPD_PROTO_RTSP:
+                        answer->i_version = 0;
 
-                            p = httpd_MsgGet( query, "Cseq" );
-                            if( p != NULL )
-                                httpd_MsgAdd( answer, "Cseq", "%s", p );
-                            p = httpd_MsgGet( query, "Timestamp" );
-                            if( p != NULL )
-                                httpd_MsgAdd( answer, "Timestamp", "%s", p );
+                        const char *p = httpd_MsgGet( query, "Cseq" );
+                        if( p != NULL )
+                            httpd_MsgAdd( answer, "Cseq", "%s", p );
+                        p = httpd_MsgGet( query, "Timestamp" );
+                        if( p != NULL )
+                            httpd_MsgAdd( answer, "Timestamp", "%s", p );
 
-                            p = httpd_MsgGet( query, "Require" );
-                            if( p != NULL )
-                            {
-                                answer->i_status = 551;
-                                httpd_MsgAdd( query, "Unsupported", "%s", p );
-                            }
-
-                            httpd_MsgAdd( answer, "Public", "DESCRIBE,SETUP,"
-                                          "TEARDOWN,PLAY,PAUSE,GET_PARAMETER" );
-                            break;
+                        p = httpd_MsgGet( query, "Require" );
+                        if( p != NULL ) {
+                            answer->i_status = 551;
+                            httpd_MsgAdd( query, "Unsupported", "%s", p );
                         }
+
+                        httpd_MsgAdd( answer, "Public", "DESCRIBE,SETUP,"
+                                      "TEARDOWN,PLAY,PAUSE,GET_PARAMETER" );
+                        break;
                     }
 
                     cl->i_buffer = -1;  /* Force the creation of the answer in
                                          * httpd_ClientSend */
                     cl->i_state = HTTPD_CLIENT_SENDING;
-                }
-                else if( i_msg == HTTPD_MSG_NONE )
-                {
-                    if( query->i_proto == HTTPD_PROTO_NONE )
-                    {
+                    break;
+
+                case HTTPD_MSG_NONE:
+                    if( query->i_proto == HTTPD_PROTO_NONE ) {
                         cl->url = NULL;
                         cl->i_state = HTTPD_CLIENT_DEAD;
                     }
-                    else
-                    {
-                        char *p;
-
+                    else {
                         /* unimplemented */
                         answer->i_proto  = query->i_proto ;
                         answer->i_type   = HTTPD_MSG_ANSWER;
                         answer->i_version= 0;
                         answer->i_status = 501;
 
+                        char *p;
                         answer->i_body = httpd_HtmlError (&p, 501, NULL);
                         answer->p_body = (uint8_t *)p;
                         httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
@@ -2087,9 +2063,10 @@ static void* httpd_HostThread( void *data )
                         cl->i_buffer = -1;  /* Force the creation of the answer in httpd_ClientSend */
                         cl->i_state = HTTPD_CLIENT_SENDING;
                     }
-                }
-                else
-                {
+                    break;
+
+                default: {
+                    int i_msg = query->i_type;
                     bool b_auth_failed = false;
 
                     /* Search the url and trigger callbacks */
@@ -2190,9 +2167,11 @@ static void* httpd_HostThread( void *data )
 
                     cl->i_state = HTTPD_CLIENT_SENDING;
                 }
+                }
             }
-            else if( cl->i_state == HTTPD_CLIENT_SEND_DONE )
-            {
+            break;
+
+            case HTTPD_CLIENT_SEND_DONE:
                 if( !cl->b_stream_mode || cl->answer.i_body_offset == 0 )
                 {
                     const char *psz_connection = httpd_MsgGet( &cl->answer, "Connection" );
@@ -2236,7 +2215,7 @@ static void* httpd_HostThread( void *data )
                 }
                 else
                 {
-                    int64_t i_offset = cl->answer.i_body_offset;
+                    i_offset = cl->answer.i_body_offset;
                     httpd_MsgClean( &cl->answer );
 
                     cl->answer.i_body_offset = i_offset;
@@ -2247,11 +2226,11 @@ static void* httpd_HostThread( void *data )
 
                     cl->i_state = HTTPD_CLIENT_WAITING;
                 }
-            }
-            else if( cl->i_state == HTTPD_CLIENT_WAITING )
-            {
-                int64_t i_offset = cl->answer.i_body_offset;
-                int     i_msg = cl->query.i_type;
+                break;
+
+            case HTTPD_CLIENT_WAITING:
+                i_offset = cl->answer.i_body_offset;
+                int i_msg = cl->query.i_type;
 
                 httpd_MsgInit( &cl->answer );
                 cl->answer.i_body_offset = i_offset;
@@ -2283,18 +2262,15 @@ static void* httpd_HostThread( void *data )
 
         canc = vlc_savecancel();
         vlc_mutex_lock( &host->lock );
-        switch( ret )
-        {
-            case -1:
-                if (errno != EINTR)
-                {
-                    /* Kernel on low memory or a bug: pace */
-                    msg_Err( host, "polling error: %s",
-                             vlc_strerror_c(errno) );
-                    msleep( 100000 );
-                }
-            case 0:
-                continue;
+        switch( ret ) {
+        case -1:
+            if (errno != EINTR) {
+                /* Kernel on low memory or a bug: pace */
+                msg_Err( host, "polling error: %s", vlc_strerror_c(errno) );
+                msleep( 100000 );
+            }
+        case 0:
+            continue;
         }
 
         /* Handle client sockets */
@@ -2316,18 +2292,11 @@ static void* httpd_HostThread( void *data )
 
             cl->i_activity_date = now;
 
-            if( cl->i_state == HTTPD_CLIENT_RECEIVING )
-            {
-                httpd_ClientRecv( cl );
-            }
-            else if( cl->i_state == HTTPD_CLIENT_SENDING )
-            {
-                httpd_ClientSend( cl );
-            }
-            else if( cl->i_state == HTTPD_CLIENT_TLS_HS_IN
-                  || cl->i_state == HTTPD_CLIENT_TLS_HS_OUT )
-            {
-                httpd_ClientTlsHandshake( cl );
+            switch (cl->i_state) {
+            case HTTPD_CLIENT_RECEIVING: httpd_ClientRecv( cl ); break;
+            case HTTPD_CLIENT_SENDING:   httpd_ClientSend( cl ); break;
+            case HTTPD_CLIENT_TLS_HS_IN:
+            case HTTPD_CLIENT_TLS_HS_OUT: httpd_ClientTlsHandshake( cl ); break;
             }
         }
 
