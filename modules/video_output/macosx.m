@@ -335,7 +335,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
         {
             unsigned state = va_arg (ap, unsigned);
-            return vout_window_SetState (sys->embed, state);            
+            return vout_window_SetState (sys->embed, state);
         }
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         case VOUT_DISPLAY_CHANGE_ZOOM:
@@ -374,7 +374,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 [o_pool release];
                 return VLC_EGENERIC;
             }
- 
+
             /* we always use our current frame here, because we have some size constraints
                in the ui vout provider */
             vout_display_cfg_t cfg_tmp = *cfg;
@@ -639,7 +639,7 @@ static void OpenglSwap (vlc_gl_t *gl)
     else
         bounds = [self bounds];
     vout_display_place_t place;
-    
+
     @synchronized(self) {
         if (vd) {
             vout_display_cfg_t cfg_tmp = *(vd->cfg);
@@ -783,7 +783,7 @@ static void OpenglSwap (vlc_gl_t *gl)
         s_rect = [self bounds];
     ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
     b_inside = [self mouse: ml inRect: s_rect];
-    
+
     if (b_inside) {
         @synchronized (self) {
             if (vd) {
