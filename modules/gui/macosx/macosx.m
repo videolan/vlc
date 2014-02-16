@@ -122,7 +122,7 @@ void WindowClose  (vout_window_t *);
 #define SIDEBAR_LONGTEXT N_("Shows a sidebar in the main window listing media sources.")
 
 #define ITUNES_TEXT N_("Control external music players")
-#define ITUNES_LONGTEXT N_("When a video starts playing, VLC will pause supported music players. If selected, external player will be resumed again when playback is finished.")
+#define ITUNES_LONGTEXT N_("VLC will pause and resume supported music players on playback.")
 
 static const int itunes_list[] =
     { 0, 1, 2 };
