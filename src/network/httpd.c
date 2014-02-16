@@ -2070,93 +2070,70 @@ static void* httpd_HostThread( void *data )
                     bool b_auth_failed = false;
 
                     /* Search the url and trigger callbacks */
-                    for(int i = 0; i < host->i_url; i++ )
-                    {
+                    for(int i = 0; i < host->i_url; i++ ) {
                         httpd_url_t *url = host->url[i];
 
-                        if( !strcmp( url->psz_url, query->psz_url ) )
-                        {
-                            if( url->catch[i_msg].cb )
-                            {
-                                if( answer && ( *url->psz_user || *url->psz_password ) )
-                                {
-                                    /* create the headers */
-                                    const char *b64 = httpd_MsgGet( query, "Authorization" ); /* BASIC id */
-                                    char *user = NULL, *pass = NULL;
+                        if (strcmp(url->psz_url, query->psz_url))
+                            continue;
+                        if (!url->catch[i_msg].cb)
+                            continue;
 
-                                    if( b64 != NULL
-                                     && !strncasecmp( b64, "BASIC", 5 ) )
-                                    {
-                                        b64 += 5;
-                                        while( *b64 == ' ' )
-                                            b64++;
+                        if (answer && (*url->psz_user || *url->psz_password)) {
+                            /* create the headers */
+                            const char *b64 = httpd_MsgGet(query, "Authorization"); /* BASIC id */
+                            char *user = NULL, *pass = NULL;
 
-                                        user = vlc_b64_decode( b64 );
-                                        if (user != NULL)
-                                        {
-                                            pass = strchr (user, ':');
-                                            if (pass != NULL)
-                                                *pass++ = '\0';
-                                        }
-                                    }
+                            if (b64 && !strncasecmp(b64, "BASIC", 5)) {
+                                b64 += 5;
+                                while (*b64 == ' ')
+                                    b64++;
 
-                                    if ((user == NULL) || (pass == NULL)
-                                     || strcmp (user, url->psz_user)
-                                     || strcmp (pass, url->psz_password))
-                                    {
-                                        httpd_MsgAdd( answer,
-                                                      "WWW-Authenticate",
-                                                      "Basic realm=\"VLC stream\"" );
-                                        /* We fail for all url */
-                                        b_auth_failed = true;
-                                        free( user );
-                                        break;
-                                    }
-
-                                    free( user );
-                                }
-
-                                if( !url->catch[i_msg].cb( url->catch[i_msg].p_sys, cl, answer, query ) )
-                                {
-                                    if( answer->i_proto == HTTPD_PROTO_NONE )
-                                    {
-                                        /* Raw answer from a CGI */
-                                        cl->i_buffer = cl->i_buffer_size;
-                                    }
-                                    else
-                                        cl->i_buffer = -1;
-
-                                    /* only one url can answer */
-                                    answer = NULL;
-                                    if( cl->url == NULL )
-                                    {
-                                        cl->url = url;
-                                    }
+                                user = vlc_b64_decode( b64 );
+                                if (user) {
+                                    pass = strchr (user, ':');
+                                    if (pass)
+                                        *pass++ = '\0';
                                 }
                             }
+
+                            if (!user || strcmp (user, url->psz_user) ||
+                                !pass || strcmp (pass, url->psz_password)) {
+                                httpd_MsgAdd( answer, "WWW-Authenticate",
+                                        "Basic realm=\"VLC stream\"" );
+                                b_auth_failed = true; /* We fail for all url */
+                                free( user );
+                                break;
+                            }
+
+                            free( user );
                         }
+
+                        if (url->catch[i_msg].cb(url->catch[i_msg].p_sys, cl, answer, query))
+                            continue;
+
+                        if( answer->i_proto == HTTPD_PROTO_NONE )
+                            cl->i_buffer = cl->i_buffer_size; /* Raw answer from a CGI */
+                        else
+                            cl->i_buffer = -1;
+
+                        /* only one url can answer */
+                        answer = NULL;
+                        if( cl->url == NULL )
+                            cl->url = url;
                     }
 
-                    if( answer )
-                    {
-                        char *p;
-
+                    if( answer ) {
                         answer->i_proto  = query->i_proto;
                         answer->i_type   = HTTPD_MSG_ANSWER;
                         answer->i_version= 0;
 
                         if( b_auth_failed )
-                        {
                             answer->i_status = 401;
-                        }
                         else
-                        {
-                            /* no url registered */
-                            answer->i_status = 404;
-                        }
+                            answer->i_status = 404; /* no url registered */
 
-                        answer->i_body = httpd_HtmlError (&p,
-                                                          answer->i_status,
+                        char *p;
+                        answer->i_body = httpd_HtmlError (&p, answer->i_status,
                                                           query->psz_url);
                         answer->p_body = (uint8_t *)p;
 
