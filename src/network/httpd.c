@@ -1915,6 +1915,46 @@ static void httpd_ClientTlsHandshake( httpd_client_t *cl )
     }
 }
 
+static bool httpdAuthOk(const char *b64, const char *user, const char *pass)
+{
+    if (!*user && !*pass)
+        return true;
+
+    if (!b64)
+        return false;
+
+    if (strncasecmp(b64, "BASIC", 5))
+        return false;
+
+    b64 += 5;
+    while (*b64 == ' ')
+        b64++;
+
+    char *given_user = vlc_b64_decode(b64);
+    if (!given_user)
+        return false;
+
+    char *given_pass = NULL;
+    given_pass = strchr (given_user, ':');
+    if (!given_pass)
+        goto auth_failed;
+
+    *given_pass++ = '\0';
+
+    if (strcmp (given_user, user))
+        goto auth_failed;
+
+    if (strcmp (given_pass, pass))
+        goto auth_failed;
+
+    free( given_user );
+    return true;
+
+auth_failed:
+    free( given_user );
+    return false;
+}
+
 static void httpdLoop(httpd_host_t *host)
 {
     struct pollfd ufd[host->nfd + host->i_client];
@@ -2031,8 +2071,7 @@ static void httpdLoop(httpd_host_t *host)
                         if( query->i_proto == HTTPD_PROTO_NONE ) {
                             cl->url = NULL;
                             cl->i_state = HTTPD_CLIENT_DEAD;
-                        }
-                        else {
+                        } else {
                             /* unimplemented */
                             answer->i_proto  = query->i_proto ;
                             answer->i_type   = HTTPD_MSG_ANSWER;
@@ -2062,34 +2101,12 @@ static void httpdLoop(httpd_host_t *host)
                              if (!url->catch[i_msg].cb)
                                  continue;
 
-                             if (answer && (*url->psz_user || *url->psz_password)) {
-                                 /* create the headers */
-                                 const char *b64 = httpd_MsgGet(query, "Authorization"); /* BASIC id */
-                                 char *user = NULL, *pass = NULL;
-
-                                 if (b64 && !strncasecmp(b64, "BASIC", 5)) {
-                                     b64 += 5;
-                                     while (*b64 == ' ')
-                                         b64++;
-
-                                     user = vlc_b64_decode( b64 );
-                                     if (user) {
-                                         pass = strchr (user, ':');
-                                         if (pass)
-                                             *pass++ = '\0';
-                                     }
-                                 }
-
-                                 if (!user || strcmp (user, url->psz_user) ||
-                                         !pass || strcmp (pass, url->psz_password)) {
-                                     httpd_MsgAdd( answer, "WWW-Authenticate",
-                                             "Basic realm=\"VLC stream\"" );
-                                     b_auth_failed = true; /* We fail for all url */
-                                     free( user );
-                                     break;
-                                 }
-
-                                 free( user );
+                             if (answer) {
+                                 b_auth_failed = !httpdAuthOk(url->psz_user,
+                                    url->psz_password,
+                                    httpd_MsgGet(query, "Authorization")); /* BASIC id */
+                                 if (b_auth_failed)
+                                    break;
                              }
 
                              if (url->catch[i_msg].cb(url->catch[i_msg].p_sys, cl, answer, query))
@@ -2111,9 +2128,11 @@ static void httpdLoop(httpd_host_t *host)
                              answer->i_type   = HTTPD_MSG_ANSWER;
                              answer->i_version= 0;
 
-                             if( b_auth_failed )
+                             if( b_auth_failed ) {
+                                 httpd_MsgAdd( answer, "WWW-Authenticate",
+                                         "Basic realm=\"VLC stream\"" );
                                  answer->i_status = 401;
-                             else
+                             } else
                                  answer->i_status = 404; /* no url registered */
 
                              char *p;
