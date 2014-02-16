@@ -2036,30 +2036,30 @@ static void httpdLoop(httpd_host_t *host)
 
                         switch( query->i_proto )
                         {
-                            case HTTPD_PROTO_HTTP:
-                                answer->i_version = 1;
-                                httpd_MsgAdd(answer, "Allow", "GET,HEAD,POST,OPTIONS");
-                                break;
+                        case HTTPD_PROTO_HTTP:
+                            answer->i_version = 1;
+                            httpd_MsgAdd(answer, "Allow", "GET,HEAD,POST,OPTIONS");
+                            break;
 
-                            case HTTPD_PROTO_RTSP:
-                                answer->i_version = 0;
+                        case HTTPD_PROTO_RTSP:
+                            answer->i_version = 0;
 
-                                const char *p = httpd_MsgGet( query, "Cseq" );
-                                if( p != NULL )
-                                    httpd_MsgAdd( answer, "Cseq", "%s", p );
-                                p = httpd_MsgGet( query, "Timestamp" );
-                                if( p != NULL )
-                                    httpd_MsgAdd( answer, "Timestamp", "%s", p );
+                            const char *p = httpd_MsgGet( query, "Cseq" );
+                            if( p != NULL )
+                                httpd_MsgAdd( answer, "Cseq", "%s", p );
+                            p = httpd_MsgGet( query, "Timestamp" );
+                            if( p != NULL )
+                                httpd_MsgAdd( answer, "Timestamp", "%s", p );
 
-                                p = httpd_MsgGet( query, "Require" );
-                                if( p != NULL ) {
-                                    answer->i_status = 551;
-                                    httpd_MsgAdd( query, "Unsupported", "%s", p );
-                                }
+                            p = httpd_MsgGet( query, "Require" );
+                            if( p != NULL ) {
+                                answer->i_status = 551;
+                                httpd_MsgAdd( query, "Unsupported", "%s", p );
+                            }
 
-                                httpd_MsgAdd( answer, "Public", "DESCRIBE,SETUP,"
-                                        "TEARDOWN,PLAY,PAUSE,GET_PARAMETER" );
-                                break;
+                            httpd_MsgAdd( answer, "Public", "DESCRIBE,SETUP,"
+                                    "TEARDOWN,PLAY,PAUSE,GET_PARAMETER" );
+                            break;
                         }
 
                         cl->i_buffer = -1;  /* Force the creation of the answer in
@@ -2089,64 +2089,64 @@ static void httpdLoop(httpd_host_t *host)
                         break;
 
                     default: {
-                         int i_msg = query->i_type;
-                         bool b_auth_failed = false;
+                        int i_msg = query->i_type;
+                        bool b_auth_failed = false;
 
-                         /* Search the url and trigger callbacks */
-                         for(int i = 0; i < host->i_url; i++ ) {
-                             httpd_url_t *url = host->url[i];
+                        /* Search the url and trigger callbacks */
+                        for(int i = 0; i < host->i_url; i++ ) {
+                            httpd_url_t *url = host->url[i];
 
-                             if (strcmp(url->psz_url, query->psz_url))
-                                 continue;
-                             if (!url->catch[i_msg].cb)
-                                 continue;
+                            if (strcmp(url->psz_url, query->psz_url))
+                                continue;
+                            if (!url->catch[i_msg].cb)
+                                continue;
 
-                             if (answer) {
-                                 b_auth_failed = !httpdAuthOk(url->psz_user,
-                                    url->psz_password,
-                                    httpd_MsgGet(query, "Authorization")); /* BASIC id */
-                                 if (b_auth_failed)
-                                    break;
-                             }
+                            if (answer) {
+                                b_auth_failed = !httpdAuthOk(url->psz_user,
+                                   url->psz_password,
+                                   httpd_MsgGet(query, "Authorization")); /* BASIC id */
+                                if (b_auth_failed)
+                                   break;
+                            }
 
-                             if (url->catch[i_msg].cb(url->catch[i_msg].p_sys, cl, answer, query))
-                                 continue;
+                            if (url->catch[i_msg].cb(url->catch[i_msg].p_sys, cl, answer, query))
+                                continue;
 
-                             if( answer->i_proto == HTTPD_PROTO_NONE )
-                                 cl->i_buffer = cl->i_buffer_size; /* Raw answer from a CGI */
-                             else
-                                 cl->i_buffer = -1;
+                            if( answer->i_proto == HTTPD_PROTO_NONE )
+                                cl->i_buffer = cl->i_buffer_size; /* Raw answer from a CGI */
+                            else
+                                cl->i_buffer = -1;
 
-                             /* only one url can answer */
-                             answer = NULL;
-                             if( cl->url == NULL )
-                                 cl->url = url;
-                         }
+                            /* only one url can answer */
+                            answer = NULL;
+                            if( cl->url == NULL )
+                                cl->url = url;
+                        }
 
-                         if( answer ) {
-                             answer->i_proto  = query->i_proto;
-                             answer->i_type   = HTTPD_MSG_ANSWER;
-                             answer->i_version= 0;
+                        if( answer ) {
+                            answer->i_proto  = query->i_proto;
+                            answer->i_type   = HTTPD_MSG_ANSWER;
+                            answer->i_version= 0;
 
-                             if( b_auth_failed ) {
-                                 httpd_MsgAdd( answer, "WWW-Authenticate",
-                                         "Basic realm=\"VLC stream\"" );
-                                 answer->i_status = 401;
-                             } else
-                                 answer->i_status = 404; /* no url registered */
+                           if( b_auth_failed ) {
+                                httpd_MsgAdd( answer, "WWW-Authenticate",
+                                        "Basic realm=\"VLC stream\"" );
+                                answer->i_status = 401;
+                            } else
+                                answer->i_status = 404; /* no url registered */
 
-                             char *p;
-                             answer->i_body = httpd_HtmlError (&p, answer->i_status,
-                                     query->psz_url);
-                             answer->p_body = (uint8_t *)p;
+                            char *p;
+                            answer->i_body = httpd_HtmlError (&p, answer->i_status,
+                                    query->psz_url);
+                            answer->p_body = (uint8_t *)p;
 
-                             cl->i_buffer = -1;  /* Force the creation of the answer in httpd_ClientSend */
-                             httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
-                             httpd_MsgAdd( answer, "Content-Type", "%s", "text/html" );
-                         }
+                            cl->i_buffer = -1;  /* Force the creation of the answer in httpd_ClientSend */
+                            httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
+                            httpd_MsgAdd( answer, "Content-Type", "%s", "text/html" );
+                        }
 
-                         cl->i_state = HTTPD_CLIENT_SENDING;
-                     }
+                        cl->i_state = HTTPD_CLIENT_SENDING;
+                    }
                 }
                 break;
             }
