@@ -335,6 +335,28 @@ int OpenDemux( vlc_object_t *p_this )
 
             fmt.video.i_width = cc->width;
             fmt.video.i_height = cc->height;
+
+            char const *kRotateKey = "rotate";
+            AVDictionaryEntry *rotation = av_dict_get(s->metadata, kRotateKey, NULL, 0);
+
+            if( rotation )
+            {
+
+                long angle = strtol(rotation->value, NULL, 10);
+
+                if (angle > 45 && angle < 135)
+                    fmt.video.orientation = ORIENT_ROTATED_270;
+
+                else if (angle > 135 && angle < 225)
+                    fmt.video.orientation = ORIENT_ROTATED_180;
+
+                else if (angle > 225 && angle < 315)
+                    fmt.video.orientation = ORIENT_ROTATED_90;
+
+                else
+                    fmt.video.orientation = ORIENT_NORMAL;
+            }
+
 #if LIBAVCODEC_VERSION_MAJOR < 54
             if( cc->palctrl )
             {
