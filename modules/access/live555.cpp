@@ -1091,6 +1091,20 @@ static int SessionsSetup( demux_t *p_demux )
                 {
                     tk->fmt.i_codec = VLC_CODEC_VP8;
                 }
+                else if( !strcmp( sub->codecName(), "THEORA" ) )
+                {
+                    tk->fmt.i_codec = VLC_CODEC_THEORA;
+                    unsigned int i_extra;
+                    unsigned char *p_extra;
+                    if( ( p_extra=parseVorbisConfigStr( sub->fmtp_config(),
+                                                        i_extra ) ) )
+                    {
+                        tk->fmt.i_extra = i_extra;
+                        tk->fmt.p_extra = p_extra;
+                    }
+                    else
+                        msg_Warn( p_demux,"Missing or unsupported theora header." );
+                }
             }
             else if( !strcmp( sub->mediumName(), "text" ) )
             {
