@@ -223,6 +223,7 @@ static int Demux( demux_t * );
 static int Control( demux_t *, int, va_list );
 
 static void Fix( demux_t * );
+static char * get_language_from_filename( const char * );
 
 /*****************************************************************************
  * Module initializer
@@ -542,6 +543,17 @@ static int Open ( vlc_object_t *p_this )
     }
     else
         es_format_Init( &fmt, SPU_ES, VLC_CODEC_SUBT );
+
+    /* Stupid language detection in the filename */
+    char * psz_language = get_language_from_filename( p_demux->psz_file );
+
+    if( psz_language )
+    {
+        fmt.psz_language = psz_language;
+        msg_Dbg( p_demux, "detected language %s of subtitle: %s", psz_language,
+                 p_demux->psz_location );
+    }
+
     if( unicode )
         fmt.subs.psz_encoding = strdup( "UTF-8" );
     char *psz_description = var_InheritString( p_demux, "sub-description" );
@@ -2215,4 +2227,28 @@ static int  ParseVTT( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         strcat( psz_text, s );
         strcat( psz_text, "\n" );
     }
+}
+
+/* Matches filename.xx.srt */
+static char * get_language_from_filename( const char * psz_sub_file )
+{
+    char *psz_ret = NULL;
+    char *psz_tmp, *psz_language_begin;
+
+    if( !psz_sub_file ) return NULL;
+    char *psz_work = strdup( psz_sub_file );
+
+    /* Removing extension, but leaving the dot */
+    psz_tmp = strrchr( psz_work, '.' );
+    if( psz_tmp )
+    {
+        psz_tmp[0] = '\0';
+        psz_language_begin = strrchr( psz_work, '.' );
+        if( psz_language_begin )
+            psz_ret = strdup(++psz_language_begin);
+        psz_tmp[0] = '.';
+    }
+
+    free( psz_work );
+    return psz_ret;
 }
