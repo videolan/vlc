@@ -359,6 +359,8 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
     AddonsListModel *model = new AddonsListModel( AM, addonsView );
     addonsModel = new AddonsSortFilterProxyModel();
     addonsModel->setDynamicSortFilter( true );
+    addonsModel->setSortRole( Qt::DisplayRole );
+    addonsModel->sort( 0, Qt::AscendingOrder );
     addonsModel->setSourceModel( model );
     addonsModel->setFilterRole( Qt::DisplayRole );
     addonsView->setModel( addonsModel );
