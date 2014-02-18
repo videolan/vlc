@@ -125,9 +125,11 @@ struct  demux_sys_t
     /* Titles */
     unsigned int        i_title;
     unsigned int        i_longest_title;
-    int                 i_playlist;          /* -1 = no playlist playing */
-    unsigned int        i_current_clip;
     input_title_t       **pp_title;
+
+    vlc_mutex_t             pl_info_lock;
+    BLURAY_TITLE_INFO      *p_pl_info;
+    const BLURAY_CLIP_INFO *p_clip_info;
 
     /* Meta information */
     const META_DL       *p_meta;
@@ -266,6 +268,27 @@ static void FindMountPoint(char **file)
 #else
 # warning Disc device to mount point not implemented
 #endif
+}
+
+/*****************************************************************************
+ * cache current playlist (title) information
+ *****************************************************************************/
+
+static void setTitleInfo(demux_sys_t *p_sys, BLURAY_TITLE_INFO *info)
+{
+    vlc_mutex_lock(&p_sys->pl_info_lock);
+
+    if (p_sys->p_pl_info) {
+        bd_free_title_info(p_sys->p_pl_info);
+    }
+    p_sys->p_pl_info   = info;
+    p_sys->p_clip_info = NULL;
+
+    if (p_sys->p_pl_info && p_sys->p_pl_info->clip_count) {
+        p_sys->p_clip_info = &p_sys->p_pl_info->clips[0];
+    }
+
+    vlc_mutex_unlock(&p_sys->pl_info_lock);
 }
 
 /*****************************************************************************
@@ -431,6 +454,8 @@ static int blurayOpen(vlc_object_t *object)
         goto error;
     }
 
+    vlc_mutex_init(&p_sys->pl_info_lock);
+
     p_demux->pf_control = blurayControl;
     p_demux->pf_demux   = blurayDemux;
 
@@ -452,6 +477,8 @@ static void blurayClose(vlc_object_t *object)
 {
     demux_t *p_demux = (demux_t*)object;
     demux_sys_t *p_sys = p_demux->p_sys;
+
+    setTitleInfo(p_sys, NULL);
 
     /*
      * Close libbluray first.
@@ -479,6 +506,8 @@ static void blurayClose(vlc_object_t *object)
     for (unsigned int i = 0; i < p_sys->i_title; i++)
         vlc_input_title_Delete(p_sys->pp_title[i]);
     TAB_CLEAN(p_sys->i_title, p_sys->pp_title);
+
+    vlc_mutex_destroy(&p_sys->pl_info_lock);
 
     free(p_sys->psz_bd_path);
     free(p_sys);
@@ -530,15 +559,12 @@ static void setStreamLang(es_format_t *p_fmt,
 static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
 {
     demux_sys_t *p_sys = p_out->p_sys->p_demux->p_sys;
-    BLURAY_TITLE_INFO *title_info = bd_get_playlist_info(p_sys->bluray, p_sys->i_playlist, 0);
-    BLURAY_CLIP_INFO *clip_info = NULL;
     es_format_t fmt;
 
-    if (title_info && p_sys->i_current_clip < title_info->clip_count) {
-        clip_info = &title_info->clips[p_sys->i_current_clip];
-    }
-
     es_format_Copy(&fmt, p_fmt);
+
+    vlc_mutex_lock(&p_sys->pl_info_lock);
+
     switch (fmt.i_cat) {
     case VIDEO_ES:
         if (p_sys->i_video_stream != -1 && p_sys->i_video_stream != p_fmt->i_id)
@@ -547,19 +573,18 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
     case AUDIO_ES:
         if (p_sys->i_audio_stream != -1 && p_sys->i_audio_stream != p_fmt->i_id)
             fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
-        if (clip_info)
-            setStreamLang(&fmt, clip_info->audio_streams, clip_info->audio_stream_count);
+        if (p_sys->p_clip_info)
+            setStreamLang(&fmt, p_sys->p_clip_info->audio_streams, p_sys->p_clip_info->audio_stream_count);
         break ;
     case SPU_ES:
         if (p_sys->i_spu_stream != -1 && p_sys->i_spu_stream != p_fmt->i_id)
             fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
-        if (clip_info)
-            setStreamLang(&fmt, clip_info->pg_streams, clip_info->pg_stream_count);
+        if (p_sys->p_clip_info)
+            setStreamLang(&fmt, p_sys->p_clip_info->pg_streams, p_sys->p_clip_info->pg_stream_count);
         break ;
     }
 
-    if (title_info)
-        bd_free_title_info(title_info);
+    vlc_mutex_unlock(&p_sys->pl_info_lock);
 
     es_out_id_t *p_es = es_out_Add(p_out->p_sys->p_demux->out, &fmt);
     if (p_fmt->i_id >= 0) {
@@ -1110,19 +1135,8 @@ static void bluraySendOverlayToVout(demux_t *p_demux)
     p_sys->p_overlays[p_sys->current_overlay]->status = Outdated;
 }
 
-static void blurayUpdateTitleInfo(demux_t *p_demux, input_title_t *t, int i_title_idx, int i_playlist)
+static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_info)
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-    BLURAY_TITLE_INFO *title_info = NULL;
-
-    if (i_playlist >= 0)
-        title_info = bd_get_playlist_info(p_sys->bluray, i_playlist, 0);
-    else if (i_title_idx >= 0)
-        title_info = bd_get_title_info(p_sys->bluray, i_title_idx, 0);
-    if (!title_info) {
-        return;
-    }
-
     t->i_length = FROM_TICKS(title_info->duration);
 
     if (!t->i_seekpoint) {
@@ -1136,8 +1150,6 @@ static void blurayUpdateTitleInfo(demux_t *p_demux, input_title_t *t, int i_titl
             TAB_APPEND(t->i_seekpoint, t->seekpoint, s);
         }
     }
-
-    bd_free_title_info(title_info);
 }
 
 static void blurayInitTitles(demux_t *p_demux, int menu_titles)
@@ -1163,7 +1175,9 @@ static void blurayInitTitles(demux_t *p_demux, int menu_titles)
             break;
 
         if (!p_sys->b_menu) {
-            blurayUpdateTitleInfo(p_demux, t, i, -1);
+            BLURAY_TITLE_INFO *title_info = bd_get_title_info(p_sys->bluray, i, 0);
+            blurayUpdateTitleInfo(t, title_info);
+            bd_free_title_info(title_info);
 
 #if BLURAY_VERSION < BLURAY_VERSION_CODE(0,5,0)
             if (t->i_length > duration) {
@@ -1436,14 +1450,14 @@ static void streamFlush( demux_sys_t *p_sys )
     p_block->i_buffer = 192;
 
     /* set correct sequence end code */
-    BLURAY_TITLE_INFO *title_info = bd_get_playlist_info(p_sys->bluray, p_sys->i_playlist, 0);
-    if (title_info) {
-        if (title_info->clips[0].video_streams[0].coding_type > 2) {
+    vlc_mutex_lock(&p_sys->pl_info_lock);
+    if (p_sys->p_clip_info != NULL) {
+        if (p_sys->p_clip_info->video_streams[0].coding_type > 2) {
             /* VC1 / H.264 sequence end */
             p_block->p_buffer[191] = 0x0a;
         }
-        bd_free_title_info(title_info);
     }
+    vlc_mutex_unlock(&p_sys->pl_info_lock);
 
     stream_DemuxSend(p_sys->p_parser, p_block);
     p_sys->b_flushed = true;
@@ -1501,31 +1515,26 @@ static void blurayStreamSelect(demux_t *p_demux, uint32_t i_type, uint32_t i_id)
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_pid = -1;
 
-    if (p_sys->i_playlist < 0)
-        return;
+    vlc_mutex_lock(&p_sys->pl_info_lock);
 
-    BLURAY_TITLE_INFO *title_info = bd_get_playlist_info(p_sys->bluray, p_sys->i_playlist, 0);
-    if (title_info == NULL)
-        return;
-
-    if (p_sys->i_current_clip < title_info->clip_count) {
-        BLURAY_CLIP_INFO *clip_info = &title_info->clips[p_sys->i_current_clip];
+    if (p_sys->p_clip_info) {
 
         /* The param we get is the real stream id, not an index, ie. it starts from 1 */
         i_id--;
         if (i_type == BD_EVENT_AUDIO_STREAM) {
-            if (i_id < clip_info->audio_stream_count) {
-                i_pid = clip_info->audio_streams[i_id].pid;
+            if (i_id < p_sys->p_clip_info->audio_stream_count) {
+                i_pid = p_sys->p_clip_info->audio_streams[i_id].pid;
                 p_sys->i_audio_stream = i_pid;
             }
         } else if (i_type == BD_EVENT_PG_TEXTST_STREAM) {
-            if (i_id < clip_info->pg_stream_count) {
-                i_pid = clip_info->pg_streams[i_id].pid;
+            if (i_id < p_sys->p_clip_info->pg_stream_count) {
+                i_pid = p_sys->p_clip_info->pg_streams[i_id].pid;
                 p_sys->i_spu_stream = i_pid;
             }
         }
     }
-    bd_free_title_info(title_info);
+
+    vlc_mutex_unlock(&p_sys->pl_info_lock);
 
     if (i_pid > 0) {
         int i_idx = findEsPairIndex(p_sys, i_pid);
@@ -1540,36 +1549,42 @@ static void blurayUpdatePlaylist(demux_t *p_demux, unsigned i_playlist)
 {
     blurayResetParser(p_demux);
 
-    p_demux->p_sys->i_playlist = i_playlist;
-    p_demux->p_sys->i_current_clip = 0;
-
     /* read title info and init some values */
     if (!p_demux->p_sys->b_menu)
         p_demux->info.i_title = bd_get_current_title(p_demux->p_sys->bluray);
     p_demux->info.i_seekpoint = 0;
     p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
 
-    blurayUpdateTitleInfo(p_demux, p_demux->p_sys->pp_title[p_demux->info.i_title], -1, i_playlist);
+    BLURAY_TITLE_INFO *p_title_info = bd_get_playlist_info(p_demux->p_sys->bluray, i_playlist, 0);
+    if (p_title_info) {
+        blurayUpdateTitleInfo(p_demux->p_sys->pp_title[p_demux->info.i_title], p_title_info);
+    }
+    setTitleInfo(p_demux->p_sys, p_title_info);
 
     blurayResetStillImage(p_demux);
 }
 
 static void blurayUpdateCurrentClip(demux_t *p_demux, uint32_t clip)
 {
-    if (clip == 0xFF)
-        return ;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    p_sys->i_current_clip = clip;
-    BLURAY_TITLE_INFO *info = bd_get_playlist_info(p_sys->bluray, p_sys->i_playlist, 0);
-    if (info == NULL)
-        return ;
+    vlc_mutex_lock(&p_sys->pl_info_lock);
+
+    p_sys->p_clip_info = NULL;
+    p_sys->i_video_stream = -1;
+
+    if (p_sys->p_pl_info && clip < p_sys->p_pl_info->clip_count) {
+
+        p_sys->p_clip_info = &p_sys->p_pl_info->clips[clip];
+
     /* Let's assume a single video track for now.
      * This may brake later, but it's enough for now.
      */
-    assert(info->clips[p_sys->i_current_clip].video_stream_count >= 1);
-    p_sys->i_video_stream = info->clips[p_sys->i_current_clip].video_streams[0].pid;
-    bd_free_title_info(info);
+        assert(p_sys->p_clip_info->video_stream_count >= 1);
+        p_sys->i_video_stream = p_sys->p_clip_info->video_streams[0].pid;
+    }
+
+    vlc_mutex_unlock(&p_sys->pl_info_lock);
 
     blurayResetStillImage(p_demux);
 }
@@ -1585,7 +1600,7 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
         else
             p_demux->info.i_title = e->param;
         /* this is feature title, we don't know yet which playlist it will play (if any) */
-        p_sys->i_playlist = -1;
+        setTitleInfo(p_sys, NULL);
         /* reset title infos here ? */
         p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT; /* might be BD-J title with no video */
         break;
