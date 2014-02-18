@@ -151,6 +151,7 @@ struct  demux_sys_t
     int                 i_spu_stream;   /* Selected subtitle stream. -1 if default */
     int                 i_video_stream;
     stream_t            *p_parser;
+    bool                b_flushed;
 
     /* Used to store bluray disc path */
     char                *psz_bd_path;
@@ -1396,6 +1397,58 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * libbluray event handling
+ *****************************************************************************/
+
+static void streamFlush( demux_sys_t *p_sys )
+{
+    /*
+     * MPEG-TS demuxer does not flush last video frame if size of PES packet is unknown.
+     * Packet is flushed only when TS packet with PUSI flag set is received.
+     *
+     * Fix this by emitting (video) ts packet with PUSI flag set.
+     * Add video sequence end code to payload so that also video decoder is flushed.
+     * Set PES packet size in the payload so that it will be sent to decoder immediately.
+     */
+
+    if (p_sys->b_flushed)
+        return;
+
+    block_t *p_block = block_Alloc(192);
+    if (!p_block)
+        return;
+
+    static const uint8_t seq_end_pes[] = {
+        0x00, 0x00, 0x01, 0xe0, 0x00, 0x07, 0x80, 0x00, 0x00,  /* PES header */
+        0x00, 0x00, 0x01, 0xb7,                                /* PES payload: sequence end */
+    };
+    static const uint8_t vid_pusi_ts[] = {
+        0x00, 0x00, 0x00, 0x00,                /* TP extra header (ATC) */
+        0x47, 0x50, 0x11, 0x30,                /* TP header */
+        (192 - (4 + 5) - sizeof(seq_end_pes)), /* adaptation field length */
+        0x80,                                  /* adaptation field: discontinuity indicator */
+    };
+
+    memset(p_block->p_buffer, 0, 192);
+    memcpy(p_block->p_buffer, vid_pusi_ts, sizeof(vid_pusi_ts));
+    memcpy(p_block->p_buffer + 192 - sizeof(seq_end_pes), seq_end_pes, sizeof(seq_end_pes));
+    p_block->i_buffer = 192;
+
+    /* set correct sequence end code */
+    BLURAY_TITLE_INFO *title_info = bd_get_playlist_info(p_sys->bluray, p_sys->i_playlist, 0);
+    if (title_info) {
+        if (title_info->clips[0].video_streams[0].coding_type > 2) {
+            /* VC1 / H.264 sequence end */
+            p_block->p_buffer[191] = 0x0a;
+        }
+        bd_free_title_info(title_info);
+    }
+
+    stream_DemuxSend(p_sys->p_parser, p_block);
+    p_sys->b_flushed = true;
+}
+
 static void blurayResetStillImage( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -1430,6 +1483,13 @@ static void blurayStillImage( demux_t *p_demux, unsigned i_timeout )
             msg_Dbg(p_demux, "Still image (infinite)");
             p_sys->i_still_end_time = -1;
         }
+
+        /* flush demuxer and decoder (there won't be next video packet starting with ts PUSI) */
+        streamFlush(p_sys);
+
+        /* stop buffering */
+        bool b_empty;
+        es_out_Control( p_demux->out, ES_OUT_GET_EMPTY, &b_empty );
     }
 
     /* avoid busy loops (read returns no data) */
@@ -1637,6 +1697,8 @@ static int blurayDemux(demux_t *p_demux)
     p_block->i_buffer = nread;
 
     stream_DemuxSend(p_sys->p_parser, p_block);
+
+    p_sys->b_flushed = false;
 
     return 1;
 }
