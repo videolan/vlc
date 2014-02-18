@@ -51,6 +51,7 @@ extern JavaVM *myVm;
 extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void jni_UnlockAndroidSurface();
 extern void jni_SetAndroidSurfaceSizeEnv(JNIEnv *p_env, int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
+extern void jni_EventHardwareAccelerationError();
 
 struct decoder_sys_t
 {
@@ -81,6 +82,8 @@ struct decoder_sys_t
 
     bool started;
     bool decoded;
+    bool error_state;
+    bool error_event_sent;
 
     ArchitectureSpecificCopyData architecture_specific_data;
 
@@ -554,6 +557,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic)
                                           p_sys->buffer_info, (jlong) 0);
         if ((*env)->ExceptionOccurred(env)) {
             (*env)->ExceptionClear(env);
+            p_sys->error_state = true;
             return;
         }
 
@@ -614,6 +618,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic)
                             msg_Err(p_dec, "Codec error (IllegalStateException) in MediaCodec.releaseOutputBuffer");
                             (*env)->ExceptionClear(env);
                             (*env)->DeleteLocalRef(env, illegalStateException);
+                            p_sys->error_state = true;
                         }
                     }
                     (*env)->DeleteLocalRef(env, buf);
@@ -717,6 +722,16 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
 
     block_t *p_block = *pp_block;
 
+    if (p_sys->error_state) {
+        block_Release(p_block);
+        if (!p_sys->error_event_sent) {
+            /* Signal the error to the Java. */
+            jni_EventHardwareAccelerationError();
+            p_sys->error_event_sent = true;
+        }
+        return NULL;
+    }
+
     (*myVm)->AttachCurrentThread(myVm, &env, NULL);
 
     if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
@@ -732,6 +747,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             if ((*env)->ExceptionOccurred(env)) {
                 msg_Warn(p_dec, "Exception occurred in MediaCodec.flush");
                 (*env)->ExceptionClear(env);
+                p_sys->error_state = true;
             }
         }
         p_sys->decoded = false;
@@ -755,6 +771,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_input_buffer, timeout);
         if ((*env)->ExceptionOccurred(env)) {
             (*env)->ExceptionClear(env);
+            p_sys->error_state = true;
             break;
         }
         if (index < 0) {
