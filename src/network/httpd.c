@@ -265,6 +265,8 @@ static size_t httpd_HtmlError (char **body, int code, const char *url)
     const char *errname = httpd_ReasonFromCode (code);
     assert (errname != NULL);
 
+    char *url_Encoded = convert_xml_special_chars (url ? url : "");
+
     int res = asprintf (body,
         "<?xml version=\"1.0\" encoding=\"ascii\" ?>\n"
         "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\""
@@ -279,7 +281,9 @@ static size_t httpd_HtmlError (char **body, int code, const char *url)
         "<a href=\"http://www.videolan.org\">VideoLAN</a>\n"
         "</body>\n"
         "</html>\n", errname, code, errname,
-        (url ? " (" : ""), (url ? url : ""), (url ? ")" : ""));
+        (url_Encoded ? " (" : ""), (url_Encoded ? url_Encoded : ""), (url_Encoded ? ")" : ""));
+
+    free (url_Encoded);
 
     if (res == -1)
     {
