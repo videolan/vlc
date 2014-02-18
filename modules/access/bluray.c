@@ -1229,7 +1229,7 @@ static int bluraySetTitle(demux_t *p_demux, int i_title)
             msg_Dbg(p_demux, "Playing Title %i", i_title);
         }
 
-        if (bd_play_title(p_demux->p_sys->bluray, i_title) == 0) {
+        if (bd_play_title(p_sys->bluray, i_title) == 0) {
             msg_Err(p_demux, "cannot play bd title '%d'", i_title);
             return VLC_EGENERIC;
         }
@@ -1245,7 +1245,7 @@ static int bluraySetTitle(demux_t *p_demux, int i_title)
 
     msg_Dbg(p_demux, "Selecting Title %i", i_title);
 
-    if (bd_select_title(p_demux->p_sys->bluray, i_title) == 0) {
+    if (bd_select_title(p_sys->bluray, i_title) == 0) {
         msg_Err(p_demux, "cannot select bd title '%d'", i_title);
         return VLC_EGENERIC;
     }
@@ -1547,19 +1547,21 @@ static void blurayStreamSelect(demux_t *p_demux, uint32_t i_type, uint32_t i_id)
 
 static void blurayUpdatePlaylist(demux_t *p_demux, unsigned i_playlist)
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
+
     blurayResetParser(p_demux);
 
     /* read title info and init some values */
-    if (!p_demux->p_sys->b_menu)
-        p_demux->info.i_title = bd_get_current_title(p_demux->p_sys->bluray);
+    if (!p_sys->b_menu)
+        p_demux->info.i_title = bd_get_current_title(p_sys->bluray);
     p_demux->info.i_seekpoint = 0;
     p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
 
-    BLURAY_TITLE_INFO *p_title_info = bd_get_playlist_info(p_demux->p_sys->bluray, i_playlist, 0);
+    BLURAY_TITLE_INFO *p_title_info = bd_get_playlist_info(p_sys->bluray, i_playlist, 0);
     if (p_title_info) {
-        blurayUpdateTitleInfo(p_demux->p_sys->pp_title[p_demux->info.i_title], p_title_info);
+        blurayUpdateTitleInfo(p_sys->pp_title[p_demux->info.i_title], p_title_info);
     }
-    setTitleInfo(p_demux->p_sys, p_title_info);
+    setTitleInfo(p_sys, p_title_info);
 
     blurayResetStillImage(p_demux);
 }
@@ -1672,7 +1674,7 @@ static int blurayDemux(demux_t *p_demux)
     int nread;
 
     if (p_sys->b_menu == false) {
-        while (bd_get_event(p_demux->p_sys->bluray, &e))
+        while (bd_get_event(p_sys->bluray, &e))
             blurayHandleEvent(p_demux, &e);
 
         nread = bd_read(p_sys->bluray, p_block->p_buffer,
