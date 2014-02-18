@@ -138,6 +138,7 @@ struct  demux_sys_t
     bool                b_menu;
     bool                b_menu_open;
     bool                b_popup_available;
+    mtime_t             i_still_end_time;
 
     /* */
     input_thread_t      *p_input;
@@ -291,6 +292,7 @@ static int blurayOpen(vlc_object_t *object)
     p_sys->i_audio_stream = -1;
     p_sys->i_spu_stream = -1;
     p_sys->i_video_stream = -1;
+    p_sys->i_still_end_time = 0;
 
     /* init demux info fields */
     p_demux->info.i_update    = 0;
@@ -1394,6 +1396,46 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     return VLC_SUCCESS;
 }
 
+static void blurayResetStillImage( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if (p_sys->i_still_end_time) {
+        p_sys->i_still_end_time = 0;
+
+        blurayResetParser(p_demux);
+        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+    }
+}
+
+static void blurayStillImage( demux_t *p_demux, unsigned i_timeout )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    /* time period elapsed ? */
+    if (p_sys->i_still_end_time > 0 && p_sys->i_still_end_time <= mdate()) {
+        msg_Dbg(p_demux, "Still image end");
+        bd_read_skip_still(p_sys->bluray);
+
+        blurayResetStillImage(p_demux);
+        return;
+    }
+
+    /* show last frame as still image */
+    if (!p_sys->i_still_end_time) {
+        if (i_timeout) {
+            msg_Dbg(p_demux, "Still image (%d seconds)", i_timeout);
+            p_sys->i_still_end_time = mdate() + i_timeout * CLOCK_FREQ;
+        } else {
+            msg_Dbg(p_demux, "Still image (infinite)");
+            p_sys->i_still_end_time = -1;
+        }
+    }
+
+    /* avoid busy loops (read returns no data) */
+    msleep( 40000 );
+}
+
 static void blurayStreamSelect(demux_t *p_demux, uint32_t i_type, uint32_t i_id)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -1448,6 +1490,8 @@ static void blurayUpdatePlaylist(demux_t *p_demux, unsigned i_playlist)
     p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
 
     blurayUpdateTitleInfo(p_demux, p_demux->p_sys->pp_title[p_demux->info.i_title], -1, i_playlist);
+
+    blurayResetStillImage(p_demux);
 }
 
 static void blurayUpdateCurrentClip(demux_t *p_demux, uint32_t clip)
@@ -1466,6 +1510,8 @@ static void blurayUpdateCurrentClip(demux_t *p_demux, uint32_t clip)
     assert(info->clips[p_sys->i_current_clip].video_stream_count >= 1);
     p_sys->i_video_stream = info->clips[p_sys->i_current_clip].video_streams[0].pid;
     bd_free_title_info(info);
+
+    blurayResetStillImage(p_demux);
 }
 
 static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
@@ -1514,6 +1560,12 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
     case BD_EVENT_IG_STREAM:
         break;
 
+    /*
+     * playback control events
+     */
+    case BD_EVENT_STILL_TIME:
+        blurayStillImage(p_demux, e->param);
+        break;
     case BD_EVENT_DISCONTINUITY:
         /* reset demuxer (partially decoded PES packets must be dropped) */
         blurayResetParser(p_demux);
