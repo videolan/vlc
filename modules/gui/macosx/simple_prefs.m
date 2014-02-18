@@ -1,7 +1,7 @@
 /*****************************************************************************
 * simple_prefs.m: Simple Preferences for Mac OS X
 *****************************************************************************
-* Copyright (C) 2008-2013 VLC authors and VideoLAN
+* Copyright (C) 2008-2014 VLC authors and VideoLAN
 * $Id$
 *
 * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
@@ -397,7 +397,6 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     [o_video_fullscreen_ckb setTitle: _NS("Fullscreen")];
     [o_video_videodeco_ckb setTitle: _NS("Window decorations")];
     [o_video_onTop_ckb setTitle: _NS("Float on Top")];
-    [o_video_output_txt setStringValue: _NS("Output module")];
     [o_video_skipFrames_ckb setTitle: _NS("Skip frames")];
     [o_video_snap_box setTitle: _NS("Video snapshots")];
     [o_video_snap_folder_btn setTitle: _NS("Browse...")];
@@ -657,8 +656,6 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     [self setupButton: o_video_skipFrames_ckb forBoolValue: "skip-frames"];
     [self setupButton: o_video_black_ckb forBoolValue: "macosx-black"];
     [self setupButton: o_video_videodeco_ckb forBoolValue: "video-deco"];
-
-    [self setupButton: o_video_output_pop forModuleList: "vout"];
 
     [o_video_device_pop removeAllItems];
     i = 0;
@@ -999,7 +996,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         config_PutInt(p_intf, "skip-frames", [o_video_skipFrames_ckb state]);
         config_PutInt(p_intf, "macosx-black", [o_video_black_ckb state]);
 
-        SaveModuleList(o_video_output_pop, "vout");
         config_PutInt(p_intf, "macosx-vdev", [[o_video_device_pop selectedItem] tag]);
 
         config_PutPsz(p_intf, "snapshot-path", [[o_video_snap_folder_fld stringValue] UTF8String]);
