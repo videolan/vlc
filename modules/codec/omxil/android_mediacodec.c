@@ -552,6 +552,11 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic)
     while (1) {
         int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_output_buffer,
                                           p_sys->buffer_info, (jlong) 0);
+        if ((*env)->ExceptionOccurred(env)) {
+            (*env)->ExceptionClear(env);
+            return;
+        }
+
         if (index >= 0) {
             if (!p_sys->pixel_format) {
                 msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
@@ -748,6 +753,10 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     int attempts = 0;
     while (true) {
         int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_input_buffer, timeout);
+        if ((*env)->ExceptionOccurred(env)) {
+            (*env)->ExceptionClear(env);
+            break;
+        }
         if (index < 0) {
             GetOutput(p_dec, env, &p_pic);
             if (p_pic) {
