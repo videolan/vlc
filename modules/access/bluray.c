@@ -1195,34 +1195,6 @@ static void blurayResetParser(demux_t *p_demux)
         msg_Err(p_demux, "Failed to create TS demuxer");
 }
 
-static void blurayUpdateTitle(demux_t *p_demux, unsigned i_title)
-{
-    blurayResetParser(p_demux);
-    if (i_title >= p_demux->p_sys->i_title)
-        return;
-
-    /* read title info and init some values */
-    p_demux->info.i_title = i_title;
-    p_demux->info.i_seekpoint = 0;
-    p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
-}
-
-static void blurayUpdatePlaylist(demux_t *p_demux, unsigned i_playlist)
-{
-    blurayResetParser(p_demux);
-
-    p_demux->p_sys->i_playlist = i_playlist;
-    p_demux->p_sys->i_current_clip = 0;
-
-    /* read title info and init some values */
-    if (!p_demux->p_sys->b_menu)
-        p_demux->info.i_title = bd_get_current_title(p_demux->p_sys->bluray);
-    p_demux->info.i_seekpoint = 0;
-    p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
-
-    blurayUpdateTitleInfo(p_demux, p_demux->p_sys->pp_title[p_demux->info.i_title], -1, i_playlist);
-}
-
 /*****************************************************************************
  * bluraySetTitle: select new BD title
  *****************************************************************************/
@@ -1260,7 +1232,8 @@ static int bluraySetTitle(demux_t *p_demux, int i_title)
         msg_Err(p_demux, "cannot select bd title '%d'", i_title);
         return VLC_EGENERIC;
     }
-    blurayUpdateTitle(p_demux, i_title);
+
+    blurayResetParser(p_demux);
 
     return VLC_SUCCESS;
 }
@@ -1459,6 +1432,22 @@ static void blurayStreamSelect(demux_t *p_demux, uint32_t i_type, uint32_t i_id)
             es_out_Control(p_demux->out, ES_OUT_SET_ES, p_es);
         }
     }
+}
+
+static void blurayUpdatePlaylist(demux_t *p_demux, unsigned i_playlist)
+{
+    blurayResetParser(p_demux);
+
+    p_demux->p_sys->i_playlist = i_playlist;
+    p_demux->p_sys->i_current_clip = 0;
+
+    /* read title info and init some values */
+    if (!p_demux->p_sys->b_menu)
+        p_demux->info.i_title = bd_get_current_title(p_demux->p_sys->bluray);
+    p_demux->info.i_seekpoint = 0;
+    p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+
+    blurayUpdateTitleInfo(p_demux, p_demux->p_sys->pp_title[p_demux->info.i_title], -1, i_playlist);
 }
 
 static void blurayUpdateCurrentClip(demux_t *p_demux, uint32_t clip)
