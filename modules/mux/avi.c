@@ -343,7 +343,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     p_wf->wFormatTag = WAVE_FORMAT_A52;
                     p_wf->nBlockAlign= 1;
                     break;
-                case VLC_CODEC_MPGA:
+                case VLC_CODEC_MP3:
                     p_wf->wFormatTag = WAVE_FORMAT_MPEGLAYER3;
                     p_wf->nBlockAlign= 1;
                     break;

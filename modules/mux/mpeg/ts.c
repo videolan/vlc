@@ -935,6 +935,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     /* AUDIO */
 
     case VLC_CODEC_MPGA:
+    case VLC_CODEC_MP3:
         p_stream->i_stream_type =
             p_input->p_fmt->audio.i_rate >= 32000 ? 0x03 : 0x04;
         p_stream->i_stream_id = 0xc0;
@@ -1289,7 +1290,8 @@ static bool MuxStreams(sout_mux_t *p_mux )
 
         block_t *p_data;
         if( p_stream == p_pcr_stream || p_sys->b_data_alignment
-             || p_input->p_fmt->i_codec != VLC_CODEC_MPGA )
+             || ((p_input->p_fmt->i_codec != VLC_CODEC_MPGA ) &&
+                 (p_input->p_fmt->i_codec != VLC_CODEC_MP3) ) )
         {
             p_data = block_FifoGet( p_input->p_fifo );
             if (p_data->i_pts <= VLC_TS_INVALID)

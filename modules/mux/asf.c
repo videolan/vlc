@@ -374,22 +374,20 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     tk->psz_name = "MPEG-4 Audio";
                     i_bitspersample = 0;
                     break;
-                case VLC_CODEC_MPGA:
-#if 1
+                case VLC_CODEC_MP3:
                     tk->psz_name = "MPEG Audio Layer 3";
                     tk->i_tag = WAVE_FORMAT_MPEGLAYER3;
                     i_bitspersample = 0;
                     i_blockalign = 1;
                     i_extra = 12;
                     break;
-#else
+                case VLC_CODEC_MPGA:
                     tk->psz_name = "MPEG Audio Layer 1/2";
                     tk->i_tag = WAVE_FORMAT_MPEG;
                     i_bitspersample = 0;
                     i_blockalign = 1;
                     i_extra = 22;
                     break;
-#endif
                 case VLC_CODEC_WMA1:
                     tk->psz_name = "Windows Media Audio v1";
                     tk->i_tag = WAVE_FORMAT_WMA1;
