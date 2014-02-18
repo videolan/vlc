@@ -425,6 +425,7 @@ struct convertBits {
 };
 typedef convertBits< 9, 8> convert8To9Bits;
 typedef convertBits<10, 8> convert8To10Bits;
+typedef convertBits<16, 8> convert8To16Bits;
 
 struct convertRgbToYuv8 {
     convertRgbToYuv8(const video_format_t *, const video_format_t *) {}
@@ -598,9 +599,11 @@ static const struct {
 #ifdef WORDS_BIGENDIAN
     YUV(VLC_CODEC_I444_9B,  CPictureI444_16,  convert8To9Bits),
     YUV(VLC_CODEC_I444_10B, CPictureI444_16,  convert8To10Bits),
+    YUV(VLC_CODEC_I444_16B, CPictureI444_16,  convert8To16Bits),
 #else
     YUV(VLC_CODEC_I444_9L,  CPictureI444_16,  convert8To9Bits),
     YUV(VLC_CODEC_I444_10L, CPictureI444_16,  convert8To10Bits),
+    YUV(VLC_CODEC_I444_16L, CPictureI444_16,  convert8To16Bits),
 #endif
 
     YUV(VLC_CODEC_YUYV,     CPictureYUYV,     convertNone),
