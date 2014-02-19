@@ -165,10 +165,15 @@ addons_manager_t *addons_manager_New( vlc_object_t *p_this )
 
 void addons_manager_Delete( addons_manager_t *p_manager )
 {
+    vlc_mutex_lock( &p_manager->p_priv->finder.lock );
     if ( p_manager->p_priv->finder.b_live )
         vlc_cancel( *p_manager->p_priv->finder.p_thread );
+    vlc_mutex_unlock( &p_manager->p_priv->finder.lock );
+
+    vlc_mutex_lock( &p_manager->p_priv->installer.lock );
     if ( p_manager->p_priv->installer.b_live )
         vlc_cancel( *p_manager->p_priv->installer.p_thread );
+    vlc_mutex_unlock( &p_manager->p_priv->installer.lock );
 
     vlc_event_manager_fini( p_manager->p_event_manager );
 
@@ -193,6 +198,12 @@ void addons_manager_Delete( addons_manager_t *p_manager )
 void addons_manager_Gather( addons_manager_t *p_manager, const char *psz_uri )
 {
     vlc_mutex_lock( &p_manager->p_priv->finder.lock );
+    if( p_manager->p_priv->finder.b_live )
+    {
+        /* Ignore if we're already running */
+        vlc_mutex_unlock( &p_manager->p_priv->finder.lock );
+        return;
+    }
     if ( psz_uri )
     {
         p_manager->p_priv->finder.psz_uri_hint = strdup( psz_uri );
@@ -293,7 +304,6 @@ static void *FinderThread( void *p_data )
 {
     addons_manager_t *p_manager = p_data;
     int i_cancel;
-    p_manager->p_priv->finder.b_live = true;
 
     addons_finder_t *p_finder =
             vlc_custom_create( p_manager->p_priv->p_parent, sizeof( *p_finder ), "entries finder" );
@@ -321,7 +331,9 @@ static void *FinderThread( void *p_data )
         vlc_object_release( p_finder );
     }
 
+    vlc_mutex_lock( & p_manager->p_priv->finder.lock );
     p_manager->p_priv->finder.b_live = false;
+    vlc_mutex_unlock( & p_manager->p_priv->finder.lock );
 
     vlc_event_t event;
     event.type = vlc_AddonsDiscoveryEnded;
@@ -403,8 +415,8 @@ static void *InstallerThread( void *p_data )
         if ( !p_manager->p_priv->installer.entries.i_size )
         {
             /* No queued addons */
-            vlc_mutex_unlock( &p_manager->p_priv->installer.lock );
             p_manager->p_priv->installer.b_live = false;
+            vlc_mutex_unlock( &p_manager->p_priv->installer.lock );
             break;
         }
 
