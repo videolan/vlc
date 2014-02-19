@@ -62,7 +62,6 @@ void vout_control_Init(vout_control_t *ctrl)
     vlc_cond_init(&ctrl->wait_acknowledge);
 
     ctrl->is_dead = false;
-    ctrl->is_sleeping = false;
     ctrl->can_sleep = true;
     ctrl->is_processing = false;
     ARRAY_INIT(ctrl->cmd);
@@ -115,8 +114,7 @@ void vout_control_Wake(vout_control_t *ctrl)
 {
     vlc_mutex_lock(&ctrl->lock);
     ctrl->can_sleep = false;
-    if (ctrl->is_sleeping)
-        vlc_cond_signal(&ctrl->wait_request);
+    vlc_cond_signal(&ctrl->wait_request);
     vlc_mutex_unlock(&ctrl->lock);
 }
 
@@ -190,10 +188,8 @@ int vout_control_Pop(vout_control_t *ctrl, vout_control_cmd_t *cmd,
 
         /* Spurious wakeups are perfectly fine */
         if (deadline <= VLC_TS_INVALID) {
-            ctrl->is_sleeping = true;
             if (ctrl->can_sleep)
                 vlc_cond_timedwait(&ctrl->wait_request, &ctrl->lock, max_deadline);
-            ctrl->is_sleeping = false;
         } else {
             vlc_cond_timedwait(&ctrl->wait_request, &ctrl->lock, __MIN(deadline, max_deadline));
         }
