@@ -393,10 +393,8 @@ int OpenEncoder( vlc_object_t *p_this )
             p_sys->i_aac_profile = FF_PROFILE_AAC_MAIN;
         else if( !strncmp( psz_val, "low", 3 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_LOW;
-#if 0    /* Not supported by FAAC encoder */
         else if( !strncmp( psz_val, "ssr", 3 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_SSR;
-#endif
         else if( !strncmp( psz_val, "ltp", 3 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_LTP;
 #if LIBAVCODEC_VERSION_CHECK( 54, 19, 0, 35, 100 )
