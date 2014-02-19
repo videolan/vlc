@@ -454,6 +454,9 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->i_alpha = p_sys->i_alpha;
     p_spu->b_absolute = false;
 
+    p_spu->i_original_picture_width = p_sys->i_width;
+    p_spu->i_original_picture_height = p_sys->i_height;
+
     vlc_mutex_lock( &p_sys->lock );
     vlc_global_lock( VLC_MOSAIC_MUTEX );
 
