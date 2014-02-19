@@ -323,7 +323,7 @@ static int OpenDecoder(vlc_object_t *p_this)
                 /* The mime type is matching for this component. We
                    now check if the capabilities of the codec is
                    matching the video format. */
-                if (p_dec->fmt_in.i_codec == VLC_CODEC_H264 && fmt_profile && profile_levels_len) {
+                if (p_dec->fmt_in.i_codec == VLC_CODEC_H264 && fmt_profile) {
                     for (int i = 0; i < profile_levels_len && !found; ++i) {
                         jobject profile_level = (*env)->GetObjectArrayElement(env, profile_levels, i);
 
