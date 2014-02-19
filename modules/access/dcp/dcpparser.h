@@ -71,7 +71,7 @@ struct info_reel
     int i_entrypoint;
     int i_duration;
     int i_correction;       /* entrypoint - sum of previous durations */
-    int i_absolute_end;     /* correction + duration */
+    uint32_t i_absolute_end;     /* correction + duration */
 };
 
 /* This struct stores the most important information about the DCP */

@@ -442,6 +442,9 @@ int Asset::Parse( xml_reader_t *p_xmlReader, string p_node, int p_type)
                                 case ASSET_SIZE:
                                     /* Asset tags not in AssetMap */
                                     break;
+                                default:
+                                    msg_Warn(this->p_demux, "Unknow ASSET_TAG: %i", _tag );
+                                    break;
                             }
                             /* break the for loop as a tag is found*/
                             break;
@@ -526,6 +529,9 @@ int Asset::ParsePKL( xml_reader_t *p_xmlReader)
                                 case ASSET_PACKING_LIST:
                                 case ASSET_CHUNK_LIST:
                                     /* Asset tags not in PKL */
+                                    break;
+                                default:
+                                    msg_Warn(this->p_demux, "Unknow ASSET_TAG: %i", _tag );
                                     break;
                             }
                             /* break the for loop as a tag is found*/
@@ -806,6 +812,9 @@ int PKL::Parse()
                                 if ( ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_group_id = s_value;
+                                break;
+                            default:
+                                msg_Warn(this->p_demux, "Unknow PKG_TAG: %i", _tag );
                                 break;
                         }
                         /* break the for loop as a tag is found*/
@@ -1300,6 +1309,9 @@ int CPL::Parse()
                                 if ( ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_content_kind = s_value;
+                                break;
+                            default:
+                                msg_Warn(this->p_demux, "Unknow CPL_TAG: %i", _tag );
                                 break;
                         }
 

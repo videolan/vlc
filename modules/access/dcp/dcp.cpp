@@ -136,17 +136,17 @@ class demux_sys_t
     uint32_t frame_no;
 
     /* frame rate */
-    unsigned int frame_rate_num;
-    unsigned int frame_rate_denom;
+    int frame_rate_num;
+    int frame_rate_denom;
 
     /* total number of frames */
     uint32_t frames_total;
 
     /* current video reel */
-    int i_video_reel;
+    unsigned int i_video_reel;
 
     /* current audio reel */
-    int i_audio_reel;
+    unsigned int i_audio_reel;
 
     uint8_t i_chans_to_reorder;            /* do we need channel reordering */
     uint8_t pi_chan_table[AOUT_CHAN_MAX];
@@ -156,8 +156,8 @@ class demux_sys_t
 
     demux_sys_t():
         PictureEssType ( ESS_UNKNOWN ),
-        v_videoReader( NULL ),
-        v_audioReader( NULL ),
+        v_videoReader(),
+        v_audioReader(),
         p_video_es( NULL ),
         p_audio_es( NULL ),
         p_dcp( NULL ),
@@ -318,7 +318,7 @@ static int Open( vlc_object_t *obj )
 
     /* Open video file */
     EssenceType_t essInter;
-    for ( int i = 0; i < ( p_sys->p_dcp->video_reels.size() ); i++ )
+    for ( size_t i = 0; i < ( p_sys->p_dcp->video_reels.size() ); i++ )
     {
         EssenceType( p_sys->p_dcp->video_reels[i].filename.c_str(), essInter );
         if ( i == 0 )
@@ -487,14 +487,14 @@ static int Open( vlc_object_t *obj )
     if ( (AudioEssType == ESS_PCM_24b_48k) || (AudioEssType == ESS_PCM_24b_96k) ) {
         PCM::AudioDescriptor AudioDesc;
 
-        for ( int i=0; i < ( p_sys->p_dcp->audio_reels.size() ); i++)
+        for ( size_t i = 0; i < ( p_sys->p_dcp->audio_reels.size() ); i++)
         {
             if ( i != 0 )
             {
                 EssenceType( p_sys->p_dcp->audio_reels[i].filename.c_str(), AudioEssTypeCompare );
                 if ( AudioEssTypeCompare != AudioEssType )
                 {
-                    msg_Err( p_demux, "Integrity check failed : different audio essence types",
+                    msg_Err( p_demux, "Integrity check failed : different audio essence types in %s",
                     p_sys->p_dcp->audio_reels[i].filename.c_str() );
                     retval = VLC_EGENERIC;
                     goto error;
@@ -832,21 +832,21 @@ void CloseDcpAndMxf( demux_t *p_demux )
         case ESS_UNKNOWN:
             break;
         case ESS_JPEG_2000:
-            for ( int i = 0; i < p_sys->v_videoReader.size(); i++ )
+            for ( size_t i = 0; i < p_sys->v_videoReader.size(); i++ )
             {
                 if( p_sys->v_videoReader[i].p_PicMXFReader )
                     p_sys->v_videoReader[i].p_PicMXFReader->Close();
             }
             break;
         case ESS_JPEG_2000_S:
-            for ( int i = 0; i < p_sys->v_videoReader.size(); i++ )
+            for ( size_t i = 0; i < p_sys->v_videoReader.size(); i++ )
             {
                 if( p_sys->v_videoReader[i].p_PicMXFSReader )
                     p_sys->v_videoReader[i].p_PicMXFSReader->Close();
             }
             break;
         case ESS_MPEG2_VES:
-            for ( int i = 0; i < p_sys->v_videoReader.size(); i++ )
+            for ( size_t i = 0; i < p_sys->v_videoReader.size(); i++ )
             {
                 if( p_sys->v_videoReader[i].p_VideoMXFReader )
                     p_sys->v_videoReader[i].p_VideoMXFReader->Close();
@@ -856,7 +856,7 @@ void CloseDcpAndMxf( demux_t *p_demux )
             break;
     }
 
-    for ( int i = 0; i < p_sys->v_audioReader.size(); i++ )
+    for ( size_t i = 0; i < p_sys->v_audioReader.size(); i++ )
     {
         if( p_sys->v_audioReader[i].p_AudioMXFReader )
             p_sys->v_audioReader[i].p_AudioMXFReader->Close();
