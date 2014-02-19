@@ -187,11 +187,11 @@ int vout_control_Pop(vout_control_t *ctrl, vout_control_cmd_t *cmd,
         const mtime_t max_deadline = mdate() + timeout;
 
         /* Spurious wakeups are perfectly fine */
-        if (deadline <= VLC_TS_INVALID) {
-            if (ctrl->can_sleep)
+        if (ctrl->can_sleep) {
+            if (deadline <= VLC_TS_INVALID)
                 vlc_cond_timedwait(&ctrl->wait_request, &ctrl->lock, max_deadline);
-        } else {
-            vlc_cond_timedwait(&ctrl->wait_request, &ctrl->lock, __MIN(deadline, max_deadline));
+            else
+                vlc_cond_timedwait(&ctrl->wait_request, &ctrl->lock, __MIN(deadline, max_deadline));
         }
     }
 
