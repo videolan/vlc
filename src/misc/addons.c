@@ -174,6 +174,9 @@ void addons_manager_Delete( addons_manager_t *p_manager )
         vlc_cancel( p_manager->p_priv->installer.thread );
     vlc_mutex_unlock( &p_manager->p_priv->installer.lock );
 
+    vlc_join( p_manager->p_priv->finder.thread, NULL );
+    vlc_join( p_manager->p_priv->installer.thread, NULL );
+
     vlc_event_manager_fini( p_manager->p_event_manager );
 
 #define FREE_QUEUE( name ) \
