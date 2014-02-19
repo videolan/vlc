@@ -310,8 +310,13 @@ static int OpenDecoder(vlc_object_t *p_this)
 
         jobject codec_capabilities = (*env)->CallObjectMethod(env, info, p_sys->get_capabilities_for_type,
                                                               (*env)->NewStringUTF(env, mime));
-        jobject profile_levels = (*env)->GetObjectField(env, codec_capabilities, p_sys->profile_levels_field);
-        int profile_levels_len = profile_levels ? (*env)->GetArrayLength(env, profile_levels) : 0;
+        jobject profile_levels = NULL;
+        int profile_levels_len = 0;
+        if (codec_capabilities) {
+            profile_levels = (*env)->GetObjectField(env, codec_capabilities, p_sys->profile_levels_field);
+            if (profile_levels)
+                profile_levels_len = (*env)->GetArrayLength(env, profile_levels);
+        }
         msg_Dbg(p_dec, "Number of profile levels: %d", profile_levels_len);
 
         jobject types = (*env)->CallObjectMethod(env, info, p_sys->get_supported_types);
