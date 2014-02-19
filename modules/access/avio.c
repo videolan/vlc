@@ -317,7 +317,7 @@ static ssize_t Read(access_t *access, uint8_t *data, size_t size)
  *****************************************************************************/
 static ssize_t Write(sout_access_out_t *p_access, block_t *p_buffer)
 {
-    access_sys_t *p_sys = (access_sys_t*)p_access->p_sys;
+    sout_access_out_sys_t *p_sys = (sout_access_out_sys_t*)p_access->p_sys;
     size_t i_write = 0;
     int val;
 
