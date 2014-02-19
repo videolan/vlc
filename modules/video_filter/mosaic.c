@@ -433,8 +433,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     filter_sys_t *p_sys = p_filter->p_sys;
     bridge_t *p_bridge;
 
-    subpicture_t *p_spu;
-
     int i_index, i_real_index, i_row, i_col;
     int i_greatest_real_index_used = p_sys->i_order_length - 1;
 
@@ -444,7 +442,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     subpicture_region_t *p_region_prev = NULL;
 
     /* Allocate the subpicture internal data. */
-    p_spu = filter_NewSubpicture( p_filter );
+    subpicture_t *p_spu = filter_NewSubpicture( p_filter );
     if( !p_spu )
         return NULL;
 
