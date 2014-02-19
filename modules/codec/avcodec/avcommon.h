@@ -92,6 +92,8 @@ static inline void vlc_init_avformat(vlc_object_t *obj)
 {
     vlc_avcodec_lock();
 
+    avformat_network_init();
+
     vlc_init_avutil(obj);
 
 #if LIBAVUTIL_VERSION_CHECK(51, 25, 0, 42, 100)
