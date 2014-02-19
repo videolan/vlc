@@ -539,7 +539,7 @@ static int WriteCatalog( addons_storage_t *p_storage,
     }
     free( psz_userdir );
 
-    if ( asprintf( &psz_file_tmp, "%s.tmp", psz_file ) < 1 )
+    if ( asprintf( &psz_file_tmp, "%s.tmp%"PRIu32, psz_file, (uint32_t)getpid() ) < 1 )
     {
         free( psz_file );
         return VLC_ENOMEM;

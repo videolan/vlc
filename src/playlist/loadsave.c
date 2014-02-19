@@ -202,7 +202,7 @@ int playlist_MLDump( playlist_t *p_playlist )
 
     strcat( psz_dirname, DIR_SEP "ml.xspf" );
 
-    if ( asprintf( &psz_temp, "%s.tmp", psz_dirname ) < 1 )
+    if ( asprintf( &psz_temp, "%s.tmp%"PRIu32, psz_dirname, (uint32_t)getpid() ) < 1 )
         return VLC_EGENERIC;
 
     int i_ret = playlist_Export( p_playlist, psz_temp, p_playlist->p_media_library,
