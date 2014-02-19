@@ -748,7 +748,7 @@ QVariant AddonsListModel::Addon::data( int role ) const
         returnval = QVariant( (double) p_entry->i_downloads );
         break;
     case ScoreRole:
-        returnval = QVariant( (double) p_entry->i_score );
+        returnval = QVariant( (int) p_entry->i_score );
         break;
     case VersionRole:
         returnval = QVariant( p_entry->psz_version );
@@ -1031,13 +1031,13 @@ void AddonItemDelegate::paint( QPainter *painter,
     textrect.translate( 0, newopt.fontMetrics.height() );
 
     /* Score */
-    double i_score = index.data( AddonsListModel::ScoreRole ).toDouble();
+    int i_score = index.data( AddonsListModel::ScoreRole ).toInt();
     QPixmap scoreicon;
     if ( i_score )
     {
         scoreicon = QPixmap( ":/addons/score" ).scaledToHeight(
                     newopt.fontMetrics.height(), Qt::SmoothTransformation );
-        int i_width = ( i_score / 5.0 ) * scoreicon.width();
+        int i_width = ( (float) i_score / ADDON_MAX_SCORE ) * scoreicon.width();
         /* Erase the end (value) of our pixmap with a shadow */
         QPainter erasepainter( &scoreicon );
         erasepainter.setCompositionMode( QPainter::CompositionMode_SourceIn );

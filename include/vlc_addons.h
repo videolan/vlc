@@ -54,6 +54,7 @@ typedef enum addon_flags_t
     ADDON_UPDATABLE  = 1 << 2,
 } addon_flags_t;
 
+#define ADDON_MAX_SCORE (5 * 100)
 #define ADDON_UUID_SIZE 16
 #define ADDON_UUID_PSZ_SIZE (ADDON_UUID_SIZE * 2 + 4)
 typedef uint8_t addon_uuid_t[ADDON_UUID_SIZE];
@@ -86,7 +87,7 @@ struct addon_entry_t
 
     /* stats */
     long int i_downloads;
-    long int i_score;
+    int i_score; /* score 0..5 in hundredth */
 
     /* Lister */
     char *psz_source_module;

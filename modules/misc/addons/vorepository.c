@@ -249,10 +249,16 @@ static int ParseCategoriesInfo( addons_finder_t *p_finder, stream_t *p_stream )
                     else if ( !strcmp( attr, "downloads" ) )
                     {
                         p_entry->i_downloads = atoi( value );
+                        if ( p_entry->i_downloads < 0 )
+                            p_entry->i_downloads = 0;
                     }
                     else if ( !strcmp( attr, "score" ) )
                     {
-                        p_entry->i_score = atol( value );
+                        p_entry->i_score = atoi( value );
+                        if ( p_entry->i_score < 0 )
+                            p_entry->i_score = 0;
+                        else if ( p_entry->i_score > ADDON_MAX_SCORE )
+                            p_entry->i_score = ADDON_MAX_SCORE;
                     }
                     else if ( !strcmp( attr, "version" ) )
                     {

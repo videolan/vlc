@@ -593,7 +593,7 @@ static int WriteCatalog( addons_storage_t *p_storage,
 
         char *psz_uuid = addons_uuid_to_psz( ( const addon_uuid_t * ) & p_entry->uuid );
         fprintf( p_catalog, "\t\t<addon source=\"%s\" type=\"%s\" id=\"%s\" "
-                                 "downloads=\"%ld\" score=\"%ld\"",
+                                 "downloads=\"%ld\" score=\"%d\"",
                  ( psz_tempstring ) ? psz_tempstring : "",
                  getTypePsz( p_entry->e_type ),
                  psz_uuid,
@@ -746,10 +746,16 @@ static int LoadCatalog( addons_finder_t *p_finder )
                     else if ( !strcmp( attr, "downloads" ) )
                     {
                         p_entry->i_downloads = atoi( value );
+                        if ( p_entry->i_downloads < 0 )
+                            p_entry->i_downloads = 0;
                     }
                     else if ( !strcmp( attr, "score" ) )
                     {
-                        p_entry->i_score = atol( value );
+                        p_entry->i_score = atoi( value );
+                        if ( p_entry->i_score < 0 )
+                            p_entry->i_score = 0;
+                        else if ( p_entry->i_score > ADDON_MAX_SCORE )
+                            p_entry->i_score = ADDON_MAX_SCORE;
                     }
                     else if ( !strcmp( attr, "source" ) )
                     {
