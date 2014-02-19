@@ -224,16 +224,23 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         codec->sample_rate = fmt->audio.i_rate;
         codec->time_base = (AVRational){1, codec->sample_rate};
         codec->frame_size = fmt->audio.i_frame_length;
+        if (fmt->i_bitrate == 0) {
+            msg_Warn( p_mux, "Missing audio bitrate, assuming 64k" );
+            fmt->i_bitrate = 64000;
+        }
         break;
 
     case VIDEO_ES:
-        if( !fmt->video.i_frame_rate ||
-            !fmt->video.i_frame_rate_base )
-        {
+        if( !fmt->video.i_frame_rate || !fmt->video.i_frame_rate_base ) {
             msg_Warn( p_mux, "Missing frame rate, assuming 25fps" );
             fmt->video.i_frame_rate = 25;
             fmt->video.i_frame_rate_base = 1;
-        }
+        } else
+            msg_Dbg( p_mux, "Muxing framerate will be %d/%d = %.2f fps",
+                    fmt->video.i_frame_rate,
+                    fmt->video.i_frame_rate_base,
+                    (double)fmt->video.i_frame_rate/(double)fmt->video.i_frame_rate_base );
+
         codec->codec_type = AVMEDIA_TYPE_VIDEO;
         codec->width = fmt->video.i_width;
         codec->height = fmt->video.i_height;
@@ -241,10 +248,17 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                    &codec->sample_aspect_ratio.den,
                    fmt->video.i_sar_num,
                    fmt->video.i_sar_den, 1 << 30 /* something big */ );
+        msg_Dbg(p_mux, "Muxing aspect ratio will be %d/%d",
+                fmt->video.i_sar_num, fmt->video.i_sar_den);
         stream->sample_aspect_ratio.den = codec->sample_aspect_ratio.den;
         stream->sample_aspect_ratio.num = codec->sample_aspect_ratio.num;
         codec->time_base.den = fmt->video.i_frame_rate;
         codec->time_base.num = fmt->video.i_frame_rate_base;
+        if (fmt->i_bitrate == 0) {
+            msg_Warn( p_mux, "Missing video bitrate, assuming 512k" );
+            fmt->i_bitrate = 512000;
+        } else
+            msg_Dbg( p_mux, "Muxing video bitrate will be %d", fmt->i_bitrate );
         break;
 
     }
