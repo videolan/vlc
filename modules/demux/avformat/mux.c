@@ -221,6 +221,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     case AUDIO_ES:
         codec->codec_type = AVMEDIA_TYPE_AUDIO;
         codec->channels = fmt->audio.i_channels;
+        codec->frame_size = fmt->audio.i_frame_length;
         codec->sample_rate = fmt->audio.i_rate;
         codec->time_base = (AVRational){1, codec->sample_rate};
         codec->frame_size = fmt->audio.i_frame_length;
