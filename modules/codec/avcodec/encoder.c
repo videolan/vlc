@@ -887,6 +887,7 @@ errmsg:
         {
             goto error;
         }
+        p_enc->fmt_out.audio.i_frame_length = p_context->frame_size;
         p_enc->fmt_out.audio.i_blockalign = p_context->block_align;
         p_enc->fmt_out.audio.i_bitspersample = aout_BitsPerSample( p_enc->fmt_out.i_codec );
         //b_variable tells if we can feed any size frames to encoder
