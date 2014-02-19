@@ -188,7 +188,7 @@ int vout_control_Pop(vout_control_t *ctrl, vout_control_cmd_t *cmd,
 
         const mtime_t max_deadline = mdate() + timeout;
 
-        /* Supurious wake up are perfectly fine */
+        /* Spurious wakeups are perfectly fine */
         if (deadline <= VLC_TS_INVALID) {
             ctrl->is_sleeping = true;
             if (ctrl->can_sleep)
