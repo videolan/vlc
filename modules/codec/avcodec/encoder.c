@@ -403,6 +403,10 @@ int OpenEncoder( vlc_object_t *p_this )
             p_sys->i_aac_profile = FF_PROFILE_AAC_HE_V2;
         else if( !strncmp( psz_val, "hev1", 4 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_HE;
+        else if( !strncmp( psz_val, "ld", 2 ) )
+            p_sys->i_aac_profile = FF_PROFILE_AAC_LD;
+        else if( !strncmp( psz_val, "eld", 3 ) )
+            p_sys->i_aac_profile = FF_PROFILE_AAC_ELD;
 #endif
         else
         {
