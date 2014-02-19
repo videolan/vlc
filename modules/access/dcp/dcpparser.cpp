@@ -225,6 +225,10 @@ AssetMap::~AssetMap() { }
 int AssetMap::Parse ( )
 {
     int type = 0;
+    int reel_nbr = 0;
+    int index = 0;
+    int sum_duration_vid = 0;
+    int sum_duration_aud = 0;
     string node;
 
     CPL  *cpl;
@@ -327,23 +331,53 @@ int AssetMap::Parse ( )
         this->CloseXml();
         return -1;
     }
-    /*TODO : case of 1st reel only managed */
-    reel = cpl->getReel(0);
 
-    Asset *asset;
-    /* Get picture */
-    asset = reel->getTrack(TRACK_PICTURE);
-    msg_Dbg( this->p_demux, "Video Track: %s",asset->getPath().c_str());
-    msg_Dbg( this->p_demux, "Entry point: %i",asset->getEntryPoint());
-    p_dcp->videofile = p_dcp->path + asset->getPath();
-    p_dcp->i_video_entry = asset->getEntryPoint();
-    /* Get audio */
-    asset = reel->getTrack(TRACK_SOUND);
-    msg_Dbg( this->p_demux, "Audio Track: %s",asset->getPath().c_str());
-    msg_Dbg( this->p_demux, "Entry point: %i",asset->getEntryPoint());
-    p_dcp->audiofile = p_dcp->path + asset->getPath();
-    p_dcp->i_audio_entry = asset->getEntryPoint();
+    reel_nbr = cpl->getReelList().size();
+    for(index = 0; index != reel_nbr; ++index)
+    {
+        reel = cpl->getReel(index);
 
+        Asset *asset;
+        struct info_reel video;
+        struct info_reel audio;
+
+        /* Get picture */
+        asset = reel->getTrack(TRACK_PICTURE);
+        if (asset != NULL)
+        {
+            sum_duration_vid += asset->getDuration();
+            video.filename = p_dcp->path + asset->getPath();
+            video.i_entrypoint = asset->getEntryPoint();
+            video.i_duration = asset->getDuration();
+            video.i_correction = video.i_entrypoint - sum_duration_vid + video.i_duration;
+            video.i_absolute_end = sum_duration_vid;
+            p_dcp->video_reels.push_back(video);
+            msg_Dbg( this->p_demux, "Video Track: %s",asset->getPath().c_str());
+            msg_Dbg( this->p_demux, "Entry point: %i",asset->getEntryPoint());
+        }
+        /* Get audio */
+        asset = reel->getTrack(TRACK_SOUND);
+        if (asset != NULL)
+        {
+            /*if (!p_dcp->audio_reels.empty())
+            {
+                sum_duration_aud = 0;
+                for (int i = 0; i != p_dcp->audio_reels.size(); ++i)
+                {
+                    sum_duration_aud += p_dcp->audio_reels(i).i_duration;
+                }
+            }*/
+            sum_duration_aud += asset->getDuration();
+            audio.filename = p_dcp->path + asset->getPath();
+            audio.i_entrypoint = asset->getEntryPoint();
+            audio.i_duration = asset->getDuration();
+            audio.i_correction = audio.i_entrypoint - sum_duration_aud + audio.i_duration;
+            audio.i_absolute_end = sum_duration_aud;
+            p_dcp->audio_reels.push_back(audio);
+            msg_Dbg( this->p_demux, "Audio Track: %s",asset->getPath().c_str());
+            msg_Dbg( this->p_demux, "Entry point: %i",asset->getEntryPoint());
+        }
+    }
     /* free memory */
     this->CloseXml();
     return VLC_SUCCESS;

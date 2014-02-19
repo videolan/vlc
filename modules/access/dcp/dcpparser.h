@@ -63,6 +63,17 @@ class Asset;
 class AssetList: public std::list<Asset *> {};
 class PKL;
 
+
+/* This struct stores useful information about an MXF for demux() */
+struct info_reel
+{
+    string filename;
+    int i_entrypoint;
+    int i_duration;
+    int i_correction;       /* entrypoint - sum of previous durations */
+    int i_absolute_end;     /* correction + duration */
+};
+
 /* This struct stores the most important information about the DCP */
 struct dcp_t
 {
@@ -71,16 +82,11 @@ struct dcp_t
     vector<PKL *> pkls;
     AssetList *p_asset_list;
 
-    string videofile;               /* Picture file name */
-    string audiofile;               /* Sound file name */
-
-    int i_video_entry;              /* Picture entry point */
-    int i_audio_entry;              /* Sound entry point */
+    vector<info_reel> audio_reels;
+    vector<info_reel> video_reels;
 
     dcp_t():
-        p_asset_list(NULL),
-        i_video_entry(0),
-        i_audio_entry(0) {};
+        p_asset_list(NULL) {};
 
     ~dcp_t( ) {
         vlc_delete_all(pkls);
@@ -160,6 +166,7 @@ public:
     string getId() const { return this->s_id; } ;
     string getPath() const { return this->s_path; };
     string getType() const { return this->s_type; };
+    string getOriginalFilename() const { return this->s_original_filename; };
     int getEntryPoint() const { return this->i_entry_point; };
     int getDuration() const { return this->i_duration; };
     int getIntrinsicDuration() const { return this->i_intrisic_duration; };
@@ -236,6 +243,7 @@ public:
     virtual int Parse();
 
     Reel *getReel(int pos) { return this->vec_reel[pos]; } ;
+    std::vector<Reel *> getReelList() { return this->vec_reel; } ;
 
 private :
     AssetList *asset_list;
