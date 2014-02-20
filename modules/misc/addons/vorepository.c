@@ -347,27 +347,39 @@ static int Find( addons_finder_t *p_finder )
 
 static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
 {
+    vlc_mutex_lock( &p_entry->lock );
     if ( !p_entry->psz_archive_uri )
+    {
+        vlc_mutex_unlock( &p_entry->lock );
         return VLC_EGENERIC;
+    }
+    char *psz_archive_uri = strdup( p_entry->psz_archive_uri );
+    vlc_mutex_unlock( &p_entry->lock );
+    if ( !psz_archive_uri )
+        return VLC_ENOMEM;
 
     /* get archive and parse manifest */
     stream_t *p_stream;
 
-    if ( p_entry->psz_archive_uri[0] == '/' )
+    if ( psz_archive_uri[0] == '/' )
     {
         /* Relative path */
         char *psz_uri;
-        if ( ! asprintf( &psz_uri, ADDONS_REPO_SCHEMEHOST"%s", p_entry->psz_archive_uri ) )
+        if ( ! asprintf( &psz_uri, ADDONS_REPO_SCHEMEHOST"%s", psz_archive_uri ) )
+        {
+            free( psz_archive_uri );
             return VLC_ENOMEM;
+        }
         p_stream = stream_UrlNew( p_finder, psz_uri );
         free( psz_uri );
     }
     else
     {
-        p_stream = stream_UrlNew( p_finder, p_entry->psz_archive_uri );
+        p_stream = stream_UrlNew( p_finder, psz_archive_uri );
     }
 
-    msg_Dbg( p_finder, "downloading archive %s", p_entry->psz_archive_uri );
+    msg_Dbg( p_finder, "downloading archive %s", psz_archive_uri );
+    free ( psz_archive_uri );
     if ( !p_stream ) return VLC_EGENERIC;
 
     /* In case of pf_ reuse */
@@ -430,8 +442,10 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
         return VLC_EGENERIC;
     }
 
+    vlc_mutex_lock( &p_entry->lock );
     int i_ret = ( ParseManifest( p_finder, p_entry, psz_tempfileuri, p_stream ) > 0 )
                     ? VLC_SUCCESS : VLC_EGENERIC;
+    vlc_mutex_unlock( &p_entry->lock );
     free( psz_tempfileuri );
     stream_Delete( p_stream );
 

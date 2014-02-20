@@ -498,14 +498,15 @@ static int Install( addons_storage_t *p_storage, addon_entry_t *p_entry )
                                       p_entry->psz_source_module, true );
     if( p_module )
     {
-        vlc_mutex_lock( &p_entry->lock );
         if ( p_finder->pf_retrieve( p_finder, p_entry ) == VLC_SUCCESS )
         {
             /* Do things while retrieved data is here */
+            vlc_mutex_lock( &p_entry->lock );
             i_ret = InstallAllFiles( p_storage, p_entry );
+            vlc_mutex_unlock( &p_entry->lock );
             /* !Do things while retrieved data is here */
         }
-        vlc_mutex_unlock( &p_entry->lock );
+
         module_unneed( p_finder, p_module );
     }
 
