@@ -58,14 +58,14 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
         return -1;
 
     module_handle_t handle = NULL;
-#if (_WIN32_WINNT >= 0x601)
+#if (_WIN32_WINNT >= 0x601) && !VLC_WINSTORE_APP
     DWORD mode;
 
     if (SetThreadErrorMode (SEM_FAILCRITICALERRORS, &mode) == 0)
 #endif
     {
         handle = LoadLibraryW (wfile);
-#if (_WIN32_WINNT >= 0x601)
+#if (_WIN32_WINNT >= 0x601) && !VLC_WINSTORE_APP
         SetThreadErrorMode (mode, NULL);
 #endif
     }
