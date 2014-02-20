@@ -137,7 +137,7 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    playlist_t *p_playlist = pl_Get( p_this );
+    playlist_t *p_playlist = pl_Get( p_intf );
     intf_sys_t *p_sys = p_intf->p_sys;
 
     var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
