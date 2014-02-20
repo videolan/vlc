@@ -116,7 +116,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = malloc(sizeof(decoder_sys_t)) ) == NULL )
+    p_dec->p_sys = malloc( sizeof(decoder_sys_t) );
+    if( p_dec->p_sys == NULL )
         return VLC_ENOMEM;
 
     p_dec->p_sys->p_obj = p_this;
