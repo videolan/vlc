@@ -406,6 +406,7 @@ $Id$
  * win_msg: Windows Messages module
  * windrive: Windows logical disc drives
  * wingdi: WIN 32 / WIN CE GDI video output
+ * winstore: Windows Store App audio output
  * wma_fixed: wma decoder using integer decoder from Rockbox
  * x262: MPEG-2 video encoder using x262
  * x26410b: H264 10 bit video encoder using x264

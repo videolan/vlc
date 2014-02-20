@@ -31,6 +31,7 @@ Encoder:
  * Support for HEVC/H.265 encoding using x265
  * Support for Opus encoding using libopus
  * New jpeg image encoder using libjpeg
+ * New png image encoder using libpng
 
 Demuxer:
  * New CAF format module
