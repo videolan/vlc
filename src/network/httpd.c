@@ -671,14 +671,8 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
         int64_t i_write;
         int     i_pos;
 
-#if 0
-        fprintf( stderr, "httpd_StreamCallBack i_body_offset=%lld\n",
-                 answer->i_body_offset );
-#endif
-
         if( answer->i_body_offset >= stream->i_buffer_pos )
         {
-            /* fprintf( stderr, "httpd_StreamCallBack: no data\n" ); */
             return VLC_EGENERIC;    /* wait, no data available */
         }
         if( cl->i_keyframe_wait_to_pass >= 0 )
@@ -695,10 +689,6 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
             stream->i_buffer_pos )
         {
             /* this client isn't fast enough */
-#if 0
-            fprintf( stderr, "fixing i_body_offset (old=%lld new=%lld)\n",
-                     answer->i_body_offset, stream->i_buffer_last_pos );
-#endif
             answer->i_body_offset = stream->i_buffer_last_pos;
         }
 
@@ -1637,8 +1627,6 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                     p = NULL;
                     cl->query.i_type = HTTPD_MSG_NONE;
 
-                    /*fprintf( stderr, "received new request=%s\n", cl->p_buffer);*/
-
                     for( i = 0; msg_type[i].name[0]; i++ )
                     {
                         if( !strncmp( (char *)cl->p_buffer, msg_type[i].name,
@@ -1818,33 +1806,6 @@ static void httpd_ClientRecv( httpd_client_t *cl )
     /* XXX: for QT I have to disable timeout. Try to find why */
     if( cl->query.i_proto == HTTPD_PROTO_RTSP )
         cl->i_activity_timeout = 0;
-
-#if 0 /* Debugging only */
-    if( cl->i_state == HTTPD_CLIENT_RECEIVE_DONE )
-    {
-        int i;
-
-        fprintf( stderr, "received new request\n" );
-        fprintf( stderr, "  - proto=%s\n",
-                 cl->query.i_proto == HTTPD_PROTO_HTTP ? "HTTP" : "RTSP" );
-        fprintf( stderr, "  - version=%d\n", cl->query.i_version );
-        fprintf( stderr, "  - msg=%d\n", cl->query.i_type );
-        if( cl->query.i_type == HTTPD_MSG_ANSWER )
-        {
-            fprintf( stderr, "  - answer=%d '%s'\n", cl->query.i_status,
-                     cl->query.psz_status );
-        }
-        else if( cl->query.i_type != HTTPD_MSG_NONE )
-        {
-            fprintf( stderr, "  - url=%s\n", cl->query.psz_url );
-        }
-        for( i = 0; i < cl->query.i_name; i++ )
-        {
-            fprintf( stderr, "  - option name='%s' value='%s'\n",
-                     cl->query.name[i], cl->query.value[i] );
-        }
-    }
-#endif
 }
 
 static void httpd_ClientSend( httpd_client_t *cl )
@@ -1887,9 +1848,6 @@ static void httpd_ClientSend( httpd_client_t *cl )
 
         cl->i_buffer = 0;
         cl->i_buffer_size = (uint8_t*)p - cl->p_buffer;
-
-        /*fprintf( stderr, "sending answer\n" );
-        fprintf( stderr, "%s",  cl->p_buffer );*/
     }
 
     i_len = httpd_NetSend( cl, &cl->p_buffer[cl->i_buffer],
