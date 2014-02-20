@@ -36,6 +36,7 @@
 #include "dialogs_provider.hpp" /* THEDP creation */
 #include "main_interface.hpp"   /* MainInterface creation */
 #include "extensions_manager.hpp" /* Extensions manager */
+#include "managers/addons_manager.hpp" /* Addons manager */
 #include "dialogs/help.hpp"     /* Launch Update */
 #include "recents.hpp"          /* Recents Item destruction */
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
@@ -573,6 +574,7 @@ static void *Thread( void *obj )
 
     /* */
     ExtensionsManager::killInstance();
+    AddonsManager::killInstance();
 
     /* Destroy all remaining windows,
        because some are connected to some slots
