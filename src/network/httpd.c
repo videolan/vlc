@@ -774,7 +774,6 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
         if( !strcmp( stream->psz_mime, "video/x-ms-asf-stream" ) )
         {
             bool b_xplaystream = false;
-            int i;
 
             httpd_MsgAdd( answer, "Content-type", "application/octet-stream" );
             httpd_MsgAdd( answer, "Server", "Cougar 4.1.0.3921" );
@@ -784,7 +783,7 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
             httpd_MsgAdd( answer, "Pragma", "features=\"broadcast\"" );
 
             /* Check if there is a xPlayStrm=1 */
-            for( i = 0; i < query->i_headers; i++ )
+            for( size_t i = 0; i < query->i_headers; i++ )
             {
                 if( !strcasecmp( query->p_headers[i].name,  "Pragma" ) &&
                     strstr( query->p_headers[i].value, "xPlayStrm=1" ) )
@@ -1121,7 +1120,6 @@ error:
 /* delete a host */
 void httpd_HostDelete( httpd_host_t *host )
 {
-    int i;
     bool delete = false;
 
     vlc_mutex_lock( &httpd.mutex );
@@ -1145,11 +1143,11 @@ void httpd_HostDelete( httpd_host_t *host )
 
     msg_Dbg( host, "HTTP host removed" );
 
-    for( i = 0; i < host->i_url; i++ )
+    for( int i = 0; i < host->i_url; i++ )
     {
         msg_Err( host, "url still registered: %s", host->url[i]->psz_url );
     }
-    for( i = 0; i < host->i_client; i++ )
+    for( int i = 0; i < host->i_client; i++ )
     {
         httpd_client_t *cl = host->client[i];
         msg_Warn( host, "client still connected" );
@@ -1224,7 +1222,6 @@ int httpd_UrlCatch( httpd_url_t *url, int i_msg, httpd_callback_t cb,
 void httpd_UrlDelete( httpd_url_t *url )
 {
     httpd_host_t *host = url->host;
-    int          i;
 
     vlc_mutex_lock( &host->lock );
     TAB_REMOVE( host->i_url, host->url, url );
@@ -1234,7 +1231,7 @@ void httpd_UrlDelete( httpd_url_t *url )
     free( url->psz_user );
     free( url->psz_password );
 
-    for( i = 0; i < host->i_client; i++ )
+    for( int i = 0; i < host->i_client; i++ )
     {
         httpd_client_t *client = host->client[i];
 
@@ -1622,12 +1619,10 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                 }
                 else
                 {
-                    unsigned i;
-
                     p = NULL;
                     cl->query.i_type = HTTPD_MSG_NONE;
 
-                    for( i = 0; msg_type[i].name[0]; i++ )
+                    for( unsigned i = 0; msg_type[i].name[0]; i++ )
                     {
                         if( !strncmp( (char *)cl->p_buffer, msg_type[i].name,
                                       strlen( msg_type[i].name ) ) )
@@ -1810,7 +1805,6 @@ static void httpd_ClientRecv( httpd_client_t *cl )
 
 static void httpd_ClientSend( httpd_client_t *cl )
 {
-    int i;
     int i_len;
 
     if( cl->i_buffer < 0 )
@@ -1821,7 +1815,7 @@ static void httpd_ClientSend( httpd_client_t *cl )
         const char *psz_status = httpd_ReasonFromCode( cl->answer.i_status );
 
         i_size = strlen( "HTTP/1.") + 10 + 10 + strlen( psz_status ) + 5;
-        for( i = 0; i < cl->answer.i_headers; i++ )
+        for( size_t i = 0; i < cl->answer.i_headers; i++ )
         {
             i_size += strlen( cl->answer.p_headers[i].name ) + 2 +
                       strlen( cl->answer.p_headers[i].value ) + 2;
@@ -1839,7 +1833,7 @@ static void httpd_ClientSend( httpd_client_t *cl )
                       cl->answer.i_proto ==  HTTPD_PROTO_HTTP ? "HTTP/1" : "RTSP/1",
                       cl->answer.i_version,
                       cl->answer.i_status, psz_status );
-        for( i = 0; i < cl->answer.i_headers; i++ )
+        for( size_t i = 0; i < cl->answer.i_headers; i++ )
         {
             p += sprintf( p, "%s: %s\r\n", cl->answer.p_headers[i].name,
                           cl->answer.p_headers[i].value );
