@@ -1297,36 +1297,30 @@ const char *httpd_MsgGet( const httpd_message_t *msg, const char *name )
 
 void httpd_MsgAdd( httpd_message_t *msg, const char *name, const char *psz_value, ... )
 {
-    va_list args;
-    char *value = NULL;
+    httpd_header *p_tmp = realloc( msg->p_headers, sizeof(httpd_header) * (msg->i_headers + 1));
+    if (!p_tmp)
+        return;
 
+    msg->p_headers = p_tmp;
+
+    httpd_header *h = &msg->p_headers[msg->i_headers];
+    h->name = strdup(name);
+    if (!h->name)
+        return;
+
+    h->value = NULL;
+
+    va_list args;
     va_start( args, psz_value );
-    if( us_vasprintf( &value, psz_value, args ) == -1 )
-        value = NULL;
+    int ret = us_vasprintf(&h->value, psz_value, args);
     va_end( args );
 
-    if( value == NULL )
+    if (ret == -1 ) {
+        free(h->name);
         return;
+    }
 
-    name = strdup( name );
-    if( name == NULL )
-    {
-        free( value );
-        return;
-    }
-    httpd_header * p_tmp = realloc( msg->p_headers, sizeof(httpd_header) * (msg->i_headers + 1));
-    if(p_tmp)
-    {
-        msg->p_headers = p_tmp;
-        msg->p_headers[msg->i_headers].name = name;
-        msg->p_headers[msg->i_headers].value = value;
-        msg->i_headers++;
-    }
-    else
-    {
-        free(name);
-        free(value);
-    }
+    msg->i_headers++;
 }
 
 static void httpd_ClientInit( httpd_client_t *cl, mtime_t now )
