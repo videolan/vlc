@@ -439,7 +439,6 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     AudioComponentDescription   desc;
     AudioStreamBasicDescription DeviceFormat;
     AudioChannelLayout          *layout;
-    AudioChannelLayout          new_layout;
     AURenderCallbackStruct      input;
     p_aout->sys->chans_to_reorder = 0;
 
@@ -548,43 +547,72 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
             fmt->i_physical_channels = AOUT_CHANS_STEREO;
         } else {
             /* We want more than stereo and we can do that */
+            msg_Dbg(p_aout, "Device is configured with %d channels", layout->mNumberChannelDescriptions);
+
+            // maps auhal channels (1-9) to vlc ones
+            static const unsigned i_auhal_channel_mapping[] = {
+                [kAudioChannelLabel_Left]           = AOUT_CHAN_LEFT,
+                [kAudioChannelLabel_Right]          = AOUT_CHAN_RIGHT,
+                [kAudioChannelLabel_Center]         = AOUT_CHAN_CENTER,
+                [kAudioChannelLabel_LFEScreen]      = AOUT_CHAN_LFE,
+                [kAudioChannelLabel_LeftSurround]   = AOUT_CHAN_REARLEFT,
+                [kAudioChannelLabel_RightSurround]  = AOUT_CHAN_REARRIGHT,
+                [kAudioChannelLabel_RearSurroundLeft]  = AOUT_CHAN_MIDDLELEFT, // needs to be swapped with rear
+                [kAudioChannelLabel_RearSurroundRight] = AOUT_CHAN_MIDDLERIGHT,// needs to be swapped with rear
+                [kAudioChannelLabel_CenterSurround] = AOUT_CHAN_REARCENTER
+            };
+
+
+            uint32_t chans_out[AOUT_CHAN_MAX];
+            memset(&chans_out, 0, sizeof(chans_out));
+
+            bool b_have_middle_channels = false;
+            unsigned index = 0;
             for (unsigned int i = 0; i < layout->mNumberChannelDescriptions; i++) {
 #ifndef NDEBUG
-                msg_Dbg(p_aout, "this is channel: %d", (int)layout->mChannelDescriptions[i].mChannelLabel);
+                msg_Dbg(p_aout, "this is channel: %d, at index %d", (int)layout->mChannelDescriptions[i].mChannelLabel, i);
 #endif
+                if(index >= AOUT_CHAN_MAX)
+                    break;
 
-                switch(layout->mChannelDescriptions[i].mChannelLabel) {
-                    case kAudioChannelLabel_Left:
-                        fmt->i_physical_channels |= AOUT_CHAN_LEFT;
-                        continue;
-                    case kAudioChannelLabel_Right:
-                        fmt->i_physical_channels |= AOUT_CHAN_RIGHT;
-                        continue;
-                    case kAudioChannelLabel_Center:
-                        fmt->i_physical_channels |= AOUT_CHAN_CENTER;
-                        continue;
-                    case kAudioChannelLabel_LFEScreen:
-                        fmt->i_physical_channels |= AOUT_CHAN_LFE;
-                        continue;
-                    case kAudioChannelLabel_LeftSurround:
-                        fmt->i_physical_channels |= AOUT_CHAN_REARLEFT;
-                        continue;
-                    case kAudioChannelLabel_RightSurround:
-                        fmt->i_physical_channels |= AOUT_CHAN_REARRIGHT;
-                        continue;
-                    case kAudioChannelLabel_RearSurroundLeft:
-                        fmt->i_physical_channels |= AOUT_CHAN_MIDDLELEFT;
-                        continue;
-                    case kAudioChannelLabel_RearSurroundRight:
-                        fmt->i_physical_channels |= AOUT_CHAN_MIDDLERIGHT;
-                        continue;
-                    case kAudioChannelLabel_CenterSurround:
-                        fmt->i_physical_channels |= AOUT_CHAN_REARCENTER;
-                        continue;
-                    default:
-                        msg_Warn(p_aout, "unrecognized channel form provided by driver: %d", (int)layout->mChannelDescriptions[i].mChannelLabel);
+                AudioChannelLabel chan = layout->mChannelDescriptions[i].mChannelLabel;
+                if(chan < sizeof(i_auhal_channel_mapping) / sizeof(i_auhal_channel_mapping[0])
+                      && i_auhal_channel_mapping[chan] > 0) {
+                    fmt->i_physical_channels |= i_auhal_channel_mapping[chan];
+                    chans_out[index++] = i_auhal_channel_mapping[chan];
+
+                    if (chan == kAudioChannelLabel_RearSurroundLeft ||
+                        chan == kAudioChannelLabel_RearSurroundRight)
+                        b_have_middle_channels = true;
+                } else {
+                    msg_Dbg(p_aout, "found nonrecognized channel %d at index %d", chan, i);
                 }
             }
+
+            /*
+             * For 7.1, AOUT_CHAN_MIDDLELEFT/RIGHT needs to be swapped with AOUT_CHAN_REARLEFT/RIGHT.
+             * Auhals kAudioChannelLabel_Left/RightSurround is used as surround for 5.1, but as middle speakers
+             * for rear 7.1.
+             */
+            if (b_have_middle_channels) {
+                for (unsigned i = 0; i < index; i++) {
+                    switch (chans_out[i]) {
+                        case AOUT_CHAN_MIDDLELEFT:
+                            chans_out[i] = AOUT_CHAN_REARLEFT;
+                            break;
+                        case AOUT_CHAN_MIDDLERIGHT:
+                            chans_out[i] = AOUT_CHAN_REARRIGHT;
+                            break;
+                        case AOUT_CHAN_REARLEFT:
+                            chans_out[i] = AOUT_CHAN_MIDDLELEFT;
+                            break;
+                        case AOUT_CHAN_REARRIGHT:
+                            chans_out[i] = AOUT_CHAN_MIDDLERIGHT;
+                            break;
+                    }
+                }
+            }
+
             if (fmt->i_physical_channels == 0) {
                 fmt->i_physical_channels = AOUT_CHANS_STEREO;
                 msg_Err(p_aout, "You should configure your speaker layout with Audio Midi Setup in /Applications/Utilities. VLC will output Stereo only.");
@@ -592,7 +620,15 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                                 _("You should configure your speaker layout with "
                                   "\"Audio Midi Setup\" in /Applications/"
                                   "Utilities. VLC will output Stereo only."));
+            } else {
+
+                p_aout->sys->chans_to_reorder = aout_CheckChannelReorder(NULL, chans_out, fmt->i_physical_channels, p_aout->sys->chan_table);
+                if (p_aout->sys->chans_to_reorder)
+                    msg_Dbg(p_aout, "channel reordering needed");
+                else
+                    msg_Dbg(p_aout, "no channel reordering needed");
             }
+
         }
         free(layout);
     } else {
@@ -603,165 +639,6 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     msg_Dbg(p_aout, "selected %d physical channels for device output", aout_FormatNbChannels(fmt));
     msg_Dbg(p_aout, "VLC will output: %s", aout_FormatPrintChannels(fmt));
 
-    memset (&new_layout, 0, sizeof(new_layout));
-    uint32_t chans_out[AOUT_CHAN_MAX];
-    memset(&chans_out, 0, sizeof(chans_out));
-
-    /* Some channel abbreviations used below:
-     * L - left
-     * R - right
-     * C - center
-     * Ls - left surround
-     * Rs - right surround
-     * Cs - center surround
-     * Rls - rear left surround
-     * Rrs - rear right surround
-     * Lw - left wide
-     * Rw - right wide
-     * Lsd - left surround direct
-     * Rsd - right surround direct
-     * Lc - left center
-     * Rc - right center
-     * Ts - top surround
-     * Vhl - vertical height left
-     * Vhc - vertical height center
-     * Vhr - vertical height right
-     * Lt - left matrix total. for matrix encoded stereo.
-     * Rt - right matrix total. for matrix encoded stereo. */
-
-    switch(aout_FormatNbChannels(fmt)) {
-        case 1:
-            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
-            break;
-        case 2:
-            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_Stereo;
-            break;
-        case 3:
-            if (fmt->i_physical_channels & AOUT_CHAN_CENTER)
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_7; // L R C
-            else if (fmt->i_physical_channels & AOUT_CHAN_LFE)
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_4; // L R LFE
-            break;
-        case 4:
-            if (fmt->i_physical_channels & (AOUT_CHAN_CENTER | AOUT_CHAN_LFE))
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_10; // L R C LFE
-            else if (fmt->i_physical_channels & (AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT))
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_3; // L R Ls Rs
-            else if (fmt->i_physical_channels & (AOUT_CHAN_CENTER | AOUT_CHAN_REARCENTER))
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_3; // L R C Cs
-            break;
-        case 5:
-            if (fmt->i_physical_channels & (AOUT_CHAN_CENTER))
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_19; // L R Ls Rs C
-            else if (fmt->i_physical_channels & (AOUT_CHAN_LFE))
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_18; // L R Ls Rs LFE
-            break;
-        case 6:
-            if (fmt->i_physical_channels & (AOUT_CHAN_LFE)) {
-                /* note: for some reason, kAudioChannelLayoutTag_DVD_20, which would not require channel reordering, 
-                 does not work anymore */
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_5_1; // L R C LFE Ls Rs
-
-                chans_out[0] = AOUT_CHAN_LEFT;
-                chans_out[1] = AOUT_CHAN_RIGHT;
-                chans_out[2] = AOUT_CHAN_CENTER;
-                chans_out[3] = AOUT_CHAN_LFE;
-                chans_out[4] = AOUT_CHAN_REARLEFT;
-                chans_out[5] = AOUT_CHAN_REARRIGHT;
-
-                p_aout->sys->chans_to_reorder = aout_CheckChannelReorder(NULL, chans_out, fmt->i_physical_channels, p_aout->sys->chan_table);
-                if (p_aout->sys->chans_to_reorder)
-                    msg_Dbg(p_aout, "channel reordering needed for 5.1 output");
-            } else {
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_6_0; // L R Ls Rs C Cs
-
-                chans_out[0] = AOUT_CHAN_LEFT;
-                chans_out[1] = AOUT_CHAN_RIGHT;
-                chans_out[2] = AOUT_CHAN_REARLEFT;
-                chans_out[3] = AOUT_CHAN_REARRIGHT;
-                chans_out[4] = AOUT_CHAN_CENTER;
-                chans_out[5] = AOUT_CHAN_REARCENTER;
-
-                p_aout->sys->chans_to_reorder = aout_CheckChannelReorder(NULL, chans_out, fmt->i_physical_channels, p_aout->sys->chan_table);
-                if (p_aout->sys->chans_to_reorder)
-                    msg_Dbg(p_aout, "channel reordering needed for 6.0 output");
-            }
-            break;
-        case 7:
-            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_6_1_A; // L R C LFE Ls Rs Cs
-
-            chans_out[0] = AOUT_CHAN_LEFT;
-            chans_out[1] = AOUT_CHAN_RIGHT;
-            chans_out[2] = AOUT_CHAN_CENTER;
-            chans_out[3] = AOUT_CHAN_LFE;
-            chans_out[4] = AOUT_CHAN_REARLEFT;
-            chans_out[5] = AOUT_CHAN_REARRIGHT;
-            chans_out[6] = AOUT_CHAN_REARCENTER;
-
-            p_aout->sys->chans_to_reorder = aout_CheckChannelReorder(NULL, chans_out, fmt->i_physical_channels, p_aout->sys->chan_table);
-            if (p_aout->sys->chans_to_reorder)
-                msg_Dbg(p_aout, "channel reordering needed for 6.1 output");
-
-            break;
-        case 8:
-            if (fmt->i_physical_channels & (AOUT_CHAN_LFE) || currentMinorSystemVersion < 7) {
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_7_1_A; // L R C LFE Ls Rs Lc Rc
-
-                chans_out[0] = AOUT_CHAN_LEFT;
-                chans_out[1] = AOUT_CHAN_RIGHT;
-                chans_out[2] = AOUT_CHAN_CENTER;
-                chans_out[3] = AOUT_CHAN_LFE;
-                chans_out[4] = AOUT_CHAN_MIDDLELEFT;
-                chans_out[5] = AOUT_CHAN_MIDDLERIGHT;
-                chans_out[6] = AOUT_CHAN_REARLEFT;
-                chans_out[7] = AOUT_CHAN_REARRIGHT;
-
-                if (!(fmt->i_physical_channels & (AOUT_CHAN_LFE)))
-                    msg_Warn(p_aout, "8.0 audio output not supported on OS X 10.%i, layout will be incorrect", currentMinorSystemVersion);
-            }
-#ifdef MAC_OS_X_VERSION_10_7
-            else {
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DTS_8_0_B; // Lc C Rc L R Ls Cs Rs
-
-                chans_out[0] = AOUT_CHAN_MIDDLELEFT;
-                chans_out[1] = AOUT_CHAN_CENTER;
-                chans_out[2] = AOUT_CHAN_MIDDLERIGHT;
-                chans_out[3] = AOUT_CHAN_LEFT;
-                chans_out[4] = AOUT_CHAN_RIGHT;
-                chans_out[5] = AOUT_CHAN_REARLEFT;
-                chans_out[6] = AOUT_CHAN_REARCENTER;
-                chans_out[7] = AOUT_CHAN_REARRIGHT;
-            }
-#endif
-            p_aout->sys->chans_to_reorder = aout_CheckChannelReorder(NULL, chans_out, fmt->i_physical_channels, p_aout->sys->chan_table);
-            if (p_aout->sys->chans_to_reorder)
-                msg_Dbg(p_aout, "channel reordering needed for 7.1 / 8.0 output");
-
-            break;
-        case 9:
-            if (currentMinorSystemVersion < 7) {
-                msg_Warn(p_aout, "8.1 audio output not supported on OS X 10.%i", currentMinorSystemVersion);
-                break;
-            }
-
-#ifdef MAC_OS_X_VERSION_10_7
-            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DTS_8_1_B; // Lc C Rc L R Ls Cs Rs LFE
-            chans_out[0] = AOUT_CHAN_MIDDLELEFT;
-            chans_out[1] = AOUT_CHAN_CENTER;
-            chans_out[2] = AOUT_CHAN_MIDDLERIGHT;
-            chans_out[3] = AOUT_CHAN_LEFT;
-            chans_out[4] = AOUT_CHAN_RIGHT;
-            chans_out[5] = AOUT_CHAN_REARLEFT;
-            chans_out[6] = AOUT_CHAN_REARCENTER;
-            chans_out[7] = AOUT_CHAN_REARRIGHT;
-            chans_out[8] = AOUT_CHAN_LFE;
-
-            p_aout->sys->chans_to_reorder = aout_CheckChannelReorder(NULL, chans_out, fmt->i_physical_channels, p_aout->sys->chan_table);
-            if (p_aout->sys->chans_to_reorder)
-                msg_Dbg(p_aout, "channel reordering needed for 8.1 output");
-#endif
-            break;
-    }
 
     /* Set up the format to be used */
     DeviceFormat.mSampleRate = fmt->i_rate;
@@ -811,15 +688,6 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                             kAudioUnitProperty_SetRenderCallback,
                             kAudioUnitScope_Input,
                             0, &input, sizeof(input)));
-
-    /* Set the new_layout as the layout VLC will use to feed the AU unit */
-    verify_noerr(AudioUnitSetProperty(p_sys->au_unit,
-                            kAudioUnitProperty_AudioChannelLayout,
-                            kAudioUnitScope_Output,
-                            0, &new_layout, sizeof(new_layout)));
-
-    if (new_layout.mNumberChannelDescriptions > 0)
-        free(new_layout.mChannelDescriptions);
 
     /* AU initiliaze */
     verify_noerr(AudioUnitInitialize(p_sys->au_unit));
