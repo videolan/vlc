@@ -1,7 +1,7 @@
 /*****************************************************************************
  * about.m: MacOS X About Panel
  *****************************************************************************
- * Copyright (C) 2001-2013 VLC authors and VideoLAN
+ * Copyright (C) 2001-2014 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -31,13 +31,9 @@
 #import <vlc_about.h>
 #import "CompatibilityFixes.h"
 
-#ifdef __x86_64__
+/* this is a bit weird, but we should be confident that there will be more than
+ * one arch to support again one day */
 #define PLATFORM "Intel 64bit"
-#elif __i386__
-#define PLATFORM "Intel 32bit"
-#else
-#define PLATFORM "PowerPC 32bit"
-#endif
 
 /*****************************************************************************
  * VLAboutBox implementation
@@ -107,10 +103,8 @@ static VLAboutBox *_o_sharedInstance = nil;
         NSString *compiler;
 #ifdef __clang__
         compiler = [NSString stringWithFormat:@"clang %s", __clang_version__];
-#elif __llvm__
-        compiler = [NSString stringWithFormat:@"llvm-gcc %s", __VERSION__];
 #else
-        compiler = [NSString stringWithFormat:@"gcc %s", __VERSION__];
+        compiler = [NSString stringWithFormat:@"llvm-gcc %s", __VERSION__];
 #endif
         [o_revision_field setStringValue: [NSString stringWithFormat: _NS("Compiled by %s with %@"), VLC_CompileBy(), compiler]];
 
@@ -254,14 +248,7 @@ static VLAboutBox *_o_sharedInstance = nil;
 - (void)showGPL
 {
     [self showAbout];
-    [o_credits_scrollview setHidden:NO];
-    [o_credits_textview setHidden:NO];
-    [o_joinus_txt setHidden:YES];
-
-    [o_credits_textview setString:[NSString stringWithUTF8String:psz_license]];
-
-    [o_credits_textview scrollPoint:NSMakePoint(0, 0)];
-    b_restart = YES;
+    [self buttonAction:nil];
 }
 
 /*****************************************************************************
