@@ -279,7 +279,7 @@ static VLCAddonManager *_o_sharedInstance = nil;
 - (void)_findNewAddons
 {
     [_spinner startAnimation:nil];
-    addons_manager_Gather(_manager, NULL);
+    addons_manager_Gather(_manager, "repo://");
 }
 
 /* FIXME: un-used */

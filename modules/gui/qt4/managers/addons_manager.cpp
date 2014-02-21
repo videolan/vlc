@@ -47,7 +47,7 @@ AddonsManager::~AddonsManager()
 
 void AddonsManager::findNewAddons()
 {
-    addons_manager_Gather( p_manager, NULL );
+    addons_manager_Gather( p_manager, "repo://" );
 }
 
 void AddonsManager::findDesignatedAddon( QString uri )

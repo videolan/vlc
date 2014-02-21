@@ -51,7 +51,7 @@ struct addons_manager_private_t
         vlc_cond_t waitcond;
         bool b_live;
         vlc_mutex_t lock;
-        char *psz_uri_hint; /* uri hint for non repo based install */
+        DECL_ARRAY(char*) uris;
         DECL_ARRAY(addon_entry_t*) entries;
     } finder;
 
@@ -154,7 +154,7 @@ addons_manager_t *addons_manager_New( vlc_object_t *p_this )
 
     INIT_QUEUE( finder )
     INIT_QUEUE( installer )
-    p_manager->p_priv->finder.psz_uri_hint = NULL;
+    ARRAY_INIT( p_manager->p_priv->finder.uris );
 
     vlc_event_manager_t *em = p_manager->p_event_manager;
     vlc_event_manager_init( em, p_manager );
@@ -201,7 +201,10 @@ void addons_manager_Delete( addons_manager_t *p_manager )
 
     FREE_QUEUE( finder )
     FREE_QUEUE( installer )
-    free( p_manager->p_priv->finder.psz_uri_hint );
+    FOREACH_ARRAY( char *psz_uri, p_manager->p_priv->finder.uris )
+       free( psz_uri );
+    FOREACH_END();
+    ARRAY_RESET( p_manager->p_priv->finder.uris );
 
     free( p_manager->p_priv );
     free( p_manager->p_event_manager );
@@ -210,11 +213,13 @@ void addons_manager_Delete( addons_manager_t *p_manager )
 
 void addons_manager_Gather( addons_manager_t *p_manager, const char *psz_uri )
 {
+    if ( !psz_uri )
+        return;
+
     vlc_mutex_lock( &p_manager->p_priv->finder.lock );
-    if ( psz_uri )
-    {
-        p_manager->p_priv->finder.psz_uri_hint = strdup( psz_uri );
-    }
+
+    ARRAY_APPEND( p_manager->p_priv->finder.uris, strdup( psz_uri ) );
+
     if( !p_manager->p_priv->finder.b_live )
     {
         if( vlc_clone( &p_manager->p_priv->finder.thread, FinderThread, p_manager,
@@ -226,13 +231,10 @@ void addons_manager_Gather( addons_manager_t *p_manager, const char *psz_uri )
             return;
         }
         p_manager->p_priv->finder.b_live = true;
-        vlc_mutex_unlock( &p_manager->p_priv->finder.lock );
     }
-    else
-    {
-        vlc_mutex_unlock( &p_manager->p_priv->finder.lock );
-        vlc_cond_signal( &p_manager->p_priv->finder.waitcond );
-    }
+
+    vlc_mutex_unlock( &p_manager->p_priv->finder.lock );
+    vlc_cond_signal( &p_manager->p_priv->finder.waitcond );
 }
 
 /*****************************************************************************
@@ -305,6 +307,7 @@ static void LoadLocalStorage( addons_manager_t *p_manager )
     if( p_module )
     {
         ARRAY_INIT( p_finder->entries );
+        p_finder->psz_uri = NULL;
         p_finder->pf_find( p_finder );
         module_unneed( p_finder, p_module );
 
@@ -319,9 +322,21 @@ static void *FinderThread( void *p_data )
 {
     addons_manager_t *p_manager = p_data;
     int i_cancel;
+    char *psz_uri;
 
     for( ;; )
     {
+        vlc_mutex_lock( &p_manager->p_priv->finder.lock );
+        vlc_cleanup_push( vlc_mutex_unlock, &p_manager->p_priv->finder.lock );
+        while( p_manager->p_priv->finder.uris.i_size == 0 )
+        {
+            vlc_cond_wait( &p_manager->p_priv->finder.waitcond,
+                           &p_manager->p_priv->finder.lock );
+        }
+        psz_uri = p_manager->p_priv->finder.uris.p_elems[0];
+        ARRAY_REMOVE( p_manager->p_priv->finder.uris, 0 );
+        vlc_cleanup_run();
+
         addons_finder_t *p_finder =
                 vlc_custom_create( p_manager->p_priv->p_parent, sizeof( *p_finder ), "entries finder" );
 
@@ -331,8 +346,7 @@ static void *FinderThread( void *p_data )
             module_t *p_module;
             ARRAY_INIT( p_finder->entries );
             vlc_mutex_lock( &p_manager->p_priv->finder.lock );
-            p_finder->psz_uri = p_manager->p_priv->finder.psz_uri_hint;
-            p_manager->p_priv->finder.psz_uri_hint = NULL;
+            p_finder->psz_uri = psz_uri;
             vlc_mutex_unlock( &p_manager->p_priv->finder.lock );
 
             p_module = module_need( p_finder, "addons finder", NULL, false );
@@ -343,7 +357,7 @@ static void *FinderThread( void *p_data )
                 MergeSources( p_manager, p_finder->entries.p_elems, p_finder->entries.i_size );
             }
             ARRAY_RESET( p_finder->entries );
-            free( p_finder->psz_uri );
+            free( psz_uri );
             vlc_object_release( p_finder );
         }
 
@@ -354,12 +368,6 @@ static void *FinderThread( void *p_data )
 
         vlc_restorecancel( i_cancel );
         vlc_testcancel();
-
-        vlc_mutex_lock( &p_manager->p_priv->finder.lock );
-        vlc_cleanup_push( vlc_mutex_unlock, &p_manager->p_priv->finder.lock );
-        vlc_cond_wait( &p_manager->p_priv->finder.waitcond,
-                       &p_manager->p_priv->finder.lock );
-        vlc_cleanup_run();
     }
 
     return NULL;
