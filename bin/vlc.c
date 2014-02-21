@@ -275,7 +275,7 @@ int main( int i_argc, const char *ppsz_argv[] )
 out:
     libvlc_release (vlc);
 #ifdef __OS2__
-    for (int i = 2; i < argc; i++)
+    for (int i = argc - i_argc; i < argc; i++)
         free (argv[i]);
 #endif
     return ret;
