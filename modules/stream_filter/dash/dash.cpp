@@ -25,11 +25,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#define __STDC_CONSTANT_MACROS 1
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#define __STDC_CONSTANT_MACROS 1
 #include <stdint.h>
 
 #include <vlc_common.h>
