@@ -111,6 +111,113 @@ Removed modules:
  * dirac encoder: use schroedinger
 
 
+Changes between 2.1.2 and 2.1.3:
+--------------------------------
+
+Core:
+ * Fix broken behaviour with SOCKSv5 proxies
+ * Fix integer overflow on error when using vlc_readdir
+
+Access:
+ * Fix DVB-T2 tuning on Linux
+ * Fix encrypted DVD playback
+ * Fix v4l2 frequency conversion
+
+Decoders:
+ * Fix numerous issues (M2TS, VC1 interlaced, Lagarith, FFv1.3, Xvid)
+   by updating codec libraries
+ * Bring fluidsynth back on Mac OS X
+ * Fix some Opus crashes with some filters
+ * Fix teletext crash on Windows
+
+Demuxers:
+ * Avoid an infinite recursion in MKV tags parsing
+ * Fix an issue with some Vobsub tracks
+ * Fix missing samples at the end of some wav files
+ * Fix divide by 0 on ASF/WMV parsing
+
+Audio output:
+ * Fix audio device selection via command line on Mac OS X
+ * Fix audio crashes on Mac OS X
+
+Video Output:
+ * Fix selection of DirectDraw as the default output for XP
+ * Fix transform off-by-one issue
+ * Fix screensaver disabling on Windows outputs
+ * Fix DirectDraw device enumeration and multi-display output
+ * Fix a potential crash when playing a fullscreen game at the same time as VLC
+
+Stream output:
+ * Fix 24bits audio MTU alignment in RTP
+ * Fix record file names
+
+Qt interface:
+ * Fix minimal size possible on start
+ * Fix a crash with the simple volume widget
+ * Fix a crash in the audio menu building
+ * Fix multimedia keys issues on Windows
+ * Fix opening of DVD and BD folders on Windows
+
+HTTP interface:
+ * Fix album art display on Windows
+
+Translations:
+ * Update of Bulgarian, Catalan, Czech, Danish, German, Modern Greek,
+   Spanish, Basque, Finnish, French, Scottish Gaelic, Galician, Hebrew,
+   Hungarian, Italian, Japanese, Korean, Malay, Norwegian Bokmål, Nepali,
+   Dutch, Polish, Brazilian Portuguese, Portuguese, Romanian, Russian,
+   Sinhala, Slovak, Slovenian, Swedish, Telugu, Thai, Turkish, Ukrainian
+   and Simplified Chinese translations
+ * Fix encoding for Windows installer translations
+
+
+Changes between 2.1.1 and 2.1.2:
+--------------------------------
+
+Audio output:
+ * Fix digital playback on OS X when more than one audio device is installed
+ * Fix digital playback (SPDIF/HDMI) on Windows
+ * Fix stuttering or silent playback when using sound enhancers or external
+   audio devices on OS X
+ * Improve responsiveness on OS X when playback starts or is being paused
+ * Improve responsiveness, silent playback intervals and reliability on iOS
+
+Demuxers:
+ * Fix Vimeo and DailyMotion parsing
+ * Various WMV playback improvements and fixes
+
+Decoders:
+ * Fix LPCM 20/24-bit decoding and 16 bits with channel padding
+ * Fix playback of some HEVC samples
+
+Video filters:
+ * Fix crash on deinterlace selection
+
+Qt interface:
+ * Fix some streaming profiles when copy existed
+ * Improve A-B loop control
+ * Fix album art update when changing media
+
+Mac OS X interface:
+ * Add a language option in the interface
+ * Option to control VLC's iTunes pausing behavior is more easy to find
+ * Improved UI resetting when requested in the preferences
+ * Fix issue which prevented to enable more than one video filter on Mavericks
+ * Fix an issue which could prevent automatic UI language settings from working
+ * Fix opening subtitles files through drag & drop or double-clicking
+ * Fix crash when closing window without decorations
+ * Fix issue where extra video window was resized even if this was disabled
+
+Win32 installer:
+ * Kill running VLC process on uninstall/update
+
+Translations:
+ * Update of Basque, Bosnian, Bulgarian, Croatian, Czech, Danish, Estonian,
+   French, Hungarian, Icelandic, Indonesian, Italian, Kannada, Khmer,
+   Lithuanian, Occitan, Persian, Polish, Romanian, Scottish Gaelic, Sinhala,
+   Slovenian, Spanish, Swedish, Tamil, Thai, Uzbek, Welsh translations
+
+
 Changes between 2.1.0 and 2.1.1:
 --------------------------------
 
