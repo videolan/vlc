@@ -244,7 +244,6 @@ libavcodec_plugin_la_SOURCES = \
 	codec/avcodec/video.c \
 	codec/avcodec/subtitle.c \
 	codec/avcodec/audio.c \
-	codec/avcodec/cpu.c \
 	codec/avcodec/fourcc.c \
 	codec/avcodec/chroma.c codec/avcodec/chroma.h \
 	codec/avcodec/va.c codec/avcodec/va.h \

@@ -316,11 +316,6 @@ int OpenEncoder( vlc_object_t *p_this )
     p_context->debug = var_InheritInteger( p_enc, "avcodec-debug" );
     p_context->opaque = (void *)p_this;
 
-    /* set CPU capabilities */
-#if !LIBAVUTIL_VERSION_CHECK(51, 25, 0, 42, 100)
-    p_context->dsp_mask = GetVlcDspMask();
-#endif
-
     p_sys->i_key_int = var_GetInteger( p_enc, ENC_CFG_PREFIX "keyint" );
     p_sys->i_b_frames = var_GetInteger( p_enc, ENC_CFG_PREFIX "bframes" );
     p_sys->i_vtolerance = var_GetInteger( p_enc, ENC_CFG_PREFIX "vt" ) * 1000;

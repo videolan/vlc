@@ -301,11 +301,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_context->debug = var_InheritInteger( p_dec, "avcodec-debug" );
     p_context->opaque = (void *)p_this;
 
-    /* set CPU capabilities */
-#if !LIBAVUTIL_VERSION_CHECK(51, 25, 0, 42, 100)
-    p_context->dsp_mask = GetVlcDspMask();
-#endif
-
     p_dec->b_need_packetized = true;
     switch( i_cat )
     {

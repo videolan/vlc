@@ -133,7 +133,6 @@ demux_LTLIBRARIES += libcaf_plugin.la
 libavformat_plugin_la_SOURCES = demux/avformat/demux.c \
 	codec/avcodec/fourcc.c \
 	codec/avcodec/chroma.c \
-	codec/avcodec/cpu.c \
 	codec/avcodec/avcommon.h \
 	codec/avcodec/avcommon_compat.h \
 	demux/vobsub.h \

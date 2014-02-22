@@ -409,7 +409,7 @@ libaccess_realrtsp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBaccess_realrtsp)
 EXTRA_LTLIBRARIES += libaccess_realrtsp_plugin.la
 
-libavio_plugin_la_SOURCES = access/avio.c access/avio.h codec/avcodec/cpu.c
+libavio_plugin_la_SOURCES = access/avio.c access/avio.h
 libavio_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVFORMAT_CFLAGS) $(AVUTIL_CFLAGS)
 libavio_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(SYMBOLIC_LDFLAGS)
 libavio_plugin_la_LIBADD = $(AVFORMAT_LIBS) $(AVUTIL_LIBS) $(LIBM)
