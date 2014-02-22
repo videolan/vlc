@@ -302,9 +302,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_context->opaque = (void *)p_this;
 
     /* set CPU capabilities */
-#if LIBAVUTIL_VERSION_CHECK(51, 25, 0, 42, 100)
-    av_set_cpu_flags_mask( INT_MAX & ~GetVlcDspMask() );
-#else
+#if !LIBAVUTIL_VERSION_CHECK(51, 25, 0, 42, 100)
     p_context->dsp_mask = GetVlcDspMask();
 #endif
 
