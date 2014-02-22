@@ -184,6 +184,58 @@ static const char *const ppsz_language_text[] =
     "Walon",
 };
 
+static int getDefaultAudioVolume(vlc_object_t *obj, const char *aout)
+{
+    if (!strcmp(aout, "") || !strcmp(aout, "any"))
+        return -1;
+    else
+    /* Note: For hysterical raisins, this is sorted by decreasing priority
+     * order (then alphabetical order). */
+    if (!strcmp(aout, "pulse"))
+        return -1;
+    else
+#ifdef __linux__
+    if (!strcmp(aout, "alsa") && module_exists("alsa"))
+        return cbrtf(config_GetFloat(obj, "alsa-gain")) * 100.f + .5f;
+    else
+#endif
+#ifdef _WIN32
+    if (!strcmp(aout, "mmdevice"))
+        return -1;
+    else
+#endif
+    if (!strcmp(aout, "sndio"))
+        return -1;
+    else
+#ifdef __APPLE__
+    if (!strcmp("auhal") && module_exists("auhal"))
+        return (config_GetFloat(obj, "auhal-volume") * 100.f + .5f)
+                 / AOUT_VOLUME_DEFAULT;
+    else
+#endif
+#ifdef _WIN32
+    if (!strcmp(aout, "directsound") && module_exists("directsound"))
+        return config_GetFloat(obj, "directx-volume") * 100.f + .5f;
+    else
+#endif
+    if (!strcmp(aout, "jack"))
+        return cbrtf(config_GetFloat(obj, "jack-gain")) * 100.f + 0.5f;
+    else
+#ifdef __OS2__
+    if (!strcmp(aout, "kai"))
+        return cbrtf(config_GetFloat(obj, "kai-gain")) * 100.f + .5f;
+    else
+#endif
+    if (!strcmp(aout, "oss"))
+        return -1;
+    else
+#ifdef _WIN32
+    if (!strcmp(aout, "waveout"))
+        return config_GetFloat(obj, "waveout-volume") * 100.f + .5f;
+    else
+#endif
+        return -1;
+}
 
 /*********************************************************************
  * The List of categories
@@ -472,38 +524,22 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.volumeValue->setMaximum( i_max_volume );
             ui.defaultVolume->setMaximum( i_max_volume );
 
-            bool b_enabled = config_GetInt( p_intf, "volume-save" );
-            ui.resetVolumeCheckbox->setChecked( !b_enabled );
-
             p_config = config_FindConfig( VLC_OBJECT(p_intf), "aout" );
             char *psz_aout = p_config->value.psz;
 
-            int i_volume = 100; //FIXME not foolproof
+            int i_volume = getDefaultAudioVolume(VLC_OBJECT(p_intf), psz_aout);
+            if( i_volume >= 0 )
+            {
+                bool b_enabled = config_GetInt( p_intf, "volume-save" );
 
-#define get_vol_aout( name ) \
-            module_exists( name ) && ( !psz_aout || !strcmp( psz_aout, name ) || !strcmp( psz_aout, "any" ) )
-
-#if defined( _WIN32 )
-            if( get_vol_aout( "directsound" ) )
-                i_volume = config_GetFloat( p_intf, "directx-volume") * 100 + 0.5;
-            else if( get_vol_aout( "waveout" ) )
-                i_volume = config_GetFloat( p_intf, "waveout-volume") * 100 + 0.5;
-#elif defined( Q_OS_MAC )
-            if( get_vol_aout( "auhal" ) )
-                i_volume = ( config_GetFloat( p_intf, "auhal-volume") * 100 + 0.5 )
-                    / AOUT_VOLUME_DEFAULT;
-#elif defined( __OS2__ )
-            if( get_vol_aout( "kai" ) )
-                i_volume = cbrtf( config_GetFloat( p_intf, "kai-gain" ) ) * 100 + 0.5;
-#else
-            if( get_vol_aout( "alsa" ) )
-                i_volume = cbrtf( config_GetFloat( p_intf, "alsa-gain" ) ) * 100 + 0.5;
-            else if( get_vol_aout( "jack" ) )
-                i_volume = cbrtf( config_GetFloat( p_intf, "jack-gain" ) ) * 100 + 0.5;
-#endif
-#undef get_vol_aout
-
-            ui.defaultVolume->setValue( i_volume );
+                ui.resetVolumeCheckbox->setChecked( !b_enabled );
+                ui.defaultVolume->setValue( i_volume );
+            }
+            else
+            {
+                ui.resetVolumeCheckbox->setChecked( false );
+                ui.defaultVolume->setValue( 100 );
+            }
 
             CONNECT( ui.defaultVolume, valueChanged( int ),
                      this, updateAudioVolume( int ) );
@@ -583,7 +619,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             qs_filter = qfu( psz ).split( ':', QString::SkipEmptyParts );
             free( psz );
 
-            b_enabled = ( qs_filter.contains( "normvol" ) );
+            bool b_enabled = ( qs_filter.contains( "normvol" ) );
             ui.volNormBox->setChecked( b_enabled );
             ui.volNormSpin->setEnabled( b_enabled );
 
