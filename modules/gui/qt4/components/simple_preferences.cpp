@@ -524,23 +524,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.volumeValue->setMaximum( i_max_volume );
             ui.defaultVolume->setMaximum( i_max_volume );
 
-            p_config = config_FindConfig( VLC_OBJECT(p_intf), "aout" );
-            char *psz_aout = p_config->value.psz;
-
-            int i_volume = getDefaultAudioVolume(VLC_OBJECT(p_intf), psz_aout);
-            if( i_volume >= 0 )
-            {
-                bool b_enabled = config_GetInt( p_intf, "volume-save" );
-
-                ui.resetVolumeCheckbox->setChecked( !b_enabled );
-                ui.defaultVolume->setValue( i_volume );
-            }
-            else
-            {
-                ui.resetVolumeCheckbox->setChecked( false );
-                ui.defaultVolume->setValue( 100 );
-            }
-
             CONNECT( ui.defaultVolume, valueChanged( int ),
                      this, updateAudioVolume( int ) );
 
@@ -1008,6 +991,22 @@ void SPrefsPanel::updateAudioOptions( int number)
     optionWidgets["fileW"]->setVisible( ( value == "afile" ) );
     optionWidgets["spdifChB"]->setVisible( ( value == "alsa" || value == "oss" || value == "auhal" ||
                                            value == "directsound" || value == "waveout" ) );
+
+    int volume = getDefaultAudioVolume(VLC_OBJECT(p_intf), qtu(value));
+    bool save = true;
+
+    if (volume >= 0)
+        save = config_GetInt(VLC_OBJECT(p_intf), "volume-save");
+
+    QCheckBox *resetVolumeCheckBox =
+        qobject_cast<QCheckBox *>(optionWidgets["resetVolumeCheckbox"]);
+    resetVolumeCheckBox->setChecked(!save);
+    resetVolumeCheckBox->setEnabled(volume >= 0);
+
+    QSlider *defaultVolume =
+        qobject_cast<QSlider *>(optionWidgets["defaultVolume"]);
+    defaultVolume->setValue((volume >= 0) ? volume : 100);
+    defaultVolume->setEnabled(volume >= 0);
 }
 
 
