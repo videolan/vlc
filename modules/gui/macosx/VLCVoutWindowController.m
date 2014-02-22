@@ -129,10 +129,11 @@
         [[VLCMainWindow sharedInstance] setNonembedded:YES];
         b_nonembedded = YES;
     } else {
-        if ((var_InheritBool(VLCIntf, "embedded-video") && !b_multiple_vout_windows)) {
+        if ((var_InheritBool(VLCIntf, "embedded-video") && !b_mainwindow_has_video)) {
             // setup embedded video
             o_vout_view = [[[VLCMainWindow sharedInstance] videoView] retain];
             o_new_video_window = [[VLCMainWindow sharedInstance] retain];
+            b_mainwindow_has_video = YES;
             b_nonembedded = NO;
         } else {
             // setup detached window with controls
@@ -242,6 +243,9 @@
         msg_Err(VLCIntf, "Cannot close nonexisting window");
         return;
     }
+
+    if ([o_window class] == [VLCMainWindow class])
+        b_mainwindow_has_video = NO;
 
     if ([o_window fullscreen] && ![[VLCMainWindow sharedInstance] nativeFullscreenMode])
         [o_window leaveFullscreen];

@@ -38,6 +38,8 @@
     // save the status level if at least one video window is on status level
     NSUInteger i_statusLevelWindowCounter;
     NSInteger i_currentWindowLevel;
+
+    BOOL b_mainwindow_has_video;
 }
 
 @property (readonly, nonatomic) NSInteger currentWindowLevel;
