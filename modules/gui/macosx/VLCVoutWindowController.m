@@ -255,7 +255,7 @@
     // set active video to no BEFORE closing the window to avoid stopping playback
     // due to NSWindowWillCloseNotification
     [o_window setHasActiveVideo: NO];
-    if (![NSStringFromClass([o_window class]) isEqualToString:@"VLCMainWindow"]) {
+    if ([o_window class] != [VLCMainWindow class]) {
         [o_window close];
         [o_window orderOut:self]; // for dark interface
     }
