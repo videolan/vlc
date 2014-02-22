@@ -86,7 +86,7 @@ static inline void vlc_init_avutil(vlc_object_t *obj)
 #if LIBAVUTIL_VERSION_CHECK(51, 25, 0, 42, 100)
     av_set_cpu_flags_mask( INT_MAX & ~GetVlcDspMask() );
 #endif
-    av_get_cpu_flags();
+    msg_Dbg(obj, "CPU flags: 0x%08x", av_get_cpu_flags());
 }
 #endif
 
