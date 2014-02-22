@@ -40,6 +40,8 @@
 #include <vlc_iso_lang.h>
 #include <vlc_meta.h>
 
+#include "../demux/mpeg/mpeg_parser_helpers.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -162,7 +164,7 @@ static void box_send(sout_mux_t *p_mux,  bo_t *box);
 static bo_t *GetMoovBox(sout_mux_t *p_mux);
 
 static block_t *ConvertSUBT(block_t *);
-static block_t *ConvertAVC1(block_t *);
+static block_t *ConvertFromAnnexB(block_t *);
 
 static const char avc1_start_code[4] = { 0, 0, 0, 1 };
 
@@ -448,8 +450,9 @@ static int Mux(sout_mux_t *p_mux)
         block_t *p_data;
         do {
             p_data = block_FifoGet(p_input->p_fifo);
-            if (p_stream->fmt.i_codec == VLC_CODEC_H264)
-                p_data = ConvertAVC1(p_data);
+            if (p_stream->fmt.i_codec == VLC_CODEC_H264 ||
+                p_stream->fmt.i_codec == VLC_CODEC_HEVC)
+                p_data = ConvertFromAnnexB(p_data);
             else if (p_stream->fmt.i_codec == VLC_CODEC_SUBT)
                 p_data = ConvertSUBT(p_data);
         } while (!p_data);
@@ -580,7 +583,7 @@ static block_t *ConvertSUBT(block_t *p_block)
     return p_block;
 }
 
-static block_t *ConvertAVC1(block_t *p_block)
+static block_t *ConvertFromAnnexB(block_t *p_block)
 {
     uint8_t *last = p_block->p_buffer;  /* Assume it starts with 0x00000001 */
     uint8_t *dat  = &p_block->p_buffer[4];
@@ -759,13 +762,233 @@ static bo_t *GetD263Tag(void)
     return d263;
 }
 
+static void hevcParseVPS(uint8_t * p_buffer, size_t i_buffer, uint8_t *general,
+                         uint8_t * numTemporalLayer, bool * temporalIdNested)
+{
+    const size_t i_decoded_nal_size = 512;
+    uint8_t p_dec_nal[i_decoded_nal_size];
+    size_t i_size = (i_buffer < i_decoded_nal_size)?i_buffer:i_decoded_nal_size;
+    nal_decode(p_buffer, p_dec_nal, i_size);
+
+    /* first two bytes are the NAL header, 3rd and 4th are:
+        vps_video_parameter_set_id(4)
+        vps_reserved_3_2bis(2)
+        vps_max_layers_minus1(6)
+        vps_max_sub_layers_minus1(3)
+        vps_temporal_id_nesting_flags
+    */
+    *numTemporalLayer =  ((p_dec_nal[3] & 0x0E) >> 1) + 1;
+    *temporalIdNested = (bool)(p_dec_nal[3] & 0x01);
+
+    /* 5th & 6th are reserved 0xffff */
+    /* copy the first 12 bytes of profile tier */
+    memcpy(general, &p_dec_nal[6], 12);
+}
+
+static void hevcParseSPS(uint8_t * p_buffer, size_t i_buffer, uint8_t * chroma_idc,
+                         uint8_t *bit_depth_luma_minus8, uint8_t *bit_depth_chroma_minus8)
+{
+    const size_t i_decoded_nal_size = 512;
+    uint8_t p_dec_nal[i_decoded_nal_size];
+    size_t i_size = (i_buffer < i_decoded_nal_size)?i_buffer-2:i_decoded_nal_size;
+    nal_decode(p_buffer+2, p_dec_nal, i_size);
+    bs_t bs;
+    bs_init(&bs, p_dec_nal, i_size);
+
+    /* skip vps id */
+    bs_skip(&bs, 4);
+    uint32_t sps_max_sublayer_minus1 = bs_read(&bs, 3);
+
+    /* skip nesting flag */
+    bs_skip(&bs, 1);
+
+    hevc_skip_profile_tiers_level(&bs, sps_max_sublayer_minus1);
+
+    /* skip sps id */
+    (void) read_ue( &bs );
+
+    *chroma_idc = read_ue(&bs);
+    if (*chroma_idc == 3)
+        bs_skip(&bs, 1);
+
+    /* skip width and heigh */
+    (void) read_ue( &bs );
+    (void) read_ue( &bs );
+
+    uint32_t conformance_window_flag = bs_read1(&bs);
+    if (conformance_window_flag) {
+        /* skip offsets*/
+        (void) read_ue(&bs);
+        (void) read_ue(&bs);
+        (void) read_ue(&bs);
+        (void) read_ue(&bs);
+    }
+    *bit_depth_luma_minus8 = read_ue(&bs);
+    *bit_depth_chroma_minus8 = read_ue(&bs);
+}
+
 static bo_t *GetHvcCTag(mp4_stream_t *p_stream)
 {
+    /* Generate hvcC box matching iso/iec 14496-15 3rd edition */
     bo_t *hvcC = box_new("hvcC");
+    if(!p_stream->fmt.i_extra)
+        return hvcC;
 
-    if (p_stream->fmt.i_extra > 0)
-        bo_add_mem(hvcC, p_stream->fmt.i_extra, p_stream->fmt.p_extra);
+    struct nal {
+        size_t i_buffer;
+        uint8_t * p_buffer;
+    };
 
+    /* According to the specification HEVC stream can have
+     * 16 vps id and an "unlimited" number of sps and pps id using ue(v) id*/
+    struct nal p_vps[16], *p_sps = NULL, *p_pps = NULL, *p_sei = NULL,
+               *p_nal = NULL;
+    size_t i_vps = 0, i_sps = 0, i_pps = 0, i_sei = 0;
+    uint8_t i_num_arrays = 0;
+
+    uint8_t * p_buffer = p_stream->fmt.p_extra;
+    size_t i_buffer = p_stream->fmt.i_extra;
+
+    uint8_t general_configuration[12] = {0};
+    uint8_t i_numTemporalLayer;
+    uint8_t i_chroma_idc = 1;
+    uint8_t i_bit_depth_luma_minus8 = 0;
+    uint8_t i_bit_depth_chroma_minus8 = 0;
+    bool b_temporalIdNested;
+
+    uint32_t cmp = 0xFFFFFFFF;
+    while (i_buffer) {
+        /* look for start code 0X0000001 */
+        while (i_buffer) {
+            cmp = (cmp << 8) | *p_buffer;
+            if((cmp ^ UINT32_C(0x100)) <= UINT32_C(0xFF))
+                break;
+            p_buffer++;
+            i_buffer--;
+        }
+        if (p_nal)
+            p_nal->i_buffer = p_buffer - p_nal->p_buffer - ((i_buffer)?3:0);
+
+        switch (*p_buffer & 0x72) {
+            /* VPS */
+        case 0x40:
+            p_nal = &p_vps[i_vps++];
+            p_nal->p_buffer = p_buffer;
+            /* Only keep the general profile from the first VPS
+             * if there are several (this shouldn't happen so soon) */
+            if (i_vps == 1) {
+                hevcParseVPS(p_buffer, i_buffer, general_configuration,
+                             &i_numTemporalLayer, &b_temporalIdNested);
+                i_num_arrays++;
+            }
+            break;
+            /* SPS */
+        case 0x42: {
+            struct nal * p_tmp =  realloc(p_sps, sizeof(struct nal) * (i_sps + 1));
+            if (!p_tmp)
+                break;
+            p_sps = p_tmp;
+            p_nal = &p_sps[i_sps++];
+            p_nal->p_buffer = p_buffer;
+            if (i_sps == 1 && i_buffer > 15) {
+                /* Get Chroma_idc and bitdepths */
+                hevcParseSPS(p_buffer, i_buffer, &i_chroma_idc,
+                             &i_bit_depth_luma_minus8, &i_bit_depth_chroma_minus8);
+                i_num_arrays++;
+            }
+            break;
+            }
+        /* PPS */
+        case 0x44: {
+            struct nal * p_tmp =  realloc(p_pps, sizeof(struct nal) * (i_pps + 1));
+            if (!p_tmp)
+                break;
+            p_pps = p_tmp;
+            p_nal = &p_pps[i_pps++];
+            p_nal->p_buffer = p_buffer;
+            if (i_pps == 1)
+                i_num_arrays++;
+            break;
+            }
+        /* SEI */
+        case 0x4E:
+        case 0x50: {
+            struct nal * p_tmp =  realloc(p_sei, sizeof(struct nal) * (i_sei + 1));
+            if (!p_tmp)
+                break;
+            p_sei = p_tmp;
+            p_nal = &p_sei[i_sei++];
+            p_nal->p_buffer = p_buffer;
+            if(i_sei == 1)
+                i_num_arrays++;
+            break;
+        }
+        default:
+            p_nal = NULL;
+            break;
+        }
+    }
+    bo_add_8(hvcC, 0x01);
+    bo_add_mem(hvcC, 12, general_configuration);
+    /* Don't set min spatial segmentation */
+    bo_add_16be(hvcC, 0xF000);
+    /* Don't set parallelism type since segmentation isn't set */
+    bo_add_8(hvcC, 0xFC);
+    bo_add_8(hvcC, (0xFC | (i_chroma_idc & 0x03)));
+    bo_add_8(hvcC, (0xF8 | (i_bit_depth_luma_minus8 & 0x07)));
+    bo_add_8(hvcC, (0xF8 | (i_bit_depth_chroma_minus8 & 0x07)));
+
+    /* Don't set framerate */
+    bo_add_16be(hvcC, 0x0000);
+    /* Force NAL size of 4 bytes that replace the startcode */
+    bo_add_8(hvcC, (((i_numTemporalLayer & 0x07) << 3) |
+                    (b_temporalIdNested << 2) | 0x03));
+    bo_add_8(hvcC, i_num_arrays);
+
+    if (i_vps)
+    {
+        /* Write VPS without forcing array_completeness */
+        bo_add_8(hvcC, 32);
+        bo_add_16be(hvcC, i_vps);
+        for (size_t i = 0; i < i_vps; i++) {
+            p_nal = &p_vps[i];
+            bo_add_16be(hvcC, p_nal->i_buffer);
+            bo_add_mem(hvcC, p_nal->i_buffer, p_nal->p_buffer);
+        }
+    }
+
+    if (i_sps) {
+        /* Write SPS without forcing array_completeness */
+        bo_add_8(hvcC, 33);
+        bo_add_16be(hvcC, i_sps);
+        for (size_t i = 0; i < i_sps; i++) {
+            p_nal = &p_sps[i];
+            bo_add_16be(hvcC, p_nal->i_buffer);
+            bo_add_mem(hvcC, p_nal->i_buffer, p_nal->p_buffer);
+        }
+    }
+
+    if (i_pps) {
+        /* Write PPS without forcing array_completeness */
+        bo_add_8(hvcC, 34);
+        bo_add_16be(hvcC, i_pps);
+        for (size_t i = 0; i < i_pps; i++) {
+            p_nal = &p_pps[i];
+            bo_add_16be(hvcC, p_nal->i_buffer);
+            bo_add_mem(hvcC, p_nal->i_buffer, p_nal->p_buffer);
+        }
+    }
+
+    if (i_sei) {
+        /* Write SEI without forcing array_completeness */
+        bo_add_8(hvcC, 39);
+        bo_add_16be(hvcC, i_sei);
+        for (size_t i = 0; i < i_sei; i++) {
+            p_nal = &p_sei[i];
+            bo_add_16be(hvcC, p_nal->i_buffer);
+            bo_add_mem(hvcC, p_nal->i_buffer, p_nal->p_buffer);
+        }
+    }
     return hvcC;
 }
 

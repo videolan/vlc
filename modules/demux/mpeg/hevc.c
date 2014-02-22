@@ -35,6 +35,7 @@
 #include <vlc_codec.h>
 #include <vlc_bits.h>
 
+#include "mpeg_parser_helpers.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -108,7 +109,7 @@ static int Open( vlc_object_t * p_this )
         return VLC_ENOMEM;
 
     p_sys->p_es        = NULL;
-    p_sys->i_dts       = 0;
+    p_sys->i_dts       = VLC_TS_0;
     p_sys->f_force_fps = var_CreateGetFloat( p_demux, "hevc-force-fps" );
     if( p_sys->f_force_fps != 0.0f )
     {
@@ -181,11 +182,13 @@ static int Demux( demux_t *p_demux)
 
             p_block_out->p_next = NULL;
 
-            p_block_out->i_dts = VLC_TS_0 + p_sys->i_dts;
+            p_block_out->i_dts = p_sys->i_dts;
             p_block_out->i_pts = VLC_TS_INVALID;
 
+            uint8_t nal_type = p_block_out->p_buffer[4] & 0x7E;
+
             /*Get fps from vps if available and not already forced*/
-            if( p_sys->f_fps == 0.0f && ( p_block_out->p_buffer[3] & 0x7E ) == 0x40 )
+            if( p_sys->f_fps == 0.0f && nal_type == 0x40 )
             {
                 if( getFPS( p_demux, p_block_out) )
                 {
@@ -195,7 +198,7 @@ static int Demux( demux_t *p_demux)
             }
 
             /* Update DTS only on VCL NAL*/
-            if( ( p_block_out->p_buffer[3]&0x7E ) < 0x40 && p_sys->f_fps )
+            if( nal_type < 0x40 && p_sys->f_fps )
             {
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_dts );
                 p_sys->i_dts += (int64_t)((double)1000000.0 / p_sys->f_fps);
@@ -221,70 +224,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 }
 
 
-static void CreateDecodedNAL( uint8_t **pp_ret, int *pi_ret,
+static uint8_t * CreateDecodedNAL( int *pi_ret,
                               const uint8_t *src, int i_src )
 {
-    const uint8_t *end = &src[i_src];
     uint8_t *dst = malloc( i_src );
     if( !dst )
         return;
 
-    *pp_ret = dst;
-
-    if( dst )
-    {
-        while( src < end )
-        {
-            if( src < end - 3 && src[0] == 0x00 && src[1] == 0x00 &&
-                src[2] == 0x03 )
-            {
-                *dst++ = 0x00;
-                *dst++ = 0x00;
-
-                src += 3;
-                continue;
-            }
-            *dst++ = *src++;
-        }
-    }
-    *pi_ret = dst - *pp_ret;
-}
-
-
-static void skipProfileTiersLevel( bs_t * bs, int32_t max_sub_layer_minus1 )
-{
-    uint8_t sub_layer_profile_present_flag[8];
-    uint8_t sub_layer_level_present_flag[8];
-
-    /* skipping useless fields of the VPS see https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-H.265-201304-I!!PDF-E&type=item */
-    bs_skip( bs, 2 + 1 + 5 + 32 + 1 + 1 + 1 + 1 + 44 + 8 );
-
-    for( int32_t i = 0; i < max_sub_layer_minus1; i++ )
-    {
-        sub_layer_profile_present_flag[i] = bs_read1( bs );
-        sub_layer_level_present_flag[i] = bs_read1( bs );
-    }
-
-    if(max_sub_layer_minus1 > 0)
-        bs_skip( bs, (8 - max_sub_layer_minus1) * 2 );
-
-    for( int32_t i = 0; i < max_sub_layer_minus1; i++ )
-    {
-        if( sub_layer_profile_present_flag[i] )
-            bs_skip( bs, 2 + 1 + 5 + 32 + 1 + 1 + 1 + 1 + 44 );
-        if( sub_layer_level_present_flag[i] )
-            bs_skip( bs, 8 );
-    }
-}
-
-static uint32_t read_ue( bs_t * bs )
-{
-    int32_t i = 0;
-
-    while( bs_read1( bs ) == 0 && bs->p < bs->p_end && i < 32 )
-        i++;
-
-    return (1 << i) - 1 + bs_read( bs, i );
+    *pi_ret = nal_decode( src, dst, i_src );
+    return dst;
 }
 
 static int32_t getFPS( demux_t *p_demux, block_t * p_block )
@@ -298,8 +246,8 @@ static int32_t getFPS( demux_t *p_demux, block_t * p_block )
     if( p_block->i_buffer < 5 )
         return -1;
 
-    CreateDecodedNAL( &p_decoded_nal, &i_decoded_nal,
-                              p_block->p_buffer+3, p_block->i_buffer-3 );
+    p_decoded_nal = CreateDecodedNAL(&i_decoded_nal,
+                                     p_block->p_buffer+4, p_block->i_buffer-4);
 
     if( !p_decoded_nal )
         return -1;
@@ -309,7 +257,7 @@ static int32_t getFPS( demux_t *p_demux, block_t * p_block )
     int32_t max_sub_layer_minus1 = bs_read( &bs, 3 );
     bs_skip( &bs, 17 );
 
-    skipProfileTiersLevel( &bs, max_sub_layer_minus1 );
+    hevc_skip_profile_tiers_level( &bs, max_sub_layer_minus1 );
 
     int32_t vps_sub_layer_ordering_info_present_flag = bs_read1( &bs );
     int32_t i = vps_sub_layer_ordering_info_present_flag? 0 : max_sub_layer_minus1;

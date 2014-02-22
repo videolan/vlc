@@ -124,7 +124,7 @@ static int Open(vlc_object_t *p_this)
 
     packetizer_Init(&p_dec->p_sys->packetizer,
                     p_hevc_startcode, sizeof(p_hevc_startcode),
-                    NULL, 0, 0,
+                    p_hevc_startcode, 1, 5,
                     PacketizeReset, PacketizeParse, PacketizeValidate, p_dec);
 
     /* Copy properties */
@@ -185,7 +185,7 @@ static block_t *PacketizeParse(void *p_private, bool *pb_ts_used, block_t *p_blo
         p_block->i_buffer--;
 
     bs_t bs;
-    bs_init(&bs, p_block->p_buffer+3, p_block->i_buffer-3);
+    bs_init(&bs, p_block->p_buffer+4, p_block->i_buffer-4);
 
     /* Get NALU type */
     uint32_t forbidden_zero_bit = bs_read1(&bs);
