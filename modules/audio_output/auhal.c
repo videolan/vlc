@@ -1497,18 +1497,22 @@ static OSStatus StreamsChangedListener(AudioObjectID inObjectID,  UInt32 inNumbe
     AudioObjectPropertyAddress streamsAddress = { kAudioDevicePropertyStreams, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
     err = AudioObjectGetPropertyDataSize(p_sys->i_selected_dev, &streamsAddress, 0, NULL, &i_param_size);
     if (err != noErr) {
-        msg_Err(p_aout, "could not get number of streams [%4.4s]", (char *)&err);
+        msg_Err(p_aout, "could not get number of streams for device %i [%4.4s]", p_sys->i_selected_dev, (char *)&err);
+        vlc_mutex_unlock(&p_sys->var_lock);
         return VLC_EGENERIC;
     }
 
     i_streams = i_param_size / sizeof(AudioStreamID);
     p_streams = (AudioStreamID *)malloc(i_param_size);
-    if (p_streams == NULL)
+    if (p_streams == NULL) {
+        vlc_mutex_unlock(&p_sys->var_lock);
         return VLC_ENOMEM;
+    }
 
     err = AudioObjectGetPropertyData(p_sys->i_selected_dev, &streamsAddress, 0, NULL, &i_param_size, p_streams);
     if (err != noErr) {
         msg_Err(p_aout, "could not get list of streams [%4.4s]", (char *)&err);
+        vlc_mutex_unlock(&p_sys->var_lock);
         return VLC_EGENERIC;
     }
     vlc_mutex_unlock(&p_sys->var_lock);
