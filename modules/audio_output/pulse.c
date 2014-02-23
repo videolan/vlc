@@ -619,6 +619,7 @@ static int VolumeSet(audio_output_t *aout, float vol)
     pa_stream *s = sys->stream;
     pa_operation *op;
     int ret = -1;
+    pa_volume_t base_volume;
 
     /* VLC provides the software volume so convert directly to PulseAudio
      * software volume, pa_volume_t. This is not a linear amplification factor
@@ -629,18 +630,32 @@ static int VolumeSet(audio_output_t *aout, float vol)
 
     pa_threaded_mainloop_lock(sys->mainloop);
 
-    if (!PA_VOLUME_IS_VALID(sys->base_volume))
-    {
-        msg_Err(aout, "cannot change volume without base");
-        goto out;
+    base_volume = sys->base_volume;
+    if (!PA_VOLUME_IS_VALID(base_volume))
+    {   /* Base volume is unknown, typically because sink is unknown.
+         * Try to guess the base volume. */
+        const struct sink *sink = sys->sinks;
+        if (unlikely(sink == NULL))
+        {
+            msg_Err(aout, "cannot change volume without sink");
+            goto out;
+        }
+
+        base_volume = sink->base_volume;
+        while ((sink = sink->next) != NULL)
+            if (sink->base_volume != base_volume)
+            {
+                msg_Err(aout, "cannot change volume without base");
+                goto out;
+            }
     }
 
-    pa_volume_t volume = pa_sw_volume_multiply(lroundf(vol), sys->base_volume);
+    pa_volume_t volume = pa_sw_volume_multiply(lroundf(vol), base_volume);
 
     if (s == NULL)
     {
         sys->volume_force = volume;
-        aout_VolumeReport(aout, volume / PA_VOLUME_NORM);
+        aout_VolumeReport(aout, vol / (float)PA_VOLUME_NORM);
         ret = 0;
         goto out;
     }
