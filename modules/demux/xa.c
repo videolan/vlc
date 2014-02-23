@@ -55,12 +55,13 @@ static int Control( demux_t *, int i_query, va_list args );
 
 struct demux_sys_t
 {
-    es_format_t     fmt;
     es_out_id_t     *p_es;
 
     int64_t         i_data_offset;
     unsigned int    i_data_size;
     unsigned int    i_block_frames;
+    unsigned int    i_frame_size;
+    unsigned int    i_bitrate;
 
     date_t          pts;
 };
@@ -77,6 +78,8 @@ typedef struct xa_header_t
     uint16_t nBlockAlign;
     uint16_t wBitsPerSample;
 } xa_header_t;
+
+#define FRAME_LENGTH 28 /* samples per frame */
 
 /*****************************************************************************
  * Open: check file and initializes structures
@@ -112,38 +115,37 @@ static int Open( vlc_object_t * p_this )
     /* skip XA header -- cannot fail */
     stream_Read( p_demux->s, NULL, sizeof( p_xa ) );
 
-    es_format_Init( &p_sys->fmt, AUDIO_ES, VLC_FOURCC('X','A','J',0) );
+    es_format_t fmt;
+    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC('X','A','J',0) );
 
     msg_Dbg( p_demux, "assuming EA ADPCM audio codec" );
-    p_sys->fmt.audio.i_rate = GetDWLE( &p_xa.nSamplesPerSec );
-    p_sys->fmt.audio.i_bytes_per_frame = 15 * GetWLE( &p_xa.nChannels );
-    p_sys->fmt.audio.i_frame_length = 28; /* 28 samples of 4 bits each */
+    fmt.audio.i_rate = GetDWLE( &p_xa.nSamplesPerSec );
+    fmt.audio.i_bytes_per_frame = 15 * GetWLE( &p_xa.nChannels );
+    fmt.audio.i_frame_length = FRAME_LENGTH;
 
-    p_sys->fmt.audio.i_channels = GetWLE ( &p_xa.nChannels );
-    p_sys->fmt.audio.i_blockalign = p_sys->fmt.audio.i_bytes_per_frame;
-    p_sys->fmt.audio.i_bitspersample = 16;
-    p_sys->fmt.i_bitrate = (p_sys->fmt.audio.i_rate
-                            * p_sys->fmt.audio.i_bytes_per_frame * 8)
-                            / p_sys->fmt.audio.i_frame_length;
-    p_sys->fmt.i_extra = 0;
-    p_sys->fmt.p_extra = NULL;
+    fmt.audio.i_channels = GetWLE ( &p_xa.nChannels );
+    fmt.audio.i_blockalign = fmt.audio.i_bytes_per_frame;
+    fmt.audio.i_bitspersample = 16;
+    fmt.i_bitrate = (fmt.audio.i_rate * fmt.audio.i_bytes_per_frame * 8)
+                    / fmt.audio.i_frame_length;
 
     p_sys->i_data_offset = stream_Tell( p_demux->s );
     /* FIXME: better computation */
     p_sys->i_data_size = p_xa.iSize * 15 / 56;
     /* How many frames per block (1:1 is too CPU intensive) */
-    p_sys->i_block_frames = p_sys->fmt.audio.i_rate / (28 * 20) + 1;
+    p_sys->i_block_frames = fmt.audio.i_rate / (FRAME_LENGTH * 20) + 1;
+    p_sys->i_frame_size = fmt.audio.i_bytes_per_frame;
+    p_sys->i_bitrate = fmt.i_bitrate;
 
     msg_Dbg( p_demux, "fourcc: %4.4s, channels: %d, "
              "freq: %d Hz, bitrate: %dKo/s, blockalign: %d",
-             (char *)&p_sys->fmt.i_codec, p_sys->fmt.audio.i_channels,
-             p_sys->fmt.audio.i_rate, p_sys->fmt.i_bitrate / 8192,
-             p_sys->fmt.audio.i_blockalign );
+             (char *)&fmt.i_codec, fmt.audio.i_channels, fmt.audio.i_rate,
+             fmt.i_bitrate / 8192, fmt.audio.i_blockalign );
 
-    p_sys->p_es = es_out_Add( p_demux->out, &p_sys->fmt );
+    p_sys->p_es = es_out_Add( p_demux->out, &fmt );
 
-    date_Init( &p_sys->pts, p_sys->fmt.audio.i_rate, 1 );
-    date_Set( &p_sys->pts, 1 );
+    date_Init( &p_sys->pts, fmt.audio.i_rate, 1 );
+    date_Set( &p_sys->pts, VLC_TS_0 );
 
     return VLC_SUCCESS;
 }
@@ -169,20 +171,19 @@ static int Demux( demux_t *p_demux )
         return 0;
     }
 
-    p_block = stream_Block( p_demux->s, p_sys->fmt.audio.i_bytes_per_frame *
-                            i_frames );
+    p_block = stream_Block( p_demux->s, p_sys->i_frame_size * i_frames );
     if( p_block == NULL )
     {
         msg_Warn( p_demux, "cannot read data" );
         return 0;
     }
 
-    i_frames = p_block->i_buffer / p_sys->fmt.audio.i_bytes_per_frame;
-    p_block->i_dts = p_block->i_pts = VLC_TS_0 + date_Get( &p_sys->pts );
+    i_frames = p_block->i_buffer / p_sys->i_frame_size;
+    p_block->i_dts = p_block->i_pts = date_Get( &p_sys->pts );
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
     es_out_Send( p_demux->out, p_sys->p_es, p_block );
 
-    date_Increment( &p_sys->pts, i_frames * p_sys->fmt.audio.i_frame_length );
+    date_Increment( &p_sys->pts, i_frames * FRAME_LENGTH );
 
     return 1;
 }
@@ -207,7 +208,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     return demux_vaControlHelper( p_demux->s, p_sys->i_data_offset,
                                    p_sys->i_data_size ? p_sys->i_data_offset
                                    + p_sys->i_data_size : -1,
-                                   p_sys->fmt.i_bitrate,
-                                   p_sys->fmt.audio.i_blockalign,
+                                   p_sys->i_bitrate, p_sys->i_frame_size,
                                    i_query, args );
 }
