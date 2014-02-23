@@ -640,6 +640,7 @@ static int VolumeSet(audio_output_t *aout, float vol)
     if (s == NULL)
     {
         sys->volume_force = volume;
+        aout_VolumeReport(aout, volume / PA_VOLUME_NORM);
         ret = 0;
         goto out;
     }
