@@ -1028,6 +1028,7 @@ static int Open(vlc_object_t *obj)
     }
     sys->stream = NULL;
     sys->context = ctx;
+    sys->base_volume = PA_VOLUME_INVALID;
     sys->volume_force = PA_VOLUME_INVALID;
     sys->flags_force = PA_STREAM_NOFLAGS;
     sys->sink_force = NULL;
