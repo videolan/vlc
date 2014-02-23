@@ -409,6 +409,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #   define OS2EMX_PLAIN_CHAR
 #   define INCL_BASE
 #   define INCL_PM
+#   include <os2safe.h>
 #   include <os2.h>
 #endif
 
