@@ -1490,6 +1490,10 @@ static OSStatus StreamsChangedListener(AudioObjectID inObjectID,  UInt32 inNumbe
     msg_Dbg(p_aout, "available physical formats for audio device changed");
     RebuildDeviceList(p_aout);
 
+    /* In this case audio has not yet started. Below code will not work and is not needed here. */
+    if (p_sys->i_selected_dev == 0)
+        return 0;
+
     /*
      * check if changed stream id belongs to current device
      */
