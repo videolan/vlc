@@ -1302,6 +1302,8 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
 
     int bytesRequested = ioData->mBuffers[0].mDataByteSize;
     Float32 *targetBuffer = (Float32*)ioData->mBuffers[0].mData;
+    if (unlikely(bytesRequested == 0)) /* cannot be negative */
+        return noErr;
 
     vlc_mutex_lock(&p_sys->lock);
     /* Pull audio from buffer */
@@ -1314,7 +1316,6 @@ static OSStatus RenderCallbackAnalog(vlc_object_t *p_obj,
         memset(targetBuffer, 0, bytesRequested);
     } else {
         int32_t bytesToCopy = __MIN(bytesRequested, availableBytes);
-        assert(bytesToCopy > 0);
 
         memcpy(targetBuffer, buffer, bytesToCopy);
         TPCircularBufferConsume(&p_sys->circular_buffer, bytesToCopy);
@@ -1349,6 +1350,8 @@ static OSStatus RenderCallbackSPDIF(AudioDeviceID inDevice,
 
     int bytesRequested = outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize;
     char *targetBuffer = outOutputData->mBuffers[p_sys->i_stream_index].mData;
+    if (unlikely(bytesRequested == 0)) /* cannot be negative */
+        return noErr;
 
     vlc_mutex_lock(&p_sys->lock);
     /* Pull audio from buffer */
@@ -1361,7 +1364,6 @@ static OSStatus RenderCallbackSPDIF(AudioDeviceID inDevice,
         memset(targetBuffer, 0, bytesRequested);
     } else {
         int32_t bytesToCopy = __MIN(bytesRequested, availableBytes);
-        assert(bytesToCopy > 0);
 
         memcpy(targetBuffer, buffer, bytesToCopy);
         TPCircularBufferConsume(&p_sys->circular_buffer, bytesToCopy);
