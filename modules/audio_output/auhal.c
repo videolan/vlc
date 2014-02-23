@@ -1725,9 +1725,7 @@ static int AudioStreamSupportsDigital(audio_output_t *p_aout, AudioStreamID i_st
  */
 static int AudioStreamChangeFormat(audio_output_t *p_aout, AudioStreamID i_stream_id, AudioStreamBasicDescription change_format)
 {
-    OSStatus            err = noErr;
-    UInt32              i_param_size = 0;
-
+    OSStatus err = noErr;
     int retValue = true;
 
     AudioObjectPropertyAddress physicalFormatAddress = { kAudioStreamPropertyPhysicalFormat, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
@@ -1762,14 +1760,10 @@ static int AudioStreamChangeFormat(audio_output_t *p_aout, AudioStreamID i_strea
      * it is also not atomic in its behaviour.
      * Therefore we check 5 times before we really give up.
      * FIXME: failing isn't actually implemented yet. */
+    AudioStreamBasicDescription actual_format;
+    UInt32 i_param_size = sizeof(AudioStreamBasicDescription);
     for (int i = 0; i < 5; i++) {
-        AudioStreamBasicDescription actual_format;
-        mtime_t timeout = mdate() + 500000;
-
-        if (vlc_cond_timedwait(&w.cond, &w.lock, timeout))
-            msg_Dbg(p_aout, "reached timeout");
-
-        i_param_size = sizeof(AudioStreamBasicDescription);
+        /* Callback is not always invoked. So first check if format is already set. */
         err = AudioObjectGetPropertyData(i_stream_id, &physicalFormatAddress, 0, NULL, &i_param_size, &actual_format);
 
         msg_Dbg(p_aout, STREAM_FORMAT_MSG("actual format in use: ", actual_format));
@@ -1779,7 +1773,11 @@ static int AudioStreamChangeFormat(audio_output_t *p_aout, AudioStreamID i_strea
             /* The right format is now active */
             break;
         }
+
         /* We need to check again */
+        mtime_t timeout = mdate() + 500000;
+        if (vlc_cond_timedwait(&w.cond, &w.lock, timeout))
+            msg_Dbg(p_aout, "reached timeout");
     }
 
 out:
