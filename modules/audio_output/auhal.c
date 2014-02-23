@@ -98,7 +98,6 @@ struct aout_sys_t
     pid_t                       i_hog_pid;          /* The keep the pid of our hog status */
     AudioStreamID               i_stream_id;        /* The StreamID that has a cac3 streamformat */
     int                         i_stream_index;     /* The index of i_stream_id in an AudioBufferList */
-    AudioStreamBasicDescription stream_format;      /* The format we changed the stream to */
     AudioStreamBasicDescription sfmt_revert;        /* The original format of the stream */
     bool                        b_revert;           /* Whether we need to revert the stream format */
     bool                        b_changed_mixing;   /* Whether we need to set the mixing mode back */
@@ -716,6 +715,7 @@ static int StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
     Boolean                 b_writeable = false;
     AudioStreamID           *p_streams = NULL;
     unsigned                i_streams = 0;
+    AudioStreamBasicDescription desired_stream_format;
 
     /* Start doing the SPDIF setup proces */
     p_sys->b_digital = true;
@@ -856,11 +856,11 @@ static int StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
             }
 
             if (i_requested_rate_format >= 0) /* We prefer to output at the samplerate of the original audio */
-                p_sys->stream_format = p_format_list[i_requested_rate_format].mFormat;
+                desired_stream_format = p_format_list[i_requested_rate_format].mFormat;
             else if (i_current_rate_format >= 0) /* If not possible, we will try to use the current samplerate of the device */
-                p_sys->stream_format = p_format_list[i_current_rate_format].mFormat;
+                desired_stream_format = p_format_list[i_current_rate_format].mFormat;
             else
-                p_sys->stream_format = p_format_list[i_backup_rate_format].mFormat; /* And if we have to, any digital format will be just fine (highest rate possible) */
+                desired_stream_format = p_format_list[i_backup_rate_format].mFormat; /* And if we have to, any digital format will be just fine (highest rate possible) */
         }
         free(p_format_list);
     }
@@ -868,19 +868,19 @@ static int StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
 
     msg_Dbg(p_aout, STREAM_FORMAT_MSG("original stream format: ", p_sys->sfmt_revert));
 
-    if (!AudioStreamChangeFormat(p_aout, p_sys->i_stream_id, p_sys->stream_format)) {
+    if (!AudioStreamChangeFormat(p_aout, p_sys->i_stream_id, desired_stream_format)) {
         msg_Err(p_aout, "failed to change stream format for SPDIF output");
         return false;
     }
 
     /* Set the format flags */
-    if (p_sys->stream_format.mFormatFlags & kAudioFormatFlagIsBigEndian)
+    if (desired_stream_format.mFormatFlags & kAudioFormatFlagIsBigEndian)
         fmt->i_format = VLC_CODEC_SPDIFB;
     else
         fmt->i_format = VLC_CODEC_SPDIFL;
     fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
     fmt->i_frame_length = A52_FRAME_NB;
-    fmt->i_rate = (unsigned int)p_sys->stream_format.mSampleRate;
+    fmt->i_rate = (unsigned int)desired_stream_format.mSampleRate;
     p_sys->i_rate = fmt->i_rate;
     aout_FormatPrepare(fmt);
 
