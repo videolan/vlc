@@ -592,14 +592,14 @@ static VLCMainWindow *_o_sharedInstance = nil;
     b_dropzone_active = YES;
     [o_right_split_view addSubview: o_dropzone_view positioned:NSWindowAbove relativeTo:o_playlist_table];
     [o_dropzone_view setFrame: [o_playlist_table frame]];
-    [[o_playlist_table animator] setHidden:YES];
+    [o_playlist_table setHidden:YES];
 }
 
 - (void)hideDropZone
 {
     b_dropzone_active = NO;
     [o_dropzone_view removeFromSuperview];
-    [[o_playlist_table animator] setHidden: NO];
+    [o_playlist_table setHidden: NO];
 }
 
 - (void)hideSplitView:(BOOL)b_with_resize
