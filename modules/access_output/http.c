@@ -30,7 +30,6 @@
 # include "config.h"
 #endif
 
-#include <arpa/inet.h>
 #include <stdint.h>
 
 #include <vlc_common.h>
@@ -377,9 +376,9 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
             {
                 struct metacube2_block_header hdr;
                 memcpy( hdr.sync, METACUBE2_SYNC, sizeof( METACUBE2_SYNC ) );
-                hdr.size = htonl( p_sys->i_header_size );
-                hdr.flags = htons( METACUBE_FLAGS_HEADER );
-                hdr.csum = htons( metacube2_compute_crc( &hdr ) );
+                hdr.size = hton32( p_sys->i_header_size );
+                hdr.flags = hton16( METACUBE_FLAGS_HEADER );
+                hdr.csum = hton16( metacube2_compute_crc( &hdr ) );
 
                 int i_header_size = p_sys->i_header_size + sizeof( hdr );
                 uint8_t *p_hdr_block = xmalloc( i_header_size );
@@ -411,13 +410,13 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
             /* prepend Metacube header */
             struct metacube2_block_header hdr;
             memcpy( hdr.sync, METACUBE2_SYNC, sizeof( METACUBE2_SYNC ) );
-            hdr.size = htonl( p_buffer->i_buffer );
-            hdr.flags = htons( 0 );
+            hdr.size = hton32( p_buffer->i_buffer );
+            hdr.flags = hton16( 0 );
             if( p_buffer->i_flags & BLOCK_FLAG_HEADER )
-                hdr.flags |= htons( METACUBE_FLAGS_HEADER );
+                hdr.flags |= hton16( METACUBE_FLAGS_HEADER );
             if( p_sys->b_has_keyframes && !( p_buffer->i_flags & BLOCK_FLAG_TYPE_I ) )
-                hdr.flags |= htons( METACUBE_FLAGS_NOT_SUITABLE_FOR_STREAM_START );
-            hdr.csum = htons( metacube2_compute_crc( &hdr ) );
+                hdr.flags |= hton16( METACUBE_FLAGS_NOT_SUITABLE_FOR_STREAM_START );
+            hdr.csum = hton16( metacube2_compute_crc( &hdr ) );
 
             p_buffer = block_Realloc( p_buffer, sizeof( hdr ), p_buffer->i_buffer );
             if( p_buffer == NULL ) {
