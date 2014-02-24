@@ -52,6 +52,7 @@ extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void jni_UnlockAndroidSurface();
 extern void jni_SetAndroidSurfaceSizeEnv(JNIEnv *p_env, int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
 extern void jni_EventHardwareAccelerationError();
+extern bool jni_IsVideoPlayerActivityCreated();
 
 struct decoder_sys_t
 {
@@ -399,7 +400,10 @@ static int OpenDecoder(vlc_object_t *p_this)
         (*env)->DeleteLocalRef(env, bytebuf);
     }
 
-    p_sys->direct_rendering = var_InheritBool(p_dec, CFG_PREFIX "dr");
+    /* If the VideoPlayerActivity is not started, MediaCodec opaque
+       direct rendering should be disabled since no surface will be
+       attached to the JNI. */
+    p_sys->direct_rendering = jni_IsVideoPlayerActivityCreated() && var_InheritBool(p_dec, CFG_PREFIX "dr");
     if (p_sys->direct_rendering) {
         jobject surf = jni_LockAndGetAndroidJavaSurface();
         if (surf) {
