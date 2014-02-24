@@ -191,6 +191,8 @@ static int Open(vlc_object_t *obj)
     p_sys->b_ignore_streams_changed_callback = false;
     p_sys->b_selected_dev_is_default = false;
     p_sys->b_paused = false;
+    memset(&p_sys->sfmt_revert, 0, sizeof(p_sys->sfmt_revert));
+    p_sys->i_stream_id = 0;
 
     p_aout->sys = p_sys;
     p_aout->start = Start;
@@ -307,7 +309,6 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     p_sys->au_component = NULL;
     p_sys->au_unit = NULL;
     p_sys->i_hog_pid = -1;
-    p_sys->i_stream_id = 0;
     p_sys->i_stream_index = -1;
     p_sys->b_revert = false;
     p_sys->b_changed_mixing = false;
@@ -716,6 +717,7 @@ static int StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
     AudioStreamID           *p_streams = NULL;
     unsigned                i_streams = 0;
     AudioStreamBasicDescription desired_stream_format;
+    memset(&desired_stream_format, 0, sizeof(desired_stream_format));
 
     /* Start doing the SPDIF setup proces */
     p_sys->b_digital = true;
@@ -822,20 +824,36 @@ static int StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
             int i_current_rate_format = -1;
             int i_backup_rate_format = -1;
 
-            p_sys->i_stream_id = p_streams[i];
-            p_sys->i_stream_index = i;
-
             if (!p_sys->b_revert) {
                 AudioObjectPropertyAddress currentPhysicalFormatAddress = { kAudioStreamPropertyPhysicalFormat, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
                 /* Retrieve the original format of this stream first if not done so already */
-                i_param_size = sizeof(p_sys->sfmt_revert);
-                err = AudioObjectGetPropertyData(p_sys->i_stream_id, &currentPhysicalFormatAddress, 0, NULL, &i_param_size, &p_sys->sfmt_revert);
+                AudioStreamBasicDescription current_streamformat;
+                i_param_size = sizeof(current_streamformat);
+                err = AudioObjectGetPropertyData(p_streams[i], &currentPhysicalFormatAddress, 0, NULL, &i_param_size, &current_streamformat);
                 if (err != noErr) {
                     msg_Err(p_aout, "could not retrieve the original streamformat [%4.4s]", (char *)&err);
                     continue;
                 }
+
+                /* 
+                 * Only the first found format id is accepted. In case of another id later on, we still use the
+                 * already saved one. This can happen if the user plugs in a spdif cable while a stream is already
+                 * playing. Then, auhal already misleadingly reports an ac3 format here whereas the original format
+                 * should be still pcm.
+                 */
+                if (p_sys->sfmt_revert.mFormatID > 0 && p_sys->sfmt_revert.mFormatID != current_streamformat.mFormatID &&
+                        p_streams[i] == p_sys->i_stream_id) {
+                    msg_Warn(p_aout, STREAM_FORMAT_MSG("Detected current stream format: ", current_streamformat));
+                    msg_Warn(p_aout, "... there is another stream format already stored, the current one is ignored");
+                } else {
+                    p_sys->sfmt_revert = current_streamformat;
+                }
+
                 p_sys->b_revert = true;
             }
+
+            p_sys->i_stream_id = p_streams[i];
+            p_sys->i_stream_index = i;
 
             for (int j = 0; j < i_formats; j++) {
                 if (p_format_list[j].mFormat.mFormatID == 'IAC3' ||
