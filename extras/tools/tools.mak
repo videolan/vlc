@@ -51,7 +51,7 @@ yasm: yasm-$(YASM_VERSION).tar.gz
 	$(MOVE)
 
 .yasm: yasm
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
 CLEAN_FILE += .yasm
@@ -68,7 +68,7 @@ cmake: cmake-$(CMAKE_VERSION).tar.gz
 	$(MOVE)
 
 .cmake: cmake
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
 CLEAN_FILE += .cmake
@@ -85,7 +85,7 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 	$(MOVE)
 
 .libtool: libtool
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	ln -sf libtool $(PREFIX)/bin/glibtool
 	ln -sf libtoolize $(PREFIX)/bin/glibtoolize
 	touch $@
@@ -104,7 +104,7 @@ tar: tar-$(TAR_VERSION).tar.bz2
 	$(MOVE)
 
 .tar: tar
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
 CLEAN_PKG += tar
@@ -121,7 +121,7 @@ xz: xz-$(XZ_VERSION).tar.bz2
 	$(MOVE)
 
 .xz: xz
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
 CLEAN_PKG += xz
@@ -138,7 +138,7 @@ autoconf: autoconf-$(AUTOCONF_VERSION).tar.gz
 	$(MOVE)
 
 .autoconf: autoconf .pkg-config
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
 CLEAN_FILE += .autoconf
@@ -155,7 +155,7 @@ automake: automake-$(AUTOMAKE_VERSION).tar.gz
 	$(MOVE)
 
 .automake: automake .autoconf
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
 CLEAN_FILE += .automake
@@ -172,7 +172,7 @@ m4: m4-$(M4_VERSION).tar.gz
 	$(MOVE)
 
 .m4: m4
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
 CLEAN_FILE += .m4
@@ -190,7 +190,7 @@ pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
 	$(MOVE)
 
 .pkg-config: pkgconfig
-	(cd pkgconfig; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
+	(cd pkgconfig; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && $(MAKE) && $(MAKE) install)
 	touch $@
 
 CLEAN_FILE += .pkg-config
@@ -208,7 +208,7 @@ openssl: openssl-$(OPENSSL_VERSION).tar.gz
 	$(MOVE)
 
 .openssl: openssl
-	(cd openssl; ./config --prefix=$(PREFIX) no-shared no-zlib && make -j1 && make test && make install)
+	(cd openssl; ./config --prefix=$(PREFIX) no-shared no-zlib && $(MAKE) -j1 && $(MAKE) test && $(MAKE) install)
 	touch $@
 
 CLEAN_FILE += .openssl
@@ -241,7 +241,7 @@ ragel: ragel-$(RAGEL_VERSION).tar.gz
 
 .ragel: ragel
 	$(APPLY) ragel-6.8-javacodegen.patch
-	(cd ragel; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
+	(cd ragel; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && $(MAKE) && $(MAKE) install)
 	touch $@
 
 CLEAN_FILE += .ragel
