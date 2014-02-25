@@ -57,16 +57,6 @@ vout_thread_t *getVout(void);
 vout_thread_t *getVoutForActiveWindow(void);
 audio_output_t *getAout(void);
 
-/*****************************************************************************
- * intf_sys_t: description and status of the interface
- *****************************************************************************/
-struct intf_sys_t
-{
-    /* menus handlers */
-    bool b_input_update;
-    bool b_aout_update;
-    bool b_vout_update;
-};
 
 /*****************************************************************************
  * VLCMain interface

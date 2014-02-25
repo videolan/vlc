@@ -108,27 +108,10 @@ int OpenIntf (vlc_object_t *p_this)
     [VLCApplication sharedApplication];
 
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
-
-    p_intf->p_sys = malloc(sizeof(intf_sys_t));
-    if (p_intf->p_sys == NULL)
-        return VLC_ENOMEM;
-
-    memset(p_intf->p_sys, 0, sizeof(*p_intf->p_sys));
-
     Run(p_intf);
 
     [o_pool release];
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * CloseIntf: destroy interface
- *****************************************************************************/
-void CloseIntf (vlc_object_t *p_this)
-{
-    intf_thread_t *p_intf = (intf_thread_t*) p_this;
-
-    free(p_intf->p_sys);
 }
 
 static NSLock * o_vout_provider_lock = nil;
