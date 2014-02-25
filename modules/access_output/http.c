@@ -113,7 +113,7 @@ struct sout_access_out_sys_t
 
 /* Definitions for the Metacube2 protocol, used to communicate with Cubemap. */
 
-#define METACUBE2_SYNC "cube!map"  /* 8 bytes long. */
+static const uint8_t METACUBE2_SYNC[8] = {'c', 'u', 'b', 'e', '!', 'm', 'a', 'p'};
 #define METACUBE_FLAGS_HEADER 0x1
 #define METACUBE_FLAGS_NOT_SUITABLE_FOR_STREAM_START 0x2
 
