@@ -766,11 +766,7 @@ QVariant AddonsListModel::Addon::data( int role ) const
     {
     case Qt::DisplayRole:
     {
-        QString name = qfu( p_entry->psz_name );
-        if ( p_entry->e_state == ADDON_INSTALLED )
-            name.append( QString(" (%1)").arg( qtr("installed") ) );
-
-        returnval = name;
+        returnval = qfu( p_entry->psz_name );
         break;
     }
     case Qt::DecorationRole:
@@ -1124,6 +1120,33 @@ void AddonItemDelegate::paint( QPainter *painter,
 
     painter->save();
     painter->setRenderHint( QPainter::TextAntialiasing );
+
+    /* Addon status */
+    if ( i_state == ADDON_INSTALLED )
+    {
+        painter->save();
+        painter->setRenderHint( QPainter::Antialiasing );
+        QMargins statusMargins( 5, 2, 5, 2 );
+        QFont font( newopt.font );
+        font.setBold( true );
+        QFontMetrics metrics( font );
+        painter->setFont( font );
+        QRect statusRect = metrics.boundingRect( qtr("Installed") );
+        statusRect.translate( newopt.rect.width() - statusRect.width(),
+                              newopt.rect.top() + statusRect.height() );
+        statusRect.adjust( - statusMargins.left() - statusMargins.right(),
+                           0, 0,
+                           statusMargins.top() + statusMargins.bottom() );
+        QPainterPath path;
+        path.addRoundedRect( statusRect, 2.0, 2.0 );
+        painter->fillPath( path, QColor( Qt::green ).darker( 125 ) );
+        painter->setPen( Qt::white );
+        painter->drawText(
+            statusRect.adjusted( statusMargins.left(), statusMargins.top(),
+                                 -statusMargins.right(), -statusMargins.bottom() ),
+            qtr("Installed") );
+        painter->restore();
+    }
 
     if ( newopt.state & QStyle::State_Selected )
         painter->setPen( newopt.palette.highlightedText().color() );
