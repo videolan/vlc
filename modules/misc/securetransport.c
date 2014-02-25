@@ -701,10 +701,6 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key) 
 
     msg_Dbg(crd, "open st server");
 
-    vlc_tls_creds_sys_t *sys = malloc(sizeof(*sys));
-    if (unlikely(sys == NULL))
-        return VLC_ENOMEM;
-
     /*
      * Get the server certificate.
      *
@@ -785,6 +781,12 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key) 
         CFArrayAppendArray(server_cert_chain, cert_chain, CFRangeMake(1, num_cert_chain - 1));
     CFRelease(cert_chain);
 
+    vlc_tls_creds_sys_t *sys = malloc(sizeof(*sys));
+    if (unlikely(sys == NULL)) {
+        CFRelease(server_cert_chain);
+        result = VLC_ENOMEM;
+        goto out;
+    }
 
     sys->server_cert_chain = server_cert_chain;
     sys->whitelist = NULL;
