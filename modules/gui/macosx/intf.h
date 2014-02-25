@@ -62,8 +62,6 @@ audio_output_t *getAout(void);
  * VLCMain interface
  *****************************************************************************/
 @class AppleRemote;
-@class VLCInformation;
-@class VLCEmbeddedWindow;
 @class VLCControls;
 @class VLCPlaylist;
 
