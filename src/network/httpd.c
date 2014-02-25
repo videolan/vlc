@@ -694,7 +694,7 @@ static int httpd_StreamCallBack(httpd_callback_sys_t *p_sys,
         vlc_mutex_lock(&stream->lock);
         for (size_t i = 0; i < stream->i_http_headers; i++)
             if (strncasecmp(stream->p_http_headers[i].name, "Content-Length", 14)) {
-                httpd_MsgAdd(answer, stream->p_http_headers[i].name,
+                httpd_MsgAdd(answer, stream->p_http_headers[i].name, "%s",
                               stream->p_http_headers[i].value);
 
                 if (!strncasecmp(stream->p_http_headers[i].name, "Content-Type", 12))
@@ -744,7 +744,7 @@ static int httpd_StreamCallBack(httpd_callback_sys_t *p_sys,
             if (!b_xplaystream)
                 answer->i_body_offset = 0;
         } else if (!b_has_content_type)
-            httpd_MsgAdd(answer, "Content-type", stream->psz_mime);
+            httpd_MsgAdd(answer, "Content-type", "%s", stream->psz_mime);
 
         if (!b_has_cache_control)
             httpd_MsgAdd(answer, "Cache-Control", "no-cache");
@@ -1557,7 +1557,7 @@ static void httpd_ClientRecv(httpd_client_t *cl)
                         *colon++ = '\0';
                         while (*colon == ' ')
                             colon++;
-                        httpd_MsgAdd(&cl->query, line, colon);
+                        httpd_MsgAdd(&cl->query, line, "%s", colon);
 
                         if (!strcasecmp(line, "Content-Length"))
                             cl->query.i_body = atol(colon);
