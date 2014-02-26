@@ -23,6 +23,7 @@
 # include "config.h"
 #endif
 
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -147,12 +148,15 @@ char *encode_URI_component (const char *str)
  * @param path path to convert (or URI to copy)
  * @param scheme URI scheme to use (default is auto: "file", "fd" or "smb")
  * @return a nul-terminated URI string (use free() to release it),
- * or NULL in case of error
+ * or NULL in case of error (errno will be set accordingly)
  */
 char *vlc_path2uri (const char *path, const char *scheme)
 {
     if (path == NULL)
+    {
+        errno = EINVAL;
         return NULL;
+    }
     if (scheme == NULL && !strcmp (path, "-"))
         return strdup ("fd://0"); // standard input
     /* Note: VLC cannot handle URI schemes without double slash after the
@@ -180,7 +184,10 @@ char *vlc_path2uri (const char *path, const char *scheme)
         path += 2;
 # warning Drive letter-relative path not implemented!
         if (path[0] != DIR_SEP_CHAR)
+        {
+            errno = ENOTSUP;
             return NULL;
+        }
     }
     else
 #endif
@@ -188,7 +195,10 @@ char *vlc_path2uri (const char *path, const char *scheme)
     {   /* Windows UNC paths */
 #if !defined( _WIN32 ) && !defined( __OS2__ )
         if (scheme != NULL)
+        {
+            errno = ENOTSUP;
             return NULL; /* remote files not supported */
+        }
 
         /* \\host\share\path -> smb://host/share/path */
         if (strchr (path + 2, '\\') != NULL)
