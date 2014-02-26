@@ -129,14 +129,9 @@ char* FontConfig_Select( filter_t *p_filter, const char* family,
     FcPatternAddBool( pat, FC_OUTLINE, FcTrue );
     FcPatternAddInteger( pat, FC_SLANT, b_italic ? FC_SLANT_ITALIC : FC_SLANT_ROMAN );
     FcPatternAddInteger( pat, FC_WEIGHT, b_bold ? FC_WEIGHT_EXTRABOLD : FC_WEIGHT_NORMAL );
-    if( i_size != -1 )
+    if( i_size > 0 )
     {
-        char *psz_fontsize;
-        if( asprintf( &psz_fontsize, "%d", i_size ) != -1 )
-        {
-            FcPatternAddString( pat, FC_SIZE, (const FcChar8 *)psz_fontsize );
-            free( psz_fontsize );
-        }
+        FcPatternAddDouble( pat, FC_SIZE, (double)i_size );
     }
 
     /* */
