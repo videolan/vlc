@@ -129,7 +129,10 @@ int transcode_spu_process( sout_stream_t *p_stream,
 
     p_subpic = id->p_decoder->pf_decode_sub( id->p_decoder, &in );
     if( !p_subpic )
-        return VLC_EGENERIC;
+    {
+        /* We just don't have anything to handle now, go own*/
+        return VLC_SUCCESS;
+    }
 
     if( p_sys->b_master_sync && p_sys->i_master_drift )
     {
