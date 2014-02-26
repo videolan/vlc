@@ -163,7 +163,7 @@ bool transcode_spu_add( sout_stream_t *p_stream, es_format_t *p_fmt,
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    if( p_sys->i_scodec || p_sys->psz_senc )
+    if( p_sys->i_scodec )
     {
         msg_Dbg( p_stream, "creating subtitle transcoding from fcc=`%4.4s' "
                  "to fcc=`%4.4s'", (char*)&p_fmt->i_codec,
