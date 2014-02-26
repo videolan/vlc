@@ -1012,8 +1012,8 @@ static int subtitle_ParseSubRipTiming( subtitle_t *p_subtitle,
 {
     int i_result = VLC_EGENERIC;
     char *psz_start, *psz_stop;
-    psz_start = malloc( strlen(s) );
-    psz_stop = malloc( strlen(s) );
+    psz_start = malloc( strlen(s) + 1 );
+    psz_stop = malloc( strlen(s) + 1 );
 
     if( sscanf( s, "%s --> %s", psz_start, psz_stop) == 2 &&
         subtitle_ParseSubRipTimingValue( &p_subtitle->i_start, psz_start ) == VLC_SUCCESS &&
