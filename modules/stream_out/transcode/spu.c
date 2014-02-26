@@ -140,6 +140,7 @@ int transcode_spu_process( sout_stream_t *p_stream,
     if( p_sys->b_soverlay )
     {
         spu_PutSubpicture( p_sys->p_spu, p_subpic );
+        return VLC_SUCCESS;
     }
     else
     {
