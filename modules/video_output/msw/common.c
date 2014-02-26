@@ -213,7 +213,7 @@ int CommonUpdatePicture(picture_t *picture, picture_t **fallback,
     /* fill in buffer info in first plane */
     picture->p->p_pixels = data;
     picture->p->i_pitch  = pitch;
-    picture->p->i_lines  = picture->format.i_height;
+    picture->p->i_lines  = picture->format.i_visible_height;
 
     /*  Fill chroma planes for planar YUV */
     if (picture->format.i_chroma == VLC_CODEC_I420 ||
@@ -226,7 +226,7 @@ int CommonUpdatePicture(picture_t *picture, picture_t **fallback,
 
             p->p_pixels = o->p_pixels + o->i_lines * o->i_pitch;
             p->i_pitch  = pitch / 2;
-            p->i_lines  = picture->format.i_height / 2;
+            p->i_lines  = picture->format.i_visible_height / 2;
         }
         /* The dx/d3d buffer is always allocated as YV12 */
         if (vlc_fourcc_AreUVPlanesSwapped(picture->format.i_chroma, VLC_CODEC_YV12)) {
@@ -403,8 +403,8 @@ void UpdateRects(vout_display_t *vd,
     /* src image dimensions */
     rect_src.left   = 0;
     rect_src.top    = 0;
-    rect_src.right  = source->i_width;
-    rect_src.bottom = source->i_height;
+    rect_src.right  = source->i_visible_width;
+    rect_src.bottom = source->i_visible_height;
 
     /* Clip the source image */
     rect_src_clipped.left = source->i_x_offset +

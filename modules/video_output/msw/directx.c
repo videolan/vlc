@@ -850,8 +850,8 @@ static int DirectXCreateSurface(vout_display_t *vd,
     ddsd.dwSize   = sizeof(ddsd);
     ddsd.ddpfPixelFormat.dwSize = sizeof(ddsd.ddpfPixelFormat);
     ddsd.dwFlags  = DDSD_HEIGHT | DDSD_WIDTH;
-    ddsd.dwWidth  = fmt->i_width;
-    ddsd.dwHeight = fmt->i_height;
+    ddsd.dwWidth  = fmt->i_visible_width;
+    ddsd.dwHeight = fmt->i_visible_height;
     if (fourcc) {
         ddsd.dwFlags |= DDSD_PIXELFORMAT;
         ddsd.ddpfPixelFormat.dwFlags = DDPF_FOURCC;

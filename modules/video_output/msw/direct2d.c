@@ -347,8 +347,8 @@ static int D2D_CreateRenderTarget(vout_display_t *vd)
     };
 
     D2D1_SIZE_U bitmap_size = {
-        vd->fmt.i_width,
-        vd->fmt.i_height
+        vd->fmt.i_visible_width,
+        vd->fmt.i_visible_height
     };
 
     hr = ID2D1HwndRenderTarget_CreateBitmap(sys->d2_render_target,

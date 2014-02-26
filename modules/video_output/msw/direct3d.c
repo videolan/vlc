@@ -972,8 +972,8 @@ static int Direct3DCreatePool(vout_display_t *vd, video_format_t *fmt)
     /* Create a surface */
     LPDIRECT3DSURFACE9 surface;
     HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(d3ddev,
-                                                              fmt->i_width,
-                                                              fmt->i_height,
+                                                              fmt->i_visible_width,
+                                                              fmt->i_visible_height,
                                                               d3dfmt->format,
                                                               D3DPOOL_DEFAULT,
                                                               &surface,
@@ -996,7 +996,7 @@ static int Direct3DCreatePool(vout_display_t *vd, video_format_t *fmt)
 
     picture_resource_t resource = { .p_sys = picsys };
     for (int i = 0; i < PICTURE_PLANE_MAX; i++)
-        resource.p[i].i_lines = fmt->i_height / (i > 0 ? 2 : 1);
+        resource.p[i].i_lines = fmt->i_visible_height / (i > 0 ? 2 : 1);
 
     picture_t *picture = picture_NewFromResource(fmt, &resource);
     if (!picture) {
@@ -1055,8 +1055,8 @@ static int Direct3DCreateScene(vout_display_t *vd, const video_format_t *fmt)
      */
     LPDIRECT3DTEXTURE9 d3dtex;
     hr = IDirect3DDevice9_CreateTexture(d3ddev,
-                                        fmt->i_width,
-                                        fmt->i_height,
+                                        fmt->i_visible_width,
+                                        fmt->i_visible_height,
                                         1,
                                         D3DUSAGE_RENDERTARGET,
                                         sys->d3dpp.BackBufferFormat,
