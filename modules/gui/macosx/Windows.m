@@ -576,6 +576,9 @@
     if (b_in_fullscreen_transition || [self fullscreen])
         return proposedFrameSize;
 
+    if ([o_video_view isHidden])
+        return proposedFrameSize;
+
     if ([[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]) {
         NSRect videoWindowFrame = [self frame];
         NSRect viewRect = [o_video_view convertRect:[o_video_view bounds] toView: nil];
