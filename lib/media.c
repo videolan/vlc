@@ -26,6 +26,7 @@
 #endif
 
 #include <assert.h>
+#include <errno.h>
 
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_media.h>
@@ -355,7 +356,7 @@ libvlc_media_t *libvlc_media_new_path( libvlc_instance_t *p_instance,
     char *mrl = vlc_path2uri( path, NULL );
     if( unlikely(mrl == NULL) )
     {
-        libvlc_printerr( "Not enough memory" );
+        libvlc_printerr( "%s", vlc_strerror_c(errno) );
         return NULL;
     }
 
