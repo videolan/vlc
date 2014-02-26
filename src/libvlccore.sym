@@ -217,7 +217,9 @@ input_resource_New
 input_resource_Release
 input_resource_TerminateVout
 input_resource_Terminate
+input_resource_GetAout
 input_resource_HoldAout
+input_resource_PutAout
 input_Start
 input_Stop
 input_vaControl

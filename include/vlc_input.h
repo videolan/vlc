@@ -653,4 +653,14 @@ VLC_API void input_resource_Terminate( input_resource_t * );
  */
 VLC_API audio_output_t *input_resource_HoldAout( input_resource_t * );
 
+/**
+ * This function creates or recycles an audio output.
+ */
+VLC_API audio_output_t *input_resource_GetAout( input_resource_t * );
+
+/**
+ * This function retains or destroys an audio output.
+ */
+VLC_API void input_resource_PutAout( input_resource_t *, audio_output_t * );
+
 #endif

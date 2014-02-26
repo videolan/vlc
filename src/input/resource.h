@@ -37,16 +37,6 @@ void input_resource_SetInput( input_resource_t *, input_thread_t * );
 sout_instance_t *input_resource_RequestSout( input_resource_t *, sout_instance_t *, const char *psz_sout );
 
 /**
- * This function creates or recycles an audio output.
- */
-audio_output_t *input_resource_GetAout( input_resource_t * );
-
-/**
- * This function retains or destroys an audio output.
- */
-void input_resource_PutAout( input_resource_t *, audio_output_t * );
-
-/**
  * This function handles vout request.
  */
 vout_thread_t *input_resource_RequestVout( input_resource_t *, vout_thread_t *, video_format_t *, unsigned dpb_size, bool b_recycle );
