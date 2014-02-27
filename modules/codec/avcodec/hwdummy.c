@@ -143,10 +143,5 @@ static int Open(vlc_va_t *va, int codec, const es_format_t *fmt)
 
 static void Close(vlc_va_t *va)
 {
-    vlc_va_sys_t *sys = va->sys;
-
-#if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55, 13, 0))
-    av_freep(&sys->context.bitstream_buffers);
-#endif
-    free(sys);
+    free(va->sys);
 }
