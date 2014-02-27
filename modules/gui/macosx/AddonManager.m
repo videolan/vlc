@@ -146,7 +146,7 @@ static VLCAddonManager *_o_sharedInstance = nil;
     if (selectedRow > _displayedAddons.count - 1 || selectedRow < 0)
         return;
 
-    NSDictionary *currentItem = _displayedAddons[selectedRow];
+    NSDictionary *currentItem = [_displayedAddons objectAtIndex:selectedRow];
     [self _installAddonWithID:[[currentItem objectForKey:@"uuid"] pointerValue]];
 }
 
@@ -156,7 +156,7 @@ static VLCAddonManager *_o_sharedInstance = nil;
     if (selectedRow > _displayedAddons.count - 1 || selectedRow < 0)
         return;
 
-    NSDictionary *currentItem = _displayedAddons[selectedRow];
+    NSDictionary *currentItem = [_displayedAddons objectAtIndex:selectedRow];
     [self _removeAddonWithID:[[currentItem objectForKey:@"uuid"] pointerValue]];
 }
 
@@ -181,7 +181,7 @@ static VLCAddonManager *_o_sharedInstance = nil;
         return;
     }
 
-    NSDictionary *currentItem = _displayedAddons[selectedRow];
+    NSDictionary *currentItem = [_displayedAddons objectAtIndex:selectedRow];
     [_name setStringValue:[currentItem objectForKey:@"name"]];
     [_author setStringValue:[currentItem objectForKey:@"author"]];
     [_version setStringValue:[currentItem objectForKey:@"version"]];
@@ -192,13 +192,13 @@ static VLCAddonManager *_o_sharedInstance = nil;
 {
     NSString *identifier = [aTableColumn identifier];
     if ([identifier isEqualToString:@"installed"]) {
-        if ([[_displayedAddons[rowIndex] objectForKey:@"state"] intValue] == ADDON_INSTALLED)
+        if ([[[_displayedAddons objectAtIndex:rowIndex] objectForKey:@"state"] intValue] == ADDON_INSTALLED)
             return @"✔";
         return @"✘";
     } else if([identifier isEqualToString:@"type"])
-        return [self _getAddonType:[[_displayedAddons[rowIndex] objectForKey:@"type"] intValue]];
+        return [self _getAddonType:[[[_displayedAddons objectAtIndex:rowIndex] objectForKey:@"type"] intValue]];
 
-    return [_displayedAddons[rowIndex] objectForKey:identifier];
+    return [[_displayedAddons objectAtIndex:rowIndex] objectForKey:identifier];
 }
 
 #pragma mark - data handling
@@ -250,7 +250,7 @@ static VLCAddonManager *_o_sharedInstance = nil;
     NSMutableArray *filteredItems = [[NSMutableArray alloc] initWithCapacity:count];
     NSDictionary *currentItem;
     for (NSUInteger x = 0; x < count; x++) {
-        currentItem = _addons[x];
+        currentItem = [_addons objectAtIndex:x];
         if (type != -1) {
             if ([[currentItem objectForKey:@"type"] intValue] == type) {
                 if (installedOnly) {
