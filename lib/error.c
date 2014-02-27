@@ -33,11 +33,17 @@ static vlc_threadvar_t context;
 static vlc_mutex_t lock = VLC_STATIC_MUTEX;
 static uintptr_t refs = 0;
 
+static void free_msg (void *msg)
+{
+    if (msg != oom)
+        free (msg);
+}
+
 void libvlc_threads_init (void)
 {
     vlc_mutex_lock (&lock);
     if (refs++ == 0)
-        vlc_threadvar_create (&context, free);
+        vlc_threadvar_create (&context, free_msg);
     vlc_mutex_unlock (&lock);
 }
 
@@ -57,9 +63,7 @@ static char *get_error (void)
 
 static void free_error (void)
 {
-    char *msg = get_error ();
-    if (msg != oom)
-        free (msg);
+    free_msg (get_error ());
 }
 
 /**
