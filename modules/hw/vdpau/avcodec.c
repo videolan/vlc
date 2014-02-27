@@ -151,9 +151,6 @@ static void Deinit(vlc_va_t *va)
 
     assert(sys->context->decoder != VDP_INVALID_HANDLE);
     vdp_decoder_destroy(sys->vdp, sys->context->decoder);
-#if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55, 13, 0))
-    av_freep(&sys->context->bitstream_buffers);
-#endif
 }
 
 static int Setup(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
@@ -279,11 +276,7 @@ static int Open(vlc_va_t *va, int codec, const es_format_t *fmt)
     if (unlikely(sys == NULL))
        return VLC_ENOMEM;
 
-#if (LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55, 26, 0))
     sys->context = av_vdpau_alloc_context();
-#else
-    sys->context = calloc(1, sizeof (*sys->context));
-#endif
     if (unlikely(sys->context == NULL))
     {
         free(sys);
