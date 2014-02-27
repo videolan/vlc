@@ -754,6 +754,9 @@ static int Control( demux_t *p_demux, int query, va_list args )
                 *pb = false;
             break;
 
+        case DEMUX_SET_PAUSE_STATE:
+            return VLC_SUCCESS;
+
         case DEMUX_GET_POSITION:
             pf = ( double* ) va_arg ( args, double* );
             if( p_sys->frames_total != 0 )
