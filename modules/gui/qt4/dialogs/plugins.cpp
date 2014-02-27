@@ -349,6 +349,10 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
     leftPane->layout()->setMargin(0);
     leftPane->layout()->setSpacing(0);
 
+    SearchLineEdit *searchInput = new SearchLineEdit();
+    leftPane->layout()->addWidget( searchInput );
+    leftPane->layout()->addItem( new QSpacerItem( 0, 10 ) );
+
     QToolButton * button;
     QSignalMapper *mapper = new QSignalMapper();
     QImage icon( ":/addons/default" );
@@ -449,6 +453,7 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
     AddonsListModel *model = new AddonsListModel( AM, addonsView );
     addonsModel = new AddonsSortFilterProxyModel();
     addonsModel->setDynamicSortFilter( true );
+    addonsModel->setFilterCaseSensitivity( Qt::CaseInsensitive );
     addonsModel->setSortRole( Qt::DisplayRole );
     addonsModel->sort( 0, Qt::AscendingOrder );
     addonsModel->setSourceModel( model );
@@ -456,6 +461,9 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
     addonsView->setModel( addonsModel );
 
     CONNECT( mapper, mapped(int), addonsModel, setTypeFilter(int) );
+
+    CONNECT( searchInput, textChanged( const QString &),
+             addonsModel, setFilterFixedString( QString ) );
 
     CONNECT( addonsView->selectionModel(), currentChanged(QModelIndex,QModelIndex),
              addonsView, edit(QModelIndex) );
