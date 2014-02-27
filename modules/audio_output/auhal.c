@@ -439,7 +439,6 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     AudioComponentDescription   desc;
     AudioStreamBasicDescription DeviceFormat;
     AudioChannelLayout          *layout;
-    AudioChannelLayout          new_layout;
     AURenderCallbackStruct      input;
     p_aout->sys->chans_to_reorder = 0;
 
@@ -593,7 +592,9 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     msg_Dbg(p_aout, "selected %d physical channels for device output", aout_FormatNbChannels(fmt));
     msg_Dbg(p_aout, "VLC will output: %s", aout_FormatPrintChannels(fmt));
 
-    memset (&new_layout, 0, sizeof(new_layout));
+    /* Now we set the INPUT layout of the AU */
+    AudioChannelLayout input_layout;
+    memset (&input_layout, 0, sizeof(input_layout));
     uint32_t chans_out[AOUT_CHAN_MAX];
 
     /* Some channel abbreviations used below:
@@ -620,34 +621,34 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 
     switch(aout_FormatNbChannels(fmt)) {
         case 1:
-            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
+            input_layout.mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
             break;
         case 2:
-            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_Stereo;
+            input_layout.mChannelLayoutTag = kAudioChannelLayoutTag_Stereo;
             break;
         case 3:
             if (fmt->i_physical_channels & AOUT_CHAN_CENTER)
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_7; // L R C
+                input_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_7; // L R C
             else if (fmt->i_physical_channels & AOUT_CHAN_LFE)
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_4; // L R LFE
+                input_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_4; // L R LFE
             break;
         case 4:
             if (fmt->i_physical_channels & (AOUT_CHAN_CENTER | AOUT_CHAN_LFE))
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_10; // L R C LFE
+                input_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_10; // L R C LFE
             else if (fmt->i_physical_channels & (AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT))
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_3; // L R Ls Rs
+                input_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_3; // L R Ls Rs
             else if (fmt->i_physical_channels & (AOUT_CHAN_CENTER | AOUT_CHAN_REARCENTER))
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_3; // L R C Cs
+                input_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_3; // L R C Cs
             break;
         case 5:
             if (fmt->i_physical_channels & (AOUT_CHAN_CENTER))
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_19; // L R Ls Rs C
+                input_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_19; // L R Ls Rs C
             else if (fmt->i_physical_channels & (AOUT_CHAN_LFE))
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_18; // L R Ls Rs LFE
+                input_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_18; // L R Ls Rs LFE
             break;
         case 6:
             if (fmt->i_physical_channels & (AOUT_CHAN_LFE)) {
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_20; // L R Ls Rs C LFE
+                input_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_20; // L R Ls Rs C LFE
 
                 chans_out[0] = AOUT_CHAN_LEFT;
                 chans_out[1] = AOUT_CHAN_RIGHT;
@@ -660,7 +661,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                 if (p_aout->sys->chans_to_reorder)
                     msg_Dbg(p_aout, "channel reordering needed for 5.1 output");
             } else {
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_6_0; // L R Ls Rs C Cs
+                input_layout.mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_6_0; // L R Ls Rs C Cs
 
                 chans_out[0] = AOUT_CHAN_LEFT;
                 chans_out[1] = AOUT_CHAN_RIGHT;
@@ -675,7 +676,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
             }
             break;
         case 7:
-            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_6_1_A; // L R C LFE Ls Rs Cs
+            input_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_6_1_A; // L R C LFE Ls Rs Cs
 
             chans_out[0] = AOUT_CHAN_LEFT;
             chans_out[1] = AOUT_CHAN_RIGHT;
@@ -692,7 +693,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
             break;
         case 8:
             if (fmt->i_physical_channels & (AOUT_CHAN_LFE) || currentMinorSystemVersion < 7) {
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_7_1_A; // L R C LFE Ls Rs Lc Rc
+                input_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_7_1_A; // L R C LFE Ls Rs Lc Rc
 
                 chans_out[0] = AOUT_CHAN_LEFT;
                 chans_out[1] = AOUT_CHAN_RIGHT;
@@ -708,7 +709,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
             }
 #ifdef MAC_OS_X_VERSION_10_7
             else {
-                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DTS_8_0_B; // Lc C Rc L R Ls Cs Rs
+                input_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DTS_8_0_B; // Lc C Rc L R Ls Cs Rs
 
                 chans_out[0] = AOUT_CHAN_MIDDLELEFT;
                 chans_out[1] = AOUT_CHAN_CENTER;
@@ -732,7 +733,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
             }
 
 #ifdef MAC_OS_X_VERSION_10_7
-            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DTS_8_1_B; // Lc C Rc L R Ls Cs Rs LFE
+            input_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DTS_8_1_B; // Lc C Rc L R Ls Cs Rs LFE
             chans_out[0] = AOUT_CHAN_MIDDLELEFT;
             chans_out[1] = AOUT_CHAN_CENTER;
             chans_out[2] = AOUT_CHAN_MIDDLERIGHT;
@@ -799,14 +800,11 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                             kAudioUnitScope_Input,
                             0, &input, sizeof(input)));
 
-    /* Set the new_layout as the layout VLC will use to feed the AU unit */
+    /* Set the input_layout as the layout VLC will use to feed the AU unit */
     verify_noerr(AudioUnitSetProperty(p_sys->au_unit,
                             kAudioUnitProperty_AudioChannelLayout,
                             kAudioUnitScope_Input, /* yes, it must be the INPUT scope */
-                            0, &new_layout, sizeof(new_layout)));
-
-    if (new_layout.mNumberChannelDescriptions > 0)
-        free(new_layout.mChannelDescriptions);
+                            0, &input_layout, sizeof(input_layout)));
 
     /* AU initiliaze */
     verify_noerr(AudioUnitInitialize(p_sys->au_unit));
