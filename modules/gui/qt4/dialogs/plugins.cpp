@@ -307,7 +307,7 @@ static QPixmap hueRotate( QImage image, const QColor &source, const QColor &targ
 {
     int distance = target.hue() - source.hue();
     /* must be indexed as we alter palette, not a whole pic */
-    Q_ASSERT( image.numColors() );
+    Q_ASSERT( image.colorCount() );
     if ( target.isValid() )
     {
         /* color 1 = transparency */
