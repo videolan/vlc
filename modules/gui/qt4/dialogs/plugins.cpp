@@ -57,7 +57,6 @@
 #include <QCheckBox>
 #include <QPixmap>
 #include <QStylePainter>
-#include <QGraphicsColorizeEffect>
 #include <QProgressBar>
 #include <QTextEdit>
 #include <QUrl>
@@ -846,6 +845,32 @@ bool AddonsListModel::setData( const QModelIndex &index, const QVariant &value, 
     return true;
 }
 
+QColor AddonsListModel::getColorByAddonType( int i_type )
+{
+    QColor color;
+    switch( i_type )
+    {
+    case ADDON_EXTENSION:
+        color = QColor(0xDB, 0xC5, 0x40);
+        break;
+    case ADDON_PLAYLIST_PARSER:
+        color = QColor(0x36, 0xBB, 0x59);
+        break;
+    case ADDON_SERVICE_DISCOVERY:
+        color = QColor(0xDB, 0x52, 0x40);
+        break;
+    case ADDON_SKIN2:
+        color = QColor(0x8B, 0xD6, 0xFC);
+        break;
+    case ADDON_PLUGIN:
+    case ADDON_UNKNOWN:
+    case ADDON_OTHER:
+    default:
+        break;
+    }
+    return color;
+}
+
 QVariant AddonsListModel::data( const QModelIndex& index, int role ) const
 {
     if( !index.isValid() )
@@ -1004,7 +1029,24 @@ void AddonItemDelegate::paint( QPainter *painter,
 {
     QStyleOptionViewItemV4 newopt = option;
     int i_state = index.data( AddonsListModel::StateRole ).toInt();
+    int i_type = index.data( AddonsListModel::TypeRole ).toInt();
 
+    /* Draw Background gradient by addon type */
+    QColor backgroundColor = AddonsListModel::getColorByAddonType( i_type );
+
+    if ( backgroundColor.isValid() )
+    {
+        painter->save();
+        QLinearGradient gradient(
+                    QPoint( option.rect.right() - 50, option.rect.top() ),
+                    option.rect.bottomRight() );
+        gradient.setColorAt( 0, Qt::transparent );
+        gradient.setColorAt( 1.0, backgroundColor );
+        painter->fillRect( option.rect, gradient );
+        painter->restore();
+    }
+
+    /* Draw base info from parent */
     ExtensionItemDelegate::paint( painter, newopt, index );
 
     initStyleOption( &newopt, index );

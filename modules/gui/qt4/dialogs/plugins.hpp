@@ -227,6 +227,8 @@ public:
         ScoreRole
     };
 
+    static QColor getColorByAddonType( int );
+
 protected slots:
     void addonAdded( addon_entry_t * );
     void addonChanged( const addon_entry_t * );
