@@ -90,8 +90,8 @@ protected slots:
     void updateDelegate();
 
 private:
-    BasicAnimator *animator;
     QAbstractItemView *view;
+    BasicAnimator *animator;
     QPersistentModelIndex index;
 };
 
