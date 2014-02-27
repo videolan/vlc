@@ -30,14 +30,24 @@ static const char oom[] = "Out of memory";
 /* TODO: use only one thread-specific key for whole libvlc */
 static vlc_threadvar_t context;
 
-static vlc_mutex_t lock = VLC_STATIC_MUTEX;
-static uintptr_t refs = 0;
+static char *get_error (void)
+{
+    return vlc_threadvar_get (context);
+}
 
 static void free_msg (void *msg)
 {
     if (msg != oom)
         free (msg);
 }
+
+static void free_error (void)
+{
+    free_msg (get_error ());
+}
+
+static vlc_mutex_t lock = VLC_STATIC_MUTEX;
+static uintptr_t refs = 0;
 
 void libvlc_threads_init (void)
 {
@@ -52,18 +62,11 @@ void libvlc_threads_deinit (void)
     vlc_mutex_lock (&lock);
     assert (refs > 0);
     if (--refs == 0)
+    {
+        free_error ();
         vlc_threadvar_delete (&context);
+    }
     vlc_mutex_unlock (&lock);
-}
-
-static char *get_error (void)
-{
-    return vlc_threadvar_get (context);
-}
-
-static void free_error (void)
-{
-    free_msg (get_error ());
 }
 
 /**
