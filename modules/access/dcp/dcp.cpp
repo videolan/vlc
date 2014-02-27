@@ -5,6 +5,11 @@
  *          Nicolas Bertrand <nico@isf.cc>
  *          Simona-Marinela Prodea <simona dot marinela dot prodea at gmail dot com>
  *          Jean-Baptiste Kempf <jb@videolan.org>
+ *          Guillaume Gonnaud
+ *          Valentin Vetter <vvetter@outlook.com>
+ *          Anthony Giniers
+ *          Ludovic Hoareau
+ *          Loukmane Dessai
  *          Pierre Villard <pierre dot villard dot fr at gmail dot com>
  *          Claire Etienne
  *          Aurélie Sbinné

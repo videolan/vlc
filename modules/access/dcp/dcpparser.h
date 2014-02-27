@@ -3,6 +3,11 @@
  *
  * Authors: Nicolas Bertrand <nico@isf.cc>
  *          Jean-Baptiste Kempf <jb@videolan.org>
+ *          Guillaume Gonnaud
+ *          Valentin Vetter <vvetter@outlook.com>
+ *          Anthony Giniers
+ *          Ludovic Hoareau
+ *          Loukmane Dessai
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
