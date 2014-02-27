@@ -802,7 +802,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     /* Set the new_layout as the layout VLC will use to feed the AU unit */
     verify_noerr(AudioUnitSetProperty(p_sys->au_unit,
                             kAudioUnitProperty_AudioChannelLayout,
-                            kAudioUnitScope_Output,
+                            kAudioUnitScope_Input, /* yes, it must be the INPUT scope */
                             0, &new_layout, sizeof(new_layout)));
 
     if (new_layout.mNumberChannelDescriptions > 0)
