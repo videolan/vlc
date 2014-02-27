@@ -1585,9 +1585,9 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     else if (key == NSEndFunctionKey)
         [tempString appendString:@"End"];
     else if (key == NSPageUpFunctionKey)
-        [tempString appendString:@"Pageup"];
+        [tempString appendString:@"Page Up"];
     else if (key == NSPageDownFunctionKey)
-        [tempString appendString:@"Pagedown"];
+        [tempString appendString:@"Page Down"];
     else if (key == NSMenuFunctionKey)
         [tempString appendString:@"Menu"];
     else if (key == NSTabCharacter)

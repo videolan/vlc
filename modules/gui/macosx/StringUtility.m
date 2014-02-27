@@ -139,6 +139,8 @@ static VLCStringUtility *_o_sharedInstance = nil;
         /* show non-character keys correctly */
         theString = [theString stringByReplacingOccurrencesOfString:@"Right" withString:[NSString stringWithUTF8String:"\xE2\x86\x92"]];
         theString = [theString stringByReplacingOccurrencesOfString:@"Left" withString:[NSString stringWithUTF8String:"\xE2\x86\x90"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Page Up" withString:[NSString stringWithUTF8String:"\xE2\x87\x9E"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Page Down" withString:[NSString stringWithUTF8String:"\xE2\x87\x9F"]];
         theString = [theString stringByReplacingOccurrencesOfString:@"Up" withString:[NSString stringWithUTF8String:"\xE2\x86\x91"]];
         theString = [theString stringByReplacingOccurrencesOfString:@"Down" withString:[NSString stringWithUTF8String:"\xE2\x86\x93"]];
         theString = [theString stringByReplacingOccurrencesOfString:@"Enter" withString:[NSString stringWithUTF8String:"\xe2\x86\xb5"]];
@@ -261,7 +263,11 @@ unsigned int CocoaKeyToVLC(unichar i_key)
 #pragma GCC diagnostic ignored "-Wformat"
 #endif
     if ([theString length] > 1) {
-        if ([theString rangeOfString:@"Up"].location != NSNotFound)
+        if ([theString rangeOfString:@"Page Up"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSPageUpFunctionKey];
+        else if ([theString rangeOfString:@"Page Down"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSPageDownFunctionKey];
+        else if ([theString rangeOfString:@"Up"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSUpArrowFunctionKey];
         else if ([theString rangeOfString:@"Down"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSDownArrowFunctionKey];
@@ -277,10 +283,6 @@ unsigned int CocoaKeyToVLC(unichar i_key)
             return [NSString stringWithFormat:@"%C", NSHomeFunctionKey];
         else if ([theString rangeOfString:@"End"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSEndFunctionKey];
-        else if ([theString rangeOfString:@"Pageup"].location != NSNotFound)
-            return [NSString stringWithFormat:@"%C", NSPageUpFunctionKey];
-        else if ([theString rangeOfString:@"Pagedown"].location != NSNotFound)
-            return [NSString stringWithFormat:@"%C", NSPageDownFunctionKey];
         else if ([theString rangeOfString:@"Menu"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSMenuFunctionKey];
         else if ([theString rangeOfString:@"Tab"].location != NSNotFound)
