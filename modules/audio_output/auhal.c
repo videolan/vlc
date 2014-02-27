@@ -547,42 +547,32 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
             /* We only need Stereo or cannot output more than 2 channels */
             fmt->i_physical_channels = AOUT_CHANS_STEREO;
         } else {
+
+            // maps auhal channels to vlc ones
+            static const unsigned i_auhal_channel_mapping[] = {
+                [kAudioChannelLabel_Left]           = AOUT_CHAN_LEFT,
+                [kAudioChannelLabel_Right]          = AOUT_CHAN_RIGHT,
+                [kAudioChannelLabel_Center]         = AOUT_CHAN_CENTER,
+                [kAudioChannelLabel_LFEScreen]      = AOUT_CHAN_LFE,
+                [kAudioChannelLabel_LeftSurround]   = AOUT_CHAN_REARLEFT,
+                [kAudioChannelLabel_RightSurround]  = AOUT_CHAN_REARRIGHT,
+                [kAudioChannelLabel_RearSurroundLeft]  = AOUT_CHAN_MIDDLELEFT, // needs to be swapped with rear
+                [kAudioChannelLabel_RearSurroundRight] = AOUT_CHAN_MIDDLERIGHT,// needs to be swapped with rear
+                [kAudioChannelLabel_CenterSurround] = AOUT_CHAN_REARCENTER
+            };
+
             /* We want more than stereo and we can do that */
             for (unsigned int i = 0; i < layout->mNumberChannelDescriptions; i++) {
 #ifndef NDEBUG
                 msg_Dbg(p_aout, "this is channel: %d", (int)layout->mChannelDescriptions[i].mChannelLabel);
 #endif
 
-                switch(layout->mChannelDescriptions[i].mChannelLabel) {
-                    case kAudioChannelLabel_Left:
-                        fmt->i_physical_channels |= AOUT_CHAN_LEFT;
-                        continue;
-                    case kAudioChannelLabel_Right:
-                        fmt->i_physical_channels |= AOUT_CHAN_RIGHT;
-                        continue;
-                    case kAudioChannelLabel_Center:
-                        fmt->i_physical_channels |= AOUT_CHAN_CENTER;
-                        continue;
-                    case kAudioChannelLabel_LFEScreen:
-                        fmt->i_physical_channels |= AOUT_CHAN_LFE;
-                        continue;
-                    case kAudioChannelLabel_LeftSurround:
-                        fmt->i_physical_channels |= AOUT_CHAN_REARLEFT;
-                        continue;
-                    case kAudioChannelLabel_RightSurround:
-                        fmt->i_physical_channels |= AOUT_CHAN_REARRIGHT;
-                        continue;
-                    case kAudioChannelLabel_RearSurroundLeft:
-                        fmt->i_physical_channels |= AOUT_CHAN_MIDDLELEFT;
-                        continue;
-                    case kAudioChannelLabel_RearSurroundRight:
-                        fmt->i_physical_channels |= AOUT_CHAN_MIDDLERIGHT;
-                        continue;
-                    case kAudioChannelLabel_CenterSurround:
-                        fmt->i_physical_channels |= AOUT_CHAN_REARCENTER;
-                        continue;
-                    default:
-                        msg_Warn(p_aout, "unrecognized channel form provided by driver: %d", (int)layout->mChannelDescriptions[i].mChannelLabel);
+                AudioChannelLabel chan = layout->mChannelDescriptions[i].mChannelLabel;
+                if(chan < sizeof(i_auhal_channel_mapping) / sizeof(i_auhal_channel_mapping[0])
+                   && i_auhal_channel_mapping[chan] > 0) {
+                    fmt->i_physical_channels |= i_auhal_channel_mapping[chan];
+                } else {
+                    msg_Dbg(p_aout, "found nonrecognized channel %d at index %d", chan, i);
                 }
             }
             if (fmt->i_physical_channels == 0) {
