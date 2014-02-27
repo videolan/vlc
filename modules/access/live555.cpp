@@ -1033,6 +1033,40 @@ static int SessionsSetup( demux_t *p_demux )
                         delete[] p_extra;
                     }
                 }
+#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1393372800 // 2014.02.26
+                else if( !strcmp( sub->codecName(), "H265" ) )
+                {
+                   unsigned int i_extra1 = 0, i_extra2 = 0, i_extra3 = 0, i_extraTot;
+                    uint8_t      *p_extra1 = NULL, *p_extra2 = NULL, *p_extra3 = NULL;
+
+                    tk->fmt.i_codec = VLC_CODEC_HEVC;
+                    tk->fmt.b_packetized = false;
+
+                    p_extra1 = parseH264ConfigStr( sub->fmtp_spropvps(), i_extra1 );
+                    p_extra2 = parseH264ConfigStr( sub->fmtp_spropsps(), i_extra2 );
+                    p_extra3 = parseH264ConfigStr( sub->fmtp_sproppps(), i_extra3 );
+                   i_extraTot = i_extra1 + i_extra2 + i_extra3;
+                   if( i_extraTot > 0 )
+                    {
+                        tk->fmt.i_extra = i_extraTot;
+                        tk->fmt.p_extra = xmalloc( i_extraTot );
+                       if( p_extra1 )
+                       {
+                            memcpy( tk->fmt.p_extra, p_extra1, i_extra1 );
+                       }
+                       if( p_extra2 )
+                       {
+                         memcpy( ((char*)tk->fmt.p_extra)+i_extra1, p_extra2, i_extra2 );
+                       }
+                       if( p_extra3 )
+                       {
+                         memcpy( ((char*)tk->fmt.p_extra)+i_extra1+i_extra2, p_extra3, i_extra3 );
+                       }
+
+                        delete[] p_extra1; delete[] p_extra2; delete[] p_extra3;
+                    }
+                }
+#endif
                 else if( !strcmp( sub->codecName(), "JPEG" ) )
                 {
                     tk->fmt.i_codec = VLC_CODEC_MJPG;
@@ -1947,10 +1981,12 @@ static void StreamRead( void *p_private, unsigned int i_size,
         if( tk->sub->rtpSource()->curPacketMarkerBit() )
             p_block->i_flags |= BLOCK_FLAG_END_OF_FRAME;
     }
-    else if( tk->fmt.i_codec == VLC_CODEC_H264 )
+    else if( tk->fmt.i_codec == VLC_CODEC_H264 || tk->fmt.i_codec == VLC_CODEC_HEVC )
     {
-        if( (tk->p_buffer[0] & 0x1f) >= 24 )
+        if( tk->fmt.i_codec == VLC_CODEC_H264 && (tk->p_buffer[0] & 0x1f) >= 24 )
             msg_Warn( p_demux, "unsupported NAL type for H264" );
+        else if( tk->fmt.i_codec == VLC_CODEC_HEVC && ((tk->p_buffer[0] & 0x7e)>>1) >= 48 )
+            msg_Warn( p_demux, "unsupported NAL type for H265" );
 
         /* Normal NAL type */
         p_block = block_Alloc( i_size + 4 );
