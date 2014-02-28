@@ -586,13 +586,13 @@ static inline void VolumeEntries( intf_thread_t *p_intf, QMenu *current )
 {
     current->addSeparator();
 
-    QAction *action = current->addAction( qtr( "&Increase Volume" ),
+    QAction *action = current->addAction( QIcon( ":/toolbar/volume-high" ), qtr( "&Increase Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioUp() ) );
     action->setData( VLCMenuBar::ACTION_STATIC );
-    action = current->addAction( qtr( "&Decrease Volume" ),
+    action = current->addAction( QIcon( ":/toolbar/volume-low" ), qtr( "&Decrease Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioDown() ) );
     action->setData( VLCMenuBar::ACTION_STATIC );
-    action = current->addAction( qtr( "&Mute" ),
+    action = current->addAction( QIcon( ":/toolbar/volume-muted" ), qtr( "&Mute" ),
                 ActionsManager::getInstance( p_intf ), SLOT( toggleMuteAudio() ) );
     action->setData( VLCMenuBar::ACTION_STATIC );
 }
@@ -868,7 +868,7 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
         action->setData( ACTION_STATIC );
     }
 
-    action = rateMenu->addAction( qtr( "Faster (fine)" ), THEMIM->getIM(),
+    action = rateMenu->addAction( QIcon( ":/toolbar/faster2" ), qtr( "Faster (fine)" ), THEMIM->getIM(),
                               SLOT( littlefaster() ) );
     action->setData( ACTION_STATIC );
 
@@ -876,7 +876,7 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
                               SLOT( normalRate() ) );
     action->setData( ACTION_STATIC );
 
-    action = rateMenu->addAction( qtr( "Slower (fine)" ), THEMIM->getIM(),
+    action = rateMenu->addAction( QIcon( ":/toolbar/slower2" ), qtr( "Slower (fine)" ), THEMIM->getIM(),
                               SLOT( littleslower() ) );
     action->setData( ACTION_STATIC );
 
