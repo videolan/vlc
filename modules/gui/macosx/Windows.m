@@ -661,6 +661,7 @@
     [[[VLCMainWindow sharedInstance] fsPanel] setNonActive:nil];
 }
 
+#ifdef MAC_OS_X_VERSION_10_7
 -(NSArray*)customWindowsToEnterFullScreenForWindow:(NSWindow *)window
 {
     if (window == self) {
@@ -702,6 +703,7 @@
         [[window animator] setFrame:frameBeforeLionFullscreen display:YES animate:YES];
     } completionHandler:nil];
 }
+#endif
 
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
