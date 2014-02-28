@@ -772,10 +772,7 @@ static HRESULT StreamStart( aout_stream_t *s,
 
     hr = Start( VLC_OBJECT(s), sys, fmt );
     if( FAILED(hr) )
-    {
-        IDirectSound_Release( sys->p_dsobject );
         goto error;
-    }
 
     s->sys = sys;
     s->time_get = StreamTimeGet;
