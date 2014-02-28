@@ -81,10 +81,6 @@ static inline void vlc_init_avutil(vlc_object_t *obj)
 
     av_log_set_level(level);
 
-# if defined (__arm__) && defined (__ANDROID__)
-    if (!vlc_CPU_ARM_NEON())
-        av_set_cpu_flags(AV_CPU_FLAG_NEON);
-# endif
     msg_Dbg(obj, "CPU flags: 0x%08x", av_get_cpu_flags());
 }
 #endif
