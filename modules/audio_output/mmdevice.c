@@ -552,9 +552,9 @@ vlc_MMNotificationClient_OnDeviceStateChanged(IMMNotificationClient *this,
 }
 
 static STDMETHODIMP
-vlc_MMNotificationClient_OnDevicePropertyChanged(IMMNotificationClient *this,
-                                                 LPCWSTR wid,
-                                                 const PROPERTYKEY key)
+vlc_MMNotificationClient_OnPropertyValueChanged(IMMNotificationClient *this,
+                                                LPCWSTR wid,
+                                                const PROPERTYKEY key)
 {
     aout_sys_t *sys = vlc_MMNotificationClient_sys(this);
     audio_output_t *aout = sys->aout;
@@ -577,7 +577,7 @@ static const struct IMMNotificationClientVtbl vlc_MMNotificationClient =
     vlc_MMNotificationClient_OnDeviceAdded,
     vlc_MMNotificationClient_OnDeviceRemoved,
     vlc_MMNotificationClient_OnDefaultDeviceChange,
-    vlc_MMNotificationClient_OnDevicePropertyChanged,
+    vlc_MMNotificationClient_OnPropertyValueChanged,
 };
 
 static int DevicesEnum(audio_output_t *aout, IMMDeviceEnumerator *it)
@@ -961,6 +961,7 @@ static int Open(vlc_object_t *obj)
     sys->aout = aout;
     sys->it = NULL;
     sys->dev = NULL;
+    sys->device_events.lpVtbl = &vlc_MMNotificationClient;
     sys->session_events.lpVtbl = &vlc_AudioSessionEvents;
     sys->refs = 1;
 
