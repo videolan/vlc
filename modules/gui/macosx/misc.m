@@ -953,19 +953,15 @@ void _drawFrameInRect(NSRect frameRect)
  * VLCByteCountFormatter addition
  *****************************************************************************/
 
-#ifndef MAC_OS_X_VERSION_10_8
-@interface NSByteCountFormatter (IntroducedInMountainLion)
-+ (NSString *)stringFromByteCount:(long long)byteCount countStyle:(NSByteCountFormatterCountStyle)countStyle;
-@end
-#endif
-
-
 @implementation VLCByteCountFormatter
 
 + (NSString *)stringFromByteCount:(long long)byteCount countStyle:(NSByteCountFormatterCountStyle)countStyle
 {
-    if (OSX_MAVERICKS || OSX_MOUNTAIN_LION)
-        return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleFile];
+    // Use native implementation on >= mountain lion
+    Class byteFormatterClass = NSClassFromString(@"NSByteCountFormatter");
+    if (byteFormatterClass && [byteFormatterClass respondsToSelector:@selector(stringFromByteCount:countStyle:)]) {
+        return [byteFormatterClass stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleFile];
+    }
 
     float devider = 0.;
     float returnValue = 0.;
