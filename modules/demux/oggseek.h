@@ -54,19 +54,12 @@ bool    Ogg_IsKeyFrame ( logical_stream_t *, ogg_packet * );
 
 int64_t Oggseek_GranuleToAbsTimestamp ( logical_stream_t *p_stream, int64_t i_granule,
                                        bool b_presentation );
-bool    Oggseek_PacketPCRFixup ( logical_stream_t *p_stream, ogg_page *, ogg_packet * );
 int     Oggseek_BlindSeektoAbsoluteTime ( demux_t *, logical_stream_t *, int64_t, bool );
 int     Oggseek_BlindSeektoPosition ( demux_t *, logical_stream_t *, double f, bool );
 int     Oggseek_SeektoAbsolutetime ( demux_t *, logical_stream_t *, int64_t i_granulepos );
 const demux_index_entry_t *OggSeek_IndexAdd ( logical_stream_t *, int64_t, int64_t );
 void    Oggseek_ProbeEnd( demux_t * );
 
-const demux_index_entry_t *oggseek_theora_index_entry_add ( logical_stream_t *,
-                                                            int64_t i_granule,
-                                                            int64_t i_pagepos );
-
 void oggseek_index_entries_free ( demux_index_entry_t * );
-
-int oggseek_find_frame ( demux_t *, logical_stream_t *, int64_t i_tframe );
 
 int64_t oggseek_read_page ( demux_t * );

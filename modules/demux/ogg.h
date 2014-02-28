@@ -22,6 +22,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#ifdef HAVE_LIBVORBIS
+  #include <vorbis/codec.h>
+#endif
+
 /*****************************************************************************
  * Definitions of structures and functions used by this plugin
  *****************************************************************************/
@@ -43,6 +51,12 @@
 typedef struct oggseek_index_entry demux_index_entry_t;
 typedef struct ogg_skeleton_t ogg_skeleton_t;
 
+typedef struct backup_queue
+{
+    block_t *p_block;
+    mtime_t i_duration;
+} backup_queue_t;
+
 typedef struct logical_stream_s
 {
     ogg_stream_state os;                        /* logical stream of packets */
@@ -63,11 +77,11 @@ typedef struct logical_stream_s
     void             *p_headers;
     int              i_headers;
     ogg_int64_t      i_previous_granulepos;
+    ogg_int64_t      i_granulepos_offset;/* first granule offset */
 
     /* program clock reference (in units of 90kHz) derived from the previous
      * granulepos */
     mtime_t          i_pcr;
-    mtime_t          i_interpolated_pcr;
     mtime_t          i_previous_pcr;
 
     /* Misc */
@@ -92,18 +106,42 @@ typedef struct logical_stream_s
     ogg_skeleton_t *p_skel;
 
     /* skip some frames after a seek */
-    int i_skip_frames;
+    unsigned int i_skip_frames;
 
     /* data start offset (absolute) in bytes */
     int64_t i_data_start;
 
-    /* kate streams have the number of headers in the ID header */
-    int i_kate_num_headers;
-
     /* for Annodex logical bitstreams */
     int i_secondary_header_packets;
 
+    /* All blocks which can't be sent because track PCR isn't known yet */
+    block_t **p_prepcr_blocks;
+    int i_prepcr_blocks;
+    /* All blocks that are queued because ES isn't created yet */
     block_t *p_preparse_block;
+
+    union
+    {
+#ifdef HAVE_LIBVORBIS
+        struct
+        {
+            vorbis_info *p_info;
+            vorbis_comment *p_comment;
+            bool b_invalid;
+            int i_prev_blocksize;
+        } vorbis;
+#endif
+        struct
+        {
+            /* kate streams have the number of headers in the ID header */
+            int i_num_headers;
+        } kate;
+        struct
+        {
+            bool b_interlaced;
+        } dirac;
+    } special;
+
 } logical_stream_t;
 
 struct ogg_skeleton_t
@@ -131,7 +169,7 @@ struct demux_sys_t
     /* program clock reference (in units of 90kHz) derived from the pcr of
      * the sub-streams */
     mtime_t i_pcr;
-    mtime_t i_pcr_offset;
+    mtime_t i_nzpcr_offset;
     /* informative only */
     mtime_t i_pcr_jitter;
     int64_t i_access_delay;
@@ -181,7 +219,6 @@ struct demux_sys_t
     /* Length, if available. */
     int64_t i_length;
 
-    DemuxDebug( bool b_seeked; )
 };
 
 
