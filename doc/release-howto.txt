@@ -26,7 +26,7 @@ Release HOWTO
   - Use 'make distcheck' to make sure all files are exported correctly
   - copy the tar.xz file on ganesh.videolan.org
   - generate SHA, MD5 hashes and OpenPGP signature of these files
-    (use sha*sum --binary, md5sum --binary, gpg --sign --detach --armor)
+    (use sha*sum --binary, md5sum --binary, gpg -u VideoLAN\ Release --sign --detach --armor)
     Use the sumandsign.sh script
 
  * Contribs
@@ -60,7 +60,7 @@ Release HOWTO
 
  * "Check for updates" functionality
   - edit update.videolan.org/vlc/status
-  - gpg -t --sign --detach --armor
+  - gpg -u VideoLAN\ Release -t --sign --detach --armor
   - for i in *asc;do gpg --verify $i || echo $i;done
 
  * Mirrors (if necessary)
