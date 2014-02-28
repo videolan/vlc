@@ -747,7 +747,7 @@ static HRESULT StreamStart( aout_stream_t *s,
                             audio_sample_format_t *restrict fmt,
                             const GUID *sid )
 {
-    aout_stream_sys_t *sys = malloc( sizeof( *sys ) );
+    aout_stream_sys_t *sys = calloc( 1, sizeof( *sys ) );
     if( unlikely(sys == NULL) )
         return E_OUTOFMEMORY;
 
