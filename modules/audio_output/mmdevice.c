@@ -112,6 +112,7 @@ struct aout_sys_t
     IMMDevice *dev; /**< Selected output device, NULL if none */
 
     struct IMMNotificationClient device_events;
+    struct IAudioEndpointVolumeCallback endpoint_callback;
     struct IAudioSessionEvents session_events;
 
     LONG refs;
@@ -383,6 +384,70 @@ static const struct IAudioSessionEventsVtbl vlc_AudioSessionEvents =
     vlc_AudioSessionEvents_OnStateChanged,
     vlc_AudioSessionEvents_OnSessionDisconnected,
 };
+
+
+/*** Audio endpoint volume ***/
+static inline aout_sys_t *vlc_AudioEndpointVolumeCallback_sys(IAudioEndpointVolumeCallback *this)
+{
+    return (void *)(((char *)this) - offsetof(aout_sys_t, endpoint_callback));
+}
+
+static STDMETHODIMP
+vlc_AudioEndpointVolumeCallback_QueryInterface(IAudioEndpointVolumeCallback *this,
+                                               REFIID riid, void **ppv)
+{
+    if (IsEqualIID(riid, &IID_IUnknown)
+     || IsEqualIID(riid, &IID_IAudioEndpointVolumeCallback))
+    {
+        *ppv = this;
+        IUnknown_AddRef(this);
+        return S_OK;
+    }
+    else
+    {
+       *ppv = NULL;
+        return E_NOINTERFACE;
+    }
+}
+
+static STDMETHODIMP_(ULONG)
+vlc_AudioEndpointVolumeCallback_AddRef(IAudioEndpointVolumeCallback *this)
+{
+    aout_sys_t *sys = vlc_AudioEndpointVolumeCallback_sys(this);
+    return InterlockedIncrement(&sys->refs);
+}
+
+static STDMETHODIMP_(ULONG)
+vlc_AudioEndpointVolumeCallback_Release(IAudioEndpointVolumeCallback *this)
+{
+    aout_sys_t *sys = vlc_AudioEndpointVolumeCallback_sys(this);
+    return InterlockedDecrement(&sys->refs);
+}
+
+static STDMETHODIMP
+vlc_AudioEndpointVolumeCallback_OnNotify(IAudioEndpointVolumeCallback *this,
+                                  const PAUDIO_VOLUME_NOTIFICATION_DATA notify)
+{
+    aout_sys_t *sys = vlc_AudioEndpointVolumeCallback_sys(this);
+    audio_output_t *aout = sys->aout;
+
+    msg_Dbg(aout, "endpoint volume changed");
+    EnterCriticalSection(&sys->lock);
+    WakeConditionVariable(&sys->work); /* implicit state: endpoint volume */
+    LeaveCriticalSection(&sys->lock);
+    (void) notify;
+    return S_OK;
+}
+
+static const struct IAudioEndpointVolumeCallbackVtbl vlc_AudioEndpointVolumeCallback =
+{
+    vlc_AudioEndpointVolumeCallback_QueryInterface,
+    vlc_AudioEndpointVolumeCallback_AddRef,
+    vlc_AudioEndpointVolumeCallback_Release,
+
+    vlc_AudioEndpointVolumeCallback_OnNotify,
+};
+
 
 /*** Audio devices ***/
 
@@ -699,6 +764,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     IAudioEndpointVolume *endpoint;
     void *pv;
     HRESULT hr;
+    float base_volume = 1.f;
 
     assert(sys->device != NULL);
     assert(sys->dev == NULL);
@@ -794,10 +860,16 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
 
         hr = IAudioEndpointVolume_GetVolumeRange(endpoint, &min, &max, &inc);
         if (SUCCEEDED(hr))
+        {
             msg_Dbg(aout, "volume from %+f dB to %+f dB with %f dB increments",
                     min, max, inc);
+            base_volume = powf(10.f, max / 20.f + .3f);
+        }
         else
             msg_Err(aout, "cannot get volume range (error 0x%lx)", hr);
+
+        IAudioEndpointVolume_RegisterControlChangeNotify(endpoint,
+                                                      &sys->endpoint_callback);
     }
     else
         msg_Err(aout, "cannot activate endpoint volume (error %lx)", hr);
@@ -805,28 +877,60 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     /* Main loop (adjust volume as long as device is unchanged) */
     while (sys->device == NULL)
     {
+        float level = 1.f, master = 1.f;
+
         if (volume != NULL)
         {
-            float level;
-
             hr = ISimpleAudioVolume_GetMasterVolume(volume, &level);
-            if (SUCCEEDED(hr))
-                aout_VolumeReport(aout, cbrtf(level));
-            else
+            if (FAILED(hr))
                 msg_Err(aout, "cannot get master volume (error 0x%lx)", hr);
+        }
 
-            level = sys->volume;
+        if (endpoint != NULL)
+        {
+            float db;
+
+            hr = IAudioEndpointVolume_GetMasterVolumeLevel(endpoint, &db);
+            if (SUCCEEDED(hr))
+                master = powf(10.f, db / 20.f);
+            else
+                msg_Err(aout, "cannot get endpoint volume (error 0x%lx)", hr);
+        }
+
+        aout_VolumeReport(aout, cbrtf(level * master * base_volume));
+
+    /* The WASAPI simple volume is relative to the endpoint volume, and it
+     * cannot exceed 100%. Therefore the endpoint master volume must be
+     * increased to reach an overall volume above the current endpoint master
+     * volume. Unfortunately, that means the volume of other applications will
+     * also be changed (which may or may not be what the user wants) and
+     * introduces race conditions between updates. */
+
+        level = sys->volume / base_volume;
+        sys->volume = -1.f;
+
+        if (level > master)
+        {
+            master = level;
+            level = 1.f;
+        }
+        else
+        {
+            if (master > 0.f)
+                level /= master;
+            master = -1.f;
+        }
+
+        if (volume != NULL)
+        {
             if (level >= 0.f)
             {
-                if (level > 1.f)
-                    level = 1.f;
-
+                assert(level <= 1.f);
                 hr = ISimpleAudioVolume_SetMasterVolume(volume, level, NULL);
                 if (FAILED(hr))
                     msg_Err(aout, "cannot set master volume (error 0x%lx)",
                             hr);
             }
-            sys->volume = -1.f;
 
             BOOL mute;
 
@@ -847,12 +951,28 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
             sys->mute = -1;
         }
 
+        if (endpoint != NULL && master >= 0.f)
+        {
+            float v = 20.f * log10f(master);
+
+            msg_Warn(aout, "overriding endpoint volume: %+f dB", v);
+            hr = IAudioEndpointVolume_SetMasterVolumeLevel(endpoint, v, NULL);
+            if (FAILED(hr))
+                msg_Err(aout, "cannot set endpoint volume (error 0x%lx)", hr);
+        }
+
+        sys->volume = -1.f;
+
         SleepConditionVariableCS(&sys->work, &sys->lock, INFINITE);
     }
     LeaveCriticalSection(&sys->lock);
 
     if (endpoint != NULL)
+    {
+        IAudioEndpointVolume_UnregisterControlChangeNotify(endpoint,
+                                                      &sys->endpoint_callback);
         IAudioEndpointVolume_Release(endpoint);
+    }
 
     if (manager != NULL)
     {   /* Deregister callbacks *without* the lock */
@@ -999,6 +1119,7 @@ static int Open(vlc_object_t *obj)
     sys->it = NULL;
     sys->dev = NULL;
     sys->device_events.lpVtbl = &vlc_MMNotificationClient;
+    sys->endpoint_callback.lpVtbl = &vlc_AudioEndpointVolumeCallback;
     sys->session_events.lpVtbl = &vlc_AudioSessionEvents;
     sys->refs = 1;
 
