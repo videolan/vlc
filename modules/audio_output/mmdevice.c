@@ -704,6 +704,9 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     {
         msg_Dbg(aout, "using selected device %ls", sys->device);
         hr = IMMDeviceEnumerator_GetDevice(it, sys->device, &sys->dev);
+        if (FAILED(hr))
+            msg_Err(aout, "cannot get selected device %ls (error 0x%lx)",
+                    sys->device, hr);
         free(sys->device);
     }
     else
@@ -715,6 +718,8 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
         msg_Dbg(aout, "using default device");
         hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(it, eRender,
                                                          eConsole, &sys->dev);
+        if (FAILED(hr))
+            msg_Err(aout, "cannot get default device (error 0x%lx)", hr);
     }
 
     sys->device = NULL;
@@ -738,7 +743,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     }
     else
     {
-        msg_Err(aout, "cannot get device (error 0x%lx)", hr);
+        msg_Err(aout, "cannot get device identifier (error 0x%lx)", hr);
         return hr;
     }
 
