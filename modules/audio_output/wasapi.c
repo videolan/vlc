@@ -313,7 +313,7 @@ static unsigned vlc_CheckWaveOrder (const WAVEFORMATEX *restrict wf,
 static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
                      const GUID *sid)
 {
-    if (!s->b_force && var_InheritBool(s, "spdif"))
+    if (!s->b_force && var_InheritBool(s, "spdif") && AOUT_FMT_SPDIF(fmt))
         /* Fallback to other plugin until pass-through is implemented */
         return E_NOTIMPL;
 
