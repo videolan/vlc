@@ -31,6 +31,7 @@
 #include <assert.h>
 #include <audiopolicy.h>
 #include <mmdeviceapi.h>
+#include <endpointvolume.h>
 
 DEFINE_PROPERTYKEY(PKEY_Device_FriendlyName, 0xa45c254e, 0xdf1c, 0x4efd,
    0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0, 14);
@@ -695,6 +696,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     IAudioSessionManager *manager;
     IAudioSessionControl *control;
     ISimpleAudioVolume *volume;
+    IAudioEndpointVolume *endpoint;
     void *pv;
     HRESULT hr;
 
@@ -783,6 +785,23 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
         volume = NULL;
     }
 
+    hr = IMMDevice_Activate(sys->dev, &IID_IAudioEndpointVolume,
+                            CLSCTX_ALL, NULL, &pv);
+    endpoint = pv;
+    if (SUCCEEDED(hr))
+    {
+        float min, max, inc;
+
+        hr = IAudioEndpointVolume_GetVolumeRange(endpoint, &min, &max, &inc);
+        if (SUCCEEDED(hr))
+            msg_Dbg(aout, "volume from %+f dB to %+f dB with %f dB increments",
+                    min, max, inc);
+        else
+            msg_Err(aout, "cannot get volume range (error 0x%lx)", hr);
+    }
+    else
+        msg_Err(aout, "cannot activate endpoint volume (error %lx)", hr);
+
     /* Main loop (adjust volume as long as device is unchanged) */
     while (sys->device == NULL)
     {
@@ -831,6 +850,9 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
         SleepConditionVariableCS(&sys->work, &sys->lock, INFINITE);
     }
     LeaveCriticalSection(&sys->lock);
+
+    if (endpoint != NULL)
+        IAudioEndpointVolume_Release(endpoint);
 
     if (manager != NULL)
     {   /* Deregister callbacks *without* the lock */
