@@ -85,36 +85,38 @@ static HRESULT TimeGet(aout_stream_t *s, mtime_t *restrict delay)
 {
     aout_stream_sys_t *sys = s->sys;
     void *pv;
-    UINT64 pos, qpcpos;
+    UINT64 pos, qpcpos, freq;
     HRESULT hr;
 
     hr = IAudioClient_GetService(sys->client, &IID_IAudioClock, &pv);
-    if (SUCCEEDED(hr))
+    if (FAILED(hr))
     {
-        IAudioClock *clock = pv;
-
-        hr = IAudioClock_GetPosition(clock, &pos, &qpcpos);
-        if (FAILED(hr))
-            msg_Err(s, "cannot get position (error 0x%lx)", hr);
-        IAudioClock_Release(clock);
-    }
-    else
         msg_Err(s, "cannot get clock (error 0x%lx)", hr);
-
-    if (SUCCEEDED(hr))
-    {
-        if (pos != 0)
-        {
-            *delay = ((GetQPC() - qpcpos) / (10000000 / CLOCK_FREQ));
-            static_assert((10000000 % CLOCK_FREQ) == 0,
-                          "Frequency conversion broken");
-        }
-        else
-        {
-            *delay = sys->written * CLOCK_FREQ / sys->rate;
-            msg_Dbg(s, "extrapolating position: still propagating buffers");
-        }
+        return hr;
     }
+
+    IAudioClock *clock = pv;
+
+    hr = IAudioClock_GetPosition(clock, &pos, &qpcpos);
+    if (SUCCEEDED(hr))
+        hr = IAudioClock_GetFrequency(clock, &freq);
+    IAudioClock_Release(clock);
+    if (FAILED(hr))
+    {
+        msg_Err(s, "cannot get position (error 0x%lx)", hr);
+        return hr;
+    }
+
+    lldiv_t w = lldiv(sys->written, sys->rate);
+    lldiv_t r = lldiv(pos, freq);
+
+    static_assert((10000000 % CLOCK_FREQ) == 0, "Frequency conversion broken");
+
+    *delay = ((w.quot - r.quot) * CLOCK_FREQ)
+           + ((w.rem * CLOCK_FREQ) / sys->rate)
+           - ((r.rem * CLOCK_FREQ) / freq)
+           - ((GetQPC() - qpcpos) / (10000000 / CLOCK_FREQ));
+
     return hr;
 }
 
@@ -407,7 +409,7 @@ static void Stop(aout_stream_t *s)
 vlc_module_begin()
     set_shortname("WASAPI")
     set_description(N_("Windows Audio Session API output"))
-    set_capability("aout stream", /*50*/0)
+    set_capability("aout stream", 50)
     set_category(CAT_AUDIO)
     set_subcategory(SUBCAT_AUDIO_AOUT)
     set_callbacks(Start, Stop)
