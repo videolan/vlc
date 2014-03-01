@@ -45,6 +45,10 @@ enum {
 };
 
 enum {
+    NSFullScreenWindowMask      = 1 << 14
+};
+
+enum {
     NSWindowAnimationBehaviorDefault = 0,       // let AppKit infer animation behavior for this window
     NSWindowAnimationBehaviorNone = 2,          // suppress inferred animations (don't animate)
     NSWindowAnimationBehaviorDocumentWindow = 3,
@@ -65,6 +69,10 @@ typedef NSInteger NSWindowAnimationBehavior;
 
 @interface NSEvent (IntroducedInLion)
 - (BOOL)isDirectionInvertedFromDevice;
+@end
+
+@interface NSAnimationContext (IntroducedInLion)
++ (void)runAnimationGroup:(void (^)(NSAnimationContext *context))changes completionHandler:(void (^)(void))completionHandler;
 @end
 
 #endif
