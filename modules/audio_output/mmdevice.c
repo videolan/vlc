@@ -804,6 +804,9 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     {
         if (volume != NULL && sys->volume >= 0.f)
         {
+            if (sys->volume > 1.f)
+                sys->volume = 1.f;
+
             hr = ISimpleAudioVolume_SetMasterVolume(volume, sys->volume, NULL);
             if (FAILED(hr))
                 msg_Err(aout, "cannot set master volume (error 0x%lx)", hr);
