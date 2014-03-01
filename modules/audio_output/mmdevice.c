@@ -287,8 +287,9 @@ vlc_AudioSessionEvents_OnSimpleVolumeChanged(IAudioSessionEvents *this,
 
     msg_Dbg(aout, "simple volume changed: %f, muting %sabled", vol,
             mute ? "en" : "dis");
-    aout_VolumeReport(aout, cbrtf(vol));
-    aout_MuteReport(aout, mute == TRUE);
+    EnterCriticalSection(&sys->lock);
+    WakeConditionVariable(&sys->work); /* implicit state: vol & mute */
+    LeaveCriticalSection(&sys->lock);
     (void) ctx;
     return S_OK;
 }
@@ -772,24 +773,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
 
         hr = IAudioSessionManager_GetSimpleAudioVolume(manager, guid, FALSE,
                                                        &volume);
-        if (SUCCEEDED(hr))
-        {   /* Get current values _after_ registering for notification */
-            BOOL mute;
-            float level;
-
-            hr = ISimpleAudioVolume_GetMute(volume, &mute);
-            if (SUCCEEDED(hr))
-                aout_MuteReport(aout, mute != FALSE);
-            else
-                msg_Err(aout, "cannot get mute (error 0x%lx)", hr);
-
-            hr = ISimpleAudioVolume_GetMasterVolume(volume, &level);
-            if (SUCCEEDED(hr))
-                aout_VolumeReport(aout, level);
-            else
-                msg_Err(aout, "cannot get mute (error 0x%lx)", hr);
-        }
-        else
+        if (FAILED(hr))
             msg_Err(aout, "cannot get simple volume (error 0x%lx)", hr);
     }
     else
@@ -802,32 +786,54 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     /* Main loop (adjust volume as long as device is unchanged) */
     while (sys->device == NULL)
     {
-        if (volume != NULL && sys->volume >= 0.f)
+        if (volume != NULL)
         {
-            if (sys->volume > 1.f)
-                sys->volume = 1.f;
+            float level;
 
-            hr = ISimpleAudioVolume_SetMasterVolume(volume, sys->volume, NULL);
-            if (FAILED(hr))
-                msg_Err(aout, "cannot set master volume (error 0x%lx)", hr);
+            hr = ISimpleAudioVolume_GetMasterVolume(volume, &level);
+            if (SUCCEEDED(hr))
+                aout_VolumeReport(aout, cbrtf(level));
+            else
+                msg_Err(aout, "cannot get master volume (error 0x%lx)", hr);
+
+            level = sys->volume;
+            if (level >= 0.f)
+            {
+                if (level > 1.f)
+                    level = 1.f;
+
+                hr = ISimpleAudioVolume_SetMasterVolume(volume, level, NULL);
+                if (FAILED(hr))
+                    msg_Err(aout, "cannot set master volume (error 0x%lx)",
+                            hr);
+            }
             sys->volume = -1.f;
-        }
 
-        if (volume != NULL && sys->mute >= 0)
-        {
-            hr = ISimpleAudioVolume_SetMute(volume,
-                                            sys->mute ? TRUE : FALSE, NULL);
-            if (FAILED(hr))
-                msg_Err(aout, "cannot set mute (error 0x%lx)", hr);
+            BOOL mute;
+
+            hr = ISimpleAudioVolume_GetMute(volume, &mute);
+            if (SUCCEEDED(hr))
+                aout_MuteReport(aout, mute != FALSE);
+            else
+                msg_Err(aout, "cannot get mute (error 0x%lx)", hr);
+
+            if (sys->mute >= 0)
+            {
+                mute = sys->mute ? TRUE : FALSE;
+
+                hr = ISimpleAudioVolume_SetMute(volume, mute, NULL);
+                if (FAILED(hr))
+                    msg_Err(aout, "cannot set mute (error 0x%lx)", hr);
+            }
             sys->mute = -1;
         }
 
         SleepConditionVariableCS(&sys->work, &sys->lock, INFINITE);
     }
+    LeaveCriticalSection(&sys->lock);
 
     if (manager != NULL)
-    {
-        /* Deregister session control */
+    {   /* Deregister callbacks *without* the lock */
         if (volume != NULL)
             ISimpleAudioVolume_Release(volume);
 
@@ -841,6 +847,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
         IAudioSessionManager_Release(manager);
     }
 
+    EnterCriticalSection(&sys->lock);
     IMMDevice_Release(sys->dev);
     sys->dev = NULL;
     return S_OK;
