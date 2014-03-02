@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mmdevice.c : Windows Multimedia Device API audio output plugin for VLC
  *****************************************************************************
- * Copyright (C) 2012-2013 Rémi Denis-Courmont
+ * Copyright (C) 2012-2014 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -114,8 +114,10 @@ struct aout_sys_t
     struct IMMNotificationClient device_events;
     struct IAudioEndpointVolumeCallback endpoint_callback;
     struct IAudioSessionEvents session_events;
+    struct IAudioVolumeDuckNotification duck;
 
     LONG refs;
+    unsigned ducks;
 
     wchar_t *device; /**< Requested device identifier, NULL if none */
     float volume; /**< Requested volume, negative if none */
@@ -383,6 +385,79 @@ static const struct IAudioSessionEventsVtbl vlc_AudioSessionEvents =
     vlc_AudioSessionEvents_OnGroupingParamChanged,
     vlc_AudioSessionEvents_OnStateChanged,
     vlc_AudioSessionEvents_OnSessionDisconnected,
+};
+
+static inline aout_sys_t *vlc_AudioVolumeDuckNotification_sys(IAudioVolumeDuckNotification *this)
+{
+    return (void *)(((char *)this) - offsetof(aout_sys_t, duck));
+}
+
+static STDMETHODIMP
+vlc_AudioVolumeDuckNotification_QueryInterface(
+    IAudioVolumeDuckNotification *this, REFIID riid, void **ppv)
+{
+    if (IsEqualIID(riid, &IID_IUnknown)
+     || IsEqualIID(riid, &IID_IAudioVolumeDuckNotification))
+    {
+        *ppv = this;
+        IUnknown_AddRef(this);
+        return S_OK;
+    }
+    else
+    {
+       *ppv = NULL;
+        return E_NOINTERFACE;
+    }
+}
+
+static STDMETHODIMP_(ULONG)
+vlc_AudioVolumeDuckNotification_AddRef(IAudioVolumeDuckNotification *this)
+{
+    aout_sys_t *sys = vlc_AudioVolumeDuckNotification_sys(this);
+    return InterlockedIncrement(&sys->refs);
+}
+
+static STDMETHODIMP_(ULONG)
+vlc_AudioVolumeDuckNotification_Release(IAudioVolumeDuckNotification *this)
+{
+    aout_sys_t *sys = vlc_AudioVolumeDuckNotification_sys(this);
+    return InterlockedDecrement(&sys->refs);
+}
+
+static STDMETHODIMP
+vlc_AudioVolumeDuckNotification_OnVolumeDuckNotification(
+    IAudioVolumeDuckNotification *this, LPCWSTR sid, UINT32 count)
+{
+    aout_sys_t *sys = vlc_AudioVolumeDuckNotification_sys(this);
+    audio_output_t *aout = sys->aout;
+
+    msg_Dbg(aout, "volume ducked by %ls of %u sessions", sid, count);
+    sys->ducks++;
+    aout_PolicyReport(aout, true);
+    return S_OK;
+}
+
+static STDMETHODIMP
+vlc_AudioVolumeDuckNotification_OnVolumeUnduckNotification(
+    IAudioVolumeDuckNotification *this, LPCWSTR sid)
+{
+    aout_sys_t *sys = vlc_AudioVolumeDuckNotification_sys(this);
+    audio_output_t *aout = sys->aout;
+
+    msg_Dbg(aout, "volume unducked by %ls", sid);
+    sys->ducks--;
+    aout_PolicyReport(aout, sys->ducks != 0);
+    return S_OK;
+}
+
+static const struct IAudioVolumeDuckNotificationVtbl vlc_AudioVolumeDuckNotification =
+{
+    vlc_AudioVolumeDuckNotification_QueryInterface,
+    vlc_AudioVolumeDuckNotification_AddRef,
+    vlc_AudioVolumeDuckNotification_Release,
+
+    vlc_AudioVolumeDuckNotification_OnVolumeDuckNotification,
+    vlc_AudioVolumeDuckNotification_OnVolumeUnduckNotification,
 };
 
 
@@ -843,6 +918,39 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
                                                        &volume);
         if (FAILED(hr))
             msg_Err(aout, "cannot get simple volume (error 0x%lx)", hr);
+
+        /* Try to get version 2 (Windows 7) of the manager & control */
+        wchar_t *siid = NULL;
+
+        hr = IAudioSessionManager_QueryInterface(manager,
+                                              &IID_IAudioSessionControl2, &pv);
+        if (SUCCEEDED(hr))
+        {
+            IAudioSessionControl2 *c2 = pv;
+
+            IAudioSessionControl2_SetDuckingPreference(c2, FALSE);
+            hr = IAudioSessionControl2_GetSessionInstanceIdentifier(c2, &siid);
+            if (FAILED(hr))
+                siid = NULL;
+            IAudioSessionControl2_Release(c2);
+        }
+        else
+            msg_Dbg(aout, "version 2 session control unavailable");
+
+        hr = IAudioSessionManager_QueryInterface(manager,
+                                              &IID_IAudioSessionManager2, &pv);
+        if (SUCCEEDED(hr))
+        {
+            IAudioSessionManager2 *m2 = pv;
+
+            IAudioSessionManager2_RegisterDuckNotification(m2, siid,
+                                                           &sys->duck);
+            IAudioSessionManager2_Release(m2);
+        }
+        else
+            msg_Dbg(aout, "version 2 session management unavailable");
+
+        CoTaskMemFree(siid);
     }
     else
     {
@@ -976,6 +1084,16 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
 
     if (manager != NULL)
     {   /* Deregister callbacks *without* the lock */
+        hr = IAudioSessionManager_QueryInterface(manager,
+                                              &IID_IAudioSessionManager2, &pv);
+        if (SUCCEEDED(hr))
+        {
+            IAudioSessionManager2 *m2 = pv;
+
+            IAudioSessionManager2_UnregisterDuckNotification(m2, &sys->duck);
+            IAudioSessionManager2_Release(m2);
+        }
+
         if (volume != NULL)
             ISimpleAudioVolume_Release(volume);
 
@@ -1121,7 +1239,9 @@ static int Open(vlc_object_t *obj)
     sys->device_events.lpVtbl = &vlc_MMNotificationClient;
     sys->endpoint_callback.lpVtbl = &vlc_AudioEndpointVolumeCallback;
     sys->session_events.lpVtbl = &vlc_AudioSessionEvents;
+    sys->duck.lpVtbl = &vlc_AudioVolumeDuckNotification;
     sys->refs = 1;
+    sys->ducks = 0;
 
     sys->device = default_device;
     sys->volume = -1.f;
