@@ -105,6 +105,14 @@ if HAVE_QTKIT
 access_LTLIBRARIES += libqtsound_plugin.la
 endif
 
+libaccess_wasapi_plugin_la_SOURCES = access/wasapi.c
+libaccess_wasapi_plugin_la_LIBADD = -lole32 -lksuser
+if HAVE_WASAPI
+if !HAVE_WINSTORE
+access_LTLIBRARIES += libaccess_wasapi_plugin.la
+endif
+endif
+
 
 ### Video capture ###
 

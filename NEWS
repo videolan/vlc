@@ -18,6 +18,7 @@ Access:
  * Support depayloading Opus from RTP
  * Support sftp username and passwords options and URL
  * New UPnP access module, to list directories without infinite recursions
+ * New WASAPI audio capture module on Windows
 
 Decoder:
  * OMX GPU-zerocopy support for decoding and display on Android using OpenMax IL

@@ -19,6 +19,7 @@ $Id$
  * access_output_shout: Shoutcast access output
  * access_output_udp: UDP Network access_output module
  * access_realrtsp: Real RTSP access
+ * access_wasapi: WASAPI audio input
  * addonsfsstorage: Local storage extensions repository
  * addonsvorepository: Videolan extensions repository
  * adjust: Contrast/Hue/saturation/Brightness adjust module
