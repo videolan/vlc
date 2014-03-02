@@ -41,6 +41,7 @@
 #include <vlc_cpu.h>
 
 #include <libavcodec/avcodec.h>
+#include <libavutil/audioconvert.h>
 
 #include "avcodec.h"
 #include "avcommon.h"
@@ -122,6 +123,10 @@ struct encoder_sys_t
     mtime_t i_pts;
     date_t  buffer_date;
 
+    /* Multichannel (>2) channel reordering */
+    uint8_t    i_channels_to_reorder;
+    uint8_t    pi_reorder_layout[AOUT_CHAN_MAX];
+
     /* Encoding settings */
     int        i_key_int;
     int        i_b_frames;
@@ -146,6 +151,45 @@ struct encoder_sys_t
     int        i_aac_profile; /* AAC profile to use.*/
 
     AVFrame    *frame;
+};
+
+
+/* Taken from audio.c*/
+static const uint64_t pi_channels_map[][2] =
+{
+    { AV_CH_FRONT_LEFT,        AOUT_CHAN_LEFT },
+    { AV_CH_FRONT_RIGHT,       AOUT_CHAN_RIGHT },
+    { AV_CH_FRONT_CENTER,      AOUT_CHAN_CENTER },
+    { AV_CH_LOW_FREQUENCY,     AOUT_CHAN_LFE },
+    { AV_CH_BACK_LEFT,         AOUT_CHAN_REARLEFT },
+    { AV_CH_BACK_RIGHT,        AOUT_CHAN_REARRIGHT },
+    { AV_CH_FRONT_LEFT_OF_CENTER, 0 },
+    { AV_CH_FRONT_RIGHT_OF_CENTER, 0 },
+    { AV_CH_BACK_CENTER,       AOUT_CHAN_REARCENTER },
+    { AV_CH_SIDE_LEFT,         AOUT_CHAN_MIDDLELEFT },
+    { AV_CH_SIDE_RIGHT,        AOUT_CHAN_MIDDLERIGHT },
+    { AV_CH_TOP_CENTER,        0 },
+    { AV_CH_TOP_FRONT_LEFT,    0 },
+    { AV_CH_TOP_FRONT_CENTER,  0 },
+    { AV_CH_TOP_FRONT_RIGHT,   0 },
+    { AV_CH_TOP_BACK_LEFT,     0 },
+    { AV_CH_TOP_BACK_CENTER,   0 },
+    { AV_CH_TOP_BACK_RIGHT,    0 },
+    { AV_CH_STEREO_LEFT,       0 },
+    { AV_CH_STEREO_RIGHT,      0 },
+};
+
+static const uint32_t channel_mask[][2] = {
+    {0,0},
+    {AOUT_CHAN_CENTER, AV_CH_LAYOUT_MONO},
+    {AOUT_CHANS_STEREO, AV_CH_LAYOUT_STEREO},
+    {AOUT_CHANS_2_1, AV_CH_LAYOUT_2POINT1},
+    {AOUT_CHANS_4_0, AV_CH_LAYOUT_4POINT0},
+    {AOUT_CHANS_4_1, AV_CH_LAYOUT_4POINT1},
+    {AOUT_CHANS_5_1, AV_CH_LAYOUT_5POINT1_BACK},
+    {AOUT_CHANS_7_0, AV_CH_LAYOUT_7POINT0},
+    {AOUT_CHANS_7_1, AV_CH_LAYOUT_7POINT1},
+    {AOUT_CHANS_8_1, AV_CH_LAYOUT_OCTAGONAL},
 };
 
 static const char *const ppsz_enc_options[] = {
@@ -651,7 +695,51 @@ int OpenEncoder( vlc_object_t *p_this )
         p_context->time_base.den = p_context->sample_rate;
         p_context->channels      = p_enc->fmt_out.audio.i_channels;
 #if LIBAVUTIL_VERSION_CHECK( 52, 2, 6, 0, 0)
-        p_context->channel_layout = av_get_default_channel_layout( p_context->channels );
+        p_context->channel_layout = channel_mask[p_context->channels][1];
+
+        /* Setup Channel ordering for multichannel audio
+         * as VLC channel order isn't same as libavcodec expects
+         */
+
+        p_sys->i_channels_to_reorder = 0;
+
+        /* Specified order
+         * Copied from audio.c
+         */
+        const unsigned i_order_max = 8 * sizeof(p_context->channel_layout);
+        uint32_t pi_order_dst[AOUT_CHAN_MAX];
+        int i_channels_src = 0;
+
+        if( p_context->channel_layout )
+        {
+            msg_Dbg( p_enc, "Creating channel order for reordering");
+            for( unsigned i = 0; i < sizeof(pi_channels_map)/sizeof(*pi_channels_map); i++ )
+            {
+                if( p_context->channel_layout & pi_channels_map[i][0] )
+                {
+                    msg_Dbg( p_enc, "%d %x mapped to %x", i_channels_src, pi_channels_map[i][0], pi_channels_map[i][1]);
+                    pi_order_dst[i_channels_src++] = pi_channels_map[i][1];
+                }
+            }
+        }
+        else
+        {
+            msg_Dbg( p_enc, "Creating default channel order for reordering");
+            /* Create default order  */
+            for( unsigned int i = 0; i < __MIN( i_order_max, (unsigned)p_sys->p_context->channels ); i++ )
+            {
+                if( i < sizeof(pi_channels_map)/sizeof(*pi_channels_map) )
+                {
+                    msg_Dbg( p_enc, "%d channel is %x", i_channels_src, pi_channels_map[i][1]);
+                    pi_order_dst[i_channels_src++] = pi_channels_map[i][1];
+                }
+            }
+        }
+        if( i_channels_src != p_context->channels )
+            msg_Err( p_enc, "Channel layout not understood" );
+
+        p_sys->i_channels_to_reorder = aout_CheckChannelReorder( NULL, pi_order_dst,
+            channel_mask[p_context->channels][0], p_sys->pi_reorder_layout );
 #endif
 
         if ( p_enc->fmt_out.i_codec == VLC_CODEC_MP4A )
@@ -1233,6 +1321,14 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         /* take back amount we have leftover from previous buffer*/
         if( p_sys->i_samples_delay > 0 )
             date_Decrement( &p_sys->buffer_date, p_sys->i_samples_delay );
+    }
+    /* Handle reordering here so we have p_sys->p_buffer always in correct
+     * order already */
+    if( p_aout_buf && p_sys->i_channels_to_reorder > 0 )
+    {
+        aout_ChannelReorder( p_aout_buf->p_buffer, p_aout_buf->i_buffer,
+             p_sys->i_channels_to_reorder, p_sys->pi_reorder_layout,
+             p_enc->fmt_in.i_codec );
     }
 
     // Check if we have enough samples in delay_buffer and current p_aout_buf to fill frame
