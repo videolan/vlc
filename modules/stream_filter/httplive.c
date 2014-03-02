@@ -1756,8 +1756,12 @@ static void* hls_Reload(void *p_this)
 
             /* determine next time to update playlist */
             p_sys->playlist.last = now;
-            p_sys->playlist.wakeup = now + ((mtime_t)(hls->max_segment_length * wait)
-                                                   * (mtime_t)1000000);
+            p_sys->playlist.wakeup = now;
+            /* If there is no new segments,use playlist duration as sleep period base */
+            if( likely( hls->max_segment_length > 0 ) )
+                p_sys->playlist.wakeup += (mtime_t)((hls->max_segment_length * wait) * CLOCK_FREQ);
+            else
+                p_sys->playlist.wakeup += (mtime_t)((hls->duration * wait) * CLOCK_FREQ);
         }
 
         mwait(p_sys->playlist.wakeup);
