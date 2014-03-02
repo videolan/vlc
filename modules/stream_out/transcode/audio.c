@@ -35,15 +35,24 @@
 #include <vlc_meta.h>
 #include <vlc_modules.h>
 
-static const int pi_channels_maps[6] =
+static const int pi_channels_maps[9] =
 {
     0,
-    AOUT_CHAN_CENTER,   AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-    AOUT_CHAN_CENTER | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
+    AOUT_CHAN_CENTER,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
+    AOUT_CHAN_LFE  | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
      | AOUT_CHAN_REARRIGHT,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+     | AOUT_CHAN_REARCENTER | AOUT_CHAN_MIDDLELEFT
+     | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT
+     | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT
+     | AOUT_CHAN_LFE,
 };
 
 static int audio_update_format( decoder_t *p_dec )
@@ -114,7 +123,7 @@ static int transcode_audio_initialize_encoder( sout_stream_id_sys_t *id, sout_st
     if( !id->p_encoder->fmt_in.audio.i_physical_channels
      || !id->p_encoder->fmt_in.audio.i_original_channels )
     {
-        if( id->p_encoder->fmt_in.audio.i_channels < 6 )
+        if( id->p_encoder->fmt_in.audio.i_channels < (sizeof(pi_channels_maps) / sizeof(*pi_channels_maps)) )
             id->p_encoder->fmt_in.audio.i_physical_channels =
             id->p_encoder->fmt_in.audio.i_original_channels =
                       pi_channels_maps[id->p_encoder->fmt_in.audio.i_channels];
