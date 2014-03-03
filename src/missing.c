@@ -1,7 +1,16 @@
 /*****************************************************************************
  * missing.c: missing libvlccore symbols
  *****************************************************************************
- * Copyright (C) 2008 Rémi Denis-Courmont
+ * Copyright (C) 2008-2011 Rémi Denis-Courmont
+ * Copyright (C) 2009-2014 VLC authors and VideoLAN
+ * $Id$
+ *
+ * Authors: Rémi Denis-Courmont <rem # videolan : org>
+ *          Pierre Ynard <linkfanel # yahoo fr>
+ *          Toralf Niebuhr <gmthor85 # aim com>
+ *          Felix Paul Kühne <fkuehne # videolan org>
+ *          Jean-Paul Saman <jpsaman # videolan org>
+ *          Antoine Cellerier <dionoea # videolan org>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -36,12 +45,14 @@ char *httpd_ClientIP (const httpd_client_t *cl, char *psz_ip, int *port)
 {
     (void) cl; (void) psz_ip; (void) port;
     assert (0);
+    return NULL;
 }
 
 httpd_file_sys_t *httpd_FileDelete (httpd_file_t *file)
 {
     (void) file;
     assert (0);
+    return NULL;
 }
 
 httpd_file_t *httpd_FileNew (httpd_host_t *host,
@@ -54,12 +65,14 @@ httpd_file_t *httpd_FileNew (httpd_host_t *host,
     (void) login; (void) password;
     (void) cb; (void) data;
     assert (0);
+    return NULL;
 }
 
 httpd_handler_sys_t *httpd_HandlerDelete (httpd_handler_t *handler)
 {
     (void) handler;
     assert (0);
+    return NULL;
 }
 
 httpd_handler_t *httpd_HandlerNew (httpd_host_t *host, const char *url,
@@ -71,6 +84,7 @@ httpd_handler_t *httpd_HandlerNew (httpd_host_t *host, const char *url,
     (void) login; (void) password;
     (void) cb; (void) data;
     assert (0);
+    return NULL;
 }
 
 void httpd_HostDelete (httpd_host_t *h)
@@ -107,6 +121,7 @@ const char *httpd_MsgGet (const httpd_message_t *m, const char *name)
 {
     (void) m; (void) name;
     assert (0);
+    return NULL;
 }
 
 void httpd_RedirectDelete (httpd_redirect_t *r)
@@ -120,12 +135,14 @@ httpd_redirect_t *httpd_RedirectNew (httpd_host_t *host,
 {
     (void) host; (void) dst; (void) src;
     assert (0);
+    return NULL;
 }
 
 char *httpd_ServerIP (const httpd_client_t *client, char *ip, int *port)
 {
     (void) client; (void) ip; (void) port;
     assert (0);
+    return NULL;
 }
 
 void httpd_StreamDelete (httpd_stream_t *stream)
@@ -138,6 +155,7 @@ int httpd_StreamHeader (httpd_stream_t *stream, uint8_t *data, int count)
 {
     (void) stream; (void) data; (void) count;
     assert (0);
+    return 0;
 }
 
 httpd_stream_t *httpd_StreamNew (httpd_host_t *host,
@@ -147,12 +165,14 @@ httpd_stream_t *httpd_StreamNew (httpd_host_t *host,
     (void) host; (void) url; (void) content_type;
     (void) login; (void) password;
     assert (0);
+    return NULL;
 }
 
 int httpd_StreamSend (httpd_stream_t *stream, const block_t *p_block)
 {
     (void) stream; (void) p_block;
     assert (0);
+    return 0;
 }
 
 int httpd_StreamSetHTTPHeaders (httpd_stream_t * stream,
@@ -161,6 +181,7 @@ int httpd_StreamSetHTTPHeaders (httpd_stream_t * stream,
 {
     (void) stream; (void) headers; (void) i_headers;
     assert (0);
+    return 0;
 }
 
 int httpd_UrlCatch (httpd_url_t *url, int request, httpd_callback_t cb,
@@ -168,6 +189,7 @@ int httpd_UrlCatch (httpd_url_t *url, int request, httpd_callback_t cb,
 {
     (void) url; (void) request; (void) cb; (void) data;
     assert (0);
+    return 0;
 }
 
 void httpd_UrlDelete (httpd_url_t *url)
@@ -181,6 +203,7 @@ httpd_url_t *httpd_UrlNew (httpd_host_t *host, const char *url,
 {
     (void) host; (void) url; (void) login; (void) password;
     assert (0);
+    return NULL;
 }
 #endif /* !ENABLE_HTTPD */
 
@@ -192,23 +215,31 @@ char *sdp_AddMedia (char **sdp, const char *type, const char *protocol,
                     const char *ptname, unsigned clockrate, unsigned channels,
                     const char *fmtp)
 {
+    VLC_UNUSED (sdp); VLC_UNUSED (type); VLC_UNUSED (protocol);
+    VLC_UNUSED (dport); VLC_UNUSED (pt); VLC_UNUSED (bw_indep);
+    VLC_UNUSED (bw); VLC_UNUSED (ptname); VLC_UNUSED (clockrate);
+    VLC_UNUSED (channels); VLC_UNUSED (fmtp);
     assert (*sdp == NULL);
     return NULL;
 }
 
 char *sdp_AddAttribute (char **sdp, const char *name, const char *fmt, ...)
 {
+    VLC_UNUSED (sdp); VLC_UNUSED (name); VLC_UNUSED (fmt);
     assert (*sdp == NULL);
     return NULL;
 }
 
 int sout_AccessOutControl (sout_access_out_t *out, int query, ...)
 {
+    VLC_UNUSED (out); VLC_UNUSED (query);
     assert (0);
+    return 0;
 }
 
 void sout_AccessOutDelete (sout_access_out_t *out)
 {
+    VLC_UNUSED (out);
     assert (0);
 }
 
@@ -216,23 +247,30 @@ void sout_AccessOutDelete (sout_access_out_t *out)
 sout_access_out_t *sout_AccessOutNew (vlc_object_t *obj,
                                       const char *access, const char *name)
 {
+    VLC_UNUSED (access); VLC_UNUSED (name);
     msg_Err (obj, "Output support not compiled-in!");
     return NULL;
 }
 
 ssize_t sout_AccessOutRead (sout_access_out_t *out, block_t *block)
 {
+    VLC_UNUSED (out); VLC_UNUSED (block);
     assert (0);
+    return 0;
 }
 
 int sout_AccessOutSeek (sout_access_out_t *out, off_t offset)
 {
+    VLC_UNUSED (out); VLC_UNUSED (offset);
     assert (0);
+    return 0;
 }
 
 ssize_t sout_AccessOutWrite (sout_access_out_t *out, block_t *block)
 {
+    VLC_UNUSED (out); VLC_UNUSED (block);
     assert (0);
+    return 0;
 }
 
 #undef sout_AnnounceRegisterSDP
@@ -240,14 +278,17 @@ session_descriptor_t *sout_AnnounceRegisterSDP (vlc_object_t *obj,
                                                 const char *sdp,
                                                 const char *dst)
 {
+    VLC_UNUSED (sdp); VLC_UNUSED (dst);
     msg_Err (obj, "SDP export not compiled-in!");
     return NULL;
 }
 
 #undef sout_AnnounceUnRegister
-sout_AnnounceUnRegister (vlc_object_t *obj, session_descriptor_t *d)
+int sout_AnnounceUnRegister (vlc_object_t *obj, session_descriptor_t *d)
 {
+    VLC_UNUSED (obj); VLC_UNUSED (d);
     assert (0);
+    return 0;
 }
 
 #undef sout_EncoderCreate
@@ -259,37 +300,48 @@ encoder_t *sout_EncoderCreate( vlc_object_t *p_this )
 
 sout_input_t *sout_MuxAddStream (sout_mux_t *mux, es_format_t *fmt)
 {
+    VLC_UNUSED (mux); VLC_UNUSED (fmt);
     assert (0);
+    return NULL;
 }
 
 void sout_MuxDelete (sout_mux_t *mux)
 {
+    VLC_UNUSED (mux);
     assert (0);
 }
 
 void sout_MuxDeleteStream (sout_mux_t *mux, sout_input_t *input)
 {
+    VLC_UNUSED (mux); VLC_UNUSED (input);
     assert (0);
 }
 
 int sout_MuxGetStream (sout_mux_t *p_mux, int i_blocks, mtime_t *pi_dts)
 {
+    VLC_UNUSED (p_mux); VLC_UNUSED (i_blocks); VLC_UNUSED (pi_dts);
     assert (0);
+    return 0;
 }
 
 sout_mux_t *sout_MuxNew (sout_instance_t *instance, const char *mux,
                          sout_access_out_t *out)
 {
+    VLC_UNUSED (instance); VLC_UNUSED (mux); VLC_UNUSED (out);
     assert (0);
+    return NULL;
 }
 
 int sout_MuxSendBuffer (sout_mux_t *mux, sout_input_t *input, block_t *block)
 {
+    VLC_UNUSED (mux); VLC_UNUSED (input); VLC_UNUSED (block);
     assert (0);
+    return 0;
 }
 
 void sout_StreamChainDelete (sout_stream_t *p_first, sout_stream_t *p_last)
 {
+    VLC_UNUSED (p_first); VLC_UNUSED (p_last);
     assert (0);
 }
 
@@ -297,13 +349,18 @@ sout_stream_t *sout_StreamChainNew (sout_instance_t *p_sout, char *psz_chain,
                                     sout_stream_t *p_next,
                                     sout_stream_t **pp_last)
 {
+    VLC_UNUSED (p_sout); VLC_UNUSED (psz_chain); VLC_UNUSED (p_next);
+    VLC_UNUSED (pp_last);
     assert (0);
+    return NULL;
 }
 
 char *vlc_sdp_Start (vlc_object_t *obj, const char *cfg,
                      const struct sockaddr *src, size_t srclen,
                      const struct sockaddr *addr, size_t addrlen)
 {
+    VLC_UNUSED (obj); VLC_UNUSED (cfg); VLC_UNUSED (src); VLC_UNUSED (srclen);
+    VLC_UNUSED (addr); VLC_UNUSED (addrlen);
     return NULL;
 }
 #endif /* !ENABLE_SOUT */
@@ -313,8 +370,10 @@ char *vlc_sdp_Start (vlc_object_t *obj, const char *cfg,
 
 int vlm_Control (vlm_t *vlm, int query, ...)
 {
+    VLC_UNUSED (query);
     VLC_UNUSED (vlm);
     assert (0);
+    return 0;
 }
 
 void vlm_Delete (vlm_t *vlm)
@@ -329,6 +388,7 @@ int vlm_ExecuteCommand (vlm_t *vlm, const char *cmd, vlm_message_t **pm)
     VLC_UNUSED (cmd);
     VLC_UNUSED (pm);
     assert (0);
+    return 0;
 }
 
 vlm_message_t *vlm_MessageAdd (vlm_message_t *a, vlm_message_t *b)
@@ -336,6 +396,7 @@ vlm_message_t *vlm_MessageAdd (vlm_message_t *a, vlm_message_t *b)
     VLC_UNUSED (a);
     VLC_UNUSED (b);
     assert (0);
+    return NULL;
 }
 
 void vlm_MessageDelete (vlm_message_t *m)
