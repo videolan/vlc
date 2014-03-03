@@ -244,8 +244,9 @@ libvcdx_plugin_la_SOURCES = \
 	access/vcdx/vcdplayer.h access/vcdx/vcdplayer.c \
 	access/vcdx/info.c access/vcdx/info.h
 libvcdx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libvcdx_plugin_la_LIBADD = $(VCDX_LIBS)
 if HAVE_WIN32
-libvcdx_plugin_la_LIBADD = -lwinmm
+libvcdx_plugin_la_LIBADD += -lwinmm
 endif
 libvcdx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 if HAVE_DARWIN
