@@ -859,7 +859,8 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
         int64_t i_timestamp;
         int64_t i_granule;
     } bestlower = { p_stream->i_data_start, -1, -1 },
-      current = { -1, -1, -1 };
+      current = { -1, -1, -1 },
+      lowestupper = { -1, -1, -1 };
 
     demux_sys_t *p_sys  = p_demux->p_sys;
 
@@ -905,6 +906,10 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
             msg_Err( p_demux, "Unmatched granule. New codec ?" );
             return -1;
         }
+        else if ( current.i_timestamp < -1 )  /* due to preskip with some codecs */
+        {
+            current.i_timestamp = 0;
+        }
 
         if ( current.i_pos != -1 && current.i_granule != -1 )
         {
@@ -919,6 +924,8 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
             }
             else if ( current.i_timestamp > i_targettime )
             {
+                if ( lowestupper.i_timestamp == -1 || current.i_timestamp < lowestupper.i_timestamp )
+                    lowestupper = current;
                 /* check lower half of segment */
                 i_start_pos -= i_segsize;
                 i_end_pos -= i_segsize;
@@ -931,15 +938,22 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
             i_start_pos -= i_segsize;
         }
 
-        OggDebug( msg_Dbg(p_demux, "Bisect restart i_segsize=%"PRId64" between %"PRId64" and %"PRId64,
-                i_segsize, i_start_pos, i_end_pos ) );
+        OggDebug( msg_Dbg(p_demux, "Bisect restart i_segsize=%"PRId64" between %"PRId64
+                                   " and %"PRId64 " bl %"PRId64" lu %"PRId64,
+                i_segsize, i_start_pos, i_end_pos, bestlower.i_granule, lowestupper.i_granule  ) );
 
         i_segsize = ( i_end_pos - i_start_pos + 1 ) >> 1;
         i_start_pos += i_segsize;
 
     } while ( i_segsize > 64 );
 
-    if ( bestlower.i_granule == -1 ) return -1;
+    if ( bestlower.i_granule == -1 )
+    {
+        if ( lowestupper.i_granule == -1 )
+            return -1;
+        else
+            bestlower = lowestupper;
+    }
 
     if ( p_stream->b_oggds )
     {
