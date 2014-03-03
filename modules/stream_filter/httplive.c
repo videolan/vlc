@@ -566,6 +566,7 @@ static int string_to_IV(char *string_hexa, uint8_t iv[AES_BLOCK_SIZE])
 static char *relative_URI(const char *psz_url, const char *psz_path)
 {
     char *ret = NULL;
+    const char *fmt;
     assert(psz_url != NULL && psz_path != NULL);
 
 
@@ -587,6 +588,7 @@ static char *relative_URI(const char *psz_url, const char *psz_path)
         if (unlikely(slash == NULL))
             goto end;
         *slash = '\0';
+        fmt = "%s%s";
     } else {
         int levels = 0;
         while(len >= 3 && !strncmp(psz_path, "../", 3)) {
@@ -600,9 +602,10 @@ static char *relative_URI(const char *psz_url, const char *psz_path)
                 goto end;
             *slash = '\0';
         } while (levels--);
+	fmt = "%s/%s";
     }
 
-    if (asprintf(&ret, "%s/%s", new_url, psz_path) < 0)
+    if (asprintf(&ret, fmt, new_url, psz_path) < 0)
         ret = NULL;
 
 end:
