@@ -318,8 +318,6 @@ static int64_t get_data( demux_t *p_demux, int64_t i_bytes_to_read )
 
     i_result = stream_Read( p_demux->s, buf, i_bytes_to_read );
 
-    p_sys->b_page_waiting = false;
-
     ogg_sync_wrote( &p_sys->oy, i_result );
     return i_result;
 }
@@ -449,10 +447,7 @@ static int64_t find_first_page_granule( demux_t *p_demux,
     seek_byte( p_demux, i_pos1 );
 
     if ( i_pos1 == p_stream->i_data_start )
-    {
-        p_sys->b_page_waiting = true;
         return p_sys->i_input_position;
-    }
 
     if ( i_bytes_to_read > OGGSEEK_BYTES_TO_READ ) i_bytes_to_read = OGGSEEK_BYTES_TO_READ;
 
@@ -516,20 +511,18 @@ static int64_t find_first_page_granule( demux_t *p_demux,
         }
 
         // found a page
-        if ( p_stream->os.serialno != ogg_page_serialno( &p_sys->current_page ) )
+        if ( ogg_stream_pagein( &p_stream->os, &p_sys->current_page ) != 0 )
         {
-            /* page is not for this stream */
+            /* page is not for this stream or incomplete */
             p_sys->i_input_position += i_result;
             if ( ! i_pages_checked ) i_pos1 = p_sys->i_input_position;
             continue;
         }
 
-        ogg_stream_pagein( &p_stream->os, &p_sys->current_page );
-
         i_pages_checked++;
         i_packets_checked = 0;
 
-        if ( ogg_stream_packetout( &p_stream->os, &op ) > 0 )
+        while ( ogg_stream_packetout( &p_stream->os, &op ) > 0 )
         {
             i_packets_checked++;
         }
@@ -537,9 +530,7 @@ static int64_t find_first_page_granule( demux_t *p_demux,
         if ( i_packets_checked )
         {
             *i_granulepos = ogg_page_granulepos( &p_sys->current_page );
-            p_sys->b_page_waiting = true;
             return i_pos1;
-
         }
 
         /*  -> start of next page */
@@ -592,7 +583,9 @@ static bool OggSeekToPacket( demux_t *p_demux, logical_stream_t *p_stream,
 {
     ogg_packet op;
     demux_sys_t *p_sys  = p_demux->p_sys;
-    ogg_stream_pagein( &p_stream->os, &p_sys->current_page );
+    if ( ogg_stream_pagein( &p_stream->os, &p_sys->current_page ) != 0 )
+        return false;
+    p_sys->b_page_waiting = true;
     int i=0;
 
     int64_t itarget_frame = Ogg_GetKeyframeGranule( p_stream, i_granulepos );
@@ -609,6 +602,7 @@ static bool OggSeekToPacket( demux_t *p_demux, logical_stream_t *p_stream,
     if ( b_exact && iframe > itarget_frame )
     {
         while( ogg_stream_packetout( &p_stream->os, &op ) > 0 ) {};
+        p_sys->b_page_waiting = false;
         return false;
     }
 
@@ -704,6 +698,9 @@ static int64_t OggForwardSeekToFrame( demux_t *p_demux, int64_t i_pos1, int64_t 
     seek_byte( p_demux, p_sys->i_input_position );
     ogg_stream_reset( &p_stream->os );
 
+    ogg_packet op;
+    while( ogg_stream_packetout( &p_stream->os, &op ) > 0 ) {};
+
     packetStartCoordinates lastpacket = { -1, -1, -1 };
 
     while( 1 )
@@ -735,7 +732,6 @@ static int64_t OggForwardSeekToFrame( demux_t *p_demux, int64_t i_pos1, int64_t 
         {
             p_sys->i_input_position = lastpacket.i_pos;
             p_stream->i_skip_frames = 0;
-            p_sys->b_page_waiting = true;
             return p_sys->i_input_position;
         }
 
@@ -1108,7 +1104,12 @@ int Oggseek_SeektoAbsolutetime( demux_t *p_demux, logical_stream_t *p_stream,
 
     int64_t i_pagepos = OggBisectSearchByTime( p_demux, p_stream, i_time,
                                        i_offset_lower, i_offset_upper);
-
+    if ( i_pagepos >= 0 )
+    {
+        /* be sure to clear any state or read+pagein() will fail on same # */
+        ogg_stream_reset( &p_stream->os );
+        seek_byte( p_demux, p_sys->i_input_position );
+    }
     /* Insert keyframe position into index */
     OggNoDebug(
     if ( i_pagepos >= p_stream->i_data_start )
@@ -1191,8 +1192,6 @@ int64_t oggseek_read_page( demux_t *p_demux )
                  i_result, i_page_size, buf, i_in_pos );
         return 0;
     }
-
-    p_sys->b_page_waiting = false;
 
     return i_result + PAGE_HEADER_BYTES + i_nsegs;
 }

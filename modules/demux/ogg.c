@@ -383,7 +383,6 @@ static int Demux( demux_t * p_demux )
             {
                 continue;
             }
-
         }
 
         /* clear the finished flag if pages after eos (ex: after a seek) */
