@@ -38,18 +38,6 @@ char *httpd_ClientIP (const httpd_client_t *cl, char *psz_ip, int *port)
     assert (0);
 }
 
-void httpd_ClientModeBidir (httpd_client_t *cl)
-{
-    (void) cl;
-    assert (0);
-}
-
-void httpd_ClientModeStream (httpd_client_t *cl)
-{
-    (void) cl;
-    assert (0);
-}
-
 httpd_file_sys_t *httpd_FileDelete (httpd_file_t *file)
 {
     (void) file;
