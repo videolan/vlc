@@ -437,7 +437,7 @@ static int Control(access_t *access, int query, va_list args)
         return VLC_SUCCESS;
     case ACCESS_GET_PTS_DELAY: {
         int64_t *delay = va_arg(args, int64_t *);
-        *delay = DEFAULT_PTS_DELAY; /* FIXME */
+        *delay = INT64_C(1000) * var_InheritInteger(access, "network-caching");
         return VLC_SUCCESS;
     }
     case ACCESS_SET_PAUSE_STATE: {
