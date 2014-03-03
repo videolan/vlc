@@ -167,6 +167,14 @@ int httpd_StreamSend (httpd_stream_t *stream, const block_t *p_block)
     assert (0);
 }
 
+int httpd_StreamSetHTTPHeaders (httpd_stream_t * stream,
+                                httpd_header * headers,
+                                size_t i_headers)
+{
+    (void) stream; (void) headers; (void) i_headers;
+    assert (0);
+}
+
 int httpd_UrlCatch (httpd_url_t *url, int request, httpd_callback_t cb,
                     httpd_callback_sys_t *data)
 {
