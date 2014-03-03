@@ -68,7 +68,8 @@
     VLCVideoWindowCommon *o_new_video_window;
 
     // should be called before any window resizing occurs
-    [[VLCMainWindow sharedInstance] videoplayWillBeStarted];
+    if (!b_multiple_vout_windows)
+        [[VLCMainWindow sharedInstance] videoplayWillBeStarted];
 
     if (b_multiple_vout_windows && b_video_wallpaper)
         b_video_wallpaper = false;
@@ -126,7 +127,6 @@
             [o_new_video_window setContentMinSize: NSMakeSize(f_min_video_height, f_min_video_height)];
         }
 
-        [[VLCMainWindow sharedInstance] setNonembedded:YES];
         b_nonembedded = YES;
     } else {
         if ((var_InheritBool(VLCIntf, "embedded-video") && !b_mainwindow_has_video)) {
@@ -221,12 +221,17 @@
 
     [o_new_video_window setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
 
-    if (!b_multiple_vout_windows)
-        [[VLCMainWindow sharedInstance] setNonembedded:b_nonembedded];
+
 
     [o_vout_view setVoutThread:(vout_thread_t *)p_wnd->p_parent];
     [o_new_video_window setHasActiveVideo: YES];
     [o_vout_dict setObject:[o_new_video_window autorelease] forKey:[NSValue valueWithPointer:p_wnd]];
+
+    [[VLCMainWindow sharedInstance] setNonembedded:!b_mainwindow_has_video];
+
+    // beware of order, setActiveVideoPlayback:, setHasActiveVideo: and setNonembedded: must be called before
+    if ([o_new_video_window class] == [VLCMainWindow class])
+        [[VLCMainWindow sharedInstance] changePlaylistState: psVideoStartedOrStoppedEvent];
 
     if (b_nonembedded) {
         // event occurs before window is created, so call again
@@ -244,9 +249,6 @@
         return;
     }
 
-    if ([o_window class] == [VLCMainWindow class])
-        b_mainwindow_has_video = NO;
-
     if ([o_window fullscreen] && ![[VLCMainWindow sharedInstance] nativeFullscreenMode])
         [o_window leaveFullscreen];
 
@@ -255,17 +257,31 @@
     // set active video to no BEFORE closing the window to avoid stopping playback
     // due to NSWindowWillCloseNotification
     [o_window setHasActiveVideo: NO];
+
     if ([o_window class] != [VLCMainWindow class]) {
         [o_window close];
         [o_window orderOut:self]; // for dark interface
     }
 
+    [o_window retain];
     [o_vout_dict removeObjectForKey:o_key];
-
     if ([o_vout_dict count] == 0) {
         [[VLCMain sharedInstance] setActiveVideoPlayback:NO];
         i_statusLevelWindowCounter = 0;
     }
+
+    if ([o_window class] == [VLCMainWindow class]) {
+        b_mainwindow_has_video = NO;
+
+        // video in main window might get stopped while another vout is open
+        if ([o_vout_dict count] > 0)
+            [[VLCMainWindow sharedInstance] setNonembedded:YES];
+
+        // beware of order, setActiveVideoPlayback:, setHasActiveVideo: and setNonembedded: must be called before
+        [[VLCMainWindow sharedInstance] changePlaylistState: psVideoStartedOrStoppedEvent];
+    }
+
+    [o_window release];
 }
 
 

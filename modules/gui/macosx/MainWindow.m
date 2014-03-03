@@ -783,8 +783,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
             // only resize back to minimum view of this is still desired final state
             float f_threshold_height = f_min_video_height + [o_controls_bar height];
-            if(frameBeforePlayback.size.height > f_threshold_height || b_minimized_view)
+            if(frameBeforePlayback.size.height > f_threshold_height || b_minimized_view) {
                 [[self animator] setFrame:frameBeforePlayback display:YES];
+            }
         }
 
         frameBeforePlayback = NSMakeRect(0, 0, 0, 0);
@@ -810,8 +811,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [o_fspanel setNonActive: nil];
         }
     }
-
-    [self changePlaylistState: psVideoStartedOrStoppedEvent];
 }
 
 #pragma mark -

@@ -135,6 +135,8 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
         return VLC_EGENERIC;
     }
 
+    [[VLCMain sharedInstance] setActiveVideoPlayback: YES];
+
     SEL sel = @selector(setupVoutForWindow:withProposedVideoViewPosition:);
     NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[o_vout_controller methodSignatureForSelector:sel]];
     [inv setTarget:o_vout_controller];
@@ -148,19 +150,14 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
     VLCVoutView *videoView = nil;
     [inv getReturnValue:&videoView];
 
-    if (!videoView) {
-        msg_Err(p_wnd, "got no video view from the interface");
-        [o_vout_provider_lock unlock];
-        [o_pool release];
-        return VLC_EGENERIC;
-    }
+    // this method is not supposed to fail
+    assert(videoView != nil);
 
     msg_Dbg(VLCIntf, "returning videoview with proposed position x=%i, y=%i, width=%i, height=%i", cfg->x, cfg->y, cfg->width, cfg->height);
     p_wnd->handle.nsobject = videoView;
 
     [o_vout_provider_lock unlock];
 
-    [[VLCMain sharedInstance] setActiveVideoPlayback: YES];
     p_wnd->control = WindowControl;
 
     [o_pool release];
