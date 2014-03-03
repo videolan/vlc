@@ -202,7 +202,7 @@ access_LTLIBRARIES += libscreen_plugin.la
 endif
 
 librdp_plugin_la_SOURCES = access/rdp.c
-librdp_plugin_la_CFLAGS = $(AM_CFLAGS) $(FREERDP_CFLAGSp)
+librdp_plugin_la_CFLAGS = $(AM_CFLAGS) $(FREERDP_CFLAGS)
 librdp_plugin_la_LIBADD = $(FREERDP_LIBS)
 librdp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBrdp)
