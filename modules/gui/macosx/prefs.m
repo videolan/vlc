@@ -484,9 +484,8 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 
 - (id)initWithConfigItem: (module_config_t *) configItem
 {
-    NSString * name = _NS(configItem->psz_name);
+    NSString *name = toNSStr(configItem->psz_name);
     self = [super initWithName:name];
-    [name release];
     if (self != nil)
         _configItem = configItem;
 
