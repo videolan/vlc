@@ -288,7 +288,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt)
 
 error:
     vdp_release_x11(sys->vdp);
-    free(sys->context);
+    av_free(sys->context);
     free(sys);
     return VLC_EGENERIC;
 }
@@ -300,6 +300,6 @@ static void Close(vlc_va_t *va)
     if (sys->context->decoder != VDP_INVALID_HANDLE)
         Deinit(va);
     vdp_release_x11(sys->vdp);
-    free(sys->context);
+    av_free(sys->context);
     free(sys);
 }
