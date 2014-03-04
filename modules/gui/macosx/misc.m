@@ -488,7 +488,6 @@ void _drawFrameInRect(NSRect frameRect)
 
 - (void)scrollWheel:(NSEvent *)o_event
 {
-    intf_thread_t * p_intf = VLCIntf;
     BOOL b_forward = NO;
     CGFloat f_deltaY = [o_event deltaY];
     CGFloat f_deltaX = [o_event deltaX];
@@ -593,7 +592,6 @@ void _drawFrameInRect(NSRect frameRect)
 
 - (void)scrollWheel:(NSEvent *)o_event
 {
-    intf_thread_t * p_intf = VLCIntf;
     BOOL b_up = NO;
     CGFloat f_deltaY = [o_event deltaY];
     CGFloat f_deltaX = [o_event deltaX];
@@ -606,7 +604,6 @@ void _drawFrameInRect(NSRect frameRect)
     // positive for left / down, negative otherwise
     CGFloat f_delta = f_deltaX + f_deltaY;
     CGFloat f_abs;
-    int i_vlckey;
 
     if (f_delta > 0.0f)
         f_abs = f_delta;
@@ -913,7 +910,7 @@ void _drawFrameInRect(NSRect frameRect)
     return YES;
 }
 
-- (bool)isPartialStringValid:(NSString*)partialString newEditingString:(NSString**)newString errorDescription:(NSString**)error
+- (BOOL)isPartialStringValid:(NSString*)partialString newEditingString:(NSString**)newString errorDescription:(NSString**)error
 {
     if ([partialString rangeOfCharacterFromSet:o_forbidden_characters options:NSLiteralSearch].location != NSNotFound) {
         return NO;

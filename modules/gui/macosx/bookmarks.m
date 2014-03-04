@@ -36,7 +36,6 @@
 
 #import "bookmarks.h"
 #import "wizard.h"
-#import <vlc_interface.h>
 #import "CompatibilityFixes.h"
 
 @interface VLCBookmarks (Internal)
@@ -387,7 +386,7 @@ clear:
     input_thread_t * p_input = pl_CurrentInput(VLCIntf);
     seekpoint_t **pp_bookmarks;
     int i_bookmarks;
-    id ret;
+    id ret = @"";
 
     if (!p_input)
         return @"";

@@ -412,7 +412,7 @@
 - (NSRect) customConstrainFrameRect: (NSRect)frameRect toScreen: (NSScreen*)screen
 {
     NSRect screenRect = [screen visibleFrame];
-    float difference;
+    CGFloat difference;
 
     /* Move top edge of the window inside the screen */
     difference = NSMaxY (frameRect) - NSMaxY (screenRect);
@@ -425,7 +425,7 @@
      the window */
     difference = NSMaxY (screenRect) - NSMaxY (frameRect);
     if (_styleMask & NSResizableWindowMask) {
-        float difference2;
+        CGFloat difference2;
 
         difference2 = screenRect.origin.y - frameRect.origin.y;
         difference2 -= difference;
@@ -514,17 +514,17 @@
     NSPoint topleftbase = NSMakePoint(0, [self frame].size.height);
     NSPoint topleftscreen = [self convertBaseToScreen: topleftbase];
 
-    unsigned int i_width = size.width;
-    unsigned int i_height = size.height;
-    if (i_width < windowMinSize.width)
-        i_width = windowMinSize.width;
-    if (i_height < f_min_video_height)
-        i_height = f_min_video_height;
+    CGFloat f_width = size.width;
+    CGFloat f_height = size.height;
+    if (f_width < windowMinSize.width)
+        f_width = windowMinSize.width;
+    if (f_height < f_min_video_height)
+        f_height = f_min_video_height;
 
     /* Calculate the window's new size */
     NSRect new_frame;
-    new_frame.size.width = [self frame].size.width - [o_video_view frame].size.width + i_width;
-    new_frame.size.height = [self frame].size.height - [o_video_view frame].size.height + i_height;
+    new_frame.size.width = [self frame].size.width - [o_video_view frame].size.width + f_width;
+    new_frame.size.height = [self frame].size.height - [o_video_view frame].size.height + f_height;
     new_frame.origin.x = topleftscreen.x;
     new_frame.origin.y = topleftscreen.y - new_frame.size.height;
 
@@ -583,8 +583,8 @@
         NSRect videoWindowFrame = [self frame];
         NSRect viewRect = [o_video_view convertRect:[o_video_view bounds] toView: nil];
         NSRect contentRect = [self contentRectForFrameRect:videoWindowFrame];
-        float marginy = viewRect.origin.y + videoWindowFrame.size.height - contentRect.size.height;
-        float marginx = contentRect.size.width - viewRect.size.width;
+        CGFloat marginy = viewRect.origin.y + videoWindowFrame.size.height - contentRect.size.height;
+        CGFloat marginx = contentRect.size.width - viewRect.size.width;
         if (o_titlebar_view && b_dark_interface)
             marginy += [o_titlebar_view frame].size.height;
 

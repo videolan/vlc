@@ -284,7 +284,9 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     i_old_profile_index = [o_profile_pop indexOfSelectedItem];
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSUInteger selectedProfile = [o_profile_pop indexOfSelectedItem];
+    NSInteger selectedProfile = [o_profile_pop indexOfSelectedItem];
+    if (selectedProfile < 0)
+        return;
 
     audio_output_t *p_aout = getAout();
     playlist_t *p_playlist = pl_Get(p_intf);
@@ -301,7 +303,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     }
 
     /* fetch preset */
-    NSArray *items = [[[defaults objectForKey:@"AudioEffectProfiles"] objectAtIndex:selectedProfile] componentsSeparatedByString:@";"];
+    NSArray *items = [[[defaults objectForKey:@"AudioEffectProfiles"] objectAtIndex:(NSUInteger) selectedProfile] componentsSeparatedByString:@";"];
 
     /* eq preset */
     vlc_object_t *p_object = VLC_OBJECT(getAout());
@@ -947,7 +949,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 - (IBAction)spat_sliderUpdated:(id)sender
 {
     audio_output_t *p_aout = getAout();
-    char *value;
+    char *value = NULL;
     if (sender == o_spat_band1_sld)
         value = "spatializer-roomsize";
     else if (sender == o_spat_band2_sld)

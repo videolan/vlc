@@ -35,9 +35,6 @@
 #import <vlc_strings.h>
 #import <vlc_url.h>
 
-@interface VLCMainWindow (Internal)
-- (void)jumpWithValue:(char *)p_value forward:(BOOL)b_value;
-@end
 
 @implementation VLCCoreInteraction
 static VLCCoreInteraction *_o_sharedInstance = nil;
@@ -67,13 +64,6 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     [super dealloc];
 }
 
-- (void)awakeFromNib
-{
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(applicationWillFinishLaunching:)
-                                                 name: NSApplicationWillFinishLaunchingNotification
-                                               object: nil];
-}
 
 #pragma mark -
 #pragma mark Playback Controls
@@ -573,12 +563,11 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
             NSUInteger count = [o_values count];
 
             input_thread_t * p_input = pl_CurrentInput(VLCIntf);
-            BOOL b_returned = NO;
 
             if (count == 1 && p_input) {
-                b_returned = input_AddSubtitleOSD(p_input, [[o_values objectAtIndex:0] UTF8String], true, true);
+                int i_result = input_AddSubtitleOSD(p_input, [[o_values objectAtIndex:0] UTF8String], true, true);
                 vlc_object_release(p_input);
-                if (!b_returned)
+                if (i_result == VLC_SUCCESS)
                     return YES;
             }
             else if (p_input)

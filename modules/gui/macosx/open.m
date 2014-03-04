@@ -463,7 +463,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         if ([o_file_custom_timing_ckb state] == NSOnState) {
             NSArray * components = [[o_file_starttime_fld stringValue] componentsSeparatedByString:@":"];
             NSUInteger componentCount = [components count];
-            NSInteger tempValue;
+            NSInteger tempValue = 0;
             if (componentCount == 1)
                 tempValue = [[components objectAtIndex:0] intValue];
             else if (componentCount == 2)
@@ -1493,7 +1493,7 @@ out:
     if (channels) {
         NSString *channel;
         [[o_eyetv_channels_pop menu] addItem: [NSMenuItem separatorItem]];
-        while (channel = [channels nextObject])
+        while ((channel = [channels nextObject]) != nil)
             /* we have to add items this way, because we accept duplicates
              * additionally, we save a bit of time */
             [[[o_eyetv_channels_pop menu] addItemWithTitle: channel action: nil keyEquivalent: @""] setTag:++x];

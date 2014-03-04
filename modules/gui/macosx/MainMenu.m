@@ -292,8 +292,11 @@ static VLCMainMenu *_o_sharedInstance = nil;
             mi = [[NSMenuItem alloc] initWithTitle: _NS(p_item->list_text[i]) action:NULL keyEquivalent: @""];
         else if (p_item->list.i[i])
             mi = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%d", p_item->list.i[i]] action:NULL keyEquivalent: @""];
-        else
+        else {
             msg_Err(p_intf, "item %d of pref %s failed to be created", i, psz_name);
+            continue;
+        }
+
         [mi setTarget:self];
         [mi setAction:selector];
         [mi setTag:p_item->list.i[i]];
@@ -594,7 +597,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (void)refreshVoutDeviceMenu:(NSNotification *)o_notification
 {
-    NSUInteger count = [o_mu_screen numberOfItems];
+    NSUInteger count = (NSUInteger) [o_mu_screen numberOfItems];
     NSMenu * o_submenu = o_mu_screen;
     if (count > 0)
         [o_submenu removeAllItems];
@@ -987,7 +990,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     config_PutInt(p_intf, [representedObject UTF8String], intValue);
 
     NSMenu *menu = [sender menu];
-    NSUInteger count = [menu numberOfItems];
+    NSUInteger count = (NSUInteger) [menu numberOfItems];
     for (NSUInteger x = 0; x < count; x++)
         [[menu itemAtIndex:x] setState:NSOffState];
     [[menu itemWithTag:intValue] setState:NSOnState];
@@ -1011,7 +1014,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (IBAction)telxNavLink:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
     vlc_object_t *p_vbi;
     int i_page = 0;
 

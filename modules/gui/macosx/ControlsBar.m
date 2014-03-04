@@ -146,7 +146,7 @@
 
     // remove fullscreen button for lion fullscreen
     if (b_nativeFullscreenMode) {
-        float f_width = [o_fullscreen_btn frame].size.width;
+        CGFloat f_width = [o_fullscreen_btn frame].size.width;
 
         NSRect frame = [o_time_fld frame];
         frame.origin.x += f_width;
@@ -447,6 +447,14 @@
         [o_fullscreen_btn setState:b_fullscreen];
 }
 
+- (void)dealloc {
+    [o_play_img release];
+    [o_play_pressed_img release];
+    [o_pause_img release];
+    [o_pause_pressed_img release];
+    [super dealloc];
+}
+
 @end
 
 
@@ -645,7 +653,7 @@ else \
 [[item animator] setFrame: frame]
 
     NSRect frame;
-    float f_space = [o_effects_btn frame].size.width;
+    CGFloat f_space = [o_effects_btn frame].size.width;
     // extra margin between button and volume up button
     if (b_nativeFullscreenMode)
         f_space += 2;
@@ -695,7 +703,7 @@ else \
 [[item animator] setFrame: frame]
 
     NSRect frame;
-    float f_space = [o_effects_btn frame].size.width;
+    CGFloat f_space = [o_effects_btn frame].size.width;
     // extra margin between button and volume up button
     if (b_nativeFullscreenMode)
         f_space += 2;
@@ -925,7 +933,7 @@ else \
 - (void)addPlaymodeButtons:(BOOL)b_fast
 {
     NSRect frame;
-    float f_space = [o_repeat_btn frame].size.width + [o_shuffle_btn frame].size.width - 6.;
+    CGFloat f_space = [o_repeat_btn frame].size.width + [o_shuffle_btn frame].size.width - 6.;
 
     if (b_dark_interface) {
         [[o_playlist_btn animator] setImage:[NSImage imageNamed:@"playlist_dark"]];
@@ -958,7 +966,7 @@ else \
 - (void)removePlaymodeButtons:(BOOL)b_fast
 {
     NSRect frame;
-    float f_space = [o_repeat_btn frame].size.width + [o_shuffle_btn frame].size.width - 6.;
+    CGFloat f_space = [o_repeat_btn frame].size.width + [o_shuffle_btn frame].size.width - 6.;
     [o_repeat_btn setHidden: YES];
     [o_shuffle_btn setHidden: YES];
 
@@ -1140,6 +1148,20 @@ else \
     }
 
     [[VLCMainMenu sharedInstance] setRateControlsEnabled: b_control];
+}
+
+- (void)dealloc {
+    [o_repeat_img release];
+    [o_repeat_pressed_img release];
+    [o_repeat_all_img release];
+    [o_repeat_all_pressed_img release];
+    [o_repeat_one_img release];
+    [o_repeat_one_pressed_img release];
+    [o_shuffle_img release];
+    [o_shuffle_pressed_img release];
+    [o_shuffle_on_img release];
+    [o_shuffle_on_pressed_img release];
+    [super dealloc];
 }
 
 @end

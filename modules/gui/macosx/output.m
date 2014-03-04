@@ -372,8 +372,7 @@
              * port correctly. Not need, if there isn't any path following the
              * hostname. */
             NSArray * o_urlItems = [[o_stream_address stringValue] componentsSeparatedByString: @"/"];
-            NSMutableString * o_finalStreamAddress;
-            o_finalStreamAddress = [[NSMutableString alloc] init];
+            NSMutableString * o_finalStreamAddress = [[[NSMutableString alloc] init] autorelease];
 
             if ([o_urlItems count] == 1)
                 [o_finalStreamAddress appendFormat: @"\"%@:%@\"", [o_stream_address stringValue],[o_stream_port stringValue]];

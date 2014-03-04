@@ -46,7 +46,7 @@
 
     NSTimer *o_scroll_timer;
     float f_current;
-    float f_end;
+    CGFloat f_end;
     NSTimeInterval i_start;
     BOOL b_restart;
     BOOL b_isSetUp;

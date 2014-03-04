@@ -785,7 +785,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     playlist_t * p_playlist = pl_Get(VLCIntf);
     PL_LOCK;
-    BOOL kidsAround = p_playlist->p_local_category->i_children;
+    BOOL kidsAround = p_playlist->p_local_category->i_children != 0;
     PL_UNLOCK;
     if (kidsAround && var_GetBool(p_playlist, "playlist-autostart"))
         [[self playlist] playItem:nil];
@@ -1021,9 +1021,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     if ([o_names count] == 1 && psz_uri) {
         input_thread_t * p_input = pl_CurrentInput(VLCIntf);
         if (p_input) {
-            BOOL b_returned = input_AddSubtitleOSD(p_input, [[o_names objectAtIndex:0] UTF8String], true, true);
+            int i_result = input_AddSubtitleOSD(p_input, [[o_names objectAtIndex:0] UTF8String], true, true);
             vlc_object_release(p_input);
-            if (!b_returned) {
+            if (i_result == VLC_SUCCESS) {
                 free(psz_uri);
                 return;
             }

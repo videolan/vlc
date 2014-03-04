@@ -30,16 +30,13 @@
  * Preamble
  *****************************************************************************/
 #import <stdlib.h>                                                 /* free() */
-#import <string.h>
 
 #import "CompatibilityFixes.h"
 #import "intf.h"
 #import "VideoView.h"
 #import "CoreInteraction.h"
 #import "MainMenu.h"
-#import "MainWindow.h"
 
-#import <vlc_common.h>
 #import <vlc_keys.h>
 
 

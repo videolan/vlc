@@ -89,8 +89,8 @@ typedef enum {
     BOOL b_splitview_removed;
     BOOL b_minimized_view;
 
-    NSUInteger i_lastSplitViewHeight;
-    NSUInteger i_lastLeftSplitViewWidth;
+    CGFloat f_lastSplitViewHeight;
+    CGFloat f_lastLeftSplitViewWidth;
 
     NSMutableArray *o_sidebaritems;
 

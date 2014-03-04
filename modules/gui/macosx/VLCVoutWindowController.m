@@ -330,7 +330,7 @@
     if (!p_intf || (!b_nativeFullscreenMode && !p_wnd))
         return;
     playlist_t *p_playlist = pl_Get(p_intf);
-    BOOL b_fullscreen = i_full;
+    BOOL b_fullscreen = i_full != 0;
 
     if (!var_GetBool(p_playlist, "fullscreen") != !b_fullscreen)
         var_SetBool(p_playlist, "fullscreen", b_fullscreen);

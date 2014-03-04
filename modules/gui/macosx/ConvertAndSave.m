@@ -826,7 +826,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (NSString *)currentEncapsulationFormatAsFileExtension:(BOOL)b_extension
 {
-    NSUInteger cellTag = [[_customize_encap_matrix selectedCell] tag];
+    NSUInteger cellTag = (NSUInteger) [[_customize_encap_matrix selectedCell] tag];
     NSString * returnValue;
     switch (cellTag) {
         case MPEGTS:
