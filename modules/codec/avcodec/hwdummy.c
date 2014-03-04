@@ -51,11 +51,6 @@ vlc_module_end()
 #define DATA_MAGIC    0xda1a0000
 #define OPAQUE_MAGIC  0x0da00e00
 
-struct vlc_va_sys_t
-{
-    AVVDPAUContext context;
-};
-
 static int Lock(vlc_va_t *va, void **opaque, uint8_t **data)
 {
     *data = (void *)(uintptr_t)DATA_MAGIC;
@@ -104,11 +99,8 @@ static int Copy(vlc_va_t *va, picture_t *pic, void *opaque, uint8_t *data)
 static int Setup(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
                  int width, int height)
 {
-    vlc_va_sys_t *sys = va->sys;
-
     (void) width; (void) height;
-
-    *ctxp = &sys->context;
+    *ctxp = (AVVDPAUContext *)va->sys;
     *chromap = VLC_CODEC_YV12;
     return VLC_SUCCESS;
 }
@@ -121,17 +113,17 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt)
         vlc_fourcc_t fourcc;
     } u = { .fourcc = fmt->i_codec };
 
-    vlc_va_sys_t *sys = calloc(1, sizeof (*sys));
-    if (unlikely(sys == NULL))
+    AVVDPAUContext *hwctx = av_vdpau_alloc_context();
+    if (unlikely(hwctx == NULL))
        return VLC_ENOMEM;
 
     msg_Dbg(va, "codec %d (%4.4s) profile %d level %d", ctx->codec_id, u.str,
             fmt->i_profile, fmt->i_level);
 
-    sys->context.decoder = DECODER_MAGIC;
-    sys->context.render = Render;
+    hwctx->decoder = DECODER_MAGIC;
+    hwctx->render = Render;
 
-    va->sys = sys;
+    va->sys = (vlc_va_sys_t *)hwctx;
     va->description = (char *)"Dummy video decoding accelerator";
     va->pix_fmt = AV_PIX_FMT_VDPAU;
     va->setup = Setup;
@@ -143,5 +135,5 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt)
 
 static void Close(vlc_va_t *va)
 {
-    free(va->sys);
+    av_free(va->sys);
 }
