@@ -498,7 +498,7 @@ static int Open(vlc_va_t *external, int codec_id, const es_format_t *fmt)
 {
     vlc_va_dxva2_t *va = calloc(1, sizeof(*va));
     if (!va)
-        return NULL;
+        return VLC_EGENERIC;
 
     external->sys = va;
     /* */
