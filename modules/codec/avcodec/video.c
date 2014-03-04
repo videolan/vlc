@@ -1328,7 +1328,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     if( p_context->level != FF_LEVEL_UNKNOWN)
         p_dec->fmt_in.i_level = p_context->level;
 
-    p_va = vlc_va_New( VLC_OBJECT(p_dec), p_sys->i_codec_id, &p_dec->fmt_in );
+    p_va = vlc_va_New( VLC_OBJECT(p_dec), p_context, &p_dec->fmt_in );
     if( p_va == NULL )
         goto end;
 

@@ -31,11 +31,11 @@
 static int vlc_va_Start(void *func, va_list ap)
 {
     vlc_va_t *va = va_arg(ap, vlc_va_t *);
-    int codec = va_arg(ap, int);
+    AVCodecContext *ctx = va_arg(ap, AVCodecContext *);
     const es_format_t *fmt = va_arg(ap, const es_format_t *);
     int (*open)(vlc_va_t *, int, const es_format_t *) = func;
 
-    return open(va, codec, fmt);
+    return open(va, ctx->codec_id, fmt);
 }
 
 static void vlc_va_Stop(void *func, va_list ap)
@@ -46,14 +46,15 @@ static void vlc_va_Stop(void *func, va_list ap)
     close(va);
 }
 
-vlc_va_t *vlc_va_New(vlc_object_t *obj, int codec_id, const es_format_t *fmt)
+vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
+                     const es_format_t *fmt)
 {
     vlc_va_t *va = vlc_object_create(obj, sizeof (*va));
     if (unlikely(va == NULL))
         return NULL;
 
     va->module = vlc_module_load(va, "hw decoder", "$avcodec-hw", true,
-                                 vlc_va_Start, va, codec_id, fmt);
+                                 vlc_va_Start, va, avctx, fmt);
     if (va->module == NULL)
     {
         vlc_object_release(va);
