@@ -283,6 +283,8 @@ struct vlc_va_sys_t
     int          surface_height;
     vlc_fourcc_t surface_chroma;
 
+    int          thread_count;
+
     vlc_va_surface_t surface[VA_DXVA2_MAX_SURFACE_COUNT];
     LPDIRECT3DSURFACE9 hw_surface[VA_DXVA2_MAX_SURFACE_COUNT];
 };
@@ -540,6 +542,8 @@ static int Open(vlc_va_t *external, AVCodecContext *ctx,
         msg_Err(va->log, "DxFindVideoServiceConversion failed");
         goto error;
     }
+
+    va->thread_count = ctx->thread_count;
 
     /* TODO print the hardware name/vendor for debugging purposes */
     external->description = DxDescribe(va);
@@ -859,7 +863,7 @@ static int DxCreateVideoDecoder(vlc_va_dxva2_t *va,
     int surface_count;
     switch (codec_id) {
     case AV_CODEC_ID_H264:
-        surface_count = 16 + 1;
+        surface_count = 16 + va->thread_count + 2;
         break;
     default:
         surface_count = 2 + 1;

@@ -96,7 +96,7 @@ struct vlc_va_sys_t
 };
 
 /* */
-static int Open( vlc_va_t *va, int i_codec_id )
+static int Open( vlc_va_t *va, int i_codec_id, int i_thread_count )
 {
     vlc_va_sys_t *sys = calloc( 1, sizeof(*sys) );
     if ( unlikely(sys == NULL) )
@@ -129,8 +129,8 @@ static int Open( vlc_va_t *va, int i_codec_id )
         break;
     case AV_CODEC_ID_H264:
         i_profile = VAProfileH264High;
-        i_surface_count = 16+1;
-        break;
+        i_surface_count = 16 + i_thread_count + 2;
+        break;;
     default:
         return VLC_EGENERIC;
     }
@@ -552,7 +552,7 @@ static int Create( vlc_va_t *p_va, AVCodecContext *ctx,
 
     (void) fmt;
 
-    int err = Open( p_va, ctx->codec_id );
+    int err = Open( p_va, ctx->codec_id, ctx->thread_count );
     if( err )
         return err;
 
