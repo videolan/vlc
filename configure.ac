@@ -1674,20 +1674,7 @@ PKG_ENABLE_MODULES_VLC([DVDREAD], [], [dvdread], [dvdread input module], [auto])
 dnl
 dnl libdvdnav plugin
 dnl
-AC_ARG_ENABLE(dvdnav,
-  [AS_HELP_STRING([--disable-dvdnav],
-    [disable DVD navigation with libdvdnav (default auto)])])
-AS_IF([test "${enable_dvdnav}" != "no"], [
-  PKG_CHECK_MODULES(DVDNAV, dvdnav, [
-    VLC_ADD_PLUGIN([dvdnav])
-    AC_CHECK_LIB(dvdnav, dvdnav_get_video_resolution,
-      AC_DEFINE(HAVE_DVDNAV_GET_VIDEO_RESOLUTION, 1, [Define if you have dvdnav_get_video_resolution.]),
-        [], [${LIBS_dvdnav}])
-    AC_CHECK_LIB(dvdnav, dvdnav_describe_title_chapters,
-      AC_DEFINE(HAVE_DVDNAV_DESCRIBE_TITLE_CHAPTERS, 1, [Define if you have dvdnav_describe_title_chapters.]),
-        [], [${LIBS_dvdnav}])],
-      [AC_MSG_WARN([${DVDNAV_PKG_ERRORS}.])])
-])
+PKG_ENABLE_MODULES_VLC([DVDNAV], [], [dvdnav >= 4.2.1], [DVD with navigation input module (dvdnav)], [auto])
 
 dnl
 dnl  Blu-ray Disc Support with libbluray
