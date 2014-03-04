@@ -41,6 +41,22 @@
 #include <freerdp/channels/channels.h>
 #include <freerdp/gdi/gdi.h>
 
+#if !defined(FREERDP_INTERFACE_VERSION)
+# include <freerdp/version.h>
+#endif
+
+#if !defined(FREERDP_VERSION_MAJOR) || \
+    (defined(FREERDP_VERSION_MAJOR) && !(FREERDP_VERSION_MAJOR >= 1 && FREERDP_VERSION_MINOR >= 1 ))
+# define SoftwareGdi sw_gdi
+# define Fullscreen fullscreen
+# define ServerHostname hostname
+# define Username username
+# define Password password
+# define ServerPort port
+# define EncryptionMethods encryption
+# define ContextSize context_size
+#endif
+
 #include <errno.h>
 #ifdef HAVE_POLL
 # include <poll.h>
@@ -198,15 +214,15 @@ static bool preConnectHandler( freerdp *p_instance )
     demux_sys_t *p_sys = p_vlccontext->p_demux->p_sys;
 
     /* Configure connexion */
-    p_instance->settings->sw_gdi = true; /* render in buffer */
-    p_instance->settings->fullscreen = true;
-    p_instance->settings->hostname = strdup( p_sys->psz_hostname );
-    p_instance->settings->username =
+    p_instance->settings->SoftwareGdi = true; /* render in buffer */
+    p_instance->settings->Fullscreen = true;
+    p_instance->settings->ServerHostname = strdup( p_sys->psz_hostname );
+    p_instance->settings->Username =
             var_InheritString( p_vlccontext->p_demux, CFG_PREFIX "user" );
-    p_instance->settings->password =
+    p_instance->settings->Password =
             var_InheritString( p_vlccontext->p_demux, CFG_PREFIX "password" );
-    p_instance->settings->port = p_sys->i_port;
-    p_instance->settings->encryption =
+    p_instance->settings->ServerPort = p_sys->i_port;
+    p_instance->settings->EncryptionMethods =
             var_InheritBool( p_vlccontext->p_demux, CFG_PREFIX "encrypt" );
 
     return true;
@@ -217,9 +233,16 @@ static bool postConnectHandler( freerdp *p_instance )
     vlcrdp_context_t * p_vlccontext = (vlcrdp_context_t *) p_instance->context;
 
     msg_Dbg( p_vlccontext->p_demux, "connected to desktop %dx%d (%d bpp)",
+#if (FREERDP_VERSION_MAJOR >= 1 && FREERDP_VERSION_MINOR >= 1 )
+             p_instance->settings->DesktopWidth,
+             p_instance->settings->DesktopHeight,
+             p_instance->settings->ColorDepth
+#else
              p_instance->settings->width,
              p_instance->settings->height,
-             p_instance->settings->color_depth );
+             p_instance->settings->color_depth
+#endif
+             );
 
     p_instance->update->DesktopResize = desktopResizeHandler;
     p_instance->update->BeginPaint = beginPaintHandler;
@@ -415,7 +438,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_instance->Authenticate = authenticateHandler;
 
     /* Set up context handlers and let it be allocated */
-    p_sys->p_instance->context_size = sizeof( vlcrdp_context_t );
+    p_sys->p_instance->ContextSize = sizeof( vlcrdp_context_t );
     freerdp_context_new( p_sys->p_instance );
 
     vlcrdp_context_t * p_vlccontext = (vlcrdp_context_t *) p_sys->p_instance->context;
