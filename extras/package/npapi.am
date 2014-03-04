@@ -30,7 +30,7 @@ npapi-vlc/configure: stamp-npapi
 npapi-vlc/Makefile: npapi-vlc/configure
 	cd npapi-vlc && \
 	$(SHELL) ./configure \
-		--prefix=$(prefix) \
+		--prefix=/ \
 		--host=$(host_alias) --build=$(build_alias) \
 		CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)" \
 		CC="$(CC)" CFLAGS="$(CFLAGS)" \
