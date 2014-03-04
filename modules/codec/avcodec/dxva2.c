@@ -855,14 +855,18 @@ static int DxCreateVideoDecoder(vlc_va_dxva2_t *va,
     /* Allocates all surfaces needed for the decoder */
     va->surface_width  = (fmt->i_width  + 15) & ~15;
     va->surface_height = (fmt->i_height + 15) & ~15;
+    int surface_count;
     switch (codec_id) {
     case AV_CODEC_ID_H264:
-        va->surface_count = 16 + 1;
+        surface_count = 16 + 1;
         break;
     default:
-        va->surface_count = 2 + 1;
+        surface_count = 2 + 1;
         break;
     }
+    if (surface_count > VA_DXVA2_MAX_SURFACE_COUNT)
+        return VLC_EGENERIC;
+    va->surface_count = surface_count;
     if (FAILED(IDirectXVideoDecoderService_CreateSurface(va->vs,
                                                          va->surface_width,
                                                          va->surface_height,
