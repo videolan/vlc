@@ -132,6 +132,7 @@ static sout_instance_t *RequestSout( input_resource_t *p_resource,
         return NULL;
     }
 #else
+    VLC_UNUSED (p_resource); VLC_UNUSED (p_sout); VLC_UNUSED (psz_sout);
     return NULL;
 #endif
 }

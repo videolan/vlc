@@ -2479,7 +2479,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     {
         const int i_id = (int)va_arg( args, int );
         es_out_id_t *p_es = EsOutGetFromID( out, i_id );
-        int i_new_query;
+        int i_new_query = 0;
 
         switch( i_query )
         {
