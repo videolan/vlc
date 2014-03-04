@@ -50,7 +50,7 @@ VLC-tmp: vlc
 	mkdir -p $@/Contents/MacOS/share/locale/
 	cp -r "$(prefix)/lib/vlc/lua" "$(prefix)/share/vlc/lua" $@/Contents/MacOS/share/
 	mkdir -p $@/Contents/MacOS/include/
-	cp -r "$(srcdir)/include/vlc" $@/Contents/MacOS/include/
+	(cd "$(prefix)/include" && $(AMTAR) -c --exclude "plugins" vlc) | $(AMTAR) -x -C $@/Contents/MacOS/include/
 	$(INSTALL) -m 644 $(srcdir)/share/vlc512x512.png $@/Contents/MacOS/share/vlc512x512.png
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
 	  $(INSTALL) -d $@/Contents/MacOS/share/locale/$${i}/LC_MESSAGES ; \
