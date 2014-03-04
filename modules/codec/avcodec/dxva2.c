@@ -347,8 +347,6 @@ static int Setup(vlc_va_t *external, void **hw, vlc_fourcc_t *chroma,
     va->hw.cfg = &va->cfg;
     va->hw.surface_count = va->surface_count;
     va->hw.surface = va->hw_surface;
-    for (unsigned i = 0; i < va->surface_count; i++)
-        va->hw.surface[i] = va->surface[i].d3d;
 
     /* */
     DxCreateVideoConversion(va);
@@ -865,7 +863,6 @@ static int DxCreateVideoDecoder(vlc_va_dxva2_t *va,
         va->surface_count = 2 + 1;
         break;
     }
-    LPDIRECT3DSURFACE9 surface_list[VA_DXVA2_MAX_SURFACE_COUNT];
     if (FAILED(IDirectXVideoDecoderService_CreateSurface(va->vs,
                                                          va->surface_width,
                                                          va->surface_height,
@@ -874,7 +871,7 @@ static int DxCreateVideoDecoder(vlc_va_dxva2_t *va,
                                                          D3DPOOL_DEFAULT,
                                                          0,
                                                          DXVA2_VideoDecoderRenderTarget,
-                                                         surface_list,
+                                                         va->hw_surface,
                                                          NULL))) {
         msg_Err(va->log, "IDirectXVideoAccelerationService_CreateSurface failed");
         va->surface_count = 0;
@@ -882,7 +879,7 @@ static int DxCreateVideoDecoder(vlc_va_dxva2_t *va,
     }
     for (unsigned i = 0; i < va->surface_count; i++) {
         vlc_va_surface_t *surface = &va->surface[i];
-        surface->d3d = surface_list[i];
+        surface->d3d = va->hw_surface[i];
         surface->refcount = 0;
         surface->order = 0;
     }
@@ -967,7 +964,7 @@ static int DxCreateVideoDecoder(vlc_va_dxva2_t *va,
                                                               &va->input,
                                                               &dsc,
                                                               &va->cfg,
-                                                              surface_list,
+                                                              va->hw_surface,
                                                               va->surface_count,
                                                               &decoder))) {
         msg_Err(va->log, "IDirectXVideoDecoderService_CreateVideoDecoder failed");
