@@ -46,7 +46,7 @@
     vaCreateSurfaces(d, w, h, f, ns, s)
 #endif
 
-static int Create( vlc_va_t *, int, const es_format_t * );
+static int Create( vlc_va_t *, AVCodecContext *, const es_format_t * );
 static void Delete( vlc_va_t * );
 
 vlc_module_begin ()
@@ -541,7 +541,8 @@ static void Delete( vlc_va_t *va )
     free( sys );
 }
 
-static int Create( vlc_va_t *p_va, int i_codec_id, const es_format_t *fmt )
+static int Create( vlc_va_t *p_va, AVCodecContext *ctx,
+                   const es_format_t *fmt )
 {
     if( !vlc_xlib_init( VLC_OBJECT(p_va) ) )
     {
@@ -551,7 +552,7 @@ static int Create( vlc_va_t *p_va, int i_codec_id, const es_format_t *fmt )
 
     (void) fmt;
 
-    int err = Open( p_va, i_codec_id );
+    int err = Open( p_va, ctx->codec_id );
     if( err )
         return err;
 

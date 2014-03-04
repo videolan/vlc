@@ -38,7 +38,7 @@
 #include "vlc_vdpau.h"
 #include "../../codec/avcodec/va.h"
 
-static int Open(vlc_va_t *, int, const es_format_t *);
+static int Open(vlc_va_t *, AVCodecContext *, const es_format_t *);
 static void Close(vlc_va_t *);
 
 vlc_module_begin()
@@ -169,13 +169,13 @@ static int Setup(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
     return Init(va, ctxp, chromap, width, height);
 }
 
-static int Open(vlc_va_t *va, int codec, const es_format_t *fmt)
+static int Open(vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt)
 {
     VdpStatus err;
     VdpDecoderProfile profile;
     int level;
 
-    switch (codec)
+    switch (ctx->codec_id)
     {
       case AV_CODEC_ID_MPEG1VIDEO:
         profile = VDP_DECODER_PROFILE_MPEG1;
@@ -262,7 +262,7 @@ static int Open(vlc_va_t *va, int codec, const es_format_t *fmt)
         break;
 
       default:
-        msg_Err(va, "unknown codec %d", codec);
+        msg_Err(va, "unknown codec %d", ctx->codec_id);
         return VLC_EGENERIC;
     }
 

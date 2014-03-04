@@ -39,7 +39,7 @@
 #include <libavcodec/vda.h>
 #include <VideoDecodeAcceleration/VDADecoder.h>
 
-static int Open( vlc_va_t *, int, const es_format_t * );
+static int Open( vlc_va_t *, AVCodecContext *, const es_format_t * );
 static void Close( vlc_va_t * );
 
 static const int  nvda_pix_fmt_list[] = { 0, 1 };
@@ -272,10 +272,11 @@ static void Close( vlc_va_t *external )
     free( p_va );
 }
 
-static int Open( vlc_va_t *external, int i_codec_id, const es_format_t *fmt )
+static int Open( vlc_va_t *external, AVCodecContext *ctx,
+                 const es_format_t *fmt )
 {
     msg_Dbg( external, "opening VDA module" );
-    if( i_codec_id != AV_CODEC_ID_H264 )
+    if( ctx->codec_id != AV_CODEC_ID_H264 )
     {
         msg_Warn( external, "input codec isn't H264, canceling VDA decoding" );
         return VLC_EGENERIC;

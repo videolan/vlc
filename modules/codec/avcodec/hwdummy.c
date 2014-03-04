@@ -35,7 +35,7 @@
 #include <vlc_picture.h>
 #include "../../codec/avcodec/va.h"
 
-static int Open(vlc_va_t *, int, const es_format_t *);
+static int Open(vlc_va_t *, AVCodecContext *, const es_format_t *);
 static void Close(vlc_va_t *);
 
 vlc_module_begin()
@@ -113,7 +113,7 @@ static int Setup(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
     return VLC_SUCCESS;
 }
 
-static int Open(vlc_va_t *va, int codec, const es_format_t *fmt)
+static int Open(vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt)
 {
     union
     {
@@ -125,7 +125,7 @@ static int Open(vlc_va_t *va, int codec, const es_format_t *fmt)
     if (unlikely(sys == NULL))
        return VLC_ENOMEM;
 
-    msg_Dbg(va, "codec %d (%4.4s) profile %d level %d", codec, u.str,
+    msg_Dbg(va, "codec %d (%4.4s) profile %d level %d", ctx->codec_id, u.str,
             fmt->i_profile, fmt->i_level);
 
     sys->context.decoder = DECODER_MAGIC;

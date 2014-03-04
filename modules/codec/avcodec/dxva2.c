@@ -51,7 +51,7 @@
 #include "va.h"
 #include "../../video_chroma/copy.h"
 
-static int Open(vlc_va_t *, int, const es_format_t *);
+static int Open(vlc_va_t *, AVCodecContext *, const es_format_t *);
 static void Close(vlc_va_t *);
 
 vlc_module_begin()
@@ -492,7 +492,8 @@ static void Close(vlc_va_t *external)
     free(va);
 }
 
-static int Open(vlc_va_t *external, int codec_id, const es_format_t *fmt)
+static int Open(vlc_va_t *external, AVCodecContext *ctx,
+                const es_format_t *fmt)
 {
     vlc_va_dxva2_t *va = calloc(1, sizeof(*va));
     if (!va)
@@ -501,7 +502,7 @@ static int Open(vlc_va_t *external, int codec_id, const es_format_t *fmt)
     external->sys = va;
     /* */
     va->log = VLC_OBJECT(external);
-    va->codec_id = codec_id;
+    va->codec_id = ctx->codec_id;
     (void) fmt;
 
     /* Load dll*/
