@@ -173,97 +173,32 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt)
 {
     VdpStatus err;
     VdpDecoderProfile profile;
-    int level;
+    int level = fmt->i_level;
+
+    if (av_vdpau_get_profile(ctx, &profile))
+    {
+        msg_Err(va, "unsupported codec %d or profile %d", ctx->codec_id,
+                fmt->i_profile);
+        return VLC_EGENERIC;
+    }
 
     switch (ctx->codec_id)
     {
-      case AV_CODEC_ID_MPEG1VIDEO:
-        profile = VDP_DECODER_PROFILE_MPEG1;
-        level = VDP_DECODER_LEVEL_MPEG1_NA;
-        break;
-
-      case AV_CODEC_ID_MPEG2VIDEO:
-        switch (fmt->i_profile)
-        {
-          case FF_PROFILE_MPEG2_MAIN:
-            profile = VDP_DECODER_PROFILE_MPEG2_MAIN;
+        case AV_CODEC_ID_MPEG1VIDEO:
+            level = VDP_DECODER_LEVEL_MPEG1_NA;
             break;
-          case FF_PROFILE_MPEG2_SIMPLE:
-            profile = VDP_DECODER_PROFILE_MPEG2_SIMPLE;
+        case AV_CODEC_ID_MPEG2VIDEO:
+            level = VDP_DECODER_LEVEL_MPEG2_HL;
             break;
-          default:
-            msg_Err(va, "unsupported %s profile %d", "MPEG2", fmt->i_profile);
-            return VLC_EGENERIC;
-        }
-        level = VDP_DECODER_LEVEL_MPEG2_HL;
-        break;
-
-      case AV_CODEC_ID_H263:
-        profile = VDP_DECODER_PROFILE_MPEG4_PART2_ASP;
-        level = VDP_DECODER_LEVEL_MPEG4_PART2_ASP_L5;
-        break;
-      case AV_CODEC_ID_MPEG4:
-        switch (fmt->i_profile)
-        {
-          case FF_PROFILE_MPEG4_SIMPLE:
-            profile = VDP_DECODER_PROFILE_MPEG4_PART2_SP;
+        case AV_CODEC_ID_H263:
+            level = VDP_DECODER_LEVEL_MPEG4_PART2_ASP_L5;
             break;
-          case FF_PROFILE_MPEG4_ADVANCED_SIMPLE:
-            profile = VDP_DECODER_PROFILE_MPEG4_PART2_ASP;
+        case AV_CODEC_ID_H264:
+            if ((fmt->i_profile & FF_PROFILE_H264_INTRA)
+             && (fmt->i_level == 11))
+                level = VDP_DECODER_LEVEL_H264_1b;
+         default:
             break;
-          default:
-            msg_Err(va, "unsupported %s profile %d", "MPEG4", fmt->i_profile);
-            return VLC_EGENERIC;
-        }
-        level = fmt->i_level;
-        break;
-
-      case AV_CODEC_ID_H264:
-        switch (fmt->i_profile
-                        & ~(FF_PROFILE_H264_CONSTRAINED|FF_PROFILE_H264_INTRA))
-        {
-          case FF_PROFILE_H264_BASELINE:
-            profile = VDP_DECODER_PROFILE_H264_BASELINE;
-            break;
-          case FF_PROFILE_H264_MAIN:
-            profile = VDP_DECODER_PROFILE_H264_MAIN;
-            break;
-          case FF_PROFILE_H264_HIGH:
-            profile = VDP_DECODER_PROFILE_H264_HIGH;
-            break;
-          case FF_PROFILE_H264_EXTENDED:
-          default:
-            msg_Err(va, "unsupported %s profile %d", "H.264", fmt->i_profile);
-            return VLC_EGENERIC;
-        }
-        level = fmt->i_level;
-        if ((fmt->i_profile & FF_PROFILE_H264_INTRA) && (fmt->i_level == 11))
-            level = VDP_DECODER_LEVEL_H264_1b;
-        break;
-
-      case AV_CODEC_ID_WMV3:
-      case AV_CODEC_ID_VC1:
-        switch (fmt->i_profile)
-        {
-          case FF_PROFILE_VC1_SIMPLE:
-            profile = VDP_DECODER_PROFILE_VC1_SIMPLE;
-            break;
-          case FF_PROFILE_VC1_MAIN:
-            profile = VDP_DECODER_PROFILE_VC1_MAIN;
-            break;
-          case FF_PROFILE_VC1_ADVANCED:
-            profile = VDP_DECODER_PROFILE_VC1_ADVANCED;
-            break;
-          default:
-            msg_Err(va, "unsupported %s profile %d", "VC-1", fmt->i_profile);
-            return VLC_EGENERIC;
-        }
-        level = fmt->i_level;
-        break;
-
-      default:
-        msg_Err(va, "unknown codec %d", ctx->codec_id);
-        return VLC_EGENERIC;
     }
 
     if (!vlc_xlib_init(VLC_OBJECT(va)))
