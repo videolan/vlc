@@ -65,7 +65,6 @@ static VLCStringUtility *_o_sharedInstance = nil;
             return(@"");
         }
     } else {
-        msg_Warn(VLCIntf, "can't translate empty strings");
         return(@"");
     }
 
