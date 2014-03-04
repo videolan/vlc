@@ -558,12 +558,12 @@ static void InvalidateAllPictures(decoder_t *p_dec)
     vlc_mutex_unlock(get_android_opaque_mutex());
 }
 
-static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic)
+static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong timeout)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     while (1) {
         int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_output_buffer,
-                                          p_sys->buffer_info, (jlong) 0);
+                                          p_sys->buffer_info, timeout);
         if ((*env)->ExceptionOccurred(env)) {
             (*env)->ExceptionClear(env);
             p_sys->error_state = true;
@@ -776,14 +776,14 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     const int max_polling_attempts = 50;
     int attempts = 0;
     while (true) {
-        int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_input_buffer, timeout);
+        int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_input_buffer, (jlong) 0);
         if ((*env)->ExceptionOccurred(env)) {
             (*env)->ExceptionClear(env);
             p_sys->error_state = true;
             break;
         }
         if (index < 0) {
-            GetOutput(p_dec, env, &p_pic);
+            GetOutput(p_dec, env, &p_pic, timeout);
             if (p_pic) {
                 /* If we couldn't get an available input buffer but a
                  * decoded frame is available, we return the frame
@@ -839,7 +839,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         break;
     }
     if (!p_pic)
-        GetOutput(p_dec, env, &p_pic);
+        GetOutput(p_dec, env, &p_pic, 0);
     (*myVm)->DetachCurrentThread(myVm);
 
     block_Release(p_block);
