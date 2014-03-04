@@ -190,8 +190,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         /* */
         fmt_in = p_filter->fmt_in.video;
-        fmt_in.i_width  = (fmt_in.i_width  * ZOOM_FACTOR / o_zoom) & ~1;
-        fmt_in.i_height = (fmt_in.i_height * ZOOM_FACTOR / o_zoom) & ~1;
+        fmt_in.i_width  = fmt_in.i_visible_width  = (fmt_in.i_width  * ZOOM_FACTOR / o_zoom) & ~1;
+        fmt_in.i_height = fmt_in.i_visible_height = (fmt_in.i_height * ZOOM_FACTOR / o_zoom) & ~1;
 
         /* */
         fmt_out = p_filter->fmt_out.video;
@@ -215,8 +215,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         /* image visualization */
         fmt_out = p_filter->fmt_out.video;
-        fmt_out.i_width  = (fmt_out.i_width /VIS_ZOOM) & ~1;
-        fmt_out.i_height = (fmt_out.i_height/VIS_ZOOM) & ~1;
+        fmt_out.i_width  = fmt_out.i_visible_width  = (fmt_out.i_width /VIS_ZOOM) & ~1;
+        fmt_out.i_height = fmt_out.i_visible_height = (fmt_out.i_height/VIS_ZOOM) & ~1;
         p_converted = image_Convert( p_sys->p_image, p_pic,
                                      &p_pic->format, &fmt_out );
 
