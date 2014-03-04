@@ -103,9 +103,9 @@ static char *ParseText(uint8_t *data, int size, const char *charset)
             snprintf(tmp, sizeof(tmp), "<u>");
         else if (code == 0x83)
             snprintf(tmp, sizeof(tmp), "</u>");
+#endif
         else if (code == 0x8a)
             snprintf(tmp, sizeof(tmp), "\n");
-#endif
         else {
             t = NULL;
         }
