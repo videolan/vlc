@@ -2212,6 +2212,20 @@ AC_ARG_ENABLE(merge-ffmpeg,
 ])
 AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
 
+AC_MSG_CHECKING([for libavutil variant])
+PKG_CHECK_EXISTS([libavutil], [
+  libavutil_version="$(${PKG_CONFIG} --modversion libavutil)"
+  libavutil_micro="${libavutil_version##*.}"
+  AS_IF([test ${libavutil_micro} -le 99], [
+    avfork="libav"
+  ], [
+    avfork="ffmpeg"
+  ])
+], [
+  avfork="none"
+])
+AC_MSG_RESULT([${avfork}])
+
 dnl
 dnl  avcodec decoder/encoder plugin
 dnl
