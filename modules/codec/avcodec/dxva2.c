@@ -865,6 +865,10 @@ static int DxCreateVideoDecoder(vlc_va_dxva2_t *va,
     case AV_CODEC_ID_H264:
         surface_count = 16 + va->thread_count + 2;
         break;
+    case AV_CODEC_ID_MPEG1VIDEO:
+    case AV_CODEC_ID_MPEG2VIDEO:
+        surface_count = 2 + 2;
+        break;
     default:
         surface_count = 2 + 1;
         break;

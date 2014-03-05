@@ -113,7 +113,7 @@ static int Open( vlc_va_t *va, int i_codec_id, int i_thread_count )
     case AV_CODEC_ID_MPEG1VIDEO:
     case AV_CODEC_ID_MPEG2VIDEO:
         i_profile = VAProfileMPEG2Main;
-        i_surface_count = 2+1;
+        i_surface_count = 2 + 2;
         break;
     case AV_CODEC_ID_MPEG4:
         i_profile = VAProfileMPEG4AdvancedSimple;
