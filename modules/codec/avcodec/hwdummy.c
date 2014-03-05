@@ -34,6 +34,7 @@
 #include <vlc_fourcc.h>
 #include <vlc_picture.h>
 #include "../../codec/avcodec/va.h"
+#include "../../codec/avcodec/avcommon_compat.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, const es_format_t *);
 static void Close(vlc_va_t *);
