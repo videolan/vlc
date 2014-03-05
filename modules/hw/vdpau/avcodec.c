@@ -170,6 +170,53 @@ static int Setup(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
     return Init(va, ctxp, chromap, width, height);
 }
 
+#if LIBAVCODEC_VERSION_MAJOR == 55 && LIBAVCODEC_VERSION_MINOR <= 42 && LIBAVCODEC_VERSION_MICRO >= 100
+static inline int av_vdpau_get_profile(AVCodecContext *avctx, VdpDecoderProfile *profile)
+{
+#define PROFILE(prof)       \
+do {                        \
+    *profile = prof;        \
+    return 0;               \
+} while (0)
+
+    switch (avctx->codec_id) {
+    case AV_CODEC_ID_MPEG1VIDEO:               PROFILE(VDP_DECODER_PROFILE_MPEG1);
+    case AV_CODEC_ID_MPEG2VIDEO:
+        switch (avctx->profile) {
+        case FF_PROFILE_MPEG2_MAIN:            PROFILE(VDP_DECODER_PROFILE_MPEG2_MAIN);
+        case FF_PROFILE_MPEG2_SIMPLE:          PROFILE(VDP_DECODER_PROFILE_MPEG2_SIMPLE);
+        default:                               return AVERROR(EINVAL);
+        }
+    case AV_CODEC_ID_H263:                     PROFILE(VDP_DECODER_PROFILE_MPEG4_PART2_ASP);
+    case AV_CODEC_ID_MPEG4:
+        switch (avctx->profile) {
+        case FF_PROFILE_MPEG4_SIMPLE:          PROFILE(VDP_DECODER_PROFILE_MPEG4_PART2_SP);
+        case FF_PROFILE_MPEG4_ADVANCED_SIMPLE: PROFILE(VDP_DECODER_PROFILE_MPEG4_PART2_ASP);
+        default:                               return AVERROR(EINVAL);
+        }
+    case AV_CODEC_ID_H264:
+        switch (avctx->profile) {
+        case FF_PROFILE_H264_CONSTRAINED_BASELINE:
+        case FF_PROFILE_H264_BASELINE:         PROFILE(VDP_DECODER_PROFILE_H264_BASELINE);
+        case FF_PROFILE_H264_MAIN:             PROFILE(VDP_DECODER_PROFILE_H264_MAIN);
+        case FF_PROFILE_H264_HIGH:             PROFILE(VDP_DECODER_PROFILE_H264_HIGH);
+        default:                               return AVERROR(EINVAL);
+        }
+    case AV_CODEC_ID_WMV3:
+    case AV_CODEC_ID_VC1:
+        switch (avctx->profile) {
+        case FF_PROFILE_VC1_SIMPLE:            PROFILE(VDP_DECODER_PROFILE_VC1_SIMPLE);
+        case FF_PROFILE_VC1_MAIN:              PROFILE(VDP_DECODER_PROFILE_VC1_MAIN);
+        case FF_PROFILE_VC1_ADVANCED:          PROFILE(VDP_DECODER_PROFILE_VC1_ADVANCED);
+        default:                               return AVERROR(EINVAL);
+        }
+    default:
+        return AVERROR(EINVAL);
+    }
+#undef PROFILE
+}
+#endif
+
 static int Open(vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt)
 {
     VdpStatus err;
