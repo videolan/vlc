@@ -479,10 +479,6 @@ enum {
 # define err_recognition error_recognition
 #endif
 
-#if LIBAVCODEC_VERSION_MAJOR == 55 && LIBAVCODEC_VERSION_MINOR <= 42 && LIBAVCODEC_VERSION_MICRO >= 100
-# define av_vdpau_alloc_context av_alloc_vdpaucontext
-#endif
-
 #endif /* HAVE_LIBAVCODEC_AVCODEC_H */
 
 #ifdef HAVE_LIBAVUTIL_AVUTIL_H
