@@ -3052,7 +3052,11 @@ AM_CONDITIONAL([HAVE_VDPAU], [test "${have_vdpau}" = "yes"])
 
 have_avcodec_vdpau="no"
 AS_IF([test "${have_vdpau}" = "yes" -a "${have_avcodec}" = "yes"], [
-  PKG_CHECK_EXISTS([libavutil >= 0.52.4 libavcodec >= 55.26.0], [
+  case "${avfork}" in
+    libav) av_vdpau_ver="55.26.0" ;;
+    ffmpeg) av_vdpau_ver="55.42.100" ;;
+  esac
+  PKG_CHECK_EXISTS([libavutil >= 0.52.4 libavcodec >= ${av_vdpau_ver}], [
     have_avcodec_vdpau="yes"
     AC_MSG_NOTICE([VDPAU decoding acceleration activated])
   ], [
