@@ -73,6 +73,7 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
     x265_picture_init(&p_sys->param, &pic);
 
     if (likely(p_pict)) {
+        pic.pts = p_pict->date;
         if (unlikely(p_sys->initial_date == 0)) {
             p_sys->initial_date = p_pict->date;
 #ifndef NDEBUG
