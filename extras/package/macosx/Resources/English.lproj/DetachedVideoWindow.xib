@@ -1092,6 +1092,7 @@
           <string>27.CustomClassName</string>
           <string>27.IBPluginDependency</string>
           <string>27.IBViewBoundsToFrameTransform</string>
+          <string>28.CustomClassName</string>
           <string>28.IBPluginDependency</string>
           <string>28.IBViewBoundsToFrameTransform</string>
           <string>29.IBPluginDependency</string>
@@ -1194,6 +1195,7 @@
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABDv4AAwYAAAA</bytes>
           </object>
+          <string>VLCWindowTitleTextField</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABCggAAwZAAAA</bytes>
