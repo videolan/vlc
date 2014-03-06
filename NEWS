@@ -101,6 +101,7 @@ Interfaces:
  * Add support for subtitles drag 'n drop in skins2
  * Add record button in Qt menus
  * Fixes for advanced preferences on OS X
+ * New module for core dialogs on iOS
 
 Misc:
  * New module for TLS on OS X and iOS
