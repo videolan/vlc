@@ -229,6 +229,7 @@ typedef struct {
     char      name[16];
     convert_t convert;
     convert_t iconvert;
+    video_transform_t operation;
     void      (*plane8) (plane_t *dst, const plane_t *src);
     void      (*plane16)(plane_t *dst, const plane_t *src);
     void      (*plane32)(plane_t *dst, const plane_t *src);
@@ -236,18 +237,18 @@ typedef struct {
     void      (*yuyv)(plane_t *dst, const plane_t *src);
 } transform_description_t;
 
-#define DESC(str, f, invf) \
-    { str, f, invf, Plane8_##f, Plane16_##f, Plane32_##f, \
+#define DESC(str, f, invf, op) \
+    { str, f, invf, op, Plane8_##f, Plane16_##f, Plane32_##f, \
       Plane422_##f, PlaneYUY2_##f }
 
 static const transform_description_t descriptions[] = {
-    DESC("90",            R90,           R270),
-    DESC("180",           R180,          R180),
-    DESC("270",           R270,          R90),
-    DESC("hflip",         HFlip,         HFlip),
-    DESC("vflip",         VFlip,         VFlip),
-    DESC("transpose",     Transpose,     Transpose),
-    DESC("antitranspose", AntiTranspose, AntiTranspose),
+    DESC("90",            R90,           R270,          TRANSFORM_R90),
+    DESC("180",           R180,          R180,          TRANSFORM_R180),
+    DESC("270",           R270,          R90,           TRANSFORM_R270),
+    DESC("hflip",         HFlip,         HFlip,         TRANSFORM_HFLIP),
+    DESC("vflip",         VFlip,         VFlip,         TRANSFORM_VFLIP),
+    DESC("transpose",     Transpose,     Transpose,     TRANSFORM_TRANSPOSE),
+    DESC("antitranspose", AntiTranspose, AntiTranspose, TRANSFORM_ANTI_TRANSPOSE),
 };
 
 static bool dsc_is_rotated(const transform_description_t *dsc)
@@ -373,18 +374,40 @@ static int Open(vlc_object_t *object)
                     }
             }
         }
+    }
 
-        if (!filter->b_allow_fmt_out_change) {
+    /*
+     * Note: we neither compare nor set dst->orientation,
+     * the caller needs to do it manually (user might want
+     * to transform video without changing the orientation).
+     */
+
+    video_format_t src_trans = *src;
+    video_format_TransformBy(&src_trans, dsc->operation);
+
+    if (!filter->b_allow_fmt_out_change &&
+        (dst->i_width          != src_trans.i_width ||
+         dst->i_visible_width  != src_trans.i_visible_width ||
+         dst->i_height         != src_trans.i_height ||
+         dst->i_visible_height != src_trans.i_visible_height ||
+         dst->i_sar_num        != src_trans.i_sar_num ||
+         dst->i_sar_den        != src_trans.i_sar_den ||
+         dst->i_x_offset       != src_trans.i_x_offset ||
+         dst->i_y_offset       != src_trans.i_y_offset)) {
+
             msg_Err(filter, "Format change is not allowed");
             goto error;
-        }
+    }
+    else if(filter->b_allow_fmt_out_change) {
 
-        dst->i_width          = src->i_height;
-        dst->i_visible_width  = src->i_visible_height;
-        dst->i_height         = src->i_width;
-        dst->i_visible_height = src->i_visible_width;
-        dst->i_sar_num        = src->i_sar_den;
-        dst->i_sar_den        = src->i_sar_num;
+        dst->i_width          = src_trans.i_width;
+        dst->i_visible_width  = src_trans.i_visible_width;
+        dst->i_height         = src_trans.i_height;
+        dst->i_visible_height = src_trans.i_visible_height;
+        dst->i_sar_num        = src_trans.i_sar_num;
+        dst->i_sar_den        = src_trans.i_sar_den;
+        dst->i_x_offset       = src_trans.i_x_offset;
+        dst->i_y_offset       = src_trans.i_y_offset;
     }
 
     /* Deal with weird packed formats */
@@ -404,17 +427,6 @@ static int Open(vlc_object_t *object)
         case VLC_CODEC_NV12:
         case VLC_CODEC_NV21:
             goto error;
-    }
-
-    dst->i_x_offset       = INT_MAX;
-    dst->i_y_offset       = INT_MAX;
-    for (int i = 0; i < 2; i++) {
-        int tx, ty;
-        dsc->iconvert(&tx, &ty, src->i_width, src->i_height,
-                      src->i_x_offset + i * (src->i_visible_width  - 1),
-                      src->i_y_offset + i * (src->i_visible_height - 1));
-        dst->i_x_offset = __MIN(dst->i_x_offset, (unsigned)(1 + tx));
-        dst->i_y_offset = __MIN(dst->i_y_offset, (unsigned)(1 + ty));
     }
 
     filter->p_sys           = sys;
