@@ -153,6 +153,8 @@ typedef enum video_orientation_t
     ORIENT_RIGHT_BOTTOM, /**< Anti-transposed */
 
     ORIENT_NORMAL      = ORIENT_TOP_LEFT,
+    ORIENT_TRANSPOSED  = ORIENT_LEFT_TOP,
+    ORIENT_ANTI_TRANSPOSED = ORIENT_RIGHT_BOTTOM,
     ORIENT_HFLIPPED    = ORIENT_TOP_RIGHT,
     ORIENT_VFLIPPED    = ORIENT_BOTTOM_LEFT,
     ORIENT_ROTATED_180 = ORIENT_BOTTOM_RIGHT,
@@ -173,6 +175,18 @@ typedef enum video_orientation_t
 #define ORIENT_VFLIP(orient) ((orient) ^ 2)
 /** Applies horizontal flip to an orientation */
 #define ORIENT_ROTATE_180(orient) ((orient) ^ 3)
+
+typedef enum video_transform_t
+{
+    TRANSFORM_IDENTIY        = ORIENT_NORMAL,
+    TRANSFORM_HFLIP          = ORIENT_HFLIPPED,
+    TRANSFORM_VFLIP          = ORIENT_VFLIPPED,
+    TRANSFORM_R180           = ORIENT_ROTATED_180,
+    TRANSFORM_R270           = ORIENT_ROTATED_270,
+    TRANSFORM_R90            = ORIENT_ROTATED_90,
+    TRANSFORM_TRANSPOSE      = ORIENT_TRANSPOSED,
+    TRANSFORM_ANTI_TRANSPOSE = ORIENT_ANTI_TRANSPOSED
+} video_transform_t;
 
 /**
  * video format description
@@ -265,6 +279,28 @@ VLC_API void video_format_CopyCrop( video_format_t *, const video_format_t * );
 VLC_API void video_format_ScaleCropAr( video_format_t *, const video_format_t * );
 
 /**
+ * This function "normalizes" the formats orientation, by switching the a/r according to the orientation,
+ * producing a format whose orientation is ORIENT_NORMAL. It makes a shallow copy (pallette is not alloc'ed).
+ */
+VLC_API void video_format_ApplyRotation(const video_format_t * restrict in, video_format_t * restrict out);
+
+/**
+ * This function applies the transform operation to fmt.
+ */
+VLC_API void video_format_TransformBy(video_format_t *fmt, video_transform_t transform);
+
+/**
+ * This function applies the transforms necessary to fmt so that the resulting fmt
+ * has the dst_orientation.
+ */
+VLC_API void video_format_TransformTo(video_format_t *fmt, video_orientation_t dst_orientation);
+
+/**
+ * Returns the operation required to transform src into dst.
+ */
+VLC_API video_transform_t video_format_GetTransform(video_orientation_t src, video_orientation_t dst);
+
+/**
  * This function will check if the first video format is similar
  * to the second one.
  */
@@ -275,6 +311,18 @@ VLC_API bool video_format_IsSimilar( const video_format_t *, const video_format_
  */
 VLC_API void video_format_Print( vlc_object_t *, const char *, const video_format_t * );
 
+
+static inline video_transform_t transform_Inverse( video_transform_t transform )
+{
+    switch ( transform ) {
+        case TRANSFORM_R90:
+            return TRANSFORM_R270;
+        case TRANSFORM_R270:
+            return TRANSFORM_R90;
+        default:
+            return transform;
+    }
+}
 /**
  * subtitles format description
  */
