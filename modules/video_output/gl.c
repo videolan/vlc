@@ -142,17 +142,17 @@ static int Open (vlc_object_t *obj)
     if (sys->gl == NULL)
         goto error;
 
+    /* Initialize video display */
+    const vlc_fourcc_t *spu_chromas;
+
     if (vlc_gl_MakeCurrent (sys->gl))
         goto error;
 
-    /* Initialize video display */
-    const vlc_fourcc_t *spu_chromas;
     sys->vgl = vout_display_opengl_New (&vd->fmt, &spu_chromas, sys->gl);
-    if (!sys->vgl)
-    {
-        vlc_gl_ReleaseCurrent (sys->gl);
+    vlc_gl_ReleaseCurrent (sys->gl);
+
+    if (sys->vgl == NULL)
         goto error;
-    }
 
     vd->sys = sys;
     vd->info.has_pictures_invalid = false;
@@ -182,6 +182,7 @@ static void Close (vlc_object_t *obj)
     vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *sys = vd->sys;
 
+    vlc_gl_MakeCurrent (sys->gl);
     vout_display_opengl_Delete (sys->vgl);
     vlc_gl_ReleaseCurrent (sys->gl);
 
@@ -198,7 +199,11 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned count)
     vout_display_sys_t *sys = vd->sys;
 
     if (!sys->pool)
+    {
+        vlc_gl_MakeCurrent (sys->gl);
         sys->pool = vout_display_opengl_GetPool (sys->vgl, count);
+        vlc_gl_ReleaseCurrent (sys->gl);
+    }
     return sys->pool;
 }
 
@@ -206,16 +211,21 @@ static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *sub
 {
     vout_display_sys_t *sys = vd->sys;
 
+    vlc_gl_MakeCurrent (sys->gl);
     vout_display_opengl_Prepare (sys->vgl, pic, subpicture);
+    vlc_gl_ReleaseCurrent (sys->gl);
 }
 
 static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
 
+    vlc_gl_MakeCurrent (sys->gl);
     vout_display_opengl_Display (sys->vgl, &vd->source);
+    vlc_gl_ReleaseCurrent (sys->gl);
+
     picture_Release (pic);
-    (void)subpicture;
+    (void) subpicture;
 }
 
 static int Control (vout_display_t *vd, int query, va_list ap)
@@ -268,7 +278,9 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         vout_display_place_t place;
 
         vout_display_PlacePicture (&place, src, cfg, false);
+        vlc_gl_MakeCurrent (sys->gl);
         glViewport (0, 0, place.width, place.height);
+        vlc_gl_ReleaseCurrent (sys->gl);
         return VLC_SUCCESS;
       }
 
@@ -280,7 +292,9 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         vout_display_place_t place;
 
         vout_display_PlacePicture (&place, src, cfg, false);
+        vlc_gl_MakeCurrent (sys->gl);
         glViewport (0, 0, place.width, place.height);
+        vlc_gl_ReleaseCurrent (sys->gl);
         return VLC_SUCCESS;
       }
 
