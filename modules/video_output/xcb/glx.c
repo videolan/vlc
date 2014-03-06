@@ -310,7 +310,8 @@ static int Open (vlc_object_t *obj)
 
     sys->vgl = vout_display_opengl_New (&vd->fmt, &info.subpicture_chromas,
                                         &sys->gl);
-    if (!sys->vgl)
+    glXMakeContextCurrent (dpy, None, None, NULL);
+    if (sys->vgl == NULL)
     {
         sys->gl.sys = NULL;
         goto error;
@@ -352,11 +353,13 @@ static void Close (vlc_object_t *obj)
     Display *dpy = sys->display;
 
     if (sys->gl.sys != NULL)
+    {
+        glXMakeContextCurrent (dpy, sys->glwin, sys->glwin, sys->ctx);
         vout_display_opengl_Delete (sys->vgl);
-
+        glXMakeContextCurrent (dpy, None, None, NULL);
+    }
     if (sys->ctx != NULL)
     {
-        glXMakeContextCurrent (dpy, None, None, NULL);
         glXDestroyContext (dpy, sys->ctx);
         glXDestroyWindow (dpy, sys->glwin);
     }
@@ -397,22 +400,35 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
     vout_display_sys_t *sys = vd->sys;
 
     if (!sys->pool)
+    {
+        Display *dpy = sys->display;
+
+        glXMakeContextCurrent (dpy, sys->glwin, sys->glwin, sys->ctx);
         sys->pool = vout_display_opengl_GetPool (sys->vgl, requested_count);
+        glXMakeContextCurrent (dpy, None, None, NULL);
+    }
     return sys->pool;
 }
 
 static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
+    Display *dpy = sys->display;
 
+    glXMakeContextCurrent (dpy, sys->glwin, sys->glwin, sys->ctx);
     vout_display_opengl_Prepare (sys->vgl, pic, subpicture);
+    glXMakeContextCurrent (dpy, None, None, NULL);
 }
 
 static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
+    Display *dpy = sys->display;
 
+    glXMakeContextCurrent (dpy, sys->glwin, sys->glwin, sys->ctx);
     vout_display_opengl_Display (sys->vgl, &vd->source);
+    glXMakeContextCurrent (dpy, None, None, NULL);
+
     picture_Release (pic);
     if (subpicture)
         subpicture_Delete(subpicture);
@@ -479,7 +495,11 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         if (XCB_error_Check (vd, sys->conn, "cannot resize X11 window", ck))
             return VLC_EGENERIC;
 
+        Display *dpy = sys->display;
+
+        glXMakeContextCurrent (dpy, sys->glwin, sys->glwin, sys->ctx);
         glViewport (0, 0, place.width, place.height);
+        glXMakeContextCurrent (dpy, None, None, NULL);
         return VLC_SUCCESS;
     }
 
