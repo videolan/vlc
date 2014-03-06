@@ -71,7 +71,9 @@
 /* Win32 */
 #ifdef _WIN32
 # undef HAVE_FONTCONFIG
-# define HAVE_GET_FONT_BY_FAMILY_NAME
+# if !VLC_WINSTORE_APP
+#  define HAVE_GET_FONT_BY_FAMILY_NAME
+# endif
 #endif
 
 /* FontConfig */
@@ -1949,7 +1951,7 @@ static int Create( vlc_object_t *p_this )
 #if !TARGET_OS_IPHONE
     p_sys->pf_select = MacLegacy_Select;
 #endif
-#elif defined( _WIN32 )
+#elif defined( _WIN32 ) && defined( HAVE_GET_FONT_BY_FAMILY_NAME )
     p_sys->pf_select = Win32_Select;
 #else
     p_sys->pf_select = Dummy_Select;

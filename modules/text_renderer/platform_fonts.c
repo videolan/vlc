@@ -418,7 +418,7 @@ char* Dummy_Select( filter_t *p_filter, const char* psz_font,
     VLC_UNUSED(i_idx);
 
     char *psz_fontname;
-# ifdef _WIN32
+# if defined( _WIN32 ) && !VLC_WINSTORE_APP
     /* Get Windows Font folder */
     char *psz_win_fonts_path = GetWindowsFontPath();
     if( asprintf( &psz_fontname, "%s\\%s", psz_win_fonts_path, psz_font ) == -1 )
