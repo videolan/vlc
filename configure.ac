@@ -1565,6 +1565,19 @@ AM_CONDITIONAL([ENABLE_VLM], [test "${enable_vlm}" != "no"])
 
 
 dnl
+dnl Addons manager storage and repositories modules
+dnl
+AC_ARG_ENABLE(addonmanagermodules,
+  [AS_HELP_STRING([--disable-addonmanagermodules],
+    [disable the addons manager modules (default enabled)])])
+if test "${enable_addonmanagermodules}" != "no"
+then
+  AC_DEFINE(ENABLE_ADDONMANAGERMODULES, 1, [Define if you want the addons manager modules])
+fi
+AM_CONDITIONAL([ENABLE_ADDONMANAGERMODULES], [test "${enable_addonmanagermodules}" != "no"])
+
+
+dnl
 dnl  Input plugins
 dnl
 
