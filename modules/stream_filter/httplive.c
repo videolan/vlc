@@ -2089,7 +2089,7 @@ static int Open(vlc_object_t *p_this)
         hls_stream_t *hls = hls_Get(p_sys->hls_stream, current);
         p_sys->playlist.last = mdate();
         p_sys->playlist.wakeup = p_sys->playlist.last +
-                ((mtime_t)hls->duration * UINT64_C(1000000));
+                ((mtime_t)hls->duration * CLOCK_FREQ );
 
         if (vlc_clone(&p_sys->reload, hls_Reload, s, VLC_THREAD_PRIORITY_LOW))
         {
@@ -2386,7 +2386,7 @@ static int Read(stream_t *s, void *buffer, unsigned int i_read)
             mtime_t start = mdate();
 
             // Wait for 10 seconds
-            mtime_t timeout_limit = start + (10 * UINT64_C(1000000));
+            mtime_t timeout_limit = start + (10 * CLOCK_FREQ);
 
             int res = vlc_cond_timedwait(&p_sys->read.wait, &p_sys->read.lock_wait, timeout_limit);
 
