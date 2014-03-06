@@ -24,6 +24,8 @@
 # include "config.h"
 #endif
 
+#include <math.h>
+
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_playlist.h>
@@ -76,7 +78,9 @@ int playlist_VolumeUp (playlist_t *pl, int value, float *volp)
 {
     int ret = -1;
 
-    float delta = value * var_InheritFloat (pl, "volume-step");
+    float stepSize = var_InheritFloat (pl, "volume-step") / (float)AOUT_VOLUME_DEFAULT;
+
+    float delta = value * stepSize;
 
     audio_output_t *aout = playlist_GetAout (pl);
     if (aout != NULL)
@@ -84,11 +88,12 @@ int playlist_VolumeUp (playlist_t *pl, int value, float *volp)
         float vol = aout_VolumeGet (aout);
         if (vol >= 0.)
         {
-            vol += delta / (float)AOUT_VOLUME_DEFAULT;
+            vol += delta;
             if (vol < 0.)
                 vol = 0.;
             if (vol > 2.)
                 vol = 2.;
+            vol = (roundf (vol / stepSize)) * stepSize;
             if (volp != NULL)
                 *volp = vol;
             ret = aout_VolumeSet (aout, vol);
