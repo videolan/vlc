@@ -436,5 +436,18 @@ typedef struct {
  */
 VLC_API void vout_display_PlacePicture(vout_display_place_t *place, const video_format_t *source, const vout_display_cfg_t *cfg, bool do_clipping);
 
+
+/**
+ * Helper function that applies the necessary transforms to the mouse position
+ * and then calls vout_display_SendEventMouseMoved.
+ *
+ * \param vd vout_display_t.
+ * \param orient_display The orientation of the picture as seen on screen (probably ORIENT_NORMAL).
+ * \param m_x Mouse x position (relative to place, origin is top left).
+ * \param m_y Mouse y position (relative to place, origin is top left).
+ * \param place Place of the picture.
+ */
+VLC_API void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, video_orientation_t orient_display, int m_x, int m_y,
+                                                           vout_display_place_t *place);
 #endif /* VLC_VOUT_DISPLAY_H */
 
