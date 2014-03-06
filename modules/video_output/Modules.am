@@ -9,9 +9,6 @@ SOURCES_vout_sdl = sdl.c
 SOURCES_directfb = directfb.c
 SOURCES_vmem = vmem.c
 SOURCES_yuv = yuv.c
-SOURCES_vout_macosx = macosx.m opengl.h opengl.c
-SOURCES_vout_coregraphicslayer = coregraphicslayer.m
-SOURCES_vout_ios2 = ios2.m opengl.h opengl.c
 SOURCES_android_surface = android/surface.c android/utils.c
 SOURCES_android_opaque = android/opaque.c
 
@@ -22,12 +19,29 @@ libdecklinkoutput_plugin_la_LIBADD = $(LIBS_decklink) $(LIBDL)
 vout_LTLIBRARIES += libdecklinkoutput_plugin.la
 endif
 
-if HAVE_DARWIN
+if HAVE_OSX
+libvout_macosx_plugin_la_SOURCES = macosx.m opengl.c opengl.h
+libvout_macosx_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
+libvout_macosx_plugin_la_LIBADD = $(GL_LIBS)
+libvout_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' -Wl,-framework,OpenGL,-framework,Cocoa
+
+libvout_coregraphicslayer_plugin_la_SOURCES = coregraphicslayer.m
+libvout_coregraphicslayer_plugin_la_CFLAGS = $(AM_CFLAGS)
+libvout_coregraphicslayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' -Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
+
 libcaopengllayer_plugin_la_SOURCES = caopengllayer.m opengl.c opengl.h
 libcaopengllayer_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
 libcaopengllayer_plugin_la_LIBADD = $(GL_LIBS)
 libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' -Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
-vout_LTLIBRARIES += libcaopengllayer_plugin.la
+vout_LTLIBRARIES += libvout_macosx_plugin.la libvout_coregraphicslayer_plugin.la libcaopengllayer_plugin.la
+endif
+
+if HAVE_IOS
+libvout_ios2_plugin_la_SOURCES = ios2.m opengl.h opengl.c
+libvout_ios2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
+libvout_ios2_plugin_la_LIBADD = $(GL_LIBS)
+libvout_ios2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' -Wl,-framework,OpenGLES,-framework,QuartzCore,-framework,UIKit
+vout_LTLIBRARIES += libvout_ios2_plugin.la
 endif
 
 ### OpenGL ###

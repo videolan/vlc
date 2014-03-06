@@ -97,6 +97,8 @@ dnl
 dnl  Check the operating system
 dnl
 HAVE_WIN64="0"
+HAVE_IOS="0"
+HAVE_OSX="0"
 
 YASMFLAGS=""
 case "${host}" in
@@ -171,6 +173,17 @@ case "${host_os}" in
     VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup,-framework,AppKit])
     VLC_ADD_LIBS([avcodec access_avio swscale postproc i420_rgb_mmx x262 x264 x26410b],[-Wl,-read_only_relocs,suppress])
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation,-framework,CoreServices])
+
+    AC_EGREP_CPP(yes,
+            [#import <TargetConditionals.h>
+             #if TARGET_OS_IPHONE
+             yes
+             #endif],
+             [HAVE_IOS="1"],
+             [HAVE_OSX="1"])
+
+    AM_CONDITIONAL(HAVE_IOS,   test "${HAVE_IOS}" = "1")
+    AM_CONDITIONAL(HAVE_OSX,   test "${HAVE_OSX}" = "1")
 
     dnl Allow binaries created on Lion to run on earlier releases
     AC_EGREP_CPP(yes,
@@ -3102,29 +3115,6 @@ then
    ])
 fi
 
-
-dnl
-dnl Mac Vout
-AC_ARG_ENABLE(macosx-vout,
-  [  --enable-macosx-vout    Mac OS X video output module (default enabled on Mac OS X)])
-if test "x${enable_macosx_vout}" != "xno" &&
-  (test "${SYS}" = "darwin" || test "${enable_macosx_vout}" = "yes")
-then
-  VLC_ADD_LIBS([vout_macosx],[-Wl,-framework,Cocoa])
-  VLC_ADD_LIBS([vout_macosx],[-Wl,-framework,OpenGL])
-  VLC_ADD_PLUGIN([vout_macosx])
-fi
-
-dnl
-dnl Mac CoreGraphics Layer Vout
-AC_ARG_ENABLE(coregraphicslayer-vout,
-  [  --enable-coregraphicslayer-vout CoreGraphics layered video output module (default disabled)])
-if test "${enable_coregraphicslayer_vout}" = "yes"; then
-  VLC_ADD_LIBS([vout_coregraphicslayer],[-Wl,-framework,Cocoa])
-  VLC_ADD_LIBS([vout_coregraphicslayer],[-Wl,-framework,QuartzCore])
-  VLC_ADD_PLUGIN([vout_coregraphicslayer])
-fi
-
 dnl
 dnl  freetype module
 dnl
@@ -3229,19 +3219,6 @@ if test "${enable_android_surface}" = "yes"; then
      VLC_ADD_LIBS([android_opaque], [-ldl])
   fi
 fi
-
-
-dnl
-dnl  iOS ES2 vout module
-dnl
-AC_ARG_ENABLE(ios-vout2,
-  [  --enable-ios-vout2    iOS video output module (default disabled)])
-if test "${enable_ios_vout2}" = "yes"
-then
-  VLC_ADD_PLUGIN([vout_ios2])
-  VLC_ADD_LIBS([vout_ios2], [-Wl,-framework,OpenGLES,-framework,QuartzCore,-framework,UIKit])
-fi
-
 
 dnl
 dnl  Windows DirectX module
@@ -3520,31 +3497,6 @@ AS_IF([test "$enable_wasapi" != "no"], [
   ])
 ])
 AM_CONDITIONAL([HAVE_WASAPI], [test "${have_wasapi}" = "yes"])
-
-dnl
-dnl  CoreAudio plugin
-dnl
-AC_ARG_ENABLE(macosx-audio,
-  [  --enable-macosx-audio   Mac OS X audio module (default enabled on MacOS X)])
-if test "x${enable_macosx_audio}" != "xno" &&
-  (test "${SYS}" = "darwin" || test "${enable_macosx_audio}" = "yes")
-then
-  AC_CHECK_HEADER([CoreAudio/CoreAudio.h],
-    [ VLC_ADD_PLUGIN([auhal])
-    ], [ AC_MSG_ERROR([cannot find CoreAudio headers]) ])
-fi
-
-dnl
-dnl  iOS CoreAudio plugin
-dnl
-AC_ARG_ENABLE(ios-audio,
-  [  --enable-ios-audio       Audio module for iOS (default disabled)])
-if test "${enable_ios_audio}" = "yes"
-then
-  AC_CHECK_HEADER([AudioUnit/AudioUnit.h],
-    [ VLC_ADD_PLUGIN([audiounit_ios])
-    ], [ AC_MSG_ERROR([cannot find AudioUnit headers]) ])
-fi
 
 dnl
 dnl  AudioQueue plugin

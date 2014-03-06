@@ -101,10 +101,16 @@ endif
 libauhal_plugin_la_SOURCES = audio_output/auhal.c \
 	audio_output/TPCircularBuffer.h audio_output/TPCircularBuffer.c
 libauhal_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,CoreServices -rpath '$(aoutdir)'
+if HAVE_OSX
+aout_LTLIBRARIES += libauhal_plugin.la
+endif
 libaudiounit_ios_plugin_la_SOURCES = audio_output/audiounit_ios.c \
 	audio_output/TPCircularBuffer.h audio_output/TPCircularBuffer.c
 libaudiounit_ios_plugin_la_LDFLAGS = $(libauhal_plugin_la_LDFLAGS)
+if HAVE_IOS
+aout_LTLIBRARIES += libaudiounit_ios_plugin.la
+endif
+
 libaudioqueue_plugin_la_SOURCES = audio_output/audioqueue.c
 libaudioqueue_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,CoreServices -rpath '$(aoutdir)'
-EXTRA_LTLIBRARIES += libauhal_plugin.la libaudiounit_ios_plugin.la libaudioqueue_plugin.la
-aout_LTLIBRARIES += $(LTLIBauhal) $(LTLIBaudiounit_ios) $(LTLIBaudioqueue)
+EXTRA_LTLIBRARIES += libaudioqueue_plugin.la
