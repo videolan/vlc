@@ -36,11 +36,12 @@ libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' -Wl,-fram
 vout_LTLIBRARIES += libvout_macosx_plugin.la libvout_coregraphicslayer_plugin.la libcaopengllayer_plugin.la
 endif
 
-if HAVE_IOS
 libvout_ios2_plugin_la_SOURCES = ios2.m opengl.h opengl.c
 libvout_ios2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
-libvout_ios2_plugin_la_LIBADD = $(GL_LIBS)
+libvout_ios2_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) $(GL_OBJCFLAGS)
+libvout_ios2_plugin_la_LIBADD = $(AM_LIBADD) $(GL_LIBS)
 libvout_ios2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' -Wl,-framework,OpenGLES,-framework,QuartzCore,-framework,UIKit
+if HAVE_IOS
 vout_LTLIBRARIES += libvout_ios2_plugin.la
 endif
 

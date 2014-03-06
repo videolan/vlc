@@ -1,6 +1,7 @@
 AM_LIBTOOLFLAGS=--tag=CC
 
 libios_dialog_provider_plugin_la_SOURCES = dialogProvider.m
+libios_dialog_provider_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS)
 libios_dialog_provider_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,UIKit
 
 if HAVE_IOS
