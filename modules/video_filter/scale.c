@@ -68,6 +68,9 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    if( p_filter->fmt_in.video.orientation != p_filter->fmt_out.video.orientation )
+        return VLC_EGENERIC;
+
     video_format_ScaleCropAr( &p_filter->fmt_out.video, &p_filter->fmt_in.video );
     p_filter->pf_video_filter = Filter;
 

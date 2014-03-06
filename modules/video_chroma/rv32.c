@@ -63,7 +63,8 @@ static int OpenFilter( vlc_object_t *p_this )
     }
 
     if( p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width
-     || p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height )
+     || p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height
+     || p_filter->fmt_in.video.orientation != p_filter->fmt_out.video.orientation)
         return -1;
 
     p_filter->pf_video_filter = Filter;

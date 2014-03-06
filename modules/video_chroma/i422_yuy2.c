@@ -104,6 +104,11 @@ static int Activate( vlc_object_t *p_this )
         return -1;
     }
 
+    if( p_filter->fmt_in.video.orientation != p_filter->fmt_out.video.orientation )
+    {
+        return VLC_EGENERIC;
+    }
+
     switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_CODEC_I422:

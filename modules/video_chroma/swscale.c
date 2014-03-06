@@ -355,12 +355,16 @@ static int Init( filter_t *p_filter )
     const video_format_t *p_fmti = &p_filter->fmt_in.video;
     video_format_t       *p_fmto = &p_filter->fmt_out.video;
 
+    if( p_fmti->orientation != p_fmto->orientation )
+        return VLC_EGENERIC;
+
     if( video_format_IsSimilar( p_fmti, &p_sys->fmt_in ) &&
         video_format_IsSimilar( p_fmto, &p_sys->fmt_out ) &&
         p_sys->ctx )
     {
         return VLC_SUCCESS;
     }
+
     Clean( p_filter );
 
     /* Init with new parameters */

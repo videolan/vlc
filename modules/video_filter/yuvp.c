@@ -69,7 +69,8 @@ static int Open( vlc_object_t *p_this )
           p_filter->fmt_out.video.i_chroma != VLC_CODEC_RGBA &&
           p_filter->fmt_out.video.i_chroma != VLC_CODEC_ARGB ) ||
         p_filter->fmt_in.video.i_width  != p_filter->fmt_out.video.i_width ||
-        p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height )
+        p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height ||
+        p_filter->fmt_in.video.orientation != p_filter->fmt_out.video.orientation )
     {
         return VLC_EGENERIC;
     }
