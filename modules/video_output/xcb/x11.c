@@ -139,7 +139,7 @@ static int Open (vlc_object_t *obj)
         if (fmt->depth <= sys->depth)
             continue; /* no better than earlier format */
 
-        fmt_pic = vd->fmt;
+        video_format_ApplyRotation(&vd->fmt, &fmt_pic);
 
         /* Check that the pixmap format is supported by VLC. */
         switch (fmt->depth)
@@ -533,13 +533,16 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         vout_display_place_t place;
         vout_display_PlacePicture (&place, &vd->source, vd->cfg, false);
 
-        vd->fmt.i_width  = vd->source.i_width  * place.width  / vd->source.i_visible_width;
-        vd->fmt.i_height = vd->source.i_height * place.height / vd->source.i_visible_height;
+        video_format_t source_rot;
+        video_format_ApplyRotation(&vd->source, &source_rot);
+
+        vd->fmt.i_width  = source_rot.i_width  * place.width  / source_rot.i_visible_width;
+        vd->fmt.i_height = source_rot.i_height * place.height / source_rot.i_visible_height;
 
         vd->fmt.i_visible_width  = place.width;
         vd->fmt.i_visible_height = place.height;
-        vd->fmt.i_x_offset = vd->source.i_x_offset * place.width  / vd->source.i_visible_width;
-        vd->fmt.i_y_offset = vd->source.i_y_offset * place.height / vd->source.i_visible_height;
+        vd->fmt.i_x_offset = source_rot.i_x_offset * place.width  / source_rot.i_visible_width;
+        vd->fmt.i_y_offset = source_rot.i_y_offset * place.height / source_rot.i_visible_height;
         return VLC_SUCCESS;
     }
 
