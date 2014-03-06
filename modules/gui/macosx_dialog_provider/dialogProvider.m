@@ -306,6 +306,8 @@ bool checkProgressPanel (void *priv)
     return ret;
 }
 
+@interface VLCDialogDisplayer() <NSWindowDelegate>
+@end
 
 @implementation VLCDialogDisplayer
 - (void)dealloc
@@ -371,7 +373,7 @@ bool checkProgressPanel (void *priv)
                               defaultButton:[dialog objectForKey:@"yes"]
                             alternateButton:[dialog objectForKey:@"no"]
                                 otherButton:[dialog objectForKey:@"cancel"]
-                  informativeTextWithFormat:[dialog objectForKey:@"message"]];
+                  informativeTextWithFormat:@"%@", [dialog objectForKey:@"message"]];
     [alert setAlertStyle:NSInformationalAlertStyle];
     alertRet = [alert runModal];
 

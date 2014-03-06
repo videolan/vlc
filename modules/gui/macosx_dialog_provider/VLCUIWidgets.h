@@ -56,7 +56,7 @@
 @end
 
 
-@interface VLCDialogList : NSTableView
+@interface VLCDialogList : NSTableView <NSTableViewDataSource>
 {
     extension_widget_t *widget;
     NSMutableArray *contentArray;
