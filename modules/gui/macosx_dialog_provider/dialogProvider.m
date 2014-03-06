@@ -94,8 +94,8 @@ struct intf_sys_t
 vlc_module_begin()
     /* Minimal interface. see intf.m */
     set_shortname("Mac OS X Dialogs")
-    add_shortcut("macosx_dialog_provider", "miosx")
-    set_description("Minimal Mac OS X Dialog Provider")
+    add_shortcut("macosx_dialog_provider")
+    set_description("Mac OS X Dialog Provider")
     set_capability("interface", 0)
 
     /* This setting is interesting, because when used with a libvlc app
