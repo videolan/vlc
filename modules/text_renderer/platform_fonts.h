@@ -85,7 +85,7 @@ void FontConfig_BuildCache( filter_t *p_filter );
 #endif
 
 
-#ifdef _WIN32
+#if defined( _WIN32 ) && !VLC_WINSTORE_APP
 char* Win32_Select( filter_t *p_filter, const char* family,
                            bool b_bold, bool b_italic, int i_size, int *i_idx );
 

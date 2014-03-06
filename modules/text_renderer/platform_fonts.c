@@ -178,7 +178,7 @@ char* FontConfig_Select( filter_t *p_filter, const char* family,
 }
 #endif
 
-#ifdef _WIN32
+#if defined( _WIN32 ) && !VLC_WINSTORE_APP
 #define FONT_DIR_NT _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts")
 
 static int GetFileFontByName( LPCTSTR font_name, char **psz_filename )
