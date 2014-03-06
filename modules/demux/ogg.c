@@ -1676,6 +1676,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         free( p_stream );
                         p_ogg->i_streams--;
                     }
+                    if ( p_stream->f_rate == 0 ) p_stream->fmt.i_cat = UNKNOWN_ES;
                 }
                 /* Check for OggDS */
                 else if( oggpacket.bytes >= 44+1 &&
@@ -1811,6 +1812,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         free( p_stream );
                         p_ogg->i_streams--;
                     }
+                    if ( p_stream->f_rate == 0 ) p_stream->fmt.i_cat = UNKNOWN_ES;
                 }
                 else if( oggpacket.bytes >= 8 &&
                              ! memcmp( oggpacket.packet, "fishead\0", 8 ) )
@@ -2276,8 +2278,8 @@ static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
                                   ogg_packet *p_oggpacket )
 {
     bs_t bitstream;
-    int i_fps_numerator;
-    int i_fps_denominator;
+    unsigned int i_fps_numerator;
+    unsigned int i_fps_denominator;
     int i_keyframe_frequency_force;
     int i_major;
     int i_minor;
@@ -2333,7 +2335,9 @@ static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
 
     i_version = i_major * 1000000 + i_minor * 1000 + i_subminor;
     p_stream->i_keyframe_offset = 0;
-    p_stream->f_rate = ((float)i_fps_numerator) / i_fps_denominator;
+    p_stream->f_rate = ((double)i_fps_numerator) / i_fps_denominator;
+    if ( p_stream->f_rate == 0 )
+        p_stream->fmt.i_cat = UNKNOWN_ES;
 
     if ( i_version >= 3002001 )
     {
@@ -2364,6 +2368,7 @@ static void Ogg_ReadVorbisHeader( logical_stream_t *p_stream,
     oggpack_adv( &opb, 32 );
     p_stream->fmt.i_bitrate = oggpack_read( &opb, 32 ); /* is signed 32 */
     if( p_stream->fmt.i_bitrate > INT32_MAX ) p_stream->fmt.i_bitrate = 0;
+    if ( p_stream->f_rate == 0 ) p_stream->fmt.i_cat = UNKNOWN_ES;
 }
 
 static void Ogg_ReadSpeexHeader( logical_stream_t *p_stream,
@@ -2461,8 +2466,8 @@ static void Ogg_ReadKateHeader( logical_stream_t *p_stream,
                                 ogg_packet *p_oggpacket )
 {
     oggpack_buffer opb;
-    int32_t gnum;
-    int32_t gden;
+    uint32_t gnum;
+    uint32_t gden;
     int n;
     char *psz_desc;
 
@@ -2517,6 +2522,7 @@ static void Ogg_ReadKateHeader( logical_stream_t *p_stream,
         for( n = 0; n < 16; n++ )
             oggpack_read(&opb,8);
     }
+    if ( p_stream->f_rate == 0 ) p_stream->fmt.i_cat = UNKNOWN_ES;
 }
 
 static bool Ogg_ReadVP8Header( demux_t *p_demux, logical_stream_t *p_stream,
@@ -2539,6 +2545,7 @@ static bool Ogg_ReadVP8Header( demux_t *p_demux, logical_stream_t *p_stream,
         p_stream->fmt.video.i_frame_rate = GetDWBE( &p_oggpacket->packet[18] );
         p_stream->fmt.video.i_frame_rate_base = GetDWBE( &p_oggpacket->packet[22] );
         p_stream->f_rate = (double) p_stream->fmt.video.i_frame_rate / p_stream->fmt.video.i_frame_rate_base;
+        if ( p_stream->f_rate == 0 ) return false;
         return true;
     /* METADATA */
     case 0x02:
@@ -3009,6 +3016,7 @@ static bool Ogg_ReadDiracHeader( logical_stream_t *p_stream,
     /* probably is an ogg dirac es */
     p_stream->fmt.i_cat = VIDEO_ES;
     p_stream->fmt.i_codec = VLC_CODEC_DIRAC;
+    if ( p_stream->f_rate == 0 ) p_stream->fmt.i_cat = UNKNOWN_ES;
 
     return true;
 }
