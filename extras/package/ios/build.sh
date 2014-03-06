@@ -257,15 +257,12 @@ ${VLCROOT}/configure \
     --disable-debug \
     --enable-static \
     --disable-macosx \
-    --disable-macosx-vout \
     --disable-macosx-dialog-provider \
     --disable-macosx-qtkit \
     --disable-macosx-eyetv \
     --disable-macosx-vlc-app \
     --disable-macosx-avfoundation \
-    --enable-audioqueue \
-    --enable-ios-audio \
-    --enable-ios-vout2 \
+    --disable-audioqueue \
     --disable-shared \
     --enable-macosx-quartztext \
     --enable-avcodec \
@@ -276,7 +273,6 @@ ${VLCROOT}/configure \
     --disable-lua \
     --disable-a52 \
     --enable-fribidi \
-    --disable-macosx-audio \
     --disable-qt --disable-skins2 \
     --disable-vcd \
     --disable-vlc \
