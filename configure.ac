@@ -182,9 +182,6 @@ case "${host_os}" in
              [HAVE_IOS="1"],
              [HAVE_OSX="1"])
 
-    AM_CONDITIONAL(HAVE_IOS,   test "${HAVE_IOS}" = "1")
-    AM_CONDITIONAL(HAVE_OSX,   test "${HAVE_OSX}" = "1")
-
     dnl Allow binaries created on Lion to run on earlier releases
     AC_EGREP_CPP(yes,
            [#import <Cocoa/Cocoa.h>
@@ -304,6 +301,8 @@ AM_CONDITIONAL(HAVE_OS2,     test "${SYS}" = "os2")
 AM_CONDITIONAL(HAVE_WIN32,   test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1")
 AM_CONDITIONAL(HAVE_SYMBIAN, test "${SYS}" = "symbian")
+AM_CONDITIONAL(HAVE_IOS,   test "${HAVE_IOS}" = "1")
+AM_CONDITIONAL(HAVE_OSX,   test "${HAVE_OSX}" = "1")
 
 AC_SUBST(YASMFLAGS)
 
