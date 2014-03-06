@@ -4111,6 +4111,7 @@ AC_CONFIG_FILES([
   modules/audio_filter/Makefile
   modules/control/Makefile
   modules/gui/Makefile
+  modules/gui/ios_dialog_provider/Makefile
   modules/gui/macosx/Makefile
   modules/gui/minimal_macosx/Makefile
   modules/gui/macosx_dialog_provider/Makefile
