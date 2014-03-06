@@ -114,3 +114,4 @@ endif
 libaudioqueue_plugin_la_SOURCES = audio_output/audioqueue.c
 libaudioqueue_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,CoreServices -rpath '$(aoutdir)'
 EXTRA_LTLIBRARIES += libaudioqueue_plugin.la
+aout_LTLIBRARIES += $(LTLIBaudioqueue)
