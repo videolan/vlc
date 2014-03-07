@@ -46,7 +46,7 @@ static void Close(vlc_object_t *);
     "DeckLink capture card to use, if multiple exist. " \
     "The cards are numbered from 0.")
 
-#define MODE_TEXT N_("Desired input video mode")
+#define MODE_TEXT N_("Desired input video mode. Leave empty for autodetection.")
 #define MODE_LONGTEXT N_( \
     "Desired input video mode for DeckLink captures. " \
     "This value should be a FOURCC code in textual " \
@@ -101,7 +101,7 @@ vlc_module_begin ()
 
     add_integer("decklink-card-index", 0,
                  CARD_INDEX_TEXT, CARD_INDEX_LONGTEXT, true)
-    add_string("decklink-mode", "pal ",
+    add_string("decklink-mode", NULL,
                  MODE_TEXT, MODE_LONGTEXT, true)
     add_string("decklink-audio-connection", 0,
                  AUDIO_CONNECTION_TEXT, AUDIO_CONNECTION_LONGTEXT, true)
@@ -135,6 +135,9 @@ struct demux_sys_t
     /* We need to hold onto the IDeckLinkConfiguration object, or our settings will not apply.
        See section 2.4.15 of the Blackmagic Decklink SDK documentation. */
     IDeckLinkConfiguration *config;
+    IDeckLinkAttributes *attributes;
+
+    bool autodetect;
 
     es_out_id_t *video_es;
     es_out_id_t *audio_es;
@@ -148,6 +151,62 @@ struct demux_sys_t
 
     bool tenbits;
 };
+
+static const char *GetFieldDominance(BMDFieldDominance dom, uint32_t *flags)
+{
+    switch(dom)
+    {
+        case bmdProgressiveFrame:
+            return "";
+        case bmdProgressiveSegmentedFrame:
+            return ", segmented";
+        case bmdLowerFieldFirst:
+            *flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+            return ", interlaced [BFF]";
+        case bmdUpperFieldFirst:
+            *flags = BLOCK_FLAG_TOP_FIELD_FIRST;
+            return ", interlaced [TFF]";
+        case bmdUnknownFieldDominance:
+        default:
+            return ", unknown field dominance";
+    }
+}
+
+static es_format_t GetModeSettings(demux_t *demux, IDeckLinkDisplayMode *m)
+{
+    demux_sys_t *sys = demux->p_sys;
+    uint32_t flags = 0;
+    (void)GetFieldDominance(m->GetFieldDominance(), &flags);
+
+    BMDTimeValue frame_duration, time_scale;
+    if (m->GetFrameRate(&frame_duration, &time_scale) != S_OK) {
+        time_scale = 0;
+        frame_duration = 1;
+    }
+
+    es_format_t video_fmt;
+    vlc_fourcc_t chroma; chroma = sys->tenbits ? VLC_CODEC_I422_10L : VLC_CODEC_UYVY;
+    es_format_Init(&video_fmt, VIDEO_ES, chroma);
+
+    video_fmt.video.i_width = m->GetWidth();
+    video_fmt.video.i_height = m->GetHeight();
+    video_fmt.video.i_sar_num = 1;
+    video_fmt.video.i_sar_den = 1;
+    video_fmt.video.i_frame_rate = time_scale;
+    video_fmt.video.i_frame_rate_base = frame_duration;
+    video_fmt.i_bitrate = video_fmt.video.i_width * video_fmt.video.i_height * video_fmt.video.i_frame_rate * 2 * 8;
+
+    unsigned aspect_num, aspect_den;
+    if (!var_InheritURational(demux, &aspect_num, &aspect_den, "decklink-aspect-ratio") &&
+         aspect_num > 0 && aspect_den > 0) {
+        video_fmt.video.i_sar_num = aspect_num * video_fmt.video.i_height;
+        video_fmt.video.i_sar_den = aspect_den * video_fmt.video.i_width;
+    }
+
+    sys->dominance_flags = flags;
+
+    return video_fmt;
+}
 
 class DeckLinkCaptureDelegate : public IDeckLinkInputCallback
 {
@@ -172,9 +231,33 @@ public:
         return new_ref;
     }
 
-    virtual HRESULT STDMETHODCALLTYPE VideoInputFormatChanged(BMDVideoInputFormatChangedEvents, IDeckLinkDisplayMode*, BMDDetectedVideoInputFormatFlags)
+    virtual HRESULT STDMETHODCALLTYPE VideoInputFormatChanged(BMDVideoInputFormatChangedEvents events, IDeckLinkDisplayMode *mode, BMDDetectedVideoInputFormatFlags)
     {
-        msg_Dbg(demux_, "Video input format changed");
+        demux_sys_t *sys = demux_->p_sys;
+
+        if( !(events & bmdVideoInputDisplayModeChanged ))
+            return S_OK;
+
+        const char *mode_name;
+        if (mode->GetName(&mode_name) != S_OK)
+            mode_name = "unknown";
+
+        msg_Dbg(demux_, "Video input format changed to %s", mode_name);
+        if (!sys->autodetect) {
+            msg_Err(demux_, "Video format detection disabled");
+            return S_OK;
+        }
+
+        es_out_Del(demux_->out, sys->video_es);
+        es_format_t video_fmt = GetModeSettings(demux_, mode);
+        sys->video_es = es_out_Add(demux_->out, &video_fmt);
+
+        BMDPixelFormat fmt = sys->tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV;
+        sys->input->PauseStreams();
+        sys->input->EnableVideoInput( mode->GetDisplayMode(), fmt, bmdVideoInputEnableFormatDetection );
+        sys->input->FlushStreams();
+        sys->input->StartStreams();
+
         return S_OK;
     }
 
@@ -491,36 +574,15 @@ static int GetVideoConn(demux_t *demux)
     return VLC_SUCCESS;
 }
 
-static const char *GetFieldDominance(BMDFieldDominance dom, uint32_t *flags)
-{
-    switch(dom)
-    {
-        case bmdProgressiveFrame:
-            return "";
-        case bmdProgressiveSegmentedFrame:
-            return ", segmented";
-        case bmdLowerFieldFirst:
-            *flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
-            return ", interlaced [BFF]";
-        case bmdUpperFieldFirst:
-            *flags = BLOCK_FLAG_TOP_FIELD_FIRST;
-            return ", interlaced [TFF]";
-        case bmdUnknownFieldDominance:
-        default:
-            return ", unknown field dominance";
-    }
-}
-
 static int Open(vlc_object_t *p_this)
 {
     demux_t     *demux = (demux_t*)p_this;
     demux_sys_t *sys;
     int         ret = VLC_EGENERIC;
     int         card_index;
-    int         width = 0, height, fps_num, fps_den;
     int         physical_channels = 0;
     int         rate;
-    unsigned    aspect_num, aspect_den;
+    BMDVideoInputFlags flags = bmdVideoInputFlagDefault;
 
     /* Only when selected */
     if (*demux->psz_access == '\0')
@@ -578,13 +640,18 @@ static int Open(vlc_object_t *p_this)
         goto finish;
     }
 
+    if (sys->card->QueryInterface(IID_IDeckLinkAttributes, (void**)&sys->attributes) != S_OK) {
+        msg_Err(demux, "Failed to get attributes interface");
+        goto finish;
+    }
+
     if (GetVideoConn(demux) || GetAudioConn(demux))
         goto finish;
 
-    char *mode;
-    mode = var_CreateGetNonEmptyString(demux, "decklink-mode");
-    if (!mode || strlen(mode) < 3 || strlen(mode) > 4) {
-        msg_Err(demux, "Invalid mode: `%s\'", mode ? mode : "");
+    BMDPixelFormat fmt;
+    fmt = sys->tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV;
+    if (sys->attributes->GetFlag(BMDDeckLinkSupportsInputFormatDetection, &sys->autodetect) != S_OK) {
+        msg_Err(demux, "Failed to query card attribute");
         goto finish;
     }
 
@@ -592,7 +659,6 @@ static int Open(vlc_object_t *p_this)
     IDeckLinkDisplayModeIterator *mode_it;
     if (sys->input->GetDisplayModeIterator(&mode_it) != S_OK) {
         msg_Err(demux, "Failed to enumerate display modes");
-        free(mode);
         goto finish;
     }
 
@@ -600,10 +666,35 @@ static int Open(vlc_object_t *p_this)
         BMDDisplayMode id;
         char str[4];
     } u;
-    memcpy(u.str, mode, 4);
-    if (u.str[3] == '\0')
-        u.str[3] = ' '; /* 'pal'\0 -> 'pal ' */
-    free(mode);
+
+    u.id = 0;
+
+    char *mode;
+    mode = var_CreateGetNonEmptyString(demux, "decklink-mode");
+    if (mode)
+        sys->autodetect = false; // disable autodetection if mode was set
+
+    if (sys->autodetect) {
+        msg_Dbg(demux, "Card supports input format detection");
+        flags |= bmdVideoInputEnableFormatDetection;
+        /* Enable a random format, we will reconfigure on format detection */
+        u.id = htonl(bmdModeHD1080p2997);
+    } else {
+        if (!mode || strlen(mode) < 3 || strlen(mode) > 4) {
+            msg_Err(demux, "Invalid mode: \'%s\'", mode ? mode : "");
+            free(mode);
+            goto finish;
+        }
+
+        msg_Dbg(demux, "Looking for mode \'%s\'", mode);
+        memcpy(u.str, mode, 4);
+        if (u.str[3] == '\0')
+            u.str[3] = ' '; /* 'pal'\0 -> 'pal ' */
+        free(mode);
+    }
+
+    es_format_t video_fmt;
+    video_fmt.video.i_width = 0;
 
     for (IDeckLinkDisplayMode *m;; m->Release()) {
         if ((mode_it->Next(&m) != S_OK) || !m)
@@ -611,8 +702,8 @@ static int Open(vlc_object_t *p_this)
 
         const char *mode_name;
         BMDTimeValue frame_duration, time_scale;
-        uint32_t flags = 0;
-        const char *field = GetFieldDominance(m->GetFieldDominance(), &flags);
+        uint32_t field_flags;
+        const char *field = GetFieldDominance(m->GetFieldDominance(), &field_flags);
         BMDDisplayMode id = ntohl(m->GetDisplayMode());
 
         if (m->GetName(&mode_name) != S_OK)
@@ -628,23 +719,19 @@ static int Open(vlc_object_t *p_this)
                  double(time_scale) / frame_duration, field);
 
         if (u.id == id) {
-            width = m->GetWidth();
-            height = m->GetHeight();
-            fps_num = time_scale;
-            fps_den = frame_duration;
-            sys->dominance_flags = flags;
+            video_fmt = GetModeSettings(demux, m);
+            msg_Dbg(demux, "Using that mode");
         }
     }
 
     mode_it->Release();
 
-    if (width == 0) {
+    if (video_fmt.video.i_width == 0) {
         msg_Err(demux, "Unknown video mode `%4.4s\' specified.", (char*)&u.id);
         goto finish;
     }
 
-    BMDPixelFormat fmt; fmt = sys->tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV;
-    if (sys->input->EnableVideoInput(htonl(u.id), fmt, 0) != S_OK) {
+    if (sys->input->EnableVideoInput(htonl(u.id), fmt, flags) != S_OK) {
         msg_Err(demux, "Failed to enable video input");
         goto finish;
     }
@@ -682,24 +769,6 @@ static int Open(vlc_object_t *p_this)
         goto finish;
     }
 
-    /* Declare elementary streams */
-    es_format_t video_fmt;
-    vlc_fourcc_t chroma; chroma = sys->tenbits ? VLC_CODEC_I422_10L : VLC_CODEC_UYVY;
-    es_format_Init(&video_fmt, VIDEO_ES, chroma);
-    video_fmt.video.i_width = width;
-    video_fmt.video.i_height = height;
-    video_fmt.video.i_sar_num = 1;
-    video_fmt.video.i_sar_den = 1;
-    video_fmt.video.i_frame_rate = fps_num;
-    video_fmt.video.i_frame_rate_base = fps_den;
-    video_fmt.i_bitrate = video_fmt.video.i_width * video_fmt.video.i_height * video_fmt.video.i_frame_rate * 2 * 8;
-
-    if (!var_InheritURational(demux, &aspect_num, &aspect_den, "decklink-aspect-ratio") &&
-         aspect_num > 0 && aspect_den > 0) {
-        video_fmt.video.i_sar_num = aspect_num * video_fmt.video.i_height;
-        video_fmt.video.i_sar_den = aspect_den * video_fmt.video.i_width;
-    }
-
     msg_Dbg(demux, "added new video es %4.4s %dx%d",
              (char*)&video_fmt.i_codec, video_fmt.video.i_width, video_fmt.video.i_height);
     sys->video_es = es_out_Add(demux->out, &video_fmt);
@@ -733,6 +802,9 @@ static void Close(vlc_object_t *p_this)
 {
     demux_t     *demux = (demux_t *)p_this;
     demux_sys_t *sys   = demux->p_sys;
+
+    if (sys->attributes)
+        sys->attributes->Release();
 
     if (sys->config)
         sys->config->Release();
