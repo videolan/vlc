@@ -361,7 +361,8 @@ static int Open( vlc_object_t * p_this )
     if( LoadInitFrag( p_demux, b_smooth ) != VLC_SUCCESS )
         goto error;
 
-    if( MP4_BoxCount( p_sys->p_root, "/moov/mvex" ) > 0 )
+    if( MP4_BoxCount( p_sys->p_root, "/moov/mvex" ) > 0 &&
+        MP4_BoxCount( p_sys->p_root, "/moof" ) > 0 )
     {
         p_sys->b_fragmented = true;
     }
