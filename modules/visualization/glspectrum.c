@@ -215,7 +215,7 @@ static block_t *DoWork(filter_t *p_filter, block_t *p_in_buf)
 /**
   * Init the OpenGL scene.
   **/
-static void initOpenGLScene()
+static void initOpenGLScene(void)
 {
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
@@ -247,7 +247,7 @@ static void initOpenGLScene()
 /**
  * Draw one bar of the Spectrum.
  */
-static void drawBar()
+static void drawBar(void)
 {
     const float w = SPECTRUM_WIDTH / NB_BANDS - 0.05;
 
@@ -559,4 +559,3 @@ error:
     vlc_sem_post(&p_sys->ready);
     return NULL;
 }
-
