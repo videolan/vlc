@@ -351,6 +351,8 @@ static void *Thread( void *p_data )
         goto error;
     }
 
+    vlc_gl_MakeCurrent( gl );
+
     /* Work-around the projectM locale bug */
     loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
     oldloc = uselocale (loc);
@@ -446,6 +448,7 @@ static void *Thread( void *p_data )
                 uselocale (oldloc);
                 freelocale (loc);
             }
+            vlc_gl_ReleaseCurrent( gl );
             return NULL;
         }
         vlc_mutex_unlock( &p_sys->lock );
@@ -464,6 +467,7 @@ static void *Thread( void *p_data )
     assert(0);
 
 error:
+    vlc_gl_ReleaseCurrent( gl );
     p_sys->b_error = true;
     vlc_sem_post( &p_sys->ready );
     return NULL;
