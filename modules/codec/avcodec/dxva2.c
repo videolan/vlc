@@ -791,11 +791,11 @@ static int DxFindVideoServiceConversion(vlc_va_dxva2_t *va, GUID *input, D3DFORM
             continue;
 
         /* */
-        bool is_suported = false;
-        for (const GUID *g = &input_list[0]; !is_suported && g < &input_list[input_count]; g++) {
-            is_suported = IsEqualGUID(mode->guid, g);
+        bool is_supported = false;
+        for (const GUID *g = &input_list[0]; !is_supported && g < &input_list[input_count]; g++) {
+            is_supported = IsEqualGUID(mode->guid, g);
         }
-        if (!is_suported)
+        if (!is_supported)
             continue;
 
         /* */
@@ -823,11 +823,11 @@ static int DxFindVideoServiceConversion(vlc_va_dxva2_t *va, GUID *input, D3DFORM
             const d3d_format_t *format = &d3d_formats[j];
 
             /* */
-            bool is_suported = false;
-            for (unsigned k = 0; !is_suported && k < output_count; k++) {
-                is_suported = format->format == output_list[k];
+            bool is_supported = false;
+            for (unsigned k = 0; !is_supported && k < output_count; k++) {
+                is_supported = format->format == output_list[k];
             }
-            if (!is_suported)
+            if (!is_supported)
                 continue;
 
             /* We have our solution */
