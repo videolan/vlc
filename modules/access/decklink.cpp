@@ -2,10 +2,10 @@
  * decklink.cpp: BlackMagic DeckLink SDI input module
  *****************************************************************************
  * Copyright (C) 2010 Steinar H. Gunderson
- * Copyright (C) 2009 Michael Niedermayer <michaelni@gmx.at>
- * Copyright (c) 2009 Baptiste Coudurier <baptiste dot coudurier at gmail dot com>
+ * Copyright (C) 2012-2014 Rafaël Carré
  *
  * Authors: Steinar H. Gunderson <steinar+vlc@gunderson.no>
+            Rafaël Carré <funman@videolanorg>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -37,6 +37,8 @@
 
 #include <DeckLinkAPI.h>
 #include <DeckLinkAPIDispatch.cpp>
+
+#include "sdi.h"
 
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
@@ -268,60 +270,6 @@ private:
     demux_t *demux_;
 };
 
-static inline uint32_t av_le2ne32(uint32_t val)
-{
-    union {
-        uint32_t v;
-        uint8_t b[4];
-    } u;
-    u.v = val;
-    return (u.b[0] << 0) | (u.b[1] << 8) | (u.b[2] << 16) | (u.b[3] << 24);
-}
-
-static void v210_convert(uint16_t *dst, const uint32_t *bytes, const int width, const int height)
-{
-    const int stride = ((width + 47) / 48) * 48 * 8 / 3 / 4;
-    uint16_t *y = &dst[0];
-    uint16_t *u = &dst[width * height * 2 / 2];
-    uint16_t *v = &dst[width * height * 3 / 2];
-
-#define READ_PIXELS(a, b, c)         \
-    do {                             \
-        val  = av_le2ne32(*src++);   \
-        *a++ =  val & 0x3FF;         \
-        *b++ = (val >> 10) & 0x3FF;  \
-        *c++ = (val >> 20) & 0x3FF;  \
-    } while (0)
-
-    for (int h = 0; h < height; h++) {
-        const uint32_t *src = bytes;
-        uint32_t val = 0;
-        int w;
-        for (w = 0; w < width - 5; w += 6) {
-            READ_PIXELS(u, y, v);
-            READ_PIXELS(y, u, y);
-            READ_PIXELS(v, y, u);
-            READ_PIXELS(y, v, y);
-        }
-        if (w < width - 1) {
-            READ_PIXELS(u, y, v);
-
-            val  = av_le2ne32(*src++);
-            *y++ =  val & 0x3FF;
-        }
-        if (w < width - 3) {
-            *u++ = (val >> 10) & 0x3FF;
-            *y++ = (val >> 20) & 0x3FF;
-
-            val  = av_le2ne32(*src++);
-            *v++ =  val & 0x3FF;
-            *y++ = (val >> 10) & 0x3FF;
-        }
-
-        bytes += stride;
-    }
-}
-
 HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame* videoFrame, IDeckLinkAudioInputPacket* audioFrame)
 {
     demux_sys_t *sys = demux_->p_sys;
@@ -359,108 +307,26 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
                         break;
                     uint16_t dec[width * 2];
                     v210_convert(&dec[0], buf, width, 1);
-                    static const uint16_t vanc_header[3] = { 0, 0x3ff, 0x3ff };
-                    if (!memcmp(vanc_header, dec, sizeof(vanc_header))) {
-                        int len = (dec[5] & 0xff) + 6 + 1;
-                        uint16_t vanc_sum = 0;
-                        bool parity_ok = true;
-                        for (int i = 3; i < len - 1; i++) {
-                            uint16_t v = dec[i];
-                            int np = v >> 8;
-                            int p = parity(v & 0xff);
-                            if ((!!p ^ !!(v & 0x100)) || (np != 1 && np != 2)) {
-                                parity_ok = false;
-                                break;
-                            }
-                            vanc_sum += v;
-                            vanc_sum &= 0x1ff;
-                            dec[i] &= 0xff;
+                    block_t *cc = vanc_to_cc(demux_, dec, width * 2);
+                    if (!cc)
+                        continue;
+                    cc->i_pts = cc->i_dts = VLC_TS_0 + stream_time;
+
+                    if (!sys->cc_es) {
+                        es_format_t fmt;
+
+                        es_format_Init( &fmt, SPU_ES, VLC_FOURCC('c', 'c', '1' , ' ') );
+                        fmt.psz_description = strdup(N_("Closed captions 1"));
+                        if (fmt.psz_description) {
+                            sys->cc_es = es_out_Add(demux_->out, &fmt);
+                            msg_Dbg(demux_, "Adding Closed captions stream");
                         }
-
-                        if (!parity_ok)
-                            continue;
-
-                        vanc_sum |= ((~vanc_sum & 0x100) << 1);
-                        if (dec[len - 1] != vanc_sum)
-                            continue;
-
-                        if (dec[3] != 0x61 /* DID */ ||
-                            dec[4] != 0x01 /* SDID = CEA-708 */)
-                            continue;
-
-                        /* CDP follows */
-                        uint16_t *cdp = &dec[6];
-                        if (cdp[0] != 0x96 || cdp[1] != 0x69)
-                            continue;
-
-                        len -= 7; // remove VANC header and checksum
-
-                        if (cdp[2] != len)
-                            continue;
-
-                        uint8_t cdp_sum = 0;
-                        for (int i = 0; i < len - 1; i++)
-                            cdp_sum += cdp[i];
-                        cdp_sum = cdp_sum ? 256 - cdp_sum : 0;
-                        if (cdp[len - 1] != cdp_sum)
-                            continue;
-
-                        uint8_t rate = cdp[3];
-                        if (!(rate & 0x0f))
-                            continue;
-                        rate >>= 4;
-                        if (rate > 8)
-                            continue;
-
-                        if (!(cdp[4] & 0x43)) /* ccdata_present | caption_service_active | reserved */
-                            continue;
-
-                        uint16_t hdr = (cdp[5] << 8) | cdp[6];
-                        if (cdp[7] != 0x72) /* ccdata_id */
-                            continue;
-
-                        int cc_count = cdp[8];
-                        if (!(cc_count & 0xe0))
-                            continue;
-                        cc_count &= 0x1f;
-
-                        /* FIXME: parse additional data (CC language?) */
-                        if ((len - 13) < cc_count * 3)
-                            continue;
-
-                        if (cdp[len - 4] != 0x74) /* footer id */
-                            continue;
-
-                        uint16_t ftr = (cdp[len - 3] << 8) | cdp[len - 2];
-                        if (ftr != hdr)
-                            continue;
-
-                        block_t *cc = block_Alloc(cc_count * 3);
-
-                        for (int i = 0; i < cc_count; i++) {
-                            cc->p_buffer[3*i+0] = cdp[9 + 3*i+0] & 3;
-                            cc->p_buffer[3*i+1] = cdp[9 + 3*i+1];
-                            cc->p_buffer[3*i+2] = cdp[9 + 3*i+2];
-                        }
-
-                        cc->i_pts = cc->i_dts = VLC_TS_0 + stream_time;
-
-                        if (!sys->cc_es) {
-                            es_format_t fmt;
-
-                            es_format_Init( &fmt, SPU_ES, VLC_FOURCC('c', 'c', '1' , ' ') );
-                            fmt.psz_description = strdup("Closed captions 1");
-                            if (fmt.psz_description) {
-                                sys->cc_es = es_out_Add(demux_->out, &fmt);
-                                msg_Dbg(demux_, "Adding Closed captions stream");
-                            }
-                        }
-                        if (sys->cc_es)
-                            es_out_Send(demux_->out, sys->cc_es, cc);
-                        else
-                            block_Release(cc);
-                        break; // we found the line with Closed Caption data
                     }
+                    if (sys->cc_es)
+                        es_out_Send(demux_->out, sys->cc_es, cc);
+                    else
+                        block_Release(cc);
+                    break; // we found the line with Closed Caption data
                 }
                 vanc->Release();
             }

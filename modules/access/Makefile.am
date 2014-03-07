@@ -132,7 +132,7 @@ liblinsys_sdi_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBlinsys_hdsdi) $(LTLIBlinsys_sdi)
 EXTRA_LTLIBRARIES += liblinsys_hdsdi_plugin.la liblinsys_sdi_plugin.la
 
-libdecklink_plugin_la_SOURCES = access/decklink.cpp
+libdecklink_plugin_la_SOURCES = access/decklink.cpp access/sdi.c access/sdi.h
 libdecklink_plugin_la_CXXFLAGS = $(AM_CFLAGS) $(CPPFLAGS_decklink)
 libdecklink_plugin_la_LIBADD = $(LIBS_decklink) -ldl
 if HAVE_DECKLINK
