@@ -29,6 +29,8 @@
 # define __STDC_CONSTANT_MACROS
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
@@ -459,7 +461,7 @@ static void *Thread( void *p_data )
             vlc_gl_Unlock( gl );
         }
     }
-    abort();
+    assert(0);
 
 error:
     p_sys->b_error = true;
