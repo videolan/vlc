@@ -101,7 +101,7 @@ static int Open (vlc_object_t *obj)
 {
     vlc_gl_t *gl = (vlc_gl_t *)obj;
 
-    if (!vlc_xlib_init (obj))
+    if (gl->surface->type != VOUT_WINDOW_TYPE_XID || !vlc_xlib_init (obj))
         return VLC_EGENERIC;
 
     /* Initialize GLX display */
