@@ -167,8 +167,13 @@ static int  Open (vlc_object_t *p_this)
     param->bEnableWavefront = 0; // buggy in x265, use frame threading for now
     param->maxCUSize = 16; /* use smaller macroblock */
 
+#if X265_BUILD >= 6
+    param->fpsNum = p_enc->fmt_in.video.i_frame_rate;
+    param->fpsDenom = p_enc->fmt_in.video.i_frame_rate_base;
+#else
     param->frameRate = p_enc->fmt_in.video.i_frame_rate /
             p_enc->fmt_in.video.i_frame_rate_base;
+#endif
     param->sourceWidth = p_enc->fmt_in.video.i_visible_width;
     param->sourceHeight = p_enc->fmt_in.video.i_visible_height;
 
