@@ -559,7 +559,7 @@ static void OutputSend( sout_stream_t *p_stream, sout_stream_id_sys_t *id, block
     {
         /* We wait until the first key frame (if needed) and
          * to be beyong i_dts_start (for stream without key frame) */
-        if( id->b_wait_key )
+        if( unlikely( id->b_wait_key ) )
         {
             if( p_block->i_flags & BLOCK_FLAG_TYPE_I )
             {
@@ -570,12 +570,12 @@ static void OutputSend( sout_stream_t *p_stream, sout_stream_id_sys_t *id, block
             if( ( p_block->i_flags & BLOCK_FLAG_TYPE_MASK ) == 0 )
                 id->b_wait_key = false;
         }
-        if( id->b_wait_start )
+        if( unlikely( id->b_wait_start ) )
         {
             if( p_block->i_dts >=p_sys->i_dts_start )
                 id->b_wait_start = false;
         }
-        if( id->b_wait_key || id->b_wait_start )
+        if( unlikely( id->b_wait_key || id->b_wait_start ) )
             block_ChainRelease( p_block );
         else
             sout_StreamIdSend( p_sys->p_out, id->id, p_block );
