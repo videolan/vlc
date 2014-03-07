@@ -510,6 +510,13 @@ static int64_t find_first_page_granule( demux_t *p_demux,
             return p_sys->i_input_position;
         }
 
+        if ( ogg_page_granulepos( &p_sys->current_page ) <= 0 )
+        {
+            p_sys->i_input_position += i_result;
+            i_bytes_to_read += OGGSEEK_BYTES_TO_READ;
+            continue;
+        }
+
         // found a page
         if ( ogg_stream_pagein( &p_stream->os, &p_sys->current_page ) != 0 )
         {
@@ -772,6 +779,8 @@ int64_t Oggseek_GranuleToAbsTimestamp( logical_stream_t *p_stream,
                                        int64_t i_granule, bool b_presentation )
 {
     int64_t i_timestamp = -1;
+    if ( i_granule < 0 )
+        return -1;
 
     if ( p_stream->b_oggds )
     {
@@ -897,7 +906,7 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
         current.i_timestamp = Oggseek_GranuleToAbsTimestamp( p_stream,
                                                              current.i_granule, false );
 
-        if ( current.i_timestamp == -1 )
+        if ( current.i_timestamp == -1 && current.i_granule > 0 )
         {
             msg_Err( p_demux, "Unmatched granule. New codec ?" );
             return -1;
