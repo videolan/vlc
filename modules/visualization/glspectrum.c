@@ -403,7 +403,9 @@ static void *Thread( void *p_data )
 
     vlc_sem_post(&p_sys->ready);
 
+    vlc_gl_MakeCurrent(gl);
     initOpenGLScene();
+    vlc_gl_ReleaseCurrent(gl);
 
     float height[NB_BANDS] = {0};
 
@@ -413,6 +415,7 @@ static void *Thread( void *p_data )
 
         int canc = vlc_savecancel();
 
+        vlc_gl_MakeCurrent(gl);
         /* Manage the events */
         vout_ManageDisplay(p_sys->p_vd, true);
         if (p_sys->p_vd->cfg->display.width != i_last_width ||
@@ -548,6 +551,7 @@ static void *Thread( void *p_data )
 release:
         window_close(&wind_ctx);
         fft_close(p_state);
+        vlc_gl_ReleaseCurrent(gl);
         block_Release(block);
         vlc_restorecancel(canc);
     }
