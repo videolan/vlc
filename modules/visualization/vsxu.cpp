@@ -315,6 +315,7 @@ static void *Thread( void *p_data )
 
     // tell main thread we are ready
     vlc_sem_post( &p_sys->ready );
+    vlc_gl_MakeCurrent( gl );
 
     while ( run )
     {
@@ -391,6 +392,8 @@ static void *Thread( void *p_data )
 
     // delete the intro (if ever allocated)
     if (intro) delete intro;
+
+    vlc_gl_ReleaseCurrent( gl );
 
     var_DelCallback( p_vout, "fullscreen", VoutCallback, p_vd );
 
