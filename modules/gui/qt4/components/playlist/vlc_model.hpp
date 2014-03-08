@@ -163,9 +163,9 @@ public:
 
     /* Custom */
     static int columnToMeta( int _column );
+    static int metaToColumn( int meta );
     static QString getMeta( const QModelIndex & index, int meta );
     static QPixmap getArtPixmap( const QModelIndex & index, const QSize & size );
-    static QString getArtUrl( const QModelIndex & index );
 
 protected:
     /* Custom methods / helpers */

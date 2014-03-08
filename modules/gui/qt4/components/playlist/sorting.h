@@ -61,7 +61,7 @@ static inline const char * psz_column_title( uint32_t i_column )
     case COLUMN_DESCRIPTION:     return VLC_META_DESCRIPTION;
     case COLUMN_URI:             return _("URI");
     case COLUMN_RATING:          return VLC_META_RATING;
-    case COLUMN_COVER:           return VLC_META_ART_URL;
+    case COLUMN_COVER:           return _("Cover");
     default: abort();
     }
 }

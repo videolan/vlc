@@ -381,7 +381,7 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
                         break;
                 }
             }
-            return QVariant( artUrl );
+            return artUrl;
         }
         else
         {
@@ -391,50 +391,24 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
         }
         return QVariant( returninfo );
     }
-    else if( role == Qt::DecorationRole && index.column() == 0  )
+    else if( role == Qt::DecorationRole )
     {
-        /* Used to segfault here because i_type wasn't always initialized */
-        return QVariant( icons[item->inputItem()->i_type] );
+        switch( columnToMeta(index.column()) )
+        {
+        case COLUMN_TITLE:
+            /* Used to segfault here because i_type wasn't always initialized */
+            return QVariant( icons[item->inputItem()->i_type] );
+        case COLUMN_COVER:
+            /* !warn: changes tree item line height. Otherwise, override
+             * delegate's sizehint */
+            return getArtPixmap( index, QSize(16,16) );
+        default:
+            return QVariant();
+        }
     }
     else if( role == Qt::FontRole )
     {
         return QVariant( QFont() );
-    }
-    else if( role == Qt::ToolTipRole )
-    {
-        int i_art_policy = var_GetInteger( p_playlist, "album-art" );
-        QString artUrl;
-        /* FIXME: Skip, as we don't want the pixmap and do not know the cached art file */
-        if ( i_art_policy == ALBUM_ART_ALL )
-            artUrl = getArtUrl( index );
-        if ( artUrl.isEmpty() ) artUrl = ":/noart";
-        QString duration = qtr( "unknown" );
-        QString name;
-        PL_LOCK;
-        input_item_t *p_item = item->inputItem();
-        if ( !p_item )
-        {
-            PL_UNLOCK;
-            return QVariant();
-        }
-        if ( p_item->i_duration > 0 )
-        {
-            char *psz = psz_column_meta( item->inputItem(), COLUMN_DURATION );
-            duration = qfu( psz );
-            free( psz );
-        }
-        name = qfu( p_item->psz_name );
-        PL_UNLOCK;
-        QPixmap image = getArtPixmap( index, QSize( 128, 128 ) );
-        QByteArray bytes;
-        QBuffer buffer( &bytes );
-        buffer.open( QIODevice::WriteOnly );
-        image.save(&buffer, "BMP"); /* uncompressed, see qpixmap#reading-and-writing-image-files */
-        return QVariant( QString("<img width=\"128\" height=\"128\" align=\"left\" src=\"data:image/bmp;base64,%1\"/><div><b>%2</b><br/>%3</div>")
-                         .arg( bytes.toBase64().constData() )
-                         .arg( name )
-                         .arg( qtr("Duration") + ": " + duration )
-                        );
     }
     else if( role == Qt::BackgroundRole && isCurrent( index ) )
     {

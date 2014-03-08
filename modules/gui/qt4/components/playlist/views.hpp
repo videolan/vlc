@@ -78,6 +78,15 @@ public:
     virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 };
 
+class CellPixmapDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    CellPixmapDelegate(QWidget *parent = 0) : QStyledItemDelegate(parent) {}
+    virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+};
+
 class PlIconView : public QListView
 {
     Q_OBJECT

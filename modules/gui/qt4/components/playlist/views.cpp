@@ -288,6 +288,13 @@ void PlTreeViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     }
 }
 
+void CellPixmapDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
+{
+    QPixmap pixmap = index.data( Qt::DecorationRole ).value<QPixmap>();
+    painter->drawPixmap( option.rect.topLeft(),
+                         pixmap.scaled( option.rect.size(), Qt::KeepAspectRatio ) );
+}
+
 static inline void plViewStartDrag( QAbstractItemView *view, const Qt::DropActions & supportedActions )
 {
     QDrag *drag = new QDrag( view );
@@ -415,7 +422,8 @@ bool PlListView::viewportEvent ( QEvent * event )
 PlTreeView::PlTreeView( QAbstractItemModel *, QWidget *parent ) : QTreeView( parent )
 {
     setItemDelegate( new PlTreeViewItemDelegate( this ) );
-
+    setItemDelegateForColumn( VLCModel::metaToColumn(COLUMN_COVER),
+                              new CellPixmapDelegate( this ) );
     setIconSize( QSize( 20, 20 ) );
     setAlternatingRowColors( true );
     setAnimated( true );
