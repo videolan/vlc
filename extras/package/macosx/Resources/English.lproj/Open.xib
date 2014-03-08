@@ -5152,7 +5152,7 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
           <object class="NSButton" id="46748615">
             <reference key="NSNextResponder" ref="318731548"/>
             <int key="NSvFlags">256</int>
-            <string key="NSFrame">{{82, 140}, {132, 28}}</string>
+            <string key="NSFrame">{{82, 140}, {165, 28}}</string>
             <reference key="NSSuperview" ref="318731548"/>
             <bool key="NSEnabled">YES</bool>
             <object class="NSButtonCell" key="NSCell" id="695038759">
@@ -5228,7 +5228,7 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
           <object class="NSButton" id="163862958">
             <reference key="NSNextResponder" ref="251474543"/>
             <int key="NSvFlags">256</int>
-            <string key="NSFrame">{{82, 140}, {132, 28}}</string>
+            <string key="NSFrame">{{82, 140}, {165, 28}}</string>
             <reference key="NSSuperview" ref="251474543"/>
             <bool key="NSEnabled">YES</bool>
             <object class="NSButtonCell" key="NSCell" id="88216532">
@@ -13046,12 +13046,10 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
               <string>o_currentCaptureView</string>
               <string>o_currentOpticalMediaIconView</string>
               <string>o_currentOpticalMediaView</string>
-              <string>o_disc_audiocd_bdmv_btn</string>
               <string>o_disc_audiocd_lbl</string>
               <string>o_disc_audiocd_trackcount_lbl</string>
               <string>o_disc_audiocd_videots_btn</string>
               <string>o_disc_audiocd_view</string>
-              <string>o_disc_bd_bdmv_btn</string>
               <string>o_disc_bd_lbl</string>
               <string>o_disc_bd_videots_btn</string>
               <string>o_disc_bd_view</string>
@@ -13069,12 +13067,10 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
               <string>o_disc_dvdwomenus_title_stp</string>
               <string>o_disc_dvdwomenus_videots_btn</string>
               <string>o_disc_dvdwomenus_view</string>
-              <string>o_disc_nodisc_bdmv_btn</string>
               <string>o_disc_nodisc_lbl</string>
               <string>o_disc_nodisc_videots_btn</string>
               <string>o_disc_nodisc_view</string>
               <string>o_disc_selector_pop</string>
-              <string>o_disc_vcd_bdmv_btn</string>
               <string>o_disc_vcd_chapter</string>
               <string>o_disc_vcd_chapter_lbl</string>
               <string>o_disc_vcd_chapter_stp</string>
@@ -13350,10 +13346,6 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
               <string>id</string>
               <string>id</string>
               <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
             </object>
           </object>
           <object class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -13375,12 +13367,10 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
               <string>o_currentCaptureView</string>
               <string>o_currentOpticalMediaIconView</string>
               <string>o_currentOpticalMediaView</string>
-              <string>o_disc_audiocd_bdmv_btn</string>
               <string>o_disc_audiocd_lbl</string>
               <string>o_disc_audiocd_trackcount_lbl</string>
               <string>o_disc_audiocd_videots_btn</string>
               <string>o_disc_audiocd_view</string>
-              <string>o_disc_bd_bdmv_btn</string>
               <string>o_disc_bd_lbl</string>
               <string>o_disc_bd_videots_btn</string>
               <string>o_disc_bd_view</string>
@@ -13398,12 +13388,10 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
               <string>o_disc_dvdwomenus_title_stp</string>
               <string>o_disc_dvdwomenus_videots_btn</string>
               <string>o_disc_dvdwomenus_view</string>
-              <string>o_disc_nodisc_bdmv_btn</string>
               <string>o_disc_nodisc_lbl</string>
               <string>o_disc_nodisc_videots_btn</string>
               <string>o_disc_nodisc_view</string>
               <string>o_disc_selector_pop</string>
-              <string>o_disc_vcd_bdmv_btn</string>
               <string>o_disc_vcd_chapter</string>
               <string>o_disc_vcd_chapter_lbl</string>
               <string>o_disc_vcd_chapter_stp</string>
@@ -13584,10 +13572,6 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_disc_audiocd_bdmv_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
                 <string key="name">o_disc_audiocd_lbl</string>
                 <string key="candidateClassName">id</string>
               </object>
@@ -13601,10 +13585,6 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_disc_audiocd_view</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_disc_bd_bdmv_btn</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
@@ -13676,10 +13656,6 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_disc_nodisc_bdmv_btn</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
                 <string key="name">o_disc_nodisc_lbl</string>
                 <string key="candidateClassName">id</string>
               </object>
@@ -13693,10 +13669,6 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_disc_selector_pop</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_disc_vcd_bdmv_btn</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
