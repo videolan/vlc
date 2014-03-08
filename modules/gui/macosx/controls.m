@@ -50,11 +50,11 @@
 
 - (void)awakeFromNib
 {
-    [o_specificTime_mi setTitle: _NS("Jump To Time")];
+    [o_specificTime_mi setTitle: _NS("Jump to Time")];
     [o_specificTime_cancel_btn setTitle: _NS("Cancel")];
     [o_specificTime_ok_btn setTitle: _NS("OK")];
     [o_specificTime_sec_lbl setStringValue: _NS("sec.")];
-    [o_specificTime_goTo_lbl setStringValue: _NS("Jump to time")];
+    [o_specificTime_goTo_lbl setStringValue: _NS("Jump to Time")];
 
     [o_specificTime_enter_fld setFormatter:[[[PositionFormatter alloc] init] autorelease]];
 }

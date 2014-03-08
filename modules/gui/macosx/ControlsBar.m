@@ -504,7 +504,7 @@
     [[o_volume_up_btn cell] accessibilitySetOverrideValue:_NS("Click to play the audio at maximum volume.") forAttribute:NSAccessibilityDescriptionAttribute];
     [[o_volume_up_btn cell] accessibilitySetOverrideValue:[o_volume_up_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
-    [o_effects_btn setToolTip: _NS("Effects")];
+    [o_effects_btn setToolTip: _NS("Audio Effects")];
     [[o_effects_btn cell] accessibilitySetOverrideValue:_NS("Click to show an Audio Effects panel featuring an equalizer and further filters.") forAttribute:NSAccessibilityDescriptionAttribute];
     [[o_effects_btn cell] accessibilitySetOverrideValue:[o_effects_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
 

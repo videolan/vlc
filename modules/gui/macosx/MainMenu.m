@@ -1531,7 +1531,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         [o_mi setState: i_state];
     } else if ([o_title isEqualToString: _NS("Step Forward")] ||
                [o_title isEqualToString: _NS("Step Backward")] ||
-               [o_title isEqualToString: _NS("Jump To Time")]) {
+               [o_title isEqualToString: _NS("Jump to Time")]) {
         if (p_input != NULL) {
             var_Get(p_input, "can-seek", &val);
             bEnabled = val.b_bool;

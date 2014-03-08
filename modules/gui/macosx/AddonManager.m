@@ -94,7 +94,7 @@ static VLCAddonManager *_o_sharedInstance = nil;
     [[_typeSwitcher lastItem] setTag:ADDON_SKIN2]; */
     [_typeSwitcher addItemWithTitle:_NS("Playlist parsers")];
     [[_typeSwitcher lastItem] setTag:ADDON_PLAYLIST_PARSER];
-    [_typeSwitcher addItemWithTitle:_NS("Service discovery")];
+    [_typeSwitcher addItemWithTitle:_NS("Service Discovery")];
     [[_typeSwitcher lastItem] setTag:ADDON_SERVICE_DISCOVERY];
     [_typeSwitcher addItemWithTitle:_NS("Extensions")];
     [[_typeSwitcher lastItem] setTag:ADDON_EXTENSION];
@@ -107,7 +107,7 @@ static VLCAddonManager *_o_sharedInstance = nil;
     [_author setStringValue:@""];
     [_version setStringValue:@""];
     [_description setString:@""];
-    [_window setTitle:_NS("Addon Manager")];
+    [_window setTitle:_NS("Addons Manager")];
 
     [[[_addonsTable tableColumnWithIdentifier:@"installed"] headerCell] setStringValue:_NS("Installed")];
     [[[_addonsTable tableColumnWithIdentifier:@"name"] headerCell] setStringValue:_NS("Name")];
@@ -208,7 +208,7 @@ static VLCAddonManager *_o_sharedInstance = nil;
     @autoreleasepool {
         NSString *name = [NSString stringWithUTF8String:p_entry->psz_name ? p_entry->psz_name : ""];
         if (p_entry->e_state == ADDON_INSTALLED)
-            name = [name stringByAppendingFormat: @" (%@)", _NS("installed")];
+            name = [name stringByAppendingFormat: @" (%@)", _NS("Installed")];
 
         NSDictionary *addonProperties = [NSDictionary dictionaryWithObjectsAndKeys:
                                          name, @"name",

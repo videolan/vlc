@@ -176,7 +176,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_customize_vid_keep_ckb setTitle: _NS("Keep original video track")];
     [_customize_vid_codec_lbl setStringValue: _NS("Codec")];
     [_customize_vid_bitrate_lbl setStringValue: _NS("Bitrate")];
-    [_customize_vid_framerate_lbl setStringValue: _NS("Frame Rate")];
+    [_customize_vid_framerate_lbl setStringValue: _NS("Frame rate")];
     [_customize_vid_res_box setTitle: _NS("Resolution")];
     [_customize_vid_res_lbl setStringValue: _NS("You just need to fill one of the three following parameters, VLC will autodetect the other using the original aspect ratio")];
     [_customize_vid_width_lbl setStringValue: _NS("Width")];

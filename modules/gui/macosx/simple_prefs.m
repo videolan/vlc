@@ -306,7 +306,7 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
 {
     /* audio */
     [o_audio_dolby_txt setStringValue: _NS("Force detection of Dolby Surround")];
-    [o_audio_effects_box setTitle: _NS("Effects")];
+    [o_audio_effects_box setTitle: _NS("Audio Effects")];
     [o_audio_enable_ckb setTitle: _NS("Enable audio")];
     [o_audio_general_box setTitle: _NS("General Audio")];
     [o_audio_lang_txt setStringValue: _NS("Preferred Audio language")];
