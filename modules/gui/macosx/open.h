@@ -77,25 +77,21 @@
     IBOutlet id o_disc_nodisc_view;
     IBOutlet id o_disc_nodisc_lbl;
     IBOutlet id o_disc_nodisc_videots_btn;
-    IBOutlet id o_disc_nodisc_bdmv_btn;
 
     IBOutlet id o_disc_audiocd_view;
     IBOutlet id o_disc_audiocd_lbl;
     IBOutlet id o_disc_audiocd_trackcount_lbl;
     IBOutlet id o_disc_audiocd_videots_btn;
-    IBOutlet id o_disc_audiocd_bdmv_btn;
 
     IBOutlet id o_disc_dvd_view;
     IBOutlet id o_disc_dvd_lbl;
     IBOutlet id o_disc_dvd_disablemenus_btn;
     IBOutlet id o_disc_dvd_videots_btn;
-    IBOutlet id o_disc_dvd_bdmv_btn;
 
     IBOutlet id o_disc_dvdwomenus_view;
     IBOutlet id o_disc_dvdwomenus_lbl;
     IBOutlet id o_disc_dvdwomenus_enablemenus_btn;
     IBOutlet id o_disc_dvdwomenus_videots_btn;
-    IBOutlet id o_disc_dvdwomenus_bdmv_btn;
     IBOutlet id o_disc_dvdwomenus_title;
     IBOutlet id o_disc_dvdwomenus_title_lbl;
     IBOutlet id o_disc_dvdwomenus_title_stp;
@@ -106,7 +102,6 @@
     IBOutlet id o_disc_vcd_view;
     IBOutlet id o_disc_vcd_lbl;
     IBOutlet id o_disc_vcd_videots_btn;
-    IBOutlet id o_disc_vcd_bdmv_btn;
     IBOutlet id o_disc_vcd_title;
     IBOutlet id o_disc_vcd_title_lbl;
     IBOutlet id o_disc_vcd_title_stp;
@@ -117,7 +112,6 @@
     IBOutlet id o_disc_bd_view;
     IBOutlet id o_disc_bd_lbl;
     IBOutlet id o_disc_bd_videots_btn;
-    IBOutlet id o_disc_bd_bdmv_btn;
 
     /* open network */
     IBOutlet id o_net_http_url;
