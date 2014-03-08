@@ -311,6 +311,7 @@ ${VLCROOT}/configure \
     --enable-freetype \
     --enable-taglib \
     --disable-mmx \
+    --disable-addonmanagermodules \
     --disable-mad > ${out} # MMX and SSE support requires llvm which is broken on Simulator
 fi
 
