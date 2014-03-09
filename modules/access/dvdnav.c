@@ -856,8 +856,7 @@ static int Demux( demux_t *p_demux )
                 p_demux->info.i_update |= INPUT_UPDATE_TITLE;
                 p_demux->info.i_title = i_title;
 
-                if( i_part >= 1 && i_part <= p_sys->title[i_title]->i_seekpoint &&
-                        p_demux->info.i_seekpoint != i_part - 1 )
+                if( i_part >= 1 && i_part <= p_sys->title[i_title]->i_seekpoint )
                 {
                     p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
                     p_demux->info.i_seekpoint = i_part - 1;
