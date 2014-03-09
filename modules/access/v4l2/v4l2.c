@@ -67,8 +67,8 @@
 #define SIZE_LONGTEXT N_( \
     "The specified pixel resolution is forced " \
     "(if both width and height are strictly positive)." )
-/*#define FPS_TEXT N_( "Frame rate" )
-#define FPS_LONGTEXT N_( "Maximum frame rate to use (0 = no limits)." )*/
+#define FPS_TEXT N_( "Frame rate" )
+#define FPS_LONGTEXT N_( "Maximum frame rate to use (0 = no limits)." )
 
 #define RADIO_DEVICE_TEXT N_( "Radio device" )
 #define RADIO_DEVICE_LONGTEXT N_("Radio tuner device node." )
@@ -310,9 +310,8 @@ vlc_module_begin ()
     add_string( CFG_PREFIX "aspect-ratio", "4:3", ASPECT_TEXT,
               ASPECT_LONGTEXT, true )
         change_safe()
-    /*add_float( CFG_PREFIX "fps", 0, FPS_TEXT, FPS_LONGTEXT, true )*/
-    add_obsolete_float( CFG_PREFIX "fps" )
-        change_safe() /* since 2.1.0 */
+    add_string( CFG_PREFIX "fps", "60", FPS_TEXT, FPS_LONGTEXT, false )
+        change_safe()
     add_obsolete_bool( CFG_PREFIX "use-libv4l2" ) /* since 2.1.0 */
 
     set_section( N_( "Tuner" ), NULL )
