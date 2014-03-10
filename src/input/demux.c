@@ -143,7 +143,7 @@ demux_t *demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
         const char *psz_ext;
         const char *psz_module = p_demux->psz_demux;
 
-        if( *psz_module && p_demux->psz_file != NULL
+        if( !strcmp(psz_module, "any") && p_demux->psz_file != NULL
          && (psz_ext = strrchr( p_demux->psz_file, '.' )) != NULL )
         {
             psz_ext++; // skip '.'
