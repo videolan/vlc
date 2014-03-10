@@ -717,7 +717,7 @@ int OpenEncoder( vlc_object_t *p_this )
             {
                 if( p_context->channel_layout & pi_channels_map[i][0] )
                 {
-                    msg_Dbg( p_enc, "%d %x mapped to %x", i_channels_src, pi_channels_map[i][0], pi_channels_map[i][1]);
+                    msg_Dbg( p_enc, "%d %"PRIx64" mapped to %"PRIx64"", i_channels_src, pi_channels_map[i][0], pi_channels_map[i][1]);
                     pi_order_dst[i_channels_src++] = pi_channels_map[i][1];
                 }
             }
@@ -730,7 +730,7 @@ int OpenEncoder( vlc_object_t *p_this )
             {
                 if( i < sizeof(pi_channels_map)/sizeof(*pi_channels_map) )
                 {
-                    msg_Dbg( p_enc, "%d channel is %x", i_channels_src, pi_channels_map[i][1]);
+                    msg_Dbg( p_enc, "%d channel is %"PRIx64"", i_channels_src, pi_channels_map[i][1]);
                     pi_order_dst[i_channels_src++] = pi_channels_map[i][1];
                 }
             }
