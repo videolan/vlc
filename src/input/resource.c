@@ -392,12 +392,14 @@ audio_output_t *input_resource_HoldAout( input_resource_t *p_resource )
     return p_aout;
 }
 
-static void input_resource_TerminateAout( input_resource_t *p_resource )
+void input_resource_ResetAout( input_resource_t *p_resource )
 {
-    audio_output_t *p_aout;
+    audio_output_t *p_aout = NULL;
 
     vlc_mutex_lock( &p_resource->lock_hold );
-    p_aout = p_resource->p_aout;
+    if( !p_resource->b_aout_busy )
+        p_aout = p_resource->p_aout;
+
     p_resource->p_aout = NULL;
     p_resource->b_aout_busy = false;
     vlc_mutex_unlock( &p_resource->lock_hold );
@@ -507,7 +509,7 @@ void input_resource_TerminateSout( input_resource_t *p_resource )
 void input_resource_Terminate( input_resource_t *p_resource )
 {
     input_resource_TerminateSout( p_resource );
-    input_resource_TerminateAout( p_resource );
+    input_resource_ResetAout( p_resource );
     input_resource_TerminateVout( p_resource );
 }
 

@@ -220,6 +220,7 @@ input_resource_Terminate
 input_resource_GetAout
 input_resource_HoldAout
 input_resource_PutAout
+input_resource_ResetAout
 input_Start
 input_Stop
 input_vaControl
