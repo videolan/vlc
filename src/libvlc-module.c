@@ -1884,7 +1884,7 @@ vlc_module_begin ()
     add_module( "access", "access", NULL, ACCESS_TEXT, ACCESS_LONGTEXT, true )
 
     set_subcategory( SUBCAT_INPUT_DEMUX )
-    add_module( "demux", "demux", NULL, DEMUX_TEXT, DEMUX_LONGTEXT, true )
+    add_module( "demux", "demux", "any", DEMUX_TEXT, DEMUX_LONGTEXT, true )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_subcategory( SUBCAT_INPUT_ACODEC )
     set_subcategory( SUBCAT_INPUT_SCODEC )
