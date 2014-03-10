@@ -988,12 +988,16 @@ void libvlc_audio_set_callbacks( libvlc_media_player_t *mp,
     var_SetAddress( mp, "amem-drain", drain_cb );
     var_SetAddress( mp, "amem-data", opaque );
     var_SetString( mp, "aout", "amem,none" );
+
+    input_resource_ResetAout(mp->input.p_resource);
 }
 
 void libvlc_audio_set_volume_callback( libvlc_media_player_t *mp,
                                        libvlc_audio_set_volume_cb cb )
 {
     var_SetAddress( mp, "amem-set-volume", cb );
+
+    input_resource_ResetAout(mp->input.p_resource);
 }
 
 void libvlc_audio_set_format_callbacks( libvlc_media_player_t *mp,
@@ -1002,6 +1006,8 @@ void libvlc_audio_set_format_callbacks( libvlc_media_player_t *mp,
 {
     var_SetAddress( mp, "amem-setup", setup );
     var_SetAddress( mp, "amem-cleanup", cleanup );
+
+    input_resource_ResetAout(mp->input.p_resource);
 }
 
 void libvlc_audio_set_format( libvlc_media_player_t *mp, const char *format,
@@ -1010,6 +1016,8 @@ void libvlc_audio_set_format( libvlc_media_player_t *mp, const char *format,
     var_SetString( mp, "amem-format", format );
     var_SetInteger( mp, "amem-rate", rate );
     var_SetInteger( mp, "amem-channels", channels );
+
+    input_resource_ResetAout(mp->input.p_resource);
 }
 
 
