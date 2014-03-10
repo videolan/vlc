@@ -197,6 +197,8 @@ void SeekSlider::updatePos()
 
 void SeekSlider::updateBuffering( float f_buffering_ )
 {
+    if ( f_buffering_ < f_buffering )
+        bufferingStart = QTime::currentTime();
     f_buffering = f_buffering_;
     repaint();
 }
@@ -386,7 +388,10 @@ void SeekSlider::paintEvent( QPaintEvent *ev )
     {
         SeekStyle::SeekStyleOption option;
         option.initFrom( this );
-        option.buffering = f_buffering;
+        if ( QTime::currentTime() > bufferingStart.addSecs( 1 ) )
+            option.buffering = f_buffering;
+        else
+            option.buffering = 1.0;
         option.length = inputLength;
         option.animate = ( animHandle->state() == QAbstractAnimation::Running
                            || hideHandleTimer->isActive() );

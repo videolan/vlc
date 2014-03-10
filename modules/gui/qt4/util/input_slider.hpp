@@ -36,6 +36,7 @@
 
 #include <QSlider>
 #include <QPainter>
+#include <QTime>
 
 #define MSTRTIME_MAX_SIZE 22
 
@@ -85,6 +86,7 @@ private:
     QTimer *seekLimitTimer;
     TimeTooltip *mTimeTooltip;
     float f_buffering;
+    QTime bufferingStart;
     SeekPoints* chapters;
     bool b_classic;
     bool b_seekable;
