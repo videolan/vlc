@@ -66,13 +66,13 @@ protected:
     virtual void enterEvent( QEvent * );
     virtual void leaveEvent( QEvent * );
     virtual void hideEvent( QHideEvent * );
+    virtual void paintEvent(QPaintEvent *ev);
 
     virtual bool eventFilter( QObject *obj, QEvent *event );
 
     virtual QSize sizeHint() const;
 
     void processReleasedButton();
-    bool isAnimationRunning() const;
     qreal handleOpacity() const;
     void setHandleOpacity( qreal opacity );
     int handleLength();
@@ -118,8 +118,6 @@ private slots:
 signals:
     void sliderDragged( float );
 
-
-    friend class SeekStyle;
 };
 
 /* Sound Slider inherited directly from QAbstractSlider */

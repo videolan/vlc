@@ -380,6 +380,30 @@ void SeekSlider::leaveEvent( QEvent * )
     }
 }
 
+void SeekSlider::paintEvent( QPaintEvent *ev )
+{
+    if ( alternativeStyle )
+    {
+        SeekStyle::SeekStyleOption option;
+        option.initFrom( this );
+        option.buffering = f_buffering;
+        option.length = inputLength;
+        option.animate = ( animHandle->state() == QAbstractAnimation::Running
+                           || hideHandleTimer->isActive() );
+        option.animationopacity = mHandleOpacity;
+        option.sliderPosition = sliderPosition();
+        option.sliderValue = value();
+        option.maximum = maximum();
+        option.minimum = minimum();
+        foreach( const SeekPoint &point, chapters->getPoints() )
+            option.points << point.time;
+        QPainter painter( this );
+        style()->drawComplexControl( QStyle::CC_Slider, &option, &painter, this );
+    }
+    else
+        QSlider::paintEvent( ev );
+}
+
 void SeekSlider::hideEvent( QHideEvent * )
 {
     mTimeTooltip->hide();
@@ -442,12 +466,6 @@ void SeekSlider::hideHandle()
     /* Play the animation backward */
     animHandle->setDirection( QAbstractAnimation::Backward );
     animHandle->start();
-}
-
-bool SeekSlider::isAnimationRunning() const
-{
-    return animHandle->state() == QAbstractAnimation::Running
-            || hideHandleTimer->isActive();
 }
 
 
