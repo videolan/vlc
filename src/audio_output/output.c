@@ -324,6 +324,7 @@ void aout_Destroy (audio_output_t *aout)
     /* Protect against late call from intf.c */
     aout->volume_set = NULL;
     aout->mute_set = NULL;
+    aout->device_select = NULL;
     aout_OutputUnlock (aout);
 
     var_DelCallback (aout, "mute", var_Copy, aout->p_parent);
