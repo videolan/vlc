@@ -293,7 +293,7 @@ static void *Thread( void *p_data )
     filter_sys_t *p_sys = p_filter->p_sys;
 
     video_format_t fmt;
-    vlc_gl_t *gl;
+    vlc_gl_t *gl = NULL;
     unsigned int i_last_width  = 0;
     unsigned int i_last_height = 0;
     locale_t loc;
@@ -467,7 +467,8 @@ static void *Thread( void *p_data )
     assert(0);
 
 error:
-    vlc_gl_ReleaseCurrent( gl );
+    if (gl)
+        vlc_gl_ReleaseCurrent( gl );
     p_sys->b_error = true;
     vlc_sem_post( &p_sys->ready );
     return NULL;
