@@ -53,7 +53,6 @@
  #include <QtPlugin>
  #if QT_VERSION >= 0x050000
   Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
-  Q_IMPORT_PLUGIN(QJpegPlugin)
   Q_IMPORT_PLUGIN(AccessibleFactory)
  #else
   Q_IMPORT_PLUGIN(qjpeg)
