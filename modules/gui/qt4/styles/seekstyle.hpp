@@ -23,6 +23,7 @@
 #ifndef SEEKSTYLE_HPP
 #define SEEKSTYLE_HPP
 
+#include <inttypes.h>
 #include <QProxyStyle>
 #include <QStyleOptionSlider>
 
