@@ -142,27 +142,29 @@ static int Open (vlc_object_t *p_this)
     /* store for later, released in Close() */
     sys->container = [container retain];
 
-    [VLCCAOpenGLLayer performSelectorOnMainThread:@selector(getNewView:) withObject:[NSValue valueWithPointer:&sys->cgLayer] waitUntilDone:YES];
+	dispatch_sync(dispatch_get_main_queue(), ^{
+		[CATransaction begin];
+		sys->cgLayer = [[VLCCAOpenGLLayer alloc] init];
+		[sys->cgLayer setVoutDisplay:vd];
+		[sys->cgLayer display];		// TODO: Find a better way to wait until we get a context
+	    if ([container respondsToSelector:@selector(addVoutLayer:)]) {
+	        msg_Dbg(vd, "container implements implicit protocol");
+	        [container addVoutLayer:sys->cgLayer];
+	    } else if ([container respondsToSelector:@selector(addSublayer:)] || [container isKindOfClass:[CALayer class]]) {
+	        msg_Dbg(vd, "container doesn't implement implicit protocol, fallback mode used");
+	        [container addSublayer:sys->cgLayer];
+	    } else {
+	        msg_Err(vd, "Provided NSObject container isn't compatible");
+			[sys->cgLayer release];
+			sys->cgLayer = nil;
+	    }
+		[CATransaction commit];
+	});
+
     if (!sys->cgLayer)
         goto bailout;
 
-    [sys->cgLayer setVoutDisplay:vd];
-
-    // TODO: Find a better way to wait until we get a context
-    [sys->cgLayer performSelectorOnMainThread:@selector(display)
-                                   withObject:nil waitUntilDone:YES];
     assert(sys->glContext);
-
-    if ([container respondsToSelector:@selector(addVoutLayer:)]) {
-        msg_Dbg(vd, "container implements implicit protocol");
-        [container addVoutLayer:sys->cgLayer];
-    } else if ([container respondsToSelector:@selector(addSublayer:)] || [container isKindOfClass:[CALayer class]]) {
-        msg_Dbg(vd, "container doesn't implement implicit protocol, fallback mode used");
-        [container addSublayer:sys->cgLayer];
-    } else {
-        msg_Err(vd, "Provided NSObject container isn't compatible");
-        goto bailout;
-    }
 
     /* Initialize common OpenGL video display */
     sys->gl.lock = OpenglLock;
@@ -199,7 +201,6 @@ static int Open (vlc_object_t *p_this)
         outputSize = [sys->container visibleRect].size;
     vout_display_SendEventFullscreen(vd, false);
     vout_display_SendEventDisplaySize(vd, (int)outputSize.width, (int)outputSize.height, false);
-
 
     [pool release];
     return VLC_SUCCESS;
@@ -269,7 +270,6 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *su
          * and makes sure the picture is actually displayed. */
         [sys->cgLayer display];
         [CATransaction flush];
-        sys->b_frame_available = NO;
     }
 
     picture_Release(pic);
@@ -307,7 +307,9 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
             /* we always use our current frame here */
             vout_display_cfg_t cfg_tmp = *cfg;
+            [CATransaction lock];
             CGRect bounds = [sys->cgLayer bounds];
+            [CATransaction unlock];
             cfg_tmp.display.width = bounds.size.width;
             cfg_tmp.display.height = bounds.size.height;
 
@@ -385,20 +387,14 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
  *****************************************************************************/
 @implementation VLCCAOpenGLLayer
 
-+ (void)getNewView:(NSValue *)value
-{
-    id *ret = [value pointerValue];
-    *ret = [[self alloc] init];
-}
-
 - (id)init {
 
     self = [super init];
     if (self) {
-        [CATransaction begin];
+        [CATransaction lock];
         [self setAutoresizingMask: kCALayerWidthSizable | kCALayerHeightSizable];
-        [self setAsynchronous: NO];
-        [CATransaction commit];
+        self.asynchronous = NO;
+        [CATransaction unlock];
     }
 
     return self;
@@ -413,8 +409,9 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
 {
     [super resizeWithOldSuperlayerSize: size];
 
+    CGRect bounds = self.bounds;
     if (_vd)
-        vout_display_SendEventDisplaySize(_vd, self.bounds.size.width, self.bounds.size.height, _vd->cfg->is_fullscreen);
+        vout_display_SendEventDisplaySize(_vd, bounds.size.width, bounds.size.height, _vd->cfg->is_fullscreen);
 }
 
 - (BOOL)canDrawInCGLContext:(CGLContextObj)glContext pixelFormat:(CGLPixelFormatObj)pixelFormat forLayerTime:(CFTimeInterval)timeInterval displayTime:(const CVTimeStamp *)timeStamp
@@ -441,6 +438,7 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
 
     // flush is also done by this method, no need to call super
     vout_display_opengl_Display (sys->vgl, &_vd->source);
+    sys->b_frame_available = NO;
 }
 
 - (CGLContextObj)copyCGLContextForPixelFormat:(CGLPixelFormatObj)pixelFormat
