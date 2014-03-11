@@ -31,6 +31,12 @@
 #include <QBitmap>
 #include <vlc_windows_interfaces.h>
 
+#if defined(_WIN32) && QT_VERSION >= 0x050000
+#include <QWindow>
+#include <qpa/qplatformnativeinterface.h>
+#endif
+
+
 #define WM_APPCOMMAND 0x0319
 
 #define APPCOMMAND_VOLUME_MUTE            8
@@ -72,6 +78,34 @@
 #define GET_FLAGS_LPARAM(lParam)      (LOWORD(lParam))
 #define GET_KEYSTATE_LPARAM(lParam)   GET_FLAGS_LPARAM(lParam)
 
+HWND MainInterface::WinId()
+{
+#if QT_VERSION >= 0x050000
+    QWindow *window = windowHandle();
+    HWND id = static_cast<HWND>(QGuiApplication::platformNativeInterface()->
+            nativeResourceForWindow("handle", window));
+    return id;
+#else
+    return winId();
+#endif
+}
+
+#if defined(_WIN32) && QT_VERSION < 0x050000
+static const int PremultipliedAlpha = QPixmap::PremultipliedAlpha;
+static HBITMAP qt_pixmapToWinHBITMAP(const QPixmap &p, int hbitmapFormat = 0)
+{
+    return p.toWinHBITMAP((enum QBitmap::HBitmapFormat)hbitmapFormat);
+}
+#else
+Q_GUI_EXPORT HBITMAP qt_pixmapToWinHBITMAP(const QPixmap &p, int hbitmapFormat = 0);
+enum HBitmapFormat
+{
+    NoAlpha,
+    PremultipliedAlpha,
+    Alpha
+};
+#endif
+
 void MainInterface::createTaskBarButtons()
 {
     /*Here is the code for the taskbar thumb buttons
@@ -104,13 +138,13 @@ void MainInterface::createTaskBarButtons()
             QBitmap mask3 = img3.createMaskFromColor(Qt::transparent);
             QBitmap mask4 = img4.createMaskFromColor(Qt::transparent);
 
-            if(-1 == ImageList_Add(himl, img.toWinHBITMAP(QPixmap::PremultipliedAlpha),mask.toWinHBITMAP()))
+            if(-1 == ImageList_Add(himl, qt_pixmapToWinHBITMAP(img, PremultipliedAlpha), qt_pixmapToWinHBITMAP(mask)))
                 msg_Err( p_intf, "First ImageList_Add failed" );
-            if(-1 == ImageList_Add(himl, img2.toWinHBITMAP(QPixmap::PremultipliedAlpha),mask2.toWinHBITMAP()))
+            if(-1 == ImageList_Add(himl, qt_pixmapToWinHBITMAP(img2, PremultipliedAlpha), qt_pixmapToWinHBITMAP(mask2)))
                 msg_Err( p_intf, "Second ImageList_Add failed" );
-            if(-1 == ImageList_Add(himl, img3.toWinHBITMAP(QPixmap::PremultipliedAlpha),mask3.toWinHBITMAP()))
+            if(-1 == ImageList_Add(himl, qt_pixmapToWinHBITMAP(img3, PremultipliedAlpha), qt_pixmapToWinHBITMAP(mask3)))
                 msg_Err( p_intf, "Third ImageList_Add failed" );
-            if(-1 == ImageList_Add(himl, img4.toWinHBITMAP(QPixmap::PremultipliedAlpha),mask4.toWinHBITMAP()))
+            if(-1 == ImageList_Add(himl, qt_pixmapToWinHBITMAP(img4, PremultipliedAlpha), qt_pixmapToWinHBITMAP(mask4)))
                 msg_Err( p_intf, "Fourth ImageList_Add failed" );
         }
 
@@ -134,12 +168,12 @@ void MainInterface::createTaskBarButtons()
         thbButtons[2].iBitmap = 3;
         thbButtons[2].dwFlags = THBF_HIDDEN;
 
-        HRESULT hr = p_taskbl->ThumbBarSetImageList(winId(), himl );
+        HRESULT hr = p_taskbl->ThumbBarSetImageList(WinId(), himl );
         if(S_OK != hr)
             msg_Err( p_intf, "ThumbBarSetImageList failed with error %08lx", hr );
         else
         {
-            hr = p_taskbl->ThumbBarAddButtons(winId(), 3, thbButtons);
+            hr = p_taskbl->ThumbBarAddButtons(WinId(), 3, thbButtons);
             if(S_OK != hr)
                 msg_Err( p_intf, "ThumbBarAddButtons failed with error %08lx", hr );
         }
@@ -299,7 +333,7 @@ void MainInterface::changeThumbbarButtons( int i_status )
         default:
             return;
     }
-    HRESULT hr =  p_taskbl->ThumbBarUpdateButtons(this->winId(), 3, thbButtons);
+    HRESULT hr =  p_taskbl->ThumbBarUpdateButtons(WinId(), 3, thbButtons);
     if(S_OK != hr)
         msg_Err( p_intf, "ThumbBarUpdateButtons failed with error %08lx", hr );
 }

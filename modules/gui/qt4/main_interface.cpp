@@ -63,6 +63,12 @@
 #include <vlc_keys.h>                       /* Wheel event */
 #include <vlc_vout_display.h>               /* vout_thread_t and VOUT_ events */
 
+
+#if QT_VERSION >= 0x050000
+#include <QWindow>
+#include <qpa/qplatformnativeinterface.h>
+#endif
+
 // #define DEBUG_INTF
 
 /* Callback prototypes */
@@ -1102,10 +1108,18 @@ void MainInterface::toggleUpdateSystrayMenu()
         /* check if any visible window is above vlc in the z-order,
          * but ignore the ones always on top
          * and the ones which can't be activated */
+        HWND winId;
+#if QT_VERSION >= 0x050000
+        QWindow *window = windowHandle();
+        winId = static_cast<HWND>(QGuiApplication::platformNativeInterface()->nativeResourceForWindow("handle", window));
+#else
+        winId = internalWinId();
+#endif
+
         WINDOWINFO wi;
         HWND hwnd;
         wi.cbSize = sizeof( WINDOWINFO );
-        for( hwnd = GetNextWindow( internalWinId(), GW_HWNDPREV );
+        for( hwnd = GetNextWindow( winId, GW_HWNDPREV );
                 hwnd && ( !IsWindowVisible( hwnd ) ||
                     ( GetWindowInfo( hwnd, &wi ) &&
                       (wi.dwExStyle&WS_EX_NOACTIVATE) ) );
@@ -1121,7 +1135,7 @@ void MainInterface::toggleUpdateSystrayMenu()
             }
 #else
         hide();
-#endif
+#endif // _WIN32
     }
     if( sysTray )
         VLCMenuBar::updateSystrayMenu( this, p_intf );

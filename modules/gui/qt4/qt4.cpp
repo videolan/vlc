@@ -51,8 +51,14 @@
 
 #ifdef _WIN32 /* For static builds */
  #include <QtPlugin>
- Q_IMPORT_PLUGIN(qjpeg)
- Q_IMPORT_PLUGIN(qtaccessiblewidgets)
+ #if QT_VERSION >= 0x050000
+  Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+  Q_IMPORT_PLUGIN(QJpegPlugin)
+  Q_IMPORT_PLUGIN(AccessibleFactory)
+ #else
+  Q_IMPORT_PLUGIN(qjpeg)
+  Q_IMPORT_PLUGIN(qtaccessiblewidgets)
+ #endif
 #endif
 
 /*****************************************************************************

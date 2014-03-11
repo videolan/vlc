@@ -175,6 +175,7 @@ private:
     bool                 b_statusbarVisible;
 
 #ifdef _WIN32
+    HWND WinId();
     HIMAGELIST himl;
     ITaskbarList3 *p_taskbl;
     UINT taskbar_wmsg;
