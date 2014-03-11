@@ -90,6 +90,9 @@ case `uname` in
         gcc-4.2 --version >/dev/null 2>&1 && CC=CC=gcc-4.2
         g++-4.2 --version >/dev/null 2>&1 && CXX=CXX=g++-4.2
     ;;
+    SunOS)
+        CPUS=`/usr/bin/kstat -p :::state | grep 'on-line$' | wc -l | sed 's/ //g'`
+    ;;
     *)
         CPUS=1  # default
      ;;
