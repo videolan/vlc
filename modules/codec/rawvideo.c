@@ -43,9 +43,11 @@ struct decoder_sys_t
     /*
      * Input properties
      */
-    size_t i_raw_size;
     bool b_invert;
-    plane_t planes[PICTURE_PLANE_MAX];
+
+    size_t size;
+    unsigned pitches[PICTURE_PLANE_MAX];
+    unsigned lines[PICTURE_PLANE_MAX];
 
     /*
      * Common properties
@@ -87,58 +89,24 @@ vlc_module_end ()
 static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
-    decoder_sys_t *p_sys;
 
-    switch( p_dec->fmt_in.i_codec )
+    const vlc_chroma_description_t *dsc =
+        vlc_fourcc_GetChromaDescription( p_dec->fmt_in.i_codec );
+    if( dsc == NULL || dsc->plane_count == 0 )
+        return VLC_EGENERIC;
+
+    if( p_dec->fmt_in.video.i_visible_width <= 0
+     || p_dec->fmt_in.video.i_visible_height <= 0 )
     {
-        /* Planar YUV */
-        case VLC_CODEC_I444:
-        case VLC_CODEC_J444:
-        case VLC_CODEC_I440:
-        case VLC_CODEC_J440:
-        case VLC_CODEC_I422:
-        case VLC_CODEC_J422:
-        case VLC_CODEC_I420:
-        case VLC_CODEC_J420:
-        case VLC_CODEC_YV12:
-        case VLC_CODEC_YV9:
-        case VLC_CODEC_I411:
-        case VLC_CODEC_I410:
-        case VLC_CODEC_GREY:
-        case VLC_CODEC_YUVP:
-        case VLC_CODEC_NV12:
-        case VLC_CODEC_NV21:
-        case VLC_CODEC_I422_10L:
-        case VLC_CODEC_I422_10B:
-
-        /* Packed YUV */
-        case VLC_CODEC_YUYV:
-        case VLC_CODEC_YVYU:
-        case VLC_CODEC_UYVY:
-        case VLC_CODEC_VYUY:
-
-        /* RGB */
-        case VLC_CODEC_RGB32:
-        case VLC_CODEC_RGB24:
-        case VLC_CODEC_RGB16:
-        case VLC_CODEC_RGB15:
-        case VLC_CODEC_RGB8:
-        case VLC_CODEC_RGBP:
-        case VLC_CODEC_RGBA:
-        case VLC_CODEC_ARGB:
-            break;
-
-        default:
-            return VLC_EGENERIC;
+        msg_Err( p_dec, "invalid display size %dx%d",
+                 p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height );
+        return VLC_EGENERIC;
     }
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+    decoder_sys_t *p_sys = calloc(1, sizeof(*p_sys));
+    if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
-    /* Misc init */
-    p_dec->p_sys->b_packetizer = false;
-    p_sys->b_invert = false;
 
     if( (int)p_dec->fmt_in.video.i_height < 0 )
     {
@@ -151,14 +119,6 @@ static int OpenDecoder( vlc_object_t *p_this )
         p_dec->fmt_in.video.i_visible_width = p_dec->fmt_in.video.i_width;
     if( !p_dec->fmt_in.video.i_visible_height )
         p_dec->fmt_in.video.i_visible_height = p_dec->fmt_in.video.i_height;
-
-    if( p_dec->fmt_in.video.i_visible_width <= 0
-     || p_dec->fmt_in.video.i_visible_height <= 0 )
-    {
-        msg_Err( p_dec, "invalid display size %dx%d",
-                 p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height );
-        return VLC_EGENERIC;
-    }
 
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
 
@@ -173,23 +133,16 @@ static int OpenDecoder( vlc_object_t *p_this )
         date_Init( &p_sys->pts, 25, 1 );
     }
 
-    /* Find out p_vdec->i_raw_size */
-    video_format_Setup( &p_dec->fmt_out.video, p_dec->fmt_in.i_codec,
-                        p_dec->fmt_in.video.i_width,
-                        p_dec->fmt_in.video.i_height,
-                        p_dec->fmt_in.video.i_visible_width,
-                        p_dec->fmt_in.video.i_visible_height,
-                        p_dec->fmt_in.video.i_sar_num,
-                        p_dec->fmt_in.video.i_sar_den );
-    picture_t picture;
-    picture_Setup( &picture, &p_dec->fmt_out );
-
-    p_sys->i_raw_size = 0;
-    for( int i = 0; i < picture.i_planes; i++ )
+    for( unsigned i = 0; i < dsc->plane_count; i++ )
     {
-        p_sys->i_raw_size += picture.p[i].i_visible_pitch *
-                             picture.p[i].i_visible_lines;
-        p_sys->planes[i] = picture.p[i];
+        unsigned pitch = p_dec->fmt_in.video.i_width * dsc->pixel_size
+                         * dsc->p[i].w.num / dsc->p[i].w.den;
+        unsigned lines = p_dec->fmt_in.video.i_height
+                         * dsc->p[i].h.num / dsc->p[i].h.den;
+
+        p_sys->pitches[i] = pitch;
+        p_sys->lines[i] = lines;
+        p_sys->size += pitch * lines;
     }
 
     /* Set callbacks */
@@ -197,6 +150,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         DecodeBlock;
     p_dec->pf_packetize    = (block_t *(*)(decoder_t *, block_t **))
         DecodeBlock;
+    p_dec->p_sys           = p_sys;
 
     return VLC_SUCCESS;
 }
@@ -250,10 +204,10 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         date_Set( &p_sys->pts, p_block->i_dts );
     }
 
-    if( p_block->i_buffer < p_sys->i_raw_size )
+    if( p_block->i_buffer < p_sys->size )
     {
         msg_Warn( p_dec, "invalid frame size (%zu < %zu)",
-                  p_block->i_buffer, p_sys->i_raw_size );
+                  p_block->i_buffer, p_sys->size );
 
         block_Release( p_block );
         return NULL;
@@ -280,27 +234,40 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
  *****************************************************************************/
 static void FillPicture( decoder_t *p_dec, block_t *p_block, picture_t *p_pic )
 {
-    int i_plane;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    uint8_t *p_src = p_block->p_buffer;
+    const uint8_t *p_src = p_block->p_buffer;
 
-    for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
-    {
-        int i_pitch = p_pic->p[i_plane].i_pitch;
-        int i_visible_pitch = p_sys->planes[i_plane].i_visible_pitch;
-        int i_visible_lines = p_sys->planes[i_plane].i_visible_lines;
-        uint8_t *p_dst = p_pic->p[i_plane].p_pixels;
-        uint8_t *p_dst_end = p_dst+i_pitch*i_visible_lines;
+    if( p_sys->b_invert )
+        for( int i = 0; i < p_pic->i_planes; i++ )
+        {
+            uint8_t *p_dst = p_pic->p[i].p_pixels
+                         + (p_pic->p[i].i_pitch * p_pic->p[i].i_visible_lines);
 
-        if( p_sys->b_invert )
-            for( p_dst_end -= i_pitch; p_dst <= p_dst_end;
-                 p_dst_end -= i_pitch, p_src += i_visible_pitch )
-                memcpy( p_dst_end, p_src, i_visible_pitch );
-        else
-            for( ; p_dst < p_dst_end;
-                 p_dst += i_pitch, p_src += i_visible_pitch )
-                memcpy( p_dst, p_src, i_visible_pitch );
-    }
+            for( int x = 0; x < p_pic->p[i].i_visible_lines; x++ )
+            {
+                p_dst -= p_pic->p[i].i_pitch;
+                memcpy( p_dst, p_src, p_pic->p[i].i_visible_pitch );
+                p_src += p_sys->pitches[i];
+            }
+
+            p_src += p_sys->pitches[i]
+                   * (p_sys->lines[i] - p_pic->p[i].i_visible_lines);
+        }
+    else
+        for( int i = 0; i < p_pic->i_planes; i++ )
+        {
+            uint8_t *p_dst = p_pic->p[i].p_pixels;
+
+            for( int x = 0; x < p_pic->p[i].i_visible_lines; x++ )
+            {
+                memcpy( p_dst, p_src, p_pic->p[i].i_visible_pitch );
+                p_src += p_sys->pitches[i];
+                p_dst += p_pic->p[i].i_pitch;
+            }
+
+            p_src += p_sys->pitches[i]
+                   * (p_sys->lines[i] - p_pic->p[i].i_visible_lines);
+        }
 }
 
 /*****************************************************************************
@@ -349,42 +316,29 @@ static block_t *SendFrame( decoder_t *p_dec, block_t *p_block )
 
     if( p_sys->b_invert )
     {
-        picture_t pic;
-        uint8_t *p_tmp, *p_pixels;
-        int i, j;
-
-        /* Fill in picture_t fields */
-        picture_Setup( &pic, &p_dec->fmt_out );
-
-        if( !pic.i_planes )
+        block_t *out = block_Alloc( p_block->i_buffer );
+        if( likely(out != NULL) )
         {
-            msg_Err( p_dec, "unsupported chroma" );
-            return p_block;
-        }
+            block_CopyProperties( out, p_block );
 
-        p_tmp = malloc( pic.p[0].i_pitch );
-        if( !p_tmp )
-            return p_block;
-        p_pixels = p_block->p_buffer;
-        for( i = 0; i < pic.i_planes; i++ )
-        {
-            int i_pitch = pic.p[i].i_pitch;
-            uint8_t *p_top = p_pixels;
-            uint8_t *p_bottom = p_pixels + i_pitch *
-                (pic.p[i].i_visible_lines - 1);
+            const uint8_t *p_src = p_block->p_buffer;
+            uint8_t *p_pixels = out->p_buffer;
 
-            for( j = 0; j < pic.p[i].i_visible_lines / 2; j++ )
+            for( unsigned i = 0; i < PICTURE_PLANE_MAX; i++ )
             {
-                memcpy( p_tmp, p_bottom, pic.p[i].i_visible_pitch  );
-                memcpy( p_bottom, p_top, pic.p[i].i_visible_pitch  );
-                memcpy( p_top, p_tmp, pic.p[i].i_visible_pitch  );
-                p_top += i_pitch;
-                p_bottom -= i_pitch;
-            }
+                unsigned pitch = p_sys->pitches[i];
+                unsigned lines = p_sys->lines[i];
+                uint8_t *p_dst = p_pixels + (pitch * lines);
 
-            p_pixels += i_pitch * pic.p[i].i_lines;
+                for( unsigned x = 0; x < lines; x++ )
+                {
+                    p_dst -= p_sys->pitches[i];
+                    memcpy( p_dst, p_src, p_sys->pitches[i] );
+                    p_src += p_sys->pitches[i];
+                }
+            }
         }
-        free( p_tmp );
+        block_Release( p_block );
     }
 
     return p_block;
