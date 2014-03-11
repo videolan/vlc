@@ -248,6 +248,23 @@ CLEAN_FILE += .ragel
 CLEAN_PKG += ragel
 DISTCLEAN_PKG += ragel-$(RAGEL_VERSION).tar.gz
 
+# GNU sed
+
+sed-$(SED_VERSION).tar.bz2:
+	$(call download,$(SED_URL))
+
+sed: sed-$(SED_VERSION).tar.bz2
+	$(UNPACK)
+	$(MOVE)
+
+.sed: sed
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	touch $@
+
+CLEAN_PKG += sed
+DISTCLEAN_PKG += sed-$(SED_VERSION).tar.bz2
+CLEAN_FILE += .sed
+
 #
 #
 #

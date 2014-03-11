@@ -32,6 +32,17 @@ then
 fi
 }
 
+check_sed() {
+tmp="`pwd`/check_sed"
+trap "rm $tmp" EXIT
+echo "test file for GNU sed" > $tmp
+if ! sed -i -e 's/sed//' $tmp >/dev/null 2>&1
+then
+    echo "sed doesn't do in-place editing (-i option)"
+    NEEDED="$NEEDED .sed"
+fi
+}
+
 check() {
 if ! $1 --version >/dev/null 2>&1
 then
@@ -63,6 +74,7 @@ check cmake
 check yasm
 check_tar
 check ragel
+check_sed
 
 [ -n "$NEEDED" ] && mkdir -p build/
 

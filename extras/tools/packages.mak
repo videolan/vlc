@@ -37,3 +37,6 @@ GAS_URL=http://git.libav.org/?p=gas-preprocessor.git;a=snapshot;h=$(GAS_VERSION)
 
 RAGEL_VERSION=6.8
 RAGEL_URL=http://www.complang.org/ragel/ragel-$(RAGEL_VERSION).tar.gz
+
+SED_VERSION=4.2.2
+SED_URL=$(GNU)/sed/sed-$(SED_VERSION).tar.bz2
