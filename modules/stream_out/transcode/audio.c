@@ -233,14 +233,15 @@ int transcode_audio_process( sout_stream_t *p_stream,
                 id->p_decoder->fmt_out.audio.i_bitspersample;
             id->p_encoder->fmt_out.audio.i_channels = p_sys->i_channels > 0 ?
                 p_sys->i_channels : id->p_decoder->fmt_out.audio.i_channels;
-            /* Sanity check for audio channels */
-            id->p_encoder->fmt_out.audio.i_channels =
-                __MIN( id->p_encoder->fmt_out.audio.i_channels,
-                       id->p_decoder->fmt_out.audio.i_channels );
+
+            id->p_encoder->fmt_in.audio.i_original_channels =
             id->p_encoder->fmt_out.audio.i_original_channels =
-                id->p_decoder->fmt_in.audio.i_physical_channels;
+                id->p_decoder->fmt_out.audio.i_physical_channels;
+
+            id->p_encoder->fmt_in.audio.i_physical_channels =
             id->p_encoder->fmt_out.audio.i_physical_channels =
                 pi_channels_maps[id->p_encoder->fmt_out.audio.i_channels];
+
             if( transcode_audio_initialize_encoder( id, p_stream ) )
             {
                 msg_Err( p_stream, "cannot create audio chain" );
@@ -334,12 +335,12 @@ bool transcode_audio_add( sout_stream_t *p_stream, es_format_t *p_fmt,
         p_fmt->audio.i_bitspersample;
     id->p_encoder->fmt_out.audio.i_channels = p_sys->i_channels > 0 ?
         p_sys->i_channels : p_fmt->audio.i_channels;
-    /* Sanity check for audio channels */
-    id->p_encoder->fmt_out.audio.i_channels =
-        __MIN( id->p_encoder->fmt_out.audio.i_channels,
-               id->p_decoder->fmt_in.audio.i_channels );
+
+    id->p_encoder->fmt_in.audio.i_original_channels =
     id->p_encoder->fmt_out.audio.i_original_channels =
-        id->p_decoder->fmt_in.audio.i_physical_channels;
+        id->p_decoder->fmt_out.audio.i_physical_channels;
+
+    id->p_encoder->fmt_in.audio.i_physical_channels =
     id->p_encoder->fmt_out.audio.i_physical_channels =
             pi_channels_maps[id->p_encoder->fmt_out.audio.i_channels];
 
@@ -376,8 +377,5 @@ bool transcode_audio_add( sout_stream_t *p_stream, es_format_t *p_fmt,
             aout_FiltersDelete( (vlc_object_t *)NULL, id->p_af_chain );
         id->p_af_chain = NULL;
     }
-
-    date_Init( &id->interpolated_pts, p_fmt->audio.i_rate, 1 );
-
     return true;
 }
