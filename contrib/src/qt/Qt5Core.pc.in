@@ -1,0 +1,10 @@
+prefix=@@PREFIX@@
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include/qt5/QtCore
+
+Name: Qt5core
+Description: Qt5core Library
+Version: @@VERSION@@
+Libs: -Wl,--subsystem,windows -mwindows -L${libdir} -lQt5Core -lrpcrt4 -loleaut32 -lole32 -luuid -lwinspool -lwinmm -lshell32 -lcomctl32 -ladvapi32 -lgdi32 -limm32 -lwsock32
+Cflags:  -I${prefix}/include/qt5 -I${includedir}
