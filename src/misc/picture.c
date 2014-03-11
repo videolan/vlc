@@ -128,7 +128,7 @@ static int LCM( int a, int b )
     return a * b / GCD( a, b );
 }
 
-int picture_Setup( picture_t *p_picture, video_format_t *fmt )
+int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
 {
     /* Store default values */
     p_picture->i_planes = 0;
