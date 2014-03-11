@@ -166,7 +166,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
 }
 
 static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
-                         const subpicture_region_t *reg, int alpha)
+                         const subpicture_t *subpic,
+                         const subpicture_region_t *reg)
 {
     vout_display_sys_t *sys = vd->sys;
     VdpBitmapSurface surface;
@@ -185,9 +186,9 @@ static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
     }
 
     /* Upload sub-picture to GPU surface */
-    picture_t *subpic = reg->p_picture;
-    const void *data = subpic->p[0].p_pixels;
-    uint32_t pitch = subpic->p[0].i_pitch;
+    picture_t *pic = reg->p_picture;
+    const void *data = pic->p[0].p_pixels;
+    uint32_t pitch = pic->p[0].i_pitch;
 
     err = vdp_bitmap_surface_put_bits_native(sys->vdp, surface, &data, &pitch,
                                              NULL);
@@ -200,12 +201,17 @@ static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
 
     /* Render onto main surface */
     VdpRect area = {
-        reg->i_x,
-        reg->i_y,
-        reg->i_x + reg->fmt.i_visible_width,
-        reg->i_y + reg->fmt.i_visible_height,
+        reg->i_x * vd->fmt.i_visible_width
+            / subpic->i_original_picture_width,
+        reg->i_y * vd->fmt.i_visible_height
+            / subpic->i_original_picture_height,
+        (reg->i_x + reg->fmt.i_visible_width) * vd->fmt.i_visible_width
+            / subpic->i_original_picture_width,
+        (reg->i_y + reg->fmt.i_visible_height) * vd->fmt.i_visible_height
+            / subpic->i_original_picture_height,
     };
-    VdpColor color = { 1.f, 1.f, 1.f, reg->i_alpha * alpha / 65535.f };
+    VdpColor color = { 1.f, 1.f, 1.f,
+        reg->i_alpha * subpic->i_alpha / 65535.f };
     VdpOutputSurfaceRenderBlendState state = {
         .struct_version = VDP_OUTPUT_SURFACE_RENDER_BLEND_STATE_VERSION,
         .blend_factor_source_color =
@@ -247,7 +253,7 @@ static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic)
     if (subpic != NULL)
         for (subpicture_region_t *r = subpic->p_region; r != NULL;
              r = r->p_next)
-            RenderRegion(vd, surface, r, subpic->i_alpha);
+            RenderRegion(vd, surface, subpic, r);
 
     /* Compute picture presentation time */
     mtime_t now = mdate();
