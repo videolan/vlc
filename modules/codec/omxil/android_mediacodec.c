@@ -54,6 +54,80 @@ extern void jni_SetAndroidSurfaceSizeEnv(JNIEnv *p_env, int width, int height, i
 extern void jni_EventHardwareAccelerationError();
 extern bool jni_IsVideoPlayerActivityCreated();
 
+/* Implementation of a circular buffer of timestamps with overwriting
+ * of older values. MediaCodec has only one type of timestamp, if a
+ * block has no PTS, we send the DTS instead. Some hardware decoders
+ * cannot cope with this situation and output the frames in the wrong
+ * order. As a workaround in this case, we use a FIFO of timestamps in
+ * order to remember which input packets had no PTS.  Since an
+ * hardware decoder can silently drop frames, this might cause a
+ * growing desynchronization with the actual timestamp. Thus the
+ * circular buffer has a limited size and will overwrite older values.
+ */
+typedef struct
+{
+    uint32_t          begin;
+    uint32_t          size;
+    uint32_t          capacity;
+    int64_t           *buffer;
+} timestamp_fifo_t;
+
+static timestamp_fifo_t *timestamp_FifoNew(uint32_t capacity)
+{
+    timestamp_fifo_t *fifo = calloc(1, sizeof(*fifo));
+    if (!fifo)
+        return NULL;
+    fifo->buffer = malloc(capacity * sizeof(*fifo->buffer));
+    if (!fifo->buffer) {
+        free(fifo);
+        return NULL;
+    }
+    fifo->capacity = capacity;
+    return fifo;
+}
+
+static void timestamp_FifoRelease(timestamp_fifo_t *fifo)
+{
+    free(fifo->buffer);
+    free(fifo);
+}
+
+static bool timestamp_FifoIsEmpty(timestamp_fifo_t *fifo)
+{
+    return fifo->size == 0;
+}
+
+static bool timestamp_FifoIsFull(timestamp_fifo_t *fifo)
+{
+    return fifo->size == fifo->capacity;
+}
+
+static void timestamp_FifoEmpty(timestamp_fifo_t *fifo)
+{
+    fifo->size = 0;
+}
+
+static void timestamp_FifoPut(timestamp_fifo_t *fifo, int64_t ts)
+{
+    uint32_t end = (fifo->begin + fifo->size) % fifo->capacity;
+    fifo->buffer[end] = ts;
+    if (!timestamp_FifoIsFull(fifo))
+        fifo->size += 1;
+    else
+        fifo->begin = (fifo->begin + 1) % fifo->capacity;
+}
+
+static int64_t timestamp_FifoGet(timestamp_fifo_t *fifo)
+{
+    if (timestamp_FifoIsEmpty(fifo))
+        return VLC_TS_INVALID;
+
+    int64_t result = fifo->buffer[fifo->begin];
+    fifo->begin = (fifo->begin + 1) % fifo->capacity;
+    fifo->size -= 1;
+    return result;
+}
+
 struct decoder_sys_t
 {
     jclass media_codec_list_class, media_codec_class, media_format_class;
@@ -92,6 +166,8 @@ struct decoder_sys_t
     bool direct_rendering;
     int i_output_buffers; /**< number of MediaCodec output buffers */
     picture_t** inflight_picture; /**< stores the inflight picture for each output buffer or NULL */
+
+    timestamp_fifo_t *timestamp_fifo;
 };
 
 enum Types
@@ -451,6 +527,12 @@ static int OpenDecoder(vlc_object_t *p_this)
     (*env)->DeleteLocalRef(env, format);
 
     (*myVm)->DetachCurrentThread(myVm);
+
+    const int timestamp_fifo_size = 32;
+    p_sys->timestamp_fifo = timestamp_FifoNew(timestamp_fifo_size);
+    if (!p_sys->timestamp_fifo)
+        goto error;
+
     return VLC_SUCCESS;
 
  error:
@@ -490,6 +572,8 @@ static void CloseDecoder(vlc_object_t *p_this)
     free(p_sys->name);
     ArchitectureSpecificCopyHooksDestroy(p_sys->pixel_format, &p_sys->architecture_specific_data);
     free(p_sys->inflight_picture);
+    if (p_sys->timestamp_fifo)
+        timestamp_FifoRelease(p_sys->timestamp_fifo);
     free(p_sys);
 }
 
@@ -591,7 +675,16 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                 // TODO: Use crop_top/crop_left as well? Or is that already taken into account?
                 // On OMX_TI_COLOR_FormatYUV420PackedSemiPlanar the offset already incldues
                 // the cropping, so the top/left cropping params should just be ignored.
-                p_pic->date = (*env)->GetLongField(env, p_sys->buffer_info, p_sys->pts_field);
+
+                /* If the oldest input block had no PTS, the timestamp
+                 * of the frame returned by MediaCodec might be wrong
+                 * so we overwrite it with the corresponding dts. */
+                int64_t forced_ts = timestamp_FifoGet(p_sys->timestamp_fifo);
+                if (forced_ts == VLC_TS_INVALID)
+                    p_pic->date = (*env)->GetLongField(env, p_sys->buffer_info, p_sys->pts_field);
+                else
+                    p_pic->date = forced_ts;
+
                 if (p_sys->direct_rendering) {
                     picture_sys_t *p_picsys = p_pic->p_sys;
                     p_picsys->pf_display_callback = DisplayCallback;
@@ -741,6 +834,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
 
     if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
         block_Release(p_block);
+        timestamp_FifoEmpty(p_sys->timestamp_fifo);
         if (p_sys->decoded) {
             /* Invalidate all pictures that are currently in flight
              * since flushing make all previous indices returned by
@@ -831,6 +925,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         int64_t ts = p_block->i_pts;
         if (!ts && p_block->i_dts)
             ts = p_block->i_dts;
+        timestamp_FifoPut(p_sys->timestamp_fifo, p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
         (*env)->CallVoidMethod(env, p_sys->codec, p_sys->queue_input_buffer, index, 0, size, ts, 0);
         (*env)->DeleteLocalRef(env, buf);
         p_sys->decoded = true;
