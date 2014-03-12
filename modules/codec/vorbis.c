@@ -362,9 +362,10 @@ static int ProcessHeaders( decoder_t *p_dec )
     p_dec->fmt_out.audio.i_rate     = p_sys->vi.rate;
     p_dec->fmt_out.audio.i_channels = p_sys->vi.channels;
 
-    if( p_dec->fmt_out.audio.i_channels > 9 )
+    if( p_dec->fmt_out.audio.i_channels > ARRAY_SIZE(pi_channels_maps) )
     {
-        msg_Err( p_dec, "invalid number of channels (not between 1 and 9): %i",
+        msg_Err( p_dec, "invalid number of channels (not between 1 and %lu): %i",
+                 ARRAY_SIZE(pi_channels_maps),
                  p_dec->fmt_out.audio.i_channels );
         return VLC_EGENERIC;
     }
