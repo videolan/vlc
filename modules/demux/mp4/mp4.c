@@ -503,6 +503,7 @@ static int Open( vlc_object_t * p_this )
                     {
                         free( psz_ref );
                         free( psz_path );
+                        input_item_node_Delete( p_subitems );
                         vlc_object_release( p_input) ;
                         return VLC_ENOMEM;
                     }
