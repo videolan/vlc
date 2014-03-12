@@ -378,6 +378,11 @@ static int Download( stream_t *s, sms_stream_t *sms )
     stream_sys_t *p_sys = s->p_sys;
 
     int index = es_cat_to_index( sms->type );
+    if ( unlikely( index == -1 ) )
+    {
+        msg_Err( s, "invalid stream type" );
+        return VLC_EGENERIC;
+    }
     int64_t start_time = p_sys->download.lead[index];
 
     quality_level_t *qlevel = get_qlevel( sms, sms->download_qlvl );
