@@ -75,7 +75,7 @@ typedef struct aout_stream_sys
     vlc_fourcc_t format; /**< Sample format */
     unsigned rate; /**< Sample rate */
     unsigned bytes_per_frame;
-    UINT32 written; /**< Frames written to the buffer */
+    UINT64 written; /**< Frames written to the buffer */
     UINT32 frames; /**< Total buffer size (frames) */
 } aout_stream_sys_t;
 
