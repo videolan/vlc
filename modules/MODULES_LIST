@@ -391,7 +391,6 @@ $Id$
  * vod_rtsp: RTSP VoD module
  * volume_neon: audio volume optimized for ARM NEON
  * vorbis: a vorbis audio decoder/packetizer using the libvorbis library
- * vout_coregraphicslayer: CoreGraphics video output for NPAPI plugins
  * vout_ios2: iOS video provider using OpenGL ES 2
  * vout_macosx: Mac OS X OpenGL provider
  * vout_sdl: video output module using the SDL library

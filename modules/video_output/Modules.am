@@ -25,15 +25,11 @@ libvout_macosx_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
 libvout_macosx_plugin_la_LIBADD = $(GL_LIBS)
 libvout_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' -Wl,-framework,OpenGL,-framework,Cocoa
 
-libvout_coregraphicslayer_plugin_la_SOURCES = coregraphicslayer.m
-libvout_coregraphicslayer_plugin_la_CFLAGS = $(AM_CFLAGS)
-libvout_coregraphicslayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' -Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
-
 libcaopengllayer_plugin_la_SOURCES = caopengllayer.m opengl.c opengl.h
 libcaopengllayer_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
 libcaopengllayer_plugin_la_LIBADD = $(GL_LIBS)
 libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' -Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
-vout_LTLIBRARIES += libvout_macosx_plugin.la libvout_coregraphicslayer_plugin.la libcaopengllayer_plugin.la
+vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la
 endif
 
 libvout_ios2_plugin_la_SOURCES = ios2.m opengl.h opengl.c

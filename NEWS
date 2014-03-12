@@ -57,7 +57,6 @@ Muxers:
 
 Video Output:
  * Direct rendering and filtering for VDPAU hardware acceleration
- * New CoreGraphics video output module for NPAPI plugins
  * New CoreAnimation OpenGL video output module for NPAPI plugins
  * New OpenGL ES 2.0 through EGL video output module for Android
  * New Android native window provider module
