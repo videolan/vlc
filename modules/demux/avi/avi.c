@@ -1012,6 +1012,7 @@ static int Demux_Seekable( demux_t *p_demux )
                     index.i_flags  = AVI_GetKeyFlag(tk->i_codec, avi_pk.i_peek);
                     index.i_pos    = avi_pk.i_pos;
                     index.i_length = avi_pk.i_size;
+                    index.i_lengthtotal = index.i_length;
                     avi_index_Append( &tk->idx, &p_sys->i_movi_lastchunk_pos, &index );
 
                     /* do we will read this data ? */
@@ -1643,6 +1644,7 @@ static int AVI_StreamChunkFind( demux_t *p_demux, unsigned int i_stream )
             index.i_flags  = AVI_GetKeyFlag(tk_pk->i_codec, avi_pk.i_peek);
             index.i_pos    = avi_pk.i_pos;
             index.i_length = avi_pk.i_size;
+            index.i_lengthtotal = index.i_length;
             avi_index_Append( &tk_pk->idx, &p_sys->i_movi_lastchunk_pos, &index );
 
             if( avi_pk.i_stream == i_stream  )
@@ -2194,6 +2196,7 @@ static int AVI_IndexLoad_idx1( demux_t *p_demux,
             index.i_flags  = p_idx1->entry[i_index].i_flags&(~AVIIF_FIXKEYFRAME);
             index.i_pos    = p_idx1->entry[i_index].i_pos + i_offset;
             index.i_length = p_idx1->entry[i_index].i_length;
+            index.i_lengthtotal = index.i_length;
 
             avi_index_Append( &p_index[i_stream], pi_last_offset, &index );
         }
@@ -2215,6 +2218,7 @@ static void __Parse_indx( demux_t *p_demux, avi_index_t *p_index, off_t *pi_max_
             index.i_flags  = p_indx->idx.std[i].i_size & 0x80000000 ? 0 : AVIIF_KEYFRAME;
             index.i_pos    = p_indx->i_baseoffset + p_indx->idx.std[i].i_offset - 8;
             index.i_length = p_indx->idx.std[i].i_size&0x7fffffff;
+            index.i_lengthtotal = index.i_length;
 
             avi_index_Append( p_index, pi_max_offset, &index );
         }
@@ -2227,6 +2231,7 @@ static void __Parse_indx( demux_t *p_demux, avi_index_t *p_index, off_t *pi_max_
             index.i_flags  = p_indx->idx.field[i].i_size & 0x80000000 ? 0 : AVIIF_KEYFRAME;
             index.i_pos    = p_indx->i_baseoffset + p_indx->idx.field[i].i_offset - 8;
             index.i_length = p_indx->idx.field[i].i_size;
+            index.i_lengthtotal = index.i_length;
 
             avi_index_Append( p_index, pi_max_offset, &index );
         }
@@ -2423,6 +2428,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
             index.i_flags   = AVI_GetKeyFlag(tk->i_codec, pk.i_peek);
             index.i_pos     = pk.i_pos;
             index.i_length  = pk.i_size;
+            index.i_lengthtotal = pk.i_size;
             avi_index_Append( &tk->idx, &p_sys->i_movi_lastchunk_pos, &index );
         }
         else
