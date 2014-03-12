@@ -2488,8 +2488,10 @@ static void Ogg_DecodeVorbisHeader( logical_stream_t *p_stream,
         p_stream->special.vorbis.p_comment = malloc( sizeof(vorbis_comment) );
         if ( !p_stream->special.vorbis.p_info || !p_stream->special.vorbis.p_comment )
         {
-            free( p_stream->special.vorbis.p_info );
-            free( p_stream->special.vorbis.p_comment );
+            FREENULL( p_stream->special.vorbis.p_info );
+            FREENULL( p_stream->special.vorbis.p_comment );
+            p_stream->special.vorbis.b_invalid = true;
+            break;
         }
         vorbis_info_init( p_stream->special.vorbis.p_info );
         vorbis_comment_init( p_stream->special.vorbis.p_comment );
