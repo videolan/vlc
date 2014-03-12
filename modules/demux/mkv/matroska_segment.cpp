@@ -991,6 +991,12 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
             if( BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration ) )
             {
                 msg_Warn( &sys.demuxer, "cannot get block EOF?" );
+                while( p_first )
+                {
+                    spoint *tmp = p_first;
+                    p_first = p_first->p_next;
+                    delete tmp;
+                }
                 return;
             }
 
