@@ -1146,7 +1146,6 @@ modules/video_output/android/opaque.c
 modules/video_output/android/surface.c
 modules/video_output/caca.c
 modules/video_output/caopengllayer.m
-modules/video_output/coregraphicslayer.m
 modules/video_output/decklink.cpp
 modules/video_output/directfb.c
 modules/video_output/drawable.c
