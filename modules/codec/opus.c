@@ -283,7 +283,7 @@ static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
     msg_Dbg( p_dec, "Opus audio with %d channels", p_header->channels);
 
     if((p_header->channels>2 && p_header->channel_mapping==0) ||
-       (p_header->channels>8 && p_header->channel_mapping==1) ||
+        p_header->channels>8 ||
         p_header->channel_mapping>1)
     {
         msg_Err( p_dec, "Unsupported channel mapping" );
@@ -297,7 +297,7 @@ static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
     p_dec->fmt_out.audio.i_channels = p_header->channels;
     p_dec->fmt_out.audio.i_rate = 48000;
 
-    if( p_header->channels>2 && p_header->channels<9 )
+    if( p_header->channels>2 )
     {
         static const uint32_t *pi_ch[6] = { pi_3channels_in, pi_4channels_in,
                                             pi_5channels_in, pi_6channels_in,
