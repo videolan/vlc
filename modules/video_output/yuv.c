@@ -247,12 +247,19 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     fprintf(sys->f, "FRAME\n");
     for (int i = 0; i < picture->i_planes; i++) {
         const plane_t *plane = &picture->p[i];
+        const uint8_t *pixels = plane->p_pixels;
+
+        pixels += (vd->fmt.i_x_offset * plane->i_visible_pitch)
+                  / vd->fmt.i_visible_height;
+
         for( int y = 0; y < plane->i_visible_lines; y++) {
-            const size_t written = fwrite(&plane->p_pixels[y*plane->i_pitch],
-                                          1, plane->i_visible_pitch, sys->f);
+            const size_t written = fwrite(pixels, 1, plane->i_visible_pitch,
+                                          sys->f);
             if (written != (size_t)plane->i_visible_pitch)
                 msg_Warn(vd, "only %zd of %d bytes written",
                          written, plane->i_visible_pitch);
+
+            pixels += plane->i_pitch;
         }
     }
     fflush(sys->f);
