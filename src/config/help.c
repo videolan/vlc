@@ -623,6 +623,8 @@ static void ListModules (vlc_object_t *p_this, bool b_verbose)
 #ifndef _WIN32
     if (isatty(STDOUT_FILENO))
         color = var_InheritBool(p_this, "color");
+#else
+    (void) p_this;
 #endif
 
     /* List all modules */
