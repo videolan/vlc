@@ -415,7 +415,7 @@ static int Demux( demux_t * p_demux )
             {
                 assert( p_stream->p_prepcr_blocks == NULL );
                 p_stream->i_prepcr_blocks = 0;
-                p_stream->p_prepcr_blocks = malloc( sizeof(block_t) * ogg_page_packets( &p_sys->current_page ) );
+                p_stream->p_prepcr_blocks = malloc( sizeof(block_t *) * ogg_page_packets( &p_sys->current_page ) );
             }
         }
 
