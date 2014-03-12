@@ -189,8 +189,8 @@ static void Close(vlc_object_t *obj)
 }
 
 vlc_module_begin()
-    set_shortname(N_("Windows "))
-    set_description(N_("Windows Service interface"))
+    set_shortname(N_("WinMsg"))
+    set_description(N_("Windows messages interface"))
     set_category(CAT_INTERFACE)
     set_subcategory(SUBCAT_INTERFACE_CONTROL)
     set_capability("interface", 0)
