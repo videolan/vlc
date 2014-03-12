@@ -837,12 +837,14 @@ static void OggGetSkeletonFisbone( uint8_t **pp_buffer, long *pi_size,
     if ( p_input->p_fmt->p_extra )
         SetDWLE( &(*pp_buffer)[44], xiph_CountHeaders( p_input->p_fmt->p_extra, p_input->p_fmt->i_extra ) );
 
-    psz_header = *pp_buffer + FISBONE_BASE_SIZE;
-    memcpy( psz_header, headers.psz_content_type, strlen( headers.psz_content_type ) );
-    psz_header += strlen( headers.psz_content_type );
-    if ( headers.psz_role )
-        memcpy( psz_header, headers.psz_role, strlen( headers.psz_role ) );
-
+    if ( headers.i_size > 0 )
+    {
+        psz_header = *pp_buffer + FISBONE_BASE_SIZE;
+        memcpy( psz_header, headers.psz_content_type, strlen( headers.psz_content_type ) );
+        psz_header += strlen( headers.psz_content_type );
+        if ( headers.psz_role )
+            memcpy( psz_header, headers.psz_role, strlen( headers.psz_role ) );
+    }
     *pi_size = FISBONE_BASE_SIZE + headers.i_size;
 
     free( headers.psz_content_type );
