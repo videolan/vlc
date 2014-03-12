@@ -180,8 +180,7 @@ static HRESULT Play(aout_stream_t *s, block_t *block)
             break; /* done */
 
         /* Out of buffer space, sleep */
-        msleep(AOUT_MIN_PREPARE_TIME
-             + block->i_nb_samples * CLOCK_FREQ / sys->rate);
+        msleep(sys->frames * (CLOCK_FREQ / 2) / sys->rate);
     }
     IAudioRenderClient_Release(render);
 out:
