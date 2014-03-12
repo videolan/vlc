@@ -147,18 +147,18 @@ static int Open( vlc_object_t *p_this )
     if( psz_name[0] && psz_name[1] == ':' &&
         psz_name[2] == '\\' && psz_name[3] == '\0' ) psz_name[2] = '\0';
 #endif
+    /* Set up p_access */
+    STANDARD_BLOCK_ACCESS_INIT
 
     /* Open CDDA */
     if( (vcddev = ioctl_Open( VLC_OBJECT(p_access), psz_name ) ) == NULL )
     {
         msg_Warn( p_access, "could not open %s", psz_name );
         free( psz_name );
+        free( p_sys );
         return VLC_EGENERIC;
     }
     free( psz_name );
-
-    /* Set up p_access */
-    STANDARD_BLOCK_ACCESS_INIT
     p_sys->vcddev = vcddev;
 
     /* Do we play a single track ? */
