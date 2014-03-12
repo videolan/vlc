@@ -213,9 +213,12 @@ static HRESULT Flush(aout_stream_t *s)
 
     hr = IAudioClient_Reset(sys->client);
     if (FAILED(hr))
-        msg_Warn(s, "cannot reset stream (error 0x%lx)", hr);
-    else
+    {
+        msg_Dbg(s, "reset");
         sys->written = 0;
+    }
+    else
+        msg_Warn(s, "cannot reset stream (error 0x%lx)", hr);
     return hr;
 }
 
@@ -379,6 +382,16 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
     {
         msg_Err(s, "cannot get buffer size (error 0x%lx)", hr);
         goto error;
+    }
+    msg_Dbg(s, "buffer size    : %"PRIu32" frames", sys->frames);
+
+    REFERENCE_TIME latT, defT, minT;
+    if (SUCCEEDED(IAudioClient_GetStreamLatency(sys->client, &latT))
+     && SUCCEEDED(IAudioClient_GetDevicePeriod(sys->client, &defT, &minT)))
+    {
+        msg_Dbg(s, "maximum latency: %"PRIu64"00 ns", latT);
+        msg_Dbg(s, "default period : %"PRIu64"00 ns", defT);
+        msg_Dbg(s, "minimum period : %"PRIu64"00 ns", minT);
     }
 
     sys->rate = fmt->i_rate;
