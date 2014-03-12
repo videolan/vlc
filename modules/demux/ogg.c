@@ -2140,6 +2140,7 @@ static void Ogg_LogicalStreamDelete( demux_t *p_demux, logical_stream_t *p_strea
         block_ChainRelease( p_stream->p_preparse_block );
         p_stream->p_preparse_block = NULL;
     }
+    free( p_stream->p_prepcr_blocks );
 
     free( p_stream );
 }
