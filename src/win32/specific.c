@@ -114,7 +114,7 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
 
         if( GetLastError() != ERROR_ALREADY_EXISTS )
         {
-            libvlc_InternalAddIntf( p_this, "win32msg,none" );
+            libvlc_InternalAddIntf( p_this, "win_msg,none" );
             /* Initialization done.
              * Release the mutex to unblock other instances */
             ReleaseMutex( hmutex );
