@@ -98,7 +98,7 @@ done
 if test -z "$BUILD"
 then
 	echo -n "Guessing build system... "
-	BUILD="`cc -dumpmachine`"
+	BUILD="`${CC:-cc} -dumpmachine`"
 	if test -z "$BUILD"; then
 		echo "FAIL!"
 		exit 1
