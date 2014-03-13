@@ -751,12 +751,18 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [[[VLCMain sharedInstance] playlist] setColumn: o_column state: i_new_state translationDict: o_ptc_translation_dict];
 }
 
-- (void)setPlaylistColumnTableState:(NSInteger)i_state forColumn:(NSString *)o_column
+- (BOOL)setPlaylistColumnTableState:(NSInteger)i_state forColumn:(NSString *)o_column
 {
-    NSInteger i_tag = [o_ptc_menuorder indexOfObject: o_column];
+    NSUInteger i_tag = [o_ptc_menuorder indexOfObject: o_column];
+    // prevent setting unknown columns
+    if(i_tag == NSNotFound)
+        return NO;
+
     [[o_mu_playlistTableColumns            itemWithTag: i_tag] setState: i_state];
     [[o_mu_playlistTableColumnsContextMenu itemWithTag: i_tag] setState: i_state];
     [[[VLCMain sharedInstance] playlist] setColumn: o_column state: i_state translationDict: o_ptc_translation_dict];
+
+    return YES;
 }
 
 #pragma mark -
