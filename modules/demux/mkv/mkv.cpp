@@ -601,20 +601,11 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             continue;
          }
          case VLC_CODEC_OPUS:
-            if( i_duration > 0 )
-            {
-                mtime_t i_length = i_duration * tk-> f_timecodescale *
+            mtime_t i_length = i_duration * tk-> f_timecodescale *
                     (double) p_segment->i_timescale / 1000.0;
-                p_block->i_nb_samples = i_length * tk->fmt.audio.i_rate
-                     / CLOCK_FREQ;
-                break;
-            }
-            else if( i_duration < 0 )
-            {
-                /* Opus uses p_block->i_length to handle discard padding */
-                p_block->i_length = -1 * i_duration * tk->fmt.audio.i_rate
+            if ( i_length < 0 ) i_length = 0;
+            p_block->i_nb_samples = i_length * tk->fmt.audio.i_rate
                     / CLOCK_FREQ;
-            }
             break;
         }
 

@@ -1431,7 +1431,11 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                     else if( MKV_IS_ID( el, KaxDiscardPadding ) )
                     {
                         KaxDiscardPadding &dp = *(KaxDiscardPadding*) el;
-                        *pi_duration -= int64(dp);
+                        dp.ReadData( es.I_O() );
+                        if ( *pi_duration < int64(dp) )
+                            *pi_duration = 0;
+                        else
+                            *pi_duration -= int64(dp);
                     }
 #endif
                     break;
