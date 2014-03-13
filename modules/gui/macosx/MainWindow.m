@@ -158,6 +158,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     BOOL b_splitviewShouldBeHidden = NO;
 
+    if (!OSX_SNOW_LEOPARD)
+        [self setRestorable: NO];
+    [self setFrameAutosaveName:@"mainwindow"];
+
     /* setup the styled interface */
     b_nativeFullscreenMode = NO;
 #ifdef MAC_OS_X_VERSION_10_7
