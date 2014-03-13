@@ -148,6 +148,16 @@ HAVE_MINGW_W64 := 1
 endif
 endif
 
+ifdef HAVE_SOLARIS
+ifeq ($(ARCH),x86_64)
+EXTRA_CFLAGS += -m64
+EXTRA_LDFLAGS += -m64
+else
+EXTRA_CFLAGS += -m32
+EXTRA_LDFLAGS += -m32
+endif
+endif
+
 cppcheck = $(shell $(CC) $(CFLAGS) -E -dM - < /dev/null | grep -E $(1))
 
 EXTRA_CFLAGS += -I$(PREFIX)/include

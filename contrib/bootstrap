@@ -265,6 +265,9 @@ case "${OS}" in
 	*mingw*)
 		add_make_enabled "HAVE_WIN32"
 		;;
+	*solaris*)
+		add_make_enabled "HAVE_SOLARIS"
+		;;
 esac
 
 #
