@@ -441,7 +441,7 @@ static int Open (vlc_object_t *obj)
             continue;
 
         /* Look for an image format */
-        fmt = vd->fmt;
+        video_format_ApplyRotation(&vd->fmt, &fmt);
         free (p_sys->att);
         p_sys->att = FindFormat (obj, conn, &fmt, a, &p_sys->id);
         if (p_sys->att == NULL) /* No acceptable image formats */
@@ -706,20 +706,20 @@ static void Display (vout_display_t *vd, picture_t *pic, subpicture_t *subpictur
     if (segment)
         ck = xcb_xv_shm_put_image_checked (p_sys->conn, p_sys->port,
                               p_sys->window, p_sys->gc, segment, p_sys->id, 0,
-                   /* Src: */ vd->source.i_x_offset,
-                              vd->source.i_y_offset,
-                              vd->source.i_visible_width,
-                              vd->source.i_visible_height,
+                   /* Src: */ vd->fmt.i_x_offset,
+                              vd->fmt.i_y_offset,
+                              vd->fmt.i_visible_width,
+                              vd->fmt.i_visible_height,
                    /* Dst: */ 0, 0, p_sys->width, p_sys->height,
                 /* Memory: */ pic->p->i_pitch / pic->p->i_pixel_pitch,
                               pic->p->i_lines, false);
     else
         ck = xcb_xv_put_image_checked (p_sys->conn, p_sys->port, p_sys->window,
                           p_sys->gc, p_sys->id,
-                          vd->source.i_x_offset,
-                          vd->source.i_y_offset,
-                          vd->source.i_visible_width,
-                          vd->source.i_visible_height,
+                          vd->fmt.i_x_offset,
+                          vd->fmt.i_y_offset,
+                          vd->fmt.i_visible_width,
+                          vd->fmt.i_visible_height,
                           0, 0, p_sys->width, p_sys->height,
                           pic->p->i_pitch / pic->p->i_pixel_pitch,
                           pic->p->i_lines,
