@@ -244,7 +244,6 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     p_dec->pf_decode_video = DecodeVideo;
 
-
     p_dec->fmt_out.i_cat = p_dec->fmt_in.i_cat;
     p_dec->fmt_out.video = p_dec->fmt_in.video;
     p_dec->fmt_out.audio = p_dec->fmt_in.audio;
@@ -508,8 +507,7 @@ static void DisplayBuffer(picture_sys_t* p_picsys, bool b_render)
     vlc_mutex_lock(get_android_opaque_mutex());
 
     /* Picture might have been invalidated while waiting on the mutex. */
-    if (!p_picsys->b_valid)
-    {
+    if (!p_picsys->b_valid) {
         vlc_mutex_unlock(get_android_opaque_mutex());
         return;
     }
@@ -547,8 +545,7 @@ static void InvalidateAllPictures(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     vlc_mutex_lock(get_android_opaque_mutex());
-    for (int i = 0; i < p_sys->i_output_buffers; ++i)
-    {
+    for (int i = 0; i < p_sys->i_output_buffers; ++i) {
         picture_t *p_pic = p_sys->inflight_picture[i];
         if (p_pic) {
             p_pic->p_sys->b_valid = false;
@@ -621,7 +618,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                     (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, index, false);
 
                     jthrowable exception = (*env)->ExceptionOccurred(env);
-                    if(exception != NULL) {
+                    if (exception != NULL) {
                         jclass illegalStateException = (*env)->FindClass(env, "java/lang/IllegalStateException");
                         if((*env)->IsInstanceOf(env, exception, illegalStateException)) {
                             msg_Err(p_dec, "Codec error (IllegalStateException) in MediaCodec.releaseOutputBuffer");
@@ -636,8 +633,8 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                 msg_Warn(p_dec, "NewPicture failed");
                 (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, index, false);
             }
-
             return;
+
         } else if (index == INFO_OUTPUT_BUFFERS_CHANGED) {
             msg_Dbg(p_dec, "output buffers changed");
             (*env)->DeleteGlobalRef(env, p_sys->output_buffers);
@@ -653,7 +650,6 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
             vlc_mutex_unlock(get_android_opaque_mutex());
 
         } else if (index == INFO_OUTPUT_FORMAT_CHANGED) {
-
             jobject format = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_output_format);
             jobject format_string = (*env)->CallObjectMethod(env, format, p_sys->tostring);
 
@@ -782,6 +778,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             p_sys->error_state = true;
             break;
         }
+
         if (index < 0) {
             GetOutput(p_dec, env, &p_pic, timeout);
             if (p_pic) {
@@ -793,7 +790,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
                 (*myVm)->DetachCurrentThread(myVm);
                 return p_pic;
             }
-            timeout = 30*1000;
+            timeout = 30 * 1000;
             ++attempts;
             /* With opaque DR the output buffers are released by the
                vout therefore we implement a timeout for polling in
@@ -821,6 +818,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             }
             continue;
         }
+
         jobject buf = (*env)->GetObjectArrayElement(env, p_sys->input_buffers, index);
         jsize size = (*env)->GetDirectBufferCapacity(env, buf);
         uint8_t *bufptr = (*env)->GetDirectBufferAddress(env, buf);
