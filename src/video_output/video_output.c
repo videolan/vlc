@@ -795,7 +795,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
         fmt_current = *filter_chain_GetFmtOut(chain);
         vlc_array_clear(array);
     }
-    VideoFormatCopyCropAr(&fmt_target.video, &fmt_current.video);
+
     if (!es_format_IsSimilar(&fmt_current, &fmt_target)) {
         msg_Dbg(vout, "Adding a filter to compensate for format changes");
         if (!filter_chain_AppendFilter(vout->p->filter.chain_interactive, NULL, NULL,
