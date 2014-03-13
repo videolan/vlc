@@ -201,7 +201,7 @@ fi
     --disable-upnp \
     --disable-gme \
     --disable-tremor \
-    --disable-vorbis \
+    --enable-vorbis \
     --disable-sidplay2 \
     --disable-samplerate \
     --disable-goom \
@@ -299,7 +299,7 @@ ${VLCROOT}/configure \
     --disable-libva \
     --disable-gme \
     --disable-tremor \
-    --disable-vorbis \
+    --enable-vorbis \
     --disable-fluidsynth \
     --disable-jack \
     --disable-pulse \
