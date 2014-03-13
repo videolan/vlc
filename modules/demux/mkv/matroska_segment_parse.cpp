@@ -341,6 +341,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
             KaxTrackTimecodeScale &ttcs = *(KaxTrackTimecodeScale*)l;
 
             tk->f_timecodescale = float( ttcs );
+            if ( tk->f_timecodescale <= 0 ) tk->f_timecodescale = 1.0;
             msg_Dbg( &sys.demuxer, "|   |   |   + Track TimeCodeScale=%f", tk->f_timecodescale );
         }
         else  if( MKV_IS_ID( l, KaxMaxBlockAdditionID ) ) // UNUSED
