@@ -622,7 +622,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                 {
                     KaxVideoFrameRate &vfps = *(KaxVideoFrameRate*)l;
 
-                    tk->f_fps = float( vfps );
+                    tk->f_fps = __MAX( float( vfps ), 1 );
                     msg_Dbg( &sys.demuxer, "   |   |   |   + fps=%f", float( vfps ) );
                 }
 //                else if( MKV_IS_ID( l, KaxVideoGamma) ) //DEPRECATED by Matroska
