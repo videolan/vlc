@@ -1,6 +1,6 @@
 diff -urN ragel-6.8.orig/ragel/javacodegen.cpp ragel-6.8/ragel/javacodegen.cpp
 --- ragel-6.8.orig/ragel/javacodegen.cpp	2013-02-11 05:57:45.000000000 +0400
-+++ ragel-6.8/ragel/javacodegen.cpp	2013-09-01 14:42:27.000000000 +0400
++++ ragel-6.8/ragel/javacodegen.cpp.new	2013-09-01 14:42:27.000000000 +0400
 @@ -50,6 +50,7 @@
  using std::ifstream;
  using std::ostream;
