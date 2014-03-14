@@ -257,7 +257,8 @@ static int Open(vlc_object_t *object)
     vout_display_DeleteWindow(vd, NULL);
 
     /* */
-    video_format_t fmt = vd->fmt;
+    video_format_t fmt;
+    video_format_ApplyRotation(&fmt, &vd->fmt);
 
     if (sys->chroma) {
         fmt.i_chroma = sys->chroma;
