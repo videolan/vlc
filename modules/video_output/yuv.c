@@ -152,7 +152,8 @@ static int Open(vlc_object_t *object)
     free(name);
 
     /* */
-    video_format_t fmt = vd->fmt;
+    video_format_t fmt;
+    video_format_ApplyRotation(&fmt, &vd->fmt);
     fmt.i_chroma = chroma;
     video_format_FixRgb(&fmt);
 
@@ -202,8 +203,17 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     /* */
     video_format_t fmt = vd->fmt;
-    fmt.i_sar_num = vd->source.i_sar_num;
-    fmt.i_sar_den = vd->source.i_sar_den;
+
+    if (ORIENT_IS_SWAP(vd->source.orientation))
+    {
+        fmt.i_sar_num = vd->source.i_sar_den;
+        fmt.i_sar_den = vd->source.i_sar_num;
+    }
+    else
+    {
+        fmt.i_sar_num = vd->source.i_sar_num;
+        fmt.i_sar_den = vd->source.i_sar_den;
+    }
 
     /* */
     char type;
