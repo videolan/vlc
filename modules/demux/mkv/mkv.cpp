@@ -445,6 +445,11 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, virtual_ch
         msg_Warn( p_demux, "cannot seek without duration!");
         return;
     }
+    if( !p_segment )
+    {
+        msg_Warn( p_demux, "cannot seek without valid segment position");
+        return;
+    }
 
     /* seek without index or without date */
     if( f_percent >= 0 && (var_InheritBool( p_demux, "mkv-seek-percent" ) || !p_segment->b_cues || i_date < 0 ))
