@@ -164,7 +164,10 @@ static int Open (vlc_object_t *p_this)
     if (!sys->cgLayer)
         goto bailout;
 
-    assert(sys->glContext);
+    if (!sys->glContext) {
+        msg_Err(vd, "Have no gl context");
+        goto bailout;
+    }
 
     /* Initialize common OpenGL video display */
     sys->gl.lock = OpenglLock;
