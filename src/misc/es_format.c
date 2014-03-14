@@ -245,45 +245,37 @@ void video_format_ScaleCropAr( video_format_t *p_dst, const video_format_t *p_sr
 }
 
 //Simplify transforms to have something more managable. Order: angle, hflip.
-void transform_GetBasicOps( video_transform_t transform, int *angle, int *hflip ) {
+static void transform_GetBasicOps( video_transform_t transform,
+                                   unsigned *restrict angle,
+                                   bool *restrict hflip )
+{
+    *hflip = ORIENT_IS_MIRROR(transform);
 
-    *angle = 0;
-    *hflip = 0;
-
-    switch ( transform ) {
-
+    switch ( transform )
+    {
         case TRANSFORM_R90:
+        case TRANSFORM_TRANSPOSE:
             *angle = 90;
             break;
         case TRANSFORM_R180:
+        case TRANSFORM_VFLIP:
             *angle = 180;
             break;
         case TRANSFORM_R270:
+        case TRANSFORM_ANTI_TRANSPOSE:
             *angle = 270;
             break;
         case TRANSFORM_HFLIP:
-            *hflip = 1;
-            break;
-        case TRANSFORM_VFLIP:
-            *angle = 180;
-            *hflip = 1;
-            break;
-        case TRANSFORM_TRANSPOSE:
-            *angle = 90;
-            *hflip = 1;
-            break;
-        case TRANSFORM_ANTI_TRANSPOSE:
-            *angle = 270;
-            *hflip = 1;
+        case TRANSFORM_IDENTITY:
+            *angle = 0;
             break;
     }
 }
 
-video_transform_t transform_FromBasicOps( int angle, int hflip )
+static video_transform_t transform_FromBasicOps( unsigned angle, bool hflip )
 {
-    switch ( angle ) {
-        case 0:
-            return hflip ? TRANSFORM_HFLIP : TRANSFORM_IDENTIY;
+    switch ( angle )
+    {
         case 90:
             return hflip ? TRANSFORM_TRANSPOSE : TRANSFORM_R90;
         case 180:
@@ -291,24 +283,22 @@ video_transform_t transform_FromBasicOps( int angle, int hflip )
         case 270:
             return hflip ? TRANSFORM_ANTI_TRANSPOSE : TRANSFORM_R270;
         default:
-            return TRANSFORM_IDENTIY;
+            return hflip ? TRANSFORM_HFLIP : TRANSFORM_IDENTITY;
     }
 }
 
-video_transform_t video_format_GetTransform( video_orientation_t src, video_orientation_t dst )
+video_transform_t video_format_GetTransform( video_orientation_t src,
+                                             video_orientation_t dst )
 {
-    int angle1 = 0;
-    int hflip1 = 0;
+    unsigned angle1, angle2;
+    bool hflip1, hflip2;
 
     transform_GetBasicOps(  (video_transform_t)src, &angle1, &hflip1 );
-
-    int angle2 = 0;
-    int hflip2 = 0;
-
-    transform_GetBasicOps( transform_Inverse( (video_transform_t)dst ), &angle2, &hflip2 );
+    transform_GetBasicOps( transform_Inverse( (video_transform_t)dst ),
+                           &angle2, &hflip2 );
 
     int angle = (angle1 + angle2) % 360;
-    int hflip = (hflip1 + hflip2) % 2;
+    bool hflip = hflip1 ^ hflip2;
 
     return transform_FromBasicOps(angle, hflip);
 }
@@ -323,19 +313,14 @@ void video_format_TransformTo( video_format_t *fmt, video_orientation_t dst_orie
 void video_format_TransformBy( video_format_t *fmt, video_transform_t transform )
 {
     /* Get destination orientation */
-
-    int angle1 = 0;
-    int hflip1 = 0;
+    unsigned angle1, angle2;
+    bool hflip1, hflip2;
 
     transform_GetBasicOps( transform, &angle1, &hflip1 );
+    transform_GetBasicOps( (video_transform_t)fmt->orientation, &angle2, &hflip2 );
 
-    int angle2 = 0;
-    int hflip2 = 0;
-
-    transform_GetBasicOps( (video_transform_t)( fmt->orientation ), &angle2, &hflip2 );
-
-    int angle = (angle2 - angle1 + 360) % 360;
-    int hflip = (hflip2 - hflip1 + 2) % 2;
+    unsigned angle = (angle2 - angle1 + 360) % 360;
+    bool hflip = hflip2 ^ hflip1;
 
     video_orientation_t dst_orient = ORIENT_NORMAL;
 
@@ -379,6 +364,8 @@ void video_format_TransformBy( video_format_t *fmt, video_transform_t transform 
 
     switch ( transform )
     {
+        case TRANSFORM_IDENTITY:
+            break;
         case TRANSFORM_R90:
             fmt->i_x_offset = delta_y;
             fmt->i_y_offset = scratch.i_x_offset;

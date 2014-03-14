@@ -178,7 +178,7 @@ typedef enum video_orientation_t
 
 typedef enum video_transform_t
 {
-    TRANSFORM_IDENTIY        = ORIENT_NORMAL,
+    TRANSFORM_IDENTITY       = ORIENT_NORMAL,
     TRANSFORM_HFLIP          = ORIENT_HFLIPPED,
     TRANSFORM_VFLIP          = ORIENT_VFLIPPED,
     TRANSFORM_R180           = ORIENT_ROTATED_180,
