@@ -165,6 +165,8 @@ static int Open(vlc_object_t *object)
 
     /* */
     video_format_t fmt = vd->fmt;
+    video_format_ApplyRotation(&fmt, &vd->fmt);
+    fmt = vd->fmt;
 
     /* */
     vout_display_info_t info = vd->info;
@@ -638,11 +640,11 @@ static void Manage(vout_display_t *vd)
             if (sys->place.width <= 0 || sys->place.height <= 0)
                 break;
 
-            const int x = (int64_t)(event.motion.x - sys->place.x) * vd->source.i_width  / sys->place.width;
-            const int y = (int64_t)(event.motion.y - sys->place.y) * vd->source.i_height / sys->place.height;
-
             SDL_ShowCursor(1);
-            vout_display_SendEventMouseMoved(vd, x, y);
+
+            vout_display_SendMouseMovedDisplayCoordinates(vd, ORIENT_NORMAL,
+                                                          event.motion.x, event.motion.y,
+                                                          &sys->place);
             break;
         }
 
