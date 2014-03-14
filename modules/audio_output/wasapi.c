@@ -212,7 +212,7 @@ static HRESULT Flush(aout_stream_t *s)
     IAudioClient_Stop(sys->client);
 
     hr = IAudioClient_Reset(sys->client);
-    if (FAILED(hr))
+    if (SUCCEEDED(hr))
     {
         msg_Dbg(s, "reset");
         sys->written = 0;
