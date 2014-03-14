@@ -656,8 +656,11 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                     p_block->i_dts = min( i_pts, tk->i_last_dts + ( mtime_t )( tk->i_default_duration / 1000 ) );
             }
         }
-        if( tk->fmt.i_cat == VIDEO_ES || tk->fmt.i_cat == AUDIO_ES )
+        if( p_block->i_dts > VLC_TS_INVALID &&
+            ( tk->fmt.i_cat == VIDEO_ES || tk->fmt.i_cat == AUDIO_ES ) )
+        {
             tk->i_last_dts = p_block->i_dts;
+        }
 
 #if 0
 msg_Dbg( p_demux, "block i_dts: %"PRId64" / i_pts: %"PRId64, p_block->i_dts, p_block->i_pts);
