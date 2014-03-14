@@ -660,7 +660,7 @@ void demux_sys_t::PreloadFamily( const matroska_segment_c & of_segment )
 // preload all the linked segments for all preloaded segments
 bool demux_sys_t::PreloadLinked()
 {
-    size_t i, j;
+    size_t i, j, ij = 0;
     virtual_segment_c *p_seg;
 
     p_current_segment = VirtualFromSegments( &opened_segments );
@@ -712,11 +712,12 @@ bool demux_sys_t::PreloadLinked()
                         }
 
                         if( !p_title->psz_name &&
-                            asprintf(&(p_title->psz_name), "%s %d", N_("Segment"), (int)i) == -1 )
+                            asprintf(&(p_title->psz_name), "%s %d", N_("Segment"), (int)ij) == -1 )
                             p_title->psz_name = NULL;
                     }
                 }
 
+                ij++;
                 i_chapters = 0;
                 p_ved->PublishChapters( *p_title, i_chapters, 0 );
 
