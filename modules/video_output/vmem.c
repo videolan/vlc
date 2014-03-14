@@ -139,7 +139,8 @@ static int Open(vlc_object_t *object)
     sys->pool = NULL;
 
     /* Define the video format */
-    video_format_t fmt = vd->fmt;
+    video_format_t fmt;
+    video_format_ApplyRotation(&fmt, &vd->fmt);
 
     if (setup != NULL) {
         char chroma[5];
