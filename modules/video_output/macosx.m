@@ -213,7 +213,6 @@ static int Open (vlc_object_t *this)
     sys->gl.getProcAddress = OurGetProcAddress;
     sys->gl.sys = sys;
     const vlc_fourcc_t *subpicture_chromas;
-    video_format_t fmt = vd->fmt;
 
     sys->vgl = vout_display_opengl_New (&vd->fmt, &subpicture_chromas, &sys->gl);
     if (!sys->vgl) {
@@ -238,7 +237,7 @@ static int Open (vlc_object_t *this)
     vd->control = Control;
 
     /* */
-    vout_display_SendEventDisplaySize (vd, vd->source.i_visible_width, vd->source.i_visible_height, false);
+    vout_display_SendEventDisplaySize (vd, vd->fmt.i_visible_width, vd->fmt.i_visible_height, false);
 
     return VLC_SUCCESS;
 
@@ -784,16 +783,10 @@ static void OpenglSwap (vlc_gl_t *gl)
     if (b_inside) {
         @synchronized (self) {
             if (vd) {
-                vout_display_place_t place = vd->sys->place;
 
-                if (place.width > 0 && place.height > 0) {
-                    const int x = vd->source.i_x_offset +
-                    (int64_t)(ml.x - place.x) * vd->source.i_visible_width / place.width;
-                    const int y = vd->source.i_y_offset +
-                    (int64_t)((int)s_rect.size.height - (int)ml.y - place.y) * vd->source.i_visible_height / place.height;
-
-                    vout_display_SendEventMouseMoved (vd, x, y);
-                }
+                vout_display_SendMouseMovedDisplayCoordinates(vd, ORIENT_NORMAL,
+                                                              (int)ml.x, s_rect.size.height - (int)ml.y,
+                                                              &vd->sys->place);
             }
         }
     }
