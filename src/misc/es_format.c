@@ -410,7 +410,8 @@ void video_format_TransformBy( video_format_t *fmt, video_transform_t transform 
     fmt->orientation = dst_orient;
 }
 
-void video_format_ApplyRotation( const video_format_t * restrict in, video_format_t * restrict out )
+void video_format_ApplyRotation( video_format_t *restrict out,
+                                 const video_format_t *restrict in )
 {
     *out = *in;
 

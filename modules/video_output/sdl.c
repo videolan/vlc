@@ -164,9 +164,8 @@ static int Open(vlc_object_t *object)
     sys->desktop_height = SDL_GetVideoInfo()->current_h;
 
     /* */
-    video_format_t fmt = vd->fmt;
+    video_format_t fmt;
     video_format_ApplyRotation(&fmt, &vd->fmt);
-    fmt = vd->fmt;
 
     /* */
     vout_display_info_t info = vd->info;

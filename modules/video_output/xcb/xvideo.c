@@ -441,7 +441,7 @@ static int Open (vlc_object_t *obj)
             continue;
 
         /* Look for an image format */
-        video_format_ApplyRotation(&vd->fmt, &fmt);
+        video_format_ApplyRotation(&fmt, &vd->fmt);
         free (p_sys->att);
         p_sys->att = FindFormat (obj, conn, &fmt, a, &p_sys->id);
         if (p_sys->att == NULL) /* No acceptable image formats */

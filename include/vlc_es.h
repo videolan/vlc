@@ -282,7 +282,7 @@ VLC_API void video_format_ScaleCropAr( video_format_t *, const video_format_t * 
  * This function "normalizes" the formats orientation, by switching the a/r according to the orientation,
  * producing a format whose orientation is ORIENT_NORMAL. It makes a shallow copy (pallette is not alloc'ed).
  */
-VLC_API void video_format_ApplyRotation(const video_format_t * restrict in, video_format_t * restrict out);
+VLC_API void video_format_ApplyRotation(video_format_t *restrict out, const video_format_t *restrict in);
 
 /**
  * This function applies the transform operation to fmt.

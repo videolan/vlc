@@ -222,7 +222,7 @@ void vout_display_PlacePicture(vout_display_place_t *place,
     unsigned display_height;
 
     video_format_t source_rot;
-    video_format_ApplyRotation(source, &source_rot);
+    video_format_ApplyRotation(&source_rot, source);
     source = &source_rot;
 
     if (cfg->is_display_filled) {

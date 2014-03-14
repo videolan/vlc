@@ -971,7 +971,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     }
 
     video_format_t fmt_spu_rot;
-    video_format_ApplyRotation(&fmt_spu, &fmt_spu_rot);
+    video_format_ApplyRotation(&fmt_spu_rot, &fmt_spu);
     subpicture_t *subpic = spu_Render(vout->p->spu,
                                       subpicture_chromas, &fmt_spu_rot,
                                       &vd->source,
