@@ -145,7 +145,7 @@ static seekpoint_t * getChapterEntry( unsigned int i_index, chapters_array_t *p_
     return p_array->pp_chapters[i_index];
 }
 
-void vorbis_ParseComment( vlc_meta_t **pp_meta,
+void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
         const uint8_t *p_data, int i_data,
         int *i_attachments, input_attachment_t ***attachments,
         int *i_cover_score, int *i_cover_idx,

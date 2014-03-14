@@ -2288,7 +2288,7 @@ static void Ogg_ExtractComments( demux_t *p_demux, es_format_t *p_fmt,
         pf_replay_gain[i] = 0;
         pf_replay_peak[i] = 0;
     }
-    vorbis_ParseComment( &p_ogg->p_meta, p_headers, i_headers,
+    vorbis_ParseComment( p_fmt, &p_ogg->p_meta, p_headers, i_headers,
                          &p_ogg->i_attachments, &p_ogg->attachments,
                          &i_cover_score, &i_cover_idx,
                          &p_ogg->i_seekpoints, &p_ogg->pp_seekpoints,

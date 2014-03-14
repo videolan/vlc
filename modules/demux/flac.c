@@ -577,7 +577,7 @@ static void ParseComment( demux_t *p_demux, const uint8_t *p_data, int i_data )
     if( i_data < 4 )
         return;
 
-    vorbis_ParseComment( &p_sys->p_meta, &p_data[4], i_data - 4,
+    vorbis_ParseComment( NULL, &p_sys->p_meta, &p_data[4], i_data - 4,
         &p_sys->i_attachments, &p_sys->attachments,
         &p_sys->i_cover_score, &p_sys->i_cover_idx, NULL, NULL, NULL, NULL );
 }
