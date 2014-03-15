@@ -98,7 +98,7 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
     if( !pp_block || !*pp_block )
         return NULL;
 
-    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    if( unlikely( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) ) )
     {
         const bool b_broken = ( (*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED ) != 0;
         if( b_broken )
