@@ -339,52 +339,18 @@ void video_format_TransformBy( video_format_t *fmt, video_transform_t transform 
     }
 
     /* Apply transform */
-
-    video_format_t scratch = *fmt;
-
-    if( ORIENT_IS_SWAP( fmt->orientation ) != ORIENT_IS_SWAP( dst_orient )) {
+    if( ORIENT_IS_SWAP( fmt->orientation ) != ORIENT_IS_SWAP( dst_orient ) )
+    {
+        video_format_t scratch = *fmt;
 
         fmt->i_width = scratch.i_height;
         fmt->i_visible_width = scratch.i_visible_height;
         fmt->i_height = scratch.i_width;
         fmt->i_visible_height = scratch.i_visible_width;
+        fmt->i_x_offset = scratch.i_y_offset;
+        fmt->i_y_offset = scratch.i_x_offset;
         fmt->i_sar_num = scratch.i_sar_den;
         fmt->i_sar_den = scratch.i_sar_num;
-    }
-
-    unsigned int delta_y = scratch.i_height - scratch.i_visible_height - scratch.i_y_offset;
-    unsigned int delta_x = scratch.i_width - scratch.i_visible_width - scratch.i_x_offset;
-
-    switch ( transform )
-    {
-        case TRANSFORM_IDENTITY:
-            break;
-        case TRANSFORM_R90:
-            fmt->i_x_offset = delta_y;
-            fmt->i_y_offset = scratch.i_x_offset;
-            break;
-        case TRANSFORM_R180:
-            fmt->i_x_offset = delta_x;
-            fmt->i_y_offset = delta_y;
-            break;
-        case TRANSFORM_R270:
-            fmt->i_x_offset = scratch.i_y_offset;
-            fmt->i_y_offset = delta_x;
-            break;
-        case TRANSFORM_HFLIP:
-            fmt->i_x_offset = delta_x;
-            break;
-        case TRANSFORM_VFLIP:
-            fmt->i_y_offset = delta_y;
-            break;
-        case TRANSFORM_TRANSPOSE:
-            fmt->i_x_offset = scratch.i_y_offset;
-            fmt->i_y_offset = scratch.i_x_offset;
-            break;
-        case TRANSFORM_ANTI_TRANSPOSE:
-            fmt->i_x_offset = delta_y;
-            fmt->i_y_offset = delta_x;
-            break;
     }
 
     fmt->orientation = dst_orient;
