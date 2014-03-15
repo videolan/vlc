@@ -105,7 +105,7 @@ static inline block_t *block_BytestreamPop( block_bytestream_t *p_bytestream )
     block_BytestreamFlush( p_bytestream );
 
     p_block = p_bytestream->p_block;
-    if( p_block == NULL )
+    if( unlikely( p_block == NULL ) )
     {
         return NULL;
     }
@@ -131,7 +131,7 @@ static inline block_t *block_BytestreamPop( block_bytestream_t *p_bytestream )
 static inline int block_SkipByte( block_bytestream_t *p_bytestream )
 {
     /* Most common case first */
-    if( p_bytestream->p_block->i_buffer - p_bytestream->i_offset )
+    if( likely( p_bytestream->p_block->i_buffer - p_bytestream->i_offset ) )
     {
         p_bytestream->i_offset++;
         return VLC_SUCCESS;
@@ -161,7 +161,7 @@ static inline int block_PeekByte( block_bytestream_t *p_bytestream,
                                   uint8_t *p_data )
 {
     /* Most common case first */
-    if( p_bytestream->p_block->i_buffer - p_bytestream->i_offset )
+    if( likely( p_bytestream->p_block->i_buffer - p_bytestream->i_offset ) )
     {
         *p_data = p_bytestream->p_block->p_buffer[p_bytestream->i_offset];
         return VLC_SUCCESS;
@@ -190,7 +190,7 @@ static inline int block_GetByte( block_bytestream_t *p_bytestream,
                                  uint8_t *p_data )
 {
     /* Most common case first */
-    if( p_bytestream->p_block->i_buffer - p_bytestream->i_offset )
+    if( likely( p_bytestream->p_block->i_buffer - p_bytestream->i_offset ) )
     {
         *p_data = p_bytestream->p_block->p_buffer[p_bytestream->i_offset];
         p_bytestream->i_offset++;
@@ -462,7 +462,7 @@ static inline int block_FindStartcodeFromOffset(
         if( i_size < 0 ) break;
     }
 
-    if( i_size >= 0 )
+    if( unlikely( i_size >= 0 ) )
     {
         /* Not enough data, bail out */
         return VLC_EGENERIC;
