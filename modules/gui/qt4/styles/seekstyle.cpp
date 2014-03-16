@@ -48,10 +48,19 @@ int SeekStyle::pixelMetric( PixelMetric metric, const QStyleOption *option, cons
 {
     const QStyleOptionSlider *slider;
 
-    if ( widget && metric == QStyle::PM_SliderThickness && ( slider = qstyleoption_cast<const QStyleOptionSlider *>( option ) ) )
-        return widget->minimumSize().height();
-    else
-        return QProxyStyle::pixelMetric( metric, option, widget );
+    if ( widget && ( slider = qstyleoption_cast<const QStyleOptionSlider *>( option ) ) )
+    {
+        switch( metric )
+        {
+        case QStyle::PM_SliderThickness:
+        case QStyle::PM_SliderLength:
+            return widget->minimumSize().height();
+        default:
+            break;
+        }
+    }
+
+    return QProxyStyle::pixelMetric( metric, option, widget );
 }
 
 void SeekStyle::drawComplexControl( ComplexControl cc, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget ) const
