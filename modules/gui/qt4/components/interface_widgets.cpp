@@ -730,8 +730,7 @@ void CoverArtLabel::clear()
 }
 
 TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
-    : ClickableQLabel(), p_intf( _p_intf ), bufTimer( new QTimer(this) ),
-      buffering( false ), showBuffering(false), bufVal( -1 ), displayType( _displayType )
+    : ClickableQLabel(), p_intf( _p_intf ), displayType( _displayType )
 {
     b_remainingTime = false;
     if( _displayType != TimeLabel::Elapsed )
@@ -758,22 +757,14 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
     }
     setAlignment( Qt::AlignRight | Qt::AlignVCenter );
 
-    bufTimer->setSingleShot( true );
-
     CONNECT( THEMIM->getIM(), positionUpdated( float, int64_t, int ),
               this, setDisplayPosition( float, int64_t, int ) );
-    CONNECT( THEMIM->getIM(), cachingChanged( float ),
-              this, updateBuffering( float ) );
-    CONNECT( bufTimer, timeout(), this, updateBuffering() );
 
     setStyleSheet( "padding-left: 4px; padding-right: 4px;" );
 }
 
 void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
 {
-    showBuffering = false;
-    bufTimer->stop();
-
     if( pos == -1.f )
     {
         setMinimumSize( QSize( 0, 0 ) );
@@ -864,39 +855,3 @@ void TimeLabel::toggleTimeDisplay()
     getSettings()->setValue( "MainWindow/ShowRemainingTime", b_remainingTime );
 }
 
-
-void TimeLabel::updateBuffering( float _buffered )
-{
-    bufVal = _buffered;
-    if( !buffering || bufVal == 0 )
-    {
-        showBuffering = false;
-        buffering = true;
-        bufTimer->start(200);
-    }
-    else if( bufVal == 1 )
-    {
-        showBuffering = buffering = false;
-        bufTimer->stop();
-    }
-    update();
-}
-
-void TimeLabel::updateBuffering()
-{
-    showBuffering = true;
-    update();
-}
-
-void TimeLabel::paintEvent( QPaintEvent* event )
-{
-    if( showBuffering )
-    {
-        QRect r( rect() );
-        r.setLeft( r.width() * bufVal );
-        QPainter p( this );
-        p.setOpacity( 0.4 );
-        p.fillRect( r, palette().color( QPalette::Highlight ) );
-    }
-    QLabel::paintEvent( event );
-}

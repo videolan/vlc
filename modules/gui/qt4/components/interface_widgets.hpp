@@ -200,22 +200,14 @@ private:
     intf_thread_t *p_intf;
     bool b_remainingTime;
     int cachedLength;
-    QTimer *bufTimer;
-
-    bool buffering;
-    bool showBuffering;
-    float bufVal;
     TimeLabel::Display displayType;
 
     char psz_length[MSTRTIME_MAX_SIZE];
     char psz_time[MSTRTIME_MAX_SIZE];
     void toggleTimeDisplay();
-    void paintEvent( QPaintEvent* );
 private slots:
     void setDisplayPosition( float pos, int64_t time, int length );
     void setDisplayPosition( float pos );
-    void updateBuffering( float );
-    void updateBuffering();
 };
 
 class SpeedLabel : public QLabel
