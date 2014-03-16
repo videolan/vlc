@@ -328,7 +328,10 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
      * request from this thread must be completed at this point. */
     if ((p_sys->keys != NULL)
      && vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
+    {
         XCB_keyHandler_Destroy (p_sys->keys);
+        p_sys->keys = NULL;
+    }
 
     xcb_flush (conn); /* Make sure map_window is sent (should be useless) */
     return VLC_SUCCESS;
@@ -595,7 +598,10 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     CacheAtoms (p_sys);
     if ((p_sys->keys != NULL)
      && vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
+    {
         XCB_keyHandler_Destroy (p_sys->keys);
+        p_sys->keys = NULL;
+    }
 
     xcb_flush (conn);
     (void) cfg;
