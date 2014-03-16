@@ -926,7 +926,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
             if (!cfg.is_fullscreen != !display_is_fullscreen ||
                 vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &cfg, display_is_forced)) {
-                if (!cfg.is_fullscreen == !display_is_fullscreen)
+                if (!display_is_forced)
                     msg_Err(vd, "Failed to resize display");
 
                 /* We ignore the resized */
