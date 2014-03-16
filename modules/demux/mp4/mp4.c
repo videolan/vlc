@@ -2659,7 +2659,8 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
 
         for( i = 0; i < p_chap->i_entry_count; i++ )
         {
-            if( p_track->i_track_ID == p_chap->i_track_ID[i] )
+            if( p_track->i_track_ID == p_chap->i_track_ID[i] &&
+                p_track->fmt.i_cat == UNKNOWN_ES )
             {
                 p_track->b_chapter = true;
                 p_track->b_enable = false;
