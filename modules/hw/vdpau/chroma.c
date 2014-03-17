@@ -289,20 +289,19 @@ static picture_t *OutputAllocate(filter_t *filter)
 
     picture_sys_t *psys = pic->p_sys;
     assert(psys->vdp != NULL);
-    if (unlikely(sys->vdp != psys->vdp))
+
+    if (unlikely(sys->vdp != psys->vdp) && (sys->mixer != VDP_INVALID_HANDLE))
     {
-        if (sys->mixer != VDP_INVALID_HANDLE)
-        {
-            Flush(filter);
-            vdp_video_mixer_destroy(sys->vdp, sys->mixer);
-            sys->mixer = VDP_INVALID_HANDLE;
-        }
-        sys->vdp = psys->vdp;
-        sys->device = psys->device;
+        Flush(filter); /* release surfaces from the old device */
+        vdp_video_mixer_destroy(sys->vdp, sys->mixer);
+        vdp_release_x11(sys->vdp);
+        sys->mixer = VDP_INVALID_HANDLE;
     }
 
     if (unlikely(sys->mixer == VDP_INVALID_HANDLE))
     {
+        sys->vdp = vdp_hold_x11(psys->vdp, NULL);
+        sys->device = psys->device;
         sys->mixer = MixerCreate(filter);
         if (sys->mixer == VDP_INVALID_HANDLE)
             goto error;
@@ -659,8 +658,10 @@ static void OutputClose(vlc_object_t *obj)
 
     Flush(filter);
     if (sys->mixer != VDP_INVALID_HANDLE)
+    {
         vdp_video_mixer_destroy(sys->vdp, sys->mixer);
-
+        vdp_release_x11(sys->vdp);
+    }
     free(sys);
 }
 
