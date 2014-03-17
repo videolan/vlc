@@ -358,6 +358,9 @@ static picture_t *VideoImport(filter_t *filter, picture_t *src)
     VdpVideoSurface surface;
     VdpStatus err;
 
+    if (sys->vdp == NULL)
+        goto drop;
+
     /* Create surface (TODO: reuse?) */
     err = vdp_video_surface_create(sys->vdp, sys->device, sys->chroma,
                                    filter->fmt_in.video.i_width,
@@ -366,8 +369,7 @@ static picture_t *VideoImport(filter_t *filter, picture_t *src)
     {
         msg_Err(filter, "video %s %s failure: %s", "surface", "creation",
                 vdp_get_error_string(sys->vdp, err));
-        picture_Release(src);
-        return NULL;
+        goto drop;
     }
 
     /* Put bits */
@@ -414,6 +416,7 @@ static picture_t *VideoImport(filter_t *filter, picture_t *src)
     return dst;
 error:
     vdp_video_surface_destroy(sys->vdp, surface);
+drop:
     picture_Release(src);
     return NULL;
 }
@@ -468,12 +471,6 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
     VdpStatus err;
 
     picture_t *dst = OutputAllocate(filter);
-    if (dst == NULL)
-    {
-        picture_Release(src);
-        Flush(filter);
-        return NULL;
-    }
 
     src = sys->import(filter, src);
     /* Update history and take "present" picture field */
@@ -488,9 +485,17 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
     else
         sys->history[MAX_PAST + MAX_FUTURE].field = NULL;
 
+    if (dst == NULL)
+        goto skip;
+
     vlc_vdp_video_field_t *f = sys->history[MAX_PAST].field;
     if (f == NULL)
+    {
+        picture_Release(dst);
+        dst = NULL;
         goto skip;
+    }
+
     dst->date = sys->history[MAX_PAST].date;
     dst->b_force = sys->history[MAX_PAST].force;
 
@@ -571,11 +576,11 @@ static picture_t *MixerRender(filter_t *filter, picture_t *src)
     {
         msg_Err(filter, "video %s %s failure: %s", "mixer", "rendering",
                 vdp_get_error_string(sys->vdp, err));
-skip:
         picture_Release(dst);
         dst = NULL;
     }
 
+skip:
     f = sys->history[0].field;
     if (f != NULL)
         f->destroy(f); /* Release oldest field */
