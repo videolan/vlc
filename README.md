@@ -31,33 +31,52 @@ Links:
 Source Code Content:
 ===================
 ABOUT-NLS          - Notes on the Free Translation Project.
+
 AUTHORS            - VLC authors.
+
 COPYING            - The GPL license.
+
 COPYING.LIB        - The LGPL license.
+
 INSTALL            - Installation and building instructions.
+
 NEWS               - Important modifications between the releases.
+
 README             - This file.
+
 THANKS             - VLC contributors.
 
 
 bin/               - VLC binaries.
+
 bindings/          - libVLC bindings to other languages.
+
 compat/            - compatibility library for operating systems missing
                      essential functionalities.
 contrib/           - Facilities for retrieving external libraries and building
                      them for systems that don't have the right versions.
 doc/               - Miscellaneous documentation.
-extras/analyser    - Code analyser and editor specific files.
-extras/buildsystem - different buildsystems specific files.
-extras/misc        - Files that don't fit in the other extras/ categories.
-extras/package     - VLC packaging specific files such as spec files.
-extras/tools/      - Facilities for retrieving external building tools needed
-                     for systems that don't have the right versions.
-include/           - Header files.
-lib/               - libVLC source code.
-modules/           - VLC plugins and modules. Most of the code is here.
-po/                - VLC translations.
-share/             - Common Resources files.
-src/               - libvlccore source code.
-test/              - testing system.
 
+extras/analyser    - Code analyser and editor specific files.
+
+extras/buildsystem - different buildsystems specific files.
+
+extras/misc        - Files that don't fit in the other extras/ categories.
+
+extras/package     - VLC packaging specific files such as spec files.
+
+extras/tools/      - Facilities for retrieving external building tools needed for systems that don't have the right versions.
+
+include/           - Header files.
+
+lib/               - libVLC source code.
+
+modules/           - VLC plugins and modules. Most of the code is here.
+
+po/                - VLC translations.
+
+share/             - Common Resources files.
+
+src/               - libvlccore source code.
+
+test/              - testing system.
