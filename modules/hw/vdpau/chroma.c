@@ -391,7 +391,6 @@ static picture_t *VideoImport(filter_t *filter, picture_t *src)
     {
         msg_Err(filter, "video %s %s failure: %s", "surface", "import",
                 vdp_get_error_string(sys->vdp, err));
-        vdp_video_surface_destroy(sys->vdp, surface);
         goto error;
     }
 
