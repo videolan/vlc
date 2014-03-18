@@ -1006,6 +1006,13 @@ out:
     NSImage *o_image = [[NSWorkspace sharedWorkspace] iconForFile: o_path];
     NSString *o_device_path;
 
+    // BDMV path must not end with BDMV directory
+    if([o_type isEqualToString: kVLCMediaBDMVFolder]) {
+        if([[o_path lastPathComponent] isEqualToString: @"BDMV"]) {
+            o_path = [o_path stringByDeletingLastPathComponent];
+        }
+    }
+
     if ([o_type isEqualToString: kVLCMediaVideoTSFolder] ||
         [o_type isEqualToString: kVLCMediaBD] ||
         [o_type isEqualToString: kVLCMediaBDMVFolder] ||
