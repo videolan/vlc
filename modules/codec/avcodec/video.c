@@ -434,7 +434,6 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *p_context = p_sys->p_context;
     int b_drawpicture;
-    int b_null_size = false;
     block_t *p_block;
 
     if( !pp_block )
@@ -539,7 +538,6 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     {
         if( p_sys->b_hurry_up )
             p_context->skip_frame = p_sys->i_skip_frame;
-        b_null_size = true;
     }
     else if( !b_drawpicture )
     {
@@ -615,16 +613,6 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         i_used = avcodec_decode_video2( p_context, p_sys->p_ff_pic,
                                        &b_gotpicture, &pkt );
 
-        if( b_null_size && !p_sys->b_flush &&
-            p_context->width > 0 && p_context->height > 0 )
-        {
-            /* Reparse it to not drop the I frame */
-            b_null_size = false;
-            if( p_sys->b_hurry_up )
-                p_context->skip_frame = p_sys->i_skip_frame;
-            i_used = avcodec_decode_video2( p_context, p_sys->p_ff_pic,
-                                           &b_gotpicture, &pkt );
-        }
         wait_mt( p_sys );
 
         if( p_sys->b_flush )
