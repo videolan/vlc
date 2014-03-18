@@ -64,7 +64,7 @@
 #include <vlc_vout_display.h>               /* vout_thread_t and VOUT_ events */
 
 
-#if QT_VERSION >= 0x050000
+#if defined(_WIN32) && QT_VERSION >= 0x050000
 #include <QWindow>
 #include <qpa/qplatformnativeinterface.h>
 #endif
