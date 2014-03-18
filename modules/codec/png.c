@@ -422,6 +422,9 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     /* restore original buffer position */
     p_block->p_buffer = p_start;
     p_block->i_buffer = i_start;
+
+    p_block->i_dts = p_block->i_pts = p_pic->date;
+
     return p_block;
 
  error:
