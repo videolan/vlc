@@ -405,6 +405,8 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     }
     free(p_row_pointers);
 
+    p_block->i_dts = p_block->i_pts = p_pic->date;
+
     return p_block;
 
 error:
