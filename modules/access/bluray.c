@@ -339,6 +339,8 @@ static int blurayOpen(vlc_object_t *object)
         return VLC_EGENERIC;
     }
 
+    vlc_mutex_init(&p_sys->pl_info_lock);
+
     /* Warning the user about AACS/BD+ */
     const BLURAY_DISC_INFO *disc_info = bd_get_disc_info(p_sys->bluray);
 
@@ -453,8 +455,6 @@ static int blurayOpen(vlc_object_t *object)
         msg_Err(p_demux, "Failed to create TS demuxer");
         goto error;
     }
-
-    vlc_mutex_init(&p_sys->pl_info_lock);
 
     p_demux->pf_control = blurayControl;
     p_demux->pf_demux   = blurayDemux;
