@@ -49,6 +49,7 @@
 #   define PFNGLGETATTRIBLOCATIONPROC        typeof(glGetAttribLocation)*
 #   define PFNGLVERTEXATTRIBPOINTERPROC      typeof(glVertexAttribPointer)*
 #   define PFNGLENABLEVERTEXATTRIBARRAYPROC  typeof(glEnableVertexAttribArray)*
+#   define PFNGLUNIFORMMATRIX4FVPROC         typeof(glUniformMatrix4fv)*
 #   define PFNGLUNIFORM4FVPROC               typeof(glUniform4fv)*
 #   define PFNGLUNIFORM4FPROC                typeof(glUniform4f)*
 #   define PFNGLUNIFORM1IPROC                typeof(glUniform1i)*
@@ -146,9 +147,10 @@ struct vout_display_opengl_t {
     PFNGLVERTEXATTRIBPOINTERPROC     VertexAttribPointer;
     PFNGLENABLEVERTEXATTRIBARRAYPROC EnableVertexAttribArray;
 
-    PFNGLUNIFORM4FVPROC   Uniform4fv;
-    PFNGLUNIFORM4FPROC    Uniform4f;
-    PFNGLUNIFORM1IPROC    Uniform1i;
+    PFNGLUNIFORMMATRIX4FVPROC   UniformMatrix4fv;
+    PFNGLUNIFORM4FVPROC         Uniform4fv;
+    PFNGLUNIFORM4FPROC          Uniform4f;
+    PFNGLUNIFORM1IPROC          Uniform1i;
 
     /* Shader command */
     PFNGLCREATESHADERPROC CreateShader;
@@ -221,12 +223,13 @@ static void BuildVertexShader(vout_display_opengl_t *vgl,
         PRECISION
         "varying vec4 TexCoord0,TexCoord1, TexCoord2;"
         "attribute vec4 MultiTexCoord0,MultiTexCoord1,MultiTexCoord2;"
-        "attribute vec4 VertexPosition;"
+        "attribute vec2 VertexPosition;"
+        "uniform mat4 RotationMatrix;"
         "void main() {"
         " TexCoord0 = MultiTexCoord0;"
         " TexCoord1 = MultiTexCoord1;"
         " TexCoord2 = MultiTexCoord2;"
-        " gl_Position = VertexPosition;"
+        " gl_Position = RotationMatrix * vec4(VertexPosition, 0.0, 1.0);"
         "}";
 
     *shader = vgl->CreateShader(GL_VERTEX_SHADER);
@@ -432,6 +435,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->GetAttribLocation  = glGetAttribLocation;
     vgl->VertexAttribPointer= glVertexAttribPointer;
     vgl->EnableVertexAttribArray = glEnableVertexAttribArray;
+    vgl->UniformMatrix4fv = glUniformMatrix4fv;
     vgl->Uniform4fv    = glUniform4fv;
     vgl->Uniform4f     = glUniform4f;
     vgl->Uniform1i     = glUniform1i;
@@ -458,6 +462,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->GetAttribLocation  = (PFNGLGETATTRIBLOCATIONPROC)vlc_gl_GetProcAddress(vgl->gl, "glGetAttribLocation");
     vgl->VertexAttribPointer= (PFNGLVERTEXATTRIBPOINTERPROC)vlc_gl_GetProcAddress(vgl->gl, "glVertexAttribPointer");
     vgl->EnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)vlc_gl_GetProcAddress(vgl->gl, "glEnableVertexAttribArray");
+    vgl->UniformMatrix4fv   = (PFNGLUNIFORMMATRIX4FVPROC)vlc_gl_GetProcAddress(vgl->gl,"glUniformMatrix4fv");
     vgl->Uniform4fv    = (PFNGLUNIFORM4FVPROC)vlc_gl_GetProcAddress(vgl->gl,"glUniform4fv");
     vgl->Uniform4f     = (PFNGLUNIFORM4FPROC)vlc_gl_GetProcAddress(vgl->gl,"glUniform4f");
     vgl->Uniform1i     = (PFNGLUNIFORM1IPROC)vlc_gl_GetProcAddress(vgl->gl,"glUniform1i");
@@ -947,6 +952,76 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     return VLC_SUCCESS;
 }
 
+static const GLfloat identity[] = {
+    1.0f, 0.0f, 0.0f, 0.0f,
+    0.0f, 1.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 1.0f, 0.0f,
+    0.0f, 0.0f, 0.0f, 1.0f
+};
+
+static void orientationTransformMatrix(GLfloat matrix[static 16], video_orientation_t orientation) {
+
+    memcpy(matrix, identity, sizeof(identity));
+
+    const int k_cos_pi = -1;
+    const int k_cos_pi_2 = 0;
+    const int k_cos_n_pi_2 = 0;
+
+    const int k_sin_pi = 0;
+    const int k_sin_pi_2 = 1;
+    const int k_sin_n_pi_2 = -1;
+
+    bool rotate = false;
+    int cos = 0, sin = 0;
+
+    switch (orientation) {
+
+        case ORIENT_ROTATED_90:
+            cos = k_cos_pi_2;
+            sin = k_sin_pi_2;
+            rotate = true;
+            break;
+        case ORIENT_ROTATED_180:
+            cos = k_cos_pi;
+            sin = k_sin_pi;
+            rotate = true;
+            break;
+        case ORIENT_ROTATED_270:
+            cos = k_cos_n_pi_2;
+            sin = k_sin_n_pi_2;
+            rotate = true;
+            break;
+        case ORIENT_HFLIPPED:
+            matrix[0 * 4 + 0] = -1;
+            break;
+        case ORIENT_VFLIPPED:
+            matrix[1 * 4 + 1] = -1;
+            break;
+        case ORIENT_TRANSPOSED:
+            matrix[0 * 4 + 0] = 0;
+            matrix[0 * 4 + 1] = -1;
+            matrix[1 * 4 + 0] = -1;
+            matrix[1 * 4 + 1] = 0;
+            break;
+        case ORIENT_ANTI_TRANSPOSED:
+            matrix[0 * 4 + 0] = 0;
+            matrix[0 * 4 + 1] = 1;
+            matrix[1 * 4 + 0] = 1;
+            matrix[1 * 4 + 1] = 0;
+            break;
+        default:
+            break;
+    }
+
+    if (rotate) {
+
+        matrix[0 * 4 + 0] = cos;
+        matrix[0 * 4 + 1] = -sin;
+        matrix[1 * 4 + 0] = sin;
+        matrix[1 * 4 + 1] = cos;
+    }
+}
+
 #ifdef SUPPORTS_FIXED_PIPELINE
 static void DrawWithoutShaders(vout_display_opengl_t *vgl,
                                float *left, float *top, float *right, float *bottom)
@@ -964,6 +1039,13 @@ static void DrawWithoutShaders(vout_display_opengl_t *vgl,
         left[0],  top[0],
         right[0], top[0]
     };
+
+    GLfloat transformMatrix[16];
+    orientationTransformMatrix(transformMatrix, vgl->fmt.orientation);
+
+    glPushMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(transformMatrix);
 
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glEnable(vgl->tex_target);
@@ -983,6 +1065,9 @@ static void DrawWithoutShaders(vout_display_opengl_t *vgl,
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisable(vgl->tex_target);
+
+    glPopMatrix();
+
 }
 #endif
 
@@ -1014,6 +1099,9 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
          1.0, -1.0,
     };
 
+    GLfloat transformMatrix[16];
+    orientationTransformMatrix(transformMatrix, vgl->fmt.orientation);
+
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         const GLfloat textureCoord[] = {
             left[j],  top[j],
@@ -1034,6 +1122,8 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     glClientActiveTexture(GL_TEXTURE0 + 0);
     vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[program], "VertexPosition"));
     vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[program], "VertexPosition"), 2, GL_FLOAT, 0, 0, vertexCoord);
+
+    vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "RotationMatrix"), 1, GL_FALSE, transformMatrix);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
@@ -1138,6 +1228,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
             vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "MultiTexCoord0"), 2, GL_FLOAT, 0, 0, textureCoord);
             vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[1], "VertexPosition"));
             vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "VertexPosition"), 2, GL_FLOAT, 0, 0, vertexCoord);
+            // Subpictures have the correct orientation:
+            vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "RotationMatrix"), 1, GL_FALSE, identity);
 #endif
         } else {
 #ifdef SUPPORTS_FIXED_PIPELINE
