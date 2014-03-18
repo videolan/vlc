@@ -251,8 +251,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     /* Set output properties */
     p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
-    p_dec->fmt_out.video.i_width = i_width;
-    p_dec->fmt_out.video.i_height = i_height;
+    p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width = i_width;
+    p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height = i_height;
     p_dec->fmt_out.video.i_sar_num = 1;
     p_dec->fmt_out.video.i_sar_den = 1;
     p_dec->fmt_out.video.i_rmask = 0x000000ff;
