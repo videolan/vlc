@@ -260,7 +260,6 @@
 
     if ([o_window class] != [VLCMainWindow class]) {
         [o_window close];
-        [o_window orderOut:self]; // for dark interface
     }
 
     [o_window retain];
