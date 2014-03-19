@@ -489,6 +489,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
 
     /* Equalizer */
     var_Create (mp, "equalizer-preamp", VLC_VAR_FLOAT);
+    var_Create (mp, "equalizer-vlcfreqs", VLC_VAR_BOOL);
     var_Create (mp, "equalizer-bands", VLC_VAR_STRING);
 
     mp->p_md = NULL;
