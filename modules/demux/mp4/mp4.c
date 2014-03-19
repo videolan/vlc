@@ -100,8 +100,8 @@ static void MP4_TrackUnselect(demux_t *, mp4_track_t * );
 static int  MP4_TrackSeek   ( demux_t *, mp4_track_t *, mtime_t );
 
 static uint64_t MP4_TrackGetPos    ( mp4_track_t * );
-static int      MP4_TrackSampleSize( mp4_track_t * );
-static int      MP4_TrackNextSample( demux_t *, mp4_track_t * );
+static int      MP4_TrackSampleSize( mp4_track_t *, int * );
+static int      MP4_TrackNextSample( demux_t *, mp4_track_t *, int );
 static void     MP4_TrackSetELST( demux_t *, mp4_track_t *, int64_t );
 
 static void     MP4_UpdateSeekpoint( demux_t * );
@@ -708,12 +708,11 @@ static int Demux( demux_t *p_demux )
     MP4_UpdateSeekpoint( p_demux );
 
     /* first wait for the good time to read a packet */
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
-
     p_sys->i_pcr = MP4_GetMoviePTS( p_sys );
 
     /* we will read 100ms for each stream so ...*/
-    p_sys->i_time += __MAX( p_sys->i_timescale / 10 , 1 );
+    mtime_t i_targettime = p_sys->i_pcr + CLOCK_FREQ/10;
+    bool b_data_sent = false;
 
     for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
     {
@@ -722,15 +721,16 @@ static int Demux( demux_t *p_demux )
         if( !tk->b_ok || tk->b_chapter || !tk->b_selected || tk->i_sample >= tk->i_sample_count )
             continue;
 
-        while( MP4_TrackGetDTS( p_demux, tk ) < MP4_GetMoviePTS( p_sys ) )
+        while( MP4_TrackGetDTS( p_demux, tk ) < i_targettime )
         {
 #if 0
             msg_Dbg( p_demux, "tk(%i)=%lld mv=%lld", i_track,
                      MP4_TrackGetDTS( p_demux, tk ),
                      MP4_GetMoviePTS( p_sys ) );
 #endif
-
-            if( MP4_TrackSampleSize( tk ) > 0 )
+            int i_nb_samples = 0;
+            int i_samplessize = MP4_TrackSampleSize( tk, &i_nb_samples );
+            if( i_samplessize > 0 )
             {
                 block_t *p_block;
                 int64_t i_delta;
@@ -745,8 +745,7 @@ static int Demux( demux_t *p_demux )
                 }
 
                 /* now read pes */
-                if( !(p_block =
-                         stream_Block( p_demux->s, MP4_TrackSampleSize(tk) )) )
+                if( !(p_block = stream_Block( p_demux->s, i_samplessize )) )
                 {
                     msg_Warn( p_demux, "track[0x%x] will be disabled (eof?)",
                               tk->i_track_ID );
@@ -794,16 +793,33 @@ static int Demux( demux_t *p_demux )
                 else
                     p_block->i_pts = VLC_TS_INVALID;
 
+                if ( !b_data_sent )
+                {
+                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
+                    b_data_sent = true;
+                }
                 es_out_Send( p_demux->out, tk->p_es, p_block );
             }
 
             /* Next sample */
-            if( MP4_TrackNextSample( p_demux, tk ) )
+            if( MP4_TrackNextSample( p_demux, tk, i_nb_samples ) )
                 break;
         }
     }
 
-    return 1;
+    if ( b_data_sent )
+    {
+        p_sys->i_pcr = INT64_MAX;
+        for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
+        {
+            mp4_track_t *tk = &p_sys->track[i_track];
+            if ( !tk->b_ok || !tk->b_selected ) continue;
+            p_sys->i_pcr = __MIN( MP4_TrackGetDTS( p_demux, tk ), p_sys->i_pcr );
+            p_sys->i_time = p_sys->i_pcr * p_sys->i_timescale / CLOCK_FREQ;
+        }
+    }
+
+    return b_data_sent;
 }
 
 static void MP4_UpdateSeekpoint( demux_t *p_demux )
@@ -837,7 +853,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date )
 
     /* First update global time */
     p_sys->i_time = i_date * p_sys->i_timescale / 1000000;
-    p_sys->i_pcr  = i_date;
+    p_sys->i_pcr  = VLC_TS_INVALID;
 
     /* Now for each stream try to go to this time */
     for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
@@ -1215,7 +1231,8 @@ static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
     {
         const int64_t i_dts = MP4_TrackGetDTS( p_demux, tk );
         const int64_t i_pts_delta = MP4_TrackGetPTSDelta( p_demux, tk );
-        const unsigned int i_size = MP4_TrackSampleSize( tk );
+        int i_nb_samples = 0;
+        const unsigned int i_size = MP4_TrackSampleSize( tk, &i_nb_samples );
 
         if( i_size > 0 && !stream_Seek( p_demux->s, MP4_TrackGetPos( tk ) ) )
         {
@@ -2827,7 +2844,7 @@ static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
  *
  */
 #define QT_V0_MAX_SAMPLES 1024
-static int MP4_TrackSampleSize( mp4_track_t *p_track )
+static int MP4_TrackSampleSize( mp4_track_t *p_track, int *pi_nb_samples )
 {
     int i_size;
     MP4_Box_data_sample_soun_t *p_soun;
@@ -2860,13 +2877,21 @@ static int MP4_TrackSampleSize( mp4_track_t *p_track )
     }
     else
     {
-        /* Read a bunch of samples at once */
-        int i_samples = p_track->chunk[p_track->i_chunk].i_sample_count -
-            ( p_track->i_sample -
-              p_track->chunk[p_track->i_chunk].i_sample_first );
+        mp4_chunk_t *p_chunk = &p_track->chunk[p_track->i_chunk];
+        int64_t i_length = CLOCK_FREQ / 10;
+        int i_samples = 1;
+        int64_t i_maxsamples = 1;
+        for( uint32_t i=p_track->i_sample; i<p_chunk->i_sample_count; i++ )
+        {
+            i_length -= CLOCK_FREQ * p_chunk->p_sample_delta_dts[i] / p_track->i_timescale;
+            if ( i_length < 0 ) break;
+            i_maxsamples++;
+        }
 
         i_samples = __MIN( QT_V0_MAX_SAMPLES, i_samples );
+        i_samples = __MIN( i_maxsamples, i_samples );
         i_size = i_samples * p_track->i_sample_size;
+        *pi_nb_samples = i_samples;
     }
 
     //fprintf( stderr, "size=%d\n", i_size );
@@ -2911,7 +2936,7 @@ static uint64_t MP4_TrackGetPos( mp4_track_t *p_track )
     return i_pos;
 }
 
-static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track )
+static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track, int i_samples )
 {
     if( p_track->fmt.i_cat == AUDIO_ES && p_track->i_sample_size != 0 )
     {
@@ -2936,7 +2961,7 @@ static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track )
         else
         {
             /* FIXME */
-            p_track->i_sample += QT_V0_MAX_SAMPLES;
+            p_track->i_sample += i_samples;
             if( p_track->i_sample >
                 p_track->chunk[p_track->i_chunk].i_sample_first +
                 p_track->chunk[p_track->i_chunk].i_sample_count )
