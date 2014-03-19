@@ -156,37 +156,8 @@
 
     NSSize videoViewSize = NSMakeSize(videoViewPosition.size.width, videoViewPosition.size.height);
 
-    // TODO: find a cleaner way for "start in fullscreen"
-    // Start in fs, because either prefs settings, or fullscreen button was pressed before
-
-    char *psz_splitter = var_GetString(pl_Get(VLCIntf), "video-splitter");
-    BOOL b_have_splitter = psz_splitter != NULL && *psz_splitter != '\0';
-    free(psz_splitter);
-
-    if (!b_have_splitter && (var_InheritBool(VLCIntf, "fullscreen") || var_GetBool(pl_Get(VLCIntf), "fullscreen"))) {
-
-        // this is not set when we start in fullscreen because of
-        // fullscreen settings in video prefs the second time
-        var_SetBool(p_wnd->p_parent, "fullscreen", 1);
-
-        int i_full = 1;
-
-        SEL sel = @selector(setFullscreen:forWindow:);
-        NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[self methodSignatureForSelector:sel]];
-        [inv setTarget:self];
-        [inv setSelector:sel];
-        [inv setArgument:&i_full atIndex:2];
-        [inv setArgument:&p_wnd atIndex:3];
-
-        NSTimeInterval resizeTime = 0.;
-        if(!b_nonembedded && !b_video_wallpaper) {
-            NSRect window_rect = [o_new_video_window getWindowRectForProposedVideoViewSize:videoViewSize];
-            resizeTime = [o_new_video_window animationResizeTime:window_rect];
-            resizeTime += 0.1;
-        }
-        
-        [NSTimer scheduledTimerWithTimeInterval:resizeTime invocation:inv repeats:NO];
-    }
+    // Avoid flashes if video will directly start in fullscreen
+    NSDisableScreenUpdates();
 
     if (!b_video_wallpaper) {
         // set (only!) window origin if specified
@@ -221,8 +192,6 @@
 
     [o_new_video_window setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
 
-
-
     [o_vout_view setVoutThread:(vout_thread_t *)p_wnd->p_parent];
     [o_new_video_window setHasActiveVideo: YES];
     [o_vout_dict setObject:[o_new_video_window autorelease] forKey:[NSValue valueWithPointer:p_wnd]];
@@ -237,6 +206,23 @@
         // event occurs before window is created, so call again
         [[VLCMain sharedInstance] playlistUpdated];
     }
+
+    // TODO: find a cleaner way for "start in fullscreen"
+    // Start in fs, because either prefs settings, or fullscreen button was pressed before
+    char *psz_splitter = var_GetString(pl_Get(VLCIntf), "video-splitter");
+    BOOL b_have_splitter = psz_splitter != NULL && *psz_splitter != '\0';
+    free(psz_splitter);
+
+    if (!b_have_splitter && (var_InheritBool(VLCIntf, "fullscreen") || var_GetBool(pl_Get(VLCIntf), "fullscreen"))) {
+
+        // this is not set when we start in fullscreen because of
+        // fullscreen settings in video prefs the second time
+        var_SetBool(p_wnd->p_parent, "fullscreen", 1);
+
+        [self setFullscreen:1 forWindow:p_wnd withAnimation:NO];
+    }
+
+    NSEnableScreenUpdates();
 
     return [o_vout_view autorelease];
 }
@@ -325,7 +311,7 @@
     [o_window setWindowLevel:i_level];
 }
 
-- (void)setFullscreen:(int)i_full forWindow:(vout_window_t *)p_wnd
+- (void)setFullscreen:(int)i_full forWindow:(vout_window_t *)p_wnd withAnimation:(BOOL)b_animation
 {
     intf_thread_t *p_intf = VLCIntf;
     BOOL b_nativeFullscreenMode = [[VLCMain sharedInstance] nativeFullscreenMode];
@@ -367,7 +353,7 @@
             if (p_input != NULL && [[VLCMain sharedInstance] activeVideoPlayback]) {
                 // activate app, as method can also be triggered from outside the app (prevents nasty window layout)
                 [NSApp activateIgnoringOtherApps:YES];
-                [o_current_window enterFullscreen];
+                [o_current_window enterFullscreenWithAnimation:b_animation];
 
             }
             if (p_input)

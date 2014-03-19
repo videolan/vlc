@@ -832,7 +832,7 @@
 #pragma mark -
 #pragma mark Fullscreen Logic
 
-- (void)enterFullscreen
+- (void)enterFullscreenWithAnimation:(BOOL)b_animation
 {
     NSMutableDictionary *dict1, *dict2;
     NSScreen *screen;
@@ -882,7 +882,11 @@
         [o_fullscreen_window setHasActiveVideo: YES];
         [o_fullscreen_window setFullscreen: YES];
 
-        if (![self isVisible] || [self alphaValue] == 0.0) {
+        /* Make sure video view gets visible in case the playlist was visible before */
+        b_video_view_was_hidden = [o_video_view isHidden];
+        [o_video_view setHidden: NO];
+
+        if (!b_animation) {
             /* We don't animate if we are not visible, instead we
              * simply fade the display */
             CGDisplayFadeReservationToken token;
@@ -892,18 +896,20 @@
                 CGDisplayFade(token, 0.5, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES);
             }
 
-            [screen setFullscreenPresentationOptions];
-
+            NSDisableScreenUpdates();
             [o_video_view retain];
             [[o_video_view superview] replaceSubview:o_video_view with:o_temp_view];
             [o_temp_view setFrame:[o_video_view frame]];
             [o_fullscreen_window setContentView:o_video_view];
             [o_video_view release];
+            NSEnableScreenUpdates();
 
-            [o_fullscreen_window makeKeyAndOrderFront:self];
+            [screen setFullscreenPresentationOptions];
+
+            [o_fullscreen_window setFrame:screen_rect display:YES animate:NO];
+
             [o_fullscreen_window orderFront:self animate:YES];
 
-            [o_fullscreen_window setFrame:screen_rect display:YES animate:YES];
             [o_fullscreen_window setLevel:NSNormalWindowLevel];
 
             if (blackout_other_displays) {
@@ -916,10 +922,6 @@
 
             return;
         }
-
-        /* Make sure video view gets visible in case the playlist was visible before */
-        b_video_view_was_hidden = [o_video_view isHidden];
-        [o_video_view setHidden: NO];
 
         /* Make sure we don't see the o_video_view disappearing of the screen during this operation */
         NSDisableScreenUpdates();

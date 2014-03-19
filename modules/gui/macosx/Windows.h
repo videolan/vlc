@@ -126,7 +126,7 @@ static const float f_min_video_height = 70.0;
 - (void)setTitle:(NSString *)title;
 
 /* fullscreen handling */
-- (void)enterFullscreen;
+- (void)enterFullscreenWithAnimation:(BOOL)b_animation;
 - (void)leaveFullscreenWithAnimation:(BOOL)b_animation;
 
 /* lion fullscreen handling */

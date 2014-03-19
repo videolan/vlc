@@ -217,13 +217,15 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
         case VOUT_WINDOW_SET_FULLSCREEN:
         {
             int i_full = va_arg(args, int);
+            BOOL b_animation = YES;
 
-            SEL sel = @selector(setFullscreen:forWindow:);
+            SEL sel = @selector(setFullscreen:forWindow:withAnimation:);
             NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[o_vout_controller methodSignatureForSelector:sel]];
             [inv setTarget:o_vout_controller];
             [inv setSelector:sel];
             [inv setArgument:&i_full atIndex:2]; // starting at 2!
             [inv setArgument:&p_wnd atIndex:3];
+            [inv setArgument:&b_animation atIndex:4];
             [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
                                waitUntilDone:NO];
 
