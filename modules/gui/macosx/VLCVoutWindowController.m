@@ -249,8 +249,11 @@
         return;
     }
 
-    if ([o_window fullscreen] && ![[VLCMainWindow sharedInstance] nativeFullscreenMode])
-        [o_window leaveFullscreen];
+    // prevent visible extra window if in fullscreen
+    NSDisableScreenUpdates();
+    if (![[VLCMainWindow sharedInstance] nativeFullscreenMode] &&
+            ([o_window fullscreen] || [o_window inFullscreenTransition]))
+        [o_window leaveFullscreenWithAnimation: NO];
 
     [[o_window videoView] releaseVoutThread];
 
@@ -261,6 +264,7 @@
     if ([o_window class] != [VLCMainWindow class]) {
         [o_window close];
     }
+    NSEnableScreenUpdates();
 
     [o_window retain];
     [o_vout_dict removeObjectForKey:o_key];
@@ -370,7 +374,7 @@
                 vlc_object_release(p_input);
         } else {
             // leaving fullscreen is always allowed
-            [o_current_window leaveFullscreen];
+            [o_current_window leaveFullscreenWithAnimation:YES];
         }
     }
 }

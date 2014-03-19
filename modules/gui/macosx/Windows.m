@@ -275,7 +275,6 @@
 @interface VLCVideoWindowCommon (Internal)
 - (void)customZoom:(id)sender;
 - (void)hasBecomeFullscreen;
-- (void)leaveFullscreenAndFadeOut:(BOOL)fadeout;
 - (void)hasEndedFullscreen;
 @end
 
@@ -1007,12 +1006,7 @@
     [self setFullscreen:YES];
 }
 
-- (void)leaveFullscreen
-{
-    [self leaveFullscreenAndFadeOut: NO];
-}
-
-- (void)leaveFullscreenAndFadeOut: (BOOL)fadeout
+- (void)leaveFullscreenWithAnimation:(BOOL)b_animation
 {
     NSMutableDictionary *dict1, *dict2;
     NSRect frame;
@@ -1032,7 +1026,21 @@
         return;
     }
 
-    if (fadeout) {
+    [[[VLCMainWindow sharedInstance] fsPanel] setNonActive: nil];
+    [[o_fullscreen_window screen] setNonFullscreenPresentationOptions];
+
+    if (o_fullscreen_anim1) {
+        [o_fullscreen_anim1 stopAnimation];
+        [o_fullscreen_anim1 release];
+        o_fullscreen_anim1 = nil;
+    }
+    if (o_fullscreen_anim2) {
+        [o_fullscreen_anim2 stopAnimation];
+        [o_fullscreen_anim2 release];
+        o_fullscreen_anim2 = nil;
+    }
+
+    if (!b_animation) {
         /* We don't animate if we are not visible, instead we
          * simply fade the display */
         CGDisplayFadeReservationToken token;
@@ -1042,15 +1050,11 @@
             CGDisplayFade(token, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES);
         }
 
-        [[[VLCMainWindow sharedInstance] fsPanel] setNonActive: nil];
-        [[o_fullscreen_window screen] setNonFullscreenPresentationOptions];
+        [self setAlphaValue:1.0];
+        [self orderFront: self];
 
         /* Will release the lock */
         [self hasEndedFullscreen];
-
-        /* Our window is hidden, and might be faded. We need to workaround that, so note it
-         * here */
-        b_window_is_invisible = YES;
 
         if (blackout_other_displays) {
             CGDisplayFade(token, 0.5, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, NO);
@@ -1065,18 +1069,6 @@
     [self setAlphaValue: 0.0];
     [self orderFront: self];
     [[o_video_view window] orderFront: self];
-
-    [[[VLCMainWindow sharedInstance] fsPanel] setNonActive: nil];
-    [[o_fullscreen_window screen] setNonFullscreenPresentationOptions];
-
-    if (o_fullscreen_anim1) {
-        [o_fullscreen_anim1 stopAnimation];
-        [o_fullscreen_anim1 release];
-    }
-    if (o_fullscreen_anim2) {
-        [o_fullscreen_anim2 stopAnimation];
-        [o_fullscreen_anim2 release];
-    }
 
     frame = [[o_temp_view superview] convertRect: [o_temp_view frame] toView: nil]; /* Convert to Window base coord */
     frame.origin.x += [self frame].origin.x;
@@ -1134,7 +1126,7 @@
 
     [o_video_view setHidden: b_video_view_was_hidden];
 
-    [super makeKeyAndOrderFront:self]; /* our version (in main window) contains a workaround */
+    [self makeKeyAndOrderFront:self];
 
     [o_fullscreen_window orderOut: self];
     NSEnableScreenUpdates();
@@ -1146,19 +1138,11 @@
     [self setLevel:i_originalLevel];
 
     [self setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
-
-    // if we quit fullscreen because there is no video anymore, make sure non-embedded window is not visible
-    if (![[VLCMain sharedInstance] activeVideoPlayback] && [self class] != [VLCMainWindow class])
-        [self orderOut: self];
 }
 
 - (void)animationDidEnd:(NSAnimation*)animation
 {
     NSArray *viewAnimations;
-    if (o_makekey_anim == animation) {
-        [o_makekey_anim release];
-        return;
-    }
     if ([animation currentValue] < 1.0)
         return;
 
@@ -1172,55 +1156,6 @@
     /* Fullscreen started */
         [self hasBecomeFullscreen];
 }
-
-- (void)orderOut:(id)sender
-{
-    [super orderOut:sender];
-
-    /*
-     * TODO reimplement leaveFullscreenAndFadeOut:YES, or remove code
-     * and the hack below
-    
-    if (![NSStringFromClass([self class]) isEqualToString:@"VLCMainWindow"]) {
-        [self leaveFullscreenAndFadeOut:YES];
-    }
-     */
-}
-
-- (void)makeKeyAndOrderFront: (id)sender
-{
-    /* Hack
-     * when we exit fullscreen and fade out, we may endup in
-     * having a window that is faded. We can't have it fade in unless we
-     * animate again. */
-
-    if (!b_window_is_invisible) {
-        /* Make sure we don't do it too much */
-        [super makeKeyAndOrderFront: sender];
-        return;
-    }
-
-    [super setAlphaValue:0.0f];
-    [super makeKeyAndOrderFront: sender];
-
-    NSMutableDictionary * dict = [[NSMutableDictionary alloc] initWithCapacity:2];
-    [dict setObject:self forKey:NSViewAnimationTargetKey];
-    [dict setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
-
-    o_makekey_anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict]];
-    [dict release];
-
-    [o_makekey_anim setAnimationBlockingMode: NSAnimationNonblocking];
-    [o_makekey_anim setDuration: 0.1];
-    [o_makekey_anim setFrameRate: 30];
-    [o_makekey_anim setDelegate: self];
-
-    [o_makekey_anim startAnimation];
-    b_window_is_invisible = NO;
-
-    /* fullscreenAnimation will be unlocked when animation ends */
-}
-
 
 #pragma mark -
 #pragma mark Accessibility stuff
