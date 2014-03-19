@@ -733,15 +733,19 @@ static int Demux( demux_t *p_demux )
             if( i_samplessize > 0 )
             {
                 block_t *p_block;
-                int64_t i_delta;
+                int64_t i_delta, i_newpos;
 
                 /* go,go go ! */
-                if( stream_Seek( p_demux->s, MP4_TrackGetPos( tk ) ) )
+                i_newpos = MP4_TrackGetPos( tk );
+                if( stream_Tell( p_demux->s ) != i_newpos )
                 {
-                    msg_Warn( p_demux, "track[0x%x] will be disabled (eof?)",
-                              tk->i_track_ID );
-                    MP4_TrackUnselect( p_demux, tk );
-                    break;
+                    if( stream_Seek( p_demux->s, i_newpos ) )
+                    {
+                        msg_Warn( p_demux, "track[0x%x] will be disabled (eof?)",
+                                  tk->i_track_ID );
+                        MP4_TrackUnselect( p_demux, tk );
+                        break;
+                    }
                 }
 
                 /* now read pes */
