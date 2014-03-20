@@ -60,9 +60,6 @@
   "Enforce the bargraph position on the video " \
   "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
   "also use combinations of these values, eg 6 = top-right).")
-#define ALARM_TEXT N_("Alarm")
-#define ALARM_LONGTEXT N_("Signals a silence and displays and alert " \
-                "(0=no alarm, 1=alarm).")
 #define BARWIDTH_TEXT N_("Bar width in pixel (default : 10)")
 #define BARWIDTH_LONGTEXT N_("Width in pixel of each bar in the BarGraph to be displayed " \
                 "(default : 10).")
@@ -96,7 +93,7 @@ vlc_module_begin ()
         TRANS_TEXT, TRANS_LONGTEXT, false )
     add_integer( CFG_PREFIX "position", -1, POS_TEXT, POS_LONGTEXT, false )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions )
-    add_integer( CFG_PREFIX "alarm", 0, ALARM_TEXT, ALARM_LONGTEXT, true )
+    add_obsolete_integer( CFG_PREFIX "alarm" )
     add_integer( CFG_PREFIX "barWidth", 10, BARWIDTH_TEXT, BARWIDTH_LONGTEXT, true )
 
     /* video output filter submodule */
@@ -123,7 +120,7 @@ typedef struct
     picture_t *p_pic;
     mtime_t date;
     int scale;
-    int alarm;
+    bool alarm;
     int barWidth;
 
 } BarGraph_t;
@@ -149,7 +146,7 @@ struct filter_sys_t
 };
 
 static const char *const ppsz_filter_options[] = {
-    "i_values", "x", "y", "transparency", "position", "alarm", "barWidth", NULL
+    "i_values", "x", "y", "transparency", "position", "barWidth", NULL
 };
 
 static const char *const ppsz_filter_callbacks[] = {
@@ -158,7 +155,6 @@ static const char *const ppsz_filter_callbacks[] = {
     "audiobargraph_v-y",
     "audiobargraph_v-transparency",
     "audiobargraph_v-position",
-    "audiobargraph_v-alarm",
     "audiobargraph_v-barWidth",
     NULL
 };
@@ -246,7 +242,8 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
     //p_BarGraph->nbChannels = 0;
     //p_BarGraph->i_values = NULL;
     parse_i_values(p_BarGraph, i_values);
-    p_BarGraph->alarm = var_CreateGetIntegerCommand( p_filter, "audiobargraph_v-alarm" );
+    p_BarGraph->alarm = false;
+
     p_BarGraph->barWidth = var_CreateGetIntegerCommand( p_filter, "audiobargraph_v-barWidth" );
     p_BarGraph->scale = 400;
 
@@ -255,8 +252,12 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
         p_sys->i_pos = 0;
 
     vlc_mutex_init( &p_sys->lock );
-    LoadBarGraph( p_this, p_BarGraph );
-    p_sys->b_spu_update = true;
+
+    var_Create(p_filter->p_libvlc, "audiobargraph_v-alarm", VLC_VAR_BOOL);
+    var_AddCallback(p_filter->p_libvlc, "audiobargraph_v-alarm",
+                    BarGraphCallback, p_sys);
+
+    var_TriggerCallback(p_filter->p_libvlc, "audiobargraph_v-alarm");
 
     for( int i = 0; ppsz_filter_callbacks[i]; i++ )
         var_AddCallback( p_filter, ppsz_filter_callbacks[i],
@@ -288,6 +289,10 @@ static void Close( vlc_object_t *p_this )
     for( int i = 0; ppsz_filter_callbacks[i]; i++ )
         var_DelCallback( p_filter, ppsz_filter_callbacks[i],
                          BarGraphCallback, p_sys );
+
+    var_DelCallback(p_filter->p_libvlc, "audiobargraph_v-alarm",
+                    BarGraphCallback, p_sys);
+    var_Destroy(p_filter->p_libvlc, "audiobargraph_v-alarm");
 
     if( p_sys->p_blend )
         filter_DeleteBlend( p_sys->p_blend );
@@ -509,7 +514,7 @@ static int BarGraphCallback( vlc_object_t *p_this, char const *psz_var,
             picture_Release( p_BarGraph->p_pic );
             p_BarGraph->p_pic = NULL;
         }
-        p_BarGraph->alarm = newval.i_int;
+        p_BarGraph->alarm = newval.b_bool;
         LoadBarGraph(p_this,p_BarGraph);
     }
     else if ( !strcmp( psz_var, "audiobargraph_v-barWidth" ) )

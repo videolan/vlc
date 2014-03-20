@@ -158,6 +158,8 @@ static int Open( vlc_object_t *p_this )
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
     p_filter->pf_audio_filter = DoWork;
 
+    var_Create( p_filter->p_libvlc, "audiobargraph_v-alarm", VLC_VAR_BOOL );
+
     return VLC_SUCCESS;
 }
 
@@ -235,17 +237,8 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
             sum = sqrtf(sum);
 
             /* 5 - compare it to the threshold */
-            if (sum < p_sys->alarm_threshold) {
-                i=1;
-            } else {
-                i=0;
-            }
-            snprintf(message,255,"@audiobargraph_v audiobargraph_v-alarm %d\n",i);
-
-            msg_Dbg( p_filter, "message alarm : %s", message );
-            //TCPconnection = net_ConnectTCP(p_filter,p_sys->address,p_sys->port);
-            net_Write(p_filter, p_sys->TCPconnection, NULL, message, strlen(message));
-            //net_Close(TCPconnection);
+            var_SetBool(p_filter->p_libvlc, "audiobargraph_v-alarm",
+                        sum < p_sys->alarm_threshold);
 
             p_sys->lastAlarm = p_in_buf->i_pts;
         }
@@ -299,6 +292,8 @@ static void Close( vlc_object_t *p_this )
     filter_t * p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
     ValueDate_t* current;
+
+    var_Destroy( p_filter->p_libvlc, "audiobargraph_v-alarm" );
 
     p_sys->last = NULL;
     while (p_sys->first != NULL) {
