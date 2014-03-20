@@ -202,6 +202,7 @@
 #define VLC_CODEC_YUV422A         VLC_FOURCC('I','4','2','A')
 /* Planar YUV 4:2:0 Y:U:V:A */
 #define VLC_CODEC_YUV420A         VLC_FOURCC('I','4','0','A')
+
 /* Palettized RGB with palette element R:G:B */
 #define VLC_CODEC_RGBP            VLC_FOURCC('R','G','B','P')
 /* 8 bits RGB */
@@ -224,6 +225,16 @@
 #define VLC_CODEC_RGBA            VLC_FOURCC('R','G','B','A')
 /* 32 bits ARGB */
 #define VLC_CODEC_ARGB            VLC_FOURCC('A','R','G','B')
+
+/* Planar GBR 4:4:4 8 bits */
+#define VLC_CODEC_GBR_PLANAR      VLC_FOURCC('G','B','R','8')
+#define VLC_CODEC_GBR_PLANAR_9B   VLC_FOURCC('G','B','9','B')
+#define VLC_CODEC_GBR_PLANAR_9L   VLC_FOURCC('G','B','9','L')
+#define VLC_CODEC_GBR_PLANAR_10B  VLC_FOURCC('G','B','A','B')
+#define VLC_CODEC_GBR_PLANAR_10L  VLC_FOURCC('G','B','A','L')
+#define VLC_CODEC_GBR_PLANAR_16L  VLC_FOURCC('G','B','F','L')
+#define VLC_CODEC_GBR_PLANAR_16B  VLC_FOURCC('G','B','F','B')
+
 /* 8 bits grey */
 #define VLC_CODEC_GREY            VLC_FOURCC('G','R','E','Y')
 /* Packed YUV 4:2:2, U:Y:V:Y */

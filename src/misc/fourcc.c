@@ -2033,6 +2033,8 @@ static const struct
     { { VLC_CODEC_YUV420A, 0 },                PLANAR_8(4, 2, 2) },
     { { VLC_CODEC_YUV422A, 0 },                PLANAR_8(4, 2, 1) },
 
+    { { VLC_CODEC_GBR_PLANAR, 0 },             PLANAR_8(3, 1, 1) },
+
     { { VLC_CODEC_I420_10L,
         VLC_CODEC_I420_10B, 0 },               PLANAR_16(3, 2, 2, 10) },
     { { VLC_CODEC_I420_9L,
