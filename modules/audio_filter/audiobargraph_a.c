@@ -34,17 +34,8 @@
 #include <vlc_aout.h>
 #include <vlc_filter.h>
 
-#include <vlc_network.h>
 #include <math.h>
 
-#define ADDRESS_TEXT N_("TCP address to use")
-#define ADDRESS_LONGTEXT N_("TCP address to use to communicate with the video "\
-                "part of the Bar Graph (default localhost). " \
-                "In the case of bargraph incrustation, use localhost." )
-#define PORT_TEXT N_("TCP port to use")
-#define PORT_LONGTEXT N_("TCP port to use to communicate with the video "\
-                "part of the Bar Graph (default 12345). " \
-                "Use the same port as the one used in the rc interface." )
 #define BARGRAPH_TEXT N_("Defines if BarGraph information should be sent")
 #define BARGRAPH_LONGTEXT N_("Defines if BarGraph information should be sent. "\
                 "1 if the information should be sent, 0 otherwise (default 1)." )
@@ -65,9 +56,6 @@
 #define REPETITION_TIME_TEXT N_("Time between two alarm messages in ms" )
 #define REPETITION_TIME_LONGTEXT N_("Time between two alarm messages in ms. "\
                 "This value is used to avoid alarm saturation (default 2000)." )
-#define CONNECTION_RESET_TEXT N_("Force connection reset regularly" )
-#define CONNECTION_RESET_LONGTEXT N_("Defines if the TCP connection should be reset. "\
-                "This is to be used when using with audiobargraph_v (default 1)." )
 
 #define CFG_PREFIX "audiobargraph_a-"
 
@@ -85,15 +73,15 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
 
-    add_string( CFG_PREFIX "address", "localhost", ADDRESS_TEXT, ADDRESS_LONGTEXT, false )
-    add_integer( CFG_PREFIX "port", 12345, PORT_TEXT, PORT_LONGTEXT, false )
+    add_obsolete_string( CFG_PREFIX "address" )
+    add_obsolete_integer( CFG_PREFIX "port" )
     add_integer( CFG_PREFIX "bargraph", 1, BARGRAPH_TEXT, BARGRAPH_LONGTEXT, false )
     add_integer( CFG_PREFIX "bargraph_repetition", 4, BARGRAPH_REPETITION_TEXT, BARGRAPH_REPETITION_LONGTEXT, false )
     add_integer( CFG_PREFIX "silence", 1, SILENCE_TEXT, SILENCE_LONGTEXT, false )
     add_integer( CFG_PREFIX "time_window", 5000, TIME_WINDOW_TEXT, TIME_WINDOW_LONGTEXT, false )
     add_float( CFG_PREFIX "alarm_threshold", 0.1, ALARM_THRESHOLD_TEXT, ALARM_THRESHOLD_LONGTEXT, false )
     add_integer( CFG_PREFIX "repetition_time", 2000, REPETITION_TIME_TEXT, REPETITION_TIME_LONGTEXT, false )
-    add_integer( CFG_PREFIX "connection_reset", 1, CONNECTION_RESET_TEXT, CONNECTION_RESET_LONGTEXT, false )
+    add_obsolete_integer( CFG_PREFIX "connection_reset" )
 
     set_callbacks( Open, Close )
 vlc_module_end ()
@@ -106,16 +94,12 @@ typedef struct ValueDate_t {
 
 struct filter_sys_t
 {
-    char*           address;
-    int             port;
     int             bargraph;
     int             bargraph_repetition;
     int             silence;
     int             time_window;
     float           alarm_threshold;
     int             repetition_time;
-    int             connection_reset;
-    int             TCPconnection;
     int             counter;
     int             nbChannels;
     ValueDate_t*    first;
@@ -137,16 +121,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->bargraph = var_CreateGetIntegerCommand( p_filter, "audiobargraph_a-bargraph" );
     p_sys->bargraph_repetition = var_CreateGetIntegerCommand( p_filter, "audiobargraph_a-bargraph_repetition" );
     p_sys->silence = var_CreateGetIntegerCommand( p_filter, "audiobargraph_a-silence" );
-    p_sys->address = var_CreateGetStringCommand( p_filter, "audiobargraph_a-address" );
-    p_sys->port = var_CreateGetIntegerCommand( p_filter, "audiobargraph_a-port" );
     p_sys->time_window = var_CreateGetIntegerCommand( p_filter, "audiobargraph_a-time_window" );
     p_sys->alarm_threshold = var_CreateGetFloatCommand( p_filter, "audiobargraph_a-alarm_threshold" );
     p_sys->repetition_time = var_CreateGetIntegerCommand( p_filter, "audiobargraph_a-repetition_time" );
-    p_sys->connection_reset = var_CreateGetIntegerCommand( p_filter, "audiobargraph_a-connection_reset" );
-    if ((p_sys->TCPconnection = net_ConnectTCP(p_this,p_sys->address,p_sys->port)) == -1) {
-        free(p_sys);
-        return VLC_EGENERIC;
-    }
     p_sys->counter = 0;
     p_sys->nbChannels = 0;
     p_sys->first = NULL;
@@ -272,13 +249,8 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         }
     }
 
-    if (p_sys->counter > p_sys->bargraph_repetition*100) {
-        if (p_sys->connection_reset) {
-            net_Close(p_sys->TCPconnection);
-            p_sys->TCPconnection = net_ConnectTCP(p_filter,p_sys->address,p_sys->port);
-        }
+    if (p_sys->counter > p_sys->bargraph_repetition*100)
         p_sys->counter = 0;
-    }
 
     p_sys->counter++;
 
@@ -303,8 +275,6 @@ static void Close( vlc_object_t *p_this )
         p_sys->first = p_sys->first->next;
         free(current);
     }
-    net_Close(p_sys->TCPconnection);
-    free(p_sys->address);
     //free(p_sys->value);
     free( p_filter->p_sys );
 }
