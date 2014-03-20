@@ -196,7 +196,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
                 max = ch;
         }
     }
-    max = pow( max, 2 );
+    max = powf( max, 2 );
 
     if (p_sys->silence) {
         /* 2 - store the new value */
@@ -231,8 +231,8 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
                 count ++;
                 current = current->next;
             }
-            sum = sum / count;
-            sum = sqrt(sum);
+            sum /= count;
+            sum = sqrtf(sum);
 
             /* 5 - compare it to the threshold */
             if (sum < p_sys->alarm_threshold) {
