@@ -95,8 +95,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( dsc == NULL || dsc->plane_count == 0 )
         return VLC_EGENERIC;
 
-    if( p_dec->fmt_in.video.i_visible_width <= 0
-     || p_dec->fmt_in.video.i_visible_height <= 0 )
+    if( p_dec->fmt_in.video.i_visible_width < 0
+     || p_dec->fmt_in.video.i_visible_height < 0 )
     {
         msg_Err( p_dec, "invalid display size %dx%d",
                  p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height );
