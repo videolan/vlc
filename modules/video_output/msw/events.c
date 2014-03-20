@@ -30,7 +30,7 @@
 # include "config.h"
 #endif
 
-#include "../../control/win32touch.h"
+#include "win32touch.h"
 
 #include <vlc_common.h>
 #include <vlc_vout_display.h>
