@@ -169,7 +169,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     filter_sys_t *p_sys = p_filter->p_sys;
     int i, j;
     float *p_sample = (float *)p_in_buf->p_buffer;
-    float *i_value = NULL;
+    float i_value[AOUT_CHAN_MAX];
     float ch;
     float max = 0.0;
     //char *message = (char*)malloc(255*sizeof(char));
@@ -183,10 +183,8 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     nbChannels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
     p_sys->nbChannels = nbChannels;
 
-    i_value = (float*)malloc(nbChannels * sizeof(float));
-
     for (i=0; i<nbChannels; i++) {
-        i_value[i] = 0;
+        i_value[i] = 0.;
     }
 
     /* 1 - Compute the peack values */
@@ -280,8 +278,6 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 
         }
     }
-
-    free(i_value);
 
     if (p_sys->counter > p_sys->bargraph_repetition*100) {
         if (p_sys->connection_reset) {
