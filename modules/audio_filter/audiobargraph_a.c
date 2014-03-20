@@ -159,6 +159,7 @@ static int Open( vlc_object_t *p_this )
     p_filter->pf_audio_filter = DoWork;
 
     var_Create( p_filter->p_libvlc, "audiobargraph_v-alarm", VLC_VAR_BOOL );
+    var_Create( p_filter->p_libvlc, "audiobargraph_v-i_values", VLC_VAR_STRING );
 
     return VLC_SUCCESS;
 }
@@ -169,12 +170,11 @@ static int Open( vlc_object_t *p_this )
 static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    int i, j;
+    int i;
     float *p_sample = (float *)p_in_buf->p_buffer;
     float i_value[AOUT_CHAN_MAX];
     float ch;
     float max = 0.0;
-    char message[255];
     int nbChannels = 0;
     ValueDate_t* current = NULL;
     float sum;
@@ -190,7 +190,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     /* 1 - Compute the peack values */
     for ( i = 0 ; i < (int)(p_in_buf->i_nb_samples); i++ )
     {
-        for (j=0; j<nbChannels; j++) {
+        for (int j = 0; j<nbChannels; j++) {
             ch = (*p_sample++);
             if (ch > i_value[j])
                 i_value[j] = ch;
@@ -255,18 +255,20 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     if (p_sys->bargraph) {
         /* 6 - sent the message with the values for the BarGraph */
         if ((nbChannels > 0) && (p_sys->counter%(p_sys->bargraph_repetition) == 0)) {
-            j=snprintf(message,255,"@audiobargraph_v audiobargraph_v-i_values ");
-            for (i=0; i<(nbChannels-1); i++) {
-                j+=snprintf(message+j,255,"%f:", i_value[i]);
+            char message[256];
+            size_t j = 0;
+
+            for (i = 0; i < nbChannels; i++) {
+                if (j >= sizeof (message))
+                    break;
+                j += snprintf(message + j, sizeof (message),"%f:", i_value[i]);
             }
-            snprintf(message+j,255,"%f\n", i_value[nbChannels-1]);
-            msg_Dbg( p_filter, "message values : %s", message );
 
-            //test = send(p_sys->TCPconnection,message,strlen(message),0);
-            //net_Write(p_filter, p_sys->TCPconnection, NULL, message, strlen(message));
+            message[--j] = '\0';
+            msg_Dbg( p_filter, "values: %s", message );
 
-            net_Write(p_filter, p_sys->TCPconnection, NULL, message, strlen(message));
-
+            var_SetString(p_filter->p_libvlc, "audiobargraph_v-i_values",
+                          message);
         }
     }
 
@@ -278,7 +280,6 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         p_sys->counter = 0;
     }
 
-    //free(message);
     p_sys->counter++;
 
     return p_in_buf;
@@ -293,6 +294,7 @@ static void Close( vlc_object_t *p_this )
     filter_sys_t *p_sys = p_filter->p_sys;
     ValueDate_t* current;
 
+    var_Destroy( p_filter->p_libvlc, "audiobargraph_v-i_values" );
     var_Destroy( p_filter->p_libvlc, "audiobargraph_v-alarm" );
 
     p_sys->last = NULL;

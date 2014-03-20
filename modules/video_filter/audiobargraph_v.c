@@ -45,9 +45,6 @@
  * Module descriptor
  *****************************************************************************/
 
-#define I_VALUES_TEXT N_("Value of the audio channels levels")
-#define I_VALUES_LONGTEXT N_("Value of the audio level of each channels between 0 and 1. " \
-    "Each level should be separated with ':'.")
 #define POSX_TEXT N_("X coordinate")
 #define POSX_LONGTEXT N_("X coordinate of the bargraph." )
 #define POSY_TEXT N_("Y coordinate")
@@ -86,7 +83,7 @@ vlc_module_begin ()
     set_shortname( N_("Audio Bar Graph Video") )
     add_shortcut( "audiobargraph_v" )
 
-    add_string( CFG_PREFIX "i_values", NULL, I_VALUES_TEXT, I_VALUES_LONGTEXT, false )
+    add_obsolete_string( CFG_PREFIX "i_values" )
     add_integer( CFG_PREFIX "x", 0, POSX_TEXT, POSX_LONGTEXT, true )
     add_integer( CFG_PREFIX "y", 0, POSY_TEXT, POSY_LONGTEXT, true )
     add_integer_with_range( CFG_PREFIX "transparency", 255, 0, 255,
@@ -146,11 +143,10 @@ struct filter_sys_t
 };
 
 static const char *const ppsz_filter_options[] = {
-    "i_values", "x", "y", "transparency", "position", "barWidth", NULL
+    "x", "y", "transparency", "position", "barWidth", NULL
 };
 
 static const char *const ppsz_filter_callbacks[] = {
-    "audiobargraph_v-i_values",
     "audiobargraph_v-x",
     "audiobargraph_v-y",
     "audiobargraph_v-transparency",
@@ -238,10 +234,9 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
     p_BarGraph->i_alpha = var_CreateGetIntegerCommand( p_filter,
                                                         "audiobargraph_v-transparency" );
     p_BarGraph->i_alpha = VLC_CLIP( p_BarGraph->i_alpha, 0, 255 );
-    i_values = var_CreateGetStringCommand( p_filter, "audiobargraph_v-i_values" );
     //p_BarGraph->nbChannels = 0;
     //p_BarGraph->i_values = NULL;
-    parse_i_values(p_BarGraph, i_values);
+    parse_i_values(p_BarGraph, &(char){ 0 });
     p_BarGraph->alarm = false;
 
     p_BarGraph->barWidth = var_CreateGetIntegerCommand( p_filter, "audiobargraph_v-barWidth" );
@@ -254,10 +249,15 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
     vlc_mutex_init( &p_sys->lock );
 
     var_Create(p_filter->p_libvlc, "audiobargraph_v-alarm", VLC_VAR_BOOL);
+    var_Create(p_filter->p_libvlc, "audiobargraph_v-i_values", VLC_VAR_STRING);
+
     var_AddCallback(p_filter->p_libvlc, "audiobargraph_v-alarm",
+                    BarGraphCallback, p_sys);
+    var_AddCallback(p_filter->p_libvlc, "audiobargraph_v-i_values",
                     BarGraphCallback, p_sys);
 
     var_TriggerCallback(p_filter->p_libvlc, "audiobargraph_v-alarm");
+    var_TriggerCallback(p_filter->p_libvlc, "audiobargraph_v-i_values");
 
     for( int i = 0; ppsz_filter_callbacks[i]; i++ )
         var_AddCallback( p_filter, ppsz_filter_callbacks[i],
@@ -290,8 +290,11 @@ static void Close( vlc_object_t *p_this )
         var_DelCallback( p_filter, ppsz_filter_callbacks[i],
                          BarGraphCallback, p_sys );
 
+    var_DelCallback(p_filter->p_libvlc, "audiobargraph_v-i_values",
+                    BarGraphCallback, p_sys);
     var_DelCallback(p_filter->p_libvlc, "audiobargraph_v-alarm",
                     BarGraphCallback, p_sys);
+    var_Destroy(p_filter->p_libvlc, "audiobargraph_v-i_values");
     var_Destroy(p_filter->p_libvlc, "audiobargraph_v-alarm");
 
     if( p_sys->p_blend )
@@ -495,16 +498,17 @@ static int BarGraphCallback( vlc_object_t *p_this, char const *psz_var,
             picture_Release( p_BarGraph->p_pic );
             p_BarGraph->p_pic = NULL;
         }
-        char *psz_i_values = strdup( newval.psz_string );
+
+        char *psz = xstrdup( newval.psz_string ? newval.psz_string : "" );
         free(p_BarGraph->i_values);
         //p_BarGraph->i_values = NULL;
         //p_BarGraph->nbChannels = 0;
         // in case many answer are received at the same time, only keep one
-        res = strchr(psz_i_values, '@');
+        res = strchr(psz, '@');
         if (res)
             *res = 0;
-        parse_i_values( p_BarGraph, psz_i_values);
-        free( psz_i_values );
+        parse_i_values( p_BarGraph, psz);
+        free( psz );
         LoadBarGraph(p_this,p_BarGraph);
     }
     else if ( !strcmp( psz_var, "audiobargraph_v-alarm" ) )
