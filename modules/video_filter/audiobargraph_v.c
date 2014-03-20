@@ -214,6 +214,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
     if( !p_sys )
         return VLC_ENOMEM;
     p_BarGraph = &(p_sys->p_BarGraph);
+    p_BarGraph->p_pic = NULL;
 
     /* */
     p_sys->p_blend = NULL;
