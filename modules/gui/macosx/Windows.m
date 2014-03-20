@@ -223,8 +223,13 @@
 
 - (VLCVoutView *)videoView
 {
-    if ([[self contentView] class] == [VLCVoutView class])
-        return (VLCVoutView *)[self contentView];
+    NSArray *o_subViews = [[self contentView] subviews];
+    if ([o_subViews count] > 0) {
+        id o_vout_view = [o_subViews objectAtIndex:0];
+
+        if ([o_vout_view class] == [VLCVoutView class])
+            return (VLCVoutView *)o_vout_view;
+    }
 
     return nil;
 }
@@ -900,7 +905,8 @@
             [o_video_view retain];
             [[o_video_view superview] replaceSubview:o_video_view with:o_temp_view];
             [o_temp_view setFrame:[o_video_view frame]];
-            [o_fullscreen_window setContentView:o_video_view];
+            [[o_fullscreen_window contentView] addSubview:o_video_view];
+            [o_video_view setFrame: [[o_fullscreen_window contentView] frame]];
             [o_video_view release];
             NSEnableScreenUpdates();
 
@@ -928,7 +934,8 @@
         [o_video_view retain];
         [[o_video_view superview] replaceSubview:o_video_view with:o_temp_view];
         [o_temp_view setFrame:[o_video_view frame]];
-        [o_fullscreen_window setContentView:o_video_view];
+        [[o_fullscreen_window contentView] addSubview:o_video_view];
+        [o_video_view setFrame: [[o_fullscreen_window contentView] frame]];
         [o_video_view release];
         [o_fullscreen_window makeKeyAndOrderFront:self];
         NSEnableScreenUpdates();
