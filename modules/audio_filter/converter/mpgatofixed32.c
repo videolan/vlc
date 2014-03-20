@@ -86,10 +86,6 @@ static void DoWork( filter_t * p_filter,
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_buffer = p_in_buf->i_nb_samples * sizeof(float) *
-                               aout_FormatNbChannels( &p_filter->fmt_out.audio );
-
     /* Do the actual decoding now. */
     mad_stream_buffer( &p_sys->mad_stream, p_in_buf->p_buffer,
                        p_in_buf->i_buffer );
