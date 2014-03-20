@@ -172,10 +172,8 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     float i_value[AOUT_CHAN_MAX];
     float ch;
     float max = 0.0;
-    //char *message = (char*)malloc(255*sizeof(char));
     char message[255];
     int nbChannels = 0;
-    ValueDate_t* new = NULL;
     ValueDate_t* current = NULL;
     float sum;
     int count = 0;
@@ -202,7 +200,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 
     if (p_sys->silence) {
         /* 2 - store the new value */
-        new = (ValueDate_t*)malloc(sizeof(ValueDate_t));
+        ValueDate_t *new = xmalloc(sizeof(*new));
         new->value = max;
         new->date = p_in_buf->i_pts;
         new->next = NULL;
