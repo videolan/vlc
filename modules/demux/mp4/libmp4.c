@@ -1842,7 +1842,7 @@ static int MP4_ReadBox_sample_text( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET2BYTES( p_box->data.p_sample_text->i_background_color[0] );
     MP4_GET2BYTES( p_box->data.p_sample_text->i_background_color[1] );
     MP4_GET2BYTES( p_box->data.p_sample_text->i_background_color[2] );
-    p_box->data.p_sample_text->i_background_color[3] = 0;
+    p_box->data.p_sample_text->i_background_color[3] = 0xFF;
 
     MP4_GET2BYTES( p_box->data.p_sample_text->i_text_box_top );
     MP4_GET2BYTES( p_box->data.p_sample_text->i_text_box_left );
@@ -1878,6 +1878,13 @@ static int MP4_ReadBox_sample_tx3g( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET2BYTES( p_box->data.p_sample_text->i_text_box_left );
     MP4_GET2BYTES( p_box->data.p_sample_text->i_text_box_bottom );
     MP4_GET2BYTES( p_box->data.p_sample_text->i_text_box_right );
+
+    MP4_GET4BYTES( p_box->data.p_sample_text->i_reserved3 );
+
+    MP4_GET2BYTES( p_box->data.p_sample_text->i_font_id );
+    MP4_GET1BYTE ( p_box->data.p_sample_text->i_font_face );
+    MP4_GET1BYTE ( p_box->data.p_sample_text->i_font_size );
+    MP4_GET4BYTES( p_box->data.p_sample_text->i_font_color );
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"tx3g\" in stsd text" );
@@ -3217,6 +3224,10 @@ static const struct
     { ATOM_skip,    MP4_ReadBoxSkip,          MP4_FreeBox_Common },
     { ATOM_free,    MP4_ReadBoxSkip,          MP4_FreeBox_Common },
     { ATOM_wide,    MP4_ReadBoxSkip,          MP4_FreeBox_Common },
+
+    /* Subtitles */
+    { ATOM_tx3g,    MP4_ReadBox_sample_tx3g,      MP4_FreeBox_Common },
+    //{ ATOM_text,    MP4_ReadBox_sample_text,      MP4_FreeBox_Common },
 
     /* for codecs */
     { ATOM_soun,    MP4_ReadBox_sample_soun,  MP4_FreeBox_sample_soun },

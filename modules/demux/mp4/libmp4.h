@@ -580,6 +580,13 @@ typedef struct
     uint16_t i_text_box_bottom;
     uint16_t i_text_box_right;
 
+    uint32_t i_reserved3;
+
+    uint16_t i_font_id;
+    uint8_t  i_font_face;
+    uint8_t  i_font_size;
+    uint32_t i_font_color; //RGBA
+
     // TODO to complete
 } MP4_Box_data_sample_text_t;
 

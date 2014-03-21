@@ -756,36 +756,12 @@ static int Demux( demux_t *p_demux )
                     MP4_TrackUnselect( p_demux, tk );
                     break;
                 }
-
                 else if( tk->fmt.i_cat == SPU_ES )
                 {
-                    if( tk->fmt.i_codec == VLC_CODEC_SUBT &&
-                        p_block->i_buffer >= 2 )
-                    {
-                        size_t i_size = GetWBE( p_block->p_buffer );
-
-                        if( i_size + 2 <= p_block->i_buffer )
-                        {
-                            char *p;
-                            /* remove the length field, and append a '\0' */
-                            memmove( &p_block->p_buffer[0],
-                                     &p_block->p_buffer[2], i_size );
-                            p_block->p_buffer[i_size] = '\0';
-                            p_block->i_buffer = i_size + 1;
-
-                            /* convert \r -> \n */
-                            while( ( p = strchr((char *) p_block->p_buffer, '\r' ) ) )
-                            {
-                                *p = '\n';
-                            }
-                        }
-                        else
-                        {
-                            /* Invalid */
-                            p_block->i_buffer = 0;
-                        }
-                    }
+                    if ( tk->fmt.i_codec != VLC_CODEC_TX3G )
+                        p_block->i_buffer = 0;
                 }
+
                 /* dts */
                 p_block->i_dts = VLC_TS_0 + MP4_TrackGetDTS( p_demux, tk );
                 /* pts */
@@ -1931,7 +1907,31 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
 
         case( VLC_FOURCC( 't', 'e', 'x', 't' ) ):
         case( VLC_FOURCC( 't', 'x', '3', 'g' ) ):
-            p_track->fmt.i_codec = VLC_CODEC_SUBT;
+        {
+            p_track->fmt.i_codec = VLC_CODEC_TX3G;
+            MP4_Box_data_sample_text_t *p_text = p_sample->data.p_sample_text;
+            if ( p_text )
+            {
+                text_style_t *p_style = text_style_New();
+                if ( p_style )
+                {
+                    if ( p_text->i_font_size ) /* !WARN: % in absolute storage */
+                        p_style->i_font_size = p_text->i_font_size;
+                    if ( p_text->i_font_color )
+                    {
+                        p_style->i_font_color = p_text->i_font_color >> 8;
+                        p_style->i_font_alpha = p_text->i_font_color & 0xFF;
+                    }
+                    if ( p_text->i_background_color )
+                    {
+                        p_style->i_background_color = p_text->i_background_color[0] >> 8;
+                        p_style->i_background_color |= p_text->i_background_color[1] >> 8;
+                        p_style->i_background_color |= p_text->i_background_color[2] >> 8;
+                        p_style->i_background_alpha = p_text->i_background_color[3] >> 8;
+                    }
+                }
+                p_track->fmt.subs.p_style = p_style;
+            }
             /* FIXME: Not true, could be UTF-16 with a Byte Order Mark (0xfeff) */
             /* FIXME UTF-8 doesn't work here ? */
             if( p_track->b_mac_encoding )
@@ -1939,7 +1939,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             else
                 p_track->fmt.subs.psz_encoding = strdup( "UTF-8" );
             break;
-
+        }
         case VLC_FOURCC('y','v','1','2'):
             p_track->fmt.i_codec = VLC_CODEC_YV12;
             break;
@@ -2592,10 +2592,11 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
             p_track->fmt.i_cat = VIDEO_ES;
             break;
 
+        case( ATOM_tx3g ):
         case( ATOM_text ):
         case( ATOM_subp ):
-        case( ATOM_tx3g ):
         case( ATOM_sbtl ):
+            p_track->fmt.i_codec = VLC_CODEC_TX3G;
             p_track->fmt.i_cat = SPU_ES;
             break;
 

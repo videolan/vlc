@@ -49,6 +49,7 @@ Demuxer:
  * Fix encoding issues in some XML playlist formats
  * Support THP Wii/Gamecube, RenderWare and Escape Replay game video files
  * New HEVC raw packetizer and demuxer
+ * Handle MOV/MP4 tx3g styled subtitles through codec
 
 Muxers:
  * Important rework of the Ogg muxer, notably for skeleton
