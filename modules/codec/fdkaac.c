@@ -503,9 +503,9 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
                                              (double)p_enc->fmt_in.audio.i_channels;
                     i_pts_out -= (mtime_t)((double)CLOCK_FREQ * d_samples_delay /
                                            (double)p_enc->fmt_out.audio.i_rate);
-                    //p_block->i_length = (mtime_t)((double)CLOCK_FREQ * (double)p_sys->i_frame_size / 
-                    //    (double)p_enc->fmt_out.audio.i_rate);
-                    p_block->i_length = i_pts_out - p_sys->i_pts_last;
+                    p_block->i_length = (mtime_t)((double)CLOCK_FREQ * (double)p_sys->i_frame_size /
+                        (double)p_enc->fmt_out.audio.i_rate);
+                    //p_block->i_length = i_pts_out - p_sys->i_pts_last;
                 }
                 else
                 {
