@@ -25,6 +25,7 @@
 #define VLC_ES_H 1
 
 #include <vlc_fourcc.h>
+#include <vlc_text_style.h>
 
 /**
  * \file
@@ -356,6 +357,8 @@ struct subs_format_t
         int i_magazine;
         int i_page;
     } teletext;
+
+    text_style_t *p_style; /* Default styles to use */
 };
 
 /**

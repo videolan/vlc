@@ -475,6 +475,7 @@ int es_format_Copy( es_format_t *dst, const es_format_t *src )
     }
 
     dst->subs.psz_encoding = dst->subs.psz_encoding ? strdup( src->subs.psz_encoding ) : NULL;
+    dst->subs.p_style = src->subs.p_style ? text_style_Duplicate( src->subs.p_style ) : NULL;
 
     if( src->video.p_palette )
     {
@@ -522,6 +523,8 @@ void es_format_Clean( es_format_t *fmt )
 
     free( fmt->video.p_palette );
     free( fmt->subs.psz_encoding );
+
+    if ( fmt->subs.p_style ) text_style_Delete( fmt->subs.p_style );
 
     if( fmt->i_extra_languages > 0 && fmt->p_extra_languages )
     {
