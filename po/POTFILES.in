@@ -399,6 +399,7 @@ modules/codec/spudec/spudec.h
 modules/codec/stl.c
 modules/codec/subsdec.c
 modules/codec/subsusf.c
+modules/codec/substx3g.c
 modules/codec/svcdsub.c
 modules/codec/t140.c
 modules/codec/telx.c

@@ -1,17 +1,163 @@
+#include <vlc_strings.h>
+
+typedef struct
+{
+    bool b_set;
+    unsigned int i_value;
+} subpicture_updater_sys_option_t;
+
+typedef struct segment_t segment_t;
+
+typedef struct
+{
+    uint8_t i_fontsize;
+    uint32_t i_color;   //ARGB
+    uint8_t i_flags;
+} segment_style_t;
+
+struct segment_t
+{
+    char *psz_string;
+    unsigned int i_size;
+    segment_t *p_next;
+    /* styles applied to that segment */
+    segment_style_t styles;
+};
+
 struct subpicture_updater_sys_t {
     char *text;
     char *html;
+    segment_t *p_htmlsegments;
 
     int  align;
     int  x;
     int  y;
     int  i_font_height_percent;
+    int  i_font_height_abs_to_src;
 
     bool is_fixed;
     int  fixed_width;
     int  fixed_height;
     bool renderbg;
+
+    /* styling */
+    subpicture_updater_sys_option_t style_flags;
+    subpicture_updater_sys_option_t font_color;
+    subpicture_updater_sys_option_t background_color;
+    int16_t i_alpha;
+    int16_t i_drop_shadow;
+    int16_t i_drop_shadow_alpha;
 };
+
+static void SegmentFree( segment_t *p_segment )
+{
+    if ( p_segment )
+    {
+        free( p_segment->psz_string );
+        free( p_segment );
+    }
+}
+
+static void MakeHtmlNewLines( char **ppsz_src )
+{
+    unsigned int i_nlcount = 0;
+    unsigned i_len = strlen( *ppsz_src );
+    if ( i_len == 0 ) return;
+    for ( unsigned i=0; i<i_len; i++ )
+        if ( (*ppsz_src)[i] == '\n' )
+            i_nlcount++;
+    if ( !i_nlcount ) return;
+
+    char *psz_dst = malloc( i_len + 1 + (i_nlcount * 4) );
+    char *ptr = psz_dst;
+    for ( unsigned i=0; i<i_len; i++ )
+    {
+        if ( (*ppsz_src)[i] == '\n' )
+        {
+            strcpy( ptr, "<br/>" );
+            ptr += 5;
+        } else {
+            *ptr++ = (*ppsz_src)[i];
+        }
+    }
+    *ptr = 0;
+    free( *ppsz_src );
+    *ppsz_src = psz_dst;
+}
+
+static void HtmlAppend( char **ppsz_dst, const char *psz_src,
+                        const segment_style_t *p_styles, const float f_scale )
+{
+    if ( !ppsz_dst ) return;
+    int i_ignore; VLC_UNUSED(i_ignore);
+    char *psz_subtext = NULL;
+    char *psz_text = NULL;
+    char *psz_fontsize = NULL;
+    char *psz_color = NULL;
+    char *psz_encoded = convert_xml_special_chars( psz_src );
+    if ( !psz_encoded ) return;
+
+    MakeHtmlNewLines( &psz_encoded );
+
+    if ( p_styles->i_color & 0xFF000000 ) //ARGB
+        i_ignore = asprintf( &psz_color, " color=\"#%6x\"",
+                             p_styles->i_color & 0x00FFFFFF );
+
+    if ( p_styles->i_fontsize > 0 && f_scale > 0 )
+        i_ignore = asprintf( &psz_fontsize, " size=\"%u\"",
+                             (unsigned) (f_scale * p_styles->i_fontsize) );
+
+    i_ignore = asprintf( &psz_subtext, "%s%s%s%s%s%s%s",
+                        ( p_styles->i_flags & STYLE_UNDERLINE ) ? "<u>" : "",
+                        ( p_styles->i_flags & STYLE_BOLD ) ? "<b>" : "",
+                        ( p_styles->i_flags & STYLE_ITALIC ) ? "<i>" : "",
+                          psz_encoded,
+                        ( p_styles->i_flags & STYLE_ITALIC ) ? "</i>" : "",
+                        ( p_styles->i_flags & STYLE_BOLD ) ? "</b>" : "",
+                        ( p_styles->i_flags & STYLE_UNDERLINE ) ? "</u>" : ""
+                        );
+
+    if ( psz_color || psz_fontsize )
+    {
+        i_ignore = asprintf( &psz_text, "<font%s%s>%s</font>",
+                            psz_color ? psz_color : "",
+                            psz_fontsize ? psz_fontsize : "",
+                            psz_subtext );
+        free( psz_subtext );
+    }
+    else
+    {
+        psz_text = psz_subtext;
+    }
+
+    free( psz_fontsize );
+    free( psz_color );
+
+    if ( *ppsz_dst )
+    {
+        char *psz_dst = *ppsz_dst;
+        i_ignore = asprintf( ppsz_dst, "%s%s", psz_dst, psz_text );
+        free( psz_dst );
+        free( psz_text );
+    }
+    else
+        *ppsz_dst = psz_text;
+}
+
+static char *SegmentsToHtml( segment_t *p_head, const float f_scale )
+{
+    char *psz_dst = NULL;
+    char *psz_ret = NULL;
+    while( p_head )
+    {
+        HtmlAppend( &psz_dst, p_head->psz_string, &p_head->styles, f_scale );
+        p_head = p_head->p_next;
+    }
+    int i_ignore = asprintf( &psz_ret, "<text>%s</text>", psz_dst );
+    VLC_UNUSED( i_ignore );
+    free( psz_dst );
+    return psz_ret;
+}
 
 static int SubpictureTextValidate(subpicture_t *subpic,
                                   bool has_src_changed, const video_format_t *fmt_src,
@@ -59,7 +205,13 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         return;
 
     r->psz_text = sys->text ? strdup(sys->text) : NULL;
-    r->psz_html = sys->html ? strdup(sys->html) : NULL;
+    if ( sys->p_htmlsegments )
+        r->psz_html = SegmentsToHtml( sys->p_htmlsegments,
+                                      (float) fmt_dst->i_height / fmt_src->i_height );
+    else if ( sys->html )
+        r->psz_html = strdup(sys->html);
+    else
+        r->psz_html = NULL;
     r->i_align  = sys->align;
     r->b_renderbg = sys->renderbg;
     if (!sys->is_fixed) {
@@ -84,16 +236,38 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         r->i_y = sys->y * fmt_dst->i_height / sys->fixed_height;
     }
 
-    if (sys->i_font_height_percent != 0)
+    if (sys->i_font_height_percent || sys->i_alpha ||
+        sys->style_flags.b_set ||
+        sys->font_color.b_set ||
+        sys->background_color.b_set )
     {
         r->p_style = text_style_New();
-        if (r->p_style)
+        if (!r->p_style) return;
+
+        if (sys->i_font_height_abs_to_src)
+            sys->i_font_height_percent = sys->i_font_height_abs_to_src * 100 /
+                                         fmt_src->i_visible_height;
+
+        if (sys->i_font_height_percent)
         {
-	    r->p_style->i_font_size = sys->i_font_height_percent *
-	      subpic->i_original_picture_height / 100;
+            r->p_style->i_font_size = sys->i_font_height_percent *
+                                      subpic->i_original_picture_height / 100;
             r->p_style->i_font_color = 0xffffff;
             r->p_style->i_font_alpha = 0xff;
-	}
+        }
+
+        if (sys->style_flags.b_set)
+            r->p_style->i_style_flags = sys->style_flags.i_value;
+        if (sys->font_color.b_set)
+            r->p_style->i_font_color = sys->font_color.i_value;
+        if (sys->background_color.b_set)
+            r->p_style->i_background_color = sys->background_color.i_value;
+        if (sys->i_alpha)
+            r->p_style->i_font_alpha = sys->i_alpha;
+        if (sys->i_drop_shadow)
+            r->p_style->i_shadow_width = sys->i_drop_shadow;
+        if (sys->i_drop_shadow_alpha)
+            r->p_style->i_shadow_alpha = sys->i_drop_shadow_alpha;
     }
 }
 static void SubpictureTextDestroy(subpicture_t *subpic)
@@ -102,6 +276,12 @@ static void SubpictureTextDestroy(subpicture_t *subpic)
 
     free(sys->text);
     free(sys->html);
+    while( sys->p_htmlsegments )
+    {
+        segment_t *p_segment = sys->p_htmlsegments;
+        sys->p_htmlsegments = sys->p_htmlsegments->p_next;
+        SegmentFree( p_segment );
+    }
     free(sys);
 }
 

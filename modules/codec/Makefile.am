@@ -183,6 +183,8 @@ endif
 EXTRA_LTLIBRARIES += libzvbi_plugin.la
 codec_LTLIBRARIES += $(LTLIBzvbi)
 
+libsubstx3g_plugin_la_SOURCES = codec/substx3g.c codec/substext.h
+codec_LTLIBRARIES += libsubstx3g_plugin.la
 
 ### Xiph ###
 
