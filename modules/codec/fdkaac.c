@@ -505,6 +505,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
                                            (double)p_enc->fmt_out.audio.i_rate);
                     p_block->i_length = (mtime_t)((double)CLOCK_FREQ * (double)p_sys->i_frame_size /
                         (double)p_enc->fmt_out.audio.i_rate);
+                    p_block->i_nb_samples = d_samples_delay;
                     //p_block->i_length = i_pts_out - p_sys->i_pts_last;
                 }
                 else
@@ -514,6 +515,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
                                             (double)p_enc->fmt_out.audio.i_rate);
                     i_pts_out += (mtime_t) d_length;
                     p_block->i_length = (mtime_t) d_length;
+                    p_block->i_nb_samples = d_samples_forward;
                 }
             }
             p_block->i_dts = p_block->i_pts = i_pts_out;
