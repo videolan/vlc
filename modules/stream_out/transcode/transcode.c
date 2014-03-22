@@ -191,6 +191,7 @@ vlc_module_begin ()
                 ALANG_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "channels", 0, ACHANS_TEXT,
                  ACHANS_LONGTEXT, false )
+        change_integer_range( 0, 9 )
     add_integer( SOUT_CFG_PREFIX "samplerate", 0, ARATE_TEXT,
                  ARATE_LONGTEXT, true )
         change_integer_range( 0, 48000 )
