@@ -133,7 +133,9 @@ static const struct
      /* Paletized RGB */
     {VLC_CODEC_RGBP, PIX_FMT_PAL8, 0, 0, 0},
 
+#if LIBAVUTIL_VERSION_CHECK(51, 42, 0, 74,100)
     {VLC_CODEC_GBR_PLANAR, AV_PIX_FMT_GBRP, 0, 0, 0 },
+#endif
 
     /* XYZ */
 #if LIBAVUTIL_VERSION_CHECK(52, 10, 0, 25, 100)
