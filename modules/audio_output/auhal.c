@@ -1072,8 +1072,11 @@ static void Stop(audio_output_t *p_aout)
         if (err != noErr)
             msg_Err(p_aout, "Failed to destroy Process ID [%4.4s]", (char *)&err);
 
-        if (p_sys->b_revert)
-            AudioStreamChangeFormat(p_aout, p_sys->i_stream_id, p_sys->sfmt_revert);
+        if (p_sys->b_revert) {
+            if (!AudioStreamChangeFormat(p_aout, p_sys->i_stream_id, p_sys->sfmt_revert)) {
+                msg_Err(p_aout, "failed to revert stream format in close");
+            }
+        }
 
         if (p_sys->b_changed_mixing && p_sys->sfmt_revert.mFormatID != kAudioFormat60958AC3) {
             int b_mix;
