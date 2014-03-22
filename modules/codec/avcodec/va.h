@@ -32,7 +32,7 @@ struct vlc_va_t {
 
     vlc_va_sys_t *sys;
     module_t *module;
-    char *description;
+    const char *description;
     int pix_fmt;
 
     int  (*setup)(vlc_va_t *, void **hw, vlc_fourcc_t *output,

@@ -278,7 +278,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt)
         infos = "VDPAU";
 
     va->sys = sys;
-    va->description = (char *)infos;
+    va->description = infos;
     va->pix_fmt = AV_PIX_FMT_VDPAU;
     va->setup = Setup;
     va->get = Lock;

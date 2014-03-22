@@ -478,7 +478,7 @@ static void Close(vlc_va_t *va)
     if (sys->hd3d9_dll)
         FreeLibrary(sys->hd3d9_dll);
 
-    free(va->description);
+    free((char *)va->description);
     free(sys);
 }
 

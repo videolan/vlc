@@ -124,7 +124,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt)
     hwctx->render = Render;
 
     va->sys = (vlc_va_sys_t *)hwctx;
-    va->description = (char *)"Dummy video decoding accelerator";
+    va->description = "Dummy video decoding accelerator";
     va->pix_fmt = AV_PIX_FMT_VDPAU;
     va->setup = Setup;
     va->get = Lock;

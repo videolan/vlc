@@ -239,7 +239,7 @@ static int Open( vlc_va_t *va, int i_codec_id, int i_thread_count )
     vlc_mutex_init(&sys->lock);
 
     va->sys = sys;
-    va->description = (char *)vaQueryVendorString( sys->p_display );
+    va->description = vaQueryVendorString( sys->p_display );
     return VLC_SUCCESS;
 
 error:

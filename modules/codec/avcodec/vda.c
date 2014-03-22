@@ -115,7 +115,7 @@ static int Open( vlc_va_t *external, AVCodecContext *ctx,
     p_va->i_extradata = fmt->i_extra;
 
     external->sys = p_va;
-    external->description = (char *)"VDA";
+    external->description = "VDA";
     external->pix_fmt = PIX_FMT_VDA_VLD;
     external->setup = Setup;
     external->get = Get;
