@@ -1899,6 +1899,12 @@ static int AudioStreamChangeFormat(audio_output_t *p_aout, AudioStreamID i_strea
     UInt32 i_param_size = sizeof(AudioStreamBasicDescription);
     for (int i = 0; i < 5; i++) {
         /* Callback is not always invoked. So first check if format is already set. */
+        if (i > 0) {
+            mtime_t timeout = mdate() + 500000;
+            if (vlc_cond_timedwait(&w.cond, &w.lock, timeout))
+                msg_Dbg(p_aout, "reached timeout");
+        }
+
         err = AudioObjectGetPropertyData(i_stream_id, &physicalFormatAddress, 0, NULL, &i_param_size, &actual_format);
 
         msg_Dbg(p_aout, STREAM_FORMAT_MSG("actual format in use: ", actual_format));
@@ -1910,9 +1916,6 @@ static int AudioStreamChangeFormat(audio_output_t *p_aout, AudioStreamID i_strea
         }
 
         /* We need to check again */
-        mtime_t timeout = mdate() + 500000;
-        if (vlc_cond_timedwait(&w.cond, &w.lock, timeout))
-            msg_Dbg(p_aout, "reached timeout");
     }
 
 out:
