@@ -267,6 +267,8 @@ virtual_segment_c::virtual_segment_c( std::vector<matroska_segment_c*> * p_opene
     i_sys_title = 0;
     p_current_chapter = NULL;
 
+    i_current_edition = p_segment->i_default_edition;
+
     for( i = 0; i < p_segment->stored_editions.size(); i++ )
     {
         /* Create a virtual edition from opened */
@@ -276,9 +278,16 @@ virtual_segment_c::virtual_segment_c( std::vector<matroska_segment_c*> * p_opene
          * on an other segment which couldn't be found... ignore it */
         if(p_vedition->b_ordered && p_vedition->i_duration == 0)
         {
+
             msg_Warn( &p_segment->sys.demuxer,
                       "Edition %s (%zu) links to other segments not found and is empty... ignoring it",
                        p_vedition->GetMainName().c_str(), i );
+            if(i_current_edition == i)
+            {
+                msg_Warn( &p_segment->sys.demuxer,
+                          "Empty edition was the default... defaulting to 0");
+                i_current_edition = 0;
+            }
             delete p_vedition;
         }
         else
