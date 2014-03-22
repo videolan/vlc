@@ -1,0 +1,29 @@
+From 3149e9b73a94b45a5126cc778fe03f0b686dced9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Felix=20Paul=20K=C3=BChne?= <fkuehne@videolan.org>
+Date: Sat, 22 Mar 2014 19:55:52 +0100
+Subject: [PATCH] Fix code path selection for x86_64 on Darwin
+
+---
+ mpi/config.links | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/mpi/config.links b/mpi/config.links
+index 0217d35..4f35ea2 100644
+--- a/mpi/config.links
++++ b/mpi/config.links
+@@ -127,6 +127,12 @@ case "${host}" in
+ 	path="i586 i386"
+         mpi_cpu_arch="x86"
+ 	;;
++    x86_64-apple-darwin*)
++	echo '#define BSD_SYNTAX' >>./mpi/asm-syntax.h
++	cat  $srcdir/mpi/i386/syntax.h	    >>./mpi/asm-syntax.h
++	path="amd64"
++        mpi_cpu_arch="x86"
++	;;
+     x86_64-*-*)
+ 	echo '#define ELF_SYNTAX' >>./mpi/asm-syntax.h
+ 	cat  $srcdir/mpi/i386/syntax.h	    >>./mpi/asm-syntax.h
+-- 
+1.8.5.2 (Apple Git-48)
+

@@ -11,6 +11,7 @@ $(TARBALLS)/libgcrypt-$(GCRYPT_VERSION).tar.bz2:
 
 libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2 .sum-gcrypt
 	$(UNPACK)
+	$(APPLY) $(SRC)/gcrypt/gcrypt-fix-x86_64-codepath-on-Darwin.patch
 	$(MOVE)
 
 DEPS_gcrypt = gpg-error
