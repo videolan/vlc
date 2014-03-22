@@ -132,11 +132,6 @@
     "Runs the optional encoder thread at the OUTPUT priority instead of " \
     "VIDEO." )
 
-#define ASYNC_TEXT N_("Synchronise on audio track")
-#define ASYNC_LONGTEXT N_( \
-    "This option will drop/duplicate video frames to synchronise the video " \
-    "track on the audio track." )
-
 
 static const char *const ppsz_deinterlace_type[] =
 {
@@ -198,8 +193,8 @@ vlc_module_begin ()
                  ACHANS_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "samplerate", 0, ARATE_TEXT,
                  ARATE_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "audio-sync", false, ASYNC_TEXT,
-              ASYNC_LONGTEXT, false )
+        change_integer_range( 0, 48000 )
+    add_obsolete_bool( SOUT_CFG_PREFIX "audio-sync" ) /*Since 2.2.0 */
     add_module_list( SOUT_CFG_PREFIX "afilter",  "audio filter",
                      NULL, AFILTER_TEXT, AFILTER_LONGTEXT, false )
 
@@ -230,7 +225,7 @@ static const char *const ppsz_sout_options[] = {
     "scale", "fps", "width", "height", "vfilter", "deinterlace",
     "deinterlace-module", "threads", "aenc", "acodec", "ab", "alang",
     "afilter", "samplerate", "channels", "senc", "scodec", "soverlay",
-    "sfilter", "osd", "audio-sync", "high-priority", "maxwidth", "maxheight",
+    "sfilter", "osd", "high-priority", "maxwidth", "maxheight",
     NULL
 };
 
@@ -459,9 +454,6 @@ static int Open( vlc_object_t *p_this )
             spu_ChangeSources( p_sys->p_spu, "osdmenu" );
         }
     }
-
-    /* Audio settings */
-    p_sys->b_master_sync = __MAX( p_sys->b_master_sync == VLC_SUCCESS, var_GetBool( p_stream, SOUT_CFG_PREFIX "audio-sync" ) );
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
