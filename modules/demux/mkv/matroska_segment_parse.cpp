@@ -1711,6 +1711,20 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             }
         }
     }
+    else if( !strncmp( p_tk->psz_codec, "A_QUICKTIME", 11 ) )
+    {
+        p_tk->fmt.i_cat = AUDIO_ES;
+        if ( !strncmp( p_tk->psz_codec+11, "/QDM2", 5 ) )
+            p_tk->fmt.i_codec = VLC_CODEC_QDM2;
+        else if( !strncmp( p_tk->psz_codec+11, "/QDMC", 5 ) )
+            p_tk->fmt.i_codec = VLC_FOURCC('Q','D','M','C');
+        else if( p_tk->i_extra_data >= 8)
+            p_tk->fmt.i_codec = VLC_FOURCC(p_tk->p_extra_data[4],
+                                           p_tk->p_extra_data[5],
+                                           p_tk->p_extra_data[6],
+                                           p_tk->p_extra_data[7]);
+        fill_extra_data( p_tk, 0 );
+    }
     else if( !strcmp( p_tk->psz_codec, "S_KATE" ) )
     {
         p_tk->fmt.i_codec = VLC_CODEC_KATE;
