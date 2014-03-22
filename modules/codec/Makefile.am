@@ -270,14 +270,27 @@ endif
 
 ### avcodec hardware acceleration ###
 
-libvaapi_plugin_la_SOURCES = \
+libvaapi_drm_plugin_la_SOURCES = \
 	video_chroma/copy.c video_chroma/copy.h \
 	codec/avcodec/vaapi.c
-libvaapi_plugin_la_CFLAGS = $(AM_CFLAGS) \
-	$(LIBVA_CFLAGS) $(X_CFLAGS) $(AVCODEC_CFLAGS)
-libvaapi_plugin_la_LIBADD = $(LIBVA_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
+libvaapi_drm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_VA_BACKEND_DRM
+libvaapi_drm_plugin_la_CFLAGS = $(AM_CFLAGS) \
+	$(LIBVA_DRM_CFLAGS) $(AVCODEC_CFLAGS)
+libvaapi_drm_plugin_la_LIBADD = $(LIBVA_DRM_LIBS)
+libvaapi_x11_plugin_la_SOURCES = \
+	video_chroma/copy.c video_chroma/copy.h \
+	codec/avcodec/vaapi.c
+libvaapi_x11_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_VA_BACKEND_XLIB
+libvaapi_x11_plugin_la_CFLAGS = $(AM_CFLAGS) \
+	$(LIBVA_X11_CFLAGS) $(X_CFLAGS) $(AVCODEC_CFLAGS)
+libvaapi_x11_plugin_la_LIBADD = $(LIBVA_X11_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
 if HAVE_AVCODEC_VAAPI
-codec_LTLIBRARIES += libvaapi_plugin.la
+if HAVE_VAAPI_DRM
+codec_LTLIBRARIES += libvaapi_drm_plugin.la
+endif
+if HAVE_VAAPI_X11
+codec_LTLIBRARIES += libvaapi_x11_plugin.la
+endif
 endif
 
 libdxva2_plugin_la_SOURCES = \

@@ -2289,30 +2289,50 @@ AC_ARG_ENABLE(libva,
 AS_IF([test "${enable_libva}" = "yes" -a "${have_avcodec}" != "yes" ], [
   AC_MSG_ERROR([--enable-libva and --disable-avcodec options are mutually exclusive. Use --enable-avcodec.])
 ])
-have_avcodec_vaapi="no"
-AS_IF([test "${enable_libva}" != "no" -a "${have_avcodec}" = "yes"], [
-  PKG_CHECK_MODULES(LIBVA, [libva libva-x11], [
-    VLC_SAVE_FLAGS
-    CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
-    CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
-    AC_CHECK_HEADERS(libavcodec/vaapi.h, [
-      AC_MSG_NOTICE([VAAPI acceleration activated])
-      have_avcodec_vaapi="yes"
-    ],[
-      AS_IF([test -n "${enable_libva}"], [
-        AC_MSG_ERROR([libva is present but libavcodec/vaapi.h is missing])
-      ], [
-        AC_MSG_WARN([libva is present but libavcodec/vaapi.h is missing ])
-      ])
-    ])
-    VLC_RESTORE_FLAGS
-  ],[
+
+have_vaapi="no"
+have_vaapi_drm="no"
+have_vaapi_x11="no"
+AS_IF([test "${enable_libva}" != "no"], [
+  PKG_CHECK_EXISTS([libva], [
+    have_vaapi="yes"
+  ], [
     AS_IF([test -n "${enable_libva}"], [
       AC_MSG_ERROR([${LIBVA_PKG_ERRORS}.])
     ], [
       AC_MSG_WARN([${LIBVA_PKG_ERRORS}.])
     ])
   ])
+  PKG_CHECK_MODULES([LIBVA_DRM], [libva-drm], [
+    have_vaapi_drm="yes"
+  ], [
+    AC_MSG_WARN([${LIBVA_DRM_PKG_ERRORS}.])
+  ])
+  PKG_CHECK_MODULES(LIBVA_X11, [libva-x11], [
+    have_vaapi_x11="yes"
+  ], [
+    AC_MSG_WARN([${LIBVA_X11_PKG_ERRORS}.])
+  ])
+])
+AM_CONDITIONAL([HAVE_VAAPI_DRM], [test "${have_vaapi_drm}" = "yes"])
+AM_CONDITIONAL([HAVE_VAAPI_X11], [test "${have_vaapi_x11}" = "yes"])
+
+have_avcodec_vaapi="no"
+AS_IF([test "${have_vaapi}" = "yes" -a "${have_avcodec}" = "yes"], [
+  VLC_SAVE_FLAGS
+  CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
+  CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
+  AC_CHECK_HEADERS([libavcodec/vaapi.h], [
+    AC_MSG_NOTICE([VAAPI acceleration activated])
+    have_avcodec_vaapi="yes"
+  ],[
+    AS_IF([test -n "${enable_libva}"], [
+      AC_MSG_ERROR([libva is present but libavcodec/vaapi.h is missing])
+    ], [
+      AC_MSG_WARN([libva is present but libavcodec/vaapi.h is missing ])
+    ])
+  ])
+  VLC_RESTORE_FLAGS
 ])
 AM_CONDITIONAL([HAVE_AVCODEC_VAAPI], [test "${have_avcodec_vaapi}" = "yes"])
 

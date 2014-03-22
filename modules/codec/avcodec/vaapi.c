@@ -30,12 +30,20 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_fourcc.h>
-#include <vlc_xlib.h>
 
+#ifdef VLC_VA_BACKEND_XLIB
+# include <vlc_xlib.h>
+# include <va/va_x11.h>
+#endif
+#ifdef VLC_VA_BACKEND_DRM
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <fcntl.h>
+# include <vlc_fs.h>
+# include <va/va_drm.h>
+#endif
 #include <libavcodec/avcodec.h>
 #include <libavcodec/vaapi.h>
-#include <X11/Xlib.h>
-#include <va/va_x11.h>
 
 #include "avcodec.h"
 #include "va.h"
@@ -50,11 +58,16 @@ static int Create( vlc_va_t *, AVCodecContext *, const es_format_t * );
 static void Delete( vlc_va_t * );
 
 vlc_module_begin ()
-    set_description( N_("Video Acceleration (VA) API") )
+#if defined (VLC_VA_BACKEND_XLIB)
+    set_description( N_("Video Acceleration (VA) API / X11") )
+#elif defined (VLC_VA_BACKEND_DRM)
+    set_description( N_("Video Acceleration (VA) API / DRM") )
+#endif
     set_capability( "hw decoder", 0 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_callbacks( Create, Delete )
+    add_shortcut( "vaapi" )
 vlc_module_end ()
 
 typedef struct
@@ -67,7 +80,12 @@ typedef struct
 
 struct vlc_va_sys_t
 {
-    Display      *p_display_x11;
+#ifdef VLC_VA_BACKEND_XLIB
+        Display  *p_display_x11;
+#endif
+#ifdef VLC_VA_BACKEND_DRM
+        int       drm_fd;
+#endif
     VADisplay     p_display;
 
     VAConfigID    i_config_id;
@@ -138,6 +156,7 @@ static int Open( vlc_va_t *va, int i_codec_id, int i_thread_count )
     sys->image.image_id = VA_INVALID_ID;
 
     /* Create a VA display */
+#ifdef VLC_VA_BACKEND_XLIB
     sys->p_display_x11 = XOpenDisplay(NULL);
     if( !sys->p_display_x11 )
     {
@@ -146,6 +165,17 @@ static int Open( vlc_va_t *va, int i_codec_id, int i_thread_count )
     }
 
     sys->p_display = vaGetDisplay( sys->p_display_x11 );
+#endif
+#ifdef VLC_VA_BACKEND_DRM
+    sys->drm_fd = vlc_open("/dev/dri/card0", O_RDWR);
+    if( sys->drm_fd == -1 )
+    {
+        msg_Err( va, "Could not access rendering device: %m" );
+        goto error;
+    }
+
+    sys->p_display = vaGetDisplayDRM( sys->drm_fd );
+#endif
     if( !sys->p_display )
     {
         msg_Err( va, "Could not get a VAAPI device" );
@@ -219,8 +249,14 @@ error:
     free( va->description );
     if( sys->p_display != NULL )
         vaTerminate( sys->p_display );
+#ifdef VLC_VA_BACKEND_XLIB
     if( sys->p_display_x11 != NULL )
         XCloseDisplay( sys->p_display_x11 );
+#endif
+#ifdef VLC_VA_BACKEND_DRM
+    if( sys->drm_fd != -1 )
+        close( sys->drm_fd );
+#endif
     free( sys );
     return VLC_EGENERIC;
 }
@@ -531,7 +567,12 @@ static void Close( vlc_va_sys_t *sys )
     if( sys->i_config_id != VA_INVALID_ID )
         vaDestroyConfig( sys->p_display, sys->i_config_id );
     vaTerminate( sys->p_display );
+#ifdef VLC_VA_BACKEND_XLIB
     XCloseDisplay( sys->p_display_x11 );
+#endif
+#ifdef VLC_VA_BACKEND_DRM
+    close( sys->drm_fd );
+#endif
 }
 
 static void Delete( vlc_va_t *va )
@@ -545,11 +586,13 @@ static void Delete( vlc_va_t *va )
 static int Create( vlc_va_t *p_va, AVCodecContext *ctx,
                    const es_format_t *fmt )
 {
+#ifdef VLC_VA_BACKEND_XLIB
     if( !vlc_xlib_init( VLC_OBJECT(p_va) ) )
     {
         msg_Warn( p_va, "Ignoring VA API" );
         return VLC_EGENERIC;
     }
+#endif
 
     (void) fmt;
 
