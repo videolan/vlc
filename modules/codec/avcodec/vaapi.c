@@ -150,7 +150,6 @@ static int Open( vlc_va_t *va, int i_codec_id, int i_thread_count )
     }
 
     /* */
-    va->description = NULL;
     sys->i_config_id  = VA_INVALID_ID;
     sys->i_context_id = VA_INVALID_ID;
     sys->image.image_id = VA_INVALID_ID;
@@ -189,9 +188,6 @@ static int Open( vlc_va_t *va, int i_codec_id, int i_thread_count )
         msg_Err( va, "Failed to initialize the VAAPI device" );
         goto error;
     }
-
-    if( asprintf( &va->description, "VA API v%d.%d", major, minor ) < 0 )
-        va->description = NULL;
 
     /* Check if the selected profile is supported */
     i_profiles_nb = vaMaxNumProfiles( sys->p_display );
@@ -243,10 +239,10 @@ static int Open( vlc_va_t *va, int i_codec_id, int i_thread_count )
     vlc_mutex_init(&sys->lock);
 
     va->sys = sys;
+    va->description = (char *)vaQueryVendorString( sys->p_display );
     return VLC_SUCCESS;
 
 error:
-    free( va->description );
     if( sys->p_display != NULL )
         vaTerminate( sys->p_display );
 #ifdef VLC_VA_BACKEND_XLIB
@@ -579,7 +575,6 @@ static void Delete( vlc_va_t *va )
 {
     vlc_va_sys_t *sys = va->sys;
     Close( sys );
-    free( va->description );
     free( sys );
 }
 
