@@ -1682,9 +1682,11 @@ static OSStatus StreamListener(AudioObjectID inObjectID,  UInt32 inNumberAddress
 
     for (unsigned int i = 0; i < inNumberAddresses; i++) {
         if (inAddresses[i].mSelector == kAudioStreamPropertyPhysicalFormat) {
+            int canc = vlc_savecancel();
             vlc_mutex_lock(&w->lock);
             vlc_cond_signal(&w->cond);
             vlc_mutex_unlock(&w->lock);
+            vlc_restorecancel(canc);
             break;
         }
     }
@@ -1861,7 +1863,7 @@ static int AudioStreamSupportsDigital(audio_output_t *p_aout, AudioStreamID i_st
 static int AudioStreamChangeFormat(audio_output_t *p_aout, AudioStreamID i_stream_id, AudioStreamBasicDescription change_format)
 {
     OSStatus err = noErr;
-    int retValue = true;
+    int retValue = false;
 
     AudioObjectPropertyAddress physicalFormatAddress = { kAudioStreamPropertyPhysicalFormat, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
 
@@ -1893,11 +1895,11 @@ static int AudioStreamChangeFormat(audio_output_t *p_aout, AudioStreamID i_strea
 
     /* The AudioStreamSetProperty is not only asynchronious (requiring the locks)
      * it is also not atomic in its behaviour.
-     * Therefore we check 5 times before we really give up.
-     * FIXME: failing isn't actually implemented yet. */
+     * Therefore we check 9 times before we really give up.
+     */
     AudioStreamBasicDescription actual_format;
     UInt32 i_param_size = sizeof(AudioStreamBasicDescription);
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 9; i++) {
         /* Callback is not always invoked. So first check if format is already set. */
         if (i > 0) {
             mtime_t timeout = mdate() + 500000;
@@ -1912,6 +1914,7 @@ static int AudioStreamChangeFormat(audio_output_t *p_aout, AudioStreamID i_strea
             actual_format.mFormatID == change_format.mFormatID &&
             actual_format.mFramesPerPacket == change_format.mFramesPerPacket) {
             /* The right format is now active */
+            retValue = true;
             break;
         }
 
@@ -1919,6 +1922,8 @@ static int AudioStreamChangeFormat(audio_output_t *p_aout, AudioStreamID i_strea
     }
 
 out:
+    vlc_mutex_unlock(&w.lock);
+
     /* Removing the property listener */
     err = AudioObjectRemovePropertyListener(i_stream_id, &physicalFormatAddress, StreamListener, (void *)&w);
     if (err != noErr) {
@@ -1926,8 +1931,6 @@ out:
         retValue = false;
     }
 
-    /* Destroy the lock and condition */
-    vlc_mutex_unlock(&w.lock);
     vlc_mutex_destroy(&w.lock);
     vlc_cond_destroy(&w.cond);
 
