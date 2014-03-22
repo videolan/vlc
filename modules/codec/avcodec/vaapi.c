@@ -1,8 +1,8 @@
 /*****************************************************************************
  * vaapi.c: VAAPI helpers for the libavcodec decoder
  *****************************************************************************
- * Copyright (C) 2009 Laurent Aimar
- * $Id$
+ * Copyright (C) 2009-2010 Laurent Aimar
+ * Copyright (C) 2012-2014 Rémi Denis-Courmont
  *
  * Authors: Laurent Aimar <fenrir_AT_ videolan _DOT_ org>
  *
@@ -218,7 +218,11 @@ static int Open( vlc_va_t *va, int i_codec_id, int i_thread_count )
     return VLC_SUCCESS;
 
 error:
-#warning Leaks!
+    if( sys->p_display != NULL )
+        vaTerminate( sys->p_display );
+    if( sys->p_display_x11 != NULL )
+        XCloseDisplay( sys->p_display_x11 );
+    free( sys );
     return VLC_EGENERIC;
 }
 
@@ -527,10 +531,8 @@ static void Close( vlc_va_sys_t *sys )
 
     if( sys->i_config_id != VA_INVALID_ID )
         vaDestroyConfig( sys->p_display, sys->i_config_id );
-    if( sys->p_display )
-        vaTerminate( sys->p_display );
-    if( sys->p_display_x11 )
-        XCloseDisplay( sys->p_display_x11 );
+    vaTerminate( sys->p_display );
+    XCloseDisplay( sys->p_display_x11 );
 }
 
 static void Delete( vlc_va_t *va )
