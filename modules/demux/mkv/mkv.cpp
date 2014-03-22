@@ -705,8 +705,7 @@ static int Demux( demux_t *p_demux)
         vlc_mutex_unlock( &p_sys->lock_demuxer );
         return 0;
     }
-    int                i_block_count = 0;
-    int                i_return = 0;
+    int i_return = 0;
 
     for( ;; )
     {
@@ -792,14 +791,9 @@ static int Demux( demux_t *p_demux)
         BlockDecode( p_demux, block, simpleblock, p_sys->i_pts, i_block_duration, b_key_picture || b_discardable_picture );
 
         delete block;
-        i_block_count++;
 
-        // TODO optimize when there is need to leave or when seeking has been called
-        if( i_block_count > 5 )
-        {
-            i_return = 1;
-            break;
-        }
+        vlc_mutex_unlock( &p_sys->lock_demuxer );
+        return 1;
     }
 
     vlc_mutex_unlock( &p_sys->lock_demuxer );
