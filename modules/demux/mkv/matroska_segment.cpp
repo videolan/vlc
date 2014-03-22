@@ -189,6 +189,16 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                                 cbnum.ReadData( es.I_O() );
                                 idx.i_block_number = uint32( cbnum );
                             }
+#if LIBMATROSKA_VERSION >= 0x010401
+                            else if( MKV_IS_ID( el, KaxCueRelativePosition ) )
+                            {
+                                /* For future use */
+                            }
+                            else if( MKV_IS_ID( el, KaxCueDuration ) )
+                            {
+                                /* For future use */
+                            }
+#endif
                             else
                             {
                                 msg_Dbg( &sys.demuxer, "         * Unknown (%s)", typeid(*el).name() );
