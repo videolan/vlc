@@ -475,11 +475,7 @@ static int vlclua_node_add_subnode( lua_State *L )
 /*****************************************************************************
  *
  *****************************************************************************/
-static const luaL_Reg vlclua_sd_reg[] = {
-    { "get_services_names", vlclua_sd_get_services_names },
-    { "add", vlclua_sd_add },
-    { "remove", vlclua_sd_remove },
-    { "is_loaded", vlclua_sd_is_loaded },
+static const luaL_Reg vlclua_sd_sd_reg[] = {
     { "add_node", vlclua_sd_add_node },
     { "add_item", vlclua_sd_add_item },
     { "remove_item", vlclua_sd_remove_item },
@@ -488,9 +484,24 @@ static const luaL_Reg vlclua_sd_reg[] = {
     { NULL, NULL }
 };
 
-void luaopen_sd( lua_State *L )
+void luaopen_sd_sd( lua_State *L )
 {
     lua_newtable( L );
-    luaL_register( L, NULL, vlclua_sd_reg );
+    luaL_register( L, NULL, vlclua_sd_sd_reg );
+    lua_setfield( L, -2, "sd" );
+}
+
+static const luaL_Reg vlclua_sd_intf_reg[] = {
+    { "get_services_names", vlclua_sd_get_services_names },
+    { "add", vlclua_sd_add },
+    { "remove", vlclua_sd_remove },
+    { "is_loaded", vlclua_sd_is_loaded },
+    { NULL, NULL }
+};
+
+void luaopen_sd_intf( lua_State *L )
+{
+    lua_newtable( L );
+    luaL_register( L, NULL, vlclua_sd_intf_reg );
     lua_setfield( L, -2, "sd" );
 }

@@ -110,7 +110,7 @@ int Open_LuaSD( vlc_object_t *p_this )
     luaopen_input( L );
     luaopen_msg( L );
     luaopen_object( L );
-    luaopen_sd( L );
+    luaopen_sd_sd( L );
     luaopen_strings( L );
     luaopen_variables( L );
     luaopen_stream( L );

@@ -310,13 +310,19 @@ playlist.move( id_item, id_where ): take id_item and if id_where has children, i
 
 FIXME: add methods to get an item's meta, options, es ...
 
-SD
---
+Services discovery
+------------------
+
+Interfaces and extensions can use the following SD functions:
+
 sd.get_services_names(): Get a table of all available service discovery
   modules. The module name is used as key, the long name is used as value.
 sd.add( name ): Add service discovery.
 sd.remove( name ): Remove service discovery.
 sd.is_loaded( name ): Check if service discovery is loaded.
+
+Services discovery scripts can use the following SD functions:
+
 sd.add_node( ... ): Add a node to the service discovery.
   The node object has the following members:
       .title: the node's name
