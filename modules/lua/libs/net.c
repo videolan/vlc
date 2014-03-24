@@ -544,17 +544,3 @@ void vlclua_fd_cleanup( vlclua_dtable_t *dt )
     close( dt->fd[0] );
 #endif
 }
-
-static const luaL_Reg vlclua_net_generic_reg[] = {
-    { "url_parse", vlclua_url_parse },
-    { "stat", vlclua_stat }, /* Not really "net" */
-    { "opendir", vlclua_opendir }, /* Not really "net" */
-    { NULL, NULL }
-};
-
-void luaopen_net_generic( lua_State *L )
-{
-    lua_newtable( L );
-    luaL_register( L, NULL, vlclua_net_generic_reg );
-    lua_setfield( L, -2, "net" );
-}
