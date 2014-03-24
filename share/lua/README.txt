@@ -160,7 +160,7 @@ misc.quit(): Quit VLC.
 Net
 ---
 ----------------------------------------------------------------
-/!\ NB: this namespace is ONLY usable for interfaces.
+/!\ NB: this namespace is ONLY usable for interfaces and extensions.
 ---
 ----------------------------------------------------------------
 net.url_parse( url, [option delimiter] ): Parse URL. Returns a table with

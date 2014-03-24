@@ -28,6 +28,7 @@
 /* I don't want to include lua headers here */
 typedef struct lua_State lua_State;
 
+#include "vlc.h"
 #include "extension.h"
 #include "assert.h"
 

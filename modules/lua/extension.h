@@ -69,6 +69,8 @@ struct extension_sys_t
     /* Lua specific */
     lua_State *L;
 
+    vlclua_dtable_t dtable;
+
     /* Thread data */
     vlc_thread_t thread;
     vlc_mutex_t command_lock;
