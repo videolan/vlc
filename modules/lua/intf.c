@@ -223,8 +223,6 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
     }
     p_intf->p_sys = p_sys;
 
-    vlclua_fd_init( p_sys );
-
     p_sys->psz_filename = vlclua_find_file( "intf", name );
     if( !p_sys->psz_filename )
     {
@@ -255,7 +253,11 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
     luaopen_input( L );
     luaopen_msg( L );
     luaopen_misc( L );
-    luaopen_net_intf( L );
+    if( vlclua_fd_init( L, &p_sys->dtable ) )
+    {
+        lua_close( L );
+        goto error;
+    }
     luaopen_object( L );
     luaopen_osd( L );
     luaopen_playlist( L );
@@ -364,20 +366,9 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
 
     p_sys->L = L;
 
-#ifndef _WIN32
-    if( vlc_pipe( p_sys->fd ) )
-    {
-        lua_close( p_sys->L );
-        goto error;
-    }
-#else
-# define close(fd) (void)0
-#endif
-
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
-        close( p_sys->fd[1] );
-        close( p_sys->fd[0] );
+        vlclua_fd_cleanup( &p_sys->dtable );
         lua_close( p_sys->L );
         goto error;
     }
@@ -396,12 +387,11 @@ void Close_LuaIntf( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     intf_sys_t *p_sys = p_intf->p_sys;
 
-    close( p_sys->fd[1] );
+    vlclua_fd_interrupt( &p_sys->dtable );
     vlc_join( p_sys->thread, NULL );
 
+    vlclua_fd_cleanup( &p_sys->dtable );
     lua_close( p_sys->L );
-    close( p_sys->fd[0] );
-    vlclua_fd_destroy( p_sys );
     free( p_sys->psz_filename );
     free( p_sys );
 }

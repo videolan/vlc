@@ -42,50 +42,40 @@
 #include <vlc_network.h>
 #include <vlc_url.h>
 #include <vlc_fs.h>
-#include <vlc_interface.h>
 
 #include "../vlc.h"
 #include "../libs.h"
+#include "misc.h"
 
-void vlclua_fd_init( intf_sys_t *sys )
+static vlclua_dtable_t *vlclua_get_dtable( lua_State *L )
 {
-    sys->fdv = NULL;
-    sys->fdc = 0;
-}
-
-/** Releases all (leaked) VLC Lua file descriptors. */
-void vlclua_fd_destroy( intf_sys_t *sys )
-{
-    for( unsigned i = 0; i < sys->fdc; i++ )
-         net_Close( sys->fdv[i] );
-    free( sys->fdv );
+    return vlclua_get_object( L, vlclua_get_dtable );
 }
 
 /** Maps an OS file descriptor to a VLC Lua file descriptor */
 static int vlclua_fd_map( lua_State *L, int fd )
 {
-    intf_thread_t *intf = (intf_thread_t *)vlclua_get_this( L );
-    intf_sys_t *sys = intf->p_sys;
+    vlclua_dtable_t *dt = vlclua_get_dtable( L );
 
     if( (unsigned)fd < 3u )
         return -1;
 
 #ifndef NDEBUG
-    for( unsigned i = 0; i < sys->fdc; i++ )
-        assert( sys->fdv[i] != fd );
+    for( unsigned i = 0; i < dt->fdc; i++ )
+        assert( dt->fdv[i] != fd );
 #endif
 
-    if( sys->fdc >= 64 )
+    if( dt->fdc >= 64 )
         return -1;
 
-    int *fdv = realloc( sys->fdv, (sys->fdc + 1) * sizeof (sys->fdv[0]) );
+    int *fdv = realloc( dt->fdv, (dt->fdc + 1) * sizeof (dt->fdv[0]) );
     if( unlikely(fdv == NULL) )
         return -1;
 
-    sys->fdv = fdv;
-    sys->fdv[sys->fdc] = fd;
-    fd = 3 + sys->fdc;
-    sys->fdc++;
+    dt->fdv = fdv;
+    dt->fdv[dt->fdc] = fd;
+    fd = 3 + dt->fdc;
+    dt->fdc++;
     return fd;
 }
 
@@ -100,25 +90,23 @@ static int vlclua_fd_map_safe( lua_State *L, int fd )
 /** Gets the OS file descriptor mapped to a VLC Lua file descriptor */
 static int vlclua_fd_get( lua_State *L, unsigned idx )
 {
-    intf_thread_t *intf = (intf_thread_t *)vlclua_get_this( L );
-    intf_sys_t *sys = intf->p_sys;
+    vlclua_dtable_t *dt = vlclua_get_dtable( L );
 
     if( idx < 3u )
         return idx;
     idx -= 3;
-    return (idx < sys->fdc) ? sys->fdv[idx] : -1;
+    return (idx < dt->fdc) ? dt->fdv[idx] : -1;
 }
 
 /** Gets the VLC Lua file descriptor mapped from an OS file descriptor */
 static int vlclua_fd_get_lua( lua_State *L, int fd )
 {
-    intf_thread_t *intf = (intf_thread_t *)vlclua_get_this( L );
-    intf_sys_t *sys = intf->p_sys;
+    vlclua_dtable_t *dt = vlclua_get_dtable( L );
 
     if( (unsigned)fd < 3u )
         return fd;
-    for( unsigned i = 0; i < sys->fdc; i++ )
-        if( sys->fdv[i] == fd )
+    for( unsigned i = 0; i < dt->fdc; i++ )
+        if( dt->fdv[i] == fd )
             return 3 + i;
     return -1;
 }
@@ -126,25 +114,24 @@ static int vlclua_fd_get_lua( lua_State *L, int fd )
 /** Unmaps an OS file descriptor from VLC Lua */
 static void vlclua_fd_unmap( lua_State *L, unsigned idx )
 {
-    intf_thread_t *intf = (intf_thread_t *)vlclua_get_this( L );
-    intf_sys_t *sys = intf->p_sys;
+    vlclua_dtable_t *dt = vlclua_get_dtable( L );
     int fd = -1;
 
     if( idx < 3u )
         return; /* Never close stdin/stdout/stderr. */
 
     idx -= 3;
-    if( idx >= sys->fdc )
+    if( idx >= dt->fdc )
         return;
 
-    fd = sys->fdv[idx];
-    sys->fdc--;
-    memmove( sys->fdv + idx, sys->fdv + idx + 1,
-             (sys->fdc - idx) * sizeof (sys->fdv[0]) );
+    fd = dt->fdv[idx];
+    dt->fdc--;
+    memmove( dt->fdv + idx, dt->fdv + idx + 1,
+             (dt->fdc - idx) * sizeof (dt->fdv[0]) );
     /* realloc() not really needed */
 #ifndef NDEBUG
-    for( unsigned i = 0; i < sys->fdc; i++ )
-        assert( sys->fdv[i] != fd );
+    for( unsigned i = 0; i < dt->fdc; i++ )
+        assert( dt->fdv[i] != fd );
 #endif
 }
 
@@ -322,8 +309,7 @@ static int vlclua_net_recv( lua_State *L )
 /* Takes a { fd : events } table as first arg and modifies it to { fd : revents } */
 static int vlclua_net_poll( lua_State *L )
 {
-    intf_thread_t *intf = (intf_thread_t *)vlclua_get_this( L );
-    intf_sys_t *sys = intf->p_sys;
+    vlclua_dtable_t *dt = vlclua_get_dtable( L );
 
     luaL_checktype( L, 1, LUA_TTABLE );
 
@@ -340,7 +326,7 @@ static int vlclua_net_poll( lua_State *L )
 
     lua_pushnil( L );
     int i = 1;
-    p_fds[0].fd = sys->fd[0];
+    p_fds[0].fd = dt->fd[0];
     p_fds[0].events = POLLIN;
     while( lua_next( L, 1 ) )
     {
@@ -509,7 +495,7 @@ static const luaL_Reg vlclua_net_intf_reg[] = {
     { NULL, NULL }
 };
 
-void luaopen_net_intf( lua_State *L )
+static void luaopen_net_intf( lua_State *L )
 {
     lua_newtable( L );
     luaL_register( L, NULL, vlclua_net_intf_reg );
@@ -523,6 +509,40 @@ void luaopen_net_intf( lua_State *L )
     ADD_CONSTANT( HUP )
     ADD_CONSTANT( NVAL )
     lua_setfield( L, -2, "net" );
+}
+
+int vlclua_fd_init( lua_State *L, vlclua_dtable_t *dt )
+{
+#ifndef _WIN32
+    if( vlc_pipe( dt->fd ) )
+        return -1;
+#endif
+    dt->fdv = NULL;
+    dt->fdc = 0;
+    vlclua_set_object( L, vlclua_get_dtable, dt );
+    luaopen_net_intf( L );
+    return 0;
+}
+
+void vlclua_fd_interrupt( vlclua_dtable_t *dt )
+{
+#ifndef _WIN32
+    close( dt->fd[1] );
+    dt->fd[1] = -1;
+#endif
+}
+
+/** Releases all (leaked) VLC Lua file descriptors. */
+void vlclua_fd_cleanup( vlclua_dtable_t *dt )
+{
+    for( unsigned i = 0; i < dt->fdc; i++ )
+         net_Close( dt->fdv[i] );
+    free( dt->fdv );
+#ifndef _WIN32
+    if( dt->fd[1] != -1 )
+        close( dt->fd[1] );
+    close( dt->fd[0] );
+#endif
 }
 
 static const luaL_Reg vlclua_net_generic_reg[] = {

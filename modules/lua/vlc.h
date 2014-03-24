@@ -155,23 +155,31 @@ int vlclua_playlist_add_internal( vlc_object_t *, lua_State *, playlist_t *,
 int vlclua_add_modules_path( lua_State *, const char *psz_filename );
 
 /**
+ * File descriptors table
+ */
+typedef struct
+{
+    int *fdv;
+    unsigned fdc;
+#ifndef _WIN32
+    int fd[2];
+#endif
+} vlclua_dtable_t;
+
+int vlclua_fd_init( lua_State *, vlclua_dtable_t * );
+void vlclua_fd_interrupt( vlclua_dtable_t * );
+void vlclua_fd_cleanup( vlclua_dtable_t * );
+
+/**
  * Per-interface private state
  */
 struct intf_sys_t
 {
     char *psz_filename;
     lua_State *L;
-#ifndef _WIN32
-    int fd[2];
-#endif
-    int *fdv;
-    unsigned fdc;
-
     vlc_thread_t thread;
+    vlclua_dtable_t dtable;
 };
-
-void vlclua_fd_init( struct intf_sys_t * );
-void vlclua_fd_destroy( struct intf_sys_t * );
 
 #endif /* VLC_LUA_H */
 
