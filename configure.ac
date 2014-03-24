@@ -2421,7 +2421,13 @@ AS_IF([test "${enable_vda}" != "no"], [
       AC_MSG_ERROR([--enable-vda and --disable-avcodec options are mutually exclusive.])
     ])
  ])
-  fi
+ AS_IF([test "${have_avcodec_vda}" = "yes"], [
+     SAVE_LIBS=$LIBS
+     LIBS="$LIBS $AVCODEC_LIBS"
+     AC_CHECK_FUNCS([av_vda_alloc_context])
+     LIBS=$SAVE_LIBS
+ ])
+ fi
 ])
 AM_CONDITIONAL([HAVE_AVCODEC_VDA], [test "${have_avcodec_vda}" = "yes"])
 
