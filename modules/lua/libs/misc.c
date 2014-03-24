@@ -42,18 +42,19 @@
 
 #include "../vlc.h"
 #include "../libs.h"
+#include "misc.h"
 
 /*****************************************************************************
  * Internal lua<->vlc utils
  *****************************************************************************/
-static void vlclua_set_object( lua_State *L, void *id, void *value )
+void vlclua_set_object( lua_State *L, void *id, void *value )
 {
     lua_pushlightuserdata( L, id );
     lua_pushlightuserdata( L, value );
     lua_rawset( L, LUA_REGISTRYINDEX );
 }
 
-static void *vlclua_get_object( lua_State *L, void *id )
+void *vlclua_get_object( lua_State *L, void *id )
 {
     lua_pushlightuserdata( L, id );
     lua_rawget( L, LUA_REGISTRYINDEX );
@@ -71,16 +72,6 @@ void vlclua_set_this( lua_State *L, vlc_object_t *p_this )
 vlc_object_t * vlclua_get_this( lua_State *L )
 {
     return vlclua_get_object( L, vlclua_set_this );
-}
-
-void vlclua_set_playlist_internal( lua_State *L, playlist_t *pl )
-{
-    vlclua_set_object( L, vlclua_set_playlist_internal, pl );
-}
-
-playlist_t *vlclua_get_playlist_internal( lua_State *L )
-{
-    return vlclua_get_object( L, vlclua_set_playlist_internal );
 }
 
 /*****************************************************************************

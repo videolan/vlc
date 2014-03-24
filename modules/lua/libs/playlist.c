@@ -41,6 +41,17 @@
 #include "../libs.h"
 #include "input.h"
 #include "variables.h"
+#include "misc.h"
+
+void vlclua_set_playlist_internal( lua_State *L, playlist_t *pl )
+{
+    vlclua_set_object( L, vlclua_set_playlist_internal, pl );
+}
+
+playlist_t *vlclua_get_playlist_internal( lua_State *L )
+{
+    return vlclua_get_object( L, vlclua_set_playlist_internal );
+}
 
 static int vlclua_playlist_prev( lua_State * L )
 {
