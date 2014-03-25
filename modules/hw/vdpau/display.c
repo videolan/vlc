@@ -470,13 +470,17 @@ static int Open(vlc_object_t *obj)
         msg_Dbg(vd, "using back-end %s", info);
 
     /* Check source format */
+    video_format_t fmt;
     VdpChromaType chroma;
     VdpYCbCrFormat format;
-    if (vd->fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
-     || vd->fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_422)
+
+    video_format_ApplyRotation(&fmt, &vd->fmt);
+
+    if (fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
+     || fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_422)
         ;
     else
-    if (vlc_fourcc_to_vdp_ycc(vd->fmt.i_chroma, &chroma, &format))
+    if (vlc_fourcc_to_vdp_ycc(fmt.i_chroma, &chroma, &format))
     {
         uint32_t w, h;
         VdpBool ok;
@@ -489,7 +493,7 @@ static int Open(vlc_object_t *obj)
                     vdp_get_error_string(sys->vdp, err));
             goto error;
         }
-        if (!ok || w < vd->fmt.i_width || h < vd->fmt.i_height)
+        if (!ok || w < fmt.i_width || h < fmt.i_height)
         {
             msg_Err(vd, "source video %s not supported", "chroma type");
             goto error;
@@ -526,7 +530,7 @@ static int Open(vlc_object_t *obj)
                     vdp_get_error_string(sys->vdp, err));
             goto error;
         }
-        if (min > vd->fmt.i_width || vd->fmt.i_width > max)
+        if (min > fmt.i_width || fmt.i_width > max)
         {
             msg_Err(vd, "source video %s not supported", "width");
             goto error;
@@ -542,12 +546,13 @@ static int Open(vlc_object_t *obj)
                     vdp_get_error_string(sys->vdp, err));
             goto error;
         }
-        if (min > vd->fmt.i_height || vd->fmt.i_height > max)
+        if (min > fmt.i_height || fmt.i_height > max)
         {
             msg_Err(vd, "source video %s not supported", "height");
             goto error;
         }
     }
+    fmt.i_chroma = VLC_CODEC_VDPAU_OUTPUT;
 
     /* Select surface format */
     static const VdpRGBAFormat rgb_fmts[] = {
@@ -570,7 +575,7 @@ static int Open(vlc_object_t *obj)
             continue;
         }
         /* NOTE: Wrong! No warranties that zoom <= 100%! */
-        if (!ok || w < vd->fmt.i_width || h < vd->fmt.i_height)
+        if (!ok || w < fmt.i_width || h < fmt.i_height)
             continue;
 
         sys->rgb_fmt = rgb_fmts[i];
@@ -667,7 +672,7 @@ static int Open(vlc_object_t *obj)
     vd->info.has_pictures_invalid = true;
     vd->info.has_event_thread = true;
     vd->info.subpicture_chromas = spu_chromas;
-    vd->fmt.i_chroma = VLC_CODEC_VDPAU_OUTPUT;
+    vd->fmt = fmt;
 
     vd->pool = Pool;
     vd->prepare = Queue;
