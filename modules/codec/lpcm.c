@@ -1117,10 +1117,12 @@ static void BdExtract( block_t *p_aout_buffer, block_t *p_block,
             if (i_bits == 16) {
                 swab( p_src, p_dst, (i_channels + i_channels_padding) * i_bits / 8 );
             } else {
-                p_dst[0] = 0;
-                p_dst[1] = p_src[2];
-                p_dst[2] = p_src[1];
-                p_dst[3] = p_src[0];
+                for (unsigned i = 0; i < i_channels; ++i) {
+                    p_dst[i * 4] = 0;
+                    p_dst[1 + (i * 4)] = p_src[2 + (i * 3)];
+                    p_dst[2 + (i * 4)] = p_src[1 + (i * 3)];
+                    p_dst[3 + (i * 4)] = p_src[i * 3];
+                }
             }
 #endif
             p_src += (i_channels + i_channels_padding) * i_bits / 8;
