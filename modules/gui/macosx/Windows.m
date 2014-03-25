@@ -1074,6 +1074,7 @@
     }
 
     b_in_fullscreen_transition = YES;
+    [self setFullscreen:NO];
 
     [self setAlphaValue: 0.0];
     [self orderFront: self];
@@ -1119,7 +1120,6 @@
 
 - (void)hasEndedFullscreen
 {
-    [self setFullscreen:NO];
     b_in_fullscreen_transition = NO;
 
     /* This function is private and should be only triggered at the end of the fullscreen change animation */
