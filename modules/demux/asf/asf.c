@@ -658,15 +658,19 @@ static void ParsePayloadExtensions(demux_t *p_demux, asf_track_t *tk,
             uint8_t i_ratio_y = *(p_data + 1);
             if ( tk->p_fmt->video.i_sar_num != i_ratio_x || tk->p_fmt->video.i_sar_den != i_ratio_y )
             {
-                vout_thread_t *p_vout = input_GetVout( p_demux->p_input );
-                if ( p_vout )
+                /* Only apply if origin pixel size >= 1x1, due to broken yacast */
+                if ( tk->p_fmt->video.i_height * i_ratio_x > tk->p_fmt->video.i_width * i_ratio_y )
                 {
-                    msg_Info( p_demux, "Changing aspect ratio to %i/%i", i_ratio_x, i_ratio_y );
-                    tk->p_fmt->video.i_sar_num = i_ratio_x;
-                    tk->p_fmt->video.i_sar_den = i_ratio_y;
-                    vout_ChangeAspectRatio( p_vout, i_ratio_x, i_ratio_y );
-                    vlc_object_release( p_vout );
+                    vout_thread_t *p_vout = input_GetVout( p_demux->p_input );
+                    if ( p_vout )
+                    {
+                        msg_Info( p_demux, "Changing aspect ratio to %i/%i", i_ratio_x, i_ratio_y );
+                        vout_ChangeAspectRatio( p_vout, i_ratio_x, i_ratio_y );
+                        vlc_object_release( p_vout );
+                    }
                 }
+                tk->p_fmt->video.i_sar_num = i_ratio_x;
+                tk->p_fmt->video.i_sar_den = i_ratio_y;
             }
         }
         i_length -= i_payload_extensions_size;
