@@ -76,12 +76,12 @@ PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
     QVBoxLayout *layout = new QVBoxLayout( this );
     tabs = new QTabWidget( this );
+    tabs->addTab( addonsTab = new AddonsTab( p_intf ),
+                  qtr( "Addons Manager" ) );
     tabs->addTab( extensionTab = new ExtensionTab( p_intf ),
                   qtr( "Active Extensions" ) );
     tabs->addTab( pluginTab = new PluginTab( p_intf ),
                   qtr( "Plugins" ) );
-    tabs->addTab( addonsTab = new AddonsTab( p_intf ),
-                  qtr( "Addons Manager" ) );
     layout->addWidget( tabs );
 
     QDialogButtonBox *box = new QDialogButtonBox;
@@ -219,12 +219,6 @@ ExtensionTab::ExtensionTab( intf_thread_t *p_intf_ )
 {
     // Layout
     QVBoxLayout *layout = new QVBoxLayout( this );
-
-    QLabel *notice = new QLabel( qtr("Get more extensions from")
-            + QString( " <a href=\"http://addons.videolan.org/\">"
-                       "addons.videolan.org</a>." ) );
-    notice->setOpenExternalLinks( true );
-    layout->addWidget( notice );
 
     // ListView
     extList = new QListView( this );
