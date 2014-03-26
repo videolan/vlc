@@ -771,7 +771,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (IBAction)toggleWindow:(id)sender
 {
-    if ([o_window isVisible])
+    if ([o_window isKeyWindow])
         [o_window orderOut:sender];
     else {
         [o_window setLevel: [[[VLCMain sharedInstance] voutController] currentWindowLevel]];
