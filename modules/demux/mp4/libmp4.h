@@ -261,6 +261,7 @@
 
 #define ATOM_meta VLC_FOURCC( 'm', 'e', 't', 'a' )
 #define ATOM_ilst VLC_FOURCC( 'i', 'l', 's', 't' )
+#define ATOM_covr VLC_FOURCC( 'c', 'o', 'v', 'r' )
 
 #define ATOM_chap VLC_FOURCC( 'c', 'h', 'a', 'p' )
 
@@ -1164,6 +1165,12 @@ typedef struct
     uint8_t *p_hvcC;
 } MP4_Box_data_hvcC_t;
 
+typedef struct
+{
+    uint8_t *p_blob;
+    uint32_t i_blob;
+} MP4_Box_data_data_t;
+
 /*
 typedef struct MP4_Box_data__s
 {
@@ -1249,6 +1256,8 @@ typedef union MP4_Box_data_s
     MP4_Box_data_tfrf_t *p_tfrf;
     MP4_Box_data_tfxd_t *p_tfxd;
     MP4_Box_data_hvcC_t *p_hvcC;
+
+    MP4_Box_data_data_t *p_data;
 
     void                *p_payload; /* for unknow type */
 } MP4_Box_data_t;

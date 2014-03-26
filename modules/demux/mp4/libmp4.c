@@ -2622,6 +2622,29 @@ static void MP4_FreeBox_name( MP4_Box_t *p_box )
     FREENULL( p_box->data.p_name->psz_text );
 }
 
+static int MP4_ReadBox_data( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_data_t );
+
+    /* What's that header ?? */
+    if ( i_read <= 8 )
+        MP4_READBOX_EXIT( 0 );
+
+    p_box->data.p_data->p_blob = malloc( i_read - 8 );
+    if ( !p_box->data.p_data->p_blob )
+        MP4_READBOX_EXIT( 0 );
+
+    p_box->data.p_data->i_blob = i_read - 8;
+    memcpy( p_box->data.p_data->p_blob, p_peek + 8, i_read - 8 );
+
+    MP4_READBOX_EXIT( 1 );
+}
+
+static void MP4_FreeBox_data( MP4_Box_t *p_box )
+{
+    free( p_box->data.p_data->p_blob );
+}
+
 static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
 {
     uint16_t i16;
@@ -3380,6 +3403,8 @@ static const struct
     /* iTunes/Quicktime meta info */
     { ATOM_meta,    MP4_ReadBox_meta,         MP4_FreeBox_Common },
     { ATOM_name,    MP4_ReadBox_name,         MP4_FreeBox_name },
+    { ATOM_covr,    MP4_ReadBoxContainer,     MP4_FreeBox_Common },
+    { ATOM_data,    MP4_ReadBox_data,         MP4_FreeBox_data },
 
     /* found in smoothstreaming */
     { ATOM_traf,    MP4_ReadBoxContainer,     MP4_FreeBox_Common },

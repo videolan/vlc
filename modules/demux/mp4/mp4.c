@@ -952,19 +952,89 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pf = p_sys->f_fps;
             return VLC_SUCCESS;
 
+        case DEMUX_GET_ATTACHMENTS:
+        {
+            input_attachment_t ***ppp_attach = va_arg( args, input_attachment_t*** );
+            int *pi_int = va_arg( args, int * );
+
+            MP4_Box_t  *p_covr = MP4_BoxGet( p_sys->p_root, "/moov/udta/meta/ilst/covr" );
+            if ( !p_covr ) return VLC_EGENERIC;
+            MP4_Box_t  *p_box;
+            int i_count = 0;
+
+            for( p_box = p_covr->p_first; p_box != NULL; p_box = p_box->p_next )
+            {
+                if ( p_box->i_type == ATOM_data && p_box->data.p_data->i_blob >= 16 )
+                    i_count++;
+            }
+
+            if ( i_count == 0 )
+                return VLC_EGENERIC;
+
+            *ppp_attach = (input_attachment_t**)
+                    malloc( sizeof(input_attachment_t*) * i_count );
+            if( !(*ppp_attach) ) return VLC_ENOMEM;
+            char *psz_mime;
+            char *psz_filename;
+            i_count = 0;
+            for( p_box = p_covr->p_first; p_box != NULL; p_box = p_box->p_next )
+            {
+                if ( p_box->i_type != ATOM_data || p_box->data.p_data->i_blob < 16 )
+                    continue;
+
+                if ( !memcmp( p_box->data.p_data->p_blob,
+                              "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A", 8 ) )
+                {
+                    psz_mime = strdup( "image/png" );
+                }
+                else if ( !memcmp( p_box->data.p_data->p_blob, "\xFF\xD8", 2 ) )
+                {
+                    psz_mime = strdup( "image/jpeg" );
+                }
+                else
+                {
+                    continue;
+                }
+
+                if ( asprintf( &psz_filename, "picture%u", i_count ) >= 0 )
+                {
+                    (*ppp_attach)[i_count++] =
+                        vlc_input_attachment_New( psz_filename, psz_mime, NULL,
+                            p_box->data.p_data->p_blob, p_box->data.p_data->i_blob );
+                    free( psz_filename );
+                }
+
+                free( psz_mime );
+            }
+
+            if ( i_count == 0 )
+            {
+                free( *ppp_attach );
+                return VLC_EGENERIC;
+            }
+
+            *pi_int = i_count;
+
+            return VLC_SUCCESS;
+        }
+
         case DEMUX_GET_META:
         {
             vlc_meta_t *p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t*);
             MP4_Box_t  *p_0xa9xxx;
 
+            MP4_Box_t *p_covr = MP4_BoxGet( p_sys->p_root, "/moov/udta/meta/ilst/covr/data[0]" );
+            if ( p_covr )
+                vlc_meta_SetArtURL( p_meta, "attachment://picture0" );
+
             MP4_Box_t  *p_udta = MP4_BoxGet( p_sys->p_root, "/moov/udta/meta/ilst" );
             if( p_udta == NULL )
             {
                 p_udta = MP4_BoxGet( p_sys->p_root, "/moov/udta" );
-                if( p_udta == NULL )
-                {
+                if( p_udta == NULL && p_covr == NULL )
                     return VLC_EGENERIC;
-                }
+                else
+                    return VLC_SUCCESS;
             }
 
             for( p_0xa9xxx = p_udta->p_first; p_0xa9xxx != NULL;
@@ -1146,7 +1216,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_NEXT_DEMUX_TIME:
         case DEMUX_SET_GROUP:
         case DEMUX_HAS_UNSUPPORTED_META:
-        case DEMUX_GET_ATTACHMENTS:
         case DEMUX_GET_PTS_DELAY:
         case DEMUX_CAN_RECORD:
             return VLC_EGENERIC;
