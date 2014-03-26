@@ -1250,7 +1250,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_tfxd_t *p_tfxd;
     MP4_Box_data_hvcC_t *p_hvcC;
 
-    void                *p_data; /* for unknow type */
+    void                *p_payload; /* for unknow type */
 } MP4_Box_data_t;
 
 
@@ -1431,7 +1431,7 @@ static inline size_t mp4_box_headersize( MP4_Box_t *p_box )
     } \
     p_peek += mp4_box_headersize( p_box ); \
     i_read -= mp4_box_headersize( p_box ); \
-    if( !( p_box->data.p_data = calloc( 1, sizeof( MP4_Box_data_TYPE_t ) ) ) ) \
+    if( !( p_box->data.p_payload = calloc( 1, sizeof( MP4_Box_data_TYPE_t ) ) ) ) \
     { \
         free( p_buff ); \
         return( 0 ); \

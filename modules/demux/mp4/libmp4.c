@@ -90,7 +90,7 @@ int MP4_ReadBoxCommon( stream_t *p_stream, MP4_Box_t *p_box )
     }
     p_box->i_pos = stream_Tell( p_stream );
 
-    p_box->data.p_data = NULL;
+    p_box->data.p_payload = NULL;
     p_box->p_father = NULL;
     p_box->p_first  = NULL;
     p_box->p_last  = NULL;
@@ -3467,7 +3467,7 @@ void MP4_BoxFree( stream_t *s, MP4_Box_t *p_box )
     }
 
     /* Now search function to call */
-    if( p_box->data.p_data )
+    if( p_box->data.p_payload )
     {
         for( i_index = 0; ; i_index++ )
         {
@@ -3493,7 +3493,7 @@ void MP4_BoxFree( stream_t *s, MP4_Box_t *p_box )
         {
             MP4_Box_Function[i_index].MP4_FreeBox_function( p_box );
         }
-        free( p_box->data.p_data );
+        free( p_box->data.p_payload );
     }
     free( p_box );
 }
@@ -3591,7 +3591,7 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *s )
     p_root->i_size = 0;
     CreateUUID( &p_root->i_uuid, p_root->i_type );
 
-    p_root->data.p_data = NULL;
+    p_root->data.p_payload = NULL;
     p_root->p_father    = NULL;
     p_root->p_first     = NULL;
     p_root->p_last      = NULL;

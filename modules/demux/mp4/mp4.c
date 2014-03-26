@@ -1656,7 +1656,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                             i_sample_description_index - 1 );
 
     if( !p_sample ||
-        ( !p_sample->data.p_data && p_track->fmt.i_cat != SPU_ES ) )
+        ( !p_sample->data.p_payload && p_track->fmt.i_cat != SPU_ES ) )
     {
         msg_Warn( p_demux, "cannot find SampleEntry (track[Id 0x%x])",
                   p_track->i_track_ID );
