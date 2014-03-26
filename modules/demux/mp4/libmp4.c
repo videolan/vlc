@@ -503,6 +503,7 @@ static int MP4_ReadBox_stra( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_Box_data_stra_t *p_stra = p_box->data.p_stra;
 
     uint8_t i_reserved;
+    VLC_UNUSED(i_reserved);
     MP4_GET1BYTE( p_stra->i_es_cat );
     MP4_GET1BYTE( i_reserved );
     MP4_GET2BYTES( p_stra->i_track_ID );
@@ -595,6 +596,7 @@ static int MP4_ReadBox_sidx(  stream_t *p_stream, MP4_Box_t *p_box )
     }
 
     uint16_t i_reserved;
+    VLC_UNUSED(i_reserved);
     MP4_GET2BYTES( i_reserved );
     MP4_GET2BYTES( p_sidx_data->i_reference_count );
     uint16_t i_count = p_sidx_data->i_reference_count;
@@ -907,6 +909,7 @@ static int MP4_ReadBox_mdhd( stream_t *p_stream, MP4_Box_t *p_box )
 static int MP4_ReadBox_hdlr( stream_t *p_stream, MP4_Box_t *p_box )
 {
     int32_t i_reserved;
+    VLC_UNUSED(i_reserved);
 
     MP4_READBOX_ENTER( MP4_Box_data_hdlr_t );
 
@@ -1532,7 +1535,9 @@ static int MP4_ReadBox_gnre( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_READBOX_EXIT( 0 );
 
     uint32_t i_version;
+    VLC_UNUSED(i_version);
     uint32_t i_reserved;
+    VLC_UNUSED(i_reserved);
     MP4_GET4BYTES( i_version );
     MP4_GET4BYTES( i_reserved );
     MP4_GET2BYTES( p_gnre->i_genre );
@@ -1561,7 +1566,9 @@ static int MP4_ReadBox_trkn( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_READBOX_EXIT( 0 );
 
     uint32_t i_version;
+    VLC_UNUSED(i_version);
     uint32_t i_reserved;
+    VLC_UNUSED(i_reserved);
     MP4_GET4BYTES( i_version );
     MP4_GET4BYTES( i_reserved );
     MP4_GET2BYTES( i_reserved );
@@ -1579,7 +1586,6 @@ static int MP4_ReadBox_trkn( stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_READBOX_EXIT( 1 );
 }
-
 
 static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
 {
@@ -2694,6 +2700,7 @@ static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
             /* data box contains a version/flags field */
             uint32_t i_version;
             uint32_t i_reserved;
+            VLC_UNUSED(i_reserved);
             MP4_GET4BYTES( i_version );
             MP4_GET4BYTES( i_reserved );
             // version should be 0, flags should be 1 for text, 0 for data
@@ -2741,6 +2748,7 @@ static int MP4_ReadBox_chpl( stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_Box_data_chpl_t *p_chpl;
     uint32_t i_dummy;
+    VLC_UNUSED(i_dummy);
     int i;
     MP4_READBOX_ENTER( MP4_Box_data_chpl_t );
 
@@ -2851,6 +2859,7 @@ static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
 static int MP4_ReadBox_iods( stream_t *p_stream, MP4_Box_t *p_box )
 {
     char i_unused;
+    VLC_UNUSED(i_unused);
 
     MP4_READBOX_ENTER( MP4_Box_data_iods_t );
     MP4_GETVERSIONFLAGS( p_box->data.p_iods );
