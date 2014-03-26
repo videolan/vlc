@@ -89,7 +89,7 @@ static void HtmlAppend( char **ppsz_dst, const char *psz_src,
                         const segment_style_t *p_styles, const float f_scale )
 {
     if ( !ppsz_dst ) return;
-    int i_ignore; VLC_UNUSED(i_ignore);
+    int i_return;
     char *psz_subtext = NULL;
     char *psz_text = NULL;
     char *psz_fontsize = NULL;
@@ -100,14 +100,20 @@ static void HtmlAppend( char **ppsz_dst, const char *psz_src,
     MakeHtmlNewLines( &psz_encoded );
 
     if ( p_styles->i_color & 0xFF000000 ) //ARGB
-        i_ignore = asprintf( &psz_color, " color=\"#%6x\"",
+    {
+        i_return = asprintf( &psz_color, " color=\"#%6x\"",
                              p_styles->i_color & 0x00FFFFFF );
+        if ( i_return < 0 ) psz_color = NULL;
+    }
 
     if ( p_styles->i_fontsize > 0 && f_scale > 0 )
-        i_ignore = asprintf( &psz_fontsize, " size=\"%u\"",
+    {
+        i_return = asprintf( &psz_fontsize, " size=\"%u\"",
                              (unsigned) (f_scale * p_styles->i_fontsize) );
+        if ( i_return < 0 ) psz_fontsize = NULL;
+    }
 
-    i_ignore = asprintf( &psz_subtext, "%s%s%s%s%s%s%s",
+    i_return = asprintf( &psz_subtext, "%s%s%s%s%s%s%s",
                         ( p_styles->i_flags & STYLE_UNDERLINE ) ? "<u>" : "",
                         ( p_styles->i_flags & STYLE_BOLD ) ? "<b>" : "",
                         ( p_styles->i_flags & STYLE_ITALIC ) ? "<i>" : "",
@@ -116,13 +122,15 @@ static void HtmlAppend( char **ppsz_dst, const char *psz_src,
                         ( p_styles->i_flags & STYLE_BOLD ) ? "</b>" : "",
                         ( p_styles->i_flags & STYLE_UNDERLINE ) ? "</u>" : ""
                         );
+    if ( i_return < 0 ) psz_subtext = NULL;
 
     if ( psz_color || psz_fontsize )
     {
-        i_ignore = asprintf( &psz_text, "<font%s%s>%s</font>",
+        i_return = asprintf( &psz_text, "<font%s%s>%s</font>",
                             psz_color ? psz_color : "",
                             psz_fontsize ? psz_fontsize : "",
                             psz_subtext );
+        if ( i_return < 0 ) psz_text = NULL;
         free( psz_subtext );
     }
     else
@@ -136,7 +144,8 @@ static void HtmlAppend( char **ppsz_dst, const char *psz_src,
     if ( *ppsz_dst )
     {
         char *psz_dst = *ppsz_dst;
-        i_ignore = asprintf( ppsz_dst, "%s%s", psz_dst, psz_text );
+        i_return = asprintf( ppsz_dst, "%s%s", psz_dst, psz_text );
+        if ( i_return < 0 ) ppsz_dst = NULL;
         free( psz_dst );
         free( psz_text );
     }
@@ -153,8 +162,8 @@ static char *SegmentsToHtml( segment_t *p_head, const float f_scale )
         HtmlAppend( &psz_dst, p_head->psz_string, &p_head->styles, f_scale );
         p_head = p_head->p_next;
     }
-    int i_ignore = asprintf( &psz_ret, "<text>%s</text>", psz_dst );
-    VLC_UNUSED( i_ignore );
+    int i_ret = asprintf( &psz_ret, "<text>%s</text>", psz_dst );
+    if ( i_ret < 0 ) psz_ret = NULL;
     free( psz_dst );
     return psz_ret;
 }
