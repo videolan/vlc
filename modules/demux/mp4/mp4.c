@@ -1773,8 +1773,15 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         if( p_pasp && p_pasp->data.p_pasp->i_horizontal_spacing > 0 &&
                       p_pasp->data.p_pasp->i_vertical_spacing > 0 )
         {
-            p_track->fmt.video.i_sar_num = p_pasp->data.p_pasp->i_horizontal_spacing;
-            p_track->fmt.video.i_sar_den = p_pasp->data.p_pasp->i_vertical_spacing;
+            /* Convert pixel ratio to picture/display aspect ratio */
+            /* SAR * PAR -> DAR */
+            vlc_ureduce( &p_track->fmt.video.i_sar_num, &p_track->fmt.video.i_sar_den,
+                         (uint64_t) p_pasp->data.p_pasp->i_horizontal_spacing
+                                    * p_track->fmt.video.i_width,
+                         (uint64_t) p_pasp->data.p_pasp->i_vertical_spacing
+                                    * p_track->fmt.video.i_height,
+                         UINT32_MAX
+                         );
         }
 
         /* Support for cropping (eg. in H263 files) */
