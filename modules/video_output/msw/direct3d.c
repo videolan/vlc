@@ -1316,31 +1316,112 @@ static void Direct3DDestroyShaders(vout_display_t *vd)
     sys->d3dx_shader = NULL;
 }
 
+/**
+ * Compute the vertex ordering needed to rotate the video. Without
+ * rotation, the vertices of the rectangle are defined in a clockwise
+ * order. This function computes a remapping of the coordinates to
+ * implement the rotation, given fixed texture coordinates.
+ * The unrotated order is the following:
+ * 0--1
+ * |  |
+ * 3--2
+ * For a 180 degrees rotation it should like this:
+ * 2--3
+ * |  |
+ * 1--0
+ * Vertex 0 should be assigned coordinates at index 2 from the
+ * unrotated order and so on, thus yielding order: 2 3 0 1.
+ */
+static void orientationVertexOrder(video_orientation_t orientation, int vertex_order[static 4])
+{
+    switch (orientation) {
+        case ORIENT_ROTATED_90:
+            vertex_order[0] = 1;
+            vertex_order[1] = 2;
+            vertex_order[2] = 3;
+            vertex_order[3] = 0;
+            break;
+        case ORIENT_ROTATED_270:
+            vertex_order[0] = 3;
+            vertex_order[1] = 0;
+            vertex_order[2] = 1;
+            vertex_order[3] = 2;
+            break;
+        case ORIENT_ROTATED_180:
+            vertex_order[0] = 2;
+            vertex_order[1] = 3;
+            vertex_order[2] = 0;
+            vertex_order[3] = 1;
+            break;
+        case ORIENT_TRANSPOSED:
+            vertex_order[0] = 0;
+            vertex_order[1] = 3;
+            vertex_order[2] = 2;
+            vertex_order[3] = 1;
+            break;
+        case ORIENT_HFLIPPED:
+            vertex_order[0] = 3;
+            vertex_order[1] = 2;
+            vertex_order[2] = 1;
+            vertex_order[3] = 0;
+            break;
+        case ORIENT_VFLIPPED:
+            vertex_order[0] = 1;
+            vertex_order[1] = 0;
+            vertex_order[2] = 3;
+            vertex_order[3] = 2;
+            break;
+        case ORIENT_ANTI_TRANSPOSED: /* transpose + vflip */
+            vertex_order[0] = 1;
+            vertex_order[1] = 2;
+            vertex_order[2] = 3;
+            vertex_order[3] = 0;
+            break;
+       default:
+            vertex_order[0] = 0;
+            vertex_order[1] = 1;
+            vertex_order[2] = 2;
+            vertex_order[3] = 3;
+            break;
+    }
+}
+
 static void Direct3DSetupVertices(CUSTOMVERTEX *vertices,
                                   const RECT src_full,
                                   const RECT src_crop,
                                   const RECT dst,
-                                  int alpha)
+                                  int alpha,
+                                  video_orientation_t orientation)
 {
     const float src_full_width  = src_full.right  - src_full.left;
     const float src_full_height = src_full.bottom - src_full.top;
-    vertices[0].x  = dst.left;
-    vertices[0].y  = dst.top;
+
+    /* Vertices of the dst rectangle in the unrotated (clockwise) order. */
+    const int vertices_coords[4][2] = {
+        { dst.left,  dst.top    },
+        { dst.right, dst.top    },
+        { dst.right, dst.bottom },
+        { dst.left,  dst.bottom },
+    };
+
+    /* Compute index remapping necessary to implement the rotation. */
+    int vertex_order[4];
+    orientationVertexOrder(orientation, vertex_order);
+
+    for (int i = 0; i < 4; ++i) {
+        vertices[i].x  = vertices_coords[vertex_order[i]][0];
+        vertices[i].y  = vertices_coords[vertex_order[i]][1];
+    }
+
     vertices[0].tu = src_crop.left / src_full_width;
     vertices[0].tv = src_crop.top  / src_full_height;
 
-    vertices[1].x  = dst.right;
-    vertices[1].y  = dst.top;
     vertices[1].tu = src_crop.right / src_full_width;
     vertices[1].tv = src_crop.top   / src_full_height;
 
-    vertices[2].x  = dst.right;
-    vertices[2].y  = dst.bottom;
     vertices[2].tu = src_crop.right  / src_full_width;
     vertices[2].tv = src_crop.bottom / src_full_height;
 
-    vertices[3].x  = dst.left;
-    vertices[3].y  = dst.bottom;
     vertices[3].tu = src_crop.left   / src_full_width;
     vertices[3].tv = src_crop.bottom / src_full_height;
 
@@ -1393,7 +1474,7 @@ static int Direct3DImportPicture(vout_display_t *vd,
     Direct3DSetupVertices(region->vertex,
                           vd->sys->rect_src,
                           vd->sys->rect_src_clipped,
-                          vd->sys->rect_dest_clipped, 255);
+                          vd->sys->rect_dest_clipped, 255, vd->fmt.orientation);
     return VLC_SUCCESS;
 }
 
@@ -1516,7 +1597,7 @@ static void Direct3DImportSubpicture(vout_display_t *vd,
         dst.bottom = dst.top  + scale_h * r->fmt.i_visible_height,
         Direct3DSetupVertices(d3dr->vertex,
                               src, src, dst,
-                              subpicture->i_alpha * r->i_alpha / 255);
+                              subpicture->i_alpha * r->i_alpha / 255, ORIENT_NORMAL);
     }
 }
 
