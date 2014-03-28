@@ -62,6 +62,10 @@
 #   define PFNGLUSEPROGRAMPROC               typeof(glUseProgram)*
 #   define PFNGLDELETEPROGRAMPROC            typeof(glDeleteProgram)*
 #   define PFNGLATTACHSHADERPROC             typeof(glAttachShader)*
+#   define PFNGLGENBUFFERSPROC               typeof(glGenBuffers)*
+#   define PFNGLBINDBUFFERPROC               typeof(glBindBuffer)*
+#   define PFNGLBUFFERDATAPROC               typeof(glBufferData)*
+#   define PFNGLDELETEBUFFERSPROC            typeof(glDeleteBuffers)*
 #if defined(__APPLE__) && USE_OPENGL_ES
 #   import <CoreFoundation/CoreFoundation.h>
 #endif
@@ -140,6 +144,9 @@ struct vout_display_opengl_t {
     int        local_count;
     GLfloat    local_value[16];
 
+    GLuint vertex_buffer_object;
+    GLuint texture_buffer_object[PICTURE_PLANE_MAX];
+
     /* Shader variables commands*/
 #ifdef SUPPORTS_SHADERS
     PFNGLGETUNIFORMLOCATIONPROC      GetUniformLocation;
@@ -170,6 +177,11 @@ struct vout_display_opengl_t {
     PFNGLGETPROGRAMINFOLOGPROC GetProgramInfoLog;
     PFNGLGETSHADERIVPROC   GetShaderiv;
     PFNGLGETSHADERINFOLOGPROC GetShaderInfoLog;
+
+    PFNGLGENBUFFERSPROC    GenBuffers;
+    PFNGLBINDBUFFERPROC    BindBuffer;
+    PFNGLBUFFERDATAPROC    BufferData;
+    PFNGLDELETEBUFFERSPROC DeleteBuffers;
 #endif
 
 #if defined(_WIN32)
@@ -444,6 +456,12 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->LinkProgram   = glLinkProgram;
     vgl->UseProgram    = glUseProgram;
     vgl->DeleteProgram = glDeleteProgram;
+
+    vgl->GenBuffers    = glGenBuffers;
+    vgl->BindBuffer    = glBindBuffer;
+    vgl->BufferData    = glBufferData;
+    vgl->DeleteBuffers = glDeleteBuffers;
+
     supports_shaders = true;
 #elif defined(SUPPORTS_SHADERS)
     vgl->CreateShader  = (PFNGLCREATESHADERPROC)vlc_gl_GetProcAddress(vgl->gl, "glCreateShader");
@@ -471,6 +489,11 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->LinkProgram   = (PFNGLLINKPROGRAMPROC)vlc_gl_GetProcAddress(vgl->gl, "glLinkProgram");
     vgl->UseProgram    = (PFNGLUSEPROGRAMPROC)vlc_gl_GetProcAddress(vgl->gl, "glUseProgram");
     vgl->DeleteProgram = (PFNGLDELETEPROGRAMPROC)vlc_gl_GetProcAddress(vgl->gl, "glDeleteProgram");
+
+    vgl->GenBuffers    = (PFNGLGENBUFFERSPROC)vlc_gl_GetProcAddress(vgl->gl, "glGenBuffers");
+    vgl->BindBuffer    = (PFNGLBINDBUFFERPROC)vlc_gl_GetProcAddress(vgl->gl, "glBindBuffer");
+    vgl->BufferData    = (PFNGLBUFFERDATAPROC)vlc_gl_GetProcAddress(vgl->gl, "glBufferData");
+    vgl->DeleteBuffers = (PFNGLDELETEBUFFERSPROC)vlc_gl_GetProcAddress(vgl->gl, "glDeleteBuffers");
 
     if (!vgl->CreateShader || !vgl->ShaderSource || !vgl->CreateProgram)
         supports_shaders = false;
@@ -657,6 +680,11 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+#ifdef SUPPORTS_SHADERS
+    vgl->GenBuffers(1, &vgl->vertex_buffer_object);
+    vgl->GenBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
+#endif
+
     vlc_gl_Unlock(vgl->gl);
 
     /* */
@@ -696,6 +724,8 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
             for (int i = 0; i < 3; i++)
                 vgl->DeleteShader(vgl->shader[i]);
         }
+        vgl->DeleteBuffers(1, &vgl->vertex_buffer_object);
+        vgl->DeleteBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
 #endif
 
         free(vgl->texture_temp_buf);
@@ -1113,15 +1143,21 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
         glClientActiveTexture(GL_TEXTURE0+j);
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
 
+        vgl->BindBuffer(GL_ARRAY_BUFFER, vgl->texture_buffer_object[j]);
+        vgl->BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);
+
         char attribute[20];
         snprintf(attribute, sizeof(attribute), "MultiTexCoord%1d", j);
         vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[program], attribute));
-        vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[program], attribute), 2, GL_FLOAT, 0, 0, textureCoord);
+        vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[program], attribute), 2, GL_FLOAT, 0, 0, 0);
     }
     glActiveTexture(GL_TEXTURE0 + 0);
     glClientActiveTexture(GL_TEXTURE0 + 0);
+
+    vgl->BindBuffer(GL_ARRAY_BUFFER, vgl->vertex_buffer_object);
+    vgl->BufferData(GL_ARRAY_BUFFER, sizeof(vertexCoord), vertexCoord, GL_STATIC_DRAW);
     vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[program], "VertexPosition"));
-    vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[program], "VertexPosition"), 2, GL_FLOAT, 0, 0, vertexCoord);
+    vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[program], "VertexPosition"), 2, GL_FLOAT, 0, 0, 0);
 
     vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "RotationMatrix"), 1, GL_FALSE, transformMatrix);
 
