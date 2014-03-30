@@ -13,6 +13,7 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2 .sum-gcrypt
 	$(UNPACK)
 	$(APPLY) $(SRC)/gcrypt/gcrypt-fix-x86_64-codepath-on-Darwin.patch
 	$(APPLY) $(SRC)/gcrypt/fix-amd64-assembly-on-solaris.patch
+	$(APPLY) $(SRC)/gcrypt/0001-Fix-assembly-division-check.patch
 	$(MOVE)
 
 DEPS_gcrypt = gpg-error
