@@ -2315,6 +2315,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 break;
             }
             case VLC_FOURCC( 'h', 'v', 'c', '1' ):
+            case VLC_FOURCC( 'h', 'e', 'v', '1' ):
             {
                 MP4_Box_t *p_hvcC = MP4_BoxGet( p_sample, "hvcC" );
 
