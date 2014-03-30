@@ -288,6 +288,7 @@
 @synthesize videoView=o_video_view;
 @synthesize controlsBar=o_controls_bar;
 @synthesize inFullscreenTransition=b_in_fullscreen_transition;
+@synthesize windowShouldExitFullscreenWhenFinished=b_windowShouldExitFullscreenWhenFinished;
 
 #pragma mark -
 #pragma mark Init
@@ -713,6 +714,8 @@
     [NSApp setPresentationOptions:(NSApplicationPresentationFullScreen | NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
 
     i_originalLevel = [self level];
+    b_windowShouldExitFullscreenWhenFinished = [[VLCMain sharedInstance] activeVideoPlayback];
+
     // b_fullscreen and b_in_fullscreen_transition must not be true yet
     [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
     [self setLevel:NSNormalWindowLevel];

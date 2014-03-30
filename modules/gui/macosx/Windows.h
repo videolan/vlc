@@ -110,11 +110,14 @@ static const float f_min_video_height = 70.0;
     BOOL b_in_fullscreen_transition;
 
     NSRect frameBeforeLionFullscreen;
+
+    BOOL b_windowShouldExitFullscreenWhenFinished;
 }
 
 @property (nonatomic, assign) VLCVoutView* videoView;
 @property (readonly) VLCControlsBarCommon* controlsBar;
 @property (readonly) BOOL inFullscreenTransition;
+@property (readonly) BOOL windowShouldExitFullscreenWhenFinished;
 
 - (void)setWindowLevel:(NSInteger)i_state;
 

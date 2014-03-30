@@ -237,9 +237,17 @@
 
     // prevent visible extra window if in fullscreen
     NSDisableScreenUpdates();
-    if (![[VLCMainWindow sharedInstance] nativeFullscreenMode] &&
-            ([o_window fullscreen] || [o_window inFullscreenTransition]))
-        [o_window leaveFullscreenWithAnimation: NO];
+    BOOL b_native = [[VLCMainWindow sharedInstance] nativeFullscreenMode];
+
+    // close fullscreen, without changing fullscreen vars
+    if (!b_native && ([o_window fullscreen] || [o_window inFullscreenTransition]))
+        [o_window leaveFullscreenWithAnimation:NO];
+
+    // native fullscreen window will not be closed if
+    // fullscreen was triggered without video
+    if ((b_native && [o_window class] == [VLCMainWindow class] && [o_window fullscreen] && [o_window windowShouldExitFullscreenWhenFinished])) {
+        [o_window toggleFullScreen:self];
+    }
 
     [[o_window videoView] releaseVoutThread];
 
