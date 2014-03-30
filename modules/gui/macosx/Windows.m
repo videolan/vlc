@@ -1049,6 +1049,9 @@
         o_fullscreen_anim2 = nil;
     }
 
+    b_in_fullscreen_transition = YES;
+    [self setFullscreen:NO];
+
     if (!b_animation) {
         /* We don't animate if we are not visible, instead we
          * simply fade the display */
@@ -1072,9 +1075,6 @@
 
         return;
     }
-
-    b_in_fullscreen_transition = YES;
-    [self setFullscreen:NO];
 
     [self setAlphaValue: 0.0];
     [self orderFront: self];
