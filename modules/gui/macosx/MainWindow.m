@@ -454,7 +454,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [o_video_view setHidden: YES];
     [o_split_view setHidden: NO];
-    if ([self fullscreen]) {
+    if (b_nativeFullscreenMode && [self fullscreen]) {
         [[o_controls_bar bottomBarView] setHidden: NO];
         [o_fspanel setNonActive:nil];
     }
@@ -471,7 +471,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [o_split_view setHidden: YES];
     [o_video_view setHidden: NO];
-    if ([self fullscreen]) {
+    if (b_nativeFullscreenMode && [self fullscreen]) {
         [[o_controls_bar bottomBarView] setHidden: YES];
         [o_fspanel setActive:nil];
     }
