@@ -4,6 +4,7 @@
  * Copyright (C) 2014 VLC authors and VideoLAN
  *
  * Authors: Adam Leggett <adamvleggett@gmail.com>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -39,13 +40,6 @@
 #include <cairo/cairo.h>
 
 /*****************************************************************************
- * decoder_sys_t : svg decoder descriptor
- *****************************************************************************/
-struct decoder_sys_t
-{
-};
-
-/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  OpenDecoder   ( vlc_object_t * );
@@ -73,29 +67,19 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
 
     if( p_dec->fmt_in.i_codec != VLC_CODEC_SVG )
-    {
         return VLC_EGENERIC;
-    }
 
     /* Initialize library */
     rsvg_init();
 
     /* Set output properties */
-
     p_dec->fmt_out.i_cat = VIDEO_ES;
-    p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
+    p_dec->fmt_out.i_codec = VLC_CODEC_RGB32;
 
     /* Set callbacks */
     p_dec->pf_decode_video = DecodeBlock;
 
     return VLC_SUCCESS;
-}
-
-static void rsvg_cairo_size_callback(int *width, int *height, gpointer data)
-{
-    RsvgDimensionData *dim = data;
-    *width = dim->width;
-    *height = dim->height;
 }
 
 /****************************************************************************
@@ -111,7 +95,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     RsvgHandle *rsvg = NULL;
     cairo_surface_t *surface = NULL;
     cairo_t *cr = NULL;
-    int stride = 0;
 
     if( !pp_block || !*pp_block ) return NULL;
 
@@ -124,48 +107,60 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    rsvg = rsvg_handle_new_from_data(p_block->p_buffer, p_block->i_buffer, NULL);
+    rsvg = rsvg_handle_new_from_data( p_block->p_buffer, p_block->i_buffer, NULL );
     if( !rsvg )
         goto done;
 
     RsvgDimensionData dim;
-    rsvg_handle_get_dimensions(rsvg, &dim);
-    rsvg_handle_set_size_callback(rsvg, rsvg_cairo_size_callback, &dim, NULL);
+    rsvg_handle_get_dimensions( rsvg, &dim );
 
-    p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
-    p_dec->fmt_out.video.i_width = dim.width;
+    p_dec->fmt_out.video.i_chroma = VLC_CODEC_RGB32;
+    p_dec->fmt_out.video.i_width  = dim.width;
     p_dec->fmt_out.video.i_height = dim.height;
+    p_dec->fmt_out.video.i_visible_width  = dim.width;
+    p_dec->fmt_out.video.i_visible_height = dim.height;
     p_dec->fmt_out.video.i_sar_num = 1;
     p_dec->fmt_out.video.i_sar_den = 1;
-    p_dec->fmt_out.video.i_rmask = 0x000000ff;
+    p_dec->fmt_out.video.i_rmask = 0x80800000; /* Since librsvg v1.0 */
     p_dec->fmt_out.video.i_gmask = 0x0000ff00;
-    p_dec->fmt_out.video.i_bmask = 0x00ff0000;
+    p_dec->fmt_out.video.i_bmask = 0x000000ff;
+    video_format_FixRgb(&p_dec->fmt_out.video);
 
     /* Get a new picture */
     p_pic = decoder_NewPicture( p_dec );
     if( !p_pic )
         goto done;
 
-    stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, dim.width);
-    surface = cairo_image_surface_create_for_data(p_pic->p->p_pixels,
-                                                  CAIRO_FORMAT_ARGB32,
-                                                  dim.width, dim.height,
-                                                  stride);
+    /* NOTE: Do not use the stride calculation from cairo, because it is wrong:
+     * stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, dim.width);
+     * Use the stride from VLC its picture_t::p[0].i_pitch, which is correct.
+     */
+    surface = cairo_image_surface_create_for_data( p_pic->p->p_pixels,
+                                                   CAIRO_FORMAT_ARGB32,
+                                                   dim.width, dim.height,
+                                                   p_pic->p[0].i_pitch );
     if( !surface )
     {
+        picture_Release( p_pic );
         p_pic = NULL;
         goto done;
     }
 
     /* Decode picture */
-    cr = cairo_create(surface);
+    cr = cairo_create( surface );
     if( !cr )
     {
+        picture_Release( p_pic );
         p_pic = NULL;
         goto done;
     }
 
-    rsvg_handle_render_cairo(rsvg, cr);
+    if( !rsvg_handle_render_cairo( rsvg, cr ) )
+    {
+        picture_Release( p_pic );
+        p_pic = NULL;
+        goto done;
+    }
 
     p_pic->date = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : p_block->i_dts;
 
