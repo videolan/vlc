@@ -786,9 +786,9 @@
     b_in_fullscreen_transition = YES;
     [self setFullscreen: NO];
 
-    var_SetBool(pl_Get(VLCIntf), "fullscreen", false);
-
     if ([self hasActiveVideo]) {
+        var_SetBool(pl_Get(VLCIntf), "fullscreen", false);
+
         vout_thread_t *p_vout = getVoutForActiveWindow();
         if (p_vout) {
             var_SetBool(p_vout, "fullscreen", false);
