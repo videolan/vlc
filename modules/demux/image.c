@@ -423,6 +423,53 @@ static bool IsExif(stream_t *s)
     return true;
 }
 
+static bool FindSVGmarker(int *position, const uint8_t *data, const int size, const char *marker)
+{
+    for( int i = *position; i < size; i++)
+    {
+        if (memcmp(&data[i], marker, strlen(marker)) == 0)
+        {
+            *position = i;
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool IsSVG(stream_t *s)
+{
+    char *ext = strstr(s->psz_path, ".svg");
+    if (!ext) return false;
+
+    const uint8_t *header;
+    int size = stream_Peek(s, &header, 4096);
+    int position = 0;
+
+    const char xml[] = "<?xml version=\"";
+    if (!FindSVGmarker(&position, header, size, xml))
+        return false;
+    if (position != 0)
+        return false;
+
+    const char endxml[] = ">\0";
+    if (!FindSVGmarker(&position, header, size, endxml))
+        return false;
+    if (position <= 15)
+        return false;
+
+    const char svg[] = "<svg";
+    if (!FindSVGmarker(&position, header, size, svg))
+        return false;
+    if (position < 19)
+        return false;
+
+    /* SVG Scalable Vector Graphics image */
+
+    /* NOTE: some SVG images have the mimetype set in a meta data section
+     * and some do not */
+    return true;
+}
+
 static bool IsTarga(stream_t *s)
 {
     /* The header is not enough to ensure proper detection, we need
@@ -537,6 +584,9 @@ static const image_format_t formats[] = {
     },
     { .codec = VLC_CODEC_JPEG,
       .detect = IsExif,
+    },
+    { .codec = VLC_CODEC_SVG,
+      .detect = IsSVG,
     },
     { .codec = VLC_CODEC_TARGA,
       .detect = IsTarga,
