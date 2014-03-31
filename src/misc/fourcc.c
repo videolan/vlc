@@ -972,6 +972,9 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_SGI, "SGI Image"),
         A("sgi "),
 
+    B(VLC_CODEC_SVG, "SVG Scalable Vector Graphics Image"),
+        A("svg "),
+
     B(VLC_CODEC_PNM, "Portable Anymap Image"),
         A("pnm "),
 

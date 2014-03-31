@@ -289,6 +289,7 @@
 #define VLC_CODEC_TIFF            VLC_FOURCC('t','i','f','f')
 #define VLC_CODEC_GIF             VLC_FOURCC('g','i','f',' ')
 #define VLC_CODEC_TARGA           VLC_FOURCC('t','g','a',' ')
+#define VLC_CODEC_SVG             VLC_FOURCC('s','v','g',' ')
 #define VLC_CODEC_SGI             VLC_FOURCC('s','g','i',' ')
 #define VLC_CODEC_PNM             VLC_FOURCC('p','n','m',' ')
 #define VLC_CODEC_PCX             VLC_FOURCC('p','c','x',' ')
