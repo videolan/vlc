@@ -348,11 +348,6 @@
 
             [o_current_window toggleFullScreen:self];
         }
-
-        if (b_fullscreen)
-            [NSApp setPresentationOptions:(NSApplicationPresentationFullScreen | NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
-        else
-            [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
     } else {
         assert(o_current_window);
 
