@@ -47,6 +47,13 @@ static void CloseDecoder  ( vlc_object_t * );
 
 static picture_t *DecodeBlock  ( decoder_t *, block_t ** );
 
+#define TEXT_WIDTH       N_("Image width")
+#define LONG_TEXT_WIDTH  N_("Specify the width to decode the image too")
+#define TEXT_HEIGHT      N_("Image height")
+#define LONG_TEXT_HEIGHT N_("Specify the height to decode the image too")
+#define TEXT_SCALE       N_("Scale factor")
+#define LONG_TEXT_SCALE  N_("Scale factor to apply to image")
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -57,7 +64,24 @@ vlc_module_begin ()
     set_capability( "decoder", 100 )
     set_callbacks( OpenDecoder, CloseDecoder )
     add_shortcut( "svg" )
+
+    /* svg options */
+    add_integer_with_range( "svg-width", -1, 1, 65535,
+                            TEXT_WIDTH, LONG_TEXT_WIDTH, false )
+        change_safe()
+    add_integer_with_range( "svg-height", -1, 1, 65535,
+                            TEXT_HEIGHT, LONG_TEXT_HEIGHT, false )
+        change_safe()
+
+    add_float( "svg-scale", -1.0, TEXT_SCALE, LONG_TEXT_SCALE, false )
 vlc_module_end ()
+
+struct decoder_sys_t
+{
+    int32_t i_width;
+    int32_t i_height;
+    double  f_scale;
+};
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -68,6 +92,15 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     if( p_dec->fmt_in.i_codec != VLC_CODEC_SVG )
         return VLC_EGENERIC;
+
+    decoder_sys_t *p_sys = malloc( sizeof(decoder_sys_t) );
+    if (!p_sys)
+        return VLC_ENOMEM;
+    p_dec->p_sys = p_sys;
+
+    p_sys->i_width = var_InheritInteger( p_this, "svg-width" );
+    p_sys->i_height = var_InheritInteger( p_this, "svg-height" );
+    p_sys->f_scale = var_InheritFloat( p_this, "svg-scale" );
 
     /* Initialize library */
     rsvg_init();
@@ -89,8 +122,10 @@ static int OpenDecoder( vlc_object_t *p_this )
  ****************************************************************************/
 static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
+    decoder_sys_t *p_sys  = (decoder_sys_t *) p_dec->p_sys;
     block_t *p_block;
     picture_t *p_pic = NULL;
+    int32_t i_width, i_height;
 
     RsvgHandle *rsvg = NULL;
     cairo_surface_t *surface = NULL;
@@ -114,11 +149,41 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     RsvgDimensionData dim;
     rsvg_handle_get_dimensions( rsvg, &dim );
 
+    if( p_sys->f_scale > 0.0 )
+    {
+        i_width  = (int32_t)(p_sys->f_scale * dim.width);
+        i_height = (int32_t)(p_sys->f_scale * dim.height);
+    }
+    else
+    {
+        /* Keep aspect */
+        if( p_sys->i_width < 0 && p_sys->i_height > 0 )
+        {
+            i_width  = dim.width * p_sys->i_height / dim.height;
+            i_height = p_sys->i_height;
+        }
+        else if( p_sys->i_width > 0 && p_sys->i_height < 0 )
+        {
+            i_width  = p_sys->i_width;
+            i_height = dim.height * p_sys->i_width / dim.height;
+        }
+        else if( p_sys->i_width > 0 && p_sys->i_height > 0 )
+        {
+            i_width  = dim.width * p_sys->i_height / dim.height;
+            i_height = p_sys->i_height;
+        }
+        else
+        {
+            i_width  = dim.width;
+            i_height = dim.height;
+        }
+    }
+
     p_dec->fmt_out.video.i_chroma = VLC_CODEC_RGB32;
-    p_dec->fmt_out.video.i_width  = dim.width;
-    p_dec->fmt_out.video.i_height = dim.height;
-    p_dec->fmt_out.video.i_visible_width  = dim.width;
-    p_dec->fmt_out.video.i_visible_height = dim.height;
+    p_dec->fmt_out.video.i_width  = i_width;
+    p_dec->fmt_out.video.i_height = i_height;
+    p_dec->fmt_out.video.i_visible_width  = i_width;
+    p_dec->fmt_out.video.i_visible_height = i_height;
     p_dec->fmt_out.video.i_sar_num = 1;
     p_dec->fmt_out.video.i_sar_den = 1;
     p_dec->fmt_out.video.i_rmask = 0x80800000; /* Since librsvg v1.0 */
@@ -137,7 +202,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
      */
     surface = cairo_image_surface_create_for_data( p_pic->p->p_pixels,
                                                    CAIRO_FORMAT_ARGB32,
-                                                   dim.width, dim.height,
+                                                   i_width, i_height,
                                                    p_pic->p[0].i_pitch );
     if( !surface )
     {
@@ -153,6 +218,21 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         picture_Release( p_pic );
         p_pic = NULL;
         goto done;
+    }
+
+    if ( i_width != dim.width || i_height != dim.height )
+    {
+        double sw, sh;
+        if ( p_sys->f_scale > 0.0 && !(p_sys->i_width > 0 || p_sys->i_height > 0) )
+            sw = sh = p_sys->f_scale;
+        else
+        {
+            double aspect = (double) (dim.width * p_dec->fmt_out.video.i_sar_num) /
+                    (dim.height * p_dec->fmt_out.video.i_sar_den);
+            sw = aspect * i_width / dim.width;
+            sh = aspect * i_height / dim.height;
+        }
+        cairo_scale(cr, sw, sh);
     }
 
     if( !rsvg_handle_render_cairo( rsvg, cr ) )
