@@ -818,12 +818,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     playlist_t * p_playlist = pl_Get(p_intf);
 
-    /* always exit fullscreen on quit, otherwise we get ugly artifacts on the next launch */
-    if (b_nativeFullscreenMode && [o_mainwindow fullscreen]) {
-        [o_mainwindow toggleFullScreen: self];
-        [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
-    }
-
     /* save current video and audio profiles */
     [[VLCVideoEffects sharedInstance] saveCurrentProfile];
     [[VLCAudioEffects sharedInstance] saveCurrentProfile];
