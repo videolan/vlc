@@ -740,7 +740,7 @@ static void *Run( void *data )
             else
                 fs = var_ToggleBool( p_sys->p_playlist, "fullscreen" );
 
-            if( p_sys->p_input == NULL )
+            if( p_sys->p_input != NULL )
             {
                 vout_thread_t *p_vout = input_GetVout( p_sys->p_input );
                 if( p_vout )
