@@ -803,7 +803,7 @@ static int MP4_ReadBox_tkhd(  stream_t *p_stream, MP4_Box_t *p_box )
     double scale[2];    // scale factor; sx = scale[0] , sy = scale[1]
     double translate[2];// amount to translate; tx = translate[0] , ty = translate[1]
 
-    int *matrix = p_box->data.p_tkhd->i_matrix;
+    int32_t *matrix = p_box->data.p_tkhd->i_matrix;
 
     translate[0] = conv_fx(matrix[6]);
     translate[1] = conv_fx(matrix[7]);
