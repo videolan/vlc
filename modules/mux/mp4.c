@@ -1451,8 +1451,26 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
 
 static int64_t get_timestamp(void);
 
-static const uint32_t mvhd_matrix[9] =
-    { 0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0x40000000 };
+static void matrix_apply_rotation(es_format_t *fmt, uint32_t mvhd_matrix[9])
+{
+    enum video_orientation_t orientation = ORIENT_NORMAL;
+    if (fmt->i_cat == VIDEO_ES)
+        orientation = fmt->video.orientation;
+
+#define ATAN(a, b) do { mvhd_matrix[1] = (a) << 16; \
+    mvhd_matrix[0] = (b) << 16; \
+    } while(0)
+
+    switch (orientation) {
+    case ORIENT_ROTATED_90:  ATAN( 1,  0); break;
+    case ORIENT_ROTATED_180: ATAN( 0, -1); break;
+    case ORIENT_ROTATED_270: ATAN( -1, 0); break;
+    default:                 ATAN( 0,  1); break;
+    }
+
+    mvhd_matrix[3] = mvhd_matrix[0] ? 0 : 0x10000;
+    mvhd_matrix[4] = mvhd_matrix[1] ? 0 : 0x10000;
+}
 
 static bo_t *GetMoovBox(sout_mux_t *p_mux)
 {
@@ -1494,6 +1512,9 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
     bo_add_16be(mvhd, 0);                 // reserved
     for (int i = 0; i < 2; i++)
         bo_add_32be(mvhd, 0);             // reserved
+
+    uint32_t mvhd_matrix[9] = { 0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0x40000000 };
+
     for (int i = 0; i < 9; i++)
         bo_add_32be(mvhd, mvhd_matrix[i]);// matrix
     for (int i = 0; i < 6; i++)
@@ -1551,6 +1572,7 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
         // volume
         bo_add_16be(tkhd, p_stream->fmt.i_cat == AUDIO_ES ? 0x100 : 0);
         bo_add_16be(tkhd, 0);                     // reserved
+        matrix_apply_rotation(&p_stream->fmt, mvhd_matrix);
         for (int i = 0; i < 9; i++)
             bo_add_32be(tkhd, mvhd_matrix[i]);    // matrix
         if (p_stream->fmt.i_cat == AUDIO_ES) {
