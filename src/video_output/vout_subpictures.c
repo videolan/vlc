@@ -1372,9 +1372,13 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
 
     vlc_mutex_lock(&sys->filter_chain_lock);
     if (chain_update) {
-        filter_chain_Reset(sys->filter_chain, NULL, NULL);
+        if (*chain_update) {
+            filter_chain_Reset(sys->filter_chain, NULL, NULL);
 
-        filter_chain_AppendFromString(spu->p->filter_chain, chain_update);
+            filter_chain_AppendFromString(spu->p->filter_chain, chain_update);
+        }
+        else if (filter_chain_GetLength(spu->p->filter_chain) > 0)
+            filter_chain_Reset(sys->filter_chain, NULL, NULL);
 
         /* "sub-source"  was formerly "sub-filter", so now the "sub-filter"
         configuration may contain sub-filters or sub-sources configurations.
@@ -1383,23 +1387,27 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
     }
     vlc_mutex_unlock(&sys->filter_chain_lock);
 
-
     if (is_left_empty) {
-        /* try to use the configuration as a sub-source configuration */
-
-        vlc_mutex_lock(&sys->lock);
-        if (!sys->source_chain_update || !*sys->source_chain_update) {
-            free(sys->source_chain_update);
-            sys->source_chain_update = chain_update;
-            chain_update = NULL;
+        /* try to use the configuration as a sub-source configuration,
+           but only if there is no 'source_chain_update' value and
+           if only if 'chain_update' has a value */
+        if (chain_update && *chain_update) {
+            vlc_mutex_lock(&sys->lock);
+            if (!sys->source_chain_update && !*sys->source_chain_update) {
+                free(sys->source_chain_update);
+                sys->source_chain_update = chain_update;
+                chain_update = NULL;
+            }
+            vlc_mutex_unlock(&sys->lock);
         }
-        vlc_mutex_unlock(&sys->lock);
     }
 
     free(chain_update);
 
     /* Run filter chain on the new subpicture */
+    vlc_mutex_lock(&sys->filter_chain_lock);
     subpic = filter_chain_SubFilter(spu->p->filter_chain, subpic);
+    vlc_mutex_unlock(&sys->filter_chain_lock);
     if (!subpic)
         return;
 
@@ -1440,9 +1448,13 @@ subpicture_t *spu_Render(spu_t *spu,
 
     vlc_mutex_lock(&sys->source_chain_lock);
     if (chain_update) {
-        filter_chain_Reset(sys->source_chain, NULL, NULL);
+        if (*chain_update) {
+            filter_chain_Reset(sys->source_chain, NULL, NULL);
 
-        filter_chain_AppendFromString(spu->p->source_chain, chain_update);
+            filter_chain_AppendFromString(spu->p->source_chain, chain_update);
+        }
+        else if (filter_chain_GetLength(spu->p->source_chain) > 0)
+            filter_chain_Reset(sys->source_chain, NULL, NULL);
 
         free(chain_update);
     }
