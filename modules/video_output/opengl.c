@@ -33,6 +33,7 @@
 #include <vlc_picture_pool.h>
 #include <vlc_subpicture.h>
 #include <vlc_opengl.h>
+#include <vlc_memory.h>
 
 #include "opengl.h"
 
@@ -146,6 +147,9 @@ struct vout_display_opengl_t {
 
     GLuint vertex_buffer_object;
     GLuint texture_buffer_object[PICTURE_PLANE_MAX];
+
+    GLuint *subpicture_buffer_object;
+    int    subpicture_buffer_object_count;
 
     /* Shader variables commands*/
 #ifdef SUPPORTS_SHADERS
@@ -683,6 +687,17 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #ifdef SUPPORTS_SHADERS
     vgl->GenBuffers(1, &vgl->vertex_buffer_object);
     vgl->GenBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
+
+    /* Initial number of allocated buffer objects for subpictures, will grow dynamically. */
+    int subpicture_buffer_object_count = 8;
+    vgl->subpicture_buffer_object = malloc(subpicture_buffer_object_count * sizeof(GLuint));
+    if (!vgl->subpicture_buffer_object) {
+        vlc_gl_Unlock(vgl->gl);
+        vout_display_opengl_Delete(vgl);
+        return NULL;
+    }
+    vgl->subpicture_buffer_object_count = subpicture_buffer_object_count;
+    vgl->GenBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
 #endif
 
     vlc_gl_Unlock(vgl->gl);
@@ -726,6 +741,9 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
         }
         vgl->DeleteBuffers(1, &vgl->vertex_buffer_object);
         vgl->DeleteBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
+        if (vgl->subpicture_buffer_object_count > 0)
+            vgl->DeleteBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
+        free(vgl->subpicture_buffer_object);
 #endif
 
         free(vgl->texture_temp_buf);
@@ -1239,6 +1257,25 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+#ifdef SUPPORTS_SHADERS
+    /* We need two buffer objects for each region: for vertex and texture coordinates. */
+    if (2 * vgl->region_count > vgl->subpicture_buffer_object_count) {
+        if (vgl->subpicture_buffer_object_count > 0)
+            vgl->DeleteBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
+        vgl->subpicture_buffer_object_count = 0;
+
+        int new_count = 2 * vgl->region_count;
+        vgl->subpicture_buffer_object = realloc_or_free(vgl->subpicture_buffer_object, new_count * sizeof(GLuint));
+        if (!vgl->subpicture_buffer_object) {
+            vlc_gl_Unlock(vgl->gl);
+            return VLC_ENOMEM;
+        }
+
+        vgl->subpicture_buffer_object_count = new_count;
+        vgl->GenBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
+    }
+#endif
+
     glActiveTexture(GL_TEXTURE0 + 0);
     glClientActiveTexture(GL_TEXTURE0 + 0);
     for (int i = 0; i < vgl->region_count; i++) {
@@ -1260,10 +1297,17 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         if (vgl->program[1]) {
 #ifdef SUPPORTS_SHADERS
             vgl->Uniform4f(vgl->GetUniformLocation(vgl->program[1], "FillColor"), 1.0f, 1.0f, 1.0f, glr->alpha);
+
+            vgl->BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i]);
+            vgl->BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);
             vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[1], "MultiTexCoord0"));
-            vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "MultiTexCoord0"), 2, GL_FLOAT, 0, 0, textureCoord);
+            vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "MultiTexCoord0"), 2, GL_FLOAT, 0, 0, 0);
+
+            vgl->BindBuffer(GL_ARRAY_BUFFER, vgl->subpicture_buffer_object[2 * i + 1]);
+            vgl->BufferData(GL_ARRAY_BUFFER, sizeof(vertexCoord), vertexCoord, GL_STATIC_DRAW);
             vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[1], "VertexPosition"));
-            vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "VertexPosition"), 2, GL_FLOAT, 0, 0, vertexCoord);
+            vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "VertexPosition"), 2, GL_FLOAT, 0, 0, 0);
+
             // Subpictures have the correct orientation:
             vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "RotationMatrix"), 1, GL_FALSE, identity);
 #endif
