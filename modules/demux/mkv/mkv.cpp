@@ -559,7 +559,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             // condition when the DTS is correct (keyframe or B frame == NOT P frame)
         }
         frame_size += data->Size();
-        if( !data->Buffer() || data->Size() > SIZE_MAX || frame_size > block_size  )
+        if( !data->Buffer() || data->Size() > frame_size || frame_size > block_size  )
         {
             msg_Warn( p_demux, "Cannot read frame (too long or no frame)" );
             break;
