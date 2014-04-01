@@ -528,6 +528,10 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
         }
     }
 
+    id->p_encoder->fmt_in.video.orientation =
+        id->p_encoder->fmt_out.video.orientation =
+        id->p_decoder->fmt_in.video.orientation;
+
     id->p_encoder->fmt_in.video.i_frame_rate =
         id->p_encoder->fmt_out.video.i_frame_rate;
     id->p_encoder->fmt_in.video.i_frame_rate_base =
