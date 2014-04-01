@@ -294,7 +294,7 @@ void http_auth_ParseWwwAuthenticateHeader(
         const char *psz_end = strchr( psz_header, ' ' );
         if ( psz_end )
             msg_Warn( p_this, "Unknown authentication scheme: '%*s'",
-                      psz_end - psz_header, psz_header );
+                      (int)(psz_end - psz_header), psz_header );
         else
             msg_Warn( p_this, "Unknown authentication scheme: '%s'",
                       psz_header );
