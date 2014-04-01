@@ -1017,7 +1017,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( !DVBEventInformation( p_demux, &i_time, &i_length ) && i_length > 0 )
                 *pf = (double)i_time/(double)i_length;
             else if( (i64 = stream_Size( p_demux->s) ) > 0 )
-                *pf = (double)stream_Tell( p_demux->s ) / (double)i64;
+            {
+                int64_t offset = stream_Tell( p_demux->s );
+
+                *pf = (double)offset / (double)i64;
+            }
             else
                 *pf = 0.0;
         }
