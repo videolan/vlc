@@ -317,8 +317,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     [[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidMountNotification object:nil];
     [[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidUnmountNotification object:nil];
-    [self performSelector:@selector(qtkToggleUIElements:) withObject:nil afterDelay:.3];
-    [self performSelector:@selector(scanOpticalMedia:) withObject:nil afterDelay:.5];
+
+    [self qtkToggleUIElements:nil];
+    [self scanOpticalMedia:nil];
 
     [self setMRL: @""];
 }
