@@ -400,7 +400,7 @@ void SeekSlider::paintEvent( QPaintEvent *ev )
         option.sliderValue = value();
         option.maximum = maximum();
         option.minimum = minimum();
-        foreach( const SeekPoint &point, chapters->getPoints() )
+        if ( chapters ) foreach( const SeekPoint &point, chapters->getPoints() )
             option.points << point.time;
         QPainter painter( this );
         style()->drawComplexControl( QStyle::CC_Slider, &option, &painter, this );
