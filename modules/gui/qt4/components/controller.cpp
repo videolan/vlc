@@ -607,7 +607,7 @@ QFrame *AbstractController::telexFrame()
 
     /* Page setting */
     QSpinBox *telexPage = new QSpinBox( telexFrame );
-    telexPage->setRange( 0, 999 );
+    telexPage->setRange( 100, 899 );
     telexPage->setValue( 100 );
     telexPage->setAccelerated( true );
     telexPage->setWrapping( true );
