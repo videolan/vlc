@@ -493,7 +493,7 @@ static int DialogCallback(vlc_object_t *p_this, const char *type, vlc_value_t pr
     }
 
     NSValue *o_value = [NSValue valueWithPointer:value.p_address];
-    [[VLCCoreDialogProvider sharedInstance] performEventWithObject: o_value ofType: type];
+    [[[VLCMain sharedInstance] coreDialogProvider] performEventWithObject: o_value ofType: type];
 
     [o_pool release];
     return VLC_SUCCESS;
@@ -682,8 +682,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             var_SetBool(p_playlist, "fullscreen", YES);
     }
 
-    /* load our Core and Shared Dialogs nibs */
-    nib_coredialogs_loaded = [NSBundle loadNibNamed:@"CoreDialogs" owner: NSApp];
+    /* load our Shared Dialogs nib */
     [NSBundle loadNibNamed:@"SharedDialogs" owner: NSApp];
 
     /* subscribe to various interactive dialogues */
@@ -1659,10 +1658,11 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (id)coreDialogProvider
 {
-    if (o_coredialogs)
-        return o_coredialogs;
+    if (!nib_coredialogs_loaded) {
+        nib_coredialogs_loaded = [NSBundle loadNibNamed:@"CoreDialogs" owner: NSApp];
+    }
 
-    return nil;
+    return o_coredialogs;
 }
 
 - (id)eyeTVController
