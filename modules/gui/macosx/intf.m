@@ -1575,10 +1575,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (id)controls
 {
-    if (o_controls)
-        return o_controls;
-
-    return nil;
+    return o_controls;
 }
 
 - (id)bookmarks
@@ -1594,9 +1591,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (id)open
 {
-    if (!o_open)
-        return nil;
-
     if (!nib_open_loaded)
         nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner: NSApp];
 
@@ -1627,10 +1621,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (id)playlist
 {
-    if (o_playlist)
-        return o_playlist;
-
-    return nil;
+    return o_playlist;
 }
 
 - (id)info
@@ -1638,10 +1629,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     if (! nib_info_loaded)
         nib_info_loaded = [NSBundle loadNibNamed:@"MediaInfo" owner: NSApp];
 
-    if (o_info)
-        return o_info;
-
-    return nil;
+    return o_info;
 }
 
 - (id)wizard
@@ -1653,6 +1641,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         nib_wizard_loaded = [NSBundle loadNibNamed:@"Wizard" owner: NSApp];
         [o_wizard initStrings];
     }
+
     return o_wizard;
 }
 
@@ -1667,10 +1656,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (id)eyeTVController
 {
-    if (o_eyetv)
-        return o_eyetv;
-
-    return nil;
+    return o_eyetv;
 }
 
 - (id)appleRemoteController
