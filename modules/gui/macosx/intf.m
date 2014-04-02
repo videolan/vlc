@@ -777,9 +777,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(computerWillSleep:)
            name:NSWorkspaceWillSleepNotification object:nil];
 
-    /* we will need this, so let's load it here so the interface appears to be more responsive */
-    nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner: NSApp];
-
     /* update the main window */
     [o_mainwindow updateWindow];
     [o_mainwindow updateTimeSlider];
