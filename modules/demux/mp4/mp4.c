@@ -1991,7 +1991,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                         p_style->i_font_color = p_text->i_font_color >> 8;
                         p_style->i_font_alpha = p_text->i_font_color & 0xFF;
                     }
-                    if ( p_text->i_background_color )
+                    if ( p_text->i_background_color[3] >> 8 )
                     {
                         p_style->i_background_color = p_text->i_background_color[0] >> 8;
                         p_style->i_background_color |= p_text->i_background_color[1] >> 8;
