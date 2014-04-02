@@ -4,6 +4,9 @@ TAGLIB_VERSION := 1.9.1
 TAGLIB_URL := http://taglib.github.io/releases/taglib-$(TAGLIB_VERSION).tar.gz
 
 PKGS += taglib
+ifeq ($(call need_pkg,"taglib >= 1.9"),)
+PKGS_FOUND += taglib
+endif
 
 $(TARBALLS)/taglib-$(TAGLIB_VERSION).tar.gz:
 	$(call download,$(TAGLIB_URL))
