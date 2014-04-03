@@ -107,6 +107,7 @@ Interfaces:
 Misc:
  * New module for TLS on OS X and iOS
  * Windows installer will kill running instance before installing
+ * Teletext navigation buttons support in Qt4 gui
 
 Removed modules:
  * ios video output: use ios2
