@@ -107,7 +107,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
-    p_dec->fmt_out.i_codec = VLC_CODEC_RGB32;
+    p_dec->fmt_out.i_codec = VLC_CODEC_BGRA;
 
     /* Set callbacks */
     p_dec->pf_decode_video = DecodeBlock;
@@ -179,7 +179,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
     }
 
-    p_dec->fmt_out.video.i_chroma = VLC_CODEC_RGB32;
+    p_dec->fmt_out.i_codec =
+    p_dec->fmt_out.video.i_chroma = VLC_CODEC_BGRA;
     p_dec->fmt_out.video.i_width  = i_width;
     p_dec->fmt_out.video.i_height = i_height;
     p_dec->fmt_out.video.i_visible_width  = i_width;
@@ -200,6 +201,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
      * stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, dim.width);
      * Use the stride from VLC its picture_t::p[0].i_pitch, which is correct.
      */
+    memset(p_pic->p[0].p_pixels, 0, p_pic->p[0].i_pitch * p_pic->p[0].i_lines);
     surface = cairo_image_surface_create_for_data( p_pic->p->p_pixels,
                                                    CAIRO_FORMAT_ARGB32,
                                                    i_width, i_height,
