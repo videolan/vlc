@@ -128,6 +128,7 @@ static const struct
 
     {VLC_CODEC_RGBA, PIX_FMT_RGBA, 0, 0, 0 },
     {VLC_CODEC_ARGB, PIX_FMT_ARGB, 0, 0, 0 },
+    {VLC_CODEC_BGRA, PIX_FMT_BGRA, 0, 0, 0 },
     {VLC_CODEC_GREY, PIX_FMT_GRAY8, 0, 0, 0},
 
      /* Paletized RGB */

@@ -274,6 +274,10 @@ static void FixParameters( int *pi_fmt, bool *pb_has_a, bool *pb_swap_uv, vlc_fo
         *pi_fmt = PIX_FMT_BGR32_1;
         *pb_has_a = true;
         break;
+    case VLC_CODEC_BGRA:
+        *pi_fmt = PIX_FMT_RGB32;
+        *pb_has_a = true;
+        break;
     case VLC_CODEC_YV12:
         *pi_fmt = PIX_FMT_YUV420P;
         *pb_swap_uv = true;
@@ -648,7 +652,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         /* We extract the A plane to rescale it, and then we reinject it. */
         if( p_fmti->i_chroma == VLC_CODEC_RGBA )
             ExtractA( p_sys->p_src_a, p_src, p_fmti->i_visible_width * p_sys->i_extend_factor, p_fmti->i_visible_height, OFFSET_A );
-        else if( p_fmti->i_chroma == VLC_CODEC_ARGB )
+        else if( p_fmti->i_chroma == VLC_CODEC_ARGB || p_fmti->i_chroma == VLC_CODEC_BGRA )
             ExtractA( p_sys->p_src_a, p_src, p_fmti->i_visible_width * p_sys->i_extend_factor, p_fmti->i_visible_height, 0 );
         else
             plane_CopyPixels( p_sys->p_src_a->p, p_src->p+A_PLANE );
@@ -656,7 +660,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         Convert( p_filter, p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a, p_fmti->i_visible_height, 0, 1, false, false );
         if( p_fmto->i_chroma == VLC_CODEC_RGBA )
             InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_visible_width * p_sys->i_extend_factor, p_fmto->i_visible_height, OFFSET_A );
-        else if( p_fmto->i_chroma == VLC_CODEC_ARGB )
+        else if( p_fmto->i_chroma == VLC_CODEC_ARGB || p_fmto->i_chroma == VLC_CODEC_BGRA )
             InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_visible_width * p_sys->i_extend_factor, p_fmto->i_visible_height, 0 );
         else
             plane_CopyPixels( p_dst->p+A_PLANE, p_sys->p_dst_a->p );
@@ -666,7 +670,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         /* We inject a complete opaque alpha plane */
         if( p_fmto->i_chroma == VLC_CODEC_RGBA )
             FillA( &p_dst->p[0], OFFSET_A );
-        else if( p_fmto->i_chroma == VLC_CODEC_ARGB )
+        else if( p_fmto->i_chroma == VLC_CODEC_ARGB || p_fmto->i_chroma == VLC_CODEC_BGRA )
             FillA( &p_dst->p[0], 0 );
         else
             FillA( &p_dst->p[A_PLANE], 0 );
