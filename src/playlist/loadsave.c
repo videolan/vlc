@@ -76,6 +76,9 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename,
         module_unneed( p_export, p_module );
         if( !ferror( p_export->p_file ) )
             ret = VLC_SUCCESS;
+        else
+            msg_Err( p_playlist, "could not write playlist file: %s",
+                     vlc_strerror_c(errno) );
     }
     else
         msg_Err( p_playlist, "could not export playlist" );
