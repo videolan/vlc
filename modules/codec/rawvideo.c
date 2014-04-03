@@ -37,9 +37,6 @@
  *****************************************************************************/
 struct decoder_sys_t
 {
-    /* Module mode */
-    bool b_packetizer;
-
     /*
      * Input properties
      */
@@ -60,12 +57,7 @@ struct decoder_sys_t
  ****************************************************************************/
 static int  OpenDecoder   ( vlc_object_t * );
 static int  OpenPacketizer( vlc_object_t * );
-static void CloseDecoder  ( vlc_object_t * );
-
-static void *DecodeBlock  ( decoder_t *, block_t ** );
-
-static picture_t *DecodeFrame( decoder_t *, block_t * );
-static block_t   *SendFrame  ( decoder_t *, block_t * );
+static void CloseCommon   ( vlc_object_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -75,21 +67,19 @@ vlc_module_begin ()
     set_capability( "decoder", 50 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
-    set_callbacks( OpenDecoder, CloseDecoder )
+    set_callbacks( OpenDecoder, CloseCommon )
 
     add_submodule ()
     set_description( N_("Pseudo raw video packetizer") )
     set_capability( "packetizer", 100 )
-    set_callbacks( OpenPacketizer, CloseDecoder )
+    set_callbacks( OpenPacketizer, CloseCommon )
 vlc_module_end ()
 
-/*****************************************************************************
- * OpenDecoder: probe the decoder and return score
- *****************************************************************************/
-static int OpenDecoder( vlc_object_t *p_this )
+/**
+ * Common initialization for decoder and packetizer
+ */
+static int OpenCommon( decoder_t *p_dec )
 {
-    decoder_t *p_dec = (decoder_t*)p_this;
-
     const vlc_chroma_description_t *dsc =
         vlc_fourcc_GetChromaDescription( p_dec->fmt_in.i_codec );
     if( dsc == NULL || dsc->plane_count == 0 )
@@ -144,25 +134,8 @@ static int OpenDecoder( vlc_object_t *p_this )
         p_sys->size += pitch * lines;
     }
 
-    /* Set callbacks */
-    p_dec->pf_decode_video = (picture_t *(*)(decoder_t *, block_t **))
-        DecodeBlock;
-    p_dec->pf_packetize    = (block_t *(*)(decoder_t *, block_t **))
-        DecodeBlock;
     p_dec->p_sys           = p_sys;
-
     return VLC_SUCCESS;
-}
-
-static int OpenPacketizer( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t*)p_this;
-
-    int i_ret = OpenDecoder( p_this );
-
-    if( i_ret == VLC_SUCCESS ) p_dec->p_sys->b_packetizer = true;
-
-    return i_ret;
 }
 
 /****************************************************************************
@@ -173,13 +146,11 @@ static int OpenPacketizer( vlc_object_t *p_this )
 static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block;
-    void *p_buf;
 
-    if( !pp_block || !*pp_block ) return NULL;
+    if( pp_block == NULL || *pp_block == NULL )
+        return NULL;
 
-    p_block = *pp_block;
-
+    block_t *p_block = *pp_block;
 
     if( p_block->i_pts <= VLC_TS_INVALID && p_block->i_dts <= VLC_TS_INVALID &&
         !date_Get( &p_sys->pts ) )
@@ -212,20 +183,8 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( p_sys->b_packetizer )
-    {
-        p_buf = SendFrame( p_dec, p_block );
-    }
-    else
-    {
-        p_buf = DecodeFrame( p_dec, p_block );
-    }
-
-    /* Date management: 1 frame per packet */
-    date_Increment( &p_sys->pts, 1 );
     *pp_block = NULL;
-
-    return p_buf;
+    return p_block;
 }
 
 /*****************************************************************************
@@ -272,14 +231,17 @@ static void FillPicture( decoder_t *p_dec, block_t *p_block, picture_t *p_pic )
 /*****************************************************************************
  * DecodeFrame: decodes a video frame.
  *****************************************************************************/
-static picture_t *DecodeFrame( decoder_t *p_dec, block_t *p_block )
+static picture_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 {
+    block_t *p_block = DecodeBlock( p_dec, pp_block );
+    if( p_block == NULL )
+        return NULL;
+
     decoder_sys_t *p_sys = p_dec->p_sys;
-    picture_t *p_pic;
 
     /* Get a new picture */
-    p_pic = decoder_NewPicture( p_dec );
-    if( !p_pic )
+    picture_t *p_pic = decoder_NewPicture( p_dec );
+    if( p_pic == NULL )
     {
         block_Release( p_block );
         return NULL;
@@ -287,7 +249,10 @@ static picture_t *DecodeFrame( decoder_t *p_dec, block_t *p_block )
 
     FillPicture( p_dec, p_block, p_pic );
 
-    p_pic->date = date_Get( &p_sys->pts );
+    /* Date management: 1 frame per packet */
+    p_pic->date = date_Get( &p_dec->p_sys->pts );
+    date_Increment( &p_sys->pts, 1 );
+
     if( p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK )
     {
         p_pic->b_progressive = false;
@@ -304,14 +269,30 @@ static picture_t *DecodeFrame( decoder_t *p_dec, block_t *p_block )
     return p_pic;
 }
 
+static int OpenDecoder( vlc_object_t *p_this )
+{
+    decoder_t *p_dec = (decoder_t *)p_this;
+
+    int ret = OpenCommon( p_dec );
+    if( ret == VLC_SUCCESS )
+        p_dec->pf_decode_video = DecodeFrame;
+    return ret;
+}
+
 /*****************************************************************************
  * SendFrame: send a video frame to the stream output.
  *****************************************************************************/
-static block_t *SendFrame( decoder_t *p_dec, block_t *p_block )
+static block_t *SendFrame( decoder_t *p_dec, block_t **pp_block )
 {
+    block_t *p_block = DecodeBlock( p_dec, pp_block );
+    if( p_block == NULL )
+        return NULL;
+
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    /* Date management: 1 frame per packet */
     p_block->i_dts = p_block->i_pts = date_Get( &p_sys->pts );
+    date_Increment( &p_sys->pts, 1 );
 
     if( p_sys->b_invert )
     {
@@ -344,10 +325,20 @@ static block_t *SendFrame( decoder_t *p_dec, block_t *p_block )
     return p_block;
 }
 
-/*****************************************************************************
- * CloseDecoder: decoder destruction
- *****************************************************************************/
-static void CloseDecoder( vlc_object_t *p_this )
+static int OpenPacketizer( vlc_object_t *p_this )
+{
+    decoder_t *p_dec = (decoder_t *)p_this;
+
+    int ret = OpenCommon( p_dec );
+    if( ret == VLC_SUCCESS )
+        p_dec->pf_packetize = SendFrame;
+    return ret;
+}
+
+/**
+ * Common deinitialization
+ */
+static void CloseCommon( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     free( p_dec->p_sys );
