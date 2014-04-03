@@ -338,6 +338,7 @@ static block_t *SendFrame( decoder_t *p_dec, block_t *p_block )
             }
         }
         block_Release( p_block );
+        p_block = out;
     }
 
     return p_block;
