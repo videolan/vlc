@@ -388,7 +388,11 @@ static int OpenDecoder(vlc_object_t *p_this)
                                                               (*env)->NewStringUTF(env, mime));
         jobject profile_levels = NULL;
         int profile_levels_len = 0;
-        if (codec_capabilities) {
+        if ((*env)->ExceptionOccurred(env)) {
+            msg_Warn(p_dec, "Exception occurred in MediaCodecInfo.getCapabilitiesForType");
+            (*env)->ExceptionClear(env);
+            break;
+        } else if (codec_capabilities) {
             profile_levels = (*env)->GetObjectField(env, codec_capabilities, p_sys->profile_levels_field);
             if (profile_levels)
                 profile_levels_len = (*env)->GetArrayLength(env, profile_levels);
