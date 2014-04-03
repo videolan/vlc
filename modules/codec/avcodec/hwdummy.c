@@ -39,7 +39,7 @@ static int Open(vlc_va_t *, AVCodecContext *, const es_format_t *);
 static void Close(vlc_va_t *);
 
 vlc_module_begin()
-    set_description(N_("Dummy video decoding accelerator"))
+    set_description(N_("Dummy video decoder"))
     set_capability("hw decoder", 0)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)

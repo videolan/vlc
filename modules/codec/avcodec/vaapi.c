@@ -59,9 +59,9 @@ static void Delete( vlc_va_t * );
 
 vlc_module_begin ()
 #if defined (VLC_VA_BACKEND_XLIB)
-    set_description( N_("Video Acceleration (VA) API / X11") )
+    set_description( N_("VA-API video decoder via X11") )
 #elif defined (VLC_VA_BACKEND_DRM)
-    set_description( N_("Video Acceleration (VA) API / DRM") )
+    set_description( N_("VA-API video decoder via DRM") )
 #endif
     set_capability( "hw decoder", 0 )
     set_category( CAT_INPUT )
