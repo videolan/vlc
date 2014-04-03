@@ -86,6 +86,36 @@ static int ConvertFlags( int i_atomflags )
     return i_vlcstyles_flags;
 }
 
+static size_t str8len( const char *psz_string )
+{
+    const char *psz_tmp = psz_string;
+    size_t i=0;
+    while ( *psz_tmp )
+    {
+        if ( (*psz_tmp & 0xC0) != 0x80 ) i++;
+        psz_tmp++;
+    }
+    return i;
+}
+
+static char * str8indup( const char *psz_string, size_t i_skip, size_t n )
+{
+    while( i_skip && *psz_string )
+    {
+        if ( (*psz_string & 0xC0) != 0x80 ) i_skip--;
+        psz_string++;
+    }
+    if ( ! *psz_string || i_skip ) return NULL;
+
+    const char *psz_tmp = psz_string;
+    while( n && *psz_tmp )
+    {
+        if ( (*psz_tmp & 0xC0) != 0x80 ) n--;
+        psz_tmp++;
+    }
+    return strndup( psz_string, psz_tmp - psz_string );
+}
+
 static void SegmentDoSplit( segment_t *p_segment, uint16_t i_start, uint16_t i_end,
                             segment_t **pp_segment_left,
                             segment_t **pp_segment_middle,
@@ -104,23 +134,23 @@ static void SegmentDoSplit( segment_t *p_segment, uint16_t i_start, uint16_t i_e
         p_segment_left = calloc( 1, sizeof(segment_t) );
         if ( !p_segment_left ) goto error;
         memcpy( &p_segment_left->styles, &p_segment->styles, sizeof(segment_style_t) );
-        p_segment_left->psz_string = strndup( p_segment->psz_string, i_start );
-        p_segment_left->i_size = strlen( p_segment_left->psz_string );
+        p_segment_left->psz_string = str8indup( p_segment->psz_string, 0, i_start );
+        p_segment_left->i_size = str8len( p_segment_left->psz_string );
     }
 
     p_segment_middle = calloc( 1, sizeof(segment_t) );
     if ( !p_segment_middle ) goto error;
     memcpy( &p_segment_middle->styles, &p_segment->styles, sizeof(segment_style_t) );
-    p_segment_middle->psz_string = strndup( p_segment->psz_string + i_start, i_end - i_start + 1 );
-    p_segment_middle->i_size = strlen( p_segment_middle->psz_string );
+    p_segment_middle->psz_string = str8indup( p_segment->psz_string, i_start, i_end - i_start + 1 );
+    p_segment_middle->i_size = str8len( p_segment_middle->psz_string );
 
     if ( i_end < (p_segment->i_size - 1) )
     {
         p_segment_right = calloc( 1, sizeof(segment_t) );
         if ( !p_segment_right ) goto error;
         memcpy( &p_segment_right->styles, &p_segment->styles, sizeof(segment_style_t) );
-        p_segment_right->psz_string = strndup( p_segment->psz_string + i_end + 1, p_segment->i_size - i_end - 1 );
-        p_segment_right->i_size = strlen( p_segment_right->psz_string );
+        p_segment_right->psz_string = str8indup( p_segment->psz_string, i_end + 1, p_segment->i_size - i_end - 1 );
+        p_segment_right->i_size = str8len( p_segment_right->psz_string );
     }
 
     if ( p_segment_left ) p_segment_left->p_next = p_segment_middle;
@@ -242,7 +272,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
     p_segment->psz_string = strdup( psz_subtitle );
-    p_segment->i_size = strlen( psz_subtitle );
+    p_segment->i_size = str8len( psz_subtitle );
     if ( p_dec->fmt_in.subs.p_style )
     {
         p_segment->styles.i_color = p_dec->fmt_in.subs.p_style->i_font_color;
