@@ -262,12 +262,17 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     if ( i_psz_bytelength > 2 &&
          ( !memcmp( p_pszstart, "\xFE\xFF", 2 ) || !memcmp( p_pszstart, "\xFF\xFE", 2 ) )
        )
+    {
         psz_subtitle = FromCharset( "UTF-16", p_pszstart, i_psz_bytelength );
+        if ( !psz_subtitle ) return NULL;
+    }
     else
+    {
         psz_subtitle = malloc( i_psz_bytelength + 1 );
-    if ( !psz_subtitle ) return NULL;
-    memcpy( psz_subtitle, p_pszstart, i_psz_bytelength );
-    psz_subtitle[ i_psz_bytelength ] = '\0';
+        if ( !psz_subtitle ) return NULL;
+        memcpy( psz_subtitle, p_pszstart, i_psz_bytelength );
+        psz_subtitle[ i_psz_bytelength ] = '\0';
+    }
     p_buf += i_psz_bytelength + sizeof(uint16_t);
 
     for( uint16_t i=0; i < i_psz_bytelength; i++ )
