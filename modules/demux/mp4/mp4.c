@@ -2001,7 +2001,6 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 }
                 p_track->fmt.subs.p_style = p_style;
             }
-            /* FIXME: Not true, could be UTF-16 with a Byte Order Mark (0xfeff) */
             /* FIXME UTF-8 doesn't work here ? */
             if( p_track->b_mac_encoding )
                 p_track->fmt.subs.psz_encoding = strdup( "MAC" );

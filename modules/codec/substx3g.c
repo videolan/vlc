@@ -26,6 +26,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_sout.h>
+#include <vlc_charset.h>
 
 #include "substext.h"
 
@@ -255,14 +256,21 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     uint8_t *p_buf = p_block->p_buffer;
 
     /* Read our raw string and create the styled segment for HTML */
-    uint16_t i_psz_length = GetWBE( p_buf );
-    char *psz_subtitle = malloc( i_psz_length + 1 );
+    uint16_t i_psz_bytelength = GetWBE( p_buf );
+    const uint8_t *p_pszstart = p_block->p_buffer + sizeof(uint16_t);
+    char *psz_subtitle;
+    if ( i_psz_bytelength > 2 &&
+         ( !memcmp( p_pszstart, "\xFE\xFF", 2 ) || !memcmp( p_pszstart, "\xFF\xFE", 2 ) )
+       )
+        psz_subtitle = FromCharset( "UTF-16", p_pszstart, i_psz_bytelength );
+    else
+        psz_subtitle = malloc( i_psz_bytelength + 1 );
     if ( !psz_subtitle ) return NULL;
-    memcpy( psz_subtitle, p_block->p_buffer + sizeof(uint16_t), i_psz_length );
-    psz_subtitle[ i_psz_length ] = '\0';
-    p_buf += i_psz_length + sizeof(uint16_t);
+    memcpy( psz_subtitle, p_pszstart, i_psz_bytelength );
+    psz_subtitle[ i_psz_bytelength ] = '\0';
+    p_buf += i_psz_bytelength + sizeof(uint16_t);
 
-    for( uint16_t i=0; i < i_psz_length; i++ )
+    for( uint16_t i=0; i < i_psz_bytelength; i++ )
      if ( psz_subtitle[i] == '\r' ) psz_subtitle[i] = '\n';
 
     segment_t *p_segment = calloc( 1, sizeof(segment_t) );
@@ -317,8 +325,8 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             while( i_cur_record++ < i_nbrecords )
             {
                 if ( (size_t)(p_buf - p_block->p_buffer) < 12 ) break;
-                uint16_t i_start = __MIN( GetWBE(p_buf), i_psz_length - 1 );
-                uint16_t i_end =  __MIN( GetWBE(p_buf + 2), i_psz_length - 1 );
+                uint16_t i_start = __MIN( GetWBE(p_buf), i_psz_bytelength - 1 );
+                uint16_t i_end =  __MIN( GetWBE(p_buf + 2), i_psz_bytelength - 1 );
 
                 segment_style_t style;
                 style.i_flags = ConvertFlags( p_buf[6] );
