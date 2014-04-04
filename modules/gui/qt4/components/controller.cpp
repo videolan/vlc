@@ -619,7 +619,8 @@ QFrame *AbstractController::telexFrame()
     /* Contextual & Index Buttons */
     QSignalMapper *contextButtonMapper = new QSignalMapper( this );
     QToolButton *contextButton = NULL;
-    QPixmap iconPixmap( telexOn->minimumHeight(), telexOn->minimumHeight() );
+    int i_iconminsize = __MAX( 16, telexOn->minimumHeight() );
+    QPixmap iconPixmap( i_iconminsize, i_iconminsize );
     iconPixmap.fill( Qt::transparent );
     QPainter iconPixmapPainter( &iconPixmap );
     QRadialGradient iconPixmapPainterGradient( iconPixmap.rect().center(),
