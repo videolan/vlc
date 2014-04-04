@@ -188,12 +188,12 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, m
     if( p_tk->fmt.i_codec == VLC_CODEC_COOK ||
         p_tk->fmt.i_codec == VLC_CODEC_ATRAC3 )
     {
-        const uint32_t i_num = p_sys->i_frame_size / p_sys->i_subpacket_size;
-        const int y = p_sys->i_subpacket / ( p_sys->i_frame_size / p_sys->i_subpacket_size );
+        const uint16_t i_num = p_sys->i_frame_size / p_sys->i_subpacket_size;
+        const size_t y = p_sys->i_subpacket / ( p_sys->i_frame_size / p_sys->i_subpacket_size );
 
-        for( int i = 0; i < i_num; i++ )
+        for( uint16_t i = 0; i < i_num; i++ )
         {
-            int i_index = p_sys->i_sub_packet_h * i +
+            size_t i_index = (size_t) p_sys->i_sub_packet_h * i +
                           ((p_sys->i_sub_packet_h + 1) / 2) * (y&1) + (y>>1);
             if( i_index >= p_sys->i_subpackets )
                 return;
