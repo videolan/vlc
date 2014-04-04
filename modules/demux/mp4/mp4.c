@@ -158,7 +158,7 @@ static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
         if( i_dts < 0 ) i_dts = 0;
     }
 
-    return INT64_C(1000000) * i_dts / p_track->i_timescale;
+    return CLOCK_FREQ * i_dts / p_track->i_timescale;
 }
 
 static inline int64_t MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_track )
@@ -179,7 +179,7 @@ static inline int64_t MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_tra
     for( i_index = 0;; i_index++ )
     {
         if( i_sample < ck->p_sample_count_pts[i_index] )
-            return ck->p_sample_offset_pts[i_index] * INT64_C(1000000) /
+            return ck->p_sample_offset_pts[i_index] * CLOCK_FREQ /
                    (int64_t)p_track->i_timescale;
 
         i_sample -= ck->p_sample_count_pts[i_index];
@@ -188,7 +188,7 @@ static inline int64_t MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_tra
 
 static inline int64_t MP4_GetMoviePTS(demux_sys_t *p_sys )
 {
-    return INT64_C(1000000) * p_sys->i_time / p_sys->i_timescale;
+    return CLOCK_FREQ * p_sys->i_time / p_sys->i_timescale;
 }
 
 static void LoadChapter( demux_t  *p_demux );
@@ -692,7 +692,7 @@ static int Demux( demux_t *p_demux )
         p_sys->i_time += __MAX( p_sys->i_timescale / 10 , 1 );
         if( p_sys->i_timescale > 0 )
         {
-            int64_t i_length = (mtime_t)1000000 *
+            int64_t i_length = CLOCK_FREQ *
                                (mtime_t)p_sys->i_duration /
                                (mtime_t)p_sys->i_timescale;
             if( MP4_GetMoviePTS( p_sys ) >= i_length )
@@ -832,7 +832,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date )
     unsigned int i_track;
 
     /* First update global time */
-    p_sys->i_time = i_date * p_sys->i_timescale / 1000000;
+    p_sys->i_time = i_date * p_sys->i_timescale / CLOCK_FREQ;
     p_sys->i_pcr  = VLC_TS_INVALID;
 
     /* Now for each stream try to go to this time */
@@ -914,7 +914,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             else if( p_sys->i_timescale > 0 )
             {
-                i64 = (int64_t)( f * (double)1000000 *
+                i64 = (int64_t)( f * CLOCK_FREQ *
                                  (double)p_sys->i_duration /
                                  (double)p_sys->i_timescale );
                 return Seek( p_demux, i64 );
@@ -925,7 +925,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = (int64_t*)va_arg( args, int64_t * );
             if( p_sys->i_timescale > 0 )
             {
-                *pi64 = (mtime_t)1000000 *
+                *pi64 = CLOCK_FREQ *
                         (mtime_t)p_sys->i_time /
                         (mtime_t)p_sys->i_timescale;
             }
@@ -940,7 +940,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = (int64_t*)va_arg( args, int64_t * );
             if( p_sys->i_timescale > 0 )
             {
-                *pi64 = (mtime_t)1000000 *
+                *pi64 = CLOCK_FREQ *
                         (mtime_t)p_sys->i_duration /
                         (mtime_t)p_sys->i_timescale;
             }
@@ -1343,7 +1343,7 @@ static void LoadChapter( demux_t  *p_demux )
     /* Add duration if titles are enabled */
     if( p_sys->p_title )
     {
-        p_sys->p_title->i_length = (uint64_t)1000000 *
+        p_sys->p_title->i_length = CLOCK_FREQ *
                        (uint64_t)p_sys->i_duration / (uint64_t)p_sys->i_timescale;
     }
 }
@@ -2381,11 +2381,11 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
     if( p_track->p_elst && p_track->p_elst->data.p_elst->i_entry_count > 0 )
     {
         MP4_Box_data_elst_t *elst = p_track->p_elst->data.p_elst;
-        int64_t i_mvt= i_start * p_sys->i_timescale / (int64_t)1000000;
+        int64_t i_mvt= i_start * p_sys->i_timescale / CLOCK_FREQ;
 
         /* now calculate i_start for this elst */
         /* offset */
-        i_start -= p_track->i_elst_time * INT64_C(1000000) / p_sys->i_timescale;
+        i_start -= p_track->i_elst_time * CLOCK_FREQ / p_sys->i_timescale;
         if( i_start < 0 )
         {
             *pi_chunk = 0;
@@ -2394,7 +2394,7 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
             return VLC_SUCCESS;
         }
         /* to track time scale */
-        i_start  = i_start * p_track->i_timescale / (int64_t)1000000;
+        i_start  = i_start * p_track->i_timescale / CLOCK_FREQ;
         /* add elst offset */
         if( ( elst->i_media_rate_integer[p_track->i_elst] > 0 ||
              elst->i_media_rate_fraction[p_track->i_elst] > 0 ) &&
@@ -2411,7 +2411,7 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
     else
     {
         /* convert absolute time to in timescale unit */
-        i_start = i_start * p_track->i_timescale / (int64_t)1000000;
+        i_start = i_start * p_track->i_timescale / CLOCK_FREQ;
     }
 
     /* we start from sample 0/chunk 0, hope it won't take too much time */
@@ -3074,7 +3074,7 @@ static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track, int i_sa
         demux_sys_t *p_sys = p_demux->p_sys;
         MP4_Box_data_elst_t *elst = p_track->p_elst->data.p_elst;
         uint64_t i_mvt = MP4_TrackGetDTS( p_demux, p_track ) *
-                        p_sys->i_timescale / (int64_t)1000000;
+                        p_sys->i_timescale / CLOCK_FREQ;
 
         if( (unsigned int)p_track->i_elst < elst->i_entry_count &&
             i_mvt >= p_track->i_elst_time +
@@ -3100,7 +3100,7 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
     if( tk->p_elst && tk->p_elst->data.p_elst->i_entry_count > 0 )
     {
         MP4_Box_data_elst_t *elst = tk->p_elst->data.p_elst;
-        int64_t i_mvt= i_time * p_sys->i_timescale / (int64_t)1000000;
+        int64_t i_mvt= i_time * p_sys->i_timescale / CLOCK_FREQ;
 
         for( tk->i_elst = 0; (unsigned int)tk->i_elst < elst->i_entry_count; tk->i_elst++ )
         {
@@ -3801,7 +3801,7 @@ int DemuxFrg( demux_t *p_demux )
         p_sys->i_time += __MAX( p_sys->i_timescale / 10 , 1 );
         if( p_sys->i_timescale > 0 )
         {
-            int64_t i_length = (mtime_t)1000000 *
+            int64_t i_length = CLOCK_FREQ *
                                (mtime_t)p_sys->i_duration /
                                (mtime_t)p_sys->i_timescale;
             if( MP4_GetMoviePTS( p_sys ) >= i_length )
