@@ -838,8 +838,8 @@ static int MP4_ReadBox_tkhd(  stream_t *p_stream, MP4_Box_t *p_box )
                   scale[1],
                   translate[0],
                   translate[1],
-                  (float)p_box->data.p_tkhd->i_width / 65536,
-                  (float)p_box->data.p_tkhd->i_height / 65536,
+                  (float)p_box->data.p_tkhd->i_width / BLOCK16x16,
+                  (float)p_box->data.p_tkhd->i_height / BLOCK16x16,
                   p_box->data.p_tkhd->i_matrix[0],
                   p_box->data.p_tkhd->i_matrix[1],
                   p_box->data.p_tkhd->i_matrix[2],
@@ -1665,8 +1665,8 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
         memcpy( &f_sample_rate, &dummy, 8 );
 
         msg_Dbg( p_stream, "read box: %f Hz", f_sample_rate );
-        p_box->data.p_sample_soun->i_sampleratehi = (int)f_sample_rate % 65536;
-        p_box->data.p_sample_soun->i_sampleratelo = f_sample_rate / 65536;
+        p_box->data.p_sample_soun->i_sampleratehi = (int)f_sample_rate % BLOCK16x16;
+        p_box->data.p_sample_soun->i_sampleratelo = f_sample_rate / BLOCK16x16;
 
         MP4_GET4BYTES( i_channel );
         p_box->data.p_sample_soun->i_channelcount = i_channel;
@@ -1712,7 +1712,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
              p_box->data.p_sample_soun->i_channelcount,
              p_box->data.p_sample_soun->i_samplesize,
              (float)p_box->data.p_sample_soun->i_sampleratehi +
-             (float)p_box->data.p_sample_soun->i_sampleratelo / 65536 );
+             (float)p_box->data.p_sample_soun->i_sampleratelo / BLOCK16x16 );
 
 #endif
     MP4_READBOX_EXIT( 1 );

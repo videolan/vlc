@@ -25,6 +25,8 @@
 
 #include <vlc_es.h>
 
+#define BLOCK16x16 (1<<16)
+
 #define ATOM_root VLC_FOURCC( 'r', 'o', 'o', 't' )
 #define ATOM_uuid VLC_FOURCC( 'u', 'u', 'i', 'd' )
 

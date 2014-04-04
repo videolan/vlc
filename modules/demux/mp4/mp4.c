@@ -2607,8 +2607,8 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
 
     p_track->i_track_ID = p_tkhd->data.p_tkhd->i_track_ID;
 
-    p_track->i_width = p_tkhd->data.p_tkhd->i_width / 65536;
-    p_track->i_height = p_tkhd->data.p_tkhd->i_height / 65536;
+    p_track->i_width = p_tkhd->data.p_tkhd->i_width / BLOCK16x16;
+    p_track->i_height = p_tkhd->data.p_tkhd->i_height / BLOCK16x16;
     p_track->f_rotation = p_tkhd->data.p_tkhd->f_rotation;
 
     if( p_tref )
