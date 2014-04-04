@@ -105,7 +105,7 @@ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
     mainLayout->addWidget( settingBox, 1, 0, 1, -1  );
 
     /* Buttons */
-    QPushButton *okButton = new QPushButton( qtr( "&Start" ) );
+    okButton = new QPushButton( qtr( "&Start" ) );
     QPushButton *cancelButton = new QPushButton( qtr( "&Cancel" ) );
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
 
@@ -121,6 +121,9 @@ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
     CONNECT( convertRadio, toggled(bool), convertPanel, setEnabled(bool) );
     CONNECT(profile, optionsChanged(), this, setDestinationFileExtension());
     CONNECT(fileLine, editingFinished(), this, setDestinationFileExtension());
+    CONNECT(fileLine, textChanged(const QString&), this, validate());
+
+    validate();
 }
 
 void ConvertDialog::fileBrowse()
@@ -181,4 +184,9 @@ void ConvertDialog::setDestinationFileExtension()
             fileLine->setText( toNativeSeparators( newFileName ) );
         }
     }
+}
+
+void ConvertDialog::validate()
+{
+    okButton->setEnabled( !fileLine->text().isEmpty() );
 }

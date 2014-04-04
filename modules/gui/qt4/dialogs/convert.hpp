@@ -29,6 +29,7 @@
 class QLineEdit;
 class QCheckBox;
 class QRadioButton;
+class QPushButton;
 class VLCProfileSelector;
 
 class ConvertDialog : public QVLCDialog
@@ -45,6 +46,7 @@ private:
 
     QCheckBox *displayBox, *deinterBox;
     QRadioButton *dumpRadio;
+    QPushButton *okButton;
     VLCProfileSelector *profile;
     QString mrl;
 private slots:
@@ -52,6 +54,7 @@ private slots:
     virtual void cancel();
     void fileBrowse();
     void setDestinationFileExtension();
+    void validate();
 };
 
 #endif
