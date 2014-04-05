@@ -151,7 +151,8 @@ static void PMThread( void *arg )
     ULONG i_kva_mode;
 
     /* */
-    video_format_t fmt = vd->fmt;
+    video_format_t fmt;
+    video_format_ApplyRotation(&fmt, &vd->fmt);
 
     /* */
     vout_display_info_t info = vd->info;
@@ -501,22 +502,27 @@ static int Control( vout_display_t *vd, int query, va_list args )
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     {
-        const video_format_t *source = va_arg(args, const video_format_t *);
+        const video_format_t *src = va_arg(args, const video_format_t *);
 
         if( query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT )
         {
-            sys->kvas.ulAspectWidth  = ( int64_t )source->i_width *
-                                       source->i_sar_num / source->i_sar_den;
-            sys->kvas.ulAspectHeight = source->i_height;
+            vout_display_place_t place;
+            vout_display_PlacePicture(&place, src, vd->cfg, false);
+
+            sys->kvas.ulAspectWidth  = place.width;
+            sys->kvas.ulAspectHeight = place.height;
         }
         else
         {
-            sys->kvas.rclSrcRect.xLeft   = source->i_x_offset;
-            sys->kvas.rclSrcRect.yTop    = source->i_y_offset;
-            sys->kvas.rclSrcRect.xRight  = source->i_x_offset +
-                                           source->i_visible_width;
-            sys->kvas.rclSrcRect.yBottom = source->i_y_offset +
-                                           source->i_visible_height;
+            video_format_t src_rot;
+            video_format_ApplyRotation(&src_rot, src);
+
+            sys->kvas.rclSrcRect.xLeft   = src_rot.i_x_offset;
+            sys->kvas.rclSrcRect.yTop    = src_rot.i_y_offset;
+            sys->kvas.rclSrcRect.xRight  = src_rot.i_x_offset +
+                                           src_rot.i_visible_width;
+            sys->kvas.rclSrcRect.yBottom = src_rot.i_y_offset +
+                                           src_rot.i_visible_height;
         }
 
         kvaSetup( &sys->kvas );
@@ -632,8 +638,8 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
     msg_Dbg( vd, "output chroma = %4.4s", ( const char * )&fmt->i_chroma );
     msg_Dbg( vd, "KVA chroma = %4.4s", ( const char * )&i_kva_fourcc );
 
-    w = vd->source.i_width;
-    h = vd->source.i_height;
+    w = fmt->i_width;
+    h = fmt->i_height;
 
     sys->kvas.ulLength           = sizeof( KVASETUP );
     sys->kvas.szlSrcSize.cx      = w;
