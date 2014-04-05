@@ -623,15 +623,14 @@ QFrame *AbstractController::telexFrame()
     QPixmap iconPixmap( i_iconminsize, i_iconminsize );
     iconPixmap.fill( Qt::transparent );
     QPainter iconPixmapPainter( &iconPixmap );
-    QRadialGradient iconPixmapPainterGradient( iconPixmap.rect().center(),
-                                               iconPixmap.rect().width() / 2,
-                                               iconPixmap.rect().center() / 2 );
+    QLinearGradient iconPixmapPainterGradient( iconPixmap.rect().center() / 2,
+                                               iconPixmap.rect().center() );
 
 #define CREATE_CONTEXT_BUTTON(color, key) \
     iconPixmapPainterGradient.setColorAt( 0, QColor( color ).lighter(150) );\
     iconPixmapPainterGradient.setColorAt( 1.0, QColor( color ) );\
     iconPixmapPainter.setBrush( iconPixmapPainterGradient );\
-    iconPixmapPainter.drawEllipse( iconPixmap.rect().adjusted( 0, 0, -1, -1 ) );\
+    iconPixmapPainter.drawEllipse( iconPixmap.rect().adjusted( 4, 4, -5, -5 ) );\
     contextButton = new QToolButton();\
     setupButton( contextButton );\
     contextButton->setIcon( iconPixmap );\
