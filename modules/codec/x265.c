@@ -170,9 +170,17 @@ static int  Open (vlc_object_t *p_this)
 #if X265_BUILD >= 6
     param->fpsNum = p_enc->fmt_in.video.i_frame_rate;
     param->fpsDenom = p_enc->fmt_in.video.i_frame_rate_base;
+    if (!param->fpsNum) {
+        param->fpsNum = 25;
+        param->fpsDenom = 1;
+    }
 #else
-    param->frameRate = p_enc->fmt_in.video.i_frame_rate /
+    if (p_enc->fmt_in.video.i_frame_rate_base) {
+        param->frameRate = p_enc->fmt_in.video.i_frame_rate /
             p_enc->fmt_in.video.i_frame_rate_base;
+    } else {
+        param->frameRate = 25;
+    }
 #endif
     param->sourceWidth = p_enc->fmt_in.video.i_visible_width;
     param->sourceHeight = p_enc->fmt_in.video.i_visible_height;
