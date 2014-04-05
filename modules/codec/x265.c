@@ -203,7 +203,7 @@ static int  Open (vlc_object_t *p_this)
 
     x265_nal *nal;
     uint32_t i_nal;
-    if (x265_encoder_headers(p_sys->h, &nal, &i_nal)) {
+    if (x265_encoder_headers(p_sys->h, &nal, &i_nal) < 0) {
         msg_Err(p_enc, "cannot get x265 headers");
         Close(VLC_OBJECT(p_enc));
         return VLC_EGENERIC;
