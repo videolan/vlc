@@ -54,8 +54,6 @@ struct encoder_sys_t
     x265_encoder    *h;
     x265_param      param;
 
-    bool            write_headers;
-
     mtime_t         i_initial_delay;
 
     mtime_t         dts;
@@ -100,16 +98,14 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
         i_out += nal[i].sizeBytes;
 
     int i_extra = 0;
-    if (unlikely(p_sys->write_headers)) {
+    if (IS_X265_TYPE_I(pic.sliceType))
         i_extra = p_enc->fmt_out.i_extra;
-        p_sys->write_headers = false;
-    }
 
     block_t *p_block = block_Alloc(i_extra + i_out);
     if (!p_block)
         return NULL;
 
-    if (unlikely(i_extra))
+    if (i_extra)
        memcpy(p_block->p_buffer, p_enc->fmt_out.p_extra, i_extra);
 
     /* all payloads are sequentially laid out in memory */
@@ -237,7 +233,6 @@ static int  Open (vlc_object_t *p_this)
     p_sys->dts = 0;
     p_sys->initial_date = 0;
     p_sys->i_initial_delay = 0;
-    p_sys->write_headers = true;
 
     p_enc->pf_encode_video = Encode;
     p_enc->pf_encode_audio = NULL;
