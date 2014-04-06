@@ -691,12 +691,13 @@ libvlc_media_player_get_media( libvlc_media_player_t *p_mi )
 {
     libvlc_media_t *p_m;
 
-    lock(p_mi);
+    lock( p_mi );
     p_m = p_mi->p_md;
     if( p_m )
-        libvlc_media_retain( p_mi->p_md );
-    unlock(p_mi);
-    return p_mi->p_md;
+        libvlc_media_retain( p_m );
+    unlock( p_mi );
+
+    return p_m;
 }
 
 /**************************************************************************
