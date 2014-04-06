@@ -231,6 +231,7 @@ ATTR_PACKED
 #define WAVE_FORMAT_TRUESPEECH          0x0022 /* TrueSpeech */
 #define WAVE_FORMAT_GSM610              0x0031 /* Microsoft Corporation */
 #define WAVE_FORMAT_MSNAUDIO            0x0032 /* Microsoft Corporation */
+#define WAVE_FORMAT_AMR_NB_2            0x0038 /* AMR NB rogue */
 #define WAVE_FORMAT_MSG723              0x0042 /* Microsoft G.723 [G723.1] */
 #define WAVE_FORMAT_G726                0x0045 /* ITU-T standard  */
 #define WAVE_FORMAT_MPEG                0x0050 /* Microsoft Corporation */
@@ -293,7 +294,7 @@ ATTR_PACKED
 #define WAVE_FORMAT_VORB_3PLUS          0x6771
 
 #define WAVE_FORMAT_G723_1              0xa100
-
+#define WAVE_FORMAT_AAC_3               0xa106
 #define WAVE_FORMAT_SPEEX               0xa109 /* Speex audio */
 #define WAVE_FORMAT_FLAC                0xf1ac /* Xiph Flac */
 
@@ -377,6 +378,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_MPEGLAYER3, VLC_CODEC_MP3,                    "Mpeg Audio Layer 3" },
     { WAVE_FORMAT_MPEG,       VLC_CODEC_MPGA,                   "Mpeg Audio" },
     { WAVE_FORMAT_AMR_NB,     VLC_CODEC_AMR_NB,                 "AMR NB" },
+    { WAVE_FORMAT_AMR_NB_2,   VLC_CODEC_AMR_NB,                 "AMR NB" },
     { WAVE_FORMAT_AMR_WB,     VLC_CODEC_AMR_WB,                 "AMR Wideband" },
     { WAVE_FORMAT_SIPRO,      VLC_CODEC_SIPR,                   "Sipr Audio" },
     { WAVE_FORMAT_A52,        VLC_CODEC_A52,                    "A/52" },
@@ -394,6 +396,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_DIVIO_AAC,  VLC_CODEC_MP4A,                   "MPEG-4 Audio (Divio)" },
     { WAVE_FORMAT_AAC,        VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_AAC_2,      VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
+    { WAVE_FORMAT_AAC_3,      VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_AAC_LATM,   VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_AVCODEC_AAC, VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_AAC_MS,     VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
