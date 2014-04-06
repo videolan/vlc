@@ -479,9 +479,11 @@ static int Control( vout_display_t *vd, int query, va_list args )
     }
 
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+    case VOUT_DISPLAY_CHANGE_ZOOM:
     {
         const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
-        bool  is_forced = va_arg(args, int);
+        bool  is_forced = query == VOUT_DISPLAY_CHANGE_ZOOM ||
+                          va_arg(args, int);
 
         if( is_forced )
         {
@@ -532,7 +534,6 @@ static int Control( vout_display_t *vd, int query, va_list args )
 
     case VOUT_DISPLAY_RESET_PICTURES:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
-    case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_GET_OPENGL:
         /* TODO */
         break;
