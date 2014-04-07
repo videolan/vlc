@@ -1454,8 +1454,8 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
     int64_t i_sample;
     int64_t i_chunk;
 
-    int64_t i_index;
-    int64_t i_index_sample_used;
+    uint32_t i_index;
+    uint32_t i_index_sample_used;
 
     int64_t i_next_dts;
 
@@ -1517,7 +1517,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
     for( i_chunk = 0; i_chunk < p_demux_track->i_chunk_count; i_chunk++ )
     {
         mp4_chunk_t *ck = &p_demux_track->chunk[i_chunk];
-        int64_t i_entry, i_sample_count, i;
+        uint32_t i_entry, i_sample_count, i;
 
         /* save first dts */
         ck->i_first_dts = i_next_dts;
@@ -1528,14 +1528,40 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
         i_sample_count = ck->i_sample_count;
 
         i_entry = 0;
+        uint32_t i_array_offset = i_index;
         while( i_sample_count > 0 )
         {
-            i_sample_count -= stts->i_sample_count[i_index+i_entry];
+            if (likely( (UINT32_MAX - i_index) >= i_entry ))
+                i_array_offset = i_index + i_entry;
+            else
+                return VLC_EGENERIC;
+
+            if ( i_array_offset >= stts->i_entry_count )
+            {
+                if ( likely( i_entry != UINT32_MAX ) )
+                    i_entry++;
+                break;
+            }
+
+            if ( i_sample_count > stts->pi_sample_count[i_array_offset] )
+                i_sample_count -= stts->pi_sample_count[i_array_offset];
+            else
+                i_sample_count = 0;
+
             /* don't count already used sample in this entry */
             if( i_entry == 0 )
-                i_sample_count += i_index_sample_used;
+            {
+                if ( i_index_sample_used < ( UINT32_MAX - i_sample_count ) )
+                    i_sample_count += i_index_sample_used;
+            }
 
-            i_entry++;
+            if (likely( i_entry != UINT32_MAX ))
+                i_entry++;
+            else
+            {
+                msg_Err( p_demux, "suspiciously high number of i_entry" );
+                break; /* likely will go ENOMEM now */
+            }
         }
 
         /* allocate them */
@@ -1543,32 +1569,52 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
         ck->p_sample_delta_dts = calloc( i_entry, sizeof( uint32_t ) );
 
         if( !ck->p_sample_count_dts || !ck->p_sample_delta_dts )
+        {
+            msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, i_entry );
             return VLC_ENOMEM;
+        }
 
         /* now copy */
         i_sample_count = ck->i_sample_count;
         for( i = 0; i < i_entry; i++ )
         {
-            int64_t i_used;
-            int64_t i_rest;
+            uint32_t i_used;
+            uint32_t i_rest;
 
-            i_rest = stts->i_sample_count[i_index] - i_index_sample_used;
+            if ( i_index >= stts->i_entry_count )
+                i_index = stts->i_entry_count;
+
+            if ( i_index_sample_used < stts->pi_sample_count[i_index] )
+                i_rest = stts->pi_sample_count[i_index] - i_index_sample_used;
+            else
+                i_rest = 0;
 
             i_used = __MIN( i_rest, i_sample_count );
 
-            i_index_sample_used += i_used;
-            i_sample_count -= i_used;
-            i_next_dts += i_used * stts->i_sample_delta[i_index];
+            if ( (UINT32_MAX - i_index_sample_used) >= i_used  )
+                i_index_sample_used += i_used;
+            else
+                i_index_sample_used = UINT32_MAX;
+
+            if ( i_used > i_sample_count )
+                i_sample_count -= i_used;
+            else
+                i_sample_count = 0;
+
+            i_next_dts += i_used * stts->pi_sample_delta[i_index];
 
             ck->p_sample_count_dts[i] = i_used;
-            ck->p_sample_delta_dts[i] = stts->i_sample_delta[i_index];
+            ck->p_sample_delta_dts[i] = stts->pi_sample_delta[i_index];
             if( i_used > 0 )
                 ck->i_last_dts = i_next_dts - ck->p_sample_delta_dts[i];
 
-            if( i_index_sample_used >= stts->i_sample_count[i_index] )
+            if( i_index_sample_used >= stts->pi_sample_count[i_index] )
             {
-                i_index++;
                 i_index_sample_used = 0;
+                if (unlikely( i_index == UINT32_MAX ))
+                    break;
+                else
+                    i_index++;
             }
         }
     }
@@ -1597,7 +1643,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
             i_entry = 0;
             while( i_sample_count > 0 )
             {
-                i_sample_count -= ctts->i_sample_count[i_index+i_entry];
+                i_sample_count -= ctts->pi_sample_count[i_index+i_entry];
 
                 /* don't count already used sample in this entry */
                 if( i_entry == 0 )
@@ -1619,7 +1665,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                 int64_t i_used;
                 int64_t i_rest;
 
-                i_rest = ctts->i_sample_count[i_index] -
+                i_rest = ctts->pi_sample_count[i_index] -
                     i_index_sample_used;
 
                 i_used = __MIN( i_rest, i_sample_count );
@@ -1628,9 +1674,9 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                 i_sample_count -= i_used;
 
                 ck->p_sample_count_pts[i] = i_used;
-                ck->p_sample_offset_pts[i] = ctts->i_sample_offset[i_index];
+                ck->p_sample_offset_pts[i] = ctts->pi_sample_offset[i_index];
 
-                if( i_index_sample_used >= ctts->i_sample_count[i_index] )
+                if( i_index_sample_used >= ctts->pi_sample_count[i_index] )
                 {
                     i_index++;
                     i_index_sample_used = 0;
