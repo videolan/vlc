@@ -1168,10 +1168,6 @@ static const char *const ppsz_albumart_descriptions[] =
     "The media library is automatically saved and reloaded each time you " \
     "start VLC." )
 
-#define LOAD_ML_TEXT N_( "Load Media Library" )
-#define LOAD_ML_LONGTEXT N_( \
-    "Enable this option to load the SQL-based Media Library at VLC startup" )
-
 #define PLTREE_TEXT N_("Display playlist tree")
 #define PLTREE_LONGTEXT N_( \
     "The playlist can use a tree to categorize some items, like the " \
