@@ -272,6 +272,7 @@ static const staticentry_t p_list_video[] = {
         A("h265"),
         A("H265"),
         A("x265"),
+        A("hev1"),
 
     /* h264 */
     B(VLC_CODEC_H264, "H264 - MPEG-4 AVC (part 10)"),
