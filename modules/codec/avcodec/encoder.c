@@ -1090,6 +1090,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             {
                 msg_Warn( p_enc, "almost fed libavcodec with two frames with "
                           "the same PTS (%"PRId64 ")", frame->pts );
+                block_Release( p_block );
                 return NULL;
             }
             else if ( p_sys->i_last_pts > frame->pts )
@@ -1097,6 +1098,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
                 msg_Warn( p_enc, "almost fed libavcodec with a frame in the "
                          "past (current: %"PRId64 ", last: %"PRId64")",
                          frame->pts, p_sys->i_last_pts );
+                block_Release( p_block );
                 return NULL;
             }
             else
