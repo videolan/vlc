@@ -325,7 +325,7 @@ static void SSE_CopyFromNv12(picture_t *dst,
                     dst->p[1].p_pixels, dst->p[1].i_pitch,
                     src[1], src_pitch[1],
                     cache->buffer, cache->size,
-                    width/2, height/2, cpu);
+                    (width+1)/2, (height+1)/2, cpu);
     asm volatile ("emms");
 }
 
@@ -339,7 +339,7 @@ static void SSE_CopyFromYv12(picture_t *dst,
         SSE_CopyPlane(dst->p[n].p_pixels, dst->p[n].i_pitch,
                       src[n], src_pitch[n],
                       cache->buffer, cache->size,
-                      width/d, height/d, cpu);
+                      (width+d-1)/d, (height+d-1)/d, cpu);
     }
     asm volatile ("emms");
 }
