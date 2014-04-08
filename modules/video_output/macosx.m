@@ -183,8 +183,10 @@ static int Open (vlc_object_t *this)
     nsPool = [[NSAutoreleasePool alloc] init];
 
     [VLCOpenGLVideoView performSelectorOnMainThread:@selector(getNewView:) withObject:[NSValue valueWithPointer:&sys->glView] waitUntilDone:YES];
-    if (!sys->glView)
+    if (!sys->glView) {
+        msg_Err(vd, "Initialization of open gl view failed");
         goto error;
+    }
 
     [sys->glView setVoutDisplay:vd];
 
