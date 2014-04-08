@@ -720,7 +720,8 @@ static int Demux( demux_t *p_demux )
         if( !tk->b_ok || tk->b_chapter || !tk->b_selected || tk->i_sample >= tk->i_sample_count )
             continue;
 
-        while( MP4_TrackGetDTS( p_demux, tk ) < i_targettime )
+        while( MP4_TrackGetDTS( p_demux, tk ) < i_targettime
+               || ( p_sys->i_pcr == VLC_TS_INVALID && !b_data_sent ) )
         {
 #if 0
             msg_Dbg( p_demux, "tk(%i)=%lld mv=%lld", i_track,
