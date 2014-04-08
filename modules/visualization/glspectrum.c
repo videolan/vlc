@@ -447,6 +447,11 @@ static void *Thread( void *p_data )
         int16_t  *p_buffs;                         /* int16_t converted buffer */
         int16_t  *p_s16_buff;                      /* int16_t converted buffer */
 
+        if (!block->i_nb_samples) {
+            msg_Err(p_filter, "no samples yet");
+            goto release;
+        }
+
         /* Allocate the buffer only if the number of samples change */
         if (block->i_nb_samples != p_sys->i_prev_nb_samples)
         {
