@@ -29,9 +29,6 @@ TAR_URL=$(GNU)/tar/tar-$(TAR_VERSION).tar.bz2
 XZ_VERSION=5.0.3
 XZ_URL=http://tukaani.org/xz/xz-$(XZ_VERSION).tar.bz2
 
-OPENSSL_VERSION=1.0.0e
-OPENSSL_URL=http://www.openssl.org/source/openssl-$(OPENSSL_VERSION).tar.gz
-
 GAS_VERSION=eca4c18
 GAS_URL=http://git.libav.org/?p=gas-preprocessor.git;a=snapshot;h=$(GAS_VERSION);sf=tgz
 
