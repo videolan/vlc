@@ -3,6 +3,10 @@
 NETTLE_VERSION := 2.6
 NETTLE_URL := ftp://ftp.gnu.org/gnu/nettle/nettle-$(NETTLE_VERSION).tar.gz
 
+ifeq ($(call need_pkg,"nettle >= 2.6"),)
+PKGS_FOUND += nettle
+endif
+
 $(TARBALLS)/nettle-$(NETTLE_VERSION).tar.gz:
 	$(call download,$(NETTLE_URL))
 
