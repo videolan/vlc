@@ -210,6 +210,7 @@ static int Open( vlc_object_t *p_this )
         if( !strcmp( mode, "html" ) )
         {
             p_sys->footer = HTML_FOOTER;
+            filename = LOG_FILE_HTML;
             header = HTML_HEADER;
             cb = HtmlPrint;
         }
