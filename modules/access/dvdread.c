@@ -726,7 +726,11 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
     {
         int i_start_cell, i_end_cell;
 
-        if( p_sys->p_title != NULL ) DVDCloseFile( p_sys->p_title );
+        if( p_sys->p_title != NULL )
+        {
+            DVDCloseFile( p_sys->p_title );
+            p_sys->p_title = NULL;
+        }
         if( p_vts != NULL ) ifoClose( p_vts );
         p_sys->i_title = i_title;
 
