@@ -1036,6 +1036,10 @@ static void DemuxTitles( demux_t *p_demux )
 
     /* Find out number of titles/chapters */
     dvdnav_get_number_of_titles( p_sys->dvdnav, &i_titles );
+
+    if( i_titles > 90 )
+        msg_Err( p_demux, "This is probably an Arccos Protected DVD. This could take time..." );
+
     for( i = 1; i <= i_titles; i++ )
     {
         int32_t i_chapters;
