@@ -324,18 +324,29 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     AudioObjectPropertyAddress audioDeviceAliveAddress = { kAudioDevicePropertyDeviceIsAlive, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
     if (p_sys->i_selected_dev > 0) {
-        /* Check if the desired device is alive and usable */
-        i_param_size = sizeof(b_alive);
-        err = AudioObjectGetPropertyData(p_sys->i_selected_dev, &audioDeviceAliveAddress, 0, NULL, &i_param_size, &b_alive);
-        if (err != noErr) {
-            /* Be tolerant, only give a warning here */
-            msg_Warn(p_aout, "could not check whether device [0x%x] is alive [%4.4s]",
-                     (unsigned int)p_sys->i_selected_dev, (char *)&err);
-            b_alive = false;
-        }
 
-        if (!b_alive)
-            msg_Warn(p_aout, "selected audio device is not alive, switching to default device");
+        /* Check if device is in devices list. Only checking for kAudioDevicePropertyDeviceIsAlive is not sufficient,
+         * as a former airplay device might be already gone, but the device number might be still valid. Core Audio
+         * even says that this device would be alive. Don't ask why, its Core Audio. */
+        CFIndex count = CFArrayGetCount(p_sys->device_list);
+        if (CFArrayContainsValue(p_sys->device_list, CFRangeMake(0, count), CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &p_sys->i_selected_dev))) {
+
+            /* Check if the desired device is alive and usable */
+            i_param_size = sizeof(b_alive);
+            err = AudioObjectGetPropertyData(p_sys->i_selected_dev, &audioDeviceAliveAddress, 0, NULL, &i_param_size, &b_alive);
+            if (err != noErr) {
+                /* Be tolerant, only give a warning here */
+                msg_Warn(p_aout, "could not check whether device [0x%x] is alive [%4.4s]",
+                         (unsigned int)p_sys->i_selected_dev, (char *)&err);
+                b_alive = false;
+            }
+
+            if (!b_alive)
+                msg_Warn(p_aout, "selected audio device is not alive, switching to default device");
+
+        } else {
+            msg_Warn(p_aout, "device id %i not found in the current devices list, fallback to default device", p_sys->i_selected_dev);
+        }
     }
 
     p_sys->b_selected_dev_is_default = false;
