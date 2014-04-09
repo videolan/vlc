@@ -51,13 +51,18 @@ then
 else
     # found, need to check version ?
     [ -z "$2" ] && return # no
-    # we only check GNU tools, their version have the form MAJOR.MINOR
     gotver=`$1 --version | head -1 | sed s/'.* '//`
     gotmajor=`echo $gotver|cut -d. -f1`
     gotminor=`echo $gotver|cut -d. -f2`
+    gotmicro=`echo $gotver|cut -d. -f3`
+    [ -z "$gotmicro" ] && gotmicro=0
     needmajor=`echo $2|cut -d. -f1`
     needminor=`echo $2|cut -d. -f2`
-    if [ "$needmajor" -gt "$gotmajor" -o "$needmajor" -eq "$gotmajor" -a "$needminor" -gt "$gotminor" ]
+    needmicro=`echo $2|cut -d. -f3`
+    [ -z "$needmicro" ] && needmicro=0
+    if [ "$needmajor" -gt "$gotmajor" \
+         -o "$needmajor" -eq "$gotmajor" -a "$needminor" -gt "$gotminor" \
+         -o "$needmajor" -eq "$gotmajor" -a "$needminor" -eq "$gotminor" -a "$needmicro" -gt "$gotmicro" ]
     then
         echo "$1 too old"
         NEEDED="$NEEDED .$1"
