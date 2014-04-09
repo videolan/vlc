@@ -758,7 +758,8 @@ static int Demux( demux_t *p_demux )
                 }
                 else if( tk->fmt.i_cat == SPU_ES )
                 {
-                    if ( tk->fmt.i_codec != VLC_CODEC_TX3G )
+                    if ( tk->fmt.i_codec != VLC_CODEC_TX3G &&
+                         tk->fmt.i_codec != VLC_CODEC_SPU )
                         p_block->i_buffer = 0;
                 }
 
@@ -2314,6 +2315,16 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             p_track->fmt.p_extra = malloc( p_track->fmt.i_extra );
             memcpy( p_track->fmt.p_extra, p_decconfig->p_decoder_specific_info,
                     p_track->fmt.i_extra );
+        }
+        if( p_track->fmt.i_codec == VLC_CODEC_SPU &&
+            p_track->fmt.i_extra >= 16 * 4 )
+        {
+            for( int i = 0; i < 16; i++ )
+            {
+                p_track->fmt.subs.spu.palette[1 + i] =
+                            GetDWBE((char*)p_track->fmt.p_extra + i * 4);
+            }
+            p_track->fmt.subs.spu.palette[0] = 0xBeef;
         }
     }
     else
