@@ -33,6 +33,7 @@
     BOOL b_genericAudioProfileInInteraction;
 
     /* Equalizer */
+    IBOutlet id o_eq_view;
     IBOutlet id o_eq_enable_ckb;
     IBOutlet id o_eq_twopass_ckb;
     IBOutlet id o_eq_preamp_lbl;

@@ -362,10 +362,10 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     }
 
     /* update UI */
-    if ([tempString rangeOfString:@"equalizer"].location == NSNotFound)
-        [o_eq_enable_ckb setState:NSOffState];
-    else
-        [o_eq_enable_ckb setState:NSOnState];
+    BOOL b_eq_enabled = [tempString rangeOfString:@"equalizer"].location != NSNotFound;
+    [o_eq_view enableSubviews:b_eq_enabled];
+    [o_eq_enable_ckb setState:(b_eq_enabled ? NSOnState : NSOffState)];
+
     [o_eq_twopass_ckb setState:[[items objectAtIndex:15] intValue]];
     [self resetCompressor];
     [self resetSpatializer];
@@ -508,6 +508,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     [self updatePresetSelector];
 
     /* Set the the checkboxes */
+    [o_eq_view enableSubviews: b_enabled];
     [o_eq_enable_ckb setState: b_enabled];
     [o_eq_twopass_ckb setState: b_2p];
 }
@@ -563,6 +564,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)eq_enable:(id)sender
 {
+    [o_eq_view enableSubviews:[sender state]];
     [self setAudioFilter: "equalizer" on:[sender state]];
 }
 
