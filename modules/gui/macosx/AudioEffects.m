@@ -993,18 +993,23 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 #pragma mark Filter
 - (void)resetAudioFilters
 {
+    BOOL b_enable_normvol = NO;
     char *psz_afilters;
     psz_afilters = config_GetPsz(p_intf, "audio-filter");
     if (psz_afilters) {
         [o_filter_headPhone_ckb setState: (NSInteger)strstr(psz_afilters, "headphone") ];
-        [o_filter_normLevel_ckb setState: (NSInteger)strstr(psz_afilters, "normvol") ];
         [o_filter_karaoke_ckb setState: (NSInteger)strstr(psz_afilters, "karaoke") ];
+        b_enable_normvol = strstr(psz_afilters, "normvol") != NULL;
         free(psz_afilters);
     } else {
         [o_filter_headPhone_ckb setState: NSOffState];
-        [o_filter_normLevel_ckb setState: NSOffState];
         [o_filter_karaoke_ckb setState: NSOffState];
     }
+
+    [o_filter_normLevel_sld setEnabled:b_enable_normvol];
+    [o_filter_normLevel_lbl setEnabled:b_enable_normvol];
+    [o_filter_normLevel_ckb setState:(b_enable_normvol ? NSOnState : NSOffState)];
+
     [o_filter_normLevel_sld setFloatValue: config_GetFloat(p_intf, "norm-max-level")];
 }
 
@@ -1015,6 +1020,8 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)filter_enableVolumeNorm:(id)sender
 {
+    [o_filter_normLevel_sld setEnabled:[sender state]];
+    [o_filter_normLevel_lbl setEnabled:[sender state]];
     [self setAudioFilter: "normvol" on:[sender state]];
 }
 
