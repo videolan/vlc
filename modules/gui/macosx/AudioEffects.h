@@ -77,6 +77,7 @@
     IBOutlet id o_comp_band7_lbl;
 
     /* Spatializer */
+    IBOutlet id o_spat_view;
     IBOutlet id o_spat_enable_ckb;
     IBOutlet id o_spat_reset_btn;
     IBOutlet id o_spat_band1_sld;

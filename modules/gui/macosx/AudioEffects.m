@@ -905,14 +905,17 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 #pragma mark Spatializer
 - (void)resetSpatializer
 {
+    BOOL b_enable_spat = NO;
     char *psz_afilters;
     psz_afilters = config_GetPsz(p_intf, "audio-filter");
     if (psz_afilters) {
-        [o_spat_enable_ckb setState: (NSInteger)strstr(psz_afilters, "spatializer") ];
+        b_enable_spat = strstr(psz_afilters, "spatializer") != NULL;
         free(psz_afilters);
     }
-    else
-        [o_spat_enable_ckb setState: NSOffState];
+
+    [o_spat_view enableSubviews:b_enable_spat];
+    [o_spat_enable_ckb setState:(b_enable_spat ? NSOnState : NSOffState)];
+
 
 #define setSlider(bandsld, bandfld, var) \
 [bandsld setFloatValue: config_GetFloat(p_intf, var) * 10.]; \
@@ -949,6 +952,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)spat_enable:(id)sender
 {
+    [o_spat_view enableSubviews:[sender state]];
     [self setAudioFilter:"spatializer" on:[sender state]];
 }
 
