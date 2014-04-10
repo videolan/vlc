@@ -2423,9 +2423,6 @@ static void PIDFillFormat( const ts_es_t *es, int i_stream_type )
     case 0x82:  /* SCTE-27 (sub) */
         es_format_Init( fmt, SPU_ES, VLC_CODEC_SCTE_27 );
         break;
-    case 0x83:  /* LPCM (audio) */
-        es_format_Init( fmt, AUDIO_ES, VLC_CODEC_DVD_LPCM );
-        break;
     case 0x84:  /* SDDS (audio) */
         es_format_Init( fmt, AUDIO_ES, VLC_CODEC_SDDS );
         break;
@@ -3788,6 +3785,21 @@ static void PMTSetupEs0xA0( demux_t *p_demux, ts_pid_t *pid,
     p_fmt->b_packetized = true;
 }
 
+static void PMTSetupEs0x83( const dvbpsi_pmt_t *p_pmt, ts_pid_t *pid )
+{
+    /* WiDi broadcasts without registration on PMT 0x1, PCR 0x1000 and
+     * with audio track pid being 0x1100..0x11FF */
+    if ( p_pmt->i_program_number == 0x1 &&
+         p_pmt->i_pcr_pid == 0x1000 &&
+        ( pid->i_pid >> 8 ) == 0x11 )
+    {
+        /* Not enough ? might contain 0x83 private descriptor, 2 bytes 0x473F */
+        es_format_Init( &pid->es->fmt, AUDIO_ES, VLC_CODEC_WIDI_LPCM );
+    }
+    else
+        es_format_Init( &pid->es->fmt, AUDIO_ES, VLC_CODEC_DVD_LPCM );
+}
+
 static void PMTSetupEsHDMV( ts_pid_t *pid, const dvbpsi_pmt_es_t *p_es )
 {
     es_format_t *p_fmt = &pid->es->fmt;
@@ -4092,6 +4104,11 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
         else if( p_es->i_type == 0xa0 )
         {
             PMTSetupEs0xA0( p_demux, pid, p_es );
+        }
+        else if ( p_es->i_type == 0x83 )
+        {
+            /* LPCM (audio) */
+            PMTSetupEs0x83( p_pmt, pid );
         }
         else if( registration_type == TS_REGISTRATION_HDMV )
         {
