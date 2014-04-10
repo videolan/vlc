@@ -237,6 +237,12 @@ typedef enum
     TS_ES_DATA_TABLE_SECTION
 } ts_es_data_type_t;
 
+typedef enum
+{
+    TS_REGISTRATION_OTHER = 0,
+    TS_REGISTRATION_HDMV
+} ts_registration_type_t;
+
 typedef struct
 {
     es_format_t  fmt;
@@ -3999,7 +4005,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
         SetPIDFilter( p_demux, prg->i_pid_pcr, true ); /* Set demux filter */
 
     /* Parse descriptor */
-    bool b_hdmv = false;
+    ts_registration_type_t registration_type = TS_REGISTRATION_OTHER;
     dvbpsi_descriptor_t  *p_dr;
     for( p_dr = p_pmt->p_first_descriptor; p_dr != NULL; p_dr = p_dr->p_next )
         switch(p_dr->i_tag)
@@ -4023,7 +4029,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
             {
                 msg_Dbg( p_demux, " * descriptor : registration %4.4s", p_dr->p_data );
                 if( !memcmp( p_dr->p_data, "HDMV", 4 ) || !memcmp( p_dr->p_data, "HDPR", 4 ) )
-                    b_hdmv = true; /* Blu-Ray */
+                    registration_type = TS_REGISTRATION_HDMV; /* Blu-Ray */
             }
             break;
 
@@ -4088,7 +4094,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
         {
             PMTSetupEs0xA0( p_demux, pid, p_es );
         }
-        else if( b_hdmv )
+        else if( registration_type == TS_REGISTRATION_HDMV )
         {
             PMTSetupEsHDMV( pid, p_es );
         }
