@@ -142,17 +142,30 @@ struct encoder_sys_t
  * - frequency (4 bits)
  * - bits per sample (2 bits)
  * - unknown (6 bits)
+ *
+ * LPCM WIDI header
+ * refers http://www.dvdforum.org/images/Guideline1394V10R0_20020911.pdf
+  * - sub stream id (8 bits) = 0xa0
+ * - frame header count (8 bits) = 0x06
+ * [ 0b0000000 (7 bits)
+ * - audio emphasis (1 bit) ] (8 bits)
+ * [ qz word length (2 bits) 0x00 == 16bits
+ * - sampling freq (3 bits) 0b001 == 44.1K, 0b010 == 48K Hz
+ * - channels count(3 bits) ] (8 bits) 0b000 == dual mono, 0b001 == stereo
+ * follows: LPCM data (15360 bits/1920 bytes)
  */
 
 #define LPCM_VOB_HEADER_LEN (6)
 #define LPCM_AOB_HEADER_LEN (11)
 #define LPCM_BD_HEADER_LEN (4)
+#define LPCM_WIDI_HEADER_LEN (4)
 
 enum
 {
     LPCM_VOB,
     LPCM_AOB,
     LPCM_BD,
+    LPCM_WIDI,
 };
 
 typedef struct
@@ -190,7 +203,11 @@ static int BdHeader( decoder_sys_t *p_sys,
                      unsigned *pi_bits,
                      const uint8_t *p_header );
 static void BdExtract( block_t *, block_t *, unsigned, unsigned, unsigned, unsigned );
-
+/* */
+static int WidiHeader( unsigned *pi_rate,
+                       unsigned *pi_channels, unsigned *pi_original_channels,
+                       unsigned *pi_bits,
+                       const uint8_t *p_header );
 
 /*****************************************************************************
  * OpenCommon:
@@ -219,6 +236,11 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
         i_type = LPCM_BD;
         i_header_size = LPCM_BD_HEADER_LEN;
         break;
+    /* WIDI LPCM */
+    case VLC_CODEC_WIDI_LPCM:
+        i_type = LPCM_WIDI;
+        i_header_size = LPCM_WIDI_HEADER_LEN;
+        break;
     default:
         return VLC_EGENERIC;
     }
@@ -246,6 +268,9 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
             break;
         case LPCM_AOB:
             p_dec->fmt_out.i_codec = VLC_CODEC_DVDA_LPCM;
+            break;
+        case LPCM_WIDI:
+            p_dec->fmt_out.i_codec = VLC_CODEC_WIDI_LPCM;
             break;
         default:
             assert(0);
@@ -342,6 +367,10 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         i_ret = BdHeader( p_sys, &i_rate, &i_channels, &i_channels_padding, &i_original_channels, &i_bits,
                           p_block->p_buffer );
         break;
+    case LPCM_WIDI:
+        i_ret = WidiHeader( &i_rate, &i_channels, &i_original_channels, &i_bits,
+                            p_block->p_buffer );
+        break;
     default:
         abort();
     }
@@ -414,6 +443,7 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 
         switch( p_sys->i_type )
         {
+        case LPCM_WIDI:
         case LPCM_VOB:
             VobExtract( p_aout_buffer, p_block, i_bits );
             break;
@@ -968,6 +998,38 @@ static int BdHeader( decoder_sys_t *p_sys,
                                       *pi_original_channels,
                                       p_sys->pi_chan_table );
     }
+
+    return 0;
+}
+
+static int WidiHeader( unsigned *pi_rate,
+                       unsigned *pi_channels, unsigned *pi_original_channels,
+                       unsigned *pi_bits,
+                       const uint8_t *p_header )
+{
+    if ( p_header[0] != 0xa0 || p_header[1] != 0x06 )
+        return -1;
+
+    switch( ( p_header[3] & 0x38 ) >> 3 )
+    {
+    case 0b001:
+        *pi_rate = 44100;
+        break;
+    case 0b010:
+        *pi_rate = 48000;
+        break;
+    default:
+        return -1;
+    }
+
+    if( p_header[3] >> 6 != 0 )
+        return -1;
+    else
+        *pi_bits = 16;
+
+    *pi_channels = (p_header[3] & 0x7) + 1;
+
+    *pi_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
 
     return 0;
 }

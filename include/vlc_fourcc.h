@@ -366,6 +366,7 @@
 #define VLC_CODEC_DVD_LPCM                   VLC_FOURCC('l','p','c','m')
 #define VLC_CODEC_DVDA_LPCM                  VLC_FOURCC('a','p','c','m')
 #define VLC_CODEC_BD_LPCM                    VLC_FOURCC('b','p','c','m')
+#define VLC_CODEC_WIDI_LPCM                  VLC_FOURCC('w','p','c','m')
 #define VLC_CODEC_SDDS                       VLC_FOURCC('s','d','d','s')
 #define VLC_CODEC_MIDI                       VLC_FOURCC('M','I','D','I')
 #define VLC_CODEC_RALF                       VLC_FOURCC('R','A','L','F')
