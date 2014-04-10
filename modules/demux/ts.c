@@ -343,7 +343,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 
 static void PIDInit ( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner );
 static void PIDClean( demux_t *, ts_pid_t *pid );
-static void PIDFillFormat( ts_es_t *es, int i_stream_type );
+static void PIDFillFormat( const ts_es_t *es, int i_stream_type );
 
 static void PATCallBack( void*, dvbpsi_pat_t * );
 static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt );
@@ -2383,7 +2383,7 @@ static bool GatherData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     return i_ret;
 }
 
-static void PIDFillFormat( ts_es_t *es, int i_stream_type )
+static void PIDFillFormat( const ts_es_t *es, int i_stream_type )
 {
     es_format_t *fmt = &es->fmt;
 
@@ -2422,7 +2422,6 @@ static void PIDFillFormat( ts_es_t *es, int i_stream_type )
         break;
     case 0x82:  /* SCTE-27 (sub) */
         es_format_Init( fmt, SPU_ES, VLC_CODEC_SCTE_27 );
-        es->data_type = TS_ES_DATA_TABLE_SECTION;
         break;
     case 0x83:  /* LPCM (audio) */
         es_format_Init( fmt, AUDIO_ES, VLC_CODEC_DVD_LPCM );
@@ -4109,6 +4108,16 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
               pid->es->fmt.i_codec != VLC_CODEC_TELETEXT ) )
         {
             PMTParseEsIso639( p_demux, pid, p_es );
+        }
+
+        switch( pid->es->fmt.i_codec )
+        {
+        case VLC_CODEC_SCTE_27:
+            pid->es->data_type = TS_ES_DATA_TABLE_SECTION;
+            break;
+        default:
+            //pid->es->data_type = TS_ES_DATA_PES;
+            break;
         }
 
         pid->es->fmt.i_group = p_pmt->i_program_number;
