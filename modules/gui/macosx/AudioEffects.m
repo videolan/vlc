@@ -802,14 +802,17 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 #pragma mark Compressor
 - (void)resetCompressor
 {
+    BOOL b_enable_comp = NO;
     char *psz_afilters;
     psz_afilters = config_GetPsz(p_intf, "audio-filter");
     if (psz_afilters) {
+        b_enable_comp = strstr(psz_afilters, "compressor") != NULL;
         [o_comp_enable_ckb setState: (NSInteger)strstr(psz_afilters, "compressor") ];
         free(psz_afilters);
     }
-    else
-        [o_comp_enable_ckb setState: NSOffState];
+
+    [o_comp_view enableSubviews:b_enable_comp];
+    [o_comp_enable_ckb setState:(b_enable_comp ? NSOnState : NSOffState)];
 
     [o_comp_band1_sld setFloatValue: config_GetFloat(p_intf, "compressor-rms-peak")];
     [o_comp_band1_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [o_comp_band1_sld floatValue]]];
@@ -853,6 +856,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)comp_enable:(id)sender
 {
+    [o_comp_view enableSubviews:[sender state]];
     [self setAudioFilter:"compressor" on:[sender state]];
 }
 

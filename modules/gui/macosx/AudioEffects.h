@@ -51,6 +51,7 @@
     IBOutlet id o_eq_preamp_sld;
 
     /* Compressor */
+    IBOutlet id o_comp_view;
     IBOutlet id o_comp_enable_ckb;
     IBOutlet id o_comp_reset_btn;
     IBOutlet id o_comp_band1_sld;
