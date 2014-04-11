@@ -187,7 +187,7 @@ vlc_module_begin()
     add_string(VIDEO_CFG_PREFIX "video-connection", "sdi",
                 VIDEO_CONNECTION_TEXT, VIDEO_CONNECTION_LONGTEXT, true)
                 change_string_list(ppsz_videoconns, ppsz_videoconns_text)
-    add_string(VIDEO_CFG_PREFIX "mode", "pal ",
+    add_string(VIDEO_CFG_PREFIX "mode", "",
                 MODE_TEXT, MODE_LONGTEXT, true)
     add_bool(VIDEO_CFG_PREFIX "tenbits", false,
                 VIDEO_TENBITS_TEXT, VIDEO_TENBITS_LONGTEXT, true)
@@ -329,6 +329,7 @@ static const char * lookup_error_string(long i_code)
 static struct decklink_sys_t *OpenDecklink(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
+    video_format_t *fmt = &vd->fmt;
 #define CHECK(message) do { \
     if (result != S_OK) \
     { \
@@ -361,17 +362,19 @@ static struct decklink_sys_t *OpenDecklink(vout_display_t *vd)
     BMDVideoConnection vconn = getVConn(vd);
     char *mode = var_InheritString(vd, VIDEO_CFG_PREFIX "mode");
     size_t len = mode ? strlen(mode) : 0;
-    if (!mode || len > 4)
+    if (len > 4)
     {
         free(mode);
-        msg_Err(vd, "Missing or invalid mode");
+        msg_Err(vd, "Invalid mode %s", mode);
         goto error;
     }
 
     BMDDisplayMode wanted_mode_id;
     memset(&wanted_mode_id, ' ', 4);
-    strncpy((char*)&wanted_mode_id, mode, 4);
-    free(mode);
+    if (mode) {
+        strncpy((char*)&wanted_mode_id, mode, 4);
+        free(mode);
+    }
 
     if (i_card_index < 0)
     {
@@ -420,7 +423,7 @@ static struct decklink_sys_t *OpenDecklink(vout_display_t *vd)
 
     for (; ; p_display_mode->Release())
     {
-        int w, h;
+        unsigned w, h;
         result = p_display_iterator->Next(&p_display_mode);
         if (result != S_OK)
         {
@@ -445,6 +448,20 @@ static struct decklink_sys_t *OpenDecklink(vout_display_t *vd)
                 double(decklink_sys->timescale) / decklink_sys->frameduration);
         msg_Dbg(vd, "scale %d dur %d", (int)decklink_sys->timescale,
             (int)decklink_sys->frameduration);
+
+        if (w == fmt->i_width && h == fmt->i_height) {
+            unsigned int num_deck, den_deck;
+            unsigned int num_stream, den_stream;
+            vlc_ureduce(&num_deck, &den_deck,
+                decklink_sys->timescale, decklink_sys->frameduration, 0);
+            vlc_ureduce(&num_stream, &den_stream,
+                fmt->i_frame_rate, fmt->i_frame_rate_base, 0);
+
+            if (num_deck == num_stream && den_deck == den_stream) {
+                msg_Info(vd, "Matches incoming stream!");
+                wanted_mode_id = mode_id;
+            }
+        }
 
         if (wanted_mode_id != mode_id)
             continue;
