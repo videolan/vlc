@@ -907,6 +907,7 @@ static int ControlVideo(vout_display_t *vd, int query, va_list args)
 static int OpenVideo(vlc_object_t *p_this)
 {
     vout_display_t *vd = (vout_display_t *)p_this;
+    video_format_t *fmt = &vd->fmt;
     vout_display_sys_t *sys;
     struct decklink_sys_t *decklink_sys;
 
@@ -930,13 +931,13 @@ static int OpenVideo(vlc_object_t *p_this)
 
     sys->pool = NULL;
 
-    vd->fmt.i_chroma = sys->tenbits
+    fmt->i_chroma = sys->tenbits
         ? VLC_CODEC_I422_10L /* we will convert to v210 */
         : VLC_CODEC_UYVY;
-    //video_format_FixRgb(&(vd->fmt));
+    //video_format_FixRgb(fmt);
 
-    vd->fmt.i_width = decklink_sys->i_width;
-    vd->fmt.i_height = decklink_sys->i_height;
+    fmt->i_width = decklink_sys->i_width;
+    fmt->i_height = decklink_sys->i_height;
 
     char *pic_file = var_InheritString(p_this, VIDEO_CFG_PREFIX "nosignal-image");
     if (pic_file) {
@@ -947,15 +948,15 @@ static int OpenVideo(vlc_object_t *p_this)
             video_format_t in, dummy;
 
             video_format_Init(&in, 0);
-            video_format_Setup(&in, 0, vd->fmt.i_width, vd->fmt.i_height,
-                    vd->fmt.i_width, vd->fmt.i_height, 1, 1);
+            video_format_Setup(&in, 0, fmt->i_width, fmt->i_height,
+                               fmt->i_width, fmt->i_height, 1, 1);
 
             video_format_Init(&dummy, 0);
 
             picture_t *png = image_ReadUrl(img, pic_file, &dummy, &in);
             if (png) {
                 msg_Err(p_this, "Converting");
-                sys->pic_nosignal = image_Convert(img, png, &in, &vd->fmt);
+                sys->pic_nosignal = image_Convert(img, png, &in, fmt);
                 picture_Release(png);
             }
 
