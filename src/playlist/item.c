@@ -146,10 +146,7 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
 
             if( var_GetBool( p_playlist, "random" ) )
             {
-                unsigned rand_pos =
-                    ((unsigned)vlc_mrand48()) % (last_pos - pos);
-                rand_pos += pos;
-                p_play_item = p_item->pp_children[rand_pos];
+                p_play_item = NULL;
             }
             else
             {
