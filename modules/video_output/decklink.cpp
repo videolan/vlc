@@ -70,6 +70,9 @@ static const int pi_channels_maps[CHANNELS_MAX+1] =
     "After this delay we black out the video."\
     )
 
+#define AFDLINE_INDEX_TEXT N_("Active Format Descriptor line.")
+#define AFDLINE_INDEX_LONGTEXT N_("VBI line on which to output Active Format Descriptor.")
+
 #define NOSIGNAL_IMAGE_TEXT N_("Picture to display on input signal loss.")
 #define NOSIGNAL_IMAGE_LONGTEXT NOSIGNAL_IMAGE_TEXT
 
@@ -193,6 +196,8 @@ vlc_module_begin()
                 VIDEO_TENBITS_TEXT, VIDEO_TENBITS_LONGTEXT, true)
     add_integer(VIDEO_CFG_PREFIX "nosignal-delay", 5,
                 NOSIGNAL_INDEX_TEXT, NOSIGNAL_INDEX_LONGTEXT, true)
+    add_integer(VIDEO_CFG_PREFIX "afd-line", 16,
+                AFDLINE_INDEX_TEXT, AFDLINE_INDEX_LONGTEXT, true)
     add_loadfile(VIDEO_CFG_PREFIX "nosignal-image", NULL,
                 NOSIGNAL_IMAGE_TEXT, NOSIGNAL_IMAGE_LONGTEXT, true)
 
@@ -677,6 +682,61 @@ static void v210_convert(void *frame_bytes, picture_t *pic, int dst_stride)
     }
 }
 
+static void send_AFD(vout_display_t *vd, uint8_t *buf)
+{
+    const size_t len = 6 /* vanc header */ + 8 /* AFD data */ + 1 /* csum */;
+    const size_t s = ((len + 5) / 6) * 6; // align for v210
+
+    uint16_t afd[s];
+
+    afd[0] = 0x000;
+    afd[1] = 0x3ff;
+    afd[2] = 0x3ff;
+    afd[3] = 0x41; // DID
+    afd[4] = 0x05; // SDID
+    afd[5] = 8; // Data Count
+
+    int afd_code = 0;
+    int AR = 0;
+    int bar_data_flags = 0;
+    int bar_data_val1 = 0;
+    int bar_data_val2 = 0;
+
+    afd[ 6] = (afd_code << 3) | (AR << 2);
+    afd[ 7] = 0; // reserved
+    afd[ 8] = 0; // reserved
+    afd[ 9] = bar_data_flags << 4;
+    afd[10] = bar_data_val1 << 8;
+    afd[11] = bar_data_val1 & 0xff;
+    afd[12] = bar_data_val2 << 8;
+    afd[13] = bar_data_val2 & 0xff;
+
+    /* parity bit */
+    for (size_t i = 3; i < len - 1; i++)
+        afd[i] |= parity(afd[i]) ? 0x100 : 0x200;
+
+    /* vanc checksum */
+    uint16_t vanc_sum = 0;
+    for (size_t i = 3; i < len - 1; i++) {
+        vanc_sum += afd[i];
+        vanc_sum &= 0x1ff;
+    }
+
+    afd[len - 1] = vanc_sum | ((~vanc_sum & 0x100) << 1);
+
+    /* pad */
+    for (size_t i = len; i < s; i++)
+        afd[i] = 0x040;
+
+    /* convert to v210 and write into VANC */
+    for (size_t w = 0; w < s / 6 ; w++) {
+        put_le32(&buf, afd[w*6+0] << 10);
+        put_le32(&buf, afd[w*6+1] | (afd[w*6+2] << 20));
+        put_le32(&buf, afd[w*6+3] << 10);
+        put_le32(&buf, afd[w*6+4] | (afd[w*6+5] << 20));
+    }
+}
+
 static void DisplayVideo(vout_display_t *vd, picture_t *picture, subpicture_t *)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -734,8 +794,35 @@ static void DisplayVideo(vout_display_t *vd, picture_t *picture, subpicture_t *)
     pDLVideoFrame->GetBytes((void**)&frame_bytes);
     stride = pDLVideoFrame->GetRowBytes();
 
-    if (sys->tenbits)
+    if (sys->tenbits) {
+        IDeckLinkVideoFrameAncillary *vanc;
+        int line;
+        void *buf;
+
+        result = decklink_sys->p_output->CreateAncillaryData(
+                sys->tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV, &vanc);
+        if (result != S_OK) {
+            msg_Err(vd, "Failed to create vanc: %d", result);
+            goto end;
+        }
+
+        line = var_InheritInteger(vd, VIDEO_CFG_PREFIX "afd-line");
+        result = vanc->GetBufferForVerticalBlankingLine(line, &buf);
+        if (result != S_OK) {
+            msg_Err(vd, "Failed to get VBI line %d: %d", line, result);
+            goto end;
+        }
+        send_AFD(vd, (uint8_t*)buf);
+
         v210_convert(frame_bytes, picture, stride);
+
+        result = pDLVideoFrame->SetAncillaryData(vanc);
+        vanc->Release();
+        if (result != S_OK) {
+            msg_Err(vd, "Failed to set vanc: %d", result);
+            goto end;
+        }
+    }
     else for(int y = 0; y < h; ++y) {
         uint8_t *dst = (uint8_t *)frame_bytes + stride * y;
         const uint8_t *src = (const uint8_t *)picture->p[0].p_pixels +
