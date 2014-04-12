@@ -2233,15 +2233,8 @@ static int InputSourceInit( input_thread_t *p_input,
             /* special hack for forcing a demuxer with --demux=module
              * (and do nothing with a list) */
             psz_var_demux = var_GetNonEmptyString( p_input, "demux" );
-
-            if( psz_var_demux != NULL &&
-                !strchr(psz_var_demux, ',' ) &&
-                !strchr(psz_var_demux, ':' ) )
-            {
-                psz_demux = psz_var_demux;
-
-                msg_Dbg( p_input, "enforced demux ` %s'", psz_demux );
-            }
+            psz_demux = psz_var_demux;
+            msg_Dbg( p_input, "specified demux `%s'", psz_demux );
         }
 
         /* Try access_demux first */
@@ -2320,7 +2313,7 @@ static int InputSourceInit( input_thread_t *p_input,
         }
 
         /* Access-forced demuxer (PARENTAL ADVISORY: EXPLICIT HACK) */
-        if( !*psz_demux && *p_access->psz_demux )
+        if( !psz_demux[0] || !strcasecmp( psz_demux, "any" ) )
             psz_demux = p_access->psz_demux;
 
         /* */
