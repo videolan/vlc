@@ -39,7 +39,7 @@ static void test_block_File (void)
     FILE *stream;
     int res;
 
-    stream = fopen ("testfile.txt", "wb+");
+    stream = fopen ("testfile.txt", "wb+e");
     assert (stream != NULL);
 
     res = fputs (text, stream);

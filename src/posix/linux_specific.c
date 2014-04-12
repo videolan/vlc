@@ -34,7 +34,7 @@ char *config_GetLibDir (void)
     char *path = NULL;
 
     /* Find the path to libvlc (i.e. ourselves) */
-    FILE *maps = fopen ("/proc/self/maps", "rt");
+    FILE *maps = fopen ("/proc/self/maps", "rte");
     if (maps == NULL)
         goto error;
 
