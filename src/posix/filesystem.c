@@ -252,7 +252,7 @@ int vlc_dup (int oldfd)
     int newfd;
 
 #ifdef F_DUPFD_CLOEXEC
-    newfd = fcntl (oldfd, F_DUPFD_CLOEXEC);
+    newfd = fcntl (oldfd, F_DUPFD_CLOEXEC, 0);
     if (unlikely(newfd == -1 && errno == EINVAL))
 #endif
     {
