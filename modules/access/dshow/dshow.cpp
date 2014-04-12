@@ -793,18 +793,15 @@ static int AccessOpen( vlc_object_t *p_this )
     dshow_stream_t *p_stream = p_sys->pp_streams[0];
 
     /* Check if we need to force demuxers */
-    if( !p_access->psz_demux || !*p_access->psz_demux )
+    if( p_stream->i_fourcc == VLC_CODEC_DV )
     {
-        if( p_stream->i_fourcc == VLC_CODEC_DV )
-        {
-            free( p_access->psz_demux );
-            p_access->psz_demux = strdup( "rawdv" );
-        }
-        else if( p_stream->i_fourcc == VLC_CODEC_MPGV )
-        {
-            free( p_access->psz_demux );
-            p_access->psz_demux = strdup( "mpgv" );
-        }
+        free( p_access->psz_demux );
+        p_access->psz_demux = strdup( "rawdv" );
+    }
+    else if( p_stream->i_fourcc == VLC_CODEC_MPGV )
+    {
+        free( p_access->psz_demux );
+        p_access->psz_demux = strdup( "mpgv" );
     }
 
     /* Setup Access */
