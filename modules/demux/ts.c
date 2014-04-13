@@ -4084,39 +4084,36 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
         pid->i_pid          = p_es->i_pid;
         pid->b_seen         = p_sys->pid[p_es->i_pid].b_seen;
 
-        if( p_es->i_type == 0x10 || p_es->i_type == 0x11 ||
-            p_es->i_type == 0x12 || p_es->i_type == 0x0f )
+        switch( p_es->i_type )
         {
+        case 0x10:
+        case 0x11:
+        case 0x12:
+        case 0x0f:
             PMTSetupEsISO14496( p_demux, pid, prg, p_es );
-        }
-        else if( p_es->i_type == 0x06 )
-        {
+            break;
+        case 0x06:
             PMTSetupEs0x06( p_demux, pid, p_es );
-        }
-        else if( p_es->i_type == 0xEA )
-        {
-            PMTSetupEs0xEA( p_demux, pid, p_es );
-        }
-        else if( p_es->i_type == 0xd1 )
-        {
-            PMTSetupEs0xD1( p_demux, pid, p_es );
-        }
-        else if( p_es->i_type == 0xa0 )
-        {
-            PMTSetupEs0xA0( p_demux, pid, p_es );
-        }
-        else if ( p_es->i_type == 0x83 )
-        {
+            break;
+        case 0x83:
             /* LPCM (audio) */
             PMTSetupEs0x83( p_pmt, pid );
-        }
-        else if( registration_type == TS_REGISTRATION_HDMV )
-        {
-            PMTSetupEsHDMV( pid, p_es );
-        }
-        else if( p_es->i_type >= 0x80 )
-        {
-            PMTSetupEsRegistration( p_demux, pid, p_es );
+            break;
+        case 0xa0:
+            PMTSetupEs0xA0( p_demux, pid, p_es );
+            break;
+        case 0xd1:
+            PMTSetupEs0xD1( p_demux, pid, p_es );
+            break;
+        case 0xEA:
+            PMTSetupEs0xEA( p_demux, pid, p_es );
+            break;
+        default:
+            if( registration_type == TS_REGISTRATION_HDMV )
+                PMTSetupEsHDMV( pid, p_es );
+            else if( p_es->i_type >= 0x80 )
+                PMTSetupEsRegistration( p_demux, pid, p_es );
+            break;
         }
 
         if( pid->es->fmt.i_cat == AUDIO_ES ||
