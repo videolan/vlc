@@ -327,7 +327,7 @@ static void *FinderThread( void *p_data )
     for( ;; )
     {
         vlc_mutex_lock( &p_manager->p_priv->finder.lock );
-        vlc_cleanup_push( vlc_mutex_unlock, &p_manager->p_priv->finder.lock );
+        mutex_cleanup_push( &p_manager->p_priv->finder.lock );
         while( p_manager->p_priv->finder.uris.i_size == 0 )
         {
             vlc_cond_wait( &p_manager->p_priv->finder.waitcond,
@@ -441,7 +441,7 @@ static void *InstallerThread( void *p_data )
     for( ;; )
     {
         vlc_mutex_lock( &p_manager->p_priv->installer.lock );
-        vlc_cleanup_push( vlc_mutex_unlock, &p_manager->p_priv->installer.lock );
+        mutex_cleanup_push( &p_manager->p_priv->installer.lock );
         while ( !p_manager->p_priv->installer.entries.i_size )
         {
             /* No queued addons */
