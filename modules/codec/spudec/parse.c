@@ -623,10 +623,13 @@ static int ParseRLE( decoder_t *p_dec,
         int i, i_inner = -1, i_shade = -1;
 
         /* Set the border color */
-        p_spu_data->pi_yuv[i_border][0] = 0x00;
-        p_spu_data->pi_yuv[i_border][1] = 0x80;
-        p_spu_data->pi_yuv[i_border][2] = 0x80;
-        stats[i_border] = 0;
+        if( i_border != -1 )
+        {
+            p_spu_data->pi_yuv[i_border][0] = 0x00;
+            p_spu_data->pi_yuv[i_border][1] = 0x80;
+            p_spu_data->pi_yuv[i_border][2] = 0x80;
+            stats[i_border] = 0;
+        }
 
         /* Find the inner colors */
         for( i = 0 ; i < 4 && i_inner == -1 ; i++ )
