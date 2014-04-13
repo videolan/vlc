@@ -2854,13 +2854,33 @@ static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
     if( i_actually_read < 8 )
         return 0;
 
-    /* meta content starts with a 4 byte version/flags value (should be 0) */
-    i_actually_read = stream_Read( p_stream, meta_data, 4 );
-    if( i_actually_read < 4 )
+    if ( !p_box->p_father )
         return 0;
 
-    /* then it behaves like a container */
-    return MP4_ReadBoxContainerRaw( p_stream, p_box );
+    switch( p_box->p_father->i_type )
+    {
+    case ATOM_udta: /* itunes udta/meta */
+        /* meta content starts with a 4 byte version/flags value (should be 0) */
+        i_actually_read = stream_Read( p_stream, meta_data, 4 );
+        if( i_actually_read < 4 )
+            return 0;
+
+        /* then it behaves like a container */
+        return MP4_ReadBoxContainerRaw( p_stream, p_box );
+
+    default: /* regular meta atom */
+
+        i_actually_read = stream_Read( p_stream, meta_data, 8 );
+        if( i_actually_read < 8 )
+            return 0;
+
+        /* Mandatory */
+        if ( VLC_FOURCC( meta_data[4], meta_data[5], meta_data[6], meta_data[7] ) != ATOM_hdlr )
+            return 0;
+
+        //ft
+    }
+    return 1;
 }
 
 static int MP4_ReadBox_iods( stream_t *p_stream, MP4_Box_t *p_box )
