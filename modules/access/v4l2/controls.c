@@ -683,11 +683,12 @@ static vlc_v4l2_ctrl_t *ControlAddIntMenu (vlc_object_t *obj, int fd,
 
         if (v4l2_ioctl (fd, VIDIOC_QUERYMENU, &menu) < 0)
             continue;
-        msg_Dbg (obj, "  choice %"PRIu32") %"PRId64, menu.index, menu.value);
+        msg_Dbg (obj, "  choice %"PRIu32") %"PRId64, menu.index,
+                 (uint64_t)menu.value);
 
         vlc_value_t text;
         val.i_int = menu.index;
-        sprintf (name, "%"PRId64, menu.value);
+        sprintf (name, "%"PRId64, (int64_t)menu.value);
         text.psz_string = name;
         var_Change (obj, c->name, VLC_VAR_ADDCHOICE, &val, &text);
     }

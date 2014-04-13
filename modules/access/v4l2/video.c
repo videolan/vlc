@@ -61,11 +61,11 @@ static int SetupStandard (vlc_object_t *obj, int fd,
     }
     if (v4l2_ioctl (fd, VIDIOC_S_STD, std) < 0)
     {
-        msg_Err (obj, "cannot set video standard 0x%"PRIx64": %s", *std,
-                 vlc_strerror_c(errno));
+        msg_Err (obj, "cannot set video standard 0x%"PRIx64": %s",
+                 (uint64_t)*std, vlc_strerror_c(errno));
         return -1;
     }
-    msg_Dbg (obj, "video standard set to 0x%"PRIx64":", *std);
+    msg_Dbg (obj, "video standard set to 0x%"PRIx64":", (uint64_t)*std);
     return 0;
 }
 
