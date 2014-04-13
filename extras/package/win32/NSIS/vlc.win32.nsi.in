@@ -122,29 +122,45 @@ RequestExecutionLevel admin
   !insertmacro MUI_LANGUAGE "SimpChinese"
   !insertmacro MUI_LANGUAGE "TradChinese"
   !insertmacro MUI_LANGUAGE "Japanese"
-  !insertmacro MUI_LANGUAGE "Korean"
   !insertmacro MUI_LANGUAGE "Italian"
   !insertmacro MUI_LANGUAGE "Dutch"
   !insertmacro MUI_LANGUAGE "Danish"
   !insertmacro MUI_LANGUAGE "Swedish"
-  !insertmacro MUI_LANGUAGE "Norwegian"
   !insertmacro MUI_LANGUAGE "Finnish"
-  !insertmacro MUI_LANGUAGE "Greek"
   !insertmacro MUI_LANGUAGE "Russian"
   !insertmacro MUI_LANGUAGE "Portuguese"
   !insertmacro MUI_LANGUAGE "PortugueseBR"
+  !insertmacro MUI_LANGUAGE "Welsh"
+  !insertmacro MUI_LANGUAGE "Uzbek"
+  !insertmacro MUI_LANGUAGE "Ukrainian"
+  !insertmacro MUI_LANGUAGE "Turkish"
+  !insertmacro MUI_LANGUAGE "Traditional_Chinese"
+  !insertmacro MUI_LANGUAGE "Thai"
+  !insertmacro MUI_LANGUAGE "Sinhala"
+  !insertmacro MUI_LANGUAGE "Scottish_Gaelic"
+  !insertmacro MUI_LANGUAGE "Norwegian"
+  !insertmacro MUI_LANGUAGE "Malay"
+  !insertmacro MUI_LANGUAGE "Korean"
+  !insertmacro MUI_LANGUAGE "Khmer"
+  !insertmacro MUI_LANGUAGE "Greek"
+  !insertmacro MUI_LANGUAGE "English_United_Kingdom"
+  !insertmacro MUI_LANGUAGE "Czech"
+  !insertmacro MUI_LANGUAGE "Bosnian"
   !insertmacro MUI_LANGUAGE "Arabic"
   !insertmacro MUI_LANGUAGE "Polish"
   !insertmacro MUI_LANGUAGE "Romanian"
   !insertmacro MUI_LANGUAGE "Slovak"
   !insertmacro MUI_LANGUAGE "Serbian"
-  !insertmacro MUI_LANGUAGE "Czech"
   !insertmacro MUI_LANGUAGE "Hungarian"
   !insertmacro MUI_LANGUAGE "Catalan"
   !insertmacro MUI_LANGUAGE "Bulgarian"
   !insertmacro MUI_LANGUAGE "Estonian"
   !insertmacro MUI_LANGUAGE "Lithuanian"
   !insertmacro MUI_LANGUAGE "Basque"
+  !insertmacro MUI_LANGUAGE "Galician"
+  !insertmacro MUI_LANGUAGE "Hebrew"
+  !insertmacro MUI_LANGUAGE "Portuguese"
+  !insertmacro MUI_LANGUAGE "Slovenian"
 
 ; Reserve files for solid compression
   !insertmacro MUI_RESERVEFILE_LANGDLL
@@ -509,7 +525,7 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_JAPANESE} Japanese 0
 ;  StrCmp $LANGUAGE ${LANG_BENGALI} Bengali 0
 ;  StrCmp $LANGUAGE ${LANG_PUNJABI} Punjabi 0
-;  StrCmp $LANGUAGE ${LANG_SLOVENIAN} Slovenian 0
+  StrCmp $LANGUAGE ${LANG_SLOVENIAN} Slovenian 0
   StrCmp $LANGUAGE ${LANG_SPANISH} Spanish 0
   StrCmp $LANGUAGE ${LANG_ESTONIAN} Estonian 0
   StrCmp $LANGUAGE ${LANG_LITHUANIAN} Lithuanian 0
@@ -519,6 +535,23 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_HEBREW} Hebrew 0
   StrCmp $LANGUAGE ${LANG_GALICIAN} Galician 0
   StrCmp $LANGUAGE ${LANG_SWEDISH} Swedish 0
+  StrCmp $LANGUAGE ${LANG_ARABIC} Arabic 0
+  StrCmp $LANGUAGE ${LANG_BOSNIAN} Bosnian 0
+  StrCmp $LANGUAGE ${LANG_CZECH} Czech 0
+  StrCmp $LANGUAGE ${LANG_ENGLISH_UNITED_KINGDOM} English_United_Kingdom 0
+  StrCmp $LANGUAGE ${LANG_GREEK} Greek 0
+  StrCmp $LANGUAGE ${LANG_KHMER} Khmer 0
+  StrCmp $LANGUAGE ${LANG_KOREAN} Korean 0
+  StrCmp $LANGUAGE ${LANG_MALAY} Malay 0
+  StrCmp $LANGUAGE ${LANG_NORWEGIAN} Norwegian 0
+  StrCmp $LANGUAGE ${LANG_SCOTTISH_GAELIC} Scottish_Gaelic 0
+  StrCmp $LANGUAGE ${LANG_SINHALA} Sinhala 0
+  StrCmp $LANGUAGE ${LANG_THAI} Thai 0
+  StrCmp $LANGUAGE ${LANG_TRADITIONAL_CHINESE} Traditional_Chinese 0
+  StrCmp $LANGUAGE ${LANG_TURKISH} Turkish 0
+  StrCmp $LANGUAGE ${LANG_UKRAINIAN} Ukrainian 0
+  StrCmp $LANGUAGE ${LANG_UZBEK} Uzbek 0
+  StrCmp $LANGUAGE ${LANG_WELSH} Welsh 0
   StrCmp $LANGUAGE ${LANG_PORTUGUESEBR} Brazilian EndLanguageCmp
   French:
   !include "languages\french.nsh"
@@ -597,6 +630,57 @@ UAC_Success:
   Goto EndLanguageCmp
   Swedish:
   !include "languages\swedish.nsh"
+  Goto EndLanguageCmp
+  Arabic:
+  !include "languages\arabic.nsh"
+  Goto EndLanguageCmp
+  Bosnian:
+  !include "languages\bosnian.nsh"
+  Goto EndLanguageCmp
+  Czech:
+  !include "languages\czech.nsh"
+  Goto EndLanguageCmp
+  English_United_Kingdom:
+  !include "languages\english_united_kingdom.nsh"
+  Goto EndLanguageCmp
+  Greek:
+  !include "languages\greek.nsh"
+  Goto EndLanguageCmp
+  Khmer:
+  !include "languages\khmer.nsh"
+  Goto EndLanguageCmp
+  Korean:
+  !include "languages\korean.nsh"
+  Goto EndLanguageCmp
+  Malay:
+  !include "languages\malay.nsh"
+  Goto EndLanguageCmp
+  Norwegian:
+  !include "languages\norwegian.nsh"
+  Goto EndLanguageCmp
+  Scottish_Gaelic:
+  !include "languages\scottish_gaelic.nsh"
+  Goto EndLanguageCmp
+  Sinhala:
+  !include "languages\sinhala.nsh"
+  Goto EndLanguageCmp
+  Thai:
+  !include "languages\thai.nsh"
+  Goto EndLanguageCmp
+  Traditional_Chinese:
+  !include "languages\traditional_chinese.nsh"
+  Goto EndLanguageCmp
+  Turkish:
+  !include "languages\turkish.nsh"
+  Goto EndLanguageCmp
+  Ukrainian:
+  !include "languages\ukrainian.nsh"
+  Goto EndLanguageCmp
+  Uzbek:
+  !include "languages\uzbek.nsh"
+  Goto EndLanguageCmp
+  Welsh:
+  !include "languages\welsh.nsh"
   Goto EndLanguageCmp
   Brazilian:
   !include "languages\brazilian_portuguese.nsh"
@@ -966,7 +1050,7 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_JAPANESE} Japanese 0
 ;  StrCmp $LANGUAGE ${LANG_BENGALI} Bengali 0
 ;  StrCmp $LANGUAGE ${LANG_PUNJABI} Punjabi 0
-;  StrCmp $LANGUAGE ${LANG_SLOVENIAN} Slovenian 0
+  StrCmp $LANGUAGE ${LANG_SLOVENIAN} Slovenian 0
   StrCmp $LANGUAGE ${LANG_SPANISH} Spanish 0
   StrCmp $LANGUAGE ${LANG_ESTONIAN} Estonian 0
   StrCmp $LANGUAGE ${LANG_LITHUANIAN} Lithuanian 0
@@ -976,6 +1060,23 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_HEBREW} Hebrew 0
   StrCmp $LANGUAGE ${LANG_GALICIAN} Galician 0
   StrCmp $LANGUAGE ${LANG_SWEDISH} Swedish 0
+  StrCmp $LANGUAGE ${LANG_ARABIC} Arabic 0
+  StrCmp $LANGUAGE ${LANG_BOSNIAN} Bosnian 0
+  StrCmp $LANGUAGE ${LANG_CZECH} Czech 0
+  StrCmp $LANGUAGE ${LANG_ENGLISH_UNITED_KINGDOM} English_United_Kingdom 0
+  StrCmp $LANGUAGE ${LANG_GREEK} Greek 0
+  StrCmp $LANGUAGE ${LANG_KHMER} Khmer 0
+  StrCmp $LANGUAGE ${LANG_KOREAN} Korean 0
+  StrCmp $LANGUAGE ${LANG_MALAY} Malay 0
+  StrCmp $LANGUAGE ${LANG_NORWEGIAN} Norwegian 0
+  StrCmp $LANGUAGE ${LANG_SCOTTISH_GAELIC} Scottish_Gaelic 0
+  StrCmp $LANGUAGE ${LANG_SINHALA} Sinhala 0
+  StrCmp $LANGUAGE ${LANG_THAI} Thai 0
+  StrCmp $LANGUAGE ${LANG_TRADITIONAL_CHINESE} Traditional_Chinese 0
+  StrCmp $LANGUAGE ${LANG_TURKISH} Turkish 0
+  StrCmp $LANGUAGE ${LANG_UKRAINIAN} Ukrainian 0
+  StrCmp $LANGUAGE ${LANG_UZBEK} Uzbek 0
+  StrCmp $LANGUAGE ${LANG_WELSH} Welsh 0
   StrCmp $LANGUAGE ${LANG_PORTUGUESEBR} Brazilian EndLanguageCmp
   French:
   !include "languages\french.nsh"
@@ -1054,6 +1155,57 @@ UAC_Success:
   Goto EndLanguageCmp
   Swedish:
   !include "languages\swedish.nsh"
+  Goto EndLanguageCmp
+  Arabic:
+  !include "languages\arabic.nsh"
+  Goto EndLanguageCmp
+  Bosnian:
+  !include "languages\bosnian.nsh"
+  Goto EndLanguageCmp
+  Czech:
+  !include "languages\czech.nsh"
+  Goto EndLanguageCmp
+  English_United_Kingdom:
+  !include "languages\english_united_kingdom.nsh"
+  Goto EndLanguageCmp
+  Greek:
+  !include "languages\greek.nsh"
+  Goto EndLanguageCmp
+  Khmer:
+  !include "languages\khmer.nsh"
+  Goto EndLanguageCmp
+  Korean:
+  !include "languages\korean.nsh"
+  Goto EndLanguageCmp
+  Malay:
+  !include "languages\malay.nsh"
+  Goto EndLanguageCmp
+  Norwegian:
+  !include "languages\norwegian.nsh"
+  Goto EndLanguageCmp
+  Scottish_Gaelic:
+  !include "languages\scottish_gaelic.nsh"
+  Goto EndLanguageCmp
+  Sinhala:
+  !include "languages\sinhala.nsh"
+  Goto EndLanguageCmp
+  Thai:
+  !include "languages\thai.nsh"
+  Goto EndLanguageCmp
+  Traditional_Chinese:
+  !include "languages\traditional_chinese.nsh"
+  Goto EndLanguageCmp
+  Turkish:
+  !include "languages\turkish.nsh"
+  Goto EndLanguageCmp
+  Ukrainian:
+  !include "languages\ukrainian.nsh"
+  Goto EndLanguageCmp
+  Uzbek:
+  !include "languages\uzbek.nsh"
+  Goto EndLanguageCmp
+  Welsh:
+  !include "languages\welsh.nsh"
   Goto EndLanguageCmp
   Brazilian:
   !include "languages\brazilian_portuguese.nsh"
