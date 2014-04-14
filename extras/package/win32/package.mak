@@ -62,7 +62,7 @@ endif
 # Compiler shared DLLs, when using compilers built with --enable-shared
 # The shared DLLs may not necessarily be in the first LIBRARY_PATH, we
 # should check them all.
-	library_path_list=`$(CXX) -v /dev/null 2>&1 | grep ^LIBRARY_PATH|cut -d= -f2` ;\
+	-library_path_list=`$(CXX) -v /dev/null 2>&1 | grep ^LIBRARY_PATH|cut -d= -f2` ;\
 	IFS=':' ;\
 	for x in $$library_path_list ;\
 	do \
