@@ -6,6 +6,7 @@ libfloat_mixer_plugin_la_LIBADD = $(LIBM)
 
 libinteger_mixer_plugin_la_SOURCES = audio_mixer/integer.c
 libinteger_mixer_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libinteger_mixer_plugin_la_LIBADD = $(LIBM)
 
 audio_mixer_LTLIBRARIES = \
 	libfloat_mixer_plugin.la \
