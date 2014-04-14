@@ -760,7 +760,7 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
     CONNECT( THEMIM->getIM(), positionUpdated( float, int64_t, int ),
               this, setDisplayPosition( float, int64_t, int ) );
 
-    setStyleSheet( "padding-left: 4px; padding-right: 4px;" );
+    setStyleSheet( "QLabel { padding-left: 4px; padding-right: 4px; }" );
 }
 
 void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
