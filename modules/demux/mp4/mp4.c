@@ -3708,7 +3708,15 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
      * more than one subsegment. */
     if( !default_duration )
     {
-        if( p_sidx )
+        MP4_Box_t *p_trex = MP4_BoxGet( p_demux->p_sys->p_root, "moov/mvex/trex");
+        if ( p_trex )
+        {
+            while( p_trex && p_trex->data.p_trex->i_track_ID != i_track_ID )
+                p_trex = p_trex->p_next;
+            if ( p_trex )
+                default_duration = p_trex->data.p_trex->i_default_sample_duration * p_track->i_timescale;
+        }
+        else if( p_sidx )
         {
             MP4_Box_data_sidx_t *p_sidx_data = p_sidx->data.p_sidx;
             assert( p_sidx_data->i_reference_count == 1 );
