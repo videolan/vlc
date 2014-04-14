@@ -1012,3 +1012,8 @@ reactor leaks ionizing radiations."
 < tmatth> cowboys and endianess
 < tmatth> flac over telegraph
  -- #videolan, remembering good old times
+%
+<+courmisch> elenril: there are three types of OSes: Windows, those
+ with pthreads, and the useless ones
+ -- IRC, trol^Wdebating on mobile OSes
+%
