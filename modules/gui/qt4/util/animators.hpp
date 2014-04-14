@@ -63,7 +63,7 @@ class PixmapAnimator : public BasicAnimator
 public:
     PixmapAnimator( QWidget *parent, QList<QString> _frames );
     virtual int duration() const { return interval * pixmaps.count(); }
-    virtual ~PixmapAnimator() { qDeleteAll( pixmaps ); }
+    virtual ~PixmapAnimator();
     QPixmap *getPixmap() { return currentPixmap; }
 protected:
     virtual void updateCurrentTime ( int msecs );

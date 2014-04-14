@@ -52,6 +52,11 @@ PixmapAnimator::PixmapAnimator( QWidget *parent, QList<QString> frames )
     setFps( frames.count() ); /* default to 1 sec loop */
 }
 
+PixmapAnimator::~PixmapAnimator()
+{
+    qDeleteAll( pixmaps );
+}
+
 void PixmapAnimator::updateCurrentTime( int msecs )
 {
     int i = msecs / interval;
