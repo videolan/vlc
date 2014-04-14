@@ -337,7 +337,9 @@ vout_thread_t *aout_filter_RequestVout (filter_t *filter, vout_thread_t *vout,
      * to aout_request_vout_t inside filter_t (i.e. a level of indirection). */
     const aout_request_vout_t *req = (void *)filter->p_owner;
     char *visual = var_InheritString (filter->p_parent, "audio-visual");
-    bool recycle = (visual != NULL) && strcasecmp(visual, "none");
+    /* NOTE: Disable recycling to always close the filter vout because OpenGL
+     * visualizations do not use this function to ask for a context. */
+    bool recycle = false;
     free (visual);
 
     return req->pf_request_vout (req->p_private, vout, fmt, recycle);
