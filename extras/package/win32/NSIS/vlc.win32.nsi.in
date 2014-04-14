@@ -158,7 +158,6 @@ RequestExecutionLevel admin
   !insertmacro MUI_LANGUAGE "Basque"
   !insertmacro MUI_LANGUAGE "Galician"
   !insertmacro MUI_LANGUAGE "Hebrew"
-  !insertmacro MUI_LANGUAGE "Portuguese"
   !insertmacro MUI_LANGUAGE "Slovenian"
 
 ; Reserve files for solid compression
