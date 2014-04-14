@@ -107,6 +107,21 @@ static void     MP4_TrackSetELST( demux_t *, mp4_track_t *, int64_t );
 static void     MP4_UpdateSeekpoint( demux_t * );
 static const char *MP4_ConvertMacCode( uint16_t );
 
+static uint32_t stream_ReadU32( stream_t *s, void *p_read, uint32_t i_toread )
+{
+    uint32_t i_return = 0;
+    if ( i_toread > INT32_MAX )
+    {
+        i_return = stream_Read( s, p_read, INT32_MAX );
+        if ( i_return < INT32_MAX )
+            return i_return;
+        else
+            i_toread -= INT32_MAX;
+    }
+    i_return += stream_Read( s, (uint8_t *)p_read + i_return, (int32_t) i_toread );
+    return i_return;
+}
+
 /* Return time in microsecond of a track */
 static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
 {
@@ -1282,13 +1297,14 @@ static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
         const int64_t i_dts = MP4_TrackGetDTS( p_demux, tk );
         const int64_t i_pts_delta = MP4_TrackGetPTSDelta( p_demux, tk );
         int i_nb_samples = 0;
-        const unsigned int i_size = MP4_TrackSampleSize( tk, &i_nb_samples );
+        const uint32_t i_size = MP4_TrackSampleSize( tk, &i_nb_samples );
 
         if( i_size > 0 && !stream_Seek( p_demux->s, MP4_TrackGetPos( tk ) ) )
         {
             char p_buffer[256];
-            const int i_read = stream_Read( p_demux->s, p_buffer, __MIN( sizeof(p_buffer), i_size ) );
-            const int i_len = __MIN( GetWBE(p_buffer), i_read-2 );
+            const uint32_t i_read = stream_ReadU32( p_demux->s, p_buffer,
+                                                    __MIN( sizeof(p_buffer), i_size ) );
+            const uint32_t i_len = __MIN( GetWBE(p_buffer), i_read-2 );
 
             if( i_len > 0 )
             {
@@ -3765,8 +3781,8 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
         ret->p_sample_data[i] = malloc( len );
         if( ret->p_sample_data[i] == NULL )
             return VLC_ENOMEM;
-        int read = stream_Read( p_demux->s, ret->p_sample_data[i], len );
-        if( read < (int)len )
+        uint32_t i_read = stream_ReadU32( p_demux->s, ret->p_sample_data[i], len );
+        if( i_read < len )
             return VLC_EGENERIC;
         chunk_size += len;
     }
