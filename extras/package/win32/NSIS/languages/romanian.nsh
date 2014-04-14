@@ -18,7 +18,7 @@ StrCpy $Desc_Section03 "VLC Mozilla și plugin-ul Mozilla Firefox"
 StrCpy $Desc_Section04 "Plugin-ul ActiveX VLC"
 StrCpy $Desc_Section05 "Înregistrare DVD-uri și CD-uri de redare"
 StrCpy $Desc_Section06 "Setați VLC media player ca aplicația implicită pentru tipul de fișier specificat"
-StrCpy $Desc_Section07 "Adăuga elemente de meniu (\"Redare cu VLC\" și \"Adăugare la Playlist-ul VLC\")"
+StrCpy $Desc_Section07 'Adăuga elemente de meniu ("Redare cu VLC" și "Adăugare la Playlist-ul VLC")'
 StrCpy $Desc_Section08 "Ștergeți VLC Media Player și preferințele fisierelor cache rămase de la instalațiile anterioare"
 StrCpy $Name_Section91 "Dezinstalare"
 StrCpy $Name_Section92 "Ștergeți preferințele și cache-urile"

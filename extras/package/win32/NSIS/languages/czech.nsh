@@ -18,7 +18,7 @@ StrCpy $Desc_Section03 "Modul VLC pro prohlíeèe Mozilla a Mozilla Firefox"
 StrCpy $Desc_Section04 "Modul VLC ActiveX"
 StrCpy $Desc_Section05 "Registrace pøehrávání CD a DVD"
 StrCpy $Desc_Section06 "Nastaví pøehrávaè VLC jako vıchozí aplikaci pro danı typ souborù"
-StrCpy $Desc_Section07 "Pøidá poloky kontextové nabídky (\"Pøehrát s VLC\" a \"Pøidat do seznamu skladeb VLC\")"
+StrCpy $Desc_Section07 'Pøidá poloky kontextové nabídky ("Pøehrát s VLC" a "Pøidat do seznamu skladeb VLC")'
 StrCpy $Desc_Section08 "Smae nastavení a mezipamì pøehrávaèe VLC, které jsou pozùstatkem z pøedchozích instalací"
 StrCpy $Name_Section91 "Odinstalovat"
 StrCpy $Name_Section92 "Smazat nastavení a mezipamì"
