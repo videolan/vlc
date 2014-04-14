@@ -3771,11 +3771,16 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
     if( !ret->p_sample_data )
         return VLC_ENOMEM;
 
-    uint32_t dur = 0, len;
+    uint32_t dur = 0, i_mdatlen = 0, len;
     uint32_t chunk_duration = 0, chunk_size = 0;
 
     /* Skip header of mdat */
-    stream_Read( p_demux->s, NULL, 8 );
+    uint8_t mdat[8];
+    int i_read = stream_Read( p_demux->s, &mdat, 8 );
+    i_mdatlen = GetDWBE( mdat );
+    if ( i_read < 8 || i_mdatlen < 8 ||
+         VLC_FOURCC( mdat[4], mdat[5], mdat[6], mdat[7] ) != ATOM_mdat )
+        return VLC_EGENERIC;
 
     for( uint32_t i = 0; i < ret->i_sample_count; i++)
     {
@@ -3799,6 +3804,9 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
         else
             len = ret->p_sample_size[i] = default_size;
 
+        if ( chunk_size + len > ( i_mdatlen - 8 ) )
+            return VLC_EGENERIC;
+
         ret->p_sample_data[i] = malloc( len );
         if( ret->p_sample_data[i] == NULL )
             return VLC_ENOMEM;
@@ -3813,6 +3821,10 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
     if( p_track->b_codec_need_restart &&
             p_track->fmt.i_cat == VIDEO_ES )
         ReInitDecoder( p_demux, p_track );
+
+    /* Skip if we didn't reach the end of mdat box */
+    if ( chunk_size < (i_mdatlen - 8) )
+        stream_ReadU32( p_demux->s, NULL, i_mdatlen - chunk_size - 8 );
 
     p_track->b_has_non_empty_cchunk = true;
     return VLC_SUCCESS;
