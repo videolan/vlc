@@ -47,7 +47,7 @@ static double conv_fx( int32_t fx ) {
 
 /* some functions for mp4 encoding of variables */
 #ifdef MP4_VERBOSE
-static void MP4_ConvertDate2Str( char *psz, uint64_t i_date )
+static void MP4_ConvertDate2Str( char *psz, uint64_t i_date, bool b_relative )
 {
     int i_day;
     int i_hour;
@@ -55,7 +55,8 @@ static void MP4_ConvertDate2Str( char *psz, uint64_t i_date )
     int i_sec;
 
     /* date begin at 1 jan 1904 */
-    i_date += ((INT64_C(1904) * 365) + 17) * 24 * 60 * 60;
+    if ( !b_relative )
+        i_date += ((INT64_C(1904) * 365) + 17) * 24 * 60 * 60;
 
     i_day = i_date / ( 60*60*24);
     i_hour = ( i_date /( 60*60 ) ) % 60;
@@ -126,8 +127,8 @@ int MP4_ReadBoxCommon( stream_t *p_stream, MP4_Box_t *p_box )
     if( p_box->i_size )
     {
         if MP4_BOX_TYPE_ASCII()
-            msg_Dbg( p_stream, "found Box: %4.4s size %"PRId64,
-                    (char*)&p_box->i_type, p_box->i_size );
+            msg_Dbg( p_stream, "found Box: %4.4s size %"PRId64" %"PRId64,
+                    (char*)&p_box->i_type, p_box->i_size, p_box->i_pos );
         else
             msg_Dbg( p_stream, "found Box: c%3.3s size %"PRId64,
                     (char*)&p_box->i_type+1, p_box->i_size );
@@ -374,13 +375,13 @@ static int MP4_ReadBox_mvhd(  stream_t *p_stream, MP4_Box_t *p_box )
 
 
 #ifdef MP4_VERBOSE
-    MP4_ConvertDate2Str( s_creation_time, p_box->data.p_mvhd->i_creation_time );
+    MP4_ConvertDate2Str( s_creation_time, p_box->data.p_mvhd->i_creation_time, false );
     MP4_ConvertDate2Str( s_modification_time,
-                         p_box->data.p_mvhd->i_modification_time );
+                         p_box->data.p_mvhd->i_modification_time, false );
     if( p_box->data.p_mvhd->i_rate )
     {
         MP4_ConvertDate2Str( s_duration,
-                 p_box->data.p_mvhd->i_duration / p_box->data.p_mvhd->i_rate );
+                 p_box->data.p_mvhd->i_duration / p_box->data.p_mvhd->i_rate, true );
     }
     else
     {
@@ -821,9 +822,9 @@ static int MP4_ReadBox_tkhd(  stream_t *p_stream, MP4_Box_t *p_box )
     p_box->data.p_tkhd->f_rotation = rotation;
 
 #ifdef MP4_VERBOSE
-    MP4_ConvertDate2Str( s_creation_time, p_box->data.p_mvhd->i_creation_time );
-    MP4_ConvertDate2Str( s_modification_time, p_box->data.p_mvhd->i_modification_time );
-    MP4_ConvertDate2Str( s_duration, p_box->data.p_mvhd->i_duration );
+    MP4_ConvertDate2Str( s_creation_time, p_box->data.p_mvhd->i_creation_time, false );
+    MP4_ConvertDate2Str( s_modification_time, p_box->data.p_mvhd->i_modification_time, false );
+    MP4_ConvertDate2Str( s_duration, p_box->data.p_mvhd->i_duration, true );
 
     msg_Dbg( p_stream, "read box: \"tkhd\" creation %s modification %s duration %s track ID %d layer %d volume %f rotation %f scaleX %f scaleY %f translateX %f translateY %f width %f height %f. "
             "Matrix: %i %i %i %i %i %i %i %i %i",
@@ -890,9 +891,9 @@ static int MP4_ReadBox_mdhd( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET2BYTES( p_box->data.p_mdhd->i_predefined );
 
 #ifdef MP4_VERBOSE
-    MP4_ConvertDate2Str( s_creation_time, p_box->data.p_mdhd->i_creation_time );
-    MP4_ConvertDate2Str( s_modification_time, p_box->data.p_mdhd->i_modification_time );
-    MP4_ConvertDate2Str( s_duration, p_box->data.p_mdhd->i_duration );
+    MP4_ConvertDate2Str( s_creation_time, p_box->data.p_mdhd->i_creation_time, false );
+    MP4_ConvertDate2Str( s_modification_time, p_box->data.p_mdhd->i_modification_time, false );
+    MP4_ConvertDate2Str( s_duration, p_box->data.p_mdhd->i_duration, true );
     msg_Dbg( p_stream, "read box: \"mdhd\" creation %s modification %s time scale %d duration %s language %c%c%c",
                   s_creation_time,
                   s_modification_time,
