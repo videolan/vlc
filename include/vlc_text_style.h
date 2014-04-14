@@ -43,7 +43,7 @@ typedef struct
     int        i_font_size;       /**< The font size in pixels */
     int        i_font_color;      /**< The color of the text 0xRRGGBB
                                        (native endianness) */
-    int        i_font_alpha;      /**< The transparency of the text.
+    unsigned   i_font_alpha;      /**< The transparency of the text.
                                        0x00 is fully opaque,
                                        0xFF fully transparent */
     int        i_style_flags;     /**< Formatting style flags */
