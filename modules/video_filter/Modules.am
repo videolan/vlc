@@ -54,6 +54,7 @@ libpuzzle_plugin_la_SOURCES = \
 	puzzle_lib.c puzzle_lib.h \
 	puzzle_mgt.c puzzle_mgt.h \
 	puzzle_pce.c puzzle_pce.h
+libpuzzle_plugin_la_LIBADD = $(LIBM)
 video_filter_LTLIBRARIES += libpuzzle_plugin.la
 
 SOURCES_magnify = magnify.c
