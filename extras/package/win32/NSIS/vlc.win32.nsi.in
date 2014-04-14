@@ -134,7 +134,6 @@ RequestExecutionLevel admin
   !insertmacro MUI_LANGUAGE "Uzbek"
   !insertmacro MUI_LANGUAGE "Ukrainian"
   !insertmacro MUI_LANGUAGE "Turkish"
-  !insertmacro MUI_LANGUAGE "Traditional_Chinese"
   !insertmacro MUI_LANGUAGE "Thai"
   !insertmacro MUI_LANGUAGE "Sinhala"
   !insertmacro MUI_LANGUAGE "Scottish_Gaelic"
@@ -547,7 +546,7 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_SCOTTISH_GAELIC} Scottish_Gaelic 0
   StrCmp $LANGUAGE ${LANG_SINHALA} Sinhala 0
   StrCmp $LANGUAGE ${LANG_THAI} Thai 0
-  StrCmp $LANGUAGE ${LANG_TRADITIONAL_CHINESE} Traditional_Chinese 0
+  StrCmp $LANGUAGE ${LANG_TRADITIONAL_CHINESE} TradChinese 0
   StrCmp $LANGUAGE ${LANG_TURKISH} Turkish 0
   StrCmp $LANGUAGE ${LANG_UKRAINIAN} Ukrainian 0
   StrCmp $LANGUAGE ${LANG_UZBEK} Uzbek 0
@@ -667,8 +666,8 @@ UAC_Success:
   Thai:
   !include "languages\thai.nsh"
   Goto EndLanguageCmp
-  Traditional_Chinese:
-  !include "languages\traditional_chinese.nsh"
+  TradChinese:
+  !include "languages\tradchinese.nsh"
   Goto EndLanguageCmp
   Turkish:
   !include "languages\turkish.nsh"
@@ -1072,7 +1071,7 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_SCOTTISH_GAELIC} Scottish_Gaelic 0
   StrCmp $LANGUAGE ${LANG_SINHALA} Sinhala 0
   StrCmp $LANGUAGE ${LANG_THAI} Thai 0
-  StrCmp $LANGUAGE ${LANG_TRADITIONAL_CHINESE} Traditional_Chinese 0
+  StrCmp $LANGUAGE ${LANG_TRADITIONAL_CHINESE} TradChinese 0
   StrCmp $LANGUAGE ${LANG_TURKISH} Turkish 0
   StrCmp $LANGUAGE ${LANG_UKRAINIAN} Ukrainian 0
   StrCmp $LANGUAGE ${LANG_UZBEK} Uzbek 0
@@ -1192,8 +1191,8 @@ UAC_Success:
   Thai:
   !include "languages\thai.nsh"
   Goto EndLanguageCmp
-  Traditional_Chinese:
-  !include "languages\traditional_chinese.nsh"
+  TradChinese:
+  !include "languages\tradchinese.nsh"
   Goto EndLanguageCmp
   Turkish:
   !include "languages\turkish.nsh"
