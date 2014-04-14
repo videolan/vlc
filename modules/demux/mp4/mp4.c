@@ -100,8 +100,8 @@ static void MP4_TrackUnselect(demux_t *, mp4_track_t * );
 static int  MP4_TrackSeek   ( demux_t *, mp4_track_t *, mtime_t );
 
 static uint64_t MP4_TrackGetPos    ( mp4_track_t * );
-static int      MP4_TrackSampleSize( mp4_track_t *, int * );
-static int      MP4_TrackNextSample( demux_t *, mp4_track_t *, int );
+static uint32_t MP4_TrackSampleSize( mp4_track_t *, uint32_t * );
+static int      MP4_TrackNextSample( demux_t *, mp4_track_t *, uint32_t );
 static void     MP4_TrackSetELST( demux_t *, mp4_track_t *, int64_t );
 
 static void     MP4_UpdateSeekpoint( demux_t * );
@@ -743,8 +743,8 @@ static int Demux( demux_t *p_demux )
                      MP4_TrackGetDTS( p_demux, tk ),
                      MP4_GetMoviePTS( p_sys ) );
 #endif
-            int i_nb_samples = 0;
-            int i_samplessize = MP4_TrackSampleSize( tk, &i_nb_samples );
+            uint32_t i_nb_samples = 0;
+            uint32_t i_samplessize = MP4_TrackSampleSize( tk, &i_nb_samples );
             if( i_samplessize > 0 )
             {
                 block_t *p_block;
@@ -1296,7 +1296,7 @@ static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
     {
         const int64_t i_dts = MP4_TrackGetDTS( p_demux, tk );
         const int64_t i_pts_delta = MP4_TrackGetPTSDelta( p_demux, tk );
-        int i_nb_samples = 0;
+        uint32_t i_nb_samples = 0;
         const uint32_t i_size = MP4_TrackSampleSize( tk, &i_nb_samples );
 
         if( i_size > 0 && !stream_Seek( p_demux->s, MP4_TrackGetPos( tk ) ) )
@@ -3048,9 +3048,9 @@ static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
  *
  */
 #define QT_V0_MAX_SAMPLES 1024
-static int MP4_TrackSampleSize( mp4_track_t *p_track, int *pi_nb_samples )
+static uint32_t MP4_TrackSampleSize( mp4_track_t *p_track, uint32_t *pi_nb_samples )
 {
-    int i_size;
+    uint32_t i_size;
     MP4_Box_data_sample_soun_t *p_soun;
 
     if( p_track->i_sample_size == 0 )
@@ -3067,11 +3067,15 @@ static int MP4_TrackSampleSize( mp4_track_t *p_track, int *pi_nb_samples )
 
     if( p_soun->i_qt_version == 1 )
     {
-        int i_samples = p_track->chunk[p_track->i_chunk].i_sample_count;
+        uint32_t i_samples = p_track->chunk[p_track->i_chunk].i_sample_count;
         if( p_track->fmt.audio.i_blockalign > 1 )
             i_samples = p_soun->i_sample_per_packet;
 
-        i_size = i_samples / p_soun->i_sample_per_packet * p_soun->i_bytes_per_frame;
+        i_size = i_samples / p_soun->i_sample_per_packet;
+        if ( UINT32_MAX / i_size < p_soun->i_bytes_per_frame )
+            i_size *= p_soun->i_bytes_per_frame;
+        else
+            i_size = UINT32_MAX;
     }
     else if( p_track->i_sample_size > 256 )
     {
@@ -3083,8 +3087,8 @@ static int MP4_TrackSampleSize( mp4_track_t *p_track, int *pi_nb_samples )
     {
         mp4_chunk_t *p_chunk = &p_track->chunk[p_track->i_chunk];
         int64_t i_length = CLOCK_FREQ / 10;
-        int i_samples = 1;
-        int64_t i_maxsamples = 1;
+        uint32_t i_samples = 0;
+        uint32_t i_maxsamples = 0;
         for( uint32_t i=p_track->i_sample; i<p_chunk->i_sample_count; i++ )
         {
             i_length -= CLOCK_FREQ * p_chunk->p_sample_delta_dts[i] / p_track->i_timescale;
@@ -3094,6 +3098,7 @@ static int MP4_TrackSampleSize( mp4_track_t *p_track, int *pi_nb_samples )
 
         i_samples = __MIN( QT_V0_MAX_SAMPLES, i_samples );
         i_samples = __MIN( i_maxsamples, i_samples );
+        if ( i_samples == 0 ) i_samples = 1;
         i_size = i_samples * p_track->i_sample_size;
         *pi_nb_samples = i_samples;
     }
@@ -3140,7 +3145,7 @@ static uint64_t MP4_TrackGetPos( mp4_track_t *p_track )
     return i_pos;
 }
 
-static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track, int i_samples )
+static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track, uint32_t i_samples )
 {
     if( p_track->fmt.i_cat == AUDIO_ES && p_track->i_sample_size != 0 )
     {
