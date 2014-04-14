@@ -847,7 +847,7 @@ static void *Run( void *data )
 
         /* Get the list of timeouts to process */
         unsigned int i_timeouts = vlc_array_count( p_sys->p_timeouts );
-        DBusTimeout *p_timeouts[i_timeouts];
+        DBusTimeout *p_timeouts[i_timeouts ? i_timeouts : 1];
         for( unsigned int i = 0; i < i_timeouts; i++ )
         {
             p_timeouts[i] = vlc_array_item_at_index( p_sys->p_timeouts, i );
@@ -863,7 +863,7 @@ static void *Run( void *data )
 
         /* Get the list of events to process */
         int i_events = vlc_array_count( p_intf->p_sys->p_events );
-        callback_info_t* p_info[i_events];
+        callback_info_t* p_info[i_events ? i_events : 1];
         for( int i = i_events - 1; i >= 0; i-- )
         {
             p_info[i] = vlc_array_item_at_index( p_intf->p_sys->p_events, i );
