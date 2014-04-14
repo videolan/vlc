@@ -568,6 +568,14 @@ static int Open( vlc_object_t * p_this )
         p_sys->i_duration = p_mvhd->data.p_mvhd->i_duration;
     }
 
+    /* Try in mehd if fragmented */
+    if ( p_sys->i_duration == 0 )
+    {
+        MP4_Box_t *p_mehd = MP4_BoxGet( p_demux->p_sys->p_root, "moov/mvex/mehd");
+        if ( p_mehd )
+            p_sys->i_duration = p_mehd->data.p_mehd->i_fragment_duration;
+    }
+
     if( !( p_sys->i_tracks = MP4_BoxCount( p_sys->p_root, "/moov/trak" ) ) )
     {
         msg_Err( p_demux, "cannot find any /moov/trak" );
