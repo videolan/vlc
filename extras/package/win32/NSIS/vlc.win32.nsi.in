@@ -135,14 +135,14 @@ RequestExecutionLevel admin
   !insertmacro MUI_LANGUAGE "Ukrainian"
   !insertmacro MUI_LANGUAGE "Turkish"
   !insertmacro MUI_LANGUAGE "Thai"
-  !insertmacro MUI_LANGUAGE "Sinhala"
-  !insertmacro MUI_LANGUAGE "Scottish_Gaelic"
+;  !insertmacro MUI_LANGUAGE "Sinhala"
+;  !insertmacro MUI_LANGUAGE "Scottish_Gaelic"
   !insertmacro MUI_LANGUAGE "Norwegian"
   !insertmacro MUI_LANGUAGE "Malay"
   !insertmacro MUI_LANGUAGE "Korean"
-  !insertmacro MUI_LANGUAGE "Khmer"
+;  !insertmacro MUI_LANGUAGE "Khmer"
   !insertmacro MUI_LANGUAGE "Greek"
-  !insertmacro MUI_LANGUAGE "English_United_Kingdom"
+;  !insertmacro MUI_LANGUAGE "English_United_Kingdom"
   !insertmacro MUI_LANGUAGE "Czech"
   !insertmacro MUI_LANGUAGE "Bosnian"
   !insertmacro MUI_LANGUAGE "Arabic"
@@ -536,14 +536,14 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_ARABIC} Arabic 0
   StrCmp $LANGUAGE ${LANG_BOSNIAN} Bosnian 0
   StrCmp $LANGUAGE ${LANG_CZECH} Czech 0
-  StrCmp $LANGUAGE ${LANG_ENGLISH_UNITED_KINGDOM} English_United_Kingdom 0
+;  StrCmp $LANGUAGE ${LANG_ENGLISH_UNITED_KINGDOM} English_United_Kingdom 0
   StrCmp $LANGUAGE ${LANG_GREEK} Greek 0
-  StrCmp $LANGUAGE ${LANG_KHMER} Khmer 0
+;  StrCmp $LANGUAGE ${LANG_KHMER} Khmer 0
   StrCmp $LANGUAGE ${LANG_KOREAN} Korean 0
   StrCmp $LANGUAGE ${LANG_MALAY} Malay 0
   StrCmp $LANGUAGE ${LANG_NORWEGIAN} Norwegian 0
-  StrCmp $LANGUAGE ${LANG_SCOTTISH_GAELIC} Scottish_Gaelic 0
-  StrCmp $LANGUAGE ${LANG_SINHALA} Sinhala 0
+;  StrCmp $LANGUAGE ${LANG_SCOTTISH_GAELIC} Scottish_Gaelic 0
+;  StrCmp $LANGUAGE ${LANG_SINHALA} Sinhala 0
   StrCmp $LANGUAGE ${LANG_THAI} Thai 0
   StrCmp $LANGUAGE ${LANG_TRADITIONAL_CHINESE} TradChinese 0
   StrCmp $LANGUAGE ${LANG_TURKISH} Turkish 0
@@ -638,15 +638,15 @@ UAC_Success:
   Czech:
   !include "languages\czech.nsh"
   Goto EndLanguageCmp
-  English_United_Kingdom:
-  !include "languages\english_united_kingdom.nsh"
-  Goto EndLanguageCmp
+;  English_United_Kingdom:
+;  !include "languages\english_united_kingdom.nsh"
+;  Goto EndLanguageCmp
   Greek:
   !include "languages\greek.nsh"
   Goto EndLanguageCmp
-  Khmer:
-  !include "languages\khmer.nsh"
-  Goto EndLanguageCmp
+;  Khmer:
+;  !include "languages\khmer.nsh"
+;  Goto EndLanguageCmp
   Korean:
   !include "languages\korean.nsh"
   Goto EndLanguageCmp
@@ -656,12 +656,12 @@ UAC_Success:
   Norwegian:
   !include "languages\norwegian.nsh"
   Goto EndLanguageCmp
-  Scottish_Gaelic:
-  !include "languages\scottish_gaelic.nsh"
-  Goto EndLanguageCmp
-  Sinhala:
-  !include "languages\sinhala.nsh"
-  Goto EndLanguageCmp
+;  Scottish_Gaelic:
+;  !include "languages\scottish_gaelic.nsh"
+;  Goto EndLanguageCmp
+;  Sinhala:
+;  !include "languages\sinhala.nsh"
+;  Goto EndLanguageCmp
   Thai:
   !include "languages\thai.nsh"
   Goto EndLanguageCmp
@@ -1061,14 +1061,14 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_ARABIC} Arabic 0
   StrCmp $LANGUAGE ${LANG_BOSNIAN} Bosnian 0
   StrCmp $LANGUAGE ${LANG_CZECH} Czech 0
-  StrCmp $LANGUAGE ${LANG_ENGLISH_UNITED_KINGDOM} English_United_Kingdom 0
+;  StrCmp $LANGUAGE ${LANG_ENGLISH_UNITED_KINGDOM} English_United_Kingdom 0
   StrCmp $LANGUAGE ${LANG_GREEK} Greek 0
-  StrCmp $LANGUAGE ${LANG_KHMER} Khmer 0
+;  StrCmp $LANGUAGE ${LANG_KHMER} Khmer 0
   StrCmp $LANGUAGE ${LANG_KOREAN} Korean 0
   StrCmp $LANGUAGE ${LANG_MALAY} Malay 0
   StrCmp $LANGUAGE ${LANG_NORWEGIAN} Norwegian 0
-  StrCmp $LANGUAGE ${LANG_SCOTTISH_GAELIC} Scottish_Gaelic 0
-  StrCmp $LANGUAGE ${LANG_SINHALA} Sinhala 0
+;  StrCmp $LANGUAGE ${LANG_SCOTTISH_GAELIC} Scottish_Gaelic 0
+;  StrCmp $LANGUAGE ${LANG_SINHALA} Sinhala 0
   StrCmp $LANGUAGE ${LANG_THAI} Thai 0
   StrCmp $LANGUAGE ${LANG_TRADITIONAL_CHINESE} TradChinese 0
   StrCmp $LANGUAGE ${LANG_TURKISH} Turkish 0
@@ -1163,15 +1163,15 @@ UAC_Success:
   Czech:
   !include "languages\czech.nsh"
   Goto EndLanguageCmp
-  English_United_Kingdom:
-  !include "languages\english_united_kingdom.nsh"
-  Goto EndLanguageCmp
+;  English_United_Kingdom:
+;  !include "languages\english_united_kingdom.nsh"
+;  Goto EndLanguageCmp
   Greek:
   !include "languages\greek.nsh"
   Goto EndLanguageCmp
-  Khmer:
-  !include "languages\khmer.nsh"
-  Goto EndLanguageCmp
+;  Khmer:
+;  !include "languages\khmer.nsh"
+;  Goto EndLanguageCmp
   Korean:
   !include "languages\korean.nsh"
   Goto EndLanguageCmp
@@ -1181,12 +1181,12 @@ UAC_Success:
   Norwegian:
   !include "languages\norwegian.nsh"
   Goto EndLanguageCmp
-  Scottish_Gaelic:
-  !include "languages\scottish_gaelic.nsh"
-  Goto EndLanguageCmp
-  Sinhala:
-  !include "languages\sinhala.nsh"
-  Goto EndLanguageCmp
+;  Scottish_Gaelic:
+;  !include "languages\scottish_gaelic.nsh"
+;  Goto EndLanguageCmp
+;  Sinhala:
+;  !include "languages\sinhala.nsh"
+;  Goto EndLanguageCmp
   Thai:
   !include "languages\thai.nsh"
   Goto EndLanguageCmp
