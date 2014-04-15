@@ -1,9 +1,6 @@
 # DVDREAD
-
 LIBDVDREAD_VERSION := 4.9.9
 LIBDVDREAD_URL := http://download.videolan.org/pub/videolan/libdvdread/4.9.9/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
-#DVDREAD_GITURL := git://git.videolan.org/libdvdread
-#LIBDVDREAD_VERSION := git
 
 ifdef BUILD_DISCS
 ifdef GPL
@@ -14,15 +11,10 @@ ifeq ($(call need_pkg,"dvdread > 4.9.0 "),)
 PKGS_FOUND += dvdread
 endif
 
-# $(TARBALLS)/libdvdread-git.tar.xz:
-# 	$(call download_git,$(DVDREAD_GITURL))
-
 $(TARBALLS)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
 	$(call download,$(LIBDVDREAD_URL))
 
-#.sum-dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz
-#	$(warning $@ not implemented)
-#	touch $@
+.sum-dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
 
 dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2 .sum-dvdread
 	$(UNPACK)
