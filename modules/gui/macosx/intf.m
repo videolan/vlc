@@ -135,8 +135,6 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
         return VLC_EGENERIC;
     }
 
-    [[VLCMain sharedInstance] setActiveVideoPlayback: YES];
-
     SEL sel = @selector(setupVoutForWindow:withProposedVideoViewPosition:);
     NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[o_vout_controller methodSignatureForSelector:sel]];
     [inv setTarget:o_vout_controller];

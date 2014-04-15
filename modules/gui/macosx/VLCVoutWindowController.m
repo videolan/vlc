@@ -196,6 +196,7 @@
     [o_new_video_window setHasActiveVideo: YES];
     [o_vout_dict setObject:[o_new_video_window autorelease] forKey:[NSValue valueWithPointer:p_wnd]];
 
+    [[VLCMain sharedInstance] setActiveVideoPlayback: YES];
     [[VLCMainWindow sharedInstance] setNonembedded:!b_mainwindow_has_video];
 
     // beware of order, setActiveVideoPlayback:, setHasActiveVideo: and setNonembedded: must be called before
