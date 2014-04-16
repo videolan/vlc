@@ -182,23 +182,21 @@ static float iec_scale(float dB)
  *****************************************************************************/
 static void parse_i_values(BarGraph_t *p_BarGraph, char *i_values)
 {
-    char* res = NULL;
     char delim[] = ":";
     char* tok;
-    float db;
 
     p_BarGraph->nbChannels = 0;
+    free(p_BarGraph->i_values);
     p_BarGraph->i_values = NULL;
-    res = strtok_r(i_values, delim, &tok);
+    char *res = strtok_r(i_values, delim, &tok);
     while (res != NULL) {
         p_BarGraph->nbChannels++;
         p_BarGraph->i_values = xrealloc(p_BarGraph->i_values,
                                           p_BarGraph->nbChannels*sizeof(int));
-        db = log10(atof(res)) * 20;
+        float db = log10(atof(res)) * 20;
         p_BarGraph->i_values[p_BarGraph->nbChannels-1] = VLC_CLIP(iec_scale(db)*p_BarGraph->scale, 0, p_BarGraph->scale);
         res = strtok_r(NULL, delim, &tok);
     }
-
 }
 
 /*****************************************************************************
@@ -589,7 +587,6 @@ static int BarGraphCallback(vlc_object_t *p_this, char const *psz_var,
         p_BarGraph->i_alpha = VLC_CLIP(newval.i_int, 0, 255);
     else if (!strcmp(psz_var, "audiobargraph_v-i_values")) {
         char *psz = xstrdup(newval.psz_string ? newval.psz_string : "");
-        free(p_BarGraph->i_values);
         // in case many answer are received at the same time, only keep one
         res = strchr(psz, '@');
         if (res)
@@ -788,6 +785,7 @@ static int OpenCommon(vlc_object_t *p_this, bool b_sub)
     p_BarGraph->i_alpha = var_CreateGetIntegerCommand(p_filter,
                                                         "audiobargraph_v-transparency");
     p_BarGraph->i_alpha = VLC_CLIP(p_BarGraph->i_alpha, 0, 255);
+    p_BarGraph->i_values = NULL;
     parse_i_values(p_BarGraph, &(char){ 0 });
     p_BarGraph->alarm = false;
 
