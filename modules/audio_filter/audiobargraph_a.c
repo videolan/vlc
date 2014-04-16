@@ -75,9 +75,9 @@ vlc_module_begin ()
 
     add_obsolete_string( CFG_PREFIX "address" )
     add_obsolete_integer( CFG_PREFIX "port" )
-    add_integer( CFG_PREFIX "bargraph", 1, BARGRAPH_TEXT, BARGRAPH_LONGTEXT, false )
+    add_integer( CFG_PREFIX "bargraph", 1, BARGRAPH_TEXT, BARGRAPH_LONGTEXT, false ) // FIXME: this is a bool
     add_integer( CFG_PREFIX "bargraph_repetition", 4, BARGRAPH_REPETITION_TEXT, BARGRAPH_REPETITION_LONGTEXT, false )
-    add_integer( CFG_PREFIX "silence", 1, SILENCE_TEXT, SILENCE_LONGTEXT, false )
+    add_integer( CFG_PREFIX "silence", 1, SILENCE_TEXT, SILENCE_LONGTEXT, false ) // FIXME: this is a bool
     add_integer( CFG_PREFIX "time_window", 5000, TIME_WINDOW_TEXT, TIME_WINDOW_LONGTEXT, false )
     add_float( CFG_PREFIX "alarm_threshold", 0.1, ALARM_THRESHOLD_TEXT, ALARM_THRESHOLD_LONGTEXT, false )
     add_integer( CFG_PREFIX "repetition_time", 2000, REPETITION_TIME_TEXT, REPETITION_TIME_LONGTEXT, false )
@@ -94,9 +94,9 @@ typedef struct ValueDate_t {
 
 struct filter_sys_t
 {
-    int             bargraph;
+    bool            bargraph;
     int             bargraph_repetition;
-    int             silence;
+    bool            silence;
     int64_t         time_window;
     float           alarm_threshold;
     int64_t         repetition_time;
@@ -117,9 +117,9 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->bargraph = var_CreateGetInteger( p_filter, CFG_PREFIX "bargraph" );
+    p_sys->bargraph = !!var_CreateGetInteger( p_filter, CFG_PREFIX "bargraph" );
     p_sys->bargraph_repetition = var_CreateGetInteger( p_filter, CFG_PREFIX "bargraph_repetition" );
-    p_sys->silence = var_CreateGetInteger( p_filter, CFG_PREFIX "silence" );
+    p_sys->silence = !!var_CreateGetInteger( p_filter, CFG_PREFIX "silence" );
     p_sys->time_window = var_CreateGetInteger( p_filter, CFG_PREFIX "time_window" ) * 1000;
     p_sys->alarm_threshold = var_CreateGetFloat( p_filter, CFG_PREFIX "alarm_threshold" );
     p_sys->repetition_time = var_CreateGetInteger( p_filter, CFG_PREFIX "repetition_time" ) * 1000;
