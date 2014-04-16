@@ -245,10 +245,8 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         }
     }
 
-    if (p_sys->counter > p_sys->bargraph_repetition*100)
+    if (++p_sys->counter > p_sys->bargraph_repetition*100)
         p_sys->counter = 0;
-
-    p_sys->counter++;
 
     return p_in_buf;
 }
