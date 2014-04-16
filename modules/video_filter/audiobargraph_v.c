@@ -236,12 +236,9 @@ static void DrawNumber(plane_t *p, int h, const uint8_t data[5], int l)
     }
 }
 /*****************************************************************************
- * LoadImage: creates and returns the bar graph image
+ * Draw: creates and returns the bar graph image
  *****************************************************************************/
-#ifdef LoadImage
-#   undef LoadImage
-#endif
-static void LoadImage(BarGraph_t *b)
+static void Draw(BarGraph_t *b)
 {
     int nbChannels = b->nbChannels;
     int scale      = b->scale;
@@ -343,13 +340,13 @@ static int BarGraphCallback(vlc_object_t *p_this, char const *psz_var,
             *res = '\0';
         parse_i_values(p_BarGraph, psz);
         free(psz);
-        LoadImage(p_BarGraph);
+        Draw(p_BarGraph);
     } else if (!strcmp(psz_var, "audiobargraph_v-alarm")) {
         p_BarGraph->alarm = newval.b_bool;
-        LoadImage(p_BarGraph);
+        Draw(p_BarGraph);
     } else if (!strcmp(psz_var, "audiobargraph_v-barWidth")) {
         p_BarGraph->barWidth = newval.i_int;
-        LoadImage(p_BarGraph);
+        Draw(p_BarGraph);
     }
     p_sys->b_spu_update = true;
     vlc_mutex_unlock(&p_sys->lock);
