@@ -37,10 +37,6 @@
 
 #include <vlc_image.h>
 
-#ifdef LoadImage
-#   undef LoadImage
-#endif
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -202,14 +198,24 @@ static void parse_i_values(BarGraph_t *p_BarGraph, char *i_values)
 /*****************************************************************************
  * LoadImage: creates and returns the bar graph image
  *****************************************************************************/
-static picture_t *LoadImage(vlc_object_t *p_this, int nbChannels, int* i_values, int scale, int alarm, int barWidth)
+#ifdef LoadImage
+#   undef LoadImage
+#endif
+static void LoadImage(BarGraph_t *p)
 {
-    VLC_UNUSED(p_this);
-    picture_t *p_pic;
+    int nbChannels = p->nbChannels;
+    int *i_values  = p->i_values;
+    int scale      = p->scale;
+    int alarm      = p->alarm;
+    int barWidth   = p->barWidth;
+
     int i, j, pi;
     int i_width = 0;
     int i_line;
     int minus8, minus10, minus18, minus20, minus30, minus40, minus50, minus60;
+
+    if (p->p_pic)
+        picture_Release(p->p_pic);
 
     if (nbChannels == 0)
         i_width = 20;
@@ -225,8 +231,10 @@ static picture_t *LoadImage(vlc_object_t *p_this, int nbChannels, int* i_values,
     minus50 = iec_scale(-50)*scale + 20;
     minus60 = iec_scale(-60)*scale + 20;
 
-    p_pic = picture_New(VLC_FOURCC('Y','U','V','A'), i_width+20, scale+30, 1, 1);
-
+    picture_t *p_pic = picture_New(VLC_FOURCC('Y','U','V','A'), i_width+20, scale+30, 1, 1);
+    if (!p_pic)
+        return;
+    p->p_pic = p_pic;
 
 #define DrawLine(a,b,Y,U,V,A) \
         for (i=a; i<b; i++) {\
@@ -549,20 +557,6 @@ static picture_t *LoadImage(vlc_object_t *p_this, int nbChannels, int* i_values,
             }
         }
     }
-
-    return p_pic;
-}
-/*****************************************************************************
- * LoadBarGraph: loads the BarGraph images into memory
- *****************************************************************************/
-static void LoadBarGraph(vlc_object_t *p_this, BarGraph_t *p_BarGraph)
-{
-    if (p_BarGraph->p_pic)
-        picture_Release(p_BarGraph->p_pic);
-
-    p_BarGraph->p_pic = LoadImage(p_this, p_BarGraph->nbChannels, p_BarGraph->i_values, p_BarGraph->scale, p_BarGraph->alarm, p_BarGraph->barWidth);
-    if (!p_BarGraph->p_pic)
-        msg_Warn(p_this, "error while creating picture");
 }
 
 /*****************************************************************************
@@ -571,7 +565,7 @@ static void LoadBarGraph(vlc_object_t *p_this, BarGraph_t *p_BarGraph)
 static int BarGraphCallback(vlc_object_t *p_this, char const *psz_var,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data)
 {
-    VLC_UNUSED(oldval);
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     filter_sys_t *p_sys = p_data;
     BarGraph_t *p_BarGraph = &p_sys->p_BarGraph;
     char* res = NULL;
@@ -593,13 +587,13 @@ static int BarGraphCallback(vlc_object_t *p_this, char const *psz_var,
             *res = '\0';
         parse_i_values(p_BarGraph, psz);
         free(psz);
-        LoadBarGraph(p_this,p_BarGraph);
+        LoadImage(p_BarGraph);
     } else if (!strcmp(psz_var, "audiobargraph_v-alarm")) {
         p_BarGraph->alarm = newval.b_bool;
-        LoadBarGraph(p_this,p_BarGraph);
+        LoadImage(p_BarGraph);
     } else if (!strcmp(psz_var, "audiobargraph_v-barWidth")) {
         p_BarGraph->barWidth = newval.i_int;
-        LoadBarGraph(p_this,p_BarGraph);
+        LoadImage(p_BarGraph);
     }
     p_sys->b_spu_update = true;
     vlc_mutex_unlock(&p_sys->lock);
