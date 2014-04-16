@@ -124,7 +124,6 @@
 #define VLC_VAR_GETLIST             0x0025
 #define VLC_VAR_CHOICESCOUNT        0x0026
 
-#define VLC_VAR_SETISCOMMAND        0x0040
 /**@}*/
 
 /** \defgroup var_GetAndSet Variable actions
