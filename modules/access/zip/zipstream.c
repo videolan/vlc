@@ -439,6 +439,8 @@ static int GetFilesInZip( stream_t *p_this, unzFile file,
             != UNZ_OK )
         {
             msg_Warn( p_this, "can't get info about file in zip" );
+            free( psz_fileName );
+            free( p_fileInfo );
             return VLC_EGENERIC;
         }
 
