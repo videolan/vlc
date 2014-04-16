@@ -50,6 +50,10 @@
 #include <QDialogButtonBox>
 #include <QInputDialog>
 #include <QMimeData>
+#include <QFormLayout>
+#include <QVBoxLayout>
+#include <QTabWidget>
+#include <QSignalMapper>
 
 #include <assert.h>
 
@@ -68,91 +72,74 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
                               QSizePolicy::MinimumExpanding );
     QGridLayout *boxLayout = new QGridLayout( widgetBox );
 
-    QLabel *styleLabel = new QLabel( qtr( "Next widget style:" ) );
     flatBox = new QCheckBox( qtr( "Flat Button" ) );
+    flatBox->setToolTip( qtr( "Next widget style" ) );
     bigBox = new QCheckBox( qtr( "Big Button" ) );
+    bigBox->setToolTip( flatBox->toolTip() );
     shinyBox = new QCheckBox( qtr( "Native Slider" ) );
+    shinyBox->setToolTip( flatBox->toolTip() );
 
-    boxLayout->addWidget( new WidgetListing( p_intf, this ), 0, 0, 1, -1);
-    boxLayout->addWidget( styleLabel, 1, 0 );
-    boxLayout->addWidget( flatBox, 1, 1 );
-    boxLayout->addWidget( bigBox, 1, 2 );
-    boxLayout->addWidget( shinyBox, 2, 1 );
-    mainLayout->addWidget( widgetBox, 0, 0, 5, 1 );
+    boxLayout->addWidget( new WidgetListing( p_intf, this ), 1, 0, 1, -1 );
+    boxLayout->addWidget( flatBox, 0, 0 );
+    boxLayout->addWidget( bigBox, 0, 1 );
+    boxLayout->addWidget( shinyBox, 0, 2 );
+    mainLayout->addWidget( widgetBox, 5, 0, 3, 6 );
 
+    QTabWidget *tabWidget = new QTabWidget();
+    mainLayout->addWidget( tabWidget, 1, 0, 4, 9 );
 
     /* Main ToolBar */
-    QGroupBox *mainToolbarBox = new QGroupBox( qtr( "Main Toolbar" ), this );
-    QGridLayout *mainTboxLayout = new QGridLayout( mainToolbarBox );
+    QWidget *mainToolbarBox = new QWidget();
+    tabWidget->addTab( mainToolbarBox, qtr( "Main Toolbar" ) );
+    QFormLayout *mainTboxLayout = new QFormLayout( mainToolbarBox );
 
-    QLabel *label = new QLabel( qtr( "Toolbar position:" ) );
-    mainTboxLayout->addWidget(label, 0, 0, 1, 2);
+    positionCheckbox = new QCheckBox( qtr( "Above the Video" ) );
+    positionCheckbox->setChecked(
+                getSettings()->value( "MainWindow/ToolbarPos", 0 ).toInt() );
+    mainTboxLayout->addRow( new QLabel( qtr( "Toolbar position:" ) ),
+                            positionCheckbox );
 
-    positionCombo = new QComboBox;
-    positionCombo->addItem( qtr( "Under the Video" ), QVariant( 0 ) );
-    positionCombo->addItem( qtr( "Above the Video" ), QVariant( 1 ) );
-    positionCombo->setCurrentIndex( positionCombo->findData(
-                getSettings()->value( "MainWindow/ToolbarPos", 0 ).toInt() ) );
-    mainTboxLayout->addWidget( positionCombo, 0, 2, 1, 1 );
-
-    QLabel *line1Label = new QLabel( qtr("Line 1:") );
     QString line1 = getSettings()->value( "MainWindow/MainToolbar1",
                                           MAIN_TB1_DEFAULT ).toString();
-    controller1 = new DroppingController( p_intf, line1,
-            this );
-    mainTboxLayout->addWidget( line1Label, 1, 0, 1, 1 );
-    mainTboxLayout->addWidget( controller1, 1, 1, 1, 2 );
+    controller1 = new DroppingController( p_intf, line1, this );
+    mainTboxLayout->addRow( new QLabel( qtr("Line 1:") ), controller1 );
 
-    QLabel *line2Label = new QLabel( qtr("Line 2:") );
     QString line2 = getSettings()->value( "MainWindow/MainToolbar2",
                                           MAIN_TB2_DEFAULT ).toString();
-    controller2 = new DroppingController( p_intf, line2,
-            this );
-    mainTboxLayout->addWidget( line2Label, 2, 0, 1, 1 );
-    mainTboxLayout->addWidget( controller2, 2, 1, 1, 2);
-
-    /* Advanced ToolBar */
-    QLabel *advLabel = new QLabel( qtr( "Advanced Widget toolbar:" ) );
-    QString lineA = getSettings()->value( "MainWindow/AdvToolbar",
-                                          ADV_TB_DEFAULT ).toString();
-    controllerA = new DroppingController( p_intf, lineA,
-            this );
-    mainTboxLayout->addWidget( advLabel, 3, 0, 1, 2 );
-    mainTboxLayout->addWidget( controllerA, 3, 2, 1, 1 );
-
-    mainLayout->addWidget( mainToolbarBox, 0, 1, 1, -1 );
+    controller2 = new DroppingController( p_intf, line2, this );
+    mainTboxLayout->addRow( new QLabel( qtr("Line 2:") ), controller2 );
 
     /* TimeToolBar */
-    QGroupBox *timeToolbarBox = new QGroupBox( qtr( "Time Toolbar" ) , this );
-    QGridLayout *timeTboxLayout = new QGridLayout( timeToolbarBox );
-
     QString line = getSettings()->value( "MainWindow/InputToolbar",
                                          INPT_TB_DEFAULT ).toString();
-    controller = new DroppingController( p_intf, line,
-            this );
-    timeTboxLayout->addWidget( controller, 0, 0, 1, -1 );
+    controller = new DroppingController( p_intf, line, this );
+    QWidget *timeToolbarBox = new QWidget();
+    timeToolbarBox->setLayout( new QVBoxLayout() );
+    timeToolbarBox->layout()->addWidget( controller );
+    tabWidget->addTab( timeToolbarBox, qtr( "Time Toolbar" ) );
 
-    mainLayout->addWidget( timeToolbarBox, 1, 1, 1, -1 );
+    /* Advanced ToolBar */
+    QString lineA = getSettings()->value( "MainWindow/AdvToolbar",
+                                          ADV_TB_DEFAULT ).toString();
+    controllerA = new DroppingController( p_intf, lineA, this );
+    QWidget *advToolbarBox = new QWidget();
+    advToolbarBox->setLayout( new QVBoxLayout() );
+    advToolbarBox->layout()->addWidget( controllerA );
+    tabWidget->addTab( advToolbarBox, qtr( "Advanced Widget" ) );
 
     /* FSCToolBar */
-    QGroupBox *FSCToolbarBox = new QGroupBox( qtr( "Fullscreen Controller" ),
-                                              this );
-    QGridLayout *FSCTboxLayout = new QGridLayout( FSCToolbarBox );
-
     QString lineFSC = getSettings()->value( "MainWindow/FSCtoolbar",
                                             FSC_TB_DEFAULT ).toString();
-    controllerFSC = new DroppingController( p_intf,
-            lineFSC, this );
-    FSCTboxLayout->addWidget( controllerFSC, 0, 0, 1, -1 );
-
-    mainLayout->addWidget( FSCToolbarBox, 2, 1, 1, -1 );
+    controllerFSC = new DroppingController( p_intf, lineFSC, this );
+    QWidget *FSCToolbarBox = new QWidget();
+    FSCToolbarBox->setLayout( new QVBoxLayout() );
+    FSCToolbarBox->layout()->addWidget( controllerFSC );
+    tabWidget->addTab( FSCToolbarBox, qtr( "Fullscreen Controller" ) );
 
     /* Profile */
-    QGroupBox *profileBox = new QGroupBox( qtr( "Profile" ), this );
-    QGridLayout *profileBoxLayout = new QGridLayout( profileBox );
+    QGridLayout *profileBoxLayout = new QGridLayout();
 
     profileCombo = new QComboBox;
-    QLabel *profileLabel = new QLabel( qtr( "Select profile:" ), this );
 
     QToolButton *newButton = new QToolButton;
     newButton->setIcon( QIcon( ":/new" ) );
@@ -161,12 +148,12 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
     deleteButton->setIcon( QIcon( ":/toolbar/clear" ) );
     deleteButton->setToolTip( qtr( "Delete the current profile" ) );
 
-    profileBoxLayout->addWidget( profileLabel, 0, 0 );
+    profileBoxLayout->addWidget( new QLabel( qtr( "Select profile:" ) ), 0, 0 );
     profileBoxLayout->addWidget( profileCombo, 0, 1 );
     profileBoxLayout->addWidget( newButton, 0, 2 );
     profileBoxLayout->addWidget( deleteButton, 0, 3 );
 
-    mainLayout->addWidget( profileBox, 3, 1, 1, -1 );
+    mainLayout->addLayout( profileBoxLayout, 0, 0, 1, 9 );
 
     /* Fill combos */
     int i_size = getSettings()->beginReadArray( "ToolbarProfiles" );
@@ -193,6 +180,15 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
     }
     profileCombo->setCurrentIndex( -1 );
 
+    /* Build and prepare our preview */
+    PreviewWidget *previewWidget = new PreviewWidget( controller1, controller2, controller );
+    QGroupBox *previewBox = new QGroupBox( qtr("Preview"), this );
+    previewBox->setLayout( new QVBoxLayout() );
+    previewBox->layout()->addWidget( previewWidget );
+    mainLayout->addWidget( previewBox, 5, 6, 3, 3 );
+    CONNECT( positionCheckbox, stateChanged(int),
+             previewWidget, setBarsTopPosition(int) );
+
     /* Buttons */
     QDialogButtonBox *okCancel = new QDialogButtonBox;
     QPushButton *okButton = new QPushButton( qtr( "Cl&ose" ), this );
@@ -206,7 +202,7 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
     CONNECT( profileCombo, currentIndexChanged( int ), this, changeProfile( int ) );
     BUTTONACT( okButton, close() );
     BUTTONACT( cancelButton, cancel() );
-    mainLayout->addWidget( okCancel, 5, 2 );
+    mainLayout->addWidget( okCancel, 8, 0, 1, 9 );
 }
 
 
@@ -229,7 +225,7 @@ void ToolbarEditDialog::newProfile()
                  qtr( "Please enter the new profile name." ), QLineEdit::Normal, 0, &ok );
     if( !ok ) return;
 
-    QString temp = QString::number( positionCombo->currentIndex() );
+    QString temp = QString::number( !!positionCheckbox->isChecked() );
     temp += "|" + controller1->getValue();
     temp += "|" + controller2->getValue();
     temp += "|" + controllerA->getValue();
@@ -251,7 +247,7 @@ void ToolbarEditDialog::changeProfile( int i )
     if( qs_list.count() < 6 )
         return;
 
-    positionCombo->setCurrentIndex( positionCombo->findData( qs_list[0].toInt() ) );
+    positionCheckbox->setChecked( qs_list[0].toInt() );
     controller1->resetLine( qs_list[1] );
     controller2->resetLine( qs_list[2] );
     controllerA->resetLine( qs_list[3] );
@@ -261,8 +257,7 @@ void ToolbarEditDialog::changeProfile( int i )
 
 void ToolbarEditDialog::close()
 {
-    getSettings()->setValue( "MainWindow/ToolbarPos",
-            positionCombo->itemData( positionCombo->currentIndex() ).toInt() );
+    getSettings()->setValue( "MainWindow/ToolbarPos", !!positionCheckbox->isChecked() );
     getSettings()->setValue( "MainWindow/MainToolbar1", controller1->getValue() );
     getSettings()->setValue( "MainWindow/MainToolbar2", controller2->getValue() );
     getSettings()->setValue( "MainWindow/AdvToolbar", controllerA->getValue() );
@@ -277,6 +272,94 @@ void ToolbarEditDialog::cancel()
     reject();
 }
 
+
+PreviewWidget::PreviewWidget( QWidget *a, QWidget *b, QWidget *c )
+               : QWidget( a )
+{
+    bars[0] = a;
+    bars[1] = b;
+    bars[2] = c;
+    for ( int i=0; i<3; i++ ) bars[i]->installEventFilter( this );
+    setAutoFillBackground( true );
+    setBarsTopPosition( false );
+}
+
+void PreviewWidget::setBarsTopPosition( int b )
+{
+    b_top = b;
+    repaint();
+}
+
+void PreviewWidget::paintEvent( QPaintEvent * )
+{
+    int i_total = 0, i_offset = 0, i;
+    QPainter painter( this );
+    QPixmap pixmaps[3];
+    for( int i=0; i<3; i++ )
+    {
+        pixmaps[i] = QPixmap::grabWidget( bars[i], bars[i]->contentsRect() );
+        for( int j=0; j < bars[i]->layout()->count(); j++ )
+        {
+            QLayoutItem *item = bars[i]->layout()->itemAt( j );
+            if ( !strcmp( item->widget()->metaObject()->className(), "QLabel" ) )
+            {
+                QPainter eraser( &pixmaps[i] );
+                eraser.fillRect( item->geometry(), palette().background() );
+                eraser.end();
+            }
+        }
+        pixmaps[i] = pixmaps[i].scaled( size(), Qt::KeepAspectRatio );
+    }
+
+    for( i=0; i<3; i++ )
+        i_total += pixmaps[i].size().height();
+
+    /* Draw top bars */
+    i = ( b_top ) ? 0 : 3;
+    for( ; i<2; i++ )
+    {
+        painter.drawPixmap( pixmaps[i].rect().translated( 0, i_offset ), pixmaps[i] );
+        i_offset += pixmaps[i].rect().height();
+    }
+
+    /* Draw central area */
+    QRect conearea( 0, i_offset, size().width(), size().height() - i_total );
+    painter.fillRect( conearea, Qt::black );
+    QPixmap cone = QPixmap( ":/logo/vlc128.png" );
+    if ( ( conearea.size() - QSize(10, 10) - cone.size() ).isEmpty() )
+        cone = cone.scaled( conearea.size() - QSize(10, 10), Qt::KeepAspectRatio );
+    if ( cone.size().isValid() )
+    {
+        painter.drawPixmap( ((conearea.size() - cone.size()) / 2).width(),
+                            i_offset + ((conearea.size() - cone.size()) / 2).height(),
+                            cone );
+    }
+
+    /* Draw bottom bars */
+    i_offset += conearea.height();
+    i = ( b_top ) ? 2 : 0;
+    for( ; i<3; i++ )
+    {
+        painter.drawPixmap( pixmaps[i].rect().translated( 0, i_offset ), pixmaps[i] );
+        i_offset += pixmaps[i].rect().height();
+    }
+
+    /* Draw overlay */
+    painter.fillRect( rect(), QColor( 255, 255, 255, 128 ) );
+
+    painter.end();
+}
+
+bool PreviewWidget::eventFilter( QObject *obj, QEvent *event )
+{
+    if ( obj == this )
+        return QWidget::eventFilter( obj, event );
+
+    if ( event->type() == QEvent::LayoutRequest )
+        repaint();
+    return false;
+}
+
 /************************************************
  *  Widget Listing:
  * Creation of the list of drawed lovely buttons
@@ -289,19 +372,17 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
     assert( parent );
 
     /* Normal options */
-    setViewMode( QListView::IconMode );
-    setSpacing( 8 );
-    setGridSize( QSize(90, 50) );
-    setWrapping( true );
-    setWordWrap( true );
+    setViewMode( QListView::ListMode );
     setTextElideMode( Qt::ElideNone );
     setDragEnabled( true );
+    setIconSize( QSize( 64, 32 ) );
 
     /* All the buttons do not need a special rendering */
     for( int i = 0; i < BUTTON_MAX; i++ )
     {
         QListWidgetItem *widgetItem = new QListWidgetItem( this );
         widgetItem->setText( qtr( nameL[i] ) );
+        widgetItem->setSizeHint( QSize( widgetItem->sizeHint().width(), 32 ) );
         QPixmap pix( iconL[i] );
         widgetItem->setIcon( pix.scaled( 16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
         widgetItem->setData( Qt::UserRole, QVariant( i ) );
@@ -314,12 +395,14 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
             qtr( "Spacer" ), this );
     widgetItem->setData( Qt::UserRole, WIDGET_SPACER );
     widgetItem->setToolTip( widgetItem->text() );
+    widgetItem->setSizeHint( QSize( widgetItem->sizeHint().width(), 32 ) );
     addItem( widgetItem );
 
     widgetItem = new QListWidgetItem( QIcon( ":/toolbar/space" ),
             qtr( "Expanding Spacer" ), this );
     widgetItem->setData( Qt::UserRole, WIDGET_SPACER_EXTEND );
     widgetItem->setToolTip( widgetItem->text() );
+    widgetItem->setSizeHint( QSize( widgetItem->sizeHint().width(), 32 ) );
     addItem( widgetItem );
 
     /**
@@ -337,6 +420,7 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
     {
         QWidget *widget = NULL;
         QListWidgetItem *widgetItem = new QListWidgetItem( this );
+        widgetItem->setSizeHint( QSize( widgetItem->sizeHint().width(), 32 ) );
         switch( i )
         {
         case SPLITTER:

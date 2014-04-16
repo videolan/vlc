@@ -48,6 +48,25 @@ class DroppingController;
 class QComboBox;
 class QRubberBand;
 
+class PreviewWidget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    PreviewWidget( QWidget *, QWidget *, QWidget * );
+
+public slots:
+    void setBarsTopPosition( int b );
+
+protected:
+    virtual void paintEvent(QPaintEvent *);
+    virtual bool eventFilter(QObject *obj, QEvent *event);
+
+private:
+    QWidget * bars[3];
+    bool b_top;
+};
+
 class WidgetListing : public QListWidget
 {
     Q_OBJECT
@@ -70,8 +89,8 @@ public:
     virtual ~ToolbarEditDialog();
 
 private:
-    QCheckBox *flatBox, *bigBox, *shinyBox;
-    QComboBox *positionCombo, *profileCombo;
+    QCheckBox *flatBox, *bigBox, *shinyBox, *positionCheckbox;
+    QComboBox *profileCombo;
 
     WidgetListing *widgetListing;
     DroppingController *controller1, *controller2, *controllerA;
