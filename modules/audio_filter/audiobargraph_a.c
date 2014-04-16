@@ -97,9 +97,9 @@ struct filter_sys_t
     int             bargraph;
     int             bargraph_repetition;
     int             silence;
-    int             time_window;
+    int64_t         time_window;
     float           alarm_threshold;
-    int             repetition_time;
+    int64_t         repetition_time;
     int             counter;
     ValueDate_t*    first;
     ValueDate_t*    last;
@@ -120,9 +120,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->bargraph = var_CreateGetInteger( p_filter, CFG_PREFIX "bargraph" );
     p_sys->bargraph_repetition = var_CreateGetInteger( p_filter, CFG_PREFIX "bargraph_repetition" );
     p_sys->silence = var_CreateGetInteger( p_filter, CFG_PREFIX "silence" );
-    p_sys->time_window = var_CreateGetInteger( p_filter, CFG_PREFIX "time_window" );
+    p_sys->time_window = var_CreateGetInteger( p_filter, CFG_PREFIX "time_window" ) * 1000;
     p_sys->alarm_threshold = var_CreateGetFloat( p_filter, CFG_PREFIX "alarm_threshold" );
-    p_sys->repetition_time = var_CreateGetInteger( p_filter, CFG_PREFIX "repetition_time" );
+    p_sys->repetition_time = var_CreateGetInteger( p_filter, CFG_PREFIX "repetition_time" ) * 1000;
     p_sys->counter = 0;
     p_sys->first = NULL;
     p_sys->last = NULL;
@@ -188,7 +188,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         }
 
         /* 3 - delete too old values */
-        while (p_sys->first->date < (new->date - (p_sys->time_window*1000))) {
+        while (p_sys->first->date < (new->date - p_sys->time_window)) {
             p_sys->started = 1; // we have enough values to compute a valid total
             current = p_sys->first;
             p_sys->first = p_sys->first->next;
@@ -196,7 +196,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         }
 
         /* If last message was sent enough time ago */
-        if ((p_sys->started) && (p_in_buf->i_pts > p_sys->lastAlarm + (p_sys->repetition_time*1000))) {
+        if ((p_sys->started) && (p_in_buf->i_pts > p_sys->lastAlarm + p_sys->repetition_time)) {
 
             /* 4 - compute the RMS */
             current = p_sys->first;
