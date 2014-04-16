@@ -167,7 +167,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
                 max = ch;
         }
     }
-    max = powf( max, 2 );
+    max *= max;
 
     if (p_sys->silence) {
         /* 2 - store the new value */

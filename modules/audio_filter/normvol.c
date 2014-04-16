@@ -156,8 +156,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         for( i_chan = 0; i_chan < i_channels; i_chan++ )
         {
             float f_sample = p_in[i_chan];
-            float f_square = pow( f_sample, 2 );
-            pf_sum[i_chan] += f_square;
+            pf_sum[i_chan] += f_sample * f_sample;
         }
         p_in += i_channels;
     }
