@@ -148,7 +148,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     float *p_sample = (float *)p_in_buf->p_buffer;
     float i_value[AOUT_CHAN_MAX];
 
-    int nbChannels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
+    int nbChannels = aout_FormatNbChannels(&p_filter->fmt_in.audio);
 
     for (int i = 0; i < nbChannels; i++)
         i_value[i] = 0.;
@@ -172,16 +172,14 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         new->value = max;
         new->date = p_in_buf->i_pts;
         new->next = NULL;
-        if (p_sys->last != NULL) {
+        if (p_sys->last != NULL)
             p_sys->last->next = new;
-        }
         p_sys->last = new;
-        if (p_sys->first == NULL) {
+        if (p_sys->first == NULL)
             p_sys->first = new;
-        }
 
         /* 3 - delete too old values */
-        while (p_sys->first->date < (new->date - p_sys->time_window)) {
+        while (p_sys->first->date < new->date - p_sys->time_window) {
             p_sys->started = 1; // we have enough values to compute a valid total
             ValueDate_t *current = p_sys->first;
             p_sys->first = p_sys->first->next;
@@ -189,7 +187,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         }
 
         /* If last message was sent enough time ago */
-        if ((p_sys->started) && (p_in_buf->i_pts > p_sys->lastAlarm + p_sys->repetition_time)) {
+        if (p_sys->started && p_in_buf->i_pts > p_sys->lastAlarm + p_sys->repetition_time) {
 
             /* 4 - compute the RMS */
             ValueDate_t *current = p_sys->first;
@@ -221,18 +219,18 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 
     if (p_sys->bargraph) {
         /* 6 - sent the message with the values for the BarGraph */
-        if ((nbChannels > 0) && (p_sys->counter%(p_sys->bargraph_repetition) == 0)) {
+        if (nbChannels > 0 && p_sys->counter % p_sys->bargraph_repetition == 0) {
             char message[256];
             size_t j = 0;
 
             for (int i = 0; i < nbChannels; i++) {
-                if (j >= sizeof (message))
+                if (j >= sizeof(message))
                     break;
                 j += snprintf(message + j, sizeof (message),"%f:", i_value[i]);
             }
 
             message[--j] = '\0';
-            msg_Dbg( p_filter, "values: %s", message );
+            msg_Dbg(p_filter, "values: %s", message);
 
             var_SetString(p_filter->p_libvlc, "audiobargraph_v-i_values",
                           message);
