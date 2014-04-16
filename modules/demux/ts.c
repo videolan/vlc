@@ -2167,16 +2167,34 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
         p_sys->i_current_pcr = AdjustPCRWrapAround( p_demux, i_pcr );
 
     /* Search program and set the PCR */
-    for( int i = 0; i < p_sys->i_pmt; i++ )
+    int i_group = -1;
+    for( int i = 0; i < p_sys->i_pmt && i_group < 0 ; i++ )
+    {
+        bool b_pmt_has_es = false;
+
         for( int i_prg = 0; i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
+        {
             if( pid->i_pid == p_sys->pmt[i]->psi->prg[i_prg]->i_pid_pcr )
             {
+                /* We've found our target group */
                 p_sys->pmt[i]->psi->prg[i_prg]->i_pcr_value = i_pcr;
-                if (p_sys->b_trust_pcr)
-                    es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
-                      (int)p_sys->pmt[i]->psi->prg[i_prg]->i_number,
-                      (int64_t)(VLC_TS_0 + i_pcr * 100 / 9) );
+                i_group = p_sys->pmt[i]->psi->prg[i_prg]->i_number;
+                for( int j = 0; j < 8192; j++ )
+                {
+                    const ts_pid_t *pid = &p_sys->pid[j];
+                    if( pid->b_valid && pid->p_owner == p_sys->pmt[i]->psi && pid->es )
+                    {
+                        b_pmt_has_es = true;
+                        break;
+                    }
+                }
             }
+        }
+
+        if ( p_sys->b_trust_pcr && i_group > 0 && b_pmt_has_es )
+            es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
+              i_group, VLC_TS_0 + i_pcr * 100 / 9 );
+    }
 }
 
 static bool GatherData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
