@@ -324,15 +324,15 @@ static int BarGraphCallback(vlc_object_t *p_this, char const *psz_var,
     char* res = NULL;
 
     vlc_mutex_lock(&p_sys->lock);
-    if (!strcmp(psz_var, "audiobargraph_v-x"))
+    if (!strcmp(psz_var, CFG_PREFIX "x"))
         p_sys->i_pos_x = newval.i_int;
-    else if (!strcmp(psz_var, "audiobargraph_v-y"))
+    else if (!strcmp(psz_var, CFG_PREFIX "y"))
         p_sys->i_pos_y = newval.i_int;
-    else if (!strcmp(psz_var, "audiobargraph_v-position"))
+    else if (!strcmp(psz_var, CFG_PREFIX "position"))
         p_sys->i_pos = newval.i_int;
-    else if (!strcmp(psz_var, "audiobargraph_v-transparency"))
+    else if (!strcmp(psz_var, CFG_PREFIX "transparency"))
         p_BarGraph->i_alpha = VLC_CLIP(newval.i_int, 0, 255);
-    else if (!strcmp(psz_var, "audiobargraph_v-i_values")) {
+    else if (!strcmp(psz_var, CFG_PREFIX "i_values")) {
         char *psz = xstrdup(newval.psz_string ? newval.psz_string : "");
         // in case many answer are received at the same time, only keep one
         res = strchr(psz, '@');
@@ -341,10 +341,10 @@ static int BarGraphCallback(vlc_object_t *p_this, char const *psz_var,
         parse_i_values(p_BarGraph, psz);
         free(psz);
         Draw(p_BarGraph);
-    } else if (!strcmp(psz_var, "audiobargraph_v-alarm")) {
+    } else if (!strcmp(psz_var, CFG_PREFIX "alarm")) {
         p_BarGraph->alarm = newval.b_bool;
         Draw(p_BarGraph);
-    } else if (!strcmp(psz_var, "audiobargraph_v-barWidth")) {
+    } else if (!strcmp(psz_var, CFG_PREFIX "barWidth")) {
         p_BarGraph->barWidth = newval.i_int;
         Draw(p_BarGraph);
     }
@@ -524,19 +524,18 @@ static int OpenCommon(vlc_object_t *p_this, bool b_sub)
                        p_filter->p_cfg);
 
     /* create and initialize variables */
-    p_sys->i_pos = var_CreateGetInteger(p_filter, "audiobargraph_v-position");
-    p_sys->i_pos_x = var_CreateGetInteger(p_filter, "audiobargraph_v-x");
-    p_sys->i_pos_y = var_CreateGetInteger(p_filter, "audiobargraph_v-y");
+    p_sys->i_pos = var_CreateGetInteger(p_filter, CFG_PREFIX "position");
+    p_sys->i_pos_x = var_CreateGetInteger(p_filter, CFG_PREFIX "x");
+    p_sys->i_pos_y = var_CreateGetInteger(p_filter, CFG_PREFIX "y");
     BarGraph_t *p_BarGraph = &p_sys->p_BarGraph;
     p_BarGraph->p_pic = NULL;
-    p_BarGraph->i_alpha = var_CreateGetInteger(p_filter,
-                                                        "audiobargraph_v-transparency");
+    p_BarGraph->i_alpha = var_CreateGetInteger(p_filter, CFG_PREFIX "transparency");
     p_BarGraph->i_alpha = VLC_CLIP(p_BarGraph->i_alpha, 0, 255);
     p_BarGraph->i_values = NULL;
     parse_i_values(p_BarGraph, &(char){ 0 });
     p_BarGraph->alarm = false;
 
-    p_BarGraph->barWidth = var_CreateGetInteger(p_filter, "audiobargraph_v-barWidth");
+    p_BarGraph->barWidth = var_CreateGetInteger(p_filter, CFG_PREFIX "barWidth");
     p_BarGraph->scale = 400;
 
     /* Ignore aligment if a position is given for video filter */
@@ -545,16 +544,16 @@ static int OpenCommon(vlc_object_t *p_this, bool b_sub)
 
     vlc_mutex_init(&p_sys->lock);
 
-    var_Create(p_filter->p_libvlc, "audiobargraph_v-alarm", VLC_VAR_BOOL);
-    var_Create(p_filter->p_libvlc, "audiobargraph_v-i_values", VLC_VAR_STRING);
+    var_Create(p_filter->p_libvlc, CFG_PREFIX "alarm", VLC_VAR_BOOL);
+    var_Create(p_filter->p_libvlc, CFG_PREFIX "i_values", VLC_VAR_STRING);
 
-    var_AddCallback(p_filter->p_libvlc, "audiobargraph_v-alarm",
+    var_AddCallback(p_filter->p_libvlc, CFG_PREFIX "alarm",
                     BarGraphCallback, p_sys);
-    var_AddCallback(p_filter->p_libvlc, "audiobargraph_v-i_values",
+    var_AddCallback(p_filter->p_libvlc, CFG_PREFIX "i_values",
                     BarGraphCallback, p_sys);
 
-    var_TriggerCallback(p_filter->p_libvlc, "audiobargraph_v-alarm");
-    var_TriggerCallback(p_filter->p_libvlc, "audiobargraph_v-i_values");
+    var_TriggerCallback(p_filter->p_libvlc, CFG_PREFIX "alarm");
+    var_TriggerCallback(p_filter->p_libvlc, CFG_PREFIX "i_values");
 
     for (int i = 0; ppsz_filter_callbacks[i]; i++)
         var_AddCallback(p_filter, ppsz_filter_callbacks[i],
@@ -596,12 +595,12 @@ static void Close(vlc_object_t *p_this)
         var_DelCallback(p_filter, ppsz_filter_callbacks[i],
                          BarGraphCallback, p_sys);
 
-    var_DelCallback(p_filter->p_libvlc, "audiobargraph_v-i_values",
+    var_DelCallback(p_filter->p_libvlc, CFG_PREFIX "i_values",
                     BarGraphCallback, p_sys);
-    var_DelCallback(p_filter->p_libvlc, "audiobargraph_v-alarm",
+    var_DelCallback(p_filter->p_libvlc, CFG_PREFIX "alarm",
                     BarGraphCallback, p_sys);
-    var_Destroy(p_filter->p_libvlc, "audiobargraph_v-i_values");
-    var_Destroy(p_filter->p_libvlc, "audiobargraph_v-alarm");
+    var_Destroy(p_filter->p_libvlc, CFG_PREFIX "i_values");
+    var_Destroy(p_filter->p_libvlc, CFG_PREFIX "alarm");
 
     if (p_sys->p_blend)
         filter_DeleteBlend(p_sys->p_blend);
