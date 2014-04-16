@@ -175,25 +175,19 @@ static HRESULT FillBuffer( vlc_object_t *obj, aout_stream_sys_t *p_sys,
     unsigned long l_bytes1, l_bytes2;
     DWORD i_read;
     size_t i_size;
-    mtime_t i_buf;
+    mtime_t i_buf = towrite;
     HRESULT dsresult;
 
-    size_t toerase = p_sys->i_bytes_per_sample * p_sys->i_rate / 4;
-    mtime_t max = towrite;
-
+    /* Erase all the data already played */
     dsresult = IDirectSoundBuffer_GetCurrentPosition( p_sys->p_dsbuffer,
                                                       &i_read, NULL );
     if( dsresult == DS_OK )
     {
-        max = (mtime_t)i_read - (mtime_t)p_sys->i_write;
+        int64_t max = (int64_t)i_read - (int64_t)p_sys->i_write;
         if( max <= 0 )
             max += DS_BUF_SIZE;
+        i_buf = max;
     }
-
-    if( towrite + toerase <= max )
-        i_buf = towrite + toerase;
-    else
-        i_buf = towrite;
 
     /* Before copying anything, we have to lock the buffer */
     dsresult = IDirectSoundBuffer_Lock(
