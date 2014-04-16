@@ -1,7 +1,7 @@
 /*****************************************************************************
  * audiobargraph_a.c : audiobargraph audio plugin for vlc
  *****************************************************************************
- * Copyright (C) 2002-2009 VLC authors and VideoLAN
+ * Copyright (C) 2002-2014 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Clement CHESNIN <clement.chesnin@gmail.com>
