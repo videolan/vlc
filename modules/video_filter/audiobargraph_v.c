@@ -559,6 +559,9 @@ static picture_t *LoadImage(vlc_object_t *p_this, int nbChannels, int* i_values,
  *****************************************************************************/
 static void LoadBarGraph(vlc_object_t *p_this, BarGraph_t *p_BarGraph)
 {
+    if (p_BarGraph->p_pic)
+        picture_Release(p_BarGraph->p_pic);
+
     p_BarGraph->p_pic = LoadImage(p_this, p_BarGraph->nbChannels, p_BarGraph->i_values, p_BarGraph->scale, p_BarGraph->alarm, p_BarGraph->barWidth);
     if (!p_BarGraph->p_pic)
         msg_Warn(p_this, "error while creating picture");
@@ -585,11 +588,6 @@ static int BarGraphCallback(vlc_object_t *p_this, char const *psz_var,
     else if (!strcmp(psz_var, "audiobargraph_v-transparency"))
         p_BarGraph->i_alpha = VLC_CLIP(newval.i_int, 0, 255);
     else if (!strcmp(psz_var, "audiobargraph_v-i_values")) {
-        if (p_BarGraph->p_pic) {
-            picture_Release(p_BarGraph->p_pic);
-            p_BarGraph->p_pic = NULL;
-        }
-
         char *psz = xstrdup(newval.psz_string ? newval.psz_string : "");
         free(p_BarGraph->i_values);
         // in case many answer are received at the same time, only keep one
@@ -600,17 +598,9 @@ static int BarGraphCallback(vlc_object_t *p_this, char const *psz_var,
         free(psz);
         LoadBarGraph(p_this,p_BarGraph);
     } else if (!strcmp(psz_var, "audiobargraph_v-alarm")) {
-        if (p_BarGraph->p_pic) {
-            picture_Release(p_BarGraph->p_pic);
-            p_BarGraph->p_pic = NULL;
-        }
         p_BarGraph->alarm = newval.b_bool;
         LoadBarGraph(p_this,p_BarGraph);
     } else if (!strcmp(psz_var, "audiobargraph_v-barWidth")) {
-        if (p_BarGraph->p_pic) {
-            picture_Release(p_BarGraph->p_pic);
-            p_BarGraph->p_pic = NULL;
-        }
         p_BarGraph->barWidth = newval.i_int;
         LoadBarGraph(p_this,p_BarGraph);
     }
