@@ -915,7 +915,6 @@ static void Close( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
-    BarGraph_t *p_BarGraph = &(p_sys->p_BarGraph);
 
     for( int i = 0; ppsz_filter_callbacks[i]; i++ )
         var_DelCallback( p_filter, ppsz_filter_callbacks[i],
@@ -933,12 +932,10 @@ static void Close( vlc_object_t *p_this )
 
     vlc_mutex_destroy( &p_sys->lock );
 
-    if( p_BarGraph->p_pic )
-    {
-        picture_Release( p_BarGraph->p_pic );
-        p_BarGraph->p_pic = NULL;
-    }
-    free( p_BarGraph->i_values );
+    if( p_sys->p_BarGraph.p_pic )
+        picture_Release( p_sys->p_BarGraph.p_pic );
+
+    free( p_sys->p_BarGraph.i_values );
 
     free( p_sys );
 }
