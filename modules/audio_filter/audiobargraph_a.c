@@ -101,7 +101,6 @@ struct filter_sys_t
     float           alarm_threshold;
     int             repetition_time;
     int             counter;
-    int             nbChannels;
     ValueDate_t*    first;
     ValueDate_t*    last;
     int             started;
@@ -125,7 +124,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->alarm_threshold = var_CreateGetFloat( p_filter, CFG_PREFIX "alarm_threshold" );
     p_sys->repetition_time = var_CreateGetInteger( p_filter, CFG_PREFIX "repetition_time" );
     p_sys->counter = 0;
-    p_sys->nbChannels = 0;
     p_sys->first = NULL;
     p_sys->last = NULL;
     p_sys->started = 0;
@@ -152,13 +150,11 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     float i_value[AOUT_CHAN_MAX];
     float ch;
     float max = 0.0;
-    int nbChannels = 0;
     ValueDate_t* current = NULL;
     float sum;
     int count = 0;
 
-    nbChannels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
-    p_sys->nbChannels = nbChannels;
+    int nbChannels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
 
     for (i=0; i<nbChannels; i++) {
         i_value[i] = 0.;
