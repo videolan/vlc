@@ -524,19 +524,19 @@ static int OpenCommon(vlc_object_t *p_this, bool b_sub)
                        p_filter->p_cfg);
 
     /* create and initialize variables */
-    p_sys->i_pos = var_CreateGetIntegerCommand(p_filter, "audiobargraph_v-position");
-    p_sys->i_pos_x = var_CreateGetIntegerCommand(p_filter, "audiobargraph_v-x");
-    p_sys->i_pos_y = var_CreateGetIntegerCommand(p_filter, "audiobargraph_v-y");
+    p_sys->i_pos = var_CreateGetInteger(p_filter, "audiobargraph_v-position");
+    p_sys->i_pos_x = var_CreateGetInteger(p_filter, "audiobargraph_v-x");
+    p_sys->i_pos_y = var_CreateGetInteger(p_filter, "audiobargraph_v-y");
     BarGraph_t *p_BarGraph = &p_sys->p_BarGraph;
     p_BarGraph->p_pic = NULL;
-    p_BarGraph->i_alpha = var_CreateGetIntegerCommand(p_filter,
+    p_BarGraph->i_alpha = var_CreateGetInteger(p_filter,
                                                         "audiobargraph_v-transparency");
     p_BarGraph->i_alpha = VLC_CLIP(p_BarGraph->i_alpha, 0, 255);
     p_BarGraph->i_values = NULL;
     parse_i_values(p_BarGraph, &(char){ 0 });
     p_BarGraph->alarm = false;
 
-    p_BarGraph->barWidth = var_CreateGetIntegerCommand(p_filter, "audiobargraph_v-barWidth");
+    p_BarGraph->barWidth = var_CreateGetInteger(p_filter, "audiobargraph_v-barWidth");
     p_BarGraph->scale = 400;
 
     /* Ignore aligment if a position is given for video filter */
