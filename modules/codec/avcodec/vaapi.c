@@ -146,6 +146,7 @@ static int Open( vlc_va_t *va, int i_codec_id, int i_thread_count )
         i_surface_count = 16 + i_thread_count + 2;
         break;;
     default:
+        free( sys );
         return VLC_EGENERIC;
     }
 
