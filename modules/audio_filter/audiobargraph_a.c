@@ -213,15 +213,15 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         /* 6 - send the message with the values for the BarGraph */
         p_sys->counter = 0;
         char message[256];
-        size_t j = 0;
+        size_t len = 0;
 
         for (int i = 0; i < nbChannels; i++) {
-            if (j >= sizeof(message))
+            if (len >= sizeof(message))
                 break;
-            j += snprintf(message + j, sizeof (message),"%f:", i_value[i]);
+            len += snprintf(message + len, sizeof (message),"%f:", i_value[i]);
         }
 
-        message[--j] = '\0';
+        message[len-1] = '\0';
         msg_Dbg(p_filter, "values: %s", message);
 
         var_SetString(p_filter->p_libvlc, "audiobargraph_v-i_values",
