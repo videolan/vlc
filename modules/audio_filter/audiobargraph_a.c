@@ -139,6 +139,24 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+static void SendValues(filter_t *p_filter, float *value, int nbChannels)
+{
+    char message[256];
+    size_t len = 0;
+
+    for (int i = 0; i < nbChannels; i++) {
+        if (len >= sizeof(message))
+            break;
+        len += snprintf(message + len, sizeof (message),"%f:", value[i]);
+    }
+
+    message[len-1] = '\0';
+    msg_Dbg(p_filter, "values: %s", message);
+
+    var_SetString(p_filter->p_libvlc, "audiobargraph_v-i_values",
+            message);
+}
+
 /*****************************************************************************
  * DoWork: treat an audio buffer
  ****************************************************************************/
@@ -210,22 +228,8 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     }
 
     if (p_sys->bargraph && nbChannels > 0 && p_sys->counter++ > p_sys->bargraph_repetition) {
-        /* 6 - send the message with the values for the BarGraph */
+        SendValues(p_filter, i_value, nbChannels);
         p_sys->counter = 0;
-        char message[256];
-        size_t len = 0;
-
-        for (int i = 0; i < nbChannels; i++) {
-            if (len >= sizeof(message))
-                break;
-            len += snprintf(message + len, sizeof (message),"%f:", i_value[i]);
-        }
-
-        message[len-1] = '\0';
-        msg_Dbg(p_filter, "values: %s", message);
-
-        var_SetString(p_filter->p_libvlc, "audiobargraph_v-i_values",
-                message);
     }
 
     return p_in_buf;
