@@ -209,28 +209,24 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         }
     }
 
-    if (p_sys->bargraph) {
-        /* 6 - sent the message with the values for the BarGraph */
-        if (nbChannels > 0 && p_sys->counter % p_sys->bargraph_repetition == 0) {
-            char message[256];
-            size_t j = 0;
-
-            for (int i = 0; i < nbChannels; i++) {
-                if (j >= sizeof(message))
-                    break;
-                j += snprintf(message + j, sizeof (message),"%f:", i_value[i]);
-            }
-
-            message[--j] = '\0';
-            msg_Dbg(p_filter, "values: %s", message);
-
-            var_SetString(p_filter->p_libvlc, "audiobargraph_v-i_values",
-                          message);
-        }
-    }
-
-    if (++p_sys->counter > p_sys->bargraph_repetition*100)
+    if (p_sys->bargraph && nbChannels > 0 && p_sys->counter++ > p_sys->bargraph_repetition) {
+        /* 6 - send the message with the values for the BarGraph */
         p_sys->counter = 0;
+        char message[256];
+        size_t j = 0;
+
+        for (int i = 0; i < nbChannels; i++) {
+            if (j >= sizeof(message))
+                break;
+            j += snprintf(message + j, sizeof (message),"%f:", i_value[i]);
+        }
+
+        message[--j] = '\0';
+        msg_Dbg(p_filter, "values: %s", message);
+
+        var_SetString(p_filter->p_libvlc, "audiobargraph_v-i_values",
+                message);
+    }
 
     return p_in_buf;
 }
