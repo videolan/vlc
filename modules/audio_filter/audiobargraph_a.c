@@ -209,14 +209,6 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         }
     }
 
-    /*for (i=0; i<nbChannels; i++) {
-        value[i] = abs(i_value[i]*100);
-        if ( value[i] > p_sys->value[i] - 6 )
-            p_sys->value[i] = value[i];
-        else
-            p_sys->value[i] = p_sys->value[i] - 6;
-    }*/
-
     if (p_sys->bargraph) {
         /* 6 - sent the message with the values for the BarGraph */
         if (nbChannels > 0 && p_sys->counter % p_sys->bargraph_repetition == 0) {
