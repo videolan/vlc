@@ -118,12 +118,12 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->bargraph = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "bargraph" );
-    p_sys->bargraph_repetition = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "bargraph_repetition" );
-    p_sys->silence = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "silence" );
-    p_sys->time_window = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "time_window" );
-    p_sys->alarm_threshold = var_CreateGetFloatCommand( p_filter, CFG_PREFIX "alarm_threshold" );
-    p_sys->repetition_time = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "repetition_time" );
+    p_sys->bargraph = var_CreateGetInteger( p_filter, CFG_PREFIX "bargraph" );
+    p_sys->bargraph_repetition = var_CreateGetInteger( p_filter, CFG_PREFIX "bargraph_repetition" );
+    p_sys->silence = var_CreateGetInteger( p_filter, CFG_PREFIX "silence" );
+    p_sys->time_window = var_CreateGetInteger( p_filter, CFG_PREFIX "time_window" );
+    p_sys->alarm_threshold = var_CreateGetFloat( p_filter, CFG_PREFIX "alarm_threshold" );
+    p_sys->repetition_time = var_CreateGetInteger( p_filter, CFG_PREFIX "repetition_time" );
     p_sys->counter = 0;
     p_sys->nbChannels = 0;
     p_sys->first = NULL;
