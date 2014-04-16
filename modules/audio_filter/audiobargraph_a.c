@@ -145,26 +145,22 @@ static int Open( vlc_object_t *p_this )
 static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    int i;
     float *p_sample = (float *)p_in_buf->p_buffer;
     float i_value[AOUT_CHAN_MAX];
-    float ch;
-    float max = 0.0;
     ValueDate_t* current = NULL;
     float sum;
     int count = 0;
 
     int nbChannels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
 
-    for (i=0; i<nbChannels; i++) {
+    for (int i = 0; i < nbChannels; i++)
         i_value[i] = 0.;
-    }
 
     /* 1 - Compute the peak values */
-    for ( i = 0 ; i < (int)(p_in_buf->i_nb_samples); i++ )
-    {
+    float max = 0.0;
+    for (size_t i = 0; i < p_in_buf->i_nb_samples; i++) {
         for (int j = 0; j<nbChannels; j++) {
-            ch = (*p_sample++);
+            float ch = (*p_sample++);
             if (ch > i_value[j])
                 i_value[j] = ch;
             if (ch > max)
@@ -231,7 +227,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
             char message[256];
             size_t j = 0;
 
-            for (i = 0; i < nbChannels; i++) {
+            for (int i = 0; i < nbChannels; i++) {
                 if (j >= sizeof (message))
                     break;
                 j += snprintf(message + j, sizeof (message),"%f:", i_value[i]);
