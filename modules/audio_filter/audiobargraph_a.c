@@ -160,7 +160,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         i_value[i] = 0.;
     }
 
-    /* 1 - Compute the peack values */
+    /* 1 - Compute the peak values */
     for ( i = 0 ; i < (int)(p_in_buf->i_nb_samples); i++ )
     {
         for (int j = 0; j<nbChannels; j++) {
