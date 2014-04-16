@@ -49,7 +49,7 @@ static HRESULT StreamStart( aout_stream_t *, audio_sample_format_t *,
 static HRESULT StreamStop( aout_stream_t * );
 static int ReloadDirectXDevices( vlc_object_t *, const char *,
                                  char ***, char *** );
-
+static void * PlayedDataEraser( void * );
 /* Speaker setup override options list */
 static const char *const speaker_list[] = { "Windows default", "Mono", "Stereo",
                                             "Quad", "5.1", "7.1" };
@@ -112,6 +112,11 @@ typedef struct aout_stream_sys
     vlc_fourcc_t format;
 
     size_t  i_write;
+
+    bool b_playing;
+    vlc_mutex_t lock;
+    vlc_cond_t cond;
+    vlc_thread_t eraser_thread;
 } aout_stream_sys_t;
 
 /**
@@ -173,27 +178,15 @@ static HRESULT FillBuffer( vlc_object_t *obj, aout_stream_sys_t *p_sys,
     size_t towrite = (p_buffer != NULL) ? p_buffer->i_buffer : DS_BUF_SIZE;
     void *p_write_position, *p_wrap_around;
     unsigned long l_bytes1, l_bytes2;
-    DWORD i_read;
-    size_t i_size;
-    mtime_t i_buf = towrite;
     HRESULT dsresult;
 
-    /* Erase all the data already played */
-    dsresult = IDirectSoundBuffer_GetCurrentPosition( p_sys->p_dsbuffer,
-                                                      &i_read, NULL );
-    if( dsresult == DS_OK )
-    {
-        int64_t max = (int64_t)i_read - (int64_t)p_sys->i_write;
-        if( max <= 0 )
-            max += DS_BUF_SIZE;
-        i_buf = max;
-    }
+    vlc_mutex_lock( &p_sys->lock );
 
     /* Before copying anything, we have to lock the buffer */
     dsresult = IDirectSoundBuffer_Lock(
            p_sys->p_dsbuffer,    /* DS buffer */
            p_sys->i_write,       /* Start offset */
-           i_buf,                /* Number of bytes */
+           towrite,                /* Number of bytes */
            &p_write_position,    /* Address of lock start */
            &l_bytes1,            /* Count of bytes locked before wrap around */
            &p_wrap_around,       /* Buffer address (if wrap around) */
@@ -205,7 +198,7 @@ static HRESULT FillBuffer( vlc_object_t *obj, aout_stream_sys_t *p_sys,
         dsresult = IDirectSoundBuffer_Lock(
                                p_sys->p_dsbuffer,
                                p_sys->i_write,
-                               i_buf,
+                               towrite,
                                &p_write_position,
                                &l_bytes1,
                                &p_wrap_around,
@@ -217,6 +210,7 @@ static HRESULT FillBuffer( vlc_object_t *obj, aout_stream_sys_t *p_sys,
         msg_Warn( obj, "cannot lock buffer" );
         if( p_buffer != NULL )
             block_Release( p_buffer );
+        vlc_mutex_unlock( &p_sys->lock );
         return dsresult;
     }
 
@@ -232,18 +226,13 @@ static HRESULT FillBuffer( vlc_object_t *obj, aout_stream_sys_t *p_sys,
                                  p_sys->chans_to_reorder, p_sys->chan_table,
                                  p_sys->format );
 
+        memcpy( p_write_position, p_buffer->p_buffer, l_bytes1 );
+        if( p_wrap_around && l_bytes2 )
+            memcpy( p_wrap_around, p_buffer->p_buffer + l_bytes1, l_bytes2 );
 
-        i_size = ( p_buffer->i_buffer < l_bytes1 ) ? p_buffer->i_buffer : l_bytes1;
-        memcpy( p_write_position, p_buffer->p_buffer, i_size );
-        memset( (uint8_t*) p_write_position + i_size, 0, l_bytes1 - i_size );
+        if( unlikely( ( l_bytes1 + l_bytes2 ) < p_buffer->i_buffer ) )
+            msg_Err( obj, "Buffer overrun");
 
-        if( l_bytes1 < p_buffer->i_buffer)
-        {   /* Compute the remaining buffer space to be written */
-            i_buf = i_buf - i_size - (l_bytes1 - i_size);
-            i_size = ( p_buffer->i_buffer - l_bytes1 < l_bytes2 ) ? p_buffer->i_buffer - l_bytes1 : l_bytes2;
-            memcpy( p_wrap_around, p_buffer->p_buffer + l_bytes1, i_size );
-            memset( (uint8_t*) p_wrap_around + i_size, 0, i_buf - i_size );
-        }
         block_Release( p_buffer );
     }
 
@@ -253,6 +242,7 @@ static HRESULT FillBuffer( vlc_object_t *obj, aout_stream_sys_t *p_sys,
 
     p_sys->i_write += towrite;
     p_sys->i_write %= DS_BUF_SIZE;
+    vlc_mutex_unlock( &p_sys->lock );
 
     return DS_OK;
 }
@@ -261,7 +251,6 @@ static HRESULT Play( vlc_object_t *obj, aout_stream_sys_t *sys,
                      block_t *p_buffer )
 {
     HRESULT dsresult;
-
     dsresult = FillBuffer( obj, sys, p_buffer );
     if( dsresult != DS_OK )
         return dsresult;
@@ -277,6 +266,14 @@ static HRESULT Play( vlc_object_t *obj, aout_stream_sys_t *sys,
     }
     if( dsresult != DS_OK )
         msg_Err( obj, "cannot start playing buffer" );
+    else
+    {
+        vlc_mutex_lock( &sys->lock );
+        sys->b_playing = true;
+        vlc_cond_signal(&sys->cond);
+        vlc_mutex_unlock( &sys->lock );
+
+    }
     return dsresult;
 }
 
@@ -298,6 +295,14 @@ static HRESULT Pause( aout_stream_sys_t *sys, bool pause )
         hr = IDirectSoundBuffer_Stop( sys->p_dsbuffer );
     else
         hr = IDirectSoundBuffer_Play( sys->p_dsbuffer, 0, 0, DSBPLAY_LOOPING );
+    if( hr == DS_OK )
+    {
+        vlc_mutex_lock( &sys->lock );
+        sys->b_playing = !pause;
+        if( sys->b_playing )
+            vlc_cond_signal( &sys->cond );
+        vlc_mutex_unlock( &sys->lock );
+    }
     return hr;
 }
 
@@ -513,6 +518,12 @@ static HRESULT CreateDSBufferPCM( vlc_object_t *obj, aout_stream_sys_t *sys,
  */
 static HRESULT Stop( aout_stream_sys_t *p_sys )
 {
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->b_playing =  true;
+    vlc_cond_signal( &p_sys->cond );
+    vlc_cancel( p_sys->eraser_thread );
+    vlc_mutex_unlock( &p_sys->lock );
+    vlc_join( p_sys->eraser_thread, NULL );
     if( p_sys->p_notify != NULL )
     {
         IDirectSoundNotify_Release(p_sys->p_notify );
@@ -729,7 +740,27 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
         }
     }
 
+    int ret = vlc_clone(&sys->eraser_thread, PlayedDataEraser, (void*) obj,
+                        VLC_THREAD_PRIORITY_LOW);
+    if( unlikely( ret ) )
+    {
+        if( ret != ENOMEM )
+            msg_Err( obj, "Couldn't start eraser thread" );
+        if( sys->p_notify != NULL )
+        {
+            IDirectSoundNotify_Release( sys->p_notify );
+            sys->p_notify = NULL;
+        }
+        IDirectSoundBuffer_Release( sys->p_dsbuffer );
+        sys->p_dsbuffer = NULL;
+        IDirectSound_Release( sys->p_dsobject );
+        sys->p_dsobject = NULL;
+        return ret;
+    }
+    sys->b_playing = false;
     sys->i_write = 0;
+    vlc_mutex_unlock( &sys->lock );
+
     return DS_OK;
 
 error:
@@ -1028,6 +1059,9 @@ static int Open(vlc_object_t *obj)
     aout_DeviceReport(aout, dev);
     free(dev);
 
+    vlc_mutex_init(&sys->s.lock);
+    vlc_cond_init(&sys->s.cond);
+
     return VLC_SUCCESS;
 }
 
@@ -1035,8 +1069,82 @@ static void Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
+    vlc_cond_destroy( &sys->s.cond );
+    vlc_mutex_destroy( &sys->s.lock );
 
     var_Destroy(aout, "directx-audio-device");
     FreeLibrary(sys->hdsound_dll); /* free DSOUND.DLL */
     free(sys);
+}
+
+static void * PlayedDataEraser( void * data )
+{
+    const audio_output_t *aout = (audio_output_t *) data;
+    aout_stream_sys_t *p_sys = &aout->sys->s;
+    void *p_write_position, *p_wrap_around;
+    unsigned long l_bytes1, l_bytes2;
+    DWORD i_read;
+    int64_t toerase, tosleep;
+    HRESULT dsresult;
+
+    for(;;)
+    {
+        int canc = vlc_savecancel();
+        vlc_mutex_lock( &p_sys->lock );
+
+        while( !p_sys->b_playing )
+           vlc_cond_wait( &p_sys->cond, &p_sys->lock );
+
+        toerase = 0;
+        tosleep = 0;
+
+        dsresult = IDirectSoundBuffer_GetCurrentPosition( p_sys->p_dsbuffer,
+                                                          &i_read, NULL );
+        if( dsresult == DS_OK )
+        {
+            int64_t max = (int64_t) i_read - (int64_t) p_sys->i_write;
+            tosleep = -max;
+            if( max <= 0 )
+                max += DS_BUF_SIZE;
+            else
+                tosleep += DS_BUF_SIZE;
+            toerase = max;
+            tosleep = ( tosleep / p_sys->i_bytes_per_sample ) * CLOCK_FREQ / p_sys->i_rate;
+        }
+
+        tosleep = __MAX( tosleep, 20000 );
+        dsresult = IDirectSoundBuffer_Lock( p_sys->p_dsbuffer,
+                                            p_sys->i_write,
+                                            toerase,
+                                            &p_write_position,
+                                            &l_bytes1,
+                                            &p_wrap_around,
+                                            &l_bytes2,
+                                            0 );
+        if( dsresult == DSERR_BUFFERLOST )
+        {
+            IDirectSoundBuffer_Restore( p_sys->p_dsbuffer );
+            dsresult = IDirectSoundBuffer_Lock( p_sys->p_dsbuffer,
+                                                p_sys->i_write,
+                                                toerase,
+                                                &p_write_position,
+                                                &l_bytes1,
+                                                &p_wrap_around,
+                                                &l_bytes2,
+                                                0 );
+        }
+        if( dsresult != DS_OK )
+            goto wait;
+
+        memset( p_write_position, 0, l_bytes1 );
+        memset( p_wrap_around, 0, l_bytes2 );
+
+        IDirectSoundBuffer_Unlock( p_sys->p_dsbuffer, p_write_position, l_bytes1,
+                                   p_wrap_around, l_bytes2 );
+wait:
+        vlc_mutex_unlock(&p_sys->lock);
+        vlc_restorecancel(canc);
+        msleep(tosleep);
+    }
+    return NULL;
 }
