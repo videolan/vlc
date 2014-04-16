@@ -639,7 +639,7 @@ static subpicture_t *FilterSub(filter_t *p_filter, mtime_t date)
     /* Basic test:  b_spu_update occurs on a dynamic change */
     if (!p_sys->b_spu_update) {
         vlc_mutex_unlock(&p_sys->lock);
-        return 0;
+        return NULL;
     }
 
     p_pic = p_BarGraph->p_pic;
