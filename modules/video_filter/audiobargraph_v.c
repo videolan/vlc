@@ -571,8 +571,8 @@ static int BarGraphCallback(vlc_object_t *p_this, char const *psz_var,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data)
 {
     VLC_UNUSED(oldval);
-    filter_sys_t *p_sys = (filter_sys_t *)p_data;
-    BarGraph_t *p_BarGraph = &(p_sys->p_BarGraph);
+    filter_sys_t *p_sys = p_data;
+    BarGraph_t *p_BarGraph = &p_sys->p_BarGraph;
     char* res = NULL;
 
     vlc_mutex_lock(&p_sys->lock);
@@ -592,12 +592,10 @@ static int BarGraphCallback(vlc_object_t *p_this, char const *psz_var,
 
         char *psz = xstrdup(newval.psz_string ? newval.psz_string : "");
         free(p_BarGraph->i_values);
-        //p_BarGraph->i_values = NULL;
-        //p_BarGraph->nbChannels = 0;
         // in case many answer are received at the same time, only keep one
         res = strchr(psz, '@');
         if (res)
-            *res = 0;
+            *res = '\0';
         parse_i_values(p_BarGraph, psz);
         free(psz);
         LoadBarGraph(p_this,p_BarGraph);
