@@ -147,9 +147,6 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     filter_sys_t *p_sys = p_filter->p_sys;
     float *p_sample = (float *)p_in_buf->p_buffer;
     float i_value[AOUT_CHAN_MAX];
-    ValueDate_t* current = NULL;
-    float sum;
-    int count = 0;
 
     int nbChannels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
 
@@ -186,7 +183,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         /* 3 - delete too old values */
         while (p_sys->first->date < (new->date - p_sys->time_window)) {
             p_sys->started = 1; // we have enough values to compute a valid total
-            current = p_sys->first;
+            ValueDate_t *current = p_sys->first;
             p_sys->first = p_sys->first->next;
             free(current);
         }
@@ -195,11 +192,12 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         if ((p_sys->started) && (p_in_buf->i_pts > p_sys->lastAlarm + p_sys->repetition_time)) {
 
             /* 4 - compute the RMS */
-            current = p_sys->first;
-            sum = 0.0;
+            ValueDate_t *current = p_sys->first;
+            float sum = 0.0;
+            int count = 0;
             while (current != NULL) {
                 sum += current->value;
-                count ++;
+                count++;
                 current = current->next;
             }
             sum /= count;
