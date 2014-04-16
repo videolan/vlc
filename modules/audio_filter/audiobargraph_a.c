@@ -113,16 +113,16 @@ struct filter_sys_t
 static int Open( vlc_object_t *p_this )
 {
     filter_t     *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys = p_filter->p_sys = malloc( sizeof( *p_sys ) );
-    if( !p_sys )
+    filter_sys_t *p_sys = p_filter->p_sys = malloc(sizeof(*p_sys));
+    if (!p_sys)
         return VLC_ENOMEM;
 
-    p_sys->bargraph = !!var_CreateGetInteger( p_filter, CFG_PREFIX "bargraph" );
-    p_sys->bargraph_repetition = var_CreateGetInteger( p_filter, CFG_PREFIX "bargraph_repetition" );
-    p_sys->silence = !!var_CreateGetInteger( p_filter, CFG_PREFIX "silence" );
-    p_sys->time_window = var_CreateGetInteger( p_filter, CFG_PREFIX "time_window" ) * 1000;
-    p_sys->alarm_threshold = var_CreateGetFloat( p_filter, CFG_PREFIX "alarm_threshold" );
-    p_sys->repetition_time = var_CreateGetInteger( p_filter, CFG_PREFIX "repetition_time" ) * 1000;
+    p_sys->bargraph = !!var_CreateGetInteger(p_filter, CFG_PREFIX "bargraph");
+    p_sys->bargraph_repetition = var_CreateGetInteger(p_filter, CFG_PREFIX "bargraph_repetition");
+    p_sys->silence = !!var_CreateGetInteger(p_filter, CFG_PREFIX "silence");
+    p_sys->time_window = var_CreateGetInteger(p_filter, CFG_PREFIX "time_window") * 1000;
+    p_sys->alarm_threshold = var_CreateGetFloat(p_filter, CFG_PREFIX "alarm_threshold");
+    p_sys->repetition_time = var_CreateGetInteger(p_filter, CFG_PREFIX "repetition_time") * 1000;
     p_sys->counter = 0;
     p_sys->first = NULL;
     p_sys->last = NULL;
@@ -133,8 +133,8 @@ static int Open( vlc_object_t *p_this )
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
     p_filter->pf_audio_filter = DoWork;
 
-    var_Create( p_filter->p_libvlc, "audiobargraph_v-alarm", VLC_VAR_BOOL );
-    var_Create( p_filter->p_libvlc, "audiobargraph_v-i_values", VLC_VAR_STRING );
+    var_Create(p_filter->p_libvlc, "audiobargraph_v-alarm", VLC_VAR_BOOL);
+    var_Create(p_filter->p_libvlc, "audiobargraph_v-i_values", VLC_VAR_STRING);
 
     return VLC_SUCCESS;
 }
@@ -243,13 +243,13 @@ static void Close( vlc_object_t *p_this )
     filter_t * p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    var_Destroy( p_filter->p_libvlc, "audiobargraph_v-i_values" );
-    var_Destroy( p_filter->p_libvlc, "audiobargraph_v-alarm" );
+    var_Destroy(p_filter->p_libvlc, "audiobargraph_v-i_values");
+    var_Destroy(p_filter->p_libvlc, "audiobargraph_v-alarm");
 
     while (p_sys->first != NULL) {
         ValueDate_t *current = p_sys->first;
         p_sys->first = p_sys->first->next;
         free(current);
     }
-    free( p_sys );
+    free(p_sys);
 }
