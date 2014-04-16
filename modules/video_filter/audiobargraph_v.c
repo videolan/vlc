@@ -195,366 +195,122 @@ static void parse_i_values(BarGraph_t *p_BarGraph, char *i_values)
     }
 }
 
+/* Drawing */
+
+static const uint8_t bright_red[4]   = { 76, 85, 0xff, 0xff };
+static const uint8_t black[4] = { 0x00, 0x80, 0x80, 0xff };
+static const uint8_t white[4] = { 0xff, 0x80, 0x80, 0xff };
+static const uint8_t bright_green[4] = { 150, 44, 21, 0xff };
+static const uint8_t bright_yellow[4] = { 226, 1, 148, 0xff };
+static const uint8_t green[4] = { 74, 85, 74, 0xff };
+static const uint8_t yellow[4] = { 112, 64, 138, 0xff };
+static const uint8_t red[4] = { 37, 106, 191, 0xff };
+
+static inline void DrawHLine(plane_t *p, int line, int col, const uint8_t color[4], int w)
+{
+    for (int j = 0; j < 4; j++)
+        memset(&p[j].p_pixels[line * p[j].i_pitch + col], color[j], w);
+}
+
+static void Draw2VLines(plane_t *p, int scale, int col, const uint8_t color[4])
+{
+    for (int i = 10; i < scale + 10; i++)
+        DrawHLine(p, i, col, color, 2);
+}
+
+static void DrawHLines(plane_t *p, int line, int col, const uint8_t color[4], int h, int w)
+{
+    for (int i = line; i < line + h; i++)
+        DrawHLine(p, i, col, color, w);
+}
+
+static void DrawNumber(plane_t *p, int h, const uint8_t data[5], int l)
+{
+    for (int i = 0; i < 5; i++) {
+        uint8_t x = data[i];
+        for (int j = 0; j < 7; j++) {
+            x <<= 1;
+            if (x & 0x80)
+                DrawHLine(p, h - l + 2 - 1 - i, 12 + j, black, 1);
+        }
+    }
+}
 /*****************************************************************************
  * LoadImage: creates and returns the bar graph image
  *****************************************************************************/
 #ifdef LoadImage
 #   undef LoadImage
 #endif
-static void LoadImage(BarGraph_t *p)
+static void LoadImage(BarGraph_t *b)
 {
-    int nbChannels = p->nbChannels;
-    int *i_values  = p->i_values;
-    int scale      = p->scale;
-    int alarm      = p->alarm;
-    int barWidth   = p->barWidth;
+    int nbChannels = b->nbChannels;
+    int scale      = b->scale;
+    int barWidth   = b->barWidth;
 
-    int i, j, pi;
-    int i_width = 0;
-    int i_line;
-    int minus8, minus10, minus18, minus20, minus30, minus40, minus50, minus60;
+    int w = 40;
+    if (nbChannels > 0)
+        w = 2 * nbChannels * barWidth + 30;
+    int h = scale + 30;
 
-    if (p->p_pic)
-        picture_Release(p->p_pic);
+    int level[6];
+    for (int i = 0; i < 6; i++)
+        level[i] = iec_scale(-(i+1) * 10) * scale + 20;
 
-    if (nbChannels == 0)
-        i_width = 20;
-    else
-        i_width = 2 * nbChannels * barWidth + 10;
-
-    minus8  = iec_scale(-8)*scale + 20;
-    minus10 = iec_scale(-10)*scale + 20;
-    minus18 = iec_scale(-18)*scale + 20;
-    minus20 = iec_scale(-20)*scale + 20;
-    minus30 = iec_scale(-30)*scale + 20;
-    minus40 = iec_scale(-40)*scale + 20;
-    minus50 = iec_scale(-50)*scale + 20;
-    minus60 = iec_scale(-60)*scale + 20;
-
-    picture_t *p_pic = picture_New(VLC_FOURCC('Y','U','V','A'), i_width+20, scale+30, 1, 1);
-    if (!p_pic)
+    if (b->p_pic)
+        picture_Release(b->p_pic);
+    b->p_pic = picture_New(VLC_FOURCC('Y','U','V','A'), w, h, 1, 1);
+    if (!b->p_pic)
         return;
-    p->p_pic = p_pic;
+    picture_t *p_pic = b->p_pic;
+    plane_t *p = p_pic->p;
 
-#define DrawLine(a,b,Y,U,V,A) \
-        for (i=a; i<b; i++) {\
-            *(p_pic->p[0].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[0].i_pitch + i) = Y;\
-            *(p_pic->p[1].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[1].i_pitch + i) = U;\
-            *(p_pic->p[2].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[2].i_pitch + i) = V;\
-            *(p_pic->p[3].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[3].i_pitch + i) = A; \
-        }
-#define DrawLineBlack(a,b) DrawLine(a,b,0,128,128,0xFF)
-#define DrawLineWhite(a,b) DrawLine(a,b,255,128,128,0xFF)
+    for (int i = 0 ; i < p_pic->i_planes ; i++)
+        memset(p[i].p_pixels, 0x00, p[i].i_visible_lines * p[i].i_pitch);
 
-    // blacken the whole picture
-    for (i = 0 ; i < p_pic->i_planes ; i++) {
-        memset(p_pic->p[i].p_pixels, 0x00,
-                p_pic->p[i].i_visible_lines * p_pic->p[i].i_pitch);
+    Draw2VLines(p, scale, 20, black);
+    Draw2VLines(p, scale, 22, white);
+
+    static const uint8_t pixmap[6][5] = {
+        { 0x17, 0x15, 0x15, 0x15, 0x17 },
+        { 0x77, 0x45, 0x75, 0x15, 0x77 },
+        { 0x77, 0x15, 0x75, 0x15, 0x77 },
+        { 0x17, 0x15, 0x75, 0x55, 0x57 },
+        { 0x77, 0x15, 0x75, 0x45, 0x77 },
+        { 0x77, 0x55, 0x75, 0x45, 0x77 },
+    };
+
+    for (int i = 0; i < 6; i++) {
+        DrawHLines(p, h - 1 - level[i] - 1, 24, white, 1, 3);
+        DrawHLines(p, h - 1 - level[i],     24, black, 2, 3);
+        DrawNumber(p, h, pixmap[i], level[i]);
     }
 
+    int minus8  = iec_scale(- 8) * scale + 20;
+    int minus18 = iec_scale(-18) * scale + 20;
+    int *i_values  = b->i_values;
+    const uint8_t *indicator_color = b->alarm ? bright_red : black;
 
-    // side bar
-    for (i_line = 20; i_line < scale+20; i_line++) {
-        // vertical line
-        DrawLineBlack(20,22);
-        DrawLineWhite(22,24);
+    for (int i = 0; i < nbChannels; i++) {
+        int pi = 30 + i * (5 + barWidth);
 
-        // -10dB
-        if (i_line == minus10 - 2) {
-            // 1
-            DrawLineBlack(14,15);
-            // 0
-            DrawLineBlack(16,19);
-        }
-        if (i_line == minus10 - 1) {
-            // 1
-            DrawLineBlack(14,15);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineWhite(24,27); //White
-        }
-        if (i_line == minus10) {
-            // 1
-            DrawLineBlack(14,15);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineBlack(24,27);
-        }
-        if (i_line == minus10 + 1) {
-            // 1
-            DrawLineBlack(14,15);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineBlack(24,27);
-        }
-        if (i_line == minus10 + 2) {
-            // 1
-            DrawLineBlack(14,15);
-            // 0
-            DrawLineBlack(16,19);
+        DrawHLines(p, h - 20 - 1, pi, indicator_color, 8, barWidth);
+
+        for (int line = 20; line < i_values[i] + 20; line++) {
+            if (line < minus18)
+                DrawHLines(p, h - line - 1, pi, bright_green, 1, barWidth);
+            else if (line < minus8)
+                DrawHLines(p, h - line - 1, pi, bright_yellow, 1, barWidth);
+            else
+                DrawHLines(p, h - line - 1, pi, bright_red, 1, barWidth);
         }
 
-        // -20dB
-        if (i_line == minus20 - 2) {
-            // 2
-            DrawLineBlack(12,15);
-            // 0
-            DrawLineBlack(16,19);
-        }
-        if (i_line == minus20 - 1) {
-            // 2
-            DrawLineBlack(12,13);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineWhite(24,27); //White
-        }
-        if (i_line == minus20) {
-            // 2
-            DrawLineBlack(12,15);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineBlack(24,27);
-        }
-        if (i_line == minus20 + 1) {
-            // 2
-            DrawLineBlack(14,15);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineBlack(24,27);
-        }
-        if (i_line == minus20 + 2) {
-            // 2
-            DrawLineBlack(12,15);
-            // 0
-            DrawLineBlack(16,19);
-        }
-
-        // -30dB
-        if (i_line == minus30 - 2) {
-            // 3
-            DrawLineBlack(12,15);
-            // 0
-            DrawLineBlack(16,19);
-        }
-        if (i_line == minus30 - 1) {
-            // 3
-            DrawLineBlack(14,15);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineWhite(24,27); //White
-        }
-        if (i_line == minus30) {
-            // 3
-            DrawLineBlack(12,15);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineBlack(24,27);
-        }
-        if (i_line == minus30 + 1) {
-            // 3
-            DrawLineBlack(14,15);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineBlack(24,27);
-        }
-        if (i_line == minus30 + 2) {
-            // 3
-            DrawLineBlack(12,15);
-            // 0
-            DrawLineBlack(16,19);
-        }
-
-        // -40dB
-        if (i_line == minus40 - 2) {
-            // 4
-            DrawLineBlack(14,15);
-            // 0
-            DrawLineBlack(16,19);
-        }
-        if (i_line == minus40 - 1) {
-            // 4
-            DrawLineBlack(14,15);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineWhite(24,27); // white
-        }
-        if (i_line == minus40) {
-            // 4
-            DrawLineBlack(12,15);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineBlack(24,27);
-        }
-        if (i_line == minus40 + 1) {
-            // 4
-            DrawLineBlack(12,13);
-            DrawLineBlack(14,15);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineBlack(24,27);
-        }
-        if (i_line == minus40 + 2) {
-            // 4
-            DrawLineBlack(12,13);
-            DrawLineBlack(14,15);
-            // 0
-            DrawLineBlack(16,19);
-        }
-
-        // -50dB
-        if (i_line == minus50 - 2) {
-            // 5
-            DrawLineBlack(12,15);
-            // 0
-            DrawLineBlack(16,19);
-        }
-        if (i_line == minus50 - 1) {
-            // 5
-            DrawLineBlack(14,15);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineWhite(24,27); //White
-        }
-        if (i_line == minus50) {
-            // 5
-            DrawLineBlack(12,15);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineBlack(24,27);
-        }
-        if (i_line == minus50 + 1) {
-            // 5
-            DrawLineBlack(12,13);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineBlack(24,27);
-        }
-        if (i_line == minus50 + 2) {
-            // 2
-            DrawLineBlack(12,15);
-            // 0
-            DrawLineBlack(16,19);
-        }
-        // -60dB
-        if (i_line == minus60 - 2) {
-            // 6
-            DrawLineBlack(12,15);
-            // 0
-            DrawLineBlack(16,19);
-        }
-        if (i_line == minus60 - 1) {
-            // 6
-            DrawLineBlack(12,13);
-            DrawLineBlack(14,15);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineWhite(24,27); //White
-        }
-        if (i_line == minus60) {
-            // 6
-            DrawLineBlack(12,15);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineBlack(24,27);
-        }
-        if (i_line == minus60 + 1) {
-            // 6
-            DrawLineBlack(12,13);
-            // 0
-            DrawLineBlack(16,17);
-            DrawLineBlack(18,19);
-            // limit
-            DrawLineBlack(24,27);
-        }
-        if (i_line == minus60 + 2) {
-            // 6
-            DrawLineBlack(12,15);
-            // 0
-            DrawLineBlack(16,19);
-        }
-    }
-
-#define drawPoint(offset,y,u,v,a)  do { \
-                *(p_pic->p[0].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[0].i_pitch + offset) = y; \
-                *(p_pic->p[1].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[1].i_pitch + offset) = u; \
-                *(p_pic->p[2].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[2].i_pitch + offset) = v; \
-                *(p_pic->p[3].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[3].i_pitch + offset) = a; \
-                } while(0)
-
-
-    // draw the bars and channel indicators
-    for (i=0; i<nbChannels; i++) {
-        pi =  25 + ((i+1)*5) + (i*barWidth) ;  // 25 separació amb indicador, 5 separació entre barres
-
-        for (j = pi; j < pi + barWidth; j++) {
-            // channel indicators
-            for (i_line = 12; i_line < 20; i_line++) {
-                if (alarm) {
-                    drawPoint(j,76,85,0xFF,0xFF);  // red
-                } else
-                    drawPoint(j,0,128,128,0xFF); // black             DrawLine(pi,pf,0xFF,128,128,0xFF);
-            }
-
-            // bars
-            for (i_line = 20; i_line < i_values[i]+20; i_line++) {
-                if (i_line < minus18) { // green if < -18 dB
-                    drawPoint(j,150,44,21,0xFF);
-                    //DrawLine(pi,pf,150,44,21,0xFF);
-                } else if (i_line < minus8) { // yellow if > -18dB and < -8dB
-                    drawPoint(j,226,1,148,0xFF);
-                    //DrawLine(pi,pf,226,1,148,0xFF);
-                } else { // red if > -8 dB
-                    drawPoint(j,76,85,0xFF,0xFF);
-                    //DrawLine(pi,pf,76,85,255,0xFF);
-                }
-            }
-            // bars no signal
-            for (; i_line < scale+20; i_line++) {
-                if (i_line < minus18) { // green if < -18 dB
-                    drawPoint(j,74,85,74,0xFF);
-                    //DrawLine(pi,pf,74,85,74,0xFF);
-                } else if (i_line < minus8) { // yellow if > -18dB and < -8dB
-                    drawPoint(j,112,64,138,0xFF);
-                    //DrawLine(pi,pf,112,64,138,0xFF);
-                } else { // red if > -8 dB
-                    drawPoint(j,37,106,191,0xFF);
-                    //DrawLine(pi,pf,37,106,191,0xFF);
-                }
-            }
+        for (int line = i_values[i] + 20; line < scale + 20; line++) {
+            if (line < minus18)
+                DrawHLines(p, h - line - 1, pi, green, 1, barWidth);
+            else if (line < minus8)
+                DrawHLines(p, h - line - 1, pi, yellow, 1, barWidth);
+            else
+                DrawHLines(p, h - line - 1, pi, red, 1, barWidth);
         }
     }
 }
