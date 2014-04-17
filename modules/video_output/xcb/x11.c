@@ -128,7 +128,7 @@ static int Open (vlc_object_t *obj)
 
     /* Determine our pixel format */
     video_format_t fmt_pic;
-    xcb_visualid_t vid;
+    xcb_visualid_t vid = 0;
     sys->depth = 0;
 
     for (const xcb_format_t *fmt = xcb_setup_pixmap_formats (setup),
