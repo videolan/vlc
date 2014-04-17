@@ -344,7 +344,8 @@ int  EStoPES ( block_t **pp_pes, block_t *p_es,
     }
 
     if( ( p_fmt->i_codec == VLC_CODEC_MP4V ||
-          p_fmt->i_codec == VLC_CODEC_H264 ) &&
+          p_fmt->i_codec == VLC_CODEC_H264 ||
+          p_fmt->i_codec == VLC_CODEC_HEVC) &&
         p_es->i_flags & BLOCK_FLAG_TYPE_I )
     {
         /* For MPEG4 video, add VOL before I-frames,
