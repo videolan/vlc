@@ -3727,7 +3727,7 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
             while( p_trex && p_trex->data.p_trex->i_track_ID != i_track_ID )
                 p_trex = p_trex->p_next;
             if ( p_trex )
-                default_duration = p_trex->data.p_trex->i_default_sample_duration * p_track->i_timescale;
+                default_duration = p_trex->data.p_trex->i_default_sample_duration;
         }
         else if( p_sidx )
         {
