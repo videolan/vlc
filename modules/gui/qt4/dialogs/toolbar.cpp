@@ -181,7 +181,7 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
     profileCombo->setCurrentIndex( -1 );
 
     /* Build and prepare our preview */
-    PreviewWidget *previewWidget = new PreviewWidget( controller1, controller2, controller );
+    PreviewWidget *previewWidget = new PreviewWidget( controller, controller1, controller2 );
     QGroupBox *previewBox = new QGroupBox( qtr("Preview"), this );
     previewBox->setLayout( new QVBoxLayout() );
     previewBox->layout()->addWidget( previewWidget );
@@ -315,8 +315,8 @@ void PreviewWidget::paintEvent( QPaintEvent * )
         i_total += pixmaps[i].size().height();
 
     /* Draw top bars */
-    i = ( b_top ) ? 0 : 3;
-    for( ; i<2; i++ )
+    i = ( b_top ) ? 1 : 3;
+    for( ; i<3; i++ )
     {
         painter.drawPixmap( pixmaps[i].rect().translated( 0, i_offset ), pixmaps[i] );
         i_offset += pixmaps[i].rect().height();
@@ -337,8 +337,7 @@ void PreviewWidget::paintEvent( QPaintEvent * )
 
     /* Draw bottom bars */
     i_offset += conearea.height();
-    i = ( b_top ) ? 2 : 0;
-    for( ; i<3; i++ )
+    for( i = 0 ; i< ((b_top) ? 1 : 3); i++ )
     {
         painter.drawPixmap( pixmaps[i].rect().translated( 0, i_offset ), pixmaps[i] );
         i_offset += pixmaps[i].rect().height();
