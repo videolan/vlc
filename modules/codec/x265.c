@@ -97,19 +97,12 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
     for (uint32_t i = 0; i < i_nal; i++)
         i_out += nal[i].sizeBytes;
 
-    int i_extra = 0;
-    if (IS_X265_TYPE_I(pic.sliceType))
-        i_extra = p_enc->fmt_out.i_extra;
-
-    block_t *p_block = block_Alloc(i_extra + i_out);
+    block_t *p_block = block_Alloc(i_out);
     if (!p_block)
         return NULL;
 
-    if (i_extra)
-       memcpy(p_block->p_buffer, p_enc->fmt_out.p_extra, i_extra);
-
     /* all payloads are sequentially laid out in memory */
-    memcpy(p_block->p_buffer + i_extra, nal[0].payload, i_out);
+    memcpy(p_block->p_buffer, nal[0].payload, i_out);
 
     /* This isn't really valid for streams with B-frames */
     p_block->i_length = CLOCK_FREQ *
