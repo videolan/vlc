@@ -115,12 +115,14 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
     switch (pic.sliceType)
     {
     case X265_TYPE_I:
+    case X265_TYPE_IDR:
         p_block->i_flags |= BLOCK_FLAG_TYPE_I;
         break;
     case X265_TYPE_P:
         p_block->i_flags |= BLOCK_FLAG_TYPE_P;
         break;
     case X265_TYPE_B:
+    case X265_TYPE_BREF:
         p_block->i_flags |= BLOCK_FLAG_TYPE_B;
         break;
     }
