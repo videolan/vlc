@@ -399,9 +399,13 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     /* Ignore transparent rows at the beginning and end */
     int i_first_row = get_first_visible_row( p_page.text, p_page.rows, p_page.columns );
-    if ( i_first_row < 0 )
-        goto error;
-    int i_num_rows = get_last_visible_row( p_page.text, p_page.rows, p_page.columns ) - i_first_row + 1;
+    int i_num_rows;
+    if ( i_first_row < 0 ) {
+        i_first_row = p_page.rows - 1;
+        i_num_rows = 0;
+    } else {
+        i_num_rows = get_last_visible_row( p_page.text, p_page.rows, p_page.columns ) - i_first_row + 1;
+    }
 #ifdef ZVBI_DEBUG
     msg_Dbg( p_dec, "After top and tail of page we have rows %i-%i of %i",
              i_first_row + 1, i_first_row + i_num_rows, p_page.rows );
@@ -598,7 +602,7 @@ static int get_first_visible_row( vbi_char *p_text, int rows, int columns)
         }
     }
 
-    return rows;
+    return -1;
 }
 
 static int get_last_visible_row( vbi_char *p_text, int rows, int columns)
@@ -611,7 +615,7 @@ static int get_last_visible_row( vbi_char *p_text, int rows, int columns)
         }
     }
 
-    return 0;
+    return -1;
 }
 
 static int OpaquePage( picture_t *p_src, const vbi_page p_page,
