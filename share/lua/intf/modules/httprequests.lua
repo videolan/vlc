@@ -149,7 +149,9 @@ processcommands = function ()
             vlc.sd.add(val)
         end
     elseif command == "fullscreen" then
-        vlc.video.fullscreen()
+        if vlc.object.vout() then
+            vlc.video.fullscreen()
+        end
     elseif command == "snapshot" then
         common.snapshot()
     elseif command == "volume" then
