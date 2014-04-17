@@ -117,6 +117,12 @@ static int Open( vlc_object_t *p_this )
     if (!p_sys)
         return VLC_ENOMEM;
 
+    static const char *const options[] = {
+        "bargraph", "bargraph_repetition", "silence", "time_window",
+        "alarm_threshold", "repetition_time", NULL
+    };
+    config_ChainParse(p_filter, CFG_PREFIX, options, p_filter->p_cfg);
+
     p_sys->bargraph = !!var_CreateGetInteger(p_filter, CFG_PREFIX "bargraph");
     p_sys->bargraph_repetition = var_CreateGetInteger(p_filter, CFG_PREFIX "bargraph_repetition");
     p_sys->silence = !!var_CreateGetInteger(p_filter, CFG_PREFIX "silence");
