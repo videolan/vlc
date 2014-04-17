@@ -468,6 +468,9 @@ static int SyncInfo(decoder_t *p_dec, uint8_t *p_buf,
             samplerate *= 10;
     }
 
+    if ( !samplerate )
+        return 0;
+
     /* Check the CRC-8 byte */
     if (flac_crc8(p_buf, i_header) != p_buf[i_header])
         return 0;
