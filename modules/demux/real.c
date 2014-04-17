@@ -1445,7 +1445,7 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
     int i_subpacket_h = 0;
     int i_frame_size = 0;
     int i_subpacket_size = 0;
-    char p_genr[4];
+    char p_genr[4] = {0,0,0,0};
     int i_version = GetWBE( &p_data[4] );
     int i_extra_codec = 0;
 
