@@ -225,7 +225,7 @@ bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
     i_current_rate = decoder_GetDisplayRate( p_synchro->p_dec );
 
     now = mdate();
-    period = 1000000 * 1001 / p_synchro->i_frame_rate
+    period = CLOCK_FREQ * 1001 / p_synchro->i_frame_rate
                      * i_current_rate / INPUT_RATE_DEFAULT;
 
     p_synchro->i_render_time = i_render_time;
