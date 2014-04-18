@@ -241,6 +241,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         CONNECT_MAP_SET( playButton, PLAY_ACTION );
         CONNECT( this, inputPlaying( bool ),
                  playButton, updateButtonIcons( bool ));
+        playButton->updateButtonIcons( THEMIM->getIM()->playingStatus() == PLAYING_S );
         widget = playButton;
         }
         break;

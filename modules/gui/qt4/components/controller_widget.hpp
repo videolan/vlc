@@ -52,7 +52,7 @@ class QAbstractSlider;
 class PlayButton : public QToolButton
 {
     Q_OBJECT
-private slots:
+public slots:
     void updateButtonIcons( bool );
 };
 
