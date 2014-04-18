@@ -228,6 +228,8 @@ static mtime_t  AVI_MovieGetLength( demux_t * );
 
 static void AVI_MetaLoad( demux_t *, avi_chunk_list_t *p_riff, avi_chunk_avih_t *p_avih );
 
+block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk, const int i_size );
+
 /*****************************************************************************
  * Stream management
  *****************************************************************************/
@@ -519,7 +521,7 @@ static int Open( vlc_object_t * p_this )
 
                     tk->i_width_bytes = p_vids->p_bih->biWidth * (p_vids->p_bih->biBitCount >> 3);
                     /* RGB DIB are coded from bottom to top */
-                    if ( p_vids->p_bih->biHeight >= 0 ) tk->b_flipped = true;
+                    if ( p_vids->p_bih->biHeight < INT32_MAX ) tk->b_flipped = true;
                 }
                 else
                 {
@@ -540,7 +542,7 @@ static int Open( vlc_object_t * p_this )
                 fmt.video.i_frame_rate_base = tk->i_scale;
 
                  /* Uncompresse Bitmap or YUV, YUV being always topdown */
-                if ( fmt.video.i_height < 0 )
+                if ( fmt.video.i_height > INT32_MAX )
                     fmt.video.i_height =
                         (unsigned int)(-(int)p_vids->p_bih->biHeight);
 
