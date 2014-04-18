@@ -59,7 +59,6 @@ vlc_module_end()
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
 static void           Display(vout_display_t *, picture_t *, subpicture_t *);
 static int            Control(vout_display_t *, int, va_list);
-static void           Manage (vout_display_t *);
 
 /* */
 struct vout_display_sys_t {
@@ -152,7 +151,7 @@ static int Open(vlc_object_t *object)
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
-    vd->manage  = Manage;
+    vd->manage  = NULL;
 
     /* */
     vout_display_SendEventFullscreen(vd, true);
@@ -237,9 +236,4 @@ static int Control(vout_display_t *vd, int query, va_list args)
         msg_Err(vd, "Unsupported query in vout display directfb");
         return VLC_EGENERIC;
     }
-}
-
-static void Manage (vout_display_t *vd)
-{
-    VLC_UNUSED(vd);
 }
