@@ -403,12 +403,27 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
             {
                 p_chk->strf.vids.p_bih->biSize = p_chk->common.i_chunk_size;
             }
-            if( p_chk->common.i_chunk_size > sizeof(VLC_BITMAPINFOHEADER) )
+            uint64_t i_extrasize = p_chk->common.i_chunk_size - sizeof(VLC_BITMAPINFOHEADER);
+            if( i_extrasize > 0 )
             {
+                /* There's a color palette appended, set up VLC_BITMAPINFO */
                 memcpy( &p_chk->strf.vids.p_bih[1],
                         p_buff + 8 + sizeof(VLC_BITMAPINFOHEADER), /* 8=fourrc+size */
-                        p_chk->common.i_chunk_size -sizeof(VLC_BITMAPINFOHEADER) );
+                        i_extrasize );
+
+                if ( !p_chk->strf.vids.p_bih->biClrUsed )
+                    p_chk->strf.vids.p_bih->biClrUsed = (1 << p_chk->strf.vids.p_bih->biBitCount);
+
+                if( i_extrasize > (UINT32_MAX * sizeof(uint32_t)) )
+                    p_chk->strf.vids.p_bih->biClrUsed = UINT32_MAX;
+                else
+                {
+                    p_chk->strf.vids.p_bih->biClrUsed =
+                            __MAX( i_extrasize / sizeof(uint32_t),
+                                   p_chk->strf.vids.p_bih->biClrUsed );
+                }
             }
+            else p_chk->strf.vids.p_bih->biClrUsed = 0;
 #ifdef AVI_DEBUG
             msg_Dbg( (vlc_object_t*)s,
                      "strf: video:%4.4s %"PRIu32"x%"PRIu32" planes:%d %dbpp",
