@@ -496,8 +496,11 @@ static int Open( vlc_object_t * p_this )
                         case 9: /* <- TODO check that */
                             tk->i_codec = VLC_CODEC_I410;
                             break;
-                        case 8: /* <- TODO check that */
-                            tk->i_codec = VLC_CODEC_GREY;
+                        case 8:
+                            if ( p_vids->p_bih->biClrUsed )
+                                tk->i_codec = VLC_CODEC_RGBP;
+                            else
+                                tk->i_codec = VLC_CODEC_GREY;
                             break;
                     }
                     es_format_Init( &fmt, VIDEO_ES, tk->i_codec );
@@ -514,6 +517,25 @@ static int Open( vlc_object_t * p_this )
                         fmt.video.i_rmask = 0x7c00;
                         fmt.video.i_gmask = 0x03e0;
                         fmt.video.i_bmask = 0x001f;
+                        break;
+                    case VLC_CODEC_RGBP:
+                    {
+                        const VLC_BITMAPINFO *p_bi = (const VLC_BITMAPINFO *) p_vids->p_bih;
+                        fmt.video.p_palette = malloc( sizeof(video_palette_t) );
+                        if ( fmt.video.p_palette )
+                        {
+                            uint32_t entry;
+                            for ( uint32_t i=0; i<p_vids->p_bih->biClrUsed; i++ )
+                            {
+                                 entry = GetDWBE( &p_bi->bmiColors[i] );
+                                 fmt.video.p_palette->palette[i][0] = entry >> 24;
+                                 fmt.video.p_palette->palette[i][1] = (entry >> 16) & 0xFF;
+                                 fmt.video.p_palette->palette[i][2] = (entry >> 8) & 0xFF;
+                                 fmt.video.p_palette->palette[i][3] = entry & 0xFF;
+                            }
+                            fmt.video.p_palette->i_entries = p_vids->p_bih->biClrUsed;
+                        }
+                    }
                         break;
                     default:
                         break;
