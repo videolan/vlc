@@ -74,12 +74,10 @@ static int Open(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
 
-    /* Allocate structure */
     vd->sys = sys = calloc(1, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
 
-    /* Init DirectFB */
     if (DirectFBInit(NULL,NULL) != DFB_OK) {
         msg_Err(vd, "Cannot init DirectFB");
         free(sys);
