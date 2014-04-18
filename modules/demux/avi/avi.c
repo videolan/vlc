@@ -805,24 +805,75 @@ static void Close ( vlc_object_t * p_this )
 
 block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk, const int i_size )
 {
-    block_t *p_frame = stream_Block( p_demux->s, i_size );
-    if ( !p_frame || !tk->i_width_bytes ) /* There's no stride */
+    block_t *p_frame = stream_Block( p_demux->s, __EVEN( i_size ) );
+    if ( !p_frame ) return p_frame;
+
+    const uint8_t i_header = ( tk->i_idxposb == 0 ) ? 8 : 0;
+
+    if( i_size % 2 )    /* read was padded on word boundary */
+    {
+        p_frame->i_buffer--;
+    }
+
+    /* skip header */
+    if( tk->i_idxposb == 0 )
+    {
+        p_frame->p_buffer += i_header;
+        p_frame->i_buffer -= i_header;
+    }
+
+    if ( !tk->i_width_bytes )
         return p_frame;
 
     const unsigned int i_stride_bytes = ((( (tk->i_width_bytes << 3) + 31) & ~31) >> 3);
-    const uint8_t *p_end = p_frame->p_buffer + p_frame->i_buffer;
-    const uint8_t *p_src = p_frame->p_buffer + i_stride_bytes;
-    uint8_t *p_dst = p_frame->p_buffer + tk->i_width_bytes;
 
-    p_frame->i_buffer = tk->i_width_bytes;
-    if ( tk->i_idxposb == 0 ) p_frame->i_buffer += 8;
-
-    while ( p_src + i_stride_bytes < p_end )
+    if ( p_frame->i_buffer < i_stride_bytes )
     {
-        memmove( p_dst, p_src, tk->i_width_bytes );
-        p_src += i_stride_bytes;
-        p_dst += tk->i_width_bytes;
-        p_frame->i_buffer += tk->i_width_bytes;
+        p_frame->i_buffer = 0;
+        return p_frame;
+    }
+
+    if( !tk->b_flipped )
+    {
+        const uint8_t *p_src = p_frame->p_buffer + i_stride_bytes;
+        const uint8_t *p_end = p_frame->p_buffer + p_frame->i_buffer;
+        uint8_t *p_dst = p_frame->p_buffer + tk->i_width_bytes;
+
+        p_frame->i_buffer = tk->i_width_bytes;
+
+        while ( p_src + i_stride_bytes <= p_end )
+        {
+            memmove( p_dst, p_src, tk->i_width_bytes );
+            p_src += i_stride_bytes;
+            p_dst += tk->i_width_bytes;
+            p_frame->i_buffer += tk->i_width_bytes;
+        }
+    }
+    else
+    {
+        block_t *p_flippedframe = block_Alloc( p_frame->i_buffer );
+        if ( !p_flippedframe )
+        {
+            block_Release( p_frame );
+            return NULL;
+        }
+
+        unsigned int i_lines = p_frame->i_buffer / i_stride_bytes;
+        const uint8_t *p_src = p_frame->p_buffer + i_lines * i_stride_bytes;
+        uint8_t *p_dst = p_flippedframe->p_buffer;
+
+        p_flippedframe->i_buffer = 0;
+
+        while ( i_lines-- > 0 )
+        {
+            p_src -= i_stride_bytes;
+            memcpy( p_dst, p_src, tk->i_width_bytes );
+            p_dst += tk->i_width_bytes;
+            p_flippedframe->i_buffer += tk->i_width_bytes;
+        }
+
+        block_Release( p_frame );
+        p_frame = p_flippedframe;
     }
 
     return p_frame;
@@ -1111,23 +1162,14 @@ static int Demux_Seekable( demux_t *p_demux )
             i_size += 8; /* need to read and skip header */
         }
 
-        if( ( p_frame = ReadFrame( p_demux, tk, __EVEN( i_size ) ) )==NULL )
+        if( ( p_frame = ReadFrame( p_demux, tk, i_size ) )==NULL )
         {
             msg_Warn( p_demux, "failed reading data" );
             tk->b_eof = false;
             toread[i_track].b_ok = false;
             continue;
         }
-        if( i_size % 2 )    /* read was padded on word boundary */
-        {
-            p_frame->i_buffer--;
-        }
-        /* skip header */
-        if( tk->i_idxposb == 0 )
-        {
-            p_frame->p_buffer += 8;
-            p_frame->i_buffer -= 8;
-        }
+
         p_frame->i_pts = AVI_GetPTS( tk ) + 1;
         if( tk->idx.p_entry[tk->i_idxposc].i_flags&AVIIF_KEYFRAME )
         {
