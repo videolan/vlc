@@ -62,10 +62,12 @@ static int            Control(vout_display_t *, int, va_list);
 
 /* */
 struct vout_display_sys_t {
-    IDirectFB             *directfb;
-    IDirectFBSurface      *primary;
+    IDirectFB        *directfb;
+    IDirectFBSurface *primary;
 
     picture_pool_t *pool;
+    picture_t      *pics[3];
+    int             idx;
 };
 
 /* */
@@ -85,11 +87,13 @@ static int Open(vlc_object_t *object)
     }
 
     DFBSurfaceDescription dsc;
-    /*dsc.flags = DSDESC_CAPS | DSDESC_HEIGHT | DSDESC_WIDTH;*/
     dsc.flags = DSDESC_CAPS;
-    dsc.caps  = DSCAPS_PRIMARY | DSCAPS_FLIPPING;
-    /*dsc.width = 352;*/
-    /*dsc.height = 240;*/
+    dsc.caps  = DSCAPS_PRIMARY | DSCAPS_TRIPLE;
+#if 0
+    dsc.flags |= DSDESC_HEIGHT | DSDESC_WIDTH;
+    dsc.width = 352;
+    dsc.height = 240;
+#endif
 
     IDirectFB *directfb = NULL;
     if (DirectFBCreate(&directfb) != DFB_OK || !directfb)
@@ -106,8 +110,6 @@ static int Open(vlc_object_t *object)
     int height;
 
     primary->GetSize(primary, &width, &height);
-    primary->FillRectangle(primary, 0, 0, width, height);
-    primary->Flip(primary, NULL, 0);
 
     vout_display_DeleteWindow(vd, NULL);
 
@@ -183,14 +185,70 @@ static void Close(vlc_object_t *object)
     free(sys);
 }
 
+struct picture_sys_t {
+    vout_display_sys_t *sys;
+};
+
+static int Lock(picture_t *pic)
+{
+    vout_display_sys_t *sys = pic->p_sys->sys;
+    return sys->pics[sys->idx] == pic ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
 /* */
 static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
+    VLC_UNUSED(count);
     vout_display_sys_t *sys = vd->sys;
+    IDirectFBSurface *primary = sys->primary;
 
-    if (!sys->pool)
-        sys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
+    if (!sys->pool) {
+        picture_resource_t rsc;
+        memset(&rsc, 0, sizeof(rsc));
+        rsc.p[0].i_lines  = vd->fmt.i_height;
+
+        for (int i = 0; i < 3; i++) {
+            rsc.p_sys = malloc(sizeof(*rsc.p_sys));
+            if (!rsc.p_sys)
+                goto cleanup;
+            rsc.p_sys->sys = sys;
+            void *pixels;
+            int  pitch;
+            if (primary->Lock(primary, DSLF_WRITE, &pixels, &pitch) != DFB_OK)
+                goto cleanup;
+
+            rsc.p[0].i_pitch = pitch;
+            rsc.p[0].p_pixels = pixels;
+            primary->Unlock(primary);
+            primary->Flip(primary, NULL, 0);
+
+            sys->pics[i] = picture_NewFromResource(&vd->fmt, &rsc);
+            if (!sys->pics[i]) {
+                free(rsc.p_sys);
+                goto cleanup;
+            }
+        }
+
+        picture_pool_configuration_t cfg = {
+            .picture_count  = 3,
+            .picture        = sys->pics,
+            .lock           = Lock,
+            .unlock         = NULL,
+        };
+
+        sys->pool = picture_pool_NewExtended(&cfg);
+    }
     return sys->pool;
+
+cleanup:
+    for (int i = 0; i < 2; i++) {
+        if (sys->pics[i]) {
+            free(sys->pics[i]->p_sys);
+            picture_Release(sys->pics[i]);
+        }
+    }
+
+    return NULL;
 }
 
 static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
@@ -198,27 +256,11 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     vout_display_sys_t *sys = vd->sys;
 
     IDirectFBSurface *primary = sys->primary;
-
-    void *pixels;
-    int  pitch;
-    if (primary->Lock(primary, DSLF_WRITE, &pixels, &pitch) == DFB_OK) {
-        picture_resource_t rsc;
-
-        memset(&rsc, 0, sizeof(rsc));
-        rsc.p[0].p_pixels = pixels;
-        rsc.p[0].i_lines  = vd->fmt.i_height;
-        rsc.p[0].i_pitch  = pitch;
-
-        picture_t *direct = picture_NewFromResource(&vd->fmt, &rsc);
-        if (direct) {
-            picture_Copy(direct, picture);
-            picture_Release(direct);
-        }
-
-        if (primary->Unlock(primary) == DFB_OK)
-            primary->Flip(primary, NULL, 0);
-    }
+    primary->Flip(primary, NULL, 0);
+    if (++sys->idx >= 3)
+        sys->idx = 0;
     picture_Release(picture);
+
     VLC_UNUSED(subpicture);
 }
 
