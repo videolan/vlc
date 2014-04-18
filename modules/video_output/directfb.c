@@ -137,6 +137,8 @@ static int Open(vlc_object_t *object)
 
     fmt.i_width  = width;
     fmt.i_height = height;
+    fmt.i_visible_width  = width;
+    fmt.i_visible_height = height;
 
     /* */
     vout_display_info_t info = vd->info;
