@@ -338,6 +338,10 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
         case( AVIFOURCC_auds ):
             p_chk->strf.auds.i_cat = AUDIO_ES;
             p_chk->strf.auds.p_wf = xmalloc( __MAX( p_chk->common.i_chunk_size, sizeof( WAVEFORMATEX ) ) );
+            if ( !p_chk->strf.auds.p_wf )
+            {
+                AVI_READCHUNK_EXIT( VLC_ENOMEM );
+            }
             AVI_READ2BYTES( p_chk->strf.auds.p_wf->wFormatTag );
             AVI_READ2BYTES( p_chk->strf.auds.p_wf->nChannels );
             AVI_READ4BYTES( p_chk->strf.auds.p_wf->nSamplesPerSec );
@@ -388,6 +392,10 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
             p_chk->strf.vids.i_cat = VIDEO_ES;
             p_chk->strf.vids.p_bih = xmalloc( __MAX( p_chk->common.i_chunk_size,
                                          sizeof( *p_chk->strf.vids.p_bih ) ) );
+            if ( !p_chk->strf.vids.p_bih )
+            {
+                AVI_READCHUNK_EXIT( VLC_ENOMEM );
+            }
             AVI_READ4BYTES( p_chk->strf.vids.p_bih->biSize );
             AVI_READ4BYTES( p_chk->strf.vids.p_bih->biWidth );
             AVI_READ4BYTES( p_chk->strf.vids.p_bih->biHeight );
