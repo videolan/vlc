@@ -149,6 +149,7 @@ typedef struct
     unsigned int    i_samplesize;
 
     unsigned int    i_width_bytes;
+    bool            b_flipped;
 
     es_out_id_t     *p_es;
 
@@ -515,6 +516,10 @@ static int Open( vlc_object_t * p_this )
                     default:
                         break;
                     }
+
+                    tk->i_width_bytes = p_vids->p_bih->biWidth * (p_vids->p_bih->biBitCount >> 3);
+                    /* RGB DIB are coded from bottom to top */
+                    if ( p_vids->p_bih->biHeight >= 0 ) tk->b_flipped = true;
                 }
                 else
                 {
@@ -534,10 +539,10 @@ static int Open( vlc_object_t * p_this )
                 fmt.video.i_frame_rate = tk->i_rate;
                 fmt.video.i_frame_rate_base = tk->i_scale;
 
-                if ( p_vids->p_bih->biCompression == BI_RAWRGB )
-                    tk->i_width_bytes = p_vids->p_bih->biWidth * (p_vids->p_bih->biBitCount >> 3);
-                else
-                    tk->i_width_bytes = 0;
+                 /* Uncompresse Bitmap or YUV, YUV being always topdown */
+                if ( fmt.video.i_height < 0 )
+                    fmt.video.i_height =
+                        (unsigned int)(-(int)p_vids->p_bih->biHeight);
 
                 avi_chunk_vprp_t *p_vprp = AVI_ChunkFind( p_strl, AVIFOURCC_vprp, 0 );
                 if( p_vprp )
@@ -564,13 +569,6 @@ static int Open( vlc_object_t * p_this )
                          (uint32_t)p_vids->p_bih->biHeight,
                          p_vids->p_bih->biBitCount,
                          (float)tk->i_rate/(float)tk->i_scale );
-
-                if( p_vids->p_bih->biCompression == BI_RAWRGB && fmt.video.i_height <= 0 )
-                {
-                    /* RGB DIB are coded from bottom to top */
-                    fmt.video.i_height =
-                        (unsigned int)(-(int)p_vids->p_bih->biHeight);
-                }
 
                 /* Extract palette from extradata if bpp <= 8 */
                 if( fmt.video.i_bits_per_pixel > 0 && fmt.video.i_bits_per_pixel <= 8 )
