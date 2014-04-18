@@ -50,6 +50,8 @@ Demuxer:
  * Support THP Wii/Gamecube, RenderWare and Escape Replay game video files
  * New HEVC raw packetizer and demuxer
  * Handle MOV/MP4 tx3g styled subtitles through codec
+ * AVI fixes for uncompressed and indexed bitmaps
+ * TS support for WiDi/Miracast LPCM
 
 Muxers:
  * Important rework of the Ogg muxer, notably for skeleton
@@ -103,6 +105,7 @@ Interfaces:
  * Add record button in Qt menus
  * Fixes for advanced preferences on OS X
  * New module for core dialogs on iOS
+ * New layout for Qt buttons customization
 
 Misc:
  * New module for TLS on OS X and iOS
