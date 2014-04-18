@@ -145,6 +145,8 @@ typedef struct
     int             i_scale;
     unsigned int    i_samplesize;
 
+    unsigned int    i_width_bytes;
+
     es_out_id_t     *p_es;
 
     int             i_dv_audio_rate;
@@ -522,11 +524,18 @@ static int Open( vlc_object_t * p_this )
                     }
                 }
                 tk->i_samplesize = 0;
+
                 fmt.video.i_width  = p_vids->p_bih->biWidth;
                 fmt.video.i_height = p_vids->p_bih->biHeight;
                 fmt.video.i_bits_per_pixel = p_vids->p_bih->biBitCount;
                 fmt.video.i_frame_rate = tk->i_rate;
                 fmt.video.i_frame_rate_base = tk->i_scale;
+
+                if ( p_vids->p_bih->biCompression == 0x00 )
+                    tk->i_width_bytes = p_vids->p_bih->biWidth * (p_vids->p_bih->biBitCount >> 3);
+                else
+                    tk->i_width_bytes = 0;
+
                 avi_chunk_vprp_t *p_vprp = AVI_ChunkFind( p_strl, AVIFOURCC_vprp, 0 );
                 if( p_vprp )
                 {
@@ -787,6 +796,35 @@ static void Close ( vlc_object_t * p_this )
     free(p_sys->attachment);
 
     free( p_sys );
+}
+
+/*****************************************************************************
+ * ReadFrame: Reads frame, using stride if necessary
+ *****************************************************************************/
+
+block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk, const int i_size )
+{
+    block_t *p_frame = stream_Block( p_demux->s, i_size );
+    if ( !p_frame || !tk->i_width_bytes ) /* There's no stride */
+        return p_frame;
+
+    const unsigned int i_stride_bytes = ((( (tk->i_width_bytes << 3) + 31) & ~31) >> 3);
+    const uint8_t *p_end = p_frame->p_buffer + p_frame->i_buffer;
+    const uint8_t *p_src = p_frame->p_buffer + i_stride_bytes;
+    uint8_t *p_dst = p_frame->p_buffer + tk->i_width_bytes;
+
+    p_frame->i_buffer = tk->i_width_bytes;
+    if ( tk->i_idxposb == 0 ) p_frame->i_buffer += 8;
+
+    while ( p_src + i_stride_bytes < p_end )
+    {
+        memmove( p_dst, p_src, tk->i_width_bytes );
+        p_src += i_stride_bytes;
+        p_dst += tk->i_width_bytes;
+        p_frame->i_buffer += tk->i_width_bytes;
+    }
+
+    return p_frame;
 }
 
 /*****************************************************************************
@@ -1072,7 +1110,7 @@ static int Demux_Seekable( demux_t *p_demux )
             i_size += 8; /* need to read and skip header */
         }
 
-        if( ( p_frame = stream_Block( p_demux->s, __EVEN( i_size ) ) )==NULL )
+        if( ( p_frame = ReadFrame( p_demux, tk, __EVEN( i_size ) ) )==NULL )
         {
             msg_Warn( p_demux, "failed reading data" );
             tk->b_eof = false;
