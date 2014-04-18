@@ -86,15 +86,9 @@ static int Open(vlc_object_t *object)
     vout_display_sys_t *sys;
 
     /* Allocate structure */
-    vd->sys = sys = malloc(sizeof(*sys));
+    vd->sys = sys = calloc(1, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
-
-    sys->directfb = NULL;
-    sys->primary  = NULL;
-    sys->width    = 0;
-    sys->height   = 0;
-    sys->pool     = NULL;
 
     /* Init DirectFB */
     if (DirectFBInit(NULL,NULL) != DFB_OK) {
@@ -116,38 +110,21 @@ static int Open(vlc_object_t *object)
 
     switch (sys->pixel_format) {
     case DSPF_RGB332:
-        /* 8 bit RGB (1 byte, red 3@5, green 3@2, blue 2@0) */
         fmt.i_chroma = VLC_CODEC_RGB8;
         fmt.i_rmask = 0x7 << 5;
         fmt.i_gmask = 0x7 << 2;
         fmt.i_bmask = 0x3 << 0;
         break;
-    case DSPF_RGB16:
-        /* 16 bit RGB (2 byte, red 5@11, green 6@5, blue 5@0) */
-        fmt.i_chroma = VLC_CODEC_RGB16;
-        fmt.i_rmask = 0x1f << 11;
-        fmt.i_gmask = 0x3f <<  5;
-        fmt.i_bmask = 0x1f <<  0;
-        break;
-    case DSPF_RGB24:
-        /* 24 bit RGB (3 byte, red 8@16, green 8@8, blue 8@0) */
-        fmt.i_chroma = VLC_CODEC_RGB24;
-        fmt.i_rmask = 0xff << 16;
-        fmt.i_gmask = 0xff <<  8;
-        fmt.i_bmask = 0xff <<  0;
-        break;
-    case DSPF_RGB32:
-        /* 24 bit RGB (4 byte, nothing@24, red 8@16, green 8@8, blue 8@0) */
-        fmt.i_chroma = VLC_CODEC_RGB32;
-        fmt.i_rmask = 0xff << 16;
-        fmt.i_gmask = 0xff <<  8;
-        fmt.i_bmask = 0xff <<  0;
-        break;
+    case DSPF_RGB16: fmt.i_chroma = VLC_CODEC_RGB16; break;
+    case DSPF_RGB24: fmt.i_chroma = VLC_CODEC_RGB24; break;
+    case DSPF_RGB32: fmt.i_chroma = VLC_CODEC_RGB32; break;
     default:
         msg_Err(vd, "unknown screen depth %i", sys->pixel_format);
         Close(VLC_OBJECT(vd));
         return VLC_EGENERIC;
     }
+
+    video_format_FixRgb(&fmt);
 
     fmt.i_width  = sys->width;
     fmt.i_height = sys->height;
