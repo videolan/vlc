@@ -228,7 +228,8 @@ static mtime_t  AVI_MovieGetLength( demux_t * );
 
 static void AVI_MetaLoad( demux_t *, avi_chunk_list_t *p_riff, avi_chunk_avih_t *p_avih );
 
-block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk, const int i_size );
+block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
+                     const int i_header, const int i_size );
 
 /*****************************************************************************
  * Stream management
@@ -827,12 +828,11 @@ static void Close ( vlc_object_t * p_this )
  * ReadFrame: Reads frame, using stride if necessary
  *****************************************************************************/
 
-block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk, const int i_size )
+block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
+                     const int i_header, const int i_size )
 {
     block_t *p_frame = stream_Block( p_demux->s, __EVEN( i_size ) );
     if ( !p_frame ) return p_frame;
-
-    const uint8_t i_header = ( tk->i_idxposb == 0 ) ? 8 : 0;
 
     if( i_size % 2 )    /* read was padded on word boundary */
     {
@@ -1186,7 +1186,8 @@ static int Demux_Seekable( demux_t *p_demux )
             i_size += 8; /* need to read and skip header */
         }
 
-        if( ( p_frame = ReadFrame( p_demux, tk, i_size ) )==NULL )
+        if( ( p_frame = ReadFrame( p_demux, tk,
+                        ( tk->i_idxposb == 0 ) ? 8 : 0, i_size ) )==NULL )
         {
             msg_Warn( p_demux, "failed reading data" );
             tk->b_eof = false;
@@ -1356,8 +1357,8 @@ static int Demux_UnSeekable( demux_t *p_demux )
                         AVI_GetPTS( p_stream_master ) )< 600*1000 )
             {
                 /* load it and send to decoder */
-                block_t *p_frame;
-                if( AVI_PacketRead( p_demux, &avi_pk, &p_frame ) || p_frame == NULL )
+                block_t *p_frame = ReadFrame( p_demux, p_stream, 8, avi_pk.i_size + 8 ) ;
+                if( p_frame == NULL )
                 {
                     return( -1 );
                 }
