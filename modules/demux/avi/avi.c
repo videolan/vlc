@@ -57,6 +57,9 @@
     "Recreate a index for the AVI file. Use this if your AVI file is damaged "\
     "or incomplete (not seekable)." )
 
+#define BI_RAWRGB 0x00
+#define BI_RGBBITFIELDS 0x03
+
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -473,7 +476,7 @@ static int Open( vlc_object_t * p_this )
                    tk->i_cat = SPU_ES;
                    break;
                 }
-                else if( p_vids->p_bih->biCompression == 0x00 )
+                else if( p_vids->p_bih->biCompression == BI_RAWRGB )
                 {
                     switch( p_vids->p_bih->biBitCount )
                     {
@@ -531,7 +534,7 @@ static int Open( vlc_object_t * p_this )
                 fmt.video.i_frame_rate = tk->i_rate;
                 fmt.video.i_frame_rate_base = tk->i_scale;
 
-                if ( p_vids->p_bih->biCompression == 0x00 )
+                if ( p_vids->p_bih->biCompression == BI_RAWRGB )
                     tk->i_width_bytes = p_vids->p_bih->biWidth * (p_vids->p_bih->biBitCount >> 3);
                 else
                     tk->i_width_bytes = 0;
@@ -562,7 +565,7 @@ static int Open( vlc_object_t * p_this )
                          p_vids->p_bih->biBitCount,
                          (float)tk->i_rate/(float)tk->i_scale );
 
-                if( p_vids->p_bih->biCompression == 0x00 && fmt.video.i_height <= 0 )
+                if( p_vids->p_bih->biCompression == BI_RAWRGB && fmt.video.i_height <= 0 )
                 {
                     /* RGB DIB are coded from bottom to top */
                     fmt.video.i_height =
