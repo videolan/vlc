@@ -63,7 +63,6 @@ static void           Manage (vout_display_t *);
 
 /* */
 static int  OpenDisplay (vout_display_t *);
-static void CloseDisplay(vout_display_t *);
 
 /* */
 struct vout_display_sys_t {
@@ -180,7 +179,14 @@ static void Close(vlc_object_t *object)
     if (sys->pool)
         picture_pool_Delete(sys->pool);
 
-    CloseDisplay(vd);
+    IDirectFBSurface *primary = sys->primary;
+    if (primary)
+        primary->Release(primary);
+
+    IDirectFB *directfb = sys->directfb;
+    if (directfb)
+        directfb->Release(directfb);
+
     free(sys);
 }
 
@@ -272,17 +278,3 @@ static int OpenDisplay(vout_display_t *vd)
 
     return VLC_SUCCESS;
 }
-
-static void CloseDisplay(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    IDirectFBSurface *primary = sys->primary;
-    if (primary)
-        primary->Release(primary);
-
-    IDirectFB *directfb = sys->directfb;
-    if (directfb)
-        directfb->Release(directfb);
-}
-
