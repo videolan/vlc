@@ -62,20 +62,10 @@ static int            Control(vout_display_t *, int, va_list);
 static void           Manage (vout_display_t *);
 
 /* */
-static int  OpenDisplay (vout_display_t *);
-
-/* */
 struct vout_display_sys_t {
-    /* */
     IDirectFB             *directfb;
     IDirectFBSurface      *primary;
-    DFBSurfacePixelFormat pixel_format;
 
-    /* */
-    int width;
-    int height;
-
-    /* */
     picture_pool_t *pool;
 };
 
@@ -97,18 +87,40 @@ static int Open(vlc_object_t *object)
         return VLC_EGENERIC;
     }
 
-    if (OpenDisplay(vd)) {
-        msg_Err(vd, "Cannot create primary surface");
-        Close(VLC_OBJECT(vd));
-        return VLC_EGENERIC;
-    }
+    DFBSurfaceDescription dsc;
+    /*dsc.flags = DSDESC_CAPS | DSDESC_HEIGHT | DSDESC_WIDTH;*/
+    dsc.flags = DSDESC_CAPS;
+    dsc.caps  = DSCAPS_PRIMARY | DSCAPS_FLIPPING;
+    /*dsc.width = 352;*/
+    /*dsc.height = 240;*/
+
+    IDirectFB *directfb = NULL;
+    if (DirectFBCreate(&directfb) != DFB_OK || !directfb)
+        goto error;
+    sys->directfb = directfb;
+
+    IDirectFBSurface *primary = NULL;
+    if (directfb->CreateSurface(directfb, &dsc, &primary) || !primary)
+        goto error;
+    sys->primary = primary;
+
+    /* */
+    int width;
+    int height;
+
+    primary->GetSize(primary, &width, &height);
+    primary->FillRectangle(primary, 0, 0, width, height);
+    primary->Flip(primary, NULL, 0);
+
     vout_display_DeleteWindow(vd, NULL);
 
     /* */
     video_format_t fmt;
     video_format_ApplyRotation(&fmt, &vd->fmt);
 
-    switch (sys->pixel_format) {
+    DFBSurfacePixelFormat pixel_format;
+    sys->primary->GetPixelFormat(sys->primary, &pixel_format);
+    switch (pixel_format) {
     case DSPF_RGB332:
         fmt.i_chroma = VLC_CODEC_RGB8;
         fmt.i_rmask = 0x7 << 5;
@@ -119,15 +131,15 @@ static int Open(vlc_object_t *object)
     case DSPF_RGB24: fmt.i_chroma = VLC_CODEC_RGB24; break;
     case DSPF_RGB32: fmt.i_chroma = VLC_CODEC_RGB32; break;
     default:
-        msg_Err(vd, "unknown screen depth %i", sys->pixel_format);
+        msg_Err(vd, "unknown screen depth %i", pixel_format);
         Close(VLC_OBJECT(vd));
         return VLC_EGENERIC;
     }
 
     video_format_FixRgb(&fmt);
 
-    fmt.i_width  = sys->width;
-    fmt.i_height = sys->height;
+    fmt.i_width  = width;
+    fmt.i_height = height;
 
     /* */
     vout_display_info_t info = vd->info;
@@ -146,6 +158,11 @@ static int Open(vlc_object_t *object)
     vout_display_SendEventFullscreen(vd, true);
     vout_display_SendEventDisplaySize(vd, fmt.i_width, fmt.i_height, true);
     return VLC_SUCCESS;
+
+error:
+    msg_Err(vd, "Cannot create primary surface");
+    Close(VLC_OBJECT(vd));
+    return VLC_EGENERIC;
 }
 
 static void Close(vlc_object_t *object)
@@ -190,7 +207,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
         memset(&rsc, 0, sizeof(rsc));
         rsc.p[0].p_pixels = pixels;
-        rsc.p[0].i_lines  = sys->height;
+        rsc.p[0].i_lines  = vd->fmt.i_height;
         rsc.p[0].i_pitch  = pitch;
 
         picture_t *direct = picture_NewFromResource(&vd->fmt, &rsc);
@@ -225,33 +242,4 @@ static int Control(vout_display_t *vd, int query, va_list args)
 static void Manage (vout_display_t *vd)
 {
     VLC_UNUSED(vd);
-}
-
-static int OpenDisplay(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    DFBSurfaceDescription dsc;
-    /*dsc.flags = DSDESC_CAPS | DSDESC_HEIGHT | DSDESC_WIDTH;*/
-    dsc.flags = DSDESC_CAPS;
-    dsc.caps  = DSCAPS_PRIMARY | DSCAPS_FLIPPING;
-    /*dsc.width = 352;*/
-    /*dsc.height = 240;*/
-
-    IDirectFB *directfb = NULL;
-    if (DirectFBCreate(&directfb) != DFB_OK || !directfb)
-        return VLC_EGENERIC;
-    sys->directfb = directfb;
-
-    IDirectFBSurface *primary = NULL;
-    if (directfb->CreateSurface(directfb, &dsc, &primary) || !primary)
-        return VLC_EGENERIC;
-    sys->primary = primary;
-
-    primary->GetSize(primary, &sys->width, &sys->height);
-    primary->GetPixelFormat(primary, &sys->pixel_format);
-    primary->FillRectangle(primary, 0, 0, sys->width, sys->height);
-    primary->Flip(primary, NULL, 0);
-
-    return VLC_SUCCESS;
 }
