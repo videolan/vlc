@@ -85,7 +85,6 @@
     IBOutlet id o_btn_playlist;
     IBOutlet id o_playlist_view;
     IBOutlet id o_search_field;
-    IBOutlet id o_search_field_other;
     IBOutlet id o_mi_save_playlist;
     IBOutlet id o_ctx_menu;
 

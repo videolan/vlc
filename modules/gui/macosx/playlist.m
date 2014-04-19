@@ -560,7 +560,6 @@
     [o_mi_sort_author setTitle: _NS("Sort Node by Author")];
 
     [o_search_field setToolTip: _NS("Search in Playlist")];
-    [o_search_field_other setToolTip: _NS("Search in Playlist")];
 }
 
 - (void)playlistUpdated
