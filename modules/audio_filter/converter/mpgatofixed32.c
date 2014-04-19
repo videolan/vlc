@@ -118,6 +118,14 @@ reject:
     mad_fixed_t const * p_right = p_pcm->samples[1];
     float *p_samples = (float *)p_out_buf->p_buffer;
 
+    if (p_pcm->channels > p_filter->fmt_out.audio.i_channels)
+    {
+        msg_Err( p_filter, "wrong channels count (corrupt stream?): %u > %u",
+                 p_pcm->channels, p_filter->fmt_out.audio.i_channels);
+        p_sys->i_reject_count = 3;
+        goto reject;
+    }
+
     if( i_samples != p_out_buf->i_nb_samples )
     {
         msg_Err( p_filter, "unexpected samples count (corrupt stream?): "
