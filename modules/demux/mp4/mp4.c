@@ -3521,7 +3521,7 @@ static int MP4_frg_TrackCreate( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_
 /**
  * Return the track identified by tid
  */
-static mp4_track_t *MP4_frg_GetTrack( demux_t *p_demux, const uint32_t tid )
+static mp4_track_t *MP4_frg_GetTrackByID( demux_t *p_demux, const uint32_t tid )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -3664,7 +3664,7 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
     assert( i_track_ID > 0 );
     msg_Dbg( p_demux, "GetChunk: track ID is %"PRIu32"", i_track_ID );
 
-    mp4_track_t *p_track = MP4_frg_GetTrack( p_demux, i_track_ID );
+    mp4_track_t *p_track = MP4_frg_GetTrackByID( p_demux, i_track_ID );
     if( !p_track )
         return VLC_EGENERIC;
 
@@ -3880,7 +3880,7 @@ static int MP4_frg_GetChunks( demux_t *p_demux, const unsigned i_tk_id )
                 tid = p_stra->data.p_stra->i_track_ID;
             }
 
-            p_track = MP4_frg_GetTrack( p_demux, tid );
+            p_track = MP4_frg_GetTrackByID( p_demux, tid );
             if( !p_track )
                 goto MP4_frg_GetChunks_Error;
             p_track->b_codec_need_restart = true;
