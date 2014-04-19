@@ -770,24 +770,21 @@ static void OpenglSwap (vlc_gl_t *gl)
 
 - (void)mouseMoved:(NSEvent *)o_event
 {
-    NSPoint ml;
-    NSRect s_rect;
-    BOOL b_inside;
-
     /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
-    if (OSX_LION)
-        s_rect = [self convertRectToBacking:[self bounds]];
-    else
-        s_rect = [self bounds];
-    ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
-    b_inside = [self mouse: ml inRect: s_rect];
+    NSPoint ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
+    NSRect videoRect = [self bounds];
+    BOOL b_inside = [self mouse: ml inRect: videoRect];
+
+    if (OSX_LION) {
+        ml = [self convertPointToBacking: ml];
+        videoRect = [self convertRectToBacking: videoRect];
+    }
 
     if (b_inside) {
         @synchronized (self) {
             if (vd) {
-
                 vout_display_SendMouseMovedDisplayCoordinates(vd, ORIENT_NORMAL,
-                                                              (int)ml.x, s_rect.size.height - (int)ml.y,
+                                                              (int)ml.x, videoRect.size.height - (int)ml.y,
                                                               &vd->sys->place);
             }
         }
