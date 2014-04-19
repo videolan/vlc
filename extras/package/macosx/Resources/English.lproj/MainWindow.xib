@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">12F45</string>
+    <string key="IBDocument.SystemVersion">13C64</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1187.40</string>
-    <string key="IBDocument.HIToolboxVersion">626.00</string>
+    <string key="IBDocument.AppKitVersion">1265.19</string>
+    <string key="IBDocument.HIToolboxVersion">697.40</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <object class="NSArray" key="dict.sortedKeys">
@@ -21,10 +21,10 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="5605"/>
-      <integer value="4682"/>
       <integer value="5260"/>
       <integer value="4850"/>
+      <integer value="5605"/>
+      <integer value="4682"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -315,6 +315,7 @@
                         <int key="NSMaximumRecents">255</int>
                       </object>
                       <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                      <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                     </object>
                     <object class="NSTextField" id="185065733">
                       <reference key="NSNextResponder" ref="440594360"/>
@@ -344,6 +345,7 @@
                         </object>
                       </object>
                       <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                      <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                     </object>
                     <object class="NSImageView" id="447614808">
                       <reference key="NSNextResponder" ref="440594360"/>
@@ -827,6 +829,7 @@
                         </object>
                       </object>
                       <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                      <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                     </object>
                     <object class="NSButton" id="963106097">
                       <reference key="NSNextResponder" ref="1038517863"/>
@@ -1123,6 +1126,7 @@
               </object>
             </object>
             <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+            <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
           </object>
           <object class="NSButton" id="725350360">
             <reference key="NSNextResponder" ref="661733562"/>
@@ -1265,6 +1269,7 @@
                           <reference key="NSTextColor" ref="1018329413"/>
                         </object>
                         <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                        <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                       </object>
                       <object class="NSImageView" id="684815277">
                         <reference key="NSNextResponder" ref="457727486"/>
@@ -1524,6 +1529,7 @@
                 <reference key="NSTextColor" ref="306532497"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSTextField" id="380575444">
               <reference key="NSNextResponder" ref="383192078"/>
@@ -1541,6 +1547,7 @@
                 <reference key="NSTextColor" ref="306532497"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSButton" id="819678038">
               <reference key="NSNextResponder" ref="383192078"/>
@@ -1610,6 +1617,7 @@
                 </object>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
           </object>
           <string key="NSFrameSize">{612, 159}</string>
@@ -1653,6 +1661,7 @@
                 <reference key="NSTextColor" ref="306532497"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSTextField" id="926334721">
               <reference key="NSNextResponder" ref="306630988"/>
@@ -1670,6 +1679,7 @@
                 <reference key="NSTextColor" ref="306532497"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSButton" id="956657117">
               <reference key="NSNextResponder" ref="306630988"/>
@@ -2497,6 +2507,38 @@
             <reference key="destination" ref="1038517863"/>
           </object>
           <int key="connectionID">5609</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_chosen_category_lbl</string>
+            <reference key="source" ref="498338108"/>
+            <reference key="destination" ref="185065733"/>
+          </object>
+          <int key="connectionID">5616</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_search_fld</string>
+            <reference key="source" ref="498338108"/>
+            <reference key="destination" ref="898390870"/>
+          </object>
+          <int key="connectionID">5617</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_search_field</string>
+            <reference key="source" ref="998338913"/>
+            <reference key="destination" ref="898390870"/>
+          </object>
+          <int key="connectionID">5618</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">searchItem:</string>
+            <reference key="source" ref="998338913"/>
+            <reference key="destination" ref="898390870"/>
+          </object>
+          <int key="connectionID">5619</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -3722,9 +3764,9 @@
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{61, 297}, {604, 310}}</string>
+          <string>{{179, 407}, {604, 310}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{61, 297}, {604, 310}}</string>
+          <string>{{179, 407}, {604, 310}}</string>
           <boolean value="YES"/>
           <boolean value="YES"/>
           <boolean value="NO"/>
@@ -4091,7 +4133,7 @@
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">5615</int>
+      <int key="maxID">5619</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
