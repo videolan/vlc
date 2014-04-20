@@ -21,7 +21,7 @@ StrCpy $Desc_Section06 "Définit le lecteur média VLC comme application par défau
 StrCpy $Desc_Section07 "Ajoute des entrées de menu contextuel (« Lire avec VLC » et « Ajouter à la liste de lecture de VLC »)"
 StrCpy $Desc_Section08 "Efface les préférences de VLC et les fichiers cache laissés par une précédente installation"
 StrCpy $Name_Section91 "Désinstaller"
-StrCpy $Name_Section92 "Effacer les préfvrences et les fichiers cache"
+StrCpy $Name_Section92 "Effacer les préférences et les fichiers cache"
 StrCpy $Desc_Section91 "Désinstalle VLC et tous ses composants"
 StrCpy $Desc_Section92 "Efface les préférences de VLC et les fichiers cache"
 StrCpy $ShellAssociation_Play "Lire"
