@@ -650,9 +650,12 @@ static block_t *DecodeRtpSpeexPacket( decoder_t *p_dec, block_t **pp_block )
             msg_Err( p_dec, "Could not allocate a Speex header.");
             return NULL;
         }
-        speex_init_header( p_sys->p_header,p_sys->rtp_rate,1,&speex_nb_mode );
+
+        const SpeexMode *mode = speex_lib_get_mode((p_sys->rtp_rate / 8000) >> 1);
+
+        speex_init_header( p_sys->p_header,p_sys->rtp_rate, 1, mode );
             speex_bits_init( &p_sys->bits );
-        p_sys->p_state = speex_decoder_init( &speex_nb_mode );
+        p_sys->p_state = speex_decoder_init( mode );
         if ( !p_sys->p_state )
         {
             msg_Err( p_dec, "Could not allocate a Speex decoder." );
