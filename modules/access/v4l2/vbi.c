@@ -72,6 +72,7 @@ vlc_v4l2_vbi_t *OpenVBI (demux_t *demux, const char *psz_device)
     {
         msg_Err (demux, "cannot capture VBI data: %s", errstr);
         free (errstr);
+        close (rawfd);
         goto err;
     }
 
