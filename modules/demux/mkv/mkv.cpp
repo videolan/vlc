@@ -707,7 +707,7 @@ static int Demux( demux_t *p_demux)
     }
     int i_return = 0;
 
-    for( ;; )
+    do
     {
         if( p_sys->i_pts >= p_sys->i_start_pts  )
             if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
@@ -795,6 +795,7 @@ static int Demux( demux_t *p_demux)
         vlc_mutex_unlock( &p_sys->lock_demuxer );
         return 1;
     }
+    while (0);
 
     vlc_mutex_unlock( &p_sys->lock_demuxer );
 
