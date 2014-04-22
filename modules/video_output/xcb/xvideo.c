@@ -172,6 +172,7 @@ static vlc_fourcc_t ParseFormat (vlc_object_t *obj,
                     return VLC_CODEC_RGBA16;
                 if (f->bpp == 16 && f->depth == 12)
                     return VLC_CODEC_RGB12;
+                break;
               case 8:
                 if (f->bpp == 8 && f->depth == 8)
                     return VLC_CODEC_RGB8;
