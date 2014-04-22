@@ -657,9 +657,8 @@ static block_t *dirac_EmitEOS( decoder_t *p_dec, uint32_t i_prev_parse_offset )
 
     p_block->i_flags = DIRAC_NON_DATED;
 
-    return p_block;
-
     (void) p_dec;
+    return p_block;
 }
 
 /***
