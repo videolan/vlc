@@ -851,8 +851,8 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
 
         uint32_t i_private_data_id = 0;
         dvbpsi_descriptor_t *p_dsc;
-        scan_configuration_t *p_cfg = malloc(sizeof(*p_cfg));
-        if(!p_cfg) return;
+        scan_configuration_t cfg, *p_cfg = &cfg;
+
         memset(p_cfg,0,sizeof(*p_cfg));
         for( p_dsc = p_ts->p_first_descriptor; p_dsc != NULL; p_dsc = p_dsc->p_next )
         {
