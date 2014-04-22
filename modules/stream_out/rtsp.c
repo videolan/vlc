@@ -1077,8 +1077,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             {
                 answer->i_status = 405;
                 httpd_MsgAdd( answer, "Allow",
-                              "%s, TEARDOWN, PLAY, GET_PARAMETER",
-                              ( id != NULL ) ? "SETUP" : "DESCRIBE" );
+                              "DESCRIBE, TEARDOWN, PLAY, GET_PARAMETER" );
                 break;
             }
 
