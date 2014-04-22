@@ -140,7 +140,7 @@ static int cmpdev (const void *a, const void *b)
     dev_t delta = *da - *db;
 
     if (sizeof (delta) > sizeof (int))
-        return delta ? ((delta > 0) ? 1 : -1) : 0;
+        return delta ? (((signed)delta > 0) ? 1 : -1) : 0;
     return (signed)delta;
 }
 
