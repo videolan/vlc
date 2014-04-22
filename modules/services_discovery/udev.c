@@ -535,8 +535,9 @@ static char *disc_get_mrl (struct udev_device *dev)
     val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_STATE");
     if (val == NULL)
     {   /* Force probing of the disc in the drive if any. */
-        int fd = open (node, O_RDONLY);
-        close (fd);
+        int fd = open (node, O_RDONLY|O_CLOEXEC);
+        if (fd != -1)
+            close (fd);
         return NULL;
     }
     if (!strcmp (val, "blank"))
