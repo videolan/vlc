@@ -750,12 +750,12 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         if (strcmp (psz_sdp, "application/sdp"))
         {
             msg_Dbg (p_sd, "unsupported content type: %s", psz_sdp);
-            return VLC_EGENERIC;
+            goto error;
         }
 
         // skips content type
         if (len <= clen)
-            return VLC_EGENERIC;
+            goto error;
 
         len -= clen;
         psz_sdp += clen;
@@ -765,7 +765,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
     p_sdp = ParseSDP( VLC_OBJECT(p_sd), psz_sdp );
 
     if( p_sdp == NULL )
-        return VLC_EGENERIC;
+        goto error;
 
     p_sdp->psz_sdp = psz_sdp;
 
@@ -785,7 +785,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
     if( p_sdp->psz_uri == NULL )
     {
         FreeSDP( p_sdp );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     for( i = 0 ; i< p_sd->p_sys->i_announces ; i++ )
@@ -817,15 +817,19 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
                 p_announce->i_period = ( p_announce->i_period * (p_announce->i_period_trust-1) + (now - p_announce->i_last) ) / p_announce->i_period_trust;
                 p_announce->i_last = now;
             }
-            FreeSDP( p_sdp ); p_sdp = NULL;
+            FreeSDP( p_sdp );
+            free (decomp);
             return VLC_SUCCESS;
         }
     }
 
     CreateAnnounce( p_sd, i_source, i_hash, p_sdp );
 
-    FREENULL (decomp);
+    free (decomp);
     return VLC_SUCCESS;
+error:
+    free (decomp);
+    return VLC_EGENERIC;
 }
 
 sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint32_t *i_source, uint16_t i_hash,
