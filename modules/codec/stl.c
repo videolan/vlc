@@ -78,49 +78,30 @@ static cct_number_t cct_nums[] = { {CCT_ISO_6937_2, "ISO_6937-2"},
                                    {CCT_ISO_8859_8, "ISO_8859-8"} };
 
 
-static char *ParseText(uint8_t *data, int size, const char *charset)
+static char *ParseText(const uint8_t *data, size_t size, const char *charset)
 {
-    char *text = strdup("");
-    int  text_size = 0;
+    char *text = malloc(size);
+    if (text == NULL)
+        return NULL;
 
-    for (int i = 0; i < size; i++) {
+    size_t text_size = 0;
+
+    for (size_t i = 0; i < size; i++) {
         uint8_t code = data[i];
 
         if (code == 0x8f)
             break;
-
-        char tmp[16] = "";
-        char *t = tmp;
-        if ((code >= 0x20 && code <= 0x7e) ||
-            (code >= 0xa0) )
-            snprintf(tmp, sizeof(tmp), "%c", code);
-#if 0
-        else if (code == 0x80)
-            snprintf(tmp, sizeof(tmp), "<i>");
-        else if (code == 0x81)
-            snprintf(tmp, sizeof(tmp), "</i>");
-        else if (code == 0x82)
-            snprintf(tmp, sizeof(tmp), "<u>");
-        else if (code == 0x83)
-            snprintf(tmp, sizeof(tmp), "</u>");
-#endif
-        else if (code == 0x8a)
-            snprintf(tmp, sizeof(tmp), "\n");
-        else {
-            t = NULL;
-        }
-
-        if (!t)
+        if (code == 0x7f)
             continue;
-        size_t t_size = strlen(t);
-        text = realloc_or_free(text, t_size + text_size + 1);
-        if (!text)
-            continue;
-        memcpy(&text[text_size], t, t_size);
-        text_size += t_size;
-        text[text_size]   = '\0';
+        if (code & 0x60)
+            text[text_size++] = code;
+        if (code == 0x8a)
+            text[text_size++] = '\n';
     }
-    return FromCharset(charset, text, text_size);
+
+    char *u8 = FromCharset(charset, text, text_size);
+    free(text);
+    return u8;
 }
 
 static subpicture_t *Decode(decoder_t *dec, block_t **block)
