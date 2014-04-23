@@ -40,7 +40,8 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
 {
     VLC_UNUSED( p_dec );
     subpicture_t *p_subpicture = subpicture_New( p_upd );
-    p_subpicture->b_subtitle = true;
+    if( likely(p_subpicture != NULL) )
+        p_subpicture->b_subtitle = true;
     return p_subpicture;
 }
 
