@@ -460,6 +460,8 @@ static void OpenglESSwap(vlc_gl_t *gl)
 {
     assert([[NSThread currentThread] isMainThread]);
 
+    [EAGLContext setCurrentContext:_eaglContext];
+
     CGRect bounds;
     bounds = [self bounds];
 
