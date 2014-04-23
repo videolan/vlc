@@ -214,7 +214,7 @@ static int parse_Manifest( stream_t *s )
                             sms->url_template = strdup(value);
                     }
 
-                    if( sms && !sms->timescale )
+                    if( !sms->timescale )
                         sms->timescale = TIMESCALE;
                     if( !sms->name )
                     {
