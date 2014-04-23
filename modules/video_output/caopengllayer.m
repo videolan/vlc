@@ -474,4 +474,45 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
     // do not release anything here, we do that when closing the module
 }
 
+- (void)mouseButtonDown:(int)buttonNumber
+{
+    @synchronized (self) {
+        if (_vd) {
+            if (buttonNumber == 0)
+                vout_display_SendEventMousePressed (_vd, MOUSE_BUTTON_LEFT);
+            else if (buttonNumber == 1)
+                vout_display_SendEventMousePressed (_vd, MOUSE_BUTTON_RIGHT);
+            else
+                vout_display_SendEventMousePressed (_vd, MOUSE_BUTTON_CENTER);
+        }
+    }
+}
+
+- (void)mouseButtonUp:(int)buttonNumber
+{
+    @synchronized (self) {
+        if (_vd) {
+            if (buttonNumber == 0)
+                vout_display_SendEventMouseReleased (_vd, MOUSE_BUTTON_LEFT);
+            else if (buttonNumber == 1)
+                vout_display_SendEventMouseReleased (_vd, MOUSE_BUTTON_RIGHT);
+            else
+                vout_display_SendEventMouseReleased (_vd, MOUSE_BUTTON_CENTER);
+        }
+    }
+}
+
+- (void)mouseMovedToX:(double)xValue Y:(double)yValue
+{
+    @synchronized (self) {
+        if (_vd) {
+            vout_display_SendMouseMovedDisplayCoordinates (_vd,
+                                                           ORIENT_NORMAL,
+                                                           xValue,
+                                                           yValue,
+                                                           &_vd->sys->place);
+        }
+    }
+}
+
 @end
