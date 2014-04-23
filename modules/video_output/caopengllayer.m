@@ -188,7 +188,7 @@ static int Open (vlc_object_t *p_this)
     /* setup vout display */
     vout_display_info_t info = vd->info;
     info.subpicture_chromas = subpicture_chromas;
-    info.has_hide_mouse = false;
+    info.has_hide_mouse = true;
     vd->info = info;
 
     vd->pool    = Pool;
@@ -320,6 +320,12 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             vout_display_PlacePicture (&place, source, &cfg_tmp, false);
             sys->place = place;
 
+            return VLC_SUCCESS;
+        }
+
+        case VOUT_DISPLAY_HIDE_MOUSE:
+        {
+            [NSCursor setHiddenUntilMouseMoves: YES];
             return VLC_SUCCESS;
         }
 
