@@ -854,8 +854,8 @@ int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
 
     if( !psz_buf || !ppsz_command )
     {
-        p_message = vlm_MessageNew( ( ppsz_command ) ? ppsz_command[0] : NULL,
-                        "Memory allocation failed for command of length %zu",
+        p_message = vlm_MessageNew( "Memory error",
+                        "allocation failed for command of length %zu",
                         i_command_len );
         goto error;
     }
