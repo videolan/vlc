@@ -465,11 +465,9 @@ int puzzle_shuffle( filter_t *p_filter )
 int puzzle_generate_rand_pce_list( filter_t *p_filter, int32_t **pi_pce_lst )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-
     int32_t i_pieces_nbr = p_sys->s_allocated.i_pieces_nbr;
 
-    if (pi_pce_lst != NULL )
-        free( *pi_pce_lst );
+    free( *pi_pce_lst );
     *pi_pce_lst = calloc( i_pieces_nbr, sizeof(**pi_pce_lst) );
     if( !*pi_pce_lst )
         return VLC_ENOMEM;
