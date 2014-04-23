@@ -1387,10 +1387,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys = calloc( 1, sizeof( *p_sys ) );
     if ( p_sys == NULL )
-    {
-        i_err = VLC_ENOMEM;
-        goto error;
-    }
+        return VLC_ENOMEM;
 
     p_stream->pf_add = Add;
     p_stream->pf_del = Del;
