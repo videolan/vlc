@@ -465,7 +465,11 @@ static int Open( vlc_object_t * p_this )
                 if( fmt.i_extra > 0 )
                 {
                     fmt.p_extra = malloc( fmt.i_extra );
-                    if( !fmt.p_extra ) goto error;
+                    if( unlikely(fmt.p_extra == NULL) )
+                    {
+                        free( tk );
+                        goto error;
+                    }
                     memcpy( fmt.p_extra, &p_auds->p_wf[1], fmt.i_extra );
                 }
                 break;
@@ -586,7 +590,11 @@ static int Open( vlc_object_t * p_this )
                 if( fmt.i_extra > 0 )
                 {
                     fmt.p_extra = malloc( fmt.i_extra );
-                    if( !fmt.p_extra ) goto error;
+                    if( unlikely(fmt.p_extra == NULL) )
+                    {
+                        free( tk );
+                        goto error;
+                    }
                     memcpy( fmt.p_extra, &p_vids->p_bih[1], fmt.i_extra );
                 }
 
