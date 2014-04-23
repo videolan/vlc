@@ -35,6 +35,7 @@ CAtmoChannelAssignment::CAtmoChannelAssignment(CAtmoChannelAssignment &source)
 
 CAtmoChannelAssignment::~CAtmoChannelAssignment(void)
 {
+  delete[] m_mappings;
   free(m_psz_name);
 }
 
@@ -48,14 +49,15 @@ void CAtmoChannelAssignment::setSize(int numChannels)
 {
   if(numChannels != m_num_channels)
   {
-     delete []m_mappings;
-     m_mappings = NULL;
+     delete[] m_mappings;
      m_num_channels = numChannels;
      if(m_num_channels > 0)
      {
        m_mappings = new int[m_num_channels];
        memset(m_mappings, 0, sizeof(int) * m_num_channels);
      }
+     else
+       m_mappings = NULL;
   }
 }
 
