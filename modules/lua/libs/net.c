@@ -280,21 +280,22 @@ static int vlclua_net_close( lua_State *L )
 
 static int vlclua_net_send( lua_State *L )
 {
-    int i_fd = luaL_checkint( L, 1 );
+    int fd = vlclua_fd_get( L, luaL_checkint( L, 1 ) );
     size_t i_len;
     const char *psz_buffer = luaL_checklstring( L, 2, &i_len );
+
     i_len = luaL_optint( L, 3, i_len );
-    i_len = send( vlclua_fd_get( L, i_fd ), psz_buffer, i_len, 0 );
-    lua_pushinteger( L, i_len );
+    lua_pushinteger( L, (fd != -1) ? send( fd, psz_buffer, i_len, 0 ) : -1 );
     return 1;
 }
 
 static int vlclua_net_recv( lua_State *L )
 {
-    int i_fd = luaL_checkint( L, 1 );
+    int fd = vlclua_fd_get( L, luaL_checkint( L, 1 ) );
     size_t i_len = luaL_optint( L, 2, 1 );
     char psz_buffer[i_len];
-    ssize_t i_ret = recv( vlclua_fd_get( L, i_fd ), psz_buffer, i_len, 0 );
+
+    ssize_t i_ret = (fd != -1) ? recv( fd, psz_buffer, i_len, 0 ) : -1;
     if( i_ret > 0 )
         lua_pushlstring( L, psz_buffer, i_ret );
     else
@@ -372,22 +373,22 @@ static int vlclua_fd_open( lua_State *L )
 
 static int vlclua_fd_write( lua_State *L )
 {
-    int i_fd = luaL_checkint( L, 1 );
+    int fd = vlclua_fd_get( L, luaL_checkint( L, 1 ) );
     size_t i_len;
-    ssize_t i_ret;
     const char *psz_buffer = luaL_checklstring( L, 2, &i_len );
+
     i_len = luaL_optint( L, 3, i_len );
-    i_ret = write( vlclua_fd_get( L, i_fd ), psz_buffer, i_len );
-    lua_pushinteger( L, i_ret );
+    lua_pushinteger( L, (fd != -1) ? write( fd, psz_buffer, i_len ) : -1 );
     return 1;
 }
 
 static int vlclua_fd_read( lua_State *L )
 {
-    int i_fd = luaL_checkint( L, 1 );
+    int fd = vlclua_fd_get( L, luaL_checkint( L, 1 ) );
     size_t i_len = luaL_optint( L, 2, 1 );
     char psz_buffer[i_len];
-    ssize_t i_ret = read( vlclua_fd_get( L, i_fd ), psz_buffer, i_len );
+
+    ssize_t i_ret = (fd != -1) ? read( fd, psz_buffer, i_len ) : -1;
     if( i_ret > 0 )
         lua_pushlstring( L, psz_buffer, i_ret );
     else
