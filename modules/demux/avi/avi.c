@@ -174,6 +174,7 @@ struct demux_sys_t
     mtime_t i_length;
 
     bool  b_seekable;
+    bool  b_fastseekable;
     avi_chunk_t ck_root;
 
     bool  b_odml;
@@ -289,7 +290,8 @@ static int Open( vlc_object_t * p_this )
     p_sys->meta     = NULL;
     TAB_INIT(p_sys->i_attachment, p_sys->attachment);
 
-    stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &p_sys->b_seekable );
+    stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &p_sys->b_fastseekable );
+    stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
 
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux_Seekable;
@@ -661,7 +663,7 @@ static int Open( vlc_object_t * p_this )
     if( i_do_index == 1 ) /* Always fix */
     {
 aviindex:
-        if( p_sys->b_seekable )
+        if( p_sys->b_fastseekable )
         {
             AVI_IndexCreate( p_demux );
         }
@@ -2382,6 +2384,8 @@ static void AVI_IndexLoad_indx( demux_t *p_demux,
         }
         else if( p_indx->i_indextype == AVI_INDEX_OF_INDEXES )
         {
+            if ( !p_sys->b_seekable )
+                return;
             avi_chunk_t    ck_sub;
             for( unsigned i = 0; i < p_indx->i_entriesinuse; i++ )
             {
