@@ -349,8 +349,8 @@ discard:
         return;
     }
 
-    int w = sys->w;
-    int h = sys->h;
+    unsigned w = sys->w;
+    unsigned h = sys->h;
     int x, y;
 
     if (sys->follow_mouse)
@@ -366,9 +366,9 @@ discard:
         if (w == 0 || w > geo->width)
             w = geo->width;
         x = ptr->win_x;
-        if (x < w / 2)
+        if (x < (int)(w / 2))
             x = 0;
-        else if (x >= (int)geo->width - (w / 2))
+        else if (x >= (int)(geo->width - (w / 2)))
             x = geo->width - w;
         else
             x -= w / 2;
@@ -376,9 +376,9 @@ discard:
         if (h == 0 || h > geo->height)
             h = geo->height;
         y = ptr->win_y;
-        if (y < h / 2)
+        if (y < (int)(h / 2))
             y = 0;
-        else if (y >= (int)geo->height - (h / 2))
+        else if (y >= (int)(geo->height - (h / 2)))
             y = geo->height - h;
         else
             y -= h / 2;
@@ -391,14 +391,14 @@ discard:
         max = (int)geo->width - x;
         if (max <= 0)
             goto discard;
-        if (w == 0 || w > max)
+        if (w == 0 || w > (unsigned)max)
             w = max;
 
         y = sys->y;
         max = (int)geo->height - y;
         if (max <= 0)
             goto discard;
-        if (h == 0 || h > max)
+        if (h == 0 || h > (unsigned)max)
             h = max;
     }
 
