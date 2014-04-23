@@ -81,15 +81,18 @@ int OpenMux( vlc_object_t *p_this )
 {
     AVOutputFormat *file_oformat;
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
-    sout_mux_sys_t *p_sys;
-    char *psz_mux;
+    bool dummy = !strcmp( p_mux->p_access->psz_access, "dummy");
+
+    if( dummy && strlen(p_mux->p_access->psz_path)
+                              >= sizeof (((AVFormatContext *)NULL)->filename) )
+        return VLC_EGENERIC;
 
     vlc_init_avformat(p_this);
 
     config_ChainParse( p_mux, "sout-avformat-", ppsz_mux_options, p_mux->p_cfg );
 
     /* Find the requested muxer */
-    psz_mux = var_GetNonEmptyString( p_mux, "sout-avformat-mux" );
+    char *psz_mux = var_InheritString( p_mux, "sout-avformat-mux" );
     if( psz_mux )
     {
         file_oformat = av_guess_format( psz_mux, NULL, NULL );
@@ -106,14 +109,15 @@ int OpenMux( vlc_object_t *p_this )
       return VLC_EGENERIC;
     }
 
-    p_mux->p_sys = p_sys = malloc( sizeof( sout_mux_sys_t ) );
-    if( !p_sys )
+    sout_mux_sys_t *p_sys = malloc( sizeof( sout_mux_sys_t ) );
+    if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
+    p_mux->p_sys = p_sys;
     p_sys->oc = avformat_alloc_context();
     p_sys->oc->oformat = file_oformat;
     /* If we use dummy access, let avformat write output */
-    if( !strcmp( p_mux->p_access->psz_access, "dummy") )
+    if( dummy )
         strcpy( p_sys->oc->filename, p_mux->p_access->psz_path );
 
     /* Create I/O wrapper */
