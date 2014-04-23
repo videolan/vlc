@@ -240,10 +240,6 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
     access_sys_t *p_sys;
     char         *psz, *p;
 
-    /* Only forward an store cookies if the corresponding option is activated */
-    bool   b_forward_cookies = var_InheritBool( p_access, "http-forward-cookies" );
-    vlc_array_t * saved_cookies = b_forward_cookies ? (cookies ? cookies : vlc_array_new()) : NULL;
-
     /* Set up p_access */
     STANDARD_READ_ACCESS_INIT;
 #ifdef HAVE_ZLIB_H
@@ -286,7 +282,11 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
     p_access->info.i_pos  = 0;
     p_access->info.b_eof  = false;
 
-    p_sys->cookies = saved_cookies;
+    /* Only forward an store cookies if the corresponding option is activated */
+    if( var_CreateGetBool( p_access, "http-forward-cookies" ) )
+        p_sys->cookies = (cookies != NULL) ? cookies : vlc_array_new();
+    else
+        p_sys->cookies = NULL;
 
     http_auth_Init( &p_sys->auth );
     http_auth_Init( &p_sys->proxy_auth );
