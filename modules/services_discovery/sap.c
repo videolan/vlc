@@ -856,14 +856,18 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint32_t *i_source, 
     p_input = input_item_NewWithType( p_sap->p_sdp->psz_uri,
                                       p_sdp->psz_sessionname,
                                       0, NULL, 0, -1, ITEM_TYPE_NET );
-    vlc_meta_t *p_meta = vlc_meta_New();
-    vlc_meta_Set( p_meta, vlc_meta_Description, p_sdp->psz_sessioninfo );
-    p_input->p_meta = p_meta;
-    p_sap->p_item = p_input;
-    if( !p_input )
+    if( unlikely(p_input == NULL) )
     {
         free( p_sap );
         return NULL;
+    }
+    p_sap->p_item = p_input;
+
+    vlc_meta_t *p_meta = vlc_meta_New();
+    if( likely(p_meta != NULL) )
+    {
+        vlc_meta_Set( p_meta, vlc_meta_Description, p_sdp->psz_sessioninfo );
+        p_input->p_meta = p_meta;
     }
 
     if( p_sdp->rtcp_port )
