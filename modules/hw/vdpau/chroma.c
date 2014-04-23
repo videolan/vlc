@@ -324,6 +324,8 @@ static picture_t *VideoExport(filter_t *filter, picture_t *src, picture_t *dst)
     void *planes[3];
     uint32_t pitches[3];
 
+    picture_CopyProperties(dst, src);
+
     for (int i = 0; i < dst->i_planes; i++)
     {
         planes[i] = dst->p[i].p_pixels;
@@ -346,7 +348,6 @@ static picture_t *VideoExport(filter_t *filter, picture_t *src, picture_t *dst)
         picture_Release(dst);
         dst = NULL;
     }
-    picture_CopyProperties(dst, src);
     picture_Release(src);
     return dst;
 }
