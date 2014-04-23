@@ -1216,11 +1216,11 @@ static int Request( access_t *p_access, uint64_t i_tell )
     }
 
     /* Authentication */
-    if( p_sys->url.psz_username || p_sys->url.psz_password )
+    if( p_sys->url.psz_username && p_sys->url.psz_password )
         AuthReply( p_access, "", &p_sys->url, &p_sys->auth );
 
     /* Proxy Authentication */
-    if( p_sys->proxy.psz_username || p_sys->proxy.psz_password )
+    if( p_sys->proxy.psz_username && p_sys->proxy.psz_password )
         AuthReply( p_access, "Proxy-", &p_sys->proxy, &p_sys->proxy_auth );
 
     /* ICY meta data request */
