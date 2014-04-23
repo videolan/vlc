@@ -116,7 +116,7 @@ int AccessOpen( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* Split the MRL */
-    psz_path = strdup( p_access->psz_location );
+    psz_path = xstrdup( p_access->psz_location );
     psz_sep = strstr( psz_path, ZIP_SEP );
 
     *psz_sep = '\0';
