@@ -411,6 +411,7 @@ static int Demux( demux_t * p_demux )
             // PASS 0
             if ( p_stream->fmt.i_codec == VLC_CODEC_OPUS ||
                  p_stream->fmt.i_codec == VLC_CODEC_VORBIS ||
+                 p_stream->fmt.i_codec == VLC_CODEC_SPEEX ||
                  p_stream->fmt.i_cat == VIDEO_ES )
             {
                 assert( p_stream->p_prepcr_blocks == NULL );
@@ -483,6 +484,10 @@ static int Demux( demux_t * p_demux )
 
                 switch( p_stream->fmt.i_codec )
                 {
+                case VLC_CODEC_SPEEX:
+                    p_block->i_nb_samples = p_stream->special.speex.i_framesize *
+                            p_stream->special.speex.i_framesperpacket;
+                    break;
                 case VLC_CODEC_OPUS:
                     i_duration = Ogg_OpusPacketDuration( p_stream, &dumb_packet );
                     p_block->i_nb_samples = i_duration;
@@ -510,6 +515,7 @@ static int Demux( demux_t * p_demux )
                 block_t *p_block = p_stream->p_prepcr_blocks[i];
                 switch( p_stream->fmt.i_codec )
                 {
+                case VLC_CODEC_SPEEX:
                 case VLC_CODEC_OPUS:
                 case VLC_CODEC_VORBIS:
                     pagestamp -= CLOCK_FREQ * p_block->i_nb_samples / p_stream->f_rate;
@@ -921,6 +927,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
             p_stream->fmt.i_codec == VLC_CODEC_KATE ||
             p_stream->fmt.i_codec == VLC_CODEC_VP8 ||
             p_stream->fmt.i_codec == VLC_CODEC_DIRAC ||
+            p_stream->fmt.i_codec == VLC_CODEC_SPEEX ||
             (p_stream->b_oggds && p_stream->fmt.i_cat == VIDEO_ES) )
         {
             p_stream->i_pcr = VLC_TS_0 + Oggseek_GranuleToAbsTimestamp( p_stream,
@@ -981,6 +988,16 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
             p_stream->i_pcr += p_ogg->i_nzpcr_offset;
         }
 #endif
+        else if ( p_stream->fmt.i_codec == VLC_CODEC_SPEEX &&
+                  p_stream->i_previous_granulepos > 0 )
+        {
+            i_duration = p_stream->special.speex.i_framesize *
+                         p_stream->special.speex.i_framesperpacket;
+            p_oggpacket->granulepos = p_stream->i_previous_granulepos + i_duration;
+            p_stream->i_pcr = VLC_TS_0 + Oggseek_GranuleToAbsTimestamp( p_stream,
+                                    p_stream->i_previous_granulepos, false );
+            p_stream->i_pcr += p_ogg->i_nzpcr_offset;
+        }
         else if( p_stream->fmt.i_codec == VLC_CODEC_OPUS &&
                  p_stream->i_previous_granulepos > 0 &&
                  ( i_duration =
@@ -1494,9 +1511,11 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 {
                     if ( Ogg_ReadSpeexHeader( p_stream, &oggpacket ) )
                         msg_Dbg( p_demux, "found speex header, channels: %i, "
-                                "rate: %i,  bitrate: %i",
+                                "rate: %i,  bitrate: %i, frames: %i group %i",
                                 p_stream->fmt.audio.i_channels,
-                                (int)p_stream->f_rate, p_stream->fmt.i_bitrate );
+                                (int)p_stream->f_rate, p_stream->fmt.i_bitrate,
+                                p_stream->special.speex.i_framesize,
+                                p_stream->special.speex.i_framesperpacket );
                     else
                     {
                         msg_Dbg( p_demux, "found invalid Speex header" );
@@ -2538,9 +2557,11 @@ static bool Ogg_ReadSpeexHeader( logical_stream_t *p_stream,
     p_stream->fmt.audio.i_channels = oggpack_read( &opb, 32 );
     fill_channels_info(&p_stream->fmt.audio);
     p_stream->fmt.i_bitrate = oggpack_read( &opb, 32 );
-    oggpack_adv( &opb, 32 ); /* frame_size */
+    p_stream->special.speex.i_framesize =
+            oggpack_read( &opb, 32 ); /* frame_size */
     oggpack_adv( &opb, 32 ); /* vbr */
-    oggpack_adv( &opb, 32 ); /* frames_per_packet */
+    p_stream->special.speex.i_framesperpacket =
+            oggpack_read( &opb, 32 ); /* frames_per_packet */
     p_stream->i_extra_headers_packets = oggpack_read( &opb, 32 ); /* extra_headers */
     return true;
 }

@@ -729,6 +729,14 @@ int64_t Oggseek_GranuleToAbsTimestamp( logical_stream_t *p_stream,
         i_timestamp = i_granule * CLOCK_FREQ / p_stream->f_rate;
         break;
     }
+    case VLC_CODEC_SPEEX:
+    {
+        if ( b_presentation )
+            i_granule -= p_stream->special.speex.i_framesize *
+                         p_stream->special.speex.i_framesperpacket;
+        i_timestamp = i_granule * CLOCK_FREQ / p_stream->f_rate;
+        break;
+    }
     }
 
     return i_timestamp;

@@ -140,6 +140,11 @@ typedef struct logical_stream_s
         {
             bool b_interlaced;
         } dirac;
+        struct
+        {
+            int32_t i_framesize;
+            int32_t i_framesperpacket;
+        } speex;
     } special;
 
 } logical_stream_t;
