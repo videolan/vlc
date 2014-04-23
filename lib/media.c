@@ -113,15 +113,14 @@ static void input_item_subitem_added( const vlc_event_t *p_event,
                 p_event->u.input_item_subitem_added.p_new_child );
 
     /* Add this to our media list */
-    if( !p_md->p_subitems )
+    if( p_md->p_subitems == NULL )
     {
         p_md->p_subitems = libvlc_media_list_new( p_md->p_libvlc_instance );
+        if( unlikely(p_md->p_subitems == NULL) )
+            abort();
         libvlc_media_list_set_media( p_md->p_subitems, p_md );
     }
-    if( p_md->p_subitems )
-    {
-        libvlc_media_list_add_media( p_md->p_subitems, p_md_child );
-    }
+    libvlc_media_list_add_media( p_md->p_subitems, p_md_child );
 
     /* Construct the event */
     event.type = libvlc_MediaSubItemAdded;
