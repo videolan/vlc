@@ -247,7 +247,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 
 error_out:
     /* Clean up, if an error occurred */
-    if( status != VLC_SUCCESS && p_sys != NULL )
+    if( status != VLC_SUCCESS )
     {
         if( p_sys->p_jack_client )
         {
