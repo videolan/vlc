@@ -258,14 +258,13 @@ static void ReadMetaFromASF( ASF::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
             TAB_APPEND_CAST( (input_attachment_t**),
                              p_demux_meta->i_attachments, p_demux_meta->attachments,
                              p_attachment );
-        free( psz_name );
-
         char *psz_url;
-        if( asprintf( &psz_url, "attachment://%s",
-                      p_attachment->psz_name ) == -1 )
-            continue;
-        vlc_meta_SetArtURL( p_meta, psz_url );
-        free( psz_url );
+        if( asprintf( &psz_url, "attachment://%s", psz_name ) != -1 )
+        {
+            vlc_meta_SetArtURL( p_meta, psz_url );
+            free( psz_url );
+        }
+        free( psz_name );
     }
 #endif
 }
