@@ -144,7 +144,7 @@ static void Poll (snd_pcm_t *pcm, int canc)
     do
     {
         vlc_restorecancel (canc);
-        poll (ufd, n, -1);
+        while (poll (ufd, n, -1) == -1);
         canc = vlc_savecancel ();
         snd_pcm_poll_descriptors_revents (pcm, ufd, n, &revents);
     }
