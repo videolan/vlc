@@ -446,17 +446,6 @@ handle_root ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this )
  * PropertiesChangedSignal() synthetizes and sends the
  * org.freedesktop.DBus.Properties.PropertiesChanged signal
  */
-
-#define PROPERTY_MAPPING_BEGIN if( 0 ) {}
-#define PROPERTY_ENTRY( prop, signature ) \
-    else if( !strcmp( ppsz_properties[i], #prop ) ) \
-    { \
-        if( VLC_SUCCESS != AddProperty( (intf_thread_t*) p_intf, \
-                    &changed_properties, #prop, signature, Marshal##prop ) ) \
-            return DBUS_HANDLER_RESULT_NEED_MEMORY; \
-    }
-#define PROPERTY_MAPPING_END else { return DBUS_HANDLER_RESULT_NOT_YET_HANDLED; }
-
 static DBusHandlerResult
 PropertiesChangedSignal( intf_thread_t    *p_intf,
                          vlc_dictionary_t *p_changed_properties )
@@ -489,10 +478,9 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
 
     for( int i = 0; i < i_properties; i++ )
     {
-        PROPERTY_MAPPING_BEGIN
-        PROPERTY_ENTRY( Fullscreen, "b" )
-        PROPERTY_MAPPING_END
-
+        if( !strcmp( ppsz_properties[i], "Fullscreen" ) )
+             AddProperty( p_intf, &changed_properties, "Fullscreen", "b",
+                          MarshalFullscreen );
         free( ppsz_properties[i] );
     }
     free( ppsz_properties );
