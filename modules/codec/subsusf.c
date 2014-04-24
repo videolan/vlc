@@ -1065,12 +1065,10 @@ static char *StripTags( char *psz_subtitle )
 
         psz_subtitle++;
     }
-    *psz_text = '\0';
+    *psz_text++ = '\0';
 
-    char *psz = realloc( psz_text_start, strlen( psz_text_start ) + 1 );
-    if( psz ) psz_text_start = psz;
-
-    return psz_text_start;
+    char *psz = realloc( psz_text_start, psz_text - psz_text_start );
+    return likely(psz != NULL) ? psz : psz_text_start;
 }
 
 /* Turn a HTML subtitle, turn into a plain-text version,
