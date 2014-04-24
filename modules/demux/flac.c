@@ -109,7 +109,16 @@ static int Open( vlc_object_t * p_this )
 
     if( p_peek[0]!='f' || p_peek[1]!='L' || p_peek[2]!='a' || p_peek[3]!='C' )
     {
-        if( !p_demux->b_force ) return VLC_EGENERIC;
+        if( !p_demux->b_force )
+        {
+            char *psz_mime = stream_ContentType( p_demux->s );
+            if ( !psz_mime || strcmp( psz_mime, "audio/flac" ) )
+            {
+                free( psz_mime );
+                return VLC_EGENERIC;
+            }
+            free( psz_mime );
+        }
 
         /* User forced */
         msg_Err( p_demux, "this doesn't look like a flac stream, "
