@@ -467,8 +467,6 @@ static void *Thread( void *p_data )
     assert(0);
 
 error:
-    if (gl)
-        vlc_gl_ReleaseCurrent( gl );
     p_sys->b_error = true;
     vlc_sem_post( &p_sys->ready );
     return NULL;
