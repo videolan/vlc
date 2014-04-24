@@ -93,6 +93,7 @@ static char *ParseText(const uint8_t *data, size_t size, const char *charset)
             break;
         if (code == 0x7f)
             continue;
+        /* TODO: italics begin/end 0x80/0x81, underline being/end 0x82/0x83 */
         if (code & 0x60)
             text[text_size++] = code;
         if (code == 0x8a)
