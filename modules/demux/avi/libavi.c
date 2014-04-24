@@ -433,7 +433,7 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
 
                 /* stay within VLC's limits */
                 p_chk->strf.vids.p_bih->biClrUsed =
-                    __MAX( VIDEO_PALETTE_COLORS_MAX, p_chk->strf.vids.p_bih->biClrUsed );
+                    __MIN( VIDEO_PALETTE_COLORS_MAX, p_chk->strf.vids.p_bih->biClrUsed );
             }
             else p_chk->strf.vids.p_bih->biClrUsed = 0;
 #ifdef AVI_DEBUG
