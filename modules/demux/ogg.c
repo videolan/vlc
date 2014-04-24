@@ -204,7 +204,19 @@ static int Open( vlc_object_t * p_this )
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
     if( !p_demux->b_force && memcmp( p_peek, "OggS", 4 ) )
     {
-        return VLC_EGENERIC;
+        char *psz_mime = stream_ContentType( p_demux->s );
+        if( !psz_mime )
+        {
+            return VLC_EGENERIC;
+        }
+        else if ( strcmp( psz_mime, "application/ogg" ) &&
+                  strcmp( psz_mime, "video/ogg" ) &&
+                  strcmp( psz_mime, "audio/ogg" ) )
+        {
+            free( psz_mime );
+            return VLC_EGENERIC;
+        }
+        free( psz_mime );
     }
 
     /* */
