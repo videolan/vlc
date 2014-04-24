@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ios2.m: iOS OpenGL ES 2 provider
  *****************************************************************************
- * Copyright (C) 2001-2013 VLC authors and VideoLAN
+ * Copyright (C) 2001-2014 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont at videolan dot org>
@@ -152,11 +152,13 @@ static int Open(vlc_object_t *this)
 
     [sys->glESView setVoutDisplay:vd];
 
-    [sys->viewContainer performSelectorOnMainThread:@selector(addSubview:) withObject:sys->glESView waitUntilDone:YES];
+    [sys->viewContainer performSelectorOnMainThread:@selector(addSubview:)
+                                         withObject:sys->glESView
+                                      waitUntilDone:YES];
 
     /* add tap gesture recognizer for DVD menus and stuff */
-    //self.userInteractionEnabled = YES;
-    sys->tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:sys->glESView action:@selector(tapRecognized:)];
+    sys->tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:sys->glESView
+                                                                 action:@selector(tapRecognized:)];
     sys->tapRecognizer.numberOfTapsRequired = 2;
     if (sys->viewContainer.window) {
         if (sys->viewContainer.window.rootViewController) {
@@ -175,7 +177,7 @@ static int Open(vlc_object_t *this)
     const vlc_fourcc_t *subpicture_chromas;
     video_format_t fmt = vd->fmt;
 
-    sys->vgl = vout_display_opengl_New (&vd->fmt, &subpicture_chromas, &sys->gl);
+    sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas, &sys->gl);
     if (!sys->vgl) {
         sys->gl.sys = NULL;
         goto bailout;
@@ -202,9 +204,17 @@ static int Open(vlc_object_t *this)
     vout_display_SendEventDisplaySize(vd, (int)viewSize.width, (int)viewSize.height, false);
 
     /* */
-    [[NSNotificationCenter defaultCenter] addObserver:sys->glESView selector:@selector(applicationStateChanged:) name:UIApplicationWillResignActiveNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:sys->glESView selector:@selector(applicationStateChanged:) name:UIApplicationDidBecomeActiveNotification object:nil];
-    [sys->glESView performSelectorOnMainThread:@selector(reshape) withObject:nil waitUntilDone:YES];
+    [[NSNotificationCenter defaultCenter] addObserver:sys->glESView
+                                             selector:@selector(applicationStateChanged:)
+                                                 name:UIApplicationWillResignActiveNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:sys->glESView
+                                             selector:@selector(applicationStateChanged:)
+                                                 name:UIApplicationDidBecomeActiveNotification
+                                               object:nil];
+    [sys->glESView performSelectorOnMainThread:@selector(reshape)
+                                    withObject:nil
+                                 waitUntilDone:YES];
 
     [autoreleasePool release];
     return VLC_SUCCESS;
@@ -277,8 +287,8 @@ static int Control(vout_display_t *vd, int query, va_list ap)
                 cfg = (const vout_display_cfg_t*)va_arg(ap, const vout_display_cfg_t *);
             }
 
-            /* we always use our current frame here, because we have some size constraints
-             in the ui vout provider */
+            /* we don't adapt anything here regardless of what the vout core
+             * wants since we are not in a traditional desktop window */
             if (!cfg)
                 return VLC_EGENERIC;
 
@@ -286,7 +296,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             CGSize viewSize;
             viewSize = [sys->glESView bounds].size;
 
-            /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
+            /* on HiDPI displays, the point bounds don't equal the actual pixels */
             CGFloat scaleFactor = sys->glESView.contentScaleFactor;
             cfg_tmp.display.width = viewSize.width * scaleFactor;
             cfg_tmp.display.height = viewSize.height * scaleFactor;
@@ -296,12 +306,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             @synchronized (sys->glESView) {
                 sys->place = place;
             }
-
-            /* For resize, we call glViewport in reshape and not here.
-             This has the positive side effect that we avoid erratic sizing as we animate every resize. */
-/*            if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
-                // x / y are top left corner, but we need the lower left one
-                glViewport(place.x, cfg_tmp.display.height - (place.y + place.height), place.width, place.height);*/
 
             [autoreleasePool release];
             return VLC_SUCCESS;
@@ -384,7 +388,7 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
 - (id)initWithFrame:(CGRect)frame
 {
-    self = [super initWithFrame:frame]; // perform selector on main thread?
+    self = [super initWithFrame:frame];
 
     if (!self)
         return nil;
@@ -473,9 +477,6 @@ static void OpenglESSwap(vlc_gl_t *gl)
     _bufferNeedReset = YES;
 }
 
-/**
- * Method called by Cocoa when the view is resized.
- */
 - (void)reshape
 {
     assert([[NSThread currentThread] isMainThread]);
@@ -496,7 +497,9 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
             vout_display_PlacePicture(&place, &_voutDisplay->source, &cfg_tmp, false);
             _voutDisplay->sys->place = place;
-            vout_display_SendEventDisplaySize(_voutDisplay, viewSize.width * scaleFactor, viewSize.height * scaleFactor, _voutDisplay->cfg->is_fullscreen);
+            vout_display_SendEventDisplaySize(_voutDisplay, viewSize.width * scaleFactor,
+                                              viewSize.height * scaleFactor,
+                                              _voutDisplay->cfg->is_fullscreen);
         }
     }
 
@@ -518,7 +521,9 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
 - (void)applicationStateChanged:(NSNotification *)notification
 {
-    if ([[notification name] isEqualToString:UIApplicationWillResignActiveNotification] || [[notification name] isEqualToString:UIApplicationDidEnterBackgroundNotification] || [[notification name] isEqualToString:UIApplicationWillTerminateNotification])
+    if ([[notification name] isEqualToString:UIApplicationWillResignActiveNotification]
+        || [[notification name] isEqualToString:UIApplicationDidEnterBackgroundNotification]
+        || [[notification name] isEqualToString:UIApplicationWillTerminateNotification])
         _appActive = NO;
     else
         _appActive = YES;
