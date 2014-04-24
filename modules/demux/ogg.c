@@ -394,6 +394,8 @@ static int Demux( demux_t * p_demux )
             {
                 msg_Err( p_demux, "Broken Ogg stream (serialno) mismatch" );
                 Ogg_ResetStream( p_stream );
+                p_sys->i_nzpcr_offset = (p_sys->i_pcr >= VLC_TS_INVALID) ?
+                                         p_sys->i_pcr - VLC_TS_0 : 0;
                 ogg_stream_reset_serialno( &p_stream->os, ogg_page_serialno( &p_sys->current_page ) );
             }
 
