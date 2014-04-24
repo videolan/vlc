@@ -567,9 +567,11 @@ int rtp_packetize_xiph_config( sout_stream_id_sys_t *id, const char *fmtp,
     int i_data;
 
     i_data = vlc_b64_decode_binary(&p_orig, b64);
-    if (i_data == 0)
+    if (i_data <= 9)
+    {
+        free(p_orig);
         return VLC_EGENERIC;
-    assert(i_data > 9);
+    }
     p_data = p_orig + 9;
     i_data -= 9;
 
