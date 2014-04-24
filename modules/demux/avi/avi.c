@@ -709,7 +709,7 @@ aviindex:
                            "approximative or will exhibit strange behavior" );
         if( (i_do_index == 0 || i_do_index == 3) && !b_index )
         {
-            if( !p_sys->b_seekable ) {
+            if( !p_sys->b_fastseekable ) {
                 b_index = true;
                 goto aviindex;
             }
