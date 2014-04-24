@@ -142,32 +142,32 @@ static int Open (vlc_object_t *p_this)
     /* store for later, released in Close() */
     sys->container = [container retain];
 
-	dispatch_sync(dispatch_get_main_queue(), ^{
-		[CATransaction begin];
-		sys->cgLayer = [[VLCCAOpenGLLayer alloc] init];
-		[sys->cgLayer setVoutDisplay:vd];
-		[sys->cgLayer display];		// TODO: Find a better way to wait until we get a context
-	    if ([container respondsToSelector:@selector(addVoutLayer:)]) {
-	        msg_Dbg(vd, "container implements implicit protocol");
-	        [container addVoutLayer:sys->cgLayer];
-	    } else if ([container respondsToSelector:@selector(addSublayer:)] || [container isKindOfClass:[CALayer class]]) {
-	        msg_Dbg(vd, "container doesn't implement implicit protocol, fallback mode used");
-	        [container addSublayer:sys->cgLayer];
-	    } else {
-	        msg_Err(vd, "Provided NSObject container isn't compatible");
-			[sys->cgLayer release];
-			sys->cgLayer = nil;
-	    }
-		[CATransaction commit];
-	});
+    [CATransaction begin];
+    sys->cgLayer = [[VLCCAOpenGLLayer alloc] init];
+    [sys->cgLayer setVoutDisplay:vd];
+
+    [sys->cgLayer performSelectorOnMainThread:@selector(display) withObject:nil waitUntilDone:YES];
+
+    if ([container respondsToSelector:@selector(addVoutLayer:)]) {
+        msg_Dbg(vd, "container implements implicit protocol");
+        [container addVoutLayer:sys->cgLayer];
+    } else if ([container respondsToSelector:@selector(addSublayer:)] || [container isKindOfClass:[CALayer class]]) {
+        msg_Dbg(vd, "container doesn't implement implicit protocol, fallback mode used");
+        [container addSublayer:sys->cgLayer];
+    } else {
+        msg_Err(vd, "Provided NSObject container isn't compatible");
+        [sys->cgLayer release];
+        sys->cgLayer = nil;
+        [CATransaction commit];
+        goto bailout;
+    }
+    [CATransaction commit];
 
     if (!sys->cgLayer)
         goto bailout;
 
-    if (!sys->glContext) {
-        msg_Err(vd, "Have no gl context");
-        goto bailout;
-    }
+    if (!sys->glContext)
+        msg_Warn(vd, "we might not have an OpenGL context yet");
 
     /* Initialize common OpenGL video display */
     sys->gl.lock = OpenglLock;
@@ -335,6 +335,10 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             *gl = &sys->gl;
             return VLC_SUCCESS;
         }
+        case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
+        {
+            return VLC_SUCCESS;
+        }
 
         case VOUT_DISPLAY_RESET_PICTURES:
             assert (0);
@@ -418,9 +422,9 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
 {
     [super resizeWithOldSuperlayerSize: size];
 
-    CGRect bounds = self.bounds;
+    CGSize boundsSize = self.bounds.size;
     if (_vd)
-        vout_display_SendEventDisplaySize(_vd, bounds.size.width, bounds.size.height, _vd->cfg->is_fullscreen);
+        vout_display_SendEventDisplaySize(_vd, boundsSize.width, boundsSize.height, _vd->cfg->is_fullscreen);
 }
 
 - (BOOL)canDrawInCGLContext:(CGLContextObj)glContext pixelFormat:(CGLPixelFormatObj)pixelFormat forLayerTime:(CFTimeInterval)timeInterval displayTime:(const CVTimeStamp *)timeStamp
