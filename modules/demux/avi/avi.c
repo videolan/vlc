@@ -175,6 +175,8 @@ struct demux_sys_t
 
     bool  b_seekable;
     bool  b_fastseekable;
+    bool  b_indexloaded; /* if we read indexes from end of file before starting */
+    uint32_t i_avih_flags;
     avi_chunk_t ck_root;
 
     bool  b_odml;
@@ -374,6 +376,7 @@ static int Open( vlc_object_t * p_this )
              p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
 
     AVI_MetaLoad( p_demux, p_riff, p_avih );
+    p_sys->i_avih_flags = p_avih->i_flags;
 
     /* now read info on each stream and create ES */
     for( i = 0 ; i < i_track; i++ )
@@ -1426,19 +1429,48 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
 
     if( p_sys->b_seekable )
     {
+        int64_t i_pos_backup = stream_Tell( p_demux->s );
+
+        /* Check and lazy load indexes if it was not done (not fastseekable) */
+        if ( !p_sys->b_indexloaded && ( p_sys->i_avih_flags & AVIF_HASINDEX ) )
+        {
+            avi_chunk_t *p_riff = AVI_ChunkFind( &p_sys->ck_root, AVIFOURCC_RIFF, 0 );
+            if (unlikely( !p_riff ))
+                return VLC_EGENERIC;
+
+            int i_ret = AVI_ChunkFetchIndexes( p_demux->s, p_riff );
+            if ( i_ret )
+            {
+                /* Go back to position before index failure */
+                if ( stream_Tell( p_demux->s ) - i_pos_backup )
+                    stream_Seek( p_demux->s, i_pos_backup );
+
+                if ( p_sys->i_avih_flags & AVIF_MUSTUSEINDEX )
+                    return VLC_EGENERIC;
+            }
+            else AVI_IndexLoad( p_demux );
+
+            p_sys->b_indexloaded = true; /* we don't want to try each time */
+        }
+
         if( !p_sys->i_length )
         {
             avi_track_t *p_stream = NULL;
             unsigned i_stream = 0;
             int64_t i_pos;
 
+            if ( !p_sys->i_movi_lastchunk_pos && /* set when index is successfully loaded */
+                 ! ( p_sys->i_avih_flags & AVIF_ISINTERLEAVED ) )
+            {
+                msg_Err( p_demux, "seeking without index at %d%%"
+                         " only works for interleaved files", i_percent );
+                goto failandresetpos;
+            }
             /* use i_percent to create a true i_date */
-            msg_Warn( p_demux, "seeking without index at %d%%"
-                      " only works for interleaved files", i_percent );
             if( i_percent >= 100 )
             {
                 msg_Warn( p_demux, "cannot seek so far !" );
-                return VLC_EGENERIC;
+                goto failandresetpos;
             }
             i_percent = __MAX( i_percent, 0 );
 
@@ -1460,14 +1492,14 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
             if( p_stream == NULL )
             {
                 msg_Warn( p_demux, "cannot find any selected stream" );
-                return VLC_EGENERIC;
+                goto failandresetpos;
             }
 
             /* be sure that the index exist */
             if( AVI_StreamChunkSet( p_demux, i_stream, 0 ) )
             {
                 msg_Warn( p_demux, "cannot seek" );
-                return VLC_EGENERIC;
+                goto failandresetpos;
             }
 
             while( i_pos >= p_stream->idx.p_entry[p_stream->i_idxposc].i_pos +
@@ -1478,7 +1510,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
                                         i_stream, p_stream->i_idxposc + 1 ) )
                 {
                     msg_Warn( p_demux, "cannot seek" );
-                    return VLC_EGENERIC;
+                    goto failandresetpos;
                 }
             }
 
@@ -1501,6 +1533,13 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
         p_sys->i_time = i_date;
         msg_Dbg( p_demux, "seek: %"PRId64" seconds", p_sys->i_time /1000000 );
         return VLC_SUCCESS;
+
+failandresetpos:
+        /* Go back to position before index failure */
+        if ( stream_Tell( p_demux->s ) - i_pos_backup )
+            stream_Seek( p_demux->s, i_pos_backup );
+
+        return VLC_EGENERIC;
     }
     else
     {
@@ -2296,6 +2335,8 @@ static int AVI_IndexLoad_idx1( demux_t *p_demux,
     if( AVI_IndexFind_idx1( p_demux, &p_idx1, &i_offset ) )
         return VLC_EGENERIC;
 
+    p_sys->b_indexloaded = true;
+
     for( unsigned i_index = 0; i_index < p_idx1->i_entry_count; i_index++ )
     {
         unsigned i_cat;
@@ -2324,6 +2365,8 @@ static void __Parse_indx( demux_t *p_demux, avi_index_t *p_index, off_t *pi_max_
                           avi_chunk_indx_t *p_indx )
 {
     avi_entry_t index;
+
+    p_demux->p_sys->b_indexloaded = true;
 
     msg_Dbg( p_demux, "loading subindex(0x%x) %d entries", p_indx->i_indextype, p_indx->i_entriesinuse );
     if( p_indx->i_indexsubtype == 0 )

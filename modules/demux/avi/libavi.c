@@ -202,6 +202,56 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
     return VLC_SUCCESS;
 }
 
+/* Allow to append indexes after starting playback */
+int AVI_ChunkFetchIndexes( stream_t *s, avi_chunk_t *p_riff )
+{
+    avi_chunk_t *p_movi = AVI_ChunkFind( p_riff, AVIFOURCC_movi, 0 );
+    if ( !p_movi )
+        return VLC_EGENERIC;
+
+    avi_chunk_t *p_chk;
+    uint64_t i_indexpos = 8 + p_movi->common.i_chunk_pos + p_movi->common.i_chunk_size;
+    bool b_seekable = false;
+    int i_ret = VLC_SUCCESS;
+
+    stream_Control( s, STREAM_CAN_SEEK, &b_seekable );
+    if ( !b_seekable || stream_Seek( s, i_indexpos ) )
+        return VLC_EGENERIC;
+
+    for( ; ; )
+    {
+        p_chk = xmalloc( sizeof( avi_chunk_t ) );
+        memset( p_chk, 0, sizeof( avi_chunk_t ) );
+        if (unlikely( !p_riff->common.p_first ))
+            p_riff->common.p_first = p_chk;
+        else
+            p_riff->common.p_last->common.p_next = p_chk;
+        p_riff->common.p_last = p_chk;
+
+        i_ret = AVI_ChunkRead( s, p_chk, p_riff );
+        if( i_ret )
+            break;
+
+        if( p_chk->common.p_father->common.i_chunk_size > 0 &&
+           ( stream_Tell( s ) >
+              (off_t)p_chk->common.p_father->common.i_chunk_pos +
+               (off_t)__EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
+        {
+            break;
+        }
+
+        /* If we can't seek then stop when we 've found any index */
+        if( p_chk->common.i_chunk_fourcc == AVIFOURCC_indx ||
+            p_chk->common.i_chunk_fourcc == AVIFOURCC_idx1 )
+        {
+            break;
+        }
+
+    }
+
+    return i_ret;
+}
+
 #define AVI_READCHUNK_ENTER \
     int64_t i_read = __EVEN(p_chk->common.i_chunk_size ) + 8; \
     if( i_read > 100000000 ) \
