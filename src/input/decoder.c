@@ -809,6 +809,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
             {
                 es_format_Clean( &p_owner->p_packetizer->fmt_in );
                 vlc_object_release( p_owner->p_packetizer );
+                p_owner->p_packetizer = NULL;
             }
         }
     }
