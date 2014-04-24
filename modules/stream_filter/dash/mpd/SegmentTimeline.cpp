@@ -56,17 +56,16 @@ void dash::mpd::SegmentTimeline::setTimescale(int timescale)
 
 void dash::mpd::SegmentTimeline::addElement(dash::mpd::SegmentTimeline::Element *e)
 {
-    int64_t         offset = 0;
-    for ( int i = 0; i <= e->r; ++i )
+    int64_t offset = 0;
+
+    for ( int i = 0; i < e->r; ++i )
     {
         this->elements.push_back( e );
-        if ( i < e->r )
-        {
-            e = new SegmentTimeline::Element( *e );
-            offset += e->d;
-            e->t += offset;
-        }
+        e = new SegmentTimeline::Element( *e );
+        offset += e->d;
+        e->t += offset;
     }
+    this->elements.push_back( e );
 }
 
 const SegmentTimeline::Element*    SegmentTimeline::getElement( unsigned int index ) const
