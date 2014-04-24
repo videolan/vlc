@@ -366,8 +366,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             }
 
             if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE && is_forced
-                && (cfg->display.width != vd->cfg->display.width
-                    || cfg->display.height != vd->cfg->display.height)
                 && vout_window_SetSize (sys->embed, cfg->display.width, cfg->display.height)) {
                 [o_pool release];
                 return VLC_EGENERIC;
