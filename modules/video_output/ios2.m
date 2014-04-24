@@ -100,6 +100,7 @@ struct vout_display_sys_t
 {
     VLCOpenGLES2VideoView *glESView;
     UIView* viewContainer;
+    UITapGestureRecognizer *tapRecognizer;
 
     vlc_gl_t gl;
     vout_display_opengl_t *vgl;
@@ -153,6 +154,18 @@ static int Open(vlc_object_t *this)
 
     [sys->viewContainer performSelectorOnMainThread:@selector(addSubview:) withObject:sys->glESView waitUntilDone:YES];
 
+    /* add tap gesture recognizer for DVD menus and stuff */
+    //self.userInteractionEnabled = YES;
+    sys->tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:sys->glESView action:@selector(tapRecognized:)];
+    sys->tapRecognizer.numberOfTapsRequired = 2;
+    if (sys->viewContainer.window) {
+        if (sys->viewContainer.window.rootViewController) {
+            if (sys->viewContainer.window.rootViewController.view)
+                [sys->viewContainer.superview addGestureRecognizer:sys->tapRecognizer];
+        }
+    }
+    sys->tapRecognizer.cancelsTouchesInView = NO;
+
     /* Initialize common OpenGL video display */
     sys->gl.lock = OpenglESClean;
     sys->gl.unlock = nil;
@@ -173,6 +186,7 @@ static int Open(vlc_object_t *this)
     info.has_pictures_invalid = false;
     info.has_event_thread = true;
     info.subpicture_chromas = subpicture_chromas;
+    info.has_hide_mouse = false;
 
     /* Setup vout_display_t once everything is fine */
     vd->info = info;
@@ -181,6 +195,11 @@ static int Open(vlc_object_t *this)
     vd->prepare = PictureRender;
     vd->display = PictureDisplay;
     vd->control = Control;
+
+    /* forward our dimensions to the vout core */
+    CGSize viewSize = sys->viewContainer.frame.size;
+    vout_display_SendEventFullscreen(vd, false);
+    vout_display_SendEventDisplaySize(vd, (int)viewSize.width, (int)viewSize.height, false);
 
     /* */
     [[NSNotificationCenter defaultCenter] addObserver:sys->glESView selector:@selector(applicationStateChanged:) name:UIApplicationWillResignActiveNotification object:nil];
@@ -200,6 +219,11 @@ void Close (vlc_object_t *this)
 {
     vout_display_t *vd = (vout_display_t *)this;
     vout_display_sys_t *sys = vd->sys;
+
+    if (sys->tapRecognizer) {
+        [sys->glESView removeGestureRecognizer:sys->tapRecognizer];
+        [sys->tapRecognizer release];
+    }
 
     [sys->glESView setVoutDisplay:nil];
 
@@ -226,10 +250,11 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     vout_display_sys_t *sys = vd->sys;
 
     switch (query) {
+        case VOUT_DISPLAY_HIDE_MOUSE:
+            return VLC_EGENERIC;
+
         case VOUT_DISPLAY_CHANGE_FULLSCREEN:
         case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
-        case VOUT_DISPLAY_HIDE_MOUSE:
-            return VLC_SUCCESS;
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
@@ -243,7 +268,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 
             const vout_display_cfg_t *cfg;
             const video_format_t *source;
-            bool is_forced = false;
 
             if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
                 source = (const video_format_t *)va_arg(ap, const video_format_t *);
@@ -251,25 +275,21 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             } else {
                 source = &vd->source;
                 cfg = (const vout_display_cfg_t*)va_arg(ap, const vout_display_cfg_t *);
-                if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
-                    is_forced = (bool)va_arg(ap, int);
             }
-
-            if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE && is_forced
-                && (cfg->display.width != vd->cfg->display.width
-                    || cfg->display.height != vd->cfg->display.height))
-                return VLC_EGENERIC;
 
             /* we always use our current frame here, because we have some size constraints
              in the ui vout provider */
+            if (!cfg)
+                return VLC_EGENERIC;
+
             vout_display_cfg_t cfg_tmp = *cfg;
-            CGRect bounds;
-            bounds = [sys->glESView bounds];
+            CGSize viewSize;
+            viewSize = [sys->glESView bounds].size;
 
             /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
             CGFloat scaleFactor = sys->glESView.contentScaleFactor;
-            cfg_tmp.display.width = bounds.size.width * scaleFactor;
-            cfg_tmp.display.height = bounds.size.height * scaleFactor;
+            cfg_tmp.display.width = viewSize.width * scaleFactor;
+            cfg_tmp.display.height = viewSize.height * scaleFactor;
 
             vout_display_place_t place;
             vout_display_PlacePicture(&place, source, &cfg_tmp, false);
@@ -279,9 +299,9 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 
             /* For resize, we call glViewport in reshape and not here.
              This has the positive side effect that we avoid erratic sizing as we animate every resize. */
-            if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
+/*            if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
                 // x / y are top left corner, but we need the lower left one
-                glViewport(place.x, cfg_tmp.display.height - (place.y + place.height), place.width, place.height);
+                glViewport(place.x, cfg_tmp.display.height - (place.y + place.height), place.width, place.height);*/
 
             [autoreleasePool release];
             return VLC_SUCCESS;
@@ -297,7 +317,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_RESET_PICTURES:
             assert (0);
         default:
-            msg_Err(vd, "Unknown request %i in iOS ES 2 vout display", query);
+            msg_Err(vd, "Unknown request %d", query);
             return VLC_EGENERIC;
     }
 }
@@ -462,8 +482,7 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
     [EAGLContext setCurrentContext:_eaglContext];
 
-    CGRect bounds;
-    bounds = [self bounds];
+    CGSize viewSize = [self bounds].size;
 
     vout_display_place_t place;
 
@@ -472,17 +491,29 @@ static void OpenglESSwap(vlc_gl_t *gl)
             vout_display_cfg_t cfg_tmp = *(_voutDisplay->cfg);
             CGFloat scaleFactor = self.contentScaleFactor;
 
-            cfg_tmp.display.width  = bounds.size.width * scaleFactor;
-            cfg_tmp.display.height = bounds.size.height * scaleFactor;
+            cfg_tmp.display.width  = viewSize.width * scaleFactor;
+            cfg_tmp.display.height = viewSize.height * scaleFactor;
 
             vout_display_PlacePicture(&place, &_voutDisplay->source, &cfg_tmp, false);
             _voutDisplay->sys->place = place;
-            vout_display_SendEventDisplaySize(_voutDisplay, bounds.size.width * scaleFactor, bounds.size.height * scaleFactor, _voutDisplay->cfg->is_fullscreen);
+            vout_display_SendEventDisplaySize(_voutDisplay, viewSize.width * scaleFactor, viewSize.height * scaleFactor, _voutDisplay->cfg->is_fullscreen);
         }
     }
 
     // x / y are top left corner, but we need the lower left one
     glViewport(place.x, place.y, place.width, place.height);
+}
+
+- (void)tapRecognized:(UITapGestureRecognizer *)tapRecognizer
+{
+    UIGestureRecognizerState state = [tapRecognizer state];
+    CGPoint touchPoint = [tapRecognizer locationInView:self];
+    vout_display_SendMouseMovedDisplayCoordinates(_voutDisplay, ORIENT_NORMAL,
+                                                  (int)touchPoint.x, (int)touchPoint.y,
+                                                  &_voutDisplay->sys->place);
+
+    vout_display_SendEventMousePressed(_voutDisplay, MOUSE_BUTTON_LEFT);
+    vout_display_SendEventMouseReleased(_voutDisplay, MOUSE_BUTTON_LEFT);
 }
 
 - (void)applicationStateChanged:(NSNotification *)notification
