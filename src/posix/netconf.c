@@ -89,6 +89,7 @@ char *vlc_getProxyUrl(const char *url)
              ssize_t val = read(fd[0], buf + len, sizeof (buf) - len);
              if (val <= 0)
                  break;
+             len += val;
         }
         while (len < sizeof (buf));
 
