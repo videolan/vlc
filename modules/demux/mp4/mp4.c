@@ -3529,8 +3529,6 @@ static mp4_track_t *MP4_frg_GetTrackByID( demux_t *p_demux, const uint32_t tid )
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
         ret = &p_sys->track[i];
-        if( !ret )
-            return NULL;
         if( ret->i_track_ID == tid )
             return ret;
     }
