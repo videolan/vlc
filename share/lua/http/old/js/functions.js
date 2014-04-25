@@ -1,7 +1,7 @@
 /*****************************************************************************
  * functions.js: VLC media player web interface
  *****************************************************************************
- * Copyright (C) 2005-2006 the VideoLAN team
+ * Copyright (C) 2005-2014 VLC authors and VideoLAN
  * $Id: functions.js 21264 2007-08-19 17:48:28Z dionoea $
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /**********************************************************************
