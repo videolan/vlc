@@ -273,7 +273,6 @@ static void QuitVLC( void *obj )
  * Run: main loop
  *****************************************************************************/
 static NSLock * o_appLock = nil;    // controls access to f_appExit
-static NSLock * o_plItemChangedLock = nil;
 
 static void Run(intf_thread_t *p_intf)
 {
@@ -281,7 +280,6 @@ static void Run(intf_thread_t *p_intf)
     [VLCApplication sharedApplication];
 
     o_appLock = [[NSLock alloc] init];
-    o_plItemChangedLock = [[NSLock alloc] init];
     o_vout_provider_lock = [[NSLock alloc] init];
 
     libvlc_SetExitHandler(p_intf->p_libvlc, QuitVLC, p_intf);
@@ -292,7 +290,6 @@ static void Run(intf_thread_t *p_intf)
 
     [NSApp run];
     [[VLCMain sharedInstance] applicationWillTerminate:nil];
-    [o_plItemChangedLock release];
     [o_appLock release];
     [o_vout_provider_lock release];
     o_vout_provider_lock = nil;
@@ -388,13 +385,7 @@ static int PLItemChanged(vlc_object_t *p_this, const char *psz_var,
 {
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
 
-    /* Due to constraints within NSAttributedString's main loop runtime handling
-     * and other issues, we need to wait for -PlaylistItemChanged to finish and
-     * then -informInputChanged on this non-main thread. */
-    [o_plItemChangedLock lock];
-    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(PlaylistItemChanged) withObject:nil waitUntilDone:YES]; // MUST BE ON MAIN THREAD
-    [[VLCMain sharedInstance] informInputChanged]; // DO NOT MOVE TO MAIN THREAD
-    [o_plItemChangedLock unlock];
+    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(PlaylistItemChanged) withObject:nil waitUntilDone:NO];
 
     [o_pool release];
     return VLC_SUCCESS;
@@ -614,7 +605,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         _o_sharedMainInstance = [super init];
 
     p_intf = NULL;
-    p_current_input = p_input_changed = NULL;
+    p_current_input = NULL;
 
     o_open = [[VLCOpen alloc] init];
     o_coredialogs = [[VLCCoreDialogProvider alloc] init];
@@ -634,6 +625,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     [defaults registerDefaults:appDefaults];
 
     o_vout_controller = [[VLCVoutWindowController alloc] init];
+
+    informInputChangedQueue = dispatch_queue_create("org.videolan.vlc.inputChangedQueue", DISPATCH_QUEUE_SERIAL);
 
     return _o_sharedMainInstance;
 }
@@ -1265,6 +1258,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 // This must be called on main thread
 - (void)PlaylistItemChanged
 {
+    input_thread_t *p_input_changed = nil;
+
     if (p_current_input && (p_current_input->b_dead || !vlc_object_alive(p_current_input))) {
         var_DelCallback(p_current_input, "intf-event", InputEvent, [VLCMain sharedInstance]);
         p_input_changed = p_current_input;
@@ -1292,14 +1287,17 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mainwindow updateWindow];
     [self updateDelays];
     [self updateMainMenu];
-}
 
-- (void)informInputChanged
-{
+    /*
+     * Due to constraints within NSAttributedString's main loop runtime handling
+     * and other issues, we need to inform the extension manager on a separate thread.
+     * The serial queue ensures that changed inputs are propagated in the same order as they arrive.
+     */
     if (p_input_changed) {
-        [[ExtensionsManager getInstance:p_intf] inputChanged:p_input_changed];
-        vlc_object_release(p_input_changed);
-        p_input_changed = NULL;
+        dispatch_async(informInputChangedQueue, ^{
+            [[ExtensionsManager getInstance:p_intf] inputChanged:p_input_changed];
+            vlc_object_release(p_input_changed);
+        });
     }
 }
 

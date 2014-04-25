@@ -68,7 +68,7 @@ audio_output_t *getAout(void);
 @interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
 {
     intf_thread_t *p_intf;      /* The main intf object */
-    input_thread_t *p_current_input, *p_input_changed;
+    input_thread_t *p_current_input;
     BOOL launched;              /* finishedLaunching */
     int items_at_launch;        /* items in playlist after launch */
     id o_mainmenu;              /* VLCMainMenu */
@@ -119,6 +119,8 @@ audio_output_t *getAout(void);
     NSTimer *o_itunes_play_timer;
 
     BOOL b_playlist_updated_selector_in_queue;
+
+    dispatch_queue_t informInputChangedQueue;
 }
 
 @property (readonly) VLCVoutWindowController* voutController;
@@ -149,7 +151,6 @@ audio_output_t *getAout(void);
 - (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event force:(BOOL)b_force;
 
 - (void)PlaylistItemChanged;
-- (void)informInputChanged;
 - (void)playbackStatusUpdated;
 - (void)sendDistributedNotificationWithUpdatedPlaybackStatus;
 - (void)playbackModeUpdated;
