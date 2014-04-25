@@ -346,14 +346,12 @@ DIST_http_lua = \
 	lua/http/css/ui-lightness/images/ui-bg_glass_100_fdf5ce_1x400.png \
 	lua/http/css/main.css \
 	lua/http/css/mobile.css \
-	lua/http/js/jquery-1.5.1.min.js \
 	lua/http/old/js/functions.js \
 	lua/http/old/js/vlm.js \
 	lua/http/js/ui.js \
 	lua/http/js/common.js \
 	lua/http/js/jquery.jstree.js \
 	lua/http/js/controllers.js \
-	lua/http/js/jquery-ui-1.8.13.custom.min.js \
 	lua/http/old/style.css
 
 DIST_solid = \
