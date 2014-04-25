@@ -352,7 +352,7 @@ DIST_http_lua = \
 	lua/http/js/ui.js \
 	lua/http/js/common.js \
 	lua/http/js/jquery.jstree.js \
-	lua/http/js/controlers.js \
+	lua/http/js/controllers.js \
 	lua/http/js/jquery-ui-1.8.13.custom.min.js \
 	lua/http/old/style.css
 
