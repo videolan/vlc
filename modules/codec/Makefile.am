@@ -459,6 +459,12 @@ libdmo_plugin_la_LIBADD += -lole32 -luuid
 codec_LTLIBRARIES += libdmo_plugin.la
 endif
 
+libmft_plugin_la_SOURCES = codec/mft.c
+if HAVE_WIN32
+libmft_plugin_la_LIBADD = -lole32 -luuid
+codec_LTLIBRARIES += libmft_plugin.la
+endif
+
 libquicktime_plugin_la_SOURCES = codec/quicktime.c
 libquicktime_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libquicktime_plugin_la_LIBADD = $(LIBM)

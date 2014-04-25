@@ -26,6 +26,7 @@ Decoder:
  * Fix channel ordering of LPCM codec in m2ts files
  * New jpeg image decoder
  * Add tx3g subtitles decoder
+ * Add Media Foundation Transform decoder
 
 Encoder:
  * Support for MPEG-2 encoding using x262
