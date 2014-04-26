@@ -48,6 +48,7 @@ unsigned int CocoaKeyToVLC(unichar i_key);
 - (NSString *)localizedString:(const char *)psz;
 - (NSString *)wrapString: (NSString *)o_in_string toWidth: (int)i_width;
 - (NSString *)getCurrentTimeAsString:(input_thread_t *)p_input negative:(BOOL)b_negative;
+- (NSString *)stringForTime:(long long int)time;
 
 - (NSString *)OSXStringKeyToString:(NSString *)theString;
 - (NSString *)VLCKeyToString:(NSString *)theString;

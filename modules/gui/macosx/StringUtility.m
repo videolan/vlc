@@ -117,12 +117,12 @@ static VLCStringUtility *_o_sharedInstance = nil;
 - (NSString *)getCurrentTimeAsString:(input_thread_t *)p_input negative:(BOOL)b_negative
 {
     assert(p_input != nil);
-    
+
     vlc_value_t time;
     char psz_time[MSTRTIME_MAX_SIZE];
-    
+
     var_Get(p_input, "time", &time);
-    
+
     mtime_t dur = input_item_GetDuration(input_GetItem(p_input));
     if (b_negative && dur > 0) {
         mtime_t remaining = 0;
@@ -131,6 +131,27 @@ static VLCStringUtility *_o_sharedInstance = nil;
         return [NSString stringWithFormat: @"-%s", secstotimestr(psz_time, (remaining / 1000000))];
     } else
         return [NSString stringWithUTF8String:secstotimestr(psz_time, (time.i_time / 1000000))];
+}
+
+- (NSString *)stringForTime:(long long int)time
+{
+    if (time > 0) {
+        long long positiveDuration = llabs(time);
+        if (positiveDuration > 3600)
+            return [NSString stringWithFormat:@"%s%01ld:%02ld:%02ld",
+                    time < 0 ? "-" : "",
+                    (long) (positiveDuration / 3600),
+                    (long)((positiveDuration / 60) % 60),
+                    (long) (positiveDuration % 60)];
+        else
+            return [NSString stringWithFormat:@"%s%02ld:%02ld",
+                    time < 0 ? "-" : "",
+                    (long)((positiveDuration / 60) % 60),
+                    (long) (positiveDuration % 60)];
+    } else {
+        // Return a string that represents an undefined time.
+        return @"--:--";
+    }
 }
 
 #pragma mark -
