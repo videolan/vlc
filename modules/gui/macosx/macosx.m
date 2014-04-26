@@ -129,6 +129,15 @@ static const char *const itunes_list_text[] = {
     N_("Do nothing"), N_("Pause iTunes / Spotify"), N_("Pause and resume iTunes / Spotify")
 };
 
+#define CONTINUE_PLAYBACK_TEXT N_("Continue playback where you left off")
+#define CONTINUE_PLAYBACK_LONGTEXT N_("VLC will store playback positions of the last 30 items you played. If you re-open one of those, playback will continue.")
+
+static const int continue_playback_list[] =
+{ 0, 1, 2 };
+static const char *const continue_playback_list_text[] = {
+    N_("Ask"), N_("Always"), N_("Never")
+};
+
 #define VOLUME_MAX_TEXT N_("Maximum Volume displayed")
 
 
@@ -161,6 +170,8 @@ vlc_module_begin()
         add_bool("macosx-lock-aspect-ratio", true, LOCK_ASPECT_RATIO_TEXT, LOCK_ASPECT_RATIO_TEXT, true)
         add_integer("macosx-control-itunes", 1, ITUNES_TEXT, ITUNES_LONGTEXT, false)
         change_integer_list(itunes_list, itunes_list_text)
+        add_integer("macosx-continue-playback", 0, CONTINUE_PLAYBACK_TEXT, CONTINUE_PLAYBACK_LONGTEXT, false)
+        change_integer_list(continue_playback_list, continue_playback_list_text)
 
     set_section(N_("Apple Remote and media keys"), 0)
         add_bool("macosx-appleremote", true, USE_APPLE_REMOTE_TEXT, USE_APPLE_REMOTE_LONGTEXT, false)

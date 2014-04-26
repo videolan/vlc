@@ -825,6 +825,12 @@
             else
                 p_item = NULL;
         }
+
+        /* continue playback where you left off */
+        input_item_t *p_input = p_item->p_input;
+        if (p_input)
+            [self _continuePlaybackWhereYouLeftOff:p_input];
+
         playlist_Control(p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, p_node, p_item);
     }
     PL_UNLOCK;
@@ -1065,6 +1071,8 @@
             input_item_AddOption(p_input, [[o_options objectAtIndex:i] UTF8String], VLC_INPUT_OPTION_TRUSTED);
     }
 
+    [self _continuePlaybackWhereYouLeftOff:p_input];
+
     /* Recent documents menu */
     if (o_nsurl != nil && (BOOL)config_GetInt(p_playlist, "macosx-recentitems") == YES)
         [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: o_nsurl];
@@ -1121,6 +1129,7 @@
         NSDictionary *o_one_item;
 
         /* Get the item */
+        PL_LOCK;
         o_one_item = [o_array objectAtIndex:i_item];
         p_input = [self createItem: o_one_item];
 
@@ -1128,7 +1137,6 @@
             continue;
 
         /* Add the item */
-        PL_LOCK;
         playlist_NodeAddInput(p_playlist, p_input, p_node,
                                       PLAYLIST_INSERT,
                                       i_position == -1 ?
@@ -1434,6 +1442,39 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     [o_columns release];
     [o_arrayToSave release];
+}
+
+- (void)_continuePlaybackWhereYouLeftOff:(input_item_t *)p_input
+{
+    NSDictionary *recentlyPlayedFiles = [[NSUserDefaults standardUserDefaults] objectForKey:@"recentlyPlayedMedia"];
+    if (recentlyPlayedFiles) {
+        char *psz_url = decode_URI(input_item_GetURI(p_input));
+        NSString *url = [NSString stringWithUTF8String:psz_url ? psz_url : ""];
+        free(psz_url);
+
+        NSNumber *lastPosition = [recentlyPlayedFiles objectForKey:url];
+        if (lastPosition.intValue > 0) {
+            msg_Dbg(VLCIntf, "last playback position for %s was %i", [url UTF8String], lastPosition.intValue);
+
+            int settingValue = config_GetInt(VLCIntf, "macosx-continue-playback");
+            NSInteger returnValue = 0;
+
+            if (settingValue == 0) {
+                NSAlert *theAlert = [NSAlert alertWithMessageText:_NS("Continue playback?") defaultButton:_NS("Continue") alternateButton:_NS("Restart playback") otherButton:_NS("Always continue") informativeTextWithFormat:_NS("Playback of \"%s\" will continue at %@"), input_item_GetTitleFbName(p_input), [[VLCStringUtility sharedInstance] stringForTime:lastPosition.intValue]];
+
+                playlist_t *p_playlist = pl_Get(VLCIntf);
+                PL_UNLOCK;
+                returnValue = [theAlert runModal];
+                PL_LOCK;
+            }
+
+            if (returnValue !=0 || settingValue == 1)
+                input_item_AddOption(p_input, [[NSString stringWithFormat:@"start-time=%i", lastPosition.intValue] UTF8String], VLC_INPUT_OPTION_TRUSTED);
+
+            if (returnValue == -1)
+                config_PutInt(VLCIntf, "macosx-continue-playback", 1);
+        }
+    }
 }
 
 @end
