@@ -136,9 +136,12 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         avcodec_align_dimensions2(p_context, &width, &height, aligns);
     }
 
-    if( width == 0 || height == 0)
-        return NULL; /* invalid display size */
 
+    if( width == 0 || height == 0 || width > 8192 || height > 8192 )
+    {
+        msg_Err( p_dec, "Invalid frame size %dx%d.", width, height );
+        return NULL; /* invalid display size */
+    }
     p_dec->fmt_out.video.i_width = width;
     p_dec->fmt_out.video.i_height = height;
 
