@@ -219,10 +219,11 @@ ragel-$(RAGEL_VERSION).tar.gz:
 
 ragel: ragel-$(RAGEL_VERSION).tar.gz
 	$(UNPACK)
+	$(APPLY) ragel-6.8-javacodegen.patch
 	$(MOVE)
 
+
 .ragel: ragel
-	$(APPLY) ragel-6.8-javacodegen.patch
 	(cd ragel; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && $(MAKE) && $(MAKE) install)
 	touch $@
 
