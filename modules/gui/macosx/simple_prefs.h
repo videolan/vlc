@@ -109,6 +109,8 @@
     IBOutlet id o_intf_luahttppwd_fld;
     IBOutlet id o_intf_pauseitunes_lbl;
     IBOutlet id o_intf_pauseitunes_pop;
+    IBOutlet id o_intf_continueplayback_lbl;
+    IBOutlet id o_intf_continueplayback_pop;
 
     IBOutlet id o_osd_encoding_pop;
     IBOutlet id o_osd_encoding_txt;
