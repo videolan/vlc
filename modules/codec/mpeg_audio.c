@@ -264,8 +264,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             }
 
             /* Build frame header */
-            i_header = (p_header[0]<<24)|(p_header[1]<<16)|(p_header[2]<<8)
-                       |p_header[3];
+            i_header = GetDWBE(p_header);
 
             /* Check if frame is valid and get frame info */
             p_sys->i_frame_size = SyncInfo( i_header,
@@ -324,8 +323,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 unsigned int i_next_layer;
 
                 /* Build frame header */
-                i_header = (p_header[0]<<24)|(p_header[1]<<16)|(p_header[2]<<8)
-                           |p_header[3];
+                i_header = GetDWBE(p_header);
 
                 i_next_frame_size = SyncInfo( i_header,
                                               &i_next_channels,
