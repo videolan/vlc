@@ -759,10 +759,9 @@ httpd_stream_t *httpd_StreamNew(httpd_host_t *host,
     }
 
     vlc_mutex_init(&stream->lock);
-    if (psz_mime && *psz_mime)
-        stream->psz_mime = strdup(psz_mime);
-    else
-        stream->psz_mime = strdup(vlc_mime_Ext2Mime(psz_url));
+    if (psz_mime == NULL || psz_mime[0] == '\0')
+        psz_mime = vlc_mime_Ext2Mime(psz_url);
+    stream->psz_mime = xstrdup(psz_mime);
 
     stream->i_header = 0;
     stream->p_header = NULL;
@@ -1100,9 +1099,9 @@ httpd_url_t *httpd_UrlNew(httpd_host_t *host, const char *psz_url,
     url->host = host;
 
     vlc_mutex_init(&url->lock);
-    url->psz_url = strdup(psz_url);
-    url->psz_user = strdup(psz_user ? psz_user : "");
-    url->psz_password = strdup(psz_password ? psz_password : "");
+    url->psz_url = xstrdup(psz_url);
+    url->psz_user = xstrdup(psz_user ? psz_user : "");
+    url->psz_password = xstrdup(psz_password ? psz_password : "");
     for (int i = 0; i < HTTPD_MSG_MAX; i++) {
         url->catch[i].cb = NULL;
         url->catch[i].p_sys = NULL;
