@@ -262,7 +262,7 @@ ATTR_PACKED
 #define WAVE_FORMAT_INDEO_AUDIO         0x0402 /* Indeo Audio Coder */
 
 #define WAVE_FORMAT_ON2_AVC             0x0500 /* VP7 */
-#define WAVE_FORMAT_ON2_AVC_2           0x0500 /* VP6 */
+#define WAVE_FORMAT_ON2_AVC_2           0x0501 /* VP6 */
 
 #define WAVE_FORMAT_AAC_2               0x1601 /* Other AAC */
 #define WAVE_FORMAT_AAC_LATM            0x1602 /* AAC/LATM */
