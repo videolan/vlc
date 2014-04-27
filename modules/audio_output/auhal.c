@@ -1188,7 +1188,7 @@ static void RebuildDeviceList(audio_output_t * p_aout)
     ReportDevice(p_aout, 0, _("System Sound Output Device"));
 
     /* setup local array */
-    currentListOfDevices = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
+    currentListOfDevices = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
 
     /* Get number of devices */
     AudioObjectPropertyAddress audioDevicesAddress = { kAudioHardwarePropertyDevices, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
