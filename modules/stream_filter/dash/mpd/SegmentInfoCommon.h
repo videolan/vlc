@@ -27,6 +27,7 @@
 
 #include <string>
 #include <list>
+#include <ctime>
 
 namespace dash
 {
