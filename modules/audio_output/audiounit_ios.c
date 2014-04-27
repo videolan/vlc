@@ -182,7 +182,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 
     status = AudioComponentInstanceNew(p_sys->au_component, &p_sys->au_unit);
     if (status != noErr) {
-        msg_Warn(p_aout, "we cannot open our audio component (%li)", status);
+        msg_Warn(p_aout, "we cannot open our audio component (%i)", (int)status);
         return false;
     }
 
@@ -194,7 +194,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                                   &flag,
                                   sizeof(flag));
     if (status != noErr)
-        msg_Warn(p_aout, "failed to set IO mode (%li)", status);
+        msg_Warn(p_aout, "failed to set IO mode (%i)", (int)status);
 
     /* Get the current format */
     AudioStreamBasicDescription streamDescription;
@@ -220,7 +220,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                                   &streamDescription,
                                   i_param_size);
     if (status != noErr) {
-        msg_Err(p_aout, "failed to set stream format (%li)", status);
+        msg_Err(p_aout, "failed to set stream format (%i)", (int)status);
         return false;
     }
     msg_Dbg(p_aout, STREAM_FORMAT_MSG("we set the AU format: " , streamDescription));
@@ -233,7 +233,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                                   &streamDescription,
                                   &i_param_size);
     if (status != noErr)
-        msg_Warn(p_aout, "failed to verify stream format (%li)", status);
+        msg_Warn(p_aout, "failed to verify stream format (%i)", (int)status);
     msg_Dbg(p_aout, STREAM_FORMAT_MSG("the actual set AU format is " , streamDescription));
 
     /* Do the last VLC aout setups */
@@ -248,14 +248,14 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                             kAudioUnitScope_Input,
                             0, &callback, sizeof(callback));
     if (status != noErr) {
-        msg_Err(p_aout, "render callback setup failed (%li)", status);
+        msg_Err(p_aout, "render callback setup failed (%i)", (int)status);
         return false;
     }
 
     /* AU init */
     status = AudioUnitInitialize(p_sys->au_unit);
     if (status != noErr) {
-        msg_Err(p_aout, "failed to init AudioUnit (%li)", status);
+        msg_Err(p_aout, "failed to init AudioUnit (%i)", (int)status);
         return false;
     }
 
@@ -273,8 +273,9 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 	AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(sessionCategory),&sessionCategory);
 	AudioSessionSetActive(true);
 
+    /* start the unit */
     status = AudioOutputUnitStart(p_sys->au_unit);
-    msg_Dbg(p_aout, "audio output unit started: %li", status);
+    msg_Dbg(p_aout, "audio output unit started: %i", (int)status);
 
     return true;
 }
@@ -289,11 +290,11 @@ static void Stop(audio_output_t *p_aout)
     if (p_sys->au_unit) {
         status = AudioOutputUnitStop(p_sys->au_unit);
         if (status != noErr)
-            msg_Warn(p_aout, "failed to stop AudioUnit (%li)", status);
+            msg_Warn(p_aout, "failed to stop AudioUnit (%i)", (int)status);
 
         status = AudioComponentInstanceDispose(p_sys->au_unit);
         if (status != noErr)
-            msg_Warn(p_aout, "failed to dispose Audio Component instance (%li)", status);
+            msg_Warn(p_aout, "failed to dispose Audio Component instance (%i)", (int)status);
     }
     p_sys->i_bytes_per_sample = 0;
 
