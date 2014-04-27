@@ -2621,7 +2621,7 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
                 i_sample < p_stss->i_sample_number[i_index+1] )
             {
                 unsigned i_sync_sample = p_stss->i_sample_number[i_index];
-                msg_Dbg( p_demux, "stts gives %d --> %d (sample number)",
+                msg_Dbg( p_demux, "stss gives %d --> %d (sample number)",
                          i_sample, i_sync_sample );
 
                 if( i_sync_sample <= i_sample )
