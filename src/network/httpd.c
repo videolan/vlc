@@ -525,7 +525,7 @@ httpd_handler_sys_t *httpd_HandlerDelete(httpd_handler_t *handler)
 struct httpd_redirect_t
 {
     httpd_url_t *url;
-    char        *psz_dst;
+    char         dst[1];
 };
 
 static int httpd_RedirectCallBack(httpd_callback_sys_t *p_sys,
@@ -544,11 +544,11 @@ static int httpd_RedirectCallBack(httpd_callback_sys_t *p_sys,
     answer->i_type   = HTTPD_MSG_ANSWER;
     answer->i_status = 301;
 
-    answer->i_body = httpd_HtmlError (&p_body, 301, rdir->psz_dst);
+    answer->i_body = httpd_HtmlError (&p_body, 301, rdir->dst);
     answer->p_body = (unsigned char *)p_body;
 
     /* XXX check if it's ok or we need to set an absolute url */
-    httpd_MsgAdd(answer, "Location",  "%s", rdir->psz_dst);
+    httpd_MsgAdd(answer, "Location",  "%s", rdir->dst);
 
     httpd_MsgAdd(answer, "Content-Length", "%d", answer->i_body);
 
@@ -558,8 +558,10 @@ static int httpd_RedirectCallBack(httpd_callback_sys_t *p_sys,
 httpd_redirect_t *httpd_RedirectNew(httpd_host_t *host, const char *psz_url_dst,
                                      const char *psz_url_src)
 {
-    httpd_redirect_t *rdir = malloc(sizeof(*rdir));
-    if (!rdir)
+    size_t dstlen = strlen(psz_url_dst);
+
+    httpd_redirect_t *rdir = malloc(sizeof(*rdir) + dstlen);
+    if (unlikely(rdir == NULL))
         return NULL;
 
     rdir->url = httpd_UrlNew(host, psz_url_src, NULL, NULL);
@@ -567,7 +569,7 @@ httpd_redirect_t *httpd_RedirectNew(httpd_host_t *host, const char *psz_url_dst,
         free(rdir);
         return NULL;
     }
-    rdir->psz_dst = strdup(psz_url_dst);
+    memcpy(rdir->dst, psz_url_dst, dstlen + 1);
 
     /* Redirect apply for all HTTP request and RTSP DESCRIBE resquest */
     httpd_UrlCatch(rdir->url, HTTPD_MSG_HEAD, httpd_RedirectCallBack,
@@ -584,7 +586,6 @@ httpd_redirect_t *httpd_RedirectNew(httpd_host_t *host, const char *psz_url_dst,
 void httpd_RedirectDelete(httpd_redirect_t *rdir)
 {
     httpd_UrlDelete(rdir->url);
-    free(rdir->psz_dst);
     free(rdir);
 }
 
