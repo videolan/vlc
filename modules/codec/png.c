@@ -393,12 +393,9 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     png_infop p_end_info = png_create_info_struct( p_png );
     if( p_end_info == NULL ) goto error;
 
-    const unsigned i_width = p_enc->fmt_in.video.i_visible_width;
-    const unsigned i_height = p_enc->fmt_in.video.i_visible_height;
-
     png_set_IHDR( p_png, p_info,
-            i_width,
-            i_height,
+            p_enc->fmt_in.video.i_visible_width,
+            p_enc->fmt_in.video.i_visible_height,
             8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE,
             PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT );
     if( p_sys->b_error ) goto error;
@@ -408,9 +405,9 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
 
     /* Encode picture */
 
-    for( unsigned i = 0; i < i_height; i++ )
+    for( int i = 0; i < p_pic->p->i_lines; i++ )
     {
-        png_write_row( p_png, p_pic->p->p_pixels + (i_width * i * 3));
+        png_write_row( p_png, p_pic->p->p_pixels + (i * p_pic->p->i_pitch) );
         if( p_sys->b_error ) goto error;
     }
 
