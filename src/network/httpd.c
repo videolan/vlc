@@ -300,12 +300,9 @@ static size_t httpd_HtmlError (char **body, int code, const char *url)
 struct httpd_file_t
 {
     httpd_url_t *url;
-
-    char *psz_mime;
-
     httpd_file_callback_t pf_fill;
     httpd_file_sys_t      *p_sys;
-
+    char mime[1];
 };
 
 static int
@@ -325,7 +322,7 @@ httpd_FileCallBack(httpd_callback_sys_t *p_sys, httpd_client_t *cl,
 
     answer->i_status = 200;
 
-    httpd_MsgAdd(answer, "Content-type",  "%s", file->psz_mime);
+    httpd_MsgAdd(answer, "Content-type",  "%s", file->mime);
     httpd_MsgAdd(answer, "Cache-Control", "%s", "no-cache");
 
     if (query->i_type != HTTPD_MSG_HEAD) {
@@ -365,8 +362,13 @@ httpd_file_t *httpd_FileNew(httpd_host_t *host,
                              httpd_file_callback_t pf_fill,
                              httpd_file_sys_t *p_sys)
 {
-    httpd_file_t *file = malloc(sizeof(*file));
-    if (!file)
+    const char *mime = psz_mime;
+    if (mime == NULL || mime[0] == '\0')
+        mime = vlc_mime_Ext2Mime(psz_url);
+
+    size_t mimelen = strlen(mime);
+    httpd_file_t *file = malloc(sizeof(*file) + mimelen);
+    if (unlikely(file == NULL))
         return NULL;
 
     file->url = httpd_UrlNew(host, psz_url, psz_user, psz_password);
@@ -375,13 +377,9 @@ httpd_file_t *httpd_FileNew(httpd_host_t *host,
         return NULL;
     }
 
-    if (psz_mime && *psz_mime)
-        file->psz_mime = strdup(psz_mime);
-    else
-        file->psz_mime = strdup(vlc_mime_Ext2Mime(psz_url));
-
     file->pf_fill = pf_fill;
     file->p_sys   = p_sys;
+    memcpy(file->mime, mime, mimelen + 1);
 
     httpd_UrlCatch(file->url, HTTPD_MSG_HEAD, httpd_FileCallBack,
                     (httpd_callback_sys_t*)file);
@@ -398,11 +396,7 @@ httpd_file_sys_t *httpd_FileDelete(httpd_file_t *file)
     httpd_file_sys_t *p_sys = file->p_sys;
 
     httpd_UrlDelete(file->url);
-
-    free(file->psz_mime);
-
     free(file);
-
     return p_sys;
 }
 
