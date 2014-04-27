@@ -301,7 +301,6 @@ struct httpd_file_t
 {
     httpd_url_t *url;
 
-    char *psz_url;
     char *psz_mime;
 
     httpd_file_callback_t pf_fill;
@@ -376,7 +375,6 @@ httpd_file_t *httpd_FileNew(httpd_host_t *host,
         return NULL;
     }
 
-    file->psz_url  = strdup(psz_url);
     if (psz_mime && *psz_mime)
         file->psz_mime = strdup(psz_mime);
     else
@@ -401,7 +399,6 @@ httpd_file_sys_t *httpd_FileDelete(httpd_file_t *file)
 
     httpd_UrlDelete(file->url);
 
-    free(file->psz_url);
     free(file->psz_mime);
 
     free(file);
