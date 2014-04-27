@@ -261,12 +261,15 @@ ATTR_PACKED
 #define WAVE_FORMAT_IMC                 0x0401
 #define WAVE_FORMAT_INDEO_AUDIO         0x0402 /* Indeo Audio Coder */
 
+#define WAVE_FORMAT_ON2_AVC             0x0500 /* VP7 */
+#define WAVE_FORMAT_ON2_AVC_2           0x0500 /* VP6 */
+
 #define WAVE_FORMAT_AAC_2               0x1601 /* Other AAC */
 #define WAVE_FORMAT_AAC_LATM            0x1602 /* AAC/LATM */
 
 #define WAVE_FORMAT_A52                 0x2000 /* a52 */
 #define WAVE_FORMAT_DTS                 0x2001 /* DTS */
-#define WAVE_FORMAT_AVCODEC_AAC          0x706D
+#define WAVE_FORMAT_AVCODEC_AAC         0x706D
 #define WAVE_FORMAT_DIVIO_AAC           0x4143 /* Divio's AAC */
 
 #define WAVE_FORMAT_GSM_AMR_FIXED       0x7A21 /* Fixed bitrate, no SID */
@@ -416,6 +419,8 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_IMC,        VLC_CODEC_IMC,                    "IMC" },
     { WAVE_FORMAT_INDEO_AUDIO, VLC_CODEC_INDEO_AUDIO, "Indeo Audio Coder" },
     { WAVE_FORMAT_VOXWARE_RT29,VLC_CODEC_METASOUND,             "VoxWare MetaSound" },
+    { WAVE_FORMAT_ON2_AVC     ,VLC_CODEC_ON2AVC,                "On2 Audio for Video Codec (VP7)" },
+    { WAVE_FORMAT_ON2_AVC_2   ,VLC_CODEC_ON2AVC,                "On2 Audio for Video Codec (VP6)" },
 
     { WAVE_FORMAT_UNKNOWN,    VLC_FOURCC( 'u', 'n', 'd', 'f' ), "Unknown" }
 };

@@ -457,6 +457,11 @@ static const struct
 #if LIBAVCODEC_VERSION_CHECK( 55, 15, 0, 24, 100 )
     { VLC_CODEC_METASOUND, AV_CODEC_ID_METASOUND, AUDIO_ES },
 #endif
+    /* AV_CODEC_ID_PAF_AUDIO */
+#if LIBAVCODEC_VERSION_CHECK( 55, 49, 0, 59, 100 )
+    { VLC_CODEC_ON2AVC, AV_CODEC_ID_ON2AVC, AUDIO_ES },
+#endif
+
     /* ffmpeg only: AV_CODEC_ID_FFWAVESYNTH */
     /* ffmpeg only: AV_CODEC_ID_SONIC */
     /* ffmpeg only: AV_CODEC_ID_SONIC_LS */
