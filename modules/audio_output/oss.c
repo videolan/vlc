@@ -214,6 +214,22 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
     aout_FormatPrepare (fmt);
 
+    /* Select timing */
+    unsigned bytes;
+    if (spdif)
+        bytes = AOUT_SPDIF_SIZE;
+    else
+        bytes = fmt->i_rate / (CLOCK_FREQ / AOUT_MIN_PREPARE_TIME)
+                * fmt->i_bytes_per_frame;
+    if (unlikely(bytes < 16))
+        bytes = 16;
+
+    int frag = (AOUT_MAX_ADVANCE_TIME / AOUT_MIN_PREPARE_TIME) << 16
+             | (32 - clz32(bytes - 1));
+    if (ioctl (fd, SNDCTL_DSP_SETFRAGMENT, &frag) < 0)
+        msg_Err (aout, "cannot set 0x%08x fragment: %s", frag,
+                 vlc_strerror_c(errno));
+
     sys->fd = fd;
     VolumeSync (aout);
     sys->starting = true;
