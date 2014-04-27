@@ -519,6 +519,11 @@ int OpenEncoder( vlc_object_t *p_this )
 
 
         p_enc->fmt_in.i_codec = VLC_CODEC_I420;
+
+        /* Very few application support YUV in TIFF, not even VLC */
+        if( p_enc->fmt_out.i_codec == VLC_CODEC_TIFF )
+            p_enc->fmt_in.i_codec = VLC_CODEC_RGB24;
+
         p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec;
         GetFfmpegChroma( &p_context->pix_fmt, &p_enc->fmt_in.video );
 
