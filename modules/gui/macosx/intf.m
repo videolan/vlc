@@ -1516,21 +1516,19 @@ static VLCMain *_o_sharedMainInstance = nil;
 
                 if (pos.f_float > .05 && pos.f_float < .95 && dur > 180) {
                     [mutDict setObject:[NSNumber numberWithInt:current_pos_in_sec] forKey:url];
-                    if ([mediaList containsObject:url])
-                         [mediaList removeObject:url];
+
+                    [mediaList removeObject:url];
                     [mediaList addObject:url];
-                    if (mediaList.count > 30) {
-                        NSUInteger count = mediaList.count;
-                        for (NSUInteger x = 0; x < 30 - count; x++) {
-                            [mutDict removeObjectForKey:mediaList[x]];
-                            [mediaList removeObject:mediaList[x]];
+                    NSUInteger mediaListCount = mediaList.count;
+                    if (mediaListCount > 30) {
+                        for (NSUInteger x = 0; x < mediaListCount - 30; x++) {
+                            [mutDict removeObjectForKey:[mediaList objectAtIndex:0]];
+                            [mediaList removeObjectAtIndex:0];
                         }
                     }
                 } else {
-                    if ([mediaList containsObject:url]) {
-                        [mutDict removeObjectForKey:url];
-                        [mediaList removeObject:url];
-                    }
+                    [mutDict removeObjectForKey:url];
+                    [mediaList removeObject:url];
                 }
                 [defaults setObject:mutDict forKey:@"recentlyPlayedMedia"];
                 [defaults setObject:mediaList forKey:@"recentlyPlayedMediaList"];
