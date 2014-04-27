@@ -1,7 +1,7 @@
 /*****************************************************************************
  * auhal.c: AUHAL and Coreaudio output plugin
  *****************************************************************************
- * Copyright (C) 2005 - 2013 VLC authors and VideoLAN
+ * Copyright (C) 2005 - 2014 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
@@ -332,7 +332,8 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
          * as a former airplay device might be already gone, but the device number might be still valid. Core Audio
          * even says that this device would be alive. Don't ask why, its Core Audio. */
         CFIndex count = CFArrayGetCount(p_sys->device_list);
-        if (CFArrayContainsValue(p_sys->device_list, CFRangeMake(0, count), CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &p_sys->i_selected_dev))) {
+        CFNumberRef deviceNumber = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &p_sys->i_selected_dev);
+        if (CFArrayContainsValue(p_sys->device_list, CFRangeMake(0, count), deviceNumber)) {
 
             /* Check if the desired device is alive and usable */
             i_param_size = sizeof(b_alive);
@@ -350,6 +351,7 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         } else {
             msg_Warn(p_aout, "device id %i not found in the current devices list, fallback to default device", p_sys->i_selected_dev);
         }
+        CFRelease(deviceNumber);
     }
 
     p_sys->b_selected_dev_is_default = false;
@@ -562,6 +564,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 
         if (layout->mNumberChannelDescriptions == 0) {
             msg_Err(p_aout, "insufficient number of output channels");
+            free(layout);
             return false;
         }
 
@@ -1192,6 +1195,7 @@ static void RebuildDeviceList(audio_output_t * p_aout)
     err = AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &audioDevicesAddress, 0, NULL, &propertySize);
     if (err != noErr) {
         msg_Err(p_aout, "Could not get number of devices: [%4.4s]", (char *)&err);
+        CFRelease(currentListOfDevices);
         return;
     }
 
@@ -1199,19 +1203,24 @@ static void RebuildDeviceList(audio_output_t * p_aout)
 
     if (numberOfDevices < 1) {
         msg_Err(p_aout, "No audio output devices found.");
+        CFRelease(currentListOfDevices);
         return;
     }
     msg_Dbg(p_aout, "found %i audio device(s)", numberOfDevices);
 
     /* Allocate DeviceID array */
     deviceIDs = (AudioDeviceID *)calloc(numberOfDevices, sizeof(AudioDeviceID));
-    if (deviceIDs == NULL)
+    if (deviceIDs == NULL) {
+        CFRelease(currentListOfDevices);
         return;
+    }
 
     /* Populate DeviceID array */
     err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &audioDevicesAddress, 0, NULL, &propertySize, deviceIDs);
     if (err != noErr) {
         msg_Err(p_aout, "could not get the device IDs [%4.4s]", (char *)&err);
+        CFRelease(currentListOfDevices);
+        free(deviceIDs);
         return;
     }
 
@@ -1221,7 +1230,6 @@ static void RebuildDeviceList(audio_output_t * p_aout)
         CFStringRef device_name_ref;
         char *psz_name;
         CFIndex length;
-        bool b_digital = false;
         UInt32 i_id = deviceIDs[i];
 
         /* Retrieve the length of the device name */
@@ -1251,16 +1259,19 @@ static void RebuildDeviceList(audio_output_t * p_aout)
         }
 
         ReportDevice(p_aout, i_id, psz_name);
-        CFArrayAppendValue(currentListOfDevices, CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &i_id));
+        CFNumberRef deviceNumber = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &i_id);
+        CFArrayAppendValue(currentListOfDevices, deviceNumber);
+        CFRelease(deviceNumber);
 
         if (AudioDeviceSupportsDigital(p_aout, deviceIDs[i])) {
-            b_digital = true;
             msg_Dbg(p_aout, "'%s' supports digital output", psz_name);
             char *psz_encoded_name = nil;
             asprintf(&psz_encoded_name, _("%s (Encoded Output)"), psz_name);
             i_id = i_id | AOUT_VAR_SPDIF_FLAG;
             ReportDevice(p_aout, i_id, psz_encoded_name);
-            CFArrayAppendValue(currentListOfDevices, CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &i_id));
+            deviceNumber = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &i_id);
+            CFArrayAppendValue(currentListOfDevices, deviceNumber);
+            CFRelease(deviceNumber);
             free(psz_encoded_name);
         }
 
@@ -1290,7 +1301,8 @@ static void RebuildDeviceList(audio_output_t * p_aout)
             }
         }
     }
-    CFRelease(p_sys->device_list);
+    if (p_sys->device_list)
+        CFRelease(p_sys->device_list);
     p_sys->device_list = CFArrayCreateCopy(kCFAllocatorDefault, currentListOfDevices);
     CFRelease(currentListOfDevices);
     vlc_mutex_unlock(&p_sys->var_lock);
@@ -1565,8 +1577,10 @@ static OSStatus DevicesListener(AudioObjectID inObjectID,  UInt32 inNumberAddres
     RebuildDeviceList(p_aout);
 
     vlc_mutex_lock(&p_sys->var_lock);
-    if(!CFArrayContainsValue(p_sys->device_list, CFRangeMake(0, CFArrayGetCount(p_sys->device_list)),CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &p_sys->i_selected_dev)))
+    CFNumberRef selectedDevice = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &p_sys->i_selected_dev);
+    if(!CFArrayContainsValue(p_sys->device_list, CFRangeMake(0, CFArrayGetCount(p_sys->device_list)), selectedDevice))
         aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+    CFRelease(selectedDevice);
     vlc_mutex_unlock(&p_sys->var_lock);
 
     return noErr;
@@ -1687,6 +1701,7 @@ static OSStatus StreamsChangedListener(AudioObjectID inObjectID,  UInt32 inNumbe
     if (err != noErr) {
         msg_Err(p_aout, "could not get list of streams [%4.4s]", (char *)&err);
         vlc_mutex_unlock(&p_sys->var_lock);
+        free(p_streams);
         return VLC_EGENERIC;
     }
     vlc_mutex_unlock(&p_sys->var_lock);
@@ -1752,6 +1767,7 @@ static int ManageAudioStreamsCallback(audio_output_t *p_aout, AudioDeviceID i_de
     err = AudioObjectGetPropertyData(i_dev_id, &streamsAddress, 0, NULL, &i_param_size, p_streams);
     if (err != noErr) {
         msg_Err(p_aout, "could not get list of streams [%4.4s]", (char *)&err);
+        free(p_streams);
         return VLC_EGENERIC;
     }
 
@@ -1828,6 +1844,7 @@ static int AudioDeviceSupportsDigital(audio_output_t *p_aout, AudioDeviceID i_de
     err = AudioObjectGetPropertyData(i_dev_id, &streamsAddress, 0, NULL, &i_param_size, p_streams);
     if (err != noErr) {
         msg_Err(p_aout, "could not get list of streams [%4.4s]", (char *)&err);
+        free(p_streams);
         return false;
     }
 
