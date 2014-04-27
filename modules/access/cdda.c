@@ -414,6 +414,8 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
             psz_artist = psz_track_artist;
         }
     }
+    else
+        msg_Dbg( p_access, "GetCDDBInfo failed" );
 #endif
 
     /* CD-Text */
@@ -586,7 +588,10 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
 static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors )
 {
     if( var_InheritInteger( p_access, "album-art" ) == ALBUM_ART_WHEN_ASKED )
+    {
+        msg_Dbg( p_access, "Album art policy set to manual; no automatic fetching" );
         return NULL;
+    }
 
     /* */
     cddb_conn_t *p_cddb = cddb_new();
