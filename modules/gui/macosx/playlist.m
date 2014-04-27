@@ -166,6 +166,8 @@
     [[o_tc_name_other headerCell] setStringValue:_NS("Name")];
     [[o_tc_author_other headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration_other headerCell] setStringValue:_NS("Duration")];
+
+    [self reloadStyles];
 }
 
 - (void)setPlaylistRoot: (playlist_item_t *)root_item
@@ -189,6 +191,31 @@
 {
     return [[o_outline_view itemAtRow: [o_outline_view selectedRow]]
                                                                 pointerValue];
+}
+
+- (void)reloadStyles
+{
+    NSFont *fontToUse;
+    CGFloat rowHeight;
+    if (config_GetInt(VLCIntf, "macosx-large-text")) {
+        fontToUse = [NSFont systemFontOfSize:13.];
+        rowHeight = 21.;
+    } else {
+        fontToUse = [NSFont systemFontOfSize:11.];
+        rowHeight = 16.;
+    }
+
+    NSArray *columns = [o_outline_view tableColumns];
+    NSUInteger count = columns.count;
+    for (NSUInteger x = 0; x < count; x++)
+        [[columns[x] dataCell] setFont:fontToUse];
+    [o_outline_view setRowHeight:rowHeight];
+
+    columns = [o_outline_view_other tableColumns];
+    count = columns.count;
+    for (NSUInteger x = 0; x < count; x++)
+        [[columns[x] dataCell] setFont:fontToUse];
+    [o_outline_view_other setRowHeight:rowHeight];
 }
 
 - (void)dealloc {
@@ -1371,11 +1398,17 @@
     o_playing_item = [o_outline_dict objectForKey: [NSString stringWithFormat:@"%p",  playlist_CurrentPlayingItem(p_playlist)]];
     PL_UNLOCK;
 
+    NSFont *fontToUse;
+    if (config_GetInt(VLCIntf, "macosx-large-text"))
+        fontToUse = [NSFont systemFontOfSize:13.];
+    else
+        fontToUse = [NSFont systemFontOfSize:11.];
+
     if ([self isItem: [o_playing_item pointerValue] inNode: [item pointerValue] checkItemExistence:YES locked:NO]
                         || [o_playing_item isEqual: item])
-        [cell setFont: [[NSFontManager sharedFontManager] convertFont:[cell font] toHaveTrait:NSBoldFontMask]];
+        [cell setFont: [[NSFontManager sharedFontManager] convertFont:fontToUse toHaveTrait:NSBoldFontMask]];
     else
-        [cell setFont: [[NSFontManager sharedFontManager] convertFont:[cell font] toNotHaveTrait:NSBoldFontMask]];
+        [cell setFont: [[NSFontManager sharedFontManager] convertFont:fontToUse toNotHaveTrait:NSBoldFontMask]];
 }
 
 - (id)playingItem

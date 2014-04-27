@@ -64,6 +64,7 @@
 - (playlist_item_t *)currentPlaylistRoot;
 - (playlist_item_t *)selectedPlaylistItem;
 - (NSOutlineView *)outlineView;
+- (void)reloadStyles;
 @end
 
 /*****************************************************************************
