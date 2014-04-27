@@ -977,8 +977,10 @@ void MainInterface::setStatusBarVisibility( bool b_visible )
 
 void MainInterface::setPlaylistVisibility( bool b_visible )
 {
-    if ( !isPlDocked() && !THEDP->isDying() && (playlistWidget && !playlistWidget->isMinimized() ) )
-        playlistVisible = b_visible;
+    if( isPlDocked() || THEDP->isDying() || (playlistWidget && playlistWidget->isMinimized() ) )
+        return;
+
+    playlistVisible = b_visible;
 }
 
 #if 0
