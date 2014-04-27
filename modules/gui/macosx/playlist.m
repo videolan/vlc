@@ -1460,7 +1460,7 @@
             NSInteger returnValue = 0;
 
             if (settingValue == 0) {
-                NSAlert *theAlert = [NSAlert alertWithMessageText:_NS("Continue playback?") defaultButton:_NS("Continue") alternateButton:_NS("Restart playback") otherButton:_NS("Always continue") informativeTextWithFormat:_NS("Playback of \"%s\" will continue at %@"), input_item_GetTitleFbName(p_input), [[VLCStringUtility sharedInstance] stringForTime:lastPosition.intValue]];
+                NSAlert *theAlert = [NSAlert alertWithMessageText:_NS("Continue playback?") defaultButton:_NS("Continue") alternateButton:_NS("Restart playback") otherButton:_NS("Always continue") informativeTextWithFormat:_NS("Playback of \"%@\" will continue at %@"), [NSString stringWithUTF8String:input_item_GetTitleFbName(p_input)], [[VLCStringUtility sharedInstance] stringForTime:lastPosition.intValue]];
 
                 playlist_t *p_playlist = pl_Get(VLCIntf);
                 PL_UNLOCK;
