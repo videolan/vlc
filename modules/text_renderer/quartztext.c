@@ -310,7 +310,7 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     char         *psz_string;
-    int           i_font_alpha, i_font_size;
+    int           i_font_size;
     uint32_t      i_font_color;
     bool          b_bold, b_uline, b_italic;
     vlc_value_t val;
@@ -329,7 +329,6 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
 
     if (p_region_in->p_style) {
         i_font_color = VLC_CLIP(p_region_in->p_style->i_font_color, 0, 0xFFFFFF);
-        i_font_alpha = VLC_CLIP(p_region_in->p_style->i_font_alpha, 0, 255);
         i_font_size  = VLC_CLIP(p_region_in->p_style->i_font_size, 0, 255);
         if (p_region_in->p_style->i_style_flags) {
             if (p_region_in->p_style->i_style_flags & STYLE_BOLD)
@@ -341,12 +340,8 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
         }
     } else {
         i_font_color = p_sys->i_font_color;
-        i_font_alpha = 255 - p_sys->i_font_opacity;
         i_font_size  = p_sys->i_font_size;
     }
-
-    if (!i_font_alpha)
-        i_font_alpha = 255 - p_sys->i_font_opacity;
 
     if (i_font_size <= 0) {
         msg_Warn(p_filter, "invalid fontsize, using 12");
@@ -779,8 +774,6 @@ static int RenderHtml(filter_t *p_filter, subpicture_region_t *p_region_out,
     if (p_sub) {
         p_xml = xml_Create(p_filter);
         if (p_xml) {
-            bool b_karaoke = false;
-
             p_xml_reader = xml_ReaderCreate(p_xml, p_sub);
             if (p_xml_reader) {
                 /* Look for Root Node */
@@ -792,10 +785,7 @@ static int RenderHtml(filter_t *p_filter, subpicture_region_t *p_region_out,
                          * of times to show the progress marker on the text.
                          */
                         var_SetBool(p_filter, "text-rerender", true);
-                        b_karaoke = true;
-                    } else if (!strcasecmp("text", name))
-                        b_karaoke = false;
-                    else {
+                    } else {
                         /* Only text and karaoke tags are supported */
                         msg_Dbg(p_filter, "Unsupported top-level tag "
                                            "<%s> ignored.", name);
@@ -1010,8 +1000,11 @@ static int RenderYUVA(filter_t *p_filter, subpicture_region_t *p_region,
     fmt.i_sar_den = 1;
 
     p_region->p_picture = picture_NewFromFormat(&fmt);
-    if (!p_region->p_picture)
+    if (!p_region->p_picture) {
+        free(p_offScreen->p_data);
+        free(p_offScreen);
         return VLC_EGENERIC;
+    }
     p_region->fmt = fmt;
 
     p_dst_y = p_region->p_picture->Y_PIXELS;
