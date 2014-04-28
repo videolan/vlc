@@ -1258,11 +1258,11 @@ static VLCMain *_o_sharedMainInstance = nil;
 // This must be called on main thread
 - (void)PlaylistItemChanged
 {
-    input_thread_t *p_input_changed = nil;
+    input_thread_t *p_input_changed = NULL;
 
     if (p_current_input && (p_current_input->b_dead || !vlc_object_alive(p_current_input))) {
         var_DelCallback(p_current_input, "intf-event", InputEvent, [VLCMain sharedInstance]);
-        p_input_changed = p_current_input;
+        vlc_object_release(p_current_input);
         p_current_input = NULL;
 
         [o_mainmenu setRateControlsEnabled: NO];
@@ -1293,12 +1293,11 @@ static VLCMain *_o_sharedMainInstance = nil;
      * and other issues, we need to inform the extension manager on a separate thread.
      * The serial queue ensures that changed inputs are propagated in the same order as they arrive.
      */
-    if (p_input_changed) {
-        dispatch_async(informInputChangedQueue, ^{
-            [[ExtensionsManager getInstance:p_intf] inputChanged:p_input_changed];
+    dispatch_async(informInputChangedQueue, ^{
+        [[ExtensionsManager getInstance:p_intf] inputChanged:p_input_changed];
+        if (p_input_changed)
             vlc_object_release(p_input_changed);
-        });
-    }
+    });
 }
 
 - (void)updateMainMenu
