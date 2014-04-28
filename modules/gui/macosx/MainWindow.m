@@ -338,6 +338,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [o_sidebar_view expandItem: [o_sidebaritems objectAtIndex:x] expandChildren: YES];
 
         [o_fspanel center];
+
+        NSAlert *albumArtAlert = [NSAlert alertWithMessageText:_NS("Check for album art and metadata?") defaultButton:_NS("Enable Metadata Retrieval") alternateButton:_NS("No, Thanks") otherButton:nil informativeTextWithFormat:_NS("VLC can check online for album art and metadata to enrich your playback experience, e.g. by providing track information when playing Audio CDs. To provide this functionality, VLC will send information about your contents to trusted services in an anonymized form.")];
+        NSInteger returnValue = [albumArtAlert runModal];
+        config_PutInt(VLCIntf, "album-art", returnValue == 1 ? ALBUM_ART_ALL : ALBUM_ART_WHEN_ASKED);
     }
 
     // select playlist item by default
