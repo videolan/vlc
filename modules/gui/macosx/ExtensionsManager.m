@@ -273,7 +273,7 @@ static ExtensionsManager* instance = nil;
 {
     //This is unlikely, but can happen if no extension modules can be loaded.
     if (p_extensions_manager == NULL)
-        return ;
+        return;
     vlc_mutex_lock(&p_extensions_manager->lock);
 
     extension_t *p_ext;
@@ -290,7 +290,7 @@ static ExtensionsManager* instance = nil;
 {
     //This is unlikely, but can happen if no extension modules can be loaded.
     if (p_extensions_manager == NULL)
-        return ;
+        return;
     vlc_mutex_lock(&p_extensions_manager->lock);
 
     extension_t *p_ext;
@@ -307,7 +307,7 @@ static ExtensionsManager* instance = nil;
 {
     //This is unlikely, but can happen if no extension modules can be loaded.
     if (p_extensions_manager == NULL)
-        return ;
+        return;
     vlc_mutex_lock(&p_extensions_manager->lock);
     extension_t *p_ext;
     FOREACH_ARRAY(p_ext, p_extensions_manager->extensions) {
