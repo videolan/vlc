@@ -56,7 +56,6 @@
 
 - (id)initWithIntf:(intf_thread_t *)_p_intf;
 - (void)buildMenu:(NSMenu *)extMenu;
-- (extensions_manager_t *)getManager;
 
 - (BOOL)loadExtensions;
 - (void)unloadExtensions;
