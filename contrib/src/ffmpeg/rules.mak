@@ -14,6 +14,7 @@ endif
 
 FFMPEGCONF = \
 	--cc="$(CC)" \
+	--pkg-config="$(PKG_CONFIG)" \
 	--disable-doc \
 	--disable-encoder=vorbis \
 	--enable-libgsm \
