@@ -256,6 +256,11 @@ static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *sub
 {
     vout_display_sys_t *sys = vd->sys;
 
+    if (pic == NULL) {
+        msg_Warn(vd, "invalid pic, skipping frame");
+        return;
+    }
+
     @synchronized (sys->cgLayer) {
         vout_display_opengl_Prepare(sys->vgl, pic, subpicture);
     }
