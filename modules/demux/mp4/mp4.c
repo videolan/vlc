@@ -3078,9 +3078,8 @@ static uint32_t MP4_TrackSampleSize( mp4_track_t *p_track, uint32_t *pi_nb_sampl
         uint32_t i_samples = p_track->chunk[p_track->i_chunk].i_sample_count;
         if( p_track->fmt.audio.i_blockalign > 1 )
             i_samples = p_soun->i_sample_per_packet;
-
         i_size = i_samples / p_soun->i_sample_per_packet;
-        if ( UINT32_MAX / i_size < p_soun->i_bytes_per_frame )
+        if ( UINT32_MAX / i_size >= p_soun->i_bytes_per_frame )
             i_size *= p_soun->i_bytes_per_frame;
         else
             i_size = UINT32_MAX;
