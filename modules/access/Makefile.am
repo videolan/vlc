@@ -9,11 +9,15 @@ AM_CPPFLAGS += -I$(srcdir)/access
 libattachment_plugin_la_SOURCES = access/attachment.c
 access_LTLIBRARIES += libattachment_plugin.la
 
-libdcp_plugin_la_SOURCES = access/dcp/dcpparser.h access/dcp/dcp.cpp access/dcp/dcpparser.cpp
+libdcp_plugin_la_SOURCES = access/dcp/dcpparser.h access/dcp/dcp.cpp access/dcp/dcpparser.cpp access/dcp/dcpdecrypt.cpp
 if HAVE_ASDCP
 libdcp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(ASDCP_CFLAGS)
 libdcp_plugin_la_LIBADD = $(AM_LIBADD) $(ASDCP_LIBS)
+if HAVE_GCRYPT
+libdcp_plugin_la_CPPFLAGS += $(GCRYPT_CFLAGS)
+libdcp_plugin_la_LIBADD += $(GCRYPT_LIBS)
 access_LTLIBRARIES += libdcp_plugin.la
+endif
 endif
 
 libfilesystem_plugin_la_SOURCES = access/fs.h access/file.c access/directory.c access/fs.c

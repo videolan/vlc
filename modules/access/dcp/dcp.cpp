@@ -41,6 +41,8 @@
 #endif
 
 #define __STDC_CONSTANT_MACROS 1
+#define KDM_HELP_TEXT          "KDM file"
+#define KDM_HELP_LONG_TEXT     "Path to Key Delivery Message XML file"
 
 /* VLC core API headers */
 #include <vlc_common.h>
@@ -72,6 +74,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin()
     set_shortname( N_( "DCP" ) )
     add_shortcut( "dcp" )
+    add_loadfile( "kdm", "", KDM_HELP_TEXT, KDM_HELP_LONG_TEXT, false )
     set_description( N_( "Digital Cinema Package module" ) )
     set_capability( "access_demux", 0 )
     set_category( CAT_INPUT )
@@ -604,6 +607,7 @@ static int Demux( demux_t *p_demux )
     block_t *p_video_frame = NULL, *p_audio_frame = NULL;
 
     PCM::FrameBuffer   AudioFrameBuff( p_sys->i_audio_buffer);
+    AESDecContext video_aes_ctx, audio_aes_ctx;
 
     /* swaping video reels */
     if  ( p_sys->frame_no == p_sys->p_dcp->video_reels[p_sys->i_video_reel].i_absolute_end )
@@ -632,6 +636,20 @@ static int Demux( demux_t *p_demux )
      }
 
     /* video frame */
+
+    /* initialize AES context, if reel is encrypted */
+    if( p_sys &&
+            p_sys->p_dcp &&
+            p_sys->p_dcp->video_reels.size() > p_sys->i_video_reel &&
+            p_sys->p_dcp->video_reels[p_sys->i_video_reel].p_key )
+    {
+        if( ! ASDCP_SUCCESS( video_aes_ctx.InitKey( p_sys->p_dcp->video_reels[p_sys->i_video_reel].p_key->getKey() ) ) )
+        {
+            msg_Err( p_demux, "ASDCP failed to initialize AES key" );
+            goto error;
+        }
+    }
+
     switch( p_sys->PictureEssType )
     {
         case ESS_JPEG_2000:
@@ -646,13 +664,13 @@ static int Demux( demux_t *p_demux )
                 goto error_asdcp;
             if ( p_sys->PictureEssType == ESS_JPEG_2000_S ) {
                 if ( ! ASDCP_SUCCESS(
-                        p_sys->v_videoReader[p_sys->i_video_reel].p_PicMXFSReader->ReadFrame(nextFrame, JP2K::SP_LEFT, PicFrameBuff, 0, 0)) ) {
+                        p_sys->v_videoReader[p_sys->i_video_reel].p_PicMXFSReader->ReadFrame(nextFrame, JP2K::SP_LEFT, PicFrameBuff, &video_aes_ctx, 0)) ) {
                     PicFrameBuff.SetData(0,0);
                     goto error_asdcp;
                 }
              } else {
                 if ( ! ASDCP_SUCCESS(
-                        p_sys->v_videoReader[p_sys->i_video_reel].p_PicMXFReader->ReadFrame(nextFrame, PicFrameBuff, 0, 0)) ) {
+                        p_sys->v_videoReader[p_sys->i_video_reel].p_PicMXFReader->ReadFrame(nextFrame, PicFrameBuff, &video_aes_ctx, 0)) ) {
                     PicFrameBuff.SetData(0,0);
                     goto error_asdcp;
                 }
@@ -670,7 +688,7 @@ static int Demux( demux_t *p_demux )
                 goto error_asdcp;
 
             if ( ! ASDCP_SUCCESS(
-                    p_sys->v_videoReader[p_sys->i_video_reel].p_VideoMXFReader->ReadFrame(p_sys->frame_no + p_sys->p_dcp->video_reels[p_sys->i_video_reel].i_correction, VideoFrameBuff, 0, 0)) ) {
+                    p_sys->v_videoReader[p_sys->i_video_reel].p_VideoMXFReader->ReadFrame(p_sys->frame_no + p_sys->p_dcp->video_reels[p_sys->i_video_reel].i_correction, VideoFrameBuff, &video_aes_ctx, 0)) ) {
                 VideoFrameBuff.SetData(0,0);
                 goto error_asdcp;
             }
@@ -690,13 +708,27 @@ static int Demux( demux_t *p_demux )
     if ( ( p_audio_frame = block_Alloc( p_sys->i_audio_buffer )) == NULL ) {
         goto error;
     }
+
+    /* initialize AES context, if reel is encrypted */
+    if( p_sys &&
+            p_sys->p_dcp &&
+            p_sys->p_dcp->audio_reels.size() > p_sys->i_audio_reel &&
+            p_sys->p_dcp->audio_reels[p_sys->i_audio_reel].p_key )
+    {
+        if( ! ASDCP_SUCCESS( audio_aes_ctx.InitKey( p_sys->p_dcp->audio_reels[p_sys->i_audio_reel].p_key->getKey() ) ) )
+        {
+            msg_Err( p_demux, "ASDCP failed to initialize AES key" );
+            goto error;
+        }
+    }
+
     if ( ! ASDCP_SUCCESS(
             AudioFrameBuff.SetData(p_audio_frame->p_buffer, p_sys->i_audio_buffer)) ) {
         goto error_asdcp;
     }
 
     if ( ! ASDCP_SUCCESS(
-            p_sys->v_audioReader[p_sys->i_audio_reel].p_AudioMXFReader->ReadFrame(p_sys->frame_no + p_sys->p_dcp->audio_reels[p_sys->i_audio_reel].i_correction, AudioFrameBuff, 0, 0)) ) {
+            p_sys->v_audioReader[p_sys->i_audio_reel].p_AudioMXFReader->ReadFrame(p_sys->frame_no + p_sys->p_dcp->audio_reels[p_sys->i_audio_reel].i_correction, AudioFrameBuff, &audio_aes_ctx, 0)) ) {
         AudioFrameBuff.SetData(0,0);
         goto error_asdcp;
     }

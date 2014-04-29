@@ -9,6 +9,7 @@
  *          Anthony Giniers
  *          Ludovic Hoareau
  *          Loukmane Dessai
+ *          Simona-Marinela Prodea <simona dot marinela dot prodea at gmail dot com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -47,34 +48,6 @@
 #include "dcpparser.h"
 
 using namespace std;
-
-static int ReadNextNode(xml_reader_t *p_xmlReader, string& p_node) {
-    const char * c_node;
-    int i;
-    i = xml_ReaderNextNode( p_xmlReader, &c_node );
-    p_node = c_node;
-    return i;
-}
-
-static int ReadEndNode( xml_reader_t *p_xmlReader, string p_node,
-                        int p_type, string &s_value) {
-    string node;
-
-    if ( xml_ReaderIsEmptyElement( p_xmlReader) )
-            return 0;
-
-    if (p_type != XML_READER_STARTELEM)
-        return -1;
-
-    if (ReadNextNode(p_xmlReader, node) == XML_READER_TEXT)
-    {
-        s_value = node;
-        if((ReadNextNode(p_xmlReader, node) == XML_READER_ENDELEM) &&
-                node == p_node)
-            return 0;
-    }
-    return -1;
-}
 
 typedef enum {
     CHUNK_UNKNOWN = 0,
@@ -161,7 +134,7 @@ int Chunk::Parse( xml_reader_t *p_xmlReader, string p_node, int p_type){
     if( p_node != "Chunk")
         return -1;
     /* loop on Chunks Node */
-    while( ( type = ReadNextNode( p_xmlReader, node ) ) > 0 ) {
+    while( ( type = XmlFile::ReadNextNode( p_xmlReader, node ) ) > 0 ) {
         switch (type) {
             case XML_READER_STARTELEM:
             {
@@ -169,7 +142,7 @@ int Chunk::Parse( xml_reader_t *p_xmlReader, string p_node, int p_type){
                 for(ChunkTag_t i = CHUNK_PATH; i <= CHUNK_LENGTH; i = ChunkTag_t(i+1)) {
                     if( node == names[i-1]) {
                         chunk_tag = i;
-                        if ( ReadEndNode(p_xmlReader, node, type, s_value))
+                        if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value))
                             return -1;
                         switch (chunk_tag) {
                             case CHUNK_PATH:
@@ -230,11 +203,13 @@ AssetMap::~AssetMap() { }
 int AssetMap::Parse ( )
 {
     int type = 0;
+    int retval;
     int reel_nbr = 0;
     int index = 0;
     int sum_duration_vid = 0;
     int sum_duration_aud = 0;
     string node;
+    char *psz_kdm_path;
 
     CPL  *cpl;
     Reel *reel;
@@ -251,7 +226,7 @@ int AssetMap::Parse ( )
 
     /* reading ASSETMAP file to get the asset_list */
     msg_Dbg( p_demux, "reading ASSETMAP file..." );
-    while( ( type = ReadNextNode( this->p_xmlReader, node ) ) > 0 ) {
+    while( ( type = XmlFile::ReadNextNode( this->p_xmlReader, node ) ) > 0 ) {
         if ( (type == XML_READER_STARTELEM) && ( node =="AssetList")) {
             _p_asset_list =  new (nothrow) AssetList();
             if ( unlikely(_p_asset_list == NULL) ) {
@@ -337,6 +312,29 @@ int AssetMap::Parse ( )
         return -1;
     }
 
+    /* KDM, if needed */
+    for( AssetList::iterator iter = _p_asset_list->begin(); iter != _p_asset_list->end(); ++iter )
+        if( ! (*iter)->getKeyId().empty() )
+        {
+            msg_Dbg( p_demux, "DCP is encrypted, searching KDM file...");
+            psz_kdm_path = var_InheritString( p_demux, "kdm" );
+            if( !psz_kdm_path || !*psz_kdm_path )
+            {
+                msg_Err( p_demux, "cryptographic key IDs found in CPL and no path to KDM given");
+                free( psz_kdm_path );
+                this->CloseXml();
+                return VLC_EGENERIC;
+            }
+            KDM p_kdm( p_demux, psz_kdm_path, p_dcp );
+            free( psz_kdm_path );
+            if( ( retval = p_kdm.Parse() ) )
+            {
+                this->CloseXml();
+                return retval;
+            }
+            break;
+        }
+
     reel_nbr = cpl->getReelList().size();
     for(index = 0; index != reel_nbr; ++index)
     {
@@ -356,6 +354,7 @@ int AssetMap::Parse ( )
             video.i_duration = asset->getDuration();
             video.i_correction = video.i_entrypoint - sum_duration_vid + video.i_duration;
             video.i_absolute_end = sum_duration_vid;
+            video.p_key = asset->getAESKeyById( p_dcp->p_key_list, asset->getKeyId() );
             p_dcp->video_reels.push_back(video);
             msg_Dbg( this->p_demux, "Video Track: %s",asset->getPath().c_str());
             msg_Dbg( this->p_demux, "Entry point: %i",asset->getEntryPoint());
@@ -378,6 +377,7 @@ int AssetMap::Parse ( )
             audio.i_duration = asset->getDuration();
             audio.i_correction = audio.i_entrypoint - sum_duration_aud + audio.i_duration;
             audio.i_absolute_end = sum_duration_aud;
+            audio.p_key = asset->getAESKeyById( p_dcp->p_key_list, asset->getKeyId() );
             p_dcp->audio_reels.push_back(audio);
             msg_Dbg( this->p_demux, "Audio Track: %s",asset->getPath().c_str());
             msg_Dbg( this->p_demux, "Entry point: %i",asset->getEntryPoint());
@@ -407,7 +407,7 @@ int Asset::Parse( xml_reader_t *p_xmlReader, string p_node, int p_type)
     if( p_node != s_root_node)
         return -1;
     /* loop on Assets Node */
-    while( ( type = ReadNextNode( p_xmlReader, node ) ) > 0 ) {
+    while( ( type = XmlFile::ReadNextNode( p_xmlReader, node ) ) > 0 ) {
         switch (type) {
             case XML_READER_STARTELEM:
                 {
@@ -421,7 +421,7 @@ int Asset::Parse( xml_reader_t *p_xmlReader, string p_node, int p_type)
                                     /* case of <PackinkList/> tag, bur not compliant with SMPTE-429-9 2007*/
                                     if (xml_ReaderIsEmptyElement( p_xmlReader))
                                         this->b_is_packing_list = true;
-                                    else if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                    else if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                         return -1;
                                     if ( s_value == "true" )
                                         this->b_is_packing_list = true;
@@ -432,12 +432,12 @@ int Asset::Parse( xml_reader_t *p_xmlReader, string p_node, int p_type)
                                     this->s_path = this->chunk_vec[0].getPath();
                                     break;
                                 case ASSET_ID:
-                                    if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                    if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                         return -1;
                                     this->s_id = s_value;
                                     break;
                                 case ASSET_ANNOTATION_TEXT:
-                                    if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                    if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                         return -1;
                                     this->s_annotation = s_value;
                                     break;
@@ -493,7 +493,7 @@ int Asset::ParsePKL( xml_reader_t *p_xmlReader)
     string s_value;
     const string s_root_node = "Asset";
 
-    while( ( type = ReadNextNode( p_xmlReader, node ) ) > 0 ) {
+    while( ( type = XmlFile::ReadNextNode( p_xmlReader, node ) ) > 0 ) {
         switch (type) {
             case XML_READER_STARTELEM:
                 {
@@ -503,7 +503,7 @@ int Asset::ParsePKL( xml_reader_t *p_xmlReader)
                             _tag = i;
                             switch(_tag) {
                                 case ASSET_ANNOTATION_TEXT:
-                                    if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                    if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                         return -1;
                                     if ( this->s_annotation.empty() )
                                         this->s_annotation = s_value;
@@ -511,22 +511,22 @@ int Asset::ParsePKL( xml_reader_t *p_xmlReader)
                                         this->s_annotation = this->s_annotation + "--" + s_value;
                                     break;
                                 case ASSET_HASH:
-                                    if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                    if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                         return -1;
                                     this->s_hash = s_value;
                                     break;
                                 case ASSET_SIZE:
-                                    if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                    if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                         return -1;
                                     this->ui_size = atol(s_value.c_str());
                                     break;
                                 case ASSET_TYPE:
-                                    if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                    if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                         return -1;
                                     this->s_type = s_value;
                                     break;
                                 case ASSET_ORIGINAL_FILENAME:
-                                    if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                    if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                         return -1;
                                     this->s_original_filename = s_value;
                                     break;
@@ -602,7 +602,7 @@ int Asset::parseChunkList( xml_reader_t *p_xmlReader, string p_node, int p_type)
     if( p_node != "ChunkList" )
         return -1;
     /* loop on Assets Node */
-    while( ( type = ReadNextNode( p_xmlReader, node ) ) > 0 ) {
+    while( ( type = XmlFile::ReadNextNode( p_xmlReader, node ) ) > 0 ) {
          switch (type) {
             case XML_READER_STARTELEM:
                 {
@@ -629,6 +629,20 @@ int Asset::parseChunkList( xml_reader_t *p_xmlReader, string p_node, int p_type)
     return -1;
 }
 
+AESKey * Asset::getAESKeyById( AESKeyList* p_key_list, const string s_id )
+{
+    /* return NULL if DCP is not encrypted */
+    if( !p_key_list || s_id.empty() )
+        return NULL;
+
+    for( AESKeyList::iterator index = p_key_list->begin(); index != p_key_list->end(); ++index )
+        if( (*index)->getKeyId() == s_id )
+            return *index;
+
+    return NULL;
+}
+
+
 int AssetMap::ParseAssetList (xml_reader_t *p_xmlReader, const string p_node, int p_type)
 {
     string node;
@@ -640,7 +654,7 @@ int AssetMap::ParseAssetList (xml_reader_t *p_xmlReader, const string p_node, in
     if( p_node != "AssetList" )
         return -1;
     /* loop on AssetList nodes */
-    while( ( type = ReadNextNode( p_xmlReader, node ) ) > 0 ) {
+    while( ( type = XmlFile::ReadNextNode( p_xmlReader, node ) ) > 0 ) {
         switch (type) {
             case XML_READER_STARTELEM:
                 if (node != "Asset" )
@@ -707,6 +721,35 @@ int XmlFile::OpenXml()
     return 0;
 }
 
+int XmlFile::ReadNextNode( xml_reader_t *p_xmlReader, string& p_node )
+{
+    const char * c_node;
+    int i;
+    i = xml_ReaderNextNode( p_xmlReader, &c_node );
+    p_node = c_node;
+    return i;
+}
+
+int XmlFile::ReadEndNode( xml_reader_t *p_xmlReader, string p_node, int p_type, string &s_value)
+{
+    string node;
+
+    if ( xml_ReaderIsEmptyElement( p_xmlReader) )
+            return 0;
+
+    if (p_type != XML_READER_STARTELEM)
+        return -1;
+
+    if ( XmlFile::ReadNextNode( p_xmlReader, node ) == XML_READER_TEXT )
+    {
+        s_value = node;
+        if( ( XmlFile::ReadNextNode( p_xmlReader, node ) == XML_READER_ENDELEM ) &&
+                node == p_node)
+            return 0;
+    }
+    return -1;
+}
+
 void XmlFile::CloseXml() {
     if( this->p_stream )
         stream_Delete( this->p_stream );
@@ -756,12 +799,12 @@ int PKL::Parse()
         return -1;
 
     /* read 1st node  and verify that is a PKL*/
-    if (! ( ( XML_READER_STARTELEM == ReadNextNode(this->p_xmlReader, node) ) &&
+    if (! ( ( XML_READER_STARTELEM == XmlFile::ReadNextNode(this->p_xmlReader, node) ) &&
                 (node == s_root_node) ) ) {
         msg_Err( this->p_demux, "Not a valid XML Packing List");
         goto error;
     }
-    while( ( type = ReadNextNode( this->p_xmlReader, node ) ) > 0 ) {
+    while( ( type = XmlFile::ReadNextNode( this->p_xmlReader, node ) ) > 0 ) {
         switch (type) {
             case XML_READER_STARTELEM: {
                 PKLTag_t _tag = PKL_UNKNOWN;
@@ -784,37 +827,37 @@ int PKL::Parse()
                                 break;
                             /* Parse simple/end nodes */
                             case PKL_ID:
-                                if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_id = s_value;
                                 break;
                             case PKL_ISSUE_DATE:
-                                if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_issue_date = s_value;
                                 break;
                             case PKL_ISSUER:
-                                if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_issuer = s_value;
                                 break;
                             case PKL_CREATOR:
-                                if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_creator = s_value;
                                 break;
                             case PKL_ANNOTATION_TEXT:
-                                if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_annotation = s_value;
                                 break;
                             case PKL_ICON_ID:
-                                if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_icon_id = s_value;
                                 break;
                             case PKL_GROUP_ID:
-                                if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_group_id = s_value;
                                 break;
@@ -890,7 +933,7 @@ int PKL::ParseAssetList(string p_node, int p_type) {
         return -1;
     if( p_node != "AssetList")
         return -1;
-    while( ( type = ReadNextNode( this->p_xmlReader, node ) ) > 0 ) {
+    while( ( type = XmlFile::ReadNextNode( this->p_xmlReader, node ) ) > 0 ) {
         switch (type) {
             case XML_READER_STARTELEM:
                 if( node =="Asset") {
@@ -923,16 +966,16 @@ int PKL::ParseAsset(string p_node, int p_type) {
         return -1;
 
     /* 1st node shall be Id" */
-    if (( type = ReadNextNode( this->p_xmlReader, node ) ) > 0)
+    if (( type = XmlFile::ReadNextNode( this->p_xmlReader, node ) ) > 0)
         if ( ! ((type == XML_READER_STARTELEM) && (node == "Id")))
             return -1;
-    if (( type = ReadNextNode( this->p_xmlReader, node ) ) > 0)
+    if (( type = XmlFile::ReadNextNode( this->p_xmlReader, node ) ) > 0)
          if (type == XML_READER_TEXT) {
             s_value = node;
             if (unlikely(node.empty()))
                 return -1;
             }
-    if (( type = ReadNextNode( this->p_xmlReader, node ) ) > 0)
+    if (( type = XmlFile::ReadNextNode( this->p_xmlReader, node ) ) > 0)
         if (type == XML_READER_ENDELEM) {
             asset = AssetMap::getAssetById(this->asset_list, s_value);
             if (asset  == NULL)
@@ -955,7 +998,7 @@ int PKL::ParseSigner(string p_node, int p_type)
     if( p_node != "Signer")
         return -1;
 
-    while( ( type = ReadNextNode( this->p_xmlReader, node ) ) > 0 ) {
+    while( ( type = XmlFile::ReadNextNode( this->p_xmlReader, node ) ) > 0 ) {
         /* TODO not implemented. Just parse until end of Signer node */
             if ((node == p_node) && (type = XML_READER_ENDELEM))
                 return 0;
@@ -975,7 +1018,7 @@ int PKL::ParseSignature(string p_node, int p_type)
     if( p_node != "ds:Signature")
         return -1;
 
-    while (( type = ReadNextNode( this->p_xmlReader, node ) ) > 0 ) {
+    while (( type = XmlFile::ReadNextNode( this->p_xmlReader, node ) ) > 0 ) {
         /* TODO not implemented. Just parse until end of Signature node */
             if ((node == p_node) && (type = XML_READER_ENDELEM))
                 return 0;
@@ -997,15 +1040,15 @@ int Reel::Parse(string p_node, int p_type) {
     if( p_node != "Reel")
         return -1;
 
-    while (( type = ReadNextNode(this->p_xmlReader, node ) ) > 0 ) {
+    while (( type = XmlFile::ReadNextNode(this->p_xmlReader, node ) ) > 0 ) {
         switch (type) {
             case XML_READER_STARTELEM:
                 if (node =="Id") {
-                    if ( ReadEndNode(this->p_xmlReader, node, type, s_value))
+                    if ( XmlFile::ReadEndNode(this->p_xmlReader, node, type, s_value))
                         return -1;
                     this->s_id = s_value;
                 } else if (node == "AnnotationText") {
-                    if ( ReadEndNode(this->p_xmlReader, node, type, s_value))
+                    if ( XmlFile::ReadEndNode(this->p_xmlReader, node, type, s_value))
                         return -1;
                     this->s_annotation = s_value;
                 } else if ( node =="AssetList" ) {
@@ -1060,7 +1103,7 @@ int Reel::ParseAssetList(string p_node, int p_type) {
     if( p_node != "AssetList")
         return -1;
 
-    while (( type = ReadNextNode( this->p_xmlReader, node ) ) > 0 )  {
+    while (( type = XmlFile::ReadNextNode( this->p_xmlReader, node ) ) > 0 )  {
         switch (type) {
             case XML_READER_STARTELEM:
                 if (node =="MainPicture") {
@@ -1105,11 +1148,11 @@ int Reel::ParseAsset(string p_node, int p_type, TrackType_t e_track) {
         return -1;
 
     /* 1st node shall be Id */
-    if (( type = ReadNextNode( this->p_xmlReader, node ) ) > 0)
+    if (( type = XmlFile::ReadNextNode( this->p_xmlReader, node ) ) > 0)
         if ( ! ((type == XML_READER_STARTELEM) && (node == "Id")))
             return -1;
 
-    if ( ReadEndNode(this->p_xmlReader, node, type, s_value) )
+    if ( XmlFile::ReadEndNode(this->p_xmlReader, node, type, s_value) )
         return -1;
 
     asset = AssetMap::getAssetById(this->p_asset_list, s_value);
@@ -1117,42 +1160,43 @@ int Reel::ParseAsset(string p_node, int p_type, TrackType_t e_track) {
         return -1;
 
     while(  (! b_stop_parse) &&
-            (( type = ReadNextNode( this->p_xmlReader, node ) ) > 0 ) ) {
+            (( type = XmlFile::ReadNextNode( this->p_xmlReader, node ) ) > 0 ) ) {
         switch (type) {
             case XML_READER_STARTELEM:
                 if (node =="EditRate") {
-                    if ( ReadEndNode(this->p_xmlReader, node, type, s_value))
+                    if ( XmlFile::ReadEndNode(this->p_xmlReader, node, type, s_value))
                         return -1;
                 } else if (node == "AnnotationText") {
-                    if ( ReadEndNode(this->p_xmlReader, node, type, s_value))
+                    if ( XmlFile::ReadEndNode(this->p_xmlReader, node, type, s_value))
                         return -1;
                         asset->setAnnotation(s_value);
                 } else if (node == "IntrinsicDuration") {
-                    if ( ReadEndNode(this->p_xmlReader, node, type, s_value))
+                    if ( XmlFile::ReadEndNode(this->p_xmlReader, node, type, s_value))
                         return -1;
                         asset->setIntrinsicDuration(atoi(s_value.c_str()));
                 } else if (node == "EntryPoint") {
-                    if ( ReadEndNode(this->p_xmlReader, node, type, s_value))
+                    if ( XmlFile::ReadEndNode(this->p_xmlReader, node, type, s_value))
                         return -1;
                         asset->setEntryPoint(atoi(s_value.c_str()));
                 } else if (node == "Duration") {
-                    if ( ReadEndNode(this->p_xmlReader, node, type, s_value))
+                    if ( XmlFile::ReadEndNode(this->p_xmlReader, node, type, s_value))
                         return -1;
                         asset->setDuration(atoi(s_value.c_str()));
                 } else if (node == "KeyId") {
-                    if ( ReadEndNode(this->p_xmlReader, node, type, s_value))
+                    if ( XmlFile::ReadEndNode(this->p_xmlReader, node, type, s_value))
                         return -1;
+                    asset->setKeyId( s_value );
                 } else if (node == "Hash") {
-                    if ( ReadEndNode(this->p_xmlReader, node, type, s_value))
+                    if ( XmlFile::ReadEndNode(this->p_xmlReader, node, type, s_value))
                         return -1;
                 } else if (node == "FrameRate") {
-                    if ( ReadEndNode(this->p_xmlReader, node, type, s_value))
+                    if ( XmlFile::ReadEndNode(this->p_xmlReader, node, type, s_value))
                         return -1;
                 } else if (node == "ScreenAspectRatio") {
-                    if ( ReadEndNode(this->p_xmlReader, node, type, s_value))
+                    if ( XmlFile::ReadEndNode(this->p_xmlReader, node, type, s_value))
                         return -1;
                 } else if (node == "Language") {
-                    if ( ReadEndNode(this->p_xmlReader, node, type, s_value))
+                    if ( XmlFile::ReadEndNode(this->p_xmlReader, node, type, s_value))
                         return -1;
                 } else {
                     /* unknown tag */
@@ -1208,7 +1252,7 @@ CPL::CPL(demux_t * p_demux, string s_path, AssetList *_asset_list)
         }
 
     /* read 1st node  and verify that is a CPL */
-    if ( (type = ReadNextNode(p_xmlReader, node)) > 0) {
+    if ( (type = XmlFile::ReadNextNode(p_xmlReader, node)) > 0) {
         if ( (type == XML_READER_STARTELEM) && (node == "CompositionPlaylist") ) {
             this->type = XML_CPL;
         }
@@ -1248,13 +1292,13 @@ int CPL::Parse()
         return -1;
 
     /* read 1st node  and verify that is a CPL*/
-    if (! ( ( XML_READER_STARTELEM == ReadNextNode(this->p_xmlReader, node) ) &&
+    if (! ( ( XML_READER_STARTELEM == XmlFile::ReadNextNode(this->p_xmlReader, node) ) &&
                 (node == s_root_node) ) ) {
         msg_Err( this->p_demux, "Not a valid XML Packing List");
         goto error;
     }
 
-    while( ( type = ReadNextNode( this->p_xmlReader, node ) ) > 0 ) {
+    while( ( type = XmlFile::ReadNextNode( this->p_xmlReader, node ) ) > 0 ) {
         switch (type) {
             case XML_READER_STARTELEM: {
                 CPLTag_t _tag = CPL_UNKNOWN;
@@ -1276,42 +1320,42 @@ int CPL::Parse()
                                 break;
                                 /* Parse simple/end nodes */
                             case CPL_ID:
-                                if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_id = s_value;
                                 break;
                             case CPL_ANNOTATION_TEXT:
-                                if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_annotation = s_value;
                                 break;
                             case CPL_ICON_ID:
-                                if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_icon_id = s_value;
                                 break;
                             case CPL_ISSUE_DATE:
-                                if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_issue_date= s_value;
                                 break;
                             case CPL_ISSUER:
-                                if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_issuer = s_value;
                                 break;
                             case CPL_CREATOR:
-                                if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_creator = s_value;
                                 break;
                             case CPL_CONTENT_TITLE:
-                                if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_content_title = s_value;
                                 break;
                             case CPL_CONTENT_KIND:
-                                if ( ReadEndNode(p_xmlReader, node, type, s_value) )
+                                if ( XmlFile::ReadEndNode(p_xmlReader, node, type, s_value) )
                                     goto error;
                                 this->s_content_kind = s_value;
                                 break;
@@ -1358,7 +1402,7 @@ int CPL::ParseReelList(string p_node, int p_type) {
         return -1;
     if( p_node != "ReelList")
         return -1;
-    while( ( type = ReadNextNode( this->p_xmlReader, node ) ) > 0 ) {
+    while( ( type = XmlFile::ReadNextNode( this->p_xmlReader, node ) ) > 0 ) {
         switch (type) {
             case XML_READER_STARTELEM: {
                 Reel *p_reel = new (nothrow) Reel( this->p_demux, this->asset_list, this->p_xmlReader);
@@ -1401,7 +1445,7 @@ int CPL::DummyParse(string p_node, int p_type)
     if (xml_ReaderIsEmptyElement( this->p_xmlReader))
         return 0;
 
-    while (( type = ReadNextNode( this->p_xmlReader, node ) ) > 0 ) {
+    while (( type = XmlFile::ReadNextNode( this->p_xmlReader, node ) ) > 0 ) {
         /* TODO not implemented. Just pase until end of input node */
         if ((node == p_node) && (type = XML_READER_ENDELEM))
             return 0;

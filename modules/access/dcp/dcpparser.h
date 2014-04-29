@@ -8,6 +8,7 @@
  *          Anthony Giniers
  *          Ludovic Hoareau
  *          Loukmane Dessai
+ *          Simona-Marinela Prodea <simona dot marinela dot prodea at gmail dot com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -42,6 +43,10 @@
 #include <vlc_demux.h>
 #include <vlc_plugin.h>
 
+/* gcrypt headers */
+#include <gcrypt.h>
+#include <vlc_gcrypt.h>
+
 #include <iostream>
 #include <string>
 #include <list>
@@ -67,7 +72,8 @@ typedef enum {
 class Asset;
 class AssetList: public std::list<Asset *> {};
 class PKL;
-
+class AESKey;
+class AESKeyList: public std::list<AESKey *> {};
 
 /* This struct stores useful information about an MXF for demux() */
 struct info_reel
@@ -77,6 +83,7 @@ struct info_reel
     int i_duration;
     int i_correction;       /* entrypoint - sum of previous durations */
     uint32_t i_absolute_end;     /* correction + duration */
+    AESKey * p_key;
 };
 
 /* This struct stores the most important information about the DCP */
@@ -86,12 +93,13 @@ struct dcp_t
 
     vector<PKL *> pkls;
     AssetList *p_asset_list;
+    AESKeyList *p_key_list;
 
     vector<info_reel> audio_reels;
     vector<info_reel> video_reels;
 
     dcp_t():
-        p_asset_list(NULL) {};
+        p_asset_list(NULL), p_key_list(NULL) {};
 
     ~dcp_t( ) {
         vlc_delete_all(pkls);
@@ -99,6 +107,10 @@ struct dcp_t
             vlc_delete_all(*p_asset_list);
             delete(p_asset_list);
 
+        }
+        if ( p_key_list != NULL ) {
+            vlc_delete_all(*p_key_list);
+            delete(p_key_list);
         }
     }
 };
@@ -116,6 +128,9 @@ public:
     virtual ~XmlFile( );
 
     virtual int Parse() = 0;
+
+    static int ReadNextNode( xml_reader_t *p_xmlReader, string& s_node );
+    static int ReadEndNode( xml_reader_t *p_xmlReader, string s_node, int i_type, string &s_value );
 
     bool IsCPL() { return type == XML_CPL; }
 protected:
@@ -164,6 +179,7 @@ public:
         else
             this->s_annotation = this->s_annotation + "--" + p_string;
     };
+    void setKeyId(string p_string) { this->s_key_id = p_string; };
     void setPackingList(bool p_bool) { this->s_path = p_bool; };
     void setEntryPoint(int i_val) { this->i_entry_point = i_val; };
     void setDuration (int i_val) { this->i_duration = i_val; };
@@ -172,6 +188,7 @@ public:
     string getPath() const { return this->s_path; };
     string getType() const { return this->s_type; };
     string getOriginalFilename() const { return this->s_original_filename; };
+    string getKeyId() const { return this->s_key_id; }
     int getEntryPoint() const { return this->i_entry_point; };
     int getDuration() const { return this->i_duration; };
     int getIntrinsicDuration() const { return this->i_intrisic_duration; };
@@ -180,6 +197,8 @@ public:
 
     int Parse( xml_reader_t *p_xmlReader, string node, int type);
     int ParsePKL( xml_reader_t *p_xmlReader);
+
+    static AESKey * getAESKeyById( AESKeyList* , const string s_id );
 
     // TODO: remove
     void Dump();
@@ -315,4 +334,76 @@ private:
 
     int ParseAssetList (xml_reader_t *p_xmlReader, const string p_node, int p_type);
 };
+
+class KDM : public XmlFile {
+
+public:
+    KDM( demux_t * p_demux, string s_path, dcp_t *_p_dcp )
+        : XmlFile( p_demux, s_path ), p_dcp(_p_dcp) {}
+
+    virtual int Parse();
+
+private:
+    dcp_t *p_dcp;
+
+    int ParsePrivate( const string s_node, int i_type );
+};
+
+class AESKey
+{
+public:
+    AESKey( demux_t *demux ): p_demux( demux ) { }
+    virtual ~AESKey() {};
+
+    const string getKeyId() { return this->s_key_id; };
+    const unsigned char * getKey() { return this->ps_key; };
+
+    int Parse( xml_reader_t *p_xml_reader, string s_node, int i_type );
+
+private:
+    demux_t *p_demux;
+    string s_key_id;
+    unsigned char ps_key[16];
+
+    int decryptRSA( string s_cipher_text_b64 );
+    int extractInfo( unsigned char * ps_plain_text, bool smpte );
+};
+
+class RSAKey
+{
+public:
+    RSAKey( demux_t *demux ):
+        priv_key( NULL ), p_demux( demux ) { }
+    virtual ~RSAKey() { gcry_sexp_release( priv_key ); }
+
+    /* some ASN.1 tags.  */
+    enum
+    {
+      TAG_INTEGER = 2,
+      TAG_SEQUENCE = 16,
+    };
+
+    /* ASN.1 Parser object.  */
+    struct tag_info
+    {
+        int class_;            /* Object class.  */
+        unsigned long tag;     /* The tag of the object.  */
+        unsigned long length;  /* Length of the values.  */
+        int nhdr;              /* Length of the header (TL).  */
+        unsigned int ndef:1;   /* The object has an indefinite length.  */
+        unsigned int cons:1;   /* This is a constructed object.  */
+    };
+
+    int setPath();
+    int readPEM();
+    int readDER( unsigned char const *ps_data_der, size_t length );
+    int parseTag( unsigned char const **buffer, size_t *buflen, struct tag_info *ti);
+
+    gcry_sexp_t priv_key;
+
+private:
+    demux_t *p_demux;
+    string s_path;
+};
+
 #endif /* _DCPPARSER_H */
