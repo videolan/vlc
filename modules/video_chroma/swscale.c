@@ -430,6 +430,26 @@ static int Init( filter_t *p_filter )
         return VLC_EGENERIC;
     }
 
+    if (p_filter->b_allow_fmt_out_change)
+    {
+        /*
+         * If the transformation is not homothetic we must modify the
+         * aspect ratio of the output format in order to have the
+         * output picture displayed correctly and not stretched
+         * horizontally or vertically.
+         * WARNING: this is a hack, ideally this should not be needed
+         * and the vout should update its video format instead.
+         */
+        unsigned i_sar_num = p_fmti->i_sar_num * p_fmti->i_visible_width;
+        unsigned i_sar_den = p_fmti->i_sar_den * p_fmto->i_visible_width;
+        vlc_ureduce(&i_sar_num, &i_sar_den, i_sar_num, i_sar_den, 65536);
+        i_sar_num *= p_fmto->i_visible_height;
+        i_sar_den *= p_fmti->i_visible_height;
+        vlc_ureduce(&i_sar_num, &i_sar_den, i_sar_num, i_sar_den, 65536);
+        p_fmto->i_sar_num = i_sar_num;
+        p_fmto->i_sar_den = i_sar_den;
+    }
+
     p_sys->b_add_a = cfg.b_add_a;
     p_sys->b_copy = cfg.b_copy;
     p_sys->fmt_in  = *p_fmti;
