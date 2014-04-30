@@ -155,6 +155,7 @@ struct decoder_sys_t
     int crop_top, crop_left;
     char *name;
 
+    bool allocated;
     bool started;
     bool decoded;
     bool error_state;
@@ -451,6 +452,12 @@ static int OpenDecoder(vlc_object_t *p_this)
     // but not in 4.1 devices.
     p_sys->codec = (*env)->CallStaticObjectMethod(env, p_sys->media_codec_class,
                                                   p_sys->create_by_codec_name, codec_name);
+    if ((*env)->ExceptionOccurred(env)) {
+        msg_Warn(p_dec, "Exception occurred in MediaCodec.createByCodecName.");
+        (*env)->ExceptionClear(env);
+        goto error;
+    }
+    p_sys->allocated = true;
     p_sys->codec = (*env)->NewGlobalRef(env, p_sys->codec);
 
     jobject format = (*env)->CallStaticObjectMethod(env, p_sys->media_format_class,
@@ -566,7 +573,8 @@ static void CloseDecoder(vlc_object_t *p_this)
     if (p_sys->codec) {
         if (p_sys->started)
             (*env)->CallVoidMethod(env, p_sys->codec, p_sys->stop);
-        (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release);
+        if (p_sys->allocated)
+            (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release);
         (*env)->DeleteGlobalRef(env, p_sys->codec);
     }
     if (p_sys->buffer_info)
