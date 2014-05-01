@@ -109,6 +109,11 @@ sms_stream_t * sms_New( void )
 
     sms->qlevels = vlc_array_new();
     sms->chunks = vlc_array_new();
+    if ( unlikely(!sms->qlevels || !sms->chunks) )
+    {
+        sms_Free( sms );
+        return NULL;
+    }
     sms->type = UNKNOWN_ES;
     return sms;
 }
