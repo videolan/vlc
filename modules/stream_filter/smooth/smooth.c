@@ -404,6 +404,26 @@ static int parse_Manifest( stream_t *s )
     return VLC_SUCCESS;
 }
 
+static void SysCleanup( stream_sys_t *p_sys )
+{
+    if ( p_sys->sms_streams )
+    {
+        for ( int i=0; i< p_sys->sms_streams->i_count ; i++ )
+            sms_Free( p_sys->sms_streams->pp_elems[i] );
+        vlc_array_destroy( p_sys->sms_streams );
+    }
+    vlc_array_destroy( p_sys->selected_st );
+    vlc_array_destroy( p_sys->download.chunks );
+    if ( p_sys->init_chunks )
+    {
+        for ( int i=0; i< p_sys->init_chunks->i_count ; i++ )
+            chunk_Free( p_sys->init_chunks->pp_elems[i] );
+        vlc_array_destroy( p_sys->init_chunks );
+    }
+    sms_queue_free( p_sys->bws );
+    free( p_sys->base_url );
+}
+
 static int Open( vlc_object_t *p_this )
 {
     stream_t *s = (stream_t*)p_this;
@@ -440,6 +460,7 @@ static int Open( vlc_object_t *p_this )
     if( unlikely( !p_sys->sms_streams || !p_sys->download.chunks ||
                   !p_sys->selected_st || !p_sys->init_chunks ) )
     {
+        SysCleanup( p_sys );
         free( p_sys );
         return VLC_ENOMEM;
     }
@@ -447,6 +468,7 @@ static int Open( vlc_object_t *p_this )
     /* Parse SMS ismc content. */
     if( parse_Manifest( s ) != VLC_SUCCESS )
     {
+        SysCleanup( p_sys );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -497,9 +519,10 @@ static int Open( vlc_object_t *p_this )
 
     if( vlc_clone( &p_sys->thread, sms_Thread, s, VLC_THREAD_PRIORITY_INPUT ) )
     {
-        free( p_sys );
+        SysCleanup( p_sys );
         vlc_mutex_destroy( &p_sys->download.lock_wait );
         vlc_cond_destroy( &p_sys->download.wait );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -524,29 +547,7 @@ static void Close( vlc_object_t *p_this )
     vlc_mutex_destroy( &p_sys->download.lock_wait );
     vlc_cond_destroy( &p_sys->download.wait );
 
-    /* Free sms streams */
-    sms_stream_t *sms;
-    for( int i = 0; i < vlc_array_count( p_sys->sms_streams ); i++ )
-    {
-        sms = vlc_array_item_at_index( p_sys->sms_streams, i );
-        if( sms )
-            sms_Free( sms );
-    }
-    /* Free downloaded chunks */
-    chunk_t *chunk;
-    for( int i = 0; i < vlc_array_count( p_sys->init_chunks ); i++ )
-    {
-        chunk = vlc_array_item_at_index( p_sys->init_chunks, i );
-        chunk_Free( chunk );
-    }
-
-    sms_queue_free( p_sys->bws );
-    vlc_array_destroy( p_sys->sms_streams );
-    vlc_array_destroy( p_sys->selected_st );
-    vlc_array_destroy( p_sys->download.chunks );
-    vlc_array_destroy( p_sys->init_chunks );
-
-    free( p_sys->base_url );
+    SysCleanup( p_sys );
     free( p_sys );
 }
 
