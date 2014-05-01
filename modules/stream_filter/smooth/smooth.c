@@ -172,12 +172,15 @@ static int parse_Manifest( stream_t *s )
                         p_sys->timescale = TIMESCALE;
                 }
 
-
                 if( !strcmp( node, "StreamIndex" ) )
                 {
                     sms = sms_New();
                     if( unlikely( !sms ) )
+                    {
+                        xml_ReaderDelete( vlc_reader );
+                        xml_Delete( vlc_xml );
                         return VLC_ENOMEM;
+                    }
                     sms->id = next_track_id;
                     next_track_id++;
 
@@ -225,15 +228,21 @@ static int parse_Manifest( stream_t *s )
                         else if( sms->type == SPU_ES )
                             sms->name = strdup( "text" );
                     }
-
-                    vlc_array_append( p_sys->sms_streams, sms );
                 }
 
                 if( !strcmp( node, "QualityLevel" ) )
                 {
+                    if ( !sms )
+                        break;
+
                     ql = ql_New();
                     if( !ql )
+                    {
+                        sms_Free( sms );
+                        xml_ReaderDelete( vlc_reader );
+                        xml_Delete( vlc_xml );
                         return VLC_ENOMEM;
+                    }
                     ql->id = next_qid;
                     next_qid++;
                     while( (name = xml_ReaderNextAttr( vlc_reader, &value )) )
@@ -275,11 +284,21 @@ static int parse_Manifest( stream_t *s )
                         if( !strcmp( name, "BitsPerSample" ) )
                             ql->BitsPerSample = strtoul( value, NULL, 10 );
                     }
+
                     vlc_array_append( sms->qlevels, ql );
+                }
+
+                if ( !strcmp( node, "Content" ) && sms && !sms->url_template )
+                {
+                    /* empty(@Url) && ./Content == manifest embedded content */
+                    sms_Free( sms );
+                    sms = NULL;
                 }
 
                 if( !strcmp( node, "c" ) )
                 {
+                    if ( !sms )
+                        break;
                     loop_count++;
                     start_time = duration = -1;
                     while( (name = xml_ReaderNextAttr( vlc_reader, &value )) )
@@ -327,6 +346,9 @@ static int parse_Manifest( stream_t *s )
                     if( unlikely( chunk_New( sms, computed_duration,
                                         computed_start_time ) == NULL ) )
                     {
+                        sms_Free( sms );
+                        xml_ReaderDelete( vlc_reader );
+                        xml_Delete( vlc_xml );
                         return VLC_ENOMEM;
                     }
                     if( b_weird && start_time != -1 )
@@ -338,17 +360,29 @@ static int parse_Manifest( stream_t *s )
                 if( strcmp( node, "StreamIndex" ) )
                     break;
 
-                computed_start_time = 0;
-                computed_duration = 0;
-                loop_count = 0;
-                if( b_weird && !chunk_New( sms, computed_duration, computed_start_time ) )
-                    return VLC_ENOMEM;
+                if ( sms )
+                {
+                    vlc_array_append( p_sys->sms_streams, sms );
 
-                b_weird = false;
-                next_qid = 1;
+                    computed_start_time = 0;
+                    computed_duration = 0;
+                    loop_count = 0;
+                    if( b_weird && !chunk_New( sms, computed_duration, computed_start_time ) )
+                    {
+                        sms_Free( sms );
+                        xml_ReaderDelete( vlc_reader );
+                        xml_Delete( vlc_xml );
+                        return VLC_ENOMEM;
+                    }
 
-                if( sms->qlevel_nb == 0 )
-                    sms->qlevel_nb = vlc_array_count( sms->qlevels );
+                    b_weird = false;
+                    next_qid = 1;
+
+                    if( sms->qlevel_nb == 0 )
+                        sms->qlevel_nb = vlc_array_count( sms->qlevels );
+
+                    sms = NULL;
+                }
                 break;
 
             case XML_READER_NONE:
@@ -356,6 +390,9 @@ static int parse_Manifest( stream_t *s )
             case XML_READER_TEXT:
                 break;
             default:
+                sms_Free( sms );
+                xml_ReaderDelete( vlc_reader );
+                xml_Delete( vlc_xml );
                 return VLC_EGENERIC;
         }
     }
@@ -437,14 +474,17 @@ static int Open( vlc_object_t *p_this )
     {
         wanted = qlvl = NULL;
         sms = vlc_array_item_at_index( p_sys->sms_streams, i );
-        wanted = vlc_array_item_at_index( sms->qlevels, 0 );
-        for( unsigned i=1; i < sms->qlevel_nb; i++ )
+        if ( vlc_array_count( sms->qlevels ) )
         {
-            qlvl = vlc_array_item_at_index( sms->qlevels, i );
-            if( qlvl->Bitrate < wanted->Bitrate )
-                wanted = qlvl;
+            wanted = vlc_array_item_at_index( sms->qlevels, 0 );
+            for( unsigned i=1; i < sms->qlevel_nb; i++ )
+            {
+                qlvl = vlc_array_item_at_index( sms->qlevels, i );
+                if( qlvl->Bitrate < wanted->Bitrate )
+                    wanted = qlvl;
+            }
+            sms->download_qlvl = wanted->id;
         }
-        sms->download_qlvl = wanted->id;
     }
 
     vlc_mutex_init( &p_sys->download.lock_wait );

@@ -115,6 +115,8 @@ sms_stream_t * sms_New( void )
 
 void sms_Free( sms_stream_t *sms )
 {
+    if ( !sms )
+        return;
     if( sms->qlevels )
     {
         for( int n = 0; n < vlc_array_count( sms->qlevels ); n++ )
@@ -138,7 +140,6 @@ void sms_Free( sms_stream_t *sms )
     free( sms->name );
     free( sms->url_template );
     free( sms );
-    sms = NULL;
 }
 
 quality_level_t *get_qlevel( sms_stream_t *sms, const unsigned qid )
