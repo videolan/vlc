@@ -30,7 +30,6 @@
 
 #include "components/playlist/vlc_model.hpp"      /* VLCModel */
 #include "components/playlist/playlist_model.hpp" /* PLModel */
-#include "components/playlist/ml_model.hpp"       /* MLModel */
 #include "components/playlist/views.hpp"          /* 3 views */
 #include "components/playlist/selector.hpp"       /* PLSelector */
 #include "util/animators.hpp"                     /* PixmapAnimator */
@@ -478,21 +477,9 @@ void StandardPLPanel::searchDelayed( const QString& searchText )
 /* This activated by the selector selection */
 void StandardPLPanel::setRootItem( playlist_item_t *p_item, bool b )
 {
-#ifdef SQL_MEDIA_LIBRARY
-    if( b )
-    {
-        msg_Dbg( p_intf, "Setting the SQL ML" );
-        if ( model->switchToModel( VLCProxyModel::SQLML_MODEL ) )
-            currentView->setModel( model );
-    }
-    else
-#else
     Q_UNUSED( b );
-#endif
-    {
-        if ( model->switchToModel( VLCProxyModel::PL_MODEL ) )
-            model->rebuild( p_item );
-    }
+    if ( model->switchToModel( VLCProxyModel::PL_MODEL ) )
+        model->rebuild( p_item );
 }
 
 void StandardPLPanel::browseInto( const QModelIndex &index )

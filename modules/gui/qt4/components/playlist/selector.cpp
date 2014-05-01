@@ -240,12 +240,6 @@ void PLSelector::createItems()
     ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
     ml->treeItem()->setData( 0, Qt::DecorationRole, QIcon( ":/sidebar/library" ) );
 
-#ifdef SQL_MEDIA_LIBRARY
-    /* SQL ML */
-    ml = addItem( SQL_ML_TYPE, "SQL Media Library" )->treeItem();
-    ml->treeItem()->setData( 0, Qt::DecorationRole, QIcon( ":/sidebar/library" ) );
-#endif
-
     /* SD nodes */
     QTreeWidgetItem *mycomp = addItem( CATEGORY_TYPE, N_("My Computer"), false, true )->treeItem();
     QTreeWidgetItem *devices = addItem( CATEGORY_TYPE, N_("Devices"), false, true )->treeItem();
@@ -377,14 +371,6 @@ void PLSelector::setSource( QTreeWidgetItem *item )
                 item->setData( 0, CAP_SEARCH_ROLE, true );
         }
     }
-#ifdef SQL_MEDIA_LIBRARY
-    else if( i_type == SQL_ML_TYPE )
-    {
-        emit categoryActivated( NULL, true );
-        curItem = item;
-        return;
-    }
-#endif
 
     curItem = item;
 

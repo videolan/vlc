@@ -49,7 +49,6 @@ libqt4_plugin_la_SOURCES = \
 	dialogs/bookmarks.cpp dialogs/bookmarks.hpp \
 	dialogs/preferences.cpp dialogs/preferences.hpp \
 	dialogs/mediainfo.cpp dialogs/mediainfo.hpp \
-	dialogs/ml_configuration.cpp dialogs/ml_configuration.hpp \
 	dialogs/epg.cpp dialogs/epg.hpp \
 	dialogs/extended.cpp dialogs/extended.hpp \
 	dialogs/messages.cpp dialogs/messages.hpp \
@@ -85,8 +84,6 @@ libqt4_plugin_la_SOURCES = \
 	components/epg/EPGView.cpp components/epg/EPGView.hpp \
 	components/epg/EPGWidget.cpp components/epg/EPGWidget.hpp \
 	components/playlist/views.cpp components/playlist/views.hpp \
-	components/playlist/ml_item.cpp components/playlist/ml_item.hpp \
-	components/playlist/ml_model.cpp components/playlist/ml_model.hpp \
 	components/playlist/vlc_model.cpp components/playlist/vlc_model.hpp \
 	components/playlist/playlist_model.cpp \
 	components/playlist/playlist_model.hpp \
@@ -169,7 +166,6 @@ nodist_libqt4_plugin_la_SOURCES = \
 	dialogs/firstrun.moc.cpp \
 	dialogs/extensions.moc.cpp \
 	dialogs/fingerprintdialog.moc.cpp \
-	dialogs/ml_configuration.moc.cpp \
 	components/extended_panels.moc.cpp \
 	components/info_panels.moc.cpp \
 	components/info_widgets.moc.cpp \
@@ -190,7 +186,6 @@ nodist_libqt4_plugin_la_SOURCES = \
 	components/playlist/playlist.moc.cpp \
 	components/playlist/standardpanel.moc.cpp \
 	components/playlist/selector.moc.cpp \
-	components/playlist/ml_model.moc.cpp \
 	components/sout/profile_selector.moc.cpp \
 	components/sout/sout_widgets.moc.cpp \
 	util/animators.moc.cpp \

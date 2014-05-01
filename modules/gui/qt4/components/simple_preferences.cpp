@@ -29,7 +29,6 @@
 
 #include "components/simple_preferences.hpp"
 #include "components/preferences_widgets.hpp"
-#include "dialogs/ml_configuration.hpp"
 
 #include <vlc_config_cat.h>
 #include <vlc_configuration.h>
@@ -748,11 +747,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             BUTTONACT( ui.assoButton, assoDialog() );
 #else
             ui.osGroupBox->hide();
-#endif
-#ifdef SQL_MEDIA_LIBRARY
-            BUTTONACT( ui.sqlMLbtn, configML() );
-#else
-            ui.sqlMLbtn->hide();
 #endif
 
             /* interface */

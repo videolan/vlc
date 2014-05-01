@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>686</width>
-    <height>656</height>
+    <height>667</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -318,16 +318,7 @@
              </sizepolicy>
             </property>
             <layout class="QGridLayout" name="gridLayout_7">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
+             <property name="margin">
               <number>0</number>
              </property>
              <item row="1" column="1">
@@ -432,17 +423,24 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="OneInterfaceMode">
+        <property name="text">
+         <string>Allow only one instance</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QCheckBox" name="oneInstanceFromFile">
+        <property name="text">
+         <string>Use only one instance when started from file manager</string>
+        </property>
+       </widget>
+      </item>
       <item row="2" column="0">
        <widget class="QCheckBox" name="treePlaylist">
         <property name="text">
          <string>Display playlist tree</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QCheckBox" name="EnqueueOneInterfaceMode">
-        <property name="text">
-         <string>Enqueue items into playlist in one instance mode</string>
         </property>
        </widget>
       </item>
@@ -453,27 +451,13 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="OneInterfaceMode">
-        <property name="text">
-         <string>Allow only one instance</string>
-        </property>
-       </widget>
-      </item>
       <item row="4" column="1">
        <widget class="QComboBox" name="artFetcher"/>
       </item>
-      <item row="5" column="0">
-       <widget class="QPushButton" name="sqlMLbtn">
+      <item row="0" column="1">
+       <widget class="QCheckBox" name="EnqueueOneInterfaceMode">
         <property name="text">
-         <string>Configure Media Library</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" colspan="2">
-       <widget class="QCheckBox" name="oneInstanceFromFile">
-        <property name="text">
-         <string>Use only one instance when started from file manager</string>
+         <string>Enqueue items into playlist in one instance mode</string>
         </property>
        </widget>
       </item>
@@ -678,7 +662,6 @@
   <tabstop>treePlaylist</tabstop>
   <tabstop>playPauseBox</tabstop>
   <tabstop>artFetcher</tabstop>
-  <tabstop>sqlMLbtn</tabstop>
   <tabstop>updatesBox</tabstop>
   <tabstop>updatesDays</tabstop>
   <tabstop>saveRecentlyPlayed</tabstop>

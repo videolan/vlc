@@ -30,7 +30,6 @@
 */
 
 #include "pictureflow.hpp"
-#include "components/playlist/ml_model.hpp"
 
 #include <QApplication>
 #include <QImage>
