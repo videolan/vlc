@@ -429,7 +429,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                      else if( !strncmp( psz_start, "time=", 5 ) )
                      {
                          p_seekpoint->i_time_offset = atoll(psz_start + 5) *
-                                                        1000000;
+                                                        CLOCK_FREQ;
                      }
                      psz_start = psz_end + 1;
                 }
@@ -801,7 +801,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             if( i_statistic_update < i_current )
             {
                 MainLoopStatistic( p_input );
-                i_statistic_update = i_current + INT64_C(1000000);
+                i_statistic_update = i_current + CLOCK_FREQ;
             }
 
             /* Update the wakeup time */
@@ -939,7 +939,7 @@ static void StartTitle( input_thread_t * p_input )
         vlc_value_t s;
 
         msg_Dbg( p_input, "starting at time: %ds",
-                 (int)( p_input->p->i_start / INT64_C(1000000) ) );
+                 (int)( p_input->p->i_start / CLOCK_FREQ ) );
 
         s.i_time = p_input->p->i_start;
         input_ControlPush( p_input, INPUT_CONTROL_SET_TIME, &s );
@@ -975,7 +975,7 @@ static void LoadSubtitles( input_thread_t *p_input )
 
     const int i_delay = var_CreateGetInteger( p_input, "sub-delay" );
     if( i_delay != 0 )
-        var_SetTime( p_input, "spu-delay", (mtime_t)i_delay * 100000 );
+        var_SetTime( p_input, "spu-delay", (mtime_t)i_delay * CLOCK_FREQ );
 
     /* Look for and add subtitle files */
     unsigned i_flags = SUB_FORCED;
