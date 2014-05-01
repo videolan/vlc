@@ -453,7 +453,7 @@ void PlTreeView::setModel( QAbstractItemModel * model )
     QTreeView::setModel( model );
     VLCModel *m = static_cast<VLCModel*>(model);
     CONNECT( this, expanded( const QModelIndex & ),
-             m->sigs, ensureArtRequestedSlot( const QModelIndex & ) );
+             m, ensureArtRequested( const QModelIndex & ) );
 }
 
 void PlTreeView::startDrag ( Qt::DropActions supportedActions )

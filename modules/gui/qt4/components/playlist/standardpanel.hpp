@@ -60,7 +60,7 @@ class StandardPLPanel: public QWidget
 
 public:
     StandardPLPanel( PlaylistWidget *, intf_thread_t *,
-                     playlist_item_t *, PLSelector *, VLCProxyModel * );
+                     playlist_item_t *, PLSelector *, VLCModel * );
     virtual ~StandardPLPanel();
 
     enum { ICON_VIEW = 0,
@@ -74,7 +74,7 @@ public:
     static QMenu *viewSelectionMenu(StandardPLPanel *obj);
 
 protected:
-    VLCProxyModel *model;
+    VLCModel *model;
     virtual void wheelEvent( QWheelEvent *e );
     bool popup( const QPoint &point );
 

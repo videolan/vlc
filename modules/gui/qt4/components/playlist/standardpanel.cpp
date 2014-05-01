@@ -78,7 +78,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   intf_thread_t *_p_intf,
                                   playlist_item_t *p_root,
                                   PLSelector *_p_selector,
-                                  VLCProxyModel *_p_model )
+                                  VLCModel *_p_model )
                 : QWidget( _parent ),
                   model( _p_model ),
                   p_intf( _p_intf ),
@@ -113,9 +113,9 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     DCONNECT( THEMIM, leafBecameParent( int ),
               this, browseInto( int ) );
 
-    CONNECT( model->sigs, currentIndexChanged( const QModelIndex& ),
+    CONNECT( model, currentIndexChanged( const QModelIndex& ),
              this, handleExpansion( const QModelIndex& ) );
-    CONNECT( model->sigs, rootIndexChanged(), this, browseInto() );
+    CONNECT( model, rootIndexChanged(), this, browseInto() );
 
     setRootItem( p_root, false );
 }
@@ -164,7 +164,7 @@ void StandardPLPanel::popupPlView( const QPoint &point )
 bool StandardPLPanel::popup( const QPoint &point )
 {
     QModelIndex index = popupIndex( currentView ); /* index for menu logic only. Do not store.*/
-    VLCProxyModel *model = qobject_cast<VLCProxyModel *>(currentView->model());
+    VLCModel *model = qobject_cast<VLCModel *>(currentView->model());
 
 #define ADD_MENU_ENTRY( icon, title, act ) \
     if ( model->isSupportedAction( act, index ) )\
@@ -279,7 +279,7 @@ bool StandardPLPanel::popup( const QPoint &point )
 
 void StandardPLPanel::popupAction( QAction *action )
 {
-    VLCProxyModel *model = qobject_cast<VLCProxyModel *>(currentView->model());
+    VLCModel *model = qobject_cast<VLCModel *>(currentView->model());
     VLCModelSubInterface::actionsContainerType a =
             action->data().value<VLCModelSubInterface::actionsContainerType>();
     QModelIndexList list = currentView->selectionModel()->selectedRows();
@@ -478,8 +478,7 @@ void StandardPLPanel::searchDelayed( const QString& searchText )
 void StandardPLPanel::setRootItem( playlist_item_t *p_item, bool b )
 {
     Q_UNUSED( b );
-    if ( model->switchToModel( VLCProxyModel::PL_MODEL ) )
-        model->rebuild( p_item );
+    model->rebuild( p_item );
 }
 
 void StandardPLPanel::browseInto( const QModelIndex &index )

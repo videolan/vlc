@@ -43,66 +43,6 @@
 #include <QBuffer>
 
 /*************************************************************************
- * Proxy model implementation
- *************************************************************************/
-
-VLCProxyModel::VLCProxyModel( QObject *parent )
-    : QSortFilterProxyModel( parent ), VLCModelSubInterface()
-{
-    for ( int i = 0; i <= SQLML_MODEL ; i++ ) sourcemodels[ i ] = NULL;
-    /* Because we can't directly plug the signal without mapping
-       the index to the proxy model, we need a conversion step.
-    */
-    connect( this, SIGNAL( currentIndexChanged_Converted(const QModelIndex&) ),
-             this->sigs, SIGNAL( currentIndexChanged(const QModelIndex&) ) );
-}
-
-bool VLCProxyModel::switchToModel( models type )
-{
-    VLCModel *previousModel = model();
-    VLCModel *newModel = sourcemodels[ type ];
-    if ( ! newModel /*|| newModel == previousModel*/ ) return false;
-
-    setSourceModel( newModel );
-    if ( previousModel )
-    {
-        /* First disconnect previous signals */
-        disconnect( previousModel->sigs, SIGNAL( currentIndexChanged(const QModelIndex&) ),
-                    this, SIGNAL( currentIndexChanged_IndexConversion(const QModelIndex&) ) );
-        disconnect( previousModel->sigs, SIGNAL( rootIndexChanged() ),
-                    this->sigs, SIGNAL( rootIndexChanged() ) );
-    }
-
-    /* wire to propagate sourceModel's signals */
-    connect( model()->sigs, SIGNAL( currentIndexChanged(const QModelIndex&) ),
-             this, SLOT( currentIndexChanged_IndexConversion(const QModelIndex&) ) );
-    connect( model()->sigs, SIGNAL( rootIndexChanged() ),
-             this->sigs, SIGNAL( rootIndexChanged() ) );
-    return true;
-}
-
-QModelIndexList VLCProxyModel::mapListToSource( const QModelIndexList& list )
-{
-    QModelIndexList newlist;
-    foreach( const QModelIndex &index, list )
-    {
-        if ( index.isValid() )
-            newlist << mapToSource( index );
-    }
-    return newlist;
-}
-
-void VLCProxyModel::sort( const int column, Qt::SortOrder order )
-{
-    /* sorting on PLModel affects playlist order. */
-    if ( model() == sourcemodels[ PL_MODEL ] )
-        model()->sort( column, order );
-    else
-    /* otherwise we just use native proxy sorting */
-        QSortFilterProxyModel::sort( column, order );
-}
-
-/*************************************************************************
  * Playlist model implementation
  *************************************************************************/
 
@@ -626,7 +566,7 @@ void PLModel::processInputItemUpdate( input_thread_t *p_input )
     if( p_input && !( p_input->b_dead || !vlc_object_alive( p_input ) ) )
     {
         PLItem *item = findByInputId( rootItem, input_GetItem( p_input )->i_id );
-        if( item ) sigs->emit_currentIndexChanged( index( item, 0 ) );
+        if( item ) emit currentIndexChanged( index( item, 0 ) );
     }
 
     processInputItemUpdate( input_GetItem( p_input ) );
@@ -679,7 +619,7 @@ void PLModel::processItemAppend( int i_pl_itemid, int i_pl_itemidparent )
     nodeParentItem->insertChild( newItem, pos );
     endInsertRows();
     if ( newItem->inputItem() == THEMIM->currentInputItem() )
-        sigs->emit_currentIndexChanged( index( newItem, 0 ) );
+        emit currentIndexChanged( index( newItem, 0 ) );
 
     if( latestSearch.isEmpty() ) return;
     filter( latestSearch, index( rootItem, 0), false /*FIXME*/ );
@@ -703,7 +643,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
 
     /* And signal the view */
     endResetModel();
-    if( p_root ) sigs->emit_rootIndexChanged();
+    if( p_root ) emit rootIndexChanged();
 }
 
 void PLModel::takeItem( PLItem *item )
@@ -868,9 +808,9 @@ void PLModel::sort( QModelIndex caller, QModelIndex rootIndex, const int column,
     }
     PL_UNLOCK;
     /* if we have popup item, try to make sure that you keep that item visible */
-    if( caller.isValid() ) sigs->emit_currentIndexChanged( caller );
+    if( caller.isValid() ) emit currentIndexChanged( caller );
 
-    else if( currentIndex().isValid() ) sigs->emit_currentIndexChanged( currentIndex() );
+    else if( currentIndex().isValid() ) emit currentIndexChanged( currentIndex() );
 }
 
 void PLModel::filter( const QString& search_text, const QModelIndex & idx, bool b_recursive )

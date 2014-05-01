@@ -39,7 +39,6 @@
 #include <QSignalMapper>
 #include <QMimeData>
 #include <QAbstractItemModel>
-#include <QSortFilterProxyModel>
 #include <QVariant>
 #include <QModelIndex>
 #include <QAction>
@@ -47,78 +46,6 @@
 class PLItem;
 class PLSelector;
 class PlMimeData;
-
-class VLCProxyModel : public QSortFilterProxyModel, public VLCModelSubInterface
-{
-    Q_OBJECT
-public:
-    VLCProxyModel( QObject *parent = 0 );
-    inline VLCModel *model() const
-    {
-        return qobject_cast<VLCModel *>( sourceModel() );
-    }
-
-    /* Different Models Handling */
-
-    enum models
-    {
-        PL_MODEL = 0,
-        SQLML_MODEL /* note: keep it last */
-    };
-    bool switchToModel( models type );
-    void setModel( models type, VLCModel *model )
-    {
-        sourcemodels[ type ] = model;
-    }
-    QModelIndexList mapListToSource( const QModelIndexList& list );
-
-    /* VLCModelSubInterface Methods */
-    virtual void rebuild( playlist_item_t * p = NULL ) { model()->rebuild( p ); }
-    virtual void doDelete( QModelIndexList list ) { model()->doDelete( mapListToSource( list ) ); }
-    virtual void createNode( QModelIndex a, QString b ) { model()->createNode( mapToSource( a ), b ); }
-    virtual void renameNode( QModelIndex a, QString b ) { model()->renameNode( mapToSource( a ), b ); }
-    virtual void removeAll() { model()->removeAll(); }
-
-    virtual QModelIndex rootIndex() const { return mapFromSource( model()->rootIndex() ); }
-    virtual void filter( const QString& text, const QModelIndex & root, bool b_recursive )
-    {
-        model()->filter( text, mapToSource( root ), b_recursive );
-    }
-
-    virtual QModelIndex currentIndex() const { return mapFromSource( model()->currentIndex() ); }
-    virtual QModelIndex indexByPLID( const int i_plid, const int c ) const { return mapFromSource( model()->indexByPLID( i_plid, c ) ); }
-    virtual QModelIndex indexByInputItemID( const int i_inputitem_id, const int c ) const { return mapFromSource( model()->indexByInputItemID( i_inputitem_id, c ) ); }
-    virtual int itemId( const QModelIndex &index, int type ) const { return model()->itemId( mapToSource( index ), type ); }
-    virtual bool isTree() const { return model()->isTree();  }
-    virtual bool canEdit() const { return model()->canEdit(); }
-
-    virtual QString getURI( const QModelIndex &index ) const { return model()->getURI( mapToSource( index ) ); }
-    virtual input_item_t *getInputItem( const QModelIndex &index ) const { return model()->getInputItem( mapToSource( index ) ); }
-    virtual QString getTitle( const QModelIndex &index ) const { return model()->getTitle( mapToSource( index ) ); }
-    virtual bool action( QAction *action, const QModelIndexList &indexes )
-    {
-        return model()->action( action, mapListToSource( indexes ) );
-    }
-    virtual bool isSupportedAction( actions action, const QModelIndex &index ) const { return model()->isSupportedAction( action, mapToSource( index ) ); }
-    /* Indirect slots handlers */
-    virtual void activateItem( const QModelIndex &index ) { model()->activateItem( mapToSource( index ) ); }
-    virtual void ensureArtRequested( const QModelIndex &index ) { model()->ensureArtRequested( mapToSource( index ) ); }
-
-    /* AbstractItemModel subclassing */
-    virtual void sort( const int column, Qt::SortOrder order = Qt::AscendingOrder );
-
-    /* Local signals for index conversion */
-public slots:
-    void currentIndexChanged_IndexConversion( const QModelIndex &index )
-    {
-        emit currentIndexChanged_Converted( mapFromSource( index ) );
-    }
-
-signals:
-    void currentIndexChanged_Converted( const QModelIndex & );
-private:
-    VLCModel * sourcemodels[SQLML_MODEL + 1];
-};
 
 class PLModel : public VLCModel
 {

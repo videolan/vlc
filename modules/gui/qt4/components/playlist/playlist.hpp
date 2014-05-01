@@ -118,16 +118,16 @@ private:
     bool b_arrow;
 };
 
-class VLCProxyModel;
+class VLCModel;
 class QHBoxLayout;
 
 class LocationBar : public QWidget
 {
     Q_OBJECT
 public:
-    LocationBar( VLCProxyModel * );
+    LocationBar( VLCModel * );
     void setIndex( const QModelIndex & );
-    void setModel( VLCProxyModel * _model ) { model = _model; };
+    void setModel( VLCModel * _model ) { model = _model; };
     virtual QSize sizeHint() const;
 protected:
     virtual void resizeEvent ( QResizeEvent * event );
@@ -135,7 +135,7 @@ protected:
 private:
     void layOut( const QSize& size );
 
-    VLCProxyModel *model;
+    VLCModel *model;
     QSignalMapper *mapper;
     QWidgetList buttons;
     QList<QAction*> actions;

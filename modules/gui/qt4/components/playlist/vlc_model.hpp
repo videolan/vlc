@@ -43,7 +43,6 @@
 #include <QIcon>
 
 class QAction;
-class VLCModelSignalsHandler;
 
 /* Provides non Q_Object interface for Models.
    This allows multiple inheritance on already QAbstractModel based
@@ -108,32 +107,8 @@ public:
     virtual bool isSupportedAction( actions action, const QModelIndex & ) const = 0;
     static int columnFromMeta( int meta_col );
 
-    /* Indirect slots handlers */
-    VLCModelSignalsHandler *sigs;
     virtual void activateItem( const QModelIndex &index ) = 0;
     virtual void ensureArtRequested( const QModelIndex &index ) = 0;
-};
-
-class VLCModelSignalsHandler : public QObject
-{
-    Q_OBJECT
-
-public:
-    VLCModelSignalsHandler( VLCModelSubInterface *_parent ) { parent = _parent; }
-
-    void emit_currentIndexChanged( const QModelIndex &index ) { emit currentIndexChanged( index ); }
-    void emit_rootIndexChanged() { emit rootIndexChanged(); }
-
-public slots:
-    void activateItemSlot( const QModelIndex &index ) { parent->activateItem( index ); }
-    void ensureArtRequestedSlot( const QModelIndex &index ) { parent->ensureArtRequested( index ); }
-
-signals:
-    void currentIndexChanged( const QModelIndex& );
-    void rootIndexChanged();
-
-private:
-    VLCModelSubInterface *parent;
 };
 
 /* Abstract VLC Model ; Base for custom models.
@@ -158,14 +133,19 @@ public:
     virtual input_item_t *getInputItem( const QModelIndex & ) const;
     virtual QString getTitle( const QModelIndex &index ) const;
 
-    /* VLCModelSubInterface Indirect slots handlers */
-    virtual void ensureArtRequested( const QModelIndex &index );
-
     /* Custom */
     static int columnToMeta( int _column );
     static int metaToColumn( int meta );
     static QString getMeta( const QModelIndex & index, int meta );
     static QPixmap getArtPixmap( const QModelIndex & index, const QSize & size );
+
+public slots:
+    /* slots handlers */
+    virtual void ensureArtRequested( const QModelIndex &index );
+
+signals:
+    void currentIndexChanged( const QModelIndex& );
+    void rootIndexChanged();
 
 protected:
     /* Custom methods / helpers */

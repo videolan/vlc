@@ -93,11 +93,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
 
     setMinimumWidth( 400 );
 
-    VLCProxyModel *model = new VLCProxyModel( this );
-
-    PLModel *plmodel = PLModel::getPLModel( p_intf );
-    model->setModel( VLCProxyModel::PL_MODEL, plmodel );
-    model->switchToModel( VLCProxyModel::PL_MODEL );
+    PLModel *model = PLModel::getPLModel( p_intf );
 
     mainView = new StandardPLPanel( this, p_intf, p_root, selector, model );
 
@@ -233,7 +229,7 @@ void PlaylistWidget::changeView( const QModelIndex& index )
 #include <QSignalMapper>
 #include <QMenu>
 #include <QPainter>
-LocationBar::LocationBar( VLCProxyModel *m )
+LocationBar::LocationBar( VLCModel *m )
 {
     setModel( m );
     mapper = new QSignalMapper( this );

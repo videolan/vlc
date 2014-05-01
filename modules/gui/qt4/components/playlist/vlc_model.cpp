@@ -27,12 +27,10 @@
 
 VLCModelSubInterface::VLCModelSubInterface()
 {
-    sigs = new VLCModelSignalsHandler( this );
 }
 
 VLCModelSubInterface::~VLCModelSubInterface()
 {
-    delete sigs;
 }
 
 int VLCModelSubInterface::columnFromMeta( int meta_col )
