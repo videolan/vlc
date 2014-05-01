@@ -165,14 +165,13 @@ static int parse_Manifest( stream_t *s )
                     {
                         if( !strcmp( name, "Duration" ) )
                             p_sys->vod_duration = strtoull( value, NULL, 10 );
-                        if( !strcmp( name, "TimeScale" ) )
+                        else if( !strcmp( name, "TimeScale" ) )
                             p_sys->timescale = strtoull( value, NULL, 10 );
                     }
                     if( !p_sys->timescale )
                         p_sys->timescale = TIMESCALE;
                 }
-
-                if( !strcmp( node, "StreamIndex" ) )
+                else if( !strcmp( node, "StreamIndex" ) )
                 {
                     sms = sms_New();
                     if( unlikely( !sms ) )
@@ -196,29 +195,30 @@ static int parse_Manifest( stream_t *s )
                                 sms->type = SPU_ES;
                         }
 
-                        if( !strcmp( name, "Name" ) )
+                        else if( !strcmp( name, "Name" ) )
                             sms->name = strdup( value );
-                        if( !strcmp( name, "TimeScale" ) )
+                        else if( !strcmp( name, "TimeScale" ) )
                             sms->timescale = strtoull( value, NULL, 10 );
-                        if( !strcmp( name, "FourCC" ) )
+                        else if( !strcmp( name, "FourCC" ) )
                             sms->default_FourCC =
                                 VLC_FOURCC( value[0], value[1], value[2], value[3] );
 
-                        if( !strcmp( name, "Chunks" ) )
+                        else if( !strcmp( name, "Chunks" ) )
                         {
                             sms->vod_chunks_nb = strtol( value, NULL, 10 );
                             if( sms->vod_chunks_nb == 0 ) /* live */
                                 sms->vod_chunks_nb = UINT32_MAX;
                         }
 
-                        if( !strcmp( name, "QualityLevels" ) )
+                        else if( !strcmp( name, "QualityLevels" ) )
                             sms->qlevel_nb = strtoul( value, NULL, 10 );
-                        if( !strcmp( name, "Url" ) )
+                        else if( !strcmp( name, "Url" ) )
                             sms->url_template = strdup(value);
                     }
 
                     if( !sms->timescale )
                         sms->timescale = TIMESCALE;
+
                     if( !sms->name )
                     {
                         if( sms->type == VIDEO_ES )
@@ -229,8 +229,7 @@ static int parse_Manifest( stream_t *s )
                             sms->name = strdup( "text" );
                     }
                 }
-
-                if( !strcmp( node, "QualityLevel" ) )
+                else if( !strcmp( node, "QualityLevel" ) )
                 {
                     if ( !sms )
                         break;
@@ -249,16 +248,16 @@ static int parse_Manifest( stream_t *s )
                     {
                         if( !strcmp( name, "Index" ) )
                             ql->Index = strtol( value, NULL, 10 );
-                        if( !strcmp( name, "Bitrate" ) )
+                        else if( !strcmp( name, "Bitrate" ) )
                             ql->Bitrate = strtoull( value, NULL, 10 );
-                        if( !strcmp( name, "PacketSize" ) )
+                        else if( !strcmp( name, "PacketSize" ) )
                             ql->nBlockAlign = strtoull( value, NULL, 10 );
-                        if( !strcmp( name, "FourCC" ) )
+                        else if( !strcmp( name, "FourCC" ) )
                             ql->FourCC = VLC_FOURCC( value[0], value[1],
                                                      value[2], value[3] );
-                        if( !strcmp( name, "CodecPrivateData" ) )
+                        else if( !strcmp( name, "CodecPrivateData" ) )
                             ql->CodecPrivateData = strdup( value );
-                        if( !strcmp( name, "WaveFormatEx" ) )
+                        else if( !strcmp( name, "WaveFormatEx" ) )
                         {
                             WaveFormatEx = decode_string_hex_to_binary( value );
                             uint16_t data_len = ((uint16_t *)WaveFormatEx)[8];
@@ -273,29 +272,27 @@ static int parse_Manifest( stream_t *s )
                             ql->BitsPerSample = ((uint16_t *)WaveFormatEx)[7];
                             free( WaveFormatEx );
                         }
-                        if( !strcmp( name, "MaxWidth" ) || !strcmp( name, "Width" ) )
+                        else if( !strcmp( name, "MaxWidth" ) || !strcmp( name, "Width" ) )
                             ql->MaxWidth = strtoul( value, NULL, 10 );
-                        if( !strcmp( name, "MaxHeight" ) || !strcmp( name, "Height" ) )
+                        else if( !strcmp( name, "MaxHeight" ) || !strcmp( name, "Height" ) )
                             ql->MaxHeight = strtoul( value, NULL, 10 );
-                        if( !strcmp( name, "Channels" ) )
+                        else if( !strcmp( name, "Channels" ) )
                             ql->Channels = strtoul( value, NULL, 10 );
-                        if( !strcmp( name, "SamplingRate" ) )
+                        else if( !strcmp( name, "SamplingRate" ) )
                             ql->SamplingRate = strtoul( value, NULL, 10 );
-                        if( !strcmp( name, "BitsPerSample" ) )
+                        else if( !strcmp( name, "BitsPerSample" ) )
                             ql->BitsPerSample = strtoul( value, NULL, 10 );
                     }
 
                     vlc_array_append( sms->qlevels, ql );
                 }
-
-                if ( !strcmp( node, "Content" ) && sms && !sms->url_template )
+                else if ( !strcmp( node, "Content" ) && sms && !sms->url_template )
                 {
                     /* empty(@Url) && ./Content == manifest embedded content */
                     sms_Free( sms );
                     sms = NULL;
                 }
-
-                if( !strcmp( node, "c" ) )
+                else if( !strcmp( node, "c" ) )
                 {
                     if ( !sms )
                         break;
