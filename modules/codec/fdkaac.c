@@ -187,14 +187,11 @@ static int OpenEncoder( vlc_object_t *p_this )
     encoder_sys_t *p_sys;
     CHANNEL_MODE mode;
     AACENC_ERROR erraac;
-    bool b_profile_selected;
     int sce;
     int cpe;
-    int i_profile;
     int i_bitrate;
 
     p_enc = (encoder_t *)p_this;
-    b_profile_selected = false;
     sce = 0;
     cpe = 0;
 
@@ -204,21 +201,6 @@ static int OpenEncoder( vlc_object_t *p_this )
         p_enc->fmt_out.i_codec != VLC_CODEC_MP4A )
     {
         return VLC_EGENERIC;
-    }
-    else if ( p_enc->fmt_out.i_codec == VLC_FOURCC( 'l', 'a', 'a', 'c' ) )
-    {
-        b_profile_selected = true;
-        i_profile = PROFILE_AAC_LC;
-    }
-    else if ( p_enc->fmt_out.i_codec == VLC_FOURCC( 'h', 'a', 'a', 'c' ) )
-    {
-        b_profile_selected = true;
-        i_profile = PROFILE_AAC_HE;
-    }
-    else if ( p_enc->fmt_out.i_codec == VLC_FOURCC( 's', 'a', 'a', 'c' ) )
-    {
-        b_profile_selected = true;
-        i_profile = PROFILE_AAC_HE_v2;
     }
 
     uint16_t channel_config;
@@ -258,10 +240,15 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
-    if ( b_profile_selected == false )
-        p_sys->i_aot = var_InheritInteger( p_enc, ENC_CFG_PREFIX "profile" );
+    if ( p_enc->fmt_out.i_codec == VLC_FOURCC( 'l', 'a', 'a', 'c' ) )
+        p_sys->i_aot = PROFILE_AAC_LC;
+    else if ( p_enc->fmt_out.i_codec == VLC_FOURCC( 'h', 'a', 'a', 'c' ) )
+        p_sys->i_aot = PROFILE_AAC_HE;
+    else if ( p_enc->fmt_out.i_codec == VLC_FOURCC( 's', 'a', 'a', 'c' ) )
+        p_sys->i_aot = PROFILE_AAC_HE_v2;
     else
-        p_sys->i_aot = i_profile;
+        p_sys->i_aot = var_InheritInteger( p_enc, ENC_CFG_PREFIX "profile" );
+
     p_sys->b_eld_sbr = var_InheritBool( p_enc, ENC_CFG_PREFIX "sbr" );
     p_sys->i_vbr = var_InheritInteger( p_enc, ENC_CFG_PREFIX "vbr" );
     p_sys->b_afterburner = var_InheritBool( p_enc, ENC_CFG_PREFIX "afterburner" );
