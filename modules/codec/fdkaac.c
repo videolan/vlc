@@ -59,25 +59,25 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 
-static int OpenEncoder( vlc_object_t * );
-static void CloseEncoder( vlc_object_t * );
+static int OpenEncoder(vlc_object_t *);
+static void CloseEncoder(vlc_object_t *);
 
 #define ENC_CFG_PREFIX "sout-fdkaac-"
 
 #define AOT_TEXT N_("Encoder Profile")
-#define AOT_LONGTEXT N_( "Encoder Algorithm to use" )
+#define AOT_LONGTEXT N_("Encoder Algorithm to use")
 
 #define SIDEBAND_TEXT N_("Enable spectral band replication")
-#define SIDEBAND_LONGTEXT N_( "This is an optional feature only for the AAC-ELD profile" )
+#define SIDEBAND_LONGTEXT N_("This is an optional feature only for the AAC-ELD profile")
 
 #define VBR_QUALITY_TEXT N_("VBR Quality")
-#define VBR_QUALITY_LONGTEXT N_( "Quality of the VBR Encoding (0=cbr, 1-5 constant quality vbr, 5 is best" )
+#define VBR_QUALITY_LONGTEXT N_("Quality of the VBR Encoding (0=cbr, 1-5 constant quality vbr, 5 is best")
 
 #define AFTERBURNER_TEXT N_("Enable afterburner library")
-#define AFTERBURNER_LONGTEXT N_( "This library will produce higher quality audio at the expense of additional CPU usage (default is enabled)" )
+#define AFTERBURNER_LONGTEXT N_("This library will produce higher quality audio at the expense of additional CPU usage (default is enabled)")
 
 #define SIGNALING_TEXT N_("Signaling mode of the extension AOT")
-#define SIGNALING_LONGTEXT N_( "1 is explicit for SBR and implicit for PS (default), 2 is explicit hierarchical" )
+#define SIGNALING_LONGTEXT N_("1 is explicit for SBR and implicit for PS (default), 2 is explicit hierarchical")
 
 #define  CH_ORDER_MPEG 0  /*!< MPEG channel ordering (e. g. 5.1: C, L, R, SL, SR, LFE)           */
 #define  CH_ORDER_WAV 1   /*!< WAV fileformat channel ordering (e. g. 5.1: L, R, C, LFE, SL, SR) */
@@ -97,32 +97,32 @@ static const char *const ppsz_aot_descriptions[] =
 { N_("AAC-LC"), N_("HE-AAC"), N_("HE-AAC-v2"), N_("AAC-LD"), N_("AAC-ELD") };
 
 vlc_module_begin ()
-    set_shortname( N_("FDKAAC") )
-    set_description( N_("FDK-AAC Audio encoder") )
-    set_capability( "encoder", 150 )
-    set_callbacks( OpenEncoder, CloseEncoder )
-    add_shortcut( "fdkaac" )
-    set_category( CAT_INPUT )
-    set_subcategory( SUBCAT_INPUT_ACODEC )
-    add_integer( ENC_CFG_PREFIX "profile", PROFILE_AAC_LC, AOT_TEXT,
-             AOT_LONGTEXT, false )
-    change_integer_list( pi_aot_values, ppsz_aot_descriptions );
-    add_bool( ENC_CFG_PREFIX "sbr", false, SIDEBAND_TEXT,
-              SIDEBAND_LONGTEXT, false )
-    add_integer( ENC_CFG_PREFIX "vbr", 0, VBR_QUALITY_TEXT,
-              VBR_QUALITY_LONGTEXT, false )
+    set_shortname(N_("FDKAAC"))
+    set_description(N_("FDK-AAC Audio encoder"))
+    set_capability("encoder", 150)
+    set_callbacks(OpenEncoder, CloseEncoder)
+    add_shortcut("fdkaac")
+    set_category(CAT_INPUT)
+    set_subcategory(SUBCAT_INPUT_ACODEC)
+    add_integer(ENC_CFG_PREFIX "profile", PROFILE_AAC_LC, AOT_TEXT,
+             AOT_LONGTEXT, false)
+    change_integer_list(pi_aot_values, ppsz_aot_descriptions);
+    add_bool(ENC_CFG_PREFIX "sbr", false, SIDEBAND_TEXT,
+              SIDEBAND_LONGTEXT, false)
+    add_integer(ENC_CFG_PREFIX "vbr", 0, VBR_QUALITY_TEXT,
+              VBR_QUALITY_LONGTEXT, false)
     change_integer_range (0, 5)
-    add_bool( ENC_CFG_PREFIX "afterburner", true, AFTERBURNER_TEXT,
-              AFTERBURNER_LONGTEXT, true )
-    add_integer( ENC_CFG_PREFIX "signaling", SIGNALING_COMPATIBLE, SIGNALING_TEXT,
-             SIGNALING_LONGTEXT, true )
+    add_bool(ENC_CFG_PREFIX "afterburner", true, AFTERBURNER_TEXT,
+              AFTERBURNER_LONGTEXT, true)
+    add_integer(ENC_CFG_PREFIX "signaling", SIGNALING_COMPATIBLE, SIGNALING_TEXT,
+             SIGNALING_LONGTEXT, true)
     change_integer_range (0, 2)
 vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_buf );
+static block_t *EncodeAudio(encoder_t *p_enc, block_t *p_buf);
 
 static const char *const ppsz_enc_options[] = {
     "profile", "sbr", "vbr", "afterburner", "signaling", NULL
@@ -176,14 +176,14 @@ static const char *aac_get_errorstring(AACENC_ERROR erraac)
 /*****************************************************************************
  * OpenDecoder: open the encoder.
  *****************************************************************************/
-static int OpenEncoder( vlc_object_t *p_this )
+static int OpenEncoder(vlc_object_t *p_this)
 {
     encoder_t *p_enc = (encoder_t *)p_this;
 
-    if( p_enc->fmt_out.i_codec != VLC_FOURCC( 'l', 'a', 'a', 'c' ) &&
-        p_enc->fmt_out.i_codec != VLC_FOURCC( 'h', 'a', 'a', 'c' ) &&
-        p_enc->fmt_out.i_codec != VLC_FOURCC( 's', 'a', 'a', 'c' ) &&
-        p_enc->fmt_out.i_codec != VLC_CODEC_MP4A )
+    if (p_enc->fmt_out.i_codec != VLC_FOURCC('l', 'a', 'a', 'c') &&
+        p_enc->fmt_out.i_codec != VLC_FOURCC('h', 'a', 'a', 'c') &&
+        p_enc->fmt_out.i_codec != VLC_FOURCC('s', 'a', 'a', 'c') &&
+        p_enc->fmt_out.i_codec != VLC_CODEC_MP4A)
     {
         return VLC_EGENERIC;
     }
@@ -207,8 +207,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     case 8: mode = MODE_1_2_2_2_1; sce = 2; cpe = 3;
          channel_config = AOUT_CHANS_7_1; break;
     default:
-        msg_Err( p_enc, "we do not support > 8 input channels, this input has %i",
-                        p_enc->fmt_in.audio.i_channels );
+        msg_Err(p_enc, "we do not support > 8 input channels, this input has %i",
+                        p_enc->fmt_in.audio.i_channels);
         return VLC_EGENERIC;
     }
 
@@ -218,47 +218,44 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     /* Allocate the memory needed to store the encoder's structure */
     encoder_sys_t *p_sys = (encoder_sys_t *)malloc(sizeof(encoder_sys_t));
-    if( unlikely( !p_sys ) )
+    if (unlikely(!p_sys))
         return VLC_ENOMEM;
     p_enc->p_sys = p_sys;
     p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
     p_enc->fmt_out.i_cat = AUDIO_ES;
     p_enc->fmt_out.i_codec = VLC_CODEC_MP4A;
 
-    config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
+    config_ChainParse(p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg);
 
     int i_aot; /* This stores the aac profile chosen */
-    if ( p_enc->fmt_out.i_codec == VLC_FOURCC( 'l', 'a', 'a', 'c' ) )
+    if (p_enc->fmt_out.i_codec == VLC_FOURCC('l', 'a', 'a', 'c'))
         i_aot = PROFILE_AAC_LC;
-    else if ( p_enc->fmt_out.i_codec == VLC_FOURCC( 'h', 'a', 'a', 'c' ) )
+    else if (p_enc->fmt_out.i_codec == VLC_FOURCC('h', 'a', 'a', 'c'))
         i_aot = PROFILE_AAC_HE;
-    else if ( p_enc->fmt_out.i_codec == VLC_FOURCC( 's', 'a', 'a', 'c' ) )
+    else if (p_enc->fmt_out.i_codec == VLC_FOURCC('s', 'a', 'a', 'c'))
         i_aot = PROFILE_AAC_HE_v2;
     else
-        i_aot = var_InheritInteger( p_enc, ENC_CFG_PREFIX "profile" );
+        i_aot = var_InheritInteger(p_enc, ENC_CFG_PREFIX "profile");
 
-    bool b_eld_sbr = var_InheritBool( p_enc, ENC_CFG_PREFIX "sbr" );
-    int i_vbr = var_InheritInteger( p_enc, ENC_CFG_PREFIX "vbr" );
+    bool b_eld_sbr = var_InheritBool(p_enc, ENC_CFG_PREFIX "sbr");
+    int i_vbr = var_InheritInteger(p_enc, ENC_CFG_PREFIX "vbr");
     p_sys->i_pts_last = 0;
 
-    if ((i_aot == PROFILE_AAC_HE || i_aot == PROFILE_AAC_HE_v2) && i_vbr > 3)
-    {
+    if ((i_aot == PROFILE_AAC_HE || i_aot == PROFILE_AAC_HE_v2) && i_vbr > 3) {
         msg_Warn(p_enc, "Maximum VBR quality for this profile is 3, setting vbr=3");
         i_vbr = 3;
     }
     AACENC_ERROR erraac;
     if ((erraac = aacEncOpen(&p_sys->handle, 0, p_enc->fmt_in.audio.i_channels)) != AACENC_OK) {
         msg_Err(p_enc, "Unable to open encoder: %s", aac_get_errorstring(erraac));
-        free( p_sys );
+        free(p_sys);
         return VLC_EGENERIC;
     }
-    if ( i_aot == PROFILE_AAC_HE_v2 && p_enc->fmt_in.audio.i_channels != 2 )
-    {
+    if (i_aot == PROFILE_AAC_HE_v2 && p_enc->fmt_in.audio.i_channels != 2) {
         msg_Err(p_enc, "The HE-AAC-v2 profile can only be used with stereo sources");
         goto error;
     }
-    if ( i_aot == PROFILE_AAC_ELD && p_enc->fmt_in.audio.i_channels != 2 )
-    {
+    if (i_aot == PROFILE_AAC_ELD && p_enc->fmt_in.audio.i_channels != 2) {
         msg_Err(p_enc, "The ELD-AAC profile can only be used with stereo sources");
         goto error;
     }
@@ -269,7 +266,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     if (i_aot == PROFILE_AAC_ELD && b_eld_sbr) {
         if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_SBR_MODE, 1)) != AACENC_OK) {
             msg_Err(p_enc, "Unable to set SBR mode for ELD: %s", aac_get_errorstring(erraac));
-        goto error;
+            goto error;
         }
     }
     if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_SAMPLERATE,
@@ -306,9 +303,7 @@ static int OpenEncoder( vlc_object_t *p_this )
                 i_bitrate /= 2;
             p_enc->fmt_out.i_bitrate = i_bitrate;
             msg_Info(p_enc, "Setting optimal bitrate of %i", i_bitrate);
-        }
-        else
-        {
+        } else {
             i_bitrate = p_enc->fmt_out.i_bitrate;
         }
         if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_BITRATE,
@@ -323,14 +318,14 @@ static int OpenEncoder( vlc_object_t *p_this )
         goto error;
     }
     if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_SIGNALING_MODE,
-                    (int)var_InheritInteger( p_enc, ENC_CFG_PREFIX "signaling" ))) != AACENC_OK) {
+                    (int)var_InheritInteger(p_enc, ENC_CFG_PREFIX "signaling"))) != AACENC_OK) {
       /* use explicit backward compatible =1 */
       /* use explicit hierarchical signaling =2 */
         msg_Err(p_enc, "Unable to set signaling mode: %s", aac_get_errorstring(erraac));
         goto error;
     }
     if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_AFTERBURNER,
-                    !!var_InheritBool( p_enc, ENC_CFG_PREFIX "afterburner"))) !=
+                    !!var_InheritBool(p_enc, ENC_CFG_PREFIX "afterburner"))) !=
                                AACENC_OK) {
         msg_Err(p_enc, "Unable to set the afterburner mode: %s", aac_get_errorstring(erraac));
         goto error;
@@ -352,16 +347,14 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->i_encoderdelay = info.encoderDelay;
 
     p_enc->fmt_out.i_extra = info.confSize;
-    if( p_enc->fmt_out.i_extra )
-    {
-        p_enc->fmt_out.p_extra = malloc( p_enc->fmt_out.i_extra );
-        if ( p_enc->fmt_out.p_extra == NULL )
-        {
+    if (p_enc->fmt_out.i_extra) {
+        p_enc->fmt_out.p_extra = malloc(p_enc->fmt_out.i_extra);
+        if (p_enc->fmt_out.p_extra == NULL) {
             msg_Err(p_enc, "Unable to allocate fmt_out.p_extra");
             goto error;
         }
-        memcpy( p_enc->fmt_out.p_extra, info.confBuf,
-                p_enc->fmt_out.i_extra );
+        memcpy(p_enc->fmt_out.p_extra, info.confBuf,
+                p_enc->fmt_out.i_extra);
     }
 
     p_enc->pf_encode_audio = EncodeAudio;
@@ -375,14 +368,14 @@ static int OpenEncoder( vlc_object_t *p_this )
 
 error:
     aacEncClose(&p_sys->handle);
-    free( p_sys );
+    free(p_sys);
     return VLC_EGENERIC;
 }
 
 /****************************************************************************
  * EncodeAudio: the whole thing
  ****************************************************************************/
-static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
+static block_t *EncodeAudio(encoder_t *p_enc, block_t *p_aout_buf)
 {
     int16_t *p_buffer;
     int i_samples;
@@ -390,8 +383,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
 
     encoder_sys_t *p_sys = p_enc->p_sys;
 
-    if ( likely( p_aout_buf ) )
-    {
+    if (likely(p_aout_buf)) {
         p_buffer = (int16_t *)p_aout_buf->p_buffer;
         i_samples = p_aout_buf->i_nb_samples;
         i_pts_out = p_aout_buf->i_pts - (mtime_t)((double)CLOCK_FREQ *
@@ -401,9 +393,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             p_sys->i_pts_last = i_pts_out - (mtime_t)((double)CLOCK_FREQ *
                (double)(p_sys->i_frame_size) /
                (double)p_enc->fmt_out.audio.i_rate);
-    }
-    else
-    {
+    } else {
         i_samples = 0;
         i_pts_out = p_sys->i_pts_last;
     }
@@ -412,8 +402,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     int i_loop_count = 0;
 
     block_t *p_chain = NULL;
-    while ( i_samples_left >= 0 )
-    {
+    while (i_samples_left >= 0) {
         AACENC_BufDesc in_buf = { 0 }, out_buf = { 0 };
         AACENC_InArgs in_args = { 0 };
         AACENC_OutArgs out_args = { 0 };
@@ -423,7 +412,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         int out_size, out_elem_size;
         void *in_ptr, *out_ptr;
 
-        if ( unlikely(i_samples == 0) ) {
+        if (unlikely(i_samples == 0)) {
             // this forces the encoder to purge whatever is left in the internal buffer
             in_args.numInSamples = -1;
         } else {
@@ -438,7 +427,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             in_buf.bufElSizes = &in_elem_size;
         }
         block_t *p_block;
-        p_block = block_Alloc( p_sys->i_maxoutputsize );
+        p_block = block_Alloc(p_sys->i_maxoutputsize);
         p_block->i_buffer = p_sys->i_maxoutputsize;
         out_ptr = p_block->p_buffer;
         out_size = p_block->i_buffer;
@@ -452,20 +441,16 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         AACENC_ERROR erraac;
         if ((erraac = aacEncEncode(p_sys->handle, &in_buf, &out_buf, &in_args, &out_args)) != AACENC_OK) {
             if (erraac == AACENC_ENCODE_EOF) {
-                msg_Info( p_enc, "Encoding final bytes (EOF)");
-            }
-            else
-            {
-                msg_Err( p_enc, "Encoding failed: %s", aac_get_errorstring(erraac));
+                msg_Info(p_enc, "Encoding final bytes (EOF)");
+            } else {
+                msg_Err(p_enc, "Encoding failed: %s", aac_get_errorstring(erraac));
                 block_Release(p_block);
                 break;
             }
         }
-        if ( out_args.numOutBytes > 0 )
-        {
+        if (out_args.numOutBytes > 0) {
             p_block->i_buffer = out_args.numOutBytes;
-            if ( unlikely(i_samples == 0) )
-            {
+            if (unlikely(i_samples == 0)) {
                 // I only have the numOutBytes so approximate based on compression factor
                 double d_samples_forward = p_sys->d_compression_ratio*(double)out_args.numOutBytes;
                 i_pts_out += (mtime_t)d_samples_forward;
@@ -474,11 +459,8 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
                 // (mtime_t)CLOCK_FREQ * (mtime_t)p_sys->i_frame_size/(mtime_t)p_enc->fmt_out.audio.i_rate
                 // but I am not sure if the lib always outputs a full frame when
                 // emptying the internal buffer in the EOF scenario
-            }
-            else
-            {
-                if ( i_loop_count == 0 )
-                {
+            } else {
+                if (i_loop_count == 0) {
                     // There can be an implicit delay in the first loop cycle because leftover bytes
                     // in the library buffer from the prior block
                     double d_samples_delay = (double)p_sys->i_frame_size - (double)out_args.numInSamples /
@@ -489,9 +471,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
                         (double)p_enc->fmt_out.audio.i_rate);
                     p_block->i_nb_samples = d_samples_delay;
                     //p_block->i_length = i_pts_out - p_sys->i_pts_last;
-                }
-                else
-                {
+                } else {
                     double d_samples_forward = (double)out_args.numInSamples/(double)p_enc->fmt_in.audio.i_channels;
                     double d_length = ((double)CLOCK_FREQ * d_samples_forward /
                                             (double)p_enc->fmt_out.audio.i_rate);
@@ -501,48 +481,42 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
                 }
             }
             p_block->i_dts = p_block->i_pts = i_pts_out;
-            block_ChainAppend( &p_chain, p_block );
+            block_ChainAppend(&p_chain, p_block);
 #if 0
-            msg_Dbg( p_enc, "dts %"PRId64", length %"PRId64", " "pts_last "
+            msg_Dbg(p_enc, "dts %"PRId64", length %"PRId64", " "pts_last "
                             "%"PRId64" numOutBytes = %i, numInSamples = %i, "
                             "i_samples %i, i_loop_count %i",
                               p_block->i_dts, p_block->i_length,
                               p_sys->i_pts_last, out_args.numOutBytes,
                               out_args.numInSamples, i_samples, i_loop_count);
 #endif
-            if ( likely(i_samples > 0) )
-            {
+            if (likely(i_samples > 0)) {
                 p_sys->d_compression_ratio = (double)p_block->i_length / (double)out_args.numOutBytes;
                 i_samples_left -= out_args.numInSamples/p_enc->fmt_in.audio.i_channels;
                 p_sys->i_pts_last = i_pts_out;
             }
-        }
-        else
-        {
+        } else {
             block_Release(p_block);
-            //msg_Dbg( p_enc, "aac_encode_audio: not enough data yet");
+            //msg_Dbg(p_enc, "aac_encode_audio: not enough data yet");
             break;
         }
-        if ( unlikely(i_loop_count++ > 100) )
-        {
-            msg_Err( p_enc, "Loop count greater than 100!!!, something must be wrong with the encoder library");
+        if (unlikely(i_loop_count++ > 100)) {
+            msg_Err(p_enc, "Loop count greater than 100!!!, something must be wrong with the encoder library");
             break;
         }
     }
 
     return p_chain;
-
 }
 
 /*****************************************************************************
  * CloseDecoder: decoder destruction
  *****************************************************************************/
-static void CloseEncoder( vlc_object_t *p_this )
+static void CloseEncoder(vlc_object_t *p_this)
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     aacEncClose(&p_sys->handle);
-
-    free( p_sys );
+    free(p_sys);
 }
