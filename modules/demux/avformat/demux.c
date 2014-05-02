@@ -345,13 +345,13 @@ int OpenDemux( vlc_object_t *p_this )
                 long angle = strtol(rotation->value, NULL, 10);
 
                 if (angle > 45 && angle < 135)
-                    fmt.video.orientation = ORIENT_ROTATED_270;
+                    fmt.video.orientation = ORIENT_ROTATED_90;
 
                 else if (angle > 135 && angle < 225)
                     fmt.video.orientation = ORIENT_ROTATED_180;
 
                 else if (angle > 225 && angle < 315)
-                    fmt.video.orientation = ORIENT_ROTATED_90;
+                    fmt.video.orientation = ORIENT_ROTATED_270;
 
                 else
                     fmt.video.orientation = ORIENT_NORMAL;
