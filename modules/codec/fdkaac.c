@@ -135,15 +135,10 @@ struct encoder_sys_t
 {
     double d_compression_ratio;
     mtime_t i_pts_last;
-    int i_aot; /* This stores the aac profile chosen */
-    int i_vbr; /* cbr or vbr-quality value chosen */
-    int i_signaling; /* Library feature for backwards compatibility */
     int i_encoderdelay; /* Samples delay introduced by the profile */
     int i_frame_size;
     int i_maxoutputsize; /* Maximum buffer size for encoded output */
     HANDLE_AACENCODER handle;
-    bool b_afterburner; /* Library feature for additional quality */
-    bool b_eld_sbr; /* Spectral band replication option for ELD profile */
 };
 
 static const char *aac_get_errorstring(AACENC_ERROR erraac)
@@ -232,25 +227,24 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
+    int i_aot; /* This stores the aac profile chosen */
     if ( p_enc->fmt_out.i_codec == VLC_FOURCC( 'l', 'a', 'a', 'c' ) )
-        p_sys->i_aot = PROFILE_AAC_LC;
+        i_aot = PROFILE_AAC_LC;
     else if ( p_enc->fmt_out.i_codec == VLC_FOURCC( 'h', 'a', 'a', 'c' ) )
-        p_sys->i_aot = PROFILE_AAC_HE;
+        i_aot = PROFILE_AAC_HE;
     else if ( p_enc->fmt_out.i_codec == VLC_FOURCC( 's', 'a', 'a', 'c' ) )
-        p_sys->i_aot = PROFILE_AAC_HE_v2;
+        i_aot = PROFILE_AAC_HE_v2;
     else
-        p_sys->i_aot = var_InheritInteger( p_enc, ENC_CFG_PREFIX "profile" );
+        i_aot = var_InheritInteger( p_enc, ENC_CFG_PREFIX "profile" );
 
-    p_sys->b_eld_sbr = var_InheritBool( p_enc, ENC_CFG_PREFIX "sbr" );
-    p_sys->i_vbr = var_InheritInteger( p_enc, ENC_CFG_PREFIX "vbr" );
-    p_sys->b_afterburner = var_InheritBool( p_enc, ENC_CFG_PREFIX "afterburner" );
-    p_sys->i_signaling = var_InheritInteger( p_enc, ENC_CFG_PREFIX "signaling" );
+    bool b_eld_sbr = var_InheritBool( p_enc, ENC_CFG_PREFIX "sbr" );
+    int i_vbr = var_InheritInteger( p_enc, ENC_CFG_PREFIX "vbr" );
     p_sys->i_pts_last = 0;
 
-    if ((p_sys->i_aot == PROFILE_AAC_HE || p_sys->i_aot == PROFILE_AAC_HE_v2) && p_sys->i_vbr > 3)
+    if ((i_aot == PROFILE_AAC_HE || i_aot == PROFILE_AAC_HE_v2) && i_vbr > 3)
     {
         msg_Warn(p_enc, "Maximum VBR quality for this profile is 3, setting vbr=3");
-        p_sys->i_vbr = 3;
+        i_vbr = 3;
     }
     AACENC_ERROR erraac;
     if ((erraac = aacEncOpen(&p_sys->handle, 0, p_enc->fmt_in.audio.i_channels)) != AACENC_OK) {
@@ -258,21 +252,21 @@ static int OpenEncoder( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
-    if ( p_sys->i_aot == PROFILE_AAC_HE_v2 && p_enc->fmt_in.audio.i_channels != 2 )
+    if ( i_aot == PROFILE_AAC_HE_v2 && p_enc->fmt_in.audio.i_channels != 2 )
     {
         msg_Err(p_enc, "The HE-AAC-v2 profile can only be used with stereo sources");
         goto error;
     }
-    if ( p_sys->i_aot == PROFILE_AAC_ELD && p_enc->fmt_in.audio.i_channels != 2 )
+    if ( i_aot == PROFILE_AAC_ELD && p_enc->fmt_in.audio.i_channels != 2 )
     {
         msg_Err(p_enc, "The ELD-AAC profile can only be used with stereo sources");
         goto error;
     }
-    if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_AOT, p_sys->i_aot)) != AACENC_OK) {
-        msg_Err(p_enc, "Unable to set the Profile %i: %s", p_sys->i_aot, aac_get_errorstring(erraac));
+    if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_AOT, i_aot)) != AACENC_OK) {
+        msg_Err(p_enc, "Unable to set the Profile %i: %s", i_aot, aac_get_errorstring(erraac));
         goto error;
     }
-    if (p_sys->i_aot == PROFILE_AAC_ELD && p_sys->b_eld_sbr) {
+    if (i_aot == PROFILE_AAC_ELD && b_eld_sbr) {
         if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_SBR_MODE, 1)) != AACENC_OK) {
             msg_Err(p_enc, "Unable to set SBR mode for ELD: %s", aac_get_errorstring(erraac));
         goto error;
@@ -292,23 +286,23 @@ static int OpenEncoder( vlc_object_t *p_this )
         msg_Err(p_enc, "Unable to set the sound channel order: %s", aac_get_errorstring(erraac));
         goto error;
     }
-    if (p_sys->i_vbr != 0) {
+    if (i_vbr != 0) {
         if ((erraac = aacEncoder_SetParam(p_sys->handle,
-                         AACENC_BITRATEMODE, p_sys->i_vbr)) != AACENC_OK) {
+                         AACENC_BITRATEMODE, i_vbr)) != AACENC_OK) {
             msg_Err(p_enc, "Unable to set the VBR bitrate mode: %s", aac_get_errorstring(erraac));
             goto error;
         }
     } else {
         int i_bitrate;
         if (p_enc->fmt_out.i_bitrate == 0) {
-            if (p_sys->i_aot == PROFILE_AAC_HE_v2) {
+            if (i_aot == PROFILE_AAC_HE_v2) {
                 sce = 1;
                 cpe = 0;
             }
             i_bitrate = (96*sce + 128*cpe) * p_enc->fmt_out.audio.i_rate / 44;
-            if (p_sys->i_aot == PROFILE_AAC_HE ||
-                p_sys->i_aot == PROFILE_AAC_HE_v2 ||
-                p_sys->b_eld_sbr)
+            if (i_aot == PROFILE_AAC_HE ||
+                i_aot == PROFILE_AAC_HE_v2 ||
+                b_eld_sbr)
                 i_bitrate /= 2;
             p_enc->fmt_out.i_bitrate = i_bitrate;
             msg_Info(p_enc, "Setting optimal bitrate of %i", i_bitrate);
@@ -329,14 +323,15 @@ static int OpenEncoder( vlc_object_t *p_this )
         goto error;
     }
     if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_SIGNALING_MODE,
-                                 (int)p_sys->i_signaling)) != AACENC_OK) {
+                    (int)var_InheritInteger( p_enc, ENC_CFG_PREFIX "signaling" ))) != AACENC_OK) {
       /* use explicit backward compatible =1 */
       /* use explicit hierarchical signaling =2 */
         msg_Err(p_enc, "Unable to set signaling mode: %s", aac_get_errorstring(erraac));
         goto error;
     }
     if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_AFTERBURNER,
-                               (int)p_sys->b_afterburner)) != AACENC_OK) {
+                    !!var_InheritBool( p_enc, ENC_CFG_PREFIX "afterburner"))) !=
+                               AACENC_OK) {
         msg_Err(p_enc, "Unable to set the afterburner mode: %s", aac_get_errorstring(erraac));
         goto error;
     }
