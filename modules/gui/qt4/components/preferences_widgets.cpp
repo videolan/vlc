@@ -191,7 +191,8 @@ void InterfacePreviewWidget::setPreview( enum_style e_style )
         break;
     }
 
-    setPixmap( QPixmap( pixmapLocationString ) );
+    setPixmap( QPixmap( pixmapLocationString ).
+               scaledToWidth( width(), Qt::SmoothTransformation ) );
     update();
 }
 
