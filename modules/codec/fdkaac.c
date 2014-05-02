@@ -190,22 +190,14 @@ static int OpenEncoder(vlc_object_t *p_this)
 
     uint16_t channel_config;
     CHANNEL_MODE mode;
-    int sce, cpe;
     switch (p_enc->fmt_in.audio.i_channels) {
-    case 1: mode = MODE_1;       sce = 1; cpe = 0;
-         channel_config = AOUT_CHAN_CENTER; break;
-    case 2: mode = MODE_2;       sce = 0; cpe = 1;
-         channel_config = AOUT_CHANS_STEREO; break;
-    case 3: mode = MODE_1_2;     sce = 1; cpe = 1;
-         channel_config = AOUT_CHANS_3_0; break;
-    case 4: mode = MODE_1_2_1;   sce = 2; cpe = 1;
-         channel_config = AOUT_CHANS_4_CENTER_REAR; break;
-    case 5: mode = MODE_1_2_2;   sce = 1; cpe = 2;
-         channel_config = AOUT_CHANS_5_0; break;
-    case 6: mode = MODE_1_2_2_1; sce = 2; cpe = 2;
-         channel_config = AOUT_CHANS_5_1; break;
-    case 8: mode = MODE_1_2_2_2_1; sce = 2; cpe = 3;
-         channel_config = AOUT_CHANS_7_1; break;
+    case 1: mode = MODE_1; channel_config = AOUT_CHAN_CENTER; break;
+    case 2: mode = MODE_2; channel_config = AOUT_CHANS_STEREO; break;
+    case 3: mode = MODE_1_2; channel_config = AOUT_CHANS_3_0; break;
+    case 4: mode = MODE_1_2_1; channel_config = AOUT_CHANS_4_CENTER_REAR; break;
+    case 5: mode = MODE_1_2_2; channel_config = AOUT_CHANS_5_0; break;
+    case 6: mode = MODE_1_2_2_1; channel_config = AOUT_CHANS_5_1; break;
+    case 8: mode = MODE_1_2_2_2_1; channel_config = AOUT_CHANS_7_1; break;
     default:
         msg_Err(p_enc, "we do not support > 8 input channels, this input has %i",
                         p_enc->fmt_in.audio.i_channels);
@@ -290,21 +282,13 @@ static int OpenEncoder(vlc_object_t *p_this)
             goto error;
         }
     } else {
-        int i_bitrate;
-        if (p_enc->fmt_out.i_bitrate == 0) {
-            if (i_aot == PROFILE_AAC_HE_v2) {
-                sce = 1;
-                cpe = 0;
-            }
-            i_bitrate = (96*sce + 128*cpe) * p_enc->fmt_out.audio.i_rate / 44;
-            if (i_aot == PROFILE_AAC_HE ||
-                i_aot == PROFILE_AAC_HE_v2 ||
-                b_eld_sbr)
+        int i_bitrate = p_enc->fmt_out.i_bitrate;
+        if (i_bitrate == 0) {
+            i_bitrate = 96 * p_enc->fmt_in.audio.i_channels * p_enc->fmt_out.audio.i_rate / 44;
+            if (i_aot == PROFILE_AAC_HE || i_aot == PROFILE_AAC_HE_v2 || b_eld_sbr)
                 i_bitrate /= 2;
             p_enc->fmt_out.i_bitrate = i_bitrate;
             msg_Info(p_enc, "Setting optimal bitrate of %i", i_bitrate);
-        } else {
-            i_bitrate = p_enc->fmt_out.i_bitrate;
         }
         if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_BITRATE,
                                          i_bitrate)) != AACENC_OK) {
