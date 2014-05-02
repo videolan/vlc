@@ -9,12 +9,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -52,7 +52,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
- 
+
 #include <fdk-aac/aacenc_lib.h>
 
 #include <vlc_common.h>
@@ -109,7 +109,7 @@ vlc_module_begin ()
     change_integer_list( pi_aot_values, ppsz_aot_descriptions );
     add_bool( ENC_CFG_PREFIX "sbr", false, SIDEBAND_TEXT,
               SIDEBAND_LONGTEXT, false )
-    add_integer( ENC_CFG_PREFIX "vbr", 0, VBR_QUALITY_TEXT, 
+    add_integer( ENC_CFG_PREFIX "vbr", 0, VBR_QUALITY_TEXT,
               VBR_QUALITY_LONGTEXT, false )
     change_integer_range (0, 5)
     add_bool( ENC_CFG_PREFIX "afterburner", true, AFTERBURNER_TEXT,
@@ -198,8 +198,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     sce = 0;
     cpe = 0;
 
-    if( p_enc->fmt_out.i_codec != VLC_FOURCC( 'l', 'a', 'a', 'c' ) && 
-        p_enc->fmt_out.i_codec != VLC_FOURCC( 'h', 'a', 'a', 'c' ) && 
+    if( p_enc->fmt_out.i_codec != VLC_FOURCC( 'l', 'a', 'a', 'c' ) &&
+        p_enc->fmt_out.i_codec != VLC_FOURCC( 'h', 'a', 'a', 'c' ) &&
         p_enc->fmt_out.i_codec != VLC_FOURCC( 's', 'a', 'a', 'c' ) &&
         p_enc->fmt_out.i_codec != VLC_CODEC_MP4A )
     {
@@ -238,7 +238,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     case 8: mode = MODE_1_2_2_2_1; sce = 2; cpe = 3;
          channel_config = AOUT_CHANS_7_1; break;
     default:
-        msg_Err( p_enc, "we do not support > 8 input channels, this input has %i", 
+        msg_Err( p_enc, "we do not support > 8 input channels, this input has %i",
                         p_enc->fmt_in.audio.i_channels );
         return VLC_EGENERIC;
     }
@@ -298,7 +298,7 @@ static int OpenEncoder( vlc_object_t *p_this )
         goto error;
         }
     }
-    if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_SAMPLERATE, 
+    if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_SAMPLERATE,
                     p_enc->fmt_out.audio.i_rate)) != AACENC_OK) {
         msg_Err(p_enc, "Unable to set the sample rate %i: %s",p_enc->fmt_out.audio.i_rate,
                         aac_get_errorstring(erraac));
@@ -313,7 +313,7 @@ static int OpenEncoder( vlc_object_t *p_this )
         goto error;
     }
     if (p_sys->i_vbr != 0) {
-        if ((erraac = aacEncoder_SetParam(p_sys->handle, 
+        if ((erraac = aacEncoder_SetParam(p_sys->handle,
                          AACENC_BITRATEMODE, p_sys->i_vbr)) != AACENC_OK) {
             msg_Err(p_enc, "Unable to set the VBR bitrate mode: %s", aac_get_errorstring(erraac));
             goto error;
@@ -336,7 +336,7 @@ static int OpenEncoder( vlc_object_t *p_this )
         {
             i_bitrate = p_enc->fmt_out.i_bitrate;
         }
-        if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_BITRATE, 
+        if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_BITRATE,
                                          i_bitrate)) != AACENC_OK) {
             msg_Err(p_enc, "Unable to set the bitrate %i: %s", i_bitrate,
                     aac_get_errorstring(erraac));
@@ -347,14 +347,14 @@ static int OpenEncoder( vlc_object_t *p_this )
         msg_Err(p_enc, "Unable to set the ADTS transmux: %s", aac_get_errorstring(erraac));
         goto error;
     }
-    if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_SIGNALING_MODE, 
+    if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_SIGNALING_MODE,
                                  (int)p_sys->i_signaling)) != AACENC_OK) {
       /* use explicit backward compatible =1 */
       /* use explicit hierarchical signaling =2 */
         msg_Err(p_enc, "Unable to set signaling mode: %s", aac_get_errorstring(erraac));
         goto error;
     }
-    if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_AFTERBURNER, 
+    if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_AFTERBURNER,
                                (int)p_sys->b_afterburner)) != AACENC_OK) {
         msg_Err(p_enc, "Unable to set the afterburner mode: %s", aac_get_errorstring(erraac));
         goto error;
@@ -498,9 +498,9 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
                 double d_samples_forward = p_sys->d_compression_ratio*(double)out_args.numOutBytes;
                 i_pts_out += (mtime_t)d_samples_forward;
                 p_block->i_length = (mtime_t)d_samples_forward;
-                // TODO: It would be more precise (a few microseconds) to use d_samples_forward = 
+                // TODO: It would be more precise (a few microseconds) to use d_samples_forward =
                 // (mtime_t)CLOCK_FREQ * (mtime_t)p_sys->i_frame_size/(mtime_t)p_enc->fmt_out.audio.i_rate
-                // but I am not sure if the lib always outputs a full frame when 
+                // but I am not sure if the lib always outputs a full frame when
                 // emptying the internal buffer in the EOF scenario
             }
             else
@@ -530,10 +530,14 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             }
             p_block->i_dts = p_block->i_pts = i_pts_out;
             block_ChainAppend( &p_chain, p_block );
-            //msg_Dbg( p_enc, "p_block->i_dts %llu, p_block->i_length %llu, p_sys->i_pts_last %llu\n\ 
-            //                  out_args.numOutBytes = %i, out_args.numInSamples = %i, i_samples %i, i_loop_count %i",
-            //                  p_block->i_dts , p_block->i_length,p_sys->i_pts_last,
-            //                  out_args.numOutBytes, out_args.numInSamples, i_samples, i_loop_count);
+#if 0
+            msg_Dbg( p_enc, "dts %"PRId64", length %"PRId64", " "pts_last "
+                            "%"PRId64" numOutBytes = %i, numInSamples = %i, "
+                            "i_samples %i, i_loop_count %i",
+                              p_block->i_dts, p_block->i_length,
+                              p_sys->i_pts_last, out_args.numOutBytes,
+                              out_args.numInSamples, i_samples, i_loop_count);
+#endif
             if ( likely(i_samples > 0) )
             {
                 p_sys->d_compression_ratio = (double)p_block->i_length / (double)out_args.numOutBytes;
