@@ -180,13 +180,31 @@ static int OpenEncoder(vlc_object_t *p_this)
 {
     encoder_t *p_enc = (encoder_t *)p_this;
 
-    if (p_enc->fmt_out.i_codec != VLC_FOURCC('l', 'a', 'a', 'c') &&
-        p_enc->fmt_out.i_codec != VLC_FOURCC('h', 'a', 'a', 'c') &&
-        p_enc->fmt_out.i_codec != VLC_FOURCC('s', 'a', 'a', 'c') &&
-        p_enc->fmt_out.i_codec != VLC_CODEC_MP4A)
-    {
+    config_ChainParse(p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg);
+
+    int i_aot;
+    switch (p_enc->fmt_out.i_codec) {
+    case VLC_CODEC_MP4A:
+        i_aot = var_InheritInteger(p_enc, ENC_CFG_PREFIX "profile");
+        break;
+    case VLC_FOURCC('l', 'a', 'a', 'c'):
+        i_aot = PROFILE_AAC_LC;
+        break;
+    case VLC_FOURCC('h', 'a', 'a', 'c'):
+        i_aot = PROFILE_AAC_HE;
+        break;
+    case VLC_FOURCC('s', 'a', 'a', 'c'):
+        i_aot = PROFILE_AAC_HE_v2;
+        break;
+    default:
         return VLC_EGENERIC;
     }
+
+    if (p_enc->fmt_in.audio.i_channels != 2)
+        if (i_aot == PROFILE_AAC_HE_v2 || i_aot == PROFILE_AAC_ELD) {
+            msg_Err(p_enc, "Selected profile %d can only be used with stereo", i_aot);
+            return VLC_EGENERIC;
+        }
 
     uint16_t channel_config;
     CHANNEL_MODE mode;
@@ -217,25 +235,7 @@ static int OpenEncoder(vlc_object_t *p_this)
     p_enc->fmt_out.i_cat = AUDIO_ES;
     p_enc->fmt_out.i_codec = VLC_CODEC_MP4A;
 
-    config_ChainParse(p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg);
-
-    int i_aot; /* This stores the aac profile chosen */
-    if (p_enc->fmt_out.i_codec == VLC_FOURCC('l', 'a', 'a', 'c'))
-        i_aot = PROFILE_AAC_LC;
-    else if (p_enc->fmt_out.i_codec == VLC_FOURCC('h', 'a', 'a', 'c'))
-        i_aot = PROFILE_AAC_HE;
-    else if (p_enc->fmt_out.i_codec == VLC_FOURCC('s', 'a', 'a', 'c'))
-        i_aot = PROFILE_AAC_HE_v2;
-    else
-        i_aot = var_InheritInteger(p_enc, ENC_CFG_PREFIX "profile");
-
-    int i_vbr = var_InheritInteger(p_enc, ENC_CFG_PREFIX "vbr");
     p_sys->i_pts_last = 0;
-
-    if ((i_aot == PROFILE_AAC_HE || i_aot == PROFILE_AAC_HE_v2) && i_vbr > 3) {
-        msg_Warn(p_enc, "Maximum VBR quality for this profile is 3, setting vbr=3");
-        i_vbr = 3;
-    }
 
     AACENC_ERROR erraac;
     erraac = aacEncOpen(&p_sys->handle, 0, p_enc->fmt_in.audio.i_channels);
@@ -243,14 +243,6 @@ static int OpenEncoder(vlc_object_t *p_this)
         msg_Err(p_enc, "Unable to open encoder: %s", aac_get_errorstring(erraac));
         free(p_sys);
         return VLC_EGENERIC;
-    }
-    if (i_aot == PROFILE_AAC_HE_v2 && p_enc->fmt_in.audio.i_channels != 2) {
-        msg_Err(p_enc, "The HE-AAC-v2 profile can only be used with stereo sources");
-        goto error;
-    }
-    if (i_aot == PROFILE_AAC_ELD && p_enc->fmt_in.audio.i_channels != 2) {
-        msg_Err(p_enc, "The ELD-AAC profile can only be used with stereo sources");
-        goto error;
     }
 
 #define SET_PARAM(P, V) do { \
@@ -268,9 +260,15 @@ static int OpenEncoder(vlc_object_t *p_this)
     SET_PARAM(SAMPLERATE, p_enc->fmt_out.audio.i_rate);
     SET_PARAM(CHANNELMODE, mode);
     SET_PARAM(CHANNELORDER, CH_ORDER_WG4);
-    if (i_vbr != 0)
+
+    int i_vbr = var_InheritInteger(p_enc, ENC_CFG_PREFIX "vbr");
+    if (i_vbr != 0) {
+        if ((i_aot == PROFILE_AAC_HE || i_aot == PROFILE_AAC_HE_v2) && i_vbr > 3) {
+            msg_Warn(p_enc, "Maximum VBR quality for this profile is 3, setting vbr=3");
+            i_vbr = 3;
+        }
         SET_PARAM(BITRATEMODE, i_vbr);
-    else {
+    } else {
         int i_bitrate = p_enc->fmt_out.i_bitrate;
         if (i_bitrate == 0) {
             i_bitrate = 96 * p_enc->fmt_in.audio.i_channels * p_enc->fmt_out.audio.i_rate / 44;
@@ -325,8 +323,7 @@ static int OpenEncoder(vlc_object_t *p_this)
     return VLC_SUCCESS;
 
 error:
-    aacEncClose(&p_sys->handle);
-    free(p_sys);
+    CloseEncoder(p_this);
     return VLC_EGENERIC;
 }
 
