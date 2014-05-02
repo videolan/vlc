@@ -183,17 +183,7 @@ static const char *aac_get_errorstring(AACENC_ERROR erraac)
  *****************************************************************************/
 static int OpenEncoder( vlc_object_t *p_this )
 {
-    encoder_t *p_enc;
-    encoder_sys_t *p_sys;
-    CHANNEL_MODE mode;
-    AACENC_ERROR erraac;
-    int sce;
-    int cpe;
-    int i_bitrate;
-
-    p_enc = (encoder_t *)p_this;
-    sce = 0;
-    cpe = 0;
+    encoder_t *p_enc = (encoder_t *)p_this;
 
     if( p_enc->fmt_out.i_codec != VLC_FOURCC( 'l', 'a', 'a', 'c' ) &&
         p_enc->fmt_out.i_codec != VLC_FOURCC( 'h', 'a', 'a', 'c' ) &&
@@ -204,6 +194,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     }
 
     uint16_t channel_config;
+    CHANNEL_MODE mode;
+    int sce, cpe;
     switch (p_enc->fmt_in.audio.i_channels) {
     case 1: mode = MODE_1;       sce = 1; cpe = 0;
          channel_config = AOUT_CHAN_CENTER; break;
@@ -230,7 +222,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     msg_Info(p_enc, "Initializing AAC Encoder, %i channels", p_enc->fmt_in.audio.i_channels);
 
     /* Allocate the memory needed to store the encoder's structure */
-    p_sys = (encoder_sys_t *)malloc(sizeof(encoder_sys_t));
+    encoder_sys_t *p_sys = (encoder_sys_t *)malloc(sizeof(encoder_sys_t));
     if( unlikely( !p_sys ) )
         return VLC_ENOMEM;
     p_enc->p_sys = p_sys;
@@ -260,6 +252,7 @@ static int OpenEncoder( vlc_object_t *p_this )
         msg_Warn(p_enc, "Maximum VBR quality for this profile is 3, setting vbr=3");
         p_sys->i_vbr = 3;
     }
+    AACENC_ERROR erraac;
     if ((erraac = aacEncOpen(&p_sys->handle, 0, p_enc->fmt_in.audio.i_channels)) != AACENC_OK) {
         msg_Err(p_enc, "Unable to open encoder: %s", aac_get_errorstring(erraac));
         free( p_sys );
@@ -306,6 +299,7 @@ static int OpenEncoder( vlc_object_t *p_this )
             goto error;
         }
     } else {
+        int i_bitrate;
         if (p_enc->fmt_out.i_bitrate == 0) {
             if (p_sys->i_aot == PROFILE_AAC_HE_v2) {
                 sce = 1;
@@ -395,17 +389,11 @@ error:
  ****************************************************************************/
 static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
 {
-    encoder_sys_t *p_sys;
     int16_t *p_buffer;
     int i_samples;
-    int i_loop_count;
-    int i_samples_left;
     mtime_t i_pts_out;
-    block_t *p_chain;
-    AACENC_ERROR erraac;
 
-    p_sys = p_enc->p_sys;
-    p_chain = NULL;
+    encoder_sys_t *p_sys = p_enc->p_sys;
 
     if ( likely( p_aout_buf ) )
     {
@@ -425,9 +413,10 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         i_pts_out = p_sys->i_pts_last;
     }
 
-    i_samples_left = i_samples;
-    i_loop_count = 0;
+    int i_samples_left = i_samples;
+    int i_loop_count = 0;
 
+    block_t *p_chain = NULL;
     while ( i_samples_left >= 0 )
     {
         AACENC_BufDesc in_buf = { 0 }, out_buf = { 0 };
@@ -465,6 +454,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         out_buf.bufSizes = &out_size;
         out_buf.bufElSizes = &out_elem_size;
 
+        AACENC_ERROR erraac;
         if ((erraac = aacEncEncode(p_sys->handle, &in_buf, &out_buf, &in_args, &out_args)) != AACENC_OK) {
             if (erraac == AACENC_ENCODE_EOF) {
                 msg_Info( p_enc, "Encoding final bytes (EOF)");
