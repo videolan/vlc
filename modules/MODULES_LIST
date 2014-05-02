@@ -151,6 +151,7 @@ $Id$
  * grain: Grain Video filter
  * grey_yuv: grayscale to others conversion module
  * growl: announce currently playing stream to growl
+ * gstdecode: GStreamer based decoder module.
  * h264: H264 decoder
  * headphone_channel_mixer:  headphone channel mixer with virtual spatialization effect
  * hevc: HEVC demuxer

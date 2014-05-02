@@ -27,6 +27,7 @@ Decoder:
  * New jpeg image decoder
  * Add tx3g subtitles decoder
  * Add Media Foundation Transform decoder
+ * Add decoder module based on GStreamer. Currently supports only video decode.
 
 Encoder:
  * Support for MPEG-2 encoding using x262
