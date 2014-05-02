@@ -141,35 +141,22 @@ struct encoder_sys_t
     HANDLE_AACENCODER handle;
 };
 
-static const char *aac_get_errorstring(AACENC_ERROR erraac)
+static const char *fdkaac_error(AACENC_ERROR erraac)
 {
     switch (erraac) {
-    case AACENC_OK:
-        return "No error";
-    case AACENC_INVALID_HANDLE:
-        return "Invalid handle";
-    case AACENC_MEMORY_ERROR:
-        return "Memory allocation error";
-    case AACENC_UNSUPPORTED_PARAMETER:
-        return "Unsupported parameter";
-    case AACENC_INVALID_CONFIG:
-        return "Invalid config";
-    case AACENC_INIT_ERROR:
-        return "Initialization error";
-    case AACENC_INIT_AAC_ERROR:
-        return "AAC library initialization error";
-    case AACENC_INIT_SBR_ERROR:
-        return "SBR library initialization error";
-    case AACENC_INIT_TP_ERROR:
-        return "Transport library initialization error";
-    case AACENC_INIT_META_ERROR:
-        return "Metadata library initialization error";
-    case AACENC_ENCODE_ERROR:
-        return "Encoding error";
-    case AACENC_ENCODE_EOF:
-        return "End of file";
-    default:
-        return "Unknown error";
+    case AACENC_OK: return "No error";
+    case AACENC_INVALID_HANDLE: return "Invalid handle";
+    case AACENC_MEMORY_ERROR: return "Memory allocation error";
+    case AACENC_UNSUPPORTED_PARAMETER: return "Unsupported parameter";
+    case AACENC_INVALID_CONFIG: return "Invalid config";
+    case AACENC_INIT_ERROR: return "Initialization error";
+    case AACENC_INIT_AAC_ERROR: return "AAC library initialization error";
+    case AACENC_INIT_SBR_ERROR: return "SBR library initialization error";
+    case AACENC_INIT_TP_ERROR: return "Transport library initialization error";
+    case AACENC_INIT_META_ERROR: return "Metadata library initialization error";
+    case AACENC_ENCODE_ERROR: return "Encoding error";
+    case AACENC_ENCODE_EOF: return "End of file";
+    default: return "Unknown error";
     }
 }
 
@@ -240,7 +227,7 @@ static int OpenEncoder(vlc_object_t *p_this)
     AACENC_ERROR erraac;
     erraac = aacEncOpen(&p_sys->handle, 0, p_enc->fmt_in.audio.i_channels);
     if (erraac != AACENC_OK) {
-        msg_Err(p_enc, "Unable to open encoder: %s", aac_get_errorstring(erraac));
+        msg_Err(p_enc, "Unable to open encoder: %s", fdkaac_error(erraac));
         free(p_sys);
         return VLC_EGENERIC;
     }
@@ -248,7 +235,7 @@ static int OpenEncoder(vlc_object_t *p_this)
 #define SET_PARAM(P, V) do { \
         AACENC_ERROR err = aacEncoder_SetParam(p_sys->handle, AACENC_ ## P, V); \
         if (err != AACENC_OK) { \
-            msg_Err(p_enc, "Couldn't set " #P " to value %d: %s", V, aac_get_errorstring(err)); \
+            msg_Err(p_enc, "Couldn't set " #P " to value %d: %s", V, fdkaac_error(err)); \
             goto error; \
         } \
     } while(0)
@@ -286,14 +273,14 @@ static int OpenEncoder(vlc_object_t *p_this)
 
     erraac = aacEncEncode(p_sys->handle, NULL, NULL, NULL, NULL);
     if (erraac != AACENC_OK) {
-        msg_Err(p_enc, "Unable to initialize the encoder: %s", aac_get_errorstring(erraac));
+        msg_Err(p_enc, "Unable to initialize the encoder: %s", fdkaac_error(erraac));
         goto error;
     }
 
     AACENC_InfoStruct info = { 0 };
     erraac = aacEncInfo(p_sys->handle, &info);
     if (erraac != AACENC_OK) {
-        msg_Err(p_enc, "Unable to get the encoder info: %s", aac_get_errorstring(erraac));
+        msg_Err(p_enc, "Unable to get the encoder info: %s", fdkaac_error(erraac));
         goto error;
     }
 
@@ -398,7 +385,7 @@ static block_t *EncodeAudio(encoder_t *p_enc, block_t *p_aout_buf)
             if (erraac == AACENC_ENCODE_EOF) {
                 msg_Info(p_enc, "Encoding final bytes (EOF)");
             } else {
-                msg_Err(p_enc, "Encoding failed: %s", aac_get_errorstring(erraac));
+                msg_Err(p_enc, "Encoding failed: %s", fdkaac_error(erraac));
                 block_Release(p_block);
                 break;
             }
