@@ -229,7 +229,6 @@ static int OpenEncoder(vlc_object_t *p_this)
     else
         i_aot = var_InheritInteger(p_enc, ENC_CFG_PREFIX "profile");
 
-    bool b_eld_sbr = var_InheritBool(p_enc, ENC_CFG_PREFIX "sbr");
     int i_vbr = var_InheritInteger(p_enc, ENC_CFG_PREFIX "vbr");
     p_sys->i_pts_last = 0;
 
@@ -237,8 +236,10 @@ static int OpenEncoder(vlc_object_t *p_this)
         msg_Warn(p_enc, "Maximum VBR quality for this profile is 3, setting vbr=3");
         i_vbr = 3;
     }
+
     AACENC_ERROR erraac;
-    if ((erraac = aacEncOpen(&p_sys->handle, 0, p_enc->fmt_in.audio.i_channels)) != AACENC_OK) {
+    erraac = aacEncOpen(&p_sys->handle, 0, p_enc->fmt_in.audio.i_channels);
+    if (erraac != AACENC_OK) {
         msg_Err(p_enc, "Unable to open encoder: %s", aac_get_errorstring(erraac));
         free(p_sys);
         return VLC_EGENERIC;
@@ -251,37 +252,25 @@ static int OpenEncoder(vlc_object_t *p_this)
         msg_Err(p_enc, "The ELD-AAC profile can only be used with stereo sources");
         goto error;
     }
-    if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_AOT, i_aot)) != AACENC_OK) {
-        msg_Err(p_enc, "Unable to set the Profile %i: %s", i_aot, aac_get_errorstring(erraac));
-        goto error;
-    }
-    if (i_aot == PROFILE_AAC_ELD && b_eld_sbr) {
-        if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_SBR_MODE, 1)) != AACENC_OK) {
-            msg_Err(p_enc, "Unable to set SBR mode for ELD: %s", aac_get_errorstring(erraac));
-            goto error;
-        }
-    }
-    if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_SAMPLERATE,
-                    p_enc->fmt_out.audio.i_rate)) != AACENC_OK) {
-        msg_Err(p_enc, "Unable to set the sample rate %i: %s",p_enc->fmt_out.audio.i_rate,
-                        aac_get_errorstring(erraac));
-        goto error;
-    }
-    if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_CHANNELMODE, mode)) != AACENC_OK) {
-        msg_Err(p_enc, "Unable to set the channel mode: %s", aac_get_errorstring(erraac));
-        goto error;
-    }
-    if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_CHANNELORDER, CH_ORDER_WG4)) != AACENC_OK) {
-        msg_Err(p_enc, "Unable to set the sound channel order: %s", aac_get_errorstring(erraac));
-        goto error;
-    }
-    if (i_vbr != 0) {
-        if ((erraac = aacEncoder_SetParam(p_sys->handle,
-                         AACENC_BITRATEMODE, i_vbr)) != AACENC_OK) {
-            msg_Err(p_enc, "Unable to set the VBR bitrate mode: %s", aac_get_errorstring(erraac));
-            goto error;
-        }
-    } else {
+
+#define SET_PARAM(P, V) do { \
+        AACENC_ERROR err = aacEncoder_SetParam(p_sys->handle, AACENC_ ## P, V); \
+        if (err != AACENC_OK) { \
+            msg_Err(p_enc, "Couldn't set " #P " to value %d: %s", V, aac_get_errorstring(err)); \
+            goto error; \
+        } \
+    } while(0)
+
+    SET_PARAM(AOT, i_aot);
+    bool b_eld_sbr = var_InheritBool(p_enc, ENC_CFG_PREFIX "sbr");
+    if (i_aot == PROFILE_AAC_ELD && b_eld_sbr)
+        SET_PARAM(SBR_MODE, 1);
+    SET_PARAM(SAMPLERATE, p_enc->fmt_out.audio.i_rate);
+    SET_PARAM(CHANNELMODE, mode);
+    SET_PARAM(CHANNELORDER, CH_ORDER_WG4);
+    if (i_vbr != 0)
+        SET_PARAM(BITRATEMODE, i_vbr);
+    else {
         int i_bitrate = p_enc->fmt_out.i_bitrate;
         if (i_bitrate == 0) {
             i_bitrate = 96 * p_enc->fmt_in.audio.i_channels * p_enc->fmt_out.audio.i_rate / 44;
@@ -290,36 +279,22 @@ static int OpenEncoder(vlc_object_t *p_this)
             p_enc->fmt_out.i_bitrate = i_bitrate;
             msg_Info(p_enc, "Setting optimal bitrate of %i", i_bitrate);
         }
-        if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_BITRATE,
-                                         i_bitrate)) != AACENC_OK) {
-            msg_Err(p_enc, "Unable to set the bitrate %i: %s", i_bitrate,
-                    aac_get_errorstring(erraac));
-            goto error;
-        }
+        SET_PARAM(BITRATE, i_bitrate);
     }
-    if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_TRANSMUX, 0)) != AACENC_OK) {
-        msg_Err(p_enc, "Unable to set the ADTS transmux: %s", aac_get_errorstring(erraac));
-        goto error;
-    }
-    if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_SIGNALING_MODE,
-                    (int)var_InheritInteger(p_enc, ENC_CFG_PREFIX "signaling"))) != AACENC_OK) {
-      /* use explicit backward compatible =1 */
-      /* use explicit hierarchical signaling =2 */
-        msg_Err(p_enc, "Unable to set signaling mode: %s", aac_get_errorstring(erraac));
-        goto error;
-    }
-    if ((erraac = aacEncoder_SetParam(p_sys->handle, AACENC_AFTERBURNER,
-                    !!var_InheritBool(p_enc, ENC_CFG_PREFIX "afterburner"))) !=
-                               AACENC_OK) {
-        msg_Err(p_enc, "Unable to set the afterburner mode: %s", aac_get_errorstring(erraac));
-        goto error;
-    }
-    if ((erraac = aacEncEncode(p_sys->handle, NULL, NULL, NULL, NULL)) != AACENC_OK) {
+    SET_PARAM(TRANSMUX, 0);
+    SET_PARAM(SIGNALING_MODE, (int)var_InheritInteger(p_enc, ENC_CFG_PREFIX "signaling"));
+    SET_PARAM(AFTERBURNER, !!var_InheritBool(p_enc, ENC_CFG_PREFIX "afterburner"));
+#undef SET_PARAM
+
+    erraac = aacEncEncode(p_sys->handle, NULL, NULL, NULL, NULL);
+    if (erraac != AACENC_OK) {
         msg_Err(p_enc, "Unable to initialize the encoder: %s", aac_get_errorstring(erraac));
         goto error;
     }
+
     AACENC_InfoStruct info = { 0 };
-    if ((erraac = aacEncInfo(p_sys->handle, &info)) != AACENC_OK) {
+    erraac = aacEncInfo(p_sys->handle, &info);
+    if (erraac != AACENC_OK) {
         msg_Err(p_enc, "Unable to get the encoder info: %s", aac_get_errorstring(erraac));
         goto error;
     }
@@ -337,8 +312,7 @@ static int OpenEncoder(vlc_object_t *p_this)
             msg_Err(p_enc, "Unable to allocate fmt_out.p_extra");
             goto error;
         }
-        memcpy(p_enc->fmt_out.p_extra, info.confBuf,
-                p_enc->fmt_out.i_extra);
+        memcpy(p_enc->fmt_out.p_extra, info.confBuf, p_enc->fmt_out.i_extra);
     }
 
     p_enc->pf_encode_audio = EncodeAudio;
