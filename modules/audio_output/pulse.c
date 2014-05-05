@@ -114,7 +114,10 @@ static void sink_add_cb(pa_context *ctx, const pa_sink_info *i, int eol,
     aout_sys_t *sys = aout->sys;
 
     if (eol)
+    {
+        pa_threaded_mainloop_signal(sys->mainloop, 0);
         return;
+    }
     (void) ctx;
 
     msg_Dbg(aout, "adding sink %"PRIu32": %s (%s)", i->index, i->name,
@@ -1064,8 +1067,12 @@ static int Open(vlc_object_t *obj)
     pa_threaded_mainloop_lock(sys->mainloop);
     /* Sinks (output devices) list */
     op = pa_context_get_sink_info_list(sys->context, sink_add_cb, aout);
-    if (op != NULL)
+    if (likely(op != NULL))
+    {
+        while (pa_operation_get_state(op) == PA_OPERATION_RUNNING)
+            pa_threaded_mainloop_wait(sys->mainloop);
         pa_operation_unref(op);
+    }
 
     /* Context events */
     const pa_subscription_mask_t mask = PA_SUBSCRIPTION_MASK_SINK
