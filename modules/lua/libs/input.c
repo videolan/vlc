@@ -218,9 +218,9 @@ static int vlclua_input_add_subtitle( lua_State *L )
     if( !p_input )
         return luaL_error( L, "can't add subtitle: no current input" );
     if( !lua_isstring( L, 1 ) )
-        return luaL_error( L, "vlc.input.add_subtitle() usage: (url)" );
-    const char *psz_url = luaL_checkstring( L, 1 );
-    input_AddSubtitle( p_input, psz_url, false );
+        return luaL_error( L, "vlc.input.add_subtitle() usage: (path)" );
+    const char *psz_path = luaL_checkstring( L, 1 );
+    input_AddSubtitle( p_input, psz_path, false );
     vlc_object_release( p_input );
     return 1;
 }
