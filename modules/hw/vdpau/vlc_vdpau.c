@@ -321,7 +321,7 @@ VdpStatus vdp_output_surface_render_output_surface(const vdp_t *vdp,
     VdpOutputSurface dst_surface, const VdpRect *dst_rect,
     VdpOutputSurface src_surface, const VdpRect *src_rect,
     const VdpColor *colors,
-    const VdpOutputSurfaceRenderBlendState const *state, uint32_t flags)
+    const VdpOutputSurfaceRenderBlendState *const state, uint32_t flags)
 {
     return vdp->vt.output_surface_render_output_surface(dst_surface, dst_rect,
         src_surface, src_rect, colors, state, flags);
@@ -422,7 +422,7 @@ VdpStatus vdp_video_mixer_set_feature_enables(const vdp_t *vdp,
 
 VdpStatus vdp_video_mixer_set_attribute_values(const vdp_t *vdp,
     VdpVideoMixer mixer, uint32_t count,
-    const VdpVideoMixerAttribute const *ids, const void *const *values)
+    const VdpVideoMixerAttribute *const ids, const void *const *values)
 {
     return vdp->vt.video_mixer_set_attribute_values(mixer, count, ids, values);
 }

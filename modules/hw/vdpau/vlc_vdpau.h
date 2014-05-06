@@ -79,7 +79,7 @@ VdpStatus vdp_bitmap_surface_put_bits_native(const vdp_t *, VdpBitmapSurface,
     const void *const *, const uint32_t *, const VdpRect *);
 VdpStatus vdp_output_surface_render_output_surface(const vdp_t *,
     VdpOutputSurface, const VdpRect *, VdpOutputSurface, const VdpRect *,
-    const VdpColor *, const VdpOutputSurfaceRenderBlendState const *,
+    const VdpColor *, const VdpOutputSurfaceRenderBlendState *const,
     uint32_t);
 VdpStatus vdp_output_surface_render_bitmap_surface(const vdp_t *,
     VdpOutputSurface, const VdpRect *, VdpBitmapSurface, const VdpRect *,
@@ -110,7 +110,7 @@ VdpStatus vdp_video_mixer_create(const vdp_t *, VdpDevice, uint32_t,
 VdpStatus vdp_video_mixer_set_feature_enables(const vdp_t *, VdpVideoMixer,
     uint32_t, const VdpVideoMixerFeature *, const VdpBool *);
 VdpStatus vdp_video_mixer_set_attribute_values(const vdp_t *, VdpVideoMixer,
-    uint32_t, const VdpVideoMixerAttribute const *, const void *const *);
+    uint32_t, const VdpVideoMixerAttribute *const, const void *const *);
 VdpStatus vdp_video_mixer_get_feature_support(const vdp_t *, VdpVideoMixer,
     uint32_t, const VdpVideoMixerFeature *, VdpBool *);
 VdpStatus vdp_video_mixer_get_feature_enables(const vdp_t *, VdpVideoMixer,
