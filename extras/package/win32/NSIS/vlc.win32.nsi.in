@@ -38,7 +38,7 @@ Var UninstallLog
 ; General configuration ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 
-Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
+Name "${PRODUCT_NAME}"
 @HAVE_WIN64_FALSE@ OutFile ..\vlc-${VERSION}-win32.exe
 @HAVE_WIN64_TRUE@  OutFile ..\vlc-${VERSION}-win64.exe
 InstallDir "$@PROGRAMFILES@\VideoLAN\VLC"
