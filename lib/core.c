@@ -38,8 +38,6 @@
 
 #include "../src/revision.c"
 
-static const char nomemstr[] = "Insufficient memory";
-
 libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
 {
     libvlc_threads_init ();
