@@ -154,10 +154,8 @@ void filter_chain_Delete( filter_chain_t *p_chain )
 void filter_chain_Reset( filter_chain_t *p_chain, const es_format_t *p_fmt_in,
                          const es_format_t *p_fmt_out )
 {
-    filter_t *p_filter;
-
-    while( (p_filter = &p_chain->first->filter) != NULL )
-        filter_chain_DeleteFilterInternal( p_chain, p_filter );
+    while( p_chain->first != NULL )
+        filter_chain_DeleteFilterInternal( p_chain, &p_chain->first->filter );
 
     if( p_fmt_in )
     {
