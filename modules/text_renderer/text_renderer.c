@@ -398,7 +398,7 @@ int HandleFontAttributes( xml_reader_t *p_xml_reader,
     rv = PushFont( p_fonts,
                    psz_fontname,
                    i_font_size,
-                   (i_font_color & 0xffffff) | ((i_font_alpha & 0xff) << 24),
+                   (i_font_color & 0xffffff) | ((uint32_t)(i_font_alpha & 0xff) << 24),
                    i_karaoke_bg_color );
 
     free( psz_fontname );
@@ -572,7 +572,7 @@ int ProcessNodes( filter_t *p_filter,
                        p_default_style->psz_fontname,
                        i_font_size,
                        (i_font_color & 0xffffff) |
-                          ((i_font_alpha & 0xff) << 24),
+                       ((uint32_t)(i_font_alpha & 0xff) << 24),
                        0x00ffffff );
     }
     if( p_default_style->i_style_flags & STYLE_BOLD )
