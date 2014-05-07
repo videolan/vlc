@@ -221,7 +221,7 @@ skip:
     switch( xmlTextReaderRead( p_sys->xml ) )
     {
         case 0: /* EOF */
-            return 0;
+            return XML_READER_NONE;
         case -1: /* error */
             return -1;
     }
