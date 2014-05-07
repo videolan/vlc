@@ -288,7 +288,7 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->i_xoff = var_CreateGetInteger( p_filter, CFG_PREFIX "x" );
     p_sys->i_yoff = var_CreateGetInteger( p_filter, CFG_PREFIX "y" );
     p_sys->i_pos = var_CreateGetInteger( p_filter, CFG_PREFIX "position" );
-    p_sys->p_style->i_font_alpha = 255 - var_CreateGetInteger( p_filter, CFG_PREFIX "opacity" );
+    p_sys->p_style->i_font_alpha = var_CreateGetInteger( p_filter, CFG_PREFIX "opacity" );
     p_sys->p_style->i_font_color = var_CreateGetInteger( p_filter, CFG_PREFIX "color" );
     p_sys->p_style->i_font_size = var_CreateGetInteger( p_filter, CFG_PREFIX "size" );
 
