@@ -382,8 +382,6 @@ static int parse_Manifest( stream_t *s )
                 }
                 break;
 
-            case XML_READER_NONE:
-                break;
             case XML_READER_TEXT:
                 break;
             default:
