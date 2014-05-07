@@ -395,6 +395,7 @@ static int parse_Manifest( stream_t *s )
     }
 #undef TIMESCALE
 
+    sms_Free( sms );
     xml_ReaderDelete( vlc_reader );
     xml_Delete( vlc_xml );
 
