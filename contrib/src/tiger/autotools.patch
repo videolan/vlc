@@ -1,0 +1,38 @@
+--- tiger/configure.ac.orig	2008-11-10 19:56:12.000000000 +0100
++++ tiger/configure.ac	2014-05-08 15:45:25.755258933 +0200
+@@ -3,7 +3,7 @@
+ AC_CONFIG_SRCDIR([include/tiger/tiger.h.in])
+ AC_CONFIG_AUX_DIR([misc/autotools])
+ 
+-AC_PREREQ(2.53)
++AC_PREREQ([2.69])
+ 
+ AC_CANONICAL_TARGET
+ 
+@@ -29,6 +29,7 @@
+ AC_PROG_GREP
+ AC_PROG_NM
+ AC_PROG_SED
++AM_PROG_AR
+ 
+ AC_C_CONST
+ AC_C_INLINE
+--- tiger/Makefile.am.orig	2008-11-10 11:48:46.000000000 +0100
++++ tiger/Makefile.am	2014-05-08 15:46:13.028469021 +0200
+@@ -11,7 +11,7 @@
+ tigerpc_DATA=misc/pkgconfig/tiger.pc
+ noinst_DATA=misc/pkgconfig/tiger-uninstalled.pc
+ 
+-LIBTOOLFLAGS=--silent
++AM_LIBTOOLFLAGS=--silent
+ 
+ AM_CPPFLAGS=-I $(top_srcdir)/src -I $(top_srcdir)/include
+ 
+--- tiger/doc/Makefile.am.orig	2008-11-11 21:45:33.000000000 +0100
++++ tiger//doc/Makefile.am	2014-05-08 15:46:16.782167744 +0200
+@@ -1,4 +1,4 @@
+-LIBTOOLFLAGS=--silent
++AM_LIBTOOLFLAGS=--silent
+ 
+ # dependency to get doc to be built
+ noinst_DATA = .doc-dummy-target
