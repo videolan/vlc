@@ -422,10 +422,11 @@ struct es_format_t
 enum es_format_category_e
 {
     UNKNOWN_ES = 0x00,
-    VIDEO_ES   = 0x01,
-    AUDIO_ES   = 0x02,
-    SPU_ES     = 0x03,
-    NAV_ES     = 0x04,
+    VIDEO_ES,
+    AUDIO_ES,
+    SPU_ES,
+    NAV_ES,
+    ES_CATEGORY_COUNT
 };
 
 /**
