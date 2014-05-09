@@ -1843,6 +1843,9 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                     ( p_sys->p_es_sub && 
                       p_sys->p_es_sub->fmt.i_priority < es->fmt.i_priority ) )
                     i_wanted = es->i_channel;
+                else if( p_sys->p_es_sub &&
+                         p_sys->p_es_sub->fmt.i_priority >= es->fmt.i_priority )
+                    i_wanted = p_sys->p_es_sub->i_channel;
             }
 
             if( p_sys->i_sub_last >= 0 )

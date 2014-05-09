@@ -623,6 +623,24 @@ void virtual_chapter_c::print()
 void virtual_segment_c::ChangeSegment( matroska_segment_c * p_old, matroska_segment_c * p_new, mtime_t i_start_time )
 {
     size_t i, j;
+    char *sub_lang = NULL, *aud_lang = NULL;
+    for( i = 0; i < p_old->tracks.size(); i++)
+    {
+        mkv_track_t *p_tk = p_old->tracks[i];
+        es_format_t *p_ofmt = &p_tk->fmt;
+        if( p_tk->p_es )
+        {
+            bool state = false;
+            es_out_Control( p_old->sys.demuxer.out, ES_OUT_GET_ES_STATE, p_tk->p_es, &state );
+            if( state )
+            {
+                if( p_ofmt->i_cat == AUDIO_ES )
+                    aud_lang = p_tk->fmt.psz_language;
+                else if( p_ofmt->i_cat == SPU_ES )
+                    sub_lang = p_tk->fmt.psz_language;
+            }
+        }
+    }
     for( i = 0; i < p_new->tracks.size(); i++)
     {
         mkv_track_t *p_tk = p_new->tracks[i];
@@ -660,6 +678,15 @@ void virtual_segment_c::ChangeSegment( matroska_segment_c * p_old, matroska_segm
                     break;
                 }
             }
+        }
+        p_tk->fmt.i_priority &= ~(0x10);
+        if( ( sub_lang && p_nfmt->i_cat == SPU_ES && !strcasecmp(sub_lang, p_nfmt->psz_language) ) ||
+            ( aud_lang && p_nfmt->i_cat == AUDIO_ES && !strcasecmp(aud_lang, p_nfmt->psz_language) ) )
+        {
+            msg_Warn( &p_old->sys.demuxer, "Since previous segment used lang %s forcing track %zu",
+                      p_nfmt->psz_language, i);
+            p_tk->fmt.i_priority |= 0x10;
+            p_tk->b_forced = true;
         }
     }
     p_new->Select( i_start_time );
