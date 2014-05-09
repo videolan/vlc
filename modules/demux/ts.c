@@ -343,7 +343,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 
 static void PIDInit ( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner );
 static void PIDClean( demux_t *, ts_pid_t *pid );
-static void PIDFillFormat( const ts_es_t *es, int i_stream_type );
+static void PIDFillFormat( es_format_t *fmt, int i_stream_type );
 
 static void PATCallBack( void*, dvbpsi_pat_t * );
 static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt );
@@ -1294,7 +1294,7 @@ static int UserPmt( demux_t *p_demux, const char *psz_fmt )
             else
             {
                 const int i_stream_type = strtol( psz_opt, NULL, 0 );
-                PIDFillFormat( pid->es, i_stream_type );
+                PIDFillFormat( &pid->es->fmt, i_stream_type );
             }
             pid->es->fmt.i_group = i_number;
             if( p_sys->b_es_id_pid )
@@ -2381,10 +2381,8 @@ static bool GatherData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     return i_ret;
 }
 
-static void PIDFillFormat( const ts_es_t *es, int i_stream_type )
+static void PIDFillFormat( es_format_t *fmt, int i_stream_type )
 {
-    es_format_t *fmt = &es->fmt;
-
     switch( i_stream_type )
     {
     case 0x01:  /* MPEG-1 video */
@@ -4077,7 +4075,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
         }
 
         PIDInit( pid, false, pmt->psi );
-        PIDFillFormat( pid->es, p_es->i_type );
+        PIDFillFormat( &pid->es->fmt, p_es->i_type );
         pid->i_owner_number = prg->i_number;
         pid->i_pid          = p_es->i_pid;
         pid->b_seen         = p_sys->pid[p_es->i_pid].b_seen;
