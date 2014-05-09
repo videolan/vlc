@@ -1088,6 +1088,9 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     o_win_rect = [o_sprefs_win frame];
     o_view_rect = [o_new_category_view frame];
 
+    if (o_currentlyShownCategoryView == o_new_category_view)
+        return;
+
     if (o_currentlyShownCategoryView != nil) {
         /* restore our window's height, if we've shown another category previously */
         o_old_view_rect = [o_currentlyShownCategoryView frame];
