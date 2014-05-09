@@ -2242,7 +2242,7 @@ vlc_module_begin ()
 #   define KEY_PLAY_BOOKMARK9     NULL
 #   define KEY_PLAY_BOOKMARK10    NULL
 #   define KEY_RECORD             "Command+Shift+r"
-#   define KEY_WALLPAPER          "w"
+#   define KEY_WALLPAPER          NULL
 #   define KEY_AUDIODEVICE_CYCLE  "Shift+a"
 #   define KEY_PLAY_CLEAR         NULL
 
