@@ -63,12 +63,16 @@ Release HOWTO
   - gpg -u VideoLAN\ Release -t --sign --detach --armor
   - for i in *asc;do gpg --verify $i || echo $i;done
 
- * Mirrors (if necessary)
-  - Forwarn the mirror admins
-  - Update the list of files for the mirror check
-     (/var/www/local/mirrors.v.o/files)
-  - Disable mirrors which haven't synced yet and possibly ganesh if there are
-    enough other mirrors (see http://mirrors.videolan.org/release.html)
+ * Mirrors
+  - Forwarn the mirror admins (optional for any minor release)
+  - Go to https://get.videolan.org/<path-to-the-file>?mirrorlist
+  - Ensures there is enough mirrors able to serve the file in each region
+    or just wait few more hours before doing the release.
+    Suggested number of mirrors:
+        - > 70% for a minor release
+        - > 80% for a major release
+        - > 80% for any auto-update
+  - Keep an eye on https://get.videolan.org/?mirrorstats during the release
 
  * Update the wiki
   - edit http://wiki.videolan.org/Template:VLC:latest_version
