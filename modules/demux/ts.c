@@ -1763,7 +1763,7 @@ static void ParseTableSection( demux_t *p_demux, ts_pid_t *pid, block_t *p_data 
             if( p_content->i_buffer > 9 && p_content->p_buffer[0] == 0xc6 )
             {
                 int i_index = 0;
-                int i_offset = 4;
+                size_t i_offset = 4;
                 if( p_content->p_buffer[3] & 0x40 )
                 {
                     i_index = ((p_content->p_buffer[7] & 0x0f) << 8) |
