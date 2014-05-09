@@ -379,6 +379,7 @@ struct sout_mux_sys_t
     int64_t         i_pcr_delay;
 
     int64_t         i_dts_delay;
+    mtime_t         first_dts;
 
     bool            b_use_key_frames;
 
@@ -1274,7 +1275,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
                 /* Don't mux the SPU yet if it is too early */
                 block_t *p_spu = block_FifoShow( p_input->p_fifo );
 
-                int64_t i_spu_delay = p_spu->i_dts - p_pcr_stream->i_pes_dts;
+                int64_t i_spu_delay = p_spu->i_dts - p_sys->first_dts - p_pcr_stream->i_pes_dts;
                 if( ( i_spu_delay > i_shaping_delay ) &&
                     ( i_spu_delay < INT64_C(100000000) ) )
                     continue;
@@ -1316,6 +1317,12 @@ static bool MuxStreams(sout_mux_t *p_mux )
         else if( p_input->p_fmt->i_codec !=
                    VLC_CODEC_SUBT )
             p_data->i_length = 1000;
+
+        if (p_sys->first_dts == 0)
+            p_sys->first_dts = p_data->i_dts;
+
+        p_data->i_dts -= p_sys->first_dts;
+        p_data->i_pts -= p_sys->first_dts;
 
         if( ( p_pcr_stream->i_pes_dts > 0 &&
               p_data->i_dts - 10000000 > p_pcr_stream->i_pes_dts +
