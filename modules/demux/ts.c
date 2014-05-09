@@ -365,8 +365,6 @@ static inline int PIDGet( block_t *p )
 static bool GatherData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk );
 
 static block_t* ReadTSPacket( demux_t *p_demux );
-static mtime_t GetPCR( block_t *p_pkt );
-static int SeekToPCR( demux_t *p_demux, int64_t i_pos );
 static int Seek( demux_t *p_demux, double f_percent );
 static void GetFirstPCR( demux_t *p_demux );
 static void GetLastPCR( demux_t *p_demux );
