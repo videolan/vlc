@@ -452,14 +452,15 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param)
 {
     intf_thread_t * p_intf = VLCIntf;
-    if (p_intf && p_intf->p_sys) {
+    if (p_intf) {
         playlist_t * p_playlist = pl_Get(p_intf);
         BOOL b_fullscreen = var_GetBool(p_playlist, "fullscreen");
-        if (strcmp(psz_variable, "intf-toggle-fscontrol") || b_fullscreen)
+        if (b_fullscreen)
             [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(showFullscreenController) withObject:nil waitUntilDone:NO];
-        else
+        else if (!strcmp(psz_variable, "intf-show"))
             [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(showMainWindow) withObject:nil waitUntilDone:NO];
     }
+
     return VLC_SUCCESS;
 }
 
