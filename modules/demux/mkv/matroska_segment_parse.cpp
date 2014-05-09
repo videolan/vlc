@@ -1403,8 +1403,13 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             MP4_ReadBox_sample_vide( p_mp4_stream, p_box ) )
         {
             p_tk->fmt.i_codec = p_box->i_type;
-            p_tk->fmt.video.i_width = p_box->data.p_sample_vide->i_width;
-            p_tk->fmt.video.i_height = p_box->data.p_sample_vide->i_height;
+            uint32_t i_width = p_box->data.p_sample_vide->i_width;
+            uint32_t i_height = p_box->data.p_sample_vide->i_height;
+            if( i_width && i_height )
+            {
+                p_tk->fmt.video.i_width = i_width;
+                p_tk->fmt.video.i_height = i_height;
+            }
             p_tk->fmt.i_extra = p_box->data.p_sample_vide->i_qt_image_description;
             p_tk->fmt.p_extra = xmalloc( p_tk->fmt.i_extra );
             memcpy( p_tk->fmt.p_extra, p_box->data.p_sample_vide->p_qt_image_description, p_tk->fmt.i_extra );
