@@ -788,7 +788,7 @@ static int Open( vlc_object_t *p_this )
 
     while( p_sys->i_pmt_es <= 0 && vlc_object_alive( p_demux ) )
     {
-        if( p_demux->pf_demux( p_demux ) != 1 )
+        if( Demux( p_demux ) != 1 )
             break;
     }
     return VLC_SUCCESS;
