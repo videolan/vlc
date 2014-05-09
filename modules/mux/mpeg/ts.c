@@ -967,7 +967,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         //p_stream->i_stream_type = 0x11; /* LOAS/LATM */
         p_stream->i_stream_type = 0x0f; /* ADTS */
         p_stream->i_stream_id = 0xc0;
-        p_sys->i_mpeg4_streams++;
         p_stream->i_es_id = p_stream->i_pid;
         break;
 
