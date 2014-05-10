@@ -1486,11 +1486,11 @@
         free(psz_url);
 
         NSNumber *lastPosition = [recentlyPlayedFiles objectForKey:url];
-        if (lastPosition.intValue > 0) {
+        if (lastPosition && lastPosition.intValue > 0) {
             msg_Dbg(VLCIntf, "last playback position for %s was %i", [url UTF8String], lastPosition.intValue);
 
             int settingValue = config_GetInt(VLCIntf, "macosx-continue-playback");
-            NSInteger returnValue = 0;
+            NSInteger returnValue = NSAlertErrorReturn;
 
             if (settingValue == 0) {
                 NSAlert *theAlert = [NSAlert alertWithMessageText:_NS("Continue playback?") defaultButton:_NS("Continue") alternateButton:_NS("Restart playback") otherButton:_NS("Always continue") informativeTextWithFormat:_NS("Playback of \"%@\" will continue at %@"), [NSString stringWithUTF8String:input_item_GetTitleFbName(p_input)], [[VLCStringUtility sharedInstance] stringForTime:lastPosition.intValue]];
@@ -1501,10 +1501,11 @@
                 PL_LOCK;
             }
 
-            if (returnValue !=0 || settingValue == 1)
-                input_item_AddOption(p_input, [[NSString stringWithFormat:@"start-time=%i", lastPosition.intValue] UTF8String], VLC_INPUT_OPTION_TRUSTED);
+            if (returnValue == NSAlertAlternateReturn || settingValue == 2)
+                lastPosition = [NSNumber numberWithInt:0];
+            input_item_AddOption(p_input, [[NSString stringWithFormat:@"start-time=%i", lastPosition.intValue] UTF8String], VLC_INPUT_OPTION_TRUSTED | VLC_INPUT_OPTION_REPLACE);
 
-            if (returnValue == -1)
+            if (returnValue == NSAlertOtherReturn)
                 config_PutInt(VLCIntf, "macosx-continue-playback", 1);
         }
     }
