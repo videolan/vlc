@@ -112,6 +112,8 @@ typedef struct aout_stream_sys
     vlc_fourcc_t format;
 
     size_t  i_write;
+    size_t  i_last_read;
+    int64_t i_data;
 
     bool b_playing;
     vlc_mutex_t lock;
@@ -137,23 +139,39 @@ struct aout_sys_t
     HINSTANCE         hdsound_dll; /*< handle of the opened dsound DLL */
 };
 
+static HRESULT Flush( aout_stream_sys_t *sys, bool drain);
 static HRESULT TimeGet( aout_stream_sys_t *sys, mtime_t *delay )
 {
-    DWORD read;
+    DWORD read, status;
     HRESULT hr;
     mtime_t size;
+
+    hr = IDirectSoundBuffer_GetStatus( sys->p_dsbuffer, &status );
+    if(hr != DS_OK || !(status & DSBSTATUS_PLAYING))
+        return 1;
 
     hr = IDirectSoundBuffer_GetCurrentPosition( sys->p_dsbuffer, &read, NULL );
     if( hr != DS_OK )
         return hr;
 
-    read %= DS_BUF_SIZE;
+    size = read - sys->i_last_read;
 
-    size = (mtime_t)sys->i_write - (mtime_t) read;
-    if( size < 0 )
-        size += DS_BUF_SIZE;
+    /* GetCurrentPosition cannot be trusted if the return doesn't change
+     * Just return an error */
+    if( size ==  0 )
+        return 1;
+    else if( size < 0 )
+      size += DS_BUF_SIZE;
 
-    *delay = ( size / sys->i_bytes_per_sample ) * CLOCK_FREQ / sys->i_rate;
+    sys->i_data -= size;
+    sys->i_last_read = read;
+
+    if( sys->i_data < 0 )
+        /* underrun */
+        Flush(sys, false);
+
+    *delay = ( sys->i_data / sys->i_bytes_per_sample ) * CLOCK_FREQ / sys->i_rate;
+
     return DS_OK;
 }
 
@@ -242,6 +260,7 @@ static HRESULT FillBuffer( vlc_object_t *obj, aout_stream_sys_t *p_sys,
 
     p_sys->i_write += towrite;
     p_sys->i_write %= DS_BUF_SIZE;
+    p_sys->i_data += towrite;
     vlc_mutex_unlock( &p_sys->lock );
 
     return DS_OK;
@@ -317,23 +336,30 @@ static void OutputPause( audio_output_t *aout, bool pause, mtime_t date )
     (void) date;
 }
 
-static HRESULT Flush( aout_stream_sys_t *sys )
+static HRESULT Flush( aout_stream_sys_t *sys, bool drain)
 {
-    return IDirectSoundBuffer_Stop( sys->p_dsbuffer );
+    HRESULT ret = IDirectSoundBuffer_Stop( sys->p_dsbuffer );
+    if( ret == DS_OK && !drain )
+    {
+        vlc_mutex_lock(&sys->lock);
+        sys->i_data = 0;
+        sys->i_last_read = sys->i_write;
+        IDirectSoundBuffer_SetCurrentPosition( sys->p_dsbuffer, sys->i_write);
+        sys->b_playing = false;
+        vlc_mutex_unlock(&sys->lock);
+    }
+    return ret;
 }
 
 static HRESULT StreamFlush( aout_stream_t *s )
 {
-    return Flush( s->sys );
+    return Flush( s->sys, false );
 }
 
 static void OutputFlush( audio_output_t *aout, bool drain )
 {
     aout_stream_sys_t *sys = &aout->sys->s;
-
-    Flush( sys );
-    if( !drain )
-        IDirectSoundBuffer_SetCurrentPosition( sys->p_dsbuffer, sys->i_write );
+    Flush( sys, drain );
 }
 
 /**
@@ -759,6 +785,8 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
     }
     sys->b_playing = false;
     sys->i_write = 0;
+    sys->i_last_read =  0;
+    sys->i_data = 0;
     vlc_mutex_unlock( &sys->lock );
 
     return DS_OK;
