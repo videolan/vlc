@@ -654,7 +654,7 @@ static uint8_t *hash_finish( gcry_md_hd_t hd, signature_packet_t *p_sig )
 
     gcry_md_final( hd );
 
-    uint8_t *p_tmp = (uint8_t*) gcry_md_read( hd, GCRY_MD_SHA1);
+    uint8_t *p_tmp = (uint8_t*) gcry_md_read( hd, p_sig->digest_algo) ;
     uint8_t *p_hash = malloc( 20 );
     if( p_hash )
         memcpy( p_hash, p_tmp, 20 );
@@ -670,7 +670,7 @@ uint8_t *hash_sha1_from_text( const char *psz_string,
         signature_packet_t *p_sig )
 {
     gcry_md_hd_t hd;
-    if( gcry_md_open( &hd, GCRY_MD_SHA1, 0 ) )
+    if( gcry_md_open( &hd, p_sig->digest_algo, 0 ) )
         return NULL;
 
     if( p_sig->type == TEXT_SIGNATURE )
@@ -704,7 +704,7 @@ uint8_t *hash_sha1_from_text( const char *psz_string,
 uint8_t *hash_sha1_from_file( const char *psz_file, signature_packet_t *p_sig )
 {
     gcry_md_hd_t hd;
-    if( gcry_md_open( &hd, GCRY_MD_SHA1, 0 ) )
+    if( gcry_md_open( &hd, p_sig->digest_algo, 0 ) )
         return NULL;
 
     if( hash_from_binary_file( psz_file, hd ) < 0 )
@@ -733,7 +733,7 @@ uint8_t *hash_sha1_from_public_key( public_key_t *p_pkey )
     gcry_error_t error = 0;
     gcry_md_hd_t hd;
 
-    error = gcry_md_open( &hd, GCRY_MD_SHA1, 0 );
+    error = gcry_md_open( &hd, p_pkey->sig.digest_algo, 0 );
     if( error )
         return NULL;
 
