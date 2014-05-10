@@ -105,7 +105,7 @@ static int parse_public_key_packet( public_key_packet_t *p_key,
     memcpy( p_key->timestamp, p_buf, 4 ); p_buf += 4; i_read += 4;
 
     p_key->algo      = *p_buf++; i_read++;
-    if( p_key->algo != PUBLIC_KEY_ALGO_DSA )
+    if( p_key->algo != GCRY_PK_DSA )
         return VLC_EGENERIC;
 
     READ_MPI(p_key->p, 1024);
@@ -282,10 +282,10 @@ static int parse_signature_packet( signature_packet_t *p_sig,
     if( i_read == 0 ) /* signature packet parsing has failed */
         goto error;
 
-    if( p_sig->public_key_algo != PUBLIC_KEY_ALGO_DSA )
+    if( p_sig->public_key_algo != GCRY_PK_DSA )
         goto error;
 
-    if( p_sig->digest_algo != DIGEST_ALGO_SHA1 )
+    if( p_sig->digest_algo != GCRY_MD_SHA1 )
         goto error;
 
     switch( p_sig->type )
