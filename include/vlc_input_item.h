@@ -176,8 +176,8 @@ enum input_item_option_e
      * By default options are untrusted */
     VLC_INPUT_OPTION_TRUSTED = 0x2,
 
-    /* Change the value associated to an option if already present, otherwise
-     * add the option */
+    /* Add the option, unless the same option
+     * is already present. */
     VLC_INPUT_OPTION_UNIQUE  = 0x100,
 };
 
