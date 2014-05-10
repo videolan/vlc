@@ -42,6 +42,7 @@
 #include "mms.h"
 #include "mmsh.h"
 
+#include "assert.h"
 /* TODO:
  *  - authentication
  */
@@ -262,24 +263,41 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         case ACCESS_SET_PRIVATE_ID_STATE:
+        {
             i_int = (int)va_arg( args, int );
             b_bool = (bool)va_arg( args, int );
-            if( (i_int < 0) || (i_int > 127) )
+            int i_cat;
+            if( i_int > 127 )
                 return VLC_EGENERIC;
+            else if ( i_int < 0 )
+            {
+                /* Deselecting all ES in this category */
+                assert( !b_bool );
+                i_cat = -1 * i_int;
+                if ( i_cat > ES_CATEGORY_COUNT )
+                    return VLC_EGENERIC;
+            }
             else
             {
-                int i_cat = p_sys->asfh.stream[i_int].i_cat;
-                for ( int i=0; i< 128; i++ )
-                {
-                    /* First unselect all streams from the same cat */
-                    if ( i_cat == p_sys->asfh.stream[i].i_cat )
-                        p_sys->asfh.stream[i].i_selected = false;
-                }
-                p_sys->asfh.stream[i_int].i_selected = true;
-                Stop( p_access );
-                Seek( p_access, p_access->info.i_pos );
-                return VLC_SUCCESS;
+                /* Chose another ES */
+                assert( b_bool );
+                i_cat = p_sys->asfh.stream[i_int].i_cat;
             }
+
+            for ( int i=0; i< 128; i++ )
+            {
+                /* First unselect all streams from the same cat */
+                if ( i_cat == p_sys->asfh.stream[i].i_cat )
+                    p_sys->asfh.stream[i].i_selected = false;
+            }
+
+            if ( i_int > 0 )
+                p_sys->asfh.stream[i_int].i_selected = true;
+
+            Stop( p_access );
+            Seek( p_access, p_access->info.i_pos );
+            return VLC_SUCCESS;
+        }
 
         case ACCESS_SET_PAUSE_STATE:
             b_bool = (bool)va_arg( args, int );

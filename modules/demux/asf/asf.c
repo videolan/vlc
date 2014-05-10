@@ -42,6 +42,7 @@
 #include <limits.h>
 
 #include "libasf.h"
+#include "assert.h"
 
 /* TODO
  *  - add support for the newly added object: language, bitrate,
@@ -79,6 +80,7 @@ typedef struct
 
     es_out_id_t     *p_es;
     es_format_t     *p_fmt; /* format backup for video changes */
+    bool             b_selected;
 
     asf_object_stream_properties_t *p_sp;
     asf_object_extended_stream_properties_t *p_esp;
@@ -106,6 +108,7 @@ struct demux_sys_t
     bool                b_index;
     bool                b_canfastseek;
     uint8_t             i_seek_track;
+    uint8_t             i_access_selected_track[ES_CATEGORY_COUNT]; /* mms, depends on access algorithm */
     unsigned int        i_wait_keyframe;
 
     vlc_meta_t          *meta;
@@ -152,6 +155,27 @@ static int Open( vlc_object_t * p_this )
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+
+    for( int i=0; i<ES_CATEGORY_COUNT; i++ )
+    {
+        if ( p_sys->i_access_selected_track[i] > 0 )
+        {
+            es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE,
+                            p_sys->track[p_sys->i_access_selected_track[i]]->p_es, true );
+            p_sys->i_access_selected_track[i] = 0;
+        }
+    }
+
+    /* Get selected tracks, especially for computing PCR */
+    for( int i=0; i<MAX_ASF_TRACKS; i++ )
+    {
+        asf_track_t *tk = p_sys->track[i];
+        if ( !tk ) continue;
+        if ( tk->p_es )
+            es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, & tk->b_selected );
+        else
+            tk->b_selected = false;
+    }
 
     for( ;; )
     {
@@ -247,16 +271,10 @@ static void WaitKeyframe( demux_t *p_demux )
         for ( int i=0; i<MAX_ASF_TRACKS; i++ )
         {
             asf_track_t *tk = p_sys->track[i];
-            if ( tk && tk->p_sp && tk->i_cat == VIDEO_ES )
+            if ( tk && tk->p_sp && tk->i_cat == VIDEO_ES && tk->b_selected )
             {
-                bool b_selected = false;
-                es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
-                                tk->p_es, &b_selected );
-                if ( b_selected )
-                {
-                    p_sys->i_seek_track = tk->p_sp->i_stream_number;
-                    break;
-                }
+                p_sys->i_seek_track = tk->p_sp->i_stream_number;
+                break;
             }
         }
     }
@@ -401,14 +419,26 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     case DEMUX_SET_ES:
     {
         i = (int)va_arg( args, int );
-        int i_ret = stream_Control( p_demux->s,
-                                    STREAM_SET_PRIVATE_ID_STATE, i, true );
+        int i_ret;
+        if ( i >= 0 )
+        {
+            i++; /* video/audio-es variable starts 0 */
+            msg_Dbg( p_demux, "Requesting access to enable stream %d", i );
+            i_ret = stream_Control( p_demux->s, STREAM_SET_PRIVATE_ID_STATE, i, true );
+        }
+        else
+        {  /* i contains -1 * es_category */
+            msg_Dbg( p_demux, "Requesting access to disable stream %d", i );
+            i_ret = stream_Control( p_demux->s, STREAM_SET_PRIVATE_ID_STATE, i, false );
+        }
+
         if ( i_ret == VLC_SUCCESS )
         {
             SeekPrepare( p_demux );
             p_sys->i_seek_track = 0;
             WaitKeyframe( p_demux );
         }
+        assert( i_ret == VLC_SUCCESS );
         return i_ret;
     }
 
@@ -478,12 +508,13 @@ static mtime_t GetMoviePTS( demux_sys_t *p_sys )
 {
     mtime_t i_time = -1;
     int     i;
-
+    /* As some tracks might have been deselected by access, the PCR might
+     * stop updating */
     for( i = 0; i < MAX_ASF_TRACKS ; i++ )
     {
-        asf_track_t *tk = p_sys->track[i];
+        const asf_track_t *tk = p_sys->track[i];
 
-        if( tk && tk->p_es && tk->i_time > 0)
+        if( tk && tk->p_es && tk->i_time > 0 && tk->b_selected )
         {
             if( i_time < 0 ) i_time = tk->i_time;
             else i_time = __MIN( i_time, tk->i_time );
@@ -1438,6 +1469,14 @@ static int DemuxInit( demux_t *p_demux )
             }
 
             tk->p_es = es_out_Add( p_demux->out, &fmt );
+
+            if( !stream_Control( p_demux->s, STREAM_GET_PRIVATE_ID_STATE,
+                                 (int) p_sp->i_stream_number, &b_access_selected ) &&
+                b_access_selected )
+            {
+                p_sys->i_access_selected_track[fmt.i_cat] = p_sp->i_stream_number;
+            }
+
         }
         else
         {
