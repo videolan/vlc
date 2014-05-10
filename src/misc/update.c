@@ -316,7 +316,7 @@ static bool GetUpdateFile( update_t *p_update )
             goto error;
         }
 
-        if( verify_signature( p_new_pkey->sig.r, p_new_pkey->sig.s,
+        if( verify_signature( &p_new_pkey->sig,
                     &p_update->p_pkey->key, p_hash ) == VLC_SUCCESS )
         {
             free( p_hash );
@@ -347,7 +347,7 @@ static bool GetUpdateFile( update_t *p_update )
         goto error;
     }
 
-    else if( verify_signature( sign.r, sign.s, &p_update->p_pkey->key, p_hash )
+    else if( verify_signature( &sign, &p_update->p_pkey->key, p_hash )
             != VLC_SUCCESS )
     {
         msg_Err( p_update->p_libvlc, "BAD SIGNATURE for status file" );
@@ -696,7 +696,7 @@ static void* update_DownloadReal( void *obj )
         goto end;
     }
 
-    if( verify_signature( sign.r, sign.s, &p_update->p_pkey->key, p_hash )
+    if( verify_signature( &sign, &p_update->p_pkey->key, p_hash )
             != VLC_SUCCESS )
     {
         vlc_unlink( psz_destfile );

@@ -194,8 +194,7 @@ parse_public_key(
  * Verify an OpenPGP signature made on some SHA-1 hash, with some DSA public key
  */
 int
-verify_signature(
-        uint8_t *p_r, uint8_t *p_s, public_key_packet_t *p_key,
+verify_signature(signature_packet_t *sign, public_key_packet_t *p_key,
         uint8_t *p_hash );
 
 /*
