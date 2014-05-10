@@ -787,7 +787,6 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
     sys->i_write = 0;
     sys->i_last_read =  0;
     sys->i_data = 0;
-    vlc_mutex_unlock( &sys->lock );
 
     return DS_OK;
 
