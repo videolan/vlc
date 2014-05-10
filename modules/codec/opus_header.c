@@ -313,57 +313,7 @@ int opus_prepare_header(unsigned channels, unsigned rate, OpusHeader *header)
     return 0;
 }
 
-int opus_write_header(uint8_t **p_extra, int *i_extra, OpusHeader *header)
-{
-    unsigned char header_data[100];
-    const int packet_size = opus_header_to_packet(header, header_data,
-                                                  sizeof(header_data));
-    ogg_packet headers[2];
-    headers[0].packet = header_data;
-    headers[0].bytes = packet_size;
-    headers[0].b_o_s = 1;
-    headers[0].e_o_s = 0;
-    headers[0].granulepos = 0;
-    headers[0].packetno = 0;
-
-    size_t comments_length;
-    char *comments = comment_init(&comments_length);
-    if (!comments)
-        return 1;
-    if (comment_add(&comments, &comments_length, "ENCODER=",
-                    "VLC media player"))
-    {
-        free(comments);
-        return 1;
-    }
-
-    if (comment_pad(&comments, &comments_length))
-    {
-        free(comments);
-        return 1;
-    }
-
-    headers[1].packet = (unsigned char *) comments;
-    headers[1].bytes = comments_length;
-    headers[1].b_o_s = 0;
-    headers[1].e_o_s = 0;
-    headers[1].granulepos = 0;
-    headers[1].packetno = 1;
-
-    for (unsigned i = 0; i < ARRAY_SIZE(headers); ++i)
-    {
-        if (xiph_AppendHeaders(i_extra, (void **) p_extra,
-                               headers[i].bytes, headers[i].packet))
-        {
-            *i_extra = 0;
-            *p_extra = NULL;
-        }
-    }
-
-    return 0;
-}
-
-int opus_header_to_packet(const OpusHeader *h, unsigned char *packet, int len)
+static int opus_header_to_packet(const OpusHeader *h, unsigned char *packet, int len)
 {
     Packet p;
     unsigned char ch;
@@ -416,3 +366,54 @@ int opus_header_to_packet(const OpusHeader *h, unsigned char *packet, int len)
 
     return p.pos;
 }
+
+int opus_write_header(uint8_t **p_extra, int *i_extra, OpusHeader *header)
+{
+    unsigned char header_data[100];
+    const int packet_size = opus_header_to_packet(header, header_data,
+                                                  sizeof(header_data));
+    ogg_packet headers[2];
+    headers[0].packet = header_data;
+    headers[0].bytes = packet_size;
+    headers[0].b_o_s = 1;
+    headers[0].e_o_s = 0;
+    headers[0].granulepos = 0;
+    headers[0].packetno = 0;
+
+    size_t comments_length;
+    char *comments = comment_init(&comments_length);
+    if (!comments)
+        return 1;
+    if (comment_add(&comments, &comments_length, "ENCODER=",
+                    "VLC media player"))
+    {
+        free(comments);
+        return 1;
+    }
+
+    if (comment_pad(&comments, &comments_length))
+    {
+        free(comments);
+        return 1;
+    }
+
+    headers[1].packet = (unsigned char *) comments;
+    headers[1].bytes = comments_length;
+    headers[1].b_o_s = 0;
+    headers[1].e_o_s = 0;
+    headers[1].granulepos = 0;
+    headers[1].packetno = 1;
+
+    for (unsigned i = 0; i < ARRAY_SIZE(headers); ++i)
+    {
+        if (xiph_AppendHeaders(i_extra, (void **) p_extra,
+                               headers[i].bytes, headers[i].packet))
+        {
+            *i_extra = 0;
+            *p_extra = NULL;
+        }
+    }
+
+    return 0;
+}
+
