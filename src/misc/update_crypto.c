@@ -1,5 +1,5 @@
 /*****************************************************************************
- * update_crypto.c: DSA/SHA1 related functions used for updating
+ * update_crypto.c: DSA related functions used for updating
  *****************************************************************************
  * Copyright © 2008-2009 VLC authors and VideoLAN
  * $Id$
@@ -158,7 +158,7 @@ static size_t parse_signature_v3_packet( signature_packet_t *p_sig,
 
 /*
  * fill a signature_packet_v4_t from signature packet data
- * verify that it was used with a DSA public key, using SHA-1 digest
+ * verify that it was used with a DSA public key
  */
 static size_t parse_signature_v4_packet( signature_packet_t *p_sig,
                                       const uint8_t *p_buf, size_t i_sig_len )
@@ -412,12 +412,12 @@ static int pgp_unarmor( const char *p_ibuf, size_t i_ibuf_len,
 
 
 /*
- * Verify an OpenPGP signature made on some SHA-1 hash, with some DSA public key
+ * Verify an OpenPGP signature made with some DSA public key
  */
 int verify_signature( signature_packet_t *sign, public_key_packet_t *p_key,
                       uint8_t *p_hash )
 {
-    /* the data to be verified (a SHA-1 hash) */
+    /* the data to be verified (a hash) */
     const char *hash_sexp_s = "(data(flags raw)(value %m))";
     /* the public key */
     const char *key_sexp_s = "(public-key(dsa(p %m)(q %m)(g %m)(y %m)))";
@@ -668,9 +668,9 @@ static uint8_t *hash_finish( gcry_md_hd_t hd, signature_packet_t *p_sig )
 
 
 /*
- * return a sha1 hash of a text
+ * return a hash of a text
  */
-uint8_t *hash_sha1_from_text( const char *psz_string,
+uint8_t *hash_from_text( const char *psz_string,
         signature_packet_t *p_sig )
 {
     gcry_md_hd_t hd;
@@ -703,9 +703,9 @@ uint8_t *hash_sha1_from_text( const char *psz_string,
 
 
 /*
- * return a sha1 hash of a file
+ * return a hash of a file
  */
-uint8_t *hash_sha1_from_file( const char *psz_file, signature_packet_t *p_sig )
+uint8_t *hash_from_file( const char *psz_file, signature_packet_t *p_sig )
 {
     gcry_md_hd_t hd;
     if( gcry_md_open( &hd, p_sig->digest_algo, 0 ) )
@@ -722,10 +722,10 @@ uint8_t *hash_sha1_from_file( const char *psz_file, signature_packet_t *p_sig )
 
 
 /*
- * Generate a SHA1 hash on a public key, to verify a signature made on that hash
+ * Generate a hash on a public key, to verify a signature made on that hash
  * Note that we need the signature (v4) to compute the hash
  */
-uint8_t *hash_sha1_from_public_key( public_key_t *p_pkey )
+uint8_t *hash_from_public_key( public_key_t *p_pkey )
 {
     if( p_pkey->sig.version != 4 )
         return NULL;

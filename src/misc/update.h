@@ -20,23 +20,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/* Go reading the rfc 4880 ! NOW !! */
-
-/*
- * XXX
- *  When PGP-signing a file, we only sign a SHA-1 hash of this file
- *  The DSA key size requires that we use an algorithm which produce
- *  a 160 bits long hash
- *  An alternative is RIPEMD160 , which you can use by giving the option
- *      --digest-algo RIPEMD160 to GnuPG
- *
- *  As soon as SHA-1 is broken, this method is not secure anymore, because an
- *  attacker could generate a file with the same SHA-1 hash.
- *
- *  Whenever this happens, we need to use another algorithm / type of key.
- * XXX
- */
-
 #include <vlc_update.h>
 #include <vlc_atomic.h>
 
@@ -65,7 +48,7 @@ enum    /* Signature subpacket types */
 };
 
 struct public_key_packet_t
-{ /* a public key packet (DSA/SHA-1) is 418 bytes */
+{ /* a public key packet (DSA) is 418 bytes */
 
     uint8_t version;      /* we use only version 4 */
     uint8_t timestamp[4]; /* creation time of the key */
@@ -84,7 +67,7 @@ struct signature_packet_t
 
     uint8_t type;
     uint8_t public_key_algo;    /* DSA only */
-    uint8_t digest_algo;        /* SHA-1 only */
+    uint8_t digest_algo;
 
     uint8_t hash_verification[2];
     uint8_t issuer_longid[8];
@@ -191,7 +174,7 @@ parse_public_key(
         const uint8_t *p_sig_issuer );
 
 /*
- * Verify an OpenPGP signature made on some SHA-1 hash, with some DSA public key
+ * Verify an OpenPGP signature made on some hash, with some DSA public key
  */
 int
 verify_signature(signature_packet_t *sign, public_key_packet_t *p_key,
@@ -206,21 +189,21 @@ download_signature(
         vlc_object_t *p_this, signature_packet_t *p_sig, const char *psz_url );
 
 /*
- * return a sha1 hash of a text
+ * return a hash of a text
  */
 uint8_t *
-hash_sha1_from_text(
+hash_from_text(
         const char *psz_text, signature_packet_t *p_sig );
 
 /*
- * return a sha1 hash of a file
+ * return a hash of a file
  */
 uint8_t *
-hash_sha1_from_file(
+hash_from_file(
         const char *psz_file, signature_packet_t *p_sig );
 
 /*
- * return a sha1 hash of a public key
+ * return a hash of a public key
  */
 uint8_t *
-hash_sha1_from_public_key( public_key_t *p_pkey );
+hash_from_public_key( public_key_t *p_pkey );
