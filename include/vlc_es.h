@@ -426,8 +426,8 @@ enum es_format_category_e
     AUDIO_ES,
     SPU_ES,
     NAV_ES,
-    ES_CATEGORY_COUNT
 };
+#define ES_CATEGORY_COUNT (NAV_ES + 1)
 
 /**
  * This function will fill all RGB shift from RGB masks.
