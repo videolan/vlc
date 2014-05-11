@@ -1106,8 +1106,9 @@ void AddonItemDelegate::paint( QPainter *painter,
     if ( backgroundColor.isValid() )
     {
         painter->save();
+        int i_corner = qMin( (int)(option.rect.width() * .05), 30 );
         QLinearGradient gradient(
-                    QPoint( option.rect.right() - 50, option.rect.top() ),
+                    QPoint( option.rect.right() - i_corner, option.rect.bottom() - i_corner ),
                     option.rect.bottomRight() );
         gradient.setColorAt( 0, Qt::transparent );
         gradient.setColorAt( 1.0, backgroundColor );
