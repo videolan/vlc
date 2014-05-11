@@ -19,12 +19,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "AddonManager.h"
-
 #import <vlc_common.h>
 #import <vlc_events.h>
 #import <vlc_addons.h>
+
+#import "AddonManager.h"
 #import "intf.h"
+#import "AddonListDataSource.h"
 
 @interface VLCAddonManager ()
 {
@@ -37,8 +38,6 @@
 - (void)discoveryEnded;
 - (void)addonChanged:(addon_entry_t *)data;
 @end
-
-static void addonsEventsCallback( const vlc_event_t *, void * );
 
 static void addonsEventsCallback( const vlc_event_t *event, void *data )
 {
@@ -126,6 +125,8 @@ static VLCAddonManager *_o_sharedInstance = nil;
 
 - (void)showWindow
 {
+    [self _findInstalled];
+
     [self _findNewAddons];
     [_window makeKeyAndOrderFront:nil];
 }
@@ -146,8 +147,8 @@ static VLCAddonManager *_o_sharedInstance = nil;
     if (selectedRow > _displayedAddons.count - 1 || selectedRow < 0)
         return;
 
-    NSDictionary *currentItem = [_displayedAddons objectAtIndex:selectedRow];
-    [self _installAddonWithID:[[currentItem objectForKey:@"uuid"] pointerValue]];
+    VLCAddon *currentAddon = [_displayedAddons objectAtIndex:selectedRow];
+    [self _installAddonWithID:[currentAddon uuid]];
 }
 
 - (IBAction)uninstallSelection:(id)sender
@@ -156,8 +157,8 @@ static VLCAddonManager *_o_sharedInstance = nil;
     if (selectedRow > _displayedAddons.count - 1 || selectedRow < 0)
         return;
 
-    NSDictionary *currentItem = [_displayedAddons objectAtIndex:selectedRow];
-    [self _removeAddonWithID:[[currentItem objectForKey:@"uuid"] pointerValue]];
+    VLCAddon *currentAddon = [_displayedAddons objectAtIndex:selectedRow];
+    [self _removeAddonWithID:[currentAddon uuid]];
 }
 
 - (IBAction)refresh:(id)sender
@@ -181,24 +182,22 @@ static VLCAddonManager *_o_sharedInstance = nil;
         return;
     }
 
-    NSDictionary *currentItem = [_displayedAddons objectAtIndex:selectedRow];
-    [_name setStringValue:[currentItem objectForKey:@"name"]];
-    [_author setStringValue:[currentItem objectForKey:@"author"]];
-    [_version setStringValue:[currentItem objectForKey:@"version"]];
-    [_description setString:[currentItem objectForKey:@"description"]];
+    VLCAddon *currentItem = [_displayedAddons objectAtIndex:selectedRow];
+    [_name setStringValue:[currentItem name]];
+    [_author setStringValue:[currentItem author]];
+    [_version setStringValue:[currentItem version]];
+    [_description setString:[currentItem description]];
 }
 
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
     NSString *identifier = [aTableColumn identifier];
     if ([identifier isEqualToString:@"installed"]) {
-        if ([[[_displayedAddons objectAtIndex:rowIndex] objectForKey:@"state"] intValue] == ADDON_INSTALLED)
-            return @"✔";
-        return @"✘";
-    } else if([identifier isEqualToString:@"type"])
-        return [self _getAddonType:[[[_displayedAddons objectAtIndex:rowIndex] objectForKey:@"type"] intValue]];
+        return [[_displayedAddons objectAtIndex:rowIndex] isInstalled] ? @"✔" : @"✘";
+    } else if([identifier isEqualToString:@"name"])
+        return [[_displayedAddons objectAtIndex:rowIndex] name];
 
-    return [[_displayedAddons objectAtIndex:rowIndex] objectForKey:identifier];
+    return @"";
 }
 
 #pragma mark - data handling
@@ -206,25 +205,10 @@ static VLCAddonManager *_o_sharedInstance = nil;
 - (void)addAddon:(addon_entry_t *)p_entry
 {
     @autoreleasepool {
-        NSString *name = [NSString stringWithUTF8String:p_entry->psz_name ? p_entry->psz_name : ""];
-        if (p_entry->e_state == ADDON_INSTALLED)
-            name = [name stringByAppendingFormat: @" (%@)", _NS("Installed")];
-
-        NSDictionary *addonProperties = [NSDictionary dictionaryWithObjectsAndKeys:
-                                         name, @"name",
-                                         toNSStr(p_entry->psz_description), @"description",
-                                         toNSStr(p_entry->psz_author), @"author",
-                                         toNSStr(p_entry->psz_source_uri), @"uri",
-                                         toNSStr(p_entry->psz_version), @"version",
-                                         toNSStr(p_entry->psz_image_uri), @"imageuri",
-                                         [NSNumber numberWithInt:p_entry->e_state], @"state",
-                                         [NSNumber numberWithInt:p_entry->e_type], @"type",
-                                         [NSValue valueWithPointer:&p_entry->uuid], @"uuid",
-                                         nil];
 
         /* no skin support on OS X so far */
-        if ([[addonProperties objectForKey:@"type"] intValue] != ADDON_SKIN2)
-            [_addons addObject:addonProperties];
+        if (p_entry->e_type != ADDON_SKIN2)
+            [_addons addObject:[[[VLCAddon alloc] initWithAddon:p_entry] autorelease]];
     }
 }
 
@@ -248,20 +232,19 @@ static VLCAddonManager *_o_sharedInstance = nil;
 
     NSUInteger count = _addons.count;
     NSMutableArray *filteredItems = [[NSMutableArray alloc] initWithCapacity:count];
-    NSDictionary *currentItem;
     for (NSUInteger x = 0; x < count; x++) {
-        currentItem = [_addons objectAtIndex:x];
+        VLCAddon *currentItem = [_addons objectAtIndex:x];
         if (type != -1) {
-            if ([[currentItem objectForKey:@"type"] intValue] == type) {
+            if ([currentItem type] == type) {
                 if (installedOnly) {
-                    if ([[currentItem objectForKey:@"state"] intValue] == ADDON_INSTALLED)
+                    if ([currentItem isInstalled])
                         [filteredItems addObject:currentItem];
                 } else
                     [filteredItems addObject:currentItem];
             }
         } else {
             if (installedOnly) {
-                if ([[currentItem objectForKey:@"state"] intValue] == ADDON_INSTALLED)
+                if ([currentItem isInstalled])
                     [filteredItems addObject:currentItem];
             } else
                 [filteredItems addObject:currentItem];
@@ -288,7 +271,6 @@ static VLCAddonManager *_o_sharedInstance = nil;
     addons_manager_Gather(_manager, [uri UTF8String]);
 }
 
-/* FIXME: un-used */
 - (void)_findInstalled
 {
     addons_manager_LoadCatalog(_manager);
