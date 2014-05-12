@@ -48,16 +48,16 @@ enum    /* Signature subpacket types */
 };
 
 struct public_key_packet_t
-{ /* a public key packet (DSA) is 418 bytes */
+{
 
     uint8_t version;      /* we use only version 4 */
     uint8_t timestamp[4]; /* creation time of the key */
     uint8_t algo;         /* we only use DSA */
     /* the multi precision integers, with their 2 bytes length header */
-    uint8_t p[2+128];
-    uint8_t q[2+20];
-    uint8_t g[2+128];
-    uint8_t y[2+128];
+    uint8_t p[2+3072/8];
+    uint8_t q[2+256/8];
+    uint8_t g[2+3072/8];
+    uint8_t y[2+3072/8];
 };
 
 /* used for public key and file signatures */
@@ -91,14 +91,11 @@ struct signature_packet_t
 /* The part below is made of consecutive MPIs, their number and size being
  * public-key-algorithm dependent.
  *
- * Since we use DSA signatures only, there is 2 integers, r & s, made of:
- *      2 bytes for the integer length (scalar number)
- *      160 bits (20 bytes) for the integer itself
- *
- * Note: the integers may be less than 160 significant bits
+ * Since we use DSA signatures only, there is 2 integers, r & s.
+ * They range from 160 for 1k keys to 256 bits for 3k keys.
  */
-    uint8_t r[2+20];
-    uint8_t s[2+20];
+    uint8_t r[2+256/8];
+    uint8_t s[2+256/8];
 };
 
 typedef struct public_key_packet_t public_key_packet_t;

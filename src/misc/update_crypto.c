@@ -71,18 +71,36 @@ static inline int scalar_number( const uint8_t *p, int header_len )
 
 
 /* number of data bytes in a MPI */
-#define mpi_len( mpi ) ( ( scalar_number( mpi, 2 ) + 7 ) / 8 )
+static int mpi_len(const uint8_t *mpi)
+{
+    return (scalar_number(mpi, 2) + 7) / 8;
+}
 
-#define READ_MPI(n, bits) do { \
-    if( i_read + 2 > i_packet_len ) \
-        goto error; \
-    int len = mpi_len( p_buf ); \
-    if( len > (bits)/8 || i_read + 2 + len > i_packet_len ) \
-        goto error; \
-    len += 2; \
-    memcpy( n, p_buf, len ); \
-    p_buf += len; i_read += len; \
-    } while(0)
+static size_t read_mpi(uint8_t *dst, const uint8_t *buf, size_t buflen, size_t bits)
+{
+    if (buflen < 2)
+        return 0;
+
+    size_t n = mpi_len(buf);
+
+    if (n * 8 > bits)
+        return 0;
+
+    n += 2;
+
+    if (buflen < n)
+        return 0;
+
+    memcpy(dst, buf, n);
+    return n;
+}
+
+#define READ_MPI(d, bits) do { \
+    size_t n = read_mpi(d, p_buf, i_packet_len - i_read, bits); \
+    if (!n) goto error; \
+    p_buf += n; \
+    i_read += n; \
+} while(0)
 
 /*
  * fill a public_key_packet_t structure from public key packet data
@@ -91,8 +109,7 @@ static inline int scalar_number( const uint8_t *p, int header_len )
 static int parse_public_key_packet( public_key_packet_t *p_key,
                                     const uint8_t *p_buf, size_t i_packet_len )
 {
-
-    if( i_packet_len > 418 || i_packet_len < 6 )
+    if( i_packet_len < 6 )
         return VLC_EGENERIC;
 
     size_t i_read = 0;
@@ -108,15 +125,15 @@ static int parse_public_key_packet( public_key_packet_t *p_key,
     if( p_key->algo != GCRY_PK_DSA )
         return VLC_EGENERIC;
 
-    READ_MPI(p_key->p, 1024);
-    READ_MPI(p_key->q, 160);
-    READ_MPI(p_key->g, 1024);
-    READ_MPI(p_key->y, 1024);
+    READ_MPI(p_key->p, 3072);
+    READ_MPI(p_key->q, 256);
+    READ_MPI(p_key->g, 3072);
+    READ_MPI(p_key->y, 3072);
 
-    if( i_read != i_packet_len ) /* some extra data eh ? */
-        return VLC_EGENERIC;
+    if( i_read == i_packet_len )
+        return VLC_SUCCESS;
 
-    return VLC_SUCCESS;
+    /* some extra data eh ? */
 
 error:
     return VLC_EGENERIC;
@@ -301,8 +318,8 @@ static int parse_signature_packet( signature_packet_t *p_sig,
     p_buf--; /* rewind to the version byte */
     p_buf += i_read;
 
-    READ_MPI(p_sig->r, 160);
-    READ_MPI(p_sig->s, 160);
+    READ_MPI(p_sig->r, 256);
+    READ_MPI(p_sig->s, 256);
 
     assert( i_read == i_packet_len );
     if( i_read < i_packet_len ) /* some extra data, hm ? */
