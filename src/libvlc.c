@@ -84,16 +84,14 @@
 static void GetFilenames  ( libvlc_int_t *, unsigned, const char *const [] );
 
 /**
- * Allocate a libvlc instance, initialize global data if needed
- * It also initializes the threading system
+ * Allocate a blank libvlc instance, also setting the exit handler.
+ * Vlc's threading system must have been initialized first
  */
 libvlc_int_t * libvlc_InternalCreate( void )
 {
     libvlc_int_t *p_libvlc;
     libvlc_priv_t *priv;
 
-    /* Now that the thread system is initialized, we don't have much, but
-     * at least we have variables */
     /* Allocate a libvlc instance object */
     p_libvlc = vlc_custom_create( (vlc_object_t *)NULL, sizeof (*priv),
                                   "libvlc" );
