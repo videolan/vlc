@@ -452,8 +452,8 @@ int verify_signature( signature_packet_t *sign, public_key_packet_t *p_key,
 
     int i_hash_len = gcry_md_get_algo_dlen (sign->digest_algo);
     if (sign->public_key_algo == GCRY_PK_DSA) {
-        if (i_hash_len > 20)
-            i_hash_len = 20;
+        if (i_hash_len > i_q_len)
+            i_hash_len = i_q_len;
     }
     if( gcry_mpi_scan( &hash, GCRYMPI_FMT_USG, p_hash, i_hash_len, NULL ) ||
         gcry_sexp_build( &hash_sexp, &erroff, hash_sexp_s, hash ) )
