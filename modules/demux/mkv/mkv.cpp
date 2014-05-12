@@ -73,7 +73,7 @@ vlc_module_begin ()
     add_shortcut( "mka", "mkv" )
 vlc_module_end ()
 
-class demux_sys_t;
+struct demux_sys_t;
 
 static int  Demux  ( demux_t * );
 static int  Control( demux_t *, int, va_list );

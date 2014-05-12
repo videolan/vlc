@@ -326,7 +326,7 @@ private:
 };
 
 
-class demux_sys_t
+struct demux_sys_t
 {
 public:
     demux_sys_t( demux_t & demux )

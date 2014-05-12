@@ -35,7 +35,7 @@ const binary MATROSKA_DVD_LEVEL_PG   = 0x18;
 const binary MATROSKA_DVD_LEVEL_PTT  = 0x10;
 const binary MATROSKA_DVD_LEVEL_CN   = 0x08;
 
-class demux_sys_t;
+struct demux_sys_t;
 
 class chapter_codec_cmds_c
 {
