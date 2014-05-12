@@ -190,6 +190,7 @@ static int Setup( vlc_va_t *external, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
 
     memset( &p_va->hw_ctx, 0, sizeof(p_va->hw_ctx) );
     p_va->hw_ctx.format = 'avc1';
+    p_va->hw_ctx.use_ref_buffer = 1;
 
     int i_pix_fmt = var_CreateGetInteger( p_va->p_log, "avcodec-vda-pix-fmt" );
 
