@@ -2957,7 +2957,7 @@ msgstr ""
 
 #: src/libvlc-module.c:842
 msgid ""
-"This file contains an optional CRL to prevent remove clients from using "
+"This file contains an optional CRL to prevent remote clients from using "
 "revoked certificates in TLS sessions."
 msgstr ""
 
@@ -17868,7 +17868,7 @@ msgstr ""
 #: modules/gui/macosx/wizard.m:265
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
-"This protocol is used as transport method by many Microsoft's softwares. "
+"This protocol is used as transport method by many Microsoft's software. "
 "Note that only a small part of the MMS protocol is supported (MMS "
 "encapsulated in HTTP)."
 msgstr ""
@@ -19644,7 +19644,7 @@ msgid "Network Access Policy"
 msgstr ""
 
 #: modules/gui/qt4/dialogs/firstrun.cpp:98
-msgid "Automatically retrieve media infos"
+msgid "Automatically retrieve media info"
 msgstr ""
 
 #: modules/gui/qt4/dialogs/firstrun.cpp:103
