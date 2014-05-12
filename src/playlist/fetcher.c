@@ -49,7 +49,6 @@ struct playlist_fetcher_t
     vlc_mutex_t     lock;
     vlc_cond_t      wait;
     bool            b_live;
-    int             i_art_policy;
     int             i_waiting;
     input_item_t    **pp_waiting;
 
@@ -74,7 +73,6 @@ playlist_fetcher_t *playlist_fetcher_New( vlc_object_t *parent )
     p_fetcher->b_live = false;
     p_fetcher->i_waiting = 0;
     p_fetcher->pp_waiting = NULL;
-    p_fetcher->i_art_policy = var_GetInteger( parent, "album-art" );
     ARRAY_INIT( p_fetcher->albums );
 
     return p_fetcher;
