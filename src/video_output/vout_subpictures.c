@@ -1393,8 +1393,9 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
            if only if 'chain_update' has a value */
         if (chain_update && *chain_update) {
             vlc_mutex_lock(&sys->lock);
-            if (!sys->source_chain_update && !*sys->source_chain_update) {
-                free(sys->source_chain_update);
+            if (!sys->source_chain_update || !*sys->source_chain_update) {
+                if (sys->source_chain_update)
+                    free(sys->source_chain_update);
                 sys->source_chain_update = chain_update;
                 chain_update = NULL;
             }
