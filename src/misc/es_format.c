@@ -190,6 +190,7 @@ void video_format_Setup( video_format_t *p_fmt, vlc_fourcc_t i_chroma,
     case VLC_CODEC_RGB32:
     case VLC_CODEC_RGBA:
     case VLC_CODEC_ARGB:
+    case VLC_CODEC_BGRA:
         p_fmt->i_bits_per_pixel = 32;
         break;
     case VLC_CODEC_RGB24:

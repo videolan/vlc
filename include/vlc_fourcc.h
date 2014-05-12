@@ -226,6 +226,8 @@
 #define VLC_CODEC_RGBA            VLC_FOURCC('R','G','B','A')
 /* 32 bits ARGB */
 #define VLC_CODEC_ARGB            VLC_FOURCC('A','R','G','B')
+/* 32 bits BGRA */
+#define VLC_CODEC_BGRA            VLC_FOURCC('B','G','R','A')
 
 /* Planar GBR 4:4:4 8 bits */
 #define VLC_CODEC_GBR_PLANAR      VLC_FOURCC('G','B','R','8')

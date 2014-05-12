@@ -814,6 +814,8 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_RGBA, "32 bits ARGB"),
         A("ARGB"),
         A("AV32"),
+    B(VLC_CODEC_BGRA, "32 bits BGRA"),
+        A("BGRA"),
 
     B(VLC_CODEC_GREY, "8 bits greyscale"),
         A("GREY"),
@@ -2084,7 +2086,8 @@ static const struct
         VLC_CODEC_RGBA16, 0 },                 PACKED_FMT(2, 16) },
     { { VLC_CODEC_RGB24, 0 },                  PACKED_FMT(3, 24) },
     { { VLC_CODEC_RGB32, 0 },                  PACKED_FMT(4, 24) },
-    { { VLC_CODEC_RGBA, VLC_CODEC_ARGB, 0 },   PACKED_FMT(4, 32) },
+    { { VLC_CODEC_RGBA, VLC_CODEC_ARGB,
+        VLC_CODEC_BGRA, 0 },                   PACKED_FMT(4, 32) },
 
     { { VLC_CODEC_Y211, 0 },                   { 1, { {{1,4}, {1,1}} }, 4, 32 } },
     { { VLC_CODEC_XYZ12,  0 },                 PACKED_FMT(6, 48) },
