@@ -30,7 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_stream.h>
-#include <vlc_art_finder.h>
+#include <vlc_meta_fetcher.h>
 #include <vlc_memory.h>
 #include <vlc_demux.h>
 #include <vlc_modules.h>
@@ -225,7 +225,7 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
     i_ret = VLC_EGENERIC;
 
     vlc_object_t *p_parent = p_fetcher->object;
-    art_finder_t *p_finder =
+    meta_fetcher_t *p_finder =
         vlc_custom_create( p_parent, sizeof( *p_finder ), "art finder" );
     if( p_finder != NULL)
     {
@@ -341,7 +341,7 @@ error:
  */
 static void FetchMeta( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
 {
-    art_finder_t *p_finder =
+    meta_fetcher_t *p_finder =
         vlc_custom_create( p_fetcher->object, sizeof( *p_finder ), "art finder" );
     if ( !p_finder )
         return;

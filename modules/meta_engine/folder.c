@@ -33,7 +33,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_art_finder.h>
+#include <vlc_meta_fetcher.h>
 #include <vlc_fs.h>
 #include <vlc_url.h>
 #include <vlc_input_item.h>
@@ -72,7 +72,7 @@ vlc_module_end ()
  *****************************************************************************/
 static int FindMeta( vlc_object_t *p_this )
 {
-    art_finder_t *p_finder = (art_finder_t *)p_this;
+    meta_fetcher_t *p_finder = (meta_fetcher_t *)p_this;
     input_item_t *p_item = p_finder->p_item;
     bool b_have_art = false;
     struct stat statinfo;

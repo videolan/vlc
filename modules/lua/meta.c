@@ -37,7 +37,7 @@
 #include <vlc_input.h>
 #include <vlc_meta.h>
 #include <vlc_demux.h>
-#include <vlc_art_finder.h>
+#include <vlc_meta_fetcher.h>
 #include <vlc_url.h>
 #include <vlc_strings.h>
 #include <vlc_stream.h>
@@ -259,7 +259,7 @@ int ReadMeta( demux_meta_t *p_this )
  * Read meta.
  *****************************************************************************/
 
-int FetchMeta( art_finder_t *p_finder )
+int FetchMeta( meta_fetcher_t *p_finder )
 {
     luabatch_context_t context = { p_finder->p_item, p_finder->e_scope, validate_scope };
 
@@ -271,7 +271,7 @@ int FetchMeta( art_finder_t *p_finder )
 /*****************************************************************************
  * Module entry point for art.
  *****************************************************************************/
-int FindArt( art_finder_t *p_finder )
+int FindArt( meta_fetcher_t *p_finder )
 {
     luabatch_context_t context = { p_finder->p_item, p_finder->e_scope, validate_scope };
 

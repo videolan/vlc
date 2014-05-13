@@ -32,7 +32,7 @@
 #include <vlc_input.h>
 #include <vlc_playlist.h>
 #include <vlc_meta.h>
-#include <vlc_art_finder.h>
+#include <vlc_meta_fetcher.h>
 #include <vlc_url.h>
 #include <vlc_strings.h>
 #include <vlc_stream.h>
@@ -52,8 +52,8 @@
  * Module entry points
  *****************************************************************************/
 int ReadMeta( demux_meta_t * );
-int FetchMeta( art_finder_t * );
-int FindArt( art_finder_t * );
+int FetchMeta( meta_fetcher_t * );
+int FindArt( meta_fetcher_t * );
 
 int Import_LuaPlaylist( vlc_object_t * );
 void Close_LuaPlaylist( vlc_object_t * );
