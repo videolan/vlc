@@ -19,6 +19,10 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]]
 
+function descriptor()
+    return { scope="local" }
+end
+
 function trim (s)
   return (string.gsub(s, "^%s*(.-)%s*$", "%1"))
 end
