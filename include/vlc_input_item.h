@@ -291,8 +291,18 @@ VLC_API void input_item_Release(input_item_t *);
 #define vlc_gc_incref(i) input_item_Hold(i)
 #define vlc_gc_decref(i) input_item_Release(i)
 
-VLC_API int libvlc_MetaRequest(libvlc_int_t *, input_item_t *);
-VLC_API int libvlc_ArtRequest(libvlc_int_t *, input_item_t *);
+typedef enum input_item_meta_request_option_t
+{
+    META_REQUEST_OPTION_NONE = 0,
+    META_REQUEST_OPTION_LOCAL = 1 << 0,
+    META_REQUEST_OPTION_NETWORK = 1 << 1,
+    META_REQUEST_OPTION_ANY = 1 << 2
+} input_item_meta_request_option_t;
+
+VLC_API int libvlc_MetaRequest(libvlc_int_t *, input_item_t *,
+                               input_item_meta_request_option_t );
+VLC_API int libvlc_ArtRequest(libvlc_int_t *, input_item_t *,
+                              input_item_meta_request_option_t );
 
 /******************
  * Input stats

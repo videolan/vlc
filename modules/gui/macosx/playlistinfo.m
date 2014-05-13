@@ -212,7 +212,7 @@ static VLCInfo *_o_sharedInstance = nil;
         [o_image_well setImage: [NSImage imageNamed: @"noart.png"]];
     } else {
         if (!input_item_IsPreparsed(p_item))
-            libvlc_MetaRequest(VLCIntf->p_libvlc, p_item);
+            libvlc_MetaRequest(VLCIntf->p_libvlc, p_item, META_REQUEST_OPTION_NONE);
 
         /* fill uri info */
         char * psz_url = decode_URI(input_item_GetURI(p_item));
@@ -365,7 +365,7 @@ error:
 - (IBAction)downloadCoverArt:(id)sender
 {
     playlist_t * p_playlist = pl_Get(VLCIntf);
-    if (p_item) libvlc_ArtRequest(VLCIntf->p_libvlc, p_item);
+    if (p_item) libvlc_ArtRequest(VLCIntf->p_libvlc, p_item, META_REQUEST_OPTION_NONE);
 }
 
 - (input_item_t *)item

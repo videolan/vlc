@@ -233,7 +233,7 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     if( !b_has_art || strncmp( psz_arturl, "attachment://", 13 ) )
     {
         PL_DEBUG( "requesting art for %s", psz_name );
-        libvlc_ArtRequest( p_playlist->p_libvlc, p_input );
+        libvlc_ArtRequest( p_playlist->p_libvlc, p_input, META_REQUEST_OPTION_NONE );
     }
     free( psz_arturl );
     free( psz_name );

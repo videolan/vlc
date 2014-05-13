@@ -619,14 +619,15 @@ static void GetFilenames( libvlc_int_t *p_vlc, unsigned n,
  * Requests extraction of the meta data for an input item (a.k.a. preparsing).
  * The actual extraction is asynchronous.
  */
-int libvlc_MetaRequest(libvlc_int_t *libvlc, input_item_t *item)
+int libvlc_MetaRequest(libvlc_int_t *libvlc, input_item_t *item,
+                       input_item_meta_request_option_t i_options)
 {
     libvlc_priv_t *priv = libvlc_priv(libvlc);
 
     if (unlikely(priv->parser == NULL))
         return VLC_ENOMEM;
 
-    playlist_preparser_Push(priv->parser, item);
+    playlist_preparser_Push(priv->parser, item, i_options);
     return VLC_SUCCESS;
 }
 
@@ -634,13 +635,14 @@ int libvlc_MetaRequest(libvlc_int_t *libvlc, input_item_t *item)
  * Requests retrieving/downloading art for an input item.
  * The retrieval is performed asynchronously.
  */
-int libvlc_ArtRequest(libvlc_int_t *libvlc, input_item_t *item)
+int libvlc_ArtRequest(libvlc_int_t *libvlc, input_item_t *item,
+                      input_item_meta_request_option_t i_options)
 {
     libvlc_priv_t *priv = libvlc_priv(libvlc);
 
     if (unlikely(priv->parser == NULL))
         return VLC_ENOMEM;
 
-    playlist_preparser_fetcher_Push(priv->parser, item);
+    playlist_preparser_fetcher_Push(priv->parser, item, i_options);
     return VLC_SUCCESS;
 }

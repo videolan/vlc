@@ -633,8 +633,8 @@ static int media_parse(libvlc_media_t *media)
     input_item_t *item = media->p_input_item;
 
     /* TODO: Fetch art on need basis. But how not to break compatibility? */
-    libvlc_ArtRequest(libvlc, item);
-    return libvlc_MetaRequest(libvlc, item);
+    libvlc_ArtRequest(libvlc, item, META_REQUEST_OPTION_NONE);
+    return libvlc_MetaRequest(libvlc, item, META_REQUEST_OPTION_NONE);
 }
 
 /**************************************************************************

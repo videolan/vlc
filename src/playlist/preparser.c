@@ -71,9 +71,11 @@ playlist_preparser_t *playlist_preparser_New( vlc_object_t *parent )
     return p_preparser;
 }
 
-void playlist_preparser_Push( playlist_preparser_t *p_preparser, input_item_t *p_item )
+void playlist_preparser_Push( playlist_preparser_t *p_preparser, input_item_t *p_item,
+                              input_item_meta_request_option_t i_options )
 {
     vlc_gc_incref( p_item );
+    VLC_UNUSED( i_options );
 
     vlc_mutex_lock( &p_preparser->lock );
     INSERT_ELEM( p_preparser->pp_waiting, p_preparser->i_waiting,
@@ -90,10 +92,10 @@ void playlist_preparser_Push( playlist_preparser_t *p_preparser, input_item_t *p
 }
 
 void playlist_preparser_fetcher_Push( playlist_preparser_t *p_preparser,
-                                      input_item_t *p_item )
+             input_item_t *p_item, input_item_meta_request_option_t i_options )
 {
     if( p_preparser->p_fetcher != NULL )
-        playlist_fetcher_Push( p_preparser->p_fetcher, p_item );
+        playlist_fetcher_Push( p_preparser->p_fetcher, p_item, i_options );
 }
 
 void playlist_preparser_Delete( playlist_preparser_t *p_preparser )
@@ -185,7 +187,7 @@ static void Art( playlist_preparser_t *p_preparser, input_item_t *p_item )
     vlc_mutex_unlock( &p_item->lock );
 
     if( b_fetch && p_fetcher )
-        playlist_fetcher_Push( p_fetcher, p_item );
+        playlist_fetcher_Push( p_fetcher, p_item, 0 );
 }
 
 /**

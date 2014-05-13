@@ -913,7 +913,7 @@
 
         if (p_item) {
             if (p_item->i_children == -1)
-                libvlc_MetaRequest(p_intf->p_libvlc, p_item->p_input);
+                libvlc_MetaRequest(p_intf->p_libvlc, p_item->p_input, META_REQUEST_OPTION_NONE);
             else
                 msg_Dbg(p_intf, "preparsing nodes not implemented");
         }
@@ -938,7 +938,7 @@
         p_item = [[o_outline_view itemAtRow: indexes[i]] pointerValue];
 
         if (p_item && p_item->i_children == -1)
-            libvlc_ArtRequest(p_intf->p_libvlc, p_item->p_input);
+            libvlc_ArtRequest(p_intf->p_libvlc, p_item->p_input, META_REQUEST_OPTION_NONE);
     }
     [self playlistUpdated];
 }

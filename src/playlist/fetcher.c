@@ -43,15 +43,19 @@
 /*****************************************************************************
  * Structures/definitions
  *****************************************************************************/
+typedef struct playlist_fetcher_entry_t
+{
+    input_item_t    *p_item;
+    input_item_meta_request_option_t i_options;
+} playlist_fetcher_entry_t;
+
 struct playlist_fetcher_t
 {
     vlc_object_t   *object;
     vlc_mutex_t     lock;
     vlc_cond_t      wait;
     bool            b_live;
-    int             i_waiting;
-    input_item_t    **pp_waiting;
-
+    DECL_ARRAY(playlist_fetcher_entry_t) waiting;
     DECL_ARRAY(playlist_album_t) albums;
     meta_fetcher_scope_t e_scope;
 };
@@ -72,8 +76,6 @@ playlist_fetcher_t *playlist_fetcher_New( vlc_object_t *parent )
     vlc_mutex_init( &p_fetcher->lock );
     vlc_cond_init( &p_fetcher->wait );
     p_fetcher->b_live = false;
-    p_fetcher->i_waiting = 0;
-    p_fetcher->pp_waiting = NULL;
 
     bool b_access = var_InheritBool( parent, "metadata-network-access" );
     if ( !b_access )
@@ -82,18 +84,19 @@ playlist_fetcher_t *playlist_fetcher_New( vlc_object_t *parent )
     p_fetcher->e_scope = ( b_access ) ? FETCHER_SCOPE_ANY : FETCHER_SCOPE_LOCAL;
 
     ARRAY_INIT( p_fetcher->albums );
+    ARRAY_INIT( p_fetcher->waiting );
 
     return p_fetcher;
 }
 
-void playlist_fetcher_Push( playlist_fetcher_t *p_fetcher,
-                            input_item_t *p_item )
+void playlist_fetcher_Push( playlist_fetcher_t *p_fetcher, input_item_t *p_item,
+                            input_item_meta_request_option_t i_options )
 {
     vlc_gc_incref( p_item );
 
+    playlist_fetcher_entry_t entry = { p_item, i_options };
     vlc_mutex_lock( &p_fetcher->lock );
-    INSERT_ELEM( p_fetcher->pp_waiting, p_fetcher->i_waiting,
-                 p_fetcher->i_waiting, p_item );
+    ARRAY_APPEND( p_fetcher->waiting, entry );
     if( !p_fetcher->b_live )
     {
         if( vlc_clone_detach( NULL, Thread, p_fetcher,
@@ -110,11 +113,9 @@ void playlist_fetcher_Delete( playlist_fetcher_t *p_fetcher )
 {
     vlc_mutex_lock( &p_fetcher->lock );
     /* Remove any left-over item, the fetcher will exit */
-    while( p_fetcher->i_waiting > 0 )
-    {
-        vlc_gc_decref( p_fetcher->pp_waiting[0] );
-        REMOVE_ELEM( p_fetcher->pp_waiting, p_fetcher->i_waiting, 0 );
-    }
+    for (int i=0;i<p_fetcher->waiting.i_size; i++)
+        vlc_gc_decref( p_fetcher->waiting.p_elems[i].p_item );
+    ARRAY_RESET( p_fetcher->waiting );
 
     while( p_fetcher->b_live )
         vlc_cond_wait( &p_fetcher->wait, &p_fetcher->lock );
@@ -122,6 +123,7 @@ void playlist_fetcher_Delete( playlist_fetcher_t *p_fetcher )
 
     vlc_cond_destroy( &p_fetcher->wait );
     vlc_mutex_destroy( &p_fetcher->lock );
+
     free( p_fetcher );
 }
 
@@ -364,12 +366,14 @@ static void *Thread( void *p_data )
     for( ;; )
     {
         input_item_t *p_item = NULL;
+        input_item_meta_request_option_t i_options;
 
         vlc_mutex_lock( &p_fetcher->lock );
-        if( p_fetcher->i_waiting != 0 )
+        if( p_fetcher->waiting.i_size != 0 )
         {
-            p_item = p_fetcher->pp_waiting[0];
-            REMOVE_ELEM( p_fetcher->pp_waiting, p_fetcher->i_waiting, 0 );
+            p_item = p_fetcher->waiting.p_elems[0].p_item;
+            i_options = p_fetcher->waiting.p_elems[0].i_options;
+            ARRAY_REMOVE( p_fetcher->waiting, 0 );
         }
         else
         {
