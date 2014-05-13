@@ -4,6 +4,7 @@
 #
 # Translators:
 # Eugene Kutia <fossugn@gmail.com>, 2013
+# Oleksandr Natalenko <oleksandr@natalenko.name>, 2009-2012
 # Андрій Бандура <andriykopanytsia@gmail.com>, 2013-2014
 msgid ""
 msgstr ""

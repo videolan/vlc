@@ -9,16 +9,12 @@
 # Jens Seidel <jensseidel _at_ users.sf.net>, 2005
 # Kai Hermann <kai.uwe.hermann@gmail.com>, 2009
 # LGaudian <lgaudian@me.com>, 2013
-# LGaudian <lgaudian@me.com>, 2013
-# Mario Siegmann <mario_siegmann@web.de>, 2013-2014
-# MartinB. <martin-boeh@outlook.com>, 2013
+# Mario Siegmann <mario_siegmann@web.de>, 2011-2014
 # MartinB. <martin-boeh@outlook.com>, 2013
 # Mathias C. Berens | welcome-soft <berens at welcome-soft.de>, 2006
 # Michael <inactive+banescar@transifex.com>, 2013
-# Michał Trzebiatowski <hippie_1968@hotmail.com>, 2010,2012
-# M T <michtrz@gmail.com>, 2013
+# M T <michtrz@gmail.com>, 2010, 2012, 2013
 # Philipp Weissenbacher <philippweissenbacher _at_ aon.at>, 2004
-# thillux, 2013
 # thillux, 2013
 # Thomas Graf <tgr at reeler.org>, 2002
 # to_ba, 2014

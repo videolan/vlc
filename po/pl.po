@@ -6,7 +6,7 @@
 # Marcin Szymański <cysioland@gmail.com>, 2013
 # Gootector <gootector@o2.pl>, 2013-2014
 # Marcin Szymański <cysioland@gmail.com>, 2013
-# M T <michtrz@gmail.com>, 2013-2014
+# M T <michtrz@gmail.com>, 2007-2014
 # robaks, 2013
 msgid ""
 msgstr ""

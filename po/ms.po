@@ -4,7 +4,7 @@
 #
 # Translators:
 # abuyop <abuyop@gmail.com>, 2013-2014
-# mahrazi <mahrazi@gmail.com>, 2013-2014
+# mahrazi <mahrazi@gmail.com>, 2006,2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

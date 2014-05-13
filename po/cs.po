@@ -7,14 +7,12 @@
 # Jakub Žáček <dawon.cz@gmail.com>, 2009
 # Kamil Páral <ripper42@gmail.com>, 2009
 # Martin Zicha <zicha@centrum.cz>, 2012
-# Michal Halenka <michal.halenka@gmail.com>, 2013
 # Michal Halenka <michal.halenka@gmail.com>, 2012-2013
 # Miroslav Oujeský <oujesky@mail.muni.cz>, 2006
 # Mustafa Sandal <dreddux@gmail.com>, 2012
 # petr.simacek <petr.simacek@gmail.com>, 2012
-# petr.simacek <petr.simacek@gmail.com>, 2012
 # MMMHHH <hrubymar10@gmail.com>, 2013
-# Tomáš Chvátal <tomas.chvatal@gmail.com>, 2013-2014
+# Tomáš Chvátal <tomas.chvatal@gmail.com>, 2008-2014
 # Tomáš Souček <soucek.gns@gmail.com>, 2014
 # Václav Pavlíček <v.pavlicek@centrum.cz>, 2012
 # Vít Pelčák, 2012

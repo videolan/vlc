@@ -3,8 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# A S Alam <aalam@users.sf.net>, 2009-2011
-# A S Alam <apreet.alam@gmail.com>, 2013-2014
+# A S Alam <apreet.alam@gmail.com>, 2009-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

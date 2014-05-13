@@ -4,7 +4,6 @@
 #
 # Translators:
 # Arnis Lupiks, 2014
-# Arnis Lupiks, 2014
 # Dāvis Mosāns, 2014
 # jeanmarcgailis <jeanmarc.gailis@gmail.com>, 2013
 # Kristaps Ancāns <kristaps.ancans@gmail.com>, 2013

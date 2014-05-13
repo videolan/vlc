@@ -4,7 +4,6 @@
 #
 # Translators:
 # Emin Mastizada <emin@mastizada.tk>, 2013
-# Emin Mastizada <emin@mastizada.tk>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

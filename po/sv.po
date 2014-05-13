@@ -12,6 +12,7 @@
 # MightyNerd <staszw@live.se>, 2013
 # dotar <t.dotar@gmail.com>, 2014
 # leveebreaks <when.the.levee.breaks.89@gmail.com>, 2013
+# Niklas 'Nille' Åkerström <nille.kungen@gmail.com>, 2009
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

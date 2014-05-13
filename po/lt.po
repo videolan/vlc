@@ -4,8 +4,7 @@
 #
 # Translators:
 # Baltix kūrėjas <mantas@akl.lt>, 2013-2014
-# Mindaugas <embar@super.lt>, 2009-2013
-# Mindaugas <embar@super.lt>, 2013-2014
+# Mindaugas <embar@super.lt>, 2009-2014
 # jawnuolis <jawnuolis@gmail.com>, 2013
 msgid ""
 msgstr ""

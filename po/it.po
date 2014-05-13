@@ -13,8 +13,7 @@
 # Lorenzo Scrocca <justthegladiator@gmail.com>, 2014
 # Lorenzo Facca <lorenzo.facca@gmail.com>, 2013
 # Lorenzo Porta, 2013
-# Vindex17 <vindex17@outlook.it>, 2014
-# Vindex17 <vindex17@outlook.it>, 2013
+# Vindex17 <vindex17@outlook.it>, 2013-2014
 # Stiffmaister88 <antani125@yahoo.it>, 2013
 # Marco91, 2013
 # momocat <momocat19@gmail.com>, 2014
@@ -23,8 +22,7 @@
 # Roberto91 <robh91@hotmail.it>, 2014
 # sara.nocentini <sara.nocentini@gmail.com>, 2014
 # verodigiorgio <verodigiorgio@gmail.com>, 2013
-# Vincenzo Reale <smart2128@baslug.org>, 2013
-# Vincenzo Reale <vinx.reale@gmail.com>, 2013-2014
+# Vincenzo Reale <vinx.reale@gmail.com>, 2006,2008-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

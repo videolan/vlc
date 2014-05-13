@@ -5,8 +5,6 @@
 # Translators:
 # andregomes <andre.filipe.gomez@gmail.com>, 2013
 # Bruno Queiros <bqueiros@gmail.com>, 2012-2013
-# Bruno Queiros <bqueiros@gmail.com>, 2013
-# Christoph Miebach <christoph.miebach@web.de>, 2013
 # glrs <goncaloluisilva@gmail.com>, 2013
 # pingo.mister <joao.lnsa@netcabo.pt>, 2012
 # joseldgois <joseldgois@hotmail.com>, 2013
@@ -15,7 +13,6 @@
 # Miguel Sousa <migueljorgesousa@sapo.pt>, 2012
 # pvaladares, 2012
 # Ricardo Perdigão <ricardofonseca1977@gmail.com>, 2012
-# Yaron Shahrabani <sh.yaron@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

@@ -3,11 +3,10 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# law <exclusion@gmail.com>, 2013
+# law <exclusion@gmail.com>, 2011-2013
 # Andrey Brilevskiy <andrey-brilevskiy@yandex.ru>, 2005
 # Andrey Wolk (Lorni) <andywolk@gmail.com>, 2009
 # Konstantin Pavlov <thresh@videolan.org>, 2011
-# law <exclusion@gmail.com>, 2013
 # Roustam Ghizdatov <roustam@2-u.ru>, 2009
 # Valek Filippov <frob@df.ru>, 2001
 msgid ""

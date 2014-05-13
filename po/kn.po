@@ -9,7 +9,6 @@
 # karthiknatesh <karthik_natesh@live.com>, 2013
 # msj2, 2013
 # yogi <yogesh@karnatakaeducation.org.in>, 2013
-# yogi <yogesh@karnatakaeducation.org.in>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

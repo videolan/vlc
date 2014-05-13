@@ -5,7 +5,6 @@
 # Translators:
 # Gabor Kelemen <kelemeng at gnome dot hu>, 2005-2013
 # isc _ <iscreamd@gmail.com>, 2013
-# kelemeng <kelemeng@ubuntu.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

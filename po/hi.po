@@ -12,7 +12,6 @@
 # Shantanu Sarkar <shantanusarkar.me@gmail.com>, 2013
 # shashiranjan <rshashi906@gmail.com>, 2012
 # sheeshmohsin <sheeshmohsin@gmail.com>, 2013
-# Simos Xenitellis <simos74@gmx.net>, 2005
 # Tarsem <tarsemsinghtarsemsingh@gmail.com>, 2013
 msgid ""
 msgstr ""

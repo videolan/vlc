@@ -5,9 +5,7 @@
 # Translators:
 # gorkaazk <gorkaazkarate@gmail.com>, 2013
 # Iñaki Larrañaga Murgoitio <dooteo@euskalgnu.org>, 2011
-# julen <julenx@gmail.com>, 2012-2013
-# julen <julenx@gmail.com>, 2013-2014
-# Xabier Aramendi, 2011-2013
+# julen <julenx@gmail.com>, 2012-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

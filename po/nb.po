@@ -3,11 +3,13 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Alexander Jansen <bornxlo@gmail.com>, 2014
+# Alexander Jansen <bornxlo@gmail.com>, 2013-2014
 # thomhov, 2014
 # bobbaluba <bobbaluba@gmail.com>, 2013-2014
 # haarek <haarektrans@gmail.com>, 2014
-# Stian Jørgensrud <stianahj@gmail.com>, 2013-2014
+# Olav Dahlum <odahlum@gmail.com>, 2011
+# Sigmund Augdal <sigmunau@idi.ntnu.no>, 2002
+# Stian Jørgensrud <stianahj@gmail.com>, 2012-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

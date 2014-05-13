@@ -4,9 +4,7 @@
 #
 # Translators:
 # geniushkg <geniushkg@gmail.com>, 2011
-# geniushkg <geniushkg@gmail.com>, 2011
 # kartikm <kartik.mistry@gmail.com>, 2013
-# nilurajnik <nilurajnik@gmail.com>, 2013
 # nilurajnik <nilurajnik@gmail.com>, 2013
 msgid ""
 msgstr ""

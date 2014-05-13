@@ -4,7 +4,6 @@
 #
 # Translators:
 # Firdaus Simbolon <dausbajing@hotmail.co.id>, 2013
-# Firdaus Simbolon <dausbajing@hotmail.co.id>, 2013
 # Luqman Hakim <ovdl@rocketmail.com>, 2008,2010
 # Pe R <madara.code@gmail.com>, 2014
 msgid ""

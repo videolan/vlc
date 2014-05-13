@@ -3,10 +3,8 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# ppanhh <vietnamesel10n@gmail.com>, 2013
-# Christoph Miebach <christoph.miebach@web.de>, 2013
+# ppanhh <vietnamesel10n@gmail.com>, 2009-2010,2013
 # thanhpk <thanhpk@live.com>, 2013
-# ppanhh <vietnamesel10n@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

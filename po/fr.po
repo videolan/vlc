@@ -5,21 +5,20 @@
 # Translators:
 # chioubaca <chioubaca@gmail.com>, 2014
 # Calixte, 2013
-# Calixte, 2013
 # Christophe Lherieau <skimpax@gmail.com>, 2013
 # Eramdam <damien.erambert@me.com>, 2013
 # Emmanuel Sd <emanediteur@gmail.com>, 2013
-# Emmanuel Sd <emanediteur@gmail.com>, 2013
 # Eramdam <damien.erambert@me.com>, 2013
-# Éric Lassauge <lassauge {AT} users {dot} sourceforge {dot} net>, 2013
 # Eric Lassauge <lassauge@users.sourceforge.net>, 2013
 # Freddydelanuit Dec <fred.dec@free.fr>, 2014
 # Loys, 2013
-# Loys, 2013
 # funman <funman@videolan.org>, 2014
 # sebasthug <sebhug@free.fr>, 2013
-# sebasthug <sebhug@free.fr>, 2013
 # Tubuntu <tubuntu@testimonium.be>, 2013-2014
+# Previous Translators
+#  Samuel Hocevar <sam@zoy.org>
+#  Jean-Pierre Kuypers <Kuypers@sri.ucl.ac.be>
+#  Probably other french VLC developers, look at the AUTHORS files
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

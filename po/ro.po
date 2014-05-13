@@ -4,9 +4,9 @@
 #
 # Translators:
 # ArianServ <arianserv@gmail.com>, 2014
-# Arthur Țițeică <arthur@psw.ro>, 2013
 # roentgen <arthur.titeica@gmail.com>, 2013
 # Circo Radu <circo DOT radusorin AT gmail DOT com>, 2005
+# Cristian Secară <cristi AT secarica DOT ro>, 2007-2013
 # Cristian Silaghi <cristian.silaghi@mozilla.ro>, 2013-2014
 # Sethan <the.sethan@gmail.com>, 2014
 # ed62 <eduard.pintilie@gmail.com>, 2014

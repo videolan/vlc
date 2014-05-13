@@ -4,7 +4,7 @@
 #
 # Translators:
 # André de Barros Martins Ribeiro  <andrerib at ajato.com dot br>, 2003
-# ssdoria <ssdoria@gmail.com>, 2013-2014
+# ssdoria <ssdoria@gmail.com>, 2008-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

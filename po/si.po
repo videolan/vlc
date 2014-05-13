@@ -7,8 +7,6 @@
 # dushmantha <dushmantharupasinghe@gmail.com>, 2014
 # H.Shalitha Vikum  <HSVIKUM at sinhalaya dot com>, 2010
 # Pasindu Kavinda <pkavinda@gmail.com>, 2013-2014
-# Pasindu Kavinda <pkavinda@gmail.com>, 2013
-# Pasindu Kavinda <pkavinda@gmail.com>, 2013
 # leprabat <prab4th@gmail.com>, 2013
 msgid ""
 msgstr ""

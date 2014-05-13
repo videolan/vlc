@@ -3,9 +3,10 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# mstefanis <mstefanis@hotmail.com>, 2013
+# mstefanis <mstefanis@hotmail.com>, 2012-2013
 # jopo146 <johnpontikis@yahoo.gr>, 2013
 # kolokotronis <modernphilosopher82-2011@yahoo.com>, 2013-2014
+# Simos Xenitellis <simos74@gmx.net>, 2005, 2010
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

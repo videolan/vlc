@@ -4,7 +4,7 @@
 #
 # Translators:
 # uzadmin <uzbadmin@gmail.com>, 2014
-# Umidjon Almasov <u.almasov@gmail.com>, 2013
+# Umidjon Almasov <u.almasov@gmail.com>, 2012-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

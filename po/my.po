@@ -3,6 +3,8 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
+# Khin Mi Mi Aung <kmma@myanmarlug.org>, 2005
+# Pyae Sone <gipsyhnh@gmail.com>, 2013
 # Yhal Htet Aung <jumoun@gmail.com>, 2013
 msgid ""
 msgstr ""

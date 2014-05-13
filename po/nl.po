@@ -4,8 +4,9 @@
 #
 # Translators:
 # Alexander Henket <ahenket at xs4all dot nl>, 2009
-# Thomas De Rocker, 2013
-# Thomas De Rocker, 2013
+# Derk-Jan Hartman <hartman at videolan dot org>, 2004-2005
+# Myckel Habets <myckel at sdf dot lonestar dot org>, 2007-2010
+# Thomas De Rocker, 2008-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

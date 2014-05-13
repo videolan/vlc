@@ -10,6 +10,21 @@
 # Peter Jespersen <flywheeldk@gmail.com>, 2013
 # Sejani, 2013
 # ulrik, 2013-2014
+# Jonas Larsen <jonas@vrt.dk>
+# Morten Brix Pedersen <morten@wtf.dk>
+# Niels Fanøe <niels.f@noee.dk>
+# Kasper Tvede <kasper@webmasteren.eu>
+# Kenneth Nielsen <k.nielsen81@gmail.com>
+# Ask Hjorth Larsen <asklarsen@gmail.com>
+#
+# Konventioner:
+# Playlist = spilleliste
+# Transcode = Konverter (Det er ikke en decideret konvertering men der er intet bedre dansk ord)
+#
+# Ord som ikke har fået en dansk oversættelse (endnu):
+# Stream
+# Encode
+# Decode
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

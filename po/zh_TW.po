@@ -4,15 +4,13 @@
 #
 # Translators:
 # brli7848 <rainman59118@gmail.com>, 2013
-# brli7848 <rainman59118@gmail.com>, 2013
-# twentyfour <iwangce@gmail.com>, 2013
-# Frank Chao <frank0624@gmail.com>, 2013
 # Frank Chao <frank0624@gmail.com>, 2013
 # Ruei-Yuan Lu <RueiYuan.Lu@gmail.com>, 2012
 # taijuin lee <taijuin@gmail.com>, 2013
 # twentyfour <iwangce@gmail.com>, 2013
 # xatier 同學@提不起勁 <xatierlike@gmail.com>, 2014
 # 柏諺 黃 <s8321414@gmail.com>, 2014
+# Thanks to Hsi-Ching Chao
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

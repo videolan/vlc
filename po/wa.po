@@ -3,8 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Gaytan <gaytan@skynet.be>, 2009-2010,2012
-# Gaytan <gaytan@skynet.be>, 2013
+# Gaytan <gaytan@skynet.be>, 2009-2010,2012-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

@@ -6,7 +6,6 @@
 # Andri Pálsson <palsson.andri@gmail.com>, 2011
 # Freyr Gunnar Ólafsson <gnarlin@gmail.com>, 2010
 # Sveinn í Felli <sv1@fellsnet.is>, 2013-2014
-# Sveinn í Felli <sv1@fellsnet.is>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

@@ -6,16 +6,10 @@
 # Arshad <hossein.arshad@gmail.com>, 2013
 # djcsaeed <security.registered@gmail.com>, 2013
 # EmadNavy <tiptopland@gmail.com>, 2013
-# EmadNavy <tiptopland@gmail.com>, 2013
-# Arshad <hossein.arshad@gmail.com>, 2013
-# imni <if90@chmail.ir>, 2014
 # imni <if90@chmail.ir>, 2014
 # Meelad Zakaria <meelad@farsiweb.info>, 2007
 # M.Hossein Mojtahedi <Mhm5000@gmail.com>, 2013
-# M.Hossein Mojtahedi <Mhm5000@gmail.com>, 2013
 # Pouriya <pouriya.he@ymail.com>, 2014
-# Pouriya <pouriya.he@ymail.com>, 2014
-# djcsaeed <security.registered@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

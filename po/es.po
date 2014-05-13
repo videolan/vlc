@@ -5,10 +5,14 @@
 # Translators:
 # elamigo <cyko666@gmail.com>, 2013
 # asaez <asaez@asaez.eu>, 2013
+# Antonio Javier Varela Calvo <tonxabar@hotmail.com>, 2003-2005
+# estebande <estebandeleo91@hotmail.com>, 2013
+# inye <j.contrerasferrada@gmail.com>, 2013
+# msoko <sokolovitch@yahoo.com>, 2013
+# Saúl Ortega <saulortega.co@gmail.com>, 2013
 # hyundi <jomarg@telefonica.net>, 2013
-# picodotdev <pico.dev@gmail.com>, 2013
+# picodotdev <pico.dev@gmail.com>, 2010-2013
 # KonradIturbe <mail@chernowii.com>, 2013
-# saskarip <saskarip@gmail.com>, 2013
 # saskarip <saskarip@gmail.com>, 2013
 # Yllelder, 2013
 msgid ""

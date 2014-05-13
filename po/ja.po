@@ -3,7 +3,8 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Fumio Nakayama <fumio.n6a@gmail.com>, 2013
+# Fumio Nakayama <fumio.n6a@gmail.com>, 2002,2009-2013
+# Tadashi Jokagi <elf@elf.no-ip.org>, 2004-2009
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"

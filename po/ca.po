@@ -5,7 +5,7 @@
 # Translators:
 # Eva Castillo <evac1295@gmail.com>, 2013
 # jmontane <joan@montane.cat>, 2013
-# jmontane <joan@montane.cat>, 2013
+# Lorena Gomes and Xènia Albà, April 2005
 # Pau Iranzo <paugnu@gmail.com>, 2013-2014
 msgid ""
 msgstr ""

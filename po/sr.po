@@ -7,10 +7,9 @@
 # Rancher <djordje.vasiljevich@gmail.com>, 2013-2014
 # Gorana Milicevic <gorana.milicevic@gmail.com>, 2008
 # Marko Uskokoddic <>, 2007
-# predrag83yu <predragljubenovic@gmail.com>, 2010
-# Rancher <djordje.vasiljevich@gmail.com>, 2013
-# Rancher <djordje.vasiljevich@gmail.com>, 2013
-# predrag83yu <predragljubenovic@gmail.com>, 2013-2014
+# Marko Uskokovic <uskokovic@etf.bg.ac.yu>, 2007-2008
+# predrag83yu <predragljubenovic@gmail.com>, 2010,2013-2014
+# Serbian linux distribution cp6Linux
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
