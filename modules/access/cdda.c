@@ -587,7 +587,8 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
 #ifdef HAVE_LIBCDDB
 static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors )
 {
-    if( var_InheritInteger( p_access, "album-art" ) == ALBUM_ART_WHEN_ASKED )
+    if( var_InheritInteger( p_access, "album-art" ) != ALBUM_ART_ALL &&
+        !  var_InheritBool( p_access, "metadata-network-access" ) )
     {
         msg_Dbg( p_access, "Album art policy set to manual; no automatic fetching" );
         return NULL;

@@ -75,11 +75,11 @@ playlist_fetcher_t *playlist_fetcher_New( vlc_object_t *parent )
     p_fetcher->i_waiting = 0;
     p_fetcher->pp_waiting = NULL;
 
-    int i_policy = var_InheritInteger( parent, "album-art" );
-    if ( i_policy == ALBUM_ART_ALL )
-        p_fetcher->e_scope = FETCHER_SCOPE_ANY;
-    else
-        p_fetcher->e_scope = FETCHER_SCOPE_LOCAL;
+    bool b_access = var_InheritBool( parent, "metadata-network-access" );
+    if ( !b_access )
+        b_access = ( var_InheritInteger( parent, "album-art" ) == ALBUM_ART_ALL );
+
+    p_fetcher->e_scope = ( b_access ) ? FETCHER_SCOPE_ANY : FETCHER_SCOPE_LOCAL;
 
     ARRAY_INIT( p_fetcher->albums );
 

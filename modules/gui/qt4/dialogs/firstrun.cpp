@@ -42,7 +42,7 @@ FirstRun::FirstRun( QWidget *_p, intf_thread_t *_p_intf  )
 
 void FirstRun::save()
 {
-    config_PutInt( p_intf,  "album-art", checkbox->isChecked() ? ALBUM_ART_ALL: ALBUM_ART_WHEN_ASKED );
+    config_PutInt( p_intf,  "metadata-network-access", checkbox->isChecked() );
 #ifdef UPDATE_CHECK
     config_PutInt( p_intf,  "qt-updates-notif", checkbox2->isChecked() );
 #endif
@@ -95,7 +95,7 @@ void FirstRun::buildPrivDialog()
     gLayout->addWidget( options, 1, 0, 1, 3 );
     int line = 0;
 
-    checkbox = new QCheckBox( qtr( "Automatically retrieve media info" ) );
+    checkbox = new QCheckBox( qtr( "Allow metadata network access" ) );
     checkbox->setChecked( true );
     optionsLayout->addWidget( checkbox, line++, 0 );
 

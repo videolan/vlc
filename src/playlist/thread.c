@@ -224,33 +224,20 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
         }
     }
 
-    bool b_find_art = var_GetInteger( p_playlist, "album-art" )
-                                                      == ALBUM_ART_WHEN_PLAYED;
-    if( b_find_art )
-    {
-        char *psz_uri = input_item_GetURI( p_item->p_input );
-        if( psz_uri != NULL && (!strncmp( psz_uri, "directory:", 10 ) ||
-                                !strncmp( psz_uri, "vlc:", 4 )) )
-            b_find_art = false;
-        free( psz_uri );
-    }
-
     /* TODO store art policy in playlist private data */
-    if( b_find_art )
-    {
-        char *psz_arturl = input_item_GetArtURL( p_input );
-        char *psz_name = input_item_GetName( p_input );
-        /* p_input->p_meta should not be null after a successful CreateThread */
-        bool b_has_art = !EMPTY_STR( psz_arturl );
+    char *psz_arturl = input_item_GetArtURL( p_input );
+    char *psz_name = input_item_GetName( p_input );
+    /* p_input->p_meta should not be null after a successful CreateThread */
+    bool b_has_art = !EMPTY_STR( psz_arturl );
 
-        if( !b_has_art || strncmp( psz_arturl, "attachment://", 13 ) )
-        {
-            PL_DEBUG( "requesting art for %s", psz_name );
-            libvlc_ArtRequest( p_playlist->p_libvlc, p_input );
-        }
-        free( psz_arturl );
-        free( psz_name );
+    if( !b_has_art || strncmp( psz_arturl, "attachment://", 13 ) )
+    {
+        PL_DEBUG( "requesting art for %s", psz_name );
+        libvlc_ArtRequest( p_playlist->p_libvlc, p_input );
     }
+    free( psz_arturl );
+    free( psz_name );
+
     PL_UNLOCK;
     var_TriggerCallback( p_playlist, "activity" );
     PL_LOCK;

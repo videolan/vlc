@@ -44,8 +44,6 @@ struct playlist_preparser_t
     bool            b_live;
     input_item_t  **pp_waiting;
     int             i_waiting;
-
-    int             i_art_policy;
 };
 
 static void *Thread( void * );
@@ -67,7 +65,6 @@ playlist_preparser_t *playlist_preparser_New( vlc_object_t *parent )
     vlc_mutex_init( &p_preparser->lock );
     vlc_cond_init( &p_preparser->wait );
     p_preparser->b_live = false;
-    p_preparser->i_art_policy = var_InheritInteger( parent, "album-art" );
     p_preparser->i_waiting = 0;
     p_preparser->pp_waiting = NULL;
 

@@ -810,8 +810,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC_FILE( "skins2-last", File, ui.skinFileLabel,
                                  ui.fileSkin, ui.skinBrowse );
 
-            CONFIG_GENERIC( "album-art", IntegerList, ui.artFetchLabel,
-                                                      artFetcher );
+            CONFIG_BOOL( "metadata-network-access", MetadataNetworkAccessMode );
 
             /* UPDATE options */
 #ifdef UPDATE_CHECK

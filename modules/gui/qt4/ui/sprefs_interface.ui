@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>686</width>
-    <height>667</height>
+    <height>663</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -407,22 +407,6 @@
       <string>Playlist and Instances</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="4" column="0">
-       <widget class="QLabel" name="artFetchLabel">
-        <property name="minimumSize">
-         <size>
-          <width>220</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Album art download policy:</string>
-        </property>
-        <property name="buddy">
-         <cstring>artFetcher</cstring>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QCheckBox" name="OneInterfaceMode">
         <property name="text">
@@ -451,13 +435,17 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
-       <widget class="QComboBox" name="artFetcher"/>
-      </item>
       <item row="0" column="1">
        <widget class="QCheckBox" name="EnqueueOneInterfaceMode">
         <property name="text">
          <string>Enqueue items into playlist in one instance mode</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="MetadataNetworkAccessMode">
+        <property name="text">
+         <string>Allow metadata network access</string>
         </property>
        </widget>
       </item>
@@ -646,25 +634,26 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>langCombo</tabstop>
   <tabstop>qt</tabstop>
   <tabstop>skins</tabstop>
   <tabstop>fsController</tabstop>
   <tabstop>embedVideo</tabstop>
-  <tabstop>resizingBox</tabstop>
   <tabstop>minimalviewBox</tabstop>
-  <tabstop>pauseMinimizedBox</tabstop>
   <tabstop>systrayBox</tabstop>
+  <tabstop>resizingBox</tabstop>
+  <tabstop>pauseMinimizedBox</tabstop>
   <tabstop>notificationCombo</tabstop>
   <tabstop>stylesCombo</tabstop>
   <tabstop>OneInterfaceMode</tabstop>
-  <tabstop>EnqueueOneInterfaceMode</tabstop>
   <tabstop>oneInstanceFromFile</tabstop>
   <tabstop>treePlaylist</tabstop>
+  <tabstop>MetadataNetworkAccessMode</tabstop>
+  <tabstop>EnqueueOneInterfaceMode</tabstop>
   <tabstop>playPauseBox</tabstop>
-  <tabstop>artFetcher</tabstop>
   <tabstop>updatesBox</tabstop>
-  <tabstop>updatesDays</tabstop>
   <tabstop>saveRecentlyPlayed</tabstop>
+  <tabstop>updatesDays</tabstop>
   <tabstop>recentlyPlayedFilters</tabstop>
   <tabstop>assoButton</tabstop>
   <tabstop>skinBrowse</tabstop>

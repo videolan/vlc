@@ -1113,17 +1113,7 @@ static const char *const ppsz_prefres[] = {
     "Automatically preparse files added to the playlist " \
     "(to retrieve some metadata)." )
 
-#define ALBUM_ART_TEXT N_( "Album art policy" )
-#define ALBUM_ART_LONGTEXT N_( \
-    "Choose how album art will be downloaded." )
-
-static const int pi_albumart_values[] = { ALBUM_ART_WHEN_ASKED,
-                                          ALBUM_ART_WHEN_PLAYED,
-                                          ALBUM_ART_ALL };
-static const char *const ppsz_albumart_descriptions[] =
-    { N_("Manual download only"),
-      N_("When track starts playing"),
-      N_("As soon as track is added") };
+#define METADATA_NETWORK_TEXT N_( "Allow metadata network access" )
 
 #define SD_TEXT N_( "Services discovery modules")
 #define SD_LONGTEXT N_( \
@@ -2037,10 +2027,9 @@ vlc_module_begin ()
     add_bool( "auto-preparse", true, PREPARSE_TEXT,
               PREPARSE_LONGTEXT, false )
 
-    add_integer( "album-art", ALBUM_ART_WHEN_ASKED, ALBUM_ART_TEXT,
-                 ALBUM_ART_LONGTEXT, false )
-        change_integer_list( pi_albumart_values,
-                             ppsz_albumart_descriptions )
+    add_obsolete_integer( "album-art" )
+    add_bool( "metadata-network-access", false, METADATA_NETWORK_TEXT,
+                 METADATA_NETWORK_TEXT, false )
 
     set_subcategory( SUBCAT_PLAYLIST_SD )
     add_string( "services-discovery", "", SD_TEXT, SD_LONGTEXT, true )
