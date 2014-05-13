@@ -235,7 +235,7 @@ static int Open(vlc_object_t *p_this)
     vd->display = Display;
     vd->control = Control;
     vd->prepare = NULL;
-    vd->manage  = NULL;
+    vd->manage  = Manage;
 
     /* Fix initial state */
     vout_display_SendEventFullscreen(vd, false);

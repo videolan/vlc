@@ -20,9 +20,16 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <android/native_window.h>
 #include <jni.h>
 #include <android/native_window_jni.h>
+#include <android/input.h>
+
+#include <vlc_vout_display.h>
 
 typedef ANativeWindow* (*ptr_ANativeWindow_fromSurface)(JNIEnv*, jobject);
 typedef void (*ptr_ANativeWindow_release)(ANativeWindow*);
@@ -40,3 +47,4 @@ typedef struct
 /* Fill the structure passed as parameter and return a library handle
    that should be destroyed with dlclose. */
 void *LoadNativeWindowAPI(native_window_api_t *native);
+void Manage(vout_display_t *);
