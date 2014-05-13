@@ -32,9 +32,11 @@
 #include <vlc_input.h>
 #include <vlc_playlist.h>
 #include <vlc_meta.h>
+#include <vlc_art_finder.h>
 #include <vlc_url.h>
 #include <vlc_strings.h>
 #include <vlc_stream.h>
+#include <vlc_demux.h>
 
 #define LUA_COMPAT_MODULE
 #include <lua.h>        /* Low level lua C API */
@@ -49,9 +51,9 @@
 /*****************************************************************************
  * Module entry points
  *****************************************************************************/
-int ReadMeta( vlc_object_t * );
-int FetchMeta( vlc_object_t * );
-int FindArt( vlc_object_t * );
+int ReadMeta( demux_meta_t * );
+int FetchMeta( art_finder_t * );
+int FindArt( art_finder_t * );
 
 int Import_LuaPlaylist( vlc_object_t * );
 void Close_LuaPlaylist( vlc_object_t * );
@@ -126,8 +128,16 @@ int vlclua_push_ret( lua_State *, int i_error );
  * Will execute func on all scripts in luadirname, and stop if func returns
  * success.
  *****************************************************************************/
+typedef struct luabatch_context_t luabatch_context_t;
+struct luabatch_context_t
+{
+    input_item_t *p_item;
+    meta_fetcher_scope_t e_scope;
+    bool (*pf_validator)( const luabatch_context_t *, meta_fetcher_scope_t );
+};
+
 int vlclua_scripts_batch_execute( vlc_object_t *p_this, const char * luadirname,
-        int (*func)(vlc_object_t *, const char *, void *),
+        int (*func)(vlc_object_t *, const char *, const luabatch_context_t *),
         void * user_data );
 int vlclua_dir_list( const char *luadirname, char ***pppsz_dir_list );
 void vlclua_dir_list_free( char **ppsz_dir_list );

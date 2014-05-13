@@ -53,6 +53,7 @@ struct playlist_fetcher_t
     input_item_t    **pp_waiting;
 
     DECL_ARRAY(playlist_album_t) albums;
+    meta_fetcher_scope_t e_scope;
 };
 
 static void *Thread( void * );
@@ -73,6 +74,13 @@ playlist_fetcher_t *playlist_fetcher_New( vlc_object_t *parent )
     p_fetcher->b_live = false;
     p_fetcher->i_waiting = 0;
     p_fetcher->pp_waiting = NULL;
+
+    int i_policy = var_InheritInteger( parent, "album-art" );
+    if ( i_policy == ALBUM_ART_ALL )
+        p_fetcher->e_scope = FETCHER_SCOPE_ANY;
+    else
+        p_fetcher->e_scope = FETCHER_SCOPE_LOCAL;
+
     ARRAY_INIT( p_fetcher->albums );
 
     return p_fetcher;
@@ -224,6 +232,7 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
         module_t *p_module;
 
         p_finder->p_item = p_item;
+        p_finder->e_scope = p_fetcher->e_scope;
 
         p_module = module_need( p_finder, "art finder", NULL, false );
         if( p_module )
@@ -332,18 +341,19 @@ error:
  */
 static void FetchMeta( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
 {
-    demux_meta_t *p_demux_meta = vlc_custom_create(p_fetcher->object,
-                                         sizeof(*p_demux_meta), "demux meta" );
-    if( !p_demux_meta )
+    art_finder_t *p_finder =
+        vlc_custom_create( p_fetcher->object, sizeof( *p_finder ), "art finder" );
+    if ( !p_finder )
         return;
 
-    p_demux_meta->p_demux = NULL;
-    p_demux_meta->p_item = p_item;
+    p_finder->e_scope = p_fetcher->e_scope;
+    p_finder->p_item = p_item;
 
-    module_t *p_meta_fetcher = module_need( p_demux_meta, "meta fetcher", NULL, false );
-    if( p_meta_fetcher )
-        module_unneed( p_demux_meta, p_meta_fetcher );
-    vlc_object_release( p_demux_meta );
+    module_t *p_module = module_need( p_finder, "meta fetcher", NULL, false );
+    if( p_module )
+        module_unneed( p_finder, p_module );
+
+    vlc_object_release( p_finder );
 }
 
 static void *Thread( void *p_data )

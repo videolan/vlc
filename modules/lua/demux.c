@@ -126,9 +126,9 @@ static const luaL_Reg p_reg_parse[] =
  * the script pointed by psz_filename.
  *****************************************************************************/
 static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
-                            void * user_data )
+                            const luabatch_context_t *p_context )
 {
-    VLC_UNUSED(user_data);
+    VLC_UNUSED(p_context);
     demux_t * p_demux = (demux_t *)p_this;
 
     p_demux->p_sys->psz_filename = strdup(psz_filename);

@@ -21,10 +21,18 @@
 #ifndef VLC_ART_FINDER_H
 #define VLC_ART_FINDER_H 1
 
+typedef enum meta_fetcher_scope_t
+{
+    FETCHER_SCOPE_LOCAL,
+    FETCHER_SCOPE_NETWORK,
+    FETCHER_SCOPE_ANY
+} meta_fetcher_scope_t;
+
 typedef struct art_finder_t
 {
     VLC_COMMON_MEMBERS
     input_item_t *p_item;
+    meta_fetcher_scope_t e_scope;
 } art_finder_t;
 
 #endif

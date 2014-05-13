@@ -67,7 +67,7 @@ static const char caps[][20] = {
 
 static int ScanExtensions( extensions_manager_t *p_this );
 static int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
-                            void *dummy );
+                            const struct luabatch_context_t * );
 static int Control( extensions_manager_t *, int, va_list );
 static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
                     char ***pppsz_titles, uint16_t **ppi_ids );
@@ -275,7 +275,7 @@ static int vlclua_extension_require( lua_State *L )
  * @param dummy: unused
  **/
 int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
-                     void *dummy )
+                     const struct luabatch_context_t *dummy )
 {
     VLC_UNUSED(dummy);
     extensions_manager_t *p_mgr = ( extensions_manager_t* ) p_this;
