@@ -534,7 +534,7 @@ static int Open(vlc_object_t *obj)
         if (err != VDP_STATUS_OK)
         {
             msg_Err(vd, "%s capabilities query failure: %s",
-                    "video mixer surface width",
+                    "video mixer surface height",
                     vdp_get_error_string(sys->vdp, err));
             goto error;
         }
