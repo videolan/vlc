@@ -99,13 +99,13 @@ int KDM::Parse()
     msg_Dbg( this->p_demux, "parsing KDM..." );
 
     /* read first node and check if it is a KDM */
-    if( ! ( ( XML_READER_STARTELEM == XmlFile::ReadNextNode( this->p_xmlReader, s_node ) ) && ( s_node == s_root_node ) ) )
+    if( ! ( ( XML_READER_STARTELEM == XmlFile::ReadNextNode( this->p_demux, this->p_xmlReader, s_node ) ) && ( s_node == s_root_node ) ) )
     {
         msg_Err( this->p_demux, "not a valid XML KDM" );
         goto error;
     }
 
-    while( ( type = XmlFile::ReadNextNode( this->p_xmlReader, s_node ) ) > 0 )
+    while( ( type = XmlFile::ReadNextNode( this->p_demux, this->p_xmlReader, s_node ) ) > 0 )
         if( type == XML_READER_STARTELEM && s_node == "AuthenticatedPrivate" )
         {
             _p_key_list = new (nothrow) AESKeyList;
@@ -146,12 +146,12 @@ int KDM::ParsePrivate( const string _s_node, int _i_type )
         goto error;
 
     /* loop on EncryptedKey nodes */
-    while( ( i_type = XmlFile::ReadNextNode( this->p_xmlReader, s_node ) ) > 0 )
+    while( ( i_type = XmlFile::ReadNextNode( this->p_demux, this->p_xmlReader, s_node ) ) > 0 )
     {
         switch( i_type )
         {
             case XML_READER_STARTELEM:
-                if( s_node != "enc:EncryptedKey" )
+                if( s_node != "EncryptedKey" )
                     goto error;
                 p_key = new (nothrow) AESKey( this->p_demux );
                 if( unlikely( p_key == NULL ) )
@@ -192,17 +192,17 @@ int AESKey::Parse( xml_reader_t *p_xml_reader, string _s_node, int _i_type)
 
     if( _i_type != XML_READER_STARTELEM)
         goto error;
-    if( _s_node != "enc:EncryptedKey" )
+    if( _s_node != "EncryptedKey" )
         goto error;
 
-    while( ( i_type = XmlFile::ReadNextNode( p_xml_reader, s_node ) ) > 0 )
+    while( ( i_type = XmlFile::ReadNextNode( this->p_demux, p_xml_reader, s_node ) ) > 0 )
     {
         switch( i_type )
         {
             case XML_READER_STARTELEM:
-                if( s_node == "enc:CipherValue" )
+                if( s_node == "CipherValue" )
                 {
-                    if( XmlFile::ReadEndNode( p_xml_reader, s_node, i_type, s_value ) )
+                    if( XmlFile::ReadEndNode( this->p_demux, p_xml_reader, s_node, i_type, s_value ) )
                         goto error;
                     if( this->decryptRSA( s_value ) )
                         return VLC_EGENERIC;

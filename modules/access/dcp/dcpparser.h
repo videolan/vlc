@@ -60,15 +60,6 @@ typedef enum {
     TRACK_SUBTITLE
 } TrackType_t;
 
-typedef enum {
-    XML_UNKNOWN = 0,
-    XML_ASSETMAP,
-    XML_CPL,
-    XML_PKL,
-    XML_SUB,
-} XmlType_t;
-
-
 class Asset;
 class AssetList: public std::list<Asset *> {};
 class PKL;
@@ -122,17 +113,16 @@ public:
     p_demux(p_demux), s_path(s_path),
     p_stream(NULL),
     p_xml(NULL),
-    p_xmlReader(NULL),
-    type(XML_UNKNOWN) {}
+    p_xmlReader(NULL) {}
 
     virtual ~XmlFile( );
 
     virtual int Parse() = 0;
 
-    static int ReadNextNode( xml_reader_t *p_xmlReader, string& s_node );
-    static int ReadEndNode( xml_reader_t *p_xmlReader, string s_node, int i_type, string &s_value );
+    static int ReadNextNode( demux_t *p_demux, xml_reader_t *p_xmlReader, string& s_node );
+    static int ReadEndNode( demux_t *p_demux, xml_reader_t *p_xmlReader, string s_node, int i_type, string &s_value );
 
-    bool IsCPL() { return type == XML_CPL; }
+    int isCPL();
 protected:
     demux_t      *p_demux;
     string       s_path;
@@ -143,8 +133,6 @@ protected:
 
     int OpenXml();
     void CloseXml();
-
-    XmlType_t type;
 };
 
 class Chunk {
@@ -262,7 +250,9 @@ private:
 class CPL : public XmlFile
 {
 public:
-    CPL(demux_t *, string, AssetList*);
+    CPL(demux_t * p_demux, string s_path, AssetList *_asset_list)
+        : XmlFile(p_demux, s_path), asset_list( _asset_list)
+        {};
     ~CPL();
     virtual int Parse();
 
@@ -291,8 +281,9 @@ private :
 class PKL : public XmlFile
 {
 public:
-    PKL ( demux_t * p_demux, string s_path, AssetList *asset_list,
-         string s_dcp_path);
+    PKL( demux_t * p_demux, string s_path, AssetList *_asset_list, string s )
+        : XmlFile( p_demux, s_path ), asset_list( _asset_list ), s_dcp_path( s )
+        {};
     ~PKL();
     virtual int Parse();
 
