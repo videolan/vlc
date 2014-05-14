@@ -850,11 +850,11 @@ static bo_t *GetHvcCTag(mp4_stream_t *p_stream)
     size_t i_buffer = p_stream->fmt.i_extra;
 
     uint8_t general_configuration[12] = {0};
-    uint8_t i_numTemporalLayer;
+    uint8_t i_numTemporalLayer = 0;
     uint8_t i_chroma_idc = 1;
     uint8_t i_bit_depth_luma_minus8 = 0;
     uint8_t i_bit_depth_chroma_minus8 = 0;
-    bool b_temporalIdNested;
+    bool b_temporalIdNested = false;
 
     uint32_t cmp = 0xFFFFFFFF;
     while (i_buffer) {
