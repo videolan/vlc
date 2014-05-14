@@ -525,7 +525,7 @@ static void *Thread ( void *data )
     playlist_t *p_playlist = data;
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
-    playlist_Lock( p_playlist );
+    PL_LOCK;
     for( ;; )
     {
         while( p_sys->p_input != NULL )
@@ -550,7 +550,7 @@ static void *Thread ( void *data )
         LoopRequest( p_playlist, status );
     }
     p_sys->status.i_status = PLAYLIST_STOPPED;
-    playlist_Unlock( p_playlist );
+    PL_UNLOCK;
 
     input_resource_Terminate( p_sys->p_input_resource );
     return NULL;
