@@ -413,7 +413,7 @@ static int OpenDecoder(vlc_object_t *p_this)
                     for (int i = 0; i < profile_levels_len && !found; ++i) {
                         jobject profile_level = (*env)->GetObjectArrayElement(env, profile_levels, i);
 
-                        int omx_profile = (*env)->GetLongField(env, profile_level, p_sys->profile_field);
+                        int omx_profile = (*env)->GetIntField(env, profile_level, p_sys->profile_field);
                         size_t codec_profile = convert_omx_to_profile_idc(omx_profile);
                         if (codec_profile != fmt_profile)
                             continue;
