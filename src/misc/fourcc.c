@@ -1454,6 +1454,8 @@ static const staticentry_t p_list_audio[] = {
 
     B(VLC_CODEC_TAK, "TAK (Tom's lossless Audio Kompressor)"),
 
+    B(VLC_CODEC_SMACKAUDIO, "Smacker audio"),
+
     B(0, "")
 };
 static const staticentry_t p_list_spu[] = {

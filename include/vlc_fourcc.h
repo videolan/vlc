@@ -408,6 +408,7 @@
 #define VLC_CODEC_METASOUND                  VLC_FOURCC('m','s',0x00,0x75)
 #define VLC_CODEC_ON2AVC                     VLC_FOURCC('m','s',0x05,0x00)
 #define VLC_CODEC_TAK                        VLC_FOURCC('t','a','k',' ')
+#define VLC_CODEC_SMACKAUDIO                 VLC_FOURCC('S','M','K','A')
 
 /* Subtitle */
 #define VLC_CODEC_SPU       VLC_FOURCC('s','p','u',' ')
