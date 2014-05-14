@@ -32,15 +32,13 @@
 #include <assert.h>
 #include <sys/stat.h>
 
-#include <vlc_common.h>
+#include "vlc.h"
+
 #include <vlc_plugin.h>
-#include <vlc_meta.h>
 #include <vlc_charset.h>
 #include <vlc_fs.h>
 #include <vlc_services_discovery.h>
 #include <vlc_stream.h>
-
-#include "vlc.h"
 
 /*****************************************************************************
  * Module descriptor

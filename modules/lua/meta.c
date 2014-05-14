@@ -33,15 +33,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_input.h>
-#include <vlc_meta.h>
-#include <vlc_demux.h>
-#include <vlc_meta_fetcher.h>
-#include <vlc_url.h>
-#include <vlc_strings.h>
-#include <vlc_stream.h>
-
 #include "vlc.h"
 #include "libs.h"
 
