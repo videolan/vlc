@@ -385,6 +385,23 @@ static void *Thread( void *p_data )
         if( !p_item )
             break;
 
+        meta_fetcher_scope_t e_prev_scope = p_fetcher->e_scope;
+
+        /* scope override */
+        switch ( i_options ) {
+        case META_REQUEST_OPTION_ANY:
+            p_fetcher->e_scope = FETCHER_SCOPE_ANY;
+            break;
+        case META_REQUEST_OPTION_LOCAL:
+            p_fetcher->e_scope = FETCHER_SCOPE_LOCAL;
+            break;
+        case META_REQUEST_OPTION_NETWORK:
+            p_fetcher->e_scope = FETCHER_SCOPE_NETWORK;
+            break;
+        case META_REQUEST_OPTION_NONE:
+        default:
+            break;
+        }
         /* Triggers "meta fetcher", eventually fetch meta on the network.
          * They are identical to "meta reader" expect that may actually
          * takes time. That's why they are running here.
@@ -396,6 +413,7 @@ static void *Thread( void *p_data )
         if( i_ret == 1 )
             i_ret = DownloadArt( p_fetcher, p_item );
 
+        p_fetcher->e_scope = e_prev_scope;
         /* */
         char *psz_name = input_item_GetName( p_item );
         if( !i_ret ) /* Art is now in cache */

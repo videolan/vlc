@@ -705,7 +705,7 @@ void CoverArtLabel::showArtUpdate( input_item_t *_p_item )
 
 void CoverArtLabel::askForUpdate()
 {
-    THEMIM->getIM()->requestArtUpdate( p_item );
+    THEMIM->getIM()->requestArtUpdate( p_item, true );
 }
 
 void CoverArtLabel::setArtFromFile()

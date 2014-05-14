@@ -636,7 +636,7 @@ void InputManager::UpdateCaching()
     }
 }
 
-void InputManager::requestArtUpdate( input_item_t *p_item )
+void InputManager::requestArtUpdate( input_item_t *p_item, bool b_forced )
 {
     bool b_current_item = false;
     if ( !p_item && hasInput() )
@@ -648,13 +648,15 @@ void InputManager::requestArtUpdate( input_item_t *p_item )
     if ( p_item )
     {
         /* check if it has already been enqueued */
-        if ( p_item->p_meta )
+        if ( p_item->p_meta && !b_forced )
         {
             int status = vlc_meta_GetStatus( p_item->p_meta );
             if ( status & ( ITEM_ART_NOTFOUND|ITEM_ART_FETCHED ) )
                 return;
         }
-        libvlc_ArtRequest( p_intf->p_libvlc, p_item, META_REQUEST_OPTION_NONE );
+        libvlc_ArtRequest( p_intf->p_libvlc, p_item,
+                           (b_forced) ? META_REQUEST_OPTION_ANY
+                                      : META_REQUEST_OPTION_NONE );
         /* No input will signal the cover art to update,
              * let's do it ourself */
         if ( b_current_item )

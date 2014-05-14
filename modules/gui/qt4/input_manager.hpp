@@ -141,7 +141,7 @@ public:
     bool hasAudio();
     bool hasVideo() { return hasInput() && b_video; }
     bool hasVisualisation();
-    void requestArtUpdate( input_item_t *p_item );
+    void requestArtUpdate( input_item_t *p_item, bool b_forced );
     void setArt( input_item_t *p_item, QString fileUrl );
 
     QString getName() { return oldName; }

@@ -206,7 +206,7 @@ void VLCModel::ensureArtRequested( const QModelIndex &index )
         {
             child = index.child( row, COLUMN_COVER );
             if ( child.isValid() && child.data().toString().isEmpty() )
-                THEMIM->getIM()->requestArtUpdate( getInputItem( child ) );
+                THEMIM->getIM()->requestArtUpdate( getInputItem( child ), false );
         }
     }
 }
