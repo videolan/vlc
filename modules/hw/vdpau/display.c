@@ -171,7 +171,11 @@ static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
 {
     vout_display_sys_t *sys = vd->sys;
     VdpBitmapSurface surface;
-    VdpRGBAFormat fmt = VDP_RGBA_FORMAT_R8G8B8A8; /* TODO? YUVA */
+#ifdef WORDS_BIGENDIAN
+    VdpRGBAFormat fmt = VDP_RGBA_FORMAT_B8G8R8A8;
+#else
+    VdpRGBAFormat fmt = VDP_RGBA_FORMAT_R8G8B8A8;
+#endif
     VdpStatus err;
 
     /* Create GPU surface for sub-picture */
@@ -612,7 +616,11 @@ static int Open(vlc_object_t *obj)
     /* Check bitmap capabilities (for SPU) */
     const vlc_fourcc_t *spu_chromas = NULL;
     {
+#ifdef WORDS_BIGENDIAN
+        static const vlc_fourcc_t subpicture_chromas[] = { VLC_CODEC_ARGB, 0 };
+#else
         static const vlc_fourcc_t subpicture_chromas[] = { VLC_CODEC_RGBA, 0 };
+#endif
         uint32_t w, h;
         VdpBool ok;
 
