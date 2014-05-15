@@ -316,10 +316,7 @@ static int EqualizerCallback (vlc_object_t *obj, const char *var,
 {
     const char *val = newval.psz_string;
     if (!strcmp("equalizer", var) && *val)
-    {
-        var_Create (obj, "equalizer-preset", VLC_VAR_STRING);
         var_SetString (obj, "equalizer-preset", val);
-    }
 
     if (aout_ChangeFilterString (obj, obj, "audio-filter", "equalizer", *val))
         aout_InputRequestRestart ((audio_output_t *)obj); /* <- That sucks! */
