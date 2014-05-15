@@ -1508,26 +1508,42 @@ LIBVLC_API void libvlc_audio_output_device_list_release(
                                         libvlc_audio_output_device_t *p_list );
 
 /**
- * Configures an explicit audio output device for a given audio output plugin.
- * A list of possible devices can be obtained with
+ * Configures an explicit audio output device.
+ *
+ * If the module paramater is NULL, audio output will be moved to the device
+ * specified by the device identifier string immediately. This is the
+ * recommended usage.
+ *
+ * However passing NULL is supported in LibVLC version 2.2.0 and later only;
+ * in earlier versions, this function would have no effects when the module
+ * parameter was NULL.
+ *
+ * If the module parameter is not NULL, the device parameter of the
+ * corresponding audio output, if it exists, will be set to the specified
+ * string. Note that some audio output modules do not have such a parameter
+ * (notably MMDevice and PulseAudio).
+ *
+ * A list of adequate potential device strings can be obtained with
  * libvlc_audio_output_device_list_get().
  *
  * \note This function does not select the specified audio output plugin.
  * libvlc_audio_output_set() is used for that purpose.
  *
  * \warning The syntax for the device parameter depends on the audio output.
- * This is not portable. Only use this function if you know what you are doing.
- * Some audio outputs do not support this function (e.g. PulseAudio, WASAPI).
- * Some audio outputs require further parameters (e.g. ALSA: channels map).
  *
- * \param p_mi media player
- * \param psz_audio_output - name of audio output, \see libvlc_audio_output_t
- * \param psz_device_id device
- * \return Nothing. Errors are ignored.
+ * Some audio output modules require further parameters (e.g. a channels map
+ * in the case of ALSA).
+ *
+ * \param mp media player
+ * \param module If NULL, current audio output module.
+ *               if non-NULL, name of audio output module
+                 (\see libvlc_audio_output_t)
+ * \param device_id device identifier string
+ * \return Nothing. Errors are ignored (this is a design bug).
  */
-LIBVLC_API void libvlc_audio_output_device_set( libvlc_media_player_t *p_mi,
-                                                const char *psz_audio_output,
-                                                const char *psz_device_id );
+LIBVLC_API void libvlc_audio_output_device_set( libvlc_media_player_t *mp,
+                                                const char *module,
+                                                const char *device_id );
 
 /**
  * Stub for backward compatibility.
