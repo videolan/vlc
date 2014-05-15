@@ -41,7 +41,6 @@
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
 
-#include <vlc_playlist.h>
 #include <vlc_filter.h>
 #include <vlc_atomic.h>
 #include <vlc_charset.h>
