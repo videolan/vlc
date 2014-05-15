@@ -140,6 +140,42 @@ int libvlc_audio_output_set( libvlc_media_player_t *mp, const char *psz_name )
 }
 
 libvlc_audio_output_device_t *
+libvlc_audio_output_device_enum( libvlc_media_player_t *mp )
+{
+    audio_output_t *aout = GetAOut( mp );
+    if( aout == NULL )
+        return NULL;
+
+    libvlc_audio_output_device_t *list = NULL, **pp = &list;
+    char **values, **texts;
+
+    int n = aout_DevicesList( aout, &values, &texts );
+    if( n < 0 )
+        goto err;
+
+    for (int i = 0; i < n; i++)
+    {
+        libvlc_audio_output_device_t *item = malloc( sizeof(*item) );
+        if( unlikely(item == NULL) )
+        {
+            free( texts[i] );
+            free( values[i] );
+            continue;
+        }
+
+        *pp = item;
+        pp = &item->p_next;
+        item->psz_device = values[i];
+        item->psz_description = texts[i];
+    }
+
+    free( texts );
+    free( values );
+err:
+    return list;
+}
+
+libvlc_audio_output_device_t *
 libvlc_audio_output_device_list_get( libvlc_instance_t *p_instance,
                                      const char *aout )
 {

@@ -1474,6 +1474,27 @@ LIBVLC_DEPRECATED LIBVLC_API
 char *libvlc_audio_output_device_id( libvlc_instance_t *, const char *, int );
 
 /**
+ * Gets a list of potential audio output devices,
+ * \see libvlc_audio_output_device_set().
+ *
+ * \note Not all audio outputs support enumerating devices.
+ * The audio output may be functional even if the list is empty (NULL).
+ *
+ * \note The list may not be exhaustive.
+ *
+ * \warning Some audio output devices in the list might not actually work in
+ * some circumstances. By default, it is recommended to not specify any
+ * explicit audio device.
+ *
+ * \param mp media player
+ * \return A NULL-terminated linked list of potential audio output devices.
+ * It must be freed it with libvlc_audio_output_device_list_release()
+ * \version LibVLC 2.2.0 or later.
+ */
+LIBVLC_API libvlc_audio_output_device_t *
+libvlc_audio_output_device_enum( libvlc_media_player_t *mp );
+
+/**
  * Gets a list of audio output devices for a given audio output module,
  * \see libvlc_audio_output_device_set().
  *
@@ -1513,6 +1534,9 @@ LIBVLC_API void libvlc_audio_output_device_list_release(
  * If the module paramater is NULL, audio output will be moved to the device
  * specified by the device identifier string immediately. This is the
  * recommended usage.
+ *
+ * A list of adequate potential device strings can be obtained with
+ * libvlc_audio_output_device_enum().
  *
  * However passing NULL is supported in LibVLC version 2.2.0 and later only;
  * in earlier versions, this function would have no effects when the module
