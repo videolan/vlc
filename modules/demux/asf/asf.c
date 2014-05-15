@@ -242,9 +242,9 @@ static int Demux( demux_t *p_demux )
     if( p_sys->i_time >= 0 )
     {
 #ifdef ASF_DEBUG
-        msg_Dbg( p_demux, "Setting PCR to %"PRId64, p_sys->i_time );
+        msg_Dbg( p_demux, "Demux Loop Setting PCR to %"PRId64, VLC_TS_0 + p_sys->i_time );
 #endif
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time+1 );
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_time );
     }
 
     return 1;
