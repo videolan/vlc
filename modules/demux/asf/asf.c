@@ -85,7 +85,7 @@ typedef struct
     asf_object_stream_properties_t *p_sp;
     asf_object_extended_stream_properties_t *p_esp;
 
-    mtime_t i_time;
+    mtime_t          i_time; /* track time*/
 
     block_t         *p_frame; /* use to gather complete frame */
 } asf_track_t;
@@ -514,10 +514,22 @@ static mtime_t GetMoviePTS( demux_sys_t *p_sys )
     {
         const asf_track_t *tk = p_sys->track[i];
 
-        if( tk && tk->p_es && tk->i_time > 0 && tk->b_selected )
+        if( tk && tk->p_es && tk->b_selected )
         {
-            if( i_time < 0 ) i_time = tk->i_time;
-            else i_time = __MIN( i_time, tk->i_time );
+            /* Skip discrete tracks */
+            if ( tk->i_cat != VIDEO_ES && tk->i_cat != AUDIO_ES )
+                continue;
+
+            /* We need to have all ES seen once, as they might have lower DTS */
+            if ( tk->i_time + (int64_t)p_sys->p_fp->i_preroll * 1000 < 0 )
+            {
+                /* early fail */
+                return -1;
+            }
+            else if ( i_time == -1 || i_time > tk->i_time )
+            {
+                i_time = tk->i_time;
+            }
         }
     }
 
