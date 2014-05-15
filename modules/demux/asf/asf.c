@@ -111,6 +111,8 @@ struct demux_sys_t
     uint8_t             i_access_selected_track[ES_CATEGORY_COUNT]; /* mms, depends on access algorithm */
     unsigned int        i_wait_keyframe;
 
+    mtime_t             i_preroll_start;
+
     vlc_meta_t          *meta;
 };
 
@@ -331,9 +333,12 @@ static int SeekIndex( demux_t *p_demux, mtime_t i_date, float f_pos )
     if( i_date < 0 )
         i_date = p_sys->i_length * f_pos;
 
+    p_sys->i_preroll_start = i_date - (int64_t) p_sys->p_fp->i_preroll;
+    if ( p_sys->i_preroll_start < 0 ) p_sys->i_preroll_start = 0;
+
     p_index = ASF_FindObject( p_sys->p_root, &asf_object_simple_index_guid, 0 );
 
-    uint64_t i_entry = i_date * 10 / p_index->i_index_entry_time_interval;
+    uint64_t i_entry = p_sys->i_preroll_start * 10 / p_index->i_index_entry_time_interval;
     if( i_entry >= p_index->i_index_entry_count )
     {
         msg_Warn( p_demux, "Incomplete index" );
@@ -754,7 +759,6 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     uint8_t i_pts_delta = 0;
     uint32_t i_payload_data_length = 0;
     uint32_t i_temp_payload_length = 0;
-    bool b_preroll_done = false;
     p_sys->p_fp->i_preroll = __MIN( p_sys->p_fp->i_preroll, INT64_MAX );
 
     /* Non compressed */
@@ -766,8 +770,6 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
         /* Parsing extensions, See 7.3.1 */
         ParsePayloadExtensions( p_demux, p_sys->track[i_stream_number], pkt,
                                 i_replicated_data_length, &b_packet_keyframe );
-
-        b_preroll_done = ( i_base_pts > (int64_t)p_sys->p_fp->i_preroll );
         i_base_pts -= p_sys->p_fp->i_preroll;
         pkt->i_skip += i_replicated_data_length;
 
@@ -778,7 +780,7 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     {
         /* optional DWORDS missing */
         i_base_pts = (mtime_t)pkt->send_time;
-        b_preroll_done = ( i_base_pts > (int64_t)p_sys->p_fp->i_preroll );
+        i_base_pts -= p_sys->p_fp->i_preroll;
     }
     /* Compressed payload */
     else if( i_replicated_data_length == 1 )
@@ -787,7 +789,6 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
         /* Next byte is Presentation Time Delta */
         i_pts_delta = pkt->p_peek[pkt->i_skip];
         i_base_pts = (mtime_t)i_media_object_offset;
-        b_preroll_done = ( i_base_pts > (int64_t)p_sys->p_fp->i_preroll );
         i_base_pts -= p_sys->p_fp->i_preroll;
         pkt->i_skip++;
         i_media_object_offset = 0;
@@ -799,6 +800,8 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
         i_payload_data_length = pkt->length - pkt->padding_length - pkt->i_skip;
         goto skip;
     }
+
+    bool b_preroll_done = ( i_base_pts > p_sys->i_preroll_start/1000 );
 
     if (i_base_pts < 0) i_base_pts = 0; // FIXME?
     i_base_pts *= 1000;
