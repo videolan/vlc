@@ -1417,7 +1417,7 @@ typedef enum libvlc_audio_output_channel_t {
 
 
 /**
- * Gets the list of available audio outputs
+ * Gets the list of available audio output modules.
  *
  * \param p_instance libvlc instance
  * \return list of available audio outputs. It must be freed it with
@@ -1428,7 +1428,7 @@ LIBVLC_API libvlc_audio_output_t *
 libvlc_audio_output_list_get( libvlc_instance_t *p_instance );
 
 /**
- * Frees the list of available audio outputs
+ * Frees the list of available audio output modules.
  *
  * \param p_list list with audio outputs for release
  */
@@ -1436,7 +1436,7 @@ LIBVLC_API
 void libvlc_audio_output_list_release( libvlc_audio_output_t *p_list );
 
 /**
- * Sets the audio output.
+ * Selects an audio output module.
  * \note Any change will take be effect only after playback is stopped and
  * restarted. Audio output cannot be changed while playing.
  *
@@ -1474,7 +1474,7 @@ LIBVLC_DEPRECATED LIBVLC_API
 char *libvlc_audio_output_device_id( libvlc_instance_t *, const char *, int );
 
 /**
- * Gets a list of audio output devices for a given audio output.
+ * Gets a list of audio output devices for a given audio output module,
  * \see libvlc_audio_output_device_set().
  *
  * \note Not all audio outputs support this. In particular, an empty (NULL)
