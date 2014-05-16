@@ -801,7 +801,7 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
         goto skip;
     }
 
-    bool b_preroll_done = ( pkt->send_time > p_sys->i_preroll_start/1000 );
+    bool b_preroll_done = ( pkt->send_time > (p_sys->i_preroll_start/1000 + p_sys->p_fp->i_preroll) );
 
     if (i_base_pts < 0) i_base_pts = 0; // FIXME?
     i_base_pts *= 1000;
