@@ -565,7 +565,7 @@ static inline int input_AddSubtitleOSD( input_thread_t *p_input, const char *psz
     vout_thread_t *p_vout = input_GetVout( p_input );
     if( p_vout )
     {
-        vout_OSDMessage(p_vout, SPU_DEFAULT_CHANNEL, _("Subtitle track added") );
+        vout_OSDMessage(p_vout, SPU_DEFAULT_CHANNEL, "%s", _("Subtitle track added") );
         vlc_object_release( (vlc_object_t *)p_vout );
     }
     return i_result;
