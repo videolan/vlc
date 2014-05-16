@@ -73,6 +73,7 @@
 - (void)volumeDown;
 - (void)toggleMute;
 
+- (void)addSubtitlesToCurrentInput:(NSArray *)paths;
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
 
 - (void)toggleFullscreen;

@@ -546,6 +546,25 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     return f_maxVolume;
 }
 
+- (void)addSubtitlesToCurrentInput:(NSArray *)paths
+{
+    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    if (!p_input)
+        return;
+
+    NSUInteger count = [paths count];
+
+    for (int i = 0; i < count ; i++) {
+        const char *path = [[[paths objectAtIndex:i] path] UTF8String];
+        msg_Dbg(VLCIntf, "loading subs from %s", path);
+
+        int i_result = input_AddSubtitleOSD(p_input, path, true, true);
+        if (i_result != VLC_SUCCESS)
+            msg_Warn(VLCIntf, "unable to load subtitles from '%s'", path);
+    }
+    vlc_object_release(p_input);
+}
+
 #pragma mark -
 #pragma mark drag and drop support for VLCVoutView, VLCDragDropView and VLCThreePartDropView
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender

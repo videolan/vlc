@@ -24,6 +24,7 @@
 #import "MainMenu.h"
 #import <vlc_common.h>
 #import <vlc_playlist.h>
+#import <vlc_input.h>
 
 #import "intf.h"
 #import "open.h"
@@ -970,24 +971,12 @@ static VLCMainMenu *_o_sharedInstance = nil;
     o_url = [o_url URLByDeletingLastPathComponent];
     [openPanel setDirectoryURL: o_url];
     free(path);
+    vlc_object_release(p_input);
 
     i_returnValue = [openPanel runModal];
 
-    if (i_returnValue == NSOKButton) {
-        NSUInteger c = 0;
-        if (!p_input)
-            return;
-
-        c = [[openPanel URLs] count];
-
-        for (int i = 0; i < c ; i++) {
-            msg_Dbg(VLCIntf, "loading subs from %s", [[[[openPanel URLs] objectAtIndex:i] path] UTF8String]);
-            if (input_AddSubtitle(p_input, [[[[openPanel URLs] objectAtIndex:i] path] UTF8String], TRUE))
-                msg_Warn(VLCIntf, "unable to load subtitles from '%s'",
-                         [[[[openPanel URLs] objectAtIndex:i] path] UTF8String]);
-        }
-    }
-    vlc_object_release(p_input);
+    if (i_returnValue == NSOKButton)
+        [[VLCCoreInteraction sharedInstance] addSubtitlesToCurrentInput:[openPanel URLs]];
 }
 
 - (IBAction)switchSubtitleOption:(id)sender
