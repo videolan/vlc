@@ -445,7 +445,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_sys->i_seek_track = 0;
             WaitKeyframe( p_demux );
         }
-        assert( i_ret == VLC_SUCCESS );
         return i_ret;
     }
 
