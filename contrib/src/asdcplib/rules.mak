@@ -16,9 +16,11 @@ $(TARBALLS)/asdcplib-$(ASDCPLIB_VERSION).tar.gz:
 
 asdcplib: asdcplib-$(ASDCPLIB_VERSION).tar.gz .sum-asdcplib
 	$(UNPACK)
+	$(APPLY) $(SRC)/asdcplib/win32-cross-compilation.patch
 	$(MOVE)
 
 .asdcplib: asdcplib
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+	$(RECONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-freedist
 	cd $< && $(MAKE) install
 	touch $@

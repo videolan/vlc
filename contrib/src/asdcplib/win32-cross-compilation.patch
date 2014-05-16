@@ -1,0 +1,12 @@
+--- asdcplib/configure.ac	2014-01-06 20:08:54.000000000 +0100
++++ asdcplib/configure.ac.new	2014-05-16 13:05:45.689691678 +0200
+@@ -49,6 +49,9 @@
+ AC_CANONICAL_HOST
+ case $host_os in
+        openbsd*) openbsd_host=true ;;
++       cygwin* | mingw32*)
++            openbsd_host=false
++            CPPFLAGS="${CPPFLAGS} -DKM_WIN32" ;;
+        *)        openbsd_host=false ;;
+ esac
+ AM_CONDITIONAL([OPENBSD_HOST], [test x$openbsd_host = xtrue])
