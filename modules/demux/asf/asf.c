@@ -239,6 +239,7 @@ static int Demux( demux_t *p_demux )
     }
 
     /* Set the PCR */
+    /* WARN: Don't move it before the end of the whole chunk */
     p_sys->i_time = GetMoviePTS( p_sys );
     if( p_sys->i_time >= 0 )
     {
@@ -371,7 +372,7 @@ static void SeekPrepare( demux_t *p_demux )
         if( !tk )
             continue;
 
-        tk->i_time = VLC_TS_INVALID;
+        tk->i_time = -1;
         if( tk->p_frame )
             block_ChainRelease( tk->p_frame );
         tk->p_frame = NULL;
@@ -532,7 +533,7 @@ static mtime_t GetMoviePTS( demux_sys_t *p_sys )
                 /* early fail */
                 return -1;
             }
-            else if ( i_time == -1 || i_time > tk->i_time )
+            else if ( tk->i_time > -1 && ( i_time == -1 || i_time > tk->i_time ) )
             {
                 i_time = tk->i_time;
             }
@@ -600,7 +601,6 @@ static void SendPacket(demux_t *p_demux, asf_track_t *tk)
 #ifdef ASF_DEBUG
     msg_Dbg( p_demux, "    sending packet dts %"PRId64" pts %"PRId64" pcr %"PRId64, p_gather->i_dts, p_gather->i_pts, p_sys->i_time );
 #endif
-
     es_out_Send( p_demux->out, tk->p_es, p_gather );
     tk->p_frame = NULL;
 }
@@ -860,11 +860,18 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     if( !tk->p_es )
         goto skip;
 
-    if ( b_preroll_done )
+    bool b_hugedelay = ( p_sys->p_fp->i_preroll * 1000 > CLOCK_FREQ * 3 );
+
+    if ( b_preroll_done || b_hugedelay )
     {
-        tk->i_time = INT64_C(1000) * pkt->send_time;
-        tk->i_time -= p_sys->p_fp->i_preroll * 1000;
-        tk->i_time -= tk->p_sp->i_time_offset * 10;
+        if ( !b_hugedelay )
+        {
+            tk->i_time = INT64_C(1000) * pkt->send_time;
+            tk->i_time -= p_sys->p_fp->i_preroll * 1000;
+            tk->i_time -= tk->p_sp->i_time_offset * 10;
+        }
+        else
+            tk->i_time = i_base_pts;
     }
 
     uint32_t i_subpayload_count = 0;
@@ -884,6 +891,9 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
         mtime_t i_payload_dts = INT64_C(1000) * pkt->send_time;
         i_payload_dts -= p_sys->p_fp->i_preroll * 1000;
         i_payload_dts -= tk->p_sp->i_time_offset * 10;
+
+        if ( b_hugedelay )
+            i_payload_dts = i_base_pts;
 
         if ( i_sub_payload_data_length &&
              DemuxSubPayload(p_demux, tk, i_sub_payload_data_length,
