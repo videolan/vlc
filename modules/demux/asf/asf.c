@@ -377,7 +377,7 @@ static void SeekPrepare( demux_t *p_demux )
         tk->p_frame = NULL;
     }
 
-    es_out_Control( p_demux->out, ES_OUT_RESET_PCR, VLC_TS_INVALID );
+    es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 }
 
 /*****************************************************************************
