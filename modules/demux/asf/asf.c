@@ -73,6 +73,7 @@ static int Control( demux_t *, int i_query, va_list args );
 static void FlushRemainingPackets( demux_t *p_demux );
 
 #define MAX_ASF_TRACKS 128
+#define ASF_PREROLL_FROM_CURRENT -1
 
 typedef struct
 {
@@ -363,6 +364,7 @@ static void SeekPrepare( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     p_sys->i_time = VLC_TS_INVALID;
+    p_sys->i_preroll_start = ASF_PREROLL_FROM_CURRENT;
     for( int i = 0; i < MAX_ASF_TRACKS ; i++ )
     {
         asf_track_t *tk = p_sys->track[i];
@@ -760,6 +762,10 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
     uint32_t i_payload_data_length = 0;
     uint32_t i_temp_payload_length = 0;
     p_sys->p_fp->i_preroll = __MIN( p_sys->p_fp->i_preroll, INT64_MAX );
+
+    /* First packet, in case we do not have index to guess preroll start time */
+    if ( p_sys->i_preroll_start == ASF_PREROLL_FROM_CURRENT )
+        p_sys->i_preroll_start = pkt->send_time * 1000;
 
     /* Non compressed */
     if( i_replicated_data_length > 7 ) // should be at least 8 bytes
