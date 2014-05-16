@@ -28,6 +28,7 @@
 # include "config.h"
 #endif
 
+#include <math.h>
 #include <assert.h>
 
 #include <vlc_common.h>
@@ -96,7 +97,9 @@ static void S24L32Decode( void *, const uint8_t *, unsigned );
 static void U32BDecode( void *, const uint8_t *, unsigned );
 static void U32LDecode( void *, const uint8_t *, unsigned );
 static void S32IDecode( void *, const uint8_t *, unsigned );
+static void F32NDecode( void *, const uint8_t *, unsigned );
 static void F32IDecode( void *, const uint8_t *, unsigned );
+static void F64NDecode( void *, const uint8_t *, unsigned );
 static void F64IDecode( void *, const uint8_t *, unsigned );
 static void DAT12Decode( void *, const uint8_t *, unsigned );
 
@@ -139,7 +142,10 @@ static int DecoderOpen( vlc_object_t *p_this )
 #endif
         format = VLC_CODEC_FL64;
         decode = F64IDecode;
+        bits = 64;
+        break;
     case VLC_CODEC_FL64:
+        decode = F64NDecode;
         bits = 64;
         break;
 #ifdef WORDS_BIGENDIAN
@@ -149,7 +155,10 @@ static int DecoderOpen( vlc_object_t *p_this )
 #endif
         format = VLC_CODEC_FL32;
         decode = F32IDecode;
+        bits = 32;
+        break;
     case VLC_CODEC_FL32:
+        decode = F32NDecode;
         bits = 32;
         break;
     case VLC_CODEC_U32B:
@@ -506,6 +515,20 @@ static void S32IDecode( void *outp, const uint8_t *in, unsigned samples )
     }
 }
 
+static void F32NDecode( void *outp, const uint8_t *in, unsigned samples )
+{
+    float *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+        memcpy( out, in, sizeof(float) );
+        if( unlikely(!isfinite(*out)) )
+            *out = 0.f;
+        out++;
+        in += sizeof(float);
+    }
+}
+
 static void F32IDecode( void *outp, const uint8_t *in, unsigned samples )
 {
     float *out = outp;
@@ -519,8 +542,24 @@ static void F32IDecode( void *outp, const uint8_t *in, unsigned samples )
 #else
         s.u = GetDWBE( in );
 #endif
+        if( unlikely(!isfinite(s.f)) )
+            s.f = 0.f;
         *(out++) = s.f;
         in += 4;
+    }
+}
+
+static void F64NDecode( void *outp, const uint8_t *in, unsigned samples )
+{
+    double *out = outp;
+
+    for( size_t i = 0; i < samples; i++ )
+    {
+        memcpy( out, in, sizeof(double) );
+        if( unlikely(!isfinite( *out )) )
+            *out = 0.;
+        out++;
+        in += sizeof(double);
     }
 }
 
@@ -537,6 +576,8 @@ static void F64IDecode( void *outp, const uint8_t *in, unsigned samples )
 #else
         s.u = GetQWBE( in );
 #endif
+        if( unlikely(!isfinite( s.d )) )
+            s.d = 0.;
         *(out++) = s.d;
         in += 8;
     }

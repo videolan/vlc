@@ -24,6 +24,7 @@ libaes3_plugin_la_SOURCES = codec/aes3.c
 codec_LTLIBRARIES += libaes3_plugin.la
 
 libaraw_plugin_la_SOURCES = codec/araw.c
+libaraw_plugin_la_LIBADD = $(LIBM)
 codec_LTLIBRARIES += libaraw_plugin.la
 
 libdts_plugin_la_SOURCES = codec/dts.c codec/dts_header.c codec/dts_header.h
