@@ -1,7 +1,7 @@
 /*****************************************************************************
  * StringUtility.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2012 VLC authors and VideoLAN
+ * Copyright (C) 2002-2014 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -55,24 +55,23 @@ static VLCStringUtility *_o_sharedInstance = nil;
 
 - (NSString *)localizedString:(const char *)psz
 {
-    NSString * o_str = nil;
+    NSString * stringObject = nil;
 
     if (psz != NULL) {
-        o_str = [NSString stringWithCString: _(psz) encoding:NSUTF8StringEncoding];
+        stringObject = [NSString stringWithCString: _(psz) encoding:NSUTF8StringEncoding];
 
-        if (o_str == NULL) {
+        if (stringObject == NULL) {
             msg_Err(VLCIntf, "could not translate: %s", psz);
-            return(@"");
+            return @"";
         }
-    } else {
-        return(@"");
-    }
+    } else
+        return @"";
 
-    return(o_str);
+    return stringObject;
 }
 
 /* i_width is in pixels */
-- (NSString *)wrapString: (NSString *)o_in_string toWidth: (int) i_width
+- (NSString *)wrapString:(NSString *)o_in_string toWidth:(int)i_width
 {
     NSMutableString *o_wrapped;
     NSString *o_out_string;
@@ -206,6 +205,12 @@ unsigned int CocoaKeyToVLC(unichar i_key)
         }
     }
     return (unsigned int)i_key;
+}
+
+/* takes a good old const c string and converts it to NSString without UTF8 loss */
+
+NSString *toNSStr(const char *str) {
+    return str != NULL ? [NSString stringWithUTF8String:str] : @"";
 }
 
 /*

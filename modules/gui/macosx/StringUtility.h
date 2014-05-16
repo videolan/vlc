@@ -1,7 +1,7 @@
 /*****************************************************************************
  * StringUtility.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2012 VLC authors and VideoLAN
+ * Copyright (C) 2002-2014 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -35,10 +35,7 @@
 #define B64DecNSStr(s) [[VLCStringUtility sharedInstance] b64Decode: s]
 #define B64EncAndFree(s) [[VLCStringUtility sharedInstance] b64EncodeAndFree: s]
 
-inline NSString *toNSStr(const char *str) {
-    return str != NULL ? [NSString stringWithUTF8String:str] : @"";
-}
-
+NSString *toNSStr(const char *str);
 unsigned int CocoaKeyToVLC(unichar i_key);
 
 @interface VLCStringUtility : NSObject
