@@ -592,9 +592,9 @@ static void SendPacket(demux_t *p_demux, asf_track_t *tk)
     if( p_sys->i_time < VLC_TS_0 && tk->i_time > VLC_TS_INVALID )
     {
         p_sys->i_time = tk->i_time;
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time );
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_time );
 #ifdef ASF_DEBUG
-        msg_Dbg( p_demux, "    setting PCR to %"PRId64, p_sys->i_time );
+        msg_Dbg( p_demux, "    setting PCR to %"PRId64, VLC_TS_0 + p_sys->i_time );
 #endif
     }
 
