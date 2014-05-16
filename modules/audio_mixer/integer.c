@@ -44,21 +44,19 @@ static void FilterS32N (audio_volume_t *vol, block_t *block, float volume)
 {
     int32_t *p = (int32_t *)block->p_buffer;
 
-    int32_t mult = lroundf (volume * 0x1.p24f);
+    int_fast32_t mult = lroundf (volume * 0x1.p24f);
     if (mult == (1 << 24))
         return;
 
     for (size_t n = block->i_buffer / sizeof (*p); n > 0; n--)
     {
-        int64_t s = *p * (int64_t)mult;
-        if (s >= ((int64_t)INT32_MAX << INT64_C(24)))
-            *p = INT32_MAX;
+        int_fast64_t s = (*p * (int_fast64_t)mult) >> INT64_C(24);
+        if (s > INT32_MAX)
+            s = INT32_MAX;
         else
-        if (s < ((int64_t)INT32_MIN << INT64_C(24)))
-            *p = INT32_MIN;
-        else
-            *p = s >> INT64_C(24);
-        p++;
+        if (s < INT32_MIN)
+            s = INT32_MIN;
+        *(p++) = s;
     }
     (void) vol;
 }
@@ -67,21 +65,19 @@ static void FilterS16N (audio_volume_t *vol, block_t *block, float volume)
 {
     int16_t *p = (int16_t *)block->p_buffer;
 
-    int16_t mult = lroundf (volume * 0x1.p8f);
+    int_fast16_t mult = lroundf (volume * 0x1.p8f);
     if (mult == (1 << 8))
         return;
 
     for (size_t n = block->i_buffer / sizeof (*p); n > 0; n--)
     {
-        int32_t s = *p * (int32_t)mult;
-        if (s >= (INT16_MAX << 8))
-            *p = INT16_MAX;
+        int_fast32_t s = (*p * (int_fast32_t)mult) >> 8;
+        if (s > INT16_MAX)
+            s = INT16_MAX;
         else
-        if (s < (INT16_MIN << 8))
-            *p = INT16_MIN;
-        else
-            *p = s >> 8;
-        p++;
+        if (s < INT16_MIN)
+            s = INT16_MIN;
+        *(p++) = s;
     }
     (void) vol;
 }
@@ -90,21 +86,19 @@ static void FilterU8 (audio_volume_t *vol, block_t *block, float volume)
 {
     uint8_t *p = (uint8_t *)block->p_buffer;
 
-    int16_t mult = lroundf (volume * 0x1.p8f);
+    int_fast16_t mult = lroundf (volume * 0x1.p8f);
     if (mult == (1 << 8))
         return;
 
     for (size_t n = block->i_buffer / sizeof (*p); n > 0; n--)
     {
-        int32_t s = (*p - 128) * mult;
-        if (s >= (INT8_MAX << 8))
-            *p = 255;
+        int_fast32_t s = (((int_fast8_t)(*p - 128)) * (int_fast32_t)mult) >> 8;
+        if (s > INT8_MAX)
+            s = INT8_MAX;
         else
-        if (s < (INT8_MIN << 8))
-            *p = 0;
-        else
-            *p = (s >> 8) + 128;
-        p++;
+        if (s < INT8_MIN)
+            s = INT8_MIN;
+        *(p++) = s + 128;
     }
     (void) vol;
 }
