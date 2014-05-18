@@ -172,16 +172,17 @@ int Open::openMRL( intf_thread_t *p_intf,
                     bool b_start,
                     bool b_playlist)
 {
-    return openMRLwithOptions( p_intf, mrl, NULL, b_start, b_playlist, NULL );
+    return openMRLwithOptions( p_intf, mrl, NULL, b_start, b_playlist );
 }
 
 int Open::openMRLwithOptions( intf_thread_t* p_intf,
                      const QString &mrl,
-                     const QStringList *options,
+                     QStringList *options,
                      bool b_start,
                      bool b_playlist,
                      const char *title)
 {
+    /* Options */
     const char **ppsz_options = NULL;
     int i_options = 0;
 
@@ -199,6 +200,7 @@ int Open::openMRLwithOptions( intf_thread_t* p_intf,
         }
     }
 
+    /* Add to playlist */
     int i_ret = playlist_AddExt( THEPL,
                   qtu(mrl), title,
                   PLAYLIST_APPEND | (b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE),
@@ -208,6 +210,7 @@ int Open::openMRLwithOptions( intf_thread_t* p_intf,
                   b_playlist,
                   pl_Unlocked );
 
+    /* Add to recent items, only if played */
     if( i_ret == VLC_SUCCESS && b_start && b_playlist )
         RecentsMRL::getInstance( p_intf )->addRecent( mrl );
 

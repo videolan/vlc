@@ -38,17 +38,17 @@ class QSignalMapper;
 class Open
 {
 public:
-    int static openMRL( intf_thread_t*,
-                         const QString &,
-                         bool b_start = true,
-                         bool b_playlist = true);
+    static int openMRL( intf_thread_t*,
+                        const QString &,
+                        bool b_start = true,
+                        bool b_playlist = true);
 
-    int static openMRLwithOptions( intf_thread_t*,
-                          const QString &,
-                          const QStringList *options,
-                          bool b_start = true,
-                          bool b_playlist = true,
-                          const char* title = NULL);
+    static int openMRLwithOptions( intf_thread_t*,
+                                   const QString &,
+                                   QStringList *options,
+                                   bool b_start = true,
+                                   bool b_playlist = true,
+                                   const char* title = NULL);
 };
 
 class RecentsMRL : public QObject, public Singleton<RecentsMRL>
