@@ -32,7 +32,7 @@ private:
     char m_pathBuffer[256];
 public:
     QVLCRegistry(HKEY rootKey);
-    ~QVLCRegistry(void);
+    ~QVLCRegistry(void) {}
 
     void WriteRegistryInt( const char *path, const char *valueName, int value);
     void WriteRegistryString( const char *path, const char *valueName, const char *value);

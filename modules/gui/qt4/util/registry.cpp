@@ -35,10 +35,6 @@ QVLCRegistry::QVLCRegistry( HKEY rootKey )
     m_RootKey = rootKey;
 }
 
-QVLCRegistry::~QVLCRegistry( void )
-{
-}
-
 bool QVLCRegistry::RegistryKeyExists( const char *path )
 {
     HKEY keyHandle;
