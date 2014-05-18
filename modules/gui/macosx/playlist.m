@@ -1479,6 +1479,14 @@
         if (!p_item)
             return;
 
+        /* allow the user to over-write the start-time */
+        if (p_item->i_options > 0) {
+            for (int x = 0; x < p_item->i_options; x++) {
+                if (strstr(p_item->ppsz_options[x],"start-time"))
+                    return;
+            }
+        }
+
         char *psz_url = decode_URI(input_item_GetURI(p_item));
         NSString *url = [NSString stringWithUTF8String:psz_url ? psz_url : ""];
         free(psz_url);
@@ -1491,7 +1499,7 @@
             long long int dur = input_item_GetDuration(p_item) / 1000000;
             int current_pos_in_sec = (f_current_pos * dur) / 100;
 
-            if (current_pos_in_sec == 0 || current_pos_in_sec >= lastPosition.intValue)
+            if (current_pos_in_sec >= lastPosition.intValue)
                 return;
 
             int settingValue = config_GetInt(VLCIntf, "macosx-continue-playback");
