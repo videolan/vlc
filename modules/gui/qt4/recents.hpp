@@ -66,8 +66,10 @@ private:
 
     void load();
     void save();
+
 public slots:
     void clear();
+    void playMRL( const QString & );
 };
 
 #endif

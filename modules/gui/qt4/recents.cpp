@@ -55,7 +55,7 @@ RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
     signalMapper = new QSignalMapper( this );
     CONNECT( signalMapper,
             mapped(const QString & ),
-            DialogsProvider::getInstance( p_intf ),
+            this,
             playMRL( const QString & ) );
 
     /* Load the filter psz */
@@ -161,6 +161,11 @@ playlist_item_t *RecentsMRL::toPlaylist(int length)
     }
 
     return p_node_recent;
+}
+
+void RecentsMRL::playMRL( const QString &mrl )
+{
+    Open::openMRL( p_intf, mrl );
 }
 
 void Open::openMRL( intf_thread_t *p_intf,

@@ -110,8 +110,6 @@ private:
     void saveAPlaylist(playlist_t *p_playlist, playlist_item_t *p_node);
 
 public slots:
-    void playMRL( const QString & );
-
     void playlistDialog();
     void bookmarksDialog();
     void mediaInfoDialog();

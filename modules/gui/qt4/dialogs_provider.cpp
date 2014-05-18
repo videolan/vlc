@@ -813,12 +813,3 @@ void DialogsProvider::SDMenuAction( const QString& data )
         playlist_ServicesDiscoveryRemove( THEPL, qtu( data ) );
 }
 
-/**
- * Play the MRL contained in the Recently played menu.
- **/
-void DialogsProvider::playMRL( const QString &mrl )
-{
-    playlist_Add( THEPL, qtu(mrl), NULL,
-                  PLAYLIST_APPEND | PLAYLIST_GO , PLAYLIST_END, true, pl_Unlocked );
-    RecentsMRL::getInstance( p_intf )->addRecent( mrl );
-}
