@@ -35,6 +35,15 @@ class QSignalMapper;
 
 #define RECENTS_LIST_SIZE 10
 
+class Open
+{
+public:
+    void static openMRL( intf_thread_t*,
+                         const QString &,
+                         bool b_start = true,
+                         bool b_playlist = true);
+};
+
 class RecentsMRL : public QObject, public Singleton<RecentsMRL>
 {
     Q_OBJECT

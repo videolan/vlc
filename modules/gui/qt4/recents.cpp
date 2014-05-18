@@ -22,6 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include "qt4.hpp"
 #include "recents.hpp"
 #include "dialogs_provider.hpp"
 #include "menus.hpp"
@@ -160,4 +161,19 @@ playlist_item_t *RecentsMRL::toPlaylist(int length)
     }
 
     return p_node_recent;
+}
+
+void Open::openMRL( intf_thread_t *p_intf,
+                    const QString &mrl,
+                    bool b_start,
+                    bool b_playlist)
+{
+    playlist_Add( THEPL, qtu(mrl), NULL,
+                  PLAYLIST_APPEND | (b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE),
+                  PLAYLIST_END,
+                  b_playlist,
+                  pl_Unlocked );
+
+    if( b_start && b_playlist )
+        RecentsMRL::getInstance( p_intf )->addRecent( mrl );
 }
