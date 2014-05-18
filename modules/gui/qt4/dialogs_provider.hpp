@@ -83,10 +83,6 @@ public:
         delete instance;
         instance = NULL;
     }
-    static bool isAlive()
-    {
-        return ( instance != NULL );
-    }
 
     QStringList showSimpleOpen( const QString& help = QString(),
                                 int filters = EXT_FILTER_MEDIA |
