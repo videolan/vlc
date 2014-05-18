@@ -440,16 +440,14 @@ QStringList DialogsProvider::showSimpleOpen( const QString& help,
 void DialogsProvider::addFromSimple( bool pl, bool go)
 {
     QStringList files = DialogsProvider::showSimpleOpen();
-    int mode = go ? PLAYLIST_GO : PLAYLIST_PREPARSE;
 
+    bool first = go;
     files.sort();
     foreach( const QString &file, files )
     {
         QString url = toURI( toNativeSeparators( file ) );
-        playlist_Add( THEPL, qtu( url ), NULL, PLAYLIST_APPEND | mode,
-                      PLAYLIST_END, pl, pl_Unlocked );
-        RecentsMRL::getInstance( p_intf )->addRecent( url );
-        mode = PLAYLIST_PREPARSE;
+        Open::openMRL( p_intf, url, first, pl);
+        first = false;
     }
 }
 
@@ -481,11 +479,8 @@ void DialogsProvider::openUrlDialog()
         url = qfu(uri);
         free( uri );
     }
-    playlist_Add( THEPL, qtu(url), NULL,
-                  !oud.shouldEnqueue() ? ( PLAYLIST_APPEND | PLAYLIST_GO )
-                                     : ( PLAYLIST_APPEND | PLAYLIST_PREPARSE ),
-                  PLAYLIST_END, true, pl_Unlocked );
-    RecentsMRL::getInstance( p_intf )->addRecent( url );
+
+    Open::openMRL( p_intf, qtu(url), !oud.shouldEnqueue() );
 }
 
 /* Directory */
