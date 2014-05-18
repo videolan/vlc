@@ -491,27 +491,9 @@ void DialogsProvider::openUrlDialog()
  **/
 static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
 {
-    QString dir = QFileDialog::getExistingDirectory( NULL, qtr( I_OP_DIR_WINTITLE ), p_intf->p_sys->filepath );
-
-    if( dir.isEmpty() )
-        return;
-
-    p_intf->p_sys->filepath = dir;
-
-    const char *scheme = "directory";
-    if( dir.endsWith( DIR_SEP "VIDEO_TS", Qt::CaseInsensitive ) )
-        scheme = "dvd";
-    else if( dir.endsWith( DIR_SEP "BDMV", Qt::CaseInsensitive ) )
-    {
-        scheme = "bluray";
-        dir.remove( "BDMV" );
-    }
-
-    char *uri = vlc_path2uri( qtu( toNativeSeparators( dir ) ), scheme );
-    if( unlikely(uri == NULL) )
-        return;
-
-    Open::openMRL( p_intf, uri, go, pl );
+    QString uri = DialogsProvider::getDirectoryDialog( p_intf );
+    if( !uri.isEmpty() )
+        Open::openMRL( p_intf, uri, go, pl );
 }
 
 QString DialogsProvider::getDirectoryDialog( intf_thread_t *p_intf )
@@ -533,7 +515,9 @@ QString DialogsProvider::getDirectoryDialog( intf_thread_t *p_intf )
     }
 
     char *uri = vlc_path2uri( qtu( toNativeSeparators( dir ) ), scheme );
-    if( unlikely(uri == NULL) ) return QString();
+    if( unlikely(uri == NULL) )
+        return QString();
+
     dir = qfu( uri );
     free( uri );
 
