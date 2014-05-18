@@ -69,7 +69,7 @@ public:
 
 private:
     ActionsManager( intf_thread_t  *_p_i );
-    virtual ~ActionsManager();
+    virtual ~ActionsManager() {}
 
     intf_thread_t       *p_intf;
 

@@ -1,11 +1,10 @@
 /*****************************************************************************
  * actions_manager.cpp : Controller for the main interface
  ****************************************************************************
- * Copyright (C) 2006-2008 the VideoLAN team
+ * Copyright © 2009-2014 VideoLAN and VLC authors
  * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb@videolan.org>
- *          Ilkka Ollakka <ileoo@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,17 +29,16 @@
 #include <vlc_keys.h>
 
 #include "actions_manager.hpp"
-#include "dialogs_provider.hpp" /* Opening Dialogs */
-#include "input_manager.hpp"
-#include "main_interface.hpp" /* Show playlist */
+
+#include "dialogs_provider.hpp"      /* Opening Dialogs */
+#include "input_manager.hpp"         /* THEMIM */
+#include "main_interface.hpp"        /* Show playlist */
 #include "components/controller.hpp" /* Toggle FSC controller width */
 
 ActionsManager::ActionsManager( intf_thread_t * _p_i )
 {
     p_intf = _p_i;
 }
-
-ActionsManager::~ActionsManager(){}
 
 void ActionsManager::doAction( int id_action )
 {
@@ -95,7 +93,7 @@ void ActionsManager::doAction( int id_action )
                 p_intf->p_sys->p_mi->getFullscreenControllerWidget()->toggleFullwidth();
             break;
         default:
-            msg_Dbg( p_intf, "Action: %i", id_action );
+            msg_Warn( p_intf, "Action not supported: %i", id_action );
             break;
     }
 }
@@ -112,10 +110,10 @@ void ActionsManager::play()
 }
 
 /**
-  * TODO
+ * TODO
  * This functions toggle the fullscreen mode
  * If there is no video, it should first activate Visualisations...
- *  This has also to be fixed in enableVideo()
+ * This has also to be fixed in enableVideo()
  */
 void ActionsManager::fullscreen()
 {
@@ -140,7 +138,8 @@ void ActionsManager::snapshot()
 
 void ActionsManager::playlist()
 {
-    if( p_intf->p_sys->p_mi ) p_intf->p_sys->p_mi->togglePlaylist();
+    if( p_intf->p_sys->p_mi )
+        p_intf->p_sys->p_mi->togglePlaylist();
 }
 
 void ActionsManager::record()
