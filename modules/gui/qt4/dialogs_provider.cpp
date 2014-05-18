@@ -700,26 +700,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
     {
         options += soutoption.split( " :");
 
-        /* Create Input */
-        input_item_t *p_input;
-        p_input = input_item_New( qtu( mrl ), _("Streaming") );
-
-        /* Add normal Options */
-        for( int j = 0; j < options.count(); j++ )
-        {
-            QString qs = colon_unescape( options[j] );
-            if( !qs.isEmpty() )
-            {
-                input_item_AddOption( p_input, qtu( qs ),
-                        VLC_INPUT_OPTION_TRUSTED );
-                msg_Dbg( p_intf, "Adding option: %s", qtu( qs ) );
-            }
-        }
-
-        /* Switch between enqueuing and starting the item */
-        Open::openInput( p_intf, p_input, mrl, true, true );
-        vlc_gc_decref( p_input );
-
+        Open::openInput( p_intf, mrl, &options, true, true, _("Streaming") );
     }
 }
 

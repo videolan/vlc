@@ -44,10 +44,11 @@ public:
                          bool b_playlist = true);
 
     int static openInput( intf_thread_t*,
-                          input_item_t *,
                           const QString &,
+                          const QStringList *options,
                           bool b_start = true,
-                          bool b_playlist = true);
+                          bool b_playlist = true,
+                          const char* title = NULL);
 };
 
 class RecentsMRL : public QObject, public Singleton<RecentsMRL>

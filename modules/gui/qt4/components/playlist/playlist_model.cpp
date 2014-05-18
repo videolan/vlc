@@ -889,7 +889,6 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
 {
     QModelIndex index;
     actionsContainerType a = action->data().value<actionsContainerType>();
-    input_item_t *p_input;
 
     switch ( a.action )
     {
@@ -950,17 +949,8 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
     case ACTION_ENQUEUEGENERIC:
         foreach( const QString &uri, a.uris )
         {
-            p_input = input_item_New( qtu( uri ), NULL );
-            /* Insert options */
-            foreach( const QString &option, a.options.split( " :" ) )
-            {
-                QString temp = colon_unescape( option );
-                if( !temp.isEmpty() )
-                    input_item_AddOption( p_input, qtu( temp ),
-                                          VLC_INPUT_OPTION_TRUSTED );
-            }
-
-            Open::openInput( p_intf, p_input, uri, false );
+            QStringList options = a.options.split( " :" );
+            Open::openInput( p_intf, uri, &options, false );
         }
         return true;
 

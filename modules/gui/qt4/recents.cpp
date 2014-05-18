@@ -26,6 +26,7 @@
 #include "recents.hpp"
 #include "dialogs_provider.hpp"
 #include "menus.hpp"
+#include "util/qt_dirs.hpp"
 
 #include <QStringList>
 #include <QRegExp>
@@ -81,8 +82,6 @@ void RecentsMRL::addRecent( const QString &mrl )
 {
     if ( !isActive || ( filter && filter->indexIn( mrl ) >= 0 ) )
         return;
-
-    msg_Dbg( p_intf, "Adding a new MRL to recent ones: %s", qtu( mrl ) );
 
 #ifdef _WIN32
     /* Add to the Windows 7 default list in taskbar */
@@ -184,14 +183,34 @@ void Open::openMRL( intf_thread_t *p_intf,
 }
 
 int Open::openInput( intf_thread_t* p_intf,
-                      input_item_t *p_item,
-                      const QString &mrl,
-                      bool b_start,
-                      bool b_playlist)
+                     const QString &mrl,
+                     const QStringList *options,
+                     bool b_start,
+                     bool b_playlist,
+                     const char *title)
 {
-    int i_ret = playlist_AddInput( THEPL, p_item,
+    const char **ppsz_options = NULL;
+    int i_options = 0;
+
+    if( options != NULL && options->count() > 0 )
+    {
+        ppsz_options = (const char **)malloc( options->count() );
+        if( ppsz_options ) {
+            for( int j = 0; j < options->count(); j++ ) {
+                QString option = colon_unescape( options->at(j) );
+                if( !option.isEmpty() ) {
+                    ppsz_options[j] = qtu(option);
+                    i_options++;
+                }
+            }
+        }
+    }
+
+    int i_ret = playlist_AddExt( THEPL, qtu(mrl), title,
                   PLAYLIST_APPEND | (b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE),
                   PLAYLIST_END,
+                  -1,
+                  i_options, ppsz_options, VLC_INPUT_OPTION_TRUSTED,
                   b_playlist,
                   pl_Unlocked );
 

@@ -377,28 +377,11 @@ void OpenDialog::enqueue( bool b_enqueue )
     {
         bool b_start = !i && !b_enqueue;
 
-        input_item_t *p_input_item;
-        p_input_item = input_item_New( qtu( itemsMRL[i] ), NULL );
-
         /* Take options from the UI, not from what we stored */
         QStringList optionsList = getOptions().split( " :" );
 
-        /* Insert options */
-        for( int j = 0; j < optionsList.count(); j++ )
-        {
-            QString qs = colon_unescape( optionsList[j] );
-            if( !qs.isEmpty() )
-            {
-                input_item_AddOption( p_input_item, qtu( qs ),
-                                      VLC_INPUT_OPTION_TRUSTED );
-#ifdef DEBUG_QT
-                msg_Warn( p_intf, "Input option: %s", qtu( qs ) );
-#endif
-            }
-        }
-
         /* Switch between enqueuing and starting the item */
-        Open::openInput( p_intf, p_input_item, itemsMRL[i], b_start, b_pl );
+        Open::openInput( p_intf, itemsMRL[i], &optionsList, b_start, b_pl );
     }
 }
 
