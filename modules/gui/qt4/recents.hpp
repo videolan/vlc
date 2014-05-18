@@ -38,7 +38,7 @@ class QSignalMapper;
 class Open
 {
 public:
-    void static openMRL( intf_thread_t*,
+    int static openMRL( intf_thread_t*,
                          const QString &,
                          bool b_start = true,
                          bool b_playlist = true);

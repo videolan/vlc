@@ -167,19 +167,12 @@ void RecentsMRL::playMRL( const QString &mrl )
     Open::openMRL( p_intf, mrl );
 }
 
-void Open::openMRL( intf_thread_t *p_intf,
+int Open::openMRL( intf_thread_t *p_intf,
                     const QString &mrl,
                     bool b_start,
                     bool b_playlist)
 {
-    playlist_Add( THEPL, qtu(mrl), NULL,
-                  PLAYLIST_APPEND | (b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE),
-                  PLAYLIST_END,
-                  b_playlist,
-                  pl_Unlocked );
-
-    if( b_start && b_playlist )
-        RecentsMRL::getInstance( p_intf )->addRecent( mrl );
+    return openMRLwithOptions( p_intf, mrl, NULL, b_start, b_playlist, NULL );
 }
 
 int Open::openMRLwithOptions( intf_thread_t* p_intf,
@@ -206,7 +199,8 @@ int Open::openMRLwithOptions( intf_thread_t* p_intf,
         }
     }
 
-    int i_ret = playlist_AddExt( THEPL, qtu(mrl), title,
+    int i_ret = playlist_AddExt( THEPL,
+                  qtu(mrl), title,
                   PLAYLIST_APPEND | (b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE),
                   PLAYLIST_END,
                   -1,
