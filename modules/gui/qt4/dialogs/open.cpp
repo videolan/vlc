@@ -398,14 +398,7 @@ void OpenDialog::enqueue( bool b_enqueue )
         }
 
         /* Switch between enqueuing and starting the item */
-        /* FIXME: playlist_AddInput() can fail */
-        playlist_AddInput( THEPL, p_input_item,
-                PLAYLIST_APPEND | ( b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE ),
-                PLAYLIST_END, b_pl ? true : false, pl_Unlocked );
-        vlc_gc_decref( p_input_item );
-
-        /* Do not add the current MRL if playlist_AddInput fail */
-        RecentsMRL::getInstance( p_intf )->addRecent( itemsMRL[i] );
+        Open::openInput( p_intf, p_input_item, itemsMRL[i], b_start, b_pl );
     }
 }
 
