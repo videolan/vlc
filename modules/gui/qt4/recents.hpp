@@ -1,10 +1,11 @@
 /*****************************************************************************
  * recents.hpp : Recents MRL (menu)
  *****************************************************************************
- * Copyright © 2006-2008 the VideoLAN team
+ * Copyright © 2008-2014 VideoLAN and VLC authors
  * $Id$
  *
  * Authors: Ludovic Fauvet <etix@l0cal.com>
+ *          Jean-baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

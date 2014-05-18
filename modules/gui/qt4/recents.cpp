@@ -1,10 +1,11 @@
 /*****************************************************************************
  * recents.cpp : Recents MRL (menu)
  *****************************************************************************
- * Copyright © 2006-2008 the VideoLAN team
+ * Copyright © 2008-2014 VideoLAN and VLC authors
  * $Id$
  *
  * Authors: Ludovic Fauvet <etix@l0cal.com>
+ *          Jean-baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,14 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-
 #include "recents.hpp"
 #include "dialogs_provider.hpp"
 #include "menus.hpp"
 
 #include <QStringList>
-#include <QAction>
-#include <QSettings>
 #include <QRegExp>
 #include <QSignalMapper>
 
@@ -48,7 +46,6 @@
 
     #include <vlc_charset.h>
 #endif
-
 
 RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
 {
