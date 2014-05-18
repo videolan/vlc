@@ -50,8 +50,6 @@
 #endif
 
 
-RecentsMRL* RecentsMRL::instance = NULL;
-
 RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
 {
     stack = new QStringList;

@@ -25,6 +25,7 @@
 #define QVLC_RECENTS_H_
 
 #include "qt4.hpp"
+#include "util/singleton.hpp"
 
 #include <QObject>
 class QStringList;
@@ -33,23 +34,12 @@ class QSignalMapper;
 
 #define RECENTS_LIST_SIZE 10
 
-class RecentsMRL : public QObject
+class RecentsMRL : public QObject, public Singleton<RecentsMRL>
 {
     Q_OBJECT
+    friend class Singleton<RecentsMRL>;
 
 public:
-    static RecentsMRL* getInstance( intf_thread_t* p_intf )
-    {
-        if(!instance)
-            instance = new RecentsMRL( p_intf );
-        return instance;
-    }
-    static void killInstance()
-    {
-        delete instance;
-        instance = NULL;
-    }
-
     void addRecent( const QString & );
     QStringList recents();
     playlist_item_t *toPlaylist(int length);
@@ -58,8 +48,6 @@ public:
 private:
     RecentsMRL( intf_thread_t* _p_intf );
     virtual ~RecentsMRL();
-
-    static RecentsMRL *instance;
 
     intf_thread_t *p_intf;
     QStringList   *stack;
