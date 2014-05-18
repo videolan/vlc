@@ -35,10 +35,7 @@
 #include "main_interface.hpp" /* Show playlist */
 #include "components/controller.hpp" /* Toggle FSC controller width */
 
-ActionsManager * ActionsManager::instance = NULL;
-
-ActionsManager::ActionsManager( intf_thread_t * _p_i, QObject *_parent )
-               : QObject( _parent )
+ActionsManager::ActionsManager( intf_thread_t * _p_i )
 {
     p_intf = _p_i;
 }

@@ -29,6 +29,7 @@
 #endif
 
 #include "qt4.hpp"
+#include "util/singleton.hpp"
 
 #include <QObject>
 typedef enum actionType_e
@@ -58,28 +59,18 @@ typedef enum actionType_e
     OPEN_SUB_ACTION,
 } actionType_e;
 
-class ActionsManager : public QObject
+class ActionsManager : public QObject, public Singleton<ActionsManager>
 {
 
     Q_OBJECT
+    friend class Singleton<ActionsManager>;
+
 public:
-    static ActionsManager *getInstance( intf_thread_t *_p_intf, QObject *_parent = 0 )
-    {
-        if( !instance )
-            instance = new ActionsManager( _p_intf, _parent );
-        return instance;
-    }
-    static void killInstance()
-    {
-        delete instance;
-        instance = NULL;
-    }
 
 private:
+    ActionsManager( intf_thread_t  *_p_i );
     virtual ~ActionsManager();
 
-    static ActionsManager *instance;
-    ActionsManager( intf_thread_t  *_p_i, QObject *_parent );
     intf_thread_t       *p_intf;
 
 public slots:
@@ -90,6 +81,7 @@ public slots:
     void record();
     void skipForward();
     void skipBackward();
+
 protected slots:
     void fullscreen();
     void snapshot();
