@@ -40,7 +40,7 @@ class DialogHandler : public QObject
 
 public:
     DialogHandler (intf_thread_t *, QObject *parent);
-    ~DialogHandler (void);
+    virtual ~DialogHandler (void);
 
 private:
     intf_thread_t *intf;

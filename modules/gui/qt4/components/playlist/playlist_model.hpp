@@ -172,7 +172,7 @@ class PlMimeData : public QMimeData
 
 public:
     PlMimeData() {}
-    ~PlMimeData();
+    virtual ~PlMimeData();
     void appendItem( input_item_t *p_item );
     QList<input_item_t*> inputItems() const;
     QStringList formats () const;

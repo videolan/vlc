@@ -43,7 +43,7 @@ class FingerprintDialog : public QDialog
 public:
     FingerprintDialog( QWidget *parent, intf_thread_t *p_intf,
                                 input_item_t *p_item );
-    ~FingerprintDialog();
+    virtual ~FingerprintDialog();
 
 private:
     Ui::FingerprintDialog *ui;

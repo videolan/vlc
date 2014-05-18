@@ -53,7 +53,7 @@ Q_OBJECT
 
 public:
     explicit EPGView( QWidget *parent = 0 );
-    ~EPGView();
+    virtual ~EPGView();
 
     void            setScale( double scaleFactor );
 

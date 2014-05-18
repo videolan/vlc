@@ -47,7 +47,7 @@ public:
     {
         addon_entry_Hold( p_entry );
     }
-    ~AddonManagerEvent()
+    virtual ~AddonManagerEvent()
     {
         addon_entry_Release( p_entry );
     }
@@ -65,7 +65,7 @@ class AddonsManager : public QObject, public Singleton<AddonsManager>
 
 public:
     AddonsManager( intf_thread_t * );
-    ~AddonsManager();
+    virtual ~AddonsManager();
     static void addonsEventsCallback( const vlc_event_t *, void * );
     void customEvent( QEvent * );
     void install( QByteArray id );

@@ -40,7 +40,7 @@ private:
 
 public:
     QVLCVariable (vlc_object_t *, const char *, int, bool);
-    ~QVLCVariable (void);
+    virtual ~QVLCVariable (void);
 };
 
 class QVLCPointer : public QVLCVariable
