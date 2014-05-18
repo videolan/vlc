@@ -43,38 +43,66 @@
     [super dealloc];
 }
 
-- (uint8_t *)uuid
+- (NSData *)uuid
 {
-    return p_addon_entry->uuid;
+    vlc_mutex_lock(&p_addon_entry->lock);
+    NSData *o_uuid = [NSData dataWithBytes:p_addon_entry->uuid length:sizeof(p_addon_entry->uuid)];
+    vlc_mutex_unlock(&p_addon_entry->lock);
+
+    return o_uuid;
 }
 
 - (NSString *)name
 {
-    return toNSStr(p_addon_entry->psz_name);
+    vlc_mutex_lock(&p_addon_entry->lock);
+    NSString *o_str = toNSStr(p_addon_entry->psz_name);
+    vlc_mutex_unlock(&p_addon_entry->lock);
+
+    return o_str;
 }
 - (NSString *)author
 {
-    return toNSStr(p_addon_entry->psz_author);
+    vlc_mutex_lock(&p_addon_entry->lock);
+    NSString *o_str = toNSStr(p_addon_entry->psz_author);
+    vlc_mutex_unlock(&p_addon_entry->lock);
+
+    return o_str;
 }
 
 - (NSString *)version
 {
-    return toNSStr(p_addon_entry->psz_version);
+    vlc_mutex_lock(&p_addon_entry->lock);
+    NSString *o_str = toNSStr(p_addon_entry->psz_version);
+    vlc_mutex_unlock(&p_addon_entry->lock);
+
+    return o_str;
 }
 
 - (NSString *)description
 {
-    return toNSStr(p_addon_entry->psz_description);
+    vlc_mutex_lock(&p_addon_entry->lock);
+    NSString *o_str = toNSStr(p_addon_entry->psz_description);
+    vlc_mutex_unlock(&p_addon_entry->lock);
+
+    return o_str;
 }
 
 - (BOOL)isInstalled
 {
-    return p_addon_entry->e_state == ADDON_INSTALLED;
+    vlc_mutex_lock(&p_addon_entry->lock);
+    BOOL b_installed = p_addon_entry->e_state == ADDON_INSTALLED;
+    vlc_mutex_unlock(&p_addon_entry->lock);
+
+    return b_installed;
 }
 
 - (addon_type_t)type
 {
-    return p_addon_entry->e_type;
+    vlc_mutex_lock(&p_addon_entry->lock);
+    addon_type_t type = p_addon_entry->e_type;
+    vlc_mutex_unlock(&p_addon_entry->lock);
+
+    return type;
 }
 
 @end

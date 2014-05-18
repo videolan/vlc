@@ -32,7 +32,7 @@
 
 - (id)initWithAddon:(addon_entry_t *)p_entry;
 
-- (uint8_t *)uuid;
+- (NSData *)uuid;
 
 - (NSString *)name;
 - (NSString *)author;

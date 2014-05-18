@@ -276,14 +276,20 @@ static VLCAddonManager *_o_sharedInstance = nil;
     addons_manager_LoadCatalog(_manager);
 }
 
-- (void)_installAddonWithID:(addon_uuid_t)addonid
+- (void)_installAddonWithID:(NSData *)o_data
 {
-    addons_manager_Install(_manager, addonid);
+    addon_uuid_t uuid;
+    [o_data getBytes:uuid length:sizeof(uuid)];
+
+    addons_manager_Install(_manager, uuid);
 }
 
-- (void)_removeAddonWithID:(addon_uuid_t)addonid
+- (void)_removeAddonWithID:(NSData *)o_data
 {
-    addons_manager_Remove(_manager, addonid);
+    addon_uuid_t uuid;
+    [o_data getBytes:uuid length:sizeof(uuid)];
+
+    addons_manager_Remove(_manager, uuid);
 }
 
 - (NSString *)_getAddonType:(int)i_type
