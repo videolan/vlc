@@ -717,12 +717,9 @@ void DialogsProvider::streamingDialog( QWidget *parent,
         }
 
         /* Switch between enqueuing and starting the item */
-        /* FIXME: playlist_AddInput() can fail */
-        playlist_AddInput( THEPL, p_input,
-                PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END, true, pl_Unlocked );
+        Open::openInput( p_intf, p_input, mrl, true, true );
         vlc_gc_decref( p_input );
 
-        RecentsMRL::getInstance( p_intf )->addRecent( mrl );
     }
 }
 
