@@ -511,18 +511,7 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
     if( unlikely(uri == NULL) )
         return;
 
-    RecentsMRL::getInstance( p_intf )->addRecent( qfu(uri) );
-
-    input_item_t *p_input = input_item_New( uri, NULL );
-    free( uri );
-    if( unlikely( p_input == NULL ) )
-        return;
-
-    /* FIXME: playlist_AddInput() can fail */
-    playlist_AddInput( THEPL, p_input,
-                       go ? ( PLAYLIST_APPEND | PLAYLIST_GO ) : PLAYLIST_APPEND,
-                       PLAYLIST_END, pl, pl_Unlocked );
-    vlc_gc_decref( p_input );
+    Open::openMRL( p_intf, uri, go, pl );
 }
 
 QString DialogsProvider::getDirectoryDialog()
