@@ -175,7 +175,7 @@ void ActionsManager::frame()
 
 void ActionsManager::toggleMuteAudio()
 {
-     playlist_MuteToggle( THEPL );
+    playlist_MuteToggle( THEPL );
 }
 
 void ActionsManager::AudioUp()
