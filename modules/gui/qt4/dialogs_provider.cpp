@@ -484,7 +484,7 @@ void DialogsProvider::openUrlDialog()
     playlist_Add( THEPL, qtu(url), NULL,
                   !oud.shouldEnqueue() ? ( PLAYLIST_APPEND | PLAYLIST_GO )
                                      : ( PLAYLIST_APPEND | PLAYLIST_PREPARSE ),
-                  PLAYLIST_END, true, false );
+                  PLAYLIST_END, true, pl_Unlocked );
     RecentsMRL::getInstance( p_intf )->addRecent( url );
 }
 
@@ -819,6 +819,6 @@ void DialogsProvider::SDMenuAction( const QString& data )
 void DialogsProvider::playMRL( const QString &mrl )
 {
     playlist_Add( THEPL, qtu(mrl), NULL,
-                  PLAYLIST_APPEND | PLAYLIST_GO , PLAYLIST_END, true, false );
+                  PLAYLIST_APPEND | PLAYLIST_GO , PLAYLIST_END, true, pl_Unlocked );
     RecentsMRL::getInstance( p_intf )->addRecent( mrl );
 }
