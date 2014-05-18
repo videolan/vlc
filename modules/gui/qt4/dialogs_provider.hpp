@@ -90,6 +90,8 @@ public:
                                 EXT_FILTER_PLAYLIST,
                                 const QString& path = QString() );
     bool isDying() { return b_isDying; }
+    static QString getDirectoryDialog( intf_thread_t *p_intf);
+
 protected:
     QSignalMapper *menusMapper;
     QSignalMapper *menusUpdateMapper;
@@ -143,7 +145,6 @@ public slots:
     void openNetDialog();
     void openCaptureDialog();
 
-    QString getDirectoryDialog();
     void PLAppendDialog( int tab = OPEN_FILE_TAB );
     void MLAppendDialog( int tab = OPEN_FILE_TAB );
 

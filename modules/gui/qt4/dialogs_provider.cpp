@@ -514,9 +514,10 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
     Open::openMRL( p_intf, uri, go, pl );
 }
 
-QString DialogsProvider::getDirectoryDialog()
+QString DialogsProvider::getDirectoryDialog( intf_thread_t *p_intf )
 {
-    QString dir = QFileDialog::getExistingDirectory( NULL, qtr( I_OP_DIR_WINTITLE ), p_intf->p_sys->filepath );
+    QString dir = QFileDialog::getExistingDirectory( NULL,
+            qtr( I_OP_DIR_WINTITLE ), p_intf->p_sys->filepath );
 
     if( dir.isEmpty() ) return QString();
 

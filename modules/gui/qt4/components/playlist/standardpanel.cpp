@@ -358,7 +358,7 @@ void StandardPLPanel::popupAction( QAction *action )
         break;
 
     case VLCModelSubInterface::ACTION_ENQUEUEDIR:
-        temp = THEDP->getDirectoryDialog();
+        temp = DialogsProvider::getDirectoryDialog( p_intf );
         if ( temp.isEmpty() ) return;
         a.uris << temp;
         action->setData( QVariant::fromValue( a ) );
