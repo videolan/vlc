@@ -182,3 +182,23 @@ void Open::openMRL( intf_thread_t *p_intf,
     if( b_start && b_playlist )
         RecentsMRL::getInstance( p_intf )->addRecent( mrl );
 }
+
+int Open::openInput( intf_thread_t* p_intf,
+                      input_item_t *p_item,
+                      const QString &mrl,
+                      bool b_start,
+                      bool b_playlist)
+{
+    int i_ret = playlist_AddInput( THEPL, p_item,
+                  PLAYLIST_APPEND | (b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE),
+                  PLAYLIST_END,
+                  b_playlist,
+                  pl_Unlocked );
+
+    if( i_ret == VLC_SUCCESS && b_start && b_playlist )
+        RecentsMRL::getInstance( p_intf )->addRecent( mrl );
+
+    return i_ret;
+}
+
+

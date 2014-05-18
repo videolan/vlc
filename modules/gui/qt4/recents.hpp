@@ -42,6 +42,12 @@ public:
                          const QString &,
                          bool b_start = true,
                          bool b_playlist = true);
+
+    int static openInput( intf_thread_t*,
+                          input_item_t *,
+                          const QString &,
+                          bool b_start = true,
+                          bool b_playlist = true);
 };
 
 class RecentsMRL : public QObject, public Singleton<RecentsMRL>
