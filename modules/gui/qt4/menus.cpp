@@ -1595,7 +1595,7 @@ void VLCMenuBar::updateRecents( intf_thread_t *p_intf )
     {
         QAction* action;
         RecentsMRL* rmrl = RecentsMRL::getInstance( p_intf );
-        QStringList l = rmrl->recents();
+        QStringList l = rmrl->recentList();
 
         recentsMenu->clear();
 

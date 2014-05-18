@@ -29,7 +29,7 @@
 #include "util/singleton.hpp"
 
 #include <QObject>
-class QStringList;
+#include <QStringList>
 class QRegExp;
 class QSignalMapper;
 
@@ -58,16 +58,21 @@ class RecentsMRL : public QObject, public Singleton<RecentsMRL>
 
 public:
     void addRecent( const QString & );
-    QStringList recents();
+    QStringList recentList();
     playlist_item_t *toPlaylist(int length);
     QSignalMapper *signalMapper;
+
+    int time( const QString &mrl );
+    void setTime( const QString &mrl, const int64_t time );
 
 private:
     RecentsMRL( intf_thread_t* _p_intf );
     virtual ~RecentsMRL();
 
     intf_thread_t *p_intf;
-    QStringList   *stack;
+
+    QStringList   recents;
+    QStringList   times;
     QRegExp       *filter;
     bool          isActive;
 

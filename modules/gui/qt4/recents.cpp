@@ -51,7 +51,8 @@
 
 RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
 {
-    stack = new QStringList;
+    recents = QStringList();
+    times = QStringList();
 
     signalMapper = new QSignalMapper( this );
     CONNECT( signalMapper,
@@ -76,7 +77,6 @@ RecentsMRL::~RecentsMRL()
 {
     save();
     delete filter;
-    delete stack;
 }
 
 void RecentsMRL::addRecent( const QString &mrl )
@@ -96,17 +96,21 @@ void RecentsMRL::addRecent( const QString &mrl )
     }
 #endif
 
-    int i_index = stack->indexOf( mrl );
+    int i_index = recents.indexOf( mrl );
     if( 0 <= i_index )
     {
         /* move to the front */
-        stack->move( i_index, 0 );
+        recents.move( i_index, 0 );
+        times.move( i_index, 0 );
     }
     else
     {
-        stack->prepend( mrl );
-        if( stack->count() > RECENTS_LIST_SIZE )
-            stack->takeLast();
+        recents.prepend( mrl );
+        times.prepend( "-1" );
+        if( recents.count() > RECENTS_LIST_SIZE ) {
+            recents.takeLast();
+            times.takeLast();
+        }
     }
     VLCMenuBar::updateRecents( p_intf );
     save();
@@ -114,35 +118,40 @@ void RecentsMRL::addRecent( const QString &mrl )
 
 void RecentsMRL::clear()
 {
-    if ( stack->isEmpty() )
+    if ( recents.isEmpty() )
         return;
 
-    stack->clear();
+    recents.clear();
+    times.clear();
     if( isActive ) VLCMenuBar::updateRecents( p_intf );
     save();
 }
 
-QStringList RecentsMRL::recents()
+QStringList RecentsMRL::recentList()
 {
-    return *stack;
+    return recents;
 }
 
 void RecentsMRL::load()
 {
     /* Load from the settings */
     QStringList list = getSettings()->value( "RecentsMRL/list" ).toStringList();
+    QStringList list2 = getSettings()->value( "RecentsMRL/times" ).toStringList();
 
     /* And filter the regexp on the list */
     for( int i = 0; i < list.count(); ++i )
     {
-        if ( !filter || filter->indexIn( list.at(i) ) == -1 )
-            stack->append( list.at(i) );
+        if ( !filter || filter->indexIn( list.at(i) ) == -1 ) {
+            recents.append( list.at(i) );
+            times.append( list2.value(i, "-1" ) );
+        }
     }
 }
 
 void RecentsMRL::save()
 {
-    getSettings()->setValue( "RecentsMRL/list", *stack );
+    getSettings()->setValue( "RecentsMRL/list", recents );
+    getSettings()->setValue( "RecentsMRL/times", times );
 }
 
 playlist_item_t *RecentsMRL::toPlaylist(int length)
@@ -151,12 +160,12 @@ playlist_item_t *RecentsMRL::toPlaylist(int length)
 
     if ( p_node_recent == NULL )  return NULL;
 
-    if (length == 0 || stack->count() < length)
-        length = stack->count();
+    if (length == 0 || recents.count() < length)
+        length = recents.count();
 
     for (int i = 0; i < length; i++)
     {
-        input_item_t *p_input = input_item_New(qtu(stack->at(i)), NULL);
+        input_item_t *p_input = input_item_New(qtu(recents.at(i)), NULL);
         playlist_NodeAddInput(THEPL, p_input, p_node_recent, PLAYLIST_APPEND, PLAYLIST_END, false);
     }
 
@@ -166,6 +175,25 @@ playlist_item_t *RecentsMRL::toPlaylist(int length)
 void RecentsMRL::playMRL( const QString &mrl )
 {
     Open::openMRL( p_intf, mrl );
+}
+
+int RecentsMRL::time( const QString &mrl )
+{
+    if( !isActive )
+        return -1;
+
+    int i_index = recents.indexOf( mrl );
+    if( i_index != -1 )
+        return times.value(i_index, "-1").toInt();
+    else
+        return -1;
+}
+
+void RecentsMRL::setTime( const QString &mrl, const int64_t time )
+{
+    int i_index = recents.indexOf( mrl );
+    if( i_index != -1 )
+        times[i_index] = QString::number( time / 1000 );
 }
 
 int Open::openMRL( intf_thread_t *p_intf,
