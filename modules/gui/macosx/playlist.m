@@ -1491,7 +1491,7 @@
             long long int dur = input_item_GetDuration(p_item) / 1000000;
             int current_pos_in_sec = (f_current_pos * dur) / 100;
 
-            if (current_pos_in_sec >= lastPosition.intValue)
+            if (current_pos_in_sec == 0 || current_pos_in_sec >= lastPosition.intValue)
                 return;
 
             int settingValue = config_GetInt(VLCIntf, "macosx-continue-playback");
