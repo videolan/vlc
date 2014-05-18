@@ -941,16 +941,10 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
 
     case ACTION_ENQUEUEDIR:
         if( a.uris.isEmpty() ) break;
-        p_input = input_item_New( a.uris.first().toLatin1().constData(), NULL );
-        if( unlikely( p_input == NULL ) ) break;
 
-        /* FIXME: playlist_AddInput() can fail */
-        playlist_AddInput( THEPL, p_input,
-                           PLAYLIST_APPEND,
-                           PLAYLIST_END,
-                           getPLRootType() == ROOTTYPE_CURRENT_PLAYING,
-                           pl_Unlocked );
-        vlc_gc_decref( p_input );
+        Open::openMRL( p_intf, a.uris.first().toLatin1().constData(),
+                       false, getPLRootType() == ROOTTYPE_CURRENT_PLAYING );
+
         return true;
 
     case ACTION_ENQUEUEGENERIC:
@@ -966,11 +960,7 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
                                           VLC_INPUT_OPTION_TRUSTED );
             }
 
-            /* FIXME: playlist_AddInput() can fail */
-            playlist_AddInput( THEPL, p_input,
-                    PLAYLIST_APPEND | PLAYLIST_PREPARSE,
-                    PLAYLIST_END, true, pl_Unlocked );
-            vlc_gc_decref( p_input );
+            Open::openInput( p_intf, p_input, uri, false );
         }
         return true;
 
