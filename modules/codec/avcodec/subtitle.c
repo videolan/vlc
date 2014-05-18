@@ -42,7 +42,8 @@ struct decoder_sys_t {
     AVCODEC_COMMON_MEMBERS
 };
 
-static subpicture_t *ConvertSubtitle(decoder_t *, AVSubtitle *, mtime_t pts);
+static subpicture_t *ConvertSubtitle(decoder_t *, AVSubtitle *, mtime_t pts,
+                                     AVCodecContext *avctx);
 
 /**
  * Initialize subtitle decoder
@@ -175,7 +176,8 @@ subpicture_t *DecodeSubtitle(decoder_t *dec, block_t **block_ptr)
     subpicture_t *spu = NULL;
     if (has_subtitle)
         spu = ConvertSubtitle(dec, &subtitle,
-                              block->i_pts > 0 ? block->i_pts : block->i_dts);
+                              block->i_pts > 0 ? block->i_pts : block->i_dts,
+                              sys->p_context);
 
     /* */
     if (!spu)
@@ -233,7 +235,8 @@ static subpicture_region_t *ConvertRegionRGBA(AVSubtitleRect *ffregion)
 /**
  * Convert a libavcodec subtitle to our format.
  */
-static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, mtime_t pts)
+static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, mtime_t pts,
+                                     AVCodecContext *avctx)
 {
     subpicture_t *spu = decoder_NewSubpicture(dec, NULL);
     if (!spu)
@@ -245,10 +248,16 @@ static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, mtime_t 
     spu->i_stop     = pts + ffsub->end_display_time * INT64_C(1000);
     spu->b_absolute = true; /* FIXME How to set it right ? */
     spu->b_ephemer  = true; /* FIXME How to set it right ? */
-    spu->i_original_picture_width =
-        dec->fmt_in.subs.spu.i_original_frame_width;
-    spu->i_original_picture_height =
-        dec->fmt_in.subs.spu.i_original_frame_height;
+
+    if (avctx->codec_id == AV_CODEC_ID_HDMV_PGS_SUBTITLE) {
+        spu->i_original_picture_width = avctx->coded_width;
+        spu->i_original_picture_height = avctx->coded_height;
+    } else {
+        spu->i_original_picture_width =
+            dec->fmt_in.subs.spu.i_original_frame_width;
+        spu->i_original_picture_height =
+            dec->fmt_in.subs.spu.i_original_frame_height;
+    }
 
     subpicture_region_t **region_next = &spu->p_region;
 
