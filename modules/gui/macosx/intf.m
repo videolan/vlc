@@ -839,6 +839,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_DelCallback(p_intf->p_libvlc, "intf-boss", BossCallback, self);
 
     if (p_current_input) {
+        /* continue playback where you left off */
+        [[self playlist] storePlaybackPositionForItem:p_current_input];
+
         var_DelCallback(p_current_input, "intf-event", InputEvent, [VLCMain sharedInstance]);
         vlc_object_release(p_current_input);
         p_current_input = NULL;
@@ -1281,6 +1284,8 @@ static VLCMain *_o_sharedMainInstance = nil;
             }
 
             p_input_changed = vlc_object_hold(p_current_input);
+
+            [[self playlist] continuePlaybackWhereYouLeftOff:p_current_input];
         }
     }
 
@@ -1495,45 +1500,11 @@ static VLCMain *_o_sharedMainInstance = nil;
             IOPMAssertionRelease(systemSleepAssertionID);
         }
 
-        /* continue playback where you left off */
-        if (p_current_input) {
-            input_item_t *p_item = input_GetItem(p_current_input);
-            if (p_item) {
-                NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-                NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] initWithDictionary:[defaults objectForKey:@"recentlyPlayedMedia"]];
-
-                char *psz_url = decode_URI(input_item_GetURI(p_item));
-                NSString *url = [NSString stringWithUTF8String:psz_url ? psz_url : ""];
-                free(psz_url);
-                vlc_value_t pos;
-                var_Get(p_current_input, "position", &pos);
-                float f_current_pos = 100. * pos.f_float;
-                long long int dur = input_item_GetDuration(p_item) / 1000000;
-                int current_pos_in_sec = (f_current_pos * dur) / 100;
-                NSMutableArray *mediaList = [defaults objectForKey:@"recentlyPlayedMediaList"];
-
-                if (pos.f_float > .05 && pos.f_float < .95 && dur > 180) {
-                    [mutDict setObject:[NSNumber numberWithInt:current_pos_in_sec] forKey:url];
-
-                    [mediaList removeObject:url];
-                    [mediaList addObject:url];
-                    NSUInteger mediaListCount = mediaList.count;
-                    if (mediaListCount > 30) {
-                        for (NSUInteger x = 0; x < mediaListCount - 30; x++) {
-                            [mutDict removeObjectForKey:[mediaList objectAtIndex:0]];
-                            [mediaList removeObjectAtIndex:0];
-                        }
-                    }
-                } else {
-                    [mutDict removeObjectForKey:url];
-                    [mediaList removeObject:url];
-                }
-                [defaults setObject:mutDict forKey:@"recentlyPlayedMedia"];
-                [defaults setObject:mediaList forKey:@"recentlyPlayedMediaList"];
-            }
-        }
-
         if (state == END_S || state == -1) {
+            /* continue playback where you left off */
+            if (p_current_input)
+                [[self playlist] storePlaybackPositionForItem:p_current_input];
+
             if (i_control_itunes > 0) {
                 if (o_itunes_play_timer) {
                     [o_itunes_play_timer invalidate];

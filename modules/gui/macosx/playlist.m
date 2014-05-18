@@ -50,6 +50,7 @@
 #import "misc.h"
 #import "open.h"
 #import "MainMenu.h"
+#import "CoreInteraction.h"
 
 #include <vlc_keys.h>
 #import <vlc_interface.h>
@@ -853,11 +854,6 @@
                 p_item = NULL;
         }
 
-        /* continue playback where you left off */
-        input_item_t *p_input = p_item->p_input;
-        if (p_input)
-            [self _continuePlaybackWhereYouLeftOff:p_input];
-
         playlist_Control(p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, p_node, p_item);
     }
     PL_UNLOCK;
@@ -1097,8 +1093,6 @@
         for (NSUInteger i = 0; i < count; i++)
             input_item_AddOption(p_input, [[o_options objectAtIndex:i] UTF8String], VLC_INPUT_OPTION_TRUSTED);
     }
-
-    [self _continuePlaybackWhereYouLeftOff:p_input];
 
     /* Recent documents menu */
     if (o_nsurl != nil && (BOOL)config_GetInt(p_playlist, "macosx-recentitems") == YES)
@@ -1477,38 +1471,91 @@
     [o_arrayToSave release];
 }
 
-- (void)_continuePlaybackWhereYouLeftOff:(input_item_t *)p_input
+- (void)continuePlaybackWhereYouLeftOff:(input_thread_t *)p_input_thread
 {
     NSDictionary *recentlyPlayedFiles = [[NSUserDefaults standardUserDefaults] objectForKey:@"recentlyPlayedMedia"];
     if (recentlyPlayedFiles) {
-        char *psz_url = decode_URI(input_item_GetURI(p_input));
+        input_item_t *p_item = input_GetItem(p_input_thread);
+        if (!p_item)
+            return;
+
+        char *psz_url = decode_URI(input_item_GetURI(p_item));
         NSString *url = [NSString stringWithUTF8String:psz_url ? psz_url : ""];
         free(psz_url);
 
         NSNumber *lastPosition = [recentlyPlayedFiles objectForKey:url];
         if (lastPosition && lastPosition.intValue > 0) {
-            msg_Dbg(VLCIntf, "last playback position for %s was %i", [url UTF8String], lastPosition.intValue);
+            vlc_value_t pos;
+            var_Get(p_input_thread, "position", &pos);
+            float f_current_pos = 100. * pos.f_float;
+            long long int dur = input_item_GetDuration(p_item) / 1000000;
+            int current_pos_in_sec = (f_current_pos * dur) / 100;
+
+            if (current_pos_in_sec >= lastPosition.intValue)
+                return;
 
             int settingValue = config_GetInt(VLCIntf, "macosx-continue-playback");
             NSInteger returnValue = NSAlertErrorReturn;
 
             if (settingValue == 0) {
-                NSAlert *theAlert = [NSAlert alertWithMessageText:_NS("Continue playback?") defaultButton:_NS("Continue") alternateButton:_NS("Restart playback") otherButton:_NS("Always continue") informativeTextWithFormat:_NS("Playback of \"%@\" will continue at %@"), [NSString stringWithUTF8String:input_item_GetTitleFbName(p_input)], [[VLCStringUtility sharedInstance] stringForTime:lastPosition.intValue]];
+                NSAlert *theAlert = [NSAlert alertWithMessageText:_NS("Continue playback?") defaultButton:_NS("Continue") alternateButton:_NS("Restart playback") otherButton:_NS("Always continue") informativeTextWithFormat:_NS("Playback of \"%@\" will continue at %@"), [NSString stringWithUTF8String:input_item_GetTitleFbName(p_item)], [[VLCStringUtility sharedInstance] stringForTime:lastPosition.intValue]];
 
-                playlist_t *p_playlist = pl_Get(VLCIntf);
-                PL_UNLOCK;
+                [[VLCCoreInteraction sharedInstance] pause];
                 returnValue = [theAlert runModal];
-                PL_LOCK;
+                [[VLCCoreInteraction sharedInstance] playOrPause];
             }
 
             if (returnValue == NSAlertAlternateReturn || settingValue == 2)
                 lastPosition = [NSNumber numberWithInt:0];
-            input_item_AddOption(p_input, [[NSString stringWithFormat:@"start-time=%i", lastPosition.intValue] UTF8String], VLC_INPUT_OPTION_TRUSTED | VLC_INPUT_OPTION_REPLACE);
+
+            pos.f_float = (float)lastPosition.intValue / (float)dur;
+            msg_Dbg(VLCIntf, "continuing playback at %2.2f", pos.f_float);
+            var_Set(p_input_thread, "position", pos);
 
             if (returnValue == NSAlertOtherReturn)
                 config_PutInt(VLCIntf, "macosx-continue-playback", 1);
         }
     }
+}
+
+- (void)storePlaybackPositionForItem:(input_thread_t *)p_input_thread
+{
+    input_item_t *p_item = input_GetItem(p_input_thread);
+    if (!p_item)
+        return;
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] initWithDictionary:[defaults objectForKey:@"recentlyPlayedMedia"]];
+
+    char *psz_url = decode_URI(input_item_GetURI(p_item));
+    NSString *url = [NSString stringWithUTF8String:psz_url ? psz_url : ""];
+    free(psz_url);
+    vlc_value_t pos;
+    var_Get(p_input_thread, "position", &pos);
+    float f_current_pos = 100. * pos.f_float;
+    long long int dur = input_item_GetDuration(p_item) / 1000000;
+    int current_pos_in_sec = (f_current_pos * dur) / 100;
+    NSMutableArray *mediaList = [defaults objectForKey:@"recentlyPlayedMediaList"];
+
+    if (pos.f_float > .05 && pos.f_float < .95 && dur > 180) {
+        [mutDict setObject:[NSNumber numberWithInt:current_pos_in_sec] forKey:url];
+
+        [mediaList removeObject:url];
+        [mediaList addObject:url];
+        NSUInteger mediaListCount = mediaList.count;
+        if (mediaListCount > 30) {
+            for (NSUInteger x = 0; x < mediaListCount - 30; x++) {
+                [mutDict removeObjectForKey:[mediaList objectAtIndex:0]];
+                [mediaList removeObjectAtIndex:0];
+            }
+        }
+    } else {
+        [mutDict removeObjectForKey:url];
+        [mediaList removeObject:url];
+    }
+    [defaults setObject:mutDict forKey:@"recentlyPlayedMedia"];
+    [defaults setObject:mediaList forKey:@"recentlyPlayedMediaList"];
+    [defaults synchronize];
 }
 
 @end

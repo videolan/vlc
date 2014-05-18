@@ -139,4 +139,7 @@
 - (void)appendNodeArray:(NSArray*)o_array inNode:(playlist_item_t *)p_node atPos:(int)i_position enqueue:(BOOL)b_enqueue;
 
 - (void)setColumn: (NSString *)o_column state: (NSInteger)i_state translationDict:(NSDictionary *)o_dict;
+- (void)continuePlaybackWhereYouLeftOff:(input_thread_t *)p_input_thread;
+- (void)storePlaybackPositionForItem:(input_thread_t *)p_input_thread;
+
 @end
