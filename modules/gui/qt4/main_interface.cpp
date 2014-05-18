@@ -1324,11 +1324,8 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play, bool b_playli
             }
             if( mrl.length() > 0 )
             {
-                playlist_Add( THEPL, qtu(mrl), NULL,
-                          PLAYLIST_APPEND | (first ? PLAYLIST_GO: PLAYLIST_PREPARSE),
-                          PLAYLIST_END, b_playlist, pl_Unlocked );
+                Open::openMRL( p_intf, mrl, first, b_playlist );
                 first = false;
-                RecentsMRL::getInstance( p_intf )->addRecent( mrl );
             }
         }
     }
@@ -1340,9 +1337,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play, bool b_playli
         QUrl(mimeData->text()).isValid() )
     {
         QString mrl = toURI( mimeData->text() );
-        playlist_Add( THEPL, qtu(mrl), NULL,
-                      PLAYLIST_APPEND | (first ? PLAYLIST_GO: PLAYLIST_PREPARSE),
-                      PLAYLIST_END, b_playlist, pl_Unlocked );
+        Open::openMRL( p_intf, mrl, first, b_playlist );
     }
     event->accept();
 }
