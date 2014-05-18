@@ -43,7 +43,7 @@ public:
                          bool b_start = true,
                          bool b_playlist = true);
 
-    int static openInput( intf_thread_t*,
+    int static openMRLwithOptions( intf_thread_t*,
                           const QString &,
                           const QStringList *options,
                           bool b_start = true,

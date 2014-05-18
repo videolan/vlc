@@ -381,7 +381,7 @@ void OpenDialog::enqueue( bool b_enqueue )
         QStringList optionsList = getOptions().split( " :" );
 
         /* Switch between enqueuing and starting the item */
-        Open::openInput( p_intf, itemsMRL[i], &optionsList, b_start, b_pl );
+        Open::openMRLwithOptions( p_intf, itemsMRL[i], &optionsList, b_start, b_pl );
     }
 }
 

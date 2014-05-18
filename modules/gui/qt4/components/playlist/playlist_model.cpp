@@ -950,7 +950,7 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
         foreach( const QString &uri, a.uris )
         {
             QStringList options = a.options.split( " :" );
-            Open::openInput( p_intf, uri, &options, false );
+            Open::openMRLwithOptions( p_intf, uri, &options, false );
         }
         return true;
 

@@ -700,7 +700,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
     {
         options += soutoption.split( " :");
 
-        Open::openInput( p_intf, mrl, &options, true, true, _("Streaming") );
+        Open::openMRLwithOptions( p_intf, mrl, &options, true, true, _("Streaming") );
     }
 }
 

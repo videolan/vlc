@@ -182,7 +182,7 @@ void Open::openMRL( intf_thread_t *p_intf,
         RecentsMRL::getInstance( p_intf )->addRecent( mrl );
 }
 
-int Open::openInput( intf_thread_t* p_intf,
+int Open::openMRLwithOptions( intf_thread_t* p_intf,
                      const QString &mrl,
                      const QStringList *options,
                      bool b_start,
