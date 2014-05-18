@@ -31,6 +31,7 @@
 #include "components/playlist/playlist_model.hpp"
 #include "input_manager.hpp"                            /* THEMIM */
 #include "util/qt_dirs.hpp"
+#include "recents.hpp"                                  /* Open:: */
 
 #include <vlc_intf_strings.h>                           /* I_DIR */
 
@@ -934,11 +935,8 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
 
     case ACTION_ENQUEUEFILE:
         foreach( const QString &uri, a.uris )
-            playlist_Add( THEPL, uri.toLatin1().constData(),
-                          NULL, PLAYLIST_APPEND | PLAYLIST_PREPARSE,
-                          PLAYLIST_END,
-                          getPLRootType() == ROOTTYPE_CURRENT_PLAYING,
-                          pl_Unlocked );
+            Open::openMRL( p_intf, uri.toLatin1().constData(),
+                           false, getPLRootType() == ROOTTYPE_CURRENT_PLAYING );
         return true;
 
     case ACTION_ENQUEUEDIR:
