@@ -1833,7 +1833,7 @@ LIBVLC_API int libvlc_audio_equalizer_set_amp_at_index( libvlc_equalizer_t *p_eq
  *
  * \param p_equalizer valid equalizer handle, must not be NULL
  * \param u_band index, counting from zero, of the frequency band to get
- * \return amplification value (Hz); zero if there is no such frequency band
+ * \return amplification value (Hz); NaN if there is no such frequency band
  * \version LibVLC 2.2.0 or later
  */
 LIBVLC_API float libvlc_audio_equalizer_get_amp_at_index( libvlc_equalizer_t *p_equalizer, unsigned u_band );

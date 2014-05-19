@@ -621,7 +621,7 @@ int libvlc_audio_equalizer_set_amp_at_index( libvlc_equalizer_t *p_equalizer, fl
 float libvlc_audio_equalizer_get_amp_at_index( libvlc_equalizer_t *p_equalizer, unsigned u_band )
 {
     if ( u_band >= EQZ_BANDS_MAX )
-        return 0.f;
+        return nanf("");
 
     return p_equalizer->f_amp[ u_band ];
 }
