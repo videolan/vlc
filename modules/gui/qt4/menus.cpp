@@ -1605,7 +1605,7 @@ void VLCMenuBar::updateRecents( intf_thread_t *p_intf )
         }
         else
         {
-            for( int i = 0; i < l.count(); ++i )
+            for( int i = 0; i < __MIN( l.count(), 10) ; ++i )
             {
                 QString mrl = l.at( i );
                 char *psz = decode_URI_duplicate( qtu( mrl ) );

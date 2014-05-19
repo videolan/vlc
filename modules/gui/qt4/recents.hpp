@@ -33,7 +33,7 @@
 class QRegExp;
 class QSignalMapper;
 
-#define RECENTS_LIST_SIZE 10
+#define RECENTS_LIST_SIZE 30
 
 class Open
 {
