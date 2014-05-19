@@ -46,7 +46,7 @@
 #include <QDir>
 #include <math.h>
 
-#define ICON_HEIGHT 64
+#define ICON_HEIGHT 48
 
 #ifdef _WIN32
 # include <vlc_windows_interfaces.h>
@@ -239,10 +239,10 @@ static int getDefaultAudioVolume(vlc_object_t *obj, const char *aout)
 /*********************************************************************
  * The List of categories
  *********************************************************************/
-SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent, bool small ) :
+SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
                                   QWidget( _parent ), p_intf( _p_intf )
 {
-    QVBoxLayout *layout = new QVBoxLayout();
+    QHBoxLayout *layout = new QHBoxLayout();
 
     /* Use autoExclusive buttons and a mapper as QButtonGroup can't
        set focus (keys) when it manages the buttons's exclusivity.
@@ -250,7 +250,7 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent, bool sma
     QSignalMapper *mapper = new QSignalMapper( layout );
     CONNECT( mapper, mapped(int), this, switchPanel(int) );
 
-    short icon_height = small ? ICON_HEIGHT /2 : ICON_HEIGHT;
+    short icon_height = ICON_HEIGHT;
 
 #define ADD_CATEGORY( button, label, ltooltip, icon, numb )                 \
     QToolButton * button = new QToolButton( this );                         \
@@ -260,7 +260,7 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent, bool sma
     button->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );              \
     button->setIconSize( QSize( icon_height, icon_height ) );               \
     button->resize( icon_height + 6 , icon_height + 6 );                    \
-    button->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding) ;  \
+    button->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred        ); \
     button->setAutoRaise( true );                                           \
     button->setCheckable( true );                                           \
     button->setAutoExclusive( true );                                       \
@@ -287,10 +287,9 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent, bool sma
     layout->setMargin( 0 );
     layout->setSpacing( 1 );
 
-    setMinimumWidth( 140 );
-    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Preferred);
+    setMinimumWidth( ICON_HEIGHT * 6 + 10 );
     setLayout( layout );
-
 }
 
 void SPrefsCatList::switchPanel( int i )
@@ -302,7 +301,7 @@ void SPrefsCatList::switchPanel( int i )
  * The Panels
  *********************************************************************/
 SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
-                          int _number, bool small ) : QWidget( _parent ), p_intf( _p_intf )
+                          int _number ) : QWidget( _parent ), p_intf( _p_intf )
 {
     module_config_t *p_config;
     ConfigControl *control;
@@ -930,19 +929,11 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     panel_layout->addWidget( panel_label );
     panel_layout->addWidget( title_line );
 
-    if( small )
-    {
-        QScrollArea *scroller= new QScrollArea;
-        scroller->setWidget( panel );
-        scroller->setWidgetResizable( true );
-        scroller->setFrameStyle( QFrame::NoFrame );
-        panel_layout->addWidget( scroller );
-    }
-    else
-    {
-        panel_layout->addWidget( panel );
-        if( number != SPrefsHotkeys ) panel_layout->addStretch( 2 );
-    }
+    QScrollArea *scroller= new QScrollArea;
+    scroller->setWidget( panel );
+    scroller->setWidgetResizable( true );
+    scroller->setFrameStyle( QFrame::NoFrame );
+    panel_layout->addWidget( scroller );
 
     setLayout( panel_layout );
 

@@ -75,7 +75,6 @@ struct intf_sys_t
 
     QString filepath;        /* Last path used in dialogs */
 
-    int  i_screenHeight;     /* Detection of Small screens */
     unsigned voutWindowType; /* Type of vout_window_t provided */
     bool b_isDialogProvider; /* Qt mode or Skins mode */
     playlist_t *p_playlist;  /* playlist */

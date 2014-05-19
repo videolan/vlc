@@ -33,6 +33,7 @@
 #include "components/complete_preferences.hpp"
 #include "components/simple_preferences.hpp"
 #include "util/searchlineedit.hpp"
+#include "util/qvlcframe.hpp"
 #include "main_interface.hpp"
 
 #include <QHBoxLayout>
@@ -44,6 +45,7 @@
 #include <QStackedWidget>
 #include <QSplitter>
 #include <QShortcut>
+#include <QScrollArea>
 
 PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
             : QVLCDialog( parent, _p_intf )
@@ -96,12 +98,10 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     buttonsBox->addButton( cancel, QDialogButtonBox::RejectRole );
     buttonsBox->addButton( reset, QDialogButtonBox::ResetRole );
 
-
     simple_split_widget = new QWidget();
-    simple_split_widget->setLayout( new QHBoxLayout );
+    simple_split_widget->setLayout( new QVBoxLayout );
 
     advanced_split_widget = new QSplitter();
-    advanced_split_widget->setLayout( new QHBoxLayout );
 
     stack = new QStackedWidget();
     stack->insertWidget( SIMPLE, simple_split_widget );
@@ -111,9 +111,8 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     simple_split_widget->layout()->addWidget( simple_panels_stack );
     simple_split_widget->layout()->setMargin( 0 );
 
-    advanced_split_widget->layout()->addWidget( advanced_tree_panel );
-    advanced_split_widget->layout()->addWidget( advanced_panels_stack );
-    advanced_split_widget->layout()->setMargin( 0 );
+    advanced_split_widget->addWidget( advanced_tree_panel );
+    advanced_split_widget->addWidget( advanced_panels_stack );
 
     /* Layout  */
     main_layout->addWidget( stack, 0, 0, 3, 3 );
@@ -127,9 +126,6 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     simple_tree_panel->layout()->setMargin( 1 );
     simple_panels_stack->layout()->setContentsMargins( 6, 0, 0, 3 );
 
-    b_small = (p_intf->p_sys->i_screenHeight < 750);
-    if( b_small ) msg_Dbg( p_intf, "Small Resolution");
-    setMaximumHeight( p_intf->p_sys->i_screenHeight );
     for( int i = 0; i < SPrefsMax ; i++ ) simple_panels[i] = NULL;
 
     if( var_InheritBool( p_intf, "qt-advanced-pref" )
@@ -145,7 +141,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     BUTTONACT( simple, setSimple() );
     BUTTONACT( all, setAdvanced() );
 
-    resize( 780, sizeHint().height() );
+    QVLCTools::restoreWidgetPosition( p_intf, "Preferences", this, QSize( 800 , 700 ) );
 }
 
 void PrefsDialog::setAdvanced()
@@ -206,7 +202,7 @@ void PrefsDialog::setSimple()
     /* If no simple_tree, create one, connect it */
     if( !simple_tree )
     {
-         simple_tree = new SPrefsCatList( p_intf, simple_tree_panel, b_small );
+         simple_tree = new SPrefsCatList( p_intf, simple_tree_panel );
          CONNECT( simple_tree,
                   currentItemChanged( int ),
                   this,  changeSimplePanel( int ) );
@@ -227,7 +223,7 @@ void PrefsDialog::changeSimplePanel( int number )
 {
     if( ! simple_panels[number] )
     {
-        SPrefsPanel *insert = new SPrefsPanel( p_intf, simple_panels_stack, number, b_small ) ;
+        SPrefsPanel *insert = new SPrefsPanel( p_intf, simple_panels_stack, number ) ;
         simple_panels_stack->insertWidget( number, insert );
         simple_panels[number] = insert;
     }
@@ -310,11 +306,16 @@ void PrefsDialog::save()
     if( p_intf->p_sys->p_mi )
         p_intf->p_sys->p_mi->reloadPrefs();
     accept();
+
+    QVLCTools::saveWidgetPosition( p_intf, "Preferences", this );
+
 }
 
 /* Clean the preferences, dunno if it does something really */
 void PrefsDialog::cancel()
 {
+    QVLCTools::saveWidgetPosition( p_intf, "Preferences", this );
+
     reject();
 }
 

@@ -41,6 +41,7 @@ class QLabel;
 class SearchLineEdit;
 class QStackedWidget;
 class QSplitter;
+class QScrollArea;
 
 class PrefsDialog : public QVLCDialog
 {
@@ -74,8 +75,6 @@ private:
 
     QGroupBox *types;
     QRadioButton *simple,*all;
-
-    bool b_small;
 
 private slots:
     void setAdvanced();
