@@ -56,7 +56,7 @@ public:
              playlist_item_t *, QObject *parent = 0 );
     virtual ~PLModel();
 
-    /* Qt4 main PLModel */
+    /* Qt main PLModel */
     static PLModel* getPLModel( intf_thread_t *p_intf )
     {
         if(!p_intf->p_sys->pl_model )

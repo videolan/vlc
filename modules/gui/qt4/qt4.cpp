@@ -704,9 +704,9 @@ static void WindowClose( vout_window_t *p_wnd )
     QMutexLocker locker (&lock);
 
     /* Normally, the interface terminates after the video. In the contrary, the
-     * Qt4 main loop is gone, so we cannot send any event to the user interface
-     * widgets. Ideally, we would keep the Qt4 main loop running until after
-     * the video window is released. But it is far simpler to just have the Qt4
+     * Qt main loop is gone, so we cannot send any event to the user interface
+     * widgets. Ideally, we would keep the Qt main loop running until after
+     * the video window is released. But it is far simpler to just have the Qt
      * thread destroy the window early, and to turn this function into a stub.
      *
      * That assumes the video output will behave sanely if it window is

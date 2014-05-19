@@ -640,8 +640,8 @@ void MainInterface::toggleFSC()
 
 /**
  * NOTE:
- * You must not change the state of this object or other Qt4 UI objects,
- * from the video output thread - only from the Qt4 UI main loop thread.
+ * You must not change the state of this object or other Qt UI objects,
+ * from the video output thread - only from the Qt UI main loop thread.
  * All window provider queries must be handled through signals or events.
  * That's why we have all those emit statements...
  */
@@ -691,7 +691,7 @@ void MainInterface::releaseVideoSlot( void )
 {
     /* This function is called when the embedded video window is destroyed,
      * or in the rare case that the embedded window is still here but the
-     * Qt4 interface exits. */
+     * Qt interface exits. */
     assert( videoWidget );
     videoWidget->release();
     setVideoOnTop( false );

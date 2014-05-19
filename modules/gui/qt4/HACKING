@@ -1,6 +1,6 @@
 Small Hacking file for the Qt Interface
 
-If you ever code for Qt4 interface, please read this before.
+If you ever code for Qt interface, please read this before.
 
 ** Code Convetions **
 
@@ -18,7 +18,7 @@ Refer to http://wiki.videolan.org/Code_Conventions it should be up to date
 
 - VLC include/*.h includes
 - Other VLC .h includes (gruiking :D)
-- Qt4 module includes
+- Qt module includes
 - Qt includes
 
 ** Naming **
@@ -43,7 +43,7 @@ So if your dialog is a dialog you are used to keep during a playing of a video, 
 QVLCFrame: extended panel, messages...
 QVLCDialog: preferences, open...
 
-** HIG for Qt4 **
+** HIG for Qt **
 We tend to use GNOME/KDE specs over Vista ones for capitalizations:
 We use Header for:
  - Menu
