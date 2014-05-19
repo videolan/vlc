@@ -239,7 +239,7 @@ void libvlc_video_set_scale( libvlc_media_player_t *p_mp, float f_scale )
 {
     if (f_scale != 0.)
         var_SetFloat (p_mp, "scale", f_scale);
-    var_SetBool (p_mp, "autoscale", f_scale == 0.);
+    var_SetBool (p_mp, "autoscale", f_scale == 0.f);
 
     /* Apply to current video outputs (if any) */
     size_t n;
@@ -250,7 +250,7 @@ void libvlc_video_set_scale( libvlc_media_player_t *p_mp, float f_scale )
 
         if (f_scale != 0.)
             var_SetFloat (p_vout, "scale", f_scale);
-        var_SetBool (p_vout, "autoscale", f_scale == 0.);
+        var_SetBool (p_vout, "autoscale", f_scale == 0.f);
         vlc_object_release (p_vout);
     }
     free (pp_vouts);
