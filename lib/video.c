@@ -38,6 +38,7 @@
 #include <vlc_vout.h>
 
 #include "media_player_internal.h"
+#include <math.h>
 #include <assert.h>
 
 /*
@@ -237,7 +238,7 @@ float libvlc_video_get_scale( libvlc_media_player_t *mp )
 
 void libvlc_video_set_scale( libvlc_media_player_t *p_mp, float f_scale )
 {
-    if (f_scale != 0.)
+    if (isfinite(f_scale) && f_scale != 0.f)
         var_SetFloat (p_mp, "scale", f_scale);
     var_SetBool (p_mp, "autoscale", f_scale == 0.f);
 
@@ -248,7 +249,7 @@ void libvlc_video_set_scale( libvlc_media_player_t *p_mp, float f_scale )
     {
         vout_thread_t *p_vout = pp_vouts[i];
 
-        if (f_scale != 0.)
+        if (isfinite(f_scale) && f_scale != 0.f)
             var_SetFloat (p_vout, "scale", f_scale);
         var_SetBool (p_vout, "autoscale", f_scale == 0.f);
         vlc_object_release (p_vout);
