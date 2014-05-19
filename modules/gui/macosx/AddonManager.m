@@ -107,6 +107,7 @@ static VLCAddonManager *_o_sharedInstance = nil;
     [_version setStringValue:@""];
     [_description setString:@""];
     [_window setTitle:_NS("Addons Manager")];
+    [_window setReleasedWhenClosed:NO];
 
     [[[_addonsTable tableColumnWithIdentifier:@"installed"] headerCell] setStringValue:_NS("Installed")];
     [[[_addonsTable tableColumnWithIdentifier:@"name"] headerCell] setStringValue:_NS("Name")];
