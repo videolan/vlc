@@ -42,6 +42,7 @@
 #include <QFile>
 #include <QDir>
 #include <QSignalMapper>
+#include <QMessageBox>
 
 #include <assert.h>
 
@@ -110,6 +111,7 @@ void InputManager::setInput( input_thread_t *_p_input )
         msg_Dbg( p_intf, "IM: Setting an input" );
         vlc_object_hold( p_input );
         addCallbacks();
+
         UpdateStatus();
         UpdateName();
         UpdateArt();
@@ -119,6 +121,22 @@ void InputManager::setInput( input_thread_t *_p_input )
 
         p_item = input_GetItem( p_input );
         emit rateChanged( var_GetFloat( p_input, "rate" ) );
+
+        /* Get Saved Time */
+        int i_time = RecentsMRL::getInstance( p_intf )->time( p_item->psz_uri );
+        if( i_time > 0 )
+        {
+            THEMIM->togglePlayPause();
+
+            if( QMessageBox::question( NULL,
+                        _("Continue playback?"),
+                        _("Do you want to restart the playback where left off?"),
+                        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes )
+                    == QMessageBox::Yes )
+                var_SetTime( p_input, "time", (int64_t)i_time * 1000 );
+
+            THEMIM->togglePlayPause();
+        }
     }
     else
     {
