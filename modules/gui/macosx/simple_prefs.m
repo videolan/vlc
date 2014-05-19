@@ -1262,7 +1262,8 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         [[NSFontManager sharedFontManager] setSelectedFont:font isMultiple:NO];
     }
     [[NSFontManager sharedFontManager] setTarget: self];
-    [[NSFontPanel sharedFontPanel] orderFront:self];
+    [[NSFontPanel sharedFontPanel] setDelegate:self];
+    [[NSFontPanel sharedFontPanel] makeKeyAndOrderFront:self];
 }
 
 - (void)changeFont:(id)sender
@@ -1270,6 +1271,11 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     NSFont * font = [sender convertFont:[[NSFontManager sharedFontManager] selectedFont]];
     [o_osd_font_fld setStringValue:[font fontName]];
     [self osdSettingChanged:self];
+}
+
+- (NSUInteger)validModesForFontPanel:(NSFontPanel *)fontPanel
+{
+    return NSFontPanelFaceModeMask | NSFontPanelCollectionModeMask;
 }
 
 - (IBAction)inputSettingChanged:(id)sender

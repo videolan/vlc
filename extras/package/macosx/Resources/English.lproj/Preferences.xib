@@ -2,23 +2,25 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">12F45</string>
+    <string key="IBDocument.SystemVersion">13D65</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1187.40</string>
-    <string key="IBDocument.HIToolboxVersion">626.00</string>
+    <string key="IBDocument.AppKitVersion">1265.20</string>
+    <string key="IBDocument.HIToolboxVersion">698.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
       <string key="NS.object.0">851</string>
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="3745"/>
-      <integer value="1530"/>
-      <integer value="2562"/>
-      <integer value="2265"/>
-      <integer value="2677"/>
+      <integer value="2523"/>
       <integer value="2311"/>
       <integer value="2440"/>
+      <integer value="3745"/>
+      <integer value="2265"/>
+      <integer value="2677"/>
+      <integer value="1530"/>
+      <integer value="2330"/>
+      <integer value="2562"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -321,6 +323,7 @@
                 <reference key="NSTextColor" ref="499525791"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSButton" id="470463600">
               <reference key="NSNextResponder" ref="669190984"/>
@@ -578,6 +581,7 @@
               <reference key="NSTextColor" ref="499525791"/>
             </object>
             <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+            <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
           </object>
           <object class="NSPopUpButton" id="979338837">
             <reference key="NSNextResponder" ref="1006472879"/>
@@ -633,6 +637,7 @@
               <reference key="NSTextColor" ref="499525791"/>
             </object>
             <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+            <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
           </object>
           <object class="NSPopUpButton" id="222815804">
             <reference key="NSNextResponder" ref="1006472879"/>
@@ -698,6 +703,7 @@
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSTextField" id="866391398">
                     <reference key="NSNextResponder" ref="291446283"/>
@@ -723,6 +729,7 @@
                       </object>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                 </object>
                 <string key="NSFrame">{{1, 1}, {534, 44}}</string>
@@ -834,10 +841,63 @@ AAAAAAAAAAUAAAAfAAAAZTMzM8KAgIDwv7+//O3t7f/t7e3/v7+//ICAgPAzMzPCAAAAZQAAAB8AAAAF
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAAFwAAAEMAAAB3AAAAnwAAALMAAACzAAAAnwAAAHcAAABD
 AAAAFwAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAoAAAAXAAAAJAAAAC4AAAAu
 AAAAJAAAABcAAAAKAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAwAAAAMAAAADAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQEAAAMAAAABABIAAAEB
-AAMAAAABABIAAAECAAMAAAAEAAAFugEDAAMAAAABAAEAAAEGAAMAAAABAAIAAAERAAQAAAABAAAACAES
+AAAAAwAAAAMAAAADAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgEAAAMAAAABABIAAAEB
+AAMAAAABABIAAAECAAMAAAAEAAAFxgEDAAMAAAABAAEAAAEGAAMAAAABAAIAAAERAAQAAAABAAAACAES
 AAMAAAABAAEAAAEVAAMAAAABAAQAAAEWAAMAAAABABIAAAEXAAQAAAABAAAFEAEcAAMAAAABAAEAAAFS
-AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
+AAMAAAABAAEAAAFTAAMAAAAEAAAFzodzAAcAAAxIAAAF1gAAAAAACAAIAAgACAABAAEAAQABAAAMSExp
+bm8CEAAAbW50clJHQiBYWVogB84AAgAJAAYAMQAAYWNzcE1TRlQAAAAASUVDIHNSR0IAAAAAAAAAAAAA
+AAAAAPbWAAEAAAAA0y1IUCAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAARY3BydAAAAVAAAAAzZGVzYwAAAYQAAABsd3RwdAAAAfAAAAAUYmtwdAAAAgQAAAAUclhZWgAA
+AhgAAAAUZ1hZWgAAAiwAAAAUYlhZWgAAAkAAAAAUZG1uZAAAAlQAAABwZG1kZAAAAsQAAACIdnVlZAAA
+A0wAAACGdmlldwAAA9QAAAAkbHVtaQAAA/gAAAAUbWVhcwAABAwAAAAkdGVjaAAABDAAAAAMclRSQwAA
+BDwAAAgMZ1RSQwAABDwAAAgMYlRSQwAABDwAAAgMdGV4dAAAAABDb3B5cmlnaHQgKGMpIDE5OTggSGV3
+bGV0dC1QYWNrYXJkIENvbXBhbnkAAGRlc2MAAAAAAAAAEnNSR0IgSUVDNjE5NjYtMi4xAAAAAAAAAAAA
+AAASc1JHQiBJRUM2MTk2Ni0yLjEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAFhZWiAAAAAAAADzUQABAAAAARbMWFlaIAAAAAAAAAAAAAAAAAAAAABYWVogAAAAAAAA
+b6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9kZXNjAAAAAAAA
+ABZJRUMgaHR0cDovL3d3dy5pZWMuY2gAAAAAAAAAAAAAABZJRUMgaHR0cDovL3d3dy5pZWMuY2gAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZGVzYwAAAAAAAAAuSUVDIDYx
+OTY2LTIuMSBEZWZhdWx0IFJHQiBjb2xvdXIgc3BhY2UgLSBzUkdCAAAAAAAAAAAAAAAuSUVDIDYxOTY2
+LTIuMSBEZWZhdWx0IFJHQiBjb2xvdXIgc3BhY2UgLSBzUkdCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGRl
+c2MAAAAAAAAALFJlZmVyZW5jZSBWaWV3aW5nIENvbmRpdGlvbiBpbiBJRUM2MTk2Ni0yLjEAAAAAAAAA
+AAAAACxSZWZlcmVuY2UgVmlld2luZyBDb25kaXRpb24gaW4gSUVDNjE5NjYtMi4xAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAB2aWV3AAAAAAATpP4AFF8uABDPFAAD7cwABBMLAANcngAAAAFYWVogAAAAAABM
+CVYAUAAAAFcf521lYXMAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAKPAAAAAnNpZyAAAAAAQ1JUIGN1
+cnYAAAAAAAAEAAAAAAUACgAPABQAGQAeACMAKAAtADIANwA7AEAARQBKAE8AVABZAF4AYwBoAG0AcgB3
+AHwAgQCGAIsAkACVAJoAnwCkAKkArgCyALcAvADBAMYAywDQANUA2wDgAOUA6wDwAPYA+wEBAQcBDQET
+ARkBHwElASsBMgE4AT4BRQFMAVIBWQFgAWcBbgF1AXwBgwGLAZIBmgGhAakBsQG5AcEByQHRAdkB4QHp
+AfIB+gIDAgwCFAIdAiYCLwI4AkECSwJUAl0CZwJxAnoChAKOApgCogKsArYCwQLLAtUC4ALrAvUDAAML
+AxYDIQMtAzgDQwNPA1oDZgNyA34DigOWA6IDrgO6A8cD0wPgA+wD+QQGBBMEIAQtBDsESARVBGMEcQR+
+BIwEmgSoBLYExATTBOEE8AT+BQ0FHAUrBToFSQVYBWcFdwWGBZYFpgW1BcUF1QXlBfYGBgYWBicGNwZI
+BlkGagZ7BowGnQavBsAG0QbjBvUHBwcZBysHPQdPB2EHdAeGB5kHrAe/B9IH5Qf4CAsIHwgyCEYIWghu
+CIIIlgiqCL4I0gjnCPsJEAklCToJTwlkCXkJjwmkCboJzwnlCfsKEQonCj0KVApqCoEKmAquCsUK3Arz
+CwsLIgs5C1ELaQuAC5gLsAvIC+EL+QwSDCoMQwxcDHUMjgynDMAM2QzzDQ0NJg1ADVoNdA2ODakNww3e
+DfgOEw4uDkkOZA5/DpsOtg7SDu4PCQ8lD0EPXg96D5YPsw/PD+wQCRAmEEMQYRB+EJsQuRDXEPURExEx
+EU8RbRGMEaoRyRHoEgcSJhJFEmQShBKjEsMS4xMDEyMTQxNjE4MTpBPFE+UUBhQnFEkUahSLFK0UzhTw
+FRIVNBVWFXgVmxW9FeAWAxYmFkkWbBaPFrIW1hb6Fx0XQRdlF4kXrhfSF/cYGxhAGGUYihivGNUY+hkg
+GUUZaxmRGbcZ3RoEGioaURp3Gp4axRrsGxQbOxtjG4obshvaHAIcKhxSHHscoxzMHPUdHh1HHXAdmR3D
+HeweFh5AHmoelB6+HukfEx8+H2kflB+/H+ogFSBBIGwgmCDEIPAhHCFIIXUhoSHOIfsiJyJVIoIiryLd
+IwojOCNmI5QjwiPwJB8kTSR8JKsk2iUJJTglaCWXJccl9yYnJlcmhya3JugnGCdJJ3onqyfcKA0oPyhx
+KKIo1CkGKTgpaymdKdAqAio1KmgqmyrPKwIrNitpK50r0SwFLDksbiyiLNctDC1BLXYtqy3hLhYuTC6C
+Lrcu7i8kL1ovkS/HL/4wNTBsMKQw2zESMUoxgjG6MfIyKjJjMpsy1DMNM0YzfzO4M/E0KzRlNJ402DUT
+NU01hzXCNf02NzZyNq426TckN2A3nDfXOBQ4UDiMOMg5BTlCOX85vDn5OjY6dDqyOu87LTtrO6o76Dwn
+PGU8pDzjPSI9YT2hPeA+ID5gPqA+4D8hP2E/oj/iQCNAZECmQOdBKUFqQaxB7kIwQnJCtUL3QzpDfUPA
+RANER0SKRM5FEkVVRZpF3kYiRmdGq0bwRzVHe0fASAVIS0iRSNdJHUljSalJ8Eo3Sn1KxEsMS1NLmkvi
+TCpMcky6TQJNSk2TTdxOJU5uTrdPAE9JT5NP3VAnUHFQu1EGUVBRm1HmUjFSfFLHUxNTX1OqU/ZUQlSP
+VNtVKFV1VcJWD1ZcVqlW91dEV5JX4FgvWH1Yy1kaWWlZuFoHWlZaplr1W0VblVvlXDVchlzWXSddeF3J
+XhpebF69Xw9fYV+zYAVgV2CqYPxhT2GiYfViSWKcYvBjQ2OXY+tkQGSUZOllPWWSZedmPWaSZuhnPWeT
+Z+loP2iWaOxpQ2maafFqSGqfavdrT2una/9sV2yvbQhtYG25bhJua27Ebx5veG/RcCtwhnDgcTpxlXHw
+cktypnMBc11zuHQUdHB0zHUodYV14XY+dpt2+HdWd7N4EXhueMx5KnmJeed6RnqlewR7Y3vCfCF8gXzh
+fUF9oX4BfmJ+wn8jf4R/5YBHgKiBCoFrgc2CMIKSgvSDV4O6hB2EgITjhUeFq4YOhnKG14c7h5+IBIhp
+iM6JM4mZif6KZIrKizCLlov8jGOMyo0xjZiN/45mjs6PNo+ekAaQbpDWkT+RqJIRknqS45NNk7aUIJSK
+lPSVX5XJljSWn5cKl3WX4JhMmLiZJJmQmfyaaJrVm0Kbr5wcnImc951kndKeQJ6unx2fi5/6oGmg2KFH
+obaiJqKWowajdqPmpFakx6U4pammGqaLpv2nbqfgqFKoxKk3qamqHKqPqwKrdavprFys0K1ErbiuLa6h
+rxavi7AAsHWw6rFgsdayS7LCszizrrQltJy1E7WKtgG2ebbwt2i34LhZuNG5SrnCuju6tbsuu6e8Ibyb
+vRW9j74KvoS+/796v/XAcMDswWfB48JfwtvDWMPUxFHEzsVLxcjGRsbDx0HHv8g9yLzJOsm5yjjKt8s2
+y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
+2vvbgNwF3IrdEN2W3hzeot8p36/gNuC94UThzOJT4tvjY+Pr5HPk/OWE5g3mlucf56noMui86Ubp0Opb
+6uXrcOv77IbtEe2c7ijutO9A78zwWPDl8XLx//KM8xnzp/Q09ML1UPXe9m32+/eK+Bn4qPk4+cf6V/rn
++3f8B/yY/Sn9uv5L/tz/bf//A</bytes>
                       </object>
                     </object>
                   </object>
@@ -873,6 +933,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               <reference key="NSTextColor" ref="499525791"/>
             </object>
             <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+            <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
           </object>
           <object class="NSTextField" id="878046419">
             <reference key="NSNextResponder" ref="1006472879"/>
@@ -890,6 +951,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               <reference key="NSTextColor" ref="499525791"/>
             </object>
             <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+            <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
           </object>
           <object class="NSBox" id="698552329">
             <reference key="NSNextResponder" ref="1006472879"/>
@@ -994,6 +1056,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSButton" id="243384014">
                     <reference key="NSNextResponder" ref="185944260"/>
@@ -1047,6 +1110,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       </object>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                 </object>
                 <string key="NSFrame">{{2, 2}, {532, 97}}</string>
@@ -1289,7 +1353,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         <string key="NSExtension">NSResponder</string>
       </object>
       <object class="NSCustomView" id="1030708865">
-        <nil key="NSNextResponder"/>
+        <reference key="NSNextResponder"/>
         <int key="NSvFlags">256</int>
         <object class="NSMutableArray" key="NSSubviews">
           <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1471,6 +1535,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="292380699"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSButton" id="895998750">
                     <reference key="NSNextResponder" ref="830950655"/>
@@ -1511,6 +1576,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSPopUpButton" id="888922289">
                     <reference key="NSNextResponder" ref="830950655"/>
@@ -1599,6 +1665,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSTextField" id="430352128">
                     <reference key="NSNextResponder" ref="830950655"/>
@@ -1617,6 +1684,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="292380699"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSMatrix" id="58457500">
                     <reference key="NSNextResponder" ref="830950655"/>
@@ -1793,10 +1861,63 @@ AAAAAAAAAAUAAAAfAAAAZTMzM8KAgIDwv7+//O3t7f/t7e3/v7+//ICAgPAzMzPCAAAAZQAAAB8AAAAF
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAAFwAAAEMAAAB3AAAAnwAAALMAAACzAAAAnwAAAHcAAABD
 AAAAFwAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAoAAAAXAAAAJAAAAC4AAAAu
 AAAAJAAAABcAAAAKAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAwAAAAMAAAADAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQEAAAMAAAABABIAAAEB
-AAMAAAABABIAAAECAAMAAAAEAAAFugEDAAMAAAABAAEAAAEGAAMAAAABAAIAAAERAAQAAAABAAAACAES
+AAAAAwAAAAMAAAADAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgEAAAMAAAABABIAAAEB
+AAMAAAABABIAAAECAAMAAAAEAAAFxgEDAAMAAAABAAEAAAEGAAMAAAABAAIAAAERAAQAAAABAAAACAES
 AAMAAAABAAEAAAEVAAMAAAABAAQAAAEWAAMAAAABABIAAAEXAAQAAAABAAAFEAEcAAMAAAABAAEAAAFS
-AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
+AAMAAAABAAEAAAFTAAMAAAAEAAAFzodzAAcAAAxIAAAF1gAAAAAACAAIAAgACAABAAEAAQABAAAMSExp
+bm8CEAAAbW50clJHQiBYWVogB84AAgAJAAYAMQAAYWNzcE1TRlQAAAAASUVDIHNSR0IAAAAAAAAAAAAA
+AAAAAPbWAAEAAAAA0y1IUCAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAARY3BydAAAAVAAAAAzZGVzYwAAAYQAAABsd3RwdAAAAfAAAAAUYmtwdAAAAgQAAAAUclhZWgAA
+AhgAAAAUZ1hZWgAAAiwAAAAUYlhZWgAAAkAAAAAUZG1uZAAAAlQAAABwZG1kZAAAAsQAAACIdnVlZAAA
+A0wAAACGdmlldwAAA9QAAAAkbHVtaQAAA/gAAAAUbWVhcwAABAwAAAAkdGVjaAAABDAAAAAMclRSQwAA
+BDwAAAgMZ1RSQwAABDwAAAgMYlRSQwAABDwAAAgMdGV4dAAAAABDb3B5cmlnaHQgKGMpIDE5OTggSGV3
+bGV0dC1QYWNrYXJkIENvbXBhbnkAAGRlc2MAAAAAAAAAEnNSR0IgSUVDNjE5NjYtMi4xAAAAAAAAAAAA
+AAASc1JHQiBJRUM2MTk2Ni0yLjEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAFhZWiAAAAAAAADzUQABAAAAARbMWFlaIAAAAAAAAAAAAAAAAAAAAABYWVogAAAAAAAA
+b6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9kZXNjAAAAAAAA
+ABZJRUMgaHR0cDovL3d3dy5pZWMuY2gAAAAAAAAAAAAAABZJRUMgaHR0cDovL3d3dy5pZWMuY2gAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZGVzYwAAAAAAAAAuSUVDIDYx
+OTY2LTIuMSBEZWZhdWx0IFJHQiBjb2xvdXIgc3BhY2UgLSBzUkdCAAAAAAAAAAAAAAAuSUVDIDYxOTY2
+LTIuMSBEZWZhdWx0IFJHQiBjb2xvdXIgc3BhY2UgLSBzUkdCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGRl
+c2MAAAAAAAAALFJlZmVyZW5jZSBWaWV3aW5nIENvbmRpdGlvbiBpbiBJRUM2MTk2Ni0yLjEAAAAAAAAA
+AAAAACxSZWZlcmVuY2UgVmlld2luZyBDb25kaXRpb24gaW4gSUVDNjE5NjYtMi4xAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAB2aWV3AAAAAAATpP4AFF8uABDPFAAD7cwABBMLAANcngAAAAFYWVogAAAAAABM
+CVYAUAAAAFcf521lYXMAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAKPAAAAAnNpZyAAAAAAQ1JUIGN1
+cnYAAAAAAAAEAAAAAAUACgAPABQAGQAeACMAKAAtADIANwA7AEAARQBKAE8AVABZAF4AYwBoAG0AcgB3
+AHwAgQCGAIsAkACVAJoAnwCkAKkArgCyALcAvADBAMYAywDQANUA2wDgAOUA6wDwAPYA+wEBAQcBDQET
+ARkBHwElASsBMgE4AT4BRQFMAVIBWQFgAWcBbgF1AXwBgwGLAZIBmgGhAakBsQG5AcEByQHRAdkB4QHp
+AfIB+gIDAgwCFAIdAiYCLwI4AkECSwJUAl0CZwJxAnoChAKOApgCogKsArYCwQLLAtUC4ALrAvUDAAML
+AxYDIQMtAzgDQwNPA1oDZgNyA34DigOWA6IDrgO6A8cD0wPgA+wD+QQGBBMEIAQtBDsESARVBGMEcQR+
+BIwEmgSoBLYExATTBOEE8AT+BQ0FHAUrBToFSQVYBWcFdwWGBZYFpgW1BcUF1QXlBfYGBgYWBicGNwZI
+BlkGagZ7BowGnQavBsAG0QbjBvUHBwcZBysHPQdPB2EHdAeGB5kHrAe/B9IH5Qf4CAsIHwgyCEYIWghu
+CIIIlgiqCL4I0gjnCPsJEAklCToJTwlkCXkJjwmkCboJzwnlCfsKEQonCj0KVApqCoEKmAquCsUK3Arz
+CwsLIgs5C1ELaQuAC5gLsAvIC+EL+QwSDCoMQwxcDHUMjgynDMAM2QzzDQ0NJg1ADVoNdA2ODakNww3e
+DfgOEw4uDkkOZA5/DpsOtg7SDu4PCQ8lD0EPXg96D5YPsw/PD+wQCRAmEEMQYRB+EJsQuRDXEPURExEx
+EU8RbRGMEaoRyRHoEgcSJhJFEmQShBKjEsMS4xMDEyMTQxNjE4MTpBPFE+UUBhQnFEkUahSLFK0UzhTw
+FRIVNBVWFXgVmxW9FeAWAxYmFkkWbBaPFrIW1hb6Fx0XQRdlF4kXrhfSF/cYGxhAGGUYihivGNUY+hkg
+GUUZaxmRGbcZ3RoEGioaURp3Gp4axRrsGxQbOxtjG4obshvaHAIcKhxSHHscoxzMHPUdHh1HHXAdmR3D
+HeweFh5AHmoelB6+HukfEx8+H2kflB+/H+ogFSBBIGwgmCDEIPAhHCFIIXUhoSHOIfsiJyJVIoIiryLd
+IwojOCNmI5QjwiPwJB8kTSR8JKsk2iUJJTglaCWXJccl9yYnJlcmhya3JugnGCdJJ3onqyfcKA0oPyhx
+KKIo1CkGKTgpaymdKdAqAio1KmgqmyrPKwIrNitpK50r0SwFLDksbiyiLNctDC1BLXYtqy3hLhYuTC6C
+Lrcu7i8kL1ovkS/HL/4wNTBsMKQw2zESMUoxgjG6MfIyKjJjMpsy1DMNM0YzfzO4M/E0KzRlNJ402DUT
+NU01hzXCNf02NzZyNq426TckN2A3nDfXOBQ4UDiMOMg5BTlCOX85vDn5OjY6dDqyOu87LTtrO6o76Dwn
+PGU8pDzjPSI9YT2hPeA+ID5gPqA+4D8hP2E/oj/iQCNAZECmQOdBKUFqQaxB7kIwQnJCtUL3QzpDfUPA
+RANER0SKRM5FEkVVRZpF3kYiRmdGq0bwRzVHe0fASAVIS0iRSNdJHUljSalJ8Eo3Sn1KxEsMS1NLmkvi
+TCpMcky6TQJNSk2TTdxOJU5uTrdPAE9JT5NP3VAnUHFQu1EGUVBRm1HmUjFSfFLHUxNTX1OqU/ZUQlSP
+VNtVKFV1VcJWD1ZcVqlW91dEV5JX4FgvWH1Yy1kaWWlZuFoHWlZaplr1W0VblVvlXDVchlzWXSddeF3J
+XhpebF69Xw9fYV+zYAVgV2CqYPxhT2GiYfViSWKcYvBjQ2OXY+tkQGSUZOllPWWSZedmPWaSZuhnPWeT
+Z+loP2iWaOxpQ2maafFqSGqfavdrT2una/9sV2yvbQhtYG25bhJua27Ebx5veG/RcCtwhnDgcTpxlXHw
+cktypnMBc11zuHQUdHB0zHUodYV14XY+dpt2+HdWd7N4EXhueMx5KnmJeed6RnqlewR7Y3vCfCF8gXzh
+fUF9oX4BfmJ+wn8jf4R/5YBHgKiBCoFrgc2CMIKSgvSDV4O6hB2EgITjhUeFq4YOhnKG14c7h5+IBIhp
+iM6JM4mZif6KZIrKizCLlov8jGOMyo0xjZiN/45mjs6PNo+ekAaQbpDWkT+RqJIRknqS45NNk7aUIJSK
+lPSVX5XJljSWn5cKl3WX4JhMmLiZJJmQmfyaaJrVm0Kbr5wcnImc951kndKeQJ6unx2fi5/6oGmg2KFH
+obaiJqKWowajdqPmpFakx6U4pammGqaLpv2nbqfgqFKoxKk3qamqHKqPqwKrdavprFys0K1ErbiuLa6h
+rxavi7AAsHWw6rFgsdayS7LCszizrrQltJy1E7WKtgG2ebbwt2i34LhZuNG5SrnCuju6tbsuu6e8Ibyb
+vRW9j74KvoS+/796v/XAcMDswWfB48JfwtvDWMPUxFHEzsVLxcjGRsbDx0HHv8g9yLzJOsm5yjjKt8s2
+y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
+2vvbgNwF3IrdEN2W3hzeot8p36/gNuC94UThzOJT4tvjY+Pr5HPk/OWE5g3mlucf56noMui86Ubp0Opb
+6uXrcOv77IbtEe2c7ijutO9A78zwWPDl8XLx//KM8xnzp/Q09ML1UPXe9m32+/eK+Bn4qPk4+cf6V/rn
++3f8B/yY/Sn9uv5L/tz/bf//A</bytes>
                               </object>
                             </object>
                           </object>
@@ -1863,6 +1984,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSPopUpButton" id="1043716973">
                     <reference key="NSNextResponder" ref="1026306433"/>
@@ -2010,6 +2132,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="292380699"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSTextField" id="992731424">
                     <reference key="NSNextResponder" ref="766648432"/>
@@ -2027,6 +2150,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSTextField" id="271538554">
                     <reference key="NSNextResponder" ref="766648432"/>
@@ -2045,6 +2169,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="292380699"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSTextField" id="710479511">
                     <reference key="NSNextResponder" ref="766648432"/>
@@ -2062,6 +2187,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                 </object>
                 <string key="NSFrame">{{2, 2}, {531, 100}}</string>
@@ -2090,6 +2216,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           </object>
         </object>
         <string key="NSFrameSize">{569, 448}</string>
+        <reference key="NSSuperview"/>
         <string key="NSClassName">NSView</string>
         <string key="NSExtension">NSResponder</string>
       </object>
@@ -2127,6 +2254,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSTextField" id="989270199">
                     <reference key="NSNextResponder" ref="884600482"/>
@@ -2144,6 +2272,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSPopUpButton" id="394811372">
                     <reference key="NSNextResponder" ref="884600482"/>
@@ -2549,6 +2678,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                 </object>
                 <string key="NSFrame">{{2, 2}, {532, 116}}</string>
@@ -2602,6 +2732,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="292380699"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSTextField" id="511886993">
                     <reference key="NSNextResponder" ref="55664769"/>
@@ -2619,6 +2750,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSButton" id="451974659">
                     <reference key="NSNextResponder" ref="55664769"/>
@@ -2661,6 +2793,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="292380699"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSTextField" id="204791602">
                     <reference key="NSNextResponder" ref="55664769"/>
@@ -2678,6 +2811,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSButton" id="356236872">
                     <reference key="NSNextResponder" ref="55664769"/>
@@ -2718,6 +2852,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSPopUpButton" id="123779204">
                     <reference key="NSNextResponder" ref="55664769"/>
@@ -2811,7 +2946,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         <string key="NSExtension">NSResponder</string>
       </object>
       <object class="NSCustomView" id="192213238">
-        <nil key="NSNextResponder"/>
+        <reference key="NSNextResponder"/>
         <int key="NSvFlags">256</int>
         <object class="NSMutableArray" key="NSSubviews">
           <bool key="EncodedWithXMLCoder">YES</bool>
@@ -2899,6 +3034,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSTextField" id="770847139">
                     <reference key="NSNextResponder" ref="493831356"/>
@@ -2917,6 +3053,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="292380699"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSTextField" id="683383563">
                     <reference key="NSNextResponder" ref="493831356"/>
@@ -2934,6 +3071,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSPopUpButton" id="849555725">
                     <reference key="NSNextResponder" ref="493831356"/>
@@ -3072,6 +3210,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="292380699"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSTextField" id="395250996">
                     <reference key="NSNextResponder" ref="1045304801"/>
@@ -3089,6 +3228,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSButton" id="10156473">
                     <reference key="NSNextResponder" ref="1045304801"/>
@@ -3201,6 +3341,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSPopUpButton" id="726831071">
                     <reference key="NSNextResponder" ref="1045304801"/>
@@ -3289,6 +3430,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSPopUpButton" id="497958621">
                     <reference key="NSNextResponder" ref="1045304801"/>
@@ -3377,6 +3519,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSPopUpButton" id="149722219">
                     <reference key="NSNextResponder" ref="1045304801"/>
@@ -3465,6 +3608,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSTextField" id="417997805">
                     <reference key="NSNextResponder" ref="1045304801"/>
@@ -3482,6 +3626,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSSlider" id="273574919">
                     <reference key="NSNextResponder" ref="1045304801"/>
@@ -3615,6 +3760,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="292380699"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                 </object>
                 <string key="NSFrame">{{2, 2}, {532, 196}}</string>
@@ -3643,6 +3789,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           </object>
         </object>
         <string key="NSFrameSize">{570, 396}</string>
+        <reference key="NSSuperview"/>
         <object class="NSMutableString" key="NSClassName">
           <characters key="NS.bytes">NSView</characters>
         </object>
@@ -3680,6 +3827,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="292380699"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSButton" id="1031034723">
                     <reference key="NSNextResponder" ref="67619185"/>
@@ -3888,6 +4036,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="292380699"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSStepper" id="1020668341">
                     <reference key="NSNextResponder" ref="602221378"/>
@@ -3922,6 +4071,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSTextField" id="410952216">
                     <reference key="NSNextResponder" ref="602221378"/>
@@ -3939,6 +4089,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSPopUpButton" id="635955542">
                     <reference key="NSNextResponder" ref="602221378"/>
@@ -4071,6 +4222,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSPopUpButton" id="133030296">
                     <reference key="NSNextResponder" ref="602221378"/>
@@ -4159,6 +4311,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSPopUpButton" id="245155142">
                     <reference key="NSNextResponder" ref="602221378"/>
@@ -4353,6 +4506,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                   <object class="NSTextField" id="1021847329">
                     <reference key="NSNextResponder" ref="488052292"/>
@@ -4374,6 +4528,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <reference key="NSTextColor" ref="499525791"/>
                     </object>
                     <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                    <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                   </object>
                 </object>
                 <string key="NSFrame">{{2, 2}, {533, 71}}</string>
@@ -4427,6 +4582,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
               <reference key="NSTextColor" ref="499525791"/>
             </object>
             <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+            <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
           </object>
           <object class="NSButton" id="447698293">
             <reference key="NSNextResponder" ref="48286561"/>
@@ -4681,6 +4837,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <reference key="NSTextColor" ref="499525791"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSTextField" id="531253919">
               <reference key="NSNextResponder" ref="476990944"/>
@@ -4702,6 +4859,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <reference key="NSTextColor" ref="499525791"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSTextField" id="610020240">
               <reference key="NSNextResponder" ref="476990944"/>
@@ -4719,6 +4877,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <reference key="NSTextColor" ref="893054262"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSButton" id="71192979">
               <reference key="NSNextResponder" ref="476990944"/>
@@ -4808,6 +4967,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <reference key="NSTextColor" ref="499525791"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSTextField" id="94624398">
               <reference key="NSNextResponder" ref="613777167"/>
@@ -4831,6 +4991,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <reference key="NSTextColor" ref="499525791"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSButton" id="295137417">
               <reference key="NSNextResponder" ref="613777167"/>
@@ -4965,6 +5126,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <reference key="NSTextColor" ref="499525791"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSPopUpButton" id="361177942">
               <reference key="NSNextResponder" ref="613777167"/>
@@ -5053,6 +5215,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <reference key="NSTextColor" ref="499525791"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSPopUpButton" id="651281733">
               <reference key="NSNextResponder" ref="613777167"/>
@@ -5141,6 +5304,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <reference key="NSTextColor" ref="499525791"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSPopUpButton" id="463016229">
               <reference key="NSNextResponder" ref="613777167"/>
@@ -5229,6 +5393,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <reference key="NSTextColor" ref="499525791"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSPopUpButton" id="762428792">
               <reference key="NSNextResponder" ref="613777167"/>
@@ -5317,6 +5482,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <reference key="NSTextColor" ref="499525791"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSPopUpButton" id="681449485">
               <reference key="NSNextResponder" ref="613777167"/>
@@ -5405,6 +5571,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <reference key="NSTextColor" ref="499525791"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSPopUpButton" id="636759238">
               <reference key="NSNextResponder" ref="613777167"/>
@@ -5493,6 +5660,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <reference key="NSTextColor" ref="499525791"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
             <object class="NSPopUpButton" id="258732405">
               <reference key="NSNextResponder" ref="613777167"/>
@@ -5581,6 +5749,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <reference key="NSTextColor" ref="499525791"/>
               </object>
               <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+              <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
             </object>
           </object>
           <string key="NSFrameSize">{485, 254}</string>
@@ -7658,6 +7827,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <reference key="destination" ref="876599045"/>
           </object>
           <int key="connectionID">3926</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">delegate</string>
+            <reference key="source" ref="1060376317"/>
+            <reference key="destination" ref="150917409"/>
+          </object>
+          <int key="connectionID">3927</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -11718,7 +11895,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <bytes key="NSTransformStruct">P4AAAL+AAABDSAAAwiwAAA</bytes>
           </object>
           <boolean value="YES"/>
-          <string>{{1009, 245}, {570, 576}}</string>
+          <string>{{710, 180}, {570, 576}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform"/>
           <boolean value="YES"/>
@@ -12080,9 +12257,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{840, 586}, {440, 170}}</string>
+          <string>{{528, 586}, {440, 170}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{840, 586}, {440, 170}}</string>
+          <string>{{528, 586}, {440, 170}}</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
@@ -12425,9 +12602,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           </object>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{795, 502}, {485, 254}}</string>
+          <string>{{483, 502}, {485, 254}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{795, 502}, {485, 254}}</string>
+          <string>{{483, 502}, {485, 254}}</string>
           <boolean value="NO"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12660,7 +12837,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">3926</int>
+      <int key="maxID">3927</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
