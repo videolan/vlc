@@ -154,6 +154,9 @@
             <property name="alignment">
              <set>Qt::AlignHCenter|Qt::AlignTop</set>
             </property>
+            <property name="margin">
+             <number>0</number>
+            </property>
            </widget>
           </item>
           <item>
@@ -166,7 +169,7 @@
             </property>
             <layout class="QGridLayout">
              <property name="leftMargin">
-              <number>0</number>
+              <number>10</number>
              </property>
              <property name="topMargin">
               <number>0</number>
@@ -318,7 +321,16 @@
              </sizepolicy>
             </property>
             <layout class="QGridLayout" name="gridLayout_7">
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item row="1" column="1">
@@ -442,13 +454,6 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QCheckBox" name="MetadataNetworkAccessMode">
-        <property name="text">
-         <string>Allow metadata network access</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -458,22 +463,6 @@
       <string>Privacy / Network Interaction</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
-      <item row="2" column="1">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Preferred</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item row="1" column="3">
        <widget class="QSpinBox" name="updatesDays">
         <property name="sizePolicy">
@@ -492,6 +481,22 @@
          <string>Every </string>
         </property>
        </widget>
+      </item>
+      <item row="2" column="1">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Preferred</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item row="2" column="2">
        <widget class="QLabel" name="filterLabel">
@@ -545,6 +550,13 @@
         </property>
         <property name="text">
          <string>Activate updates notifier</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="MetadataNetworkAccessMode">
+        <property name="text">
+         <string>Allow metadata network access</string>
         </property>
        </widget>
       </item>
@@ -624,6 +636,19 @@
      </layout>
     </widget>
    </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -648,7 +673,6 @@
   <tabstop>OneInterfaceMode</tabstop>
   <tabstop>oneInstanceFromFile</tabstop>
   <tabstop>treePlaylist</tabstop>
-  <tabstop>MetadataNetworkAccessMode</tabstop>
   <tabstop>EnqueueOneInterfaceMode</tabstop>
   <tabstop>playPauseBox</tabstop>
   <tabstop>updatesBox</tabstop>

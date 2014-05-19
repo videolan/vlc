@@ -70,8 +70,7 @@
        <widget class="QComboBox" name="tuneBox"/>
       </item>
       <item row="4" column="1" colspan="2">
-       <widget class="QComboBox" name="hwAccelModule">
-       </widget>
+       <widget class="QComboBox" name="hwAccelModule"/>
       </item>
       <item row="4" column="0">
        <widget class="QLabel" name="hwAccelLabel">
@@ -348,6 +347,19 @@
       </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

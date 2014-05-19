@@ -28,7 +28,16 @@
    <item>
     <widget class="QWidget" name="videoZone" native="true">
      <layout class="QVBoxLayout" name="videoZoneLayout">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -37,7 +46,16 @@
          <string>Display</string>
         </property>
         <layout class="QGridLayout">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>9</number>
+         </property>
+         <property name="topMargin">
+          <number>9</number>
+         </property>
+         <property name="rightMargin">
+          <number>9</number>
+         </property>
+         <property name="bottomMargin">
           <number>9</number>
          </property>
          <property name="spacing">
@@ -104,7 +122,16 @@
          <string>DirectX</string>
         </property>
         <layout class="QGridLayout">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>9</number>
+         </property>
+         <property name="topMargin">
+          <number>9</number>
+         </property>
+         <property name="rightMargin">
+          <number>9</number>
+         </property>
+         <property name="bottomMargin">
           <number>9</number>
          </property>
          <property name="spacing">
@@ -132,7 +159,16 @@
          <string>KVA</string>
         </property>
         <layout class="QGridLayout">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>9</number>
+         </property>
+         <property name="topMargin">
+          <number>9</number>
+         </property>
+         <property name="rightMargin">
+          <number>9</number>
+         </property>
+         <property name="bottomMargin">
           <number>9</number>
          </property>
          <property name="spacing">
@@ -235,7 +271,16 @@
          <string>Video snapshots</string>
         </property>
         <layout class="QGridLayout">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>9</number>
+         </property>
+         <property name="topMargin">
+          <number>9</number>
+         </property>
+         <property name="rightMargin">
+          <number>9</number>
+         </property>
+         <property name="bottomMargin">
           <number>9</number>
          </property>
          <property name="spacing">
@@ -319,6 +364,19 @@
       </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
