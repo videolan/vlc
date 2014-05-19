@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>686</width>
-    <height>663</height>
+    <width>700</width>
+    <height>640</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -49,6 +49,9 @@
       <string>Look and feel</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item row="0" column="4">
        <widget class="QRadioButton" name="skins">
         <property name="text">
@@ -172,6 +175,9 @@
               <number>10</number>
              </property>
              <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item row="1" column="2" colspan="2">
@@ -463,6 +469,9 @@
       <string>Privacy / Network Interaction</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
+      <property name="bottomMargin">
+       <number>4</number>
+      </property>
       <item row="1" column="3">
        <widget class="QSpinBox" name="updatesDays">
         <property name="sizePolicy">
@@ -644,7 +653,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>40</height>
+       <height>0</height>
       </size>
      </property>
     </spacer>

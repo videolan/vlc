@@ -45,51 +45,43 @@
         <property name="title">
          <string>Display</string>
         </property>
-        <layout class="QGridLayout">
-         <property name="leftMargin">
-          <number>9</number>
-         </property>
-         <property name="topMargin">
-          <number>9</number>
-         </property>
-         <property name="rightMargin">
-          <number>9</number>
-         </property>
-         <property name="bottomMargin">
-          <number>9</number>
-         </property>
-         <property name="spacing">
-          <number>6</number>
-         </property>
-         <item row="0" column="0" colspan="2">
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
           <widget class="QCheckBox" name="fullscreen">
            <property name="text">
             <string>Fullscreen</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="2">
-          <widget class="QCheckBox" name="windowDecorations">
-           <property name="text">
-            <string>Window decorations</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QCheckBox" name="hwYUVBox">
-           <property name="text">
-            <string>Use hardware YUV-&gt;RGB conversions</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" colspan="2">
+         <item row="1" column="0">
           <widget class="QCheckBox" name="overlay">
            <property name="text">
             <string>Accelerated video output (Overlay)</string>
            </property>
           </widget>
          </item>
-         <item row="8" column="0">
+         <item row="1" column="1">
+          <widget class="QCheckBox" name="hwYUVBox">
+           <property name="text">
+            <string>Use hardware YUV-&gt;RGB conversions</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="alwaysOnTop">
+           <property name="text">
+            <string>Always on top</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QCheckBox" name="windowDecorations">
+           <property name="text">
+            <string>Window decorations</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
           <widget class="QLabel" name="voutLabel">
            <property name="text">
             <string>Output</string>
@@ -99,14 +91,7 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0" colspan="2">
-          <widget class="QCheckBox" name="alwaysOnTop">
-           <property name="text">
-            <string>Always on top</string>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="1" colspan="2">
+         <item row="3" column="1">
           <widget class="QComboBox" name="outputModule">
            <property name="maxVisibleItems">
             <number>15</number>
@@ -121,25 +106,7 @@
         <property name="title">
          <string>DirectX</string>
         </property>
-        <layout class="QGridLayout">
-         <property name="leftMargin">
-          <number>9</number>
-         </property>
-         <property name="topMargin">
-          <number>9</number>
-         </property>
-         <property name="rightMargin">
-          <number>9</number>
-         </property>
-         <property name="bottomMargin">
-          <number>9</number>
-         </property>
-         <property name="spacing">
-          <number>6</number>
-         </property>
-         <item row="0" column="1" colspan="2">
-          <widget class="QComboBox" name="dXdisplayDevice"/>
-         </item>
+        <layout class="QGridLayout" name="gridLayout_4">
          <item row="0" column="0">
           <widget class="QLabel" name="dxDeviceLabel">
            <property name="text">
@@ -150,6 +117,9 @@
            </property>
           </widget>
          </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="dXdisplayDevice"/>
+         </item>
         </layout>
        </widget>
       </item>
@@ -158,22 +128,14 @@
         <property name="title">
          <string>KVA</string>
         </property>
-        <layout class="QGridLayout">
-         <property name="leftMargin">
-          <number>9</number>
-         </property>
-         <property name="topMargin">
-          <number>9</number>
-         </property>
-         <property name="rightMargin">
-          <number>9</number>
-         </property>
-         <property name="bottomMargin">
-          <number>9</number>
-         </property>
-         <property name="spacing">
-          <number>6</number>
-         </property>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="kvaFixT23">
+           <property name="text">
+            <string>Enable a workaround for T23</string>
+           </property>
+          </widget>
+         </item>
          <item row="1" column="0">
           <widget class="QLabel" name="kvaVideoModeLabel">
            <property name="text">
@@ -184,14 +146,7 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0" colspan="2">
-          <widget class="QCheckBox" name="kvaFixT23">
-           <property name="text">
-            <string>Enable a workaround for T23</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1" colspan="2">
+         <item row="1" column="1">
           <widget class="QComboBox" name="kvaVideoMode"/>
          </item>
         </layout>
@@ -210,16 +165,6 @@
            </property>
            <property name="buddy">
             <cstring>deinterlaceBox</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="arLabel">
-           <property name="text">
-            <string>Force Aspect Ratio</string>
-           </property>
-           <property name="buddy">
-            <cstring>arLine</cstring>
            </property>
           </widget>
          </item>
@@ -262,6 +207,16 @@
          <item row="1" column="1" colspan="3">
           <widget class="QLineEdit" name="arLine"/>
          </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="arLabel">
+           <property name="text">
+            <string>Force Aspect Ratio</string>
+           </property>
+           <property name="buddy">
+            <cstring>arLine</cstring>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -270,32 +225,7 @@
         <property name="title">
          <string>Video snapshots</string>
         </property>
-        <layout class="QGridLayout">
-         <property name="leftMargin">
-          <number>9</number>
-         </property>
-         <property name="topMargin">
-          <number>9</number>
-         </property>
-         <property name="rightMargin">
-          <number>9</number>
-         </property>
-         <property name="bottomMargin">
-          <number>9</number>
-         </property>
-         <property name="spacing">
-          <number>6</number>
-         </property>
-         <item row="0" column="2" colspan="2">
-          <widget class="QLineEdit" name="snapshotsDirectory"/>
-         </item>
-         <item row="0" column="4">
-          <widget class="QPushButton" name="snapshotsDirectoryBrowse">
-           <property name="text">
-            <string>Browse...</string>
-           </property>
-          </widget>
-         </item>
+        <layout class="QGridLayout" name="gridLayout_2">
          <item row="0" column="0">
           <widget class="QLabel" name="dirLabel">
            <property name="text">
@@ -303,6 +233,32 @@
            </property>
            <property name="buddy">
             <cstring>snapshotsDirectory</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Preferred</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>60</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLineEdit" name="snapshotsDirectory"/>
+         </item>
+         <item row="0" column="3">
+          <widget class="QPushButton" name="snapshotsDirectoryBrowse">
+           <property name="text">
+            <string>Browse...</string>
            </property>
           </widget>
          </item>
@@ -323,6 +279,13 @@
            </property>
           </widget>
          </item>
+         <item row="1" column="3">
+          <widget class="QCheckBox" name="snapshotsSequentialNumbering">
+           <property name="text">
+            <string>Sequential numbering</string>
+           </property>
+          </widget>
+         </item>
          <item row="2" column="0">
           <widget class="QLabel" name="formatLabel">
            <property name="text">
@@ -332,29 +295,6 @@
             <cstring>snapshotsFormat</cstring>
            </property>
           </widget>
-         </item>
-         <item row="1" column="3" colspan="2">
-          <widget class="QCheckBox" name="snapshotsSequentialNumbering">
-           <property name="text">
-            <string>Sequential numbering</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Preferred</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
          </item>
          <item row="2" column="2">
           <widget class="QComboBox" name="snapshotsFormat"/>
