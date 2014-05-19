@@ -334,7 +334,7 @@ int libvlc_audio_get_volume( libvlc_media_player_t *mp )
 int libvlc_audio_set_volume( libvlc_media_player_t *mp, int volume )
 {
     float vol = volume / 100.f;
-    if (vol < 0.f)
+    if (!isgreaterequal(vol, 0.f))
     {
         libvlc_printerr( "Volume out of range" );
         return -1;
