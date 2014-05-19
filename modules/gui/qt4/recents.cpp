@@ -74,6 +74,7 @@ RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
 
 RecentsMRL::~RecentsMRL()
 {
+    save();
     delete filter;
     delete stack;
 }
