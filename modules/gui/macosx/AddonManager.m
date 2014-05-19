@@ -102,6 +102,9 @@ static VLCAddonManager *_o_sharedInstance = nil;
     [_localAddonsOnlyCheckbox setState:NSOffState];
     [_spinner setUsesThreadedAnimation:YES];
 
+    [self updateInstallButton:NO];
+    [_installButton setHidden:YES];
+
     [_name setStringValue:@""];
     [_author setStringValue:@""];
     [_version setStringValue:@""];
@@ -122,13 +125,12 @@ static VLCAddonManager *_o_sharedInstance = nil;
     vlc_event_attach(p_em, vlc_AddonFound, addonsEventsCallback, self);
     vlc_event_attach(p_em, vlc_AddonsDiscoveryEnded, addonsEventsCallback, self);
     vlc_event_attach(p_em, vlc_AddonChanged, addonsEventsCallback, self);
+
+    [self _findInstalled];
 }
 
 - (void)showWindow
 {
-    [self _findInstalled];
-
-    [self _findNewAddons];
     [_window makeKeyAndOrderFront:nil];
 }
 
@@ -142,6 +144,13 @@ static VLCAddonManager *_o_sharedInstance = nil;
     [self _refactorDataModel];
 }
 
+- (IBAction)downloadCatalog:(id)sender
+{
+    [self _findNewAddons];
+    [_downloadCatalogButton setHidden:YES];
+    [_localAddonsOnlyCheckbox setHidden:NO];
+}
+
 - (IBAction)installSelection:(id)sender
 {
     NSInteger selectedRow = [_addonsTable selectedRow];
@@ -150,6 +159,8 @@ static VLCAddonManager *_o_sharedInstance = nil;
 
     VLCAddon *currentAddon = [_displayedAddons objectAtIndex:selectedRow];
     [self _installAddonWithID:[currentAddon uuid]];
+
+    [_installButton setEnabled:NO];
 }
 
 - (IBAction)uninstallSelection:(id)sender
@@ -160,11 +171,22 @@ static VLCAddonManager *_o_sharedInstance = nil;
 
     VLCAddon *currentAddon = [_displayedAddons objectAtIndex:selectedRow];
     [self _removeAddonWithID:[currentAddon uuid]];
+
+    [_installButton setEnabled:NO];
 }
 
-- (IBAction)refresh:(id)sender
+- (void)updateInstallButton:(BOOL)b_is_installed
 {
-    [self _findNewAddons];
+    [_installButton setHidden:NO];
+    [_installButton setEnabled:YES];
+
+    if (b_is_installed) {
+        [_installButton setTitle:_NS("Uninstall")];
+        [_installButton setAction:@selector(uninstallSelection:)];
+    } else {
+        [_installButton setTitle:_NS("Install")];
+        [_installButton setAction:@selector(installSelection:)];
+    }
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
@@ -180,6 +202,7 @@ static VLCAddonManager *_o_sharedInstance = nil;
         [_author setStringValue:@""];
         [_version setStringValue:@""];
         [_description setString:@""];
+        [_installButton setHidden:YES];
         return;
     }
 
@@ -188,6 +211,8 @@ static VLCAddonManager *_o_sharedInstance = nil;
     [_author setStringValue:[currentItem author]];
     [_version setStringValue:[currentItem version]];
     [_description setString:[currentItem description]];
+
+    [self updateInstallButton:[currentItem isInstalled]];
 }
 
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
@@ -206,7 +231,6 @@ static VLCAddonManager *_o_sharedInstance = nil;
 - (void)addAddon:(addon_entry_t *)p_entry
 {
     @autoreleasepool {
-
         /* no skin support on OS X so far */
         if (p_entry->e_type != ADDON_SKIN2)
             [_addons addObject:[[[VLCAddon alloc] initWithAddon:p_entry] autorelease]];
@@ -257,7 +281,10 @@ static VLCAddonManager *_o_sharedInstance = nil;
     _displayedAddons = [NSArray arrayWithArray:filteredItems];
     [_displayedAddons retain];
     [filteredItems release];
+
+    // update ui
     [_addonsTable reloadData];
+    [self tableViewSelectionDidChange:nil];
 }
 
 - (void)_findNewAddons
@@ -275,6 +302,7 @@ static VLCAddonManager *_o_sharedInstance = nil;
 - (void)_findInstalled
 {
     addons_manager_LoadCatalog(_manager);
+    [self _refactorDataModel];
 }
 
 - (void)_installAddonWithID:(NSData *)o_data
