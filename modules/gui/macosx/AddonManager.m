@@ -34,19 +34,21 @@
     NSArray *_displayedAddons;
 }
 
-- (void)addAddon:(addon_entry_t *)data;
+- (void)addAddon:(NSValue *)o_value;
 - (void)discoveryEnded;
-- (void)addonChanged:(addon_entry_t *)data;
+- (void)addonChanged:(NSValue *)o_value;
 @end
 
 static void addonsEventsCallback( const vlc_event_t *event, void *data )
 {
-    if (event->type == vlc_AddonFound)
-        [[VLCAddonManager sharedInstance] addAddon:event->u.addon_generic_event.p_entry];
-    else if (event->type == vlc_AddonsDiscoveryEnded)
-        [[VLCAddonManager sharedInstance] discoveryEnded];
-    else if (event->type == vlc_AddonChanged)
-        [[VLCAddonManager sharedInstance] addonChanged:event->u.addon_generic_event.p_entry];
+    @autoreleasepool {
+        if (event->type == vlc_AddonFound)
+            [[VLCAddonManager sharedInstance] performSelectorOnMainThread:@selector(addAddon:) withObject:[NSValue valueWithPointer:event->u.addon_generic_event.p_entry] waitUntilDone:NO];
+        else if (event->type == vlc_AddonsDiscoveryEnded)
+            [[VLCAddonManager sharedInstance] performSelectorOnMainThread:@selector(discoveryEnded) withObject:nil waitUntilDone:NO];
+        else if (event->type == vlc_AddonChanged)
+            [[VLCAddonManager sharedInstance] performSelectorOnMainThread:@selector(addonChanged:) withObject:[NSValue valueWithPointer:event->u.addon_generic_event.p_entry] waitUntilDone:NO];
+    }
 }
 
 @implementation VLCAddonManager
@@ -228,13 +230,12 @@ static VLCAddonManager *_o_sharedInstance = nil;
 
 #pragma mark - data handling
 
-- (void)addAddon:(addon_entry_t *)p_entry
+- (void)addAddon:(NSValue *)o_value
 {
-    @autoreleasepool {
-        /* no skin support on OS X so far */
-        if (p_entry->e_type != ADDON_SKIN2)
-            [_addons addObject:[[[VLCAddon alloc] initWithAddon:p_entry] autorelease]];
-    }
+    addon_entry_t *p_entry = [o_value pointerValue];
+    /* no skin support on OS X so far */
+    if (p_entry->e_type != ADDON_SKIN2)
+        [_addons addObject:[[[VLCAddon alloc] initWithAddon:p_entry] autorelease]];
 }
 
 - (void)discoveryEnded
@@ -243,7 +244,7 @@ static VLCAddonManager *_o_sharedInstance = nil;
     [_spinner stopAnimation:nil];
 }
 
-- (void)addonChanged:(addon_entry_t *)data
+- (void)addonChanged:(NSValue *)o_value
 {
     [self _refactorDataModel];
 }
@@ -302,7 +303,9 @@ static VLCAddonManager *_o_sharedInstance = nil;
 - (void)_findInstalled
 {
     addons_manager_LoadCatalog(_manager);
-    [self _refactorDataModel];
+
+    // enqueue, to process the addons first
+    [self performSelectorOnMainThread:@selector(_refactorDataModel) withObject:nil waitUntilDone:NO];
 }
 
 - (void)_installAddonWithID:(NSData *)o_data
