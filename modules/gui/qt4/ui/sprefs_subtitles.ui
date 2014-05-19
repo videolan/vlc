@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>741</width>
-    <height>410</height>
+    <height>416</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -161,9 +161,6 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1" colspan="3">
-          <widget class="QFontComboBox" name="font"/>
-         </item>
          <item row="1" column="0">
           <widget class="QLabel" name="fontSizeLabel">
            <property name="minimumSize">
@@ -200,7 +197,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>20</width>
+             <width>10</width>
              <height>20</height>
             </size>
            </property>
@@ -265,13 +262,6 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="3">
-          <widget class="QCheckBox" name="backgroundCheck">
-           <property name="text">
-            <string>Add a background</string>
-           </property>
-          </widget>
-         </item>
          <item row="4" column="0">
           <widget class="QLabel" name="subsPosLabel">
            <property name="minimumSize">
@@ -310,6 +300,16 @@
            </property>
           </widget>
          </item>
+         <item row="0" column="1" colspan="4">
+          <widget class="QFontComboBox" name="font"/>
+         </item>
+         <item row="3" column="1">
+          <widget class="QCheckBox" name="backgroundCheck">
+           <property name="text">
+            <string>Add a background</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -343,7 +343,6 @@
   <tabstop>effect</tabstop>
   <tabstop>outlineColor</tabstop>
   <tabstop>shadowCheck</tabstop>
-  <tabstop>backgroundCheck</tabstop>
   <tabstop>subsPosition</tabstop>
  </tabstops>
  <resources/>

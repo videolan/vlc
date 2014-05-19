@@ -145,20 +145,11 @@
               <height>50</height>
              </size>
             </property>
-            <property name="baseSize">
-             <size>
-              <width>0</width>
-              <height>0</height>
-             </size>
-            </property>
             <property name="styleSheet">
              <string notr="true">background-color: rgb(192, 192, 192);</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignHCenter|Qt::AlignTop</set>
-            </property>
-            <property name="margin">
-             <number>0</number>
             </property>
            </widget>
           </item>
