@@ -578,10 +578,12 @@ void libvlc_audio_equalizer_release( libvlc_equalizer_t *p_equalizer )
  *****************************************************************************/
 int libvlc_audio_equalizer_set_preamp( libvlc_equalizer_t *p_equalizer, float f_preamp )
 {
-    if ( f_preamp < -20.0f )
-        f_preamp = -20.0f;
-    else if ( f_preamp > 20.0f )
-        f_preamp = 20.0f;
+    if( isnan(f_preamp) )
+        return -1;
+    if( f_preamp < -20.f )
+        f_preamp = -20.f;
+    else if( f_preamp > 20.f )
+        f_preamp = 20.f;
 
     p_equalizer->f_preamp = f_preamp;
     return 0;
@@ -600,13 +602,14 @@ float libvlc_audio_equalizer_get_preamp( libvlc_equalizer_t *p_equalizer )
  *****************************************************************************/
 int libvlc_audio_equalizer_set_amp_at_index( libvlc_equalizer_t *p_equalizer, float f_amp, unsigned u_band )
 {
-    if ( u_band >= EQZ_BANDS_MAX )
+    if( u_band >= EQZ_BANDS_MAX || isnan(f_amp) )
         return -1;
 
-    if ( f_amp < -20.0f )
-        f_amp = -20.0f;
-    else if ( f_amp > 20.0f )
-        f_amp = 20.0f;
+
+    if( f_amp < -20.f )
+        f_amp = -20.f;
+    else if( f_amp > 20.f )
+        f_amp = 20.f;
 
     p_equalizer->f_amp[ u_band ] = f_amp;
     return 0;
