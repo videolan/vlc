@@ -32,10 +32,11 @@
 
 #include "input_manager.hpp"
 #include "recents.hpp"
-#include <vlc_keys.h>
-#include <vlc_url.h>
-#include <vlc_strings.h>
-#include <vlc_aout.h>
+
+#include <vlc_keys.h>           /* ACTION_ID */
+#include <vlc_url.h>            /* decode_URI */
+#include <vlc_strings.h>        /* str_format_meta */
+#include <vlc_aout.h>           /* audio_output_t */
 
 #include <QApplication>
 #include <QFile>

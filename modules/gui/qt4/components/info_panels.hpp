@@ -31,21 +31,10 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_meta.h>
-
 #include <QWidget>
-
-#include <limits.h>
-
-#define setSpinBounds( spinbox ) {               \
-    spinbox->setRange( 0, INT_MAX );             \
-    spinbox->setAccelerated( true ) ;            \
-    spinbox->setAlignment( Qt::AlignRight );     \
-    spinbox->setSpecialValueText(""); }
 
 class QTreeWidget;
 class QTreeWidgetItem;
-class QTreeView;
 class QSpinBox;
 class QLineEdit;
 class CoverArtLabel;

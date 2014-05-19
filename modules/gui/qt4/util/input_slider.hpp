@@ -30,7 +30,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
 #include "timetooltip.hpp"
 #include "styles/seekstyle.hpp"
 
