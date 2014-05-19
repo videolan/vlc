@@ -102,6 +102,7 @@ static VLCAddonManager *_o_sharedInstance = nil;
 
     [_localAddonsOnlyCheckbox setTitle:_NS("Show Installed Only")];
     [_localAddonsOnlyCheckbox setState:NSOffState];
+    [_downloadCatalogButton setTitle:_NS("Find more addons online")];
     [_spinner setUsesThreadedAnimation:YES];
 
     [self updateInstallButton:NO];
