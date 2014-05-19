@@ -31,6 +31,7 @@
 #endif
 
 #include "input_manager.hpp"
+#include "recents.hpp"
 #include <vlc_keys.h>
 #include <vlc_url.h>
 #include <vlc_strings.h>
@@ -133,6 +134,15 @@ void InputManager::delInput()
 {
     if( !p_input ) return;
     msg_Dbg( p_intf, "IM: Deleting the input" );
+
+    /* Save time / position */
+    float f_pos = var_GetFloat( p_input , "position" );
+    int64_t i_time = var_GetTime( p_input, "time");
+    int i_length = var_GetTime( p_input , "length" ) / CLOCK_FREQ;
+    if( f_pos < 0.05 || f_pos > 0.95 || i_length < 60) {
+        i_time = -1;
+    }
+    RecentsMRL::getInstance( p_intf )->setTime( p_item->psz_uri, i_time );
 
     delCallbacks();
     i_old_playing_status = END_S;
