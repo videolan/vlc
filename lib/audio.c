@@ -268,7 +268,7 @@ void libvlc_audio_output_device_set( libvlc_media_player_t *mp,
     }
 
     audio_output_t *aout = GetAOut( mp );
-    if( aout != NULL )
+    if( aout == NULL )
         return;
 
     aout_DeviceSet( aout, devid );
