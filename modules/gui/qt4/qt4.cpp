@@ -520,10 +520,14 @@ static void *Thread( void *obj )
 
     /* Check window type from the Qt platform back-end */
     p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_INVALID;
-#if defined (Q_WS_QPA)
+#if defined (Q_WS_QPA) || HAS_QT5
     QString platform = app.platformName();
     if( platform == qfu("xcb") )
         p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
+    else if( platform == qfu("windows") )
+        p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
+    else if( platform == qfu("cocoa" ) )
+        p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
     else
         msg_Err( p_intf, "unknown Qt platform: %s", qtu(platform) );
 #elif defined (Q_WS_X11)
