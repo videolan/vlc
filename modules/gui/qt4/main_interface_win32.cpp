@@ -31,9 +31,9 @@
 #include <QBitmap>
 #include <vlc_windows_interfaces.h>
 
-#if defined(_WIN32) && QT_VERSION >= 0x050000
-#include <QWindow>
-#include <qpa/qplatformnativeinterface.h>
+#if defined(_WIN32) && HAS_QT5
+# include <QWindow>
+# include <qpa/qplatformnativeinterface.h>
 #endif
 
 
@@ -80,7 +80,7 @@
 
 HWND MainInterface::WinId()
 {
-#if QT_VERSION >= 0x050000
+#if HAS_QT5
     QWindow *window = windowHandle();
     HWND id = static_cast<HWND>(QGuiApplication::platformNativeInterface()->
             nativeResourceForWindow("handle", window));
@@ -90,7 +90,7 @@ HWND MainInterface::WinId()
 #endif
 }
 
-#if defined(_WIN32) && QT_VERSION < 0x050000
+#if defined(_WIN32) && !HAS_QT5
 static const int PremultipliedAlpha = QPixmap::PremultipliedAlpha;
 static HBITMAP qt_pixmapToWinHBITMAP(const QPixmap &p, int hbitmapFormat = 0)
 {

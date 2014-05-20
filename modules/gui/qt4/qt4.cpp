@@ -51,7 +51,7 @@
 
 #ifdef _WIN32 /* For static builds */
  #include <QtPlugin>
- #if QT_VERSION >= 0x050000
+ #if HAS_QT5
   Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
   Q_IMPORT_PLUGIN(AccessibleFactory)
  #else

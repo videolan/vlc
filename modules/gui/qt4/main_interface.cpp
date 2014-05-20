@@ -64,7 +64,7 @@
 #include <vlc_vout_display.h>               /* vout_thread_t and VOUT_ events */
 
 
-#if defined(_WIN32) && QT_VERSION >= 0x050000
+#if defined(_WIN32) && HAS_QT5
 #include <QWindow>
 #include <qpa/qplatformnativeinterface.h>
 #endif
@@ -1111,7 +1111,7 @@ void MainInterface::toggleUpdateSystrayMenu()
          * but ignore the ones always on top
          * and the ones which can't be activated */
         HWND winId;
-#if QT_VERSION >= 0x050000
+#if HAS_QT5
         QWindow *window = windowHandle();
         winId = static_cast<HWND>(QGuiApplication::platformNativeInterface()->nativeResourceForWindow("handle", window));
 #else

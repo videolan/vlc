@@ -41,6 +41,7 @@
 #endif
 
 #define HAS_QT47 ( QT_VERSION >= 0x040700 )
+#define HAS_QT5  ( QT_VERSION >= 0x050000 )
 
 enum {
     DialogEventTypeOffset = 0,

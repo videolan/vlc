@@ -109,7 +109,7 @@ PluginTab::PluginTab( intf_thread_t *p_intf_ )
     layout->addWidget( treePlugins, 0, 0, 1, -1 );
 
     /* Users cannot move the columns around but we need to sort */
-#if QT_VERSION >= 0x050000
+#if HAS_QT5
     treePlugins->header()->setSectionsMovable( false );
 #else
     treePlugins->header()->setMovable( false );

@@ -433,7 +433,7 @@ PlTreeView::PlTreeView( QAbstractItemModel *, QWidget *parent ) : QTreeView( par
     viewport()->setAttribute( Qt::WA_Hover );
     header()->setSortIndicator( -1 , Qt::AscendingOrder );
     header()->setSortIndicatorShown( true );
-#if QT_VERSION >= 0x050000
+#if HAS_QT5
     header()->setSectionsClickable( true );
 #else
     header()->setClickable( true );
