@@ -1619,7 +1619,7 @@ vlc_module_begin ()
     set_section( N_("On Screen Display") , NULL )
     add_category_hint( N_("Subpictures"), SUB_CAT_LONGTEXT , false )
 
-    add_bool( "spu", 1, SPU_TEXT, SPU_LONGTEXT, true )
+    add_bool( "spu", 1, SPU_TEXT, SPU_LONGTEXT, false )
         change_safe ()
     add_bool( "osd", 1, OSD_TEXT, OSD_LONGTEXT, false )
     add_module( "text-renderer", "text renderer", NULL, TEXTRENDERER_TEXT,
