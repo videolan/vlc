@@ -506,4 +506,18 @@ enum {
 
 #endif /* HAVE_LIBAVUTIL_AVUTIL_H */
 
+#ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
+# include <libavformat/avformat.h>
+
+#define LIBAVFORMAT_VERSION_CHECK( a, b, c, d, e ) \
+    ( (LIBAVFORMAT_VERSION_MICRO <  100 && LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( a, b, c ) ) || \
+      (LIBAVFORMAT_VERSION_MICRO >= 100 && LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( a, d, e ) ) )
+
+#if LIBAVFORMAT_VERSION_MAJOR < 54
+# define AVDictionaryEntry AVMetadataTag
+# define av_dict_get av_metadata_get
+#endif
+
+#endif
+
 #endif

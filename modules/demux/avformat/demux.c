@@ -38,21 +38,14 @@
 #include <vlc_charset.h>
 #include <vlc_avcodec.h>
 
-#include <libavformat/avformat.h>
-
 #include "../../codec/avcodec/avcodec.h"
 #include "../../codec/avcodec/chroma.h"
-#include "../../codec/avcodec/avcommon.h"
+#include "../../codec/avcodec/avcommon_compat.h"
 #include "avformat.h"
 #include "../xiph.h"
 #include "../vobsub.h"
 
-/* Support for deprecated APIs */
-
-#if LIBAVFORMAT_VERSION_MAJOR < 54
-# define AVDictionaryEntry AVMetadataTag
-# define av_dict_get av_metadata_get
-#endif
+#include <libavformat/avformat.h>
 
 //#define AVFORMAT_DEBUG 1
 
