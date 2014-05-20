@@ -249,7 +249,7 @@ static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, mtime_t 
     spu->b_absolute = true; /* FIXME How to set it right ? */
     spu->b_ephemer  = true; /* FIXME How to set it right ? */
 
-    if (avctx->codec_id == AV_CODEC_ID_HDMV_PGS_SUBTITLE) {
+    if (avctx->coded_width != 0 && avctx->coded_height != 0) {
         spu->i_original_picture_width = avctx->coded_width;
         spu->i_original_picture_height = avctx->coded_height;
     } else {
