@@ -1339,7 +1339,7 @@ typedef struct
     float f_rotation;
 
     /* more internal data */
-    uint64_t        i_timescale;    /* time scale for this track only */
+    uint32_t        i_timescale;    /* time scale for this track only */
     uint16_t        current_qid;    /* Smooth Streaming quality level ID */
 
     /* elst */

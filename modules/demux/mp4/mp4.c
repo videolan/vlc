@@ -72,7 +72,7 @@ struct demux_sys_t
 
     uint64_t     i_time;         /* time position of the presentation
                                   * in movie timescale */
-    uint64_t     i_timescale;    /* movie time scale */
+    uint32_t     i_timescale;    /* movie time scale */
     uint64_t     i_duration;     /* movie duration */
     unsigned int i_tracks;       /* number of tracks */
     mp4_track_t  *track;         /* array of track */
@@ -2086,7 +2086,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 MP4_Box_data_sample_soun_t *p_soun =
                     p_sample->data.p_sample_soun;
 
-                msg_Warn( p_demux, "i_timescale (%"PRIu64") != i_sampleratehi "
+                msg_Warn( p_demux, "i_timescale (%"PRId32") != i_sampleratehi "
                           "(%u), making both equal (report any problem).",
                           p_track->i_timescale, p_soun->i_sampleratehi );
 
