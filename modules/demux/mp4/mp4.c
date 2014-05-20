@@ -79,6 +79,8 @@ struct demux_sys_t
     float        f_fps;          /* number of frame per seconds */
 
     bool         b_fragmented;   /* fMP4 */
+    bool         b_seekable;
+    bool         b_fastseekable;
 
     /* */
     MP4_Box_t    *p_tref_chap;
@@ -259,6 +261,18 @@ LoadInitFragError:
     return VLC_EGENERIC;
 }
 
+/* Does lookup for remaining boxes */
+static int ProbeFragments( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    msg_Dbg( p_demux, "probing fragments from %"PRId64, stream_Tell( p_demux->s ) );
+
+    MP4_ReadBoxContainerRaw( p_demux->s, p_sys->p_root );
+
+    return VLC_SUCCESS;
+}
+
 static int InitTracks( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -321,7 +335,6 @@ static int Open( vlc_object_t * p_this )
     MP4_Box_t       *p_trak;
 
     unsigned int    i;
-    bool      b_seekable;
     bool      b_enabled_es;
 
     /* A little test to see if it could be a mp4 */
@@ -349,20 +362,26 @@ static int Open( vlc_object_t * p_this )
             return VLC_EGENERIC;
     }
 
+    /* create our structure that will contains all data */
+    p_sys = calloc( 1, sizeof( demux_sys_t ) );
+    if ( !p_sys )
+        return VLC_EGENERIC;
+
     /* I need to seek */
-    stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_seekable );
-    if( !b_seekable )
+    stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
+    if( !p_sys->b_seekable )
     {
         msg_Warn( p_demux, "MP4 plugin discarded (not seekable)" );
+        free( p_sys );
         return VLC_EGENERIC;
     }
+    stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &p_sys->b_fastseekable );
 
     /*Set exported functions */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
 
-    /* create our structure that will contains all data */
-    p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
+    p_demux->p_sys = p_sys;
 
     /* Is it Smooth Streaming? */
     bool b_smooth = false;
@@ -376,16 +395,25 @@ static int Open( vlc_object_t * p_this )
     if( LoadInitFrag( p_demux, b_smooth ) != VLC_SUCCESS )
         goto error;
 
+    /* LoadInitFrag early failed */
     if( MP4_BoxCount( p_sys->p_root, "/moov/mvex" ) > 0 )
     {
-        p_sys->b_fragmented = true;
+        if ( p_sys->b_seekable )
+        {
+            /* Probe remaining to check if there's really fragments
+               or if that file is just ready to append fragments */
+            ProbeFragments( p_demux );
+            p_sys->b_fragmented = !!MP4_BoxCount( p_sys->p_root, "/moof" );
+        }
+        else
+            p_sys->b_fragmented = true;
     }
+
     if( p_sys->b_fragmented )
     {
         p_demux->pf_demux = DemuxFrg;
     }
 
-    stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_seekable );
     if( b_smooth )
     {
         if( InitTracks( p_demux ) != VLC_SUCCESS )
@@ -393,17 +421,16 @@ static int Open( vlc_object_t * p_this )
         CreateTracksFromSmooBox( p_demux );
         return VLC_SUCCESS;
     }
-    else if( p_sys->b_fragmented && b_seekable )
+    else if( p_sys->b_fragmented )
     {
         /* We are not yet able to demux a fragmented MP4 file, using the 'mfra'
-         * box. So if STREAM_CAN_FASTSEEK is true, we're assuming we've got such
          * a file, and we let avformat do the job. */
         msg_Warn( p_demux, "MP4 plugin discarded "\
-                "(fast-seekable and fragmented, let avformat demux it)" );
+                "(fragmented, let avformat demux it)" );
         stream_Seek( p_demux->s, 0 ); /* rewind, for other demux */
         goto error;
     }
-    else if( !p_sys->b_fragmented && !b_seekable )
+    else if( !p_sys->b_fastseekable )
     {
         msg_Warn( p_demux, "MP4 plugin discarded (not fast-seekable)" );
         stream_Seek( p_demux->s, 0 ); /* rewind, for other demux */
