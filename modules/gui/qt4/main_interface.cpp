@@ -541,7 +541,7 @@ void MainInterface::debug()
 #endif
 }
 
-inline void MainInterface::showVideo() { showTab( videoWidget ); }
+inline void MainInterface::showVideo() { showTab( videoWidget ); setRaise(); }
 inline void MainInterface::restoreStackOldWidget()
             { showTab( stackCentralOldWidget ); }
 
