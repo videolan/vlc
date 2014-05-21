@@ -25,15 +25,6 @@
 #ifndef _PLAYLIST_ART_H
 #define _PLAYLIST_ART_H 1
 
-typedef struct
-{
-    char *psz_artist;
-    char *psz_album;
-    char *psz_arturl;
-    bool b_found;
-
-} playlist_album_t;
-
 int playlist_FindArtInCache( input_item_t * );
 int playlist_FindArtInCacheUsingItemUID( input_item_t * );
 

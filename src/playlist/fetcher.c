@@ -43,6 +43,15 @@
 /*****************************************************************************
  * Structures/definitions
  *****************************************************************************/
+typedef struct
+{
+    char *psz_artist;
+    char *psz_album;
+    char *psz_arturl;
+    bool b_found;
+
+} playlist_album_t;
+
 typedef struct playlist_fetcher_entry_t
 {
     input_item_t    *p_item;
