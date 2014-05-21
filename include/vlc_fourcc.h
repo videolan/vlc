@@ -279,6 +279,9 @@
 /* MediaCodec/IOMX opaque buffer type */
 #define VLC_CODEC_ANDROID_OPAQUE  VLC_FOURCC('A','N','O','P')
 
+/* Broadcom MMAL opaque buffer type */
+#define VLC_CODEC_MMAL_OPAQUE     VLC_FOURCC('M','M','A','L')
+
 /* Image codec (video) */
 #define VLC_CODEC_PNG             VLC_FOURCC('p','n','g',' ')
 #define VLC_CODEC_PPM             VLC_FOURCC('p','p','m',' ')
