@@ -353,6 +353,7 @@ static const struct action actions[] =
     { "subsync-markaudio", ACTIONID_SUBSYNC_MARKAUDIO, },
     { "subsync-marksub", ACTIONID_SUBSYNC_MARKSUB, },
     { "subsync-reset", ACTIONID_SUBSYNC_RESET, },
+    { "subtitle-toggle", ACTIONID_SUBTITLE_TOGGLE, },
     { "subtitle-track", ACTIONID_SUBTITLE_TRACK, },
     { "title-next", ACTIONID_TITLE_NEXT, },
     { "title-prev", ACTIONID_TITLE_PREV, },

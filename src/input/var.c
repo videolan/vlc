@@ -210,6 +210,10 @@ void input_ControlVarInit ( input_thread_t *p_input )
     text.psz_string = _("Subtitle Track");
     var_Change( p_input, "spu-es", VLC_VAR_SETTEXT, &text, NULL );
 
+    var_Create( p_input, "spu-choice", VLC_VAR_INTEGER );
+    val.i_int = -1;
+    var_Change( p_input, "spu-choice", VLC_VAR_SETVALUE, &val, NULL );
+
     /* Special read only objects variables for intf */
     var_Create( p_input, "bookmarks", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
