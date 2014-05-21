@@ -68,6 +68,7 @@ Video Output:
  * New Android native window provider module
  * Direct rendering for MediaCodec Android hardware acceleration
  * Support for loading HLSL shaders in Direct3D video output
+ * Add mmal based video output
 
 Video Filter:
  * New Oldmovie effect filter

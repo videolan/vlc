@@ -3442,6 +3442,33 @@ AC_SUBST(KVA_LIBS)
 AM_CONDITIONAL([HAVE_KVA], [test "${have_kva}" = "yes"])
 
 dnl
+dnl MMAL vout plugin
+dnl
+AC_ARG_ENABLE(mmal-vout,
+  AS_HELP_STRING([--enable-mmal-vout],
+    [Multi-Media Abstraction Layer (MMAL) based vout plugin for Raspberry Pi (default enable)]))
+if test "${enable_mmal_vout}" != "no"; then
+  VLC_SAVE_FLAGS
+  LDFLAGS="${LDFLAGS} -L/opt/vc/lib"
+  CPPFLAGS="${CPPFLAGS} -I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vcos/linux"
+  AC_CHECK_HEADERS(interface/mmal/mmal.h,
+    [ AC_CHECK_LIB(bcm_host, vc_tv_unregister_callback_full, [
+        VLC_ADD_PLUGIN([mmal_vout])
+        VLC_ADD_LDFLAGS([mmal_vout],[ -L/opt/vc/lib ])
+        VLC_ADD_CFLAGS([mmal_vout],[ -I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vcos/linux ])
+        VLC_ADD_LIBS([mmal_vout],[ -lbcm_host -lmmal ]) ], [
+          AS_IF([test "${enable_mmal_vout}" = "yes"],
+            [ AC_MSG_ERROR([Cannot find bcm library...]) ],
+            [ AC_MSG_WARN([Cannot find bcm library...]) ])
+          ],
+        [])
+    ] , [ AS_IF([test "${enable_mmal_vout}" = "yes"],
+      [ AC_MSG_ERROR([Cannot find development headers for mmal...]) ],
+      [ AC_MSG_WARN([Cannot find development headers for mmal...]) ]) ])
+  VLC_RESTORE_FLAGS
+fi
+
+dnl
 dnl  Audio plugins
 dnl
 
