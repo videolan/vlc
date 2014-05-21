@@ -28,6 +28,7 @@ Decoder:
  * Add tx3g subtitles decoder
  * Add Media Foundation Transform decoder
  * Add decoder module based on GStreamer. Currently supports only video decode.
+ * Add mmal based mpeg2/h264 decoder
 
 Encoder:
  * Support for MPEG-2 encoding using x262

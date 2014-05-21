@@ -2147,6 +2147,33 @@ then
 fi
 
 dnl
+dnl MMAL codec plugin
+dnl
+AC_ARG_ENABLE(mmal-codec,
+  AS_HELP_STRING([--enable-mmal-codec],
+    [Multi-Media Abstraction Layer (MMAL) based codec plugin for Raspberry Pi (default enable)]))
+if test "${enable_mmal_codec}" != "no"; then
+  VLC_SAVE_FLAGS
+  LDFLAGS="${LDFLAGS} -L/opt/vc/lib"
+  CPPFLAGS="${CPPFLAGS} -I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vcos/linux"
+  AC_CHECK_HEADERS(interface/mmal/mmal.h,
+    [ AC_CHECK_LIB(bcm_host, bcm_host_init, [
+        VLC_ADD_PLUGIN([mmal_codec])
+        VLC_ADD_LDFLAGS([mmal_codec],[ -L/opt/vc/lib ])
+        VLC_ADD_CFLAGS([mmal_codec],[ -I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vcos/linux ])
+        VLC_ADD_LIBS([mmal_codec],[ -lbcm_host -lmmal ]) ], [
+          AS_IF([test "${enable_mmal_codec}" = "yes"],
+            [ AC_MSG_ERROR([Cannot find bcm library...]) ],
+            [ AC_MSG_WARN([Cannot find bcm library...]) ])
+          ],
+        [])
+    ] , [ AS_IF([test "${enable_mmal_codec}" = "yes"],
+      [ AC_MSG_ERROR([Cannot find development headers for mmal...]) ],
+      [ AC_MSG_WARN([Cannot find development headers for mmal...]) ]) ])
+  VLC_RESTORE_FLAGS
+fi
+
+dnl
 dnl CrystalHD codec plugin
 dnl
 AC_ARG_ENABLE(crystalhd,
