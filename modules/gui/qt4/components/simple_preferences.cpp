@@ -258,8 +258,7 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
     button->setText( label );                                               \
     button->setToolTip( ltooltip );                                         \
     button->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );              \
-    button->setIconSize( QSize( icon_height, icon_height ) );               \
-    button->resize( icon_height + 6 , icon_height + 6 );                    \
+    button->setIconSize( QSize( icon_height + 40 , icon_height ) );         \
     button->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred        ); \
     button->setAutoRaise( true );                                           \
     button->setCheckable( true );                                           \
