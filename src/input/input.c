@@ -310,7 +310,10 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     p_input->p = calloc( 1, sizeof( input_thread_private_t ) );
     if( !p_input->p )
+    {
+        vlc_object_release( p_input );
         return NULL;
+    }
 
     /* Parse input options */
     vlc_mutex_lock( &p_item->lock );
