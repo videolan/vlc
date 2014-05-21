@@ -23,9 +23,9 @@
 
 typedef enum meta_fetcher_scope_t
 {
-    FETCHER_SCOPE_LOCAL,
-    FETCHER_SCOPE_NETWORK,
-    FETCHER_SCOPE_ANY
+    FETCHER_SCOPE_LOCAL   = 0x01,
+    FETCHER_SCOPE_NETWORK = 0x02,
+    FETCHER_SCOPE_ANY     = 0x03
 } meta_fetcher_scope_t;
 
 typedef struct meta_fetcher_t

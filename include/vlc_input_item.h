@@ -293,10 +293,10 @@ VLC_API void input_item_Release(input_item_t *);
 
 typedef enum input_item_meta_request_option_t
 {
-    META_REQUEST_OPTION_NONE = 0,
-    META_REQUEST_OPTION_LOCAL = 1 << 0,
-    META_REQUEST_OPTION_NETWORK = 1 << 1,
-    META_REQUEST_OPTION_ANY = 1 << 2
+    META_REQUEST_OPTION_NONE          = 0x00,
+    META_REQUEST_OPTION_SCOPE_LOCAL   = 0x01,
+    META_REQUEST_OPTION_SCOPE_NETWORK = 0x02,
+    META_REQUEST_OPTION_SCOPE_ANY     = 0x03
 } input_item_meta_request_option_t;
 
 VLC_API int libvlc_MetaRequest(libvlc_int_t *, input_item_t *,
