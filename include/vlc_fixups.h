@@ -343,4 +343,10 @@ long nrand48 (unsigned short subi[3]);
 # undef HAVE_FORK   /* Implementation of fork() is imperfect on OS/2 */
 #endif
 
+/* math.h */
+
+#ifdef __ANDROID__
+#define nanf(tagp) NAN
+#endif
+
 #endif /* !LIBVLC_FIXUPS_H */
