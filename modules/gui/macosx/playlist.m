@@ -480,9 +480,10 @@
 
 @implementation VLCPlaylist
 
-+ (void)initialize{
++ (void)initialize
+{
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSMutableArray * o_columnArray = [[NSMutableArray alloc] init];
+    NSMutableArray *o_columnArray = [[NSMutableArray alloc] init];
     [o_columnArray addObject: [NSArray arrayWithObjects:TITLE_COLUMN, [NSNumber numberWithFloat:190.], nil]];
     [o_columnArray addObject: [NSArray arrayWithObjects:ARTIST_COLUMN, [NSNumber numberWithFloat:95.], nil]];
     [o_columnArray addObject: [NSArray arrayWithObjects:DURATION_COLUMN, [NSNumber numberWithFloat:95.], nil]];
