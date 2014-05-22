@@ -241,7 +241,6 @@ int Open::openMRLwithOptions( intf_thread_t* p_intf,
     if( i_ret == VLC_SUCCESS && b_start && b_playlist )
         RecentsMRL::getInstance( p_intf )->addRecent( mrl );
 
-    delete[] options;
     return i_ret;
 }
 
