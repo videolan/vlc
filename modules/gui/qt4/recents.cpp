@@ -221,7 +221,7 @@ int Open::openMRLwithOptions( intf_thread_t* p_intf,
         for( int j = 0; j < options->count(); j++ ) {
             QString option = colon_unescape( options->at(j) );
             if( !option.isEmpty() ) {
-                ppsz_options[j] = strdup(qtu(option));
+                ppsz_options[i_options] = strdup(qtu(option));
                 i_options++;
             }
         }
