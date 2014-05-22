@@ -303,13 +303,12 @@ vlc_module_begin ()
         set_capability( "vout window xid", 0 )
         set_callbacks( WindowOpen, WindowClose )
 #endif
-#if defined (Q_WS_WIN) || (defined (Q_WS_QPA) && defined (_WIN32)) \
- || defined (Q_WS_PM)  || (defined (Q_WS_QPA) && defined (__OS2__))
+#if (defined (Q_OS_WIN) && !defined (_WIN32_X11_)) || defined (Q_OS_OS2)
     add_submodule ()
         set_capability( "vout window hwnd", 0 )
         set_callbacks( WindowOpen, WindowClose )
 #endif
-#if defined (Q_WS_MAC) || (defined (Q_WS_QPA) && defined (__APPLE__))
+#if defined (Q_OS_DARWIN)
     add_submodule ()
         set_capability( "vout window nsobject", 0 )
         set_callbacks( WindowOpen, WindowClose )
