@@ -221,7 +221,7 @@ int Open::openMRLwithOptions( intf_thread_t* p_intf,
         for( int j = 0; j < options->count(); j++ ) {
             QString option = colon_unescape( options->at(j) );
             if( !option.isEmpty() ) {
-                ppsz_options[j] = qtu(option);
+                ppsz_options[j] = strdup(qtu(option));
                 i_options++;
             }
         }
@@ -241,7 +241,13 @@ int Open::openMRLwithOptions( intf_thread_t* p_intf,
     if( i_ret == VLC_SUCCESS && b_start && b_playlist )
         RecentsMRL::getInstance( p_intf )->addRecent( mrl );
 
+    /* Free options */
+    if ( ppsz_options != NULL )
+    {
+        for ( int i = 0; i < i_options; ++i )
+            free( (char*)ppsz_options[i] );
+        delete[] ppsz_options;
+    }
     return i_ret;
 }
-
 
