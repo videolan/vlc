@@ -473,28 +473,6 @@ int input_item_AddOption( input_item_t *p_input, const char *psz_option,
                 goto out;
     }
 
-    if (flags & VLC_INPUT_OPTION_REPLACE)
-    {
-        /* search for option format "option=value" */
-
-        const char *psz_found = strchr( psz_option, '=' );
-        if( likely( psz_found ) )
-        {
-            for( int i = 0 ; i < p_input->i_options; i++ )
-            {
-                if( !strncmp( p_input->ppsz_options[i], psz_option,
-                             psz_found - psz_option + 1 /* = */ ) )
-                {
-                    free( p_input->ppsz_options[i] );
-                    p_input->ppsz_options[i] = strdup( psz_option );
-
-                    goto out;
-                }
-            }
-        }
-
-    }
-
     uint8_t *flagv = realloc (p_input->optflagv, p_input->optflagc + 1);
     if (flagv == NULL)
     {

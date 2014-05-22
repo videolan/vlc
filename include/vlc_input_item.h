@@ -179,13 +179,6 @@ enum input_item_option_e
     /* Add the option, unless the same option
      * is already present. */
     VLC_INPUT_OPTION_UNIQUE  = 0x100,
-
-    /* Search for an existing option in the format
-     * option=value and replaces the first one found.
-     * Else, the new option is added.
-     * This option and VLC_INPUT_OPTION_UNIQUE are
-     * mutually exclusive. */
-    VLC_INPUT_OPTION_REPLACE = 0x200,
 };
 
 /**
