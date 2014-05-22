@@ -536,31 +536,27 @@ static int BandsCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     filter_sys_t *p_sys = p_data;
-    const char *psz_bands = newval.psz_string;
-    const char *p = psz_bands;
-    char *psz_next;
+    const char *p = newval.psz_string;
+    int i = 0;
 
     /* Same thing for bands */
     vlc_mutex_lock( &p_sys->lock );
-    for( int i = 0; i < p_sys->i_band; i++ )
+    while( i < p_sys->i_band )
     {
-        float f;
-
-        if( *psz_bands == '\0' )
-            break;
-
+        char *next;
         /* Read dB -20/20 */
-        f = us_strtof( p, &psz_next );
-
-        if( psz_next == p )
+        float f = us_strtof( p, &next );
+        if( next == p || isnan( f ) )
             break; /* no conversion */
 
-        p_sys->f_amp[i] = EqzConvertdB( f );
+        p_sys->f_amp[i++] = EqzConvertdB( f );
 
-        if( *psz_next == '\0' )
+        if( *next == '\0' )
             break; /* end of line */
-        p = &psz_next[1];
+        p = &next[1];
     }
+    while( i < p_sys->i_band )
+        p_sys->f_amp[i++] = EqzConvertdB( 0.f );
     vlc_mutex_unlock( &p_sys->lock );
     return VLC_SUCCESS;
 }
