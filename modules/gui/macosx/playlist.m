@@ -486,7 +486,11 @@
     [o_columnArray addObject: [NSArray arrayWithObjects:TITLE_COLUMN, [NSNumber numberWithFloat:190.], nil]];
     [o_columnArray addObject: [NSArray arrayWithObjects:ARTIST_COLUMN, [NSNumber numberWithFloat:95.], nil]];
     [o_columnArray addObject: [NSArray arrayWithObjects:DURATION_COLUMN, [NSNumber numberWithFloat:95.], nil]];
-    NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:[NSArray arrayWithArray:o_columnArray] forKey: @"PlaylistColumnSelection"];
+
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 [NSArray arrayWithArray:o_columnArray], @"PlaylistColumnSelection",
+                                 [NSArray array], @"recentlyPlayedMediaList",
+                                 [NSDictionary dictionary], @"recentlyPlayedMedia", nil];
 
     [defaults registerDefaults:appDefaults];
     [o_columnArray release];
@@ -1543,7 +1547,7 @@
     float f_current_pos = 100. * pos.f_float;
     long long int dur = input_item_GetDuration(p_item) / 1000000;
     int current_pos_in_sec = (f_current_pos * dur) / 100;
-    NSMutableArray *mediaList = [defaults objectForKey:@"recentlyPlayedMediaList"];
+    NSMutableArray *mediaList = [[defaults objectForKey:@"recentlyPlayedMediaList"] mutableCopy];
 
     if (pos.f_float > .05 && pos.f_float < .95 && dur > 180) {
         [mutDict setObject:[NSNumber numberWithInt:current_pos_in_sec] forKey:url];
@@ -1564,6 +1568,9 @@
     [defaults setObject:mutDict forKey:@"recentlyPlayedMedia"];
     [defaults setObject:mediaList forKey:@"recentlyPlayedMediaList"];
     [defaults synchronize];
+
+    [mutDict release];
+    [mediaList release];
 }
 
 @end
