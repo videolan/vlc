@@ -146,14 +146,6 @@ enum nal_unit_type_e
     /* ref_idc == 0 for 6,9,10,11,12 */
 };
 
-enum nal_priority_e
-{
-    NAL_PRIORITY_DISPOSABLE = 0,
-    NAL_PRIORITY_LOW        = 1,
-    NAL_PRIORITY_HIGH       = 2,
-    NAL_PRIORITY_HIGHEST    = 3,
-};
-
 #define BLOCK_FLAG_PRIVATE_AUD (1 << BLOCK_FLAG_PRIVATE_SHIFT)
 
 static block_t *Packetize( decoder_t *, block_t ** );
