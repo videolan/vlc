@@ -109,10 +109,6 @@ struct filter_sys_t
     float *f_beta;
     float *f_gamma;
 
-    float f_newpreamp;
-    char *psz_newbands;
-    bool b_first;
-
     /* Filter dyn config */
     float *f_amp;   /* Per band amp */
     float f_gamp;   /* Global preamp */
@@ -336,8 +332,6 @@ static int EqzInit( filter_t *p_filter, int i_rate )
         }
     }
 
-    p_sys->psz_newbands = NULL;
-
     var_Create( p_aout, "equalizer-bands", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_aout, "equalizer-preset", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
@@ -347,35 +341,22 @@ static int EqzInit( filter_t *p_filter, int i_rate )
 
     /* Get initial values */
     var_Get( p_aout, "equalizer-preset", &val1 );
-    var_Get( p_aout, "equalizer-bands", &val2 );
-    var_Get( p_aout, "equalizer-preamp", &val3 );
-
-    p_sys->b_first = true;
     PresetCallback( VLC_OBJECT( p_aout ), NULL, val1, val1, p_sys );
-    BandsCallback(  VLC_OBJECT( p_aout ), NULL, val2, val2, p_sys );
-    PreampCallback( VLC_OBJECT( p_aout ), NULL, val3, val3, p_sys );
-    p_sys->b_first = false;
-
     free( val1.psz_string );
 
+    var_Get( p_aout, "equalizer-bands", &val2 );
+    var_Get( p_aout, "equalizer-preamp", &val3 );
+    BandsCallback(  VLC_OBJECT( p_aout ), NULL, val2, val2, p_sys );
+    PreampCallback( VLC_OBJECT( p_aout ), NULL, val3, val3, p_sys );
+
     /* Exit if we have no preset and no bands value */
-    if (p_sys->psz_newbands == NULL && (!val2.psz_string || !*val2.psz_string))
+    if (!val2.psz_string || !*val2.psz_string)
     {
         msg_Err(p_filter, "No preset selected");
         free( val2.psz_string );
         free( p_sys->f_amp );
         i_ret = VLC_EGENERIC;
         goto error;
-    }
-    /* Register preset bands (for intf) if : */
-    /* We have no bands info --> the preset info must be given to the intf */
-    /* or The bands info matches the preset */
-    if( ( p_sys->psz_newbands && *(val2.psz_string) &&
-         strstr( p_sys->psz_newbands, val2.psz_string ) ) || !*val2.psz_string )
-    {
-        var_SetString( p_aout, "equalizer-bands", p_sys->psz_newbands );
-        if( p_sys->f_newpreamp == p_sys->f_gamp )
-            var_SetFloat( p_aout, "equalizer-preamp", p_sys->f_newpreamp );
     }
     free( val2.psz_string );
 
@@ -480,72 +461,53 @@ static void EqzClean( filter_t *p_filter )
     free( p_sys->f_gamma );
 
     free( p_sys->f_amp );
-    free( p_sys->psz_newbands );
 }
 
 
 static int PresetCallback( vlc_object_t *p_aout, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
-    filter_sys_t *p_sys = p_data;
-
+    const eqz_preset_t *preset = NULL;
     const char *psz_preset = newval.psz_string;
 
-    vlc_mutex_lock( &p_sys->lock );
-    if( !*psz_preset || p_sys->i_band != 10 )
-    {
-        vlc_mutex_unlock( &p_sys->lock );
-        return VLC_SUCCESS;
-    }
-
     for( unsigned i = 0; i < NB_PRESETS; i++ )
-    {
         if( !strcasecmp( eqz_preset_10b[i].psz_name, psz_preset ) )
         {
-            char *psz_newbands = NULL;
-
-            p_sys->f_gamp *= powf( 10.0f, eqz_preset_10b[i].f_preamp / 20.0f );
-            for( int j = 0; j < p_sys->i_band; j++ )
-            {
-                lldiv_t d;
-                char *psz;
-
-                p_sys->f_amp[j] = EqzConvertdB( eqz_preset_10b[i].f_amp[j] );
-                d = lldiv( eqz_preset_10b[i].f_amp[j] * 10000000, 10000000 );
-                if( asprintf( &psz, "%s %lld.%07llu",
-                              psz_newbands ? psz_newbands : "",
-                              d.quot, d.rem ) == -1 )
-                {
-                    free( psz_newbands );
-                    vlc_mutex_unlock( &p_sys->lock );
-                    return VLC_ENOMEM;
-                }
-                free( psz_newbands );
-                psz_newbands = psz;
-            }
-            if( !p_sys->b_first )
-            {
-                vlc_mutex_unlock( &p_sys->lock );
-                var_SetString( p_aout, "equalizer-bands", psz_newbands );
-                var_SetFloat( p_aout, "equalizer-preamp",
-                              eqz_preset_10b[i].f_preamp );
-                free( psz_newbands );
-            }
-            else
-            {
-                p_sys->psz_newbands = psz_newbands;
-                p_sys->f_newpreamp = eqz_preset_10b[i].f_preamp;
-                vlc_mutex_unlock( &p_sys->lock );
-            }
-            return VLC_SUCCESS;
+            preset = eqz_preset_10b + i;
+            break;
         }
+
+    if( preset == NULL )
+    {
+        msg_Err( p_aout, "equalizer preset '%s' not found", psz_preset );
+        msg_Info( p_aout, "full list:" );
+        for( unsigned i = 0; i < NB_PRESETS; i++ )
+             msg_Info( p_aout, "  - '%s'", eqz_preset_10b[i].psz_name );
+        return VLC_EGENERIC;
     }
-    vlc_mutex_unlock( &p_sys->lock );
-    msg_Err( p_aout, "equalizer preset '%s' not found", psz_preset );
-    msg_Info( p_aout, "full list:" );
-    for( unsigned i = 0; i < NB_PRESETS; i++ )
-         msg_Info( p_aout, "  - '%s'", eqz_preset_10b[i].psz_name );
+
+    char *bands = NULL;
+
+    for( unsigned i = 0; i < EQZ_BANDS_MAX; i++ )
+    {
+        char *psz;
+
+        lldiv_t d = lldiv( lroundf(preset->f_amp[i] * 10000000.f), 10000000 );
+
+        if( asprintf( &psz, "%s %lld.%07llu", i ? bands : "",
+                      d.quot, d.rem ) == -1 )
+            psz = NULL;
+
+        free( bands );
+        if( unlikely(psz == NULL) )
+            return VLC_ENOMEM;
+        bands = psz;
+    }
+
+    var_SetFloat( p_aout, "equalizer-preamp", preset->f_preamp );
+    var_SetString( p_aout, "equalizer-bands", bands );
+    free( bands );
+    (void) psz_cmd; (void) oldval; (void) p_data;
     return VLC_SUCCESS;
 }
 
