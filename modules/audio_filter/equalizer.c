@@ -554,16 +554,18 @@ static int PreampCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     filter_sys_t *p_sys = p_data;
+    float preamp;
 
-    if( newval.f_float < -20.0f )
-        newval.f_float = -20.0f;
-    else if( newval.f_float > 20.0f )
-        newval.f_float = 20.0f;
+    if( newval.f_float < -20.f )
+        preamp = .1f;
+    else if( newval.f_float < 20.f )
+        preamp = powf( 10.f, newval.f_float / 20.f );
+    else
+        preamp = 10.f;
 
     vlc_mutex_lock( &p_sys->lock );
-    p_sys->f_gamp = powf( 10.0f, newval.f_float / 20.0f );
+    p_sys->f_gamp = preamp;
     vlc_mutex_unlock( &p_sys->lock );
-
     return VLC_SUCCESS;
 }
 
