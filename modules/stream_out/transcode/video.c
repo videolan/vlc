@@ -836,13 +836,13 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 
         if( unlikely (
              id->p_encoder->p_module &&
-             !video_format_IsSimilar( &p_sys->fmt_input_video, &id->p_decoder->fmt_out.video )
+             !video_format_IsSimilar( &id->fmt_input_video, &id->p_decoder->fmt_out.video )
             )
           )
         {
             msg_Info( p_stream, "aspect-ratio changed, reiniting. %i -> %i : %i -> %i.",
-                        p_sys->fmt_input_video.i_sar_num, id->p_decoder->fmt_out.video.i_sar_num,
-                        p_sys->fmt_input_video.i_sar_den, id->p_decoder->fmt_out.video.i_sar_den
+                        id->fmt_input_video.i_sar_num, id->p_decoder->fmt_out.video.i_sar_num,
+                        id->fmt_input_video.i_sar_den, id->p_decoder->fmt_out.video.i_sar_den
                     );
             /* Close filters */
             if( id->p_f_chain )
@@ -860,7 +860,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             transcode_video_filter_init( p_stream, id );
             transcode_video_encoder_init( p_stream, id );
             conversion_video_filter_append( id );
-            memcpy( &p_sys->fmt_input_video, &id->p_decoder->fmt_out.video, sizeof(video_format_t));
+            memcpy( &id->fmt_input_video, &id->p_decoder->fmt_out.video, sizeof(video_format_t));
         }
 
 
@@ -875,7 +875,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             transcode_video_filter_init( p_stream, id );
             transcode_video_encoder_init( p_stream, id );
             conversion_video_filter_append( id );
-            memcpy( &p_sys->fmt_input_video, &id->p_decoder->fmt_out.video, sizeof(video_format_t));
+            memcpy( &id->fmt_input_video, &id->p_decoder->fmt_out.video, sizeof(video_format_t));
 
             if( transcode_video_encoder_open( p_stream, id ) != VLC_SUCCESS )
             {

@@ -83,8 +83,8 @@ static int transcode_audio_initialize_filters( sout_stream_t *p_stream, sout_str
         id->p_decoder->p_module = NULL;
         return VLC_EGENERIC;
     }
-    p_sys->fmt_audio.i_rate = fmt_last->i_rate;
-    p_sys->fmt_audio.i_physical_channels = fmt_last->i_physical_channels;
+    id->fmt_audio.i_rate = fmt_last->i_rate;
+    id->fmt_audio.i_physical_channels = fmt_last->i_physical_channels;
     return VLC_SUCCESS;
 }
 
@@ -255,8 +255,8 @@ int transcode_audio_process( sout_stream_t *p_stream,
         }
 
         /* Check if audio format has changed, and filters need reinit */
-        if( unlikely( ( id->p_decoder->fmt_out.audio.i_rate != p_sys->fmt_audio.i_rate ) ||
-                      ( id->p_decoder->fmt_out.audio.i_physical_channels != p_sys->fmt_audio.i_physical_channels ) ) )
+        if( unlikely( ( id->p_decoder->fmt_out.audio.i_rate != id->fmt_audio.i_rate ) ||
+                      ( id->p_decoder->fmt_out.audio.i_physical_channels != id->fmt_audio.i_physical_channels ) ) )
         {
             msg_Info( p_stream, "Audio changed, trying to reinitialize filters" );
             if( id->p_af_chain != NULL )

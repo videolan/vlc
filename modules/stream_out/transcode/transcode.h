@@ -26,7 +26,6 @@ struct sout_stream_sys_t
 
     /* Audio */
     vlc_fourcc_t    i_acodec;   /* codec audio (0 if not transcode) */
-    audio_sample_format_t   fmt_audio;
     char            *psz_aenc;
     char            *psz_alang;
     config_chain_t  *p_audio_cfg;
@@ -38,7 +37,6 @@ struct sout_stream_sys_t
 
     /* Video */
     vlc_fourcc_t    i_vcodec;   /* codec video (0 if not transcode) */
-    video_format_t  fmt_input_video;
     char            *psz_venc;
     config_chain_t  *p_video_cfg;
     int             i_vbitrate;
@@ -93,8 +91,14 @@ struct sout_stream_id_sys_t
          {
              filter_chain_t  *p_f_chain; /**< Video filters */
              filter_chain_t  *p_uf_chain; /**< User-specified video filters */
+             video_format_t  fmt_input_video;
          };
-         struct aout_filters *p_af_chain; /**< Audio filters */
+         struct
+         {
+             struct aout_filters    *p_af_chain; /**< Audio filters */
+             audio_format_t  fmt_audio;
+         };
+
     };
 
     /* Encoder */
