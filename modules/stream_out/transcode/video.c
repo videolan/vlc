@@ -548,9 +548,17 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
         id->p_encoder->fmt_in.video.i_frame_rate,
         id->p_encoder->fmt_in.video.i_frame_rate_base );
 
-    id->i_output_frame_interval = id->p_encoder->fmt_out.video.i_frame_rate_base * CLOCK_FREQ / id->p_encoder->fmt_out.video.i_frame_rate;
+    id->i_input_frame_interval  = id->p_decoder->fmt_out.video.i_frame_rate_base * CLOCK_FREQ / id->p_decoder->fmt_out.video.i_frame_rate;
+    msg_Info( p_stream, "input interval %d (base %d)",
+                        id->i_input_frame_interval, id->p_decoder->fmt_out.video.i_frame_rate_base );
+
+    id->i_output_frame_interval = id->p_encoder->fmt_in.video.i_frame_rate_base * CLOCK_FREQ / id->p_encoder->fmt_in.video.i_frame_rate;
     msg_Info( p_stream, "output interval %d (base %d)",
                         id->i_output_frame_interval, id->p_encoder->fmt_in.video.i_frame_rate_base );
+
+    date_Init( &id->next_input_pts,
+               id->p_decoder->fmt_out.video.i_frame_rate,
+               1 );
 
     date_Init( &id->next_output_pts,
                id->p_encoder->fmt_in.video.i_frame_rate,
@@ -885,6 +893,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                 return VLC_EGENERIC;
             }
             date_Set( &id->next_output_pts, p_pic->date );
+            date_Set( &id->next_input_pts, p_pic->date );
         }
 
         /*Input lipsync and drop check */
@@ -912,6 +921,21 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 #endif
 
         }
+        /* Check input drift regardless, if it's more than 100ms from our approximation, we most likely have lost pictures
+         * and are in danger to become out of sync, so better reset timestamps then */
+        if( likely( p_pic->date != VLC_TS_INVALID ) )
+        {
+            mtime_t input_drift = p_pic->date - date_Get( &id->next_input_pts );
+            if( unlikely( (input_drift > (CLOCK_FREQ/10)) ||
+                          (input_drift < -(CLOCK_FREQ/10))
+               ) )
+            {
+                msg_Warn( p_stream, "Reseting video sync" );
+                date_Set( &id->next_output_pts, p_pic->date );
+                date_Set( &id->next_input_pts, p_pic->date );
+            }
+        }
+        date_Increment( &id->next_input_pts, id->p_decoder->fmt_out.video.i_frame_rate_base );
 
         /* Run the filter and output chains; first with the picture,
          * and then with NULL as many times as we need until they

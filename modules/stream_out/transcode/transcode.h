@@ -105,10 +105,10 @@ struct sout_stream_id_sys_t
     encoder_t       *p_encoder;
 
     /* Sync */
-    date_t          interpolated_pts; /**< Incoming calculated PTS */
+    date_t          next_input_pts; /**< Incoming calculated PTS */
     date_t          next_output_pts; /**< output calculated PTS */
-    int             i_output_frame_interval;
     int             i_input_frame_interval;
+    int             i_output_frame_interval;
 };
 
 /* OSD */

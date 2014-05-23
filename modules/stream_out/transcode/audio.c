@@ -250,8 +250,8 @@ int transcode_audio_process( sout_stream_t *p_stream,
             if( unlikely( transcode_audio_initialize_filters( p_stream, id, p_sys,
                           &id->p_decoder->fmt_out.audio ) != VLC_SUCCESS ) )
                 return VLC_EGENERIC;
-            date_Init( &id->interpolated_pts, id->p_decoder->fmt_out.audio.i_rate, 1 );
-            date_Set( &id->interpolated_pts, p_audio_buf->i_pts );
+            date_Init( &id->next_input_pts, id->p_decoder->fmt_out.audio.i_rate, 1 );
+            date_Set( &id->next_input_pts, p_audio_buf->i_pts );
         }
 
         /* Check if audio format has changed, and filters need reinit */
@@ -270,14 +270,14 @@ int transcode_audio_process( sout_stream_t *p_stream,
                           &id->p_decoder->fmt_out.audio ) != VLC_SUCCESS )
                 return VLC_EGENERIC;
 
-            /* Set interpolated_pts to run with new samplerate */
-            date_Init( &id->interpolated_pts, p_sys->fmt_audio.i_rate, 1 );
-            date_Set( &id->interpolated_pts, p_audio_buf->i_pts );
+            /* Set next_input_pts to run with new samplerate */
+            date_Init( &id->next_input_pts, id->fmt_audio.i_rate, 1 );
+            date_Set( &id->next_input_pts, p_audio_buf->i_pts );
         }
 
         if( p_sys->b_master_sync )
         {
-            mtime_t i_pts = date_Get( &id->interpolated_pts );
+            mtime_t i_pts = date_Get( &id->next_input_pts );
             mtime_t i_drift = 0;
 
             if( likely( p_audio_buf->i_pts != VLC_TS_INVALID ) )
@@ -289,13 +289,13 @@ int transcode_audio_process( sout_stream_t *p_stream,
                 msg_Dbg( p_stream,
                     "audio drift is too high (%"PRId64"), resetting master sync",
                     i_drift );
-                date_Set( &id->interpolated_pts, p_audio_buf->i_pts );
-                i_pts = date_Get( &id->interpolated_pts );
+                date_Set( &id->next_input_pts, p_audio_buf->i_pts );
+                i_pts = date_Get( &id->next_input_pts );
                 if( likely(p_audio_buf->i_pts != VLC_TS_INVALID ) )
                     i_drift = p_audio_buf->i_pts - i_pts;
             }
             p_sys->i_master_drift = i_drift;
-            date_Increment( &id->interpolated_pts, p_audio_buf->i_nb_samples );
+            date_Increment( &id->next_input_pts, p_audio_buf->i_nb_samples );
         }
 
         p_audio_buf->i_dts = p_audio_buf->i_pts;
