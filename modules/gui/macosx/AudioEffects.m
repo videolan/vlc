@@ -161,31 +161,14 @@ static VLCAudioEffects *_o_sharedInstance = nil;
 
 - (void)setAudioFilter: (char *)psz_name on:(BOOL)b_on
 {
-    char *psz_tmp;
     audio_output_t *p_aout = getAout();
-    if (p_aout)
-        psz_tmp = var_GetNonEmptyString(p_aout, "audio-filter");
-    else
-        psz_tmp = config_GetPsz(p_intf, "audio-filter");
-
-    if (b_on) {
-        if (!psz_tmp)
-            config_PutPsz(p_intf, "audio-filter", psz_name);
-        else if (strstr(psz_tmp, psz_name) == NULL) {
-            psz_tmp = (char *)[[NSString stringWithFormat: @"%s:%s", psz_tmp, psz_name] UTF8String];
-            config_PutPsz(p_intf, "audio-filter", psz_tmp);
-        }
-    } else {
-        if (psz_tmp) {
-            psz_tmp = (char *)[[[NSString stringWithUTF8String:psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithFormat:@":%s",psz_name]]] UTF8String];
-            psz_tmp = (char *)[[[NSString stringWithUTF8String:psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithFormat:@"%s:",psz_name]]] UTF8String];
-            psz_tmp = (char *)[[[NSString stringWithUTF8String:psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithUTF8String:psz_name]]] UTF8String];
-            config_PutPsz(p_intf, "audio-filter", psz_tmp);
-        }
-    }
+    playlist_EnableAudioFilter(pl_Get(p_intf), psz_name, b_on);
 
     if (p_aout) {
-        playlist_EnableAudioFilter(pl_Get(p_intf), psz_name, b_on);
+        char *psz_new = var_GetNonEmptyString(p_aout, "audio-filter");
+        config_PutPsz(p_intf, "audio-filter", psz_new);
+        free(psz_new);
+
         vlc_object_release(p_aout);
     }
 }
