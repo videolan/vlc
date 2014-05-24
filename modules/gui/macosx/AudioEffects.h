@@ -119,7 +119,6 @@
 - (void)saveCurrentProfile;
 
 /* Equalizer */
-- (void)setupEqualizer;
 - (void)equalizerUpdated;
 - (void)setValue:(float)value forSlider:(int)index;
 - (IBAction)eq_bandSliderUpdated:(id)sender;

@@ -149,7 +149,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     if (!OSX_SNOW_LEOPARD)
         [o_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
-    [self setupEqualizer];
+    [self equalizerUpdated];
     [self resetCompressor];
     [self resetSpatializer];
     [self resetAudioFilters];
@@ -437,19 +437,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         return true;
     else
         return false;
-}
-
-- (void)setupEqualizer
-{
-    audio_output_t *p_aout = getAout();
-    if (p_aout) {
-        var_Create(p_aout, "equalizer-preset", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
-        var_Create(p_aout, "equalizer-preamp", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
-        var_Create(p_aout, "equalizer-bands", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
-        vlc_object_release(p_aout);
-    }
-
-    [self equalizerUpdated];
 }
 
 - (void)updatePresetSelector
