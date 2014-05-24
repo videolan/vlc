@@ -353,6 +353,7 @@ $Id$
  * subtitle: a demuxer for subtitle files
  * svcdsub: SVCD subtitles decoder
  * svg: a svg renderer module
+ * svgdec: a svg decoder module
  * swscale: Video scaling filter
  * t140: T.140 text encoder
  * taglib: Taglib tags parser and writer
@@ -374,7 +375,8 @@ $Id$
  * uleaddvaudio: codec for DV Audio from Ulead
  * upnp: libupnp UPNP service discovery
  * v4l2: Video 4 Linux 2 input module
- * vaapi: VAAPI hardware-accelerated decoding
+ * vaapi_drm: VAAPI hardware-accelerated decoding with drm backend
+ * vaapi_x11: VAAPI hardware-accelerated decoding with x11 backend
  * vc1: VC-1 Video demuxer
  * vcd: input module for accessing Video CDs
  * vcdx: input module for accessing Video CDs with navigation & stills
