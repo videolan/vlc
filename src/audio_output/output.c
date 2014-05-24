@@ -156,8 +156,9 @@ static int aout_GainNotify (audio_output_t *aout, float gain)
 static int FilterCallback (vlc_object_t *obj, const char *var,
                            vlc_value_t prev, vlc_value_t cur, void *data)
 {
-    aout_InputRequestRestart ((audio_output_t *)obj);
-    (void) var; (void) prev; (void) cur; (void) data;
+    if (strcmp(prev.psz_string, cur.psz_string))
+        aout_InputRequestRestart ((audio_output_t *)obj);
+    (void) var; (void) data;
     return VLC_SUCCESS;
 }
 
