@@ -338,8 +338,9 @@ static void DoWork( filter_t * p_filter,
 
     float * p_in = (float*) p_in_buf->p_buffer;
     float * p_out;
-    float * p_overflow;
-    float * p_slide;
+    uint8_t * p_overflow;
+    uint8_t * p_end_overflow;
+    uint8_t * p_slide;
 
     size_t i_overflow_size;     /* in bytes */
     size_t i_out_size;          /* in bytes */
@@ -355,32 +356,33 @@ static void DoWork( filter_t * p_filter,
     i_out_size = p_out_buf->i_buffer;
 
     /* Slide the overflow buffer */
-    p_overflow = p_sys->p_overflow_buffer;
+    p_overflow = (uint8_t *) p_sys->p_overflow_buffer;
     i_overflow_size = p_sys->i_overflow_buffer_size;
+    p_end_overflow = p_overflow + i_overflow_size;
 
     memset( p_out, 0, i_out_size );
-    if ( i_out_size > i_overflow_size )
-        memcpy( p_out, p_overflow, i_overflow_size );
-    else
-        memcpy( p_out, p_overflow, i_out_size );
+    memcpy( p_out, p_overflow, __MIN( i_out_size, i_overflow_size ) );
 
-    p_slide = p_sys->p_overflow_buffer;
-    while( p_slide < p_overflow + i_overflow_size )
+    p_slide = (uint8_t *) p_sys->p_overflow_buffer;
+    while( p_slide < p_end_overflow )
     {
-        if( p_slide + i_out_size < p_overflow + i_overflow_size )
+        size_t i_bytes_copied;
+
+        if( p_slide + i_out_size < p_end_overflow )
         {
             memset( p_slide, 0, i_out_size );
-            if( p_slide + 2 * i_out_size < p_overflow + i_overflow_size )
-                memcpy( p_slide, p_slide + i_out_size, i_out_size );
+            if( p_slide + 2 * i_out_size < p_end_overflow )
+                i_bytes_copied = i_out_size;
             else
-                memcpy( p_slide, p_slide + i_out_size,
-                        p_overflow + i_overflow_size - ( p_slide + i_out_size ) );
+                i_bytes_copied = p_end_overflow - ( p_slide + i_out_size );
+            memcpy( p_slide, p_slide + i_out_size, i_bytes_copied );
         }
         else
         {
-            memset( p_slide, 0, p_overflow + i_overflow_size - p_slide );
+            i_bytes_copied = p_end_overflow - p_slide;
+            memset( p_slide, 0, i_bytes_copied );
         }
-        p_slide += i_out_size;
+        p_slide += i_bytes_copied;
     }
 
     /* apply the atomic operations */
