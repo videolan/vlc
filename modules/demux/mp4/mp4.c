@@ -111,6 +111,8 @@ static void     MP4_TrackSetELST( demux_t *, mp4_track_t *, int64_t );
 static void     MP4_UpdateSeekpoint( demux_t * );
 static const char *MP4_ConvertMacCode( uint16_t );
 
+static MP4_Box_t * MP4_GetTrexByTrackID( MP4_Box_t *p_moov, const uint32_t i_id );
+
 static uint32_t stream_ReadU32( stream_t *s, void *p_read, uint32_t i_toread )
 {
     uint32_t i_return = 0;
@@ -124,6 +126,19 @@ static uint32_t stream_ReadU32( stream_t *s, void *p_read, uint32_t i_toread )
     }
     i_return += stream_Read( s, (uint8_t *)p_read + i_return, (int32_t) i_toread );
     return i_return;
+}
+
+static MP4_Box_t * MP4_GetTrexByTrackID( MP4_Box_t *p_moov, const uint32_t i_id )
+{
+    MP4_Box_t *p_trex = MP4_BoxGet( p_moov, "mvex/trex" );
+    while( p_trex )
+    {
+        if ( p_trex->i_type == ATOM_trex && BOXDATA(p_trex)->i_track_ID == i_id )
+                break;
+        else
+            p_trex = p_trex->p_next;
+    }
+    return p_trex;
 }
 
 /* Return time in microsecond of a track */
@@ -3747,14 +3762,9 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
      * more than one subsegment. */
     if( !default_duration )
     {
-        MP4_Box_t *p_trex = MP4_BoxGet( p_demux->p_sys->p_root, "moov/mvex/trex");
+        MP4_Box_t *p_trex = MP4_GetTrexByTrackID( p_moof, i_track_ID );
         if ( p_trex )
-        {
-            while( p_trex && p_trex->data.p_trex->i_track_ID != i_track_ID )
-                p_trex = p_trex->p_next;
-            if ( p_trex )
-                default_duration = BOXDATA(p_trex)->i_default_sample_duration;
-        }
+            default_duration = BOXDATA(p_trex)->i_default_sample_duration;
         else if( p_sidx )
         {
             MP4_Box_data_sidx_t *p_sidx_data = BOXDATA(p_sidx);
