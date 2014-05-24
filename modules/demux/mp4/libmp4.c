@@ -3648,6 +3648,13 @@ MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
 
     MP4_ReadBoxContainerChildren( s, p_chunk, ATOM_moof );
 
+    p_tmp_box = p_chunk->p_first;
+    while( p_tmp_box )
+    {
+        p_chunk->i_size += p_tmp_box->i_size;
+        p_tmp_box = p_tmp_box->p_next;
+    }
+
     return p_chunk;
 }
 
