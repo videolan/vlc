@@ -310,19 +310,6 @@ static int VisualizationCallback (vlc_object_t *obj, const char *var,
     return VLC_SUCCESS;
 }
 
-static int EqualizerCallback (vlc_object_t *obj, const char *var,
-                              vlc_value_t oldval, vlc_value_t newval,
-                              void *data)
-{
-    const char *val = newval.psz_string;
-
-    if (aout_ChangeFilterString (obj, obj, "audio-filter", "equalizer", *val))
-        aout_InputRequestRestart ((audio_output_t *)obj); /* <- That sucks! */
-
-    (void) var; (void) oldval; (void) data;
-    return VLC_SUCCESS;
-}
-
 vout_thread_t *aout_filter_RequestVout (filter_t *filter, vout_thread_t *vout,
                                         video_format_t *fmt)
 {
@@ -413,12 +400,7 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
 
     /* Callbacks (before reading values and also before return statement) */
     if (request_vout != NULL)
-    {
-        var_AddCallback (obj, "equalizer-bands", EqualizerCallback, NULL);
         var_AddCallback (obj, "visual", VisualizationCallback, NULL);
-
-        var_TriggerCallback( obj, "equalizer-bands" );
-    }
 
     /* Now add user filters */
     if (!AOUT_FMT_LINEAR(outfmt))
@@ -493,7 +475,6 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
 
 error:
     aout_FiltersPipelineDestroy (filters->tab, filters->count);
-    var_DelCallback (obj, "equalizer-bands", EqualizerCallback, NULL);
     var_DelCallback (obj, "visual", VisualizationCallback, NULL);
     free (filters);
     return NULL;
@@ -514,10 +495,7 @@ void aout_FiltersDelete (vlc_object_t *obj, aout_filters_t *filters)
         aout_FiltersPipelineDestroy (&filters->resampler, 1);
     aout_FiltersPipelineDestroy (filters->tab, filters->count);
     if (obj != NULL)
-    {
-        var_DelCallback (obj, "equalizer-bands", EqualizerCallback, NULL);
         var_DelCallback (obj, "visual", VisualizationCallback, NULL);
-    }
     free (filters);
 }
 
