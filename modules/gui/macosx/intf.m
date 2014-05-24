@@ -991,8 +991,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)application:(NSApplication *)o_app openFiles:(NSArray *)o_names
 {
-    char *psz_uri = vlc_path2uri([[o_names objectAtIndex:0] UTF8String], NULL);
-
     if (launched == NO) {
         if (items_at_launch) {
             int items = [o_names count];
@@ -1003,6 +1001,8 @@ static VLCMain *_o_sharedMainInstance = nil;
             return;
         }
     }
+
+    char *psz_uri = vlc_path2uri([[o_names objectAtIndex:0] UTF8String], NULL);
 
     // try to add file as subtitle
     if ([o_names count] == 1 && psz_uri) {
@@ -1031,8 +1031,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
 
     [o_playlist appendArray: o_result atPos: -1 enqueue: !config_GetInt(VLCIntf, "macosx-autoplay")];
-
-    return;
 }
 
 /* When user click in the Dock icon our double click in the finder */
