@@ -153,6 +153,14 @@ static int aout_GainNotify (audio_output_t *aout, float gain)
     return 0;
 }
 
+static int FilterCallback (vlc_object_t *obj, const char *var,
+                           vlc_value_t prev, vlc_value_t cur, void *data)
+{
+    aout_InputRequestRestart ((audio_output_t *)obj);
+    (void) var; (void) prev; (void) cur; (void) data;
+    return VLC_SUCCESS;
+}
+
 #undef aout_New
 /**
  * Creates an audio output object and initializes an output module.
@@ -267,6 +275,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
     }
 
     var_Create (aout, "audio-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    var_AddCallback (aout, "audio-filter", FilterCallback, NULL);
     text.psz_string = _("Audio filters");
     var_Change (aout, "audio-filter", VLC_VAR_SETTEXT, &text, NULL);
 
@@ -313,6 +322,7 @@ void aout_Destroy (audio_output_t *aout)
     aout->device_select = NULL;
     aout_OutputUnlock (aout);
 
+    var_DelCallback (aout, "audio-filter", FilterCallback, NULL);
     var_DelCallback (aout, "mute", var_Copy, aout->p_parent);
     var_SetFloat (aout, "volume", -1.f);
     var_DelCallback (aout, "volume", var_Copy, aout->p_parent);
