@@ -266,22 +266,6 @@ audio_output_t *aout_New (vlc_object_t *parent)
         free (str);
     }
 
-    /* Equalizer */
-    var_Create (aout, "equalizer", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
-    text.psz_string = _("Equalizer");
-    var_Change (aout, "equalizer", VLC_VAR_SETTEXT, &text, NULL);
-    val.psz_string = (char*)"";
-    text.psz_string = _("Disable");
-    var_Change (aout, "equalizer", VLC_VAR_ADDCHOICE, &val, &text);
-    cfg = config_FindConfig (VLC_OBJECT(aout), "equalizer-preset");
-    if (likely(cfg != NULL))
-        for (unsigned i = 0; i < cfg->list_count; i++)
-        {
-            val.psz_string = cfg->list.psz[i];
-            text.psz_string = vlc_gettext(cfg->list_text[i]);
-            var_Change (aout, "equalizer", VLC_VAR_ADDCHOICE, &val, &text);
-        }
-
     var_Create (aout, "audio-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     text.psz_string = _("Audio filters");
     var_Change (aout, "audio-filter", VLC_VAR_SETTEXT, &text, NULL);
@@ -306,8 +290,10 @@ audio_output_t *aout_New (vlc_object_t *parent)
                             &val, &text);
         }
 
+    /* Equalizer */
     var_Create (aout, "equalizer-preamp", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
     var_Create (aout, "equalizer-bands", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    var_Create (aout, "equalizer-preset", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
 
     return aout;
 }
