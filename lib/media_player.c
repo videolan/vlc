@@ -1446,12 +1446,30 @@ void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi )
     }
 }
 
+/**
+ * Private lookup table to get subpicture alignment flag values corresponding
+ * to a libvlc_position_t enumerated value.
+ */
+static const int position_subpicture_alignment[] = {
+    0,
+    SUBPICTURE_ALIGN_LEFT,
+    SUBPICTURE_ALIGN_RIGHT,
+    SUBPICTURE_ALIGN_TOP,
+    SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT,
+    SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_RIGHT,
+    SUBPICTURE_ALIGN_BOTTOM,
+    SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT,
+    SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT
+};
+
 void libvlc_media_player_set_video_title_display( libvlc_media_player_t *p_mi, libvlc_position_t position, unsigned timeout )
 {
+    assert( position >= libvlc_position_disable && position <= libvlc_position_bottom_right );
+
     if ( position != libvlc_position_disable )
     {
         var_SetBool( p_mi, "video-title-show", true );
-        var_SetInteger( p_mi, "video-title-position", position );
+        var_SetInteger( p_mi, "video-title-position", position_subpicture_alignment[position] );
         var_SetInteger( p_mi, "video-title-timeout", timeout );
     }
     else
