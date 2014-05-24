@@ -469,6 +469,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "mute", VLC_VAR_BOOL);
     var_Create (mp, "volume", VLC_VAR_FLOAT);
     var_Create (mp, "corks", VLC_VAR_INTEGER);
+    var_Create (mp, "audio-filter", VLC_VAR_STRING);
     var_Create (mp, "amem-data", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-setup", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-cleanup", VLC_VAR_ADDRESS);
@@ -1472,49 +1473,35 @@ void libvlc_media_player_set_video_title_display( libvlc_media_player_t *p_mi, l
 
 int libvlc_media_player_set_equalizer( libvlc_media_player_t *p_mi, libvlc_equalizer_t *p_equalizer )
 {
-    float f_preamp;
-    char *psz_bands;
+    char bands[EQZ_BANDS_MAX * EQZ_BAND_VALUE_SIZE + 1];
 
-    if ( p_equalizer )
+    if( p_equalizer != NULL )
     {
-        f_preamp = p_equalizer->f_preamp;
-
-        psz_bands = malloc( EQZ_BANDS_MAX * EQZ_BAND_VALUE_SIZE + 1 );
-        if ( unlikely( psz_bands == NULL ) )
-            return -1;
-
-        char *p = psz_bands;
-        int c;
-        for ( int i = 0; i < EQZ_BANDS_MAX; i++ )
+        for( unsigned i = 0, c = 0; i < EQZ_BANDS_MAX; i++ )
         {
-            c = snprintf( p, EQZ_BAND_VALUE_SIZE + 1, " %.07f", p_equalizer->f_amp[i] );
-            if ( unlikely( c >= EQZ_BAND_VALUE_SIZE + 1 ) )
-            {
-                free( psz_bands );
+            c = snprintf( bands + c, sizeof(bands) - c, " %.07f",
+                          p_equalizer->f_amp[i] );
+            if( unlikely(c >= sizeof(bands)) )
                 return -1;
-            }
-
-            p += c;
         }
-    }
-    else
-    {
-        f_preamp = 0.f;
-        psz_bands = NULL;
-    }
 
-    var_SetFloat( p_mi, "equalizer-preamp", f_preamp );
-    var_SetString( p_mi, "equalizer-bands", psz_bands );
+        var_SetFloat( p_mi, "equalizer-preamp", p_equalizer->f_preamp );
+        var_SetString( p_mi, "equalizer-bands", bands );
+    }
+    var_SetString( p_mi, "audio-filter", p_equalizer ? "equalizer" : "" );
 
     audio_output_t *p_aout = input_resource_HoldAout( p_mi->input.p_resource );
-    if ( p_aout )
+    if( p_aout != NULL )
     {
-        var_SetFloat( p_aout, "equalizer-preamp", f_preamp );
-        var_SetString( p_aout, "equalizer-bands", psz_bands );
+        if( p_equalizer != NULL )
+        {
+            var_SetFloat( p_aout, "equalizer-preamp", p_equalizer->f_preamp );
+            var_SetString( p_aout, "equalizer-bands", bands );
+        }
 
+        var_SetString( p_mi, "audio-filter", p_equalizer ? "equalizer" : "" );
         vlc_object_release( p_aout );
     }
 
-    free( psz_bands );
     return 0;
 }
