@@ -226,7 +226,7 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
                 }
                 msg_Dbg( p_fetcher->object,
                          " will search at higher scope, if possible" );
-                p_album = &album;
+                p_album = &p_fetcher->albums.p_elems[fe_idx];
                 break;
             }
         FOREACH_END();
