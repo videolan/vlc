@@ -1450,16 +1450,16 @@ void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi )
  * Private lookup table to get subpicture alignment flag values corresponding
  * to a libvlc_position_t enumerated value.
  */
-static const int position_subpicture_alignment[] = {
-    0,
-    SUBPICTURE_ALIGN_LEFT,
-    SUBPICTURE_ALIGN_RIGHT,
-    SUBPICTURE_ALIGN_TOP,
-    SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT,
-    SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_RIGHT,
-    SUBPICTURE_ALIGN_BOTTOM,
-    SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT,
-    SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT
+static const unsigned char position_subpicture_alignment[] = {
+    [libvlc_position_center]       = 0,
+    [libvlc_position_left]         = SUBPICTURE_ALIGN_LEFT,
+    [libvlc_position_right]        = SUBPICTURE_ALIGN_RIGHT,
+    [libvlc_position_top]          = SUBPICTURE_ALIGN_TOP,
+    [libvlc_position_top_left]     = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT,
+    [libvlc_position_top_right]    = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_RIGHT,
+    [libvlc_position_bottom]       = SUBPICTURE_ALIGN_BOTTOM,
+    [libvlc_position_bottom_left]  = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT,
+    [libvlc_position_bottom_right] = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT
 };
 
 void libvlc_media_player_set_video_title_display( libvlc_media_player_t *p_mi, libvlc_position_t position, unsigned timeout )
