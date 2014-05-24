@@ -200,8 +200,12 @@ static int DisplayLogin(vlc_object_t *p_this, const char *type, vlc_value_t prev
     intf_sys_t *sys = p_intf->p_sys;
     NSDictionary *dict = [sys->displayer displayLogin:DictFromDialogLogin(dialog)];
     if (dict) {
-        *dialog->username = strdup([[dict objectForKey:@"username"] UTF8String]);
-        *dialog->password = strdup([[dict objectForKey:@"password"] UTF8String]);
+        NSString *username = [dict objectForKey:@"username"];
+        if (username != NULL && username.length > 0)
+            *dialog->username = strdup([username UTF8String]);
+        NSString *password = [dict objectForKey:@"password"];
+        if (password != NULL && password.length > 0)
+            *dialog->password = strdup([password UTF8String]);
     }
     [pool release];
     return VLC_SUCCESS;
