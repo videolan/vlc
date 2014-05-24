@@ -7,18 +7,29 @@ Important changes:
 Core:
  * Partial fix of playback of short audio samples
  * Add extensions download from external repositories
+ * Support automatic rotation using streams metadata, GPU-accelerated when possible
+ * Rework the metadata fetching algorithm and policies
 
 Access:
  * Added TLS support for ftp access and sout access.
    New schemes for implicit (ftps) and explicit (ftpes) modes.
  * MMS audio selection on split audio streams
- * Blu-Ray: support overlays, preferred menu languages, region selection and navigation
- * Digital Cinema Package support
+ * Blu-Ray: support overlays, preferred menu languages, region selection
+   and navigation
+ * Digital Cinema Package support, including encrypted DCP with KDM
+ * Partial fixes for Arccos protected DVDs
 
 Decoder:
+ * Support VDPAU acceleration for GPU-zerocopy decoding
+ * Support MediaCodec acceleration for GPU-zerocopy decoding
+ * Add Media Foundation Transform audio and video decoder
+ * Add video decoder module based on GStreamer plugins
+ * Add MMAL decoder for Broadcom VideoCore chips (like the RaspberryPi)
+   supporting MPEG-2 and H.264, supporting GPU-zerocopy display
  * Partial support for Voxware MetaSound
  * libvpx decoder for VP8 and VP9
- * Support MSN Audio, DK3, DK4, IMC, Vivo g723.1, Bink
+ * Support MSN Audio, Atrac3+, VP7, Bink, TAK, On2 AVC, DK3, DK4, IMC, Vivo g723.1,
+   Smacker, FIC, Auravision, Canopus Lossless, and numerous videogame codecs
  * Teletext subtitles display improvements
  * Mediacodec speed improvements on x86
  * Support setting the post processing level in Theora
@@ -26,9 +37,10 @@ Decoder:
  * Fix channel ordering of LPCM codec in m2ts files
  * New jpeg image decoder
  * Add tx3g subtitles decoder
- * Add Media Foundation Transform decoder
- * Add decoder module based on GStreamer. Currently supports only video decode.
- * Add mmal based mpeg2/h264 decoder
+ * New SVG image decoder
+ * Fix Speex decoding over RTP and in flv
+ * Support more x264 and FFv1 RGB modes
+ * Improvements on ZVBI teletext decoder, notably for speed and alignments
 
 Encoder:
  * Support for MPEG-2 encoding using x262
@@ -39,28 +51,36 @@ Encoder:
 
 Demuxer:
  * New CAF format module
- * Important rework of the Ogg demuxer, notably for seeking
- * Important rework of the ASF/WMV demuxer, notably for seeking
- * Support microseconds in SubRip subtitles
- * FLAC packets validation using CRC
+ * Important rework of the Ogg demuxer, notably improving seeking,
+   streaming resilience, speex demuxing and chained Ogg
+ * Important rework of the ASF/WMV demuxer, notably for seeking,
+   synchronization and tracks exclusion
+ * AVI improvements for better seek-indexing in non-fastseekable situations
+ * AVI fixes for uncompressed, indexed and paletized bitmaps
  * Support Opus in MKV
  * Support VP8 in OGG
  * Basic support for WebVTT
- * Handle support for ISO/IEC 14496-3 Audio stream type in TS
+ * Handle support for ISO/IEC 14496-3 (AAC) Audio stream type in TS
  * Support HDPR TS files
+ * Support microseconds in SubRip subtitles
+ * FLAC packets validation using CRC
  * Improvements in metadata support in Ogg/Opus/Vorbis files
  * Fix encoding issues in some XML playlist formats
  * Support THP Wii/Gamecube, RenderWare and Escape Replay game video files
  * New HEVC raw packetizer and demuxer
- * Handle MOV/MP4 tx3g styled subtitles through codec
- * AVI fixes for uncompressed and indexed bitmaps
  * TS support for WiDi/Miracast LPCM
+ * Handle MOV/MP4 tx3g styled subtitles through codec
+ * MP4 fixes for fragmented files, vobsub, duration, aspect-ratio
+   and support for rotation, covr atom and tracks exclusion
+ * Support SVG images files (on glib platforms)
+ * Keep selection of tracks on segment changes in MKV
+ * Support detection of SRT languages based on filename
 
 Muxers:
  * Important rework of the Ogg muxer, notably for skeleton
  * Fixes for the AVI muxer for specification respect
  * Support VP8 in OGG
- * Add HEVC muxing in MP4
+ * Add HEVC muxing in MP4 and TS
 
 Video Output:
  * Direct rendering and filtering for VDPAU hardware acceleration
@@ -77,10 +97,15 @@ Video Filter:
  * New Freeze effect filter
  * Support I422 and J422 in transform
  * NEON optimizations for deinterleaving chroma, notably NV12->I420
+ * Fix audiobargraph activation and usage
 
 Audio Output:
  * Allow setting volume while not connected with PulseAudio
  * Audio device notifications for WASAPI
+ * Fix replay of sound buffer in DirectSound
+ * Split of MMDevice and WinRT audio modules
+ * Numerous fixes on AUHAL, including device management and stream changes
+ * Fixes for SPDIF passthru in most modules
 
 Streaming:
  * Important rework of the transcoding module to fix numerous bugs
@@ -95,6 +120,7 @@ Streaming:
     with --no-sout-all
  * --ts-out option has been removed, it has been superceded by --demux demuxdump 
     --demuxdump-access udp --demuxdump-file 127.0.0.1:1234
+ * Support Metacube protocol when streaming over HTTP
 
 libVLC:
  * add equalizer API libvlc_audio_equalizer_* functions
@@ -109,9 +135,9 @@ Interfaces:
  * Add record button in Qt menus
  * New module for core dialogs on iOS
  * New layout for Qt buttons customization
+ * Support to continue media playback where it was left off for Qt and MacOS
 
 Mac OS X Interface:
- * Support to continue media playback where it was left off
  * Fixes for advanced preferences
  * Option to increase playlist font size
 
@@ -124,6 +150,21 @@ Removed modules:
  * ios video output: use ios2
  * OpenMash H.261 video decoder
  * dirac encoder: use schroedinger
+
+
+Changes between 2.1.3 and 2.1.4:
+--------------------------------
+
+Demuxers:
+ * Fix issue in WMV with multiple compressed payload and empty payloads
+
+Video Output:
+ * Fix subtitles size rendering on Windows
+
+Mac OS X:
+ * Fix DVD playback regression
+ * Fix misleading error message during video playback on OS X 10.9
+ * Fix hardware acceleration memleaks
 
 
 Changes between 2.1.2 and 2.1.3:
@@ -293,7 +334,7 @@ Mac OS X interface:
 
 Translations:
  * Update of Arabic, Basque, Belarusian, Czech, Danish, Dutch, French,
-   Galician, Gujarati, Hindi, hungarian, Icelandic, Italian, Japanese, Korean,
+   Galician, Gujarati, Hindi, Hungarian, Icelandic, Italian, Japanese, Korean,
    Lithuanian, Marathi, Modern Greek, Norwegian Bokmål, Occitan, Persian,
    Polish, Portuguese, Punjabi, Romanian, Sinhala, Slovak, Slovenian, Spanish,
    Swedish, Telugu, Thai, Traditional Chinese, Turkish, Ukrainian, Uzbek
