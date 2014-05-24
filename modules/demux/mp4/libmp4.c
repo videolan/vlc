@@ -3064,15 +3064,25 @@ static int MP4_ReadBox_tfra( stream_t *p_stream, MP4_Box_t *p_box )
                         || !p_tfra->p_trun_number || !p_tfra->p_sample_number )
         goto error;
 
-    for( uint32_t i = 0; i < i_number_of_entries; i++ )
+    int i_fields_length = 3 + p_tfra->i_length_size_of_traf_num
+            + p_tfra->i_length_size_of_trun_num
+            + p_tfra->i_length_size_of_sample_num;
+
+    uint32_t i;
+    for( i = 0; i < i_number_of_entries; i++ )
     {
+
         if( p_tfra->i_version == 1 )
         {
+            if ( i_read < i_fields_length + 16 )
+                break;
             MP4_GET8BYTES( p_tfra->p_time[i*2] );
             MP4_GET8BYTES( p_tfra->p_moof_offset[i*2] );
         }
         else
         {
+            if ( i_read < i_fields_length + 8 )
+                break;
             MP4_GET4BYTES( p_tfra->p_time[i] );
             MP4_GET4BYTES( p_tfra->p_moof_offset[i] );
         }
@@ -3130,6 +3140,8 @@ static int MP4_ReadBox_tfra( stream_t *p_stream, MP4_Box_t *p_box )
                 goto error;
         }
     }
+    if ( i < i_number_of_entries )
+        i_number_of_entries = i;
 
 #ifdef MP4_VERBOSE
     if( p_tfra->i_version == 0 )
