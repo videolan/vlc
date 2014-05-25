@@ -81,6 +81,7 @@ struct demux_sys_t
     bool         b_fragmented;   /* fMP4 */
     bool         b_seekable;
     bool         b_fastseekable;
+    bool         b_smooth;       /* Is it Smooth Streaming? */
 
     /* */
     MP4_Box_t    *p_tref_chap;
@@ -227,11 +228,11 @@ static inline int64_t MP4_GetMoviePTS(demux_sys_t *p_sys )
 
 static void LoadChapter( demux_t  *p_demux );
 
-static int LoadInitFrag( demux_t *p_demux, const bool b_smooth )
+static int LoadInitFrag( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( b_smooth ) /* Smooth Streaming */
+    if( p_sys->b_smooth ) /* Smooth Streaming */
     {
         if( ( p_sys->p_root = MP4_BoxGetSmooBox( p_demux->s ) ) == NULL )
         {
@@ -400,16 +401,14 @@ static int Open( vlc_object_t * p_this )
 
     p_demux->p_sys = p_sys;
 
-    /* Is it Smooth Streaming? */
-    bool b_smooth = false;
     if( stream_Peek( p_demux->s, &p_peek, 24 ) < 24 ) return VLC_EGENERIC;
     if( !CmpUUID( (UUID_t *)(p_peek + 8), &SmooBoxUUID ) )
     {
-        b_smooth = true;
+        p_sys->b_smooth = true;
         p_sys->b_fragmented = true;
     }
 
-    if( LoadInitFrag( p_demux, b_smooth ) != VLC_SUCCESS )
+    if( LoadInitFrag( p_demux ) != VLC_SUCCESS )
         goto error;
 
     /* LoadInitFrag early failed */
@@ -431,7 +430,7 @@ static int Open( vlc_object_t * p_this )
         p_demux->pf_demux = DemuxFrg;
     }
 
-    if( b_smooth )
+    if( p_sys->b_smooth )
     {
         if( InitTracks( p_demux ) != VLC_SUCCESS )
             goto error;
