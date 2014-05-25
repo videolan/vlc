@@ -1380,6 +1380,17 @@ typedef struct
     void      *p_drms;
     MP4_Box_t *p_skcr;
 
+    mtime_t i_time;
+
+    struct
+    {
+        /* for moof parsing */
+        MP4_Box_t *p_traf;
+        MP4_Box_t *p_tfhd;
+        MP4_Box_t *p_trun;
+        uint64_t   i_traf_base_offset;
+    } context;
+
 } mp4_track_t;
 
 static inline size_t mp4_box_headersize( MP4_Box_t *p_box )
