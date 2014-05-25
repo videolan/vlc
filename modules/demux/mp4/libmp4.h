@@ -925,6 +925,7 @@ typedef struct MP4_Box_data_sidx_s
 #define MP4_TFHD_DFLT_SAMPLE_SIZE     (1LL<<4)
 #define MP4_TFHD_DFLT_SAMPLE_FLAGS    (1LL<<5)
 #define MP4_TFHD_DURATION_IS_EMPTY    (1LL<<16)
+#define MP4_TFHD_DEFAULT_BASE_IS_MOOF (1LL<<17)
 typedef struct MP4_Box_data_tfhd_s
 {
     uint8_t  i_version;
