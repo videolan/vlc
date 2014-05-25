@@ -138,6 +138,8 @@ Interfaces:
  * Support to continue media playback where it was left off for Qt and MacOS
 
 Mac OS X Interface:
+ * Avoid grey bars in fullscreen when using Mavericks with multiple monitors
+ * Improve fullscreen behavior for the native and VLCs own mode
  * Fixes for advanced preferences
  * Option to increase playlist font size
 
