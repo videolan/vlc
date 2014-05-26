@@ -4262,7 +4262,7 @@ static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
     p_new->i_chunk_range_min_offset = i_traf_min_offset;
     p_new->i_chunk_range_max_offset = i_traf_min_offset + i_trafs_total_size;
 
-    msg_Err( p_demux, "new fragment is %"PRId64" %"PRId64, p_new->i_chunk_range_min_offset, p_new->i_chunk_range_max_offset );
+    msg_Dbg( p_demux, "new fragment is %"PRId64" %"PRId64, p_new->i_chunk_range_min_offset, p_new->i_chunk_range_max_offset );
 
     /* compute total duration with that new fragment if no overall provided */
     MP4_Box_t *p_mehd = MP4_BoxGet( p_sys->moovfragment.p_moox, "mvex/mehd");
@@ -4279,7 +4279,7 @@ static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
     else
         p_sys->i_overall_duration = BOXDATA(p_mehd)->i_fragment_duration;
 
-    msg_Err( p_demux, "total fragments duration %"PRId64, CLOCK_FREQ * p_sys->i_overall_duration / p_sys->i_timescale);
+    msg_Dbg( p_demux, "total fragments duration %"PRId64, CLOCK_FREQ * p_sys->i_overall_duration / p_sys->i_timescale);
     return true;
 }
 
