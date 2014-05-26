@@ -1904,13 +1904,24 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
  * It computes the sample rate for a video track using the given sample
  * description index
  */
-static void TrackGetESSampleRate( unsigned *pi_num, unsigned *pi_den,
+static void TrackGetESSampleRate( demux_t *p_demux,
+                                  unsigned *pi_num, unsigned *pi_den,
                                   const mp4_track_t *p_track,
                                   unsigned i_sd_index,
                                   unsigned i_chunk )
 {
     *pi_num = 0;
     *pi_den = 0;
+
+    MP4_Box_t *p_trak = MP4_GetTrakByTrackID( MP4_BoxGet( p_demux->p_sys->p_root, "/moov" ),
+                                              p_track->i_track_ID );
+    MP4_Box_t *p_mdhd = MP4_BoxGet( p_trak, "mdia/mdhd" );
+    if ( p_mdhd )
+    {
+        *pi_num = BOXDATA(p_mdhd)->i_timescale / 1000;
+        *pi_den = 1;
+        return;
+    }
 
     if( p_track->i_chunk_count <= 0 )
         return;
@@ -2035,9 +2046,11 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         p_track->fmt.video.i_visible_height = p_track->fmt.video.i_height;
 
         /* Frame rate */
-        TrackGetESSampleRate( &p_track->fmt.video.i_frame_rate,
+        TrackGetESSampleRate( p_demux,
+                              &p_track->fmt.video.i_frame_rate,
                               &p_track->fmt.video.i_frame_rate_base,
                               p_track, i_sample_description_index, i_chunk );
+
         p_demux->p_sys->f_fps = (float)p_track->fmt.video.i_frame_rate /
                                 (float)p_track->fmt.video.i_frame_rate_base;
 
