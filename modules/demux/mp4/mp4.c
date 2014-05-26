@@ -1918,8 +1918,10 @@ static void TrackGetESSampleRate( demux_t *p_demux,
     MP4_Box_t *p_mdhd = MP4_BoxGet( p_trak, "mdia/mdhd" );
     if ( p_mdhd )
     {
-        *pi_num = BOXDATA(p_mdhd)->i_timescale / 1000;
-        *pi_den = 1;
+        vlc_ureduce( pi_num, pi_den,
+                     BOXDATA(p_mdhd)->i_timescale * p_track->i_sample_count,
+                     BOXDATA(p_mdhd)->i_duration,
+                     UINT16_MAX);
         return;
     }
 
