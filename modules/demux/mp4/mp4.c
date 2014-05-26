@@ -3190,10 +3190,13 @@ static uint32_t MP4_TrackSampleSize( mp4_track_t *p_track, uint32_t *pi_nb_sampl
     if( p_track->i_sample_size == 0 )
     {
         /* most simple case */
+        *pi_nb_samples = 1;
         return p_track->p_sample_size[p_track->i_sample];
     }
+
     if( p_track->fmt.i_cat != AUDIO_ES )
     {
+        *pi_nb_samples = 1;
         return p_track->i_sample_size;
     }
 
@@ -3209,12 +3212,14 @@ static uint32_t MP4_TrackSampleSize( mp4_track_t *p_track, uint32_t *pi_nb_sampl
             i_size *= p_soun->i_bytes_per_frame;
         else
             i_size = UINT32_MAX;
+        *pi_nb_samples = i_samples;
     }
     else if( p_track->i_sample_size > 256 )
     {
         /* We do that so we don't read too much data
          * (in this case we are likely dealing with compressed data) */
         i_size = p_track->i_sample_size;
+        *pi_nb_samples = 1;
     }
     else
     {
