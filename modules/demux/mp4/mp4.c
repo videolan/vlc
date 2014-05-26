@@ -446,12 +446,6 @@ static int Open( vlc_object_t * p_this )
         stream_Seek( p_demux->s, 0 ); /* rewind, for other demux */
         goto error;
     }
-    else if( !p_sys->b_fastseekable )
-    {
-        msg_Warn( p_demux, "MP4 plugin discarded (not fast-seekable)" );
-        stream_Seek( p_demux->s, 0 ); /* rewind, for other demux */
-        goto error;
-    }
 
     MP4_BoxDumpStructure( p_demux->s, p_sys->p_root );
 
@@ -775,85 +769,94 @@ static int Demux( demux_t *p_demux )
     /* first wait for the good time to read a packet */
     p_sys->i_pcr = MP4_GetMoviePTS( p_sys );
 
-    /* we will read 100ms for each stream so ...*/
-    mtime_t i_targettime = p_sys->i_pcr + CLOCK_FREQ/10;
     bool b_data_sent = false;
 
+    /* Find next track matching contiguous data */
+    mp4_track_t *tk = NULL;
+    uint64_t i_candidate_pos = UINT64_MAX;
     for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
     {
-        mp4_track_t *tk = &p_sys->track[i_track];
-
-        if( !tk->b_ok || tk->b_chapter || !tk->b_selected || tk->i_sample >= tk->i_sample_count )
+        mp4_track_t *tk_tmp = &p_sys->track[i_track];
+        if( !tk_tmp->b_ok || tk_tmp->b_chapter || !tk_tmp->b_selected || tk_tmp->i_sample >= tk_tmp->i_sample_count )
             continue;
 
-        while( MP4_TrackGetDTS( p_demux, tk ) < i_targettime
-               || ( p_sys->i_pcr == VLC_TS_INVALID && !b_data_sent ) )
+        uint64_t i_pos = MP4_TrackGetPos( tk_tmp );
+        if ( i_pos <= i_candidate_pos )
         {
-#if 0
-            msg_Dbg( p_demux, "tk(%i)=%lld mv=%lld", i_track,
-                     MP4_TrackGetDTS( p_demux, tk ),
-                     MP4_GetMoviePTS( p_sys ) );
-#endif
-            uint32_t i_nb_samples = 0;
-            uint32_t i_samplessize = MP4_TrackSampleSize( tk, &i_nb_samples );
-            if( i_samplessize > 0 )
-            {
-                block_t *p_block;
-                int64_t i_delta, i_newpos;
-
-                /* go,go go ! */
-                i_newpos = MP4_TrackGetPos( tk );
-                if( stream_Tell( p_demux->s ) != i_newpos )
-                {
-                    if( stream_Seek( p_demux->s, i_newpos ) )
-                    {
-                        msg_Warn( p_demux, "track[0x%x] will be disabled (eof?)",
-                                  tk->i_track_ID );
-                        MP4_TrackUnselect( p_demux, tk );
-                        break;
-                    }
-                }
-
-                /* now read pes */
-                if( !(p_block = stream_Block( p_demux->s, i_samplessize )) )
-                {
-                    msg_Warn( p_demux, "track[0x%x] will be disabled (eof?)",
-                              tk->i_track_ID );
-                    MP4_TrackUnselect( p_demux, tk );
-                    break;
-                }
-                else if( tk->fmt.i_cat == SPU_ES )
-                {
-                    if ( tk->fmt.i_codec != VLC_CODEC_TX3G &&
-                         tk->fmt.i_codec != VLC_CODEC_SPU )
-                        p_block->i_buffer = 0;
-                }
-
-                /* dts */
-                p_block->i_dts = VLC_TS_0 + MP4_TrackGetDTS( p_demux, tk );
-                /* pts */
-                i_delta = MP4_TrackGetPTSDelta( p_demux, tk );
-                if( i_delta != -1 )
-                    p_block->i_pts = p_block->i_dts + i_delta;
-                else if( tk->fmt.i_cat != VIDEO_ES )
-                    p_block->i_pts = p_block->i_dts;
-                else
-                    p_block->i_pts = VLC_TS_INVALID;
-
-                if ( !b_data_sent )
-                {
-                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
-                    b_data_sent = true;
-                }
-                es_out_Send( p_demux->out, tk->p_es, p_block );
-            }
-
-            /* Next sample */
-            if( MP4_TrackNextSample( p_demux, tk, i_nb_samples ) )
-                break;
+            i_candidate_pos = i_pos;
+            tk = tk_tmp;
         }
     }
 
+    if ( !tk )
+    {
+        msg_Dbg( p_demux, "Could not select track by data position" );
+        goto end;
+    }
+
+#if 0
+    msg_Dbg( p_demux, "tk(%i)=%"PRId64" mv=%"PRId64" pos=%"PRIu64, i_track,
+             MP4_TrackGetDTS( p_demux, tk ),
+             MP4_GetMoviePTS( p_sys ), i_candidate_pos );
+#endif
+
+    uint32_t i_nb_samples = 0;
+    uint32_t i_samplessize = MP4_TrackSampleSize( tk, &i_nb_samples );
+    if( i_samplessize > 0 )
+    {
+        block_t *p_block;
+        int64_t i_delta;
+
+        /* go,go go ! */
+        if( stream_Tell( p_demux->s ) != i_candidate_pos )
+        {
+            if( stream_Seek( p_demux->s, i_candidate_pos ) )
+            {
+                msg_Warn( p_demux, "track[0x%x] will be disabled (eof?)",
+                          tk->i_track_ID );
+                MP4_TrackUnselect( p_demux, tk );
+                goto end;
+            }
+        }
+
+        /* now read pes */
+        if( !(p_block = stream_Block( p_demux->s, i_samplessize )) )
+        {
+            msg_Warn( p_demux, "track[0x%x] will be disabled (eof?)",
+                      tk->i_track_ID );
+            MP4_TrackUnselect( p_demux, tk );
+            goto end;
+        }
+        else if( tk->fmt.i_cat == SPU_ES )
+        {
+            if ( tk->fmt.i_codec != VLC_CODEC_TX3G &&
+                 tk->fmt.i_codec != VLC_CODEC_SPU )
+                p_block->i_buffer = 0;
+        }
+
+        /* dts */
+        p_block->i_dts = VLC_TS_0 + MP4_TrackGetDTS( p_demux, tk );
+        /* pts */
+        i_delta = MP4_TrackGetPTSDelta( p_demux, tk );
+        if( i_delta != -1 )
+            p_block->i_pts = p_block->i_dts + i_delta;
+        else if( tk->fmt.i_cat != VIDEO_ES )
+            p_block->i_pts = p_block->i_dts;
+        else
+            p_block->i_pts = VLC_TS_INVALID;
+
+        if ( !b_data_sent )
+        {
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
+            b_data_sent = true;
+        }
+        es_out_Send( p_demux->out, tk->p_es, p_block );
+
+        /* Next sample */
+        MP4_TrackNextSample( p_demux, tk, i_nb_samples );
+    }
+
+end:
     if ( b_data_sent )
     {
         p_sys->i_pcr = INT64_MAX;
