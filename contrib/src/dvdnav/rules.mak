@@ -2,7 +2,7 @@
 
 # LIBDVDNAV_VERSION := 4.2.0
 # LIBDVDNAV_URL := http://dvdnav.mplayerhq.hu/releases/libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
-DVDNAV_GITURL := git://git.videolan.org/libdvdnav
+DVDNAV_GITURL := git://git.videolan.org/libdvdnav.git
 LIBDVDNAV_VERSION := git
 
 ifdef BUILD_DISCS
