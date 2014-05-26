@@ -149,6 +149,18 @@ static uint32_t stream_ReadU32( stream_t *s, void *p_read, uint32_t i_toread )
     return i_return;
 }
 
+static bool MP4_stream_Tell( stream_t *s, uint64_t *pi_pos )
+{
+    int64_t i_pos = stream_Tell( s );
+    if ( i_pos < 0 )
+        return false;
+    else
+    {
+        *pi_pos = (uint64_t) i_pos;
+        return true;
+    }
+}
+
 static MP4_Box_t * MP4_GetTrexByTrackID( MP4_Box_t *p_moov, const uint32_t i_id )
 {
     MP4_Box_t *p_trex = MP4_BoxGet( p_moov, "mvex/trex" );
@@ -850,9 +862,13 @@ static int Demux( demux_t *p_demux )
     {
         block_t *p_block;
         int64_t i_delta;
+        uint64_t i_current_pos;
 
         /* go,go go ! */
-        if( stream_Tell( p_demux->s ) != i_candidate_pos )
+        if ( !MP4_stream_Tell( p_demux->s, &i_current_pos ) )
+            goto end;
+
+        if( i_current_pos != i_candidate_pos )
         {
             if( stream_Seek( p_demux->s, i_candidate_pos ) )
             {
@@ -4252,8 +4268,10 @@ static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
 static int ProbeFragments( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    uint64_t i_current_pos;
 
-    msg_Dbg( p_demux, "probing fragments from %"PRId64, stream_Tell( p_demux->s ) );
+    if ( MP4_stream_Tell( p_demux->s, &i_current_pos ) )
+        msg_Dbg( p_demux, "probing fragments from %"PRId64, i_current_pos );
 
     assert( p_sys->p_root );
 
