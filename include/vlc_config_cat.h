@@ -74,12 +74,10 @@
 #define VIDEO_GENERAL_HELP N_( "General video settings" )
 
 #define _VOUT_TITLE N_("Output modules" )
-#define VOUT_HELP N_( \
-    "Choose your preferred video output and configure it here." )
+#define VOUT_HELP N_("General settings for video output modules.")
 
 #define VFILTER_TITLE N_("Filters" )
-#define VFILTER_HELP N_( \
-    "Video filters are used to process the video stream." )
+#define VFILTER_HELP N_("Video filters are used to process the video stream." )
 
 #define SUBPIC_TITLE N_( "Subtitles / OSD")
 #define SUBPIC_HELP N_( "Settings related to On-Screen-Display,"\
@@ -181,32 +179,6 @@
 #define AADVANCED_HELP N_( "Advanced settings. Use with care...")
 
 #define MISC_TITLE N_( "Advanced settings" )
-
-
-/* OLD */
-#if 0
-#define NETWORK_TITLE N_( "Network" )
-#define NETWORK_HELP N_( "These modules provide network functions to all " \
-                "other parts of VLC." )
-
-#define PACKETIZER_HELP "These are general settings for the "\
-        "packetizers used in VLC's stream output subsystem."
-
-#define ENCODER_HELP N_( \
-    "These are general settings for video/audio/subtitle encoding modules.")
-
-#define DIALOGS_HELP  N_( \
-    "Dialog providers can be configured here.")
-
-#define SUBTITLE_DEMUX_HELP N_( \
-    "In this section you can force the behavior of the subtitle demuxer, " \
-    "for example by setting the subtitle type or file name.")
-
-/*
- *  A little help for modules with unknown capabilities
- */
-
-#endif
 
 /* This function is deprecated and is kept only for compatibility */
 static const struct config_category_t categories_array[] =
