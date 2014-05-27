@@ -1919,9 +1919,9 @@ static void TrackGetESSampleRate( demux_t *p_demux,
     if ( p_mdhd )
     {
         vlc_ureduce( pi_num, pi_den,
-                     BOXDATA(p_mdhd)->i_timescale * p_track->i_sample_count,
-                     BOXDATA(p_mdhd)->i_duration,
-                     UINT16_MAX);
+                     (uint64_t) BOXDATA(p_mdhd)->i_timescale * p_track->i_sample_count,
+                     (uint64_t) BOXDATA(p_mdhd)->i_duration,
+                     UINT16_MAX );
         return;
     }
 
