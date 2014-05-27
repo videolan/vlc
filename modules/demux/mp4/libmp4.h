@@ -953,7 +953,7 @@ typedef struct MP4_descriptor_trun_sample_t
     uint32_t i_duration;
     uint32_t i_size;
     uint32_t i_flags;
-    uint32_t i_composition_time_offset;
+    uint32_t i_composition_time_offset; /* version == 0 ? signed : unsigned */
 } MP4_descriptor_trun_sample_t;
 
 typedef struct MP4_Box_data_trun_s

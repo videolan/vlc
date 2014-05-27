@@ -3933,8 +3933,10 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
 
         if( ret->p_sample_offset_pts )
         {
-            ret->p_sample_offset_pts[i] =
-                        p_trun_data->p_samples[i].i_composition_time_offset;
+            if ( p_trun_data->i_version == 0 )
+                ret->p_sample_offset_pts[i] = (int32_t) p_trun_data->p_samples[i].i_composition_time_offset;
+            else
+                ret->p_sample_offset_pts[i] = __MIN( INT32_MAX, p_trun_data->p_samples[i].i_composition_time_offset );
         }
 
         if( p_trun_data->i_flags & MP4_TRUN_SAMPLE_SIZE )
