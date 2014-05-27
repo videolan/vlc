@@ -103,7 +103,7 @@ static void Close( vlc_object_t * );
 #define RANDOMIV_LONGTEXT N_("Generate IV instead using segment-number as IV")
 
 #define INTITIAL_SEG_TEXT N_("Number of first segment")
-#define INITIAL_SEG_LONGTEXT N_("The number of the segmented generated")
+#define INITIAL_SEG_LONGTEXT N_("The number of the first segment generated")
 
 vlc_module_begin ()
     set_description( N_("HTTP Live streaming output") )
