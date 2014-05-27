@@ -1068,7 +1068,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         frame->top_field_first = !!p_pict->b_top_field_first;
 
         /* Set the pts of the frame being encoded */
-        frame->pts = p_pict->date ? p_pict->date : AV_NOPTS_VALUE;
+        frame->pts = (p_pict->date == VLC_TS_INVALID) ? AV_NOPTS_VALUE : p_pict->date;
 
         if ( p_sys->b_hurry_up && frame->pts != AV_NOPTS_VALUE )
         {
@@ -1107,7 +1107,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             }
         }
 
-        if ( frame->pts != AV_NOPTS_VALUE && frame->pts != 0 )
+        if ( ( frame->pts != AV_NOPTS_VALUE ) && ( frame->pts != VLC_TS_INVALID ) )
         {
             if ( p_sys->i_last_pts == frame->pts )
             {
@@ -1193,7 +1193,7 @@ static block_t *encode_audio_buffer( encoder_t *p_enc, encoder_sys_t *p_sys,  AV
     }
     p_block->i_buffer = packet.size;
 
-    p_block->i_length = (mtime_t)1000000 *
+    p_block->i_length = (mtime_t)CLOCK_FREQ *
      (mtime_t)p_sys->i_frame_size /
      (mtime_t)p_sys->p_context->sample_rate;
 
