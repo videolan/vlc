@@ -130,7 +130,7 @@ static const char *MP4_ConvertMacCode( uint16_t );
 static MP4_Box_t * MP4_GetTrexByTrackID( MP4_Box_t *p_moov, const uint32_t i_id );
 
 static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox );
-static int  ProbeFragments( demux_t *p_demux );
+static int  ProbeFragments( demux_t *p_demux, bool b_force );
 
 /* Helpers */
 
@@ -453,7 +453,7 @@ static int Open( vlc_object_t * p_this )
         {
             /* Probe remaining to check if there's really fragments
                or if that file is just ready to append fragments */
-            ProbeFragments( p_demux );
+            ProbeFragments( p_demux, false );
             p_sys->b_fragmented = !!MP4_BoxCount( p_sys->p_root, "/moof" );
         }
         else
@@ -4287,7 +4287,7 @@ static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
     return true;
 }
 
-static int ProbeFragments( demux_t *p_demux )
+static int ProbeFragments( demux_t *p_demux, bool b_force )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     uint64_t i_current_pos;
@@ -4297,11 +4297,22 @@ static int ProbeFragments( demux_t *p_demux )
 
     assert( p_sys->p_root );
 
-    MP4_ReadBoxContainerChildren( p_demux->s, p_sys->p_root, 0 ); /* Get the rest of the file */
+    if ( p_sys->b_fastseekable || b_force )
+    {
+        MP4_ReadBoxContainerChildren( p_demux->s, p_sys->p_root, 0 ); /* Get the rest of the file */
+        p_sys->b_fragments_probed = true;
+    }
+    else
+    {
+        /* We stop at first moof, which validates our fragmentation condition
+         * and we'll find others while reading. */
+        MP4_ReadBoxContainerChildren( p_demux->s, p_sys->p_root, ATOM_moof );
+    }
 
     MP4_Box_t *p_moov = MP4_BoxGet( p_sys->p_root, "/moov" );
     if ( !p_moov )
     {
+        /* moov/mvex before probing should be present anyway */
         MP4_BoxDumpStructure( p_demux->s, p_sys->p_root );
         return VLC_EGENERIC;
     }
@@ -4315,12 +4326,12 @@ static int ProbeFragments( demux_t *p_demux )
         p_moof = p_moof->p_next;
     }
 
-    p_sys->b_fragments_probed = true;
-
     MP4_Box_t *p_mdat = MP4_BoxGet( p_sys->p_root, "mdat" );
-    assert( p_mdat );
-    stream_Seek( p_demux->s, p_mdat->i_pos );
-    msg_Dbg( p_demux, "rewinding to mdat %"PRId64, p_mdat->i_pos );
+    if ( p_mdat )
+    {
+        stream_Seek( p_demux->s, p_mdat->i_pos );
+        msg_Dbg( p_demux, "rewinding to mdat %"PRId64, p_mdat->i_pos );
+    }
 
     return VLC_SUCCESS;
 }
