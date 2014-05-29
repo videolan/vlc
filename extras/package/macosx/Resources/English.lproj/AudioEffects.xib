@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">13C64</string>
+    <string key="IBDocument.SystemVersion">13D65</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1265.19</string>
-    <string key="IBDocument.HIToolboxVersion">697.40</string>
+    <string key="IBDocument.AppKitVersion">1265.20</string>
+    <string key="IBDocument.HIToolboxVersion">698.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <object class="NSArray" key="dict.sortedKeys">
@@ -21,7 +21,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="2"/>
+      <integer value="727"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1959,9 +1959,9 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
                                   <int key="NSCellFlags2">131072</int>
                                   <string key="NSContents"/>
                                   <reference key="NSControlView" ref="955449777"/>
-                                  <double key="NSMaxValue">100</double>
-                                  <double key="NSMinValue">0.0</double>
-                                  <double key="NSValue">50</double>
+                                  <double key="NSMaxValue">10</double>
+                                  <double key="NSMinValue">0.10000000000000001</double>
+                                  <double key="NSValue">5</double>
                                   <double key="NSAltIncValue">0.0</double>
                                   <int key="NSNumberOfTickMarks">0</int>
                                   <int key="NSTickMarkPosition">1</int>
@@ -4736,9 +4736,9 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
         <object class="NSMutableArray" key="dict.values">
           <bool key="EncodedWithXMLCoder">YES</bool>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{718, 359}, {409, 255}}</string>
+          <string>{{559, 359}, {409, 255}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{718, 359}, {409, 255}}</string>
+          <string>{{559, 359}, {409, 255}}</string>
           <boolean value="NO"/>
           <string>{196, 240}</string>
           <string>{{357, 418}, {480, 270}}</string>
