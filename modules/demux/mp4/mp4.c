@@ -1049,7 +1049,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                  (double)p_sys->i_timescale );
                 return Seek( p_demux, i64 );
             }
-            else return VLC_SUCCESS;
+            else return VLC_EGENERIC;
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
