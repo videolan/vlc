@@ -4297,7 +4297,7 @@ static int ProbeFragments( demux_t *p_demux )
 
     assert( p_sys->p_root );
 
-    MP4_ReadBoxContainerRaw( p_demux->s, p_sys->p_root ); /* Get the rest of the file */
+    MP4_ReadBoxContainerChildren( p_demux->s, p_sys->p_root, 0 ); /* Get the rest of the file */
 
     MP4_Box_t *p_moov = MP4_BoxGet( p_sys->p_root, "/moov" );
     if ( !p_moov )

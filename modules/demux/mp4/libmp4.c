@@ -190,8 +190,8 @@ static int MP4_NextBox( stream_t *p_stream, MP4_Box_t *p_box )
  *       after called one of theses functions, file position is unknown
  *       you need to call MP4_GotoBox to go where you want
  *****************************************************************************/
-static int MP4_ReadBoxContainerChildren( stream_t *p_stream,
-                                    MP4_Box_t *p_container, uint32_t i_last_child )
+int MP4_ReadBoxContainerChildren( stream_t *p_stream,
+                                  MP4_Box_t *p_container, uint32_t i_last_child )
 {
     MP4_Box_t *p_box;
 
@@ -226,7 +226,7 @@ static int MP4_ReadBoxContainerChildren( stream_t *p_stream,
     return 1;
 }
 
-int MP4_ReadBoxContainerRaw( stream_t *p_stream, MP4_Box_t *p_container )
+static int MP4_ReadBoxContainerRaw( stream_t *p_stream, MP4_Box_t *p_container )
 {
     return MP4_ReadBoxContainerChildren( p_stream, p_container, 0 );
 }
