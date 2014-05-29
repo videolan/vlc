@@ -3156,14 +3156,14 @@ AS_IF([test "${have_vdpau}" = "yes" -a "${have_avcodec}" = "yes"], [
     libav) av_vdpau_ver="55.26.0" ;;
     ffmpeg) av_vdpau_ver="55.42.100" ;;
   esac
-  PKG_CHECK_EXISTS([libavutil >= 0.52.4 libavcodec >= ${av_vdpau_ver}], [
+  PKG_CHECK_EXISTS([libavutil >= 52.4.0 libavcodec >= ${av_vdpau_ver}], [
     have_avcodec_vdpau="yes"
     AC_MSG_NOTICE([VDPAU decoding acceleration activated])
   ], [
     AS_IF([test -n "${enable_vdpau}"], [
-      AC_MSG_ERROR([libavutil >= 0.52.4 and libavcodec >= 55.26.0 are required for VDPAU decoding.])
+      AC_MSG_ERROR([libavutil >= 52.4.0 and libavcodec >= 55.26.0 are required for VDPAU decoding.])
     ], [
-      AC_MSG_WARN([libavutil >= 0.52.4 and libavcodec >= 55.26.0 are required for VDPAU decoding.])
+      AC_MSG_WARN([libavutil >= 52.4.0 and libavcodec >= 55.26.0 are required for VDPAU decoding.])
     ])
   ])
 ])
