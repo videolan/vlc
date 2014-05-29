@@ -33,9 +33,6 @@
 
 #include <pulse/pulseaudio.h>
 #include "audio_output/vlcpulse.h"
-#if !PA_CHECK_VERSION(0,9,22)
-# include <vlc_xlib.h>
-#endif
 
 static int  Open        ( vlc_object_t * );
 static void Close       ( vlc_object_t * );
@@ -340,13 +337,11 @@ static void stream_event_cb(pa_stream *s, const char *name, pa_proplist *pl,
     if (!strcmp(name, PA_STREAM_EVENT_REQUEST_UNCORK))
         aout_PolicyReport(aout, false);
     else
-#if PA_CHECK_VERSION(1,0,0)
     /* FIXME: expose aout_Restart() directly */
     if (!strcmp(name, PA_STREAM_EVENT_FORMAT_LOST)) {
         msg_Dbg (aout, "format lost");
         aout_RestartRequest (aout, AOUT_RESTART_OUTPUT);
     } else
-#endif
         msg_Warn (aout, "unhandled stream event \"%s\"", name);
     (void) s;
     (void) pl;
@@ -756,9 +751,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     /* Sample format specification */
     struct pa_sample_spec ss;
-#if PA_CHECK_VERSION(1,0,0)
     pa_encoding_t encoding = PA_ENCODING_INVALID;
-#endif
 
     switch (fmt->i_format)
     {
@@ -776,7 +769,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         case VLC_CODEC_U8:
             ss.format = PA_SAMPLE_U8;
             break;
-#if PA_CHECK_VERSION(1,0,0)
         case VLC_CODEC_A52:
             fmt->i_format = VLC_CODEC_SPDIFL;
             encoding = PA_ENCODING_AC3_IEC61937;
@@ -797,7 +789,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             encoding = PA_ENCODING_DTS_IEC61937;
             ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
             break;
-#endif
         default:
             if (HAVE_FPU)
             {
@@ -889,7 +880,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     pa_cvolume_init(&sys->cvolume);
     sys->first_pts = VLC_TS_INVALID;
 
-#if PA_CHECK_VERSION(1,0,0)
     pa_format_info *formatv[2];
     unsigned formatc = 0;
 
@@ -919,24 +909,20 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     formatc++;
 
     /* Create a playback stream */
-    pa_stream *s;
     pa_proplist *props = pa_proplist_new();
     if (likely(props != NULL))
         /* TODO: set other stream properties */
         pa_proplist_sets (props, PA_PROP_MEDIA_ROLE, "video");
 
     pa_threaded_mainloop_lock(sys->mainloop);
-    s = pa_stream_new_extended(sys->context, "audio stream", formatv, formatc,
-                               props);
+    pa_stream *s = pa_stream_new_extended(sys->context, "audio stream",
+                                          formatv, formatc, props);
+
     if (likely(props != NULL))
         pa_proplist_free(props);
-
     for (unsigned i = 0; i < formatc; i++)
         pa_format_info_free(formatv[i]);
-#else
-    pa_threaded_mainloop_lock(sys->mainloop);
-    pa_stream *s = pa_stream_new(sys->context, "audio stream", &ss, &map);
-#endif
+
     if (s == NULL) {
         pa_threaded_mainloop_unlock(sys->mainloop);
         vlc_pa_error(aout, "stream creation failure", sys->context);
@@ -966,7 +952,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     sys->sink_force = NULL;
 
     const struct pa_sample_spec *spec = pa_stream_get_sample_spec(s);
-#if PA_CHECK_VERSION(1,0,0)
     if (encoding != PA_ENCODING_INVALID) {
         const pa_format_info *info = pa_stream_get_format_info(s);
 
@@ -979,7 +964,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             spec = NULL;
         }
     }
-#endif
     if (spec != NULL)
         fmt->i_rate = spec->rate;
 
@@ -1031,10 +1015,6 @@ static int Open(vlc_object_t *obj)
     aout_sys_t *sys = malloc(sizeof (*sys));
     pa_operation *op;
 
-#if !PA_CHECK_VERSION(0,9,22)
-    if (!vlc_xlib_init(obj))
-        return VLC_EGENERIC;
-#endif
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
