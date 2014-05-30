@@ -69,6 +69,50 @@ Execute a playlist command. Commands are:
 .B quit
 (close VLC).
 
+.SH ENVIRONMENT VARIABLES
+The following environment variables may affect VLC:
+
+.TP
+.B DISPLAY
+The X11 display server address.
+
+.TP
+.B http_proxy
+The HTTP proxy server URL.
+
+.TP
+.B OSSAUDIO_DEV
+The default audio output device,
+used by the OSSv4 output plugin.
+
+.TP
+.B VLC_DATA_PATH
+The directory containing VLC run-time data files (e.g. /usr/share/vlc).
+
+.TP
+.B VLC_PLUGIN_PATH
+An extra directory to load VLC plugins from.
+
+.TP
+.B VLC_VERBOSE
+The level of verbosity for log messages
+(0: silent, 1: error/info, 2: warning, 3: debug).
+
+.TP
+.B XDG_CACHE_DIR XDG_CONFIG_DIR XDG_DATA_DIR
+The directories to store user cached data, user configuration files and
+user data files respectively.
+
+.TP
+.B XDG_DOCUMENTS_DIR XDG_DOWNLOAD_DIR XDG_MUSIC_DIR XDG_PICTURES_DIR XDG_VIDEO_DIR
+The directories to fetch or store user text files,
+downloads, music, pictures (i.e. snapshots), and video respectively.
+
+.TP
+.B XDG_SESSION_COOKIE
+The unique identifier of the desktop session,
+used by the PulseAudio output plugin.
+
 .SH SEE ALSO
 Online documentation: http://www.videolan.org/doc/
 .PP
