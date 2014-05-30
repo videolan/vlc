@@ -254,6 +254,9 @@ endif
 # Common helpers
 #
 HOSTCONF := --prefix="$(PREFIX)"
+HOSTCONF += --datarootdir="$(PREFIX)/share"
+HOSTCONF += --includedir="$(PREFIX)/include"
+HOSTCONF += --libdir="$(PREFIX)/lib"
 HOSTCONF += --build="$(BUILD)" --host="$(HOST)" --target="$(HOST)"
 HOSTCONF += --program-prefix=""
 # libtool stuff:
