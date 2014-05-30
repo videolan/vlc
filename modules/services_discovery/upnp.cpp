@@ -822,7 +822,8 @@ bool MediaServer::_fetchContents( Container* p_parent, int i_offset )
     IXML_Document* p_response = _browseAction( p_parent->getObjectID(),
                                       "BrowseDirectChildren",
                                       "id,dc:title,res," /* Filter */
-                                      "sec:CaptionInfo,sec:CaptionInfoEx",
+                                      "sec:CaptionInfo,sec:CaptionInfoEx,"
+                                      "pv:subtitlefile",
                                       psz_starting_index, /* StartingIndex */
                                       "0", /* RequestedCount */
                                       "" /* SortCriteria */
@@ -911,6 +912,10 @@ bool MediaServer::_fetchContents( Container* p_parent, int i_offset )
             if ( !psz_subtitles )
                 psz_subtitles = xml_getChildElementValue( itemElement,
                         "sec:CaptionInfoEx" );
+
+            if ( !psz_subtitles )
+                psz_subtitles = xml_getChildElementValue( itemElement,
+                        "pv:subtitlefile" );
 
             /* Try to extract all resources in DIDL */
             IXML_NodeList* p_resource_list = ixmlDocument_getElementsByTagName( (IXML_Document*) itemElement, "res" );
