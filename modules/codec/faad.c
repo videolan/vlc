@@ -491,8 +491,19 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_sys->i_buffer -= frame.bytesconsumed;
         if( p_sys->i_buffer > 0 )
         {
-            memmove( p_sys->p_buffer, &p_sys->p_buffer[frame.bytesconsumed],
-                     p_sys->i_buffer );
+            /* drop byte of raw AAC padding (if present) */
+            if ( frame.header_type == RAW &&
+                 p_sys->i_buffer == 1 &&
+                 p_sys->p_buffer[0] == 0x21 &&
+                 p_sys->p_buffer[frame.bytesconsumed] == 0 )
+            {
+                p_sys->i_buffer = 0;
+            }
+            else
+            {
+                memmove( p_sys->p_buffer, &p_sys->p_buffer[frame.bytesconsumed],
+                         p_sys->i_buffer );
+            }
         }
 
         return p_out;
