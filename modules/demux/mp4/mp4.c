@@ -1034,7 +1034,8 @@ static int LeafSeekIntoFragment( demux_t *p_demux, mp4_fragment_t *p_fragment )
     {
         p_sys->track[i_track].i_time = i_time_base * p_sys->track[i_track].i_timescale / p_sys->i_timescale;
     }
-    p_demux->p_sys->i_time = i_time_base;
+    p_sys->i_time = i_time_base;
+    p_sys->i_pcr  = VLC_TS_INVALID;
 
     return VLC_SUCCESS;
 }
@@ -1073,7 +1074,8 @@ static int LeafSeekToTime( demux_t *p_demux, mtime_t i_nztime )
             {
                 p_sys->track[i_track].i_time = i_mooftime / CLOCK_FREQ * p_sys->track[i_track].i_timescale;
             }
-            p_demux->p_sys->i_time = i_mooftime / CLOCK_FREQ * p_sys->i_timescale;
+            p_sys->i_time = i_mooftime / CLOCK_FREQ * p_sys->i_timescale;
+            p_sys->i_pcr  = VLC_TS_INVALID;
         }
         else
         {
