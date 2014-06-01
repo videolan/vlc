@@ -356,7 +356,6 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     [o_intf_style_txt setStringValue: _NS("Interface style")];
     [o_intf_style_dark_bcell setTitle: _NS("Dark")];
     [o_intf_style_bright_bcell setTitle: _NS("Bright")];
-    [o_intf_art_txt setStringValue: _NS("Album art download policy")];
     [o_intf_embedded_ckb setTitle: _NS("Show video within the main window")];
     [o_intf_nativefullscreen_ckb setTitle: _NS("Use the native fullscreen mode")];
     [o_intf_fspanel_ckb setTitle: _NS("Show Fullscreen Controller")];
@@ -557,7 +556,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     }
     [o_intf_language_pop selectItemAtIndex:sel];
 
-    [self setupButton: o_intf_art_pop forIntList: "album-art"];
+    [self setupButton: o_intf_art_ckb forBoolValue: "metadata-network-access"];
 
     [self setupButton: o_intf_fspanel_ckb forBoolValue: "macosx-fspanel"];
 
@@ -910,7 +909,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         [defaults setObject:[NSString stringWithUTF8String:ppsz_language[index]] forKey:@"language"];
         [defaults synchronize];
 
-        SaveIntList(o_intf_art_pop, "album-art");
+        config_PutInt(p_intf, "metadata-network-access", [o_intf_art_ckb state]);
 
         config_PutInt(p_intf, "macosx-fspanel", [o_intf_fspanel_ckb state]);
         config_PutInt(p_intf, "embedded-video", [o_intf_embedded_ckb state]);
