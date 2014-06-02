@@ -270,8 +270,7 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
 
         i_used = twolame_encode_flush( p_sys->p_twolame,
                                 p_sys->p_out_buffer, MAX_CODED_FRAME_SIZE );
-
-        if( i_used < 0 )
+        if( i_used <= 0 )
             return NULL;
 
         p_block = block_Alloc( i_used );
