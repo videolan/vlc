@@ -1411,10 +1411,24 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
     /* FIXME add ctts ?? FIXME */
 
     bo_t *stsz = box_full_new("stsz", 0, 0);
-    bo_add_32be(stsz, 0);                             // sample-size
-    bo_add_32be(stsz, p_stream->i_entry_count);       // sample-count
+    int i_size = 0;
     for (unsigned i = 0; i < p_stream->i_entry_count; i++)
-        bo_add_32be(stsz, p_stream->entry[i].i_size); // sample-size
+    {
+        if ( i == 0 )
+            i_size = p_stream->entry[i].i_size;
+        else if ( p_stream->entry[i].i_size != i_size )
+        {
+            i_size = 0;
+            break;
+        }
+    }
+    bo_add_32be(stsz, i_size);                         // sample-size
+    bo_add_32be(stsz, p_stream->i_entry_count);       // sample-count
+    if ( i_size == 0 ) // all samples have different size
+    {
+        for (unsigned i = 0; i < p_stream->i_entry_count; i++)
+            bo_add_32be(stsz, p_stream->entry[i].i_size); // sample-size
+    }
 
     /* create stss table */
     bo_t *stss = NULL;
