@@ -5318,18 +5318,18 @@ static int LeafParseMDATwithMOOF( demux_t *p_demux, MP4_Box_t *p_moof )
                 }
             }
 
+            const MP4_Box_data_trun_t *p_trun_data = p_track->context.BOXDATA(p_trun);
+
+           /* NOW PARSE TRUN WITH MDAT */
+            int i_ret = LeafParseTRUN( p_demux, p_track,
+                                   i_trun_sample_default_duration, i_trun_sample_default_size,
+                                   p_trun_data, & p_sys->context.i_mdatbytesleft );
+            if ( i_ret != VLC_SUCCESS )
+                goto end;
+
+            p_track->context.p_trun = p_track->context.p_trun->p_next;
         }
 
-        const MP4_Box_data_trun_t *p_trun_data = p_track->context.BOXDATA(p_trun);
-
-        /* NOW PARSE TRUN WITH MDAT */
-        int i_ret = LeafParseTRUN( p_demux, p_track,
-                               i_trun_sample_default_duration, i_trun_sample_default_size,
-                               p_trun_data, & p_sys->context.i_mdatbytesleft );
-        if ( i_ret != VLC_SUCCESS )
-            goto end;
-
-        p_track->context.p_trun = p_track->context.p_trun->p_next;
         if ( p_sys->context.i_mdatbytesleft == 0 )
             p_sys->context.i_current_box_type = 0;
         return VLC_SUCCESS;
