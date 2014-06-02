@@ -1396,17 +1396,15 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
 
     unsigned i_index = 0;
     for (unsigned i = 0; i < p_stream->i_entry_count; i_index++) {
-        p_stream->entry[i].i_length = p_stream->entry[i].i_length
-            * (int64_t)i_timescale / CLOCK_FREQ;
         int     i_first = i;
-        int64_t i_delta = p_stream->entry[i].i_length;
+        mtime_t i_delta = p_stream->entry[i].i_length;
 
         for (; i < p_stream->i_entry_count; ++i)
             if (i == p_stream->i_entry_count || p_stream->entry[i].i_length != i_delta)
                 break;
 
         bo_add_32be(stts, i - i_first); // sample-count
-        bo_add_32be(stts, i_delta);     // sample-delta
+        bo_add_32be(stts, i_delta * i_timescale / CLOCK_FREQ ); // sample-delta
     }
     bo_fix_32be(stts, 12, i_index);
 
