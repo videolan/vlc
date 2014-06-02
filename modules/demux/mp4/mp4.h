@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mp4.h : MP4 file input module for vlc
  *****************************************************************************
- * Copyright (C) 2014-2004, 2010, 2014 VLC authors and VideoLAN
+ * Copyright (C) 2001-2004, 2010, 2014 VLC authors and VideoLAN
  *
  *
  * This program is free software; you can redistribute it and/or modify it
