@@ -28,7 +28,8 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
+#include "mp4.h"
+
 #include <vlc_plugin.h>
 
 #include <vlc_demux.h>
@@ -37,7 +38,6 @@
 #include <vlc_input.h>
 #include <assert.h>
 
-#include "libmp4.h"
 #include "id3genres.h"                             /* for ATOM_gnre */
 
 /*****************************************************************************
@@ -64,16 +64,6 @@ static int   DemuxFrg( demux_t * );
 static int   DemuxAsLeaf( demux_t * );
 static int   Seek    ( demux_t *, mtime_t );
 static int   Control ( demux_t *, int, va_list );
-
-typedef struct mp4_fragment_t mp4_fragment_t;
-struct mp4_fragment_t
-{
-    uint64_t i_chunk_range_min_offset;
-    uint64_t i_chunk_range_max_offset;
-    uint64_t i_duration;
-    MP4_Box_t *p_moox;
-    mp4_fragment_t *p_next;
-};
 
 struct demux_sys_t
 {
