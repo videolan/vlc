@@ -110,6 +110,7 @@ typedef struct
     /* stats */
     int64_t      i_dts_start;
     int64_t      i_duration;
+    bool         b_hasbframes;
 
     /* for later stco fix-up (fast start files) */
     uint64_t i_stco_pos;
@@ -413,6 +414,7 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
         calloc(p_stream->i_entry_max, sizeof(mp4_entry_t));
     p_stream->i_dts_start   = 0;
     p_stream->i_duration    = 0;
+    p_stream->b_hasbframes  = false;
 
     p_input->p_sys          = p_stream;
 
@@ -502,9 +504,15 @@ static int Mux(sout_mux_t *p_mux)
         mp4_entry_t *e = &p_stream->entry[p_stream->i_entry_count];
         e->i_pos    = p_sys->i_pos;
         e->i_size   = p_data->i_buffer;
-        e->i_pts_dts = p_data->i_pts - p_data->i_dts;
-        if (e->i_pts_dts < 0)
-            e->i_pts_dts = 0;
+
+        if ( p_data->i_dts > VLC_TS_INVALID && p_data->i_pts > p_data->i_dts )
+        {
+            e->i_pts_dts = p_data->i_pts - p_data->i_dts;
+            if ( !p_stream->b_hasbframes )
+                p_stream->b_hasbframes = true;
+        }
+        else e->i_pts_dts = 0;
+
         e->i_length = p_data->i_length;
         e->i_flags  = p_data->i_flags;
 
@@ -1408,7 +1416,26 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
     }
     bo_fix_32be(stts, 12, i_index);
 
-    /* FIXME add ctts ?? FIXME */
+    /* composition time handling */
+    bo_t *ctts = NULL;
+    if ( p_stream->b_hasbframes && (ctts = box_full_new("ctts", 0, 0)) )
+    {
+        bo_add_32be(ctts, 0);
+        i_index = 0;
+        for (unsigned i = 0; i < p_stream->i_entry_count; i_index++)
+        {
+            int     i_first = i;
+            mtime_t i_offset = p_stream->entry[i].i_pts_dts;
+
+            for (; i < p_stream->i_entry_count; ++i)
+                if (i == p_stream->i_entry_count || p_stream->entry[i].i_pts_dts != i_offset)
+                    break;
+
+            bo_add_32be(ctts, i - i_first); // sample-count
+            bo_add_32be(ctts, i_offset * i_timescale / CLOCK_FREQ ); // sample-offset
+        }
+        bo_fix_32be(ctts, 12, i_index);
+    }
 
     bo_t *stsz = box_full_new("stsz", 0, 0);
     int i_size = 0;
@@ -1453,6 +1480,8 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
     box_gather(stbl, stts);
     if (stss)
         box_gather(stbl, stss);
+    if (ctts)
+        box_gather(stbl, ctts);
     box_gather(stbl, stsc);
     box_gather(stbl, stsz);
     p_stream->i_stco_pos = stbl->len + 16;
