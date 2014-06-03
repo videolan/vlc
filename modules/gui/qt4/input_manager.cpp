@@ -124,7 +124,10 @@ void InputManager::setInput( input_thread_t *_p_input )
 
         /* Get Saved Time */
         int i_time = RecentsMRL::getInstance( p_intf )->time( p_item->psz_uri );
-        if( i_time > 0 )
+        if( i_time > 0 &&
+            !var_GetFloat( p_input, "run-time" ) &&
+            !var_GetFloat( p_input, "start-time" ) &&
+            !var_GetFloat( p_input, "stop-time" ) )
         {
             THEMIM->togglePlayPause();
 
