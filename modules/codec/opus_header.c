@@ -30,7 +30,6 @@
 #endif
 
 #include "opus_header.h"
-#include <opus.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -236,11 +235,12 @@ The comment header is decoded as follows:
   7) done.
 */
 
-static char *comment_init(size_t *length)
+static char *comment_init(size_t *length, const char *vendor)
 {
     /*The 'vendor' field should be the actual encoding library used.*/
-    const char *vendor_string = opus_get_version_string();
-    int vendor_length = strlen(vendor_string);
+    if (!vendor)
+        vendor = "unknown";
+    int vendor_length = strlen(vendor);
 
     int user_comment_list_length = 0;
     int len = 8 + 4 + vendor_length + 4;
@@ -250,7 +250,7 @@ static char *comment_init(size_t *length)
 
     memcpy(p, "OpusTags", 8);
     SetDWLE(p + 8, vendor_length);
-    memcpy(p + 12, vendor_string, vendor_length);
+    memcpy(p + 12, vendor, vendor_length);
     SetDWLE(p + 12 + vendor_length, user_comment_list_length);
 
     *length = len;
@@ -367,7 +367,7 @@ static int opus_header_to_packet(const OpusHeader *h, unsigned char *packet, int
     return p.pos;
 }
 
-int opus_write_header(uint8_t **p_extra, int *i_extra, OpusHeader *header)
+int opus_write_header(uint8_t **p_extra, int *i_extra, OpusHeader *header, const char *vendor)
 {
     unsigned char header_data[100];
     const int packet_size = opus_header_to_packet(header, header_data,
@@ -380,7 +380,7 @@ int opus_write_header(uint8_t **p_extra, int *i_extra, OpusHeader *header)
     size[0] = packet_size;
 
     size_t comments_length;
-    char *comments = comment_init(&comments_length);
+    char *comments = comment_init(&comments_length, vendor);
     if (!comments)
         return 1;
     if (comment_add(&comments, &comments_length, "ENCODER=",

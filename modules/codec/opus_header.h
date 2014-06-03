@@ -45,6 +45,6 @@ typedef struct {
 
 int opus_header_parse(const unsigned char *header, int len, OpusHeader *h);
 int opus_prepare_header(unsigned channels, unsigned rate, OpusHeader *header);
-int opus_write_header(uint8_t **p_extra, int *i_extra, OpusHeader *header);
+int opus_write_header(uint8_t **p_extra, int *i_extra, OpusHeader *header, const char *vendor);
 
 #endif
