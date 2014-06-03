@@ -74,7 +74,7 @@ typedef struct {
     int pos;
 } ROPacket;
 
-static int write_uint32(Packet *p, ogg_uint32_t val)
+static int write_uint32(Packet *p, uint32_t val)
 {
     if (p->pos>p->maxlen-4)
         return 0;
@@ -86,7 +86,7 @@ static int write_uint32(Packet *p, ogg_uint32_t val)
     return 1;
 }
 
-static int write_uint16(Packet *p, ogg_uint16_t val)
+static int write_uint16(Packet *p, uint16_t val)
 {
     if (p->pos>p->maxlen-2)
         return 0;
@@ -105,24 +105,24 @@ static int write_chars(Packet *p, const unsigned char *str, int nb_chars)
     return 1;
 }
 
-static int read_uint32(ROPacket *p, ogg_uint32_t *val)
+static int read_uint32(ROPacket *p, uint32_t *val)
 {
     if (p->pos>p->maxlen-4)
         return 0;
-    *val =  (ogg_uint32_t)p->data[p->pos  ];
-    *val |= (ogg_uint32_t)p->data[p->pos+1]<< 8;
-    *val |= (ogg_uint32_t)p->data[p->pos+2]<<16;
-    *val |= (ogg_uint32_t)p->data[p->pos+3]<<24;
+    *val =  (uint32_t)p->data[p->pos  ];
+    *val |= (uint32_t)p->data[p->pos+1]<< 8;
+    *val |= (uint32_t)p->data[p->pos+2]<<16;
+    *val |= (uint32_t)p->data[p->pos+3]<<24;
     p->pos += 4;
     return 1;
 }
 
-static int read_uint16(ROPacket *p, ogg_uint16_t *val)
+static int read_uint16(ROPacket *p, uint16_t *val)
 {
     if (p->pos>p->maxlen-2)
         return 0;
-    *val =  (ogg_uint16_t)p->data[p->pos  ];
-    *val |= (ogg_uint16_t)p->data[p->pos+1]<<8;
+    *val =  (uint16_t)p->data[p->pos  ];
+    *val |= (uint16_t)p->data[p->pos+1]<<8;
     p->pos += 2;
     return 1;
 }
@@ -141,7 +141,7 @@ int opus_header_parse(const unsigned char *packet, int len, OpusHeader *h)
     char str[9];
     ROPacket p;
     unsigned char ch;
-    ogg_uint16_t shortval;
+    uint16_t shortval;
 
     p.data = packet;
     p.maxlen = len;
@@ -372,13 +372,12 @@ int opus_write_header(uint8_t **p_extra, int *i_extra, OpusHeader *header)
     unsigned char header_data[100];
     const int packet_size = opus_header_to_packet(header, header_data,
                                                   sizeof(header_data));
-    ogg_packet headers[2];
-    headers[0].packet = header_data;
-    headers[0].bytes = packet_size;
-    headers[0].b_o_s = 1;
-    headers[0].e_o_s = 0;
-    headers[0].granulepos = 0;
-    headers[0].packetno = 0;
+
+    unsigned char *data[2];
+    size_t size[2];
+
+    data[0] = header_data;
+    size[0] = packet_size;
 
     size_t comments_length;
     char *comments = comment_init(&comments_length);
@@ -397,22 +396,15 @@ int opus_write_header(uint8_t **p_extra, int *i_extra, OpusHeader *header)
         return 1;
     }
 
-    headers[1].packet = (unsigned char *) comments;
-    headers[1].bytes = comments_length;
-    headers[1].b_o_s = 0;
-    headers[1].e_o_s = 0;
-    headers[1].granulepos = 0;
-    headers[1].packetno = 1;
+    data[1] = (unsigned char *) comments;
+    size[1] = comments_length;
 
-    for (unsigned i = 0; i < ARRAY_SIZE(headers); ++i)
-    {
-        if (xiph_AppendHeaders(i_extra, (void **) p_extra,
-                               headers[i].bytes, headers[i].packet))
+    for (unsigned i = 0; i < ARRAY_SIZE(data); ++i)
+        if (xiph_AppendHeaders(i_extra, (void **) p_extra, size[i], data[i]))
         {
             *i_extra = 0;
             *p_extra = NULL;
         }
-    }
 
     return 0;
 }
