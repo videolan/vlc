@@ -3312,6 +3312,7 @@ static const struct
 
     /* for codecs */
     { ATOM_soun,    MP4_ReadBox_sample_soun,  MP4_FreeBox_sample_soun },
+    { ATOM_lpcm,    MP4_ReadBox_sample_soun,  MP4_FreeBox_sample_soun },
     { ATOM_ms02,    MP4_ReadBox_sample_soun,  MP4_FreeBox_sample_soun },
     { ATOM_ms11,    MP4_ReadBox_sample_soun,  MP4_FreeBox_sample_soun },
     { ATOM_ms55,    MP4_ReadBox_sample_soun,  MP4_FreeBox_sample_soun },

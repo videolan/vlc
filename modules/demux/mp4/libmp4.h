@@ -112,6 +112,7 @@
 #define ATOM_3gp4 VLC_FOURCC( '3', 'g', 'p', '4' )
 #define ATOM_esds VLC_FOURCC( 'e', 's', 'd', 's' )
 
+#define ATOM_lpcm VLC_FOURCC( 'l', 'p', 'c', 'm' )
 #define ATOM__mp3 VLC_FOURCC( '.', 'm', 'p', '3' )
 #define ATOM_ms02 VLC_FOURCC( 'm', 's', 0x0, 0x02 )
 #define ATOM_ms11 VLC_FOURCC( 'm', 's', 0x0, 0x11 )
