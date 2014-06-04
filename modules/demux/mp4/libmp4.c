@@ -1665,8 +1665,8 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
     {
         /* SoundDescriptionV2 */
         double f_sample_rate;
-        int64_t dummy;
-        uint32_t i_channel;
+        int64_t i_dummy64;
+        uint32_t i_channel, i_extoffset, i_dummy32;
 
         /* Checks */
         if ( p_box->data.p_sample_soun->i_channelcount != 0x3  ||
@@ -1676,15 +1676,14 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
              p_box->data.p_sample_soun->i_sampleratehi != 0x1  ||//65536
              p_box->data.p_sample_soun->i_sampleratelo != 0x0 )  //remainder
         {
-            msg_Err( p_stream, "invalid stsd V2 box" );
+            msg_Err( p_stream, "invalid stsd V2 box defaults" );
             MP4_READBOX_EXIT( 0 );
         }
         /* !Checks */
 
-        MP4_GET4BYTES( p_box->data.p_sample_soun->i_sample_per_packet );
-        MP4_GET8BYTES( dummy );
-        memcpy( &f_sample_rate, &dummy, 8 );
-
+        MP4_GET4BYTES( i_extoffset ); /* offset to stsd extentions */
+        MP4_GET8BYTES( i_dummy64 );
+        memcpy( &f_sample_rate, &i_dummy64, 8 );
         msg_Dbg( p_stream, "read box: %f Hz", f_sample_rate );
         p_box->data.p_sample_soun->i_sampleratehi = (int)f_sample_rate % BLOCK16x16;
         p_box->data.p_sample_soun->i_sampleratelo = f_sample_rate / BLOCK16x16;
@@ -1692,11 +1691,31 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_GET4BYTES( i_channel );
         p_box->data.p_sample_soun->i_channelcount = i_channel;
 
+        MP4_GET4BYTES( i_dummy32 );
+        if ( i_dummy32 != 0x7F000000 )
+        {
+            msg_Err( p_stream, "invalid stsd V2 box" );
+            MP4_READBOX_EXIT( 0 );
+        }
+
+        MP4_GET4BYTES( p_box->data.p_sample_soun->i_constbitsperchannel );
+        MP4_GET4BYTES( p_box->data.p_sample_soun->i_formatflags );
+        MP4_GET4BYTES( p_box->data.p_sample_soun->i_constbytesperaudiopacket );
+        MP4_GET4BYTES( p_box->data.p_sample_soun->i_constLPCMframesperaudiopacket );
+
 #ifdef MP4_VERBOSE
-        msg_Dbg( p_stream, "read box: \"soun\" V2" );
+        msg_Dbg( p_stream, "read box: \"soun\" V2 rate=%f bitsperchannel=%u "
+                           "flags=%u bytesperpacket=%u lpcmframesperpacket=%u",
+                 f_sample_rate,
+                 p_box->data.p_sample_soun->i_constbitsperchannel,
+                 p_box->data.p_sample_soun->i_formatflags,
+                 p_box->data.p_sample_soun->i_constbytesperaudiopacket,
+                 p_box->data.p_sample_soun->i_constLPCMframesperaudiopacket );
 #endif
-        stream_Seek( p_stream, p_box->i_pos +
-                        mp4_box_headersize( p_box ) + 28 + 36 );
+        if ( i_extoffset < p_box->i_size )
+            stream_Seek( p_stream, p_box->i_pos + i_extoffset );
+        else
+            stream_Seek( p_stream, p_box->i_pos + p_box->i_size );
     }
     else
     {
@@ -1725,6 +1744,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
         p_box->data.p_sample_soun->i_channelcount = 1;
     }
 
+    /* Loads extensions */
     MP4_ReadBoxContainerRaw( p_stream, p_box ); /* esds/wave/... */
 
 #ifdef MP4_VERBOSE

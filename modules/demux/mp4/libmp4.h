@@ -508,6 +508,12 @@ typedef struct MP4_Box_data_sample_soun_s
     uint32_t i_bytes_per_frame;
     uint32_t i_bytes_per_sample;
 
+    /* v2 */
+    uint32_t i_constbitsperchannel; /* consts are nonzero only if constant */
+    uint32_t i_formatflags;
+    uint32_t i_constbytesperaudiopacket;
+    uint32_t i_constLPCMframesperaudiopacket;
+
     /* XXX hack */
     int     i_qt_description;
     uint8_t *p_qt_description;

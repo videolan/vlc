@@ -2448,8 +2448,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         case VLC_CODEC_DVD_LPCM:
         {
             MP4_Box_data_sample_soun_t *p_soun = p_sample->data.p_sample_soun;
-            if( p_soun->i_qt_version == 2 &&
-                p_soun->i_qt_description > 20 + 28 )
+            if( p_soun->i_qt_version == 2 )
             {
                 /* Flags:
                  *  0x01: IsFloat
@@ -2487,17 +2486,16 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
 
                     {0, 0, 0, 0}
                 };
-                uint32_t i_bits  = GetDWBE(&p_soun->p_qt_description[20 + 20]);
-                uint32_t i_flags = GetDWBE(&p_soun->p_qt_description[20 + 24]);
 
                 for( int i = 0; p_formats[i].i_codec; i++ )
                 {
-                    if( p_formats[i].i_bits == i_bits &&
-                        (i_flags & p_formats[i].i_mask) == p_formats[i].i_flags )
+                    if( p_formats[i].i_bits == p_soun->i_constbitsperchannel &&
+                        (p_soun->i_formatflags & p_formats[i].i_mask) == p_formats[i].i_flags )
                     {
                         p_track->fmt.i_codec = p_formats[i].i_codec;
-                        p_track->fmt.audio.i_bitspersample = i_bits;
-                        p_track->fmt.audio.i_blockalign = p_soun->i_channelcount * i_bits / 8;
+                        p_track->fmt.audio.i_bitspersample = p_soun->i_constbitsperchannel;
+                        p_track->fmt.audio.i_blockalign =
+                                p_soun->i_channelcount * p_soun->i_constbitsperchannel / 8;
                         p_track->i_sample_size = p_track->fmt.audio.i_blockalign;
 
                         p_soun->i_qt_version = 0;
