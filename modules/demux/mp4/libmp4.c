@@ -1668,6 +1668,19 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
         int64_t dummy;
         uint32_t i_channel;
 
+        /* Checks */
+        if ( p_box->data.p_sample_soun->i_channelcount != 0x3  ||
+             p_box->data.p_sample_soun->i_samplesize != 0x0010 ||
+             p_box->data.p_sample_soun->i_predefined != 0xFFFE ||
+             p_box->data.p_sample_soun->i_reserved3 != 0x0     ||
+             p_box->data.p_sample_soun->i_sampleratehi != 0x1  ||//65536
+             p_box->data.p_sample_soun->i_sampleratelo != 0x0 )  //remainder
+        {
+            msg_Err( p_stream, "invalid stsd V2 box" );
+            MP4_READBOX_EXIT( 0 );
+        }
+        /* !Checks */
+
         MP4_GET4BYTES( p_box->data.p_sample_soun->i_sample_per_packet );
         MP4_GET8BYTES( dummy );
         memcpy( &f_sample_rate, &dummy, 8 );
