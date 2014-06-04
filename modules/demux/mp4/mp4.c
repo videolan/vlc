@@ -917,10 +917,11 @@ static int Demux( demux_t *p_demux )
             b_data_sent = true;
         }
         es_out_Send( p_demux->out, tk->p_es, p_block );
-
-        /* Next sample */
-        MP4_TrackNextSample( p_demux, tk, i_nb_samples );
     }
+
+    /* Next sample */
+    if ( i_nb_samples ) /* sample size could be 0, need to go fwd. see return */
+        MP4_TrackNextSample( p_demux, tk, i_nb_samples );
 
 end:
     if ( b_data_sent )
@@ -935,7 +936,7 @@ end:
         }
     }
 
-    return b_data_sent;
+    return b_data_sent || ( i_samplessize == 0 && i_nb_samples );
 }
 
 static void MP4_UpdateSeekpoint( demux_t *p_demux )
