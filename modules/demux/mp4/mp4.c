@@ -2229,11 +2229,12 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         p_track->fmt.audio.i_bitspersample =
             p_sample->data.p_sample_soun->i_samplesize;
 
+        MP4_Box_data_sample_soun_t *p_soun = p_sample->data.p_sample_soun;
+
+        p_track->fmt.i_original_fourcc = p_sample->i_type;
+
         if( ( p_track->i_sample_size == 1 || p_track->i_sample_size == 2 ) )
         {
-            MP4_Box_data_sample_soun_t *p_soun;
-            p_soun = p_sample->data.p_sample_soun;
-
             if( p_soun->i_qt_version == 0 )
             {
                 switch( p_sample->i_type )
@@ -2283,8 +2284,6 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         }
         else if( p_sample->data.p_sample_soun->i_qt_version == 1 )
         {
-            MP4_Box_data_sample_soun_t *p_soun = p_sample->data.p_sample_soun;
-
             switch( p_sample->i_type )
             {
                 case( VLC_FOURCC( '.', 'm', 'p', '3' ) ):
@@ -2370,9 +2369,6 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             if( p_sample->data.p_sample_soun && (p_track->i_timescale !=
                 p_sample->data.p_sample_soun->i_sampleratehi) )
             {
-                MP4_Box_data_sample_soun_t *p_soun =
-                    p_sample->data.p_sample_soun;
-
                 msg_Warn( p_demux, "i_timescale (%"PRId32") != i_sampleratehi "
                           "(%u), making both equal (report any problem).",
                           p_track->i_timescale, p_soun->i_sampleratehi );
