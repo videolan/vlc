@@ -497,7 +497,7 @@ typedef struct MP4_Box_data_sample_soun_s
 
     uint16_t i_channelcount;
     uint16_t i_samplesize;
-    uint16_t i_predefined;
+    uint16_t i_compressionid;
     uint16_t i_reserved3;
     uint16_t i_sampleratehi; /* timescale of track */
     uint16_t i_sampleratelo;

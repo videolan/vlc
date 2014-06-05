@@ -1636,7 +1636,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_channelcount );
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_samplesize );
-    MP4_GET2BYTES( p_box->data.p_sample_soun->i_predefined );
+    MP4_GET2BYTES( p_box->data.p_sample_soun->i_compressionid );
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_reserved3 );
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_sampleratehi );
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_sampleratelo );
@@ -1671,7 +1671,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
         /* Checks */
         if ( p_box->data.p_sample_soun->i_channelcount != 0x3  ||
              p_box->data.p_sample_soun->i_samplesize != 0x0010 ||
-             p_box->data.p_sample_soun->i_predefined != 0xFFFE ||
+             p_box->data.p_sample_soun->i_compressionid != 0xFFFE ||
              p_box->data.p_sample_soun->i_reserved3 != 0x0     ||
              p_box->data.p_sample_soun->i_sampleratehi != 0x1  ||//65536
              p_box->data.p_sample_soun->i_sampleratelo != 0x0 )  //remainder
