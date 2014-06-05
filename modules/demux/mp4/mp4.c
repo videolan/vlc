@@ -119,7 +119,7 @@ static void MP4_TrackUnselect(demux_t *, mp4_track_t * );
 static int  MP4_TrackSeek   ( demux_t *, mp4_track_t *, mtime_t );
 
 static uint64_t MP4_TrackGetPos    ( mp4_track_t * );
-static uint32_t MP4_TrackSampleSize( mp4_track_t *, uint32_t * );
+static uint32_t MP4_TrackGetReadSize( mp4_track_t *, uint32_t * );
 static int      MP4_TrackNextSample( demux_t *, mp4_track_t *, uint32_t );
 static void     MP4_TrackSetELST( demux_t *, mp4_track_t *, int64_t );
 
@@ -863,7 +863,7 @@ static int Demux( demux_t *p_demux )
 #endif
 
     uint32_t i_nb_samples = 0;
-    uint32_t i_samplessize = MP4_TrackSampleSize( tk, &i_nb_samples );
+    uint32_t i_samplessize = MP4_TrackGetReadSize( tk, &i_nb_samples );
     if( i_samplessize > 0 )
     {
         block_t *p_block;
@@ -1565,7 +1565,7 @@ static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
         const int64_t i_dts = MP4_TrackGetDTS( p_demux, tk );
         const int64_t i_pts_delta = MP4_TrackGetPTSDelta( p_demux, tk );
         uint32_t i_nb_samples = 0;
-        const uint32_t i_size = MP4_TrackSampleSize( tk, &i_nb_samples );
+        const uint32_t i_size = MP4_TrackGetReadSize( tk, &i_nb_samples );
 
         if( i_size > 0 && !stream_Seek( p_demux->s, MP4_TrackGetPos( tk ) ) )
         {
@@ -3339,63 +3339,89 @@ static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
  *
  */
 #define QT_V0_MAX_SAMPLES 1024
-static uint32_t MP4_TrackSampleSize( mp4_track_t *p_track, uint32_t *pi_nb_samples )
+static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samples )
 {
-    uint32_t i_size;
-    MP4_Box_data_sample_soun_t *p_soun;
+    uint32_t i_size = 0;
+    *pi_nb_samples = 0;
 
-    if( p_track->i_sample_size == 0 )
-    {
-        /* most simple case */
-        *pi_nb_samples = 1;
-        return p_track->p_sample_size[p_track->i_sample];
-    }
+    if ( p_track->i_sample == p_track->i_sample_count )
+        return 0;
 
-    if( p_track->fmt.i_cat != AUDIO_ES )
+    if ( p_track->fmt.i_cat != AUDIO_ES )
     {
         *pi_nb_samples = 1;
-        return p_track->i_sample_size;
-    }
 
-    p_soun = p_track->p_sample->data.p_sample_soun;
-
-    if( p_soun->i_qt_version == 1 )
-    {
-        uint32_t i_samples = p_track->chunk[p_track->i_chunk].i_sample_count;
-        if( p_track->fmt.audio.i_blockalign > 1 )
-            i_samples = p_soun->i_sample_per_packet;
-        i_size = i_samples / p_soun->i_sample_per_packet;
-        if ( UINT32_MAX / i_size >= p_soun->i_bytes_per_frame )
-            i_size *= p_soun->i_bytes_per_frame;
+        if( p_track->i_sample_size == 0 ) /* all sizes are different */
+            return p_track->p_sample_size[p_track->i_sample];
         else
-            i_size = UINT32_MAX;
-        *pi_nb_samples = i_samples;
-    }
-    else if( p_track->i_sample_size > 256 )
-    {
-        /* We do that so we don't read too much data
-         * (in this case we are likely dealing with compressed data) */
-        i_size = p_track->i_sample_size;
-        *pi_nb_samples = 1;
+            return p_track->i_sample_size;
     }
     else
     {
-        mp4_chunk_t *p_chunk = &p_track->chunk[p_track->i_chunk];
-        int64_t i_length = CLOCK_FREQ / 10;
-        uint32_t i_samples = 0;
-        uint32_t i_maxsamples = 0;
+        const MP4_Box_data_sample_soun_t *p_soun = p_track->p_sample->data.p_sample_soun;
+        const mp4_chunk_t *p_chunk = &p_track->chunk[p_track->i_chunk];
+        uint32_t i_max_samples = p_chunk->i_sample_count - p_chunk->i_sample + 1;
+        i_max_samples = __MIN( i_max_samples, QT_V0_MAX_SAMPLES );
+
+        /* Group audio packets so we don't call demux for single sample unit */
+        if( p_track->fmt.i_original_fourcc == VLC_CODEC_DVD_LPCM &&
+            p_soun->i_constLPCMframesperaudiopacket &&
+            p_soun->i_constbytesperaudiopacket )
+        {
+            /* uncompressed case */
+            uint32_t i_packets = i_max_samples / p_soun->i_constLPCMframesperaudiopacket;
+            if ( UINT32_MAX / p_soun->i_constbytesperaudiopacket < i_packets )
+                i_packets = UINT32_MAX / p_soun->i_constbytesperaudiopacket;
+            *pi_nb_samples = i_packets * p_soun->i_constLPCMframesperaudiopacket;
+            return i_packets * p_soun->i_constbytesperaudiopacket;
+        }
+
+        /* all samples have a different size */
+        if( p_track->i_sample_size == 0 )
+        {
+            *pi_nb_samples = 1;
+            return p_track->p_sample_size[p_track->i_sample];
+        }
+
+        if( p_soun->i_qt_version == 1 )
+        {
+            if ( p_soun->i_compressionid != 0 )
+            {
+                /* in this case we are dealing with compressed data
+                   -2 in V1: additional fields are meaningless (VBR and such) */
+                i_size = p_track->i_sample_size;
+                *pi_nb_samples = 1;
+            }
+            else /* uncompressed case */
+            {
+                uint32_t i_packets;
+                if( p_track->fmt.audio.i_blockalign > 1 )
+                    i_packets = 1;
+                else
+                    i_packets = i_max_samples / p_soun->i_sample_per_packet;
+
+                if ( UINT32_MAX / p_soun->i_bytes_per_frame < i_packets )
+                    i_packets = UINT32_MAX / p_soun->i_bytes_per_frame;
+
+                *pi_nb_samples = i_packets * p_soun->i_sample_per_packet;
+                i_size = i_packets * p_soun->i_bytes_per_frame;
+            }
+        }
+
+        /* uncompressed */
+        *pi_nb_samples = 0;
+        mtime_t i_length = CLOCK_FREQ / 10;
         for( uint32_t i=p_track->i_sample; i<p_chunk->i_sample_count; i++ )
         {
             i_length -= CLOCK_FREQ * p_chunk->p_sample_delta_dts[i] / p_track->i_timescale;
-            if ( i_length < 0 ) break;
-            i_maxsamples++;
+            if ( i_length < 0 || *pi_nb_samples == QT_V0_MAX_SAMPLES )
+                break;
+            (*pi_nb_samples)++;
+            if ( p_track->i_sample_size == 0 )
+                i_size += p_track->p_sample_size[i];
+            else
+                i_size += p_track->i_sample_size;
         }
-
-        i_samples = __MIN( QT_V0_MAX_SAMPLES, i_samples );
-        i_samples = __MIN( i_maxsamples, i_samples );
-        if ( i_samples == 0 ) i_samples = 1;
-        i_size = i_samples * p_track->i_sample_size;
-        *pi_nb_samples = i_samples;
     }
 
     //fprintf( stderr, "size=%d\n", i_size );
@@ -3442,44 +3468,13 @@ static uint64_t MP4_TrackGetPos( mp4_track_t *p_track )
 
 static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track, uint32_t i_samples )
 {
-    if( p_track->fmt.i_cat == AUDIO_ES && p_track->i_sample_size != 0 )
+    if ( UINT32_MAX - p_track->i_sample < i_samples )
     {
-        MP4_Box_data_sample_soun_t *p_soun;
-
-        p_soun = p_track->p_sample->data.p_sample_soun;
-
-        if( p_soun->i_qt_version == 1 )
-        {
-            /* we read chunk by chunk unless a blockalign is requested */
-            if( p_track->fmt.audio.i_blockalign > 1 )
-                p_track->i_sample += p_soun->i_sample_per_packet;
-            else
-                p_track->i_sample += p_track->chunk[p_track->i_chunk].i_sample_count;
-        }
-        else if( p_track->i_sample_size > 256 )
-        {
-            /* We do that so we don't read too much data
-             * (in this case we are likely dealing with compressed data) */
-            p_track->i_sample += 1;
-        }
-        else
-        {
-            /* FIXME */
-            p_track->i_sample += i_samples;
-            if( p_track->i_sample >
-                p_track->chunk[p_track->i_chunk].i_sample_first +
-                p_track->chunk[p_track->i_chunk].i_sample_count )
-            {
-                p_track->i_sample =
-                    p_track->chunk[p_track->i_chunk].i_sample_first +
-                    p_track->chunk[p_track->i_chunk].i_sample_count;
-            }
-        }
+        p_track->i_sample = UINT32_MAX;
+        return VLC_EGENERIC;
     }
-    else
-    {
-        p_track->i_sample++;
-    }
+
+    p_track->i_sample += i_samples;
 
     if( p_track->i_sample >= p_track->i_sample_count )
         return VLC_EGENERIC;
