@@ -3325,8 +3325,6 @@ static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
     }
 
     p_track->b_selected = true;
-    msg_Err( p_demux, "select track[Id 0x%x] %d %d %ld",
-              p_track->i_track_ID, i_chunk, i_sample, i_start );
     if( !TrackGotoChunkSample( p_demux, p_track, i_chunk, i_sample ) )
         p_track->b_selected = true;
 
