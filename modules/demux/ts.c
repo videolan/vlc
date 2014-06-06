@@ -3279,10 +3279,12 @@ static void PMTSetupEsISO14496( demux_t *p_demux, ts_pid_t *pid,
         for( int i = 0; i < 255; i++ )
         {
             iod_descriptor_t *iod = prg->iod;
-
-            if( iod->es_descr[i].b_ok && iod->es_descr[i].i_es_id == i_es_id )
+            if( iod->es_descr[i].i_es_id == i_es_id )
             {
-                pid->es->p_mpeg4desc = &iod->es_descr[i];
+                if ( iod->es_descr[i].b_ok )
+                    pid->es->p_mpeg4desc = &iod->es_descr[i];
+                else
+                    msg_Dbg( p_demux, "MPEG-4 descriptor not yet available on es_id=%d", i_es_id );
                 break;
             }
         }
