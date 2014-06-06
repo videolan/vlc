@@ -196,12 +196,13 @@ typedef struct
 
 } es_mpeg4_descriptor_t;
 
+#define ES_DESCRIPTOR_COUNT 255
 typedef struct
 {
     /* IOD */
     char                    *psz_url;
 
-    es_mpeg4_descriptor_t   es_descr[255];
+    es_mpeg4_descriptor_t   es_descr[ES_DESCRIPTOR_COUNT];
 
 } iod_descriptor_t;
 
@@ -2585,7 +2586,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
     int i_length = 0;
     int i_data_sav = i_data;
     uint8_t *p_data_sav = p_data;
-    for (int i = 0; i_data > 0 && i < 255; i++)
+    for (int i = 0; i_data > 0 && i < ES_DESCRIPTOR_COUNT; i++)
     {
         es_mpeg4_descriptor_t *es_descr = &p_iod->es_descr[i];
 
@@ -3276,7 +3277,7 @@ static void PMTSetupEsISO14496( demux_t *p_demux, ts_pid_t *pid,
 
         pid->es->p_mpeg4desc = NULL;
 
-        for( int i = 0; i < 255; i++ )
+        for( int i = 0; i < ES_DESCRIPTOR_COUNT; i++ )
         {
             iod_descriptor_t *iod = prg->iod;
             if( iod->es_descr[i].i_es_id == i_es_id )
