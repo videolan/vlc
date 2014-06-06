@@ -3408,17 +3408,18 @@ static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samp
 
         /* uncompressed */
         *pi_nb_samples = 0;
-        mtime_t i_length = CLOCK_FREQ / 10;
-        for( uint32_t i=p_track->i_sample; i<p_chunk->i_sample_count; i++ )
+        for( uint32_t i=p_track->i_sample;
+             i<p_chunk->i_sample_first+p_chunk->i_sample_count &&
+             i<p_track->i_sample_count;
+             i++ )
         {
-            i_length -= CLOCK_FREQ * p_chunk->p_sample_delta_dts[i] / p_track->i_timescale;
-            if ( i_length < 0 || *pi_nb_samples == QT_V0_MAX_SAMPLES )
-                break;
             (*pi_nb_samples)++;
             if ( p_track->i_sample_size == 0 )
                 i_size += p_track->p_sample_size[i];
             else
                 i_size += p_track->i_sample_size;
+            if ( *pi_nb_samples == QT_V0_MAX_SAMPLES )
+                break;
         }
     }
 
