@@ -2625,6 +2625,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
             ts_debug( "\n* ERR missing DecoderConfigDescr" );
             continue;
         }
+        int i_config_desc_length = IODDescriptorLength( &i_data, &p_data ); /* DecoderConfigDescr_length */
         decoder_config_descriptor_t *dec_descr = &es_descr->dec_descr;
         dec_descr->i_objectTypeIndication = IODGetBytes( &i_data, &p_data, 1 );
         i_flags = IODGetBytes( &i_data, &p_data, 1 );
@@ -2634,8 +2635,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
         IODGetBytes( &i_data, &p_data, 4); /* maxBitrate */
         IODGetBytes( &i_data, &p_data, 4 ); /* avgBitrate */
 
-        int i_decoderConfigDescr_length = IODDescriptorLength( &i_data, &p_data );
-        if( i_decoderConfigDescr_length > 13 && IODGetBytes( &i_data, &p_data, 1 ) == 0x05 )
+        if( i_config_desc_length > 13 && IODGetBytes( &i_data, &p_data, 1 ) == 0x05 )
         {
             dec_descr->i_extra = IODDescriptorLength( &i_data, &p_data );
             if( dec_descr->i_extra > 0 )
