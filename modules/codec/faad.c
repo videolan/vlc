@@ -130,12 +130,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if ( !p_dec->fmt_in.i_extra )
-    {
-        msg_Err( p_dec, "cannot initialize faad wihtout codec extradata" );
-        return VLC_EGENERIC;
-    }
-
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys = malloc( sizeof(*p_sys) ) ) == NULL )
         return VLC_ENOMEM;
