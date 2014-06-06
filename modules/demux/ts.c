@@ -3265,14 +3265,14 @@ static void PMTSetupEsISO14496( demux_t *p_demux, ts_pid_t *pid,
 {
     es_format_t *p_fmt = &pid->es->fmt;
 
-    /* MPEG-4 stream: search SL_DESCRIPTOR */
+    /* MPEG-4 stream: search FMC_DESCRIPTOR (SL Packetized stream) */
     dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_es, 0x1f );
 
     if( p_dr && p_dr->i_length == 2 )
     {
         const int i_es_id = ( p_dr->p_data[0] << 8 ) | p_dr->p_data[1];
 
-        msg_Warn( p_demux, "found SL_descriptor es_id=%d", i_es_id );
+        msg_Dbg( p_demux, "found FMC_descriptor declaring sl packetization on es_id=%d", i_es_id );
 
         pid->es->p_mpeg4desc = NULL;
 
