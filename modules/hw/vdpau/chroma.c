@@ -485,11 +485,7 @@ static picture_t *VideoRender(filter_t *filter, picture_t *src)
 
     vlc_vdp_video_field_t *f = sys->history[MAX_PAST].field;
     if (f == NULL)
-    {
-        picture_Release(dst);
-        dst = NULL;
-        goto skip;
-    }
+        goto error;
 
     dst->date = sys->history[MAX_PAST].date;
     dst->b_force = sys->history[MAX_PAST].force;
@@ -535,6 +531,55 @@ static picture_t *VideoRender(filter_t *filter, picture_t *src)
         msg_Err(filter, "video %s %s failure: %s", "mixer", "attributes",
                 vdp_get_error_string(sys->vdp, err));
 
+    /* Check video orientation, allocate intermediate surface if needed */
+    bool swap = ORIENT_IS_SWAP(filter->fmt_in.video.orientation);
+    bool hflip = false, vflip = false;
+
+    switch (filter->fmt_in.video.orientation)
+    {
+        case ORIENT_TOP_LEFT:
+        case ORIENT_RIGHT_TOP:
+            break;
+        case ORIENT_TOP_RIGHT:
+        case ORIENT_RIGHT_BOTTOM:
+            hflip = true;
+            break;
+        case ORIENT_BOTTOM_LEFT:
+        case ORIENT_LEFT_TOP:
+            vflip = true;
+            break;
+        case ORIENT_BOTTOM_RIGHT:
+        case ORIENT_LEFT_BOTTOM:
+            vflip = hflip = true;
+            break;
+    }
+
+    VdpOutputSurface output = dst->p_sys->surface;
+
+    if (swap)
+    {
+        VdpRGBAFormat fmt;
+        uint32_t width, height;
+
+        err = vdp_output_surface_get_parameters(sys->vdp, output,
+                                                &fmt, &width, &height);
+        if (err != VDP_STATUS_OK)
+        {
+            msg_Err(filter, "output %s %s failure: %s", "surface", "query",
+                    vdp_get_error_string(sys->vdp, err));
+            goto error;
+        }
+
+        err = vdp_output_surface_create(sys->vdp, sys->device,
+                                        fmt, height, width, &output);
+        if (err != VDP_STATUS_OK)
+        {
+            msg_Err(filter, "output %s %s failure: %s", "surface", "creation",
+                    vdp_get_error_string(sys->vdp, err));
+            goto error;
+        }
+    }
+
     /* Render video into output */
     VdpVideoMixerPictureStructure structure = f->structure;
     VdpVideoSurface past[MAX_PAST];
@@ -542,14 +587,24 @@ static picture_t *VideoRender(filter_t *filter, picture_t *src)
     VdpVideoSurface future[MAX_FUTURE];
     VdpRect src_rect = {
         filter->fmt_in.video.i_x_offset, filter->fmt_in.video.i_y_offset,
-        filter->fmt_in.video.i_visible_width + filter->fmt_in.video.i_x_offset,
-        filter->fmt_in.video.i_visible_height + filter->fmt_in.video.i_y_offset
+        filter->fmt_in.video.i_x_offset, filter->fmt_in.video.i_y_offset
     };
-    VdpOutputSurface output = dst->p_sys->surface;
+
+    if (hflip)
+        src_rect.x0 += filter->fmt_in.video.i_visible_width;
+    else
+        src_rect.x1 += filter->fmt_in.video.i_visible_width;
+    if (vflip)
+        src_rect.y0 += filter->fmt_in.video.i_visible_height;
+    else
+        src_rect.y1 += filter->fmt_in.video.i_visible_height;
+
     VdpRect dst_rect = {
         0, 0,
-        filter->fmt_out.video.i_visible_width,
-        filter->fmt_out.video.i_visible_height
+        swap ? filter->fmt_out.video.i_visible_height
+             : filter->fmt_out.video.i_visible_width,
+        swap ? filter->fmt_out.video.i_visible_width
+             : filter->fmt_out.video.i_visible_height,
     };
 
     for (unsigned i = 0; i < MAX_PAST; i++)
@@ -575,6 +630,20 @@ static picture_t *VideoRender(filter_t *filter, picture_t *src)
         dst = NULL;
     }
 
+    if (swap)
+    {
+        err = vdp_output_surface_render_output_surface(sys->vdp,
+            dst->p_sys->surface, NULL, output, NULL, NULL, NULL,
+            VDP_OUTPUT_SURFACE_RENDER_ROTATE_90);
+        vdp_output_surface_destroy(sys->vdp, output);
+        if (err != VDP_STATUS_OK)
+        {
+            msg_Err(filter, "output %s %s failure: %s", "surface", "render",
+                    vdp_get_error_string(sys->vdp, err));
+            goto error;
+        }
+    }
+
 skip:
     f = sys->history[0].field;
     if (f != NULL)
@@ -583,6 +652,10 @@ skip:
             sizeof (sys->history[0]) * (MAX_PAST + MAX_FUTURE));
 
     return dst;
+error:
+    picture_Release(dst);
+    dst = NULL;
+    goto skip;
 }
 
 static picture_t *YCbCrRender(filter_t *filter, picture_t *src)
@@ -604,6 +677,8 @@ static int OutputOpen(vlc_object_t *obj)
     filter_t *filter = (filter_t *)obj;
     if (filter->fmt_out.video.i_chroma != VLC_CODEC_VDPAU_OUTPUT)
         return VLC_EGENERIC;
+
+    assert(filter->fmt_out.video.orientation == ORIENT_TOP_LEFT);
 
     filter_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
