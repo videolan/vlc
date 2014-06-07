@@ -3645,6 +3645,7 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pid_t *pid,
                             const dvbpsi_pmt_es_t *p_es )
 {
     es_format_t *p_fmt = &pid->es->fmt;
+    dvbpsi_descriptor_t *p_subs_dr = PMTEsFindDescriptor( p_es, 0x59 );
 
     if( PMTEsHasRegistration( p_demux, p_es, "AC-3" ) ||
         PMTEsFindDescriptor( p_es, 0x6a ) ||
@@ -3668,8 +3669,10 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pid_t *pid,
         p_fmt->i_cat = AUDIO_ES;
         p_fmt->i_codec = VLC_CODEC_DTS;
     }
-    else if( PMTEsHasRegistration( p_demux, p_es, "BSSD" ) )
+    else if( PMTEsHasRegistration( p_demux, p_es, "BSSD" ) && !p_subs_dr )
     {
+        /* BSSD is AES3 DATA, but could also be subtitles
+         * we need to check for secondary descriptor then s*/
         p_fmt->i_cat = AUDIO_ES;
         p_fmt->b_packetized = true;
         p_fmt->i_codec = VLC_CODEC_302M;
@@ -3682,10 +3685,8 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pid_t *pid,
     else
     {
         /* Subtitle/Teletext/VBI fallbacks */
-        dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_es, 0x59 );
-
         dvbpsi_subtitling_dr_t *p_sub;
-        if( p_dr && ( p_sub = dvbpsi_DecodeSubtitlingDr( p_dr ) ) )
+        if( p_subs_dr && ( p_sub = dvbpsi_DecodeSubtitlingDr( p_subs_dr ) ) )
         {
             for( int i = 0; i < p_sub->i_subtitles_number; i++ )
             {
