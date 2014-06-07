@@ -4061,6 +4061,11 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
             }
             break;
 
+        case 0x88: /* EACEM Simulcast HD Logical channels ordering */
+            msg_Dbg( p_demux, " * descriptor : EACEM Simulcast HD" );
+            /* TODO: apply visibility flags */
+            break;
+
         default:
             msg_Dbg( p_demux, " * descriptor : unknown (0x%x)", p_dr->i_tag );
         }
