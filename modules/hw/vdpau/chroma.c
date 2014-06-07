@@ -428,7 +428,7 @@ static picture_t *VideoPassthrough(filter_t *filter, picture_t *src)
     if (unlikely(field == NULL))
     {
         msg_Err(filter, "corrupt VDPAU video surface");
-        return NULL;
+        goto error;
     }
 
     vlc_vdp_video_frame_t *psys = field->frame;
@@ -447,7 +447,7 @@ static picture_t *VideoPassthrough(filter_t *filter, picture_t *src)
 
         picture_t *pic = picture_NewFromFormat(&fmt);
         if (unlikely(pic == NULL))
-            return NULL;
+            goto error;
 
         pic = VideoExport(filter, src, pic);
         if (pic == NULL)
@@ -456,6 +456,9 @@ static picture_t *VideoPassthrough(filter_t *filter, picture_t *src)
         src = VideoImport(filter, pic);
     }
     return src;
+error:
+    picture_Release(src);
+    return NULL;
 }
 
 static inline VdpVideoSurface picture_GetVideoSurface(const picture_t *pic)
