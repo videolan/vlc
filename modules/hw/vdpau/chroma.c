@@ -197,8 +197,10 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
     {
         msg_Err(filter, "video %s %s failure: %s", "mixer", "creation",
                 vdp_get_error_string(sys->vdp, err));
-        mixer = VDP_INVALID_HANDLE;
+        return VDP_INVALID_HANDLE;
     }
+
+    msg_Dbg(filter, "using video mixer %"PRIu32, mixer);
 
     /* Set initial features and attributes */
     VdpVideoMixerAttribute attrv[3];
@@ -305,7 +307,6 @@ static picture_t *OutputAllocate(filter_t *filter)
         sys->mixer = MixerCreate(filter);
         if (sys->mixer == VDP_INVALID_HANDLE)
             goto error;
-        msg_Dbg(filter, "using video mixer %"PRIu32, sys->mixer);
     }
     return pic;
 error:
