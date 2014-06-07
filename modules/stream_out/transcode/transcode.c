@@ -383,6 +383,12 @@ static int Open( vlc_object_t *p_this )
                  p_sys->f_scale, p_sys->i_vbitrate / 1000 );
     }
 
+    /* Disable hardware decoding by default (unlike normal playback) */
+    psz_string = var_CreateGetString( p_stream, "avcodec-hw" );
+    if( !strcasecmp( "any", psz_string ) )
+        var_SetString( p_stream, "avcodec-hw", "none" );
+    free( psz_string );
+
     /* Subpictures transcoding parameters */
     p_sys->p_spu = NULL;
     p_sys->p_spu_blend = NULL;
