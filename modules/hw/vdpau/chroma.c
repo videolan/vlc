@@ -292,24 +292,21 @@ static picture_t *OutputAllocate(filter_t *filter)
     picture_sys_t *psys = pic->p_sys;
     assert(psys->vdp != NULL);
 
-    if (unlikely(sys->vdp != psys->vdp) && (sys->mixer != VDP_INVALID_HANDLE))
-    {
-        Flush(filter); /* release surfaces from the old device */
-        vdp_video_mixer_destroy(sys->vdp, sys->mixer);
-        vdp_release_x11(sys->vdp);
-        sys->mixer = VDP_INVALID_HANDLE;
+    if (likely(sys->mixer != VDP_INVALID_HANDLE))
+    {   /* Not the first output picture */
+        assert(psys->vdp == sys->vdp);
+        return pic;
     }
 
-    if (unlikely(sys->mixer == VDP_INVALID_HANDLE))
-    {
-        sys->vdp = vdp_hold_x11(psys->vdp, NULL);
-        sys->device = psys->device;
-        sys->mixer = MixerCreate(filter);
-        if (sys->mixer == VDP_INVALID_HANDLE)
-            goto error;
-    }
-    return pic;
-error:
+    /* First picture: get the context and allocate the mixer */
+    sys->vdp = vdp_hold_x11(psys->vdp, NULL);
+    sys->device = psys->device;
+    sys->mixer = MixerCreate(filter);
+    if (sys->mixer != VDP_INVALID_HANDLE)
+        return pic;
+
+    vdp_release_x11(psys->vdp);
+    psys->vdp = NULL;
     picture_Release(pic);
     return NULL;
 }
