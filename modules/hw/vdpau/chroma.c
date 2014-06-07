@@ -42,7 +42,6 @@ struct filter_sys_t
     VdpVideoMixer mixer;
     VdpChromaType chroma;
     VdpYCbCrFormat format;
-    picture_t *(*import)(filter_t *, picture_t *);
 
     struct
     {
@@ -420,21 +419,29 @@ drop:
     return NULL;
 }
 
-static picture_t *VideoPassthrough(filter_t *filter, picture_t *src)
+static inline VdpVideoSurface picture_GetVideoSurface(const picture_t *pic)
+{
+    vlc_vdp_video_field_t *field = pic->context;
+    return field->frame->surface;
+}
+
+static picture_t *VideoRender(filter_t *filter, picture_t *src)
 {
     filter_sys_t *sys = filter->p_sys;
-    vlc_vdp_video_field_t *field = src->context;
+    VdpStatus err;
 
-    if (unlikely(field == NULL))
+    if (unlikely(src->context == NULL))
     {
         msg_Err(filter, "corrupt VDPAU video surface");
-        goto error;
+        picture_Release(src);
+        return NULL;
     }
 
-    vlc_vdp_video_frame_t *psys = field->frame;
+    picture_t *dst = OutputAllocate(filter);
 
     /* Corner case: different VDPAU instances decoding and rendering */
-    if (psys->vdp != sys->vdp)
+    vlc_vdp_video_field_t *field = src->context;
+    if (field->frame->vdp != sys->vdp)
     {
         video_format_t fmt = src->format;
         switch (sys->chroma)
@@ -446,35 +453,21 @@ static picture_t *VideoPassthrough(filter_t *filter, picture_t *src)
         }
 
         picture_t *pic = picture_NewFromFormat(&fmt);
-        if (unlikely(pic == NULL))
-            goto error;
-
-        pic = VideoExport(filter, src, pic);
-        if (pic == NULL)
-            return NULL;
-
-        src = VideoImport(filter, pic);
+        if (likely(pic != NULL))
+        {
+            pic = VideoExport(filter, src, pic);
+            if (pic != NULL)
+                src = VideoImport(filter, pic);
+            else
+                src = NULL;
+        }
+        else
+        {
+            picture_Release(src);
+            src = NULL;
+        }
     }
-    return src;
-error:
-    picture_Release(src);
-    return NULL;
-}
 
-static inline VdpVideoSurface picture_GetVideoSurface(const picture_t *pic)
-{
-    vlc_vdp_video_field_t *field = pic->context;
-    return field->frame->surface;
-}
-
-static picture_t *MixerRender(filter_t *filter, picture_t *src)
-{
-    filter_sys_t *sys = filter->p_sys;
-    VdpStatus err;
-
-    picture_t *dst = OutputAllocate(filter);
-
-    src = sys->import(filter, src);
     /* Update history and take "present" picture field */
     if (likely(src != NULL))
     {
@@ -592,6 +585,20 @@ skip:
     return dst;
 }
 
+static picture_t *YCbCrRender(filter_t *filter, picture_t *src)
+{
+    /* FIXME: Define a way to initialize the mixer in Open() instead. */
+    if (unlikely(filter->p_sys->vdp == NULL))
+    {
+        picture_t *dummy = OutputAllocate(filter);
+        if (dummy != NULL)
+            picture_Release(dummy);
+    }
+
+    src = VideoImport(filter, src);
+    return (src != NULL) ? VideoRender(filter, src) : NULL;
+}
+
 static int OutputOpen(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
@@ -609,7 +616,7 @@ static int OutputOpen(vlc_object_t *obj)
     {
         sys->chroma = VDP_CHROMA_TYPE_444;
         sys->format = VDP_YCBCR_FORMAT_NV12;
-        sys->import = VideoPassthrough;
+        filter->pf_video_filter = VideoRender;
     }
     else
     if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_422)
@@ -617,19 +624,19 @@ static int OutputOpen(vlc_object_t *obj)
         sys->chroma = VDP_CHROMA_TYPE_422;
         /* TODO: check if the drivery supports NV12 or UYVY */
         sys->format = VDP_YCBCR_FORMAT_UYVY;
-        sys->import = VideoPassthrough;
+        filter->pf_video_filter = VideoRender;
     }
     else
     if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_420)
     {
         sys->chroma = VDP_CHROMA_TYPE_420;
         sys->format = VDP_YCBCR_FORMAT_NV12;
-        sys->import = VideoPassthrough;
+        filter->pf_video_filter = VideoRender;
     }
     else
     if (vlc_fourcc_to_vdp_ycc(filter->fmt_in.video.i_chroma,
                               &sys->chroma, &sys->format))
-        sys->import = VideoImport;
+        filter->pf_video_filter = YCbCrRender;
     else
     {
         free(sys);
@@ -651,7 +658,6 @@ static int OutputOpen(vlc_object_t *obj)
     sys->procamp.saturation = 1.f;
     sys->procamp.hue = 0.f;
 
-    filter->pf_video_filter = MixerRender;
     filter->pf_video_flush = Flush;
     filter->p_sys = sys;
     return VLC_SUCCESS;
