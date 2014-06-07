@@ -3292,7 +3292,19 @@ static void PMTSetupEsISO14496( demux_t *p_demux, ts_pid_t *pid,
     }
     if( !pid->es->p_mpeg4desc )
     {
-        msg_Err( p_demux, "MPEG-4 descriptor not found" );
+        switch( p_es->i_type )
+        {
+        /* non fatal, set by packetizer */
+        case 0x0f: /* ADTS */
+        case 0x11: /* LOAS */
+            msg_Info( p_demux, "MPEG-4 descriptor not found for pid 0x%x type 0x%x",
+                      pid->i_pid, p_es->i_type );
+            break;
+        default:
+            msg_Err( p_demux, "MPEG-4 descriptor not found for pid 0x%x type 0x%x",
+                     pid->i_pid, p_es->i_type );
+            break;
+        }
         return;
     }
 
