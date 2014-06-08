@@ -12,15 +12,15 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="2677"/>
-      <integer value="2523"/>
-      <integer value="2440"/>
       <integer value="1530"/>
-      <integer value="2562"/>
-      <integer value="2311"/>
-      <integer value="2330"/>
-      <integer value="3745"/>
       <integer value="2265"/>
+      <integer value="2311"/>
+      <integer value="2440"/>
+      <integer value="2562"/>
+      <integer value="2677"/>
+      <integer value="3745"/>
+      <integer value="2330"/>
+      <integer value="2523"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -7754,6 +7754,14 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
           </object>
           <int key="connectionID">3931</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">interfaceSettingChanged:</string>
+            <reference key="source" ref="150917409"/>
+            <reference key="destination" ref="21180305"/>
+          </object>
+          <int key="connectionID">3933</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -12686,7 +12694,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">3932</int>
+      <int key="maxID">3933</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
