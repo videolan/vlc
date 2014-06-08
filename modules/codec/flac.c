@@ -134,7 +134,7 @@ static void Interleave( int32_t *p_out, const int32_t * const *pp_in,
 
     for( unsigned j = 0; j < i_samples; j++ )
         for( unsigned i = 0; i < i_nb_channels; i++ )
-            p_out[j * i_nb_channels + i] = pp_in[pi_index[i]][j] << shift;
+            p_out[j * i_nb_channels + i] = ((uint32_t)pp_in[pi_index[i]][j]) << shift;
 }
 
 /*****************************************************************************
