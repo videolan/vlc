@@ -538,6 +538,8 @@ modules/gui/macosx/AudioEffects.h
 modules/gui/macosx/AudioEffects.m
 modules/gui/macosx/bookmarks.h
 modules/gui/macosx/bookmarks.m
+modules/gui/macosx/BWQuincyUI.h
+modules/gui/macosx/BWQuincyUI.m
 modules/gui/macosx/controls.h
 modules/gui/macosx/controls.m
 modules/gui/macosx/ControlsBar.h
