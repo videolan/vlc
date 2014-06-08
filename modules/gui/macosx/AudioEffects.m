@@ -719,8 +719,8 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (void)panel:(VLCSelectItemInPopupPanel *)panel returnValue:(NSUInteger)value item:(NSUInteger)item
 {
-    if (value == NSOKButton) {
-        if (!b_genericAudioProfileInInteraction) {
+    if (!b_genericAudioProfileInInteraction) {
+        if (value == NSOKButton) {
             /* remove requested profile from the arrays */
             NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
             NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQValues"]];
@@ -740,28 +740,34 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
             [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQNames"];
             [workArray release];
             [defaults synchronize];
-
-            /* update UI */
-            [self updatePresetSelector];
-        } else {
-            /* remove selected profile from settings */
-            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-            NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"AudioEffectProfiles"]];
-            [workArray removeObjectAtIndex:item];
-            [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"AudioEffectProfiles"];
-            [workArray release];
-            workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"AudioEffectProfileNames"]];
-            [workArray removeObjectAtIndex:item];
-            [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"AudioEffectProfileNames"];
-            [workArray release];
-
-            if (i_old_profile_index >= item)
-                [defaults setInteger:i_old_profile_index - 1 forKey:@"AudioEffectSelectedProfile"];
-
-            /* save defaults */
-            [defaults synchronize];
-            [self resetProfileSelector];
         }
+
+        /* update UI */
+        [self updatePresetSelector];
+    } else {
+
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        if (value != NSOKButton) {
+            [o_profile_pop selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
+            return;
+        }
+
+        /* remove selected profile from settings */
+        NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"AudioEffectProfiles"]];
+        [workArray removeObjectAtIndex:item];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"AudioEffectProfiles"];
+        [workArray release];
+        workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"AudioEffectProfileNames"]];
+        [workArray removeObjectAtIndex:item];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"AudioEffectProfileNames"];
+        [workArray release];
+
+        if (i_old_profile_index >= item)
+            [defaults setInteger:i_old_profile_index - 1 forKey:@"AudioEffectSelectedProfile"];
+
+        /* save defaults */
+        [defaults synchronize];
+        [self resetProfileSelector];
     }
 }
 
