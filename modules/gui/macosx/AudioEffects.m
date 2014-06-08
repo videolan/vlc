@@ -452,9 +452,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
     NSUInteger currentPresetIndex = 0;
     if (currentPreset && [currentPreset length] > 0) {
-        currentPresetIndex = [presets indexOfObjectPassingTest:^(id obj, NSUInteger idx, BOOL *stop) {
-            return [obj isEqualToString:currentPreset];
-        }];
+        currentPresetIndex = [presets indexOfObject:currentPreset];
 
         if (currentPresetIndex == NSNotFound)
             currentPresetIndex = [presets count] - 1;
@@ -662,7 +660,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
     // profile settings
     } else {
-
         if (value != NSOKButton) {
             [o_profile_pop selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
             return;
