@@ -150,6 +150,7 @@ libvlc_audio_output_device_enum( libvlc_media_player_t *mp )
     char **values, **texts;
 
     int n = aout_DevicesList( aout, &values, &texts );
+    vlc_object_release( aout );
     if( n < 0 )
         goto err;
 
