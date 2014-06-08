@@ -12,9 +12,7 @@ libvpx: libvpx-$(VPX_VERSION).tar.bz2 .sum-vpx
 	$(UNPACK)
 	$(APPLY) $(SRC)/vpx/libvpx-no-cross.patch
 	$(APPLY) $(SRC)/vpx/windows.patch
-ifdef HAVE_MACOSX
 	$(APPLY) $(SRC)/vpx/libvpx-mac.patch
-endif
 ifneq ($(which bash),/bin/bash)
 	sed -i.orig \
 		s,^\#!/bin/bash,\#!`which bash`,g \
