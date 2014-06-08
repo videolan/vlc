@@ -471,7 +471,7 @@ static void Interleave( INTERLEAVE_TYPE *p_out, const INTERLEAVE_TYPE **pp_in,
     for( int j = 0; j < i_samples; j++ )
         for( int i = 0; i < i_nb_channels; i++ )
 #ifdef MODULE_NAME_IS_tremor
-            p_out[j * i_nb_channels + pi_chan_table[i]] = pp_in[i][j] << 8;
+            p_out[j * i_nb_channels + pi_chan_table[i]] = ((uint32_t)pp_in[i][j]) << 8;
 #else
             p_out[j * i_nb_channels + pi_chan_table[i]] = pp_in[i][j];
 #endif
