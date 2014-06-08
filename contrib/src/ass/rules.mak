@@ -32,9 +32,8 @@ $(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
 
 libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(UNPACK)
-ifdef HAVE_MACOSX
 	$(APPLY) $(SRC)/ass/ass-macosx.patch
-endif
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 DEPS_ass = freetype2 $(DEPS_freetype2) fribidi
@@ -54,7 +53,6 @@ ASS_CONF += --disable-harfbuzz
 endif
 
 .ass: libass
-	$(UPDATE_AUTOCONFIG)
 	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -O3" ./configure $(HOSTCONF) $(ASS_CONF)
 	cd $< && $(MAKE) install
 	touch $@
