@@ -14,15 +14,10 @@ $(TARBALLS)/libcaca-$(CACA_VERSION).tar.gz:
 
 caca: libcaca-$(CACA_VERSION).tar.gz .sum-caca
 	$(UNPACK)
-ifdef HAVE_MACOSX
-	$(APPLY) $(SRC)/caca/caca-osx-sdkofourchoice.patch
 	$(APPLY) $(SRC)/caca/caca-fix-compilation-llvmgcc.patch
-endif
 	$(APPLY) $(SRC)/caca/caca-llvm-weak-alias.patch
-
-ifdef HAVE_WIN32
+	$(APPLY) $(SRC)/caca/caca-osx-sdkofourchoice.patch
 	$(APPLY) $(SRC)/caca/caca-win32-static.patch
-endif
 	$(MOVE)
 
 CACA_CONF := \
