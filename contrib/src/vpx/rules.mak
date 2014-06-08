@@ -95,5 +95,7 @@ endif
 .vpx: libvpx
 	cd $< && CROSS=$(VPX_CROSS) ./configure --target=$(VPX_TARGET) \
 		$(VPX_CONF) --prefix=$(PREFIX)
+	cd $< && $(MAKE)
+	cd $< && ../../../contrib/src/pkg-static.sh vpx.pc
 	cd $< && $(MAKE) install
 	touch $@
