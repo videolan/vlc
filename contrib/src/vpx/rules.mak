@@ -13,11 +13,6 @@ libvpx: libvpx-$(VPX_VERSION).tar.bz2 .sum-vpx
 	$(APPLY) $(SRC)/vpx/libvpx-no-cross.patch
 	$(APPLY) $(SRC)/vpx/windows.patch
 	$(APPLY) $(SRC)/vpx/libvpx-mac.patch
-ifneq ($(which bash),/bin/bash)
-	sed -i.orig \
-		s,^\#!/bin/bash,\#!`which bash`,g \
-		`grep -Rl ^\#!/bin/bash libvpx-$(VPX_VERSION)`
-endif
 	$(MOVE)
 
 DEPS_vpx =
