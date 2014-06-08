@@ -20,7 +20,6 @@ $(TARBALLS)/zlib-$(ZLIB_VERSION).tar.gz:
 
 zlib: zlib-$(ZLIB_VERSION).tar.gz .sum-zlib
 	$(UNPACK)
-	$(APPLY) $(SRC)/zlib/zlib-wince.patch
 	$(MOVE)
 
 .zlib: zlib

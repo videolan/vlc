@@ -20,9 +20,6 @@ endif
 ifdef HAVE_WIN32
 LIVE_TARGET := mingw
 endif
-ifdef HAVE_WINCE
-LIVE_TARGET := mingw
-endif
 ifdef HAVE_DARWIN_OS
 LIVE_TARGET := macosx
 else
@@ -37,9 +34,6 @@ live555: $(LIVE555_FILE) .sum-live555
 	rm -Rf live
 	$(UNPACK)
 	chmod -R u+w live
-ifdef HAVE_WINCE
-	cd live && sed -e 's/-lws2_32/-lws2/g' -i.orig config.mingw
-endif
 	cd live && sed -e 's%cc%$(CC)%' -e 's%c++%$(CXX)%' -e 's%LIBRARY_LINK =.*ar%LIBRARY_LINK = $(AR)%' -i.orig config.$(LIVE_TARGET)
 	cd live && sed -i.orig -e s/"libtool -s -o"/"ar cr"/g config.macosx*
 	cd live && sed -i.orig \

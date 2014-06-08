@@ -19,9 +19,6 @@ $(TARBALLS)/libogg-$(OGG_VERSION).tar.xz:
 libogg: libogg-$(OGG_VERSION).tar.xz .sum-ogg
 	$(UNPACK)
 	$(APPLY) $(SRC)/ogg/libogg-1.1.patch
-ifdef HAVE_WINCE
-	$(APPLY) $(SRC)/ogg/libogg-wince.patch
-endif
 	$(APPLY) $(SRC)/ogg/libogg-disable-check.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)

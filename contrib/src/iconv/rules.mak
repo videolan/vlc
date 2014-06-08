@@ -21,10 +21,6 @@ iconv: libiconv-$(LIBICONV_VERSION).tar.gz .sum-iconv
 ifdef HAVE_WIN64
 	$(APPLY) $(SRC)/iconv/libiconv-win64.patch
 endif
-ifdef HAVE_WINCE
-	$(APPLY) $(SRC)/iconv/libiconv-wince.patch
-	$(APPLY) $(SRC)/iconv/libiconv-wince-hack.patch
-endif
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/iconv/libiconv-android-ios.patch
 endif
