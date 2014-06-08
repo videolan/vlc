@@ -16,7 +16,6 @@ $(TARBALLS)/libtheora-$(THEORA_VERSION).tar.xz:
 
 libtheora: libtheora-$(THEORA_VERSION).tar.xz .sum-theora
 	$(UNPACK)
-	$(APPLY) $(SRC)/theora/libtheora-includes.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
