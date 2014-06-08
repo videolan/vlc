@@ -236,7 +236,7 @@ static void Interleave( sample_t *restrict p_out, const sample_t *restrict p_in,
         for( unsigned i = 0; i < 256; i++ )
         {
 #ifdef LIBA52_FIXED
-            p_out[i * i_nb_channels + pi_chan_table[j]] = p_in[j * 256 + i] << 4;
+            p_out[i * i_nb_channels + pi_chan_table[j]] = ((uint32_t)p_in[j * 256 + i]) << 4;
 #else
             p_out[i * i_nb_channels + pi_chan_table[j]] = p_in[j * 256 + i];
 #endif
@@ -252,7 +252,7 @@ static void Duplicate( sample_t *restrict p_out, const sample_t *restrict p_in )
     for( unsigned i = 256; i--; )
     {
 #ifdef LIBA52_FIXED
-        sample_t s = *(p_in++) << 4;
+        sample_t s = ((uint32_t)*(p_in++)) << 4;
 #else
         sample_t s = *(p_in++);
 #endif
@@ -272,8 +272,8 @@ static void Exchange( sample_t *restrict p_out, const sample_t *restrict p_in )
     for( unsigned i = 0; i < 256; i++ )
     {
 #ifdef LIBA52_FIXED
-        *p_out++ = *p_first++ << 4;
-        *p_out++ = *p_second++ << 4;
+        *p_out++ = ((uint32_t)*p_first++) << 4;
+        *p_out++ = ((uint32_t)*p_second++) << 4;
 #else
         *p_out++ = *p_first++;
         *p_out++ = *p_second++;
