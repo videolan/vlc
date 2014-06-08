@@ -363,6 +363,7 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     [o_intf_appleremote_ckb setTitle: _NS("Control playback with the Apple Remote")];
     [o_intf_appleremote_sysvol_ckb setTitle: _NS("Control system volume with the Apple Remote")];
     [o_intf_mediakeys_ckb setTitle: _NS("Control playback with media keys")];
+    [o_intf_art_ckb setTitle: _NS("Allow metadata network access")];
     [o_intf_update_ckb setTitle: _NS("Automatically check for updates")];
     [o_intf_last_update_lbl setStringValue: @""];
     [o_intf_enableGrowl_ckb setTitle: _NS("Enable Growl notifications (on playlist item change)")];
