@@ -996,7 +996,7 @@ errmsg:
         goto error;
     }
     msg_Dbg( p_enc, "found encoder %s", psz_namecodec );
-    
+
     p_enc->pf_encode_video = EncodeVideo;
     p_enc->pf_encode_audio = EncodeAudio;
 
