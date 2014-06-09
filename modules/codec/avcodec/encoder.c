@@ -970,7 +970,7 @@ errmsg:
         p_sys->i_buffer_out = av_samples_get_buffer_size(NULL,
                 p_sys->p_context->channels, p_sys->i_frame_size,
                 p_sys->p_context->sample_fmt, DEFAULT_ALIGN);
-        p_sys->p_buffer = malloc( p_sys->i_buffer_out );
+        p_sys->p_buffer = av_malloc( p_sys->i_buffer_out );
         if ( unlikely( p_sys->p_buffer == NULL ) )
         {
             goto error;
@@ -984,7 +984,7 @@ errmsg:
 
         if( p_sys->b_planar )
         {
-            p_sys->p_interleave_buf = malloc( p_sys->i_buffer_out );
+            p_sys->p_interleave_buf = av_malloc( p_sys->i_buffer_out );
             if( unlikely( p_sys->p_interleave_buf == NULL ) )
                 goto error;
         }
@@ -1004,8 +1004,8 @@ errmsg:
     return VLC_SUCCESS;
 error:
     free( p_enc->fmt_out.p_extra );
-    free( p_sys->p_buffer );
-    free( p_sys->p_interleave_buf );
+    av_free( p_sys->p_buffer );
+    av_free( p_sys->p_interleave_buf );
     free( p_sys );
     return VLC_ENOMEM;
 }
@@ -1447,8 +1447,8 @@ void CloseEncoder( vlc_object_t *p_this )
     av_free( p_sys->p_context );
 
 
-    free( p_sys->p_interleave_buf );
-    free( p_sys->p_buffer );
+    av_free( p_sys->p_interleave_buf );
+    av_free( p_sys->p_buffer );
 
     free( p_sys );
 }
