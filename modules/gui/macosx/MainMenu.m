@@ -317,7 +317,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_prefs setTitle: _NS("Preferences...")];
     [o_mi_extensions setTitle: _NS("Extensions")];
     [o_mu_extensions setTitle: _NS("Extensions")];
-    [o_mi_addonManager setTitle: _NS("Addon Manager")];
+    [o_mi_addonManager setTitle: _NS("Addons Manager")];
     [o_mi_add_intf setTitle: _NS("Add Interface")];
     [o_mu_add_intf setTitle: _NS("Add Interface")];
     [o_mi_services setTitle: _NS("Services")];
