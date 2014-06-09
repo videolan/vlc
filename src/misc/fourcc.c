@@ -2044,41 +2044,41 @@ bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
 
 static const struct
 {
-    vlc_fourcc_t             p_fourcc[6];
+    vlc_fourcc_t             p_fourcc[4];
     vlc_chroma_description_t description;
 } p_list_chroma_description[] = {
-    { { VLC_CODEC_I411, 0 },                   PLANAR_8(3, 4, 1) },
-    { { VLC_CODEC_YUV_PLANAR_410, 0 },         PLANAR_8(3, 4, 4) },
-    { { VLC_CODEC_YUV_PLANAR_420, 0 },         PLANAR_8(3, 2, 2) },
-    { { VLC_CODEC_NV12, VLC_CODEC_NV21, 0 },   PLANAR_8(2, 1, 2) },
-    { { VLC_CODEC_YUV_PLANAR_422, 0 },         PLANAR_8(3, 2, 1) },
-    { { VLC_CODEC_NV16, VLC_CODEC_NV61, 0 },   PLANAR_8(2, 1, 1) },
-    { { VLC_CODEC_YUV_PLANAR_440, 0 },         PLANAR_8(3, 1, 2) },
-    { { VLC_CODEC_YUV_PLANAR_444, 0 },         PLANAR_8(3, 1, 1) },
-    { { VLC_CODEC_YUVA, 0 },                   PLANAR_8(4, 1, 1) },
-    { { VLC_CODEC_YUV420A, 0 },                PLANAR_8(4, 2, 2) },
-    { { VLC_CODEC_YUV422A, 0 },                PLANAR_8(4, 2, 1) },
+    { { VLC_CODEC_I411 },                      PLANAR_8(3, 4, 1) },
+    { { VLC_CODEC_YUV_PLANAR_410 },            PLANAR_8(3, 4, 4) },
+    { { VLC_CODEC_YUV_PLANAR_420 },            PLANAR_8(3, 2, 2) },
+    { { VLC_CODEC_NV12, VLC_CODEC_NV21 },      PLANAR_8(2, 1, 2) },
+    { { VLC_CODEC_YUV_PLANAR_422 },            PLANAR_8(3, 2, 1) },
+    { { VLC_CODEC_NV16, VLC_CODEC_NV61 },      PLANAR_8(2, 1, 1) },
+    { { VLC_CODEC_YUV_PLANAR_440 },            PLANAR_8(3, 1, 2) },
+    { { VLC_CODEC_YUV_PLANAR_444 },            PLANAR_8(3, 1, 1) },
+    { { VLC_CODEC_YUVA },                      PLANAR_8(4, 1, 1) },
+    { { VLC_CODEC_YUV420A },                   PLANAR_8(4, 2, 2) },
+    { { VLC_CODEC_YUV422A },                   PLANAR_8(4, 2, 1) },
 
-    { { VLC_CODEC_GBR_PLANAR, 0 },             PLANAR_8(3, 1, 1) },
+    { { VLC_CODEC_GBR_PLANAR },                PLANAR_8(3, 1, 1) },
 
     { { VLC_CODEC_I420_10L,
-        VLC_CODEC_I420_10B, 0 },               PLANAR_16(3, 2, 2, 10) },
+        VLC_CODEC_I420_10B },                  PLANAR_16(3, 2, 2, 10) },
     { { VLC_CODEC_I420_9L,
-        VLC_CODEC_I420_9B, 0 },                PLANAR_16(3, 2, 2,  9) },
+        VLC_CODEC_I420_9B },                   PLANAR_16(3, 2, 2,  9) },
     { { VLC_CODEC_I422_10L,
-        VLC_CODEC_I422_10B, 0 },               PLANAR_16(3, 2, 1, 10) },
+        VLC_CODEC_I422_10B },                  PLANAR_16(3, 2, 1, 10) },
     { { VLC_CODEC_I422_9L,
-        VLC_CODEC_I422_9B, 0 },                PLANAR_16(3, 2, 1,  9) },
+        VLC_CODEC_I422_9B },                   PLANAR_16(3, 2, 1,  9) },
     { { VLC_CODEC_I444_10L,
-        VLC_CODEC_I444_10B, 0 },               PLANAR_16(3, 1, 1, 10) },
+        VLC_CODEC_I444_10B },                  PLANAR_16(3, 1, 1, 10) },
     { { VLC_CODEC_I444_9L,
-        VLC_CODEC_I444_9B, 0 },                PLANAR_16(3, 1, 1,  9) },
+        VLC_CODEC_I444_9B },                   PLANAR_16(3, 1, 1,  9) },
     { { VLC_CODEC_I444_16L,
-        VLC_CODEC_I444_16B, 0 },               PLANAR_16(3, 1, 1, 16) },
+        VLC_CODEC_I444_16B },                  PLANAR_16(3, 1, 1, 16) },
 
-    { { VLC_CODEC_YUV_PACKED, 0 },             PACKED_FMT(2, 16) },
+    { { VLC_CODEC_YUV_PACKED },                PACKED_FMT(2, 16) },
     { { VLC_CODEC_RGB8, VLC_CODEC_GREY,
-        VLC_CODEC_YUVP, VLC_CODEC_RGBP, 0 },   PACKED_FMT(1, 8) },
+        VLC_CODEC_YUVP, VLC_CODEC_RGBP },      PACKED_FMT(1, 8) },
 
     { { VLC_CODEC_RGB15, 0 },                  PACKED_FMT(2, 15) },
     { { VLC_CODEC_RGB12, 0 },                  PACKED_FMT(2, 12) },
@@ -2086,16 +2086,16 @@ static const struct
     { { VLC_CODEC_RGB24, 0 },                  PACKED_FMT(3, 24) },
     { { VLC_CODEC_RGB32, 0 },                  PACKED_FMT(4, 24) },
     { { VLC_CODEC_RGBA, VLC_CODEC_ARGB,
-        VLC_CODEC_BGRA, 0 },                   PACKED_FMT(4, 32) },
+        VLC_CODEC_BGRA, },                     PACKED_FMT(4, 32) },
 
     { { VLC_CODEC_Y211, 0 },                   { 1, { {{1,4}, {1,1}} }, 4, 32 } },
     { { VLC_CODEC_XYZ12,  0 },                 PACKED_FMT(6, 48) },
 
     { { VLC_CODEC_VDPAU_VIDEO_420, VLC_CODEC_VDPAU_VIDEO_422,
-        VLC_CODEC_VDPAU_VIDEO_444,
-        VLC_CODEC_VDPAU_OUTPUT,
-        VLC_CODEC_ANDROID_OPAQUE,
-        VLC_CODEC_MMAL_OPAQUE, 0 },            FAKE_FMT() },
+        VLC_CODEC_VDPAU_VIDEO_444, VLC_CODEC_VDPAU_OUTPUT },
+                                               FAKE_FMT() },
+    { { VLC_CODEC_ANDROID_OPAQUE, VLC_CODEC_MMAL_OPAQUE, },
+                                               FAKE_FMT() },
 
     { { 0 },                                   FAKE_FMT() }
 };
@@ -2110,7 +2110,7 @@ const vlc_chroma_description_t *vlc_fourcc_GetChromaDescription( vlc_fourcc_t i_
     for( unsigned i = 0; p_list_chroma_description[i].p_fourcc[0]; i++ )
     {
         const vlc_fourcc_t *p_fourcc = p_list_chroma_description[i].p_fourcc;
-        for( unsigned j = 0; p_fourcc[j]; j++ )
+        for( unsigned j = 0; j < 4 && p_fourcc[j] != 0; j++ )
         {
             if( p_fourcc[j] == i_fourcc )
                 return &p_list_chroma_description[i].description;
