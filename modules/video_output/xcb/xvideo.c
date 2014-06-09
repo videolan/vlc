@@ -162,14 +162,10 @@ static vlc_fourcc_t ParseFormat (vlc_object_t *obj,
               case 15:
                 if (f->byte_order != ORDER)
                     return 0; /* Mixed endian! */
-                if (f->bpp == 16 && f->depth == 16)
-                    return VLC_CODEC_RGBT;
                 if (f->bpp == 16 && f->depth == 15)
                     return VLC_CODEC_RGB15;
                 break;
               case 12:
-                if (f->bpp == 16 && f->depth == 16)
-                    return VLC_CODEC_RGBA16;
                 if (f->bpp == 16 && f->depth == 12)
                     return VLC_CODEC_RGB12;
                 break;

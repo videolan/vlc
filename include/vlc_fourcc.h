@@ -210,12 +210,8 @@
 #define VLC_CODEC_RGB8            VLC_FOURCC('R','G','B','8')
 /* 12 bits RGB padded to 16 bits */
 #define VLC_CODEC_RGB12           VLC_FOURCC('R','V','1','2')
-/* 16 bits RGBA (12 bits RGB + 4 bits alpha) */
-#define VLC_CODEC_RGBA16          VLC_FOURCC('A','V','1','6')
 /* 15 bits RGB padded to 16 bits */
 #define VLC_CODEC_RGB15           VLC_FOURCC('R','V','1','5')
-/* 16 bits RGBA (15 bits RGB + 1 bit alpha)  */
-#define VLC_CODEC_RGBT            VLC_FOURCC('R','G','B','T')
 /* 16 bits RGB */
 #define VLC_CODEC_RGB16           VLC_FOURCC('R','V','1','6')
 /* 24 bits RGB */
