@@ -108,8 +108,9 @@ typedef struct
     int64_t      i_length_neg;
 
     /* stats */
-    int64_t      i_dts_start;
+    int64_t      i_dts_start; /* applies to current segment only */
     int64_t      i_duration;
+    mtime_t      i_starttime; /* the really first packet */
     bool         b_hasbframes;
 
     /* for later stco fix-up (fast start files) */
@@ -117,7 +118,7 @@ typedef struct
     bool b_stco64;
 
     /* for spu */
-    int64_t i_last_dts;
+    int64_t i_last_dts; /* applies to current segment only */
 
 } mp4_stream_t;
 
@@ -130,8 +131,7 @@ struct sout_mux_sys_t
 
     uint64_t i_mdat_pos;
     uint64_t i_pos;
-
-    int64_t  i_dts_start;
+    mtime_t  i_duration;
 
     int          i_nb_streams;
     mp4_stream_t **pp_streams;
@@ -194,8 +194,7 @@ static int Open(vlc_object_t *p_this)
     p_sys->i_mdat_pos   = 0;
     p_sys->b_mov        = p_mux->psz_mux && !strcmp(p_mux->psz_mux, "mov");
     p_sys->b_3gp        = p_mux->psz_mux && !strcmp(p_mux->psz_mux, "3gp");
-    p_sys->i_dts_start  = 0;
-
+    p_sys->i_duration   = 0;
 
     if (!p_sys->b_mov) {
         /* Now add ftyp header */
@@ -414,7 +413,10 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
         calloc(p_stream->i_entry_max, sizeof(mp4_entry_t));
     p_stream->i_dts_start   = 0;
     p_stream->i_duration    = 0;
+    p_stream->i_starttime   = p_sys->i_duration;
     p_stream->b_hasbframes  = false;
+
+    p_stream->i_last_dts    = 0;
 
     p_input->p_sys          = p_stream;
 
@@ -459,12 +461,19 @@ static int Mux(sout_mux_t *p_mux)
                 p_data = ConvertSUBT(p_data);
         } while (!p_data);
 
+        /* Reset reference dts in case of discontinuity (ex: gather sout) */
+        if ( p_stream->i_entry_count == 0 || p_data->i_flags & BLOCK_FLAG_DISCONTINUITY )
+        {
+            p_stream->i_dts_start = p_data->i_dts;
+            p_stream->i_last_dts = p_data->i_dts;
+            p_stream->i_length_neg = 0;
+        }
+
         if (p_stream->fmt.i_cat != SPU_ES) {
             /* Fix length of the sample */
             if (block_FifoCount(p_input->p_fifo) > 0) {
                 block_t *p_next = block_FifoShow(p_input->p_fifo);
                 int64_t i_diff  = p_next->i_dts - p_data->i_dts;
-
                 if (i_diff < CLOCK_FREQ) /* protection */
                     p_data->i_length = i_diff;
             }
@@ -478,15 +487,6 @@ static int Mux(sout_mux_t *p_mux)
                 p_data->i_length -= i_recover;
                 p_stream->i_length_neg += i_recover;
             }
-        }
-
-        /* Save starting time */
-        if (p_stream->i_entry_count == 0) {
-            p_stream->i_dts_start = p_data->i_dts;
-
-            /* Update global dts_start */
-            if (p_sys->i_dts_start <= 0 || p_stream->i_dts_start < p_sys->i_dts_start)
-                p_sys->i_dts_start = p_stream->i_dts_start;
         }
 
         if (p_stream->fmt.i_cat == SPU_ES && p_stream->i_entry_count > 0) {
@@ -525,15 +525,16 @@ static int Mux(sout_mux_t *p_mux)
         }
 
         /* update */
-        p_stream->i_duration = p_stream->i_last_dts - p_stream->i_dts_start + p_data->i_length;
+        p_stream->i_duration += __MAX( 0, p_data->i_length );
         p_sys->i_pos += p_data->i_buffer;
 
-        /* Save the DTS */
+        /* Save the DTS for SPU */
         p_stream->i_last_dts = p_data->i_dts;
 
         /* write data */
         sout_AccessOutWrite(p_mux->p_access, p_data);
 
+        /* close subtitle with empty frame */
         if (p_stream->fmt.i_cat == SPU_ES) {
             int64_t i_length = p_stream->entry[p_stream->i_entry_count-1].i_length;
 
@@ -567,9 +568,16 @@ static int Mux(sout_mux_t *p_mux)
                 sout_AccessOutWrite(p_mux->p_access, p_data);
             }
 
-            /* Fix duration */
-            p_stream->i_duration = p_stream->i_last_dts - p_stream->i_dts_start;
+            /* Fix duration = current segment starttime + duration within */
+            p_stream->i_duration = p_stream->i_starttime + ( p_stream->i_last_dts - p_stream->i_dts_start );
         }
+    }
+
+    /* Update the global segment/media duration */
+    for ( int i=0; i<p_sys->i_nb_streams; i++ )
+    {
+        if ( p_sys->pp_streams[i]->i_duration > p_sys->i_duration )
+            p_sys->i_duration = p_sys->pp_streams[i]->i_duration;
     }
 
     return(VLC_SUCCESS);
@@ -1657,15 +1665,15 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
         /* *** add /moov/trak/edts and elst */
         bo_t *edts = box_new("edts");
         bo_t *elst = box_full_new("elst", p_sys->b_64_ext ? 1 : 0, 0);
-        if (p_stream->i_dts_start > p_sys->i_dts_start) {
+        if (p_stream->i_starttime > 0) {
             bo_add_32be(elst, 2);
 
             if (p_sys->b_64_ext) {
-                bo_add_64be(elst, (p_stream->i_dts_start-p_sys->i_dts_start) *
+                bo_add_64be(elst, p_stream->i_starttime *
                              i_movie_timescale / CLOCK_FREQ);
                 bo_add_64be(elst, -1);
             } else {
-                bo_add_32be(elst, (p_stream->i_dts_start-p_sys->i_dts_start) *
+                bo_add_32be(elst, p_stream->i_starttime *
                              i_movie_timescale / CLOCK_FREQ);
                 bo_add_32be(elst, -1);
             }
