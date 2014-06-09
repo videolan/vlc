@@ -363,7 +363,6 @@
               <int key="NSvFlags">268</int>
               <string key="NSFrame">{{124, 128}, {32, 32}}</string>
               <reference key="NSSuperview" ref="868374226"/>
-              <reference key="NSNextKeyView"/>
               <string key="NSHuggingPriority">{750, 750}</string>
               <int key="NSpiFlags">28686</int>
               <double key="NSMaxValue">100</double>
@@ -645,7 +644,7 @@ ZQ</bytes>
                     <object class="NSButton" id="308859318">
                       <reference key="NSNextResponder" ref="42699324"/>
                       <int key="NSvFlags">268</int>
-                      <string key="NSFrame">{{12, 6}, {113.328125, 32}}</string>
+                      <string key="NSFrame">{{12, 6}, {131.87109375, 32}}</string>
                       <reference key="NSSuperview" ref="42699324"/>
                       <string key="NSReuseIdentifierKey">_NS:610</string>
                       <bool key="NSEnabled">YES</bool>
@@ -700,7 +699,7 @@ ZQ</bytes>
             <object class="NSButton" id="326462144">
               <reference key="NSNextResponder" ref="868374226"/>
               <int key="NSvFlags">268</int>
-              <string key="NSFrame">{{15, 15}, {243.9453125, 32}}</string>
+              <string key="NSFrame">{{15, 15}, {271, 32}}</string>
               <reference key="NSSuperview" ref="868374226"/>
               <string key="NSReuseIdentifierKey">_NS:610</string>
               <bool key="NSEnabled">YES</bool>
