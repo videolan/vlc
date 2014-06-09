@@ -729,45 +729,37 @@ static void DecodeAdpcmDk3( decoder_t *p_dec, int16_t *p_sample,
 static void DecodeAdpcmEA( decoder_t *p_dec, int16_t *p_sample,
                            uint8_t *p_buffer )
 {
-    static const uint32_t EATable[]=
+    static const int16_t EATable[]=
     {
-        0x00000000, 0x000000F0, 0x000001CC, 0x00000188,
-        0x00000000, 0x00000000, 0xFFFFFF30, 0xFFFFFF24,
-        0x00000000, 0x00000001, 0x00000003, 0x00000004,
-        0x00000007, 0x00000008, 0x0000000A, 0x0000000B,
-        0x00000000, 0xFFFFFFFF, 0xFFFFFFFD, 0xFFFFFFFC
+        0x0000, 0x00F0, 0x01CC, 0x0188, 0x0000, 0x0000, 0xFF30, 0xFF24,
+        0x0000, 0x0001, 0x0003, 0x0004, 0x0007, 0x0008, 0x000A, 0x000B,
+        0x0000, 0xFFFF, 0xFFFD, 0xFFFC,
     };
     decoder_sys_t *p_sys  = p_dec->p_sys;
-    uint8_t *p_end;
-    unsigned i_channels, c;
-    int16_t *prev, *cur;
-    int32_t c1[MAX_CHAN], c2[MAX_CHAN];
-    int8_t d[MAX_CHAN];
+    int_fast32_t c1[MAX_CHAN], c2[MAX_CHAN];
+    int_fast8_t d[MAX_CHAN];
 
-    i_channels = p_dec->fmt_in.audio.i_channels;
-    p_end = &p_buffer[p_sys->i_block];
+    unsigned chans = p_dec->fmt_in.audio.i_channels;
+    const uint8_t *p_end = &p_buffer[p_sys->i_block];
+    int16_t *prev = (int16_t *)p_dec->fmt_in.p_extra;
+    int16_t *cur = prev + chans;
 
-    prev = (int16_t *)p_dec->fmt_in.p_extra;
-    cur = prev + i_channels;
-
-    for (c = 0; c < i_channels; c++)
+    for (unsigned c = 0; c < chans; c++)
     {
-        uint8_t input;
+        uint8_t input = p_buffer[c];
 
-        input = p_buffer[c];
         c1[c] = EATable[input >> 4];
         c2[c] = EATable[(input >> 4) + 4];
         d[c] = (input & 0xf) + 8;
     }
 
-    for( p_buffer += i_channels; p_buffer < p_end ; p_buffer += i_channels)
+    for (p_buffer += chans; p_buffer < p_end; p_buffer += chans)
     {
-        for (c = 0; c < i_channels; c++)
+        for (unsigned c = 0; c < chans; c++)
         {
             int32_t spl;
 
-            spl = (p_buffer[c] >> 4) & 0xf;
-            spl = (spl << 0x1c) >> d[c];
+            spl = ((p_buffer[c] & 0xf0) << 0x18u) >> d[c];
             spl = (spl + cur[c] * c1[c] + prev[c] * c2[c] + 0x80) >> 8;
             CLAMP( spl, -32768, 32767 );
             prev[c] = cur[c];
@@ -776,12 +768,11 @@ static void DecodeAdpcmEA( decoder_t *p_dec, int16_t *p_sample,
             *(p_sample++) = spl;
         }
 
-        for (c = 0; c < i_channels; c++)
+        for (unsigned c = 0; c < chans; c++)
         {
             int32_t spl;
 
-            spl = p_buffer[c] & 0xf;
-            spl = (spl << 0x1c) >> d[c];
+            spl = ((p_buffer[c] & 0x0f) << 0x1cu) >> d[c];
             spl = (spl + cur[c] * c1[c] + prev[c] * c2[c] + 0x80) >> 8;
             CLAMP( spl, -32768, 32767 );
             prev[c] = cur[c];
