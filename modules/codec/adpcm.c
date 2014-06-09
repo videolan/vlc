@@ -755,30 +755,30 @@ static void DecodeAdpcmEA( decoder_t *p_dec, int16_t *p_sample,
 
     for (p_buffer += chans; p_buffer < p_end; p_buffer += chans)
     {
+        union { uint32_t u; int32_t i; } spl;
+
         for (unsigned c = 0; c < chans; c++)
         {
-            int32_t spl;
-
-            spl = ((p_buffer[c] & 0xf0) << 0x18u) >> d[c];
-            spl = (spl + cur[c] * c1[c] + prev[c] * c2[c] + 0x80) >> 8;
-            CLAMP( spl, -32768, 32767 );
+            spl.u = (p_buffer[c] & 0xf0u) << 24u;
+            spl.i >>= d[c];
+            spl.i = (spl.i + cur[c] * c1[c] + prev[c] * c2[c] + 0x80) >> 8;
+            CLAMP(spl.i, -32768, 32767);
             prev[c] = cur[c];
-            cur[c] = spl;
+            cur[c] = spl.i;
 
-            *(p_sample++) = spl;
+            *(p_sample++) = spl.i;
         }
 
         for (unsigned c = 0; c < chans; c++)
         {
-            int32_t spl;
-
-            spl = ((p_buffer[c] & 0x0f) << 0x1cu) >> d[c];
-            spl = (spl + cur[c] * c1[c] + prev[c] * c2[c] + 0x80) >> 8;
-            CLAMP( spl, -32768, 32767 );
+            spl.u = (p_buffer[c] & 0x0fu) << 28u;
+            spl.i >>= d[c];
+            spl.i = (spl.i + cur[c] * c1[c] + prev[c] * c2[c] + 0x80) >> 8;
+            CLAMP(spl.i, -32768, 32767);
             prev[c] = cur[c];
-            cur[c] = spl;
+            cur[c] = spl.i;
 
-            *(p_sample++) = spl;
+            *(p_sample++) = spl.i;
         }
     }
 }
