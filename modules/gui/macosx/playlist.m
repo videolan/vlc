@@ -1537,12 +1537,19 @@
     if (!p_item)
         return;
 
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] initWithDictionary:[defaults objectForKey:@"recentlyPlayedMedia"]];
-
     char *psz_url = decode_URI(input_item_GetURI(p_item));
     NSString *url = [NSString stringWithUTF8String:psz_url ? psz_url : ""];
     free(psz_url);
+
+    if (url.length < 1)
+        return;
+
+    if (![[NSURL URLWithString:url] isFileURL])
+        return;
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] initWithDictionary:[defaults objectForKey:@"recentlyPlayedMedia"]];
+
     vlc_value_t pos;
     var_Get(p_input_thread, "position", &pos);
     float f_current_pos = 100. * pos.f_float;
