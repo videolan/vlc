@@ -1304,7 +1304,7 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
     if( p_pgrm->psz_now_playing )
     {
         input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-            vlc_meta_TypeToLocalizedString(vlc_meta_NowPlaying),
+            vlc_meta_TypeToLocalizedString(vlc_meta_NowPlaying), "%s",
             p_pgrm->psz_now_playing );
     }
     else
