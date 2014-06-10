@@ -1146,7 +1146,7 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Opcionet video"
+msgstr "Porti klientit"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -10991,9 +10991,8 @@ msgid "PNG video encoder"
 msgstr "kodeks video"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Aktivizo mënyrën letër-muri"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11002,9 +11001,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Zgjidh Profil"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11014,9 +11012,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Kodek"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11057,9 +11054,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Ndërfaqja"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11123,9 +11119,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Bitrate maksimale"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11157,9 +11152,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Numrat e segmenteve"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11944,12 +11938,12 @@ msgstr ""
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "Teletekst titrash"
+msgstr "Titra kodeks "
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "Titra "
+msgstr "Teletekst titrash"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -13812,7 +13806,7 @@ msgstr ""
 #: modules/demux/caf.c:53
 #, fuzzy
 msgid "CAF demuxer"
-msgstr "Krijim i tekstit"
+msgstr "Demuxers"
 
 #: modules/demux/cdg.c:43
 msgid "CDG demuxer"
@@ -20684,7 +20678,7 @@ msgstr ""
 #: modules/gui/qt4/menus.cpp:1636
 #, fuzzy
 msgid "&Save To Playlist"
-msgstr "Ruaj luajlistën tek &Dokumenta..."
+msgstr "Shto tek luajlistën"
 
 #: modules/gui/qt4/qt4.cpp:78
 msgid "Show advanced preferences over simple ones"
@@ -21809,7 +21803,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Proporcioni i aspektit në ekran"
+msgstr "Dokument indeksi"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -24350,7 +24344,7 @@ msgstr "Prodhim"
 #: modules/video_filter/croppadd.c:79
 #, fuzzy
 msgid "Video cropping filter"
-msgstr "Filtra audio"
+msgstr "Video X koordinate"
 
 #: modules/video_filter/croppadd.c:96
 msgid "Padd"
@@ -27509,9 +27503,8 @@ msgid "Default caching policy"
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:506
-#, fuzzy
 msgid "Menus language:"
-msgstr "Gjuhë titra"
+msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:507
 msgid "Look and feel"
@@ -28195,41 +28188,6 @@ msgstr ""
 msgid "Streaming Output"
 msgstr "Shpërndarje nxjerrse"
 
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr ""
-#~ "Zgjidh preferencat tuaja të video dhe nxjerrni/konfiguroni atë këtu."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "Këto modula sigurojnë funksione rrjeti tek të gjithë pjesët e VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Këto janë konfigurime të përgjithshme për video/audio/titra kodime moduli."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Ofruesit e dialogut mund të konfigurohen këtu."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "Në këtë seksion ju mund të detyroni sjelljen e titrave demuxer, për "
-#~ "shembull duke vendosur llojin titrave ose emrin e dokumentit."
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg akses"
-
-#~ msgid "Jump to time"
-#~ msgstr "Kërce tek koha"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Media Titra"
-
 #, fuzzy
 #~ msgid "General Input"
 #~ msgstr "Te pergjithshme"
@@ -28564,6 +28522,41 @@ msgstr "Shpërndarje nxjerrse"
 #, fuzzy
 #~ msgid "left"
 #~ msgstr "Nentitujt / Titrat"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr ""
+#~ "Zgjidh preferencat tuaja të video dhe nxjerrni/konfiguroni atë këtu."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "Këto modula sigurojnë funksione rrjeti tek të gjithë pjesët e VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Këto janë konfigurime të përgjithshme për video/audio/titra kodime moduli."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Ofruesit e dialogut mund të konfigurohen këtu."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "Në këtë seksion ju mund të detyroni sjelljen e titrave demuxer, për "
+#~ "shembull duke vendosur llojin titrave ose emrin e dokumentit."
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg akses"
+
+#~ msgid "Jump to time"
+#~ msgstr "Kërce tek koha"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Media Titra"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
