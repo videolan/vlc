@@ -11136,9 +11136,8 @@ msgid "PNG video encoder"
 msgstr "Video dekodér CDG"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Povolit režim obrázku na pozadí"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11147,9 +11146,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Vybrat profil"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11159,9 +11157,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Název kodeku"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11202,9 +11199,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Rozmezí hlídání"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11227,9 +11223,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "Parametry terestriálního příjmu"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11269,9 +11264,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Maximální datový tok"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11303,9 +11297,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Počet segmentů"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11319,9 +11312,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Počet řad ve skládačce"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
