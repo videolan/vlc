@@ -1225,7 +1225,7 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Videooutputmodul"
+msgstr "Klientport"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -4905,7 +4905,7 @@ msgstr "udskriv versionsoplysninger"
 #: src/libvlc-module.c:2690
 #, fuzzy
 msgid "core program"
-msgstr "Programmer"
+msgstr "hovedprogram"
 
 #: src/misc/update.c:473
 #, c-format
@@ -10904,7 +10904,7 @@ msgstr "VLC kunne ikke åbne modulet %s."
 #: modules/codec/avcodec/hwdummy.c:42
 #, fuzzy
 msgid "Dummy video decoder"
-msgstr "Theora-videodekoder"
+msgstr "Attrap-dekoder"
 
 #: modules/codec/avcodec/vaapi.c:62
 #, fuzzy
@@ -11596,9 +11596,8 @@ msgid "PNG video encoder"
 msgstr "PNG-videodekoder"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Aktivér baggrundsbilledtilstand "
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11607,9 +11606,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Profil for indkoder"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11619,9 +11617,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Codec-navn"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11642,9 +11639,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:79
-#, fuzzy
 msgid "Group of Picture Reference Distance"
-msgstr "Navn på den aktuelle instans"
+msgstr ""
 
 #: modules/codec/qsv.c:81
 msgid ""
@@ -11663,9 +11659,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Qt grænseflade"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11688,9 +11683,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "I-kvantiseringsfaktor"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11730,9 +11724,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Maksimal bithastighed"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11764,9 +11757,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Antallet af referencebilleder"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11780,9 +11772,8 @@ msgid "Number of reference frames"
 msgstr "Antallet af referencebilleder"
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Antallet af DWT-operationer"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -12559,7 +12550,7 @@ msgstr "DVB undertekst dekoder"
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "DVB-undertekster"
+msgstr "Tekst-TV-undertekster"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -14216,7 +14207,7 @@ msgstr ""
 msgid "Press pause to continue."
 msgstr ""
 "\n"
-"Tryk RETUR-tasten for at fortsætte...\n"
+"Tast RETUR for at fortsætte...\n"
 
 #: modules/control/rc.c:1191 modules/control/rc.c:1446
 #: modules/control/rc.c:1490
@@ -16333,7 +16324,7 @@ msgstr "Vis indstillinger"
 #: modules/gui/macosx/BWQuincyUI.m:79
 #, fuzzy
 msgid "Hide Details"
-msgstr "Vis indstillinger"
+msgstr "Skjul andre"
 
 #: modules/gui/macosx/BWQuincyUI.m:81
 msgid "Send"
@@ -21704,7 +21695,7 @@ msgstr "Åbn skin..."
 #: modules/hw/vdpau/adjust.c:182
 #, fuzzy
 msgid "VDPAU adjust video filter"
-msgstr "Logo-videofilter"
+msgstr "Rotationsvideofilter"
 
 #: modules/hw/vdpau/avcodec.c:45
 #, fuzzy
@@ -21757,7 +21748,7 @@ msgstr "Indkodningskvalitet"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Lyd-resampling i høj kvalitet"
+msgstr "Kvalitetsniveau"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -22537,7 +22528,7 @@ msgstr ""
 #: modules/mux/ogg.c:47
 #, fuzzy
 msgid "Index interval"
-msgstr "Opdateringsinterval for menu"
+msgstr "Index-fil"
 
 #: modules/mux/ogg.c:48
 msgid ""
@@ -28834,7 +28825,7 @@ msgstr ""
 #: modules/control/win_msg.c:193
 #, fuzzy
 msgid "Windows messages interface"
-msgstr "Qt grænseflade"
+msgstr "Grænseflade til genvejstastehåndtering"
 
 #: modules/gui/macosx/DebugMessageVisualizer.m:93
 msgid "Save this Log..."
@@ -28948,12 +28939,12 @@ msgstr "Retning af spejlingen"
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Standard"
+msgstr "Standard-stream"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
 msgid "Chromaprint stream output"
-msgstr "Filstrømoutput"
+msgstr "Bro stream-uddata"
 
 #: modules/text_renderer/platform_fonts.c:82
 msgid ""
@@ -29007,231 +28998,6 @@ msgstr "Opdateringer til VLC medieafspiller"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Streamuddata"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Vælg dit foretrukne video-output og konfigurér det her."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "Disse moduler giver netværksfunktioner til alle andre dele af VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Dette er generelle indstillinger for indkodningsmoduler til video, lyd og "
-#~ "undertekster."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Indstillinger for vinduesudbydere kan konfigureres her."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "I denne sektion kan du bestemme hvordan undertekst-demuxeren skal "
-#~ "fungere, f.eks. ved at angive underteksternes type eller filnavn."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Intet passende dekodningsmodul"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC understøtter ikke lyd- eller videoformatet \"%4.4s\". Der er desværre "
-#~ "ikke noget, du kan gøre for at rette op på det."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "Yderligere placeringer som VLC skal kigge efter sine moduler. Du kan "
-#~ "tilføje flere placeringer ved at sammensætte dem med \" PATH_SEP \" som "
-#~ "separator"
-
-#~ msgid "Album art policy"
-#~ msgstr "Politik vedr. albumbilleder"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Vælg, hvordan albumbilleder skal hentes."
-
-#~ msgid "Manual download only"
-#~ msgstr "Kun manuel hentning"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Ved afspilning af et spor"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Så snart et spor tilføjes"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Indlæs mediebibliotek"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr ""
-#~ "Slå dette tilvalg til for at indlæse det SQL-baserede mediebibliotek ved "
-#~ "opstart af VLC"
-
-#~ msgid "main program"
-#~ msgstr "hovedprogram"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg-adgang"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "Dit systems AACS-afkodningsbibliotek fungerer ikke. Mangler der nøgler?"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC kunne ikke åbne filen \"%s\". (%m)"
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr ""
-#~ "Angiver om TCP-forbindelsen skal genstartes. Denne bør bruges sammen med "
-#~ "audiobargraph_v (standard er 1)."
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Lydfilter for konvertering af stereo til mono"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr "hvis bitrate=0, bruges denne værdi til konstant kvalitet"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "En positiv værdi aktiverer konstant bitrate-tilstand"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Aktivér tabsfri kodning"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "Tabsfri kodning ignorerer indstillinger for bitrate og kvalitet, og "
-#~ "tillader en perfekt gengivelse af originalen"
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "Rektangulær lineær fase"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "Diagonal lineær fase"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "Afstand mellem \"P\"-billeder"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Antallet af \"P\"-billeder per GOP"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Bredde af bevægelseskompensationsblokke"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Højde af bevægelseskompensationsblokke"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "Blokoverlap (%)"
-
-#~ msgid "Amount that each motion block should be overlapped by its neighbours"
-#~ msgstr "Hvor meget hver bevægelsesblok skal overlappe med sine naboer"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "Total horizontal block length including overlaps"
-#~ msgstr "Samlet vandret bloklængde inklusive overlap"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Total vertical block length including overlaps"
-#~ msgstr "Samlet lodret bloklængde inklusive overlap"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "Bevægelsesvektorpræcision"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "Bevægelsesvektorpræcision i pels."
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "Simpelt ME-søgningsområde x:y"
-
-#~ msgid ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-#~ msgstr ""
-#~ "(Anbefales ikke) Udfør en simpel (ikkehierarkisk blokmatchende "
-#~ "bevægelsesvektorsøgning med søgeområde på +/-x, +/-y"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Aktivér rumlig partitionering"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Dirac-videoindkoder, som bruger biblioteket dirac-research"
-
-#~ msgid "Jump to time"
-#~ msgstr "Spring til tidspunkt"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Åbn nedbrudslog..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Send ikke"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Ingen CrashLog fundet"
-
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "Paus iTunes under VLC-afspilning"
-
-#~ msgid ""
-#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
-#~ "playback will be resumed again if VLC playback is finished."
-#~ msgstr ""
-#~ "Pauser iTunes-afspilning når VLC-afspilning starter. iTunes-afspilning "
-#~ "genoptages når VLC-afspilning afsluttes, hvis dette vælges."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Åbn BDMV-mappe"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Hentning af albumbilleder"
-
-#~ msgid "Output module"
-#~ msgstr "Uddatamodul"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Grafisk equalizer"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Indstil videoforstærkningen automatisk."
-
-#~ msgid "Under the Video"
-#~ msgstr "Under video"
-
-#~ msgid "&Help..."
-#~ msgstr "&Hjælp..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Synkroniser via lydspor"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Hvis du aktivere denne indstilling vil VLC springe frames over eller "
-#~ "duplikere frames for at synkronisere video sporet til lyd sporet"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Tilføj undertekstfil:"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Hentning af albumbilleder:"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -31579,6 +31345,231 @@ msgstr "Streamuddata"
 
 #~ msgid "_Modules..."
 #~ msgstr "_Moduler..."
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Vælg dit foretrukne video-output og konfigurér det her."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "Disse moduler giver netværksfunktioner til alle andre dele af VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Dette er generelle indstillinger for indkodningsmoduler til video, lyd og "
+#~ "undertekster."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Indstillinger for vinduesudbydere kan konfigureres her."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "I denne sektion kan du bestemme hvordan undertekst-demuxeren skal "
+#~ "fungere, f.eks. ved at angive underteksternes type eller filnavn."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Intet passende dekodningsmodul"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC understøtter ikke lyd- eller videoformatet \"%4.4s\". Der er desværre "
+#~ "ikke noget, du kan gøre for at rette op på det."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "Yderligere placeringer som VLC skal kigge efter sine moduler. Du kan "
+#~ "tilføje flere placeringer ved at sammensætte dem med \" PATH_SEP \" som "
+#~ "separator"
+
+#~ msgid "Album art policy"
+#~ msgstr "Politik vedr. albumbilleder"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Vælg, hvordan albumbilleder skal hentes."
+
+#~ msgid "Manual download only"
+#~ msgstr "Kun manuel hentning"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Ved afspilning af et spor"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Så snart et spor tilføjes"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Indlæs mediebibliotek"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr ""
+#~ "Slå dette tilvalg til for at indlæse det SQL-baserede mediebibliotek ved "
+#~ "opstart af VLC"
+
+#~ msgid "main program"
+#~ msgstr "hovedprogram"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg-adgang"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "Dit systems AACS-afkodningsbibliotek fungerer ikke. Mangler der nøgler?"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLC kunne ikke åbne filen \"%s\". (%m)"
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr ""
+#~ "Angiver om TCP-forbindelsen skal genstartes. Denne bør bruges sammen med "
+#~ "audiobargraph_v (standard er 1)."
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Lydfilter for konvertering af stereo til mono"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr "hvis bitrate=0, bruges denne værdi til konstant kvalitet"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "En positiv værdi aktiverer konstant bitrate-tilstand"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Aktivér tabsfri kodning"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "Tabsfri kodning ignorerer indstillinger for bitrate og kvalitet, og "
+#~ "tillader en perfekt gengivelse af originalen"
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "Rektangulær lineær fase"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "Diagonal lineær fase"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Afstand mellem \"P\"-billeder"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Antallet af \"P\"-billeder per GOP"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "Bredde af bevægelseskompensationsblokke"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "Højde af bevægelseskompensationsblokke"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "Blokoverlap (%)"
+
+#~ msgid "Amount that each motion block should be overlapped by its neighbours"
+#~ msgstr "Hvor meget hver bevægelsesblok skal overlappe med sine naboer"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "Total horizontal block length including overlaps"
+#~ msgstr "Samlet vandret bloklængde inklusive overlap"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Total vertical block length including overlaps"
+#~ msgstr "Samlet lodret bloklængde inklusive overlap"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "Bevægelsesvektorpræcision"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "Bevægelsesvektorpræcision i pels."
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "Simpelt ME-søgningsområde x:y"
+
+#~ msgid ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+#~ msgstr ""
+#~ "(Anbefales ikke) Udfør en simpel (ikkehierarkisk blokmatchende "
+#~ "bevægelsesvektorsøgning med søgeområde på +/-x, +/-y"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Aktivér rumlig partitionering"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Dirac-videoindkoder, som bruger biblioteket dirac-research"
+
+#~ msgid "Jump to time"
+#~ msgstr "Spring til tidspunkt"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Åbn nedbrudslog..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Send ikke"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Ingen CrashLog fundet"
+
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "Paus iTunes under VLC-afspilning"
+
+#~ msgid ""
+#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
+#~ "playback will be resumed again if VLC playback is finished."
+#~ msgstr ""
+#~ "Pauser iTunes-afspilning når VLC-afspilning starter. iTunes-afspilning "
+#~ "genoptages når VLC-afspilning afsluttes, hvis dette vælges."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Åbn BDMV-mappe"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Hentning af albumbilleder"
+
+#~ msgid "Output module"
+#~ msgstr "Uddatamodul"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Grafisk equalizer"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Indstil videoforstærkningen automatisk."
+
+#~ msgid "Under the Video"
+#~ msgstr "Under video"
+
+#~ msgid "&Help..."
+#~ msgstr "&Hjælp..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Synkroniser via lydspor"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Hvis du aktivere denne indstilling vil VLC springe frames over eller "
+#~ "duplikere frames for at synkronisere video sporet til lyd sporet"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Tilføj undertekstfil:"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Hentning af albumbilleder:"
 
 #, fuzzy
 #~ msgid "Allows you to reduce the speed of the animation (default 6, max 10)."
