@@ -1228,7 +1228,7 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Videolähtömoduuli"
+msgstr "Asiakasportti"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -3355,14 +3355,10 @@ msgid "HTTP/TLS Certificate Revocation List"
 msgstr "HTTP/TLS-varmenteiden sulkulista (CRL)"
 
 #: src/libvlc-module.c:846
-#, fuzzy
 msgid ""
 "This file contains an optional CRL to prevent remote clients from using "
 "revoked certificates in TLS sessions."
 msgstr ""
-"Tässä määrätty tiedosto sisältää valinnaisen sulkulistan (CRL; Certificate "
-"Revocation List), jolla voidaan estää TLS-istuntojen etäasiakkaita "
-"käyttämästä varmenteita, jotka eivät enää ole voimassa."
 
 #: src/libvlc-module.c:849
 msgid "SOCKS server"
@@ -11767,9 +11763,8 @@ msgid "PNG video encoder"
 msgstr "PNG-videopurkaja"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Käytä taustakuvatilaa "
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11778,9 +11773,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Pakota profiili"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11790,9 +11784,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Koodekin nimi"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11813,9 +11806,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:79
-#, fuzzy
 msgid "Group of Picture Reference Distance"
-msgstr "Nykyisen instanssin nimi"
+msgstr ""
 
 #: modules/codec/qsv.c:81
 msgid ""
@@ -11834,9 +11826,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Vahtiväli (guard interval)"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11849,9 +11840,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:100
-#, fuzzy
 msgid "Rate Control Method"
-msgstr "Nopeuskontrollimetodi"
+msgstr ""
 
 #: modules/codec/qsv.c:102
 msgid ""
@@ -11860,9 +11850,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "I-kvantisointitekijä"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11902,9 +11891,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Enimmäisbittinopeus"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11936,9 +11924,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Pakota viipaleiden määrä ruudussa"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11952,9 +11939,8 @@ msgid "Number of reference frames"
 msgstr "Referenssiruutujen määrä"
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "DWT-iteraatioiden määrä"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -12753,7 +12739,7 @@ msgstr "DVB-tekstityksen purkaja"
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "DVB-tekstitys"
+msgstr "Teksti-TV-tekstitys"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -22366,7 +22352,7 @@ msgstr "Uudelleennäytteistyksen laatu"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Korkealaatuinen äänen uudelleennäytteistys"
+msgstr "Videon jälkikäsittelyn taso (0-6)"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -23211,7 +23197,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Säilytä kuvasuhde"
+msgstr "Indeksitiedosto"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -26115,7 +26101,7 @@ msgstr "RGB-komponentin purkava videosuodin"
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Lomituksen poiston videosuodin"
+msgstr "Palapeli -vuorovaikutteinen videosuodin"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freeze"
@@ -29338,9 +29324,8 @@ msgid "Default caching policy"
 msgstr "Puskuroinnin oletuskäytäntö"
 
 #: modules/gui/qt4/ui/sprefs_interface.h:506
-#, fuzzy
 msgid "Menus language:"
-msgstr "Äänen kieli"
+msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:507
 msgid "Look and feel"
@@ -29741,7 +29726,7 @@ msgstr "Videokaappaus"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLC ei voinut avata pakkauksenpurkumoduulia."
+msgstr "Äänilähtömoduuli"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -29990,7 +29975,7 @@ msgstr "Mihin suuntaan peilataan"
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Oletusarvo"
+msgstr "Oletustietovirta"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -30051,327 +30036,6 @@ msgstr "VLC-mediasoitin - web-käyttöliittymä"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Suoratoistolähtö"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Valitse tästä ensisijainen videolähtö ja määritä sen asetukset."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Nämä moduulit tarjoavat verkkotoiminnallisuuden VLC:n kaikille muille "
-#~ "osille."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Nämä ovat kuvan, äänen ja tekstityksen pakkausmoduulien yleisasetukset."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Täällä voi määritellä valintaikkunatarjoajien asetukset."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "Tässä osiossa voit pakottaa tekstityksen kanavoinnin purkajan "
-#~ "toimintatavan, esimerkiksi asettamalla tekstitysten tyypin tai "
-#~ "tiedostonimen."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Sopivaa pakkauksenpurkumoduulia ei ole"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC ei tue ääni- tai videomuotoa \"%4.4s\". Valitettavasti et voi itse "
-#~ "korjata asiaa."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "Lisäpolku, josta VLC etsii moduuleita. Voit käyttää useita lisäpolkuja "
-#~ "kirjoittamalla listan, erottimena \" PATH_SEP \"."
-
-#~ msgid "Album art policy"
-#~ msgstr "Levyn kansien latauskäytäntö"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Valitse milloin albumien kuvat ladataan verkosta."
-
-#~ msgid "Manual download only"
-#~ msgstr "Vain manuaalinen lataus"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Kun kappaletta aletaan soittaa"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Välittömästi kappaleen lisäämisen jälkeen"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Lataa Mediakirjasto"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr ""
-#~ "Kytke tämä päälle ladataksesi SQL-pohjaisen Mediakirjaston VLC:n "
-#~ "käynnistyessä."
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg-käyttö"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "Järjestelmäsi AACS-purkukirjasto ei jostain syystä toimi. Avaimet "
-#~ "puuttuvat?"
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr ""
-#~ "Määrää, nollataanko TCP-yhteys. Tätä käytetään audiobargraph_v:n kanssa "
-#~ "(oletus 1)."
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Stereosta monoksi muuntava äänisuodin"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr "Jos bittinopeus = 0, käytä tätä arvoa vakiolaadun ylläpitämiseksi"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr ""
-#~ "Jos tämä arvo > 0, käytetään CBR-tilaa (vakiobittinopeus; constant bit "
-#~ "rate)."
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Häviötön pakkaus"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "Häviötön pakkaus ohittaa bittinopeus- ja laatuasetukset, mahdollistaen "
-#~ "alkuperäisen signaalin täydellisen palauttamisen purkuvaiheessa."
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "Suorakaidemainen lineaarivaihe"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "Diagonaalinen lineaarivaihe"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "Etäisyys P-ruutujen välillä"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "P-ruutujen määrä yhdessä kuvaryhmässä (GOP)"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Liikekompensaatioblokkien leveys"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Liikekompensaatioblokkien korkeus"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "Blokkien limittäisyys (%)"
-
-#~ msgid "Amount that each motion block should be overlapped by its neighbours"
-#~ msgstr ""
-#~ "Kuinka paljon jokaisen liikekompensaatioblokin halutaan menevän limittäin "
-#~ "naapureidensa kanssa"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "Total horizontal block length including overlaps"
-#~ msgstr "Blokin vaakapituus yhteensä, mukaanlukien limittäisyydet"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Total vertical block length including overlaps"
-#~ msgstr "Blokin pystypituus yhteensä, mukaanlukien limittäisyydet"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "Liikevektorien tarkkuus"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "Liikevektorien tarkkuus (precision) pel-yksiköissä."
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "Yksinkertainen liiketunnistus x:y"
-
-#~ msgid ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-#~ msgstr ""
-#~ "(Ei suositella) Suorita yksinkertainen (ei-hierarkinen) "
-#~ "blokkivertailuperustainen liikevektorihaku alueessa +/-x, +/-y"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Tilanlohkominen (spatial partitioning)"
-
-#~ msgid "cycles per degree"
-#~ msgstr "Syklejä astetta kohti"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Dirac-videopakkaaja käyttäen dirac-research -kirjastoa"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Videopurkaja käyttäen openmash-kirjastoa"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr "| menu . . [on|off|up|down|left|right|select] käytä DVD-valikkoa"
-
-#~ msgid "Jump to time"
-#~ msgstr "Siirry ajankohtaan"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Avaa kaatumisloki..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Älä lähetä"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC kaatui aiemmin"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Haluatko lähettää tiedot kaatumisesta VLC:n kehittäjille?\n"
-#~ "\n"
-#~ "Jos haluat, voit kirjoittaa muutaman rivin (englanniksi) mitä teit juuri "
-#~ "ennen kuin VLC kaatui, ja mahdollista muuta hyödyllistä tietoa ongelman "
-#~ "toistamiseen: esim. linkki esimerkkitiedostoon, verkkomediavirran "
-#~ "osoite, ..."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr "Minuun saa tarvittaessa ottaa yhteyttä tästä ongelmaraportista."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr "Vain oletussähköpostiosoitteesi lähetetään. Muuta tietoa ei."
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Kaatumislokia ei löydy"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Edellisestä kaatumisesta ei löydy mitään jälkeä."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Avaa BDMV-kansio"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Albumin kansikuvien latauskäytäntö"
-
-#~ msgid "Output module"
-#~ msgstr "Lähtömoduuli"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Graafinen taajuuskorjain"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Asettaa video gain-arvon automaattisesti."
-
-#~ msgid "Under the Video"
-#~ msgstr "Videon alla"
-
-#~ msgid "&Help..."
-#~ msgstr "O&hje..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Synkronoi ääniraitaan"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Tämä pudottaa tai duplikoi videoruutuja synkronoidakseen videoraidan "
-#~ "ääniraitaan."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "Transkooderi pudottaa ruutuja, jos suoritin ei pysy mukana pakkauksen "
-#~ "tahdissa."
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "Äänikanavien tasot"
-
-#~ msgid ""
-#~ "Value of the audio level of each channels between 0 and 1. Each level "
-#~ "should be separated with ':'."
-#~ msgstr ""
-#~ "Jokaisen äänikanavan taso väliltä 0 ja 1. Käytä arvojen erottamiseen ':'-"
-#~ "merkkiä (kaksoispiste)."
-
-#~ msgid "Alarm"
-#~ msgstr "Hälytys"
-
-#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
-#~ msgstr ""
-#~ "Signaloi hiljaisuuden ja näyttää hälytyksen (0 = ei hälytystä, 1 = "
-#~ "hälytys)."
-
-#~ msgid "Spatial luma strength (default 4)"
-#~ msgstr "Avaruudellinen vahvuus kirkkauskomponentissa (oletus 4)"
-
-#~ msgid "Spatial chroma strength (default 3)"
-#~ msgstr "Avaruudellinen vahvuus värikomponenteissa (oletus 3)"
-
-#~ msgid "Temporal luma strength (default 6)"
-#~ msgstr "Ajallinen vahvuus kirkkauskomponentissa (oletus 6)"
-
-#~ msgid "Temporal chroma strength (default 4.5)"
-#~ msgstr "Ajallinen vahvuus värikomponenteissa (oletus 4.5)"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "Tekstiskrollerissa näytettävä teksti. (Muotoilumerkkijonot: Aikaan "
-#~ "liittyvät: %Y = vuosi, )%m = kuukausi, %d = päivä, %H = tunti, %M = "
-#~ "minuutti, %S = sekunti ... Metatietoihin liittyvät: $a = esittäjä, $b = "
-#~ "albumi, $c = tekijänoikeus, $d = kuvaus, $e = pakkaajan nimi, $g = "
-#~ "tyylilaji, $l = kieli, $n = raidan numero, $p = nyt soimassa, $r = "
-#~ "arvosana, $s = tekstityskieli, $t = otsikko, $u = url, $A = päiväys, $B = "
-#~ "äänen bittinopeus (kb/s), $C = luku (chapter), $D = kesto, $F = täysi "
-#~ "nimi tiedostopolkuineen, $I = nimi (title), $L = aikaa jäljellä, $N = "
-#~ "nimi (name), $O = äänen kieli, $P = sijainti (prosentteina), $R = taajuus "
-#~ "(rate), $S = äänen näytteistystaajuus (kHz), $T = aikaa kulunut, $U = "
-#~ "julkaisija, $V = nide (volume), $_ = rivinvaihto)"
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "iOS OpenGL ES -videolähtö (vaatii UIViewin)"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "Mac OS X OpenGL -videolähtö (vaatii drawable-nsobjectin)"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Lisää tekstitystiedosto:"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Albumien kansikuvian latauskäytäntö"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Mediakirjaston asetukst"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -32872,6 +32536,327 @@ msgstr "Suoratoistolähtö"
 
 #~ msgid "Remaining time: %i seconds"
 #~ msgstr "Aikaa jäljellä: %i sekuntia"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Valitse tästä ensisijainen videolähtö ja määritä sen asetukset."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Nämä moduulit tarjoavat verkkotoiminnallisuuden VLC:n kaikille muille "
+#~ "osille."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Nämä ovat kuvan, äänen ja tekstityksen pakkausmoduulien yleisasetukset."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Täällä voi määritellä valintaikkunatarjoajien asetukset."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "Tässä osiossa voit pakottaa tekstityksen kanavoinnin purkajan "
+#~ "toimintatavan, esimerkiksi asettamalla tekstitysten tyypin tai "
+#~ "tiedostonimen."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Sopivaa pakkauksenpurkumoduulia ei ole"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC ei tue ääni- tai videomuotoa \"%4.4s\". Valitettavasti et voi itse "
+#~ "korjata asiaa."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "Lisäpolku, josta VLC etsii moduuleita. Voit käyttää useita lisäpolkuja "
+#~ "kirjoittamalla listan, erottimena \" PATH_SEP \"."
+
+#~ msgid "Album art policy"
+#~ msgstr "Levyn kansien latauskäytäntö"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Valitse milloin albumien kuvat ladataan verkosta."
+
+#~ msgid "Manual download only"
+#~ msgstr "Vain manuaalinen lataus"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Kun kappaletta aletaan soittaa"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Välittömästi kappaleen lisäämisen jälkeen"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Lataa Mediakirjasto"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr ""
+#~ "Kytke tämä päälle ladataksesi SQL-pohjaisen Mediakirjaston VLC:n "
+#~ "käynnistyessä."
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg-käyttö"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "Järjestelmäsi AACS-purkukirjasto ei jostain syystä toimi. Avaimet "
+#~ "puuttuvat?"
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr ""
+#~ "Määrää, nollataanko TCP-yhteys. Tätä käytetään audiobargraph_v:n kanssa "
+#~ "(oletus 1)."
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Stereosta monoksi muuntava äänisuodin"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr "Jos bittinopeus = 0, käytä tätä arvoa vakiolaadun ylläpitämiseksi"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr ""
+#~ "Jos tämä arvo > 0, käytetään CBR-tilaa (vakiobittinopeus; constant bit "
+#~ "rate)."
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Häviötön pakkaus"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "Häviötön pakkaus ohittaa bittinopeus- ja laatuasetukset, mahdollistaen "
+#~ "alkuperäisen signaalin täydellisen palauttamisen purkuvaiheessa."
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "Suorakaidemainen lineaarivaihe"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "Diagonaalinen lineaarivaihe"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Etäisyys P-ruutujen välillä"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "P-ruutujen määrä yhdessä kuvaryhmässä (GOP)"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "Liikekompensaatioblokkien leveys"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "Liikekompensaatioblokkien korkeus"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "Blokkien limittäisyys (%)"
+
+#~ msgid "Amount that each motion block should be overlapped by its neighbours"
+#~ msgstr ""
+#~ "Kuinka paljon jokaisen liikekompensaatioblokin halutaan menevän limittäin "
+#~ "naapureidensa kanssa"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "Total horizontal block length including overlaps"
+#~ msgstr "Blokin vaakapituus yhteensä, mukaanlukien limittäisyydet"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Total vertical block length including overlaps"
+#~ msgstr "Blokin pystypituus yhteensä, mukaanlukien limittäisyydet"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "Liikevektorien tarkkuus"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "Liikevektorien tarkkuus (precision) pel-yksiköissä."
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "Yksinkertainen liiketunnistus x:y"
+
+#~ msgid ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+#~ msgstr ""
+#~ "(Ei suositella) Suorita yksinkertainen (ei-hierarkinen) "
+#~ "blokkivertailuperustainen liikevektorihaku alueessa +/-x, +/-y"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Tilanlohkominen (spatial partitioning)"
+
+#~ msgid "cycles per degree"
+#~ msgstr "Syklejä astetta kohti"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Dirac-videopakkaaja käyttäen dirac-research -kirjastoa"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Videopurkaja käyttäen openmash-kirjastoa"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr "| menu . . [on|off|up|down|left|right|select] käytä DVD-valikkoa"
+
+#~ msgid "Jump to time"
+#~ msgstr "Siirry ajankohtaan"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Avaa kaatumisloki..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Älä lähetä"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC kaatui aiemmin"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Haluatko lähettää tiedot kaatumisesta VLC:n kehittäjille?\n"
+#~ "\n"
+#~ "Jos haluat, voit kirjoittaa muutaman rivin (englanniksi) mitä teit juuri "
+#~ "ennen kuin VLC kaatui, ja mahdollista muuta hyödyllistä tietoa ongelman "
+#~ "toistamiseen: esim. linkki esimerkkitiedostoon, verkkomediavirran "
+#~ "osoite, ..."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr "Minuun saa tarvittaessa ottaa yhteyttä tästä ongelmaraportista."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr "Vain oletussähköpostiosoitteesi lähetetään. Muuta tietoa ei."
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Kaatumislokia ei löydy"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Edellisestä kaatumisesta ei löydy mitään jälkeä."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Avaa BDMV-kansio"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Albumin kansikuvien latauskäytäntö"
+
+#~ msgid "Output module"
+#~ msgstr "Lähtömoduuli"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Graafinen taajuuskorjain"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Asettaa video gain-arvon automaattisesti."
+
+#~ msgid "Under the Video"
+#~ msgstr "Videon alla"
+
+#~ msgid "&Help..."
+#~ msgstr "O&hje..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Synkronoi ääniraitaan"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Tämä pudottaa tai duplikoi videoruutuja synkronoidakseen videoraidan "
+#~ "ääniraitaan."
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "Transkooderi pudottaa ruutuja, jos suoritin ei pysy mukana pakkauksen "
+#~ "tahdissa."
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "Äänikanavien tasot"
+
+#~ msgid ""
+#~ "Value of the audio level of each channels between 0 and 1. Each level "
+#~ "should be separated with ':'."
+#~ msgstr ""
+#~ "Jokaisen äänikanavan taso väliltä 0 ja 1. Käytä arvojen erottamiseen ':'-"
+#~ "merkkiä (kaksoispiste)."
+
+#~ msgid "Alarm"
+#~ msgstr "Hälytys"
+
+#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+#~ msgstr ""
+#~ "Signaloi hiljaisuuden ja näyttää hälytyksen (0 = ei hälytystä, 1 = "
+#~ "hälytys)."
+
+#~ msgid "Spatial luma strength (default 4)"
+#~ msgstr "Avaruudellinen vahvuus kirkkauskomponentissa (oletus 4)"
+
+#~ msgid "Spatial chroma strength (default 3)"
+#~ msgstr "Avaruudellinen vahvuus värikomponenteissa (oletus 3)"
+
+#~ msgid "Temporal luma strength (default 6)"
+#~ msgstr "Ajallinen vahvuus kirkkauskomponentissa (oletus 6)"
+
+#~ msgid "Temporal chroma strength (default 4.5)"
+#~ msgstr "Ajallinen vahvuus värikomponenteissa (oletus 4.5)"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "Tekstiskrollerissa näytettävä teksti. (Muotoilumerkkijonot: Aikaan "
+#~ "liittyvät: %Y = vuosi, )%m = kuukausi, %d = päivä, %H = tunti, %M = "
+#~ "minuutti, %S = sekunti ... Metatietoihin liittyvät: $a = esittäjä, $b = "
+#~ "albumi, $c = tekijänoikeus, $d = kuvaus, $e = pakkaajan nimi, $g = "
+#~ "tyylilaji, $l = kieli, $n = raidan numero, $p = nyt soimassa, $r = "
+#~ "arvosana, $s = tekstityskieli, $t = otsikko, $u = url, $A = päiväys, $B = "
+#~ "äänen bittinopeus (kb/s), $C = luku (chapter), $D = kesto, $F = täysi "
+#~ "nimi tiedostopolkuineen, $I = nimi (title), $L = aikaa jäljellä, $N = "
+#~ "nimi (name), $O = äänen kieli, $P = sijainti (prosentteina), $R = taajuus "
+#~ "(rate), $S = äänen näytteistystaajuus (kHz), $T = aikaa kulunut, $U = "
+#~ "julkaisija, $V = nide (volume), $_ = rivinvaihto)"
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "iOS OpenGL ES -videolähtö (vaatii UIViewin)"
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "Mac OS X OpenGL -videolähtö (vaatii drawable-nsobjectin)"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Lisää tekstitystiedosto:"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Albumien kansikuvian latauskäytäntö"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Mediakirjaston asetukst"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
