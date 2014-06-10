@@ -13,7 +13,7 @@ msgstr ""
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: Mongolian (Mongolia) (http://www.transifex.com/projects/p/vlc-"
 "trans/language/mn_MN/)\n"
-"Language: mn\n"
+"Language: mn_MN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -371,7 +371,7 @@ msgstr "Өргөтгөсөн тохиргоонууд"
 #: include/vlc_input.h:568
 #, fuzzy
 msgid "Subtitle track added"
-msgstr "Бичвэрийн мөр"
+msgstr "Дэд бичвэрийн мөр: %s"
 
 #: include/vlc_interface.h:140
 msgid ""
@@ -10863,9 +10863,8 @@ msgid "PNG video encoder"
 msgstr "Видео кодчилол"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Ханын цаас горим нээлттэй"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -10874,9 +10873,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Шинж"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11026,9 +11024,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Хуулбарын тоо"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11042,9 +11039,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Хуулбарын тоо"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -15546,7 +15542,7 @@ msgstr "Тохиргоо харуулах"
 #: modules/gui/macosx/BWQuincyUI.m:79
 #, fuzzy
 msgid "Hide Details"
-msgstr "Тохиргоо харуулах"
+msgstr "Бусдыг нуух"
 
 #: modules/gui/macosx/BWQuincyUI.m:81
 msgid "Send"
@@ -27396,9 +27392,8 @@ msgid "Default caching policy"
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:506
-#, fuzzy
 msgid "Menus language:"
-msgstr "Дууны хэл"
+msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:507
 msgid "Look and feel"
@@ -28026,7 +28021,7 @@ msgstr ""
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Анхдагч"
+msgstr "Анхдагч урсгал"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -28082,61 +28077,6 @@ msgstr "VLC дамжуулга тоглуулагчийн Тусламж"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Гаргах урсгал"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Илүүд үзсэн видео гаргалтаа сонгоод үүнийг энд тохируул."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Эдгээр модулиуд нь VLC-ийн бүх бусад хэсгүүдэд сүлжээний функцээр "
-#~ "үйлчилнэ."
-
-#~ msgid "Album art policy"
-#~ msgstr "Цомгийн урлангийн бодлого"
-
-#~ msgid "Manual download only"
-#~ msgstr "Зөвхөн гараар татах"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Тоглож эхлэх үед"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Замыг нэмэгдэнгүүт"
-
-#~ msgid "Jump to time"
-#~ msgstr "Очих хугацаа"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Эвдэрсэн тэмдэглэл нээх..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Илгээхгүй"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Цомгийн урлал татах бодлого"
-
-#~ msgid "Output module"
-#~ msgstr "Гаргах модуль"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "График тэгшитгэл"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Файлуудыг автоматаар хэлзүйн задаргаа хийх"
-
-#~ msgid "Under the Video"
-#~ msgstr "Дүрсний доор"
-
-#~ msgid "&Help..."
-#~ msgstr "&Тусламж"
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Дууны зам дээр давхцуулах"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Хэрэглэх дэд бичвэрийн файл"
 
 #~ msgid ""
 #~ "You can choose to disable some CPU accelerations here. Use with extreme "
@@ -28666,6 +28606,61 @@ msgstr "Гаргах урсгал"
 
 #~ msgid "16"
 #~ msgstr "16"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Илүүд үзсэн видео гаргалтаа сонгоод үүнийг энд тохируул."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Эдгээр модулиуд нь VLC-ийн бүх бусад хэсгүүдэд сүлжээний функцээр "
+#~ "үйлчилнэ."
+
+#~ msgid "Album art policy"
+#~ msgstr "Цомгийн урлангийн бодлого"
+
+#~ msgid "Manual download only"
+#~ msgstr "Зөвхөн гараар татах"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Тоглож эхлэх үед"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Замыг нэмэгдэнгүүт"
+
+#~ msgid "Jump to time"
+#~ msgstr "Очих хугацаа"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Эвдэрсэн тэмдэглэл нээх..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Илгээхгүй"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Цомгийн урлал татах бодлого"
+
+#~ msgid "Output module"
+#~ msgstr "Гаргах модуль"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "График тэгшитгэл"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Файлуудыг автоматаар хэлзүйн задаргаа хийх"
+
+#~ msgid "Under the Video"
+#~ msgstr "Дүрсний доор"
+
+#~ msgid "&Help..."
+#~ msgstr "&Тусламж"
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Дууны зам дээр давхцуулах"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Хэрэглэх дэд бичвэрийн файл"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
