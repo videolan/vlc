@@ -1207,7 +1207,7 @@ msgstr "Цільовий кодек субтитрів"
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Модуль виведення відео"
+msgstr "Порт клієнта"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -3297,7 +3297,6 @@ msgid "HTTP/TLS Certificate Revocation List"
 msgstr "Список відкликаних сертифікатів HTTP/TLS"
 
 #: src/libvlc-module.c:846
-#, fuzzy
 msgid ""
 "This file contains an optional CRL to prevent remote clients from using "
 "revoked certificates in TLS sessions."
@@ -12785,7 +12784,7 @@ msgstr "Декодер субтитрів USF"
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "Декодер тексту субтитрів"
+msgstr "Декодер субтитрів DVB"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
@@ -19314,7 +19313,6 @@ msgstr ""
 "комп'ютери можуть звернутися до потоку на mms://yourip:8080."
 
 #: modules/gui/macosx/wizard.m:265
-#, fuzzy
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
 "This protocol is used as transport method by many Microsoft's software. Note "
@@ -22513,7 +22511,7 @@ msgstr "Якість передискретизації"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Високоякісна передискретизація звуку"
+msgstr "Рівень якості постобробки відео"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -23370,7 +23368,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Зберігати співвідношення сторін"
+msgstr "Індексний файл"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -26255,7 +26253,7 @@ msgstr "Фільтр видобування компоненти RGB"
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Відеофільтр деінтерлейсу"
+msgstr "Відеофільтр інтерактивної гри „Пазл“"
 
 #: modules/video_filter/freeze.c:78
 #, fuzzy
@@ -29872,7 +29870,7 @@ msgstr "Захоплення відео"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLC не вдалося відкрити модуль декодера."
+msgstr "Модуль виведення звуку"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -30125,7 +30123,7 @@ msgstr "Напрям віддзеркалення"
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Стандартно"
+msgstr "Типовиий потік"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -30186,397 +30184,6 @@ msgstr "Медіапрогравач VLC — веб-інтерфейс"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Вивід потоку"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Виберіть бажаний модуль виведення відео та налаштуйте його тут."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "Ці модулі надають мережеві функції іншим частинам VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr "Загальні наслаштування модулів кодування відео/звуку/субтитрів."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Можна налаштувати постачальників діалогів."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "Можна примусово встановити демультиплексор субтитрів, наприклад, "
-#~ "установленням типу субтитрів або назви файлу."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Немає відповідного модуля декодера"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC не підтримує формат звуку або відео „%4.4s“. На жаль, виправити це не "
-#~ "можна."
-
-#, fuzzy
-#~ msgid ""
-#~ "This file contains an optional CRL to prevent remove clients from using "
-#~ "revoked certificates in TLS sessions."
-#~ msgstr ""
-#~ "Цей файл містить необов’язковий CRL для запобігання використання "
-#~ "віддаленими клієнтами відкликаних сертифікатів у сесіях TLS."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "Додатковий шлях для пошуку модулів VLC. Можна додати кілька шляхів, "
-#~ "розділяючи їх символом „ PATH_SEP “."
-
-#~ msgid "Album art policy"
-#~ msgstr "Політика обкладинки альбому"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Виберіть спосіб завантаження обкладинки альбому."
-
-#~ msgid "Manual download only"
-#~ msgstr "Завантажувати лише вручну"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Коли доріжка починає відтворюватися"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Як тільки доріжку додано"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Завантажувати медіатеку"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr ""
-#~ "Увімкніть цю опцію для завантаження медіатеки SQL під час відкривання VLC"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "Доступ FFmpeg"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "Системна бібліотека декодування AACS не працює. Імовірно, немає ключів."
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC не вдалося відкрити файл „%s“. (%m)"
-
-#~ msgid "TCP address to use"
-#~ msgstr "TCP адреса для використання"
-
-#~ msgid ""
-#~ "TCP address to use to communicate with the video part of the Bar Graph "
-#~ "(default localhost). In the case of bargraph incrustation, use localhost."
-#~ msgstr ""
-#~ "Адреса TCP для з’єднання із відеочастиною Bar Graph (localhost — "
-#~ "стандартна). У випадку bargraph-накипу, використовуйте localhost."
-
-#~ msgid "TCP port to use"
-#~ msgstr "TCP порт для використання"
-
-#~ msgid ""
-#~ "TCP port to use to communicate with the video part of the Bar Graph "
-#~ "(default 12345). Use the same port as the one used in the rc interface."
-#~ msgstr ""
-#~ "Порт TCP для з’єднання із Bar Graph (12345 — стандартний). Використовуйте "
-#~ "той самий порт, який вказаний у інтерфейсі RC."
-
-#~ msgid "Force connection reset regularly"
-#~ msgstr "Вимушений симетричний перезапуск з’єднання"
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr ""
-#~ "Визначає, чи повинно перериватися з’єднання TCP. Використовується із "
-#~ "модулем гістограма звуку (стандартно: 1)."
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Звуковий фільтр для перетворення стерео на моно"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "Ігнорувати параметри обрізання"
-
-#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
-#~ msgstr ""
-#~ "Ігнорувати внутрішні параметри обрізання відео (наприклад, в H.264 SPS)."
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "Прискорення відео (VA) API"
-
-#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
-#~ msgstr "API декодування відео та презентацій для Unix (VDPAU)"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr ""
-#~ "Якщо бітрейт рівний нулю, використовуйте це значення для постійної якості"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "Значення більше, ніж 0, вмикає режим постійного бітрейту"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Увімкнути режим кодування без втрат"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "Кодування без втрат ігнорує параметри бітрейту та якості, дозволяючи "
-#~ "отримати ідеальне відтворення оригіналу"
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "Прямокутна лінійна фаза"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "Діагональна лінійна фаза"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "Відстань між P-кадрами"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Кількість P-кадрів на одну групу кадрів"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Висота блоків компенсації руху"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Ширина блоків компенсації руху"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "Перекриття блоку (%)"
-
-#~ msgid "Amount that each motion block should be overlapped by its neighbours"
-#~ msgstr ""
-#~ "Значення, наскільки кожен блок руху має перекриватися сусідніми блоками"
-
-#~ msgid "xblen"
-#~ msgstr "Ширина блоків компенсації руху"
-
-#~ msgid "Total horizontal block length including overlaps"
-#~ msgstr "Загальна горизонтальна довжина блоку, включаючи перекриття"
-
-#~ msgid "yblen"
-#~ msgstr "Висота блоків компенсації руху"
-
-#~ msgid "Total vertical block length including overlaps"
-#~ msgstr "Загальна вертикальна довжина блоку, включаючи перекриття"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "Точність вектору руху"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "Точність вектору руху в пікселях."
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "Простий технічний пошук у області x:y"
-
-#~ msgid ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-#~ msgstr ""
-#~ "(Не рекомендується) Здійснювати простий (без ієрархічної відповідності "
-#~ "блоків) пошук векторів руху з пошуковим діапазоном +/-x, +/-y"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Увімкнути просторовий поділ"
-
-#~ msgid "cycles per degree"
-#~ msgstr "циклів на градус"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Відеокодер Dirac, використовуючи бібліотеку dirac-research"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Відеодекодер через openmash"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr ""
-#~ "| menu . . . . . . . . [on|off|up|down|left|right|select] використання "
-#~ "меню"
-
-#~ msgid "Jump to time"
-#~ msgstr "Перейти до часу"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Відкрити журнал збоїв…"
-
-#~ msgid "Don't Send"
-#~ msgstr "Не надсилати"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "Перед цим VLC потерпів аварію"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Хочете надіслати деталі аварії команді розробників VLC?\n"
-#~ "\n"
-#~ "Якщо хочете, введіть кілька рядків про те, що Ви робили перед тим, як VLC "
-#~ "впав, заодно вкажіть іншу корисну інформацію: посилання на файл прикладу, "
-#~ "URL мережевого потоку,…"
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr "Я погоджуюся з тим, що зі мною можуть зв’язатися щодо цього звіту."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "Буде відправлено лише вашу стандартну адресу електронної пошти без "
-#~ "подальшої інформації."
-
-#~ msgid "Don't ask again"
-#~ msgstr "Не запитувати знову"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Журнал збою не знайдено"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Не можу знайти нічого від попереднього збою."
-
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "Призупинити iTunes під час відтворення VLC"
-
-#~ msgid ""
-#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
-#~ "playback will be resumed again if VLC playback is finished."
-#~ msgstr ""
-#~ "Призупиняє відтворення iTunes, коли розпочалося відтворення у VLC. Якщо "
-#~ "вибрано, то відтворення iTunes відновиться знову після завершення "
-#~ "відтворення у VLC."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Відкрити каталог BDMV"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Політика завантаження обкладинок альбому"
-
-#~ msgid "Output module"
-#~ msgstr "Модуль виводу"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Графічний еквалайзер"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Автоматично отримувати медіадані"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Отримати нові розширення з"
-
-#~ msgid "Under the Video"
-#~ msgstr "Під відео"
-
-#~ msgid "&Help..."
-#~ msgstr "Довідка…"
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Синхронізовувати за звуковою доріжкою"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Цей параметр буде видаляти/додавати кадри для синхронізації відео та "
-#~ "звуку."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "Перекодувальник буде пропускати кадри, якщо Ваш ЦП не справляється із "
-#~ "навантаженням."
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "Значення рівнів звукових каналів"
-
-#~ msgid ""
-#~ "Value of the audio level of each channels between 0 and 1. Each level "
-#~ "should be separated with ':'."
-#~ msgstr ""
-#~ "Значення рівня кожного звукового каналу між 0 та 1. Кожний рівень має "
-#~ "бути відділений символом «:»."
-
-#~ msgid "Alarm"
-#~ msgstr "Сповіщення"
-
-#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
-#~ msgstr ""
-#~ "Сигналізує про тишу та відображає сповіщення (0=без сповіщення, "
-#~ "1=сповіщення)."
-
-#~ msgid "Spatial luma strength (default 4)"
-#~ msgstr "Просторова інтенсивність яскравості (стандартно: 4)"
-
-#~ msgid "Spatial chroma strength (default 3)"
-#~ msgstr "Просторова інтенсивність насиченості (стандартно: 3)"
-
-#~ msgid "Temporal luma strength (default 6)"
-#~ msgstr "Часова інтенсивність яскравості (стандартно: 6)"
-
-#~ msgid "Temporal chroma strength (default 4.5)"
-#~ msgstr "Часова інтенсивність насиченості (стандартно: 4,5)"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "Рухомий текст на дисплеї. (Доступні формати рядків: Часове: %Y = рік, %m "
-#~ "= місяць, %d = день, %H = година, %M = хвилина, %S = секунда, … Метадані: "
-#~ "$a = виконавець, $b = альбом, $c = авторське право, $d = опис, $e = "
-#~ "кодовано, $g = жанр, $l = мова, $n = номер доріжки, $p = зараз "
-#~ "відтворюється, $r = рейтинг, $s = мова субтитрів, $t = заголовок, $u = "
-#~ "url, $A = дата, $B = бітрейт звуку (в кб/с), $C = розділ, $D = "
-#~ "тривалість, $F = повне ім’я із шляхом, $I = заголовок, $L = часу "
-#~ "лишилося, $N = ім’я, $O = мова звуку, $P = позиція (у %), $R = швидкість, "
-#~ "$S = частота дискретизації (у кГц), $T = час, $U = видавець, $V = "
-#~ "гучність, $_ = новий рядок) "
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "Відеовивід iOS OpenGL ES (вимагає UIView)"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "Відеовивід Mac OS X OpenGL (вимагає промальовуваний-NSObject)"
-
-#~ msgid "OpenGL acceleration is not supported on your Mac"
-#~ msgstr "Прискорення OpenGL не підтримується на вашому Mac"
-
-#~ msgid ""
-#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
-#~ "output. It will still work, but much slower and with possibly unexpected "
-#~ "results."
-#~ msgstr ""
-#~ "На вашому Mac немає прискорення Quartz Extreme, яке необхідно для "
-#~ "виведення відео. Виведення працюватиме, але набагато повільніше та з "
-#~ "неочікуваними результатами."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Використовувати файл суб&титрів"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Політика завантаження обкладинки альбому:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Конфігурувати медіатеку"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -33157,6 +32764,397 @@ msgstr "Вивід потоку"
 
 #~ msgid "You can choose the default deinterlace mode"
 #~ msgstr "Ви можете обрати режим деінтерлейсу за змовчуванням"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Виберіть бажаний модуль виведення відео та налаштуйте його тут."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "Ці модулі надають мережеві функції іншим частинам VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr "Загальні наслаштування модулів кодування відео/звуку/субтитрів."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Можна налаштувати постачальників діалогів."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "Можна примусово встановити демультиплексор субтитрів, наприклад, "
+#~ "установленням типу субтитрів або назви файлу."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Немає відповідного модуля декодера"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC не підтримує формат звуку або відео „%4.4s“. На жаль, виправити це не "
+#~ "можна."
+
+#, fuzzy
+#~ msgid ""
+#~ "This file contains an optional CRL to prevent remove clients from using "
+#~ "revoked certificates in TLS sessions."
+#~ msgstr ""
+#~ "Цей файл містить необов’язковий CRL для запобігання використання "
+#~ "віддаленими клієнтами відкликаних сертифікатів у сесіях TLS."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "Додатковий шлях для пошуку модулів VLC. Можна додати кілька шляхів, "
+#~ "розділяючи їх символом „ PATH_SEP “."
+
+#~ msgid "Album art policy"
+#~ msgstr "Політика обкладинки альбому"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Виберіть спосіб завантаження обкладинки альбому."
+
+#~ msgid "Manual download only"
+#~ msgstr "Завантажувати лише вручну"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Коли доріжка починає відтворюватися"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Як тільки доріжку додано"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Завантажувати медіатеку"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr ""
+#~ "Увімкніть цю опцію для завантаження медіатеки SQL під час відкривання VLC"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "Доступ FFmpeg"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "Системна бібліотека декодування AACS не працює. Імовірно, немає ключів."
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLC не вдалося відкрити файл „%s“. (%m)"
+
+#~ msgid "TCP address to use"
+#~ msgstr "TCP адреса для використання"
+
+#~ msgid ""
+#~ "TCP address to use to communicate with the video part of the Bar Graph "
+#~ "(default localhost). In the case of bargraph incrustation, use localhost."
+#~ msgstr ""
+#~ "Адреса TCP для з’єднання із відеочастиною Bar Graph (localhost — "
+#~ "стандартна). У випадку bargraph-накипу, використовуйте localhost."
+
+#~ msgid "TCP port to use"
+#~ msgstr "TCP порт для використання"
+
+#~ msgid ""
+#~ "TCP port to use to communicate with the video part of the Bar Graph "
+#~ "(default 12345). Use the same port as the one used in the rc interface."
+#~ msgstr ""
+#~ "Порт TCP для з’єднання із Bar Graph (12345 — стандартний). Використовуйте "
+#~ "той самий порт, який вказаний у інтерфейсі RC."
+
+#~ msgid "Force connection reset regularly"
+#~ msgstr "Вимушений симетричний перезапуск з’єднання"
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr ""
+#~ "Визначає, чи повинно перериватися з’єднання TCP. Використовується із "
+#~ "модулем гістограма звуку (стандартно: 1)."
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Звуковий фільтр для перетворення стерео на моно"
+
+#~ msgid "Discard cropping information"
+#~ msgstr "Ігнорувати параметри обрізання"
+
+#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
+#~ msgstr ""
+#~ "Ігнорувати внутрішні параметри обрізання відео (наприклад, в H.264 SPS)."
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "Прискорення відео (VA) API"
+
+#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
+#~ msgstr "API декодування відео та презентацій для Unix (VDPAU)"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr ""
+#~ "Якщо бітрейт рівний нулю, використовуйте це значення для постійної якості"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "Значення більше, ніж 0, вмикає режим постійного бітрейту"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Увімкнути режим кодування без втрат"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "Кодування без втрат ігнорує параметри бітрейту та якості, дозволяючи "
+#~ "отримати ідеальне відтворення оригіналу"
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "Прямокутна лінійна фаза"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "Діагональна лінійна фаза"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Відстань між P-кадрами"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Кількість P-кадрів на одну групу кадрів"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "Висота блоків компенсації руху"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "Ширина блоків компенсації руху"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "Перекриття блоку (%)"
+
+#~ msgid "Amount that each motion block should be overlapped by its neighbours"
+#~ msgstr ""
+#~ "Значення, наскільки кожен блок руху має перекриватися сусідніми блоками"
+
+#~ msgid "xblen"
+#~ msgstr "Ширина блоків компенсації руху"
+
+#~ msgid "Total horizontal block length including overlaps"
+#~ msgstr "Загальна горизонтальна довжина блоку, включаючи перекриття"
+
+#~ msgid "yblen"
+#~ msgstr "Висота блоків компенсації руху"
+
+#~ msgid "Total vertical block length including overlaps"
+#~ msgstr "Загальна вертикальна довжина блоку, включаючи перекриття"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "Точність вектору руху"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "Точність вектору руху в пікселях."
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "Простий технічний пошук у області x:y"
+
+#~ msgid ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+#~ msgstr ""
+#~ "(Не рекомендується) Здійснювати простий (без ієрархічної відповідності "
+#~ "блоків) пошук векторів руху з пошуковим діапазоном +/-x, +/-y"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Увімкнути просторовий поділ"
+
+#~ msgid "cycles per degree"
+#~ msgstr "циклів на градус"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Відеокодер Dirac, використовуючи бібліотеку dirac-research"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Відеодекодер через openmash"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr ""
+#~ "| menu . . . . . . . . [on|off|up|down|left|right|select] використання "
+#~ "меню"
+
+#~ msgid "Jump to time"
+#~ msgstr "Перейти до часу"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Відкрити журнал збоїв…"
+
+#~ msgid "Don't Send"
+#~ msgstr "Не надсилати"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "Перед цим VLC потерпів аварію"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Хочете надіслати деталі аварії команді розробників VLC?\n"
+#~ "\n"
+#~ "Якщо хочете, введіть кілька рядків про те, що Ви робили перед тим, як VLC "
+#~ "впав, заодно вкажіть іншу корисну інформацію: посилання на файл прикладу, "
+#~ "URL мережевого потоку,…"
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr "Я погоджуюся з тим, що зі мною можуть зв’язатися щодо цього звіту."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "Буде відправлено лише вашу стандартну адресу електронної пошти без "
+#~ "подальшої інформації."
+
+#~ msgid "Don't ask again"
+#~ msgstr "Не запитувати знову"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Журнал збою не знайдено"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Не можу знайти нічого від попереднього збою."
+
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "Призупинити iTunes під час відтворення VLC"
+
+#~ msgid ""
+#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
+#~ "playback will be resumed again if VLC playback is finished."
+#~ msgstr ""
+#~ "Призупиняє відтворення iTunes, коли розпочалося відтворення у VLC. Якщо "
+#~ "вибрано, то відтворення iTunes відновиться знову після завершення "
+#~ "відтворення у VLC."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Відкрити каталог BDMV"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Політика завантаження обкладинок альбому"
+
+#~ msgid "Output module"
+#~ msgstr "Модуль виводу"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Графічний еквалайзер"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Автоматично отримувати медіадані"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "Отримати нові розширення з"
+
+#~ msgid "Under the Video"
+#~ msgstr "Під відео"
+
+#~ msgid "&Help..."
+#~ msgstr "Довідка…"
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Синхронізовувати за звуковою доріжкою"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Цей параметр буде видаляти/додавати кадри для синхронізації відео та "
+#~ "звуку."
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "Перекодувальник буде пропускати кадри, якщо Ваш ЦП не справляється із "
+#~ "навантаженням."
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "Значення рівнів звукових каналів"
+
+#~ msgid ""
+#~ "Value of the audio level of each channels between 0 and 1. Each level "
+#~ "should be separated with ':'."
+#~ msgstr ""
+#~ "Значення рівня кожного звукового каналу між 0 та 1. Кожний рівень має "
+#~ "бути відділений символом «:»."
+
+#~ msgid "Alarm"
+#~ msgstr "Сповіщення"
+
+#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+#~ msgstr ""
+#~ "Сигналізує про тишу та відображає сповіщення (0=без сповіщення, "
+#~ "1=сповіщення)."
+
+#~ msgid "Spatial luma strength (default 4)"
+#~ msgstr "Просторова інтенсивність яскравості (стандартно: 4)"
+
+#~ msgid "Spatial chroma strength (default 3)"
+#~ msgstr "Просторова інтенсивність насиченості (стандартно: 3)"
+
+#~ msgid "Temporal luma strength (default 6)"
+#~ msgstr "Часова інтенсивність яскравості (стандартно: 6)"
+
+#~ msgid "Temporal chroma strength (default 4.5)"
+#~ msgstr "Часова інтенсивність насиченості (стандартно: 4,5)"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "Рухомий текст на дисплеї. (Доступні формати рядків: Часове: %Y = рік, %m "
+#~ "= місяць, %d = день, %H = година, %M = хвилина, %S = секунда, … Метадані: "
+#~ "$a = виконавець, $b = альбом, $c = авторське право, $d = опис, $e = "
+#~ "кодовано, $g = жанр, $l = мова, $n = номер доріжки, $p = зараз "
+#~ "відтворюється, $r = рейтинг, $s = мова субтитрів, $t = заголовок, $u = "
+#~ "url, $A = дата, $B = бітрейт звуку (в кб/с), $C = розділ, $D = "
+#~ "тривалість, $F = повне ім’я із шляхом, $I = заголовок, $L = часу "
+#~ "лишилося, $N = ім’я, $O = мова звуку, $P = позиція (у %), $R = швидкість, "
+#~ "$S = частота дискретизації (у кГц), $T = час, $U = видавець, $V = "
+#~ "гучність, $_ = новий рядок) "
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "Відеовивід iOS OpenGL ES (вимагає UIView)"
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "Відеовивід Mac OS X OpenGL (вимагає промальовуваний-NSObject)"
+
+#~ msgid "OpenGL acceleration is not supported on your Mac"
+#~ msgstr "Прискорення OpenGL не підтримується на вашому Mac"
+
+#~ msgid ""
+#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
+#~ "output. It will still work, but much slower and with possibly unexpected "
+#~ "results."
+#~ msgstr ""
+#~ "На вашому Mac немає прискорення Quartz Extreme, яке необхідно для "
+#~ "виведення відео. Виведення працюватиме, але набагато повільніше та з "
+#~ "неочікуваними результатами."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Використовувати файл суб&титрів"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Політика завантаження обкладинки альбому:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Конфігурувати медіатеку"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
