@@ -1208,7 +1208,7 @@ msgstr "Paskirties vaizdo kodavimas"
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Vaizdo išvesties modulis"
+msgstr "Kliento prievadas"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -1472,7 +1472,7 @@ msgstr ""
 #: src/input/meta.c:76
 #, fuzzy
 msgid "Show Name"
-msgstr "Rikiuoti mazgą pagal pavadinimą"
+msgstr "Rodyti pagrindines"
 
 #: src/input/meta.c:77
 #, fuzzy
@@ -11362,9 +11362,8 @@ msgid "PNG video encoder"
 msgstr "PNG vaizdo iškodavimas"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Įgalinti darbastalio fono veikseną"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11373,9 +11372,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Profilis"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11385,9 +11383,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Kodavimo priemonės pavadinimas"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11428,9 +11425,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "PCR intervalas (ms)"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11494,9 +11490,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Didžiausias bitų dažnis"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11528,9 +11523,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Garso kanalų skaičius "
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11544,9 +11538,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Dėlionės eilučių skaičius"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -12316,7 +12309,7 @@ msgstr "USF subtitrų iškodavimas"
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "Teleteksto subtitrų iškodavimas"
+msgstr "DVB subtitrų iškodavimas"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
@@ -21599,7 +21592,7 @@ msgstr "Įkodavimo kokybė"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Aukštos kokybės garsas"
+msgstr "Vaizdo kokybės galutinio apdorojimo lygis"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -22381,7 +22374,7 @@ msgstr "Daugialypis JPEG tankintuvas"
 #: modules/mux/ogg.c:47
 #, fuzzy
 msgid "Index interval"
-msgstr "Memiu atnaujinimo intervalas"
+msgstr "Indekso failas"
 
 #: modules/mux/ogg.c:48
 msgid ""
@@ -22391,7 +22384,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Išlaikyti santykį"
+msgstr "Indekso failas"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -25123,7 +25116,7 @@ msgstr "RGB komponentės išskyrimo vaizdo filtras"
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Perėjimą šalinantis vaizdo filtras"
+msgstr "Interaktyvaus dėlionės žaidimo vaizdo filtras"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freeze"
@@ -28603,7 +28596,7 @@ msgstr "Vaizdo įrašymas"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLC negali atverti iškodavimo modulio."
+msgstr "Garso išvesties modulis"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -28847,7 +28840,7 @@ msgstr ""
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Numatytasis"
+msgstr "Numatytasis srautas"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -28908,182 +28901,6 @@ msgstr "VLC leistuvė - saityno sąsaja"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Srauto išvestis"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Pasirinkite pageidaujamą vaizdo išvestį ir ją suderinkite čia."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "Šie moduliai įgalina tinklo funkcijas kitoms VLC dalims."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Dialogo tiekėjai gali būti konfigūruojami čia."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Nėra tinkamo iškodavimo modulio"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "Garso ar vaizdo formato „%4.4s“ VLC programa nepalaiko. Deja, negalime "
-#~ "pasiūlyti, kaip išspręsti šią problemą."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "Papildomas kelias, kuriame VLC ieškos savo modulių. Galite pridėti keletą "
-#~ "kelių, tarpusavyje atskirtų „ PATH_SEP “ įrašu."
-
-#~ msgid "Album art policy"
-#~ msgstr "Albumų viršelių atsiuntimas"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Pasirinkite, kaip albumų viršeliai bus atsiunčiami."
-
-#~ msgid "Manual download only"
-#~ msgstr "Tik rankiniu būdu"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Takelio grojimo metu"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Kaip galima greičiau po takelio įkėlimo"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Įkelti fonoteką"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg prieiga"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC negali atverti „%s“ failo. (%m)"
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Stereofoninį garsą į monofoninį konvertuojantis filtras"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Įgalinti kodavimą be praradimų"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "Atstumas tarp „P“ kadrų"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Vaizdo iškodavimas naudoja openmash"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr "| menu [on|off|up|down|left|right|select] naudot meniu"
-
-#~ msgid "Jump to time"
-#~ msgstr "Šokti į laiką"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Atverti lūžimo žurnalą..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Nesiųsti"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "Praėjusį kartą VLC nulūžo"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Ar norėtumėte nusiųsti programos užstrigimo informaciją VLC kūrėjų "
-#~ "komandai?\n"
-#~ "\n"
-#~ "Jei norite, galite trumpai aprašyti tai, ką darėte prieš nulūžtant VLC, "
-#~ "taip pat ir kitą naudingą informaciją: nuorodą failo pavyzdžio "
-#~ "atsisiuntimui, tinklo srauto URL ir pan."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr "Aš sutinku su galimybe susisiekti dėl šio pranešimo apie klaidą."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "Bus įdėtas tik jūsų el.p. adresas, neįtraukiant daugiau jokios kitos "
-#~ "informacijos."
-
-#~ msgid "Don't ask again"
-#~ msgstr "Nebeklausti"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Nerasta jokio pranešimo apie nulūžimą"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Nepavyko aptikti jokio paskutinio nulūžimo pėdsako."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Atverti BDMV aplanką"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Viršelių atsiuntimas"
-
-#~ msgid "Output module"
-#~ msgstr "Išvesties moduliai"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Grafinis glodintuvas"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Automatiškai peržiūrėti failus"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Parsisiųsti daugiau plėtinių iš"
-
-#~ msgid "Under the Video"
-#~ msgstr "Po vaizdu"
-
-#~ msgid "&Help..."
-#~ msgstr "&Žinynas"
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Sinchronizuoti garso takelius"
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "Garso kanalų lygių reikšmė"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "Žymi rodomą tekstą. (Galimi kodo formatai: laiko: %Y = metai, %m = mėnuo, "
-#~ "%d = diena, %H = valanda, %M = minutė, %S = sekundė, ... Meta duomenys: "
-#~ "$a = atlikėjas, $b = albumas, $c = autorinės teisės, $d = aprašymas, $e = "
-#~ "įkodavusysis, $g = stilius, $l = kalba, $n = takelio numeris, $p = dabar "
-#~ "grojama, $r = įvertinimas, $s = subtitrų kalba, $t = pavadinimas, $u = "
-#~ "url, $A = data, $B = garso bitų dažnis (kb/s), $C = skyrius, $D = trukmė, "
-#~ "$F = pilnas rinkmenos pavadinimas su keliu, $I = pavadinimas, $L = likęs "
-#~ "laikas, $N = pavadinimas, $O = garso takelio kalba, $P = padėtis (%), $R "
-#~ "= dažnis, $S = garso elementų dažnis (kHz), $T = laikas, $U = paruošė, $V "
-#~ "= dalis, $_ = nauja linija) "
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Naudoti &titrų failą"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Viršelių parsiuntimo veiksena:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Konfigūruoti fonoteką"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -30884,6 +30701,182 @@ msgstr "Srauto išvestis"
 
 #~ msgid "You can choose the default deinterlace mode"
 #~ msgstr "Galite pasirinkti numatytąją perėjimo šalinimo veikseną"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Pasirinkite pageidaujamą vaizdo išvestį ir ją suderinkite čia."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "Šie moduliai įgalina tinklo funkcijas kitoms VLC dalims."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Dialogo tiekėjai gali būti konfigūruojami čia."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Nėra tinkamo iškodavimo modulio"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "Garso ar vaizdo formato „%4.4s“ VLC programa nepalaiko. Deja, negalime "
+#~ "pasiūlyti, kaip išspręsti šią problemą."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "Papildomas kelias, kuriame VLC ieškos savo modulių. Galite pridėti keletą "
+#~ "kelių, tarpusavyje atskirtų „ PATH_SEP “ įrašu."
+
+#~ msgid "Album art policy"
+#~ msgstr "Albumų viršelių atsiuntimas"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Pasirinkite, kaip albumų viršeliai bus atsiunčiami."
+
+#~ msgid "Manual download only"
+#~ msgstr "Tik rankiniu būdu"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Takelio grojimo metu"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Kaip galima greičiau po takelio įkėlimo"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Įkelti fonoteką"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg prieiga"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLC negali atverti „%s“ failo. (%m)"
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Stereofoninį garsą į monofoninį konvertuojantis filtras"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Įgalinti kodavimą be praradimų"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Atstumas tarp „P“ kadrų"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Vaizdo iškodavimas naudoja openmash"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr "| menu [on|off|up|down|left|right|select] naudot meniu"
+
+#~ msgid "Jump to time"
+#~ msgstr "Šokti į laiką"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Atverti lūžimo žurnalą..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Nesiųsti"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "Praėjusį kartą VLC nulūžo"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Ar norėtumėte nusiųsti programos užstrigimo informaciją VLC kūrėjų "
+#~ "komandai?\n"
+#~ "\n"
+#~ "Jei norite, galite trumpai aprašyti tai, ką darėte prieš nulūžtant VLC, "
+#~ "taip pat ir kitą naudingą informaciją: nuorodą failo pavyzdžio "
+#~ "atsisiuntimui, tinklo srauto URL ir pan."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr "Aš sutinku su galimybe susisiekti dėl šio pranešimo apie klaidą."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "Bus įdėtas tik jūsų el.p. adresas, neįtraukiant daugiau jokios kitos "
+#~ "informacijos."
+
+#~ msgid "Don't ask again"
+#~ msgstr "Nebeklausti"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Nerasta jokio pranešimo apie nulūžimą"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Nepavyko aptikti jokio paskutinio nulūžimo pėdsako."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Atverti BDMV aplanką"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Viršelių atsiuntimas"
+
+#~ msgid "Output module"
+#~ msgstr "Išvesties moduliai"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Grafinis glodintuvas"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Automatiškai peržiūrėti failus"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "Parsisiųsti daugiau plėtinių iš"
+
+#~ msgid "Under the Video"
+#~ msgstr "Po vaizdu"
+
+#~ msgid "&Help..."
+#~ msgstr "&Žinynas"
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Sinchronizuoti garso takelius"
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "Garso kanalų lygių reikšmė"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "Žymi rodomą tekstą. (Galimi kodo formatai: laiko: %Y = metai, %m = mėnuo, "
+#~ "%d = diena, %H = valanda, %M = minutė, %S = sekundė, ... Meta duomenys: "
+#~ "$a = atlikėjas, $b = albumas, $c = autorinės teisės, $d = aprašymas, $e = "
+#~ "įkodavusysis, $g = stilius, $l = kalba, $n = takelio numeris, $p = dabar "
+#~ "grojama, $r = įvertinimas, $s = subtitrų kalba, $t = pavadinimas, $u = "
+#~ "url, $A = data, $B = garso bitų dažnis (kb/s), $C = skyrius, $D = trukmė, "
+#~ "$F = pilnas rinkmenos pavadinimas su keliu, $I = pavadinimas, $L = likęs "
+#~ "laikas, $N = pavadinimas, $O = garso takelio kalba, $P = padėtis (%), $R "
+#~ "= dažnis, $S = garso elementų dažnis (kHz), $T = laikas, $U = paruošė, $V "
+#~ "= dalis, $_ = nauja linija) "
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Naudoti &titrų failą"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Viršelių parsiuntimo veiksena:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Konfigūruoti fonoteką"
 
 #, fuzzy
 #~ msgid ""
