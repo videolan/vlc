@@ -10948,9 +10948,8 @@ msgid "PNG video encoder"
 msgstr "CDG myndmerkisafkóðari"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Virkja veggfóðursham"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -10959,9 +10958,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Veldu snið"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -10971,9 +10969,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Heiti kóðunarlykils"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11014,9 +11011,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Merkjabil (guard interval)"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11039,9 +11035,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "Viðföng afkóðunar"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11081,9 +11076,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Hámarks bitahraði"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11115,9 +11109,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Fjöldi búta"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11131,9 +11124,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Fjöldi púslraða"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -20976,7 +20968,7 @@ msgstr "Opna skinn ..."
 #: modules/hw/vdpau/adjust.c:182
 #, fuzzy
 msgid "VDPAU adjust video filter"
-msgstr "Hljóðsíur"
+msgstr "Myndsía"
 
 #: modules/hw/vdpau/avcodec.c:45
 #, fuzzy
@@ -21032,7 +21024,7 @@ msgstr "Gæði eftirmeðhöndlunar á myndmerki"
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
 msgid "VDPAU deinterlacing filter"
-msgstr "Afflétta myndmerki"
+msgstr "Affléttun"
 
 #: modules/hw/vdpau/display.c:46
 #, fuzzy
@@ -21042,7 +21034,7 @@ msgstr "YUV úttak"
 #: modules/hw/vdpau/sharpen.c:141
 #, fuzzy
 msgid "VDPAU sharpen video filter"
-msgstr "Hljóðsíur"
+msgstr "Hugvíkkandi myndbandasía"
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -24489,7 +24481,7 @@ msgstr ""
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Afflétta myndmerki"
+msgstr "Aðlaga stærð viðmóts að stærð myndar"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freeze"
@@ -25024,7 +25016,7 @@ msgstr ""
 #: modules/video_filter/oldmovie.c:185
 #, fuzzy
 msgid "Old movie effect video filter"
-msgstr "Afflétta myndmerki"
+msgstr "Hugvíkkandi myndbandasía"
 
 #: modules/video_filter/oldmovie.c:186
 msgid "Old movie"
@@ -25701,7 +25693,7 @@ msgstr ""
 #: modules/video_filter/vhs.c:108
 #, fuzzy
 msgid "VHS movie effect video filter"
-msgstr "Afflétta myndmerki"
+msgstr "Hugvíkkandi myndbandasía"
 
 #: modules/video_filter/vhs.c:109
 msgid "VHS movie"
@@ -28207,105 +28199,6 @@ msgstr "VLC margmiðlunarspilarinn - Vefviðmót"
 msgid "Streaming Output"
 msgstr "Straumúttak"
 
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Veldu hvaða myndúttak þú óskar þér og stillingar fyrir það hér."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "Þessar einingar sjá um netvirkni allra annarra hluta VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Þetta eru almennar stillingar fyrir kóðunareiningar myndmerkis/hljóðs/"
-#~ "skjátexta."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Engin hentug afkóðunareining"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC styður ekki hljóð- eða myndmerkissniðið \"%4.4s\". Því miður er engin "
-#~ "leið til að laga þetta."
-
-#~ msgid "Manual download only"
-#~ msgstr "Aðeins hlaða niður handvirkt"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Þegar lag byrjar að spila"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Um leið og lagi er bætt við"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Hlaða inn miðlasafni"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg aðgangur"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Virkja taplausa kóðun"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "Lengd milli 'P' ramma"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Fjöldi 'P' ramma á GOP"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Jump to time"
-#~ msgstr "Hoppa að Tíma"
-
-#~ msgid "Don't Send"
-#~ msgstr "Ekki Senda"
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Opna BDMV möppu"
-
-#~ msgid "Output module"
-#~ msgstr "Úttakseining"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Grafískur tónjafnari"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Nota sjálfvirka styrkaukningu myndmerkis."
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Ná í fleiri viðbætur frá"
-
-#~ msgid "Under the Video"
-#~ msgstr "Undir myndskeiði"
-
-#~ msgid "&Help..."
-#~ msgstr "&Hjálp..."
-
-#~ msgid "Alarm"
-#~ msgstr "Áminning"
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "iOS OpenGL ES myndmerkisúttak (krefst UIView)"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Nota skjá&textaskrá"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Regla fyrir niðurhölun á umslagamyndum:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Stilla miðlasafn"
-
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
 #~ "multicast UDP or RTP."
@@ -28852,6 +28745,105 @@ msgstr "Straumúttak"
 
 #~ msgid "iSight Capture Input"
 #~ msgstr "iSight Upptökuinntak"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Veldu hvaða myndúttak þú óskar þér og stillingar fyrir það hér."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "Þessar einingar sjá um netvirkni allra annarra hluta VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Þetta eru almennar stillingar fyrir kóðunareiningar myndmerkis/hljóðs/"
+#~ "skjátexta."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Engin hentug afkóðunareining"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC styður ekki hljóð- eða myndmerkissniðið \"%4.4s\". Því miður er engin "
+#~ "leið til að laga þetta."
+
+#~ msgid "Manual download only"
+#~ msgstr "Aðeins hlaða niður handvirkt"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Þegar lag byrjar að spila"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Um leið og lagi er bætt við"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Hlaða inn miðlasafni"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg aðgangur"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Virkja taplausa kóðun"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Lengd milli 'P' ramma"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Fjöldi 'P' ramma á GOP"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Jump to time"
+#~ msgstr "Hoppa að Tíma"
+
+#~ msgid "Don't Send"
+#~ msgstr "Ekki Senda"
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Opna BDMV möppu"
+
+#~ msgid "Output module"
+#~ msgstr "Úttakseining"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Grafískur tónjafnari"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Nota sjálfvirka styrkaukningu myndmerkis."
+
+#~ msgid "Get more extensions from"
+#~ msgstr "Ná í fleiri viðbætur frá"
+
+#~ msgid "Under the Video"
+#~ msgstr "Undir myndskeiði"
+
+#~ msgid "&Help..."
+#~ msgstr "&Hjálp..."
+
+#~ msgid "Alarm"
+#~ msgstr "Áminning"
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "iOS OpenGL ES myndmerkisúttak (krefst UIView)"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Nota skjá&textaskrá"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Regla fyrir niðurhölun á umslagamyndum:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Stilla miðlasafn"
 
 #, fuzzy
 #~ msgid "Greek, Modern ()"
