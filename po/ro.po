@@ -1224,7 +1224,7 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Modul de ieșire video"
+msgstr "Port client"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -11829,9 +11829,8 @@ msgid "PNG video encoder"
 msgstr "Decodor video PNG"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Activează modul tapet"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11840,9 +11839,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Profil Codor"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11852,9 +11850,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Nume codec"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11875,9 +11872,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:79
-#, fuzzy
 msgid "Group of Picture Reference Distance"
-msgstr "Numele instanței curente"
+msgstr ""
 
 #: modules/codec/qsv.c:81
 msgid ""
@@ -11896,9 +11892,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Interval Gardă"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11911,9 +11906,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:100
-#, fuzzy
 msgid "Rate Control Method"
-msgstr "Dimensiune buffer de control al ratei"
+msgstr ""
 
 #: modules/codec/qsv.c:102
 msgid ""
@@ -11922,9 +11916,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "Factor de cuantificare I"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11997,9 +11990,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Numărul de canale audio"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -22085,7 +22077,7 @@ msgstr "Calitate de reeșantionare"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Reeșantionare audio de înaltă calitate"
+msgstr "Nivel de post procesare a calității video"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -22100,7 +22092,7 @@ msgstr "Ieșire YUV"
 #: modules/hw/vdpau/sharpen.c:141
 #, fuzzy
 msgid "VDPAU sharpen video filter"
-msgstr "Filtru de clonare video"
+msgstr "Filtru video de fundal albastru (chroma key)"
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -22880,7 +22872,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Păstrează raportul de aspect"
+msgstr "Fișier index"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -25635,7 +25627,7 @@ msgstr ""
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Filtru de deîntrețesere video"
+msgstr "Filtru video de joc interactiv tip puzzle"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freeze"
@@ -29132,7 +29124,7 @@ msgstr "Captură video"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLC nu a putut deschide modulul decodor."
+msgstr "Modul de ieșire audio"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -29382,7 +29374,7 @@ msgstr ""
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Implicit"
+msgstr "Flux implicit"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -29443,292 +29435,6 @@ msgstr "Interfață Web - VLC media player"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Flux de ieșire"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Alege ieșirea video preferată și configurează aici."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Aceste module furnizează funcții de rețea pentru toate celelalte părți "
-#~ "ale VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Acestea sunt setări generale pentru modulele de codare video/audio/"
-#~ "subtitlu."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Furnizorii de dialog pot fi configurați aici."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "În această secțiune poți forța comportamentul demultiplexorului de "
-#~ "subtitlu, de exemplu setând tipul subtitlului și numele fișierului."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Niciun modul de decodare adecvat"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC nu suportă formatul audio sau video „%4.4s”. Din păcate nu aveți "
-#~ "nicio cale de rezolvare a problemei."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "Calea adiţională folosită de VLC pentru a-şi căuta modulele. Puteţi "
-#~ "adăuga mai multe căi, înlănţuindu-le prin folosirea \" PATH_SEP \" ca şi "
-#~ "separator"
-
-#~ msgid "Album art policy"
-#~ msgstr "Politica de descărcare a graficii de album"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Modul de descărcare a graficii de album."
-
-#~ msgid "Manual download only"
-#~ msgstr "Numai prin descărcare manuală"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Când începe redarea piesei"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "De îndată ce este adăugată o piesă"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Încarcă mediateca"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr ""
-#~ "Activaţi această opţiune pentru a încărca, la pornirea VLC, a Bibliotecii "
-#~ "Media de tip SQL"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "Acces FFmpeg"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "Biblioteca de decodare AACS de sistem nu funcţionează. Lipsesc elemente?"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC nu a putut deschide fişierul \"%s\". (%m)"
-
-#~ msgid "TCP address to use"
-#~ msgstr "Adresa TCP de folosit"
-
-#~ msgid ""
-#~ "TCP address to use to communicate with the video part of the Bar Graph "
-#~ "(default localhost). In the case of bargraph incrustation, use localhost."
-#~ msgstr ""
-#~ "Adresa TCP pentru utilizarea la comunicarea cu partea video a Bar Graph "
-#~ "(implicit localhost). În cazul încrustării barei grafice, folosiţi "
-#~ "localhost."
-
-#~ msgid "TCP port to use"
-#~ msgstr "Portul TCP de folosit"
-
-#~ msgid ""
-#~ "TCP port to use to communicate with the video part of the Bar Graph "
-#~ "(default 12345). Use the same port as the one used in the rc interface."
-#~ msgstr ""
-#~ "Portul TCP pentru utilizarea la comunicarea cu partea video a Bar Graph "
-#~ "(implicit 12345). Folosiţi acelaşi port ca şi cel folosit în interfaţa rc."
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr ""
-#~ "Defineşte dacă conexiunea TCP ar trebui resetată. Aceasta se va folosi în "
-#~ "momentul utilizării cu audiobargraph_v (implicit 1)."
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Fitru audio pentru conversie de la stereo la mono"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "Eliminarea informaţiei de decupare"
-
-#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
-#~ msgstr "Eliminarea parametrilor interni de decupare (ex. din H.264 SPS)."
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "API Accelerare Video (VA)"
-
-#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
-#~ msgstr "API Prezentare şi Decodare Video pentru Unix (VDPAU)"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr ""
-#~ "Dacă rată de biți=0, foloseşte această valoare pentru calitate constantă"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "O valoare > 0 activează modul de CBR - rată de biți constantă"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Activează codarea fără pierderi"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "Codarea fără pierderi, ignoră rata de biţi şi configurările pentru "
-#~ "calitate, permiţând o reproducere perfectă a originalului."
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "Faza Liniară Rectangulară"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "Faza Liniară Diagonală"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "Distanţa dintre cadrele 'P' "
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Numărul de cadre 'P', per GOP "
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Lăţimea blocurilor de compensare mişcare"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Înălţimea blocurilor de compensare mişcare"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "Suprapunere bloc (%)"
-
-#~ msgid "Amount that each motion block should be overlapped by its neighbours"
-#~ msgstr ""
-#~ "Măsura în care fiecare bloc de mişcare ar trebui să se suprapună peste "
-#~ "blocurile învecinate"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "Total horizontal block length including overlaps"
-#~ msgstr "Lungimea totală a blocurilor orizontale, inclusiv suprapunerile"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Total vertical block length including overlaps"
-#~ msgstr "Lungimea totală a blocurilor verticale, inclusiv suprapunerile"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "Precizie vector mişcare"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "Precizie vector mişcare, în pels. "
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "Zonă de căutare, ME, simplă x:y"
-
-#~ msgid ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-#~ msgstr ""
-#~ "(Nerecomandat) Realizarea unei căutări, de mişcare vectorială, simplă "
-#~ "(potrivire non-ierarhică de blocuri, cu gama de căutare +/-x, +/-y"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Activare partiţionare spaţială"
-
-#~ msgid "cycles per degree"
-#~ msgstr "cicluri per grade"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Codor video Dirac, folosind biblioteca de căutare-dirac"
-
-#~ msgid "Jump to time"
-#~ msgstr "Salt la timpul"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Deschide jurnalul de pană..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Nu trimite"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC a crăpat înainte"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Vreți să fie trimise detalii despre problemă la echipa de dezvoltare "
-#~ "VLC ?\n"
-#~ "\n"
-#~ "Dacă vreți, puteți scrie câteva linii despre ce ați făcut înainte ca VLC "
-#~ "să crape, împreună cu alte informații ajutătoare: o legătură pentru a "
-#~ "descărca un eșantion, un URL al unui flux de rețea, ..."
-
-#~ msgid "Don't ask again"
-#~ msgstr "Nu mai întreba"
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Deschide un dosar BDMV"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Politica de descărcare a graficii de album"
-
-#~ msgid "Output module"
-#~ msgstr "Module de ieșire"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Egalizator grafic"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Descarcă automat informații despre media"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Obțineți mai multe extensii de la"
-
-#~ msgid "Under the Video"
-#~ msgstr "Sub imaginea video"
-
-#~ msgid "&Help..."
-#~ msgstr "A&jutor..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Sincronizează pe pista audio"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Această opțiune va arunca sau va duplica cadre video pentru a sincroniza "
-#~ "pista video cu pista audio."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "Transcodorul va arunca cadre dacă CPU-ul pe care îl aveți nu poate ține "
-#~ "pasul cu rata de codare."
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "Ieșire video iOS OpenGL ES (necesită UIView)"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Folosește un fișier sub&titlu"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Politica de descărcare a graficii de album:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Configurează mediateca"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -31515,6 +31221,292 @@ msgstr "Flux de ieșire"
 
 #~ msgid "Set aspect (like 4:3) of the video canvas"
 #~ msgstr "Stabilește aspectul (gen 4:3) canavalei video"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Alege ieșirea video preferată și configurează aici."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Aceste module furnizează funcții de rețea pentru toate celelalte părți "
+#~ "ale VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Acestea sunt setări generale pentru modulele de codare video/audio/"
+#~ "subtitlu."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Furnizorii de dialog pot fi configurați aici."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "În această secțiune poți forța comportamentul demultiplexorului de "
+#~ "subtitlu, de exemplu setând tipul subtitlului și numele fișierului."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Niciun modul de decodare adecvat"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC nu suportă formatul audio sau video „%4.4s”. Din păcate nu aveți "
+#~ "nicio cale de rezolvare a problemei."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "Calea adiţională folosită de VLC pentru a-şi căuta modulele. Puteţi "
+#~ "adăuga mai multe căi, înlănţuindu-le prin folosirea \" PATH_SEP \" ca şi "
+#~ "separator"
+
+#~ msgid "Album art policy"
+#~ msgstr "Politica de descărcare a graficii de album"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Modul de descărcare a graficii de album."
+
+#~ msgid "Manual download only"
+#~ msgstr "Numai prin descărcare manuală"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Când începe redarea piesei"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "De îndată ce este adăugată o piesă"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Încarcă mediateca"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr ""
+#~ "Activaţi această opţiune pentru a încărca, la pornirea VLC, a Bibliotecii "
+#~ "Media de tip SQL"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "Acces FFmpeg"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "Biblioteca de decodare AACS de sistem nu funcţionează. Lipsesc elemente?"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLC nu a putut deschide fişierul \"%s\". (%m)"
+
+#~ msgid "TCP address to use"
+#~ msgstr "Adresa TCP de folosit"
+
+#~ msgid ""
+#~ "TCP address to use to communicate with the video part of the Bar Graph "
+#~ "(default localhost). In the case of bargraph incrustation, use localhost."
+#~ msgstr ""
+#~ "Adresa TCP pentru utilizarea la comunicarea cu partea video a Bar Graph "
+#~ "(implicit localhost). În cazul încrustării barei grafice, folosiţi "
+#~ "localhost."
+
+#~ msgid "TCP port to use"
+#~ msgstr "Portul TCP de folosit"
+
+#~ msgid ""
+#~ "TCP port to use to communicate with the video part of the Bar Graph "
+#~ "(default 12345). Use the same port as the one used in the rc interface."
+#~ msgstr ""
+#~ "Portul TCP pentru utilizarea la comunicarea cu partea video a Bar Graph "
+#~ "(implicit 12345). Folosiţi acelaşi port ca şi cel folosit în interfaţa rc."
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr ""
+#~ "Defineşte dacă conexiunea TCP ar trebui resetată. Aceasta se va folosi în "
+#~ "momentul utilizării cu audiobargraph_v (implicit 1)."
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Fitru audio pentru conversie de la stereo la mono"
+
+#~ msgid "Discard cropping information"
+#~ msgstr "Eliminarea informaţiei de decupare"
+
+#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
+#~ msgstr "Eliminarea parametrilor interni de decupare (ex. din H.264 SPS)."
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "API Accelerare Video (VA)"
+
+#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
+#~ msgstr "API Prezentare şi Decodare Video pentru Unix (VDPAU)"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr ""
+#~ "Dacă rată de biți=0, foloseşte această valoare pentru calitate constantă"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "O valoare > 0 activează modul de CBR - rată de biți constantă"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Activează codarea fără pierderi"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "Codarea fără pierderi, ignoră rata de biţi şi configurările pentru "
+#~ "calitate, permiţând o reproducere perfectă a originalului."
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "Faza Liniară Rectangulară"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "Faza Liniară Diagonală"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Distanţa dintre cadrele 'P' "
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Numărul de cadre 'P', per GOP "
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "Lăţimea blocurilor de compensare mişcare"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "Înălţimea blocurilor de compensare mişcare"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "Suprapunere bloc (%)"
+
+#~ msgid "Amount that each motion block should be overlapped by its neighbours"
+#~ msgstr ""
+#~ "Măsura în care fiecare bloc de mişcare ar trebui să se suprapună peste "
+#~ "blocurile învecinate"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "Total horizontal block length including overlaps"
+#~ msgstr "Lungimea totală a blocurilor orizontale, inclusiv suprapunerile"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Total vertical block length including overlaps"
+#~ msgstr "Lungimea totală a blocurilor verticale, inclusiv suprapunerile"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "Precizie vector mişcare"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "Precizie vector mişcare, în pels. "
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "Zonă de căutare, ME, simplă x:y"
+
+#~ msgid ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+#~ msgstr ""
+#~ "(Nerecomandat) Realizarea unei căutări, de mişcare vectorială, simplă "
+#~ "(potrivire non-ierarhică de blocuri, cu gama de căutare +/-x, +/-y"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Activare partiţionare spaţială"
+
+#~ msgid "cycles per degree"
+#~ msgstr "cicluri per grade"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Codor video Dirac, folosind biblioteca de căutare-dirac"
+
+#~ msgid "Jump to time"
+#~ msgstr "Salt la timpul"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Deschide jurnalul de pană..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Nu trimite"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC a crăpat înainte"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Vreți să fie trimise detalii despre problemă la echipa de dezvoltare "
+#~ "VLC ?\n"
+#~ "\n"
+#~ "Dacă vreți, puteți scrie câteva linii despre ce ați făcut înainte ca VLC "
+#~ "să crape, împreună cu alte informații ajutătoare: o legătură pentru a "
+#~ "descărca un eșantion, un URL al unui flux de rețea, ..."
+
+#~ msgid "Don't ask again"
+#~ msgstr "Nu mai întreba"
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Deschide un dosar BDMV"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Politica de descărcare a graficii de album"
+
+#~ msgid "Output module"
+#~ msgstr "Module de ieșire"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Egalizator grafic"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Descarcă automat informații despre media"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "Obțineți mai multe extensii de la"
+
+#~ msgid "Under the Video"
+#~ msgstr "Sub imaginea video"
+
+#~ msgid "&Help..."
+#~ msgstr "A&jutor..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Sincronizează pe pista audio"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Această opțiune va arunca sau va duplica cadre video pentru a sincroniza "
+#~ "pista video cu pista audio."
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "Transcodorul va arunca cadre dacă CPU-ul pe care îl aveți nu poate ține "
+#~ "pasul cu rata de codare."
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "Ieșire video iOS OpenGL ES (necesită UIView)"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Folosește un fișier sub&titlu"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Politica de descărcare a graficii de album:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Configurează mediateca"
 
 #, fuzzy
 #~ msgid "Clear overlay framebuffer"
