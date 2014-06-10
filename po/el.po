@@ -1239,7 +1239,7 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Ενότητα εξόδου βίντεο"
+msgstr "Θύρα πελάτη"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -3375,7 +3375,6 @@ msgid "HTTP/TLS Certificate Revocation List"
 msgstr "Λίστα ανάκλησης πιστοποιητικού HTTP/TLS"
 
 #: src/libvlc-module.c:846
-#, fuzzy
 msgid ""
 "This file contains an optional CRL to prevent remote clients from using "
 "revoked certificates in TLS sessions."
@@ -5059,7 +5058,7 @@ msgstr "εκτύπωση πληροφοριών έκδοσης"
 #: src/libvlc-module.c:2690
 #, fuzzy
 msgid "core program"
-msgstr "Επιλογή Προφίλ"
+msgstr "κύριο πρόγραμμα"
 
 #: src/misc/update.c:473
 #, c-format
@@ -6083,7 +6082,7 @@ msgstr "Σφάλμα Blu-ray"
 #: modules/access/bluray.c:1189
 #, fuzzy
 msgid "Top Menu"
-msgstr "Κλείσιμο παραθύρου"
+msgstr "Μενού"
 
 #: modules/access/bluray.c:1191
 #, fuzzy
@@ -13082,7 +13081,7 @@ msgstr "Aποκωδικοποιητής υπότιτλων DVB"
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "Υπότιτλοι DVB"
+msgstr "Υπότιτλοι teletext"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -19691,7 +19690,6 @@ msgstr ""
 "yourip:8080 από προεπιλογή."
 
 #: modules/gui/macosx/wizard.m:265
-#, fuzzy
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
 "This protocol is used as transport method by many Microsoft's software. Note "
@@ -22960,7 +22958,7 @@ msgstr "Ποιότητα επαναδειγματοληψίας"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Υψηλής ποιότητας επαναδειγματοληψία ήχου"
+msgstr "Επίπεδο μετεπεξεργασίας ποιότητας βίντεο"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -23844,7 +23842,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Διατήρηση αναλογίας διαστάσεων"
+msgstr "Αρχείο ευρετηρίου"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -26824,7 +26822,7 @@ msgstr "Εξαγωγή φίλτρου βίντεο συστατικού RGB"
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Φίλτρο αποδιαπλοκής βίντεο"
+msgstr "Φίλτρο βίντεο του διαδραστικού παιχνιδιού παζλ"
 
 #: modules/video_filter/freeze.c:78
 #, fuzzy
@@ -30528,7 +30526,7 @@ msgstr "Σύλληψη βίντεο"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "Ο VLC δεν μπορεί να ανοίξει την ενότητα αποκωδικοποιητή."
+msgstr "Ενότητα εξόδου ήχου"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -30783,7 +30781,7 @@ msgstr "Κατεύθυνση του αντικατοπτρισμού"
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Προεπιλογή"
+msgstr "Προεπιλεγμένη ροή δεδομένων"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -30845,421 +30843,6 @@ msgstr "Αναπαραγωγός πολυμέσων VLC - Διεπαφή ιστ�
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Έξοδος ροής δεδομένων"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Επιλέξτε το είδος εξόδου βίντεο που προτιμάτε και ρυθμίστε το εδώ."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Οι ενότητες αυτές παρέχουν λειτουργίες δικτύου σε όλα τα άλλα τμήματα του "
-#~ "VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Αυτές είναι οι γενικές ρυθμίσεις για τις ενότητες βίντεο/ήχου/υπότιτλων "
-#~ "κωδικοποίησης"
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Οι πάροχοι διαλόγων μπορούν να ρυθμιστούν εδώ."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "Σε αυτή την ενότητα μπορείτε να επιβάλετε την συμπεριφορά του demuxer "
-#~ "υποτίτλων, για παράδειγμα ορίζοντας τον τύπο των υποτίτλων ή το όνομα του "
-#~ "αρχείου"
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Δεν υπάρχει κατάλληλη ενότητα αποκωδικοποιητή"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "O VLC δεν υποστηρίζει τον τύπο ήχου η βίντεο \"%4.4s\". Δυστυχώς δεν "
-#~ "υπάρχει τρόπος για να το διορθώσετε."
-
-#, fuzzy
-#~ msgid ""
-#~ "This file contains an optional CRL to prevent remove clients from using "
-#~ "revoked certificates in TLS sessions."
-#~ msgstr ""
-#~ "Αυτό το αρχείο περιέχει ένα προαιρετικό CRL για να αποτρέψει "
-#~ "απομακρυσμένους πελάτες από τη χρήση ανακαλεσμένων πιστοποιητικών σε "
-#~ "συνεδρίες TLS."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "Πρόσθετη διαδρομή για τον VLC ώστε να αναζητήσει τις ενότητές του. "
-#~ "Μπορείτε να προσθέσετε διάφορες διαδρομές, ενώνοντάς τις με χρήση \" "
-#~ "PATH_SEP \" ως διαχωριστή"
-
-#~ msgid "Album art policy"
-#~ msgstr "Πολιτική τέχνης άλμπουμ"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Επιλέξτε πώς θα γίνεται το κατέβασμα της τέχνης άλμπουμ."
-
-#~ msgid "Manual download only"
-#~ msgstr "Μόνο όταν γίνεται χειροκίνητο κατέβασμα"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Όταν αρχίζει η αναπαραγωγή του κομματιού"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Μόλις προστίθεται ένα κομμάτι"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Φόρτωση βιβλιοθήκης πολυμέσων"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr ""
-#~ "Ενεργοποιήστε αυτή την επιλογή για να φορτώσετε τη βασισμένη σε SQL "
-#~ "βιβλιοθήκη πολυμέσων κατά την έναρξη του VLC"
-
-#~ msgid "main program"
-#~ msgstr "κύριο πρόγραμμα"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "Πρόσβαση FFmpeg"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "Η βιβλιοθήκη αποκωδικοποίησης AACS του συστήματός σας δεν δουλεύει. "
-#~ "Λείπουν κλειδιά;"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "Ο VLC δεν μπόρεσε να ανοίξει το αρχείο \"%s\". (%m)"
-
-#~ msgid "TCP address to use"
-#~ msgstr "Διεύθυνση TCP που θα χρησιμοποιηθεί"
-
-#~ msgid ""
-#~ "TCP address to use to communicate with the video part of the Bar Graph "
-#~ "(default localhost). In the case of bargraph incrustation, use localhost."
-#~ msgstr ""
-#~ "Η διεύθυνση TCP που θα χρησιμοποιηθεί για την επικοινωνία με το τμήμα "
-#~ "βίντεο του γραφήματος ράβδων (προεπιλεγμένος τοπικός κεντρικός "
-#~ "υπολογιστής). Σε περίπτωση περισκλήρυνσης του γραφήματος ράβδων, να "
-#~ "χρησιμοποιηθεί ο τοπικός κεντρικός υπολογιστής."
-
-#~ msgid "TCP port to use"
-#~ msgstr "Θύρα TCP που θα χρησιμοποιηθεί"
-
-#~ msgid ""
-#~ "TCP port to use to communicate with the video part of the Bar Graph "
-#~ "(default 12345). Use the same port as the one used in the rc interface."
-#~ msgstr ""
-#~ "Η θύρα TCP που θα χρησιμοποιηθεί για την επικοινωνία με το τμήμα βίντεο "
-#~ "του γραφήματος ράβδων (προεπιλεγμένη η 12345). Να χρησιμοποιηθεί η ίδια "
-#~ "θύρα με αυτήν που χρησιμοποιήθηκε στην διεπαφή rc."
-
-#~ msgid "Force connection reset regularly"
-#~ msgstr "Τακτική επιβολή επαναφοράς σύνδεσης"
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr ""
-#~ "Ορίζει εάν θα πρέπει να γίνει επαναφορά της σύνδεσης TCP. Αυτό θα πρέπει "
-#~ "να χρησιμοποιηθεί μαζί με το audiobargraph_v (προεπιλογή: 1)."
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Φίλτρο ήχου για μετατροπή από στερεοφωνικό σε μονοφωνικό"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "Απορρίψτε πληροφορίες περικοπής"
-
-#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
-#~ msgstr ""
-#~ "Απορρίψτε τις εσωτερικές παραμέτρους περικοπής (π.χ. από το H.264 SPS)."
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "Επιτάχυνση βίντεο (VA) API"
-
-#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
-#~ msgstr "API Αποκωδικοποίησης Βίντεο και Παρουσίασης για το Unix (VDPAU)"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr ""
-#~ "Εάν ο ρυθμός μετάδοσης δεδομένων είναι 0, χρησιμοποιήστε αυτη την τιμή "
-#~ "για σταθερή ποιότητα"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr ""
-#~ "Μία τιμή > 0 ενεργοποιεί τη λειτουργία σταθερού ρυθμού μετάδοσης δεδομένων"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Ενεργοποίηση κωδικοποίησης χωρίς απώλειες"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "Η κωδικοποίηση χωρίς απώλειες αγνοεί τις ρυθμίσεις ρυθμού μετάδοσης "
-#~ "δεδομένων και ποιότητας, επιτρέποντας την τέλεια αναπαραγωγή του αρχικού"
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "Παραλληλόγραμμης γραμμικής φάσης"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "Διαγώνιας γραμμικής φάσης"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "Απόσταση μεταξύ καρέ 'P'"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Αριθμός καρέ 'P' ανά GOP"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Πλάτος των ομάδων δεδομένων για την επανόρθωση της κίνησης"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Ύψος των ομάδων δεδομένων για την επανόρθωση της κίνησης"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "Επικάλυψη ομάδων δεδομένων (%)"
-
-#~ msgid "Amount that each motion block should be overlapped by its neighbours"
-#~ msgstr ""
-#~ "Ποσότητα κατά την οποία κάθε ομάδα δεδομένων κίνησης θα πρέπει να "
-#~ "επικαλύπτεται από τις γειτονικές της"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "Total horizontal block length including overlaps"
-#~ msgstr ""
-#~ "Συνολικό μήκος των οριζόντιων ομάδων δεδομένων συμπεριλαμβανομένων των "
-#~ "επικαλύψεων"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Total vertical block length including overlaps"
-#~ msgstr ""
-#~ "Συνολικό μήκος των κατακόρυφων ομάδων δεδομένων συμπεριλαμβανομένων των "
-#~ "επικαλύψεων"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "Ακρίβεια διανύσματος κίνησης"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "Ακρίβεια διανύσματος κίνησης σε pels."
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "Επιφάνεια αναζήτησης απλού ME x:y"
-
-#~ msgid ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-#~ msgstr ""
-#~ "(Δεν συνιστάται) Πραγματοποίηση μιας απλής (όχι ιεραρχικής ταύτισης "
-#~ "ομάδων δεδομένων) αναζήτησης διανυσμάτων κίνησης με εύρος αναζήτησης +/-"
-#~ "x, +/-y"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Ενεργοποίηση χωρικού διαμερισμού"
-
-#~ msgid "cycles per degree"
-#~ msgstr "Κύκλοι ανά μοίρα"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Κωδικοποιητής βίντεο Dirac με βιβλιοθήκη έρευνας Dirac"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Αποκωδικοποιητής βίντεο που χρησιμοποιεί openmash"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr "| menu . . [on|off|πάνω|κάτω|αριστερά|δεξιά|επιλογή] χρήση μενού"
-
-#~ msgid "Jump to time"
-#~ msgstr "Μεταπήδηση στο χρόνο"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Άνοιγμα αρχείου καταγραφής καταρρεύσεων..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Να μη γίνει αποστολή"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "O VLC κατέρρευσε προηγουμένως"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Θέλετε να στείλετε πληροφορίες για την κατάρρευση στην ομάδα ανάπτυξης "
-#~ "του VLC;\n"
-#~ "\n"
-#~ "Εάν θέλετε, μπορείτε να εισάγετε μερικές γραμμές σχετικά με το τι κάνατε "
-#~ "πριν καταρρεύσει ο VLC, μαζί με άλλες χρήσιμες πληροφορίες: ένας "
-#~ "σύνδεσμος για το κατέβασμα ενός δείγματος αρχείου, ένα URL μιας ροής "
-#~ "δεδομένων δικτύου, ..."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr ""
-#~ "Συμφωνώ να έρθω σε πιθανή επικοινωνία για αυτή την αναφορά σφάλματος."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "Μόνο η προεπιλεγμένη διεύθυνση e-maIl σας θα υποβληθεί, δεν θα "
-#~ "συμπεριληφθεί καμία επιπλέον πληροφορία."
-
-#~ msgid "Don't ask again"
-#~ msgstr "Να μην ερωτηθώ ξανά"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Δεν βρέθηκε αρχείο καταγραφής καταρρεύσεων"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Αδύνατη η ανεύρεση ιχνών από προηγούμενη κατάρρευση."
-
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "Παύση του iTunes κατά τη διάρκεια της αναπαραγωγής του VLC"
-
-#~ msgid ""
-#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
-#~ "playback will be resumed again if VLC playback is finished."
-#~ msgstr ""
-#~ "Παύει την αναπαραγωγή iTunes όταν αρχίζει η αναπαραγωγή VLC. Αν επιλεγεί, "
-#~ "η αναπαραγωγή iTunes θα επαναληφθεί όταν τελειώσει η αναπαραγωγή VLC."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Άνοιγμα φακέλου BDMV"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Πολιτική κατεβάσματος τέχνης των άλμπουμ"
-
-#~ msgid "Output module"
-#~ msgstr "Ενότητα εξόδου"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Γραφικός ισοσταθμιστής"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Αυτόματη ανάκτηση πληροφοριών πολυμέσου"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Λήψη περισσότερων επεκτάσεων από"
-
-#~ msgid "Under the Video"
-#~ msgstr "Κάτω από το βίντεο"
-
-#~ msgid "&Help..."
-#~ msgstr "&Βοήθεια..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Συγχρονισμός στο κομμάτι ήχου"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Αυτή η επιλογή θα παραλείψει ή θα δημιουργήσει διπλότυπα καρέ βίντεο για "
-#~ "να συγχρονίσει το κομμάτι βίντεο με το κομμάτι ήχου."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "Ο επανακωδικοποιητής θα παραλείψει κάποια καρέ εάν η CPU σας δεν μπορεί "
-#~ "να συμβαδίσει με το ρυθμό κωδικοποίησης."
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "Τιμή των επιπέδων καναλιών ήχου"
-
-#~ msgid ""
-#~ "Value of the audio level of each channels between 0 and 1. Each level "
-#~ "should be separated with ':'."
-#~ msgstr ""
-#~ "Τιμή του επιπέδου έντασης ήχου για κάθε κανάλι μεταξύ 0 και 1. Κάθε "
-#~ "επίπεδο θα πρέπει να διαχωρίζεται με ':'."
-
-#~ msgid "Alarm"
-#~ msgstr "Συναγερμός"
-
-#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
-#~ msgstr ""
-#~ "Σηματοδοτεί μία σιωπή και εμφανίζει μία ειδοποίηση συναγερμού (0=χωρίς "
-#~ "συναγερμό, 1=συναγερμός)."
-
-#~ msgid "Spatial luma strength (default 4)"
-#~ msgstr "Ισχύς χωρικού luma (προεπιλογή: 4)"
-
-#~ msgid "Spatial chroma strength (default 3)"
-#~ msgstr "Ισχύς χωρικού chroma (προεπιλογή: 3)"
-
-#~ msgid "Temporal luma strength (default 6)"
-#~ msgstr "Ισχύς χρονικού luma (προεπιλογή: 6)"
-
-#~ msgid "Temporal chroma strength (default 4.5)"
-#~ msgstr "Ισχύς χρονικού chroma (προεπιλογή: 4,5)"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "Κείμενο μαρκίζας που θα εμφανιστεί. (Διαθέσιμες στοιχειοσειρές τύπου: "
-#~ "Σχετιζόμενος χρόνος: %Y = έτος, %m = μήνας, %d = ημέρα, %H = ώρα, %M = "
-#~ "λεπτό, %S = δευτερόλεπτο, ... Σχετιζόμενα μεταδεδομένα: $a = καλλιτέχνης, "
-#~ "$b = άλμπουμ, $c = πνευματικά δικαιώματα, $d = περιγραφή, $e = "
-#~ "κωδικοποιήθηκε με, $g = είδος, $l = γλώσσα, $n = αριθμός κομματιού, $p = "
-#~ "αναπαράγεται τώρα, $r = αξιολόγηση, $s = γλώσσα υπότιτλων, $t = τίτλος, "
-#~ "$u = url, $A = ημερομηνία, $B = ρυθμός μετάδοσης δεδομένων ήχου (σε kb/"
-#~ "s), $C = κεφάλαιο,$D = διάρκεια, $F = πλήρες όνομα με διαδρομή, $I = "
-#~ "τίτλο, $L = απομένων χρόνος, $N = όνομα, $O = γλώσσα ήχου, $P = θέση (%), "
-#~ "$R =ρυθμός, $S = ρυθμός δειγματοληψίας ήχου (σε kHz), $T = χρόνος, $U = "
-#~ "εκδότης, $V = ένταση ήχου, $_ = νέα γραμμή) "
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "Έξοδος βίντεο iOS OpenGL ES (απαιτεί UIView)"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "Έξοδος βίντεο Mac OS X OpenGL (απαιτεί σχεδιάσιμο-nsobject)"
-
-#~ msgid "OpenGL acceleration is not supported on your Mac"
-#~ msgstr "Η επιτάχυνση OpenGL δεν υποστηρίζεται στο Mac σας"
-
-#~ msgid ""
-#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
-#~ "output. It will still work, but much slower and with possibly unexpected "
-#~ "results."
-#~ msgstr ""
-#~ "Ο Mac σας δεν διαθέτει επιτάχυνση Quartz Extreme, η οποία απαιτείται για "
-#~ "έξοδο ήχου. Θα εξακολουθεί να δουλεύει, αλλά πολύ πιο αργά και με πιθανά "
-#~ "απρόσμενα αποτελέσματα."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Χρήση αρχείου υπο&τίτλων"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Πολιτική κατεβάσματος τέχνης των άλμπουμ:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Ρυθμίσεις βιβλιοθήκης πολυμέσων"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -34001,6 +33584,421 @@ msgstr "Έξοδος ροής δεδομένων"
 
 #~ msgid "Save volume on exit"
 #~ msgstr "Αποθήκευση έντασης κατά την έξοδο"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Επιλέξτε το είδος εξόδου βίντεο που προτιμάτε και ρυθμίστε το εδώ."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Οι ενότητες αυτές παρέχουν λειτουργίες δικτύου σε όλα τα άλλα τμήματα του "
+#~ "VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Αυτές είναι οι γενικές ρυθμίσεις για τις ενότητες βίντεο/ήχου/υπότιτλων "
+#~ "κωδικοποίησης"
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Οι πάροχοι διαλόγων μπορούν να ρυθμιστούν εδώ."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "Σε αυτή την ενότητα μπορείτε να επιβάλετε την συμπεριφορά του demuxer "
+#~ "υποτίτλων, για παράδειγμα ορίζοντας τον τύπο των υποτίτλων ή το όνομα του "
+#~ "αρχείου"
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Δεν υπάρχει κατάλληλη ενότητα αποκωδικοποιητή"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "O VLC δεν υποστηρίζει τον τύπο ήχου η βίντεο \"%4.4s\". Δυστυχώς δεν "
+#~ "υπάρχει τρόπος για να το διορθώσετε."
+
+#, fuzzy
+#~ msgid ""
+#~ "This file contains an optional CRL to prevent remove clients from using "
+#~ "revoked certificates in TLS sessions."
+#~ msgstr ""
+#~ "Αυτό το αρχείο περιέχει ένα προαιρετικό CRL για να αποτρέψει "
+#~ "απομακρυσμένους πελάτες από τη χρήση ανακαλεσμένων πιστοποιητικών σε "
+#~ "συνεδρίες TLS."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "Πρόσθετη διαδρομή για τον VLC ώστε να αναζητήσει τις ενότητές του. "
+#~ "Μπορείτε να προσθέσετε διάφορες διαδρομές, ενώνοντάς τις με χρήση \" "
+#~ "PATH_SEP \" ως διαχωριστή"
+
+#~ msgid "Album art policy"
+#~ msgstr "Πολιτική τέχνης άλμπουμ"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Επιλέξτε πώς θα γίνεται το κατέβασμα της τέχνης άλμπουμ."
+
+#~ msgid "Manual download only"
+#~ msgstr "Μόνο όταν γίνεται χειροκίνητο κατέβασμα"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Όταν αρχίζει η αναπαραγωγή του κομματιού"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Μόλις προστίθεται ένα κομμάτι"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Φόρτωση βιβλιοθήκης πολυμέσων"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr ""
+#~ "Ενεργοποιήστε αυτή την επιλογή για να φορτώσετε τη βασισμένη σε SQL "
+#~ "βιβλιοθήκη πολυμέσων κατά την έναρξη του VLC"
+
+#~ msgid "main program"
+#~ msgstr "κύριο πρόγραμμα"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "Πρόσβαση FFmpeg"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "Η βιβλιοθήκη αποκωδικοποίησης AACS του συστήματός σας δεν δουλεύει. "
+#~ "Λείπουν κλειδιά;"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "Ο VLC δεν μπόρεσε να ανοίξει το αρχείο \"%s\". (%m)"
+
+#~ msgid "TCP address to use"
+#~ msgstr "Διεύθυνση TCP που θα χρησιμοποιηθεί"
+
+#~ msgid ""
+#~ "TCP address to use to communicate with the video part of the Bar Graph "
+#~ "(default localhost). In the case of bargraph incrustation, use localhost."
+#~ msgstr ""
+#~ "Η διεύθυνση TCP που θα χρησιμοποιηθεί για την επικοινωνία με το τμήμα "
+#~ "βίντεο του γραφήματος ράβδων (προεπιλεγμένος τοπικός κεντρικός "
+#~ "υπολογιστής). Σε περίπτωση περισκλήρυνσης του γραφήματος ράβδων, να "
+#~ "χρησιμοποιηθεί ο τοπικός κεντρικός υπολογιστής."
+
+#~ msgid "TCP port to use"
+#~ msgstr "Θύρα TCP που θα χρησιμοποιηθεί"
+
+#~ msgid ""
+#~ "TCP port to use to communicate with the video part of the Bar Graph "
+#~ "(default 12345). Use the same port as the one used in the rc interface."
+#~ msgstr ""
+#~ "Η θύρα TCP που θα χρησιμοποιηθεί για την επικοινωνία με το τμήμα βίντεο "
+#~ "του γραφήματος ράβδων (προεπιλεγμένη η 12345). Να χρησιμοποιηθεί η ίδια "
+#~ "θύρα με αυτήν που χρησιμοποιήθηκε στην διεπαφή rc."
+
+#~ msgid "Force connection reset regularly"
+#~ msgstr "Τακτική επιβολή επαναφοράς σύνδεσης"
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr ""
+#~ "Ορίζει εάν θα πρέπει να γίνει επαναφορά της σύνδεσης TCP. Αυτό θα πρέπει "
+#~ "να χρησιμοποιηθεί μαζί με το audiobargraph_v (προεπιλογή: 1)."
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Φίλτρο ήχου για μετατροπή από στερεοφωνικό σε μονοφωνικό"
+
+#~ msgid "Discard cropping information"
+#~ msgstr "Απορρίψτε πληροφορίες περικοπής"
+
+#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
+#~ msgstr ""
+#~ "Απορρίψτε τις εσωτερικές παραμέτρους περικοπής (π.χ. από το H.264 SPS)."
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "Επιτάχυνση βίντεο (VA) API"
+
+#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
+#~ msgstr "API Αποκωδικοποίησης Βίντεο και Παρουσίασης για το Unix (VDPAU)"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr ""
+#~ "Εάν ο ρυθμός μετάδοσης δεδομένων είναι 0, χρησιμοποιήστε αυτη την τιμή "
+#~ "για σταθερή ποιότητα"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr ""
+#~ "Μία τιμή > 0 ενεργοποιεί τη λειτουργία σταθερού ρυθμού μετάδοσης δεδομένων"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Ενεργοποίηση κωδικοποίησης χωρίς απώλειες"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "Η κωδικοποίηση χωρίς απώλειες αγνοεί τις ρυθμίσεις ρυθμού μετάδοσης "
+#~ "δεδομένων και ποιότητας, επιτρέποντας την τέλεια αναπαραγωγή του αρχικού"
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "Παραλληλόγραμμης γραμμικής φάσης"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "Διαγώνιας γραμμικής φάσης"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Απόσταση μεταξύ καρέ 'P'"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Αριθμός καρέ 'P' ανά GOP"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "Πλάτος των ομάδων δεδομένων για την επανόρθωση της κίνησης"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "Ύψος των ομάδων δεδομένων για την επανόρθωση της κίνησης"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "Επικάλυψη ομάδων δεδομένων (%)"
+
+#~ msgid "Amount that each motion block should be overlapped by its neighbours"
+#~ msgstr ""
+#~ "Ποσότητα κατά την οποία κάθε ομάδα δεδομένων κίνησης θα πρέπει να "
+#~ "επικαλύπτεται από τις γειτονικές της"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "Total horizontal block length including overlaps"
+#~ msgstr ""
+#~ "Συνολικό μήκος των οριζόντιων ομάδων δεδομένων συμπεριλαμβανομένων των "
+#~ "επικαλύψεων"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Total vertical block length including overlaps"
+#~ msgstr ""
+#~ "Συνολικό μήκος των κατακόρυφων ομάδων δεδομένων συμπεριλαμβανομένων των "
+#~ "επικαλύψεων"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "Ακρίβεια διανύσματος κίνησης"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "Ακρίβεια διανύσματος κίνησης σε pels."
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "Επιφάνεια αναζήτησης απλού ME x:y"
+
+#~ msgid ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+#~ msgstr ""
+#~ "(Δεν συνιστάται) Πραγματοποίηση μιας απλής (όχι ιεραρχικής ταύτισης "
+#~ "ομάδων δεδομένων) αναζήτησης διανυσμάτων κίνησης με εύρος αναζήτησης +/-"
+#~ "x, +/-y"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Ενεργοποίηση χωρικού διαμερισμού"
+
+#~ msgid "cycles per degree"
+#~ msgstr "Κύκλοι ανά μοίρα"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Κωδικοποιητής βίντεο Dirac με βιβλιοθήκη έρευνας Dirac"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Αποκωδικοποιητής βίντεο που χρησιμοποιεί openmash"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr "| menu . . [on|off|πάνω|κάτω|αριστερά|δεξιά|επιλογή] χρήση μενού"
+
+#~ msgid "Jump to time"
+#~ msgstr "Μεταπήδηση στο χρόνο"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Άνοιγμα αρχείου καταγραφής καταρρεύσεων..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Να μη γίνει αποστολή"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "O VLC κατέρρευσε προηγουμένως"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Θέλετε να στείλετε πληροφορίες για την κατάρρευση στην ομάδα ανάπτυξης "
+#~ "του VLC;\n"
+#~ "\n"
+#~ "Εάν θέλετε, μπορείτε να εισάγετε μερικές γραμμές σχετικά με το τι κάνατε "
+#~ "πριν καταρρεύσει ο VLC, μαζί με άλλες χρήσιμες πληροφορίες: ένας "
+#~ "σύνδεσμος για το κατέβασμα ενός δείγματος αρχείου, ένα URL μιας ροής "
+#~ "δεδομένων δικτύου, ..."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr ""
+#~ "Συμφωνώ να έρθω σε πιθανή επικοινωνία για αυτή την αναφορά σφάλματος."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "Μόνο η προεπιλεγμένη διεύθυνση e-maIl σας θα υποβληθεί, δεν θα "
+#~ "συμπεριληφθεί καμία επιπλέον πληροφορία."
+
+#~ msgid "Don't ask again"
+#~ msgstr "Να μην ερωτηθώ ξανά"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Δεν βρέθηκε αρχείο καταγραφής καταρρεύσεων"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Αδύνατη η ανεύρεση ιχνών από προηγούμενη κατάρρευση."
+
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "Παύση του iTunes κατά τη διάρκεια της αναπαραγωγής του VLC"
+
+#~ msgid ""
+#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
+#~ "playback will be resumed again if VLC playback is finished."
+#~ msgstr ""
+#~ "Παύει την αναπαραγωγή iTunes όταν αρχίζει η αναπαραγωγή VLC. Αν επιλεγεί, "
+#~ "η αναπαραγωγή iTunes θα επαναληφθεί όταν τελειώσει η αναπαραγωγή VLC."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Άνοιγμα φακέλου BDMV"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Πολιτική κατεβάσματος τέχνης των άλμπουμ"
+
+#~ msgid "Output module"
+#~ msgstr "Ενότητα εξόδου"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Γραφικός ισοσταθμιστής"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Αυτόματη ανάκτηση πληροφοριών πολυμέσου"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "Λήψη περισσότερων επεκτάσεων από"
+
+#~ msgid "Under the Video"
+#~ msgstr "Κάτω από το βίντεο"
+
+#~ msgid "&Help..."
+#~ msgstr "&Βοήθεια..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Συγχρονισμός στο κομμάτι ήχου"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Αυτή η επιλογή θα παραλείψει ή θα δημιουργήσει διπλότυπα καρέ βίντεο για "
+#~ "να συγχρονίσει το κομμάτι βίντεο με το κομμάτι ήχου."
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "Ο επανακωδικοποιητής θα παραλείψει κάποια καρέ εάν η CPU σας δεν μπορεί "
+#~ "να συμβαδίσει με το ρυθμό κωδικοποίησης."
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "Τιμή των επιπέδων καναλιών ήχου"
+
+#~ msgid ""
+#~ "Value of the audio level of each channels between 0 and 1. Each level "
+#~ "should be separated with ':'."
+#~ msgstr ""
+#~ "Τιμή του επιπέδου έντασης ήχου για κάθε κανάλι μεταξύ 0 και 1. Κάθε "
+#~ "επίπεδο θα πρέπει να διαχωρίζεται με ':'."
+
+#~ msgid "Alarm"
+#~ msgstr "Συναγερμός"
+
+#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+#~ msgstr ""
+#~ "Σηματοδοτεί μία σιωπή και εμφανίζει μία ειδοποίηση συναγερμού (0=χωρίς "
+#~ "συναγερμό, 1=συναγερμός)."
+
+#~ msgid "Spatial luma strength (default 4)"
+#~ msgstr "Ισχύς χωρικού luma (προεπιλογή: 4)"
+
+#~ msgid "Spatial chroma strength (default 3)"
+#~ msgstr "Ισχύς χωρικού chroma (προεπιλογή: 3)"
+
+#~ msgid "Temporal luma strength (default 6)"
+#~ msgstr "Ισχύς χρονικού luma (προεπιλογή: 6)"
+
+#~ msgid "Temporal chroma strength (default 4.5)"
+#~ msgstr "Ισχύς χρονικού chroma (προεπιλογή: 4,5)"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "Κείμενο μαρκίζας που θα εμφανιστεί. (Διαθέσιμες στοιχειοσειρές τύπου: "
+#~ "Σχετιζόμενος χρόνος: %Y = έτος, %m = μήνας, %d = ημέρα, %H = ώρα, %M = "
+#~ "λεπτό, %S = δευτερόλεπτο, ... Σχετιζόμενα μεταδεδομένα: $a = καλλιτέχνης, "
+#~ "$b = άλμπουμ, $c = πνευματικά δικαιώματα, $d = περιγραφή, $e = "
+#~ "κωδικοποιήθηκε με, $g = είδος, $l = γλώσσα, $n = αριθμός κομματιού, $p = "
+#~ "αναπαράγεται τώρα, $r = αξιολόγηση, $s = γλώσσα υπότιτλων, $t = τίτλος, "
+#~ "$u = url, $A = ημερομηνία, $B = ρυθμός μετάδοσης δεδομένων ήχου (σε kb/"
+#~ "s), $C = κεφάλαιο,$D = διάρκεια, $F = πλήρες όνομα με διαδρομή, $I = "
+#~ "τίτλο, $L = απομένων χρόνος, $N = όνομα, $O = γλώσσα ήχου, $P = θέση (%), "
+#~ "$R =ρυθμός, $S = ρυθμός δειγματοληψίας ήχου (σε kHz), $T = χρόνος, $U = "
+#~ "εκδότης, $V = ένταση ήχου, $_ = νέα γραμμή) "
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "Έξοδος βίντεο iOS OpenGL ES (απαιτεί UIView)"
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "Έξοδος βίντεο Mac OS X OpenGL (απαιτεί σχεδιάσιμο-nsobject)"
+
+#~ msgid "OpenGL acceleration is not supported on your Mac"
+#~ msgstr "Η επιτάχυνση OpenGL δεν υποστηρίζεται στο Mac σας"
+
+#~ msgid ""
+#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
+#~ "output. It will still work, but much slower and with possibly unexpected "
+#~ "results."
+#~ msgstr ""
+#~ "Ο Mac σας δεν διαθέτει επιτάχυνση Quartz Extreme, η οποία απαιτείται για "
+#~ "έξοδο ήχου. Θα εξακολουθεί να δουλεύει, αλλά πολύ πιο αργά και με πιθανά "
+#~ "απρόσμενα αποτελέσματα."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Χρήση αρχείου υπο&τίτλων"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Πολιτική κατεβάσματος τέχνης των άλμπουμ:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Ρυθμίσεις βιβλιοθήκης πολυμέσων"
 
 #, fuzzy
 #~ msgid "Enqueue files when in one instance mode"
