@@ -1196,7 +1196,7 @@ msgstr "대상 자막 코덱"
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "영상 출력 모듈"
+msgstr "클라이언트 포트"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -3227,7 +3227,6 @@ msgid "HTTP/TLS Certificate Revocation List"
 msgstr "HTTP/TLS 인증서 폐기 목록"
 
 #: src/libvlc-module.c:846
-#, fuzzy
 msgid ""
 "This file contains an optional CRL to prevent remote clients from using "
 "revoked certificates in TLS sessions."
@@ -4790,7 +4789,7 @@ msgstr "버전 정보 인쇄"
 #: src/libvlc-module.c:2690
 #, fuzzy
 msgid "core program"
-msgstr "프로파일 선택하기"
+msgstr "메인 프로그램"
 
 #: src/misc/update.c:473
 #, c-format
@@ -12541,12 +12540,12 @@ msgstr "USF 자막 디코더"
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "텍스트 자막  디코더"
+msgstr "DVB 자막 디코더"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "DVB 자막"
+msgstr "문자다중방송 자막"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -14316,7 +14315,7 @@ msgstr "+----[ 도움말의 끝 ]"
 #: modules/control/rc.c:965
 #, fuzzy
 msgid "Press pause to continue."
-msgstr "계속하려면 '메뉴 선택' 또는 '일시중지' 를 입력하세요."
+msgstr "계속하려면 메뉴 선택 또는 일시중지를 누르세요."
 
 #: modules/control/rc.c:1191 modules/control/rc.c:1446
 #: modules/control/rc.c:1490
@@ -18943,7 +18942,6 @@ msgstr ""
 "적으로 다른 컴퓨터들도 mms://YourIP:8080 의 스트림에 접근할 수 있습니다."
 
 #: modules/gui/macosx/wizard.m:265
-#, fuzzy
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
 "This protocol is used as transport method by many Microsoft's software. Note "
@@ -22067,7 +22065,7 @@ msgstr "스킨 열기..."
 #: modules/hw/vdpau/adjust.c:182
 #, fuzzy
 msgid "VDPAU adjust video filter"
-msgstr "비디오 필터 미러하기"
+msgstr "Gradfun 비디오 필터"
 
 #: modules/hw/vdpau/avcodec.c:45
 #, fuzzy
@@ -22120,7 +22118,7 @@ msgstr "리샘플링 품질"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "고품질 오디오 리샘플링"
+msgstr "비디오 품질 후처리 레벨"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -22968,7 +22966,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "화면 비율 유지하기"
+msgstr "인덱스 파일"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -25812,7 +25810,7 @@ msgstr "RGB 요소 추출 영상 필터"
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "디인터레이싱 영상 필터"
+msgstr "퍼즐 게임 영상 필터"
 
 #: modules/video_filter/freeze.c:78
 #, fuzzy
@@ -29376,7 +29374,7 @@ msgstr "비디오 캡처"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLC에서 디코더 모듈을 열 수 없습니다."
+msgstr "오디오 출력 모듈"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -29629,12 +29627,12 @@ msgstr "미러링의 방향"
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "기본"
+msgstr "기본 스트림"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
 msgid "Chromaprint stream output"
-msgstr "파일 스트림 출력"
+msgstr "스트림 출력 수집"
 
 #: modules/text_renderer/platform_fonts.c:82
 msgid ""
@@ -29690,384 +29688,6 @@ msgstr "VLC 미디어 재생기 - 웹 인터페이스"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "스트림 출력"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "선호하는 비디오 출력을 선택하고 여기에서 설정하세요."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "이 모듈들은 VLC의 다른 모든 부분에 네트워크 기능을 제공합니다."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr "이것은 비디오/오디오/자막 인코딩 모듈에 대한 일반 설정입니다."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "대화상자 제공자를 설정할 수 있습니다."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "이 부분에서 자막 디먹서의 동작을 제어할 수 있습니다. 예를 들어, 자막의 형"
-#~ "식이나 파일이름을 설정할 수 있습니다."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "적당한 디코더 모듈 없음"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC 가 \"%4.4s\" 오디오 또는 비디오 형식을 지원하지 않습니다. 이 문제는 해"
-#~ "결할 수 없습니다."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "VLC의 모듈을 검색하기 위한 추가 경로. \" PATH_SEP \" 를 분리자로 사용해"
-#~ "서, 몇 개의 경로를 연이어서 추가할 수 있습니다."
-
-#~ msgid "Album art policy"
-#~ msgstr "앨범 아트 정책"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "어떻게 앨범 아트를 다운로드할지 선택하세요."
-
-#~ msgid "Manual download only"
-#~ msgstr "자동으로 다운로드하지 않음"
-
-#~ msgid "When track starts playing"
-#~ msgstr "트랙 재생이 시작될 때"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "트랙이 추가될 때"
-
-#~ msgid "Load Media Library"
-#~ msgstr "미디어 라이브러리 불러오기"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr ""
-#~ "VLC 시작시 SQL 기반의 미디어 라이브러를 불러오려면 이 옵션을 활성화하세요."
-
-#~ msgid "main program"
-#~ msgstr "메인 프로그램"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg 접근"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "이 시스템의 AACS 디코딩 라이브러리가 동작하지 않습니다. 키가 없나요?"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC가 파일 \"%s\" (%m) 를 열 수 없습니다."
-
-#~ msgid "TCP address to use"
-#~ msgstr "사용할 TCP 주소"
-
-#~ msgid ""
-#~ "TCP address to use to communicate with the video part of the Bar Graph "
-#~ "(default localhost). In the case of bargraph incrustation, use localhost."
-#~ msgstr ""
-#~ "막대 그래프 (기본값 localhost) 의 비디오 부분과 통신하는데 사용할 TCP 주"
-#~ "소. 막대그래프의 외부를 둘러싸려면  localhost 를 사용하세요."
-
-#~ msgid "TCP port to use"
-#~ msgstr "사용할 TCP 포트"
-
-#~ msgid ""
-#~ "TCP port to use to communicate with the video part of the Bar Graph "
-#~ "(default 12345). Use the same port as the one used in the rc interface."
-#~ msgstr ""
-#~ "막대 그래프 (기본값 12345) 의 비디오 부분과 통신하는데 사용할 TCP 포트. "
-#~ "rc 인터페이스에서 사용한 것과 같은 포트를 사용하세요."
-
-#~ msgid "Force connection reset regularly"
-#~ msgstr "접속 초기화를 정기적으로 강제하기"
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr ""
-#~ "TCP 접속을 초기화하려면 정의하세요. 이 옵션은 audiobargraph_v 와 함께 사용"
-#~ "할 때 사용할 수 있습니다 (기뽄값 1)."
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "스테레오를 모노로 변환하는 오디오 필터"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "잘라내기 정보를 버리기"
-
-#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
-#~ msgstr "내부 잘라내기 변수를 버리기 (예. H.264 SPS에서)"
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "비디오 가속 (VA) API"
-
-#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
-#~ msgstr "유닉스용 비디오 가속과 출력 API (VDPAU)"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr "비트레이트=0 이면, 일정한 품질에 이 값을 사용합니다"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "값 > 0 은 일정한 비트레이트 모드를 사용합니다"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "무손실 부호화 사용"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "무손실 코딩은 원본의 완벽한 재현을 위해 비트레이트와 품질 설정을 무시합니"
-#~ "다."
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "직각 선형 위상"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "대각 선형 위상"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "'P' 프레임간의 거리"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "GOP 당 'P' 프레임수"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "모션 보정 블록 너비"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "모션 보정 블록 높이"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "블록 오버랩 (%)"
-
-#~ msgid "Amount that each motion block should be overlapped by its neighbours"
-#~ msgstr "각각의 모션 블록이 근접한 모션 블록과 중첩해야 하는 량"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "Total horizontal block length including overlaps"
-#~ msgstr "오버랩을 포함하는 전체 수평 블록 길이"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Total vertical block length including overlaps"
-#~ msgstr "오버랩을 포함하는 수평 블록 길이"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "모션 벡터 정밀도"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "모션 벡터 정밀도 (pels)."
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "단순 ME 검색 영영 x:y"
-
-#~ msgid ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-#~ msgstr ""
-#~ "(추천하지 않음) +/-x, +/-y 검색 범위의 단순 검색 수행 (계층 블록 일치 모"
-#~ "션 벡터 아님)"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "공간적 분활 사용"
-
-#~ msgid "cycles per degree"
-#~ msgstr "각도당 주기"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "dirac-research 라이브러리를 사용하는 Dirac 비디오 인코더"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "openmash를 사용하는 비디오 디코더"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr "| menu . . [켜기|끄기|위로|아래로|왼쪽|오른쪽|선택] 메뉴 사용"
-
-#~ msgid "Press menu select or pause to continue."
-#~ msgstr "계속하려면 메뉴 선택 또는 일시중지를 누르세요."
-
-#~ msgid "Type 'menu select' or 'pause' to continue."
-#~ msgstr "계속하려면 '메뉴 선택' 또는 '일시중지' 를 입력하세요."
-
-#~ msgid "Jump to time"
-#~ msgstr "시간으로 이동하기"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "충돌 로그 열기..."
-
-#~ msgid "Don't Send"
-#~ msgstr "보내지 않기"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "이전에 VLC 가 멈추었습니다"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "VLC 개발 팀에 멈춘 상세정보를 보내시겠습니까?\n"
-#~ "\n"
-#~ "원한다면, VLC 멈춤전에 무엇을 했는지와 같이 다른 도움이 되는 정보를 몇 줄 "
-#~ "입력할수 있습니다: 샘플 파일의 다운로드 링크, 네트워크 스트림의 URL, ..."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr "이 버그리포트에 대해 연락을 받을 수도 있는 것에 동의합니다."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr "어떤 다른 정보도 포함하지 않고 기본 이메일 주소만 보냅니다."
-
-#~ msgid "Don't ask again"
-#~ msgstr "다시 묻지 않기"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "충돌 로그를 찾을수 없음"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "이전 충돌의 어떤 흔적도 발견하지 못했습니다."
-
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "VLC 재생중에 iTunes 일시중지하기"
-
-#~ msgid ""
-#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
-#~ "playback will be resumed again if VLC playback is finished."
-#~ msgstr ""
-#~ "VLC 재생이 시작할 때 iTunes 재생을 일시중지합니다. 이 옵션 사용시, iTunes "
-#~ "재생은 VLC 재생이 끝나면 다시 시작이 될 것입니다."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "BDMV 폴더 열기"
-
-#~ msgid "Album art download policy"
-#~ msgstr "앨범 아트 다운로드 정책"
-
-#~ msgid "Output module"
-#~ msgstr "출력 모듈"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "그래픽 이퀄라이저"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "자동으로 미디어 정보를 검색합니다"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "더 많은 확장 기능 얻기"
-
-#~ msgid "Under the Video"
-#~ msgstr "비디오 밑에"
-
-#~ msgid "&Help..."
-#~ msgstr "도움말(&H)..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "오디오 트랙과 동기"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "이 옵션은 비디오와 오디오 트랙을 동기화하기 위해 비디오 프레임을 드롭/복제"
-#~ "할 것입니다."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "당신의 CPU가 인코딩 속도를 따라잡지 못하면 트랜스코더는 프레임을 드롭할 것"
-#~ "입니다."
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "오디오 채널 레벨값"
-
-#~ msgid ""
-#~ "Value of the audio level of each channels between 0 and 1. Each level "
-#~ "should be separated with ':'."
-#~ msgstr ""
-#~ "0과 1 사이의 각 채널의 오디오 레벨값. 각 레벨은 ':' 으로 구분되어야 합니"
-#~ "다."
-
-#~ msgid "Alarm"
-#~ msgstr "알람"
-
-#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
-#~ msgstr "묵음 신호를 보내고 출력하고 경고를 알립니다 (0=알람 없음, 1=알람)."
-
-#~ msgid "Spatial luma strength (default 4)"
-#~ msgstr "Spatial 루마 세기 (기본값 4)"
-
-#~ msgid "Spatial chroma strength (default 3)"
-#~ msgstr "Spatial 크로마 세기 (기본값 3)"
-
-#~ msgid "Temporal luma strength (default 6)"
-#~ msgstr "Temporal 루마 세기 (기본값 6)"
-
-#~ msgid "Temporal chroma strength (default 4.5)"
-#~ msgstr "Temporal 크로마 세기 (기본값 4.5)"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "표시할 마키 문자. (사용 가능한 형식 문자열: 시간 관련: %Y = 년, %m = 월, "
-#~ "%d = 일, %H = 시, %M = 분, %S = 초, ... 메타 데이터 관련: $a = 아티스트, "
-#~ "$b = 앨범, $c = 저작권, $d = 설명, $e = 인코딩, $g = 장르, $l = 언어, $n "
-#~ "= 트렉 번호, $p = 지금 재생, $r = 등급, $s = 자막 언어, $t = 제목, $u = "
-#~ "url, $A = 날짜, $B = 오디오 비트레이트 (in kb/s), $C = 챕터, $D = 재생시"
-#~ "간, $F = 경로포함 전체 이름, $I = 제목, $L = 남은 시간, $N = 이름, $O = 오"
-#~ "디오 언어, $P = 위치 (%), $R = 배율, $S = 오디오 샘플레이트 (kHz), $T = 시"
-#~ "간, $U = 발행인, $V = 음량, $_ = 개행) "
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "iOS OpenGL ES 비디오 출력 (UIView 필요)"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "Mac OS X OpenGL 비디오 출력 (drawable-nsobject 필요)"
-
-#~ msgid "OpenGL acceleration is not supported on your Mac"
-#~ msgstr "OpenGL 가속이 당신의 MCA에서 지원되지 않습니다"
-
-#~ msgid ""
-#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
-#~ "output. It will still work, but much slower and with possibly unexpected "
-#~ "results."
-#~ msgstr ""
-#~ "당신의 맥은 비디오 출력시 필요한 Quartz Extreme 가속 능력이 없습니다. 여전"
-#~ "히 동작하지만 매우 느리고 예기치 않는 결과를 가져올 수 있습니다."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "자막 파일을 사용합니다(&T)"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "앨범 아트 다운로드 정책:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "미디어 라이브러리 설정하기"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -32653,6 +32273,384 @@ msgstr "스트림 출력"
 #, fuzzy
 #~ msgid "MMX EXT IDCT"
 #~ msgstr "MMX EXT memcpy"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "선호하는 비디오 출력을 선택하고 여기에서 설정하세요."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "이 모듈들은 VLC의 다른 모든 부분에 네트워크 기능을 제공합니다."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr "이것은 비디오/오디오/자막 인코딩 모듈에 대한 일반 설정입니다."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "대화상자 제공자를 설정할 수 있습니다."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "이 부분에서 자막 디먹서의 동작을 제어할 수 있습니다. 예를 들어, 자막의 형"
+#~ "식이나 파일이름을 설정할 수 있습니다."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "적당한 디코더 모듈 없음"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC 가 \"%4.4s\" 오디오 또는 비디오 형식을 지원하지 않습니다. 이 문제는 해"
+#~ "결할 수 없습니다."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "VLC의 모듈을 검색하기 위한 추가 경로. \" PATH_SEP \" 를 분리자로 사용해"
+#~ "서, 몇 개의 경로를 연이어서 추가할 수 있습니다."
+
+#~ msgid "Album art policy"
+#~ msgstr "앨범 아트 정책"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "어떻게 앨범 아트를 다운로드할지 선택하세요."
+
+#~ msgid "Manual download only"
+#~ msgstr "자동으로 다운로드하지 않음"
+
+#~ msgid "When track starts playing"
+#~ msgstr "트랙 재생이 시작될 때"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "트랙이 추가될 때"
+
+#~ msgid "Load Media Library"
+#~ msgstr "미디어 라이브러리 불러오기"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr ""
+#~ "VLC 시작시 SQL 기반의 미디어 라이브러를 불러오려면 이 옵션을 활성화하세요."
+
+#~ msgid "main program"
+#~ msgstr "메인 프로그램"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg 접근"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "이 시스템의 AACS 디코딩 라이브러리가 동작하지 않습니다. 키가 없나요?"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLC가 파일 \"%s\" (%m) 를 열 수 없습니다."
+
+#~ msgid "TCP address to use"
+#~ msgstr "사용할 TCP 주소"
+
+#~ msgid ""
+#~ "TCP address to use to communicate with the video part of the Bar Graph "
+#~ "(default localhost). In the case of bargraph incrustation, use localhost."
+#~ msgstr ""
+#~ "막대 그래프 (기본값 localhost) 의 비디오 부분과 통신하는데 사용할 TCP 주"
+#~ "소. 막대그래프의 외부를 둘러싸려면  localhost 를 사용하세요."
+
+#~ msgid "TCP port to use"
+#~ msgstr "사용할 TCP 포트"
+
+#~ msgid ""
+#~ "TCP port to use to communicate with the video part of the Bar Graph "
+#~ "(default 12345). Use the same port as the one used in the rc interface."
+#~ msgstr ""
+#~ "막대 그래프 (기본값 12345) 의 비디오 부분과 통신하는데 사용할 TCP 포트. "
+#~ "rc 인터페이스에서 사용한 것과 같은 포트를 사용하세요."
+
+#~ msgid "Force connection reset regularly"
+#~ msgstr "접속 초기화를 정기적으로 강제하기"
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr ""
+#~ "TCP 접속을 초기화하려면 정의하세요. 이 옵션은 audiobargraph_v 와 함께 사용"
+#~ "할 때 사용할 수 있습니다 (기뽄값 1)."
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "스테레오를 모노로 변환하는 오디오 필터"
+
+#~ msgid "Discard cropping information"
+#~ msgstr "잘라내기 정보를 버리기"
+
+#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
+#~ msgstr "내부 잘라내기 변수를 버리기 (예. H.264 SPS에서)"
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "비디오 가속 (VA) API"
+
+#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
+#~ msgstr "유닉스용 비디오 가속과 출력 API (VDPAU)"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr "비트레이트=0 이면, 일정한 품질에 이 값을 사용합니다"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "값 > 0 은 일정한 비트레이트 모드를 사용합니다"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "무손실 부호화 사용"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "무손실 코딩은 원본의 완벽한 재현을 위해 비트레이트와 품질 설정을 무시합니"
+#~ "다."
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "직각 선형 위상"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "대각 선형 위상"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "'P' 프레임간의 거리"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "GOP 당 'P' 프레임수"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "모션 보정 블록 너비"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "모션 보정 블록 높이"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "블록 오버랩 (%)"
+
+#~ msgid "Amount that each motion block should be overlapped by its neighbours"
+#~ msgstr "각각의 모션 블록이 근접한 모션 블록과 중첩해야 하는 량"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "Total horizontal block length including overlaps"
+#~ msgstr "오버랩을 포함하는 전체 수평 블록 길이"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Total vertical block length including overlaps"
+#~ msgstr "오버랩을 포함하는 수평 블록 길이"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "모션 벡터 정밀도"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "모션 벡터 정밀도 (pels)."
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "단순 ME 검색 영영 x:y"
+
+#~ msgid ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+#~ msgstr ""
+#~ "(추천하지 않음) +/-x, +/-y 검색 범위의 단순 검색 수행 (계층 블록 일치 모"
+#~ "션 벡터 아님)"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "공간적 분활 사용"
+
+#~ msgid "cycles per degree"
+#~ msgstr "각도당 주기"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "dirac-research 라이브러리를 사용하는 Dirac 비디오 인코더"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "openmash를 사용하는 비디오 디코더"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr "| menu . . [켜기|끄기|위로|아래로|왼쪽|오른쪽|선택] 메뉴 사용"
+
+#~ msgid "Press menu select or pause to continue."
+#~ msgstr "계속하려면 메뉴 선택 또는 일시중지를 누르세요."
+
+#~ msgid "Type 'menu select' or 'pause' to continue."
+#~ msgstr "계속하려면 '메뉴 선택' 또는 '일시중지' 를 입력하세요."
+
+#~ msgid "Jump to time"
+#~ msgstr "시간으로 이동하기"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "충돌 로그 열기..."
+
+#~ msgid "Don't Send"
+#~ msgstr "보내지 않기"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "이전에 VLC 가 멈추었습니다"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "VLC 개발 팀에 멈춘 상세정보를 보내시겠습니까?\n"
+#~ "\n"
+#~ "원한다면, VLC 멈춤전에 무엇을 했는지와 같이 다른 도움이 되는 정보를 몇 줄 "
+#~ "입력할수 있습니다: 샘플 파일의 다운로드 링크, 네트워크 스트림의 URL, ..."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr "이 버그리포트에 대해 연락을 받을 수도 있는 것에 동의합니다."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr "어떤 다른 정보도 포함하지 않고 기본 이메일 주소만 보냅니다."
+
+#~ msgid "Don't ask again"
+#~ msgstr "다시 묻지 않기"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "충돌 로그를 찾을수 없음"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "이전 충돌의 어떤 흔적도 발견하지 못했습니다."
+
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "VLC 재생중에 iTunes 일시중지하기"
+
+#~ msgid ""
+#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
+#~ "playback will be resumed again if VLC playback is finished."
+#~ msgstr ""
+#~ "VLC 재생이 시작할 때 iTunes 재생을 일시중지합니다. 이 옵션 사용시, iTunes "
+#~ "재생은 VLC 재생이 끝나면 다시 시작이 될 것입니다."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "BDMV 폴더 열기"
+
+#~ msgid "Album art download policy"
+#~ msgstr "앨범 아트 다운로드 정책"
+
+#~ msgid "Output module"
+#~ msgstr "출력 모듈"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "그래픽 이퀄라이저"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "자동으로 미디어 정보를 검색합니다"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "더 많은 확장 기능 얻기"
+
+#~ msgid "Under the Video"
+#~ msgstr "비디오 밑에"
+
+#~ msgid "&Help..."
+#~ msgstr "도움말(&H)..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "오디오 트랙과 동기"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "이 옵션은 비디오와 오디오 트랙을 동기화하기 위해 비디오 프레임을 드롭/복제"
+#~ "할 것입니다."
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "당신의 CPU가 인코딩 속도를 따라잡지 못하면 트랜스코더는 프레임을 드롭할 것"
+#~ "입니다."
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "오디오 채널 레벨값"
+
+#~ msgid ""
+#~ "Value of the audio level of each channels between 0 and 1. Each level "
+#~ "should be separated with ':'."
+#~ msgstr ""
+#~ "0과 1 사이의 각 채널의 오디오 레벨값. 각 레벨은 ':' 으로 구분되어야 합니"
+#~ "다."
+
+#~ msgid "Alarm"
+#~ msgstr "알람"
+
+#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+#~ msgstr "묵음 신호를 보내고 출력하고 경고를 알립니다 (0=알람 없음, 1=알람)."
+
+#~ msgid "Spatial luma strength (default 4)"
+#~ msgstr "Spatial 루마 세기 (기본값 4)"
+
+#~ msgid "Spatial chroma strength (default 3)"
+#~ msgstr "Spatial 크로마 세기 (기본값 3)"
+
+#~ msgid "Temporal luma strength (default 6)"
+#~ msgstr "Temporal 루마 세기 (기본값 6)"
+
+#~ msgid "Temporal chroma strength (default 4.5)"
+#~ msgstr "Temporal 크로마 세기 (기본값 4.5)"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "표시할 마키 문자. (사용 가능한 형식 문자열: 시간 관련: %Y = 년, %m = 월, "
+#~ "%d = 일, %H = 시, %M = 분, %S = 초, ... 메타 데이터 관련: $a = 아티스트, "
+#~ "$b = 앨범, $c = 저작권, $d = 설명, $e = 인코딩, $g = 장르, $l = 언어, $n "
+#~ "= 트렉 번호, $p = 지금 재생, $r = 등급, $s = 자막 언어, $t = 제목, $u = "
+#~ "url, $A = 날짜, $B = 오디오 비트레이트 (in kb/s), $C = 챕터, $D = 재생시"
+#~ "간, $F = 경로포함 전체 이름, $I = 제목, $L = 남은 시간, $N = 이름, $O = 오"
+#~ "디오 언어, $P = 위치 (%), $R = 배율, $S = 오디오 샘플레이트 (kHz), $T = 시"
+#~ "간, $U = 발행인, $V = 음량, $_ = 개행) "
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "iOS OpenGL ES 비디오 출력 (UIView 필요)"
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "Mac OS X OpenGL 비디오 출력 (drawable-nsobject 필요)"
+
+#~ msgid "OpenGL acceleration is not supported on your Mac"
+#~ msgstr "OpenGL 가속이 당신의 MCA에서 지원되지 않습니다"
+
+#~ msgid ""
+#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
+#~ "output. It will still work, but much slower and with possibly unexpected "
+#~ "results."
+#~ msgstr ""
+#~ "당신의 맥은 비디오 출력시 필요한 Quartz Extreme 가속 능력이 없습니다. 여전"
+#~ "히 동작하지만 매우 느리고 예기치 않는 결과를 가져올 수 있습니다."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "자막 파일을 사용합니다(&T)"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "앨범 아트 다운로드 정책:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "미디어 라이브러리 설정하기"
 
 #, fuzzy
 #~ msgid "Override the default data/share search path."
