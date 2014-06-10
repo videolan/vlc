@@ -368,7 +368,7 @@ msgstr "प्रगत सेटिंग"
 #: include/vlc_input.h:568
 #, fuzzy
 msgid "Subtitle track added"
-msgstr "उपशीर्षक गाणे"
+msgstr "उपशीर्षक गाणे: %s"
 
 #: include/vlc_interface.h:140
 msgid ""
@@ -10885,9 +10885,8 @@ msgid "PNG video encoder"
 msgstr "चित्रफीत एनकोडर"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "वोलपेपर मोड सुरु करा"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -10896,9 +10895,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "प्रोफाईल निवडा"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -10908,9 +10906,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "कोडेकचे नाव"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -10951,9 +10948,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "गार्ड मध्यांतर"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11017,9 +11013,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "अधिकतम बिटरेट"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11051,9 +11046,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "रेफरन्स फ्रेम्सची संख्या"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11067,9 +11061,8 @@ msgid "Number of reference frames"
 msgstr "रेफरन्स फ्रेम्सची संख्या"
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "क्लोनची संख्या"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -27969,7 +27962,7 @@ msgstr ""
 #: modules/control/win_msg.c:193
 #, fuzzy
 msgid "Windows messages interface"
-msgstr "QT दर्शक"
+msgstr "Ncurses दर्शक"
 
 #: modules/gui/macosx/DebugMessageVisualizer.m:93
 msgid "Save this Log..."
@@ -28135,83 +28128,6 @@ msgstr "VLC मेडिया प्लेयर मदत"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "स्ट्रीम प्रदान"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "तुमच्या पसंतीचे चित्रफित आउटपुट निवडा आणि त्यास येथे संरचित करा."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "या ऑडिओ / व्हिडिओ / उपशीर्षक एन्कोडिंग मोड्यूल्स साठी वापरात येणार्या सामान्य सेटिंग्ज "
-#~ "आहेत."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "संवादक पुरवठादार येथे बदलता येतील."
-
-#~ msgid "Load Media Library"
-#~ msgstr "मीडिया लाइब्रेरी भरा"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg प्रवेश"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "तुमच्या प्रणालीतील AACS  डिकोडिंग लायब्ररी योग्य काम करीत नाही.कि नाही का?"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC \"%s\" ही फाईल उघडू शकत नाही. (%m)"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Jump to time"
-#~ msgstr "वेळेवर जा"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "क्रशलॉग उघडा..."
-
-#~ msgid "Don't Send"
-#~ msgstr "पाठवू नका"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC अगोदरच बंद पडला आहे"
-
-#~ msgid "Don't ask again"
-#~ msgstr "पुन्हा विचारू नये"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "क्रशलॉग सापडत नाही"
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "BDMV फोल्डर उघडा"
-
-#~ msgid "Output module"
-#~ msgstr "प्रदान साधन"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "ग्राफिक इक्विलायझर"
-
-#~ msgid "Under the Video"
-#~ msgstr "चीत्रफितीखाली"
-
-#~ msgid "&Help..."
-#~ msgstr "मदत..."
-
-#~ msgid "Alarm"
-#~ msgstr "गजर"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "उपशीर्षक फाईल वापरा"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "मेडिया ग्रंथालय बदला"
 
 #~ msgid "There is no help available for these modules."
 #~ msgstr "या साधनांसाठी मदत उपलब्ध नाही."
@@ -28420,6 +28336,83 @@ msgstr "स्ट्रीम प्रदान"
 
 #~ msgid "Do you want to download it ?"
 #~ msgstr "तुम्ही डाउनलोड करू इच्छिता?"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "तुमच्या पसंतीचे चित्रफित आउटपुट निवडा आणि त्यास येथे संरचित करा."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "या ऑडिओ / व्हिडिओ / उपशीर्षक एन्कोडिंग मोड्यूल्स साठी वापरात येणार्या सामान्य सेटिंग्ज "
+#~ "आहेत."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "संवादक पुरवठादार येथे बदलता येतील."
+
+#~ msgid "Load Media Library"
+#~ msgstr "मीडिया लाइब्रेरी भरा"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg प्रवेश"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "तुमच्या प्रणालीतील AACS  डिकोडिंग लायब्ररी योग्य काम करीत नाही.कि नाही का?"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLC \"%s\" ही फाईल उघडू शकत नाही. (%m)"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Jump to time"
+#~ msgstr "वेळेवर जा"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "क्रशलॉग उघडा..."
+
+#~ msgid "Don't Send"
+#~ msgstr "पाठवू नका"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC अगोदरच बंद पडला आहे"
+
+#~ msgid "Don't ask again"
+#~ msgstr "पुन्हा विचारू नये"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "क्रशलॉग सापडत नाही"
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "BDMV फोल्डर उघडा"
+
+#~ msgid "Output module"
+#~ msgstr "प्रदान साधन"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "ग्राफिक इक्विलायझर"
+
+#~ msgid "Under the Video"
+#~ msgstr "चीत्रफितीखाली"
+
+#~ msgid "&Help..."
+#~ msgstr "मदत..."
+
+#~ msgid "Alarm"
+#~ msgstr "गजर"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "उपशीर्षक फाईल वापरा"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "मेडिया ग्रंथालय बदला"
 
 #, fuzzy
 #~ msgid "Image colors inversion"
