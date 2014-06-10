@@ -3,23 +3,24 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Alexander Jansen <bornxlo@gmail.com>, 2013-2014
-# thomhov, 2014
+# Alexander Mackinnon Jansen <bornxlo@gmail.com>, 2013-2014
+# asd, 2014
 # bobbaluba <bobbaluba@gmail.com>, 2013-2014
 # haarek <haarektrans@gmail.com>, 2014
 # Olav Dahlum <odahlum@gmail.com>, 2011
 # Sigmund Augdal <sigmunau@idi.ntnu.no>, 2002
 # Stian Jørgensrud <stianahj@gmail.com>, 2012-2014
+# thomhov, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2014-06-10 15:44-0400\n"
-"PO-Revision-Date: 2014-04-30 14:18+0000\n"
-"Last-Translator: Stian Jørgensrud <stianahj@gmail.com>\n"
+"PO-Revision-Date: 2014-05-19 11:13+0000\n"
+"Last-Translator: bobbaluba <bobbaluba@gmail.com>\n"
 "Language-Team: Norwegian Bokmål (Norway) (http://www.transifex.com/projects/"
 "p/vlc-trans/language/nb_NO/)\n"
-"Language: nb\n"
+"Language: nb_NO\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1166,12 +1167,12 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Videoeksportmodul"
+msgstr "Klientport"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr "DVDRead kunne ikke åpne «%s»."
+msgstr "VLC kunne ikke koble til «%s:%d»."
 
 #: src/input/decoder.c:698
 #, fuzzy
@@ -1430,7 +1431,7 @@ msgstr ""
 #: src/input/meta.c:76
 #, fuzzy
 msgid "Show Name"
-msgstr "Kodek"
+msgstr "Navn"
 
 #: src/input/meta.c:77
 msgid "Actors"
@@ -2466,7 +2467,7 @@ msgstr ""
 
 #: src/libvlc-module.c:499
 msgid "File caching (ms)"
-msgstr ""
+msgstr "Filbufring (ms)"
 
 #: src/libvlc-module.c:501
 msgid "Caching value for local files, in milliseconds."
@@ -4612,7 +4613,7 @@ msgstr "skriv ut versjonsinformasjon"
 #: src/libvlc-module.c:2690
 #, fuzzy
 msgid "core program"
-msgstr "Programmer"
+msgstr "hovedprogrammet"
 
 #: src/misc/update.c:473
 #, c-format
@@ -6561,7 +6562,7 @@ msgstr ""
 #: modules/access/file.c:178 modules/access/vdr.c:535
 #, fuzzy, c-format
 msgid "VLC could not open the file \"%s\" (%s)."
-msgstr "DVDRead kunne ikke åpne «%s»."
+msgstr "VLC kunne ikke åpne modulen %s."
 
 #: modules/access/file.c:305 modules/access/vdr.c:369
 #, fuzzy, c-format
@@ -7187,7 +7188,7 @@ msgstr "VLC kunne ikke lese fila."
 #: modules/access/mtp.c:287
 #, fuzzy, c-format
 msgid "VLC could not open the file \"%s\": %s"
-msgstr "DVDRead kunne ikke åpne «%s»."
+msgstr "VLC kunne ikke åpne modulen %s."
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -11053,9 +11054,8 @@ msgid "PNG video encoder"
 msgstr "PNG-videodekoder"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Slå på bakgrunnbildemodus"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11064,9 +11064,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Profil"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11076,9 +11075,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Kodek"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11119,9 +11117,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Fjern linjesprang/linjesamlefletting"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11144,9 +11141,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "Standard grensesnitt: "
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11186,9 +11182,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Maksimalt nivå"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11220,9 +11215,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Antall kloner"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11236,9 +11230,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Antall puslespillrader"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -12008,12 +12001,12 @@ msgstr ""
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "Teletext-undertekster"
+msgstr "Undertekstkodeker"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "DVB-undertekster"
+msgstr "Teletext-undertekster"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -21084,7 +21077,7 @@ msgstr "Åpne tema …"
 #: modules/hw/vdpau/adjust.c:182
 #, fuzzy
 msgid "VDPAU adjust video filter"
-msgstr "Logo"
+msgstr "Lerret video filter"
 
 #: modules/hw/vdpau/avcodec.c:45
 #, fuzzy
@@ -21140,7 +21133,7 @@ msgstr ""
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
 msgid "VDPAU deinterlacing filter"
-msgstr "Psykedelisk videofilter"
+msgstr "Fjern linjesprang/linjesamlefletting"
 
 #: modules/hw/vdpau/display.c:46
 #, fuzzy
@@ -21150,7 +21143,7 @@ msgstr "Ut tilgang"
 #: modules/hw/vdpau/sharpen.c:141
 #, fuzzy
 msgid "VDPAU sharpen video filter"
-msgstr "Logo"
+msgstr "Psykedelisk videofilter"
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -24596,7 +24589,7 @@ msgstr ""
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Psykedelisk videofilter"
+msgstr "Endre størrelse til videostørrelse"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freeze"
@@ -25808,7 +25801,7 @@ msgstr ""
 #: modules/video_filter/vhs.c:108
 #, fuzzy
 msgid "VHS movie effect video filter"
-msgstr "Logo"
+msgstr "Klon video filter"
 
 #: modules/video_filter/vhs.c:109
 msgid "VHS movie"
@@ -28145,7 +28138,7 @@ msgstr ""
 #: modules/control/win_msg.c:193
 #, fuzzy
 msgid "Windows messages interface"
-msgstr "Hovedbrukerflater"
+msgstr "Grensesnitt for håndtering av hurtigtaster"
 
 #: modules/gui/macosx/DebugMessageVisualizer.m:93
 msgid "Save this Log..."
@@ -28257,7 +28250,7 @@ msgstr "Retningen til speilinga"
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Standard"
+msgstr "Standard kringkasting"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -28318,90 +28311,6 @@ msgstr "VLC media player - Webgrensesnitt"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Kringkastingseksport"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Velg og still inn den foretrukne eksportmodulen for video."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "Disse modulene tilbyr nettverkfunksjonalitet til resten av VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Dette er generelle innstillinger for video/lyd/undertekst kodingsmoduler."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "I denne seksjonen kan du tvinge oppførselen til undertekstdemuxeren, for "
-#~ "eksempel ved å sette underteksttype eller -navn."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Ingen passende dekodermodul"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC støtter ikke lyd/videoformatet «%4.4s». Dessverre kan ikke dette "
-#~ "problemet løses."
-
-#~ msgid "Manual download only"
-#~ msgstr "Manuell nedlasting"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Når sporet starter"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Så fort sporet er lagt til"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Last Mediabilbiotek"
-
-#~ msgid "main program"
-#~ msgstr "hovedprogrammet"
-
-#~ msgid "Jump to time"
-#~ msgstr "Hopp til:"
-
-#~ msgid "Don't Send"
-#~ msgstr "Ikke send"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC krasjet tidligere"
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr "Jeg godtar å bli kontaktet angående denne feilrapporten."
-
-#~ msgid "Don't ask again"
-#~ msgstr "Ikke spør igjen"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Fant ingen krasjlogg"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Kunne ikke finne spor av et tidligere krasj."
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Grafisk tonekontroll"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Hent medieinformasjon automatisk."
-
-#~ msgid "Under the Video"
-#~ msgstr "Under videoen"
-
-#~ msgid "&Help..."
-#~ msgstr "&Hjelp …"
-
-#~ msgid "Alarm"
-#~ msgstr "Alarm"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Legg til undertekstfil:"
 
 #~ msgid ""
 #~ "You can choose to disable some CPU accelerations here. Use with extreme "
@@ -31158,6 +31067,90 @@ msgstr "Kringkastingseksport"
 #, fuzzy
 #~ msgid "tarkin"
 #~ msgstr "tegn"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Velg og still inn den foretrukne eksportmodulen for video."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "Disse modulene tilbyr nettverkfunksjonalitet til resten av VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Dette er generelle innstillinger for video/lyd/undertekst kodingsmoduler."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "I denne seksjonen kan du tvinge oppførselen til undertekstdemuxeren, for "
+#~ "eksempel ved å sette underteksttype eller -navn."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Ingen passende dekodermodul"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC støtter ikke lyd/videoformatet «%4.4s». Dessverre kan ikke dette "
+#~ "problemet løses."
+
+#~ msgid "Manual download only"
+#~ msgstr "Manuell nedlasting"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Når sporet starter"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Så fort sporet er lagt til"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Last Mediabilbiotek"
+
+#~ msgid "main program"
+#~ msgstr "hovedprogrammet"
+
+#~ msgid "Jump to time"
+#~ msgstr "Hopp til:"
+
+#~ msgid "Don't Send"
+#~ msgstr "Ikke send"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC krasjet tidligere"
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr "Jeg godtar å bli kontaktet angående denne feilrapporten."
+
+#~ msgid "Don't ask again"
+#~ msgstr "Ikke spør igjen"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Fant ingen krasjlogg"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Kunne ikke finne spor av et tidligere krasj."
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Grafisk tonekontroll"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Hent medieinformasjon automatisk."
+
+#~ msgid "Under the Video"
+#~ msgstr "Under videoen"
+
+#~ msgid "&Help..."
+#~ msgstr "&Hjelp …"
+
+#~ msgid "Alarm"
+#~ msgstr "Alarm"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Legg til undertekstfil:"
 
 #, fuzzy
 #~ msgid "Do you want to download it ?"
