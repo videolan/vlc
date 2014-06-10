@@ -1170,7 +1170,7 @@ msgstr "پیمانهٔ خروجی ویدئو"
 #: src/input/decoder.c:694
 #, fuzzy, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr "وی‌ال‌سی نتوانست پیمانهٔ کدگشا را باز کند."
+msgstr "وی‌ال‌سی نتوانست پیمانهٔ %s را باز کند."
 
 #: src/input/decoder.c:698
 #, fuzzy
@@ -6572,12 +6572,12 @@ msgstr ""
 #: modules/access/file.c:178 modules/access/vdr.c:535
 #, fuzzy, c-format
 msgid "VLC could not open the file \"%s\" (%s)."
-msgstr "وی‌ال‌سی نتوانست پیمانهٔ کدگشا را باز کند."
+msgstr "وی‌ال‌سی نتوانست پیمانهٔ %s را باز کند."
 
 #: modules/access/file.c:305 modules/access/vdr.c:369
 #, fuzzy, c-format
 msgid "VLC could not read the file (%s)."
-msgstr "وی‌ال‌سی نتوانست پیمانهٔ کدگشا را باز کند."
+msgstr "وی‌ال‌سی نتوانست پیمانهٔ %s را باز کند."
 
 #: modules/access/fs.c:33
 msgid "Subdirectory behavior"
@@ -7198,7 +7198,7 @@ msgstr "وی‌ال‌سی نتوانست پیمانهٔ %s را باز کند."
 #: modules/access/mtp.c:287
 #, fuzzy, c-format
 msgid "VLC could not open the file \"%s\": %s"
-msgstr "وی‌ال‌سی نتوانست پیمانهٔ کدگشا را باز کند."
+msgstr "وی‌ال‌سی نتوانست پیمانهٔ %s را باز کند."
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -11057,9 +11057,8 @@ msgid "PNG video encoder"
 msgstr "کدگذار ویدئو"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "فعال کردن حالت پس‌زمینه"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11068,9 +11067,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "فایل ایندکس"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11080,9 +11078,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "نمایش جزئیات"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11123,9 +11120,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "واسط اُ اس ایکس مکینتاش"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11189,9 +11185,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "حداکثر نرخ بیتی"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11223,9 +11218,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "تعداد کانال های صوتی"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11239,9 +11233,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "تعداد کانال های صوتی"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -13886,7 +13879,7 @@ msgstr ""
 #: modules/demux/caf.c:53
 #, fuzzy
 msgid "CAF demuxer"
-msgstr "دستگاه ویدئوی PVR‏"
+msgstr "جداسازها"
 
 #: modules/demux/cdg.c:43
 msgid "CDG demuxer"
@@ -15754,7 +15747,7 @@ msgstr "نمایش تنظیمات"
 #: modules/gui/macosx/BWQuincyUI.m:79
 #, fuzzy
 msgid "Hide Details"
-msgstr "نمایش جزئیات"
+msgstr "مخفی کردن بقیه"
 
 #: modules/gui/macosx/BWQuincyUI.m:81
 msgid "Send"
@@ -21081,7 +21074,7 @@ msgstr "صافی ویدئوی دیوار"
 #: modules/hw/vdpau/avcodec.c:45
 #, fuzzy
 msgid "VDPAU video decoder"
-msgstr "کدگشای ویدئوی تئورا"
+msgstr "کدگذار ویدئو"
 
 #: modules/hw/vdpau/chroma.c:820
 msgid "Temporal-spatial"
@@ -21126,7 +21119,7 @@ msgstr "کیفیت کدگذاری"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "نمونه‌برداری مجدد صدا با کیفیت بالا"
+msgstr "سطح کیفی"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -21888,7 +21881,7 @@ msgstr ""
 #: modules/mux/ogg.c:47
 #, fuzzy
 msgid "Index interval"
-msgstr "بازهٔ به‌هنگام‌سازی منو"
+msgstr "فایل ایندکس"
 
 #: modules/mux/ogg.c:48
 msgid ""
@@ -21898,7 +21891,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "حفظ نسبت طول به عرض"
+msgstr "فایل ایندکس"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -25117,7 +25110,7 @@ msgstr ""
 #: modules/video_filter/oldmovie.c:185
 #, fuzzy
 msgid "Old movie effect video filter"
-msgstr "نادرهم‌بافی ویدئو"
+msgstr "صافی ویدئوی دیوار"
 
 #: modules/video_filter/oldmovie.c:186
 msgid "Old movie"
@@ -27606,9 +27599,8 @@ msgid "Default caching policy"
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:506
-#, fuzzy
 msgid "Menus language:"
-msgstr "زبان صدا"
+msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:507
 msgid "Look and feel"
@@ -28003,7 +27995,7 @@ msgstr ""
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "وی‌ال‌سی نتوانست پیمانهٔ کدگشا را باز کند."
+msgstr "پیمانهٔ خروجی صدا"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -28092,7 +28084,7 @@ msgstr "خروجی ویدئوی OpenGL"
 #: modules/audio_output/winstore.c:204
 #, fuzzy
 msgid "Windows Store audio output"
-msgstr "خروجی ویدئوی OpenGL"
+msgstr "خروجی صدا در پرونده"
 
 #: modules/codec/scte27.c:42
 #, fuzzy
@@ -28118,7 +28110,7 @@ msgstr ""
 #: modules/codec/svg.c:63
 #, fuzzy
 msgid "SVG video decoder"
-msgstr "کدگشای ویدئوی تئورا"
+msgstr "کدگذار ویدئو"
 
 #: modules/control/win_msg.c:192
 msgid "WinMsg"
@@ -28237,7 +28229,7 @@ msgstr ""
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "پیش‌فرض"
+msgstr "جریان پیش‌فرض"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -28297,56 +28289,9 @@ msgstr "پخش‌کنندهٔ صدا و تصویر وی‌ال‌سی"
 msgid "Streaming Output"
 msgstr "خروجی جریان"
 
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "پیمانه خروجی دلخواهتان را، برای ویدئو، انتخاب و پیکربندی کنید."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "این پیمانه‌ها کارکردهای شبکه را برای همهٔ بخش‌های دیگر وی‌ال‌سی فراهم می‌کنند."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr "اینها تنظیمات عمومی برای پیمانه‌های کدگذاری صدا/ویدئو/زیرنویس هستند."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "سازندگان محاورات را اینجا پیکربندی کنید."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "در این بخش می‌توانید رفتار واتافتگر زیرنویس را مشخص نمایید؛ مثلا نوع "
-#~ "زیرنویس یا نام پرونده زیرنویس را."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "کدگشای مناسبی برای این قالب موجود نیست."
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "وی‌ال‌سی قالب صوتی یا ویدئویی «%4.4s» را پشتیبانی نمی‌کند. متأسفانه راهی "
-#~ "برای انجام این کار وجود ندارد."
-
-#~ msgid "Jump to time"
-#~ msgstr "پرش به زمان"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "ثبت فروپاشی پیدا نشد"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "اثری از فروپاشی قبلی دیده نمی‌شود."
-
 #, fuzzy
 #~ msgid "Automatically retrieve media infos"
 #~ msgstr "حاشیه‌گیری خودکار"
-
-#~ msgid "&Help..."
-#~ msgstr "راهنما"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "استفاده از پروندهٔ زیرنویس"
 
 #~ msgid "CPU features"
 #~ msgstr "امکانات پردازنده"
@@ -29489,6 +29434,53 @@ msgstr "خروجی جریان"
 
 #~ msgid "Remaining time: %i seconds"
 #~ msgstr "زمان باقی‌مانده: %Ii ثانیه"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "پیمانه خروجی دلخواهتان را، برای ویدئو، انتخاب و پیکربندی کنید."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "این پیمانه‌ها کارکردهای شبکه را برای همهٔ بخش‌های دیگر وی‌ال‌سی فراهم می‌کنند."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr "اینها تنظیمات عمومی برای پیمانه‌های کدگذاری صدا/ویدئو/زیرنویس هستند."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "سازندگان محاورات را اینجا پیکربندی کنید."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "در این بخش می‌توانید رفتار واتافتگر زیرنویس را مشخص نمایید؛ مثلا نوع "
+#~ "زیرنویس یا نام پرونده زیرنویس را."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "کدگشای مناسبی برای این قالب موجود نیست."
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "وی‌ال‌سی قالب صوتی یا ویدئویی «%4.4s» را پشتیبانی نمی‌کند. متأسفانه راهی "
+#~ "برای انجام این کار وجود ندارد."
+
+#~ msgid "Jump to time"
+#~ msgstr "پرش به زمان"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "ثبت فروپاشی پیدا نشد"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "اثری از فروپاشی قبلی دیده نمی‌شود."
+
+#~ msgid "&Help..."
+#~ msgstr "راهنما"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "استفاده از پروندهٔ زیرنویس"
 
 #, fuzzy
 #~ msgid "Display XOSD output at the bottom of the screen instead of the top."
