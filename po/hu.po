@@ -1213,7 +1213,7 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Videokimeneti modul"
+msgstr "Kliensport"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -3302,7 +3302,6 @@ msgid "HTTP/TLS Certificate Revocation List"
 msgstr "HTTP/TLS tanúsítvány-visszavonási listája"
 
 #: src/libvlc-module.c:846
-#, fuzzy
 msgid ""
 "This file contains an optional CRL to prevent remote clients from using "
 "revoked certificates in TLS sessions."
@@ -19370,7 +19369,6 @@ msgstr ""
 "elérhetik a műsort az mms://azönipcíme:8080 címen."
 
 #: modules/gui/macosx/wizard.m:265
-#, fuzzy
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
 "This protocol is used as transport method by many Microsoft's software. Note "
@@ -22564,7 +22562,7 @@ msgstr "Újramintavételezés minősége"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Jó minőségű hang-újramintavételezés"
+msgstr "Videominőség utófeldolgozási szintje"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -23431,7 +23429,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Méretarány megtartása"
+msgstr "Indexfájl"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -26344,7 +26342,7 @@ msgstr "RGB összetevő kivonása videoszűrő"
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Váltottsorosság-mentesítő videoszűrő"
+msgstr "Interaktív kirakójáték videoszűrő"
 
 #: modules/video_filter/freeze.c:78
 #, fuzzy
@@ -29987,7 +29985,7 @@ msgstr "Videofelvétel"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "A VLC nem tudta megnyitni a dekódoló modult."
+msgstr "Hangkimeneti modul"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -30239,7 +30237,7 @@ msgstr "A tükrözés iránya"
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Alapértelmezett"
+msgstr "Alapértelmezett folyam"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -30300,399 +30298,6 @@ msgstr "VLC médialejátszó – webes felület"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Műsorkimenet"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr ""
-#~ "Válassza ki az előnyben részesített videokimenetet és állítsa be itt."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Ezek a modulok hálózati funkciókat biztosítanak a VLC többi része számára."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr "Általános beállítások a video-, hang- és feliratkódoló modulokhoz."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "A párbeszéd-szolgáltatók itt állíthatók be."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "Ebben a szakaszban a felirat-szétválasztó viselkedése befolyásolható, "
-#~ "például a felirat típusának beállításával vagy fájlnév megadásával."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Nincs megfelelő dekódoló modul"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "A VLC nem támogatja a(z) „%4.4s” hang- vagy videoformátumot. Sajnos nem "
-#~ "tehet semmit ennek kijavításáért."
-
-#, fuzzy
-#~ msgid ""
-#~ "This file contains an optional CRL to prevent remove clients from using "
-#~ "revoked certificates in TLS sessions."
-#~ msgstr ""
-#~ "Ez a fájl egy tanúsítvány-visszavonási listát tartalmazhat, hogy a távoli "
-#~ "kliensek ne használhassanak visszavont tanúsítványokat TLS-"
-#~ "munkamenetekben."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "Kiegészítő útvonal, ahol a VLC a moduljait keresheti. Több útvonal is "
-#~ "megadható a „PATH_SEP” elválasztóval összefűzve."
-
-#~ msgid "Album art policy"
-#~ msgstr "Albumgrafika-irányelv"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Válassza ki, hogyan kívánja letöltetni az albumgrafikát."
-
-#~ msgid "Manual download only"
-#~ msgstr "Csak kézi letöltés"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Szám lejátszásának megkezdésekor"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "A szám felvételekor azonnal"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Médiatár betöltése"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr "Az SQL-alapú médiatár betöltése a VLC indításakor"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg hozzáférés"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "A rendszer AACS-dekódoló függvénytára nem működik, talán hiányoznak a "
-#~ "kulcsok?"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "A VLC nem tudta megnyitni a(z) „%s” fájlt. (%m)"
-
-#~ msgid "TCP address to use"
-#~ msgstr "Használandó TCP-cím"
-
-#~ msgid ""
-#~ "TCP address to use to communicate with the video part of the Bar Graph "
-#~ "(default localhost). In the case of bargraph incrustation, use localhost."
-#~ msgstr ""
-#~ "Az oszlopgrafikon video részével való kommunikációhoz használandó TCP cím "
-#~ "(alapértelmezésben localhost). Ha az oszlopgrafikon nem működik "
-#~ "megfelelően, használja a localhostot."
-
-#~ msgid "TCP port to use"
-#~ msgstr "Használandó TCP port"
-
-#~ msgid ""
-#~ "TCP port to use to communicate with the video part of the Bar Graph "
-#~ "(default 12345). Use the same port as the one used in the rc interface."
-#~ msgstr ""
-#~ "Az oszlopgrafikon video részével való kommunikációhoz használandó TCP "
-#~ "port (alapértelmezett: 12345). Az rc felületen megadottal egyező portot "
-#~ "használja."
-
-#~ msgid "Force connection reset regularly"
-#~ msgstr "Kapcsolat rendszeres visszaállításának kényszerítése"
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr ""
-#~ "Megadja, hogy a TCP kapcsolatot vissza kell-e állítani. Ezt az "
-#~ "audiobargraph_v használata esetén kell használni (alapértelmezett: 1)."
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Hangszűrő a sztereó → mono átalakításhoz"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "Levágási információk eldobása"
-
-#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
-#~ msgstr "Belső levágási paraméterek eldobása (pl. a H.264 SPS-ből)"
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "Videogyorsítás (VA) API"
-
-#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
-#~ msgstr "Videodekódoló- és megjelenítő API Unixhoz (VDPAU)"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr "Ha a bitsebesség 0, használja ezt az állandó minőség megadásához"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "A 0-tól nagyobb érték bekapcsolja az állandó bitsebességű módot"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Veszteségmentes kódolás engedélyezése"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "A veszteségmentes kódolás figyelmen kívül hagyja a bitsebesség és minőség "
-#~ "beállításait, lehetővé téve az eredeti tökéletes másolását"
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "Négyszögű lineáris fázis"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "Átlós lineáris fázis"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "„P” képkockák közötti távolság"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "„P” képkockák száma GOP-onként"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Mozgáskompenzációs blokkok szélessége"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Mozgáskompenzációs blokkok magassága"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "Blokkok átfedése (%)"
-
-#~ msgid "Amount that each motion block should be overlapped by its neighbours"
-#~ msgstr "Minden mozgásblokkot ennyivel fedjenek át a szomszédai"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "Total horizontal block length including overlaps"
-#~ msgstr "Vízszintes blokkok teljes hossza átfedésekkel"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Total vertical block length including overlaps"
-#~ msgstr "Függőleges blokkok teljes hossza átfedésekkel"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "Mozgásvektor pontossága"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "Mozgásvektor pontossága."
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "Egyszerű ME keresési terület x:y"
-
-#~ msgid ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-#~ msgstr ""
-#~ "(Nem javasolt) Egyszerű, nem hierarchikus, blokkillesztéses mozgásvektor-"
-#~ "keresés végrehajtása a +/-x, +/-y keresési tartományban"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Térbeli felosztás engedélyezése"
-
-#~ msgid "cycles per degree"
-#~ msgstr "ismétlések fokonként"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Dirac videokódoló a dirac-research függvénytár használatával"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Openmash-t használó videodekódoló"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr "| menu [on|off|up|down|left|right|select] menü használata"
-
-#~ msgid "Jump to time"
-#~ msgstr "Ugrás időpontra"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Összeomlási napló megnyitása…"
-
-#~ msgid "Don't Send"
-#~ msgstr "Ne küldje"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "A VLC korábban összeomlott"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "El kívánja küldeni az összeomlás részleteit a VLC fejlesztői csapatának?\n"
-#~ "\n"
-#~ "Ha kívánja, leírhatja néhány sorban, mit csinált a VLC összeomlása előtt, "
-#~ "más hasznos információkkal együtt, például letölthető példafájlra mutató "
-#~ "hivatkozással vagy a hálózati műsor URL-címével."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr ""
-#~ "Beleegyezem, hogy esetleg megkeressenek ezzel a hibajelentéssel "
-#~ "kapcsolatban."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "Csak az alapértelmezett e-mail címe kerül beküldésre, más információk "
-#~ "nélkül-"
-
-#~ msgid "Don't ask again"
-#~ msgstr "Ne kérdezze újra"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Nem található összeomlási napló"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Nincs nyoma korábbi összeomlásnak."
-
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "Az iTunes szüneteltetése a VLC lejátszás közben"
-
-#~ msgid ""
-#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
-#~ "playback will be resumed again if VLC playback is finished."
-#~ msgstr ""
-#~ "Az iTunes lejátszás szüneteltetése a VLC lejátszás indításakor. Ha ki van "
-#~ "jelölve, az iTunes lejátszás folytatódni fog a VLC lejátszás befejeződése "
-#~ "után."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "BSMV mappa megnyitása"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Albumgrafikaletöltési-irányelv"
-
-#~ msgid "Output module"
-#~ msgstr "Kimeneti modul"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Grafikus hangszínszabályzó"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Médiainformációk automatikus lekérése"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "További kiterjesztések letöltése"
-
-#~ msgid "Under the Video"
-#~ msgstr "A videó alatt"
-
-#~ msgid "&Help..."
-#~ msgstr "&Súgó…"
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Szinkronizálása a hangsávon"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Ez a beállítás videoképkockákat dob el/kettőz meg a videosáv hangsávhoz "
-#~ "szinkronizálása érdekében."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "Az átkódoló képkockákat fog eldobni, ha a processzor nem tud lépést "
-#~ "tartani a kódolás sebességével."
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "Hangcsatornák szintjeinek értéke"
-
-#~ msgid ""
-#~ "Value of the audio level of each channels between 0 and 1. Each level "
-#~ "should be separated with ':'."
-#~ msgstr ""
-#~ "Az egyes csatornák hangszintjeinek értéke 0 és 1 között. Minden szintet "
-#~ "kettősponttal (:) kell elválasztani."
-
-#~ msgid "Alarm"
-#~ msgstr "Figyelmeztetés"
-
-#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
-#~ msgstr ""
-#~ "Jelzi a csendet, és figyelmeztetést jelenít meg (0=nincs figyelmeztetés, "
-#~ "1=van)."
-
-#~ msgid "Spatial luma strength (default 4)"
-#~ msgstr "Térbeli fényesség erőssége (alapértelmezett: 4)"
-
-#~ msgid "Spatial chroma strength (default 3)"
-#~ msgstr "Térbeli színesség erőssége (alapértelmezett: 3)"
-
-#~ msgid "Temporal luma strength (default 6)"
-#~ msgstr "Ideiglenes fényesség erőssége (alapértelmezett: 6)"
-
-#~ msgid "Temporal chroma strength (default 4.5)"
-#~ msgstr "Ideiglenes színesség erőssége (alapértelmezett: 4,5)"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "A megjelenítendő futó szöveg. Az elérhető formátum-karakterláncok: Idővel "
-#~ "kapcsolatos: %Y = év, %m = hónap, %d = nap, %H = óra, %M = perc, %S = "
-#~ "másodperc, … Metaadatokkal kapcsolatos: $a = előadó, $b = album, $c = "
-#~ "szerzői jog, $d = leírás, $e = kódoló, $g = műfaj, $l = nyelv, $n = "
-#~ "sorszám, $p = most játszott, $r = értékelés, $s = feliratok nyelve, $t = "
-#~ "cím, $u = URL, $A = dátum, $B = hang bitsebessége (kb/mp), $C = fejezet, "
-#~ "$D = időtartam, $F = teljes név útvonallal, $I = cím, $L = hátralévő idő, "
-#~ "$N = név, $O = hang nyelve, $P = pozíció (%-ban), $R = sebesség, $S = "
-#~ "hang mintavételi frekvenciája (kHz-ben), $T = idő, $U = kiadó, $V = "
-#~ "hangerő, $_ = új sor."
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "iOS OpenGL ES videokimenet (UIView-t igényel)"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "Mac OS X OpenGL videokimenet (rajzolható nsobjectet igényel)"
-
-#~ msgid "OpenGL acceleration is not supported on your Mac"
-#~ msgstr "Ez a Mac nem támogatja az OpenGL gyorsítást"
-
-#~ msgid ""
-#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
-#~ "output. It will still work, but much slower and with possibly unexpected "
-#~ "results."
-#~ msgstr ""
-#~ "Ez a Mac nem támogatja a Quartz Extreme gyorsítást, amely szükséges a "
-#~ "videokimenethez. Így is működni fog, de sokkal lassabban és esetleg "
-#~ "váratlan eredményekkel."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "&Feliratfájl használata"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Albumgrafika-letöltési irányelv:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Médiatár beállítása"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -33295,6 +32900,399 @@ msgstr "Műsorkimenet"
 #, fuzzy
 #~ msgid "You can choose the default deinterlace mode"
 #~ msgstr "Körbelépkedés a váltottsorosság-megszüntetési módokon."
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr ""
+#~ "Válassza ki az előnyben részesített videokimenetet és állítsa be itt."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Ezek a modulok hálózati funkciókat biztosítanak a VLC többi része számára."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr "Általános beállítások a video-, hang- és feliratkódoló modulokhoz."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "A párbeszéd-szolgáltatók itt állíthatók be."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "Ebben a szakaszban a felirat-szétválasztó viselkedése befolyásolható, "
+#~ "például a felirat típusának beállításával vagy fájlnév megadásával."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Nincs megfelelő dekódoló modul"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "A VLC nem támogatja a(z) „%4.4s” hang- vagy videoformátumot. Sajnos nem "
+#~ "tehet semmit ennek kijavításáért."
+
+#, fuzzy
+#~ msgid ""
+#~ "This file contains an optional CRL to prevent remove clients from using "
+#~ "revoked certificates in TLS sessions."
+#~ msgstr ""
+#~ "Ez a fájl egy tanúsítvány-visszavonási listát tartalmazhat, hogy a távoli "
+#~ "kliensek ne használhassanak visszavont tanúsítványokat TLS-"
+#~ "munkamenetekben."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "Kiegészítő útvonal, ahol a VLC a moduljait keresheti. Több útvonal is "
+#~ "megadható a „PATH_SEP” elválasztóval összefűzve."
+
+#~ msgid "Album art policy"
+#~ msgstr "Albumgrafika-irányelv"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Válassza ki, hogyan kívánja letöltetni az albumgrafikát."
+
+#~ msgid "Manual download only"
+#~ msgstr "Csak kézi letöltés"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Szám lejátszásának megkezdésekor"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "A szám felvételekor azonnal"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Médiatár betöltése"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr "Az SQL-alapú médiatár betöltése a VLC indításakor"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg hozzáférés"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "A rendszer AACS-dekódoló függvénytára nem működik, talán hiányoznak a "
+#~ "kulcsok?"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "A VLC nem tudta megnyitni a(z) „%s” fájlt. (%m)"
+
+#~ msgid "TCP address to use"
+#~ msgstr "Használandó TCP-cím"
+
+#~ msgid ""
+#~ "TCP address to use to communicate with the video part of the Bar Graph "
+#~ "(default localhost). In the case of bargraph incrustation, use localhost."
+#~ msgstr ""
+#~ "Az oszlopgrafikon video részével való kommunikációhoz használandó TCP cím "
+#~ "(alapértelmezésben localhost). Ha az oszlopgrafikon nem működik "
+#~ "megfelelően, használja a localhostot."
+
+#~ msgid "TCP port to use"
+#~ msgstr "Használandó TCP port"
+
+#~ msgid ""
+#~ "TCP port to use to communicate with the video part of the Bar Graph "
+#~ "(default 12345). Use the same port as the one used in the rc interface."
+#~ msgstr ""
+#~ "Az oszlopgrafikon video részével való kommunikációhoz használandó TCP "
+#~ "port (alapértelmezett: 12345). Az rc felületen megadottal egyező portot "
+#~ "használja."
+
+#~ msgid "Force connection reset regularly"
+#~ msgstr "Kapcsolat rendszeres visszaállításának kényszerítése"
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr ""
+#~ "Megadja, hogy a TCP kapcsolatot vissza kell-e állítani. Ezt az "
+#~ "audiobargraph_v használata esetén kell használni (alapértelmezett: 1)."
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Hangszűrő a sztereó → mono átalakításhoz"
+
+#~ msgid "Discard cropping information"
+#~ msgstr "Levágási információk eldobása"
+
+#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
+#~ msgstr "Belső levágási paraméterek eldobása (pl. a H.264 SPS-ből)"
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "Videogyorsítás (VA) API"
+
+#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
+#~ msgstr "Videodekódoló- és megjelenítő API Unixhoz (VDPAU)"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr "Ha a bitsebesség 0, használja ezt az állandó minőség megadásához"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "A 0-tól nagyobb érték bekapcsolja az állandó bitsebességű módot"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Veszteségmentes kódolás engedélyezése"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "A veszteségmentes kódolás figyelmen kívül hagyja a bitsebesség és minőség "
+#~ "beállításait, lehetővé téve az eredeti tökéletes másolását"
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "Négyszögű lineáris fázis"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "Átlós lineáris fázis"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "„P” képkockák közötti távolság"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "„P” képkockák száma GOP-onként"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "Mozgáskompenzációs blokkok szélessége"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "Mozgáskompenzációs blokkok magassága"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "Blokkok átfedése (%)"
+
+#~ msgid "Amount that each motion block should be overlapped by its neighbours"
+#~ msgstr "Minden mozgásblokkot ennyivel fedjenek át a szomszédai"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "Total horizontal block length including overlaps"
+#~ msgstr "Vízszintes blokkok teljes hossza átfedésekkel"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Total vertical block length including overlaps"
+#~ msgstr "Függőleges blokkok teljes hossza átfedésekkel"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "Mozgásvektor pontossága"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "Mozgásvektor pontossága."
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "Egyszerű ME keresési terület x:y"
+
+#~ msgid ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+#~ msgstr ""
+#~ "(Nem javasolt) Egyszerű, nem hierarchikus, blokkillesztéses mozgásvektor-"
+#~ "keresés végrehajtása a +/-x, +/-y keresési tartományban"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Térbeli felosztás engedélyezése"
+
+#~ msgid "cycles per degree"
+#~ msgstr "ismétlések fokonként"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Dirac videokódoló a dirac-research függvénytár használatával"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Openmash-t használó videodekódoló"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr "| menu [on|off|up|down|left|right|select] menü használata"
+
+#~ msgid "Jump to time"
+#~ msgstr "Ugrás időpontra"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Összeomlási napló megnyitása…"
+
+#~ msgid "Don't Send"
+#~ msgstr "Ne küldje"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "A VLC korábban összeomlott"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "El kívánja küldeni az összeomlás részleteit a VLC fejlesztői csapatának?\n"
+#~ "\n"
+#~ "Ha kívánja, leírhatja néhány sorban, mit csinált a VLC összeomlása előtt, "
+#~ "más hasznos információkkal együtt, például letölthető példafájlra mutató "
+#~ "hivatkozással vagy a hálózati műsor URL-címével."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr ""
+#~ "Beleegyezem, hogy esetleg megkeressenek ezzel a hibajelentéssel "
+#~ "kapcsolatban."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "Csak az alapértelmezett e-mail címe kerül beküldésre, más információk "
+#~ "nélkül-"
+
+#~ msgid "Don't ask again"
+#~ msgstr "Ne kérdezze újra"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Nem található összeomlási napló"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Nincs nyoma korábbi összeomlásnak."
+
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "Az iTunes szüneteltetése a VLC lejátszás közben"
+
+#~ msgid ""
+#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
+#~ "playback will be resumed again if VLC playback is finished."
+#~ msgstr ""
+#~ "Az iTunes lejátszás szüneteltetése a VLC lejátszás indításakor. Ha ki van "
+#~ "jelölve, az iTunes lejátszás folytatódni fog a VLC lejátszás befejeződése "
+#~ "után."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "BSMV mappa megnyitása"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Albumgrafikaletöltési-irányelv"
+
+#~ msgid "Output module"
+#~ msgstr "Kimeneti modul"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Grafikus hangszínszabályzó"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Médiainformációk automatikus lekérése"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "További kiterjesztések letöltése"
+
+#~ msgid "Under the Video"
+#~ msgstr "A videó alatt"
+
+#~ msgid "&Help..."
+#~ msgstr "&Súgó…"
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Szinkronizálása a hangsávon"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Ez a beállítás videoképkockákat dob el/kettőz meg a videosáv hangsávhoz "
+#~ "szinkronizálása érdekében."
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "Az átkódoló képkockákat fog eldobni, ha a processzor nem tud lépést "
+#~ "tartani a kódolás sebességével."
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "Hangcsatornák szintjeinek értéke"
+
+#~ msgid ""
+#~ "Value of the audio level of each channels between 0 and 1. Each level "
+#~ "should be separated with ':'."
+#~ msgstr ""
+#~ "Az egyes csatornák hangszintjeinek értéke 0 és 1 között. Minden szintet "
+#~ "kettősponttal (:) kell elválasztani."
+
+#~ msgid "Alarm"
+#~ msgstr "Figyelmeztetés"
+
+#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+#~ msgstr ""
+#~ "Jelzi a csendet, és figyelmeztetést jelenít meg (0=nincs figyelmeztetés, "
+#~ "1=van)."
+
+#~ msgid "Spatial luma strength (default 4)"
+#~ msgstr "Térbeli fényesség erőssége (alapértelmezett: 4)"
+
+#~ msgid "Spatial chroma strength (default 3)"
+#~ msgstr "Térbeli színesség erőssége (alapértelmezett: 3)"
+
+#~ msgid "Temporal luma strength (default 6)"
+#~ msgstr "Ideiglenes fényesség erőssége (alapértelmezett: 6)"
+
+#~ msgid "Temporal chroma strength (default 4.5)"
+#~ msgstr "Ideiglenes színesség erőssége (alapértelmezett: 4,5)"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "A megjelenítendő futó szöveg. Az elérhető formátum-karakterláncok: Idővel "
+#~ "kapcsolatos: %Y = év, %m = hónap, %d = nap, %H = óra, %M = perc, %S = "
+#~ "másodperc, … Metaadatokkal kapcsolatos: $a = előadó, $b = album, $c = "
+#~ "szerzői jog, $d = leírás, $e = kódoló, $g = műfaj, $l = nyelv, $n = "
+#~ "sorszám, $p = most játszott, $r = értékelés, $s = feliratok nyelve, $t = "
+#~ "cím, $u = URL, $A = dátum, $B = hang bitsebessége (kb/mp), $C = fejezet, "
+#~ "$D = időtartam, $F = teljes név útvonallal, $I = cím, $L = hátralévő idő, "
+#~ "$N = név, $O = hang nyelve, $P = pozíció (%-ban), $R = sebesség, $S = "
+#~ "hang mintavételi frekvenciája (kHz-ben), $T = idő, $U = kiadó, $V = "
+#~ "hangerő, $_ = új sor."
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "iOS OpenGL ES videokimenet (UIView-t igényel)"
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "Mac OS X OpenGL videokimenet (rajzolható nsobjectet igényel)"
+
+#~ msgid "OpenGL acceleration is not supported on your Mac"
+#~ msgstr "Ez a Mac nem támogatja az OpenGL gyorsítást"
+
+#~ msgid ""
+#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
+#~ "output. It will still work, but much slower and with possibly unexpected "
+#~ "results."
+#~ msgstr ""
+#~ "Ez a Mac nem támogatja a Quartz Extreme gyorsítást, amely szükséges a "
+#~ "videokimenethez. Így is működni fog, de sokkal lassabban és esetleg "
+#~ "váratlan eredményekkel."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "&Feliratfájl használata"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Albumgrafika-letöltési irányelv:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Médiatár beállítása"
 
 #, fuzzy
 #~ msgid "Display OSD menu on top of video output"
