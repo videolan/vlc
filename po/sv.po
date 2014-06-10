@@ -3,23 +3,23 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# DolphinPhoenix <anton_r_3@hotmail.com>, 2013-2014
+# Anton <anton_r_3@hotmail.com>, 2013-2014
 # Daniel Nylander <po@danielnylander.se>, 2006-2012
-# Göran Johansson <goran@fusse.se>, 2014
+# Göran Fusse Johansson <goran@fusse.se>, 2014
 # Gustav Smedberg <shadow.elf@hotmail.com>, 2013
 # Joel Arvidsson <dogai@privat.utfors.se>, 2002
-# Kristoffer Grundströ <kristoffer.grundstrom1983@gmail.com>, 2013-2014
-# MightyNerd <staszw@live.se>, 2013
+# Kristoffer Grundström <kristoffer.grundstrom1983@gmail.com>, 2013-2014
+# Staś Zw. <staszw@live.se>, 2013
 # dotar <t.dotar@gmail.com>, 2014
-# leveebreaks <when.the.levee.breaks.89@gmail.com>, 2013
+# leveebreaks <when.the.levee.breaks.89@gmail.com>, 2013-2014
 # Niklas 'Nille' Åkerström <nille.kungen@gmail.com>, 2009
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2014-06-10 15:44-0400\n"
-"PO-Revision-Date: 2014-05-07 20:59+0000\n"
-"Last-Translator: DolphinPhoenix <anton_r_3@hotmail.com>\n"
+"PO-Revision-Date: 2014-05-17 20:57+0000\n"
+"Last-Translator: leveebreaks <when.the.levee.breaks.89@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/vlc-trans/"
 "language/sv/)\n"
 "Language: sv\n"
@@ -1214,7 +1214,7 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Videoutmatningsmodul"
+msgstr "Klientport"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -4830,7 +4830,7 @@ msgstr "skriv ut versionsinformation"
 #: src/libvlc-module.c:2690
 #, fuzzy
 msgid "core program"
-msgstr "Välj profil"
+msgstr "huvudprogram"
 
 #: src/misc/update.c:473
 #, c-format
@@ -5848,7 +5848,7 @@ msgstr "Blu-ray-fel"
 #: modules/access/bluray.c:1189
 #, fuzzy
 msgid "Top Menu"
-msgstr "Stäng fönster"
+msgstr "Meny"
 
 #: modules/access/bluray.c:1191
 #, fuzzy
@@ -11484,9 +11484,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:100
-#, fuzzy
 msgid "Rate Control Method"
-msgstr "Buffertstorlek för frekvenskontroll"
+msgstr ""
 
 #: modules/codec/qsv.c:102
 msgid ""
@@ -11497,9 +11496,8 @@ msgstr ""
 "'vbr', 'qp', 'avbr'. Läget 'qp' stöds inte för mpeg2."
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "Maximal quantizer-parameter."
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11572,9 +11570,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Antal referensbildrutor"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -12370,7 +12367,7 @@ msgstr "Avkodare för DVB-undertexter"
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "DVB-undertexter"
+msgstr "Text-tv-undertexter"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -14027,7 +14024,7 @@ msgstr "+----[ Slut på hjälpavsnittet ]"
 #: modules/control/rc.c:965
 #, fuzzy
 msgid "Press pause to continue."
-msgstr "Skriv in \"menu select\" eller \"pause\" för att fortsätta."
+msgstr "Tryck på menyval eller paus för att fortsätta."
 
 #: modules/control/rc.c:1191 modules/control/rc.c:1446
 #: modules/control/rc.c:1490
@@ -17006,7 +17003,7 @@ msgstr "Markera allt"
 
 #: modules/gui/macosx/MainMenu.m:348
 msgid "View"
-msgstr "Visa"
+msgstr "Innehåll"
 
 #: modules/gui/macosx/MainMenu.m:357 modules/gui/macosx/MainMenu.m:358
 msgid "Playlist Table Columns"
@@ -18640,7 +18637,6 @@ msgstr ""
 "ip-adress:8080 som standard."
 
 #: modules/gui/macosx/wizard.m:265
-#, fuzzy
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
 "This protocol is used as transport method by many Microsoft's software. Note "
@@ -21785,7 +21781,7 @@ msgstr "Omsamplingskvalitet"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Högkvalitativ omsampling av ljud"
+msgstr "Nivå för efterbehandling av videokvalitet"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -22582,7 +22578,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Behåll bildförhållande"
+msgstr "Indexfil"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -25341,7 +25337,7 @@ msgstr ""
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Avflätningsfilter för video"
+msgstr "Videofilter för interaktivt pusselspel"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freeze"
@@ -28856,7 +28852,7 @@ msgstr "Videofångst"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLC kunde inte öppna avkodningsmodulen."
+msgstr "Ljudutmatningsmodul"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -29107,7 +29103,7 @@ msgstr "Speglingsriktning"
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Standard"
+msgstr "Standardström"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -29168,273 +29164,6 @@ msgstr "VLC media player - Webbgränssnitt"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Strömutmatning"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Välj din föredragna videoutmatningsmodul och konfigurera den här."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Dessa moduler tillhandahåller nätverksfunktioner till alla andra delar av "
-#~ "VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Dessa är allmänna inställningar för kodningsmoduler för video/ljud/"
-#~ "undertexter."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Dialogleverantörer kan konfigureras här."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "I den här sektionen kan du tvinga fram beteendet för undertextdemuxern, "
-#~ "till exempel genom att ställa in undertexttypen eller filnamnet."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Ingen lämplig avkodningsmodul"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC saknar stöd för ljud- eller videoformatet \"%4.4s\". Tyvärr finns det "
-#~ "inget sätt för dig att rätta till detta."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "Ytterligare sökväg för VLC att leta efter sina moduler. Du kan lägga till "
-#~ "flera sökvägar genom att sammanfoga dem med \" PATH_SEP \" som avgränsare"
-
-#~ msgid "Album art policy"
-#~ msgstr "Policy för omslagsbilder"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Välj hur omslagsbilder ska hämtas."
-
-#~ msgid "Manual download only"
-#~ msgstr "Endast manuell hämtning"
-
-#~ msgid "When track starts playing"
-#~ msgstr "När spåret börjar spelas"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Så snart som spåret läggs till"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Läs in mediabibliotek"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr ""
-#~ "Aktivera detta alternativ för att läsa in det SQL-baserade "
-#~ "mediabiblioteket när VLC startas."
-
-#~ msgid "main program"
-#~ msgstr "huvudprogram"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg-åtkomst"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "Ditt systems avkodningsbibliotek för AACS fungerar inte. Saknas nycklar?"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC kunde inte öppna filen \"%s\". (%m)"
-
-#~ msgid "TCP address to use"
-#~ msgstr "TCP-adress som ska användas"
-
-#~ msgid "TCP port to use"
-#~ msgstr "TCP-port som ska användas"
-
-#~ msgid "Force connection reset regularly"
-#~ msgstr "Tvinga anslutningen att återställa sig regelbundet"
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Ljudfilter för konverting av stereo till mono"
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "API för videoacceleration (VA) "
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr "Om bitfrekvensen är 0, använd detta värde för konstant kvalitet"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "Ett värde mer än 0 aktiverar konstant bitfrekvensläge"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Aktivera förlustfri kodning"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "Förlustfri kodning ignorerar bitfrekvens- och kvalitetsinställningar, "
-#~ "vilket möjliggör perfekt återgivning av originalet"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Aktivera spatiell partitionering"
-
-#~ msgid "cycles per degree"
-#~ msgstr "cykler per grad"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Videoavkodare med openmash"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr "| menu . . . [on|off|up|down|left|right|select] använd meny"
-
-#~ msgid "Press menu select or pause to continue."
-#~ msgstr "Tryck på menyval eller paus för att fortsätta."
-
-#~ msgid "Type 'menu select' or 'pause' to continue."
-#~ msgstr "Skriv in \"menu select\" eller \"pause\" för att fortsätta."
-
-#~ msgid "Jump to time"
-#~ msgstr "Hoppa till tid"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Öppna kraschlogg..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Skicka inte"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC har kraschat tidigare"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Vill du skicka in information om kraschen till VLC:s utvecklingsteam?\n"
-#~ "\n"
-#~ "Om du vill så kan du skriva ett par rader om vad du gjorde innan VLC "
-#~ "kraschade tillsammans med annan behjälplig information: en länk till en "
-#~ "exempelfil, en URL för en nätverksström, ..."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr "Jag godkänner att bli kontaktad angående denna felrapport."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "Endast din e-postadress kommer att skickas in och ingen annan information."
-
-#~ msgid "Don't ask again"
-#~ msgstr "Fråga inte igen"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Ingen kraschlogg hittad"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Kunde inte hitta några spår efter en tidigare krasch."
-
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "Pausa iTunes när VLC spelar upp"
-
-#~ msgid ""
-#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
-#~ "playback will be resumed again if VLC playback is finished."
-#~ msgstr ""
-#~ "Pausar uppspelning i iTunes när uppspelning i VLC startar. Om det "
-#~ "markeras kommer uppspelningen i iTunes återupptas igen om uppspelningen i "
-#~ "VLC slutförs."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Öppna BDMV-mapp"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Policy för hämtning av omslagsbilder"
-
-#~ msgid "Output module"
-#~ msgstr "Utmatningsmodul"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Grafisk equalizer"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Hämta mediainfo automatiskt"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Hämta fler tillägg på"
-
-#~ msgid "Under the Video"
-#~ msgstr "Under videon"
-
-#~ msgid "&Help..."
-#~ msgstr "&Hjälp..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Synkronisera på ljudspår"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Detta alternativ kommer att släppa/fördubbla videobildrutor för att "
-#~ "synkronisera videospåret med ljudspåret."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "Omkodaren kommer att kasta bildrutor om din processor inte klarar av "
-#~ "kodningsfrekvensen."
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "Värde för ljudkanalernas nivåer"
-
-#~ msgid ""
-#~ "Value of the audio level of each channels between 0 and 1. Each level "
-#~ "should be separated with ':'."
-#~ msgstr ""
-#~ "Värdet för ljudnivån av varje kanal mellan 0 och 1. Varje nivå bör "
-#~ "avskiljas med ':'."
-
-#~ msgid "Alarm"
-#~ msgstr "Alarm"
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "iOS OpenGL ES-videoutmatning (kräver UIView)"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "Mac OS X OpenGL-videoutmatning (kräver drawable-nsobject)"
-
-#~ msgid "OpenGL acceleration is not supported on your Mac"
-#~ msgstr "OpenGL-acceleration stöds inte på din Mac"
-
-#~ msgid ""
-#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
-#~ "output. It will still work, but much slower and with possibly unexpected "
-#~ "results."
-#~ msgstr ""
-#~ "Din Mac saknar Quartz Extreme-acceleration som är nödvändig för "
-#~ "videoutmatning. Den kommer fortfarande fungera, men mycket långsammare "
-#~ "och förmodligen med oväntade resultat."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Använd en under&textfil"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Policy för hämtning av omslagsbilder:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Konfigurera mediabibliotek"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -31896,6 +31625,273 @@ msgstr "Strömutmatning"
 #~ msgid "Subtitles files (*.cdg *.idx *.srt *.sub *.utf);;All files (*)"
 #~ msgstr "Undertextfiler (*.cdg *.idx *.srt *.sub *.utf);;Alla filer (*)"
 
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Välj din föredragna videoutmatningsmodul och konfigurera den här."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Dessa moduler tillhandahåller nätverksfunktioner till alla andra delar av "
+#~ "VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Dessa är allmänna inställningar för kodningsmoduler för video/ljud/"
+#~ "undertexter."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Dialogleverantörer kan konfigureras här."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "I den här sektionen kan du tvinga fram beteendet för undertextdemuxern, "
+#~ "till exempel genom att ställa in undertexttypen eller filnamnet."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Ingen lämplig avkodningsmodul"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC saknar stöd för ljud- eller videoformatet \"%4.4s\". Tyvärr finns det "
+#~ "inget sätt för dig att rätta till detta."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "Ytterligare sökväg för VLC att leta efter sina moduler. Du kan lägga till "
+#~ "flera sökvägar genom att sammanfoga dem med \" PATH_SEP \" som avgränsare"
+
+#~ msgid "Album art policy"
+#~ msgstr "Policy för omslagsbilder"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Välj hur omslagsbilder ska hämtas."
+
+#~ msgid "Manual download only"
+#~ msgstr "Endast manuell hämtning"
+
+#~ msgid "When track starts playing"
+#~ msgstr "När spåret börjar spelas"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Så snart som spåret läggs till"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Läs in mediabibliotek"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr ""
+#~ "Aktivera detta alternativ för att läsa in det SQL-baserade "
+#~ "mediabiblioteket när VLC startas."
+
+#~ msgid "main program"
+#~ msgstr "huvudprogram"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg-åtkomst"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "Ditt systems avkodningsbibliotek för AACS fungerar inte. Saknas nycklar?"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLC kunde inte öppna filen \"%s\". (%m)"
+
+#~ msgid "TCP address to use"
+#~ msgstr "TCP-adress som ska användas"
+
+#~ msgid "TCP port to use"
+#~ msgstr "TCP-port som ska användas"
+
+#~ msgid "Force connection reset regularly"
+#~ msgstr "Tvinga anslutningen att återställa sig regelbundet"
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Ljudfilter för konverting av stereo till mono"
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "API för videoacceleration (VA) "
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr "Om bitfrekvensen är 0, använd detta värde för konstant kvalitet"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "Ett värde mer än 0 aktiverar konstant bitfrekvensläge"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Aktivera förlustfri kodning"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "Förlustfri kodning ignorerar bitfrekvens- och kvalitetsinställningar, "
+#~ "vilket möjliggör perfekt återgivning av originalet"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Aktivera spatiell partitionering"
+
+#~ msgid "cycles per degree"
+#~ msgstr "cykler per grad"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Videoavkodare med openmash"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr "| menu . . . [on|off|up|down|left|right|select] använd meny"
+
+#~ msgid "Press menu select or pause to continue."
+#~ msgstr "Tryck på menyval eller paus för att fortsätta."
+
+#~ msgid "Type 'menu select' or 'pause' to continue."
+#~ msgstr "Skriv in \"menu select\" eller \"pause\" för att fortsätta."
+
+#~ msgid "Jump to time"
+#~ msgstr "Hoppa till tid"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Öppna kraschlogg..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Skicka inte"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC har kraschat tidigare"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Vill du skicka in information om kraschen till VLC:s utvecklingsteam?\n"
+#~ "\n"
+#~ "Om du vill så kan du skriva ett par rader om vad du gjorde innan VLC "
+#~ "kraschade tillsammans med annan behjälplig information: en länk till en "
+#~ "exempelfil, en URL för en nätverksström, ..."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr "Jag godkänner att bli kontaktad angående denna felrapport."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "Endast din e-postadress kommer att skickas in och ingen annan information."
+
+#~ msgid "Don't ask again"
+#~ msgstr "Fråga inte igen"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Ingen kraschlogg hittad"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Kunde inte hitta några spår efter en tidigare krasch."
+
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "Pausa iTunes när VLC spelar upp"
+
+#~ msgid ""
+#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
+#~ "playback will be resumed again if VLC playback is finished."
+#~ msgstr ""
+#~ "Pausar uppspelning i iTunes när uppspelning i VLC startar. Om det "
+#~ "markeras kommer uppspelningen i iTunes återupptas igen om uppspelningen i "
+#~ "VLC slutförs."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Öppna BDMV-mapp"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Policy för hämtning av omslagsbilder"
+
+#~ msgid "Output module"
+#~ msgstr "Utmatningsmodul"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Grafisk equalizer"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Hämta mediainfo automatiskt"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "Hämta fler tillägg på"
+
+#~ msgid "Under the Video"
+#~ msgstr "Under videon"
+
+#~ msgid "&Help..."
+#~ msgstr "&Hjälp..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Synkronisera på ljudspår"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Detta alternativ kommer att släppa/fördubbla videobildrutor för att "
+#~ "synkronisera videospåret med ljudspåret."
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "Omkodaren kommer att kasta bildrutor om din processor inte klarar av "
+#~ "kodningsfrekvensen."
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "Värde för ljudkanalernas nivåer"
+
+#~ msgid ""
+#~ "Value of the audio level of each channels between 0 and 1. Each level "
+#~ "should be separated with ':'."
+#~ msgstr ""
+#~ "Värdet för ljudnivån av varje kanal mellan 0 och 1. Varje nivå bör "
+#~ "avskiljas med ':'."
+
+#~ msgid "Alarm"
+#~ msgstr "Alarm"
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "iOS OpenGL ES-videoutmatning (kräver UIView)"
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "Mac OS X OpenGL-videoutmatning (kräver drawable-nsobject)"
+
+#~ msgid "OpenGL acceleration is not supported on your Mac"
+#~ msgstr "OpenGL-acceleration stöds inte på din Mac"
+
+#~ msgid ""
+#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
+#~ "output. It will still work, but much slower and with possibly unexpected "
+#~ "results."
+#~ msgstr ""
+#~ "Din Mac saknar Quartz Extreme-acceleration som är nödvändig för "
+#~ "videoutmatning. Den kommer fortfarande fungera, men mycket långsammare "
+#~ "och förmodligen med oväntade resultat."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Använd en under&textfil"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Policy för hämtning av omslagsbilder:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Konfigurera mediabibliotek"
+
 #, fuzzy
 #~ msgid "Display OSD menu on top of video output"
 #~ msgstr "iOS OpenGL-videoutmatning"
@@ -32044,7 +32040,7 @@ msgstr "Strömutmatning"
 
 #, fuzzy
 #~ msgid "Icon View"
-#~ msgstr "Visa"
+#~ msgstr "Innehåll"
 
 #, fuzzy
 #~ msgid "List View"
@@ -33097,7 +33093,7 @@ msgstr "Strömutmatning"
 
 #, fuzzy
 #~ msgid "Viewer"
-#~ msgstr "Visa"
+#~ msgstr "Innehåll"
 
 #, fuzzy
 #~ msgid "Library"
@@ -36438,7 +36434,7 @@ msgstr "Strömutmatning"
 
 #, fuzzy
 #~ msgid "_View"
-#~ msgstr "Visa"
+#~ msgstr "Innehåll"
 
 #, fuzzy
 #~ msgid "_Settings"
