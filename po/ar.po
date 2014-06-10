@@ -1159,12 +1159,12 @@ msgstr "المقصد ترميز  الفيديو "
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "وحدة خرج الفديو"
+msgstr "زبون المنفذ"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr "لا يستطيع VLC فتح الوحدة %s."
+msgstr "لم يستطع VLC الاتصال ب\"%s:%d\"."
 
 #: src/input/decoder.c:698
 #, fuzzy
@@ -5574,7 +5574,7 @@ msgstr ""
 #: modules/access/bluray.c:70
 #, fuzzy
 msgid "Region code"
-msgstr "طريقة الإرسال"
+msgstr "مرماز الفيديو"
 
 #: modules/access/bluray.c:71
 msgid ""
@@ -10481,7 +10481,7 @@ msgstr "لم يستطع VLC فتح المُرمّز."
 #: modules/codec/avcodec/hwdummy.c:42
 #, fuzzy
 msgid "Dummy video decoder"
-msgstr "كاشف رموز الفديو Theora"
+msgstr "فك الرموز الافتراضي"
 
 #: modules/codec/avcodec/vaapi.c:62
 #, fuzzy
@@ -11173,9 +11173,8 @@ msgid "PNG video encoder"
 msgstr " كاشف الرموز للفديو"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "تمكين نمط الخلفية"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11184,9 +11183,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "اختر ملفًا شخصيًا:"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11196,9 +11194,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "كوديك"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11239,9 +11236,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "واجهة Qt"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11254,9 +11250,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:100
-#, fuzzy
 msgid "Rate Control Method"
-msgstr "حجم صوان مراقبة التدفق"
+msgstr ""
 
 #: modules/codec/qsv.c:102
 msgid ""
@@ -11265,9 +11260,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "I quantization عامل "
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11307,9 +11301,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "أعلى معدل البت"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11341,9 +11334,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "عدد الإطارات المرجعيّة"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11357,9 +11349,8 @@ msgid "Number of reference frames"
 msgstr "عدد الإطارات المرجعيّة"
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "عدد صفوف اللغز"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -13849,7 +13840,7 @@ msgstr "+----[نهاية المساعدة]"
 #: modules/control/rc.c:965
 #, fuzzy
 msgid "Press pause to continue."
-msgstr "  النوع 'انتقاء القاءمة' أو 'التوقف' للمتابعة"
+msgstr "ضغط انتقاء القائمة أو التوقف للمتابعة"
 
 #: modules/control/rc.c:1191 modules/control/rc.c:1446
 #: modules/control/rc.c:1490
@@ -15978,7 +15969,7 @@ msgstr "أظهر الإعدادات"
 #: modules/gui/macosx/BWQuincyUI.m:79
 #, fuzzy
 msgid "Hide Details"
-msgstr "أظهر الإعدادات"
+msgstr "اخفاء البقية"
 
 #: modules/gui/macosx/BWQuincyUI.m:81
 msgid "Send"
@@ -20620,7 +20611,7 @@ msgstr "اختر ملفًا شخصيًا:"
 #: modules/gui/qt4/dialogs/toolbar.cpp:185
 #, fuzzy
 msgid "Preview"
-msgstr "العنوان السابق"
+msgstr "السابق"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:194
 msgid "Cl&ose"
@@ -21434,7 +21425,7 @@ msgstr "نوعية الترميز"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "إعادة أخذ العينات ذو جودة عالية"
+msgstr "مستوى الجودة"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -24960,7 +24951,7 @@ msgstr "RGB  مُرشح   الفيديو إستخراج مكّونات"
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Deinterlacing  المرشح  الفيديو "
+msgstr "game video filter فلتر الفيديو"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freeze"
@@ -28038,9 +28029,8 @@ msgid "Default caching policy"
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:506
-#, fuzzy
 msgid "Menus language:"
-msgstr "لغة الصوت"
+msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:507
 msgid "Look and feel"
@@ -28436,7 +28426,7 @@ msgstr ""
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "لم يستطع VLC فتح وحدة فتح الترميز."
+msgstr "وحدة اخراج الصوت"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -28544,7 +28534,7 @@ msgstr "اعداد عرض صورة اللقطة"
 #: modules/codec/svg.c:53
 #, fuzzy
 msgid "Specify the height to decode the image too"
-msgstr "مجموع ذروة  البكسل لذروة العناصر"
+msgstr "يحدد ديينتيرلاكي نموذج الإستخدام."
 
 #: modules/codec/svg.c:55
 #, fuzzy
@@ -28675,7 +28665,7 @@ msgstr ""
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "المبدئي"
+msgstr "الدفق المبدئي"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -28734,122 +28724,6 @@ msgstr "مساعدة مشغل الوسائط VLC"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "ناتج التيار"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "اختر خرج الفيديو المفضل واضبطه هنا"
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ".VLCهذه الوحدات توفر وظائف الوصول للشبكة لكل  وحدات"
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr "هذه اعدادات وحدات الترميز العامة لـ الفيديو / الصوت / الترجمة."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr ".مجهزون الحوار يمكن أن يشكلون هنا"
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "لا توجد وحدة فك الترميز المناسبة"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "لا يدعم VLC صيغة الصوت أوالفيديو \"%4.4s\". مع الأسف، لا توجد طريقة تمكنك "
-#~ "من إصلاح هذا."
-
-#~ msgid "Album art policy"
-#~ msgstr "art policy ألبوم "
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr ".إختار أي ألبوم فن و سيتم تنزيله"
-
-#~ msgid "Manual download only"
-#~ msgstr "تنزيل يدوي فقط"
-
-#~ msgid "When track starts playing"
-#~ msgstr "عندما يبدأ مسار اللعب "
-
-#~ msgid "As soon as track is added"
-#~ msgstr "عندما تضاف المقطوعة"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "مُرشح سمعي للتحويل إلى الصيغة الأحادية"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "openmash كاشف الرموز للفديو مستعملاً   "
-
-#~ msgid "Press menu select or pause to continue."
-#~ msgstr "ضغط انتقاء القائمة أو التوقف للمتابعة"
-
-#~ msgid "Type 'menu select' or 'pause' to continue."
-#~ msgstr "  النوع 'انتقاء القاءمة' أو 'التوقف' للمتابعة"
-
-#~ msgid "Jump to time"
-#~ msgstr "القفز على الزمن"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "لم يوجد سجل اتهيار"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr " يمكن العثور على اي اثر لحادث سابق."
-
-#~ msgid "Output module"
-#~ msgstr "وحدة الخرج"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "حضّر الملفات تلقائيًا"
-
-#~ msgid "Under the Video"
-#~ msgstr "تحت الفيديو"
-
-#~ msgid "&Help..."
-#~ msgstr "م&ساعدة..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "المداومه على المسار الصوتي "
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ ".هذا الخيارسوف\" يفلة/ينسخ\" اطر المداومه الفيديو المسار على المسار الصوتي"
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ ".المحوّل الإلكتروني لإشارات الفيديو   سيهبط الى الاطر كان حرصك على وحدة "
-#~ "المعالجه المركزية الى عدم مواكبة معدل الترميز"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "خيمة عرض النص. (متاح شكل خيوط : الوقت المتصله :%Y = year, %m = month, %d "
-#~ "= day, %H = hour, %M = minute, %S = second, ... Meta data related: $a = "
-#~ "artist, $b = album, $c = copyright, $d = description, $e = encoded by, $g "
-#~ "= genre, $l = language, $n = track num, $p = now playing, $r = rating, $s "
-#~ "= subtitles language, $t = title, $u = url, $A = date, $B = audio bitrate "
-#~ "(in kb/s), $C = chapter,$D = duration, $F = full name with path, $I = "
-#~ "title, $L = time left, $N = name, $O = audio language, $P = position (in "
-#~ "%), $R = rate, $S = audio sample rate (in kHz), $T = time, $U = "
-#~ "publisher, $V = volume, $_ = new line) "
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "أضِف ملف ترجمة"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -32218,6 +32092,122 @@ msgstr "ناتج التيار"
 
 #~ msgid "Remaining time: %i seconds"
 #~ msgstr "ثانية %  i :الوقت المتبقي"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "اختر خرج الفيديو المفضل واضبطه هنا"
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ".VLCهذه الوحدات توفر وظائف الوصول للشبكة لكل  وحدات"
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr "هذه اعدادات وحدات الترميز العامة لـ الفيديو / الصوت / الترجمة."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr ".مجهزون الحوار يمكن أن يشكلون هنا"
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "لا توجد وحدة فك الترميز المناسبة"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "لا يدعم VLC صيغة الصوت أوالفيديو \"%4.4s\". مع الأسف، لا توجد طريقة تمكنك "
+#~ "من إصلاح هذا."
+
+#~ msgid "Album art policy"
+#~ msgstr "art policy ألبوم "
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr ".إختار أي ألبوم فن و سيتم تنزيله"
+
+#~ msgid "Manual download only"
+#~ msgstr "تنزيل يدوي فقط"
+
+#~ msgid "When track starts playing"
+#~ msgstr "عندما يبدأ مسار اللعب "
+
+#~ msgid "As soon as track is added"
+#~ msgstr "عندما تضاف المقطوعة"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "مُرشح سمعي للتحويل إلى الصيغة الأحادية"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "openmash كاشف الرموز للفديو مستعملاً   "
+
+#~ msgid "Press menu select or pause to continue."
+#~ msgstr "ضغط انتقاء القائمة أو التوقف للمتابعة"
+
+#~ msgid "Type 'menu select' or 'pause' to continue."
+#~ msgstr "  النوع 'انتقاء القاءمة' أو 'التوقف' للمتابعة"
+
+#~ msgid "Jump to time"
+#~ msgstr "القفز على الزمن"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "لم يوجد سجل اتهيار"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr " يمكن العثور على اي اثر لحادث سابق."
+
+#~ msgid "Output module"
+#~ msgstr "وحدة الخرج"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "حضّر الملفات تلقائيًا"
+
+#~ msgid "Under the Video"
+#~ msgstr "تحت الفيديو"
+
+#~ msgid "&Help..."
+#~ msgstr "م&ساعدة..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "المداومه على المسار الصوتي "
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ ".هذا الخيارسوف\" يفلة/ينسخ\" اطر المداومه الفيديو المسار على المسار الصوتي"
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ ".المحوّل الإلكتروني لإشارات الفيديو   سيهبط الى الاطر كان حرصك على وحدة "
+#~ "المعالجه المركزية الى عدم مواكبة معدل الترميز"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "خيمة عرض النص. (متاح شكل خيوط : الوقت المتصله :%Y = year, %m = month, %d "
+#~ "= day, %H = hour, %M = minute, %S = second, ... Meta data related: $a = "
+#~ "artist, $b = album, $c = copyright, $d = description, $e = encoded by, $g "
+#~ "= genre, $l = language, $n = track num, $p = now playing, $r = rating, $s "
+#~ "= subtitles language, $t = title, $u = url, $A = date, $B = audio bitrate "
+#~ "(in kb/s), $C = chapter,$D = duration, $F = full name with path, $I = "
+#~ "title, $L = time left, $N = name, $O = audio language, $P = position (in "
+#~ "%), $R = rate, $S = audio sample rate (in kHz), $T = time, $U = "
+#~ "publisher, $V = volume, $_ = new line) "
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "أضِف ملف ترجمة"
 
 #, fuzzy
 #~ msgid "Greek, Modern ()"
