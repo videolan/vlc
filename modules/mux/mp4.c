@@ -537,7 +537,7 @@ static int Mux(sout_mux_t *p_mux)
         if (p_stream->fmt.i_cat == SPU_ES) {
             int64_t i_length = p_stream->entry[p_stream->i_entry_count-1].i_length;
 
-            if (i_length != 0) {
+            if ( i_length != 0 && (p_data = block_Alloc(3)) ) {
                 /* TODO */
                 msg_Dbg(p_mux, "writing an empty sub") ;
 
@@ -556,7 +556,6 @@ static int Mux(sout_mux_t *p_mux)
                 p_stream->i_last_dts += i_length;
 
                 /* Write a " " */
-                p_data = block_Alloc(3);
                 p_data->p_buffer[0] = 0;
                 p_data->p_buffer[1] = 1;
                 p_data->p_buffer[2] = ' ';
