@@ -10906,9 +10906,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Kodek"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11014,9 +11013,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Bitreyt"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -28061,39 +28059,6 @@ msgstr "VLC media pleyeri - Veb interfeysi"
 msgid "Streaming Output"
 msgstr "Oqimni chiqarish"
 
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Video ko'rsatish usulini tanlash va moslash."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Ushbu modullar VLC boshqa qismlarining tarmoq imkoniyatlarini ta'minlaydi."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Mos dekoder yo'q"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC \"%4.4s\" audio yoki video formatini ta'minlamaydi. Afsuski, siz "
-#~ "uchun buni tuzatishning iloji yo'q."
-
-#~ msgid "When track starts playing"
-#~ msgstr "Trek ijro etilayotganda"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Trek qo‘shilganda"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Subtitr faylini qo‘shish:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Media kutu"
-
 #~ msgid "General Input"
 #~ msgstr "Umumiy kiritish"
 
@@ -28217,6 +28182,39 @@ msgstr "Oqimni chiqarish"
 
 #~ msgid "Group name"
 #~ msgstr "Guruh nomi"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Video ko'rsatish usulini tanlash va moslash."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Ushbu modullar VLC boshqa qismlarining tarmoq imkoniyatlarini ta'minlaydi."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Mos dekoder yo'q"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC \"%4.4s\" audio yoki video formatini ta'minlamaydi. Afsuski, siz "
+#~ "uchun buni tuzatishning iloji yo'q."
+
+#~ msgid "When track starts playing"
+#~ msgstr "Trek ijro etilayotganda"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Trek qo‘shilganda"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Subtitr faylini qo‘shish:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Media kutu"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
