@@ -3,19 +3,19 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# nask0 <arrtedone@gmail.com>, 2013
+# Atanas Beloborodov <arrtedone@gmail.com>, 2013
 # Ivo Ivanov, 2008,2010
-# ivopetkov <ivopetkov@krutt.org>, 2013
-# cybercop <cybercop_montana@abv.bg>, 2013
+# ivo <ivopetkov@krutt.org>, 2013
+# Kiril Kirilov <cybercop_montana@abv.bg>, 2013
 # alexdimitrov <kvikmen@gmail.com>, 2013
-# Dani.Peteva <danie.peteva@gmail.com>, 2014
+# Yordanka Peteva <danie.peteva@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2014-06-10 15:44-0400\n"
-"PO-Revision-Date: 2014-04-29 13:38+0000\n"
-"Last-Translator: Dani.Peteva <danie.peteva@gmail.com>\n"
+"PO-Revision-Date: 2014-05-20 09:00+0000\n"
+"Last-Translator: Atanas Beloborodov <arrtedone@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/projects/p/vlc-trans/"
 "language/bg/)\n"
 "Language: bg\n"
@@ -1151,7 +1151,7 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Модул за извеждане на видеото"
+msgstr "Порт на клиента"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -3240,13 +3240,10 @@ msgid "HTTP/TLS Certificate Revocation List"
 msgstr "HTTP/TLS списък на отменените сертификати (CRL)."
 
 #: src/libvlc-module.c:846
-#, fuzzy
 msgid ""
 "This file contains an optional CRL to prevent remote clients from using "
 "revoked certificates in TLS sessions."
 msgstr ""
-"Този файл съдържа по избор CRL, за да предпази отдалечените клиенти да "
-"използват анулирани сертификати в TLS сесии."
 
 #: src/libvlc-module.c:849
 msgid "SOCKS server"
@@ -11572,9 +11569,8 @@ msgid "PNG video encoder"
 msgstr "Видео декодер PNG"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Възпроизвеждане на десктоп"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11583,9 +11579,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Изберете профил"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11595,9 +11590,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Кодек"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11618,9 +11612,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:79
-#, fuzzy
 msgid "Group of Picture Reference Distance"
-msgstr "Име на текущото копие"
+msgstr ""
 
 #: modules/codec/qsv.c:81
 msgid ""
@@ -11639,9 +11632,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Защитен интервал"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11654,9 +11646,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:100
-#, fuzzy
 msgid "Rate Control Method"
-msgstr "Метод за контрол на честотата"
+msgstr ""
 
 #: modules/codec/qsv.c:102
 msgid ""
@@ -11665,9 +11656,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "Коефицент на квантоване на I-кадрите"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11707,9 +11697,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Максимален битрейт"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11741,9 +11730,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Брой на частите за кадър"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11757,9 +11745,8 @@ msgid "Number of reference frames"
 msgstr "Брой на референсните кадри"
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Брой редове на пъзела"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -22109,7 +22096,7 @@ msgstr "Качество на обработката на звука"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Висококачествена обработка на звука"
+msgstr "Ниво на допълнителната обработка на видеото"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -22942,7 +22929,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Запазване съотношението на страните"
+msgstr "Индекс файл"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -25812,7 +25799,7 @@ msgstr "Извличане на RGB компонент от видеото"
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Деинтерлейс"
+msgstr "Интерактивна игра на пъзел"
 
 #: modules/video_filter/freeze.c:78
 #, fuzzy
@@ -29041,9 +29028,8 @@ msgid "Default caching policy"
 msgstr "Ниво на кеширане по подразбиране"
 
 #: modules/gui/qt4/ui/sprefs_interface.h:506
-#, fuzzy
 msgid "Menus language:"
-msgstr "Език на аудиото"
+msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:507
 msgid "Look and feel"
@@ -29444,7 +29430,7 @@ msgstr "Видео захващане"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLC не може да отвори декодер модула."
+msgstr "Модул за извеждане на звука"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -29751,265 +29737,6 @@ msgstr "VLC media player - Уеб интерфейс"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Извеждане на поток"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr ""
-#~ "Изберете предпочитаното извеждане на видеото и го настройте в този раздел."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "Тези модули обезпечават мрежови функции към другите части на VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr "Това са общи настройки за кодиране на видео / аудио / модулите."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Тук можете да настроите показването на диалогови прозорци."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "В тази секция, можете да форсирате поведението на субтитрите, например за "
-#~ "посочване на типа или файла на субтитрите ."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Няма подходящ модул за декодера"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC не поддържа аудио или видео формата \"%4.4s\". За съжаление, няма "
-#~ "начин да го поправите."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "Допълнителен път за търсене на модули за VLC. Можете да добавите няколко "
-#~ "пътя за последователно им използване, като за разделител използвайте \" "
-#~ "PATH_SEP \"."
-
-#~ msgid "Album art policy"
-#~ msgstr "Управление зареждането на обложка на албум"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Изберете как да се зарежда обложка на албум"
-
-#~ msgid "Manual download only"
-#~ msgstr "Ръчно зареждане"
-
-#~ msgid "When track starts playing"
-#~ msgstr "При стартиране възпроизв. на файла"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "При добавяне на файла в плейлиста"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Зареждане на медия библиотеката"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr ""
-#~ "Включете тази опция, за да се зареди SQL-базираната медия библиотека на "
-#~ "VLC при стартиране"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "Библиотеката за AACS декодиране във вашата система не работи. Липсващ "
-#~ "ключ?"
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr ""
-#~ "Определяне дали да се нулира TCP връзката. Това се избира, когато се "
-#~ "използва видео частта на хистограмата (по подразбиране 1)."
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Конвертиране на стерео към моно"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr "Ако битрейта=0, използвайте тази стойност за постоянно качество"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "Стойност > 0 включва режима на постоянен битрейт"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Включване кодиране без загуби"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "Кодирането без загуби игнорира битрейта и настройките за качество, "
-#~ "позволявайки перфектно възпроизвеждане на оригинала"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "Разстояние между 'P' кадрите"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Брой на 'P' кадрите за GOP"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "Точност на векторното движение"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Видео декодер с използване на openmash"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr ""
-#~ "| menu . . [вкл.|изкл.|нагоре|надолу|наляво|надясно|избор] използване на "
-#~ "меню"
-
-#~ msgid "Jump to time"
-#~ msgstr "Преход до време"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Отваряне на отчета за срива"
-
-#~ msgid "Don't Send"
-#~ msgstr "Без изпращане"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "Предишния път е имало срив на VLC"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Желаете ли да изпратите подробности за срива до разработчиците на VLC\n"
-#~ "\n"
-#~ "Ако желаете, можете да напишете няколко реда за това какво сте правили "
-#~ "преди да стане срива на VLC, заедно с друга полезна информация като: линк "
-#~ "за изтегляне на проблемния файл, URL на проблемния мрежов поток, ..."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr ""
-#~ "Съгласен съм да бъда на разположение за контакт относно този доклад за "
-#~ "бъг."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "Само вашия E-Mail по подразбиране ще бъде изпратен, няма да включва "
-#~ "никаква друга информация."
-
-#~ msgid "Don't ask again"
-#~ msgstr "Не питай отново"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Не е намерен отчет за срив"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Никакви признаци за предишен срив не са намерени."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Отваряне на папката BDMV"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Управление зареждането на обложка на албум"
-
-#~ msgid "Output module"
-#~ msgstr "Модул за извеждане"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Графичен Еквалайзер"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Автоматично настройване усилването на видеото."
-
-#~ msgid "Under the Video"
-#~ msgstr "Под видеото"
-
-#~ msgid "&Help..."
-#~ msgstr "Помощ..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Синхронизиране на аудио пътечка"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Пропускане/дублиране на видео кадри, за синхронизиране на видео пътечка с "
-#~ "аудио пътечка."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "Кодера ще пропуска кадри, ако вашия процесор не може да поддържа "
-#~ "честотата на кодиране."
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "Стойност на нивата на аудио каналите"
-
-#~ msgid ""
-#~ "Value of the audio level of each channels between 0 and 1. Each level "
-#~ "should be separated with ':'."
-#~ msgstr ""
-#~ "Стойност на нивото на аудиото на всеки канал, между 0 и 1. Всяко ниво "
-#~ "трябва да бъде разделено с ':'."
-
-#~ msgid "Alarm"
-#~ msgstr "Аларма"
-
-#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
-#~ msgstr ""
-#~ "При сигнали за затихване, да се показва съобщение (0=без аларма, "
-#~ "1=аларма)."
-
-#~ msgid "Spatial luma strength (default 4)"
-#~ msgstr "Усилване на яркостта (по подразбиране 4)"
-
-#~ msgid "Spatial chroma strength (default 3)"
-#~ msgstr "Усилване на цветността (по подразбиране 3)"
-
-#~ msgid "Temporal luma strength (default 6)"
-#~ msgstr "Временно усилване на яркостта (по подразбиране 6)"
-
-#~ msgid "Temporal chroma strength (default 4.5)"
-#~ msgstr "Временно усилване на цветността (по подразбиране 4.5)"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "Текст, който да се показва на екрана. (Налични са следните формати за "
-#~ "низ: Отнасящи се до време: %Y = година, %m = месец, %d = ден, %H = час, "
-#~ "%M = минута, %S = секунда, ... Отнасящи се до мета-данни: $a = "
-#~ "изпълнител, $b = албум, $c = авторски права, $d = описание, $e = кодирано "
-#~ "от, $g = жанр, $l = език, $n = номер на пътечка, $p = сега се "
-#~ "възпроизвежда, $r = рейтинг, $s = език за субтитрите, $t = заглавие, $u = "
-#~ "url, $A = дата, $B = битрейт на аудиото (в kb/s), $C = глава,$D = "
-#~ "времетраене, $F = пълното име с пътя, $I = заглавие, $L = изминало време, "
-#~ "$N = име, $O = език за аудиото, $P = позиция (в %), $R = честота, $S = "
-#~ "честота на дискретизация на аудиото (в kHz), $T = време, $U = издател, $V "
-#~ "= сила на звука, $_ = нов ред) "
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Добавяне на файл със субтитри:"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Управление зареждането на обложка на албум:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Настройка на медия библиотеката"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -31556,6 +31283,265 @@ msgstr "Извеждане на поток"
 
 #~ msgid "Okay"
 #~ msgstr "ОК"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr ""
+#~ "Изберете предпочитаното извеждане на видеото и го настройте в този раздел."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "Тези модули обезпечават мрежови функции към другите части на VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr "Това са общи настройки за кодиране на видео / аудио / модулите."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Тук можете да настроите показването на диалогови прозорци."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "В тази секция, можете да форсирате поведението на субтитрите, например за "
+#~ "посочване на типа или файла на субтитрите ."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Няма подходящ модул за декодера"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC не поддържа аудио или видео формата \"%4.4s\". За съжаление, няма "
+#~ "начин да го поправите."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "Допълнителен път за търсене на модули за VLC. Можете да добавите няколко "
+#~ "пътя за последователно им използване, като за разделител използвайте \" "
+#~ "PATH_SEP \"."
+
+#~ msgid "Album art policy"
+#~ msgstr "Управление зареждането на обложка на албум"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Изберете как да се зарежда обложка на албум"
+
+#~ msgid "Manual download only"
+#~ msgstr "Ръчно зареждане"
+
+#~ msgid "When track starts playing"
+#~ msgstr "При стартиране възпроизв. на файла"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "При добавяне на файла в плейлиста"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Зареждане на медия библиотеката"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr ""
+#~ "Включете тази опция, за да се зареди SQL-базираната медия библиотека на "
+#~ "VLC при стартиране"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "Библиотеката за AACS декодиране във вашата система не работи. Липсващ "
+#~ "ключ?"
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr ""
+#~ "Определяне дали да се нулира TCP връзката. Това се избира, когато се "
+#~ "използва видео частта на хистограмата (по подразбиране 1)."
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Конвертиране на стерео към моно"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr "Ако битрейта=0, използвайте тази стойност за постоянно качество"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "Стойност > 0 включва режима на постоянен битрейт"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Включване кодиране без загуби"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "Кодирането без загуби игнорира битрейта и настройките за качество, "
+#~ "позволявайки перфектно възпроизвеждане на оригинала"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Разстояние между 'P' кадрите"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Брой на 'P' кадрите за GOP"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "Точност на векторното движение"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Видео декодер с използване на openmash"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr ""
+#~ "| menu . . [вкл.|изкл.|нагоре|надолу|наляво|надясно|избор] използване на "
+#~ "меню"
+
+#~ msgid "Jump to time"
+#~ msgstr "Преход до време"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Отваряне на отчета за срива"
+
+#~ msgid "Don't Send"
+#~ msgstr "Без изпращане"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "Предишния път е имало срив на VLC"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Желаете ли да изпратите подробности за срива до разработчиците на VLC\n"
+#~ "\n"
+#~ "Ако желаете, можете да напишете няколко реда за това какво сте правили "
+#~ "преди да стане срива на VLC, заедно с друга полезна информация като: линк "
+#~ "за изтегляне на проблемния файл, URL на проблемния мрежов поток, ..."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr ""
+#~ "Съгласен съм да бъда на разположение за контакт относно този доклад за "
+#~ "бъг."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "Само вашия E-Mail по подразбиране ще бъде изпратен, няма да включва "
+#~ "никаква друга информация."
+
+#~ msgid "Don't ask again"
+#~ msgstr "Не питай отново"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Не е намерен отчет за срив"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Никакви признаци за предишен срив не са намерени."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Отваряне на папката BDMV"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Управление зареждането на обложка на албум"
+
+#~ msgid "Output module"
+#~ msgstr "Модул за извеждане"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Графичен Еквалайзер"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Автоматично настройване усилването на видеото."
+
+#~ msgid "Under the Video"
+#~ msgstr "Под видеото"
+
+#~ msgid "&Help..."
+#~ msgstr "Помощ..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Синхронизиране на аудио пътечка"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Пропускане/дублиране на видео кадри, за синхронизиране на видео пътечка с "
+#~ "аудио пътечка."
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "Кодера ще пропуска кадри, ако вашия процесор не може да поддържа "
+#~ "честотата на кодиране."
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "Стойност на нивата на аудио каналите"
+
+#~ msgid ""
+#~ "Value of the audio level of each channels between 0 and 1. Each level "
+#~ "should be separated with ':'."
+#~ msgstr ""
+#~ "Стойност на нивото на аудиото на всеки канал, между 0 и 1. Всяко ниво "
+#~ "трябва да бъде разделено с ':'."
+
+#~ msgid "Alarm"
+#~ msgstr "Аларма"
+
+#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+#~ msgstr ""
+#~ "При сигнали за затихване, да се показва съобщение (0=без аларма, "
+#~ "1=аларма)."
+
+#~ msgid "Spatial luma strength (default 4)"
+#~ msgstr "Усилване на яркостта (по подразбиране 4)"
+
+#~ msgid "Spatial chroma strength (default 3)"
+#~ msgstr "Усилване на цветността (по подразбиране 3)"
+
+#~ msgid "Temporal luma strength (default 6)"
+#~ msgstr "Временно усилване на яркостта (по подразбиране 6)"
+
+#~ msgid "Temporal chroma strength (default 4.5)"
+#~ msgstr "Временно усилване на цветността (по подразбиране 4.5)"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "Текст, който да се показва на екрана. (Налични са следните формати за "
+#~ "низ: Отнасящи се до време: %Y = година, %m = месец, %d = ден, %H = час, "
+#~ "%M = минута, %S = секунда, ... Отнасящи се до мета-данни: $a = "
+#~ "изпълнител, $b = албум, $c = авторски права, $d = описание, $e = кодирано "
+#~ "от, $g = жанр, $l = език, $n = номер на пътечка, $p = сега се "
+#~ "възпроизвежда, $r = рейтинг, $s = език за субтитрите, $t = заглавие, $u = "
+#~ "url, $A = дата, $B = битрейт на аудиото (в kb/s), $C = глава,$D = "
+#~ "времетраене, $F = пълното име с пътя, $I = заглавие, $L = изминало време, "
+#~ "$N = име, $O = език за аудиото, $P = позиция (в %), $R = честота, $S = "
+#~ "честота на дискретизация на аудиото (в kHz), $T = време, $U = издател, $V "
+#~ "= сила на звука, $_ = нов ред) "
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Добавяне на файл със субтитри:"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Управление зареждането на обложка на албум:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Настройка на медия библиотеката"
 
 #, fuzzy
 #~ msgid "Rewind"
