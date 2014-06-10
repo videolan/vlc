@@ -1,7 +1,7 @@
 # qt
 
-QT_VERSION = 5.2.1
-QT_URL := http://download.qt-project.org/official_releases/qt/5.2/$(QT_VERSION)/submodules/qtbase-opensource-src-$(QT_VERSION).tar.xz
+QT_VERSION = 5.3.0
+QT_URL := http://download.qt-project.org/official_releases/qt/5.3/$(QT_VERSION)/submodules/qtbase-opensource-src-$(QT_VERSION).tar.xz
 
 ifdef HAVE_MACOSX
 #PKGS += qt
