@@ -1165,12 +1165,12 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Modul de sortida vidèo"
+msgstr "Pòrt del client"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr "DVDRead pòt pas dobrir lo disc \"%s\"."
+msgstr "VLC pòt pas se connectar a \"%s:%d\"."
 
 #: src/input/decoder.c:698
 #, fuzzy
@@ -6611,7 +6611,7 @@ msgstr ""
 #: modules/access/file.c:178 modules/access/vdr.c:535
 #, fuzzy, c-format
 msgid "VLC could not open the file \"%s\" (%s)."
-msgstr "DVDRead pòt pas dobrir lo disc \"%s\"."
+msgstr "VLC pòt pas legir aqueste fichièr."
 
 #: modules/access/file.c:305 modules/access/vdr.c:369
 #, fuzzy, c-format
@@ -7237,7 +7237,7 @@ msgstr "VLC pòt pas legir aqueste fichièr."
 #: modules/access/mtp.c:287
 #, fuzzy, c-format
 msgid "VLC could not open the file \"%s\": %s"
-msgstr "DVDRead pòt pas dobrir lo disc \"%s\"."
+msgstr "VLC pòt pas legir aqueste fichièr."
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -11095,9 +11095,8 @@ msgid "PNG video encoder"
 msgstr "Descodador vidèo CDG"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Activar mòde fons de pagina"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11106,9 +11105,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Forçar perfil"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11118,9 +11116,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Detalhs del codec"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11141,9 +11138,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:79
-#, fuzzy
 msgid "Group of Picture Reference Distance"
-msgstr "Nom de l'instància actuala"
+msgstr ""
 
 #: modules/codec/qsv.c:81
 msgid ""
@@ -11162,9 +11158,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Interval d'interrogacion de VNC"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11228,9 +11223,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Taus de bits maximal"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11262,9 +11256,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Nombre de canals àudio"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11278,9 +11271,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Nombre de canals àudio"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -12055,7 +12047,7 @@ msgstr "Descodador de sostítols DVB"
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "Sostítols DVB"
+msgstr "Sostítols teletèxt"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -21167,7 +21159,7 @@ msgstr "Qualitat d'encodatge"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Nauta qualitat per la sortida audio"
+msgstr "Nivèl de qualitat"
 
 #: modules/hw/vdpau/deinterlace.c:131
 msgid "VDPAU deinterlacing filter"
@@ -27650,9 +27642,8 @@ msgid "Default caching policy"
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:506
-#, fuzzy
 msgid "Menus language:"
-msgstr "Lenga per l'audio"
+msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:507
 msgid "Look and feel"
@@ -28054,7 +28045,7 @@ msgstr "Modul de sortida d'àudio"
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
 msgid "No video devices found"
-msgstr "Periferic vidèo"
+msgstr "Nom del periferic vidèo"
 
 #: modules/access/avcapture.m:289
 msgid ""
@@ -28283,7 +28274,7 @@ msgstr ""
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Defaut"
+msgstr "Flux per defaut"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -28340,85 +28331,6 @@ msgstr "Ajuda de VLC"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Flux de sortida"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Causir la vòstra sortida vidèo preferida e la configurar aquí."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "Aquestes moduls fornisson los foncions del ret."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Los fornidors de dialòg pòdon èsser cambiats aicí."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Cap de moduls apropriats"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC suporta pas lo format àudio o vidèo \"%4.4s\". Malurosament es pas "
-#~ "possible de cambiar aquò."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "Repertòris ont VLC cèrca los moduls. Podètz n'utilizatz mai d'un amb \" "
-#~ "PATH_SEP \" entre los repertòris"
-
-#~ msgid "Album art policy"
-#~ msgstr "Album art policy*"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Choose how album art will be downloaded.*"
-
-#~ msgid "Manual download only"
-#~ msgstr "Telecargament manual solament"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Quand la pista es jogada"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Quand la pista es aponduda"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Cargar la bibliotèca multimèdia"
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Filtre àudio per la conversion d'esterèo cap a mòno"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Jump to time"
-#~ msgstr "Anar al temps"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Dobrir CrashLog"
-
-#~ msgid "Don't Send"
-#~ msgstr "Pas mandar"
-
-#~ msgid "Output module"
-#~ msgstr "Modul de Sortida"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Automatically preparse files*"
-
-#~ msgid "&Help..."
-#~ msgstr "&Ajuda..."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Utilizar un fichièr de sostítols"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Configurar la bibliotèca multimèdia"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -29517,6 +29429,85 @@ msgstr "Flux de sortida"
 
 #~ msgid "left"
 #~ msgstr "esquèrra"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Causir la vòstra sortida vidèo preferida e la configurar aquí."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "Aquestes moduls fornisson los foncions del ret."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Los fornidors de dialòg pòdon èsser cambiats aicí."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Cap de moduls apropriats"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC suporta pas lo format àudio o vidèo \"%4.4s\". Malurosament es pas "
+#~ "possible de cambiar aquò."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "Repertòris ont VLC cèrca los moduls. Podètz n'utilizatz mai d'un amb \" "
+#~ "PATH_SEP \" entre los repertòris"
+
+#~ msgid "Album art policy"
+#~ msgstr "Album art policy*"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Choose how album art will be downloaded.*"
+
+#~ msgid "Manual download only"
+#~ msgstr "Telecargament manual solament"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Quand la pista es jogada"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Quand la pista es aponduda"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Cargar la bibliotèca multimèdia"
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Filtre àudio per la conversion d'esterèo cap a mòno"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Jump to time"
+#~ msgstr "Anar al temps"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Dobrir CrashLog"
+
+#~ msgid "Don't Send"
+#~ msgstr "Pas mandar"
+
+#~ msgid "Output module"
+#~ msgstr "Modul de Sortida"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Automatically preparse files*"
+
+#~ msgid "&Help..."
+#~ msgstr "&Ajuda..."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Utilizar un fichièr de sostítols"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Configurar la bibliotèca multimèdia"
 
 #, fuzzy
 #~ msgid "Sort"
