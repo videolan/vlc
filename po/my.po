@@ -15,7 +15,7 @@ msgstr ""
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: Burmese (Myanmar) (http://www.transifex.com/projects/p/vlc-"
 "trans/language/my_MM/)\n"
-"Language: my\n"
+"Language: my_MM\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -4434,7 +4434,7 @@ msgstr ""
 #: src/libvlc-module.c:2690
 #, fuzzy
 msgid "core program"
-msgstr "နုဒိ၇ာိ"
+msgstr "ပရိုဂရမ်"
 
 #: src/misc/update.c:473
 #, c-format
@@ -20073,7 +20073,7 @@ msgstr ""
 #: modules/gui/qt4/dialogs/toolbar.cpp:185
 #, fuzzy
 msgid "Preview"
-msgstr "ရှေ့ခေါင်းစဉ်"
+msgstr "ယခင်"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:194
 msgid "Cl&ose"
@@ -20523,7 +20523,7 @@ msgstr ""
 #: modules/gui/qt4/menus.cpp:1636
 #, fuzzy
 msgid "&Save To Playlist"
-msgstr "ဖိုင်သို့ဖွင့်စာရင်းမှတ်သိမ်း(&F)..."
+msgstr "ဖွင့်မည့်စာရင်းထဲသို့ထည့်"
 
 #: modules/gui/qt4/qt4.cpp:78
 msgid "Show advanced preferences over simple ones"
@@ -27340,9 +27340,8 @@ msgid "Default caching policy"
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:506
-#, fuzzy
 msgid "Menus language:"
-msgstr "အသံဘာသာစကား"
+msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:507
 msgid "Look and feel"
