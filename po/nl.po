@@ -1213,7 +1213,7 @@ msgstr "Doel-ondertitelcodec"
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Video-uitvoermodule"
+msgstr "Client poort"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -1479,7 +1479,7 @@ msgstr ""
 #: src/input/meta.c:76
 #, fuzzy
 msgid "Show Name"
-msgstr "Sorteer subgroep op naam"
+msgstr "Basis weergeven"
 
 #: src/input/meta.c:77
 #, fuzzy
@@ -3301,7 +3301,6 @@ msgid "HTTP/TLS Certificate Revocation List"
 msgstr "HTTP/TLS Certificate revocation list"
 
 #: src/libvlc-module.c:846
-#, fuzzy
 msgid ""
 "This file contains an optional CRL to prevent remote clients from using "
 "revoked certificates in TLS sessions."
@@ -12845,12 +12844,12 @@ msgstr "USF-ondertiteldecoder"
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "Tekst ondertiteldecoder"
+msgstr "DVB-ondertiteldecoder"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "DVB-ondertitels"
+msgstr "Teletekst-ondertitels"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -19348,7 +19347,6 @@ msgstr ""
 "bereiken op mms://uwip:8080."
 
 #: modules/gui/macosx/wizard.m:265
-#, fuzzy
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
 "This protocol is used as transport method by many Microsoft's software. Note "
@@ -22564,7 +22562,7 @@ msgstr "Resampling-kwaliteit"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Hoge kwaliteit audioresampling"
+msgstr "Naverwerkingsniveau voor videokwaliteit"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -23428,7 +23426,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Beeldverhouding behouden"
+msgstr "Indexbestand"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -26347,7 +26345,7 @@ msgstr "RGB-component extraheren"
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Deïnterlace"
+msgstr "Puzzel"
 
 #: modules/video_filter/freeze.c:78
 #, fuzzy
@@ -30009,7 +30007,7 @@ msgstr "Video opnemen"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLC kon decodermodule niet openen."
+msgstr "Audio-uitvoermodule"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -30260,7 +30258,7 @@ msgstr "Spiegelingsrichting"
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Standaard"
+msgstr "Standaardstream"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -30321,403 +30319,6 @@ msgstr "VLC Media Player - web-interface"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Streamuitvoer"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Kies en configureer hier de gewenste video-uitvoermethode."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Deze modules voorzien alle andere onderdelen van VLC van "
-#~ "netwerkfunctionaliteit."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Dit zijn de algemene instellingen voor video/audio/ondertitel-"
-#~ "codeermodules."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Dialoogproviders kunnen hier ingesteld worden."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "In deze sectie kunt u het gedrag van de ondertiteldemuxer aanpassen. "
-#~ "Bijvoorbeeld het type ondertitel en de bestandsnaam."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Geen bruikbare decodermodule"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC ondersteunt het \"%4.4s\" audio- of videoformaat niet. Helaas kunt u "
-#~ "dit niet oplossen."
-
-#, fuzzy
-#~ msgid ""
-#~ "This file contains an optional CRL to prevent remove clients from using "
-#~ "revoked certificates in TLS sessions."
-#~ msgstr ""
-#~ "Dit bestand bevat een optionele CRL om te voorkomen dat remote clients "
-#~ "gebruik maken van ingetrokken certificaten in TLS-sessies."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "Aanvullend pad voor VLC om naar modules te laten zoeken. U kunt meerdere "
-#~ "paden toevoegen door ze op te laten volgen met \" PATH_SEP \" als "
-#~ "scheidingsteken"
-
-#~ msgid "Album art policy"
-#~ msgstr "Albumhoes-beleid"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Kies hoe albumhoezen gedownload moeten worden."
-
-#~ msgid "Manual download only"
-#~ msgstr "Alleen handmatig downloaden"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Wanneer het nummer start met spelen"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Zodra het nummer toegevoegd wordt"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Mediabibliotheek laden"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr ""
-#~ "Activeer deze optie om de SQL-gebaseerde mediabibliotheek te laden bij "
-#~ "het opstarten van VLC"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg-toegang"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "De AACS-decodeerbibliotheek op uw systeem werkt niet. Ontbrekende "
-#~ "sleutels?"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC kon het bestand \"%s\" niet openen. (%m)"
-
-#~ msgid "TCP address to use"
-#~ msgstr "Te gebruiken TCP-adres"
-
-#~ msgid ""
-#~ "TCP address to use to communicate with the video part of the Bar Graph "
-#~ "(default localhost). In the case of bargraph incrustation, use localhost."
-#~ msgstr ""
-#~ "TCP-adres om met het videogedeelte van de balkgrafiek te communiceren "
-#~ "(standaard localhost). In geval van incrustatie van de balkgrafiek, "
-#~ "gebruik localhost."
-
-#~ msgid "TCP port to use"
-#~ msgstr "Te gebruiken TCP-poort"
-
-#~ msgid ""
-#~ "TCP port to use to communicate with the video part of the Bar Graph "
-#~ "(default 12345). Use the same port as the one used in the rc interface."
-#~ msgstr ""
-#~ "TCP-poort om met het videogedeelte van balkgrafiek te communiceren "
-#~ "(standaard 12345). Gebruik dezelfde poort als die in de rc-interface."
-
-#~ msgid "Force connection reset regularly"
-#~ msgstr "Forceert regelmatige verbindingherinitialisatie"
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr ""
-#~ "Definieert of de TCP verbinding geherinitialiseerd moet worden. Dit moet "
-#~ "gebruik worden als audiobalkgrafiek_v gebruikt wordt (standaard 1)."
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Audiofilter voor stereo-naar-mono conversie"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "Bijsnijdinformatie verwijderen"
-
-#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
-#~ msgstr ""
-#~ "Interne bijsnijdingsparameters verwijderen (bijvoorbeeld van H.264 SPS)."
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "Videoversnelling (VA) API"
-
-#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
-#~ msgstr "Videodecoderings- en presentati-API voor Unix (VDPAU)"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr "Indien bitrate = 0, gebruik deze waarde voor constante kwaliteit"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "Een waarde >0 schakelt een constante bitratemodus in"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Verliesloze codering inschakelen"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr "Verliesloze codering negeert bitrate of kwaliteitinstellingen"
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "Rechthoekige Lineaire Fase"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "Diagonaal Lineaire Fase"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "Afstand tussen 'P'-beelden."
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Aantal 'P'-beelden per GOP"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Breedte van bewegingscompensatieblokken"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Hoogte van bewegingcompensatieblokken"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "Blokoverlap (%)"
-
-#~ msgid "Amount that each motion block should be overlapped by its neighbours"
-#~ msgstr "Hoeveelheid dat ieder blok moet worden overlapt door zijn buren"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "Total horizontal block length including overlaps"
-#~ msgstr "Totale horizontale bloklengte inclusief overlappen"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Total vertical block length including overlaps"
-#~ msgstr "Totale verticale bloklengte inclusief overlappen"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "Bewegingsvectorprecisie"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "Bewegingsvectorprecisie in pels."
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "Eenvoudig ME zoekgebied x:y"
-
-#~ msgid ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-#~ msgstr ""
-#~ "(Niet aanbevolen) Voer een eenvoudige, niet-hiërarchische, "
-#~ "blokvergelijkende bewegingsvectorzoekopdracht uit met een zoekbereik van "
-#~ "+/-x, +/-y"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Ruimtelijke verdeling inschakelen"
-
-#~ msgid "cycles per degree"
-#~ msgstr "cycli per graad"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr ""
-#~ "Dirac video-encoder, gebruik makend van de dirac-onderzoek bibliotheek"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Videodecoder met openmash"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr "| menu . . [on|off|up|down|left|right|select] gebruik menu"
-
-#~ msgid "Jump to time"
-#~ msgstr "Naar tijdstip springen"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Crashlog openen..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Niet verzenden"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC is eerder gecrashed"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Wilt u details over de crash naar VLC's ontwikkelteam sturen?\n"
-#~ "\n"
-#~ "Als u wilt kunt u een korte beschrijving opgeven van wat u deed voordat "
-#~ "VLC crashte, samen met wat andere bruikbare informatie: een link naar een "
-#~ "bestand, URL of een netwerk-stream te downloaden,..."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr ""
-#~ "Ik stem toe dat er contact met mij opgenomen kan worden over deze "
-#~ "bugraportage."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "Alleen uw standaard e-mailadres zal opgestuurd worden, inclusief geen "
-#~ "verdere informatie."
-
-#~ msgid "Don't ask again"
-#~ msgstr "Niet opnieuw vragen"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Geen CrashLog gevonden"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Kan geen trace-bestand van een vorige crash vinden."
-
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "iTunes pauzeren tijdens afspelen van VLC"
-
-#~ msgid ""
-#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
-#~ "playback will be resumed again if VLC playback is finished."
-#~ msgstr ""
-#~ "Pauzeert het afspelen van iTunes wanneer VLC begint met afspelen. Indien "
-#~ "geselecteerd, zal iTunes het afspelen hervatten als VLC klaar is met "
-#~ "afspelen."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "BDMV-map openen"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Downloadbeleid albumhoezen"
-
-#~ msgid "Output module"
-#~ msgstr "Uitvoermodule"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Grafische equalizer"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Media-informatie automatisch ophalen"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Meer extensies krijgen van"
-
-#~ msgid "Under the Video"
-#~ msgstr "Onder de video"
-
-#~ msgid "&Help..."
-#~ msgstr "&Help..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Synchroniseer met het geluid"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Deze optie verwijdert/dupliceert videobeelden om het videospoor te "
-#~ "synchroniseren met het audiospoor."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "De transcoder zal beelden verliezen als uw CPU de coderingssnelheid niet "
-#~ "bij kan houden."
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "Waarde van de audiokanaal-niveaus"
-
-#~ msgid ""
-#~ "Value of the audio level of each channels between 0 and 1. Each level "
-#~ "should be separated with ':'."
-#~ msgstr ""
-#~ "Waarde van het audioniveau op elk kanaal tussen 0 en 1. Elk niveau moet "
-#~ "gescheiden worden door ':'."
-
-#~ msgid "Alarm"
-#~ msgstr "Alarm"
-
-#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
-#~ msgstr ""
-#~ "Geeft een stiltesignaal en geeft deze weer en een alarm (0=geen alarm, "
-#~ "1=alarm)."
-
-#~ msgid "Spatial luma strength (default 4)"
-#~ msgstr "Ruimtelijke lumasterkte (standaard 4)"
-
-#~ msgid "Spatial chroma strength (default 3)"
-#~ msgstr "Ruimtelijke chromasterkte (standaard 3)"
-
-#~ msgid "Temporal luma strength (default 6)"
-#~ msgstr "Tijdelijke lumasterkte (standaard 6)"
-
-#~ msgid "Temporal chroma strength (default 4.5)"
-#~ msgstr "Tijdelijke chroma-sterkte (standaard 4.5)"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "Lichtkranttekst om weer te geven. (Beschikbare opmaakopties: "
-#~ "Tijdgerelateerd: %Y = jaar, %m = maand, %d = dag, %H = uren, %M = "
-#~ "minuten, %S = seconden, ... Metagegevens gerelateerd: $a = artiest, $b = "
-#~ "album, $c = copyright, $d = beschrijving, $e = gecodeerd door, $g = "
-#~ "genre, $l = taal, $n = spoornummer, $p = nu speelt, $r = score, $s = "
-#~ "ondertiteltaal, $t = titel, $u = url, $A = datum, $B = audio-bitrate (in "
-#~ "kb/s), $C = hoofdstuk, $D = duur, $F = volledige naam met pad, $I = "
-#~ "titel, $L = tijd over, $N = naam, $O = audiotaal, $P = positie (in %), $R "
-#~ "= snelheid, $S = audio-samplerate (in kHz), $T = tijd, $U = uitgever, $V "
-#~ "= volume, $_ = nieuwe regel) "
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "iOS OpenGL ES video-uitvoer (vereist UIView)"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "Mac OS X OpenGL video-uitvoer (vereist drawable-nsopbject)"
-
-#~ msgid "OpenGL acceleration is not supported on your Mac"
-#~ msgstr "OpenGL-versnelling is niet ondersteund op uw Mac"
-
-#~ msgid ""
-#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
-#~ "output. It will still work, but much slower and with possibly unexpected "
-#~ "results."
-#~ msgstr ""
-#~ "Uw Mac mist Quartz Extreme-versnelling, wat vereist is voor video-"
-#~ "uitvoer. Het zal nog steeds werken, maar veel trager en met mogelijk "
-#~ "onverwachte resultaten."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Onder&titelbestand gebruiken"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Downloadbeleid albumhoezen:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Mediabibliotheek configureren"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -33545,6 +33146,403 @@ msgstr "Streamuitvoer"
 #~ msgstr ""
 #~ "Dit zal de originele instellingen van VLC mediaspeler terugzetten.\n"
 #~ "Weet u zeker dat u door wil gaan?"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Kies en configureer hier de gewenste video-uitvoermethode."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Deze modules voorzien alle andere onderdelen van VLC van "
+#~ "netwerkfunctionaliteit."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Dit zijn de algemene instellingen voor video/audio/ondertitel-"
+#~ "codeermodules."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Dialoogproviders kunnen hier ingesteld worden."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "In deze sectie kunt u het gedrag van de ondertiteldemuxer aanpassen. "
+#~ "Bijvoorbeeld het type ondertitel en de bestandsnaam."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Geen bruikbare decodermodule"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC ondersteunt het \"%4.4s\" audio- of videoformaat niet. Helaas kunt u "
+#~ "dit niet oplossen."
+
+#, fuzzy
+#~ msgid ""
+#~ "This file contains an optional CRL to prevent remove clients from using "
+#~ "revoked certificates in TLS sessions."
+#~ msgstr ""
+#~ "Dit bestand bevat een optionele CRL om te voorkomen dat remote clients "
+#~ "gebruik maken van ingetrokken certificaten in TLS-sessies."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "Aanvullend pad voor VLC om naar modules te laten zoeken. U kunt meerdere "
+#~ "paden toevoegen door ze op te laten volgen met \" PATH_SEP \" als "
+#~ "scheidingsteken"
+
+#~ msgid "Album art policy"
+#~ msgstr "Albumhoes-beleid"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Kies hoe albumhoezen gedownload moeten worden."
+
+#~ msgid "Manual download only"
+#~ msgstr "Alleen handmatig downloaden"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Wanneer het nummer start met spelen"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Zodra het nummer toegevoegd wordt"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Mediabibliotheek laden"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr ""
+#~ "Activeer deze optie om de SQL-gebaseerde mediabibliotheek te laden bij "
+#~ "het opstarten van VLC"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg-toegang"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "De AACS-decodeerbibliotheek op uw systeem werkt niet. Ontbrekende "
+#~ "sleutels?"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLC kon het bestand \"%s\" niet openen. (%m)"
+
+#~ msgid "TCP address to use"
+#~ msgstr "Te gebruiken TCP-adres"
+
+#~ msgid ""
+#~ "TCP address to use to communicate with the video part of the Bar Graph "
+#~ "(default localhost). In the case of bargraph incrustation, use localhost."
+#~ msgstr ""
+#~ "TCP-adres om met het videogedeelte van de balkgrafiek te communiceren "
+#~ "(standaard localhost). In geval van incrustatie van de balkgrafiek, "
+#~ "gebruik localhost."
+
+#~ msgid "TCP port to use"
+#~ msgstr "Te gebruiken TCP-poort"
+
+#~ msgid ""
+#~ "TCP port to use to communicate with the video part of the Bar Graph "
+#~ "(default 12345). Use the same port as the one used in the rc interface."
+#~ msgstr ""
+#~ "TCP-poort om met het videogedeelte van balkgrafiek te communiceren "
+#~ "(standaard 12345). Gebruik dezelfde poort als die in de rc-interface."
+
+#~ msgid "Force connection reset regularly"
+#~ msgstr "Forceert regelmatige verbindingherinitialisatie"
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr ""
+#~ "Definieert of de TCP verbinding geherinitialiseerd moet worden. Dit moet "
+#~ "gebruik worden als audiobalkgrafiek_v gebruikt wordt (standaard 1)."
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Audiofilter voor stereo-naar-mono conversie"
+
+#~ msgid "Discard cropping information"
+#~ msgstr "Bijsnijdinformatie verwijderen"
+
+#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
+#~ msgstr ""
+#~ "Interne bijsnijdingsparameters verwijderen (bijvoorbeeld van H.264 SPS)."
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "Videoversnelling (VA) API"
+
+#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
+#~ msgstr "Videodecoderings- en presentati-API voor Unix (VDPAU)"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr "Indien bitrate = 0, gebruik deze waarde voor constante kwaliteit"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "Een waarde >0 schakelt een constante bitratemodus in"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Verliesloze codering inschakelen"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr "Verliesloze codering negeert bitrate of kwaliteitinstellingen"
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "Rechthoekige Lineaire Fase"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "Diagonaal Lineaire Fase"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Afstand tussen 'P'-beelden."
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Aantal 'P'-beelden per GOP"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "Breedte van bewegingscompensatieblokken"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "Hoogte van bewegingcompensatieblokken"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "Blokoverlap (%)"
+
+#~ msgid "Amount that each motion block should be overlapped by its neighbours"
+#~ msgstr "Hoeveelheid dat ieder blok moet worden overlapt door zijn buren"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "Total horizontal block length including overlaps"
+#~ msgstr "Totale horizontale bloklengte inclusief overlappen"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Total vertical block length including overlaps"
+#~ msgstr "Totale verticale bloklengte inclusief overlappen"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "Bewegingsvectorprecisie"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "Bewegingsvectorprecisie in pels."
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "Eenvoudig ME zoekgebied x:y"
+
+#~ msgid ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+#~ msgstr ""
+#~ "(Niet aanbevolen) Voer een eenvoudige, niet-hiërarchische, "
+#~ "blokvergelijkende bewegingsvectorzoekopdracht uit met een zoekbereik van "
+#~ "+/-x, +/-y"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Ruimtelijke verdeling inschakelen"
+
+#~ msgid "cycles per degree"
+#~ msgstr "cycli per graad"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr ""
+#~ "Dirac video-encoder, gebruik makend van de dirac-onderzoek bibliotheek"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Videodecoder met openmash"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr "| menu . . [on|off|up|down|left|right|select] gebruik menu"
+
+#~ msgid "Jump to time"
+#~ msgstr "Naar tijdstip springen"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Crashlog openen..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Niet verzenden"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC is eerder gecrashed"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Wilt u details over de crash naar VLC's ontwikkelteam sturen?\n"
+#~ "\n"
+#~ "Als u wilt kunt u een korte beschrijving opgeven van wat u deed voordat "
+#~ "VLC crashte, samen met wat andere bruikbare informatie: een link naar een "
+#~ "bestand, URL of een netwerk-stream te downloaden,..."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr ""
+#~ "Ik stem toe dat er contact met mij opgenomen kan worden over deze "
+#~ "bugraportage."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "Alleen uw standaard e-mailadres zal opgestuurd worden, inclusief geen "
+#~ "verdere informatie."
+
+#~ msgid "Don't ask again"
+#~ msgstr "Niet opnieuw vragen"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Geen CrashLog gevonden"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Kan geen trace-bestand van een vorige crash vinden."
+
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "iTunes pauzeren tijdens afspelen van VLC"
+
+#~ msgid ""
+#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
+#~ "playback will be resumed again if VLC playback is finished."
+#~ msgstr ""
+#~ "Pauzeert het afspelen van iTunes wanneer VLC begint met afspelen. Indien "
+#~ "geselecteerd, zal iTunes het afspelen hervatten als VLC klaar is met "
+#~ "afspelen."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "BDMV-map openen"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Downloadbeleid albumhoezen"
+
+#~ msgid "Output module"
+#~ msgstr "Uitvoermodule"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Grafische equalizer"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Media-informatie automatisch ophalen"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "Meer extensies krijgen van"
+
+#~ msgid "Under the Video"
+#~ msgstr "Onder de video"
+
+#~ msgid "&Help..."
+#~ msgstr "&Help..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Synchroniseer met het geluid"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Deze optie verwijdert/dupliceert videobeelden om het videospoor te "
+#~ "synchroniseren met het audiospoor."
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "De transcoder zal beelden verliezen als uw CPU de coderingssnelheid niet "
+#~ "bij kan houden."
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "Waarde van de audiokanaal-niveaus"
+
+#~ msgid ""
+#~ "Value of the audio level of each channels between 0 and 1. Each level "
+#~ "should be separated with ':'."
+#~ msgstr ""
+#~ "Waarde van het audioniveau op elk kanaal tussen 0 en 1. Elk niveau moet "
+#~ "gescheiden worden door ':'."
+
+#~ msgid "Alarm"
+#~ msgstr "Alarm"
+
+#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+#~ msgstr ""
+#~ "Geeft een stiltesignaal en geeft deze weer en een alarm (0=geen alarm, "
+#~ "1=alarm)."
+
+#~ msgid "Spatial luma strength (default 4)"
+#~ msgstr "Ruimtelijke lumasterkte (standaard 4)"
+
+#~ msgid "Spatial chroma strength (default 3)"
+#~ msgstr "Ruimtelijke chromasterkte (standaard 3)"
+
+#~ msgid "Temporal luma strength (default 6)"
+#~ msgstr "Tijdelijke lumasterkte (standaard 6)"
+
+#~ msgid "Temporal chroma strength (default 4.5)"
+#~ msgstr "Tijdelijke chroma-sterkte (standaard 4.5)"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "Lichtkranttekst om weer te geven. (Beschikbare opmaakopties: "
+#~ "Tijdgerelateerd: %Y = jaar, %m = maand, %d = dag, %H = uren, %M = "
+#~ "minuten, %S = seconden, ... Metagegevens gerelateerd: $a = artiest, $b = "
+#~ "album, $c = copyright, $d = beschrijving, $e = gecodeerd door, $g = "
+#~ "genre, $l = taal, $n = spoornummer, $p = nu speelt, $r = score, $s = "
+#~ "ondertiteltaal, $t = titel, $u = url, $A = datum, $B = audio-bitrate (in "
+#~ "kb/s), $C = hoofdstuk, $D = duur, $F = volledige naam met pad, $I = "
+#~ "titel, $L = tijd over, $N = naam, $O = audiotaal, $P = positie (in %), $R "
+#~ "= snelheid, $S = audio-samplerate (in kHz), $T = tijd, $U = uitgever, $V "
+#~ "= volume, $_ = nieuwe regel) "
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "iOS OpenGL ES video-uitvoer (vereist UIView)"
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "Mac OS X OpenGL video-uitvoer (vereist drawable-nsopbject)"
+
+#~ msgid "OpenGL acceleration is not supported on your Mac"
+#~ msgstr "OpenGL-versnelling is niet ondersteund op uw Mac"
+
+#~ msgid ""
+#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
+#~ "output. It will still work, but much slower and with possibly unexpected "
+#~ "results."
+#~ msgstr ""
+#~ "Uw Mac mist Quartz Extreme-versnelling, wat vereist is voor video-"
+#~ "uitvoer. Het zal nog steeds werken, maar veel trager en met mogelijk "
+#~ "onverwachte resultaten."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Onder&titelbestand gebruiken"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Downloadbeleid albumhoezen:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Mediabibliotheek configureren"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
