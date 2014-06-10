@@ -364,7 +364,7 @@ msgstr "ਤਕਨੀਕੀ ਸੈਟਿੰਗ"
 #: include/vlc_input.h:568
 #, fuzzy
 msgid "Subtitle track added"
-msgstr "ਸਬ-ਟਾਈਟਲ ਟਰੈਕ"
+msgstr "ਸਬ-ਟਾਈਟਲ ਟਰੈਕ: %s"
 
 #: include/vlc_interface.h:140
 msgid ""
@@ -1105,7 +1105,7 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "ਵਿਡੀਓ ਆਉਟਪੁੱਟ ਮੋਡੀਊਲ"
+msgstr "ਕਲਾਈਟ ਪੋਰਟ"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -10908,9 +10908,8 @@ msgid "PNG video encoder"
 msgstr "PNG ਵਿਡੀਓ ਡੀਕੋਡਰ"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "ਵਾਲਪੇਪਰ ਮੋਡ ਚਾਲੂ ਕਰੋ"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -10919,9 +10918,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "ਪਰੋਫਾਇਲ ਚੁਣੋ"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -10931,9 +10929,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Codec ਵੇਰਵਾ"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -10954,9 +10951,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:79
-#, fuzzy
 msgid "Group of Picture Reference Distance"
-msgstr "ਮੌਜੂਦਾ ਮੌਕਿਆਂ ਦੇ ਨਾਂ"
+msgstr ""
 
 #: modules/codec/qsv.c:81
 msgid ""
@@ -10975,9 +10971,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "PCR ਅੰਤਰਾਲ (ms)"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -10990,9 +10985,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:100
-#, fuzzy
 msgid "Rate Control Method"
-msgstr "ਰੇਟ ਕੰਟਰੋਲ ਢੰਗ"
+msgstr ""
 
 #: modules/codec/qsv.c:102
 msgid ""
@@ -11042,9 +11036,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "ਵੱਧੋ-ਵੱਧ ਬਿੱਟਰੇਟ"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11076,9 +11069,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "ਆਡੀਓ ਚੈਨਲ ਦੀ ਗਿਣਤੀ"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11092,9 +11084,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "ਕਲੋਨਾਂ ਦੀ ਗਿਣਤੀ"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -11864,12 +11855,12 @@ msgstr "USF ਸਬ-ਟਾਈਟਲ ਡੀਕੋਡਰ"
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "ਟੈਲੀਟੈਕਸਟ ਸਬ-ਟਾਈਟਲ ਡੀਕੋਡਰ"
+msgstr "DVB ਸਬ-ਟਾਈਟਲ ਡੀਕੋਡਰ"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "DVB ਸਬ-ਟਾਈਟਲ"
+msgstr "ਟੈਲੀਟੈਕਸਟ ਸਬ-ਟਾਈਟਲ"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -20988,7 +20979,7 @@ msgstr "ਇੰਕੋਡਿੰਗ ਕੁਆਲਟੀ"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "ਉੱਚ ਕੁਆਲਟੀ ਆਡੀਓ ਰੀ-ਸੈਂਪਲਿੰਗ"
+msgstr "ਵਿਡੀਓ ਕੁਆਥਟੀ ਪੋਸਟ ਪਰੋਸੈੱਸ ਲੈਵਲ"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -28104,7 +28095,7 @@ msgstr ""
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "ਡਿਫਾਲਟ"
+msgstr "ਡਿਫਾਲਟ ਸਟਰੀਮ"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -28165,141 +28156,6 @@ msgstr "VLC ਮੀਡਿਆ ਪਲੇਅਰ ਮੱਦਦ"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "ਸਟਰੀਮ ਆਉਟਪੁੱਟ"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "ਆਪਣੀ ਪਸੰਦੀਦਾ ਵਿਡੀਓ ਆਉਟਪੁੱਟ ਨੂੰ ਚੁਣੋ ਅਤੇ ਇੱਥੇ ਸੰਰਚਿਤ ਕਰੋ।"
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "ਇਹ ਮੋਡੀਊਲ VLC ਦੇ ਹੋਰ ਸਭ ਭਾਗਾਂ ਲਈ ਨੈੱਟਵਰਕ ਸਹੂਲਤਾਂ ਦਿੰਦੇ ਹਨ।"
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "ਡਾਈਲਾਗ ਪਰੋਵਾਈਡਰ ਇੱਥੇ ਸੰਰਚਿਤ ਕੀਤੇ ਜਾ ਸਕਦੇ ਹਨ।"
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "ਕੋਈ ਢੁੱਕਵਾਂ ਡੀਕੋਡਰ ਮੋਡੀਊਲ ਨਹੀਂ ਲੱਭਿਆ"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC \"%4.4s\" ਆਡੀਓ ਜਾਂ ਵਿਡੀਓ ਫਾਰਮੈਟ ਲਈ ਸਹਾਇਕ ਨਹੀਂ ਹੈ। ਅਫਸੋਸ ਰਹੇਗਾ ਕਿ ਇਸ ਨੂੰ ਠੀਕ "
-#~ "ਕਰਨ ਦਾ ਤੁਹਾਡੇ ਕੋਲ ਕੋਈ ਵੀ ਢੰਗ ਨਹੀਂ ਹੈ।"
-
-#~ msgid "Album art policy"
-#~ msgstr "ਐਲਬਮ ਆਰਟ ਪਾਲਸੀ"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "ਚੋਣ ਕਰੋ ਕਿ ਐਲਬਮ ਆਰਟ ਕਿਵੇਂ ਡਾਊਨਲੋਡ ਕਰਨਾ ਹੈ।"
-
-#~ msgid "Manual download only"
-#~ msgstr "ਕੇਵਲ ਖੁਦ ਹੀ ਡਾਊਨਲੋਡ ਕਰੋ"
-
-#~ msgid "When track starts playing"
-#~ msgstr "ਜਦੋਂ ਟਰੈਕ ਚੱਲ ਰਿਹਾ ਹੋਵੇ"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "ਜਦੋਂ ਵੀ ਟਰੈਕ ਸ਼ਾਮਲ ਕੀਤਾ ਜਾਵੇ"
-
-#~ msgid "Load Media Library"
-#~ msgstr "ਮੀਡਿਆ ਲਾਇਬਰੇਰੀ ਲੋਡ ਕਰੋ"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg ਅਸੈੱਸ"
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "ਸਟੀਰਿਓ ਨੂੰ ਮੋਨੋ ਵਿੱਚ ਬਦਲਣ ਲਈ ਆਡੀਓ ਫਿਲਟਰ"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "ਲੂਜ਼-ਲਿਸ ਕੋਡਿੰਗ ਚਾਲੂ"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "ਬਲਾਕ ਓਵਰਲੈਪ (%)"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "ਮੋਸ਼ਨ ਵੈਕਟਰ ਸ਼ੁੱਧਤਾ"
-
-#~ msgid "cycles per degree"
-#~ msgstr "ਪ੍ਰਤੀ ਡਿਗਰੀ ਸਾਈਕਲ"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "openmash ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਵਿਡੀਓ ਡੀਕੋਡਰ"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr "| menu . . [on|off|up|down|left|right|select] use menu"
-
-#~ msgid "Jump to time"
-#~ msgstr "ਟਾਈਮ ਉੱਤੇ ਜਾਓ"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "ਕਰੈਸ਼-ਲਾਗ ਖੋਲ੍ਹੋ..."
-
-#~ msgid "Don't Send"
-#~ msgstr "ਨਾ ਭੇਜੋ"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC ਪਹਿਲਾਂ ਕਰੈਸ਼ ਹੋ ਗਿਆ ਸੀ"
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr "ਮੈਂ ਇਸ ਬੱਗ-ਰਿਪੋਰਟ ਬਾਰੇ ਸੰਪਰਕ ਕਰਨ ਲਈ ਸਹਿਮਤ ਹਾਂ।"
-
-#~ msgid "Don't ask again"
-#~ msgstr "ਫੇਰ ਨਾ ਪੁੱਛੋ"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "ਕੋਈ ਕਰੈਸ਼-ਲਾਗ ਨਹੀਂ ਹੈ"
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "BDMV ਫੋਲਡਰ ਖੋਲ੍ਹੋ"
-
-#~ msgid "Album art download policy"
-#~ msgstr "ਐਲਬਮ ਆਰਟ ਡਾਊਨਲੋਡ ਪਾਲਸੀ"
-
-#~ msgid "Output module"
-#~ msgstr "ਆਉਟਪੁੱਟ ਮੋਡੀਊਲ"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "ਗਰਾਫਿਕਸ ਇਕੂਲਾਈਜ਼ਰ"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "ਵਿਡੀਓ ਆਟੋਮੈਟਿਕ ਹੀ ਮੁੜ-ਆਕਾਰ ਅਤੇ ਪੈੱਡ ਕਰੋ"
-
-#~ msgid "Under the Video"
-#~ msgstr "ਵਿਡੀਓ ਹੇਠ"
-
-#~ msgid "&Help..."
-#~ msgstr "ਮੱਦਦ(&H)..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "ਆਡੀਓ ਟਰੈਕ ਉੱਤੇ ਸੈਕਰੋਨਾਈਜ਼"
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "ਆਡੀਓ ਚੈਨਲ ਲੈਵਲ ਦਾ ਮੁੱਲ"
-
-#~ msgid "Alarm"
-#~ msgstr "ਅਲਾਰਮ"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "Mac OS X OpenGL ਵਿਡੀਓ ਆਉਟਪੁੱਟ (drawable-nsobject ਚਾਹੀਦਾ ਹੈ)"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "ਸਬ-ਟਾਈਟਲ ਫਾਇਲ ਵਰਤੋਂ"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "ਐਲਬਮ ਆਰਟ ਡਾਊਨਲੋਡ ਪਾਲਸੀ:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "ਮੀਡਿਆ ਲਾਇਬਰੇਰੀ ਸੰਰਚਨਾ"
 
 #~ msgid ""
 #~ "You can choose to disable some CPU accelerations here. Use with extreme "
@@ -29324,6 +29180,141 @@ msgstr "ਸਟਰੀਮ ਆਉਟਪੁੱਟ"
 
 #~ msgid "left"
 #~ msgstr "ਖੱਬੇ"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "ਆਪਣੀ ਪਸੰਦੀਦਾ ਵਿਡੀਓ ਆਉਟਪੁੱਟ ਨੂੰ ਚੁਣੋ ਅਤੇ ਇੱਥੇ ਸੰਰਚਿਤ ਕਰੋ।"
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "ਇਹ ਮੋਡੀਊਲ VLC ਦੇ ਹੋਰ ਸਭ ਭਾਗਾਂ ਲਈ ਨੈੱਟਵਰਕ ਸਹੂਲਤਾਂ ਦਿੰਦੇ ਹਨ।"
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "ਡਾਈਲਾਗ ਪਰੋਵਾਈਡਰ ਇੱਥੇ ਸੰਰਚਿਤ ਕੀਤੇ ਜਾ ਸਕਦੇ ਹਨ।"
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "ਕੋਈ ਢੁੱਕਵਾਂ ਡੀਕੋਡਰ ਮੋਡੀਊਲ ਨਹੀਂ ਲੱਭਿਆ"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC \"%4.4s\" ਆਡੀਓ ਜਾਂ ਵਿਡੀਓ ਫਾਰਮੈਟ ਲਈ ਸਹਾਇਕ ਨਹੀਂ ਹੈ। ਅਫਸੋਸ ਰਹੇਗਾ ਕਿ ਇਸ ਨੂੰ ਠੀਕ "
+#~ "ਕਰਨ ਦਾ ਤੁਹਾਡੇ ਕੋਲ ਕੋਈ ਵੀ ਢੰਗ ਨਹੀਂ ਹੈ।"
+
+#~ msgid "Album art policy"
+#~ msgstr "ਐਲਬਮ ਆਰਟ ਪਾਲਸੀ"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "ਚੋਣ ਕਰੋ ਕਿ ਐਲਬਮ ਆਰਟ ਕਿਵੇਂ ਡਾਊਨਲੋਡ ਕਰਨਾ ਹੈ।"
+
+#~ msgid "Manual download only"
+#~ msgstr "ਕੇਵਲ ਖੁਦ ਹੀ ਡਾਊਨਲੋਡ ਕਰੋ"
+
+#~ msgid "When track starts playing"
+#~ msgstr "ਜਦੋਂ ਟਰੈਕ ਚੱਲ ਰਿਹਾ ਹੋਵੇ"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "ਜਦੋਂ ਵੀ ਟਰੈਕ ਸ਼ਾਮਲ ਕੀਤਾ ਜਾਵੇ"
+
+#~ msgid "Load Media Library"
+#~ msgstr "ਮੀਡਿਆ ਲਾਇਬਰੇਰੀ ਲੋਡ ਕਰੋ"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg ਅਸੈੱਸ"
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "ਸਟੀਰਿਓ ਨੂੰ ਮੋਨੋ ਵਿੱਚ ਬਦਲਣ ਲਈ ਆਡੀਓ ਫਿਲਟਰ"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "ਲੂਜ਼-ਲਿਸ ਕੋਡਿੰਗ ਚਾਲੂ"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "ਬਲਾਕ ਓਵਰਲੈਪ (%)"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "ਮੋਸ਼ਨ ਵੈਕਟਰ ਸ਼ੁੱਧਤਾ"
+
+#~ msgid "cycles per degree"
+#~ msgstr "ਪ੍ਰਤੀ ਡਿਗਰੀ ਸਾਈਕਲ"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "openmash ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਵਿਡੀਓ ਡੀਕੋਡਰ"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr "| menu . . [on|off|up|down|left|right|select] use menu"
+
+#~ msgid "Jump to time"
+#~ msgstr "ਟਾਈਮ ਉੱਤੇ ਜਾਓ"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "ਕਰੈਸ਼-ਲਾਗ ਖੋਲ੍ਹੋ..."
+
+#~ msgid "Don't Send"
+#~ msgstr "ਨਾ ਭੇਜੋ"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC ਪਹਿਲਾਂ ਕਰੈਸ਼ ਹੋ ਗਿਆ ਸੀ"
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr "ਮੈਂ ਇਸ ਬੱਗ-ਰਿਪੋਰਟ ਬਾਰੇ ਸੰਪਰਕ ਕਰਨ ਲਈ ਸਹਿਮਤ ਹਾਂ।"
+
+#~ msgid "Don't ask again"
+#~ msgstr "ਫੇਰ ਨਾ ਪੁੱਛੋ"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "ਕੋਈ ਕਰੈਸ਼-ਲਾਗ ਨਹੀਂ ਹੈ"
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "BDMV ਫੋਲਡਰ ਖੋਲ੍ਹੋ"
+
+#~ msgid "Album art download policy"
+#~ msgstr "ਐਲਬਮ ਆਰਟ ਡਾਊਨਲੋਡ ਪਾਲਸੀ"
+
+#~ msgid "Output module"
+#~ msgstr "ਆਉਟਪੁੱਟ ਮੋਡੀਊਲ"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "ਗਰਾਫਿਕਸ ਇਕੂਲਾਈਜ਼ਰ"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "ਵਿਡੀਓ ਆਟੋਮੈਟਿਕ ਹੀ ਮੁੜ-ਆਕਾਰ ਅਤੇ ਪੈੱਡ ਕਰੋ"
+
+#~ msgid "Under the Video"
+#~ msgstr "ਵਿਡੀਓ ਹੇਠ"
+
+#~ msgid "&Help..."
+#~ msgstr "ਮੱਦਦ(&H)..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "ਆਡੀਓ ਟਰੈਕ ਉੱਤੇ ਸੈਕਰੋਨਾਈਜ਼"
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "ਆਡੀਓ ਚੈਨਲ ਲੈਵਲ ਦਾ ਮੁੱਲ"
+
+#~ msgid "Alarm"
+#~ msgstr "ਅਲਾਰਮ"
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "Mac OS X OpenGL ਵਿਡੀਓ ਆਉਟਪੁੱਟ (drawable-nsobject ਚਾਹੀਦਾ ਹੈ)"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "ਸਬ-ਟਾਈਟਲ ਫਾਇਲ ਵਰਤੋਂ"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "ਐਲਬਮ ਆਰਟ ਡਾਊਨਲੋਡ ਪਾਲਸੀ:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "ਮੀਡਿਆ ਲਾਇਬਰੇਰੀ ਸੰਰਚਨਾ"
 
 #, fuzzy
 #~ msgid "Secondary language (Analog TV tuners only)"
