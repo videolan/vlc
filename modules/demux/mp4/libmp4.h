@@ -43,6 +43,7 @@
 #define ATOM_free VLC_FOURCC( 'f', 'r', 'e', 'e' )
 #define ATOM_udta VLC_FOURCC( 'u', 'd', 't', 'a' )
 #define ATOM_wide VLC_FOURCC( 'w', 'i', 'd', 'e' )
+#define ATOM_binm VLC_FOURCC( 0x82, 0x82, 0x7f, 0x7d ) /* binary Computer Graphics Metafile */
 
 #define ATOM_data VLC_FOURCC( 'd', 'a', 't', 'a' )
 

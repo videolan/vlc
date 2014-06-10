@@ -3338,6 +3338,7 @@ static const struct
     { ATOM_skip,    MP4_ReadBoxSkip,          MP4_FreeBox_Common },
     { ATOM_free,    MP4_ReadBoxSkip,          MP4_FreeBox_Common },
     { ATOM_wide,    MP4_ReadBoxSkip,          MP4_FreeBox_Common },
+    { ATOM_binm,    MP4_ReadBoxSkip,          MP4_FreeBox_Common },
 
     /* Subtitles */
     { ATOM_tx3g,    MP4_ReadBox_sample_tx3g,      MP4_FreeBox_Common },
