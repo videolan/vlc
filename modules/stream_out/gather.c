@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_input.h>
 #include <vlc_sout.h>
+#include <vlc_block.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -57,6 +58,7 @@ static int               Send( sout_stream_t *, sout_stream_id_sys_t *, block_t*
 struct sout_stream_id_sys_t
 {
     bool    b_used;
+    bool    b_streamswap;
 
     es_format_t fmt;
     void          *id;
@@ -154,6 +156,7 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         /* */
         msg_Dbg( p_stream, "reusing already opened output" );
         id->b_used = true;
+        id->b_streamswap = true;
         return id;
     }
 
@@ -206,5 +209,10 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 static int Send( sout_stream_t *p_stream,
                  sout_stream_id_sys_t *id, block_t *p_buffer )
 {
+    if ( id->b_streamswap )
+    {
+        id->b_streamswap = false;
+        p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+    }
     return sout_StreamIdSend( p_stream->p_next, id->id, p_buffer );
 }
