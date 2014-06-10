@@ -41,10 +41,8 @@ Release HOWTO
 
  * Mac OS X packages
   - configure using the extras/package/macosx/configure.sh script
-  - compile the source on both a PowerPC and an Intel-based Mac.
-  - use extras/package/macosx/ub.sh to create a Universal Binary.
-  - use extras/package/macosx/codesign.sh to sign it.
-  - copy the packages files on ganesh.videolan.org
+  - use extras/package/macosx/codesign.sh with options and key to sign it.
+  - copy the package to ganesh.videolan.org
 
  * Sign all the files and move the signed files on /opt/ftp/pub/videolan/vlc/X.X.X
   - At first block access to this directory by http or ftp. Only authorize rsync.
