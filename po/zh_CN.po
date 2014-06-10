@@ -1177,7 +1177,7 @@ msgstr "目标字幕编解码器"
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "视频输出模块"
+msgstr "客户端端口"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -3125,7 +3125,6 @@ msgid "HTTP/TLS Certificate Revocation List"
 msgstr "HTTP/TLS 证书废止列表"
 
 #: src/libvlc-module.c:846
-#, fuzzy
 msgid ""
 "This file contains an optional CRL to prevent remote clients from using "
 "revoked certificates in TLS sessions."
@@ -12258,12 +12257,12 @@ msgstr "USF 字幕解码器"
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "文本字幕解码器"
+msgstr "DVB 字幕解码器"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "DVB 字幕"
+msgstr "Teletext 字幕"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -18546,7 +18545,6 @@ msgstr ""
 "问流。"
 
 #: modules/gui/macosx/wizard.m:265
-#, fuzzy
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
 "This protocol is used as transport method by many Microsoft's software. Note "
@@ -21664,7 +21662,7 @@ msgstr "重采样质量"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "高质量音频重采样"
+msgstr "视频质量后处理层级"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -22490,7 +22488,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "保持高宽比"
+msgstr "索引文件"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -25255,7 +25253,7 @@ msgstr "释放 RGB 组件视频滤镜"
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "反交错视频滤镜"
+msgstr "智力交互游戏视频滤镜"
 
 #: modules/video_filter/freeze.c:78
 #, fuzzy
@@ -28754,7 +28752,7 @@ msgstr "视频捕获"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLC 无法打开解码器模块。"
+msgstr "音频输出模块"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -29001,7 +28999,7 @@ msgstr "镜像方向"
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "默认"
+msgstr "默认流"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -29062,366 +29060,6 @@ msgstr "VLC media player - Web 界面"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "流输出"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "选择您的首选视频输出并在这里设置它。"
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "这些模块为所有其它 VLC 的模块提供网络功能。"
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr "这些是视频/音频/字幕编码模块的常规设置。"
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "对话框提供者可以在这里设置。"
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "在此区域您可以强制指定字幕去复用器的行为，例如设置字幕的类型和文件名。"
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "无字幕解码器模块"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr "VLC 不支持音频或视频格式 \"%4.4s\"。很遗憾的您将没有办法修复它。"
-
-#, fuzzy
-#~ msgid ""
-#~ "This file contains an optional CRL to prevent remove clients from using "
-#~ "revoked certificates in TLS sessions."
-#~ msgstr ""
-#~ "该文件包含可选的 CRL，可防止远程客户端在 TLS 会话中使用被吊销的证书。"
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "VLC 查找模块的附加路径。您可以通过使用 \"PATH_SEP\" 作为分隔符添加一系列的"
-#~ "路径"
-
-#~ msgid "Album art policy"
-#~ msgstr "专辑封面策略"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "选择要如何下载专辑封面。"
-
-#~ msgid "Manual download only"
-#~ msgstr "仅手动下载"
-
-#~ msgid "When track starts playing"
-#~ msgstr "在轨道开始播放时"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "在轨道被添加后"
-
-#~ msgid "Load Media Library"
-#~ msgstr "载入媒体库"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr "启用本项可在 VLC 启动时加载基于 SQL 的媒体库"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg 访问"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr "您的系统 AACS 解码库无效。缺密钥?"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC 无法打开文件“%s”。(%m)"
-
-#~ msgid "TCP address to use"
-#~ msgstr "要使用的 TCP 地址"
-
-#~ msgid ""
-#~ "TCP address to use to communicate with the video part of the Bar Graph "
-#~ "(default localhost). In the case of bargraph incrustation, use localhost."
-#~ msgstr ""
-#~ "用于与 Bar Graph 的视频部分进行通讯的 TCP 地址 (默认 localhost)。使用 "
-#~ "bargraph 外壳时，请用 localhost。"
-
-#~ msgid "TCP port to use"
-#~ msgstr "要使用的 TCP 端口"
-
-#~ msgid ""
-#~ "TCP port to use to communicate with the video part of the Bar Graph "
-#~ "(default 12345). Use the same port as the one used in the rc interface."
-#~ msgstr ""
-#~ "用于与 Bar Graph 的视频部分进行通讯的 TCP 端口 (默认 12345)。使用与 rc 接"
-#~ "口所用相同的端口。"
-
-#~ msgid "Force connection reset regularly"
-#~ msgstr "定期强制重置连接"
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr "定义是否重置 TCP 连接。与 audiobargraph_v 配合使用 (默认 1)。"
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "用于将立体声转换为单声道的音频滤镜"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "丢弃裁剪信息"
-
-#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
-#~ msgstr "丢弃内部裁剪参数 (如 H.264 SPS 中的)。"
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "视频加速 (VA) API"
-
-#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
-#~ msgstr "Unix 视频解码及演示 API (VDPAU)"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr "如位率=0，使用此数值以得到恒定质量"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "大于零的值将启用常位率模式"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "启用无损编码"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr "无损编码将忽略码率和质量设置，以完美再现原始质量"
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "长方形线性阶段"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "对角线线性阶段"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "'P' 帧间的距离"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "每 GOP 的 'P' 帧数目"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "运动补偿块宽度"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "运动补偿块高度"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "块重叠 (%)"
-
-#~ msgid "Amount that each motion block should be overlapped by its neighbours"
-#~ msgstr "各移动块与附近块重叠的量"
-
-#~ msgid "xblen"
-#~ msgstr "横向块长"
-
-#~ msgid "Total horizontal block length including overlaps"
-#~ msgstr "总水平块长（含重叠部分）"
-
-#~ msgid "yblen"
-#~ msgstr "纵向块长"
-
-#~ msgid "Total vertical block length including overlaps"
-#~ msgstr "总垂直块长（含重叠部分）"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "动作向量精确度"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "运动矢量的精度（单位为像素）。"
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "简单 ME 搜索区域 x:y"
-
-#~ msgid ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-#~ msgstr ""
-#~ "(不推荐) 在 +/-x, +/-y 的区间内进一次简易的 (非分级) 块匹配运动向量搜索"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "启用空间化分割"
-
-#~ msgid "cycles per degree"
-#~ msgstr "每 cycle 角度值"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Dirac 视频编码器，使用 dirac-research 库"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "使用 openmash 视频解码器"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr "| menu . . [on|off|up|down|left|right|select] 使用菜单"
-
-#~ msgid "Jump to time"
-#~ msgstr "跳转到时间"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "打开崩溃日志..."
-
-#~ msgid "Don't Send"
-#~ msgstr "不发送"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC 上次崩溃了"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "您是否愿意发送详细的崩溃信息给 VLC 的开发小组?\n"
-#~ "\n"
-#~ "如果您愿意，您可以输入几行文字，描述您在 VLC 崩溃之前做了什么，并附上其它"
-#~ "有用的信息，如: 下载样本文件的链接、网络流的 URL ..."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr "我同意发送此错误报告。"
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr "仅会提交您的默认电子邮件地址，不会包含更多的信息。"
-
-#~ msgid "Don't ask again"
-#~ msgstr "不再询问"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "找不到崩溃日志"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "找不到任何上次崩溃的痕迹。"
-
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "在 VLC 回放过程中暂停 iTunes 播放"
-
-#~ msgid ""
-#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
-#~ "playback will be resumed again if VLC playback is finished."
-#~ msgstr ""
-#~ "VLC 回放开始时暂停 iTunes 回放。若选中，iTunes 回放将在 VLC 回放完成后再次"
-#~ "恢复。"
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "打开 BDMV 文件夹"
-
-#~ msgid "Album art download policy"
-#~ msgstr "专辑封面下载策略"
-
-#~ msgid "Output module"
-#~ msgstr "输出模式"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "图像均衡器"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "自动检索媒体信息"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "获取更多扩展"
-
-#~ msgid "Under the Video"
-#~ msgstr "在视频下面"
-
-#~ msgid "&Help..."
-#~ msgstr "帮助(&H)..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "同步音轨"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr "此选项将丢弃/复制视频帧和音频轨道进行同步。"
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr "如果您的 CPU 不能跟进编码率，转码器将丢弃帧。"
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "音频声道层级数值"
-
-#~ msgid ""
-#~ "Value of the audio level of each channels between 0 and 1. Each level "
-#~ "should be separated with ':'."
-#~ msgstr "各声道音频层级的值，介于 0 与 1。各层级应以 ':' 分隔。"
-
-#~ msgid "Alarm"
-#~ msgstr "警告"
-
-#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
-#~ msgstr "发出静音信号并显示警告 (0=不警告, 1=警告)。"
-
-#~ msgid "Spatial luma strength (default 4)"
-#~ msgstr "空间亮度强度 (默认 4)"
-
-#~ msgid "Spatial chroma strength (default 3)"
-#~ msgstr "空间色度强度 (默认 3)"
-
-#~ msgid "Temporal luma strength (default 6)"
-#~ msgstr "时序亮度强度 (默认 6)"
-
-#~ msgid "Temporal chroma strength (default 4.5)"
-#~ msgstr "时序色度强度 (默认 4.5)"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "用于显示的文本。(可用的格式字串为: 与时间有关的: %Y = 年, %m = 月, %d = "
-#~ "天, %H = 小时, %M = 分钟, %S = 秒, ... 与元数据有关: $a = 艺术家, $b = 专"
-#~ "辑, $c = 版权, $d = 描述, $e = 编码者, $g = 流派, $l = 语言, $n = 轨道号, "
-#~ "$p = 正在播放, $r = 分级, $s = 字幕语言, $t = 标题, $u = url, $A = 日期, "
-#~ "$B = 音频位率 (以 kb/s), $C = 章节,$D = 持续时间, $F = 带路径的完整名称, "
-#~ "$I = 标题e, $L = 剩余时间, $N = 名称, $O = 音频语言, $P = 位置 (以 %), $R "
-#~ "= 分级, $S = 音频采样率 (以 kHz), $T = 时间, $U = 发布商, $V = 音量, $_ = "
-#~ "新行) "
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "iOS OpenGL ES 视频输出 (需要 UIView)"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "Mac OS X OpenGL 视频输出 (需要 drawable-nsobject)"
-
-#~ msgid "OpenGL acceleration is not supported on your Mac"
-#~ msgstr "您的 Mac 不支持 OpenGL 加速"
-
-#~ msgid ""
-#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
-#~ "output. It will still work, but much slower and with possibly unexpected "
-#~ "results."
-#~ msgstr ""
-#~ "您的 Mac 缺视频输出所需的 Quartz Extreme 加速组件。视频输出仍然可用，但速"
-#~ "度会非常慢，并且可能会出现异常结果。"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "使用字幕文件(&T)"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "专辑封面下载策略:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "配置媒体库"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -32017,6 +31655,366 @@ msgstr "流输出"
 #~ "禁用。关键字 'all' 代表所有对象。对象可以用类型或模块名称来表示。对用准确"
 #~ "名称表示的对象应用的规则将比对类型应用的规则优先。注意，您仍然需要使用 -"
 #~ "vvv 来真正显示出调试信息。"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "选择您的首选视频输出并在这里设置它。"
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "这些模块为所有其它 VLC 的模块提供网络功能。"
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr "这些是视频/音频/字幕编码模块的常规设置。"
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "对话框提供者可以在这里设置。"
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "在此区域您可以强制指定字幕去复用器的行为，例如设置字幕的类型和文件名。"
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "无字幕解码器模块"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr "VLC 不支持音频或视频格式 \"%4.4s\"。很遗憾的您将没有办法修复它。"
+
+#, fuzzy
+#~ msgid ""
+#~ "This file contains an optional CRL to prevent remove clients from using "
+#~ "revoked certificates in TLS sessions."
+#~ msgstr ""
+#~ "该文件包含可选的 CRL，可防止远程客户端在 TLS 会话中使用被吊销的证书。"
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "VLC 查找模块的附加路径。您可以通过使用 \"PATH_SEP\" 作为分隔符添加一系列的"
+#~ "路径"
+
+#~ msgid "Album art policy"
+#~ msgstr "专辑封面策略"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "选择要如何下载专辑封面。"
+
+#~ msgid "Manual download only"
+#~ msgstr "仅手动下载"
+
+#~ msgid "When track starts playing"
+#~ msgstr "在轨道开始播放时"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "在轨道被添加后"
+
+#~ msgid "Load Media Library"
+#~ msgstr "载入媒体库"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr "启用本项可在 VLC 启动时加载基于 SQL 的媒体库"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg 访问"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr "您的系统 AACS 解码库无效。缺密钥?"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLC 无法打开文件“%s”。(%m)"
+
+#~ msgid "TCP address to use"
+#~ msgstr "要使用的 TCP 地址"
+
+#~ msgid ""
+#~ "TCP address to use to communicate with the video part of the Bar Graph "
+#~ "(default localhost). In the case of bargraph incrustation, use localhost."
+#~ msgstr ""
+#~ "用于与 Bar Graph 的视频部分进行通讯的 TCP 地址 (默认 localhost)。使用 "
+#~ "bargraph 外壳时，请用 localhost。"
+
+#~ msgid "TCP port to use"
+#~ msgstr "要使用的 TCP 端口"
+
+#~ msgid ""
+#~ "TCP port to use to communicate with the video part of the Bar Graph "
+#~ "(default 12345). Use the same port as the one used in the rc interface."
+#~ msgstr ""
+#~ "用于与 Bar Graph 的视频部分进行通讯的 TCP 端口 (默认 12345)。使用与 rc 接"
+#~ "口所用相同的端口。"
+
+#~ msgid "Force connection reset regularly"
+#~ msgstr "定期强制重置连接"
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr "定义是否重置 TCP 连接。与 audiobargraph_v 配合使用 (默认 1)。"
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "用于将立体声转换为单声道的音频滤镜"
+
+#~ msgid "Discard cropping information"
+#~ msgstr "丢弃裁剪信息"
+
+#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
+#~ msgstr "丢弃内部裁剪参数 (如 H.264 SPS 中的)。"
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "视频加速 (VA) API"
+
+#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
+#~ msgstr "Unix 视频解码及演示 API (VDPAU)"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr "如位率=0，使用此数值以得到恒定质量"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "大于零的值将启用常位率模式"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "启用无损编码"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr "无损编码将忽略码率和质量设置，以完美再现原始质量"
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "长方形线性阶段"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "对角线线性阶段"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "'P' 帧间的距离"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "每 GOP 的 'P' 帧数目"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "运动补偿块宽度"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "运动补偿块高度"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "块重叠 (%)"
+
+#~ msgid "Amount that each motion block should be overlapped by its neighbours"
+#~ msgstr "各移动块与附近块重叠的量"
+
+#~ msgid "xblen"
+#~ msgstr "横向块长"
+
+#~ msgid "Total horizontal block length including overlaps"
+#~ msgstr "总水平块长（含重叠部分）"
+
+#~ msgid "yblen"
+#~ msgstr "纵向块长"
+
+#~ msgid "Total vertical block length including overlaps"
+#~ msgstr "总垂直块长（含重叠部分）"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "动作向量精确度"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "运动矢量的精度（单位为像素）。"
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "简单 ME 搜索区域 x:y"
+
+#~ msgid ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+#~ msgstr ""
+#~ "(不推荐) 在 +/-x, +/-y 的区间内进一次简易的 (非分级) 块匹配运动向量搜索"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "启用空间化分割"
+
+#~ msgid "cycles per degree"
+#~ msgstr "每 cycle 角度值"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Dirac 视频编码器，使用 dirac-research 库"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "使用 openmash 视频解码器"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr "| menu . . [on|off|up|down|left|right|select] 使用菜单"
+
+#~ msgid "Jump to time"
+#~ msgstr "跳转到时间"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "打开崩溃日志..."
+
+#~ msgid "Don't Send"
+#~ msgstr "不发送"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC 上次崩溃了"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "您是否愿意发送详细的崩溃信息给 VLC 的开发小组?\n"
+#~ "\n"
+#~ "如果您愿意，您可以输入几行文字，描述您在 VLC 崩溃之前做了什么，并附上其它"
+#~ "有用的信息，如: 下载样本文件的链接、网络流的 URL ..."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr "我同意发送此错误报告。"
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr "仅会提交您的默认电子邮件地址，不会包含更多的信息。"
+
+#~ msgid "Don't ask again"
+#~ msgstr "不再询问"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "找不到崩溃日志"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "找不到任何上次崩溃的痕迹。"
+
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "在 VLC 回放过程中暂停 iTunes 播放"
+
+#~ msgid ""
+#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
+#~ "playback will be resumed again if VLC playback is finished."
+#~ msgstr ""
+#~ "VLC 回放开始时暂停 iTunes 回放。若选中，iTunes 回放将在 VLC 回放完成后再次"
+#~ "恢复。"
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "打开 BDMV 文件夹"
+
+#~ msgid "Album art download policy"
+#~ msgstr "专辑封面下载策略"
+
+#~ msgid "Output module"
+#~ msgstr "输出模式"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "图像均衡器"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "自动检索媒体信息"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "获取更多扩展"
+
+#~ msgid "Under the Video"
+#~ msgstr "在视频下面"
+
+#~ msgid "&Help..."
+#~ msgstr "帮助(&H)..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "同步音轨"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr "此选项将丢弃/复制视频帧和音频轨道进行同步。"
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr "如果您的 CPU 不能跟进编码率，转码器将丢弃帧。"
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "音频声道层级数值"
+
+#~ msgid ""
+#~ "Value of the audio level of each channels between 0 and 1. Each level "
+#~ "should be separated with ':'."
+#~ msgstr "各声道音频层级的值，介于 0 与 1。各层级应以 ':' 分隔。"
+
+#~ msgid "Alarm"
+#~ msgstr "警告"
+
+#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+#~ msgstr "发出静音信号并显示警告 (0=不警告, 1=警告)。"
+
+#~ msgid "Spatial luma strength (default 4)"
+#~ msgstr "空间亮度强度 (默认 4)"
+
+#~ msgid "Spatial chroma strength (default 3)"
+#~ msgstr "空间色度强度 (默认 3)"
+
+#~ msgid "Temporal luma strength (default 6)"
+#~ msgstr "时序亮度强度 (默认 6)"
+
+#~ msgid "Temporal chroma strength (default 4.5)"
+#~ msgstr "时序色度强度 (默认 4.5)"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "用于显示的文本。(可用的格式字串为: 与时间有关的: %Y = 年, %m = 月, %d = "
+#~ "天, %H = 小时, %M = 分钟, %S = 秒, ... 与元数据有关: $a = 艺术家, $b = 专"
+#~ "辑, $c = 版权, $d = 描述, $e = 编码者, $g = 流派, $l = 语言, $n = 轨道号, "
+#~ "$p = 正在播放, $r = 分级, $s = 字幕语言, $t = 标题, $u = url, $A = 日期, "
+#~ "$B = 音频位率 (以 kb/s), $C = 章节,$D = 持续时间, $F = 带路径的完整名称, "
+#~ "$I = 标题e, $L = 剩余时间, $N = 名称, $O = 音频语言, $P = 位置 (以 %), $R "
+#~ "= 分级, $S = 音频采样率 (以 kHz), $T = 时间, $U = 发布商, $V = 音量, $_ = "
+#~ "新行) "
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "iOS OpenGL ES 视频输出 (需要 UIView)"
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "Mac OS X OpenGL 视频输出 (需要 drawable-nsobject)"
+
+#~ msgid "OpenGL acceleration is not supported on your Mac"
+#~ msgstr "您的 Mac 不支持 OpenGL 加速"
+
+#~ msgid ""
+#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
+#~ "output. It will still work, but much slower and with possibly unexpected "
+#~ "results."
+#~ msgstr ""
+#~ "您的 Mac 缺视频输出所需的 Quartz Extreme 加速组件。视频输出仍然可用，但速"
+#~ "度会非常慢，并且可能会出现异常结果。"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "使用字幕文件(&T)"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "专辑封面下载策略:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "配置媒体库"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
