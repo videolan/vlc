@@ -1204,7 +1204,7 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Modul output video"
+msgstr "Port klien"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -5762,7 +5762,7 @@ msgstr ""
 #: modules/access/bluray.c:70
 #, fuzzy
 msgid "Region code"
-msgstr "Mode transmisi"
+msgstr "Kodek video"
 
 #: modules/access/bluray.c:71
 msgid ""
@@ -11543,15 +11543,11 @@ msgid "Codec Profile"
 msgstr "Profil Kodek"
 
 #: modules/codec/qsv.c:63
-#, fuzzy
 msgid ""
 "Specify the codec profile explicitly. If you don't, the codec will determine "
 "the correct profile from other sources, such as resolution and bitrate. E.g. "
 "'high'"
 msgstr ""
-"Tentukan level kodek secara eksplisit. Jika Anda tidak melakukannya, kodek "
-"akan menentukan profil yang sesuai dari sumber lain, seperti resolusi dan "
-"dan kadar bit. Cth. '4.2' untuk mpeg4-part10 atau 'low' untuk mpeg2"
 
 #: modules/codec/qsv.c:67
 msgid "Codec Level"
@@ -11599,9 +11595,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Interval PCR (milidetik)"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11614,9 +11609,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:100
-#, fuzzy
 msgid "Rate Control Method"
-msgstr "Ukuran buffer kontrol"
+msgstr ""
 
 #: modules/codec/qsv.c:102
 msgid ""
@@ -11636,9 +11630,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:110
-#, fuzzy
 msgid "Quantization parameter for I-frames"
-msgstr "Parameter pengkuantitasan"
+msgstr ""
 
 #: modules/codec/qsv.c:111
 msgid ""
@@ -11647,9 +11640,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:114
-#, fuzzy
 msgid "Quantization parameter for P-frames"
-msgstr "Parameter pengkuantitasan"
+msgstr ""
 
 #: modules/codec/qsv.c:115
 msgid ""
@@ -11658,9 +11650,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:118
-#, fuzzy
 msgid "Quantization parameter for B-frames"
-msgstr "Parameter pengkuantitasan"
+msgstr ""
 
 #: modules/codec/qsv.c:119
 msgid ""
@@ -11669,9 +11660,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Kadar bit maksimum"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11703,9 +11693,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Paksakan jumlah potongan tiap bingkai"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11719,9 +11708,8 @@ msgid "Number of reference frames"
 msgstr "Jumlah frame rujukan"
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Jumlah iterasi DWT"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -18850,7 +18838,6 @@ msgstr ""
 "mengakses stream pada mms://ip-anda:8080 secara default."
 
 #: modules/gui/macosx/wizard.m:265
-#, fuzzy
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
 "This protocol is used as transport method by many Microsoft's software. Note "
@@ -21177,7 +21164,7 @@ msgstr "Pilih profil:"
 #: modules/gui/qt4/dialogs/toolbar.cpp:185
 #, fuzzy
 msgid "Preview"
-msgstr "Judul sebelumnya"
+msgstr "Sebelumnya"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:194
 msgid "Cl&ose"
@@ -22009,7 +21996,7 @@ msgstr "Kualitas enkoding"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Pensampelan ulang audio kualitas tinggi"
+msgstr "Level kualitas video pasca memproses"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -22825,7 +22812,7 @@ msgstr "Muxer JPEG Multipart"
 #: modules/mux/ogg.c:47
 #, fuzzy
 msgid "Index interval"
-msgstr "Interval update menu"
+msgstr "File indeks"
 
 #: modules/mux/ogg.c:48
 msgid ""
@@ -22835,7 +22822,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Pertahankan rasio aspek"
+msgstr "File indeks"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -29198,7 +29185,7 @@ msgstr "Penangkap audio"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLC tidak dapat membuka modul dekoder."
+msgstr "Modul output audio"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -29446,7 +29433,7 @@ msgstr ""
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Default"
+msgstr "Stream default"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -29507,285 +29494,6 @@ msgstr "VLC media player - Antarmuka Web"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Output stream"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Pilih output video yang Anda kehendaki dan konfigurasikan di sini."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "Modul ini menyediakan fungsi jaringan pada semua bagian lain VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Ini adalah setting umum untuk modul mengenkode video/audio/subtitle."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Penyedia dialog dapat dikonfigurasikan di sini."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "Pada seksi ini Anda dapat memaksakan kelakuan demuxer subtitle, sebagai "
-#~ "contoh dengan menetapkan jenis atau nama file subtitle."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Tidak ada modul dekoder yang cocok"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC tidak mendukung format audio atau video \"%4.4s\". Sayangnya tidak "
-#~ "ada cara bagi Anda untuk memperbaiki hal ini."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "Path tambahan untuk VLC dalam mencari modulnya. Anda dapat menambah "
-#~ "beberapa path dengan menggabungkan mereka menggunakan \" PATH_SEP \" "
-#~ "sebagai pemisah"
-
-#~ msgid "Album art policy"
-#~ msgstr "Kebijakan seni album"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Pilih bagaimana album art akan diunduh."
-
-#~ msgid "Manual download only"
-#~ msgstr "Hanya unduh secara manual"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Ketika trek mulai dimainkan"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Segera setelah trek ditambahkan"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Muat Pustaka Media"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "Akses FFmpeg"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC tidak dapat membuka file \"%s\". (%m)"
-
-#~ msgid "TCP address to use"
-#~ msgstr "Alamat TCP yang digunakan"
-
-#~ msgid ""
-#~ "TCP address to use to communicate with the video part of the Bar Graph "
-#~ "(default localhost). In the case of bargraph incrustation, use localhost."
-#~ msgstr ""
-#~ "Alamat TCP yang digunakan untuk berkomunikasi dengan bagian video dari "
-#~ "Bar Graph (default localhost). Dalam hal inkrustasi bargraph, gunakan "
-#~ "localhost."
-
-#~ msgid "TCP port to use"
-#~ msgstr "Port TCP yang digunakan"
-
-#~ msgid ""
-#~ "TCP port to use to communicate with the video part of the Bar Graph "
-#~ "(default 12345). Use the same port as the one used in the rc interface."
-#~ msgstr ""
-#~ "Alamat TCP yang digunakan untuk berkomunikasi dengan bagian video dari "
-#~ "Bar Graph (default localhost). Dalam hal inkrustasi bargraph, gunakan "
-#~ "localhost."
-
-#~ msgid "Force connection reset regularly"
-#~ msgstr "Paksa mereset koneksi secara reguler"
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr ""
-#~ "Menentukan apakah koneksi TCP harus direset. Ini harus digunakan ketika "
-#~ "menggunakan audiobargraph_v (default 1)."
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Filter audio untuk konversi stereo ke mono"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr "Jika bitrate=0, gunakan nilai ini untuk kualitas konstan"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "Nilai > 0 menghidupkan mode kadar bit konstan"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Hidupkan pengkodingan lossless"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "Pengkodingan lossless mengabaikan setting kadar bit dan kualitas, "
-#~ "mengizinkan reproduksi sempurna dari yang asli"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "Jarak antara bingkai 'P'"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Jumlah bingkai 'P' per GOP"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Panjang dari blok kompensasi gerak"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Lebar dari blok kompensasi gerak"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "Presisi vektor gerak"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "Presisi vektor gerak dalam pels."
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Hidupkan penyekatan spasial"
-
-#~ msgid "cycles per degree"
-#~ msgstr "putaran per derajat"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Enkoder video Dirac menggunakan pustaka riset-dirac"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Dekoder video menggunakan openmash"
-
-#~ msgid "Jump to time"
-#~ msgstr "Lompat ke waktu"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Buka CrashLog..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Jangan Dikirim"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC crash sebelumnya"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Apakah Anda ingin mengirimkan detail dari crash ke tim pengembang VLC?\n"
-#~ "\n"
-#~ "Jika Anda ingin, Anda dapat memasukkan beberapa baris tentang apa yang "
-#~ "Anda lakukan sebelum VLC crash bersama-sama dengan informasi lain yang "
-#~ "sangat membantu: sebuah tautan untuk mengunduh sebuah file contoh, sebuah "
-#~ "URL untuk stream jaringan, ..."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr ""
-#~ "Saya setuju untuk kemungkinan dihubungi berkenaan dengan laporan bug ini."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "Hanya alamat E-Mail default Anda yang akan dikirimkan, termasuk tidak ada "
-#~ "informasi lain."
-
-#~ msgid "Don't ask again"
-#~ msgstr "Jangan tanya lagi"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Tidak ada CrashLog yang ditemukan"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Tidak menemukan jejak crash sebelumnya."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Buka Folder BDMV"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Kebijakan pengunduhan album art"
-
-#~ msgid "Output module"
-#~ msgstr "Modul output"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Equalizer Grafis"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Preparse file secara otomatis"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Dapatkan ekstensi lebih banyak dari"
-
-#~ msgid "Under the Video"
-#~ msgstr "Di Bawah Video"
-
-#~ msgid "&Help..."
-#~ msgstr "&Bantuan"
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Sinkronkan pada trek audio"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Pilihan ini akan menjatuhkan/menduplikasi bingkai video untuk "
-#~ "mensinkronkan trek video pada trek audio."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "Transkoder akan menjatuhkan bingkai jika CPU tidak dapat bertahan dengan "
-#~ "tingkat pengenkodean."
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "Teks marquee untuk ditampilkan. (Format string yang tersedia: Berhubungan "
-#~ "dengan waktu: %Y = tahun, %m = bulan, %d = hari, %H = jam, %M = menit, %S "
-#~ "= detik, ... Berhubungan dengan meta data: $a = artis, $b = album, $c = "
-#~ "hakcipta, $d = deskripsi, $e = dienkodekan oleh, $g = genre, $l = bahasa, "
-#~ "$n = nomor trek, $p = ditayangkan saat ini, $r = rating, $s = bahasa "
-#~ "subtitle, $t = judul, $u = url, $A = tanggal, $B = nilai bit audio (dalam "
-#~ "kb/s), $C = bab, $D = durasi, $F = nama lengkap dengan path, $I = judul, "
-#~ "$L = masa tinggal, $N = nama, $O = bahasa audio, $P = posisi (dalam %), "
-#~ "$R = nilai, $S = nilai sampel audio (dalam kHz), $T = masa, $U = "
-#~ "penerbit, $V = volume, $_ = baris baru) "
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "Output video iOS OpenGL ES (membutuhkan UIView)"
-
-#~ msgid "OpenGL acceleration is not supported on your Mac"
-#~ msgstr "Akselerasi OpenGL tidak didukung pada Mac Anda"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Gunakan file sub&title"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Kebijakan pengunduhan album art:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Konfigurasikan Pustaka Media"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -31656,6 +31364,285 @@ msgstr "Output stream"
 
 #~ msgid "Minimal view mode (no toolbars)"
 #~ msgstr "Mode tampilan minimal (tanpa toolbar)"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Pilih output video yang Anda kehendaki dan konfigurasikan di sini."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "Modul ini menyediakan fungsi jaringan pada semua bagian lain VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Ini adalah setting umum untuk modul mengenkode video/audio/subtitle."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Penyedia dialog dapat dikonfigurasikan di sini."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "Pada seksi ini Anda dapat memaksakan kelakuan demuxer subtitle, sebagai "
+#~ "contoh dengan menetapkan jenis atau nama file subtitle."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Tidak ada modul dekoder yang cocok"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC tidak mendukung format audio atau video \"%4.4s\". Sayangnya tidak "
+#~ "ada cara bagi Anda untuk memperbaiki hal ini."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "Path tambahan untuk VLC dalam mencari modulnya. Anda dapat menambah "
+#~ "beberapa path dengan menggabungkan mereka menggunakan \" PATH_SEP \" "
+#~ "sebagai pemisah"
+
+#~ msgid "Album art policy"
+#~ msgstr "Kebijakan seni album"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Pilih bagaimana album art akan diunduh."
+
+#~ msgid "Manual download only"
+#~ msgstr "Hanya unduh secara manual"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Ketika trek mulai dimainkan"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Segera setelah trek ditambahkan"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Muat Pustaka Media"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "Akses FFmpeg"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLC tidak dapat membuka file \"%s\". (%m)"
+
+#~ msgid "TCP address to use"
+#~ msgstr "Alamat TCP yang digunakan"
+
+#~ msgid ""
+#~ "TCP address to use to communicate with the video part of the Bar Graph "
+#~ "(default localhost). In the case of bargraph incrustation, use localhost."
+#~ msgstr ""
+#~ "Alamat TCP yang digunakan untuk berkomunikasi dengan bagian video dari "
+#~ "Bar Graph (default localhost). Dalam hal inkrustasi bargraph, gunakan "
+#~ "localhost."
+
+#~ msgid "TCP port to use"
+#~ msgstr "Port TCP yang digunakan"
+
+#~ msgid ""
+#~ "TCP port to use to communicate with the video part of the Bar Graph "
+#~ "(default 12345). Use the same port as the one used in the rc interface."
+#~ msgstr ""
+#~ "Alamat TCP yang digunakan untuk berkomunikasi dengan bagian video dari "
+#~ "Bar Graph (default localhost). Dalam hal inkrustasi bargraph, gunakan "
+#~ "localhost."
+
+#~ msgid "Force connection reset regularly"
+#~ msgstr "Paksa mereset koneksi secara reguler"
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr ""
+#~ "Menentukan apakah koneksi TCP harus direset. Ini harus digunakan ketika "
+#~ "menggunakan audiobargraph_v (default 1)."
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Filter audio untuk konversi stereo ke mono"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr "Jika bitrate=0, gunakan nilai ini untuk kualitas konstan"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "Nilai > 0 menghidupkan mode kadar bit konstan"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Hidupkan pengkodingan lossless"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "Pengkodingan lossless mengabaikan setting kadar bit dan kualitas, "
+#~ "mengizinkan reproduksi sempurna dari yang asli"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Jarak antara bingkai 'P'"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Jumlah bingkai 'P' per GOP"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "Panjang dari blok kompensasi gerak"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "Lebar dari blok kompensasi gerak"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "Presisi vektor gerak"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "Presisi vektor gerak dalam pels."
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Hidupkan penyekatan spasial"
+
+#~ msgid "cycles per degree"
+#~ msgstr "putaran per derajat"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Enkoder video Dirac menggunakan pustaka riset-dirac"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Dekoder video menggunakan openmash"
+
+#~ msgid "Jump to time"
+#~ msgstr "Lompat ke waktu"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Buka CrashLog..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Jangan Dikirim"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC crash sebelumnya"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Apakah Anda ingin mengirimkan detail dari crash ke tim pengembang VLC?\n"
+#~ "\n"
+#~ "Jika Anda ingin, Anda dapat memasukkan beberapa baris tentang apa yang "
+#~ "Anda lakukan sebelum VLC crash bersama-sama dengan informasi lain yang "
+#~ "sangat membantu: sebuah tautan untuk mengunduh sebuah file contoh, sebuah "
+#~ "URL untuk stream jaringan, ..."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr ""
+#~ "Saya setuju untuk kemungkinan dihubungi berkenaan dengan laporan bug ini."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "Hanya alamat E-Mail default Anda yang akan dikirimkan, termasuk tidak ada "
+#~ "informasi lain."
+
+#~ msgid "Don't ask again"
+#~ msgstr "Jangan tanya lagi"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Tidak ada CrashLog yang ditemukan"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Tidak menemukan jejak crash sebelumnya."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Buka Folder BDMV"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Kebijakan pengunduhan album art"
+
+#~ msgid "Output module"
+#~ msgstr "Modul output"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Equalizer Grafis"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Preparse file secara otomatis"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "Dapatkan ekstensi lebih banyak dari"
+
+#~ msgid "Under the Video"
+#~ msgstr "Di Bawah Video"
+
+#~ msgid "&Help..."
+#~ msgstr "&Bantuan"
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Sinkronkan pada trek audio"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Pilihan ini akan menjatuhkan/menduplikasi bingkai video untuk "
+#~ "mensinkronkan trek video pada trek audio."
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "Transkoder akan menjatuhkan bingkai jika CPU tidak dapat bertahan dengan "
+#~ "tingkat pengenkodean."
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "Teks marquee untuk ditampilkan. (Format string yang tersedia: Berhubungan "
+#~ "dengan waktu: %Y = tahun, %m = bulan, %d = hari, %H = jam, %M = menit, %S "
+#~ "= detik, ... Berhubungan dengan meta data: $a = artis, $b = album, $c = "
+#~ "hakcipta, $d = deskripsi, $e = dienkodekan oleh, $g = genre, $l = bahasa, "
+#~ "$n = nomor trek, $p = ditayangkan saat ini, $r = rating, $s = bahasa "
+#~ "subtitle, $t = judul, $u = url, $A = tanggal, $B = nilai bit audio (dalam "
+#~ "kb/s), $C = bab, $D = durasi, $F = nama lengkap dengan path, $I = judul, "
+#~ "$L = masa tinggal, $N = nama, $O = bahasa audio, $P = posisi (dalam %), "
+#~ "$R = nilai, $S = nilai sampel audio (dalam kHz), $T = masa, $U = "
+#~ "penerbit, $V = volume, $_ = baris baru) "
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "Output video iOS OpenGL ES (membutuhkan UIView)"
+
+#~ msgid "OpenGL acceleration is not supported on your Mac"
+#~ msgstr "Akselerasi OpenGL tidak didukung pada Mac Anda"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Gunakan file sub&title"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Kebijakan pengunduhan album art:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Konfigurasikan Pustaka Media"
 
 #, fuzzy
 #~ msgid ""
