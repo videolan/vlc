@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Prasannajit Acharya <holmessherlock21@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
@@ -13,7 +12,7 @@ msgstr ""
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: Oriya (India) (http://www.transifex.com/projects/p/vlc-trans/"
 "language/or_IN/)\n"
-"Language: or\n"
+"Language: or_IN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -10854,9 +10853,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "କୋଡେକ୍"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -10866,9 +10864,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "କୋଡେକ୍"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -16217,7 +16214,7 @@ msgstr ""
 #: modules/gui/macosx/MainMenu.m:81
 #, fuzzy
 msgid "File Size"
-msgstr "ଫାଇଲ ନାମ"
+msgstr "ଆକାର"
 
 #: modules/gui/macosx/MainMenu.m:316
 msgid "Check for Update..."
@@ -28007,6 +28004,12 @@ msgstr "VLC ମିଡିଆ ପ୍ଲେୟାର ସାହାଯ୍ୟ"
 msgid "Streaming Output"
 msgstr "ଷ୍ଟ୍ରିମ୍ ଆଉଟପୁଟ୍"
 
+#~ msgid "There is no help available for these modules."
+#~ msgstr "ଏହି ମଡ୍ୟୁଲ୍‌ଗୁଡିକ ପାଇଁ କୌଣସି ସାହାଯ୍ୟ ଉପଲବ୍ଧ ନାହିଁ|"
+
+#~ msgid "Sort"
+#~ msgstr "ସର୍ଟ କରନ୍ତୁ"
+
 #~ msgid "Choose your preferred video output and configure it here."
 #~ msgstr "ଏଠାରେ ଆପଣଙ୍କର ପସନ୍ଦିତ ଭିଡ଼ିଓ ଆଉଟପୁଟ୍ ମନୋନୟନ କରନ୍ତୁ ଏବଂ ବିନ୍ୟାସ କରନ୍ତୁ|"
 
@@ -28015,12 +28018,6 @@ msgstr "ଷ୍ଟ୍ରିମ୍ ଆଉଟପୁଟ୍"
 
 #~ msgid "&Help..."
 #~ msgstr "&ସାହାଯ୍ୟ..."
-
-#~ msgid "There is no help available for these modules."
-#~ msgstr "ଏହି ମଡ୍ୟୁଲ୍‌ଗୁଡିକ ପାଇଁ କୌଣସି ସାହାଯ୍ୟ ଉପଲବ୍ଧ ନାହିଁ|"
-
-#~ msgid "Sort"
-#~ msgstr "ସର୍ଟ କରନ୍ତୁ"
 
 #, fuzzy
 #~ msgid "General Input"
