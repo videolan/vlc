@@ -10977,9 +10977,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "ബിറ്റ്‌ റേറ്റ്"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -27348,9 +27347,8 @@ msgid "Default caching policy"
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:506
-#, fuzzy
 msgid "Menus language:"
-msgstr "ഭാഷ"
+msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:507
 msgid "Look and feel"
@@ -28024,28 +28022,6 @@ msgstr "വീഎല്‍സീ മീഡിയ പ്ലേയറിനെ ക
 msgid "Streaming Output"
 msgstr "സ്റ്റ്രീം ഔട്ട്‌പുട്ട്‌"
 
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "നിങ്ങള്‍ക്കാവശ്യമായ ദ്രിശ്യ ഉല്‍പാദന രീതി ഇവിടെ തിരഞ്ഞെടുക്കുക"
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "ഈ മോഡ്യൂളുകള്‍ വീ എല്‍ സീയുടെ എല്ലാ ഭാഗങ്ങള്‍ക്കും നെറ്റ്വര്‍ക്ക്‌ സൗകര്യം ലഭ്യം ആക്കുന്നു"
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "അനുയോജ്യമായ ഡീകോഡര്‍ മോട്യുല്‍ ഇല്ല"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "ഈ ദ്രിശ്യ/ശ്രവ്യ സംവിധാനത്തെ വി എല്‍ സീക്ക് അറിയില്ല \"%4.4s\" . നിര്‍ഭാഗ്യവശാല്‍ ഈ "
-#~ "പ്രശ്നം തീര്‍ക്കാന്‍ യാതൊരു വഴിയുമില്ല"
-
-#~ msgid "Under the Video"
-#~ msgstr "ദ്രിശ്യത്തിന്റെ താഴെ"
-
-#~ msgid "&Help..."
-#~ msgstr "സഹായം"
-
 #, fuzzy
 #~ msgid "Add a subtitle file"
 #~ msgstr "സബ്‌ റ്റൈറ്റിലുകള്‍"
@@ -28137,6 +28113,28 @@ msgstr "സ്റ്റ്രീം ഔട്ട്‌പുട്ട്‌"
 
 #~ msgid "key"
 #~ msgstr "കീ"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "നിങ്ങള്‍ക്കാവശ്യമായ ദ്രിശ്യ ഉല്‍പാദന രീതി ഇവിടെ തിരഞ്ഞെടുക്കുക"
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "ഈ മോഡ്യൂളുകള്‍ വീ എല്‍ സീയുടെ എല്ലാ ഭാഗങ്ങള്‍ക്കും നെറ്റ്വര്‍ക്ക്‌ സൗകര്യം ലഭ്യം ആക്കുന്നു"
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "അനുയോജ്യമായ ഡീകോഡര്‍ മോട്യുല്‍ ഇല്ല"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "ഈ ദ്രിശ്യ/ശ്രവ്യ സംവിധാനത്തെ വി എല്‍ സീക്ക് അറിയില്ല \"%4.4s\" . നിര്‍ഭാഗ്യവശാല്‍ ഈ "
+#~ "പ്രശ്നം തീര്‍ക്കാന്‍ യാതൊരു വഴിയുമില്ല"
+
+#~ msgid "Under the Video"
+#~ msgstr "ദ്രിശ്യത്തിന്റെ താഴെ"
+
+#~ msgid "&Help..."
+#~ msgstr "സഹായം"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
