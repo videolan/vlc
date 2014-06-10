@@ -1208,7 +1208,7 @@ msgstr "Ciljni kodirnik slike"
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Enota slikovnega izhoda"
+msgstr "Vrata odjemalca"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -5743,7 +5743,7 @@ msgstr ""
 #: modules/access/bluray.c:70
 #, fuzzy
 msgid "Region code"
-msgstr "Način prenosa"
+msgstr "Slikovni kodek"
 
 #: modules/access/bluray.c:71
 msgid ""
@@ -11459,9 +11459,8 @@ msgid "PNG video encoder"
 msgstr "PNG odkodirnik slike"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Omogoči način ozadja"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11470,9 +11469,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Izberi profil"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11482,9 +11480,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Podrobnosti kodeka"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11505,9 +11502,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:79
-#, fuzzy
 msgid "Group of Picture Reference Distance"
-msgstr "Ime trenutno zagnanega okna"
+msgstr ""
 
 #: modules/codec/qsv.c:81
 msgid ""
@@ -11526,9 +11522,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "PCR časovni zamik (ms)"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11541,9 +11536,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:100
-#, fuzzy
 msgid "Rate Control Method"
-msgstr "Hitrost nadzornega medpomnilnika"
+msgstr ""
 
 #: modules/codec/qsv.c:102
 msgid ""
@@ -11552,9 +11546,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "Delitveni posrednik I"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11594,9 +11587,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Največja bitna hitrost"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -12425,12 +12417,12 @@ msgstr "USF odkodirnik podnapisov"
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "Teletekst odkodirnik podnapisov"
+msgstr "DVB odkodirnik podnapisov"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "DVB podnapisi"
+msgstr "Teletekst podnapisi"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -21865,7 +21857,7 @@ msgstr "Kakovost kodiranja"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Visoka kakovost prevzorčenja zvoka"
+msgstr "Raven kakovosti slike poopravilnega filtra"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -25476,7 +25468,7 @@ msgstr "Filter izločevanja RGB dela slike"
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Filter razpletanja slike."
+msgstr "Slikovni filter igre sestavljanja"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freeze"
@@ -29017,7 +29009,7 @@ msgstr "Zajemanje videa"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "Ni mogoče odpreti enote odkodiranja."
+msgstr "Enota zvočnega izhoda"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -29267,7 +29259,7 @@ msgstr "Smer zrcaljenja"
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Privzeto"
+msgstr "Privzeti zapis"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -29328,278 +29320,6 @@ msgstr "Predvajalnik VLC - spletni vmesnik"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Prikaz pretoka"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Nastavite in uporabite želen izhod slikovnega zapisa."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Enote ponujajo podporo omrežnemu delovanju vsem drugim delom "
-#~ "predvajalnika VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Splošne nastavitve kodiranja slikovnih in zvokovnih enot ter kodiranje "
-#~ "podnapisov."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Okna ponudnikov nastavljate med izbranimi možnostmi."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Ni primerne enote za  odkodiranje"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "Predvajalnik VLC verjetno ne podpira \"%4.4s\" zvokovnega ali slikovnega "
-#~ "zapisa. Na žalost tega trenutno ni mogoče popraviti."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "Dodatne poti, kjer predvajalnik VLC išče enote. Lahko dodate več poti, ki "
-#~ "jih zapišete ločeno z \" PATH_SEP \" kot ločilom."
-
-#~ msgid "Album art policy"
-#~ msgstr "Art pravila albuma"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Nastavitev prejemanja art slikovnih dodatkov albuma."
-
-#~ msgid "Manual download only"
-#~ msgstr "Prejemanje na zahtevo"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Ob predvajanju sledi"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Takoj ob dodajanju sledi"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Naloži predstavno knjižnico"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "Dostop FFmpeg"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "Datoteke \"%s\" ni mogoče odpreti. (%m)"
-
-#~ msgid "TCP address to use"
-#~ msgstr "Uporabljen TCP naslov"
-
-#~ msgid "TCP port to use"
-#~ msgstr "Uporabljena TCP vrata"
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Zvokovni filter za stereo -> mono pretvarjanje"
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "Video pospeševanje (VA) API"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr "Bitna hitrosti =0 določa stalno kakovost posnetka"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "Vrednost> 0 omogoča način stalne bitne hitrosti"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Omogoči kodiranje brez izgub"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "Kodiranje brez izgub prezre bitno hitrost in nastavitve kakovosti. S tem "
-#~ "se omogoči popolno kopiranje izvornega posnetka."
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "Pravokotna linearna faza"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "Diagonalna linearna faza"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "Razdalja med P sličicami."
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Število 'P' sličic v skupini"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Širina blokov poravnave gibanja"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Višina blokov poravnave gibanja"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "Bločno prekrivanje (%)"
-
-#~ msgid "Amount that each motion block should be overlapped by its neighbours"
-#~ msgstr "Količina prekrivanja blokov gibanja s sosednjimi bloki"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "Total horizontal block length including overlaps"
-#~ msgstr "Skupna vodoravna dolžina bloka skupaj s prekrivanjem"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Total vertical block length including overlaps"
-#~ msgstr "Skupna navpična dolžina bloka skupaj s prekrivanjem"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "Natančnost vektorjev gibanja"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "Natančnost vektorja gibanja podana kot vrednost elementov slike."
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "Enostavno ME območje iskanja x:y"
-
-#~ msgid ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-#~ msgstr ""
-#~ "(Ni priporočljivo) Izvedi enostavno drevesno neurejeno primerjavo iskanja "
-#~ "vektorjev gibanja z iskalnim območjem +/-x, +/-y"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Omogoči prostorsko razdeljevanje"
-
-#~ msgid "cycles per degree"
-#~ msgstr "obratov na stopinjo"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Dirac kodirnik slike, ki uporablja knjižnico dirac-research"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Slikovni odkodirnik z openmash"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr "| meni . . [on|off|up|down|left|right|select] uporabi meni"
-
-#~ msgid "Jump to time"
-#~ msgstr "Skoči na čas"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Odpri dnevnik napak ..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Ne pošlji"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "Predvajalnik se je že sesul."
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Ali želite poslati podrobno poročilo o napaki razvijalcem programa VLC??\n"
-#~ "\n"
-#~ "V primeru, da bi želeli pomagati, lahko vpišete nekaj vrstic o vašem delu "
-#~ "preden se je program sesul, skupaj s podrobnostmi, povezavo do "
-#~ "datoteke ..."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr ""
-#~ "Strinjam se, da lahko v primeru, da potrebujete več podrobnosti o napaki, "
-#~ "stopite v stik z menoj preko elektronskega naslova."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "Poslan bo le vaš privzeti elektronski naslov, drugi podatki pa ne bodo "
-#~ "poslani."
-
-#~ msgid "Don't ask again"
-#~ msgstr "Ne vprašaj več"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Ni mogoče najti dnevnika napak."
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Ni mogoče najti znakov predhodnega sesutja programa."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Odpri mapo BDMV"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Album art pravila prejemanja"
-
-#~ msgid "Output module"
-#~ msgstr "Odvodne enote"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Grafično uravnavanje zvoka"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Samodejno nastavi ojačanje videa."
-
-#~ msgid "Under the Video"
-#~ msgstr "Pod posnetkom"
-
-#~ msgid "&Help..."
-#~ msgstr "Pomo&č ..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Uskladi z zvokovno sledjo"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Nastavitev omogoča izpuščanje in podvajanje sličic za usklajevanje sledi "
-#~ "zvoka in slike."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "Pri prekodiranju bodo izpuščene sličice, če CPE ne dohaja hitrosti "
-#~ "kodiranja."
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "Vrednost ravni zvokovnih kanalov"
-
-#~ msgid "Alarm"
-#~ msgstr "Alarm"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "Prikaz oznak. (Mogoče nastavitve so: Izdaja: %Y = leto, %m = mesec, %d = "
-#~ "dan, %H = ure, %M = minute, %S = sekunde, ... Metapodatki: $a = "
-#~ "izvajalec, $b = album, $c = avtorstvo, $d = opis, $e = kodiral, $g = "
-#~ "zvrst, $l = jezik, $n = številka sledi, $p = trenutno predvajan, $r = "
-#~ "ocena, $s = jezik podnapisov, $t = naslov, $u = url, $A = datum, $B = "
-#~ "bitna hitrost zvoka (kb/s), $C = poglavje,$D = trajanje, $F = ime in pot, "
-#~ "$I = naslov, $L = preostali čas, $N = ime, $O = jezik zvoka, $P = položaj "
-#~ "(%), $R = hitrost, $S = hitrost vzorčenja zvoka (kHz), $T = čas, $U = "
-#~ "izdajatelj, $V = glasnost, $_ = nova vrstica) "
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Uporabi datoteko s &podnapisi"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -33013,6 +32733,278 @@ msgstr "Prikaz pretoka"
 
 #~ msgid "Remaining time: %i seconds"
 #~ msgstr "Preostali čas: %i sekund"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Nastavite in uporabite želen izhod slikovnega zapisa."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Enote ponujajo podporo omrežnemu delovanju vsem drugim delom "
+#~ "predvajalnika VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Splošne nastavitve kodiranja slikovnih in zvokovnih enot ter kodiranje "
+#~ "podnapisov."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Okna ponudnikov nastavljate med izbranimi možnostmi."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Ni primerne enote za  odkodiranje"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "Predvajalnik VLC verjetno ne podpira \"%4.4s\" zvokovnega ali slikovnega "
+#~ "zapisa. Na žalost tega trenutno ni mogoče popraviti."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "Dodatne poti, kjer predvajalnik VLC išče enote. Lahko dodate več poti, ki "
+#~ "jih zapišete ločeno z \" PATH_SEP \" kot ločilom."
+
+#~ msgid "Album art policy"
+#~ msgstr "Art pravila albuma"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Nastavitev prejemanja art slikovnih dodatkov albuma."
+
+#~ msgid "Manual download only"
+#~ msgstr "Prejemanje na zahtevo"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Ob predvajanju sledi"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Takoj ob dodajanju sledi"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Naloži predstavno knjižnico"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "Dostop FFmpeg"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "Datoteke \"%s\" ni mogoče odpreti. (%m)"
+
+#~ msgid "TCP address to use"
+#~ msgstr "Uporabljen TCP naslov"
+
+#~ msgid "TCP port to use"
+#~ msgstr "Uporabljena TCP vrata"
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Zvokovni filter za stereo -> mono pretvarjanje"
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "Video pospeševanje (VA) API"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr "Bitna hitrosti =0 določa stalno kakovost posnetka"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "Vrednost> 0 omogoča način stalne bitne hitrosti"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Omogoči kodiranje brez izgub"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "Kodiranje brez izgub prezre bitno hitrost in nastavitve kakovosti. S tem "
+#~ "se omogoči popolno kopiranje izvornega posnetka."
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "Pravokotna linearna faza"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "Diagonalna linearna faza"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Razdalja med P sličicami."
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Število 'P' sličic v skupini"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "Širina blokov poravnave gibanja"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "Višina blokov poravnave gibanja"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "Bločno prekrivanje (%)"
+
+#~ msgid "Amount that each motion block should be overlapped by its neighbours"
+#~ msgstr "Količina prekrivanja blokov gibanja s sosednjimi bloki"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "Total horizontal block length including overlaps"
+#~ msgstr "Skupna vodoravna dolžina bloka skupaj s prekrivanjem"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Total vertical block length including overlaps"
+#~ msgstr "Skupna navpična dolžina bloka skupaj s prekrivanjem"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "Natančnost vektorjev gibanja"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "Natančnost vektorja gibanja podana kot vrednost elementov slike."
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "Enostavno ME območje iskanja x:y"
+
+#~ msgid ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+#~ msgstr ""
+#~ "(Ni priporočljivo) Izvedi enostavno drevesno neurejeno primerjavo iskanja "
+#~ "vektorjev gibanja z iskalnim območjem +/-x, +/-y"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Omogoči prostorsko razdeljevanje"
+
+#~ msgid "cycles per degree"
+#~ msgstr "obratov na stopinjo"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Dirac kodirnik slike, ki uporablja knjižnico dirac-research"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Slikovni odkodirnik z openmash"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr "| meni . . [on|off|up|down|left|right|select] uporabi meni"
+
+#~ msgid "Jump to time"
+#~ msgstr "Skoči na čas"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Odpri dnevnik napak ..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Ne pošlji"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "Predvajalnik se je že sesul."
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Ali želite poslati podrobno poročilo o napaki razvijalcem programa VLC??\n"
+#~ "\n"
+#~ "V primeru, da bi želeli pomagati, lahko vpišete nekaj vrstic o vašem delu "
+#~ "preden se je program sesul, skupaj s podrobnostmi, povezavo do "
+#~ "datoteke ..."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr ""
+#~ "Strinjam se, da lahko v primeru, da potrebujete več podrobnosti o napaki, "
+#~ "stopite v stik z menoj preko elektronskega naslova."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "Poslan bo le vaš privzeti elektronski naslov, drugi podatki pa ne bodo "
+#~ "poslani."
+
+#~ msgid "Don't ask again"
+#~ msgstr "Ne vprašaj več"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Ni mogoče najti dnevnika napak."
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Ni mogoče najti znakov predhodnega sesutja programa."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Odpri mapo BDMV"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Album art pravila prejemanja"
+
+#~ msgid "Output module"
+#~ msgstr "Odvodne enote"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Grafično uravnavanje zvoka"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Samodejno nastavi ojačanje videa."
+
+#~ msgid "Under the Video"
+#~ msgstr "Pod posnetkom"
+
+#~ msgid "&Help..."
+#~ msgstr "Pomo&č ..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Uskladi z zvokovno sledjo"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Nastavitev omogoča izpuščanje in podvajanje sličic za usklajevanje sledi "
+#~ "zvoka in slike."
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "Pri prekodiranju bodo izpuščene sličice, če CPE ne dohaja hitrosti "
+#~ "kodiranja."
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "Vrednost ravni zvokovnih kanalov"
+
+#~ msgid "Alarm"
+#~ msgstr "Alarm"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "Prikaz oznak. (Mogoče nastavitve so: Izdaja: %Y = leto, %m = mesec, %d = "
+#~ "dan, %H = ure, %M = minute, %S = sekunde, ... Metapodatki: $a = "
+#~ "izvajalec, $b = album, $c = avtorstvo, $d = opis, $e = kodiral, $g = "
+#~ "zvrst, $l = jezik, $n = številka sledi, $p = trenutno predvajan, $r = "
+#~ "ocena, $s = jezik podnapisov, $t = naslov, $u = url, $A = datum, $B = "
+#~ "bitna hitrost zvoka (kb/s), $C = poglavje,$D = trajanje, $F = ime in pot, "
+#~ "$I = naslov, $L = preostali čas, $N = ime, $O = jezik zvoka, $P = položaj "
+#~ "(%), $R = hitrost, $S = hitrost vzorčenja zvoka (kHz), $T = čas, $U = "
+#~ "izdajatelj, $V = glasnost, $_ = nova vrstica) "
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Uporabi datoteko s &podnapisi"
 
 #, fuzzy
 #~ msgid ""
