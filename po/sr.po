@@ -8,6 +8,7 @@
 # Gorana Milicevic <gorana.milicevic@gmail.com>, 2008
 # Marko Uskokoddic <>, 2007
 # Marko Uskokovic <uskokovic@etf.bg.ac.yu>, 2007-2008
+# Rancher <djordje.vasiljevich@gmail.com>, 2013
 # predrag83yu <predragljubenovic@gmail.com>, 2010,2013-2014
 # Serbian linux distribution cp6Linux
 msgid ""
@@ -1157,7 +1158,7 @@ msgstr "Видео кодео одредишта"
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Модул видео излаза"
+msgstr "Порт клијента"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -5638,7 +5639,7 @@ msgstr ""
 #: modules/access/bluray.c:70
 #, fuzzy
 msgid "Region code"
-msgstr "Претвори из"
+msgstr "Видео кодек"
 
 #: modules/access/bluray.c:71
 msgid ""
@@ -10542,7 +10543,7 @@ msgstr "VLC не може да отвори модул %s."
 #: modules/codec/avcodec/hwdummy.c:42
 #, fuzzy
 msgid "Dummy video decoder"
-msgstr "Theora видео декодер"
+msgstr "Псеудо декодер"
 
 #: modules/codec/avcodec/vaapi.c:62
 #, fuzzy
@@ -11234,9 +11235,8 @@ msgid "PNG video encoder"
 msgstr "PNG видео декодер"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Укључи мод позадине"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11245,9 +11245,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Профил"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11257,9 +11256,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Кодек"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11300,9 +11298,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Qt интерфејс"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11315,9 +11312,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:100
-#, fuzzy
 msgid "Rate Control Method"
-msgstr "Величина бафера за контролу брзине"
+msgstr ""
 
 #: modules/codec/qsv.c:102
 msgid ""
@@ -11326,9 +11322,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "I фактор квантизације"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11368,9 +11363,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Максимална брзина битова у секунди"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11402,9 +11396,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Број референтних оквира"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11418,9 +11411,8 @@ msgid "Number of reference frames"
 msgstr "Број референтних оквира"
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Број копирања"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -12192,12 +12184,12 @@ msgstr ""
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "Декодер текстуалних титлова "
+msgstr "DVB декодер титлова"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "DVB титлови"
+msgstr "Телетекст титлови"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -13912,7 +13904,7 @@ msgstr "+----[ крај помоћи ]"
 #: modules/control/rc.c:965
 #, fuzzy
 msgid "Press pause to continue."
-msgstr "Унесите 'одабир менија' или 'пауза' за наставак."
+msgstr "Притисните одабир менија или паузу за наставак."
 
 #: modules/control/rc.c:1191 modules/control/rc.c:1446
 #: modules/control/rc.c:1490
@@ -16054,7 +16046,7 @@ msgstr "Прикажи подешавања"
 #: modules/gui/macosx/BWQuincyUI.m:79
 #, fuzzy
 msgid "Hide Details"
-msgstr "Прикажи подешавања"
+msgstr "Сакриј Остале"
 
 #: modules/gui/macosx/BWQuincyUI.m:81
 msgid "Send"
@@ -20717,7 +20709,7 @@ msgstr "Изабери профил:"
 #: modules/gui/qt4/dialogs/toolbar.cpp:185
 #, fuzzy
 msgid "Preview"
-msgstr "Претходни наслов"
+msgstr "Претходно"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:194
 msgid "Cl&ose"
@@ -21529,7 +21521,7 @@ msgstr "Квалитет енкодирања"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Високи квалитет звучног преузорка."
+msgstr "Ниво квалитета"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -21544,7 +21536,7 @@ msgstr "Приступни излаз"
 #: modules/hw/vdpau/sharpen.c:141
 #, fuzzy
 msgid "VDPAU sharpen video filter"
-msgstr "Копија видео филтера"
+msgstr "Зрнасти видео филтер"
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -22328,7 +22320,7 @@ msgstr "Вишечлани JPEG мултиплексер"
 #: modules/mux/ogg.c:47
 #, fuzzy
 msgid "Index interval"
-msgstr "Интервал ажурирања менија"
+msgstr "Индексна датотека"
 
 #: modules/mux/ogg.c:48
 msgid ""
@@ -28556,7 +28548,7 @@ msgstr "Модул звучног излаза"
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
 msgid "No video devices found"
-msgstr "Видео уређај"
+msgstr "Име видео уређаја"
 
 #: modules/access/avcapture.m:289
 msgid ""
@@ -28791,7 +28783,7 @@ msgstr ""
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Подразумевано"
+msgstr "Подразумевани ток"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -28852,103 +28844,6 @@ msgstr "VLC Media Player – веб сучеље"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Излаз тока"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Изаберите жељени видео-излаз и подесите га овде."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "Ови модули пружају мрежне функције свим другим деловима VLC-а."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Ово су опште поставке модула за кодирање титлова, аудио и видео записа."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Овде можете да подесите добављаче дијалога."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Нема одговарајућег модула за декодирање"
-
-#~ msgid "Manual download only"
-#~ msgstr "Само ручно преузимање"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Када запис почне са репродукцијом"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Чим је запис додат"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "Приступ FFmpeg-у"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Видео декодер који користи openmash"
-
-#~ msgid "Press menu select or pause to continue."
-#~ msgstr "Притисните одабир менија или паузу за наставак."
-
-#~ msgid "Type 'menu select' or 'pause' to continue."
-#~ msgstr "Унесите 'одабир менија' или 'пауза' за наставак."
-
-#~ msgid "Jump to time"
-#~ msgstr "Скочи на време"
-
-#~ msgid "Don't Send"
-#~ msgstr "Не шаљи"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Да ли желиш да пошаљеш детаље грешке VLC развојном тиму?\n"
-#~ "\n"
-#~ "Ако желиш, можеш послати опис онога шта је рађено пре него што се VLC "
-#~ "срушио са осталим помоћним информацијама: линк ка узорку фајла, URL "
-#~ "мрежног тока, ..."
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Не могу да пронађем никакав траг претходног пада програма."
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Графички еквилајзер"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Аутоматско појачање видео-сигнала."
-
-#~ msgid "Under the Video"
-#~ msgstr "Испод видеа"
-
-#~ msgid "&Help..."
-#~ msgstr "&Помоћ..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Синхронизуј на аудио траци"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Ова опција ће испустити/дуплирати видео фрејмове да би синхронизовао "
-#~ "видео траку са аудио траком."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "Транскодер ће испустити фрејмове ако Ваш CPU не може да се усклади са "
-#~ "брзином енкодирања."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Користи фа&јл титла"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -31861,6 +31756,103 @@ msgstr "Излаз тока"
 
 #~ msgid "Use minimal interface, with no toolbar and fewer menus."
 #~ msgstr "Користи минимални интерфејс, без алатки и са мање менија."
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Изаберите жељени видео-излаз и подесите га овде."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "Ови модули пружају мрежне функције свим другим деловима VLC-а."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Ово су опште поставке модула за кодирање титлова, аудио и видео записа."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Овде можете да подесите добављаче дијалога."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Нема одговарајућег модула за декодирање"
+
+#~ msgid "Manual download only"
+#~ msgstr "Само ручно преузимање"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Када запис почне са репродукцијом"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Чим је запис додат"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "Приступ FFmpeg-у"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Видео декодер који користи openmash"
+
+#~ msgid "Press menu select or pause to continue."
+#~ msgstr "Притисните одабир менија или паузу за наставак."
+
+#~ msgid "Type 'menu select' or 'pause' to continue."
+#~ msgstr "Унесите 'одабир менија' или 'пауза' за наставак."
+
+#~ msgid "Jump to time"
+#~ msgstr "Скочи на време"
+
+#~ msgid "Don't Send"
+#~ msgstr "Не шаљи"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Да ли желиш да пошаљеш детаље грешке VLC развојном тиму?\n"
+#~ "\n"
+#~ "Ако желиш, можеш послати опис онога шта је рађено пре него што се VLC "
+#~ "срушио са осталим помоћним информацијама: линк ка узорку фајла, URL "
+#~ "мрежног тока, ..."
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Не могу да пронађем никакав траг претходног пада програма."
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Графички еквилајзер"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Аутоматско појачање видео-сигнала."
+
+#~ msgid "Under the Video"
+#~ msgstr "Испод видеа"
+
+#~ msgid "&Help..."
+#~ msgstr "&Помоћ..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Синхронизуј на аудио траци"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Ова опција ће испустити/дуплирати видео фрејмове да би синхронизовао "
+#~ "видео траку са аудио траком."
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "Транскодер ће испустити фрејмове ако Ваш CPU не може да се усклади са "
+#~ "брзином енкодирања."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Користи фа&јл титла"
 
 #, fuzzy
 #~ msgid "Sort"
