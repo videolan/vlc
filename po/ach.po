@@ -10845,9 +10845,8 @@ msgid "PNG video encoder"
 msgstr "Nyonyo me yungo Cal anena"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Mi video"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -10856,9 +10855,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Kop makwako"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -10868,9 +10866,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Lok yoreyore ikom Codec"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -10911,9 +10908,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Qt kaneno"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -10977,9 +10973,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Rwom mamite"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11011,9 +11006,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Namba me yiko"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11027,9 +11021,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Namba me yiko"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -20914,7 +20907,7 @@ msgstr "Kan madong ber pa jami anena dong otunu iye"
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
 msgid "VDPAU deinterlacing filter"
-msgstr "Lok caji me neno video"
+msgstr "Kwanyo kubere"
 
 #: modules/hw/vdpau/display.c:46
 msgid "VDPAU output"
@@ -27785,7 +27778,7 @@ msgstr ""
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
 msgid "No video devices found"
-msgstr "Jami me video"
+msgstr "Nying giketo cinema"
 
 #: modules/access/avcapture.m:289
 msgid ""
@@ -28012,7 +28005,7 @@ msgstr "Manen jwi"
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
 msgid "Chromaprint stream output"
-msgstr "Ket jami ma imaro"
+msgstr "Coc maceto woko ma ginongo"
 
 #: modules/text_renderer/platform_fonts.c:82
 msgid ""
@@ -28063,53 +28056,6 @@ msgstr "Kony me gi tuku wer me VLC"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Ket jami ma imaro"
-
-#~ msgid "Jump to time"
-#~ msgstr "Pye i cawa"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Yab Dul ma Opoto..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Pe I cwal"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC otyeko too lacen con"
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr "An aye ka imito kube keda pi bur man mageri."
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Pe ginongo jami mo mamito timo oyoto"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Pe onongo lanen mo ma nyutu bunyere mukato."
-
-#~ msgid "Album art download policy"
-#~ msgstr "Cik makwako kwanyo buk cal"
-
-#~ msgid "Output module"
-#~ msgstr "Kite me kwanyo"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Gitero kite me tuko"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Gwok dwon kene kun i aa"
-
-#~ msgid "Under the Video"
-#~ msgstr "Ite Cal anena"
-
-#~ msgid "&Help..."
-#~ msgstr "&Kony"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Fail me Wie matino"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Polici me loko albam me cale"
 
 #, fuzzy
 #~ msgid "Subtitle demuxer settings"
@@ -28411,6 +28357,53 @@ msgstr "Ket jami ma imaro"
 
 #~ msgid "...when VLC is in background"
 #~ msgstr "...Ka VCL tye ma okane"
+
+#~ msgid "Jump to time"
+#~ msgstr "Pye i cawa"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Yab Dul ma Opoto..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Pe I cwal"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC otyeko too lacen con"
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr "An aye ka imito kube keda pi bur man mageri."
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Pe ginongo jami mo mamito timo oyoto"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Pe onongo lanen mo ma nyutu bunyere mukato."
+
+#~ msgid "Album art download policy"
+#~ msgstr "Cik makwako kwanyo buk cal"
+
+#~ msgid "Output module"
+#~ msgstr "Kite me kwanyo"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Gitero kite me tuko"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Yeny lamed kene"
+
+#~ msgid "Under the Video"
+#~ msgstr "Ite Cal anena"
+
+#~ msgid "&Help..."
+#~ msgstr "&Kony"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Fail me Wie matino"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Polici me loko albam me cale"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
