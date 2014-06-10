@@ -366,7 +366,7 @@ msgstr "Қосымша теңшелімдер"
 #: include/vlc_input.h:568
 #, fuzzy
 msgid "Subtitle track added"
-msgstr "Субтитрлер жолшығы"
+msgstr "Субтитр жолшығы: %s"
 
 #: include/vlc_interface.h:140
 msgid ""
@@ -1134,7 +1134,7 @@ msgstr "Жеткілімдік бейнелік кодек"
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Бейнелік шығасын модулі"
+msgstr "Тұтынғыш порты"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -5427,7 +5427,7 @@ msgstr ""
 #: modules/access/bluray.c:70
 #, fuzzy
 msgid "Region code"
-msgstr "Түрлендірулер мынадан"
+msgstr "Бейнелік кодек"
 
 #: modules/access/bluray.c:71
 msgid ""
@@ -10928,9 +10928,8 @@ msgid "PNG video encoder"
 msgstr "PNG бейнелік кодсыздандырғыш"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Түсқағаз режімін қосу"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -10939,9 +10938,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Бейін"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -10951,9 +10949,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Кодегі"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -10974,9 +10971,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:79
-#, fuzzy
 msgid "Group of Picture Reference Distance"
-msgstr "Ағымдық дананың атауы"
+msgstr ""
 
 #: modules/codec/qsv.c:81
 msgid ""
@@ -10995,9 +10991,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "VNC сауалдау аралығы"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11010,9 +11005,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:100
-#, fuzzy
 msgid "Rate Control Method"
-msgstr "Қарқын басқару аралық сақтағышының мөлшері"
+msgstr ""
 
 #: modules/codec/qsv.c:102
 msgid ""
@@ -11021,9 +11015,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "I-кванттау ықпалы"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11063,9 +11056,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Ең көп ағындық қарқын"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11097,9 +11089,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Тірек кадр саны"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11113,9 +11104,8 @@ msgid "Number of reference frames"
 msgstr "Тірек кадр саны"
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "DWT итерация саны"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -11885,7 +11875,7 @@ msgstr "USF субтитрлер кодсыздандырғышы"
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "Телетекст субтитрлер кодсыздандырғышы"
+msgstr "DVB субтитрлер кодсыздандырғышы"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
@@ -21023,7 +21013,7 @@ msgstr "Кодтау сапасы"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Жоғары сапалы дыбыстық қайта іріктеу"
+msgstr "Сапа деңгейі"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -24481,7 +24471,7 @@ msgstr "RGB құрамдасын бөліп алатын бейнелік сүз
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Тізбектестіру бейнелік сүзгісі"
+msgstr "Әрекеттестік пазл ойынының бейнелік сүзгісі"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freeze"
@@ -27517,9 +27507,8 @@ msgid "Default caching policy"
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:506
-#, fuzzy
 msgid "Menus language:"
-msgstr "Дыбыс тілі"
+msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:507
 msgid "Look and feel"
@@ -28154,7 +28143,7 @@ msgstr ""
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Әдепкі"
+msgstr "Әдепкі ағын"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -28213,146 +28202,6 @@ msgstr "VLC тасушы ойнатқышының анықтамасы"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Ағындық шығасын"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr ""
-#~ "Мыннан өзіңізге ұнамды бейнелік шығасынын таңдаңыз да және бұны "
-#~ "ішқұрылымдаңыз."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Еш жарамды кодсыздандырғыш модулі жоқ"
-
-#~ msgid "Album art policy"
-#~ msgstr "Альбомның мұқаба суреті туралы ереже"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Альбомның қотарып алынатын мұқаба суретіні таңдау."
-
-#~ msgid "Manual download only"
-#~ msgstr "Тек қолмен қотару"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Жолшық ойнатылуы басталғанда"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Жолшық үстелген бойда"
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Стерео -> моно түрлендіруге арналған дыбыстық сүзгі"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "Мәні > 0 болса тұрақты ағындық қарқын режімін қосады."
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Ысырапсыз кодтауды қосу"
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "Тікбұрышты сызықтық фаза"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "Қиғаш сызықтық фаза"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "'P' кадрлер ара қашықтығы"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Бір GOP-қа келетін 'P' кадр саны"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Қимыл өтемдейтіні бөліктердің ені"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Қимыл өтемдейтіні бөліктердің биіктігі"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "Телім асып түсуі (%)"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "Қимылдау бағдарынның дәлденуі"
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "Қарапайым ME іздеу аумағы x:y"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Кеңістік айырылысуды қосу"
-
-#~ msgid "cycles per degree"
-#~ msgstr "бір градустағы орайғын саны"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "dirac-research кітапханасын қолданған Дирак бейнелік кодтауышы"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Бейнелік кодсыздандырғыш (openmash қолданып)"
-
-#~ msgid "Jump to time"
-#~ msgstr "Уақытқа ауысу"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Күйреу жұрналын ашу..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Жіберілмесін"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "Өткенде VLC күйреген"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Еш күйреу жұрналы табылмады"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Альбомның мұқаба суретін қотару туралы ереже"
-
-#~ msgid "Output module"
-#~ msgstr "Шығасын модулі"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Сызықтық экуалайзер"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Файлдарды өздігінен алдын-ала талдау"
-
-#~ msgid "Under the Video"
-#~ msgstr "Бейне төменінде"
-
-#~ msgid "&Help..."
-#~ msgstr "Анықтама..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Дыбыстық жолшық бойынша қадамдастыру"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "Бейнелейтін кенере мәтіні. (Қатынаулы пішім жолдықтары: Уақытқа қатысты: "
-#~ "%Y = жыл, %m = ай, %d = күн, %H = сағат, %M = минөт, %S = секунд, ... "
-#~ "Мета-деректерге қатысты: $a = орындаушы, $b = альбом, $c = туындыгерлік "
-#~ "құқықтар, $d = сипаттама, $e = кодтауыш, $g = жанр, $l = тіл, $n = жолшық "
-#~ "№, $p = қазір ойнатуда, $r = бағалау, $s = субтитрлер тілі, $t = тақырып, "
-#~ "$u = url, $A = күн-айы, $B = дыбыстық ағын қарқыны, kb/s, $C = бөлім,$D = "
-#~ "ұзақтық, $F = жолын қоса толық атау, $I = тақырып, $L = қалған уақыт, $N "
-#~ "= атау, $O = дубыс тілі, $P = жайғасым, %, $R = қарқын, $S = дыбыстік "
-#~ "іріктеу қарқыны, kHz, $T = уақыт, $U = жариялаушы, $V = деңгей, $_ = жаңа "
-#~ "жол) "
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Субтитр файлын қолдану"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -29872,6 +29721,146 @@ msgstr "Ағындық шығасын"
 
 #~ msgid "left"
 #~ msgstr "сол"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr ""
+#~ "Мыннан өзіңізге ұнамды бейнелік шығасынын таңдаңыз да және бұны "
+#~ "ішқұрылымдаңыз."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Еш жарамды кодсыздандырғыш модулі жоқ"
+
+#~ msgid "Album art policy"
+#~ msgstr "Альбомның мұқаба суреті туралы ереже"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Альбомның қотарып алынатын мұқаба суретіні таңдау."
+
+#~ msgid "Manual download only"
+#~ msgstr "Тек қолмен қотару"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Жолшық ойнатылуы басталғанда"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Жолшық үстелген бойда"
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Стерео -> моно түрлендіруге арналған дыбыстық сүзгі"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "Мәні > 0 болса тұрақты ағындық қарқын режімін қосады."
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Ысырапсыз кодтауды қосу"
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "Тікбұрышты сызықтық фаза"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "Қиғаш сызықтық фаза"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "'P' кадрлер ара қашықтығы"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Бір GOP-қа келетін 'P' кадр саны"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "Қимыл өтемдейтіні бөліктердің ені"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "Қимыл өтемдейтіні бөліктердің биіктігі"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "Телім асып түсуі (%)"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "Қимылдау бағдарынның дәлденуі"
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "Қарапайым ME іздеу аумағы x:y"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Кеңістік айырылысуды қосу"
+
+#~ msgid "cycles per degree"
+#~ msgstr "бір градустағы орайғын саны"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "dirac-research кітапханасын қолданған Дирак бейнелік кодтауышы"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Бейнелік кодсыздандырғыш (openmash қолданып)"
+
+#~ msgid "Jump to time"
+#~ msgstr "Уақытқа ауысу"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Күйреу жұрналын ашу..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Жіберілмесін"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "Өткенде VLC күйреген"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Еш күйреу жұрналы табылмады"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Альбомның мұқаба суретін қотару туралы ереже"
+
+#~ msgid "Output module"
+#~ msgstr "Шығасын модулі"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Сызықтық экуалайзер"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Файлдарды өздігінен алдын-ала талдау"
+
+#~ msgid "Under the Video"
+#~ msgstr "Бейне төменінде"
+
+#~ msgid "&Help..."
+#~ msgstr "Анықтама..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Дыбыстық жолшық бойынша қадамдастыру"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "Бейнелейтін кенере мәтіні. (Қатынаулы пішім жолдықтары: Уақытқа қатысты: "
+#~ "%Y = жыл, %m = ай, %d = күн, %H = сағат, %M = минөт, %S = секунд, ... "
+#~ "Мета-деректерге қатысты: $a = орындаушы, $b = альбом, $c = туындыгерлік "
+#~ "құқықтар, $d = сипаттама, $e = кодтауыш, $g = жанр, $l = тіл, $n = жолшық "
+#~ "№, $p = қазір ойнатуда, $r = бағалау, $s = субтитрлер тілі, $t = тақырып, "
+#~ "$u = url, $A = күн-айы, $B = дыбыстық ағын қарқыны, kb/s, $C = бөлім,$D = "
+#~ "ұзақтық, $F = жолын қоса толық атау, $I = тақырып, $L = қалған уақыт, $N "
+#~ "= атау, $O = дубыс тілі, $P = жайғасым, %, $R = қарқын, $S = дыбыстік "
+#~ "іріктеу қарқыны, kHz, $T = уақыт, $U = жариялаушы, $V = деңгей, $_ = жаңа "
+#~ "жол) "
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Субтитр файлын қолдану"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
