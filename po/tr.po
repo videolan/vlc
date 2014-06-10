@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2014-06-10 15:44-0400\n"
-"PO-Revision-Date: 2014-03-10 15:58+0000\n"
+"PO-Revision-Date: 2014-05-23 17:36+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/vlc-trans/"
 "language/tr/)\n"
@@ -1221,7 +1221,7 @@ msgstr "Hedef altyazı kodlayıcı/çözücü"
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Görüntü çıkış modülü"
+msgstr "İstemci kapısı"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -2675,7 +2675,7 @@ msgstr "Varsayılan"
 #: modules/gui/qt4/components/extended_panels.cpp:1016
 #: modules/gui/qt4/ui/equalizer.h:134 modules/gui/qt4/ui/vlm.h:290
 msgid "Enable"
-msgstr "Etkinleştir"
+msgstr "Etkinleştirin"
 
 #: src/libvlc-module.c:540
 msgid "MTU of the network interface"
@@ -3313,7 +3313,6 @@ msgid "HTTP/TLS Certificate Revocation List"
 msgstr "İptal Edilmiş HTTP/TLS Sertifikaları Listesi"
 
 #: src/libvlc-module.c:846
-#, fuzzy
 msgid ""
 "This file contains an optional CRL to prevent remote clients from using "
 "revoked certificates in TLS sessions."
@@ -3981,7 +3980,7 @@ msgid ""
 "directory."
 msgstr ""
 "Oynatma listesi bazı ögeleri bir klasörün içeriği gibi ağaç şeklinde "
-"kategorize edecek şekilde kullanılabilir."
+"kategorize etmek için kullanılabilir."
 
 #: src/libvlc-module.c:1172
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
@@ -4124,7 +4123,8 @@ msgstr "Önceki"
 #: src/libvlc-module.c:1212
 msgid "Select the hotkey to use to skip to the previous item in the playlist."
 msgstr ""
-"Oynatma listesinde önceki ögeye geçmek için kullanılacak kestirme tuşu seçin."
+"Oynatma listesinde önceki ögeye geçmek için kullanılacak kısayol tuşunu "
+"seçin."
 
 #: src/libvlc-module.c:1213 modules/gui/macosx/ControlsBar.m:481
 #: modules/gui/macosx/MainMenu.m:362 modules/gui/macosx/MainMenu.m:469
@@ -4132,7 +4132,7 @@ msgstr ""
 #: modules/gui/qt4/components/controller.hpp:115
 #: modules/gui/qt4/dialogs/vlm.cpp:556 modules/gui/qt4/ui/streampanel.h:181
 msgid "Stop"
-msgstr "Durdur"
+msgstr "Durdurun"
 
 #: src/libvlc-module.c:1214
 msgid "Select the hotkey to stop playback."
@@ -4153,71 +4153,69 @@ msgstr "Konumu göstermek için kullanılacak kısayol tuşunu seçin."
 
 #: src/libvlc-module.c:1218
 msgid "Very short backwards jump"
-msgstr "Çok kısa geri atlama"
+msgstr "Geriye çok kısa atlama"
 
 #: src/libvlc-module.c:1220
 msgid "Select the hotkey to make a very short backwards jump."
 msgstr ""
-"Çok kısa bir geri atlama yapmak için kullanılacak kısayol tuşunu seçin."
+"Geriye çok kısa bir atlama yapmak için kullanılacak kısayol tuşunu seçin."
 
 #: src/libvlc-module.c:1221
 msgid "Short backwards jump"
-msgstr "Kısa geri atlama"
+msgstr "Geriye kısa atlama"
 
 #: src/libvlc-module.c:1223
 msgid "Select the hotkey to make a short backwards jump."
-msgstr "Kısa bir geri atlama yapmak için kullanılacak kısayol tuşunu seçin."
+msgstr "Geriye kısa bir atlama yapmak için kullanılacak kısayol tuşunu seçin."
 
 #: src/libvlc-module.c:1224
 msgid "Medium backwards jump"
-msgstr "Orta uzunlukta geri atlama"
+msgstr "Geriye orta atlama"
 
 #: src/libvlc-module.c:1226
 msgid "Select the hotkey to make a medium backwards jump."
-msgstr ""
-"Orta uzunlukta bir geri atlama yapmak için kullanılacak kısayol tuşunu seçin."
+msgstr "Geriye orta bir atlama yapmak için kullanılacak kısayol tuşunu seçin."
 
 #: src/libvlc-module.c:1227
 msgid "Long backwards jump"
-msgstr "Uzun geri atlama"
+msgstr "Geriye uzun atlama"
 
 #: src/libvlc-module.c:1229
 msgid "Select the hotkey to make a long backwards jump."
-msgstr "Uzun bir geri atlama yapmak için kullanılacak kısayol tuşunu seçin."
+msgstr "Geriye uzun bir atlama yapmak için kullanılacak kısayol tuşunu seçin."
 
 #: src/libvlc-module.c:1231
 msgid "Very short forward jump"
-msgstr "Çok kısa ileri atlama"
+msgstr "İleri çok kısa atlama"
 
 #: src/libvlc-module.c:1233
 msgid "Select the hotkey to make a very short forward jump."
 msgstr ""
-"Çok kısa bir ileri atlama yapmak için kullanılacak kısayol tuşunu seçin."
+"İleri çok kısa bir atlama yapmak için kullanılacak kısayol tuşunu seçin."
 
 #: src/libvlc-module.c:1234
 msgid "Short forward jump"
-msgstr "Kısa ileri atlama"
+msgstr "İleri kısa atlama"
 
 #: src/libvlc-module.c:1236
 msgid "Select the hotkey to make a short forward jump."
-msgstr "Kısa bir ileri atlama yapmak için kullanılacak kısayol tuşunu seçin."
+msgstr "İleri kısa bir atlama yapmak için kullanılacak kısayol tuşunu seçin."
 
 #: src/libvlc-module.c:1237
 msgid "Medium forward jump"
-msgstr "Orta uzunlukta ileri atlama"
+msgstr "İleri orta atlama"
 
 #: src/libvlc-module.c:1239
 msgid "Select the hotkey to make a medium forward jump."
-msgstr ""
-"Orta uzunlukta bir atlama yapmak için kullanılacak kısayol tuşunu seçin."
+msgstr "İleri orta bir atlama yapmak için kullanılacak kısayol tuşunu seçin."
 
 #: src/libvlc-module.c:1240
 msgid "Long forward jump"
-msgstr "Uzun ileri atlama"
+msgstr "İleri uzun atlama"
 
 #: src/libvlc-module.c:1242
 msgid "Select the hotkey to make a long forward jump."
-msgstr "Uzun bir ileri atlama yapmak için kullanılacak kısayol tuşunu seçin."
+msgstr "İleri uzun bir atlama yapmak için kullanılacak kısayol tuşunu seçin."
 
 #: src/libvlc-module.c:1243 modules/control/hotkeys.c:402
 msgid "Next frame"
@@ -4254,7 +4252,7 @@ msgstr "Saniye cinsinden, orta atlama uzunluğu."
 
 #: src/libvlc-module.c:1253
 msgid "Long jump length"
-msgstr "Uzun atlama boyu"
+msgstr "Uzun atlama uzunluğu"
 
 #: src/libvlc-module.c:1254
 msgid "Long jump length, in seconds."
@@ -4472,43 +4470,43 @@ msgstr "Ses gecikmesini azaltmak için kullanılacak kısayol tuşunu seçin."
 
 #: src/libvlc-module.c:1310
 msgid "Play playlist bookmark 1"
-msgstr "Yer imi 1'i oynat"
+msgstr "1. yer imini oynatın"
 
 #: src/libvlc-module.c:1311
 msgid "Play playlist bookmark 2"
-msgstr "Yer imi 2'yi oynat"
+msgstr "2. yer imini oynatın"
 
 #: src/libvlc-module.c:1312
 msgid "Play playlist bookmark 3"
-msgstr "Yer imi 3'ü oynat"
+msgstr "3. yer imini oynatın"
 
 #: src/libvlc-module.c:1313
 msgid "Play playlist bookmark 4"
-msgstr "Yer imi 4'ü oynat"
+msgstr "4. yer imini oynatın"
 
 #: src/libvlc-module.c:1314
 msgid "Play playlist bookmark 5"
-msgstr "Yer imi 5'i oynat"
+msgstr "5. yer imini oynatın"
 
 #: src/libvlc-module.c:1315
 msgid "Play playlist bookmark 6"
-msgstr "Yer imi 6'yı oynat"
+msgstr "6. yer imini oynatın"
 
 #: src/libvlc-module.c:1316
 msgid "Play playlist bookmark 7"
-msgstr "Yer imi 7'yi oynat"
+msgstr "7. yer imini oynatın"
 
 #: src/libvlc-module.c:1317
 msgid "Play playlist bookmark 8"
-msgstr "Yer imi 8'i oynat"
+msgstr "8. yer imini oynatın"
 
 #: src/libvlc-module.c:1318
 msgid "Play playlist bookmark 9"
-msgstr "Yer imi 9'u oynat"
+msgstr "9. yer imini oynatın"
 
 #: src/libvlc-module.c:1319
 msgid "Play playlist bookmark 10"
-msgstr "Yer imi 10'u oynat"
+msgstr "10. yer imini oynatın"
 
 #: src/libvlc-module.c:1320
 msgid "Select the key to play this bookmark."
@@ -4516,47 +4514,49 @@ msgstr "Bu yer imini oynatmak için kullanılacak kısayol tuşunu seçin."
 
 #: src/libvlc-module.c:1321
 msgid "Set playlist bookmark 1"
-msgstr "Yer imi 1'i ayarla"
+msgstr "1. yer imini ayarlayın"
 
 #: src/libvlc-module.c:1322
 msgid "Set playlist bookmark 2"
-msgstr "Yer imi 2'yi ayarla"
+msgstr "2. yer imini ayarlayın"
 
 #: src/libvlc-module.c:1323
 msgid "Set playlist bookmark 3"
-msgstr "Yer imi 3'ü ayarla"
+msgstr "3. yer imini ayarlayın"
 
 #: src/libvlc-module.c:1324
 msgid "Set playlist bookmark 4"
-msgstr "Yer imi 4'ü ayarla"
+msgstr "4. yer imini ayarlayın"
 
 #: src/libvlc-module.c:1325
 msgid "Set playlist bookmark 5"
-msgstr "Yer imi 5'i ayarla"
+msgstr "5. yer imini ayarlayın"
 
 #: src/libvlc-module.c:1326
 msgid "Set playlist bookmark 6"
-msgstr "Yer imi 6'yı ayarla"
+msgstr "6. yer imini ayarlayın"
 
 #: src/libvlc-module.c:1327
 msgid "Set playlist bookmark 7"
-msgstr "Yer imi 7'yi ayarla"
+msgstr "7. yer imini ayarlayın"
 
 #: src/libvlc-module.c:1328
 msgid "Set playlist bookmark 8"
-msgstr "Yer imi 8'i ayarla"
+msgstr "8. yer imini ayarlayın"
 
 #: src/libvlc-module.c:1329
 msgid "Set playlist bookmark 9"
-msgstr "Yer imi 9'u ayarla"
+msgstr "9. yer imini ayarlayın"
 
 #: src/libvlc-module.c:1330
 msgid "Set playlist bookmark 10"
-msgstr "Yer imi 10'u ayarla"
+msgstr "10. yer imini ayarlayın"
 
 #: src/libvlc-module.c:1331
 msgid "Select the key to set this playlist bookmark."
-msgstr "Bu oynatma listesi yer imi için kullanılacak kısayol tuşunu seçin."
+msgstr ""
+"Bu oynatma listesi yer imini ayarlamak için kullanılacak kısayol tuşunu "
+"seçin."
 
 #: src/libvlc-module.c:1332
 #: modules/gui/qt4/components/playlist/standardpanel.cpp:234
@@ -4569,43 +4569,43 @@ msgstr "Oynatma listesini temizleyecek kısayol tuşunu seçin."
 
 #: src/libvlc-module.c:1335
 msgid "Playlist bookmark 1"
-msgstr "Oynatma listesi yer imi 1"
+msgstr "1. oynatma listesi yer imi"
 
 #: src/libvlc-module.c:1336
 msgid "Playlist bookmark 2"
-msgstr "Oynatma listesi yer imi 2"
+msgstr "2. oynatma listesi yer imi"
 
 #: src/libvlc-module.c:1337
 msgid "Playlist bookmark 3"
-msgstr "Oynatma listesi yer imi 3"
+msgstr "3. oynatma listesi yer imi"
 
 #: src/libvlc-module.c:1338
 msgid "Playlist bookmark 4"
-msgstr "Oynatma listesi yer imi 4"
+msgstr "4. oynatma listesi yer imi"
 
 #: src/libvlc-module.c:1339
 msgid "Playlist bookmark 5"
-msgstr "Oynatma listesi yer imi 5"
+msgstr "5. oynatma listesi yer imi"
 
 #: src/libvlc-module.c:1340
 msgid "Playlist bookmark 6"
-msgstr "Oynatma listesi yer imi 6"
+msgstr "6. oynatma listesi yer imi"
 
 #: src/libvlc-module.c:1341
 msgid "Playlist bookmark 7"
-msgstr "Oynatma listesi yer imi 7"
+msgstr "7. oynatma listesi yer imi"
 
 #: src/libvlc-module.c:1342
 msgid "Playlist bookmark 8"
-msgstr "Oynatma listesi yer imi 8"
+msgstr "8. oynatma listesi yer imi"
 
 #: src/libvlc-module.c:1343
 msgid "Playlist bookmark 9"
-msgstr "Oynatma listesi yer imi 9"
+msgstr "9. oynatma listesi yer imi"
 
 #: src/libvlc-module.c:1344
 msgid "Playlist bookmark 10"
-msgstr "Oynatma listesi yer imi 10"
+msgstr "10. oynatma listesi yer imi"
 
 #: src/libvlc-module.c:1346
 msgid "This allows you to define playlist bookmarks."
@@ -4947,7 +4947,7 @@ msgstr "sürüm bilgisini yazdır"
 #: src/libvlc-module.c:2690
 #, fuzzy
 msgid "core program"
-msgstr "Profil Seç"
+msgstr "ana program"
 
 #: src/misc/update.c:473
 #, c-format
@@ -5119,11 +5119,11 @@ msgstr "Amharic"
 
 #: src/text/iso-639_def.h:45
 msgid "Arabic"
-msgstr "Arabic"
+msgstr "Arapça"
 
 #: src/text/iso-639_def.h:46
 msgid "Armenian"
-msgstr "Armenian"
+msgstr "Ermenice"
 
 #: src/text/iso-639_def.h:47
 msgid "Assamese"
@@ -5239,7 +5239,7 @@ msgstr "Esperanto"
 
 #: src/text/iso-639_def.h:75
 msgid "Estonian"
-msgstr "Estonian"
+msgstr "Estonyaca"
 
 #: src/text/iso-639_def.h:76
 msgid "Faroese"
@@ -5307,7 +5307,7 @@ msgstr "Herero"
 
 #: src/text/iso-639_def.h:92
 msgid "Hindi"
-msgstr "Hindi"
+msgstr "Hintçe"
 
 #: src/text/iso-639_def.h:93
 msgid "Hiri Motu"
@@ -5319,7 +5319,7 @@ msgstr "Macarca"
 
 #: src/text/iso-639_def.h:95
 msgid "Icelandic"
-msgstr "Icelandic"
+msgstr "İzlandaca"
 
 #: src/text/iso-639_def.h:96
 msgid "Inuktitut"
@@ -5335,11 +5335,11 @@ msgstr "Interlingua"
 
 #: src/text/iso-639_def.h:99
 msgid "Indonesian"
-msgstr "Indonesian"
+msgstr "Endonezce"
 
 #: src/text/iso-639_def.h:100
 msgid "Inupiaq"
-msgstr "Inupiaq"
+msgstr "İnupiak"
 
 #: src/text/iso-639_def.h:101
 msgid "Italian"
@@ -5351,7 +5351,7 @@ msgstr "Javanese"
 
 #: src/text/iso-639_def.h:103
 msgid "Japanese"
-msgstr "Japanese"
+msgstr "Japonca"
 
 #: src/text/iso-639_def.h:104
 msgid "Greenlandic, Kalaallisut"
@@ -5399,7 +5399,7 @@ msgstr "Kuanyama"
 
 #: src/text/iso-639_def.h:115
 msgid "Kurdish"
-msgstr "Kurdish"
+msgstr "Kürtçe"
 
 #: src/text/iso-639_def.h:116
 msgid "Lao"
@@ -12824,12 +12824,12 @@ msgstr "USF altyazı kod çözücüsü"
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "Metin Altyazı Kod Çözücüsü"
+msgstr "DVB Altyazı Kod Çözücüsü"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "DVB Altyazıları"
+msgstr "Teletext altyazı"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -14647,7 +14647,7 @@ msgstr "+----[ yardımın sonu ]"
 #: modules/control/rc.c:965
 #, fuzzy
 msgid "Press pause to continue."
-msgstr "Devam etmek için 'menu select' ya da 'pause' yazın."
+msgstr "Devam etmek için Menü Seç yada Duraklat'a basın"
 
 #: modules/control/rc.c:1191 modules/control/rc.c:1446
 #: modules/control/rc.c:1490
@@ -19322,7 +19322,6 @@ msgstr ""
 "adresinden ulaşabilirler."
 
 #: modules/gui/macosx/wizard.m:265
-#, fuzzy
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
 "This protocol is used as transport method by many Microsoft's software. Note "
@@ -22517,7 +22516,7 @@ msgstr "Yeniden örnekleme kalitesi"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Yüksek kalite ses yeniden örneklemesi"
+msgstr "Görüntü kalitesi son işleme düzeyi"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -23380,7 +23379,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "En boy oranını koru"
+msgstr "Dizin dosyası"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -26263,7 +26262,7 @@ msgstr "RGB Bileşeni Ayıklama Görüntü Süzgeci"
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Görüntü Taramasızlık Süzgeci"
+msgstr "Bulmaca: Etkileşimli Oyun Görüntü Süzgeci"
 
 #: modules/video_filter/freeze.c:78
 #, fuzzy
@@ -29892,7 +29891,7 @@ msgstr "Görüntü yakalama"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLC, kod çözücü modülünü açamadı."
+msgstr "Ses çıkış modülü"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -30144,7 +30143,7 @@ msgstr "Aynalama yönü"
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Varsayılan"
+msgstr "Varsayılan akış"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -30205,401 +30204,6 @@ msgstr "VLC ortam oynatıcısı - Web Arayüzü"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Akış Çıkışı"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Yeğlediğiniz görüntü çıkışını seçerek buradan yapılandırın."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Bu modüller, VLC yazılımının diğer parçalarına ağ işlevlerini sağlar."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr "Görüntü/ses/altyazı kodlama modüllerinin genel ayarları."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "İletişim sağlayıcılarının ayarları buradan yapılır."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "Bu bölümde altyazı tekleyicinin davranışını belirleyebilirsiniz. Örneğin "
-#~ "altyazı türü ya da dosya adını ayarlayabilirsiniz."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Uygun kod çözücü modülü yok"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC, \"%4.4s\" ses ya da görüntü biçimini desteklemiyor. Malesef bu "
-#~ "sorunu gidermek için yapabileceğiniz bir şey yok."
-
-#, fuzzy
-#~ msgid ""
-#~ "This file contains an optional CRL to prevent remove clients from using "
-#~ "revoked certificates in TLS sessions."
-#~ msgstr ""
-#~ "Bu dosya, uzak istemcilerin, TLS oturumlarında iptal edilmiş "
-#~ "sertifikaları kullanmasını engelleyen, isteğe bağlı bir CRL içerir."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "VLC yazılımının modülleri arayacağı ek yol. \"PATH_SEP\" ayıracı "
-#~ "kullanılarak arka arkaya bir kaç yol eklenebilir."
-
-#~ msgid "Album art policy"
-#~ msgstr "Albüm kapağı politikası"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Albüm kapağının nasıl indirileceğini seçin."
-
-#~ msgid "Manual download only"
-#~ msgstr "Yalnızca elle indirilsin"
-
-#~ msgid "When track starts playing"
-#~ msgstr "İz oynatılmaya başlandığında"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "İz eklenir eklenmez"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Ortam Kitaplığı Yüklensin"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr ""
-#~ "Bu seçenek etkinleştirildiğinde, VLC başlatıldığında, SQL tabanlı Ortam "
-#~ "kitaplığı yüklenir."
-
-#~ msgid "main program"
-#~ msgstr "ana program"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg erişimi"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "Sisteminizdeki AACS kod çözme kütüphanesi çalışmıyor. Anahtarlar mı kayıp?"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC dosyayı açamadı: \"%s\". (%m)"
-
-#~ msgid "TCP address to use"
-#~ msgstr "Kullanılacak TCP adresi"
-
-#~ msgid ""
-#~ "TCP address to use to communicate with the video part of the Bar Graph "
-#~ "(default localhost). In the case of bargraph incrustation, use localhost."
-#~ msgstr ""
-#~ "Çubuk grafiğinin görüntü bölümüyle iletişim kurmak için kullanılacak TCP "
-#~ "adresi (varsayılan olarak localhost). Çubuk grafiğinin kakılması "
-#~ "durumunda localhost kullanın."
-
-#~ msgid "TCP port to use"
-#~ msgstr "Kullanılacak TCP kapısı"
-
-#~ msgid ""
-#~ "TCP port to use to communicate with the video part of the Bar Graph "
-#~ "(default 12345). Use the same port as the one used in the rc interface."
-#~ msgstr ""
-#~ "Çubuk grafiğinin görüntü bölümüyle iletişim kurmak için kullanılacak TCP "
-#~ "kapısı (varsayılan 12345). rc arayüzüyle aynı kapıyı kullanın."
-
-#~ msgid "Force connection reset regularly"
-#~ msgstr "Bağlantı düzenli olarak sıfırlansın"
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr ""
-#~ "TCP bağlantısının sıfırlanmasının gerekip gerekmediğini belirtir. Bu "
-#~ "audiobargraph_v kullanırken kullanılır (varsayılan 1)."
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Stereo / Mono Dönüşümü Ses Süzgeci"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "Kırpma bilgisini atın"
-
-#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
-#~ msgstr "Dahili kırpma parametrelerini (H.264 SPS'den gelen gibi) atın."
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "Video Hızlandırma (VA) API"
-
-#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
-#~ msgstr "UNIX için Görüntü Çözme ve Sunma API (VDPAU)"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr "Bit hızı 0 ise, sabit kalite için bu değer kullanılır."
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "0'dan büyük bir değer sabit bit hızı kipini etkinleştirir."
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Kayıpsız kodlamayı etkinleştir"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "Kayıpsız kodlama bit hızı ve kalite ayarlarını yok sayar. Bunu "
-#~ "etkineştirdiğinizde özgün olanın kusursuz bir kopyasını elde edersiniz."
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "Dikdörtgen Doğrusal Faz"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "Diagonal Doğrusal Faz"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "P kareleri arasındaki uzaklık"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Her GOP'taki 'P' karelerinin sayısı"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Hareket dengeleme bloklarının eni"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Hareket dengeleme bloklarının boyu"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "Blok bindirme (%)"
-
-#~ msgid "Amount that each motion block should be overlapped by its neighbours"
-#~ msgstr "Her hareket bloğunun komşuları ile üstüste binme miktarı."
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "Total horizontal block length including overlaps"
-#~ msgstr "Binmeler dahil toplam yatay blok uzunluğu."
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Total vertical block length including overlaps"
-#~ msgstr "Binmeler dahil toplam dikey blok uzunluğu."
-
-#~ msgid "Motion vector precision"
-#~ msgstr "Hareket vektörü duyarlılığı"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "Pels kbit/s cinsinden, hareket vektörü duyarlılığı."
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "Basit ME arama alanı x:y"
-
-#~ msgid ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-#~ msgstr ""
-#~ "(Önerilmez) Basit +/-x, +/-y aralığında hiyerarşik olmayan bloklara uygun "
-#~ "hareket vektörü araması."
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Uzamsal bölümlemeyi etkinleştir"
-
-#~ msgid "cycles per degree"
-#~ msgstr "Her derecedeki turlar"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Dirac Görüntü Kodlayıcısı (dirac-research kütüphanesi)"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Openmash kullanan görüntü kod çözücüsü"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr "| menu . . [on|off|up|down|left|right|select] menüyü kullan"
-
-#~ msgid "Press menu select or pause to continue."
-#~ msgstr "Devam etmek için Menü Seç yada Duraklat'a basın"
-
-#~ msgid "Type 'menu select' or 'pause' to continue."
-#~ msgstr "Devam etmek için 'menu select' ya da 'pause' yazın."
-
-#~ msgid "Jump to time"
-#~ msgstr "Zamana atla"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Çökme Günlüğünü Aç..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Gönderme"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC son seferinde çökmüş"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Çökmeyle ilgili ayrıntıları VLC geliştirme ekibine iletmek ister "
-#~ "misiniz?\n"
-#~ "\n"
-#~ "İstiyorsanız, VLC çökmeden önce ne yaptığınızı ve yardımcı olabilecek "
-#~ "diğer bilgileri bir kaç satır ile yazın. Örnek dosyayı indirmek ya da ağ "
-#~ "akışını görebilmek için İnternet adresini de ekleyin..."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr ""
-#~ "Bu hata raporu ile ilgili olarak benimle iletişime geçilebileceğini kabul "
-#~ "ediyorum."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "Başka bir bilgi olmadan, yalnızca varsayılan eposta adresiniz iletilecek."
-
-#~ msgid "Don't ask again"
-#~ msgstr "Bir daha sorma"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "CrashLog bulunamadı"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Çökme ile ilgili hiç bir iz bulunamadı."
-
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "VLC oynatımı sırasında iTunes duraklatılsın"
-
-#~ msgid ""
-#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
-#~ "playback will be resumed again if VLC playback is finished."
-#~ msgstr ""
-#~ "Bu seçenek etkinleştirildiğinde, VLC oynatımı başladığında iTunes "
-#~ "oynatımı duraklatılır. VLC oynatımı bittiğinde iTunes oynatımı sürdürülür."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "BDMV klasörünü açın"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Albüm kapağı indirme politikası"
-
-#~ msgid "Output module"
-#~ msgstr "Çıkış modülü"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Grafik Dengeleyici"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Ortam bilgileri kendiliğinden alınsın"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Şu adresten yeni eklentiler alabilirsiniz:"
-
-#~ msgid "Under the Video"
-#~ msgstr "Görüntünün Altında"
-
-#~ msgid "&Help..."
-#~ msgstr "Y&ardım..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Ses iziyle eşleştir"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Bu seçenel görüntü izini ses izi ile eşleştirmek için kareleri eler ya da "
-#~ "ekler."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "İşlemciniz kodlama hızına yetişemiyorsa dönüştürücü bazı kareleri eler."
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "Ses kanalları düzeyinin değeri"
-
-#~ msgid ""
-#~ "Value of the audio level of each channels between 0 and 1. Each level "
-#~ "should be separated with ':'."
-#~ msgstr ""
-#~ "Her kanal için 0 ile 1 arasında ses düzeyi. Yazarken her düzey "
-#~ "birbirinden ':' ile ayrılmalıdır."
-
-#~ msgid "Alarm"
-#~ msgstr "Alarm"
-
-#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
-#~ msgstr "Sesi keser ve bir alarm görüntüler (0=alarm yok, 1=alarm)."
-
-#~ msgid "Spatial luma strength (default 4)"
-#~ msgstr "Uzamsal luma gücü (varsayılan: 4) "
-
-#~ msgid "Spatial chroma strength (default 3)"
-#~ msgstr "Uzamsal renk doygunluğu gücü (varsayılan: 3) "
-
-#~ msgid "Temporal luma strength (default 6)"
-#~ msgstr "Ön luma gücü (varsayılan: 6) "
-
-#~ msgid "Temporal chroma strength (default 4.5)"
-#~ msgstr "Ön renk doygunluğu gücü (varsayılan: 4.5)"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "Görüntülenecek marka metni.  (Geçerli metin biçimleri: Zaman ile ilgili: "
-#~ "%Y = yıl, %m = ay, %d = dün, %H = saat, %M = dakika, %S = saniye, ... "
-#~ "Üstveri ile ilgili: $a = sanatçı, $b = albüm, $c = telif, $d = açıklama, "
-#~ "$e = kodlayan, $g = tür, $l = dil, $n = iz numarası, $p = şimdi "
-#~ "oynatılan, $r = değerlendirme, $s = altyazı dili, $t = başlık, $u = "
-#~ "İnternet adresi, $A = tarih, $B = ses bit hızı (kb/s), $C = bölüm, $D = "
-#~ "süre, $F = yol ile tam ad, $I = başlık, $L = kalan süre, $N = ad, $O = "
-#~ "ses dili, $P = konum (yüzde olarak), $R = hız, $S = ses örnekleme hızı "
-#~ "(kHz), $T = zaman, $U = yayıncı, $V = ses düzeyi, $_ = yeni satır)"
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "iOS OpenGL ES görüntü çıkışı (UIView gereksinir)"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "Mac OS X OpenGL görüntü çıkışı (çizilebilir -nsobject gereksinir)."
-
-#~ msgid "OpenGL acceleration is not supported on your Mac"
-#~ msgstr "Kullandığınız Mac üzerinde OpenGL hızlandırması desteklenmiyor"
-
-#~ msgid ""
-#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
-#~ "output. It will still work, but much slower and with possibly unexpected "
-#~ "results."
-#~ msgstr ""
-#~ "Kullandığınız Mac üzerinde, görüntü çıkışı için gereken Quartz Extreme "
-#~ "hızlandırması desteklenmiyor. Hala çalışabilir ancak daha yavas olacaktır "
-#~ "ve beklenmeyen sorunlar çıkabilir."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Şu al&tyazı dosyası kullanılsın"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Albüm kapağı indirme politikası:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Ortam Kitaplığını Yapılandır"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -33068,6 +32672,401 @@ msgstr "Akış Çıkışı"
 #~ msgid "(c) 1996-2004 the VideoLAN team"
 #~ msgstr "(c) 1996-2004 VideoLAN Ekibi"
 
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Yeğlediğiniz görüntü çıkışını seçerek buradan yapılandırın."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Bu modüller, VLC yazılımının diğer parçalarına ağ işlevlerini sağlar."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr "Görüntü/ses/altyazı kodlama modüllerinin genel ayarları."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "İletişim sağlayıcılarının ayarları buradan yapılır."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "Bu bölümde altyazı tekleyicinin davranışını belirleyebilirsiniz. Örneğin "
+#~ "altyazı türü ya da dosya adını ayarlayabilirsiniz."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Uygun kod çözücü modülü yok"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC, \"%4.4s\" ses ya da görüntü biçimini desteklemiyor. Malesef bu "
+#~ "sorunu gidermek için yapabileceğiniz bir şey yok."
+
+#, fuzzy
+#~ msgid ""
+#~ "This file contains an optional CRL to prevent remove clients from using "
+#~ "revoked certificates in TLS sessions."
+#~ msgstr ""
+#~ "Bu dosya, uzak istemcilerin, TLS oturumlarında iptal edilmiş "
+#~ "sertifikaları kullanmasını engelleyen, isteğe bağlı bir CRL içerir."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "VLC yazılımının modülleri arayacağı ek yol. \"PATH_SEP\" ayıracı "
+#~ "kullanılarak arka arkaya bir kaç yol eklenebilir."
+
+#~ msgid "Album art policy"
+#~ msgstr "Albüm kapağı politikası"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Albüm kapağının nasıl indirileceğini seçin."
+
+#~ msgid "Manual download only"
+#~ msgstr "Yalnızca elle indirilsin"
+
+#~ msgid "When track starts playing"
+#~ msgstr "İz oynatılmaya başlandığında"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "İz eklenir eklenmez"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Ortam Kitaplığı Yüklensin"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr ""
+#~ "Bu seçenek etkinleştirildiğinde, VLC başlatıldığında, SQL tabanlı Ortam "
+#~ "kitaplığı yüklenir."
+
+#~ msgid "main program"
+#~ msgstr "ana program"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg erişimi"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "Sisteminizdeki AACS kod çözme kütüphanesi çalışmıyor. Anahtarlar mı kayıp?"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLC dosyayı açamadı: \"%s\". (%m)"
+
+#~ msgid "TCP address to use"
+#~ msgstr "Kullanılacak TCP adresi"
+
+#~ msgid ""
+#~ "TCP address to use to communicate with the video part of the Bar Graph "
+#~ "(default localhost). In the case of bargraph incrustation, use localhost."
+#~ msgstr ""
+#~ "Çubuk grafiğinin görüntü bölümüyle iletişim kurmak için kullanılacak TCP "
+#~ "adresi (varsayılan olarak localhost). Çubuk grafiğinin kakılması "
+#~ "durumunda localhost kullanın."
+
+#~ msgid "TCP port to use"
+#~ msgstr "Kullanılacak TCP kapısı"
+
+#~ msgid ""
+#~ "TCP port to use to communicate with the video part of the Bar Graph "
+#~ "(default 12345). Use the same port as the one used in the rc interface."
+#~ msgstr ""
+#~ "Çubuk grafiğinin görüntü bölümüyle iletişim kurmak için kullanılacak TCP "
+#~ "kapısı (varsayılan 12345). rc arayüzüyle aynı kapıyı kullanın."
+
+#~ msgid "Force connection reset regularly"
+#~ msgstr "Bağlantı düzenli olarak sıfırlansın"
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr ""
+#~ "TCP bağlantısının sıfırlanmasının gerekip gerekmediğini belirtir. Bu "
+#~ "audiobargraph_v kullanırken kullanılır (varsayılan 1)."
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Stereo / Mono Dönüşümü Ses Süzgeci"
+
+#~ msgid "Discard cropping information"
+#~ msgstr "Kırpma bilgisini atın"
+
+#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
+#~ msgstr "Dahili kırpma parametrelerini (H.264 SPS'den gelen gibi) atın."
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "Video Hızlandırma (VA) API"
+
+#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
+#~ msgstr "UNIX için Görüntü Çözme ve Sunma API (VDPAU)"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr "Bit hızı 0 ise, sabit kalite için bu değer kullanılır."
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "0'dan büyük bir değer sabit bit hızı kipini etkinleştirir."
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Kayıpsız kodlamayı etkinleştir"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "Kayıpsız kodlama bit hızı ve kalite ayarlarını yok sayar. Bunu "
+#~ "etkineştirdiğinizde özgün olanın kusursuz bir kopyasını elde edersiniz."
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "Dikdörtgen Doğrusal Faz"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "Diagonal Doğrusal Faz"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "P kareleri arasındaki uzaklık"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Her GOP'taki 'P' karelerinin sayısı"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "Hareket dengeleme bloklarının eni"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "Hareket dengeleme bloklarının boyu"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "Blok bindirme (%)"
+
+#~ msgid "Amount that each motion block should be overlapped by its neighbours"
+#~ msgstr "Her hareket bloğunun komşuları ile üstüste binme miktarı."
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "Total horizontal block length including overlaps"
+#~ msgstr "Binmeler dahil toplam yatay blok uzunluğu."
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Total vertical block length including overlaps"
+#~ msgstr "Binmeler dahil toplam dikey blok uzunluğu."
+
+#~ msgid "Motion vector precision"
+#~ msgstr "Hareket vektörü duyarlılığı"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "Pels kbit/s cinsinden, hareket vektörü duyarlılığı."
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "Basit ME arama alanı x:y"
+
+#~ msgid ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+#~ msgstr ""
+#~ "(Önerilmez) Basit +/-x, +/-y aralığında hiyerarşik olmayan bloklara uygun "
+#~ "hareket vektörü araması."
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Uzamsal bölümlemeyi etkinleştir"
+
+#~ msgid "cycles per degree"
+#~ msgstr "Her derecedeki turlar"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Dirac Görüntü Kodlayıcısı (dirac-research kütüphanesi)"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Openmash kullanan görüntü kod çözücüsü"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr "| menu . . [on|off|up|down|left|right|select] menüyü kullan"
+
+#~ msgid "Press menu select or pause to continue."
+#~ msgstr "Devam etmek için Menü Seç yada Duraklat'a basın"
+
+#~ msgid "Type 'menu select' or 'pause' to continue."
+#~ msgstr "Devam etmek için 'menu select' ya da 'pause' yazın."
+
+#~ msgid "Jump to time"
+#~ msgstr "Zamana atla"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Çökme Günlüğünü Aç..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Gönderme"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC son seferinde çökmüş"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Çökmeyle ilgili ayrıntıları VLC geliştirme ekibine iletmek ister "
+#~ "misiniz?\n"
+#~ "\n"
+#~ "İstiyorsanız, VLC çökmeden önce ne yaptığınızı ve yardımcı olabilecek "
+#~ "diğer bilgileri bir kaç satır ile yazın. Örnek dosyayı indirmek ya da ağ "
+#~ "akışını görebilmek için İnternet adresini de ekleyin..."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr ""
+#~ "Bu hata raporu ile ilgili olarak benimle iletişime geçilebileceğini kabul "
+#~ "ediyorum."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "Başka bir bilgi olmadan, yalnızca varsayılan eposta adresiniz iletilecek."
+
+#~ msgid "Don't ask again"
+#~ msgstr "Bir daha sorma"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "CrashLog bulunamadı"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Çökme ile ilgili hiç bir iz bulunamadı."
+
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "VLC oynatımı sırasında iTunes duraklatılsın"
+
+#~ msgid ""
+#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
+#~ "playback will be resumed again if VLC playback is finished."
+#~ msgstr ""
+#~ "Bu seçenek etkinleştirildiğinde, VLC oynatımı başladığında iTunes "
+#~ "oynatımı duraklatılır. VLC oynatımı bittiğinde iTunes oynatımı sürdürülür."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "BDMV klasörünü açın"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Albüm kapağı indirme politikası"
+
+#~ msgid "Output module"
+#~ msgstr "Çıkış modülü"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Grafik Dengeleyici"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Ortam bilgileri kendiliğinden alınsın"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "Şu adresten yeni eklentiler alabilirsiniz:"
+
+#~ msgid "Under the Video"
+#~ msgstr "Görüntünün Altında"
+
+#~ msgid "&Help..."
+#~ msgstr "Y&ardım..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Ses iziyle eşleştir"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Bu seçenel görüntü izini ses izi ile eşleştirmek için kareleri eler ya da "
+#~ "ekler."
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "İşlemciniz kodlama hızına yetişemiyorsa dönüştürücü bazı kareleri eler."
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "Ses kanalları düzeyinin değeri"
+
+#~ msgid ""
+#~ "Value of the audio level of each channels between 0 and 1. Each level "
+#~ "should be separated with ':'."
+#~ msgstr ""
+#~ "Her kanal için 0 ile 1 arasında ses düzeyi. Yazarken her düzey "
+#~ "birbirinden ':' ile ayrılmalıdır."
+
+#~ msgid "Alarm"
+#~ msgstr "Alarm"
+
+#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+#~ msgstr "Sesi keser ve bir alarm görüntüler (0=alarm yok, 1=alarm)."
+
+#~ msgid "Spatial luma strength (default 4)"
+#~ msgstr "Uzamsal luma gücü (varsayılan: 4) "
+
+#~ msgid "Spatial chroma strength (default 3)"
+#~ msgstr "Uzamsal renk doygunluğu gücü (varsayılan: 3) "
+
+#~ msgid "Temporal luma strength (default 6)"
+#~ msgstr "Ön luma gücü (varsayılan: 6) "
+
+#~ msgid "Temporal chroma strength (default 4.5)"
+#~ msgstr "Ön renk doygunluğu gücü (varsayılan: 4.5)"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "Görüntülenecek marka metni.  (Geçerli metin biçimleri: Zaman ile ilgili: "
+#~ "%Y = yıl, %m = ay, %d = dün, %H = saat, %M = dakika, %S = saniye, ... "
+#~ "Üstveri ile ilgili: $a = sanatçı, $b = albüm, $c = telif, $d = açıklama, "
+#~ "$e = kodlayan, $g = tür, $l = dil, $n = iz numarası, $p = şimdi "
+#~ "oynatılan, $r = değerlendirme, $s = altyazı dili, $t = başlık, $u = "
+#~ "İnternet adresi, $A = tarih, $B = ses bit hızı (kb/s), $C = bölüm, $D = "
+#~ "süre, $F = yol ile tam ad, $I = başlık, $L = kalan süre, $N = ad, $O = "
+#~ "ses dili, $P = konum (yüzde olarak), $R = hız, $S = ses örnekleme hızı "
+#~ "(kHz), $T = zaman, $U = yayıncı, $V = ses düzeyi, $_ = yeni satır)"
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "iOS OpenGL ES görüntü çıkışı (UIView gereksinir)"
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "Mac OS X OpenGL görüntü çıkışı (çizilebilir -nsobject gereksinir)."
+
+#~ msgid "OpenGL acceleration is not supported on your Mac"
+#~ msgstr "Kullandığınız Mac üzerinde OpenGL hızlandırması desteklenmiyor"
+
+#~ msgid ""
+#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
+#~ "output. It will still work, but much slower and with possibly unexpected "
+#~ "results."
+#~ msgstr ""
+#~ "Kullandığınız Mac üzerinde, görüntü çıkışı için gereken Quartz Extreme "
+#~ "hızlandırması desteklenmiyor. Hala çalışabilir ancak daha yavas olacaktır "
+#~ "ve beklenmeyen sorunlar çıkabilir."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Şu al&tyazı dosyası kullanılsın"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Albüm kapağı indirme politikası:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Ortam Kitaplığını Yapılandır"
+
 #, fuzzy
 #~ msgid "One instance when started from file"
 #~ msgstr "Dosya yöneticisinden başlatıldığında tek bir kopya çalışsın"
@@ -35453,7 +35452,7 @@ msgstr "Akış Çıkışı"
 #~ "Select the key to go back (to the previous media item) in the browsing "
 #~ "history."
 #~ msgstr ""
-#~ "Oynatma listesinde önceki ögeye geçmek için kullanılacak kestirme tuşu "
+#~ "Oynatma listesinde önceki ögeye geçmek için kullanılacak kısayol tuşunu "
 #~ "seçin."
 
 #, fuzzy
@@ -36832,7 +36831,7 @@ msgstr "Akış Çıkışı"
 
 #, fuzzy
 #~ msgid "enable"
-#~ msgstr "Etkinleştir"
+#~ msgstr "Etkinleştirin"
 
 #, fuzzy
 #~ msgid "Video:"
@@ -37079,7 +37078,7 @@ msgstr "Akış Çıkışı"
 
 #, fuzzy
 #~ msgid "top"
-#~ msgstr "Durdur"
+#~ msgstr "Durdurun"
 
 #, fuzzy
 #~ msgid "bottom"
@@ -37347,7 +37346,7 @@ msgstr "Akış Çıkışı"
 
 #, fuzzy
 #~ msgid "Define playlist bookmarks."
-#~ msgstr "Yer imi 1'i ayarla"
+#~ msgstr "1. yer imini ayarlayın"
 
 #, fuzzy
 #~ msgid "Raw A/52 demuxer"
@@ -37617,7 +37616,7 @@ msgstr "Akış Çıkışı"
 
 #, fuzzy
 #~ msgid "Enabled"
-#~ msgstr "Etkinleştir"
+#~ msgstr "Etkinleştirin"
 
 #, fuzzy
 #~ msgid "Position:"
@@ -37863,7 +37862,7 @@ msgstr "Akış Çıkışı"
 
 #, fuzzy
 #~ msgid "Stopped"
-#~ msgstr "Durdur"
+#~ msgstr "Durdurun"
 
 #, fuzzy
 #~ msgid "Playing"
@@ -38331,7 +38330,7 @@ msgstr "Akış Çıkışı"
 
 #, fuzzy
 #~ msgid "Enable CABAC"
-#~ msgstr "Etkinleştir"
+#~ msgstr "Etkinleştirin"
 
 #, fuzzy
 #~ msgid "Analyse mode"
@@ -38675,7 +38674,7 @@ msgstr "Akış Çıkışı"
 
 #, fuzzy
 #~ msgid "enabled"
-#~ msgstr "Etkinleştir"
+#~ msgstr "Etkinleştirin"
 
 #, fuzzy
 #~ msgid "Audioscrobbler username"
