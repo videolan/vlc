@@ -373,7 +373,7 @@ msgstr "Sipepieus apontiaedjes"
 #: include/vlc_input.h:568
 #, fuzzy
 msgid "Subtitle track added"
-msgstr "Boket des sortites"
+msgstr "Boket do sortite: %s"
 
 #: include/vlc_interface.h:140
 msgid ""
@@ -1146,7 +1146,7 @@ msgstr "Destinåcion del codec videyo"
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Module del rexhowe videyo"
+msgstr "Pôrt cliyint"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -11127,9 +11127,8 @@ msgid "PNG video encoder"
 msgstr "Discôdeu videyo PNG"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Mete en alaedje li môde di tapisreye"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11138,9 +11137,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Foirci l' profil"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11150,9 +11148,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "No do codec"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11173,9 +11170,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:79
-#, fuzzy
 msgid "Group of Picture Reference Distance"
-msgstr "No del instance do moumint"
+msgstr ""
 
 #: modules/codec/qsv.c:81
 msgid ""
@@ -11194,9 +11190,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Disinterlacî"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11219,9 +11214,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "Facteur di préjhaedje I"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11261,9 +11255,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Macsimom roedeur des bits"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11295,9 +11288,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Foirci l' nombe di trintches pa cåde"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11311,9 +11303,8 @@ msgid "Number of reference frames"
 msgstr "Nombe di cådes di referince"
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Nombe d' iteråcions DWT"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -12086,7 +12077,7 @@ msgstr "Discôdeu des sortites USF"
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "Discôdeu des sortites teletecse"
+msgstr "Discôdeu des sortites DVB"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
@@ -22070,7 +22061,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Wårder l' rapoirt lårdjeur/hôteur"
+msgstr "Fitchî indecse"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -24770,7 +24761,7 @@ msgstr ""
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Passete di disinterlaçmint videyo"
+msgstr "Passete videyo do djeu d' puzel interactif"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freeze"
@@ -28238,7 +28229,7 @@ msgstr "Egaloyaedje videyo"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLC n' saveut nén drovi l' module do discôdeu."
+msgstr "Module del rexhowe odio"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -28483,7 +28474,7 @@ msgstr "Direccion del scrijhaedje muroe"
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Prémetou"
+msgstr "Prémetou floû"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -28542,186 +28533,6 @@ msgstr "Djouweu d' media VLC - Eterface Waibe"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Rexhowe do Floû"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr ""
-#~ "Tchoezixhoz vosse pus voltî eployeye rexhowe videyo eyet apontyîz-'lzi."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Ces modeules dinèt des fonccions rantoele a totes les ôtes pårts di VLC."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Les ahesseus di dvize polèt esse apontyîs chal."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Nou module discôdeu ki va"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC ni sopoite nén li cogne odio ou videyo \"%4.4s\". Måluruzint i gn a "
-#~ "nole manire po vos a remanthî çouci."
-
-#~ msgid "Album art policy"
-#~ msgstr "Politike des potchetes d' albom"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Tchoezi comint les potchetes d' albom seront aberwetêyes."
-
-#~ msgid "Manual download only"
-#~ msgstr "Aberwetaedje al mwin seulmint"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Cwand l' boket enonde l' djouwaedje"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Totossu rade ki l' boket est radjouté"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Tcherdjî l' livreye media"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "Accès FFmpeg"
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Passete odio pol coviertixheu di stereyo a mono"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Mete en alaedje li côdaedje sins piete"
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "Faze lineyåre rectangulåre"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "Distance etur 'P' cådes"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Nombe do 'P' cådes po GOP"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "cycles per degree"
-#~ msgstr "bloukes pa digré"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Discôdeu videyo eployant openmash"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr "| menu . . [on|off|up|down|left|right|select] eployî l' dressêye"
-
-#~ msgid "Jump to time"
-#~ msgstr "Aler a"
-
-#~ msgid "Don't Send"
-#~ msgstr "Èn nén evoyî"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC a dedja tcheyou e rak"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Dji n' a savou trover d' arote d'on tcheyaedje e rak di dvant."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Drovi l' ridant BDMV"
-
-#~ msgid "Album art download policy"
-#~ msgstr ""
-#~ "Politike d' aberwetaedje\n"
-#~ "des potchetes"
-
-#~ msgid "Output module"
-#~ msgstr "Module di rexhowe"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Ewalijheu grafike"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Defini otomaticmint l' wangnaedje del videyo."
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Cweri pus d' rawtes viè"
-
-#~ msgid "Under the Video"
-#~ msgstr "A dzo del videyo"
-
-#~ msgid "&Help..."
-#~ msgstr "&Aidance..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Sincronijhî sol boket odio"
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "Valixhance des liveas des canås odio"
-
-#~ msgid "Alarm"
-#~ msgstr "Xhuflet"
-
-#~ msgid "Spatial luma strength (default 4)"
-#~ msgstr "Foice del louminance e l' espåce (prémetowe 4)"
-
-#~ msgid "Spatial chroma strength (default 3)"
-#~ msgstr "Foice del crômeye e l' espåce (prémetowe 3)"
-
-#~ msgid "Temporal luma strength (default 6)"
-#~ msgstr "Foice del louminance dins l' tins (prémetowe 6)"
-
-#~ msgid "Temporal chroma strength (default 4.5)"
-#~ msgstr "Foice del crômeye dins l' tins (prémetowe 4.5)"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "Tecse del banire a håyner. Cogne des tchinnes k' i n' a: Raloyî å tins: "
-#~ "%Y = anêye, %m = moes, %d = djoû, %H = eur, %M = munute, %S = "
-#~ "sigonde, ... Raloyî å meta-dnêyes: $a = årtisse, $b = albom, $c = "
-#~ "copyright, $d = discrijhaedje, $e = ecôdé pa, $g = djinre, $l = "
-#~ "lingaedje, $n = limero d' boket, $p = djouwé asteure, $r = préjhaedje, $s "
-#~ "= lingaedje des sortites, $t = tite, $u = url, $A = date, $B = "
-#~ "roedeur des bits del odio (e kb/s), $C = tchaptrê,$D = durêye, $F = "
-#~ "no en etir avou l' tchmin, $I = tite, $L = tins ki lait, $N = no, $O = "
-#~ "lingaedje del odio, $P = eplaeçmint (e %), $R = préjhî, $S = "
-#~ "frecwince di sampling del odio (e kHz), $T = tins, $U = eplaideu, $V = "
-#~ "volume, $_ = novele roye)"
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "Rexhowe videyo iOS OpenGL ES (i fåt UIView)"
-
-#~ msgid ""
-#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
-#~ "output. It will still work, but much slower and with possibly unexpected "
-#~ "results."
-#~ msgstr ""
-#~ "I manke a vosse Mac l' acceleråcion Quartz Extreme, k' on-z a mezåjhe pol "
-#~ "rexhowe videyo. I continouwrè a roter, mins bråmint pus londjinnmint et "
-#~ "avou des rizultats motoit nén ratindous."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Eployî l' fitchî des sortites"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Politike d' aberwetaedje des potchetes d' albom:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Apontyî l' Livreye di Media"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -30244,6 +30055,186 @@ msgstr "Rexhowe do Floû"
 #~ msgstr ""
 #~ "Eployî les codecs sistinme si c' est disponibe (meyeuse cwålité, mins "
 #~ "riskeus)"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr ""
+#~ "Tchoezixhoz vosse pus voltî eployeye rexhowe videyo eyet apontyîz-'lzi."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Ces modeules dinèt des fonccions rantoele a totes les ôtes pårts di VLC."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Les ahesseus di dvize polèt esse apontyîs chal."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Nou module discôdeu ki va"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC ni sopoite nén li cogne odio ou videyo \"%4.4s\". Måluruzint i gn a "
+#~ "nole manire po vos a remanthî çouci."
+
+#~ msgid "Album art policy"
+#~ msgstr "Politike des potchetes d' albom"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Tchoezi comint les potchetes d' albom seront aberwetêyes."
+
+#~ msgid "Manual download only"
+#~ msgstr "Aberwetaedje al mwin seulmint"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Cwand l' boket enonde l' djouwaedje"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Totossu rade ki l' boket est radjouté"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Tcherdjî l' livreye media"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "Accès FFmpeg"
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Passete odio pol coviertixheu di stereyo a mono"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Mete en alaedje li côdaedje sins piete"
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "Faze lineyåre rectangulåre"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Distance etur 'P' cådes"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Nombe do 'P' cådes po GOP"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "cycles per degree"
+#~ msgstr "bloukes pa digré"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Discôdeu videyo eployant openmash"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr "| menu . . [on|off|up|down|left|right|select] eployî l' dressêye"
+
+#~ msgid "Jump to time"
+#~ msgstr "Aler a"
+
+#~ msgid "Don't Send"
+#~ msgstr "Èn nén evoyî"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC a dedja tcheyou e rak"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Dji n' a savou trover d' arote d'on tcheyaedje e rak di dvant."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Drovi l' ridant BDMV"
+
+#~ msgid "Album art download policy"
+#~ msgstr ""
+#~ "Politike d' aberwetaedje\n"
+#~ "des potchetes"
+
+#~ msgid "Output module"
+#~ msgstr "Module di rexhowe"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Ewalijheu grafike"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Defini otomaticmint l' wangnaedje del videyo."
+
+#~ msgid "Get more extensions from"
+#~ msgstr "Cweri pus d' rawtes viè"
+
+#~ msgid "Under the Video"
+#~ msgstr "A dzo del videyo"
+
+#~ msgid "&Help..."
+#~ msgstr "&Aidance..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Sincronijhî sol boket odio"
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "Valixhance des liveas des canås odio"
+
+#~ msgid "Alarm"
+#~ msgstr "Xhuflet"
+
+#~ msgid "Spatial luma strength (default 4)"
+#~ msgstr "Foice del louminance e l' espåce (prémetowe 4)"
+
+#~ msgid "Spatial chroma strength (default 3)"
+#~ msgstr "Foice del crômeye e l' espåce (prémetowe 3)"
+
+#~ msgid "Temporal luma strength (default 6)"
+#~ msgstr "Foice del louminance dins l' tins (prémetowe 6)"
+
+#~ msgid "Temporal chroma strength (default 4.5)"
+#~ msgstr "Foice del crômeye dins l' tins (prémetowe 4.5)"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "Tecse del banire a håyner. Cogne des tchinnes k' i n' a: Raloyî å tins: "
+#~ "%Y = anêye, %m = moes, %d = djoû, %H = eur, %M = munute, %S = "
+#~ "sigonde, ... Raloyî å meta-dnêyes: $a = årtisse, $b = albom, $c = "
+#~ "copyright, $d = discrijhaedje, $e = ecôdé pa, $g = djinre, $l = "
+#~ "lingaedje, $n = limero d' boket, $p = djouwé asteure, $r = préjhaedje, $s "
+#~ "= lingaedje des sortites, $t = tite, $u = url, $A = date, $B = "
+#~ "roedeur des bits del odio (e kb/s), $C = tchaptrê,$D = durêye, $F = "
+#~ "no en etir avou l' tchmin, $I = tite, $L = tins ki lait, $N = no, $O = "
+#~ "lingaedje del odio, $P = eplaeçmint (e %), $R = préjhî, $S = "
+#~ "frecwince di sampling del odio (e kHz), $T = tins, $U = eplaideu, $V = "
+#~ "volume, $_ = novele roye)"
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "Rexhowe videyo iOS OpenGL ES (i fåt UIView)"
+
+#~ msgid ""
+#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
+#~ "output. It will still work, but much slower and with possibly unexpected "
+#~ "results."
+#~ msgstr ""
+#~ "I manke a vosse Mac l' acceleråcion Quartz Extreme, k' on-z a mezåjhe pol "
+#~ "rexhowe videyo. I continouwrè a roter, mins bråmint pus londjinnmint et "
+#~ "avou des rizultats motoit nén ratindous."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Eployî l' fitchî des sortites"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Politike d' aberwetaedje des potchetes d' albom:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Apontyî l' Livreye di Media"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
