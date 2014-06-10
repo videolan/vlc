@@ -11103,9 +11103,8 @@ msgid "PNG video encoder"
 msgstr "PNG video dekoder"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Omogući pozadinski mod"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11114,9 +11113,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Profil Kodera"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11126,9 +11124,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Naziv kodeka"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11149,9 +11146,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:79
-#, fuzzy
 msgid "Group of Picture Reference Distance"
-msgstr "Naziv trenutnog pokretanja"
+msgstr ""
 
 #: modules/codec/qsv.c:81
 msgid ""
@@ -11170,9 +11166,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Raspletavanje"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11236,9 +11231,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Bitrata"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11270,9 +11264,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Broj djelova"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11286,9 +11279,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Broj DWT iteracija"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -21944,7 +21936,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Izvorni omjer"
+msgstr "Indeks datoteka"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -28333,101 +28325,6 @@ msgstr "Nadogradnje za VLC medijski izvođač"
 msgid "Streaming Output"
 msgstr "Strujanje izlaza"
 
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Izaberite svoj željeni video izlaz i konfigurišite ga ovdje."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "Ovi moduli pružaju mrežne funkcije za sve ostale dijelove VLC-a."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr "Ovo su opšte postavke za module kodiranja videa/zvuka/podtitla."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Pružitelji dijaloga se mogu konfigurisati ovdje."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "U ovoj sekciji možete forsirati ponašanje demuksera podtitla, npr. "
-#~ "podešavanjem tipa titla ili naziva datoteke."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Nema pogodan modul dekodera"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC ne podržava format zvuka ili videa \"%4.4s\", Nažalost ne postoji "
-#~ "način da ovo popravite."
-
-#~ msgid "Album art policy"
-#~ msgstr "Politika omota albuma"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Izaberi kako da će se korice albuma preuzimati."
-
-#~ msgid "Manual download only"
-#~ msgstr "Samo ručno preuzimanje"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Kada se pjesma počne producirati"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Čim se pjesma doda"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Učitaj Medijsku Biblioteku"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr ""
-#~ "Omogućite ovu opciju kako bi učitali SQL-baziranu Medijsku Biblioteku pri "
-#~ "pokretanju VLC-a"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg pristup"
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "Video Ubrzanje (VA) API"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "cycles per degree"
-#~ msgstr "ciklusi po mjeri"
-
-#~ msgid "Don't Send"
-#~ msgstr "Ne Šalji"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC se prethodno srušio"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Automatski postavi video zauzeće."
-
-#~ msgid "Under the Video"
-#~ msgstr "Ispod Videa"
-
-#~ msgid "&Help..."
-#~ msgstr "&Pomoć..."
-
-#~ msgid "Alarm"
-#~ msgstr "Alarm"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Koristi datoteku podtitla"
-
 #~ msgid ""
 #~ "You can choose to disable some CPU accelerations here. Use with extreme "
 #~ "care!"
@@ -28615,6 +28512,101 @@ msgstr "Strujanje izlaza"
 
 #~ msgid "Do you want to download it ?"
 #~ msgstr "Želite li ga preuzeti?"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Izaberite svoj željeni video izlaz i konfigurišite ga ovdje."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "Ovi moduli pružaju mrežne funkcije za sve ostale dijelove VLC-a."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr "Ovo su opšte postavke za module kodiranja videa/zvuka/podtitla."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Pružitelji dijaloga se mogu konfigurisati ovdje."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "U ovoj sekciji možete forsirati ponašanje demuksera podtitla, npr. "
+#~ "podešavanjem tipa titla ili naziva datoteke."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Nema pogodan modul dekodera"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC ne podržava format zvuka ili videa \"%4.4s\", Nažalost ne postoji "
+#~ "način da ovo popravite."
+
+#~ msgid "Album art policy"
+#~ msgstr "Politika omota albuma"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Izaberi kako da će se korice albuma preuzimati."
+
+#~ msgid "Manual download only"
+#~ msgstr "Samo ručno preuzimanje"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Kada se pjesma počne producirati"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Čim se pjesma doda"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Učitaj Medijsku Biblioteku"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr ""
+#~ "Omogućite ovu opciju kako bi učitali SQL-baziranu Medijsku Biblioteku pri "
+#~ "pokretanju VLC-a"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg pristup"
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "Video Ubrzanje (VA) API"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "cycles per degree"
+#~ msgstr "ciklusi po mjeri"
+
+#~ msgid "Don't Send"
+#~ msgstr "Ne Šalji"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC se prethodno srušio"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Automatski postavi video zauzeće."
+
+#~ msgid "Under the Video"
+#~ msgstr "Ispod Videa"
+
+#~ msgid "&Help..."
+#~ msgstr "&Pomoć..."
+
+#~ msgid "Alarm"
+#~ msgstr "Alarm"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Koristi datoteku podtitla"
 
 #, fuzzy
 #~ msgid "Greek, Modern ()"
