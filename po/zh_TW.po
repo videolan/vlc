@@ -16,8 +16,8 @@ msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2014-06-10 15:44-0400\n"
-"PO-Revision-Date: 2014-05-12 11:21+0000\n"
-"Last-Translator: xatier 同學@提不起勁 <xatierlike@gmail.com>\n"
+"PO-Revision-Date: 2014-05-16 10:21+0000\n"
+"Last-Translator: x4r <xatierlike@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/vlc-"
 "trans/language/zh_TW/)\n"
 "Language: zh_TW\n"
@@ -1179,7 +1179,7 @@ msgstr "目的地字幕編解碼器"
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "視訊輸出模組"
+msgstr "客戶端連接埠"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -2279,6 +2279,8 @@ msgid ""
 "You can enforce the width of the video snapshot. By default it will keep the "
 "original width (-1). Using 0 will scale the width to keep the aspect ratio."
 msgstr ""
+"你可以強制調整影片截圖的寬度。預設是原本的寬度(-1)。使用 0 來調整寬度會讓維持"
+"長寬比。"
 
 #: src/libvlc-module.c:413
 msgid "Video snapshot height"
@@ -2290,6 +2292,8 @@ msgid ""
 "the original height (-1). Using 0 will scale the height to keep the aspect "
 "ratio."
 msgstr ""
+"你可以強制調整影片截圖的高度。預設是原本的高度(-1)。使用 0 來調整高度會讓維持"
+"長寬比。"
 
 #: src/libvlc-module.c:419
 msgid "Video cropping"
@@ -2300,6 +2304,8 @@ msgid ""
 "This forces the cropping of the source video. Accepted formats are x:y (4:3, "
 "16:9, etc.) expressing the global image aspect."
 msgstr ""
+"這個設定會強制裁減來源影片。接受的格式是 x:y (4:3, 16:9, 等等) 表示全域的圖片"
+"寬高比。"
 
 #: src/libvlc-module.c:425
 msgid "Source aspect ratio"
@@ -2335,6 +2341,8 @@ msgid ""
 "Scaling factor used when Auto Scaling is disabled.\n"
 "Default value is 1.0 (original video size)."
 msgstr ""
+"調整因子將被使用當自動調整關閉時。\n"
+"預設值是 1.0 (原本影片大小)"
 
 #: src/libvlc-module.c:443
 msgid "Custom crop ratios list"
@@ -2344,7 +2352,7 @@ msgstr "自訂裁剪比例清單"
 msgid ""
 "Comma separated list of crop ratios which will be added in the interface's "
 "crop ratios list."
-msgstr ""
+msgstr "裁切比例的逗號分隔列表會被加到介面上的裁切比列表。"
 
 #: src/libvlc-module.c:448
 msgid "Custom aspect ratios list"
@@ -2354,7 +2362,7 @@ msgstr "自訂長寬比例清單"
 msgid ""
 "Comma separated list of aspect ratios which will be added in the interface's "
 "aspect ratio list."
-msgstr ""
+msgstr "寬高比的逗號分隔列表會被加到介面上的寬高比列表。"
 
 #: src/libvlc-module.c:453
 msgid "Fix HDTV height"
@@ -2366,6 +2374,8 @@ msgid ""
 "incorrectly sets height to 1088 lines. You should only disable this option "
 "if your video has a non-standard format requiring all 1088 lines."
 msgstr ""
+"這個設定適當地處理 HDTV-1080 影片格式即使損壞的編碼錯誤的被設定高度到 1088 "
+"行。如果您的影片是非標準格式並且需要所有 1088 行，您應該只取消這個選項。"
 
 #: src/libvlc-module.c:460
 msgid "Monitor pixel aspect ratio"
@@ -4573,7 +4583,7 @@ msgstr "印出版本資訊"
 #: src/libvlc-module.c:2690
 #, fuzzy
 msgid "core program"
-msgstr "節目"
+msgstr "主程式"
 
 #: src/misc/update.c:473
 #, c-format
@@ -5577,7 +5587,7 @@ msgstr "藍光錯誤"
 #: modules/access/bluray.c:1189
 #, fuzzy
 msgid "Top Menu"
-msgstr "關閉視窗"
+msgstr "選單"
 
 #: modules/access/bluray.c:1191
 #, fuzzy
@@ -11077,9 +11087,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:79
-#, fuzzy
 msgid "Group of Picture Reference Distance"
-msgstr "圖片大小的群組"
+msgstr ""
 
 #: modules/codec/qsv.c:81
 msgid ""
@@ -11098,9 +11107,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "VNC 輪詢時間間隔"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11123,9 +11131,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "編碼參數"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11198,9 +11205,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "複製數量"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11214,9 +11220,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "拼圖的列數"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -11988,12 +11993,12 @@ msgstr "USF 字幕解碼器"
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "文字字幕解碼器"
+msgstr "DVB 字幕解碼器"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "DVB 字幕"
+msgstr "文字廣播字幕"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -20354,7 +20359,7 @@ msgstr "選擇設定檔："
 #: modules/gui/qt4/dialogs/toolbar.cpp:185
 #, fuzzy
 msgid "Preview"
-msgstr "上一個標題"
+msgstr "上一個"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:194
 msgid "Cl&ose"
@@ -21170,7 +21175,7 @@ msgstr "重取樣品質"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "高品質音訊重取樣"
+msgstr "視訊品質後處理等級"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -21939,7 +21944,7 @@ msgstr ""
 #: modules/mux/ogg.c:47
 #, fuzzy
 msgid "Index interval"
-msgstr "選單更新的時間間隔"
+msgstr "索引檔"
 
 #: modules/mux/ogg.c:48
 msgid ""
@@ -21949,7 +21954,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "保留原始長寬比例"
+msgstr "索引檔"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -24638,7 +24643,7 @@ msgstr ""
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "去交錯視訊過濾器"
+msgstr "互動式益智遊戲視訊過濾器"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freeze"
@@ -28074,7 +28079,7 @@ msgstr "視訊擷取"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLC 無法開啟解碼器模組。"
+msgstr "音訊輸出模組"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -28313,12 +28318,12 @@ msgstr "鏡射方向"
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "預設"
+msgstr "預設串流"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
 msgid "Chromaprint stream output"
-msgstr "檔案串流輸出"
+msgstr "錄製串流輸出"
 
 #: modules/text_renderer/platform_fonts.c:82
 msgid ""
@@ -28372,149 +28377,6 @@ msgstr "VLC 媒體播放器 - 網頁介面"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "串流輸出"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "請選擇您偏好的視訊輸出並進行設定。"
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "這些模組提供 VLC 其他部份的網路功能。"
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr "這是影片/音效/字幕編碼模組的一般設定。"
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "對話框提供者可以在這邊被設定。"
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "在這個階段您可以強制設定字幕解多工器的行為，例如設定字幕格式或是檔案名稱。"
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "無適合的解碼器模組"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr "VLC 不支援該音訊或視訊格式「%4.4s」，很遺憾您無法修正此問題。"
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "VLC 額外的模組搜尋路徑。您可以加入一些路徑並且用「PATH_SEP」當作分隔將它們"
-#~ "串接起來。"
-
-#~ msgid "Album art policy"
-#~ msgstr "專輯封面方針"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "選擇專輯封面的下載時機。"
-
-#~ msgid "Manual download only"
-#~ msgstr "僅手動下載"
-
-#~ msgid "When track starts playing"
-#~ msgstr "當音軌開始播放時"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "音軌加入清單時"
-
-#~ msgid "Load Media Library"
-#~ msgstr "載入媒體櫃"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr "啟用這個選項讓 VLC 在啟動時載入基於 SQL 的媒體櫃"
-
-#~ msgid "main program"
-#~ msgstr "主程式"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg 存取"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC 無法開啟檔案「%s」。(%m)"
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "立體聲對單聲道轉換的音訊過濾器"
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "視訊加速 (VA) API"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "啟用無損編碼"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "使用 openmash 的視訊解碼器"
-
-#~ msgid "Jump to time"
-#~ msgstr "跳至時間"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "開啟當機記錄..."
-
-#~ msgid "Don't Send"
-#~ msgstr "不要傳送"
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "開啟 BDMV 資料夾"
-
-#~ msgid "Output module"
-#~ msgstr "輸出模組"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "圖形等化器"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "自動設定視訊增益。"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "取得更多擴充套件"
-
-#~ msgid "Under the Video"
-#~ msgstr "視訊下方"
-
-#~ msgid "&Help..."
-#~ msgstr "說明(&H)..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "同步音訊軌"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr "丟棄/複製視訊畫面以達成視訊軌與音訊軌同步。"
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr "若您的 CPU 無法跟上編碼速率，轉碼器將會丟棄部份畫面。"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "Mac OS X OpenGL 視訊輸出(需要 drawable-nsobject)"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "使用字幕檔(&T)"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "專輯封面下載方針："
-
-#~ msgid "Configure Media Library"
-#~ msgstr "設定媒體櫃"
 
 #~ msgid ""
 #~ "You can choose to disable some CPU accelerations here. Use with extreme "
@@ -30404,6 +30266,149 @@ msgstr "串流輸出"
 
 #~ msgid "Jump"
 #~ msgstr "跳至"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "請選擇您偏好的視訊輸出並進行設定。"
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "這些模組提供 VLC 其他部份的網路功能。"
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr "這是影片/音效/字幕編碼模組的一般設定。"
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "對話框提供者可以在這邊被設定。"
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "在這個階段您可以強制設定字幕解多工器的行為，例如設定字幕格式或是檔案名稱。"
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "無適合的解碼器模組"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr "VLC 不支援該音訊或視訊格式「%4.4s」，很遺憾您無法修正此問題。"
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "VLC 額外的模組搜尋路徑。您可以加入一些路徑並且用「PATH_SEP」當作分隔將它們"
+#~ "串接起來。"
+
+#~ msgid "Album art policy"
+#~ msgstr "專輯封面方針"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "選擇專輯封面的下載時機。"
+
+#~ msgid "Manual download only"
+#~ msgstr "僅手動下載"
+
+#~ msgid "When track starts playing"
+#~ msgstr "當音軌開始播放時"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "音軌加入清單時"
+
+#~ msgid "Load Media Library"
+#~ msgstr "載入媒體櫃"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr "啟用這個選項讓 VLC 在啟動時載入基於 SQL 的媒體櫃"
+
+#~ msgid "main program"
+#~ msgstr "主程式"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg 存取"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLC 無法開啟檔案「%s」。(%m)"
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "立體聲對單聲道轉換的音訊過濾器"
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "視訊加速 (VA) API"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "啟用無損編碼"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "使用 openmash 的視訊解碼器"
+
+#~ msgid "Jump to time"
+#~ msgstr "跳至時間"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "開啟當機記錄..."
+
+#~ msgid "Don't Send"
+#~ msgstr "不要傳送"
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "開啟 BDMV 資料夾"
+
+#~ msgid "Output module"
+#~ msgstr "輸出模組"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "圖形等化器"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "自動設定視訊增益。"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "取得更多擴充套件"
+
+#~ msgid "Under the Video"
+#~ msgstr "視訊下方"
+
+#~ msgid "&Help..."
+#~ msgstr "說明(&H)..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "同步音訊軌"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr "丟棄/複製視訊畫面以達成視訊軌與音訊軌同步。"
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr "若您的 CPU 無法跟上編碼速率，轉碼器將會丟棄部份畫面。"
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "Mac OS X OpenGL 視訊輸出(需要 drawable-nsobject)"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "使用字幕檔(&T)"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "專輯封面下載方針："
+
+#~ msgid "Configure Media Library"
+#~ msgstr "設定媒體櫃"
 
 #, fuzzy
 #~ msgid ""
