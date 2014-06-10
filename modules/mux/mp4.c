@@ -556,6 +556,8 @@ static int Mux(sout_mux_t *p_mux)
                 p_stream->i_last_dts += i_length;
 
                 /* Write a " " */
+                p_data->i_dts = p_stream->i_last_dts;
+                p_data->i_dts = p_data->i_pts;
                 p_data->p_buffer[0] = 0;
                 p_data->p_buffer[1] = 1;
                 p_data->p_buffer[2] = ' ';
