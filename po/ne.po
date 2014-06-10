@@ -13,7 +13,7 @@ msgstr ""
 "Last-Translator: ma OpenThito <PRABINGAUTAM@gmail.com>\n"
 "Language-Team: Nepali (Nepal) (http://www.transifex.com/projects/p/vlc-trans/"
 "language/ne_NP/)\n"
-"Language: ne\n"
+"Language: ne_NP\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1144,7 +1144,7 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "भिडियो निर्गत मोड्युल"
+msgstr "ग्राहक पोर्ट"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -5568,7 +5568,7 @@ msgstr ""
 #: modules/access/bluray.c:70
 #, fuzzy
 msgid "Region code"
-msgstr "रूपान्तरण"
+msgstr "भिडियो कोडेक"
 
 #: modules/access/bluray.c:71
 msgid ""
@@ -10470,7 +10470,7 @@ msgstr "VLC को कुत्वचक मोदुले खोल्न स�
 #: modules/codec/avcodec/hwdummy.c:42
 #, fuzzy
 msgid "Dummy video decoder"
-msgstr "थेवरा भिडियो असङ्केतक"
+msgstr "डम्मी असङ्केतक"
 
 #: modules/codec/avcodec/vaapi.c:62
 #, fuzzy
@@ -11160,9 +11160,8 @@ msgid "PNG video encoder"
 msgstr "PNG भिडियो असङ्केतक"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "वालपेपर मोड सक्षम पार्नुहोस् "
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11171,9 +11170,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "कोडेक"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11183,9 +11181,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "कोडेक"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11226,9 +11223,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "म्याक OS X इन्टरफेस"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11241,9 +11237,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:100
-#, fuzzy
 msgid "Rate Control Method"
-msgstr "दर नियन्त्रण बफर साइज"
+msgstr ""
 
 #: modules/codec/qsv.c:102
 msgid ""
@@ -11252,9 +11247,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "I क्यान्टिफिकेसन तत्व"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11294,9 +11288,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "अधिकतम बिटदर"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11328,9 +11321,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "सन्दर्भ फ्रेमको नम्बर"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11344,9 +11336,8 @@ msgid "Number of reference frames"
 msgstr "सन्दर्भ फ्रेमको नम्बर"
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "क्लोनको नम्बर"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -13816,7 +13807,7 @@ msgstr "+----[ मद्दतको अन्त्य ]"
 #: modules/control/rc.c:965
 #, fuzzy
 msgid "Press pause to continue."
-msgstr "जारी राख्नका लागि 'menu select' वा 'pause' टाइप गर्नुहोस्"
+msgstr "मेनु चयन थिच्नुहोस् वा जारी राख्न पज गर्नुहोस्"
 
 #: modules/control/rc.c:1191 modules/control/rc.c:1446
 #: modules/control/rc.c:1490
@@ -15942,7 +15933,7 @@ msgstr "सबै देखाउनुहोस्"
 #: modules/gui/macosx/BWQuincyUI.m:79
 #, fuzzy
 msgid "Hide Details"
-msgstr "पूर्वनिर्धारित"
+msgstr "अन्य लुकाउनुहोस्"
 
 #: modules/gui/macosx/BWQuincyUI.m:81
 msgid "Send"
@@ -20554,7 +20545,7 @@ msgstr ""
 #: modules/gui/qt4/dialogs/toolbar.cpp:185
 #, fuzzy
 msgid "Preview"
-msgstr "अघिल्लो शीर्षक"
+msgstr "अघिल्लो"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:194
 msgid "Cl&ose"
@@ -21365,7 +21356,7 @@ msgstr "सङ्केतन गुणस्तर"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "उच्च गुणस्तरको अडियो रिस्याम्पिङ"
+msgstr "गुणस्तर"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -21380,7 +21371,7 @@ msgstr "पहुँच निर्गत"
 #: modules/hw/vdpau/sharpen.c:141
 #, fuzzy
 msgid "VDPAU sharpen video filter"
-msgstr "क्लोन भिडियो फिल्टर"
+msgstr "पर्खाल भिडियो फिल्टर"
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -27963,9 +27954,8 @@ msgid "Default caching policy"
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:506
-#, fuzzy
 msgid "Menus language:"
-msgstr "अडियो भाषा"
+msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:507
 msgid "Look and feel"
@@ -28361,12 +28351,12 @@ msgstr ""
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLC को कुत्वचक मोदुले खोल्न सकिएन "
+msgstr "अडियो निर्गत मोड्युल"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
 msgid "No video devices found"
-msgstr "भिडियो यन्त्र"
+msgstr "भिडियो यन्त्र नाम"
 
 #: modules/access/avcapture.m:289
 msgid ""
@@ -28603,7 +28593,7 @@ msgstr ""
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "पूर्वनिर्धारित"
+msgstr "पूर्वनिर्धारित प्रवाह"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -28662,72 +28652,6 @@ msgstr "VLC मिडिया प्लेयर"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "प्रवाह निर्गत"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr ""
-#~ "तपाईँले रूचाउनु भएको भिडियो निर्गत छनोट गर्नुहोस् र यसलाई यहाँ कन्फिगर गर्नुहोस् ।"
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "ति मोड्युले VLC को सबै अन्य भागमा सञ्जाल प्रकार्य प्रदान गर्दछ ।"
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "संवाद प्रदायकलाई यहाँ कन्फिगर गर्न सकिन्छ ।"
-
-#~ msgid "Album art policy"
-#~ msgstr "एल्बम कला नीति"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "अल्बुम कल कसरी डाउनलोअद गर्ने चुनौ।  "
-
-#~ msgid "Manual download only"
-#~ msgstr "म्यानुअल डाउनलोअद मात्रै "
-
-#~ msgid "When track starts playing"
-#~ msgstr "जब ट्रैक बज्न शुरू"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "ट्र्याक जोद्ने बित्तिकै "
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "openmash प्रयोग गर्दा भिडियो असङ्केतक"
-
-#~ msgid "Press menu select or pause to continue."
-#~ msgstr "मेनु चयन थिच्नुहोस् वा जारी राख्न पज गर्नुहोस्"
-
-#~ msgid "Type 'menu select' or 'pause' to continue."
-#~ msgstr "जारी राख्नका लागि 'menu select' वा 'pause' टाइप गर्नुहोस्"
-
-#~ msgid "Jump to time"
-#~ msgstr "समयमा जानुहोस्"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "क्र्याश लग फेला परेन"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "अघिल्लो बिग्रेको कुनै पनि चिन्ह फेला पार्न सकेन"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "स्वचालित रूपमा पूर्व पद वर्णक फाइल"
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "अडियो ट्रयाकमा समक्रमण गर्नुहोस्"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "यो विकल्पले अडियो ट्रयाकमा भिडियो ट्रयाक समक्रमण गर्न भिडियो फ्रेम छोड्दछ/नक्कल "
-#~ "गर्दछ ।"
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr "यदि तपाईँको CPU ले सङ्केतन दरसँग राख्न सेकन भने ट्रान्सकोडरले फ्रेम बन्द गर्दछ ।"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "उपशीर्षक फाइल प्रयोग गर्नुहोस्"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -31906,6 +31830,72 @@ msgstr "प्रवाह निर्गत"
 #, fuzzy
 #~ msgid "left"
 #~ msgstr "बायाँ"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr ""
+#~ "तपाईँले रूचाउनु भएको भिडियो निर्गत छनोट गर्नुहोस् र यसलाई यहाँ कन्फिगर गर्नुहोस् ।"
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "ति मोड्युले VLC को सबै अन्य भागमा सञ्जाल प्रकार्य प्रदान गर्दछ ।"
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "संवाद प्रदायकलाई यहाँ कन्फिगर गर्न सकिन्छ ।"
+
+#~ msgid "Album art policy"
+#~ msgstr "एल्बम कला नीति"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "अल्बुम कल कसरी डाउनलोअद गर्ने चुनौ।  "
+
+#~ msgid "Manual download only"
+#~ msgstr "म्यानुअल डाउनलोअद मात्रै "
+
+#~ msgid "When track starts playing"
+#~ msgstr "जब ट्रैक बज्न शुरू"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "ट्र्याक जोद्ने बित्तिकै "
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "openmash प्रयोग गर्दा भिडियो असङ्केतक"
+
+#~ msgid "Press menu select or pause to continue."
+#~ msgstr "मेनु चयन थिच्नुहोस् वा जारी राख्न पज गर्नुहोस्"
+
+#~ msgid "Type 'menu select' or 'pause' to continue."
+#~ msgstr "जारी राख्नका लागि 'menu select' वा 'pause' टाइप गर्नुहोस्"
+
+#~ msgid "Jump to time"
+#~ msgstr "समयमा जानुहोस्"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "क्र्याश लग फेला परेन"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "अघिल्लो बिग्रेको कुनै पनि चिन्ह फेला पार्न सकेन"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "स्वचालित रूपमा पूर्व पद वर्णक फाइल"
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "अडियो ट्रयाकमा समक्रमण गर्नुहोस्"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "यो विकल्पले अडियो ट्रयाकमा भिडियो ट्रयाक समक्रमण गर्न भिडियो फ्रेम छोड्दछ/नक्कल "
+#~ "गर्दछ ।"
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr "यदि तपाईँको CPU ले सङ्केतन दरसँग राख्न सेकन भने ट्रान्सकोडरले फ्रेम बन्द गर्दछ ।"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "उपशीर्षक फाइल प्रयोग गर्नुहोस्"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
