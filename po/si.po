@@ -11044,9 +11044,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:100
-#, fuzzy
 msgid "Rate Control Method"
-msgstr "සීඝ්‍රතාවය පාලන ආකාරය"
+msgstr ""
 
 #: modules/codec/qsv.c:102
 msgid ""
@@ -11055,9 +11054,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "කේතීකරණ පරාමිතීන්"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11130,9 +11128,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "ශ්‍රව්‍ය නාලිකා ගණන"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11146,9 +11143,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "ප්‍රහේලිකාවේ පේළි ගණන"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -12076,7 +12072,7 @@ msgstr ""
 #: modules/codec/vpx.c:49
 #, fuzzy
 msgid "WebM video decoder"
-msgstr "වීඩියෝ ආම්පන්නය"
+msgstr "වීඩියෝ කොඩෙක් "
 
 #: modules/codec/wmafixed/wma.c:82
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -21023,7 +21019,7 @@ msgstr "කැන්වස වීඩියෝ පෙරනය"
 #: modules/hw/vdpau/avcodec.c:45
 #, fuzzy
 msgid "VDPAU video decoder"
-msgstr "වීඩියෝ ආම්පන්නය"
+msgstr "වීඩියෝ කොඩෙක් "
 
 #: modules/hw/vdpau/chroma.c:820
 #, fuzzy
@@ -21085,7 +21081,7 @@ msgstr "YUV ප්‍රතිදානය"
 #: modules/hw/vdpau/sharpen.c:141
 #, fuzzy
 msgid "VDPAU sharpen video filter"
-msgstr "කැඩපත් ආකාර වීඩි‍යෝ පෙරනය"
+msgstr "දර්ශන වීඩියෝ පෙරණය"
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -27988,7 +27984,7 @@ msgstr "ශ්‍රව්‍ය ග්‍රහණය"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "විකේතත මොඩියුලය විවෘත කිරීමට VLC හට නොහැකි විය."
+msgstr "ශ්‍රව්‍ය ප්‍රතිදාන මොඩියුලය"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -28076,7 +28072,7 @@ msgstr "OpenGL විදෘශ්‍ය ප්‍රතිදානය"
 #: modules/audio_output/winstore.c:204
 #, fuzzy
 msgid "Windows Store audio output"
-msgstr "OpenGL විදෘශ්‍ය ප්‍රතිදානය"
+msgstr "K Audio අතුරුමුහුණත් ශ්‍රව්‍ය ප්‍රතිදානය"
 
 #: modules/codec/scte27.c:42
 #, fuzzy
@@ -28102,7 +28098,7 @@ msgstr ""
 #: modules/codec/svg.c:63
 #, fuzzy
 msgid "SVG video decoder"
-msgstr "වීඩියෝ ආම්පන්නය"
+msgstr "වීඩියෝ කොඩෙක් "
 
 #: modules/control/win_msg.c:192
 msgid "WinMsg"
@@ -28111,7 +28107,7 @@ msgstr ""
 #: modules/control/win_msg.c:193
 #, fuzzy
 msgid "Windows messages interface"
-msgstr "ප්‍රධාන අතුරුමුහුණත්"
+msgstr "Ncurses අතුරුමුහුණත"
 
 #: modules/gui/macosx/DebugMessageVisualizer.m:93
 msgid "Save this Log..."
@@ -28283,129 +28279,6 @@ msgstr "VLC මාධ්‍ය වාදකය - ජාල අතුරුමු
 #, fuzzy
 msgid "Streaming Output"
 msgstr "දහරා ප්‍රතිදානය"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "ඔබගේ වඩාත්ම කැමති වීඩියෝ ප්‍රතිදානය මෙයින් තෝරා එය වින්‍යාසගත කරන්න."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "දෙබස් ප්‍රතිපාදකයින් වින්‍යාසගත කිරීමට මෙහි දී පුළුවන."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "අනුකූල වන විකේතක මොඩියුල නැත"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC විසින් මෙම ශ්‍රව්‍ය හෝ වීඩියෝ මාදිලිය \"%4.4s\" සඳහා අනුකූලතාවයක් නොදක්වයි. "
-#~ "අවාසනාවකට, මෙය තිර කිරීමට ඔබට මාර්ගයක් නැත."
-
-#~ msgid "Album art policy"
-#~ msgstr "කලාකෘති ප්‍රතිපත්තිය"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "කලාකෘති අනුරූ බාගත විය යුත්තේ කෙසේදැයි තෝරන්න."
-
-#~ msgid "Manual download only"
-#~ msgstr "පරිශීලකට අවශ්‍ය නම් පමණක්"
-
-#~ msgid "When track starts playing"
-#~ msgstr "ගීතය ධාවනය වීම‍ ආරම්භ වූ විට"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "ගීතය එක් කළ විට දී"
-
-#~ msgid "Load Media Library"
-#~ msgstr "මාධ්‍ය පුස්තකාලය ප්‍රවේශනය කරන්න"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg පිවිසුම"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "CrashLog විවෘත කරන්න..."
-
-#~ msgid "Don't Send"
-#~ msgstr "යවන්න එපා"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC මීට ප්‍රථමව බිඳ වැටුණි"
-
-#~ msgid "Don't ask again"
-#~ msgstr "නැවත නොවිමසන්න"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "බිඳවැටුම් ලොගය සොයා ගැනීමට ‍නැත"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "මින් පෙර බිඳ වැටුණු ලකුණු කිසිවක් සොයා ගැනීමට නොහැකි විය."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "BDMV ෆෝල්ඩරය විවෘත කරන්න"
-
-#~ msgid "Album art download policy"
-#~ msgstr "කලාකෘති තොරතුරු බාගත කිරීම් ප්‍රතිපත්තිය"
-
-#~ msgid "Output module"
-#~ msgstr "ප්‍රතිදාන මොඩියුල "
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "චිත්‍රක සමානකරණය"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "මාධ්‍ය තොරතුරු ස්වයංක්‍රීයව ලබාගන්න"
-
-#~ msgid "Under the Video"
-#~ msgstr "වීඩියෝවෙහි යටින්"
-
-#~ msgid "&Help..."
-#~ msgstr "&උදව්..."
-
-#~ msgid "Alarm"
-#~ msgstr "සීනුව"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "දර්ශනය වන ගලන පෙළ. (ලබාගත හැකි හැඩතල අනුලකුණු වැල: කාලය හා සම්බන්ධ: %Y = වර්ෂය, "
-#~ "%m = මාසය, %d = දිනය, %H = පැය, %M = මිනිත්තු, %S = තත්පර, ... පාර-දත්ත හා "
-#~ "සම්බන්ධ: $a = කලාකරු, $b = ඇල්බමය, $c = ප්‍රකාශන හිමිකම, $d = විස්තරය, $e = "
-#~ "කේතාංකණය කළේ, $g = වර්ගය, $l = භාෂාව, $n = පථ අංකය, $p = ධාවනය වෙමින්, $r = "
-#~ "ඇගයීම, $s = උපසිරැසි භාෂාව, $t = මාතෘකාව, $u = url, $A = දිනය, $B = ශ්‍රව්‍ය බිටු "
-#~ "සීඝ්‍රතාවය (kb/s වලින්), $C = පරිච්ඡේදය,$D = කාලසීමාව, $F = පෙත සමග සම්පූර්ණ නම, $I "
-#~ "= මාතෘකාව, $L = ඉතිරි වී ඇති කාලය, $N = නම, $O = ශ්‍රව්‍ය භාෂාව, $P = ස්ථානය (% "
-#~ "ලෙස), $R = සීඝ්‍රතාවය, $S = ශ්‍රව්‍ය නියැදි සීඝ්‍රතාවය (kHz වලින්), $T = කාලය, $U = "
-#~ "ප්‍රකාශක, $V = පරිමාව, $_ = නව මග) "
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "Mac OS X OpenGL වීඩියෝ ප්‍රතිදානය (requires drawable-nsobject)"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "උපසිරැසි ගොනුවක් එක් කරන්න:"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "කලාකෘති බාගත කිරීම් ප්‍රතිපත්තිය:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "මාධ්‍ය පුස්තකාලය වින්‍යාසගත කරන්න"
 
 #~ msgid ""
 #~ "Some options are available but hidden. Check \"Advanced options\" to see "
@@ -29154,6 +29027,129 @@ msgstr "දහරා ප්‍රතිදානය"
 
 #~ msgid "Statistics about the currently playing media or stream."
 #~ msgstr "දැන් වාදනය වන මාධ්‍යයේ හෝ ස්ට්‍රිම් වාදනයේ සංඛ්‍යාන දත්ත"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "ඔබගේ වඩාත්ම කැමති වීඩියෝ ප්‍රතිදානය මෙයින් තෝරා එය වින්‍යාසගත කරන්න."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "දෙබස් ප්‍රතිපාදකයින් වින්‍යාසගත කිරීමට මෙහි දී පුළුවන."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "අනුකූල වන විකේතක මොඩියුල නැත"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC විසින් මෙම ශ්‍රව්‍ය හෝ වීඩියෝ මාදිලිය \"%4.4s\" සඳහා අනුකූලතාවයක් නොදක්වයි. "
+#~ "අවාසනාවකට, මෙය තිර කිරීමට ඔබට මාර්ගයක් නැත."
+
+#~ msgid "Album art policy"
+#~ msgstr "කලාකෘති ප්‍රතිපත්තිය"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "කලාකෘති අනුරූ බාගත විය යුත්තේ කෙසේදැයි තෝරන්න."
+
+#~ msgid "Manual download only"
+#~ msgstr "පරිශීලකට අවශ්‍ය නම් පමණක්"
+
+#~ msgid "When track starts playing"
+#~ msgstr "ගීතය ධාවනය වීම‍ ආරම්භ වූ විට"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "ගීතය එක් කළ විට දී"
+
+#~ msgid "Load Media Library"
+#~ msgstr "මාධ්‍ය පුස්තකාලය ප්‍රවේශනය කරන්න"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg පිවිසුම"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "CrashLog විවෘත කරන්න..."
+
+#~ msgid "Don't Send"
+#~ msgstr "යවන්න එපා"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC මීට ප්‍රථමව බිඳ වැටුණි"
+
+#~ msgid "Don't ask again"
+#~ msgstr "නැවත නොවිමසන්න"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "බිඳවැටුම් ලොගය සොයා ගැනීමට ‍නැත"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "මින් පෙර බිඳ වැටුණු ලකුණු කිසිවක් සොයා ගැනීමට නොහැකි විය."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "BDMV ෆෝල්ඩරය විවෘත කරන්න"
+
+#~ msgid "Album art download policy"
+#~ msgstr "කලාකෘති තොරතුරු බාගත කිරීම් ප්‍රතිපත්තිය"
+
+#~ msgid "Output module"
+#~ msgstr "ප්‍රතිදාන මොඩියුල "
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "චිත්‍රක සමානකරණය"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "මාධ්‍ය තොරතුරු ස්වයංක්‍රීයව ලබාගන්න"
+
+#~ msgid "Under the Video"
+#~ msgstr "වීඩියෝවෙහි යටින්"
+
+#~ msgid "&Help..."
+#~ msgstr "&උදව්..."
+
+#~ msgid "Alarm"
+#~ msgstr "සීනුව"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "දර්ශනය වන ගලන පෙළ. (ලබාගත හැකි හැඩතල අනුලකුණු වැල: කාලය හා සම්බන්ධ: %Y = වර්ෂය, "
+#~ "%m = මාසය, %d = දිනය, %H = පැය, %M = මිනිත්තු, %S = තත්පර, ... පාර-දත්ත හා "
+#~ "සම්බන්ධ: $a = කලාකරු, $b = ඇල්බමය, $c = ප්‍රකාශන හිමිකම, $d = විස්තරය, $e = "
+#~ "කේතාංකණය කළේ, $g = වර්ගය, $l = භාෂාව, $n = පථ අංකය, $p = ධාවනය වෙමින්, $r = "
+#~ "ඇගයීම, $s = උපසිරැසි භාෂාව, $t = මාතෘකාව, $u = url, $A = දිනය, $B = ශ්‍රව්‍ය බිටු "
+#~ "සීඝ්‍රතාවය (kb/s වලින්), $C = පරිච්ඡේදය,$D = කාලසීමාව, $F = පෙත සමග සම්පූර්ණ නම, $I "
+#~ "= මාතෘකාව, $L = ඉතිරි වී ඇති කාලය, $N = නම, $O = ශ්‍රව්‍ය භාෂාව, $P = ස්ථානය (% "
+#~ "ලෙස), $R = සීඝ්‍රතාවය, $S = ශ්‍රව්‍ය නියැදි සීඝ්‍රතාවය (kHz වලින්), $T = කාලය, $U = "
+#~ "ප්‍රකාශක, $V = පරිමාව, $_ = නව මග) "
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "Mac OS X OpenGL වීඩියෝ ප්‍රතිදානය (requires drawable-nsobject)"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "උපසිරැසි ගොනුවක් එක් කරන්න:"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "කලාකෘති බාගත කිරීම් ප්‍රතිපත්තිය:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "මාධ්‍ය පුස්තකාලය වින්‍යාසගත කරන්න"
 
 #, fuzzy
 #~ msgid "Input Settings not saved"
