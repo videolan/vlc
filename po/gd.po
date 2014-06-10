@@ -11062,9 +11062,8 @@ msgid "PNG video encoder"
 msgstr "Video codec"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Cuir an comas modh a' phàipeir-bhalla "
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11073,9 +11072,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Pròifil"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11085,9 +11083,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Mion-fhiosrachadh mun chodec"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11128,9 +11125,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Eadaramh geàird"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11194,9 +11190,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "An ìre as motha"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11228,9 +11223,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Àireamh de chlònaichean"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11244,9 +11238,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Àireamh de chlònaichean"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -21249,7 +21242,7 @@ msgstr ""
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Ath-shamplachadh fuaime de chàileachd àrd"
+msgstr "Ìre càileachd de video airson pròiseasadh an dèidh làimh"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -28426,150 +28419,6 @@ msgstr "Cluicheadair meadhanan VLC - Eadar-aghaidh an eadar-lìn"
 msgid "Streaming Output"
 msgstr "Às-chur an t-srutha"
 
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Tagh an t-às-chur video as fhearr leat an-seo 's rèitich e."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Bheir na mòidealan seo foincseanan lìonraidh do gach pàirt eile de VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Seo na roghainnean coitcheann airson mòidealan còdachadh video/fuaime/fho-"
-#~ "thiotalan."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "'S urrainn dhut solaraichean nan còmhradh a rèiteachadh an-seo."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "'S urrainn dhut giùlan demuxer nam fo-thiotalan èigneachadh an-seo, mar "
-#~ "eisimpleir le bhith a' suidheachadh seòrsa nam fo-thiotalan no ainm an "
-#~ "fhaidhle an-seo."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Chan eil mòideal dì-chòdachaidh freagarrach ann"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "Chan eil VLC a' cur taic ris an fhòrmat fhuaime no video \"%4.4s\". Gu mì-"
-#~ "fhortanach, chan eil dòigh ann air an urrainn dhutsa sin a chàradh."
-
-#~ msgid "Album art policy"
-#~ msgstr "Poileasaidh air ealain albaman"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Cuir romhad mar a thèid ealain albaman a luchdadh a-nuas."
-
-#~ msgid "Manual download only"
-#~ msgstr "Luchdadh a-nuas de làimh a-mhàin"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Nuair a thòisicheas traca air cluich"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Cho luath 's a chuirear traca ris"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Luchdaich leabhar-lann nam meadhanan"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "Inntrigeadh FFmpeg"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "Chan eil leabharlann dì-chòdachadh AACS an t-siostaim agad ag obair. "
-#~ "Saoil a bheil iuchair a dhìth?"
-
-#~ msgid "Jump to time"
-#~ msgstr "Gearr leum dhan àm"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Fosgail loga nan tuislidhean..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Na cuir"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "Thuislich VLC roimhe"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "A bheil thu airson mion-fhiosrachadh mun tuisleadh a chur gu sgioba "
-#~ "leasachadh VLC?\n"
-#~ "\n"
-#~ "Ma thogras tu, cuir a-steach beagan fiosrachaidh mu na thachair mus do "
-#~ "thuislich VLC agus fiosrachadh cuideachail eile mar ceangal far am faigh "
-#~ "sinn faidhle sampaill no URL de shruth lìonraidh..."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr ""
-#~ "Tha mi a' toirt cead dhuibh fios a leigeil dhomh mun aithisg bhuga seo."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "Cha dèid a chur a-null ach am post-d bunaiteach agad, as aonais "
-#~ "fiosrachaidh sam bith eile."
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Cha deach loga nan tuislidhean a lorg"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Cha do lorg sinn sgeul air tuisleadh sam bith."
-
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "Cuir iTunes 'na stad nuair a tha VLC a' cluich rud"
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Fosgail pasgan BDMV"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Poileasaidh a chum luchdadh a-nuas ealain albaman"
-
-#~ msgid "Output module"
-#~ msgstr "Mòideal an às-chuir"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Cothromaiche grafaigeach"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Ro-pharsaich faidhlichean gu fèin-obrachail"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Faigh barrachd leudachan o"
-
-#~ msgid "Under the Video"
-#~ msgstr "Fon video"
-
-#~ msgid "&Help..."
-#~ msgstr "Co&bhair..."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Cuir faidhle le fo-thiotalan ris:"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Poileasaidh a chum luchdadh a-nuas ealain albaman:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Rèitich leabharlann nam meadhan"
-
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
 #~ "multicast UDP or RTP."
@@ -29057,6 +28906,150 @@ msgstr "Às-chur an t-srutha"
 
 #~ msgid "Advance of audio over video:"
 #~ msgstr "Adhartas dhen fhuaim thairis air a' video:"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Tagh an t-às-chur video as fhearr leat an-seo 's rèitich e."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Bheir na mòidealan seo foincseanan lìonraidh do gach pàirt eile de VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Seo na roghainnean coitcheann airson mòidealan còdachadh video/fuaime/fho-"
+#~ "thiotalan."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "'S urrainn dhut solaraichean nan còmhradh a rèiteachadh an-seo."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "'S urrainn dhut giùlan demuxer nam fo-thiotalan èigneachadh an-seo, mar "
+#~ "eisimpleir le bhith a' suidheachadh seòrsa nam fo-thiotalan no ainm an "
+#~ "fhaidhle an-seo."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Chan eil mòideal dì-chòdachaidh freagarrach ann"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "Chan eil VLC a' cur taic ris an fhòrmat fhuaime no video \"%4.4s\". Gu mì-"
+#~ "fhortanach, chan eil dòigh ann air an urrainn dhutsa sin a chàradh."
+
+#~ msgid "Album art policy"
+#~ msgstr "Poileasaidh air ealain albaman"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Cuir romhad mar a thèid ealain albaman a luchdadh a-nuas."
+
+#~ msgid "Manual download only"
+#~ msgstr "Luchdadh a-nuas de làimh a-mhàin"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Nuair a thòisicheas traca air cluich"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Cho luath 's a chuirear traca ris"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Luchdaich leabhar-lann nam meadhanan"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "Inntrigeadh FFmpeg"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "Chan eil leabharlann dì-chòdachadh AACS an t-siostaim agad ag obair. "
+#~ "Saoil a bheil iuchair a dhìth?"
+
+#~ msgid "Jump to time"
+#~ msgstr "Gearr leum dhan àm"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Fosgail loga nan tuislidhean..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Na cuir"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "Thuislich VLC roimhe"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "A bheil thu airson mion-fhiosrachadh mun tuisleadh a chur gu sgioba "
+#~ "leasachadh VLC?\n"
+#~ "\n"
+#~ "Ma thogras tu, cuir a-steach beagan fiosrachaidh mu na thachair mus do "
+#~ "thuislich VLC agus fiosrachadh cuideachail eile mar ceangal far am faigh "
+#~ "sinn faidhle sampaill no URL de shruth lìonraidh..."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr ""
+#~ "Tha mi a' toirt cead dhuibh fios a leigeil dhomh mun aithisg bhuga seo."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "Cha dèid a chur a-null ach am post-d bunaiteach agad, as aonais "
+#~ "fiosrachaidh sam bith eile."
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Cha deach loga nan tuislidhean a lorg"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Cha do lorg sinn sgeul air tuisleadh sam bith."
+
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "Cuir iTunes 'na stad nuair a tha VLC a' cluich rud"
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Fosgail pasgan BDMV"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Poileasaidh a chum luchdadh a-nuas ealain albaman"
+
+#~ msgid "Output module"
+#~ msgstr "Mòideal an às-chuir"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Cothromaiche grafaigeach"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Ro-pharsaich faidhlichean gu fèin-obrachail"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "Faigh barrachd leudachan o"
+
+#~ msgid "Under the Video"
+#~ msgstr "Fon video"
+
+#~ msgid "&Help..."
+#~ msgstr "Co&bhair..."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Cuir faidhle le fo-thiotalan ris:"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Poileasaidh a chum luchdadh a-nuas ealain albaman:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Rèitich leabharlann nam meadhan"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
