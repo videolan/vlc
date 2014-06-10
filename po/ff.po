@@ -10863,9 +10863,8 @@ msgid "PNG video encoder"
 msgstr "Kodek widewoo"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Hurmin mbayka wutte ɓalal "
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -10874,9 +10873,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Heftinirde"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -10886,9 +10884,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Humpito Kodekke"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -10929,9 +10926,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Ittu jiñol"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -10995,9 +10991,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Tolno dowdowo"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11029,9 +11024,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "No punnaaɗe poti"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11045,9 +11039,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "No punnaaɗe poti"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -28098,62 +28091,6 @@ msgstr "Ballal VLC media player"
 msgid "Streaming Output"
 msgstr "Jaltal Ciiɓorol"
 
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Suɓo jaltal maa widewoo ɓuranɗo ma kisa teelto-ɗaa ɗum ɗoo."
-
-#~ msgid "Album art policy"
-#~ msgstr "Peeje ñeeñal album"
-
-#~ msgid "Manual download only"
-#~ msgstr "Aawtagol junngo tan"
-
-#~ msgid "Jump to time"
-#~ msgstr "Taaɓo to waktu"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Uddit CrashLog..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Hoto Neldu"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC hookii ko ɓooyaani"
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr "Miɗo jaɓi jokkondireede baɗte ndee-ɗoo jaŋtannde buggere."
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Hay CrashLog yiytaaka"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Horiima yiytude pele hookre yawtunde."
-
-#~ msgid "Album art download policy"
-#~ msgstr "Peeje aawtagol ñeeñal album"
-
-#~ msgid "Output module"
-#~ msgstr "Wulnde jaltal"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Lemminirde Natiinde"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Yiylo kesɗitine e jaajol"
-
-#~ msgid "Under the Video"
-#~ msgstr "Les Widewoo oo"
-
-#~ msgid "&Help..."
-#~ msgstr "&Ballal..."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Huutoro fiilde lestiite"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Dawirgol aawtagol ñeeñal album:"
-
 #~ msgid ""
 #~ "Some options are available but hidden. Check \"Advanced options\" to see "
 #~ "them."
@@ -28444,6 +28381,62 @@ msgstr "Jaltal Ciiɓorol"
 
 #~ msgid "HTML playlist (*.html)"
 #~ msgstr "Tarorgol HTML (*.html)"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Suɓo jaltal maa widewoo ɓuranɗo ma kisa teelto-ɗaa ɗum ɗoo."
+
+#~ msgid "Album art policy"
+#~ msgstr "Peeje ñeeñal album"
+
+#~ msgid "Manual download only"
+#~ msgstr "Aawtagol junngo tan"
+
+#~ msgid "Jump to time"
+#~ msgstr "Taaɓo to waktu"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Uddit CrashLog..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Hoto Neldu"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC hookii ko ɓooyaani"
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr "Miɗo jaɓi jokkondireede baɗte ndee-ɗoo jaŋtannde buggere."
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Hay CrashLog yiytaaka"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Horiima yiytude pele hookre yawtunde."
+
+#~ msgid "Album art download policy"
+#~ msgstr "Peeje aawtagol ñeeñal album"
+
+#~ msgid "Output module"
+#~ msgstr "Wulnde jaltal"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Lemminirde Natiinde"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Yiylo kesɗitine e jaajol"
+
+#~ msgid "Under the Video"
+#~ msgstr "Les Widewoo oo"
+
+#~ msgid "&Help..."
+#~ msgstr "&Ballal..."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Huutoro fiilde lestiite"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Dawirgol aawtagol ñeeñal album:"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
