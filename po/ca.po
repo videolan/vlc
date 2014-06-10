@@ -1218,7 +1218,7 @@ msgstr "Còdec de subtítol de destinació"
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Mòdul de la sortida de vídeo"
+msgstr "Port del client"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -3357,7 +3357,6 @@ msgid "HTTP/TLS Certificate Revocation List"
 msgstr "Llista de revocació de certificats HTTP/TLS"
 
 #: src/libvlc-module.c:846
-#, fuzzy
 msgid ""
 "This file contains an optional CRL to prevent remote clients from using "
 "revoked certificates in TLS sessions."
@@ -5079,7 +5078,7 @@ msgstr "imprimeix la informació de la versió"
 #: src/libvlc-module.c:2690
 #, fuzzy
 msgid "core program"
-msgstr "Trieu un perfil"
+msgstr "programa principal"
 
 #: src/misc/update.c:473
 #, c-format
@@ -13092,12 +13091,12 @@ msgstr "Descodificador de subtítols USF"
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "Descodificador del subtítol de text"
+msgstr "Descodificador de subtítols DVB"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "Subtítols DVB"
+msgstr "Subtítols de teletext"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -14949,7 +14948,7 @@ msgstr "+----[ fi de l'ajuda ]"
 #: modules/control/rc.c:965
 #, fuzzy
 msgid "Press pause to continue."
-msgstr "Escriu «menu select» o «pause» per continuar."
+msgstr "Premeu «menu select» o «pause» per continuar."
 
 #: modules/control/rc.c:1191 modules/control/rc.c:1446
 #: modules/control/rc.c:1490
@@ -19647,7 +19646,6 @@ msgstr ""
 "yourip:8080 per defecte."
 
 #: modules/gui/macosx/wizard.m:265
-#, fuzzy
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
 "This protocol is used as transport method by many Microsoft's software. Note "
@@ -22830,7 +22828,7 @@ msgstr "Obre una aparença..."
 #: modules/hw/vdpau/adjust.c:182
 #, fuzzy
 msgid "VDPAU adjust video filter"
-msgstr "Filtre de vídeo de mirall"
+msgstr "Filtre de vídeo gradfun"
 
 #: modules/hw/vdpau/avcodec.c:45
 #, fuzzy
@@ -22883,7 +22881,7 @@ msgstr "Qualitat del remostreig"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Remostratge de l'àudio d'alta qualitat"
+msgstr "Nivell de postprocessament de la qualitat de vídeo"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -23747,7 +23745,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Mantén la relació d'aspecte"
+msgstr "Fitxer índex"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -26676,7 +26674,7 @@ msgstr "Extreu el filtre de vídeo del component RGB"
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Filtre de desentrellaçat de vídeo"
+msgstr "Filtre de vídeo del trencaclosques interactiu"
 
 #: modules/video_filter/freeze.c:78
 #, fuzzy
@@ -30630,12 +30628,12 @@ msgstr "Direcció del mirall"
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Per defecte"
+msgstr "Flux per defecte"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
 msgid "Chromaprint stream output"
-msgstr "Sortida de flux del fitxer"
+msgstr "S'està obtenint el flux de sortida"
 
 #: modules/text_renderer/platform_fonts.c:82
 msgid ""
@@ -30691,411 +30689,6 @@ msgstr "Reproductor multimèdia VLC - Interfície del web"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Sortida de flux"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Trieu la sortida d'àudio preferida i configureu-la aquí."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Aquests mòduls presten funcions de xarxa a les altres parts del VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Aquests són els paràmetres generals per als mòduls de codificació de "
-#~ "vídeo/àudio/subtítol."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Aquí es poden configurar els proveïdors de diàleg."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "En aquesta secció podeu forçar el comportament del desmultiplexor de "
-#~ "subtítols, per exemple definint el tipus de subtítol o el nom del fitxer."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "No hi ha un descodificador adient"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "El VLC no admet aquest format de vídeo o àudio «%4.4s». Malauradament no "
-#~ "és possible solucionar-ho."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "Camí addicional perquè el VLC pugui cercar els seus mòduls. Podeu afegir "
-#~ "diferents camins mitjançant la concatenació amb «PATH_SEP» per separar-"
-#~ "los."
-
-#~ msgid "Album art policy"
-#~ msgstr "Política de la portada de l'àlbum"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Trieu com baixar la portada de l'àlbum."
-
-#~ msgid "Manual download only"
-#~ msgstr "Només la descàrrega manual"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Quan la pista comença a reproduir-se"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Quan s'afegeix la pista"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Carrega la biblioteca multimèdia"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr ""
-#~ "Habilita aquesta opció perquè la  biblioteca multimèdia basada en SQL es "
-#~ "carregui quan s'iniciï el VLC"
-
-#~ msgid "main program"
-#~ msgstr "programa principal"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "Accés FFmpeg"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "La biblioteca de descodificació de l'AACS del vostre sistema no funciona. "
-#~ "Potser falten claus."
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "L'VLC no ha pogut obrir el fitxer «%s»."
-
-#~ msgid "TCP address to use"
-#~ msgstr "Adreça TCP que s'ha d'utilitzar"
-
-#~ msgid ""
-#~ "TCP address to use to communicate with the video part of the Bar Graph "
-#~ "(default localhost). In the case of bargraph incrustation, use localhost."
-#~ msgstr ""
-#~ "Adreça TCP que s'ha d'utilitzar per comunicar-se amb la part del vídeo de "
-#~ "la gràfica de barres (màquina local per defecte). En cas que la gràfica "
-#~ "de barres estigui incrustada, utilitzeu la màquina local."
-
-#~ msgid "TCP port to use"
-#~ msgstr "Port TCP que s'ha d'utilitzar"
-
-#~ msgid ""
-#~ "TCP port to use to communicate with the video part of the Bar Graph "
-#~ "(default 12345). Use the same port as the one used in the rc interface."
-#~ msgstr ""
-#~ "Adreça TCP que s'ha d'utilitzar per comunicar-se amb la part del vídeo de "
-#~ "la gràfica de barres (12345 per defecte). En cas que la gràfica de barres "
-#~ "estigui incrustada, utilitzeu la màquina local."
-
-#~ msgid "Force connection reset regularly"
-#~ msgstr "Fes que la connexió es reinicii regularment"
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr ""
-#~ "Determina si la connexió TCP s'ha de reiniciar. S'ha d'utilitzar amb "
-#~ "audiobargraph_v (per defecte 1)."
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Filtre d'àudio per a la conversió d'estèreo a mono"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "Descarta la informació d'escapçament"
-
-#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
-#~ msgstr ""
-#~ "Descarta els paràmetres interns d'escapçament (p.ex. des de H.264 SPS)."
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "Acceleració de vídeo (VA) API"
-
-#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
-#~ msgstr "Descodificador de vídeo i API de presentació per a UNIX (VDPAU)"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr ""
-#~ "Si la taxa de bits és 0, feu servir aquest valor per a una qualitat "
-#~ "constant"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "Un valor més gran que 0 habilita el mode de taxa de bits constant"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Habilita la codificació sense pèrdues"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "La codificació sense pèrdues ignora els paràmetres de qualitat i taxa de "
-#~ "bits, així s'aconsegueix una reproducció perfecta de l'original."
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "Fase lineal rectangular"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "Fase lineal diagonal"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "Distància entre fotogrames «P»"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Nombre de fotogrames «P» per GOP"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Amplada dels blocs de compensació de moviment"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Alçada dels blocs de compensació de moviment"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "Superposició dels blocs (%)"
-
-#~ msgid "Amount that each motion block should be overlapped by its neighbours"
-#~ msgstr ""
-#~ "Percentatge de cada bloc de moviment que els seus veïns superposaran."
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "Total horizontal block length including overlaps"
-#~ msgstr ""
-#~ "Longitud total de blocs horitzontals amb les superposicions incloses"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Total vertical block length including overlaps"
-#~ msgstr "Longitud total de blocs verticals amb les superposicions incloses"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "Precisió del vector de moviment"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "Precisió del vector de moviment en píxels."
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "Àrea de cerca Simple ME x:y"
-
-#~ msgid ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-#~ msgstr ""
-#~ "(No recomanat) Realitza una cerca simple de vectors de moviment amb una "
-#~ "coincidència de blocs no jeràrquics amb un interval de cerca de +/-x, +/-y"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Habilita la partició espacial"
-
-#~ msgid "cycles per degree"
-#~ msgstr "cicles per grau"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr ""
-#~ "Codificador de vídeo Dirac que fa servir la biblioteca dirac-research"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Descodificador de vídeo amb openmash"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr ""
-#~ "| menu . . [on|off|amunt|avall|esquerra|dreta|selecciona] utilitza el menú"
-
-#~ msgid "Press menu select or pause to continue."
-#~ msgstr "Premeu «menu select» o «pause» per continuar."
-
-#~ msgid "Type 'menu select' or 'pause' to continue."
-#~ msgstr "Escriu «menu select» o «pause» per continuar."
-
-#~ msgid "Jump to time"
-#~ msgstr "Salta al punt temporal"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Obre el registre de fallades..."
-
-#~ msgid "Don't Send"
-#~ msgstr "No enviïs"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "El VLC ha fallat anteriorment"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Voleu enviar els detalls de la fallada a l'equip de desenvolupament del "
-#~ "VLC?\n"
-#~ "\n"
-#~ "Si voleu, podeu introduir un breu comentari sobre el qual estàveu fent "
-#~ "abans que el VLC fallés i afegir-hi més informació útil: un enllaç on "
-#~ "baixar un fitxer de mostra, un URL d'un flux de xarxa..."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr ""
-#~ "Accepto que es puguin posar en contacte amb mi per respondre a aquest "
-#~ "informe d'errors."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "Només s'enviarà el vostre correu electrònic per defecte, no s'inclourà "
-#~ "cap altra informació."
-
-#~ msgid "Don't ask again"
-#~ msgstr "No ho tornis a demanar"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "No s'ha trobat el registre de fallades"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "No s'han pogut trobar indicis de fallades anteriors."
-
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "Posa en pausa l'iTunes mentre el VLC està en reproducció"
-
-#~ msgid ""
-#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
-#~ "playback will be resumed again if VLC playback is finished."
-#~ msgstr ""
-#~ "Posa en pausa l'iTunes mentre el VLC comença la reproducció. Si es troba "
-#~ "seleccionat, la reproducció d'iTunes es reprendrà novament quan la "
-#~ "reproducció del VLC acabi."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Obre la carpeta BDMV"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Política de baixada de la portada de l'àlbum"
-
-#~ msgid "Output module"
-#~ msgstr "Mòdul de sortida"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Equalitzador gràfic"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Obtén informació dels elements multimèdia automàticament"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Obtén més extensions de "
-
-#~ msgid "Under the Video"
-#~ msgstr "Sota el vídeo"
-
-#~ msgid "&Help..."
-#~ msgstr "A&juda..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Sincronitza amb la pista d'àudio"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Aquesta opció ometrà/duplicarà els fotogrames de vídeo per sincronitzar "
-#~ "la pista de vídeo amb la pista d'àudio."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "El transcodificador ometrà fotogrames si la CPU no pot conservar la taxa "
-#~ "de codificació."
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "Valor dels nivells dels canals d'àudio"
-
-#~ msgid ""
-#~ "Value of the audio level of each channels between 0 and 1. Each level "
-#~ "should be separated with ':'."
-#~ msgstr ""
-#~ "Valor del nivell d'àudio de cada canal entre 0 i 1. Cada nivell ha "
-#~ "d'estar separat per «:». "
-
-#~ msgid "Alarm"
-#~ msgstr "Alarma"
-
-#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
-#~ msgstr "Indica un silenci i mostra l'alerta (0=sense alarma, 1=alarma)."
-
-#~ msgid "Spatial luma strength (default 4)"
-#~ msgstr "Força de la luminància espacial (per defecte, 4)"
-
-#~ msgid "Spatial chroma strength (default 3)"
-#~ msgstr "Força de la crominància espacial (per defecte, 3)"
-
-#~ msgid "Temporal luma strength (default 6)"
-#~ msgstr "Força de la luminància temporal (per defecte, 6)"
-
-#~ msgid "Temporal chroma strength (default 4.5)"
-#~ msgstr "Força de la crominància temporal (per defecte, 4,5)"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "Text de la marquesina que s'ha de mostrar. (Cadenes de format "
-#~ "disponibles: Relacionades amb el temps: %Y = any, %m = mes, %d = dia, %H "
-#~ "= hora, %M = minut, %S = segon, ... Relacionades amb les metadades: $a = "
-#~ "artista, $b = àlbum, $c = copyright, $d = descripció, $e = codificat per, "
-#~ "$g = gènere, $l = idioma, $n = pista número, $p = s'està reproduint, $r = "
-#~ "puntuació, $s = idioma dels subtítols, $t = títol, $u = url, $A = data, "
-#~ "$B = taxa de bits de l'àudio (en kb/s), $C = capítol, $D = durada, $F = "
-#~ "nom complet amb camí, $I = títol, $L = temps de sobra, $N = nom, $O = "
-#~ "idioma de l'àudio, $P = posició (en %), $R = velocitat, $S = velocitat de "
-#~ "mostreig de l'àudio (en kHz), $T = temps, $U = editor, $V = volum, $_ = "
-#~ "nova línia)"
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "Sortida de vídeo OpenGL ES de l'iOS (requereix UIview)"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr ""
-#~ "Sortida de vídeo OpenGL de Mac OS X (requereix un nsobject dibuixable)"
-
-#~ msgid "OpenGL acceleration is not supported on your Mac"
-#~ msgstr "El vostre Mac no admet l'acceleració OpenGL"
-
-#~ msgid ""
-#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
-#~ "output. It will still work, but much slower and with possibly unexpected "
-#~ "results."
-#~ msgstr ""
-#~ "Al vostre Mac li manca l'acceleració Quartz Extreme necessària per a la "
-#~ "sortida de vídeo. Funciona de totes maneres però molt més lent i amb "
-#~ "possibles resultats inesperats."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Utilitza un fitxer de sub&títol"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Política de baixada de la portada de l'àlbum:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Configura la biblioteca multimèdia"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -34170,6 +33763,411 @@ msgstr "Sortida de flux"
 #~ msgstr ""
 #~ "(c) 1996-2004 - L'equip de VideoLAN\n"
 #~ "\n"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Trieu la sortida d'àudio preferida i configureu-la aquí."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Aquests mòduls presten funcions de xarxa a les altres parts del VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Aquests són els paràmetres generals per als mòduls de codificació de "
+#~ "vídeo/àudio/subtítol."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Aquí es poden configurar els proveïdors de diàleg."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "En aquesta secció podeu forçar el comportament del desmultiplexor de "
+#~ "subtítols, per exemple definint el tipus de subtítol o el nom del fitxer."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "No hi ha un descodificador adient"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "El VLC no admet aquest format de vídeo o àudio «%4.4s». Malauradament no "
+#~ "és possible solucionar-ho."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "Camí addicional perquè el VLC pugui cercar els seus mòduls. Podeu afegir "
+#~ "diferents camins mitjançant la concatenació amb «PATH_SEP» per separar-"
+#~ "los."
+
+#~ msgid "Album art policy"
+#~ msgstr "Política de la portada de l'àlbum"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Trieu com baixar la portada de l'àlbum."
+
+#~ msgid "Manual download only"
+#~ msgstr "Només la descàrrega manual"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Quan la pista comença a reproduir-se"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Quan s'afegeix la pista"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Carrega la biblioteca multimèdia"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr ""
+#~ "Habilita aquesta opció perquè la  biblioteca multimèdia basada en SQL es "
+#~ "carregui quan s'iniciï el VLC"
+
+#~ msgid "main program"
+#~ msgstr "programa principal"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "Accés FFmpeg"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "La biblioteca de descodificació de l'AACS del vostre sistema no funciona. "
+#~ "Potser falten claus."
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "L'VLC no ha pogut obrir el fitxer «%s»."
+
+#~ msgid "TCP address to use"
+#~ msgstr "Adreça TCP que s'ha d'utilitzar"
+
+#~ msgid ""
+#~ "TCP address to use to communicate with the video part of the Bar Graph "
+#~ "(default localhost). In the case of bargraph incrustation, use localhost."
+#~ msgstr ""
+#~ "Adreça TCP que s'ha d'utilitzar per comunicar-se amb la part del vídeo de "
+#~ "la gràfica de barres (màquina local per defecte). En cas que la gràfica "
+#~ "de barres estigui incrustada, utilitzeu la màquina local."
+
+#~ msgid "TCP port to use"
+#~ msgstr "Port TCP que s'ha d'utilitzar"
+
+#~ msgid ""
+#~ "TCP port to use to communicate with the video part of the Bar Graph "
+#~ "(default 12345). Use the same port as the one used in the rc interface."
+#~ msgstr ""
+#~ "Adreça TCP que s'ha d'utilitzar per comunicar-se amb la part del vídeo de "
+#~ "la gràfica de barres (12345 per defecte). En cas que la gràfica de barres "
+#~ "estigui incrustada, utilitzeu la màquina local."
+
+#~ msgid "Force connection reset regularly"
+#~ msgstr "Fes que la connexió es reinicii regularment"
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr ""
+#~ "Determina si la connexió TCP s'ha de reiniciar. S'ha d'utilitzar amb "
+#~ "audiobargraph_v (per defecte 1)."
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Filtre d'àudio per a la conversió d'estèreo a mono"
+
+#~ msgid "Discard cropping information"
+#~ msgstr "Descarta la informació d'escapçament"
+
+#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
+#~ msgstr ""
+#~ "Descarta els paràmetres interns d'escapçament (p.ex. des de H.264 SPS)."
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "Acceleració de vídeo (VA) API"
+
+#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
+#~ msgstr "Descodificador de vídeo i API de presentació per a UNIX (VDPAU)"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr ""
+#~ "Si la taxa de bits és 0, feu servir aquest valor per a una qualitat "
+#~ "constant"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "Un valor més gran que 0 habilita el mode de taxa de bits constant"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Habilita la codificació sense pèrdues"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "La codificació sense pèrdues ignora els paràmetres de qualitat i taxa de "
+#~ "bits, així s'aconsegueix una reproducció perfecta de l'original."
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "Fase lineal rectangular"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "Fase lineal diagonal"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Distància entre fotogrames «P»"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Nombre de fotogrames «P» per GOP"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "Amplada dels blocs de compensació de moviment"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "Alçada dels blocs de compensació de moviment"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "Superposició dels blocs (%)"
+
+#~ msgid "Amount that each motion block should be overlapped by its neighbours"
+#~ msgstr ""
+#~ "Percentatge de cada bloc de moviment que els seus veïns superposaran."
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "Total horizontal block length including overlaps"
+#~ msgstr ""
+#~ "Longitud total de blocs horitzontals amb les superposicions incloses"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Total vertical block length including overlaps"
+#~ msgstr "Longitud total de blocs verticals amb les superposicions incloses"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "Precisió del vector de moviment"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "Precisió del vector de moviment en píxels."
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "Àrea de cerca Simple ME x:y"
+
+#~ msgid ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+#~ msgstr ""
+#~ "(No recomanat) Realitza una cerca simple de vectors de moviment amb una "
+#~ "coincidència de blocs no jeràrquics amb un interval de cerca de +/-x, +/-y"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Habilita la partició espacial"
+
+#~ msgid "cycles per degree"
+#~ msgstr "cicles per grau"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr ""
+#~ "Codificador de vídeo Dirac que fa servir la biblioteca dirac-research"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Descodificador de vídeo amb openmash"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr ""
+#~ "| menu . . [on|off|amunt|avall|esquerra|dreta|selecciona] utilitza el menú"
+
+#~ msgid "Press menu select or pause to continue."
+#~ msgstr "Premeu «menu select» o «pause» per continuar."
+
+#~ msgid "Type 'menu select' or 'pause' to continue."
+#~ msgstr "Escriu «menu select» o «pause» per continuar."
+
+#~ msgid "Jump to time"
+#~ msgstr "Salta al punt temporal"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Obre el registre de fallades..."
+
+#~ msgid "Don't Send"
+#~ msgstr "No enviïs"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "El VLC ha fallat anteriorment"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Voleu enviar els detalls de la fallada a l'equip de desenvolupament del "
+#~ "VLC?\n"
+#~ "\n"
+#~ "Si voleu, podeu introduir un breu comentari sobre el qual estàveu fent "
+#~ "abans que el VLC fallés i afegir-hi més informació útil: un enllaç on "
+#~ "baixar un fitxer de mostra, un URL d'un flux de xarxa..."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr ""
+#~ "Accepto que es puguin posar en contacte amb mi per respondre a aquest "
+#~ "informe d'errors."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "Només s'enviarà el vostre correu electrònic per defecte, no s'inclourà "
+#~ "cap altra informació."
+
+#~ msgid "Don't ask again"
+#~ msgstr "No ho tornis a demanar"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "No s'ha trobat el registre de fallades"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "No s'han pogut trobar indicis de fallades anteriors."
+
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "Posa en pausa l'iTunes mentre el VLC està en reproducció"
+
+#~ msgid ""
+#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
+#~ "playback will be resumed again if VLC playback is finished."
+#~ msgstr ""
+#~ "Posa en pausa l'iTunes mentre el VLC comença la reproducció. Si es troba "
+#~ "seleccionat, la reproducció d'iTunes es reprendrà novament quan la "
+#~ "reproducció del VLC acabi."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Obre la carpeta BDMV"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Política de baixada de la portada de l'àlbum"
+
+#~ msgid "Output module"
+#~ msgstr "Mòdul de sortida"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Equalitzador gràfic"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Obtén informació dels elements multimèdia automàticament"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "Obtén més extensions de "
+
+#~ msgid "Under the Video"
+#~ msgstr "Sota el vídeo"
+
+#~ msgid "&Help..."
+#~ msgstr "A&juda..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Sincronitza amb la pista d'àudio"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Aquesta opció ometrà/duplicarà els fotogrames de vídeo per sincronitzar "
+#~ "la pista de vídeo amb la pista d'àudio."
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "El transcodificador ometrà fotogrames si la CPU no pot conservar la taxa "
+#~ "de codificació."
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "Valor dels nivells dels canals d'àudio"
+
+#~ msgid ""
+#~ "Value of the audio level of each channels between 0 and 1. Each level "
+#~ "should be separated with ':'."
+#~ msgstr ""
+#~ "Valor del nivell d'àudio de cada canal entre 0 i 1. Cada nivell ha "
+#~ "d'estar separat per «:». "
+
+#~ msgid "Alarm"
+#~ msgstr "Alarma"
+
+#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+#~ msgstr "Indica un silenci i mostra l'alerta (0=sense alarma, 1=alarma)."
+
+#~ msgid "Spatial luma strength (default 4)"
+#~ msgstr "Força de la luminància espacial (per defecte, 4)"
+
+#~ msgid "Spatial chroma strength (default 3)"
+#~ msgstr "Força de la crominància espacial (per defecte, 3)"
+
+#~ msgid "Temporal luma strength (default 6)"
+#~ msgstr "Força de la luminància temporal (per defecte, 6)"
+
+#~ msgid "Temporal chroma strength (default 4.5)"
+#~ msgstr "Força de la crominància temporal (per defecte, 4,5)"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "Text de la marquesina que s'ha de mostrar. (Cadenes de format "
+#~ "disponibles: Relacionades amb el temps: %Y = any, %m = mes, %d = dia, %H "
+#~ "= hora, %M = minut, %S = segon, ... Relacionades amb les metadades: $a = "
+#~ "artista, $b = àlbum, $c = copyright, $d = descripció, $e = codificat per, "
+#~ "$g = gènere, $l = idioma, $n = pista número, $p = s'està reproduint, $r = "
+#~ "puntuació, $s = idioma dels subtítols, $t = títol, $u = url, $A = data, "
+#~ "$B = taxa de bits de l'àudio (en kb/s), $C = capítol, $D = durada, $F = "
+#~ "nom complet amb camí, $I = títol, $L = temps de sobra, $N = nom, $O = "
+#~ "idioma de l'àudio, $P = posició (en %), $R = velocitat, $S = velocitat de "
+#~ "mostreig de l'àudio (en kHz), $T = temps, $U = editor, $V = volum, $_ = "
+#~ "nova línia)"
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "Sortida de vídeo OpenGL ES de l'iOS (requereix UIview)"
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr ""
+#~ "Sortida de vídeo OpenGL de Mac OS X (requereix un nsobject dibuixable)"
+
+#~ msgid "OpenGL acceleration is not supported on your Mac"
+#~ msgstr "El vostre Mac no admet l'acceleració OpenGL"
+
+#~ msgid ""
+#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
+#~ "output. It will still work, but much slower and with possibly unexpected "
+#~ "results."
+#~ msgstr ""
+#~ "Al vostre Mac li manca l'acceleració Quartz Extreme necessària per a la "
+#~ "sortida de vídeo. Funciona de totes maneres però molt més lent i amb "
+#~ "possibles resultats inesperats."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Utilitza un fitxer de sub&títol"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Política de baixada de la portada de l'àlbum:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Configura la biblioteca multimèdia"
 
 #, fuzzy
 #~ msgid "Display OSD menu on top of video output"
