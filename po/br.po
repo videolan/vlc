@@ -357,7 +357,7 @@ msgstr "Arventennoù kemplesoc'h"
 #: include/vlc_input.h:568
 #, fuzzy
 msgid "Subtitle track added"
-msgstr "Loabr an istitl"
+msgstr "Loabr an istitloù : %s "
 
 #: include/vlc_interface.h:140
 msgid ""
@@ -1094,7 +1094,7 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Mollad an ec'hankad video"
+msgstr "Porzhun arval"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -10870,9 +10870,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Forzhañ an aelad"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -10882,9 +10881,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Anv ar bonez"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -10905,9 +10903,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:79
-#, fuzzy
 msgid "Group of Picture Reference Distance"
-msgstr "Anv an eriol red "
+msgstr ""
 
 #: modules/codec/qsv.c:81
 msgid ""
@@ -10926,9 +10923,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Digenweañ"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -10992,9 +10988,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Kas binarel"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11041,9 +11036,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Niver a renkoù"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -11813,7 +11807,7 @@ msgstr "Ezvoneger istitloù USF"
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "Ezvoneger istitloù Teletext"
+msgstr "Ezvonegeran istitloù DVB"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
@@ -16248,7 +16242,7 @@ msgstr "URI"
 #: modules/gui/macosx/MainMenu.m:81
 #, fuzzy
 msgid "File Size"
-msgstr "Ment an nodrezh"
+msgstr "Enankad ar restr"
 
 #: modules/gui/macosx/MainMenu.m:316
 msgid "Check for Update..."
@@ -20935,7 +20929,7 @@ msgstr "Ec'hankad YUV"
 #: modules/hw/vdpau/sharpen.c:141
 #, fuzzy
 msgid "VDPAU sharpen video filter"
-msgstr "Klonañ ar sil video"
+msgstr "Dilemel sil ar videoioù"
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -24376,7 +24370,7 @@ msgstr ""
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Digenweañ ar video"
+msgstr "Tuginañ sil ar video"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freeze"
@@ -27917,7 +27911,7 @@ msgstr ""
 #: modules/control/win_msg.c:193
 #, fuzzy
 msgid "Windows messages interface"
-msgstr "Ketal Qt"
+msgstr "Ketal Ncurses"
 
 #: modules/gui/macosx/DebugMessageVisualizer.m:93
 msgid "Save this Log..."
@@ -28083,58 +28077,6 @@ msgstr "Lenner mediaoù VLC - Ketal web"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Ec'hankad al lanv"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Diuzañ hoc'h ec'hankad video ha kefluniañ anezhañ amañ."
-
-#~ msgid "Manual download only"
-#~ msgstr "Pellgargadurioù dre zorn nemetken"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Kargañ al levraoueg mediaoù"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "Haeziñ FFmpeg"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Gweredakaat an enbonegañ hep koll"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Jump to time"
-#~ msgstr "Lamm d'an eur"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Digeriñ kerzhlevr kudennoù..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Na kas ket"
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Digeriñ an teuliad BDMV"
-
-#~ msgid "Output module"
-#~ msgstr "Mollad an ec'hankad"
-
-#~ msgid "&Help..."
-#~ msgstr "&Skoazell..."
-
-#~ msgid "Alarm"
-#~ msgstr "Evezh"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Arverañ ar restr is titloù"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Kefluniaén al levraoueg mediaoù"
 
 #~ msgid "Modules search path"
 #~ msgstr "Mollad klask an treug"
@@ -28471,6 +28413,58 @@ msgstr "Ec'hankad al lanv"
 
 #~ msgid "Text alignment:"
 #~ msgstr "Desteudañ an destenn :"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Diuzañ hoc'h ec'hankad video ha kefluniañ anezhañ amañ."
+
+#~ msgid "Manual download only"
+#~ msgstr "Pellgargadurioù dre zorn nemetken"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Kargañ al levraoueg mediaoù"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "Haeziñ FFmpeg"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Gweredakaat an enbonegañ hep koll"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Jump to time"
+#~ msgstr "Lamm d'an eur"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Digeriñ kerzhlevr kudennoù..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Na kas ket"
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Digeriñ an teuliad BDMV"
+
+#~ msgid "Output module"
+#~ msgstr "Mollad an ec'hankad"
+
+#~ msgid "&Help..."
+#~ msgstr "&Skoazell..."
+
+#~ msgid "Alarm"
+#~ msgstr "Evezh"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Arverañ ar restr is titloù"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Kefluniaén al levraoueg mediaoù"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
