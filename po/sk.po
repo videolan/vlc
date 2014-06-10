@@ -1218,7 +1218,7 @@ msgstr "Cieľový kodek titulkov"
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Modul výstupu videa"
+msgstr "Port klienta"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -3346,7 +3346,6 @@ msgid "HTTP/TLS Certificate Revocation List"
 msgstr "Zoznam odvolaných certifikátorv HTTP/TLS"
 
 #: src/libvlc-module.c:846
-#, fuzzy
 msgid ""
 "This file contains an optional CRL to prevent remote clients from using "
 "revoked certificates in TLS sessions."
@@ -12928,7 +12927,7 @@ msgstr "Dekodér USF titulkov"
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "Dekodér textových titulkov"
+msgstr "Dekodér DVB titulkov"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
@@ -19480,7 +19479,6 @@ msgstr ""
 "vašaipadresa:8080. "
 
 #: modules/gui/macosx/wizard.m:265
-#, fuzzy
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
 "This protocol is used as transport method by many Microsoft's software. Note "
@@ -22705,7 +22703,7 @@ msgstr "Kvalita prevzorkovania"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Prevzorkovanie vysoko kvalitného zvuku"
+msgstr "Kvalitatívna úroveň dodatočného spracovávania videa"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -23577,7 +23575,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Zachovať stranový pomer"
+msgstr "Súbor s indexom"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -26515,7 +26513,7 @@ msgstr "Extrahovať RGB komponent filtra videa"
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Filter videa pre odstránenie prekladania"
+msgstr "Interaktívny puzzle filter"
 
 #: modules/video_filter/freeze.c:78
 #, fuzzy
@@ -30197,7 +30195,7 @@ msgstr "Zaznamenávanie videa"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "Program VLC nemohol otvoriť modul dekodéra."
+msgstr "Výstupný zvukový modul"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -30510,406 +30508,6 @@ msgstr "VLC media player - Webové rozhranie"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Výstup streamu"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Tu si môžete vybrať preferovaný výstup videa a nakonfigurovať ho. "
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "Tieto moduly zabezpečujú fungovanie siete pre ostatné časti VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Tu sú všeobecné nastavenia kódovacích modulov videa/zvuku/titulkov. "
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Tu môžete nastaviť parametre pre poskytovanie dialógov."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "V tejto časti si môžete určiť, ako sa bude správať demuxér titulkov, "
-#~ "môžete napríklad nastaviť typ titulkov alebo názov súboru."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Nie je dostupný žiadny vhodný modul dekodéra"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC nepodporuje formát videa alebo zvuku \"%4.4s\". Túto chybu momentálne "
-#~ "nie je možné odstrániť."
-
-#, fuzzy
-#~ msgid ""
-#~ "This file contains an optional CRL to prevent remove clients from using "
-#~ "revoked certificates in TLS sessions."
-#~ msgstr ""
-#~ "Tento súbor obsahuje doplnkový zoznam zrušených certifikátov na "
-#~ "zabránenie tomu, aby vzdialení klienti používali zamietnuté certifikáty v "
-#~ "reláciách TLS."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "Tu môžete zadať cestu k ďalšiemu priečinku, v ktorom sa budú vyhľadávať "
-#~ "prídavné moduly pre program VLC. Môžete pridať aj reťazec ciest, "
-#~ "oddelených znakmi \" PATH_SEP \""
-
-#~ msgid "Album art policy"
-#~ msgstr "Metóda zisťovania albumu"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Vyberte si, kedy sa má stiahnuť druh albumu."
-
-#~ msgid "Manual download only"
-#~ msgstr "Stiahnuť manuálne"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Keď sa začne prehrávať stopa z albumu"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Hneď po pridaní stopy"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Načítať knižnicu s médiami"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr ""
-#~ "Zapnúť túto voľbu pre našítanie knižnice médií na základe SQL, pri štarte "
-#~ "programu VLC"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "Prístup FFmpeg"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "Vaša systémová knižnica pre dekódovanie AACS nie je funkčná. Chýbajúce "
-#~ "kľúče?"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "Program VLC nemôže otvoriť súbor \"%s\". (%m)"
-
-#~ msgid "TCP address to use"
-#~ msgstr "TCP adresa, ktorá sa použije"
-
-#~ msgid ""
-#~ "TCP address to use to communicate with the video part of the Bar Graph "
-#~ "(default localhost). In the case of bargraph incrustation, use localhost."
-#~ msgstr ""
-#~ "TCP adresa, ktorá sa má použiť na komunikáciu s video časťou súčasti Bar "
-#~ "Graph (predvolená adresa: localhost). V prípade inkrustácie, použite "
-#~ "adresu: localhost."
-
-#~ msgid "TCP port to use"
-#~ msgstr "TCP port, ktorý sa použije"
-
-#~ msgid ""
-#~ "TCP port to use to communicate with the video part of the Bar Graph "
-#~ "(default 12345). Use the same port as the one used in the rc interface."
-#~ msgstr ""
-#~ "TPC port, ktorý sa má použiť na komunikáciu s video časťou súčasti Bar "
-#~ "Graph (predvolená hodnota je: 12345). Použite ten istý port, ako ten, "
-#~ "ktorý ste použili v rozhraní RC."
-
-#~ msgid "Force connection reset regularly"
-#~ msgstr "Pravidelne si vynútiť reset pripojenia"
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr ""
-#~ "Určuje, či sa má TCP spojenie resetovať. Toto nastavenie je použité "
-#~ "vtedy, ak je použitá funkcia audiobargraph_v. Predvolená hodnota je 1."
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Zvukový filter pre konverziu formátu stereo na mono"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "Zlikvidovať informácie o vystrihovaní"
-
-#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
-#~ msgstr ""
-#~ "Zlikvidovať interné parametre pre vystrihovanie (napríklad z H.264 SPS)."
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "Akcelerácia videa (VA) API"
-
-#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
-#~ msgstr "API pre dekódovanie videa a prezentáciu, pre Unix (VDPAU)"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr ""
-#~ "Ak dátový tok = 0, použije sa táto hodnota ako faktor konštantnej kvality"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "Hodnota väčšia ako 0 zapne režim konštantného dátového toku"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Zapnúť bezstratové kódovanie"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "Bezstratové kódovane neberie ohľad na dátový tok a nastavenia kvality, "
-#~ "umožňuje perfektnú reprodukciu originálnej skladby"
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "Obdĺžníková lineárna fáza"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "Diagonálna lineárna fáza"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "Vzdialenosť medzi P-snímkami"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Počet P snímkov na GOP"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Šírka blokov pre kompenzáciu pohybu"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Výška blokov pre kompenzáciu pohybu"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "Prekrývanie blokov (%)"
-
-#~ msgid "Amount that each motion block should be overlapped by its neighbours"
-#~ msgstr "Udáva časť bloku, ktorá môže byť prekrytá susednými blokmi"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "Total horizontal block length including overlaps"
-#~ msgstr "Celková horizontálna dĺžka bloku vrátane prekrytia"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Total vertical block length including overlaps"
-#~ msgstr "Celková vertikálna dĺžka bloku vrátane prekrytia"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "Presnosť vektorov pohybu"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "Presnosť vektorov pohybu (v jednotkách pels)."
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "Jednoduchá oblasť vyhľadávania ME x:y"
-
-#~ msgid ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-#~ msgstr ""
-#~ "(Neodporúča sa) Vykonať jednoduché (nehierarchické blokové vektory pohybu "
-#~ "vyhľadať s použitím rozsahu +/yx, +/-y)"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Zapnúť rozdeľovanie priestoru"
-
-#~ msgid "cycles per degree"
-#~ msgstr "Cyklov na stupeň"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Kodér videa Dirac s použitím knižnice dirac-research"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Video dekodér s použitím openmash"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr "| menu . .  [on|off|up|down|left|right|select] pouzitie menu"
-
-#~ msgid "Jump to time"
-#~ msgstr "Preskočiť na čas"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Otvoriť záznam o havárii programu"
-
-#~ msgid "Don't Send"
-#~ msgstr "Neodosielať"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "Program VLC bol naposledy ukončený predčasne"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Chcete odoslať údaje o predčasnom ukončení programu VLC vývojovému tímu?\n"
-#~ "\n"
-#~ "Ak chcete, môžete krátko popísať, čo ste robili pred ukončením programu a "
-#~ "pridať iné užitočné informácie: odkaz na stiahnutie súboru, URL adresu "
-#~ "streamu a podobne,..."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr ""
-#~ "Súhlasím s tým, aby ma autori programu mohli kontaktovať za účelom popisu "
-#~ "tejto chyby."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "Odošle sa len vaša predvolená e-mailová adresa, bez akýchkoľvek ďalších "
-#~ "informácií."
-
-#~ msgid "Don't ask again"
-#~ msgstr "Už sa viac nepýtať"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Nenašiel sa žiaden záznam o havárii programu"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr ""
-#~ "Nemožno nájsť žiadnu stopu svedčiacu o predčasnom ukončení / chybe "
-#~ "programu."
-
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "Pozastaviť iTunes počas prehrávania VLC"
-
-#~ msgid ""
-#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
-#~ "playback will be resumed again if VLC playback is finished."
-#~ msgstr ""
-#~ "Pozastaví prehrávanie z iTunes ak začne prehrávanie v programe VLC. Ak je "
-#~ "vybraná táto možnosť, prehrávanie z iTunes bude opäť pokračovať po "
-#~ "skončení prehrávania programu VLC."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Otvoriť priečinok BDMV"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Metóda sťahovania druhu albumu"
-
-#~ msgid "Output module"
-#~ msgstr "Výstupný modul"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Grafický ekvalizér"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Automaticky preberať informáciu o médiu"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Viac rozšírení nájdete na stránke: "
-
-#~ msgid "Under the Video"
-#~ msgstr "Pod videom"
-
-#~ msgid "&Help..."
-#~ msgstr "&Pomocník..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Synchronizovať so zvukovou stopou"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Táto voľba spôsobí to, že niektoré snímky sa z videa vystrihnú alebo sa "
-#~ "budú opakovať. Cieľom je dosiahnuť synchrónnosť zvuku a videa."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "Pri prekódovaní sa preskočia niektoré snímky v prípade, že váš procesor "
-#~ "nie je schopný takého rýchleho kódovania."
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "Hodnota úrovní pre zvukové kanály"
-
-#~ msgid ""
-#~ "Value of the audio level of each channels between 0 and 1. Each level "
-#~ "should be separated with ':'."
-#~ msgstr ""
-#~ "Hodnota úrovne zvuku pre každý kanál, medzi 0 a 1. Každá úroveň by sa "
-#~ "mala oddeliť znakom ':'."
-
-#~ msgid "Alarm"
-#~ msgstr "Upozornenie (alarm)"
-
-#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
-#~ msgstr ""
-#~ "Signalizuje ticho a zobrazí upozornenie (0=žiadne upozornenie, "
-#~ "1=upozornenie)."
-
-#~ msgid "Spatial luma strength (default 4)"
-#~ msgstr "Intenzita priestorového jasu luma (predvolená: 4)"
-
-#~ msgid "Spatial chroma strength (default 3)"
-#~ msgstr "Intenzita priestorovej farebnej sýtosti (predvolená: 3)"
-
-#~ msgid "Temporal luma strength (default 6)"
-#~ msgstr "Intenzita dočasného jasu luma (predvolená: 6)"
-
-#~ msgid "Temporal chroma strength (default 4.5)"
-#~ msgstr "Intenzita dočasnej sýtosti chroma (predvolená = 4.5)"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "Text, ktorý sa zobrazí v značke. (Dostupné sú formátovacie príkazy: "
-#~ "Časové: %Y = rok, %m = mesiac, %d = deň, %H = hodina, %M = minúta, %S = "
-#~ "sekunda, ... Metadáta: $a = umelec, $b = album, $c = copyright, $d = "
-#~ "popis, $e = kódované, $g = žáner, $l = jazyk, $n = číslo stopy, $p = "
-#~ "práve sa prehráva, $r = hodnotenie, $s = jazyk titulkov, $t = názov, $u = "
-#~ "url adresa, $A = dátum, $B = dátový tok zvuku (v kb/s), $C = kapitola,$D "
-#~ "= trvanie, $F = plný názov s cestou, $I = názov, $L = zostávajúci čas, $N "
-#~ "= názov, $O = jazyk zvuk. stopy, $P = pozícia (v %), $R = hodnotenie, $S "
-#~ "= vzorkovacia frekvencia zvuku (v kHz), $T = čas, $U = vydavateľ, $V = "
-#~ "hlasitosť, $_ = nový riadok) "
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "Výstup videa iOS OpenGL ES (vyžaduje UIView)"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr ""
-#~ "Výstup videa Mac OS X OpenGL (vyžaduje sa vykresliteľná súčasť nsobject)"
-
-#~ msgid "OpenGL acceleration is not supported on your Mac"
-#~ msgstr "Na vašom počítači Mac nie je podporovaná akcelerácia OpenGL"
-
-#~ msgid ""
-#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
-#~ "output. It will still work, but much slower and with possibly unexpected "
-#~ "results."
-#~ msgstr ""
-#~ "Váš počítač Mac nepodporuje akceleráciu Quartz Extreme, ktorá je "
-#~ "vyžadovaná pre výstup videa. Bude fungovať, avšak oveľa pomalšie a s "
-#~ "nepredvídateľnými výsledkami."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Použiť súbor s ti&tulkami"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Stiahnuť druh albumu:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Konfigurovať knižnicu s médiami"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -32840,6 +32438,406 @@ msgstr "Výstup streamu"
 #, fuzzy
 #~ msgid "iSight Capture Input"
 #~ msgstr "Vstup pre zvukové záznamy ALSA"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Tu si môžete vybrať preferovaný výstup videa a nakonfigurovať ho. "
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "Tieto moduly zabezpečujú fungovanie siete pre ostatné časti VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Tu sú všeobecné nastavenia kódovacích modulov videa/zvuku/titulkov. "
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Tu môžete nastaviť parametre pre poskytovanie dialógov."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "V tejto časti si môžete určiť, ako sa bude správať demuxér titulkov, "
+#~ "môžete napríklad nastaviť typ titulkov alebo názov súboru."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Nie je dostupný žiadny vhodný modul dekodéra"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC nepodporuje formát videa alebo zvuku \"%4.4s\". Túto chybu momentálne "
+#~ "nie je možné odstrániť."
+
+#, fuzzy
+#~ msgid ""
+#~ "This file contains an optional CRL to prevent remove clients from using "
+#~ "revoked certificates in TLS sessions."
+#~ msgstr ""
+#~ "Tento súbor obsahuje doplnkový zoznam zrušených certifikátov na "
+#~ "zabránenie tomu, aby vzdialení klienti používali zamietnuté certifikáty v "
+#~ "reláciách TLS."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "Tu môžete zadať cestu k ďalšiemu priečinku, v ktorom sa budú vyhľadávať "
+#~ "prídavné moduly pre program VLC. Môžete pridať aj reťazec ciest, "
+#~ "oddelených znakmi \" PATH_SEP \""
+
+#~ msgid "Album art policy"
+#~ msgstr "Metóda zisťovania albumu"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Vyberte si, kedy sa má stiahnuť druh albumu."
+
+#~ msgid "Manual download only"
+#~ msgstr "Stiahnuť manuálne"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Keď sa začne prehrávať stopa z albumu"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Hneď po pridaní stopy"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Načítať knižnicu s médiami"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr ""
+#~ "Zapnúť túto voľbu pre našítanie knižnice médií na základe SQL, pri štarte "
+#~ "programu VLC"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "Prístup FFmpeg"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "Vaša systémová knižnica pre dekódovanie AACS nie je funkčná. Chýbajúce "
+#~ "kľúče?"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "Program VLC nemôže otvoriť súbor \"%s\". (%m)"
+
+#~ msgid "TCP address to use"
+#~ msgstr "TCP adresa, ktorá sa použije"
+
+#~ msgid ""
+#~ "TCP address to use to communicate with the video part of the Bar Graph "
+#~ "(default localhost). In the case of bargraph incrustation, use localhost."
+#~ msgstr ""
+#~ "TCP adresa, ktorá sa má použiť na komunikáciu s video časťou súčasti Bar "
+#~ "Graph (predvolená adresa: localhost). V prípade inkrustácie, použite "
+#~ "adresu: localhost."
+
+#~ msgid "TCP port to use"
+#~ msgstr "TCP port, ktorý sa použije"
+
+#~ msgid ""
+#~ "TCP port to use to communicate with the video part of the Bar Graph "
+#~ "(default 12345). Use the same port as the one used in the rc interface."
+#~ msgstr ""
+#~ "TPC port, ktorý sa má použiť na komunikáciu s video časťou súčasti Bar "
+#~ "Graph (predvolená hodnota je: 12345). Použite ten istý port, ako ten, "
+#~ "ktorý ste použili v rozhraní RC."
+
+#~ msgid "Force connection reset regularly"
+#~ msgstr "Pravidelne si vynútiť reset pripojenia"
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr ""
+#~ "Určuje, či sa má TCP spojenie resetovať. Toto nastavenie je použité "
+#~ "vtedy, ak je použitá funkcia audiobargraph_v. Predvolená hodnota je 1."
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Zvukový filter pre konverziu formátu stereo na mono"
+
+#~ msgid "Discard cropping information"
+#~ msgstr "Zlikvidovať informácie o vystrihovaní"
+
+#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
+#~ msgstr ""
+#~ "Zlikvidovať interné parametre pre vystrihovanie (napríklad z H.264 SPS)."
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "Akcelerácia videa (VA) API"
+
+#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
+#~ msgstr "API pre dekódovanie videa a prezentáciu, pre Unix (VDPAU)"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr ""
+#~ "Ak dátový tok = 0, použije sa táto hodnota ako faktor konštantnej kvality"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "Hodnota väčšia ako 0 zapne režim konštantného dátového toku"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Zapnúť bezstratové kódovanie"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "Bezstratové kódovane neberie ohľad na dátový tok a nastavenia kvality, "
+#~ "umožňuje perfektnú reprodukciu originálnej skladby"
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "Obdĺžníková lineárna fáza"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "Diagonálna lineárna fáza"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Vzdialenosť medzi P-snímkami"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Počet P snímkov na GOP"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "Šírka blokov pre kompenzáciu pohybu"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "Výška blokov pre kompenzáciu pohybu"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "Prekrývanie blokov (%)"
+
+#~ msgid "Amount that each motion block should be overlapped by its neighbours"
+#~ msgstr "Udáva časť bloku, ktorá môže byť prekrytá susednými blokmi"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "Total horizontal block length including overlaps"
+#~ msgstr "Celková horizontálna dĺžka bloku vrátane prekrytia"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Total vertical block length including overlaps"
+#~ msgstr "Celková vertikálna dĺžka bloku vrátane prekrytia"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "Presnosť vektorov pohybu"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "Presnosť vektorov pohybu (v jednotkách pels)."
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "Jednoduchá oblasť vyhľadávania ME x:y"
+
+#~ msgid ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+#~ msgstr ""
+#~ "(Neodporúča sa) Vykonať jednoduché (nehierarchické blokové vektory pohybu "
+#~ "vyhľadať s použitím rozsahu +/yx, +/-y)"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Zapnúť rozdeľovanie priestoru"
+
+#~ msgid "cycles per degree"
+#~ msgstr "Cyklov na stupeň"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Kodér videa Dirac s použitím knižnice dirac-research"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Video dekodér s použitím openmash"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr "| menu . .  [on|off|up|down|left|right|select] pouzitie menu"
+
+#~ msgid "Jump to time"
+#~ msgstr "Preskočiť na čas"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Otvoriť záznam o havárii programu"
+
+#~ msgid "Don't Send"
+#~ msgstr "Neodosielať"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "Program VLC bol naposledy ukončený predčasne"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Chcete odoslať údaje o predčasnom ukončení programu VLC vývojovému tímu?\n"
+#~ "\n"
+#~ "Ak chcete, môžete krátko popísať, čo ste robili pred ukončením programu a "
+#~ "pridať iné užitočné informácie: odkaz na stiahnutie súboru, URL adresu "
+#~ "streamu a podobne,..."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr ""
+#~ "Súhlasím s tým, aby ma autori programu mohli kontaktovať za účelom popisu "
+#~ "tejto chyby."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "Odošle sa len vaša predvolená e-mailová adresa, bez akýchkoľvek ďalších "
+#~ "informácií."
+
+#~ msgid "Don't ask again"
+#~ msgstr "Už sa viac nepýtať"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Nenašiel sa žiaden záznam o havárii programu"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr ""
+#~ "Nemožno nájsť žiadnu stopu svedčiacu o predčasnom ukončení / chybe "
+#~ "programu."
+
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "Pozastaviť iTunes počas prehrávania VLC"
+
+#~ msgid ""
+#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
+#~ "playback will be resumed again if VLC playback is finished."
+#~ msgstr ""
+#~ "Pozastaví prehrávanie z iTunes ak začne prehrávanie v programe VLC. Ak je "
+#~ "vybraná táto možnosť, prehrávanie z iTunes bude opäť pokračovať po "
+#~ "skončení prehrávania programu VLC."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Otvoriť priečinok BDMV"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Metóda sťahovania druhu albumu"
+
+#~ msgid "Output module"
+#~ msgstr "Výstupný modul"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Grafický ekvalizér"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Automaticky preberať informáciu o médiu"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "Viac rozšírení nájdete na stránke: "
+
+#~ msgid "Under the Video"
+#~ msgstr "Pod videom"
+
+#~ msgid "&Help..."
+#~ msgstr "&Pomocník..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Synchronizovať so zvukovou stopou"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Táto voľba spôsobí to, že niektoré snímky sa z videa vystrihnú alebo sa "
+#~ "budú opakovať. Cieľom je dosiahnuť synchrónnosť zvuku a videa."
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "Pri prekódovaní sa preskočia niektoré snímky v prípade, že váš procesor "
+#~ "nie je schopný takého rýchleho kódovania."
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "Hodnota úrovní pre zvukové kanály"
+
+#~ msgid ""
+#~ "Value of the audio level of each channels between 0 and 1. Each level "
+#~ "should be separated with ':'."
+#~ msgstr ""
+#~ "Hodnota úrovne zvuku pre každý kanál, medzi 0 a 1. Každá úroveň by sa "
+#~ "mala oddeliť znakom ':'."
+
+#~ msgid "Alarm"
+#~ msgstr "Upozornenie (alarm)"
+
+#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+#~ msgstr ""
+#~ "Signalizuje ticho a zobrazí upozornenie (0=žiadne upozornenie, "
+#~ "1=upozornenie)."
+
+#~ msgid "Spatial luma strength (default 4)"
+#~ msgstr "Intenzita priestorového jasu luma (predvolená: 4)"
+
+#~ msgid "Spatial chroma strength (default 3)"
+#~ msgstr "Intenzita priestorovej farebnej sýtosti (predvolená: 3)"
+
+#~ msgid "Temporal luma strength (default 6)"
+#~ msgstr "Intenzita dočasného jasu luma (predvolená: 6)"
+
+#~ msgid "Temporal chroma strength (default 4.5)"
+#~ msgstr "Intenzita dočasnej sýtosti chroma (predvolená = 4.5)"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "Text, ktorý sa zobrazí v značke. (Dostupné sú formátovacie príkazy: "
+#~ "Časové: %Y = rok, %m = mesiac, %d = deň, %H = hodina, %M = minúta, %S = "
+#~ "sekunda, ... Metadáta: $a = umelec, $b = album, $c = copyright, $d = "
+#~ "popis, $e = kódované, $g = žáner, $l = jazyk, $n = číslo stopy, $p = "
+#~ "práve sa prehráva, $r = hodnotenie, $s = jazyk titulkov, $t = názov, $u = "
+#~ "url adresa, $A = dátum, $B = dátový tok zvuku (v kb/s), $C = kapitola,$D "
+#~ "= trvanie, $F = plný názov s cestou, $I = názov, $L = zostávajúci čas, $N "
+#~ "= názov, $O = jazyk zvuk. stopy, $P = pozícia (v %), $R = hodnotenie, $S "
+#~ "= vzorkovacia frekvencia zvuku (v kHz), $T = čas, $U = vydavateľ, $V = "
+#~ "hlasitosť, $_ = nový riadok) "
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "Výstup videa iOS OpenGL ES (vyžaduje UIView)"
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr ""
+#~ "Výstup videa Mac OS X OpenGL (vyžaduje sa vykresliteľná súčasť nsobject)"
+
+#~ msgid "OpenGL acceleration is not supported on your Mac"
+#~ msgstr "Na vašom počítači Mac nie je podporovaná akcelerácia OpenGL"
+
+#~ msgid ""
+#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
+#~ "output. It will still work, but much slower and with possibly unexpected "
+#~ "results."
+#~ msgstr ""
+#~ "Váš počítač Mac nepodporuje akceleráciu Quartz Extreme, ktorá je "
+#~ "vyžadovaná pre výstup videa. Bude fungovať, avšak oveľa pomalšie a s "
+#~ "nepredvídateľnými výsledkami."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Použiť súbor s ti&tulkami"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Stiahnuť druh albumu:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Konfigurovať knižnicu s médiami"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
