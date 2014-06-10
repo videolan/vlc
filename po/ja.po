@@ -1206,7 +1206,7 @@ msgstr "送信先の字幕コーデック"
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "ビデオ出力モジュール"
+msgstr "クライアントポート"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -3269,7 +3269,6 @@ msgid "HTTP/TLS Certificate Revocation List"
 msgstr "HTTP/TLS証明書の廃止リスト"
 
 #: src/libvlc-module.c:846
-#, fuzzy
 msgid ""
 "This file contains an optional CRL to prevent remote clients from using "
 "revoked certificates in TLS sessions."
@@ -12705,7 +12704,7 @@ msgstr "USF字幕デコーダー"
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "テキスト字幕デコーダー"
+msgstr "DVB字幕デコーダー"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
@@ -19164,7 +19163,6 @@ msgstr ""
 "スできます。"
 
 #: modules/gui/macosx/wizard.m:265
-#, fuzzy
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
 "This protocol is used as transport method by many Microsoft's software. Note "
@@ -22372,7 +22370,7 @@ msgstr "リサンプリング品質"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "高品質オーディオリサンプリング"
+msgstr "ビデオの品質、後処理フィルターレベル"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -23232,7 +23230,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "アスペクト比を保持"
+msgstr "インデックスファイル"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -26114,7 +26112,7 @@ msgstr "RGBコンポーネント抽出ビデオフィルター"
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "デインターレースビデオフィルター"
+msgstr "パズル インタラクティブゲームビデオフィルター"
 
 #: modules/video_filter/freeze.c:78
 #, fuzzy
@@ -29715,7 +29713,7 @@ msgstr "ビデオキャプチャー"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLCはデコーダーモジュールを開くことができませんでした。"
+msgstr "オーディオ出力モジュール"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -30028,397 +30026,6 @@ msgstr "VLCメディアプレイヤー - ウェブインターフェース"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "ストリーム出力"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "ここでは好みのビデオ出力と設定を選択します。"
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "これらのモジュールはVLCのその他すべてのパーツに対するネットワーク機能を提"
-#~ "供します。"
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "これらはビデオ、オーディオ、字幕のエンコーディングモジュールに関する一般的"
-#~ "な設定です。"
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "ダイアログプロバイダーの設定が可能です。"
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "字幕のデマルチプレクサーの動作に関する設定を行います。例えば、字幕のタイト"
-#~ "ルやファイル名を指定します。"
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "適切なデコーダーモジュールがありません"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLCはこのオーディオ/ビデオ形式'%4.4s'をサポートしていません。残念ながらこ"
-#~ "れを修正する方法はありません。"
-
-#, fuzzy
-#~ msgid ""
-#~ "This file contains an optional CRL to prevent remove clients from using "
-#~ "revoked certificates in TLS sessions."
-#~ msgstr ""
-#~ "このファイルはTLSセッションで使われている廃止された証明書からクライアント"
-#~ "を削除することを抑止するためのオプショナルなCRLを含みます。"
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "VLCのモジュールを検索する追加パスを指定します。 \" PATH_SEP \" をセパレー"
-#~ "タとして複数のパスを結合して追加することが可能です。"
-
-#~ msgid "Album art policy"
-#~ msgstr "アルバムアートのポリシー"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "アルバムアートをどのようにダウンロードするか選択します。"
-
-#~ msgid "Manual download only"
-#~ msgstr "手動でのダウンロードのみ"
-
-#~ msgid "When track starts playing"
-#~ msgstr "トラックの再生を開始した時"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "トラックの追加時、即時に"
-
-#~ msgid "Load Media Library"
-#~ msgstr "メディアライブラリのロード"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr "VLCの起動時にSQLベースのメディアライブラリをロードします。"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpegアクセス"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "あなたのシステムのAACS復号ライブラリが正しく動作しません。キーはあります"
-#~ "か?"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLCはファイル\"%s\"を開くことができませんでした。(%m)"
-
-#~ msgid "TCP address to use"
-#~ msgstr "使用するTCPアドレス"
-
-#~ msgid ""
-#~ "TCP address to use to communicate with the video part of the Bar Graph "
-#~ "(default localhost). In the case of bargraph incrustation, use localhost."
-#~ msgstr ""
-#~ "Bar Graphのビデオパートと通信するために使用するTCPアドレス(デフォルトは"
-#~ "localhost)を指定します。Bar Graphを被せる場合、localhostを使用してくださ"
-#~ "い。"
-
-#~ msgid "TCP port to use"
-#~ msgstr "使用するTCPポート"
-
-#~ msgid ""
-#~ "TCP port to use to communicate with the video part of the Bar Graph "
-#~ "(default 12345). Use the same port as the one used in the rc interface."
-#~ msgstr ""
-#~ "Bar Graphのビデオパートと通信するために使用するTCPポート(デフォルトは"
-#~ "12345)を指定します。rcインターフェースで使用されているポートと同じポートを"
-#~ "使用してください。"
-
-#~ msgid "Force connection reset regularly"
-#~ msgstr "定期的な接続の強制リセット"
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr ""
-#~ "TCP接続がリセットされるべきかどうかを定義します。これは、オーディオBar "
-#~ "Graphを使用する時に使用されます。(デフォルト 1)"
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "ステレオからモノラルへのオーディオ変換フィルター"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "クロッピング情報を廃棄"
-
-#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
-#~ msgstr "内部のクロッピングパラメーターを廃棄します。 (例: H.264 SPS)"
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "ビデオアクセラレーション(VA) API"
-
-#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
-#~ msgstr "Video Decode and Presentation API for Unix (VDPAU)"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr "ビットレートが0の場合、この値が品質を一定に保持します。"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "0以上の値を指定すると固定ビットレートモードになります。"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "低損失コーディングの有効化"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "低損失コーディングは、オリジナルの完全な複製を作成するため、ビットレートと"
-#~ "品質に関する設定を無視します。"
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "矩形のリニアフェーズ"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "対角のリニアフェーズ"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "'P'フレーム間の距離"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "GOPごとの'P'フレーム数"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "モーション補正ブロックの幅"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "モーション補正ブロックの高さ"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "ブロックのオーバーラップ(%)"
-
-#~ msgid "Amount that each motion block should be overlapped by its neighbours"
-#~ msgstr ""
-#~ "隣接するモーションブロックどうしがオーバーラップする量を指定します。"
-
-#~ msgid "xblen"
-#~ msgstr "水平ブロック長"
-
-#~ msgid "Total horizontal block length including overlaps"
-#~ msgstr "オーバーラップを含む水平方向のブロック長の合計を指定します。"
-
-#~ msgid "yblen"
-#~ msgstr "垂直ブロック長"
-
-#~ msgid "Total vertical block length including overlaps"
-#~ msgstr "オーバーラップを含む垂直方向のブロック長の合計を指定します。"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "モーションベクトル精度"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "モーションベクトルの精度をピクセルで指定します。"
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "簡易ME探索範囲 x:y"
-
-#~ msgid ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-#~ msgstr ""
-#~ "(推奨されません)探索範囲を+/-x, +/-yで指定して(モーションベクトルに一致す"
-#~ "る非階層ブロックの)簡易的な探索を行います。"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "空間パーティショニングを有効化"
-
-#~ msgid "cycles per degree"
-#~ msgstr "各段階のサイクル数"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Diracリサーチライブラリ使用のDiracビデオエンコーダー"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "openmashを使用したビデオデコーダー"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr "| menu . . .[on|off|up|down|left|right|select] メニューの使用"
-
-#~ msgid "Jump to time"
-#~ msgstr "指定時間へジャンプ"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "クラッシュログを開く..."
-
-#~ msgid "Don't Send"
-#~ msgstr "送信しない"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLCは以前にクラッシュしました"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "VLCの開発チームにクラッシュの詳細情報を送信してもよいですか?\n"
-#~ "\n"
-#~ "もしよろしければ、VLCがクラッシュする直前に行った操作や、サンプルファイル"
-#~ "のダウンロード先のリンク、ネットワークストリームのURLなど数行で記入してく"
-#~ "ださると解析に役に立ちます。"
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr "この不都合報告について、おそらく連絡が取れることに同意します。"
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "デフォルトの電子メールアドレスのみが送信され、いかなる他の情報も含まれませ"
-#~ "ん。"
-
-#~ msgid "Don't ask again"
-#~ msgstr "今後、問い合わせしない"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "クラッシュの記録が見つかりません"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "以前のクラッシュのトレースを見つけることができませんでした"
-
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "VLCの再生中はiTunesを一時停止"
-
-#~ msgid ""
-#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
-#~ "playback will be resumed again if VLC playback is finished."
-#~ msgstr ""
-#~ "VLCが開始した場合にiTunesの再生を一時停止します。このオプションが選択され"
-#~ "た場合、iTunesの再生はVLCの再生が終了次第、再開されます。"
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "BDMVフォルダーを開く"
-
-#~ msgid "Album art download policy"
-#~ msgstr "アルバムアートのダウンロードポリシー"
-
-#~ msgid "Output module"
-#~ msgstr "出力モジュール"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "グラフィックイコライザー"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "メディア情報を自動的に取得"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "エクステンションの取得"
-
-#~ msgid "Under the Video"
-#~ msgstr "ビデオの下側"
-
-#~ msgid "&Help..."
-#~ msgstr "ヘルプ (&H)..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "オーディオトラックに同期"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "オーディオトラックにビデオトラックを同期させるため、ビデオのフレームを落と"
-#~ "したり、複製したりします。"
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "CPUがエンコードレートを保持できない場合、トランスコーディング機能はフレー"
-#~ "ムを取りこぼします。"
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "オーディオチャンネルレベルの値"
-
-#~ msgid ""
-#~ "Value of the audio level of each channels between 0 and 1. Each level "
-#~ "should be separated with ':'."
-#~ msgstr ""
-#~ "それぞれのチャンネルのオーディオレベルの値を':'で区切って0～1の範囲で指定"
-#~ "します。"
-
-#~ msgid "Alarm"
-#~ msgstr "アラーム"
-
-#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
-#~ msgstr ""
-#~ "無音アラームを有効化するかどうか指定します。(0: アラーム無し、1: アラーム"
-#~ "有り)"
-
-#~ msgid "Spatial luma strength (default 4)"
-#~ msgstr "スペーシャルLUMA強度(デフォルト 4)"
-
-#~ msgid "Spatial chroma strength (default 3)"
-#~ msgstr "スペーシャルクロマ強度(デフォルト 3)"
-
-#~ msgid "Temporal luma strength (default 6)"
-#~ msgstr "一時LUMA強度(デフォルト 6)"
-
-#~ msgid "Temporal chroma strength (default 4.5)"
-#~ msgstr "一時クロマ強度(デフォルト 4.5)"
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "表示されるマーキーテキストを指定します。(指定可能なフォーマット: 時間関"
-#~ "連: %Y = 年, %m = 月, %d = 日, %H = 時, %M = 分, %S = 秒, ... メタデータ関"
-#~ "連: $a = アーティスト, $b = アルバム, $c = 著作権, $d = 説明, $e = エン"
-#~ "コーダー, $g = ジャンル, $l = 言語, $n = トラック番号, $p = 再生中, $r = "
-#~ "評価, $s = 字幕の言語, $t = タイトル, $u = URL, $A = 日時, $B = オーディオ"
-#~ "のビットレート(kb/秒), $C = チャプター,$D = 長さ, $F = URI(パス付きの名"
-#~ "前), $I = ビデオのタイトル, $L = 残り時間, $N = 名前, $O = オーディオの言"
-#~ "語, $P = 位置(%), $R = レート, $S = オーディオのサンプリングレート(kHz), "
-#~ "$T = 経過時間, $U = 発行者, $V = 音量, $_ = 改行) "
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "iOS OpenGL ESビデオ出力(UIViewが必要)"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "Mac OS X OpenGLビデオ出力(描画可能なnsオブジェクトが必要)"
-
-#~ msgid "OpenGL acceleration is not supported on your Mac"
-#~ msgstr "OpenGLアクセラレーションはあなたのMacではサポートされていません。"
-
-#~ msgid ""
-#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
-#~ "output. It will still work, but much slower and with possibly unexpected "
-#~ "results."
-#~ msgstr ""
-#~ "あなたのMacはビデオ出力に必要なQuartz Extremeアクセラレーションがありませ"
-#~ "ん。動作するかも知れませんが、かなり遅く予期しない結果になることもありま"
-#~ "す。"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "字幕ファイルを使用 (&T)"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "アルバムアートのダウンロードポリシー:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "メディアライブラリの設定"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -32275,6 +31882,397 @@ msgstr "ストリーム出力"
 
 #~ msgid "iSight Capture Input"
 #~ msgstr "iSigntキャプチャー入力"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "ここでは好みのビデオ出力と設定を選択します。"
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "これらのモジュールはVLCのその他すべてのパーツに対するネットワーク機能を提"
+#~ "供します。"
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "これらはビデオ、オーディオ、字幕のエンコーディングモジュールに関する一般的"
+#~ "な設定です。"
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "ダイアログプロバイダーの設定が可能です。"
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "字幕のデマルチプレクサーの動作に関する設定を行います。例えば、字幕のタイト"
+#~ "ルやファイル名を指定します。"
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "適切なデコーダーモジュールがありません"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLCはこのオーディオ/ビデオ形式'%4.4s'をサポートしていません。残念ながらこ"
+#~ "れを修正する方法はありません。"
+
+#, fuzzy
+#~ msgid ""
+#~ "This file contains an optional CRL to prevent remove clients from using "
+#~ "revoked certificates in TLS sessions."
+#~ msgstr ""
+#~ "このファイルはTLSセッションで使われている廃止された証明書からクライアント"
+#~ "を削除することを抑止するためのオプショナルなCRLを含みます。"
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "VLCのモジュールを検索する追加パスを指定します。 \" PATH_SEP \" をセパレー"
+#~ "タとして複数のパスを結合して追加することが可能です。"
+
+#~ msgid "Album art policy"
+#~ msgstr "アルバムアートのポリシー"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "アルバムアートをどのようにダウンロードするか選択します。"
+
+#~ msgid "Manual download only"
+#~ msgstr "手動でのダウンロードのみ"
+
+#~ msgid "When track starts playing"
+#~ msgstr "トラックの再生を開始した時"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "トラックの追加時、即時に"
+
+#~ msgid "Load Media Library"
+#~ msgstr "メディアライブラリのロード"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr "VLCの起動時にSQLベースのメディアライブラリをロードします。"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpegアクセス"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "あなたのシステムのAACS復号ライブラリが正しく動作しません。キーはあります"
+#~ "か?"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLCはファイル\"%s\"を開くことができませんでした。(%m)"
+
+#~ msgid "TCP address to use"
+#~ msgstr "使用するTCPアドレス"
+
+#~ msgid ""
+#~ "TCP address to use to communicate with the video part of the Bar Graph "
+#~ "(default localhost). In the case of bargraph incrustation, use localhost."
+#~ msgstr ""
+#~ "Bar Graphのビデオパートと通信するために使用するTCPアドレス(デフォルトは"
+#~ "localhost)を指定します。Bar Graphを被せる場合、localhostを使用してくださ"
+#~ "い。"
+
+#~ msgid "TCP port to use"
+#~ msgstr "使用するTCPポート"
+
+#~ msgid ""
+#~ "TCP port to use to communicate with the video part of the Bar Graph "
+#~ "(default 12345). Use the same port as the one used in the rc interface."
+#~ msgstr ""
+#~ "Bar Graphのビデオパートと通信するために使用するTCPポート(デフォルトは"
+#~ "12345)を指定します。rcインターフェースで使用されているポートと同じポートを"
+#~ "使用してください。"
+
+#~ msgid "Force connection reset regularly"
+#~ msgstr "定期的な接続の強制リセット"
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr ""
+#~ "TCP接続がリセットされるべきかどうかを定義します。これは、オーディオBar "
+#~ "Graphを使用する時に使用されます。(デフォルト 1)"
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "ステレオからモノラルへのオーディオ変換フィルター"
+
+#~ msgid "Discard cropping information"
+#~ msgstr "クロッピング情報を廃棄"
+
+#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
+#~ msgstr "内部のクロッピングパラメーターを廃棄します。 (例: H.264 SPS)"
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "ビデオアクセラレーション(VA) API"
+
+#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
+#~ msgstr "Video Decode and Presentation API for Unix (VDPAU)"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr "ビットレートが0の場合、この値が品質を一定に保持します。"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "0以上の値を指定すると固定ビットレートモードになります。"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "低損失コーディングの有効化"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "低損失コーディングは、オリジナルの完全な複製を作成するため、ビットレートと"
+#~ "品質に関する設定を無視します。"
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "矩形のリニアフェーズ"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "対角のリニアフェーズ"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "'P'フレーム間の距離"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "GOPごとの'P'フレーム数"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "モーション補正ブロックの幅"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "モーション補正ブロックの高さ"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "ブロックのオーバーラップ(%)"
+
+#~ msgid "Amount that each motion block should be overlapped by its neighbours"
+#~ msgstr ""
+#~ "隣接するモーションブロックどうしがオーバーラップする量を指定します。"
+
+#~ msgid "xblen"
+#~ msgstr "水平ブロック長"
+
+#~ msgid "Total horizontal block length including overlaps"
+#~ msgstr "オーバーラップを含む水平方向のブロック長の合計を指定します。"
+
+#~ msgid "yblen"
+#~ msgstr "垂直ブロック長"
+
+#~ msgid "Total vertical block length including overlaps"
+#~ msgstr "オーバーラップを含む垂直方向のブロック長の合計を指定します。"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "モーションベクトル精度"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "モーションベクトルの精度をピクセルで指定します。"
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "簡易ME探索範囲 x:y"
+
+#~ msgid ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+#~ msgstr ""
+#~ "(推奨されません)探索範囲を+/-x, +/-yで指定して(モーションベクトルに一致す"
+#~ "る非階層ブロックの)簡易的な探索を行います。"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "空間パーティショニングを有効化"
+
+#~ msgid "cycles per degree"
+#~ msgstr "各段階のサイクル数"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Diracリサーチライブラリ使用のDiracビデオエンコーダー"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "openmashを使用したビデオデコーダー"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr "| menu . . .[on|off|up|down|left|right|select] メニューの使用"
+
+#~ msgid "Jump to time"
+#~ msgstr "指定時間へジャンプ"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "クラッシュログを開く..."
+
+#~ msgid "Don't Send"
+#~ msgstr "送信しない"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLCは以前にクラッシュしました"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "VLCの開発チームにクラッシュの詳細情報を送信してもよいですか?\n"
+#~ "\n"
+#~ "もしよろしければ、VLCがクラッシュする直前に行った操作や、サンプルファイル"
+#~ "のダウンロード先のリンク、ネットワークストリームのURLなど数行で記入してく"
+#~ "ださると解析に役に立ちます。"
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr "この不都合報告について、おそらく連絡が取れることに同意します。"
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "デフォルトの電子メールアドレスのみが送信され、いかなる他の情報も含まれませ"
+#~ "ん。"
+
+#~ msgid "Don't ask again"
+#~ msgstr "今後、問い合わせしない"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "クラッシュの記録が見つかりません"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "以前のクラッシュのトレースを見つけることができませんでした"
+
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "VLCの再生中はiTunesを一時停止"
+
+#~ msgid ""
+#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
+#~ "playback will be resumed again if VLC playback is finished."
+#~ msgstr ""
+#~ "VLCが開始した場合にiTunesの再生を一時停止します。このオプションが選択され"
+#~ "た場合、iTunesの再生はVLCの再生が終了次第、再開されます。"
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "BDMVフォルダーを開く"
+
+#~ msgid "Album art download policy"
+#~ msgstr "アルバムアートのダウンロードポリシー"
+
+#~ msgid "Output module"
+#~ msgstr "出力モジュール"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "グラフィックイコライザー"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "メディア情報を自動的に取得"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "エクステンションの取得"
+
+#~ msgid "Under the Video"
+#~ msgstr "ビデオの下側"
+
+#~ msgid "&Help..."
+#~ msgstr "ヘルプ (&H)..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "オーディオトラックに同期"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "オーディオトラックにビデオトラックを同期させるため、ビデオのフレームを落と"
+#~ "したり、複製したりします。"
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "CPUがエンコードレートを保持できない場合、トランスコーディング機能はフレー"
+#~ "ムを取りこぼします。"
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "オーディオチャンネルレベルの値"
+
+#~ msgid ""
+#~ "Value of the audio level of each channels between 0 and 1. Each level "
+#~ "should be separated with ':'."
+#~ msgstr ""
+#~ "それぞれのチャンネルのオーディオレベルの値を':'で区切って0～1の範囲で指定"
+#~ "します。"
+
+#~ msgid "Alarm"
+#~ msgstr "アラーム"
+
+#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+#~ msgstr ""
+#~ "無音アラームを有効化するかどうか指定します。(0: アラーム無し、1: アラーム"
+#~ "有り)"
+
+#~ msgid "Spatial luma strength (default 4)"
+#~ msgstr "スペーシャルLUMA強度(デフォルト 4)"
+
+#~ msgid "Spatial chroma strength (default 3)"
+#~ msgstr "スペーシャルクロマ強度(デフォルト 3)"
+
+#~ msgid "Temporal luma strength (default 6)"
+#~ msgstr "一時LUMA強度(デフォルト 6)"
+
+#~ msgid "Temporal chroma strength (default 4.5)"
+#~ msgstr "一時クロマ強度(デフォルト 4.5)"
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "表示されるマーキーテキストを指定します。(指定可能なフォーマット: 時間関"
+#~ "連: %Y = 年, %m = 月, %d = 日, %H = 時, %M = 分, %S = 秒, ... メタデータ関"
+#~ "連: $a = アーティスト, $b = アルバム, $c = 著作権, $d = 説明, $e = エン"
+#~ "コーダー, $g = ジャンル, $l = 言語, $n = トラック番号, $p = 再生中, $r = "
+#~ "評価, $s = 字幕の言語, $t = タイトル, $u = URL, $A = 日時, $B = オーディオ"
+#~ "のビットレート(kb/秒), $C = チャプター,$D = 長さ, $F = URI(パス付きの名"
+#~ "前), $I = ビデオのタイトル, $L = 残り時間, $N = 名前, $O = オーディオの言"
+#~ "語, $P = 位置(%), $R = レート, $S = オーディオのサンプリングレート(kHz), "
+#~ "$T = 経過時間, $U = 発行者, $V = 音量, $_ = 改行) "
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "iOS OpenGL ESビデオ出力(UIViewが必要)"
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "Mac OS X OpenGLビデオ出力(描画可能なnsオブジェクトが必要)"
+
+#~ msgid "OpenGL acceleration is not supported on your Mac"
+#~ msgstr "OpenGLアクセラレーションはあなたのMacではサポートされていません。"
+
+#~ msgid ""
+#~ "Your Mac lacks Quartz Extreme acceleration, which is required for video "
+#~ "output. It will still work, but much slower and with possibly unexpected "
+#~ "results."
+#~ msgstr ""
+#~ "あなたのMacはビデオ出力に必要なQuartz Extremeアクセラレーションがありませ"
+#~ "ん。動作するかも知れませんが、かなり遅く予期しない結果になることもありま"
+#~ "す。"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "字幕ファイルを使用 (&T)"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "アルバムアートのダウンロードポリシー:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "メディアライブラリの設定"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
