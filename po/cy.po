@@ -11132,9 +11132,8 @@ msgid "PNG video encoder"
 msgstr "Datgodiwr fideo PNG"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Galluogi modd cefndir bwrdd gwaith"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -11143,9 +11142,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Dewis Proffil"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11155,9 +11153,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Enw'r codec"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11198,9 +11195,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Datblethu"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11223,9 +11219,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "Paramedrau amgodio"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11265,9 +11260,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Didradd Uchaf"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11299,9 +11293,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Nifer o segmentau"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11315,9 +11308,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Nifer o rhesi pos"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -21354,7 +21346,7 @@ msgstr "Ansawdd ailsamplu"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Ailsamplo sain ansawdd uchel"
+msgstr "Lefel ansawdd ôl-brosesu fideo"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -28622,171 +28614,6 @@ msgstr "Chwaraewr VLC - Rhyngwyneb Gwe"
 msgid "Streaming Output"
 msgstr "Allbwn Ffrwd"
 
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Dewiswch eich allbwn fideo a'i ffurfweddu yma."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Mae'r modiwlau hyn yn darparu gweithredoedd rhwydwaith i bob rhan arall o "
-#~ "VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Rhain yw'r gosodiadau cyffredin ar gyfer modiwlau amgodio fideo/sain/"
-#~ "isdeitlau."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Dim modiwl datgodio addas"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "Ni all VLC chwarae ffeiliau sain neu fideo ffurf \"%4.4s\". Yn anffodus, "
-#~ "does dim modd i ti drwsio hyn."
-
-#~ msgid "Album art policy"
-#~ msgstr "Polisi delweddau albymau"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Dewis sut caiff delweddau albymau eu lawrlwytho"
-
-#~ msgid "Manual download only"
-#~ msgstr "Peidio lawrlwytho'n awtomatig"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Pan mae'r trac yn dechrau chwarae"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Cyn gynted ag ychwanegwyd y trac"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Llyfrgell Cyfryngau Lleol"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "TCP address to use"
-#~ msgstr "Cyfeiriad TCP i'w ddefnyddio"
-
-#~ msgid "TCP port to use"
-#~ msgstr "Porth TCP i'w ddefnyddio"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "Gwaredu gwybodaeth tocio"
-
-#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
-#~ msgstr "Gwaredu paramedrau tocio mewnol (e.e. o H.264 SPS)."
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Amgodiwr fideo Dirac yn defnyddio llyfrgell dirac-research"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Datgodiwr fideo yn defnyddio openmash"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr ""
-#~ "| dewislen . . [mlaen|ffwrdd|fyny|lawr|chwith|dde|dewis] defnyddio "
-#~ "dewislen"
-
-#~ msgid "Jump to time"
-#~ msgstr "Neidio i amser"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Agor y CrashLog..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Pedio anfon"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "Chwalodd VLC gynt"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Ydych am anfon manylion o'r chwalfa at dîm datblygu VLC?\n"
-#~ "\n"
-#~ "Os hoffech, gallwch roi ychydig o linellau yn disgrifio'r hyn roeddech yn "
-#~ "ei wneud cyn i VLC chwalu ac unrhyw wybodaeth arall gall ein helpu: dolen "
-#~ "i lawrlwytho ffeil sampl, URL ffrwd rhwydwaith, a.y.b."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr ""
-#~ "Cytunaf i gael fy nghysylltu, o bosib, ynglŷn â'r adroddiad gwall hwn."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "Dim ond eich cyfeiriad e-bost rhagosodedig caiff ei anfon, gyda dim "
-#~ "manylion pellach."
-
-#~ msgid "Don't ask again"
-#~ msgstr "Peidio gofyn eto"
-
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "Seibio iTunes tra'n chwarae gyda VLC"
-
-#~ msgid ""
-#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
-#~ "playback will be resumed again if VLC playback is finished."
-#~ msgstr ""
-#~ "Seibio chwarae ar iTunes pan mae VLC yn dechrau chwarae. Bydd iTunes yn "
-#~ "parhau i chwarae pan mae VLC yn gorffen chwarae."
-
-#~ msgid "Album art download policy"
-#~ msgstr "Polisi lawrlwytho delweddau albymau"
-
-#~ msgid "Output module"
-#~ msgstr "Modiwl allbwn"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Cydraddolydd Graffegol (Graphic Equalizer)"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Ailfeintio a padio fideo yn awtomatig"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Cewch ragor o estyniadau o"
-
-#~ msgid "Under the Video"
-#~ msgstr "Islaw y fideo"
-
-#~ msgid "&Help..."
-#~ msgstr "&Cymorth..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Cydamseru gyda'r trac sain"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Bydd hyn yn disgyn/dyblygu fframiau fideo fel bydd y trac fideo yn cadw "
-#~ "mewn amser gyda'r trac sain."
-
-#~ msgid "Alarm"
-#~ msgstr "Larwn"
-
-#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
-#~ msgstr "Mae'n nodi taweli ac yn dangos rhybydd (0=dim larwm, 1=larwm)."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Defnyddio ffeil &isdeitlau"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Polisi lawrlwytho delweddau albymau:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Ffurfweddu'r Llyfrgell Cyfryngau"
-
 #~ msgid ""
 #~ "You can choose to disable some CPU accelerations here. Use with extreme "
 #~ "care!"
@@ -29032,6 +28859,171 @@ msgstr "Allbwn Ffrwd"
 
 #~ msgid "00000; "
 #~ msgstr "00000; "
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Dewiswch eich allbwn fideo a'i ffurfweddu yma."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Mae'r modiwlau hyn yn darparu gweithredoedd rhwydwaith i bob rhan arall o "
+#~ "VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Rhain yw'r gosodiadau cyffredin ar gyfer modiwlau amgodio fideo/sain/"
+#~ "isdeitlau."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Dim modiwl datgodio addas"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "Ni all VLC chwarae ffeiliau sain neu fideo ffurf \"%4.4s\". Yn anffodus, "
+#~ "does dim modd i ti drwsio hyn."
+
+#~ msgid "Album art policy"
+#~ msgstr "Polisi delweddau albymau"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Dewis sut caiff delweddau albymau eu lawrlwytho"
+
+#~ msgid "Manual download only"
+#~ msgstr "Peidio lawrlwytho'n awtomatig"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Pan mae'r trac yn dechrau chwarae"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Cyn gynted ag ychwanegwyd y trac"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Llyfrgell Cyfryngau Lleol"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "TCP address to use"
+#~ msgstr "Cyfeiriad TCP i'w ddefnyddio"
+
+#~ msgid "TCP port to use"
+#~ msgstr "Porth TCP i'w ddefnyddio"
+
+#~ msgid "Discard cropping information"
+#~ msgstr "Gwaredu gwybodaeth tocio"
+
+#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
+#~ msgstr "Gwaredu paramedrau tocio mewnol (e.e. o H.264 SPS)."
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Amgodiwr fideo Dirac yn defnyddio llyfrgell dirac-research"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Datgodiwr fideo yn defnyddio openmash"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr ""
+#~ "| dewislen . . [mlaen|ffwrdd|fyny|lawr|chwith|dde|dewis] defnyddio "
+#~ "dewislen"
+
+#~ msgid "Jump to time"
+#~ msgstr "Neidio i amser"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Agor y CrashLog..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Pedio anfon"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "Chwalodd VLC gynt"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Ydych am anfon manylion o'r chwalfa at dîm datblygu VLC?\n"
+#~ "\n"
+#~ "Os hoffech, gallwch roi ychydig o linellau yn disgrifio'r hyn roeddech yn "
+#~ "ei wneud cyn i VLC chwalu ac unrhyw wybodaeth arall gall ein helpu: dolen "
+#~ "i lawrlwytho ffeil sampl, URL ffrwd rhwydwaith, a.y.b."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr ""
+#~ "Cytunaf i gael fy nghysylltu, o bosib, ynglŷn â'r adroddiad gwall hwn."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "Dim ond eich cyfeiriad e-bost rhagosodedig caiff ei anfon, gyda dim "
+#~ "manylion pellach."
+
+#~ msgid "Don't ask again"
+#~ msgstr "Peidio gofyn eto"
+
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "Seibio iTunes tra'n chwarae gyda VLC"
+
+#~ msgid ""
+#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
+#~ "playback will be resumed again if VLC playback is finished."
+#~ msgstr ""
+#~ "Seibio chwarae ar iTunes pan mae VLC yn dechrau chwarae. Bydd iTunes yn "
+#~ "parhau i chwarae pan mae VLC yn gorffen chwarae."
+
+#~ msgid "Album art download policy"
+#~ msgstr "Polisi lawrlwytho delweddau albymau"
+
+#~ msgid "Output module"
+#~ msgstr "Modiwl allbwn"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Cydraddolydd Graffegol (Graphic Equalizer)"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Ailfeintio a padio fideo yn awtomatig"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "Cewch ragor o estyniadau o"
+
+#~ msgid "Under the Video"
+#~ msgstr "Islaw y fideo"
+
+#~ msgid "&Help..."
+#~ msgstr "&Cymorth..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Cydamseru gyda'r trac sain"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Bydd hyn yn disgyn/dyblygu fframiau fideo fel bydd y trac fideo yn cadw "
+#~ "mewn amser gyda'r trac sain."
+
+#~ msgid "Alarm"
+#~ msgstr "Larwn"
+
+#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+#~ msgstr "Mae'n nodi taweli ac yn dangos rhybydd (0=dim larwm, 1=larwm)."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Defnyddio ffeil &isdeitlau"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Polisi lawrlwytho delweddau albymau:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Ffurfweddu'r Llyfrgell Cyfryngau"
 
 #, fuzzy
 #~ msgid "Image colors inversion"
