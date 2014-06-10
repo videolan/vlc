@@ -1197,7 +1197,7 @@ msgstr "แฟ้มปลายทาง:"
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "มอดูลแสดงวีดิทัศน์"
+msgstr "ไคลเอนต์พอร์ต"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -11092,9 +11092,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "พารามิเตอร์การลงรหัส"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -11167,9 +11166,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "จำนวนชิ้นส่วน"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11183,9 +11181,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "จำนวนของโคลน"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -11955,7 +11952,7 @@ msgstr "ตัวอ่านรหัสบทบรรยาย USF"
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "ตัวอ่านรหัสบทบรรยายข้อความ"
+msgstr "ตัวอ่านรหัสบทบรรยาย DVB"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
@@ -21908,7 +21905,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "คงค่าอัตราส่วนภาพ"
+msgstr "แฟ้มดัชนี"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -28015,7 +28012,7 @@ msgstr "ส่วนรับภาพถ่ายวีดิทัศน์"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLC ไม่สามารถเปิดมอดูลตัวอ่านรหัสได้"
+msgstr "มอดูลส่งเสียง"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -28138,7 +28135,7 @@ msgstr ""
 #: modules/control/win_msg.c:193
 #, fuzzy
 msgid "Windows messages interface"
-msgstr "ส่วนติดต่อแบบ Qt"
+msgstr "ส่วนติดต่อ Ncurses"
 
 #: modules/gui/macosx/DebugMessageVisualizer.m:93
 msgid "Save this Log..."
@@ -28307,112 +28304,6 @@ msgstr "โปรแกรมเล่นสื่อ VLC - ส่วนติ�
 #, fuzzy
 msgid "Streaming Output"
 msgstr "ส่วนส่งกระแส"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "เลือกส่วนแสดงผลวีดิทัศน์ และตั้งค่ามันได้ที่นี่"
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "ไม่มีมอดูลตัวอ่านรหัสที่เหมาะสม"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC ไม่รองรับแฟ้มเสียงหรือวีดิทัศน์แบบ \"%4.4s\" แล้วคุณก็แก้ไขมันไม่ได้ด้วย "
-#~ "ขอแสดงความเสียใจด้วย"
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "พาธสำหรับตรวจหามอดูลต่างๆ ของ VLC คุณสามารถเพิ่มได้หลายตัวโดยใช้ \" PATH_SEP \" "
-#~ "เป็นตัวแยก"
-
-#~ msgid "Album art policy"
-#~ msgstr "ข้อตกลงเกี่ยวกับหน้าปกอัลบัม"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "เลือกการดาวน์โหลดหน้าปกอัลบัม"
-
-#~ msgid "Manual download only"
-#~ msgstr "ดาวน์โหลดด้วยตนเองเท่านั้น"
-
-#~ msgid "When track starts playing"
-#~ msgstr "เมื่อเริ่มการเล่นร่องข้อมูล"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "ทันทีที่ร่องข้อมูลถูกเพิ่ม"
-
-#~ msgid "Load Media Library"
-#~ msgstr "เรียกจากคลังสื่อ"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "การเข้าใช้ FFmpeg"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC ไม่สามารถเปิดแฟ้ม \"%s\"  (%m)"
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "ตัวผันค่าเสียงสำหรับการแปลงจากสเตริโอเป็นโมโน"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr "| menu . . [on|off|up|down|left|right|select] ใช้เมนู"
-
-#~ msgid "Jump to time"
-#~ msgstr "ช่วงจำเพาะ"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "เปิดปูมความเสียหาย..."
-
-#~ msgid "Don't Send"
-#~ msgstr "ไม่ต้องส่ง"
-
-#~ msgid "Don't ask again"
-#~ msgstr "ไม่ต้องถามอีก"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "ไม่พบปูมความเสียหาย"
-
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "พัก iTunes ระหว่างที่เล่น VLC"
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "เปิดโฟลเดอร์ BDMV"
-
-#~ msgid "Album art download policy"
-#~ msgstr "ข้อกำหนดการดาวน์โหลดภาพปก"
-
-#~ msgid "Output module"
-#~ msgstr "มอดูลแสดงผล"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "สมดุลเสียง"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "รับข้อมูลสื่อโดยอัตโนมัติ"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "รับส่วนขยายต่างๆ เพิ่มจาก"
-
-#~ msgid "Under the Video"
-#~ msgstr "อยู่ใต้วีดิทัศน์"
-
-#~ msgid "&Help..."
-#~ msgstr "วิธี&ใช้..."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "เพิ่มแฟ้มบทบรรยาย:"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "ข้อกำหนดการดาวน์โหลดภาพปก"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "ตั้งค่าคลังสื่อ"
 
 #~ msgid ""
 #~ "Magnify a part of the video. You can select which part of the image "
@@ -28907,6 +28798,112 @@ msgstr "ส่วนส่งกระแส"
 
 #~ msgid "Minimal view mode (no toolbars)"
 #~ msgstr "แสดงแต่จอ (ไร้แถบเครื่องมือ)"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "เลือกส่วนแสดงผลวีดิทัศน์ และตั้งค่ามันได้ที่นี่"
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "ไม่มีมอดูลตัวอ่านรหัสที่เหมาะสม"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC ไม่รองรับแฟ้มเสียงหรือวีดิทัศน์แบบ \"%4.4s\" แล้วคุณก็แก้ไขมันไม่ได้ด้วย "
+#~ "ขอแสดงความเสียใจด้วย"
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "พาธสำหรับตรวจหามอดูลต่างๆ ของ VLC คุณสามารถเพิ่มได้หลายตัวโดยใช้ \" PATH_SEP \" "
+#~ "เป็นตัวแยก"
+
+#~ msgid "Album art policy"
+#~ msgstr "ข้อตกลงเกี่ยวกับหน้าปกอัลบัม"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "เลือกการดาวน์โหลดหน้าปกอัลบัม"
+
+#~ msgid "Manual download only"
+#~ msgstr "ดาวน์โหลดด้วยตนเองเท่านั้น"
+
+#~ msgid "When track starts playing"
+#~ msgstr "เมื่อเริ่มการเล่นร่องข้อมูล"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "ทันทีที่ร่องข้อมูลถูกเพิ่ม"
+
+#~ msgid "Load Media Library"
+#~ msgstr "เรียกจากคลังสื่อ"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "การเข้าใช้ FFmpeg"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLC ไม่สามารถเปิดแฟ้ม \"%s\"  (%m)"
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "ตัวผันค่าเสียงสำหรับการแปลงจากสเตริโอเป็นโมโน"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr "| menu . . [on|off|up|down|left|right|select] ใช้เมนู"
+
+#~ msgid "Jump to time"
+#~ msgstr "ช่วงจำเพาะ"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "เปิดปูมความเสียหาย..."
+
+#~ msgid "Don't Send"
+#~ msgstr "ไม่ต้องส่ง"
+
+#~ msgid "Don't ask again"
+#~ msgstr "ไม่ต้องถามอีก"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "ไม่พบปูมความเสียหาย"
+
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "พัก iTunes ระหว่างที่เล่น VLC"
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "เปิดโฟลเดอร์ BDMV"
+
+#~ msgid "Album art download policy"
+#~ msgstr "ข้อกำหนดการดาวน์โหลดภาพปก"
+
+#~ msgid "Output module"
+#~ msgstr "มอดูลแสดงผล"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "สมดุลเสียง"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "รับข้อมูลสื่อโดยอัตโนมัติ"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "รับส่วนขยายต่างๆ เพิ่มจาก"
+
+#~ msgid "Under the Video"
+#~ msgstr "อยู่ใต้วีดิทัศน์"
+
+#~ msgid "&Help..."
+#~ msgstr "วิธี&ใช้..."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "เพิ่มแฟ้มบทบรรยาย:"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "ข้อกำหนดการดาวน์โหลดภาพปก"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "ตั้งค่าคลังสื่อ"
 
 #, fuzzy
 #~ msgid "Do you want to download it ?"
