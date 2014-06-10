@@ -4530,7 +4530,7 @@ msgstr ""
 #: src/libvlc-module.c:2690
 #, fuzzy
 msgid "core program"
-msgstr "बाहर िनकलो"
+msgstr "कार्यक्रम"
 
 #: src/misc/update.c:473
 #, c-format
@@ -10268,7 +10268,7 @@ msgstr "VLC %s मॉड्यूल नहीं खोल सकता है"
 #: modules/codec/avcodec/hwdummy.c:42
 #, fuzzy
 msgid "Dummy video decoder"
-msgstr "दर्पण वीडियो फिल्टर"
+msgstr "डमी वीडियो आउटपुट"
 
 #: modules/codec/avcodec/vaapi.c:62
 #, fuzzy
@@ -10945,12 +10945,11 @@ msgstr ""
 #: modules/codec/png.c:100
 #, fuzzy
 msgid "PNG video encoder"
-msgstr "तरंग वीडियो फ़िल्टर"
+msgstr "वीडियो कोडेक"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "वॉलपेपर मोड सक्षम"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -10970,9 +10969,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "कोडेक"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -11013,9 +11011,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "VNC चुनाव अंतराल"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11079,9 +11076,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "बिटरेट"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11113,9 +11109,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "मिश्रण करने के लिए समय की संख्या"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11129,9 +11124,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "पहेली पंक्तियों की संख्या"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -11901,7 +11895,7 @@ msgstr ""
 #: modules/codec/substx3g.c:40
 #, fuzzy
 msgid "tx3g subtitles decoder"
-msgstr "उपशीर्षक फ़ाइल का चयन करें"
+msgstr "उपशीर्षक कोडेक्स"
 
 #: modules/codec/substx3g.c:41
 #, fuzzy
@@ -13772,7 +13766,7 @@ msgstr ""
 #: modules/demux/caf.c:53
 #, fuzzy
 msgid "CAF demuxer"
-msgstr "ऑडियो फिल्टेर"
+msgstr "डीमक्सर्स"
 
 #: modules/demux/cdg.c:43
 msgid "CDG demuxer"
@@ -15633,7 +15627,7 @@ msgstr ""
 #: modules/gui/macosx/BWQuincyUI.m:78
 #, fuzzy
 msgid "Show Details"
-msgstr "गीत-सूची"
+msgstr "और अधिक विकल्प दिखाएँ "
 
 #: modules/gui/macosx/BWQuincyUI.m:79
 #, fuzzy
@@ -16339,7 +16333,7 @@ msgstr ""
 #: modules/gui/macosx/MainMenu.m:81
 #, fuzzy
 msgid "File Size"
-msgstr "फ़ाइल नाम"
+msgstr "फ़ाइल चयन"
 
 #: modules/gui/macosx/MainMenu.m:316
 msgid "Check for Update..."
@@ -20643,7 +20637,7 @@ msgstr ""
 #: modules/gui/qt4/menus.cpp:1636
 #, fuzzy
 msgid "&Save To Playlist"
-msgstr "के रूप में सहेजें ..."
+msgstr "प्लेलिस्ट में जोड़ें"
 
 #: modules/gui/qt4/qt4.cpp:78
 msgid "Show advanced preferences over simple ones"
@@ -20955,7 +20949,7 @@ msgstr "Gradfun वीडियो फिल्टर"
 #: modules/hw/vdpau/avcodec.c:45
 #, fuzzy
 msgid "VDPAU video decoder"
-msgstr "तरंग वीडियो फ़िल्टर"
+msgstr "वीडियो कोडेक"
 
 #: modules/hw/vdpau/chroma.c:820
 msgid "Temporal-spatial"
@@ -20982,7 +20976,7 @@ msgstr "रिवर्स स्टेरीयो"
 #: modules/hw/vdpau/chroma.c:838
 #, fuzzy
 msgid "Deinterlace chroma skip"
-msgstr "इंटरफेस मॉड्यूल"
+msgstr "Deinterlacing"
 
 #: modules/hw/vdpau/chroma.c:839
 msgid "Whether temporal deinterlacing applies to luma only"
@@ -27887,7 +27881,7 @@ msgstr ""
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLC विसंकेतक मॉड्यूल नहीं खोल सकता है."
+msgstr "ऑडियो आउटपुट मॉड्यूल"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -28000,7 +27994,7 @@ msgstr ""
 #: modules/codec/svg.c:63
 #, fuzzy
 msgid "SVG video decoder"
-msgstr "तरंग वीडियो फ़िल्टर"
+msgstr "वीडियो कोडेक"
 
 #: modules/control/win_msg.c:192
 msgid "WinMsg"
@@ -28178,78 +28172,6 @@ msgstr "VLC मीडिया प्लेयर - वेब अंतरफल
 #, fuzzy
 msgid "Streaming Output"
 msgstr "स्ट्रीम आउटपुट"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "अपने पसंदीदा वीडियो आउटपुट का चयन करें और उसे यहाँ कॉन्फ़िगर करें।"
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr "ये भाग VLC के अन्य भाग को संजाल कार्य प्रदान करता है!"
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "वीडियो / ऑडियो / उपशीर्षक एन्कोडिंग मॉड्यूल के लिए यह सामान्य सेटिंग कर रहे हैं."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "संवाद प्रदाताओं यहाँ कॉन्फ़िगर किया जा सकता है।"
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "इस भाग में आप उपशीर्षक demuxer के व्यवहार के लिए मजबूर कर सकते हैं, उदाहरण के लिए "
-#~ "उपशीर्षक प्रकार या फ़ाइल नाम निर्धारित करके."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "कोई उपयुक्त डिकोडर मॉड्यूल नहीं"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC ऑडियो या वीडियो फॉर्मॅट का समर्थन नहीं करता \"%4.4s\". दुर्भाग्य से आप के पास "
-#~ "इसे ठीक करने के लिए कोई रास्ता नहीं है"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "स्वतः आकार बदले और विडियो पैड करें"
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "ऑडियो चैनलों स्तर की मान"
-
-#~ msgid "Alarm"
-#~ msgstr "अलार्म"
-
-#~ msgid "Spatial luma strength (default 4)"
-#~ msgstr "स्थानिक luma शक्ति (4 डिफ़ॉल्ट रूप से)"
-
-#~ msgid "Spatial chroma strength (default 3)"
-#~ msgstr "स्थानिक क्रोमा शक्ति (डिफ़ॉल्ट रूप से 3)"
-
-#~ msgid "Temporal luma strength (default 6)"
-#~ msgstr "अस्थायी luma शक्ति (6 डिफ़ॉल्ट रूप से)"
-
-#~ msgid "Temporal chroma strength (default 4.5)"
-#~ msgstr "अस्थायी क्रोमा ताकत (4.5 डिफ़ॉल्ट रूप से)"
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "IOS OpenGL ES वीडियो आउटपुट (UIView की आवश्यकता है)"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "Mac OS X के OpenGL का वीडियो आउटपुट (drawable-NSObject की आवश्यकता )"
-
-#~ msgid "OpenGL acceleration is not supported on your Mac"
-#~ msgstr "OpenGL का त्वरण आपके मैक पर समर्थित नहीं है"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "ऑडियो और उपशीर्षक"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "एलबम कला डाउनलोड नीति:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "मीडिया लाइब्रेरी विन्यस्त करें"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -28904,6 +28826,78 @@ msgstr "स्ट्रीम आउटपुट"
 #, fuzzy
 #~ msgid "left"
 #~ msgstr "बांये"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "अपने पसंदीदा वीडियो आउटपुट का चयन करें और उसे यहाँ कॉन्फ़िगर करें।"
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr "ये भाग VLC के अन्य भाग को संजाल कार्य प्रदान करता है!"
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "वीडियो / ऑडियो / उपशीर्षक एन्कोडिंग मॉड्यूल के लिए यह सामान्य सेटिंग कर रहे हैं."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "संवाद प्रदाताओं यहाँ कॉन्फ़िगर किया जा सकता है।"
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "इस भाग में आप उपशीर्षक demuxer के व्यवहार के लिए मजबूर कर सकते हैं, उदाहरण के लिए "
+#~ "उपशीर्षक प्रकार या फ़ाइल नाम निर्धारित करके."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "कोई उपयुक्त डिकोडर मॉड्यूल नहीं"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC ऑडियो या वीडियो फॉर्मॅट का समर्थन नहीं करता \"%4.4s\". दुर्भाग्य से आप के पास "
+#~ "इसे ठीक करने के लिए कोई रास्ता नहीं है"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "स्वतः आकार बदले और विडियो पैड करें"
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "ऑडियो चैनलों स्तर की मान"
+
+#~ msgid "Alarm"
+#~ msgstr "अलार्म"
+
+#~ msgid "Spatial luma strength (default 4)"
+#~ msgstr "स्थानिक luma शक्ति (4 डिफ़ॉल्ट रूप से)"
+
+#~ msgid "Spatial chroma strength (default 3)"
+#~ msgstr "स्थानिक क्रोमा शक्ति (डिफ़ॉल्ट रूप से 3)"
+
+#~ msgid "Temporal luma strength (default 6)"
+#~ msgstr "अस्थायी luma शक्ति (6 डिफ़ॉल्ट रूप से)"
+
+#~ msgid "Temporal chroma strength (default 4.5)"
+#~ msgstr "अस्थायी क्रोमा ताकत (4.5 डिफ़ॉल्ट रूप से)"
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "IOS OpenGL ES वीडियो आउटपुट (UIView की आवश्यकता है)"
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "Mac OS X के OpenGL का वीडियो आउटपुट (drawable-NSObject की आवश्यकता )"
+
+#~ msgid "OpenGL acceleration is not supported on your Mac"
+#~ msgstr "OpenGL का त्वरण आपके मैक पर समर्थित नहीं है"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "ऑडियो और उपशीर्षक"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "एलबम कला डाउनलोड नीति:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "मीडिया लाइब्रेरी विन्यस्त करें"
 
 #, fuzzy
 #~ msgid "Video Bit Rate"
