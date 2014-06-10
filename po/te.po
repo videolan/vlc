@@ -363,7 +363,7 @@ msgstr "అధునాతన అమరికలు"
 #: include/vlc_input.h:568
 #, fuzzy
 msgid "Subtitle track added"
-msgstr "ఉపశీర్షికల ట్రాక్"
+msgstr "ఉపశీర్షిక ట్రాక్: %s"
 
 #: include/vlc_interface.h:140
 msgid ""
@@ -10882,9 +10882,8 @@ msgid "PNG video encoder"
 msgstr "వీడియో ఎన్కోడర్"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "వీడియోని చేతనపరుచు"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -10893,9 +10892,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "ప్రవర"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -10905,9 +10903,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "కొడెక్ పేరు"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -10948,9 +10945,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "విజాలీకరణ"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11014,9 +11010,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "గరిష్ట బిట్‌రేటు"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11048,9 +11043,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "భాగముల సంఖ్య"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11064,9 +11058,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "నిలువువరుసల సంఖ్య"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -21713,7 +21706,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "రూప నిష్పత్తిని ఉంచు"
+msgstr "విషయసూచిక దస్త్రం"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -28102,78 +28095,6 @@ msgid "Streaming Output"
 msgstr "ప్రవాహం అవుట్‌పుట్"
 
 #~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "\"%4.4s\" ఆడియో లేదా వీడియో ఆకృతికి VLC మద్ధతు లేదు. దురదృష్టశావత్తు దీనిని పరిష్కరించుటకు "
-#~ "మీకు వేరే మార్గం లేదు."
-
-#~ msgid "Album art policy"
-#~ msgstr "ఆల్బమ్ కళ పాలసీ"
-
-#~ msgid "Manual download only"
-#~ msgstr "మానవీయంగా దింపుట మాత్రమే"
-
-#~ msgid "Load Media Library"
-#~ msgstr "మాధ్యమ లైబ్రరీని నింపు"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg వాడుక"
-
-#~ msgid "Jump to time"
-#~ msgstr "సమయానికి గెంతు"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "విరిగినచిట్టాను తెరువు..."
-
-#~ msgid "Don't Send"
-#~ msgstr "పంపవద్దు"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "వియల్సీ ఇంతకుముందు విరిగినది"
-
-#~ msgid "Don't ask again"
-#~ msgstr "మళ్ళీ అడుగవద్దు"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "ఎటువంటి విరిగినచిట్టా కనపడలేదు"
-
-#~ msgid "Output module"
-#~ msgstr "అవుట్‌పుట్ పర్వికం"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "గ్రాఫిక్ ఈక్వలైజర్"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "వీడియో ఫలాన్ని స్వయంచాలకంగా అమర్చు"
-
-#~ msgid "Get more extensions from"
-#~ msgstr "ఇక్కడి నుండి మరిన్ని పొడిగింతలను పొందండి"
-
-#~ msgid "Under the Video"
-#~ msgstr "దృశ్యకం క్రింద"
-
-#~ msgid "&Help..."
-#~ msgstr "సహాయం...(&H)"
-
-#~ msgid "Alarm"
-#~ msgstr "అలారం"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "ఉపశీర్షిక దస్త్రాన్ని వాడు"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "ఆల్బమ్ చిత్రం దింపుకొను పాలసీ:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "మాధ్యమ లైబ్రరీని స్వరూపించు"
-
-#~ msgid ""
 #~ "Some options are available but hidden. Check \"Advanced options\" to see "
 #~ "them."
 #~ msgstr ""
@@ -28451,6 +28372,78 @@ msgstr "ప్రవాహం అవుట్‌పుట్"
 
 #~ msgid "Okay"
 #~ msgstr "సరే"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "\"%4.4s\" ఆడియో లేదా వీడియో ఆకృతికి VLC మద్ధతు లేదు. దురదృష్టశావత్తు దీనిని పరిష్కరించుటకు "
+#~ "మీకు వేరే మార్గం లేదు."
+
+#~ msgid "Album art policy"
+#~ msgstr "ఆల్బమ్ కళ పాలసీ"
+
+#~ msgid "Manual download only"
+#~ msgstr "మానవీయంగా దింపుట మాత్రమే"
+
+#~ msgid "Load Media Library"
+#~ msgstr "మాధ్యమ లైబ్రరీని నింపు"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg వాడుక"
+
+#~ msgid "Jump to time"
+#~ msgstr "సమయానికి గెంతు"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "విరిగినచిట్టాను తెరువు..."
+
+#~ msgid "Don't Send"
+#~ msgstr "పంపవద్దు"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "వియల్సీ ఇంతకుముందు విరిగినది"
+
+#~ msgid "Don't ask again"
+#~ msgstr "మళ్ళీ అడుగవద్దు"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "ఎటువంటి విరిగినచిట్టా కనపడలేదు"
+
+#~ msgid "Output module"
+#~ msgstr "అవుట్‌పుట్ పర్వికం"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "గ్రాఫిక్ ఈక్వలైజర్"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "వీడియో ఫలాన్ని స్వయంచాలకంగా అమర్చు"
+
+#~ msgid "Get more extensions from"
+#~ msgstr "ఇక్కడి నుండి మరిన్ని పొడిగింతలను పొందండి"
+
+#~ msgid "Under the Video"
+#~ msgstr "దృశ్యకం క్రింద"
+
+#~ msgid "&Help..."
+#~ msgstr "సహాయం...(&H)"
+
+#~ msgid "Alarm"
+#~ msgstr "అలారం"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "ఉపశీర్షిక దస్త్రాన్ని వాడు"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "ఆల్బమ్ చిత్రం దింపుకొను పాలసీ:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "మాధ్యమ లైబ్రరీని స్వరూపించు"
 
 #, fuzzy
 #~ msgid "Blu-Ray error"
