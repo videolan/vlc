@@ -1269,7 +1269,7 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Module xuất Video"
+msgstr "Cổng kết nối phía client"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -12003,9 +12003,8 @@ msgid "PNG video encoder"
 msgstr "Giải mã video PNG"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "Bật chế độ Hình Nền"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -12014,9 +12013,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Chọn hồ sơ"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -12026,9 +12024,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Tên codec"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -12049,9 +12046,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:79
-#, fuzzy
 msgid "Group of Picture Reference Distance"
-msgstr "Tên của khoảng cách hiện tại"
+msgstr ""
 
 #: modules/codec/qsv.c:81
 msgid ""
@@ -12070,9 +12066,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Guard interval"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -12085,9 +12080,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:100
-#, fuzzy
 msgid "Rate Control Method"
-msgstr "Phương pháp điều khiển tốc độ"
+msgstr ""
 
 #: modules/codec/qsv.c:102
 msgid ""
@@ -12096,9 +12090,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "Hệ số lượng tử I"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -12138,9 +12131,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Bitrate tối đa"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -12172,9 +12164,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "Buộc sủ dụng số lượng lát cắt cho từng khung hình"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -12188,9 +12179,8 @@ msgid "Number of reference frames"
 msgstr "Số lượng hệ quy chiếu"
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "Số lần lặp lại DWT"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -22696,7 +22686,7 @@ msgstr "Chất lượng chuyển đổi"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Xuất audio chất lượng cao"
+msgstr "Cấp độ video tiền xử lý"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -23516,7 +23506,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Giữ hệ số đồng dạng"
+msgstr "Tập tin chỉ mục"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -29379,9 +29369,8 @@ msgid "Default caching policy"
 msgstr "Chính sách đối với bộ nhớ đệm theo mặc định"
 
 #: modules/gui/qt4/ui/sprefs_interface.h:506
-#, fuzzy
 msgid "Menus language:"
-msgstr "Ngôn ngữ của Audio"
+msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:507
 msgid "Look and feel"
@@ -30024,7 +30013,7 @@ msgstr ""
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Mặc định"
+msgstr "Luồng dữ liệu mặc định"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -30086,350 +30075,6 @@ msgstr "Chương trình VLC - Giao diện web"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Xuất dữ liệu luồng"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Chọn cách xuất dữ liệu cho Video và chỉnh sửa tại đây."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Các phương thức này cung cấp các chức năng truy cập mạng đến các phần "
-#~ "điều khiển khác trong VLC."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Đây là các thiết lập chung dành cho module mã hóa video/audio/phụ đề"
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr ""
-#~ "Nội dung về cửa sổ thông báo của chương trình có thể chỉnh sửa tại đây."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "Trong phần này bạn có thể hiệu chỉnh phần phụ đề và ghép lại các phần phụ "
-#~ "đề với nhau theo ý bạn, ví dụ như thay đổi thiết lập đối với loại phụ đề "
-#~ "hoặc tên tập tin gắn với phụ đề đó."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Module giải mã không phù hợp"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC không hỗ trợ định dạng tập tin này\"%4.4s\". Và bạn không thể sửa "
-#~ "được lỗi này."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "Đường dẫn bổ sung để VLC tìm các module của chương trình. Bạn có thể thêm "
-#~ "vào một hoặc nhiều đường dẫn bằng cách nối chúng lại với nhau sử dụng \" "
-#~ "PATH_SEP \" để phân tách"
-
-#~ msgid "Album art policy"
-#~ msgstr "Chính sách về Album art"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Chọn lựa cách tải về các album art."
-
-#~ msgid "Manual download only"
-#~ msgstr "Chỉ được tải khi người dùng cho phép"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Khi track bắt đầu được bật"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Ngay khi track vừa được thêm vào"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Nạp Thư viện Media"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr ""
-#~ "Nếu tùy chọn này được bật thì tùy chọn này sẽ tải thư viện media dưới "
-#~ "dạng tập tin SQL mỗi khi VLC được khởi động."
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "Truy cập FFmpeg"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "Hệ thống thư viện giải mã AACS của bạn không hoạt động. Có thể có một vài "
-#~ "từ khóa bị thiếu?"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLC không thể tương tác với tập tin \"%s\". (%m)"
-
-#~ msgid "TCP address to use"
-#~ msgstr "Địa chỉ TCP được dùng"
-
-#~ msgid ""
-#~ "TCP address to use to communicate with the video part of the Bar Graph "
-#~ "(default localhost). In the case of bargraph incrustation, use localhost."
-#~ msgstr ""
-#~ "Địa chỉ TCP được sử dụng để giao tiếp với phần video dạng Biểu Đồ Thanh "
-#~ "(mặc định localhost). Trong trường hợp biểu đồ thanh chỉ là phần bên "
-#~ "ngoài, sử dụng localhost."
-
-#~ msgid "TCP port to use"
-#~ msgstr "Cổng kết nối TCP được dùng"
-
-#~ msgid ""
-#~ "TCP port to use to communicate with the video part of the Bar Graph "
-#~ "(default 12345). Use the same port as the one used in the rc interface."
-#~ msgstr ""
-#~ "Cổng kết nối TCP được sử dụng để giao tiếp với phần video dạng Biểu Đồ "
-#~ "Thanh (mặc định 12345). Sử dụng cùng cổng dữ liệu đã được sử dụng trong "
-#~ "giao diện rc."
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr ""
-#~ "Xác định cho phần kết nối TCP khi bị thiết đặt lại. Nêu sử dụng phần này "
-#~ "khi dùng chung với audiobargraph_v (mặc định là 1)."
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Bộ lọc audio chuyển từ stereo thành mono"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "Bỏ qua thông tin bị cắt bỏ"
-
-#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
-#~ msgstr ""
-#~ "Bỏ qua các thông số liên quan đến phần được cắt bỏ (ví dụ từ H.264 SPS)."
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "Giao diện lập trình gia tốc video"
-
-#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
-#~ msgstr "Giải mã Video và Presentation API cho Unix (VDPAU)"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr "Nếu bitrate=0, sử dụng giá trị này hằng số chất lượng"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "Nếu giá trị > 0 sẽ bật chế độ hằng số bitrate"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Bật chế độ mã hóa nguyên bản"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "Mã hóa nguyên bản sẽ bỏ qua các thiết lập về bitrate và chất lượng đối "
-#~ "tượng, cho phép việc thể hiện tính nguyên vẹn so với bản gốc của đối tượng"
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "Nét kẻ tuyến tính hình chữ nhật"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "Nét kẻ tuyến tính chéo"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "Khoảng cách giữa các khung 'P'"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "Số khung 'P' trên một GOP"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Độ rộng của các khối bù trừ chuyển động"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Độ cao của các khối bù trừ chuyển động"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "Khóa phần chồng dữ liệu (%)"
-
-#~ msgid "Amount that each motion block should be overlapped by its neighbours"
-#~ msgstr ""
-#~ "Số lượng từng khối chuyển động được chồng lên nhau so với các khối chuyển "
-#~ "động tương tự khác"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "Total horizontal block length including overlaps"
-#~ msgstr "Tổng số chiều dài khối theo chiều ngang bao gồm phần chồng dữ liệu"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Total vertical block length including overlaps"
-#~ msgstr ""
-#~ "Tổng số chiều dài khối theo chiều thẳng đứng bao gồm phần chồng dữ liệu"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "Độ chính xác vétơ chuyển động"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "Độ chính xác vétơ chuyển động tính bằng pels."
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "Khu vực tìm kiếm ME dạng đơn giản x:y"
-
-#~ msgid ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-#~ msgstr ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Bật tính phân cách phân vùng"
-
-#~ msgid "cycles per degree"
-#~ msgstr "cycles per degree"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Trình mã hóa video dạng Dirac sử dụng thư viện dirac-research"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "Giải mã video dùng openmash"
-
-#~ msgid "Jump to time"
-#~ msgstr "Nhảy đến thời gian"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Mở tập tin lưu trữ thông tin lỗi..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Đừng gửi"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC đã bị lỗi gần đây"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Bạn có muốn gửi các thông tin về lỗi mà VLC gặp phải đến bộ phận phát "
-#~ "triển hay không?\n"
-#~ "\n"
-#~ "Nếu bạn muốn, bạn chỉ cần điền vào vài thông tin về các thao tác mà bạn "
-#~ "đã làm trước khi VLC bị lỗi cũng như, nếu có thể , bạn có thể miêu tả là "
-#~ "VLC đã bị lỗi khi phát một tập tin hay một đường dẫn nào đó..."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr ""
-#~ "Tôi đồng ý liên lạc với người phụ trách điều phối các lỗi xảy ra trong "
-#~ "VLC."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "Chỉ hiển thị địa chỉ email mặc định của bạn khi gửi đi, không bao gồm các "
-#~ "thông tin nào khác."
-
-#~ msgid "Don't ask again"
-#~ msgstr "Không hỏi lại lần nữa"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Không tìm thấy báo cáo lỗi hệ thống"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Không tìm thấy dấu vết về lần bị tắt đột ngột trước đó."
-
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "Dừng lại iTunes trong suốt chế độ phát lại của VLC"
-
-#~ msgid ""
-#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
-#~ "playback will be resumed again if VLC playback is finished."
-#~ msgstr ""
-#~ "Dừng lại chế độ phát lại của iTunes khi chế độ phát lại của VLC được bắt "
-#~ "đầu. Nếu chọn phần này, chế độ phát lại của iTunes sẽ được bật lại khi "
-#~ "chế độ phát lại của VLC đã kết thúc"
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Mở thư mục BDMV"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Chính sách tải Album Art"
-
-#~ msgid "Output module"
-#~ msgstr "Phương thức xuất dữ liệu"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Bộ cân bằng đồ họa"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Tự động thiết lập độ tăng của video."
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Tải thêm các tiện ích từ"
-
-#~ msgid "Under the Video"
-#~ msgstr "Bên dưới video"
-
-#~ msgid "&Help..."
-#~ msgstr "&Trợ giúp..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Đồng bộ hóa đối với track audio"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Tùy chọn này sẽ bỏ/trùng lặp các khung hình để đồng bộ hóa các track "
-#~ "video đối với track audio."
-
-#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
-#~ msgstr ""
-#~ "Chuyển tín hiệu sang trạng thái im lặng và hiển thị cảnh báo (0=không "
-#~ "cảnh báo, 1=cảnh báo)."
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "Đoạn văn bản giới thiệu được hiển thị. (Định dạng các chuỗi ký tự hiện "
-#~ "có: Thời gian liên quan: %Y = năm, %m = tháng, %d = ngày, %H = giờ, %M = "
-#~ "phút, %S = giây, ... Thông tin chi tiết liên quan: $a = nghệ sĩ, $b = "
-#~ "album, $c = bản quyền, $d = mô tả, $e = mã hóa bằng, $g = thể loại, $l = "
-#~ "ngôn ngữ, $n = số lượng track, $p = đang phát, $r = rating, $s = ngôn ngữ "
-#~ "phần phụ đề, $t = tiêu đề, $u = url, $A = ngày tháng, $B = audio bitrate "
-#~ "(in kb/s), $C = chương,$D = độ dài, $F = tên đầy đủ gồm đường dẫn, $I = "
-#~ "tiêu đề, $L = thời gian còn lại, $N = tên, $O = ngôn ngữ audio, $P = vị "
-#~ "trí (in %), $R = xếp hạng, $S = tỉ lệ mẫu audio (tính bằng kHz), $T = "
-#~ "thời gian, $U = nhà phát hành, $V = âm lượng, $_ = dòng mới) "
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr ""
-#~ "Chế độ xuất dữ liệu dành trong OpenGL ES thuộc iOS (yêu cầu tính năng "
-#~ "UIView)"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Sử dụng tập t&in phụ đề"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Chính sách tải album art:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Chỉnh sửa Thư Viện"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -31322,6 +30967,350 @@ msgstr "Xuất dữ liệu luồng"
 
 #~ msgid "%d Hz"
 #~ msgstr "%d Hz"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Chọn cách xuất dữ liệu cho Video và chỉnh sửa tại đây."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Các phương thức này cung cấp các chức năng truy cập mạng đến các phần "
+#~ "điều khiển khác trong VLC."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Đây là các thiết lập chung dành cho module mã hóa video/audio/phụ đề"
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr ""
+#~ "Nội dung về cửa sổ thông báo của chương trình có thể chỉnh sửa tại đây."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "Trong phần này bạn có thể hiệu chỉnh phần phụ đề và ghép lại các phần phụ "
+#~ "đề với nhau theo ý bạn, ví dụ như thay đổi thiết lập đối với loại phụ đề "
+#~ "hoặc tên tập tin gắn với phụ đề đó."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Module giải mã không phù hợp"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC không hỗ trợ định dạng tập tin này\"%4.4s\". Và bạn không thể sửa "
+#~ "được lỗi này."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "Đường dẫn bổ sung để VLC tìm các module của chương trình. Bạn có thể thêm "
+#~ "vào một hoặc nhiều đường dẫn bằng cách nối chúng lại với nhau sử dụng \" "
+#~ "PATH_SEP \" để phân tách"
+
+#~ msgid "Album art policy"
+#~ msgstr "Chính sách về Album art"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Chọn lựa cách tải về các album art."
+
+#~ msgid "Manual download only"
+#~ msgstr "Chỉ được tải khi người dùng cho phép"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Khi track bắt đầu được bật"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Ngay khi track vừa được thêm vào"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Nạp Thư viện Media"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr ""
+#~ "Nếu tùy chọn này được bật thì tùy chọn này sẽ tải thư viện media dưới "
+#~ "dạng tập tin SQL mỗi khi VLC được khởi động."
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "Truy cập FFmpeg"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "Hệ thống thư viện giải mã AACS của bạn không hoạt động. Có thể có một vài "
+#~ "từ khóa bị thiếu?"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLC không thể tương tác với tập tin \"%s\". (%m)"
+
+#~ msgid "TCP address to use"
+#~ msgstr "Địa chỉ TCP được dùng"
+
+#~ msgid ""
+#~ "TCP address to use to communicate with the video part of the Bar Graph "
+#~ "(default localhost). In the case of bargraph incrustation, use localhost."
+#~ msgstr ""
+#~ "Địa chỉ TCP được sử dụng để giao tiếp với phần video dạng Biểu Đồ Thanh "
+#~ "(mặc định localhost). Trong trường hợp biểu đồ thanh chỉ là phần bên "
+#~ "ngoài, sử dụng localhost."
+
+#~ msgid "TCP port to use"
+#~ msgstr "Cổng kết nối TCP được dùng"
+
+#~ msgid ""
+#~ "TCP port to use to communicate with the video part of the Bar Graph "
+#~ "(default 12345). Use the same port as the one used in the rc interface."
+#~ msgstr ""
+#~ "Cổng kết nối TCP được sử dụng để giao tiếp với phần video dạng Biểu Đồ "
+#~ "Thanh (mặc định 12345). Sử dụng cùng cổng dữ liệu đã được sử dụng trong "
+#~ "giao diện rc."
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr ""
+#~ "Xác định cho phần kết nối TCP khi bị thiết đặt lại. Nêu sử dụng phần này "
+#~ "khi dùng chung với audiobargraph_v (mặc định là 1)."
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Bộ lọc audio chuyển từ stereo thành mono"
+
+#~ msgid "Discard cropping information"
+#~ msgstr "Bỏ qua thông tin bị cắt bỏ"
+
+#~ msgid "Discard internal cropping parameters (e.g. from H.264 SPS)."
+#~ msgstr ""
+#~ "Bỏ qua các thông số liên quan đến phần được cắt bỏ (ví dụ từ H.264 SPS)."
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "Giao diện lập trình gia tốc video"
+
+#~ msgid "Video Decode and Presentation API for Unix (VDPAU)"
+#~ msgstr "Giải mã Video và Presentation API cho Unix (VDPAU)"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr "Nếu bitrate=0, sử dụng giá trị này hằng số chất lượng"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "Nếu giá trị > 0 sẽ bật chế độ hằng số bitrate"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Bật chế độ mã hóa nguyên bản"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "Mã hóa nguyên bản sẽ bỏ qua các thiết lập về bitrate và chất lượng đối "
+#~ "tượng, cho phép việc thể hiện tính nguyên vẹn so với bản gốc của đối tượng"
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "Nét kẻ tuyến tính hình chữ nhật"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "Nét kẻ tuyến tính chéo"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "Khoảng cách giữa các khung 'P'"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "Số khung 'P' trên một GOP"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "Độ rộng của các khối bù trừ chuyển động"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "Độ cao của các khối bù trừ chuyển động"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "Khóa phần chồng dữ liệu (%)"
+
+#~ msgid "Amount that each motion block should be overlapped by its neighbours"
+#~ msgstr ""
+#~ "Số lượng từng khối chuyển động được chồng lên nhau so với các khối chuyển "
+#~ "động tương tự khác"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "Total horizontal block length including overlaps"
+#~ msgstr "Tổng số chiều dài khối theo chiều ngang bao gồm phần chồng dữ liệu"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Total vertical block length including overlaps"
+#~ msgstr ""
+#~ "Tổng số chiều dài khối theo chiều thẳng đứng bao gồm phần chồng dữ liệu"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "Độ chính xác vétơ chuyển động"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "Độ chính xác vétơ chuyển động tính bằng pels."
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "Khu vực tìm kiếm ME dạng đơn giản x:y"
+
+#~ msgid ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+#~ msgstr ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Bật tính phân cách phân vùng"
+
+#~ msgid "cycles per degree"
+#~ msgstr "cycles per degree"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Trình mã hóa video dạng Dirac sử dụng thư viện dirac-research"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "Giải mã video dùng openmash"
+
+#~ msgid "Jump to time"
+#~ msgstr "Nhảy đến thời gian"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Mở tập tin lưu trữ thông tin lỗi..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Đừng gửi"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC đã bị lỗi gần đây"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Bạn có muốn gửi các thông tin về lỗi mà VLC gặp phải đến bộ phận phát "
+#~ "triển hay không?\n"
+#~ "\n"
+#~ "Nếu bạn muốn, bạn chỉ cần điền vào vài thông tin về các thao tác mà bạn "
+#~ "đã làm trước khi VLC bị lỗi cũng như, nếu có thể , bạn có thể miêu tả là "
+#~ "VLC đã bị lỗi khi phát một tập tin hay một đường dẫn nào đó..."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr ""
+#~ "Tôi đồng ý liên lạc với người phụ trách điều phối các lỗi xảy ra trong "
+#~ "VLC."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "Chỉ hiển thị địa chỉ email mặc định của bạn khi gửi đi, không bao gồm các "
+#~ "thông tin nào khác."
+
+#~ msgid "Don't ask again"
+#~ msgstr "Không hỏi lại lần nữa"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Không tìm thấy báo cáo lỗi hệ thống"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Không tìm thấy dấu vết về lần bị tắt đột ngột trước đó."
+
+#~ msgid "Pause iTunes during VLC playback"
+#~ msgstr "Dừng lại iTunes trong suốt chế độ phát lại của VLC"
+
+#~ msgid ""
+#~ "Pauses iTunes playback when VLC playback starts. If selected, iTunes "
+#~ "playback will be resumed again if VLC playback is finished."
+#~ msgstr ""
+#~ "Dừng lại chế độ phát lại của iTunes khi chế độ phát lại của VLC được bắt "
+#~ "đầu. Nếu chọn phần này, chế độ phát lại của iTunes sẽ được bật lại khi "
+#~ "chế độ phát lại của VLC đã kết thúc"
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Mở thư mục BDMV"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Chính sách tải Album Art"
+
+#~ msgid "Output module"
+#~ msgstr "Phương thức xuất dữ liệu"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Bộ cân bằng đồ họa"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Tự động thiết lập độ tăng của video."
+
+#~ msgid "Get more extensions from"
+#~ msgstr "Tải thêm các tiện ích từ"
+
+#~ msgid "Under the Video"
+#~ msgstr "Bên dưới video"
+
+#~ msgid "&Help..."
+#~ msgstr "&Trợ giúp..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Đồng bộ hóa đối với track audio"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Tùy chọn này sẽ bỏ/trùng lặp các khung hình để đồng bộ hóa các track "
+#~ "video đối với track audio."
+
+#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+#~ msgstr ""
+#~ "Chuyển tín hiệu sang trạng thái im lặng và hiển thị cảnh báo (0=không "
+#~ "cảnh báo, 1=cảnh báo)."
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "Đoạn văn bản giới thiệu được hiển thị. (Định dạng các chuỗi ký tự hiện "
+#~ "có: Thời gian liên quan: %Y = năm, %m = tháng, %d = ngày, %H = giờ, %M = "
+#~ "phút, %S = giây, ... Thông tin chi tiết liên quan: $a = nghệ sĩ, $b = "
+#~ "album, $c = bản quyền, $d = mô tả, $e = mã hóa bằng, $g = thể loại, $l = "
+#~ "ngôn ngữ, $n = số lượng track, $p = đang phát, $r = rating, $s = ngôn ngữ "
+#~ "phần phụ đề, $t = tiêu đề, $u = url, $A = ngày tháng, $B = audio bitrate "
+#~ "(in kb/s), $C = chương,$D = độ dài, $F = tên đầy đủ gồm đường dẫn, $I = "
+#~ "tiêu đề, $L = thời gian còn lại, $N = tên, $O = ngôn ngữ audio, $P = vị "
+#~ "trí (in %), $R = xếp hạng, $S = tỉ lệ mẫu audio (tính bằng kHz), $T = "
+#~ "thời gian, $U = nhà phát hành, $V = âm lượng, $_ = dòng mới) "
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr ""
+#~ "Chế độ xuất dữ liệu dành trong OpenGL ES thuộc iOS (yêu cầu tính năng "
+#~ "UIView)"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Sử dụng tập t&in phụ đề"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Chính sách tải album art:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Chỉnh sửa Thư Viện"
 
 #, fuzzy
 #~ msgid "     <left>      Seek -1%%"
