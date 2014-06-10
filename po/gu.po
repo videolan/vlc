@@ -15,7 +15,7 @@ msgstr ""
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: Gujarati (India) (http://www.transifex.com/projects/p/vlc-"
 "trans/language/gu_IN/)\n"
-"Language: gu\n"
+"Language: gu_IN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -363,7 +363,7 @@ msgstr ""
 #: include/vlc_input.h:568
 #, fuzzy
 msgid "Subtitle track added"
-msgstr "ઉપ નામ ટ્રેક"
+msgstr " ચિત્રપટના સંવાદોનું ભાષાંતર ટ્રેક"
 
 #: include/vlc_interface.h:140
 msgid ""
@@ -10866,9 +10866,8 @@ msgid "PNG video encoder"
 msgstr "દ્રશ્ય સેટિંગ"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "વોલપેપર મોડ શરુ કરો."
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -10888,9 +10887,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "કોડેક"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -10931,9 +10929,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "ડી ઇનટરલેન્સ"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -10997,9 +10994,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "મહાત્મ "
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -11031,9 +11027,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:139
-#, fuzzy
 msgid "Number of slices per frame"
-msgstr "ક્લોન્સ સંખ્યા"
+msgstr ""
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -11047,9 +11042,8 @@ msgid "Number of reference frames"
 msgstr ""
 
 #: modules/codec/qsv.c:148
-#, fuzzy
 msgid "Number of parallel operations"
-msgstr "ક્લોન્સ સંખ્યા"
+msgstr ""
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -15551,7 +15545,7 @@ msgstr "બધું બતાઓ"
 #: modules/gui/macosx/BWQuincyUI.m:79
 #, fuzzy
 msgid "Hide Details"
-msgstr "બધું બતાઓ"
+msgstr "છુંપવ્વા બીજો "
 
 #: modules/gui/macosx/BWQuincyUI.m:81
 msgid "Send"
@@ -27413,9 +27407,8 @@ msgid "Default caching policy"
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:506
-#, fuzzy
 msgid "Menus language:"
-msgstr "ધ્વની bhasha"
+msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:507
 msgid "Look and feel"
@@ -28094,35 +28087,6 @@ msgstr "VLC મીડિયા પ્લેયર ની મદદ"
 msgid "Streaming Output"
 msgstr "સ્ટ્રીમ આઉટપુટ"
 
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "તમારો o/p  મકી કરો સેટિંગ કરો"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLC ઑડિઓ અથવા વિડિઓ ફોર્મેટ \"% 4.4s\" સપોર્ટ કરતું નથી. કમનસીબે આ સમસ્યાને ઠીક "
-#~ "કરવા માટે કોઈ રીત નથી."
-
-#~ msgid "Jump to time"
-#~ msgstr "ખાસ સમય પર પહોચો"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "ક્રેશ લોગ ખોલો ..."
-
-#~ msgid "Don't Send"
-#~ msgstr "ના મોકલશો"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC પહેલાં ક્રેશ"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "દ્રશ્યો  Equalizer"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "લખાણ ચાલુ કરો"
-
 #~ msgid ""
 #~ "Aspect ratio of the video image (4:3, 16:9). Default is square pixels."
 #~ msgstr "આસ્પેક્ત માપ of the વીડીઓ દ્રશ્ય  (4:3, 16:9). Default છે ચોરસ પિક્ષ્લ્."
@@ -28239,6 +28203,35 @@ msgstr "સ્ટ્રીમ આઉટપુટ"
 #, fuzzy
 #~ msgid "Use a sub&titles file"
 #~ msgstr "લખાણ"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "તમારો o/p  મકી કરો સેટિંગ કરો"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLC ઑડિઓ અથવા વિડિઓ ફોર્મેટ \"% 4.4s\" સપોર્ટ કરતું નથી. કમનસીબે આ સમસ્યાને ઠીક "
+#~ "કરવા માટે કોઈ રીત નથી."
+
+#~ msgid "Jump to time"
+#~ msgstr "ખાસ સમય પર પહોચો"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "ક્રેશ લોગ ખોલો ..."
+
+#~ msgid "Don't Send"
+#~ msgstr "ના મોકલશો"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC પહેલાં ક્રેશ"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "દ્રશ્યો  Equalizer"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "મીડિયા Subtitle"
 
 #, fuzzy
 #~ msgid "Image clone"
