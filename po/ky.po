@@ -1,5 +1,5 @@
 # Kirgyz translation
-# Copyright (C) 2013 VideoLAN
+# Copyright (C) 2014 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: VLC - Trans\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2014-06-10 15:44-0400\n"
-"PO-Revision-Date: 2013-05-04 08:00+0000\n"
-"Last-Translator: Christoph Miebach <christoph.miebach@web.de>\n"
+"PO-Revision-Date: 2013-12-08 08:16+0000\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: Kirgyz (http://www.transifex.com/projects/p/vlc-trans/"
 "language/ky/)\n"
 "Language: ky\n"
@@ -356,7 +356,7 @@ msgstr ""
 #: include/vlc_input.h:568
 #, fuzzy
 msgid "Subtitle track added"
-msgstr "Субтитрлердин кодектери"
+msgstr "Субтитр тили"
 
 #: include/vlc_interface.h:140
 msgid ""
@@ -10848,9 +10848,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "Профиль"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -10860,9 +10859,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "Кодек маалыматы"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -10968,9 +10966,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:122
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Битрейт"
+msgstr ""
 
 #: modules/codec/qsv.c:123
 msgid ""
@@ -16215,7 +16212,7 @@ msgstr "URI"
 #: modules/gui/macosx/MainMenu.m:81
 #, fuzzy
 msgid "File Size"
-msgstr "Арип өлчөмү"
+msgstr "Өлчөм"
 
 #: modules/gui/macosx/MainMenu.m:316
 msgid "Check for Update..."
@@ -28014,57 +28011,17 @@ msgstr "VLC media player"
 msgid "Streaming Output"
 msgstr "Чыгышты тандоо"
 
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "Don't Send"
-#~ msgstr "Жөнөтпөө"
-
-#~ msgid "&Help..."
-#~ msgstr "&Жардам..."
-
-#~ msgid "OpenGL acceleration is not supported on your Mac"
-#~ msgstr "Сиздин Mac OpenGL ылдамдатуусун колдолбойт"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Субтитр файлы"
-
-#~ msgid "Subtitles/OSD"
-#~ msgstr "Субтитры/индикация"
-
 #~ msgid "CPU features"
 #~ msgstr "CPU өзгөчөлүктөрү"
 
-#~ msgid "Encoders settings"
-#~ msgstr "Кодерлердин ырастоолору"
-
-#~ msgid "Quick &Open File..."
-#~ msgstr "Тез файлды &ачуу..."
-
-#~ msgid "&Bookmarks"
-#~ msgstr "&Чөп каттар"
-
 #~ msgid "Sort"
 #~ msgstr "Сорттоо"
-
-#~ msgid "No Repeat"
-#~ msgstr "Кайталабоо"
-
-#~ msgid "Leave fullscreen"
-#~ msgstr "Толук экрандан чыгуу"
-
-#~ msgid "CPU"
-#~ msgstr "CPU"
 
 #~ msgid "PCM U8"
 #~ msgstr "PCM U8"
 
 #~ msgid "PCM S8"
 #~ msgstr "PCM S8"
-
-#~ msgid "GSM Audio"
-#~ msgstr "GSM-аудио"
 
 #~ msgid "PCM U16 LE"
 #~ msgstr "PCM U16 LE"
@@ -28132,9 +28089,6 @@ msgstr "Чыгышты тандоо"
 #~ msgid "RTMP"
 #~ msgstr "RTMP"
 
-#~ msgid "Channel"
-#~ msgstr "Канал"
-
 #~ msgid "SECAM"
 #~ msgstr "SECAM"
 
@@ -28150,12 +28104,6 @@ msgstr "Чыгышты тандоо"
 #~ msgid "cbr"
 #~ msgstr "cbr"
 
-#~ msgid "PVR"
-#~ msgstr "PVR"
-
-#~ msgid "all"
-#~ msgstr "баары"
-
 #~ msgid "Death metal"
 #~ msgstr "Дет-метал"
 
@@ -28165,104 +28113,14 @@ msgstr "Чыгышты тандоо"
 #~ msgid "Rock & roll"
 #~ msgstr "Рок-н-ролл"
 
-#~ msgid "Subtitles encoding"
-#~ msgstr "Субтитр кодировкасы"
-
-#~ msgid "HTML Playlist"
-#~ msgstr "HTML-плейлист"
-
-#~ msgid "HTTP Proxy"
-#~ msgstr "HTTP-прокси"
-
-#~ msgid "Font Color"
-#~ msgstr "Арип түсү"
-
-#~ msgid "Subtitle Languages"
-#~ msgstr "Субтитр тилдери"
-
-#~ msgid "Outline Color"
-#~ msgstr "Контур түсү"
-
-#~ msgid " Volume   : %u%%"
-#~ msgstr " Катуулугу   : %u%%"
-
-#~ msgid "Show playlist"
-#~ msgstr "Плейлистти көрсөтүү"
-
-#~ msgid " dB"
-#~ msgstr " дБ"
-
-#~ msgid "Add to playlist"
-#~ msgstr "Плейлистке кошуу"
-
-#~ msgid "Clear playlist"
-#~ msgstr "Плейлистти тазалоо"
-
-#~ msgid "&Codec"
-#~ msgstr "&Кодек"
-
-#~ msgid "Subtitles Files"
-#~ msgstr "Субтитр файлдары"
-
-#~ msgid "&Tools"
-#~ msgstr "А&спаптар"
-
-#~ msgid "Audio &Channels"
-#~ msgstr "Аудио-&каналдар"
-
-#~ msgid "Tools"
-#~ msgstr "Аспаптар"
-
 #~ msgid "MCE"
 #~ msgstr "MCE"
 
 #~ msgid "Blu-Ray"
 #~ msgstr "Blu-Ray"
 
-#~ msgid "Sizes"
-#~ msgstr "Өлчөмдөр"
-
-#~ msgid "Audio Language"
-#~ msgstr "Аудио тили"
-
-#~ msgid "Video Codec"
-#~ msgstr "Видео кодеги"
-
-#~ msgid "Audio Codec"
-#~ msgstr "Үн кодеги"
-
-#~ msgid "Subtitle Codec"
-#~ msgstr "Субтитр кодеги"
-
-#~ msgid "Output Method"
-#~ msgstr "Чыгыш режими"
-
-#~ msgid "Video Bit Rate"
-#~ msgstr "Видео битрейти"
-
-#~ msgid "Audio Bit Rate"
-#~ msgstr "Үн битрейти"
-
-#~ msgid "Video Scale"
-#~ msgstr "Видео масштабы"
-
-#~ msgid "Output File"
-#~ msgstr "Чыгыш файлы"
-
-#~ msgid "File Name"
-#~ msgstr "Файл аты"
-
 #~ msgid "Rows:"
 #~ msgstr "Саптар:"
-
-#~ msgid "width"
-#~ msgstr "туурасы"
-
-#~ msgid "Columns:"
-#~ msgstr "Тилкелер:"
-
-#~ msgid "height"
-#~ msgstr "бийиктиги"
 
 #~ msgid "Licence"
 #~ msgstr "Лицензия"
@@ -28301,14 +28159,197 @@ msgstr "Чыгышты тандоо"
 #~ msgid "00000; "
 #~ msgstr "00000; "
 
-#~ msgid "Group name"
-#~ msgstr "Топ аты"
+#~ msgid "Do you want to download it ?"
+#~ msgstr "Аны жүктөп аласызбы?"
 
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "Don't Send"
+#~ msgstr "Жөнөтпөө"
+
+#~ msgid "&Help..."
+#~ msgstr "&Жардам..."
+
+#~ msgid "OpenGL acceleration is not supported on your Mac"
+#~ msgstr "Сиздин Mac OpenGL ылдамдатуусун колдолбойт"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Субтитр файлы"
+
+#, fuzzy
+#~ msgid "Subtitles/OSD"
+#~ msgstr "Субтитрлер"
+
+#, fuzzy
+#~ msgid "Encoders settings"
+#~ msgstr "Ырастоолорду оңдоо"
+
+#, fuzzy
+#~ msgid "Quick &Open File..."
+#~ msgstr "Файлды ачуу..."
+
+#, fuzzy
+#~ msgid "&Bookmarks"
+#~ msgstr "Чөп каттар..."
+
+#, fuzzy
+#~ msgid "No Repeat"
+#~ msgstr "Кайталоо"
+
+#, fuzzy
+#~ msgid "Leave fullscreen"
+#~ msgstr "Толук экран"
+
+#, fuzzy
+#~ msgid "CPU"
+#~ msgstr "TCP"
+
+#, fuzzy
+#~ msgid "GSM Audio"
+#~ msgstr "Аудио"
+
+#, fuzzy
+#~ msgid "Channel"
+#~ msgstr "Каналдар"
+
+#, fuzzy
+#~ msgid "PVR"
+#~ msgstr "VDR"
+
+#, fuzzy
+#~ msgid "all"
+#~ msgstr "Дубал"
+
+#, fuzzy
+#~ msgid "Subtitles encoding"
+#~ msgstr "Субтитрлер"
+
+#, fuzzy
+#~ msgid "HTML Playlist"
+#~ msgstr "HTML плейлисти"
+
+#, fuzzy
+#~ msgid "HTTP Proxy"
+#~ msgstr "HTTP-прокси"
+
+#, fuzzy
+#~ msgid "Font Color"
+#~ msgstr "Арип түсү"
+
+#, fuzzy
+#~ msgid "Subtitle Languages"
+#~ msgstr "Субтитр тили"
+
+#, fuzzy
+#~ msgid "Outline Color"
+#~ msgstr "Контур түсү"
+
+#, fuzzy
+#~ msgid " Volume   : %u%%"
+#~ msgstr " Булагы   : %s"
+
+#, fuzzy
+#~ msgid "Show playlist"
+#~ msgstr "XSPF плейлисти"
+
+#, fuzzy
+#~ msgid " dB"
+#~ msgstr "дБ"
+
+#, fuzzy
+#~ msgid "Add to playlist"
+#~ msgstr "M3U плейлисти"
+
+#, fuzzy
+#~ msgid "Clear playlist"
+#~ msgstr "Тизмени тазалоо"
+
+#, fuzzy
+#~ msgid "&Codec"
+#~ msgstr "Кодек"
+
+#, fuzzy
+#~ msgid "Subtitles Files"
+#~ msgstr "Субтитр файлы"
+
+#, fuzzy
+#~ msgid "&Tools"
+#~ msgstr "Аспап"
+
+#, fuzzy
+#~ msgid "Audio &Channels"
+#~ msgstr "Аудио-каналдар"
+
+#, fuzzy
+#~ msgid "Tools"
+#~ msgstr "Аспап"
+
+#, fuzzy
+#~ msgid "Sizes"
+#~ msgstr "Өлчөм"
+
+#, fuzzy
+#~ msgid "Audio Language"
+#~ msgstr "Аудио тили"
+
+#, fuzzy
+#~ msgid "Video Codec"
+#~ msgstr "Видео кодеги"
+
+#, fuzzy
+#~ msgid "Audio Codec"
+#~ msgstr "Аудио кодеги"
+
+#, fuzzy
+#~ msgid "Subtitle Codec"
+#~ msgstr "Субтитр файлы"
+
+#, fuzzy
+#~ msgid "Output Method"
+#~ msgstr "Чыгыш модулдары"
+
+#, fuzzy
+#~ msgid "Video Bit Rate"
+#~ msgstr "Видео өлчөмү"
+
+#, fuzzy
+#~ msgid "Audio Bit Rate"
+#~ msgstr "Аудио битрейти"
+
+#, fuzzy
+#~ msgid "Video Scale"
+#~ msgstr "Видео кодеги"
+
+#, fuzzy
+#~ msgid "Output File"
+#~ msgstr "Чыгыш файлы"
+
+#, fuzzy
+#~ msgid "File Name"
+#~ msgstr "Файл аты"
+
+#, fuzzy
+#~ msgid "width"
+#~ msgstr "Сүрөт туурасы"
+
+#, fuzzy
+#~ msgid "Columns:"
+#~ msgstr "Тилкелер"
+
+#, fuzzy
+#~ msgid "height"
+#~ msgstr "оң"
+
+#, fuzzy
+#~ msgid "Group name"
+#~ msgstr "Топ"
+
+#, fuzzy
 #~ msgid "Subtitles Language"
 #~ msgstr "Субтитр тили"
 
+#, fuzzy
 #~ msgid "Subtitles effects"
-#~ msgstr "Субтитр эффекттери"
-
-#~ msgid "Do you want to download it ?"
-#~ msgstr "Аны жүктөп аласызбы?"
+#~ msgstr "Субтитрлер"
