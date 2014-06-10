@@ -1226,7 +1226,7 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "Bideo-irteerako modulua"
+msgstr "Bezeroaren ataka"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -3344,7 +3344,6 @@ msgid "HTTP/TLS Certificate Revocation List"
 msgstr "HTTP/TLS ziurtagirien errebokatze-zerrenda"
 
 #: src/libvlc-module.c:846
-#, fuzzy
 msgid ""
 "This file contains an optional CRL to prevent remote clients from using "
 "revoked certificates in TLS sessions."
@@ -7700,7 +7699,7 @@ msgstr "VLCk ezin izan du fitxategia irakurri."
 #: modules/access/mtp.c:287
 #, fuzzy, c-format
 msgid "VLC could not open the file \"%s\": %s"
-msgstr "VLCk ezin du \"%s\" fitxategia ireki. (%m)"
+msgstr "VLCk ezin du \"%s\" fitxategia ireki (%m)."
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -11855,9 +11854,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:79
-#, fuzzy
 msgid "Group of Picture Reference Distance"
-msgstr "Uneko instantziaren izena"
+msgstr ""
 
 #: modules/codec/qsv.c:81
 msgid ""
@@ -11876,9 +11874,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "Zaintza aldia"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -11891,9 +11888,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:100
-#, fuzzy
 msgid "Rate Control Method"
-msgstr "Ratioa kontrolatzeko metodoa"
+msgstr ""
 
 #: modules/codec/qsv.c:102
 msgid ""
@@ -11902,9 +11898,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:105
-#, fuzzy
 msgid "Quantization parameter"
-msgstr "I kuantizazio-faktorea"
+msgstr ""
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -12790,7 +12785,7 @@ msgstr "DVB azpitituluen deskodetzailea"
 #: modules/codec/substx3g.c:41
 #, fuzzy
 msgid "tx3g subtitles"
-msgstr "DVB azpitituluak"
+msgstr "Teletestuaren azpitituluak"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -19224,7 +19219,6 @@ msgstr ""
 "jarraitua lehenespenez: mms://yourip:8080."
 
 #: modules/gui/macosx/wizard.m:265
-#, fuzzy
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
 "This protocol is used as transport method by many Microsoft's software. Note "
@@ -22275,7 +22269,7 @@ msgstr "Qt interfazea"
 #: modules/gui/qt4/recents.cpp:159
 #, fuzzy
 msgid "Recently Played"
-msgstr "Ireki a&zken multimedia"
+msgstr "Gorde duela gutxi erreproduzitutako elementuak"
 
 #: modules/gui/qt4/util/customwidgets.cpp:80
 msgid "errors"
@@ -22439,7 +22433,7 @@ msgstr "Birlaginketaren kalitatea"
 #: modules/hw/vdpau/chroma.c:843
 #, fuzzy
 msgid "High quality scaling level"
-msgstr "Kalitate handiko audioaren birlaginketa"
+msgstr "Bideo-kalitatearen prozesatu ondorengo maila"
 
 #: modules/hw/vdpau/deinterlace.c:131
 #, fuzzy
@@ -23276,7 +23270,7 @@ msgstr ""
 #: modules/mux/ogg.c:50
 #, fuzzy
 msgid "Index size ratio"
-msgstr "Mantendu aspektu-erlazioa"
+msgstr "Indize-fitxategia"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
@@ -26163,7 +26157,7 @@ msgstr "Erauzi GBU osagaiaren bideo-iragazkia"
 #: modules/video_filter/freeze.c:77
 #, fuzzy
 msgid "Freezing interactive video filter"
-msgstr "Gurutzelarkatuak bereizteko bideo-iragazkia"
+msgstr "Puzzle-joko interaktiboaren bideo-iragazkia"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freeze"
@@ -29738,7 +29732,7 @@ msgstr "Bideo-kaptura"
 #: modules/access/avcapture.m:56
 #, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "VLCk ezin izan du %s deskodetzailea ireki."
+msgstr "Audio-irteeraren modulua"
 
 #: modules/access/avcapture.m:288 modules/access/avcapture.m:317
 #, fuzzy
@@ -29987,7 +29981,7 @@ msgstr "Ispilatzearen noranzkoa"
 #: modules/stream_out/chromaprint.c:58
 #, fuzzy
 msgid "Default: 90sec"
-msgstr "Lehenetsia"
+msgstr "Transmisio jarraitu lehenetsia"
 
 #: modules/stream_out/chromaprint.c:61
 #, fuzzy
@@ -30048,360 +30042,6 @@ msgstr "VLC multimedia-erreproduzigailuaren laguntza"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "Transmisio jarraituaren irteera"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr "Aukeratu nahiago duzun bideo-irteera eta konfiguratu hemen."
-
-#~ msgid "These modules provide network functions to all other parts of VLC."
-#~ msgstr ""
-#~ "Modulu hauek sareko funtzioak eskaintzen dizkiete VLCko beste atal "
-#~ "guztiei."
-
-#~ msgid ""
-#~ "These are general settings for video/audio/subtitle encoding modules."
-#~ msgstr ""
-#~ "Ezarpen hauek bideoa/audioa/azpitituluak kodetzeko moduluen ezarpen "
-#~ "orokorrak dira."
-
-#~ msgid "Dialog providers can be configured here."
-#~ msgstr "Elkarrizketa-hornitzaileak hemen konfigura daitezke."
-
-#~ msgid ""
-#~ "In this section you can force the behavior of the subtitle demuxer, for "
-#~ "example by setting the subtitle type or file name."
-#~ msgstr ""
-#~ "Atal honetan azpititulu-demultiplexatzailearen portaera behartu dezakezu, "
-#~ "adibidez, azpititulu mota edo fitxategi-izena ezarriz."
-
-#~ msgid "No suitable decoder module"
-#~ msgstr "Ez dago deskodetzailearen modulu egokirik"
-
-#~ msgid ""
-#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
-#~ "there is no way for you to fix this."
-#~ msgstr ""
-#~ "VLCk ez du onartzen \"%4.4s\" audio- edo bideo-formatua. Zoritxarrez, ez "
-#~ "daukazu hori konpontzeko erarik."
-
-#, fuzzy
-#~ msgid ""
-#~ "This file contains an optional CRL to prevent remove clients from using "
-#~ "revoked certificates in TLS sessions."
-#~ msgstr ""
-#~ "Fitxategi honek aukerazko CRLa dauka urruneko bezeroek TLS saioetan "
-#~ "errebokatutako ziurtagiriak erabiltzea saihesteko."
-
-#~ msgid ""
-#~ "Additional path for VLC to look for its modules. You can add several "
-#~ "paths by concatenating them using \" PATH_SEP \" as separator"
-#~ msgstr ""
-#~ "VLCk bere moduluak bilatzeko bide-izen osagarria. Hainbat bide-izen gehi "
-#~ "ditzakezu, elkarrekin kateatuz eta \" PATH_SEP \" bereizle gisa erabiliz"
-
-#~ msgid "Album art policy"
-#~ msgstr "Album-karatulei buruzko gidalerroak"
-
-#~ msgid "Choose how album art will be downloaded."
-#~ msgstr "Aukeratu albumaren karatula nola deskargatuko den."
-
-#~ msgid "Manual download only"
-#~ msgstr "Eskuz bakarrik deskargatu"
-
-#~ msgid "When track starts playing"
-#~ msgstr "Pista erreproduzitzen hasten denean"
-
-#~ msgid "As soon as track is added"
-#~ msgstr "Pista bat gehitu bezain laster"
-
-#~ msgid "Load Media Library"
-#~ msgstr "Kargatu multimedia-liburutegia"
-
-#~ msgid ""
-#~ "Enable this option to load the SQL-based Media Library at VLC startup"
-#~ msgstr ""
-#~ "Gaitu aukera hau SQLn oinarritutako multimedia-liburutegia kargatzeko VLC "
-#~ "abiatzean"
-
-#~ msgid "FFmpeg"
-#~ msgstr "FFmpeg"
-
-#~ msgid "FFmpeg access"
-#~ msgstr "FFmpeg atzipena"
-
-#~ msgid "Your system AACS decoding library does not work. Missing keys?"
-#~ msgstr ""
-#~ "Zure sistemako AACS deskodeketarako liburutegia ez dabil. Gakoak falta "
-#~ "dira?"
-
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "VLCk ezin du \"%s\" fitxategia ireki. (%m)"
-
-#~ msgid "TCP address to use"
-#~ msgstr "Erabili beharreko TCP helbidea"
-
-#~ msgid ""
-#~ "TCP address to use to communicate with the video part of the Bar Graph "
-#~ "(default localhost). In the case of bargraph incrustation, use localhost."
-#~ msgstr ""
-#~ "Barra-grafikoaren bideoaren zatiarekin komunikatzeko erabili behar den "
-#~ "TCP helbidea (lehenetsia localhost da). Barra-grafikoan inkrustazioa "
-#~ "badago, erabili localhost."
-
-#~ msgid "TCP port to use"
-#~ msgstr "Erabili beharreko TCP ataka"
-
-#~ msgid ""
-#~ "TCP port to use to communicate with the video part of the Bar Graph "
-#~ "(default 12345). Use the same port as the one used in the rc interface."
-#~ msgstr ""
-#~ "Barra-grafikoaren bideoaren zatiarekin komunikatzeko erabili beharreko "
-#~ "TCP ataka (lehenetsia 12345 da). Erabili rc interfazean erabilitako ataka "
-#~ "bera."
-
-#~ msgid "Force connection reset regularly"
-#~ msgstr "Behartu konexioa erregulartasunez berrezartzea"
-
-#~ msgid ""
-#~ "Defines if the TCP connection should be reset. This is to be used when "
-#~ "using with audiobargraph_v (default 1)."
-#~ msgstr ""
-#~ "TCP konexioa berrezarri behar den zehazten du. Honekin batera "
-#~ "erabiltzeko: audiobargraph_v (lehenetsia 1)."
-
-#~ msgid "Audio filter for stereo to mono conversion"
-#~ msgstr "Estereotik monora bihurtzeko audio-iragazkia"
-
-#~ msgid "Discard cropping information"
-#~ msgstr "Baztertu mozketa informazioa"
-
-#~ msgid "Video Acceleration (VA) API"
-#~ msgstr "Bideo-azelerazio (VA) APIa"
-
-#~ msgid "If bitrate=0, use this value for constant quality"
-#~ msgstr "Bit-emaria=0 bada, erabili balio hori kalitate konstanterako"
-
-#~ msgid "A value > 0 enables constant bitrate mode"
-#~ msgstr "Balio bat > 0 bada, bit-emaria konstantearen modua gaitzen du"
-
-#~ msgid "Enable lossless coding"
-#~ msgstr "Gaitu galerarik gabeko kodeketa"
-
-#~ msgid ""
-#~ "Lossless coding ignores bitrate and quality settings, allowing for "
-#~ "perfect reproduction of the original"
-#~ msgstr ""
-#~ "Galerarik gabeko kodeketak ez ditu bit-emariaren eta kalitatearen "
-#~ "ezarpenak kontuan hartzen, eta jatorrizkoa ezin hobeto erreproduzitzeko "
-#~ "aukera ematen du"
-
-#~ msgid "Rectangular Linear Phase"
-#~ msgstr "Fase lineal angeluzuzena"
-
-#~ msgid "Diagonal Linear Phase"
-#~ msgstr "Fase lineal diagonala"
-
-#~ msgid "Distance between 'P' frames"
-#~ msgstr "'P' markoen arteko distantzia"
-
-#~ msgid "Number of 'P' frames per GOP"
-#~ msgstr "'P' markoen kopurua GOP bakoitzeko"
-
-#~ msgid "Width of motion compensation blocks"
-#~ msgstr "Mugimendua konpentsatzeko blokeen zabalera"
-
-#~ msgid "Height of motion compensation blocks"
-#~ msgstr "Mugimendua konpentsatzeko blokeen altuera"
-
-#~ msgid "Block overlap (%)"
-#~ msgstr "Bloke-teilakatzea (%)"
-
-#~ msgid "Amount that each motion block should be overlapped by its neighbours"
-#~ msgstr ""
-#~ "Mugimendu-bloke bakoitza zenbateraino teilakatu behar duten bere auzoek"
-
-#~ msgid "xblen"
-#~ msgstr "xblen"
-
-#~ msgid "Total horizontal block length including overlaps"
-#~ msgstr "Blokeen luzera horizontal totala, teilakatzeak barne"
-
-#~ msgid "yblen"
-#~ msgstr "yblen"
-
-#~ msgid "Total vertical block length including overlaps"
-#~ msgstr "Blokeen luzera bertikal totala, teilakatzeak barne"
-
-#~ msgid "Motion vector precision"
-#~ msgstr "Mugimendu-bektorearen zehaztasuna"
-
-#~ msgid "Motion vector precision in pels."
-#~ msgstr "Mugimendu-bektorearen zehaztasuna pixeletan."
-
-#~ msgid "Simple ME search area x:y"
-#~ msgstr "ME bilaketa-area soila x:y"
-
-#~ msgid ""
-#~ "(Not recommended) Perform a simple (non hierarchical block matching "
-#~ "motion vector search with search range of +/-x, +/-y"
-#~ msgstr ""
-#~ "(Ez da gomendatzen) Egin blokeekin bat datozen mugimendu-bektoreen "
-#~ "bilaketa soil (ez-hierarkiko) bat, bilaketa-barruti honekin: +/-x, +/-y"
-
-#~ msgid "Enable spatial partitioning"
-#~ msgstr "Gaitu partizio espazialak"
-
-#~ msgid "cycles per degree"
-#~ msgstr "ziklo graduko"
-
-#~ msgid "Dirac video encoder using dirac-research library"
-#~ msgstr "Dirac bideo-kodetzailea; dirac-bilaketako liburutegia erabiltzen du"
-
-#~ msgid "Video decoder using openmash"
-#~ msgstr "openmash erabiltzen duen bideo-deskodetzailea"
-
-#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
-#~ msgstr "| menu . . [on|off|up|down|left|right|select] erabili menua"
-
-#~ msgid "Jump to time"
-#~ msgstr "Jauzi denborara"
-
-#~ msgid "Open CrashLog..."
-#~ msgstr "Ireki CrashLog..."
-
-#~ msgid "Don't Send"
-#~ msgstr "Ez bidali"
-
-#~ msgid "VLC crashed previously"
-#~ msgstr "VLC kraskatu egin da lehenago"
-
-#~ msgid ""
-#~ "Do you want to send details on the crash to VLC's development team?\n"
-#~ "\n"
-#~ "If you want, you can enter a few lines on what you did before VLC crashed "
-#~ "along with other helpful information: a link to download a sample file, a "
-#~ "URL of a network stream, ..."
-#~ msgstr ""
-#~ "Kraskaduraren xehetasunak VLC garatzeko taldeari bidali nahi dizkiozu?\n"
-#~ "\n"
-#~ "Hala nahi baduzu, VLC kraskatu baino lehen zer egin duzun azaldu dezakezu "
-#~ "bestelako informazio lagungarriarekin batera: adibide-fitxategi bat "
-#~ "deskargatzeko esteka bat, sareko transmisio jarraitu baten URL bat..."
-
-#~ msgid "I agree to be possibly contacted about this bugreport."
-#~ msgstr ""
-#~ "Errore-txosten honi buruz nirekin harremanetan jartzeko baimena ematen "
-#~ "dut."
-
-#~ msgid ""
-#~ "Only your default E-Mail address will be submitted, including no further "
-#~ "information."
-#~ msgstr ""
-#~ "Zure helbide elektroniko lehenetsia bakarrik bidaliko da, bestelako "
-#~ "informaziorik gabe."
-
-#~ msgid "Don't ask again"
-#~ msgstr "Ez galdetu berriro"
-
-#~ msgid "No CrashLog found"
-#~ msgstr "Ez da CrashLog-ik aurkitu"
-
-#~ msgid "Couldn't find any trace of a previous crash."
-#~ msgstr "Ezin izan da aurreko kraskadura baten arrastorik aurkitu."
-
-#~ msgid "Open BDMV folder"
-#~ msgstr "Ireki BDMV karpeta"
-
-#~ msgid "Album art download policy"
-#~ msgstr "Album-karatulak deskargatzeari buruzko gidalerroak"
-
-#~ msgid "Output module"
-#~ msgstr "Irteera-modulua"
-
-#~ msgid "Graphic Equalizer"
-#~ msgstr "Ekualizadore grafikoa"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "Ezarri automatikoki bideo-irabazia."
-
-#~ msgid "Get more extensions from"
-#~ msgstr "Lortu gehigarri gehiago hemendik:"
-
-#~ msgid "Under the Video"
-#~ msgstr "Bideoaren azpian"
-
-#~ msgid "&Help..."
-#~ msgstr "&Laguntza..."
-
-#~ msgid "Synchronise on audio track"
-#~ msgstr "Sinkronizatu audio-pistan"
-
-#~ msgid ""
-#~ "This option will drop/duplicate video frames to synchronise the video "
-#~ "track on the audio track."
-#~ msgstr ""
-#~ "Aukera honek bideo-markoak baztertu/bikoiztu egingo ditu, bideo-pista "
-#~ "audio-pistarekin sinkronizatzeko."
-
-#~ msgid ""
-#~ "The transcoder will drop frames if your CPU can't keep up with the "
-#~ "encoding rate."
-#~ msgstr ""
-#~ "Transkodetzaileak markoak baztertuko ditu PUZak ezin badio kodeketa-"
-#~ "emariari eutsi."
-
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "Audio-kanalen mailen balioa"
-
-#~ msgid "Alarm"
-#~ msgstr "Alarma"
-
-#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
-#~ msgstr ""
-#~ "Isilune bat seinalatzen du eta alerta bistaratzen du (0=alarmarik ez, "
-#~ "1=alarma)."
-
-#~ msgid ""
-#~ "Marquee text to display. (Available format strings: Time related: %Y = "
-#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
-#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
-#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
-#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
-#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
-#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
-#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
-#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
-#~ msgstr ""
-#~ "Bistaratu beharreko markesina-testua. (erabilgarri dauden formatu-kateak: "
-#~ "Denborari buruzkoak: %Y = urtea, %m = hilabetea, %d = eguna, %H = ordua, "
-#~ "%M = minutua, %S = segundoa, ... Metadatuei buruzkoak: $a = artista, $b = "
-#~ "albuma, $c = copyright-a, $d = deskribapena, $e = honekin kodetua, $g = "
-#~ "generoa, $l = hizkuntza, $n = pista-zenbakia, $p = orain erreproduzitzen, "
-#~ "$r = balorazioa, $s = azpitituluen hizkuntza, $t = titulua, $u = url, $A "
-#~ "= data, $B = audioaren bit-emaria (kb/s-tan), $C = kapitulua, $D = "
-#~ "iraupena, $F = izen osoa bide-izenarekin, $I = titulua, $L = geratzen den "
-#~ "denbora, $N = izena, $O = audioaren hizkuntza, $P = posizioa (%), $R = "
-#~ "emaria, $S = audioaren lagin-emaria (kHz-tan), $T = denbora, $U = "
-#~ "argitaratzailea, $V = bolumena, $_ = lerro berria) "
-
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "iOS OpenGL ES bideo-irteera (UIView behar du)"
-
-#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
-#~ msgstr "Mac OS X OpenGL bideo-irteera (drawable-nsobject eskatzen du)"
-
-#~ msgid "OpenGL acceleration is not supported on your Mac"
-#~ msgstr "OpenGL azelerazioa ez da onartzen zure Mac-ean"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "Erabili &azpitituluen fitxategi bat"
-
-#~ msgid "Album art download policy:"
-#~ msgstr "Album-karatulak deskargatzeari buruzko gidalerroak:"
-
-#~ msgid "Configure Media Library"
-#~ msgstr "Konfiguratu multimedia-liburutegia"
 
 #~ msgid ""
 #~ "SAP is a way to publically announce streams that are being sent using "
@@ -33173,6 +32813,360 @@ msgstr "Transmisio jarraituaren irteera"
 #, fuzzy
 #~ msgid "Save volume on exit"
 #~ msgstr "Berezgaitasunez gorde bolumena irteterakoan"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr "Aukeratu nahiago duzun bideo-irteera eta konfiguratu hemen."
+
+#~ msgid "These modules provide network functions to all other parts of VLC."
+#~ msgstr ""
+#~ "Modulu hauek sareko funtzioak eskaintzen dizkiete VLCko beste atal "
+#~ "guztiei."
+
+#~ msgid ""
+#~ "These are general settings for video/audio/subtitle encoding modules."
+#~ msgstr ""
+#~ "Ezarpen hauek bideoa/audioa/azpitituluak kodetzeko moduluen ezarpen "
+#~ "orokorrak dira."
+
+#~ msgid "Dialog providers can be configured here."
+#~ msgstr "Elkarrizketa-hornitzaileak hemen konfigura daitezke."
+
+#~ msgid ""
+#~ "In this section you can force the behavior of the subtitle demuxer, for "
+#~ "example by setting the subtitle type or file name."
+#~ msgstr ""
+#~ "Atal honetan azpititulu-demultiplexatzailearen portaera behartu dezakezu, "
+#~ "adibidez, azpititulu mota edo fitxategi-izena ezarriz."
+
+#~ msgid "No suitable decoder module"
+#~ msgstr "Ez dago deskodetzailearen modulu egokirik"
+
+#~ msgid ""
+#~ "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
+#~ "there is no way for you to fix this."
+#~ msgstr ""
+#~ "VLCk ez du onartzen \"%4.4s\" audio- edo bideo-formatua. Zoritxarrez, ez "
+#~ "daukazu hori konpontzeko erarik."
+
+#, fuzzy
+#~ msgid ""
+#~ "This file contains an optional CRL to prevent remove clients from using "
+#~ "revoked certificates in TLS sessions."
+#~ msgstr ""
+#~ "Fitxategi honek aukerazko CRLa dauka urruneko bezeroek TLS saioetan "
+#~ "errebokatutako ziurtagiriak erabiltzea saihesteko."
+
+#~ msgid ""
+#~ "Additional path for VLC to look for its modules. You can add several "
+#~ "paths by concatenating them using \" PATH_SEP \" as separator"
+#~ msgstr ""
+#~ "VLCk bere moduluak bilatzeko bide-izen osagarria. Hainbat bide-izen gehi "
+#~ "ditzakezu, elkarrekin kateatuz eta \" PATH_SEP \" bereizle gisa erabiliz"
+
+#~ msgid "Album art policy"
+#~ msgstr "Album-karatulei buruzko gidalerroak"
+
+#~ msgid "Choose how album art will be downloaded."
+#~ msgstr "Aukeratu albumaren karatula nola deskargatuko den."
+
+#~ msgid "Manual download only"
+#~ msgstr "Eskuz bakarrik deskargatu"
+
+#~ msgid "When track starts playing"
+#~ msgstr "Pista erreproduzitzen hasten denean"
+
+#~ msgid "As soon as track is added"
+#~ msgstr "Pista bat gehitu bezain laster"
+
+#~ msgid "Load Media Library"
+#~ msgstr "Kargatu multimedia-liburutegia"
+
+#~ msgid ""
+#~ "Enable this option to load the SQL-based Media Library at VLC startup"
+#~ msgstr ""
+#~ "Gaitu aukera hau SQLn oinarritutako multimedia-liburutegia kargatzeko VLC "
+#~ "abiatzean"
+
+#~ msgid "FFmpeg"
+#~ msgstr "FFmpeg"
+
+#~ msgid "FFmpeg access"
+#~ msgstr "FFmpeg atzipena"
+
+#~ msgid "Your system AACS decoding library does not work. Missing keys?"
+#~ msgstr ""
+#~ "Zure sistemako AACS deskodeketarako liburutegia ez dabil. Gakoak falta "
+#~ "dira?"
+
+#~ msgid "VLC could not open the file \"%s\". (%m)"
+#~ msgstr "VLCk ezin du \"%s\" fitxategia ireki. (%m)"
+
+#~ msgid "TCP address to use"
+#~ msgstr "Erabili beharreko TCP helbidea"
+
+#~ msgid ""
+#~ "TCP address to use to communicate with the video part of the Bar Graph "
+#~ "(default localhost). In the case of bargraph incrustation, use localhost."
+#~ msgstr ""
+#~ "Barra-grafikoaren bideoaren zatiarekin komunikatzeko erabili behar den "
+#~ "TCP helbidea (lehenetsia localhost da). Barra-grafikoan inkrustazioa "
+#~ "badago, erabili localhost."
+
+#~ msgid "TCP port to use"
+#~ msgstr "Erabili beharreko TCP ataka"
+
+#~ msgid ""
+#~ "TCP port to use to communicate with the video part of the Bar Graph "
+#~ "(default 12345). Use the same port as the one used in the rc interface."
+#~ msgstr ""
+#~ "Barra-grafikoaren bideoaren zatiarekin komunikatzeko erabili beharreko "
+#~ "TCP ataka (lehenetsia 12345 da). Erabili rc interfazean erabilitako ataka "
+#~ "bera."
+
+#~ msgid "Force connection reset regularly"
+#~ msgstr "Behartu konexioa erregulartasunez berrezartzea"
+
+#~ msgid ""
+#~ "Defines if the TCP connection should be reset. This is to be used when "
+#~ "using with audiobargraph_v (default 1)."
+#~ msgstr ""
+#~ "TCP konexioa berrezarri behar den zehazten du. Honekin batera "
+#~ "erabiltzeko: audiobargraph_v (lehenetsia 1)."
+
+#~ msgid "Audio filter for stereo to mono conversion"
+#~ msgstr "Estereotik monora bihurtzeko audio-iragazkia"
+
+#~ msgid "Discard cropping information"
+#~ msgstr "Baztertu mozketa informazioa"
+
+#~ msgid "Video Acceleration (VA) API"
+#~ msgstr "Bideo-azelerazio (VA) APIa"
+
+#~ msgid "If bitrate=0, use this value for constant quality"
+#~ msgstr "Bit-emaria=0 bada, erabili balio hori kalitate konstanterako"
+
+#~ msgid "A value > 0 enables constant bitrate mode"
+#~ msgstr "Balio bat > 0 bada, bit-emaria konstantearen modua gaitzen du"
+
+#~ msgid "Enable lossless coding"
+#~ msgstr "Gaitu galerarik gabeko kodeketa"
+
+#~ msgid ""
+#~ "Lossless coding ignores bitrate and quality settings, allowing for "
+#~ "perfect reproduction of the original"
+#~ msgstr ""
+#~ "Galerarik gabeko kodeketak ez ditu bit-emariaren eta kalitatearen "
+#~ "ezarpenak kontuan hartzen, eta jatorrizkoa ezin hobeto erreproduzitzeko "
+#~ "aukera ematen du"
+
+#~ msgid "Rectangular Linear Phase"
+#~ msgstr "Fase lineal angeluzuzena"
+
+#~ msgid "Diagonal Linear Phase"
+#~ msgstr "Fase lineal diagonala"
+
+#~ msgid "Distance between 'P' frames"
+#~ msgstr "'P' markoen arteko distantzia"
+
+#~ msgid "Number of 'P' frames per GOP"
+#~ msgstr "'P' markoen kopurua GOP bakoitzeko"
+
+#~ msgid "Width of motion compensation blocks"
+#~ msgstr "Mugimendua konpentsatzeko blokeen zabalera"
+
+#~ msgid "Height of motion compensation blocks"
+#~ msgstr "Mugimendua konpentsatzeko blokeen altuera"
+
+#~ msgid "Block overlap (%)"
+#~ msgstr "Bloke-teilakatzea (%)"
+
+#~ msgid "Amount that each motion block should be overlapped by its neighbours"
+#~ msgstr ""
+#~ "Mugimendu-bloke bakoitza zenbateraino teilakatu behar duten bere auzoek"
+
+#~ msgid "xblen"
+#~ msgstr "xblen"
+
+#~ msgid "Total horizontal block length including overlaps"
+#~ msgstr "Blokeen luzera horizontal totala, teilakatzeak barne"
+
+#~ msgid "yblen"
+#~ msgstr "yblen"
+
+#~ msgid "Total vertical block length including overlaps"
+#~ msgstr "Blokeen luzera bertikal totala, teilakatzeak barne"
+
+#~ msgid "Motion vector precision"
+#~ msgstr "Mugimendu-bektorearen zehaztasuna"
+
+#~ msgid "Motion vector precision in pels."
+#~ msgstr "Mugimendu-bektorearen zehaztasuna pixeletan."
+
+#~ msgid "Simple ME search area x:y"
+#~ msgstr "ME bilaketa-area soila x:y"
+
+#~ msgid ""
+#~ "(Not recommended) Perform a simple (non hierarchical block matching "
+#~ "motion vector search with search range of +/-x, +/-y"
+#~ msgstr ""
+#~ "(Ez da gomendatzen) Egin blokeekin bat datozen mugimendu-bektoreen "
+#~ "bilaketa soil (ez-hierarkiko) bat, bilaketa-barruti honekin: +/-x, +/-y"
+
+#~ msgid "Enable spatial partitioning"
+#~ msgstr "Gaitu partizio espazialak"
+
+#~ msgid "cycles per degree"
+#~ msgstr "ziklo graduko"
+
+#~ msgid "Dirac video encoder using dirac-research library"
+#~ msgstr "Dirac bideo-kodetzailea; dirac-bilaketako liburutegia erabiltzen du"
+
+#~ msgid "Video decoder using openmash"
+#~ msgstr "openmash erabiltzen duen bideo-deskodetzailea"
+
+#~ msgid "| menu . . [on|off|up|down|left|right|select] use menu"
+#~ msgstr "| menu . . [on|off|up|down|left|right|select] erabili menua"
+
+#~ msgid "Jump to time"
+#~ msgstr "Jauzi denborara"
+
+#~ msgid "Open CrashLog..."
+#~ msgstr "Ireki CrashLog..."
+
+#~ msgid "Don't Send"
+#~ msgstr "Ez bidali"
+
+#~ msgid "VLC crashed previously"
+#~ msgstr "VLC kraskatu egin da lehenago"
+
+#~ msgid ""
+#~ "Do you want to send details on the crash to VLC's development team?\n"
+#~ "\n"
+#~ "If you want, you can enter a few lines on what you did before VLC crashed "
+#~ "along with other helpful information: a link to download a sample file, a "
+#~ "URL of a network stream, ..."
+#~ msgstr ""
+#~ "Kraskaduraren xehetasunak VLC garatzeko taldeari bidali nahi dizkiozu?\n"
+#~ "\n"
+#~ "Hala nahi baduzu, VLC kraskatu baino lehen zer egin duzun azaldu dezakezu "
+#~ "bestelako informazio lagungarriarekin batera: adibide-fitxategi bat "
+#~ "deskargatzeko esteka bat, sareko transmisio jarraitu baten URL bat..."
+
+#~ msgid "I agree to be possibly contacted about this bugreport."
+#~ msgstr ""
+#~ "Errore-txosten honi buruz nirekin harremanetan jartzeko baimena ematen "
+#~ "dut."
+
+#~ msgid ""
+#~ "Only your default E-Mail address will be submitted, including no further "
+#~ "information."
+#~ msgstr ""
+#~ "Zure helbide elektroniko lehenetsia bakarrik bidaliko da, bestelako "
+#~ "informaziorik gabe."
+
+#~ msgid "Don't ask again"
+#~ msgstr "Ez galdetu berriro"
+
+#~ msgid "No CrashLog found"
+#~ msgstr "Ez da CrashLog-ik aurkitu"
+
+#~ msgid "Couldn't find any trace of a previous crash."
+#~ msgstr "Ezin izan da aurreko kraskadura baten arrastorik aurkitu."
+
+#~ msgid "Open BDMV folder"
+#~ msgstr "Ireki BDMV karpeta"
+
+#~ msgid "Album art download policy"
+#~ msgstr "Album-karatulak deskargatzeari buruzko gidalerroak"
+
+#~ msgid "Output module"
+#~ msgstr "Irteera-modulua"
+
+#~ msgid "Graphic Equalizer"
+#~ msgstr "Ekualizadore grafikoa"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "Ezarri automatikoki bideo-irabazia."
+
+#~ msgid "Get more extensions from"
+#~ msgstr "Lortu gehigarri gehiago hemendik:"
+
+#~ msgid "Under the Video"
+#~ msgstr "Bideoaren azpian"
+
+#~ msgid "&Help..."
+#~ msgstr "&Laguntza..."
+
+#~ msgid "Synchronise on audio track"
+#~ msgstr "Sinkronizatu audio-pistan"
+
+#~ msgid ""
+#~ "This option will drop/duplicate video frames to synchronise the video "
+#~ "track on the audio track."
+#~ msgstr ""
+#~ "Aukera honek bideo-markoak baztertu/bikoiztu egingo ditu, bideo-pista "
+#~ "audio-pistarekin sinkronizatzeko."
+
+#~ msgid ""
+#~ "The transcoder will drop frames if your CPU can't keep up with the "
+#~ "encoding rate."
+#~ msgstr ""
+#~ "Transkodetzaileak markoak baztertuko ditu PUZak ezin badio kodeketa-"
+#~ "emariari eutsi."
+
+#~ msgid "Value of the audio channels levels"
+#~ msgstr "Audio-kanalen mailen balioa"
+
+#~ msgid "Alarm"
+#~ msgstr "Alarma"
+
+#~ msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+#~ msgstr ""
+#~ "Isilune bat seinalatzen du eta alerta bistaratzen du (0=alarmarik ez, "
+#~ "1=alarma)."
+
+#~ msgid ""
+#~ "Marquee text to display. (Available format strings: Time related: %Y = "
+#~ "year, %m = month, %d = day, %H = hour, %M = minute, %S = second, ... Meta "
+#~ "data related: $a = artist, $b = album, $c = copyright, $d = description, "
+#~ "$e = encoded by, $g = genre, $l = language, $n = track num, $p = now "
+#~ "playing, $r = rating, $s = subtitles language, $t = title, $u = url, $A = "
+#~ "date, $B = audio bitrate (in kb/s), $C = chapter,$D = duration, $F = full "
+#~ "name with path, $I = title, $L = time left, $N = name, $O = audio "
+#~ "language, $P = position (in %), $R = rate, $S = audio sample rate (in "
+#~ "kHz), $T = time, $U = publisher, $V = volume, $_ = new line) "
+#~ msgstr ""
+#~ "Bistaratu beharreko markesina-testua. (erabilgarri dauden formatu-kateak: "
+#~ "Denborari buruzkoak: %Y = urtea, %m = hilabetea, %d = eguna, %H = ordua, "
+#~ "%M = minutua, %S = segundoa, ... Metadatuei buruzkoak: $a = artista, $b = "
+#~ "albuma, $c = copyright-a, $d = deskribapena, $e = honekin kodetua, $g = "
+#~ "generoa, $l = hizkuntza, $n = pista-zenbakia, $p = orain erreproduzitzen, "
+#~ "$r = balorazioa, $s = azpitituluen hizkuntza, $t = titulua, $u = url, $A "
+#~ "= data, $B = audioaren bit-emaria (kb/s-tan), $C = kapitulua, $D = "
+#~ "iraupena, $F = izen osoa bide-izenarekin, $I = titulua, $L = geratzen den "
+#~ "denbora, $N = izena, $O = audioaren hizkuntza, $P = posizioa (%), $R = "
+#~ "emaria, $S = audioaren lagin-emaria (kHz-tan), $T = denbora, $U = "
+#~ "argitaratzailea, $V = bolumena, $_ = lerro berria) "
+
+#~ msgid "iOS OpenGL ES video output (requires UIView)"
+#~ msgstr "iOS OpenGL ES bideo-irteera (UIView behar du)"
+
+#~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
+#~ msgstr "Mac OS X OpenGL bideo-irteera (drawable-nsobject eskatzen du)"
+
+#~ msgid "OpenGL acceleration is not supported on your Mac"
+#~ msgstr "OpenGL azelerazioa ez da onartzen zure Mac-ean"
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "Erabili &azpitituluen fitxategi bat"
+
+#~ msgid "Album art download policy:"
+#~ msgstr "Album-karatulak deskargatzeari buruzko gidalerroak:"
+
+#~ msgid "Configure Media Library"
+#~ msgstr "Konfiguratu multimedia-liburutegia"
 
 #, fuzzy
 #~ msgid ""
