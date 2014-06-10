@@ -1100,7 +1100,7 @@ msgstr ""
 #: src/input/decoder.c:693
 #, fuzzy
 msgid "Codec not supported"
-msgstr "ஒலித வெளிப்போத்து மாடுல்"
+msgstr "நுகர்வி வாசல்"
 
 #: src/input/decoder.c:694
 #, fuzzy, c-format
@@ -10852,12 +10852,11 @@ msgstr ""
 #: modules/codec/png.c:100
 #, fuzzy
 msgid "PNG video encoder"
-msgstr "ஒலித சாதனம்"
+msgstr "நிகழ்பட கோடக்கள்"
 
 #: modules/codec/qsv.c:56
-#, fuzzy
 msgid "Enable software mode"
-msgstr "செயல்பட வை சுவர் தாள்"
+msgstr ""
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -10866,9 +10865,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:61
-#, fuzzy
 msgid "Codec Profile"
-msgstr "சிறு வாழ்க்கைக் குறிப்பு"
+msgstr ""
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -10878,9 +10876,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:67
-#, fuzzy
 msgid "Codec Level"
-msgstr "&கோடக் தகவல்"
+msgstr ""
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -10921,9 +10918,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/qsv.c:90
-#, fuzzy
 msgid "IDR interval"
-msgstr "QT முகப்பு"
+msgstr ""
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -20915,7 +20911,7 @@ msgstr "YUV வெளிப்போத்து"
 #: modules/hw/vdpau/sharpen.c:141
 #, fuzzy
 msgid "VDPAU sharpen video filter"
-msgstr "நகலி நிகழ்பட சல்லடை"
+msgstr "நீலதிரை நிகழ்பட சல்லடை"
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -27373,9 +27369,8 @@ msgid "Default caching policy"
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:506
-#, fuzzy
 msgid "Menus language:"
-msgstr "ஒலிதம் மொழி"
+msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_interface.h:507
 msgid "Look and feel"
@@ -27892,7 +27887,7 @@ msgstr ""
 #: modules/control/win_msg.c:193
 #, fuzzy
 msgid "Windows messages interface"
-msgstr "QT முகப்பு"
+msgstr "முக்கியவிசைகள் கட்டுப்பாடு முகப்பு"
 
 #: modules/gui/macosx/DebugMessageVisualizer.m:93
 msgid "Save this Log..."
@@ -28056,33 +28051,6 @@ msgstr "VLC ஊடகஇயக்கி உதவி"
 #, fuzzy
 msgid "Streaming Output"
 msgstr "ஓடை வெளிப்போத்து"
-
-#~ msgid "Choose your preferred video output and configure it here."
-#~ msgstr ""
-#~ "உங்களுக்கு‍ விருப்பமான தேர்வுகள் மற்றும் காணொளிகளின் வெளியீடுகளை இங்கே கட்டமைக்க."
-
-#~ msgid "Manual download only"
-#~ msgstr "கையால் பதிவிறக்கம் மட்டும்"
-
-#~ msgid "Jump to time"
-#~ msgstr "நேரம் க்கு தாவு"
-
-#~ msgid "Don't Send"
-#~ msgstr "அனுப்பாதே"
-
-#~ msgid "Output module"
-#~ msgstr "வெளிப்போத்து மாடுல்"
-
-#, fuzzy
-#~ msgid "Automatically retrieve media infos"
-#~ msgstr "தானாக புதுப்பிக்க சோதனை"
-
-#~ msgid "&Help..."
-#~ msgstr "&உதவி..."
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "துணை உரை கோப்புகளை உபயோகி"
 
 #~ msgid "Modules search path"
 #~ msgstr "மாடுல்கள் தேடல் வழி"
@@ -28313,6 +28281,33 @@ msgstr "ஓடை வெளிப்போத்து"
 
 #~ msgid "OSSO"
 #~ msgstr "OSSO"
+
+#~ msgid "Choose your preferred video output and configure it here."
+#~ msgstr ""
+#~ "உங்களுக்கு‍ விருப்பமான தேர்வுகள் மற்றும் காணொளிகளின் வெளியீடுகளை இங்கே கட்டமைக்க."
+
+#~ msgid "Manual download only"
+#~ msgstr "கையால் பதிவிறக்கம் மட்டும்"
+
+#~ msgid "Jump to time"
+#~ msgstr "நேரம் க்கு தாவு"
+
+#~ msgid "Don't Send"
+#~ msgstr "அனுப்பாதே"
+
+#~ msgid "Output module"
+#~ msgstr "வெளிப்போத்து மாடுல்"
+
+#, fuzzy
+#~ msgid "Automatically retrieve media infos"
+#~ msgstr "தானாக புதுப்பிக்க சோதனை"
+
+#~ msgid "&Help..."
+#~ msgstr "&உதவி..."
+
+#, fuzzy
+#~ msgid "Add a subtitle file"
+#~ msgstr "துணை உரை கோப்புகளை உபயோகி"
 
 #, fuzzy
 #~ msgid "Subtitles/OSD"
