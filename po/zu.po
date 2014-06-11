@@ -12608,7 +12608,7 @@ msgstr "Ukufaka ikhodi ezihlokwaneni"
 #: modules/codec/subsdec.c:296 modules/demux/avi/avi.c:99
 msgctxt "GetACP"
 msgid "CP1252"
-msgstr ""
+msgstr "CP1252"
 
 #: modules/codec/subsusf.c:46
 msgid "USFSubs"
