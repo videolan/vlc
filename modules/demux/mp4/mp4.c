@@ -930,7 +930,9 @@ end:
         for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
         {
             mp4_track_t *tk = &p_sys->track[i_track];
-            if ( !tk->b_ok || !tk->b_selected ) continue;
+            if ( !tk->b_ok || !tk->b_selected  ||
+                 (tk->fmt.i_cat != AUDIO_ES && tk->fmt.i_cat != VIDEO_ES) )
+                continue;
             p_sys->i_pcr = __MIN( MP4_TrackGetDTS( p_demux, tk ), p_sys->i_pcr );
             p_sys->i_time = p_sys->i_pcr * p_sys->i_timescale / CLOCK_FREQ;
         }
