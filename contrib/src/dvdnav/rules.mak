@@ -26,6 +26,7 @@ $(TARBALLS)/libdvdnav-git.tar.xz:
 
 dvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.xz .sum-dvdnav
 	$(UNPACK)
+	cd $(UNPACK_DIR) && sed -i -e 's,Requires.private,Requires,g' misc/*.pc.in
 	cd $(UNPACK_DIR) && autoreconf -ivf
 	$(MOVE)
 
