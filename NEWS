@@ -16,6 +16,9 @@ Decoder:
 Demuxers:
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)
 
+Muxers:
+ * Added fragmented/streamable MP4 muxer
+
 Service Discovery:
  * New NetBios service discovery using libdsm
 
