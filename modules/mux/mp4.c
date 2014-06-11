@@ -473,9 +473,38 @@ static int Mux(sout_mux_t *p_mux)
             /* Fix length of the sample */
             if (block_FifoCount(p_input->p_fifo) > 0) {
                 block_t *p_next = block_FifoShow(p_input->p_fifo);
-                int64_t i_diff  = p_next->i_dts - p_data->i_dts;
-                if (i_diff < CLOCK_FREQ) /* protection */
-                    p_data->i_length = i_diff;
+                if ( p_next->i_flags & BLOCK_FLAG_DISCONTINUITY )
+                { /* we have no way to know real length except by decoding */
+                    if ( p_stream->fmt.i_cat == VIDEO_ES )
+                    {
+                        p_data->i_length = CLOCK_FREQ *
+                                           p_stream->fmt.video.i_frame_rate_base /
+                                           p_stream->fmt.video.i_frame_rate;
+                        msg_Dbg( p_mux, "video track %d fixup to %"PRId64" for sample %u",
+                                 p_stream->i_track_id, p_data->i_length, p_stream->i_entry_count );
+                    }
+                    else if ( p_stream->fmt.i_cat == AUDIO_ES &&
+                              p_stream->fmt.audio.i_rate &&
+                              p_data->i_nb_samples )
+                    {
+                        p_data->i_length = CLOCK_FREQ * p_data->i_nb_samples /
+                                           p_stream->fmt.audio.i_rate;
+                        msg_Dbg( p_mux, "audio track %d fixup to %"PRId64" for sample %u",
+                                 p_stream->i_track_id, p_data->i_length, p_stream->i_entry_count );
+                    }
+                    else if ( p_data->i_length <= 0 )
+                    {
+                        msg_Warn( p_mux, "unknown length for track %d sample %u",
+                                  p_stream->i_track_id, p_stream->i_entry_count );
+                        p_data->i_length = 1;
+                    }
+                }
+                else
+                {
+                    int64_t i_diff  = p_next->i_dts - p_data->i_dts;
+                    if (i_diff < CLOCK_FREQ) /* protection */
+                        p_data->i_length = i_diff;
+                }
             }
             if (p_data->i_length <= 0) {
                 msg_Warn(p_mux, "i_length <= 0");
