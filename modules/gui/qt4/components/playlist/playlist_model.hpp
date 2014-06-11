@@ -107,9 +107,6 @@ public:
     virtual bool action( QAction *action, const QModelIndexList &indexes );
     virtual bool isSupportedAction( actions action, const QModelIndex & ) const;
 
-    /* VLCModelSubInterface indirect slots */
-    virtual void activateItem( const QModelIndex &index );
-
 protected:
     /* VLCModel subclassing */
     bool isParent( const QModelIndex &index, const QModelIndex &current) const;
@@ -164,6 +161,7 @@ private slots:
     void processItemRemoval( int i_pl_itemid );
     void processItemAppend( int i_pl_itemid, int i_pl_itemidparent );
     void activateItem( playlist_item_t *p_item );
+    void activateItem( const QModelIndex &index );
 };
 
 class PlMimeData : public QMimeData
