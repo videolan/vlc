@@ -21,6 +21,7 @@ dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2 .sum-dvdread
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/dvdread/dvdread-win32.patch
 endif
+	cd $(UNPACK_DIR) && sed -i -e 's,Requires.private,Requires,g' misc/*.pc.in
 	cd $(UNPACK_DIR) && autoreconf -ivf
 	$(MOVE)
 
