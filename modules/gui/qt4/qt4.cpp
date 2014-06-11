@@ -486,8 +486,9 @@ static void *Thread( void *obj )
         app.setWindowIcon( QIcon::fromTheme( "vlc", QIcon( ":/logo/vlc256.png" ) ) );
 #endif
 
-    /* Initialize timers and the Dialog Provider */
+    /* Initialize the Dialog Provider and the Main Input Manager */
     DialogsProvider::getInstance( p_intf );
+    MainInputManager::getInstance( p_intf );
 
 #ifdef UPDATE_CHECK
     /* Checking for VLC updates */

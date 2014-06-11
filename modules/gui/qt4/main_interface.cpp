@@ -169,11 +169,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     createStatusBar();
     setStatusBarVisibility( getSettings()->value( "MainWindow/status-bar-visible", false ).toBool() );
 
-    /********************
-     * Input Manager    *
-     ********************/
-    MainInputManager::getInstance( p_intf );
-
 #ifdef _WIN32
     himl = NULL;
     p_taskbl = NULL;
