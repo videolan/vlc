@@ -372,8 +372,8 @@ static int vlc_clone_attr (vlc_thread_t *th, void *(*entry) (void *),
         pthread_sigmask (SIG_BLOCK, &set, &oldset);
     }
 
-
-    vlc_sem_init(&thread->finished, 0);
+    if (!detach)
+        vlc_sem_init(&thread->finished, 0);
     atomic_store(&thread->killed, false);
     thread->killable = true;
     thread->cond = NULL;
