@@ -523,14 +523,7 @@ static int OpenDecoder(vlc_object_t *p_this)
         (*env)->ExceptionClear(env);
         goto error;
     }
-
-    /* WARNING: we should normally set the started flag here, just after the start() call.
-       However, as libstagefright is asynchronous and is not entirely initialized after
-       the start() call, we wait to have successfully decoded the first frame before
-       setting this flag in order to try to avoid a crash happening during the module
-       CloseDecoder() function.
-       Note: calling release() without having called stop() does not seem to be an issue. */
-    //p_sys->started = true;
+    p_sys->started = true;
 
     p_sys->input_buffers = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_input_buffers);
     p_sys->output_buffers = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_output_buffers);
@@ -948,7 +941,6 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         (*env)->CallVoidMethod(env, p_sys->codec, p_sys->queue_input_buffer, index, 0, size, ts, 0);
         (*env)->DeleteLocalRef(env, buf);
         p_sys->decoded = true;
-        p_sys->started = true;
         break;
     }
     if (!p_pic)
