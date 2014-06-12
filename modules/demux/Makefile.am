@@ -41,7 +41,7 @@ libps_plugin_la_SOURCES = demux/ps.c demux/ps.h
 demux_LTLIBRARIES += libps_plugin.la
 
 libmod_plugin_la_SOURCES = demux/mod.c
-libmod_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CXXFLAGS_mod)
+libmod_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_mod)
 libmod_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
 libmod_plugin_la_LIBADD = $(LIBS_mod)
 EXTRA_LTLIBRARIES += libmod_plugin.la

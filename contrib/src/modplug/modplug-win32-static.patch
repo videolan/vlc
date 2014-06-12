@@ -1,0 +1,9 @@
+diff -rupN libmodplug-old/libmodplug.pc.in libmodplug-new/libmodplug.pc.in
+--- libmodplug-old/libmodplug.pc.in	2013-08-23 09:55:58.000000000 +1000
++++ libmodplug-new/libmodplug.pc.in	2014-06-12 20:59:17.705886752 +1000
+@@ -9,4 +9,4 @@ Version: @VERSION@
+ Requires: 
+ Libs: -L${libdir} -lmodplug 
+ Libs.private: -lstdc++ -lm
+-Cflags: -I${includedir}
++Cflags: -I${includedir} -DMODPLUG_STATIC

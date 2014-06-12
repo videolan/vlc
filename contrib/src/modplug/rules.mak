@@ -15,6 +15,7 @@ $(TARBALLS)/libmodplug-$(MODPLUG_VERSION).tar.gz:
 
 libmodplug: libmodplug-$(MODPLUG_VERSION).tar.gz .sum-modplug
 	$(UNPACK)
+	$(APPLY) $(SRC)/modplug/modplug-win32-static.patch
 	$(call pkg_static,"libmodplug.pc.in")
 	$(MOVE)
 
