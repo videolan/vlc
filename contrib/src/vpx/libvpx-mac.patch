@@ -4,12 +4,14 @@ VLC's contrib system is clever enough to detect this, but libvpx fails miserably
 diff -ru libvpx/build/make/configure.sh libvpx/build/make/configure.sh
 --- libvpx/build/make/configure.sh	2012-06-08 10:26:47.000000000 +0200
 +++ libvpx-fixed/build/make/configure.sh	2012-06-08 10:26:07.000000000 +0200
-@@ -628,6 +628,9 @@
+@@ -628,6 +628,11 @@
      if [ -d "/Developer/SDKs/MacOSX10.7.sdk" ]; then
          osx_sdk_dir="/Developer/SDKs/MacOSX10.7.sdk"
      fi
 +    if [ -d "${sdk_path}" ]; then
-+        osx_sdk_dir=${sdk_path}
++        case "${sdk_path}" in
++           darwin*) osx_sdk_dir=${sdk_path} ;;
++        esac
 +    fi
  
      case ${toolchain} in

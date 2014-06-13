@@ -1,0 +1,31 @@
+Our contrib system already passes the correct sysroot to the compiler, so there
+is no need to set an alternate libc path. If that path is empty the script will
+try to look for it in some fashion, but since the SDKROOT may be in a
+non standard location the look up may fail.
+
+This patch avoids that case and relies on the user configuration for the
+correct sysroot.
+
+See also https://code.google.com/p/webm/issues/detail?id=809
+
+diff --git a/build/make/configure.sh b/build/make/configure.sh
+index d4124c7..c420d25 100755
+--- a/build/make/configure.sh
++++ b/build/make/configure.sh
+@@ -939,8 +939,11 @@ EOF
+                           awk '{ print $1 }' | tail -1`
+             fi
+ 
+-            add_cflags "--sysroot=${alt_libc}"
+-            add_ldflags "--sysroot=${alt_libc}"
++            # this may happen if toolchain binaries are outside the ndk dir
++            if [ "${alt_libc}" ]; then
++                add_cflags "--sysroot=${alt_libc}"
++                add_ldflags "--sysroot=${alt_libc}"
++            fi
+ 
+             # linker flag that routes around a CPU bug in some
+             # Cortex-A8 implementations (NDK Dev Guide)
+-- 
+1.8.3.2
+
