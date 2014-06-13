@@ -572,9 +572,21 @@ static void CloseDecoder(vlc_object_t *p_this)
         (*env)->DeleteGlobalRef(env, p_sys->output_buffers);
     if (p_sys->codec) {
         if (p_sys->started)
+        {
             (*env)->CallVoidMethod(env, p_sys->codec, p_sys->stop);
+            if ((*env)->ExceptionOccurred(env)) {
+                msg_Err(p_dec, "Exception in MediaCodec.stop");
+                (*env)->ExceptionClear(env);
+            }
+        }
         if (p_sys->allocated)
+        {
             (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release);
+            if ((*env)->ExceptionOccurred(env)) {
+                msg_Err(p_dec, "Exception in MediaCodec.release");
+                (*env)->ExceptionClear(env);
+            }
+        }
         (*env)->DeleteGlobalRef(env, p_sys->codec);
     }
     if (p_sys->buffer_info)
@@ -658,6 +670,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
         int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_output_buffer,
                                           p_sys->buffer_info, timeout);
         if ((*env)->ExceptionOccurred(env)) {
+            msg_Err(p_dec, "Exception in MediaCodec.dequeueOutputBuffer (GetOutput)");
             (*env)->ExceptionClear(env);
             p_sys->error_state = true;
             return;
@@ -667,6 +680,12 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
             if (!p_sys->pixel_format) {
                 msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
                 (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, index, false);
+                if ((*env)->ExceptionOccurred(env)) {
+                    msg_Err(p_dec, "Exception in MediaCodec.releaseOutputBuffer");
+                    (*env)->ExceptionClear(env);
+                    p_sys->error_state = true;
+                    return;
+                }
                 continue;
             }
 
@@ -677,6 +696,13 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                 picture_sys_t *p_picsys = p_pic->p_sys;
                 int i_prev_index = p_picsys->i_index;
                 (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, i_prev_index, false);
+                if ((*env)->ExceptionOccurred(env)) {
+                    msg_Err(p_dec, "Exception in MediaCodec.releaseOutputBuffer " \
+                            "(GetOutput, overwriting previous picture)");
+                    (*env)->ExceptionClear(env);
+                    p_sys->error_state = true;
+                    return;
+                }
 
                 // No need to lock here since the previous picture was not sent.
                 p_sys->inflight_picture[i_prev_index] = NULL;
@@ -737,6 +763,11 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
             } else {
                 msg_Warn(p_dec, "NewPicture failed");
                 (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, index, false);
+                if ((*env)->ExceptionOccurred(env)) {
+                    msg_Err(p_dec, "Exception in MediaCodec.releaseOutputBuffer (GetOutput)");
+                    (*env)->ExceptionClear(env);
+                    p_sys->error_state = true;
+                }
             }
             return;
 
@@ -746,6 +777,14 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
 
             p_sys->output_buffers = (*env)->CallObjectMethod(env, p_sys->codec,
                                                              p_sys->get_output_buffers);
+            if ((*env)->ExceptionOccurred(env)) {
+                msg_Err(p_dec, "Exception in MediaCodec.getOutputBuffer (GetOutput)");
+                (*env)->ExceptionClear(env);
+                p_sys->output_buffers = NULL;
+                p_sys->error_state = true;
+                return;
+            }
+
             p_sys->output_buffers = (*env)->NewGlobalRef(env, p_sys->output_buffers);
 
             vlc_mutex_lock(get_android_opaque_mutex());
@@ -756,6 +795,13 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
 
         } else if (index == INFO_OUTPUT_FORMAT_CHANGED) {
             jobject format = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_output_format);
+            if ((*env)->ExceptionOccurred(env)) {
+                msg_Err(p_dec, "Exception in MediaCodec.getOutputFormat (GetOutput)");
+                (*env)->ExceptionClear(env);
+                p_sys->error_state = true;
+                return;
+            }
+
             jobject format_string = (*env)->CallObjectMethod(env, format, p_sys->tostring);
 
             jsize format_len = (*env)->GetStringUTFLength(env, format_string);
@@ -880,6 +926,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     while (true) {
         int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_input_buffer, (jlong) 0);
         if ((*env)->ExceptionOccurred(env)) {
+            msg_Err(p_dec, "Exception occurred in MediaCodec.dequeueInputBuffer");
             (*env)->ExceptionClear(env);
             p_sys->error_state = true;
             break;
@@ -940,6 +987,12 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         timestamp_FifoPut(p_sys->timestamp_fifo, p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
         (*env)->CallVoidMethod(env, p_sys->codec, p_sys->queue_input_buffer, index, 0, size, ts, 0);
         (*env)->DeleteLocalRef(env, buf);
+        if ((*env)->ExceptionOccurred(env)) {
+            msg_Err(p_dec, "Exception in MediaCodec.queueInputBuffer");
+            (*env)->ExceptionClear(env);
+            p_sys->error_state = true;
+            break;
+        }
         p_sys->decoded = true;
         break;
     }
