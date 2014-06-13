@@ -352,7 +352,6 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
     }
 
     vlc_fourcc_t  i_chroma = 0;
-    VAImageFormat fmt;
     for( int i = 0; i < i_fmt_count; i++ )
     {
         if( p_fmt[i].fourcc == VA_FOURCC( 'Y', 'V', '1', '2' ) ||
@@ -375,7 +374,6 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
             }
 
             i_chroma = VLC_CODEC_YV12;
-            fmt = p_fmt[i];
             break;
         }
     }
