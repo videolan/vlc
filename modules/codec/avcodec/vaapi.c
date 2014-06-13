@@ -354,9 +354,9 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
     vlc_fourcc_t  i_chroma = 0;
     for( int i = 0; i < i_fmt_count; i++ )
     {
-        if( p_fmt[i].fourcc == VA_FOURCC( 'Y', 'V', '1', '2' ) ||
-            p_fmt[i].fourcc == VA_FOURCC( 'I', '4', '2', '0' ) ||
-            p_fmt[i].fourcc == VA_FOURCC( 'N', 'V', '1', '2' ) )
+        if( p_fmt[i].fourcc == VA_FOURCC_YV12 ||
+            p_fmt[i].fourcc == VA_FOURCC_IYUV ||
+            p_fmt[i].fourcc == VA_FOURCC_NV12 )
         {
             if( vaCreateImage(  sys->p_display, &p_fmt[i], i_width, i_height, &sys->image ) )
             {
@@ -465,10 +465,10 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, void *opaque,
         return VLC_EGENERIC;
 
     const uint32_t i_fourcc = sys->image.format.fourcc;
-    if( i_fourcc == VA_FOURCC('Y','V','1','2') ||
-        i_fourcc == VA_FOURCC('I','4','2','0') )
+    if( i_fourcc == VA_FOURCC_YV12 ||
+        i_fourcc == VA_FOURCC_IYUV )
     {
-        bool b_swap_uv = i_fourcc == VA_FOURCC('I','4','2','0');
+        bool b_swap_uv = i_fourcc == VA_FOURCC_IYUV;
         uint8_t *pp_plane[3];
         size_t  pi_pitch[3];
 
@@ -485,7 +485,7 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, void *opaque,
     }
     else
     {
-        assert( i_fourcc == VA_FOURCC('N','V','1','2') );
+        assert( i_fourcc == VA_FOURCC_NV12 );
         uint8_t *pp_plane[2];
         size_t  pi_pitch[2];
 
