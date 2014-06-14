@@ -74,11 +74,7 @@ struct decoder_sys_t
 
 
     /* */
-#if LIBAVCODEC_VERSION_MAJOR < 54
-    AVPaletteControl palette;
-#else
     bool palette_sent;
-#endif
 
     /* */
     bool b_flush;
@@ -373,37 +369,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     p_dec->fmt_out.video.orientation = p_dec->fmt_in.video.orientation;
 
-#if LIBAVCODEC_VERSION_MAJOR < 54
-    /* Setup palette */
-    memset( &p_sys->palette, 0, sizeof(p_sys->palette) );
-    if( p_dec->fmt_in.video.p_palette )
-    {
-        p_sys->palette.palette_changed = 1;
-
-        for( int i = 0; i < __MIN( AVPALETTE_COUNT, p_dec->fmt_in.video.p_palette->i_entries ); i++ )
-        {
-            union {
-                uint32_t u;
-                uint8_t a[4];
-            } c;
-            c.a[0] = p_dec->fmt_in.video.p_palette->palette[i][0];
-            c.a[1] = p_dec->fmt_in.video.p_palette->palette[i][1];
-            c.a[2] = p_dec->fmt_in.video.p_palette->palette[i][2];
-            c.a[3] = p_dec->fmt_in.video.p_palette->palette[i][3];
-
-            p_sys->palette.palette[i] = c.u;
-        }
-        p_sys->p_context->palctrl = &p_sys->palette;
-
-        p_dec->fmt_out.video.p_palette = malloc( sizeof(video_palette_t) );
-        if( p_dec->fmt_out.video.p_palette )
-            *p_dec->fmt_out.video.p_palette = *p_dec->fmt_in.video.p_palette;
-    }
-    else if( p_sys->i_codec_id != CODEC_ID_MSVIDEO1 && p_sys->i_codec_id != CODEC_ID_CINEPAK )
-    {
-        p_sys->p_context->palctrl = &p_sys->palette;
-    }
-#else
     if( p_dec->fmt_in.video.p_palette ) {
         p_sys->palette_sent = false;
         p_dec->fmt_out.video.p_palette = malloc( sizeof(video_palette_t) );
@@ -411,7 +376,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
             *p_dec->fmt_out.video.p_palette = *p_dec->fmt_in.video.p_palette;
     } else
         p_sys->palette_sent = true;
-#endif
 
     /* ***** init this codec with special data ***** */
     ffmpeg_InitCodec( p_dec );
@@ -595,7 +559,6 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             pkt.size = 0;
         }
 
-#if LIBAVCODEC_VERSION_MAJOR >= 54
         if( !p_sys->palette_sent )
         {
             uint8_t *pal = av_packet_new_side_data(&pkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
@@ -604,7 +567,6 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 p_sys->palette_sent = true;
             }
         }
-#endif
 
         /* Make sure we don't reuse the same timestamps twice */
         if( p_block )
@@ -1212,9 +1174,6 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_ff_pic->opaque = NULL;
 #if ! LIBAVCODEC_VERSION_CHECK(54, 34, 0, 79, 101)
     p_ff_pic->pkt_pts = p_context->pkt ? p_context->pkt->pts : AV_NOPTS_VALUE;
-#endif
-#if LIBAVCODEC_VERSION_MAJOR < 54
-    p_ff_pic->age = 256*256*256*64;
 #endif
 
     if( p_sys->p_va )

@@ -109,9 +109,6 @@ static inline void vlc_init_avcodec(vlc_object_t *obj)
 
     vlc_init_avutil(obj);
 
-#if LIBAVCODEC_VERSION_MAJOR < 54
-    avcodec_init();
-#endif
     avcodec_register_all();
 
     vlc_avcodec_unlock();

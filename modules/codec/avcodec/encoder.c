@@ -236,11 +236,7 @@ static const uint16_t mpeg4_default_non_intra_matrix[64] = {
  23, 24, 25, 27, 28, 30, 31, 33,
 };
 
-#if LIBAVUTIL_VERSION_CHECK( 51, 27, 2, 46, 100 )
 static const int DEFAULT_ALIGN = 0;
-#else
-static const int DEFAULT_ALIGN = 1;
-#endif
 
 
 /*****************************************************************************
@@ -1112,7 +1108,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         frame->quality = p_sys->i_quality;
     }
 
-#if (LIBAVCODEC_VERSION_MAJOR >= 54)
     AVPacket av_pkt;
     int is_data;
 
@@ -1134,63 +1129,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     if( unlikely( av_pkt.flags & AV_PKT_FLAG_CORRUPT ) )
         p_block->i_flags |= BLOCK_FLAG_CORRUPTED;
 
-#else
-    int i_out = avcodec_encode_video( p_sys->p_context, p_block->p_buffer,
-                                      p_block->i_buffer, frame );
-    if( i_out <= 0 )
-    {
-        block_Release( p_block );
-        return NULL;
-    }
-
-    p_block->i_buffer = i_out;
-
-    /* FIXME, 3-2 pulldown is not handled correctly */
-    p_block->i_length = INT64_C(1000000) *
-        p_enc->fmt_in.video.i_frame_rate_base /
-            p_enc->fmt_in.video.i_frame_rate;
-
-    if( !p_sys->p_context->max_b_frames || !p_sys->p_context->delay )
-    {
-        /* No delay -> output pts == input pts */
-        if( p_pict )
-            p_block->i_dts = p_pict->date;
-        p_block->i_pts = p_block->i_dts;
-    }
-    else if( p_sys->p_context->coded_frame->pts != AV_NOPTS_VALUE &&
-        p_sys->p_context->coded_frame->pts != 0 &&
-        p_sys->i_buggy_pts_detect != p_sys->p_context->coded_frame->pts )
-    {
-        p_sys->i_buggy_pts_detect = p_sys->p_context->coded_frame->pts;
-        p_block->i_pts = p_sys->p_context->coded_frame->pts;
-
-        if( p_sys->p_context->coded_frame->pict_type != AV_PICTURE_TYPE_I &&
-            p_sys->p_context->coded_frame->pict_type != AV_PICTURE_TYPE_P )
-        {
-            p_block->i_dts = p_block->i_pts;
-        }
-        else
-        {
-            if( p_sys->i_last_ref_pts )
-            {
-                p_block->i_dts = p_sys->i_last_ref_pts;
-            }
-            else
-            {
-                /* Let's put something sensible */
-                p_block->i_dts = p_block->i_pts;
-            }
-
-            p_sys->i_last_ref_pts = p_block->i_pts;
-        }
-    }
-    else if( p_pict )
-    {
-        /* Buggy libavcodec which doesn't update coded_frame->pts
-         * correctly */
-        p_block->i_dts = p_block->i_pts = p_pict->date;
-    }
-#endif
 
     switch ( p_sys->p_context->coded_frame->pict_type )
     {
