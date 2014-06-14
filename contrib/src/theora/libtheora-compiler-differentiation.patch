@@ -1,0 +1,25 @@
+diff -ru libtheora/configure.ac libtheora-fixed/configure.ac
+--- libtheora/configure.ac	2009-10-01 20:00:33.000000000 +0200
++++ libtheora-fixed/configure.ac	2014-06-13 20:21:16.000000000 +0200
+@@ -155,8 +155,20 @@
+ 
+ dnl Set some target options
+ 
++cc_compiler=unknown
++AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#if ! __clang__
++                                    #error
++                                    #endif
++                                    ]])],
++                  cc_compiler=clang,
++                  [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#if ! __GNUC__
++                                                       #error
++                                                       #endif
++                                                       ]])],
++                                     cc_compiler=gcc, [])])
++
+ cflags_save="$CFLAGS"
+-if test -z "$GCC"; then
++if test $cc_compiler != "gcc" ; then
+         case $host in 
+         *)
+                 DEBUG="-g -DDEBUG"
