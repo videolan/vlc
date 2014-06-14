@@ -626,8 +626,7 @@ static picture_t *VideoRender(filter_t *filter, picture_t *src)
     {
         msg_Err(filter, "video %s %s failure: %s", "mixer", "rendering",
                 vdp_get_error_string(sys->vdp, err));
-        picture_Release(dst);
-        dst = NULL;
+        goto error;
     }
 
     if (swap)
