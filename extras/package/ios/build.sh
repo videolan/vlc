@@ -138,10 +138,6 @@ fi
 else
 export CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -miphoneos-version-min=${SDK_MIN} ${OPTIM}"
 fi
-export CFLAGS="${CFLAGS} -Wno-error=unused-command-line-argument-hard-error-in-future"
-export CPPFLAGS="${CFLAGS}"
-export CXXFLAGS="${CFLAGS}"
-export OBJCFLAGS="${CFLAGS}"
 
 export CPP="xcrun cc -E"
 export CXXCPP="xcrun c++ -E"
