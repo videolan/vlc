@@ -932,7 +932,7 @@ OMX_ERRORTYPE GetAudioParameters(OMX_HANDLETYPE handle,
 }
 
 /*****************************************************************************
- * PrintOmx: print component summary 
+ * PrintOmx: print component summary
  *****************************************************************************/
 void PrintOmx(decoder_t *p_dec, OMX_HANDLETYPE omx_handle, OMX_U32 i_port)
 {

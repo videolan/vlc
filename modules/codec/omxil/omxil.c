@@ -112,8 +112,8 @@ static OMX_ERRORTYPE ImplementationSpecificWorkarounds(decoder_t *p_dec,
 
     /* Try to find out the profile of the video */
     if(p_fmt->i_cat == VIDEO_ES && def->eDir == OMX_DirInput &&
-       p_fmt->i_codec == VLC_CODEC_H264)
-	h264_get_profile_level(&p_dec->fmt_in, &i_profile, &i_level, &p_sys->i_nal_size_length);
+            p_fmt->i_codec == VLC_CODEC_H264)
+        h264_get_profile_level(&p_dec->fmt_in, &i_profile, &i_level, &p_sys->i_nal_size_length);
 
     if(!strcmp(p_sys->psz_component, "OMX.TI.Video.Decoder"))
     {
@@ -1640,7 +1640,7 @@ static void CloseGeneric( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * OmxEventHandler: 
+ * OmxEventHandler:
  *****************************************************************************/
 static OMX_ERRORTYPE OmxEventHandler( OMX_HANDLETYPE omx_handle,
     OMX_PTR app_data, OMX_EVENTTYPE event, OMX_U32 data_1,
