@@ -225,7 +225,6 @@ struct demux_sys_t {
     QTCaptureDevice * audiodevice;
     VLCDecompressedAudioOutput * audiooutput;
     es_out_id_t *p_es_audio;
-    int i_audio_max_buffer_size;
 };
 
 /*****************************************************************************
@@ -427,7 +426,6 @@ static int Open(vlc_object_t *p_this)
     audiofmt.audio.i_channels = 2;
     audiofmt.audio.i_blockalign = audiofmt.audio.i_channels * (audiofmt.audio.i_bitspersample / 8);
     audiofmt.i_bitrate = audiofmt.audio.i_channels * audiofmt.audio.i_rate * audiofmt.audio.i_bitspersample;
-    p_sys->i_audio_max_buffer_size = audiofmt.i_bitrate;
 
     p_sys->session = [[QTCaptureSession alloc] init];
 
