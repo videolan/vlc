@@ -852,6 +852,19 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
         uint8_t *p_dst, *p_src;
         int i_src_stride, i_dst_stride;
 
+        if( p_sys->p_context->pix_fmt == PIX_FMT_PAL8 )
+        {
+            if( !p_pic->format.p_palette )
+            {
+                p_pic->format.p_palette = calloc( 1, sizeof(video_palette_t) );
+                p_pic->format.p_palette->i_entries = 256;
+            }
+            if( p_pic->format.p_palette )
+            {
+                memcpy( p_pic->format.p_palette->palette, p_ff_pic->data[1], AVPALETTE_SIZE );
+            }
+        }
+
         for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
         {
             p_src  = p_ff_pic->data[i_plane];
