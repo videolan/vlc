@@ -73,7 +73,7 @@ vlc_module_end ()
 {
     demux_t *p_qtsound;
     AudioBuffer *currentAudioBuffer;
-    block_t *rawAudioData;
+    void *rawAudioData;
     UInt32 numberOfSamples;
     date_t date;
     mtime_t currentPts;
