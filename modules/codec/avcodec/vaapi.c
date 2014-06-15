@@ -345,13 +345,16 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
     }
 
     VAImage test_image;
+    vlc_fourcc_t  deriveImageFormat = 0;
     if(vaDeriveImage(sys->p_display, pi_surface_id[0], &test_image) == VA_STATUS_SUCCESS)
     {
         sys->b_supports_derive = true;
+        deriveImageFormat = test_image.format.fourcc;
         vaDestroyImage(sys->p_display, test_image.image_id);
     }
 
     vlc_fourcc_t  i_chroma = 0;
+    int nv12support = -1;
     for( int i = 0; i < i_fmt_count; i++ )
     {
         if( p_fmt[i].fourcc == VA_FOURCC_YV12 ||
@@ -373,10 +376,34 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
                 continue;
             }
 
+            if( p_fmt[i].fourcc == VA_FOURCC_NV12 )
+            {
+                /* Mark NV12 as supported, but favor other formats first */
+                nv12support = i;
+                vaDestroyImage( sys->p_display, sys->image.image_id );
+                sys->image.image_id = VA_INVALID_ID;
+                continue;
+            }
             i_chroma = VLC_CODEC_YV12;
             break;
         }
     }
+
+    if( !i_chroma && nv12support >= 0 )
+    {
+        /* only nv12 is supported, so use that format */
+        if( vaCreateImage(  sys->p_display, &p_fmt[nv12support], i_width, i_height, &sys->image ) )
+        {
+            sys->image.image_id = VA_INVALID_ID;
+        }
+        i_chroma = VLC_CODEC_YV12;
+    }
+    else if( sys->b_supports_derive && deriveImageFormat != sys->image.format.fourcc )
+    {
+        /* only use vaDerive if it's giving us a format we handle natively */
+        sys->b_supports_derive = false;
+    }
+
     free( p_fmt );
     if( !i_chroma )
         goto error;
