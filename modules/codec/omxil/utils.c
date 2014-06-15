@@ -1050,23 +1050,22 @@ bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile, size_t 
     if(!p || !p_fmt->p_extra) return false;
 
     /* Check the profile / level */
-    if(p_fmt->i_original_fourcc == VLC_FOURCC('a','v','c','1') &&
-       p[0] == 1)
+    if (p_fmt->i_original_fourcc == VLC_FOURCC('a','v','c','1') && p[0] == 1)
     {
-	if(p_fmt->i_extra < 12) return false;
-	if (p_nal_size) *p_nal_size = 1 + (p[4]&0x03);
-	if( !(p[5]&0x1f) ) return false;
-	p += 8;
+        if (p_fmt->i_extra < 12) return false;
+        if (p_nal_size) *p_nal_size = 1 + (p[4]&0x03);
+        if (!(p[5]&0x1f)) return false;
+        p += 8;
     }
     else
     {
-	if(p_fmt->i_extra < 8) return false;
-	if(!p[0] && !p[1] && !p[2] && p[3] == 1) p += 4;
-	else if(!p[0] && !p[1] && p[2] == 1) p += 3;
-	else return false;
+        if (p_fmt->i_extra < 8) return false;
+        if (!p[0] && !p[1] && !p[2] && p[3] == 1) p += 4;
+        else if (!p[0] && !p[1] && p[2] == 1) p += 3;
+        else return false;
     }
 
-    if( ((*p++)&0x1f) != 7) return false;
+    if ( ((*p++)&0x1f) != 7) return false;
 
     /* Get profile/level out of first SPS */
     if (p_profile) *p_profile = p[0];
