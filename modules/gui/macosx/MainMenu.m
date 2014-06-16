@@ -1,7 +1,7 @@
 /*****************************************************************************
  * MainMenu.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011-2013 Felix Paul Kühne
+ * Copyright (C) 2011-2014 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -56,8 +56,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
 }
 
-#pragma mark -
-#pragma mark Initialization
+#pragma mark - Initialization
 
 - (id)init
 {
@@ -265,8 +264,16 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [self setupVarMenuItem: o_mi_add_intf target: (vlc_object_t *)p_intf
                              var: "intf-add" selector: @selector(toggleVar:)];
 
-    [self setupExtensionsMenu];
+    /* setup extensions menu */
+    // FIXME: Implement preference for autoloading extensions on mac
+    if (![o_extMgr isLoaded] && ![o_extMgr cannotLoad])
+        [o_extMgr loadExtensions];
 
+    /* Let the ExtensionsManager itself build the menu */
+    [o_extMgr buildMenu:o_mu_extensions];
+    [o_mi_extensions setEnabled: ([o_mu_extensions numberOfItems] > 0)];
+
+    /* setup post-proc menu */
     NSUInteger count = (NSUInteger) [o_mu_ffmpeg_pp numberOfItems];
     if (count > 0)
         [o_mu_ffmpeg_pp removeAllItems];
@@ -543,8 +550,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     return [o_context_menu autorelease];
 }
 
-#pragma mark -
-#pragma mark Termination
+#pragma mark - Termination
 
 - (void)releaseRepresentedObjects:(NSMenu *)the_menu
 {
@@ -561,8 +567,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     }
 }
 
-#pragma mark -
-#pragma mark Interface update
+#pragma mark - Interface update
 
 - (void)setupMenus
 {
@@ -705,31 +710,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_pool release];
 }
 
-#pragma mark -
-#pragma mark Extensions
-
-- (void)setupExtensionsMenu
-{
-    /* Load extensions if needed */
-    // TODO: Implement preference for autoloading extensions on mac
-
-    // if (!var_InheritBool(p_intf, "qt-autoload-extensions")
-    //     && ![o_extMgr isLoaded])
-    // {
-    //     return;
-    // }
-
-    if (![o_extMgr isLoaded] && ![o_extMgr cannotLoad]) {
-        [o_extMgr loadExtensions];
-    }
-
-    /* Let the ExtensionsManager itself build the menu */
-    [o_extMgr buildMenu:o_mu_extensions];
-    [o_mi_extensions setEnabled: ([o_mu_extensions numberOfItems] > 0)];
-}
-
-#pragma mark -
-#pragma mark View
+#pragma mark - View
 
 - (IBAction)toggleEffectsButton:(id)sender
 {
@@ -795,8 +776,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     return YES;
 }
 
-#pragma mark -
-#pragma mark Playback
+#pragma mark - Playback
 
 - (IBAction)quitAfterPlayback:(id)sender
 {
@@ -837,8 +817,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [[VLCCoreInteraction sharedInstance] setAtoB];
 }
 
-#pragma mark -
-#pragma mark audio menu
+#pragma mark - audio menu
+
 - (void)refreshAudioDeviceList
 {
     char **ids, **names;
@@ -901,8 +881,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [self refreshAudioDeviceList];
 }
 
-#pragma mark -
-#pragma mark video menu
+#pragma mark - video menu
 
 - (IBAction)toggleFullscreen:(id)sender
 {
@@ -1063,6 +1042,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 }
 
 #pragma mark - Subtitles Menu
+
 - (IBAction)addSubtitleFile:(id)sender
 {
     NSInteger i_returnValue = 0;
@@ -1154,8 +1134,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     }
 }
 
-#pragma mark -
-#pragma mark Panels
+#pragma mark - Panels
 
 - (IBAction)intfOpenFile:(id)sender
 {
@@ -1274,8 +1253,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [[VLCMainWindow sharedInstance] changePlaylistState: psUserMenuEvent];
 }
 
-#pragma mark -
-#pragma mark Help and Docs
+#pragma mark - Help and Docs
 
 - (void)initAbout
 {
@@ -1339,8 +1317,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [[NSWorkspace sharedWorkspace] openURL: o_url];
 }
 
-#pragma mark -
-#pragma mark Errors, warnings and messages
+#pragma mark - Errors, warnings and messages
 
 - (IBAction)viewErrorsAndWarnings:(id)sender
 {
@@ -1352,8 +1329,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [[[VLCMain sharedInstance] info] initPanel];
 }
 
-#pragma mark -
-#pragma mark convinience stuff for other objects
+#pragma mark - convinience stuff for other objects
+
 - (void)setPlay
 {
     [o_mi_play setTitle: _NS("Play")];
@@ -1395,8 +1372,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_random setState: b_value];
 }
 
-#pragma mark -
-#pragma mark Dynamic menu creation and validation
+#pragma mark - Dynamic menu creation and validation
 
 - (void)setupVarMenuItem:(NSMenuItem *)o_mi
                   target:(vlc_object_t *)p_object
