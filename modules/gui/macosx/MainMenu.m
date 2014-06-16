@@ -940,60 +940,12 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (void)_disablePostProcessing
 {
-    char *psz_name = "postprocess";
-    char *psz_string, *psz_parser;
-    psz_string = config_GetPsz(p_intf, "video-filter");
-
-    if (!psz_string)
-        return;
-
-    psz_parser = strstr(psz_string, psz_name);
-    if (psz_parser) {
-        if (*(psz_parser + strlen(psz_name)) == ':') {
-            memmove(psz_parser, psz_parser + strlen(psz_name) + 1,
-                    strlen(psz_parser + strlen(psz_name) + 1) + 1);
-        } else
-            *psz_parser = '\0';
-
-        /* Remove trailing : : */
-        if (strlen(psz_string) > 0 && *(psz_string + strlen(psz_string) -1) == ':')
-            *(psz_string + strlen(psz_string) -1) = '\0';
-    } else {
-        free(psz_string);
-        return;
-    }
-    config_PutPsz(p_intf, "video-filter", psz_string);
-
-    /* Try to set on the fly */
-    vout_thread_t *p_vout = getVout();
-    if (p_vout) {
-        var_SetString(p_vout, "video-filter", psz_string);
-        vlc_object_release(p_vout);
-    }
+    [[VLCCoreInteraction sharedInstance] setVideoFilter:"postprocess" on:false];
 }
 
 - (void)_enablePostProcessing
 {
-    char *psz_name = "postprocess";
-    char *psz_string, *psz_parser;
-    psz_string = config_GetPsz(p_intf, "video-filter");
-
-    if (psz_string == NULL)
-        psz_string = psz_name;
-    else if (strstr(psz_string, psz_name) == NULL) {
-        char *psz_tmp = strdup([[NSString stringWithFormat: @"%s:%s", psz_string, psz_name] UTF8String]);
-        free(psz_string);
-        psz_string = psz_tmp;
-    }
-
-    config_PutPsz(p_intf, "video-filter", psz_string);
-
-    /* Try to set on the fly */
-    vout_thread_t *p_vout = getVout();
-    if (p_vout) {
-        var_SetString(p_vout, "video-filter", psz_string);
-        vlc_object_release(p_vout);
-    }
+    [[VLCCoreInteraction sharedInstance] setVideoFilter:"postprocess" on:true];
 }
 
 - (IBAction)togglePostProcessing:(id)sender
@@ -1010,23 +962,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         [self _enablePostProcessing];
         [sender setState:NSOnState];
 
-        vout_thread_t *p_vout = getVout();
-        vlc_object_t *p_filter;
-
-        config_PutInt(p_intf, "postproc-q", [sender tag]);
-
-        if (p_vout) {
-            p_filter = vlc_object_find_name(pl_Get(p_intf), psz_name);
-
-            if (!p_filter) {
-                msg_Warn(p_intf, "filter '%s' isn't enabled", psz_name);
-                vlc_object_release(p_vout);
-                return;
-            }
-            var_SetInteger(p_filter, "postproc-q", [sender tag]);
-            vlc_object_release(p_vout);
-            vlc_object_release(p_filter);
-        }
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty:"postproc-q" forFilter:"postprocess" integer:[sender tag]];
     }
 }
 

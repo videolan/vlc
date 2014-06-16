@@ -237,7 +237,6 @@
 - (void)refreshVoutDeviceMenu:(NSNotification *)o_notification;
 - (void)setSubmenusEnabled:(BOOL)b_enabled;
 - (void)setRateControlsEnabled:(BOOL)b_enabled;
-- (void)setupExtensionsMenu;
 - (void)updateSidebarMenuItem;
 
 - (IBAction)openAddonManager:(id)sender;
