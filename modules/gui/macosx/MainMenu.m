@@ -285,11 +285,11 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mitem setTag: -1];
     [o_mitem setEnabled: YES];
     [o_mitem setTarget: self];
-    for (NSUInteger x = 0; x < 7; x++) {
+    for (NSUInteger x = 1; x < 7; x++) {
         [o_mu_ffmpeg_pp addItemWithTitle:[NSString stringWithFormat:_NS("Level %i"), x]
                                                action:@selector(togglePostProcessing:)
                                         keyEquivalent:@""];
-        o_mitem = [o_mu_ffmpeg_pp itemAtIndex:x+1];
+        o_mitem = [o_mu_ffmpeg_pp itemAtIndex:x];
         [o_mitem setEnabled: YES];
         [o_mitem setTag:x];
         [o_mitem setTarget: self];
