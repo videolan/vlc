@@ -277,6 +277,7 @@
 - (IBAction)switchSubtitleBackgroundOpacity:(id)sender;
 - (IBAction)telxTransparent:(id)sender;
 - (IBAction)telxNavLink:(id)sender;
+- (IBAction)togglePostProcessing:(id)sender;
 
 - (IBAction)showWizard:(id)sender;
 - (IBAction)showConvertAndSave:(id)sender;

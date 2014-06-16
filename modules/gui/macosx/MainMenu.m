@@ -267,6 +267,37 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
     [self setupExtensionsMenu];
 
+    NSUInteger count = (NSUInteger) [o_mu_ffmpeg_pp numberOfItems];
+    if (count > 0)
+        [o_mu_ffmpeg_pp removeAllItems];
+
+    NSMenuItem * o_mitem;
+    [o_mu_ffmpeg_pp setAutoenablesItems: YES];
+    [o_mu_ffmpeg_pp addItemWithTitle: _NS("Disable") action:@selector(togglePostProcessing:) keyEquivalent:@""];
+    o_mitem = [o_mu_ffmpeg_pp itemAtIndex: 0];
+    [o_mitem setTag: -1];
+    [o_mitem setEnabled: YES];
+    [o_mitem setTarget: self];
+    for (NSUInteger x = 0; x < 7; x++) {
+        [o_mu_ffmpeg_pp addItemWithTitle:[NSString stringWithFormat:_NS("Level %i"), x]
+                                               action:@selector(togglePostProcessing:)
+                                        keyEquivalent:@""];
+        o_mitem = [o_mu_ffmpeg_pp itemAtIndex:x+1];
+        [o_mitem setEnabled: YES];
+        [o_mitem setTag:x];
+        [o_mitem setTarget: self];
+    }
+    char *psz_config = config_GetPsz(p_intf, "video-filter");
+    if (psz_config) {
+        if (!strstr(psz_config, "postprocess"))
+            [[o_mu_ffmpeg_pp itemAtIndex:0] setState:NSOnState];
+        else
+            [[o_mu_ffmpeg_pp itemWithTag:config_GetInt(p_intf, "postproc-q")] setState:NSOnState];
+        free(psz_config);
+    } else
+        [[o_mu_ffmpeg_pp itemAtIndex:0] setState:NSOnState];
+    [o_mi_ffmpeg_pp setEnabled: NO];
+
     [self refreshAudioDeviceList];
 
     /* setup subtitles menu */
@@ -583,17 +614,16 @@ static VLCMainMenu *_o_sharedInstance = nil;
             [self setupVarMenuItem: o_mi_deinterlace_mode target: (vlc_object_t *)p_vout
                                      var: "deinterlace-mode" selector: @selector(toggleVar:)];
 
-            [self setupVarMenuItem: o_mi_ffmpeg_pp target: (vlc_object_t *)p_vout
-                               var:"postprocess" selector: @selector(toggleVar:)];
-
             vlc_object_release(p_vout);
 
             [self refreshVoutDeviceMenu:nil];
         }
+        [o_mi_ffmpeg_pp setEnabled:YES];
         vlc_object_release(p_input);
-    }
-    else
+    } else {
         [o_mi_record setEnabled: NO];
+        [o_mi_ffmpeg_pp setEnabled:NO];
+    }
 }
 
 - (void)refreshVoutDeviceMenu:(NSNotification *)o_notification
@@ -637,7 +667,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_channels setEnabled: b_enabled];
     [o_mi_deinterlace setEnabled: b_enabled];
     [o_mi_deinterlace_mode setEnabled: b_enabled];
-    [o_mi_ffmpeg_pp setEnabled: b_enabled];
     [o_mi_screen setEnabled: b_enabled];
     [o_mi_aspect_ratio setEnabled: b_enabled];
     [o_mi_crop setEnabled: b_enabled];
@@ -927,6 +956,98 @@ static VLCMainMenu *_o_sharedInstance = nil;
             vlc_object_release(p_vout);
         }
         vlc_object_release(p_input);
+    }
+}
+
+- (void)_disablePostProcessing
+{
+    char *psz_name = "postprocess";
+    char *psz_string, *psz_parser;
+    psz_string = config_GetPsz(p_intf, "video-filter");
+
+    if (!psz_string)
+        return;
+
+    psz_parser = strstr(psz_string, psz_name);
+    if (psz_parser) {
+        if (*(psz_parser + strlen(psz_name)) == ':') {
+            memmove(psz_parser, psz_parser + strlen(psz_name) + 1,
+                    strlen(psz_parser + strlen(psz_name) + 1) + 1);
+        } else
+            *psz_parser = '\0';
+
+        /* Remove trailing : : */
+        if (strlen(psz_string) > 0 && *(psz_string + strlen(psz_string) -1) == ':')
+            *(psz_string + strlen(psz_string) -1) = '\0';
+    } else {
+        free(psz_string);
+        return;
+    }
+    config_PutPsz(p_intf, "video-filter", psz_string);
+
+    /* Try to set on the fly */
+    vout_thread_t *p_vout = getVout();
+    if (p_vout) {
+        var_SetString(p_vout, "video-filter", psz_string);
+        vlc_object_release(p_vout);
+    }
+}
+
+- (void)_enablePostProcessing
+{
+    char *psz_name = "postprocess";
+    char *psz_string, *psz_parser;
+    psz_string = config_GetPsz(p_intf, "video-filter");
+
+    if (psz_string == NULL)
+        psz_string = psz_name;
+    else if (strstr(psz_string, psz_name) == NULL) {
+        char *psz_tmp = strdup([[NSString stringWithFormat: @"%s:%s", psz_string, psz_name] UTF8String]);
+        free(psz_string);
+        psz_string = psz_tmp;
+    }
+
+    config_PutPsz(p_intf, "video-filter", psz_string);
+
+    /* Try to set on the fly */
+    vout_thread_t *p_vout = getVout();
+    if (p_vout) {
+        var_SetString(p_vout, "video-filter", psz_string);
+        vlc_object_release(p_vout);
+    }
+}
+
+- (IBAction)togglePostProcessing:(id)sender
+{
+    char *psz_name = "postprocess";
+    NSInteger count = [o_mu_ffmpeg_pp numberOfItems];
+    for (NSUInteger x = 0; x < count; x++)
+        [[o_mu_ffmpeg_pp itemAtIndex:x] setState:NSOffState];
+
+    if ([sender tag] == -1) {
+        [self _disablePostProcessing];
+        [sender setState:NSOnState];
+    } else {
+        [self _enablePostProcessing];
+        [sender setState:NSOnState];
+
+        vout_thread_t *p_vout = getVout();
+        vlc_object_t *p_filter;
+
+        config_PutInt(p_intf, "postproc-q", [sender tag]);
+
+        if (p_vout) {
+            p_filter = vlc_object_find_name(pl_Get(p_intf), psz_name);
+
+            if (!p_filter) {
+                msg_Warn(p_intf, "filter '%s' isn't enabled", psz_name);
+                vlc_object_release(p_vout);
+                return;
+            }
+            var_SetInteger(p_filter, "postproc-q", [sender tag]);
+            vlc_object_release(p_vout);
+            vlc_object_release(p_filter);
+        }
     }
 }
 
