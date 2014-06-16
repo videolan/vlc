@@ -1497,7 +1497,7 @@ int libvlc_media_player_set_equalizer( libvlc_media_player_t *p_mi, libvlc_equal
     {
         for( unsigned i = 0, c = 0; i < EQZ_BANDS_MAX; i++ )
         {
-            c = snprintf( bands + c, sizeof(bands) - c, " %.07f",
+            c += snprintf( bands + c, sizeof(bands) - c, " %.07f",
                           p_equalizer->f_amp[i] );
             if( unlikely(c >= sizeof(bands)) )
                 return -1;
@@ -1517,7 +1517,7 @@ int libvlc_media_player_set_equalizer( libvlc_media_player_t *p_mi, libvlc_equal
             var_SetString( p_aout, "equalizer-bands", bands );
         }
 
-        var_SetString( p_mi, "audio-filter", p_equalizer ? "equalizer" : "" );
+        var_SetString( p_aout, "audio-filter", p_equalizer ? "equalizer" : "" );
         vlc_object_release( p_aout );
     }
 
