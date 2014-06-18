@@ -341,11 +341,13 @@ static int EqzInit( filter_t *p_filter, int i_rate )
 
     /* Get initial values */
     var_Get( p_aout, "equalizer-preset", &val1 );
-    PresetCallback( VLC_OBJECT( p_aout ), NULL, val1, val1, p_sys );
-    free( val1.psz_string );
-
     var_Get( p_aout, "equalizer-bands", &val2 );
     var_Get( p_aout, "equalizer-preamp", &val3 );
+
+    /* Load the preset only if equalizer-bands is not set. */
+    if (val2.psz_string != NULL && *val2.psz_string != "\0")
+        PresetCallback( VLC_OBJECT( p_aout ), NULL, val1, val1, p_sys );
+    free( val1.psz_string );
     BandsCallback(  VLC_OBJECT( p_aout ), NULL, val2, val2, p_sys );
     PreampCallback( VLC_OBJECT( p_aout ), NULL, val3, val3, p_sys );
 
