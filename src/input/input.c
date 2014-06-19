@@ -47,8 +47,6 @@
 #include "resource.h"
 
 #include <vlc_sout.h>
-#include "../stream_output/stream_output.h"
-
 #include <vlc_dialog.h>
 #include <vlc_url.h>
 #include <vlc_charset.h>
