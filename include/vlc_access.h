@@ -162,7 +162,7 @@ VLC_API input_thread_t * access_GetParentInput( access_t *p_access ) VLC_USED;
     do { \
         access_InitFields( p_access ); \
         ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek ); \
-        p_sys = p_access->p_sys = calloc( 1, sizeof( access_sys_t ) ); \
+        p_sys = p_access->p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) ); \
         if( !p_sys ) return VLC_ENOMEM;\
     } while(0);
 
@@ -170,7 +170,7 @@ VLC_API input_thread_t * access_GetParentInput( access_t *p_access ) VLC_USED;
     do { \
         access_InitFields( p_access ); \
         ACCESS_SET_CALLBACKS( NULL, Block, Control, Seek ); \
-        p_sys = p_access->p_sys = calloc( 1, sizeof( access_sys_t ) ); \
+        p_sys = p_access->p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) ); \
         if( !p_sys ) return VLC_ENOMEM; \
     } while(0);
 
