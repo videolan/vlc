@@ -33,7 +33,6 @@
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_rand.h>
-#include "stream_output/stream_output.h"
 #include "playlist_internal.h"
 
 /*****************************************************************************
