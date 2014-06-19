@@ -1679,6 +1679,14 @@ static VLCMain *_o_sharedMainInstance = nil;
 static NSString * kVLCPreferencesVersion = @"VLCPreferencesVersion";
 static const int kCurrentPreferencesVersion = 3;
 
++ (void)initialize
+{
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCurrentPreferencesVersion]
+                                                            forKey:kVLCPreferencesVersion];
+
+    [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
+}
+
 - (void)resetAndReinitializeUserDefaults
 {
     // note that [NSUserDefaults resetStandardUserDefaults] will NOT correctly reset to the defaults
@@ -1695,6 +1703,13 @@ static const int kCurrentPreferencesVersion = 3;
 {
     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
     int version = [defaults integerForKey:kVLCPreferencesVersion];
+
+    /*
+     * Store version explicitely in file, for ease of debugging.
+     * Otherwise, the value will be just defined at app startup,
+     * as initialized above.
+     */
+    [defaults setInteger:version forKey:kVLCPreferencesVersion];
     if (version >= kCurrentPreferencesVersion)
         return;
 
@@ -1716,13 +1731,6 @@ static const int kCurrentPreferencesVersion = 3;
             NSUserDomainMask, YES);
         if (!libraries || [libraries count] == 0) return;
         NSString * preferences = [[libraries objectAtIndex:0] stringByAppendingPathComponent:@"Preferences"];
-
-        /* File not found, don't attempt anything */
-        if (![[NSFileManager defaultManager] fileExistsAtPath:[preferences stringByAppendingPathComponent:@"org.videolan.vlc"]] &&
-           ![[NSFileManager defaultManager] fileExistsAtPath:[preferences stringByAppendingPathComponent:@"org.videolan.vlc.plist"]]) {
-            [defaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
-            return;
-        }
 
         int res = NSRunInformationalAlertPanel(_NS("Remove old preferences?"),
                     _NS("We just found an older version of VLC's preferences files."),
