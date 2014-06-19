@@ -2001,7 +2001,7 @@ dnl
 PKG_ENABLE_MODULES_VLC([OGG], [], [ogg >= 1.0], [Ogg demux support], [auto])
 PKG_CHECK_MODULES(LIBVORBIS, [vorbis >= 1.1], [
     AC_DEFINE(HAVE_LIBVORBIS, 1, [Define to 1 if you have the libvorbis])
-],[])
+],[true])
 PKG_ENABLE_MODULES_VLC([OGG], [], [ogg >= 1.0], [Ogg demux support], [auto], [${LIBVORBIS_CFLAGS}], [${LIBVORBIS_LIBS}])
 if test "${enable_sout}" != "no"; then
     PKG_ENABLE_MODULES_VLC([MUX_OGG], [], [ogg >= 1.0], [Ogg mux support], [auto])
