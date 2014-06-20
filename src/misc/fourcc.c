@@ -1085,6 +1085,8 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_CMV, "Electronic Arts CMV"),
 
+    B(VLC_CODEC_MOTIONPIXELS, "Sirius Publishing Motion Pixels"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
