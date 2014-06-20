@@ -193,7 +193,7 @@ static const struct
     /* AV_CODEC_ID_IFF_ILBM */
     /* AV_CODEC_ID_IFF_BYTERUN1 */
     { VLC_CODEC_KGV1, AV_CODEC_ID_KGV1, VIDEO_ES },
-    /* AV_CODEC_ID_YOP */
+    { VLC_CODEC_YOP, AV_CODEC_ID_YOP, VIDEO_ES },
     { VLC_CODEC_VP8, AV_CODEC_ID_VP8, VIDEO_ES },
     /* AV_CODEC_ID_PICTOR */
     /* AV_CODEC_ID_ANSI */
@@ -349,7 +349,7 @@ static const struct
     /* AV_CODEC_ID_ADPCM_EA_MAXIS_XA */
     /* AV_CODEC_ID_ADPCM_IMA_ISS */
     { VLC_CODEC_ADPCM_G722, AV_CODEC_ID_ADPCM_G722, AUDIO_ES },
-    /* AV_CODEC_ID_ADPCM_IMA_APC */
+    { VLC_CODEC_ADPCM_IMA_APC, AV_CODEC_ID_ADPCM_IMA_APC, AUDIO_ES },
     /* ffmpeg only: AV_CODEC_ID_VIMA */
     /* ffmpeg only: AV_CODEC_ID_ADPCM_AFC */
     /* ffmpeg only: AV_CODEC_ID_ADPCM_IMA_OKI */

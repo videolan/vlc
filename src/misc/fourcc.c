@@ -1097,6 +1097,8 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_ANM, "DeluxePaint animation"),
 
+    B(VLC_CODEC_YOP, "Psygnosis YOP"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
@@ -1499,6 +1501,8 @@ static const staticentry_t p_list_audio[] = {
     B(VLC_CODEC_ADPCM_IMA_EA_SEAD, "ADPCM IMA Electronic Arts SEAD"),
 
     B(VLC_CODEC_ADPCM_EA_R1, "ADPCM Electronic Arts R1"),
+
+    B(VLC_CODEC_ADPCM_IMA_APC, "ADPCM APC"),
 
     B(0, "")
 };
