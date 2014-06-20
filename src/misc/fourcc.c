@@ -1091,6 +1091,10 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_TGQ, "Electronic Arts TGQ"),
 
+    B(VLC_CODEC_TQI, "Electronic Arts TQI"),
+
+    B(VLC_CODEC_MAD, "Electronic Arts MAD"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
@@ -1489,6 +1493,8 @@ static const staticentry_t p_list_audio[] = {
     B(VLC_CODEC_SMACKAUDIO, "Smacker audio"),
 
     B(VLC_CODEC_ADPCM_IMA_EA_SEAD, "ADPCM IMA Electronic Arts SEAD"),
+
+    B(VLC_CODEC_ADPCM_EA_R1, "ADPCM Electronic Arts R1"),
 
     B(0, "")
 };

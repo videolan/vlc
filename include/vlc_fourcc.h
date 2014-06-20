@@ -166,6 +166,8 @@
 #define VLC_CODEC_MOTIONPIXELS    VLC_FOURCC('M','P','I','X')
 #define VLC_CODEC_TGV             VLC_FOURCC('T','G','V','V')
 #define VLC_CODEC_TGQ             VLC_FOURCC('T','G','Q','V')
+#define VLC_CODEC_TQI             VLC_FOURCC('T','Q','I','V')
+#define VLC_CODEC_MAD             VLC_FOURCC('M','A','D','V')
 
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9             VLC_FOURCC('Y','V','U','9')
@@ -426,6 +428,7 @@
 #define VLC_CODEC_TAK                        VLC_FOURCC('t','a','k',' ')
 #define VLC_CODEC_SMACKAUDIO                 VLC_FOURCC('S','M','K','A')
 #define VLC_CODEC_ADPCM_IMA_EA_SEAD          VLC_FOURCC('S','E','A','D')
+#define VLC_CODEC_ADPCM_EA_R1                VLC_FOURCC('E','A','R','1')
 
 /* Subtitle */
 #define VLC_CODEC_SPU       VLC_FOURCC('s','p','u',' ')
