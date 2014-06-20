@@ -223,7 +223,7 @@ VLC_API encoder_t * sout_EncoderCreate( vlc_object_t *obj );
  * Announce handler
  ****************************************************************************/
 VLC_API session_descriptor_t* sout_AnnounceRegisterSDP( vlc_object_t *, const char *, const char * ) VLC_USED;
-VLC_API int sout_AnnounceUnRegister(vlc_object_t *,session_descriptor_t* );
+VLC_API void sout_AnnounceUnRegister(vlc_object_t *,session_descriptor_t* );
 #define sout_AnnounceRegisterSDP(o, sdp, addr) \
         sout_AnnounceRegisterSDP(VLC_OBJECT (o), sdp, addr)
 #define sout_AnnounceUnRegister(o, a) \

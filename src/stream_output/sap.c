@@ -377,9 +377,8 @@ sout_AnnounceRegisterSDP (vlc_object_t *obj, const char *sdp,
  *
  * \param obj a VLC object
  * \param session the session descriptor
- * \return VLC_SUCCESS
  */
-int sout_AnnounceUnRegister (vlc_object_t *obj, session_descriptor_t *session)
+void sout_AnnounceUnRegister (vlc_object_t *obj, session_descriptor_t *session)
 {
     sap_address_t *addr, **paddr;
     session_descriptor_t **psession;
@@ -426,5 +425,4 @@ found:
     }
 
     free (session);
-    return VLC_SUCCESS;
 }
