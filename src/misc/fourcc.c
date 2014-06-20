@@ -1095,6 +1095,8 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_MAD, "Electronic Arts MAD"),
 
+    B(VLC_CODEC_ANM, "DeluxePaint animation"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {

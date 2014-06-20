@@ -168,6 +168,7 @@
 #define VLC_CODEC_TGQ             VLC_FOURCC('T','G','Q','V')
 #define VLC_CODEC_TQI             VLC_FOURCC('T','Q','I','V')
 #define VLC_CODEC_MAD             VLC_FOURCC('M','A','D','V')
+#define VLC_CODEC_ANM             VLC_FOURCC('A','N','I','M')
 
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9             VLC_FOURCC('Y','V','U','9')
