@@ -1063,6 +1063,8 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_WS_VQA, "Westwood Studios VQA"),
 
+    B(VLC_CODEC_MMVIDEO, "American Laser Games MM Video"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
