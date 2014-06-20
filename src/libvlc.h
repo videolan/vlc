@@ -137,8 +137,6 @@ module_t *module_find_by_shortcut (const char *psz_shortcut);
 #define ZOOM_ORIGINAL_KEY_TEXT N_("1:1 Original")
 #define ZOOM_DOUBLE_KEY_TEXT N_("2:1 Double")
 
-typedef struct sap_handler_t sap_handler_t;
-
 /**
  * Private LibVLC instance data.
  */
@@ -159,9 +157,6 @@ typedef struct libvlc_priv_t
     /* Singleton objects */
     vlm_t             *p_vlm;  ///< the VLM singleton (or NULL)
     vlc_object_t      *p_dialog_provider; ///< dialog provider
-#ifdef ENABLE_SOUT
-    sap_handler_t     *p_sap; ///< SAP SDP advertiser
-#endif
     struct playlist_t *playlist; ///< Playlist for interfaces
     struct playlist_preparser_t *parser; ///< Input item meta data handler
     struct vlc_actions *actions; ///< Hotkeys handler
