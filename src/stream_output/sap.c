@@ -49,7 +49,6 @@ struct session_descriptor_t
     struct sockaddr_storage addr;
     socklen_t addrlen;
 
-    char *psz_sdp;
     bool b_ssm;
 };
 
@@ -210,7 +209,8 @@ static void *RunThread (void *self)
 /**
  * Add a SAP announce
  */
-static int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session)
+static int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session,
+                    const char *sdp)
 {
     int i;
     char psz_addr[NI_MAXNUMERICHOST];
@@ -347,7 +347,7 @@ static int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session)
     }
 
     /* XXX: Check for dupes */
-    length = headsize + strlen (p_session->psz_sdp);
+    length = headsize + strlen (sdp);
     p_sap_session = malloc (sizeof (*p_sap_session) + length + 1);
     if (p_sap_session == NULL)
     {
@@ -399,7 +399,7 @@ static int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session)
     headsize += 16;
 
     /* Build the final message */
-    strcpy( (char *)psz_head + headsize, p_session->psz_sdp);
+    strcpy((char *)psz_head + headsize, sdp);
 
     sap_addr->session_count++;
     vlc_cond_signal (&sap_addr->wait);
@@ -488,8 +488,6 @@ sout_AnnounceRegisterSDP( vlc_object_t *obj, const char *psz_sdp,
     if( !p_session )
         return NULL;
 
-    p_session->psz_sdp = strdup( psz_sdp );
-
     /* GRUIK. We should not convert back-and-forth from string to numbers */
     struct addrinfo *res;
     if (vlc_getaddrinfo (psz_dst, 0, NULL, &res) == 0)
@@ -516,7 +514,7 @@ sout_AnnounceRegisterSDP( vlc_object_t *obj, const char *psz_sdp,
         goto error;
 
     msg_Dbg (obj, "adding SAP session");
-    if (SAP_Add (p_sap, p_session))
+    if (SAP_Add (p_sap, p_session, psz_sdp))
     {
         vlc_mutex_lock (&sap_mutex);
         vlc_object_release ((vlc_object_t *)p_sap);
@@ -527,7 +525,6 @@ sout_AnnounceRegisterSDP( vlc_object_t *obj, const char *psz_sdp,
     return p_session;
 
 error:
-    free (p_session->psz_sdp);
     free (p_session);
     return NULL;
 }
@@ -552,7 +549,6 @@ int sout_AnnounceUnRegister( vlc_object_t *obj,
     vlc_object_release ((vlc_object_t *)p_sap);
     vlc_mutex_unlock (&sap_mutex);
 
-    free (p_session->psz_sdp);
     free (p_session);
 
     return 0;
