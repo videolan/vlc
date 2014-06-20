@@ -4824,6 +4824,7 @@ static int LeafParseTRUN( demux_t *p_demux, mp4_track_t *p_track,
         {
             p_block->i_dts = VLC_TS_0 + i_nzdts;
             p_block->i_pts = VLC_TS_0 + i_nzpts;
+            p_block->i_length = CLOCK_FREQ * dur / p_track->i_timescale;
             es_out_Send( p_demux->out, p_track->p_es, p_block );
         }
         else free( p_block );
