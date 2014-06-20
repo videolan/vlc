@@ -44,8 +44,6 @@
 
 struct session_descriptor_t
 {
-    struct sockaddr_storage orig;
-    socklen_t origlen;
     struct sockaddr_storage addr;
     socklen_t addrlen;
 
@@ -328,11 +326,8 @@ static int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session,
     vlc_mutex_lock (&sap_addr->lock);
     vlc_mutex_unlock (&p_sap->lock);
 
-    memcpy (&p_session->orig, &sap_addr->orig, sap_addr->origlen);
-    p_session->origlen = sap_addr->origlen;
-
     size_t headsize = 20, length;
-    switch (p_session->orig.ss_family)
+    switch (sap_addr->orig.ss_family)
     {
 #ifdef AF_INET6
         case AF_INET6:
@@ -371,13 +366,13 @@ static int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session,
     psz_head[3] = i_hash;      /* Msg id hash 2 */
 
     headsize = 4;
-    switch (p_session->orig.ss_family)
+    switch (sap_addr->orig.ss_family)
     {
 #ifdef AF_INET6
         case AF_INET6:
         {
-            struct in6_addr *a6 =
-                &((struct sockaddr_in6 *)&p_session->orig)->sin6_addr;
+            const struct in6_addr *a6 =
+                &((const struct sockaddr_in6 *)&sap_addr->orig)->sin6_addr;
             memcpy (psz_head + headsize, a6, 16);
             psz_head[0] |= 0x10; /* IPv6 flag */
             headsize += 16;
@@ -386,9 +381,9 @@ static int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session,
 #endif
         case AF_INET:
         {
-            uint32_t ipv4 =
-                (((struct sockaddr_in *)&p_session->orig)->sin_addr.s_addr);
-            memcpy (psz_head + headsize, &ipv4, 4);
+            const struct in_addr *a4 =
+                &((const struct sockaddr_in *)&sap_addr->orig)->sin_addr;
+            memcpy (psz_head + headsize, a4, 4);
             headsize += 4;
             break;
         }
