@@ -855,12 +855,11 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
         if( p_sys->p_context->pix_fmt == PIX_FMT_PAL8 )
         {
             if( !p_pic->format.p_palette )
-            {
                 p_pic->format.p_palette = calloc( 1, sizeof(video_palette_t) );
-                p_pic->format.p_palette->i_entries = 256;
-            }
+
             if( p_pic->format.p_palette )
             {
+                p_pic->format.p_palette->i_entries = AVPALETTE_COUNT;
                 memcpy( p_pic->format.p_palette->palette, p_ff_pic->data[1], AVPALETTE_SIZE );
             }
         }
