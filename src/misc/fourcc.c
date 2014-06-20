@@ -1087,6 +1087,8 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_MOTIONPIXELS, "Sirius Publishing Motion Pixels"),
 
+    B(VLC_CODEC_TGV, "Electronic Arts TGV"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
@@ -1483,6 +1485,8 @@ static const staticentry_t p_list_audio[] = {
     B(VLC_CODEC_TAK, "TAK (Tom's lossless Audio Kompressor)"),
 
     B(VLC_CODEC_SMACKAUDIO, "Smacker audio"),
+
+    B(VLC_CODEC_ADPCM_IMA_EA_SEAD, "ADPCM IMA Electronic Arts SEAD"),
 
     B(0, "")
 };

@@ -164,6 +164,7 @@
 #define VLC_CODEC_BFI             VLC_FOURCC('B','F','&','I')
 #define VLC_CODEC_CMV             VLC_FOURCC('E','C','M','V')
 #define VLC_CODEC_MOTIONPIXELS    VLC_FOURCC('M','P','I','X')
+#define VLC_CODEC_TGV             VLC_FOURCC('T','G','V','V')
 
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9             VLC_FOURCC('Y','V','U','9')
@@ -423,6 +424,7 @@
 #define VLC_CODEC_ON2AVC                     VLC_FOURCC('m','s',0x05,0x00)
 #define VLC_CODEC_TAK                        VLC_FOURCC('t','a','k',' ')
 #define VLC_CODEC_SMACKAUDIO                 VLC_FOURCC('S','M','K','A')
+#define VLC_CODEC_ADPCM_IMA_EA_SEAD          VLC_FOURCC('S','E','A','D')
 
 /* Subtitle */
 #define VLC_CODEC_SPU       VLC_FOURCC('s','p','u',' ')
