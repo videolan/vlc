@@ -75,9 +75,10 @@ struct sap_handler_t
 {
     VLC_COMMON_MEMBERS
 
-    vlc_mutex_t    lock;
     sap_address_t *first;
 };
+
+static vlc_mutex_t sap_mutex = VLC_STATIC_MUTEX;
 
 #define SAP_MAX_BUFFER 65534
 #define MIN_INTERVAL 2
@@ -99,7 +100,6 @@ static sap_handler_t *SAP_Create (vlc_object_t *p_announce)
     if (p_sap == NULL)
         return NULL;
 
-    vlc_mutex_init (&p_sap->lock);
     p_sap->first = NULL;
     return p_sap;
 }
@@ -107,7 +107,6 @@ static sap_handler_t *SAP_Create (vlc_object_t *p_announce)
 static void SAP_Destroy (sap_handler_t *p_sap)
 {
     assert (p_sap->first == NULL);
-    vlc_mutex_destroy (&p_sap->lock);
     vlc_object_release (p_sap);
 }
 
@@ -299,7 +298,7 @@ static session_descriptor_t *SAP_Add (sap_handler_t *p_sap,
     /* Find/create SAP address thread */
     msg_Dbg( p_sap, "using SAP address: %s", psz_addr);
 
-    vlc_mutex_lock (&p_sap->lock);
+    vlc_mutex_lock (&sap_mutex);
     sap_address_t *sap_addr;
     for (sap_addr = p_sap->first; sap_addr; sap_addr = sap_addr->next)
         if (!strcmp (psz_addr, sap_addr->group))
@@ -310,7 +309,7 @@ static session_descriptor_t *SAP_Add (sap_handler_t *p_sap,
         sap_addr = AddressCreate (VLC_OBJECT(p_sap), psz_addr);
         if (sap_addr == NULL)
         {
-            vlc_mutex_unlock (&p_sap->lock);
+            vlc_mutex_unlock (&sap_mutex);
             return NULL;
         }
         sap_addr->next = p_sap->first;
@@ -319,7 +318,7 @@ static session_descriptor_t *SAP_Add (sap_handler_t *p_sap,
     /* Switch locks.
      * NEVER take the global SAP lock when holding a SAP thread lock! */
     vlc_mutex_lock (&sap_addr->lock);
-    vlc_mutex_unlock (&p_sap->lock);
+    vlc_mutex_unlock (&sap_mutex);
 
     size_t length = 20;
     switch (sap_addr->orig.ss_family)
@@ -402,7 +401,7 @@ static void SAP_Del (sap_handler_t *p_sap, session_descriptor_t *session)
     sap_address_t *addr, **paddr;
     session_descriptor_t **psession;
 
-    vlc_mutex_lock (&p_sap->lock);
+    vlc_mutex_lock (&sap_mutex);
     paddr = &p_sap->first;
     for (;;)
     {
@@ -427,7 +426,7 @@ found:
     if (addr->first == NULL)
         /* Last session for this address -> unlink the address */
         *paddr = addr->next;
-    vlc_mutex_unlock (&p_sap->lock);
+    vlc_mutex_unlock (&sap_mutex);
 
     if (addr->first == NULL)
     {
@@ -455,8 +454,6 @@ static void sap_destroy (vlc_object_t *p_this)
 }
 
 #undef sout_AnnounceRegisterSDP
-
-static vlc_mutex_t sap_mutex = VLC_STATIC_MUTEX;
 
 /**
  *  Registers a new session with the announce handler, using a pregenerated SDP
