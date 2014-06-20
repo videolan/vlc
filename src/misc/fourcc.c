@@ -1079,6 +1079,8 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_VB, "Beam Software VB"),
 
+    B(VLC_CODEC_RL2, "RL2 video"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
