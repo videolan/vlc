@@ -1099,6 +1099,8 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_YOP, "Psygnosis YOP"),
 
+    B(VLC_CODEC_JV, "Bitmap Brothers JV"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {

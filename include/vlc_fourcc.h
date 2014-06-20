@@ -170,6 +170,7 @@
 #define VLC_CODEC_MAD             VLC_FOURCC('M','A','D','V')
 #define VLC_CODEC_ANM             VLC_FOURCC('A','N','I','M')
 #define VLC_CODEC_YOP             VLC_FOURCC('Y','O','P','V')
+#define VLC_CODEC_JV              VLC_FOURCC('J','V','0','0')
 
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9             VLC_FOURCC('Y','V','U','9')
