@@ -50,22 +50,4 @@ sout_packetizer_input_t *sout_InputNew( sout_instance_t *, es_format_t * );
 int sout_InputDelete( sout_packetizer_input_t * );
 int sout_InputSendBuffer( sout_packetizer_input_t *, block_t* );
 
-/* Announce system */
-
-struct session_descriptor_t
-{
-    struct sockaddr_storage orig;
-    socklen_t origlen;
-    struct sockaddr_storage addr;
-    socklen_t addrlen;
-
-    char *psz_sdp;
-    bool b_ssm;
-};
-
-struct sap_handler_t *SAP_Create (vlc_object_t *);
-void SAP_Destroy (struct sap_handler_t *);
-int SAP_Add (struct sap_handler_t *, session_descriptor_t *);
-void SAP_Del (struct sap_handler_t *, const session_descriptor_t *);
-
 #endif

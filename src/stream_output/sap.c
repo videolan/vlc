@@ -22,10 +22,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -45,6 +41,17 @@
 
 /* SAP is always on that port */
 #define IPPORT_SAP 9875
+
+struct session_descriptor_t
+{
+    struct sockaddr_storage orig;
+    socklen_t origlen;
+    struct sockaddr_storage addr;
+    socklen_t addrlen;
+
+    char *psz_sdp;
+    bool b_ssm;
+};
 
 /* A SAP session descriptor, enqueued in the SAP handler queue */
 typedef struct sap_session_t
@@ -88,9 +95,6 @@ struct sap_handler_t
 #define MIN_INTERVAL 2
 #define MAX_INTERVAL 300
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
 static void *RunThread (void *);
 
 /**
@@ -99,7 +103,7 @@ static void *RunThread (void *);
  * \param p_announce a VLC object
  * \return the newly created SAP handler or NULL on error
  */
-sap_handler_t *SAP_Create (vlc_object_t *p_announce)
+static sap_handler_t *SAP_Create (vlc_object_t *p_announce)
 {
     sap_handler_t *p_sap;
 
@@ -112,7 +116,7 @@ sap_handler_t *SAP_Create (vlc_object_t *p_announce)
     return p_sap;
 }
 
-void SAP_Destroy (sap_handler_t *p_sap)
+static void SAP_Destroy (sap_handler_t *p_sap)
 {
     assert (p_sap->first == NULL);
     vlc_mutex_destroy (&p_sap->lock);
@@ -206,7 +210,7 @@ static void *RunThread (void *self)
 /**
  * Add a SAP announce
  */
-int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session)
+static int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session)
 {
     int i;
     char psz_addr[NI_MAXNUMERICHOST];
@@ -406,7 +410,8 @@ int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session)
 /**
  * Remove a SAP Announce
  */
-void SAP_Del (sap_handler_t *p_sap, const session_descriptor_t *p_session)
+static void SAP_Del (sap_handler_t *p_sap,
+                     const session_descriptor_t *p_session)
 {
     vlc_mutex_lock (&p_sap->lock);
 
@@ -452,4 +457,103 @@ found:
     }
 
     free (session);
+}
+
+/****************************************************************************
+ * Sout-side functions
+ ****************************************************************************/
+
+static void sap_destroy (vlc_object_t *p_this)
+{
+    libvlc_priv (p_this->p_libvlc)->p_sap = NULL;
+}
+
+#undef sout_AnnounceRegisterSDP
+
+static vlc_mutex_t sap_mutex = VLC_STATIC_MUTEX;
+
+/**
+ *  Registers a new session with the announce handler, using a pregenerated SDP
+ *
+ * \param obj a VLC object
+ * \param psz_sdp the SDP to register
+ * \param psz_dst session address (needed for SAP address auto detection)
+ * \return the new session descriptor structure
+ */
+session_descriptor_t *
+sout_AnnounceRegisterSDP( vlc_object_t *obj, const char *psz_sdp,
+                          const char *psz_dst )
+{
+    session_descriptor_t *p_session = calloc( 1, sizeof (*p_session) );
+    if( !p_session )
+        return NULL;
+
+    p_session->psz_sdp = strdup( psz_sdp );
+
+    /* GRUIK. We should not convert back-and-forth from string to numbers */
+    struct addrinfo *res;
+    if (vlc_getaddrinfo (psz_dst, 0, NULL, &res) == 0)
+    {
+        if (res->ai_addrlen <= sizeof (p_session->addr))
+            memcpy (&p_session->addr, res->ai_addr,
+                    p_session->addrlen = res->ai_addrlen);
+        freeaddrinfo (res);
+    }
+
+    vlc_mutex_lock (&sap_mutex);
+    sap_handler_t *p_sap = libvlc_priv (obj->p_libvlc)->p_sap;
+    if (p_sap == NULL)
+    {
+        p_sap = SAP_Create (VLC_OBJECT (obj->p_libvlc));
+        libvlc_priv (obj->p_libvlc)->p_sap = p_sap;
+        vlc_object_set_destructor ((vlc_object_t *)p_sap, sap_destroy);
+    }
+    else
+        vlc_object_hold ((vlc_object_t *)p_sap);
+    vlc_mutex_unlock (&sap_mutex);
+
+    if (p_sap == NULL)
+        goto error;
+
+    msg_Dbg (obj, "adding SAP session");
+    if (SAP_Add (p_sap, p_session))
+    {
+        vlc_mutex_lock (&sap_mutex);
+        vlc_object_release ((vlc_object_t *)p_sap);
+        vlc_mutex_unlock (&sap_mutex);
+        goto error;
+    }
+
+    return p_session;
+
+error:
+    free (p_session->psz_sdp);
+    free (p_session);
+    return NULL;
+}
+
+#undef sout_AnnounceUnRegister
+/**
+ *  Unregisters an existing session
+ *
+ * \param obj a VLC object
+ * \param p_session the session descriptor
+ * \return VLC_SUCCESS or an error
+ */
+int sout_AnnounceUnRegister( vlc_object_t *obj,
+                             session_descriptor_t *p_session )
+{
+    sap_handler_t *p_sap = libvlc_priv (obj->p_libvlc)->p_sap;
+
+    msg_Dbg (obj, "removing SAP session");
+    SAP_Del (p_sap, p_session);
+
+    vlc_mutex_lock (&sap_mutex);
+    vlc_object_release ((vlc_object_t *)p_sap);
+    vlc_mutex_unlock (&sap_mutex);
+
+    free (p_session->psz_sdp);
+    free (p_session);
+
+    return 0;
 }
