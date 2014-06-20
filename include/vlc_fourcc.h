@@ -155,6 +155,7 @@
 #define VLC_CODEC_MMVIDEO         VLC_FOURCC('M','M','V','I')
 #define VLC_CODEC_AVS             VLC_FOURCC('A','V','S','V')
 #define VLC_CODEC_DSICINVIDEO     VLC_FOURCC('D','C','I','V')
+#define VLC_CODEC_TIERTEXSEQVIDEO VLC_FOURCC('T','S','E','Q')
 
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9             VLC_FOURCC('Y','V','U','9')
