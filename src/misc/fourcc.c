@@ -1073,6 +1073,8 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_DXA, "Feeble Files/ScummVM DXA"),
 
+    B(VLC_CODEC_C93, "Interplay C93"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
