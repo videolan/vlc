@@ -161,6 +161,7 @@
 #define VLC_CODEC_BETHSOFTVID     VLC_FOURCC('B','V','I','D')
 #define VLC_CODEC_VB              VLC_FOURCC('V','B','V','1')
 #define VLC_CODEC_RL2             VLC_FOURCC('R','L','V','2')
+#define VLC_CODEC_BFI             VLC_FOURCC('B','F','&','I')
 
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9             VLC_FOURCC('Y','V','U','9')
