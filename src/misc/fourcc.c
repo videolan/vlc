@@ -1071,6 +1071,8 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_TIERTEXSEQVIDEO, "Tiertex Limited SEQ video"),
 
+    B(VLC_CODEC_DXA, "Feeble Files/ScummVM DXA"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
