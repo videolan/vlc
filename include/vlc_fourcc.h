@@ -395,6 +395,7 @@
 #define VLC_CODEC_S8                         VLC_FOURCC('s','8',' ',' ')
 #define VLC_CODEC_U8                         VLC_FOURCC('u','8',' ',' ')
 #define VLC_CODEC_S16L                       VLC_FOURCC('s','1','6','l')
+#define VLC_CODEC_S16L_PLANAR                VLC_FOURCC('s','1','l','p')
 #define VLC_CODEC_S16B                       VLC_FOURCC('s','1','6','b')
 #define VLC_CODEC_U16L                       VLC_FOURCC('u','1','6','l')
 #define VLC_CODEC_U16B                       VLC_FOURCC('u','1','6','b')

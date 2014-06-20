@@ -1406,6 +1406,8 @@ static const staticentry_t p_list_audio[] = {
     B(VLC_CODEC_S16L, "PCM S16 LE"),
         A("s16l"),
 
+    B(VLC_CODEC_S16L_PLANAR, "PCM S16 LE planar"),
+
     B(VLC_CODEC_S16B, "PCM S16 BE"),
         A("s16b"),
 
