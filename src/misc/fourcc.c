@@ -1083,6 +1083,8 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_BFI, "Brute Force & Ignorance (BFI) video"),
 
+    B(VLC_CODEC_CMV, "Electronic Arts CMV"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
