@@ -180,7 +180,7 @@ static const struct
     { VLC_CODEC_AURA, AV_CODEC_ID_AURA, VIDEO_ES },
     /* AV_CODEC_ID_AURA2 */
     /* AV_CODEC_ID_V210X */
-    /* AV_CODEC_ID_TMV */
+    { VLC_CODEC_TMV, AV_CODEC_ID_TMV, VIDEO_ES },
     { VLC_CODEC_V210, AV_CODEC_ID_V210, VIDEO_ES },
     /* AV_CODEC_ID_DPX */
     /* AV_CODEC_ID_MAD */

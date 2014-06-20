@@ -1057,6 +1057,8 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_AURA, "Auravision Aura"),
         A("AURA"),
 
+    B(VLC_CODEC_TMV, "8088flex TMV"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
