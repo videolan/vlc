@@ -1059,6 +1059,8 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_TMV, "8088flex TMV"),
 
+    B(VLC_CODEC_XAN_WC3, "Wing Commander III video"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {

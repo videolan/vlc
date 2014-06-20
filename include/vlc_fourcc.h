@@ -150,6 +150,7 @@
 #define VLC_CODEC_AURA            VLC_FOURCC('A','U','R','A')
 #define VLC_CODEC_FIC             VLC_FOURCC('F','I','C','V')
 #define VLC_CODEC_TMV             VLC_FOURCC('T','M','A','V')
+#define VLC_CODEC_XAN_WC3         VLC_FOURCC('X','A','N','3')
 
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9             VLC_FOURCC('Y','V','U','9')
