@@ -165,6 +165,7 @@
 #define VLC_CODEC_CMV             VLC_FOURCC('E','C','M','V')
 #define VLC_CODEC_MOTIONPIXELS    VLC_FOURCC('M','P','I','X')
 #define VLC_CODEC_TGV             VLC_FOURCC('T','G','V','V')
+#define VLC_CODEC_TGQ             VLC_FOURCC('T','G','Q','V')
 
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9             VLC_FOURCC('Y','V','U','9')

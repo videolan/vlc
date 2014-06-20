@@ -1089,6 +1089,8 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_TGV, "Electronic Arts TGV"),
 
+    B(VLC_CODEC_TGQ, "Electronic Arts TGQ"),
+
     B(0, "")
 };
 static const staticentry_t p_list_audio[] = {
