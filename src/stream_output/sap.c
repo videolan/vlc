@@ -44,9 +44,6 @@
 
 struct session_descriptor_t
 {
-    struct sockaddr_storage addr;
-    socklen_t addrlen;
-
     bool b_ssm;
 };
 
@@ -208,7 +205,7 @@ static void *RunThread (void *self)
  * Add a SAP announce
  */
 static int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session,
-                    const char *sdp)
+                    const char *sdp, const char *dst)
 {
     int i;
     char psz_addr[NI_MAXNUMERICHOST];
@@ -220,18 +217,24 @@ static int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session,
         struct sockaddr_in  in;
         struct sockaddr_in6 in6;
     } addr;
-    socklen_t addrlen;
+    socklen_t addrlen = 0;
+    struct addrinfo *res;
 
-    addrlen = p_session->addrlen;
-    if ((addrlen == 0) || (addrlen > sizeof (addr)))
+    if (vlc_getaddrinfo (dst, 0, NULL, &res) == 0)
+    {
+        if (res->ai_addrlen <= sizeof (addr))
+            memcpy (&addr, res->ai_addr, res->ai_addrlen);
+        addrlen = res->ai_addrlen;
+        freeaddrinfo (res);
+    }
+
+    if (addrlen == 0 || addrlen > sizeof (addr))
     {
         msg_Err( p_sap, "No/invalid address specified for SAP announce" );
         return VLC_EGENERIC;
     }
 
     /* Determine SAP multicast address automatically */
-    memcpy (&addr, &p_session->addr, addrlen);
-
     switch (addr.a.sa_family)
     {
 #if defined (HAVE_INET_PTON) || defined (_WIN32)
@@ -483,16 +486,6 @@ sout_AnnounceRegisterSDP( vlc_object_t *obj, const char *psz_sdp,
     if( !p_session )
         return NULL;
 
-    /* GRUIK. We should not convert back-and-forth from string to numbers */
-    struct addrinfo *res;
-    if (vlc_getaddrinfo (psz_dst, 0, NULL, &res) == 0)
-    {
-        if (res->ai_addrlen <= sizeof (p_session->addr))
-            memcpy (&p_session->addr, res->ai_addr,
-                    p_session->addrlen = res->ai_addrlen);
-        freeaddrinfo (res);
-    }
-
     vlc_mutex_lock (&sap_mutex);
     sap_handler_t *p_sap = libvlc_priv (obj->p_libvlc)->p_sap;
     if (p_sap == NULL)
@@ -509,7 +502,7 @@ sout_AnnounceRegisterSDP( vlc_object_t *obj, const char *psz_sdp,
         goto error;
 
     msg_Dbg (obj, "adding SAP session");
-    if (SAP_Add (p_sap, p_session, psz_sdp))
+    if (SAP_Add (p_sap, p_session, psz_sdp, psz_dst))
     {
         vlc_mutex_lock (&sap_mutex);
         vlc_object_release ((vlc_object_t *)p_sap);
