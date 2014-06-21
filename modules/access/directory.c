@@ -82,10 +82,7 @@ struct access_sys_t
     directory_t *current;
     char *ignored_exts;
     char mode;
-    bool header;
-    int i_item_count;
-    char *xspf_ext;
-    int (*compar)(const char **a, const char **b);
+    int (*compar) (const char **a, const char **b);
 };
 
 /* Select non-hidden files only */
@@ -108,16 +105,17 @@ static int version (const char **a, const char **b)
     return strverscmp (*a, *b);
 }
 
- /**
-+ * Does the provided URI/path/stuff has one of the extension provided ?
-+ *
-+ * \param psz_exts A comma separated list of extension without dot, or only
-+ * one ext (ex: "avi,mkv,webm")
-+ * \param psz_uri The uri/path to check (ex: "file:///home/foo/bar.avi")
-+ *
-+ * \return true if the uri/path has one of the provided extension
-+ * false otherwise.
-+ */
+/**
+ * Does the provided URI/path/stuff has one of the extension provided ?
+ *
+ * \param psz_exts A comma separated list of extension without dot, or only
+ * one ext (ex: "avi,mkv,webm")
+ * \param psz_uri The uri/path to check (ex: "file:///home/foo/bar.avi"). If
+ * providing an URI, it must not contain a query string.
+ *
+ * \return true if the uri/path has one of the provided extension
+ * false otherwise.
+ */
 static bool has_ext (const char *psz_exts, const char *psz_uri)
 {
     if (psz_exts == NULL)
@@ -263,11 +261,11 @@ static bool directory_pop (access_sys_t *p_sys)
 /*****************************************************************************
  * Open: open the directory
  *****************************************************************************/
-int DirOpen( vlc_object_t *p_this )
+int DirOpen (vlc_object_t *p_this)
 {
     access_t *p_access = (access_t*)p_this;
 
-    if( !p_access->psz_filepath )
+    if (!p_access->psz_filepath)
         return VLC_EGENERIC;
 
     DIR *handle = vlc_opendir (p_access->psz_filepath);
@@ -280,7 +278,7 @@ int DirOpen( vlc_object_t *p_this )
 int DirInit (access_t *p_access, DIR *handle)
 {
     access_sys_t *p_sys = malloc (sizeof (*p_sys));
-    if (unlikely(p_sys == NULL))
+    if (unlikely (p_sys == NULL))
         goto error;
 
     char *psz_sort = var_InheritString (p_access, "directory-sort");
@@ -302,12 +300,12 @@ int DirInit (access_t *p_access, DIR *handle)
     }
     else
         uri = vlc_path2uri (p_access->psz_filepath, "file");
-    if (unlikely(uri == NULL))
+    if (unlikely (uri == NULL))
         goto error;
 
     /* "Open" the base directory */
     p_sys->current = NULL;
-    if( !directory_push (p_sys, handle, uri))
+    if (!directory_push (p_sys, handle, uri))
     {
         free (uri);
         goto error;
@@ -322,14 +320,15 @@ int DirInit (access_t *p_access, DIR *handle)
     char *psz_rec = var_InheritString (p_access, "recursive");
     if (psz_rec == NULL || !strcasecmp (psz_rec, "none"))
         p_sys->mode = MODE_NONE;
-    else if( !strcasecmp( psz, "collapse" )  )
+    else if (!strcasecmp (psz_rec, "collapse"))
         p_sys->mode = MODE_COLLAPSE;
     else
         p_sys->mode = MODE_EXPAND;
-    free( psz );
+    free (psz_rec);
 
     p_access->pf_readdir = DirRead;
     p_access->pf_control = DirControl;
+
     return VLC_SUCCESS;
 
 error:
@@ -414,7 +413,7 @@ int DirRead (access_t *p_access, input_item_node_t *p_current_node)
         /* Handle directory flags and recursion if in EXPAND mode  */
         if (i_res == ENTRY_DIR)
         {
-            if( p_sys->mode == MODE_EXPAND
+            if (p_sys->mode == MODE_EXPAND
                 && directory_push (p_sys, handle, psz_full_uri))
             {
                 p_current_node = p_new_node;
@@ -431,7 +430,7 @@ int DirRead (access_t *p_access, input_item_node_t *p_current_node)
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-int DirControl( access_t *p_access, int i_query, va_list args )
+int DirControl (access_t *p_access, int i_query, va_list args)
 {
     VLC_UNUSED (p_access);
 
@@ -439,16 +438,16 @@ int DirControl( access_t *p_access, int i_query, va_list args )
     {
         case ACCESS_CAN_SEEK:
         case ACCESS_CAN_FASTSEEK:
-            *va_arg( args, bool* ) = false;
+            *va_arg (args, bool*) = false;
             break;
 
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
-            *va_arg( args, bool* ) = true;
+            *va_arg (args, bool*) = true;
             break;
 
         case ACCESS_GET_PTS_DELAY:
-            *va_arg( args, int64_t * ) = DEFAULT_PTS_DELAY * 1000;
+            *va_arg (args, int64_t *) = DEFAULT_PTS_DELAY * 1000;
             break;
 
         default:
