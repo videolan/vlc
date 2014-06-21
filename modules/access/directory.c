@@ -61,10 +61,10 @@ enum
     MODE_EXPAND,
 };
 
-typedef struct directory_t directory_t;
-struct directory_t
+typedef struct directory directory;
+struct directory
 {
-    directory_t *parent;
+    directory   *parent;
     DIR         *handle;
     char        *uri;
     char       **filev;
@@ -79,10 +79,10 @@ struct directory_t
 
 struct access_sys_t
 {
-    directory_t *current;
-    char *ignored_exts;
-    char mode;
-    int (*compar) (const char **a, const char **b);
+    directory *current;
+    char      *ignored_exts;
+    char       mode;
+    int        (*compar) (const char **a, const char **b);
 };
 
 /* Select non-hidden files only */
@@ -146,7 +146,7 @@ static bool has_ext (const char *psz_exts, const char *psz_uri)
 
 #ifdef HAVE_OPENAT
 /* Detect directories that recurse into themselves. */
-static bool has_inode_loop (const directory_t *dir, dev_t dev, ino_t inode)
+static bool has_inode_loop (const directory *dir, dev_t dev, ino_t inode)
 {
     while (dir != NULL)
     {
@@ -160,7 +160,7 @@ static bool has_inode_loop (const directory_t *dir, dev_t dev, ino_t inode)
 
 /* success -> returns ENTRY_DIR and the handle parameter is set to the handle,
  * error -> return ENTRY_ENOTDIR or ENTRY_EACCESS */
-static int directory_open (directory_t *p_dir, char *psz_entry, DIR **handle)
+static int directory_open (directory *p_dir, char *psz_entry, DIR **handle)
 {
     *handle = NULL;
 
@@ -197,7 +197,7 @@ static int directory_open (directory_t *p_dir, char *psz_entry, DIR **handle)
 
 static bool directory_push (access_sys_t *p_sys, DIR *handle, char *psz_uri)
 {
-    directory_t *p_dir;
+    directory *p_dir;
 
     p_dir = malloc (sizeof (*p_dir));
     if (unlikely (p_dir == NULL))
@@ -240,7 +240,7 @@ static bool directory_push (access_sys_t *p_sys, DIR *handle, char *psz_uri)
 
 static bool directory_pop (access_sys_t *p_sys)
 {
-    directory_t *p_old = p_sys->current;
+    directory *p_old = p_sys->current;
 
     if (p_old == NULL)
         return false;
@@ -362,7 +362,7 @@ int DirRead (access_t *p_access, input_item_node_t *p_current_node)
     while (p_sys->current != NULL
            && p_sys->current->i <= p_sys->current->filec)
     {
-        directory_t *p_current = p_sys->current;
+        directory *p_current = p_sys->current;
 
         /* End of the current folder, let's pop directory and node */
         if (p_current->i == p_current->filec)
