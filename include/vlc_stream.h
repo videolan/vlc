@@ -101,7 +101,7 @@ enum stream_query_e
 
     STREAM_GET_SIZE,            /**< arg1= uint64_t *     res=cannot fail (0 if no sense)*/
 
-    /* You should update size of source if any and then update size 
+    /* You should update size of source if any and then update size
      * FIXME find a way to avoid it */
     STREAM_UPDATE_SIZE,
 
@@ -225,6 +225,19 @@ VLC_API stream_t * stream_UrlNew(vlc_object_t *p_this, const char *psz_url );
  * @return New stream to use, or NULL if the filter could not be added.
  **/
 VLC_API stream_t* stream_FilterNew( stream_t *p_source, const char *psz_stream_filter );
+
+/**
+ * Default ReadDir implementation for stream Filter. This implementation just
+ * forward the pf_readdir call to the p_source stream.
+ */
+VLC_API int stream_FilterDefaultReadDir( stream_t *s, input_item_node_t *p_node );
+
+/**
+ * Sets stream_FilterDefaultReadDir as the pf_readdir callback for this stream filter
+ */
+#define stream_FilterSetDefaultReadDir(p_stream) \
+    p_stream->pf_readdir = stream_FilterDefaultReadDir;
+
 /**
  * @}
  */

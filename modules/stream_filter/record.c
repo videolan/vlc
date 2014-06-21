@@ -91,6 +91,7 @@ static int Open ( vlc_object_t *p_this )
     s->pf_read = Read;
     s->pf_peek = Peek;
     s->pf_control = Control;
+    stream_FilterSetDefaultReadDir( s );
 
     return VLC_SUCCESS;
 }

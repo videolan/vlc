@@ -127,3 +127,11 @@ static void StreamDelete( stream_t *s )
 
     stream_CommonDelete( s );
 }
+
+int stream_FilterDefaultReadDir( stream_t *s, input_item_node_t *p_node )
+{
+    if( s != NULL && s->p_source != NULL )
+        return stream_ReadDir( s->p_source, p_node );
+    else
+        return VLC_ENOITEM;
+}
