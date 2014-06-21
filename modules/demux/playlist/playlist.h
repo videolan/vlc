@@ -78,6 +78,10 @@ void Close_WPL ( vlc_object_t * );
 int Import_ZPL ( vlc_object_t * );
 void Close_ZPL ( vlc_object_t * );
 
+int Import_Dir ( vlc_object_t * );
+void Close_Dir ( vlc_object_t * );
+
+
 extern input_item_t * GetCurrentItem(demux_t *p_demux);
 
 bool CheckContentType( stream_t * p_stream, const char * psz_ctype );

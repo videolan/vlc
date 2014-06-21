@@ -216,6 +216,7 @@ libplaylist_plugin_la_SOURCES = \
 	demux/playlist/wpl.c \
 	demux/playlist/xspf.c \
 	demux/playlist/zpl.c \
+	demux/playlist/directory.c \
 	demux/playlist/playlist.c demux/playlist/playlist.h
 demux_LTLIBRARIES += libplaylist_plugin.la
 
