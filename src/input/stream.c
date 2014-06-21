@@ -116,7 +116,8 @@ typedef struct
 typedef enum
 {
     STREAM_METHOD_BLOCK,
-    STREAM_METHOD_STREAM
+    STREAM_METHOD_STREAM,
+    STREAM_METHOD_READDIR
 } stream_read_method_t;
 
 struct stream_sys_t
@@ -197,7 +198,11 @@ static int  AStreamSeekStream( stream_t *s, uint64_t i_pos );
 static void AStreamPrebufferStream( stream_t *s );
 static int  AReadStream( stream_t *s, void *p_read, unsigned int i_read );
 
+/* ReadDir */
+static int  AStreamReadDir( stream_t *s, input_item_node_t *p_node );
+
 /* Common */
+static int  AStreamGenericError( ) { return VLC_EGENERIC; }
 static int AStreamControl( stream_t *s, int i_query, va_list );
 static void AStreamDestroy( stream_t *s );
 static int  ASeek( stream_t *s, uint64_t i_pos );
@@ -285,8 +290,9 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
         return NULL;
     }
 
-    s->pf_read   = NULL;    /* Set up later */
-    s->pf_peek   = NULL;
+    s->pf_read    = (void *)AStreamGenericError;    /* Replaced later */
+    s->pf_peek    = (void *)AStreamGenericError;
+    s->pf_readdir = (void *)AStreamGenericError;
     s->pf_control = AStreamControl;
     s->pf_destroy = AStreamDestroy;
 
@@ -294,8 +300,10 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
     p_sys->p_access = p_access;
     if( p_access->pf_block )
         p_sys->method = STREAM_METHOD_BLOCK;
-    else
+    else if( p_access->pf_read )
         p_sys->method = STREAM_METHOD_STREAM;
+    else
+        p_sys->method = STREAM_METHOD_READDIR;
 
     p_sys->i_pos = p_access->info.i_pos;
 
@@ -385,11 +393,9 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
             goto error;
         }
     }
-    else
+    else if ( p_sys->method == STREAM_METHOD_STREAM )
     {
         int i;
-
-        assert( p_sys->method == STREAM_METHOD_STREAM );
 
         msg_Dbg( s, "Using stream method for AStream*" );
 
@@ -426,6 +432,11 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
             goto error;
         }
     }
+    else
+    {
+        assert( p_sys->method == STREAM_METHOD_READDIR );
+        s->pf_readdir = AStreamReadDir;
+    }
 
     return s;
 
@@ -434,7 +445,7 @@ error:
     {
         /* Nothing yet */
     }
-    else
+    else if( p_sys->method == STREAM_METHOD_STREAM )
     {
         free( p_sys->stream.p_buffer );
     }
@@ -456,7 +467,7 @@ static void AStreamDestroy( stream_t *s )
 
     if( p_sys->method == STREAM_METHOD_BLOCK )
         block_ChainRelease( p_sys->block.p_first );
-    else
+    else if( p_sys->method == STREAM_METHOD_STREAM )
         free( p_sys->stream.p_buffer );
 
     free( p_sys->p_peek );
@@ -635,6 +646,13 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
             if( ret == VLC_SUCCESS )
                 AStreamControlReset( s );
             return ret;
+        }
+
+        case STREAM_IS_DIRECTORY:
+        {
+            bool *pb_canreaddir = va_arg( args, bool * );
+            *pb_canreaddir = p_sys->method == STREAM_METHOD_READDIR;
+            return VLC_SUCCESS;
         }
 
         case STREAM_SET_RECORD_STATE:
@@ -1473,6 +1491,10 @@ char *stream_ReadLine( stream_t *s )
     char *p_line = NULL;
     int i_line = 0, i_read = 0;
 
+    /* Let's fail quickly if this is a readdir access */
+    if( s->pf_read == NULL )
+        return NULL;
+
     for( ;; )
     {
         char *psz_eol;
@@ -1830,6 +1852,15 @@ static int ASeek( stream_t *s, uint64_t i_pos )
     return p_access->pf_seek( p_access, i_pos );
 }
 
+static int AStreamReadDir( stream_t *s, input_item_node_t *p_node )
+{
+    access_t *p_access = s->p_sys->p_access;
+
+    if( p_access->pf_readdir != NULL )
+        return p_access->pf_readdir( p_access, p_node );
+    else
+        return VLC_ENOITEM;
+}
 
 /**
  * Try to read "i_read" bytes into a buffer pointed by "p_read".  If
@@ -1962,3 +1993,11 @@ block_t *stream_BlockRemaining( stream_t *s, int i_max_size )
     return p_block;
 }
 
+/**
+ * Returns a node containing all the input_item of the directory pointer by
+ * this stream. returns VLC_SUCCESS on success.
+ */
+int stream_ReadDir( stream_t *s, input_item_node_t *p_node )
+{
+    return s->pf_readdir( s, p_node );
+}

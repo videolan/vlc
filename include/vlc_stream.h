@@ -65,9 +65,10 @@ struct stream_t
     stream_t *p_source;
 
     /* */
-    int      (*pf_read)   ( stream_t *, void *p_read, unsigned int i_read );
-    int      (*pf_peek)   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
-    int      (*pf_control)( stream_t *, int i_query, va_list );
+    int         (*pf_read)   ( stream_t *, void *p_read, unsigned int i_read );
+    int         (*pf_peek)   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
+    int         (*pf_readdir)( stream_t *, input_item_node_t * );
+    int         (*pf_control)( stream_t *, int i_query, va_list );
 
     /* */
     void     (*pf_destroy)( stream_t *);
@@ -92,6 +93,7 @@ enum stream_query_e
     STREAM_CAN_FASTSEEK,        /**< arg1= bool *   res=cannot fail*/
     STREAM_CAN_PAUSE,           /**< arg1= bool *   res=cannot fail*/
     STREAM_CAN_CONTROL_PACE,    /**< arg1= bool *   res=cannot fail*/
+    STREAM_IS_DIRECTORY,        /**< arg1= bool *   res=cannot fail*/
 
     /* */
     STREAM_SET_POSITION,        /**< arg1= uint64_t       res=can fail  */
@@ -132,6 +134,7 @@ VLC_API int stream_Control( stream_t *s, int i_query, ... );
 VLC_API block_t * stream_Block( stream_t *s, int i_size );
 VLC_API block_t * stream_BlockRemaining( stream_t *s, int i_max_size );
 VLC_API char * stream_ReadLine( stream_t * );
+VLC_API int stream_ReadDir( stream_t *, input_item_node_t * );
 
 /**
  * Get the current position in a stream
