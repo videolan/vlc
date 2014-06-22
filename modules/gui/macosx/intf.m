@@ -782,14 +782,20 @@ static VLCMain *_o_sharedMainInstance = nil;
         [[self playlist] playItem:nil];
 }
 
+/* don't allow a double termination call. If the user has
+ * already invoked the quit then simply return this time. */
+static bool f_appExit = false;
+
 #pragma mark -
 #pragma mark Termination
 
+- (BOOL)isTerminating
+{
+    return f_appExit;
+}
+
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
-    /* don't allow a double termination call. If the user has
-     * already invoked the quit then simply return this time. */
-    static bool f_appExit = false;
     bool isTerminating;
 
     [o_appLock lock];

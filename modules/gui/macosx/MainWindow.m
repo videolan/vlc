@@ -792,7 +792,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
             // only resize back to minimum view of this is still desired final state
             CGFloat f_threshold_height = f_min_video_height + [o_controls_bar height];
             if(frameBeforePlayback.size.height > f_threshold_height || b_minimized_view) {
-                [[self animator] setFrame:frameBeforePlayback display:YES];
+
+                if ([[VLCMain sharedInstance] isTerminating])
+                    [self setFrame:frameBeforePlayback display:YES];
+                else
+                    [[self animator] setFrame:frameBeforePlayback display:YES];
+
             }
         }
 

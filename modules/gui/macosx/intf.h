@@ -172,6 +172,8 @@ audio_output_t *getAout(void);
 
 - (void)resetAndReinitializeUserDefaults;
 
+- (BOOL)isTerminating;
+
 @end
 
 
