@@ -1497,15 +1497,20 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
     /* create stss table */
     bo_t *stss = NULL;
     i_index = 0;
-    for (unsigned i = 0; i < p_stream->i_entry_count; i++)
-        if (p_stream->entry[i].i_flags & BLOCK_FLAG_TYPE_I) {
-            if (stss == NULL) {
-                stss = box_full_new("stss", 0, 0);
-                bo_add_32be(stss, 0); /* fixed later */
+    if ( p_stream->fmt.i_cat == VIDEO_ES || p_stream->fmt.i_cat == AUDIO_ES )
+    {
+        for (unsigned i = 0; i < p_stream->i_entry_count; i++)
+        {
+            if (p_stream->entry[i].i_flags & BLOCK_FLAG_TYPE_I) {
+                if (stss == NULL) {
+                    stss = box_full_new("stss", 0, 0);
+                    bo_add_32be(stss, 0); /* fixed later */
+                }
+                bo_add_32be(stss, 1 + i);
+                i_index++;
             }
-            bo_add_32be(stss, 1 + i);
-            i_index++;
         }
+    }
 
     if (stss)
         bo_fix_32be(stss, 12, i_index);
