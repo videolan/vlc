@@ -1554,13 +1554,15 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)setActiveVideoPlayback:(BOOL)b_value
 {
+    assert([NSThread isMainThread]);
+
     b_active_videoplayback = b_value;
     if (o_mainwindow) {
-        [o_mainwindow performSelectorOnMainThread:@selector(setVideoplayEnabled) withObject:nil waitUntilDone:YES];
+        [o_mainwindow setVideoplayEnabled];
     }
 
     // update sleep blockers
-    [self performSelectorOnMainThread:@selector(playbackStatusUpdated) withObject:nil waitUntilDone:NO];
+    [self playbackStatusUpdated];
 }
 
 #pragma mark -
