@@ -289,6 +289,7 @@ static void Run(intf_thread_t *p_intf)
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
 
     [NSApp run];
+    msg_Dbg(p_intf, "Run loop has been stopped");
     [[VLCMain sharedInstance] applicationWillTerminate:nil];
     [o_appLock release];
     [o_vout_provider_lock release];
@@ -852,6 +853,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [o_vout_provider_lock lock];
     // release before o_info!
+    // closes all open vouts
     [o_vout_controller release];
     o_vout_controller = nil;
     [o_vout_provider_lock unlock];
@@ -892,8 +894,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [o_mainmenu release];
     [o_coreinteraction release];
-
-    libvlc_Quit(p_intf->p_libvlc);
 
     o_mainwindow = NULL;
 
