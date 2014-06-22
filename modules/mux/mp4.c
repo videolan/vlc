@@ -1499,8 +1499,16 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
     i_index = 0;
     if ( p_stream->fmt.i_cat == VIDEO_ES || p_stream->fmt.i_cat == AUDIO_ES )
     {
+        mtime_t i_interval = -1;
         for (unsigned i = 0; i < p_stream->i_entry_count; i++)
         {
+            if ( i_interval != -1 )
+            {
+                i_interval += p_stream->entry[i].i_length + p_stream->entry[i].i_pts_dts;
+                if ( i_interval < CLOCK_FREQ * 2 )
+                    continue;
+            }
+
             if (p_stream->entry[i].i_flags & BLOCK_FLAG_TYPE_I) {
                 if (stss == NULL) {
                     stss = box_full_new("stss", 0, 0);
@@ -1508,6 +1516,7 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
                 }
                 bo_add_32be(stss, 1 + i);
                 i_index++;
+                i_interval = 0;
             }
         }
     }
