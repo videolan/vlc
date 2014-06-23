@@ -388,7 +388,11 @@ static int  AndroidLockSurface(picture_t *picture)
 
     if (sys->native_window.winLock) {
         ANativeWindow_Buffer buf = { 0 };
-        sys->native_window.winLock(sys->window, &buf, NULL);
+        int32_t err = sys->native_window.winLock(sys->window, &buf, NULL);
+        if (err) {
+            jni_UnlockAndroidSurface();
+            return VLC_EGENERIC;
+        }
         info->w      = buf.width;
         info->h      = buf.height;
         info->bits   = buf.bits;
