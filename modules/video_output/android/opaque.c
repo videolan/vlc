@@ -130,7 +130,11 @@ static void DisplaySubpicture(vout_display_t *vd, subpicture_t *subpicture)
     }
 
     ANativeWindow_Buffer buf = { 0 };
-    sys->native_window.winLock(sys->window, &buf, NULL);
+    int32_t err = sys->native_window.winLock(sys->window, &buf, NULL);
+    if (err) {
+        jni_UnlockAndroidSurface();
+        return;
+    }
 
     if (buf.width >= sys->fmt.i_width && buf.height >= sys->fmt.i_height)
     {
