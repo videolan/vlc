@@ -135,6 +135,7 @@ else # !Windows
 FFMPEGCONF += --enable-pthreads
 endif
 
+# Solaris
 ifdef HAVE_SOLARIS
 ifeq ($(ARCH),x86_64)
 FFMPEGCONF += --cpu=core2
