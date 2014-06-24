@@ -135,6 +135,10 @@ else # !Windows
 FFMPEGCONF += --enable-pthreads
 endif
 
+ifdef HAVE_SOLARIS
+FFMPEGCONF += --cpu=core2 --enable-pic
+endif
+
 # Build
 PKGS += ffmpeg
 ifeq ($(call need_pkg,"libavcodec >= 54.25.0 libavformat >= 53.21.0 libswscale"),)
