@@ -139,7 +139,7 @@ ifdef HAVE_SOLARIS
 ifeq ($(ARCH),x86_64)
 FFMPEGCONF += --cpu=core2
 endif
-FFMPEGCONF += --enable-pic
+FFMPEGCONF += --target-os=sunos --enable-pic
 endif
 
 # Build
