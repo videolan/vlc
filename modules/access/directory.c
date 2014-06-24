@@ -186,10 +186,16 @@ static int directory_open (directory *p_dir, char *psz_entry, DIR **handle)
     }
 #else
     char *path;
-    if (asprintf (&path, "%s/%s", current->path, entry) == -1)
-        goto ENTRY_EACCESS;
-    if ((*handle = vlc_opendir (path)) == NULL)
-        goto ENTRY_ENOTDIR;
+    if (asprintf (&path, "%s/%s", p_dir->path, psz_entry) == -1)
+        return ENTRY_EACCESS;
+
+    *handle = vlc_opendir (path);
+
+    free(path);
+
+    if (*handle == NULL) {
+        return ENTRY_ENOTDIR;
+    }
 #endif
 
     return ENTRY_DIR;
