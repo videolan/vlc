@@ -136,7 +136,10 @@ FFMPEGCONF += --enable-pthreads
 endif
 
 ifdef HAVE_SOLARIS
-FFMPEGCONF += --cpu=core2 --enable-pic
+ifeq ($(ARCH),x86_64)
+FFMPEGCONF += --cpu=core2
+endif
+FFMPEGCONF += --enable-pic
 endif
 
 # Build
