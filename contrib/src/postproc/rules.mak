@@ -75,6 +75,10 @@ else
 POSTPROCCONF += --enable-pthreads
 endif
 
+ifdef HAVE_SOLARIS
+POSTPROCCONF += --enable-pic
+endif
+
 # Build
 
 ifdef GPL
