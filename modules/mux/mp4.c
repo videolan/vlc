@@ -1981,6 +1981,12 @@ static bo_t *box_full_new(const char *fcc, uint8_t v, uint32_t f)
     return box;
 }
 
+static void box_free(bo_t *box)
+{
+    block_Release(box->b);
+    free(box);
+}
+
 static void box_fix(bo_t *box)
 {
     box->b->p_buffer[0] = box->len >> 24;
@@ -1995,8 +2001,7 @@ static void box_gather (bo_t *box, bo_t *box2)
     box->b = block_Realloc(box->b, 0, box->len + box2->len);
     memcpy(&box->b->p_buffer[box->len], box2->b->p_buffer, box2->len);
     box->len += box2->len;
-    block_Release(box2->b);
-    free(box2);
+    box_free(box2);
 }
 
 static void box_send(sout_mux_t *p_mux,  bo_t *box)
