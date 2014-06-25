@@ -435,6 +435,8 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
     }
     else
     {
+        msg_Dbg( s, "Using readdir method for AStream*" );
+
         assert( p_sys->method == STREAM_METHOD_READDIR );
         s->pf_readdir = AStreamReadDir;
     }
