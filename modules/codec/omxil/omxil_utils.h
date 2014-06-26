@@ -80,6 +80,16 @@ static inline OMX_TICKS ToOmxTicks(int64_t value)
 /*****************************************************************************
  * OMX buffer FIFO macros
  *****************************************************************************/
+#define OMX_FIFO_INIT(p_fifo, next) \
+    do { vlc_mutex_init( &(p_fifo)->lock ); \
+         vlc_cond_init( &(p_fifo)->wait ); \
+         (p_fifo)->offset = offsetof(OMX_BUFFERHEADERTYPE, next) / sizeof(void *); \
+         (p_fifo)->pp_last = &(p_fifo)->p_first; } while(0)
+
+#define OMX_FIFO_DESTROY(p_fifo) \
+    do { vlc_mutex_destroy( &(p_fifo)->lock ); \
+         vlc_cond_destroy (&(p_fifo)->wait); } while(0)
+
 #define OMX_FIFO_PEEK(p_fifo, p_buffer) \
          p_buffer = (p_fifo)->p_first;
 

@@ -39,6 +39,18 @@
 /*****************************************************************************
  * decoder_sys_t : omxil decoder descriptor
  *****************************************************************************/
+typedef struct OmxFifo
+{
+    vlc_mutex_t lock;
+    vlc_cond_t  wait;
+
+    OMX_BUFFERHEADERTYPE *p_first;
+    OMX_BUFFERHEADERTYPE **pp_last;
+
+    int offset;
+
+} OmxFifo;
+
 typedef struct OmxPort
 {
     bool b_valid;
@@ -54,17 +66,7 @@ typedef struct OmxPort
     unsigned int i_buffers;
     OMX_BUFFERHEADERTYPE **pp_buffers;
 
-    struct fifo_t
-    {
-      vlc_mutex_t         lock;
-      vlc_cond_t          wait;
-
-      OMX_BUFFERHEADERTYPE *p_first;
-      OMX_BUFFERHEADERTYPE **pp_last;
-
-      int offset;
-
-    } fifo;
+    OmxFifo fifo;
 
     OmxFormatParam format_param;
 

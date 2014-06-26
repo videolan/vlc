@@ -854,17 +854,11 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
     }
     p_sys->b_enc = b_encode;
     InitOmxEventQueue(&p_sys->event_queue);
-    vlc_mutex_init (&p_sys->in.fifo.lock);
-    vlc_cond_init (&p_sys->in.fifo.wait);
-    p_sys->in.fifo.offset = offsetof(OMX_BUFFERHEADERTYPE, pOutputPortPrivate) / sizeof(void *);
-    p_sys->in.fifo.pp_last = &p_sys->in.fifo.p_first;
+    OMX_FIFO_INIT (&p_sys->in.fifo, pOutputPortPrivate );
     p_sys->in.b_direct = false;
     p_sys->in.b_flushed = true;
     p_sys->in.p_fmt = &p_dec->fmt_in;
-    vlc_mutex_init (&p_sys->out.fifo.lock);
-    vlc_cond_init (&p_sys->out.fifo.wait);
-    p_sys->out.fifo.offset = offsetof(OMX_BUFFERHEADERTYPE, pInputPortPrivate) / sizeof(void *);
-    p_sys->out.fifo.pp_last = &p_sys->out.fifo.p_first;
+    OMX_FIFO_INIT (&p_sys->out.fifo, pInputPortPrivate );
     p_sys->out.b_direct = false;
     p_sys->out.b_flushed = true;
     p_sys->out.p_fmt = &p_dec->fmt_out;
@@ -1645,10 +1639,9 @@ static void CloseGeneric( vlc_object_t *p_this )
     DeinitOmxCore();
 
     DeinitOmxEventQueue(&p_sys->event_queue);
-    vlc_mutex_destroy (&p_sys->in.fifo.lock);
-    vlc_cond_destroy (&p_sys->in.fifo.wait);
-    vlc_mutex_destroy (&p_sys->out.fifo.lock);
-    vlc_cond_destroy (&p_sys->out.fifo.wait);
+
+    OMX_FIFO_DESTROY( &p_sys->in.fifo );
+    OMX_FIFO_DESTROY( &p_sys->out.fifo );
 
     free( p_sys );
 }
