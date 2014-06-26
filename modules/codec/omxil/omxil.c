@@ -1247,6 +1247,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         {
             omx_error = GetPortDefinition(p_dec, &p_sys->out, p_sys->out.p_fmt);
             p_sys->out.b_update_def = 0;
+            CHECK_ERROR(omx_error, "GetPortDefinition failed");
         }
 
         if(p_header->nFilledLen)
@@ -1368,15 +1369,20 @@ reconfig:
         {
             omx_error = PortReconfigure(p_dec, p_port);
             p_port->b_reconfigure = 0;
+            CHECK_ERROR(omx_error, "PortReconfigure failed");
         }
         if(p_port->b_update_def)
         {
             omx_error = GetPortDefinition(p_dec, p_port, p_port->p_fmt);
             p_port->b_update_def = 0;
+            CHECK_ERROR(omx_error, "GetPortDefinition failed");
         }
     }
 
     return p_pic;
+error:
+    p_sys->b_error = true;
+    return NULL;
 }
 
 /*****************************************************************************
@@ -1516,9 +1522,13 @@ reconfig:
         if(!p_port->b_reconfigure) continue;
         p_port->b_reconfigure = 0;
         omx_error = PortReconfigure(p_dec, p_port);
+        CHECK_ERROR(omx_error, "PortReconfigure failed");
     }
 
     return p_buffer;
+error:
+    p_sys->b_error = true;
+    return NULL;
 }
 
 /*****************************************************************************
@@ -1578,6 +1588,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pic )
         if(!p_port->b_reconfigure) continue;
         p_port->b_reconfigure = 0;
         omx_error = PortReconfigure(p_dec, p_port);
+        CHECK_ERROR(omx_error, "PortReconfigure failed");
     }
 
     /* Wait for the decoded frame */
@@ -1616,6 +1627,9 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pic )
 
     msg_Dbg(p_dec, "done");
     return p_block;
+error:
+    p_sys->b_error = true;
+    return NULL;
 }
 
 /*****************************************************************************
