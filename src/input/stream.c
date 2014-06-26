@@ -1857,10 +1857,7 @@ static int AStreamReadDir( stream_t *s, input_item_node_t *p_node )
 {
     access_t *p_access = s->p_sys->p_access;
 
-    if( p_access->pf_readdir != NULL )
-        return p_access->pf_readdir( p_access, p_node );
-    else
-        return VLC_ENOITEM;
+    return p_access->pf_readdir( p_access, p_node );
 }
 
 /**
