@@ -356,6 +356,111 @@ static OMX_ERRORTYPE UpdatePixelAspect(decoder_t *p_dec)
 }
 
 /*****************************************************************************
+ * AllocateBuffers: Allocate Omx buffers
+ *****************************************************************************/
+static OMX_ERRORTYPE AllocateBuffers(decoder_t *p_dec, OmxPort *p_port)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    OMX_ERRORTYPE omx_error = OMX_ErrorUndefined;
+    OMX_PARAM_PORTDEFINITIONTYPE *def = &p_port->definition;
+    unsigned int i;
+
+#ifdef OMXIL_EXTRA_DEBUG
+    msg_Dbg( p_dec, "AllocateBuffers(%d)", def->eDir );
+#endif
+
+    p_port->i_buffers = p_port->definition.nBufferCountActual;
+
+    p_port->pp_buffers = calloc(p_port->i_buffers, sizeof(OMX_BUFFERHEADERTYPE*));
+    if( !p_port->pp_buffers )
+    {
+        return OMX_ErrorInsufficientResources;
+    }
+
+    for(i = 0; i < p_port->i_buffers; i++)
+    {
+#if 0
+#define ALIGN(x,BLOCKLIGN) (((x) + BLOCKLIGN - 1) & ~(BLOCKLIGN - 1))
+        char *p_buf = malloc(p_port->definition.nBufferSize +
+                             p_port->definition.nBufferAlignment);
+        p_port->pp_buffers[i] = (void *)ALIGN((uintptr_t)p_buf, p_port->definition.nBufferAlignment);
+#endif
+
+        if(p_port->b_direct)
+            omx_error =
+                OMX_UseBuffer( p_sys->omx_handle, &p_port->pp_buffers[i],
+                               p_port->i_port_index, 0,
+                               p_port->definition.nBufferSize, (void*)1);
+        else
+            omx_error =
+                OMX_AllocateBuffer( p_sys->omx_handle, &p_port->pp_buffers[i],
+                                    p_port->i_port_index, 0,
+                                    p_port->definition.nBufferSize);
+
+        if(omx_error != OMX_ErrorNone)
+        {
+            p_port->i_buffers = i;
+            break;
+        }
+        OMX_FIFO_PUT(&p_port->fifo, p_port->pp_buffers[i]);
+    }
+
+    CHECK_ERROR(omx_error, "AllocateBuffers failed (%x, %i)",
+                omx_error, (int)p_port->i_port_index );
+
+
+#ifdef OMXIL_EXTRA_DEBUG
+    msg_Dbg( p_dec, "AllocateBuffers(%d)::done", def->eDir );
+#endif
+error:
+    return omx_error;
+}
+
+/*****************************************************************************
+ * FreeBuffers: Free Omx buffers
+ *****************************************************************************/
+static OMX_ERRORTYPE FreeBuffers(decoder_t *p_dec, OmxPort *p_port)
+{
+    OMX_PARAM_PORTDEFINITIONTYPE *def = &p_port->definition;
+    OMX_ERRORTYPE omx_error = OMX_ErrorNone;
+    OMX_BUFFERHEADERTYPE *p_buffer;
+    unsigned int i;
+
+#ifdef OMXIL_EXTRA_DEBUG
+    msg_Dbg( p_dec, "FreeBuffers(%d)", def->eDir );
+#endif
+
+    for(i = 0; i < p_port->i_buffers; i++)
+    {
+        OMX_FIFO_GET(&p_port->fifo, p_buffer);
+        if (p_buffer->pAppPrivate != NULL)
+            decoder_DeletePicture( p_dec, p_buffer->pAppPrivate );
+        if (p_buffer->nFlags & SENTINEL_FLAG) {
+            free(p_buffer);
+            i--;
+            continue;
+        }
+        omx_error = OMX_FreeBuffer( p_port->omx_handle,
+                                    p_port->i_port_index, p_buffer );
+
+        if(omx_error != OMX_ErrorNone) break;
+    }
+    if( omx_error != OMX_ErrorNone )
+       msg_Err( p_dec, "OMX_FreeBuffer failed (%x, %i, %i)",
+                omx_error, (int)p_port->i_port_index, i );
+
+    p_port->i_buffers = 0;
+    free( p_port->pp_buffers );
+    p_port->pp_buffers = NULL;
+
+#ifdef OMXIL_EXTRA_DEBUG
+    msg_Dbg( p_dec, "FreeBuffers(%d)::done", def->eDir );
+#endif
+
+    return omx_error;
+}
+
+/*****************************************************************************
  * GetPortDefinition: set vlc format based on the definition of the omx port
  *****************************************************************************/
 static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
@@ -505,9 +610,10 @@ static OMX_ERRORTYPE DeinitialiseComponent(decoder_t *p_dec,
                                            OMX_HANDLETYPE omx_handle)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    OMX_BUFFERHEADERTYPE *p_buffer;
     OMX_ERRORTYPE omx_error;
     OMX_STATETYPE state;
-    unsigned int i, j;
+    unsigned int i;
 
     if(!omx_handle) return OMX_ErrorNone;
 
@@ -542,34 +648,10 @@ static OMX_ERRORTYPE DeinitialiseComponent(decoder_t *p_dec,
         for(i = 0; i < p_sys->ports; i++)
         {
             OmxPort *p_port = &p_sys->p_ports[i];
-            OMX_BUFFERHEADERTYPE *p_buffer;
 
-            for(j = 0; j < p_port->i_buffers; j++)
-            {
-                OMX_FIFO_GET(&p_port->fifo, p_buffer);
-                if (p_buffer->nFlags & SENTINEL_FLAG) {
-                    free(p_buffer);
-                    j--;
-                    continue;
-                }
-                omx_error = OMX_FreeBuffer( omx_handle,
-                                            p_port->i_port_index, p_buffer );
-
-                if(omx_error != OMX_ErrorNone) break;
-            }
-            CHECK_ERROR(omx_error, "OMX_FreeBuffer failed (%x, %i, %i)",
-                        omx_error, (int)p_port->i_port_index, j );
-            while (1) {
-                OMX_FIFO_PEEK(&p_port->fifo, p_buffer);
-                if (!p_buffer) break;
-
-                OMX_FIFO_GET(&p_port->fifo, p_buffer);
-                if (p_buffer->nFlags & SENTINEL_FLAG) {
-                    free(p_buffer);
-                    continue;
-                }
-                msg_Warn( p_dec, "Stray buffer left in fifo, %p", p_buffer );
-            }
+            omx_error = FreeBuffers( p_dec, p_port );
+            CHECK_ERROR(omx_error, "FreeBuffers failed (%x, %i)",
+                        omx_error, (int)p_port->i_port_index );
         }
 
         omx_error = WaitForSpecificOmxEvent(&p_sys->event_queue, OMX_EventCmdComplete, 0, 0, 0);
@@ -582,6 +664,18 @@ static OMX_ERRORTYPE DeinitialiseComponent(decoder_t *p_dec,
         OmxPort *p_port = &p_sys->p_ports[i];
         free(p_port->pp_buffers);
         p_port->pp_buffers = 0;
+
+        while (1) {
+            OMX_FIFO_PEEK(&p_port->fifo, p_buffer);
+            if (!p_buffer) break;
+
+            OMX_FIFO_GET(&p_port->fifo, p_buffer);
+            if (p_buffer->nFlags & SENTINEL_FLAG) {
+                free(p_buffer);
+                continue;
+            }
+            msg_Warn( p_dec, "Stray buffer left in fifo, %p", p_buffer );
+        }
     }
     omx_error = pf_free_handle( omx_handle );
     return omx_error;
@@ -740,16 +834,6 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
     {
         OmxPort *p_port = &p_sys->p_ports[i];
 
-        p_port->pp_buffers =
-            malloc(p_port->definition.nBufferCountActual *
-                   sizeof(OMX_BUFFERHEADERTYPE*));
-        if(!p_port->pp_buffers)
-        {
-          omx_error = OMX_ErrorInsufficientResources;
-          CHECK_ERROR(omx_error, "memory allocation failed");
-        }
-        p_port->i_buffers = p_port->definition.nBufferCountActual;
-
         /* Enable port */
         if(!p_port->definition.bEnabled)
         {
@@ -825,7 +909,7 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
     decoder_sys_t *p_sys;
     OMX_ERRORTYPE omx_error;
     OMX_BUFFERHEADERTYPE *p_header;
-    unsigned int i, j;
+    unsigned int i;
 
     if (InitOmxCore(p_this) != VLC_SUCCESS) {
         return VLC_EGENERIC;
@@ -935,33 +1019,9 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
     for(i = 0; i < p_sys->ports; i++)
     {
         OmxPort *p_port = &p_sys->p_ports[i];
-
-        for(j = 0; j < p_port->i_buffers; j++)
-        {
-#if 0
-#define ALIGN(x,BLOCKLIGN) (((x) + BLOCKLIGN - 1) & ~(BLOCKLIGN - 1))
-            char *p_buf = malloc(p_port->definition.nBufferSize +
-                                 p_port->definition.nBufferAlignment);
-            p_port->pp_buffers[i] = (void *)ALIGN((uintptr_t)p_buf, p_port->definition.nBufferAlignment);
-#endif
-
-            if(p_port->b_direct)
-                omx_error =
-                    OMX_UseBuffer( p_sys->omx_handle, &p_port->pp_buffers[j],
-                                   p_port->i_port_index, 0,
-                                   p_port->definition.nBufferSize, (void*)1);
-            else
-                omx_error =
-                    OMX_AllocateBuffer( p_sys->omx_handle, &p_port->pp_buffers[j],
-                                        p_port->i_port_index, 0,
-                                        p_port->definition.nBufferSize);
-
-            if(omx_error != OMX_ErrorNone) break;
-            OMX_FIFO_PUT(&p_port->fifo, p_port->pp_buffers[j]);
-        }
-        p_port->i_buffers = j;
-        CHECK_ERROR(omx_error, "OMX_UseBuffer failed (%x, %i, %i)",
-                    omx_error, (int)p_port->i_port_index, j );
+        omx_error = AllocateBuffers( p_dec, p_port );
+        CHECK_ERROR(omx_error, "AllocateBuffers failed (%x, %i)",
+                    omx_error, (int)p_port->i_port_index );
     }
 
     omx_error = WaitForSpecificOmxEvent(&p_sys->event_queue, OMX_EventCmdComplete, 0, 0, 0);
@@ -1069,9 +1129,7 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     OMX_PARAM_PORTDEFINITIONTYPE definition;
-    OMX_BUFFERHEADERTYPE *p_buffer;
     OMX_ERRORTYPE omx_error;
-    unsigned int i;
 
     /* Sanity checking */
     OMX_INIT_STRUCTURE(definition);
@@ -1088,23 +1146,9 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     CHECK_ERROR(omx_error, "OMX_CommandPortDisable on %i failed (%x)",
                 (int)p_port->i_port_index, omx_error );
 
-    for(i = 0; i < p_port->i_buffers; i++)
-    {
-        OMX_FIFO_GET(&p_port->fifo, p_buffer);
-        if (p_buffer->pAppPrivate != NULL)
-            decoder_DeletePicture( p_dec, p_buffer->pAppPrivate );
-        if (p_buffer->nFlags & SENTINEL_FLAG) {
-            free(p_buffer);
-            i--;
-            continue;
-        }
-        omx_error = OMX_FreeBuffer( p_sys->omx_handle,
-                                    p_port->i_port_index, p_buffer );
-
-        if(omx_error != OMX_ErrorNone) break;
-    }
-    CHECK_ERROR(omx_error, "OMX_FreeBuffer failed (%x, %i, %i)",
-                omx_error, (int)p_port->i_port_index, i );
+    omx_error = FreeBuffers( p_dec, p_port );
+    CHECK_ERROR(omx_error, "FreeBuffers failed (%x, %i)",
+                omx_error, (int)p_port->i_port_index );
 
     omx_error = WaitForSpecificOmxEvent(&p_sys->event_queue, OMX_EventCmdComplete, 0, 0, 0);
     CHECK_ERROR(omx_error, "Wait for PortDisable failed (%x)", omx_error );
@@ -1137,35 +1181,9 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     CHECK_ERROR(omx_error, "OMX_CommandPortEnable on %i failed (%x)",
                 (int)p_port->i_port_index, omx_error );
 
-    if (p_port->definition.nBufferCountActual > p_port->i_buffers) {
-        free(p_port->pp_buffers);
-        p_port->pp_buffers = malloc(p_port->definition.nBufferCountActual * sizeof(OMX_BUFFERHEADERTYPE*));
-        if(!p_port->pp_buffers)
-        {
-            omx_error = OMX_ErrorInsufficientResources;
-            CHECK_ERROR(omx_error, "memory allocation failed");
-        }
-    }
-    p_port->i_buffers = p_port->definition.nBufferCountActual;
-    for(i = 0; i < p_port->i_buffers; i++)
-    {
-        if(p_port->b_direct)
-            omx_error =
-                OMX_UseBuffer( p_sys->omx_handle, &p_port->pp_buffers[i],
-                               p_port->i_port_index, 0,
-                               p_port->definition.nBufferSize, (void*)1);
-        else
-            omx_error =
-                OMX_AllocateBuffer( p_sys->omx_handle, &p_port->pp_buffers[i],
-                                    p_port->i_port_index, 0,
-                                    p_port->definition.nBufferSize);
-
-        if(omx_error != OMX_ErrorNone) break;
-        OMX_FIFO_PUT(&p_port->fifo, p_port->pp_buffers[i]);
-    }
-    p_port->i_buffers = i;
-    CHECK_ERROR(omx_error, "OMX_UseBuffer failed (%x, %i, %i)",
-                omx_error, (int)p_port->i_port_index, i );
+    omx_error = AllocateBuffers( p_dec, p_port );
+    CHECK_ERROR(omx_error, "OMX_AllocateBuffers failed (%x, %i)",
+                omx_error, (int)p_port->i_port_index );
 
     omx_error = WaitForSpecificOmxEvent(&p_sys->event_queue, OMX_EventCmdComplete, 0, 0, 0);
     CHECK_ERROR(omx_error, "Wait for PortEnable failed (%x)", omx_error );
