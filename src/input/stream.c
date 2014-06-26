@@ -290,9 +290,9 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
         return NULL;
     }
 
-    s->pf_read    = (void *)AStreamGenericError;    /* Replaced later */
-    s->pf_peek    = (void *)AStreamGenericError;
-    s->pf_readdir = (void *)AStreamGenericError;
+    s->pf_read    = AStreamGenericError;    /* Replaced later */
+    s->pf_peek    = AStreamGenericError;
+    s->pf_readdir = AStreamGenericError;
     s->pf_control = AStreamControl;
     s->pf_destroy = AStreamDestroy;
 
