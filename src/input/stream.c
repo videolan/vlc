@@ -298,6 +298,7 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
 
     /* Common field */
     p_sys->p_access = p_access;
+    assert( p_access->pf_block || p_access->pf_read || p_access->pf_readdir );
     if( p_access->pf_block )
         p_sys->method = STREAM_METHOD_BLOCK;
     else if( p_access->pf_read )
