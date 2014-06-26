@@ -1195,7 +1195,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
     OMX_BUFFERHEADERTYPE *p_header;
     block_t *p_block;
-    int i_input_used = 0;
+    unsigned int i_input_used = 0;
     struct H264ConvertState convert_state = { 0, 0 };
 
     if( !pp_block || !*pp_block )
