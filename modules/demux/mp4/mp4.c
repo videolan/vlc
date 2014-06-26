@@ -4605,7 +4605,6 @@ static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
     return true;
 }
 
-#define MP4_MFRO_BOXSIZE 16
 static int ProbeIndex( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -4643,7 +4642,6 @@ static int ProbeIndex( demux_t *p_demux )
 
     return stream_Seek( p_demux->s, i_backup_pos );
 }
-#undef MP4_MFRO_BOXSIZE
 
 static int ProbeFragments( demux_t *p_demux, bool b_force )
 {

@@ -276,6 +276,7 @@
 
 struct MP4_Box_s;
 
+#define MP4_MFRO_BOXSIZE 16
 
 /* uuid Universal Unique IDentifiers */
 typedef struct UUID_s
