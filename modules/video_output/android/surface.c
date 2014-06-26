@@ -173,6 +173,10 @@ static void *InitLibrary(vout_display_sys_t *sys)
 static int Open(vlc_object_t *p_this)
 {
     vout_display_t *vd = (vout_display_t *)p_this;
+    video_format_t fmt = vd->fmt;
+
+    if (fmt.i_chroma == VLC_CODEC_ANDROID_OPAQUE)
+        return VLC_EGENERIC;
 
     /* */
     if (vlc_mutex_trylock(&single_instance) != 0) {
@@ -200,11 +204,6 @@ static int Open(vlc_object_t *p_this)
     }
 
     /* Setup chroma */
-    video_format_t fmt = vd->fmt;
-
-    if (fmt.i_chroma == VLC_CODEC_ANDROID_OPAQUE)
-        return VLC_EGENERIC;
-
     char *psz_fcc = var_InheritString(vd, CFG_PREFIX "chroma");
     if( psz_fcc ) {
         fmt.i_chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, psz_fcc);
