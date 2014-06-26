@@ -37,10 +37,10 @@ index 2ba0b13..9ce4f97 100644
  [if test "$enableval" = yes; then
    has_char16=yes;
 diff --git a/libspeexdsp/resample.c b/libspeexdsp/resample.c
-index 7121445..3588f7b 100644
+index aa0d9a0..825e3c4 100644
 --- a/libspeexdsp/resample.c
 +++ b/libspeexdsp/resample.c
-@@ -585,7 +585,11 @@ static void update_filter(SpeexResamplerState *st)
+@@ -585,7 +591,11 @@ static void update_filter(SpeexResamplerState *st)
     }
     
     /* Choose the resampling type that requires the least amount of memory */
@@ -175,7 +175,7 @@ index 3fb096e..0e012e9 100644
  #define SHL(a,shift) ((spx_word32_t)(a) << (shift))
  #define PSHR(a,shift) (SHR((a)+((EXTEND32(1)<<((shift))>>1)),shift))
 diff --git a/libspeexdsp/resample.c b/libspeexdsp/resample.c
-index 3588f7b..ad59b97 100644
+index aa0d9a0..825e3c4 100644
 --- a/libspeexdsp/resample.c
 +++ b/libspeexdsp/resample.c
 @@ -99,6 +99,10 @@ static void speex_free (void *ptr) {free(ptr);}
@@ -195,7 +195,7 @@ index 3588f7b..ad59b97 100644
  */
 +      sum = SATURATE32PSHR(sum, 15, 32767);
  #else
-       sum = inner_product_single(sinc, iptr, N);
+       sum = inner_product_single(sinct, iptr, N);
  #endif
  
 -      out[out_stride * out_sample++] = SATURATE32(PSHR32(sum, 15), 32767);
