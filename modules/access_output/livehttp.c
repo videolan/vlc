@@ -761,8 +761,8 @@ static void Close( vlc_object_t * p_this )
 
         /* Since we are flushing, check the segment change by hand and don't wait
          * possible keyframe*/
-        if( ((float)(output_block->i_length * CLOCK_FREQ / INT64_C(1000000) ) +
-            (float)(output_block->i_dts - p_sys->i_opendts)) >= p_sys->i_seglenm )
+        if( ((float) output_block->i_length +
+             (float) (output_block->i_dts - p_sys->i_opendts)) >= p_sys->i_seglenm )
         {
             closeCurrentSegment( p_access, p_sys, false );
             if( unlikely(openNextFile( p_access, p_sys ) < 0 ) )
