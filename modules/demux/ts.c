@@ -41,6 +41,7 @@
 #include <vlc_meta.h>
 #include <vlc_epg.h>
 #include <vlc_charset.h>   /* FromCharset, for EIT */
+#include <vlc_bits.h>
 
 #include "../mux/mpeg/csa.h"
 
@@ -61,6 +62,10 @@
 # include <dvbpsi/tot.h>
 
 #include "../mux/mpeg/dvbpsi_compat.h"
+
+#include "../codec/opus_header.h"
+
+#include "opus.h"
 
 #undef TS_DEBUG
 VLC_FORMAT(1, 2) static void ts_debug(const char *format, ...)
@@ -1551,6 +1556,107 @@ static void PIDClean( demux_t *p_demux, ts_pid_t *pid )
     pid->b_valid = false;
 }
 
+static int16_t read_opus_flag(uint8_t **buf, size_t *len)
+{
+    if (*len < 2)
+        return -1;
+
+    int16_t ret = ((*buf)[0] << 8) | (*buf)[1];
+
+    *len -= 2;
+    *buf += 2;
+
+    if (ret & (3<<13))
+        ret = -1;
+
+    return ret;
+}
+
+static block_t *Opus_Parse(demux_t *demux, block_t *block)
+{
+    block_t *out = NULL;
+    block_t **last = NULL;
+
+    uint8_t *buf = block->p_buffer;
+    size_t len = block->i_buffer;
+
+    while (len > 3 && ((buf[0] << 3) | (buf[1] >> 5)) == 0x3ff) {
+        int16_t start_trim = 0, end_trim = 0;
+        int start_trim_flag        = (buf[1] >> 4) & 1;
+        int end_trim_flag          = (buf[1] >> 3) & 1;
+        int control_extension_flag = (buf[1] >> 2) & 1;
+
+        len -= 2;
+        buf += 2;
+
+        unsigned au_size = 0;
+        while (len--) {
+            int c = *buf++;
+            au_size += c;
+            if (c != 0xff)
+                break;
+        }
+
+        if (start_trim_flag) {
+            start_trim = read_opus_flag(&buf, &len);
+            if (start_trim < 0) {
+                msg_Err(demux, "Invalid start trimming flag");
+            }
+        }
+        if (end_trim_flag) {
+            end_trim = read_opus_flag(&buf, &len);
+            if (end_trim < 0) {
+                msg_Err(demux, "Invalid end trimming flag");
+            }
+        }
+        if (control_extension_flag && len) {
+            unsigned l = *buf++; len--;
+            if (l > len) {
+                msg_Err(demux, "Invalid control extension length %d > %zu", l, len);
+                break;
+            }
+            buf += l;
+            len -= l;
+        }
+
+        if (!au_size || au_size > len) {
+            msg_Err(demux, "Invalid Opus AU size %d (PES %zu)", au_size, len);
+            break;
+        }
+
+        block_t *au = block_Alloc(au_size);
+        if (!au)
+            break;
+        memcpy(au->p_buffer, buf, au_size);
+        block_CopyProperties(au, block);
+        au->p_next = NULL;
+
+        if (!out)
+            out = au;
+        else
+            *last = au;
+        last = &au->p_next;
+
+        au->i_nb_samples = opus_frame_duration(buf, au_size);
+        if (end_trim && end_trim <= au->i_nb_samples)
+            au->i_length = end_trim; /* Blatant abuse of the i_length field. */
+        else
+            au->i_length = 0;
+
+        if (start_trim && start_trim < (au->i_nb_samples - au->i_length)) {
+            au->i_nb_samples -= start_trim;
+            if (au->i_nb_samples == 0)
+                au->i_flags |= BLOCK_FLAG_PREROLL;
+        }
+
+        buf += au_size;
+        len -= au_size;
+    }
+
+    block_Release(block);
+    return out;
+}
+
 /****************************************************************************
  * gathering stuff
  ****************************************************************************/
@@ -1775,18 +1881,28 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                 p_block->p_buffer[p_block->i_buffer -1] = '\0';
             }
         }
-
-        for( int i = 0; i < pid->i_extra_es; i++ )
+        else if( pid->es->fmt.i_codec == VLC_CODEC_OPUS)
         {
-            es_out_Send( p_demux->out, pid->extra_es[i]->id,
-                         block_Duplicate( p_block ) );
+            p_block = Opus_Parse(p_demux, p_block);
         }
 
-        if (!p_sys->b_trust_pcr)
-            es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
-                    pid->i_owner_number, p_block->i_pts);
+        while (p_block) {
+            block_t *p_next = p_block->p_next;
+            p_block->p_next = NULL;
+            for( int i = 0; i < pid->i_extra_es; i++ )
+            {
+                es_out_Send( p_demux->out, pid->extra_es[i]->id,
+                        block_Duplicate( p_block ) );
+            }
 
-        es_out_Send( p_demux->out, pid->es->id, p_block );
+            if (!p_sys->b_trust_pcr)
+                es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
+                        pid->i_owner_number, p_block->i_pts);
+
+            es_out_Send( p_demux->out, pid->es->id, p_block );
+
+            p_block = p_next;
+        }
     }
     else
     {
@@ -3774,11 +3890,131 @@ static void PMTSetupEsDvbSubtitle( demux_t *p_demux, ts_pid_t *pid,
         }
     }
 }
+
+static int vlc_ceil_log2( const unsigned int val )
+{
+    int n = 31 - clz(val);
+    if ((1U << n) != val)
+        n++;
+
+    return n;
+}
+
+static void OpusSetup(demux_t *demux, uint8_t *p, size_t len, es_format_t *p_fmt)
+{
+    OpusHeader h;
+
+    /* default mapping */
+    static const unsigned char map[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+    memcpy(h.stream_map, map, sizeof(map));
+
+    int csc, mapping;
+    int channels = 0;
+    int stream_count = 0;
+    int ccc = p[1]; // channel_config_code
+    if (ccc <= 8) {
+        channels = ccc;
+        if (channels)
+            mapping = channels > 2;
+        else {
+            mapping = 255;
+            channels = 2; // dual mono
+        }
+        static const uint8_t p_csc[8] = { 0, 1, 1, 2, 2, 2, 3, 3 };
+        csc = p_csc[channels - 1];
+        stream_count = channels - csc;
+
+        static const uint8_t map[6][7] = {
+            { 2,1 },
+            { 1,2,3 },
+            { 4,1,2,3 },
+            { 4,1,2,3,5 },
+            { 4,1,2,3,5,6 },
+            { 6,1,2,3,4,5,7 },
+        };
+        if (channels > 2)
+            memcpy(&h.stream_map[1], map[channels-3], channels - 1);
+    } else if (ccc == 0x81) {
+        if (len < 4)
+            goto explicit_config_too_short;
+
+        channels = p[2];
+        mapping = p[3];
+        csc = 0;
+        if (mapping) {
+            bs_t s;
+            bs_init(&s, &p[4], len - 4);
+            stream_count = 1;
+            if (channels) {
+                int bits = vlc_ceil_log2(channels);
+                if (s.i_left < bits)
+                    goto explicit_config_too_short;
+                stream_count = bs_read(&s, bits) + 1;
+                bits = vlc_ceil_log2(stream_count + 1);
+                if (s.i_left < bits)
+                    goto explicit_config_too_short;
+                csc = bs_read(&s, bits);
+            }
+            int channel_bits = vlc_ceil_log2(stream_count + csc + 1);
+            if (s.i_left < channels * channel_bits)
+                goto explicit_config_too_short;
+
+            unsigned char silence = (1U << (stream_count + csc + 1)) - 1;
+            for (int i = 0; i < channels; i++) {
+                unsigned char m = bs_read(&s, channel_bits);
+                if (m == silence)
+                    m = 0xff;
+                h.stream_map[i] = m;
+            }
+        }
+    } else if (ccc >= 0x80 && ccc <= 0x88) {
+        channels = ccc - 0x80;
+        if (channels)
+            mapping = 1;
+        else {
+            mapping = 255;
+            channels = 2; // dual mono
+        }
+        csc = 0;
+        stream_count = channels;
+    } else {
+        msg_Err(demux, "Opus channel configuration 0x%.2x is reserved", ccc);
+    }
+
+    if (!channels) {
+        msg_Err(demux, "Opus channel configuration 0x%.2x not supported yet", p[1]);
+        return;
+    }
+
+    opus_prepare_header(channels, 0, &h);
+    h.preskip = 0;
+    h.input_sample_rate = 48000;
+    h.nb_coupled = csc;
+    h.nb_streams = channels - csc;
+    h.channel_mapping = mapping;
+
+    if (h.channels) {
+        opus_write_header((uint8_t**)&p_fmt->p_extra, &p_fmt->i_extra, &h, NULL /* FIXME */);
+        if (p_fmt->p_extra) {
+            p_fmt->i_cat = AUDIO_ES;
+            p_fmt->i_codec = VLC_CODEC_OPUS;
+            p_fmt->audio.i_channels = h.channels;
+            p_fmt->audio.i_rate = 48000;
+        }
+    }
+
+    return;
+
+explicit_config_too_short:
+    msg_Err(demux, "Opus descriptor too short");
+}
+
 static void PMTSetupEs0x06( demux_t *p_demux, ts_pid_t *pid,
                             const dvbpsi_pmt_es_t *p_es )
 {
     es_format_t *p_fmt = &pid->es->fmt;
     dvbpsi_descriptor_t *p_subs_dr = PMTEsFindDescriptor( p_es, 0x59 );
+    dvbpsi_descriptor_t *desc;
 
     if( PMTEsHasRegistration( p_demux, p_es, "AC-3" ) ||
         PMTEsFindDescriptor( p_es, 0x6a ) ||
@@ -3786,6 +4022,11 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pid_t *pid,
     {
         p_fmt->i_cat = AUDIO_ES;
         p_fmt->i_codec = VLC_CODEC_A52;
+    }
+    else if( (desc = PMTEsFindDescriptor( p_es, 0x7f ) ) && desc->i_length >= 2 &&
+              desc->p_data[0] == 0x80)
+    {
+        OpusSetup(p_demux, desc->p_data, desc->i_length, p_fmt);
     }
     else if( PMTEsFindDescriptor( p_es, 0x7a ) )
     {

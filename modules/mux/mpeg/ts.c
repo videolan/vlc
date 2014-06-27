@@ -954,6 +954,12 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         p_stream->i_stream_type = 0x83;
         p_stream->i_stream_id = 0xbd;
         break;
+    case VLC_CODEC_OPUS:
+        if (p_input->p_fmt->audio.i_channels > 8) {
+            msg_Err(p_mux, "Too many opus channels (%d > 8)",
+                p_input->p_fmt->audio.i_channels);
+            break;
+        }
     case VLC_CODEC_EAC3:
     case VLC_CODEC_DTS:
         p_stream->i_stream_type = 0x06;
@@ -1216,6 +1222,20 @@ static void SetHeader( sout_buffer_chain_t *c,
     p_ts->i_flags |= BLOCK_FLAG_HEADER;
 }
 
+static block_t *Pack_Opus(block_t *p_data)
+{
+    lldiv_t d = lldiv(p_data->i_buffer, 255);
+    p_data = block_Realloc(p_data, 2 + d.quot + 1, p_data->i_buffer);
+    if (p_data) { /* no flags */
+        p_data->p_buffer[0] = 0x7f;
+        p_data->p_buffer[1] = 0xe0;
+        memset(&p_data->p_buffer[2], 0xff, d.quot);
+        p_data->p_buffer[2+d.quot] = d.rem;
+    }
+
+    return p_data;
+}
+
 /* returns true if needs more data */
 static bool MuxStreams(sout_mux_t *p_mux )
 {
@@ -1303,6 +1323,8 @@ static bool MuxStreams(sout_mux_t *p_mux )
 
             if( p_input->p_fmt->i_codec == VLC_CODEC_MP4A )
                 p_data = Add_ADTS( p_data, p_input->p_fmt );
+             else if( p_input->p_fmt->i_codec == VLC_CODEC_OPUS )
+                p_data = Pack_Opus( p_data );
         }
         else
             p_data = FixPES( p_mux, p_input->p_fifo );
@@ -2352,6 +2374,14 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
         {
             uint8_t data[1] = { 0x00 };
             dvbpsi_PMTESAddDescriptor( p_es, 0x7a, 1, data );
+        }
+        else if( p_stream->i_codec == VLC_CODEC_OPUS )
+        {
+            uint8_t data[2] = {
+                0x80, /* tag extension */
+                p_input->p_fmt->audio.i_channels
+            };
+            dvbpsi_PMTESAddDescriptor( p_es, 0x7f, 2, data );
         }
         else if( p_stream->i_codec == VLC_CODEC_TELETEXT )
         {
