@@ -638,7 +638,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             if( p_dec->fmt_in.video.i_frame_rate > 0 &&
                 p_dec->fmt_in.video.i_frame_rate_base > 0 )
             {
-                p_sys->i_pts += INT64_C(1000000) *
+                p_sys->i_pts += CLOCK_FREQ *
                     (2 + p_sys->p_ff_pic->repeat_pict) *
                     p_dec->fmt_in.video.i_frame_rate_base /
                     (2 * p_dec->fmt_in.video.i_frame_rate);
@@ -649,7 +649,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 if( i_tick <= 0 )
                     i_tick = 1;
 
-                p_sys->i_pts += INT64_C(1000000) *
+                p_sys->i_pts += CLOCK_FREQ *
                     (2 + p_sys->p_ff_pic->repeat_pict) *
                     i_tick * p_context->time_base.num /
                     (2 * p_context->time_base.den);
