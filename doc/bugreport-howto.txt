@@ -1,6 +1,0 @@
-
-  Bug report  HOWTO
- - - - - - - - - - -
-
- Please visit http://www.videolan.org/support/bug-reporting.html
- for details on how to properly report/diagnose a bug in VLC media player.
