@@ -13,7 +13,24 @@ $(TARBALLS)/libxml2-$(LIBXML2_VERSION).tar.gz:
 
 .sum-libxml2: libxml2-$(LIBXML2_VERSION).tar.gz
 
-XMLCONF = --with-minimal --with-catalog --with-reader --with-tree --with-push --with-xptr --with-valid --with-xpath --with-xinclude --with-sax1 --without-zlib --without-iconv --without-http --without-ftp  --without-debug --without-docbook --without-regexps --without-python
+XMLCONF = --with-minimal     \
+          --with-catalog     \
+          --with-reader      \
+          --with-tree        \
+          --with-push        \
+          --with-xptr        \
+          --with-valid       \
+          --with-xpath       \
+          --with-xinclude    \
+          --with-sax1        \
+          --without-zlib     \
+          --without-iconv    \
+          --without-http     \
+          --without-ftp      \
+          --without-debug    \
+          --without-docbook  \
+          --without-regexps  \
+          --without-python
 
 libxml2: libxml2-$(LIBXML2_VERSION).tar.gz .sum-libxml2
 	$(UNPACK)
