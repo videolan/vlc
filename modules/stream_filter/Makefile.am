@@ -104,6 +104,13 @@ libsmooth_plugin_la_SOURCES = \
 libsmooth_plugin_la_CFLAGS = $(AM_CFLAGS)
 stream_filter_LTLIBRARIES += libsmooth_plugin.la
 
+libhds_plugin_la_SOURCES = \
+    stream_filter/hds/hds.c
+
+libhds_plugin_la_CFLAGS = $(AM_CFLAGS)
+stream_filter_LTLIBRARIES += libhds_plugin.la
+
+
 libhttplive_plugin_la_SOURCES = stream_filter/httplive.c
 libhttplive_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
 libhttplive_plugin_la_LIBADD = $(GCRYPT_LIBS) -lgpg-error

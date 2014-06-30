@@ -153,6 +153,7 @@ $Id$
  * growl: announce currently playing stream to growl
  * gstdecode: GStreamer based decoder module.
  * h264: H264 decoder
+ * hds: HTTP Dynamic Streaming, per Adobe's specs
  * headphone_channel_mixer:  headphone channel mixer with virtual spatialization effect
  * hevc: HEVC demuxer
  * hotkeys: hotkeys control module
