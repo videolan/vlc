@@ -179,10 +179,7 @@ static int Open(vlc_object_t *p_this)
                 p_sys->psz_component, omx_error, ErrorToString(omx_error));
 
     InitOmxEventQueue(&p_sys->event_queue);
-    vlc_mutex_init (&p_sys->port.fifo.lock);
-    vlc_cond_init (&p_sys->port.fifo.wait);
-    p_sys->port.fifo.offset = offsetof(OMX_BUFFERHEADERTYPE, pOutputPortPrivate) / sizeof(void *);
-    p_sys->port.fifo.pp_last = &p_sys->port.fifo.p_first;
+    OMX_FIFO_INIT(&p_sys->port.fifo, pOutputPortPrivate);
     p_sys->port.b_direct = false;
     p_sys->port.b_flushed = true;
 
@@ -373,8 +370,7 @@ static void Close(vlc_object_t *p_this)
         free(p_sys->port.pp_buffers);
         pf_free_handle(p_sys->omx_handle);
         DeinitOmxEventQueue(&p_sys->event_queue);
-        vlc_mutex_destroy(&p_sys->port.fifo.lock);
-        vlc_cond_destroy(&p_sys->port.fifo.wait);
+        OMX_FIFO_DESTROY(&p_sys->port.fifo);
     }
 
     if (p_sys->pool)
