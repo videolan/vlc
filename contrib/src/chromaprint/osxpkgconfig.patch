@@ -1,0 +1,12 @@
+--- a/CMakeLists.txt.orig	2014-06-30 14:47:35.000000000 -0400
++++ b/CMakeLists.txt	2014-06-30 14:47:38.000000000 -0400
+@@ -119,7 +119,7 @@
+ 	message(STATUS "Using FFTW3 for FFT calculations")
+ endif(WITH_FFTW3)
+ 
+-if(NOT APPLE AND NOT BUILD_FRAMEWORK)
++if(NOT BUILD_FRAMEWORK)
+ 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libchromaprint.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libchromaprint.pc)
+ 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libchromaprint.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+ endif()
+

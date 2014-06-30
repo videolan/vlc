@@ -1,0 +1,24 @@
+From d0a8d8bc7c1ad5bda3294836f49184fe34a92454 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Lalinsk=C3=BD?= <lukas@oxygene.sk>
+Date: Fri, 25 Oct 2013 14:08:46 +0200
+Subject: [PATCH] Iinclude <algorithm> in utils.h (fixes #7)
+
+---
+ src/utils.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/utils.h b/src/utils.h
+index 47c6b98..76fb240 100644
+--- a/src/utils.h
++++ b/src/utils.h
+@@ -28,6 +28,7 @@
+ #include <math.h>
+ #include <stddef.h>
+ #include <stdint.h>
++#include <algorithm>
+ #include <limits>
+ #include <iterator>
+ 
+-- 
+1.8.4.2
+

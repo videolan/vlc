@@ -1,6 +1,6 @@
 # chromaprint
 
-CHROMAPRINT_VERSION := 0.7
+CHROMAPRINT_VERSION := 1.0
 CHROMAPRINT_URL := http://bitbucket.org/acoustid/chromaprint/downloads/chromaprint-$(CHROMAPRINT_VERSION).tar.gz
 
 PKGS += chromaprint
@@ -16,6 +16,8 @@ $(TARBALLS)/chromaprint-$(CHROMAPRINT_VERSION).tar.gz:
 chromaprint: chromaprint-$(CHROMAPRINT_VERSION).tar.gz .sum-chromaprint
 	$(UNPACK)
 	$(APPLY) $(SRC)/chromaprint/avutil.patch
+	$(APPLY) $(SRC)/chromaprint/mavericks.patch
+	$(APPLY) $(SRC)/chromaprint/osxpkgconfig.patch
 	$(MOVE)
 
 DEPS_chromaprint = ffmpeg $(DEPS_ffmpeg)
