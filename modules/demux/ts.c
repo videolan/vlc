@@ -240,9 +240,9 @@ typedef enum
 
 typedef enum
 {
-    TS_REGISTRATION_OTHER = 0,
-    TS_REGISTRATION_HDMV
-} ts_registration_type_t;
+    TS_PMT_REGISTRATION_NONE = 0,
+    TS_PMT_REGISTRATION_HDMV
+} ts_pmt_registration_type_t;
 
 typedef struct
 {
@@ -3830,7 +3830,8 @@ static void PMTSetupEs0x83( const dvbpsi_pmt_t *p_pmt, ts_pid_t *pid )
         es_format_Init( &pid->es->fmt, AUDIO_ES, VLC_CODEC_DVD_LPCM );
 }
 
-static void PMTSetupEsHDMV( ts_pid_t *pid, const dvbpsi_pmt_es_t *p_es )
+static bool PMTSetupEsHDMV( demux_t *p_demux, ts_pid_t *pid,
+                            const dvbpsi_pmt_es_t *p_es )
 {
     es_format_t *p_fmt = &pid->es->fmt;
 
@@ -3865,12 +3866,17 @@ static void PMTSetupEsHDMV( ts_pid_t *pid, const dvbpsi_pmt_es_t *p_es )
         break;
     case 0x91: /* Interactive graphics */
     case 0x92: /* Subtitle */
+        return false;
     default:
+        msg_Info( p_demux, "HDMV registration not implemented for pid 0x%x type 0x%x",
+                  p_es->i_pid, p_es->i_type );
+        return false;
         break;
     }
+    return true;
 }
 
-static void PMTSetupEsRegistration( demux_t *p_demux, ts_pid_t *pid,
+static bool PMTSetupEsRegistration( demux_t *p_demux, ts_pid_t *pid,
                                     const dvbpsi_pmt_es_t *p_es )
 {
     static const struct
@@ -3898,9 +3904,10 @@ static void PMTSetupEsRegistration( demux_t *p_demux, ts_pid_t *pid,
             p_fmt->i_codec = p_regs[i].i_codec;
             if (p_es->i_type == 0x87)
                 p_fmt->i_codec = VLC_CODEC_EAC3;
-            return;
+            return true;
         }
     }
+    return false;
 }
 
 static char *GetAudioTypeDesc(demux_t *p_demux, int type)
@@ -4045,8 +4052,8 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
     if( ProgramIsSelected( p_demux, prg->i_number ) )
         SetPIDFilter( p_demux, prg->i_pid_pcr, true ); /* Set demux filter */
 
-    /* Parse descriptor */
-    ts_registration_type_t registration_type = TS_REGISTRATION_OTHER;
+    /* Parse PMT descriptors */
+    ts_pmt_registration_type_t registration_type = TS_PMT_REGISTRATION_NONE;
     dvbpsi_descriptor_t  *p_dr;
     for( p_dr = p_pmt->p_first_descriptor; p_dr != NULL; p_dr = p_dr->p_next )
         switch(p_dr->i_tag)
@@ -4070,7 +4077,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
             {
                 msg_Dbg( p_demux, " * descriptor : registration %4.4s", p_dr->p_data );
                 if( !memcmp( p_dr->p_data, "HDMV", 4 ) || !memcmp( p_dr->p_data, "HDPR", 4 ) )
-                    registration_type = TS_REGISTRATION_HDMV; /* Blu-Ray */
+                    registration_type = TS_PMT_REGISTRATION_HDMV; /* Blu-Ray */
             }
             break;
 
@@ -4123,36 +4130,52 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
         pid->i_pid          = p_es->i_pid;
         pid->b_seen         = p_sys->pid[p_es->i_pid].b_seen;
 
-        switch( p_es->i_type )
+
+        bool b_registration_applied = false;
+        if ( p_es->i_type >= 0x80 ) /* non standard, extensions */
         {
-        case 0x10:
-        case 0x11:
-        case 0x12:
-        case 0x0f:
-            PMTSetupEsISO14496( p_demux, pid, prg, p_es );
-            break;
-        case 0x06:
-            PMTSetupEs0x06( p_demux, pid, p_es );
-            break;
-        case 0x83:
-            /* LPCM (audio) */
-            PMTSetupEs0x83( p_pmt, pid );
-            break;
-        case 0xa0:
-            PMTSetupEs0xA0( p_demux, pid, p_es );
-            break;
-        case 0xd1:
-            PMTSetupEs0xD1( p_demux, pid, p_es );
-            break;
-        case 0xEA:
-            PMTSetupEs0xEA( p_demux, pid, p_es );
-            break;
-        default:
-            if( registration_type == TS_REGISTRATION_HDMV )
-                PMTSetupEsHDMV( pid, p_es );
-            else if( p_es->i_type >= 0x80 )
-                PMTSetupEsRegistration( p_demux, pid, p_es );
-            break;
+            if ( registration_type == TS_PMT_REGISTRATION_HDMV )
+            {
+                if (( b_registration_applied = PMTSetupEsHDMV( p_demux, pid, p_es ) ))
+                    msg_Dbg( p_demux, "es HDMV registration applied to pid 0x%x type 0x%x",
+                             p_es->i_pid, p_es->i_type );
+            }
+            else
+            {
+                if (( b_registration_applied = PMTSetupEsRegistration( p_demux, pid, p_es ) ))
+                    msg_Dbg( p_demux, "es registration applied to pid 0x%x type 0x%x",
+                        p_es->i_pid, p_es->i_type );
+            }
+        }
+
+        if ( !b_registration_applied )
+        {
+            switch( p_es->i_type )
+            {
+            case 0x10:
+            case 0x11:
+            case 0x12:
+            case 0x0f:
+                PMTSetupEsISO14496( p_demux, pid, prg, p_es );
+                break;
+            case 0x06:
+                PMTSetupEs0x06( p_demux, pid, p_es );
+                break;
+            case 0x83:
+                /* LPCM (audio) */
+                PMTSetupEs0x83( p_pmt, pid );
+                break;
+            case 0xa0:
+                PMTSetupEs0xA0( p_demux, pid, p_es );
+                break;
+            case 0xd1:
+                PMTSetupEs0xD1( p_demux, pid, p_es );
+                break;
+            case 0xEA:
+                PMTSetupEs0xEA( p_demux, pid, p_es );
+            default:
+                break;
+            }
         }
 
         if( pid->es->fmt.i_cat == AUDIO_ES ||

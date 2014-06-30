@@ -4605,7 +4605,6 @@ static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
     return true;
 }
 
-#define MP4_MFRO_BOXSIZE 16
 static int ProbeIndex( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -4643,7 +4642,6 @@ static int ProbeIndex( demux_t *p_demux )
 
     return stream_Seek( p_demux->s, i_backup_pos );
 }
-#undef MP4_MFRO_BOXSIZE
 
 static int ProbeFragments( demux_t *p_demux, bool b_force )
 {
@@ -4826,6 +4824,7 @@ static int LeafParseTRUN( demux_t *p_demux, mp4_track_t *p_track,
         {
             p_block->i_dts = VLC_TS_0 + i_nzdts;
             p_block->i_pts = VLC_TS_0 + i_nzpts;
+            p_block->i_length = CLOCK_FREQ * dur / p_track->i_timescale;
             es_out_Send( p_demux->out, p_track->p_es, p_block );
         }
         else free( p_block );

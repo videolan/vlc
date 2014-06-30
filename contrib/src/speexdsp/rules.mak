@@ -21,7 +21,6 @@ speexdsp: speexdsp-$(SPEEXDSP_VERSION).tar.gz .sum-speexdsp
 	mkdir -p $@-git
 	$(ZCAT) "$<" | (cd $@-git && tar xv --strip-components=1)
 	$(APPLY) $(SRC)/speexdsp/neon.patch
-	$(APPLY) $(SRC)/speexdsp/includedir.patch
 	$(MOVE)
 
 SPEEXDSP_CONF := --enable-resample-full-sinc-table

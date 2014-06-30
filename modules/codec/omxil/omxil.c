@@ -854,17 +854,11 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
     }
     p_sys->b_enc = b_encode;
     InitOmxEventQueue(&p_sys->event_queue);
-    vlc_mutex_init (&p_sys->in.fifo.lock);
-    vlc_cond_init (&p_sys->in.fifo.wait);
-    p_sys->in.fifo.offset = offsetof(OMX_BUFFERHEADERTYPE, pOutputPortPrivate) / sizeof(void *);
-    p_sys->in.fifo.pp_last = &p_sys->in.fifo.p_first;
+    OMX_FIFO_INIT (&p_sys->in.fifo, pOutputPortPrivate );
     p_sys->in.b_direct = false;
     p_sys->in.b_flushed = true;
     p_sys->in.p_fmt = &p_dec->fmt_in;
-    vlc_mutex_init (&p_sys->out.fifo.lock);
-    vlc_cond_init (&p_sys->out.fifo.wait);
-    p_sys->out.fifo.offset = offsetof(OMX_BUFFERHEADERTYPE, pInputPortPrivate) / sizeof(void *);
-    p_sys->out.fifo.pp_last = &p_sys->out.fifo.p_first;
+    OMX_FIFO_INIT (&p_sys->out.fifo, pInputPortPrivate );
     p_sys->out.b_direct = false;
     p_sys->out.b_flushed = true;
     p_sys->out.p_fmt = &p_dec->fmt_out;
@@ -1195,7 +1189,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
     OMX_BUFFERHEADERTYPE *p_header;
     block_t *p_block;
-    int i_input_used = 0;
+    unsigned int i_input_used = 0;
     struct H264ConvertState convert_state = { 0, 0 };
 
     if( !pp_block || !*pp_block )
@@ -1247,6 +1241,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         {
             omx_error = GetPortDefinition(p_dec, &p_sys->out, p_sys->out.p_fmt);
             p_sys->out.b_update_def = 0;
+            CHECK_ERROR(omx_error, "GetPortDefinition failed");
         }
 
         if(p_header->nFilledLen)
@@ -1368,15 +1363,20 @@ reconfig:
         {
             omx_error = PortReconfigure(p_dec, p_port);
             p_port->b_reconfigure = 0;
+            CHECK_ERROR(omx_error, "PortReconfigure failed");
         }
         if(p_port->b_update_def)
         {
             omx_error = GetPortDefinition(p_dec, p_port, p_port->p_fmt);
             p_port->b_update_def = 0;
+            CHECK_ERROR(omx_error, "GetPortDefinition failed");
         }
     }
 
     return p_pic;
+error:
+    p_sys->b_error = true;
+    return NULL;
 }
 
 /*****************************************************************************
@@ -1516,9 +1516,13 @@ reconfig:
         if(!p_port->b_reconfigure) continue;
         p_port->b_reconfigure = 0;
         omx_error = PortReconfigure(p_dec, p_port);
+        CHECK_ERROR(omx_error, "PortReconfigure failed");
     }
 
     return p_buffer;
+error:
+    p_sys->b_error = true;
+    return NULL;
 }
 
 /*****************************************************************************
@@ -1578,6 +1582,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pic )
         if(!p_port->b_reconfigure) continue;
         p_port->b_reconfigure = 0;
         omx_error = PortReconfigure(p_dec, p_port);
+        CHECK_ERROR(omx_error, "PortReconfigure failed");
     }
 
     /* Wait for the decoded frame */
@@ -1616,6 +1621,9 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pic )
 
     msg_Dbg(p_dec, "done");
     return p_block;
+error:
+    p_sys->b_error = true;
+    return NULL;
 }
 
 /*****************************************************************************
@@ -1631,10 +1639,9 @@ static void CloseGeneric( vlc_object_t *p_this )
     DeinitOmxCore();
 
     DeinitOmxEventQueue(&p_sys->event_queue);
-    vlc_mutex_destroy (&p_sys->in.fifo.lock);
-    vlc_cond_destroy (&p_sys->in.fifo.wait);
-    vlc_mutex_destroy (&p_sys->out.fifo.lock);
-    vlc_cond_destroy (&p_sys->out.fifo.wait);
+
+    OMX_FIFO_DESTROY( &p_sys->in.fifo );
+    OMX_FIFO_DESTROY( &p_sys->out.fifo );
 
     free( p_sys );
 }

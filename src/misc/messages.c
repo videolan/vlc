@@ -80,7 +80,7 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
         module = p;
     p = strchr(module, '.');
 
-    size_t modlen = (p != NULL) ? (p - module) : 1;
+    size_t modlen = (p != NULL) ? (p - module) : 0;
     char modulebuf[modlen + 1];
     if (p != NULL)
     {

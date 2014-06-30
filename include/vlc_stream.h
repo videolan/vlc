@@ -65,9 +65,10 @@ struct stream_t
     stream_t *p_source;
 
     /* */
-    int      (*pf_read)   ( stream_t *, void *p_read, unsigned int i_read );
-    int      (*pf_peek)   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
-    int      (*pf_control)( stream_t *, int i_query, va_list );
+    int         (*pf_read)   ( stream_t *, void *p_read, unsigned int i_read );
+    int         (*pf_peek)   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
+    int         (*pf_readdir)( stream_t *, input_item_node_t * );
+    int         (*pf_control)( stream_t *, int i_query, va_list );
 
     /* */
     void     (*pf_destroy)( stream_t *);
@@ -92,6 +93,7 @@ enum stream_query_e
     STREAM_CAN_FASTSEEK,        /**< arg1= bool *   res=cannot fail*/
     STREAM_CAN_PAUSE,           /**< arg1= bool *   res=cannot fail*/
     STREAM_CAN_CONTROL_PACE,    /**< arg1= bool *   res=cannot fail*/
+    STREAM_IS_DIRECTORY,        /**< arg1= bool *   res=cannot fail*/
 
     /* */
     STREAM_SET_POSITION,        /**< arg1= uint64_t       res=can fail  */
@@ -99,7 +101,7 @@ enum stream_query_e
 
     STREAM_GET_SIZE,            /**< arg1= uint64_t *     res=cannot fail (0 if no sense)*/
 
-    /* You should update size of source if any and then update size 
+    /* You should update size of source if any and then update size
      * FIXME find a way to avoid it */
     STREAM_UPDATE_SIZE,
 
@@ -132,6 +134,7 @@ VLC_API int stream_Control( stream_t *s, int i_query, ... );
 VLC_API block_t * stream_Block( stream_t *s, int i_size );
 VLC_API block_t * stream_BlockRemaining( stream_t *s, int i_max_size );
 VLC_API char * stream_ReadLine( stream_t * );
+VLC_API int stream_ReadDir( stream_t *, input_item_node_t * );
 
 /**
  * Get the current position in a stream
@@ -222,6 +225,19 @@ VLC_API stream_t * stream_UrlNew(vlc_object_t *p_this, const char *psz_url );
  * @return New stream to use, or NULL if the filter could not be added.
  **/
 VLC_API stream_t* stream_FilterNew( stream_t *p_source, const char *psz_stream_filter );
+
+/**
+ * Default ReadDir implementation for stream Filter. This implementation just
+ * forward the pf_readdir call to the p_source stream.
+ */
+VLC_API int stream_FilterDefaultReadDir( stream_t *s, input_item_node_t *p_node );
+
+/**
+ * Sets stream_FilterDefaultReadDir as the pf_readdir callback for this stream filter
+ */
+#define stream_FilterSetDefaultReadDir(p_stream) \
+    p_stream->pf_readdir = stream_FilterDefaultReadDir;
+
 /**
  * @}
  */

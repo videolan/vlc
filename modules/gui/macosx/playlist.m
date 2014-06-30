@@ -1544,7 +1544,7 @@
     if (url.length < 1)
         return;
 
-    if (![[NSURL URLWithString:url] isFileURL])
+    if ([url rangeOfString:@"file://" options:NSCaseInsensitiveSearch].location != 0)
         return;
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];

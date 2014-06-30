@@ -125,73 +125,6 @@ static OMX_ERRORTYPE get_error(status_t err)
     return OMX_ErrorUndefined;
 }
 
-static int get_param_size(OMX_INDEXTYPE param_index)
-{
-    switch (param_index) {
-    case OMX_IndexParamPortDefinition:
-        return sizeof(OMX_PARAM_PORTDEFINITIONTYPE);
-    case OMX_IndexParamStandardComponentRole:
-        return sizeof(OMX_PARAM_COMPONENTROLETYPE);
-    case OMX_IndexParamVideoInit:
-    case OMX_IndexParamAudioInit:
-    case OMX_IndexParamImageInit:
-    case OMX_IndexParamOtherInit:
-        return sizeof(OMX_PORT_PARAM_TYPE);
-    case OMX_IndexParamNumAvailableStreams:
-        return sizeof(OMX_PARAM_U32TYPE);
-    case OMX_IndexParamAudioPcm:
-        return sizeof(OMX_AUDIO_PARAM_PCMMODETYPE);
-    case OMX_IndexParamAudioAdpcm:
-        return sizeof(OMX_AUDIO_PARAM_AMRTYPE);
-    case OMX_IndexParamAudioAmr:
-        return sizeof(OMX_AUDIO_PARAM_AMRTYPE);
-    case OMX_IndexParamAudioG723:
-        return sizeof(OMX_AUDIO_PARAM_G723TYPE);
-    case OMX_IndexParamAudioG726:
-        return sizeof(OMX_AUDIO_PARAM_G726TYPE);
-    case OMX_IndexParamAudioG729:
-        return sizeof(OMX_AUDIO_PARAM_G729TYPE);
-    case OMX_IndexParamAudioAac:
-        return sizeof(OMX_AUDIO_PARAM_AACPROFILETYPE);
-    case OMX_IndexParamAudioMp3:
-        return sizeof(OMX_AUDIO_PARAM_MP3TYPE);
-    case OMX_IndexParamAudioSbc:
-        return sizeof(OMX_AUDIO_PARAM_SBCTYPE);
-    case OMX_IndexParamAudioVorbis:
-        return sizeof(OMX_AUDIO_PARAM_VORBISTYPE);
-    case OMX_IndexParamAudioWma:
-        return sizeof(OMX_AUDIO_PARAM_WMATYPE);
-    case OMX_IndexParamAudioRa:
-        return sizeof(OMX_AUDIO_PARAM_RATYPE);
-    case OMX_IndexParamVideoPortFormat:
-        return sizeof(OMX_VIDEO_PARAM_PORTFORMATTYPE);
-    case OMX_IndexParamVideoBitrate:
-        return sizeof(OMX_VIDEO_PARAM_BITRATETYPE);
-    case OMX_IndexParamVideoH263:
-        return sizeof(OMX_VIDEO_PARAM_H263TYPE);
-    case OMX_IndexParamVideoMpeg4:
-        return sizeof(OMX_VIDEO_PARAM_MPEG4TYPE);
-    case OMX_IndexParamVideoAvc:
-        return sizeof(OMX_VIDEO_PARAM_AVCTYPE);
-    case OMX_IndexParamVideoWmv:
-        return sizeof(OMX_VIDEO_PARAM_WMVTYPE);
-    default:
-        return 0;
-    }
-}
-
-static int get_config_size(OMX_INDEXTYPE param_index)
-{
-    switch (param_index) {
-    case OMX_IndexConfigCommonOutputCrop:
-        return sizeof(OMX_CONFIG_RECTTYPE);
-    default:
-        /* Dynamically queried config indices could have any size, but
-         * are currently only used with OMX_BOOL. */
-        return sizeof(OMX_BOOL);
-    }
-}
-
 static OMX_ERRORTYPE iomx_send_command(OMX_HANDLETYPE component, OMX_COMMANDTYPE command, OMX_U32 param1, OMX_PTR)
 {
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
@@ -201,13 +134,13 @@ static OMX_ERRORTYPE iomx_send_command(OMX_HANDLETYPE component, OMX_COMMANDTYPE
 static OMX_ERRORTYPE iomx_get_parameter(OMX_HANDLETYPE component, OMX_INDEXTYPE param_index, OMX_PTR param)
 {
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
-    return get_error(ctx->iomx->getParameter(node->node, param_index, param, get_param_size(param_index)));
+    return get_error(ctx->iomx->getParameter(node->node, param_index, param, *(OMX_U32*)param));
 }
 
 static OMX_ERRORTYPE iomx_set_parameter(OMX_HANDLETYPE component, OMX_INDEXTYPE param_index, OMX_PTR param)
 {
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
-    return get_error(ctx->iomx->setParameter(node->node, param_index, param, get_param_size(param_index)));
+    return get_error(ctx->iomx->setParameter(node->node, param_index, param, *(OMX_U32*)param));
 }
 
 static OMX_ERRORTYPE iomx_get_state(OMX_HANDLETYPE component, OMX_STATETYPE *ptr) {
@@ -292,13 +225,13 @@ static OMX_ERRORTYPE iomx_get_extension_index(OMX_HANDLETYPE component, OMX_STRI
 static OMX_ERRORTYPE iomx_set_config(OMX_HANDLETYPE component, OMX_INDEXTYPE index, OMX_PTR param)
 {
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
-    return get_error(ctx->iomx->setConfig(node->node, index, param, get_config_size(index)));
+    return get_error(ctx->iomx->setConfig(node->node, index, param, *(OMX_U32*)param));
 }
 
 static OMX_ERRORTYPE iomx_get_config(OMX_HANDLETYPE component, OMX_INDEXTYPE index, OMX_PTR param)
 {
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
-    return get_error(ctx->iomx->getConfig(node->node, index, param, get_config_size(index)));
+    return get_error(ctx->iomx->getConfig(node->node, index, param, *(OMX_U32*)param));
 }
 
 extern "C" {

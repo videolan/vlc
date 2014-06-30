@@ -995,6 +995,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     if (p_stream->i_stream_type == -1)
     {
+        msg_Warn( p_mux, "rejecting stream with unsupported codec %4.4s",
+                  (char*)&p_stream->i_codec );
         free( p_stream );
         return VLC_EGENERIC;
     }

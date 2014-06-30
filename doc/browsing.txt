@@ -1,0 +1,38 @@
+= Directory-like browsing modules
+
+== Access modules
+
+Directory-like browsing is done in access modules providing a pf_readdir
+callback. The pf_readdir callback has a specified prototype and must
+match a specific expected behavior:
+
+=== pf_readdir prototype
+
+int (*pf_readdir)( access_t *p_access, input_item_node_t *p_node );
+
+* p_access: This is a pointer to the access_t object that you are
+  calling pf_readdir on. It CANNOT be NULL.
+* p_node: A pointer on an input_item_node_t that you must provide and be
+  responsible for. In particular, you have the responsibility to free it
+  in case of error. Upon successful completion of this function, the
+  node SHOULD contain all the items present in the directory-like object
+  that the access was created for (psz_location field). It CANNOT be
+  NULL.
+
+=== pf_readdir return values and behavior
+
+A call to pf_readdir has 3 possible results:
+
+* The call was successful and the node has been filled with all the
+  input_item_t possible depending on system state and module options. In this
+  case, pf_readdir MUST return VLC_SUCCESS and info.b_eof MUST be set to true.
+  This callback must NOT be called again.
+* An unrecoverable error has occured and no input_item_t was added to the node.
+  The callback returns a VLC_ENOITEM error code, and sets info.b_eof to true.
+  This error SHOULD be propagated by the calling code (stream/demux/...)
+  This callback must NOT be called again.
+* A recoverable error has occured. The callback MUST return an error code
+  that is not VLC_SUCCESS or VLC_ENOITEM (e.g. VLC_EGENERIC, VLC_ENOMEM, ...).
+  Some input_item_t objects might have been added to the node; they are
+  owned by the node which is owned by the access. This callback CAN be
+  called again.

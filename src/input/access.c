@@ -78,6 +78,7 @@ access_t *access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
 
     p_access->pf_read    = NULL;
     p_access->pf_block   = NULL;
+    p_access->pf_readdir = NULL;
     p_access->pf_seek    = NULL;
     p_access->pf_control = NULL;
     p_access->p_sys      = NULL;
