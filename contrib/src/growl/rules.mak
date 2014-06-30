@@ -15,12 +15,12 @@ $(TARBALLS)/growl-$(GROWL_VERSION).tar.bz2:
 growl: growl-$(GROWL_VERSION).tar.bz2 .sum-growl
 	$(UNPACK)
 	mv Growl-1.2.2-src growl-1.2.2
-	$(APPLY) $(SRC)/growl/growl-xcode4.patch
+	$(APPLY) $(SRC)/growl/growl-xcode5.patch
 	sed -i.orig -e s/"REVISION \$$REV"/"REVISION 0x\$$REV"/g growl-1.2.2/generateHgRevision.sh
 	$(MOVE)
 
 .growl: growl
 	cd $< && xcodebuild $(XCODE_FLAGS) -target Growl.framework -configuration Release
 	install -d $(PREFIX)
-	cd $< && cp -R build/Release/Growl.framework "$(PREFIX)"
+	cd $< && cp -rf build/Release/Growl.framework "$(PREFIX)"
 	touch $@
