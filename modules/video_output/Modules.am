@@ -238,7 +238,7 @@ vout_LTLIBRARIES += $(LTLIBcaca)
 ### MMAL ###
 libmmal_vout_plugin_la_SOURCES = mmal.c
 libmmal_vout_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_mmal_vout)
-libmmal_vout_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' $(LDFLAGS_mmal_vout)
+libmmal_vout_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' $(LDFLAGS_mmal_vout) -lm
 libmmal_vout_plugin_la_LIBADD = $(LIBS_mmal_vout)
 EXTRA_LTLIBRARIES += libmmal_vout_plugin.la
 vout_LTLIBRARIES += $(LTLIBmmal_vout)
