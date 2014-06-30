@@ -1,0 +1,51 @@
+--- a/m4/intlmacosx.m4.orig	2014-06-25 17:40:22.000000000 -0400
++++ b/m4/intlmacosx.m4	2014-06-25 17:40:29.000000000 -0400
+@@ -43,9 +43,25 @@
+     AC_DEFINE([HAVE_CFLOCALECOPYCURRENT], [1],
+       [Define to 1 if you have the MacOS X function CFLocaleCopyCurrent in the CoreFoundation framework.])
+   fi
++  AC_CACHE_CHECK([for SecTrustCopyAnchorCertificates],
++    [SecTrustCopyAnchorCertificates],
++    [gt_save_LIBS="$LIBS"
++     LIBS="$LIBS -Wl,-framework -Wl,Security"
++     AC_TRY_LINK([#include <Security/SecTrust.h>],
++       [SecTrustCopyAnchorCertificates(NULL)],
++       [gt_cv_func_SecTrustCopyAnchorCertificates=yes],
++       [gt_cv_func_SecTrustCopyAnchorCertificates=no])
++     LIBS="$gt_save_LIBS"])
++  if test $gt_cv_func_SecTrustCopyAnchorCertificates = yes; then
++    AC_DEFINE([HAVE_SecTrustCopyAnchorCertificates], [1],
++      [Define to 1 if you have the MacOS X function SecTrustCopyAnchorCertificates in the Security framework.])
++  fi
+   INTL_MACOSX_LIBS=
+   if test $gt_cv_func_CFPreferencesCopyAppValue = yes || test $gt_cv_func_CFLocaleCopyCurrent = yes; then
+-    INTL_MACOSX_LIBS="-Wl,-framework -Wl,CoreFoundation"
++    INTL_MACOSX_LIBS+="-Wl,-framework -Wl,CoreFoundation "
++  fi
++  if test $gt_cv_func_SecTrustCopyAnchorCertificates = yes; then
++    INTL_MACOSX_LIBS+="-Wl,-framework -Wl,Security "
+   fi
+   AC_SUBST([INTL_MACOSX_LIBS])
+ ])
+
+--- a/lib/gnutls.pc.in.orig	2014-06-25 17:42:26.000000000 -0400
++++ b/lib/gnutls.pc.in	2014-06-25 17:42:35.000000000 -0400
+@@ -19,6 +19,6 @@
+ Version: @VERSION@
+ Libs: -L${libdir} -lgnutls
+-Libs.private: @LTLIBNETTLE@ @LTLIBZ@ @LTLIBINTL@ @LIBSOCKET@ @LTLIBPTHREAD@ @LTLIBICONV@ @P11_KIT_LIBS@ @LIB_SELECT@ @TSS_LIBS@ @LIB_CLOCK_GETTIME@ @GMP_LIBS@
++Libs.private: @LTLIBNETTLE@ @LTLIBZ@ @LTLIBINTL@ @LIBSOCKET@ @LTLIBPTHREAD@ @LTLIBICONV@ @P11_KIT_LIBS@ @LIB_SELECT@ @TSS_LIBS@ @LIB_CLOCK_GETTIME@ @GMP_LIBS@ @INTL_MACOSX_LIBS@
+ @GNUTLS_REQUIRES_PRIVATE@
+ Cflags: -I${includedir}
+
+--- a/libdane/gnutls-dane.pc.in.orig	2014-06-25 17:57:29.000000000 -0400
++++ b/libdane/gnutls-dane.pc.in	2014-06-25 17:57:39.000000000 -0400
+@@ -19,7 +19,7 @@
+ Description: DANE security library for the GNU system
+ URL: http://www.gnu.org/software/gnutls/
+ Version: @VERSION@
+-Libs: -L${libdir} -lgnutls-dane
++Libs: -L${libdir} -lgnutls-dane @INTL_MACOSX_LIBS@
+ Libs.private: @UNBOUND_LIBS@
+ Requires.private: gnutls
+ Cflags: -I${includedir}
