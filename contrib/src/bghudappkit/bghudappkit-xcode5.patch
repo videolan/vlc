@@ -1,0 +1,144 @@
+--- a/BGHUDAppKit.xcodeproj/project.pbxproj	2014-06-25 19:36:42.000000000 -0400
++++ b/BGHUDAppKit.xcodeproj/project.pbxproj	2014-06-25 19:31:38.000000000 -0400
+@@ -823,6 +823,9 @@
+ /* Begin PBXProject section */
+ 		0259C573FE90428111CA0C5A /* Project object */ = {
+ 			isa = PBXProject;
++			attributes = {
++				LastUpgradeCheck = 0510;
++			};
+ 			buildConfigurationList = C056398B08A954F8003078D8 /* Build configuration list for PBXProject "BGHUDAppKit" */;
+ 			compatibilityVersion = "Xcode 3.1";
+ 			developmentRegion = English;
+@@ -1009,7 +1012,7 @@
+ 		3D9BABBF1166D18F008CEA8B /* Release_10.6_10.5_32_64_GC_embed */ = {
+ 			isa = XCBuildConfiguration;
+ 			buildSettings = {
+-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
++				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+ 				GCC_ENABLE_OBJC_GC = supported;
+ 				GCC_MODEL_TUNING = "";
+ 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+@@ -1018,7 +1021,7 @@
+ 				LLVM_LTO = YES;
+ 				MACOSX_DEPLOYMENT_TARGET = 10.5;
+ 				PREBINDING = NO;
+-				SDKROOT = macosx10.6;
++				SDKROOT = macosx;
+ 			};
+ 			name = Release_10.6_10.5_32_64_GC_embed;
+ 		};
+@@ -1026,6 +1029,7 @@
+ 			isa = XCBuildConfiguration;
+ 			buildSettings = {
+ 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
++				GCC_ENABLE_OBJC_GC = disabled;
+ 				GCC_MODEL_TUNING = G5;
+ 				PRODUCT_NAME = All;
+ 				WARNING_CFLAGS = (
+@@ -1051,7 +1055,7 @@
+ 				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(HOME)/Library/Frameworks/\"";
+ 				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(DEVELOPER_DIR)/Library/Frameworks\"";
+ 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(BUILD_DIR)/$(CONFIGURATION)\"";
+-				GCC_ENABLE_OBJC_GC = supported;
++				GCC_ENABLE_OBJC_GC = disabled;
+ 				GCC_MODEL_TUNING = G5;
+ 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+ 				GCC_PREFIX_HEADER = BGHUDAppKitPlugin_Prefix.pch;
+@@ -1070,7 +1074,7 @@
+ 				DYLIB_COMPATIBILITY_VERSION = 1;
+ 				DYLIB_CURRENT_VERSION = 1;
+ 				FRAMEWORK_VERSION = A;
+-				GCC_ENABLE_OBJC_GC = supported;
++				GCC_ENABLE_OBJC_GC = disabled;
+ 				GCC_MODEL_TUNING = G5;
+ 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+ 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+@@ -1098,7 +1102,7 @@
+ 				FRAMEWORK_VERSION = A;
+ 				GCC_DYNAMIC_NO_PIC = NO;
+ 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+-				GCC_ENABLE_OBJC_GC = supported;
++				GCC_ENABLE_OBJC_GC = disabled;
+ 				GCC_MODEL_TUNING = G5;
+ 				GCC_OPTIMIZATION_LEVEL = 0;
+ 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+@@ -1143,7 +1147,7 @@
+ 				DYLIB_COMPATIBILITY_VERSION = 1;
+ 				DYLIB_CURRENT_VERSION = 1;
+ 				FRAMEWORK_VERSION = A;
+-				GCC_ENABLE_OBJC_GC = supported;
++				GCC_ENABLE_OBJC_GC = disabled;
+ 				GCC_MODEL_TUNING = G5;
+ 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+ 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+@@ -1178,7 +1182,7 @@
+ 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(BUILD_DIR)/$(CONFIGURATION)\"";
+ 				GCC_DYNAMIC_NO_PIC = NO;
+ 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+-				GCC_ENABLE_OBJC_GC = supported;
++				GCC_ENABLE_OBJC_GC = disabled;
+ 				GCC_MODEL_TUNING = G5;
+ 				GCC_OPTIMIZATION_LEVEL = 0;
+ 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+@@ -1207,7 +1211,7 @@
+ 				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(HOME)/Library/Frameworks/\"";
+ 				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(DEVELOPER_DIR)/Library/Frameworks\"";
+ 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(BUILD_DIR)/$(CONFIGURATION)\"";
+-				GCC_ENABLE_OBJC_GC = supported;
++				GCC_ENABLE_OBJC_GC = disabled;
+ 				GCC_MODEL_TUNING = G5;
+ 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+ 				GCC_PREFIX_HEADER = BGHUDAppKitPlugin_Prefix.pch;
+@@ -1224,6 +1228,7 @@
+ 				COPY_PHASE_STRIP = NO;
+ 				GCC_DYNAMIC_NO_PIC = NO;
+ 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
++				GCC_ENABLE_OBJC_GC = disabled;
+ 				GCC_MODEL_TUNING = G5;
+ 				GCC_OPTIMIZATION_LEVEL = 0;
+ 				PRODUCT_NAME = All;
+@@ -1240,6 +1245,7 @@
+ 			isa = XCBuildConfiguration;
+ 			buildSettings = {
+ 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
++				GCC_ENABLE_OBJC_GC = disabled;
+ 				GCC_MODEL_TUNING = G5;
+ 				PRODUCT_NAME = All;
+ 				WARNING_CFLAGS = (
+@@ -1253,29 +1259,26 @@
+ 		C056398C08A954F8003078D8 /* Debug */ = {
+ 			isa = XCBuildConfiguration;
+ 			buildSettings = {
+-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
++				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+ 				GCC_ENABLE_OBJC_GC = supported;
+ 				GCC_MODEL_TUNING = "";
+ 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+ 				GCC_WARN_UNUSED_VARIABLE = YES;
+ 				PREBINDING = NO;
+-				SDKROOT = macosx10.5;
++				SDKROOT = macosx;
+ 			};
+ 			name = Debug;
+ 		};
+ 		C056398D08A954F8003078D8 /* Release */ = {
+ 			isa = XCBuildConfiguration;
+ 			buildSettings = {
+-				ARCHS = (
+-					ppc,
+-					i386,
+-				);
++				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+ 				GCC_ENABLE_OBJC_GC = supported;
+ 				GCC_MODEL_TUNING = "";
+ 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+ 				GCC_WARN_UNUSED_VARIABLE = YES;
+ 				PREBINDING = NO;
+-				SDKROOT = macosx10.5;
++				SDKROOT = macosx;
+ 			};
+ 			name = Release;
+ 		};
+Only in bghudappkit-working/BGHUDAppKit.xcodeproj: project.xcworkspace
+Only in bghudappkit-working/: build
