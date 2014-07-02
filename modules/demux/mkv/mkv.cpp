@@ -411,7 +411,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TIME:
             i64 = (int64_t) va_arg( args, int64_t );
-            msg_Dbg(p_demux,"SET_TIME to %"PRId64, i64 );
+            msg_Dbg(p_demux,"SET_TIME to %" PRId64, i64 );
             Seek( p_demux, i64, -1, NULL );
             return VLC_SUCCESS;
         default:
@@ -430,7 +430,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, virtual_ch
 
     int         i_index;
 
-    msg_Dbg( p_demux, "seek request to %"PRId64" (%f%%)", i_date, f_percent );
+    msg_Dbg( p_demux, "seek request to %" PRId64 " (%f%%)", i_date, f_percent );
     if( i_date < 0 && f_percent < 0 )
     {
         msg_Warn( p_demux, "cannot seek nowhere!" );
@@ -460,7 +460,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, virtual_ch
         {
             int64_t i_pos = int64_t( f_percent * stream_Size( p_demux->s ) );
 
-            msg_Dbg( p_demux, "lengthy way of seeking for pos:%"PRId64, i_pos );
+            msg_Dbg( p_demux, "lengthy way of seeking for pos:%" PRId64, i_pos );
             for( i_index = 0; i_index < p_segment->i_index; i_index++ )
             {
                 if( p_segment->p_indexes[i_index].i_position >= i_pos &&
@@ -472,7 +472,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, virtual_ch
 
             if( p_segment->p_indexes[i_index].i_position < i_pos )
             {
-                msg_Dbg( p_demux, "no cues, seek request to global pos: %"PRId64, i_pos );
+                msg_Dbg( p_demux, "no cues, seek request to global pos: %" PRId64, i_pos );
                 i_global_position = i_pos;
             }
         }

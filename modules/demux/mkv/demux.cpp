@@ -493,7 +493,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
     EDocTypeReadVersion doc_read_version = GetChild<EDocTypeReadVersion>(*static_cast<EbmlHead*>(p_l0));
     if (uint64(doc_read_version) > 2)
     {
-        msg_Err( p_demux, "matroska file needs version %"PRId64" but only versions 1 & 2 supported", uint64(doc_read_version));
+        msg_Err( p_demux, "matroska file needs version %" PRId64 " but only versions 1 & 2 supported", uint64(doc_read_version));
         return NULL;
     }
 
@@ -704,7 +704,7 @@ bool demux_sys_t::PreloadLinked()
                                     SimpleTag * p_st = tags[k]->simple_tags[l];
                                     if( !strcmp(p_st->psz_tag_name,"TITLE") )
                                     {
-                                        msg_Dbg( &demuxer, "Using title \"%s\" from tag for edition %"PRIu64, p_st->p_value, i_ed_uid );
+                                        msg_Dbg( &demuxer, "Using title \"%s\" from tag for edition %" PRIu64, p_st->p_value, i_ed_uid );
                                         p_title->psz_name = strdup( p_st->p_value );
                                         break;
                                     }

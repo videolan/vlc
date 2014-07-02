@@ -88,7 +88,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
         *usertime_offset = tmp;
 
     msg_Dbg( &p_main_segment->sys.demuxer,
-             "Virtual chapter %s from %"PRId64" to %"PRId64" - " ,
+             "Virtual chapter %s from %" PRId64 " to %" PRId64 " - " ,
              p_chap->psz_name.c_str(), p_vchap->i_virtual_start_time, p_vchap->i_virtual_stop_time );
 
     return p_vchap;
@@ -409,7 +409,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
     /* we have moved to a new chapter */
     if ( p_cur_chapter != NULL && p_current_chapter != p_cur_chapter )
         {
-            msg_Dbg( &demux, "NEW CHAPTER %"PRId64, sys.i_pts );
+            msg_Dbg( &demux, "NEW CHAPTER %" PRId64, sys.i_pts );
             if ( p_cur_edition->b_ordered )
             {
                 /* FIXME EnterAndLeave has probably been broken for a long time */

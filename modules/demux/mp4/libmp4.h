@@ -1355,7 +1355,7 @@ static inline size_t mp4_box_headersize( MP4_Box_t *p_box )
     if( i_actually_read < 0 || (int64_t)i_actually_read < i_read )\
     { \
         msg_Warn( p_stream, "MP4_READBOX_ENTER: I got %i bytes, "\
-        "but I requested %"PRId64"", i_actually_read, i_read );\
+        "but I requested %" PRId64, i_actually_read, i_read );\
         free( p_buff ); \
         return( 0 ); \
     } \
