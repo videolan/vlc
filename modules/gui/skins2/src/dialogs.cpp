@@ -212,7 +212,7 @@ void Dialogs::showChangeSkin()
 void Dialogs::showPlaylistLoad()
 {
     showFileGeneric( _("Open playlist"),
-                     _("Playlist Files|"EXTENSIONS_PLAYLIST"|"
+                     _("Playlist Files|" EXTENSIONS_PLAYLIST "|"
                        "All Files|*"),
                      showPlaylistLoadCB, kOPEN );
 }

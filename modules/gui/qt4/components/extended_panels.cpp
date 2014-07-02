@@ -557,7 +557,7 @@ void ExtVideo::setWidgetValue( QObject *widget )
         else if( lineedit )
         {
             char str[30];
-            snprintf( str, sizeof(str), "%06"PRIX64, val.i_int );
+            snprintf( str, sizeof(str), "%06" PRIX64, val.i_int );
             lineedit->setText( str );
         }
         else if( combobox ) combobox->setCurrentIndex(
@@ -750,7 +750,7 @@ void ExtV4l2::Refresh( void )
 
             QString name = qtr( vartext.psz_string );
             free( vartext.psz_string );
-            msg_Dbg( p_intf, "v4l2 control \"%"PRIx64"\": %s (%s)",
+            msg_Dbg( p_intf, "v4l2 control \"%" PRIx64 "\": %s (%s)",
                      val.p_list->p_values[i].i_int, psz_var, qtu( name ) );
 
             int i_type = var_Type( p_obj, psz_var );
