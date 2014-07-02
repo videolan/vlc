@@ -386,7 +386,8 @@ libsmb_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBsmb)
 EXTRA_LTLIBRARIES += libsmb_plugin.la
 
-libdsm_plugin_la_SOURCES = access/dsm/access.c access/dsm/common.h
+libdsm_plugin_la_SOURCES = access/dsm/access.c access/dsm/common.h \
+	access/bdsm/browser.c
 libdsm_plugin_la_CFLAGS = $(AM_CFLAGS) $(DSM_CFLAGS)
 libdsm_plugin_la_LIBADD = $(DSM_LIBS)
 libdsm_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(sddir)'
