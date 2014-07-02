@@ -51,7 +51,7 @@ int Import_Dir ( vlc_object_t *p_this)
 
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
-    msg_Dbg( p_demux, "%s", "reading directory content" );
+    msg_Dbg( p_demux, "reading directory content" );
 
     return VLC_SUCCESS;
 }
@@ -72,6 +72,8 @@ static int Demux( demux_t *p_demux )
         input_item_node_Delete( p_node );
         return VLC_EGENERIC;
     }
+    else
+        msg_Warn( p_demux, "unable to read directory" );
 
     input_item_node_PostAndDelete( p_node );
     return VLC_SUCCESS;
