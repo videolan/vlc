@@ -98,6 +98,7 @@ $Id$
  * dolby_surround_decoder: simple decoder for dolby surround encoded streams
  * drawable: legacy LibVLC video window provider
  * dshow: DirectShow access plugin for encoding cards under Windows
+ * dsm: SMB access module
  * dts: DTS basic parser/packetizer
  * dtstofloat32: DTS Audio converter
  * dtstospdif: Audio converter that encapsulates DTS into S/PDIF

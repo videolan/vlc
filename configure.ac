@@ -1718,6 +1718,10 @@ dnl
 PKG_ENABLE_MODULES_VLC([SMBCLIENT], [smb], [smbclient], (SMB/CIFS support), [auto])
 AS_IF([test "${SYS}" = "mingw32"], [ VLC_ADD_PLUGIN([access_smb]) ])
 
+dnl
+dnl  liBDSM access module
+dnl
+PKG_ENABLE_MODULES_VLC([DSM], [dsm], [libdsm], [libdsm SMB/CIFS access/sd module], [auto])
 
 dnl
 dnl sftp access support

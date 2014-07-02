@@ -3,7 +3,7 @@ Changes between 2.2.x and 3.0.0-git:
 
 Access:
  * Support HDS (Http Dynamic Streaming) from Adobe (f4m, f4v, etc.)
-
+ * New SMB access module using libdsm
 
 Changes between 2.1.x and 2.2.0:
 --------------------------------

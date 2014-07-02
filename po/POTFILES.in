@@ -192,6 +192,7 @@ modules/access/dshow/crossbar.cpp
 modules/access/dshow/dshow.cpp
 modules/access/dshow/filter.cpp
 modules/access/dshow/filter.h
+modules/access/dsm/access.c
 modules/access/dtv/access.c
 modules/access/dv.c
 modules/access/dvdnav.c
