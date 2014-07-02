@@ -32,6 +32,10 @@
 int Open( vlc_object_t * );
 void Close( vlc_object_t * );
 
+int SdOpen( vlc_object_t * );
+void SdClose( vlc_object_t * );
+int vlc_sd_probe_Open( vlc_object_t * );
+
 int BrowserInit( access_t *p_access );
 
 struct access_sys_t

@@ -69,6 +69,15 @@ vlc_module_begin ()
     add_string( "smb-domain", NULL, DOMAIN_TEXT, DOMAIN_LONGTEXT, false )
     add_shortcut( "smb", "cifs" )
     set_callbacks( Open, Close )
+
+    add_submodule()
+        set_category( CAT_PLAYLIST )
+        set_subcategory( SUBCAT_PLAYLIST_SD )
+        set_capability( "services_discovery", 0 )
+        set_callbacks( SdOpen, SdClose )
+
+        VLC_SD_PROBE_SUBMODULE
+
 vlc_module_end ()
 
 /*****************************************************************************

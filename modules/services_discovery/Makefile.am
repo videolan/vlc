@@ -68,3 +68,5 @@ libos2drive_plugin_la_SOURCES = services_discovery/os2drive.c
 if HAVE_OS2
 sd_LTLIBRARIES += libos2drive_plugin.la
 endif
+
+sd_LTLIBRARIES += $(LTLIBdsm)
