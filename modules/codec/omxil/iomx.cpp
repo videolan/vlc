@@ -133,8 +133,17 @@ static OMX_ERRORTYPE iomx_send_command(OMX_HANDLETYPE component, OMX_COMMANDTYPE
 
 static OMX_ERRORTYPE iomx_get_parameter(OMX_HANDLETYPE component, OMX_INDEXTYPE param_index, OMX_PTR param)
 {
+    /*
+     * Some QCOM OMX_getParameter implementations override the nSize element to
+     * a bad value. So, save the initial nSize in order to restore it after.
+     */
+    OMX_U32 nSize = *(OMX_U32*)param;
+    OMX_ERRORTYPE error;
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
-    return get_error(ctx->iomx->getParameter(node->node, param_index, param, *(OMX_U32*)param));
+
+    error = get_error(ctx->iomx->getParameter(node->node, param_index, param, nSize));
+    *(OMX_U32*)param = nSize;
+    return error;
 }
 
 static OMX_ERRORTYPE iomx_set_parameter(OMX_HANDLETYPE component, OMX_INDEXTYPE param_index, OMX_PTR param)
