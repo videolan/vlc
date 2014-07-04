@@ -1006,6 +1006,42 @@ error:
     return VLC_ENOMEM;
 }
 
+typedef struct
+{
+    block_t self;
+    AVPacket packet;
+} vlc_av_packet_t;
+
+static void vlc_av_packet_Release(block_t *block)
+{
+    vlc_av_packet_t *b = (void *) block;
+
+    av_free_packet(&b->packet);
+    free(b);
+}
+
+static block_t *vlc_av_packet_Wrap(AVPacket *packet, mtime_t i_length)
+{
+    vlc_av_packet_t *b = malloc( sizeof( *b ) );
+    if( unlikely(b == NULL) )
+        return NULL;
+
+    block_t *p_block = &b->self;
+
+    block_Init( p_block, packet->data, packet->size );
+    p_block->i_nb_samples = 0;
+    p_block->pf_release = vlc_av_packet_Release;
+    b->packet = *packet;
+
+    p_block->i_length = i_length;
+    p_block->i_pts = packet->pts;
+    p_block->i_dts = packet->dts;
+    if( unlikely( packet->flags & AV_PKT_FLAG_CORRUPT ) )
+        p_block->i_flags |= BLOCK_FLAG_CORRUPTED;
+
+    return p_block;
+}
+
 /****************************************************************************
  * EncodeVideo: the whole thing
  ****************************************************************************/
@@ -1013,19 +1049,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
     int i_plane;
-    /* Initialize the video output buffer the first time.
-     * This is done here instead of OpenEncoder() because we need the actual
-     * bits_per_pixel value, without having to assume anything.
-     */
-    const int bitsPerPixel = p_enc->fmt_out.video.i_bits_per_pixel ?
-                         p_enc->fmt_out.video.i_bits_per_pixel :
-                         p_sys->p_context->bits_per_coded_sample ?
-                         p_sys->p_context->bits_per_coded_sample :
-                         24;
-    const int blocksize = __MAX( FF_MIN_BUFFER_SIZE, ( bitsPerPixel * p_sys->p_context->height * p_sys->p_context->width ) / 8 + 200 );
-    block_t *p_block = block_Alloc( blocksize );
-    if( unlikely(p_block == NULL) )
-        return NULL;
 
     AVFrame *frame = NULL;
     if( likely(p_pict) ) {
@@ -1090,7 +1113,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             {
                 msg_Warn( p_enc, "almost fed libavcodec with two frames with "
                           "the same PTS (%"PRId64 ")", frame->pts );
-                block_Release( p_block );
                 return NULL;
             }
             else if ( p_sys->i_last_pts > frame->pts )
@@ -1098,7 +1120,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
                 msg_Warn( p_enc, "almost fed libavcodec with a frame in the "
                          "past (current: %"PRId64 ", last: %"PRId64")",
                          frame->pts, p_sys->i_last_pts );
-                block_Release( p_block );
                 return NULL;
             }
             else
@@ -1109,26 +1130,25 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     }
 
     AVPacket av_pkt;
+    av_pkt.data = NULL;
+    av_pkt.size = 0;
     int is_data;
 
     av_init_packet( &av_pkt );
-    av_pkt.data = p_block->p_buffer;
-    av_pkt.size = p_block->i_buffer;
 
     if( avcodec_encode_video2( p_sys->p_context, &av_pkt, frame, &is_data ) < 0
      || is_data == 0 )
     {
-        block_Release( p_block );
         return NULL;
     }
 
-    p_block->i_buffer = av_pkt.size;
-    p_block->i_length = av_pkt.duration / p_sys->p_context->time_base.den;
-    p_block->i_pts = av_pkt.pts;
-    p_block->i_dts = av_pkt.dts;
-    if( unlikely( av_pkt.flags & AV_PKT_FLAG_CORRUPT ) )
-        p_block->i_flags |= BLOCK_FLAG_CORRUPTED;
-
+    block_t *p_block = vlc_av_packet_Wrap( &av_pkt,
+            av_pkt.duration / p_sys->p_context->time_base.den );
+    if( unlikely(p_block == NULL) )
+    {
+        av_free_packet( &av_pkt );
+        return NULL;
+    }
 
     switch ( p_sys->p_context->coded_frame->pict_type )
     {
