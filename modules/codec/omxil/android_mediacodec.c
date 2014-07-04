@@ -307,7 +307,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     case VLC_CODEC_VC1:  mime = "video/wvc1"; break;
     case VLC_CODEC_VP8:  mime = "video/x-vnd.on2.vp8"; break;
     default:
-        msg_Dbg(p_dec, "codec %d not supported", p_dec->fmt_in.i_codec);
+        msg_Dbg(p_dec, "codec %4.4s not supported", (char *)&p_dec->fmt_in.i_codec);
         return VLC_EGENERIC;
     }
 
