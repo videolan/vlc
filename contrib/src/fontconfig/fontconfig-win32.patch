@@ -1,24 +1,3 @@
-diff -ruN fontconfig/src/fcint.h fontconfig.good/src/fcint.h
---- fontconfig/src/Makefile.in	2009-06-24 21:05:27.000000000 +0200
-+++ fontconfig.good/src/Makefile.in	2009-07-03 00:13:38.000000000 +0200
-@@ -664,7 +664,6 @@
- # gcc import library install/uninstall
- 
- @OS_WIN32_TRUE@install-libtool-import-lib: 
--@OS_WIN32_TRUE@	$(INSTALL) .libs/libfontconfig.dll.a $(DESTDIR)$(libdir)
- @OS_WIN32_TRUE@	$(INSTALL) fontconfig.def $(DESTDIR)$(libdir)/fontconfig.def
- 
- @OS_WIN32_TRUE@uninstall-libtool-import-lib:
---- fontconfig/src/Makefile.am	2009-03-18 22:02:22.000000000 +0100
-+++ fontconfig.good/src/Makefile.am	2009-07-03 00:12:50.000000000 +0200
-@@ -30,7 +30,6 @@
- # gcc import library install/uninstall
- 
- install-libtool-import-lib: 
--	$(INSTALL) .libs/libfontconfig.dll.a $(DESTDIR)$(libdir)
- 	$(INSTALL) fontconfig.def $(DESTDIR)$(libdir)/fontconfig.def
- 
- uninstall-libtool-import-lib:
 --- fontconfig/src/fcinit.c	2009-06-06 00:59:27.000000000 +0200
 +++ fontconfig.good/src/fcinit.c	2009-07-13 14:58:37.000000000 +0200
 @@ -24,6 +24,7 @@
@@ -41,3 +20,23 @@ diff -ruN fontconfig/src/fcint.h fontconfig.good/src/fcint.h
  	goto bail1;
      return config;
  
+--- fontconfig-2.11.1/src/Makefile.in.orig	2014-07-04 22:34:00.932627043 +0200
++++ fontconfig-2.11.1/src/Makefile.in	2014-07-04 22:35:40.630938711 +0200
+@@ -838,7 +838,6 @@
+ 
+ @OS_WIN32_TRUE@install-libtool-import-lib: libfontconfig.la
+ @OS_WIN32_TRUE@	$(MKDIR_P) $(DESTDIR)$(libdir)
+-@OS_WIN32_TRUE@	$(INSTALL) .libs/libfontconfig.dll.a $(DESTDIR)$(libdir)/libfontconfig.dll.a
+ @OS_WIN32_TRUE@	$(INSTALL) fontconfig.def $(DESTDIR)$(libdir)/fontconfig.def
+ 
+ @OS_WIN32_TRUE@uninstall-libtool-import-lib:
+--- fontconfig-2.11.1/src/Makefile.am.orig	2014-07-04 22:34:00.932627043 +0200
++++ fontconfig-2.11.1/src/Makefile.am	2014-07-04 22:37:05.362334747 +0200
+@@ -33,7 +33,6 @@
+ 
+ install-libtool-import-lib: libfontconfig.la
+ 	$(MKDIR_P) $(DESTDIR)$(libdir)
+-	$(INSTALL) .libs/libfontconfig.dll.a $(DESTDIR)$(libdir)/libfontconfig.dll.a
+ 	$(INSTALL) fontconfig.def $(DESTDIR)$(libdir)/fontconfig.def
+ 
+ uninstall-libtool-import-lib:
