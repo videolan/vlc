@@ -139,6 +139,8 @@ else
 export CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -miphoneos-version-min=${SDK_MIN} ${OPTIM}"
 fi
 
+export CPPFLAGS="${CFLAGS}"
+
 export CPP="xcrun cc -E"
 export CXXCPP="xcrun c++ -E"
 
