@@ -1885,9 +1885,7 @@ static int Demux( demux_t *p_demux )
 
             REFERENCE_TIME i_pts, i_end_date;
             HRESULT hr = sample.p_sample->GetTime( &i_pts, &i_end_date );
-            if( hr != VFW_S_NO_STOP_TIME && hr != S_OK ) i_pts = 0;
-
-            if( !i_pts )
+            if( hr == S_OK || hr == VFW_S_NO_STOP_TIME )
             {
                 if( p_stream->mt.majortype == MEDIATYPE_Video || !p_stream->b_pts )
                 {
@@ -1895,10 +1893,12 @@ static int Demux( demux_t *p_demux )
                     i_pts = sample.i_timestamp;
                     p_stream->b_pts = true;
                 }
+                i_pts += (i_pts >= 0) ? +5 : -5;
+                i_pts /= 10; /* 100-ns to µs conversion */
+                i_pts += VLC_TS_0;
             }
-
-            i_pts /= 10; /* Dshow works with 100 nano-seconds resolution */
-
+            else
+                i_pts = VLC_TS_INVALID;
 #if 0
             msg_Dbg( p_demux, "Read() stream: %i, size: %i, PTS: %"PRId64,
                      i_stream, i_data_size, i_pts );
@@ -1909,7 +1909,8 @@ static int Demux( demux_t *p_demux )
             p_block->i_pts = p_block->i_dts = i_pts;
             sample.p_sample->Release();
 
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_pts > 0 ? i_pts : 0 );
+            if( i_pts > VLC_TS_INVALID )
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_pts );
             es_out_Send( p_demux->out, p_stream->p_es, p_block );
 
             i_samples--;
