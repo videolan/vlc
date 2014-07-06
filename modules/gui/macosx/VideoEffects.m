@@ -565,9 +565,11 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     if (p_vout) {
         var_SetString(p_vout, "video-filter", "");
         var_SetString(p_vout, "sub-source", "");
-        var_SetString(p_vout, "video-splitter", "");
         vlc_object_release(p_vout);
     }
+
+    // video-splitter needs to be set via playlist var
+    var_SetString(pl_Get(p_intf), "video-splitter", "");
 
     /* fetch preset */
     NSArray *items = [[[defaults objectForKey:@"VideoEffectProfiles"] objectAtIndex:selectedProfile] componentsSeparatedByString:@";"];
