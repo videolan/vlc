@@ -585,7 +585,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         tempArray = [tempString componentsSeparatedByString:@":"];
         count = [tempArray count];
         for (NSUInteger x = 0; x < count; x++)
-            [vci_si setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
+            [vci_si setVideoFilter:[[tempArray objectAtIndex:x] UTF8String] on:YES];
     }
 
     tempString = B64DecNSStr([items objectAtIndex:1]);
@@ -595,7 +595,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         tempArray = [tempString componentsSeparatedByString:@":"];
         count = [tempArray count];
         for (NSUInteger x = 0; x < count; x++)
-            [vci_si setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
+            [vci_si setVideoFilter:[[tempArray objectAtIndex:x] UTF8String] on:YES];
     }
 
     tempString = B64DecNSStr([items objectAtIndex:2]);
@@ -605,7 +605,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         tempArray = [tempString componentsSeparatedByString:@":"];
         count = [tempArray count];
         for (NSUInteger x = 0; x < count; x++)
-            [vci_si setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
+            [vci_si setVideoFilter:[[tempArray objectAtIndex:x] UTF8String] on:YES];
     }
 
     /* try to set filter values on-the-fly and store them appropriately */
@@ -1138,14 +1138,14 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_addtext_text_lbl setEnabled: b_state];
     [o_addtext_text_fld setEnabled: b_state];
     [vci_si setVideoFilter: "marq" on: b_state];
-    [vci_si setVideoFilterProperty: "marq-marquee" forFilter: "marq" string: (char *)[[o_addtext_text_fld stringValue] UTF8String]];
+    [vci_si setVideoFilterProperty: "marq-marquee" forFilter: "marq" string: [[o_addtext_text_fld stringValue] UTF8String]];
     [vci_si setVideoFilterProperty: "marq-position" forFilter: "marq" integer: [[o_addtext_pos_pop selectedItem] tag]];
 }
 
 - (IBAction)addTextModifierChanged:(id)sender
 {
     if (sender == o_addtext_text_fld)
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "marq-marquee" forFilter: "marq" string: (char *)[[o_addtext_text_fld stringValue] UTF8String]];
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "marq-marquee" forFilter: "marq" string:[[o_addtext_text_fld stringValue] UTF8String]];
     else
         [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "marq-position" forFilter: "marq" integer: [[o_addtext_pos_pop selectedItem] tag]];
 }
@@ -1166,7 +1166,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 - (IBAction)addLogoModifierChanged:(id)sender
 {
     if (sender == o_addlogo_logo_fld)
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "logo-file" forFilter: "logo" string: (char *)[[o_addlogo_logo_fld stringValue] UTF8String]];
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "logo-file" forFilter: "logo" string: [[o_addlogo_logo_fld stringValue] UTF8String]];
     else if (sender == o_addlogo_pos_pop)
         [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "logo-position" forFilter: "logo" integer: [[o_addlogo_pos_pop selectedItem] tag]];
     else {
