@@ -903,8 +903,8 @@ static int CheckSegmentChange( sout_access_out_t *p_access, block_t *p_buffer )
     block_t *output = p_sys->block_buffer;
 
     if( p_sys->i_handle > 0 &&
-        ( ( p_buffer->i_dts - p_sys->i_opendts +
-          ( p_buffer->i_length * CLOCK_FREQ / INT64_C(1000000) )
+       (( p_buffer->i_dts - p_sys->i_opendts +
+           p_buffer->i_length
         ) >= p_sys->i_seglenm ) )
      {
         closeCurrentSegment( p_access, p_sys, false );
@@ -972,8 +972,8 @@ static ssize_t writeSegment( sout_access_out_t *p_access )
         }
 
         p_sys->f_seglen =
-            (float)(output->i_length / INT64_C(1000000) ) +
-            (float)(output->i_dts - p_sys->i_opendts) / CLOCK_FREQ;
+            (float)(output->i_length + p_sys->i_dts_offset +
+                    output->i_dts - p_sys->i_opendts) / CLOCK_FREQ;
 
         if ( (size_t)val >= output->i_buffer )
         {
