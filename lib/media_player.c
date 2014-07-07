@@ -1135,10 +1135,10 @@ int libvlc_media_player_get_chapter_count( libvlc_media_player_t *p_mi )
     if( !p_input_thread )
         return -1;
 
-    var_Change( p_input_thread, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    int i_ret = var_Change( p_input_thread, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
     vlc_object_release( p_input_thread );
 
-    return val.i_int;
+    return i_ret == VLC_SUCCESS ? val.i_int : -1;
 }
 
 int libvlc_media_player_get_chapter_count_for_title(
@@ -1158,11 +1158,11 @@ int libvlc_media_player_get_chapter_count_for_title(
         vlc_object_release( p_input_thread );
         return -1;
     }
-    var_Change( p_input_thread, psz_name, VLC_VAR_CHOICESCOUNT, &val, NULL );
+    int i_ret = var_Change( p_input_thread, psz_name, VLC_VAR_CHOICESCOUNT, &val, NULL );
     vlc_object_release( p_input_thread );
     free( psz_name );
 
-    return val.i_int;
+    return i_ret == VLC_SUCCESS ? val.i_int : -1;
 }
 
 void libvlc_media_player_set_title( libvlc_media_player_t *p_mi,
@@ -1208,10 +1208,10 @@ int libvlc_media_player_get_title_count( libvlc_media_player_t *p_mi )
     if( !p_input_thread )
         return -1;
 
-    var_Change( p_input_thread, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    int i_ret = var_Change( p_input_thread, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
     vlc_object_release( p_input_thread );
 
-    return val.i_int;
+    return i_ret == VLC_SUCCESS ? val.i_int : -1;
 }
 
 void libvlc_media_player_next_chapter( libvlc_media_player_t *p_mi )
@@ -1344,7 +1344,9 @@ libvlc_track_description_t *
         return NULL;
 
     vlc_value_t val_list, text_list;
-    var_Change( p_input, psz_variable, VLC_VAR_GETLIST, &val_list, &text_list);
+    int i_ret = var_Change( p_input, psz_variable, VLC_VAR_GETLIST, &val_list, &text_list );
+    if( i_ret != VLC_SUCCESS )
+        return NULL;
 
     /* no tracks */
     if( val_list.p_list->i_count <= 0 )
