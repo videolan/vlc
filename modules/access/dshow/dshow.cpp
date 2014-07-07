@@ -1893,7 +1893,7 @@ static int Demux( demux_t *p_demux )
                     i_pts = sample.i_timestamp;
                     p_stream->b_pts = true;
                 }
-                i_pts += (i_pts >= 0) ? +5 : -5;
+                i_pts += (i_pts >= 0) ? +5 : -4;
                 i_pts /= 10; /* 100-ns to µs conversion */
                 i_pts += VLC_TS_0;
             }
