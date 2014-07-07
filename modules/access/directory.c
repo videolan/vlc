@@ -393,12 +393,15 @@ int DirRead (access_t *p_access, input_item_node_t *p_current_node)
         /* Create an input item for the current entry */
         psz_uri = encode_URI_component (psz_entry);
         if (psz_uri == NULL
-            || asprintf (&psz_full_uri, "%s/%s", p_current->uri, psz_uri) == -1)
+         || asprintf (&psz_full_uri, "%s/%s", p_current->uri, psz_uri) == -1)
+            psz_full_uri = NULL;
+
+        free (psz_uri);
+        if (psz_full_uri == NULL)
         {
             closedir (handle);
             continue;
         }
-        free (psz_uri);
 
         int i_type = i_res == ENTRY_DIR ? ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
         p_new = input_item_NewWithType (psz_full_uri, psz_entry,
