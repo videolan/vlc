@@ -203,14 +203,10 @@ static int directory_open (directory *p_dir, char *psz_entry, DIR **handle)
 
 static bool directory_push (access_sys_t *p_sys, DIR *handle, char *psz_uri)
 {
-    directory *p_dir;
-
-    p_dir = malloc (sizeof (*p_dir));
-    if (unlikely (p_dir == NULL))
-        return NULL;
+    directory *p_dir = malloc (sizeof (*p_dir));
 
     psz_uri = strdup (psz_uri);
-    if (unlikely (psz_uri == NULL))
+    if (unlikely (p_dir == NULL || psz_uri == NULL))
         goto error;
 
     p_dir->parent = p_sys->current;
@@ -236,11 +232,10 @@ static bool directory_push (access_sys_t *p_sys, DIR *handle, char *psz_uri)
     p_sys->current = p_dir;
     return true;
 
-    error:
+error:
     closedir (handle);
     free (p_dir);
     free (psz_uri);
-
     return false;
 }
 
@@ -307,7 +302,10 @@ int DirInit (access_t *p_access, DIR *handle)
     else
         uri = vlc_path2uri (p_access->psz_filepath, "file");
     if (unlikely (uri == NULL))
+    {
+        closedir (handle);
         goto error;
+    }
 
     /* "Open" the base directory */
     p_sys->current = NULL;
@@ -338,7 +336,6 @@ int DirInit (access_t *p_access, DIR *handle)
     return VLC_SUCCESS;
 
 error:
-    closedir (handle);
     free (p_sys);
     return VLC_EGENERIC;
 }
