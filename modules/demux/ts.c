@@ -1732,8 +1732,9 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                          block_Duplicate( p_block ) );
         }
 
-        if (!p_sys->b_trust_pcr)
+        if (!p_sys->b_trust_pcr && pid->i_owner_number == p_sys->i_current_program) {
             es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts);
+        }
 
         es_out_Send( p_demux->out, pid->es->id, p_block );
     }
