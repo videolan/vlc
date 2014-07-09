@@ -98,6 +98,7 @@ struct demux_sys_t
     uint64_t     pulse; /*< Pulses counter */
     mtime_t      tick; /*< Last tick timestamp */
 
+    mtime_t      duration; /*< Total duration */
     unsigned     ppqn;   /*< Pulses Per Quarter Note */
     /* by the way, "quarter note" is "noire" in French */
 
@@ -253,7 +254,7 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
 }
 
 static
-int HandleMessage (demux_t *p_demux, mtrk_t *tr)
+int HandleMessage (demux_t *p_demux, mtrk_t *tr, es_out_t *out)
 {
     stream_t *s = p_demux->s;
     block_t *block;
@@ -345,7 +346,10 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr)
 
 send:
     block->i_dts = block->i_pts = date_Get (&p_demux->p_sys->pts);
-    es_out_Send (p_demux->out, p_demux->p_sys->es, block);
+    if (out != NULL)
+        es_out_Send (out, p_demux->p_sys->es, block);
+    else
+        block_Release (block);
 
 skip:
     if (event < 0xF8)
@@ -389,7 +393,8 @@ static int SeekSet0 (demux_t *demux)
     return 0;
 }
 
-static int ReadEvents (demux_t *demux, uint64_t *restrict pulse)
+static int ReadEvents (demux_t *demux, uint64_t *restrict pulse,
+                       es_out_t *out)
 {
     uint64_t cur_pulse = *pulse, next_pulse = UINT64_MAX;
     demux_sys_t *sys = demux->p_sys;
@@ -400,7 +405,7 @@ static int ReadEvents (demux_t *demux, uint64_t *restrict pulse)
 
         while (track->next <= cur_pulse)
         {
-            if (HandleMessage (demux, track)
+            if (HandleMessage (demux, track, out)
              || ReadDeltaTime (demux->s, track))
             {
                 msg_Err (demux, "fatal parsing error");
@@ -447,7 +452,7 @@ static int Demux (demux_t *demux)
     /* MIDI events in chronological order across all tracks */
     uint64_t pulse = sys->pulse;
 
-    if (ReadEvents (demux, &pulse))
+    if (ReadEvents (demux, &pulse, demux->out))
         return VLC_EGENERIC;
 
     if (pulse == UINT64_MAX)
@@ -466,18 +471,24 @@ static int Control (demux_t *p_demux, int i_query, va_list args)
 
     switch (i_query)
     {
+        case DEMUX_GET_POSITION:
+            if (!sys->duration)
+                return VLC_EGENERIC;
+            *va_arg (args, double *) = (sys->tick - (double)VLC_TS_0)
+                                     / sys->duration;
+            break;
+        //case DEMUX_SET_POSITION:
+        case DEMUX_GET_LENGTH:
+            *va_arg (args, int64_t *) = sys->duration;
+            break;
         case DEMUX_GET_TIME:
             *va_arg (args, int64_t *) = sys->tick - VLC_TS_0;
-            return 0;
-#if 0
-        /* TODO: */
-        case DEMUX_SET_TIME:
-        case DEMUX_GET_POSITION:
-        case DEMUX_SET_POSITION:
-        case DEMUX_GET_LENGTH:
-#endif
+            break;
+        //case DEMUX_SET_TIME:
+        default:
+            return VLC_EGENERIC;
     }
-    return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 /**
@@ -585,6 +596,7 @@ static int Open (vlc_object_t *obj)
         goto error;
 
     demux->p_sys = sys;
+    sys->duration = 0;
     sys->ppqn = ppqn;
     sys->trackc = tracks;
 
@@ -621,6 +633,19 @@ static int Open (vlc_object_t *obj)
 
         tr->start = stream_Tell (stream);
         tr->length = GetDWBE (head + 4);
+    }
+
+    bool b;
+    if (stream_Control (stream, STREAM_CAN_FASTSEEK, &b) == 0 && b)
+    {
+        if (SeekSet0 (demux))
+            goto error;
+
+        for (uint64_t pulse = 0; pulse != UINT64_MAX;)
+             if (ReadEvents (demux, &pulse, NULL))
+                 break;
+
+        sys->duration = date_Get (&sys->pts);
     }
 
     if (SeekSet0 (demux))
