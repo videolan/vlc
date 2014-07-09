@@ -93,14 +93,15 @@ static int ReadDeltaTime (stream_t *s, mtrk_t *track)
 struct demux_sys_t
 {
     es_out_id_t *es;
-    date_t       pts;
-    uint64_t     pulse; /* Pulses counter */
+    date_t       pts; /*< Play timestamp */
+    uint64_t     pulse; /*< Pulses counter */
+    mtime_t      tick; /*< Last tick timestamp */
 
-    unsigned     ppqn;   /* Pulses Per Quarter Note */
+    unsigned     ppqn;   /*< Pulses Per Quarter Note */
     /* by the way, "quarter note" is "noire" in French */
 
-    unsigned     trackc; /* Number of tracks */
-    mtrk_t       trackv[]; /* Track states */
+    unsigned     trackc; /*< Number of tracks */
+    mtrk_t       trackv[]; /*< Track states */
 };
 
 /**
@@ -359,55 +360,53 @@ skip:
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-static int Demux (demux_t *p_demux)
+static int Demux (demux_t *demux)
 {
-    stream_t *s = p_demux->s;
-    demux_sys_t *p_sys = p_demux->p_sys;
-    uint64_t     pulse = p_sys->pulse, next_pulse = UINT64_MAX;
+    demux_sys_t *sys = demux->p_sys;
 
-    if (pulse == UINT64_MAX)
-        return 0; /* all tracks are done */
-
-    es_out_Control (p_demux->out, ES_OUT_SET_PCR, date_Get (&p_sys->pts));
-
-    for (unsigned i = 0; i < p_sys->trackc; i++)
+    /* MIDI Tick emulation (ping the decoder every 10ms) */
+    if (sys->tick <= date_Get (&sys->pts))
     {
-        mtrk_t *track = p_sys->trackv + i;
+        block_t *tick = block_Alloc (1);
+        if (unlikely(tick == NULL))
+            return VLC_ENOMEM;
 
-        while (track->next == pulse)
+        tick->p_buffer[0] = 0xF9;
+        tick->i_dts = tick->i_pts = sys->tick;
+
+        es_out_Send (demux->out, sys->es, tick);
+        es_out_Control (demux->out, ES_OUT_SET_PCR, sys->tick);
+
+        sys->tick += CLOCK_FREQ / 100;
+        return 1;
+    }
+
+    /* MIDI events in chronological order across all tracks */
+    uint64_t cur_pulse = sys->pulse, next_pulse = UINT64_MAX;
+
+    for (unsigned i = 0; i < sys->trackc; i++)
+    {
+        mtrk_t *track = sys->trackv + i;
+
+        while (track->next == cur_pulse)
         {
-            if (HandleMessage (p_demux, track)
-             || ReadDeltaTime (s, track))
+            if (HandleMessage (demux, track)
+             || ReadDeltaTime (demux->s, track))
             {
-                msg_Err (p_demux, "fatal parsing error");
+                msg_Err (demux, "fatal parsing error");
                 return VLC_EGENERIC;
             }
         }
 
-        if (track->next < next_pulse)
+        if (next_pulse > track->next)
             next_pulse = track->next;
     }
 
-    mtime_t cur_tick = (date_Get (&p_sys->pts) + 9999) / 10000, last_tick;
-    if (next_pulse != UINT64_MAX)
-        last_tick = date_Increment (&p_sys->pts, next_pulse - pulse) / 10000;
-    else
-        last_tick = cur_tick + 1;
+    if (next_pulse == UINT64_MAX)
+        return 0; /* all tracks are done */
 
-    /* MIDI Tick emulation (ping the decoder every 10ms) */
-    while (cur_tick < last_tick)
-    {
-        block_t *tick = block_Alloc (1);
-        if (tick == NULL)
-            break;
-
-        tick->p_buffer[0] = 0xF9;
-        tick->i_dts = tick->i_pts = VLC_TS_0 + cur_tick++ * 10000;
-        es_out_Send (p_demux->out, p_sys->es, tick);
-    }
-
-    p_sys->pulse = next_pulse;
-
+    date_Increment (&sys->pts, next_pulse - cur_pulse);
+    sys->pulse = next_pulse;
     return 1;
 }
 
@@ -416,15 +415,13 @@ static int Demux (demux_t *p_demux)
  *****************************************************************************/
 static int Control (demux_t *p_demux, int i_query, va_list args)
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
+    demux_sys_t *sys = p_demux->p_sys;
 
     switch (i_query)
     {
         case DEMUX_GET_TIME:
-        {
-            *(va_arg (args, int64_t *)) = date_Get (&p_sys->pts);
+            *va_arg (args, int64_t *) = sys->tick - VLC_TS_0;
             return 0;
-        }
 #if 0
         /* TODO: */
         case DEMUX_SET_TIME:
@@ -544,6 +541,7 @@ static int Open (vlc_object_t *obj)
     date_Init (&sys->pts, ppqn * 2, 1);
     date_Set (&sys->pts, VLC_TS_0);
     sys->pulse = 0;
+    sys->tick = VLC_TS_0;
     sys->ppqn = ppqn;
 
     sys->trackc       = tracks;
