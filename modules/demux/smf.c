@@ -58,10 +58,11 @@ static int32_t ReadVarInt (stream_t *s)
 
 typedef struct smf_track_t
 {
-    int64_t  offset; /* Read offset in the file (stream_Tell) */
-    int64_t  end;    /* End offset in the file */
-    uint64_t next;   /* Time of next message (in term of pulses) */
-    uint8_t  running_event; /* Running (previous) event */
+    uint64_t next;   /*< Time of next message (in term of pulses) */
+    int64_t  start;  /*< Start offset in the file */
+    uint32_t length; /*< Bytes length */
+    uint32_t offset; /*< Read offset relative to the start offset */
+    uint8_t  running_event; /*< Running (previous) event */
 } mtrk_t;
 
 /**
@@ -72,9 +73,9 @@ static int ReadDeltaTime (stream_t *s, mtrk_t *track)
 {
     int32_t delta_time;
 
-    assert (stream_Tell (s) == track->offset);
+    assert (stream_Tell (s) == track->start + track->offset);
 
-    if (track->offset >= track->end)
+    if (track->offset >= track->length)
     {
         /* This track is done */
         track->next = UINT64_MAX;
@@ -86,7 +87,7 @@ static int ReadDeltaTime (stream_t *s, mtrk_t *track)
         return -1;
 
     track->next += delta_time;
-    track->offset = stream_Tell (s);
+    track->offset = stream_Tell (s) - track->start;
     return 0;
 }
 
@@ -183,7 +184,7 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
             break;
 
         case 0x2F: /* End of track */
-            if (tr->end != stream_Tell (s))
+            if (tr->start + tr->length != stream_Tell (s))
             {
                 msg_Err (p_demux, "misplaced end of track");
                 ret = -1;
@@ -259,7 +260,7 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr)
     uint8_t first, event;
     unsigned datalen;
 
-    if (stream_Seek (s, tr->offset)
+    if (stream_Seek (s, tr->start + tr->offset)
      || (stream_Read (s, &first, 1) != 1))
         return -1;
 
@@ -351,7 +352,7 @@ skip:
         /* If event is not real-time, update running status */
         tr->running_event = event;
 
-    tr->offset = stream_Tell (s);
+    tr->offset = stream_Tell (s) - tr->start;
     return 0;
 }
 
@@ -548,18 +549,16 @@ static int Open (vlc_object_t *obj)
     /* Prefetch track offsets */
     for (unsigned i = 0; i < tracks; i++)
     {
+        mtrk_t *tr = sys->trackv + i;
         uint8_t head[8];
 
-        if (i > 0)
+        /* Seeking screws streaming up, but there is no way around this, as
+         * SMF1 tracks are performed simultaneously.
+         * Not a big deal as SMF1 are usually only a few kbytes anyway. */
+        if (i > 0 && stream_Seek (stream, tr[-1].start + tr[-1].length))
         {
-            /* Seeking screws streaming up, but there is no way around this,
-             * as SMF1 tracks are performed simultaneously.
-             * Not a big deal as SMF1 are usually only a few kbytes anyway. */
-            if (stream_Seek (stream, sys->trackv[i - 1].end))
-            {
-                msg_Err (demux, "cannot build SMF index (corrupted file?)");
-                goto error;
-            }
+            msg_Err (demux, "cannot build SMF index (corrupted file?)");
+            goto error;
         }
 
         for (;;)
@@ -578,14 +577,20 @@ static int Open (vlc_object_t *obj)
             stream_Read (stream, NULL, GetDWBE (head + 4));
         }
 
-        sys->trackv[i].offset = stream_Tell (stream);
-        sys->trackv[i].end = sys->trackv[i].offset + GetDWBE (head + 4);
-        sys->trackv[i].next = 0;
-        ReadDeltaTime (stream, sys->trackv + i);
-        sys->trackv[i].running_event = 0xF6;
+        tr->start = stream_Tell (stream);
+        tr->length = GetDWBE (head + 4);
+        tr->offset = 0;
+        tr->next = 0;
         /* Why 0xF6 (Tuning Calibration)?
          * Because it has zero bytes of data, so the parser will detect the
          * error if the first event uses running status. */
+        tr->running_event = 0xF6;
+
+        if (ReadDeltaTime (stream, tr) < 0)
+        {
+            msg_Err (demux, "fatal parsing error");
+            goto error;
+        }
     }
 
     es_format_t  fmt;
