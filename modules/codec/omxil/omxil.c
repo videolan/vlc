@@ -1391,6 +1391,10 @@ more_input:
             *pp_block = NULL; /* Avoid being fed the same packet again */
     }
 
+    /* If we don't have a p_pic from the first try. Try again */
+    if( !p_pic && DecodeVideoOutput( p_dec, &p_sys->out, &p_pic ) != 0 )
+        goto error;
+
 reconfig:
     /* Handle the PortSettingsChanged events */
     for(i = 0; i < p_sys->ports; i++)
