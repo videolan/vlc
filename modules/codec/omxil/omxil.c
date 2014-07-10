@@ -1268,6 +1268,84 @@ error:
     return -1;
 }
 
+static int DecodeVideoInput( decoder_t *p_dec, OmxPort *p_port, block_t **pp_block,
+                             unsigned int i_input_used, bool *p_reconfig )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    OMX_BUFFERHEADERTYPE *p_header;
+    struct H264ConvertState convert_state = { 0, 0 };
+    block_t *p_block = *pp_block;
+
+    /* Send the input buffer to the component */
+    OMX_FIFO_GET_TIMEOUT(&p_port->fifo, p_header, 200000);
+
+    if (p_header && p_header->nFlags & SENTINEL_FLAG) {
+        free(p_header);
+        *p_reconfig = true;
+        return 0;
+    }
+    *p_reconfig = false;
+
+    if(p_header)
+    {
+        bool decode_more = false;
+        p_header->nFilledLen = p_block->i_buffer - i_input_used;
+        p_header->nOffset = 0;
+        p_header->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
+        if (p_sys->b_use_pts && p_block->i_pts)
+            p_header->nTimeStamp = ToOmxTicks(p_block->i_pts);
+        else
+            p_header->nTimeStamp = ToOmxTicks(p_block->i_dts);
+
+        /* In direct mode we pass the input pointer as is.
+         * Otherwise we memcopy the data */
+        if(p_port->b_direct)
+        {
+            p_header->pOutputPortPrivate = p_header->pBuffer;
+            p_header->pBuffer = p_block->p_buffer;
+            p_header->pAppPrivate = p_block;
+            i_input_used = p_header->nFilledLen;
+        }
+        else
+        {
+            if(p_header->nFilledLen > p_header->nAllocLen)
+            {
+                p_header->nFilledLen = p_header->nAllocLen;
+            }
+            memcpy(p_header->pBuffer, p_block->p_buffer + i_input_used, p_header->nFilledLen);
+            i_input_used += p_header->nFilledLen;
+            if (i_input_used == p_block->i_buffer)
+            {
+                block_Release(p_block);
+            }
+            else
+            {
+                decode_more = true;
+                p_header->nFlags &= ~OMX_BUFFERFLAG_ENDOFFRAME;
+            }
+        }
+
+        /* Convert H.264 NAL format to annex b. Doesn't do anything if
+         * i_nal_size_length == 0, which is the case for codecs other
+         * than H.264 */
+        convert_h264_to_annexb( p_header->pBuffer, p_header->nFilledLen,
+                                p_sys->i_nal_size_length, &convert_state );
+#ifdef OMXIL_EXTRA_DEBUG
+        msg_Dbg( p_dec, "EmptyThisBuffer %p, %p, %i, %"PRId64, p_header, p_header->pBuffer,
+                 (int)p_header->nFilledLen, FromOmxTicks(p_header->nTimeStamp) );
+#endif
+        OMX_EmptyThisBuffer(p_port->omx_handle, p_header);
+        p_port->b_flushed = false;
+        if (decode_more)
+            return DecodeVideoInput( p_dec, p_port, pp_block, i_input_used,
+                                     p_reconfig );
+        else
+            *pp_block = NULL; /* Avoid being fed the same packet again */
+    }
+
+    return 0;
+}
+
 /*****************************************************************************
  * DecodeVideo: Called to decode one frame
  *****************************************************************************/
@@ -1277,11 +1355,8 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     picture_t *p_pic = NULL;
     OMX_ERRORTYPE omx_error;
     unsigned int i;
-
-    OMX_BUFFERHEADERTYPE *p_header;
+    bool b_reconfig;
     block_t *p_block;
-    unsigned int i_input_used = 0;
-    struct H264ConvertState convert_state = { 0, 0 };
 
     if( !pp_block || !*pp_block )
         return NULL;
@@ -1326,76 +1401,14 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     if( DecodeVideoOutput( p_dec, &p_sys->out, &p_pic ) != 0 )
         goto error;
 
-more_input:
-    /* Send the input buffer to the component */
-    OMX_FIFO_GET_TIMEOUT(&p_sys->in.fifo, p_header, 200000);
-
-    if (p_header && p_header->nFlags & SENTINEL_FLAG) {
-        free(p_header);
-        goto reconfig;
-    }
-
-    if(p_header)
-    {
-        bool decode_more = false;
-        p_header->nFilledLen = p_block->i_buffer - i_input_used;
-        p_header->nOffset = 0;
-        p_header->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
-        if (p_sys->b_use_pts && p_block->i_pts)
-            p_header->nTimeStamp = ToOmxTicks(p_block->i_pts);
-        else
-            p_header->nTimeStamp = ToOmxTicks(p_block->i_dts);
-
-        /* In direct mode we pass the input pointer as is.
-         * Otherwise we memcopy the data */
-        if(p_sys->in.b_direct)
-        {
-            p_header->pOutputPortPrivate = p_header->pBuffer;
-            p_header->pBuffer = p_block->p_buffer;
-            p_header->pAppPrivate = p_block;
-            i_input_used = p_header->nFilledLen;
-        }
-        else
-        {
-            if(p_header->nFilledLen > p_header->nAllocLen)
-            {
-                p_header->nFilledLen = p_header->nAllocLen;
-            }
-            memcpy(p_header->pBuffer, p_block->p_buffer + i_input_used, p_header->nFilledLen);
-            i_input_used += p_header->nFilledLen;
-            if (i_input_used == p_block->i_buffer)
-            {
-                block_Release(p_block);
-            }
-            else
-            {
-                decode_more = true;
-                p_header->nFlags &= ~OMX_BUFFERFLAG_ENDOFFRAME;
-            }
-        }
-
-        /* Convert H.264 NAL format to annex b. Doesn't do anything if
-         * i_nal_size_length == 0, which is the case for codecs other
-         * than H.264 */
-        convert_h264_to_annexb( p_header->pBuffer, p_header->nFilledLen,
-                                p_sys->i_nal_size_length, &convert_state );
-#ifdef OMXIL_EXTRA_DEBUG
-        msg_Dbg( p_dec, "EmptyThisBuffer %p, %p, %i, %"PRId64, p_header, p_header->pBuffer,
-                 (int)p_header->nFilledLen, FromOmxTicks(p_header->nTimeStamp) );
-#endif
-        OMX_EmptyThisBuffer(p_sys->omx_handle, p_header);
-        p_sys->in.b_flushed = false;
-        if (decode_more)
-            goto more_input;
-        else
-            *pp_block = NULL; /* Avoid being fed the same packet again */
-    }
-
-    /* If we don't have a p_pic from the first try. Try again */
-    if( !p_pic && DecodeVideoOutput( p_dec, &p_sys->out, &p_pic ) != 0 )
+    if( DecodeVideoInput( p_dec, &p_sys->in, pp_block, 0, &b_reconfig ) != 0 )
         goto error;
 
-reconfig:
+    /* If we don't have a p_pic from the first try. Try again */
+    if( !b_reconfig && !p_pic &&
+        DecodeVideoOutput( p_dec, &p_sys->out, &p_pic ) != 0 )
+        goto error;
+
     /* Handle the PortSettingsChanged events */
     for(i = 0; i < p_sys->ports; i++)
     {
