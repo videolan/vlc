@@ -86,6 +86,7 @@ Demuxer:
  * Support SVG images files (on glib platforms)
  * Keep selection of tracks on segment changes in MKV
  * Support detection of SRT languages based on filename
+ * Support for seeking Standard MIDI Files
 
 Muxers:
  * Important rework of the Ogg muxer, notably for skeleton
