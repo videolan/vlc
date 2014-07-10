@@ -356,6 +356,68 @@ skip:
     return 0;
 }
 
+static int SeekSet0 (demux_t *demux)
+{
+    stream_t *stream = demux->s;
+    demux_sys_t *sys = demux->p_sys;
+
+    /* Default SMF tempo is 120BPM, i.e. half a second per quarter note */
+    date_Init (&sys->pts, sys->ppqn * 2, 1);
+    date_Set (&sys->pts, VLC_TS_0);
+    sys->pulse = 0;
+    sys->tick = VLC_TS_0;
+
+    for (unsigned i = 0; i < sys->trackc; i++)
+    {
+        mtrk_t *tr = sys->trackv + i;
+
+        tr->offset = 0;
+        tr->next = 0;
+        /* Why 0xF6 (Tuning Calibration)?
+         * Because it has zero bytes of data, so the parser will detect the
+         * error if the first event uses running status. */
+        tr->running_event = 0xF6;
+
+        if (stream_Seek (stream, tr->start)
+         || ReadDeltaTime (stream, tr))
+        {
+            msg_Err (demux, "fatal parsing error");
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+static int ReadEvents (demux_t *demux, uint64_t *restrict pulse)
+{
+    uint64_t cur_pulse = *pulse, next_pulse = UINT64_MAX;
+    demux_sys_t *sys = demux->p_sys;
+
+    for (unsigned i = 0; i < sys->trackc; i++)
+    {
+        mtrk_t *track = sys->trackv + i;
+
+        while (track->next <= cur_pulse)
+        {
+            if (HandleMessage (demux, track)
+             || ReadDeltaTime (demux->s, track))
+            {
+                msg_Err (demux, "fatal parsing error");
+                return -1;
+            }
+        }
+
+        if (next_pulse > track->next)
+            next_pulse = track->next;
+    }
+
+    if (next_pulse != UINT64_MAX)
+        date_Increment (&sys->pts, next_pulse - cur_pulse);
+    *pulse = next_pulse;
+    return 0;
+}
+
 /*****************************************************************************
  * Demux: read chunks and send them to the synthesizer
  *****************************************************************************
@@ -383,31 +445,15 @@ static int Demux (demux_t *demux)
     }
 
     /* MIDI events in chronological order across all tracks */
-    uint64_t cur_pulse = sys->pulse, next_pulse = UINT64_MAX;
+    uint64_t pulse = sys->pulse;
 
-    for (unsigned i = 0; i < sys->trackc; i++)
-    {
-        mtrk_t *track = sys->trackv + i;
+    if (ReadEvents (demux, &pulse))
+        return VLC_EGENERIC;
 
-        while (track->next == cur_pulse)
-        {
-            if (HandleMessage (demux, track)
-             || ReadDeltaTime (demux->s, track))
-            {
-                msg_Err (demux, "fatal parsing error");
-                return VLC_EGENERIC;
-            }
-        }
-
-        if (next_pulse > track->next)
-            next_pulse = track->next;
-    }
-
-    if (next_pulse == UINT64_MAX)
+    if (pulse == UINT64_MAX)
         return 0; /* all tracks are done */
 
-    date_Increment (&sys->pts, next_pulse - cur_pulse);
-    sys->pulse = next_pulse;
+    sys->pulse = pulse;
     return 1;
 }
 
@@ -538,14 +584,10 @@ static int Open (vlc_object_t *obj)
     if (stream_Read (stream, NULL, 14) < 14)
         goto error;
 
-    /* Default SMF tempo is 120BPM, i.e. half a second per quarter note */
-    date_Init (&sys->pts, ppqn * 2, 1);
-    date_Set (&sys->pts, VLC_TS_0);
-    sys->pulse = 0;
-    sys->tick = VLC_TS_0;
+    demux->p_sys = sys;
     sys->ppqn = ppqn;
+    sys->trackc = tracks;
 
-    sys->trackc       = tracks;
     /* Prefetch track offsets */
     for (unsigned i = 0; i < tracks; i++)
     {
@@ -579,19 +621,10 @@ static int Open (vlc_object_t *obj)
 
         tr->start = stream_Tell (stream);
         tr->length = GetDWBE (head + 4);
-        tr->offset = 0;
-        tr->next = 0;
-        /* Why 0xF6 (Tuning Calibration)?
-         * Because it has zero bytes of data, so the parser will detect the
-         * error if the first event uses running status. */
-        tr->running_event = 0xF6;
-
-        if (ReadDeltaTime (stream, tr) < 0)
-        {
-            msg_Err (demux, "fatal parsing error");
-            goto error;
-        }
     }
+
+    if (SeekSet0 (demux))
+        goto error;
 
     es_format_t  fmt;
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MIDI);
@@ -601,7 +634,6 @@ static int Open (vlc_object_t *obj)
 
     demux->pf_demux = Demux;
     demux->pf_control = Control;
-    demux->p_sys = sys;
     return VLC_SUCCESS;
 
 error:
