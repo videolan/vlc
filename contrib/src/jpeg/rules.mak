@@ -1,8 +1,8 @@
 # jpeg
 
 JPEG_VERSION := 9a
-JPEG_URL := http://www.ijg.org/files/jpegsrc.v$(JPEG_VERSION).tar.gz
-#JPEG_URL := http://download.videolan.org/pub/contrib/jpegsrc.v$(JPEG_VERSION).tar.gz
+#JPEG_URL := http://www.ijg.org/files/jpegsrc.v$(JPEG_VERSION).tar.gz
+JPEG_URL := http://download.videolan.org/pub/contrib/jpegsrc.v$(JPEG_VERSION).tar.gz
 
 $(TARBALLS)/jpegsrc.v$(JPEG_VERSION).tar.gz:
 	$(call download,$(JPEG_URL))
