@@ -423,6 +423,8 @@ static int ReadEvents (demux_t *demux, uint64_t *restrict pulse,
     return 0;
 }
 
+#define TICK (CLOCK_FREQ / 100)
+
 /*****************************************************************************
  * Demux: read chunks and send them to the synthesizer
  *****************************************************************************
@@ -445,7 +447,7 @@ static int Demux (demux_t *demux)
         es_out_Send (demux->out, sys->es, tick);
         es_out_Control (demux->out, ES_OUT_SET_PCR, sys->tick);
 
-        sys->tick += CLOCK_FREQ / 100;
+        sys->tick += TICK;
         return 1;
     }
 
@@ -462,12 +464,36 @@ static int Demux (demux_t *demux)
     return 1;
 }
 
+static int Seek (demux_t *demux, mtime_t pts)
+{
+    demux_sys_t *sys = demux->p_sys;
+
+    /* Rewind if needed */
+    if (pts < date_Get (&sys->pts) && SeekSet0 (demux))
+        return VLC_EGENERIC;
+
+    /* Fast forward */
+    uint64_t pulse = sys->pulse;
+
+    while (pts > date_Get (&sys->pts))
+    {
+        if (pulse == UINT64_MAX)
+            return VLC_SUCCESS; /* premature end */
+        if (ReadEvents (demux, &pulse, NULL))
+            return VLC_EGENERIC;
+    }
+
+    sys->pulse = pulse;
+    sys->tick = ((date_Get (&sys->pts) - VLC_TS_0) / TICK) * TICK + VLC_TS_0;
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int Control (demux_t *p_demux, int i_query, va_list args)
+static int Control (demux_t *demux, int i_query, va_list args)
 {
-    demux_sys_t *sys = p_demux->p_sys;
+    demux_sys_t *sys = demux->p_sys;
 
     switch (i_query)
     {
@@ -477,14 +503,16 @@ static int Control (demux_t *p_demux, int i_query, va_list args)
             *va_arg (args, double *) = (sys->tick - (double)VLC_TS_0)
                                      / sys->duration;
             break;
-        //case DEMUX_SET_POSITION:
+        case DEMUX_SET_POSITION:
+            return Seek (demux, va_arg (args, double) * sys->duration);
         case DEMUX_GET_LENGTH:
             *va_arg (args, int64_t *) = sys->duration;
             break;
         case DEMUX_GET_TIME:
             *va_arg (args, int64_t *) = sys->tick - VLC_TS_0;
             break;
-        //case DEMUX_SET_TIME:
+        case DEMUX_SET_TIME:
+            return Seek (demux, va_arg (args, int64_t));
         default:
             return VLC_EGENERIC;
     }
