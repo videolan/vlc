@@ -25,6 +25,7 @@
 #define VOUT_WINDOW_HPP
 
 #include "generic_window.hpp"
+#include "dialogs.hpp"
 #include <vlc_vout_window.h>
 
 class OSGraphics;

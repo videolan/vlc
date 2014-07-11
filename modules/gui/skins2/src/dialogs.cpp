@@ -344,3 +344,12 @@ void Dialogs::showInteraction( interaction_dialog_t *p_dialog )
                                      0, p_arg );
     }
 }
+
+void Dialogs::sendKey( int key )
+{
+    if( m_pProvider && m_pProvider->pf_show_dialog )
+    {
+        m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_SENDKEY,
+                                     key, NULL );
+    }
+}
