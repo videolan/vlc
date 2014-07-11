@@ -104,6 +104,12 @@ private:
     static DialogsProvider *instance;
 
     intf_thread_t *p_intf;
+
+    QMenu* popupMenu;
+    QMenu* videoPopupMenu;
+    QMenu* audioPopupMenu;
+    QMenu* miscPopupMenu;
+
     QWidget* root;
     bool b_isDying;
 
@@ -120,6 +126,7 @@ public slots:
     void extendedDialog();
     void synchroDialog();
     void messagesDialog();
+    void sendKey( int key );
 #ifdef ENABLE_VLM
     void vlmDialog();
 #endif

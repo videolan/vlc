@@ -34,6 +34,7 @@
 #include "menus.hpp"
 #include "recents.hpp"
 #include "util/qt_dirs.hpp"
+#include "util/customwidgets.hpp" /* VLCKeyToString() */
 #include "main_interface.hpp"
 
 /* The dialogs */
@@ -68,7 +69,11 @@
 DialogsProvider* DialogsProvider::instance = NULL;
 
 DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
-                                  QObject( NULL ), p_intf( _p_intf )
+                                  QObject( NULL ), p_intf( _p_intf ),
+                                  popupMenu( NULL ),
+                                  videoPopupMenu( NULL ),
+                                  audioPopupMenu( NULL ),
+                                  miscPopupMenu( NULL )
 {
     b_isDying = false;
 
@@ -103,10 +108,10 @@ DialogsProvider::~DialogsProvider()
     delete menusUpdateMapper;
     delete SDMapper;
 
-    VLCMenuBar::PopupMenu( p_intf, false );
-    VLCMenuBar::AudioPopupMenu( p_intf, false );
-    VLCMenuBar::VideoPopupMenu( p_intf, false );
-    VLCMenuBar::MiscPopupMenu( p_intf, false );
+    delete popupMenu;
+    delete videoPopupMenu;
+    delete audioPopupMenu;
+    delete miscPopupMenu;
 }
 
 void DialogsProvider::quit()
@@ -148,18 +153,44 @@ void DialogsProvider::customEvent( QEvent *event )
            bookmarksDialog(); break;
         case INTF_DIALOG_EXTENDED:
            extendedDialog(); break;
+        case INTF_DIALOG_SENDKEY:
+           sendKey( de->i_arg ); break;
 #ifdef ENABLE_VLM
         case INTF_DIALOG_VLM:
            vlmDialog(); break;
 #endif
         case INTF_DIALOG_POPUPMENU:
-           VLCMenuBar::PopupMenu( p_intf, (de->i_arg != 0) ); break;
+        {
+           delete popupMenu; popupMenu = NULL;
+           bool show = (de->i_arg != 0);
+           if( show )
+               popupMenu = VLCMenuBar::PopupMenu( p_intf, show );
+           break;
+        }
         case INTF_DIALOG_AUDIOPOPUPMENU:
-           VLCMenuBar::AudioPopupMenu( p_intf, (de->i_arg != 0) ); break;
+        {
+           delete audioPopupMenu; audioPopupMenu = NULL;
+           bool show = (de->i_arg != 0);
+           if( show )
+               audioPopupMenu = VLCMenuBar::AudioPopupMenu( p_intf, show );
+           break;
+        }
         case INTF_DIALOG_VIDEOPOPUPMENU:
-           VLCMenuBar::VideoPopupMenu( p_intf, (de->i_arg != 0) ); break;
+        {
+           delete videoPopupMenu; videoPopupMenu = NULL;
+           bool show = (de->i_arg != 0);
+           if( show )
+               videoPopupMenu = VLCMenuBar::VideoPopupMenu( p_intf, show );
+           break;
+        }
         case INTF_DIALOG_MISCPOPUPMENU:
-           VLCMenuBar::MiscPopupMenu( p_intf, (de->i_arg != 0) ); break;
+        {
+           delete miscPopupMenu; miscPopupMenu = NULL;
+           bool show = (de->i_arg != 0);
+           if( show )
+               miscPopupMenu = VLCMenuBar::MiscPopupMenu( p_intf, show );
+           break;
+        }
         case INTF_DIALOG_WIZARD:
         case INTF_DIALOG_STREAMWIZARD:
             openAndStreamingDialogs(); break;
@@ -760,3 +791,32 @@ void DialogsProvider::SDMenuAction( const QString& data )
         playlist_ServicesDiscoveryRemove( THEPL, qtu( data ) );
 }
 
+void DialogsProvider::sendKey( int key )
+{
+     // translate from a vlc keycode into a Qt sequence
+     QKeySequence kseq0( VLCKeyToString( key, true ) );
+
+     if( popupMenu == NULL )
+     {
+         // make sure at least a non visible popupmenu is available
+         popupMenu = VLCMenuBar::PopupMenu( p_intf, false );
+         if( unlikely( popupMenu == NULL ) )
+             return;
+     }
+
+     // test against key accelerators from the popupmenu
+     QList<QAction*> actions = popupMenu->findChildren<QAction*>();
+     for( int i = 0; i < actions.size(); i++ )
+     {
+         QAction* action = actions.at(i);
+         QKeySequence kseq = action->shortcut();
+         if( kseq == kseq0 )
+         {
+             action->trigger();
+             return;
+         }
+     }
+
+     // forward key to vlc core when not a key accelerator
+     var_SetInteger( p_intf->p_libvlc, "key-pressed", key );
+}

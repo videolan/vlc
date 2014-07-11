@@ -396,7 +396,7 @@ QMenu *VLCMenuBar::FileMenu( intf_thread_t *p_intf, QWidget *parent, MainInterfa
     action->setCheckable( true );
     action->setChecked( THEMIM->getPlayExitState() );
 
-    if( mi->getSysTray() )
+    if( mi && mi->getSysTray() )
     {
         action = menu->addAction( qtr( "Close to systray"), mi,
                                  SLOT( toggleUpdateSystrayMenu() ) );
@@ -786,10 +786,7 @@ QMenu *VLCMenuBar::HelpMenu( QWidget *parent )
  * Popup menus - Right Click menus                                           *
  *****************************************************************************/
 #define POPUP_BOILERPLATE \
-    static QMenu* menu = NULL;  \
-    delete menu; menu = NULL; \
-    if( !show ) \
-        return; \
+    QMenu* menu;  \
     QVector<vlc_object_t *> objects; \
     QVector<const char *> varnames; \
     input_thread_t *p_input = THEMIM->getInput();
@@ -797,7 +794,8 @@ QMenu *VLCMenuBar::HelpMenu( QWidget *parent )
 #define CREATE_POPUP \
     menu = new QMenu(); \
     Populate( p_intf, menu, varnames, objects ); \
-    menu->popup( QCursor::pos() ); \
+    if( show ) \
+        menu->popup( QCursor::pos() ); \
 
 void VLCMenuBar::PopupMenuPlaylistEntries( QMenu *menu,
                                         intf_thread_t *p_intf,
@@ -944,25 +942,27 @@ void VLCMenuBar::PopupMenuStaticEntries( QMenu *menu )
 }
 
 /* Video Tracks and Subtitles tracks */
-void VLCMenuBar::VideoPopupMenu( intf_thread_t *p_intf, bool show )
+QMenu* VLCMenuBar::VideoPopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
     if( p_input )
         VideoAutoMenuBuilder( THEPL, p_input, objects, varnames );
     CREATE_POPUP
+    return menu;
 }
 
 /* Audio Tracks */
-void VLCMenuBar::AudioPopupMenu( intf_thread_t *p_intf, bool show )
+QMenu* VLCMenuBar::AudioPopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
     if( p_input )
         AudioAutoMenuBuilder( p_input, objects, varnames );
     CREATE_POPUP
+    return menu;
 }
 
 /* Navigation stuff, and general menus ( open ), used only for skins */
-void VLCMenuBar::MiscPopupMenu( intf_thread_t *p_intf, bool show )
+QMenu* VLCMenuBar::MiscPopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
 
@@ -984,11 +984,13 @@ void VLCMenuBar::MiscPopupMenu( intf_thread_t *p_intf, bool show )
     menu->addSeparator();
     PopupMenuStaticEntries( menu );
 
-    menu->popup( QCursor::pos() );
+    if( show )
+        menu->popup( QCursor::pos() );
+    return menu;
 }
 
 /* Main Menu that sticks everything together  */
-void VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
+QMenu* VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
 
@@ -1113,7 +1115,9 @@ void VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
     /* Static entries for ending, like open */
     PopupMenuStaticEntries( menu );
 
-    menu->popup( QCursor::pos() );
+    if( show )
+        menu->popup( QCursor::pos() );
+    return menu;
 }
 
 #undef CREATE_POPUP
