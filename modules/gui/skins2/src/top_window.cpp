@@ -207,26 +207,6 @@ void TopWindow::processEvent( EvtKey &rEvtKey )
     // Only do the action when the key is down
     if( rEvtKey.getKeyState() == EvtKey::kDown )
     {
-        //XXX not to be hardcoded!
-        // Ctrl-S = Change skin
-        if( (rEvtKey.getMod() & EvtInput::kModCtrl) &&
-            rEvtKey.getKey() == 's' )
-        {
-            CmdDlgChangeSkin cmd( getIntf() );
-            cmd.execute();
-            return;
-        }
-
-        //XXX not to be hardcoded!
-        // Ctrl-T = Toggle on top
-        if( (rEvtKey.getMod() & EvtInput::kModCtrl) &&
-            rEvtKey.getKey() == 't' )
-        {
-            CmdOnTop cmd( getIntf() );
-            cmd.execute();
-            return;
-        }
-
         getIntf()->p_sys->p_dialogs->sendKey( rEvtKey.getModKey() );
     }
 
