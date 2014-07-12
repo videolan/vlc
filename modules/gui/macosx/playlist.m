@@ -1493,8 +1493,15 @@
         }
 
         char *psz_url = decode_URI(input_item_GetURI(p_item));
+        if (!psz_url)
+            return;
+
         NSString *url = [NSString stringWithUTF8String:psz_url ? psz_url : ""];
         free(psz_url);
+
+        /* check for file existance before resuming */
+        if (![[NSFileManager defaultManager] fileExistsAtPath:[[NSURL URLWithString:[NSString stringWithUTF8String:input_item_GetURI(p_item)]] path]])
+            return;
 
         NSNumber *lastPosition = [recentlyPlayedFiles objectForKey:url];
         if (lastPosition && lastPosition.intValue > 0) {
