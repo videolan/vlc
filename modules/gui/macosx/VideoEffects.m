@@ -796,8 +796,9 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (IBAction)enableAdjustBrightnessThreshold:(id)sender
 {
+    VLCCoreInteraction *vci_si = [VLCCoreInteraction sharedInstance];
+
     if (sender == o_adjust_reset_btn) {
-        VLCCoreInteraction *vci_si = [VLCCoreInteraction sharedInstance];
         [o_adjust_brightness_sld setFloatValue: 1.0];
         [o_adjust_contrast_sld setFloatValue: 1.0];
         [o_adjust_gamma_sld setFloatValue: 1.0];
@@ -814,7 +815,8 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         [vci_si setVideoFilterProperty: "hue" forFilter: "adjust" integer: 0.0];
         [vci_si setVideoFilterProperty: "saturation" forFilter: "adjust" float: 1.0];
     } else
-        config_PutInt(p_intf, "brightness-threshold", [o_adjust_brightness_ckb state]);
+        [vci_si setVideoFilterProperty: "brightness-threshold" forFilter: "adjust" boolean: [o_adjust_brightness_ckb state]];
+
 }
 
 - (IBAction)enableSharpen:(id)sender
