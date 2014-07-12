@@ -1066,38 +1066,36 @@ QMenu* VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
         /*QMenu *tools =*/ ToolsMenu( p_intf, submenu );
         submenu->addSeparator();
 
-        /* In skins interface, append some items */
-        if( !mi )
-        {
-            submenu->setTitle( qtr( "Interface" ) );
-            if( p_intf->p_sys->b_isDialogProvider )
-            {
-                /* list of skins available */
-                vlc_object_t* p_object = p_intf->p_parent;
-
-                objects.clear(); varnames.clear();
-                objects.append( p_object );
-                varnames.append( "intf-skins" );
-                Populate( p_intf, submenu, varnames, objects );
-
-                objects.clear(); varnames.clear();
-                objects.append( p_object );
-                varnames.append( "intf-skins-interactive" );
-                Populate( p_intf, submenu, varnames, objects );
-
-                submenu->addSeparator();
-
-                /* Extensions */
-                ExtensionsMenu( p_intf, submenu );
-
-            }
-            else
-                msg_Warn( p_intf, "could not find parent interface" );
-        }
-        else
+        if( mi )
         {
             QMenu *bar = menu; // Needed for next macro
             BAR_DADD( ViewMenu( p_intf, NULL, mi ), qtr( "V&iew" ), 4 );
+        }
+
+        /* In skins interface, append some items */
+        if( p_intf->p_sys->b_isDialogProvider )
+        {
+            vlc_object_t* p_object = p_intf->p_parent;
+            submenu->setTitle( qtr( "Interface" ) );
+
+            /* Open skin dialog box */
+            objects.clear(); varnames.clear();
+            objects.append( p_object );
+            varnames.append( "intf-skins-interactive" );
+            Populate( p_intf, submenu, varnames, objects );
+            QAction* action = submenu->actions().back();
+            action->setShortcut( QKeySequence( "Ctrl+Shift+S" ));
+
+            /* list of skins available */
+            objects.clear(); varnames.clear();
+            objects.append( p_object );
+            varnames.append( "intf-skins" );
+            Populate( p_intf, submenu, varnames, objects );
+
+            submenu->addSeparator();
+
+            /* list of extensions */
+            ExtensionsMenu( p_intf, submenu );
         }
 
         menu->addMenu( submenu );
@@ -1113,7 +1111,23 @@ QMenu* VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
     menu->addMenu( plMenu );
 
     /* Static entries for ending, like open */
-    PopupMenuStaticEntries( menu );
+    if( p_intf->p_sys->b_isDialogProvider )
+    {
+        QMenu *openmenu = FileMenu( p_intf, menu );
+        openmenu->setTitle( qtr( "Open Media" ) );
+        menu->addMenu( openmenu );
+
+        menu->addSeparator();
+
+        QMenu *helpmenu = HelpMenu( menu );
+        helpmenu->setTitle( qtr( "Help" ) );
+        menu->addMenu( helpmenu );
+
+        addDPStaticEntry( menu, qtr( "Quit" ), ":/menu/exit",
+                          SLOT( quit() ), "Ctrl+Q", QAction::QuitRole );
+    }
+    else
+        PopupMenuStaticEntries( menu );
 
     if( show )
         menu->popup( QCursor::pos() );
