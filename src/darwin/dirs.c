@@ -1,11 +1,12 @@
 /*****************************************************************************
  * darwin_dirs.c: Mac OS X directories configuration
  *****************************************************************************
- * Copyright (C) 2001-2009 VLC authors and VideoLAN
- * Copyright © 2007-2012 Rémi Denis-Courmont
+ * Copyright (C) 2001-2014 VLC authors and VideoLAN
+ * Copyright (C) 2007-2012 Rémi Denis-Courmont
  *
- * Authors: Gildas Bazin <gbazin@videolan.org>
+ * Authors: Rémi Denis-Courmont
  *          Felix Paul Kühne <fkuehne at videolan dot org>
+ *          Pierre d'Herbemont <pdherbemont # videolan org>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -83,7 +84,6 @@ char *config_GetLibDir (void)
         char *path = NULL;
         asprintf(&path, "%s/"PACKAGE, incompletepath);
         free(incompletepath);
-        printf("final path %s\n", path);
         return path;
     }
 
