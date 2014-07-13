@@ -25,9 +25,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import "intf.h"
 #import "CompatibilityFixes.h"
 #import "MainWindow.h"
-#import "intf.h"
 #import "CoreInteraction.h"
 #import "AudioEffects.h"
 #import "MainMenu.h"

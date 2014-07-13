@@ -25,6 +25,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import <vlc_input.h>
 
 #define _NS(s) [[VLCStringUtility sharedInstance] localizedString: s]
 /* Get an alternate version of the string.

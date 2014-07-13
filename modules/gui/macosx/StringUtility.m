@@ -24,12 +24,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <vlc_input.h>
+#import "intf.h"
+#import "StringUtility.h"
+
 #import <vlc_keys.h>
 #import <vlc_strings.h>
-
-#import "StringUtility.h"
-#import "intf.h"
 
 @implementation VLCStringUtility
 
