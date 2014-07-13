@@ -341,7 +341,8 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
     /* Save */
     if( p_arg->b_save )
     {
-        QString file = QFileDialog::getSaveFileName( NULL, p_arg->psz_title,
+        QString file = QFileDialog::getSaveFileName( NULL,
+                                        qfu( p_arg->psz_title ),
                                         p_intf->p_sys->filepath, extensions );
         if( !file.isEmpty() )
         {
@@ -355,7 +356,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
     else /* non-save mode */
     {
         QStringList files = QFileDialog::getOpenFileNames( NULL,
-                p_arg->psz_title, p_intf->p_sys->filepath,
+                qfu( p_arg->psz_title ), p_intf->p_sys->filepath,
                 extensions );
         p_arg->i_results = files.count();
         p_arg->psz_results = (char **)malloc( p_arg->i_results * sizeof( char * ) );
