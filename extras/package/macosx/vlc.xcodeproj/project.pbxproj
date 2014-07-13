@@ -486,6 +486,8 @@
 		7DB65D5318ABD6380053B874 /* AddonManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddonManager.m; path = ../../../modules/gui/macosx/AddonManager.m; sourceTree = "<group>"; };
 		7DB65D5518ABD6490053B874 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/AddonManager.xib; sourceTree = "<group>"; };
 		7DE88F291831396A00CD9DA2 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PlaylistAccessoryView.xib; sourceTree = "<group>"; };
+		7DF0435E1972E26A0022B534 /* AddonListDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AddonListDataSource.h; path = ../../../modules/gui/macosx/AddonListDataSource.h; sourceTree = "<group>"; };
+		7DF0435F1972E26A0022B534 /* AddonListDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddonListDataSource.m; path = ../../../modules/gui/macosx/AddonListDataSource.m; sourceTree = "<group>"; };
 		7DFFA16A16124F38001AF89F /* effects-one-button-pressed-dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed-dark.png"; path = "Resources/mainwindow_dark/effects-one-button-pressed-dark.png"; sourceTree = "<group>"; };
 		7DFFA16B16124F38001AF89F /* effects-one-button-pressed-dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed-dark@2x.png"; path = "Resources/mainwindow_dark/effects-one-button-pressed-dark@2x.png"; sourceTree = "<group>"; };
 		8E49720006417F6800370C9F /* playlistinfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = playlistinfo.h; path = ../../../modules/gui/macosx/playlistinfo.h; sourceTree = SOURCE_ROOT; };
@@ -1101,6 +1103,8 @@
 				5CCED71314C0D4A90057F8D1 /* ExtensionsManager.m */,
 				7DB65D5218ABD6380053B874 /* AddonManager.h */,
 				7DB65D5318ABD6380053B874 /* AddonManager.m */,
+				7DF0435E1972E26A0022B534 /* AddonListDataSource.h */,
+				7DF0435F1972E26A0022B534 /* AddonListDataSource.m */,
 				5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */,
 				5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */,
 				8E6BC6FA041684EC0059A3A7 /* controls.h */,
