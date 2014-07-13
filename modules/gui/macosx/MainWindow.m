@@ -219,109 +219,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_search_fld setFrame: frame];
     }
 
-    /* create the sidebar */
-    o_sidebaritems = [[NSMutableArray alloc] init];
-    SideBarItem *libraryItem = [SideBarItem itemWithTitle:_NS("LIBRARY") identifier:@"library"];
-    SideBarItem *playlistItem = [SideBarItem itemWithTitle:_NS("Playlist") identifier:@"playlist"];
-    [playlistItem setIcon: [NSImage imageNamed:@"sidebar-playlist"]];
-    SideBarItem *medialibraryItem = [SideBarItem itemWithTitle:_NS("Media Library") identifier:@"medialibrary"];
-    [medialibraryItem setIcon: [NSImage imageNamed:@"sidebar-playlist"]];
-    SideBarItem *mycompItem = [SideBarItem itemWithTitle:_NS("MY COMPUTER") identifier:@"mycomputer"];
-    SideBarItem *devicesItem = [SideBarItem itemWithTitle:_NS("DEVICES") identifier:@"devices"];
-    SideBarItem *lanItem = [SideBarItem itemWithTitle:_NS("LOCAL NETWORK") identifier:@"localnetwork"];
-    SideBarItem *internetItem = [SideBarItem itemWithTitle:_NS("INTERNET") identifier:@"internet"];
-
-    /* SD subnodes, inspired by the Qt4 intf */
-    char **ppsz_longnames = NULL;
-    int *p_categories = NULL;
-    char **ppsz_names = vlc_sd_GetNames(pl_Get(VLCIntf), &ppsz_longnames, &p_categories);
-    if (!ppsz_names)
-        msg_Err(VLCIntf, "no sd item found"); //TODO
-    char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
-    int *p_category = p_categories;
-    NSMutableArray *internetItems = [[NSMutableArray alloc] init];
-    NSMutableArray *devicesItems = [[NSMutableArray alloc] init];
-    NSMutableArray *lanItems = [[NSMutableArray alloc] init];
-    NSMutableArray *mycompItems = [[NSMutableArray alloc] init];
-    NSString *o_identifier;
-    for (; ppsz_name && *ppsz_name; ppsz_name++, ppsz_longname++, p_category++) {
-        o_identifier = [NSString stringWithCString: *ppsz_name encoding: NSUTF8StringEncoding];
-        switch (*p_category) {
-            case SD_CAT_INTERNET:
-                    [internetItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
-                    if (!strncmp(*ppsz_name, "podcast", 7))
-                        [[internetItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-podcast"]];
-                    else
-                        [[internetItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
-                    [[internetItems lastObject] setSdtype: SD_CAT_INTERNET];
-                    [[internetItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String:*ppsz_longname]];
-                break;
-            case SD_CAT_DEVICES:
-                    [devicesItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
-                    [[devicesItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
-                    [[devicesItems lastObject] setSdtype: SD_CAT_DEVICES];
-                    [[devicesItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String:*ppsz_longname]];
-                break;
-            case SD_CAT_LAN:
-                    [lanItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
-                    [[lanItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-local"]];
-                    [[lanItems lastObject] setSdtype: SD_CAT_LAN];
-                    [[lanItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String:*ppsz_longname]];
-                break;
-            case SD_CAT_MYCOMPUTER:
-                    [mycompItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
-                    if (!strncmp(*ppsz_name, "video_dir", 9))
-                        [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-movie"]];
-                    else if (!strncmp(*ppsz_name, "audio_dir", 9))
-                        [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-music"]];
-                    else if (!strncmp(*ppsz_name, "picture_dir", 11))
-                        [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-pictures"]];
-                    else
-                        [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
-                    [[mycompItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String:*ppsz_longname]];
-                    [[mycompItems lastObject] setSdtype: SD_CAT_MYCOMPUTER];
-                break;
-            default:
-                msg_Warn(VLCIntf, "unknown SD type found, skipping (%s)", *ppsz_name);
-                break;
-        }
-
-        free(*ppsz_name);
-        free(*ppsz_longname);
-    }
-    [mycompItem setChildren: [NSArray arrayWithArray: mycompItems]];
-    [devicesItem setChildren: [NSArray arrayWithArray: devicesItems]];
-    [lanItem setChildren: [NSArray arrayWithArray: lanItems]];
-    [internetItem setChildren: [NSArray arrayWithArray: internetItems]];
-    [mycompItems release];
-    [devicesItems release];
-    [lanItems release];
-    [internetItems release];
-    free(ppsz_names);
-    free(ppsz_longnames);
-    free(p_categories);
-
-    [libraryItem setChildren: [NSArray arrayWithObjects:playlistItem, medialibraryItem, nil]];
-    [o_sidebaritems addObject: libraryItem];
-    if ([mycompItem hasChildren])
-        [o_sidebaritems addObject: mycompItem];
-    if ([devicesItem hasChildren])
-        [o_sidebaritems addObject: devicesItem];
-    if ([lanItem hasChildren])
-        [o_sidebaritems addObject: lanItem];
-    if ([internetItem hasChildren])
-        [o_sidebaritems addObject: internetItem];
-
-    [o_sidebar_view reloadData];
-    [o_sidebar_view setDropItem:playlistItem dropChildIndex:NSOutlineViewDropOnItemIndex];
-    [o_sidebar_view registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
-
-    [o_sidebar_view setAutosaveName:@"mainwindow-sidebar"];
-    [(PXSourceList *)o_sidebar_view setDataSource:self];
-    [o_sidebar_view setDelegate:self];
-    [o_sidebar_view setAutosaveExpandedItems:YES];
-
-    [o_sidebar_view expandItem: libraryItem expandChildren: YES];
+    /* reload the sidebar */
+    [self reloadSidebar];
 
     o_fspanel = [[VLCFSPanel alloc] initWithContentRect:NSMakeRect(110.,267.,549.,87.)
                                               styleMask:NSTexturedBackgroundWindowMask
@@ -414,6 +313,124 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 #pragma mark -
 #pragma mark appearance management
+
+- (void)reloadSidebar
+{
+    BOOL isAReload = NO;
+    if (o_sidebaritems) {
+        [o_sidebaritems release];
+        isAReload = YES;
+    }
+
+    o_sidebaritems = [[NSMutableArray alloc] init];
+    SideBarItem *libraryItem = [SideBarItem itemWithTitle:_NS("LIBRARY") identifier:@"library"];
+    SideBarItem *playlistItem = [SideBarItem itemWithTitle:_NS("Playlist") identifier:@"playlist"];
+    [playlistItem setIcon: [NSImage imageNamed:@"sidebar-playlist"]];
+    SideBarItem *medialibraryItem = [SideBarItem itemWithTitle:_NS("Media Library") identifier:@"medialibrary"];
+    [medialibraryItem setIcon: [NSImage imageNamed:@"sidebar-playlist"]];
+    SideBarItem *mycompItem = [SideBarItem itemWithTitle:_NS("MY COMPUTER") identifier:@"mycomputer"];
+    SideBarItem *devicesItem = [SideBarItem itemWithTitle:_NS("DEVICES") identifier:@"devices"];
+    SideBarItem *lanItem = [SideBarItem itemWithTitle:_NS("LOCAL NETWORK") identifier:@"localnetwork"];
+    SideBarItem *internetItem = [SideBarItem itemWithTitle:_NS("INTERNET") identifier:@"internet"];
+
+    /* SD subnodes, inspired by the Qt4 intf */
+    char **ppsz_longnames = NULL;
+    int *p_categories = NULL;
+    char **ppsz_names = vlc_sd_GetNames(pl_Get(VLCIntf), &ppsz_longnames, &p_categories);
+    if (!ppsz_names)
+        msg_Err(VLCIntf, "no sd item found"); //TODO
+    char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
+    int *p_category = p_categories;
+    NSMutableArray *internetItems = [[NSMutableArray alloc] init];
+    NSMutableArray *devicesItems = [[NSMutableArray alloc] init];
+    NSMutableArray *lanItems = [[NSMutableArray alloc] init];
+    NSMutableArray *mycompItems = [[NSMutableArray alloc] init];
+    NSString *o_identifier;
+    for (; ppsz_name && *ppsz_name; ppsz_name++, ppsz_longname++, p_category++) {
+        o_identifier = [NSString stringWithCString: *ppsz_name encoding: NSUTF8StringEncoding];
+        switch (*p_category) {
+            case SD_CAT_INTERNET:
+                [internetItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
+                if (!strncmp(*ppsz_name, "podcast", 7))
+                    [[internetItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-podcast"]];
+                else
+                    [[internetItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
+                [[internetItems lastObject] setSdtype: SD_CAT_INTERNET];
+                [[internetItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String:*ppsz_longname]];
+                break;
+            case SD_CAT_DEVICES:
+                [devicesItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
+                [[devicesItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
+                [[devicesItems lastObject] setSdtype: SD_CAT_DEVICES];
+                [[devicesItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String:*ppsz_longname]];
+                break;
+            case SD_CAT_LAN:
+                [lanItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
+                [[lanItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-local"]];
+                [[lanItems lastObject] setSdtype: SD_CAT_LAN];
+                [[lanItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String:*ppsz_longname]];
+                break;
+            case SD_CAT_MYCOMPUTER:
+                [mycompItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
+                if (!strncmp(*ppsz_name, "video_dir", 9))
+                    [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-movie"]];
+                else if (!strncmp(*ppsz_name, "audio_dir", 9))
+                    [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-music"]];
+                else if (!strncmp(*ppsz_name, "picture_dir", 11))
+                    [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-pictures"]];
+                else
+                    [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
+                [[mycompItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String:*ppsz_longname]];
+                [[mycompItems lastObject] setSdtype: SD_CAT_MYCOMPUTER];
+                break;
+            default:
+                msg_Warn(VLCIntf, "unknown SD type found, skipping (%s)", *ppsz_name);
+                break;
+        }
+
+        free(*ppsz_name);
+        free(*ppsz_longname);
+    }
+    [mycompItem setChildren: [NSArray arrayWithArray: mycompItems]];
+    [devicesItem setChildren: [NSArray arrayWithArray: devicesItems]];
+    [lanItem setChildren: [NSArray arrayWithArray: lanItems]];
+    [internetItem setChildren: [NSArray arrayWithArray: internetItems]];
+    [mycompItems release];
+    [devicesItems release];
+    [lanItems release];
+    [internetItems release];
+    free(ppsz_names);
+    free(ppsz_longnames);
+    free(p_categories);
+
+    [libraryItem setChildren: [NSArray arrayWithObjects:playlistItem, medialibraryItem, nil]];
+    [o_sidebaritems addObject: libraryItem];
+    if ([mycompItem hasChildren])
+        [o_sidebaritems addObject: mycompItem];
+    if ([devicesItem hasChildren])
+        [o_sidebaritems addObject: devicesItem];
+    if ([lanItem hasChildren])
+        [o_sidebaritems addObject: lanItem];
+    if ([internetItem hasChildren])
+        [o_sidebaritems addObject: internetItem];
+
+    [o_sidebar_view reloadData];
+    [o_sidebar_view setDropItem:playlistItem dropChildIndex:NSOutlineViewDropOnItemIndex];
+    [o_sidebar_view registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
+
+    [o_sidebar_view setAutosaveName:@"mainwindow-sidebar"];
+    [(PXSourceList *)o_sidebar_view setDataSource:self];
+    [o_sidebar_view setDelegate:self];
+    [o_sidebar_view setAutosaveExpandedItems:YES];
+
+    [o_sidebar_view expandItem: libraryItem expandChildren: YES];
+
+    if (isAReload) {
+        NSUInteger i_sidebaritem_count = [o_sidebaritems count];
+        for (NSUInteger x = 0; x < i_sidebaritem_count; x++)
+            [o_sidebar_view expandItem: [o_sidebaritems objectAtIndex:x] expandChildren: YES];
+    }
+}
 
 - (VLCMainWindowControlsBar *)controlsBar;
 {

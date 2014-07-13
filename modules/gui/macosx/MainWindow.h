@@ -122,6 +122,8 @@ typedef enum {
 
 - (void)windowResizedOrMoved:(NSNotification *)notification;
 
+- (void)reloadSidebar;
+
 - (void)toggleLeftSubSplitView;
 - (void)showDropZone;
 - (void)hideDropZone;
