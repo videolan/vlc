@@ -22,11 +22,12 @@
  *****************************************************************************/
 
 #import "MainMenu.h"
+#import "intf.h"
+
 #import <vlc_common.h>
 #import <vlc_playlist.h>
 #import <vlc_input.h>
 
-#import "intf.h"
 #import "open.h"
 #import "wizard.h"
 #import "about.h"
@@ -290,13 +291,13 @@ static VLCMainMenu *_o_sharedInstance = nil;
                                                action:@selector(togglePostProcessing:)
                                         keyEquivalent:@""];
         o_mitem = [o_mu_ffmpeg_pp itemAtIndex:x];
-        [o_mitem setEnabled: YES];
+        [o_mitem setEnabled:YES];
         [o_mitem setTag:x];
-        [o_mitem setTarget: self];
+        [o_mitem setTarget:self];
     }
     char *psz_config = config_GetPsz(p_intf, "video-filter");
     if (psz_config) {
-        if (!strstr(psz_config, "postprocess"))
+        if (!strstr(psz_config, "postproc"))
             [[o_mu_ffmpeg_pp itemAtIndex:0] setState:NSOnState];
         else
             [[o_mu_ffmpeg_pp itemWithTag:config_GetInt(p_intf, "postproc-q")] setState:NSOnState];
@@ -940,17 +941,17 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (void)_disablePostProcessing
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilter:"postprocess" on:false];
+    [[VLCCoreInteraction sharedInstance] setVideoFilter:"postproc" on:false];
 }
 
 - (void)_enablePostProcessing
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilter:"postprocess" on:true];
+    [[VLCCoreInteraction sharedInstance] setVideoFilter:"postproc" on:true];
 }
 
 - (IBAction)togglePostProcessing:(id)sender
 {
-    char *psz_name = "postprocess";
+    char *psz_name = "postproc";
     NSInteger count = [o_mu_ffmpeg_pp numberOfItems];
     for (NSUInteger x = 0; x < count; x++)
         [[o_mu_ffmpeg_pp itemAtIndex:x] setState:NSOffState];
@@ -962,7 +963,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         [self _enablePostProcessing];
         [sender setState:NSOnState];
 
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty:"postproc-q" forFilter:"postprocess" integer:[sender tag]];
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty:"postproc-q" forFilter:"postproc" integer:[sender tag]];
     }
 }
 
