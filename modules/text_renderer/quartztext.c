@@ -785,7 +785,7 @@ static int RenderHtml(filter_t *p_filter, subpicture_region_t *p_region_out,
                          * of times to show the progress marker on the text.
                          */
                         var_SetBool(p_filter, "text-rerender", true);
-                    } else {
+                    } else if (strcasecmp("text", name)) {
                         /* Only text and karaoke tags are supported */
                         msg_Dbg(p_filter, "Unsupported top-level tag "
                                            "<%s> ignored.", name);
