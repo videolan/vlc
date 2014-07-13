@@ -469,7 +469,7 @@
     BOOL b_selected_item_met;
     BOOL b_isSortDescending;
     id o_tc_sortColumn;
-    NSInteger retainedRowSelection;
+    NSUInteger retainedRowSelection;
 
     BOOL b_playlistmenu_nib_loaded;
     BOOL b_view_setup;
@@ -968,6 +968,8 @@
     o_selected_indexes = [o_outline_view selectedRowIndexes];
     i_count = [o_selected_indexes count];
     retainedRowSelection = [o_selected_indexes firstIndex];
+    if (retainedRowSelection == NSNotFound)
+        retainedRowSelection = 0;
 
     p_playlist = pl_Get(p_intf);
 
