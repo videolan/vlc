@@ -142,10 +142,9 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
     {
         msg_Dbg( (vlc_object_t*)s, "skipping movi chunk" );
         if( b_seekable )
-        {
             return AVI_NextChunk( s, p_container );
-        }
-        return VLC_SUCCESS; /* point at begining of LIST-movi */
+        else
+            return VLC_EGENERIC; /* point at begining of LIST-movi */
     }
 
     if( stream_Read( s, NULL, 12 ) != 12 )
