@@ -656,7 +656,8 @@ int OpenEncoder( vlc_object_t *p_this )
 
         /* Try to match avcodec input format to vlc format so we could avoid one
            format conversion */
-        if( GetVlcAudioFormat( p_context->sample_fmt ) != p_enc->fmt_in.i_codec )
+        if( GetVlcAudioFormat( p_context->sample_fmt ) != p_enc->fmt_in.i_codec
+            && p_codec->sample_fmts )
         {
             msg_Dbg( p_enc, "Trying to find more suitable sample format instead of %s", av_get_sample_fmt_name( p_context->sample_fmt ) );
             for( unsigned int i=0; p_codec->sample_fmts[i] != -1; i++ )
@@ -672,7 +673,7 @@ int OpenEncoder( vlc_object_t *p_this )
         p_sys->b_planar = av_sample_fmt_is_planar( p_context->sample_fmt );
         // Try if we can use interleaved format for codec input as VLC doesn't really do planar audio yet
         // FIXME: Remove when planar/interleaved audio in vlc is equally supported
-        if( p_sys->b_planar )
+        if( p_sys->b_planar && p_codec->sample_fmts )
         {
             msg_Dbg( p_enc, "Trying to find packet sample format instead of planar %s", av_get_sample_fmt_name( p_context->sample_fmt ) );
             for( unsigned int i=0; p_codec->sample_fmts[i] != -1; i++ )
