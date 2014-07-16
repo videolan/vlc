@@ -1596,6 +1596,11 @@ dnl
 EXTEND_HELP_STRING([Input plugins:])
 
 dnl
+dnl  libarchive access module
+dnl
+PKG_ENABLE_MODULES_VLC([ARCHIVE], [access_archive], [libarchive >= 2.8.5], (libarchive support), [auto])
+
+dnl
 dnl  live555 input
 dnl
 AC_ARG_ENABLE(live555,

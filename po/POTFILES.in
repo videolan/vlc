@@ -179,6 +179,7 @@ lib/vlm.c
 
 # modules
 modules/access/alsa.c
+modules/access/archive/archive.c
 modules/access/attachment.c
 modules/access/avio.h
 modules/access/bd/bd.c

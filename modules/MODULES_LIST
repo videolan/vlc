@@ -36,6 +36,7 @@ $Id$
  * android_surface: video output for Android, based on Surface
  * antiflicker: anti-flicker video filter
  * araw: Pseudo audio decoder for raw PCM
+ * archive: libarchive based access and stream filter
  * asf: ASF demuxer
  * atmo: Ambilight-like video-output
  * attachment: Attachment access module
