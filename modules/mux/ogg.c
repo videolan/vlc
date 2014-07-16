@@ -908,7 +908,7 @@ static int32_t OggFillDsHeader( uint8_t *p_buffer, oggds_header_t *p_oggds_heade
     /* extra header */
     if( p_oggds_header->i_size > 0 )
     {
-        memcpy( &p_buffer[index], p_oggds_header + sizeof(*p_oggds_header), p_oggds_header->i_size );
+        memcpy( &p_buffer[index], (uint8_t *) p_oggds_header + sizeof(*p_oggds_header), p_oggds_header->i_size );
         index += p_oggds_header->i_size;
     }
 
