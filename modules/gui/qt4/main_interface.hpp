@@ -199,7 +199,6 @@ public slots:
     void setStatusBarVisibility(bool b_visible);
     void setPlaylistVisibility(bool b_visible);
 
-    void popupMenu( const QPoint& );
 #ifdef _WIN32
     void changeThumbbarButtons( int );
 #endif
@@ -217,7 +216,6 @@ public slots:
 
 private slots:
     void debug();
-    void destroyPopupMenu();
     void recreateToolbars();
     void setName( const QString& );
     void setVLCWindowsTitle( const QString& title = "" );

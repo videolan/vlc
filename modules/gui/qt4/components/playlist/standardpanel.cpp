@@ -157,7 +157,7 @@ void StandardPLPanel::popupPlView( const QPoint &point )
         currentView->selectionModel()->select( index, QItemSelectionModel::Select );
     }
 
-    if( !popup( globalPoint ) ) VLCMenuBar::PopupMenu( p_intf, true );
+    if( !popup( globalPoint ) ) THEDP->setPopupMenu();
 }
 
 /*********** Popup *********/

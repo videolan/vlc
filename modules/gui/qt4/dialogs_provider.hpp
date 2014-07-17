@@ -140,6 +140,8 @@ public slots:
     void toolbarDialog();
     void pluginDialog();
     void epgDialog();
+    void setPopupMenu();
+    void destroyPopupMenu();
 
     void openFileGenericDialog( intf_dialog_args_t * );
 

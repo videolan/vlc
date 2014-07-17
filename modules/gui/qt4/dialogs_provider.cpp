@@ -316,6 +316,18 @@ void DialogsProvider::epgDialog()
     EpgDialog::getInstance( p_intf )->toggleVisible();
 }
 
+void DialogsProvider::setPopupMenu()
+{
+    delete popupMenu;
+    popupMenu = VLCMenuBar::PopupMenu( p_intf, true );
+}
+
+void DialogsProvider::destroyPopupMenu()
+{
+    delete popupMenu;
+    popupMenu = NULL;
+}
+
 /* Generic open file */
 void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
 {

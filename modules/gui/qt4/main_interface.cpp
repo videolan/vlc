@@ -159,7 +159,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      ************/
     VLCMenuBar::createMenuBar( this, p_intf );
     CONNECT( THEMIM->getIM(), voutListChanged( vout_thread_t **, int ),
-             this, destroyPopupMenu() );
+             THEDP, destroyPopupMenu() );
 
     createMainWidget( settings );
 
@@ -429,7 +429,7 @@ void MainInterface::createMainWidget( QSettings *creationSettings )
     /* Enable the popup menu in the MI */
     main->setContextMenuPolicy( Qt::CustomContextMenu );
     CONNECT( main, customContextMenuRequested( const QPoint& ),
-             this, popupMenu( const QPoint& ) );
+             THEDP, setPopupMenu() );
 
     if ( depth() > 8 ) /* 8bit depth has too many issues with opacity */
         /* Create the FULLSCREEN CONTROLS Widget */
@@ -609,16 +609,6 @@ inline void MainInterface::showTab( QWidget *widget )
         playlistWidget->artContainer->addWidget( videoWidget );
         playlistWidget->artContainer->setCurrentWidget( videoWidget );
     }
-}
-
-void MainInterface::destroyPopupMenu()
-{
-    VLCMenuBar::PopupMenu( p_intf, false );
-}
-
-void MainInterface::popupMenu( const QPoint & )
-{
-    VLCMenuBar::PopupMenu( p_intf, true );
 }
 
 void MainInterface::toggleFSC()
