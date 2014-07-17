@@ -975,7 +975,7 @@ static void LoadSubtitles( input_thread_t *p_input )
 
     const int i_delay = var_CreateGetInteger( p_input, "sub-delay" );
     if( i_delay != 0 )
-        var_SetTime( p_input, "spu-delay", (mtime_t)i_delay * CLOCK_FREQ );
+        var_SetTime( p_input, "spu-delay", (mtime_t)i_delay * 100000 );
 
     /* Look for and add subtitle files */
     unsigned i_flags = SUB_FORCED;
