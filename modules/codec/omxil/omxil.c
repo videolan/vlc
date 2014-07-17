@@ -387,15 +387,23 @@ static OMX_ERRORTYPE AllocateBuffers(decoder_t *p_dec, OmxPort *p_port)
 #endif
 
         if(p_port->b_direct)
+        {
             omx_error =
                 OMX_UseBuffer( p_sys->omx_handle, &p_port->pp_buffers[i],
                                p_port->i_port_index, 0,
                                p_port->definition.nBufferSize, (void*)1);
+            OMX_DBG( "OMX_UseBuffer(%d) %p, %p", def->eDir,
+                     p_port->pp_buffers[i], p_port->pp_buffers[i]->pBuffer );
+        }
         else
+        {
             omx_error =
                 OMX_AllocateBuffer( p_sys->omx_handle, &p_port->pp_buffers[i],
                                     p_port->i_port_index, 0,
                                     p_port->definition.nBufferSize);
+            OMX_DBG( "OMX_AllocateBuffer(%d) %p, %p", def->eDir,
+                     p_port->pp_buffers[i], p_port->pp_buffers[i]->pBuffer );
+        }
 
         if(omx_error != OMX_ErrorNone)
         {
@@ -438,6 +446,8 @@ static OMX_ERRORTYPE FreeBuffers(decoder_t *p_dec, OmxPort *p_port)
         }
         omx_error = OMX_FreeBuffer( p_port->omx_handle,
                                     p_port->i_port_index, p_buffer );
+        OMX_DBG( "OMX_FreeBuffer(%d) %p, %p", def->eDir,
+                 p_buffer, p_buffer->pBuffer );
 
         if(omx_error != OMX_ErrorNone) break;
     }
@@ -1125,6 +1135,8 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     OMX_PARAM_PORTDEFINITIONTYPE definition;
     OMX_ERRORTYPE omx_error;
 
+    OMX_DBG( "PortReconfigure(%d)", p_port->definition.eDir );
+
     /* Sanity checking */
     OMX_INIT_STRUCTURE(definition);
     definition.nPortIndex = p_port->i_port_index;
@@ -1185,6 +1197,7 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     PrintOmx(p_dec, p_sys->omx_handle, p_dec->p_sys->in.i_port_index);
     PrintOmx(p_dec, p_sys->omx_handle, p_dec->p_sys->out.i_port_index);
 
+    OMX_DBG( "PortReconfigure(%d)::done", p_port->definition.eDir );
  error:
     return omx_error;
 }
