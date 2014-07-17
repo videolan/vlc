@@ -42,7 +42,9 @@
 #include "OMX_Broadcom.h"
 
 #ifndef NDEBUG
-# define OMXIL_EXTRA_DEBUG
+# define OMX_DBG(...) msg_Dbg( p_dec, __VA_ARGS__ )
+#else
+# define OMX_DBG(...)
 #endif
 
 #define SENTINEL_FLAG 0x10000
@@ -365,9 +367,7 @@ static OMX_ERRORTYPE AllocateBuffers(decoder_t *p_dec, OmxPort *p_port)
     OMX_PARAM_PORTDEFINITIONTYPE *def = &p_port->definition;
     unsigned int i;
 
-#ifdef OMXIL_EXTRA_DEBUG
-    msg_Dbg( p_dec, "AllocateBuffers(%d)", def->eDir );
-#endif
+    OMX_DBG( "AllocateBuffers(%d)", def->eDir );
 
     p_port->i_buffers = p_port->definition.nBufferCountActual;
 
@@ -409,9 +409,7 @@ static OMX_ERRORTYPE AllocateBuffers(decoder_t *p_dec, OmxPort *p_port)
                 omx_error, (int)p_port->i_port_index );
 
 
-#ifdef OMXIL_EXTRA_DEBUG
-    msg_Dbg( p_dec, "AllocateBuffers(%d)::done", def->eDir );
-#endif
+    OMX_DBG( "AllocateBuffers(%d)::done", def->eDir );
 error:
     return omx_error;
 }
@@ -426,9 +424,7 @@ static OMX_ERRORTYPE FreeBuffers(decoder_t *p_dec, OmxPort *p_port)
     OMX_BUFFERHEADERTYPE *p_buffer;
     unsigned int i;
 
-#ifdef OMXIL_EXTRA_DEBUG
-    msg_Dbg( p_dec, "FreeBuffers(%d)", def->eDir );
-#endif
+    OMX_DBG( "FreeBuffers(%d)", def->eDir );
 
     for(i = 0; i < p_port->i_buffers; i++)
     {
@@ -453,9 +449,7 @@ static OMX_ERRORTYPE FreeBuffers(decoder_t *p_dec, OmxPort *p_port)
     free( p_port->pp_buffers );
     p_port->pp_buffers = NULL;
 
-#ifdef OMXIL_EXTRA_DEBUG
-    msg_Dbg( p_dec, "FreeBuffers(%d)::done", def->eDir );
-#endif
+    OMX_DBG( "FreeBuffers(%d)::done", def->eDir );
 
     return omx_error;
 }
@@ -1255,10 +1249,7 @@ static int DecodeVideoOutput( decoder_t *p_dec, OmxPort *p_port, picture_t **pp_
         {
             OMX_FIFO_GET(&p_port->fifo, p_header);
         }
-
-#ifdef OMXIL_EXTRA_DEBUG
-        msg_Dbg( p_dec, "FillThisBuffer %p, %p", p_header, p_header->pBuffer );
-#endif
+        OMX_DBG( "FillThisBuffer %p, %p", p_header, p_header->pBuffer );
         OMX_FillThisBuffer(p_port->omx_handle, p_header);
     }
 
@@ -1330,10 +1321,8 @@ static int DecodeVideoInput( decoder_t *p_dec, OmxPort *p_port, block_t **pp_blo
          * than H.264 */
         convert_h264_to_annexb( p_header->pBuffer, p_header->nFilledLen,
                                 p_sys->i_nal_size_length, &convert_state );
-#ifdef OMXIL_EXTRA_DEBUG
-        msg_Dbg( p_dec, "EmptyThisBuffer %p, %p, %i, %"PRId64, p_header, p_header->pBuffer,
+        OMX_DBG( "EmptyThisBuffer %p, %p, %i, %"PRId64, p_header, p_header->pBuffer,
                  (int)p_header->nFilledLen, FromOmxTicks(p_header->nTimeStamp) );
-#endif
         OMX_EmptyThisBuffer(p_port->omx_handle, p_header);
         p_port->b_flushed = false;
         if (decode_more)
@@ -1510,9 +1499,7 @@ block_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
                 p_buffer->i_pts;
         }
 
-#ifdef OMXIL_EXTRA_DEBUG
-        msg_Dbg( p_dec, "FillThisBuffer %p, %p", p_header, p_header->pBuffer );
-#endif
+        OMX_DBG( "FillThisBuffer %p, %p", p_header, p_header->pBuffer );
         OMX_FIFO_GET(&p_sys->out.fifo, p_header);
         OMX_FillThisBuffer(p_sys->omx_handle, p_header);
     }
@@ -1553,10 +1540,8 @@ block_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
             block_Release(p_block);
         }
 
-#ifdef OMXIL_EXTRA_DEBUG
-        msg_Dbg( p_dec, "EmptyThisBuffer %p, %p, %i", p_header, p_header->pBuffer,
+        OMX_DBG( "EmptyThisBuffer %p, %p, %i", p_header, p_header->pBuffer,
                  (int)p_header->nFilledLen );
-#endif
         OMX_EmptyThisBuffer(p_sys->omx_handle, p_header);
         p_sys->in.b_flushed = false;
         *pp_block = NULL; /* Avoid being fed the same packet again */
@@ -1621,10 +1606,8 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pic )
         p_header->nOffset = 0;
         p_header->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
         p_header->nTimeStamp = ToOmxTicks(p_pic->date);
-#ifdef OMXIL_EXTRA_DEBUG
-        msg_Dbg( p_dec, "EmptyThisBuffer %p, %p, %i", p_header, p_header->pBuffer,
+        OMX_DBG( "EmptyThisBuffer %p, %p, %i", p_header, p_header->pBuffer,
                  (int)p_header->nFilledLen );
-#endif
         OMX_EmptyThisBuffer(p_sys->omx_handle, p_header);
         p_sys->in.b_flushed = false;
     }
@@ -1667,9 +1650,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pic )
             p_header->pAppPrivate = 0;
         }
 
-#ifdef OMXIL_EXTRA_DEBUG
-        msg_Dbg( p_dec, "FillThisBuffer %p, %p", p_header, p_header->pBuffer );
-#endif
+        OMX_DBG( "FillThisBuffer %p, %p", p_header, p_header->pBuffer );
         OMX_FillThisBuffer(p_sys->omx_handle, p_header);
     }
 
@@ -1763,9 +1744,7 @@ static OMX_ERRORTYPE OmxEmptyBufferDone( OMX_HANDLETYPE omx_handle,
     decoder_sys_t *p_sys = p_dec->p_sys;
     (void)omx_handle;
 
-#ifdef OMXIL_EXTRA_DEBUG
-    msg_Dbg( p_dec, "OmxEmptyBufferDone %p, %p", omx_header, omx_header->pBuffer );
-#endif
+    OMX_DBG( "OmxEmptyBufferDone %p, %p", omx_header, omx_header->pBuffer );
 
     if(omx_header->pAppPrivate || omx_header->pOutputPortPrivate)
     {
@@ -1786,10 +1765,8 @@ static OMX_ERRORTYPE OmxFillBufferDone( OMX_HANDLETYPE omx_handle,
     decoder_sys_t *p_sys = p_dec->p_sys;
     (void)omx_handle;
 
-#ifdef OMXIL_EXTRA_DEBUG
-    msg_Dbg( p_dec, "OmxFillBufferDone %p, %p, %i, %"PRId64, omx_header, omx_header->pBuffer,
+    OMX_DBG( "OmxFillBufferDone %p, %p, %i, %"PRId64, omx_header, omx_header->pBuffer,
              (int)omx_header->nFilledLen, FromOmxTicks(omx_header->nTimeStamp) );
-#endif
 
     if(omx_header->pInputPortPrivate)
     {
