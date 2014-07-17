@@ -771,6 +771,9 @@ static void* download_thread( void* p )
     stream_t* s = (stream_t*) p_this;
     stream_sys_t* sys = s->p_sys;
 
+    if ( vlc_array_count( sys->hds_streams ) == 0 )
+        return NULL;
+
     // TODO: Change here for selectable stream
     hds_stream_t* hds_stream = sys->hds_streams->pp_elems[0];
 
@@ -1011,6 +1014,9 @@ static void* live_thread( void* p )
     vlc_object_t* p_this = (vlc_object_t*)p;
     stream_t* s = (stream_t*) p_this;
     stream_sys_t* sys = s->p_sys;
+
+    if ( vlc_array_count( sys->hds_streams ) == 0 )
+        return NULL;
 
     // TODO: Change here for selectable stream
     hds_stream_t* hds_stream = sys->hds_streams->pp_elems[0];
@@ -1436,15 +1442,21 @@ static void Close( vlc_object_t *p_this )
     stream_sys_t *p_sys = s->p_sys;
 
     // TODO: Change here for selectable stream
-    hds_stream_t *stream = s->p_sys->hds_streams->pp_elems[0];
+    hds_stream_t *stream = vlc_array_count(p_sys->hds_streams) ?
+        s->p_sys->hds_streams->pp_elems[0] : NULL;
 
     p_sys->closed = true;
-    vlc_cond_signal( & stream->dl_cond );
+    if (stream)
+        vlc_cond_signal( & stream->dl_cond );
 
     vlc_join( p_sys->dl_thread, NULL );
-    vlc_mutex_destroy( &stream->dl_lock );
-    vlc_cond_destroy( &stream->dl_cond );
-    vlc_mutex_destroy( &stream->abst_lock );
+
+    if (stream)
+    {
+        vlc_mutex_destroy( &stream->dl_lock );
+        vlc_cond_destroy( &stream->dl_cond );
+        vlc_mutex_destroy( &stream->abst_lock );
+    }
 
     if( p_sys->live )
     {
@@ -1595,6 +1607,9 @@ static int Read( stream_t *s, void *buffer, unsigned i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
 
+    if ( vlc_array_count( p_sys->hds_streams ) == 0 )
+        return 0;
+
     // TODO: change here for selectable stream
     hds_stream_t *stream = s->p_sys->hds_streams->pp_elems[0];
     int length = 0;
@@ -1621,6 +1636,9 @@ static int Read( stream_t *s, void *buffer, unsigned i_read )
 static int Peek( stream_t *s, const uint8_t **pp_peek, unsigned i_peek )
 {
     stream_sys_t *p_sys = s->p_sys;
+
+    if ( vlc_array_count( p_sys->hds_streams ) == 0 )
+        return 0;
 
     // TODO: change here for selectable stream
     hds_stream_t *stream = p_sys->hds_streams->pp_elems[0];
