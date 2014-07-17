@@ -691,13 +691,13 @@ static void AStreamPrebufferBlock( stream_t *s )
             /* Update stat */
             p_sys->stat.i_bytes = p_sys->block.i_size;
             p_sys->stat.i_read_time = i_date - i_start;
-            i_byterate = ( INT64_C(1000000) * p_sys->stat.i_bytes ) /
+            i_byterate = ( CLOCK_FREQ * p_sys->stat.i_bytes ) /
                          (p_sys->stat.i_read_time + 1);
 
             msg_Dbg( s, "prebuffering done %"PRId64" bytes in %"PRId64"s - "
                      "%"PRId64" KiB/s",
                      p_sys->stat.i_bytes,
-                     p_sys->stat.i_read_time / INT64_C(1000000),
+                     p_sys->stat.i_read_time / CLOCK_FREQ,
                      i_byterate / 1024 );
             break;
         }
@@ -1446,13 +1446,13 @@ static void AStreamPrebufferStream( stream_t *s )
             /* Update stat */
             p_sys->stat.i_bytes = i_buffered;
             p_sys->stat.i_read_time = i_date - i_start;
-            i_byterate = ( INT64_C(1000000) * p_sys->stat.i_bytes ) /
+            i_byterate = ( CLOCK_FREQ * p_sys->stat.i_bytes ) /
                          (p_sys->stat.i_read_time+1);
 
             msg_Dbg( s, "pre-buffering done %"PRId64" bytes in %"PRId64"s - "
                      "%"PRId64" KiB/s",
                      p_sys->stat.i_bytes,
-                     p_sys->stat.i_read_time / INT64_C(1000000),
+                     p_sys->stat.i_read_time / CLOCK_FREQ,
                      i_byterate / 1024 );
             break;
         }
