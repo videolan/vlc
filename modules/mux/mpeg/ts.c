@@ -1867,34 +1867,21 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
             p_ts->i_flags |= BLOCK_FLAG_CLOCK;
 
             p_ts->p_buffer[4] = 7 + i_stuffing;
-            p_ts->p_buffer[5] = 0x10;   /* flags */
+            p_ts->p_buffer[5] = 1 << 4; /* PCR_flag */
             if( p_stream->b_discontinuity )
             {
                 p_ts->p_buffer[5] |= 0x80; /* flag TS dicontinuity */
                 p_stream->b_discontinuity = false;
             }
-            p_ts->p_buffer[6] = 0 &0xff;
-            p_ts->p_buffer[7] = 0 &0xff;
-            p_ts->p_buffer[8] = 0 &0xff;
-            p_ts->p_buffer[9] = 0 &0xff;
-            p_ts->p_buffer[10]= ( 0 &0x80 ) | 0x7e;
-            p_ts->p_buffer[11]= 0;
-
-            for (int i = 12; i < 12 + i_stuffing; i++ )
-            {
-                p_ts->p_buffer[i] = 0xff;
-            }
+            memset(&p_ts->p_buffer[12], 0xff, i_stuffing);
         }
         else
         {
-            p_ts->p_buffer[4] = i_stuffing - 1;
-            if( i_stuffing > 1 )
+            p_ts->p_buffer[4] = --i_stuffing;
+            if( i_stuffing-- )
             {
-                p_ts->p_buffer[5] = 0x00;
-                for (int i = 6; i < 6 + i_stuffing - 2; i++ )
-                {
-                    p_ts->p_buffer[i] = 0xff;
-                }
+                p_ts->p_buffer[5] = 0;
+                memset(&p_ts->p_buffer[6], 0xff, i_stuffing);
             }
         }
     }
@@ -1941,7 +1928,9 @@ static void TSSetPCR( block_t *p_ts, mtime_t i_dts )
     p_ts->p_buffer[7]  = ( i_pcr >> 17 )&0xff;
     p_ts->p_buffer[8]  = ( i_pcr >> 9  )&0xff;
     p_ts->p_buffer[9]  = ( i_pcr >> 1  )&0xff;
-    p_ts->p_buffer[10]|= ( i_pcr << 7  )&0x80;
+    p_ts->p_buffer[10] = ( i_pcr << 7  )&0x80;
+    p_ts->p_buffer[10] |= 0x7e;
+    p_ts->p_buffer[11] = 0; /* we don't set PCR extension */
 }
 
 static void PEStoTS( sout_buffer_chain_t *c, block_t *p_pes,
