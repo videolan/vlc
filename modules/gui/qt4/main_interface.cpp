@@ -304,8 +304,6 @@ MainInterface::~MainInterface()
     /* Save this size */
     QVLCTools::saveWidgetPosition(settings, this);
 
-    delete statusBar();
-
     /* Unregister callbacks */
     var_DelCallback( p_intf->p_libvlc, "intf-boss", IntfBossCB, p_intf );
     var_DelCallback( p_intf->p_libvlc, "intf-show", IntfRaiseMainCB, p_intf );
