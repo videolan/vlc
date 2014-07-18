@@ -991,7 +991,7 @@ static int Demux_Seekable( demux_t *p_demux )
     }
 
     /* wait for the good time */
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time + 1 );
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_time );
     p_sys->i_time += 25*1000;  /* read 25ms */
 
     /* init toread */
@@ -1288,7 +1288,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
     unsigned int i_stream;
     unsigned int i_packet;
 
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time + 1 );
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_time );
 
     /* *** find master stream for data packet skipping algo *** */
     /* *** -> first video, if any, or first audio ES *** */
