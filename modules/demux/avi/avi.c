@@ -173,6 +173,7 @@ struct demux_sys_t
     mtime_t i_time;
     mtime_t i_length;
 
+    bool  b_interleaved;
     bool  b_seekable;
     bool  b_fastseekable;
     bool  b_indexloaded; /* if we read indexes from end of file before starting */
@@ -298,12 +299,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux_Seekable;
 
-    /* For unseekable stream, automatically use Demux_UnSeekable */
-    if( !p_sys->b_seekable
-     || var_InheritBool( p_demux, "avi-interleaved" ) )
-    {
-        p_demux->pf_demux = Demux_UnSeekable;
-    }
+    p_sys->b_interleaved = var_InheritBool( p_demux, "avi-interleaved" );
 
     if( i_peeker > 0 )
     {
@@ -374,6 +370,8 @@ static int Open( vlc_object_t * p_this )
              p_avih->i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
              p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
              p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
+
+    p_sys->b_interleaved |= (p_avih->i_flags & AVIF_ISINTERLEAVED);
 
     AVI_MetaLoad( p_demux, p_riff, p_avih );
     p_sys->i_avih_flags = p_avih->i_flags;
@@ -1583,15 +1581,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
         case DEMUX_SET_POSITION:
             f = (double)va_arg( args, double );
-            if( p_sys->b_seekable )
+            if ( !p_sys->b_seekable )
             {
-                i64 = (mtime_t)(f * CLOCK_FREQ * p_sys->i_length);
-                return Seek( p_demux, i64, (int)(f * 100) );
+                return VLC_EGENERIC;
             }
             else
             {
-                int64_t i_pos = stream_Size( p_demux->s ) * f;
-                return stream_Seek( p_demux->s, i_pos );
+                i64 = (mtime_t)(f * CLOCK_FREQ * p_sys->i_length);
+                return Seek( p_demux, i64, (int)(f * 100) );
             }
 
         case DEMUX_GET_TIME:
