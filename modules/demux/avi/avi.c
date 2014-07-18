@@ -1425,7 +1425,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     msg_Dbg( p_demux, "seek requested: %"PRId64" seconds %d%%",
-             i_date / 1000000, i_percent );
+             i_date / CLOCK_FREQ, i_percent );
 
     if( p_sys->b_seekable )
     {
@@ -1531,7 +1531,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
         }
         es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
         p_sys->i_time = i_date;
-        msg_Dbg( p_demux, "seek: %"PRId64" seconds", p_sys->i_time /1000000 );
+        msg_Dbg( p_demux, "seek: %"PRId64" seconds", p_sys->i_time /CLOCK_FREQ );
         return VLC_SUCCESS;
 
 failandresetpos:
@@ -1557,7 +1557,7 @@ static double ControlGetPosition( demux_t *p_demux )
 
     if( p_sys->i_length > 0 )
     {
-        return (double)p_sys->i_time / (double)( p_sys->i_length * (mtime_t)1000000 );
+        return (double)p_sys->i_time / (double)( p_sys->i_length * (mtime_t)CLOCK_FREQ );
     }
     else if( stream_Size( p_demux->s ) > 0 )
     {
@@ -1585,7 +1585,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             f = (double)va_arg( args, double );
             if( p_sys->b_seekable )
             {
-                i64 = (mtime_t)(1000000.0 * p_sys->i_length * f );
+                i64 = (mtime_t)(f * CLOCK_FREQ * p_sys->i_length);
                 return Seek( p_demux, i64, (int)(f * 100) );
             }
             else
@@ -1610,7 +1610,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             else if( p_sys->i_length > 0 )
             {
-                i_percent = 100 * i64 / (p_sys->i_length*1000000);
+                i_percent = 100 * i64 / (p_sys->i_length*CLOCK_FREQ);
             }
             else if( p_sys->i_time > 0 )
             {
@@ -1621,7 +1621,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = p_sys->i_length * (mtime_t)1000000;
+            *pi64 = p_sys->i_length * (mtime_t)CLOCK_FREQ;
             return VLC_SUCCESS;
 
         case DEMUX_GET_FPS:
@@ -1675,7 +1675,7 @@ static mtime_t AVI_PTSToChunk( avi_track_t *tk, mtime_t i_pts )
     return (mtime_t)((int64_t)i_pts *
                      (int64_t)tk->i_rate /
                      (int64_t)tk->i_scale /
-                     (int64_t)1000000 );
+                     (int64_t)CLOCK_FREQ );
 }
 static mtime_t AVI_PTSToByte( avi_track_t *tk, mtime_t i_pts )
 {
