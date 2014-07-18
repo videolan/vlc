@@ -519,7 +519,7 @@ static void parse_BootstrapData( vlc_object_t* p_this,
         return;
     }
 
-    s->quality_segment_modifier = 0;
+    s->quality_segment_modifier = NULL;
 
     uint8_t quality_entry_count = *data_p;
     data_p++;
@@ -530,10 +530,10 @@ static void parse_BootstrapData( vlc_object_t* p_this,
         return;
     }
 
-    s->quality_segment_modifier = 0;
+    s->quality_segment_modifier = NULL;
     while( quality_entry_count-- > 0 )
     {
-        if( s->quality_segment_modifier != 0 )
+        if( s->quality_segment_modifier )
         {
             s->quality_segment_modifier = strndup( (char*)data_p, data_end - data_p );
         }
@@ -626,8 +626,8 @@ static uint32_t find_chunk_mdat( vlc_object_t* p_this,
                                  uint8_t* chunkdata, uint8_t* chunkdata_end,
                                  uint8_t** mdatptr )
 {
-    uint8_t* boxname = 0;
-    uint8_t* boxdata = 0;
+    uint8_t* boxname = NULL;
+    uint8_t* boxdata = NULL;
     uint64_t boxsize = 0;
 
     do {
@@ -843,7 +843,7 @@ static chunk_t* generate_new_chunk(
 
     if( ! chunk ) {
         msg_Err( p_this, "Couldn't allocate new chunk!" );
-        return 0;
+        return NULL;
     }
 
     if( last_chunk )
@@ -1133,13 +1133,13 @@ static int parse_Manifest( stream_t *s )
 #define MAX_XML_DEPTH 256
     char* element_stack[256];
     uint8_t current_element_idx = 0;
-    char* current_element = 0;
+    char* current_element = NULL;
     memset( element_stack, 0, sizeof(char*) * MAX_XML_DEPTH );
 
     const char* attr_name;
     const char* attr_value;
 
-    char* media_id = 0;
+    char* media_id = NULL;
 
 #define TIMESCALE 10000000
     while( (type = xml_ReaderNextNode( vlc_reader, (const char**) &node )) > 0 )
@@ -1242,7 +1242,7 @@ static int parse_Manifest( stream_t *s )
             }
             if( ! strcmp( current_element, "id" ) )
             {
-                if( current_element != 0 &&
+                if( current_element &&
                     ! strcmp( element_stack[current_element_idx-1], "manifest" ) )
                 {
                     media_id = strdup( node );
