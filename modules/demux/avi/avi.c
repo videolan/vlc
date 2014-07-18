@@ -1604,7 +1604,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             int i_percent = 0;
 
             i64 = (int64_t)va_arg( args, int64_t );
-            if( p_sys->i_length > 0 )
+            if( !p_sys->b_seekable )
+            {
+                return VLC_EGENERIC;
+            }
+            else if( p_sys->i_length > 0 )
             {
                 i_percent = 100 * i64 / (p_sys->i_length*1000000);
             }
