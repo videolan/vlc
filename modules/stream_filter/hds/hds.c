@@ -1043,7 +1043,7 @@ static void* live_thread( void* p )
                           server_base,
                           hds_stream->abst_url ) )
         {
-            return 0;
+            return NULL;
         }
     }
 
