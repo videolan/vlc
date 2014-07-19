@@ -1009,6 +1009,10 @@ static void maintain_live_chunks(
     hds_stream->chunks_head = chunk;
 }
 
+#define SAFE_STRDUP( dest, src, ret )   \
+    if( !( (dest) = strdup( (src) ) ) ) \
+        return (ret)
+
 static void* live_thread( void* p )
 {
     vlc_object_t* p_this = (vlc_object_t*)p;
@@ -1028,7 +1032,7 @@ static void* live_thread( void* p )
     if( hds_stream->abst_url &&
         ( isFQUrl( hds_stream->abst_url ) ) )
     {
-        abst_url = strdup ( hds_stream->abst_url );
+        SAFE_STRDUP( abst_url, hds_stream->abst_url, NULL );
     }
     else
     {
@@ -1148,10 +1152,11 @@ static int parse_Manifest( stream_t *s )
         {
         case XML_READER_STARTELEM:
             if( current_element_idx == 0 && element_stack[current_element_idx] == 0 ) {
-                element_stack[current_element_idx] = strdup( node );
+                SAFE_STRDUP( element_stack[current_element_idx], node, VLC_ENOMEM );
             } else {
-                element_stack[++current_element_idx] = strdup( node );
+                SAFE_STRDUP( element_stack[++current_element_idx], node, VLC_ENOMEM );
             }
+
             break;
         case XML_READER_ENDELEM:
             if( ! strcmp( current_element, "bootstrapInfo") ) {
@@ -1185,15 +1190,15 @@ static int parse_Manifest( stream_t *s )
             {
                 if( !strcmp(attr_name, "streamId" ) )
                 {
-                    medias[media_idx].stream_id = strdup( attr_value );
+                    SAFE_STRDUP( medias[media_idx].stream_id, attr_value, VLC_ENOMEM );
                 }
                 if( !strcmp(attr_name, "url" ) )
                 {
-                    medias[media_idx].media_url = strdup( attr_value );
+                    SAFE_STRDUP( medias[media_idx].media_url, attr_value, VLC_ENOMEM );
                 }
                 if( !strcmp(attr_name, "bootstrapInfoId" ) )
                 {
-                    medias[media_idx].bootstrap_id = strdup( attr_value );
+                    SAFE_STRDUP( medias[media_idx].bootstrap_id, attr_value, VLC_ENOMEM );
                 }
             }
 
@@ -1206,15 +1211,15 @@ static int parse_Manifest( stream_t *s )
             {
                 if( !strcmp(attr_name, "url" ) )
                 {
-                    bootstraps[bootstrap_idx].url = strdup( attr_value );
+                    SAFE_STRDUP( bootstraps[bootstrap_idx].url, attr_value, VLC_ENOMEM );
                 }
                 if( !strcmp(attr_name, "id" ) )
                 {
-                    bootstraps[bootstrap_idx].id = strdup( attr_value );
+                    SAFE_STRDUP( bootstraps[bootstrap_idx].id, attr_value, VLC_ENOMEM );
                 }
                 if( !strcmp(attr_name, "profile" ) )
                 {
-                    bootstraps[bootstrap_idx].profile = strdup( attr_value );
+                    SAFE_STRDUP( bootstraps[bootstrap_idx].profile, attr_value, VLC_ENOMEM );
                 }
             }
         }
@@ -1245,7 +1250,7 @@ static int parse_Manifest( stream_t *s )
                 if( current_element &&
                     ! strcmp( element_stack[current_element_idx-1], "manifest" ) )
                 {
-                    media_id = strdup( node );
+                    SAFE_STRDUP( media_id, node, VLC_ENOMEM );
                 }
             }
         }
@@ -1280,7 +1285,7 @@ static int parse_Manifest( stream_t *s )
 
                 if( medias[i].media_url )
                 {
-                    new_stream->url = strdup( medias[i].media_url );
+                    SAFE_STRDUP( new_stream->url, medias[i].media_url, VLC_ENOMEM );
                 }
 
                 if( ! sys->live )
@@ -1307,7 +1312,7 @@ static int parse_Manifest( stream_t *s )
                 }
                 else
                 {
-                    new_stream->abst_url = strdup( bootstraps[j].url );
+                    SAFE_STRDUP( new_stream->abst_url, bootstraps[j].url, VLC_ENOMEM );
                 }
 
                 vlc_array_append( sys->hds_streams, new_stream );
@@ -1339,6 +1344,8 @@ static int parse_Manifest( stream_t *s )
 
     return VLC_SUCCESS;
 }
+
+#undef SAFE_STRDUP
 
 static void hds_free( hds_stream_t *p_stream )
 {
