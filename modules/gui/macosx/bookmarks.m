@@ -397,6 +397,8 @@ clear:
         return @"";
     else if (input_Control(p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, &i_bookmarks) != VLC_SUCCESS)
         ret = @"";
+    else if (row >= i_bookmarks)
+        ret = @"";
     else {
         NSString * identifier = [theTableColumn identifier];
         if ([identifier isEqualToString: @"description"])
