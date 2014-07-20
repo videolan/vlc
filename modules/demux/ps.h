@@ -174,9 +174,15 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
         {
             es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_MP4V );
         }
-        else if( (i_id&0xf0) == 0xe0 && i_type == 0x02 )
+        else if( (i_id&0xf0) == 0xe0 && i_type == 0x01 ||
+                 (i_id&0xf0) == 0xe0 && i_type == 0x02 )
         {
             es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_MPGV );
+        }
+        else if( ( i_id&0xe0 ) == 0xc0 && i_type == 0x03 ||
+                 ( i_id&0xe0 ) == 0xc0 && i_type == 0x04 )
+        {
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MPGA );
         }
         else if( ( i_id&0xe0 ) == 0xc0 && i_type == 0x0f )
         {
@@ -185,10 +191,6 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
         else if( ( i_id&0xe0 ) == 0xc0 && i_type == 0x11 )
         {
             es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MP4A );
-        }
-        else if( ( i_id&0xe0 ) == 0xc0 && i_type == 0x03 )
-        {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MPGA );
         }
 
         if( tk->fmt.i_cat == UNKNOWN_ES && ( i_id&0xf0 ) == 0xe0 )
