@@ -127,10 +127,11 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     }
 
     /* Fill p_demux field */
-    p_demux->pf_demux = Demux;
-    p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     if( !p_sys ) return VLC_ENOMEM;
+
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
 
     /* Init p_sys */
     p_sys->i_mux_rate = 0;
