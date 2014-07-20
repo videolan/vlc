@@ -82,43 +82,44 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
 {
     tk->i_skip = 0;
     tk->i_id = i_id;
-    if( ( i_id&0xff00 ) == 0xbd00 )
+    if( ( i_id&0xff00 ) == 0xbd00 ) /* 0xBD00 -> 0xBDFF, Private Stream 1 */
     {
-        if( ( i_id&0xf8 ) == 0x88 || (i_id&0xf8) == 0x98 )
+        if( ( i_id&0xf8 ) == 0x88 || /* 0x88 -> 0x8f */
+            ( i_id&0xf8 ) == 0x98 )  /* 0x98 -> 0x9f */
         {
             es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_DTS );
             tk->i_skip = 4;
         }
-        else if( ( i_id&0xf0 ) == 0x80
-               ||  (i_id&0xf0) == 0xc0 ) /* AC-3, Can also be used for DD+/E-AC-3 */
+        else if( ( i_id&0xf8 ) == 0x80 || /* 0x80 -> 0x87 */
+                 ( i_id&0xf0 ) == 0xc0 )  /* 0xc0 -> 0xcf AC-3, Can also be used for DD+/E-AC-3 */
         {
             es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_A52 );
             tk->i_skip = 4;
         }
-        else if( (i_id&0xf0) == 0xb0 )
+        else if( (i_id&0xf0) == 0xb0 ) /* 0xb0 -> 0xbf */
         {
             es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MLP );
             /* FIXME / untested ... */
         }
-        else if( ( i_id&0xe0 ) == 0x20 )
+        else if( ( i_id&0xe0 ) == 0x20 ) /* 0x20 -> 0x3f */
         {
             es_format_Init( &tk->fmt, SPU_ES, VLC_CODEC_SPU );
             tk->i_skip = 1;
         }
-        else if( ( i_id&0xf0 ) == 0xa0 )
+        else if( ( i_id&0xf0 ) == 0xa0 ) /* 0xa0 -> 0xaf */
         {
             es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_DVD_LPCM );
             tk->i_skip = 1;
         }
-        else if( ( i_id&0xff ) == 0x70 )
+        else if( ( i_id&0xff ) == 0x70 ) /* 0x70 */
         {
             es_format_Init( &tk->fmt, SPU_ES, VLC_CODEC_OGT );
         }
-        else if( ( i_id&0xfc ) == 0x00 )
+        else if( ( i_id&0xfc ) == 0x00 ) /* 0x00 -> 0x03 */
         {
             es_format_Init( &tk->fmt, SPU_ES, VLC_CODEC_CVD );
         }
-        else if( ( i_id&0xff ) == 0x10 )
+        else if( ( i_id&0xff ) == 0x10 ) /* 0x10 */
         {
             es_format_Init( &tk->fmt, SPU_ES, VLC_CODEC_TELETEXT );
         }
@@ -128,7 +129,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
             return VLC_EGENERIC;
         }
     }
-    else if( (i_id&0xff00) == 0xfd00 )
+    else if( (i_id&0xff00) == 0xfd00 ) /* 0xFD00 -> 0xFDFF */
     {
         uint8_t i_sub_id = i_id & 0xff;
         if( i_sub_id >= 0x55 && i_sub_id <= 0x5f )
@@ -141,7 +142,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
             return VLC_EGENERIC;
         }
     }
-    else if( (i_id&0xff00) == 0xa000 )
+    else if( (i_id&0xff00) == 0xa000 ) /* 0xA000 -> 0xA0FF */
     {
         uint8_t i_sub_id = i_id & 0x07;
         if( i_sub_id == 0 )
@@ -166,40 +167,45 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
 
         es_format_Init( &tk->fmt, UNKNOWN_ES, 0 );
 
-        if( (i_id&0xf0) == 0xe0 && i_type == 0x1b )
+        if( (i_id&0xf0) == 0xe0 ) /* 0xe0 -> 0xef */
         {
-            es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_H264 );
+            if( i_type == 0x1b )
+            {
+                es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_H264 );
+            }
+            else if( i_type == 0x10 )
+            {
+                es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_MP4V );
+            }
+            else if( i_type == 0x01 ||
+                     i_type == 0x02 )
+            {
+                es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_MPGV );
+            }
+            else if( tk->fmt.i_cat == UNKNOWN_ES )
+            {
+                es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_MPGV );
+            }
         }
-        else if( (i_id&0xf0) == 0xe0 && i_type == 0x10 )
+        else if( ( i_id&0xe0 ) == 0xc0 ) /* 0xc0 -> 0xdf */
         {
-            es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_MP4V );
-        }
-        else if( (i_id&0xf0) == 0xe0 && i_type == 0x01 ||
-                 (i_id&0xf0) == 0xe0 && i_type == 0x02 )
-        {
-            es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_MPGV );
-        }
-        else if( ( i_id&0xe0 ) == 0xc0 && i_type == 0x03 ||
-                 ( i_id&0xe0 ) == 0xc0 && i_type == 0x04 )
-        {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MPGA );
-        }
-        else if( ( i_id&0xe0 ) == 0xc0 && i_type == 0x0f )
-        {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MP4A );
-        }
-        else if( ( i_id&0xe0 ) == 0xc0 && i_type == 0x11 )
-        {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MP4A );
-        }
-
-        if( tk->fmt.i_cat == UNKNOWN_ES && ( i_id&0xf0 ) == 0xe0 )
-        {
-            es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_MPGV );
-        }
-        else if( tk->fmt.i_cat == UNKNOWN_ES && ( i_id&0xe0 ) == 0xc0 )
-        {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MPGA );
+            if( i_type == 0x03 ||
+                i_type == 0x04 )
+            {
+                es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MPGA );
+            }
+            else if( i_type == 0x0f )
+            {
+                es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MP4A );
+            }
+            else if( i_type == 0x11 )
+            {
+                es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MP4A );
+            }
+            else if( tk->fmt.i_cat == UNKNOWN_ES )
+            {
+                es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MPGA );
+            }
         }
         else if( tk->fmt.i_cat == UNKNOWN_ES ) return VLC_EGENERIC;
     }
