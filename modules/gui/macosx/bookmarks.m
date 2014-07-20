@@ -121,6 +121,11 @@ static VLCBookmarks *_o_sharedInstance = nil;
     [o_bookmarks_window makeKeyAndOrderFront:nil];
 }
 
+- (void)refresh
+{
+    [o_tbl_dataTable reloadData];
+}
+
 - (IBAction)add:(id)sender
 {
     /* add item to list */
