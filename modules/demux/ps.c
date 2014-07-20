@@ -274,7 +274,7 @@ static void FindLength( demux_t *p_demux )
             {
                 p_sys->i_length = i_length;
                 p_sys->i_time_track = i;
-                msg_Dbg( p_demux, "we found a length of: %"PRId64, p_sys->i_length );
+                msg_Dbg( p_demux, "we found a length of: %"PRId64 "s", p_sys->i_length / CLOCK_FREQ );
             }
         }
     }
