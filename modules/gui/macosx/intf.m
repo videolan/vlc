@@ -659,7 +659,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_AddCallback(p_intf->p_libvlc, "intf-toggle-fscontrol", ShowController, self);
     var_AddCallback(p_intf->p_libvlc, "intf-show", ShowController, self);
     var_AddCallback(p_intf->p_libvlc, "intf-boss", BossCallback, self);
-    //    var_AddCallback(p_playlist, "item-change", PLItemChanged, self);
+    var_AddCallback(p_playlist, "item-change", PLItemChanged, self);
     var_AddCallback(p_playlist, "activity", PLItemChanged, self);
     var_AddCallback(p_playlist, "leaf-to-parent", PlaylistUpdated, self);
     var_AddCallback(p_playlist, "playlist-item-append", PlaylistUpdated, self);
@@ -831,7 +831,7 @@ static bool f_appExit = false;
     var_DelCallback(p_intf, "dialog-login", DialogCallback, self);
     var_DelCallback(p_intf, "dialog-question", DialogCallback, self);
     var_DelCallback(p_intf, "dialog-progress-bar", DialogCallback, self);
-    //var_DelCallback(p_playlist, "item-change", PLItemChanged, self);
+    var_DelCallback(p_playlist, "item-change", PLItemChanged, self);
     var_DelCallback(p_playlist, "activity", PLItemChanged, self);
     var_DelCallback(p_playlist, "leaf-to-parent", PlaylistUpdated, self);
     var_DelCallback(p_playlist, "playlist-item-append", PlaylistUpdated, self);
@@ -1298,6 +1298,7 @@ static bool f_appExit = false;
     [self updateDelays];
     [self updateMainMenu];
     [[self bookmarks] refresh];
+    [self playlistUpdated];
 
     /*
      * Due to constraints within NSAttributedString's main loop runtime handling
