@@ -1079,7 +1079,7 @@ static int Demux_Seekable( demux_t *p_demux )
 
             /* no valid index, we will parse directly the stream
              * in case we fail we will disable all finished stream */
-            if( p_sys->i_movi_lastchunk_pos >= p_sys->i_movi_begin + 12 )
+            if( p_sys->b_seekable && p_sys->i_movi_lastchunk_pos >= p_sys->i_movi_begin + 12 )
             {
                 stream_Seek( p_demux->s, p_sys->i_movi_lastchunk_pos );
                 if( AVI_PacketNext( p_demux ) )
