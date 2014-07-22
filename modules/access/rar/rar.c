@@ -197,7 +197,7 @@ static int SkipFile(stream_t *s, int *count, rar_file_t ***file,
 
     rar_file_t *current = NULL;
     if (method != 0x30) {
-        msg_Warn(s, "Ignoring compressed file %s (method=0x%2.2x)", name, method);
+        msg_Dbg(s, "Ignoring compressed file %s (method=0x%2.2x)", name, method);
         goto exit;
     }
 

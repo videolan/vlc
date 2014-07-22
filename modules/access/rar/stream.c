@@ -76,7 +76,7 @@ int RarStreamOpen(vlc_object_t *object)
          RarParse(s->p_source, &count, &files, true )) || count == 0 )
     {
         stream_Seek(s->p_source, position);
-        msg_Err(s, "Invalid or unsupported RAR archive");
+        msg_Info(s, "Invalid or unsupported RAR archive");
         free(files);
         return VLC_EGENERIC;
     }
