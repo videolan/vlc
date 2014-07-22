@@ -99,13 +99,6 @@ static void Close ( vlc_object_t * );
                        " the TS stream, instead of 1, 2, 3, etc. Useful to" \
                        " do \'#duplicate{..., select=\"es=<pid>\"}\'.")
 
-#define TSOUT_TEXT N_("Fast udp streaming")
-#define TSOUT_LONGTEXT N_( \
-  "Sends TS to specific ip:port by udp (you must know what you are doing).")
-
-#define MTUOUT_TEXT N_("MTU for out mode")
-#define MTUOUT_LONGTEXT N_("MTU for out mode.")
-
 #define CSA_TEXT N_("CSA Key")
 #define CSA_LONGTEXT N_("CSA encryption key. This must be a " \
   "16 char string (8 hexadecimal bytes).")
@@ -384,7 +377,6 @@ static void SetPrgFilter( demux_t *, int i_prg, bool b_selected );
 #define TS_PACKET_SIZE_192 192
 #define TS_PACKET_SIZE_204 204
 #define TS_PACKET_SIZE_MAX 204
-#define TS_TOPFIELD_HEADER 1320
 
 static int DetectPacketSize( demux_t *p_demux, int *pi_header_size )
 {
