@@ -27,6 +27,13 @@ ifdef HAVE_BSD
 LIVE_TARGET := freebsd
 endif
 endif
+ifdef HAVE_SOLARIS
+ifeq ($(ARCH),x86_64)
+LIVE_TARGET := solaris-64bit
+else
+LIVE_TARGET := solaris-32bit
+endif
+endif
 
 LIVE_EXTRA_CFLAGS := $(EXTRA_CFLAGS) -fexceptions
 
@@ -41,6 +48,7 @@ live555: $(LIVE555_FILE) .sum-live555
 	cd live && sed -i.orig \
 		-e 's%^\(COMPILE_OPTS.*\)$$%\1 '"$(LIVE_EXTRA_CFLAGS)%" config.*
 	cd live && sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig config.linux
+	cd live && sed -e 's%-DSOLARIS%-DSOLARIS -DXLOCALE_NOT_USED%' -i.orig config.solaris-*bit
 ifdef HAVE_ANDROID
 	cd live && sed -e 's%-DPIC%-DPIC -DNO_SSTREAM=1 -DLOCALE_NOT_USED -I$(ANDROID_NDK)/platforms/android-9/arch-$(PLATFORM_SHORT_ARCH)/usr/include%' -i.orig config.linux
 endif
