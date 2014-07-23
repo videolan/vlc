@@ -8,6 +8,9 @@ Access:
 Service Discovery:
  * New NetBios service discovery using libdsm
 
+Mac OS X Interface
+ * new AppleScript API giving access to audio desynchronization
+
 
 Changes between 2.1.x and 2.2.0:
 --------------------------------
