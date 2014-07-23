@@ -58,6 +58,8 @@ static struct
     { ADDON_EXTENSION,           ADDONS_SCRIPTS_DIR DIR_SEP "extensions" },
     { ADDON_PLAYLIST_PARSER,     ADDONS_SCRIPTS_DIR DIR_SEP "playlist" },
     { ADDON_SERVICE_DISCOVERY,   ADDONS_SCRIPTS_DIR DIR_SEP "sd" },
+    { ADDON_INTERFACE,           ADDONS_SCRIPTS_DIR DIR_SEP "intf" },
+    { ADDON_META,                ADDONS_SCRIPTS_DIR DIR_SEP "meta" },
     { ADDON_SKIN2,               ADDONS_DIR DIR_SEP "skins2" },
 };
 
@@ -319,7 +321,9 @@ static int List( addons_finder_t *p_finder )
     addon_type_t types[] = {
         ADDON_EXTENSION,
         ADDON_PLAYLIST_PARSER,
-        ADDON_SERVICE_DISCOVERY
+        ADDON_SERVICE_DISCOVERY,
+        ADDON_INTERFACE,
+        ADDON_META,
     };
     unsigned int i_type = 0;
 
@@ -439,6 +443,8 @@ static int InstallAllFiles( addons_storage_t *p_this, const addon_entry_t *p_ent
         case ADDON_EXTENSION:
         case ADDON_PLAYLIST_PARSER:
         case ADDON_SERVICE_DISCOVERY:
+        case ADDON_INTERFACE:
+        case ADDON_META:
         case ADDON_SKIN2:
         {
             if ( strstr( p_file->psz_filename, ".." ) )
@@ -859,6 +865,8 @@ static int Remove( addons_storage_t *p_storage, addon_entry_t *p_entry )
         case ADDON_EXTENSION:
         case ADDON_PLAYLIST_PARSER:
         case ADDON_SERVICE_DISCOVERY:
+        case ADDON_INTERFACE:
+        case ADDON_META:
         case ADDON_SKIN2:
         {
             char *psz_dest;
