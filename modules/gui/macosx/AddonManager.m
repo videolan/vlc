@@ -99,6 +99,10 @@ static VLCAddonManager *_o_sharedInstance = nil;
     [[_typeSwitcher lastItem] setTag:ADDON_PLAYLIST_PARSER];
     [_typeSwitcher addItemWithTitle:_NS("Service Discovery")];
     [[_typeSwitcher lastItem] setTag:ADDON_SERVICE_DISCOVERY];
+    [_typeSwitcher addItemWithTitle:_NS("Interfaces")];
+    [[_typeSwitcher lastItem] setTag:ADDON_INTERFACE];
+    [_typeSwitcher addItemWithTitle:_NS("Art and meta fetchers")];
+    [[_typeSwitcher lastItem] setTag:ADDON_META];
     [_typeSwitcher addItemWithTitle:_NS("Extensions")];
     [[_typeSwitcher lastItem] setTag:ADDON_EXTENSION];
 

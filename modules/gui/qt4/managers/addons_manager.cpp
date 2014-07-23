@@ -86,6 +86,10 @@ QString AddonsManager::getAddonType( int i_type )
         return qtr("Playlist parsers");
     case ADDON_SERVICE_DISCOVERY:
         return qtr("Service Discovery");
+    case ADDON_INTERFACE:
+        return qtr("Interfaces");
+    case ADDON_META:
+        return qtr("Art and meta fetchers");
     case ADDON_EXTENSION:
         return qtr("Extensions");
     default:
