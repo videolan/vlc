@@ -138,30 +138,41 @@ static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
     APE::Item item;
 
     item = tag->itemListMap()["COVER ART (FRONT)"];
-    if( !item.isEmpty() )
+    if( !item.isEmpty() && item.type() == APE::Item::Binary)
     {
         input_attachment_t *p_attachment;
 
-        const ByteVector picture = item.value();
+        const ByteVector picture = item.binaryData();
         const char *p_data = picture.data();
         unsigned i_data = picture.size();
 
+        /* Null terminated filename followed by the image data */
         size_t desc_len = strnlen(p_data, i_data);
-        if (desc_len < i_data) {
+        if( desc_len < i_data && IsUTF8( p_data ) )
+        {
             const char *psz_name = p_data;
+            const char *psz_mime = vlc_mime_Ext2Mime( psz_name );
             p_data += desc_len + 1; /* '\0' */
             i_data -= desc_len + 1;
-            msg_Dbg( p_demux_meta, "Found embedded art: %s (%s) is %u bytes",
-                     psz_name, "image/jpeg", i_data );
 
-            p_attachment = vlc_input_attachment_New( "cover", "image/jpeg",
+            msg_Dbg( p_demux_meta, "Found embedded art: %s (%s) is %u bytes",
+                     psz_name, psz_mime, i_data );
+
+            p_attachment = vlc_input_attachment_New( psz_name, psz_mime,
                                     psz_name, p_data, i_data );
             if( p_attachment )
+            {
                 TAB_APPEND_CAST( (input_attachment_t**),
                                  p_demux_meta->i_attachments, p_demux_meta->attachments,
                                  p_attachment );
 
-            vlc_meta_SetArtURL( p_meta, "attachment://cover" );
+                char *psz_url;
+                if( asprintf( &psz_url, "attachment://%s", p_attachment->psz_name ) != -1 )
+                {
+                    vlc_meta_SetArtURL( p_meta, psz_url );
+                    free( psz_url );
+                }
+            }
         }
     }
 
@@ -1098,4 +1109,3 @@ static int WriteMeta( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 }
-
