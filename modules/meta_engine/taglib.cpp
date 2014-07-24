@@ -415,7 +415,6 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_meta_t* p_demux_meta, vlc_
     if( list.isEmpty() )
         return;
 
-    TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
     for( iter = list.begin(); iter != list.end(); iter++ )
     {
         ID3v2::AttachedPictureFrame* p_apic =
@@ -594,7 +593,6 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
             &i_cover_score, &i_cover_idx );
     }
 
-    TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
     if (p_attachment) {
         TAB_APPEND_CAST( (input_attachment_t**),
                 p_demux_meta->i_attachments, p_demux_meta->attachments,
@@ -646,7 +644,6 @@ static void ReadMetaFromMP4( MP4::Tag* tag, demux_meta_t *p_demux_meta, vlc_meta
         msg_Dbg( p_demux_meta, "Found embedded art (%s) is %i bytes",
                  psz_format, list[0].data().size() );
 
-        TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
         input_attachment_t *p_attachment =
                 vlc_input_attachment_New( "cover", psz_format, "cover",
                                           list[0].data().data(), list[0].data().size() );
@@ -729,6 +726,7 @@ static int ReadMeta( vlc_object_t* p_this)
 #undef SETINT
 #undef SET
 
+    TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
 
     // Try now to read special tags
 #ifdef TAGLIB_HAVE_APEFILE_H
