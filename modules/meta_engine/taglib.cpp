@@ -766,10 +766,10 @@ static int ReadMeta( vlc_object_t* p_this)
     }
     else if( MPEG::File* mpeg = dynamic_cast<MPEG::File*>(f.file()) )
     {
+        if( mpeg->APETag() )
+            ReadMetaFromAPE( mpeg->APETag(), p_demux_meta, p_meta );
         if( mpeg->ID3v2Tag() )
             ReadMetaFromId3v2( mpeg->ID3v2Tag(), p_demux_meta, p_meta );
-        else if( mpeg->APETag() )
-            ReadMetaFromAPE( mpeg->APETag(), p_demux_meta, p_meta );
     }
     else if( dynamic_cast<Ogg::File*>(f.file()) )
     {
