@@ -31,6 +31,10 @@
 
 #define PREFIX(x) I ## x
 
+#if ANDROID_API >= 11
+#define HAS_USE_BUFFER
+#endif
+
 using namespace android;
 
 class IOMXContext {
@@ -76,6 +80,9 @@ public:
 class OMXBuffer {
 public:
     sp<MemoryDealer> dealer;
+#ifdef HAS_USE_BUFFER
+    sp<GraphicBuffer> graphicBuffer;
+#endif
     IOMX::buffer_id id;
 };
 
@@ -162,6 +169,9 @@ static OMX_ERRORTYPE iomx_allocate_buffer(OMX_HANDLETYPE component, OMX_BUFFERHE
 {
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
     OMXBuffer* info = new OMXBuffer;
+#ifdef HAS_USE_BUFFER
+    info->graphicBuffer = NULL;
+#endif
     info->dealer = new MemoryDealer(size + 4096); // Do we need to keep this around, or is it kept alive via the IMemory that references it?
     sp<IMemory> mem = info->dealer->allocate(size);
     int ret = ctx->iomx->allocateBufferWithBackup(node->node, port_index, mem, &info->id);
@@ -176,6 +186,27 @@ static OMX_ERRORTYPE iomx_allocate_buffer(OMX_HANDLETYPE component, OMX_BUFFERHE
     node->buffers.push_back(buffer);
     return OMX_ErrorNone;
 }
+
+#ifdef HAS_USE_BUFFER
+static OMX_ERRORTYPE iomx_use_buffer(OMX_HANDLETYPE component, OMX_BUFFERHEADERTYPE **bufferptr, OMX_U32 port_index, OMX_PTR app_private, OMX_U32 size, OMX_U8* data)
+{
+    OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
+    OMXBuffer* info = new OMXBuffer;
+    info->dealer = NULL;
+    info->graphicBuffer = new GraphicBuffer((ANativeWindowBuffer*) data, false);
+    int ret = ctx->iomx->useGraphicBuffer(node->node, port_index, info->graphicBuffer, &info->id);
+    if (ret != OK)
+        return OMX_ErrorUndefined;
+    OMX_BUFFERHEADERTYPE *buffer = (OMX_BUFFERHEADERTYPE*) calloc(1, sizeof(OMX_BUFFERHEADERTYPE));
+    *bufferptr = buffer;
+    buffer->pPlatformPrivate = info;
+    buffer->pAppPrivate = app_private;
+    buffer->nAllocLen = size;
+    buffer->pBuffer = data;
+    node->buffers.push_back(buffer);
+    return OMX_ErrorNone;
+}
+#endif
 
 static OMX_ERRORTYPE iomx_free_buffer(OMX_HANDLETYPE component, OMX_U32 port, OMX_BUFFERHEADERTYPE *buffer)
 {
@@ -270,6 +301,11 @@ OMX_ERRORTYPE PREFIX(OMX_GetHandle)(OMX_HANDLETYPE *handle_ptr, OMX_STRING compo
     component->FillThisBuffer = iomx_fill_this_buffer;
     component->GetState = iomx_get_state;
     component->AllocateBuffer = iomx_allocate_buffer;
+#ifdef HAS_USE_BUFFER
+    component->UseBuffer = iomx_use_buffer;
+#else
+    component->UseBuffer = NULL;
+#endif
     component->ComponentRoleEnum = iomx_component_role_enum;
     component->GetExtensionIndex = iomx_get_extension_index;
     component->SetConfig = iomx_set_config;
