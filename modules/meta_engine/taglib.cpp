@@ -135,14 +135,17 @@ static void ExtractTrackNumberValues( vlc_meta_t* p_meta, const char *psz_value 
  */
 static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta_t* p_meta )
 {
-    APE::Item item;
+    APE::ItemListMap fields ( tag->itemListMap() );
+    APE::ItemListMap::Iterator iter;
 
-    item = tag->itemListMap()["COVER ART (FRONT)"];
-    if( !item.isEmpty() && item.type() == APE::Item::Binary)
+    iter = fields.find("COVER ART (FRONT)");
+    if( iter != fields.end()
+        && !iter->second.isEmpty()
+        && !iter->second.type() == APE::Item::Binary)
     {
         input_attachment_t *p_attachment;
 
-        const ByteVector picture = item.binaryData();
+        const ByteVector picture = iter->second.binaryData();
         const char *p_data = picture.data();
         unsigned i_data = picture.size();
 
@@ -174,15 +177,23 @@ static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
                 }
             }
         }
+
+        fields.erase(iter);
     }
 
 #define SET( keyName, metaName ) \
-    item = tag->itemListMap()[keyName]; \
-    if( !item.isEmpty() ) vlc_meta_Set##metaName( p_meta, item.toString().toCString( true ) );
+    iter = fields.find(keyName); \
+    if( iter != fields.end() && !iter->second.isEmpty() ) { \
+        vlc_meta_Set##metaName( p_meta, iter->second.toString().toCString( true ) ); \
+        fields.erase(iter); \
+    }
 
 #define SET_EXTRA( keyName, metaName ) \
-    item = tag->itemListMap()[keyName]; \
-    if( !item.isEmpty() ) vlc_meta_AddExtra( p_meta, metaName, item.toString().toCString( true ) );
+    iter = fields.find( keyName ); \
+    if( iter != fields.end() && !iter->second.isEmpty() ) { \
+        vlc_meta_AddExtra( p_meta, metaName, iter->second.toString().toCString( true ) ); \
+        fields.erase(iter); \
+    }
 
     SET( "ALBUM", Album );
     SET( "ARTIST", Artist );
@@ -200,10 +211,25 @@ static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
 #undef SET_EXTRA
 
     /* */
-    item = tag->itemListMap()["TRACK"];
-    if( !item.isEmpty() )
+    iter = fields.find( "TRACK" );
+    if( iter != fields.end() && !iter->second.isEmpty() )
     {
-        ExtractTrackNumberValues( p_meta, item.toString().toCString( true ) );
+        ExtractTrackNumberValues( p_meta, iter->second.toString().toCString( true ) );
+        fields.erase( iter );
+    }
+
+    /* Remainings */
+    for( iter = fields.begin(); iter != fields.end(); ++iter )
+    {
+        if( iter->second.isEmpty() )
+            continue;
+
+        if( iter->second.type() != APE::Item::Text )
+            continue;
+
+        vlc_meta_AddExtra( p_meta,
+                           iter->first.toCString( true ),
+                           iter->second.toString().toCString( true ) );
     }
 }
 
