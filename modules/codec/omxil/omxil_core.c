@@ -87,6 +87,14 @@ OMX_ERRORTYPE (*pf_get_handle) (OMX_HANDLETYPE *, OMX_STRING,
 OMX_ERRORTYPE (*pf_free_handle) (OMX_HANDLETYPE);
 OMX_ERRORTYPE (*pf_component_enum)(OMX_STRING, OMX_U32, OMX_U32);
 OMX_ERRORTYPE (*pf_get_roles_of_component)(OMX_STRING, OMX_U32 *, OMX_U8 **);
+int (*pf_omx_hwbuffer_connect) (void *);
+int (*pf_omx_hwbuffer_disconnect) (void *);
+int (*pf_omx_hwbuffer_setup) (void *, int, int, int, int, unsigned int *,
+                              unsigned int *);
+int (*pf_omx_hwbuffer_setcrop) (void *, int, int, int, int);
+int (*pf_omx_hwbuffer_dequeue) (void *, void **);
+int (*pf_omx_hwbuffer_queue) (void *, void *);
+int (*pf_omx_hwbuffer_cancel) (void *, void *);
 
 #ifdef RPI_OMX
 static void *extra_dll_handle;
@@ -160,6 +168,15 @@ int InitOmxCore(vlc_object_t *p_this)
         vlc_mutex_unlock( &omx_core_mutex );
         return VLC_EGENERIC;
     }
+#if defined(USE_IOMX)
+    pf_omx_hwbuffer_connect = dlsym( dll_handle, "OMXHWBuffer_Connect" );
+    pf_omx_hwbuffer_disconnect = dlsym( dll_handle, "OMXHWBuffer_Disconnect" );
+    pf_omx_hwbuffer_setup = dlsym( dll_handle, "OMXHWBuffer_Setup" );
+    pf_omx_hwbuffer_setcrop = dlsym( dll_handle, "OMXHWBuffer_Setcrop" );
+    pf_omx_hwbuffer_dequeue = dlsym( dll_handle, "OMXHWBuffer_Dequeue" );
+    pf_omx_hwbuffer_queue = dlsym( dll_handle, "OMXHWBuffer_Queue" );
+    pf_omx_hwbuffer_cancel = dlsym( dll_handle, "OMXHWBuffer_Cancel" );
+#endif
 
     /* Initialise the OMX core */
     OMX_ERRORTYPE omx_error = pf_init();

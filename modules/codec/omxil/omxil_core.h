@@ -33,6 +33,16 @@ OMX_ERRORTYPE (*pf_free_handle) (OMX_HANDLETYPE);
 OMX_ERRORTYPE (*pf_component_enum)(OMX_STRING, OMX_U32, OMX_U32);
 OMX_ERRORTYPE (*pf_get_roles_of_component)(OMX_STRING, OMX_U32 *, OMX_U8 **);
 
+/* OMXHWBuffer functions */
+int (*pf_omx_hwbuffer_connect) (void *);
+int (*pf_omx_hwbuffer_disconnect) (void *);
+int (*pf_omx_hwbuffer_setup) (void *, int, int, int, int, unsigned int *,
+                              unsigned int *);
+int (*pf_omx_hwbuffer_setcrop) (void *, int, int, int, int);
+int (*pf_omx_hwbuffer_dequeue) (void *, void **);
+int (*pf_omx_hwbuffer_queue) (void *, void *);
+int (*pf_omx_hwbuffer_cancel) (void *, void *);
+
 int InitOmxCore(vlc_object_t *p_this);
 void DeinitOmxCore(void);
 
