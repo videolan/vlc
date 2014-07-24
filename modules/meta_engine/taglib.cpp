@@ -235,8 +235,8 @@ static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
 
 
 /**
- * Read meta information from APE tags
- * @param tag: the APE tag
+ * Read meta information from ASF tags
+ * @param tag: the ASF tag
  * @param p_demux_meta: the demuxer meta
  * @param p_meta: the meta
  */
