@@ -87,6 +87,9 @@ OMX_ERRORTYPE (*pf_get_handle) (OMX_HANDLETYPE *, OMX_STRING,
 OMX_ERRORTYPE (*pf_free_handle) (OMX_HANDLETYPE);
 OMX_ERRORTYPE (*pf_component_enum)(OMX_STRING, OMX_U32, OMX_U32);
 OMX_ERRORTYPE (*pf_get_roles_of_component)(OMX_STRING, OMX_U32 *, OMX_U8 **);
+OMX_ERRORTYPE (*pf_enable_graphic_buffers)(OMX_HANDLETYPE, OMX_U32, OMX_BOOL);
+OMX_ERRORTYPE (*pf_get_graphic_buffer_usage)(OMX_HANDLETYPE, OMX_U32, OMX_U32*);
+
 int (*pf_omx_hwbuffer_connect) (void *);
 int (*pf_omx_hwbuffer_disconnect) (void *);
 int (*pf_omx_hwbuffer_setup) (void *, int, int, int, int, unsigned int *,
@@ -169,6 +172,9 @@ int InitOmxCore(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 #if defined(USE_IOMX)
+    pf_enable_graphic_buffers = dlsym( dll_handle, "OMXAndroid_EnableGraphicBuffers" );
+    pf_get_graphic_buffer_usage = dlsym( dll_handle, "OMXAndroid_GetGraphicBufferUsage" );
+
     pf_omx_hwbuffer_connect = dlsym( dll_handle, "OMXHWBuffer_Connect" );
     pf_omx_hwbuffer_disconnect = dlsym( dll_handle, "OMXHWBuffer_Disconnect" );
     pf_omx_hwbuffer_setup = dlsym( dll_handle, "OMXHWBuffer_Setup" );

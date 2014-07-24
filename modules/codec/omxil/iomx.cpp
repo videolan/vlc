@@ -404,5 +404,25 @@ OMX_ERRORTYPE PREFIX(OMX_GetComponentsOfRole)(OMX_STRING role, OMX_U32 *num_comp
     *num_comps = i;
     return OMX_ErrorNone;
 }
+
+#ifdef HAS_USE_BUFFER
+OMX_ERRORTYPE PREFIX(OMXAndroid_EnableGraphicBuffers)(OMX_HANDLETYPE component, OMX_U32 port_index, OMX_BOOL enable)
+{
+    OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
+    int ret = ctx->iomx->enableGraphicBuffers(node->node, port_index, enable);
+    if (ret != OK)
+        return OMX_ErrorUndefined;
+    return OMX_ErrorNone;
+}
+
+OMX_ERRORTYPE PREFIX(OMXAndroid_GetGraphicBufferUsage)(OMX_HANDLETYPE component, OMX_U32 port_index, OMX_U32* usage)
+{
+    OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
+    int ret = ctx->iomx->getGraphicBufferUsage(node->node, port_index, usage);
+    if (ret != OK)
+        return OMX_ErrorUndefined;
+    return OMX_ErrorNone;
+}
+#endif
 }
 
