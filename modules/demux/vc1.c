@@ -173,13 +173,13 @@ static int Demux( demux_t *p_demux)
 
             if( p_sys->p_packetizer->fmt_out.video.i_frame_rate > 0 &&
                 p_sys->p_packetizer->fmt_out.video.i_frame_rate_base > 0 )
-                p_sys->i_dts += INT64_C(1000000) *
+                p_sys->i_dts += CLOCK_FREQ *
                     p_sys->p_packetizer->fmt_out.video.i_frame_rate_base /
                     p_sys->p_packetizer->fmt_out.video.i_frame_rate;
             else if( p_sys->f_fps > 0.001 )
-                p_sys->i_dts += (int64_t)((double)1000000.0 / p_sys->f_fps);
+                p_sys->i_dts += (int64_t)((double) CLOCK_FREQ / p_sys->f_fps);
             else
-                p_sys->i_dts += INT64_C(1000000) / 25;
+                p_sys->i_dts += CLOCK_FREQ / 25;
         }
     }
     return 1;
