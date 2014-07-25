@@ -1,4 +1,5 @@
 GNU=http://ftp.gnu.org/gnu
+APACHE=http://mirror.csclub.uwaterloo.ca/apache
 
 YASM_VERSION=1.2.0
 #YASM_URL=$(CONTRIB_VIDEOLAN)/yasm-$(YASM_VERSION).tar.gz
@@ -37,3 +38,6 @@ RAGEL_URL=http://www.complang.org/ragel/ragel-$(RAGEL_VERSION).tar.gz
 
 SED_VERSION=4.2.2
 SED_URL=$(GNU)/sed/sed-$(SED_VERSION).tar.bz2
+
+ANT_VERSION=1.9.4
+ANT_URL=$(APACHE)/ant/binaries/apache-ant-$(ANT_VERSION)-bin.tar.bz2
