@@ -297,7 +297,7 @@ static int Open( vlc_object_t * p_this )
     stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
 
     p_demux->pf_control = Control;
-    p_demux->pf_demux = Demux_Seekable;
+    p_demux->pf_demux = (p_sys->b_seekable) ? Demux_Seekable : Demux_UnSeekable;
 
     p_sys->b_interleaved = var_InheritBool( p_demux, "avi-interleaved" );
 
