@@ -51,6 +51,11 @@ ifdef HAVE_DARWIN_OS
 		-e 's%LDFLAGS=%LDFLAGS=$(EXTRA_CFLAGS) $(EXTRA_LDFLAGS)%' \
 		-i.orig src/Makefile)
 endif
+ifdef HAVE_SOLARIS
+	(cd $(UNPACK_DIR) && \
+	sed -e 's%LIBS="-ldl"$$%LIBS="-ldl" MYLDFLAGS="$(EXTRA_LDFLAGS)"%' \
+		-i.orig src/Makefile)
+endif
 ifdef HAVE_WIN32
 	cd $(UNPACK_DIR) && sed -i.orig -e 's/lua luac/lua.exe luac.exe/' Makefile
 endif
