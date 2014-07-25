@@ -1456,7 +1456,7 @@ static int DecodeVideoInput( decoder_t *p_dec, OmxPort *p_port, block_t **pp_blo
     block_t *p_block = *pp_block;
 
     /* Send the input buffer to the component */
-    OMX_FIFO_GET_TIMEOUT(&p_port->fifo, p_header, 200000);
+    OMX_FIFO_GET_TIMEOUT(&p_port->fifo, p_header, 10000);
 
     if (p_header && p_header->nFlags & SENTINEL_FLAG) {
         free(p_header);
@@ -1532,7 +1532,6 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     picture_t *p_pic = NULL;
     OMX_ERRORTYPE omx_error;
     unsigned int i;
-    bool b_reconfig;
     block_t *p_block;
 
     if( !pp_block || !*pp_block )
@@ -1578,29 +1577,64 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     if( DecodeVideoOutput( p_dec, &p_sys->out, &p_pic ) != 0 )
         goto error;
 
-    if( DecodeVideoInput( p_dec, &p_sys->in, pp_block, 0, &b_reconfig ) != 0 )
-        goto error;
+    /* Loop as long as we haven't either got an input buffer (and cleared
+     * *pp_block) or got an output picture */
+    int max_polling_attempts = 100;
+    int attempts = 0;
+    while( *pp_block && !p_pic ) {
+        bool b_reconfig = false;
 
-    /* If we don't have a p_pic from the first try. Try again */
-    if( !b_reconfig && !p_pic &&
-        DecodeVideoOutput( p_dec, &p_sys->out, &p_pic ) != 0 )
-        goto error;
+        if( DecodeVideoInput( p_dec, &p_sys->in, pp_block, 0, &b_reconfig ) != 0 )
+            goto error;
 
-    /* Handle the PortSettingsChanged events */
-    for(i = 0; i < p_sys->ports; i++)
-    {
-        OmxPort *p_port = &p_sys->p_ports[i];
-        if(p_port->b_reconfigure)
+        /* If we don't have a p_pic from the first try. Try again */
+        if( !b_reconfig && !p_pic &&
+            DecodeVideoOutput( p_dec, &p_sys->out, &p_pic ) != 0 )
+            goto error;
+
+        /* Handle the PortSettingsChanged events */
+        for(i = 0; i < p_sys->ports; i++)
         {
-            omx_error = PortReconfigure(p_dec, p_port);
-            p_port->b_reconfigure = 0;
-            CHECK_ERROR(omx_error, "PortReconfigure failed");
+            OmxPort *p_port = &p_sys->p_ports[i];
+            if(p_port->b_reconfigure)
+            {
+                omx_error = PortReconfigure(p_dec, p_port);
+                p_port->b_reconfigure = 0;
+                CHECK_ERROR(omx_error, "PortReconfigure failed");
+            }
+            if(p_port->b_update_def)
+            {
+                omx_error = GetPortDefinition(p_dec, p_port, p_port->p_fmt);
+                p_port->b_update_def = 0;
+                CHECK_ERROR(omx_error, "GetPortDefinition failed");
+            }
         }
-        if(p_port->b_update_def)
-        {
-            omx_error = GetPortDefinition(p_dec, p_port, p_port->p_fmt);
-            p_port->b_update_def = 0;
-            CHECK_ERROR(omx_error, "GetPortDefinition failed");
+
+        attempts++;
+        /* With opaque DR the output buffers are released by the
+           vout therefore we implement a timeout for polling in
+           order to avoid being indefinitely stalled in this loop, if
+           playback is paused. */
+        if( p_sys->out.p_hwbuf && attempts == max_polling_attempts ) {
+#ifdef USE_IOMX
+            picture_t *invalid_picture = decoder_NewPicture(p_dec);
+            if (invalid_picture) {
+                invalid_picture->date = VLC_TS_INVALID;
+                picture_sys_t *p_picsys = invalid_picture->p_sys;
+                p_picsys->pf_display_callback = NULL;
+                p_picsys->pf_unlock_callback = NULL;
+                p_picsys->p_dec = NULL;
+                p_picsys->i_index = -1;
+                p_picsys->b_valid = false;
+            } else {
+                /* If we cannot return a picture we must free the
+                   block since the decoder will proceed with the
+                   next block. */
+                block_Release(p_block);
+                *pp_block = NULL;
+            }
+            return invalid_picture;
+#endif
         }
     }
 
