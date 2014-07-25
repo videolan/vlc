@@ -100,8 +100,7 @@ int IOMXHWBuffer_Disconnect( void *window )
 }
 
 
-int IOMXHWBuffer_Setup( void *window, int w, int h, int hal_format, int hw_usage,
-                        unsigned int *num_frames, unsigned int *min_undequeued )
+int IOMXHWBuffer_Setup( void *window, int w, int h, int hal_format, int hw_usage )
 {
     ANativeWindow *anw = (ANativeWindow *)window;
     int usage = 0;
@@ -134,19 +133,38 @@ int IOMXHWBuffer_Setup( void *window, int w, int h, int hal_format, int hw_usage
     CHECK_ERR();
 #endif
 
+    return 0;
+}
+
+int IOMXHWBuffer_GetMinUndequeued( void *window, unsigned int *min_undequeued )
+{
+    ANativeWindow *anw = (ANativeWindow *)window;
+    status_t err;
+
+    CHECK_ANW();
 #if ANDROID_API >= 11
-    if( *min_undequeued == 0 )
-    {
-        anw->query( anw, NATIVE_WINDOW_MIN_UNDEQUEUED_BUFFERS, min_undequeued );
-        CHECK_ERR();
-    }
+    err = anw->query( anw, NATIVE_WINDOW_MIN_UNDEQUEUED_BUFFERS, min_undequeued );
+    CHECK_ERR();
 #endif
     /* set a minimum value of min_undequeued in case query fails */
     if( *min_undequeued == 0 )
         *min_undequeued = 2;
-    *num_frames += *min_undequeued;
 
-    err = native_window_set_buffer_count( anw, *num_frames );
+    LOGD( "IOMXHWBuffer_GetMinUndequeued: %p %u", anw, *min_undequeued );
+
+    return 0;
+}
+
+int IOMXHWBuffer_SetBufferCount(void *window, unsigned int count )
+{
+    ANativeWindow *anw = (ANativeWindow *)window;
+    status_t err;
+
+    CHECK_ANW();
+
+    LOGD( "IOMXHWBuffer_SetBufferCount: %p %u", anw, count );
+
+    err = native_window_set_buffer_count( anw, count );
     CHECK_ERR();
 
     return 0;

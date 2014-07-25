@@ -40,8 +40,9 @@ OMX_ERRORTYPE (*pf_get_graphic_buffer_usage)(OMX_HANDLETYPE, OMX_U32, OMX_U32*);
 /* OMXHWBuffer functions */
 int (*pf_omx_hwbuffer_connect) (void *);
 int (*pf_omx_hwbuffer_disconnect) (void *);
-int (*pf_omx_hwbuffer_setup) (void *, int, int, int, int, unsigned int *,
-                              unsigned int *);
+int (*pf_omx_hwbuffer_setup) (void *, int, int, int, int );
+int (*pf_omx_hwbuffer_get_min_undequeued) (void *, unsigned int *);
+int (*pf_omx_hwbuffer_set_buffer_count) (void *, unsigned int );
 int (*pf_omx_hwbuffer_setcrop) (void *, int, int, int, int);
 int (*pf_omx_hwbuffer_dequeue) (void *, void **);
 int (*pf_omx_hwbuffer_lock) (void *, void *);

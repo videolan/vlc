@@ -2017,7 +2017,8 @@ static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port )
 
     if( !(pf_enable_graphic_buffers && pf_get_graphic_buffer_usage &&
           pf_omx_hwbuffer_connect && pf_omx_hwbuffer_disconnect &&
-          pf_omx_hwbuffer_setup && pf_omx_hwbuffer_setcrop &&
+          pf_omx_hwbuffer_setup && pf_omx_hwbuffer_get_min_undequeued &&
+          pf_omx_hwbuffer_set_buffer_count && pf_omx_hwbuffer_setcrop &&
           pf_omx_hwbuffer_dequeue && pf_omx_hwbuffer_lock &&
           pf_omx_hwbuffer_queue && pf_omx_hwbuffer_cancel &&
           ((OMX_COMPONENTTYPE*)p_port->omx_handle)->UseBuffer) )
@@ -2114,7 +2115,6 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
     decoder_sys_t *p_sys = p_dec->p_sys;
     OMX_PARAM_PORTDEFINITIONTYPE *def = &p_port->definition;
     unsigned int min_undequeued = 0;
-    unsigned int num_frames = def->nBufferCountMin;
     unsigned int i = 0;
     int colorFormat = def->format.video.eColorFormat;
     OMX_ERRORTYPE omx_error;
@@ -2150,24 +2150,39 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
                                def->format.video.nFrameWidth,
                                def->format.video.nFrameHeight,
                                colorFormat,
-                               (int) i_hw_usage,
-                               &num_frames, &min_undequeued) != 0 )
+                               (int) i_hw_usage ) != 0 )
     {
         msg_Err( p_dec, "can't setup OMXHWBuffer" );
         goto error;
     }
 
-    if( num_frames != p_port->definition.nBufferCountActual )
+    if( pf_omx_hwbuffer_get_min_undequeued( p_port->p_hwbuf->window,
+                                            &min_undequeued ) != 0 )
     {
-        OMX_DBG( "AllocateBuffers: video out wants more frames: %lu vs %u",
-                 p_port->definition.nBufferCountActual, num_frames);
+        msg_Err( p_dec, "can't get min_undequeued" );
+        goto error;
+    }
 
-        p_port->definition.nBufferCountActual = num_frames;
+    if( def->nBufferCountActual < def->nBufferCountMin + min_undequeued )
+    {
+        unsigned int new_frames_num = def->nBufferCountMin + min_undequeued;
+
+        OMX_DBG( "AllocateBuffers: video out wants more frames: %lu vs %u",
+                 p_port->definition.nBufferCountActual, new_frames_num );
+
+        p_port->definition.nBufferCountActual = new_frames_num;
         omx_error = OMX_SetParameter( p_dec->p_sys->omx_handle,
                                       OMX_IndexParamPortDefinition,
                                       &p_port->definition );
         CHECK_ERROR( omx_error, "OMX_SetParameter failed (%x : %s)",
                      omx_error, ErrorToString(omx_error) );
+    }
+
+    if( pf_omx_hwbuffer_set_buffer_count( p_port->p_hwbuf->window,
+                                          def->nBufferCountActual ) != 0 )
+    {
+        msg_Err( p_dec, "can't set buffer_count" );
+        goto error;
     }
 
     jni_SetAndroidSurfaceSize( def->format.video.nFrameWidth,

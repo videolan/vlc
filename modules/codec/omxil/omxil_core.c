@@ -92,8 +92,9 @@ OMX_ERRORTYPE (*pf_get_graphic_buffer_usage)(OMX_HANDLETYPE, OMX_U32, OMX_U32*);
 
 int (*pf_omx_hwbuffer_connect) (void *);
 int (*pf_omx_hwbuffer_disconnect) (void *);
-int (*pf_omx_hwbuffer_setup) (void *, int, int, int, int, unsigned int *,
-                              unsigned int *);
+int (*pf_omx_hwbuffer_setup) (void *, int, int, int, int );
+int (*pf_omx_hwbuffer_get_min_undequeued) (void *, unsigned int *);
+int (*pf_omx_hwbuffer_set_buffer_count) (void *, unsigned int );
 int (*pf_omx_hwbuffer_setcrop) (void *, int, int, int, int);
 int (*pf_omx_hwbuffer_dequeue) (void *, void **);
 int (*pf_omx_hwbuffer_lock) (void *, void *);
@@ -179,6 +180,8 @@ int InitOmxCore(vlc_object_t *p_this)
     pf_omx_hwbuffer_connect = dlsym( dll_handle, "OMXHWBuffer_Connect" );
     pf_omx_hwbuffer_disconnect = dlsym( dll_handle, "OMXHWBuffer_Disconnect" );
     pf_omx_hwbuffer_setup = dlsym( dll_handle, "OMXHWBuffer_Setup" );
+    pf_omx_hwbuffer_get_min_undequeued = dlsym( dll_handle, "OMXHWBuffer_GetMinUndequeued" );
+    pf_omx_hwbuffer_set_buffer_count = dlsym( dll_handle, "OMXHWBuffer_SetBufferCount" );
     pf_omx_hwbuffer_setcrop = dlsym( dll_handle, "OMXHWBuffer_Setcrop" );
     pf_omx_hwbuffer_dequeue = dlsym( dll_handle, "OMXHWBuffer_Dequeue" );
     pf_omx_hwbuffer_lock = dlsym( dll_handle, "OMXHWBuffer_Lock" );
