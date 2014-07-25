@@ -193,7 +193,11 @@ static OMX_ERRORTYPE iomx_use_buffer(OMX_HANDLETYPE component, OMX_BUFFERHEADERT
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
     OMXBuffer* info = new OMXBuffer;
     info->dealer = NULL;
+#if ANDROID_API == 11
+    info->graphicBuffer = new GraphicBuffer((android_native_buffer_t*) data, false);
+#else
     info->graphicBuffer = new GraphicBuffer((ANativeWindowBuffer*) data, false);
+#endif
     int ret = ctx->iomx->useGraphicBuffer(node->node, port_index, info->graphicBuffer, &info->id);
     if (ret != OK)
         return OMX_ErrorUndefined;

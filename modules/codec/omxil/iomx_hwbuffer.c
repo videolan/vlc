@@ -27,7 +27,7 @@
 #include <errno.h>
 #include <stdio.h>
 
-#if ANDROID_API == 10
+#if ANDROID_API <= 11
 #include <ui/android_native_buffer.h>
 #include <ui/egl/android_natives.h>
 #else
@@ -41,7 +41,7 @@
 #define NO_ERROR 0
 typedef int32_t status_t;
 
-#if ANDROID_API == 10
+#if ANDROID_API <= 11
 typedef android_native_buffer_t ANativeWindowBuffer_t;
 #endif
 
@@ -78,8 +78,8 @@ int IOMXHWBuffer_Connect( void *window )
     ANativeWindow *anw = (ANativeWindow *)window;
     CHECK_ANW();
 
-#if ANDROID_API >= 11
-    if (native_window_api_connect( anw, NATIVE_WINDOW_API_MEDIA) != 0) {
+#if ANDROID_API > 11
+    if (native_window_api_connect( anw, NATIVE_WINDOW_API_MEDIA ) != 0) {
         LOGE( "native_window_api_connect FAIL"  );
         return -EINVAL;
     }
@@ -92,7 +92,7 @@ int IOMXHWBuffer_Disconnect( void *window )
 
     CHECK_ANW();
 
-#if ANDROID_API >= 11
+#if ANDROID_API > 11
     native_window_api_disconnect( anw, NATIVE_WINDOW_API_MEDIA );
 #endif
 
@@ -120,7 +120,7 @@ int IOMXHWBuffer_Setup( void *window, int w, int h, int hal_format, int hw_usage
     err = native_window_set_usage( anw, usage );
     CHECK_ERR();
 
-#if ANDROID_API == 10
+#if ANDROID_API <= 11
     err = native_window_set_buffers_geometry( anw, w, h, hal_format );
     CHECK_ERR();
 #else
@@ -132,7 +132,9 @@ int IOMXHWBuffer_Setup( void *window, int w, int h, int hal_format, int hw_usage
 
     err = native_window_set_buffers_format( anw, hal_format );
     CHECK_ERR();
+#endif
 
+#if ANDROID_API >= 11
     if( *min_undequeued == 0 )
     {
         anw->query( anw, NATIVE_WINDOW_MIN_UNDEQUEUED_BUFFERS, min_undequeued );
