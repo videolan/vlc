@@ -920,6 +920,7 @@ static chunk_t* generate_new_chunk(
     if( frun_entry == hds_stream->fragment_run_count )
     {
         msg_Err( p_this, "Couldn'd find the fragment run!" );
+        chunk_free( chunk );
         return NULL;
     }
 
