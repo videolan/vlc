@@ -2133,6 +2133,9 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
             break;
         }
     }
+    else if( !strcmp( p_sys->psz_component, "OMX.TI.720P.Decoder" ) ||
+        !strcmp( p_sys->psz_component, "OMX.TI.Video.Decoder" ) )
+        colorFormat = 0x14; // HAL_PIXEL_FORMAT_YCbCr_422_I
 
     omx_error = pf_get_graphic_buffer_usage( p_port->omx_handle,
                                              p_port->i_port_index,
