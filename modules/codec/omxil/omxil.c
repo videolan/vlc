@@ -154,7 +154,7 @@ vlc_module_begin ()
      * enable it only via the --codec iomx command line parameter when
      * wanted. */
     set_capability( "decoder", 0 )
-    add_bool(CFG_PREFIX "dr", false,
+    add_bool(CFG_PREFIX "dr", true,
              DIRECTRENDERING_TEXT, DIRECTRENDERING_LONGTEXT, true)
 #else
     set_capability( "decoder", 80 )
