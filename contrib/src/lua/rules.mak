@@ -20,6 +20,9 @@ endif
 ifdef HAVE_WIN32
 LUA_TARGET := mingw
 endif
+ifdef HAVE_SOLARIS
+LUA_TARGET := solaris
+endif
 
 # Feel free to add autodetection if you need to...
 PKGS += lua
