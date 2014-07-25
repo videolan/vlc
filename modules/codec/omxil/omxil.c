@@ -2018,8 +2018,8 @@ static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port )
     if( !(pf_enable_graphic_buffers && pf_get_graphic_buffer_usage &&
           pf_omx_hwbuffer_connect && pf_omx_hwbuffer_disconnect &&
           pf_omx_hwbuffer_setup && pf_omx_hwbuffer_setcrop &&
-          pf_omx_hwbuffer_dequeue && pf_omx_hwbuffer_queue &&
-          pf_omx_hwbuffer_cancel &&
+          pf_omx_hwbuffer_dequeue && pf_omx_hwbuffer_lock &&
+          pf_omx_hwbuffer_queue && pf_omx_hwbuffer_cancel &&
           ((OMX_COMPONENTTYPE*)p_port->omx_handle)->UseBuffer) )
     {
         msg_Warn( p_dec, "direct output port enabled but can't find "
@@ -2281,6 +2281,13 @@ static int HwBuffer_Start( decoder_t *p_dec, OmxPort *p_port )
 
         if( p_header && p_port->p_hwbuf->i_states[i] == BUF_STATE_OWNED )
         {
+            if( pf_omx_hwbuffer_lock( p_port->p_hwbuf->window,
+                                      p_header->pBuffer ) != 0 )
+            {
+                msg_Err( p_dec, "lock failed" );
+                HWBUFFER_UNLOCK();
+                return -1;
+            }
             OMX_DBG( "FillThisBuffer %p, %p", p_header, p_header->pBuffer );
             OMX_FillThisBuffer( p_port->omx_handle, p_header );
         }
@@ -2455,6 +2462,8 @@ static void *DequeueThread( void *data )
          * we call the dequeue function if there is at least one buffer
          * available. */
         err = pf_omx_hwbuffer_dequeue( p_port->p_hwbuf->window, &p_handle );
+        if( err == 0 )
+            err = pf_omx_hwbuffer_lock( p_port->p_hwbuf->window, p_handle );
 
         HWBUFFER_LOCK();
 

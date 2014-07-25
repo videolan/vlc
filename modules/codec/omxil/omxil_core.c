@@ -96,6 +96,7 @@ int (*pf_omx_hwbuffer_setup) (void *, int, int, int, int, unsigned int *,
                               unsigned int *);
 int (*pf_omx_hwbuffer_setcrop) (void *, int, int, int, int);
 int (*pf_omx_hwbuffer_dequeue) (void *, void **);
+int (*pf_omx_hwbuffer_lock) (void *, void *);
 int (*pf_omx_hwbuffer_queue) (void *, void *);
 int (*pf_omx_hwbuffer_cancel) (void *, void *);
 
@@ -180,6 +181,7 @@ int InitOmxCore(vlc_object_t *p_this)
     pf_omx_hwbuffer_setup = dlsym( dll_handle, "OMXHWBuffer_Setup" );
     pf_omx_hwbuffer_setcrop = dlsym( dll_handle, "OMXHWBuffer_Setcrop" );
     pf_omx_hwbuffer_dequeue = dlsym( dll_handle, "OMXHWBuffer_Dequeue" );
+    pf_omx_hwbuffer_lock = dlsym( dll_handle, "OMXHWBuffer_Lock" );
     pf_omx_hwbuffer_queue = dlsym( dll_handle, "OMXHWBuffer_Queue" );
     pf_omx_hwbuffer_cancel = dlsym( dll_handle, "OMXHWBuffer_Cancel" );
 #endif

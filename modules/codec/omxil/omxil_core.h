@@ -44,6 +44,7 @@ int (*pf_omx_hwbuffer_setup) (void *, int, int, int, int, unsigned int *,
                               unsigned int *);
 int (*pf_omx_hwbuffer_setcrop) (void *, int, int, int, int);
 int (*pf_omx_hwbuffer_dequeue) (void *, void **);
+int (*pf_omx_hwbuffer_lock) (void *, void *);
 int (*pf_omx_hwbuffer_queue) (void *, void *);
 int (*pf_omx_hwbuffer_cancel) (void *, void *);
 

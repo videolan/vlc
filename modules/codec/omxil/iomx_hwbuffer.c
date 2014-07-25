@@ -181,14 +181,26 @@ int IOMXHWBuffer_Dequeue( void *window, void **pp_handle )
 #endif
     CHECK_ERR();
 
+    *pp_handle = anb;
+
+    return 0;
+}
+
+int IOMXHWBuffer_Lock( void *window, void *p_handle )
+{
+    ANativeWindow *anw = (ANativeWindow *)window;
+    ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
+    status_t err = NO_ERROR;
+
+    CHECK_ANW();
+    CHECK_ANB();
+
 #if ANDROID_API >= 18
     err = anw->lockBuffer_DEPRECATED( anw, anb );
 #else
     err = anw->lockBuffer( anw, anb );
 #endif
     CHECK_ERR();
-
-    *pp_handle = anb;
 
     return 0;
 }
