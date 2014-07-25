@@ -350,7 +350,7 @@ libftp_plugin_la_SOURCES = access/ftp.c
 libftp_plugin_la_LIBADD = $(SOCKET_LIBS)
 access_LTLIBRARIES += libftp_plugin.la
 
-libhttp_plugin_la_SOURCES = access/http.c
+libhttp_plugin_la_SOURCES = access/http.c access/httpcookies.h access/httpcookies.c
 libhttp_plugin_la_LIBADD = $(SOCKET_LIBS)
 if HAVE_ZLIB
 libhttp_plugin_la_LIBADD += -lz
