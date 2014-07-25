@@ -34,6 +34,63 @@
  * @{
  */
 
+static inline int vlc_ascii_toupper( int c )
+{
+    if ( c >= 'a' && c <= 'z' )
+        return c + ( 'A' - 'a' );
+    else
+        return c;
+}
+
+static inline int vlc_ascii_tolower( int c )
+{
+    if ( c >= 'A' && c <= 'Z' )
+        return c + ( 'a' - 'A' );
+    else
+        return c;
+}
+
+/**
+ * Compare two ASCII strings ignoring case.
+ *
+ * The result is independent of the locale. If there are non-ASCII
+ * characters in the strings, their cases are NOT ignored in the
+ * comparison.
+ */
+static inline int vlc_ascii_strcasecmp( const char *psz1, const char *psz2 )
+{
+    const char *s1 = psz1;
+    const char *s2 = psz2;
+    int d = vlc_ascii_tolower( *s1 ) - vlc_ascii_tolower( *s2 );
+    while ( *s1 && d == 0)
+    {
+        s1++;
+        s2++;
+        d = vlc_ascii_tolower( *s1 ) - vlc_ascii_tolower( *s2 );
+    }
+
+    return d;
+}
+
+static inline int vlc_ascii_strncasecmp( const char *psz1, const char *psz2, size_t n )
+{
+    const char *s1 = psz1;
+    const char *s2 = psz2;
+    const char *s1end = psz1 + n;
+    int d = vlc_ascii_tolower( *s1 ) - vlc_ascii_tolower( *s2 );
+    while ( *s1 && s1 < s1end && d == 0)
+    {
+        s1++;
+        s2++;
+        d = vlc_ascii_tolower( *s1 ) - vlc_ascii_tolower( *s2 );
+    }
+
+    if (s1 == s1end)
+        return 0;
+    else
+        return d;
+}
+
 VLC_API void resolve_xml_special_chars( char *psz_value );
 VLC_API char * convert_xml_special_chars( const char *psz_content );
 
