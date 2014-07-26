@@ -29,6 +29,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <math.h>
 
 #include <vlc_common.h>
