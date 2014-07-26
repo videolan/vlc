@@ -20,7 +20,7 @@ $(TARBALLS)/musepack_src_r$(MUSE_REV).tar.gz:
 #	$(SVN) export $(MUSE_SVN) -r $(MUSE_REV) musepack_src_r$(MUSE_REV)
 #	tar czv musepack_src_r$(MUSE_REV) > $@
 
-#.sum-mpcdec: musepack_src_r$(MUSE_REV).tar.gz
+.sum-mpcdec: musepack_src_r$(MUSE_REV).tar.gz
 #	$(warning $@ not implemented)
 #	touch $@
 
