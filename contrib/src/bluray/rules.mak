@@ -10,7 +10,7 @@ ifeq ($(call need_pkg,"libbluray >= 0.3.0"),)
 PKGS_FOUND += bluray
 endif
 
-DEPS_bluray = libxml2 $(DEPS_libxml2)
+DEPS_bluray = libxml2 $(DEPS_libxml2) freetype2 $(DEPS_freetype2)
 
 BLURAY_CONF = --disable-examples  \
               --disable-debug     \
