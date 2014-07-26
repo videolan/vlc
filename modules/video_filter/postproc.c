@@ -333,7 +333,6 @@ static void PPChangeMode( filter_t *p_filter, const char *psz_name,
     filter_sys_t *p_sys = p_filter->p_sys;
     pp_mode *newmode = NULL, *oldmode;
 
-    vlc_mutex_lock( &p_sys->lock );
     if( i_quality > 0 )
     {
          newmode = pp_get_mode_by_name_and_quality( psz_name ? psz_name :
