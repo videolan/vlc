@@ -27,7 +27,7 @@ speex: speex-$(SPEEX_VERSION).tar.gz .sum-speex
 	$(ZCAT) "$<" | (cd $@-git && tar xv --strip-components=1)
 	$(MOVE)
 
-SPEEX_CONF :=
+SPEEX_CONF := --without-ogg
 ifndef HAVE_FPU
 SPEEX_CONF += --enable-fixed-point
 ifeq ($(ARCH),arm)
