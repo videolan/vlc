@@ -477,7 +477,8 @@ static int Open(vlc_object_t *obj)
     video_format_ApplyRotation(&fmt, &vd->fmt);
 
     if (fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
-     || fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_422)
+     || fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_422
+     || fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_444)
         ;
     else
     if (vlc_fourcc_to_vdp_ycc(fmt.i_chroma, &chroma, &format))

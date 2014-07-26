@@ -329,7 +329,8 @@ static picture_t *VideoExport(filter_t *filter, picture_t *src, picture_t *dst)
         pitches[i] = dst->p[i].i_pitch;
     }
     if (dst->format.i_chroma == VLC_CODEC_I420
-     || dst->format.i_chroma == VLC_CODEC_I422)
+     || dst->format.i_chroma == VLC_CODEC_I422
+     || dst->format.i_chroma == VLC_CODEC_I444)
     {
         planes[1] = dst->p[2].p_pixels;
         planes[2] = dst->p[1].p_pixels;
@@ -378,7 +379,9 @@ static picture_t *VideoImport(filter_t *filter, picture_t *src)
         planes[i] = src->p[i].p_pixels;
         pitches[i] = src->p[i].i_pitch;
     }
-    if (src->format.i_chroma == VLC_CODEC_I420)
+    if (src->format.i_chroma == VLC_CODEC_I420
+     || src->format.i_chroma == VLC_CODEC_I422
+     || src->format.i_chroma == VLC_CODEC_I444)
     {
         planes[1] = src->p[2].p_pixels;
         planes[2] = src->p[1].p_pixels;
@@ -396,8 +399,21 @@ static picture_t *VideoImport(filter_t *filter, picture_t *src)
 
     /* Wrap surface into a picture */
     video_format_t fmt = src->format;
-    fmt.i_chroma = (sys->chroma == VDP_CHROMA_TYPE_420)
-        ? VLC_CODEC_VDPAU_VIDEO_420 : VLC_CODEC_VDPAU_VIDEO_422;
+
+    switch (sys->chroma)
+    {
+        case VDP_CHROMA_TYPE_420:
+            fmt.i_chroma = VLC_CODEC_VDPAU_VIDEO_420;
+            break;
+        case VDP_CHROMA_TYPE_422:
+            fmt.i_chroma = VLC_CODEC_VDPAU_VIDEO_422;
+            break;
+        case VDP_CHROMA_TYPE_444:
+            fmt.i_chroma = VLC_CODEC_VDPAU_VIDEO_444;
+            break;
+        default:
+            assert(0);
+    }
 
     picture_t *dst = picture_NewFromFormat(&fmt);
     if (unlikely(dst == NULL))
