@@ -400,7 +400,7 @@ VLC_API block_t * filter_chain_AudioFilter( filter_chain_t *, block_t * );
  * \param p_chain pointer to filter chain
  * \param display_date of subpictures
  */
-VLC_API void filter_chain_SubSource( filter_chain_t *, mtime_t );
+void filter_chain_SubSource( filter_chain_t *, spu_t *, mtime_t );
 
 /**
  * Apply filter chain to subpictures.

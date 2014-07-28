@@ -1441,7 +1441,7 @@ subpicture_t *spu_Render(spu_t *spu,
         free(chain_update);
     }
     /* Run subpicture sources */
-    filter_chain_SubSource(sys->source_chain, render_osd_date);
+    filter_chain_SubSource(sys->source_chain, spu, render_osd_date);
     vlc_mutex_unlock(&sys->source_chain_lock);
 
     static const vlc_fourcc_t chroma_list_default_yuv[] = {
