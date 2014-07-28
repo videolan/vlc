@@ -160,32 +160,6 @@ function js_descramble( sig, js_url )
     return sig
 end
 
-function descramble81( sig )
-    sig = string.reverse( sig )
-    local s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13 =
-        string.match( sig, "(.)(.......................)(.)(..............)(.)(......)(.)(....)(.)(...................)(.)(........)(.)" )
-    return s3..s2..s5..s4..s1..s6..s13..s8..s7..s10..s9..s12..s11
-end
-
-local descramblers = {
-                       --[81] = descramble81
-                     }
-
-function descramble( sig, js_url )
-    vlc.msg.dbg( "Found "..string.len( sig ).."-character scrambled signature for youtube video URL, attempting to descramble... " )
-    if js_url then
-        sig = js_descramble( sig, js_url )
-    else
-        local descrambler = descramblers[string.len( sig )]
-        if descrambler then
-            sig = descrambler( sig )
-        else
-            vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
-        end
-    end
-    return sig
-end
-
 -- Parse and pick our video URL
 function pick_url( url_map, fmt, js_url )
     local path = nil
@@ -203,7 +177,12 @@ function pick_url( url_map, fmt, js_url )
                     -- Scrambled signature
                     sig = string.match( stream, "s=([^&,]+)" )
                     if sig then
-                        sig = descramble( sig, js_url )
+                        vlc.msg.dbg( "Found "..string.len( sig ).."-character scrambled signature for youtube video URL, attempting to descramble... " )
+                        if js_url then
+                            sig = js_descramble( sig, js_url )
+                        else
+                            vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
+                        end
                     end
                 end
                 local signature = ""
