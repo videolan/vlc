@@ -79,12 +79,6 @@ static int  FilterAllocationInit(filter_t *filter, void *vd)
 
     return VLC_SUCCESS;
 }
-static void FilterAllocationClean(filter_t *filter)
-{
-    filter->pf_video_buffer_new = NULL;
-    filter->pf_video_buffer_del = NULL;
-    filter->p_owner             = NULL;
-}
 
 /*****************************************************************************
  *
@@ -466,8 +460,7 @@ static void VoutDisplayCreateRender(vout_display_t *vd)
     msg_Dbg(vd, "A filter to adapt decoder to display is needed");
 
     osys->filters = filter_chain_New(vd, "video filter2", false,
-                                     FilterAllocationInit,
-                                     FilterAllocationClean, vd);
+                                     FilterAllocationInit, NULL, vd);
     assert(osys->filters); /* TODO critical */
 
     /* */
