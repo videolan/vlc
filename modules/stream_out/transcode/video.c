@@ -92,11 +92,6 @@ static int transcode_video_filter_allocation_init( filter_t *p_filter,
     return VLC_SUCCESS;
 }
 
-static void transcode_video_filter_allocation_clear( filter_t *p_filter )
-{
-    VLC_UNUSED(p_filter);
-}
-
 static void* EncoderThread( void *obj )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t*)obj;
@@ -304,8 +299,7 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
     id->p_f_chain = filter_chain_New( p_stream, "video filter2",
                                       false,
                                       transcode_video_filter_allocation_init,
-                                      transcode_video_filter_allocation_clear,
-                                      p_stream->p_sys );
+                                      NULL, p_stream->p_sys );
     filter_chain_Reset( id->p_f_chain, p_fmt_out, p_fmt_out );
 
     /* Deinterlace */
@@ -329,10 +323,9 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
     if( p_stream->p_sys->psz_vf2 )
     {
         id->p_uf_chain = filter_chain_New( p_stream, "video filter2",
-                                          true,
+                                           true,
                            transcode_video_filter_allocation_init,
-                           transcode_video_filter_allocation_clear,
-                           p_stream->p_sys );
+                                           NULL, p_stream->p_sys );
         filter_chain_Reset( id->p_uf_chain, p_fmt_out,
                             &id->p_encoder->fmt_in );
         if( p_fmt_out->video.i_chroma != id->p_encoder->fmt_in.video.i_chroma )
