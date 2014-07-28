@@ -63,11 +63,10 @@ static void AllocatorClean( const filter_chain_allocator_t *,
 static bool IsInternalVideoAllocator( chained_filter_t * );
 
 static int  InternalVideoInit( filter_t *, void * );
-static void InternalVideoClean( filter_t * );
 
 static const filter_chain_allocator_t internal_video_allocator = {
     .pf_init = InternalVideoInit,
-    .pf_clean = InternalVideoClean,
+    .pf_clean = NULL,
     .p_data = NULL,
 };
 
@@ -610,11 +609,6 @@ static int InternalVideoInit( filter_t *p_filter, void *p_data )
     p_filter->pf_video_buffer_del = VideoBufferDelete;
 
     return VLC_SUCCESS;
-}
-static void InternalVideoClean( filter_t *p_filter )
-{
-    p_filter->pf_video_buffer_new = NULL;
-    p_filter->pf_video_buffer_del = NULL;
 }
 
 static bool IsInternalVideoAllocator( chained_filter_t *p_filter )
