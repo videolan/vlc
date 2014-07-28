@@ -165,7 +165,6 @@ static void FilterRelease(filter_t *filter)
 {
     if (filter->p_module)
         module_unneed(filter, filter->p_module);
-    free(filter->owner.sys);
     vlc_object_release(filter);
 }
 
@@ -186,8 +185,7 @@ static int spu_get_attachments(filter_t *filter,
                                input_attachment_t ***attachment_ptr,
                                int *attachment_count)
 {
-    filter_owner_sys_t *sys = filter->owner.sys;
-    spu_t *spu = sys->spu;
+    spu_t *spu = filter->owner.sys;
 
     int ret = VLC_EGENERIC;
     if (spu->p->input)
@@ -203,9 +201,7 @@ static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)
     if (!text)
         return NULL;
 
-    filter_owner_sys_t *sys = xmalloc(sizeof(*sys));
-    sys->spu = spu;
-    text->owner.sys = sys;
+    text->owner.sys = spu;
 
     es_format_Init(&text->fmt_in, VIDEO_ES, 0);
 
