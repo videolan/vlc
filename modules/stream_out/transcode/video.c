@@ -77,19 +77,11 @@ static picture_t *transcode_video_filter_buffer_new( filter_t *p_filter )
     p_filter->fmt_out.video.i_chroma = p_filter->fmt_out.i_codec;
     return picture_NewFromFormat( &p_filter->fmt_out.video );
 }
+
 static void transcode_video_filter_buffer_del( filter_t *p_filter, picture_t *p_pic )
 {
     VLC_UNUSED(p_filter);
     picture_Release( p_pic );
-}
-
-static int transcode_video_filter_allocation_init( filter_t *p_filter,
-                                                   void *p_data )
-{
-    VLC_UNUSED(p_data);
-    p_filter->owner.video.buffer_new = transcode_video_filter_buffer_new;
-    p_filter->owner.video.buffer_del = transcode_video_filter_buffer_del;
-    return VLC_SUCCESS;
 }
 
 static void* EncoderThread( void *obj )
@@ -293,13 +285,17 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 static void transcode_video_filter_init( sout_stream_t *p_stream,
                                          sout_stream_id_sys_t *id )
 {
+    filter_owner_t owner = {
+        .sys = p_stream->p_sys,
+        .video = {
+            .buffer_new = transcode_video_filter_buffer_new,
+            .buffer_del = transcode_video_filter_buffer_del,
+        },
+    };
     es_format_t *p_fmt_out = &id->p_decoder->fmt_out;
-    id->p_encoder->fmt_in.video.i_chroma = id->p_encoder->fmt_in.i_codec;
 
-    id->p_f_chain = filter_chain_New( p_stream, "video filter2",
-                                      false,
-                                      transcode_video_filter_allocation_init,
-                                      NULL, p_stream->p_sys );
+    id->p_encoder->fmt_in.video.i_chroma = id->p_encoder->fmt_in.i_codec;
+    id->p_f_chain = filter_chain_New( p_stream, false, &owner );
     filter_chain_Reset( id->p_f_chain, p_fmt_out, p_fmt_out );
 
     /* Deinterlace */
@@ -322,10 +318,7 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
 
     if( p_stream->p_sys->psz_vf2 )
     {
-        id->p_uf_chain = filter_chain_New( p_stream, "video filter2",
-                                           true,
-                           transcode_video_filter_allocation_init,
-                                           NULL, p_stream->p_sys );
+        id->p_uf_chain = filter_chain_New( p_stream, true, &owner );
         filter_chain_Reset( id->p_uf_chain, p_fmt_out,
                             &id->p_encoder->fmt_in );
         if( p_fmt_out->video.i_chroma != id->p_encoder->fmt_in.video.i_chroma )

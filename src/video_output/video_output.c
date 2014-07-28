@@ -696,22 +696,6 @@ static void VoutVideoFilterDelPicture(filter_t *filter, picture_t *picture)
     picture_Release(picture);
 }
 
-static int VoutVideoFilterStaticAllocationSetup(filter_t *filter, void *data)
-{
-    filter->owner.sys              = data; /* vout */
-    filter->owner.video.buffer_new = VoutVideoFilterStaticNewPicture;
-    filter->owner.video.buffer_del = VoutVideoFilterDelPicture;
-    return VLC_SUCCESS;
-}
-
-static int VoutVideoFilterInteractiveAllocationSetup(filter_t *filter, void *data)
-{
-    filter->owner.sys              = data; /* vout */
-    filter->owner.video.buffer_new = VoutVideoFilterInteractiveNewPicture;
-    filter->owner.video.buffer_del = VoutVideoFilterDelPicture;
-    return VLC_SUCCESS;
-}
-
 static void ThreadFilterFlush(vout_thread_t *vout, bool is_locked)
 {
     if (vout->p->displayed.current)
@@ -1330,12 +1314,20 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
 
     vout->p->filter.configuration = NULL;
     video_format_Copy(&vout->p->filter.format, &vout->p->original);
+
+    filter_owner_t owner = {
+        .sys = vout,
+        .video = {
+            .buffer_new = VoutVideoFilterStaticNewPicture,
+            .buffer_del = VoutVideoFilterDelPicture,
+        },
+    };
     vout->p->filter.chain_static =
-        filter_chain_New( vout, "video filter2", true,
-                          VoutVideoFilterStaticAllocationSetup, NULL, vout);
+        filter_chain_NewVideo( vout, true, &owner );
+
+    owner.video.buffer_new = VoutVideoFilterInteractiveNewPicture;
     vout->p->filter.chain_interactive =
-        filter_chain_New( vout, "video filter2", true,
-                          VoutVideoFilterInteractiveAllocationSetup, NULL, vout);
+        filter_chain_NewVideo( vout, true, &owner );
 
     vout_display_state_t state_default;
     if (!state) {

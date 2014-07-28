@@ -274,14 +274,6 @@ static void Close( vlc_object_t * p_this )
     free( p_sys );
 }
 
-static int video_filter_buffer_allocation_init( filter_t *p_filter, void *p_data )
-{
-    p_filter->owner.sys = p_data;
-    p_filter->owner.video.buffer_new = video_new_buffer_filter;
-    p_filter->owner.video.buffer_del = video_del_buffer_filter;
-    return VLC_SUCCESS;
-}
-
 static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -400,9 +392,15 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     msg_Dbg( p_stream, "psz_chain: %s", psz_chain );
     if( psz_chain )
     {
-        p_sys->p_vf2 = filter_chain_New( p_stream, "video filter2", false,
-                                         video_filter_buffer_allocation_init,
-                                         NULL, p_sys->p_decoder->p_owner );
+        filter_owner_t owner = {
+            .sys = p_sys->p_decoder->p_owner,
+            .video = {
+                .buffer_new = video_new_buffer_filter,
+                .buffer_del = video_del_buffer_filter,
+            },
+        };
+
+        p_sys->p_vf2 = filter_chain_NewVideo( p_stream, false, &owner );
         es_format_t fmt;
         es_format_Copy( &fmt, &p_sys->p_decoder->fmt_out );
         if( p_sys->i_chroma )

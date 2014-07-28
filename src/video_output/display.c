@@ -65,18 +65,11 @@ static picture_t *VideoBufferNew(filter_t *filter)
         return NULL;
     return picture_pool_Get(pool);
 }
+
 static void VideoBufferDelete(filter_t *filter, picture_t *picture)
 {
     VLC_UNUSED(filter);
     picture_Release(picture);
-}
-
-static int  FilterAllocationInit(filter_t *filter, void *vd)
-{
-    filter->owner.sys              = vd;
-    filter->owner.video.buffer_new = VideoBufferNew;
-    filter->owner.video.buffer_del = VideoBufferDelete;
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -458,8 +451,15 @@ static void VoutDisplayCreateRender(vout_display_t *vd)
 
     msg_Dbg(vd, "A filter to adapt decoder to display is needed");
 
-    osys->filters = filter_chain_New(vd, "video filter2", false,
-                                     FilterAllocationInit, NULL, vd);
+    filter_owner_t owner = {
+        .sys = vd,
+        .video = {
+            .buffer_new = VideoBufferNew,
+            .buffer_del = VideoBufferDelete,
+        },
+    };
+
+    osys->filters = filter_chain_NewVideo(vd, false, &owner);
     assert(osys->filters); /* TODO critical */
 
     /* */

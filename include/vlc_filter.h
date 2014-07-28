@@ -297,13 +297,25 @@ typedef struct filter_chain_t filter_chain_t;
  * \param p_object pointer to a vlc object
  * \param psz_capability vlc capability of filters in filter chain
  * \param b_allow_format_fmt_change allow changing of fmt
- * \param pf_buffer_allocation_init callback function to initialize buffer allocations
- * \param pf_buffer_allocation_clear callback function to clear buffer allocation initialization
- * \param p_buffer_allocation_data pointer to private allocation data
  * \return pointer to a filter chain
  */
-VLC_API filter_chain_t * filter_chain_New( vlc_object_t *, const char *, bool, int (*)( filter_t *, void * ), void (*)( filter_t * ), void *  ) VLC_USED;
-#define filter_chain_New( a, b, c, d, e, f ) filter_chain_New( VLC_OBJECT( a ), b, c, d, e, f )
+VLC_API filter_chain_t * filter_chain_New( vlc_object_t *, const char *, bool )
+VLC_USED;
+#define filter_chain_New( a, b, c ) filter_chain_New( VLC_OBJECT( a ), b, c )
+
+/**
+ * Creates a new video filter chain.
+ *
+ * \param obj pointer to parent VLC object
+ * \param change whether to allow changing the output format
+ * \param owner owner video buffer callbacks
+ * \return new filter chain, or NULL on error
+ */
+VLC_API filter_chain_t * filter_chain_NewVideo( vlc_object_t *obj, bool change,
+                                                const filter_owner_t *owner )
+VLC_USED;
+#define filter_chain_NewVideo( a, b, c ) \
+        filter_chain_NewVideo( VLC_OBJECT( a ), b, c )
 
 /**
  * Delete filter chain will delete all filters in the chain and free all
