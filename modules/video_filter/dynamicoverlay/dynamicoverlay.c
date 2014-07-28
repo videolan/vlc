@@ -340,12 +340,9 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     subpicture_t *p_spu = NULL;
     overlay_t *p_overlay = NULL;
 
-    p_spu = p_filter->pf_sub_buffer_new( p_filter );
+    p_spu = filter_NewSubpicture( p_filter );
     if( !p_spu )
-    {
-        msg_Err( p_filter, "cannot allocate subpicture" );
         return NULL;
-    }
 
     p_spu->b_absolute = true;
     p_spu->i_start = date;
