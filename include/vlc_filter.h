@@ -363,9 +363,8 @@ VLC_API int filter_chain_AppendFromString( filter_chain_t *, const char * );
  *
  * \param p_chain pointer to filter chain
  * \param p_filter pointer to filter object
- * \return VLC_SUCCESS on succes, else VLC_EGENERIC
  */
-VLC_API int filter_chain_DeleteFilter( filter_chain_t *, filter_t * );
+VLC_API void filter_chain_DeleteFilter( filter_chain_t *, filter_t * );
 
 /**
  * Get the number of filters in the filter chain.

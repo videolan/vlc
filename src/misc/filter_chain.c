@@ -65,8 +65,6 @@ struct filter_chain_t
 /**
  * Local prototypes
  */
-static int filter_chain_DeleteFilterInternal( filter_chain_t *, filter_t * );
-
 static void FilterDeletePictures( filter_t *, picture_t * );
 
 static filter_chain_t *filter_chain_NewInner( const filter_owner_t *callbacks,
@@ -163,7 +161,7 @@ filter_chain_t *filter_chain_NewVideo( vlc_object_t *obj, bool allow_change,
 void filter_chain_Delete( filter_chain_t *p_chain )
 {
     while( p_chain->first != NULL )
-        filter_chain_DeleteFilterInternal( p_chain, &p_chain->first->filter );
+        filter_chain_DeleteFilter( p_chain, &p_chain->first->filter );
 
     es_format_Clean( &p_chain->fmt_in );
     es_format_Clean( &p_chain->fmt_out );
@@ -177,7 +175,7 @@ void filter_chain_Reset( filter_chain_t *p_chain, const es_format_t *p_fmt_in,
                          const es_format_t *p_fmt_out )
 {
     while( p_chain->first != NULL )
-        filter_chain_DeleteFilterInternal( p_chain, &p_chain->first->filter );
+        filter_chain_DeleteFilter( p_chain, &p_chain->first->filter );
 
     if( p_fmt_in )
     {
@@ -269,6 +267,42 @@ error:
     return NULL;
 }
 
+void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
+{
+    vlc_object_t *obj = chain->callbacks.sys;
+    chained_filter_t *chained = (chained_filter_t *)filter;
+
+    /* Remove it from the chain */
+    if( chained->prev != NULL )
+        chained->prev->next = chained->next;
+    else
+    {
+        assert( chained == chain->first );
+        chain->first = chained->next;
+    }
+
+    if( chained->next != NULL )
+        chained->next->prev = chained->prev;
+    else
+    {
+        assert( chained == chain->last );
+        chain->last = chained->prev;
+    }
+
+    assert( chain->length > 0 );
+    chain->length--;
+
+    module_unneed( filter, filter->p_module );
+
+    msg_Dbg( obj, "Filter %p removed from chain", filter );
+    FilterDeletePictures( &chained->filter, chained->pending );
+
+    free( chained->mouse );
+    vlc_object_release( filter );
+    /* FIXME: check fmt_in/fmt_out consitency */
+}
+
+
 int filter_chain_AppendFromString( filter_chain_t *chain, const char *str )
 {
     vlc_object_t *obj = chain->callbacks.sys;
@@ -306,19 +340,11 @@ int filter_chain_AppendFromString( filter_chain_t *chain, const char *str )
 error:
     while( ret > 0 ) /* Unwind */
     {
-        filter_chain_DeleteFilterInternal( chain, &chain->last->filter );
+        filter_chain_DeleteFilter( chain, &chain->last->filter );
         ret--;
     }
     free( buf );
     return -1;
-}
-
-int filter_chain_DeleteFilter( filter_chain_t *p_chain, filter_t *p_filter )
-{
-    const int i_ret = filter_chain_DeleteFilterInternal( p_chain, p_filter );
-    if( i_ret < 0 )
-        return i_ret;
-    return VLC_SUCCESS;
 }
 
 int filter_chain_ForEach( filter_chain_t *chain,
@@ -492,44 +518,6 @@ int filter_chain_MouseEvent( filter_chain_t *p_chain,
 }
 
 /* Helpers */
-static int filter_chain_DeleteFilterInternal( filter_chain_t *p_chain,
-                                              filter_t *p_filter )
-{
-    vlc_object_t *obj = p_chain->callbacks.sys;
-    chained_filter_t *p_chained = chained( p_filter );
-
-    /* Remove it from the chain */
-    if( p_chained->prev != NULL )
-        p_chained->prev->next = p_chained->next;
-    else
-    {
-        assert( p_chained == p_chain->first );
-        p_chain->first = p_chained->next;
-    }
-
-    if( p_chained->next != NULL )
-        p_chained->next->prev = p_chained->prev;
-    else
-    {
-        assert( p_chained == p_chain->last );
-        p_chain->last = p_chained->prev;
-    }
-    p_chain->length--;
-
-    msg_Dbg( obj, "Filter %p removed from chain", p_filter );
-
-    FilterDeletePictures( &p_chained->filter, p_chained->pending );
-
-    if( p_filter->p_module )
-        module_unneed( p_filter, p_filter->p_module );
-    free( p_chained->mouse );
-    vlc_object_release( p_filter );
-
-
-    /* FIXME: check fmt_in/fmt_out consitency */
-    return VLC_SUCCESS;
-}
-
 static void FilterDeletePictures( filter_t *filter, picture_t *picture )
 {
     while( picture )
