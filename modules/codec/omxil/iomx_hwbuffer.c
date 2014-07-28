@@ -118,6 +118,10 @@ int IOMXHWBuffer_GetHalFormat( const char *comp_name, int* hal_format )
     else if( !strcmp( comp_name, "OMX.TI.720P.Decoder" ) ||
         !strcmp( comp_name, "OMX.TI.Video.Decoder" ) )
         *hal_format = 0x14; // HAL_PIXEL_FORMAT_YCbCr_422_I
+#if ANDROID_API <= 13 // Required on msm8660 on 3.2, not required on 4.1
+    else if( !strcmp( comp_name, "OMX.qcom.video.decoder.avc" ))
+        *hal_format = 0x108;
+#endif
 
     return 0;
 }
