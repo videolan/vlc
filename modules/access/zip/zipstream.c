@@ -35,9 +35,6 @@
 /* FIXME remove */
 #include <vlc_input.h>
 
-#define FILENAME_TEXT N_( "Media in Zip" )
-#define FILENAME_LONGTEXT N_( "Path to the media in the Zip archive" )
-
 /** **************************************************************************
  * Module descriptor
  *****************************************************************************/
