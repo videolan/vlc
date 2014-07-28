@@ -669,7 +669,7 @@ void vout_DeleteDisplayWindow(vout_thread_t *vout, vout_display_t *vd,
 /* */
 static picture_t *VoutVideoFilterInteractiveNewPicture(filter_t *filter)
 {
-    vout_thread_t *vout = (vout_thread_t*)filter->p_owner;
+    vout_thread_t *vout = filter->owner.sys;
 
     picture_t *picture = picture_pool_Get(vout->p->private_pool);
     if (picture) {
@@ -678,9 +678,10 @@ static picture_t *VoutVideoFilterInteractiveNewPicture(filter_t *filter)
     }
     return picture;
 }
+
 static picture_t *VoutVideoFilterStaticNewPicture(filter_t *filter)
 {
-    vout_thread_t *vout = (vout_thread_t*)filter->p_owner;
+    vout_thread_t *vout = filter->owner.sys;
 
     vlc_assert_locked(&vout->p->filter.lock);
     if (filter_chain_GetLength(vout->p->filter.chain_interactive) == 0)
@@ -688,25 +689,29 @@ static picture_t *VoutVideoFilterStaticNewPicture(filter_t *filter)
 
     return picture_NewFromFormat(&filter->fmt_out.video);
 }
+
 static void VoutVideoFilterDelPicture(filter_t *filter, picture_t *picture)
 {
     VLC_UNUSED(filter);
     picture_Release(picture);
 }
+
 static int VoutVideoFilterStaticAllocationSetup(filter_t *filter, void *data)
 {
-    filter->pf_video_buffer_new = VoutVideoFilterStaticNewPicture;
-    filter->pf_video_buffer_del = VoutVideoFilterDelPicture;
-    filter->p_owner             = data; /* vout */
+    filter->owner.sys              = data; /* vout */
+    filter->owner.video.buffer_new = VoutVideoFilterStaticNewPicture;
+    filter->owner.video.buffer_del = VoutVideoFilterDelPicture;
     return VLC_SUCCESS;
 }
+
 static int VoutVideoFilterInteractiveAllocationSetup(filter_t *filter, void *data)
 {
-    filter->pf_video_buffer_new = VoutVideoFilterInteractiveNewPicture;
-    filter->pf_video_buffer_del = VoutVideoFilterDelPicture;
-    filter->p_owner             = data; /* vout */
+    filter->owner.sys              = data; /* vout */
+    filter->owner.video.buffer_new = VoutVideoFilterInteractiveNewPicture;
+    filter->owner.video.buffer_del = VoutVideoFilterDelPicture;
     return VLC_SUCCESS;
 }
+
 static void ThreadFilterFlush(vout_thread_t *vout, bool is_locked)
 {
     if (vout->p->displayed.current)

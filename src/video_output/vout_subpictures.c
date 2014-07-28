@@ -165,9 +165,7 @@ static void FilterRelease(filter_t *filter)
 {
     if (filter->p_module)
         module_unneed(filter, filter->p_module);
-    if (filter->p_owner)
-        free(filter->p_owner);
-
+    free(filter->owner.sys);
     vlc_object_release(filter);
 }
 
@@ -188,7 +186,8 @@ static int spu_get_attachments(filter_t *filter,
                                input_attachment_t ***attachment_ptr,
                                int *attachment_count)
 {
-    spu_t *spu = filter->p_owner->spu;
+    filter_owner_sys_t *sys = filter->owner.sys;
+    spu_t *spu = sys->spu;
 
     int ret = VLC_EGENERIC;
     if (spu->p->input)
@@ -204,8 +203,9 @@ static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)
     if (!text)
         return NULL;
 
-    text->p_owner = xmalloc(sizeof(*text->p_owner));
-    text->p_owner->spu = spu;
+    filter_owner_sys_t *sys = xmalloc(sizeof(*sys));
+    sys->spu = spu;
+    text->owner.sys = sys;
 
     es_format_Init(&text->fmt_in, VIDEO_ES, 0);
 
@@ -249,8 +249,8 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
     scale->fmt_out.video.i_height =
     scale->fmt_out.video.i_visible_height = require_resize ? 16 : 32;
 
-    scale->pf_video_buffer_new = spu_new_video_buffer;
-    scale->pf_video_buffer_del = spu_del_video_buffer;
+    scale->owner.video.buffer_new = spu_new_video_buffer;
+    scale->owner.video.buffer_del = spu_del_video_buffer;
 
     scale->p_module = module_need(scale, "video filter2", NULL, false);
 
@@ -1163,13 +1163,14 @@ static int CropCallback(vlc_object_t *object, char const *var,
 
 static subpicture_t *sub_new_buffer(filter_t *filter)
 {
-    filter_owner_sys_t *sys = filter->p_owner;
+    filter_owner_sys_t *sys = filter->owner.sys;
 
     subpicture_t *subpicture = subpicture_New(NULL);
     if (subpicture)
         subpicture->i_channel = sys->channel;
     return subpicture;
 }
+
 static void sub_del_buffer(filter_t *filter, subpicture_t *subpic)
 {
     VLC_UNUSED(filter);
@@ -1184,10 +1185,10 @@ static int SubSourceAllocationInit(filter_t *filter, void *data)
     if (!sys)
         return VLC_EGENERIC;
 
-    filter->pf_sub_buffer_new = sub_new_buffer;
-    filter->pf_sub_buffer_del = sub_del_buffer;
+    filter->owner.sub.buffer_new = sub_new_buffer;
+    filter->owner.sub.buffer_del = sub_del_buffer;
 
-    filter->p_owner = sys;
+    filter->owner.sys = sys;
     sys->channel = spu_RegisterChannel(spu);
     sys->spu     = spu;
 
@@ -1196,10 +1197,10 @@ static int SubSourceAllocationInit(filter_t *filter, void *data)
 
 static void SubSourceAllocationClean(filter_t *filter)
 {
-    filter_owner_sys_t *sys = filter->p_owner;
+    filter_owner_sys_t *sys = filter->owner.sys;
 
     spu_ClearChannel(sys->spu, sys->channel);
-    free(filter->p_owner);
+    free(sys);
 }
 
 /*****************************************************************************

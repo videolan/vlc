@@ -784,9 +784,9 @@ static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
     filter_t *p_filter;
 
     p_filter = vlc_custom_create( p_this, sizeof(filter_t), "filter" );
-    p_filter->pf_video_buffer_new =
+    p_filter->owner.video.buffer_new =
         (picture_t *(*)(filter_t *))video_new_buffer;
-    p_filter->pf_video_buffer_del =
+    p_filter->owner.video.buffer_del =
         (void (*)(filter_t *, picture_t *))video_del_buffer;
 
     p_filter->fmt_in = *p_fmt_in;

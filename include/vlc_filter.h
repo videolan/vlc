@@ -1,11 +1,11 @@
 /*****************************************************************************
  * vlc_filter.h: filter related structures and functions
  *****************************************************************************
- * Copyright (C) 1999-2008 VLC authors and VideoLAN
- * $Id$
+ * Copyright (C) 1999-2014 VLC authors and VideoLAN
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Antoine Cellerier <dionoea at videolan dot org>
+ *          Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -37,6 +37,26 @@
 
 typedef struct filter_owner_sys_t filter_owner_sys_t;
 
+typedef struct filter_owner_t
+{
+    void *sys;
+
+    union
+    {
+        struct
+        {
+            picture_t * (*buffer_new)( filter_t * );
+            void        (*buffer_del)( filter_t *, picture_t * );
+        } video;
+        struct
+        {
+            subpicture_t * (*buffer_new)( filter_t * );
+            void           (*buffer_del)( filter_t *, subpicture_t * );
+        } sub;
+    };
+} filter_owner_t;
+
+
 /** Structure describing a filter
  * @warning BIG FAT WARNING : the code relies on the first 4 members of
  * filter_t and decoder_t to be the same, so if you have anything to add,
@@ -66,8 +86,6 @@ struct filter_t
         {
             picture_t * (*pf_filter) ( filter_t *, picture_t * );
             void        (*pf_flush)( filter_t * );
-            picture_t * (*pf_buffer_new) ( filter_t * );
-            void        (*pf_buffer_del) ( filter_t *, picture_t * );
             /* Filter mouse state.
              *
              * If non-NULL, you must convert from output to input formats:
@@ -83,8 +101,6 @@ struct filter_t
 #define pf_video_filter     u.video.pf_filter
 #define pf_video_flush      u.video.pf_flush
 #define pf_video_mouse      u.video.pf_mouse
-#define pf_video_buffer_new u.video.pf_buffer_new
-#define pf_video_buffer_del u.video.pf_buffer_del
 
         struct
         {
@@ -102,16 +118,12 @@ struct filter_t
         struct
         {
             subpicture_t * (*pf_source)    ( filter_t *, mtime_t );
-            subpicture_t * (*pf_buffer_new)( filter_t * );
-            void           (*pf_buffer_del)( filter_t *, subpicture_t * );
             int            (*pf_mouse)     ( filter_t *,
                                              const vlc_mouse_t *p_old,
                                              const vlc_mouse_t *p_new,
                                              const video_format_t * );
         } sub;
 #define pf_sub_source      u.sub.pf_source
-#define pf_sub_buffer_new  u.sub.pf_buffer_new
-#define pf_sub_buffer_del  u.sub.pf_buffer_del
 #define pf_sub_mouse       u.sub.pf_mouse
 
         struct
@@ -139,7 +151,7 @@ struct filter_t
     int (*pf_get_attachments)( filter_t *, input_attachment_t ***, int * );
 
     /* Private structure for the owner of the decoder */
-    filter_owner_sys_t *p_owner;
+    filter_owner_t      owner;
 };
 
 /**
@@ -153,10 +165,10 @@ struct filter_t
  */
 static inline picture_t *filter_NewPicture( filter_t *p_filter )
 {
-    picture_t *p_picture = p_filter->pf_video_buffer_new( p_filter );
-    if( !p_picture )
+    picture_t *pic = p_filter->owner.video.buffer_new( p_filter );
+    if( pic == NULL )
         msg_Warn( p_filter, "can't get output picture" );
-    return p_picture;
+    return pic;
 }
 
 /**
@@ -166,9 +178,9 @@ static inline picture_t *filter_NewPicture( filter_t *p_filter )
  * \param p_filter filter_t object
  * \param p_picture picture to be deleted
  */
-static inline void filter_DeletePicture( filter_t *p_filter, picture_t *p_picture )
+static inline void filter_DeletePicture( filter_t *p_filter, picture_t *pic )
 {
-    p_filter->pf_video_buffer_del( p_filter, p_picture );
+    p_filter->owner.video.buffer_del( p_filter, pic );
 }
 
 /**
@@ -191,10 +203,10 @@ static inline void filter_FlushPictures( filter_t *p_filter )
  */
 static inline subpicture_t *filter_NewSubpicture( filter_t *p_filter )
 {
-    subpicture_t *p_subpicture = p_filter->pf_sub_buffer_new( p_filter );
-    if( !p_subpicture )
+    subpicture_t *subpic = p_filter->owner.sub.buffer_new( p_filter );
+    if( subpic == NULL )
         msg_Warn( p_filter, "can't get output subpicture" );
-    return p_subpicture;
+    return subpic;
 }
 
 /**
@@ -204,9 +216,10 @@ static inline subpicture_t *filter_NewSubpicture( filter_t *p_filter )
  * \param p_filter filter_t object
  * \param p_subpicture to be released
  */
-static inline void filter_DeleteSubpicture( filter_t *p_filter, subpicture_t *p_subpicture )
+static inline void filter_DeleteSubpicture( filter_t *p_filter,
+                                            subpicture_t *subpic )
 {
-    p_filter->pf_sub_buffer_del( p_filter, p_subpicture );
+    p_filter->owner.sub.buffer_del( p_filter, subpic );
 }
 
 /**

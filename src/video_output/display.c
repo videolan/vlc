@@ -53,7 +53,7 @@ static void SplitterClose(vout_display_t *vd);
  *****************************************************************************/
 static picture_t *VideoBufferNew(filter_t *filter)
 {
-    vout_display_t *vd = (vout_display_t*)filter->p_owner;
+    vout_display_t *vd = filter->owner.sys;
     const video_format_t *fmt = &filter->fmt_out.video;
 
     assert(vd->fmt.i_chroma == fmt->i_chroma &&
@@ -73,10 +73,9 @@ static void VideoBufferDelete(filter_t *filter, picture_t *picture)
 
 static int  FilterAllocationInit(filter_t *filter, void *vd)
 {
-    filter->pf_video_buffer_new = VideoBufferNew;
-    filter->pf_video_buffer_del = VideoBufferDelete;
-    filter->p_owner             = vd;
-
+    filter->owner.sys              = vd;
+    filter->owner.video.buffer_new = VideoBufferNew;
+    filter->owner.video.buffer_del = VideoBufferDelete;
     return VLC_SUCCESS;
 }
 

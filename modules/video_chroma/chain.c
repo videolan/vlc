@@ -266,21 +266,23 @@ exit:
  *****************************************************************************/
 static picture_t *BufferNew( filter_t *p_filter )
 {
-    filter_t *p_parent = (filter_t*)p_filter->p_owner;
+    filter_t *p_parent = p_filter->owner.sys;
 
     return filter_NewPicture( p_parent );
 }
+
 static void BufferDel( filter_t *p_filter, picture_t *p_pic )
 {
-    filter_t *p_parent = (filter_t*)p_filter->p_owner;
+    filter_t *p_parent = p_filter->owner.sys;
 
     filter_DeletePicture( p_parent, p_pic );
 }
+
 static int BufferAllocationInit ( filter_t *p_filter, void *p_data )
 {
-    p_filter->pf_video_buffer_new = BufferNew;
-    p_filter->pf_video_buffer_del = BufferDel;
-    p_filter->p_owner = p_data;
+    p_filter->owner.sys = p_data;
+    p_filter->owner.video.buffer_new = BufferNew;
+    p_filter->owner.video.buffer_del = BufferDel;
     return VLC_SUCCESS;
 }
 
