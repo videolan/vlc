@@ -156,11 +156,6 @@ static void SpuHeapClean(spu_heap_t *heap)
     }
 }
 
-struct filter_owner_sys_t {
-    spu_t *spu;
-    int   channel;
-};
-
 static void FilterRelease(filter_t *filter)
 {
     if (filter->p_module)
@@ -1159,11 +1154,11 @@ static int CropCallback(vlc_object_t *object, char const *var,
 
 static subpicture_t *sub_new_buffer(filter_t *filter)
 {
-    filter_owner_sys_t *sys = filter->owner.sys;
+    int channel = (intptr_t)filter->owner.sys;
 
     subpicture_t *subpicture = subpicture_New(NULL);
     if (subpicture)
-        subpicture->i_channel = sys->channel;
+        subpicture->i_channel = channel;
     return subpicture;
 }
 
@@ -1173,30 +1168,24 @@ static void sub_del_buffer(filter_t *filter, subpicture_t *subpic)
     subpicture_Delete(subpic);
 }
 
-static int SubSourceAllocationInit(filter_t *filter, void *data)
+static int SubSourceInit(filter_t *filter, void *data)
 {
     spu_t *spu = data;
+    int channel = spu_RegisterChannel(spu);
 
-    filter_owner_sys_t *sys = malloc(sizeof(*sys));
-    if (!sys)
-        return VLC_EGENERIC;
-
+    filter->owner.sys = (void *)(intptr_t)channel;
     filter->owner.sub.buffer_new = sub_new_buffer;
     filter->owner.sub.buffer_del = sub_del_buffer;
-
-    filter->owner.sys = sys;
-    sys->channel = spu_RegisterChannel(spu);
-    sys->spu     = spu;
-
     return VLC_SUCCESS;
 }
 
-static void SubSourceAllocationClean(filter_t *filter)
+static int SubSourceClean(filter_t *filter, void *data)
 {
-    filter_owner_sys_t *sys = filter->owner.sys;
+    spu_t *spu = data;
+    int channel = (intptr_t)filter->owner.sys;
 
-    spu_ClearChannel(sys->spu, sys->channel);
-    free(sys);
+    spu_ClearChannel(spu, channel);
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -1239,13 +1228,9 @@ spu_t *spu_Create(vlc_object_t *object)
     vlc_mutex_init(&sys->source_chain_lock);
     vlc_mutex_init(&sys->filter_chain_lock);
     sys->source_chain = filter_chain_New(spu, "sub source", false,
-                                         SubSourceAllocationInit,
-                                         SubSourceAllocationClean,
-                                         spu);
+                                         NULL, NULL, NULL);
     sys->filter_chain = filter_chain_New(spu, "sub filter", false,
-                                         NULL,
-                                         NULL,
-                                         spu);
+                                         NULL, NULL, NULL);
 
     /* Load text and scale module */
     sys->text = SpuRenderCreateAndLoadText(spu);
@@ -1284,6 +1269,7 @@ void spu_Destroy(spu_t *spu)
     if (sys->scale)
         FilterRelease(sys->scale);
 
+    filter_chain_ForEach(sys->source_chain, SubSourceClean, spu);
     filter_chain_Delete(sys->source_chain);
     filter_chain_Delete(sys->filter_chain);
     vlc_mutex_destroy(&sys->source_chain_lock);
@@ -1446,13 +1432,11 @@ subpicture_t *spu_Render(spu_t *spu,
 
     vlc_mutex_lock(&sys->source_chain_lock);
     if (chain_update) {
-        if (*chain_update) {
-            filter_chain_Reset(sys->source_chain, NULL, NULL);
+        filter_chain_ForEach(sys->source_chain, SubSourceClean, spu);
+        filter_chain_Reset(sys->source_chain, NULL, NULL);
 
-            filter_chain_AppendFromString(spu->p->source_chain, chain_update);
-        }
-        else if (filter_chain_GetLength(spu->p->source_chain) > 0)
-            filter_chain_Reset(sys->source_chain, NULL, NULL);
+        filter_chain_AppendFromString(spu->p->source_chain, chain_update);
+        filter_chain_ForEach(sys->source_chain, SubSourceInit, spu);
 
         free(chain_update);
     }
