@@ -428,5 +428,8 @@ VLC_API int filter_chain_MouseFilter( filter_chain_t *, vlc_mouse_t *, const vlc
  */
 VLC_API int filter_chain_MouseEvent( filter_chain_t *, const vlc_mouse_t *, const video_format_t * );
 
+int filter_chain_ForEach( filter_chain_t *chain,
+                          int (*cb)( filter_t *, void * ), void *opaque );
+
 #endif /* _VLC_FILTER_H */
 

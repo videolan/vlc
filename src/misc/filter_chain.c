@@ -236,6 +236,18 @@ int filter_chain_DeleteFilter( filter_chain_t *p_chain, filter_t *p_filter )
     return UpdateBufferFunctions( p_chain );
 }
 
+int filter_chain_ForEach( filter_chain_t *chain,
+                          int (*cb)( filter_t *, void * ), void *opaque )
+{
+    for( chained_filter_t *f = chain->first; f != NULL; f = f->next )
+    {
+        int ret = cb( &f->filter, opaque );
+        if( ret )
+            return ret;
+    }
+    return VLC_SUCCESS;
+}
+
 int filter_chain_GetLength( filter_chain_t *p_chain )
 {
     return p_chain->length;
