@@ -390,7 +390,7 @@ static subpicture_t *FilterSub( filter_t *p_filter, mtime_t date )
     if( !p_region )
     {
         msg_Err( p_filter, "cannot allocate SPU region" );
-        p_filter->pf_sub_buffer_del( p_filter, p_spu );
+        filter_DeleteSubpicture( p_filter, p_spu );
         p_spu = NULL;
         goto exit;
     }
