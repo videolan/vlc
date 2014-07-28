@@ -92,10 +92,13 @@ function js_descramble( sig, js_url )
         descrambler = string.match( line, "%.signature=(.-)%(" )
     end
 
-    -- Fetch the code of the descrambler function. Example:
-    -- function ij(a){a=a.split("");a=a.reverse();a=jj(a,12);a=jj(a,32);a=a.reverse();a=jj(a,34);a=a.slice(3);a=jj(a,35);a=jj(a,42);a=a.slice(2);return a.join("")}
+    -- Fetch the code of the descrambler function. The function is
+    -- conveniently preceded by the definition of a helper object
+    -- that it uses. Example:
+    -- var Fo={TR:function(a){a.reverse()},TU:function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c},sH:function(a,b){a.splice(0,b)}};function Go(a){a=a.split("");Fo.sH(a,2);Fo.TU(a,28);Fo.TU(a,44);Fo.TU(a,26);Fo.TU(a,40);Fo.TU(a,64);Fo.TR(a,26);Fo.sH(a,1);return a.join("")};
+    local transformations = nil
     local rules = nil
-    while not rules do
+    while not transformations and not rules do
         local line
         if #lines > 0 then
             line = table.remove( lines )
@@ -106,46 +109,53 @@ function js_descramble( sig, js_url )
                 return sig
             end
         end
-        rules = string.match( line, "function "..descrambler.."%([^)]*%){(.-)}" )
+        transformations, rules = string.match( line, "var ..={(.-)};function "..descrambler.."%([^)]*%){(.-)}" )
     end
 
-    -- Parse descrambling rules one by one and apply them on the
-    -- signature as we go
-    for rule in string.gmatch( rules, "[^;]+" ) do
-        -- a=a.reverse();
-        if string.match( rule, "%.reverse%(" ) then
-            sig = string.reverse( sig )
-        else
+    -- Parse the helper object to map available transformations
+    local trans = {}
+    for meth,code in string.gmatch( transformations, "(..):function%([^)]*%){([^}]*)}" ) do
+        -- a=a.reverse()
+        if string.match( code, "%.reverse%(" ) then
+          trans[meth] = "reverse"
 
-        -- a=a.slice(3);
-        local len = string.match( rule, "%.slice%((%d+)%)" )
-        if len then
-            sig = string.sub( sig, len + 1 )
-        else
+        -- a.splice(0,b)
+        elseif string.match( code, "%.splice%(") then
+          trans[meth] = "slice"
 
-        -- a=jj(a,32);
-        -- This is known to be a function swapping the first and nth
-        -- characters:
-        -- function jj(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c;return a}
-        local idx = string.match( rule, "=..%([^,]+,(%d+)%)" )
-        -- This swapping function may also appear inlined:
-        -- var b=a[0];a[0]=a[59%a.length];a[59]=b;
-        -- In that case we only catch one of the three rules.
-        if not idx then
-            idx = string.match( rule, ".%[(%d+)%]=." )
+        -- var c=a[0];a[0]=a[b%a.length];a[b]=c
+        elseif string.match( code, "var c=" ) then
+          trans[meth] = "swap"
+        else
+            vlc.msg.warn("Couldn't parse unknown youtube video URL signature transformation")
         end
-        if idx then
-            idx = tonumber( idx )
-            if not idx then idx = 0 end
+    end
+
+    -- Parse descrambling rules, map them to known transformations
+    -- and apply them on the signature
+    local missing = false
+    for meth,idx in string.gmatch( rules, "..%.(..)%([^,]+,(%d+)%)" ) do
+        idx = tonumber( idx )
+
+        if trans[meth] == "reverse" then
+            sig = string.reverse( sig )
+
+        elseif trans[meth] == "slice" then
+            sig = string.sub( sig, idx + 1 )
+
+        elseif trans[meth] == "swap" then
             if idx > 1 then
                 sig = string.gsub( sig, "^(.)("..string.rep( ".", idx - 1 )..")(.)(.*)$", "%3%2%1%4" )
             elseif idx == 1 then
                 sig = string.gsub( sig, "^(.)(.)", "%2%1" )
             end
-        end end end
-
-        -- Simply ignore other statements, in particular initial split
-        -- and final join and return statements
+        else
+            vlc.msg.dbg("Couldn't apply unknown youtube video URL signature transformation")
+            missing = true
+        end
+    end
+    if missing then
+        vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
     end
     return sig
 end
