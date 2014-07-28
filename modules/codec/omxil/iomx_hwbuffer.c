@@ -27,6 +27,9 @@
 #include <errno.h>
 #include <stdio.h>
 
+#include <OMX_Core.h>
+#include <OMX_Component.h>
+
 #if ANDROID_API <= 11
 #include <ui/android_native_buffer.h>
 #include <ui/egl/android_natives.h>
@@ -99,6 +102,25 @@ int IOMXHWBuffer_Disconnect( void *window )
     return 0;
 }
 
+
+int IOMXHWBuffer_GetHalFormat( const char *comp_name, int* hal_format )
+{
+    if( !strncmp( comp_name, "OMX.SEC.", 8 ) ) {
+        switch( *hal_format ) {
+        case OMX_COLOR_FormatYUV420SemiPlanar:
+            *hal_format = 0x105; // HAL_PIXEL_FORMAT_YCbCr_420_SP
+            break;
+        case OMX_COLOR_FormatYUV420Planar:
+            *hal_format = 0x101; // HAL_PIXEL_FORMAT_YCbCr_420_P
+            break;
+        }
+    }
+    else if( !strcmp( comp_name, "OMX.TI.720P.Decoder" ) ||
+        !strcmp( comp_name, "OMX.TI.Video.Decoder" ) )
+        *hal_format = 0x14; // HAL_PIXEL_FORMAT_YCbCr_422_I
+
+    return 0;
+}
 
 int IOMXHWBuffer_Setup( void *window, int w, int h, int hal_format, int hw_usage )
 {

@@ -92,6 +92,7 @@ OMX_ERRORTYPE (*pf_get_graphic_buffer_usage)(OMX_HANDLETYPE, OMX_U32, OMX_U32*);
 
 int (*pf_omx_hwbuffer_connect) (void *);
 int (*pf_omx_hwbuffer_disconnect) (void *);
+int (*pf_omx_hwbuffer_get_hal_format) (const char *, int *);
 int (*pf_omx_hwbuffer_setup) (void *, int, int, int, int );
 int (*pf_omx_hwbuffer_get_min_undequeued) (void *, unsigned int *);
 int (*pf_omx_hwbuffer_set_buffer_count) (void *, unsigned int );
@@ -179,6 +180,7 @@ int InitOmxCore(vlc_object_t *p_this)
 
     pf_omx_hwbuffer_connect = dlsym( dll_handle, "OMXHWBuffer_Connect" );
     pf_omx_hwbuffer_disconnect = dlsym( dll_handle, "OMXHWBuffer_Disconnect" );
+    pf_omx_hwbuffer_get_hal_format = dlsym( dll_handle, "OMXHWBuffer_GetHalFormat" );
     pf_omx_hwbuffer_setup = dlsym( dll_handle, "OMXHWBuffer_Setup" );
     pf_omx_hwbuffer_get_min_undequeued = dlsym( dll_handle, "OMXHWBuffer_GetMinUndequeued" );
     pf_omx_hwbuffer_set_buffer_count = dlsym( dll_handle, "OMXHWBuffer_SetBufferCount" );

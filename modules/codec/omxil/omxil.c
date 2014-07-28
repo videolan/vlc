@@ -2055,6 +2055,7 @@ static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port )
           pf_omx_hwbuffer_set_buffer_count && pf_omx_hwbuffer_setcrop &&
           pf_omx_hwbuffer_dequeue && pf_omx_hwbuffer_lock &&
           pf_omx_hwbuffer_queue && pf_omx_hwbuffer_cancel &&
+          pf_omx_hwbuffer_get_hal_format &&
           ((OMX_COMPONENTTYPE*)p_port->omx_handle)->UseBuffer) )
     {
         msg_Warn( p_dec, "direct output port enabled but can't find "
@@ -2157,19 +2158,11 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
     if( !p_port->p_hwbuf )
         return 0;
 
-    if( !strncmp( p_sys->psz_component, "OMX.SEC.", 8 ) ) {
-        switch( colorFormat ) {
-        case OMX_COLOR_FormatYUV420SemiPlanar:
-            colorFormat = 0x105; // HAL_PIXEL_FORMAT_YCbCr_420_SP
-            break;
-        case OMX_COLOR_FormatYUV420Planar:
-            colorFormat = 0x101; // HAL_PIXEL_FORMAT_YCbCr_420_P
-            break;
-        }
+    omx_error = pf_omx_hwbuffer_get_hal_format( p_sys->psz_component, &colorFormat );
+    if( omx_error != OMX_ErrorNone )
+    {
+        msg_Warn( p_dec, "pf_omx_hwbuffer_get_hal_format failed (Not fatal)" );
     }
-    else if( !strcmp( p_sys->psz_component, "OMX.TI.720P.Decoder" ) ||
-        !strcmp( p_sys->psz_component, "OMX.TI.Video.Decoder" ) )
-        colorFormat = 0x14; // HAL_PIXEL_FORMAT_YCbCr_422_I
 
     omx_error = pf_get_graphic_buffer_usage( p_port->omx_handle,
                                              p_port->i_port_index,
