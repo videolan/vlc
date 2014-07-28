@@ -13,7 +13,6 @@ jpeg: jpegsrc.v$(JPEG_VERSION).tar.gz .sum-jpeg
 	$(UNPACK)
 	mv jpeg-$(JPEG_VERSION) jpegsrc.v$(JPEG_VERSION)
 	$(UPDATE_AUTOCONFIG)
-	$(APPLY) $(SRC)/jpeg/osx.patch
 	$(MOVE)
 
 .jpeg: jpeg
