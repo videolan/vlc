@@ -155,7 +155,7 @@ static HRESULT TimeGet( aout_stream_sys_t *sys, mtime_t *delay )
     if( hr != DS_OK )
         return hr;
 
-    size = read - sys->i_last_read;
+    size = (mtime_t)read - sys->i_last_read;
 
     /* GetCurrentPosition cannot be trusted if the return doesn't change
      * Just return an error */
