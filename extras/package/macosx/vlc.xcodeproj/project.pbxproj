@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1CC6EB6819882782004335BD /* window-fullscreen-on@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CC6EB6719882782004335BD /* window-fullscreen-on@2x.png */; };
+		1CC6EB6A19882789004335BD /* window-fullscreen-over@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CC6EB6919882789004335BD /* window-fullscreen-over@2x.png */; };
+		1CC6EB6C19882794004335BD /* window-fullscreen@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CC6EB6B19882794004335BD /* window-fullscreen@2x.png */; };
 		7D3F6525188051F2005776C4 /* BWQuincyMain.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D3F6523188051F2005776C4 /* BWQuincyMain.xib */; };
 		7D8BB0B71830311300FAE9B7 /* DebugMessageVisualizer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */; };
 		7D8BB0BA1830367200FAE9B7 /* PlaylistMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */; };
@@ -463,6 +466,9 @@
 		089C1672FE841209C02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		1CC6EB6719882782004335BD /* window-fullscreen-on@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-fullscreen-on@2x.png"; path = "Resources/mainwindow_dark/window-fullscreen-on@2x.png"; sourceTree = "<group>"; };
+		1CC6EB6919882789004335BD /* window-fullscreen-over@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-fullscreen-over@2x.png"; path = "Resources/mainwindow_dark/window-fullscreen-over@2x.png"; sourceTree = "<group>"; };
+		1CC6EB6B19882794004335BD /* window-fullscreen@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-fullscreen@2x.png"; path = "Resources/mainwindow_dark/window-fullscreen@2x.png"; sourceTree = "<group>"; };
 		2AEF857609A5FEC900130822 /* fspanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fspanel.h; path = ../../../modules/gui/macosx/fspanel.h; sourceTree = SOURCE_ROOT; };
 		2AEF857709A5FEC900130822 /* fspanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = fspanel.m; path = ../../../modules/gui/macosx/fspanel.m; sourceTree = SOURCE_ROOT; };
 		5CCED71014C0D4A90057F8D1 /* ExtensionsDialogProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ExtensionsDialogProvider.h; path = ../../../modules/gui/macosx/ExtensionsDialogProvider.h; sourceTree = SOURCE_ROOT; };
@@ -1377,8 +1383,11 @@
 				CC04323913B246DF00D7D52E /* volume-slider-knob_dark.png */,
 				CC04323A13B246DF00D7D52E /* volume-slider-track_dark.png */,
 				CC206B6B14AD0A5D007935C6 /* window-fullscreen-on.png */,
+				1CC6EB6719882782004335BD /* window-fullscreen-on@2x.png */,
 				CC206B6C14AD0A5D007935C6 /* window-fullscreen-over.png */,
+				1CC6EB6919882789004335BD /* window-fullscreen-over@2x.png */,
 				CC206B6D14AD0A5D007935C6 /* window-fullscreen.png */,
+				1CC6EB6B19882794004335BD /* window-fullscreen@2x.png */,
 				CC206B6914AD0A52007935C6 /* window-resize.png */,
 			);
 			name = "dark variant";
@@ -2303,6 +2312,9 @@
 				7DFFA16C16124F38001AF89F /* effects-one-button-pressed-dark.png in Resources */,
 				7DFFA16D16124F38001AF89F /* effects-one-button-pressed-dark@2x.png in Resources */,
 				E0FB95CE1615B6DF0005069A /* DetachedVideoWindow.xib in Resources */,
+				1CC6EB6819882782004335BD /* window-fullscreen-on@2x.png in Resources */,
+				1CC6EB6A19882789004335BD /* window-fullscreen-over@2x.png in Resources */,
+				1CC6EB6C19882794004335BD /* window-fullscreen@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
