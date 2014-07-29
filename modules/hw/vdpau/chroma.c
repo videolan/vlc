@@ -448,7 +448,7 @@ static picture_t *VideoRender(filter_t *filter, picture_t *src)
 
     if (unlikely(src->context == NULL))
     {
-        msg_Err(filter, "corrupt VDPAU video surface");
+        msg_Err(filter, "corrupt VDPAU video surface %p", src);
         picture_Release(src);
         return NULL;
     }
