@@ -161,6 +161,7 @@ void CloseMux( vlc_object_t *p_this )
     }
 
     avformat_free_context(p_sys->oc);
+    av_free(p_sys->io);
 
     free( p_sys->io_buffer );
     free( p_sys );
