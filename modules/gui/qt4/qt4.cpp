@@ -42,7 +42,7 @@
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
 #include "components/playlist/playlist_model.hpp" /* for ~PLModel() */
 
-#ifdef Q_WS_X11
+#if defined(Q_OS_UNIX) && !defined(Q_OS_DARWIN)
  #include <vlc_xlib.h>
 #endif
 
@@ -298,19 +298,17 @@ vlc_module_begin ()
 
         set_callbacks( OpenDialogs, Close )
 
-#if defined (Q_WS_X11) || (defined (Q_WS_QPA) && defined (__unix__))
-    add_submodule ()
-        set_capability( "vout window xid", 0 )
-        set_callbacks( WindowOpen, WindowClose )
-#endif
 #if (defined (Q_OS_WIN) && !defined (_WIN32_X11_)) || defined (Q_OS_OS2)
     add_submodule ()
         set_capability( "vout window hwnd", 0 )
         set_callbacks( WindowOpen, WindowClose )
-#endif
-#if defined (Q_OS_DARWIN)
+#elif defined (Q_OS_DARWIN)
     add_submodule ()
         set_capability( "vout window nsobject", 0 )
+        set_callbacks( WindowOpen, WindowClose )
+#elif defined (Q_OS_UNIX)
+    add_submodule ()
+        set_capability( "vout window xid", 0 )
         set_callbacks( WindowOpen, WindowClose )
 #endif
 
@@ -351,7 +349,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-#ifdef Q_WS_X11
+#if defined(Q_OS_UNIX) && !defined(Q_OS_DARWIN)
     if( !vlc_xlib_init( p_this ) )
         return VLC_EGENERIC;
 
