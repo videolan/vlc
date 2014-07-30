@@ -64,5 +64,5 @@
 - (IBAction)edit_ok:(id)sender;
 
 - (void)showBookmarks;
-- (id)dataTable;
+
 @end

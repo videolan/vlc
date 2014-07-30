@@ -608,7 +608,6 @@
     //[o_outline_dict removeAllObjects];
     [o_outline_view reloadData];
     [[[[VLCMain sharedInstance] wizard] playlistWizard] reloadOutlineView];
-    [[[[VLCMain sharedInstance] bookmarks] dataTable] reloadData];
 
     [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:retainedRowSelection] byExtendingSelection:NO];
 
