@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">12D78</string>
+    <string key="IBDocument.SystemVersion">13E28</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1187.37</string>
-    <string key="IBDocument.HIToolboxVersion">626.00</string>
+    <string key="IBDocument.AppKitVersion">1265.21</string>
+    <string key="IBDocument.HIToolboxVersion">698.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <object class="NSArray" key="dict.sortedKeys">
@@ -21,7 +21,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="9"/>
+      <integer value="6"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -194,6 +194,7 @@
                                   </object>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                               <object class="NSTextField" id="1769326">
                                 <reference key="NSNextResponder" ref="627843039"/>
@@ -211,6 +212,7 @@
                                   <reference key="NSTextColor" ref="314723737"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                               <object class="NSTextField" id="685913676">
                                 <reference key="NSNextResponder" ref="627843039"/>
@@ -228,6 +230,7 @@
                                   <reference key="NSTextColor" ref="314723737"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                               <object class="NSTextField" id="396951138">
                                 <reference key="NSNextResponder" ref="627843039"/>
@@ -245,6 +248,7 @@
                                   <reference key="NSTextColor" ref="314723737"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                               <object class="NSTextField" id="279446133">
                                 <reference key="NSNextResponder" ref="627843039"/>
@@ -262,6 +266,7 @@
                                   <reference key="NSTextColor" ref="314723737"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                               <object class="NSSlider" id="1033837370">
                                 <reference key="NSNextResponder" ref="627843039"/>
@@ -475,6 +480,7 @@
                                   <reference key="NSTextColor" ref="314723737"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                               <object class="NSSlider" id="75681829">
                                 <reference key="NSNextResponder" ref="147543206"/>
@@ -575,6 +581,7 @@
                                   <reference key="NSTextColor" ref="314723737"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                               <object class="NSSlider" id="484297776">
                                 <reference key="NSNextResponder" ref="832363197"/>
@@ -675,6 +682,7 @@
                                   <reference key="NSTextColor" ref="314723737"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                               <object class="NSSlider" id="288762928">
                                 <reference key="NSNextResponder" ref="38396992"/>
@@ -734,7 +742,7 @@
                 <object class="BGHUDTabViewItem" id="52756061">
                   <string key="NSIdentifier">crop</string>
                   <object class="NSView" key="NSView" id="838226260">
-                    <nil key="NSNextResponder"/>
+                    <reference key="NSNextResponder" ref="898819366"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -830,6 +838,7 @@
                           <string key="themeKey">gradientTheme</string>
                         </object>
                         <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                        <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                       </object>
                       <object class="BGHUDLabel" id="290531254">
                         <reference key="NSNextResponder" ref="838226260"/>
@@ -847,6 +856,7 @@
                           <reference key="NSTextColor" ref="329898124"/>
                         </object>
                         <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                        <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSStepper" id="726085921">
@@ -860,7 +870,7 @@
                           <int key="NSCellFlags2">131072</int>
                           <reference key="NSSupport" ref="26"/>
                           <reference key="NSControlView" ref="726085921"/>
-                          <double key="NSMaxValue">100</double>
+                          <double key="NSMaxValue">1000</double>
                           <double key="NSIncrement">1</double>
                           <bool key="NSAutorepeat">YES</bool>
                         </object>
@@ -941,6 +951,7 @@
                           <string key="themeKey">gradientTheme</string>
                         </object>
                         <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                        <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                       </object>
                       <object class="BGHUDLabel" id="647574939">
                         <reference key="NSNextResponder" ref="838226260"/>
@@ -958,6 +969,7 @@
                           <reference key="NSTextColor" ref="329898124"/>
                         </object>
                         <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                        <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSStepper" id="308507287">
@@ -971,7 +983,7 @@
                           <int key="NSCellFlags2">131072</int>
                           <reference key="NSSupport" ref="26"/>
                           <reference key="NSControlView" ref="308507287"/>
-                          <double key="NSMaxValue">100</double>
+                          <double key="NSMaxValue">1000</double>
                           <double key="NSIncrement">1</double>
                           <bool key="NSAutorepeat">YES</bool>
                         </object>
@@ -1052,6 +1064,7 @@
                           <string key="themeKey">gradientTheme</string>
                         </object>
                         <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                        <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                       </object>
                       <object class="BGHUDLabel" id="76138714">
                         <reference key="NSNextResponder" ref="838226260"/>
@@ -1069,6 +1082,7 @@
                           <reference key="NSTextColor" ref="329898124"/>
                         </object>
                         <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                        <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSStepper" id="1010555455">
@@ -1082,7 +1096,7 @@
                           <int key="NSCellFlags2">131072</int>
                           <reference key="NSSupport" ref="26"/>
                           <reference key="NSControlView" ref="1010555455"/>
-                          <double key="NSMaxValue">100</double>
+                          <double key="NSMaxValue">1000</double>
                           <double key="NSIncrement">1</double>
                           <bool key="NSAutorepeat">YES</bool>
                         </object>
@@ -1163,6 +1177,7 @@
                           <string key="themeKey">gradientTheme</string>
                         </object>
                         <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                        <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                       </object>
                       <object class="BGHUDLabel" id="299779593">
                         <reference key="NSNextResponder" ref="838226260"/>
@@ -1180,6 +1195,7 @@
                           <reference key="NSTextColor" ref="329898124"/>
                         </object>
                         <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                        <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                         <string key="themeKey">gradientTheme</string>
                       </object>
                       <object class="NSStepper" id="764981534">
@@ -1193,7 +1209,7 @@
                           <int key="NSCellFlags2">131072</int>
                           <reference key="NSSupport" ref="26"/>
                           <reference key="NSControlView" ref="764981534"/>
-                          <double key="NSMaxValue">100</double>
+                          <double key="NSMaxValue">1000</double>
                           <double key="NSIncrement">1</double>
                           <bool key="NSAutorepeat">YES</bool>
                         </object>
@@ -1251,6 +1267,7 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
+                    <reference key="NSSuperview" ref="898819366"/>
                   </object>
                   <string key="NSLabel">Crop</string>
                   <reference key="NSColor" ref="279270326"/>
@@ -1259,7 +1276,7 @@
                 <object class="NSTabViewItem" id="160045531">
                   <string key="NSIdentifier">geometry</string>
                   <object class="NSView" key="NSView" id="934925915">
-                    <reference key="NSNextResponder" ref="898819366"/>
+                    <nil key="NSNextResponder"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1533,6 +1550,7 @@
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                               <object class="NSStepper" id="444599762">
                                 <reference key="NSNextResponder" ref="390350599"/>
@@ -1569,6 +1587,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="NSTextField" id="227755793">
@@ -1646,6 +1665,7 @@
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                               <object class="NSStepper" id="814287388">
                                 <reference key="NSNextResponder" ref="390350599"/>
@@ -1682,6 +1702,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
@@ -1824,6 +1845,7 @@
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                               <object class="NSStepper" id="979664043">
                                 <reference key="NSNextResponder" ref="143693211"/>
@@ -1860,6 +1882,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="NSTextField" id="147071705">
@@ -1940,6 +1963,7 @@
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                               <object class="NSStepper" id="228437242">
                                 <reference key="NSNextResponder" ref="143693211"/>
@@ -1976,6 +2000,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
@@ -2115,6 +2140,7 @@
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                               <object class="NSStepper" id="1003951278">
                                 <reference key="NSNextResponder" ref="631019302"/>
@@ -2151,6 +2177,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
@@ -2180,7 +2207,6 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
-                    <reference key="NSSuperview" ref="898819366"/>
                   </object>
                   <string key="NSLabel">Geometry</string>
                   <reference key="NSColor" ref="279270326"/>
@@ -2336,6 +2362,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
@@ -2650,6 +2677,7 @@
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                               <object class="NSStepper" id="357676033">
                                 <reference key="NSNextResponder" ref="921442235"/>
@@ -2686,6 +2714,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
@@ -2829,6 +2858,7 @@
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                               <object class="NSStepper" id="614130362">
                                 <reference key="NSNextResponder" ref="32843737"/>
@@ -2865,6 +2895,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
@@ -2943,6 +2974,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="NSTextField" id="79386836">
@@ -2962,6 +2994,7 @@
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                             </object>
                             <string key="NSFrame">{{1, 1}, {187, 45}}</string>
@@ -3062,6 +3095,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                             </object>
@@ -3163,6 +3197,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="NSSlider" id="538371352">
@@ -3204,6 +3239,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="152203922">
@@ -3222,6 +3258,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="NSTextField" id="1069462988">
@@ -3240,6 +3277,7 @@
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                             </object>
                             <string key="NSFrame">{{1, 1}, {212, 88}}</string>
@@ -3331,6 +3369,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="509844824">
@@ -3349,6 +3388,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="NSPopUpButton" id="135717749">
@@ -3435,6 +3475,7 @@
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                             </object>
                             <string key="NSFrame">{{1, 1}, {308, 70}}</string>
@@ -3512,6 +3553,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="951174239">
@@ -3530,6 +3572,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="BGHUDLabel" id="20899909">
@@ -3548,6 +3591,7 @@
                                   <reference key="NSTextColor" ref="329898124"/>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                                 <string key="themeKey">gradientTheme</string>
                               </object>
                               <object class="NSTextField" id="831721084">
@@ -3567,6 +3611,7 @@
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
                                 <bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+                                <int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
                               </object>
                               <object class="NSSlider" id="1005375083">
                                 <reference key="NSNextResponder" ref="232040287"/>
@@ -3716,7 +3761,7 @@
                   <reference key="NSTabView" ref="898819366"/>
                 </object>
               </object>
-              <reference key="NSSelectedTabViewItem" ref="160045531"/>
+              <reference key="NSSelectedTabViewItem" ref="52756061"/>
               <object class="NSFont" key="NSFont">
                 <string key="NSName">LucidaGrande</string>
                 <double key="NSSize">13</double>
@@ -3728,7 +3773,7 @@
               <nil key="themeKey"/>
               <object class="NSMutableArray" key="NSSubviews">
                 <bool key="EncodedWithXMLCoder">YES</bool>
-                <reference ref="934925915"/>
+                <reference ref="838226260"/>
               </object>
             </object>
             <object class="NSPopUpButton" id="1044210417">
