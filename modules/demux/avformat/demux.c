@@ -157,7 +157,7 @@ int OpenDemux( vlc_object_t *p_this )
 {
     demux_t       *p_demux = (demux_t*)p_this;
     demux_sys_t   *p_sys;
-    AVProbeData   pd;
+    AVProbeData   pd = { };
     AVInputFormat *fmt = NULL;
     unsigned int  i;
     int64_t       i_start_time = -1;
