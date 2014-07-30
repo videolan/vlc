@@ -24,6 +24,8 @@
 # include "config.h"
 #endif
 
+#include <limits.h> /* INT_MAX */
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_stream.h>
@@ -1411,17 +1413,20 @@ static int Open( vlc_object_t *p_this )
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    char *uri = NULL;
-    if( unlikely( asprintf( &uri, "%s://%s", s->psz_access, s->psz_path ) < 0 ) )
+    char *uri_without_query = NULL;
+    size_t pathlen = strcspn( s->psz_path, "?" );
+    if( unlikely( ( pathlen > INT_MAX ) ||
+        ( asprintf( &uri_without_query, "%s://%.*s", s->psz_access,
+                    (int)pathlen, s->psz_path ) < 0 ) ) )
     {
         free( p_sys );
         return VLC_ENOMEM;
     }
 
     /* remove the last part of the url */
-    char *pos = strrchr( uri, '/');
+    char *pos = strrchr( uri_without_query, '/');
     *pos = '\0';
-    p_sys->base_url = uri;
+    p_sys->base_url = uri_without_query;
 
     p_sys->flv_header_bytes_sent = 0;
 
