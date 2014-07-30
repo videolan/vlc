@@ -217,7 +217,10 @@ void StreamClose(vlc_object_t *object)
     stream_sys_t *p_sys = p_stream->p_sys;
 
     if (p_sys->p_archive)
+    {
+        archive_read_close(p_sys->p_archive);
         archive_read_free(p_sys->p_archive);
+    }
 
     free(p_sys);
 }

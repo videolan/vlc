@@ -296,7 +296,10 @@ void AccessClose(vlc_object_t *p_object)
     access_sys_t *p_sys = p_access->p_sys;
 
     if (p_sys->p_archive)
+    {
+        archive_read_close(p_sys->p_archive);
         archive_read_free(p_sys->p_archive);
+    }
 
     free(p_sys->psz_uri);
     free(p_sys);
