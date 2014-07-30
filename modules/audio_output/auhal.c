@@ -1086,6 +1086,8 @@ static void Stop(audio_output_t *p_aout)
     OSStatus            err = noErr;
     UInt32              i_param_size = 0;
 
+    msg_Dbg(p_aout, "Stopping the auhal module");
+
     if (p_sys->au_unit) {
         verify_noerr(AudioOutputUnitStop(p_sys->au_unit));
         verify_noerr(AudioUnitUninitialize(p_sys->au_unit));
@@ -1184,6 +1186,8 @@ static void RebuildDeviceList(audio_output_t * p_aout)
     CFMutableArrayRef   currentListOfDevices;
 
     struct aout_sys_t   *p_sys = p_aout->sys;
+
+    msg_Dbg(p_aout, "Rebuild device list");
 
     ReportDevice(p_aout, 0, _("System Sound Output Device"));
 
@@ -1286,16 +1290,18 @@ static void RebuildDeviceList(audio_output_t * p_aout)
     CFIndex count = 0;
     if (p_sys->device_list)
         count = CFArrayGetCount(p_sys->device_list);
+    CFRange newListSearchRange = CFRangeMake(0, CFArrayGetCount(currentListOfDevices));
 
     if (count > 0) {
+        msg_Dbg(p_aout, "Looking for removed devices");
         CFNumberRef cfn_device_id;
         int i_device_id = 0;
         for (CFIndex x = 0; x < count; x++) {
-            if (!CFArrayContainsValue(currentListOfDevices, CFRangeMake(0, count), CFArrayGetValueAtIndex(p_sys->device_list, x))) {
+            if (!CFArrayContainsValue(currentListOfDevices, newListSearchRange, CFArrayGetValueAtIndex(p_sys->device_list, x))) {
                 cfn_device_id = CFArrayGetValueAtIndex(p_sys->device_list, x);
-
                 if (cfn_device_id) {
                     CFNumberGetValue(cfn_device_id, kCFNumberSInt32Type, &i_device_id);
+                    msg_Dbg(p_aout, "Device ID %i is not found in new array, deleting.", i_device_id);
                     ReportDevice(p_aout, i_device_id, NULL);
                 }
             }
