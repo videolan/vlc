@@ -210,11 +210,11 @@ static void ProcessEntry( int *pi_n_entry, xml_reader_t *p_xml_reader,
             /* Metadata Node */
             if( !strncasecmp( psz_node, "TITLE", 5 ) )
                 ReadElement( p_xml_reader, &psz_title );
-            if( !strncasecmp( psz_node, "AUTHOR", 6 ) )
+            else if( !strncasecmp( psz_node, "AUTHOR", 6 ) )
                 ReadElement( p_xml_reader, &psz_artist );
-            if( !strncasecmp( psz_node, "COPYRIGHT", 9 ) )
+            else if( !strncasecmp( psz_node, "COPYRIGHT", 9 ) )
                 ReadElement( p_xml_reader, &psz_copyright );
-            if( !strncasecmp( psz_node,"MOREINFO", 8 ) )
+            else if( !strncasecmp( psz_node,"MOREINFO", 8 ) )
             {
                 do
                 {
@@ -228,13 +228,13 @@ static void ProcessEntry( int *pi_n_entry, xml_reader_t *p_xml_reader,
                     psz_moreinfo = strdup( psz_node );
                 resolve_xml_special_chars( psz_moreinfo );
             }
-            if( !strncasecmp( psz_node, "ABSTRACT", 8 ) )
+            else if( !strncasecmp( psz_node, "ABSTRACT", 8 ) )
                 ReadElement( p_xml_reader, &psz_description );
-            if( !strncasecmp( psz_node, "DURATION", 8 ) )
+            else if( !strncasecmp( psz_node, "DURATION", 8 ) )
                 i_duration = ParseTime( p_xml_reader );
-            if( !strncasecmp( psz_node, "STARTTIME", 9 ) )
+            else if( !strncasecmp( psz_node, "STARTTIME", 9 ) )
                 i_start = ParseTime( p_xml_reader );
-
+            else
             /* Reference Node */
             /* All ref node will be converted into an entry */
             if( !strncasecmp( psz_node, "REF", 3 ) )
@@ -361,17 +361,17 @@ static int Demux( demux_t *p_demux )
                 ReadElement( p_xml_reader, &psz_title_asx );
                 input_item_SetTitle( p_current_input, psz_title_asx );
             }
-            if( !strncasecmp( psz_node, "AUTHOR", 6 ) )
+            else if( !strncasecmp( psz_node, "AUTHOR", 6 ) )
             {
                 ReadElement( p_xml_reader, &psz_txt );
                 input_item_SetArtist( p_current_input, psz_txt );
             }
-            if( !strncasecmp( psz_node, "COPYRIGHT", 9 ) )
+            else if( !strncasecmp( psz_node, "COPYRIGHT", 9 ) )
             {
                 ReadElement( p_xml_reader, &psz_txt );
                 input_item_SetCopyright( p_current_input, psz_txt );
             }
-            if( !strncasecmp( psz_node, "MOREINFO", 8 ) )
+            else if( !strncasecmp( psz_node, "MOREINFO", 8 ) )
             {
                 const char *psz_tmp;
                 do
@@ -388,16 +388,16 @@ static int Demux( demux_t *p_demux )
                 resolve_xml_special_chars( psz_txt );
                 input_item_SetURL( p_current_input, psz_txt );
             }
-            if( !strncasecmp( psz_node, "ABSTRACT", 8 ) )
+            else if( !strncasecmp( psz_node, "ABSTRACT", 8 ) )
             {
                 ReadElement( p_xml_reader, &psz_txt );
                 input_item_SetDescription( p_current_input, psz_txt );
             }
-
+            else
             /* Base Node handler */
             if( !strncasecmp( psz_node, "BASE", 4 ) )
                 ReadElement( p_xml_reader, &psz_base );
-
+            else
             /* Entry Ref Handler */
             if( !strncasecmp( psz_node, "ENTRYREF", 7 ) )
             {
@@ -418,7 +418,7 @@ static int Demux( demux_t *p_demux )
 
                 vlc_gc_decref( p_input );
             }
-
+            else
             /* Entry Handler */
             if( !strncasecmp( psz_node, "ENTRY", 5 ) )
             {
