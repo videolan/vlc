@@ -66,7 +66,7 @@ static encoder_t *CreateEncoder( vlc_object_t *, video_format_t *,
                                  video_format_t * );
 static void DeleteEncoder( encoder_t * );
 static filter_t *CreateFilter( vlc_object_t *, es_format_t *,
-                               video_format_t *, const char * );
+                               video_format_t * );
 static void DeleteFilter( filter_t * );
 
 vlc_fourcc_t image_Type2Fourcc( const char * );
@@ -196,7 +196,7 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         {
             p_image->p_filter =
                 CreateFilter( p_image->p_parent, &p_image->p_dec->fmt_out,
-                              p_fmt_out, NULL );
+                              p_fmt_out );
 
             if( !p_image->p_filter )
             {
@@ -321,7 +321,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
 
             p_image->p_filter =
                 CreateFilter( p_image->p_parent, &fmt_in,
-                              &p_image->p_enc->fmt_in.video, NULL );
+                              &p_image->p_enc->fmt_in.video );
 
             if( !p_image->p_filter )
             {
@@ -457,7 +457,7 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
         fmt_in.video = *p_fmt_in;
 
         p_image->p_filter =
-            CreateFilter( p_image->p_parent, &fmt_in, p_fmt_out, NULL );
+            CreateFilter( p_image->p_parent, &fmt_in, p_fmt_out );
 
         if( !p_image->p_filter )
         {
@@ -740,8 +740,7 @@ static void DeleteEncoder( encoder_t * p_enc )
 }
 
 static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
-                               video_format_t *p_fmt_out,
-                               const char *psz_module )
+                               video_format_t *p_fmt_out )
 {
     filter_t *p_filter;
 
@@ -755,8 +754,7 @@ static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
     p_filter->fmt_out = *p_fmt_in;
     p_filter->fmt_out.i_codec = p_fmt_out->i_chroma;
     p_filter->fmt_out.video = *p_fmt_out;
-    p_filter->p_module = module_need( p_filter, "video filter2",
-                                      psz_module, false );
+    p_filter->p_module = module_need( p_filter, "video filter2", NULL, false );
 
     if( !p_filter->p_module )
     {
