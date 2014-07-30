@@ -59,8 +59,6 @@ static int ImageWriteUrl( image_handler_t *, picture_t *,
 
 static picture_t *ImageConvert( image_handler_t *, picture_t *,
                                 video_format_t *, video_format_t * );
-static picture_t *ImageFilter( image_handler_t *, picture_t *,
-                               video_format_t *, const char *psz_module );
 
 static decoder_t *CreateDecoder( vlc_object_t *, video_format_t * );
 static void DeleteDecoder( decoder_t * );
@@ -93,7 +91,6 @@ image_handler_t *image_HandlerCreate( vlc_object_t *p_this )
     p_image->pf_write = ImageWrite;
     p_image->pf_write_url = ImageWriteUrl;
     p_image->pf_convert = ImageConvert;
-    p_image->pf_filter = ImageFilter;
 
     return p_image;
 }
@@ -490,41 +487,6 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
     }
 
     return p_pif;
-}
-
-/**
- * Filter an image with a psz_module filter
- *
- */
-
-static picture_t *ImageFilter( image_handler_t *p_image, picture_t *p_pic,
-                               video_format_t *p_fmt, const char *psz_module )
-{
-    /* Start a filter */
-    if( !p_image->p_filter )
-    {
-        es_format_t fmt;
-        es_format_Init( &fmt, VIDEO_ES, p_fmt->i_chroma );
-        fmt.video = *p_fmt;
-
-        p_image->p_filter =
-            CreateFilter( p_image->p_parent, &fmt, &fmt.video, psz_module );
-
-        if( !p_image->p_filter )
-        {
-            return NULL;
-        }
-    }
-    else
-    {
-        /* Filters should handle on-the-fly size changes */
-        p_image->p_filter->fmt_in.video = *p_fmt;
-        p_image->p_filter->fmt_out.video = *p_fmt;
-    }
-
-    picture_Hold( p_pic );
-
-    return p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
 }
 
 /**
