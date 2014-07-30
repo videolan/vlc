@@ -1303,7 +1303,6 @@ static bool f_appExit = false;
     [o_mainwindow updateWindow];
     [self updateDelays];
     [self updateMainMenu];
-    [[self bookmarks] refresh];
     [self playlistUpdated];
 
     /*

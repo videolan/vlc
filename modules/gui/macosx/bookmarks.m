@@ -71,12 +71,19 @@ static VLCBookmarks *_o_sharedInstance = nil;
         [o_bookmarks_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [self initStrings];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(inputChangedEvent:)
+                                                 name:VLCInputChangedNotification
+                                               object:nil];
 }
 
 - (void)dealloc
 {
     if (p_old_input)
         vlc_object_release(p_old_input);
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 
     [super dealloc];
 }
@@ -121,7 +128,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
     [o_bookmarks_window makeKeyAndOrderFront:nil];
 }
 
-- (void)refresh
+-(void)inputChangedEvent:(NSNotification *)o_notification
 {
     [o_tbl_dataTable reloadData];
 }
