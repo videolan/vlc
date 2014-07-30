@@ -4273,11 +4273,12 @@ if test -n $SHELL; then
   SHELL=${CONFIG_SHELL-/bin/sh}
 fi
 rm -f compile
+compile_top_srcdir=`sed -ne "s/^top_srcdir *= *//p" < Makefile`
 echo "#! $SHELL
 rm -f .error\$\$
 ERROR=0
 export PATH=\"$PATH\" LANG=C
-($MAKE V=1 \$@ 2>&1 || touch .error\$\$)| `sed -ne \"s/^top_srcdir *= *//p\" < Makefile`/extras/buildsystem/make.pl
+($MAKE V=1 \$@ 2>&1 || touch .error\$\$)| $compile_top_srcdir/extras/buildsystem/make.pl
 test -f .error\$\$ && ERROR=1
 rm -f .error\$\$
 exit \$ERROR" >compile
