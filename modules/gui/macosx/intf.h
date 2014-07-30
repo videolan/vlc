@@ -57,6 +57,7 @@ vout_thread_t *getVout(void);
 vout_thread_t *getVoutForActiveWindow(void);
 audio_output_t *getAout(void);
 
+static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 
 /*****************************************************************************
  * VLCMain interface

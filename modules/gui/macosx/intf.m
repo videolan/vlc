@@ -1274,6 +1274,9 @@ static bool f_appExit = false;
         p_current_input = NULL;
 
         [o_mainmenu setRateControlsEnabled: NO];
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:VLCInputChangedNotification
+                                                            object:nil];
     }
     else if (!p_current_input) {
         // object is hold here and released then it is dead
@@ -1290,6 +1293,9 @@ static bool f_appExit = false;
             p_input_changed = vlc_object_hold(p_current_input);
 
             [[self playlist] continuePlaybackWhereYouLeftOff:p_current_input];
+
+            [[NSNotificationCenter defaultCenter] postNotificationName:VLCInputChangedNotification
+                                                                object:nil];
         }
     }
 

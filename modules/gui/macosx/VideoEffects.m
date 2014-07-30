@@ -206,7 +206,20 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
     [o_tableView selectFirstTabViewItem:self];
 
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(inputChangedEvent:)
+                                                 name:VLCInputChangedNotification
+                                               object:nil];
+
+
     [self resetValues];
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+    [super dealloc];
 }
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level
@@ -217,6 +230,16 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 #pragma mark -
 #pragma mark internal functions
+
+-(void)inputChangedEvent:(NSNotification *)o_notification
+{
+    // reset crop values when input changed
+    [self setCropBottomValue:0];
+    [self setCropTopValue:0];
+    [self setCropLeftValue:0];
+    [self setCropRightValue:0];
+}
+
 - (void)resetProfileSelector
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
