@@ -3759,26 +3759,6 @@ AS_IF([test "${enable_qt}" != "no"], [
 AS_IF([test "${enable_qt}" != "no"], [
   VLC_ADD_PLUGIN([qt4])
   ALIASES="${ALIASES} qvlc"
-
-  AC_LANG_PUSH([C++])
-  VLC_SAVE_FLAGS
-
-  AC_MSG_CHECKING([whether Qt uses Xlib])
-  CPPFLAGS="${CPPFLAGS} ${QT_CFLAGS}"
-  AC_PREPROC_IFELSE([AC_LANG_SOURCE([
-#include <QWidget>
-#if !defined (Q_WS_X11)
-# error Fail
-#endif
-  ])], [
-    AC_MSG_RESULT([yes])
-  ], [
-    AC_MSG_RESULT([no])
-  ])
-
-  VLC_RESTORE_FLAGS
-  AC_LANG_POP([C++])
-
 ])
 AM_CONDITIONAL(ENABLE_QT4, [test "$enable_qt" != "no"])
 
