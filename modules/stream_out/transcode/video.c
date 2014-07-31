@@ -295,7 +295,7 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
     es_format_t *p_fmt_out = &id->p_decoder->fmt_out;
 
     id->p_encoder->fmt_in.video.i_chroma = id->p_encoder->fmt_in.i_codec;
-    id->p_f_chain = filter_chain_New( p_stream, false, &owner );
+    id->p_f_chain = filter_chain_NewVideo( p_stream, false, &owner );
     filter_chain_Reset( id->p_f_chain, p_fmt_out, p_fmt_out );
 
     /* Deinterlace */
@@ -318,7 +318,7 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
 
     if( p_stream->p_sys->psz_vf2 )
     {
-        id->p_uf_chain = filter_chain_New( p_stream, true, &owner );
+        id->p_uf_chain = filter_chain_NewVideo( p_stream, true, &owner );
         filter_chain_Reset( id->p_uf_chain, p_fmt_out,
                             &id->p_encoder->fmt_in );
         if( p_fmt_out->video.i_chroma != id->p_encoder->fmt_in.video.i_chroma )
