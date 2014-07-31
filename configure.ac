@@ -3733,6 +3733,8 @@ AS_IF([test "${enable_qt}" != "no"], [
       PKG_CHECK_MODULES([QTX11], [Qt5X11Extras], [
           VLC_ADD_LIBS([qt4],[${QTX11_LIBS}])
           VLC_ADD_CXXFLAGS([qt4],[${QTX11_CFLAGS} -DQT5_HAS_X11])
+      ],[
+          AC_MSG_WARN([Not building Qt Interface with X11 helpers.])
       ])
       QT_PATH="$(eval $PKG_CONFIG --variable=exec_prefix Qt5Core)"
       QT_HOST_PATH="$(eval $PKG_CONFIG --variable=host_bins Qt5Core)"
