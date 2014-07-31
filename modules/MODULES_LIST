@@ -5,6 +5,7 @@ $Id$
  * a52tospdif: Audio converter module to encapsulate A/52 into S/PDIF
  * aa: Ascii art video output
  * access_alsa: Alsa access module
+ * access_archive: libarchive based access and stream filter
  * access_bd: Blu-Ray Disc access
  * access_eyetv: Access module to connect to our plugin running within EyeTV
  * access_jack: JACK audio input module
@@ -36,7 +37,6 @@ $Id$
  * android_surface: video output for Android, based on Surface
  * antiflicker: anti-flicker video filter
  * araw: Pseudo audio decoder for raw PCM
- * archive: libarchive based access and stream filter
  * asf: ASF demuxer
  * atmo: Ambilight-like video-output
  * attachment: Attachment access module
