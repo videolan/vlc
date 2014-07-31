@@ -27,15 +27,23 @@
 #include <archive.h>
 #include <archive_entry.h>
 
+typedef struct callback_data_t
+{
+    char *psz_uri;
+    access_t *p_access;
+} callback_data_t;
+
 struct access_sys_t
 {
     struct archive *p_archive;
     bool b_source_canseek;
     uint8_t buffer[ARCHIVE_READ_SIZE];
 
+    callback_data_t *p_callback_data;
+    unsigned int i_callback_data;
+
     struct archive_entry *p_entry;
     stream_t *p_stream;
-    char *psz_uri;
     bool b_seekable; /* Is our archive type seekable ? */
 };
 
@@ -71,11 +79,78 @@ static int Seek(access_t *p_access, uint64_t i_pos)
     return VLC_SUCCESS;
 }
 
+static int FindVolumes(access_t *p_access, struct archive *p_archive, const char *psz_uri,
+                       char *** const pppsz_files, unsigned int * const pi_files)
+{
+    VLC_UNUSED(p_archive);
+    *pppsz_files = NULL;
+    *pi_files = 0;
+
+    static const struct
+    {
+        char const * const psz_match;
+        char const * const psz_format;
+        uint16_t i_min;
+        uint16_t i_max;
+    } patterns[] = {
+        { ".part1.rar",   ".part%.1d.rar", 2,   9 },
+        { ".part01.rar",  ".part%.2d.rar", 2,  99 },
+        { ".part001.rar", ".part%.3d.rar", 2, 999 },
+        { ".001",         ".%.3d",         2, 999 },
+        { ".000",         ".%.3d",         1, 999 },
+    };
+
+    const size_t i_uri_size = strlen(psz_uri);
+    const int i_patterns = ARRAY_SIZE(patterns);
+    for (int i=0; i<i_patterns; i++)
+    {
+        const size_t i_match_size = strlen(patterns[i].psz_match);
+        if (i_uri_size < i_match_size)
+            continue;
+
+        if (!strcmp(&psz_uri[i_uri_size - i_match_size], patterns[i].psz_match))
+        {
+            char **ppsz_files = malloc(sizeof(char *) * patterns[i].i_max);
+
+            for(int j=patterns[i].i_min; j<patterns[i].i_max; j++)
+            {
+                char *psz_newuri = strdup(psz_uri);
+                if (!psz_newuri ||
+                    !sprintf(&psz_newuri[i_uri_size - i_match_size], patterns[i].psz_format, j))
+                    break;
+
+                /* Probe URI */
+                /* FIXME: no warnings ! */
+                stream_t *p_stream = stream_UrlNew(p_access, psz_newuri);
+                if (p_stream)
+                {
+                    ppsz_files[*pi_files] = psz_newuri;
+                    (*pi_files)++;
+                    stream_Delete(p_stream);
+                }
+                else
+                {
+                    free(psz_newuri);
+                    break;
+                }
+            }
+
+            if (*pi_files == 0)
+                FREENULL(ppsz_files);
+             *pppsz_files = ppsz_files;
+
+            return VLC_SUCCESS;
+        }
+    }
+
+    return VLC_SUCCESS;
+}
+
 static ssize_t ReadCallback(struct archive *p_archive, void *p_object, const void **pp_buffer)
 {
     VLC_UNUSED(p_archive);
-    access_t *p_access = (access_t*)p_object;
-    access_sys_t *p_sys = p_access->p_sys;
+    callback_data_t *p_data = (callback_data_t *) p_object;
+    access_sys_t *p_sys = p_data->p_access->p_sys;
 
     *pp_buffer = &p_sys->buffer;
     return stream_Read(p_sys->p_stream, &p_sys->buffer, ARCHIVE_READ_SIZE);
@@ -84,8 +159,8 @@ static ssize_t ReadCallback(struct archive *p_archive, void *p_object, const voi
 static ssize_t SkipCallback(struct archive *p_archive, void *p_object, ssize_t i_request)
 {
     VLC_UNUSED(p_archive);
-    access_t *p_access = (access_t*)p_object;
-    access_sys_t *p_sys = p_access->p_sys;
+    callback_data_t *p_data = (callback_data_t *) p_object;
+    access_sys_t *p_sys = p_data->p_access->p_sys;
     ssize_t i_skipped = 0;
 
     /* be smart as small seeks converts to reads */
@@ -113,8 +188,8 @@ static ssize_t SkipCallback(struct archive *p_archive, void *p_object, ssize_t i
 static ssize_t SeekCallback(struct archive *p_archive, void *p_object, ssize_t i_offset, int i_whence)
 {
     VLC_UNUSED(p_archive);
-    access_t *p_access = (access_t*)p_object;
-    access_sys_t *p_sys = p_access->p_sys;
+    callback_data_t *p_data = (callback_data_t *) p_object;
+    access_sys_t *p_sys = p_data->p_access->p_sys;
 
     ssize_t i_pos;
 
@@ -140,13 +215,26 @@ static ssize_t SeekCallback(struct archive *p_archive, void *p_object, ssize_t i
     return stream_Tell(p_sys->p_stream);
 }
 
+static int SwitchCallback(struct archive *p_archive, void *p_object, void *p_object2)
+{
+    VLC_UNUSED(p_archive);
+    callback_data_t *p_data = (callback_data_t *) p_object;
+    callback_data_t *p_nextdata = (callback_data_t *) p_object2;
+    access_sys_t *p_sys = p_data->p_access->p_sys;
+
+    msg_Dbg(p_data->p_access, "opening next volume %s", p_nextdata->psz_uri);
+    stream_Delete(p_sys->p_stream);
+    p_sys->p_stream = stream_UrlNew(p_nextdata->p_access, p_nextdata->psz_uri);
+    return p_sys->p_stream ? ARCHIVE_OK : ARCHIVE_FATAL;
+}
+
 static int OpenCallback(struct archive *p_archive, void *p_object)
 {
     VLC_UNUSED(p_archive);
-    access_t *p_access = (access_t*)p_object;
-    access_sys_t *p_sys = p_access->p_sys;
+    callback_data_t *p_data = (callback_data_t *) p_object;
+    access_sys_t *p_sys = p_data->p_access->p_sys;
 
-    p_sys->p_stream = stream_UrlNew( p_access, p_sys->psz_uri );
+    p_sys->p_stream = stream_UrlNew( p_data->p_access, p_data->psz_uri );
     if(!p_sys->p_stream)
         return ARCHIVE_FATAL;
 
@@ -161,10 +249,14 @@ static int OpenCallback(struct archive *p_archive, void *p_object)
 static int CloseCallback(struct archive *p_archive, void *p_object)
 {
     VLC_UNUSED(p_archive);
-    access_t *p_access = (access_t*)p_object;
+    callback_data_t *p_data = (callback_data_t *) p_object;
+    access_sys_t *p_sys = p_data->p_access->p_sys;
 
-    if (p_access->p_sys->p_stream)
-        stream_Delete(p_access->p_sys->p_stream);
+    if (p_sys->p_stream)
+    {
+        stream_Delete(p_sys->p_stream);
+        p_sys->p_stream = NULL;
+    }
 
     return ARCHIVE_OK;
 }
@@ -242,9 +334,48 @@ int AccessOpen(vlc_object_t *p_object)
 
     EnableArchiveFormats(p_sys->p_archive);
 
-    p_sys->psz_uri = psz_base;
+    /* Set up the switch callback for multiple volumes handling */
+    archive_read_set_switch_callback(p_sys->p_archive, SwitchCallback);
 
-    if (archive_read_open2(p_sys->p_archive, p_access, OpenCallback, ReadCallback, SkipCallback, CloseCallback) != ARCHIVE_OK)
+    /* !Warn: sucks because libarchive can't guess format without reading 1st header
+     *        and it can't tell either if volumes are missing neither set following
+     *        volumes after the first Open().
+     *        We need to know volumes uri in advance then :/
+     */
+
+    /* Try to list existing volumes */
+    char **ppsz_files = NULL;
+    unsigned int i_files = 0;
+    FindVolumes(p_access, p_sys->p_archive, psz_base, &ppsz_files, &i_files);
+
+    p_sys->i_callback_data = 1 + i_files;
+    p_sys->p_callback_data = malloc(sizeof(callback_data_t) * p_sys->i_callback_data);
+    if (!p_sys->p_callback_data)
+    {
+        for(unsigned int i=0; i<i_files; i++)
+            free(ppsz_files[i]);
+        free(ppsz_files);
+        free(psz_base);
+        AccessClose(p_object);
+        return VLC_ENOMEM;
+    }
+
+    /* set up our callback struct for our main uri */
+    p_sys->p_callback_data[0].psz_uri = psz_base;
+    p_sys->p_callback_data[0].p_access = p_access;
+    archive_read_append_callback_data(p_sys->p_archive, &p_sys->p_callback_data[0]);
+
+    /* and register other volumes */
+    for(unsigned int i=0; i<i_files; i++)
+    {
+        p_sys->p_callback_data[1+i].psz_uri = ppsz_files[i];
+        p_sys->p_callback_data[1+i].p_access = p_access;
+        archive_read_append_callback_data(p_sys->p_archive, &p_sys->p_callback_data[1+i]);
+    }
+    free(ppsz_files);
+
+    if (archive_read_open2(p_sys->p_archive, &p_sys->p_callback_data[0],
+                           OpenCallback, ReadCallback, SkipCallback, CloseCallback) != ARCHIVE_OK)
     {
         msg_Err(p_access, "can't open archive: %s",
                 archive_error_string(p_sys->p_archive));
@@ -301,6 +432,12 @@ void AccessClose(vlc_object_t *p_object)
         archive_read_free(p_sys->p_archive);
     }
 
-    free(p_sys->psz_uri);
+    if (p_sys->p_callback_data)
+    {
+        for(unsigned int i=0; i<p_sys->i_callback_data; i++)
+            free(p_sys->p_callback_data[i].psz_uri);
+        free(p_sys->p_callback_data);
+    }
+
     free(p_sys);
 }
