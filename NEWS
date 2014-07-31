@@ -4,13 +4,21 @@ Changes between 2.2.x and 3.0.0-git:
 Access:
  * Support HDS (Http Dynamic Streaming) from Adobe (f4m, f4v, etc.)
  * New SMB access module using libdsm
- * Can now decompress and extract through libarchive
+ * Support decompression and extraction through libarchive (tar, zip, rar...)
+ * Improvements of cookie handling (domain / path matching, Secure cookies)
+
+Decoder:
+ * OMX GPU-zerocopy support for decoding and display on Android using OpenMax IL
+ * Support 4:4:4 chroma sampling with VDPAU hw acceleration
 
 Service Discovery:
  * New NetBios service discovery using libdsm
 
 Mac OS X Interface
  * new AppleScript API giving access to audio desynchronization
+
+Skins2:
+ * Support key accelerators
 
 
 Changes between 2.1.x and 2.2.0:
