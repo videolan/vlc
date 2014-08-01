@@ -583,6 +583,12 @@ static void parse_BootstrapData( vlc_object_t* p_this,
            data_end > data_p &&
            (data_p = parse_asrt( p_this, s, data_p, data_end )) );
 
+    if( ! data_p )
+    {
+        msg_Warn( p_this, "Couldn't find afrt data" );
+        return;
+    }
+
     uint8_t afrt_count = *data_p;
     data_p++;
 
