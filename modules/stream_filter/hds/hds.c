@@ -1262,8 +1262,7 @@ static int parse_Manifest( stream_t *s )
             }
             if( ! strcmp( current_element, "id" ) )
             {
-                if( current_element &&
-                    ! strcmp( element_stack[current_element_idx-1], "manifest" ) )
+                if( ! strcmp( element_stack[current_element_idx-1], "manifest" ) )
                 {
                     if( !( media_id = strdup( node ) ) )
                         return VLC_ENOMEM;
