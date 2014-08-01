@@ -856,26 +856,26 @@ static void hevcParseSPS(uint8_t * p_buffer, size_t i_buffer, uint8_t * chroma_i
     hevc_skip_profile_tiers_level(&bs, sps_max_sublayer_minus1);
 
     /* skip sps id */
-    (void) read_ue( &bs );
+    (void) bs_read_ue( &bs );
 
-    *chroma_idc = read_ue(&bs);
+    *chroma_idc = bs_read_ue(&bs);
     if (*chroma_idc == 3)
         bs_skip(&bs, 1);
 
     /* skip width and heigh */
-    (void) read_ue( &bs );
-    (void) read_ue( &bs );
+    (void) bs_read_ue( &bs );
+    (void) bs_read_ue( &bs );
 
     uint32_t conformance_window_flag = bs_read1(&bs);
     if (conformance_window_flag) {
         /* skip offsets*/
-        (void) read_ue(&bs);
-        (void) read_ue(&bs);
-        (void) read_ue(&bs);
-        (void) read_ue(&bs);
+        (void) bs_read_ue(&bs);
+        (void) bs_read_ue(&bs);
+        (void) bs_read_ue(&bs);
+        (void) bs_read_ue(&bs);
     }
-    *bit_depth_luma_minus8 = read_ue(&bs);
-    *bit_depth_chroma_minus8 = read_ue(&bs);
+    *bit_depth_luma_minus8 = bs_read_ue(&bs);
+    *bit_depth_chroma_minus8 = bs_read_ue(&bs);
 }
 
 static bo_t *GetHvcCTag(mp4_stream_t *p_stream)

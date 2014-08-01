@@ -42,6 +42,7 @@
 #include <vlc_bits.h>
 #include "../codec/cc.h"
 #include "packetizer_helper.h"
+#include "../demux/mpeg/mpeg_parser_helpers.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -570,24 +571,6 @@ static void CreateDecodedNAL( uint8_t **pp_ret, int *pi_ret,
         }
     }
     *pi_ret = dst - *pp_ret;
-}
-
-static inline int bs_read_ue( bs_t *s )
-{
-    int i = 0;
-
-    while( bs_read1( s ) == 0 && s->p < s->p_end && i < 32 )
-    {
-        i++;
-    }
-    return( ( 1 << i) - 1 + bs_read( s, i ) );
-}
-
-static inline int bs_read_se( bs_t *s )
-{
-    int val = bs_read_ue( s );
-
-    return val&0x01 ? (val+1)/2 : -(val/2);
 }
 
 /*****************************************************************************

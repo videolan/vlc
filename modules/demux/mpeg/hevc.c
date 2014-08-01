@@ -263,12 +263,12 @@ static int32_t getFPS( demux_t *p_demux, block_t * p_block )
     int32_t i = vps_sub_layer_ordering_info_present_flag? 0 : max_sub_layer_minus1;
     for( ; i <= max_sub_layer_minus1; i++ )
     {
-        read_ue( &bs );
-        read_ue( &bs );
-        read_ue( &bs );
+        bs_read_ue( &bs );
+        bs_read_ue( &bs );
+        bs_read_ue( &bs );
     }
     uint32_t vps_max_layer_id = bs_read( &bs, 6);
-    uint32_t vps_num_layer_sets_minus1 = read_ue( &bs );
+    uint32_t vps_num_layer_sets_minus1 = bs_read_ue( &bs );
     bs_skip( &bs, vps_max_layer_id * vps_num_layer_sets_minus1 );
 
     if( bs_read1( &bs ))
