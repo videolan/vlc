@@ -1202,12 +1202,12 @@ static int parse_Manifest( stream_t *s )
                     if( !( medias[media_idx].stream_id = strdup( attr_value ) ) )
                         return VLC_ENOMEM;
                 }
-                if( !strcmp(attr_name, "url" ) )
+                else if( !strcmp(attr_name, "url" ) )
                 {
                     if( !( medias[media_idx].media_url = strdup( attr_value ) ) )
                         return VLC_ENOMEM;
                 }
-                if( !strcmp(attr_name, "bootstrapInfoId" ) )
+                else if( !strcmp(attr_name, "bootstrapInfoId" ) )
                 {
                     if( !( medias[media_idx].bootstrap_id = strdup( attr_value ) ) )
                         return VLC_ENOMEM;
@@ -1217,7 +1217,7 @@ static int parse_Manifest( stream_t *s )
             media_idx++;
         }
 
-        if( type == XML_READER_STARTELEM && ! strcmp( current_element, "bootstrapInfo") )
+        else if( type == XML_READER_STARTELEM && ! strcmp( current_element, "bootstrapInfo") )
         {
             while( ( attr_name = xml_ReaderNextAttr( vlc_reader, &attr_value )) )
             {
@@ -1226,12 +1226,12 @@ static int parse_Manifest( stream_t *s )
                     if( !( bootstraps[bootstrap_idx].url = strdup( attr_value ) ) )
                         return VLC_ENOMEM;
                 }
-                if( !strcmp(attr_name, "id" ) )
+                else if( !strcmp(attr_name, "id" ) )
                 {
                     if( !( bootstraps[bootstrap_idx].id = strdup( attr_value ) ) )
                        return VLC_ENOMEM;
                 }
-                if( !strcmp(attr_name, "profile" ) )
+                else if( !strcmp(attr_name, "profile" ) )
                 {
                     if( !( bootstraps[bootstrap_idx].profile = strdup( attr_value ) ) )
                         return VLC_ENOMEM;
@@ -1239,7 +1239,7 @@ static int parse_Manifest( stream_t *s )
             }
         }
 
-        if( type == XML_READER_TEXT )
+        else if( type == XML_READER_TEXT )
         {
             if( ! strcmp( current_element, "bootstrapInfo" ) )
             {
@@ -1255,12 +1255,12 @@ static int parse_Manifest( stream_t *s )
                     msg_Err( (vlc_object_t*) s, "Couldn't decode bootstrap info" );
                 }
             }
-            if( ! strcmp( current_element, "duration" ) )
+            else if( ! strcmp( current_element, "duration" ) )
             {
                 double shutup_gcc = atof( node );
                 sys->duration_seconds = (uint64_t) shutup_gcc;
             }
-            if( ! strcmp( current_element, "id" ) )
+            else if( ! strcmp( current_element, "id" ) )
             {
                 if( ! strcmp( element_stack[current_element_idx-1], "manifest" ) )
                 {
