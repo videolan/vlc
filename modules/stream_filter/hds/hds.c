@@ -186,23 +186,24 @@ static bool isHDS( stream_t *s )
     if( i_size < 200 )
         return false;
 
-    const char *str;
+    char *str;
 
     if( !memcmp( peek, "\xFF\xFE", 2 ) )
     {
-        str = FromCharset( "UTF-16LE", peek, 512 );
+        str = FromCharset( "UTF-16LE", peek, i_size );
     }
     else if( !memcmp( peek, "\xFE\xFF", 2 ) )
     {
-        str = FromCharset( "UTF-16BE", peek, 512 );
+        str = FromCharset( "UTF-16BE", peek, i_size );
     }
     else
-        str = peek;
+        str = strndup( peek, i_size );
 
     if( str == NULL )
         return false;
 
     bool ret = strstr( str, "<manifest" ) != NULL;
+    free( str );
     return ret;
 }
 
