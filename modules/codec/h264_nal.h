@@ -18,6 +18,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef H264_NAL_H
+# define H264_NAL_H
+
 # ifdef HAVE_CONFIG_H
 #  include "config.h"
 # endif
@@ -44,3 +47,5 @@ void convert_h264_to_annexb( uint8_t *p_buf, uint32_t i_len,
 /* Get level and Profile */
 bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,
                             size_t *p_level, size_t *p_nal_size);
+
+#endif /* H264_NAL_H */
