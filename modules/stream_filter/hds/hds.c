@@ -618,7 +618,7 @@ static void whitespace_substr( char** start,
         return;
 
     while( is_whitespace(*(*end - 1) ) ) {
-        end--;
+        (*end)--;
     }
 }
 
