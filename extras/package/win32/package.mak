@@ -106,12 +106,12 @@ package-win-strip: package-win-common
 
 
 package-win32-webplugin-common: package-win-strip
-	mkdir -p "$(win32_xpi_destdir)/"
-	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/"
-	find $(prefix) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
+	mkdir -p "$(win32_xpi_destdir)/plugins/"
+	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/plugins/"
+	cp "$(win32_destdir)/libvlc.dll" "$(win32_destdir)/libvlccore.dll" "$(win32_destdir)/npvlc.dll" "$(win32_xpi_destdir)/plugins/"
 	cp $(top_builddir)/npapi-vlc/npapi/package/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins/"
 	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_xpi_destdir)/plugins/"
-	rm -rf "$(win32_xpi_destdir)/plugins/gui/"
+	rm -rf "$(win32_xpi_destdir)/plugins/plugins/gui/"
 
 
 package-win32-xpi: package-win32-webplugin-common
