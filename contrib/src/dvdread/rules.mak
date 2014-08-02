@@ -1,6 +1,6 @@
 # DVDREAD
-LIBDVDREAD_VERSION := 4.9.9
-LIBDVDREAD_URL := http://download.videolan.org/pub/videolan/libdvdread/4.9.9/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
+LIBDVDREAD_VERSION := 5.0.0
+LIBDVDREAD_URL := http://download.videolan.org/pub/videolan/libdvdread/$(LIBDVDREAD_VERSION)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
 
 ifdef BUILD_DISCS
 ifdef GPL
