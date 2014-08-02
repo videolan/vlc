@@ -1,7 +1,7 @@
 # DVDNAV
 
 LIBDVDNAV_VERSION := 5.0.0
-LIBDVDNAV_URL := http://download.videolan.org/pub/videolan/libdvdnav/$(LIBDVDNAV_VERSION)/libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
+LIBDVDNAV_URL := $(VIDEOLAN)/libdvdnav/$(LIBDVDNAV_VERSION)/libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
 
 ifdef BUILD_DISCS
 ifdef GPL
