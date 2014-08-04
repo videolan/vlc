@@ -3101,7 +3101,7 @@ static void EITCallBack( demux_t *p_demux,
                         {
                             if ( p_rating->i_rating + 3 > i_min_age )
                                 i_min_age = p_rating->i_rating + 3;
-                            msg_Dbg( p_demux, "..* event parental control set to %d years",
+                            msg_Dbg( p_demux, "    - parental control set to %d years",
                                      i_min_age );
                         }
                     }
@@ -3109,7 +3109,7 @@ static void EITCallBack( demux_t *p_demux,
             }
             else
             {
-                msg_Dbg( p_demux, "    - tag=0x%x(%d)", p_dr->i_tag, p_dr->i_tag );
+                msg_Dbg( p_demux, "    - event unknown dr 0x%x(%d)", p_dr->i_tag, p_dr->i_tag );
             }
         }
 
@@ -4052,30 +4052,34 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
         switch(p_dr->i_tag)
         {
         case 0x1d: /* We have found an IOD descriptor */
-            msg_Dbg( p_demux, " * descriptor : IOD (0x1d)" );
+            msg_Dbg( p_demux, " * PMT descriptor : IOD (0x1d)" );
             prg->iod = IODNew( p_dr->i_length, p_dr->p_data );
             break;
 
         case 0x9:
-            msg_Dbg( p_demux, " * descriptor : CA (0x9) SysID 0x%x",
+            msg_Dbg( p_demux, " * PMT descriptor : CA (0x9) SysID 0x%x",
                     (p_dr->p_data[0] << 8) | p_dr->p_data[1] );
             break;
 
         case 0x5: /* Registration Descriptor */
             if( p_dr->i_length != 4 )
             {
-                msg_Warn( p_demux, "invalid Registration Descriptor" );
+                msg_Warn( p_demux, " * PMT invalid Registration Descriptor" );
             }
             else
             {
-                msg_Dbg( p_demux, " * descriptor : registration %4.4s", p_dr->p_data );
+                msg_Dbg( p_demux, " * PMT descriptor : registration %4.4s", p_dr->p_data );
                 if( !memcmp( p_dr->p_data, "HDMV", 4 ) || !memcmp( p_dr->p_data, "HDPR", 4 ) )
                     registration_type = TS_PMT_REGISTRATION_HDMV; /* Blu-Ray */
             }
             break;
 
         case 0x0f:
-            msg_Dbg( p_demux, " * descriptor : Private Data (0x0f)" );
+            msg_Dbg( p_demux, " * PMT descriptor : Private Data (0x0f)" );
+            break;
+
+        case 0xC1:
+            msg_Dbg( p_demux, " * PMT descriptor : Digital copy control (0xC1)" );
             break;
 
         case 0x88: /* EACEM Simulcast HD Logical channels ordering */
@@ -4084,7 +4088,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
             break;
 
         default:
-            msg_Dbg( p_demux, " * descriptor : unknown (0x%x)", p_dr->i_tag );
+            msg_Dbg( p_demux, " * PMT descriptor : unknown (0x%x)", p_dr->i_tag );
         }
 
     dvbpsi_pmt_es_t      *p_es;
@@ -4105,16 +4109,74 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
 
         if( !old_pid && p_sys->pid[p_es->i_pid].b_valid )
         {
-            msg_Warn( p_demux, "pmt error: pid=%d already defined",
+            msg_Warn( p_demux, " * PMT error: pid=%d already defined",
                       p_es->i_pid );
             continue;
         }
 
+        char const * psz_typedesc = "";
+        switch(p_es->i_type)
+        {
+        case 0x00:
+            psz_typedesc = "ISO/IEC Reserved";
+            break;
+        case 0x01:
+            psz_typedesc = "ISO/IEC 11172 Video";
+            break;
+        case 0x02:
+            psz_typedesc = "ISO/IEC 13818-2 Video or ISO/IEC 11172-2 constrained parameter video stream";
+            break;
+        case 0x03:
+            psz_typedesc = "ISO/IEC 11172 Audio";
+            break;
+        case 0x04:
+            psz_typedesc = "ISO/IEC 13818-3 Audio";
+            break;
+        case 0x05:
+            psz_typedesc = "ISO/IEC 13818-1 private_sections";
+            break;
+        case 0x06:
+            psz_typedesc = "ISO/IEC 13818-1 PES packets containing private data";
+            break;
+        case 0x07:
+            psz_typedesc = "ISO/IEC 13522 MHEG";
+            break;
+        case 0x08:
+            psz_typedesc = "ISO/IEC 13818-1 Annex A DSM CC";
+            break;
+        case 0x09:
+            psz_typedesc = "ITU-T Rec. H.222.1";
+            break;
+        case 0x0A:
+            psz_typedesc = "ISO/IEC 13818-6 type A";
+            break;
+        case 0x0B:
+            psz_typedesc = "ISO/IEC 13818-6 type B";
+            break;
+        case 0x0C:
+            psz_typedesc = "ISO/IEC 13818-6 type C";
+            break;
+        case 0x0D:
+            psz_typedesc = "ISO/IEC 13818-6 type D";
+            break;
+        case 0x0E:
+            psz_typedesc = "ISO/IEC 13818-1 auxiliary";
+            break;
+        default:
+            if (p_es->i_type >= 0x0F && p_es->i_type <=0x7F)
+                psz_typedesc = "ISO/IEC 13818-1 Reserved";
+            else
+                psz_typedesc = "User Private";
+        }
+
+        msg_Dbg( p_demux, "  * pid=%d type=0x%x %s",
+                 p_es->i_pid, p_es->i_type, psz_typedesc );
+
         for( p_dr = p_es->p_first_descriptor; p_dr != NULL;
              p_dr = p_dr->p_next )
         {
-            msg_Dbg( p_demux, "  * es pid=%d type=%d dr->i_tag=0x%x",
-                     p_es->i_pid, p_es->i_type, p_dr->i_tag );
+            msg_Dbg( p_demux, "    - descriptor tag 0x%x",
+                     p_dr->i_tag );
         }
 
         PIDInit( pid, false, pmt->psi );
@@ -4130,13 +4192,13 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
             if ( registration_type == TS_PMT_REGISTRATION_HDMV )
             {
                 if (( b_registration_applied = PMTSetupEsHDMV( p_demux, pid, p_es ) ))
-                    msg_Dbg( p_demux, "es HDMV registration applied to pid 0x%x type 0x%x",
+                    msg_Dbg( p_demux, "    + HDMV registration applied to pid %d type 0x%x",
                              p_es->i_pid, p_es->i_type );
             }
             else
             {
                 if (( b_registration_applied = PMTSetupEsRegistration( p_demux, pid, p_es ) ))
-                    msg_Dbg( p_demux, "es registration applied to pid 0x%x type 0x%x",
+                    msg_Dbg( p_demux, "    + registration applied to pid %d type 0x%x",
                         p_es->i_pid, p_es->i_type );
             }
         }
@@ -4195,13 +4257,13 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
 
         if( pid->es->fmt.i_cat == UNKNOWN_ES )
         {
-            msg_Dbg( p_demux, "  * es pid=%d type=%d *unknown*",
-                     p_es->i_pid, p_es->i_type );
+            msg_Dbg( p_demux, "   => pid %d content is *unknown*",
+                     p_es->i_pid );
         }
         else
         {
-            msg_Dbg( p_demux, "  * es pid=%d type=%d fcc=%4.4s",
-                     p_es->i_pid, p_es->i_type, (char*)&pid->es->fmt.i_codec );
+            msg_Dbg( p_demux, "   => pid %d has now es fcc=%4.4s",
+                     p_es->i_pid, (char*)&pid->es->fmt.i_codec );
 
             if( p_sys->b_es_id_pid ) pid->es->fmt.i_id = p_es->i_pid;
 
@@ -4252,7 +4314,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
         p_dr = PMTEsFindDescriptor( p_es, 0x09 );
         if( p_dr && p_dr->i_length >= 2 )
         {
-            msg_Dbg( p_demux, "   * descriptor : CA (0x9) SysID 0x%x",
+            msg_Dbg( p_demux, "   * PMT descriptor : CA (0x9) SysID 0x%x",
                      (p_dr->p_data[0] << 8) | p_dr->p_data[1] );
         }
 
