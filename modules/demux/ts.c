@@ -4215,14 +4215,16 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
         {
             switch( p_es->i_type )
             {
+            case 0x06:
+                /* Handle PES private data */
+                PMTSetupEs0x06( p_demux, pid, p_es );
+                break;
+            /* All other private or reserved types */
+            case 0x0f:
             case 0x10:
             case 0x11:
             case 0x12:
-            case 0x0f:
                 PMTSetupEsISO14496( p_demux, pid, prg, p_es );
-                break;
-            case 0x06:
-                PMTSetupEs0x06( p_demux, pid, p_es );
                 break;
             case 0x83:
                 /* LPCM (audio) */
