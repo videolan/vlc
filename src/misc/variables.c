@@ -169,10 +169,11 @@ static void Destroy( variable_t *p_var )
         free( p_var->choices_text.p_values );
     }
 #if 0 // ndef NDEBUG
-    for (int i = 0; i < p_var->i_entries; i++)
+    callback_table_t *p_table = &p_var->value_callbacks;
+    for (int i = 0; i < p_table->i_entries; i++)
     {
         const char *file = "?", *symbol = "?";
-        const void *addr = p_var->p_entries[i].pf_callback;
+        const void *addr = p_table->p_entries[i].pf_callback;
 # ifdef __GLIBC__
         Dl_info info;
 
@@ -189,7 +190,7 @@ static void Destroy( variable_t *p_var )
 
     free( p_var->psz_name );
     free( p_var->psz_text );
-    free( p_var->p_entries );
+    free( p_var->value_callbacks.p_entries );
     free( p_var );
 }
 
@@ -228,8 +229,7 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     p_var->choices_text.p_values = NULL;
 
     p_var->b_incallback = false;
-    p_var->i_entries = 0;
-    p_var->p_entries = NULL;
+    p_var->value_callbacks = (callback_table_t){ 0 };
 
     /* Always initialize the variable, even if it is a list variable; this
      * will lead to errors if the variable is not initialized, but it will
@@ -825,10 +825,11 @@ static int AddCallback( vlc_object_t *p_this, const char *psz_name,
     }
 
     WaitUnused( p_this, p_var );
-    INSERT_ELEM( p_var->p_entries,
-                 p_var->i_entries,
-                 p_var->i_entries,
-                 entry );
+    callback_table_t *p_table = &p_var->value_callbacks;
+    INSERT_ELEM( p_table->p_entries,
+                 p_table->i_entries,
+                 p_table->i_entries,
+                 entry);
 
     vlc_mutex_unlock( &p_priv->var_lock );
 
@@ -886,15 +887,16 @@ static int DelCallback( vlc_object_t *p_this, const char *psz_name,
 
     WaitUnused( p_this, p_var );
 
-    for( i_entry = p_var->i_entries ; i_entry-- ; )
+    callback_table_t *p_table = &p_var->value_callbacks;
+    for( i_entry = p_table->i_entries ; i_entry-- ; )
     {
-        if( p_var->p_entries[i_entry].pf_callback == entry.pf_callback
-            && p_var->p_entries[i_entry].p_data == entry.p_data )
+        if( p_table->p_entries[i_entry].pf_callback == entry.pf_callback
+            && p_table->p_entries[i_entry].p_data == entry.p_data )
         {
             break;
         }
 #ifndef NDEBUG
-        else if( p_var->p_entries[i_entry].pf_callback == entry.pf_callback )
+        else if( p_table->p_entries[i_entry].pf_callback == entry.pf_callback )
             b_found_similar = true;
 #endif
     }
@@ -911,7 +913,7 @@ static int DelCallback( vlc_object_t *p_this, const char *psz_name,
         return VLC_EGENERIC;
     }
 
-    REMOVE_ELEM( p_var->p_entries, p_var->i_entries, i_entry );
+    REMOVE_ELEM( p_table->p_entries, p_table->i_entries, i_entry );
 
     vlc_mutex_unlock( &p_priv->var_lock );
 
@@ -1317,11 +1319,12 @@ static int TriggerCallback( vlc_object_t *p_this, variable_t *p_var,
 {
     assert( p_this );
 
-    int i_entries = p_var->i_entries;
+    callback_table_t *p_table = &p_var->value_callbacks;
+    int i_entries = p_table->i_entries;
     if( i_entries == 0 )
         return VLC_SUCCESS;
 
-    callback_entry_t *p_entries = p_var->p_entries;
+    callback_entry_t *p_entries = p_table->p_entries;
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
     assert( !p_var->b_incallback );

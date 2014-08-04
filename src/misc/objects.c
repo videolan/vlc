@@ -603,8 +603,8 @@ static void DumpVariable (const void *data, const VISIT which, const int depth)
         fputs( ", has choices", stdout );
     if( p_var->i_type & VLC_VAR_ISCOMMAND )
         fputs( ", command", stdout );
-    if( p_var->i_entries )
-        printf( ", %d callbacks", p_var->i_entries );
+    if( p_var->value_callbacks.i_entries )
+        printf( ", %d callbacks", p_var->value_callbacks.i_entries );
     switch( p_var->i_type & VLC_VAR_CLASS )
     {
         case VLC_VAR_VOID:
