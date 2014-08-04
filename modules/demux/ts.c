@@ -3022,7 +3022,9 @@ static void EITCallBack( demux_t *p_demux,
 
         for( p_dr = p_evt->p_first_descriptor; p_dr; p_dr = p_dr->p_next )
         {
-            if( p_dr->i_tag == 0x4d )
+            switch(p_dr->i_tag)
+            {
+            case 0x4d:
             {
                 dvbpsi_short_event_dr_t *pE = dvbpsi_DecodeShortEventDr( p_dr );
 
@@ -3038,7 +3040,9 @@ static void EITCallBack( demux_t *p_demux,
                              pE->i_iso_639_code, psz_name, psz_text );
                 }
             }
-            else if( p_dr->i_tag == 0x4e )
+                break;
+
+            case 0x4e:
             {
                 dvbpsi_extended_event_dr_t *pE = dvbpsi_DecodeExtendedEventDr( p_dr );
                 if( pE )
@@ -3089,7 +3093,9 @@ static void EITCallBack( demux_t *p_demux,
                     }
                 }
             }
-            else if( p_dr->i_tag == 0x55 )
+                break;
+
+            case 0x55:
             {
                 dvbpsi_parental_rating_dr_t *pR = dvbpsi_DecodeParentalRatingDr( p_dr );
                 if ( pR )
@@ -3107,9 +3113,11 @@ static void EITCallBack( demux_t *p_demux,
                     }
                 }
             }
-            else
-            {
+                break;
+
+            default:
                 msg_Dbg( p_demux, "    - event unknown dr 0x%x(%d)", p_dr->i_tag, p_dr->i_tag );
+                break;
             }
         }
 
