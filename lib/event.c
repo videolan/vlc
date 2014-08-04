@@ -281,6 +281,9 @@ static const event_name_t event_list[] = {
     DEF(MediaPlayerLengthChanged)
     DEF(MediaPlayerVout)
     DEF(MediaPlayerScrambledChanged)
+    DEF(MediaPlayerESAdded)
+    DEF(MediaPlayerESDeleted)
+    DEF(MediaPlayerESSelected)
 
     DEF(MediaListItemAdded)
     DEF(MediaListWillAddItem)
