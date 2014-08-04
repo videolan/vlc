@@ -804,6 +804,37 @@ int var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
     return var_GetChecked( p_this, psz_name, 0, p_val );
 }
 
+static int AddCallback( vlc_object_t *p_this, const char *psz_name,
+                        callback_entry_t entry )
+{
+    variable_t *p_var;
+
+    assert( p_this );
+
+    vlc_object_internals_t *p_priv = vlc_internals( p_this );
+
+    vlc_mutex_lock( &p_priv->var_lock );
+
+    p_var = Lookup( p_this, psz_name );
+    if( p_var == NULL )
+    {
+        vlc_mutex_unlock( &p_priv->var_lock );
+        msg_Err( p_this, "cannot add callback %p to nonexistent "
+                         "variable '%s'", entry.pf_callback, psz_name );
+        return VLC_ENOVAR;
+    }
+
+    WaitUnused( p_this, p_var );
+    INSERT_ELEM( p_var->p_entries,
+                 p_var->i_entries,
+                 p_var->i_entries,
+                 entry );
+
+    vlc_mutex_unlock( &p_priv->var_lock );
+
+    return VLC_SUCCESS;
+}
+
 #undef var_AddCallback
 /**
  * Register a callback in a variable
@@ -824,47 +855,15 @@ int var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
 int var_AddCallback( vlc_object_t *p_this, const char *psz_name,
                      vlc_callback_t pf_callback, void *p_data )
 {
-    variable_t *p_var;
     callback_entry_t entry;
-
-    assert( p_this );
-
-    vlc_object_internals_t *p_priv = vlc_internals( p_this );
-
     entry.pf_callback = pf_callback;
     entry.p_data = p_data;
 
-    vlc_mutex_lock( &p_priv->var_lock );
-
-    p_var = Lookup( p_this, psz_name );
-    if( p_var == NULL )
-    {
-        vlc_mutex_unlock( &p_priv->var_lock );
-        msg_Err( p_this, "cannot add callback %p to nonexistent "
-                         "variable '%s'", pf_callback, psz_name );
-        return VLC_ENOVAR;
-    }
-
-    WaitUnused( p_this, p_var );
-    INSERT_ELEM( p_var->p_entries,
-                 p_var->i_entries,
-                 p_var->i_entries,
-                 entry );
-
-    vlc_mutex_unlock( &p_priv->var_lock );
-
-    return VLC_SUCCESS;
+    return AddCallback(p_this, psz_name, entry);
 }
 
-#undef var_DelCallback
-/**
- * Remove a callback from a variable
- *
- * pf_callback and p_data have to be given again, because different objects
- * might have registered the same callback function.
- */
-int var_DelCallback( vlc_object_t *p_this, const char *psz_name,
-                     vlc_callback_t pf_callback, void *p_data )
+static int DelCallback( vlc_object_t *p_this, const char *psz_name,
+                        callback_entry_t entry )
 {
     int i_entry;
     variable_t *p_var;
@@ -889,13 +888,13 @@ int var_DelCallback( vlc_object_t *p_this, const char *psz_name,
 
     for( i_entry = p_var->i_entries ; i_entry-- ; )
     {
-        if( p_var->p_entries[i_entry].pf_callback == pf_callback
-            && p_var->p_entries[i_entry].p_data == p_data )
+        if( p_var->p_entries[i_entry].pf_callback == entry.pf_callback
+            && p_var->p_entries[i_entry].p_data == entry.p_data )
         {
             break;
         }
 #ifndef NDEBUG
-        else if( p_var->p_entries[i_entry].pf_callback == pf_callback )
+        else if( p_var->p_entries[i_entry].pf_callback == entry.pf_callback )
             b_found_similar = true;
 #endif
     }
@@ -917,6 +916,23 @@ int var_DelCallback( vlc_object_t *p_this, const char *psz_name,
     vlc_mutex_unlock( &p_priv->var_lock );
 
     return VLC_SUCCESS;
+}
+
+#undef var_DelCallback
+/**
+ * Remove a callback from a variable
+ *
+ * pf_callback and p_data have to be given again, because different objects
+ * might have registered the same callback function.
+ */
+int var_DelCallback( vlc_object_t *p_this, const char *psz_name,
+                     vlc_callback_t pf_callback, void *p_data )
+{
+    callback_entry_t entry;
+    entry.pf_callback = pf_callback;
+    entry.p_data = p_data;
+
+    return DelCallback(p_this, psz_name, entry);
 }
 
 #undef var_TriggerCallback
