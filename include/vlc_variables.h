@@ -183,9 +183,15 @@ VLC_API int var_AddCallback( vlc_object_t *, const char *, vlc_callback_t, void 
 VLC_API int var_DelCallback( vlc_object_t *, const char *, vlc_callback_t, void * );
 VLC_API int var_TriggerCallback( vlc_object_t *, const char * );
 
+VLC_API int var_AddListCallback( vlc_object_t *, const char *, vlc_list_callback_t, void * );
+VLC_API int var_DelListCallback( vlc_object_t *, const char *, vlc_list_callback_t, void * );
+
 #define var_AddCallback(a,b,c,d) var_AddCallback( VLC_OBJECT(a), b, c, d )
 #define var_DelCallback(a,b,c,d) var_DelCallback( VLC_OBJECT(a), b, c, d )
 #define var_TriggerCallback(a,b) var_TriggerCallback( VLC_OBJECT(a), b )
+
+#define var_AddListCallback(a,b,c,d) var_AddListCallback( VLC_OBJECT(a), b, c, d )
+#define var_DelListCallback(a,b,c,d) var_DelListCallback( VLC_OBJECT(a), b, c, d )
 
 /*****************************************************************************
  * helpers functions

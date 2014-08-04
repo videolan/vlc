@@ -107,6 +107,8 @@ struct variable_t
 
     /** Registered value callbacks */
     callback_table_t    value_callbacks;
+    /** Registered list callbacks */
+    callback_table_t    list_callbacks;
 };
 
 extern void var_DestroyAll( vlc_object_t * );

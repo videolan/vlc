@@ -49,7 +49,12 @@
  *****************************************************************************/
 struct callback_entry_t
 {
-    vlc_callback_t pf_callback;
+    union
+    {
+        vlc_callback_t       pf_value_callback;
+        vlc_list_callback_t  pf_list_callback;
+        void *               p_callback;
+    } u;
     void *         p_data;
 };
 
@@ -135,6 +140,10 @@ static void     CheckValue  ( variable_t *, vlc_value_t * );
 
 static int      TriggerCallback( vlc_object_t *, variable_t *, const char *,
                                  vlc_value_t );
+
+static int      TriggerListCallback( vlc_object_t *, variable_t *,
+                                     const char *, int,
+                                     vlc_value_t * );
 
 static int varcmp( const void *a, const void *b )
 {
@@ -461,6 +470,8 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
                 strdup( p_val2->psz_string ) : NULL;
 
             CheckValue( p_var, &p_var->val );
+
+            TriggerListCallback(p_this, p_var, psz_name, VLC_VAR_ADDCHOICE, p_val);
             break;
         }
         case VLC_VAR_DELCHOICE:
@@ -490,6 +501,8 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
                          p_var->choices_text.i_count, i );
 
             CheckValue( p_var, &p_var->val );
+
+            TriggerListCallback(p_this, p_var, psz_name, VLC_VAR_DELCHOICE, p_val);
             break;
         }
         case VLC_VAR_CHOICESCOUNT:
@@ -509,6 +522,7 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
             p_var->choices_text.i_count = 0;
             p_var->choices_text.p_values = NULL;
             p_var->i_default = -1;
+            TriggerListCallback(p_this, p_var, psz_name, VLC_VAR_CLEARCHOICES, NULL);
             break;
         case VLC_VAR_SETDEFAULT:
         {
@@ -805,7 +819,7 @@ int var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
 }
 
 static int AddCallback( vlc_object_t *p_this, const char *psz_name,
-                        callback_entry_t entry )
+                        callback_entry_t entry, vlc_callback_type_t i_type )
 {
     variable_t *p_var;
 
@@ -820,12 +834,17 @@ static int AddCallback( vlc_object_t *p_this, const char *psz_name,
     {
         vlc_mutex_unlock( &p_priv->var_lock );
         msg_Err( p_this, "cannot add callback %p to nonexistent "
-                         "variable '%s'", entry.pf_callback, psz_name );
+                         "variable '%s'", entry.u.p_callback, psz_name );
         return VLC_ENOVAR;
     }
 
     WaitUnused( p_this, p_var );
-    callback_table_t *p_table = &p_var->value_callbacks;
+
+    callback_table_t *p_table;
+    if (i_type == vlc_value_callback)
+        p_table = &p_var->value_callbacks;
+    else
+        p_table = &p_var->list_callbacks;
     INSERT_ELEM( p_table->p_entries,
                  p_table->i_entries,
                  p_table->i_entries,
@@ -857,14 +876,14 @@ int var_AddCallback( vlc_object_t *p_this, const char *psz_name,
                      vlc_callback_t pf_callback, void *p_data )
 {
     callback_entry_t entry;
-    entry.pf_callback = pf_callback;
+    entry.u.pf_value_callback = pf_callback;
     entry.p_data = p_data;
 
-    return AddCallback(p_this, psz_name, entry);
+    return AddCallback(p_this, psz_name, entry, vlc_value_callback);
 }
 
 static int DelCallback( vlc_object_t *p_this, const char *psz_name,
-                        callback_entry_t entry )
+                        callback_entry_t entry, vlc_callback_type_t i_type )
 {
     int i_entry;
     variable_t *p_var;
@@ -887,16 +906,21 @@ static int DelCallback( vlc_object_t *p_this, const char *psz_name,
 
     WaitUnused( p_this, p_var );
 
-    callback_table_t *p_table = &p_var->value_callbacks;
+    callback_table_t *p_table;
+    if (i_type == vlc_value_callback)
+        p_table = &p_var->value_callbacks;
+    else
+        p_table = &p_var->list_callbacks;
+
     for( i_entry = p_table->i_entries ; i_entry-- ; )
     {
-        if( p_table->p_entries[i_entry].pf_callback == entry.pf_callback
+        if( p_table->p_entries[i_entry].u.p_callback == entry.u.p_callback
             && p_table->p_entries[i_entry].p_data == entry.p_data )
         {
             break;
         }
 #ifndef NDEBUG
-        else if( p_table->p_entries[i_entry].pf_callback == entry.pf_callback )
+        else if( p_table->p_entries[i_entry].u.p_callback == entry.u.p_callback )
             b_found_similar = true;
 #endif
     }
@@ -931,10 +955,10 @@ int var_DelCallback( vlc_object_t *p_this, const char *psz_name,
                      vlc_callback_t pf_callback, void *p_data )
 {
     callback_entry_t entry;
-    entry.pf_callback = pf_callback;
+    entry.u.pf_value_callback = pf_callback;
     entry.p_data = p_data;
 
-    return DelCallback(p_this, psz_name, entry);
+    return DelCallback(p_this, psz_name, entry, vlc_value_callback);
 }
 
 #undef var_TriggerCallback
@@ -970,6 +994,41 @@ int var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
 
     vlc_mutex_unlock( &p_priv->var_lock );
     return i_ret;
+}
+
+#undef var_AddListCallback
+/**
+ * Register a callback for a list variable
+ *
+ * The callback is triggered when an element is added/removed from the
+ * list or when the list is cleared.
+ *
+ * See var_AddCallback().
+ */
+int var_AddListCallback( vlc_object_t *p_this, const char *psz_name,
+                         vlc_list_callback_t pf_callback, void *p_data )
+{
+    callback_entry_t entry;
+    entry.u.pf_list_callback = pf_callback;
+    entry.p_data = p_data;
+
+    return AddCallback(p_this, psz_name, entry, vlc_list_callback);
+}
+
+#undef var_DelListCallback
+/**
+ * Remove a callback from a list variable
+ *
+ * See var_DelCallback().
+ */
+int var_DelListCallback( vlc_object_t *p_this, const char *psz_name,
+                         vlc_list_callback_t pf_callback, void *p_data )
+{
+    callback_entry_t entry;
+    entry.u.pf_list_callback = pf_callback;
+    entry.p_data = p_data;
+
+    return DelCallback(p_this, psz_name, entry, vlc_list_callback);
 }
 
 /** Parse a stringified option
@@ -1334,8 +1393,39 @@ static int TriggerCallback( vlc_object_t *p_this, variable_t *p_var,
     /* The real calls */
     for( ; i_entries-- ; )
     {
-        p_entries[i_entries].pf_callback( p_this, psz_name, oldval, p_var->val,
-                                          p_entries[i_entries].p_data );
+        p_entries[i_entries].u.pf_value_callback( p_this, psz_name, oldval, p_var->val,
+                                                  p_entries[i_entries].p_data );
+    }
+
+    vlc_mutex_lock( &p_priv->var_lock );
+    p_var->b_incallback = false;
+    vlc_cond_broadcast( &p_priv->var_wait );
+
+    return VLC_SUCCESS;
+}
+
+static int TriggerListCallback( vlc_object_t *p_this, variable_t *p_var,
+                                const char *psz_name, int i_action,
+                                vlc_value_t *val )
+{
+    assert( p_this );
+
+    callback_table_t *p_table = &p_var->list_callbacks;
+    int i_entries = p_table->i_entries;
+    if( i_entries == 0 )
+        return VLC_SUCCESS;
+
+    callback_entry_t *p_entries = p_table->p_entries;
+    vlc_object_internals_t *p_priv = vlc_internals( p_this );
+
+    assert( !p_var->b_incallback );
+    p_var->b_incallback = true;
+    vlc_mutex_unlock( &p_priv->var_lock );
+
+    for( ; i_entries-- ; )
+    {
+        p_entries[i_entries].u.pf_list_callback( p_this, psz_name, i_action, val,
+                                                 p_entries[i_entries].p_data );
     }
 
     vlc_mutex_lock( &p_priv->var_lock );

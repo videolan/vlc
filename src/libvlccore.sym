@@ -452,9 +452,11 @@ vlc_socket
 vlc_accept
 utf8_vfprintf
 var_AddCallback
+var_AddListCallback
 var_Change
 var_Create
 var_DelCallback
+var_DelListCallback
 var_Destroy
 var_FreeList
 var_Get

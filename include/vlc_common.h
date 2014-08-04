@@ -382,13 +382,28 @@ struct vlc_list_t
 #define VLC_ENOITEM        (-8) /**< Item not found */
 
 /*****************************************************************************
- * Variable callbacks
+ * Variable callbacks: called when the value is modified
  *****************************************************************************/
 typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
                                    char const *,            /* variable name */
                                    vlc_value_t,                 /* old value */
                                    vlc_value_t,                 /* new value */
                                    void * );                /* callback data */
+
+/*****************************************************************************
+ * List callbacks: called when elements are added/removed from the list
+ *****************************************************************************/
+typedef int ( * vlc_list_callback_t ) ( vlc_object_t *,      /* variable's object */
+                                        char const *,            /* variable name */
+                                        int,                  /* VLC_VAR_* action */
+                                        vlc_value_t *,      /* new/deleted value  */
+                                        void *);                 /* callback data */
+
+typedef enum
+{
+    vlc_value_callback,
+    vlc_list_callback
+} vlc_callback_type_t;
 
 /*****************************************************************************
  * OS-specific headers and thread types
