@@ -17,7 +17,6 @@ $(TARBALLS)/sparkle-git.tar.xz:
 
 sparkle: sparkle-git.tar.xz .sum-sparkle
 	$(UNPACK)
-	$(APPLY) $(SRC)/sparkle/sparkle-fix-xcode-project-for-current-releases.patch
 	$(APPLY) $(SRC)/sparkle/sparkle-fix-compilation-on-snowleopard.patch
 	$(MOVE)
 
