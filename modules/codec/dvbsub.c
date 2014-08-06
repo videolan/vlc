@@ -1052,15 +1052,14 @@ static void decode_object( decoder_t *p_dec, bs_t *s )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     dvbsub_region_t *p_region;
-    int i_segment_length, i_coding_method, i_version, i_id, i;
-    bool b_non_modify_color;
+    int i_segment_length, i_coding_method, i_id, i;
 
     /* ETSI 300-743 paragraph 7.2.4
      * sync_byte, segment_type and page_id have already been processed.
      */
     i_segment_length = bs_read( s, 16 );
     i_id             = bs_read( s, 16 );
-    i_version        = bs_read( s, 4 );
+    bs_skip( s, 4 ); /* version */
     i_coding_method  = bs_read( s, 2 );
 
     if( i_coding_method > 1 )
@@ -1090,7 +1089,7 @@ static void decode_object( decoder_t *p_dec, bs_t *s )
     msg_Dbg( p_dec, "new object: %i", i_id );
 #endif
 
-    b_non_modify_color = bs_read( s, 1 );
+    bs_skip( s, 1 ); /* non_modify_color */
     bs_skip( s, 1 ); /* Reserved */
 
     if( i_coding_method == 0x00 )
