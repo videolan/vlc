@@ -1009,6 +1009,8 @@ static const staticentry_t p_list_video[] = {
         A("ULRG"),
         A("ULY0"),
         A("ULY2"),
+        A("ULH0"),
+        A("ULH2"),
 
     B(VLC_CODEC_VBLE, "VBLE Lossless"),
         A("VBLE"),
