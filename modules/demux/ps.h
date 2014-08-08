@@ -84,14 +84,14 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
     tk->i_id = i_id;
     if( ( i_id&0xff00 ) == 0xbd00 ) /* 0xBD00 -> 0xBDFF, Private Stream 1 */
     {
-        if( ( i_id&0xf8 ) == 0x88 || /* 0x88 -> 0x8f */
-            ( i_id&0xf8 ) == 0x98 )  /* 0x98 -> 0x9f */
+        if( ( i_id&0xf8 ) == 0x88 || /* 0x88 -> 0x8f - Can be DTS-HD primary audio in evob */
+            ( i_id&0xf8 ) == 0x98 )  /* 0x98 -> 0x9f - Can be DTS-HD secondary audio in evob */
         {
             es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_DTS );
             tk->i_skip = 4;
         }
         else if( ( i_id&0xf8 ) == 0x80 || /* 0x80 -> 0x87 */
-                 ( i_id&0xf0 ) == 0xc0 )  /* 0xc0 -> 0xcf AC-3, Can also be used for DD+/E-AC-3 */
+                 ( i_id&0xf0 ) == 0xc0 )  /* 0xc0 -> 0xcf AC-3, Can also be DD+/E-AC3 in evob */
         {
             es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_A52 );
             tk->i_skip = 4;
@@ -132,8 +132,8 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
     else if( (i_id&0xff00) == 0xfd00 ) /* 0xFD00 -> 0xFDFF */
     {
         uint8_t i_sub_id = i_id & 0xff;
-        if( i_sub_id >= 0x55 && i_sub_id <= 0x5f ||
-            i_sub_id >= 0x75 && i_sub_id <= 0x7f )
+        if( i_sub_id >= 0x55 && i_sub_id <= 0x5f || /* Can be primary VC-1 in evob */
+            i_sub_id >= 0x75 && i_sub_id <= 0x7f )  /* Secondary VC-1 */
         {
             es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_VC1 );
         }
