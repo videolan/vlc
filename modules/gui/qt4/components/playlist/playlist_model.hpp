@@ -157,7 +157,7 @@ private:
 
 private slots:
     void processInputItemUpdate( input_item_t *);
-    void processInputItemUpdate( input_thread_t* p_input );
+    void processInputItemUpdate();
     void processItemRemoval( int i_pl_itemid );
     void processItemAppend( int i_pl_itemid, int i_pl_itemidparent );
     void activateItem( playlist_item_t *p_item );

@@ -183,8 +183,10 @@ private:
     void UpdateProgramEvent();
     void UpdateEPG();
 
+    void setInput( input_thread_t * );
+
 public slots:
-    void setInput( input_thread_t * ); ///< Our controlled input changed
+    void inputChangedHandler(); ///< Our controlled input changed
     void sliderUpdate( float ); ///< User dragged the slider. We get new pos
     /* SpeedRate Rate Management */
     void reverse();
@@ -309,7 +311,7 @@ private slots:
     void menusUpdateAudio( const QString& );
 
 signals:
-    void inputChanged( input_thread_t * );
+    void inputChanged( );
     void volumeChanged( float );
     void soundMuteChanged( bool );
     void playlistItemAppended( int itemId, int parentId );

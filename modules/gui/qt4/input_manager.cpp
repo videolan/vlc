@@ -99,6 +99,11 @@ InputManager::~InputManager()
     delInput();
 }
 
+void InputManager::inputChangedHandler()
+{
+    setInput( THEMIM->getInput() );
+}
+
 /* Define the Input used.
    Add the callbacks on input
    p_input is held once here */
@@ -1017,13 +1022,13 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     mute.addCallback( this, SLOT(notifyMute(bool)) );
 
     /* Warn our embedded IM about input changes */
-    DCONNECT( this, inputChanged( input_thread_t * ),
-              im, setInput( input_thread_t * ) );
+    DCONNECT( this, inputChanged(),
+              im, inputChangedHandler() );
 
     /* initialize p_input (an input can already be running) */
     p_input = playlist_CurrentInput( THEPL );
     if( p_input )
-        emit inputChanged( p_input );
+        emit inputChanged( );
 
     /* Audio Menu */
     menusAudioMapper = new QSignalMapper();
@@ -1034,8 +1039,9 @@ MainInputManager::~MainInputManager()
 {
     if( p_input )
     {
-       emit inputChanged( NULL );
        vlc_object_release( p_input );
+       p_input = NULL;
+       emit inputChanged( );
     }
 
     var_DelCallback( THEPL, "activity", PLItemChanged, this );
@@ -1090,7 +1096,7 @@ void MainInputManager::customEvent( QEvent *event )
     if( p_input != NULL )
         vlc_object_release( p_input );
     p_input = playlist_CurrentInput( THEPL );
-    emit inputChanged( p_input );
+    emit inputChanged( );
 }
 
 /* Playlist Control functions */
