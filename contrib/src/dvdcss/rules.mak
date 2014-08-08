@@ -1,5 +1,5 @@
 # DVDCSS
-DVDCSS_VERSION := 1.2.13
+DVDCSS_VERSION := 1.3.0
 DVDCSS_URL := $(VIDEOLAN)/libdvdcss/$(DVDCSS_VERSION)/libdvdcss-$(DVDCSS_VERSION).tar.bz2
 
 ifeq ($(call need_pkg,"libdvdcss"),)
