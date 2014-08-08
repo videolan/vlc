@@ -183,6 +183,11 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
             {
                 es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_MPGV );
             }
+            else if( i_id == 0xe2 || /* Primary H.264 in evob */
+                     i_id == 0xe3 )  /* Seconday H.264 in evob */
+            {
+                es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_H264 );
+            }
             else if( tk->fmt.i_cat == UNKNOWN_ES )
             {
                 es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_MPGV );
