@@ -1469,7 +1469,7 @@ static int ProbeDVD( const char *psz_name )
     /* ISO 9660 volume descriptor */
     char iso_dsc[6];
     if( lseek( fd, 0x8000 + 1, SEEK_SET ) == -1
-     || read( fd, iso_dsc, sizeof (iso_dsc) ) < sizeof (iso_dsc)
+     || read( fd, iso_dsc, sizeof (iso_dsc) ) < (int)sizeof (iso_dsc)
      || memcmp( iso_dsc, "CD001\x01", 6 ) )
         goto bailout;
 
