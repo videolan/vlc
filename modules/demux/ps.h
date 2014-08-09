@@ -132,8 +132,8 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
     else if( (i_id&0xff00) == 0xfd00 ) /* 0xFD00 -> 0xFDFF */
     {
         uint8_t i_sub_id = i_id & 0xff;
-        if( i_sub_id >= 0x55 && i_sub_id <= 0x5f || /* Can be primary VC-1 in evob */
-            i_sub_id >= 0x75 && i_sub_id <= 0x7f )  /* Secondary VC-1 */
+        if( ( i_sub_id >= 0x55 && i_sub_id <= 0x5f ) || /* Can be primary VC-1 in evob */
+            ( i_sub_id >= 0x75 && i_sub_id <= 0x7f ) )  /* Secondary VC-1 */
         {
             es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_VC1 );
         }
