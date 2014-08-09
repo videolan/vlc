@@ -334,6 +334,12 @@ int OpenDemux( vlc_object_t *p_this )
         vlc_fourcc_t fcc;
         const char *psz_type = "unknown";
 
+        if( cc->codec_id == AV_CODEC_ID_NONE )
+        {
+            p_sys->i_tk++;
+            continue;
+        }
+
         if( !GetVlcFourcc( cc->codec_id, NULL, &fcc, NULL ) )
             fcc = VLC_FOURCC( 'u', 'n', 'd', 'f' );
 
