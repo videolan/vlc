@@ -176,7 +176,8 @@ static MP4_Box_t * MP4_GetTrexByTrackID( MP4_Box_t *p_moov, const uint32_t i_id 
     MP4_Box_t *p_trex = MP4_BoxGet( p_moov, "mvex/trex" );
     while( p_trex )
     {
-        if ( p_trex->i_type == ATOM_trex && BOXDATA(p_trex)->i_track_ID == i_id )
+        if ( p_trex->i_type == ATOM_trex &&
+             BOXDATA(p_trex) && BOXDATA(p_trex)->i_track_ID == i_id )
                 break;
         else
             p_trex = p_trex->p_next;
@@ -191,7 +192,7 @@ static MP4_Box_t * MP4_GetTrakByTrackID( MP4_Box_t *p_moov, const uint32_t i_id 
     while( p_trak )
     {
         if( p_trak->i_type == ATOM_trak &&
-            (p_tkhd = MP4_BoxGet( p_trak, "tkhd" )) &&
+            (p_tkhd = MP4_BoxGet( p_trak, "tkhd" )) && BOXDATA(p_tkhd) &&
             BOXDATA(p_tkhd)->i_track_ID == i_id )
                 break;
         else
@@ -306,14 +307,17 @@ static int LoadInitFrag( demux_t *p_demux )
             for( int i = 0; i < 3; i++ )
             {
                 MP4_Box_t *p_stra = MP4_BoxGet( p_smoo, "uuid[%d]", i );
-                if( p_stra && BOXDATA(p_stra)->i_track_ID )
+                if( p_stra && BOXDATA(p_stra) && BOXDATA(p_stra)->i_track_ID )
                     p_sys->i_tracks++;
                 /* Get timescale and duration of the video track; */
                 if( p_sys->i_timescale == 0 )
                 {
-                    p_sys->i_timescale = BOXDATA(p_stra)->i_timescale;
-                    p_sys->i_duration = BOXDATA(p_stra)->i_duration;
-                    p_sys->i_overall_duration = BOXDATA(p_stra)->i_duration;
+                    if ( p_stra && BOXDATA(p_stra) )
+                    {
+                        p_sys->i_timescale = BOXDATA(p_stra)->i_timescale;
+                        p_sys->i_duration = BOXDATA(p_stra)->i_duration;
+                        p_sys->i_overall_duration = BOXDATA(p_stra)->i_duration;
+                    }
                     if( p_sys->i_timescale == 0 )
                     {
                         msg_Err( p_demux, "bad timescale" );
@@ -373,7 +377,7 @@ static void CreateTracksFromSmooBox( demux_t *p_demux )
     for( int i = 0; i < 3; i++ )
     {
         MP4_Box_t *p_stra = MP4_BoxGet( p_smoo, "uuid[%d]", i );
-        if( !p_stra || BOXDATA(p_stra)->i_track_ID == 0 )
+        if( !p_stra || !BOXDATA(p_stra) || BOXDATA(p_stra)->i_track_ID == 0 )
             continue;
         else
         {
@@ -574,7 +578,7 @@ static int Open( vlc_object_t * p_this )
             char      *psz_ref;
             uint32_t  i_ref_type;
 
-            if( !p_rdrf || !( psz_ref = strdup( BOXDATA(p_rdrf)->psz_ref ) ) )
+            if( !p_rdrf || !BOXDATA(p_rdrf) || !( psz_ref = strdup( BOXDATA(p_rdrf)->psz_ref ) ) )
             {
                 continue;
             }
@@ -662,7 +666,7 @@ static int Open( vlc_object_t * p_this )
     {
         /* Try in mehd if fragmented */
         MP4_Box_t *p_mehd = MP4_BoxGet( p_demux->p_sys->p_root, "moov/mvex/mehd");
-        if ( p_mehd )
+        if ( p_mehd && p_mehd->data.p_mehd )
             p_sys->i_overall_duration = p_mehd->data.p_mehd->i_fragment_duration;
         else
             p_sys->i_overall_duration = p_sys->moovfragment.i_duration;
@@ -690,11 +694,12 @@ static int Open( vlc_object_t * p_this )
 
 
         MP4_Box_t *p_tkhd = MP4_BoxGet( p_trak, "tkhd" );
-        if( p_tkhd && (BOXDATA(p_tkhd)->i_flags&MP4_TRACK_ENABLED) )
+        if( p_tkhd && BOXDATA(p_tkhd) && (BOXDATA(p_tkhd)->i_flags&MP4_TRACK_ENABLED) )
             b_enabled_es = true;
 
         MP4_Box_t *p_chap = MP4_BoxGet( p_trak, "tref/chap", i );
-        if( p_chap && p_chap->data.p_tref_generic->i_entry_count > 0 && !p_sys->p_tref_chap )
+        if( p_chap && p_chap->data.p_tref_generic &&
+            p_chap->data.p_tref_generic->i_entry_count > 0 && !p_sys->p_tref_chap )
             p_sys->p_tref_chap = p_chap;
     }
 
@@ -1635,7 +1640,8 @@ static void LoadChapter( demux_t  *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     MP4_Box_t *p_chpl;
 
-    if( ( p_chpl = MP4_BoxGet( p_sys->p_root, "/moov/udta/chpl" ) ) && BOXDATA(p_chpl)->i_chapter > 0 )
+    if( ( p_chpl = MP4_BoxGet( p_sys->p_root, "/moov/udta/chpl" ) ) &&
+          BOXDATA(p_chpl) && BOXDATA(p_chpl)->i_chapter > 0 )
     {
         LoadChapterGpac( p_demux, p_chpl );
     }
@@ -1991,7 +1997,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
      *  Gives the delta between decoding time (dts) and composition table (pts)
      */
     p_box = MP4_BoxGet( p_demux_track->p_stbl, "ctts" );
-    if( p_box )
+    if( p_box && p_box->data.p_ctts )
     {
         MP4_Box_data_ctts_t *ctts = p_box->data.p_ctts;
 
@@ -2100,7 +2106,7 @@ static void TrackGetESSampleRate( demux_t *p_demux,
     MP4_Box_t *p_trak = MP4_GetTrakByTrackID( MP4_BoxGet( p_demux->p_sys->p_root, "/moov" ),
                                               p_track->i_track_ID );
     MP4_Box_t *p_mdhd = MP4_BoxGet( p_trak, "mdia/mdhd" );
-    if ( p_mdhd )
+    if ( p_mdhd && BOXDATA(p_mdhd) )
     {
         vlc_ureduce( pi_num, pi_den,
                      (uint64_t) BOXDATA(p_mdhd)->i_timescale * p_track->i_sample_count,
@@ -2184,7 +2190,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
 
     p_track->p_sample = p_sample;
 
-    if( ( p_frma = MP4_BoxGet( p_track->p_sample, "sinf/frma" ) ) )
+    if( ( p_frma = MP4_BoxGet( p_track->p_sample, "sinf/frma" ) ) && p_frma->data.p_frma )
     {
         msg_Warn( p_demux, "Original Format Box: %4.4s", (char *)&p_frma->data.p_frma->i_type );
 
@@ -2201,6 +2207,8 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
     switch( p_track->fmt.i_cat )
     {
     case VIDEO_ES:
+        if ( !p_sample->data.p_sample_vide )
+            break;
         p_track->fmt.video.i_width = p_sample->data.p_sample_vide->i_width;
         p_track->fmt.video.i_height = p_sample->data.p_sample_vide->i_height;
         p_track->fmt.video.i_bits_per_pixel =
@@ -2256,6 +2264,8 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         break;
 
     case AUDIO_ES:
+        if ( !p_sample->data.p_sample_soun )
+            break;
         p_track->fmt.audio.i_channels =
             p_sample->data.p_sample_soun->i_channelcount;
         p_track->fmt.audio.i_rate =
