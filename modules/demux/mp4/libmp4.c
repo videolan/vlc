@@ -3428,11 +3428,11 @@ static const struct
     /* found in hnti */
     { ATOM_rtp,     MP4_ReadBox_default,      NULL, 0 },
 
-    /* found in rmra */
-    { ATOM_rdrf,    MP4_ReadBox_rdrf,         MP4_FreeBox_rdrf  , ATOM_rmra },
-    { ATOM_rmdr,    MP4_ReadBox_rmdr,         MP4_FreeBox_Common, ATOM_rmra },
-    { ATOM_rmqu,    MP4_ReadBox_rmqu,         MP4_FreeBox_Common, ATOM_rmra },
-    { ATOM_rmvc,    MP4_ReadBox_rmvc,         MP4_FreeBox_Common, ATOM_rmra },
+    /* found in rmra/rmda */
+    { ATOM_rdrf,    MP4_ReadBox_rdrf,         MP4_FreeBox_rdrf  , ATOM_rmda },
+    { ATOM_rmdr,    MP4_ReadBox_rmdr,         MP4_FreeBox_Common, ATOM_rmda },
+    { ATOM_rmqu,    MP4_ReadBox_rmqu,         MP4_FreeBox_Common, ATOM_rmda },
+    { ATOM_rmvc,    MP4_ReadBox_rmvc,         MP4_FreeBox_Common, ATOM_rmda },
 
     { ATOM_drms,    MP4_ReadBox_sample_soun,  MP4_FreeBox_sample_soun, 0 },
     { ATOM_sinf,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, 0 },
