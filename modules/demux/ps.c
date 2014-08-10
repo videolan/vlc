@@ -380,7 +380,7 @@ static int Demux( demux_t *p_demux )
 
             if( !tk->b_seen )
             {
-                if( !ps_track_fill( tk, &p_sys->psm, i_id ) )
+                if( !ps_track_fill( tk, &p_sys->psm, i_id, p_pkt ) )
                 {
                     tk->es = es_out_Add( p_demux->out, &tk->fmt );
                     b_new = true;

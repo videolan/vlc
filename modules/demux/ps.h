@@ -78,7 +78,7 @@ static inline void ps_track_init( ps_track_t tk[PS_TK_COUNT] )
 }
 
 /* From id fill i_skip and es_format_t */
-static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
+static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id, block_t *p_pkt )
 {
     tk->i_skip = 0;
     tk->i_id = i_id;
@@ -399,7 +399,7 @@ static inline int ps_pkt_parse_system( block_t *p_pkt, ps_psm_t *p_psm,
 
             if( !tk[i_tk].b_seen )
             {
-                if( !ps_track_fill( &tk[i_tk], p_psm, i_id ) )
+                if( !ps_track_fill( &tk[i_tk], p_psm, i_id, p_pkt ) )
                 {
                     tk[i_tk].b_seen = true;
                 }
@@ -686,7 +686,7 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
 
         if( !tk[i].b_seen || !tk[i].es ) continue;
 
-        if( ps_track_fill( &tk_tmp, p_psm, tk[i].i_id ) != VLC_SUCCESS )
+        if( ps_track_fill( &tk_tmp, p_psm, tk[i].i_id, p_pkt ) != VLC_SUCCESS )
             continue;
 
         if( tk_tmp.fmt.i_codec == tk[i].fmt.i_codec )
