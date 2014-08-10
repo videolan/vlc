@@ -173,6 +173,7 @@ static int parse_Manifest( stream_t *s )
                 }
                 else if( !strcmp( node, "StreamIndex" ) )
                 {
+                    sms_Free( sms );
                     sms = sms_New();
                     if( unlikely( !sms ) )
                     {
