@@ -98,8 +98,8 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
         }
         else if( (i_id&0xf0) == 0xb0 ) /* 0xb0 -> 0xbf */
         {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MLP );
-            /* FIXME / untested ... */
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_TRUEHD );
+            tk->i_skip = 5;
         }
         else if( ( i_id&0xe0 ) == 0x20 ) /* 0x20 -> 0x3f */
         {
