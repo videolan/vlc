@@ -93,7 +93,21 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id, bloc
         else if( ( i_id&0xf8 ) == 0x80 || /* 0x80 -> 0x87 */
                  ( i_id&0xf0 ) == 0xc0 )  /* 0xc0 -> 0xcf AC-3, Can also be DD+/E-AC3 in evob */
         {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_A52 );
+            bool b_eac3 = false;
+            if( ( i_id&0xf0 ) == 0xc0 && p_pkt && p_pkt->i_buffer > 8 )
+            {
+                unsigned i_start = 9 + p_pkt->p_buffer[8];
+                /* AC-3 marking, see vlc_a52_header_Parse */
+                if( p_pkt->p_buffer[i_start + 4] == 0x0b ||
+                    p_pkt->p_buffer[i_start + 5] == 0x77 )
+                {
+                    int bsid = p_pkt->p_buffer[i_start + 9] >> 3;
+                    if( bsid > 10 )
+                        b_eac3 = true;
+                }
+            }
+
+            es_format_Init( &tk->fmt, AUDIO_ES, b_eac3 ? VLC_CODEC_EAC3 : VLC_CODEC_A52 );
             tk->i_skip = 4;
         }
         else if( ( i_id&0xfc ) == 0x00 ) /* 0x00 -> 0x03 */
