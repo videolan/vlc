@@ -296,7 +296,7 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
         osvi.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
         GetVersionEx( &osvi );
 
-        fwprintf( fd, L"[version]\nOS=%d.%d.%d.%d.%s\nVLC=" VERSION_MESSAGE,
+        fwprintf( fd, L"[version]\nOS=%d.%d.%d.%d.%ls\nVLC=" VERSION_MESSAGE,
                 osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber,
                 osvi.dwPlatformId, osvi.szCSDVersion);
 
@@ -347,7 +347,7 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
             wchar_t module[ 256 ];
             VirtualQuery( caller, &mbi, sizeof( mbi ) ) ;
             GetModuleFileName( mbi.AllocationBase, module, 256 );
-            fwprintf( fd, L"%p|%s\n", caller, module );
+            fwprintf( fd, L"%p|%ls\n", caller, module );
 
             /*The last BP points to NULL!*/
             caller = *(pBase + 1);
@@ -368,7 +368,7 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
                 for (unsigned int i = 0; i < size / sizeof(HMODULE); i++) {
                     wchar_t module[ 256 ];
                     GetModuleFileName(mods[i], module, 256);
-                    fwprintf( fd, L"%p|%s\n", mods[i], module);
+                    fwprintf( fd, L"%p|%ls\n", mods[i], module);
                 }
             }
             CloseHandle(hpid);
