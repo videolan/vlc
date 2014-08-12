@@ -743,6 +743,9 @@ void MainInterface::setVideoFullScreen( bool fs )
          * qt-fullscreen-screennumber is forced) */
         setMinimalView( b_minimalView );
         setInterfaceFullScreen( b_interfaceFullScreen );
+#ifdef _WIN32
+        changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
+#endif
     }
     videoWidget->sync();
 }
