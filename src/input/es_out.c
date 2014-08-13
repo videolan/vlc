@@ -827,21 +827,19 @@ static void EsOutFrameNext( es_out_t *out )
 static mtime_t EsOutGetBuffering( es_out_t *out )
 {
     es_out_sys_t *p_sys = out->p_sys;
+    mtime_t i_stream_duration, i_system_start;
 
     if( !p_sys->p_pgrm )
         return 0;
+    else
+    {
+        mtime_t i_stream_start, i_system_duration;
 
-    int i_ret;
-    mtime_t i_stream_start;
-    mtime_t i_system_start;
-    mtime_t i_stream_duration;
-    mtime_t i_system_duration;
-    i_ret = input_clock_GetState( p_sys->p_pgrm->p_clock,
+        if( input_clock_GetState( p_sys->p_pgrm->p_clock,
                                   &i_stream_start, &i_system_start,
-                                  &i_stream_duration, &i_system_duration );
-
-    if( i_ret )
-        return 0;
+                                  &i_stream_duration, &i_system_duration ) )
+            return 0;
+    }
 
     mtime_t i_delay;
 
@@ -852,6 +850,7 @@ static mtime_t EsOutGetBuffering( es_out_t *out )
     else
     {
         mtime_t i_system_duration;
+
         if( p_sys->b_paused )
         {
             i_system_duration = p_sys->i_pause_date  - i_system_start;
