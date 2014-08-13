@@ -104,10 +104,10 @@ struct filter_sys_t
 static block_t *DoWork(filter_t *, block_t *);
 static void *Thread(void *);
 
-#define SPECTRUM_WIDTH 4.0
+#define SPECTRUM_WIDTH 4.f
 #define NB_BANDS 20
-#define ROTATION_INCREMENT 0.1
-#define BAR_DECREMENT 0.075
+#define ROTATION_INCREMENT .1f
+#define BAR_DECREMENT .075f
 #define ROTATION_MAX 20
 
 const GLfloat lightZeroColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -249,40 +249,40 @@ static void initOpenGLScene(void)
  */
 static void drawBar(void)
 {
-    const float w = SPECTRUM_WIDTH / NB_BANDS - 0.05;
+    const float w = SPECTRUM_WIDTH / NB_BANDS - 0.05f;
 
     const GLfloat vertexCoords[] = {
-        0.0, 0.0, 0.0,   w, 0.0, 0.0,   0.0, 1.0, 0.0,
-        0.0, 1.0, 0.0,   w, 0.0, 0.0,   w  , 1.0, 0.0,
+        0.f, 0.f, 0.f,     w, 0.f, 0.f,   0.f, 1.f, 0.f,
+        0.f, 1.f, 0.f,     w, 0.f, 0.f,     w, 1.f, 0.f,
 
-        0.0, 0.0, -w,    0.0, 0.0, 0.0,   0.0, 1.0, -w,
-        0.0, 1.0, -w,    0.0, 0.0, 0.0,   0.0, 1.0, 0.0,
+        0.f, 0.f, -w,    0.f, 0.f, 0.f,   0.f, 1.f,  -w,
+        0.f, 1.f, -w,    0.f, 0.f, 0.f,   0.f, 1.f, 0.f,
 
-        w, 0.0, 0.0,     w, 0.0, -w,   w, 1.0, 0.0,
-        w, 1.0, 0.0,     w, 0.0, -w,   w, 1.0, -w,
+          w, 0.f, 0.f,     w, 0.f,  -w,     w, 1.f, 0.f,
+          w, 1.f, 0.f,     w, 0.f,  -w,     w, 1.f,  -w,
 
-        w, 0.0, -w,      0.0, 0.0, -w,  0.0, 1.0, -w,
-        0.0, 1.0, -w,    w, 1.0, -w,    w, 0.0, -w,
+          w, 0.f,  -w,   0.f, 0.f,  -w,   0.f, 1.f,  -w,
+        0.f, 1.f,  -w,     w, 1.f,  -w,     w, 0.f,  -w,
 
-        0.0, 1.0, 0.0,   w, 1.0, 0.0,   w, 1.0, -w,
-        0.0, 1.0, 0.0,   w, 1.0, -w,    0.0, 1.0, -w,
+        0.f, 1.f, 0.f,     w, 1.f, 0.f,     w, 1.f,  -w,
+        0.f, 1.f, 0.f,     w, 1.f,  -w,   0.f, 1.f,  -w,
     };
 
     const GLfloat normals[] = {
-        0.0, 0.0, 1.0,   0.0, 0.0, 1.0,   0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0,   0.0, 0.0, 1.0,   0.0, 0.0, 1.0,
+        0.f, 0.f, 1.f,   0.f, 0.f, 1.f,   0.f, 0.f, 1.f,
+        0.f, 0.f, 1.f,   0.f, 0.f, 1.f,   0.f, 0.f, 1.f,
 
-        -1.0, 0.0, 0.0,   -1.0, 0.0, 0.0,   -1.0, 0.0, 0.0,
-        -1.0, 0.0, 0.0,   -1.0, 0.0, 0.0,   -1.0, 0.0, 0.0,
+        -1.f, 0.f, 0.f,   -1.f, 0.f, 0.f,   -1.f, 0.f, 0.f,
+        -1.f, 0.f, 0.f,   -1.f, 0.f, 0.f,   -1.f, 0.f, 0.f,
 
-        1.0, 0.0, 0.0,   1.0, 0.0, 0.0,   1.0, 0.0, 0.0,
-        1.0, 0.0, 0.0,   1.0, 0.0, 0.0,   1.0, 0.0, 0.0,
+        1.f, 0.f, 0.f,   1.f, 0.f, 0.f,   1.f, 0.f, 0.f,
+        1.f, 0.f, 0.f,   1.f, 0.f, 0.f,   1.f, 0.f, 0.f,
 
-        0.0, 0.0, -1.0,   0.0, 0.0, -1.0,   0.0, 0.0, -1.0,
-        0.0, 0.0, -1.0,   0.0, 0.0, -1.0,   0.0, 0.0, -1.0,
+        0.f, 0.f, -1.f,   0.f, 0.f, -1.f,   0.f, 0.f, -1.f,
+        0.f, 0.f, -1.f,   0.f, 0.f, -1.f,   0.f, 0.f, -1.f,
 
-        0.0, 1.0, 0.0,   0.0, 1.0, 0.0,   0.0, 1.0, 0.0,
-        0.0, 1.0, 0.0,   0.0, 1.0, 0.0,   0.0, 1.0, 0.0,
+        0.f, 1.f, 0.f,   0.f, 1.f, 0.f,   0.f, 1.f, 0.f,
+        0.f, 1.f, 0.f,   0.f, 1.f, 0.f,   0.f, 1.f, 0.f,
     };
 
     glVertexPointer(3, GL_FLOAT, 0, vertexCoords);
@@ -299,20 +299,20 @@ static void setBarColor(float f_height)
 {
     float r, b;
 
-#define BAR_MAX_HEIGHT 4.2
-    r = -1.0 + 2 / BAR_MAX_HEIGHT * f_height;
-    b = 2.0 - 2 / BAR_MAX_HEIGHT * f_height;
+#define BAR_MAX_HEIGHT 4.2f
+    r = -1.f + 2 / BAR_MAX_HEIGHT * f_height;
+    b = 2.f - 2 / BAR_MAX_HEIGHT * f_height;
 #undef BAR_MAX_HEIGHT
 
     /* Test the ranges. */
-    r = r > 1.0 ? 1.0 : r;
-    b = b > 1.0 ? 1.0 : b;
+    r = r > 1.f ? 1.f : r;
+    b = b > 1.f ? 1.f : b;
 
-    r = r < 0.0 ? 0.0 : r;
-    b = b < 0.0 ? 0.0 : b;
+    r = r < 0.f ? 0.f : r;
+    b = b < 0.f ? 0.f : b;
 
     /* Set the bar color. */
-    glColor4f(r, 0.0, b, 1.0);
+    glColor4f(r, 0.f, b, 1.f);
 }
 
 
@@ -323,7 +323,7 @@ static void setBarColor(float f_height)
 static void drawBars(float heights[])
 {
     glPushMatrix();
-    glTranslatef(-2.0, 0.0, 0.0);
+    glTranslatef(-2.f, 0.f, 0.f);
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
@@ -332,12 +332,12 @@ static void drawBars(float heights[])
     for (unsigned i = 0; i < NB_BANDS; ++i)
     {
         glPushMatrix();
-        glScalef(1.0, heights[i], 1.0);
+        glScalef(1.f, heights[i], 1.f);
         setBarColor(heights[i]);
         drawBar();
         glPopMatrix();
 
-        glTranslatef(w, 0.0, 0.0);
+        glTranslatef(w, 0.f, 0.f);
     }
 
     glDisableClientState(GL_VERTEX_ARRAY);
@@ -471,7 +471,7 @@ static void *Thread( void *p_data )
         {
             union {float f; int32_t i;} u;
 
-            u.f = *p_buffl + 384.0;
+            u.f = *p_buffl + 384.f;
             if (u.i > 0x43c07fff)
                 *p_buffs = 32767;
             else if (u.i < 0x43bf8000)
@@ -525,7 +525,7 @@ static void *Thread( void *p_data )
                      y = p_dest[j];
             }
             /* Calculate the height of the bar */
-            float new_height = y != 0 ? log(y) * 0.4 : 0;
+            float new_height = y != 0 ? logf(y) * 0.4f : 0;
             height[i] = new_height > height[i]
                         ? new_height : height[i];
         }
