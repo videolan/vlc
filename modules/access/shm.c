@@ -220,7 +220,7 @@ static int Open (vlc_object_t *obj)
 
     /* Initializes format */
     float rate = var_InheritFloat (obj, "shm-fps");
-    if (rate <= 0.)
+    if (rate <= 0.f)
         goto error;
 
     mtime_t interval = llroundf((float)CLOCK_FREQ / rate);
