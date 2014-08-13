@@ -956,15 +956,13 @@ static void LoadSubtitles( input_thread_t *p_input )
 {
     /* Load subtitles */
     /* Get fps and set it if not already set */
-    const double f_fps = p_input->p->f_fps;
-    if( f_fps > 1.0 )
+    const float f_fps = p_input->p->f_fps;
+    if( f_fps > 1.f )
     {
-        float f_requested_fps;
-
         var_Create( p_input, "sub-original-fps", VLC_VAR_FLOAT );
         var_SetFloat( p_input, "sub-original-fps", f_fps );
 
-        f_requested_fps = var_CreateGetFloat( p_input, "sub-fps" );
+        float f_requested_fps = var_CreateGetFloat( p_input, "sub-fps" );
         if( f_requested_fps != f_fps )
         {
             var_Create( p_input, "sub-fps", VLC_VAR_FLOAT|
