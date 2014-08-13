@@ -162,7 +162,7 @@ static float iec_scale(float dB)
         return (dB + 70.0f) * 0.0025f;
     if (dB < -50.0f)
         return (dB + 60.0f) * 0.005f + 0.025f;
-    if (dB < -40.0)
+    if (dB < -40.0f)
         return (dB + 50.0f) * 0.0075f + 0.075f;
     if (dB < -30.0f)
         return (dB + 40.0f) * 0.015f + 0.15f;
