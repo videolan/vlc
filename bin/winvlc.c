@@ -207,7 +207,14 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 /* Crashdumps handling */
 static void check_crashdump(void)
 {
-    FILE * fd = _wfopen ( crashdump_path, L"r, ccs=UTF-8" );
+    wchar_t mv_crashdump_path[MAX_PATH];
+    wcscpy (mv_crashdump_path, crashdump_path);
+    wcscat (mv_crashdump_path, L".mv");
+
+    if (_wrename (crashdump_path, mv_crashdump_path))
+        return;
+
+    FILE * fd = _wfopen ( mv_crashdump_path, L"r, ccs=UTF-8" );
     if( !fd )
         return;
     fclose( fd );
@@ -235,7 +242,7 @@ static void check_crashdump(void)
                         now.wYear, now.wMonth, now.wDay, now.wHour,
                         now.wMinute, now.wSecond );
 
-                if( FtpPutFile( ftp, crashdump_path, remote_file,
+                if( FtpPutFile( ftp, mv_crashdump_path, remote_file,
                             FTP_TRANSFER_TYPE_BINARY, 0) )
                     MessageBox( NULL, L"Report sent correctly. Thanks a lot " \
                                 "for the help.", L"Report sent", MB_OK);
@@ -265,7 +272,7 @@ static void check_crashdump(void)
         }
     }
 
-    _wremove(crashdump_path);
+    _wremove(mv_crashdump_path);
 }
 
 /*****************************************************************************
