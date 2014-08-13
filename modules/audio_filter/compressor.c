@@ -549,8 +549,8 @@ static void RoundToZero( float *pf_x )
 static float Max( float f_x, float f_a )
 {
     f_x -= f_a;
-    f_x += fabs( f_x );
-    f_x *= 0.5;
+    f_x += fabsf( f_x );
+    f_x *= 0.5f;
     f_x += f_a;
 
     return f_x;
@@ -558,12 +558,12 @@ static float Max( float f_x, float f_a )
 
 static float Clamp( float f_x, float f_a, float f_b )
 {
-    const float f_x1 = fabs( f_x - f_a );
-    const float f_x2 = fabs( f_x - f_b );
+    const float f_x1 = fabsf( f_x - f_a );
+    const float f_x2 = fabsf( f_x - f_b );
 
     f_x = f_x1 + f_a + f_b;
     f_x -= f_x2;
-    f_x *= 0.5;
+    f_x *= 0.5f;
 
     return f_x;
 }
@@ -589,7 +589,7 @@ static float RmsEnvProcess( rms_env * p_r, const float f_x )
     p_r->f_sum += f_x;
 
     /* If the sum is small enough, make it zero */
-    if( p_r->f_sum < 1.0e-6 )
+    if( p_r->f_sum < 1.0e-6f )
     {
         p_r->f_sum = 0.0f;
     }
