@@ -239,7 +239,7 @@ void InputManager::customEvent( QEvent *event )
         if( p_item == ple->item() )
         {
             UpdateStatus();
-            // UpdateName();
+            UpdateName();
             UpdateArt();
             UpdateMeta();
             /* Update duration of file */
