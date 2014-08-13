@@ -32,6 +32,8 @@
 # include "config.h"
 #endif
 
+#include <math.h>
+
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_sout.h>
@@ -379,10 +381,10 @@ int OpenEncoder( vlc_object_t *p_this )
     f_val = var_GetFloat( p_enc, ENC_CFG_PREFIX "qscale" );
 
     p_sys->i_quality = 0;
-    if( f_val < 0.01 || f_val > 255.0 )
-        f_val = 0;
+    if( f_val < .01f || f_val > 255.f )
+        f_val = 0.f;
     else
-        p_sys->i_quality = (int)(FF_QP2LAMBDA * f_val + 0.5);
+        p_sys->i_quality = lroundf(FF_QP2LAMBDA * f_val);
 
     psz_val = var_GetString( p_enc, ENC_CFG_PREFIX "hq" );
     p_sys->i_hq = FF_MB_DECISION_RD;
@@ -536,7 +538,7 @@ int OpenEncoder( vlc_object_t *p_this )
         }
 
 
-        if ( p_sys->f_i_quant_factor != 0.0 )
+        if ( p_sys->f_i_quant_factor != 0.f )
             p_context->i_quant_factor = p_sys->f_i_quant_factor;
 
         p_context->noise_reduction = p_sys->i_noise_reduction;
