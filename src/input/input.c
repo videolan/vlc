@@ -1175,9 +1175,8 @@ static void InitPrograms( input_thread_t * p_input )
 static int Init( input_thread_t * p_input )
 {
     vlc_meta_t *p_meta;
-    int i;
 
-    for( i = 0; i < p_input->p->p_item->i_options; i++ )
+    for( int i = 0; i < p_input->p->p_item->i_options; i++ )
     {
         if( !strncmp( p_input->p->p_item->ppsz_options[i], "meta-file", 9 ) )
         {
