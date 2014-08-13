@@ -1248,12 +1248,9 @@ static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
         case VLC_VAR_FLOAT:
             if( p_var->i_type & VLC_VAR_HASSTEP && p_var->step.f_float )
             {
-                float f_round = p_var->step.f_float * (float)(int)( 0.5 +
-                                        p_val->f_float / p_var->step.f_float );
-                if( p_val->f_float != f_round )
-                {
-                    p_val->f_float = f_round;
-                }
+                float f_round = p_var->step.f_float
+                              * roundf( p_val->f_float / p_var->step.f_float );
+                p_val->f_float = f_round;
             }
             if( p_var->i_type & VLC_VAR_HASMIN
                  && p_val->f_float < p_var->min.f_float )
