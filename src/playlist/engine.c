@@ -143,7 +143,7 @@ static int RateOffsetCallback( vlc_object_t *obj, char const *psz_cmd,
     if( !strcmp( psz_cmd, "rate-faster" ) )
     {
         /* compensate for input rounding errors */
-        float r = f_rate * 1.1;
+        float r = f_rate * 1.1f;
         for( size_t i = 0; i < i_rate_count; i++ )
             if( r < pf_rate[i] )
             {
@@ -154,7 +154,7 @@ static int RateOffsetCallback( vlc_object_t *obj, char const *psz_cmd,
     else
     {
         /* compensate for input rounding errors */
-        float r = f_rate * .9;
+        float r = f_rate * .9f;
         for( size_t i = 1; i < i_rate_count; i++ )
             if( r <= pf_rate[i] )
             {
