@@ -700,8 +700,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     {
         bool b_force_update;
         vlc_value_t val;
-        mtime_t i_current;
-        mtime_t i_wakeup;
+        mtime_t i_wakeup, i_current;
         bool b_paused;
         bool b_demux_polled;
 
@@ -765,9 +764,9 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                 if( b_buffering )
                 {
                     /* When postpone is in order, check the ES level every 20ms */
-                    mtime_t i_current = mdate();
-                    if( i_last_seek_mdate + INT64_C(125000) >= i_current )
-                        i_limit = __MIN( i_deadline, i_current + INT64_C(20000) );
+                    mtime_t now = mdate();
+                    if( i_last_seek_mdate + INT64_C(125000) >= now )
+                        i_limit = __MIN( i_deadline, now + INT64_C(20000) );
                 }
 
                 int i_type;
