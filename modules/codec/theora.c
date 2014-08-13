@@ -727,7 +727,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     }
 
     p_sys->ti.target_bitrate = p_enc->fmt_out.i_bitrate;
-    p_sys->ti.quality = ((float)i_quality) * 6.3;
+    p_sys->ti.quality = ((float)i_quality) * 6.3f;
 
 
     p_sys->tcx = th_encode_alloc( &p_sys->ti );
