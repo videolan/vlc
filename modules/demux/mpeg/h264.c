@@ -104,9 +104,9 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_es        = NULL;
     p_sys->i_dts       = 0;
     p_sys->f_fps       = var_CreateGetFloat( p_demux, "h264-fps" );
-    if( p_sys->f_fps < 0.001 )
-        p_sys->f_fps = 0.001;
-    msg_Dbg( p_demux, "using %.2f fps", p_sys->f_fps );
+    if( p_sys->f_fps < 0.001f )
+        p_sys->f_fps = 0.001f;
+    msg_Dbg( p_demux, "using %.2f fps", (double) p_sys->f_fps );
 
     /* Load the mpegvideo packetizer */
     es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_H264 );
@@ -173,7 +173,7 @@ static int Demux( demux_t *p_demux)
 
             p_block_out = p_next;
 
-            p_sys->i_dts += (int64_t)((double)1000000.0 / p_sys->f_fps);
+            p_sys->i_dts += (int64_t)((float)CLOCK_FREQ / p_sys->f_fps);
         }
     }
     return 1;

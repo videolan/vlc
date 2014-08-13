@@ -115,7 +115,7 @@ static int Open( vlc_object_t * p_this )
     {
         p_sys->f_fps = ( p_sys->f_force_fps < 0.001f )? 0.001f:
             p_sys->f_force_fps;
-        msg_Dbg( p_demux, "using %.2f fps", p_sys->f_fps );
+        msg_Dbg( p_demux, "using %.2f fps", (double) p_sys->f_fps );
     }
     else
         p_sys->f_fps = 0.0f;
@@ -201,7 +201,7 @@ static int Demux( demux_t *p_demux)
             if( nal_type < 0x40 && p_sys->f_fps )
             {
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_dts );
-                p_sys->i_dts += (int64_t)((double)1000000.0 / p_sys->f_fps);
+                p_sys->i_dts += (int64_t)((float)CLOCK_FREQ / p_sys->f_fps);
             }
 
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
@@ -278,7 +278,8 @@ static int32_t getFPS( demux_t *p_demux, block_t * p_block )
         if( num_units_in_tick )
         {
             p_sys->f_fps = ( (float) time_scale )/( (float) num_units_in_tick );
-            msg_Dbg(p_demux,"Using framerate %f fps from VPS", p_sys->f_fps);
+            msg_Dbg(p_demux,"Using framerate %f fps from VPS",
+                    (double) p_sys->f_fps);
         }
         else
         {
