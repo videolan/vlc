@@ -1650,27 +1650,26 @@ static bool Control( input_thread_t *p_input,
 
         case INPUT_CONTROL_SET_POSITION:
         {
-            double f_pos;
-
             if( p_input->p->b_recording )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_POSITION(_OFFSET) ignored while recording" );
                 break;
             }
-            f_pos = val.f_float;
+
+            float f_pos = val.f_float;
             if( i_type != INPUT_CONTROL_SET_POSITION )
                 f_pos += var_GetFloat( p_input, "position" );
-            if( f_pos < 0.0 )
-                f_pos = 0.0;
-            else if( f_pos > 1.0 )
-                f_pos = 1.0;
+            if( f_pos < 0.f )
+                f_pos = 0.f;
+            else if( f_pos > 1.f )
+                f_pos = 1.f;
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_SetTime( p_input->p->p_es_out, -1 );
             if( demux_Control( p_input->p->input.p_demux, DEMUX_SET_POSITION,
-                                f_pos, !p_input->p->b_fast_seek ) )
+                               (double) f_pos, !p_input->p->b_fast_seek ) )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_POSITION(_OFFSET) "
-                         "%2.1f%% failed", f_pos * 100 );
+                         "%2.1f%% failed", (double)(f_pos * 100.f) );
             }
             else
             {
