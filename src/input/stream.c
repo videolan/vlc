@@ -994,7 +994,6 @@ static int AStreamSeekBlock( stream_t *s, uint64_t i_pos )
 static int AStreamRefillBlock( stream_t *s )
 {
     stream_sys_t *p_sys = s->p_sys;
-    block_t      *b;
 
     /* Release data */
     while( p_sys->block.i_size >= STREAM_CACHE_SIZE &&
@@ -1018,6 +1017,8 @@ static int AStreamRefillBlock( stream_t *s )
 
     /* Now read a new block */
     const int64_t i_start = mdate();
+    block_t *b;
+
     for( ;; )
     {
         bool b_eof;
