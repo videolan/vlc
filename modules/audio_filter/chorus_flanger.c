@@ -99,7 +99,7 @@ vlc_module_end ()
  * small_value: Helper function
  * return high pass cutoff
  */
-static inline float small_value()
+static inline float small_value(void)
 {
     /* allows for 2^-24, should be enough for 24-bit DACs at least */
     return ( 1.0 / 16777216.0 );
