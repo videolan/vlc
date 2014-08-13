@@ -34,6 +34,7 @@
 #include <limits.h>
 #include <assert.h>
 #include <errno.h>
+#include <math.h>
 #include <sys/stat.h>
 
 #include "input_internal.h"
@@ -631,7 +632,7 @@ static int MainLoopTryRepeat( input_thread_t *p_input, mtime_t *pi_start_mdate )
     }
     else
     {
-        val.f_float = 0.0;
+        val.f_float = 0.f;
         input_ControlPush( p_input, INPUT_CONTROL_SET_POSITION, &val );
     }
 
@@ -921,11 +922,11 @@ static void StartTitle( input_thread_t * p_input )
         input_ControlPush( p_input, INPUT_CONTROL_SET_SEEKPOINT, &val );
 
     /* Start/stop/run time */
-    p_input->p->i_start = (int64_t)(1000000.0
+    p_input->p->i_start = llroundf(1000000.f
                                      * var_GetFloat( p_input, "start-time" ));
-    p_input->p->i_stop  = (int64_t)(1000000.0
+    p_input->p->i_stop  = llroundf(1000000.f
                                      * var_GetFloat( p_input, "stop-time" ));
-    p_input->p->i_run   = (int64_t)(1000000.0
+    p_input->p->i_run   = llroundf(1000000.f
                                      * var_GetFloat( p_input, "run-time" ));
     if( p_input->p->i_run < 0 )
     {
