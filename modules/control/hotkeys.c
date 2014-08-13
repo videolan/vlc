@@ -356,9 +356,9 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             break;
 
         case ACTIONID_PLAY:
-            if( p_input && var_GetFloat( p_input, "rate" ) != 1. )
+            if( p_input && var_GetFloat( p_input, "rate" ) != 1.f )
                 /* Return to normal speed */
-                var_SetFloat( p_input, "rate", 1. );
+                var_SetFloat( p_input, "rate", 1.f );
             else
             {
                 ClearChannels( p_intf, p_vout );
@@ -1225,7 +1225,7 @@ static void DisplayVolume( intf_thread_t *p_intf, vout_thread_t *p_vout,
 
 static void DisplayRate( vout_thread_t *p_vout, float f_rate )
 {
-    DisplayMessage( p_vout, _("Speed: %.2fx"), f_rate );
+    DisplayMessage( p_vout, _("Speed: %.2fx"), (double) f_rate );
 }
 
 static float AdjustRateFine( vlc_object_t *p_obj, const int i_dir )
