@@ -57,6 +57,7 @@ libmjpeg_plugin_la_SOURCES = demux/mjpeg.c demux/mxpeg_helper.h
 demux_LTLIBRARIES += libmjpeg_plugin.la
 
 libsubtitle_plugin_la_SOURCES = demux/subtitle.c
+libsubtitle_plugin_la_LIBADD = $(LIBM)
 demux_LTLIBRARIES += libsubtitle_plugin.la
 
 libty_plugin_la_SOURCES = demux/ty.c codec/cc.h
