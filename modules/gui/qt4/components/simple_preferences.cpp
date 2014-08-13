@@ -465,10 +465,13 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
 #define audioControl2( name) \
             audioCommon( name ) \
+            QHBoxLayout * name ## hboxLayout = new QHBoxLayout; \
             QLineEdit * name ## Device = new QLineEdit; \
             name ## Label->setBuddy( name ## Device ); \
+            name ## hboxLayout->addWidget( name ## Device ); \
             QPushButton * name ## Browse = new QPushButton( qtr( "Browse..." ) ); \
-            outputAudioLayout->addWidget( name ## Device, outputAudioLayout->rowCount() - 1, 0, 1, -1, Qt::AlignLeft );
+            name ## hboxLayout->addWidget( name ## Browse ); \
+            outputAudioLayout->addLayout( name ## hboxLayout, outputAudioLayout->rowCount() - 1, 1, 1, 1, Qt::AlignLeft );
 
             /* Build if necessary */
             QGridLayout * outputAudioLayout = qobject_cast<QGridLayout *>(ui.outputAudioBox->layout());
@@ -506,7 +509,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 optionWidgets["ossL"] = OSSLabel;
                 optionWidgets["ossW"] = OSSDevice;
                 optionWidgets["ossB"] = OSSBrowse;
-                CONFIG_GENERIC_FILE( "oss-audio-device" , File, NULL, OSSDevice,
+                CONFIG_GENERIC_FILE( "oss-audio-device" , File, OSSLabel, OSSDevice,
                                  OSSBrowse );
             }
 #endif
