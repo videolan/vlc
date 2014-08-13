@@ -723,13 +723,14 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_use_key_frames = var_GetBool( p_mux, SOUT_CFG_PREFIX "use-key-frames" );
 
+    p_mux->p_sys        = p_sys;
+
     p_sys->csa = csaSetup(p_this);
 
     p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
-    p_mux->p_sys        = p_sys;
 
     return VLC_SUCCESS;
 }
