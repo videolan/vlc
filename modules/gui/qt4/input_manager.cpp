@@ -128,22 +128,25 @@ void InputManager::setInput( input_thread_t *_p_input )
         emit rateChanged( var_GetFloat( p_input, "rate" ) );
 
         /* Get Saved Time */
-        int i_time = RecentsMRL::getInstance( p_intf )->time( p_item->psz_uri );
-        if( i_time > 0 &&
-            !var_GetFloat( p_input, "run-time" ) &&
-            !var_GetFloat( p_input, "start-time" ) &&
-            !var_GetFloat( p_input, "stop-time" ) )
+        if( p_item->i_type == ITEM_TYPE_FILE )
         {
-            playlist_Pause( THEPL );
+            int i_time = RecentsMRL::getInstance( p_intf )->time( p_item->psz_uri );
+            if( i_time > 0 &&
+                    !var_GetFloat( p_input, "run-time" ) &&
+                    !var_GetFloat( p_input, "start-time" ) &&
+                    !var_GetFloat( p_input, "stop-time" ) )
+            {
+                playlist_Pause( THEPL );
 
-            if( QMessageBox::question( NULL,
-                        _("Continue playback?"),
-                        _("Do you want to restart the playback where left off?"),
-                        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes )
-                    == QMessageBox::Yes )
-                var_SetTime( p_input, "time", (int64_t)i_time * 1000 );
+                if( QMessageBox::question( NULL,
+                            _("Continue playback?"),
+                            _("Do you want to restart the playback where left off?"),
+                            QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes )
+                        == QMessageBox::Yes )
+                    var_SetTime( p_input, "time", (int64_t)i_time * 1000 );
 
-            playlist_Play( THEPL );
+                playlist_Play( THEPL );
+            }
         }
     }
     else
