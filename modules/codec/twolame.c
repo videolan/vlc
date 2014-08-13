@@ -177,8 +177,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     if( var_GetBool( p_enc, ENC_CFG_PREFIX "vbr" ) )
     {
         float f_quality = var_GetFloat( p_enc, ENC_CFG_PREFIX "quality" );
-        if ( f_quality > 50.0 ) f_quality = 50.0;
-        if ( f_quality < 0.0 ) f_quality = 0.0;
+        if ( f_quality > 50.f ) f_quality = 50.f;
+        if ( f_quality < 0.f ) f_quality = 0.f;
         twolame_set_VBR( p_sys->p_twolame, 1 );
         twolame_set_VBR_q( p_sys->p_twolame, f_quality );
     }
