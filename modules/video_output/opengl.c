@@ -309,12 +309,12 @@ static void BuildYUVFragmentShader(vout_display_opengl_t *vgl,
         code = NULL;
 
     for (int i = 0; i < 4; i++) {
-        float correction = i < 3 ? yuv_range_correction : 1.0;
+        float correction = i < 3 ? yuv_range_correction : 1.f;
         /* We place coefficient values for coefficient[4] in one array from matrix values.
            Notice that we fill values from top down instead of left to right.*/
         for (int j = 0; j < 4; j++)
             local_value[*local_count + i*4+j] = j < 3 ? correction * matrix[j*4+i]
-                                                      : 0.0 ;
+                                                      : 0.f;
     }
     (*local_count) += 4;
 
