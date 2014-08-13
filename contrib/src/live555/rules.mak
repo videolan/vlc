@@ -1,7 +1,7 @@
 # live555
 
 #LIVEDOTCOM_URL := http://live555.com/liveMedia/public/live555-latest.tar.gz
-LIVE555_FILE := live.2014.05.27.tar.gz
+LIVE555_FILE := live.2014.07.25.tar.gz
 LIVEDOTCOM_URL := http://download.videolan.org/pub/contrib/live555/$(LIVE555_FILE)
 
 ifdef BUILD_NETWORK
