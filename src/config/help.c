@@ -573,9 +573,9 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
                    module_gettext(m, m->psz_help));
 
         /* Print module options */
-        for (size_t i = 0; i < m->confsize; i++)
+        for (size_t j = 0; j < m->confsize; j++)
         {
-            const module_config_t *item = m->p_config + i;
+            const module_config_t *item = m->p_config + j;
 
             if (item->b_removed)
                 continue; /* Skip removed options */
