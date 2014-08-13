@@ -748,9 +748,9 @@ static int AStreamReadBlock( stream_t *s, void *p_read, unsigned int i_read )
     if( p_data == NULL )
     {
         /* seek within this stream if possible, else use plain old read and discard */
-        stream_sys_t *p_sys = s->p_sys;
-        access_t     *p_access = p_sys->p_access;
-        bool   b_aseek;
+        access_t *p_access = p_sys->p_access;
+        bool b_aseek;
+
         access_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
         if( b_aseek )
             return AStreamSeekBlock( s, p_sys->i_pos + i_read ) ? 0 : i_read;
