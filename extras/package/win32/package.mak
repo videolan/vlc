@@ -12,6 +12,8 @@ win32_xpi_destdir=$(abs_top_builddir)/vlc-plugin-$(VERSION)
 
 if HAVE_WIN32
 include extras/package/npapi.am
+
+build-npapi: package-win-install
 endif
 
 if HAVE_WIN64
