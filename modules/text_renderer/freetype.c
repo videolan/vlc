@@ -1860,7 +1860,7 @@ static int Init_FT( vlc_object_t *p_this,
     if( SetFontSize( p_filter, 0 ) != VLC_SUCCESS ) goto error;
 
     p_sys->p_stroker = NULL;
-    if( f_outline_thickness > 0.001 )
+    if( f_outline_thickness > .001f )
     {
         i_error = FT_Stroker_New( p_sys->p_library, &p_sys->p_stroker );
         if( i_error )
@@ -1928,8 +1928,8 @@ static int Create( vlc_object_t *p_this )
     float f_shadow_angle = var_InheritFloat( p_filter, "freetype-shadow-angle" );
     float f_shadow_distance = var_InheritFloat( p_filter, "freetype-shadow-distance" );
     f_shadow_distance = VLC_CLIP( f_shadow_distance, 0, 1 );
-    p_sys->f_shadow_vector_x = f_shadow_distance * cos(2 * M_PI * f_shadow_angle / 360);
-    p_sys->f_shadow_vector_y = f_shadow_distance * sin(2 * M_PI * f_shadow_angle / 360);
+    p_sys->f_shadow_vector_x = f_shadow_distance * cosf((float)(2. * M_PI) * f_shadow_angle / 360);
+    p_sys->f_shadow_vector_y = f_shadow_distance * sinf((float)(2. * M_PI) * f_shadow_angle / 360);
 
     /* Set default psz_fontname */
     if( !psz_fontname || !*psz_fontname )
