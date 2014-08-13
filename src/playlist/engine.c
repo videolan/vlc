@@ -303,8 +303,8 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
     char *mods = var_InheritString( p_playlist, "services-discovery" );
     if( mods != NULL )
     {
-        char *p = mods, *m;
-        while( (m = strsep( &p, " :," )) != NULL )
+        char *s = mods, *m;
+        while( (m = strsep( &s, " :," )) != NULL )
             playlist_ServicesDiscoveryAdd( p_playlist, m );
         free( mods );
     }
