@@ -945,6 +945,68 @@ static void ResourceManagerOpen( cam_t * p_cam, unsigned i_session_id )
  */
 
 #ifdef ENABLE_HTTPD
+
+/****************************************************************************
+ * HTTPExtractValue: Extract a GET variable from psz_request
+ ****************************************************************************/
+static const char *HTTPExtractValue( const char *psz_uri, const char *psz_name,
+                        char *psz_value, int i_value_max )
+{
+    const char *p = psz_uri;
+
+    while( (p = strstr( p, psz_name )) )
+    {
+        /* Verify that we are dealing with a post/get argument */
+        if( (p == psz_uri || *(p - 1) == '&' || *(p - 1) == '\n')
+              && p[strlen(psz_name)] == '=' )
+            break;
+        p++;
+    }
+
+    if( p )
+    {
+        int i_len;
+
+        p += strlen( psz_name );
+        if( *p == '=' ) p++;
+
+        if( strchr( p, '&' ) )
+        {
+            i_len = strchr( p, '&' ) - p;
+        }
+        else
+        {
+            /* for POST method */
+            if( strchr( p, '\n' ) )
+            {
+                i_len = strchr( p, '\n' ) - p;
+                if( i_len && *(p+i_len-1) == '\r' ) i_len--;
+            }
+            else
+            {
+                i_len = strlen( p );
+            }
+        }
+        i_len = __MIN( i_value_max - 1, i_len );
+        if( i_len > 0 )
+        {
+            strncpy( psz_value, p, i_len );
+            psz_value[i_len] = '\0';
+        }
+        else
+        {
+            strncpy( psz_value, "", i_value_max );
+        }
+        p += i_len;
+    }
+    else
+    {
+        strncpy( psz_value, "", i_value_max );
+    }
+
+    return p;
+}
+
 /*****************************************************************************
  * ApplicationInformationEnterMenu
  *****************************************************************************/
