@@ -616,13 +616,14 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
                 psz_current_uri = strdup( segment->psz_key_uri );
                 if( p_sys->b_generate_iv )
                 {
-                    unsigned long long iv_hi = 0, iv_lo = 0;
-                    for( unsigned short i = 0; i < 8; i++ )
+                    unsigned long long iv_hi = segment->aes_ivs[0];
+                    unsigned long long iv_lo = segment->aes_ivs[8];
+                    for( unsigned short i = 1; i < 8; i++ )
                     {
-                        iv_hi |= segment->aes_ivs[i] & 0xff;
                         iv_hi <<= 8;
-                        iv_lo |= segment->aes_ivs[8+i] & 0xff;
+                        iv_hi |= segment->aes_ivs[i] & 0xff;
                         iv_lo <<= 8;
+                        iv_lo |= segment->aes_ivs[8+i] & 0xff;
                     }
                     ret = fprintf( fp, "#EXT-X-KEY:METHOD=AES-128,URI=\"%s\",IV=0X%16.16llx%16.16llx\n",
                                    segment->psz_key_uri, iv_hi, iv_lo );
