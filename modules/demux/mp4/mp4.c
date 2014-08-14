@@ -4540,7 +4540,7 @@ static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
         }
         else if ( BOXDATA(p_tfhd)->i_flags & MP4_TFHD_DEFAULT_BASE_IS_MOOF )
         {
-            i_traf_base_data_offset = p_new->p_moox->i_pos + 8;
+            i_traf_base_data_offset = p_new->p_moox->i_pos /* + 8*/;
         }
         else
         {
