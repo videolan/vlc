@@ -122,7 +122,7 @@ typedef struct avi_chunk_strf_auds_s
     WAVEFORMATEX    *p_wf;
 } avi_chunk_strf_auds_t;
 
-typedef struct ATTR_PACKED avi_chunk_strf_vids_s
+typedef struct avi_chunk_strf_vids_s
 {
     AVI_CHUNK_COMMON
     int                     i_cat;
