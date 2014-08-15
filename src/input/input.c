@@ -92,7 +92,7 @@ static void SlaveDemux( input_thread_t *p_input, bool *pb_demux_polled );
 static void SlaveSeek( input_thread_t *p_input );
 
 static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta );
-static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta );
+static void InputUpdateMeta( input_thread_t *p_input, demux_t *p_demux );
 static void InputGetExtraFiles( input_thread_t *p_input,
                                 int *pi_list, char ***pppsz_list,
                                 const char *psz_access, const char *psz_path );
@@ -1954,7 +1954,6 @@ static bool Control( input_thread_t *p_input,
 
                 if( slave && !InputSourceInit( p_input, slave, uri, NULL, false ) )
                 {
-                    vlc_meta_t *p_meta;
                     int64_t i_time;
 
                     /* Add the slave */
@@ -1979,12 +1978,7 @@ static bool Control( input_thread_t *p_input,
                     }
 
                     /* Get meta (access and demux) */
-                    p_meta = vlc_meta_New();
-                    if( p_meta )
-                    {
-                        demux_Control( slave->p_demux, DEMUX_GET_META, p_meta );
-                        InputUpdateMeta( p_input, p_meta );
-                    }
+                    InputUpdateMeta( p_input, slave->p_demux );
 
                     TAB_APPEND( p_input->p->i_slave, p_input->p->slave, slave );
                 }
@@ -2140,12 +2134,7 @@ static void UpdateGenericFromDemux( input_thread_t *p_input )
 
     if( p_demux->info.i_update & INPUT_UPDATE_META )
     {
-        vlc_meta_t *p_meta = vlc_meta_New();
-        if( p_meta )
-        {
-            demux_Control( p_input->p->input.p_demux, DEMUX_GET_META, p_meta );
-            InputUpdateMeta( p_input, p_meta );
-        }
+        InputUpdateMeta( p_input, p_demux );
         p_demux->info.i_update &= ~INPUT_UPDATE_META;
     }
     {
@@ -2716,15 +2705,21 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
  * InputUpdateMeta: merge p_item meta data with p_meta taking care of
  * arturl and locking issue.
  *****************************************************************************/
-static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
+static void InputUpdateMeta( input_thread_t *p_input, demux_t *p_demux )
 {
+    vlc_meta_t *p_meta = vlc_meta_New();
+    if( unlikely(p_meta == NULL) )
+        return;
+
+    demux_Control( p_demux, DEMUX_GET_META, p_meta );
+
     /* If metadata changed, then the attachments might have changed.
        We need to update them in case they contain album art. */
-    input_source_t *in = &p_input->p->input;
-    int i_attachment;
     input_attachment_t **attachment;
-    if( !demux_Control( in->p_demux, DEMUX_GET_ATTACHMENTS,
-                         &attachment, &i_attachment ) )
+    int i_attachment;
+
+    if( !demux_Control( p_demux, DEMUX_GET_ATTACHMENTS,
+                        &attachment, &i_attachment ) )
     {
         vlc_mutex_lock( &p_input->p->p_item->lock );
         if( p_input->p->i_attachment > 0 )
@@ -2737,6 +2732,7 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
                           i_attachment, attachment );
         vlc_mutex_unlock( &p_input->p->p_item->lock );
     }
+
     es_out_ControlSetMeta( p_input->p->p_es_out, p_meta );
     vlc_meta_Delete( p_meta );
 }
