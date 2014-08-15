@@ -1723,7 +1723,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
             /* Append a \0 */
             p_block = block_Realloc( p_block, 0, p_block->i_buffer + 1 );
             if( !p_block )
-                abort();
+                return;
             p_block->p_buffer[p_block->i_buffer -1] = '\0';
         }
         else if( pid->es->fmt.i_codec == VLC_CODEC_TELETEXT )
