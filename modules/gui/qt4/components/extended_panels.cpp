@@ -698,6 +698,21 @@ void ExtVideo::updateFilterOptions()
     setFilterOption( p_intf, qtu( module ), qtu( option ), i_int, f_float, val);
 }
 
+void ExtVideo::setPostprocessing( struct intf_thread_t *p_intf, int q)
+{
+    const char *psz_name = "postproc";
+
+    if( q == -1 )
+    {
+        ChangeVFiltersString( p_intf, psz_name, false );
+    }
+    else
+    {
+        ChangeVFiltersString( p_intf, psz_name, false );
+        setFilterOption( p_intf, "postproc", "postproc-q", q, -1, QString() );
+    }
+}
+
 /**********************************************************************
  * v4l2 controls
  **********************************************************************/
