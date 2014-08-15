@@ -153,7 +153,8 @@ libdvbsub_plugin_la_SOURCES = codec/dvbsub.c
 codec_LTLIBRARIES += libdvbsub_plugin.la
 
 libaribsub_plugin_la_SOURCES = codec/arib/aribsub.c codec/arib/substext.h
-libaribsub_plugin_la_CFLAGS = $(ARIBB24_CFLAGS)
+libaribsub_plugin_la_CFLAGS = $(AM_CFLAGS) $(ARIBB24_CFLAGS)
+libaribsub_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libaribsub_plugin_la_LIBADD = $(ARIBB24_LIBS)
 EXTRA_LTLIBRARIES += libaribsub_plugin.la
 codec_LTLIBRARIES += $(LTLIBaribsub)
