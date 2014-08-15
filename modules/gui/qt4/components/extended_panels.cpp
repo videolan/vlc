@@ -583,30 +583,82 @@ void ExtVideo::setWidgetValue( QObject *widget )
                      i_type );
 }
 
+void ExtVideo::setFilterOption( struct intf_thread_t *p_intf, const char *psz_module, const char *psz_option,
+        int i_int, double f_float, QString val )
+{
+    vlc_object_t *p_obj = ( vlc_object_t * )vlc_object_find_name( p_intf->p_libvlc, psz_module );
+    int i_type;
+    bool b_is_command;
+
+    if( !p_obj )
+    {
+        msg_Warn( p_intf, "Module %s not found. You'll need to restart the filter to take the change into account.", psz_module );
+        i_type = config_GetType( p_intf, psz_option );
+        b_is_command = false;
+    }
+    else
+    {
+        i_type = var_Type( p_obj, psz_option );
+        if( i_type == 0 )
+            i_type = config_GetType( p_intf, psz_option );
+        b_is_command = ( i_type & VLC_VAR_ISCOMMAND );
+    }
+
+    i_type &= VLC_VAR_CLASS;
+    if( i_type == VLC_VAR_INTEGER || i_type == VLC_VAR_BOOL )
+    {
+        if( i_int == -1 )
+            msg_Warn( p_intf, "Could not find the correct Integer widget" );
+        config_PutInt( p_intf, psz_option, i_int );
+        if( b_is_command )
+        {
+            if( i_type == VLC_VAR_INTEGER )
+                var_SetInteger( p_obj, psz_option, i_int );
+            else
+                var_SetBool( p_obj, psz_option, i_int );
+        }
+    }
+    else if( i_type == VLC_VAR_FLOAT )
+    {
+        if( f_float == -1 )
+            msg_Warn( p_intf, "Could not find the correct Float widget" );
+        config_PutFloat( p_intf, psz_option, f_float );
+        if( b_is_command )
+            var_SetFloat( p_obj, psz_option, f_float );
+    }
+    else if( i_type == VLC_VAR_STRING )
+    {
+        if( val.isNull() )
+            msg_Warn( p_intf, "Could not find the correct String widget" );
+        config_PutPsz( p_intf, psz_option, qtu( val ) );
+        if( b_is_command )
+            var_SetString( p_obj, psz_option, qtu( val ) );
+    }
+    else
+        msg_Err( p_intf,
+                 "Module %s's %s variable is of an unsupported type ( %d )",
+                 psz_module,
+                 psz_option,
+                 i_type );
+
+    if( !b_is_command )
+    {
+        msg_Warn( p_intf, "Module %s's %s variable isn't a command. Brute-restarting the filter.",
+                 psz_module,
+                 psz_option );
+        ChangeVFiltersString( p_intf, psz_module, false );
+        ChangeVFiltersString( p_intf, psz_module, true );
+    }
+
+    if( p_obj ) vlc_object_release( p_obj );
+}
+
 void ExtVideo::updateFilterOptions()
 {
     QString module = ModuleFromWidgetName( sender()->parent() );
     //msg_Dbg( p_intf, "Module name: %s", qtu( module ) );
     QString option = OptionFromWidgetName( sender() );
     //msg_Dbg( p_intf, "Option name: %s", qtu( option ) );
-
-    vlc_object_t *p_obj = ( vlc_object_t * )
-        vlc_object_find_name( p_intf->p_libvlc, qtu( module ) );
-    int i_type;
-    bool b_is_command;
-    if( !p_obj )
-    {
-        msg_Warn( p_intf, "Module %s not found. You'll need to restart the filter to take the change into account.", qtu( module ) );
-        i_type = config_GetType( p_intf, qtu( option ) );
-        b_is_command = false;
-    }
-    else
-    {
-        i_type = var_Type( p_obj, qtu( option ) );
-        if( i_type == 0 )
-            i_type = config_GetType( p_intf, qtu( option ) );
-        b_is_command = ( i_type & VLC_VAR_ISCOMMAND );
-    }
 
     /* Try to cast to all the widgets we're likely to encounter. Only
      * one of the casts is expected to work. */
@@ -618,69 +670,32 @@ void ExtVideo::updateFilterOptions()
     QLineEdit      *lineedit      = qobject_cast<QLineEdit*>     ( sender() );
     QComboBox      *combobox      = qobject_cast<QComboBox*>     ( sender() );
 
-    i_type &= VLC_VAR_CLASS;
-    if( i_type == VLC_VAR_INTEGER || i_type == VLC_VAR_BOOL )
-    {
-        int i_int = 0;
-        if( slider )        i_int = slider->value();
-        else if( checkbox ) i_int = checkbox->checkState() == Qt::Checked;
-        else if( spinbox )  i_int = spinbox->value();
-        else if( dial )     i_int = ( 540-dial->value() )%360;
-        else if( lineedit ) i_int = lineedit->text().toInt( NULL,16 );
-        else if( combobox ) i_int = combobox->itemData( combobox->currentIndex() ).toInt();
-        else msg_Warn( p_intf, "Could not find the correct Integer widget" );
-        config_PutInt( p_intf, qtu( option ), i_int );
-        if( b_is_command )
-        {
-            if( i_type == VLC_VAR_INTEGER )
-                var_SetInteger( p_obj, qtu( option ), i_int );
-            else
-                var_SetBool( p_obj, qtu( option ), i_int );
-        }
-    }
-    else if( i_type == VLC_VAR_FLOAT )
-    {
-        double f_float = 0;
-        if( slider )             f_float = ( double )slider->value()
-                                         / ( double )slider->tickInterval(); /* hack alert! */
-        else if( doublespinbox ) f_float = doublespinbox->value();
-        else if( dial ) f_float = (540 - dial->value()) % 360;
-        else if( lineedit ) f_float = lineedit->text().toDouble();
-        else msg_Warn( p_intf, "Could not find the correct Float widget" );
-        config_PutFloat( p_intf, qtu( option ), f_float );
-        if( b_is_command )
-            var_SetFloat( p_obj, qtu( option ), f_float );
-    }
-    else if( i_type == VLC_VAR_STRING )
-    {
-        QString val;
-        if( lineedit )
-            val = lineedit->text();
-        else if( combobox )
-            val = combobox->itemData( combobox->currentIndex() ).toString();
-        else
-            msg_Warn( p_intf, "Could not find the correct String widget" );
-        config_PutPsz( p_intf, qtu( option ), qtu( val ) );
-        if( b_is_command )
-            var_SetString( p_obj, qtu( option ), qtu( val ) );
-    }
-    else
-        msg_Err( p_intf,
-                 "Module %s's %s variable is of an unsupported type ( %d )",
-                 qtu( module ),
-                 qtu( option ),
-                 i_type );
+    int i_int = -1;
+    double f_float = -1.;
+    QString val;
 
-    if( !b_is_command )
-    {
-        msg_Warn( p_intf, "Module %s's %s variable isn't a command. Brute-restarting the filter.",
-                 qtu( module ),
-                 qtu( option ) );
-        ChangeVFiltersString( p_intf, qtu( module ), false );
-        ChangeVFiltersString( p_intf, qtu( module ), true );
+    if( slider ) {
+        i_int = slider->value();
+        f_float = ( double )slider->value() / ( double )slider->tickInterval(); /* hack alert! */
+    }
+    else if( checkbox ) i_int = checkbox->checkState() == Qt::Checked;
+    else if( spinbox ) i_int = spinbox->value();
+    else if( doublespinbox ) f_float = doublespinbox->value();
+    else if( dial ) {
+        i_int = (540 - dial->value()) % 360;
+        f_float = (540 - dial->value()) / 360.;
+    }
+    else if( lineedit ) {
+        i_int = lineedit->text().toInt( NULL,16 );
+        f_float = lineedit->text().toDouble();
+        val = lineedit->text();
+    }
+    else if( combobox ) {
+        i_int = combobox->itemData( combobox->currentIndex() ).toInt();
+        val = combobox->itemData( combobox->currentIndex() ).toString();
     }
 
-    if( p_obj ) vlc_object_release( p_obj );
+    setFilterOption( p_intf, qtu( module ), qtu( option ), i_int, f_float, val);
 }
 
 /**********************************************************************
