@@ -1,6 +1,6 @@
 # aribb24
 
-ARIBB24_VERSION := 1.0.1
+ARIBB24_VERSION := 1.0.2
 ARIBB24_URL := https://github.com/nkoriyama/aribb24/releases/download/v$(ARIBB24_VERSION)/aribb24-$(ARIBB24_VERSION).tar.bz2
 
 PKGS += aribb24
