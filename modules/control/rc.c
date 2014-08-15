@@ -1798,8 +1798,8 @@ static bool ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
     DWORD i_dw;
 
     /* On Win32, select() only works on socket descriptors */
-    while( WaitForSingleObject( p_intf->p_sys->hConsoleIn,
-                                INTF_IDLE_SLEEP/1000 ) == WAIT_OBJECT_0 )
+    while( WaitForSingleObjectEx( p_intf->p_sys->hConsoleIn,
+                                INTF_IDLE_SLEEP/1000, TRUE ) == WAIT_OBJECT_0 )
     {
         while( *pi_size < MAX_LINE_LENGTH &&
                ReadConsoleInput( p_intf->p_sys->hConsoleIn, &input_record,
@@ -1852,6 +1852,8 @@ static bool ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
             return true;
         }
     }
+
+    vlc_testcancel ();
 
     return false;
 }
