@@ -1347,16 +1347,14 @@ static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
 {
     es_out_sys_t    *p_sys = p_out->p_sys;
     input_thread_t  *p_input = p_sys->p_input;
-
     input_item_t *p_item = input_GetItem( p_input );
 
-    char *psz_title = NULL;
+    if( vlc_meta_Get( p_meta, vlc_meta_Title ) != NULL )
+        input_item_SetName( p_item, vlc_meta_Get( p_meta, vlc_meta_Title ) );
+
     char *psz_arturl = input_item_GetArtURL( p_item );
 
     vlc_mutex_lock( &p_item->lock );
-
-    if( vlc_meta_Get( p_meta, vlc_meta_Title ) )
-        psz_title = strdup( vlc_meta_Get( p_meta, vlc_meta_Title ) );
 
     vlc_meta_Merge( p_item->p_meta, p_meta );
 
@@ -1384,11 +1382,6 @@ static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
     }
     free( psz_arturl );
 
-    if( psz_title )
-    {
-        input_item_SetName( p_item, psz_title );
-        free( psz_title );
-    }
     input_item_SetPreparsed( p_item, true );
 
     input_SendEventMeta( p_input );
