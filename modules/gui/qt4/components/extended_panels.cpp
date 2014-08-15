@@ -698,6 +698,18 @@ void ExtVideo::updateFilterOptions()
     setFilterOption( p_intf, qtu( module ), qtu( option ), i_int, f_float, val);
 }
 
+int ExtVideo::getPostprocessing( struct intf_thread_t *p_intf)
+{
+    char *psz_config = config_GetPsz(p_intf, "video-filter");
+    int i_q = -1;
+    if (psz_config) {
+        if (strstr(psz_config, "postproc"))
+            i_q = config_GetInt(p_intf, "postproc-q");
+        free(psz_config);
+    }
+    return i_q;
+}
+
 void ExtVideo::setPostprocessing( struct intf_thread_t *p_intf, int q)
 {
     const char *psz_name = "postproc";
