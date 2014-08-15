@@ -32,6 +32,8 @@
 #include "util/singleton.hpp"
 
 #include <QObject>
+class QAction;
+
 typedef enum actionType_e
 {
     PLAY_ACTION,
@@ -81,6 +83,7 @@ public slots:
     void record();
     void skipForward();
     void skipBackward();
+    void PPaction( QAction * );
 
 protected slots:
     void fullscreen();
