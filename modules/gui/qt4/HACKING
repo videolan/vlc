@@ -43,6 +43,14 @@ So if your dialog is a dialog you are used to keep during a playing of a video, 
 QVLCFrame: extended panel, messages...
 QVLCDialog: preferences, open...
 
+** virtual vs Q_DECL_OVERRIDE **
+Only mark functions with the virtual keyword if this is the initial virtual
+declaration. Functions that override a virtual function should have the
+Q_DECL_OVERRIDE macro appended (which expands to the override identifier
+when compiled with Qt5 and C++11). This is a visual indicator to distinguish
+virtual declarations from overriding implementations and will include a
+compile-time check in C++11 language mode.
+
 ** HIG for Qt **
 We tend to use GNOME/KDE specs over Vista ones for capitalizations:
 We use Header for:
