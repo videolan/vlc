@@ -99,6 +99,8 @@ public:
     };
     Q_DECLARE_FLAGS(actionflags, actionflag)
 
+    static QMenu *ppMenu;
+
 private:
     /* All main Menus */
     static QMenu *FileMenu( intf_thread_t *, QWidget *, MainInterface * mi = NULL );
@@ -133,6 +135,7 @@ private:
     }
 
     static QMenu *HelpMenu( QWidget * );
+    static QMenu *PPMenu( intf_thread_t *p_intf );
 
     /* Popups Menus */
     static void PopupMenuStaticEntries( QMenu *menu );
