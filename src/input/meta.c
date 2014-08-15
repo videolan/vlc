@@ -204,26 +204,17 @@ void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
 }
 
 
-void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
+void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input,
+                                         const char *name )
 {
     input_item_t *p_item = p_input->p->p_item;
 
-    /* */
-    char *psz_arturl = input_item_GetArtURL( p_item );
-    if( !psz_arturl || strncmp( psz_arturl, "attachment://", strlen("attachment://") ) )
-    {
-        msg_Err( p_input, "internal input error with input_ExtractAttachmentAndCacheArt" );
-        free( psz_arturl );
-        return;
-    }
-
     if( input_item_IsArtFetched( p_item ) )
-    {
-        /* XXX Weird, we should not have end up with attachment:// art url unless there is a race
-         * condition */
-        msg_Warn( p_input, "internal input error with input_ExtractAttachmentAndCacheArt" );
+    {   /* XXX Weird, we should not end up with attachment:// art URL
+         * unless there is a race condition */
+        msg_Warn( p_input, "art already fetched" );
         playlist_FindArtInCache( p_item );
-        goto exit;
+        return;
     }
 
     /* */
@@ -232,38 +223,33 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
     vlc_mutex_lock( &p_item->lock );
     for( int i_idx = 0; i_idx < p_input->p->i_attachment; i_idx++ )
     {
-        if( !strcmp( p_input->p->attachment[i_idx]->psz_name,
-                     &psz_arturl[strlen("attachment://")] ) )
+        input_attachment_t *a = p_input->p->attachment[i_idx];
+
+        if( !strcmp( a->psz_name, name ) )
         {
-            p_attachment = vlc_input_attachment_Duplicate( p_input->p->attachment[i_idx] );
+            p_attachment = vlc_input_attachment_Duplicate( a );
             break;
         }
     }
     vlc_mutex_unlock( &p_item->lock );
 
-    if( !p_attachment || p_attachment->i_data <= 0 )
+    if( p_attachment == NULL )
     {
-        if( p_attachment )
-            vlc_input_attachment_Delete( p_attachment );
-        msg_Warn( p_input, "internal input error with input_ExtractAttachmentAndCacheArt" );
-        goto exit;
+        msg_Warn( p_input, "art attachment %s not found", name );
+        return;
     }
 
     /* */
     const char *psz_type = NULL;
+
     if( !strcmp( p_attachment->psz_mime, "image/jpeg" ) )
         psz_type = ".jpg";
     else if( !strcmp( p_attachment->psz_mime, "image/png" ) )
         psz_type = ".png";
 
-    /* */
     playlist_SaveArt( VLC_OBJECT(p_input), p_item,
                       p_attachment->p_data, p_attachment->i_data, psz_type );
-
     vlc_input_attachment_Delete( p_attachment );
-
-exit:
-    free( psz_arturl );
 }
 
 int input_item_WriteMeta( vlc_object_t *obj, input_item_t *p_item )

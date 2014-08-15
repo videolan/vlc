@@ -1371,7 +1371,7 @@ static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
         if( p_input->p->p_sout && !p_input->b_preparsing )
             input_item_SetArtURL( p_item, NULL );
         else
-            input_ExtractAttachmentAndCacheArt( p_input );
+            input_ExtractAttachmentAndCacheArt( p_input, psz_arturl + 13 );
     }
     free( psz_arturl );
 
