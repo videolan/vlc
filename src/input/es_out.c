@@ -1355,7 +1355,7 @@ static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
 
     vlc_mutex_lock( &p_item->lock );
 
-    if( vlc_meta_Get( p_meta, vlc_meta_Title ) && !p_item->b_fixed_name )
+    if( vlc_meta_Get( p_meta, vlc_meta_Title ) )
         psz_title = strdup( vlc_meta_Get( p_meta, vlc_meta_Title ) );
 
     vlc_meta_Merge( p_item->p_meta, p_meta );

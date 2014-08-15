@@ -867,7 +867,6 @@ input_item_NewWithType( const char *psz_uri, const char *psz_name,
 
     if( type != ITEM_TYPE_UNKNOWN )
         p_input->i_type = type;
-    p_input->b_fixed_name = false;
     p_input->b_error_when_reading = false;
     return p_input;
 }
