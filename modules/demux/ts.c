@@ -74,6 +74,11 @@ VLC_FORMAT(1, 2) static void ts_debug(const char *format, ...)
 #endif
 }
 
+#ifdef HAVE_ARIBB24
+ #include <aribb24/aribb24.h>
+ #include <aribb24/decoder.h>
+#endif
+
 typedef enum arib_modes_e
 {
     ARIBMODE_AUTO = -1,
@@ -320,6 +325,9 @@ struct demux_sys_t
     struct
     {
         arib_modes_e e_mode;
+#ifdef HAVE_ARIBB24
+        arib_instance_t *p_instance;
+#endif
     } arib;
 
     /* All pid */
@@ -893,6 +901,11 @@ static void Close( vlc_object_t *p_this )
 
     free( p_sys->p_pcrs );
     free( p_sys->p_pos );
+
+#ifdef HAVE_ARIBB24
+    if ( p_sys->arib.p_instance )
+        arib_instance_destroy( p_sys->arib.p_instance );
+#endif
 
     vlc_mutex_destroy( &p_sys->csa_lock );
     free( p_sys );
@@ -2801,7 +2814,35 @@ static char *EITConvertToUTF8( demux_t *p_demux,
                                bool b_broken )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+#ifdef HAVE_ARIBB24
+    if( p_sys->arib.e_mode == ARIBMODE_ENABLED )
+    {
+        if ( !p_sys->arib.p_instance )
+            p_sys->arib.p_instance = arib_instance_new( p_demux );
+        if ( !p_sys->arib.p_instance )
+            return NULL;
+        arib_decoder_t *p_decoder = arib_get_decoder( p_sys->arib.p_instance );
+        if ( !p_decoder )
+            return NULL;
+
+        char *psz_outstring = NULL;
+        size_t i_out;
+
+        i_out = i_length * 4;
+        psz_outstring = (char*) calloc( i_out + 1, sizeof(char) );
+        if( !psz_outstring )
+            return NULL;
+
+        arib_initialize_decoder( p_decoder );
+        i_out = arib_decode_buffer( p_decoder, psz_instring, i_length,
+                                    psz_outstring, i_out );
+        arib_finalize_decoder( p_decoder );
+
+        return psz_outstring;
+    }
+#else
     VLC_UNUSED(p_sys);
+#endif
     /* Deal with no longer broken providers (no switch byte
       but sending ISO_8859-1 instead of ISO_6937) without
       removing them from the broken providers table
@@ -3059,9 +3100,31 @@ static void EITCallBack( demux_t *p_demux,
         int64_t i_start;
         int i_duration;
         int i_min_age = 0;
+        int64_t i_tot_time = 0;
 
         i_start = EITConvertStartTime( p_evt->i_start_time );
         i_duration = EITConvertDuration( p_evt->i_duration );
+
+        if( p_sys->arib.e_mode == ARIBMODE_ENABLED )
+        {
+            if( p_sys->i_tdt_delta == 0 )
+                p_sys->i_tdt_delta = CLOCK_FREQ * (i_start + i_duration - 5) - mdate();
+
+            //i_start -= 9 * 60 * 60; // JST -> UTC
+            time_t timer = time( NULL );
+            int64_t diff = difftime( mktime( localtime( &timer ) ),
+                                     mktime( gmtime( &timer ) ) );
+            i_start -= diff;
+            i_tot_time = (mdate() + p_sys->i_tdt_delta) / CLOCK_FREQ - diff;
+
+            if( p_evt->i_running_status == 0x00 &&
+                (i_start - 5 < i_tot_time &&
+                 i_tot_time < i_start + i_duration + 5) )
+            {
+                p_evt->i_running_status = 0x04;
+                msg_Dbg( p_demux, "  EIT running status 0x00 -> 0x04" );
+            }
+        }
 
         msg_Dbg( p_demux, "  * event id=%d start_time:%d duration=%d "
                           "running=%d free_ca=%d",
@@ -3175,12 +3238,12 @@ static void EITCallBack( demux_t *p_demux,
         }
 
         /* */
-        if( i_start > 0 )
+        if( i_start > 0 && psz_name && psz_text)
             vlc_epg_AddEvent( p_epg, i_start, i_duration, psz_name, psz_text,
                               *psz_extra ? psz_extra : NULL, i_min_age );
 
         /* Update "now playing" field */
-        if( p_evt->i_running_status == 0x04 && i_start > 0 )
+        if( p_evt->i_running_status == 0x04 && i_start > 0  && psz_name && psz_text )
             vlc_epg_SetCurrent( p_epg, i_start );
 
         free( psz_name );
@@ -3273,7 +3336,7 @@ static void PSINewTableCallBack( demux_t *p_demux, dvbpsi_handle h,
 #endif
     }
     else if( p_demux->p_sys->pid[0x11].psi->i_sdt_version != -1 &&
-              i_table_id == 0x70 )  /* TDT */
+            (i_table_id == 0x70 /* TDT */ || i_table_id == 0x73 /* TOT */) )
     {
          msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
                  i_table_id, i_table_id, i_extension, i_extension );
