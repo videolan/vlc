@@ -223,6 +223,8 @@ signals:
     void titleChanged( bool );
     void chapterChanged( bool );
     void inputCanSeek( bool );
+    /// You can continuePlayback
+    void continuePlayback( int64_t );
     /// Statistics are updated
     void statisticsUpdated( input_item_t* );
     void infoChanged( input_item_t* );

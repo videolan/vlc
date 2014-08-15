@@ -111,6 +111,7 @@ private:
     void createMainWidget( QSettings* );
     void createStatusBar();
     void createPlaylist();
+    void createContinueDialog( QWidget *w );
 
     /* Systray */
     void createSystray();
@@ -145,6 +146,10 @@ private:
     BackgroundWidget    *bgWidget;
     PlaylistWidget      *playlistWidget;
     //VisualSelector      *visualSelector;
+
+    /* continue */
+    QWidget             *continueDialog;
+    int64_t             i_continueTime;
 
     /* Status Bar */
     QLabel              *nameLabel;
@@ -251,6 +256,9 @@ private slots:
     void setVideoOnTop( bool );
     void setBoss();
     void setRaise();
+
+    void showContinueDialog( int64_t);
+    void continuePlayback();
 
 signals:
     void askGetVideo( WId *p_id, int *pi_x, int *pi_y,

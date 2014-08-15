@@ -60,6 +60,8 @@
 #include <QStackedWidget>
 #include <QFileInfo>
 
+#include <QTimer>
+
 #include <vlc_keys.h>                       /* Wheel event */
 #include <vlc_vout_display.h>               /* vout_thread_t and VOUT_ events */
 
@@ -364,6 +366,56 @@ void MainInterface::reloadPrefs()
     }
 }
 
+void MainInterface::createContinueDialog( QWidget *w )
+{
+    /* Create non-modal continueDialog */
+    continueDialog = new QWidget( w );
+    continueDialog->hide();
+    QHBoxLayout *continueDialogLayout = new QHBoxLayout( continueDialog );
+    continueDialogLayout->setSpacing( 0 ); continueDialogLayout->setMargin( 0 );
+
+    QLabel *continueLabel = new QLabel( qtr( "Do you want to restart the playback where left off?") );
+    QToolButton *cancel = new QToolButton( continueDialog );
+    cancel->setAutoRaise( true );
+    cancel->setText( "X" );
+    QPushButton *ok = new QPushButton( qtr("&Continue")  );
+
+    continueDialogLayout->addWidget(continueLabel);
+    continueDialogLayout->addStretch( 1 );
+    continueDialogLayout->addWidget( ok );
+    continueDialogLayout->addWidget( cancel );
+
+    CONNECT( cancel, clicked(), continueDialog, hide() );
+    BUTTONACT(ok, continuePlayback() );
+
+    CONNECT( THEMIM->getIM(), continuePlayback(int64_t), this, showContinueDialog(int64_t) );
+
+    w->layout()->addWidget( continueDialog );
+}
+
+void MainInterface::showContinueDialog( int64_t _time ) {
+    int setting = var_InheritInteger( p_intf, "qt-continue" );
+
+    if( setting == 0 )
+        return;
+
+    i_continueTime = _time;
+
+    if( setting == 2)
+        continuePlayback();
+    else
+    {
+        continueDialog->setVisible(true);
+        QTimer::singleShot(6000, continueDialog, SLOT(hide()));
+    }
+}
+
+void MainInterface::continuePlayback()
+{
+    var_SetTime( THEMIM->getInput(), "time", i_continueTime );
+    continueDialog->hide();
+}
+
 void MainInterface::createMainWidget( QSettings *creationSettings )
 {
     /* Create the main Widget and the mainLayout */
@@ -373,6 +425,7 @@ void MainInterface::createMainWidget( QSettings *creationSettings )
     main->setContentsMargins( 0, 0, 0, 0 );
     mainLayout->setSpacing( 0 ); mainLayout->setMargin( 0 );
 
+    createContinueDialog( main );
     /* */
     stackCentralW = new QVLCStackedWidget( main );
 
