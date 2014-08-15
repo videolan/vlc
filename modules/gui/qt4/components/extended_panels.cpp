@@ -354,39 +354,34 @@ static void ChangeAFiltersString( struct intf_thread_t *p_intf, const char *psz_
     free( psz_string );
 }
 
-static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add )
+static const char* GetVFilterType( struct intf_thread_t *p_intf, const char *psz_name )
 {
-    char *psz_string;
-    const char *psz_filter_type;
-
     module_t *p_obj = module_find( psz_name );
     if( !p_obj )
     {
         msg_Err( p_intf, "Unable to find filter module \"%s\".", psz_name );
-        return;
+        return NULL;
     }
 
     if( module_provides( p_obj, "video splitter" ) )
-    {
-        psz_filter_type = "video-splitter";
-    }
+        return "video-splitter";
     else if( module_provides( p_obj, "video filter2" ) )
-    {
-        psz_filter_type = "video-filter";
-    }
+        return "video-filter";
     else if( module_provides( p_obj, "sub source" ) )
-    {
-        psz_filter_type = "sub-source";
-    }
+        return "sub-source";
     else if( module_provides( p_obj, "sub filter" ) )
-    {
-        psz_filter_type = "sub-filter";
-    }
+        return "sub-filter";
     else
     {
         msg_Err( p_intf, "Unknown video filter type." );
-        return;
+        return NULL;
     }
+}
+
+static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_name, bool b_add )
+{
+    char *psz_string;
+    const char *psz_filter_type = GetVFilterType( p_intf, psz_name );
 
     psz_string = ChangeFiltersString( p_intf, psz_filter_type, psz_name, b_add );
     if( !psz_string )
