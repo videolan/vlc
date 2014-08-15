@@ -1352,33 +1352,26 @@ static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
     if( vlc_meta_Get( p_meta, vlc_meta_Title ) != NULL )
         input_item_SetName( p_item, vlc_meta_Get( p_meta, vlc_meta_Title ) );
 
-    char *psz_arturl = input_item_GetArtURL( p_item );
+    char *psz_arturl = NULL;
+    if( vlc_meta_Get( p_item->p_meta, vlc_meta_ArtworkURL ) != NULL )
+        psz_arturl = input_item_GetArtURL( p_item ); /* save value */
 
     vlc_mutex_lock( &p_item->lock );
-
     vlc_meta_Merge( p_item->p_meta, p_meta );
-
-    if( !psz_arturl || *psz_arturl == '\0' )
-    {
-        const char *psz_tmp = vlc_meta_Get( p_item->p_meta, vlc_meta_ArtworkURL );
-        if( psz_tmp )
-            psz_arturl = strdup( psz_tmp );
-    }
     vlc_mutex_unlock( &p_item->lock );
 
-    if( psz_arturl && *psz_arturl )
-    {
+    if( psz_arturl != NULL ) /* restore/favor previously set item art URL */
         input_item_SetArtURL( p_item, psz_arturl );
+    else
+        psz_arturl = input_item_GetArtURL( p_item );
 
-        if( !strncmp( psz_arturl, "attachment://", 13 ) )
-        {
-            /* Don't look for art cover if sout
-             * XXX It can change when sout has meta data support */
-            if( p_input->p->p_sout && !p_input->b_preparsing )
-                input_item_SetArtURL( p_item, "" );
-            else
-                input_ExtractAttachmentAndCacheArt( p_input );
-        }
+    if( psz_arturl != NULL && !strncmp( psz_arturl, "attachment://", 13 ) )
+    {   /* Clear art cover if streaming out.
+         * FIXME: Why? Remove this when sout gets meta data support. */
+        if( p_input->p->p_sout && !p_input->b_preparsing )
+            input_item_SetArtURL( p_item, NULL );
+        else
+            input_ExtractAttachmentAndCacheArt( p_input );
     }
     free( psz_arturl );
 
