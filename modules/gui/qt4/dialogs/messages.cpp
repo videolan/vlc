@@ -24,8 +24,6 @@
 # include "config.h"
 #endif
 
-#include "dialogs/messages.hpp"
-
 #include <QPlainTextEdit>
 #include <QTextCursor>
 #include <QTextBlock>
@@ -42,6 +40,11 @@
 #include <QMutexLocker>
 
 #include <assert.h>
+
+#include <vlc_common.h>
+#include <vlc_input_item.h>
+
+#include "dialogs/messages.hpp"
 
 enum {
     MsgEvent_Type = QEvent::User + MsgEventTypeOffset + 1,

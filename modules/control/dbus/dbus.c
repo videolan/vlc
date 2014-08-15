@@ -57,6 +57,7 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
+#include <vlc_input.h>
 #include <vlc_meta.h>
 #include <vlc_mtime.h>
 #include <vlc_fs.h>

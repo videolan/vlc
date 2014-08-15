@@ -30,15 +30,15 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_plugin.h>
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <signal.h>
 #include <assert.h>
 #include <math.h>
 
+#include <vlc_common.h>
+#include <vlc_plugin.h>
 #include <vlc_interface.h>
+#include <vlc_input.h>
 #include <vlc_aout.h>
 #include <vlc_vout.h>
 #include <vlc_playlist.h>
@@ -47,9 +47,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+
 #include <vlc_network.h>
 #include <vlc_url.h>
-
 #include <vlc_charset.h>
 
 #if defined(PF_UNIX) && !defined(PF_LOCAL)

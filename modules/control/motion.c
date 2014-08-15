@@ -37,6 +37,7 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
+#include <vlc_input.h>
 #include <vlc_vout.h>
 
 #include "motionlib.h"

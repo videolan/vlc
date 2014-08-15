@@ -49,6 +49,8 @@
     #include <vlc_charset.h>
 #endif
 
+#include <vlc_input_item.h>
+
 RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
 {
     recents = QStringList();

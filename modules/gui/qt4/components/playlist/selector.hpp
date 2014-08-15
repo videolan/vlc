@@ -109,6 +109,8 @@ private:
     QHBoxLayout*         layout;
 };
 
+#include <vlc_input_item.h>
+
 Q_DECLARE_METATYPE( playlist_item_t *);
 Q_DECLARE_METATYPE( input_item_t *);
 class PLSelector: public QTreeWidget

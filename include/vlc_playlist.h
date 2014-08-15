@@ -28,7 +28,6 @@
 extern "C" {
 # endif
 
-#include <vlc_input.h>
 #include <vlc_events.h>
 
 TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t)

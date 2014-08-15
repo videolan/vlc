@@ -30,6 +30,7 @@
 
 #include "qt4.hpp"
 #include "playlist_item.hpp"
+#include <vlc_input_item.h>
 
 /*************************************************************************
  * Playlist item implementation
