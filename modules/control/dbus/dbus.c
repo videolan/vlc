@@ -193,6 +193,8 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_this, "Failed to connect to the D-Bus session daemon: %s",
                 error.message );
         dbus_error_free( &error );
+        close( p_sys->p_pipe_fds[1] );
+        close( p_sys->p_pipe_fds[0] );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -289,6 +291,8 @@ error:
 
     vlc_mutex_destroy( &p_sys->lock );
 
+    close( p_sys->p_pipe_fds[1] );
+    close( p_sys->p_pipe_fds[0] );
     free( p_sys );
     return VLC_ENOMEM;
 }
@@ -340,6 +344,8 @@ static void Close   ( vlc_object_t *p_this )
     vlc_array_destroy( p_sys->p_events );
     vlc_array_destroy( p_sys->p_timeouts );
     vlc_array_destroy( p_sys->p_watches );
+    close( p_sys->p_pipe_fds[1] );
+    close( p_sys->p_pipe_fds[0] );
     free( p_sys );
 }
 
