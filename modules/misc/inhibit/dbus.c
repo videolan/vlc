@@ -229,8 +229,8 @@ static void Close (vlc_object_t *obj)
  * Module descriptor
  */
 vlc_module_begin ()
-    set_shortname (N_("Power"))
-    set_description (N_("Inhibits power suspend and session idle timeout."))
+    set_shortname (N_("D-Bus screensaver"))
+    set_description (N_("D-Bus screen saver inhibition"))
     set_category (CAT_ADVANCED)
     set_subcategory (SUBCAT_ADVANCED_MISC)
     set_capability ("inhibit", 20)
