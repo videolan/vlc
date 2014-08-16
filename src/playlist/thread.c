@@ -192,7 +192,7 @@ void ResetCurrentlyPlaying( playlist_t *p_playlist,
  * \param p_item the item to play
  * \return nothing
  */
-static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
+static void PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
     input_item_t *p_input = p_item->p_input;
@@ -240,8 +240,6 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     PL_UNLOCK;
     var_TriggerCallback( p_playlist, "activity" );
     PL_LOCK;
-
-    return VLC_SUCCESS;
 }
 
 /**
