@@ -80,37 +80,38 @@ QString OptionFromWidgetName( QObject *obj )
     return option;
 }
 
-ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
-            QObject( _parent ), p_intf( _p_intf )
+static inline void setup_vfilter( intf_thread_t *p_intf, const char* psz_name, QWidget *widget )
 {
-    ui.setupUi( _parent );
+    vlc_object_t *p_obj = ( vlc_object_t * )
+        vlc_object_find_name( p_intf->p_libvlc, psz_name );
+    QCheckBox *checkbox = qobject_cast<QCheckBox*>( widget );
+    QGroupBox *groupbox = qobject_cast<QGroupBox*>( widget );
+    if( p_obj )
+    {
+        vlc_object_release( p_obj ); \
+        if( checkbox ) checkbox->setChecked( true ); \
+        else if (groupbox) groupbox->setChecked( true ); \
+    }
+    else
+    {
+        if( checkbox ) checkbox->setChecked( false );
+        else if (groupbox) groupbox->setChecked( false );
+    }
+}
 
 #define SETUP_VFILTER( widget ) \
-    { \
-        vlc_object_t *p_obj = ( vlc_object_t * ) \
-            vlc_object_find_name( p_intf->p_libvlc, \
-                                  #widget ); \
-        QCheckBox *checkbox = qobject_cast<QCheckBox*>( ui.widget##Enable ); \
-        QGroupBox *groupbox = qobject_cast<QGroupBox*>( ui.widget##Enable ); \
-        if( p_obj ) \
-        { \
-            vlc_object_release( p_obj ); \
-            if( checkbox ) checkbox->setChecked( true ); \
-            else if (groupbox) groupbox->setChecked( true ); \
-        } \
-        else \
-        { \
-            if( checkbox ) checkbox->setChecked( false ); \
-            else if (groupbox)  groupbox->setChecked( false ); \
-        } \
-    } \
+    setup_vfilter( p_intf, #widget, ui.widget##Enable ); \
     CONNECT( ui.widget##Enable, clicked(), this, updateFilters() );
-
 
 #define SETUP_VFILTER_OPTION( widget, signal ) \
     initComboBoxItems( ui.widget ); \
     setWidgetValue( ui.widget ); \
     CONNECT( ui.widget, signal, this, updateFilterOptions() );
+
+ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
+            QObject( _parent ), p_intf( _p_intf )
+{
+    ui.setupUi( _parent );
 
     SETUP_VFILTER( adjust )
     SETUP_VFILTER_OPTION( hueSlider, valueChanged( int ) )
