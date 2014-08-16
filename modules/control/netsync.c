@@ -296,6 +296,7 @@ static int PlaylistEvent(vlc_object_t *object, char const *cmd,
     if (vlc_clone(&sys->thread, sys->is_master ? Master : Slave, intf,
                   VLC_THREAD_PRIORITY_INPUT)) {
         vlc_object_release(input);
+        sys->input = NULL;
         return VLC_SUCCESS;
     }
     var_AddCallback(input, "intf-event", InputEvent, intf);
