@@ -508,8 +508,12 @@ static int PlaylistEvent( vlc_object_t *p_this, char const *psz_var,
 
     (void) p_this; (void) psz_var; (void) oldval;
 
-    var_AddCallback( p_input, "intf-event", InputEvent, p_intf );
     assert( p_sys->p_input == NULL );
-    p_sys->p_input = vlc_object_hold( p_input );
+
+    if( p_input != NULL )
+    {
+        var_AddCallback( p_input, "intf-event", InputEvent, p_intf );
+        p_sys->p_input = vlc_object_hold( p_input );
+    }
     return VLC_SUCCESS;
 }
