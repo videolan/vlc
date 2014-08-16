@@ -511,21 +511,26 @@ struct vlc_actions *vlc_InitActions (libvlc_int_t *libvlc)
     keys->psz_action = NULL;
 
     /* Initialize mouse wheel events */
-    int mousemode = var_InheritInteger (obj, "hotkeys-mousewheel-mode");
-    if (mousemode < 2)
+    int xmode = var_InheritInteger (obj, "hotkeys-x-wheel-mode");
+    if (xmode < 2)
     {
-        vlc_AddMapping (&as->map,
-                        mousemode ? KEY_MOUSEWHEELRIGHT : KEY_MOUSEWHEELUP,
-                        ACTIONID_VOL_UP);
-        vlc_AddMapping (&as->map,
-                        mousemode ? KEY_MOUSEWHEELLEFT : KEY_MOUSEWHEELDOWN,
-                        ACTIONID_VOL_DOWN);
-        vlc_AddMapping (&as->map,
-                        mousemode ? KEY_MOUSEWHEELUP : KEY_MOUSEWHEELRIGHT,
-                        ACTIONID_JUMP_FORWARD_EXTRASHORT);
-        vlc_AddMapping (&as->map,
-                        mousemode ? KEY_MOUSEWHEELDOWN : KEY_MOUSEWHEELLEFT,
-                        ACTIONID_JUMP_BACKWARD_EXTRASHORT);
+        vlc_AddMapping (&as->map, KEY_MOUSEWHEELLEFT,
+                        xmode ? ACTIONID_JUMP_BACKWARD_EXTRASHORT
+                              : ACTIONID_VOL_DOWN);
+        vlc_AddMapping (&as->map, KEY_MOUSEWHEELRIGHT,
+                        xmode ? ACTIONID_JUMP_FORWARD_EXTRASHORT
+                              : ACTIONID_VOL_UP);
+    }
+
+    int ymode = var_InheritInteger (obj, "hotkeys-y-wheel-mode");
+    if (ymode < 2)
+    {
+        vlc_AddMapping (&as->map, KEY_MOUSEWHEELDOWN,
+                        ymode ? ACTIONID_JUMP_BACKWARD_EXTRASHORT
+                              : ACTIONID_VOL_DOWN);
+        vlc_AddMapping (&as->map, KEY_MOUSEWHEELUP,
+                        ymode ? ACTIONID_JUMP_FORWARD_EXTRASHORT
+                              : ACTIONID_VOL_UP);
     }
 
 
