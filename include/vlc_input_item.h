@@ -74,7 +74,6 @@ struct input_item_t
     es_format_t **es;                /**< Es formats */
 
     input_stats_t *p_stats;          /**< Statistics */
-    int           i_nb_played;       /**< Number of times played */
 
     vlc_meta_t *p_meta;
 

@@ -201,7 +201,7 @@ static void PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 
     msg_Dbg( p_playlist, "creating new input thread" );
 
-    p_input->i_nb_played++;
+    p_item->i_nb_played++;
     set_current_status_item( p_playlist, p_item );
 
     p_sys->status.i_status = PLAYLIST_RUNNING;

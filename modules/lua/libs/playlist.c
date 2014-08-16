@@ -233,7 +233,7 @@ static void push_playlist_item( lua_State *L, playlist_item_t *p_item )
         else
             lua_pushnumber( L, ((double)p_input->i_duration)*1e-6 );
         lua_setfield( L, -2, "duration" );
-        lua_pushinteger( L, p_input->i_nb_played );
+        lua_pushinteger( L, p_item->i_nb_played );
         lua_setfield( L, -2, "nb_played" );
         luaopen_input_item( L, p_input );
         /* TODO: add (optional) info categories, meta, options, es */

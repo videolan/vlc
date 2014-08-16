@@ -237,6 +237,7 @@ playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
     p_item->p_parent = NULL;
     p_item->i_children = -1;
     p_item->pp_children = NULL;
+    p_item->i_nb_played = 0;
     p_item->i_flags = 0;
     p_item->p_playlist = p_playlist;
 

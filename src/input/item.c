@@ -851,7 +851,6 @@ input_item_NewWithType( const char *psz_uri, const char *psz_name,
     TAB_INIT( p_input->i_categories, p_input->pp_categories );
     TAB_INIT( p_input->i_es, p_input->es );
     p_input->p_stats = NULL;
-    p_input->i_nb_played = 0;
     p_input->p_meta = NULL;
     TAB_INIT( p_input->i_epg, p_input->pp_epg );
 

@@ -323,7 +323,7 @@ playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
         {
             if( b_ena && p_next->i_flags & PLAYLIST_DBL_FLAG )
                 b_ena_ok = false;
-            if( b_unplayed && p_next->p_input->i_nb_played != 0 )
+            if( b_unplayed && p_next->i_nb_played != 0 )
                 b_unplayed_ok = false;
             if( b_ena_ok && b_unplayed_ok ) break;
         }
@@ -364,7 +364,7 @@ playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
         {
             if( b_ena && p_prev->i_flags & PLAYLIST_DBL_FLAG )
                 b_ena_ok = false;
-            if( b_unplayed && p_prev->p_input->i_nb_played != 0 )
+            if( b_unplayed && p_prev->i_nb_played != 0 )
                 b_unplayed_ok = false;
             if( b_ena_ok && b_unplayed_ok ) break;
         }
