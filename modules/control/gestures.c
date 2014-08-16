@@ -163,11 +163,8 @@ static void Close ( vlc_object_t *p_this )
     /* Destroy the callbacks (the order matters!) */
     var_DelCallback( pl_Get(p_intf), "input-current", PlaylistEvent, p_intf );
 
-    if( p_sys->p_input )
-    {
+    if( p_sys->p_input != NULL )
         var_DelCallback( p_sys->p_input, "intf-event", InputEvent, p_intf );
-        vlc_object_release( p_sys->p_input );
-    }
 
     if( p_sys->p_vout )
     {
@@ -469,11 +466,6 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_var,
 
     switch( val.i_int )
     {
-      case INPUT_EVENT_DEAD:
-        vlc_object_release( p_input );
-        p_sys->p_input = NULL; /* FIXME: locking!! */
-        break;
-
       case INPUT_EVENT_VOUT:
         /* intf-event is serialized against itself and is the sole user of
          * p_sys->p_vout. So there is no need to acquire the lock currently. */
@@ -506,14 +498,18 @@ static int PlaylistEvent( vlc_object_t *p_this, char const *psz_var,
     intf_sys_t *p_sys = p_intf->p_sys;
     input_thread_t *p_input = val.p_address;
 
-    (void) p_this; (void) psz_var; (void) oldval;
+    (void) p_this; (void) psz_var;
 
-    assert( p_sys->p_input == NULL );
+    if( p_sys->p_input != NULL )
+    {
+        assert( p_sys->p_input == oldval.p_address );
+        var_DelCallback( p_sys->p_input, "intf-event", InputEvent, p_intf );
+    }
+
+    p_sys->p_input = p_input;
 
     if( p_input != NULL )
-    {
         var_AddCallback( p_input, "intf-event", InputEvent, p_intf );
-        p_sys->p_input = vlc_object_hold( p_input );
-    }
+
     return VLC_SUCCESS;
 }
