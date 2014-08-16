@@ -3111,12 +3111,11 @@ static void EITCallBack( demux_t *p_demux,
             if( p_sys->i_tdt_delta == 0 )
                 p_sys->i_tdt_delta = CLOCK_FREQ * (i_start + i_duration - 5) - mdate();
 
-            //i_start -= 9 * 60 * 60; // JST -> UTC
-            time_t timer = time( NULL );
-            int64_t diff = difftime( mktime( localtime( &timer ) ),
-                                     mktime( gmtime( &timer ) ) );
-            i_start -= diff;
-            i_tot_time = (mdate() + p_sys->i_tdt_delta) / CLOCK_FREQ - diff;
+            i_tot_time = (mdate() + p_sys->i_tdt_delta) / CLOCK_FREQ;
+
+            tzset(); // JST -> UTC
+            i_start += timezone; // FIXME: what about DST?
+            i_tot_time += timezone;
 
             if( p_evt->i_running_status == 0x00 &&
                 (i_start - 5 < i_tot_time &&
