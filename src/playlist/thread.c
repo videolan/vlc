@@ -225,17 +225,15 @@ static void PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 
     /* TODO store art policy in playlist private data */
     char *psz_arturl = input_item_GetArtURL( p_input );
-    char *psz_name = input_item_GetName( p_input );
     /* p_input->p_meta should not be null after a successful CreateThread */
     bool b_has_art = !EMPTY_STR( psz_arturl );
 
     if( !b_has_art || strncmp( psz_arturl, "attachment://", 13 ) )
     {
-        PL_DEBUG( "requesting art for %s", psz_name );
+        PL_DEBUG( "requesting art for new input thread" );
         libvlc_ArtRequest( p_playlist->p_libvlc, p_input, META_REQUEST_OPTION_NONE );
     }
     free( psz_arturl );
-    free( psz_name );
 
     PL_UNLOCK;
     var_TriggerCallback( p_playlist, "activity" );
