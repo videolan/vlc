@@ -203,33 +203,36 @@ static int Open( vlc_object_t *p_this )
     dbus_connection_register_object_path( p_conn, DBUS_MPRIS_OBJECT_PATH,
             &dbus_mpris_vtable, p_this );
 
-    /* register an instance-specific well known name of the form
-     * org.mpris.MediaPlayer2.vlc.instanceXXXX where XXXX is the
-     * current process's pid */
-    size_t i_length = sizeof( DBUS_MPRIS_BUS_NAME ) +
-        sizeof( DBUS_INSTANCE_ID_PREFIX ) + 10;
-
-    char unique_service[i_length];
-
-    snprintf( unique_service, sizeof (unique_service),
-            DBUS_MPRIS_BUS_NAME"."DBUS_INSTANCE_ID_PREFIX"%"PRIu32,
-            (uint32_t)getpid() );
-
-    dbus_bus_request_name( p_conn, unique_service, 0, &error );
-
+    /* Try to register org.mpris.MediaPlayer2.vlc */
+    dbus_bus_request_name( p_conn, DBUS_MPRIS_BUS_NAME, 0, &error );
     if( dbus_error_is_set( &error ) )
     {
-        msg_Err( p_this, "Error requesting service name %s: %s",
-                 unique_service, error.message );
+        msg_Dbg( p_this, "Failed to get service name %s: %s",
+                 DBUS_MPRIS_BUS_NAME, error.message );
         dbus_error_free( &error );
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
-    msg_Dbg( p_intf, "listening on dbus as: %s", unique_service );
 
-    /* Try to register org.mpris.MediaPlayer2.vlc as well in case we are
-     * the only VLC instance currently connected to the bus */
-    dbus_bus_request_name( p_conn, DBUS_MPRIS_BUS_NAME, 0, NULL );
+        /* Register an instance-specific well known name of the form
+         * org.mpris.MediaPlayer2.vlc.instanceXXXX where XXXX is the
+         * current Process ID */
+        char unique_service[sizeof( DBUS_MPRIS_BUS_NAME ) +
+                            sizeof( DBUS_INSTANCE_ID_PREFIX ) + 10];
+
+        snprintf( unique_service, sizeof (unique_service),
+                  DBUS_MPRIS_BUS_NAME"."DBUS_INSTANCE_ID_PREFIX"%"PRIu32,
+                  (uint32_t)getpid() );
+
+        dbus_bus_request_name( p_conn, unique_service, 0, &error );
+        if( dbus_error_is_set( &error ) )
+        {
+            msg_Err( p_this, "Failed to get service name %s: %s",
+                     DBUS_MPRIS_BUS_NAME, error.message );
+            dbus_error_free( &error );
+        }
+        else
+            msg_Dbg( p_intf, "listening on dbus as: %s", unique_service );
+    }
+    else
+        msg_Dbg( p_intf, "listening on dbus as: %s", DBUS_MPRIS_BUS_NAME );
 
     dbus_connection_flush( p_conn );
 
