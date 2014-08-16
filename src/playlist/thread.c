@@ -223,9 +223,9 @@ static void PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
             vlc_object_release( p_input_thread );
             p_input_thread = NULL;
         }
-        else
-            var_SetAddress( p_playlist, "input-current", p_input_thread );
     }
+
+    var_SetAddress( p_playlist, "input-current", p_input_thread );
 
     /* TODO store art policy in playlist private data */
     char *psz_arturl = input_item_GetArtURL( p_input );
@@ -445,6 +445,8 @@ static void LoopInput( playlist_t *p_playlist )
         p_sys->p_input = NULL;
         PL_DEBUG( "dead input" );
         PL_UNLOCK;
+
+        var_SetAddress( p_playlist, "input-current", NULL );
 
         /* WARNING: Input resource manipulation and callback deletion are
          * incompatible with the playlist lock. */
