@@ -1485,12 +1485,11 @@
         if (!p_item)
             return;
 
-        /* allow the user to over-write the start-time */
-        if (p_item->i_options > 0) {
-            for (int x = 0; x < p_item->i_options; x++) {
-                if (strstr(p_item->ppsz_options[x],"start-time"))
-                    return;
-            }
+        /* allow the user to over-write the start/stop/run-time */
+        if (var_GetFloat(p_input_thread, "run-time") > 0 ||
+            var_GetFloat(p_input_thread, "start-time") > 0 ||
+            var_GetFloat(p_input_thread, "stop-time") > 0) {
+            return;
         }
 
         char *psz_url = decode_URI(input_item_GetURI(p_item));
