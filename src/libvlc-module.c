@@ -1172,9 +1172,11 @@ static const char *const ppsz_prefres[] = {
 #define HOTKEY_CAT_LONGTEXT N_( "These settings are the global VLC key " \
     "bindings, known as \"hotkeys\"." )
 
-static const int mouse_wheel_values[] = { 2, 0, 1 };
-static const char *const mouse_wheel_texts[] =
-    { N_("Ignore"), N_("Volume Control"), N_("Position Control") };
+static const int mouse_wheel_values[] = { -1, 0, 2, 3, };
+static const char *const mouse_wheel_texts[] = {
+    N_("Ignore"), N_("Volume control"),
+    N_("Position control"), N_("Position control reversed"),
+};
 
 #define MOUSE_Y_WHEEL_MODE_TEXT N_("Mouse wheel vertical axis control")
 #define MOUSE_Y_WHEEL_MODE_LONGTEXT N_( \
@@ -2094,7 +2096,7 @@ vlc_module_begin ()
     add_integer( "hotkeys-y-wheel-mode", 0, MOUSE_Y_WHEEL_MODE_TEXT,
                  MOUSE_Y_WHEEL_MODE_LONGTEXT, false )
         change_integer_list( mouse_wheel_values, mouse_wheel_texts )
-    add_integer( "hotkeys-x-wheel-mode", 1, MOUSE_X_WHEEL_MODE_TEXT,
+    add_integer( "hotkeys-x-wheel-mode", 2, MOUSE_X_WHEEL_MODE_TEXT,
                  MOUSE_X_WHEEL_MODE_LONGTEXT, false )
         change_integer_list( mouse_wheel_values, mouse_wheel_texts )
     add_obsolete_integer( "hotkeys-mousewheel-mode" ) /* since 3.0.0 */
