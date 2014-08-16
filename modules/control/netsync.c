@@ -151,8 +151,13 @@ void Close(vlc_object_t *object)
     intf_thread_t *intf = (intf_thread_t*)object;
     intf_sys_t *sys = intf->p_sys;
 
-    assert(sys->input == NULL);
     var_DelCallback(sys->playlist, "input-current", PlaylistEvent, intf);
+
+    if (sys->input != NULL) {
+        vlc_cancel(sys->thread);
+        vlc_join(sys->thread, NULL);
+    }
+
     net_Close(sys->fd);
     free(sys);
 }
@@ -266,43 +271,28 @@ static void *Slave(void *handle)
     return NULL;
 }
 
-static int InputEvent(vlc_object_t *object, char const *cmd,
-                      vlc_value_t oldval, vlc_value_t newval, void *data)
-{
-    VLC_UNUSED(cmd); VLC_UNUSED(oldval); VLC_UNUSED(object);
-    intf_thread_t  *intf = data;
-    intf_sys_t     *sys = intf->p_sys;
-
-    if (newval.i_int == INPUT_EVENT_DEAD && sys->input) {
-        msg_Err(intf, "InputEvent DEAD");
-        vlc_cancel(sys->thread);
-        vlc_join(sys->thread, NULL);
-        vlc_object_release(sys->input);
-        sys->input = NULL;
-    }
-    return VLC_SUCCESS;
-}
-
 static int PlaylistEvent(vlc_object_t *object, char const *cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *data)
 {
-    VLC_UNUSED(cmd); VLC_UNUSED(oldval); VLC_UNUSED(object);
+    VLC_UNUSED(cmd); VLC_UNUSED(object);
     intf_thread_t  *intf = data;
     intf_sys_t     *sys = intf->p_sys;
     input_thread_t *input = newval.p_address;
 
-    assert(sys->input == NULL);
+    if (sys->input != NULL) {
+        msg_Err(intf, "InputEvent DEAD");
+        assert(oldval.p_address == sys->input);
 
-    if (input != NULL)
-    {
-        sys->input = vlc_object_hold(input);
+        vlc_cancel(sys->thread);
+        vlc_join(sys->thread, NULL);
+    }
+
+    sys->input = input;
+
+    if (input != NULL) {
         if (vlc_clone(&sys->thread, sys->is_master ? Master : Slave, intf,
-                      VLC_THREAD_PRIORITY_INPUT)) {
-            vlc_object_release(input);
+                      VLC_THREAD_PRIORITY_INPUT))
             sys->input = NULL;
-            return VLC_SUCCESS;
-        }
-        var_AddCallback(input, "intf-event", InputEvent, intf);
     }
     return VLC_SUCCESS;
 }
