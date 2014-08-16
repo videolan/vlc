@@ -909,7 +909,15 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             line++;
 
-            p_config = config_FindConfig( VLC_OBJECT(p_intf), "hotkeys-mousewheel-mode" );
+            p_config = config_FindConfig( VLC_OBJECT(p_intf), "hotkeys-y-wheel-mode" );
+            control = new IntegerListConfigControl( VLC_OBJECT(p_intf),
+                    p_config, this, false );
+            control->insertIntoExistingGrid( gLayout, line );
+            controls.append( control );
+
+            line++;
+
+            p_config = config_FindConfig( VLC_OBJECT(p_intf), "hotkeys-x-wheel-mode" );
             control = new IntegerListConfigControl( VLC_OBJECT(p_intf),
                     p_config, this, false );
             control->insertIntoExistingGrid( gLayout, line );
