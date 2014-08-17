@@ -171,9 +171,7 @@ typedef struct
 {
     int *fdv;
     unsigned fdc;
-#ifndef _WIN32
     int fd[2];
-#endif
 } vlclua_dtable_t;
 
 int vlclua_fd_init( lua_State *, vlclua_dtable_t * );
