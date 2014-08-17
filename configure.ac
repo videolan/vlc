@@ -958,7 +958,7 @@ dnl Check for various optimization flags
 AS_IF([test "${enable_optimizations}" != "no"], [
 
   dnl -O4 and -O3 only in production builds
-  AS_IF([test "{enable_debug}" = "no"], [
+  AS_IF([test "${enable_debug}" = "no"], [
     VLC_SAVE_FLAGS
     CFLAGS="${CFLAGS} -O4"
     CXXFLAGS="${CXXFLAGS} -O4"
