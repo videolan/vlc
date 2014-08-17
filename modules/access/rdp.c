@@ -233,7 +233,7 @@ static bool postConnectHandler( freerdp *p_instance )
     vlcrdp_context_t * p_vlccontext = (vlcrdp_context_t *) p_instance->context;
 
     msg_Dbg( p_vlccontext->p_demux, "connected to desktop %dx%d (%d bpp)",
-#if (FREERDP_VERSION_MAJOR >= 1 && FREERDP_VERSION_MINOR >= 1 )
+#if defined(FREERDP_VERSION_MAJOR)  && (FREERDP_VERSION_MAJOR >= 1 && FREERDP_VERSION_MINOR >= 1 )
              p_instance->settings->DesktopWidth,
              p_instance->settings->DesktopHeight,
              p_instance->settings->ColorDepth
