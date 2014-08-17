@@ -1411,9 +1411,9 @@ AS_IF([test "${enable_altivec}" = "yes"], [
     [ac_cv_altivec_inline],
     [AC_TRY_COMPILE(,[asm volatile("vperm 0,1,2,3");],
          ac_cv_altivec_inline="yes",
-         [CFLAGS="${CFLAGS} -Wa,-m7400"
+         [CFLAGS="${CFLAGS} -Wa,-maltivec"
           AC_TRY_COMPILE(,[asm volatile("vperm 0,1,2,3");],
-            [ac_cv_altivec_inline="-Wa,-m7400"],
+            [ac_cv_altivec_inline="-Wa,-maltivec"],
             ac_cv_altivec_inline=no)
          ])])
   VLC_RESTORE_FLAGS
