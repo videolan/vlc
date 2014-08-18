@@ -479,12 +479,6 @@ exit:
 
 error:
     vbi_unref_page( &p_page );
-    if( p_spu != NULL )
-    {
-        decoder_DeleteSubpicture( p_dec, p_spu );
-        p_spu = NULL;
-    }
-
     block_Release( p_block );
     return NULL;
 }
