@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Emin Mastizada <emin@mastizada.tk>, 2013
+# Emin Mastizada <emin@mastizada.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: VLC - Trans\n"
@@ -104,35 +104,35 @@ msgstr "Filterlər"
 
 #: include/vlc_config_cat.h:59
 msgid "Audio filters are used to process the audio stream."
-msgstr ""
+msgstr "Səs filterləri səs axınını emal etmək üçün işlədilir."
 
 #: include/vlc_config_cat.h:61 src/audio_output/output.c:226
 #: modules/gui/macosx/MainMenu.m:398 modules/gui/macosx/MainMenu.m:399
 msgid "Visualizations"
-msgstr ""
+msgstr "Vizuallaşdırmalar"
 
 #: include/vlc_config_cat.h:62 src/audio_output/output.c:285
 #: src/libvlc-module.c:195
 msgid "Audio visualizations"
-msgstr ""
+msgstr "Səs vizuallaşdırmaları"
 
 #: include/vlc_config_cat.h:64 include/vlc_config_cat.h:76
 msgid "Output modules"
-msgstr ""
+msgstr "Çıxış modulları"
 
 #: include/vlc_config_cat.h:65
 msgid "General settings for audio output modules."
-msgstr ""
+msgstr "Səs çıxış modulları üçün əsas nizamlamalar."
 
 #: include/vlc_config_cat.h:67 src/libvlc-module.c:1952
 #: modules/gui/macosx/VideoEffects.m:85
 #: modules/stream_out/transcode/transcode.c:216
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Müxtəlif"
 
 #: include/vlc_config_cat.h:68
 msgid "Miscellaneous audio settings and modules."
-msgstr ""
+msgstr "Müxtəlif səs nizamlamaları və modulları"
 
 #: include/vlc_config_cat.h:71 src/input/es_out.c:2883 src/input/es_out.c:2965
 #: src/libvlc-module.c:1495 modules/access/imem.c:64
@@ -160,24 +160,24 @@ msgstr "Ümumi video nizamlamaları"
 
 #: include/vlc_config_cat.h:77
 msgid "General settings for video output modules."
-msgstr ""
+msgstr "Video çıxış modulları üçün əsas nizamlamalar."
 
 #: include/vlc_config_cat.h:80
 msgid "Video filters are used to process the video stream."
-msgstr ""
+msgstr "Video filterləri video axınını emal etmək üçün işlədilir."
 
 #: include/vlc_config_cat.h:82
 msgid "Subtitles / OSD"
-msgstr ""
+msgstr "Altyazmalar / OSD"
 
 #: include/vlc_config_cat.h:83
 msgid ""
 "Settings related to On-Screen-Display, subtitles and \"overlay subpictures\""
-msgstr ""
+msgstr "Ekranda-Göstərmə, altyazmalar və \"altşəkil örtükləri\" ilə bağlı nizamlamalar"
 
 #: include/vlc_config_cat.h:91
 msgid "Input / Codecs"
-msgstr ""
+msgstr "Giriş / Kodeklər"
 
 #: include/vlc_config_cat.h:92
 msgid "Settings for input, demultiplexing, decoding and encoding"
@@ -185,7 +185,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:95
 msgid "Access modules"
-msgstr ""
+msgstr "Müraciət modulları"
 
 #: include/vlc_config_cat.h:97
 msgid ""
@@ -195,7 +195,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:101
 msgid "Stream filters"
-msgstr ""
+msgstr "Axın filterləri"
 
 #: include/vlc_config_cat.h:103
 msgid ""
@@ -242,7 +242,7 @@ msgstr ""
 #: include/vlc_config_cat.h:121 src/libvlc-module.c:1887
 #: modules/access/avio.h:50
 msgid "Stream output"
-msgstr ""
+msgstr "Axın çıxışı"
 
 #: include/vlc_config_cat.h:123
 msgid ""
