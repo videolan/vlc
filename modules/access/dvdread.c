@@ -1162,7 +1162,7 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
     /*
      * Store the timecodes so we can get the current time
      */
-    p_sys->i_title_cur_time = (mtime_t) (p_sys->dsi_pack.dsi_gi.nv_pck_scr / 90 * 1000);
+    p_sys->i_title_cur_time = (mtime_t) p_sys->dsi_pack.dsi_gi.nv_pck_scr / 90 * 1000;
     p_sys->i_cell_cur_time = (mtime_t) dvdtime_to_time( &p_sys->dsi_pack.dsi_gi.c_eltm, 0 );
 
     /*
