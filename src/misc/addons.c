@@ -340,11 +340,11 @@ static void *FinderThread( void *p_data )
 
         addons_finder_t *p_finder =
                 vlc_custom_create( p_manager->p_priv->p_parent, sizeof( *p_finder ), "entries finder" );
-        p_finder->i_flags |= OBJECT_FLAGS_NOINTERACT;
 
         i_cancel = vlc_savecancel();
         if( p_finder != NULL )
         {
+            p_finder->i_flags |= OBJECT_FLAGS_NOINTERACT;
             module_t *p_module;
             ARRAY_INIT( p_finder->entries );
             vlc_mutex_lock( &p_manager->p_priv->finder.lock );
