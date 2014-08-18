@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 
+#include "qt4.hpp"
 #include "ui/equalizer.h"
 #include "ui/video_effects.h"
 
@@ -71,7 +72,7 @@ class ExtV4l2 : public QWidget
 public:
     ExtV4l2( intf_thread_t *, QWidget * );
 
-    virtual void showEvent( QShowEvent *event );
+    void showEvent( QShowEvent *event ) Q_DECL_OVERRIDE;
 
 private:
     intf_thread_t *p_intf;
@@ -156,13 +157,13 @@ public:
                          const slider_data_t *p_data, int index );
 
 protected:
-    virtual float initialValue();
+    float initialValue() Q_DECL_OVERRIDE;
     int index;
     QStringList getBandsFromAout() const;
 
 public slots:
-    virtual void onValueChanged( int i ) const;
-    virtual void writeToConfig() const;
+    void onValueChanged( int i ) const Q_DECL_OVERRIDE;
+    void writeToConfig() const Q_DECL_OVERRIDE;
 };
 
 class Equalizer: public AudioFilterControlWidget
@@ -173,10 +174,10 @@ public:
     Equalizer( intf_thread_t *, QWidget * );
 
 protected:
-    virtual void build();
+    void build() Q_DECL_OVERRIDE;
 
 protected slots:
-    virtual void setSaveToConfig( bool );
+    void setSaveToConfig( bool ) Q_DECL_OVERRIDE;
 
 private:
     FilterSliderData *preamp;

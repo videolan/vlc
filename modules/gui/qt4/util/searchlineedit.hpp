@@ -58,14 +58,14 @@ class ClickLineEdit : public QLineEdit
     Q_PROPERTY( QString clickMessage READ placeholderText WRITE setPlaceholderText )
 public:
     ClickLineEdit( const QString &msg, QWidget *parent );
-    void setPlaceholderText( const QString &msg );
-    const QString& placeholderText() const { return mClickMessage; }
-    virtual void setText( const QString& txt );
+    void setPlaceholderText( const QString &msg ) Q_DECL_OVERRIDE;
+    const QString& placeholderText() const Q_DECLARE_OVERRIDE { return mClickMessage; }
+    void setText( const QString& txt ) Q_DECLARE_OVERRIDE;
 protected:
-    virtual void paintEvent( QPaintEvent *e );
-    virtual void dropEvent( QDropEvent *ev );
-    virtual void focusInEvent( QFocusEvent *ev );
-    virtual void focusOutEvent( QFocusEvent *ev );
+    void paintEvent( QPaintEvent *e ) Q_DECL_OVERRIDE;
+    void dropEvent( QDropEvent *ev ) Q_DECL_OVERRIDE;
+    void focusInEvent( QFocusEvent *ev ) Q_DECL_OVERRIDE;
+    void focusOutEvent( QFocusEvent *ev ) Q_DECL_OVERRIDE;
 private:
     QString mClickMessage;
     bool mDrawClickMsg;
@@ -112,7 +112,7 @@ public:
     SearchLineEdit(QWidget *parent = 0);
     virtual ~SearchLineEdit() {}
 
-    virtual QSize sizeHint() const { return QSize(150, 40); }
+    QSize sizeHint() const Q_DECL_OVERRIDE { return QSize(150, 40); }
 
 public slots:
     void clear() {}

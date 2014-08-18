@@ -22,6 +22,8 @@
 #ifndef TIMETOOLTIP_H
 #define TIMETOOLTIP_H
 
+#include "qt4.hpp"
+
 #include <QWidget>
 #include <QBitmap>
 
@@ -40,7 +42,7 @@ public:
     virtual void show();
 
 protected:
-    virtual void paintEvent( QPaintEvent * );
+    void paintEvent( QPaintEvent * ) Q_DECL_OVERRIDE;
 
 private:
     void adjustPosition();

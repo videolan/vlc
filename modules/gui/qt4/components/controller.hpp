@@ -275,14 +275,14 @@ public slots:
 protected:
     friend class MainInterface;
 
-    virtual void mouseMoveEvent( QMouseEvent *event );
-    virtual void mousePressEvent( QMouseEvent *event );
-    virtual void mouseReleaseEvent( QMouseEvent *event );
-    virtual void enterEvent( QEvent *event );
-    virtual void leaveEvent( QEvent *event );
-    virtual void keyPressEvent( QKeyEvent *event );
+    void mouseMoveEvent( QMouseEvent *event ) Q_DECL_OVERRIDE;
+    void mousePressEvent( QMouseEvent *event ) Q_DECL_OVERRIDE;
+    void mouseReleaseEvent( QMouseEvent *event ) Q_DECL_OVERRIDE;
+    void enterEvent( QEvent *event ) Q_DECL_OVERRIDE;
+    void leaveEvent( QEvent *event ) Q_DECL_OVERRIDE;
+    void keyPressEvent( QKeyEvent *event ) Q_DECL_OVERRIDE;
 
-    virtual void customEvent( QEvent *event );
+    void customEvent( QEvent *event ) Q_DECL_OVERRIDE;
 
 private slots:
     void showFSC();

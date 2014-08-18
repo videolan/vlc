@@ -50,8 +50,8 @@ private:
     VLCProfileSelector *profile;
     QString mrl;
 private slots:
-    virtual void close();
-    virtual void cancel();
+    void close() Q_DECL_OVERRIDE;
+    void cancel() Q_DECL_OVERRIDE;
     void fileBrowse();
     void setDestinationFileExtension();
     void validate();

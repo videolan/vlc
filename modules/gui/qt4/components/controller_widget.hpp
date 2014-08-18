@@ -102,7 +102,7 @@ public:
     void setMuted( bool );
 
 protected:
-    virtual bool eventFilter( QObject *obj, QEvent *e );
+    bool eventFilter( QObject *obj, QEvent *e ) Q_DECL_OVERRIDE;
 
 private:
     intf_thread_t       *p_intf;

@@ -106,8 +106,8 @@ private:
     void DestroyWidget( extension_widget_t *p_widget, bool b_cond = true );
 
 protected:
-    virtual void closeEvent( QCloseEvent* );
-    virtual void keyPressEvent( QKeyEvent* );
+    void closeEvent( QCloseEvent* ) Q_DECL_OVERRIDE;
+    void keyPressEvent( QKeyEvent* ) Q_DECL_OVERRIDE;
 
 private slots:
     int TriggerClick( QObject *object );

@@ -96,15 +96,15 @@ protected:
 #ifdef _WIN32
     virtual bool winEvent( MSG *, long * );
 #endif
-    virtual void changeEvent( QEvent * );
-    virtual void dropEvent( QDropEvent *);
-    virtual void dragEnterEvent( QDragEnterEvent * );
-    virtual void dragMoveEvent( QDragMoveEvent * );
-    virtual void dragLeaveEvent( QDragLeaveEvent * );
-    virtual void closeEvent( QCloseEvent *);
-    virtual void keyPressEvent( QKeyEvent *);
-    virtual void wheelEvent( QWheelEvent * );
-    virtual bool eventFilter(QObject *, QEvent *);
+    void changeEvent( QEvent * ) Q_DECL_OVERRIDE;
+    void dropEvent( QDropEvent *) Q_DECL_OVERRIDE;
+    void dragEnterEvent( QDragEnterEvent * ) Q_DECL_OVERRIDE;
+    void dragMoveEvent( QDragMoveEvent * ) Q_DECL_OVERRIDE;
+    void dragLeaveEvent( QDragLeaveEvent * ) Q_DECL_OVERRIDE;
+    void closeEvent( QCloseEvent *) Q_DECL_OVERRIDE;
+    void keyPressEvent( QKeyEvent *) Q_DECL_OVERRIDE;
+    void wheelEvent( QWheelEvent * ) Q_DECL_OVERRIDE;
+    bool eventFilter(QObject *, QEvent *) Q_DECL_OVERRIDE;
 
 private:
     /* Main Widgets Creation */

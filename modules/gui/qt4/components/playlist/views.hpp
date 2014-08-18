@@ -52,9 +52,9 @@ class PlIconViewItemDelegate : public AbstractPlViewItemDelegate
 
 public:
     PlIconViewItemDelegate(QWidget *parent = 0) : AbstractPlViewItemDelegate( parent ) {}
-    virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
-    virtual QSize sizeHint ( const QStyleOptionViewItem & option = QStyleOptionViewItem(),
-                     const QModelIndex & index = QModelIndex() ) const;
+    void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const Q_DECL_OVERRIDE;
+    QSize sizeHint ( const QStyleOptionViewItem & option = QStyleOptionViewItem(),
+                     const QModelIndex & index = QModelIndex() ) const Q_DECL_OVERRIDE;
 };
 
 class PlListViewItemDelegate : public AbstractPlViewItemDelegate
@@ -64,8 +64,8 @@ class PlListViewItemDelegate : public AbstractPlViewItemDelegate
 public:
     PlListViewItemDelegate(QWidget *parent = 0) : AbstractPlViewItemDelegate(parent) {}
 
-    virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
-    virtual QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const Q_DECL_OVERRIDE;
+    QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const Q_DECL_OVERRIDE;
 };
 
 class PlTreeViewItemDelegate : public AbstractPlViewItemDelegate
@@ -75,7 +75,7 @@ class PlTreeViewItemDelegate : public AbstractPlViewItemDelegate
 public:
     PlTreeViewItemDelegate(QWidget *parent = 0) : AbstractPlViewItemDelegate(parent) {}
 
-    virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const Q_DECL_OVERRIDE;
 };
 
 class CellPixmapDelegate : public QStyledItemDelegate
@@ -84,7 +84,7 @@ class CellPixmapDelegate : public QStyledItemDelegate
 
 public:
     CellPixmapDelegate(QWidget *parent = 0) : QStyledItemDelegate(parent) {}
-    virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const Q_DECL_OVERRIDE;
 };
 
 class PlIconView : public QListView
@@ -94,9 +94,9 @@ class PlIconView : public QListView
 public:
     PlIconView( QAbstractItemModel *model, QWidget *parent = 0 );
 protected:
-    virtual void startDrag ( Qt::DropActions supportedActions );
-    virtual void dragMoveEvent ( QDragMoveEvent * event );
-    virtual bool viewportEvent ( QEvent * );
+    void startDrag ( Qt::DropActions supportedActions ) Q_DECL_OVERRIDE;
+    void dragMoveEvent ( QDragMoveEvent * event ) Q_DECL_OVERRIDE;
+    bool viewportEvent ( QEvent * ) Q_DECL_OVERRIDE;
 };
 
 class PlListView : public QListView
@@ -106,10 +106,10 @@ class PlListView : public QListView
 public:
     PlListView( QAbstractItemModel *model, QWidget *parent = 0 );
 protected:
-    virtual void startDrag ( Qt::DropActions supportedActions );
-    virtual void dragMoveEvent ( QDragMoveEvent * event );
-    virtual void keyPressEvent( QKeyEvent *event );
-    virtual bool viewportEvent ( QEvent * );
+    void startDrag ( Qt::DropActions supportedActions ) Q_DECL_OVERRIDE;
+    void dragMoveEvent ( QDragMoveEvent * event ) Q_DECL_OVERRIDE;
+    void keyPressEvent( QKeyEvent *event ) Q_DECL_OVERRIDE;
+    bool viewportEvent ( QEvent * ) Q_DECL_OVERRIDE;
 };
 
 class PlTreeView : public QTreeView
@@ -119,10 +119,10 @@ class PlTreeView : public QTreeView
 public:
     PlTreeView( QAbstractItemModel *, QWidget *parent = 0 );
 protected:
-    virtual void startDrag ( Qt::DropActions supportedActions );
-    virtual void dragMoveEvent ( QDragMoveEvent * event );
-    virtual void keyPressEvent( QKeyEvent *event );
-    virtual void setModel( QAbstractItemModel * );
+    void startDrag ( Qt::DropActions supportedActions ) Q_DECL_OVERRIDE;
+    void dragMoveEvent ( QDragMoveEvent * event ) Q_DECL_OVERRIDE;
+    void keyPressEvent( QKeyEvent *event ) Q_DECL_OVERRIDE;
+    void setModel( QAbstractItemModel * ) Q_DECL_OVERRIDE;
 };
 
 class PicFlowView : public QAbstractItemView
@@ -131,19 +131,19 @@ class PicFlowView : public QAbstractItemView
 public:
     PicFlowView( QAbstractItemModel *model, QWidget *parent = 0 );
 
-    virtual QRect visualRect(const QModelIndex&) const;
-    virtual void scrollTo(const QModelIndex&, QAbstractItemView::ScrollHint);
-    virtual QModelIndex indexAt(const QPoint&) const;
-    virtual void setModel(QAbstractItemModel *model);
+    QRect visualRect(const QModelIndex&) const Q_DECL_OVERRIDE;
+    void scrollTo(const QModelIndex&, QAbstractItemView::ScrollHint) Q_DECL_OVERRIDE;
+    QModelIndex indexAt(const QPoint&) const Q_DECL_OVERRIDE;
+    void setModel(QAbstractItemModel *model) Q_DECL_OVERRIDE;
 
 protected:
-    virtual int horizontalOffset() const;
-    virtual int verticalOffset() const;
-    virtual QModelIndex moveCursor(QAbstractItemView::CursorAction, Qt::KeyboardModifiers);
-    virtual bool isIndexHidden(const QModelIndex&) const;
-    virtual QRegion visualRegionForSelection(const QItemSelection&) const;
-    virtual void setSelection(const QRect&, QFlags<QItemSelectionModel::SelectionFlag>);
-    virtual bool viewportEvent ( QEvent * );
+    int horizontalOffset() const Q_DECL_OVERRIDE;
+    int verticalOffset() const Q_DECL_OVERRIDE;
+    QModelIndex moveCursor(QAbstractItemView::CursorAction, Qt::KeyboardModifiers) Q_DECL_OVERRIDE;
+    bool isIndexHidden(const QModelIndex&) const Q_DECL_OVERRIDE;
+    QRegion visualRegionForSelection(const QItemSelection&) const Q_DECL_OVERRIDE;
+    void setSelection(const QRect&, QFlags<QItemSelectionModel::SelectionFlag>) Q_DECL_OVERRIDE;
+    bool viewportEvent ( QEvent * ) Q_DECL_OVERRIDE;
 
 private:
     PictureFlow *picFlow;

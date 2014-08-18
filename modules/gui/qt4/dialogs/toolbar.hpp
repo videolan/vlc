@@ -59,8 +59,8 @@ public slots:
     void setBarsTopPosition( int b );
 
 protected:
-    virtual void paintEvent(QPaintEvent *);
-    virtual bool eventFilter(QObject *obj, QEvent *event);
+    void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
+    bool eventFilter(QObject *obj, QEvent *event) Q_DECL_OVERRIDE;
 
 private:
     QWidget * bars[3];
@@ -73,7 +73,7 @@ class WidgetListing : public QListWidget
 public:
     WidgetListing( intf_thread_t *, QWidget *_parent = 0 );
 protected:
-    virtual void startDrag( Qt::DropActions /*supportedActions*/ );
+    void startDrag( Qt::DropActions /*supportedActions*/ ) Q_DECL_OVERRIDE;
 private:
     ToolbarEditDialog *parent;
 };
@@ -114,16 +114,16 @@ public:
 
     void resetLine( const QString& );
 protected:
-    virtual void createAndAddWidget( QBoxLayout *controlLayout, int i_index,
-            buttonType_e i_type, int i_option );
-    virtual void dragEnterEvent ( QDragEnterEvent * event );
-    virtual void dragMoveEvent(QDragMoveEvent *event);
-    virtual void dropEvent ( QDropEvent * event );
-    virtual void dragLeaveEvent ( QDragLeaveEvent * event );
+    void createAndAddWidget( QBoxLayout *controlLayout, int i_index,
+                             buttonType_e i_type, int i_option ) Q_DECL_OVERRIDE;
+    void dragEnterEvent ( QDragEnterEvent * event ) Q_DECL_OVERRIDE;
+    void dragMoveEvent(QDragMoveEvent *event) Q_DECL_OVERRIDE;
+    void dropEvent ( QDropEvent * event ) Q_DECL_OVERRIDE;
+    void dragLeaveEvent ( QDragLeaveEvent * event ) Q_DECL_OVERRIDE;
 
     virtual void doAction( int );
 
-    virtual bool eventFilter( QObject *, QEvent * );
+    bool eventFilter( QObject *, QEvent * ) Q_DECL_OVERRIDE;
 
 private:
     struct doubleInt

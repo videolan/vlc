@@ -56,7 +56,7 @@ public:
     void showEvent( QShowEvent *ev );
 
 public slots:
-    virtual void close() { play(); };
+    void close() Q_DECL_OVERRIDE { play(); };
 
 };
 

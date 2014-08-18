@@ -38,6 +38,7 @@
 #include <QDial>
 
 #include "animators.hpp"
+#include "qt4.hpp"
 
 class QPixmap;
 class QWidget;
@@ -47,9 +48,9 @@ class QFramelessButton : public QPushButton
     Q_OBJECT
 public:
     QFramelessButton( QWidget *parent = NULL );
-    virtual QSize sizeHint() const { return iconSize(); }
+    QSize sizeHint() const Q_DECL_OVERRIDE { return iconSize(); }
 protected:
-    virtual void paintEvent( QPaintEvent * event );
+    void paintEvent( QPaintEvent * event ) Q_DECL_OVERRIDE;
 };
 
 class VLCQDial : public QDial
@@ -58,7 +59,7 @@ class VLCQDial : public QDial
 public:
     VLCQDial( QWidget *parent = NULL );
 protected:
-    virtual void paintEvent( QPaintEvent * event );
+    void paintEvent( QPaintEvent * event ) Q_DECL_OVERRIDE;
 };
 
 class QToolButtonExt : public QToolButton
@@ -85,7 +86,7 @@ public:
                       QWidget * parent = NULL );
     void setElideMode( Qt::TextElideMode );
 protected:
-    virtual void paintEvent( QPaintEvent * event );
+    void paintEvent( QPaintEvent * event ) Q_DECL_OVERRIDE;
 private:
     Qt::TextElideMode elideMode;
 };
@@ -107,9 +108,9 @@ class QVLCDebugLevelSpinBox : public QSpinBox
 public:
     QVLCDebugLevelSpinBox( QWidget *parent ) : QSpinBox( parent ) { };
 protected:
-    virtual QString textFromValue( int ) const;
+    QString textFromValue( int ) const Q_DECL_OVERRIDE;
     /* QVLCDebugLevelSpinBox is read-only */
-    virtual int valueFromText( const QString& ) const { return -1; }
+    int valueFromText( const QString& ) const Q_DECL_OVERRIDE { return -1; }
 };
 
 /** This spinning icon, to the colors of the VLC cone, will show

@@ -30,6 +30,8 @@
 # include "config.h"
 #endif
 
+#include "qt4.hpp"
+
 #include <vlc_common.h>
 #include <QWidget>
 
@@ -113,7 +115,7 @@ class InputStatsPanel: public QWidget
 public:
     InputStatsPanel( QWidget * );
 protected:
-    virtual void hideEvent( QHideEvent * );
+    void hideEvent( QHideEvent * ) Q_DECL_OVERRIDE;
 private:
     QTreeWidget *StatsTree;
     QTreeWidgetItem *input;

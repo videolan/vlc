@@ -75,7 +75,7 @@ public:
 
 protected:
     VLCModel *model;
-    virtual void wheelEvent( QWheelEvent *e );
+    void wheelEvent( QWheelEvent *e ) Q_DECL_OVERRIDE;
     bool popup( const QPoint &point );
 
 private:

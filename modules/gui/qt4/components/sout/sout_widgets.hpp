@@ -66,7 +66,7 @@ class FileDestBox: public VirtualDestBox
     Q_OBJECT
     public:
         FileDestBox( QWidget *_parent = NULL, intf_thread_t * = NULL );
-        virtual QString getMRL( const QString& );
+        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
     private:
         QLineEdit *fileEdit;
         intf_thread_t *p_intf;
@@ -79,7 +79,7 @@ class HTTPDestBox: public VirtualDestBox
     Q_OBJECT
     public:
         HTTPDestBox( QWidget *_parent = NULL );
-        virtual QString getMRL( const QString& );
+        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
     private:
         QLineEdit *HTTPEdit;
         QSpinBox *HTTPPort;
@@ -90,7 +90,7 @@ class MMSHDestBox: public VirtualDestBox
     Q_OBJECT
     public:
         MMSHDestBox( QWidget *_parent = NULL );
-        virtual QString getMRL( const QString& );
+        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
     private:
         QLineEdit *MMSHEdit;
         QSpinBox *MMSHPort;
@@ -101,7 +101,7 @@ class RTSPDestBox: public VirtualDestBox
     Q_OBJECT
     public:
         RTSPDestBox( QWidget *_parent = NULL );
-        virtual QString getMRL( const QString& );
+        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
     private:
         QLineEdit *RTSPEdit;
         QSpinBox *RTSPPort;
@@ -112,7 +112,7 @@ class UDPDestBox: public VirtualDestBox
     Q_OBJECT
     public:
         UDPDestBox( QWidget *_parent = NULL );
-        virtual QString getMRL( const QString& );
+        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
     private:
         QLineEdit *UDPEdit;
         QSpinBox *UDPPort;
@@ -123,7 +123,7 @@ class RTPDestBox: public VirtualDestBox
     Q_OBJECT
     public:
         RTPDestBox( QWidget *_parent = NULL, const char *mux = NULL );
-        virtual QString getMRL( const QString& );
+        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
     private:
         QLineEdit *RTPEdit;
         QSpinBox *RTPPort;
@@ -136,7 +136,7 @@ class ICEDestBox: public VirtualDestBox
     Q_OBJECT
     public:
         ICEDestBox( QWidget *_parent = NULL );
-        virtual QString getMRL( const QString& );
+        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
     private:
         QLineEdit *ICEEdit;
         QLineEdit *ICEMountEdit;

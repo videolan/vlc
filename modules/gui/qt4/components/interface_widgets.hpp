@@ -64,7 +64,7 @@ public:
     void  sync( void );
 
 protected:
-    virtual QPaintEngine *paintEngine() const
+    QPaintEngine *paintEngine() const Q_DECL_OVERRIDE
     {
         return NULL;
     }
@@ -95,10 +95,10 @@ private:
     bool b_expandPixmap;
     bool b_withart;
     QPropertyAnimation *fadeAnimation;
-    virtual void contextMenuEvent( QContextMenuEvent *event ); 
+    void contextMenuEvent( QContextMenuEvent *event ) Q_DECL_OVERRIDE;
 protected:
-    void paintEvent( QPaintEvent *e );
-    virtual void showEvent( QShowEvent * e );
+    void paintEvent( QPaintEvent *e ) Q_DECL_OVERRIDE;
+    void showEvent( QShowEvent * e ) Q_DECL_OVERRIDE;
     static const int MARGIN = 5;
     QString defaultArt;
 public slots:
@@ -118,10 +118,10 @@ public slots:
     void animate();
 
 protected:
-    void paintEvent( QPaintEvent *e );
-    void showEvent( QShowEvent *e );
-    void hideEvent( QHideEvent * );
-    void resizeEvent( QResizeEvent * );
+    void paintEvent( QPaintEvent *e ) Q_DECL_OVERRIDE;
+    void showEvent( QShowEvent *e ) Q_DECL_OVERRIDE;
+    void hideEvent( QHideEvent * ) Q_DECL_OVERRIDE;
+    void resizeEvent( QResizeEvent * ) Q_DECL_OVERRIDE;
 
 private slots:
     void spawnFlakes();
@@ -161,7 +161,7 @@ class ClickableQLabel : public QLabel
 {
     Q_OBJECT
 public:
-    virtual void mouseDoubleClickEvent( QMouseEvent *event )
+    void mouseDoubleClickEvent( QMouseEvent *event ) Q_DECL_OVERRIDE
     {
         Q_UNUSED( event );
         emit doubleClicked();
@@ -183,13 +183,13 @@ public:
 
     TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType = TimeLabel::Both );
 protected:
-    virtual void mousePressEvent( QMouseEvent *event )
+    void mousePressEvent( QMouseEvent *event ) Q_DECL_OVERRIDE
     {
         if( displayType == TimeLabel::Elapsed ) return;
         toggleTimeDisplay();
         event->accept();
     }
-    virtual void mouseDoubleClickEvent( QMouseEvent *event )
+    void mouseDoubleClickEvent( QMouseEvent *event ) Q_DECL_OVERRIDE
     {
         if( displayType != TimeLabel::Both ) return;
         event->accept();
@@ -218,7 +218,7 @@ public:
     virtual ~SpeedLabel();
 
 protected:
-    virtual void mousePressEvent ( QMouseEvent * event )
+    void mousePressEvent ( QMouseEvent * event ) Q_DECL_OVERRIDE
     {
         showSpeedMenu( event->pos() );
     }
@@ -263,7 +263,7 @@ public:
     virtual ~CoverArtLabel();
 
 protected:
-    virtual void mouseDoubleClickEvent( QMouseEvent *event )
+    void mouseDoubleClickEvent( QMouseEvent *event ) Q_DECL_OVERRIDE
     {
         if( ! p_item && qobject_cast<MetaPanel *>(this->window()) == NULL )
         {

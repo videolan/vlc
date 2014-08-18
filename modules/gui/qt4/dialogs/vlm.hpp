@@ -187,7 +187,7 @@ public:
     VLMBroadcast( const QString& name, const QString& input,
                   const QString& inputOptions, const QString& output,
                   bool _enable, bool _loop, VLMDialog *parent );
-    void update();
+    void update() Q_DECL_OVERRIDE;
 private:
     bool b_looped;
     bool b_playing;

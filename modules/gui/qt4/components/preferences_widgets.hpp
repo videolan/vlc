@@ -118,7 +118,7 @@ class VIntConfigControl : public ConfigControl
 Q_OBJECT
 public:
     virtual int getValue() const = 0;
-    virtual int getType() const;
+    int getType() const Q_DECL_OVERRIDE;
     virtual void doApply();
 protected:
     VIntConfigControl( vlc_object_t *a, module_config_t *b ) :
@@ -132,15 +132,15 @@ public:
     IntegerConfigControl( vlc_object_t *, module_config_t *, QWidget * );
     IntegerConfigControl( vlc_object_t *, module_config_t *,
                           QLabel*, QSpinBox* );
-    virtual int getValue() const;
+    int getValue() const Q_DECL_OVERRIDE;
 protected:
     QSpinBox *spin;
-    virtual void changeVisibility( bool b )
+     void changeVisibility( bool b ) Q_DECL_OVERRIDE
     {
         spin->setVisible( b );
         if ( label ) label->setVisible( b );
     }
-    virtual void fillGrid( QGridLayout*, int );
+    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     QLabel *label;
     void finish();
@@ -165,10 +165,10 @@ class IntegerRangeSliderConfigControl : public VIntConfigControl
 public:
     IntegerRangeSliderConfigControl( vlc_object_t *, module_config_t *,
                                 QLabel *, QSlider * );
-    virtual int getValue() const;
+    int getValue() const Q_DECL_OVERRIDE;
 protected:
     QSlider *slider;
-    virtual void changeVisibility( bool b )
+    void changeVisibility( bool b ) Q_DECL_OVERRIDE
     {
         slider->setVisible( b );
         if ( label ) label->setVisible( b );
@@ -185,14 +185,14 @@ public:
     IntegerListConfigControl( vlc_object_t *, module_config_t *, QWidget *, bool );
     IntegerListConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                               QComboBox*, bool );
-    virtual int getValue() const;
+    int getValue() const Q_DECL_OVERRIDE;
 protected:
-    virtual void changeVisibility( bool b )
+    void changeVisibility( bool b ) Q_DECL_OVERRIDE
     {
         combo->setVisible( b );
         if ( label ) label->setVisible( b );
     }
-    virtual void fillGrid( QGridLayout*, int );
+    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     void finish(module_config_t * );
     QLabel *label;
@@ -207,14 +207,14 @@ public:
     BoolConfigControl( vlc_object_t *, module_config_t *, QWidget * );
     BoolConfigControl( vlc_object_t *, module_config_t *,
                        QLabel *, QAbstractButton* );
-    virtual int getValue() const;
-    virtual int getType() const;
+    int getValue() const Q_DECL_OVERRIDE;
+    int getType() const Q_DECL_OVERRIDE;
 protected:
-    virtual void changeVisibility( bool b )
+    void changeVisibility( bool b ) Q_DECL_OVERRIDE
     {
         checkbox->setVisible( b );
     }
-    virtual void fillGrid( QGridLayout*, int );
+    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     QAbstractButton *checkbox;
     void finish();
@@ -228,14 +228,14 @@ public:
     ColorConfigControl( vlc_object_t *, module_config_t *,
                         QLabel *, QAbstractButton* );
     virtual ~ColorConfigControl() { delete color_px; }
-    virtual int getValue() const;
+    int getValue() const Q_DECL_OVERRIDE;
 protected:
-    virtual void changeVisibility( bool b )
+    void changeVisibility( bool b ) Q_DECL_OVERRIDE
     {
         color_but->setVisible( b );
         if ( label ) label->setVisible( b );
     }
-    virtual void fillGrid( QGridLayout*, int );
+    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     QLabel *label;
     QAbstractButton *color_but;
@@ -254,8 +254,8 @@ class VFloatConfigControl : public ConfigControl
     Q_OBJECT
 public:
     virtual float getValue() const = 0;
-    virtual int getType() const;
-    virtual void doApply();
+    int getType() const Q_DECL_OVERRIDE;
+    void doApply() Q_DECL_OVERRIDE;
 protected:
     VFloatConfigControl( vlc_object_t *a, module_config_t *b ) :
                 ConfigControl(a,b) {};
@@ -268,15 +268,15 @@ public:
     FloatConfigControl( vlc_object_t *, module_config_t *, QWidget * );
     FloatConfigControl( vlc_object_t *, module_config_t *,
                         QLabel*, QDoubleSpinBox* );
-    virtual float getValue() const;
+    float getValue() const Q_DECL_OVERRIDE;
 
 protected:
-    virtual void changeVisibility( bool b )
+    void changeVisibility( bool b ) Q_DECL_OVERRIDE
     {
         spin->setVisible( b );
         if ( label ) label->setVisible( b );
     }
-    virtual void fillGrid( QGridLayout*, int );
+    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
     QDoubleSpinBox *spin;
 
 private:
@@ -303,8 +303,8 @@ class VStringConfigControl : public ConfigControl
     Q_OBJECT
 public:
     virtual QString getValue() const = 0;
-    virtual int getType() const;
-    virtual void doApply();
+    int getType() const Q_DECL_OVERRIDE;
+    void doApply() Q_DECL_OVERRIDE;
 protected:
     VStringConfigControl( vlc_object_t *a, module_config_t *b ) :
                 ConfigControl(a,b) {};
@@ -318,14 +318,14 @@ public:
                          QWidget *, bool pwd );
     StringConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                          QLineEdit*,  bool pwd );
-    virtual QString getValue() const { return text->text(); };
+    QString getValue() const Q_DECL_OVERRIDE { return text->text(); };
 protected:
-    virtual void changeVisibility( bool b )
+    void changeVisibility( bool b ) Q_DECL_OVERRIDE
     {
         text->setVisible( b );
         if ( label ) label->setVisible( b );
     }
-    virtual void fillGrid( QGridLayout*, int );
+    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     void finish();
     QLineEdit *text;
@@ -339,17 +339,17 @@ public:
     FileConfigControl( vlc_object_t *, module_config_t *, QWidget * );
     FileConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                        QLineEdit *, QPushButton * );
-    virtual QString getValue() const { return text->text(); };
+    QString getValue() const Q_DECL_OVERRIDE { return text->text(); };
 public slots:
     virtual void updateField();
 protected:
-    virtual void changeVisibility( bool b )
+    void changeVisibility( bool b ) Q_DECL_OVERRIDE
     {
         text->setVisible( b );
         browse->setVisible( b );
         if ( label ) label->setVisible( b );
     }
-    virtual void fillGrid( QGridLayout*, int );
+    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
     void finish();
     QLineEdit *text;
     QLabel *label;
@@ -364,7 +364,7 @@ public:
     DirectoryConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                             QLineEdit *, QPushButton * );
 public slots:
-    virtual void updateField();
+    void updateField() Q_DECL_OVERRIDE;
 };
 
 class FontConfigControl : public VStringConfigControl
@@ -374,14 +374,14 @@ public:
     FontConfigControl( vlc_object_t *, module_config_t *, QWidget * );
     FontConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                        QFontComboBox *);
-    virtual QString getValue() const { return font->currentFont().family(); }
+    QString getValue() const Q_DECL_OVERRIDE  { return font->currentFont().family(); }
 protected:
-    virtual void changeVisibility( bool b )
+    void changeVisibility( bool b ) Q_DECL_OVERRIDE
     {
         font->setVisible( b );
         if ( label ) label->setVisible( b );
     }
-    virtual void fillGrid( QGridLayout*, int );
+    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
     QLabel *label;
     QFontComboBox *font;
 };
@@ -393,14 +393,14 @@ public:
     ModuleConfigControl( vlc_object_t *, module_config_t *, QWidget * );
     ModuleConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                          QComboBox* );
-    virtual QString getValue() const;
+    QString getValue() const Q_DECL_OVERRIDE;
 protected:
-    virtual void changeVisibility( bool b )
+    void changeVisibility( bool b ) Q_DECL_OVERRIDE
     {
         combo->setVisible( b );
         if ( label ) label->setVisible( b );
     }
-    virtual void fillGrid( QGridLayout*, int );
+    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     void finish( );
     QLabel *label;
@@ -421,12 +421,12 @@ public:
 //    ModuleListConfigControl( vlc_object_t *, module_config_t *, QLabel *,
 //                         QComboBox*, bool );
     virtual ~ModuleListConfigControl();
-    virtual QString getValue() const;
+    QString getValue() const Q_DECL_OVERRIDE;
 public slots:
     void onUpdate();
 protected:
-    virtual void changeVisibility( bool );
-    virtual void fillGrid( QGridLayout*, int );
+    void changeVisibility( bool ) Q_DECL_OVERRIDE;
+    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     void finish( bool );
     void checkbox_lists(module_t*);
@@ -443,14 +443,14 @@ public:
     StringListConfigControl( vlc_object_t *, module_config_t *, QWidget * );
     StringListConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                              QComboBox*, bool );
-    virtual QString getValue() const;
+    QString getValue() const Q_DECL_OVERRIDE;
 protected:
-    virtual void changeVisibility( bool b )
+    void changeVisibility( bool b ) Q_DECL_OVERRIDE
     {
         combo->setVisible( b );
         if ( label ) label->setVisible( b );
     }
-    virtual void fillGrid( QGridLayout*, int );
+    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
     QComboBox *combo;
 private:
     void finish(module_config_t * );
@@ -476,7 +476,7 @@ public:
     StringConfigControl( vlc_object_t *, module_config_t *, QWidget *, bool
                          bycat );
     virtual ~StringConfigControl();
-    virtual QString getValue();
+    QString getValue() Q_DECL_OVERRIDE;
 private:
     QVector<ModuleCheckBox> checkboxes;
     QLineEdit *text;
@@ -494,17 +494,17 @@ class KeySelectorControl : public ConfigControl
 
 public:
     KeySelectorControl( vlc_object_t *, module_config_t *, QWidget * );
-    virtual int getType() const;
-    virtual void doApply();
+    int getType() const Q_DECL_OVERRIDE;
+    void doApply() Q_DECL_OVERRIDE;
 
 protected:
-    virtual bool eventFilter( QObject *, QEvent * );
-    virtual void changeVisibility( bool b )
+    bool eventFilter( QObject *, QEvent * ) Q_DECL_OVERRIDE;
+    void changeVisibility( bool b ) Q_DECL_OVERRIDE
     {
         table->setVisible( b );
         if ( label ) label->setVisible( b );
     }
-    virtual void fillGrid( QGridLayout*, int );
+    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 
 private:
     void buildAppHotkeysList( QWidget *rootWidget );
