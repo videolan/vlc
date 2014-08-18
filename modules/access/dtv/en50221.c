@@ -1256,7 +1256,7 @@ static uint8_t *CAPMTES( system_ids_t *p_ids, uint8_t *p_capmt,
 
 static uint8_t *CAPMTBuild( cam_t * p_cam, int i_session_id,
                             dvbpsi_pmt_t *p_pmt, uint8_t i_list_mgt,
-                            uint8_t i_cmd, int *pi_capmt_size )
+                            uint8_t i_cmd, int *restrict pi_capmt_size )
 {
     system_ids_t *p_ids =
         (system_ids_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
@@ -1276,7 +1276,6 @@ static uint8_t *CAPMTBuild( cam_t * p_cam, int i_session_id,
         msg_Warn( p_cam->obj,
                   "no compatible scrambling system for SID %d on session %d",
                   p_pmt->i_program_number, i_session_id );
-        *pi_capmt_size = 0;
         return NULL;
     }
 
@@ -1323,8 +1322,7 @@ static void CAPMTFirst( cam_t * p_cam, int i_session_id,
     p_capmt = CAPMTBuild( p_cam, i_session_id, p_pmt,
                           0x3 /* only */, 0x1 /* ok_descrambling */,
                           &i_capmt_size );
-
-    if( i_capmt_size )
+    if( p_capmt != NULL )
     {
         APDUSend( p_cam, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
         free( p_capmt );
@@ -1363,8 +1361,7 @@ static void CAPMTAdd( cam_t * p_cam, int i_session_id,
     p_capmt = CAPMTBuild( p_cam, i_session_id, p_pmt,
                           0x4 /* add */, 0x1 /* ok_descrambling */,
                           &i_capmt_size );
-
-    if( i_capmt_size )
+    if( p_capmt != NULL )
     {
         APDUSend( p_cam, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
         free( p_capmt );
@@ -1386,8 +1383,7 @@ static void CAPMTUpdate( cam_t * p_cam, int i_session_id,
     p_capmt = CAPMTBuild( p_cam, i_session_id, p_pmt,
                           0x5 /* update */, 0x1 /* ok_descrambling */,
                           &i_capmt_size );
-
-    if( i_capmt_size )
+    if( p_capmt != NULL )
     {
         APDUSend( p_cam, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
         free( p_capmt );
@@ -1410,8 +1406,7 @@ static void CAPMTDelete( cam_t * p_cam, int i_session_id,
     p_capmt = CAPMTBuild( p_cam, i_session_id, p_pmt,
                           0x5 /* update */, 0x4 /* not selected */,
                           &i_capmt_size );
-
-    if( i_capmt_size )
+    if( p_capmt != NULL )
     {
         APDUSend( p_cam, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
         free( p_capmt );
