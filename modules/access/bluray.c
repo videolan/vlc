@@ -229,16 +229,17 @@ static void FindMountPoint(char **file)
 {
     char *device = *file;
 #if defined (HAVE_MNTENT_H) && defined (HAVE_SYS_STAT_H)
+    /* bd path may be a symlink (e.g. /dev/dvd -> /dev/sr0), so make sure
+     * we look up the real device */
+    char *bd_device = realpath(device, NULL);
+    if (bd_device == NULL)
+        return;
+
     struct stat st;
-    if (!stat (device, &st) && S_ISBLK (st.st_mode)) {
+    if (lstat (bd_device, &st) == 0 && S_ISBLK (st.st_mode)) {
         FILE *mtab = setmntent ("/proc/self/mounts", "r");
         struct mntent *m, mbuf;
         char buf [8192];
-        /* bd path may be a symlink (e.g. /dev/dvd -> /dev/sr0), so make
-         * sure we look up the real device */
-        char *bd_device = realpath(device, NULL);
-        if (!bd_device)
-            bd_device = strdup(device);
 
         while ((m = getmntent_r (mtab, &mbuf, buf, sizeof(buf))) != NULL) {
             if (!strcmp (m->mnt_fsname, bd_device)) {
@@ -247,9 +248,10 @@ static void FindMountPoint(char **file)
                 break;
             }
         }
-        free(bd_device);
         endmntent (mtab);
     }
+    free(bd_device);
+
 #elif defined(__APPLE__)
     struct stat st;
     if (!stat (device, &st) && S_ISBLK (st.st_mode)) {
