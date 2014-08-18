@@ -1,21 +1,20 @@
 # sparkle
 
-#SPARKLE_VERSION := 1.5b6
-#SPARKLE_URL := http://sparkle.andymatuschak.org/files/Sparkle%20$(SPARKLE_VERSION).zip
-SPARKLE_GITURL := git://github.com/andymatuschak/Sparkle.git
+SPARKLE_VERSION := 1.6.1
+SPARKLE_URL := https://github.com/sparkle-project/Sparkle/archive/$(SPARKLE_VERSION).zip
 
 ifdef HAVE_MACOSX
 PKGS += sparkle
 endif
 
-$(TARBALLS)/sparkle-git.tar.xz:
-	$(call download_git,$(SPARKLE_GITURL),,HEAD)
+$(TARBALLS)/Sparkle-$(SPARKLE_VERSION).zip:
+	$(call download,$(SPARKLE_URL))
 
-.sum-sparkle: sparkle-git.tar.xz
+.sum-sparkle: Sparkle-$(SPARKLE_VERSION).zip
 	$(warning $@ not implemented)
 	touch $@
 
-sparkle: sparkle-git.tar.xz .sum-sparkle
+sparkle: Sparkle-$(SPARKLE_VERSION).zip .sum-sparkle
 	$(UNPACK)
 	$(APPLY) $(SRC)/sparkle/sparkle-fix-compilation-on-snowleopard.patch
 	$(MOVE)
