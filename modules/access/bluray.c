@@ -868,16 +868,13 @@ static void blurayInitOverlay(demux_t *p_demux, int plane, int width, int height
 
     assert(p_sys->p_overlays[plane] == NULL);
 
-    p_sys->p_overlays[plane] = calloc(1, sizeof(**p_sys->p_overlays));
-    if (unlikely(!p_sys->p_overlays[plane]))
+    bluray_overlay_t *ov = calloc(1, sizeof(*ov));
+    if (unlikely(ov == NULL))
         return;
 
-    bluray_overlay_t *ov = p_sys->p_overlays[plane];
-
     subpicture_updater_sys_t *p_upd_sys = malloc(sizeof(*p_upd_sys));
-    if (unlikely(!p_upd_sys)) {
+    if (unlikely(p_upd_sys == NULL)) {
         free(ov);
-        p_sys->p_overlays[plane] = NULL;
         return;
     }
     /* two references: vout + demux */
@@ -890,12 +887,22 @@ static void blurayInitOverlay(demux_t *p_demux, int plane, int width, int height
         .pf_destroy  = subpictureUpdaterDestroy,
         .p_sys       = p_upd_sys,
     };
-    vlc_mutex_init(&ov->lock);
+
     ov->p_pic = subpicture_New(&updater);
+    if (ov->p_pic == NULL) {
+        free(p_upd_sys);
+        free(ov);
+        return;
+    }
+
     ov->p_pic->i_original_picture_width = width;
     ov->p_pic->i_original_picture_height = height;
     ov->p_pic->b_ephemer = true;
     ov->p_pic->b_absolute = true;
+
+    vlc_mutex_init(&ov->lock);
+
+    p_sys->p_overlays[plane] = ov;
 }
 
 /**
