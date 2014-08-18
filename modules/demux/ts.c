@@ -3141,11 +3141,12 @@ static void EITCallBack( demux_t *p_demux,
 
                 /* Only take first description, as we don't handle language-info
                    for epg atm*/
-                if( pE && psz_name == NULL)
+                if( pE && psz_name == NULL )
                 {
                     psz_name = EITConvertToUTF8( p_demux,
                                                  pE->i_event_name, pE->i_event_name_length,
                                                  p_sys->b_broken_charset );
+                    free( psz_text );
                     psz_text = EITConvertToUTF8( p_demux,
                                                  pE->i_text, pE->i_text_length,
                                                  p_sys->b_broken_charset );
