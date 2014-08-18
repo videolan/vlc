@@ -209,13 +209,13 @@
     NSArray *columns = [o_outline_view tableColumns];
     NSUInteger count = columns.count;
     for (NSUInteger x = 0; x < count; x++)
-        [[columns[x] dataCell] setFont:fontToUse];
+        [[[columns objectAtIndex:x] dataCell] setFont:fontToUse];
     [o_outline_view setRowHeight:rowHeight];
 
     columns = [o_outline_view_other tableColumns];
     count = columns.count;
     for (NSUInteger x = 0; x < count; x++)
-        [[columns[x] dataCell] setFont:fontToUse];
+        [[[columns objectAtIndex:x] dataCell] setFont:fontToUse];
     [o_outline_view_other setRowHeight:rowHeight];
 }
 
