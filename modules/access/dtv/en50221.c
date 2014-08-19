@@ -2028,6 +2028,7 @@ cam_t *en50221_Init( vlc_object_t *obj, int fd )
 
     p_cam->obj = obj;
     p_cam->fd = fd;
+    p_cam->i_nb_slots = caps.slot_num;
 
     if( caps.slot_type & CA_CI_LINK )
     {
