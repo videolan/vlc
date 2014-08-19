@@ -643,26 +643,29 @@ set_int( libvlc_media_player_t *p_mi, const char *restrict name,
 {
     if( !opt ) return;
 
-    if( !opt->type ) /* the enabler */
+    switch( opt->type )
     {
-        vout_thread_t *vout = GetVout( p_mi, 0 );
-        if (vout)
+        case 0: /* the enabler */
         {
-            /* Fill sub-source */
-            vout_EnableFilter( vout, opt->name, value, false );
-            var_TriggerCallback( vout, "sub-source" );
-            vlc_object_release( vout );
+            vout_thread_t *vout = GetVout( p_mi, 0 );
+            if (vout != NULL)
+            {   /* Fill sub-source */
+                vout_EnableFilter( vout, opt->name, value, false );
+                var_TriggerCallback( vout, "sub-source" );
+                vlc_object_release( vout );
+            }
+            break;
         }
-        return;
+        case VLC_VAR_INTEGER:
+            var_SetInteger( p_mi, opt->name, value );
+            break;
+        case VLC_VAR_FLOAT:
+            var_SetFloat( p_mi, opt->name, value );
+            break;
+        default:
+            libvlc_printerr( "Invalid argument to %s in %s", name, "set int" );
+            return;
     }
-
-    if( opt->type != VLC_VAR_INTEGER )
-    {
-        libvlc_printerr( "Invalid argument to %s in %s", name, "set int" );
-        return;
-    }
-
-    var_SetInteger( p_mi, opt->name, value );
 }
 
 static int
@@ -680,6 +683,8 @@ get_int( libvlc_media_player_t *p_mi, const char *restrict name,
         }
     case VLC_VAR_INTEGER:
         return var_GetInteger(p_mi, opt->name);
+    case VLC_VAR_FLOAT:
+        return lroundf(var_GetFloat(p_mi, opt->name));
     default:
         libvlc_printerr( "Invalid argument to %s in %s", name, "get int" );
         return 0;
