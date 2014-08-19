@@ -763,7 +763,7 @@ static void OggGetSkeletonFisbone( uint8_t **pp_buffer, long *pi_size,
             break;
         default:
             psz_value = "application/octet-stream";
-            msg_Warn( p_mux, "Unkown fourcc for stream %s, setting Content-Type to %s",
+            msg_Warn( p_mux, "Unknown fourcc for stream %s, setting Content-Type to %s",
                   vlc_fourcc_GetDescription( p_stream->i_cat, p_stream->i_fourcc ),
                   psz_value );
     }
