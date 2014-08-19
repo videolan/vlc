@@ -869,7 +869,7 @@ adjust_option_bynumber( unsigned option )
         { "adjust",     0 },
         { "contrast",   VLC_VAR_FLOAT },
         { "brightness", VLC_VAR_FLOAT },
-        { "hue",        VLC_VAR_INTEGER },
+        { "hue",        VLC_VAR_FLOAT },
         { "saturation", VLC_VAR_FLOAT },
         { "gamma",      VLC_VAR_FLOAT },
     };

@@ -556,7 +556,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
 
     var_Create (mp, "contrast", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
     var_Create (mp, "brightness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
-    var_Create (mp, "hue", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    var_Create (mp, "hue", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
     var_Create (mp, "saturation", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
     var_Create (mp, "gamma", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
 

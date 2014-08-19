@@ -91,7 +91,7 @@ vlc_module_begin ()
     add_float_with_range( "brightness", 1.0, 0.0, 2.0,
                            LUM_TEXT, LUM_LONGTEXT, false )
         change_safe()
-    add_integer_with_range( "hue", 0, 0, 360,
+    add_float_with_range( "hue", 0, -180., +180.,
                             HUE_TEXT, HUE_LONGTEXT, false )
         change_safe()
     add_float_with_range( "saturation", 1.0, 0.0, 3.0,
@@ -121,7 +121,7 @@ struct filter_sys_t
     vlc_mutex_t lock;
     double     f_contrast;
     double     f_brightness;
-    int        i_hue;
+    float      f_hue;
     double     f_saturation;
     double     f_gamma;
     bool       b_brightness_threshold;
@@ -158,7 +158,7 @@ static int Create( vlc_object_t *p_this )
 
     p_sys->f_contrast = var_CreateGetFloatCommand( p_filter, "contrast" );
     p_sys->f_brightness = var_CreateGetFloatCommand( p_filter, "brightness" );
-    p_sys->i_hue = var_CreateGetIntegerCommand( p_filter, "hue" );
+    p_sys->f_hue = var_CreateGetFloatCommand( p_filter, "hue" );
     p_sys->f_saturation = var_CreateGetFloatCommand( p_filter, "saturation" );
     p_sys->f_gamma = var_CreateGetFloatCommand( p_filter, "gamma" );
     p_sys->b_brightness_threshold =
@@ -254,7 +254,7 @@ static picture_t *FilterPlanar( filter_t *p_filter, picture_t *p_pic )
     vlc_mutex_lock( &p_sys->lock );
     i_cont = (int)( p_sys->f_contrast * 255 );
     i_lum = (int)( (p_sys->f_brightness - 1.0)*255 );
-    f_hue = (float)( p_sys->i_hue * M_PI / 180 );
+    f_hue = p_sys->f_hue * (float)(M_PI / 180.);
     i_sat = (int)( p_sys->f_saturation * 256 );
     f_gamma = 1.0 / p_sys->f_gamma;
     b_thres = p_sys->b_brightness_threshold;
@@ -415,7 +415,7 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     vlc_mutex_lock( &p_sys->lock );
     i_cont = (int)( p_sys->f_contrast * 255 );
     i_lum = (int)( (p_sys->f_brightness - 1.0)*255 );
-    f_hue = (float)( p_sys->i_hue * M_PI / 180 );
+    f_hue = p_sys->f_hue * (float)(M_PI / 180.);
     i_sat = (int)( p_sys->f_saturation * 256 );
     f_gamma = 1.0 / p_sys->f_gamma;
     b_thres = p_sys->b_brightness_threshold;
@@ -550,7 +550,7 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
     else if( !strcmp( psz_var, "brightness" ) )
         p_sys->f_brightness = newval.f_float;
     else if( !strcmp( psz_var, "hue" ) )
-        p_sys->i_hue = newval.i_int;
+        p_sys->f_hue = newval.f_float;
     else if( !strcmp( psz_var, "saturation" ) )
         p_sys->f_saturation = newval.f_float;
     else if( !strcmp( psz_var, "gamma" ) )
