@@ -42,7 +42,7 @@
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
 #include "components/playlist/playlist_model.hpp" /* for ~PLModel() */
 
-#if defined(Q_OS_UNIX) && !defined(Q_OS_DARWIN)
+#if defined (QT5_HAS_X11) || defined (Q_WS_X11)
  #include <vlc_xlib.h>
 #endif
 
@@ -317,7 +317,7 @@ vlc_module_begin ()
     add_submodule ()
         set_capability( "vout window nsobject", 0 )
         set_callbacks( WindowOpen, WindowClose )
-#elif defined (Q_OS_UNIX)
+#elif defined (QT5_HAS_X11) || defined (Q_WS_X11)
     add_submodule ()
         set_capability( "vout window xid", 0 )
         set_callbacks( WindowOpen, WindowClose )
@@ -360,7 +360,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-#if defined(Q_OS_UNIX) && !defined(Q_OS_DARWIN)
+#if defined (QT5_HAS_X11) || defined (Q_WS_X11)
     if( !vlc_xlib_init( p_this ) )
         return VLC_EGENERIC;
 
@@ -466,8 +466,18 @@ static void *Thread( void *obj )
 {
     intf_thread_t *p_intf = (intf_thread_t *)obj;
     MainInterface *p_mi;
-    char dummy[] = "vlc"; /* for WM_CLASS */
-    char *argv[] = { dummy, NULL, };
+    char vlc_name[] = "vlc"; /* for WM_CLASS */
+#ifdef QT5_HAS_X11
+    char platform_parm[] = "-platform";
+    char platform_value[] = "xcb";
+#endif
+    char *argv[] = {
+        vlc_name,
+#ifdef QT5_HAS_X11
+        platform_parm, platform_value,
+#endif
+        NULL,
+    };
     int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     Q_INIT_RESOURCE( vlc );
@@ -529,7 +539,7 @@ static void *Thread( void *obj )
 
     /* Check window type from the Qt platform back-end */
     p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_INVALID;
-#if defined (Q_WS_QPA) || HAS_QT5
+#if HAS_QT5 || defined (Q_WS_QPA)
     QString platform = app.platformName();
     if( platform == qfu("xcb") )
         p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
