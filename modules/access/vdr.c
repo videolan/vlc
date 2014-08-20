@@ -892,7 +892,7 @@ static bool ReadIndexRecord( FILE *p_file, bool b_ts, int64_t i_frame,
     uint8_t index_record[8];
     if( fseek( p_file, sizeof(index_record) * i_frame, SEEK_SET ) != 0 )
         return false;
-    if( fread( &index_record, sizeof(index_record), 1, p_file ) <= 0 )
+    if( fread( &index_record, sizeof(index_record), 1, p_file ) < 1 )
         return false;
 
     /* VDR usually (only?) runs on little endian machines, but VLC has a
