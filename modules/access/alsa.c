@@ -185,6 +185,7 @@ static void *Thread (void *data)
         pts = mdate ();
         if (frames < 0)
         {
+            block_Release (block);
             if (frames == -EAGAIN)
                 continue;
 
