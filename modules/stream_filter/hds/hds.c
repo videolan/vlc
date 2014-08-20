@@ -762,6 +762,8 @@ static uint8_t* download_chunk( stream_t *s,
         msg_Err( s, "Requested %"PRIi64" bytes, "\
                  "but only got %d", size, read );
         data = realloc( chunk->data, read );
+        if( data != NULL )
+            chunk->data = data;
         chunk->failed = true;
         return NULL;
     }
