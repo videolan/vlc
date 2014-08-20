@@ -177,7 +177,6 @@ static int dvb_open_adapter (uint8_t adapter)
 /** Opens the DVB device node of the specified type */
 static int dvb_open_node (dvb_device_t *d, const char *type, int flags)
 {
-    int fd;
     char path[strlen (type) + 4];
 
     snprintf (path, sizeof (path), "%s%u", type, d->device);
