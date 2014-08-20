@@ -676,7 +676,7 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
             }
         }
 
-        tmp_es = realloc_or_free( p_psm->es, sizeof(ps_es_t *) * (p_psm->i_es+1) );
+        tmp_es = realloc( p_psm->es, sizeof(ps_es_t *) * (p_psm->i_es+1) );
         if( tmp_es )
         {
             p_psm->es = tmp_es;
