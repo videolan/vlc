@@ -352,7 +352,7 @@ static void print_item(const module_t *m, const module_config_t *item,
 #endif
     const char *bra = OPTION_VALUE_SEP "<", *type, *ket = ">";
     const char *prefix = NULL, *suffix = NULL;
-    char psz_buffer[10000]; // XXX
+    char *typebuf = NULL;
 
     switch (CONFIG_CLASS(item->i_type))
     {
@@ -379,43 +379,64 @@ static void print_item(const module_t *m, const module_config_t *item,
             type = _("string");
             if (item->list_count > 0)
             {
-                bra = OPTION_VALUE_SEP "{";
-                type = psz_buffer;
-                psz_buffer[0] = '\0';
+                size_t len = 0;
 
+                for (unsigned i = 0; i < item->list_count; i++)
+                    len += strlen(item->list.psz[i]) + 1;
+
+                typebuf = malloc(len);
+                if (typebuf == NULL)
+                    break;
+
+                bra = OPTION_VALUE_SEP "{";
+                type = typebuf;
+                ket = "}";
+
+                *typebuf = 0;
                 for (unsigned i = 0; i < item->list_count; i++)
                 {
                     if (i > 0)
-                        strcat(psz_buffer, ",");
-                    strcat(psz_buffer, item->list.psz[i]);
+                        strcat(typebuf, ",");
+                    strcat(typebuf, item->list.psz[i]);
                 }
-                ket = "}";
             }
             break;
 
         case CONFIG_ITEM_INTEGER:
             type = _("integer");
-            if (item->min.i != 0 || item->max.i != 0)
-            {
-                sprintf (psz_buffer, "%s [%"PRId64" .. %"PRId64"]",
-                         type, item->min.i, item->max.i);
-                type = psz_buffer;
-            }
+
             if (item->list_count > 0)
             {
-                bra = OPTION_VALUE_SEP "{";
-                type = psz_buffer;
-                psz_buffer[0] = '\0';
+                size_t len = 0;
 
+                for (unsigned i = 0; i < item->list_count; i++)
+                    len += strlen(item->list_text[i]) + 4 * sizeof (int) + 5;
+
+                typebuf = malloc(len);
+                if (typebuf == NULL)
+                    break;
+
+                bra = OPTION_VALUE_SEP "{";
+                type = typebuf;
+                ket = "}";
+
+                *typebuf = 0;
                 for (unsigned i = 0; i < item->list_count; i++)
                 {
                     if (i != 0)
-                        strcat(psz_buffer, ", ");
-                    sprintf(psz_buffer + strlen(psz_buffer), "%i (%s)",
+                        strcat(typebuf, ", ");
+                    sprintf(typebuf + strlen(typebuf), "%i (%s)",
                             item->list.i[i],
                             module_gettext(m, item->list_text[i]));
                 }
-                ket = "}";
+            }
+            else if (item->min.i != 0 || item->max.i != 0)
+            {
+                if (asprintf(&typebuf, "%s [%"PRId64" .. %"PRId64"]",
+                             type, item->min.i, item->max.i) >= 0)
+                    type = typebuf;
+                else
+                    typebuf = NULL;
             }
             break;
 
@@ -423,9 +444,11 @@ static void print_item(const module_t *m, const module_config_t *item,
             type = _("float");
             if (item->min.f != 0.f || item->max.f != 0.f)
             {
-                sprintf(psz_buffer, "%s [%f .. %f]", type,
-                        item->min.f, item->max.f);
-                type = psz_buffer;
+                if (asprintf(&typebuf, "%s [%f .. %f]", type,
+                             item->min.f, item->max.f) >= 0)
+                    type = typebuf;
+                else
+                    typebuf = NULL;
             }
             break;
 
@@ -484,6 +507,8 @@ static void print_item(const module_t *m, const module_config_t *item,
         print_desc(module_gettext(m, item->psz_longtext),
                    LINE_START + 2, false);
     }
+
+    free(typebuf);
 }
 
 static bool module_match(const module_t *m, const char *pattern, bool strict)
