@@ -833,7 +833,7 @@ static void *Run( void *data )
 
         /* Get the list of watches to process */
         i_watches = vlc_array_count( p_sys->p_watches );
-        DBusWatch *p_watches[i_watches];
+        DBusWatch *p_watches[i_watches ? i_watches : 1];
         for( int i = 0; i < i_watches; i++ )
         {
             p_watches[i] = vlc_array_item_at_index( p_sys->p_watches, i );
