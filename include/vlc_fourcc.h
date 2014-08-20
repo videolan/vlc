@@ -50,6 +50,7 @@
 #define VLC_CODEC_WMVP            VLC_FOURCC('W','M','V','P')
 #define VLC_CODEC_WMVP2           VLC_FOURCC('W','V','P','2')
 #define VLC_CODEC_VC1             VLC_FOURCC('V','C','-','1')
+#define VLC_CODEC_DAALA           VLC_FOURCC('d','a','a','l')
 #define VLC_CODEC_THEORA          VLC_FOURCC('t','h','e','o')
 #define VLC_CODEC_TARKIN          VLC_FOURCC('t','a','r','k')
 #define VLC_CODEC_DIRAC           VLC_FOURCC('d','r','a','c')
