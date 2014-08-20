@@ -351,7 +351,7 @@ static void print_item(const module_t *m, const module_config_t *item,
 # define OPTION_VALUE_SEP "="
 #endif
     const char *bra = OPTION_VALUE_SEP "<", *type, *ket = ">";
-    const char *prefix = NULL, *suffix = "";
+    const char *prefix = NULL, *suffix = NULL;
     char psz_buffer[10000]; // XXX
 
     switch (CONFIG_CLASS(item->i_type))
@@ -432,8 +432,8 @@ static void print_item(const module_t *m, const module_config_t *item,
         case CONFIG_ITEM_BOOL:
             bra = type = ket = "";
             prefix = ", --no-";
-            suffix = item->value.i ? _(" (default enabled)")
-                                   : _(" (default disabled)");
+            suffix = item->value.i ? _("(default enabled)")
+                                   : _("(default disabled)");
             break;
        default:
             return;
@@ -467,17 +467,22 @@ static void print_item(const module_t *m, const module_config_t *item,
         putchar('\n');
         offset = PADDING_SPACES + LINE_START;
     }
-    printf("%*s", offset, "");
 
-    sprintf(psz_buffer, "%s%s", module_gettext(m, item->psz_text), suffix);
-    print_desc(psz_buffer, PADDING_SPACES + LINE_START, color);
+    printf("%*s", offset, "");
+    print_desc(module_gettext(m, item->psz_longtext),
+               PADDING_SPACES + LINE_START, color);
+
+    if (suffix != NULL)
+    {
+        printf("%*s", offset, "");
+        print_desc(suffix, PADDING_SPACES + LINE_START, color);
+    }
 
     if (desc && (item->psz_longtext != NULL && item->psz_longtext[0]))
     {   /* Wrap long description */
         printf("%*s", LINE_START + 2, "");
-        sprintf(psz_buffer, "%s%s", module_gettext(m, item->psz_longtext),
-                suffix);
-        print_desc(psz_buffer, LINE_START + 2, false);
+        print_desc(module_gettext(m, item->psz_longtext),
+                   LINE_START + 2, false);
     }
 }
 
