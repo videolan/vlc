@@ -712,8 +712,8 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
         es_out_Del( out, tk[i].es );
         es_format_Clean( &tk[i].fmt );
 
+        tk_tmp.b_seen = true;
         tk[i] = tk_tmp;
-        tk[i].b_seen = true;
         tk[i].es = es_out_Add( out, &tk[i].fmt );
     }
 
