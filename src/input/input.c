@@ -1126,11 +1126,6 @@ static void InitPrograms( input_thread_t * p_input )
     {
         char *prgms;
 
-        if( var_GetBool( p_input, "sout-all" ) )
-        {
-            i_es_out_mode = ES_OUT_MODE_ALL;
-        }
-        else
         if( (prgms = var_GetNonEmptyString( p_input, "programs" )) != NULL )
         {
             char *buf;
@@ -1149,6 +1144,10 @@ static void InitPrograms( input_thread_t * p_input )
                 /* Note : we should remove the "program" callback. */
 
             free( prgms );
+        }
+        else if( var_GetBool( p_input, "sout-all" ) )
+        {
+            i_es_out_mode = ES_OUT_MODE_ALL;
         }
     }
     es_out_SetMode( p_input->p->p_es_out, i_es_out_mode );
