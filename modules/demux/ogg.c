@@ -136,6 +136,7 @@ static void Ogg_ResetStream( logical_stream_t *p_stream );
 static void Ogg_ExtractMeta( demux_t *p_demux, es_format_t *p_fmt, const uint8_t *p_headers, int i_headers );
 
 /* Logical bitstream headers */
+static bool Ogg_ReadDaalaHeader( logical_stream_t *, ogg_packet * );
 static bool Ogg_ReadTheoraHeader( logical_stream_t *, ogg_packet * );
 static bool Ogg_ReadVorbisHeader( logical_stream_t *, ogg_packet * );
 static bool Ogg_ReadSpeexHeader( logical_stream_t *, ogg_packet * );
@@ -444,6 +445,13 @@ static int Demux( demux_t * p_demux )
                         ! memcmp( oggpacket.packet, "\x80theora", 7 ) )
                 {
                     Ogg_ReadTheoraHeader( p_stream, &oggpacket );
+                    p_stream->i_secondary_header_packets = 0;
+                }
+                else if( p_stream->fmt.i_codec == VLC_CODEC_DAALA &&
+                        oggpacket.bytes >= 6 &&
+                        ! memcmp( oggpacket.packet, "\x80""daala", 6 ) )
+                {
+                    Ogg_ReadDaalaHeader( p_stream, &oggpacket );
                     p_stream->i_secondary_header_packets = 0;
                 }
                 else if( p_stream->fmt.i_codec == VLC_CODEC_VORBIS &&
@@ -938,6 +946,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
     else if( p_oggpacket->granulepos > 0 )
     {
         if( p_stream->fmt.i_codec == VLC_CODEC_THEORA ||
+            p_stream->fmt.i_codec == VLC_CODEC_DAALA ||
             p_stream->fmt.i_codec == VLC_CODEC_KATE ||
             p_stream->fmt.i_codec == VLC_CODEC_VP8 ||
             p_stream->fmt.i_codec == VLC_CODEC_DIRAC ||
@@ -1162,6 +1171,12 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             b_xiph = true;
             break;
 
+        case VLC_CODEC_DAALA:
+            if( p_stream->i_packets_backup == 3 )
+                p_stream->b_force_backup = false;
+            b_xiph = true;
+            break;
+
         case VLC_CODEC_SPEEX:
             if( p_stream->i_packets_backup == 2 + p_stream->i_extra_headers_packets )
                 p_stream->b_force_backup = false;
@@ -1339,6 +1354,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         p_stream->fmt.i_codec != VLC_CODEC_FLAC &&
         p_stream->fmt.i_codec != VLC_CODEC_TARKIN &&
         p_stream->fmt.i_codec != VLC_CODEC_THEORA &&
+        p_stream->fmt.i_codec != VLC_CODEC_DAALA &&
         p_stream->fmt.i_codec != VLC_CODEC_CMML &&
         p_stream->fmt.i_codec != VLC_CODEC_DIRAC &&
         p_stream->fmt.i_codec != VLC_CODEC_KATE )
@@ -1596,6 +1612,21 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     else
                     {
                         msg_Dbg( p_demux, "found invalid Theora header" );
+                        Ogg_LogicalStreamDelete( p_demux, p_stream );
+                        p_ogg->i_streams--;
+                    }
+                }
+                /* Check for Daala header */
+                else if( oggpacket.bytes >= 6 &&
+                         ! memcmp( oggpacket.packet, "\x80""daala", 6 ) )
+                {
+                    if ( Ogg_ReadDaalaHeader( p_stream, &oggpacket ) )
+                        msg_Dbg( p_demux,
+                                 "found daala header, bitrate: %i, rate: %f",
+                                 p_stream->fmt.i_bitrate, p_stream->f_rate );
+                    else
+                    {
+                        msg_Dbg( p_demux, "found invalid Daala header" );
                         Ogg_LogicalStreamDelete( p_demux, p_stream );
                         p_ogg->i_streams--;
                     }
@@ -2381,6 +2412,7 @@ static void Ogg_ExtractMeta( demux_t *p_demux, es_format_t *p_fmt, const uint8_t
     /* 3 headers with the 2° one being the comments */
     case VLC_CODEC_VORBIS:
     case VLC_CODEC_THEORA:
+    case VLC_CODEC_DAALA:
         Ogg_ExtractXiphMeta( p_demux, p_fmt, p_headers, i_headers, 1+6 );
         break;
     case VLC_CODEC_OPUS:
@@ -2481,6 +2513,68 @@ static bool Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
     {
         p_stream->i_keyframe_offset = 1;
     }
+    return true;
+}
+
+static bool Ogg_ReadDaalaHeader( logical_stream_t *p_stream,
+                                 ogg_packet *p_oggpacket )
+{
+    oggpack_buffer opb;
+    uint32_t i_timebase_numerator;
+    uint32_t i_timebase_denominator;
+    int i_keyframe_frequency_force;
+    uint8_t i_major;
+    uint8_t i_minor;
+    uint8_t i_subminor;
+    int i_version;
+
+    p_stream->fmt.i_cat = VIDEO_ES;
+    p_stream->fmt.i_codec = VLC_CODEC_DAALA;
+
+    /* Signal that we want to keep a backup of the daala
+     * stream headers. They will be used when switching between
+     * audio streams. */
+    p_stream->b_force_backup = true;
+
+    /* Cheat and get additionnal info ;) */
+    oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes );
+    oggpack_adv( &opb, 48 );
+
+    i_major = oggpack_read( &opb, 8 ); /* major version num */
+    i_minor = oggpack_read( &opb, 8 ); /* minor version num */
+    i_subminor = oggpack_read( &opb, 8 ); /* subminor version num */
+
+    oggpack_adv( &opb, 32 ); /* width */
+    oggpack_adv( &opb, 32 ); /* height */
+
+    oggpack_adv( &opb, 32 ); /* aspect numerator */
+    oggpack_adv( &opb, 32 ); /* aspect denominator */
+    i_timebase_numerator = oggpack_read( &opb, 32 );
+
+    i_timebase_denominator = oggpack_read( &opb, 32 );
+    i_timebase_denominator = __MAX( i_timebase_denominator, 1 );
+
+    p_stream->fmt.video.i_frame_rate = i_timebase_numerator;
+    p_stream->fmt.video.i_frame_rate_base = i_timebase_denominator;
+
+    oggpack_adv( &opb, 32 ); /* frame duration */
+
+    i_keyframe_frequency_force = 1 << oggpack_read( &opb, 8 );
+
+    /* granule_shift = i_log( frequency_force -1 ) */
+    p_stream->i_granule_shift = 0;
+    i_keyframe_frequency_force--;
+    while( i_keyframe_frequency_force )
+    {
+        p_stream->i_granule_shift++;
+        i_keyframe_frequency_force >>= 1;
+    }
+
+    i_version = i_major * 1000000 + i_minor * 1000 + i_subminor;
+    p_stream->i_keyframe_offset = 0;
+    p_stream->f_rate = ((double)i_timebase_numerator) / i_timebase_denominator;
+    if ( p_stream->f_rate == 0 ) return false;
+
     return true;
 }
 
@@ -2787,6 +2881,14 @@ static void Ogg_ApplyContentType( logical_stream_t *p_stream, const char* psz_va
     {
         p_stream->fmt.i_cat = VIDEO_ES;
         p_stream->fmt.i_codec = VLC_CODEC_THEORA;
+
+        *b_force_backup = true;
+    }
+    else if( !strncmp(psz_value, "video/x-daala", 13) ||
+             !strncmp(psz_value, "video/daala", 11) )
+    {
+        p_stream->fmt.i_cat = VIDEO_ES;
+        p_stream->fmt.i_codec = VLC_CODEC_DAALA;
 
         *b_force_backup = true;
     }

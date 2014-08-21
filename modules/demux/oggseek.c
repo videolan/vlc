@@ -452,6 +452,7 @@ bool Ogg_IsKeyFrame( logical_stream_t *p_stream, ogg_packet *p_packet )
     else switch ( p_stream->fmt.i_codec )
     {
     case VLC_CODEC_THEORA:
+    case VLC_CODEC_DAALA: /* Same convention used in daala */
         if ( p_packet->bytes <= 0 || p_packet->packet[0] & THEORA_FTYPE_NOTDATA )
             return false;
         else
@@ -471,7 +472,8 @@ int64_t Ogg_GetKeyframeGranule( logical_stream_t *p_stream, int64_t i_granule )
     {
            return -1; /* We have no way to know */
     }
-    else if( p_stream->fmt.i_codec == VLC_CODEC_THEORA )
+    else if( p_stream->fmt.i_codec == VLC_CODEC_THEORA ||
+             p_stream->fmt.i_codec == VLC_CODEC_DAALA )
     {
         return ( i_granule >> p_stream->i_granule_shift ) << p_stream->i_granule_shift;
     }
@@ -689,6 +691,7 @@ int64_t Oggseek_GranuleToAbsTimestamp( logical_stream_t *p_stream,
     else  switch( p_stream->fmt.i_codec )
     {
     case VLC_CODEC_THEORA:
+    case VLC_CODEC_DAALA:
     case VLC_CODEC_KATE:
     {
         ogg_int64_t iframe = i_granule >> p_stream->i_granule_shift;
