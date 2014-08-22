@@ -412,7 +412,7 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str, unsigned char opt)
     /* URL scheme */
     next = buf;
     while ((*next >= 'A' && *next <= 'Z') || (*next >= 'a' && *next <= 'z')
-        || (*next >= '0' && *next <= '9') || (strchr ("+-.", *next) != NULL))
+        || (*next >= '0' && *next <= '9') || memchr ("+-.", *next, 3) != NULL)
         next++;
     /* This is not strictly correct. In principles, the scheme is always
      * present in an absolute URL and followed by a colon. Depending on the
