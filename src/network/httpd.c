@@ -891,10 +891,6 @@ httpd_host_t *vlc_https_HostNew(vlc_object_t *obj)
     free(cert);
 
     return httpd_HostCreate(obj, "http-host", "https-port", tls);
-
-error:
-    vlc_tls_Delete(tls);
-    return NULL;
 }
 
 httpd_host_t *vlc_rtsp_HostNew(vlc_object_t *p_this)
