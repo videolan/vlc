@@ -603,11 +603,9 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     mtime_t i_system_start;
     mtime_t i_stream_duration;
     mtime_t i_system_duration;
-    i_ret = input_clock_GetState( p_sys->p_pgrm->p_clock,
+    if (input_clock_GetState( p_sys->p_pgrm->p_clock,
                                   &i_stream_start, &i_system_start,
-                                  &i_stream_duration, &i_system_duration );
-    assert( !i_ret || b_forced );
-    if( i_ret )
+                                  &i_stream_duration, &i_system_duration ))
         return;
 
     mtime_t i_preroll_duration = 0;
