@@ -637,7 +637,7 @@ AC_CHECK_FUNCS([if_nameindex if_nametoindex])
 VLC_RESTORE_FLAGS
 
 AS_IF([test -n "$SOCKET_LIBS"], [
-  VLC_ADD_LIBS([access_rtmp access_output_shout sap stream_out_standard stream_out_rtp stream_out_raop vod_rtsp oldrc netsync gnutls ts remoteosd audiobargraph_a],[${SOCKET_LIBS}])
+  VLC_ADD_LIBS([access_rtmp access_output_shout sap stream_out_standard stream_out_rtp stream_out_raop vod_rtsp oldrc netsync ts remoteosd audiobargraph_a],[${SOCKET_LIBS}])
 ])
 AC_SUBST(SOCKET_LIBS)
 
