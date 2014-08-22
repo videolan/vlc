@@ -333,22 +333,6 @@ static int gnutls_CertSearch (vlc_tls_t *obj, const char *host,
 }
 
 
-static struct
-{
-    unsigned flag;
-    const char msg[29];
-} cert_errs[] =
-{
-    { GNUTLS_CERT_INVALID,            "Certificate not verified"     },
-    { GNUTLS_CERT_REVOKED,            "Certificate revoked"          },
-    { GNUTLS_CERT_SIGNER_NOT_FOUND,   "Signer not found"             },
-    { GNUTLS_CERT_SIGNER_NOT_CA,      "Signer not a CA"              },
-    { GNUTLS_CERT_INSECURE_ALGORITHM, "Signature algorithm insecure" },
-    { GNUTLS_CERT_NOT_ACTIVATED,      "Certificate not activated"    },
-    { GNUTLS_CERT_EXPIRED,            "Certificate expired"          },
-};
-
-
 static int gnutls_HandshakeAndValidate (vlc_tls_t *session, const char *host,
                                         const char *service)
 {
@@ -361,29 +345,37 @@ static int gnutls_HandshakeAndValidate (vlc_tls_t *session, const char *host,
     /* certificates chain verification */
     unsigned status;
 
-    val = gnutls_certificate_verify_peers2 (sys->session, &status);
+    val = gnutls_certificate_verify_peers3 (sys->session, host, &status);
     if (val)
     {
         msg_Err (session, "Certificate verification error: %s",
                  gnutls_strerror (val));
         return -1;
     }
-    if (status)
+
+    if (status == 0)
+        return 0; /* good certificate */
+
+    gnutls_datum_t datum;
+
+    if (gnutls_certificate_verification_status_print(status,
+                   gnutls_certificate_type_get (sys->session), &datum, 0) == 0)
     {
-        msg_Err (session, "Certificate verification failure (0x%04X)", status);
-        for (size_t i = 0; i < sizeof (cert_errs) / sizeof (cert_errs[0]); i++)
-            if (status & cert_errs[i].flag)
-                msg_Err (session, " * %s", cert_errs[i].msg);
-        if (status & ~(GNUTLS_CERT_INVALID|GNUTLS_CERT_SIGNER_NOT_FOUND))
-            return -1;
+        msg_Err (session, "Certificate verification failure: %s", datum.data);
+        gnutls_free (datum.data);
     }
 
-    if (host == NULL)
-        return status ? -1 : 0;
+    status &= ~GNUTLS_CERT_INVALID; /* always set / catch-all error */
+    status &= ~GNUTLS_CERT_SIGNER_NOT_FOUND; /* unknown CA */
+    status &= ~GNUTLS_CERT_UNEXPECTED_OWNER; /* mismatched hostname */
 
-    /* certificate (host)name verification */
+    if (status != 0 || host == NULL)
+        return -1; /* really bad certificate */
+
+    /* manual verification */
     const gnutls_datum_t *data;
     unsigned count;
+
     data = gnutls_certificate_get_peers (sys->session, &count);
     if (data == NULL || count == 0)
     {
@@ -392,34 +384,7 @@ static int gnutls_HandshakeAndValidate (vlc_tls_t *session, const char *host,
     }
     msg_Dbg (session, "%u certificate(s) in the list", count);
 
-    if (status && gnutls_CertSearch (session, host, service, data))
-        return -1;
-
-    gnutls_x509_crt_t cert;
-    val = gnutls_x509_crt_init (&cert);
-    if (val)
-    {
-        msg_Err (session, "X.509 fatal error: %s", gnutls_strerror (val));
-        return -1;
-    }
-
-    val = gnutls_x509_crt_import (cert, data, GNUTLS_X509_FMT_DER);
-    if (val)
-    {
-        msg_Err (session, "Certificate import error: %s",
-                 gnutls_strerror (val));
-        goto error;
-    }
-
-    val = !gnutls_x509_crt_check_hostname (cert, host);
-    if (val)
-    {
-        msg_Err (session, "Certificate does not match \"%s\"", host);
-        val = gnutls_CertSearch (session, host, service, data);
-    }
-error:
-    gnutls_x509_crt_deinit (cert);
-    return val;
+    return gnutls_CertSearch (session, host, service, data);
 }
 
 static int
