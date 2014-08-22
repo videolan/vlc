@@ -65,6 +65,15 @@ static int vlclua_fd_map( lua_State *L, int fd )
         assert( dt->fdv[i] != fd );
 #endif
 
+    for( unsigned i = 0; i < dt->fdc; i++ )
+    {
+        if( dt->fdv[i] == -1 )
+        {
+            dt->fdv[i] = fd;
+            return 3 + i;
+        }
+    }
+
     if( dt->fdc >= 64 )
         return -1;
 
@@ -125,9 +134,9 @@ static void vlclua_fd_unmap( lua_State *L, unsigned idx )
         return;
 
     fd = dt->fdv[idx];
-    dt->fdc--;
-    memmove( dt->fdv + idx, dt->fdv + idx + 1,
-             (dt->fdc - idx) * sizeof (dt->fdv[0]) );
+    dt->fdv[idx] = -1;
+    while( dt->fdc > 0 && dt->fdv[dt->fdc - 1] == -1 )
+        dt->fdc--;
     /* realloc() not really needed */
 #ifndef NDEBUG
     for( unsigned i = 0; i < dt->fdc; i++ )
@@ -537,7 +546,8 @@ void vlclua_fd_interrupt( vlclua_dtable_t *dt )
 void vlclua_fd_cleanup( vlclua_dtable_t *dt )
 {
     for( unsigned i = 0; i < dt->fdc; i++ )
-         net_Close( dt->fdv[i] );
+        if( dt->fdv[i] != -1 )
+            net_Close( dt->fdv[i] );
     free( dt->fdv );
 #ifndef _WIN32
     if( dt->fd[1] != -1 )
