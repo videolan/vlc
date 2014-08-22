@@ -410,16 +410,6 @@ gnutls_SessionPrioritize (vlc_object_t *obj, gnutls_session_t session)
 
 
 /**
- * TLS credentials private data
- */
-struct vlc_tls_creds_sys
-{
-    gnutls_certificate_credentials_t x509_cred;
-    gnutls_dh_params_t dh_params; /* XXX: used for server only */
-};
-
-
-/**
  * Terminates TLS session and releases session data.
  * You still have to close the socket yourself.
  */
@@ -435,67 +425,78 @@ static void gnutls_SessionClose (vlc_tls_t *session)
 }
 
 
-static int gnutls_SessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
-                               int type, int fd)
+static int gnutls_SessionOpen (vlc_tls_t *tls, int type,
+                               gnutls_certificate_credentials_t x509, int fd)
 {
-    vlc_tls_sys_t *sys = malloc (sizeof (*session->sys));
+    vlc_tls_sys_t *sys = malloc (sizeof (*tls->sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    session->sys = sys;
-    session->sock.p_sys = session;
-    session->sock.pf_send = gnutls_Send;
-    session->sock.pf_recv = gnutls_Recv;
     sys->handshaked = false;
 
     int val = gnutls_init (&sys->session, type);
     if (val != 0)
     {
-        msg_Err (session, "cannot initialize TLS session: %s",
+        msg_Err (tls, "cannot initialize TLS session: %s",
                  gnutls_strerror (val));
         free (sys);
         return VLC_EGENERIC;
     }
 
-    if (gnutls_SessionPrioritize (VLC_OBJECT (crd), sys->session))
+    if (gnutls_SessionPrioritize (VLC_OBJECT (tls), sys->session))
         goto error;
 
-    val = gnutls_credentials_set (sys->session, GNUTLS_CRD_CERTIFICATE,
-                                  crd->sys->x509_cred);
+    val = gnutls_credentials_set (sys->session, GNUTLS_CRD_CERTIFICATE, x509);
     if (val < 0)
     {
-        msg_Err (session, "cannot set TLS session credentials: %s",
+        msg_Err (tls, "cannot set TLS session credentials: %s",
                  gnutls_strerror (val));
         goto error;
     }
 
     gnutls_transport_set_ptr (sys->session,
                               (gnutls_transport_ptr_t)(intptr_t)fd);
+
+    tls->sys = sys;
+    tls->sock.p_sys = tls;
+    tls->sock.pf_send = gnutls_Send;
+    tls->sock.pf_recv = gnutls_Recv;
     return VLC_SUCCESS;
 
 error:
-    gnutls_SessionClose (session);
+    gnutls_SessionClose (tls);
     return VLC_EGENERIC;
 }
 
 /**
+ * Server-side TLS credentials private data
+ */
+typedef struct vlc_tls_creds_sys
+{
+    gnutls_certificate_credentials_t x509_cred;
+    gnutls_dh_params_t dh_params;
+} vlc_tls_creds_sys_t;
+
+/**
  * Initializes a server-side TLS session.
  */
-static int gnutls_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
+static int gnutls_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
                                      int fd, const char *hostname)
 {
+    vlc_tls_creds_sys_t *sys = crd->sys;
+
     assert (hostname == NULL);
-    return gnutls_SessionOpen (crd, session, GNUTLS_SERVER, fd);
+    return gnutls_SessionOpen (tls, GNUTLS_SERVER, sys->x509_cred, fd);
 }
 
-static int gnutls_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
+static int gnutls_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
                                      int fd, const char *hostname)
 {
-    int val = gnutls_SessionOpen (crd, session, GNUTLS_CLIENT, fd);
+    int val = gnutls_SessionOpen (tls, GNUTLS_CLIENT, crd->sys, fd);
     if (val != VLC_SUCCESS)
         return val;
 
-    vlc_tls_sys_t *sys = session->sys;
+    vlc_tls_sys_t *sys = tls->sys;
 
     /* minimum DH prime bits */
     gnutls_dh_set_prime_bits (sys->session, 1024);
@@ -624,49 +625,43 @@ static void CloseServer (vlc_tls_creds_t *crd)
  */
 static int OpenClient (vlc_tls_creds_t *crd)
 {
+    gnutls_certificate_credentials_t x509;
+
     if (gnutls_Init (VLC_OBJECT(crd)))
         return VLC_EGENERIC;
 
-    vlc_tls_creds_sys_t *sys = malloc (sizeof (*sys));
-    if (unlikely(sys == NULL))
-        goto error;
-
-    int val = gnutls_certificate_allocate_credentials (&sys->x509_cred);
+    int val = gnutls_certificate_allocate_credentials (&x509);
     if (val != 0)
     {
         msg_Err (crd, "cannot allocate credentials: %s",
                  gnutls_strerror (val));
-        goto error;
+        gnutls_Deinit (VLC_OBJECT(crd));
+        return VLC_EGENERIC;
     }
 
-    val = gnutls_certificate_set_x509_system_trust (sys->x509_cred);
+    val = gnutls_certificate_set_x509_system_trust (x509);
     if (val < 0)
         msg_Err (crd, "cannot load trusted Certificate Authorities: %s",
                  gnutls_strerror (val));
     else
         msg_Dbg (crd, "loaded %d trusted CAs", val);
 
-    gnutls_certificate_set_verify_flags (sys->x509_cred,
+    gnutls_certificate_set_verify_flags (x509,
                                          GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
 
-    crd->sys = sys;
+    crd->sys = x509;
     crd->open = gnutls_ClientSessionOpen;
     crd->handshake = gnutls_HandshakeAndValidate;
     crd->close = gnutls_SessionClose;
 
     return VLC_SUCCESS;
-error:
-    free (sys);
-    gnutls_Deinit (VLC_OBJECT(crd));
-    return VLC_EGENERIC;
 }
 
 static void CloseClient (vlc_tls_creds_t *crd)
 {
-    vlc_tls_creds_sys_t *sys = crd->sys;
+    gnutls_certificate_credentials_t x509 = crd->sys;
 
-    gnutls_certificate_free_credentials (sys->x509_cred);
-    free (sys);
+    gnutls_certificate_free_credentials (x509);
 
     gnutls_Deinit (VLC_OBJECT(crd));
 }

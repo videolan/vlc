@@ -32,7 +32,6 @@
 typedef struct vlc_tls vlc_tls_t;
 typedef struct vlc_tls_sys vlc_tls_sys_t;
 typedef struct vlc_tls_creds vlc_tls_creds_t;
-typedef struct vlc_tls_creds_sys vlc_tls_creds_sys_t;
 
 /** TLS session */
 struct vlc_tls
@@ -62,7 +61,7 @@ struct vlc_tls_creds
     VLC_COMMON_MEMBERS
 
     module_t  *module;
-    vlc_tls_creds_sys_t *sys;
+    void *sys;
 
     int (*open) (vlc_tls_creds_t *, vlc_tls_t *, int fd, const char *host);
     int  (*handshake) (vlc_tls_t *, const char *host, const char *service);
