@@ -65,9 +65,6 @@ struct vlc_tls_creds
     module_t  *module;
     vlc_tls_creds_sys_t *sys;
 
-    int (*add_CA) (vlc_tls_creds_t *, const char *path);
-    int (*add_CRL) (vlc_tls_creds_t *, const char *path);
-
     int (*open) (vlc_tls_creds_t *, vlc_tls_t *, int fd, const char *host);
     void (*close) (vlc_tls_creds_t *, vlc_tls_t *);
 };
@@ -76,7 +73,5 @@ VLC_API vlc_tls_creds_t *vlc_tls_ClientCreate (vlc_object_t *);
 vlc_tls_creds_t *vlc_tls_ServerCreate (vlc_object_t *,
                                        const char *cert, const char *key);
 VLC_API void vlc_tls_Delete (vlc_tls_creds_t *);
-int vlc_tls_ServerAddCA (vlc_tls_creds_t *srv, const char *path);
-int vlc_tls_ServerAddCRL (vlc_tls_creds_t *srv, const char *path);
 
 #endif

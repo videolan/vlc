@@ -890,26 +890,6 @@ httpd_host_t *vlc_https_HostNew(vlc_object_t *obj)
     free(key);
     free(cert);
 
-    char *ca = var_InheritString(obj, "http-ca");
-    if (ca) {
-        if (vlc_tls_ServerAddCA(tls, ca)) {
-            msg_Err(obj, "HTTP/TLS CA error (%s)", ca);
-            free(ca);
-            goto error;
-        }
-        free(ca);
-    }
-
-    char *crl = var_InheritString(obj, "http-crl");
-    if (crl) {
-        if (vlc_tls_ServerAddCRL(tls, crl)) {
-            msg_Err(obj, "TLS CRL error (%s)", crl);
-            free(crl);
-            goto error;
-        }
-        free(crl);
-    }
-
     return httpd_HostCreate(obj, "http-host", "https-port", tls);
 
 error:

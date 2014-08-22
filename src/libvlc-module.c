@@ -836,16 +836,6 @@ static const char *const ppsz_prefres[] = {
 #define KEY_LONGTEXT N_( \
    "This private key file (PEM format) is used for server-side TLS.")
 
-#define HTTP_CA_TEXT N_("HTTP/TLS Certificate Authority")
-#define CA_LONGTEXT N_( \
-   "This X.509 certificate file (PEM format) can optionally be used " \
-   "to authenticate remote clients in TLS sessions.")
-
-#define HTTP_CRL_TEXT N_("HTTP/TLS Certificate Revocation List")
-#define CRL_LONGTEXT N_( \
-   "This file contains an optional CRL to prevent remote clients " \
-   "from using revoked certificates in TLS sessions.")
-
 #define SOCKS_SERVER_TEXT N_("SOCKS server")
 #define SOCKS_SERVER_LONGTEXT N_( \
     "SOCKS proxy server to use. This must be of the form " \
@@ -1747,9 +1737,9 @@ vlc_module_begin ()
     add_obsolete_string( "sout-http-cert" ) /* since 2.0.0 */
     add_loadfile( "http-key", NULL, HTTP_KEY_TEXT, KEY_LONGTEXT, true )
     add_obsolete_string( "sout-http-key" ) /* since 2.0.0 */
-    add_loadfile( "http-ca", NULL, HTTP_CA_TEXT, CA_LONGTEXT, true )
+    add_obsolete_string( "http-ca" ) /* since 3.0.0 */
     add_obsolete_string( "sout-http-ca" ) /* since 2.0.0 */
-    add_loadfile( "http-crl", NULL, HTTP_CRL_TEXT, CRL_LONGTEXT, true )
+    add_obsolete_string( "http-crl" ) /* since 3.0.0 */
     add_obsolete_string( "sout-http-crl" ) /* since 2.0.0 */
 
     set_section( N_( "Socks proxy") , NULL )

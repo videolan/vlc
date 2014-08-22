@@ -143,26 +143,6 @@ void vlc_tls_Delete (vlc_tls_creds_t *crd)
 }
 
 
-/**
- * Adds one or more certificate authorities from a file.
- * @return -1 on error, 0 on success.
- */
-int vlc_tls_ServerAddCA (vlc_tls_creds_t *srv, const char *path)
-{
-    return srv->add_CA (srv, path);
-}
-
-
-/**
- * Adds one or more certificate revocation list from a file.
- * @return -1 on error, 0 on success.
- */
-int vlc_tls_ServerAddCRL (vlc_tls_creds_t *srv, const char *path)
-{
-    return srv->add_CRL (srv, path);
-}
-
-
 /*** TLS  session ***/
 
 vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *crd, int fd,
