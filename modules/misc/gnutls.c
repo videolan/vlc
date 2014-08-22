@@ -423,7 +423,7 @@ struct vlc_tls_creds_sys
  * Terminates TLS session and releases session data.
  * You still have to close the socket yourself.
  */
-static void gnutls_SessionClose (vlc_tls_creds_t *crd, vlc_tls_t *session)
+static void gnutls_SessionClose (vlc_tls_t *session)
 {
     vlc_tls_sys_t *sys = session->sys;
 
@@ -432,7 +432,6 @@ static void gnutls_SessionClose (vlc_tls_creds_t *crd, vlc_tls_t *session)
     gnutls_deinit (sys->session);
 
     free (sys);
-    (void) crd;
 }
 
 
@@ -447,10 +446,6 @@ static int gnutls_SessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
     session->sock.p_sys = session;
     session->sock.pf_send = gnutls_Send;
     session->sock.pf_recv = gnutls_Recv;
-    if (type == GNUTLS_SERVER)
-        session->handshake = gnutls_ContinueHandshake;
-    else
-        session->handshake = gnutls_HandshakeAndValidate;
     sys->handshaked = false;
 
     int val = gnutls_init (&sys->session, type);
@@ -479,7 +474,7 @@ static int gnutls_SessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
     return VLC_SUCCESS;
 
 error:
-    gnutls_SessionClose (crd, session);
+    gnutls_SessionClose (session);
     return VLC_EGENERIC;
 }
 
@@ -527,10 +522,6 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
     vlc_tls_creds_sys_t *sys = malloc (sizeof (*sys));
     if (unlikely(sys == NULL))
         goto error;
-
-    crd->sys     = sys;
-    crd->open    = gnutls_ServerSessionOpen;
-    crd->close   = gnutls_SessionClose;
 
     /* Sets server's credentials */
     val = gnutls_certificate_allocate_credentials (&sys->x509_cred);
@@ -600,6 +591,11 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
                  gnutls_strerror (val));
     }
 
+    crd->sys = sys;
+    crd->open = gnutls_ServerSessionOpen;
+    crd->handshake = gnutls_ContinueHandshake;
+    crd->close = gnutls_SessionClose;
+
     return VLC_SUCCESS;
 
 error:
@@ -635,10 +631,6 @@ static int OpenClient (vlc_tls_creds_t *crd)
     if (unlikely(sys == NULL))
         goto error;
 
-    crd->sys = sys;
-    crd->open = gnutls_ClientSessionOpen;
-    crd->close = gnutls_SessionClose;
-
     int val = gnutls_certificate_allocate_credentials (&sys->x509_cred);
     if (val != 0)
     {
@@ -656,6 +648,11 @@ static int OpenClient (vlc_tls_creds_t *crd)
 
     gnutls_certificate_set_verify_flags (sys->x509_cred,
                                          GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
+
+    crd->sys = sys;
+    crd->open = gnutls_ClientSessionOpen;
+    crd->handshake = gnutls_HandshakeAndValidate;
+    crd->close = gnutls_SessionClose;
 
     return VLC_SUCCESS;
 error:

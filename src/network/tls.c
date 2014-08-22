@@ -157,18 +157,20 @@ vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *crd, int fd,
     return NULL;
 }
 
+int vlc_tls_SessionHandshake (vlc_tls_t *session, const char *host,
+                              const char *service)
+{
+    vlc_tls_creds_t *crd = (vlc_tls_creds_t *)(session->p_parent);
+
+    return crd->handshake (session, host, service);
+}
+
 void vlc_tls_SessionDelete (vlc_tls_t *session)
 {
     vlc_tls_creds_t *crd = (vlc_tls_creds_t *)(session->p_parent);
 
-    crd->close (crd, session);
+    crd->close (session);
     vlc_object_release (session);
-}
-
-int vlc_tls_SessionHandshake (vlc_tls_t *session, const char *host,
-                              const char *service)
-{
-    return session->handshake (session, host, service);
 }
 
 /**

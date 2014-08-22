@@ -42,7 +42,6 @@ struct vlc_tls
     vlc_tls_sys_t *sys;
 
     struct virtual_socket_t sock;
-    int  (*handshake) (vlc_tls_t *, const char *host, const char *service);
 };
 
 VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *, int fd,
@@ -66,7 +65,8 @@ struct vlc_tls_creds
     vlc_tls_creds_sys_t *sys;
 
     int (*open) (vlc_tls_creds_t *, vlc_tls_t *, int fd, const char *host);
-    void (*close) (vlc_tls_creds_t *, vlc_tls_t *);
+    int  (*handshake) (vlc_tls_t *, const char *host, const char *service);
+    void (*close) (vlc_tls_t *);
 };
 
 VLC_API vlc_tls_creds_t *vlc_tls_ClientCreate (vlc_object_t *);
