@@ -378,6 +378,9 @@ static int gnutls_HandshakeAndValidate (vlc_tls_t *session, const char *host,
             return -1;
     }
 
+    if (host == NULL)
+        return status ? -1 : 0;
+
     /* certificate (host)name verification */
     const gnutls_datum_t *data;
     unsigned count;
@@ -389,8 +392,6 @@ static int gnutls_HandshakeAndValidate (vlc_tls_t *session, const char *host,
     }
     msg_Dbg (session, "%u certificate(s) in the list", count);
 
-    if (val || host == NULL)
-        return val;
     if (status && gnutls_CertSearch (session, host, service, data))
         return -1;
 
