@@ -1567,10 +1567,11 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
     /* FIXME find real max size */
     /* const int i_max = */ block_ChainExtract( p_pes, header, 34 );
 
-    if( header[0] != 0 || header[1] != 0 || header[2] != 1 )
+    if( pid->b_scrambled || header[0] != 0 || header[1] != 0 || header[2] != 1 )
     {
-        msg_Warn( p_demux, "invalid header [0x%02x:%02x:%02x:%02x] (pid: %d)",
-                    header[0], header[1],header[2],header[3], pid->i_pid );
+        if ( !pid->b_scrambled )
+            msg_Warn( p_demux, "invalid header [0x%02x:%02x:%02x:%02x] (pid: %d)",
+                        header[0], header[1],header[2],header[3], pid->i_pid );
         block_ChainRelease( p_pes );
         return;
     }
