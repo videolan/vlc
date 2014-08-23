@@ -462,10 +462,6 @@ static int snapshot_was_taken(vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-/* */
-static void libvlc_media_player_destroy( libvlc_media_player_t * );
-
-
 /**************************************************************************
  * Create a Media Instance object.
  *
