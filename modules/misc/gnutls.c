@@ -22,6 +22,8 @@
 # include "config.h"
 #endif
 
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <errno.h>
 #include <assert.h>
@@ -161,7 +163,8 @@ static int gnutls_Recv (void *opaque, void *buf, size_t length)
 }
 
 static int gnutls_SessionOpen (vlc_tls_t *tls, int type,
-                               gnutls_certificate_credentials_t x509, int fd)
+                               gnutls_certificate_credentials_t x509, int fd,
+                               const char *const *alpn)
 {
     gnutls_session_t session;
     const char *errp;
@@ -195,6 +198,31 @@ static int gnutls_SessionOpen (vlc_tls_t *tls, int type,
         goto error;
     }
 
+    if (alpn != NULL)
+    {
+        gnutls_datum_t *protv = NULL;
+        unsigned protc = 0;
+
+        while (*alpn != NULL)
+        {
+            gnutls_datum_t *n = realloc(protv, sizeof (*protv) * (protc + 1));
+            if (unlikely(n == NULL))
+            {
+                free(protv);
+                goto error;
+            }
+            protv = n;
+
+            protv[protc].data = (void *)*alpn;
+            protv[protc].size = strlen(*alpn);
+            protc++;
+            alpn++;
+        }
+
+        val = gnutls_alpn_set_protocols (session, protv, protc, 0);
+        free (protv);
+    }
+
     gnutls_transport_set_int (session, fd);
 
     tls->sys = session;
@@ -215,7 +243,7 @@ error:
  * 1 if more would-be blocking recv is needed,
  * 2 if more would-be blocking send is required.
  */
-static int gnutls_ContinueHandshake (vlc_tls_t *tls)
+static int gnutls_ContinueHandshake (vlc_tls_t *tls, char **restrict alp)
 {
     gnutls_session_t session = tls->sys;
     int val;
@@ -231,7 +259,7 @@ static int gnutls_ContinueHandshake (vlc_tls_t *tls)
         switch (val)
         {
             case GNUTLS_E_SUCCESS:
-                return 0;
+                goto done;
             case GNUTLS_E_AGAIN:
             case GNUTLS_E_INTERRUPTED:
                 /* I/O event: return to caller's poll() loop */
@@ -245,6 +273,26 @@ static int gnutls_ContinueHandshake (vlc_tls_t *tls)
 #endif
     msg_Err (tls, "TLS handshake error: %s", gnutls_strerror (val));
     return -1;
+
+done:
+    if (alp != NULL)
+    {
+        gnutls_datum_t datum;
+
+        val = gnutls_alpn_get_selected_protocol (session, &datum);
+        if (val == 0)
+        {
+            if (memchr (datum.data, 0, datum.size) != NULL)
+                return -1; /* Other end is doing something fishy?! */
+
+            *alp = strndup ((char *)datum.data, datum.size);
+            if (unlikely(*alp == NULL))
+                return -1;
+        }
+        else
+            *alp = NULL;
+    }
+    return 0;
 }
 
 /**
@@ -262,9 +310,10 @@ static void gnutls_SessionClose (vlc_tls_t *tls)
 }
 
 static int gnutls_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
-                                     int fd, const char *hostname)
+                                     int fd, const char *hostname,
+                                     const char *const *alpn)
 {
-    int val = gnutls_SessionOpen (tls, GNUTLS_CLIENT, crd->sys, fd);
+    int val = gnutls_SessionOpen (tls, GNUTLS_CLIENT, crd->sys, fd, alpn);
     if (val != VLC_SUCCESS)
         return val;
 
@@ -282,9 +331,9 @@ static int gnutls_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
 }
 
 static int gnutls_ClientHandshake (vlc_tls_t *tls, const char *host,
-                                   const char *service)
+                                   const char *service, char **restrict alp)
 {
-    int val = gnutls_ContinueHandshake (tls);
+    int val = gnutls_ContinueHandshake (tls, alp);
     if (val)
         return val;
 
@@ -468,18 +517,19 @@ typedef struct vlc_tls_creds_sys
  * Initializes a server-side TLS session.
  */
 static int gnutls_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
-                                     int fd, const char *hostname)
+                                     int fd, const char *hostname,
+                                     const char *const *alpn)
 {
     vlc_tls_creds_sys_t *sys = crd->sys;
 
     assert (hostname == NULL);
-    return gnutls_SessionOpen (tls, GNUTLS_SERVER, sys->x509_cred, fd);
+    return gnutls_SessionOpen (tls, GNUTLS_SERVER, sys->x509_cred, fd, alpn);
 }
 
 static int gnutls_ServerHandshake (vlc_tls_t *tls, const char *host,
-                                   const char *service)
+                                   const char *service, char **restrict alp)
 {
-    int val = gnutls_ContinueHandshake (tls);
+    int val = gnutls_ContinueHandshake (tls, alp);
     if (val == 0)
         tls->sock.p_sys = tls;
 

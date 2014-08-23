@@ -62,8 +62,10 @@ struct vlc_tls_creds
     module_t  *module;
     void *sys;
 
-    int (*open) (vlc_tls_creds_t *, vlc_tls_t *, int fd, const char *host);
-    int  (*handshake) (vlc_tls_t *, const char *host, const char *service);
+    int (*open) (vlc_tls_creds_t *, vlc_tls_t *, int fd, const char *host,
+                 const char *const *alpn);
+    int  (*handshake) (vlc_tls_t *, const char *host, const char *service,
+                       char **restrict alp);
     void (*close) (vlc_tls_t *);
 };
 
