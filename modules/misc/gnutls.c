@@ -61,7 +61,7 @@ static vlc_mutex_t gnutls_mutex = VLC_STATIC_MUTEX;
  */
 static int gnutls_Init (vlc_object_t *obj)
 {
-    const char *version = gnutls_check_version ("3.1.9");
+    const char *version = gnutls_check_version ("3.1.11");
     if (version == NULL)
     {
         msg_Err (obj, "unsupported GnuTLS version");
