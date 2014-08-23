@@ -53,7 +53,7 @@ static int gnutls_Init (vlc_object_t *p_this)
         goto error;
     }
 
-    const char *psz_version = gnutls_check_version ("3.1.4");
+    const char *psz_version = gnutls_check_version ("3.1.9");
     if (psz_version == NULL)
     {
         msg_Err (p_this, "unsupported GnuTLS version");
@@ -183,7 +183,7 @@ static int gnutls_SessionOpen (vlc_tls_t *tls, int type,
         goto error;
     }
 
-    gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t)(intptr_t)fd);
+    gnutls_transport_set_int (session, fd);
 
     tls->sys = session;
     tls->sock.p_sys = NULL;

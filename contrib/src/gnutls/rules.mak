@@ -8,7 +8,7 @@ ifndef HAVE_DARWIN_OS
 PKGS += gnutls
 endif
 endif
-ifeq ($(call need_pkg,"gnutls >= 3.0.20"),)
+ifeq ($(call need_pkg,"gnutls >= 3.1.9"),)
 PKGS_FOUND += gnutls
 endif
 
