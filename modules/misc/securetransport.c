@@ -76,15 +76,14 @@ vlc_module_end ()
 #define cfKeyHost CFSTR("host")
 #define cfKeyCertificate CFSTR("certificate")
 
-struct vlc_tls_creds_sys
-{
+typedef struct {
     CFMutableArrayRef whitelist;
 
     /* valid in server mode */
     CFArrayRef server_cert_chain;
-};
+} vlc_tls_creds_sys_t;
 
-struct vlc_tls_sys {
+typedef struct {
     SSLContextRef p_context;
     vlc_tls_creds_sys_t *p_cred;
     size_t i_send_buffered_bytes;
@@ -93,7 +92,7 @@ struct vlc_tls_sys {
     bool b_blocking_send;
     bool b_handshaked;
     bool b_server_mode;
-};
+} vlc_tls_sys_t;
 
 static int st_Error (vlc_tls_t *obj, int val)
 {
@@ -498,9 +497,7 @@ static int st_Recv (void *opaque, void *buf, size_t length)
 /**
  * Closes a TLS session.
  */
-static void st_SessionClose (vlc_tls_creds_t *crd, vlc_tls_t *session) {
-
-    VLC_UNUSED(crd);
+static void st_SessionClose (vlc_tls_t *session) {
 
     vlc_tls_sys_t *sys = session->sys;
     msg_Dbg(session, "close TLS session");
@@ -531,7 +528,7 @@ static void st_SessionClose (vlc_tls_creds_t *crd, vlc_tls_t *session) {
 static int st_SessionOpenCommon (vlc_tls_creds_t *crd, vlc_tls_t *session,
                                  int fd, bool b_server) {
 
-    vlc_tls_sys_t *sys = malloc(sizeof(*session->sys));
+    vlc_tls_sys_t *sys = malloc(sizeof(vlc_tls_sys_t));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
@@ -546,7 +543,7 @@ static int st_SessionOpenCommon (vlc_tls_creds_t *crd, vlc_tls_t *session,
     session->sock.p_sys = session;
     session->sock.pf_send = st_Send;
     session->sock.pf_recv = st_Recv;
-    session->handshake = st_Handshake;
+    crd->handshake = st_Handshake;
 
     SSLContextRef p_context = NULL;
 #if TARGET_OS_IPHONE
@@ -618,7 +615,7 @@ static int st_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
     return VLC_SUCCESS;
 
 error:
-    st_SessionClose(crd, session);
+    st_SessionClose(session);
     return VLC_EGENERIC;
 }
 
@@ -672,9 +669,10 @@ static int st_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
     }
 
     vlc_tls_sys_t *sys = session->sys;
+    vlc_tls_creds_sys_t *p_cred_sys = crd->sys;
     sys->b_server_mode = true;
 
-    ret = SSLSetCertificate(sys->p_context, crd->sys->server_cert_chain);
+    ret = SSLSetCertificate(sys->p_context, p_cred_sys->server_cert_chain);
     if (ret != noErr) {
         msg_Err(session, "cannot set server certificate");
         goto error;
@@ -683,7 +681,7 @@ static int st_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
     return VLC_SUCCESS;
 
 error:
-    st_SessionClose(crd, session);
+    st_SessionClose(session);
     return VLC_EGENERIC;
 }
 
