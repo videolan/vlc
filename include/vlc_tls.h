@@ -30,7 +30,6 @@
 # include <vlc_network.h>
 
 typedef struct vlc_tls vlc_tls_t;
-typedef struct vlc_tls_sys vlc_tls_sys_t;
 typedef struct vlc_tls_creds vlc_tls_creds_t;
 
 /** TLS session */
@@ -38,7 +37,7 @@ struct vlc_tls
 {
     VLC_COMMON_MEMBERS
 
-    vlc_tls_sys_t *sys;
+    void *sys;
 
     struct virtual_socket_t sock;
 };
