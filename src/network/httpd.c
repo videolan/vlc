@@ -1670,7 +1670,8 @@ static void httpd_ClientSend(httpd_client_t *cl)
 
 static void httpd_ClientTlsHandshake(httpd_client_t *cl)
 {
-    switch(vlc_tls_SessionHandshake(cl->p_tls, NULL, NULL)) {
+    switch (vlc_tls_SessionHandshake(cl->p_tls, NULL, NULL, NULL))
+    {
         case -1: cl->i_state = HTTPD_CLIENT_DEAD;       break;
         case 0:  cl->i_state = HTTPD_CLIENT_RECEIVING;  break;
         case 1:  cl->i_state = HTTPD_CLIENT_TLS_HS_IN;  break;
@@ -2047,7 +2048,7 @@ static void httpdLoop(httpd_host_t *host)
         vlc_tls_t *p_tls;
 
         if (host->p_tls)
-            p_tls = vlc_tls_SessionCreate(host->p_tls, fd, NULL);
+            p_tls = vlc_tls_SessionCreate(host->p_tls, fd, NULL, NULL);
         else
             p_tls = NULL;
 

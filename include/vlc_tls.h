@@ -43,9 +43,12 @@ struct vlc_tls
 };
 
 VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *, int fd,
-                                        const char *host, const char *service);
-vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *, int fd, const char *host);
-int vlc_tls_SessionHandshake (vlc_tls_t *, const char *host, const char *serv);
+                                         const char *host, const char *service,
+                                         const char *const *alpn, char **alp);
+vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *, int fd, const char *host,
+                                  const char *const *alpn);
+int vlc_tls_SessionHandshake (vlc_tls_t *, const char *host, const char *serv,
+                              char **restrict alp);
 VLC_API void vlc_tls_SessionDelete (vlc_tls_t *);
 
 /* NOTE: It is assumed that a->sock.p_sys = a */
