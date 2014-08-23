@@ -2047,8 +2047,12 @@ static void httpdLoop(httpd_host_t *host)
 
         vlc_tls_t *p_tls;
 
-        if (host->p_tls)
-            p_tls = vlc_tls_SessionCreate(host->p_tls, fd, NULL, NULL);
+        if (host->p_tls != NULL)
+        {
+            const char *alpn[] = { "http/1.1", NULL };
+
+            p_tls = vlc_tls_SessionCreate(host->p_tls, fd, NULL, alpn);
+        }
         else
             p_tls = NULL;
 
