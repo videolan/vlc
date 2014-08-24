@@ -97,9 +97,7 @@ struct decoder_owner_sys_t
     bool b_packetizer;
 
     /* Current format in use by the output */
-    video_format_t video;
-    audio_format_t audio;
-    es_format_t    sout;
+    es_format_t    fmt;
 
     /* */
     bool           b_fmt_description;
@@ -770,6 +768,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->p_sout_input = NULL;
     p_owner->p_packetizer = NULL;
     p_owner->b_packetizer = b_packetizer;
+    es_format_Init( &p_owner->fmt, UNKNOWN_ES, 0 );
 
     /* decoder fifo */
     p_owner->p_fifo = block_FifoNew();
@@ -1509,27 +1508,27 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
     while( ( p_sout_block =
                  p_dec->pf_packetize( p_dec, p_block ? &p_block : NULL ) ) )
     {
-        if( !p_owner->p_sout_input )
+        if( p_owner->p_sout_input == NULL )
         {
-            es_format_Copy( &p_owner->sout, &p_dec->fmt_out );
+            es_format_Clean( &p_owner->fmt );
+            es_format_Copy( &p_owner->fmt, &p_dec->fmt_out );
 
-            p_owner->sout.i_group = p_dec->fmt_in.i_group;
-            p_owner->sout.i_id = p_dec->fmt_in.i_id;
+            p_owner->fmt.i_group = p_dec->fmt_in.i_group;
+            p_owner->fmt.i_id = p_dec->fmt_in.i_id;
             if( p_dec->fmt_in.psz_language )
             {
-                free( p_owner->sout.psz_language );
-                p_owner->sout.psz_language =
+                free( p_owner->fmt.psz_language );
+                p_owner->fmt.psz_language =
                     strdup( p_dec->fmt_in.psz_language );
             }
 
             p_owner->p_sout_input =
-                sout_InputNew( p_owner->p_sout,
-                               &p_owner->sout );
+                sout_InputNew( p_owner->p_sout, &p_owner->fmt );
 
             if( p_owner->p_sout_input == NULL )
             {
                 msg_Err( p_dec, "cannot create packetizer output (%4.4s)",
-                         (char *)&p_owner->sout.i_codec );
+                         (char *)&p_owner->fmt.i_codec );
                 p_dec->b_error = true;
 
                 block_ChainRelease(p_sout_block);
@@ -1861,9 +1860,9 @@ static void DeleteDecoder( decoder_t * p_dec )
     if( p_owner->p_sout_input )
     {
         sout_InputDelete( p_owner->p_sout_input );
-        es_format_Clean( &p_owner->sout );
     }
 #endif
+    es_format_Clean( &p_owner->fmt );
 
     if( p_dec->fmt_out.i_cat == SPU_ES )
     {
@@ -1945,7 +1944,7 @@ static int aout_update_format( decoder_t *p_dec )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     if( p_owner->p_aout
-     && !AOUT_FMTS_IDENTICAL(&p_dec->fmt_out.audio, &p_owner->audio) )
+     && !AOUT_FMTS_IDENTICAL(&p_dec->fmt_out.audio, &p_owner->fmt.audio) )
     {
         audio_output_t *p_aout = p_owner->p_aout;
 
@@ -1967,10 +1966,10 @@ static int aout_update_format( decoder_t *p_dec )
         aout_request_vout_t request_vout;
 
         p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
-        p_owner->audio = p_dec->fmt_out.audio;
-        aout_FormatPrepare( &p_owner->audio );
+        p_owner->fmt.audio = p_dec->fmt_out.audio;
+        aout_FormatPrepare( &p_owner->fmt.audio );
 
-        memcpy( &format, &p_owner->audio, sizeof( audio_sample_format_t ) );
+        format = p_owner->fmt.audio;
         if( i_force_dolby &&
             (format.i_original_channels&AOUT_CHAN_PHYSMASK) ==
                 (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT) )
@@ -2023,8 +2022,9 @@ static int aout_update_format( decoder_t *p_dec )
         }
 
         p_dec->fmt_out.audio.i_bytes_per_frame =
-            p_owner->audio.i_bytes_per_frame;
-        p_dec->fmt_out.audio.i_frame_length = p_owner->audio.i_frame_length;
+            p_owner->fmt.audio.i_bytes_per_frame;
+        p_dec->fmt_out.audio.i_frame_length =
+            p_owner->fmt.audio.i_frame_length;
     }
     return 0;
 }
@@ -2033,17 +2033,17 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    if( p_owner->p_vout == NULL ||
-        p_dec->fmt_out.video.i_width != p_owner->video.i_width ||
-        p_dec->fmt_out.video.i_height != p_owner->video.i_height ||
-        p_dec->fmt_out.video.i_visible_width != p_owner->video.i_visible_width ||
-        p_dec->fmt_out.video.i_visible_height != p_owner->video.i_visible_height ||
-        p_dec->fmt_out.video.i_x_offset != p_owner->video.i_x_offset  ||
-        p_dec->fmt_out.video.i_y_offset != p_owner->video.i_y_offset  ||
-        p_dec->fmt_out.i_codec != p_owner->video.i_chroma ||
-        (int64_t)p_dec->fmt_out.video.i_sar_num * p_owner->video.i_sar_den !=
-        (int64_t)p_dec->fmt_out.video.i_sar_den * p_owner->video.i_sar_num ||
-        p_dec->fmt_out.video.orientation != p_owner->video.orientation )
+    if( p_owner->p_vout == NULL
+     || p_dec->fmt_out.video.i_width != p_owner->fmt.video.i_width
+     || p_dec->fmt_out.video.i_height != p_owner->fmt.video.i_height
+     || p_dec->fmt_out.video.i_visible_width != p_owner->fmt.video.i_visible_width
+     || p_dec->fmt_out.video.i_visible_height != p_owner->fmt.video.i_visible_height
+     || p_dec->fmt_out.video.i_x_offset != p_owner->fmt.video.i_x_offset
+     || p_dec->fmt_out.video.i_y_offset != p_owner->fmt.video.i_y_offset
+     || p_dec->fmt_out.i_codec != p_owner->fmt.video.i_chroma
+     || (int64_t)p_dec->fmt_out.video.i_sar_num * p_owner->fmt.video.i_sar_den !=
+        (int64_t)p_dec->fmt_out.video.i_sar_den * p_owner->fmt.video.i_sar_num ||
+        p_dec->fmt_out.video.orientation != p_owner->fmt.video.orientation )
     {
         vout_thread_t *p_vout;
 
@@ -2056,7 +2056,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 
         video_format_t fmt = p_dec->fmt_out.video;
         fmt.i_chroma = p_dec->fmt_out.i_codec;
-        p_owner->video = fmt;
+        p_owner->fmt.video = fmt;
 
         if( vlc_fourcc_IsYUV( fmt.i_chroma ) )
         {
