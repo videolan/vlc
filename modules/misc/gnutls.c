@@ -47,7 +47,7 @@ static int gnutls_Init (vlc_object_t *obj)
         msg_Err (obj, "unsupported GnuTLS version");
         return -1;
     }
-    msg_Dbg (p_this, "using GnuTLS verson %s", version);
+    msg_Dbg (obj, "using GnuTLS verson %s", version);
     return 0;
 }
 
