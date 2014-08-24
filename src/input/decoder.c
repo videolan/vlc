@@ -101,7 +101,6 @@ struct decoder_owner_sys_t
 
     /* */
     bool           b_fmt_description;
-    es_format_t    fmt_description;
     vlc_meta_t     *p_description;
 
     /* fifo */
@@ -611,8 +610,8 @@ bool input_DecoderHasFormatChanged( decoder_t *p_dec, es_format_t *p_fmt, vlc_me
     b_changed = p_owner->b_fmt_description;
     if( b_changed )
     {
-        if( p_fmt )
-            es_format_Copy( p_fmt, &p_owner->fmt_description );
+        if( p_fmt != NULL )
+            es_format_Copy( p_fmt, &p_owner->fmt );
 
         if( pp_meta )
         {
@@ -849,7 +848,6 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     vlc_cond_init( &p_owner->wait_acknowledge );
 
     p_owner->b_fmt_description = false;
-    es_format_Init( &p_owner->fmt_description, UNKNOWN_ES, 0 );
     p_owner->p_description = NULL;
 
     p_owner->b_exit = false;
@@ -1510,6 +1508,7 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
     {
         if( p_owner->p_sout_input == NULL )
         {
+            assert( !p_owner->b_fmt_description ); // no need for owner lock
             es_format_Clean( &p_owner->fmt );
             es_format_Copy( &p_owner->fmt, &p_dec->fmt_out );
 
@@ -1879,7 +1878,6 @@ static void DeleteDecoder( decoder_t * p_dec )
     es_format_Clean( &p_dec->fmt_out );
     if( p_dec->p_description )
         vlc_meta_Delete( p_dec->p_description );
-    es_format_Clean( &p_owner->fmt_description );
     if( p_owner->p_description )
         vlc_meta_Delete( p_owner->p_description );
 
@@ -1913,10 +1911,6 @@ static void DecoderUpdateFormatLocked( decoder_t *p_dec )
     vlc_assert_locked( &p_owner->lock );
 
     p_owner->b_fmt_description = true;
-
-    /* Copy es_format */
-    es_format_Clean( &p_owner->fmt_description );
-    es_format_Copy( &p_owner->fmt_description, &p_dec->fmt_out );
 
     /* Move p_description */
     if( p_owner->p_description && p_dec->p_description )
@@ -1960,16 +1954,12 @@ static int aout_update_format( decoder_t *p_dec )
 
     if( p_owner->p_aout == NULL )
     {
-        const int i_force_dolby = var_InheritInteger( p_dec, "force-dolby-surround" );
-        audio_sample_format_t format;
-        audio_output_t *p_aout;
-        aout_request_vout_t request_vout;
-
         p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
-        p_owner->fmt.audio = p_dec->fmt_out.audio;
-        aout_FormatPrepare( &p_owner->fmt.audio );
 
-        format = p_owner->fmt.audio;
+        audio_sample_format_t format = p_dec->fmt_out.audio;
+        aout_FormatPrepare( &format );
+
+        const int i_force_dolby = var_InheritInteger( p_dec, "force-dolby-surround" );
         if( i_force_dolby &&
             (format.i_original_channels&AOUT_CHAN_PHYSMASK) ==
                 (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT) )
@@ -1986,10 +1976,12 @@ static int aout_update_format( decoder_t *p_dec )
             }
         }
 
-        request_vout.pf_request_vout = aout_request_vout;
-        request_vout.p_private = p_dec;
+        aout_request_vout_t request_vout = {
+            .pf_request_vout = aout_request_vout,
+            .p_private = p_dec,
+        };
+        audio_output_t *p_aout;
 
-        assert( p_owner->p_aout == NULL );
         p_aout = input_resource_GetAout( p_owner->p_resource );
         if( p_aout )
         {
@@ -2005,7 +1997,13 @@ static int aout_update_format( decoder_t *p_dec )
         vlc_mutex_lock( &p_owner->lock );
 
         p_owner->p_aout = p_aout;
+
+        es_format_Clean( &p_owner->fmt );
+        es_format_Copy( &p_owner->fmt, &p_dec->fmt_out );
+        aout_FormatPrepare( &p_owner->fmt.audio );
+
         DecoderUpdateFormatLocked( p_dec );
+
         if( unlikely(p_owner->b_paused) ) /* fake pause if needed */
             aout_DecChangePause( p_aout, true, mdate() );
 
@@ -2056,7 +2054,6 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 
         video_format_t fmt = p_dec->fmt_out.video;
         fmt.i_chroma = p_dec->fmt_out.i_codec;
-        p_owner->fmt.video = fmt;
 
         if( vlc_fourcc_IsYUV( fmt.i_chroma ) )
         {
@@ -2141,6 +2138,10 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
                                              true );
         vlc_mutex_lock( &p_owner->lock );
         p_owner->p_vout = p_vout;
+
+        es_format_Clean( &p_owner->fmt );
+        es_format_Copy( &p_owner->fmt, &p_dec->fmt_out );
+        p_owner->fmt.video.i_chroma = p_dec->fmt_out.i_codec;
 
         DecoderUpdateFormatLocked( p_dec );
 
