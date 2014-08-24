@@ -60,7 +60,6 @@ static void       DeleteDecoder( decoder_t * );
 
 static void      *DecoderThread( void * );
 static void       DecoderProcess( decoder_t *, block_t * );
-static void       DecoderOutputChangePause( decoder_t *, bool b_paused, mtime_t i_date );
 static void       DecoderFlush( decoder_t * );
 static void       DecoderSignalWait( decoder_t *, bool );
 
@@ -508,7 +507,20 @@ void input_DecoderChangePause( decoder_t *p_dec, bool b_paused, mtime_t i_date )
         p_owner->pause.i_ignore = 0;
         vlc_cond_signal( &p_owner->wait_request );
 
-        DecoderOutputChangePause( p_dec, b_paused, i_date );
+        /* XXX only audio and video output have to be paused.
+         * - for sout it is useless
+         * - for subs, it is done by the vout
+         */
+        if( p_dec->fmt_out.i_cat == AUDIO_ES )
+        {
+            if( p_owner->p_aout )
+                aout_DecChangePause( p_owner->p_aout, b_paused, i_date );
+        }
+        else if( p_dec->fmt_out.i_cat == VIDEO_ES )
+        {
+            if( p_owner->p_vout )
+                vout_ChangePause( p_owner->p_vout, b_paused, i_date );
+        }
     }
     vlc_mutex_unlock( &p_owner->lock );
 }
@@ -1013,27 +1025,6 @@ static bool DecoderWaitUnblock( decoder_t *p_dec )
     return p_owner->b_flushing;
 }
 
-static void DecoderOutputChangePause( decoder_t *p_dec, bool b_paused, mtime_t i_date )
-{
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
-
-    vlc_assert_locked( &p_owner->lock );
-
-    /* XXX only audio and video output have to be paused.
-     * - for sout it is useless
-     * - for subs, it is done by the vout
-     */
-    if( p_dec->fmt_out.i_cat == AUDIO_ES )
-    {
-        if( p_owner->p_aout )
-            aout_DecChangePause( p_owner->p_aout, b_paused, i_date );
-    }
-    else if( p_dec->fmt_out.i_cat == VIDEO_ES )
-    {
-        if( p_owner->p_vout )
-            vout_ChangePause( p_owner->p_vout, b_paused, i_date );
-    }
-}
 static inline void DecoderUpdatePreroll( int64_t *pi_preroll, const block_t *p )
 {
     if( p->i_flags & (BLOCK_FLAG_PREROLL|BLOCK_FLAG_DISCONTINUITY) )
