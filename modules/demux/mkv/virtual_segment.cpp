@@ -663,7 +663,7 @@ void virtual_segment_c::ChangeSegment( matroska_segment_c * p_old, matroska_segm
                     ( p_nfmt->i_priority == p_ofmt->i_priority ) &&
                     ( p_nfmt->i_bitrate == p_ofmt->i_bitrate ) &&
                     ( p_nfmt->i_extra == p_ofmt->i_extra ) &&
-                    ( (!p_nfmt->p_extra && !p_ofmt->p_extra) ||
+                    ( p_nfmt->i_extra == 0 ||
                       !memcmp( p_nfmt->p_extra, p_ofmt->p_extra, p_nfmt->i_extra ) ) &&
                     !strcasecmp( p_nfmt->psz_language, p_ofmt->psz_language ) &&
                     ( ( p_nfmt->i_cat == AUDIO_ES &&
