@@ -776,16 +776,13 @@ static int AStreamReadBlock( stream_t *s, void *p_read, unsigned int i_read )
         if( p_sys->block.i_offset >= p_sys->block.p_current->i_buffer )
         {
             /* Current block is now empty, switch to next */
-            if( p_sys->block.p_current )
-            {
-                p_sys->block.i_offset = 0;
-                p_sys->block.p_current = p_sys->block.p_current->p_next;
-            }
+            p_sys->block.i_offset = 0;
+            p_sys->block.p_current = p_sys->block.p_current->p_next;
+
             /*Get a new block if needed */
             if( !p_sys->block.p_current && AStreamRefillBlock( s ) )
-            {
                 break;
-            }
+            assert( p_sys->block.p_current );
         }
     }
 
