@@ -88,7 +88,7 @@ struct scan_t
 {
     vlc_object_t *p_obj;
     struct dialog_progress_bar_t *p_dialog;
-    int64_t i_index;
+    uint64_t i_index;
     scan_parameter_t parameter;
     int64_t i_time_start;
 
@@ -235,7 +235,7 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
 {
     msg_Dbg( p_scan->p_obj, "Scan index %"PRId64, p_scan->i_index );
 
-    int *pi_count = &p_scan->parameter.sat_info.i_count;
+    unsigned *pi_count = &p_scan->parameter.sat_info.i_count;
 
     if( !p_scan->parameter.sat_info.psz_name )
     {
