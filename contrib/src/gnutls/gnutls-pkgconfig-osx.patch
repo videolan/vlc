@@ -28,16 +28,6 @@
    AC_SUBST([INTL_MACOSX_LIBS])
  ])
 
---- a/lib/gnutls.pc.in.orig	2014-06-25 17:42:26.000000000 -0400
-+++ b/lib/gnutls.pc.in	2014-06-25 17:42:35.000000000 -0400
-@@ -19,6 +19,6 @@
- Version: @VERSION@
- Libs: -L${libdir} -lgnutls
--Libs.private: @LTLIBNETTLE@ @LTLIBZ@ @LTLIBINTL@ @LIBSOCKET@ @LTLIBPTHREAD@ @LTLIBICONV@ @P11_KIT_LIBS@ @LIB_SELECT@ @TSS_LIBS@ @LIB_CLOCK_GETTIME@ @GMP_LIBS@
-+Libs.private: @LTLIBNETTLE@ @LTLIBZ@ @LTLIBINTL@ @LIBSOCKET@ @LTLIBPTHREAD@ @LTLIBICONV@ @P11_KIT_LIBS@ @LIB_SELECT@ @TSS_LIBS@ @LIB_CLOCK_GETTIME@ @GMP_LIBS@ @INTL_MACOSX_LIBS@
- @GNUTLS_REQUIRES_PRIVATE@
- Cflags: -I${includedir}
-
 --- a/libdane/gnutls-dane.pc.in.orig	2014-06-25 17:57:29.000000000 -0400
 +++ b/libdane/gnutls-dane.pc.in	2014-06-25 17:57:39.000000000 -0400
 @@ -19,7 +19,7 @@
@@ -49,3 +39,11 @@
  Libs.private: @UNBOUND_LIBS@
  Requires.private: gnutls
  Cflags: -I${includedir}
+--- gnutls/lib/gnutls.pc.in.orig	2014-08-26 00:12:38.680157601 +0200
++++ gnutls/lib/gnutls.pc.in	2014-08-26 00:13:14.807453832 +0200
+@@ -20,4 +20,4 @@
+ Version: @VERSION@
+ @GNUTLS_REQUIRES_PRIVATE@
+ Cflags: -I${includedir}
+-Libs:  -L${libdir} -lgnutls  @LTLIBZ@ @LTLIBINTL@ @LIBSOCKET@ @LTLIBPTHREAD@ @LTLIBICONV@ @P11_KIT_LIBS@ @LIB_SELECT@ @TSS_LIBS@ @GMP_LIBS@
++Libs:  -L${libdir} -lgnutls  @LTLIBZ@ @LTLIBINTL@ @LIBSOCKET@ @LTLIBPTHREAD@ @LTLIBICONV@ @P11_KIT_LIBS@ @LIB_SELECT@ @TSS_LIBS@ @GMP_LIBS@ @INTL_MACOSX_LIBS@
