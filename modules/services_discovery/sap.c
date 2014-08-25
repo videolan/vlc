@@ -1449,12 +1449,8 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                 if (cat == 'm')
                     goto media;
 
-                if (cat != 'm')
-                {
-                    msg_Dbg (p_obj, "unexpected SDP line: 0x%02x", (int)cat);
-                    goto error;
-                }
-                break;
+                msg_Dbg (p_obj, "unexpected SDP line: 0x%02x", (int)cat);
+                goto error;
 
             default:
                 msg_Err (p_obj, "*** BUG in SDP parser! ***");
