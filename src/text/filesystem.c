@@ -153,7 +153,7 @@ int vlc_loaddir( DIR *dir, char ***namelist,
             num++;
     }
 
-    if (compar != NULL)
+    if (compar != NULL && num > 0)
         qsort (tab, num, sizeof (*tab),
                (int (*)( const void *, const void *))compar);
     *namelist = tab;
