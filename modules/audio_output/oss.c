@@ -49,6 +49,11 @@
 #include <vlc_cpu.h>
 #include <vlc_aout.h>
 
+#if !defined (__FreeBSD__) && !defined (__FreeBSD_kernel__)
+# define USE_SOFTVOL
+# include "volume.h"
+#endif
+
 #define A52_FRAME_NB 1536
 
 struct aout_sys_t
@@ -75,6 +80,9 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_string ("oss-audio-device", "",
                 AUDIO_DEV_TEXT, AUDIO_DEV_LONGTEXT, false)
+#ifdef USE_SOFTVOL
+    add_sw_gain ()
+#endif
     set_capability( "audio output", 100 )
     set_callbacks (Open, Close)
 vlc_module_end ()
@@ -83,7 +91,9 @@ static int TimeGet (audio_output_t *, mtime_t *);
 static void Play (audio_output_t *, block_t *);
 static void Pause (audio_output_t *, bool, mtime_t);
 static void Flush (audio_output_t *, bool);
+#ifndef USE_SOFTVOL
 static int VolumeSync (audio_output_t *);
+#endif
 
 static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
@@ -231,7 +241,11 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
                  vlc_strerror_c(errno));
 
     sys->fd = fd;
+#ifndef USE_SOFTVOL
     VolumeSync (aout);
+#else
+    aout_SoftVolumeStart (aout);
+#endif
     sys->starting = true;
     sys->format = *fmt;
     return VLC_SUCCESS;
@@ -277,8 +291,10 @@ static void Play (audio_output_t *aout, block_t *block)
     }
     block_Release (block);
 
+#ifndef USE_SOFTVOL
     /* Dumb OSS cannot send any kind of events for this... */
     VolumeSync (aout);
+#endif
 }
 
 /**
@@ -306,6 +322,7 @@ static void Flush (audio_output_t *aout, bool wait)
     ioctl (fd, SNDCTL_DSP_HALT, NULL);
 }
 
+#ifndef USE_SOFTVOL
 static int VolumeSync (audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
@@ -322,6 +339,7 @@ static int VolumeSync (audio_output_t *aout)
     aout_VolumeReport (aout, (float)(level & 0xFF) / 100.f);
     return 0;
 }
+#endif
 
 /**
  * Releases the audio output device.
@@ -461,6 +479,9 @@ static int Open (vlc_object_t *obj)
     aout->mute_set = MuteSet;
     aout->device_select = DeviceSelect;
 
+#ifdef USE_SOFTVOL
+    aout_SoftVolumeInit (aout);
+#endif
     DevicesEnum (aout);
     return VLC_SUCCESS;
 }
