@@ -1546,19 +1546,17 @@ static void httpd_ClientRecv(httpd_client_t *cl)
                 if (!cl->query.p_body) {
                     switch (cl->query.i_proto) {
                         case HTTPD_PROTO_HTTP: {
-                                                   const uint8_t sorry[] =
-                                                       "HTTP/1.1 413 Request Entity Too Large\r\n\r\n";
-                                                   httpd_NetSend(cl, sorry, sizeof(sorry) - 1);
-                                                   break;
-                                               }
+                            const uint8_t sorry[] = "HTTP/1.1 413 Request Entity Too Large\r\n\r\n";
+                            httpd_NetSend(cl, sorry, sizeof(sorry) - 1);
+                            break;
+                        }
                         case HTTPD_PROTO_RTSP: {
-                                                   const uint8_t sorry[] =
-                                                       "RTSP/1.0 413 Request Entity Too Large\r\n\r\n";
-                                                   httpd_NetSend(cl, sorry, sizeof(sorry) - 1);
-                                                   break;
-                                               }
+                            const uint8_t sorry[] = "RTSP/1.0 413 Request Entity Too Large\r\n\r\n";
+                            httpd_NetSend(cl, sorry, sizeof(sorry) - 1);
+                            break;
+                        }
                         default:
-                                               assert(0);
+                            assert(0);
                     }
                     i_len = 0; /* drop */
                 }
