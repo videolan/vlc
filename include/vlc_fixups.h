@@ -256,6 +256,10 @@ static inline locale_t newlocale(int mask, const char * locale, locale_t base)
 #define N_(str)           gettext_noop (str)
 #define gettext_noop(str) (str)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef HAVE_SWAB
 void swab (const void *, void *, ssize_t);
 #endif
@@ -337,6 +341,10 @@ void tdestroy( void *root, void (*free_node)(void *nodep) );
 double erand48 (unsigned short subi[3]);
 long jrand48 (unsigned short subi[3]);
 long nrand48 (unsigned short subi[3]);
+#endif
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
 #ifdef __OS2__
