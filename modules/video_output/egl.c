@@ -3,7 +3,7 @@
  * @brief EGL OpenGL extension module
  */
 /*****************************************************************************
- * Copyright © 2010-2011 Rémi Denis-Courmont
+ * Copyright © 2010-2014 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -36,6 +36,9 @@
 #ifdef USE_PLATFORM_X11
 # include <vlc_xlib.h>
 #endif
+#ifdef USE_PLATFORM_WAYLAND
+# include <wayland-egl.h>
+#endif
 
 typedef struct vlc_gl_sys_t
 {
@@ -44,6 +47,10 @@ typedef struct vlc_gl_sys_t
     EGLContext context;
 #if defined (USE_PLATFORM_X11)
     Display *x11;
+#endif
+#if defined (USE_PLATFORM_WAYLAND)
+    struct wl_egl_window *window;
+    unsigned width, height;
 #endif
 } vlc_gl_sys_t;
 
@@ -64,6 +71,21 @@ static void ReleaseCurrent (vlc_gl_t *gl)
     eglMakeCurrent (sys->display, EGL_NO_SURFACE, EGL_NO_SURFACE,
                     EGL_NO_CONTEXT);
 }
+
+#ifdef USE_PLATFORM_WAYLAND
+static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    wl_egl_window_resize(sys->window, width, height,
+                         (sys->width - width) / 2,
+                         (sys->height - height) / 2);
+    sys->width = width;
+    sys->height = height;
+}
+#else
+# define Resize (NULL)
+#endif
 
 static void SwapBuffers (vlc_gl_t *gl)
 {
@@ -162,6 +184,10 @@ static void Close (vlc_object_t *obj)
     if (sys->x11 != NULL)
         XCloseDisplay(sys->x11);
 #endif
+#ifdef USE_PLATFORM_WAYLAND
+    if (sys->window != NULL)
+        wl_egl_window_destroy(sys->window);
+#endif
     free (sys);
 }
 
@@ -220,6 +246,28 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
         if (snum == XDefaultScreen(sys->x11))
             sys->display = eglGetDisplay(sys->x11);
     }
+# endif
+
+#elif defined (USE_PLATFORM_WAYLAND)
+    sys->window = NULL;
+
+    if (wnd->type != VOUT_WINDOW_TYPE_WAYLAND)
+        goto error;
+
+# ifdef EGL_EXT_platform_wayland
+    if (!CheckClientExt("EGL_EXT_platform_wayland"))
+        goto error;
+
+    /* Resize() should be called with the proper size before Swap() */
+    window = wl_egl_window_create(wnd->handle.wl, 1, 1);
+    if (window == NULL)
+        goto error;
+    sys->window = window;
+
+    sys->display = GetDisplayEXT(EGL_PLATFORM_WAYLAND_EXT, wnd->display.wl,
+                                 NULL);
+    createSurface = CreateWindowSurfaceEXT;
+
 # endif
 
 #elif defined (USE_PLATFORM_WIN32)
@@ -308,7 +356,7 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     /* Initialize OpenGL callbacks */
     gl->makeCurrent = MakeCurrent;
     gl->releaseCurrent = ReleaseCurrent;
-    gl->resize = NULL;
+    gl->resize = Resize;
     gl->swap = SwapBuffers;
     gl->getProcAddress = GetSymbol;
     gl->lock = NULL;

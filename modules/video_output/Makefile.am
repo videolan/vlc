@@ -145,6 +145,14 @@ if HAVE_WAYLAND
 vout_LTLIBRARIES += libwl_shell_surface_plugin.la
 endif
 
+libegl_wl_plugin_la_SOURCES = video_output/egl.c
+libegl_wl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DUSE_PLATFORM_WAYLAND=1
+libegl_wl_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) $(WAYLAND_EGL_CFLAGS)
+libegl_wl_plugin_la_LIBADD = $(EGL_LIBS) $(WAYLAND_EGL_LIBS)
+if HAVE_EGL
+vout_LTLIBRARIES += libegl_wl_plugin.la
+endif
+
 
 ### Win32 ###
 libdirect2d_plugin_la_SOURCES = video_output/msw/direct2d.c \

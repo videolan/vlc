@@ -3205,8 +3205,19 @@ AS_IF([test "${enable_wayland}" != "no"], [
       AC_MSG_ERROR([${WAYLAND_CLIENT_PKG_ERRORS}.])
     ])
   ])
+
+  AS_IF([test "${have_egl}" = "yes"], [
+    PKG_CHECK_MODULES([WAYLAND_EGL], [wayland-egl], [
+      have_wayland_egl="yes"
+    ], [
+      AS_IF([test -n "${enable_wayland}"], [
+        AC_MSG_ERROR([${WAYLAND_EGL_PKG_ERRORS}.])
+      ])
+    ])
+  ])
 ])
 AM_CONDITIONAL([HAVE_WAYLAND], [test "${have_wayland}" = "yes"])
+AM_CONDITIONAL([HAVE_WAYLAND_EGL], [test "${have_wayland_egl}" = "yes"])
 
 
 dnl
