@@ -128,6 +128,15 @@ endif
 endif
 
 
+### Wayland ###
+libwl_shell_surface_plugin_la_SOURCES = wl/shell_surface.c
+libwl_shell_surface_plugin_la_CFLAGS = $(WAYLAND_CLIENT_CFLAGS)
+libwl_shell_surface_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS)
+if HAVE_WAYLAND
+vout_LTLIBRARIES += libwl_shell_surface_plugin.la
+endif
+
+
 ### Win32 ###
 libdirect2d_plugin_la_SOURCES = msw/direct2d.c \
 	msw/common.c msw/common.h msw/events.c msw/events.h \

@@ -3216,6 +3216,24 @@ AM_CONDITIONAL([HAVE_AVCODEC_VDPAU], [test "${have_avcodec_vdpau}" = "yes"])
 
 
 dnl
+dnl  Wayland
+dnl
+AC_ARG_ENABLE(wayland,
+  [AS_HELP_STRING([--enable-wayland], [Wayland support (default auto)])])
+have_wayland="no"
+AS_IF([test "${enable_wayland}" != "no"], [
+  PKG_CHECK_MODULES([WAYLAND_CLIENT], [wayland-client >= 1.4], [
+    have_wayland="yes"
+  ], [
+    AS_IF([test -n "${enable_wayland}"], [
+      AC_MSG_ERROR([${WAYLAND_CLIENT_PKG_ERRORS}.])
+    ])
+  ])
+])
+AM_CONDITIONAL([HAVE_WAYLAND], [test "${have_wayland}" = "yes"])
+
+
+dnl
 dnl  SDL module
 dnl
 AC_ARG_ENABLE(sdl,
