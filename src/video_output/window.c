@@ -86,6 +86,11 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
         type = "vout window anative";
         window->handle.anativewindow = NULL;
         break;
+    case VOUT_WINDOW_TYPE_WAYLAND:
+        type = "vout surface wl";
+        window->handle.wl = NULL;
+        window->display.wl = NULL;
+        break;
     default:
         assert(0);
     }

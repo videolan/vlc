@@ -36,6 +36,8 @@
 typedef struct vout_window_t vout_window_t;
 typedef struct vout_window_sys_t vout_window_sys_t;
 
+struct wl_display;
+struct wl_surface;
 
 /**
  * Window handle type
@@ -46,6 +48,7 @@ enum {
     VOUT_WINDOW_TYPE_HWND,
     VOUT_WINDOW_TYPE_NSOBJECT,
     VOUT_WINDOW_TYPE_ANDROID_NATIVE,
+    VOUT_WINDOW_TYPE_WAYLAND,
 };
 
 /**
@@ -92,11 +95,13 @@ struct vout_window_t {
         uint32_t xid;            /* X11 windows ID */
         void     *nsobject;      /* Mac OSX view object */
         void     *anativewindow; /* Android native window. */
+        struct wl_surface *wl;   /* Wayland surface */
     } handle;
 
     /* display server (mandatory) */
     union {
         char     *x11; /* X11 display (NULL = use default) */
+        struct wl_display *wl;   /* Wayland struct wl_display pointer */
     } display;
 
     /* Control on the module (mandatory)
