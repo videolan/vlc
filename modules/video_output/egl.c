@@ -118,18 +118,36 @@ struct gl_api
    EGLint     attr[3];
 };
 
-/* See http://www.khronos.org/registry/egl/api/EGL/eglplatform.h *
- * for list and order of default EGL platforms. */
-#if defined (_WIN32) || defined (__VC32__) \
- && !defined (__CYGWIN__) && !defined (__SCITECH_SNAP__) /* Win32 and WinCE */
-# define USE_DEFAULT_PLATFORM USE_PLATFORM_WIN32
-#elif defined (__WINSCW__) || defined (__SYMBIAN32__)  /* Symbian */
-# define USE_DEFAULT_PLATFORM USE_PLATFORM_SYMBIAN
-#elif defined (__ANDROID__) || defined (ANDROID)
-# define USE_DEFAULT_PLATFORM USE_PLATFORM_ANDROID
-#elif defined (__unix__) /* X11 (tentative) */
-# define USE_DEFAULT_PLATFORM USE_PLATFORM_X11
+#ifdef EGL_EXT_platform_base
+static EGLDisplay GetDisplayEXT(EGLenum plat, void *dpy, const EGLint *attrs)
+{
+    PFNEGLGETPLATFORMDISPLAYEXTPROC getDisplay =
+        (PFNEGLGETPLATFORMDISPLAYEXTPROC)
+        eglGetProcAddress("eglGetPlatformDisplayEXT");
+
+    assert(getDisplay != NULL);
+    return getDisplay(plat, dpy, attrs);
+}
+
+static EGLSurface CreateWindowSurfaceEXT(EGLDisplay dpy, EGLConfig config,
+                                         void *window, const EGLint *attrs)
+{
+    PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC createSurface =
+        (PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC)
+        eglGetProcAddress("eglCreatePlatformWindowSurfaceEXT");
+
+    assert(createSurface != NULL);
+    return createSurface(dpy, config, window, attrs);
+}
 #endif
+
+static EGLSurface CreateWindowSurface(EGLDisplay dpy, EGLConfig config,
+                                      void *window, const EGLint *attrs)
+{
+    EGLNativeWindowType *native = window;
+
+    return eglCreateWindowSurface(dpy, config, *native, attrs);
+}
 
 /**
  * Probe EGL display availability
@@ -137,15 +155,6 @@ struct gl_api
 static int Open (vlc_object_t *obj, const struct gl_api *api)
 {
     vlc_gl_t *gl = (vlc_gl_t *)obj;
-    vout_window_t *wnd = gl->surface;
-    union {
-        void *ext_platform;
-        EGLNativeWindowType native;
-    } window;
-#ifdef EGL_EXT_platform_base
-    PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC createSurface = NULL;
-#endif
-
     vlc_gl_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -154,12 +163,18 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     sys->display = EGL_NO_DISPLAY;
     sys->surface = EGL_NO_SURFACE;
 
+    vout_window_t *wnd = gl->surface;
+    EGLSurface (*createSurface)(EGLDisplay, EGLConfig, void *, const EGLint *)
+        = CreateWindowSurface;
+    void *window;
+
 #ifdef USE_PLATFORM_X11
     sys->x11 = NULL;
 
     if (wnd->type != VOUT_WINDOW_TYPE_XID || !vlc_xlib_init(obj))
         goto error;
 
+    window = &wnd->handle.xid;
     sys->x11 = XOpenDisplay(wnd->display.x11);
     if (sys->x11 == NULL)
         goto error;
@@ -175,47 +190,39 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
 # ifdef EGL_EXT_platform_x11
     if (CheckClientExt("EGL_EXT_platform_x11"))
     {
-        PFNEGLGETPLATFORMDISPLAYEXTPROC getDisplay;
         const EGLint attrs[] = {
             EGL_PLATFORM_X11_SCREEN_EXT, snum,
             EGL_NONE
         };
-
-        getDisplay = (PFNEGLGETPLATFORMDISPLAYEXTPROC)
-            eglGetProcAddress("eglGetPlatformDisplayEXT");
-        createSurface = (PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC)
-            eglGetProcAddress("eglCreatePlatformWindowSurfaceEXT");
-        sys->display = getDisplay(EGL_PLATFORM_X11_EXT, sys->x11, attrs);
-        window.ext_platform = &wnd->handle.xid;
+        sys->display = GetDisplayEXT(EGL_PLATFORM_X11_EXT, sys->x11, attrs);
+        createSurface = CreateWindowSurfaceEXT;
     }
     else
 # endif
     {
-# if USE_DEFAULT_PLATFORM
+# ifdef __unix__
         if (snum == XDefaultScreen(sys->x11))
-        {
             sys->display = eglGetDisplay(sys->x11);
-            window.native = wnd->handle.xid;
-        }
-# endif
     }
+# endif
 
 #elif defined (USE_PLATFORM_WIN32)
     if (wnd->type != VOUT_WINDOW_TYPE_HWND)
         goto error;
 
-# if USE_DEFAULT_PLATFORM
+    window = &wnd->handle.hwnd;
+# if defined (_WIN32) || defined (__VC32__) \
+  && !defined (__CYGWIN__) && !defined (__SCITECH_SNAP__)
     sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    window.native = wnd->handle.hwnd;
 # endif
 
 #elif defined (USE_PLATFORM_ANDROID)
     if (wnd->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
         goto error;
 
-# if USE_DEFAULT_PLATFORM
+    window = &wnd->handle.anativewindow;
+# if defined (__ANDROID__) || defined (ANDROID)
     sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    window.native = wnd->handle.anativewindow;
 # endif
 
 #endif
@@ -260,15 +267,7 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     }
 
     /* Create a drawing surface */
-#ifdef EGL_EXT_platform_base
-    if (createSurface != NULL)
-        sys->surface = createSurface(sys->display, cfgv[0],
-                                     window.ext_platform, NULL);
-    else
-#endif
-        sys->surface = eglCreateWindowSurface(sys->display, cfgv[0],
-                                              window.native, NULL);
-
+    sys->surface = createSurface(sys->display, cfgv[0], window, NULL);
     if (sys->surface == EGL_NO_SURFACE)
     {
         msg_Err (obj, "cannot create EGL window surface");
