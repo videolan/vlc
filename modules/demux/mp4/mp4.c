@@ -36,6 +36,7 @@
 #include <vlc_charset.h>                           /* EnsureUTF8 */
 #include <vlc_meta.h>                              /* vlc_meta_t, vlc_meta_ */
 #include <vlc_input.h>
+#include <vlc_aout.h>
 #include <assert.h>
 
 #include "id3genres.h"                             /* for ATOM_gnre */
@@ -113,6 +114,8 @@ struct demux_sys_t
 static void MP4_TrackCreate ( demux_t *, mp4_track_t *, MP4_Box_t  *, bool b_force_enable );
 static int MP4_frg_TrackCreate( demux_t *, mp4_track_t *, MP4_Box_t *);
 static void MP4_TrackDestroy(  mp4_track_t * );
+
+static void MP4_Block_Send( demux_t *, mp4_track_t *, block_t * );
 
 static int  MP4_TrackSelect ( demux_t *, mp4_track_t *, mtime_t );
 static void MP4_TrackUnselect(demux_t *, mp4_track_t * );
@@ -386,6 +389,18 @@ static void CreateTracksFromSmooBox( demux_t *p_demux )
             p_track->p_es = es_out_Add( p_demux->out, &p_track->fmt );
         }
     }
+}
+
+static void MP4_Block_Send( demux_t *p_demux, mp4_track_t *p_track, block_t *p_block )
+{
+    if ( p_track->b_chans_reorder && aout_BitsPerSample( p_track->fmt.i_codec ) )
+    {
+        aout_ChannelReorder( p_block->p_buffer, p_block->i_buffer,
+                             p_track->fmt.audio.i_channels,
+                             p_track->rgi_chans_reordering,
+                             p_track->fmt.i_codec );
+    }
+    es_out_Send( p_demux->out, p_track->p_es, p_block );
 }
 
 /*****************************************************************************
@@ -948,7 +963,7 @@ static int Demux( demux_t *p_demux )
             es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
             b_data_sent = true;
         }
-        es_out_Send( p_demux->out, tk->p_es, p_block );
+        MP4_Block_Send( p_demux, tk, p_block );
     }
 
     /* Next sample */
@@ -2357,6 +2372,42 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             msg_Err( p_demux, "Invalid sample per packet value for qt_version 1. Broken muxer!" );
             p_sample->data.p_sample_soun->i_qt_version = 0;
         }
+
+        /* Lookup for then channels extension */
+        const MP4_Box_t *p_chan = MP4_BoxGet( p_sample, "chan" );
+        if ( p_chan )
+        {
+            if ( BOXDATA(p_chan)->layout.i_channels_layout_tag == MP4_CHAN_USE_CHANNELS_BITMAP )
+            {
+                uint32_t rgi_chans_sequence[AOUT_CHAN_MAX + 1];
+                uint16_t i_vlc_mapping = 0;
+                uint8_t i_channels = 0;
+                const uint32_t i_bitmap = BOXDATA(p_chan)->layout.i_channels_bitmap;
+                for (uint8_t i=0;i<MP4_CHAN_BITMAP_MAPPING_COUNT;i++)
+                {
+                    if ( chan_bitmap_mapping[i].i_bitmap & i_bitmap )
+                    {
+                        i_channels++;
+                        if ( (chan_bitmap_mapping[i].i_vlc & i_vlc_mapping) ||
+                             i_channels > AOUT_CHAN_MAX )
+                        {
+                            /* double mapping or unsupported number of channels */
+                            i_vlc_mapping = 0;
+                            msg_Warn( p_demux, "discarding chan mapping" );
+                            break;
+                        }
+                        i_vlc_mapping |= chan_bitmap_mapping[i].i_vlc;
+                        rgi_chans_sequence[i_channels - 1] = chan_bitmap_mapping[i].i_vlc;
+                    }
+                }
+                rgi_chans_sequence[i_channels] = 0;
+                p_track->b_chans_reorder = !!
+                        aout_CheckChannelReorder( rgi_chans_sequence, NULL, i_vlc_mapping,
+                                                  p_track->rgi_chans_reordering );
+            }
+
+        }
+
         break;
 
     default:
@@ -3900,7 +3951,7 @@ static void FlushChunk( demux_t *p_demux, mp4_track_t *tk )
         else
             p_block->i_pts = VLC_TS_INVALID;
 
-        es_out_Send( p_demux->out, tk->p_es, p_block );
+        MP4_Block_Send( p_demux, tk, p_block );
 
         tk->i_sample++;
     }
@@ -4364,7 +4415,7 @@ int DemuxFrg( demux_t *p_demux )
             else
                 p_block->i_pts = VLC_TS_INVALID;
 
-            es_out_Send( p_demux->out, tk->p_es, p_block );
+            MP4_Block_Send( p_demux, tk, p_block );
 
             tk->i_sample++;
 
@@ -4870,7 +4921,7 @@ static int LeafParseTRUN( demux_t *p_demux, mp4_track_t *p_track,
             p_block->i_dts = VLC_TS_0 + i_nzdts;
             p_block->i_pts = VLC_TS_0 + i_nzpts;
             p_block->i_length = CLOCK_FREQ * dur / p_track->i_timescale;
-            es_out_Send( p_demux->out, p_track->p_es, p_block );
+            MP4_Block_Send( p_demux, p_track, p_block );
         }
         else free( p_block );
 
@@ -5111,7 +5162,7 @@ static int LeafParseMDATwithMOOV( demux_t *p_demux )
                 else
                     p_block->i_pts = VLC_TS_INVALID;
 
-                es_out_Send( p_demux->out, p_track->p_es, p_block );
+                MP4_Block_Send( p_demux, p_track, p_block );
 
                 if ( p_demux->p_sys->i_pcr < VLC_TS_0 )
                 {
