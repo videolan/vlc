@@ -140,6 +140,7 @@
 #define ATOM_enda VLC_FOURCC( 'e', 'n', 'd', 'a' )
 #define ATOM_gnre VLC_FOURCC( 'g', 'n', 'r', 'e' )
 #define ATOM_trkn VLC_FOURCC( 't', 'r', 'k', 'n' )
+#define ATOM_chan VLC_FOURCC( 'c', 'h', 'a', 'n' )
 
 #define ATOM_zlib VLC_FOURCC( 'z', 'l', 'i', 'b' )
 #define ATOM_SVQ1 VLC_FOURCC( 'S', 'V', 'Q', '1' )
@@ -1039,6 +1040,24 @@ typedef struct
 
 typedef struct
 {
+    uint8_t i_version;
+    uint32_t i_channels_flags; /* 24 bits */
+    struct
+    {
+        uint32_t i_channels_layout_tag;
+        uint32_t i_channels_bitmap;
+        uint32_t i_channels_description_count;
+        struct
+        {
+            uint32_t i_channel_label;
+            uint32_t i_channel_flags;
+            float    f_coordinates[3];
+        } *p_descriptions;
+    } layout;
+} MP4_Box_data_chan_t;
+
+typedef struct
+{
     uint8_t i_fscod;
     uint8_t i_bsid;
     uint8_t i_bsmod;
@@ -1222,6 +1241,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_avcC_t *p_avcC;
     MP4_Box_data_dac3_t *p_dac3;
     MP4_Box_data_dvc1_t *p_dvc1;
+    MP4_Box_data_chan_t *p_chan;
     MP4_Box_data_enda_t *p_enda;
     MP4_Box_data_gnre_t *p_gnre;
     MP4_Box_data_trkn_t *p_trkn;
