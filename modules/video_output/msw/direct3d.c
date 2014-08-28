@@ -228,7 +228,8 @@ static int Open(vlc_object_t *object)
     var_AddCallback(vd, "video-wallpaper", DesktopCallback, NULL);
 
     /* Setup vout_display now that everything is fine */
-    vd->fmt  = fmt;
+    video_format_Clean(&vd->fmt);
+    video_format_Copy(&vd->fmt, &fmt);
     vd->info = info;
 
     vd->pool    = Pool;
