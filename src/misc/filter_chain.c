@@ -298,6 +298,8 @@ void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
     FilterDeletePictures( &chained->filter, chained->pending );
 
     free( chained->mouse );
+    es_format_Clean( &filter->fmt_out );
+    es_format_Clean( &filter->fmt_in );
     vlc_object_release( filter );
     /* FIXME: check fmt_in/fmt_out consitency */
 }
