@@ -36,6 +36,7 @@
 #else
 # include <sys/time.h>
 # include <sys/select.h>
+# include <fcntl.h>
 #endif
 
 int (poll) (struct pollfd *fds, unsigned nfds, int timeout)
