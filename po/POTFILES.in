@@ -362,6 +362,7 @@ modules/codec/cc.h
 modules/codec/cdg.c
 modules/codec/crystalhd.c
 modules/codec/cvdsub.c
+modules/codec/daala.c
 modules/codec/ddummy.c
 modules/codec/dmo/buffer.c
 modules/codec/dmo/dmo.c
