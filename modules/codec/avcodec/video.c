@@ -592,6 +592,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
         i_used = avcodec_decode_video2( p_context, p_sys->p_ff_pic,
                                        &b_gotpicture, &pkt );
+        av_free_packet( &pkt );
 
         wait_mt( p_sys );
 
