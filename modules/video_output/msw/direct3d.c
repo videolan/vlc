@@ -512,11 +512,9 @@ static HINSTANCE Direct3DLoadShaderLibrary(void)
 {
     HINSTANCE instance = NULL;
     for (int i = 43; i > 23; --i) {
-        char *filename = NULL;
-        if (asprintf(&filename, "D3dx9_%d.dll", i) == -1)
-            continue;
-        instance = LoadLibrary(ToT(filename));
-        free(filename);
+        TCHAR filename[16];
+        _sntprintf(filename, 16, TEXT("D3dx9_%d.dll"), i);
+        instance = LoadLibrary(filename);
         if (instance)
             break;
     }
