@@ -503,7 +503,10 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
     }
 
     if (detached)
+    {
         CloseHandle((HANDLE)h);
+        th->id = NULL;
+    }
     else
         th->id = (HANDLE)h;
 
