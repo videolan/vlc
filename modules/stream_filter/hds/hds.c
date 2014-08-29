@@ -153,6 +153,18 @@ typedef struct _media_info {
     char* bootstrap_id;
 } media_info;
 
+#define MAX_BOOTSTRAP_INFO 10
+#define MAX_MEDIA_ELEMENTS 10
+#define MAX_XML_DEPTH 256
+
+typedef struct _manifest {
+    char* element_stack[MAX_XML_DEPTH];
+    bootstrap_info bootstraps[MAX_BOOTSTRAP_INFO];
+    media_info medias[MAX_MEDIA_ELEMENTS];
+    xml_reader_t *vlc_reader;
+    xml_t *vlc_xml;
+} manifest_t;
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -1104,29 +1116,65 @@ static void* live_thread( void* p )
     return NULL;
 }
 
-static int parse_Manifest( stream_t *s )
+static int init_Manifest( stream_t *s, manifest_t *m )
 {
-    xml_t *vlc_xml = NULL;
-    xml_reader_t *vlc_reader = NULL;
-    int type = UNKNOWN_ES;
+    memset(m, 0, sizeof(*m));
     stream_t *st = s->p_source;
-
-    msg_Dbg( s, "Manifest parsing\n" );
-
-    vlc_xml = xml_Create( st );
-    if( !vlc_xml )
+    m->vlc_xml = xml_Create( st );
+    if( !m->vlc_xml )
     {
         msg_Err( s, "Failed to open XML parser" );
         return VLC_EGENERIC;
     }
 
-    vlc_reader = xml_ReaderCreate( vlc_xml, st );
-    if( !vlc_reader )
+    m->vlc_reader = xml_ReaderCreate( m->vlc_xml, st );
+    if( !m->vlc_reader )
     {
         msg_Err( s, "Failed to open source for parsing" );
-        xml_Delete( vlc_xml );
         return VLC_EGENERIC;
     }
+
+    return VLC_SUCCESS;
+}
+
+static void cleanup_Manifest( manifest_t *m )
+{
+    for (unsigned i = 0; i < MAX_XML_DEPTH; i++)
+        free( m->element_stack[i] );
+
+    for( unsigned i = 0; i < MAX_MEDIA_ELEMENTS; i++ )
+    {
+        free( m->medias[i].stream_id );
+        free( m->medias[i].media_url );
+        free( m->medias[i].bootstrap_id );
+    }
+
+    for( unsigned i = 0; i < MAX_BOOTSTRAP_INFO; i++ )
+    {
+        free( m->bootstraps[i].data );
+        free( m->bootstraps[i].id );
+        free( m->bootstraps[i].url );
+        free( m->bootstraps[i].profile );
+    }
+
+    if( m->vlc_reader )
+        xml_ReaderDelete( m->vlc_reader );
+    if( m->vlc_xml )
+        xml_Delete( m->vlc_xml );
+}
+
+static void cleanup_threading( hds_stream_t *stream )
+{
+    vlc_mutex_destroy( &stream->dl_lock );
+    vlc_cond_destroy( &stream->dl_cond );
+    vlc_mutex_destroy( &stream->abst_lock );
+}
+
+static int parse_Manifest( stream_t *s, manifest_t *m )
+{
+    int type = UNKNOWN_ES;
+
+    msg_Dbg( s, "Manifest parsing\n" );
 
     char *node;
 
@@ -1134,25 +1182,18 @@ static int parse_Manifest( stream_t *s )
 
     sys->duration_seconds = 0;
 
-#define MAX_BOOTSTRAP_INFO 10
-    bootstrap_info bootstraps[MAX_BOOTSTRAP_INFO];
     uint8_t bootstrap_idx = 0;
-    memset( bootstraps, 0, sizeof(bootstrap_info) * MAX_BOOTSTRAP_INFO );
-
-#define MAX_MEDIA_ELEMENTS 10
-    media_info medias[MAX_MEDIA_ELEMENTS];
     uint8_t media_idx = 0;
-    memset( medias, 0, sizeof(media_info) * MAX_MEDIA_ELEMENTS );
-
-#define MAX_XML_DEPTH 256
-    char* element_stack[256];
     uint8_t current_element_idx = 0;
     char* current_element = NULL;
-    memset( element_stack, 0, sizeof(char*) * MAX_XML_DEPTH );
 
     const char* attr_name;
     const char* attr_value;
 
+    char** element_stack = m->element_stack;
+    bootstrap_info *bootstraps = m->bootstraps;
+    media_info *medias = m->medias;
+    xml_reader_t *vlc_reader = m->vlc_reader;
     char* media_id = NULL;
 
 #define TIMESCALE 10000000
@@ -1274,9 +1315,6 @@ static int parse_Manifest( stream_t *s )
         }
     }
 
-    xml_ReaderDelete( vlc_reader );
-    xml_Delete( vlc_xml );
-
     for( int i = 0; i <= media_idx; i++ )
     {
         for( int j = 0; j < bootstrap_idx; j++ )
@@ -1286,6 +1324,11 @@ static int parse_Manifest( stream_t *s )
                  ! strcmp( medias[i].bootstrap_id, bootstraps[j].id ) ) )
             {
                 hds_stream_t* new_stream = malloc(sizeof(hds_stream_t));
+                if( !new_stream )
+                {
+                    free(media_id);
+                    return VLC_ENOMEM;
+                }
                 memset( new_stream, 0, sizeof(hds_stream_t));
 
                 vlc_mutex_init( & new_stream->abst_lock );
@@ -1305,7 +1348,9 @@ static int parse_Manifest( stream_t *s )
                 {
                     if( !(new_stream->url = strdup( medias[i].media_url ) ) )
                     {
-                        free(new_stream);
+                        free( media_id );
+                        cleanup_threading( new_stream );
+                        free( new_stream );
                         return VLC_ENOMEM;
                     }
                 }
@@ -1336,7 +1381,9 @@ static int parse_Manifest( stream_t *s )
                 {
                     if( !(new_stream->abst_url = strdup( bootstraps[j].url ) ) )
                     {
-                        free(new_stream);
+                        free( media_id );
+                        cleanup_threading( new_stream );
+                        free( new_stream );
                         return VLC_ENOMEM;
                     }
                 }
@@ -1351,22 +1398,8 @@ static int parse_Manifest( stream_t *s )
         }
     }
 
-    for( int i = 0; i < MAX_MEDIA_ELEMENTS; i++ )
-    {
-        FREENULL( medias[media_idx].stream_id );
-        FREENULL( medias[media_idx].media_url );
-        FREENULL( medias[media_idx].bootstrap_id );
-    }
-
-    for( int i = 0; i < MAX_BOOTSTRAP_INFO; i++ )
-    {
-        FREENULL( bootstraps[i].data );
-        FREENULL( bootstraps[i].id );
-        FREENULL( bootstraps[i].url );
-        FREENULL( bootstraps[i].profile );
-    }
-
-    FREENULL( media_id );
+    free( media_id );
+    cleanup_Manifest( m );
 
     return VLC_SUCCESS;
 }
@@ -1440,8 +1473,10 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->hds_streams = vlc_array_new();
 
-    if( parse_Manifest( s ) != VLC_SUCCESS )
+    manifest_t m;
+    if( init_Manifest( s, &m ) || parse_Manifest( s, &m ) )
     {
+        cleanup_Manifest( &m );
         goto error;
     }
 
@@ -1488,9 +1523,7 @@ static void Close( vlc_object_t *p_this )
 
     if (stream)
     {
-        vlc_mutex_destroy( &stream->dl_lock );
-        vlc_cond_destroy( &stream->dl_cond );
-        vlc_mutex_destroy( &stream->abst_lock );
+        cleanup_threading( stream );
     }
 
     if( p_sys->live )
