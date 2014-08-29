@@ -292,6 +292,8 @@ void aout_ChannelReorder( void *ptr, size_t bytes, unsigned channels,
     assert( channels != 0 );
     assert( channels <= AOUT_CHAN_MAX );
 
+    if ( channels == 0 || channels >= AOUT_CHAN_MAX )
+        return;
     /* The audio formats supported in audio output are inlined. For other
      * formats (used in demuxers and muxers), memcpy() is used to avoid
      * breaking type punning. */
@@ -323,6 +325,8 @@ do { \
         {
             unsigned size = aout_BitsPerSample( fourcc ) / 8;
             assert( size != 0 );
+            if ( size == 0 )
+                return;
 
             const size_t frames = bytes / (size * channels);
             unsigned char *buf = ptr;
