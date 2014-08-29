@@ -39,10 +39,12 @@
 /* This value must match the define in video_output/mmal.c
  * Think twice before changing this. Incorrect values cause havoc.
  */
-#define NUM_ACTUAL_OPAQUE_BUFFERS 40
+#define NUM_ACTUAL_OPAQUE_BUFFERS 22
 
-#define NUM_EXTRA_BUFFERS 10
-#define NUM_OPAQUE_BUFFERS 20
+/* These are only required when combined with image_fx filter. But as they
+ * won't do much harm besides using a few MB GPU memory, keep them always on
+ */
+#define NUM_EXTRA_BUFFERS 5
 
 #define MIN_NUM_BUFFERS_IN_TRANSIT 2
 
@@ -184,7 +186,7 @@ static int OpenDecoder(decoder_t *dec)
     if (sys->opaque) {
         extra_buffers.hdr.id = MMAL_PARAMETER_EXTRA_BUFFERS;
         extra_buffers.hdr.size = sizeof(MMAL_PARAMETER_UINT32_T);
-        extra_buffers.value = NUM_ACTUAL_OPAQUE_BUFFERS - NUM_OPAQUE_BUFFERS;
+        extra_buffers.value = NUM_EXTRA_BUFFERS;
         status = mmal_port_parameter_set(sys->output, &extra_buffers.hdr);
         if (status != MMAL_SUCCESS) {
             msg_Err(dec, "Failed to set MMAL_PARAMETER_EXTRA_BUFFERS on output port (status=%"PRIx32" %s)",
@@ -311,11 +313,11 @@ static int change_output_format(decoder_t *dec)
 
     if (sys->opaque) {
         sys->output->buffer_num = NUM_ACTUAL_OPAQUE_BUFFERS;
-        pool_size = sys->output->buffer_num_recommended + NUM_EXTRA_BUFFERS;
+        pool_size = sys->output->buffer_num_recommended;
     } else {
         sys->output->buffer_num = __MAX(sys->output->buffer_num_recommended,
                 MIN_NUM_BUFFERS_IN_TRANSIT);
-        pool_size = sys->output->buffer_num + NUM_EXTRA_BUFFERS;
+        pool_size = sys->output->buffer_num;
     }
 
     sys->output->buffer_size = sys->output->buffer_size_recommended;
@@ -332,15 +334,17 @@ static int change_output_format(decoder_t *dec)
         sys->output_pool = mmal_pool_create(pool_size, 0);
         msg_Dbg(dec, "Created output pool with %d pictures", sys->output_pool->headers_num);
 
-        dec->i_extra_picture_buffers = sys->output_pool->headers_num;
+        /* we need one picture from vout for each buffer header on the output
+         * port */
+        dec->i_extra_picture_buffers = pool_size;
 
+        /* remove what VLC core reserves as it is part of the pool_size
+         * already */
         if (dec->fmt_in.i_codec == VLC_CODEC_H264)
-            dec->i_extra_picture_buffers -= 16;
+            dec->i_extra_picture_buffers -= 19;
         else
-            dec->i_extra_picture_buffers -= 4;
+            dec->i_extra_picture_buffers -= 3;
 
-        dec->i_extra_picture_buffers = __MAX(dec->i_extra_picture_buffers,
-                MIN_NUM_BUFFERS_IN_TRANSIT + 1);
         msg_Dbg(dec, "Request %d extra pictures", dec->i_extra_picture_buffers);
     }
 
@@ -461,9 +465,7 @@ static picture_t *decode(decoder_t *dec, block_t **pblock)
             ret = (picture_t *)buffer->user_data;
             ret->date = buffer->pts;
 
-            buffer->user_data = NULL;
-            buffer->alloc_size = 0;
-            buffer->data = NULL;
+            mmal_buffer_header_reset(buffer);
             mmal_buffer_header_release(buffer);
         }
 
