@@ -339,6 +339,7 @@ static void Close(vlc_object_t *object)
     vlc_cond_destroy(&sys->buffer_cond);
     vlc_mutex_destroy(&sys->manage_mutex);
 
+    free(sys->pictures);
     free(sys);
 
     bcm_host_deinit();
