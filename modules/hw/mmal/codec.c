@@ -449,10 +449,8 @@ static picture_t *decode(decoder_t *dec, block_t **pblock)
      * Configure output port if necessary
      */
     if (sys->output_format) {
-        vlc_mutex_lock(&sys->mutex);
         if (change_output_format(dec) < 0)
             msg_Err(dec, "Failed to change output port format");
-        vlc_mutex_unlock(&sys->mutex);
     }
 
     /*
