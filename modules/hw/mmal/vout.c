@@ -43,7 +43,7 @@
 /* This value must match the define in codec/mmal.c
  * Think twice before changing this. Incorrect values cause havoc.
  */
-#define NUM_ACTUAL_OPAQUE_BUFFERS 40
+#define NUM_ACTUAL_OPAQUE_BUFFERS 22
 
 #define MAX_BUFFERS_IN_TRANSIT 2
 #define VC_TV_MAX_MODE_IDS 127
@@ -433,9 +433,6 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
     if (sys->opaque) {
         if (count <= NUM_ACTUAL_OPAQUE_BUFFERS)
             count = NUM_ACTUAL_OPAQUE_BUFFERS;
-        else
-            msg_Err(vd, "More picture (%u) than NUM_ACTUAL_OPAQUE_BUFFERS (%d) requested. Expect errors",
-                            count, NUM_ACTUAL_OPAQUE_BUFFERS);
     }
 
     if (count < sys->input->buffer_num_recommended)
@@ -460,7 +457,8 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
         goto out;
     }
 
-    sys->pool = mmal_pool_create_with_allocator(count, sys->input->buffer_size,
+    sys->num_buffers = count;
+    sys->pool = mmal_pool_create_with_allocator(sys->num_buffers, sys->input->buffer_size,
                     sys->input,
                     (mmal_pool_allocator_alloc_t)mmal_port_payload_alloc,
                     (mmal_pool_allocator_free_t)mmal_port_payload_free);
@@ -469,7 +467,6 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
                         count, sys->input->buffer_size);
         goto out;
     }
-    sys->num_buffers = count;
 
     memset(&picture_res, 0, sizeof(picture_resource_t));
     sys->pictures = calloc(sys->num_buffers, sizeof(picture_t *));
