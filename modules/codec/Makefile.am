@@ -389,16 +389,6 @@ codec_LTLIBRARIES += libiomx_plugin.la libmediacodec_plugin.la
 endif
 
 
-### MMAL ###
-
-libmmal_codec_plugin_la_SOURCES = codec/mmal.c
-libmmal_codec_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_mmal_codec)
-libmmal_codec_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)' $(LDFLAGS_mmal_codec)
-libmmal_codec_plugin_la_LIBADD = $(LIBS_mmal_codec)
-EXTRA_LTLIBRARIES += libmmal_codec_plugin.la
-codec_LTLIBRARIES += $(LTLIBmmal_codec)
-
-
 ### X26x encoders ###
 
 libx265_plugin_la_SOURCES = codec/x265.c
