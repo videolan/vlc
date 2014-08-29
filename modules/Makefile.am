@@ -16,7 +16,8 @@ EXTRA_SUBDIRS = \
 	access_output \
 	mux \
 	stream_out \
-	hw/vdpau
+	hw/vdpau \
+	hw/mmal
 
 SUBDIRS = . $(BASE_SUBDIRS)
 DIST_SUBDIRS = . $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
@@ -25,6 +26,9 @@ SUBDIRS += access_output mux stream_out
 endif
 if HAVE_VDPAU
 SUBDIRS += hw/vdpau
+endif
+if HAVE_MMAL
+SUBDIRS += hw/mmal
 endif
 
 TESTS =
