@@ -418,6 +418,9 @@ static void ProcessHeader( decoder_t *p_dec )
     }
     FLAC__stream_decoder_process_until_end_of_metadata( p_sys->p_flac );
     msg_Dbg( p_dec, "STREAMINFO decoded" );
+
+    block_Release( p_sys->p_block );
+    p_sys->p_block = NULL;
 }
 
 /*****************************************************************************
