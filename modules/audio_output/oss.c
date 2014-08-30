@@ -51,7 +51,6 @@
 
 #if !defined (__FreeBSD__) && !defined (__FreeBSD_kernel__)
 # define USE_SOFTVOL
-# include "volume.h"
 #endif
 
 #define A52_FRAME_NB 1536
@@ -61,11 +60,19 @@ struct aout_sys_t
     int fd;
     audio_sample_format_t format;
     bool starting;
-
+#ifndef USE_SOFTVOL
     bool mute;
     uint8_t level;
+#else
+    bool soft_mute;
+    float soft_gain;
+#endif
     char *device;
 };
+
+#ifdef USE_SOFTVOL
+# include "volume.h"
+#endif
 
 static int Open (vlc_object_t *);
 static void Close (vlc_object_t *);
@@ -354,6 +361,7 @@ static void Stop (audio_output_t *aout)
     sys->fd = -1;
 }
 
+#ifndef USE_SOFTVOL
 static int VolumeSet (audio_output_t *aout, float vol)
 {
     aout_sys_t *sys = aout->sys;
@@ -395,6 +403,7 @@ static int MuteSet (audio_output_t *aout, bool mute)
     aout_MuteReport (aout, mute);
     return 0;
 }
+#endif
 
 static int DevicesEnum (audio_output_t *aout)
 {
@@ -467,9 +476,10 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
 
     sys->fd = -1;
-
+#ifndef USE_SOFTVOL
     sys->level = 100;
     sys->mute = false;
+#endif
     sys->device = var_InheritString (aout, "oss-audio-device");
 
     aout->sys = sys;
