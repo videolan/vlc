@@ -377,7 +377,7 @@ out:
  * 2 if more would-be blocking send is required.
  */
 static int st_Handshake (vlc_tls_t *session, const char *host,
-                                        const char *service) {
+                                        const char *service, char **restrict alp) {
     VLC_UNUSED(service);
 
     vlc_tls_sys_t *sys = session->sys;
@@ -399,7 +399,7 @@ static int st_Handshake (vlc_tls_t *session, const char *host,
             return 0;
 
         case errSSLServerAuthCompleted:
-            return st_Handshake(session, host, service);
+            return st_Handshake(session, host, service, alp);
 
         case errSSLConnectionRefused:
             msg_Err(session, "connection was refused");
@@ -577,7 +577,8 @@ static int st_SessionOpenCommon (vlc_tls_creds_t *crd, vlc_tls_t *session,
 }
 
 static int st_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
-                                     int fd, const char *hostname) {
+                                     int fd, const char *hostname, const char *const *alpn) {
+    VLC_UNUSED(alpn);
     msg_Dbg(session, "open TLS session for %s", hostname);
 
     int ret = st_SessionOpenCommon(crd, session, fd, false);
@@ -658,9 +659,10 @@ static void CloseClient (vlc_tls_creds_t *crd) {
  * Initializes a server-side TLS session.
  */
 static int st_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
-                                 int fd, const char *hostname) {
+                                 int fd, const char *hostname, const char *const *alpn) {
 
     VLC_UNUSED(hostname);
+    VLC_UNUSED(alpn);
     msg_Dbg(session, "open TLS server session");
 
     int ret = st_SessionOpenCommon(crd, session, fd, true);
