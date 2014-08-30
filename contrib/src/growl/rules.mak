@@ -22,5 +22,5 @@ growl: growl-$(GROWL_VERSION).tar.bz2 .sum-growl
 .growl: growl
 	cd $< && xcodebuild $(XCODE_FLAGS) -target Growl.framework -configuration Release
 	install -d $(PREFIX)
-	cd $< && cp -rf build/Release/Growl.framework "$(PREFIX)"
+	cd $< && cp -Rf build/Release/Growl.framework "$(PREFIX)"
 	touch $@
