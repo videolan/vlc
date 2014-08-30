@@ -198,9 +198,9 @@ static int gnutls_SessionOpen (vlc_tls_t *tls, int type,
         goto error;
     }
 
-#ifdef GNUTLS_ALPN_MAND
     if (alpn != NULL)
     {
+#ifdef GNUTLS_ALPN_MAND
         gnutls_datum_t *protv = NULL;
         unsigned protc = 0;
 
@@ -222,10 +222,10 @@ static int gnutls_SessionOpen (vlc_tls_t *tls, int type,
 
         val = gnutls_alpn_set_protocols (session, protv, protc, 0);
         free (protv);
-    }
 #else
-    VLC_UNUSED(alpn);
+        goto error;
 #endif
+    }
 
     gnutls_transport_set_int (session, fd);
 
@@ -279,9 +279,9 @@ static int gnutls_ContinueHandshake (vlc_tls_t *tls, char **restrict alp)
     return -1;
 
 done:
-#ifdef GNUTLS_ALPN_MAND
     if (alp != NULL)
     {
+#ifdef GNUTLS_ALPN_MAND
         gnutls_datum_t datum;
 
         val = gnutls_alpn_get_selected_protocol (session, &datum);
@@ -295,11 +295,9 @@ done:
                 return -1;
         }
         else
+#endif
             *alp = NULL;
     }
-#else
-    VLC_UNUSED(alp);
-#endif
     return 0;
 }
 
