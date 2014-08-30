@@ -75,7 +75,7 @@ function cue_track( global, track )
     t.date = track.date or global.date
     t.description = global.comment
     t.tracknum = track.num
-    t.options = { ":start-time=" .. math.floor(track.index01) }
+    t.options = { ":start-time=" .. track.index01}
 
     return t
 end
@@ -85,7 +85,7 @@ function cue_append( tracks, global, track )
     if( t ~= nil ) then
         if( #tracks > 0 ) then
             local prev = tracks[#tracks]
-            table.insert( prev.options, ":stop-time=" .. math.floor(track.index01) )
+            table.insert( prev.options, ":stop-time=" .. track.index01)
         end
         table.insert( tracks, t )
     end
