@@ -754,36 +754,20 @@ AS_IF([test "${SYS}" != "mingw32"], [
 AC_SUBST(LIBPTHREAD)
 
 dnl Check for headers
-AC_CHECK_HEADERS([search.h])
-AC_CHECK_HEADERS(getopt.h locale.h xlocale.h)
-AC_CHECK_HEADERS([sys/time.h sys/ioctl.h])
-AC_CHECK_HEADERS([arpa/inet.h netinet/udplite.h sys/eventfd.h])
-AC_CHECK_HEADERS([net/if.h], [], [],
-  [
-    #include <sys/types.h>
-    #include <sys/socket.h>
-  ])
-AC_CHECK_HEADERS([sys/mount.h], [], [],
-  [
-    #include <sys/param.h>
-  ])
-
-if test "${SYS}" != "mingw32"; then
-  AC_CHECK_HEADERS(machine/param.h sys/shm.h)
-  AC_CHECK_HEADERS([linux/version.h linux/dccp.h scsi/scsi.h linux/magic.h])
-  AC_CHECK_HEADERS(syslog.h mntent.h)
-fi # end "${SYS}" != "mingw32"
+dnl  POSIX
+AC_CHECK_HEADERS([arpa/inet.h net/if.h pthread.h search.h syslog.h sys/shm.h])
+dnl  BSD
+AC_CHECK_HEADERS([netinet/udplite.h sys/param.h sys/mount.h])
+dnl  GNU/Linux
+AC_CHECK_HEADERS([getopt.h linux/dccp.h linux/magic.h mntent.h sys/eventfd.h])
+dnl  MacOS
+AC_CHECK_HEADERS([xlocale.h])
 
 dnl LP64 and LLP64 architectures had better define ssize_t by themselves...
 AH_TEMPLATE(ssize_t, [Define to `int' if <stddef.h> does not define.]) dnl ` (fix VIM syntax highlight
 AC_CHECK_TYPE(ssize_t,, [
   AC_DEFINE(ssize_t, int)
 ])
-
-dnl Check for threads library
-if test "${SYS}" != "mingw32"; then
-  AC_CHECK_HEADERS(pthread.h)
-fi # end "${SYS}" != "mingw32"
 
 dnl It seems that autoconf detects pkg-config only during the first
 dnl PKG_CHECK_MODULES from configure.ac - which makes sense. But in our case,
