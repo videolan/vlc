@@ -46,6 +46,13 @@ struct vout_window_sys_t
     vlc_thread_t thread;
 };
 
+static void cleanup_wl_display_read(void *data)
+{
+    struct wl_display *display = data;
+
+    wl_display_cancel_read(display);
+}
+
 /** Background thread for Wayland shell events handling */
 static void *Thread(void *data)
 {
@@ -54,6 +61,7 @@ static void *Thread(void *data)
     struct pollfd ufd[1];
 
     int canc = vlc_savecancel();
+    vlc_cleanup_push(cleanup_wl_display_read, display);
 
     ufd[0].fd = wl_display_get_fd(display);
     ufd[0].events = POLLIN;
@@ -73,6 +81,7 @@ static void *Thread(void *data)
         wl_display_dispatch_pending(display);
     }
     assert(0);
+    vlc_cleanup_pop();
     //vlc_restorecancel(canc);
     //return NULL;
 }
