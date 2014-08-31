@@ -586,14 +586,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSUInteger selectedProfile = [o_profile_pop indexOfSelectedItem];
 
-    /* disable all current video filters, if a vout is available */
-    vout_thread_t *p_vout = getVout();
-    if (p_vout) {
-        var_SetString(p_vout, "video-filter", "");
-        var_SetString(p_vout, "sub-source", "");
-        vlc_object_release(p_vout);
-    }
-
     /* fetch preset */
     NSArray *items = [[[defaults objectForKey:@"VideoEffectProfiles"] objectAtIndex:selectedProfile] componentsSeparatedByString:@";"];
 
@@ -606,26 +598,23 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
     /* filter handling */
     NSString *tempString = B64DecNSStr([items objectAtIndex:0]);
-    NSArray *tempArray;
-    NSUInteger count;
+    vout_thread_t *p_vout = getVout();
 
     /* enable the new filters */
-    config_PutPsz(p_intf, "video-filter", "");
-    if ([tempString length] > 0) {
-        tempArray = [tempString componentsSeparatedByString:@":"];
-        count = [tempArray count];
-        for (NSUInteger x = 0; x < count; x++)
-            [vci_si setVideoFilter:[[tempArray objectAtIndex:x] UTF8String] on:YES];
+    config_PutPsz(p_intf, "video-filter", [tempString UTF8String]);
+    if (p_vout) {
+        var_SetString(p_vout, "video-filter", [tempString UTF8String]);
     }
 
     tempString = B64DecNSStr([items objectAtIndex:1]);
     /* enable another round of new filters */
-    config_PutPsz(p_intf,"sub-source", "");
-    if ([tempString length] > 0) {
-        tempArray = [tempString componentsSeparatedByString:@":"];
-        count = [tempArray count];
-        for (NSUInteger x = 0; x < count; x++)
-            [vci_si setVideoFilter:[[tempArray objectAtIndex:x] UTF8String] on:YES];
+    config_PutPsz(p_intf, "sub-source", [tempString UTF8String]);
+    if (p_vout) {
+        var_SetString(p_vout, "sub-source", [tempString UTF8String]);
+    }
+
+    if (p_vout) {
+        vlc_object_release(p_vout);
     }
 
     tempString = B64DecNSStr([items objectAtIndex:2]);
