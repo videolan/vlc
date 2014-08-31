@@ -129,6 +129,13 @@ endif
 
 
 ### Wayland ###
+libwl_shm_plugin_la_SOURCES = wl/shm.c
+libwl_shm_plugin_la_CFLAGS = $(WAYLAND_CLIENT_CFLAGS)
+libwl_shm_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS)
+if HAVE_WAYLAND
+vout_LTLIBRARIES += libwl_shm_plugin.la
+endif
+
 libwl_shell_surface_plugin_la_SOURCES = wl/shell_surface.c
 libwl_shell_surface_plugin_la_CFLAGS = $(WAYLAND_CLIENT_CFLAGS)
 libwl_shell_surface_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS) $(LIBPTHREAD)

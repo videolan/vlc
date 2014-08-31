@@ -420,6 +420,7 @@ $Id$
  * wingdi: WIN 32 / WIN CE GDI video output
  * winstore: Windows Store App audio output
  * wl_shell_surface: Wayland shell surface window provider
+ * wl_shm: Wayland shared memory video output
  * wma_fixed: wma decoder using integer decoder from Rockbox
  * x262: MPEG-2 video encoder using x262
  * x26410b: H264 10 bit video encoder using x264
