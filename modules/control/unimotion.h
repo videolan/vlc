@@ -35,7 +35,7 @@ enum sms_hardware {
 // prototypes for the functions in unimotion.c
 
 // returns the value of SMS hardware present or unknown if no hardware is detected
-int detect_sms();
+int detect_sms(void);
 
 // use the value returned from detect_sms as the type
 // these functinos return 1 on success and 0 on failure
