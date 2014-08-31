@@ -662,9 +662,6 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
-    VdpColor black = { 0.f, 0.f, 0.f, 1.f };
-    vdp_presentation_queue_set_background_color(sys->vdp, sys->queue, &black);
-
     sys->cursor = XCB_cursor_Create(sys->conn, screen);
     sys->pool = NULL;
 
