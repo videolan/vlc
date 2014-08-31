@@ -45,6 +45,7 @@
 struct vout_display_sys_t
 {
     vout_window_t *embed; /* VLC window */
+    struct wl_event_queue *eventq;
     struct wl_shm *shm;
     struct wl_shm_pool *shm_pool;
 
@@ -207,8 +208,7 @@ static void Display(vout_display_t *vd, picture_t *pic, subpicture_t *subpic)
     struct wl_surface *surface = sys->embed->handle.wl;
 
     wl_surface_commit(surface);
-    // FIXME: deadlocks here
-    wl_display_roundtrip(display);
+    wl_display_roundtrip_queue(display, sys->eventq);
 
     (void) pic; (void) subpic;
 }
@@ -351,6 +351,7 @@ static int Open(vlc_object_t *obj)
 
     vd->sys = sys;
     sys->embed = NULL;
+    sys->eventq = NULL;
     sys->shm = NULL;
     sys->pool = NULL;
     sys->fd = -1;
@@ -377,12 +378,18 @@ static int Open(vlc_object_t *obj)
         goto error;
 
     struct wl_display *display = sys->embed->display.wl;
+
+    sys->eventq = wl_display_create_queue(display);
+    if (sys->eventq == NULL)
+        goto error;
+
     struct wl_registry *registry = wl_display_get_registry(display);
     if (registry == NULL)
         goto error;
 
+    wl_proxy_set_queue((struct wl_proxy *)registry, sys->eventq);
     wl_registry_add_listener(registry, &registry_cbs, vd);
-    wl_display_roundtrip(display);
+    wl_display_roundtrip_queue(display, sys->eventq);
     wl_registry_destroy(registry);
 
     if (sys->shm == NULL)
@@ -413,6 +420,8 @@ static int Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
+    if (sys->eventq != NULL)
+        wl_event_queue_destroy(sys->eventq);
     if (sys->embed != NULL)
         vout_display_DeleteWindow(vd, sys->embed);
     if (sys->fd != -1)
@@ -429,6 +438,8 @@ static void Close(vlc_object_t *obj)
     ResetPictures(vd);
 
     wl_shm_destroy(sys->shm);
+    wl_display_flush(sys->embed->display.wl);
+    wl_event_queue_destroy(sys->eventq);
     vout_display_DeleteWindow(vd, sys->embed);
     close(sys->fd);
     free(sys);
