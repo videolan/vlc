@@ -151,7 +151,7 @@ static VLCInfo *_o_sharedInstance = nil;
     else
         [self initMediaPanelStats];
 
-    NSInteger i_level = [[[VLCMain sharedInstance] voutController] currentWindowLevel];
+    NSInteger i_level = [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel];
     [o_info_window setLevel: i_level];
     [o_info_window makeKeyAndOrderFront: self];
 }

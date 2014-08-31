@@ -572,7 +572,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     if ([o_window isKeyWindow])
         [o_window orderOut:sender];
     else {
-        [o_window setLevel: [[[VLCMain sharedInstance] voutController] currentWindowLevel]];
+        [o_window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
         [o_window makeKeyAndOrderFront:sender];
     }
 }

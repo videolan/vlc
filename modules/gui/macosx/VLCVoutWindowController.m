@@ -41,6 +41,7 @@
     self = [super init];
     o_vout_dict = [[NSMutableDictionary alloc] init];
     i_currentWindowLevel = NSNormalWindowLevel;
+    i_currentFloatingWindowLevel = NSFloatingWindowLevel;
     return self;
 }
 
@@ -397,15 +398,21 @@
         return;
 
     i_currentWindowLevel = i_level;
+    if (i_level == NSNormalWindowLevel) {
+        i_currentFloatingWindowLevel = NSFloatingWindowLevel;
+    } else {
+        i_currentFloatingWindowLevel = i_level + 1;
+    }
 
     [[VLCMainWindow sharedInstance] setWindowLevel:i_level];
-    [[VLCVideoEffects sharedInstance] updateCocoaWindowLevel:i_level];
-    [[VLCAudioEffects sharedInstance] updateCocoaWindowLevel:i_level];
-    [[[VLCMain sharedInstance] info] updateCocoaWindowLevel:i_level];
-    [[VLCBookmarks sharedInstance] updateCocoaWindowLevel:i_level];
-    [[VLCTrackSynchronization sharedInstance] updateCocoaWindowLevel:i_level];
+
+    [[VLCVideoEffects sharedInstance] updateCocoaWindowLevel:i_currentFloatingWindowLevel];
+    [[VLCAudioEffects sharedInstance] updateCocoaWindowLevel:i_currentFloatingWindowLevel];
+    [[[VLCMain sharedInstance] info] updateCocoaWindowLevel:i_currentFloatingWindowLevel];
+    [[VLCBookmarks sharedInstance] updateCocoaWindowLevel:i_currentFloatingWindowLevel];
+    [[VLCTrackSynchronization sharedInstance] updateCocoaWindowLevel:i_currentFloatingWindowLevel];
 }
 
-@synthesize currentWindowLevel=i_currentWindowLevel;
+@synthesize currentStatusWindowLevel=i_currentFloatingWindowLevel;
 
 @end

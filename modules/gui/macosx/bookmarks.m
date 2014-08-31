@@ -124,7 +124,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
 {
     /* show the window, called from intf.m */
     [o_bookmarks_window displayIfNeeded];
-    [o_bookmarks_window setLevel: [[[VLCMain sharedInstance] voutController] currentWindowLevel]];
+    [o_bookmarks_window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
     [o_bookmarks_window makeKeyAndOrderFront:nil];
 }
 

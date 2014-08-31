@@ -38,11 +38,13 @@
     // save the status level if at least one video window is on status level
     NSUInteger i_statusLevelWindowCounter;
     NSInteger i_currentWindowLevel;
+    NSInteger i_currentFloatingWindowLevel;
 
     BOOL b_mainwindow_has_video;
 }
 
-@property (readonly, nonatomic) NSInteger currentWindowLevel;
+@property (readonly, nonatomic) NSInteger currentStatusWindowLevel;
+
 
 - (VLCVoutView *)setupVoutForWindow:(vout_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition;
 - (void)removeVoutforDisplay:(NSValue *)o_key;
