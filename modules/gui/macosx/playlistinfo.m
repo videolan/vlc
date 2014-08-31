@@ -65,7 +65,6 @@ static VLCInfo *_o_sharedInstance = nil;
 - (void)awakeFromNib
 {
     [o_info_window setExcludedFromWindowsMenu: YES];
-    [o_info_window setFloatingPanel: NO];
     if (!OSX_SNOW_LEOPARD)
         [o_info_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
@@ -115,7 +114,6 @@ static VLCInfo *_o_sharedInstance = nil;
     [o_lost_abuffers_lbl setStringValue: _NS("Lost buffers")];
 
     [o_info_window setInitialFirstResponder: o_uri_txt];
-    [o_info_window setDelegate: self];
 
     b_awakeFromNib = YES;
 
@@ -153,7 +151,7 @@ static VLCInfo *_o_sharedInstance = nil;
 
     NSInteger i_level = [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel];
     [o_info_window setLevel: i_level];
-    [o_info_window makeKeyAndOrderFront: self];
+    [o_info_window makeKeyAndOrderFront:nil];
 }
 
 - (void)initMediaPanelStats

@@ -611,7 +611,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     o_open = [[VLCOpen alloc] init];
     o_coredialogs = [[VLCCoreDialogProvider alloc] init];
-    o_info = [[VLCInfo alloc] init];
     o_mainmenu = [[VLCMainMenu alloc] init];
     o_coreinteraction = [[VLCCoreInteraction alloc] init];
     o_eyetv = [[VLCEyeTVController alloc] init];
@@ -1644,6 +1643,9 @@ static bool f_appExit = false;
 
 - (id)info
 {
+    if (!o_info)
+        o_info = [[VLCInfo alloc] init];
+
     if (! nib_info_loaded)
         nib_info_loaded = [NSBundle loadNibNamed:@"MediaInfo" owner: NSApp];
 
