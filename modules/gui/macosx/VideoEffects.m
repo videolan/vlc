@@ -594,9 +594,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         vlc_object_release(p_vout);
     }
 
-    // video-splitter needs to be set via playlist var
-    var_SetString(pl_Get(p_intf), "video-splitter", "");
-
     /* fetch preset */
     NSArray *items = [[[defaults objectForKey:@"VideoEffectProfiles"] objectAtIndex:selectedProfile] componentsSeparatedByString:@";"];
 
@@ -633,12 +630,13 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
     tempString = B64DecNSStr([items objectAtIndex:2]);
     /* enable another round of new filters */
-    config_PutPsz(p_intf,"video-splitter", "");
-    if ([tempString length] > 0) {
-        tempArray = [tempString componentsSeparatedByString:@":"];
-        count = [tempArray count];
-        for (NSUInteger x = 0; x < count; x++)
-            [vci_si setVideoFilter:[[tempArray objectAtIndex:x] UTF8String] on:YES];
+    char *psz_current_splitter = var_GetString(pl_Get(p_intf), "video-splitter");
+    bool b_filter_changed = ![tempString isEqual:toNSStr(psz_current_splitter)];
+    free(psz_current_splitter);
+
+    if (b_filter_changed) {
+        config_PutPsz(p_intf, "video-splitter", [tempString UTF8String]);
+        var_SetString(pl_Get(p_intf), "video-splitter", [tempString UTF8String]);
     }
 
     /* try to set filter values on-the-fly and store them appropriately */
