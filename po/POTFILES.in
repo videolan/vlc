@@ -382,7 +382,6 @@ modules/codec/libass.c
 modules/codec/libmpeg2.c
 modules/codec/lpcm.c
 modules/codec/mft.c
-modules/codec/mmal.c
 modules/codec/mpeg_audio.c
 modules/codec/omxil/android_mediacodec.c
 modules/codec/omxil/omxil.c
@@ -929,6 +928,8 @@ modules/gui/skins2/x11/x11_tooltip.cpp
 modules/gui/skins2/x11/x11_tooltip.hpp
 modules/gui/skins2/x11/x11_window.cpp
 modules/gui/skins2/x11/x11_window.hpp
+modules/hw/mmal/codec.c
+modules/hw/mmal/vout.c
 modules/hw/vdpau/adjust.c
 modules/hw/vdpau/avcodec.c
 modules/hw/vdpau/chroma.c
@@ -1166,7 +1167,6 @@ modules/video_output/glx.c
 modules/video_output/ios2.m
 modules/video_output/kva.c
 modules/video_output/macosx.m
-modules/video_output/mmal.c
 modules/video_output/msw/direct2d.c
 modules/video_output/msw/direct3d.c
 modules/video_output/msw/directx.c
