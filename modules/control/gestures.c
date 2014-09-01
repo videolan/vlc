@@ -382,8 +382,8 @@ static int MovedEvent( vlc_object_t *p_this, char const *psz_var,
         int i_vertical = newval.coords.y - p_sys->i_last_y;
         unsigned int pattern = 0;
 
-        i_horizontal = i_horizontal / p_sys->i_threshold;
-        i_vertical = i_vertical / p_sys->i_threshold;
+        i_horizontal /= p_sys->i_threshold;
+        i_vertical /= p_sys->i_threshold;
 
         if( i_horizontal < 0 )
         {
