@@ -147,6 +147,13 @@ enum nal_unit_type_e
     /* ref_idc == 0 for 6,9,10,11,12 */
 };
 
+/* Defined in H.264 annex D */
+enum sei_type_e
+{
+    SEI_USER_DATA_REGISTERED = 4,
+    SEI_RECOVERY_POINT = 6
+};
+
 #define BLOCK_FLAG_PRIVATE_AUD (1 << BLOCK_FLAG_PRIVATE_SHIFT)
 
 static block_t *Packetize( decoder_t *, block_t ** );
@@ -1130,7 +1137,7 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
             break;
 
         /* Look for user_data_registered_itu_t_t35 */
-        if( i_type == 4 )
+        if( i_type == SEI_USER_DATA_REGISTERED )
         {
             static const uint8_t p_dvb1_data_start_code[] = {
                 0xb5,
@@ -1149,7 +1156,7 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
         }
 
         /* Look for SEI recovery point */
-        if( i_type == 6 )
+        if( i_type == SEI_RECOVERY_POINT )
         {
             bs_t s;
             const int      i_rec = i_size;
