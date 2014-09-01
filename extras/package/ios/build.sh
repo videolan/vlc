@@ -5,6 +5,7 @@ PLATFORM=OS
 VERBOSE=no
 SDK_VERSION=7.0
 SDK_MIN=5.1
+64BIT_SDK_MIN=7.0
 ARCH=armv7
 
 usage()
@@ -130,14 +131,21 @@ export STRIP="xcrun strip"
 export PLATFORM=$PLATFORM
 export SDK_VERSION=$SDK_VERSION
 
+export CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} ${OPTIM}"
 if [ "$PLATFORM" = "OS" ]; then
-export CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -miphoneos-version-min=${SDK_MIN} ${OPTIM}"
 if [ "$ARCH" != "arm64" ]; then
-export CFLAGS="${CFLAGS} -mcpu=cortex-a8"
+export CFLAGS="${CFLAGS} -mcpu=cortex-a8 -miphoneos-version-min=${SDK_MIN}"
+else
+export CFLAGS="${CFLAGS} -miphoneos-version-min=${64BIT_SDK_MIN}"
 fi
 else
-export CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} -miphoneos-version-min=${SDK_MIN} ${OPTIM}"
+if [ "$ARCH" != "x86_64" ]; then
+export CFLAGS="${CFLAGS} -miphoneos-version-min=${SDK_MIN}"
+else
+export CFLAGS="${CFLAGS} -miphoneos-version-min=${64BIT_SDK_MIN}"
 fi
+
+export CXXFLAGS="${CFLAGS} -stdlib=libstdc++"
 
 export CPPFLAGS="${CFLAGS}"
 
@@ -151,21 +159,35 @@ if [ "$PLATFORM" = "Simulator" ]; then
     export OBJCFLAGS="-fobjc-abi-version=2 -fobjc-legacy-dispatch ${OBJCFLAGS}"
 fi
 
-export LDFLAGS="-L${SDKROOT}/usr/lib -arch ${ARCH} -isysroot ${SDKROOT} -miphoneos-version-min=${SDK_MIN}"
+export LDFLAGS="-L${SDKROOT}/usr/lib -arch ${ARCH} -isysroot ${SDKROOT}"
 
 if [ "$PLATFORM" = "OS" ]; then
     EXTRA_CFLAGS="-arch ${ARCH}"
 if [ "$ARCH" != "arm64" ]; then
     EXTRA_CFLAGS+=" -mcpu=cortex-a8"
+    EXTRA_CFLAGS+=" -miphoneos-version-min=${SDK_MIN}"
+    EXTRA_LDFLAGS+=" -miphoneos-version-min=${SDK_MIN}"
+    export LDFLAGS="${LDFLAGS} -miphoneos-version-min=${SDK_MIN}"
+else
+    EXTRA_CFLAGS+=" -miphoneos-version-min=${64BIT_SDK_MIN}"
+    EXTRA_LDFLAGS+=" -miphoneos-version-min=${64BIT_SDK_MIN}"
+    export LDFLAGS="${LDFLAGS} -miphoneos-version-min=${64BIT_SDK_MIN}"
 fi
     EXTRA_LDFLAGS="-arch ${ARCH}"
 else
     EXTRA_CFLAGS="-arch ${ARCH}"
     EXTRA_LDFLAGS="-arch ${ARCH}"
+if [ "$ARCH" != "x86_64" ]; then
+    EXTRA_CFLAGS+=" -miphoneos-version-min=${SDK_MIN}"
+    EXTRA_LDFLAGS+=" -miphoneos-version-min=${SDK_MIN}"
+    export LDFLAGS="${LDFLAGS} -miphoneos-version-min=${SDK_MIN}"
+else
+    EXTRA_CFLAGS+=" -miphoneos-version-min=${64BIT_SDK_MIN}"
+    EXTRA_LDFLAGS+=" -miphoneos-version-min=${64BIT_SDK_MIN}"
+    export LDFLAGS="${LDFLAGS} -miphoneos-version-min=${64BIT_SDK_MIN}"
+fi
 fi
 
-EXTRA_CFLAGS+=" -miphoneos-version-min=${SDK_MIN}"
-EXTRA_LDFLAGS+=" -miphoneos-version-min=${SDK_MIN}"
 
 info "LD FLAGS SELECTED = '${LDFLAGS}'"
 
