@@ -220,17 +220,22 @@ static bool directory_push (access_sys_t *p_sys, DIR *handle, char *psz_uri)
 #ifdef HAVE_OPENAT
     struct stat st;
     if (fstat (dirfd (handle), &st))
-        goto error;
+        goto error_filev;
     p_dir->device = st.st_dev;
     p_dir->inode = st.st_ino;
 #else
     p_dir->path = make_path (psz_uri);
     if (p_dir->path == NULL)
-        goto error;
+        goto error_filev;
 #endif
 
     p_sys->current = p_dir;
     return true;
+
+error_filev:
+    for (int i = 0; i < p_dir->filec; i++)
+        free (p_dir->filev[i]);
+    free (p_dir->filev);
 
 error:
     closedir (handle);
@@ -249,6 +254,8 @@ static bool directory_pop (access_sys_t *p_sys)
     p_sys->current = p_old->parent;
     closedir (p_old->handle);
     free (p_old->uri);
+    for (int i = 0; i < p_old->filec; i++)
+        free (p_old->filev[i]);
     free (p_old->filev);
 #ifndef HAVE_OPENAT
     free (p_old->path);
