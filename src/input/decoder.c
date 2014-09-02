@@ -946,6 +946,7 @@ static void DecoderFlush( decoder_t *p_dec )
     /* Empty the fifo */
     block_FifoEmpty( p_owner->p_fifo );
 
+    p_owner->b_waiting = false;
     /* Monitor for flush end */
     p_owner->b_flushing = true;
     vlc_cond_signal( &p_owner->wait_request );
