@@ -399,7 +399,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( ffmpeg_OpenCodec( p_dec ) < 0 )
     {
         msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
-        av_free( p_sys->p_ff_pic );
+        avcodec_free_frame( &p_sys->p_ff_pic );
         vlc_sem_destroy( &p_sys->sem_mt );
         free( p_sys );
         return VLC_EGENERIC;
@@ -775,7 +775,7 @@ void EndVideoDec( decoder_t *p_dec )
     wait_mt( p_sys );
 
     if( p_sys->p_ff_pic )
-        av_free( p_sys->p_ff_pic );
+        avcodec_free_frame( &p_sys->p_ff_pic );
 
     if( p_sys->p_va )
         vlc_va_Delete( p_sys->p_va );
