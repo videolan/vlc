@@ -33,6 +33,8 @@
 #include <vlc_threads.h>
 #include <vlc_vout_display.h>
 
+#include "mmal_picture.h"
+
 #include <bcm_host.h>
 #include <interface/mmal/mmal.h>
 #include <interface/mmal/util/mmal_util.h>
@@ -111,12 +113,6 @@ struct vout_display_sys_t {
     bool opaque;
 };
 
-struct picture_sys_t {
-    vout_display_t *vd;
-    MMAL_BUFFER_HEADER_T *buffer;
-    bool displayed;
-};
-
 static const vlc_fourcc_t subpicture_chromas[] = {
     VLC_CODEC_RGBA,
     0
@@ -133,10 +129,6 @@ static void vd_display(vout_display_t *vd, picture_t *picture,
                 subpicture_t *subpicture);
 static int vd_control(vout_display_t *vd, int query, va_list args);
 static void vd_manage(vout_display_t *vd);
-
-/* VLC picture pool */
-static int picture_lock(picture_t *picture);
-static void picture_unlock(picture_t *picture);
 
 /* MMAL callbacks */
 static void control_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer);
@@ -472,9 +464,9 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
     memset(&picture_res, 0, sizeof(picture_resource_t));
     sys->pictures = calloc(sys->num_buffers, sizeof(picture_t *));
     for (i = 0; i < sys->num_buffers; ++i) {
-        picture_res.p_sys = malloc(sizeof(picture_sys_t));
-        picture_res.p_sys->vd = vd;
-        picture_res.p_sys->buffer = NULL;
+        picture_res.p_sys = calloc(1, sizeof(picture_sys_t));
+        picture_res.p_sys->owner = (vlc_object_t *)vd;
+        picture_res.p_sys->queue = sys->pool->queue;
 
         sys->pictures[i] = picture_NewFromResource(&fmt, &picture_res);
         if (!sys->pictures[i]) {
@@ -482,13 +474,15 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
             free(picture_res.p_sys);
             goto out;
         }
+
+        memcpy(sys->pictures[i]->p, sys->planes, sizeof(sys->planes));
     }
 
     memset(&picture_pool_cfg, 0, sizeof(picture_pool_configuration_t));
     picture_pool_cfg.picture_count = sys->num_buffers;
     picture_pool_cfg.picture = sys->pictures;
-    picture_pool_cfg.lock = picture_lock;
-    picture_pool_cfg.unlock = picture_unlock;
+    picture_pool_cfg.lock = mmal_picture_lock;
+    picture_pool_cfg.unlock = mmal_picture_unlock;
 
     sys->picture_pool = picture_pool_NewExtended(&picture_pool_cfg);
     if (!sys->picture_pool) {
@@ -634,52 +628,6 @@ static void vd_manage(vout_display_t *vd)
     }
 
     vlc_mutex_unlock(&sys->manage_mutex);
-}
-
-static int picture_lock(picture_t *picture)
-{
-    vout_display_t *vd = picture->p_sys->vd;
-    vout_display_sys_t *sys = vd->sys;
-    picture_sys_t *pic_sys = picture->p_sys;
-
-    MMAL_BUFFER_HEADER_T *buffer = mmal_queue_wait(sys->pool->queue);
-    if (!buffer)
-        return VLC_EGENERIC;
-
-    vlc_mutex_lock(&sys->buffer_mutex);
-
-    mmal_buffer_header_reset(buffer);
-    buffer->user_data = picture;
-    pic_sys->buffer = buffer;
-
-    memcpy(picture->p, sys->planes, sizeof(sys->planes));
-    picture->p[0].p_pixels = buffer->data;
-    picture->p[1].p_pixels += (ptrdiff_t)buffer->data;
-    picture->p[2].p_pixels += (ptrdiff_t)buffer->data;
-
-    pic_sys->displayed = false;
-
-    vlc_mutex_unlock(&sys->buffer_mutex);
-
-    return VLC_SUCCESS;
-}
-
-static void picture_unlock(picture_t *picture)
-{
-    picture_sys_t *pic_sys = picture->p_sys;
-    vout_display_t *vd = pic_sys->vd;
-    vout_display_sys_t *sys = vd->sys;
-    MMAL_BUFFER_HEADER_T *buffer = pic_sys->buffer;
-
-    vlc_mutex_lock(&sys->buffer_mutex);
-
-    pic_sys->buffer = NULL;
-    if (buffer) {
-        buffer->user_data = NULL;
-        mmal_buffer_header_release(buffer);
-    }
-
-    vlc_mutex_unlock(&sys->buffer_mutex);
 }
 
 static void control_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
