@@ -271,7 +271,6 @@ static int Open(vlc_object_t *p_this)
         else
             bo_add_fourcc(box, "mp41");
         bo_add_fourcc(box, "avc1");
-        bo_add_fourcc(box, "qt  ");
         box_fix(box);
 
         p_sys->i_pos += box->len;
