@@ -400,6 +400,7 @@ static void ProcessHeader( decoder_t *p_dec )
     switch (i_extra) {
     case 34:
         p_sys->p_block = block_Alloc( 8 + i_extra );
+        if( p_sys->p_block == NULL ) return;
         memcpy( p_sys->p_block->p_buffer + 8, p_dec->fmt_in.p_extra, i_extra );
         memcpy( p_sys->p_block->p_buffer, header, 4);
         uint8_t *p = p_sys->p_block->p_buffer;
@@ -410,6 +411,7 @@ static void ProcessHeader( decoder_t *p_dec )
         break;
     case 42:
         p_sys->p_block = block_Alloc( i_extra );
+        if( p_sys->p_block == NULL ) return;
         memcpy( p_sys->p_block->p_buffer, p_dec->fmt_in.p_extra, i_extra );
         break;
     default:
