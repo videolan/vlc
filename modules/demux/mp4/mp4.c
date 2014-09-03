@@ -982,13 +982,14 @@ end:
                 continue;
 
             mtime_t i_dts = MP4_TrackGetDTS( p_demux, tk );
+            p_sys->i_pcr = __MIN( i_dts, p_sys->i_pcr );
+
             if ( !p_sys->b_seekmode && i_dts > p_sys->i_pcr + 2*CLOCK_FREQ )
             {
                 msg_Dbg( p_demux, "that media doesn't look interleaved, will need to seek");
                 p_sys->b_seekmode = true;
             }
 
-            p_sys->i_pcr = __MIN( i_dts, p_sys->i_pcr );
             p_sys->i_time = p_sys->i_pcr * p_sys->i_timescale / CLOCK_FREQ;
         }
     }
