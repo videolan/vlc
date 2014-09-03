@@ -152,6 +152,9 @@ typedef struct
     mtime_t      i_starttime; /* the really first packet */
     bool         b_hasbframes;
 
+    /* XXX: needed for other codecs too, see lavf */
+    block_t      *a52_frame;
+
     /* for later stco fix-up (fast start files) */
     uint64_t i_stco_pos;
     bool b_stco64;
@@ -391,6 +394,8 @@ static void Close(vlc_object_t *p_this)
         mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
 
         es_format_Clean(&p_stream->fmt);
+        if (p_stream->a52_frame)
+            block_Release(p_stream->a52_frame);
         free(p_stream->entry);
         free(p_stream);
     }
@@ -435,6 +440,8 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
 
     switch(p_input->p_fmt->i_codec)
     {
+    case VLC_CODEC_A52:
+    case VLC_CODEC_EAC3:
     case VLC_CODEC_MP4A:
     case VLC_CODEC_MP4V:
     case VLC_CODEC_MPGA:
@@ -474,6 +481,7 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
         calloc(p_stream->i_entry_max, sizeof(mp4_entry_t));
     p_stream->i_dts_start   = 0;
     p_stream->i_read_duration    = 0;
+    p_stream->a52_frame = NULL;
     switch( p_stream->fmt.i_cat )
     {
     case AUDIO_ES:
@@ -551,6 +559,11 @@ static int Mux(sout_mux_t *p_mux)
                 p_data = ConvertFromAnnexB(p_data);
             else if (p_stream->fmt.i_codec == VLC_CODEC_SUBT)
                 p_data = ConvertSUBT(p_data);
+            else if (p_stream->fmt.i_codec == VLC_CODEC_A52 ||
+                     p_stream->fmt.i_codec == VLC_CODEC_EAC3) {
+                if (p_stream->a52_frame == NULL && p_data->i_buffer >= 8)
+                    p_stream->a52_frame = block_Duplicate(p_data);
+            }
         } while (!p_data);
 
         /* Reset reference dts in case of discontinuity (ex: gather sout) */
@@ -870,6 +883,174 @@ static bo_t *GetWaveTag(mp4_stream_t *p_stream)
     return wave;
 }
 
+static bo_t *GetDec3Tag(mp4_stream_t *p_stream)
+{
+    if (!p_stream->a52_frame)
+        return NULL;
+
+    bs_t s;
+    bs_init(&s, p_stream->a52_frame->p_buffer, sizeof(p_stream->a52_frame->i_buffer));
+    bs_skip(&s, 16); // syncword
+
+    uint8_t fscod, bsid, bsmod, acmod, lfeon, strmtyp;
+
+    bsmod = 0;
+
+    strmtyp = bs_read(&s, 2);
+
+    if (strmtyp & 0x1) // dependant or reserved stream
+        return NULL;
+
+    if (bs_read(&s, 3) != 0x0) // substreamid: we don't support more than 1 stream
+        return NULL;
+
+    int numblkscod;
+    bs_skip(&s, 11); // frmsizecod
+    fscod = bs_read(&s, 2);
+    if (fscod == 0x03) {
+        bs_skip(&s, 2); // fscod2
+        numblkscod = 3;
+    } else {
+        numblkscod = bs_read(&s, 2);
+    }
+
+    acmod = bs_read(&s, 3);
+    lfeon = bs_read1(&s);
+
+    bsid = bs_read(&s, 5);
+
+    bs_skip(&s, 5); // dialnorm
+    if (bs_read1(&s)) // compre
+        bs_skip(&s, 5); // compr
+
+    if (acmod == 0) {
+        bs_skip(&s, 5); // dialnorm2
+        if (bs_read1(&s)) // compr2e
+            bs_skip(&s, 8); // compr2
+    }
+
+    if (strmtyp == 0x1) // dependant stream XXX: unsupported
+        if (bs_read1(&s)) // chanmape
+            bs_skip(&s, 16); // chanmap
+
+    /* we have to skip mixing info to read bsmod */
+    if (bs_read1(&s)) { // mixmdate
+        if (acmod > 0x2) // 2+ channels
+            bs_skip(&s, 2); // dmixmod
+        if ((acmod & 0x1) && (acmod > 0x2)) // 3 front channels
+            bs_skip(&s, 3 + 3); // ltrtcmixlev + lorocmixlev
+        if (acmod & 0x4) // surround channel
+            bs_skip(&s, 3 + 3); // ltrsurmixlev + lorosurmixlev
+        if (lfeon)
+            if (bs_read1(&s))
+                bs_skip(&s, 5); // lfemixlevcod
+        if (strmtyp == 0) { // independant stream
+            if (bs_read1(&s)) // pgmscle
+                bs_skip(&s, 6); // pgmscl
+            if (acmod == 0x0) // dual mono
+                if (bs_read1(&s)) // pgmscl2e
+                    bs_skip(&s, 6); // pgmscl2
+            if (bs_read1(&s)) // extpgmscle
+                bs_skip(&s, 6); // extpgmscl
+            uint8_t mixdef = bs_read(&s, 2);
+            if (mixdef == 0x1)
+                bs_skip(&s, 5);
+            else if (mixdef == 0x2)
+                bs_skip(&s, 12);
+            else if (mixdef == 0x3) {
+                uint8_t mixdeflen = bs_read(&s, 5);
+                bs_skip(&s, 8 * (mixdeflen + 2));
+            }
+            if (acmod < 0x2) { // mono or dual mono
+                if (bs_read1(&s)) // paninfoe
+                    bs_skip(&s, 14); // paninfo
+                if (acmod == 0) // dual mono
+                    if (bs_read1(&s)) // paninfo2e
+                        bs_skip(&s, 14); // paninfo2
+            }
+            if (bs_read1(&s)) { // frmmixcfginfoe
+                static const int blocks[4] = { 1, 2, 3, 6 };
+                int number_of_blocks = blocks[numblkscod];
+                if (number_of_blocks == 1)
+                    bs_skip(&s, 5); // blkmixcfginfo[0]
+                else for (int i = 0; i < number_of_blocks; i++)
+                    if (bs_read1(&s)) // blkmixcfginfoe
+                        bs_skip(&s, 5); // blkmixcfginfo[i]
+            }
+        }
+    }
+
+    if (bs_read1(&s)) // infomdate
+        bsmod = bs_read(&s, 3);
+
+    uint8_t mp4_eac3_header[5];
+    bs_init(&s, mp4_eac3_header, sizeof(mp4_eac3_header));
+
+    int data_rate = p_stream->fmt.i_bitrate / 1000;
+    bs_write(&s, 13, data_rate);
+    bs_write(&s, 3, 0); // num_ind_sub - 1
+    bs_write(&s, 2, fscod);
+    bs_write(&s, 5, bsid);
+    bs_write(&s, 5, bsmod);
+    bs_write(&s, 3, acmod);
+    bs_write(&s, 1, lfeon);
+    bs_write(&s, 3, 0); // reserved
+    bs_write(&s, 4, 0); // num_dep_sub
+    bs_write(&s, 1, 0); // reserved
+
+    bo_t *dec3 = box_new("dec3");
+
+    bo_add_mem(dec3, sizeof(mp4_eac3_header), mp4_eac3_header);
+
+    return dec3;
+}
+
+static bo_t *GetDac3Tag(mp4_stream_t *p_stream)
+{
+    if (!p_stream->a52_frame)
+        return NULL;
+
+    bo_t *dac3 = box_new("dac3");
+
+    bs_t s;
+    bs_init(&s, p_stream->a52_frame->p_buffer, sizeof(p_stream->a52_frame->i_buffer));
+
+    uint8_t fscod, bsid, bsmod, acmod, lfeon, frmsizecod;
+
+    bs_skip(&s, 16 + 16); // syncword + crc
+
+    fscod = bs_read(&s, 2);
+    frmsizecod = bs_read(&s, 6);
+    bsid = bs_read(&s, 5);
+    bsmod = bs_read(&s, 3);
+    acmod = bs_read(&s, 3);
+    if (acmod == 2)
+        bs_skip(&s, 2); // dsurmod
+    else {
+        if ((acmod & 1) && acmod != 1)
+            bs_skip(&s, 2); // cmixlev
+        if (acmod & 4)
+            bs_skip(&s, 2); // surmixlev
+    }
+
+    lfeon = bs_read1(&s);
+
+    uint8_t mp4_a52_header[3];
+    bs_init(&s, mp4_a52_header, sizeof(mp4_a52_header));
+
+    bs_write(&s, 2, fscod);
+    bs_write(&s, 5, bsid);
+    bs_write(&s, 3, bsmod);
+    bs_write(&s, 3, acmod);
+    bs_write(&s, 1, lfeon);
+    bs_write(&s, 5, frmsizecod >> 1); // bit_rate_code
+    bs_write(&s, 5, 0); // reserved
+
+    bo_add_mem(dac3, sizeof(mp4_a52_header), mp4_a52_header);
+
+    return dac3;
+}
+
 static bo_t *GetDamrTag(mp4_stream_t *p_stream)
 {
     bo_t *damr;
@@ -1151,7 +1332,7 @@ static bo_t *GetAvcCTag(mp4_stream_t *p_stream)
             }
             const int i_nal_type = p_buffer[3]&0x1f;
             int i_startcode = 0;
- 
+
             for (int i_offset = 1; i_offset+2 < i_buffer ; i_offset++)
                 if (!memcmp(&p_buffer[i_offset], &avc1_start_code[1], 3)) {
                     /* we found another startcode */
@@ -1175,7 +1356,7 @@ static bo_t *GetAvcCTag(mp4_stream_t *p_stream)
             p_buffer += i_size;
         }
     }
- 
+
     /* FIXME use better value */
     avcC = box_new("avcC");
     bo_add_8(avcC, 1);      /* configuration version */
@@ -1296,7 +1477,6 @@ static bo_t *GetSounBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
     bool b_descr = true;
     vlc_fourcc_t codec = p_stream->fmt.i_codec;
     char fcc[4];
-    vlc_fourcc_to_char(codec, fcc);
 
     if (codec == VLC_CODEC_MPGA) {
         if (p_sys->b_mov) {
@@ -1304,7 +1484,12 @@ static bo_t *GetSounBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
             memcpy(fcc, ".mp3", 4);
         } else
             memcpy(fcc, "mp4a", 4);
-    }
+    } else if (codec == VLC_CODEC_A52) {
+        memcpy(fcc, "ac-3", 4);
+    } else if (codec == VLC_CODEC_EAC3) {
+        memcpy(fcc, "ec-3", 4);
+    } else
+        vlc_fourcc_to_char(codec, fcc);
 
     bo_t *soun = box_new(fcc);
     for (int i = 0; i < 6; i++)
@@ -1346,9 +1531,15 @@ static bo_t *GetSounBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
             box = GetWaveTag(p_stream);
         else if (codec == VLC_CODEC_AMR_NB)
             box = GetDamrTag(p_stream);
+        else if (codec == VLC_CODEC_A52)
+            box = GetDac3Tag(p_stream);
+        else if (codec == VLC_CODEC_EAC3)
+            box = GetDec3Tag(p_stream);
         else
             box = GetESDS(p_stream);
-        box_gather(soun, box);
+
+        if (box)
+            box_gather(soun, box);
     }
 
     return soun;
