@@ -88,10 +88,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
     if (req > MAX_PICTURES)
         req = MAX_PICTURES;
 
-    vout_display_place_t place;
-
-    vout_display_PlacePicture(&place, &vd->source, vd->cfg, false);
-
     /* We need one extra line to cover for horizontal crop offset */
     unsigned stride = 4 * ((vd->fmt.i_width + 31) & ~31);
     unsigned lines = (vd->fmt.i_height + 31 + 1) & ~31;
@@ -113,6 +109,9 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
         msg_Err(vd, "cannot map buffers: %s", vlc_strerror_c(errno));
         goto error;
     }
+#ifndef NDEBUG
+    memset(sys->base, 0x80, sys->length); /* gray fill */
+#endif
 
     sys->shm_pool = wl_shm_create_pool(sys->shm, sys->fd, sys->length);
     if (sys->shm_pool == NULL)
@@ -143,7 +142,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
             break;
 
         res.p_sys = (picture_sys_t *)buf;
-        res.p[0].p_pixels = sys->base + offset;
+        res.p[0].p_pixels = sys->base + count * picsize;
         offset += picsize;
 
         picture_t *pic = picture_NewFromResource(&vd->fmt, &res);
