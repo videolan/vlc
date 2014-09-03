@@ -134,6 +134,8 @@
 #define ATOM_sawb VLC_FOURCC( 's', 'a', 'w', 'b' )
 #define ATOM_OggS VLC_FOURCC( 'O', 'g', 'g', 'S' )
 #define ATOM_alac VLC_FOURCC( 'a', 'l', 'a', 'c' )
+#define ATOM_ac3  VLC_FOURCC( 'a', 'c', '-', '3' )
+#define ATOM_eac3 VLC_FOURCC( 'e', 'c', '-', '3' )
 #define ATOM_dac3 VLC_FOURCC( 'd', 'a', 'c', '3' )
 #define ATOM_dec3 VLC_FOURCC( 'd', 'e', 'c', '3' )
 #define ATOM_dvc1 VLC_FOURCC( 'd', 'v', 'c', '1' )
