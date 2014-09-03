@@ -167,6 +167,9 @@ void CtrlCheckbox::setImage( AnimBitmap *pImg )
     if( pImg == m_pImgCurrent )
         return;
 
+    if( pImg && m_pImgCurrent && *pImg == *m_pImgCurrent )
+        return;
+
     AnimBitmap *pOldImg = m_pImgCurrent;
     m_pImgCurrent = pImg;
 
