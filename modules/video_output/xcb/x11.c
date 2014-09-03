@@ -375,12 +375,12 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
     assert (pic->i_planes == 1);
 
     picture_resource_t res = {
-       .p = {
-           [0] = {
-               .i_lines = pic->p->i_lines,
-               .i_pitch = pic->p->i_pitch,
-           },
-       },
+        .p = {
+            [0] = {
+                .i_lines = pic->p->i_lines,
+                .i_pitch = pic->p->i_pitch,
+            },
+        },
     };
     picture_Release (pic);
 
