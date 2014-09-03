@@ -2424,6 +2424,20 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             p_track->fmt.i_codec = VLC_CODEC_MPGA;
             break;
         }
+        case( VLC_FOURCC( 'e', 'c', '-', '3' ) ):
+        {
+            MP4_Box_t *p_dec3_box = MP4_BoxGet(  p_sample, "dec3", 0 );
+
+            p_track->fmt.i_codec = VLC_CODEC_EAC3;
+            if( p_dec3_box )
+            {
+                MP4_Box_data_dec3_t *p_dec3 = p_dec3_box->data.p_dec3;
+                p_track->fmt.audio.i_channels = 0;
+                p_track->fmt.i_bitrate = p_dec3->i_data_rate * 1000;
+                p_track->fmt.audio.i_bitspersample = 0;
+            }
+            break;
+        }
         case( VLC_FOURCC( 'a', 'c', '-', '3' ) ):
         {
             MP4_Box_t *p_dac3_box = MP4_BoxGet(  p_sample, "dac3", 0 );
@@ -2445,11 +2459,6 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                     p_track->fmt.i_bitrate = pi_bitrate[p_dac3->i_bitrate_code] * 1000;
                 p_track->fmt.audio.i_bitspersample = 0;
             }
-            break;
-        }
-        case( VLC_FOURCC( 'e', 'c', '-', '3' ) ):
-        {
-            p_track->fmt.i_codec = VLC_CODEC_EAC3;
             break;
         }
 

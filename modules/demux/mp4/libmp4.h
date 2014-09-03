@@ -1109,6 +1109,23 @@ typedef struct
 
 typedef struct
 {
+    uint16_t i_data_rate;
+    uint8_t i_num_ind_sub;
+    struct
+    {
+        uint8_t i_fscod;
+        uint8_t i_bsid;
+        uint8_t i_bsmod;
+        uint8_t i_acmod;
+        uint8_t i_lfeon;
+        uint8_t i_num_dep_sub;
+        uint16_t i_chan_loc;
+    } stream[8];
+
+} MP4_Box_data_dec3_t;
+
+typedef struct
+{
     uint8_t i_fscod;
     uint8_t i_bsid;
     uint8_t i_bsmod;
@@ -1291,6 +1308,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_esds_t *p_esds;
     MP4_Box_data_avcC_t *p_avcC;
     MP4_Box_data_dac3_t *p_dac3;
+    MP4_Box_data_dec3_t *p_dec3;
     MP4_Box_data_dvc1_t *p_dvc1;
     MP4_Box_data_chan_t *p_chan;
     MP4_Box_data_enda_t *p_enda;
