@@ -212,6 +212,7 @@ $Id$
  * mjpeg: a demuxer for multipart and concatenated JPEG data
  * mkv: Matroska demuxer
  * mmal_codec: mmal based video decoder
+ * mmal_deinterlace: mmal deinterlace filter
  * mmal_vout: mmal based video renderer
  * mmdevice: Windows Audio Session API audio output using MMDevice
  * mod: MOD demuxer
