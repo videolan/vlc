@@ -2355,8 +2355,8 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                             p_soun->i_qt_version = 0;
                         break;
                     }
-                case( VLC_FOURCC( 'a', 'c', '-', '3' ) ):
-                case( VLC_FOURCC( 'e', 'c', '-', '3' ) ):
+                case( ATOM_ac3 ):
+                case( ATOM_eac3 ):
                 case( VLC_FOURCC( 'm', 's', 0x20, 0x00 ) ):
                     p_soun->i_qt_version = 0;
                     break;
@@ -2424,7 +2424,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             p_track->fmt.i_codec = VLC_CODEC_MPGA;
             break;
         }
-        case( VLC_FOURCC( 'e', 'c', '-', '3' ) ):
+        case( ATOM_eac3 ):
         {
             MP4_Box_t *p_dec3_box = MP4_BoxGet(  p_sample, "dec3", 0 );
 
@@ -2438,7 +2438,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             }
             break;
         }
-        case( VLC_FOURCC( 'a', 'c', '-', '3' ) ):
+        case( ATOM_ac3 ):
         {
             MP4_Box_t *p_dac3_box = MP4_BoxGet(  p_sample, "dac3", 0 );
 
