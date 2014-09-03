@@ -241,8 +241,8 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             vout_display_place_t place;
             video_format_t src;
 
-            sys->x -= vd->fmt.i_x_offset;
-            sys->y -= vd->fmt.i_y_offset;
+            sys->x += vd->fmt.i_visible_width / 2;
+            sys->y += vd->fmt.i_visible_height / 2;
 
             vout_display_PlacePicture(&place, &vd->source, vd->cfg, false);
             video_format_ApplyRotation(&src, &vd->source);
@@ -258,8 +258,8 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             vd->fmt.i_y_offset = src.i_y_offset * place.height
                                                 / src.i_visible_height;
 
-            sys->x += vd->fmt.i_x_offset;
-            sys->y += vd->fmt.i_y_offset;
+            sys->x -= vd->fmt.i_visible_width / 2;
+            sys->y -= vd->fmt.i_visible_height / 2;
 
             ResetPictures(vd);
             break;
