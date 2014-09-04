@@ -94,6 +94,7 @@ struct vout_display_sys_t {
     MMAL_POOL_T *pool;
     struct dmx_region_t *dmx_region;
     plane_t planes[3];
+    int i_planes;
 
     vlc_mutex_t buffer_mutex;
     vlc_mutex_t manage_mutex;
@@ -174,14 +175,8 @@ static int Open(vlc_object_t *object)
     vd->info.has_hide_mouse = true;
     sys->opaque = vd->fmt.i_chroma == VLC_CODEC_MMAL_OPAQUE;
 
-    if (!sys->opaque)
-        vd->fmt.i_chroma = VLC_CODEC_I420;
     vd->fmt.i_sar_num = vd->source.i_sar_num;
     vd->fmt.i_sar_den = vd->source.i_sar_den;
-
-    buffer_pitch = align(vd->fmt.i_width, 32);
-    buffer_height = align(vd->fmt.i_height, 16);
-    sys->buffer_size = 3 * buffer_pitch * buffer_height / 2;
 
     status = mmal_component_create(MMAL_COMPONENT_DEFAULT_VIDEO_RENDERER, &sys->component);
     if (status != MMAL_SUCCESS) {
@@ -202,10 +197,20 @@ static int Open(vlc_object_t *object)
 
     sys->input = sys->component->input[0];
     sys->input->userdata = (struct MMAL_PORT_USERDATA_T *)vd;
-    if (sys->opaque)
+
+    if (sys->opaque) {
         sys->input->format->encoding = MMAL_ENCODING_OPAQUE;
-    else
+        sys->i_planes = 1;
+        sys->buffer_size = sys->input->buffer_size_recommended;
+    } else {
         sys->input->format->encoding = MMAL_ENCODING_I420;
+        vd->fmt.i_chroma = VLC_CODEC_I420;
+        buffer_pitch = align(vd->fmt.i_width, 32);
+        buffer_height = align(vd->fmt.i_height, 16);
+        sys->i_planes = 3;
+        sys->buffer_size = 3 * buffer_pitch * buffer_height / 2;
+    }
+
     sys->input->format->es->video.width = vd->fmt.i_width;
     sys->input->format->es->video.height = vd->fmt.i_height;
     sys->input->format->es->video.crop.x = 0;
@@ -248,7 +253,7 @@ static int Open(vlc_object_t *object)
     }
 
     offsets[0] = 0;
-    for (i = 0; i < 3; ++i) {
+    for (i = 0; i < sys->i_planes; ++i) {
         sys->planes[i].i_lines = buffer_height;
         sys->planes[i].i_pitch = buffer_pitch;
         sys->planes[i].i_visible_lines = vd->fmt.i_visible_height;
@@ -475,7 +480,8 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
             goto out;
         }
 
-        memcpy(sys->pictures[i]->p, sys->planes, sizeof(sys->planes));
+        sys->pictures[i]->i_planes = sys->i_planes;
+        memcpy(sys->pictures[i]->p, sys->planes, sys->i_planes * sizeof(plane_t));
     }
 
     memset(&picture_pool_cfg, 0, sizeof(picture_pool_configuration_t));
