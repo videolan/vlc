@@ -40,7 +40,7 @@ int mmal_picture_lock(picture_t *picture)
 
     vlc_mutex_lock(get_mmal_opaque_mutex());
 
-    MMAL_BUFFER_HEADER_T *buffer = mmal_queue_wait(pic_sys->queue);
+    MMAL_BUFFER_HEADER_T *buffer = mmal_queue_timedwait(pic_sys->queue, 2);
     if (!buffer) {
         ret = VLC_EGENERIC;
         goto out;
