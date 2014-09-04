@@ -127,15 +127,6 @@ out:
     return ret;
 }
 
-static void destroy_picture_pool(filter_t *filter)
-{
-    filter_sys_t *sys = filter->p_sys;
-
-    if (sys->picture_pool)
-        picture_pool_Delete(sys->picture_pool);
-    free(sys->pictures);
-}
-
 static int Open(filter_t *filter)
 {
     int32_t frame_duration = filter->fmt_in.video.i_frame_rate != 0 ?
@@ -317,11 +308,6 @@ static void Close(filter_t *filter)
     if (sys->component && sys->component->is_enabled)
         mmal_component_disable(sys->component);
 
-    if (sys->input_pool)
-        mmal_pool_destroy(sys->input_pool);
-
-    destroy_picture_pool(filter);
-
     while ((buffer = mmal_queue_get(sys->filtered_pictures))) {
         picture_t *pic = (picture_t *)buffer->user_data;
         picture_Release(pic);
@@ -335,12 +321,20 @@ static void Close(filter_t *filter)
     if (sys->filtered_pictures)
         mmal_queue_destroy(sys->filtered_pictures);
 
+    if (sys->input_pool)
+        mmal_pool_destroy(sys->input_pool);
+
     if (sys->output_pool)
         mmal_pool_destroy(sys->output_pool);
 
     if (sys->component)
         mmal_component_release(sys->component);
 
+    if (sys->picture_pool)
+        picture_pool_Delete(sys->picture_pool);
+
+    vlc_mutex_destroy(&sys->mutex);
+    free(sys->pictures);
     free(sys);
 
     bcm_host_deinit();
