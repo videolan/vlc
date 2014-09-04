@@ -3178,7 +3178,7 @@ AC_ARG_ENABLE(wayland,
   [AS_HELP_STRING([--enable-wayland], [Wayland support (default auto)])])
 have_wayland="no"
 AS_IF([test "${enable_wayland}" != "no"], [
-  PKG_CHECK_MODULES([WAYLAND_CLIENT], [wayland-client >= 1.4], [
+  PKG_CHECK_MODULES([WAYLAND_CLIENT], [wayland-client >= 1.5.91], [
     have_wayland="yes"
   ], [
     AS_IF([test -n "${enable_wayland}"], [
