@@ -456,10 +456,7 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
     }
 
     sys->num_buffers = count;
-    sys->pool = mmal_pool_create_with_allocator(sys->num_buffers, sys->input->buffer_size,
-                    sys->input,
-                    (mmal_pool_allocator_alloc_t)mmal_port_payload_alloc,
-                    (mmal_pool_allocator_free_t)mmal_port_payload_free);
+    sys->pool = mmal_pool_create(sys->num_buffers, sys->input->buffer_size);
     if (!sys->pool) {
         msg_Err(vd, "Failed to create MMAL pool for %u buffers of size %"PRIu32,
                         count, sys->input->buffer_size);
