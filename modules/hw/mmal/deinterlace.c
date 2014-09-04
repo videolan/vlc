@@ -41,8 +41,6 @@
 #define NUM_EXTRA_BUFFERS 2
 #define MIN_NUM_BUFFERS_IN_TRANSIT 2
 
-#define MAX_ALLOWED_FPS 30
-
 static int Open(filter_t *filter);
 static void Close(filter_t *filter);
 
@@ -481,7 +479,6 @@ static void input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
 {
     picture_t *picture = (picture_t *)buffer->user_data;
     filter_t *filter = (filter_t *)port->userdata;
-    filter_sys_t *sys = filter->p_sys;
 
     buffer->user_data = NULL;
     mmal_buffer_header_release(buffer);
