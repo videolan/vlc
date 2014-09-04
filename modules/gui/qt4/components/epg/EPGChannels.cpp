@@ -72,7 +72,7 @@ void EPGChannels::paintEvent( QPaintEvent *event )
             text = text.left( i_idx_channel );
 
         p.drawText( 0, - m_offset + ( i++ + 0.5 ) * TRACKS_HEIGHT - 4,
-                    width(), 20, Qt::AlignLeft, text );
+                    width(), height(), Qt::AlignLeft, text );
 
         int i_width = fontMetrics().width( text );
         if( width() < i_width )

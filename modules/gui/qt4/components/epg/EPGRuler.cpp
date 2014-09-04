@@ -36,8 +36,8 @@ EPGRuler::EPGRuler( QWidget* parent )
     : QWidget( parent )
 {
     setContentsMargins( 0, 0, 0, 0 );
-    setMinimumHeight( 15 );
-    setMaximumHeight( 15 );
+    setMinimumHeight( height() );
+    setMaximumHeight( height() );
     m_offset = 0;
 }
 
