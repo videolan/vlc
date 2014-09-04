@@ -91,7 +91,7 @@ static int create_picture_pool(filter_t *filter)
         goto out;
     }
 
-    for (int i = 0; i < sys->output->buffer_num; i++) {
+    for (unsigned i = 0; i < sys->output->buffer_num; i++) {
         picture_res.p_sys = calloc(1, sizeof(picture_sys_t));
         if (!picture_res.p_sys) {
             ret = -ENOMEM;
