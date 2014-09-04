@@ -259,7 +259,6 @@ static int Open(filter_t *filter)
         goto out;
     }
 
-    sys->output_pool = mmal_pool_create(sys->output->buffer_num, 0);
     sys->output_pool = mmal_pool_create_with_allocator(sys->output->buffer_num,
             sys->output->buffer_size, sys->output,
             (mmal_pool_allocator_alloc_t)mmal_port_payload_alloc,
