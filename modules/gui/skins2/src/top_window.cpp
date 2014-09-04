@@ -361,13 +361,14 @@ void TopWindow::setActiveLayout( GenericLayout *pLayout )
     // Get the size of the layout and resize the window
     resize( pLayout->getWidth(), pLayout->getHeight() );
 
+    // The new layout is active
+    pLayout->getActiveVar().set( true );
+
     if( isVisible )
     {
         pLayout->onShow();
     }
 
-    // The new layout is active
-    pLayout->getActiveVar().set( true );
 }
 
 
