@@ -407,7 +407,7 @@ static int Open( vlc_object_t * p_this )
         tk->i_scale = p_strh->i_scale;
         tk->i_samplesize = p_strh->i_samplesize;
         msg_Dbg( p_demux, "stream[%d] rate:%d scale:%d samplesize:%d",
-                 i, tk->i_rate, tk->i_scale, tk->i_samplesize );
+                i, tk->i_rate, tk->i_scale, tk->i_samplesize );
 
         switch( p_strh->i_type )
         {
@@ -453,6 +453,15 @@ static int Open( vlc_object_t * p_this )
                 fmt.audio.i_blockalign      = p_auds->p_wf->nBlockAlign;
                 fmt.audio.i_bitspersample   = p_auds->p_wf->wBitsPerSample;
                 fmt.b_packetized            = !tk->i_blocksize;
+
+                avi_chunk_list_t *p_info = AVI_ChunkFind( p_riff, AVIFOURCC_INFO, 0 );
+                if( p_info )
+                {
+                    int i_chunk = AVIFOURCC_IAS1 + ((i - 1) << 24);
+                    avi_chunk_STRING_t *p_lang = AVI_ChunkFind( p_info, i_chunk, 0 );
+                    if( p_lang != NULL )
+                        fmt.psz_language = FromACP( p_lang->p_str );
+                }
 
                 msg_Dbg( p_demux,
                     "stream[%d] audio(0x%x - %s) %d channels %dHz %dbits",
