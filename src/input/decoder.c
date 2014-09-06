@@ -329,7 +329,6 @@ void input_DecoderDelete( decoder_t *p_dec )
 
     /* Make sure we aren't paused/waiting/decoding anymore */
     vlc_mutex_lock( &p_owner->lock );
-    const bool b_was_paused = p_owner->b_paused;
     p_owner->b_paused = false;
     p_owner->b_waiting = false;
     p_owner->b_flushing = true;
@@ -338,7 +337,6 @@ void input_DecoderDelete( decoder_t *p_dec )
     vlc_mutex_unlock( &p_owner->lock );
 
     vlc_join( p_owner->thread, NULL );
-    p_owner->b_paused = b_was_paused;
 
     module_unneed( p_dec, p_dec->p_module );
 
