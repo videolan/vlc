@@ -47,45 +47,6 @@ vlc_module_begin ()
     set_callbacks( OpenFilter, NULL );
 vlc_module_end ()
 
-/*****************************************************************************
- * IsSupported: can we downmix?
- *****************************************************************************/
-static bool IsSupported( const audio_format_t *p_input, const audio_format_t *p_output )
-{
-    if( p_input->i_format != VLC_CODEC_FL32 ||
-        p_input->i_format != p_output->i_format ||
-        p_input->i_rate != p_output->i_rate )
-    {
-        return false;
-    }
-
-    if( p_input->i_physical_channels == p_output->i_physical_channels &&
-        p_input->i_original_channels == p_output->i_original_channels )
-    {
-        return false;
-    }
-
-    /* Only from 7.x/5.x/4.0/3.x/2.0
-     * NB 5.X rear and middle are handled the same way
-     * We don't support 2.1 -> 2.0 (trivial can do it)
-     * TODO: We don't support any 8.1 input
-     * TODO: We don't support any 6.x input
-     * TODO: We don't support 4.0 rear and 4.0 middle
-     * */
-    if( (p_input->i_physical_channels & ~AOUT_CHAN_LFE) != AOUT_CHANS_7_0 &&
-        (p_input->i_physical_channels)                  != AOUT_CHANS_6_1_MIDDLE &&
-        (p_input->i_physical_channels & ~AOUT_CHAN_LFE) != AOUT_CHANS_5_0 &&
-        (p_input->i_physical_channels & ~AOUT_CHAN_LFE) != AOUT_CHANS_5_0_MIDDLE &&
-        (p_input->i_physical_channels & ~AOUT_CHAN_LFE) != AOUT_CHANS_4_CENTER_REAR &&
-        (p_input->i_physical_channels & ~AOUT_CHAN_LFE) != AOUT_CHANS_3_0 &&
-         p_input->i_physical_channels != AOUT_CHANS_2_0 )
-    {
-        return false;
-    }
-
-    return true;
-}
-
 static block_t *Filter( filter_t *, block_t * );
 
 static void DoWork_7_x_to_2_0( filter_t * p_filter,  block_t * p_in_buf, block_t * p_out_buf ) {
@@ -306,26 +267,33 @@ static int OpenFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     void (*do_work)(filter_t *, block_t *, block_t *) = NULL;
 
-    audio_format_t fmt_in  = p_filter->fmt_in.audio;
-    audio_format_t fmt_out = p_filter->fmt_out.audio;
-
-    if( !IsSupported( &fmt_in, &fmt_out ) )
+    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
+        p_filter->fmt_in.audio.i_format != p_filter->fmt_out.audio.i_format ||
+        p_filter->fmt_in.audio.i_rate != p_filter->fmt_out.audio.i_rate )
         return VLC_EGENERIC;
 
-    const unsigned i_input_physical = p_filter->fmt_in.audio.i_physical_channels;
-    const bool b_input_7_0 = (i_input_physical & ~AOUT_CHAN_LFE) == AOUT_CHANS_7_0;
-    const bool b_input_6_1 = !b_input_7_0 &&
-                             i_input_physical == AOUT_CHANS_6_1_MIDDLE;
-    const bool b_input_5_0 = !b_input_7_0 && !b_input_6_1 &&
-                             ( (i_input_physical & AOUT_CHANS_5_0) == AOUT_CHANS_5_0 ||
-                               (i_input_physical & AOUT_CHANS_5_0_MIDDLE) == AOUT_CHANS_5_0_MIDDLE );
-    const bool b_input_4_center_rear =  !b_input_7_0 && !b_input_5_0 &&
-                             (i_input_physical & ~AOUT_CHAN_LFE) == AOUT_CHANS_4_CENTER_REAR;
-    const bool b_input_3_0 = !b_input_7_0 && !b_input_5_0 && !b_input_4_center_rear &&
-                             (i_input_physical & ~AOUT_CHAN_LFE) == AOUT_CHANS_3_0;
-
+    uint32_t input = p_filter->fmt_in.audio.i_physical_channels;
     uint32_t output = p_filter->fmt_out.audio.i_physical_channels;
 
+    /* Short circuit the common case of not remixing */
+    if( input == output
+     && p_filter->fmt_in.audio.i_original_channels
+            == p_filter->fmt_out.audio.i_original_channels )
+        return VLC_EGENERIC;
+
+    const bool b_input_7_0 = (input & ~AOUT_CHAN_LFE) == AOUT_CHANS_7_0;
+    const bool b_input_6_1 = input == AOUT_CHANS_6_1_MIDDLE;
+    const bool b_input_5_0 = input == AOUT_CHANS_5_0
+                          || input == AOUT_CHANS_5_0_MIDDLE;
+    const bool b_input_4_center_rear =
+                          (input & ~AOUT_CHAN_LFE) == AOUT_CHANS_4_CENTER_REAR;
+    const bool b_input_3_0 = (input & ~AOUT_CHAN_LFE) == AOUT_CHANS_3_0;
+
+    /*
+     * TODO: We don't support any 8.1 input
+     * TODO: We don't support any 6.x input
+     * TODO: We don't support 4.0 rear and 4.0 middle
+     */
     if( output == AOUT_CHAN_CENTER )
     {
         if( b_input_7_0 )
