@@ -332,9 +332,6 @@ static int OpenFilter( vlc_object_t *p_this )
     audio_format_t fmt_in  = p_filter->fmt_in.audio;
     audio_format_t fmt_out = p_filter->fmt_out.audio;
 
-    fmt_in.i_format = p_filter->fmt_in.i_codec;
-    fmt_out.i_format = p_filter->fmt_out.i_codec;
-
     if( !IsSupported( &fmt_in, &fmt_out ) )
         return VLC_EGENERIC;
 
