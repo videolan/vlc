@@ -33,7 +33,6 @@
 #include <vlc_aout.h>
 #include <vlc_filter.h>
 #include <vlc_block.h>
-#include <assert.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -66,15 +65,6 @@ static bool IsSupported( const audio_format_t *p_input, const audio_format_t *p_
         return false;
     }
 
-    /* Only conversion to Mono, Stereo, 4.0 and 5.1 */
-    if( p_output->i_physical_channels != AOUT_CHAN_CENTER &&
-        p_output->i_physical_channels != AOUT_CHANS_2_0 &&
-        p_output->i_physical_channels != AOUT_CHANS_4_0 &&
-        p_output->i_physical_channels != AOUT_CHANS_5_1 )
-    {
-        return false;
-    }
-
     /* Only from 7.x/5.x/4.0/3.x/2.0
      * NB 5.X rear and middle are handled the same way
      * We don't support 2.1 -> 2.0 (trivial can do it)
@@ -92,10 +82,6 @@ static bool IsSupported( const audio_format_t *p_input, const audio_format_t *p_
     {
         return false;
     }
-
-    /* Only downmixing */
-    if( aout_FormatNbChannels( p_input ) <= aout_FormatNbChannels( p_output ) )
-        return false;
 
     return true;
 }
@@ -338,20 +324,9 @@ static int OpenFilter( vlc_object_t *p_this )
     const bool b_input_3_0 = !b_input_7_0 && !b_input_5_0 && !b_input_4_center_rear &&
                              (i_input_physical & ~AOUT_CHAN_LFE) == AOUT_CHANS_3_0;
 
-    if( p_filter->fmt_out.audio.i_physical_channels == AOUT_CHANS_2_0 )
-    {
-        if( b_input_7_0 )
-            do_work = DoWork_7_x_to_2_0;
-        else if( b_input_6_1 )
-            do_work = DoWork_6_1_to_2_0;
-        else if( b_input_5_0 )
-            do_work = DoWork_5_x_to_2_0;
-        else if( b_input_4_center_rear )
-            do_work = DoWork_4_0_to_2_0;
-        else if( b_input_3_0 )
-            do_work = DoWork_3_x_to_2_0;
-    }
-    else if( p_filter->fmt_out.audio.i_physical_channels == AOUT_CHAN_CENTER )
+    uint32_t output = p_filter->fmt_out.audio.i_physical_channels;
+
+    if( output == AOUT_CHAN_CENTER )
     {
         if( b_input_7_0 )
             do_work = DoWork_7_x_to_1_0;
@@ -364,21 +339,37 @@ static int OpenFilter( vlc_object_t *p_this )
         else
             do_work = DoWork_2_x_to_1_0;
     }
-    else if(p_filter->fmt_out.audio.i_physical_channels == AOUT_CHANS_4_0)
+    else if( output == AOUT_CHANS_2_0 )
+    {
+        if( b_input_7_0 )
+            do_work = DoWork_7_x_to_2_0;
+        else if( b_input_6_1 )
+            do_work = DoWork_6_1_to_2_0;
+        else if( b_input_5_0 )
+            do_work = DoWork_5_x_to_2_0;
+        else if( b_input_4_center_rear )
+            do_work = DoWork_4_0_to_2_0;
+        else if( b_input_3_0 )
+            do_work = DoWork_3_x_to_2_0;
+    }
+    else if( output == AOUT_CHANS_4_0 )
     {
         if( b_input_7_0 )
             do_work = DoWork_7_x_to_4_0;
-        else
+        else if( b_input_5_0 )
             do_work = DoWork_5_x_to_4_0;
     }
-    else
+    else if( (output & ~AOUT_CHAN_LFE) == AOUT_CHANS_5_0 ||
+             (output & ~AOUT_CHAN_LFE) == AOUT_CHANS_5_0_MIDDLE )
     {
-        assert( b_input_7_0 || b_input_6_1 );
         if( b_input_7_0 )
             do_work = DoWork_7_x_to_5_x;
-        else
+        else if( b_input_6_1 )
             do_work = DoWork_6_1_to_5_x;
     }
+
+    if( do_work == NULL )
+        return VLC_EGENERIC;
 
     p_filter->pf_audio_filter = Filter;
     p_filter->p_sys = (void *)do_work;
