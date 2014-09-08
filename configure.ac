@@ -754,7 +754,12 @@ AC_SUBST(LIBPTHREAD)
 
 dnl Check for headers
 dnl  POSIX
-AC_CHECK_HEADERS([arpa/inet.h net/if.h pthread.h search.h syslog.h sys/shm.h])
+AC_CHECK_HEADERS([arpa/inet.h pthread.h search.h syslog.h sys/shm.h sys/socket.h])
+AC_CHECK_HEADERS([net/if.h], [], [],
+[
+#include <sys/types.h>
+#include <sys/socket.h>
+])
 dnl  BSD
 AC_CHECK_HEADERS([netinet/udplite.h sys/param.h sys/mount.h])
 dnl  GNU/Linux
