@@ -585,6 +585,7 @@ static void Close( vlc_object_t *p_this )
     for( i = 0; i < p_sys->i_subtitles; i++ )
         free( p_sys->subtitle[i].psz_text );
     free( p_sys->subtitle );
+    free( p_sys->psz_header );
 
     free( p_sys );
 }
@@ -1158,6 +1159,7 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle,
         if( asprintf( &psz_header, "%s%s\n",
                        p_sys->psz_header ? p_sys->psz_header : "", s ) == -1 )
             return VLC_ENOMEM;
+        free( p_sys->psz_header );
         p_sys->psz_header = psz_header;
     }
 }
