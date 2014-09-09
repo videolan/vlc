@@ -6,7 +6,7 @@ libflacsys_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 demux_LTLIBRARIES += libflacsys_plugin.la
 
 libogg_plugin_la_SOURCES = demux/ogg.c demux/ogg.h demux/oggseek.c demux/oggseek.h \
-	demux/xiph_metadata.h demux/xiph.h demux/xiph_metadata.c
+	demux/xiph_metadata.h demux/xiph.h demux/xiph_metadata.c demux/opus.h
 libogg_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_ogg) $(LIBVORBIS_CFLAGS)
 libogg_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
 libogg_plugin_la_LIBADD = $(LIBS_ogg) $(LIBVORBIS_LIBS)

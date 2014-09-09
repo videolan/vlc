@@ -44,6 +44,7 @@
 #include "xiph_metadata.h"
 #include "ogg.h"
 #include "oggseek.h"
+#include "opus.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -119,7 +120,7 @@ static int  Control( demux_t *, int, va_list );
 static int  Ogg_ReadPage     ( demux_t *, ogg_page * );
 static void Ogg_UpdatePCR    ( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_DecodePacket ( demux_t *, logical_stream_t *, ogg_packet * );
-static int  Ogg_OpusPacketDuration( logical_stream_t *, ogg_packet * );
+static int  Ogg_OpusPacketDuration( ogg_packet * );
 static void Ogg_SendOrQueueBlocks( demux_t *, logical_stream_t *, block_t * );
 
 static void Ogg_CreateES( demux_t *p_demux );
@@ -502,7 +503,6 @@ static int Demux( demux_t * p_demux )
                 ogg_packet dumb_packet;
                 dumb_packet.bytes = p_block->i_buffer;
                 dumb_packet.packet = p_block->p_buffer;
-                int i_duration;
 
                 switch( p_stream->fmt.i_codec )
                 {
@@ -511,8 +511,7 @@ static int Demux( demux_t * p_demux )
                             p_stream->special.speex.i_framesperpacket;
                     break;
                 case VLC_CODEC_OPUS:
-                    i_duration = Ogg_OpusPacketDuration( p_stream, &dumb_packet );
-                    p_block->i_nb_samples = i_duration;
+                    p_block->i_nb_samples = Ogg_OpusPacketDuration( &dumb_packet );
                     break;
 #ifdef HAVE_LIBVORBIS
                 case VLC_CODEC_VORBIS:
@@ -520,11 +519,10 @@ static int Demux( demux_t * p_demux )
                     long i_blocksize = vorbis_packet_blocksize(
                                 p_stream->special.vorbis.p_info, &dumb_packet );
                     if ( i_prev_blocksize )
-                        i_duration = ( i_blocksize + i_prev_blocksize ) / 4;
+                        p_block->i_nb_samples = ( i_blocksize + i_prev_blocksize ) / 4;
                     else
-                        i_duration = i_blocksize / 2;
+                        p_block->i_nb_samples = i_blocksize / 2;
                     i_prev_blocksize = i_blocksize;
-                    p_block->i_nb_samples = i_duration;
                 }
 #endif
                 }
@@ -963,7 +961,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
 
             if( p_stream->fmt.i_codec == VLC_CODEC_OPUS && p_oggpacket->e_o_s )
             {
-                int duration = Ogg_OpusPacketDuration( p_stream, p_oggpacket );
+                int duration = Ogg_OpusPacketDuration( p_oggpacket );
                 if( duration > 0 )
                 {
                     ogg_int64_t end_sample = p_oggpacket->granulepos;
@@ -1024,7 +1022,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
         else if( p_stream->fmt.i_codec == VLC_CODEC_OPUS &&
                  p_stream->i_previous_granulepos > 0 &&
                  ( i_duration =
-                     Ogg_OpusPacketDuration( p_stream, p_oggpacket ) ) > 0 )
+                     Ogg_OpusPacketDuration( p_oggpacket ) ) > 0 )
         {
             ogg_int64_t sample;
             p_oggpacket->granulepos = p_stream->i_previous_granulepos + i_duration;
@@ -1292,7 +1290,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                         p_oggpacket->granulepos, p_stream->i_pcr, p_stream->i_skip_frames); )
 
     if( p_stream->fmt.i_codec == VLC_CODEC_OPUS )
-        p_block->i_nb_samples = Ogg_OpusPacketDuration( p_stream, p_oggpacket );
+        p_block->i_nb_samples = Ogg_OpusPacketDuration( p_oggpacket );
 
     /* may need to preroll after a seek or in case of preskip */
     if ( p_stream->i_skip_frames > 0 )
@@ -1414,51 +1412,9 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     Ogg_SendOrQueueBlocks( p_demux, p_stream, p_block );
 }
 
-/* Re-implemented to avoid linking against libopus from the demuxer. */
-static int Ogg_OpusDataDuration( logical_stream_t *p_stream,
-                                 unsigned char *data, long i_datalen )
+static int Ogg_OpusPacketDuration( ogg_packet *p_oggpacket )
 {
-    static const int silk_fs_div[4] = { 6000, 3000, 1500, 1000 };
-    int toc;
-    int nframes;
-    int frame_size;
-    int nsamples;
-    int i_rate;
-    if( i_datalen < 1 )
-        return VLC_EGENERIC;
-    toc = data[0];
-    switch( toc&3 )
-    {
-        case 0:
-            nframes = 1;
-            break;
-        case 1:
-        case 2:
-            nframes = 2;
-            break;
-        default:
-            if( i_datalen < 2 )
-                return VLC_EGENERIC;
-            nframes = data[1]&0x3F;
-            break;
-    }
-    i_rate = (int)p_stream->fmt.audio.i_rate;
-    if( toc&0x80 )
-        frame_size = (i_rate << (toc >> 3 & 3)) / 400;
-    else if( ( toc&0x60 ) == 0x60 )
-        frame_size = i_rate/(100 >> (toc >> 3 & 1));
-    else
-        frame_size = i_rate*60 / silk_fs_div[toc >> 3 & 3];
-    nsamples = nframes*frame_size;
-    if( nsamples*25 > i_rate*3 )
-        return VLC_EGENERIC;
-    return nsamples;
-}
-
-static int Ogg_OpusPacketDuration( logical_stream_t *p_stream,
-                                   ogg_packet *p_oggpacket )
-{
-    return Ogg_OpusDataDuration( p_stream, p_oggpacket->packet, p_oggpacket->bytes );
+    return opus_frame_duration(p_oggpacket->packet, p_oggpacket->bytes);
 }
 
 /****************************************************************************
