@@ -395,6 +395,9 @@ bool video_format_IsSimilar( const video_format_t *f1,
     if( f1->orientation != f2->orientation)
         return false;
 
+    if( f1->multiview_mode!= f2->multiview_mode )
+       return false;
+
     if( f1->i_chroma == VLC_CODEC_RGB15 ||
         f1->i_chroma == VLC_CODEC_RGB16 ||
         f1->i_chroma == VLC_CODEC_RGB24 ||

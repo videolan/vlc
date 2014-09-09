@@ -328,7 +328,8 @@ static int vout_update_format( decoder_t *p_dec )
      || p_dec->fmt_out.i_codec != p_owner->fmt.video.i_chroma
      || (int64_t)p_dec->fmt_out.video.i_sar_num * p_owner->fmt.video.i_sar_den !=
         (int64_t)p_dec->fmt_out.video.i_sar_den * p_owner->fmt.video.i_sar_num ||
-        p_dec->fmt_out.video.orientation != p_owner->fmt.video.orientation )
+        p_dec->fmt_out.video.orientation != p_owner->fmt.video.orientation ||
+        p_dec->fmt_out.video.multiview_mode != p_owner->fmt.video.multiview_mode )
     {
         vout_thread_t *p_vout;
 
