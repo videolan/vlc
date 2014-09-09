@@ -1112,6 +1112,7 @@ static int ThreadDisplayPicture(vout_thread_t *vout, mtime_t *deadline)
         date_refresh = vout->p->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
         refresh = date_refresh <= date;
     }
+    bool force_refresh = !drop_next_frame && refresh;
 
     if (!first && !refresh && !drop_next_frame) {
         if (!frame_by_frame) {
@@ -1133,8 +1134,9 @@ static int ThreadDisplayPicture(vout_thread_t *vout, mtime_t *deadline)
         return VLC_EGENERIC;
 
     /* display the picture immediately */
-    bool is_forced = frame_by_frame || (!drop_next_frame && refresh) || vout->p->displayed.current->b_force;
-    return ThreadDisplayRenderPicture(vout, is_forced);
+    bool is_forced = frame_by_frame || force_refresh || vout->p->displayed.current->b_force;
+    int ret = ThreadDisplayRenderPicture(vout, is_forced);
+    return force_refresh ? VLC_EGENERIC : ret;
 }
 
 static void ThreadDisplaySubpicture(vout_thread_t *vout,
