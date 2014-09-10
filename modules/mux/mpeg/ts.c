@@ -1276,11 +1276,11 @@ static bool MuxStreams(sout_mux_t *p_mux )
 
                 int64_t i_spu_delay = p_spu->i_dts - p_sys->first_dts - p_pcr_stream->i_pes_dts;
                 if( ( i_spu_delay > i_shaping_delay ) &&
-                    ( i_spu_delay < INT64_C(100000000) ) )
+                    ( i_spu_delay < 100 * CLOCK_FREQ ) )
                     continue;
 
-                if ( ( i_spu_delay >= INT64_C(100000000) ) ||
-                     ( i_spu_delay < INT64_C(10000) ) )
+                if ( ( i_spu_delay >= 100 * CLOCK_FREQ ) ||
+                     ( i_spu_delay < CLOCK_FREQ / 100 ) )
                 {
                     BufferChainClean( &p_stream->chain_pes );
                     p_stream->i_pes_dts = 0;
@@ -1324,12 +1324,12 @@ static bool MuxStreams(sout_mux_t *p_mux )
         p_data->i_pts -= p_sys->first_dts;
 
         if( ( p_pcr_stream->i_pes_dts > 0 &&
-              p_data->i_dts - 10000000 > p_pcr_stream->i_pes_dts +
+              p_data->i_dts - 10 * CLOCK_FREQ > p_pcr_stream->i_pes_dts +
               p_pcr_stream->i_pes_length ) ||
             p_data->i_dts < p_stream->i_pes_dts ||
             ( p_stream->i_pes_dts > 0 &&
               p_input->p_fmt->i_cat != SPU_ES &&
-              p_data->i_dts - 10000000 > p_stream->i_pes_dts +
+              p_data->i_dts - 10 * CLOCK_FREQ > p_stream->i_pes_dts +
               p_stream->i_pes_length ) )
         {
             msg_Warn( p_mux, "packet with too strange dts "
