@@ -620,7 +620,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     tempString = B64DecNSStr([items objectAtIndex:2]);
     /* enable another round of new filters */
     char *psz_current_splitter = var_GetString(pl_Get(p_intf), "video-splitter");
-    bool b_filter_changed = ![tempString isEqual:toNSStr(psz_current_splitter)];
+    bool b_filter_changed = ![tempString isEqualToString:toNSStr(psz_current_splitter)];
     free(psz_current_splitter);
 
     if (b_filter_changed) {
