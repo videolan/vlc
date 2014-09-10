@@ -1083,6 +1083,7 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle,
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
+    size_t header_len = 0;
 
     for( ;; )
     {
@@ -1155,12 +1156,12 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle,
         free( psz_text );
 
         /* All the other stuff we add to the header field */
-        char *psz_header;
-        if( asprintf( &psz_header, "%s%s\n",
-                       p_sys->psz_header ? p_sys->psz_header : "", s ) == -1 )
+        size_t s_len = strlen( s );
+        p_sys->psz_header = realloc_or_free( p_sys->psz_header, header_len + s_len + 2 );
+        if( !p_sys->psz_header )
             return VLC_ENOMEM;
-        free( p_sys->psz_header );
-        p_sys->psz_header = psz_header;
+        snprintf( p_sys->psz_header + header_len, s_len + 2, "%s\n", s );
+        header_len += s_len + 1;
     }
 }
 
