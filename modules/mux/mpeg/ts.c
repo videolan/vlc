@@ -1383,7 +1383,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
                 p_spu->p_buffer[1] = 1;
                 p_spu->p_buffer[2] = ' ';
 
-                EStoPES( &p_spu, p_spu, p_input->p_fmt,
+                EStoPES( &p_spu, p_input->p_fmt,
                              p_stream->i_stream_id, 1, 0, 0, 0 );
                 p_data->p_next = p_spu;
             }
@@ -1429,7 +1429,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
             i_max_pes_size = INT_MAX;
         }
 
-         EStoPES ( &p_data, p_data, p_input->p_fmt, p_stream->i_stream_id,
+        EStoPES ( &p_data, p_input->p_fmt, p_stream->i_stream_id,
                        1, b_data_alignment, i_header_size,
                        i_max_pes_size );
 

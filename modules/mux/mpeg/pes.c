@@ -316,12 +316,13 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
  *                       To allow unbounded PES packets in transport stream
  *                       VIDEO_ES, set to INT_MAX.
  */
-int  EStoPES ( block_t **pp_pes, block_t *p_es,
+void EStoPES ( block_t **pp_pes,
                    es_format_t *p_fmt, int i_stream_id,
                    int b_mpeg2, int b_data_alignment, int i_header_size,
                    int i_max_pes_size )
 {
-    block_t *p_pes;
+    block_t *p_es = *pp_pes;
+    block_t *p_pes = NULL;
     mtime_t i_pts, i_dts, i_length;
 
     uint8_t *p_data;
@@ -388,8 +389,6 @@ int  EStoPES ( block_t **pp_pes, block_t *p_es,
     i_size = p_es->i_buffer;
     p_data = p_es->p_buffer;
 
-    *pp_pes = p_pes = NULL;
-
     do
     {
         i_pes_payload = __MIN( i_size, i_max_pes_size );
@@ -434,15 +433,14 @@ int  EStoPES ( block_t **pp_pes, block_t *p_es,
     } while( i_size > 0 );
 
     /* Now redate all pes */
-    i_dts    = (*pp_pes)->i_dts;
-    i_length = (*pp_pes)->i_length / i_pes_count;
-    for( p_pes = *pp_pes; p_pes != NULL; p_pes = p_pes->p_next )
+    i_dts    = p_pes->i_dts;
+    i_length = p_pes->i_length / i_pes_count;
+    while( p_pes )
     {
         p_pes->i_dts = i_dts;
         p_pes->i_length = i_length;
 
         i_dts += i_length;
+        p_pes = p_pes->p_next;
     }
-
-    return 0;
 }
