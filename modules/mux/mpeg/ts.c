@@ -950,14 +950,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         p_stream->i_stream_type = 0x81;
         p_stream->i_stream_id = 0xbd;
         break;
-    case VLC_CODEC_EAC3:
-        p_stream->i_stream_type = 0x06;
-        p_stream->i_stream_id = 0xbd;
-        break;
     case VLC_CODEC_DVD_LPCM:
         p_stream->i_stream_type = 0x83;
         p_stream->i_stream_id = 0xbd;
         break;
+    case VLC_CODEC_EAC3:
     case VLC_CODEC_DTS:
         p_stream->i_stream_type = 0x06;
         p_stream->i_stream_id = 0xbd;
