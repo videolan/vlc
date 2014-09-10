@@ -319,11 +319,10 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
 void EStoPES ( block_t **pp_pes,
                    es_format_t *p_fmt, int i_stream_id,
                    int b_mpeg2, int b_data_alignment, int i_header_size,
-                   int i_max_pes_size )
+                   int i_max_pes_size, mtime_t ts_offset )
 {
     block_t *p_es = *pp_pes;
     block_t *p_pes = NULL;
-    mtime_t i_pts, i_dts, i_length;
 
     uint8_t *p_data;
     int     i_size;
@@ -383,8 +382,12 @@ void EStoPES ( block_t **pp_pes,
 
     }
 
-    i_pts = p_es->i_pts <= 0 ? 0 : p_es->i_pts * 9 / 100; // 90000 units clock
-    i_dts = p_es->i_dts <= 0 ? 0 : p_es->i_dts * 9 / 100; // 90000 units clock
+    mtime_t i_dts = 0;
+    mtime_t i_pts = 0;
+    if (p_es->i_pts > VLC_TS_INVALID)
+        i_pts = (p_es->i_pts - ts_offset) * 9 / 100;
+    if (p_es->i_dts > VLC_TS_INVALID)
+        i_dts = (p_es->i_dts - ts_offset) * 9 / 100;
 
     i_size = p_es->i_buffer;
     p_data = p_es->p_buffer;
@@ -434,7 +437,7 @@ void EStoPES ( block_t **pp_pes,
 
     /* Now redate all pes */
     i_dts    = p_pes->i_dts;
-    i_length = p_pes->i_length / i_pes_count;
+    mtime_t i_length = p_pes->i_length / i_pes_count;
     while( p_pes )
     {
         p_pes->i_dts = i_dts;

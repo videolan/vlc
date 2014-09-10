@@ -1274,7 +1274,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
                 /* Don't mux the SPU yet if it is too early */
                 block_t *p_spu = block_FifoShow( p_input->p_fifo );
 
-                int64_t i_spu_delay = p_spu->i_dts - p_sys->first_dts - p_pcr_stream->i_pes_dts;
+                int64_t i_spu_delay = p_spu->i_dts - p_pcr_stream->i_pes_dts;
                 if( ( i_spu_delay > i_shaping_delay ) &&
                     ( i_spu_delay < 100 * CLOCK_FREQ ) )
                     continue;
@@ -1319,9 +1319,6 @@ static bool MuxStreams(sout_mux_t *p_mux )
 
         if (p_sys->first_dts == 0)
             p_sys->first_dts = p_data->i_dts;
-
-        p_data->i_dts -= p_sys->first_dts;
-        p_data->i_pts -= p_sys->first_dts;
 
         if( ( p_pcr_stream->i_pes_dts > 0 &&
               p_data->i_dts - 10 * CLOCK_FREQ > p_pcr_stream->i_pes_dts +
@@ -1384,7 +1381,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
                 p_spu->p_buffer[2] = ' ';
 
                 EStoPES( &p_spu, p_input->p_fmt,
-                             p_stream->i_stream_id, 1, 0, 0, 0 );
+                             p_stream->i_stream_id, 1, 0, 0, 0, p_sys->first_dts );
                 p_data->p_next = p_spu;
             }
             break;
@@ -1431,7 +1428,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
 
         EStoPES ( &p_data, p_input->p_fmt, p_stream->i_stream_id,
                        1, b_data_alignment, i_header_size,
-                       i_max_pes_size );
+                       i_max_pes_size, p_sys->first_dts );
 
         BufferChainAppend( &p_stream->chain_pes, p_data );
 
@@ -1799,7 +1796,7 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
         if( p_ts->i_flags & BLOCK_FLAG_CLOCK )
         {
             /* msg_Dbg( p_mux, "pcr=%lld ms", p_ts->i_dts / 1000 ); */
-            TSSetPCR( p_ts, p_ts->i_dts - p_sys->i_dts_delay );
+            TSSetPCR( p_ts, p_ts->i_dts - p_sys->i_dts_delay - p_sys->first_dts );
         }
         if( p_ts->i_flags & BLOCK_FLAG_SCRAMBLED )
         {
