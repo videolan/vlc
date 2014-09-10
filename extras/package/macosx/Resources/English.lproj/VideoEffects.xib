@@ -2,7 +2,7 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">13E28</string>
+    <string key="IBDocument.SystemVersion">13F31</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
     <string key="IBDocument.AppKitVersion">1265.21</string>
     <string key="IBDocument.HIToolboxVersion">698.00</string>
@@ -21,7 +21,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="6"/>
+      <integer value="48"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -68,7 +68,7 @@
                 <object class="BGHUDTabViewItem" id="313931694">
                   <string key="NSIdentifier">basic</string>
                   <object class="NSView" key="NSView" id="1044285835">
-                    <nil key="NSNextResponder"/>
+                    <reference key="NSNextResponder" ref="898819366"/>
                     <int key="NSvFlags">274</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -279,8 +279,8 @@
                                   <int key="NSCellFlags2">131072</int>
                                   <string key="NSContents"/>
                                   <reference key="NSControlView" ref="1033837370"/>
-                                  <double key="NSMaxValue">360</double>
-                                  <double key="NSMinValue">0.0</double>
+                                  <double key="NSMaxValue">180</double>
+                                  <double key="NSMinValue">-180</double>
                                   <double key="NSValue">0.0</double>
                                   <double key="NSAltIncValue">0.0</double>
                                   <int key="NSNumberOfTickMarks">0</int>
@@ -734,6 +734,7 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
+                    <reference key="NSSuperview" ref="898819366"/>
                   </object>
                   <string key="NSLabel">Basic</string>
                   <reference key="NSColor" ref="279270326"/>
@@ -742,7 +743,7 @@
                 <object class="BGHUDTabViewItem" id="52756061">
                   <string key="NSIdentifier">crop</string>
                   <object class="NSView" key="NSView" id="838226260">
-                    <reference key="NSNextResponder" ref="898819366"/>
+                    <nil key="NSNextResponder"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1267,7 +1268,6 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
-                    <reference key="NSSuperview" ref="898819366"/>
                   </object>
                   <string key="NSLabel">Crop</string>
                   <reference key="NSColor" ref="279270326"/>
@@ -3761,7 +3761,7 @@
                   <reference key="NSTabView" ref="898819366"/>
                 </object>
               </object>
-              <reference key="NSSelectedTabViewItem" ref="52756061"/>
+              <reference key="NSSelectedTabViewItem" ref="313931694"/>
               <object class="NSFont" key="NSFont">
                 <string key="NSName">LucidaGrande</string>
                 <double key="NSSize">13</double>
@@ -3773,7 +3773,7 @@
               <nil key="themeKey"/>
               <object class="NSMutableArray" key="NSSubviews">
                 <bool key="EncodedWithXMLCoder">YES</bool>
-                <reference ref="838226260"/>
+                <reference ref="1044285835"/>
               </object>
             </object>
             <object class="NSPopUpButton" id="1044210417">
