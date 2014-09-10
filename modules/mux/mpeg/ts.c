@@ -2286,9 +2286,10 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 
     for (int i_stream = 0; i_stream < p_mux->i_nb_inputs; i_stream++ )
     {
-        ts_stream_t *p_stream = (ts_stream_t*)p_mux->pp_inputs[i_stream]->p_sys;
+        sout_input_t *p_input = p_mux->pp_inputs[i_stream];
+        ts_stream_t *p_stream = (ts_stream_t*)p_input->p_sys;
 
-        int i_pidinput = p_mux->pp_inputs[i_stream]->p_fmt->i_id;
+        int i_pidinput = p_input->p_fmt->i_id;
         pmt_map_t *p_usepid = bsearch( &i_pidinput, p_sys->pmtmap,
                     p_sys->i_pmtslots, sizeof(pmt_map_t), intcompare );
 
