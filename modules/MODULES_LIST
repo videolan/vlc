@@ -164,7 +164,6 @@ $Id$
  * hqdn3d: High Quality denoising filter
  * http: HTTP Network access module
  * httplive: HTTP Live streaming for playback
- * hwdummy: dummy hardware video decoding
  * i420_rgb: planar YUV to packed RGB conversion functions
  * i420_rgb_mmx: MMX accelerated version of i420_rgb
  * i420_rgb_sse2: sse2 accelerated version of i420_rgb

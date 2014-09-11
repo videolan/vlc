@@ -20,7 +20,6 @@ libvdpau_avcodec_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(X_CFLAGS) $(AVCODEC_CFLAGS)
 libvdpau_avcodec_plugin_la_LIBADD = libvlc_vdpau.la \
 	$(X_LIBS) $(X_PRE_LIBS) -lX11 $(AVCODEC_LIBS)
-# FIXME: hwdummy only needs libavutil, and only if avcodec < 55.13.0
 if HAVE_AVCODEC_VDPAU
 vdpau_LTLIBRARIES += libvdpau_avcodec_plugin.la
 endif

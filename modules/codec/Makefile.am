@@ -335,14 +335,6 @@ if HAVE_AVCODEC_VDA
 codec_LTLIBRARIES += libvda_plugin.la
 endif
 
-libhwdummy_plugin_la_SOURCES = codec/avcodec/hwdummy.c
-libhwdummy_plugin_la_CFLAGS = $(AM_CFLAGS) $(VDPAU_CFLAGS) $(AVCODEC_CFLAGS)
-libhwdummy_plugin_la_LIBADD = $(AVCODEC_LIBS)
-# FIXME: hwdummy only needs libavutil, and only if avcodec < 55.13.0
-if HAVE_AVCODEC_VDPAU
-codec_LTLIBRARIES += libhwdummy_plugin.la
-endif
-
 
 ### OpenMAX ###
 
