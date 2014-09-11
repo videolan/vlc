@@ -236,7 +236,7 @@ static int GetAudioBuf( AVCodecContext *ctx, AVFrame *buf )
  * The avcodec codec will be opened, some memory allocated.
  *****************************************************************************/
 int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
-                      AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )
+                  AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )
 {
     decoder_sys_t *p_sys;
 
@@ -266,7 +266,7 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     /* ***** Open the codec ***** */
     if( OpenAudioCodec( p_dec ) < 0 )
     {
-        av_free( p_sys->p_context->extradata );
+        av_free( p_context->extradata );
         free( p_sys );
         return VLC_EGENERIC;
     }

@@ -259,7 +259,7 @@ static int OpenVideoCodec( decoder_t *p_dec )
  * opened (done after the first decoded frame).
  *****************************************************************************/
 int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
-                      AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )
+                  AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )
 {
     decoder_sys_t *p_sys;
     int i_val;
@@ -281,54 +281,55 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     vlc_sem_init( &p_sys->sem_mt, 0 );
 
     /* ***** Fill p_context with init values ***** */
-    p_sys->p_context->codec_tag = ffmpeg_CodecTag( p_dec->fmt_in.i_original_fourcc ?: p_dec->fmt_in.i_codec );
+    p_context->codec_tag = ffmpeg_CodecTag( p_dec->fmt_in.i_original_fourcc ?: p_dec->fmt_in.i_codec );
 
     /*  ***** Get configuration of ffmpeg plugin ***** */
-    p_sys->p_context->workaround_bugs =
+    p_context->workaround_bugs =
         var_InheritInteger( p_dec, "avcodec-workaround-bugs" );
-    p_sys->p_context->err_recognition =
+    p_context->err_recognition =
         var_InheritInteger( p_dec, "avcodec-error-resilience" );
 
     if( var_CreateGetBool( p_dec, "grayscale" ) )
-        p_sys->p_context->flags |= CODEC_FLAG_GRAY;
+        p_context->flags |= CODEC_FLAG_GRAY;
 
     /* ***** Output always the frames ***** */
 #if LIBAVCODEC_VERSION_CHECK(55, 23, 1, 40, 101)
-    p_sys->p_context->flags |= CODEC_FLAG_OUTPUT_CORRUPT;
+    p_context->flags |= CODEC_FLAG_OUTPUT_CORRUPT;
 #endif
 
     i_val = var_CreateGetInteger( p_dec, "avcodec-vismv" );
-    if( i_val ) p_sys->p_context->debug_mv = i_val;
+    if( i_val )
+        p_context->debug_mv = i_val;
 
     i_val = var_CreateGetInteger( p_dec, "avcodec-skiploopfilter" );
-    if( i_val >= 4 ) p_sys->p_context->skip_loop_filter = AVDISCARD_ALL;
-    else if( i_val == 3 ) p_sys->p_context->skip_loop_filter = AVDISCARD_NONKEY;
-    else if( i_val == 2 ) p_sys->p_context->skip_loop_filter = AVDISCARD_BIDIR;
-    else if( i_val == 1 ) p_sys->p_context->skip_loop_filter = AVDISCARD_NONREF;
+    if( i_val >= 4 ) p_context->skip_loop_filter = AVDISCARD_ALL;
+    else if( i_val == 3 ) p_context->skip_loop_filter = AVDISCARD_NONKEY;
+    else if( i_val == 2 ) p_context->skip_loop_filter = AVDISCARD_BIDIR;
+    else if( i_val == 1 ) p_context->skip_loop_filter = AVDISCARD_NONREF;
 
     if( var_CreateGetBool( p_dec, "avcodec-fast" ) )
-        p_sys->p_context->flags2 |= CODEC_FLAG2_FAST;
+        p_context->flags2 |= CODEC_FLAG2_FAST;
 
     /* ***** libavcodec frame skipping ***** */
     p_sys->b_hurry_up = var_CreateGetBool( p_dec, "avcodec-hurry-up" );
 
     i_val = var_CreateGetInteger( p_dec, "avcodec-skip-frame" );
-    if( i_val >= 4 ) p_sys->p_context->skip_frame = AVDISCARD_ALL;
-    else if( i_val == 3 ) p_sys->p_context->skip_frame = AVDISCARD_NONKEY;
-    else if( i_val == 2 ) p_sys->p_context->skip_frame = AVDISCARD_BIDIR;
-    else if( i_val == 1 ) p_sys->p_context->skip_frame = AVDISCARD_NONREF;
-    else if( i_val == -1 ) p_sys->p_context->skip_frame = AVDISCARD_NONE;
-    else p_sys->p_context->skip_frame = AVDISCARD_DEFAULT;
-    p_sys->i_skip_frame = p_sys->p_context->skip_frame;
+    if( i_val >= 4 ) p_context->skip_frame = AVDISCARD_ALL;
+    else if( i_val == 3 ) p_context->skip_frame = AVDISCARD_NONKEY;
+    else if( i_val == 2 ) p_context->skip_frame = AVDISCARD_BIDIR;
+    else if( i_val == 1 ) p_context->skip_frame = AVDISCARD_NONREF;
+    else if( i_val == -1 ) p_context->skip_frame = AVDISCARD_NONE;
+    else p_context->skip_frame = AVDISCARD_DEFAULT;
+    p_sys->i_skip_frame = p_context->skip_frame;
 
     i_val = var_CreateGetInteger( p_dec, "avcodec-skip-idct" );
-    if( i_val >= 4 ) p_sys->p_context->skip_idct = AVDISCARD_ALL;
-    else if( i_val == 3 ) p_sys->p_context->skip_idct = AVDISCARD_NONKEY;
-    else if( i_val == 2 ) p_sys->p_context->skip_idct = AVDISCARD_BIDIR;
-    else if( i_val == 1 ) p_sys->p_context->skip_idct = AVDISCARD_NONREF;
-    else if( i_val == -1 ) p_sys->p_context->skip_idct = AVDISCARD_NONE;
-    else p_sys->p_context->skip_idct = AVDISCARD_DEFAULT;
-    p_sys->i_skip_idct = p_sys->p_context->skip_idct;
+    if( i_val >= 4 ) p_context->skip_idct = AVDISCARD_ALL;
+    else if( i_val == 3 ) p_context->skip_idct = AVDISCARD_NONKEY;
+    else if( i_val == 2 ) p_context->skip_idct = AVDISCARD_BIDIR;
+    else if( i_val == 1 ) p_context->skip_idct = AVDISCARD_NONREF;
+    else if( i_val == -1 ) p_context->skip_idct = AVDISCARD_NONE;
+    else p_context->skip_idct = AVDISCARD_DEFAULT;
+    p_sys->i_skip_idct = p_context->skip_idct;
 
     /* ***** libavcodec direct rendering ***** */
     p_sys->b_direct_rendering = false;
@@ -338,7 +339,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
         /* No idea why ... but this fixes flickering on some TSCC streams */
         p_sys->i_codec_id != AV_CODEC_ID_TSCC && p_sys->i_codec_id != AV_CODEC_ID_CSCD &&
         p_sys->i_codec_id != AV_CODEC_ID_CINEPAK &&
-        !p_sys->p_context->debug_mv )
+        !p_context->debug_mv )
     {
         /* Some codecs set pix_fmt only after the 1st frame has been decoded,
          * so we need to do another check in ffmpeg_GetFrameBuf() */
@@ -350,24 +351,24 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( p_sys->b_direct_rendering )
     {
         msg_Dbg( p_dec, "trying to use direct rendering" );
-        p_sys->p_context->flags |= CODEC_FLAG_EMU_EDGE;
+        p_context->flags |= CODEC_FLAG_EMU_EDGE;
     }
     else
     {
         msg_Dbg( p_dec, "direct rendering is disabled" );
     }
 
-    p_sys->p_context->get_format = ffmpeg_GetFormat;
+    p_context->get_format = ffmpeg_GetFormat;
     /* Always use our get_buffer wrapper so we can calculate the
      * PTS correctly */
 #if LIBAVCODEC_VERSION_MAJOR >= 55
-    p_sys->p_context->get_buffer2 = lavc_GetFrame;
+    p_context->get_buffer2 = lavc_GetFrame;
 #else
-    p_sys->p_context->get_buffer = ffmpeg_GetFrameBuf;
-    p_sys->p_context->reget_buffer = avcodec_default_reget_buffer;
-    p_sys->p_context->release_buffer = ffmpeg_ReleaseFrameBuf;
+    p_context->get_buffer = ffmpeg_GetFrameBuf;
+    p_context->reget_buffer = avcodec_default_reget_buffer;
+    p_context->release_buffer = ffmpeg_ReleaseFrameBuf;
 #endif
-    p_sys->p_context->opaque = p_dec;
+    p_context->opaque = p_dec;
 
 #ifdef HAVE_AVCODEC_MT
     int i_thread_count = var_InheritInteger( p_dec, "avcodec-threads" );
@@ -382,24 +383,24 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     }
     i_thread_count = __MIN( i_thread_count, 16 );
     msg_Dbg( p_dec, "allowing %d thread(s) for decoding", i_thread_count );
-    p_sys->p_context->thread_count = i_thread_count;
-    p_sys->p_context->thread_safe_callbacks = true;
+    p_context->thread_count = i_thread_count;
+    p_context->thread_safe_callbacks = true;
 
     switch( i_codec_id )
     {
         case AV_CODEC_ID_MPEG4:
         case AV_CODEC_ID_H263:
-            p_sys->p_context->thread_type = 0;
+            p_context->thread_type = 0;
             break;
         case AV_CODEC_ID_MPEG1VIDEO:
         case AV_CODEC_ID_MPEG2VIDEO:
-            p_sys->p_context->thread_type &= ~FF_THREAD_SLICE;
+            p_context->thread_type &= ~FF_THREAD_SLICE;
             /* fall through */
 # if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55, 1, 0))
         case AV_CODEC_ID_H264:
         case AV_CODEC_ID_VC1:
         case AV_CODEC_ID_WMV3:
-            p_sys->p_context->thread_type &= ~FF_THREAD_FRAME;
+            p_context->thread_type &= ~FF_THREAD_FRAME;
 # endif
     }
 
@@ -413,13 +414,13 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( avcodec_hw == NULL || strcasecmp( avcodec_hw, "none" ) )
     {
         msg_Warn( p_dec, "threaded frame decoding is not compatible with DXVA2, disabled" );
-        p_sys->p_context->thread_type &= ~FF_THREAD_FRAME;
+        p_context->thread_type &= ~FF_THREAD_FRAME;
     }
     free( avcodec_hw );
 # endif
 
-    if( p_sys->p_context->thread_type & FF_THREAD_FRAME )
-        p_dec->i_extra_picture_buffers = 2 * p_sys->p_context->thread_count;
+    if( p_context->thread_type & FF_THREAD_FRAME )
+        p_dec->i_extra_picture_buffers = 2 * p_context->thread_count;
 #endif
 
     /* ***** misc init ***** */
