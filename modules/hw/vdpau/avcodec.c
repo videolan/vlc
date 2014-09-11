@@ -221,7 +221,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt)
     err = vdp_get_x11(NULL, -1, &sys->vdp, &sys->device);
     if (err != VDP_STATUS_OK)
     {
-        free(sys->context);
+        av_free(sys->context);
         free(sys);
         return VLC_EGENERIC;
     }
