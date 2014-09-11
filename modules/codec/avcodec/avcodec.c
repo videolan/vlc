@@ -299,22 +299,19 @@ static int OpenDecoder( vlc_object_t *p_this )
     switch( i_cat )
     {
     case VIDEO_ES:
-        p_dec->pf_decode_video = DecodeVideo;
-        i_result =  InitVideoDec ( p_dec, p_context, p_codec,
-                                       i_codec_id, psz_namecodec );
+        i_result =  InitVideoDec( p_dec, p_context, p_codec,
+                                  i_codec_id, psz_namecodec );
         break;
     case AUDIO_ES:
-        p_dec->pf_decode_audio = DecodeAudio;
-        i_result =  InitAudioDec ( p_dec, p_context, p_codec,
-                                       i_codec_id, psz_namecodec );
+        i_result =  InitAudioDec( p_dec, p_context, p_codec,
+                                  i_codec_id, psz_namecodec );
         break;
     case SPU_ES:
-        p_dec->pf_decode_sub = DecodeSubtitle;
         i_result =  InitSubtitleDec( p_dec, p_context, p_codec,
                                      i_codec_id, psz_namecodec );
         break;
     default:
-        i_result = VLC_EGENERIC;
+        return VLC_EGENERIC;
     }
 
     if( i_result == VLC_SUCCESS )

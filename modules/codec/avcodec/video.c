@@ -106,6 +106,7 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame * );
 #endif
 static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *,
                                           const enum PixelFormat * );
+static picture_t *DecodeVideo( decoder_t *, block_t ** );
 
 static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
 {
@@ -459,13 +460,14 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
         return VLC_EGENERIC;
     }
 
+    p_dec->pf_decode_video = DecodeVideo;
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * DecodeVideo: Called to decode one or more frames
  *****************************************************************************/
-picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
+static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *p_context = p_sys->p_context;

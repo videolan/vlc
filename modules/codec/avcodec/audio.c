@@ -69,6 +69,7 @@ struct decoder_sys_t
 #define BLOCK_FLAG_PRIVATE_REALLOCATED (1 << BLOCK_FLAG_PRIVATE_SHIFT)
 
 static void SetupOutputFormat( decoder_t *p_dec, bool b_trust );
+static block_t *DecodeAudio( decoder_t *, block_t ** );
 
 static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
 {
@@ -286,13 +287,14 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     else if( p_dec->fmt_in.audio.i_rate )
         date_Init( &p_sys->end_date, p_dec->fmt_in.audio.i_rate, 1 );
 
+    p_dec->pf_decode_audio = DecodeAudio;
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * DecodeAudio: Called to decode one frame
  *****************************************************************************/
-block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
+static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *ctx = p_sys->p_context;

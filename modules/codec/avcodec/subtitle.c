@@ -44,6 +44,7 @@ struct decoder_sys_t {
 
 static subpicture_t *ConvertSubtitle(decoder_t *, AVSubtitle *, mtime_t pts,
                                      AVCodecContext *avctx);
+static subpicture_t *DecodeSubtitle(decoder_t *, block_t **);
 
 /**
  * Initialize subtitle decoder
@@ -110,6 +111,7 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
     /* */
     msg_Dbg(dec, "libavcodec codec (%s) started", namecodec);
     dec->fmt_out.i_cat = SPU_ES;
+    dec->pf_decode_sub = DecodeSubtitle;
 
     return VLC_SUCCESS;
 }
@@ -117,7 +119,7 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
 /**
  * Decode one subtitle
  */
-subpicture_t *DecodeSubtitle(decoder_t *dec, block_t **block_ptr)
+static subpicture_t *DecodeSubtitle(decoder_t *dec, block_t **block_ptr)
 {
     decoder_sys_t *sys = dec->p_sys;
 
