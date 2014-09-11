@@ -267,8 +267,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( ( p_dec->p_sys = p_sys = calloc( 1, sizeof(decoder_sys_t) ) ) == NULL )
         return VLC_ENOMEM;
 
-    p_context->codec_type = AVMEDIA_TYPE_VIDEO;
-    p_context->codec_id = p_codec->id;
     p_sys->p_context = p_context;
     p_sys->p_codec = p_codec;
     p_sys->p_ff_pic = avcodec_alloc_frame();

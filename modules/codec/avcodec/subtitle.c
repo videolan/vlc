@@ -70,8 +70,6 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
     if (!sys)
         return VLC_ENOMEM;
 
-    context->codec_type = AVMEDIA_TYPE_SUBTITLE;
-    context->codec_id = codec->id;
     sys->p_context = context;
     sys->p_codec = codec;
     sys->b_delayed_open = false;
