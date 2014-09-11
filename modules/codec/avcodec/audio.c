@@ -246,7 +246,6 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
         return VLC_ENOMEM;
     }
 
-    p_codec->type = AVMEDIA_TYPE_AUDIO;
     p_context->codec_type = AVMEDIA_TYPE_AUDIO;
     p_context->codec_id = i_codec_id;
 #if (LIBAVCODEC_VERSION_MAJOR >= 55)
