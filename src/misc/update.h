@@ -52,12 +52,21 @@ struct public_key_packet_t
 
     uint8_t version;      /* we use only version 4 */
     uint8_t timestamp[4]; /* creation time of the key */
-    uint8_t algo;         /* we only use DSA */
+    uint8_t algo;         /* DSA or RSA */
+
     /* the multi precision integers, with their 2 bytes length header */
-    uint8_t p[2+3072/8];
-    uint8_t q[2+256/8];
-    uint8_t g[2+3072/8];
-    uint8_t y[2+3072/8];
+    union {
+        struct {
+            uint8_t p[2+3072/8];
+            uint8_t q[2+256/8];
+            uint8_t g[2+3072/8];
+            uint8_t y[2+3072/8];
+        } dsa ;
+        struct {
+            uint8_t n[2+4096/8];
+            uint8_t e[2+4096/8];
+        } rsa;
+    } sig;
 };
 
 /* used for public key and file signatures */
@@ -66,7 +75,7 @@ struct signature_packet_t
     uint8_t version; /* 3 or 4 */
 
     uint8_t type;
-    uint8_t public_key_algo;    /* DSA only */
+    uint8_t public_key_algo;    /* DSA or RSA */
     uint8_t digest_algo;
 
     uint8_t hash_verification[2];
@@ -90,12 +99,16 @@ struct signature_packet_t
 
 /* The part below is made of consecutive MPIs, their number and size being
  * public-key-algorithm dependent.
- *
- * Since we use DSA signatures only, there is 2 integers, r & s.
- * They range from 160 for 1k keys to 256 bits for 3k keys.
  */
-    uint8_t r[2+256/8];
-    uint8_t s[2+256/8];
+    union {
+        struct {
+            uint8_t r[2+256/8];
+            uint8_t s[2+256/8];
+        } dsa;
+        struct {
+            uint8_t s[2+4096/8];
+        } rsa;
+    } algo_specific;
 };
 
 typedef struct public_key_packet_t public_key_packet_t;
@@ -171,7 +184,7 @@ parse_public_key(
         const uint8_t *p_sig_issuer );
 
 /*
- * Verify an OpenPGP signature made on some hash, with some DSA public key
+ * Verify an OpenPGP signature made on some hash, with some public key
  */
 int
 verify_signature(signature_packet_t *sign, public_key_packet_t *p_key,
