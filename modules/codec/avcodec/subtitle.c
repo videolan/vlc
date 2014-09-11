@@ -50,12 +50,12 @@ static subpicture_t *DecodeSubtitle(decoder_t *, block_t **);
  * Initialize subtitle decoder
  */
 int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
-                    const AVCodec *codec, int codec_id)
+                    const AVCodec *codec)
 {
     decoder_sys_t *sys;
 
     /* */
-    switch (codec_id) {
+    switch (codec->id) {
     case AV_CODEC_ID_HDMV_PGS_SUBTITLE:
     case AV_CODEC_ID_XSUB:
     case AV_CODEC_ID_DVB_SUBTITLE:
@@ -71,10 +71,9 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
         return VLC_ENOMEM;
 
     context->codec_type = AVMEDIA_TYPE_SUBTITLE;
-    context->codec_id = codec_id;
+    context->codec_id = codec->id;
     sys->p_context = context;
     sys->p_codec = codec;
-    sys->i_codec_id = codec_id;
     sys->b_delayed_open = false;
 
     /* */

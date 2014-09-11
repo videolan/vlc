@@ -44,17 +44,14 @@ int  OpenDeinterlace( vlc_object_t * );
 void CloseDeinterlace( vlc_object_t * );
 
 /* Video Decoder */
-int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
-                  const AVCodec *p_codec, int i_codec_id );
+int InitVideoDec( decoder_t *, AVCodecContext *, const AVCodec * );
 void EndVideoDec( decoder_t *p_dec );
 
 /* Audio Decoder */
-int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
-                  const AVCodec *p_codec, int i_codec_id );
+int InitAudioDec( decoder_t *, AVCodecContext *, const AVCodec * );
 
 /* Subtitle Decoder */
-int InitSubtitleDec( decoder_t *p_dec, AVCodecContext *p_context,
-                     const AVCodec *p_codec, int i_codec_id );
+int InitSubtitleDec( decoder_t *, AVCodecContext *, const AVCodec * );
 
 /* Initialize decoder */
 int ffmpeg_OpenCodec( decoder_t *p_dec );
@@ -243,7 +240,6 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
    "hev1 and hev2 are currently supported only with libfdk-aac enabled libavcodec" )
 
 #define AVCODEC_COMMON_MEMBERS   \
-    int i_codec_id;             \
     AVCodecContext *p_context;  \
     const AVCodec  *p_codec;    \
     bool b_delayed_open;

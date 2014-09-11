@@ -202,8 +202,8 @@ static int OpenVideoCodec( decoder_t *p_dec )
 
     if( p_sys->p_context->extradata_size <= 0 )
     {
-        if( p_sys->i_codec_id == AV_CODEC_ID_VC1 ||
-            p_sys->i_codec_id == AV_CODEC_ID_THEORA )
+        if( p_sys->p_codec->id == AV_CODEC_ID_VC1 ||
+            p_sys->p_codec->id == AV_CODEC_ID_THEORA )
         {
             msg_Warn( p_dec, "waiting for extra data for codec %s",
                       p_sys->p_codec->name );
@@ -258,7 +258,7 @@ static int OpenVideoCodec( decoder_t *p_dec )
  * opened (done after the first decoded frame).
  *****************************************************************************/
 int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
-                  const AVCodec *p_codec, int i_codec_id )
+                  const AVCodec *p_codec )
 {
     decoder_sys_t *p_sys;
     int i_val;
@@ -268,10 +268,9 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
         return VLC_ENOMEM;
 
     p_context->codec_type = AVMEDIA_TYPE_VIDEO;
-    p_context->codec_id = i_codec_id;
+    p_context->codec_id = p_codec->id;
     p_sys->p_context = p_context;
     p_sys->p_codec = p_codec;
-    p_sys->i_codec_id = i_codec_id;
     p_sys->p_ff_pic = avcodec_alloc_frame();
     p_sys->b_delayed_open = true;
     p_sys->p_va = NULL;
@@ -329,8 +328,9 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( var_CreateGetBool( p_dec, "avcodec-dr" ) &&
        (p_codec->capabilities & CODEC_CAP_DR1) &&
         /* No idea why ... but this fixes flickering on some TSCC streams */
-        p_sys->i_codec_id != AV_CODEC_ID_TSCC && p_sys->i_codec_id != AV_CODEC_ID_CSCD &&
-        p_sys->i_codec_id != AV_CODEC_ID_CINEPAK )
+        p_sys->p_codec->id != AV_CODEC_ID_TSCC &&
+        p_sys->p_codec->id != AV_CODEC_ID_CSCD &&
+        p_sys->p_codec->id != AV_CODEC_ID_CINEPAK )
     {
         /* Some codecs set pix_fmt only after the 1st frame has been decoded,
          * so we need to do another check in ffmpeg_GetFrameBuf() */
@@ -377,7 +377,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_context->thread_count = i_thread_count;
     p_context->thread_safe_callbacks = true;
 
-    switch( i_codec_id )
+    switch( p_codec->id )
     {
         case AV_CODEC_ID_MPEG4:
         case AV_CODEC_ID_H263:
@@ -393,6 +393,8 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
         case AV_CODEC_ID_WMV3:
             p_context->thread_type &= ~FF_THREAD_FRAME;
 # endif
+        default:
+            break;
     }
 
     /* Workaround: frame multithreading is not compatible with
@@ -838,7 +840,7 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
 
     if( !i_size ) return;
 
-    if( p_sys->i_codec_id == AV_CODEC_ID_SVQ3 )
+    if( p_sys->p_codec->id == AV_CODEC_ID_SVQ3 )
     {
         uint8_t *p;
 
@@ -1176,7 +1178,6 @@ static int ffmpeg_va_GetFrameBuf( struct AVCodecContext *p_context, AVFrame *p_f
 static picture_t *ffmpeg_dr_GetFrameBuf(struct AVCodecContext *p_context)
 {
     decoder_t *p_dec = (decoder_t *)p_context->opaque;
-    decoder_sys_t *p_sys = p_dec->p_sys;
 
     int i_width = p_context->width;
     int i_height = p_context->height;
@@ -1202,7 +1203,7 @@ static picture_t *ffmpeg_dr_GetFrameBuf(struct AVCodecContext *p_context)
     for( int i = 0; i < p_pic->i_planes; i++ )
     {
         unsigned i_align;
-        switch( p_sys->i_codec_id )
+        switch( p_context->codec_id )
         {
         case AV_CODEC_ID_SVQ1:
         case AV_CODEC_ID_VP5:

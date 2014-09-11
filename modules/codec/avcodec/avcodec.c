@@ -298,13 +298,13 @@ static int OpenDecoder( vlc_object_t *p_this )
     switch( i_cat )
     {
     case VIDEO_ES:
-        i_result =  InitVideoDec( p_dec, p_context, p_codec, i_codec_id );
+        i_result =  InitVideoDec( p_dec, p_context, p_codec );
         break;
     case AUDIO_ES:
-        i_result =  InitAudioDec( p_dec, p_context, p_codec, i_codec_id );
+        i_result =  InitAudioDec( p_dec, p_context, p_codec );
         break;
     case SPU_ES:
-        i_result =  InitSubtitleDec( p_dec, p_context, p_codec, i_codec_id );
+        i_result =  InitSubtitleDec( p_dec, p_context, p_codec );
         break;
     default:
         return VLC_EGENERIC;

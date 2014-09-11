@@ -122,8 +122,8 @@ static int OpenAudioCodec( decoder_t *p_dec )
 
     if( p_sys->p_context->extradata_size <= 0 )
     {
-        if( p_sys->i_codec_id == AV_CODEC_ID_VORBIS ||
-            ( p_sys->i_codec_id == AV_CODEC_ID_AAC &&
+        if( p_sys->p_codec->id == AV_CODEC_ID_VORBIS ||
+            ( p_sys->p_codec->id == AV_CODEC_ID_AAC &&
               !p_dec->fmt_in.b_packetized ) )
         {
             msg_Warn( p_dec, "waiting for extra data for codec %s",
@@ -139,7 +139,7 @@ static int OpenAudioCodec( decoder_t *p_dec )
     p_sys->p_context->bits_per_coded_sample =
                                            p_dec->fmt_in.audio.i_bitspersample;
 
-    if( p_sys->i_codec_id == AV_CODEC_ID_ADPCM_G726 &&
+    if( p_sys->p_codec->id == AV_CODEC_ID_ADPCM_G726 &&
         p_sys->p_context->bit_rate > 0 &&
         p_sys->p_context->sample_rate >  0)
         p_sys->p_context->bits_per_coded_sample = p_sys->p_context->bit_rate
@@ -236,7 +236,7 @@ static int GetAudioBuf( AVCodecContext *ctx, AVFrame *buf )
  * The avcodec codec will be opened, some memory allocated.
  *****************************************************************************/
 int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
-                  const AVCodec *p_codec, int i_codec_id )
+                  const AVCodec *p_codec )
 {
     decoder_sys_t *p_sys;
 
@@ -247,7 +247,7 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     }
 
     p_context->codec_type = AVMEDIA_TYPE_AUDIO;
-    p_context->codec_id = i_codec_id;
+    p_context->codec_id = p_codec->id;
 #if (LIBAVCODEC_VERSION_MAJOR >= 55)
     p_context->refcounted_frames = true;
 #else
@@ -255,7 +255,6 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
 #endif
     p_sys->p_context = p_context;
     p_sys->p_codec = p_codec;
-    p_sys->i_codec_id = i_codec_id;
     p_sys->b_delayed_open = true;
 
     // Initialize decoder extradata
@@ -316,7 +315,8 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
         avcodec_flush_buffers( ctx );
         date_Set( &p_sys->end_date, 0 );
 
-        if( p_sys->i_codec_id == AV_CODEC_ID_MP2 || p_sys->i_codec_id == AV_CODEC_ID_MP3 )
+        if( ctx->codec_id == AV_CODEC_ID_MP2 ||
+            ctx->codec_id == AV_CODEC_ID_MP3 )
             p_sys->i_reject_count = 3;
 
         goto end;
