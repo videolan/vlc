@@ -115,6 +115,38 @@ static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
     }
 }
 
+static int OpenAudioCodec( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_sys->p_context->extradata_size <= 0 )
+    {
+        if( p_sys->i_codec_id == AV_CODEC_ID_VORBIS ||
+            ( p_sys->i_codec_id == AV_CODEC_ID_AAC &&
+              !p_dec->fmt_in.b_packetized ) )
+        {
+            msg_Warn( p_dec, "waiting for extra data for codec %s",
+                      p_sys->psz_namecodec );
+            return 1;
+        }
+    }
+
+    p_sys->p_context->sample_rate = p_dec->fmt_in.audio.i_rate;
+    p_sys->p_context->channels = p_dec->fmt_in.audio.i_channels;
+    p_sys->p_context->block_align = p_dec->fmt_in.audio.i_blockalign;
+    p_sys->p_context->bit_rate = p_dec->fmt_in.i_bitrate;
+    p_sys->p_context->bits_per_coded_sample =
+                                           p_dec->fmt_in.audio.i_bitspersample;
+
+    if( p_sys->i_codec_id == AV_CODEC_ID_ADPCM_G726 &&
+        p_sys->p_context->bit_rate > 0 &&
+        p_sys->p_context->sample_rate >  0)
+        p_sys->p_context->bits_per_coded_sample = p_sys->p_context->bit_rate
+                                               / p_sys->p_context->sample_rate;
+
+    return ffmpeg_OpenCodec( p_dec );
+}
+
 /**
  * Allocates decoded audio buffer for libavcodec to use.
  */
@@ -231,9 +263,8 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     InitDecoderConfig( p_dec, p_context);
 
     /* ***** Open the codec ***** */
-    if( ffmpeg_OpenCodec( p_dec ) < 0 )
+    if( OpenAudioCodec( p_dec ) < 0 )
     {
-        msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
         av_free( p_sys->p_context->extradata );
         free( p_sys );
         return VLC_EGENERIC;
@@ -274,8 +305,7 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     if( !ctx->extradata_size && p_dec->fmt_in.i_extra && p_sys->b_delayed_open)
     {
         InitDecoderConfig( p_dec, ctx );
-        if( ffmpeg_OpenCodec( p_dec ) )
-            msg_Err( p_dec, "Cannot open decoder %s", p_sys->psz_namecodec );
+        OpenAudioCodec( p_dec );
     }
 
     if( p_sys->b_delayed_open )
