@@ -243,7 +243,6 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
    "hev1 and hev2 are currently supported only with libfdk-aac enabled libavcodec" )
 
 #define AVCODEC_COMMON_MEMBERS   \
-    int i_cat;                  \
     int i_codec_id;             \
     const char *psz_namecodec;  \
     AVCodecContext *p_context;  \

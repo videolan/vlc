@@ -315,7 +315,6 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     if( i_result == VLC_SUCCESS )
     {
-        p_dec->p_sys->i_cat = i_cat;
         if( p_context->profile != FF_PROFILE_UNKNOWN)
             p_dec->fmt_in.i_profile = p_context->profile;
         if( p_context->level != FF_LEVEL_UNKNOWN)
@@ -333,7 +332,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    switch( p_sys->i_cat )
+    switch( p_dec->fmt_out.i_cat )
     {
     case VIDEO_ES:
          EndVideoDec ( p_dec );
