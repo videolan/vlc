@@ -252,7 +252,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     const char *psz_namecodec;
 
     AVCodecContext *p_context = NULL;
-    AVCodec        *p_codec = NULL;
+    const AVCodec  *p_codec = NULL;
 
     /* *** determine codec type *** */
     if( !GetFfmpegCodec( p_dec->fmt_in.i_codec, &i_cat, &i_codec_id,

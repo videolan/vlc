@@ -50,7 +50,7 @@ static subpicture_t *DecodeSubtitle(decoder_t *, block_t **);
  * Initialize subtitle decoder
  */
 int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
-                    AVCodec *codec, int codec_id, const char *namecodec)
+                    const AVCodec *codec, int codec_id, const char *namecodec)
 {
     decoder_sys_t *sys;
 
