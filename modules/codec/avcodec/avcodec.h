@@ -111,16 +111,6 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 #define CODEC_TEXT N_( "Codec name" )
 #define CODEC_LONGTEXT N_( "Internal libavcodec codec name" )
 
-/* TODO: Use a predefined list, with 0,1,2,4,7 */
-#define VISMV_TEXT N_( "Visualize motion vectors" )
-#define VISMV_LONGTEXT N_( \
-    "You can overlay the motion vectors (arrows showing how the images move) "\
-    "on the image. This value is a mask, based on these values:\n"\
-    "1 - visualize forward predicted MVs of P frames\n" \
-    "2 - visualize forward predicted MVs of B frames\n" \
-    "4 - visualize backward predicted MVs of B frames\n" \
-    "To visualize all vectors, the value should be 7." )
-
 #define SKIPLOOPF_TEXT N_( "Skip the loop filter for H.264 decoding" )
 #define SKIPLOOPF_LONGTEXT N_( "Skipping the loop filter (aka deblocking) " \
     "usually has a detrimental effect on quality. However it provides a big " \

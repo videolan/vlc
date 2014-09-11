@@ -297,10 +297,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_context->flags |= CODEC_FLAG_OUTPUT_CORRUPT;
 #endif
 
-    i_val = var_CreateGetInteger( p_dec, "avcodec-vismv" );
-    if( i_val )
-        p_context->debug_mv = i_val;
-
     i_val = var_CreateGetInteger( p_dec, "avcodec-skiploopfilter" );
     if( i_val >= 4 ) p_context->skip_loop_filter = AVDISCARD_ALL;
     else if( i_val == 3 ) p_context->skip_loop_filter = AVDISCARD_NONKEY;
@@ -338,8 +334,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
        (p_sys->p_codec->capabilities & CODEC_CAP_DR1) &&
         /* No idea why ... but this fixes flickering on some TSCC streams */
         p_sys->i_codec_id != AV_CODEC_ID_TSCC && p_sys->i_codec_id != AV_CODEC_ID_CSCD &&
-        p_sys->i_codec_id != AV_CODEC_ID_CINEPAK &&
-        !p_context->debug_mv )
+        p_sys->i_codec_id != AV_CODEC_ID_CINEPAK )
     {
         /* Some codecs set pix_fmt only after the 1st frame has been decoded,
          * so we need to do another check in ffmpeg_GetFrameBuf() */
