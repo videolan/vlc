@@ -127,7 +127,7 @@ static int OpenAudioCodec( decoder_t *p_dec )
               !p_dec->fmt_in.b_packetized ) )
         {
             msg_Warn( p_dec, "waiting for extra data for codec %s",
-                      p_sys->psz_namecodec );
+                      p_sys->p_codec->name );
             return 1;
         }
     }
@@ -236,7 +236,7 @@ static int GetAudioBuf( AVCodecContext *ctx, AVFrame *buf )
  * The avcodec codec will be opened, some memory allocated.
  *****************************************************************************/
 int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
-                  const AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )
+                  const AVCodec *p_codec, int i_codec_id )
 {
     decoder_sys_t *p_sys;
 
@@ -256,7 +256,6 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_context = p_context;
     p_sys->p_codec = p_codec;
     p_sys->i_codec_id = i_codec_id;
-    p_sys->psz_namecodec = psz_namecodec;
     p_sys->b_delayed_open = true;
 
     // Initialize decoder extradata

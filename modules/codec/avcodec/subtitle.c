@@ -50,7 +50,7 @@ static subpicture_t *DecodeSubtitle(decoder_t *, block_t **);
  * Initialize subtitle decoder
  */
 int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
-                    const AVCodec *codec, int codec_id, const char *namecodec)
+                    const AVCodec *codec, int codec_id)
 {
     decoder_sys_t *sys;
 
@@ -75,7 +75,6 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
     sys->p_context = context;
     sys->p_codec = codec;
     sys->i_codec_id = codec_id;
-    sys->psz_namecodec = namecodec;
     sys->b_delayed_open = false;
 
     /* */
@@ -101,14 +100,14 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
     av_dict_free(&options);
 
     if (ret < 0) {
-        msg_Err(dec, "cannot open codec (%s)", namecodec);
+        msg_Err(dec, "cannot open codec (%s)", codec->name);
         free(context->extradata);
         free(sys);
         return VLC_EGENERIC;
     }
 
     /* */
-    msg_Dbg(dec, "libavcodec codec (%s) started", namecodec);
+    msg_Dbg(dec, "libavcodec codec (%s) started", codec->name);
     dec->fmt_out.i_cat = SPU_ES;
     dec->pf_decode_sub = DecodeSubtitle;
 

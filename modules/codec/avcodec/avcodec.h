@@ -45,16 +45,16 @@ void CloseDeinterlace( vlc_object_t * );
 
 /* Video Decoder */
 int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
-                  const AVCodec *p_codec, int i_codec_id, const char *psz_namecodec );
+                  const AVCodec *p_codec, int i_codec_id );
 void EndVideoDec( decoder_t *p_dec );
 
 /* Audio Decoder */
 int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
-                  const AVCodec *p_codec, int i_codec_id, const char *psz_namecodec );
+                  const AVCodec *p_codec, int i_codec_id );
 
 /* Subtitle Decoder */
 int InitSubtitleDec( decoder_t *p_dec, AVCodecContext *p_context,
-                     const AVCodec *p_codec, int i_codec_id, const char *psz_namecodec );
+                     const AVCodec *p_codec, int i_codec_id );
 
 /* Initialize decoder */
 int ffmpeg_OpenCodec( decoder_t *p_dec );
@@ -244,7 +244,6 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 
 #define AVCODEC_COMMON_MEMBERS   \
     int i_codec_id;             \
-    const char *psz_namecodec;  \
     AVCodecContext *p_context;  \
     const AVCodec  *p_codec;    \
     bool b_delayed_open;

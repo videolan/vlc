@@ -298,16 +298,13 @@ static int OpenDecoder( vlc_object_t *p_this )
     switch( i_cat )
     {
     case VIDEO_ES:
-        i_result =  InitVideoDec( p_dec, p_context, p_codec,
-                                  i_codec_id, psz_namecodec );
+        i_result =  InitVideoDec( p_dec, p_context, p_codec, i_codec_id );
         break;
     case AUDIO_ES:
-        i_result =  InitAudioDec( p_dec, p_context, p_codec,
-                                  i_codec_id, psz_namecodec );
+        i_result =  InitAudioDec( p_dec, p_context, p_codec, i_codec_id );
         break;
     case SPU_ES:
-        i_result =  InitSubtitleDec( p_dec, p_context, p_codec,
-                                     i_codec_id, psz_namecodec );
+        i_result =  InitSubtitleDec( p_dec, p_context, p_codec, i_codec_id );
         break;
     default:
         return VLC_EGENERIC;
@@ -350,7 +347,7 @@ static void CloseDecoder( vlc_object_t *p_this )
             avcodec_close( p_sys->p_context );
             vlc_avcodec_unlock();
         }
-        msg_Dbg( p_dec, "ffmpeg codec (%s) stopped", p_sys->psz_namecodec );
+        msg_Dbg( p_dec, "ffmpeg codec (%s) stopped", p_sys->p_codec->name );
         av_free( p_sys->p_context );
     }
 
@@ -383,11 +380,11 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
 
     if( ret < 0 )
     {
-        msg_Err( p_dec, "cannot start codec (%s)", p_sys->psz_namecodec );
+        msg_Err( p_dec, "cannot start codec (%s)", p_sys->p_codec->name );
         return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_dec, "codec (%s) started", p_sys->psz_namecodec );
+    msg_Dbg( p_dec, "codec (%s) started", p_sys->p_codec->name );
     p_sys->b_delayed_open = false;
     return VLC_SUCCESS;
 }

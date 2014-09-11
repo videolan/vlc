@@ -206,7 +206,7 @@ static int OpenVideoCodec( decoder_t *p_dec )
             p_sys->i_codec_id == AV_CODEC_ID_THEORA )
         {
             msg_Warn( p_dec, "waiting for extra data for codec %s",
-                      p_sys->psz_namecodec );
+                      p_sys->p_codec->name );
             return 1;
         }
     }
@@ -258,7 +258,7 @@ static int OpenVideoCodec( decoder_t *p_dec )
  * opened (done after the first decoded frame).
  *****************************************************************************/
 int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
-                  const AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )
+                  const AVCodec *p_codec, int i_codec_id )
 {
     decoder_sys_t *p_sys;
     int i_val;
@@ -272,7 +272,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_context = p_context;
     p_sys->p_codec = p_codec;
     p_sys->i_codec_id = i_codec_id;
-    p_sys->psz_namecodec = psz_namecodec;
     p_sys->p_ff_pic = avcodec_alloc_frame();
     p_sys->b_delayed_open = true;
     p_sys->p_va = NULL;
