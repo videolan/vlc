@@ -57,7 +57,6 @@ struct decoder_sys_t
     /* for frame skipping algo */
     bool b_hurry_up;
     enum AVDiscard i_skip_frame;
-    enum AVDiscard i_skip_idct;
 
     /* how many decoded frames are late */
     int     i_late_frames;
@@ -325,7 +324,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     else if( i_val == 1 ) p_context->skip_idct = AVDISCARD_NONREF;
     else if( i_val == -1 ) p_context->skip_idct = AVDISCARD_NONE;
     else p_context->skip_idct = AVDISCARD_DEFAULT;
-    p_sys->i_skip_idct = p_context->skip_idct;
 
     /* ***** libavcodec direct rendering ***** */
     p_sys->b_direct_rendering = false;
