@@ -371,9 +371,7 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
 
     if( p_sys->p_context->extradata_size <= 0 )
     {
-        if( p_sys->i_codec_id == AV_CODEC_ID_VC1 ||
-            p_sys->i_codec_id == AV_CODEC_ID_VORBIS ||
-            p_sys->i_codec_id == AV_CODEC_ID_THEORA ||
+        if( p_sys->i_codec_id == AV_CODEC_ID_VORBIS ||
             ( p_sys->i_codec_id == AV_CODEC_ID_AAC &&
               !p_dec->fmt_in.b_packetized ) )
         {
@@ -382,21 +380,7 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
             return 1;
         }
     }
-    if( p_dec->fmt_in.i_cat == VIDEO_ES )
-    {
-        p_sys->p_context->width  = p_dec->fmt_in.video.i_visible_width;
-        p_sys->p_context->height = p_dec->fmt_in.video.i_visible_height;
-        if (p_sys->p_context->width  == 0)
-            p_sys->p_context->width  = p_dec->fmt_in.video.i_width;
-        else if (p_sys->p_context->width != p_dec->fmt_in.video.i_width)
-            p_sys->p_context->coded_width = p_dec->fmt_in.video.i_width;
-        if (p_sys->p_context->height == 0)
-            p_sys->p_context->height = p_dec->fmt_in.video.i_height;
-        else if (p_sys->p_context->height != p_dec->fmt_in.video.i_height)
-            p_sys->p_context->coded_height = p_dec->fmt_in.video.i_height;
-        p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
-    }
-    else if( p_dec->fmt_in.i_cat == AUDIO_ES )
+    if( p_dec->fmt_in.i_cat == AUDIO_ES )
     {
         p_sys->p_context->sample_rate = p_dec->fmt_in.audio.i_rate;
         p_sys->p_context->channels = p_dec->fmt_in.audio.i_channels;
@@ -410,9 +394,11 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
             p_sys->p_context->bits_per_coded_sample = p_sys->p_context->bit_rate /
                                                       p_sys->p_context->sample_rate;
     }
-    int ret;
+
     char *psz_opts = var_InheritString( p_dec, "avcodec-options" );
     AVDictionary *options = NULL;
+    int ret;
+
     if (psz_opts && *psz_opts)
         options = vlc_av_get_options(psz_opts);
     free(psz_opts);
@@ -428,35 +414,12 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
     av_dict_free(&options);
 
     if( ret < 0 )
-        return VLC_EGENERIC;
-    msg_Dbg( p_dec, "avcodec codec (%s) started", p_sys->psz_namecodec );
-
-#ifdef HAVE_AVCODEC_MT
-    if( p_dec->fmt_in.i_cat == VIDEO_ES )
     {
-        switch( p_sys->p_context->active_thread_type )
-        {
-            case FF_THREAD_FRAME:
-                msg_Dbg( p_dec, "using frame thread mode with %d threads",
-                         p_sys->p_context->thread_count );
-                break;
-            case FF_THREAD_SLICE:
-                msg_Dbg( p_dec, "using slice thread mode with %d threads",
-                         p_sys->p_context->thread_count );
-                break;
-            case 0:
-                if( p_sys->p_context->thread_count > 1 )
-                    msg_Warn( p_dec, "failed to enable threaded decoding" );
-                break;
-            default:
-                msg_Warn( p_dec, "using unknown thread mode with %d threads",
-                          p_sys->p_context->thread_count );
-                break;
-        }
+        msg_Err( p_dec, "cannot start codec (%s)", p_sys->psz_namecodec );
+        return VLC_EGENERIC;
     }
-#endif
 
+    msg_Dbg( p_dec, "codec (%s) started", p_sys->psz_namecodec );
     p_sys->b_delayed_open = false;
-
     return VLC_SUCCESS;
 }

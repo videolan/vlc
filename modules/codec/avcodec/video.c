@@ -196,6 +196,61 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
     return decoder_NewPicture( p_dec );
 }
 
+static int OpenVideoCodec( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_sys->p_context->extradata_size <= 0 )
+    {
+        if( p_sys->i_codec_id == AV_CODEC_ID_VC1 ||
+            p_sys->i_codec_id == AV_CODEC_ID_THEORA )
+        {
+            msg_Warn( p_dec, "waiting for extra data for codec %s",
+                      p_sys->psz_namecodec );
+            return 1;
+        }
+    }
+
+    p_sys->p_context->width  = p_dec->fmt_in.video.i_visible_width;
+    p_sys->p_context->height = p_dec->fmt_in.video.i_visible_height;
+    if (p_sys->p_context->width  == 0)
+        p_sys->p_context->width  = p_dec->fmt_in.video.i_width;
+    else if (p_sys->p_context->width != p_dec->fmt_in.video.i_width)
+        p_sys->p_context->coded_width = p_dec->fmt_in.video.i_width;
+    if (p_sys->p_context->height == 0)
+        p_sys->p_context->height = p_dec->fmt_in.video.i_height;
+    else if (p_sys->p_context->height != p_dec->fmt_in.video.i_height)
+        p_sys->p_context->coded_height = p_dec->fmt_in.video.i_height;
+    p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
+
+    int ret = ffmpeg_OpenCodec( p_dec );
+    if( ret < 0 )
+        return ret;
+
+#ifdef HAVE_AVCODEC_MT
+    switch( p_sys->p_context->active_thread_type )
+    {
+        case FF_THREAD_FRAME:
+            msg_Dbg( p_dec, "using frame thread mode with %d threads",
+                     p_sys->p_context->thread_count );
+            break;
+        case FF_THREAD_SLICE:
+            msg_Dbg( p_dec, "using slice thread mode with %d threads",
+                     p_sys->p_context->thread_count );
+            break;
+        case 0:
+            if( p_sys->p_context->thread_count > 1 )
+                msg_Warn( p_dec, "failed to enable threaded decoding" );
+            break;
+        default:
+            msg_Warn( p_dec, "using unknown thread mode with %d threads",
+                      p_sys->p_context->thread_count );
+            break;
+    }
+#endif
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * InitVideo: initialize the video decoder
  *****************************************************************************
@@ -396,9 +451,8 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     ffmpeg_InitCodec( p_dec );
 
     /* ***** Open the codec ***** */
-    if( ffmpeg_OpenCodec( p_dec ) < 0 )
+    if( OpenVideoCodec( p_dec ) < 0 )
     {
-        msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
         avcodec_free_frame( &p_sys->p_ff_pic );
         vlc_sem_destroy( &p_sys->sem_mt );
         free( p_sys );
@@ -425,10 +479,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     {
         ffmpeg_InitCodec( p_dec );
         if( p_sys->b_delayed_open )
-        {
-            if( ffmpeg_OpenCodec( p_dec ) )
-                msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
-        }
+            OpenVideoCodec( p_dec );
     }
 
     p_block = *pp_block;
