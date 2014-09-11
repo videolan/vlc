@@ -328,7 +328,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->b_direct_rendering = false;
     p_sys->i_direct_rendering_used = -1;
     if( var_CreateGetBool( p_dec, "avcodec-dr" ) &&
-       (p_sys->p_codec->capabilities & CODEC_CAP_DR1) &&
+       (p_codec->capabilities & CODEC_CAP_DR1) &&
         /* No idea why ... but this fixes flickering on some TSCC streams */
         p_sys->i_codec_id != AV_CODEC_ID_TSCC && p_sys->i_codec_id != AV_CODEC_ID_CSCD &&
         p_sys->i_codec_id != AV_CODEC_ID_CINEPAK )
