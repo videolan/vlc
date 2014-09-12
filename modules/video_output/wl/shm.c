@@ -314,6 +314,25 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     return VLC_SUCCESS;
 }
 
+static void shm_format_cb(void *data, struct wl_shm *shm, uint32_t format)
+{
+    vout_display_t *vd = data;
+    char str[4];
+
+    memcpy(str, &format, sizeof (str));
+
+    if (format >= 0x20202020)
+        msg_Dbg(vd, "format %.4s (0x%08"PRIx32")", str, format);
+    else
+        msg_Dbg(vd, "format %4"PRIu32" (0x%08"PRIx32")", format, format);
+    (void) shm;
+}
+
+static const struct wl_shm_listener shm_cbs =
+{
+    shm_format_cb,
+};
+
 static void registry_global_cb(void *data, struct wl_registry *registry,
                                uint32_t name, const char *iface, uint32_t vers)
 {
@@ -393,6 +412,9 @@ static int Open(vlc_object_t *obj)
 
     if (sys->shm == NULL)
         goto error;
+
+    wl_shm_add_listener(sys->shm, &shm_cbs, vd);
+    wl_display_roundtrip_queue(display, sys->eventq);
 
     /* Determine our pixel format */
     video_format_t fmt_pic;
