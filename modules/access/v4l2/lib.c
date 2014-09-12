@@ -52,7 +52,11 @@ int (*v4l2_munmap) (void *, size_t) = munmap;
 __attribute__((constructor))
 static void v4l2_lib_load (void)
 {
-    void *h = dlopen ("libv4l2.so.0", RTLD_LAZY | RTLD_LOCAL);
+    void *h;
+
+    h = dlopen ("libmediaclient.so", RTLD_LAZY | RTLD_LOCAL | RTLD_NOLOAD);
+    if (h == NULL)
+        h = dlopen ("libv4l2.so.0", RTLD_LAZY | RTLD_LOCAL);
     if (h == NULL)
         return;
 
