@@ -37,33 +37,6 @@
 # include <vlc_xlib.h>
 #endif
 
-/* Plugin callbacks */
-static int OpenGLES2 (vlc_object_t *);
-static int OpenGLES (vlc_object_t *);
-static int OpenGL (vlc_object_t *);
-static void Close (vlc_object_t *);
-
-vlc_module_begin ()
-    set_shortname (N_("EGL"))
-    set_description (N_("EGL extension for OpenGL"))
-    set_category (CAT_VIDEO)
-    set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("opengl", 50)
-    set_callbacks (OpenGL, Close)
-    add_shortcut ("egl")
-
-    add_submodule ()
-    set_capability ("opengl es2", 50)
-    set_callbacks (OpenGLES2, Close)
-    add_shortcut ("egl")
-
-    add_submodule ()
-    set_capability ("opengl es", 50)
-    set_callbacks (OpenGLES, Close)
-    add_shortcut ("egl")
-
-vlc_module_end ()
-
 typedef struct vlc_gl_sys_t
 {
     EGLDisplay display;
@@ -74,11 +47,36 @@ typedef struct vlc_gl_sys_t
 #endif
 } vlc_gl_sys_t;
 
-/* OpenGL callbacks */
-static int MakeCurrent (vlc_gl_t *);
-static void ReleaseCurrent (vlc_gl_t *);
-static void SwapBuffers (vlc_gl_t *);
-static void *GetSymbol(vlc_gl_t *, const char *);
+static int MakeCurrent (vlc_gl_t *gl)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    if (eglMakeCurrent (sys->display, sys->surface, sys->surface,
+                        sys->context) != EGL_TRUE)
+        return VLC_EGENERIC;
+    return VLC_SUCCESS;
+}
+
+static void ReleaseCurrent (vlc_gl_t *gl)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    eglMakeCurrent (sys->display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+                    EGL_NO_CONTEXT);
+}
+
+static void SwapBuffers (vlc_gl_t *gl)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    eglSwapBuffers (sys->display, sys->surface);
+}
+
+static void *GetSymbol(vlc_gl_t *gl, const char *procname)
+{
+    (void) gl;
+    return (void *)eglGetProcAddress (procname);
+}
 
 static bool CheckToken(const char *haystack, const char *needle)
 {
@@ -147,6 +145,24 @@ static EGLSurface CreateWindowSurface(EGLDisplay dpy, EGLConfig config,
     EGLNativeWindowType *native = window;
 
     return eglCreateWindowSurface(dpy, config, *native, attrs);
+}
+
+static void Close (vlc_object_t *obj)
+{
+    vlc_gl_t *gl = (vlc_gl_t *)obj;
+    vlc_gl_sys_t *sys = gl->sys;
+
+    if (sys->display != EGL_NO_DISPLAY)
+    {
+        if (sys->surface != EGL_NO_SURFACE)
+            eglDestroySurface(sys->display, sys->surface);
+        eglTerminate(sys->display);
+    }
+#ifdef USE_PLATFORM_X11
+    if (sys->x11 != NULL)
+        XCloseDisplay(sys->x11);
+#endif
+    free (sys);
 }
 
 /**
@@ -330,51 +346,23 @@ static int OpenGL (vlc_object_t *obj)
     return Open (obj, &api);
 }
 
-static void Close (vlc_object_t *obj)
-{
-    vlc_gl_t *gl = (vlc_gl_t *)obj;
-    vlc_gl_sys_t *sys = gl->sys;
+vlc_module_begin ()
+    set_shortname (N_("EGL"))
+    set_description (N_("EGL extension for OpenGL"))
+    set_category (CAT_VIDEO)
+    set_subcategory (SUBCAT_VIDEO_VOUT)
+    set_capability ("opengl", 50)
+    set_callbacks (OpenGL, Close)
+    add_shortcut ("egl")
 
-    if (sys->display != EGL_NO_DISPLAY)
-    {
-        if (sys->surface != EGL_NO_SURFACE)
-            eglDestroySurface(sys->display, sys->surface);
-        eglTerminate(sys->display);
-    }
-#ifdef USE_PLATFORM_X11
-    if (sys->x11 != NULL)
-        XCloseDisplay(sys->x11);
-#endif
-    free (sys);
-}
+    add_submodule ()
+    set_capability ("opengl es2", 50)
+    set_callbacks (OpenGLES2, Close)
+    add_shortcut ("egl")
 
-static int MakeCurrent (vlc_gl_t *gl)
-{
-    vlc_gl_sys_t *sys = gl->sys;
+    add_submodule ()
+    set_capability ("opengl es", 50)
+    set_callbacks (OpenGLES, Close)
+    add_shortcut ("egl")
 
-    if (eglMakeCurrent (sys->display, sys->surface, sys->surface,
-                        sys->context) != EGL_TRUE)
-        return VLC_EGENERIC;
-    return VLC_SUCCESS;
-}
-
-static void ReleaseCurrent (vlc_gl_t *gl)
-{
-    vlc_gl_sys_t *sys = gl->sys;
-
-    eglMakeCurrent (sys->display, EGL_NO_SURFACE, EGL_NO_SURFACE,
-                    EGL_NO_CONTEXT);
-}
-
-static void SwapBuffers (vlc_gl_t *gl)
-{
-    vlc_gl_sys_t *sys = gl->sys;
-
-    eglSwapBuffers (sys->display, sys->surface);
-}
-
-static void *GetSymbol(vlc_gl_t *gl, const char *procname)
-{
-    (void) gl;
-    return (void *)eglGetProcAddress (procname);
-}
+vlc_module_end ()
