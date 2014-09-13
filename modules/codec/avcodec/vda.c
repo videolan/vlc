@@ -329,8 +329,6 @@ vlc_module_end ()
 
 struct vlc_va_sys_t
 {
-    // to free the hwaccel
-    AVCodecContext      *avctx;
     vlc_object_t        *p_log;
 };
 
@@ -352,7 +350,6 @@ static int Open( vlc_va_t *external, AVCodecContext *avctx,
         return VLC_EGENERIC;
     }
     p_va->p_log = VLC_OBJECT(external);
-    p_va->avctx = avctx;
 
     external->sys = p_va;
     external->description = (char *)"VDA";
