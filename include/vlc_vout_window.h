@@ -30,6 +30,7 @@
  * This file defines vout windows structures and functions in vlc
  */
 
+#include <stdarg.h>
 #include <vlc_common.h>
 
 /* */
@@ -134,6 +135,11 @@ VLC_API vout_window_t * vout_window_New(vlc_object_t *, const char *module, cons
  */
 VLC_API void vout_window_Delete(vout_window_t *);
 
+static inline int vout_window_vaControl(vout_window_t *window, int query,
+                                        va_list ap)
+{
+    return window->control(window, query, ap);
+}
 
 /**
  * Reconfigures a window.
