@@ -39,7 +39,7 @@
 #include "../../codec/avcodec/va.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, const es_format_t *);
-static void Close(vlc_va_t *);
+static void Close(vlc_va_t *, AVCodecContext *);
 
 vlc_module_begin()
     set_description(N_("VDPAU video decoder"))
@@ -293,7 +293,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static void Close(vlc_va_t *va)
+static void Close(vlc_va_t *va, AVCodecContext *avctx)
 {
     vlc_va_sys_t *sys = va->sys;
 

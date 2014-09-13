@@ -154,7 +154,7 @@ static int Open( vlc_va_t *external, AVCodecContext *ctx,
     return VLC_SUCCESS;
 }
 
-static void Close( vlc_va_t *external )
+static void Close( vlc_va_t *external, AVCodecContext *ctx )
 {
     vlc_va_vda_t *p_va = vlc_va_vda_Get( external );
 
@@ -166,6 +166,7 @@ static void Close( vlc_va_t *external )
         CopyCleanCache( &p_va->image_cache );
 
     free( p_va );
+    (void) ctx;
 }
 
 static int Setup( vlc_va_t *external, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
@@ -367,11 +368,10 @@ static int Open( vlc_va_t *external, AVCodecContext *avctx,
     return VLC_SUCCESS;
 }
 
-static void Close( vlc_va_t *external )
+static void Close( vlc_va_t *external, AVCodecContext *avctx )
 {
-    vlc_va_vda_t *p_va = vlc_va_vda_Get( external );
-
-    av_vda_default_free(p_va->avctx);
+    av_vda_default_free(avctx);
+    (void) external;
 }
 
 static int Setup( vlc_va_t *external, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,

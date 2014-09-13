@@ -823,7 +823,7 @@ void EndVideoDec( decoder_t *p_dec )
         avcodec_free_frame( &p_sys->p_ff_pic );
 
     if( p_sys->p_va )
-        vlc_va_Delete( p_sys->p_va );
+        vlc_va_Delete( p_sys->p_va, p_sys->p_context );
 
     vlc_sem_destroy( &p_sys->sem_mt );
 }
@@ -1323,7 +1323,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     vlc_va_t *p_va = p_sys->p_va;
 
     if( p_va != NULL )
-        vlc_va_Delete( p_va );
+        vlc_va_Delete( p_va, p_context );
 
     /* Enumerate available formats */
     bool can_hwaccel = false;
@@ -1383,7 +1383,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         return pi_fmt[i];
     }
 
-    vlc_va_Delete( p_va );
+    vlc_va_Delete( p_va, p_context );
 
 end:
     /* Fallback to default behaviour */

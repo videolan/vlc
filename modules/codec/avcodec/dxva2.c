@@ -52,7 +52,7 @@
 #include "../../video_chroma/copy.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, const es_format_t *);
-static void Close(vlc_va_t *);
+static void Close(vlc_va_t *, AVCodecContext *);
 
 vlc_module_begin()
     set_description(N_("DirectX Video Acceleration (DXVA) 2.0"))
@@ -463,10 +463,11 @@ static void Release(void *opaque, uint8_t *data)
     (void) data;
 }
 
-static void Close(vlc_va_t *va)
+static void Close(vlc_va_t *va, AVCodecContext *ctx)
 {
     vlc_va_sys_t *sys = va->sys;
 
+    (void) ctx;
     DxDestroyVideoConversion(sys);
     DxDestroyVideoDecoder(sys);
     DxDestroyVideoService(sys);
@@ -540,7 +541,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt)
     return VLC_SUCCESS;
 
 error:
-    Close(va);
+    Close(va, ctx);
     return VLC_EGENERIC;
 }
 /* */

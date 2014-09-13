@@ -416,10 +416,11 @@ static int Setup( vlc_va_t *va, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
     return VLC_EGENERIC;
 }
 
-static void Delete( vlc_va_t *va )
+static void Delete( vlc_va_t *va, AVCodecContext *avctx )
 {
     vlc_va_sys_t *sys = va->sys;
 
+    (void) avctx;
     if( sys->i_surface_width || sys->i_surface_height )
         DestroySurfaces( sys );
 
