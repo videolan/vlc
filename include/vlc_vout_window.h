@@ -148,7 +148,16 @@ static inline int vout_window_vaControl(vout_window_t *window, int query,
  *
  * @warning The caller must own the window, as vout_window_t is not thread safe.
  */
-VLC_API int vout_window_Control(vout_window_t *, int query, ...);
+static inline int vout_window_Control(vout_window_t *window, int query, ...)
+{
+    va_list ap;
+    int ret;
+
+    va_start(ap, query);
+    ret = vout_window_vaControl(window, query, ap);
+    va_end(ap);
+    return ret;
+}
 
 /**
  * Configures the window manager state for this window.

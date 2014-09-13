@@ -623,7 +623,6 @@ vout_OSDSlider
 vout_OSDText
 vout_Request
 vout_window_New
-vout_window_Control
 vout_window_Delete
 vout_NewDisplay
 vout_DeleteDisplay

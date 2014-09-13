@@ -138,14 +138,3 @@ void vout_window_Delete(vout_window_t *window)
     vlc_module_unload(w->module, vout_window_stop, window);
     vlc_object_release(window);
 }
-
-int vout_window_Control(vout_window_t *window, int query, ...)
-{
-    va_list args;
-    va_start(args, query);
-    int ret = window->control(window, query, args);
-    va_end(args);
-
-    return ret;
-}
-
