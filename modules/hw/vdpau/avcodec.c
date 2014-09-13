@@ -153,32 +153,34 @@ static int Copy(vlc_va_t *va, picture_t *pic, void *opaque, uint8_t *data)
 static int Setup(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chromap)
 {
     vlc_va_sys_t *sys = va->sys;
+    unsigned width = (avctx->coded_width + 1) & ~1;
+    unsigned height = (avctx->coded_height + 3) & ~3;
+
+    if (sys->width == width && sys->height == height && sys->pool != NULL)
+        return VLC_SUCCESS;
+
+#if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(56, 2, 0))
     AVVDPAUContext *hwctx = avctx->hwaccel_context;
     VdpDecoderProfile profile;
     VdpStatus err;
 
     if (hwctx->decoder != VDP_INVALID_HANDLE)
     {
-        if (sys->width == avctx->coded_width
-         && sys->height == avctx->coded_height)
-            return VLC_SUCCESS;
-
-        for (unsigned i = 0; sys->pool[i] != NULL; i++)
-            sys->pool[i]->destroy(sys->pool[i]);
-        free(sys->pool);
-
         vdp_decoder_destroy(sys->vdp, hwctx->decoder);
         hwctx->decoder = VDP_INVALID_HANDLE;
     }
+#endif
 
-    sys->width = (avctx->coded_width + 1) & ~1;
-    sys->height = (avctx->coded_height + 3) & ~3;
-
-    if (av_vdpau_get_profile(avctx, &profile))
+    if (sys->pool != NULL)
     {
-        msg_Err(va, "no longer supported codec profile");
-        return VLC_EGENERIC;
+        for (unsigned i = 0; sys->pool[i] != NULL; i++)
+            sys->pool[i]->destroy(sys->pool[i]);
+        free(sys->pool);
+        sys->pool = NULL;
     }
+
+    sys->width = width;
+    sys->height =  height;
 
     vlc_vdp_video_field_t **pool = malloc(sizeof (*pool) * (avctx->refs + 6));
     if (unlikely(pool == NULL))
@@ -204,8 +206,15 @@ static int Setup(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chromap)
     }
     sys->pool = pool;
 
-    err = vdp_decoder_create(sys->vdp, sys->device, profile, sys->width,
-                             sys->height, avctx->refs, &hwctx->decoder);
+#if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(56, 2, 0))
+    if (av_vdpau_get_profile(avctx, &profile))
+    {
+        msg_Err(va, "no longer supported codec profile");
+        return VLC_EGENERIC;
+    }
+
+    err = vdp_decoder_create(sys->vdp, sys->device, profile, width, height,
+                             avctx->refs, &hwctx->decoder);
     if (err != VDP_STATUS_OK)
     {
         msg_Err(va, "%s creation failure: %s", "decoder",
@@ -216,7 +225,7 @@ static int Setup(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chromap)
         hwctx->decoder = VDP_INVALID_HANDLE;
         return VLC_EGENERIC;
     }
-
+#endif
     /* TODO: select better chromas when appropriate */
     *chromap = VLC_CODEC_VDPAU_VIDEO_420;
     return VLC_SUCCESS;
@@ -224,7 +233,9 @@ static int Setup(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chromap)
 
 static int Open(vlc_va_t *va, AVCodecContext *avctx, const es_format_t *fmt)
 {
+    void *func;
     VdpStatus err;
+#if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(56, 2, 0))
     VdpDecoderProfile profile;
     int level = fmt->i_level;
 
@@ -253,6 +264,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const es_format_t *fmt)
         default:
             break;
     }
+#endif
 
     if (!vlc_xlib_init(VLC_OBJECT(va)))
     {
@@ -264,22 +276,32 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const es_format_t *fmt)
     if (unlikely(sys == NULL))
        return VLC_ENOMEM;
 
-    avctx->hwaccel_context = av_vdpau_alloc_context();
-    if (unlikely(avctx->hwaccel_context == NULL))
-    {
-        free(sys);
-        return VLC_ENOMEM;
-    }
-
     err = vdp_get_x11(NULL, -1, &sys->vdp, &sys->device);
     if (err != VDP_STATUS_OK)
     {
-        av_freep(&avctx->hwaccel_context);
         free(sys);
         return VLC_EGENERIC;
     }
 
-    void *func;
+    sys->width = 0;
+    sys->height = 0;
+    sys->pool = NULL;
+
+#if (LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(56, 2, 0))
+    err = vdp_get_proc_address(sys->vdp, sys->device,
+                               VDP_FUNC_ID_GET_PROC_ADDRESS, &func);
+    if (err != VDP_STATUS_OK)
+        goto error;
+
+    if (av_vdpau_bind_context(avctx, sys->device, func, 0))
+        goto error;
+
+    (void) fmt;
+#else
+    avctx->hwaccel_context = av_vdpau_alloc_context();
+    if (unlikely(avctx->hwaccel_context == NULL))
+        goto error;
+
     err = vdp_get_proc_address(sys->vdp, sys->device,
                                VDP_FUNC_ID_DECODER_RENDER, &func);
     if (err != VDP_STATUS_OK)
@@ -326,6 +348,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const es_format_t *fmt)
                 level, fmt->video.i_width, fmt->video.i_height);
         goto error;
     }
+#endif
 
     const char *infos;
     if (vdp_get_information_string(sys->vdp, &infos) != VDP_STATUS_OK)
@@ -342,7 +365,9 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const es_format_t *fmt)
 
 error:
     vdp_release_x11(sys->vdp);
+#if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(56, 2, 0))
     av_freep(&avctx->hwaccel_context);
+#endif
     free(sys);
     return VLC_EGENERIC;
 }
@@ -350,15 +375,20 @@ error:
 static void Close(vlc_va_t *va, AVCodecContext *avctx)
 {
     vlc_va_sys_t *sys = va->sys;
+#if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(56, 2, 0))
     AVVDPAUContext *hwctx = avctx->hwaccel_context;
 
     if (hwctx->decoder != VDP_INVALID_HANDLE)
     {
+        vdp_decoder_destroy(sys->vdp, hwctx->decoder);
+    }
+#endif
+
+    if (sys->pool != NULL)
+    {
         for (unsigned i = 0; sys->pool[i] != NULL; i++)
             DestroySurface(sys->pool[i]);
         free(sys->pool);
-
-        vdp_decoder_destroy(sys->vdp, hwctx->decoder);
     }
     vdp_release_x11(sys->vdp);
     av_freep(&avctx->hwaccel_context);
