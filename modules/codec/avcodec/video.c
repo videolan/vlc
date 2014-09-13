@@ -819,6 +819,8 @@ void EndVideoDec( decoder_t *p_dec )
 
     wait_mt( p_sys );
 
+    ffmpeg_CloseCodec( p_dec );
+
     if( p_sys->p_ff_pic )
         avcodec_free_frame( &p_sys->p_ff_pic );
 

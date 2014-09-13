@@ -55,6 +55,7 @@ int InitSubtitleDec( decoder_t *, AVCodecContext *, const AVCodec * );
 
 /* Initialize decoder */
 int ffmpeg_OpenCodec( decoder_t *p_dec );
+void ffmpeg_CloseCodec( decoder_t *p_dec );
 
 /*****************************************************************************
  * Module descriptor help strings

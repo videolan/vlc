@@ -333,22 +333,13 @@ static int OpenDecoder( vlc_object_t *p_this )
 static void CloseDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
+
+    if( p_dec->fmt_out.i_cat == VIDEO_ES )
+        EndVideoDec( p_dec );
+    else
+        ffmpeg_CloseCodec( p_dec );
+
     decoder_sys_t *p_sys = p_dec->p_sys;
-
-    switch( p_dec->fmt_out.i_cat )
-    {
-    case VIDEO_ES:
-         EndVideoDec ( p_dec );
-        break;
-    }
-
-    if( !p_sys->b_delayed_open )
-    {
-        vlc_avcodec_lock();
-        avcodec_close( p_sys->p_context );
-        vlc_avcodec_unlock();
-        msg_Dbg( p_dec, "ffmpeg codec (%s) stopped", p_sys->p_codec->name );
-    }
 
     av_freep( &p_sys->p_context->extradata );
     avcodec_free_context( &p_sys->p_context );
@@ -388,4 +379,17 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
     msg_Dbg( p_dec, "codec (%s) started", p_sys->p_codec->name );
     p_sys->b_delayed_open = false;
     return VLC_SUCCESS;
+}
+
+void ffmpeg_CloseCodec( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_sys->b_delayed_open )
+        return;
+
+    vlc_avcodec_lock();
+    avcodec_close( p_sys->p_context );
+    vlc_avcodec_unlock();
+    msg_Dbg( p_dec, "ffmpeg codec (%s) stopped", p_sys->p_codec->name );
 }
