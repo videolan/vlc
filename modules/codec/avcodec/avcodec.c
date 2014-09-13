@@ -248,10 +248,9 @@ static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*) p_this;
     unsigned i_codec_id;
-    int i_cat, i_result;
+    int i_cat;
     const char *psz_namecodec;
 
-    AVCodecContext *p_context = NULL;
     const AVCodec  *p_codec = NULL;
 
     /* *** determine codec type *** */
@@ -288,37 +287,44 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* *** get a p_context *** */
-    p_context = avcodec_alloc_context3(p_codec);
-    if( !p_context )
+    AVCodecContext *avctx = avcodec_alloc_context3(p_codec);
+    if( unlikely(avctx == NULL) )
         return VLC_ENOMEM;
-    p_context->debug = var_InheritInteger( p_dec, "avcodec-debug" );
-    p_context->opaque = (void *)p_this;
 
-    p_dec->b_need_packetized = true;
+    avctx->debug = var_InheritInteger( p_dec, "avcodec-debug" );
+    avctx->opaque = p_dec;
+
+    int ret;
+
     switch( i_cat )
     {
-    case VIDEO_ES:
-        i_result =  InitVideoDec( p_dec, p_context, p_codec );
-        break;
-    case AUDIO_ES:
-        i_result =  InitAudioDec( p_dec, p_context, p_codec );
-        break;
-    case SPU_ES:
-        i_result =  InitSubtitleDec( p_dec, p_context, p_codec );
-        break;
-    default:
-        return VLC_EGENERIC;
+        case VIDEO_ES:
+            ret = InitVideoDec( p_dec, avctx, p_codec );
+            break;
+        case AUDIO_ES:
+            ret = InitAudioDec( p_dec, avctx, p_codec );
+            break;
+        case SPU_ES:
+            ret = InitSubtitleDec( p_dec, avctx, p_codec );
+            break;
+        default:
+            ret = VLC_EGENERIC;
     }
 
-    if( i_result == VLC_SUCCESS )
+    if( ret != VLC_SUCCESS )
     {
-        if( p_context->profile != FF_PROFILE_UNKNOWN)
-            p_dec->fmt_in.i_profile = p_context->profile;
-        if( p_context->level != FF_LEVEL_UNKNOWN)
-            p_dec->fmt_in.i_level = p_context->level;
+        avcodec_free_context( &avctx );
+        return ret;
     }
 
-    return i_result;
+    if( avctx->profile != FF_PROFILE_UNKNOWN)
+        p_dec->fmt_in.i_profile = avctx->profile;
+    if( avctx->level != FF_LEVEL_UNKNOWN)
+        p_dec->fmt_in.i_level = avctx->level;
+
+    p_dec->b_need_packetized = true;
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -336,21 +342,18 @@ static void CloseDecoder( vlc_object_t *p_this )
         break;
     }
 
-    if( p_sys->p_context )
+    av_free( p_sys->p_context->extradata );
+    p_sys->p_context->extradata = NULL;
+
+    if( !p_sys->b_delayed_open )
     {
-        av_free( p_sys->p_context->extradata );
-        p_sys->p_context->extradata = NULL;
-
-        if( !p_sys->b_delayed_open )
-        {
-            vlc_avcodec_lock();
-            avcodec_close( p_sys->p_context );
-            vlc_avcodec_unlock();
-        }
-        msg_Dbg( p_dec, "ffmpeg codec (%s) stopped", p_sys->p_codec->name );
-        av_free( p_sys->p_context );
+        vlc_avcodec_lock();
+        avcodec_close( p_sys->p_context );
+        vlc_avcodec_unlock();
     }
+    msg_Dbg( p_dec, "ffmpeg codec (%s) stopped", p_sys->p_codec->name );
 
+    avcodec_free_context( &p_sys->p_context );
     free( p_sys );
 }
 
