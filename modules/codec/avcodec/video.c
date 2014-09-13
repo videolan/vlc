@@ -959,8 +959,7 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
     decoder_sys_t *sys = dec->p_sys;
     vlc_va_t *va = sys->p_va;
 
-    if (vlc_va_Setup(va, &ctx->hwaccel_context, &dec->fmt_out.video.i_chroma,
-                     ctx->coded_width, ctx->coded_height))
+    if (vlc_va_Setup(va, ctx, &dec->fmt_out.video.i_chroma))
     {
         msg_Err(dec, "hardware acceleration setup failed");
         return -1;
@@ -1154,9 +1153,7 @@ static int ffmpeg_va_GetFrameBuf( struct AVCodecContext *p_context, AVFrame *p_f
     vlc_va_t *p_va = p_sys->p_va;
 
     /* hwaccel_context is not present in old ffmpeg version */
-    if( vlc_va_Setup( p_va,
-                &p_context->hwaccel_context, &p_dec->fmt_out.video.i_chroma,
-                p_context->coded_width, p_context->coded_height ) )
+    if( vlc_va_Setup( p_va, p_context, &p_dec->fmt_out.video.i_chroma ) )
     {
         msg_Err( p_dec, "vlc_va_Setup failed" );
         return -1;
@@ -1362,9 +1359,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         /* We try to call vlc_va_Setup when possible to detect errors when
          * possible (later is too late) */
         if( p_context->width > 0 && p_context->height > 0
-         && vlc_va_Setup( p_va, &p_context->hwaccel_context,
-                          &p_dec->fmt_out.video.i_chroma,
-                          p_context->width, p_context->height ) )
+         && vlc_va_Setup( p_va, p_context, &p_dec->fmt_out.video.i_chroma ) )
         {
             msg_Err( p_dec, "acceleration setup failure" );
             break;

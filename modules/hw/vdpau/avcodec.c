@@ -108,16 +108,13 @@ static int Copy(vlc_va_t *va, picture_t *pic, void *opaque, uint8_t *data)
     return VLC_SUCCESS;
 }
 
-static int Init(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
-                int width, int height)
+static int Init(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chromap)
 {
     vlc_va_sys_t *sys = va->sys;
     VdpStatus err;
 
-    width = (width + 1) & ~1;
-    height = (height + 3) & ~3;
-    sys->width = width;
-    sys->height = height;
+    sys->width = (avctx->coded_width + 1) & ~1;
+    sys->height = (avctx->coded_height + 3) & ~3;
 
     unsigned surfaces = 2;
     switch (sys->profile)
@@ -129,8 +126,8 @@ static int Init(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
         break;
     }
 
-    err = vdp_decoder_create(sys->vdp, sys->device, sys->profile, width,
-                             height, surfaces, &sys->context->decoder);
+    err = vdp_decoder_create(sys->vdp, sys->device, sys->profile, sys->width,
+                             sys->height, surfaces, &sys->context->decoder);
     if (err != VDP_STATUS_OK)
     {
         msg_Err(va, "%s creation failure: %s", "decoder",
@@ -139,7 +136,7 @@ static int Init(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
         return VLC_EGENERIC;
     }
 
-    *ctxp = sys->context;
+    avctx->hwaccel_context = sys->context;
     /* TODO: select better chromas when appropriate */
     *chromap = VLC_CODEC_VDPAU_VIDEO_420;
     return VLC_SUCCESS;
@@ -153,20 +150,20 @@ static void Deinit(vlc_va_t *va)
     vdp_decoder_destroy(sys->vdp, sys->context->decoder);
 }
 
-static int Setup(vlc_va_t *va, void **ctxp, vlc_fourcc_t *chromap,
-                 int width, int height)
+static int Setup(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chromap)
 {
     vlc_va_sys_t *sys = va->sys;
 
     if (sys->context->decoder != VDP_INVALID_HANDLE)
     {
-        if (sys->width == width && sys->height == height)
+        if (sys->width == avctx->coded_width
+         && sys->height == avctx->coded_height)
             return VLC_SUCCESS;
         Deinit(va);
         sys->context->decoder = VDP_INVALID_HANDLE;
     }
 
-    return Init(va, ctxp, chromap, width, height);
+    return Init(va, avctx, chromap);
 }
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt)

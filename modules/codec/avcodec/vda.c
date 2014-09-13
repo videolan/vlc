@@ -169,16 +169,16 @@ static void Close( vlc_va_t *external, AVCodecContext *ctx )
     (void) ctx;
 }
 
-static int Setup( vlc_va_t *external, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
-                 int i_width, int i_height )
+static int Setup( vlc_va_t *external, AVCodecContext *avctx,
+                  vlc_fourcc_t *pi_chroma )
 {
     vlc_va_vda_t *p_va = vlc_va_vda_Get( external );
 
-    if( p_va->hw_ctx.width == i_width
-       && p_va->hw_ctx.height == i_height
+    if( p_va->hw_ctx.width == avctx->coded_width
+       && p_va->hw_ctx.height == avctx->codec_height
        && p_va->hw_ctx.decoder )
     {
-        *pp_hw_ctx = &p_va->hw_ctx;
+        avctx->hwaccel_context = &p_va->hw_ctx;
         *pi_chroma = p_va->i_chroma;
         return VLC_SUCCESS;
     }
@@ -206,17 +206,17 @@ static int Setup( vlc_va_t *external, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
         default :
             p_va->hw_ctx.cv_pix_fmt_type = kCVPixelFormatType_420YpCbCr8Planar;
             p_va->i_chroma = VLC_CODEC_I420;
-            CopyInitCache( &p_va->image_cache, i_width );
+            CopyInitCache( &p_va->image_cache, avctx->coded_width );
             msg_Dbg(p_va->p_log, "using pixel format 420YpCbCr8Planar");
     }
 
 ok:
     /* Setup the libavcodec hardware context */
-    *pp_hw_ctx = &p_va->hw_ctx;
+    avctx->hwaccel_context = &p_va->hw_ctx;
     *pi_chroma = p_va->i_chroma;
 
-    p_va->hw_ctx.width = i_width;
-    p_va->hw_ctx.height = i_height;
+    p_va->hw_ctx.width = avctx->coded_width;
+    p_va->hw_ctx.height = avctx->coded_height;
 
     /* create the decoder */
     int status = ff_vda_create_decoder( &p_va->hw_ctx,
@@ -374,22 +374,14 @@ static void Close( vlc_va_t *external, AVCodecContext *avctx )
     (void) external;
 }
 
-static int Setup( vlc_va_t *external, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
-                 int i_width, int i_height )
+static int Setup( vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *p_chroma )
 {
-    VLC_UNUSED( pp_hw_ctx );
-    vlc_va_vda_t *p_va = vlc_va_vda_Get( external );
+    av_vda_default_free(avctx);
 
-    *pi_chroma = VLC_CODEC_UYVY;
+    (void) va;
+    *p_chroma = VLC_CODEC_UYVY;
 
-    av_vda_default_free(p_va->avctx);
-
-    if( av_vda_default_init(p_va->avctx) < 0 )
-        return VLC_EGENERIC;
-
-    (void)i_width; (void)i_height;
-
-    return VLC_SUCCESS;
+    return (av_vda_default_init(avctx) < 0) ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
 // Never called
