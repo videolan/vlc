@@ -83,8 +83,6 @@ vlc_module_end ()
 struct vout_display_sys_t
 {
     vout_display_opengl_t *vgl;
-
-    vout_window_t *window;
     vlc_gl_t *gl;
     picture_pool_t *pool;
 };
@@ -134,11 +132,11 @@ static int Open (vlc_object_t *obj)
     sys->gl = NULL;
     sys->pool = NULL;
 
-    sys->window = MakeWindow (vd);
-    if (sys->window == NULL)
+    vout_window_t *surface = MakeWindow (vd);
+    if (surface == NULL)
         goto error;
 
-    sys->gl = vlc_gl_Create (sys->window, API, "$" MODULE_VARNAME);
+    sys->gl = vlc_gl_Create (surface, API, "$" MODULE_VARNAME);
     if (sys->gl == NULL)
         goto error;
 
@@ -168,8 +166,8 @@ static int Open (vlc_object_t *obj)
 error:
     if (sys->gl != NULL)
         vlc_gl_Destroy (sys->gl);
-    if (sys->window != NULL)
-        vout_display_DeleteWindow (vd, sys->window);
+    if (surface != NULL)
+        vout_display_DeleteWindow (vd, surface);
     free (sys);
     return VLC_EGENERIC;
 }
@@ -181,13 +179,15 @@ static void Close (vlc_object_t *obj)
 {
     vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *sys = vd->sys;
+    vlc_gl_t *gl = sys->gl;
+    vout_window_t *surface = gl->surface;
 
-    vlc_gl_MakeCurrent (sys->gl);
+    vlc_gl_MakeCurrent (gl);
     vout_display_opengl_Delete (sys->vgl);
-    vlc_gl_ReleaseCurrent (sys->gl);
+    vlc_gl_ReleaseCurrent (gl);
 
-    vlc_gl_Destroy (sys->gl);
-    vout_display_DeleteWindow (vd, sys->window);
+    vlc_gl_Destroy (gl);
+    vout_display_DeleteWindow (vd, surface);
     free (sys);
 }
 
@@ -242,24 +242,24 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 #endif
       case VOUT_DISPLAY_CHANGE_FULLSCREEN:
       {
-        const vout_display_cfg_t *cfg =
+        const vout_display_cfg_t *c =
             va_arg (ap, const vout_display_cfg_t *);
 
-        return vout_window_SetFullScreen (sys->window, cfg->is_fullscreen);
+        return vout_window_SetFullScreen (sys->gl->surface, c->is_fullscreen);
       }
 
       case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
       {
         unsigned state = va_arg (ap, unsigned);
 
-        return vout_window_SetState (sys->window, state);
+        return vout_window_SetState (sys->gl->surface, state);
       }
 
       case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
       case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
       case VOUT_DISPLAY_CHANGE_ZOOM:
       {
-        const vout_display_cfg_t *cfg = va_arg (ap, const vout_display_cfg_t *);
+        const vout_display_cfg_t *c = va_arg (ap, const vout_display_cfg_t *);
         const video_format_t *src = &vd->source;
 
         if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
@@ -268,16 +268,16 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
             force = va_arg (ap, int);
             if (force
-             && (cfg->display.width  != vd->cfg->display.width
-              || cfg->display.height != vd->cfg->display.height)
-             && vout_window_SetSize (sys->window,
-                                     cfg->display.width, cfg->display.height))
+             && (c->display.width  != vd->cfg->display.width
+              || c->display.height != vd->cfg->display.height)
+             && vout_window_SetSize (sys->gl->surface,
+                                     c->display.width, c->display.height))
                 return VLC_EGENERIC;
         }
 
         vout_display_place_t place;
 
-        vout_display_PlacePicture (&place, src, cfg, false);
+        vout_display_PlacePicture (&place, src, c, false);
         vlc_gl_MakeCurrent (sys->gl);
         glViewport (place.x, place.y, place.width, place.height);
         vlc_gl_ReleaseCurrent (sys->gl);
