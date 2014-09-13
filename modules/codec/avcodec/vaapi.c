@@ -93,7 +93,6 @@ struct vlc_va_sys_t
     bool b_supports_derive;
 };
 
-/* */
 static void DestroySurfaces( vlc_va_sys_t *sys )
 {
     if( sys->image.image_id != VA_INVALID_ID )
@@ -417,8 +416,10 @@ static int Setup( vlc_va_t *va, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
     return VLC_EGENERIC;
 }
 
-static void Close( vlc_va_sys_t *sys )
+static void Delete( vlc_va_t *va )
 {
+    vlc_va_sys_t *sys = va->sys;
+
     if( sys->i_surface_width || sys->i_surface_height )
         DestroySurfaces( sys );
 
@@ -431,17 +432,20 @@ static void Close( vlc_va_sys_t *sys )
 #ifdef VLC_VA_BACKEND_DRM
     close( sys->drm_fd );
 #endif
-}
-
-static void Delete( vlc_va_t *va )
-{
-    vlc_va_sys_t *sys = va->sys;
-    Close( sys );
     free( sys );
 }
 
-static int Open( vlc_va_t *va, int i_codec_id, int i_thread_count )
+static int Create( vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt )
 {
+    (void) fmt;
+#ifdef VLC_VA_BACKEND_XLIB
+    if( !vlc_xlib_init( VLC_OBJECT(va) ) )
+    {
+        msg_Warn( va, "Ignoring VA-X11 API" );
+        return VLC_EGENERIC;
+    }
+#endif
+
     vlc_va_sys_t *sys = calloc( 1, sizeof(*sys) );
     if ( unlikely(sys == NULL) )
        return VLC_ENOMEM;
@@ -452,7 +456,7 @@ static int Open( vlc_va_t *va, int i_codec_id, int i_thread_count )
     int i_surface_count;
 
     /* */
-    switch( i_codec_id )
+    switch( ctx->codec_id )
     {
     case AV_CODEC_ID_MPEG1VIDEO:
     case AV_CODEC_ID_MPEG2VIDEO:
@@ -473,7 +477,7 @@ static int Open( vlc_va_t *va, int i_codec_id, int i_thread_count )
         break;
     case AV_CODEC_ID_H264:
         i_profile = VAProfileH264High;
-        i_surface_count = 16 + i_thread_count + 2;
+        i_surface_count = 16 + ctx->thread_count + 2;
         break;;
     default:
         free( sys );
@@ -571,6 +575,11 @@ static int Open( vlc_va_t *va, int i_codec_id, int i_thread_count )
 
     va->sys = sys;
     va->description = vaQueryVendorString( sys->p_display );
+    va->pix_fmt = PIX_FMT_VAAPI_VLD; /* Only VLD supported */
+    va->setup = Setup;
+    va->get = Get;
+    va->release = Release;
+    va->extract = Extract;
     return VLC_SUCCESS;
 
 error:
@@ -586,32 +595,6 @@ error:
 #endif
     free( sys );
     return VLC_EGENERIC;
-}
-
-static int Create( vlc_va_t *p_va, AVCodecContext *ctx,
-                   const es_format_t *fmt )
-{
-#ifdef VLC_VA_BACKEND_XLIB
-    if( !vlc_xlib_init( VLC_OBJECT(p_va) ) )
-    {
-        msg_Warn( p_va, "Ignoring VA API" );
-        return VLC_EGENERIC;
-    }
-#endif
-
-    (void) fmt;
-
-    int err = Open( p_va, ctx->codec_id, ctx->thread_count );
-    if( err )
-        return err;
-
-    /* Only VLD supported */
-    p_va->pix_fmt = PIX_FMT_VAAPI_VLD;
-    p_va->setup = Setup;
-    p_va->get = Get;
-    p_va->release = Release;
-    p_va->extract = Extract;
-    return VLC_SUCCESS;
 }
 
 vlc_module_begin ()
