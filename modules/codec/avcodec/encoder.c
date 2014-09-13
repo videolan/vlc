@@ -352,6 +352,11 @@ int OpenEncoder( vlc_object_t *p_this )
     p_sys->i_buffer_out = 0;
 
     p_context = avcodec_alloc_context3(p_codec);
+    if( unlikely(p_context == NULL) )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
     p_sys->p_context = p_context;
     p_sys->p_context->codec_id = p_sys->p_codec->id;
     p_context->thread_type = 0;
@@ -457,6 +462,7 @@ int OpenEncoder( vlc_object_t *p_this )
         {
             msg_Warn( p_enc, "invalid size %ix%i", p_enc->fmt_in.video.i_visible_width,
                       p_enc->fmt_in.video.i_visible_height );
+            avcodec_free_context( &p_context );
             free( p_sys );
             return VLC_EGENERIC;
         }
@@ -1005,6 +1011,7 @@ error:
     free( p_enc->fmt_out.p_extra );
     av_free( p_sys->p_buffer );
     av_free( p_sys->p_interleave_buf );
+    avcodec_free_context( &p_context );
     free( p_sys );
     return VLC_ENOMEM;
 }
@@ -1404,7 +1411,7 @@ void CloseEncoder( vlc_object_t *p_this )
     vlc_avcodec_lock();
     avcodec_close( p_sys->p_context );
     vlc_avcodec_unlock();
-    av_free( p_sys->p_context );
+    avcodec_free_context( &p_sys->p_context );
 
 
     av_free( p_sys->p_interleave_buf );
