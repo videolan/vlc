@@ -254,7 +254,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t   *p_sys = p_dec->p_sys;
     mpeg2_state_t   state;
-    picture_t       *p_pic;
 
     block_t *p_block;
 
@@ -401,7 +400,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 b_skip = true;
             }
 
-            p_pic = NULL;
+            picture_t *p_pic = NULL;
             if( !b_skip )
             {
                 p_pic = DpbNewPicture( p_dec );
@@ -551,7 +550,9 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         case STATE_INVALID_END:
         case STATE_END:
         case STATE_SLICE:
-            p_pic = NULL;
+        {
+            picture_t *p_pic = NULL;
+
             if( p_sys->p_info->display_fbuf &&
                 p_sys->p_info->display_fbuf->id )
             {
@@ -578,12 +579,11 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 DpbUnlinkPicture( p_dec, p_sys->p_info->discard_fbuf->id );
             }
 
-            /* For still frames */
-            if( state == STATE_END && p_pic )
-                p_pic->b_force = true;
-
             if( p_pic )
             {
+                if( state == STATE_END )
+                    p_pic->b_force = true; /* For still frames */
+
                 /* Avoid frames with identical timestamps.
                  * Especially needed for still frames in DVD menus. */
                 if( p_sys->i_last_frame_pts == p_pic->date )
@@ -592,6 +592,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 return p_pic;
             }
             break;
+        }
 
         case STATE_INVALID:
         {
