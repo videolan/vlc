@@ -211,18 +211,6 @@ int vlc_rename (const char *oldpath, const char *newpath)
  */
 char *vlc_getcwd (void)
 {
-    /* Try $PWD */
-    const char *pwd = getenv ("PWD");
-    if (pwd != NULL)
-    {
-        struct stat s1, s2;
-        /* Make sure $PWD is correct */
-        if (stat (pwd, &s1) == 0 && stat (".", &s2) == 0
-         && s1.st_dev == s2.st_dev && s1.st_ino == s2.st_ino)
-            return strdup (pwd);
-    }
-
-    /* Otherwise iterate getcwd() until the buffer is big enough */
     long path_max = pathconf (".", _PC_PATH_MAX);
     size_t size = (path_max == -1 || path_max > 4096) ? 4096 : path_max;
 
