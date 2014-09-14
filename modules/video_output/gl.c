@@ -262,17 +262,11 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         const vout_display_cfg_t *c = va_arg (ap, const vout_display_cfg_t *);
         const video_format_t *src = &vd->source;
 
-        if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
+        if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE && va_arg (ap, int))
         {
-            bool force = false;
-
-            force = va_arg (ap, int);
-            if (force
-             && (c->display.width  != vd->cfg->display.width
-              || c->display.height != vd->cfg->display.height)
-             && vout_window_SetSize (sys->gl->surface,
-                                     c->display.width, c->display.height))
-                return VLC_EGENERIC;
+            vout_window_SetSize (sys->gl->surface,
+                                 c->display.width, c->display.height);
+            return VLC_EGENERIC;
         }
 
         vout_display_place_t place;
