@@ -37,6 +37,9 @@
       (LIBAVCODEC_VERSION_MICRO >= 100 && LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( a, d, e ) ) )
 
 # if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55, 52, 0))
+
+#include <libavutil/mem.h>
+
 static inline void avcodec_free_context( AVCodecContext **ctx )
 {
     av_freep( ctx );
