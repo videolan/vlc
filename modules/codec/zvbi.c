@@ -605,7 +605,7 @@ static int get_last_visible_row( vbi_char *p_text, int rows, int columns)
     {
         if (p_text[i].opacity != VBI_TRANSPARENT_SPACE)
         {
-            return ( i + columns - 1) / columns;
+            return i / columns;
         }
     }
 
