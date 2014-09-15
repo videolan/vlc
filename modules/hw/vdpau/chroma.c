@@ -462,11 +462,32 @@ static picture_t *VideoRender(filter_t *filter, picture_t *src)
         picture_Release(src);
     }
     else
+    {
         sys->history[MAX_PAST + MAX_FUTURE].field = NULL;
+        sys->history[MAX_PAST + MAX_FUTURE].force = false;
+    }
 
     vlc_vdp_video_field_t *f = sys->history[MAX_PAST].field;
     if (f == NULL)
-        goto skip;
+    {   /* There is no present field, probably just starting playback. */
+        if (!sys->history[MAX_PAST + MAX_FUTURE].force)
+            goto skip;
+
+        /* If the picture is forced, ignore deinterlacing and fast forward. */
+        /* FIXME: Remove the forced hack pictures in video output core and
+         * allow the last field of a video to be rendered properly. */
+        while (sys->history[MAX_PAST].field == NULL)
+        {
+            f = sys->history[0].field;
+            if (f != NULL)
+                f->destroy(f);
+
+            memmove(sys->history, sys->history + 1,
+                    sizeof (sys->history[0]) * (MAX_PAST + MAX_FUTURE));
+            sys->history[MAX_PAST + MAX_FUTURE].field = NULL;
+        }
+        f = sys->history[MAX_PAST].field;
+    }
 
     /* Get a VLC picture for a VDPAU output surface */
     dst = filter_NewPicture(filter);
