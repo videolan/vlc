@@ -713,7 +713,7 @@ static node* findOrCreateParentNode( node *root, const char *fullpath )
 
     while( current )
     {
-        if( !strcmp( current->name, folder ) )
+        if( current->name && !strcmp( current->name, folder ) )
         {
             /* We found the folder, go recursively deeper */
             node *parentNode = findOrCreateParentNode( current, sep );
