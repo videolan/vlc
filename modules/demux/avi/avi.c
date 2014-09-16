@@ -711,7 +711,7 @@ aviindex:
     if( i_idx_totalframes != p_avih->i_totalframes &&
         p_sys->i_length < (mtime_t)p_avih->i_totalframes *
                           (mtime_t)p_avih->i_microsecperframe /
-                          (mtime_t)1000000 )
+                          CLOCK_FREQ )
     {
         if( !vlc_object_alive( p_demux) )
             goto error;
@@ -788,7 +788,7 @@ aviindex:
                 continue;
             }
             tk->i_samplesize = 1;
-            tk->i_rate       = i_track_length  * (int64_t)1000000/ i_length;
+            tk->i_rate       = i_track_length  * CLOCK_FREQ / i_length;
             msg_Warn( p_demux, "track[%d] fixed with rate=%d scale=%d (BeOS MediaKit generated)", i, tk->i_rate, tk->i_scale );
         }
     }
@@ -985,7 +985,7 @@ static int Demux_Seekable( demux_t *p_demux )
 
     if( i_track_count <= 0 )
     {
-        int64_t i_length = p_sys->i_length * (mtime_t)1000000;
+        int64_t i_length = p_sys->i_length * CLOCK_FREQ;
 
         p_sys->i_time += READ_LENGTH;
         if( i_length > 0 )
@@ -2951,7 +2951,7 @@ static mtime_t  AVI_MovieGetLength( demux_t *p_demux )
         {
             i_length = AVI_GetDPTS( tk, tk->idx.i_size );
         }
-        i_length /= (mtime_t)1000000;    /* in seconds */
+        i_length /= CLOCK_FREQ;    /* in seconds */
 
         msg_Dbg( p_demux,
                  "stream[%d] length:%"PRId64" (based on index)",
