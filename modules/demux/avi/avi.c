@@ -1216,7 +1216,7 @@ static int Demux_Seekable( demux_t *p_demux )
             continue;
         }
 
-        p_frame->i_pts = AVI_GetPTS( tk ) + 1;
+        p_frame->i_pts = VLC_TS_0 + AVI_GetPTS( tk );
         if( tk->idx.p_entry[tk->i_idxposc].i_flags&AVIIF_KEYFRAME )
         {
             p_frame->i_flags = BLOCK_FLAG_TYPE_I;
@@ -1383,7 +1383,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
                 {
                     return( -1 );
                 }
-                p_frame->i_pts = AVI_GetPTS( p_stream ) + 1;
+                p_frame->i_pts = VLC_TS_0 + AVI_GetPTS( p_stream );
 
                 if( avi_pk.i_cat != VIDEO_ES )
                     p_frame->i_dts = p_frame->i_pts;
