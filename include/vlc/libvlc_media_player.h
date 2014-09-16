@@ -320,7 +320,7 @@ typedef void (*libvlc_video_display_cb)(void *opaque, void *picture);
  * Similarly, the number of scanlines must be bigger than of equal to
  * the pixel height.
  * Furthermore, we recommend that pitches and lines be multiple of 32
- * to not break assumption that might be made by various optimizations
+ * to not break assumptions that might be held by optimized code
  * in the video decoders, video filters and/or video converters.
  */
 typedef unsigned (*libvlc_video_format_cb)(void **opaque, char *chroma,
