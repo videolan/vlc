@@ -178,19 +178,20 @@ struct access_sys_t
     uint64_t i_remaining;
     uint64_t size;
 
+    /* cookie jar borrowed from playlist, do not free */
+    vlc_http_cookie_jar_t * cookies;
+
     bool b_seekable;
     bool b_reconnect;
     bool b_continuous;
     bool b_pace_control;
     bool b_persist;
     bool b_has_size;
-
-    vlc_http_cookie_jar_t * cookies;
 };
 
 /* */
-static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
-                            unsigned i_redirect, vlc_http_cookie_jar_t *cookies );
+static int OpenRedirected( vlc_object_t *p_this, const char *psz_access,
+                           unsigned i_redirect );
 
 /* */
 static ssize_t Read( access_t *, uint8_t *, size_t );
@@ -208,6 +209,7 @@ static void AuthReply( access_t *p_acces, const char *psz_prefix,
                        vlc_url_t *p_url, http_auth_t *p_auth );
 static int AuthCheckReply( access_t *p_access, const char *psz_header,
                            vlc_url_t *p_url, http_auth_t *p_auth );
+static vlc_http_cookie_jar_t *GetCookieJar( vlc_object_t *p_this );
 
 /*****************************************************************************
  * Open:
@@ -215,20 +217,19 @@ static int AuthCheckReply( access_t *p_access, const char *psz_header,
 static int Open( vlc_object_t *p_this )
 {
     access_t *p_access = (access_t*)p_this;
-    return OpenWithCookies( p_this, p_access->psz_access, 5, NULL );
+    return OpenRedirected( p_this, p_access->psz_access, 5 );
 }
 
 /**
- * Open the given url using the given cookies
+ * Open the given url with limited redirects
  * @param p_this: the vlc object
  * @psz_access: the acces to use (http, https, ...) (this value must be used
  *              instead of p_access->psz_access)
  * @i_redirect: number of redirections remaining
- * @cookies: the available cookies
  * @return vlc error codes
  */
-static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
-                            unsigned i_redirect, vlc_http_cookie_jar_t *cookies )
+static int OpenRedirected( vlc_object_t *p_this, const char *psz_access,
+                           unsigned i_redirect )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
@@ -278,7 +279,7 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
 
     /* Only forward an store cookies if the corresponding option is activated */
     if( var_CreateGetBool( p_access, "http-forward-cookies" ) )
-        p_sys->cookies = (cookies != NULL) ? cookies : vlc_http_cookies_new();
+        p_sys->cookies = GetCookieJar( p_this );
     else
         p_sys->cookies = NULL;
 
@@ -509,15 +510,13 @@ connect:
 
         Disconnect( p_access );
         vlc_tls_Delete( p_sys->p_creds );
-        cookies = p_sys->cookies;
 #ifdef HAVE_ZLIB_H
         inflateEnd( &p_sys->inflate.stream );
 #endif
         free( p_sys );
 
         /* Do new Open() run with new data */
-        return OpenWithCookies( p_this, psz_protocol, i_redirect - 1,
-                                cookies );
+        return OpenRedirected( p_this, psz_protocol, i_redirect - 1 );
     }
 
     if( p_sys->b_mms )
@@ -596,8 +595,6 @@ error:
     Disconnect( p_access );
     vlc_tls_Delete( p_sys->p_creds );
 
-    vlc_http_cookies_destroy( p_sys->cookies );
-
 #ifdef HAVE_ZLIB_H
     inflateEnd( &p_sys->inflate.stream );
 #endif
@@ -631,8 +628,6 @@ static void Close( vlc_object_t *p_this )
 
     Disconnect( p_access );
     vlc_tls_Delete( p_sys->p_creds );
-
-    vlc_http_cookies_destroy( p_sys->cookies );
 
 #ifdef HAVE_ZLIB_H
     inflateEnd( &p_sys->inflate.stream );
@@ -1581,4 +1576,24 @@ static int AuthCheckReply( access_t *p_access, const char *psz_header,
                                                  p_url->psz_path,
                                                  p_url->psz_username,
                                                  p_url->psz_password );
+}
+
+/*****************************************************************************
+ * HTTP cookies
+ *****************************************************************************/
+
+/**
+ * Inherit the cookie jar from the playlist
+ *
+ * @param p_this: http access object
+ * @return A borrowed reference to a vlc_http_cookie_jar_t, do not free
+ */
+static vlc_http_cookie_jar_t *GetCookieJar( vlc_object_t *p_this )
+{
+    vlc_value_t val;
+
+    if ( var_Inherit( p_this, "http-cookies", VLC_VAR_ADDRESS, &val ) == VLC_SUCCESS )
+        return val.p_address;
+    else
+        return NULL;
 }

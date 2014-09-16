@@ -1,5 +1,5 @@
 /*****************************************************************************
- * httpcookies.h: HTTP cookie utilities
+ * httpcookies.c: HTTP cookie utilities
  *****************************************************************************
  * Copyright (C) 2014 VLC authors and VideoLAN
  * $Id$
@@ -45,6 +45,12 @@ typedef struct http_cookie_t
     bool b_secure;
 } http_cookie_t;
 
+struct vlc_http_cookie_jar_t
+{
+    vlc_array_t cookies;
+    vlc_mutex_t lock;
+};
+
 static http_cookie_t * cookie_parse( const char * cookie_header, const vlc_url_t * url );
 static void cookie_destroy( http_cookie_t * p_cookie );
 static char * cookie_get_content( const char * cookie );
@@ -60,7 +66,14 @@ static char * cookie_default_path( const char *request_path );
 
 vlc_http_cookie_jar_t * vlc_http_cookies_new()
 {
-    return vlc_array_new();
+    vlc_http_cookie_jar_t * jar = malloc( sizeof( vlc_http_cookie_jar_t ) );
+    if ( !jar )
+        return NULL;
+
+    vlc_array_init( &jar->cookies );
+    vlc_mutex_init( &jar->lock );
+
+    return jar;
 }
 
 void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar )
@@ -69,9 +82,11 @@ void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar )
         return;
 
     int i;
-    for( i = 0; i < vlc_array_count( p_jar ); i++ )
-        cookie_destroy( vlc_array_item_at_index( p_jar, i ) );
-    vlc_array_destroy( p_jar );
+    for( i = 0; i < vlc_array_count( &p_jar->cookies ); i++ )
+        cookie_destroy( vlc_array_item_at_index( &p_jar->cookies, i ) );
+
+    vlc_array_clear( &p_jar->cookies );
+    vlc_mutex_destroy( &p_jar->lock );
 }
 
 bool vlc_http_cookies_append( vlc_http_cookie_jar_t * p_jar, const char * psz_cookie_header, const vlc_url_t *p_url )
@@ -85,9 +100,11 @@ bool vlc_http_cookies_append( vlc_http_cookie_jar_t * p_jar, const char * psz_co
         return false;
     }
 
-    for( i = 0; i < vlc_array_count( p_jar ); i++ )
+    vlc_mutex_lock( &p_jar->lock );
+
+    for( i = 0; i < vlc_array_count( &p_jar->cookies ); i++ )
     {
-        http_cookie_t *iter = vlc_array_item_at_index( p_jar, i );
+        http_cookie_t *iter = vlc_array_item_at_index( &p_jar->cookies, i );
 
         assert( iter->psz_name );
         assert( iter->psz_domain );
@@ -100,24 +117,28 @@ bool vlc_http_cookies_append( vlc_http_cookie_jar_t * p_jar, const char * psz_co
         if( domains_match && paths_match && names_match )
         {
             /* Remove previous value for this cookie */
-            vlc_array_remove( p_jar, i );
+            vlc_array_remove( &p_jar->cookies, i );
             cookie_destroy(iter);
             break;
         }
     }
-    vlc_array_append( p_jar, cookie );
+    vlc_array_append( &p_jar->cookies, cookie );
+
+    vlc_mutex_unlock( &p_jar->lock );
 
     return true;
 }
-
 
 char *vlc_http_cookies_for_url( vlc_http_cookie_jar_t * p_jar, const vlc_url_t * p_url )
 {
     int i;
     char *psz_cookiebuf = NULL;
-    for( i = 0; i < vlc_array_count( p_jar ); i++ )
+
+    vlc_mutex_lock( &p_jar->lock );
+
+    for( i = 0; i < vlc_array_count( &p_jar->cookies ); i++ )
     {
-        const http_cookie_t * cookie = vlc_array_item_at_index( p_jar, i );
+        const http_cookie_t * cookie = vlc_array_item_at_index( &p_jar->cookies, i );
         if ( cookie_should_be_sent( cookie, p_url ) )
         {
             char *psz_updated_buf = NULL;
@@ -129,12 +150,15 @@ char *vlc_http_cookies_for_url( vlc_http_cookie_jar_t * p_jar, const vlc_url_t *
             {
                 // TODO: report error
                 free( psz_cookiebuf );
+                vlc_mutex_unlock( &p_jar->lock );
                 return NULL;
             }
             free( psz_cookiebuf );
             psz_cookiebuf = psz_updated_buf;
         }
     }
+
+    vlc_mutex_unlock( &p_jar->lock );
 
     return psz_cookiebuf;
 }

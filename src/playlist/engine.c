@@ -32,6 +32,7 @@
 #include <vlc_sout.h>
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
+#include <vlc_http.h>
 #include "playlist_internal.h"
 #include "input/resource.h"
 
@@ -296,6 +297,15 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
     if( aout != NULL )
         input_resource_PutAout( p->p_input_resource, aout );
 
+    /* Initialize the shared HTTP cookie jar */
+    vlc_value_t cookies;
+    cookies.p_address = vlc_http_cookies_new();
+    if ( likely(cookies.p_address) )
+    {
+        var_Create( p_playlist, "http-cookies", VLC_VAR_ADDRESS );
+        var_SetChecked( p_playlist, "http-cookies", VLC_VAR_ADDRESS, cookies );
+    }
+
     /* Thread */
     playlist_Activate (p_playlist);
 
@@ -365,6 +375,13 @@ void playlist_Destroy( playlist_t *p_playlist )
 
     ARRAY_RESET( p_playlist->items );
     ARRAY_RESET( p_playlist->current );
+
+    vlc_http_cookie_jar_t *cookies = var_GetAddress( p_playlist, "http-cookies" );
+    if ( cookies )
+    {
+        var_Destroy( p_playlist, "http-cookies" );
+        vlc_http_cookies_destroy( cookies );
+    }
 
     vlc_object_release( p_playlist );
 }

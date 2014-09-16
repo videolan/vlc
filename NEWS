@@ -5,7 +5,8 @@ Access:
  * Support HDS (Http Dynamic Streaming) from Adobe (f4m, f4v, etc.)
  * New SMB access module using libdsm
  * Support decompression and extraction through libarchive (tar, zip, rar...)
- * Improvements of cookie handling (domain / path matching, Secure cookies)
+ * Improvements of cookie handling (share cookies between playlist items,
+   domain / path matching, Secure cookies)
 
 Decoder:
  * OMX GPU-zerocopy support for decoding and display on Android using OpenMax IL

@@ -69,7 +69,7 @@ VLC_API char *http_auth_FormatAuthorizationHeader
 
 /* RFC 6265: cookies */
 
-typedef struct vlc_array_t vlc_http_cookie_jar_t;
+typedef struct vlc_http_cookie_jar_t vlc_http_cookie_jar_t;
 
 VLC_API vlc_http_cookie_jar_t * vlc_http_cookies_new( void ) VLC_USED;
 VLC_API void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar );
