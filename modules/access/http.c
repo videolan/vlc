@@ -47,7 +47,6 @@
 #include <vlc_input.h>
 #include <vlc_md5.h>
 #include <vlc_http.h>
-#include "httpcookies.h"
 
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>
@@ -186,12 +185,12 @@ struct access_sys_t
     bool b_persist;
     bool b_has_size;
 
-    http_cookie_jar_t * cookies;
+    vlc_http_cookie_jar_t * cookies;
 };
 
 /* */
 static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
-                            unsigned i_redirect, http_cookie_jar_t *cookies );
+                            unsigned i_redirect, vlc_http_cookie_jar_t *cookies );
 
 /* */
 static ssize_t Read( access_t *, uint8_t *, size_t );
@@ -229,7 +228,7 @@ static int Open( vlc_object_t *p_this )
  * @return vlc error codes
  */
 static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
-                            unsigned i_redirect, http_cookie_jar_t *cookies )
+                            unsigned i_redirect, vlc_http_cookie_jar_t *cookies )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
@@ -279,7 +278,7 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
 
     /* Only forward an store cookies if the corresponding option is activated */
     if( var_CreateGetBool( p_access, "http-forward-cookies" ) )
-        p_sys->cookies = (cookies != NULL) ? cookies : http_cookies_new();
+        p_sys->cookies = (cookies != NULL) ? cookies : vlc_http_cookies_new();
     else
         p_sys->cookies = NULL;
 
@@ -597,7 +596,7 @@ error:
     Disconnect( p_access );
     vlc_tls_Delete( p_sys->p_creds );
 
-    http_cookies_destroy( p_sys->cookies );
+    vlc_http_cookies_destroy( p_sys->cookies );
 
 #ifdef HAVE_ZLIB_H
     inflateEnd( &p_sys->inflate.stream );
@@ -633,7 +632,7 @@ static void Close( vlc_object_t *p_this )
     Disconnect( p_access );
     vlc_tls_Delete( p_sys->p_creds );
 
-    http_cookies_destroy( p_sys->cookies );
+    vlc_http_cookies_destroy( p_sys->cookies );
 
 #ifdef HAVE_ZLIB_H
     inflateEnd( &p_sys->inflate.stream );
@@ -1173,7 +1172,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
     /* Cookies */
     if( p_sys->cookies )
     {
-        char * psz_cookiestring = http_cookies_for_url( p_sys->cookies, &p_sys->url );
+        char * psz_cookiestring = vlc_http_cookies_for_url( p_sys->cookies, &p_sys->url );
         if ( psz_cookiestring )
         {
             msg_Dbg( p_access, "Sending Cookie %s", psz_cookiestring );
@@ -1476,7 +1475,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
         {
             if( p_sys->cookies )
             {
-                if ( http_cookies_append( p_sys->cookies, p, &p_sys->url ) )
+                if ( vlc_http_cookies_append( p_sys->cookies, p, &p_sys->url ) )
                     msg_Dbg( p_access, "Accepting Cookie: %s", p );
                 else
                     msg_Dbg( p_access, "Rejected Cookie: %s", p );

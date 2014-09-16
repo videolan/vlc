@@ -144,6 +144,10 @@ http_auth_Reset
 http_auth_ParseWwwAuthenticateHeader
 http_auth_ParseAuthenticationInfoHeader
 http_auth_FormatAuthorizationHeader
+vlc_http_cookies_new
+vlc_http_cookies_destroy
+vlc_http_cookies_append
+vlc_http_cookies_for_url
 httpd_ClientIP
 httpd_FileDelete
 httpd_FileNew

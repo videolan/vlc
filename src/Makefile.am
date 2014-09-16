@@ -480,6 +480,7 @@ SOURCES_libvlc_common = \
 	misc/filter.c \
 	misc/filter_chain.c \
 	misc/http_auth.c \
+	misc/httpcookies.c \
 	misc/fingerprinter.c \
 	misc/text_style.c \
 	misc/subpicture.c \

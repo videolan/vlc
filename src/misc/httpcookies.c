@@ -33,7 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_messages.h>
 #include <vlc_strings.h>
-#include "httpcookies.h"
+#include <vlc_http.h>
 
 typedef struct http_cookie_t
 {
@@ -58,12 +58,12 @@ static bool cookie_path_matches( const http_cookie_t * cookie, const char *path 
 static bool cookie_domain_is_public_suffix( const char *domain );
 static char * cookie_default_path( const char *request_path );
 
-http_cookie_jar_t * http_cookies_new()
+vlc_http_cookie_jar_t * vlc_http_cookies_new()
 {
     return vlc_array_new();
 }
 
-void http_cookies_destroy( http_cookie_jar_t * p_jar )
+void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar )
 {
     if ( !p_jar )
         return;
@@ -74,7 +74,7 @@ void http_cookies_destroy( http_cookie_jar_t * p_jar )
     vlc_array_destroy( p_jar );
 }
 
-bool http_cookies_append( http_cookie_jar_t * p_jar, const char * psz_cookie_header, const vlc_url_t *p_url )
+bool vlc_http_cookies_append( vlc_http_cookie_jar_t * p_jar, const char * psz_cookie_header, const vlc_url_t *p_url )
 {
     int i;
 
@@ -111,7 +111,7 @@ bool http_cookies_append( http_cookie_jar_t * p_jar, const char * psz_cookie_hea
 }
 
 
-char *http_cookies_for_url( http_cookie_jar_t * p_jar, const vlc_url_t * p_url )
+char *vlc_http_cookies_for_url( vlc_http_cookie_jar_t * p_jar, const vlc_url_t * p_url )
 {
     int i;
     char *psz_cookiebuf = NULL;
