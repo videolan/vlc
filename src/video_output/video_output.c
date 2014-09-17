@@ -1417,8 +1417,10 @@ static int ThreadReinit(vout_thread_t *vout,
     /* We ignore crop/ar changes at this point, they are dynamically supported */
     VideoFormatCopyCropAr(&vout->p->original, &original);
     if (video_format_IsSimilar(&original, &vout->p->original)) {
-        if (cfg->dpb_size <= vout->p->dpb_size)
+        if (cfg->dpb_size <= vout->p->dpb_size) {
+            video_format_Clean(&original);
             return VLC_SUCCESS;
+        }
         msg_Warn(vout, "DPB need to be increased");
     }
 
