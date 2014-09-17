@@ -1,6 +1,6 @@
 # LIBBLURAY
 
-BLURAY_VERSION := 0.6.1
+BLURAY_VERSION := 0.6.2
 BLURAY_URL := http://ftp.videolan.org/pub/videolan/libbluray/$(BLURAY_VERSION)/libbluray-$(BLURAY_VERSION).tar.bz2
 
 ifdef BUILD_DISCS
