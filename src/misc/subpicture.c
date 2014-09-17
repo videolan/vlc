@@ -88,6 +88,12 @@ void subpicture_Delete( subpicture_t *p_subpic )
     if( p_subpic->updater.pf_destroy )
         p_subpic->updater.pf_destroy( p_subpic );
 
+    if( p_subpic->p_private )
+    {
+        video_format_Clean( &p_subpic->p_private->src );
+        video_format_Clean( &p_subpic->p_private->dst );
+    }
+
     free( p_subpic->p_private );
     free( p_subpic );
 }
