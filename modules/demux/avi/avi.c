@@ -100,6 +100,7 @@ static char *FromACP( const char *str )
 }
 
 #define IGNORE_ES NAV_ES
+#define READ_LENGTH (25 * 1000) // 25ms
 
 typedef struct
 {
@@ -986,7 +987,7 @@ static int Demux_Seekable( demux_t *p_demux )
     {
         int64_t i_length = p_sys->i_length * (mtime_t)1000000;
 
-        p_sys->i_time += 25*1000;  /* read 25ms */
+        p_sys->i_time += READ_LENGTH;
         if( i_length > 0 )
         {
             if( p_sys->i_time >= i_length )
@@ -999,7 +1000,7 @@ static int Demux_Seekable( demux_t *p_demux )
 
     /* wait for the good time */
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_time );
-    p_sys->i_time += 25*1000;  /* read 25ms */
+    p_sys->i_time += READ_LENGTH;
 
     /* init toread */
     for( i_track = 0; i_track < p_sys->i_track; i_track++ )
@@ -1052,7 +1053,7 @@ static int Demux_Seekable( demux_t *p_demux )
         {
             if( !toread[i].b_ok ||
                 AVI_GetDPTS( p_sys->track[i],
-                             toread[i].i_toread ) <= -25 * 1000 )
+                             toread[i].i_toread ) <= -READ_LENGTH )
             {
                 continue;
             }
@@ -1150,7 +1151,7 @@ static int Demux_Seekable( demux_t *p_demux )
                     avi_index_Append( &tk->idx, &p_sys->i_movi_lastchunk_pos, &index );
 
                     /* do we will read this data ? */
-                    if( AVI_GetDPTS( tk, toread[i_track].i_toread ) > -25*1000 )
+                    if( AVI_GetDPTS( tk, toread[i_track].i_toread ) > -READ_LENGTH )
                     {
                         break;
                     }
