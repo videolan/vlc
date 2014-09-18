@@ -210,7 +210,6 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
 
 next_ai: /* failure */
         net_Close( fd );
-        continue;
     }
 
     freeaddrinfo( res );
