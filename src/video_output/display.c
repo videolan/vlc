@@ -1624,23 +1624,20 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
     wrapper->sys     = sys;
 
     /* */
-    video_splitter_owner_t *owner = malloc(sizeof(*owner));
-    if (!owner)
-        abort();
-    owner->wrapper = wrapper;
-    splitter->p_owner = owner;
+    video_splitter_owner_t *vso = xmalloc(sizeof(*vso));
+    vso->wrapper = wrapper;
+    splitter->p_owner = vso;
     splitter->pf_picture_new = SplitterPictureNew;
     splitter->pf_picture_del = SplitterPictureDel;
 
     /* */
     TAB_INIT(sys->count, sys->display);
     for (int i = 0; i < splitter->i_output; i++) {
-        vout_display_owner_t owner;
-
-        owner.event      = SplitterEvent;
-        owner.window_new = SplitterNewWindow;
-        owner.window_del = SplitterDelWindow;
-
+        vout_display_owner_t vdo = {
+            .event      = SplitterEvent,
+            .window_new = SplitterNewWindow,
+            .window_del = SplitterDelWindow,
+        };
         const video_splitter_output_t *output = &splitter->p_output[i];
         vout_display_state_t ostate;
 
@@ -1654,9 +1651,9 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
         ostate.cfg.zoom.den = 1;
 
         vout_display_t *vd = DisplayNew(vout, &output->fmt, &ostate,
-                                           output->psz_module ? output->psz_module : module,
-                                           false, wrapper,
-                                           double_click_timeout, hide_timeout, &owner);
+                                        output->psz_module ? output->psz_module : module,
+                                        false, wrapper,
+                                        double_click_timeout, hide_timeout, &vdo);
         if (!vd) {
             vout_DeleteDisplay(wrapper, NULL);
             return NULL;
