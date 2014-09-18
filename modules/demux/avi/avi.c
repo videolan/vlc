@@ -1006,7 +1006,6 @@ static int Demux_Seekable( demux_t *p_demux )
     for( i_track = 0; i_track < p_sys->i_track; i_track++ )
     {
         avi_track_t *tk = p_sys->track[i_track];
-        mtime_t i_dpts;
 
         toread[i_track].b_ok = tk->b_activated && !tk->b_eof;
         if( tk->i_idxposc < tk->idx.i_size )
@@ -1022,20 +1021,15 @@ static int Demux_Seekable( demux_t *p_demux )
             toread[i_track].i_posf = -1;
         }
 
-        i_dpts = p_sys->i_time - AVI_GetPTS( tk  );
+        mtime_t i_dpts = p_sys->i_time - AVI_GetPTS( tk );
 
         if( tk->i_samplesize )
         {
-            toread[i_track].i_toread = AVI_PTSToByte( tk, llabs( i_dpts ) );
+            toread[i_track].i_toread = AVI_PTSToByte( tk, i_dpts );
         }
         else
         {
-            toread[i_track].i_toread = AVI_PTSToChunk( tk, llabs( i_dpts ) );
-        }
-
-        if( i_dpts < 0 )
-        {
-            toread[i_track].i_toread *= -1;
+            toread[i_track].i_toread = AVI_PTSToChunk( tk, i_dpts );
         }
     }
 
