@@ -768,7 +768,7 @@ int libvlc_vlm_get_media_instance_seekable( libvlc_instance_t *p_instance,
 libvlc_event_manager_t *
 libvlc_vlm_get_event_manager( libvlc_instance_t *p_instance )
 {
-    vlm_t *p_vlm;
-    VLM_RET( p_vlm, NULL);
+    if( libvlc_vlm_init( p_instance ) )
+        return NULL;
     return p_instance->libvlc_vlm.p_event_manager;
 }
