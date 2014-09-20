@@ -944,7 +944,7 @@ static int CheckSegmentChange( sout_access_out_t *p_access, block_t *p_buffer )
 static ssize_t writeSegment( sout_access_out_t *p_access )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
-    block_t *output = p_sys->block_buffer;
+    block_t *output = p_sys->block_buffer ? block_ChainGather( p_sys->block_buffer ) : NULL;
     p_sys->block_buffer = NULL;
     ssize_t i_write=0;
     bool crypted = false;
