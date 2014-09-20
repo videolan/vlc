@@ -436,6 +436,7 @@ void EStoPES ( block_t **pp_pes,
     } while( i_size > 0 );
 
     /* Now redate all pes */
+    p_pes = *pp_pes;
     i_dts    = p_pes->i_dts;
     mtime_t i_length = p_pes->i_length / i_pes_count;
     while( p_pes )
