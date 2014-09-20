@@ -45,8 +45,8 @@
 #pragma mark prototypes and definitions
 
 static int Open( vlc_va_t *, AVCodecContext *, const es_format_t * );
-static void Close( vlc_va_t * );
-static int Setup( vlc_va_t *, void **, vlc_fourcc_t *, int , int );
+static void Close( vlc_va_t * , AVCodecContext *);
+static int Setup( vlc_va_t *, AVCodecContext *, vlc_fourcc_t *);
 static int Get( vlc_va_t *, void **, uint8_t ** );
 static int Extract( vlc_va_t *, picture_t *, void *, uint8_t * );
 static void Release( void *, uint8_t * );
