@@ -336,8 +336,9 @@ static int Activate( vlc_object_t *p_this )
     filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, &fmt );
     /* Append scaling module */
     filter_chain_AppendFilter( p_sys->p_chain, NULL, NULL, NULL, NULL );
-    /* Append padding module */
-    filter_chain_AppendFromString( p_sys->p_chain, psz_croppadd );
+    /* Append croppadd module if we actually do cropping or padding instead of just scaling*/
+    if( i_padd > 0 )
+        filter_chain_AppendFromString( p_sys->p_chain, psz_croppadd );
 
     fmt = *filter_chain_GetFmtOut( p_sys->p_chain );
     es_format_Copy( &p_filter->fmt_out, &fmt );
