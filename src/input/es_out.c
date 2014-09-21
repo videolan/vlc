@@ -1816,6 +1816,16 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                         i_wanted = es->i_channel;
                 }
             }
+            else if ( es->fmt.i_codec == EsOutFourccClosedCaptions[0] ||
+                      es->fmt.i_codec == EsOutFourccClosedCaptions[1] ||
+                      es->fmt.i_codec == EsOutFourccClosedCaptions[2] ||
+                      es->fmt.i_codec == EsOutFourccClosedCaptions[3])
+            {
+                    /* We don't want to enable on initial create since p_master
+                       isn't set yet (otherwise we will think it's a standard
+                       ES_SUB stream and cause a resource leak) */
+                    return;
+            }
             else
             {
                 /* If there is no user preference, select the default subtitle 
@@ -2000,6 +2010,10 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 
         /* */
         es->pb_cc_present[i] = true;
+
+        /* Enable if user specified on command line */
+        if (p_sys->i_sub_last == i)
+            EsOutSelect(out, es->pp_cc_es[i], true);
     }
 
     vlc_mutex_unlock( &p_sys->lock );
