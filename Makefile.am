@@ -571,7 +571,8 @@ EXTRA_DIST += \
 EXTRA_DIST += \
 	extras/tools/bootstrap \
 	extras/tools/packages.mak \
-	extras/tools/tools.mak
+	extras/tools/tools.mak \
+	extras/tools/ragel-6.8-javacodegen.patch
 
 ###############################################################################
 # Various utilities ( editor syntax files, D-Bus controller ... )
