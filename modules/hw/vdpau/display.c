@@ -315,7 +315,11 @@ static void Wait(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
     }
 
     sys->current = pic;
-    (void) subpicture;
+
+    /* We already dealt with the subpicture in the Queue phase, so it's safe to
+       delete at this point */
+    if (subpicture)
+        subpicture_Delete(subpicture);
 }
 
 static int Control(vout_display_t *vd, int query, va_list ap)
