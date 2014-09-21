@@ -2745,7 +2745,7 @@ PKG_ENABLE_MODULES_VLC([THEORA], [], [ogg theoradec >= 1.0 theoraenc], [experime
 dnl
 dnl  Daala decoder plugin
 dnl
-PKG_ENABLE_MODULES_VLC([DAALA], [], [ogg daaladec], [experimental daala codec], [disabled])
+PKG_ENABLE_MODULES_VLC([DAALA], [], [ogg daaladec daalaenc], [experimental daala codec], [disabled])
 
 dnl
 dnl  schroedinger decoder plugin (for dirac format video)

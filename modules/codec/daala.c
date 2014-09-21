@@ -38,6 +38,9 @@
 
 #include <daala/codec.h>
 #include <daala/daaladec.h>
+#ifdef ENABLE_SOUT
+#include <daala/daalaenc.h>
+#endif
 
 #include <limits.h>
 
@@ -88,6 +91,22 @@ static picture_t *DecodePacket( decoder_t *, ogg_packet * );
 static void ParseDaalaComments( decoder_t * );
 static void daala_CopyPicture( picture_t *, od_img * );
 
+#ifdef ENABLE_SOUT
+static int  OpenEncoder( vlc_object_t *p_this );
+static void CloseEncoder( vlc_object_t *p_this );
+static block_t *Encode( encoder_t *p_enc, picture_t *p_pict );
+#endif
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+#define ENC_QUALITY_TEXT N_("Encoding quality")
+#define ENC_QUALITY_LONGTEXT N_( \
+  "Enforce a quality between 0 (lossless) and 511 (worst)." )
+#define ENC_KEYINT_TEXT N_("Keyframe interval")
+#define ENC_KEYINT_LONGTEXT N_( \
+  "Enforce a keyframe interval between 1 and 1000." )
+
 vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
@@ -102,7 +121,24 @@ vlc_module_begin ()
     set_callbacks( OpenPacketizer, CloseDecoder )
     add_shortcut( "daala" )
 
+#ifdef ENABLE_SOUT
+    add_submodule ()
+    set_description( N_("Daala video encoder") )
+    set_capability( "encoder", 150 )
+    set_callbacks( OpenEncoder, CloseEncoder )
+    add_shortcut( "daala" )
+
+#   define ENC_CFG_PREFIX "sout-daala-"
+    add_integer_with_range( ENC_CFG_PREFIX "quality", 30, 0, 511,
+                 ENC_QUALITY_TEXT, ENC_QUALITY_LONGTEXT, false )
+    add_integer_with_range( ENC_CFG_PREFIX "keyint", 256, 1, 1000,
+                 ENC_KEYINT_TEXT, ENC_KEYINT_LONGTEXT, false )
+#endif
 vlc_module_end ()
+
+static const char *const ppsz_enc_options[] = {
+    "quality", "keyint", NULL
+};
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -506,3 +542,181 @@ static void daala_CopyPicture( picture_t *p_pic,
         }
     }
 }
+
+#ifdef ENABLE_SOUT
+struct encoder_sys_t
+{
+    daala_info      di;                     /* daala bitstream settings */
+    daala_comment   dc;                     /* daala comment header */
+    daala_enc_ctx   *dcx;                   /* daala context */
+};
+
+static int OpenEncoder( vlc_object_t *p_this )
+{
+    encoder_t *p_enc = (encoder_t *)p_this;
+    encoder_sys_t *p_sys;
+    ogg_packet header;
+    int status;
+
+    if( p_enc->fmt_out.i_codec != VLC_CODEC_DAALA &&
+        !p_enc->b_force )
+    {
+        return VLC_EGENERIC;
+    }
+
+    /* Allocate the memory needed to store the encoder's structure */
+    p_sys = malloc( sizeof( encoder_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
+    p_enc->p_sys = p_sys;
+
+    p_enc->pf_encode_video = Encode;
+    p_enc->fmt_in.i_codec = VLC_CODEC_I420;
+    p_enc->fmt_out.i_codec = VLC_CODEC_DAALA;
+
+    config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
+
+    daala_info_init( &p_sys->di );
+
+    p_sys->di.pic_width = p_enc->fmt_in.video.i_visible_width;
+    p_sys->di.pic_height = p_enc->fmt_in.video.i_visible_height;
+
+    /* 420 */
+    p_sys->di.nplanes = 3;
+    for (int i = 0; i < p_sys->di.nplanes; i++)
+    {
+        p_sys->di.plane_info[i].ydec =
+        p_sys->di.plane_info[i].xdec = i > 0;
+    }
+    p_sys->di.frame_duration = 1;
+
+    if( !p_enc->fmt_in.video.i_frame_rate ||
+        !p_enc->fmt_in.video.i_frame_rate_base )
+    {
+        p_sys->di.timebase_numerator = 25;
+        p_sys->di.timebase_denominator = 1;
+    }
+    else
+    {
+        p_sys->di.timebase_numerator = p_enc->fmt_in.video.i_frame_rate;
+        p_sys->di.timebase_denominator = p_enc->fmt_in.video.i_frame_rate_base;
+    }
+
+    if( p_enc->fmt_in.video.i_sar_num > 0 && p_enc->fmt_in.video.i_sar_den > 0 )
+    {
+        unsigned i_dst_num, i_dst_den;
+        vlc_ureduce( &i_dst_num, &i_dst_den,
+                     p_enc->fmt_in.video.i_sar_num,
+                     p_enc->fmt_in.video.i_sar_den, 0 );
+        p_sys->di.pixel_aspect_numerator = i_dst_num;
+        p_sys->di.pixel_aspect_denominator = i_dst_den;
+    }
+    else
+    {
+        p_sys->di.pixel_aspect_numerator = 4;
+        p_sys->di.pixel_aspect_denominator = 3;
+    }
+
+    p_sys->di.keyframe_rate = var_GetInteger( p_enc, ENC_CFG_PREFIX "keyint" );
+
+    daala_enc_ctx *dcx;
+    p_sys->dcx = dcx = daala_encode_create( &p_sys->di );
+    if( !dcx )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
+
+    daala_comment_init( &p_sys->dc );
+
+    int i_quality = var_GetInteger( p_enc, ENC_CFG_PREFIX "quality" );
+    daala_encode_ctl( dcx, OD_SET_QUANT, &i_quality, sizeof(i_quality) );
+
+    /* Create and store headers */
+    while( ( status = daala_encode_flush_header( dcx, &p_sys->dc, &header ) ) )
+    {
+        if ( status < 0 )
+        {
+            CloseEncoder( p_this );
+            return VLC_EGENERIC;
+        }
+        if( xiph_AppendHeaders( &p_enc->fmt_out.i_extra,
+                                &p_enc->fmt_out.p_extra, header.bytes,
+                                header.packet ) )
+        {
+            p_enc->fmt_out.i_extra = 0;
+            p_enc->fmt_out.p_extra = NULL;
+        }
+    }
+    return VLC_SUCCESS;
+}
+
+static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
+{
+    encoder_sys_t *p_sys = p_enc->p_sys;
+    ogg_packet oggpacket;
+    block_t *p_block;
+    od_img img;
+
+    if( !p_pict ) return NULL;
+
+    const int i_width = p_sys->di.pic_width;
+    const int i_height = p_sys->di.pic_height;
+
+    /* Sanity check */
+    if( p_pict->p[0].i_pitch < i_width ||
+        p_pict->p[0].i_lines < i_height )
+    {
+        msg_Err( p_enc, "frame is smaller than encoding size"
+                 "(%ix%i->%ix%i) -> dropping frame",
+                 p_pict->p[0].i_pitch, p_pict->p[0].i_lines,
+                 i_width, i_height );
+        return NULL;
+    }
+
+    /* Daala is a one-frame-in, one-frame-out system. Submit a frame
+     * for compression and pull out the packet. */
+
+    img.nplanes = p_sys->di.nplanes;
+    img.width = i_width;
+    img.height = i_height;
+    for( int i = 0; i < img.nplanes; i++ )
+    {
+        img.planes[i].data = p_pict->p[i].p_pixels;
+        img.planes[i].xdec = p_sys->di.plane_info[i].xdec;
+        img.planes[i].ydec = p_sys->di.plane_info[i].ydec;
+        img.planes[i].xstride = 1;
+        img.planes[i].ystride = (img.width
+     + (1 << img.planes[i].xdec) - 1)  >>  img.planes[i].xdec;
+    }
+
+    if( daala_encode_img_in( p_sys->dcx, &img, 0 ) < 0 )
+    {
+        msg_Warn( p_enc, "failed encoding a frame" );
+        return NULL;
+    }
+
+    daala_encode_packet_out( p_sys->dcx, 0, &oggpacket );
+
+    /* Ogg packet to block */
+    p_block = block_Alloc( oggpacket.bytes );
+    memcpy( p_block->p_buffer, oggpacket.packet, oggpacket.bytes );
+    p_block->i_dts = p_block->i_pts = p_pict->date;
+
+    if( daala_packet_iskeyframe( oggpacket.packet, oggpacket.bytes ) )
+        p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+
+    return p_block;
+}
+
+static void CloseEncoder( vlc_object_t *p_this )
+{
+    encoder_t *p_enc = (encoder_t *)p_this;
+    encoder_sys_t *p_sys = p_enc->p_sys;
+
+    daala_info_clear(&p_sys->di);
+    daala_comment_clear(&p_sys->dc);
+    daala_encode_free(p_sys->dcx);
+    free( p_sys );
+}
+#endif
