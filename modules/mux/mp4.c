@@ -2651,9 +2651,9 @@ static bo_t *GetMfraBox(sout_mux_t *p_mux)
                 const mp4_fragindex_t *p_indexentry = &p_stream->p_indexentries[i_index];
                 bo_add_32be(tfra, p_indexentry->i_time);
                 bo_add_32be(tfra, p_indexentry->i_moofoffset);
-                assert(sizeof(p_indexentry->i_traf==1)); /* guard against sys changes */
-                assert(sizeof(p_indexentry->i_trun==1));
-                assert(sizeof(p_indexentry->i_sample==4));
+                assert(sizeof(p_indexentry->i_traf)==1); /* guard against sys changes */
+                assert(sizeof(p_indexentry->i_trun)==1);
+                assert(sizeof(p_indexentry->i_sample)==4);
                 bo_add_8(tfra, p_indexentry->i_traf);
                 bo_add_8(tfra, p_indexentry->i_trun);
                 bo_add_32be(tfra, p_indexentry->i_sample);
