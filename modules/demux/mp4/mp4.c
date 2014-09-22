@@ -1762,12 +1762,15 @@ static int TrackCreateChunksIndex( demux_t *p_demux,
         i_last = BOXDATA(p_stsc)->i_first_chunk[i_index] - 1;
     }
 
-    p_demux_track->chunk[0].i_sample_first = 0;
-    for( i_chunk = 1; i_chunk < p_demux_track->i_chunk_count; i_chunk++ )
+    if ( p_demux_track->i_chunk_count )
     {
-        p_demux_track->chunk[i_chunk].i_sample_first =
-            p_demux_track->chunk[i_chunk-1].i_sample_first +
-                p_demux_track->chunk[i_chunk-1].i_sample_count;
+        p_demux_track->chunk[0].i_sample_first = 0;
+        for( i_chunk = 1; i_chunk < p_demux_track->i_chunk_count; i_chunk++ )
+        {
+            p_demux_track->chunk[i_chunk].i_sample_first =
+                p_demux_track->chunk[i_chunk-1].i_sample_first +
+                    p_demux_track->chunk[i_chunk-1].i_sample_count;
+        }
     }
 
     msg_Dbg( p_demux, "track[Id 0x%x] read %d chunk",
