@@ -83,7 +83,7 @@ vlc_module_begin()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_description( N_("RDP Remote Desktop") )
-    set_capability( "access_demux", 10 )
+    set_capability( "access_demux", 0 )
 
     add_string( CFG_PREFIX "user", NULL, RDP_USER, RDP_USER, false )
         change_safe()
