@@ -1396,9 +1396,11 @@ static int MP4_ReadBox_avcC( stream_t *p_stream, MP4_Box_t *p_box )
         if( !p_avcC->i_sps_length || !p_avcC->sps )
             goto error;
 
-        for( i = 0; i < p_avcC->i_sps; i++ )
+        for( i = 0; i < p_avcC->i_sps && i_read; i++ )
         {
             MP4_GET2BYTES( p_avcC->i_sps_length[i] );
+            if ( p_avcC->i_sps_length[i] > i_read )
+                goto error;
             p_avcC->sps[i] = malloc( p_avcC->i_sps_length[i] );
             if( p_avcC->sps[i] )
                 memcpy( p_avcC->sps[i], p_peek, p_avcC->i_sps_length[i] );
@@ -1406,6 +1408,8 @@ static int MP4_ReadBox_avcC( stream_t *p_stream, MP4_Box_t *p_box )
             p_peek += p_avcC->i_sps_length[i];
             i_read -= p_avcC->i_sps_length[i];
         }
+        if ( i != p_avcC->i_sps )
+            goto error;
     }
 
     MP4_GET1BYTE( p_avcC->i_pps );
@@ -1417,9 +1421,11 @@ static int MP4_ReadBox_avcC( stream_t *p_stream, MP4_Box_t *p_box )
         if( !p_avcC->i_pps_length || !p_avcC->pps )
             goto error;
 
-        for( i = 0; i < p_avcC->i_pps; i++ )
+        for( i = 0; i < p_avcC->i_pps && i_read; i++ )
         {
             MP4_GET2BYTES( p_avcC->i_pps_length[i] );
+            if( p_avcC->i_pps_length[i] > i_read )
+                goto error;
             p_avcC->pps[i] = malloc( p_avcC->i_pps_length[i] );
             if( p_avcC->pps[i] )
                 memcpy( p_avcC->pps[i], p_peek, p_avcC->i_pps_length[i] );
@@ -1427,6 +1433,8 @@ static int MP4_ReadBox_avcC( stream_t *p_stream, MP4_Box_t *p_box )
             p_peek += p_avcC->i_pps_length[i];
             i_read -= p_avcC->i_pps_length[i];
         }
+        if ( i != p_avcC->i_pps )
+            goto error;
     }
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream,
@@ -1449,6 +1457,7 @@ static int MP4_ReadBox_avcC( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 
 error:
+    MP4_FreeBox_avcC( p_box );
     MP4_READBOX_EXIT( 0 );
 }
 
