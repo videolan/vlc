@@ -14,13 +14,18 @@ Decoder:
  * Support for ARIB B24 subtitles
  * Support for Daala video
 
+Encoder:
+ * Support for Daala video
+
 Demuxers:
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)
  * Opus in MPEG Transport Stream
+ * Daala in Ogg
 
 Muxers:
  * Added fragmented/streamable MP4 muxer
  * Opus in MPEG Transport Stream
+ * Daala in Ogg
 
 Service Discovery:
  * New NetBios service discovery using libdsm
