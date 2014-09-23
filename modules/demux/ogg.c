@@ -107,8 +107,11 @@ typedef struct
 } stream_header_t;
 
 #define VORBIS_HEADER_IDENTIFICATION 1
-#define VORBIS_HEADER_COMMENT 2
-#define VORBIS_HEADER_SETUP 3
+#define VORBIS_HEADER_COMMENT        2
+#define VORBIS_HEADER_SETUP          3
+#define VORBIS_HEADER_TO_FLAG(i)     (1 << (i - 1))
+#define VORBIS_HEADERS_VALID(p_stream) \
+    ((p_stream->special.vorbis.i_headers_flags & 0b111) == 0b111)
 
 /*****************************************************************************
  * Local prototypes
@@ -516,7 +519,7 @@ static int Demux( demux_t * p_demux )
 #ifdef HAVE_LIBVORBIS
                 case VLC_CODEC_VORBIS:
                 {
-                    if( p_stream->special.vorbis.b_invalid )
+                    if( !VORBIS_HEADERS_VALID(p_stream) )
                     {
                         msg_Err( p_demux, "missing vorbis headers, can't compute block size" );
                         break;
@@ -997,7 +1000,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
 #ifdef HAVE_LIBVORBIS
         else if ( p_stream->fmt.i_codec == VLC_CODEC_VORBIS &&
                   p_stream->special.vorbis.p_info &&
-                  !p_stream->special.vorbis.b_invalid &&
+                  VORBIS_HEADERS_VALID(p_stream) &&
                   p_stream->i_previous_granulepos > 0 )
         {
             long i_blocksize = vorbis_packet_blocksize(
@@ -2126,7 +2129,7 @@ static void Ogg_CleanSpecificData( logical_stream_t *p_stream )
     {
         FREENULL( p_stream->special.vorbis.p_info );
         FREENULL( p_stream->special.vorbis.p_comment );
-        p_stream->special.vorbis.b_invalid = false;
+        p_stream->special.vorbis.i_headers_flags = 0;
     }
 #else
     VLC_UNUSED( p_stream );
@@ -2578,7 +2581,6 @@ static void Ogg_DecodeVorbisHeader( logical_stream_t *p_stream,
         {
             FREENULL( p_stream->special.vorbis.p_info );
             FREENULL( p_stream->special.vorbis.p_comment );
-            p_stream->special.vorbis.b_invalid = true;
             break;
         }
         vorbis_info_init( p_stream->special.vorbis.p_info );
@@ -2587,12 +2589,13 @@ static void Ogg_DecodeVorbisHeader( logical_stream_t *p_stream,
 
     case VORBIS_HEADER_COMMENT:
     case VORBIS_HEADER_SETUP:
-        if ( p_stream->special.vorbis.p_info && ! p_stream->special.vorbis.b_invalid )
-        {
-            p_stream->special.vorbis.b_invalid = ( 0 != vorbis_synthesis_headerin(
-                p_stream->special.vorbis.p_info,
-                p_stream->special.vorbis.p_comment, p_oggpacket ) );
-        }
+        if ( !p_stream->special.vorbis.p_info ||
+             vorbis_synthesis_headerin(
+                 p_stream->special.vorbis.p_info,
+                 p_stream->special.vorbis.p_comment, p_oggpacket ) )
+            break;
+
+        p_stream->special.vorbis.i_headers_flags |= VORBIS_HEADER_TO_FLAG(i_number);
         // ft
 
     default:

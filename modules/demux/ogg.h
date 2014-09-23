@@ -127,7 +127,7 @@ typedef struct logical_stream_s
         {
             vorbis_info *p_info;
             vorbis_comment *p_comment;
-            bool b_invalid;
+            int i_headers_flags;
             int i_prev_blocksize;
         } vorbis;
 #endif
