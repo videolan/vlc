@@ -516,6 +516,11 @@ static int Demux( demux_t * p_demux )
 #ifdef HAVE_LIBVORBIS
                 case VLC_CODEC_VORBIS:
                 {
+                    if( p_stream->special.vorbis.b_invalid )
+                    {
+                        msg_Err( p_demux, "missing vorbis headers, can't compute block size" );
+                        break;
+                    }
                     long i_blocksize = vorbis_packet_blocksize(
                                 p_stream->special.vorbis.p_info, &dumb_packet );
                     if ( i_prev_blocksize )
