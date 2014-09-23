@@ -87,6 +87,8 @@ void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar )
 
     vlc_array_clear( &p_jar->cookies );
     vlc_mutex_destroy( &p_jar->lock );
+
+    free( p_jar );
 }
 
 bool vlc_http_cookies_append( vlc_http_cookie_jar_t * p_jar, const char * psz_cookie_header, const vlc_url_t *p_url )
