@@ -3053,7 +3053,7 @@ static void Ogg_ReadSkeletonIndex( demux_t *p_demux, ogg_packet *p_oggpacket )
             break;
         }
     }
-    if ( !p_stream ) return;
+    if ( !p_stream || !p_stream->p_skel ) return;
     uint64_t i_keypoints = GetQWLE( &p_oggpacket->packet[10] );
     msg_Dbg( p_demux, "%" PRIi64 " index data for %" PRIi32, i_keypoints, i_serialno );
     if ( !i_keypoints ) return;
