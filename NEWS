@@ -21,6 +21,7 @@ Demuxers:
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)
  * Opus in MPEG Transport Stream
  * Daala in Ogg
+ * Support EIA-608 subtitles in MP4/mov
 
 Muxers:
  * Added fragmented/streamable MP4 muxer
