@@ -115,6 +115,7 @@ static void MP4_TrackCreate ( demux_t *, mp4_track_t *, MP4_Box_t  *, bool b_for
 static int MP4_frg_TrackCreate( demux_t *, mp4_track_t *, MP4_Box_t *);
 static void MP4_TrackDestroy(  mp4_track_t * );
 
+static block_t * MP4_Block_Read( demux_t *, const mp4_track_t *, int );
 static void MP4_Block_Send( demux_t *, mp4_track_t *, block_t * );
 
 static int  MP4_TrackSelect ( demux_t *, mp4_track_t *, mtime_t );
@@ -389,6 +390,31 @@ static void CreateTracksFromSmooBox( demux_t *p_demux )
             p_track->p_es = es_out_Add( p_demux->out, &p_track->fmt );
         }
     }
+}
+
+static block_t * MP4_Block_Read( demux_t *p_demux, const mp4_track_t *p_track, int i_size )
+{
+    block_t *p_block = stream_Block( p_demux->s, i_size );
+    if ( !p_block )
+        return NULL;
+
+    /* might have some encap */
+    if( p_track->fmt.i_cat == SPU_ES )
+    {
+        switch( p_track->fmt.i_codec )
+        {
+            case VLC_CODEC_TX3G:
+            case VLC_CODEC_SPU:
+            /* accept as-is */
+            break;
+
+        default:
+            p_block->i_buffer = 0;
+            break;
+        }
+    }
+
+    return p_block;
 }
 
 static void MP4_Block_Send( demux_t *p_demux, mp4_track_t *p_track, block_t *p_block )
@@ -933,18 +959,12 @@ static int Demux( demux_t *p_demux )
         }
 
         /* now read pes */
-        if( !(p_block = stream_Block( p_demux->s, i_samplessize )) )
+        if( !(p_block = MP4_Block_Read( p_demux, tk, i_samplessize )) )
         {
             msg_Warn( p_demux, "track[0x%x] will be disabled (eof?)",
                       tk->i_track_ID );
             MP4_TrackUnselect( p_demux, tk );
             goto end;
-        }
-        else if( tk->fmt.i_cat == SPU_ES )
-        {
-            if ( tk->fmt.i_codec != VLC_CODEC_TX3G &&
-                 tk->fmt.i_codec != VLC_CODEC_SPU )
-                p_block->i_buffer = 0;
         }
 
         /* dts */
@@ -4912,7 +4932,7 @@ static int LeafParseTRUN( demux_t *p_demux, mp4_track_t *p_track,
             return VLC_EGENERIC;
         }
 
-        block_t *p_block = stream_Block( p_demux->s, __MIN( len, INT32_MAX ) );
+        block_t *p_block = MP4_Block_Read( p_demux, p_track, __MIN( len, INT32_MAX ) );
         uint32_t i_read = ( p_block ) ? p_block->i_buffer : 0;
         if( i_read < len )
         {
@@ -5139,7 +5159,7 @@ static int LeafParseMDATwithMOOV( demux_t *p_demux )
 
                 /* now read pes */
 
-                if( !(p_block = stream_Block( p_demux->s, i_samplessize )) )
+                if( !(p_block = MP4_Block_Read( p_demux, p_track, i_samplessize )) )
                 {
                     uint64_t i_pos;
                     if ( MP4_stream_Tell( p_demux->s, &i_pos ) )
@@ -5148,12 +5168,6 @@ static int LeafParseMDATwithMOOV( demux_t *p_demux )
                         msg_Err( p_demux, "stream block error %"PRId64" %"PRId64, i_pos, i_pos - i_current_pos );
                     }
                     goto error;
-                }
-                else if( p_track->fmt.i_cat == SPU_ES )
-                {
-                    if ( p_track->fmt.i_codec != VLC_CODEC_TX3G &&
-                         p_track->fmt.i_codec != VLC_CODEC_SPU )
-                        p_block->i_buffer = 0;
                 }
 
                 i_nb_samples += i_samplescounttoread;
