@@ -215,6 +215,9 @@
 #define ATOM_tx3g VLC_FOURCC( 't', 'x', '3', 'g' )
 #define ATOM_subp VLC_FOURCC( 's', 'u', 'b', 'p' )
 #define ATOM_sbtl VLC_FOURCC( 's', 'b', 't', 'l' )
+#define ATOM_clcp VLC_FOURCC( 'c', 'l', 'c', 'p' )
+#define ATOM_c608 VLC_FOURCC( 'c', '6', '0', '8' )
+#define ATOM_c708 VLC_FOURCC( 'c', '7', '0', '8' )
 
 #define ATOM_0xa9nam VLC_FOURCC( 0xa9, 'n', 'a', 'm' )
 #define ATOM_0xa9aut VLC_FOURCC( 0xa9, 'a', 'u', 't' )

@@ -392,6 +392,62 @@ static void CreateTracksFromSmooBox( demux_t *p_demux )
     }
 }
 
+static block_t * MP4_EIA608_Convert( block_t * p_block )
+{
+    /* Rebuild codec data from encap */
+    size_t i_copied = 0;
+    size_t i_remaining = p_block->i_buffer;
+    uint32_t i_bytes = 0;
+    block_t *p_newblock;
+
+    if ( i_remaining < 10 ||
+         !(i_bytes = GetDWBE(p_block->p_buffer)) ||
+         (i_bytes + 8 > i_remaining) ||
+         memcmp("cdat", &p_block->p_buffer[4], 4) ||
+         !(p_newblock = block_Alloc( i_remaining * 3 - 8 )) )
+    {
+        p_block->i_buffer = 0;
+        return p_block;
+    }
+
+    uint8_t *p_write = p_newblock->p_buffer;
+    uint8_t *p_read = &p_block->p_buffer[8];
+    i_bytes -= 8;
+    i_remaining -= 8;
+
+    do
+    {
+        p_write[i_copied++] = 0; /* cc1 == field 0 */
+        p_write[i_copied++] = p_read[0];
+        p_write[i_copied++] = p_read[1];
+        p_read += 2;
+        i_bytes -= 2;
+        i_remaining -= 2;
+    } while( i_bytes >= 2 );
+
+    if ( i_remaining >= 10 &&
+         (i_bytes = GetDWBE(p_read)) &&
+         (i_bytes + 8 <= i_remaining) &&
+         !memcmp("cdt2", &p_read[4], 4) )
+    {
+        p_read += 8;
+        i_bytes -= 8;
+        i_remaining -= 8;
+        do
+        {
+            p_write[i_copied++] = 0; /* cc1 == field 0 */
+            p_write[i_copied++] = p_read[0];
+            p_write[i_copied++] = p_read[1];
+            p_read += 2;
+            i_bytes -= 2;
+        } while( i_bytes >= 2 );
+    }
+
+    block_Release( p_block );
+    p_newblock->i_buffer = i_copied;
+    return p_newblock;
+}
+
 static block_t * MP4_Block_Read( demux_t *p_demux, const mp4_track_t *p_track, int i_size )
 {
     block_t *p_block = stream_Block( p_demux->s, i_size );
@@ -407,7 +463,9 @@ static block_t * MP4_Block_Read( demux_t *p_demux, const mp4_track_t *p_track, i
             case VLC_CODEC_SPU:
             /* accept as-is */
             break;
-
+            case VLC_CODEC_EIA608_1:
+                p_block = MP4_EIA608_Convert( p_block );
+            break;
         default:
             p_block->i_buffer = 0;
             break;
@@ -2438,7 +2496,6 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         break;
     }
 
-
     /* It's a little ugly but .. there are special cases */
     switch( p_sample->i_type )
     {
@@ -2514,6 +2571,12 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
 
         case( VLC_FOURCC( 's', '2', '6', '3' ) ):
             p_track->fmt.i_codec = VLC_CODEC_H263;
+            break;
+
+        case( ATOM_c608 ): /* EIA608 closed captions */
+        //case( ATOM_c708 ): /* EIA708 closed captions */
+            p_track->fmt.i_codec = VLC_CODEC_EIA608_1;
+            p_track->fmt.i_cat = SPU_ES;
             break;
 
         case( VLC_FOURCC( 't', 'e', 'x', 't' ) ):
@@ -3216,6 +3279,11 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
         case( ATOM_subp ):
         case( ATOM_sbtl ):
             p_track->fmt.i_codec = VLC_CODEC_TX3G;
+            p_track->fmt.i_cat = SPU_ES;
+            break;
+
+        /* closed captions */
+        case( ATOM_clcp ):
             p_track->fmt.i_cat = SPU_ES;
             break;
 
