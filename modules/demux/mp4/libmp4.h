@@ -1376,6 +1376,12 @@ typedef struct MP4_Box_s
     uint32_t     i_type;
     uint32_t     i_shortsize;
 
+    enum
+    {
+        BOX_FLAG_NONE = 0,
+        BOX_FLAG_INCOMPLETE,
+    }            e_flags;
+
     UUID_t       i_uuid;  /* Set if i_type == "uuid" */
 
     uint64_t     i_size; /* always set so use it */
