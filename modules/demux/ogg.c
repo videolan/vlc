@@ -425,6 +425,9 @@ static int Demux( demux_t * p_demux )
                     p_sys->current_page.body_len )
         );
 
+        const int i_page_packets = ogg_page_packets( &p_sys->current_page );
+        bool b_doprepcr = false;
+
         if ( p_stream->i_pcr < VLC_TS_0 && ogg_page_granulepos( &p_sys->current_page ) > 0 )
         {
             // PASS 0
@@ -433,14 +436,32 @@ static int Demux( demux_t * p_demux )
                  p_stream->fmt.i_codec == VLC_CODEC_SPEEX ||
                  p_stream->fmt.i_cat == VIDEO_ES )
             {
-                assert( p_stream->p_prepcr_blocks == NULL );
-                p_stream->i_prepcr_blocks = 0;
-                p_stream->p_prepcr_blocks = malloc( sizeof(block_t *) * ogg_page_packets( &p_sys->current_page ) );
+                assert( p_stream->prepcr.pp_blocks == NULL );
+                b_doprepcr = true;
             }
         }
 
+        int i_real_page_packets = 0;
         while( ogg_stream_packetout( &p_stream->os, &oggpacket ) > 0 )
         {
+            i_real_page_packets++;
+            int i_max_packets = __MAX(i_page_packets, i_real_page_packets);
+            if ( b_doprepcr && p_stream->prepcr.i_size < i_max_packets )
+            {
+                /* always double alloc for performance */
+                i_max_packets = __MAX( i_max_packets << 1, 255 );
+                /* alloc or realloc */
+                block_t **pp_realloc = realloc( p_stream->prepcr.pp_blocks,
+                                                sizeof(block_t *) * i_max_packets );
+                if ( !pp_realloc )
+                {
+                    /* drop it then */
+                    continue;
+                }
+                p_stream->prepcr.i_size = i_max_packets;
+                p_stream->prepcr.pp_blocks = pp_realloc;
+            }
+
             /* Read info from any secondary header packets, if there are any */
             if( p_stream->i_secondary_header_packets > 0 )
             {
@@ -489,10 +510,9 @@ static int Demux( demux_t * p_demux )
             }
 
             Ogg_DecodePacket( p_demux, p_stream, &oggpacket );
-
         }
 
-        if ( p_stream->p_prepcr_blocks )
+        if ( p_stream->prepcr.pp_blocks )
         {
             int64_t pagestamp = Oggseek_GranuleToAbsTimestamp( p_stream, ogg_page_granulepos(  &p_sys->current_page ), false );
             p_stream->i_previous_pcr = pagestamp;
@@ -500,9 +520,9 @@ static int Demux( demux_t * p_demux )
             int i_prev_blocksize = 0;
 #endif
             // PASS 1
-            for( int i=0; i<p_stream->i_prepcr_blocks; i++ )
+            for( int i=0; i<p_stream->prepcr.i_used; i++ )
             {
-                block_t *p_block = p_stream->p_prepcr_blocks[i];
+                block_t *p_block = p_stream->prepcr.pp_blocks[i];
                 ogg_packet dumb_packet;
                 dumb_packet.bytes = p_block->i_buffer;
                 dumb_packet.packet = p_block->p_buffer;
@@ -538,9 +558,9 @@ static int Demux( demux_t * p_demux )
 
             // PASS 2
             bool b_fixed = false;
-            for( int i=p_stream->i_prepcr_blocks - 1; i>=0; i-- )
+            for( int i=p_stream->prepcr.i_used - 1; i>=0; i-- )
             {
-                block_t *p_block = p_stream->p_prepcr_blocks[i];
+                block_t *p_block = p_stream->prepcr.pp_blocks[i];
                 switch( p_stream->fmt.i_codec )
                 {
                 case VLC_CODEC_SPEEX:
@@ -574,8 +594,8 @@ static int Demux( demux_t * p_demux )
                 p_stream->i_previous_granulepos = ogg_page_granulepos( &p_sys->current_page );
             }
 
-            FREENULL( p_stream->p_prepcr_blocks );
-            p_stream->i_prepcr_blocks = 0;
+            FREENULL(p_stream->prepcr.pp_blocks);
+            p_stream->prepcr.i_used = 0;
 
             Ogg_SendOrQueueBlocks( p_demux, p_stream, NULL );
 
@@ -668,8 +688,9 @@ static void Ogg_ResetStream( logical_stream_t *p_stream )
     p_stream->i_previous_granulepos = -1;
     p_stream->i_previous_pcr = VLC_TS_UNKNOWN;
     ogg_stream_reset( &p_stream->os );
-    FREENULL( p_stream->p_prepcr_blocks );
-    p_stream->i_prepcr_blocks = 0;
+    FREENULL( p_stream->prepcr.pp_blocks );
+    p_stream->prepcr.i_size = 0;
+    p_stream->prepcr.i_used = 0;
 }
 
 static void Ogg_ResetStreamsHelper( demux_sys_t *p_sys )
@@ -1057,13 +1078,13 @@ static void Ogg_SendOrQueueBlocks( demux_t *p_demux, logical_stream_t *p_stream,
                                    block_t *p_block )
 {
     demux_sys_t *p_ogg = p_demux->p_sys;
-    if ( !p_stream->p_es || p_stream->p_prepcr_blocks || p_stream->i_pcr == VLC_TS_UNKNOWN )
+    if ( !p_stream->p_es || p_stream->prepcr.pp_blocks || p_stream->i_pcr == VLC_TS_UNKNOWN )
     {
         if ( !p_block ) return;
-        if ( p_stream->p_prepcr_blocks )
+        if ( p_stream->prepcr.pp_blocks )
         {
-            assert( p_stream->p_prepcr_blocks );
-            p_stream->p_prepcr_blocks[p_stream->i_prepcr_blocks++] = p_block;
+            assert( p_stream->prepcr.i_size );
+            p_stream->prepcr.pp_blocks[p_stream->prepcr.i_used++] = p_block;
         }
         DemuxDebug( msg_Dbg( p_demux, "block prepcr append > pts %"PRId64" spcr %"PRId64" pcr %"PRId64,
                              p_block->i_pts, p_stream->i_pcr, p_ogg->i_pcr ); )
@@ -2168,7 +2189,7 @@ static void Ogg_LogicalStreamDelete( demux_t *p_demux, logical_stream_t *p_strea
         block_ChainRelease( p_stream->p_preparse_block );
         p_stream->p_preparse_block = NULL;
     }
-    free( p_stream->p_prepcr_blocks );
+    free( p_stream->prepcr.pp_blocks );
 
     free( p_stream );
 }
@@ -2575,7 +2596,7 @@ static void Ogg_DecodeVorbisHeader( logical_stream_t *p_stream,
     switch( i_number )
     {
     case VORBIS_HEADER_IDENTIFICATION:
-        p_stream->special.vorbis.p_info = malloc( sizeof(vorbis_info) );
+        p_stream->special.vorbis.p_info = calloc( 1, sizeof(vorbis_info) );
         p_stream->special.vorbis.p_comment = malloc( sizeof(vorbis_comment) );
         if ( !p_stream->special.vorbis.p_info || !p_stream->special.vorbis.p_comment )
         {

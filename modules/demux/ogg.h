@@ -115,8 +115,12 @@ typedef struct logical_stream_s
     int i_secondary_header_packets;
 
     /* All blocks which can't be sent because track PCR isn't known yet */
-    block_t **p_prepcr_blocks;
-    int i_prepcr_blocks;
+    struct
+    {
+        block_t **pp_blocks;
+        uint8_t i_size; /* max 255 */
+        uint8_t i_used;
+    } prepcr;
     /* All blocks that are queued because ES isn't created yet */
     block_t *p_preparse_block;
 
