@@ -123,7 +123,7 @@ int MP4_ReadBoxCommon( stream_t *p_stream, MP4_Box_t *p_box )
     {
         CreateUUID( &p_box->i_uuid, p_box->i_type );
     }
-#ifdef MP4_VERBOSE
+#ifdef MP4_ULTRA_VERBOSE
     if( p_box->i_size )
     {
         if MP4_BOX_TYPE_ASCII()
@@ -284,7 +284,7 @@ static int MP4_ReadBoxSkip( stream_t *p_stream, MP4_Box_t *p_box )
     }
 
     /* Nothing to do */
-#ifdef MP4_VERBOSE
+#ifdef MP4_ULTRA_VERBOSE
     if MP4_BOX_TYPE_ASCII()
         msg_Dbg( p_stream, "skip box: \"%4.4s\"", (char*)&p_box->i_type );
     else

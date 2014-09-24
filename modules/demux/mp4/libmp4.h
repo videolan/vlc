@@ -278,6 +278,7 @@
 /* Do you want some debug information on all read boxes ? */
 #ifndef NDEBUG
 # define MP4_VERBOSE  1
+//# define MP4_ULTRA_VERBOSE  1
 #endif
 
 struct MP4_Box_s;
