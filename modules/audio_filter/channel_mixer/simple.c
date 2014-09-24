@@ -281,13 +281,15 @@ static int OpenFilter( vlc_object_t *p_this )
             == p_filter->fmt_out.audio.i_original_channels )
         return VLC_EGENERIC;
 
-    const bool b_input_7_0 = (input & ~AOUT_CHAN_LFE) == AOUT_CHANS_7_0;
     const bool b_input_6_1 = input == AOUT_CHANS_6_1_MIDDLE;
-    const bool b_input_5_0 = input == AOUT_CHANS_5_0
+    const bool b_input_4_center_rear = input == AOUT_CHANS_4_CENTER_REAR;
+
+    input &= ~AOUT_CHAN_LFE;
+
+    const bool b_input_7_x = input == AOUT_CHANS_7_0;
+    const bool b_input_5_x = input == AOUT_CHANS_5_0
                           || input == AOUT_CHANS_5_0_MIDDLE;
-    const bool b_input_4_center_rear =
-                          (input & ~AOUT_CHAN_LFE) == AOUT_CHANS_4_CENTER_REAR;
-    const bool b_input_3_0 = (input & ~AOUT_CHAN_LFE) == AOUT_CHANS_3_0;
+    const bool b_input_3_x = input == AOUT_CHANS_3_0;
 
     /*
      * TODO: We don't support any 8.1 input
@@ -296,41 +298,41 @@ static int OpenFilter( vlc_object_t *p_this )
      */
     if( output == AOUT_CHAN_CENTER )
     {
-        if( b_input_7_0 )
+        if( b_input_7_x )
             do_work = DoWork_7_x_to_1_0;
-        else if( b_input_5_0 )
+        else if( b_input_5_x )
             do_work = DoWork_5_x_to_1_0;
         else if( b_input_4_center_rear )
             do_work = DoWork_4_0_to_1_0;
-        else if( b_input_3_0 )
+        else if( b_input_3_x )
             do_work = DoWork_3_x_to_1_0;
         else
             do_work = DoWork_2_x_to_1_0;
     }
     else if( output == AOUT_CHANS_2_0 )
     {
-        if( b_input_7_0 )
+        if( b_input_7_x )
             do_work = DoWork_7_x_to_2_0;
         else if( b_input_6_1 )
             do_work = DoWork_6_1_to_2_0;
-        else if( b_input_5_0 )
+        else if( b_input_5_x )
             do_work = DoWork_5_x_to_2_0;
         else if( b_input_4_center_rear )
             do_work = DoWork_4_0_to_2_0;
-        else if( b_input_3_0 )
+        else if( b_input_3_x )
             do_work = DoWork_3_x_to_2_0;
     }
     else if( output == AOUT_CHANS_4_0 )
     {
-        if( b_input_7_0 )
+        if( b_input_7_x )
             do_work = DoWork_7_x_to_4_0;
-        else if( b_input_5_0 )
+        else if( b_input_5_x )
             do_work = DoWork_5_x_to_4_0;
     }
     else if( (output & ~AOUT_CHAN_LFE) == AOUT_CHANS_5_0 ||
              (output & ~AOUT_CHAN_LFE) == AOUT_CHANS_5_0_MIDDLE )
     {
-        if( b_input_7_0 )
+        if( b_input_7_x )
             do_work = DoWork_7_x_to_5_x;
         else if( b_input_6_1 )
             do_work = DoWork_6_1_to_5_x;
