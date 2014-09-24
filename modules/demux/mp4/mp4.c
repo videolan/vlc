@@ -1009,18 +1009,21 @@ static int Demux( demux_t *p_demux )
         {
             if( stream_Seek( p_demux->s, i_candidate_pos ) )
             {
-                msg_Warn( p_demux, "track[0x%x] will be disabled (eof?)",
-                          tk->i_track_ID );
+                msg_Warn( p_demux, "track[0x%x] will be disabled (eof?)"
+                          ": Failed to seek to %"PRIu64,
+                          tk->i_track_ID, i_candidate_pos );
                 MP4_TrackUnselect( p_demux, tk );
                 goto end;
             }
+            i_current_pos = i_candidate_pos;
         }
 
         /* now read pes */
         if( !(p_block = MP4_Block_Read( p_demux, tk, i_samplessize )) )
         {
-            msg_Warn( p_demux, "track[0x%x] will be disabled (eof?)",
-                      tk->i_track_ID );
+            msg_Warn( p_demux, "track[0x%x] will be disabled (eof?)"
+                      ": Failed to read %d bytes sample at %"PRIu64,
+                      tk->i_track_ID, i_samplessize, i_current_pos );
             MP4_TrackUnselect( p_demux, tk );
             goto end;
         }
