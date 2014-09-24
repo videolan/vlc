@@ -3374,7 +3374,9 @@ static const struct
 {
     /* Containers */
     { ATOM_moov,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, 0 },
+    { ATOM_foov,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, 0 },
     { ATOM_trak,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_moov },
+    { ATOM_trak,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_foov },
     { ATOM_mdia,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_trak },
     { ATOM_moof,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, 0 },
     { ATOM_minf,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_mdia },
@@ -3398,6 +3400,7 @@ static const struct
     { ATOM_ftyp,    MP4_ReadBox_ftyp,         MP4_FreeBox_ftyp, 0 },
     { ATOM_cmov,    MP4_ReadBox_cmov,         MP4_FreeBox_Common, 0 },
     { ATOM_mvhd,    MP4_ReadBox_mvhd,         MP4_FreeBox_Common, ATOM_moov },
+    { ATOM_mvhd,    MP4_ReadBox_mvhd,         MP4_FreeBox_Common, ATOM_foov },
     { ATOM_tkhd,    MP4_ReadBox_tkhd,         MP4_FreeBox_Common, ATOM_trak },
     { ATOM_mdhd,    MP4_ReadBox_mdhd,         MP4_FreeBox_Common, ATOM_mdia },
     { ATOM_hdlr,    MP4_ReadBox_hdlr,         MP4_FreeBox_hdlr,   ATOM_mdia },
