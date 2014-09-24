@@ -167,16 +167,16 @@ static int Open( vlc_object_t *p_this )
 
     switch( p_dec->fmt_in.i_codec )
     {
-        case VLC_FOURCC('c','c','1',' '):
+        case VLC_CODEC_EIA608_1:
             i_field = 0; i_channel = 1;
             break;
-        case VLC_FOURCC('c','c','2',' '):
+        case VLC_CODEC_EIA608_2:
             i_field = 0; i_channel = 2;
             break;
-        case VLC_FOURCC('c','c','3',' '):
+        case VLC_CODEC_EIA608_3:
             i_field = 1; i_channel = 1;
             break;
-        case VLC_FOURCC('c','c','4',' '):
+        case VLC_CODEC_EIA608_4:
             i_field = 1; i_channel = 2;
             break;
 
