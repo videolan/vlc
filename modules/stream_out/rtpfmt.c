@@ -926,32 +926,32 @@ static int rtp_packetize_pcm(sout_stream_id_sys_t *id, block_t *in)
 }
 
 /* split and convert from little endian to network byte order */
-static int rtp_packetize_swab( sout_stream_id_sys_t *id, block_t *in )
+static int rtp_packetize_swab(sout_stream_id_sys_t *id, block_t *in)
 {
-    int     i_max   = rtp_mtu (id); /* payload max in one packet */
-    int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
+    unsigned max = rtp_mtu(id);
 
-    uint8_t *p_data = in->p_buffer;
-    int     i_data  = in->i_buffer;
-    int     i;
-
-    for( i = 0; i < i_count; i++ )
+    while (in->i_buffer > 0)
     {
-        int           i_payload = __MIN( i_max, i_data );
-        block_t *out = block_Alloc( 12 + i_payload );
+        unsigned payload = (max < in->i_buffer) ? max : in->i_buffer;
+        unsigned duration = (in->i_length * payload) / in->i_buffer;
+        bool marker = (in->i_flags & BLOCK_FLAG_DISCONTINUITY) != 0;
 
-        /* rtp common header */
-        rtp_packetize_common( id, out, (i == i_count - 1),
-                      (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts) );
-        swab( p_data, out->p_buffer + 12, i_payload );
+        block_t *out = block_Alloc(12 + payload);
+        if (unlikely(out == NULL))
+        {
+            block_Release(in);
+            return VLC_ENOMEM;
+        }
 
-        out->i_dts    = in->i_dts + i * in->i_length / i_count;
-        out->i_length = in->i_length / i_count;
+        rtp_packetize_common(id, out, marker, in->i_pts);
+        swab(in->p_buffer, out->p_buffer + 12, payload);
+        rtp_packetize_send(id, out);
 
-        rtp_packetize_send( id, out );
-
-        p_data += i_payload;
-        i_data -= i_payload;
+        in->p_buffer += payload;
+        in->i_buffer -= payload;
+        in->i_pts += duration;
+        in->i_length -= duration;
+        in->i_flags &= ~BLOCK_FLAG_DISCONTINUITY;
     }
 
     block_Release(in);
