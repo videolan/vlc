@@ -1649,7 +1649,6 @@ void rtp_packetize_common( sout_stream_id_sys_t *id, block_t *out,
 
     memcpy( out->p_buffer + 8, id->ssrc, 4 );
 
-    out->i_buffer = 12;
     id->i_sequence++;
 }
 

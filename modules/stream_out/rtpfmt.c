@@ -609,7 +609,6 @@ int rtp_packetize_xiph_config( sout_stream_id_sys_t *id, const char *fmtp,
         SetWBE( out->p_buffer + 16, i_payload);
         memcpy( &out->p_buffer[18], p_data, i_payload );
 
-        out->i_buffer   = 18 + i_payload;
         out->i_dts    = i_pts;
 
         rtp_packetize_send( id, out );
@@ -666,7 +665,6 @@ static int rtp_packetize_xiph( sout_stream_id_sys_t *id, block_t *in )
         SetWBE( out->p_buffer + 16, i_payload);
         memcpy( &out->p_buffer[18], p_data, i_payload );
 
-        out->i_buffer   = 18 + i_payload;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -702,7 +700,6 @@ static int rtp_packetize_mpa( sout_stream_id_sys_t *id, block_t *in )
         SetWBE( out->p_buffer + 14, i * i_max );
         memcpy( &out->p_buffer[16], p_data, i_payload );
 
-        out->i_buffer   = 16 + i_payload;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -802,7 +799,6 @@ static int rtp_packetize_mpv( sout_stream_id_sys_t *id, block_t *in )
 
         memcpy( &out->p_buffer[16], p_data, i_payload );
 
-        out->i_buffer   = 16 + i_payload;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -839,7 +835,6 @@ static int rtp_packetize_ac3( sout_stream_id_sys_t *id, block_t *in )
         /* data */
         memcpy( &out->p_buffer[14], p_data, i_payload );
 
-        out->i_buffer   = 14 + i_payload;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -872,7 +867,6 @@ static int rtp_packetize_split( sout_stream_id_sys_t *id, block_t *in )
                       (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts) );
         memcpy( &out->p_buffer[12], p_data, i_payload );
 
-        out->i_buffer   = 12 + i_payload;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -906,7 +900,6 @@ static int rtp_packetize_swab( sout_stream_id_sys_t *id, block_t *in )
                       (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts) );
         swab( p_data, out->p_buffer + 12, i_payload );
 
-        out->i_buffer = 12 + i_payload;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -960,7 +953,6 @@ static int rtp_packetize_mp4a_latm( sout_stream_id_sys_t *id, block_t *in )
 
         memcpy( &out->p_buffer[12+latmhdrsize], p_data, i_payload );
 
-        out->i_buffer   = 12 + latmhdrsize + i_payload;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -1000,7 +992,6 @@ static int rtp_packetize_mp4a( sout_stream_id_sys_t *id, block_t *in )
 
         memcpy( &out->p_buffer[16], p_data, i_payload );
 
-        out->i_buffer   = 16 + i_payload;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -1065,7 +1056,6 @@ static int rtp_packetize_h263( sout_stream_id_sys_t *id, block_t *in )
         SetWBE( out->p_buffer + 12, h );
         memcpy( &out->p_buffer[RTP_H263_PAYLOAD_START], p_data, i_payload );
 
-        out->i_buffer = RTP_H263_PAYLOAD_START + i_payload;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -1109,7 +1099,6 @@ rtp_packetize_h264_nal( sout_stream_id_sys_t *id,
 
         /* */
         rtp_packetize_common( id, out, b_last, i_pts );
-        out->i_buffer = 12 + i_data;
 
         memcpy( &out->p_buffer[12], p_data, i_data );
 
@@ -1134,8 +1123,6 @@ rtp_packetize_h264_nal( sout_stream_id_sys_t *id,
             /* */
             rtp_packetize_common( id, out, (b_last && i_payload == i_data),
                                     i_pts );
-            out->i_buffer = 14 + i_payload;
-
             /* FU indicator */
             out->p_buffer[12] = 0x00 | (i_nal_hdr & 0x60) | 28;
             /* FU header */
@@ -1218,7 +1205,7 @@ static int rtp_packetize_amr( sout_stream_id_sys_t *id, block_t *in )
         /* FIXME: are we fed multiple frames ? */
         memcpy( &out->p_buffer[14], p_data+1, i_payload-1 );
 
-        out->i_buffer   = 14 + i_payload-1;
+        out->i_buffer--; /* FIXME? */
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -1269,7 +1256,6 @@ static int rtp_packetize_t140( sout_stream_id_sys_t *id, block_t *in )
         rtp_packetize_common( id, out, 0, in->i_pts + i_packet );
         memcpy( out->p_buffer + 12, p_data, i_payload );
 
-        out->i_buffer = 12 + i_payload;
         out->i_dts    = in->i_pts;
         out->i_length = 0;
 
@@ -1352,7 +1338,6 @@ static int rtp_packetize_spx( sout_stream_id_sys_t *id, block_t *in )
     /* Copy the Speex payload to the p_output buffer */
     memcpy( &p_out->p_buffer[12], p_buffer, i_data_size );
 
-    p_out->i_buffer = 12 + i_payload_size;
     p_out->i_dts = in->i_dts;
     p_out->i_length = in->i_length;
     block_Release(in);
@@ -1382,7 +1367,6 @@ static int rtp_packetize_g726( sout_stream_id_sys_t *id, block_t *in, int i_pad 
 
         memcpy( &out->p_buffer[12], p_data, i_payload );
 
-        out->i_buffer   = 12 + i_payload;
         out->i_dts    = in->i_dts + i_packet++ * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -1455,7 +1439,6 @@ static int rtp_packetize_vp8( sout_stream_id_sys_t *id, block_t *in )
                       (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts) );
         memcpy( &out->p_buffer[RTP_VP8_PAYLOAD_START], p_data, i_payload );
 
-        out->i_buffer = RTP_VP8_PAYLOAD_START + i_payload;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -1638,7 +1621,6 @@ static int rtp_packetize_jpeg( sout_stream_id_sys_t *id, block_t *in )
                       (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts) );
         memcpy( p, p_data, i_payload );
 
-        out->i_buffer = 12 + hdr_size + i_payload;
         out->i_dts    = in->i_dts;
         out->i_length = in->i_length;
 
