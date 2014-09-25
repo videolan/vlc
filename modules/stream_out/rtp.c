@@ -1265,14 +1265,13 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                  block_t *p_buffer )
 {
-    block_t *p_next;
-
     assert( p_stream->p_sys->p_mux == NULL );
     (void)p_stream;
 
     while( p_buffer != NULL )
     {
-        p_next = p_buffer->p_next;
+        block_t *p_next = p_buffer->p_next;
+        p_buffer->p_next = NULL;
 
         /* Send a Vorbis/Theora Packed Configuration packet (RFC 5215 §3.1)
          * as the first packet of the stream */
@@ -1288,7 +1287,6 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         if( id->rtp_fmt.pf_packetize( id, p_buffer ) )
             break;
 
-        block_Release( p_buffer );
         p_buffer = p_next;
     }
     return VLC_SUCCESS;

@@ -676,6 +676,7 @@ static int rtp_packetize_xiph( sout_stream_id_sys_t *id, block_t *in )
         i_data -= i_payload;
     }
 
+    block_Release(in);
     return VLC_SUCCESS;
 }
 
@@ -711,6 +712,7 @@ static int rtp_packetize_mpa( sout_stream_id_sys_t *id, block_t *in )
         i_data -= i_payload;
     }
 
+    block_Release(in);
     return VLC_SUCCESS;
 }
 
@@ -810,6 +812,7 @@ static int rtp_packetize_mpv( sout_stream_id_sys_t *id, block_t *in )
         i_data -= i_payload;
     }
 
+    block_Release(in);
     return VLC_SUCCESS;
 }
 
@@ -846,6 +849,7 @@ static int rtp_packetize_ac3( sout_stream_id_sys_t *id, block_t *in )
         i_data -= i_payload;
     }
 
+    block_Release(in);
     return VLC_SUCCESS;
 }
 
@@ -878,6 +882,7 @@ static int rtp_packetize_split( sout_stream_id_sys_t *id, block_t *in )
         i_data -= i_payload;
     }
 
+    block_Release(in);
     return VLC_SUCCESS;
 }
 
@@ -911,6 +916,7 @@ static int rtp_packetize_swab( sout_stream_id_sys_t *id, block_t *in )
         i_data -= i_payload;
     }
 
+    block_Release(in);
     return VLC_SUCCESS;
 }
 
@@ -964,6 +970,7 @@ static int rtp_packetize_mp4a_latm( sout_stream_id_sys_t *id, block_t *in )
         i_data -= i_payload;
     }
 
+    block_Release(in);
     return VLC_SUCCESS;
 }
 
@@ -1003,6 +1010,7 @@ static int rtp_packetize_mp4a( sout_stream_id_sys_t *id, block_t *in )
         i_data -= i_payload;
     }
 
+    block_Release(in);
     return VLC_SUCCESS;
 }
 
@@ -1025,10 +1033,12 @@ static int rtp_packetize_h263( sout_stream_id_sys_t *id, block_t *in )
 
     if( i_data < 2 )
     {
+        block_Release(in);
         return VLC_EGENERIC;
     }
     if( p_data[0] || p_data[1] )
     {
+        block_Release(in);
         return VLC_EGENERIC;
     }
     /* remove 2 leading 0 bytes */
@@ -1065,6 +1075,7 @@ static int rtp_packetize_h263( sout_stream_id_sys_t *id, block_t *in )
         i_data -= i_payload;
     }
 
+    block_Release(in);
     return VLC_SUCCESS;
 }
 
@@ -1177,6 +1188,8 @@ static int rtp_packetize_h264( sout_stream_id_sys_t *id, block_t *in )
         i_buffer -= i_skip;
         p_buffer += i_skip;
     }
+
+    block_Release(in);
     return VLC_SUCCESS;
 }
 
@@ -1215,6 +1228,7 @@ static int rtp_packetize_amr( sout_stream_id_sys_t *id, block_t *in )
         i_data -= i_payload;
     }
 
+    block_Release(in);
     return VLC_SUCCESS;
 }
 
@@ -1237,15 +1251,20 @@ static int rtp_packetize_t140( sout_stream_id_sys_t *id, block_t *in )
             while( ( p_data[i_payload] & 0xC0 ) == 0x80 )
             {
                 if( i_payload == 0 )
+                 {
+                    block_Release(in);
                     return VLC_SUCCESS; /* fishy input! */
-
+                }
                 i_payload--;
             }
         }
 
         block_t *out = block_Alloc( 12 + i_payload );
         if( out == NULL )
+        {
+            block_Release(in);
             return VLC_SUCCESS;
+        }
 
         rtp_packetize_common( id, out, 0, in->i_pts + i_packet );
         memcpy( out->p_buffer + 12, p_data, i_payload );
@@ -1260,6 +1279,7 @@ static int rtp_packetize_t140( sout_stream_id_sys_t *id, block_t *in )
         i_data -= i_payload;
     }
 
+    block_Release(in);
     return VLC_SUCCESS;
 }
 
@@ -1273,7 +1293,10 @@ static int rtp_packetize_spx( sout_stream_id_sys_t *id, block_t *in )
     block_t *p_out;
 
     if ( in->i_buffer > rtp_mtu (id) )
+    {
+        block_Release(in);
         return VLC_SUCCESS;
+    }
 
     /*
       RFC for Speex in RTP says that each packet must end on an octet 
@@ -1332,6 +1355,7 @@ static int rtp_packetize_spx( sout_stream_id_sys_t *id, block_t *in )
     p_out->i_buffer = 12 + i_payload_size;
     p_out->i_dts = in->i_dts;
     p_out->i_length = in->i_length;
+    block_Release(in);
 
     /* Queue the buffer for actual transmission. */
     rtp_packetize_send( id, p_out );
@@ -1367,6 +1391,8 @@ static int rtp_packetize_g726( sout_stream_id_sys_t *id, block_t *in, int i_pad 
         p_data += i_payload;
         i_data -= i_payload;
     }
+
+    block_Release(in);
     return VLC_SUCCESS;
 }
 
@@ -1402,14 +1428,20 @@ static int rtp_packetize_vp8( sout_stream_id_sys_t *id, block_t *in )
     int     i_data  = in->i_buffer;
 
     if ( i_max <= 0 )
+    {
+        block_Release(in);
         return VLC_EGENERIC;
+    }
 
     for( int i = 0; i < i_count; i++ )
     {
         int i_payload = __MIN( i_max, i_data );
         block_t *out = block_Alloc( RTP_VP8_PAYLOAD_START + i_payload );
         if ( out == NULL )
+        {
+            block_Release(in);
             return VLC_ENOMEM;
+        }
 
         /* VP8 payload header */
         /* All frames are marked as reference ones */
@@ -1433,6 +1465,7 @@ static int rtp_packetize_vp8( sout_stream_id_sys_t *id, block_t *in )
         i_data -= i_payload;
     }
 
+    block_Release(in);
     return VLC_SUCCESS;
 }
 
@@ -1458,7 +1491,7 @@ static int rtp_packetize_jpeg( sout_stream_id_sys_t *id, block_t *in )
 
     // Skip SOI
     if (GetWBE(p_data) != 0xffd8)
-        return VLC_EGENERIC;
+        goto error;
     p_data += 2;
     i_data -= 2;
 
@@ -1470,17 +1503,14 @@ static int rtp_packetize_jpeg( sout_stream_id_sys_t *id, block_t *in )
         int section_size = GetWBE(section);
         uint8_t *section_body = p_data + 4;
         if (section + section_size > bufend)
-            return VLC_EGENERIC;
+            goto error;
 
         assert((marker & 0xff00) == 0xff00);
         switch (marker)
         {
             case 0xffdb /*DQT*/:
                 if (section_body[0])
-                {
-                    // Only 8-bit precision is supported
-                    return VLC_EGENERIC;
-                }
+                    goto error; // Only 8-bit precision is supported
 
                 /* a quantization table is 64 bytes long */
                 nb_qtables = section_size / 65;
@@ -1493,7 +1523,7 @@ static int rtp_packetize_jpeg( sout_stream_id_sys_t *id, block_t *in )
                 if (width > 2040 || height > 2040)
                 {
                     // larger than limit supported by RFC 2435
-                    return VLC_EGENERIC;
+                    goto error;
                 }
                 // Round up by 8, divide by 8
                 w = ((width+7)&~7) >> 3;
@@ -1507,7 +1537,7 @@ static int rtp_packetize_jpeg( sout_stream_id_sys_t *id, block_t *in )
 
                 // Only 3 components are supported by RFC 2435
                 if (section_body[5] != 3) // Number of components
-                    return VLC_EGENERIC;
+                    goto error;
                 for (int j = 0; j < 3; j++)
                 {
                     if (section_body[6 + j * 3] == 1 /* Y */)
@@ -1517,7 +1547,7 @@ static int rtp_packetize_jpeg( sout_stream_id_sys_t *id, block_t *in )
                     else if (section_body[6 + j * 3 + 1] != 0x11)
                     {
                         // Sampling factor is unsupported by RFC 2435
-                        return VLC_EGENERIC;
+                        goto error;
                     }
                 }
                 break;
@@ -1536,9 +1566,9 @@ static int rtp_packetize_jpeg( sout_stream_id_sys_t *id, block_t *in )
         i_data -= 2 + section_size;
     }
     if (!header_finished)
-        return VLC_EGENERIC;
+        goto error;
     if (!w || !h)
-        return VLC_EGENERIC;
+        goto error;
 
     switch (y_sampling_factor)
     {
@@ -1549,8 +1579,7 @@ static int rtp_packetize_jpeg( sout_stream_id_sys_t *id, block_t *in )
             type = 0;
             break;
         default:
-            // Sampling format unsupported by RFC 2435
-            return VLC_EGENERIC;
+            goto error; // Sampling format unsupported by RFC 2435
     }
 
     if (dri_found)
@@ -1620,5 +1649,9 @@ static int rtp_packetize_jpeg( sout_stream_id_sys_t *id, block_t *in )
         off    += i_payload;
     }
 
+    block_Release(in);
     return VLC_SUCCESS;
+error:
+    block_Release(in);
+    return VLC_EGENERIC;
 }
