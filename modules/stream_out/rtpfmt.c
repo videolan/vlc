@@ -39,6 +39,7 @@
 static int rtp_packetize_mpa  (sout_stream_id_sys_t *, block_t *);
 static int rtp_packetize_mpv  (sout_stream_id_sys_t *, block_t *);
 static int rtp_packetize_ac3  (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_simple(sout_stream_id_sys_t *, block_t *);
 static int rtp_packetize_split(sout_stream_id_sys_t *, block_t *);
 static int rtp_packetize_swab (sout_stream_id_sys_t *, block_t *);
 static int rtp_packetize_mp4a (sout_stream_id_sys_t *, block_t *);
@@ -512,7 +513,7 @@ int rtp_get_fmt( vlc_object_t *obj, es_format_t *p_fmt, const char *mux,
                 return VLC_EGENERIC;
             }
             rtp_fmt->ptname = "opus";
-            rtp_fmt->pf_packetize = rtp_packetize_split;
+            rtp_fmt->pf_packetize = rtp_packetize_simple;
             rtp_fmt->clock_rate = 48000;
             rtp_fmt->channels = 2;
             if (p_fmt->audio.i_channels == 2)
@@ -845,6 +846,17 @@ static int rtp_packetize_ac3( sout_stream_id_sys_t *id, block_t *in )
     }
 
     block_Release(in);
+    return VLC_SUCCESS;
+}
+
+static int rtp_packetize_simple(sout_stream_id_sys_t *id, block_t *block)
+{
+    block = block_Realloc(block, 12, block->i_buffer);
+    if (unlikely(block == NULL))
+        return VLC_ENOMEM;
+
+    rtp_packetize_common(id, block, true, block->i_pts);
+    rtp_packetize_send(id, block);
     return VLC_SUCCESS;
 }
 
