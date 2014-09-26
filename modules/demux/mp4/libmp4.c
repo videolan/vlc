@@ -884,12 +884,8 @@ static int MP4_ReadBox_mdhd( stream_t *p_stream, MP4_Box_t *p_box )
     }
 
     MP4_GET2BYTES( i_language );
-    p_box->data.p_mdhd->i_language_code = i_language;
-    for( unsigned i = 0; i < 3; i++ )
-    {
-        p_box->data.p_mdhd->i_language[i] =
-                    ( ( i_language >> ( (2-i)*5 ) )&0x1f ) + 0x60;
-    }
+    decodeQtLanguageCode( i_language, p_box->data.p_mdhd->rgs_language,
+                          &p_box->data.p_mdhd->b_mac_encoding );
 
     MP4_GET2BYTES( p_box->data.p_mdhd->i_predefined );
 
@@ -897,14 +893,12 @@ static int MP4_ReadBox_mdhd( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_ConvertDate2Str( s_creation_time, p_box->data.p_mdhd->i_creation_time, false );
     MP4_ConvertDate2Str( s_modification_time, p_box->data.p_mdhd->i_modification_time, false );
     MP4_ConvertDate2Str( s_duration, p_box->data.p_mdhd->i_duration, true );
-    msg_Dbg( p_stream, "read box: \"mdhd\" creation %s modification %s time scale %d duration %s language %c%c%c",
+    msg_Dbg( p_stream, "read box: \"mdhd\" creation %s modification %s time scale %d duration %s language %3.3s",
                   s_creation_time,
                   s_modification_time,
                   (uint32_t)p_box->data.p_mdhd->i_timescale,
                   s_duration,
-                  p_box->data.p_mdhd->i_language[0],
-                  p_box->data.p_mdhd->i_language[1],
-                  p_box->data.p_mdhd->i_language[2] );
+                  (char*) &p_box->data.p_mdhd->rgs_language );
 #endif
     MP4_READBOX_EXIT( 1 );
 }

@@ -387,10 +387,9 @@ typedef struct MP4_Box_data_mdhd_s
     uint32_t i_timescale;
     uint64_t i_duration;
 
-    /* one bit for pad */
-    uint16_t      i_language_code;
-    /* unsigned int(5)[3] language difference with 0x60*/
-    unsigned char i_language[3];
+    char     rgs_language[3]; /* ISO-639-2/T or Mac lang table */
+    bool     b_mac_encoding;  /* media using mac encoding */
+
     uint16_t i_predefined;
 
 } MP4_Box_data_mdhd_t;
