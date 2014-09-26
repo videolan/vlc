@@ -881,7 +881,9 @@ static int MP4_ReadBox_mdhd( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_GET4BYTES( p_box->data.p_mdhd->i_timescale );
         MP4_GET4BYTES( p_box->data.p_mdhd->i_duration );
     }
-    p_box->data.p_mdhd->i_language_code = i_language = GetWBE( p_peek );
+
+    MP4_GET2BYTES( i_language );
+    p_box->data.p_mdhd->i_language_code = i_language;
     for( unsigned i = 0; i < 3; i++ )
     {
         p_box->data.p_mdhd->i_language[i] =
