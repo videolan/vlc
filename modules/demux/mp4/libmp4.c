@@ -32,6 +32,7 @@
 #endif
 
 #include "libmp4.h"
+#include "languages.h"
 #include <math.h>
 
 /* Some assumptions:
