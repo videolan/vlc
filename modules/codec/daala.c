@@ -95,6 +95,13 @@ static void daala_CopyPicture( picture_t *, od_img * );
 static int  OpenEncoder( vlc_object_t *p_this );
 static void CloseEncoder( vlc_object_t *p_this );
 static block_t *Encode( encoder_t *p_enc, picture_t *p_pict );
+
+static const char *const enc_chromafmt_list[] = {
+    "420", "444"
+};
+static const char *const enc_chromafmt_list_text[] = {
+    "4:2:0", "4:4:4"
+};
 #endif
 
 /*****************************************************************************
@@ -133,12 +140,20 @@ vlc_module_begin ()
                  ENC_QUALITY_TEXT, ENC_QUALITY_LONGTEXT, false )
     add_integer_with_range( ENC_CFG_PREFIX "keyint", 256, 1, 1000,
                  ENC_KEYINT_TEXT, ENC_KEYINT_LONGTEXT, false )
-#endif
+
+#   define ENC_CHROMAFMT_TEXT N_("Chroma format")
+#   define ENC_CHROMAFMT_LONGTEXT N_("Picking chroma format will force a " \
+                                     "conversion of the video into that format")
+
+    add_string( ENC_CFG_PREFIX "chroma-fmt", "420", ENC_CHROMAFMT_TEXT,
+                ENC_CHROMAFMT_LONGTEXT, false )
+    change_string_list( enc_chromafmt_list, enc_chromafmt_list_text )
 vlc_module_end ()
 
 static const char *const ppsz_enc_options[] = {
-    "quality", "keyint", NULL
+    "quality", "keyint", "chroma-fmt", NULL
 };
+#endif
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -576,17 +591,47 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
+    char *psz_tmp = var_GetString( p_enc, ENC_CFG_PREFIX "chroma-fmt" );
+    uint32_t i_codec;
+    if( !psz_tmp ) {
+        free(p_sys);
+        return VLC_ENOMEM;
+    } else {
+        if( !strcmp( psz_tmp, "420" ) ) {
+            i_codec = VLC_CODEC_I420;
+        }
+        else if( !strcmp( psz_tmp, "444" ) ) {
+            i_codec = VLC_CODEC_I444;
+        }
+        else {
+            msg_Err( p_enc, "Invalid chroma format: %s", psz_tmp );
+            free( psz_tmp );
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
+        free( psz_tmp );
+        p_enc->fmt_in.i_codec = i_codec;
+        /* update bits_per_pixel */
+        video_format_Setup(&p_enc->fmt_in.video, i_codec,
+                p_enc->fmt_in.video.i_width,
+                p_enc->fmt_in.video.i_height,
+                p_enc->fmt_in.video.i_visible_width,
+                p_enc->fmt_in.video.i_visible_height,
+                p_enc->fmt_in.video.i_sar_num,
+                p_enc->fmt_in.video.i_sar_den);
+    }
+
     daala_info_init( &p_sys->di );
 
     p_sys->di.pic_width = p_enc->fmt_in.video.i_visible_width;
     p_sys->di.pic_height = p_enc->fmt_in.video.i_visible_height;
 
-    /* 420 */
     p_sys->di.nplanes = 3;
     for (int i = 0; i < p_sys->di.nplanes; i++)
     {
-        p_sys->di.plane_info[i].ydec =
-        p_sys->di.plane_info[i].xdec = i > 0;
+        p_sys->di.plane_info[i].xdec = i > 0 && i_codec != VLC_CODEC_I444;
+        p_sys->di.plane_info[i].ydec = i_codec == VLC_CODEC_I420 ?
+            p_sys->di.plane_info[i].xdec : 0;
     }
     p_sys->di.frame_duration = 1;
 
