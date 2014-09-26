@@ -2485,6 +2485,11 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
 
         box_gather(traf, tfhd);
 
+        /* *** add /moof/traf/tfdt *** */
+        bo_t *tfdt = box_full_new("tfdt", 1, 0);
+        bo_add_64be(tfdt, p_stream->i_written_duration * p_stream->i_timescale / CLOCK_FREQ );
+        box_gather(traf, tfdt);
+
         /* *** add /moof/traf/trun *** */
         if (p_stream->read.p_first)
         {
