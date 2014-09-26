@@ -122,7 +122,7 @@ public:
     /* when you remove this variable the compiler issues an atomicity error */
     /* this variable only works when using std::vector<chapter_edition_c> */
     std::vector<chapter_edition_c*> stored_editions;
-    int                             i_default_edition;
+    std::vector<chapter_edition_c*>::size_type i_default_edition;
 
     std::vector<chapter_translation_c*> translations;
     std::vector<KaxSegmentFamily*>  families;

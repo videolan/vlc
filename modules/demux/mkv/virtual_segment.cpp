@@ -261,7 +261,7 @@ void virtual_edition_c::retimeChapters()
 virtual_segment_c::virtual_segment_c( std::vector<matroska_segment_c*> * p_opened_segments )
 {
     /* Main segment */
-    size_t i;
+    std::vector<chapter_edition_c*>::size_type i;
     matroska_segment_c *p_segment = (*p_opened_segments)[0];
     i_current_edition = 0;
     i_sys_title = 0;
