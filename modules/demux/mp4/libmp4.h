@@ -390,7 +390,7 @@ typedef struct MP4_Box_data_mdhd_s
     char     rgs_language[3]; /* ISO-639-2/T or Mac lang table */
     bool     b_mac_encoding;  /* media using mac encoding */
 
-    uint16_t i_predefined;
+    uint16_t i_quality;
 
 } MP4_Box_data_mdhd_t;
 

@@ -887,7 +887,7 @@ static int MP4_ReadBox_mdhd( stream_t *p_stream, MP4_Box_t *p_box )
     decodeQtLanguageCode( i_language, p_box->data.p_mdhd->rgs_language,
                           &p_box->data.p_mdhd->b_mac_encoding );
 
-    MP4_GET2BYTES( p_box->data.p_mdhd->i_predefined );
+    MP4_GET2BYTES( p_box->data.p_mdhd->i_quality );
 
 #ifdef MP4_VERBOSE
     MP4_ConvertDate2Str( s_creation_time, p_box->data.p_mdhd->i_creation_time, false );
