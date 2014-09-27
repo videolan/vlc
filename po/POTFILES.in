@@ -254,6 +254,7 @@ modules/access/rtsp/rtsp.h
 modules/access/screen/mac.c
 modules/access/screen/screen.c
 modules/access/screen/screen.h
+modules/access/screen/wayland.c
 modules/access/screen/win32.c
 modules/access/screen/xcb.c
 modules/access/sdp.c

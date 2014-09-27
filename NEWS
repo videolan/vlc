@@ -4,6 +4,7 @@ Changes between 2.2.x and 3.0.0-git:
 Access:
  * Support HDS (Http Dynamic Streaming) from Adobe (f4m, f4v, etc.)
  * New SMB access module using libdsm
+ * Screen capture plugin for Wayland display
  * Support decompression and extraction through libarchive (tar, zip, rar...)
  * Improvements of cookie handling (share cookies between playlist items,
    domain / path matching, Secure cookies)
