@@ -243,8 +243,8 @@ static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, mtime_t 
     //        pts, ffsub->start_display_time, ffsub->end_display_time);
     spu->i_start    = pts + ffsub->start_display_time * INT64_C(1000);
     spu->i_stop     = pts + ffsub->end_display_time * INT64_C(1000);
-    spu->b_absolute = true; /* FIXME How to set it right ? */
-    spu->b_ephemer  = true; /* FIXME How to set it right ? */
+    spu->b_absolute = true; /* We have offset and size for subtitle */
+    spu->b_ephemer  = false; /* We only show subtitle for i_stop time only */
 
     if (avctx->coded_width != 0 && avctx->coded_height != 0) {
         spu->i_original_picture_width = avctx->coded_width;
