@@ -192,7 +192,7 @@ static subpicture_region_t *ConvertRegionRGBA(AVSubtitleRect *ffregion)
 
     video_format_t fmt;
     memset(&fmt, 0, sizeof(fmt));
-    fmt.i_chroma         = VLC_FOURCC('R','G','B','A');
+    fmt.i_chroma         = VLC_CODEC_RGBA;
     fmt.i_width          =
     fmt.i_visible_width  = ffregion->w;
     fmt.i_height         =
