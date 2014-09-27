@@ -32,6 +32,7 @@ extern "C" {
 #include "../vobsub.h"
 #include "../xiph.h"
 #include "../windows_audio_commons.h"
+#include "../mp4/libmp4.h"
 }
 
 #include <vlc_codecs.h>

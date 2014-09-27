@@ -97,9 +97,6 @@
 
 #include "ebml/StdIOCallback.h"
 
-extern "C" {
-   #include "../mp4/libmp4.h"
-}
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>
 #endif
