@@ -121,7 +121,7 @@ public:
 
     inline virtual_edition_c * CurrentEdition()
     {
-        if( i_current_edition > 0 && i_current_edition < editions.size() )
+        if( i_current_edition < editions.size() )
             return editions[i_current_edition];
         return NULL;
     }
