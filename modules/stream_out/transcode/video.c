@@ -648,7 +648,8 @@ static void OutputFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_
             fmt.i_y_offset       = 0;
         }
 
-        subpicture_t *p_subpic = spu_Render( p_sys->p_spu, NULL, &fmt, &fmt,
+        subpicture_t *p_subpic = spu_Render( p_sys->p_spu, NULL, &fmt,
+                                             &id->p_decoder->fmt_out.video,
                                              p_pic->date, p_pic->date, false );
 
         /* Overlay subpicture */
