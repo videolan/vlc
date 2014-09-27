@@ -3182,7 +3182,19 @@ dnl
 AC_ARG_ENABLE(wayland,
   [AS_HELP_STRING([--enable-wayland], [Wayland support (default auto)])])
 have_wayland="no"
+AC_ARG_VAR([WAYLAND_SCANNER], [Wayland scanner utility])
+
 AS_IF([test "${enable_wayland}" != "no"], [
+  AC_MSG_CHECKING([for the Wayland scanner])
+  AS_IF([test -z "$WAYLAND_SCANNER"], [
+    PKG_CHECK_EXISTS([wayland-scanner], [
+      WAYLAND_SCANNER="$(${PKG_CONFIG} wayland-scanner --variable wayland_scanner)"
+    ], [
+      WAYLAND_SCANNER="wayland-scanner"
+    ])
+  ])
+  AC_MSG_RESULT([$WAYLAND_SCANNER])
+
   PKG_CHECK_MODULES([WAYLAND_CLIENT], [wayland-client >= 1.5.91], [
     have_wayland="yes"
   ], [

@@ -1,6 +1,7 @@
 noinst_LTLIBRARIES =
 noinst_HEADERS =
 check_PROGRAMS =
+EXTRA_DIST =
 
 BASE_SUBDIRS = \
 	audio_filter \
@@ -72,3 +73,14 @@ module.rc.lo: module.rc
 		-i $< -o $@
 	echo HELLO
 endif
+
+# Wayland
+SUFFIXES += -client-protocol.h -protocol.c .xml
+
+.xml-client-protocol.h:
+	$(AM_V_GEN)$(WAYLAND_SCANNER) client-header < "$^" > "$@.tmp"
+	$(AM_V_at)mv -f -- "$@.tmp" "$@"
+
+.xml-protocol.c:
+	$(AM_V_GEN)$(WAYLAND_SCANNER) code < "$^" > "$@.tmp"
+	$(AM_V_at)mv -f -- "$@.tmp" "$@"
