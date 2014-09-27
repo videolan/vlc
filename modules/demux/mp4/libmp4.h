@@ -1393,7 +1393,7 @@ typedef union MP4_Box_data_s
     void                *p_payload; /* for unknow type */
 } MP4_Box_data_t;
 
-
+#define BOXDATA(type) type->data.type
 
 typedef struct MP4_Box_s MP4_Box_t;
 /* the most basic structure */
@@ -1403,7 +1403,7 @@ struct MP4_Box_s
 
     uint32_t     i_type;
     uint32_t     i_shortsize;
-    uint32_t     i_handler;  /* stsd handler */
+    uint32_t     i_handler;  /**/
 
     enum
     {
