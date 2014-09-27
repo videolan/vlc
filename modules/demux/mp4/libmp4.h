@@ -756,8 +756,8 @@ typedef struct MP4_Box_data_cprt_s
 {
     uint8_t  i_version;
     uint32_t i_flags;
-    /* 1 pad bit */
-    unsigned char i_language[3];
+
+    char     rgs_language[3]; /* ISO-639-2/T */
 
     char *psz_notice;
 } MP4_Box_data_cprt_t;
