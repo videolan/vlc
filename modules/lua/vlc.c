@@ -213,7 +213,7 @@ int vlclua_dir_list( const char *luadirname, char ***pppsz_dir_list )
         i++;
     free( datadir );
 
-#if !(defined(__APPLE__) || defined(_WIN32) || defined(__OS2__))
+#if !(defined(__APPLE__) || defined(_WIN32))
     char *psz_libpath = config_GetLibDir();
     if( likely(psz_libpath != NULL) )
     {
