@@ -1237,6 +1237,7 @@ static int MP4_ReadBox_esds( stream_t *p_stream, MP4_Box_t *p_box )
             unsigned int i_len;
 
             MP4_GET1BYTE( i_len );
+            i_len = __MIN(i_read, i_len);
             es_descriptor.psz_URL = malloc( i_len + 1 );
             if( es_descriptor.psz_URL )
             {
