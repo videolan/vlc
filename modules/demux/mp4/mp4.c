@@ -2509,24 +2509,23 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         }
         case( ATOM_eac3 ):
         {
-            MP4_Box_t *p_dec3_box = MP4_BoxGet(  p_sample, "dec3", 0 );
+            const MP4_Box_t *p_dec3 = MP4_BoxGet(  p_sample, "dec3", 0 );
 
             p_track->fmt.i_codec = VLC_CODEC_EAC3;
-            if( p_dec3_box )
+            if( p_dec3 && BOXDATA(p_dec3) )
             {
-                MP4_Box_data_dec3_t *p_dec3 = p_dec3_box->data.p_dec3;
                 p_track->fmt.audio.i_channels = 0;
-                p_track->fmt.i_bitrate = p_dec3->i_data_rate * 1000;
+                p_track->fmt.i_bitrate = BOXDATA(p_dec3)->i_data_rate * 1000;
                 p_track->fmt.audio.i_bitspersample = 0;
             }
             break;
         }
         case( ATOM_ac3 ):
         {
-            MP4_Box_t *p_dac3_box = MP4_BoxGet(  p_sample, "dac3", 0 );
+            const MP4_Box_t *p_dac3 = MP4_BoxGet(  p_sample, "dac3", 0 );
 
             p_track->fmt.i_codec = VLC_CODEC_A52;
-            if( p_dac3_box )
+            if( p_dac3 && BOXDATA(p_dac3) )
             {
                 static const int pi_bitrate[] = {
                      32,  40,  48,  56,
@@ -2535,11 +2534,10 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                     256, 320, 384, 448,
                     512, 576, 640,
                 };
-                MP4_Box_data_dac3_t *p_dac3 = p_dac3_box->data.p_dac3;
                 p_track->fmt.audio.i_channels = 0;
                 p_track->fmt.i_bitrate = 0;
-                if( p_dac3->i_bitrate_code < sizeof(pi_bitrate)/sizeof(*pi_bitrate) )
-                    p_track->fmt.i_bitrate = pi_bitrate[p_dac3->i_bitrate_code] * 1000;
+                if( BOXDATA(p_dac3)->i_bitrate_code < sizeof(pi_bitrate)/sizeof(*pi_bitrate) )
+                    p_track->fmt.i_bitrate = pi_bitrate[BOXDATA(p_dac3)->i_bitrate_code] * 1000;
                 p_track->fmt.audio.i_bitspersample = 0;
             }
             break;
@@ -2905,7 +2903,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             case VLC_FOURCC( 'v', 'c', '-', '1' ):
             {
                 MP4_Box_t *p_dvc1 = MP4_BoxGet( p_sample, "dvc1" );
-                if( p_dvc1 )
+                if( p_dvc1 && BOXDATA(p_dvc1) )
                 {
                     p_track->fmt.i_extra = BOXDATA(p_dvc1)->i_vc1;
                     if( p_track->fmt.i_extra > 0 )
@@ -2927,7 +2925,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             {
                 MP4_Box_t *p_avcC = MP4_BoxGet( p_sample, "avcC" );
 
-                if( p_avcC )
+                if( p_avcC && BOXDATA(p_avcC) )
                 {
                     p_track->fmt.i_extra = BOXDATA(p_avcC)->i_avcC;
                     if( p_track->fmt.i_extra > 0 )
@@ -2948,13 +2946,13 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             {
                 MP4_Box_t *p_hvcC = MP4_BoxGet( p_sample, "hvcC" );
 
-                if( p_hvcC )
+                if( p_hvcC && BOXDATA(p_hvcC) )
                 {
-                    p_track->fmt.i_extra = p_hvcC->data.p_hvcC->i_hvcC;
+                    p_track->fmt.i_extra = BOXDATA(p_hvcC)->i_hvcC;
                     if( p_track->fmt.i_extra > 0 )
                     {
-                        p_track->fmt.p_extra = malloc( p_hvcC->data.p_hvcC->i_hvcC );
-                        memcpy( p_track->fmt.p_extra, p_hvcC->data.p_hvcC->p_hvcC,
+                        p_track->fmt.p_extra = malloc( BOXDATA(p_hvcC)->i_hvcC );
+                        memcpy( p_track->fmt.p_extra, BOXDATA(p_hvcC)->p_hvcC,
                                 p_track->fmt.i_extra );
                     }
                     p_track->fmt.i_codec = VLC_CODEC_HEVC;
