@@ -3547,7 +3547,7 @@ static const struct
     { ATOM_key,     MP4_ReadBox_drms,         MP4_FreeBox_Common, 0 },
     { ATOM_iviv,    MP4_ReadBox_drms,         MP4_FreeBox_Common, 0 },
     { ATOM_priv,    MP4_ReadBox_drms,         MP4_FreeBox_Common, 0 },
-    { ATOM_frma,    MP4_ReadBox_frma,         MP4_FreeBox_Common, 0 },
+    { ATOM_frma,    MP4_ReadBox_frma,         MP4_FreeBox_Common, ATOM_sinf }, /* and rinf */
     { ATOM_skcr,    MP4_ReadBox_skcr,         MP4_FreeBox_Common, 0 },
 
     /* found in udta */
