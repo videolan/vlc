@@ -1388,17 +1388,15 @@ struct MP4_Box_s
 
     uint64_t     i_size; /* always set so use it */
 
-    MP4_Box_data_t   data;   /* union of pointers on extended data depending
-                                on i_type (or i_usertype) */
-
-    struct MP4_Box_s *p_father; /* pointer on the father Box */
-
-    struct MP4_Box_s *p_first;  /* pointer on the first child Box */
-    struct MP4_Box_s *p_last;
-
-    struct MP4_Box_s *p_next;   /* pointer on the next boxes at the same level */
+    MP4_Box_t *p_father; /* pointer on the father Box */
+    MP4_Box_t *p_first;  /* pointer on the first child Box */
+    MP4_Box_t *p_last;
+    MP4_Box_t *p_next;   /* pointer on the next boxes at the same level */
 
     void (*pf_free)( MP4_Box_t *p_box ); /* pointer to free function for this box */
+
+    MP4_Box_data_t   data;   /* union of pointers on extended data depending
+                                on i_type (or i_usertype) */
 };
 
 static inline size_t mp4_box_headersize( MP4_Box_t *p_box )
