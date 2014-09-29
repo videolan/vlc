@@ -1212,7 +1212,7 @@ static int MP4_ReadBox_esds( stream_t *p_stream, MP4_Box_t *p_box )
 
 
     MP4_GET1BYTE( i_type );
-    if( i_type == 0x03 ) /* MP4ESDescrTag */
+    if( i_type == 0x03 ) /* MP4ESDescrTag ISO/IEC 14496-1 8.3.3 */
     {
         i_len = MP4_ReadLengthDescriptor( &p_peek, &i_read );
 
@@ -1258,7 +1258,7 @@ static int MP4_ReadBox_esds( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_GET1BYTE( i_type ); /* get next type */
     }
 
-    if( i_type != 0x04)/* MP4DecConfigDescrTag */
+    if( i_type != 0x04)/* MP4DecConfigDescrTag ISO/IEC 14496-1 8.3.4 */
     {
          es_descriptor.p_decConfigDescr = NULL;
          MP4_READBOX_EXIT( 1 ); /* rest isn't interesting up to now */
@@ -1276,7 +1276,7 @@ static int MP4_ReadBox_esds( stream_t *p_stream, MP4_Box_t *p_box )
     if( unlikely( es_descriptor.p_decConfigDescr == NULL ) )
         MP4_READBOX_EXIT( 0 );
 
-    MP4_GET1BYTE( es_descriptor.p_decConfigDescr->i_objectTypeIndication );
+    MP4_GET1BYTE( es_descriptor.p_decConfigDescr->i_objectProfileIndication );
     MP4_GET1BYTE( i_flags );
     es_descriptor.p_decConfigDescr->i_streamType = i_flags >> 2;
     es_descriptor.p_decConfigDescr->b_upStream = ( i_flags >> 1 )&0x01;
@@ -1284,7 +1284,7 @@ static int MP4_ReadBox_esds( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET4BYTES( es_descriptor.p_decConfigDescr->i_max_bitrate );
     MP4_GET4BYTES( es_descriptor.p_decConfigDescr->i_avg_bitrate );
     MP4_GET1BYTE( i_type );
-    if( i_type !=  0x05 )/* MP4DecSpecificDescrTag */
+    if( i_type !=  0x05 )/* MP4DecSpecificDescrTag ISO/IEC 14496-1 8.3.5 */
     {
         es_descriptor.p_decConfigDescr->i_decoder_specific_info_len = 0;
         es_descriptor.p_decConfigDescr->p_decoder_specific_info  = NULL;

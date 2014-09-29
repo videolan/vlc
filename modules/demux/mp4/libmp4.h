@@ -766,7 +766,7 @@ typedef struct MP4_Box_data_cprt_s
 /* DecoderConfigDescriptor */
 typedef struct MP4_descriptor_decoder_config_s
 {
-    uint8_t i_objectTypeIndication;
+    uint8_t i_objectProfileIndication;
     uint8_t i_streamType;
     int     b_upStream;
     int     i_buffer_sizeDB;

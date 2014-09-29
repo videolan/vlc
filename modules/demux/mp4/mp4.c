@@ -2709,6 +2709,8 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
 
     /* now see if esds is present and if so create a data packet
         with decoder_specific_info  */
+
+    /* Only if MP4V */
 #define p_decconfig p_esds->data.p_esds->es_descriptor.p_decConfigDescr
     if( ( ( p_esds = MP4_BoxGet( p_sample, "esds" ) ) ||
           ( p_esds = MP4_BoxGet( p_sample, "wave/esds" ) ) )&&
@@ -2716,7 +2718,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         ( p_decconfig ) )
     {
         /* First update information based on i_objectTypeIndication */
-        switch( p_decconfig->i_objectTypeIndication )
+        switch( p_decconfig->i_objectProfileIndication )
         {
             case( 0x20 ): /* MPEG4 VIDEO */
                 p_track->fmt.i_codec = VLC_CODEC_MP4V;
@@ -2809,8 +2811,8 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             default:
                 /* Unknown entry, but don't touch i_fourcc */
                 msg_Warn( p_demux,
-                          "unknown objectTypeIndication(0x%x) (Track[ID 0x%x])",
-                          p_decconfig->i_objectTypeIndication,
+                          "unknown objectProfileIndication(0x%x) (Track[ID 0x%x])",
+                          p_decconfig->i_objectProfileIndication,
                           p_track->i_track_ID );
                 break;
         }
