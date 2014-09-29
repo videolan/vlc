@@ -3677,6 +3677,8 @@ static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
         return NULL;
     }
 
+    p_box->pf_free = MP4_Box_Function[i_index].MP4_FreeBox_function;
+
     return p_box;
 }
 
@@ -3686,7 +3688,6 @@ static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
  *****************************************************************************/
 void MP4_BoxFree( stream_t *s, MP4_Box_t *p_box )
 {
-    unsigned int i_index;
     MP4_Box_t    *p_child;
 
     if( !p_box )
@@ -3704,15 +3705,7 @@ void MP4_BoxFree( stream_t *s, MP4_Box_t *p_box )
     /* Now search function to call */
     if( p_box->data.p_payload )
     {
-        for( i_index = 0; ; i_index++ )
-        {
-            if( ( MP4_Box_Function[i_index].i_type == p_box->i_type )||
-                ( MP4_Box_Function[i_index].i_type == 0 ) )
-            {
-                break;
-            }
-        }
-        if( MP4_Box_Function[i_index].MP4_FreeBox_function == NULL )
+        if (unlikely( p_box->pf_free == NULL ))
         {
             /* Should not happen */
             if MP4_BOX_TYPE_ASCII()
@@ -3726,7 +3719,7 @@ void MP4_BoxFree( stream_t *s, MP4_Box_t *p_box )
         }
         else
         {
-            MP4_Box_Function[i_index].MP4_FreeBox_function( p_box );
+            p_box->pf_free( p_box );
         }
         free( p_box->data.p_payload );
     }

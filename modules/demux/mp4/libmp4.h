@@ -1368,8 +1368,9 @@ typedef union MP4_Box_data_s
 
 
 
+typedef struct MP4_Box_s MP4_Box_t;
 /* the most basic structure */
-typedef struct MP4_Box_s
+struct MP4_Box_s
 {
     off_t        i_pos;      /* absolute position */
 
@@ -1397,7 +1398,8 @@ typedef struct MP4_Box_s
 
     struct MP4_Box_s *p_next;   /* pointer on the next boxes at the same level */
 
-} MP4_Box_t;
+    void (*pf_free)( MP4_Box_t *p_box ); /* pointer to free function for this box */
+};
 
 static inline size_t mp4_box_headersize( MP4_Box_t *p_box )
 {
