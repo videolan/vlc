@@ -1459,6 +1459,83 @@ error:
     MP4_READBOX_EXIT( 0 );
 }
 
+static int MP4_ReadBox_WMA2( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_WMA2_t );
+
+    MP4_Box_data_WMA2_t *p_WMA2 = p_box->data.p_WMA2;
+
+    MP4_GET2BYTESLE( p_WMA2->Format.wFormatTag );
+    MP4_GET2BYTESLE( p_WMA2->Format.nChannels );
+    MP4_GET4BYTESLE( p_WMA2->Format.nSamplesPerSec );
+    MP4_GET4BYTESLE( p_WMA2->Format.nAvgBytesPerSec );
+    MP4_GET2BYTESLE( p_WMA2->Format.nBlockAlign );
+    MP4_GET2BYTESLE( p_WMA2->Format.wBitsPerSample );
+
+    if ( i_read < 0 )
+        goto error;
+
+    p_WMA2->i_extra = i_read;
+    if ( p_WMA2->i_extra )
+    {
+        p_WMA2->p_extra = malloc( i_read );
+        if ( ! p_WMA2->p_extra )
+            goto error;
+        memcpy( p_WMA2->p_extra, p_peek, i_read );
+    }
+
+    MP4_READBOX_EXIT( 1 );
+
+error:
+    MP4_READBOX_EXIT( 0 );
+}
+
+static void MP4_FreeBox_WMA2( MP4_Box_t *p_box )
+{
+    FREENULL( p_box->data.p_WMA2->p_extra );
+}
+
+static int MP4_ReadBox_strf( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_strf_t );
+
+    MP4_Box_data_strf_t *p_strf = p_box->data.p_strf;
+
+    MP4_GET4BYTESLE( p_strf->bmiHeader.biSize );
+    MP4_GET4BYTESLE( p_strf->bmiHeader.biWidth );
+    MP4_GET4BYTESLE( p_strf->bmiHeader.biHeight );
+    MP4_GET2BYTESLE( p_strf->bmiHeader.biPlanes );
+    MP4_GET2BYTESLE( p_strf->bmiHeader.biBitCount );
+    MP4_GETFOURCC( p_strf->bmiHeader.biCompression );
+    MP4_GET4BYTESLE( p_strf->bmiHeader.biSizeImage );
+    MP4_GET4BYTESLE( p_strf->bmiHeader.biXPelsPerMeter );
+    MP4_GET4BYTESLE( p_strf->bmiHeader.biYPelsPerMeter );
+    MP4_GET4BYTESLE( p_strf->bmiHeader.biClrUsed );
+    MP4_GET4BYTESLE( p_strf->bmiHeader.biClrImportant );
+
+    if ( i_read < 0 )
+        goto error;
+
+    p_strf->i_extra = i_read;
+    if ( p_strf->i_extra )
+    {
+        p_strf->p_extra = malloc( p_strf->i_extra );
+        if ( ! p_strf->p_extra )
+            goto error;
+        memcpy( p_strf->p_extra, p_peek, i_read );
+    }
+
+    MP4_READBOX_EXIT( 1 );
+
+error:
+    MP4_READBOX_EXIT( 0 );
+}
+
+static void MP4_FreeBox_strf( MP4_Box_t *p_box )
+{
+    FREENULL( p_box->data.p_strf->p_extra );
+}
+
 static int MP4_ReadBox_stsdext_chan( stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_chan_t );
@@ -3391,6 +3468,7 @@ static const struct
     { ATOM_tref,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_trak },
     { ATOM_gmhd,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_minf },
     { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_stsd },
+    { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_WMA2 }, /* flip4mac */
     { ATOM_ilst,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_meta },
     { ATOM_mvex,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_moov },
     { ATOM_mvex,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_ftyp },
@@ -3477,8 +3555,10 @@ static const struct
     { ATOM_sawb,    MP4_ReadBox_sample_soun,  MP4_FreeBox_sample_soun, ATOM_stsd },
     { ATOM_OggS,    MP4_ReadBox_sample_soun,  MP4_FreeBox_sample_soun, ATOM_stsd },
     { ATOM_alac,    MP4_ReadBox_sample_soun,  MP4_FreeBox_sample_soun, ATOM_stsd },
+    { ATOM_WMA2,    MP4_ReadBox_sample_soun,  MP4_FreeBox_sample_soun, ATOM_stsd }, /* flip4mac */
     /* Sound extensions */
     { ATOM_chan,    MP4_ReadBox_stsdext_chan, MP4_FreeBox_stsdext_chan, 0 },
+    { ATOM_WMA2,    MP4_ReadBox_WMA2,         MP4_FreeBox_WMA2,        ATOM_wave }, /* flip4mac */
 
     { ATOM_drmi,    MP4_ReadBox_sample_vide,  MP4_FreeBox_sample_vide, ATOM_stsd },
     { ATOM_vide,    MP4_ReadBox_sample_vide,  MP4_FreeBox_sample_vide, ATOM_stsd },
@@ -3504,6 +3584,7 @@ static const struct
     { ATOM_qdrw,    MP4_ReadBox_sample_vide,  MP4_FreeBox_sample_vide, ATOM_stsd },
     { ATOM_mp2v,    MP4_ReadBox_sample_vide,  MP4_FreeBox_sample_vide, ATOM_stsd },
     { ATOM_hdv2,    MP4_ReadBox_sample_vide,  MP4_FreeBox_sample_vide, ATOM_stsd },
+    { ATOM_WMV3,    MP4_ReadBox_sample_vide,  MP4_FreeBox_sample_vide, ATOM_stsd },
 
     { ATOM_mjqt,    MP4_ReadBox_default,      NULL, 0 }, /* found in mjpa/b */
     { ATOM_mjht,    MP4_ReadBox_default,      NULL, 0 },
@@ -3521,6 +3602,8 @@ static const struct
 
     { ATOM_yv12,    MP4_ReadBox_sample_vide,  MP4_FreeBox_sample_vide, 0 },
     { ATOM_yuv2,    MP4_ReadBox_sample_vide,  MP4_FreeBox_sample_vide, 0 },
+
+    { ATOM_strf,    MP4_ReadBox_strf,         MP4_FreeBox_strf,        ATOM_WMV3 }, /* flip4mac */
 
     { ATOM_mp4s,    MP4_ReadBox_sample_mp4s,  MP4_FreeBox_Common, 0 },
 
@@ -3550,6 +3633,7 @@ static const struct
     { ATOM_iviv,    MP4_ReadBox_drms,         MP4_FreeBox_Common, 0 },
     { ATOM_priv,    MP4_ReadBox_drms,         MP4_FreeBox_Common, 0 },
     { ATOM_frma,    MP4_ReadBox_frma,         MP4_FreeBox_Common, ATOM_sinf }, /* and rinf */
+    { ATOM_frma,    MP4_ReadBox_frma,         MP4_FreeBox_Common, ATOM_wave }, /* flip4mac */
     { ATOM_skcr,    MP4_ReadBox_skcr,         MP4_FreeBox_Common, 0 },
 
     /* found in udta */

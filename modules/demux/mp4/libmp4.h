@@ -24,6 +24,7 @@
 #define _VLC_LIBMP4_H 1
 
 #include <vlc_es.h>
+#include <vlc_codecs.h>
 
 #define BLOCK16x16 (1<<16)
 
@@ -139,6 +140,7 @@
 #define ATOM_dac3 VLC_FOURCC( 'd', 'a', 'c', '3' )
 #define ATOM_dec3 VLC_FOURCC( 'd', 'e', 'c', '3' )
 #define ATOM_dvc1 VLC_FOURCC( 'd', 'v', 'c', '1' )
+#define ATOM_WMA2 VLC_FOURCC( 'W', 'M', 'A', '2' )
 #define ATOM_enda VLC_FOURCC( 'e', 'n', 'd', 'a' )
 #define ATOM_gnre VLC_FOURCC( 'g', 'n', 'r', 'e' )
 #define ATOM_trkn VLC_FOURCC( 't', 'r', 'k', 'n' )
@@ -169,6 +171,7 @@
 #define ATOM_vp31 VLC_FOURCC( 'v', 'p', '3', '1' )
 #define ATOM_h264 VLC_FOURCC( 'h', '2', '6', '4' )
 #define ATOM_qdrw VLC_FOURCC( 'q', 'd', 'r', 'w' )
+#define ATOM_WMV3 VLC_FOURCC( 'W', 'M', 'V', '3' )
 
 #define ATOM_avc1 VLC_FOURCC( 'a', 'v', 'c', '1' )
 #define ATOM_avcC VLC_FOURCC( 'a', 'v', 'c', 'C' )
@@ -198,6 +201,7 @@
 
 #define ATOM_gmhd VLC_FOURCC( 'g', 'm', 'h', 'd' )
 #define ATOM_wave VLC_FOURCC( 'w', 'a', 'v', 'e' )
+#define ATOM_strf VLC_FOURCC( 's', 't', 'r', 'f' )
 
 #define ATOM_drms VLC_FOURCC( 'd', 'r', 'm', 's' )
 #define ATOM_sinf VLC_FOURCC( 's', 'i', 'n', 'f' )
@@ -1043,6 +1047,20 @@ typedef struct
 
 } MP4_Box_data_avcC_t;
 
+typedef struct
+{
+    WAVEFORMATEX Format;
+    uint32_t i_extra;
+    char    *p_extra;
+} MP4_Box_data_WMA2_t;
+
+typedef struct
+{
+    VLC_BITMAPINFOHEADER bmiHeader;
+    uint32_t i_extra;
+    char    *p_extra;
+} MP4_Box_data_strf_t;
+
 /* According to Apple's CoreAudio/CoreAudioTypes.h */
 #define MP4_CHAN_USE_CHANNELS_DESC           0
 #define MP4_CHAN_USE_CHANNELS_BITMAP         (1<<16)
@@ -1360,6 +1378,8 @@ typedef union MP4_Box_data_s
     MP4_Box_data_tfrf_t *p_tfrf;
     MP4_Box_data_tfxd_t *p_tfxd;
     MP4_Box_data_hvcC_t *p_hvcC;
+    MP4_Box_data_WMA2_t *p_WMA2; /* flip4mac Little endian audio config */
+    MP4_Box_data_strf_t *p_strf; /* flip4mac Little endian video config */
 
     MP4_Box_data_data_t *p_data;
 
@@ -1419,6 +1439,10 @@ static inline size_t mp4_box_headersize( MP4_Box_t *p_box )
 #define MP4_GET8BYTES( dst ) MP4_GETX_PRIVATE( dst, GetQWBE(p_peek), 8 )
 #define MP4_GETFOURCC( dst ) MP4_GETX_PRIVATE( dst, \
                 VLC_FOURCC(p_peek[0],p_peek[1],p_peek[2],p_peek[3]), 4)
+
+#define MP4_GET2BYTESLE( dst ) MP4_GETX_PRIVATE( dst, GetWLE(p_peek), 2 )
+#define MP4_GET4BYTESLE( dst ) MP4_GETX_PRIVATE( dst, GetDWLE(p_peek), 4 )
+#define MP4_GET8BYTESLE( dst ) MP4_GETX_PRIVATE( dst, GetQWLE(p_peek), 8 )
 
 #define MP4_GETVERSIONFLAGS( p_void ) \
     MP4_GET1BYTE( p_void->i_version ); \
