@@ -996,6 +996,10 @@ static bool f_appExit = false;
 
 - (void)application:(NSApplication *)o_app openFiles:(NSArray *)o_names
 {
+    // Only add items here which are getting dropped to to the application icon
+    // or are given at startup. If a file is passed via command line, libvlccore
+    // will add the item, but cocoa also calls this function. In this case, the
+    // invocation is ignored here.
     if (launched == NO) {
         if (items_at_launch) {
             int items = [o_names count];
