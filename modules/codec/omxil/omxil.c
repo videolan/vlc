@@ -2173,6 +2173,31 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
         i_hw_usage = 0;
     }
 
+    if( p_port->p_fmt->video.orientation != ORIENT_NORMAL )
+    {
+        int i_angle;
+
+        switch( p_port->p_fmt->video.orientation )
+        {
+            case ORIENT_ROTATED_90:
+                i_angle = 90;
+                break;
+            case ORIENT_ROTATED_180:
+                i_angle = 180;
+                break;
+            case ORIENT_ROTATED_270:
+                i_angle = 270;
+                break;
+            default:
+                i_angle = 0;
+        }
+        p_port->p_hwbuf->anwpriv.setOrientation( p_port->p_hwbuf->window,
+                                                 i_angle );
+        video_format_ApplyRotation( &p_port->p_hwbuf->fmt_out,
+                                    &p_port->p_fmt->video );
+    } else
+        p_port->p_hwbuf->fmt_out = p_port->p_fmt->video;
+
     if( p_port->p_hwbuf->anwpriv.setup( p_port->p_hwbuf->window,
                                         def->format.video.nFrameWidth,
                                         def->format.video.nFrameHeight,
@@ -2212,12 +2237,12 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
         goto error;
     }
 
-    jni_SetAndroidSurfaceSize( def->format.video.nFrameWidth,
-                               def->format.video.nFrameHeight,
-                               def->format.video.nFrameWidth,
-                               def->format.video.nFrameHeight,
-                               p_dec->fmt_out.video.i_sar_num,
-                               p_dec->fmt_out.video.i_sar_den );
+    jni_SetAndroidSurfaceSize( p_port->p_hwbuf->fmt_out.i_width,
+                               p_port->p_hwbuf->fmt_out.i_height,
+                               p_port->p_hwbuf->fmt_out.i_visible_width,
+                               p_port->p_hwbuf->fmt_out.i_visible_height,
+                               p_port->p_hwbuf->fmt_out.i_sar_num,
+                               p_port->p_hwbuf->fmt_out.i_sar_den );
 
     p_port->p_hwbuf->i_buffers = p_port->definition.nBufferCountActual;
     p_port->p_hwbuf->i_max_owned = p_port->p_hwbuf->i_buffers - min_undequeued;
