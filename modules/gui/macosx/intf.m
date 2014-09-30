@@ -773,12 +773,14 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mainwindow updateTimeSlider];
     [o_mainwindow updateVolumeSlider];
 
+    // respect playlist-autostart
+    // note that PLAYLIST_PLAY will not stop any playback if already started
     playlist_t * p_playlist = pl_Get(VLCIntf);
     PL_LOCK;
     BOOL kidsAround = p_playlist->p_local_category->i_children != 0;
-    PL_UNLOCK;
     if (kidsAround && var_GetBool(p_playlist, "playlist-autostart"))
-        [[self playlist] playItem:nil];
+        playlist_Control(p_playlist, PLAYLIST_PLAY, true);
+    PL_UNLOCK;
 }
 
 /* don't allow a double termination call. If the user has
