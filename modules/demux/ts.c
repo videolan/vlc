@@ -2457,9 +2457,10 @@ static bool GatherData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
                       i_cc, ( pid->i_cc + 1 )&0x0f, pid->i_pid );
 
             pid->i_cc = i_cc;
-            if( pid->es->p_data && pid->es->fmt.i_cat != VIDEO_ES )
+            if( pid->es->p_data && pid->es->fmt.i_cat != VIDEO_ES &&
+                pid->es->fmt.i_cat != AUDIO_ES )
             {
-                /* Small video artifacts are usually better than
+                /* Small audio/video artifacts are usually better than
                  * dropping full frames */
                 pid->es->p_data->i_flags |= BLOCK_FLAG_CORRUPTED;
             }
