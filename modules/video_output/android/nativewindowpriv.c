@@ -259,3 +259,32 @@ int ANativeWindowPriv_cancel( void *window, void *p_handle )
 
     return 0;
 }
+
+int ANativeWindowPriv_setOrientation( void *window, int orientation )
+{
+    ANativeWindow *anw = (ANativeWindow *)window;
+    status_t err = NO_ERROR;
+    int transform;
+
+    CHECK_ANW();
+
+    switch( orientation )
+    {
+        case 90:
+            transform = NATIVE_WINDOW_TRANSFORM_ROT_90;
+            break;
+        case 180:
+            transform = NATIVE_WINDOW_TRANSFORM_ROT_180;
+            break;
+        case 270:
+            transform = NATIVE_WINDOW_TRANSFORM_ROT_270;
+            break;
+        default:
+            transform = 0;
+    }
+
+    err = native_window_set_buffers_transform( anw, transform );
+    CHECK_ERR();
+
+    return 0;
+}

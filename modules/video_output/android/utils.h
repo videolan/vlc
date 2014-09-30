@@ -59,6 +59,8 @@ typedef int (*ptr_ANativeWindowPriv_dequeue) (void *, void **);
 typedef int (*ptr_ANativeWindowPriv_lock) (void *, void *);
 typedef int (*ptr_ANativeWindowPriv_queue) (void *, void *);
 typedef int (*ptr_ANativeWindowPriv_cancel) (void *, void *);
+typedef int (*ptr_ANativeWindowPriv_setOrientation) (void *, int);
+
 typedef struct
 {
     ptr_ANativeWindowPriv_connect connect;
@@ -71,6 +73,7 @@ typedef struct
     ptr_ANativeWindowPriv_lock lock;
     ptr_ANativeWindowPriv_queue queue;
     ptr_ANativeWindowPriv_cancel cancel;
+    ptr_ANativeWindowPriv_setOrientation setOrientation;
 } native_window_priv_api_t;
 
 /* Fill the structure passed as parameter and return 0 if all symbols are
