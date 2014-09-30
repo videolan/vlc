@@ -526,10 +526,16 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     /* If the decoder is in the "aborted" state,
      * FLAC__stream_decoder_process_single() won't return an error. */
-    if( FLAC__stream_decoder_get_state(p_dec->p_sys->p_flac)
-        == FLAC__STREAM_DECODER_ABORTED )
+    switch ( FLAC__stream_decoder_get_state(p_dec->p_sys->p_flac) )
     {
-        FLAC__stream_decoder_flush( p_dec->p_sys->p_flac );
+        case FLAC__STREAM_DECODER_ABORTED:
+            FLAC__stream_decoder_flush( p_dec->p_sys->p_flac );
+            break;
+        case FLAC__STREAM_DECODER_END_OF_STREAM:
+            FLAC__stream_decoder_reset( p_dec->p_sys->p_flac );
+            break;
+        default:
+            break;
     }
 
     block_Release( p_sys->p_block );
