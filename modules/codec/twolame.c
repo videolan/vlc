@@ -328,7 +328,7 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
         if( !p_block )
         {
             if( p_chain )
-                block_Release( p_chain );
+                block_ChainRelease( p_chain );
             return NULL;
         }
         memcpy( p_block->p_buffer, p_sys->p_out_buffer, i_used );
