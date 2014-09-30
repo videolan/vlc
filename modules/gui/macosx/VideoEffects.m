@@ -511,7 +511,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
             B64EncAndFree(config_GetPsz(p_intf, "video-filter")),
             B64EncAndFree(config_GetPsz(p_intf, "sub-source")),
             B64EncAndFree(config_GetPsz(p_intf, "video-splitter")),
-            0, // former "hue" value, deprecated since 3.0.0
+            0LL, // former "hue" value, deprecated since 3.0.0
             config_GetFloat(p_intf, "contrast"),
             config_GetFloat(p_intf, "brightness"),
             config_GetFloat(p_intf, "saturation"),
