@@ -8,8 +8,8 @@
 # Please note that the actual code of GNU gettext is covered by the GNU
 # General Public License and is *not* in the public domain.
 #
-# Origin: gettext-0.18.3
-GETTEXT_MACRO_VERSION = 0.18
+# Origin: gettext-0.19
+GETTEXT_MACRO_VERSION = 0.19
 
 PACKAGE = @PACKAGE@
 VERSION = @VERSION@
@@ -77,6 +77,16 @@ POTFILES = \
 
 CATALOGS = @CATALOGS@
 
+POFILESDEPS_ = $(srcdir)/$(DOMAIN).pot
+POFILESDEPS_yes = $(POFILESDEPS_)
+POFILESDEPS_no =
+POFILESDEPS = $(POFILESDEPS_$(PO_DEPENDS_ON_POT))
+
+DISTFILESDEPS_ = update-po
+DISTFILESDEPS_yes = $(DISTFILESDEPS_)
+DISTFILESDEPS_no =
+DISTFILESDEPS = $(DISTFILESDEPS_$(DIST_DEPENDS_ON_UPDATE_PO))
+
 # Makevars gets inserted here. (Don't remove this line!)
 
 .SUFFIXES:
@@ -143,15 +153,25 @@ stamp-po: $(srcdir)/$(DOMAIN).pot
 # heuristic whether some file in the top level directory mentions "GNU xyz".
 # If GNU 'find' is available, we avoid grepping through monster files.
 $(DOMAIN).pot-update: $(POTFILES) $(srcdir)/POTFILES.in remove-potcdate.sed
-	if { if (LC_ALL=C find --version) 2>/dev/null | grep GNU >/dev/null; then \
-	       LC_ALL=C find -L $(top_srcdir) -maxdepth 1 -type f -size -10000000c -exec grep 'GNU @PACKAGE@' /dev/null '{}' ';' 2>/dev/null; \
-	     else \
-	       LC_ALL=C grep 'GNU @PACKAGE@' $(top_srcdir)/* 2>/dev/null; \
-	     fi; \
-	   } | grep -v 'libtool:' >/dev/null; then \
-	  package_gnu='GNU '; \
+	package_gnu="$(PACKAGE_GNU)"; \
+	test -n "$$package_gnu" || { \
+	  if { if (LC_ALL=C find --version) 2>/dev/null | grep GNU >/dev/null; then \
+		 LC_ALL=C find -L $(top_srcdir) -maxdepth 1 -type f \
+			       -size -10000000c -exec grep 'GNU @PACKAGE@' \
+			       /dev/null '{}' ';' 2>/dev/null; \
+	       else \
+		 LC_ALL=C grep 'GNU @PACKAGE@' $(top_srcdir)/* 2>/dev/null; \
+	       fi; \
+	     } | grep -v 'libtool:' >/dev/null; then \
+	     package_gnu=yes; \
+	   else \
+	     package_gnu=no; \
+	   fi; \
+	}; \
+	if test "$$package_gnu" = "yes"; then \
+	  package_prefix='GNU '; \
 	else \
-	  package_gnu=''; \
+	  package_prefix=''; \
 	fi; \
 	if test -n '$(MSGID_BUGS_ADDRESS)' || test '$(PACKAGE_BUGREPORT)' = '@'PACKAGE_BUGREPORT'@'; then \
 	  msgid_bugs_address='$(MSGID_BUGS_ADDRESS)'; \
@@ -171,7 +191,7 @@ $(DOMAIN).pot-update: $(POTFILES) $(srcdir)/POTFILES.in remove-potcdate.sed
 	      --add-comments=TRANSLATORS: $(XGETTEXT_OPTIONS) @XGETTEXT_EXTRA_OPTIONS@ \
 	      --files-from=$(srcdir)/POTFILES.in \
 	      --copyright-holder='$(COPYRIGHT_HOLDER)' \
-	      --package-name="$${package_gnu}@PACKAGE@" \
+	      --package-name="$${package_prefix}@PACKAGE@" \
 	      --package-version='@VERSION@' \
 	      --msgid-bugs-address="$$msgid_bugs_address" \
 	    ;; \
@@ -199,9 +219,10 @@ $(srcdir)/$(DOMAIN).pot:
 
 # This target rebuilds a PO file if $(DOMAIN).pot has changed.
 # Note that a PO file is not touched if it doesn't need to be changed.
-$(POFILES): $(srcdir)/$(DOMAIN).pot
+$(POFILES): $(POFILESDEPS)
 	@lang=`echo $@ | sed -e 's,.*/,,' -e 's/\.po$$//'`; \
 	if test -f "$(srcdir)/$${lang}.po"; then \
+	  test -f $(srcdir)/$(DOMAIN).pot || $(MAKE) $(srcdir)/$(DOMAIN).pot; \
 	  test "$(srcdir)" = . && cdcmd="" || cdcmd="cd $(srcdir) && "; \
 	  echo "$${cdcmd}$(MSGMERGE_UPDATE) $(MSGMERGE_OPTIONS) --lang=$${lang} $${lang}.po $(DOMAIN).pot"; \
 	  cd $(srcdir) \
@@ -362,7 +383,7 @@ maintainer-clean: distclean
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 dist distdir:
-	$(MAKE) update-po
+	test -z "$(DISTFILESDEPS)" || $(MAKE) $(DISTFILESDEPS)
 	@$(MAKE) dist2
 # This is a separate target because 'update-po' must be executed before.
 dist2: stamp-po $(DISTFILES)

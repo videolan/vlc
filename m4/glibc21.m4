@@ -1,5 +1,5 @@
 # glibc21.m4 serial 5
-dnl Copyright (C) 2000-2002, 2004, 2008, 2010-2013 Free Software Foundation,
+dnl Copyright (C) 2000-2002, 2004, 2008, 2010-2014 Free Software Foundation,
 dnl Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,

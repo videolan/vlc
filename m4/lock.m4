@@ -1,5 +1,5 @@
 # lock.m4 serial 13 (gettext-0.18.2)
-dnl Copyright (C) 2005-2013 Free Software Foundation, Inc.
+dnl Copyright (C) 2005-2014 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -24,6 +24,9 @@ AC_DEFUN([gl_LOCK],
         [[
 #if __FreeBSD__ == 4
 error "No, in FreeBSD 4.0 recursive mutexes actually don't work."
+#elif (defined __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ \
+       && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 1070)
+error "No, in Mac OS X < 10.7 recursive mutexes actually don't work."
 #else
 int x = (int)PTHREAD_MUTEX_RECURSIVE;
 return !x;
