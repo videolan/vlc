@@ -36,6 +36,7 @@ TESTS =
 
 dist_noinst_SCRIPTS = genmf list.sh module.rc.in
 dist_noinst_DATA = MODULES_LIST
+EXTRA_LTLIBRARIES =
 
 include common.am
 include access/Makefile.am

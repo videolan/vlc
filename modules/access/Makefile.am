@@ -1,6 +1,5 @@
 accessdir = $(pluginsdir)/access
 access_LTLIBRARIES =
-EXTRA_LTLIBRARIES =
 
 AM_CPPFLAGS += -I$(srcdir)/access
 
