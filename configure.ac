@@ -4263,7 +4263,6 @@ AC_CONFIG_FILES([
   modules/stream_out/Makefile
   modules/text_renderer/Makefile
   modules/video_filter/Makefile
-  modules/video_output/Makefile
   modules/visualization/Makefile
   modules/hw/vdpau/Makefile
   modules/hw/mmal/Makefile
