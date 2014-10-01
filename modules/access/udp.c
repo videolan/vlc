@@ -264,10 +264,10 @@ static void* ThreadRead( void *data )
             if( errno == EINTR )
                 break;
             continue;
-        } else {
-            pkt->i_buffer = len;
-            block_FifoPut( sys->fifo, pkt );
         }
+
+        pkt->i_buffer = len;
+        block_FifoPut( sys->fifo, pkt );
     }
 
     block_FifoWake( sys->fifo );
