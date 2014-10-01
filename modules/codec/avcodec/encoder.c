@@ -1408,7 +1408,8 @@ void CloseEncoder( vlc_object_t *p_this )
 #if (LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(54, 28, 0))
     avcodec_free_frame( &p_sys->frame );
 #else
-    av_freep( &p_sys->frame );
+    av_free( p_sys->frame );
+    p_sys->frame = NULL;
 #endif
 
     vlc_avcodec_lock();
