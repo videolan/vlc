@@ -198,8 +198,6 @@ if HAVE_XCB
 access_LTLIBRARIES += libxcb_screen_plugin.la
 endif
 
-libwl_screenshooter_plugin_la_DEPENDENCIES = \
-	access/screen/screenshooter-client-protocol.h
 libwl_screenshooter_plugin_la_SOURCES = \
 	access/screen/wayland.c
 nodist_libwl_screenshooter_plugin_la_SOURCES = \
@@ -211,6 +209,7 @@ libwl_screenshooter_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS) \
 EXTRA_DIST += access/screen/screenshooter.xml
 CLEANFILES += $(nodist_libwl_screenshooter_plugin_la_SOURCES)
 if HAVE_WAYLAND
+BUILT_SOURCES += access/screen/screenshooter-client-protocol.h
 access_LTLIBRARIES += libwl_screenshooter_plugin.la
 endif
 
