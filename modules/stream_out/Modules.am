@@ -69,3 +69,18 @@ BUILT_SOURCES += dummy.cpp
 
 dummy.cpp:
 	touch dummy.cpp
+
+# Chromecast plugin
+SUFFIXES += .proto .pb.cc
+BUILT_SOURCES += chromecast/cast_channel.pb.cc
+
+%.pb.cc: %.proto
+	$(PROTOC) --cpp_out=. -I$(srcdir) $<
+
+SOURCES_stream_out_chromecast = chromecast/cast_channel.proto chromecast/cast.cpp \
+                                ../misc/webservices/json.h ../misc/webservices/json.c
+nodist_libstream_out_chromecast_plugin_la_SOURCES = chromecast/cast_channel.pb.cc
+
+if BUILD_CHROMECAST
+stream_out_LTLIBRARIES += libstream_out_chromecast_plugin.la
+endif

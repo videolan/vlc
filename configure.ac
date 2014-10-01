@@ -636,7 +636,7 @@ AC_CHECK_FUNCS([if_nameindex if_nametoindex])
 VLC_RESTORE_FLAGS
 
 AS_IF([test -n "$SOCKET_LIBS"], [
-  VLC_ADD_LIBS([access_rtmp access_output_shout sap stream_out_standard stream_out_rtp stream_out_raop vod_rtsp oldrc netsync ts remoteosd audiobargraph_a],[${SOCKET_LIBS}])
+  VLC_ADD_LIBS([access_rtmp access_output_shout sap stream_out_standard stream_out_rtp stream_out_raop stream_out_chromecast vod_rtsp oldrc netsync ts remoteosd audiobargraph_a],[${SOCKET_LIBS}])
 ])
 AC_SUBST(SOCKET_LIBS)
 
@@ -3728,6 +3728,30 @@ PKG_WITH_MODULES([CHROMAPRINT],[libchromaprint >= libchromaprint_version],
          ),
     [(Chromaprint based audio fingerprinter)],[auto])
 m4_popdef([libchromaprint_version])
+
+dnl
+dnl  Chromecast streaming support
+dnl
+m4_pushdef([protobuf_lite_version], 2.5.0)
+PKG_WITH_MODULES([CHROMECAST],[protobuf-lite >= protobuf_lite_version], [
+    AC_CHECK_PROGS(PROTOC, protoc)
+    AS_IF([test "${PROTOC}" = "protoc"], [
+        VLC_ADD_PLUGIN([stream_out_chromecast])
+        VLC_ADD_CXXFLAGS([stream_out_chromecast],[${CHROMECAST_CFLAGS}] [-I./chromecast])
+        VLC_ADD_LIBS([stream_out_chromecast],[${CHROMECAST_LIBS}])
+        build_chromecast="yes"
+    ], [
+    AC_MSG_ERROR(protoc compiler needed for [chromecast] was not found)
+    ])
+], [
+    AS_IF([test "${enable_chromecast}" = "yes"],
+        AC_MSG_ERROR(Library [protobuf-lite >= protobuf_lite_version] needed for [chromecast] was not found),
+        AC_MSG_WARN(Library [protobuf-lite >= protobuf_lite_version] needed for [chromecast] was not found)
+    )
+    enable_chromecast="no"
+], [(Chromecast streaming support)], [auto])
+AM_CONDITIONAL([BUILD_CHROMECAST], [test "${build_chromecast}" = "yes"])
+m4_popdef([protobuf_lite_version])
 
 dnl
 dnl  Interface plugins
