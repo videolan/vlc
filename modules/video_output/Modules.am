@@ -9,8 +9,8 @@ SOURCES_vout_sdl = sdl.c
 SOURCES_directfb = directfb.c
 SOURCES_vmem = vmem.c
 SOURCES_yuv = yuv.c
-SOURCES_android_surface = android/surface.c android/utils.c
-SOURCES_android_opaque = android/opaque.c
+SOURCES_android_surface = android/surface.c android/utils.c android/utils.h
+SOURCES_android_opaque = android/opaque.c android/utils.c android/utils.h
 
 if HAVE_DECKLINK
 libdecklinkoutput_plugin_la_SOURCES = decklink.cpp
