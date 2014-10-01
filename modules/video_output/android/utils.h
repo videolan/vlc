@@ -48,3 +48,31 @@ typedef struct
    that should be destroyed with dlclose. */
 void *LoadNativeWindowAPI(native_window_api_t *native);
 void Manage(vout_display_t *);
+
+typedef int (*ptr_ANativeWindowPriv_connect) (void *);
+typedef int (*ptr_ANativeWindowPriv_disconnect) (void *);
+typedef int (*ptr_ANativeWindowPriv_setup) (void *, int, int, int, int );
+typedef int (*ptr_ANativeWindowPriv_getMinUndequeued) (void *, unsigned int *);
+typedef int (*ptr_ANativeWindowPriv_setBufferCount) (void *, unsigned int );
+typedef int (*ptr_ANativeWindowPriv_setCrop) (void *, int, int, int, int);
+typedef int (*ptr_ANativeWindowPriv_dequeue) (void *, void **);
+typedef int (*ptr_ANativeWindowPriv_lock) (void *, void *);
+typedef int (*ptr_ANativeWindowPriv_queue) (void *, void *);
+typedef int (*ptr_ANativeWindowPriv_cancel) (void *, void *);
+typedef struct
+{
+    ptr_ANativeWindowPriv_connect connect;
+    ptr_ANativeWindowPriv_disconnect disconnect;
+    ptr_ANativeWindowPriv_setup setup;
+    ptr_ANativeWindowPriv_getMinUndequeued getMinUndequeued;
+    ptr_ANativeWindowPriv_setBufferCount setBufferCount;
+    ptr_ANativeWindowPriv_setCrop setCrop;
+    ptr_ANativeWindowPriv_dequeue dequeue;
+    ptr_ANativeWindowPriv_lock lock;
+    ptr_ANativeWindowPriv_queue queue;
+    ptr_ANativeWindowPriv_cancel cancel;
+} native_window_priv_api_t;
+
+/* Fill the structure passed as parameter and return 0 if all symbols are
+   found. Don't need to call dlclose, the lib is already loaded. */
+int LoadNativeWindowPrivAPI(native_window_priv_api_t *native);

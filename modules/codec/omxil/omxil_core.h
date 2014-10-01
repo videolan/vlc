@@ -36,19 +36,7 @@ OMX_ERRORTYPE (*pf_get_roles_of_component)(OMX_STRING, OMX_U32 *, OMX_U8 **);
 /* Extra IOMX android functions. Can be NULL if we don't link with libiomx */
 OMX_ERRORTYPE (*pf_enable_graphic_buffers)(OMX_HANDLETYPE, OMX_U32, OMX_BOOL);
 OMX_ERRORTYPE (*pf_get_graphic_buffer_usage)(OMX_HANDLETYPE, OMX_U32, OMX_U32*);
-
-/* OMXHWBuffer functions */
-int (*pf_omx_hwbuffer_connect) (void *);
-int (*pf_omx_hwbuffer_disconnect) (void *);
-int (*pf_omx_hwbuffer_get_hal_format) (const char *, int *);
-int (*pf_omx_hwbuffer_setup) (void *, int, int, int, int );
-int (*pf_omx_hwbuffer_get_min_undequeued) (void *, unsigned int *);
-int (*pf_omx_hwbuffer_set_buffer_count) (void *, unsigned int );
-int (*pf_omx_hwbuffer_setcrop) (void *, int, int, int, int);
-int (*pf_omx_hwbuffer_dequeue) (void *, void **);
-int (*pf_omx_hwbuffer_lock) (void *, void *);
-int (*pf_omx_hwbuffer_queue) (void *, void *);
-int (*pf_omx_hwbuffer_cancel) (void *, void *);
+OMX_ERRORTYPE (*pf_get_hal_format) (const char *, int *);
 
 int InitOmxCore(vlc_object_t *p_this);
 void DeinitOmxCore(void);

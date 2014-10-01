@@ -427,6 +427,30 @@ OMX_ERRORTYPE PREFIX(OMXAndroid_GetGraphicBufferUsage)(OMX_HANDLETYPE component,
         return OMX_ErrorUndefined;
     return OMX_ErrorNone;
 }
+
+OMX_ERRORTYPE PREFIX(OMXAndroid_GetHalFormat)( const char *comp_name, int* hal_format )
+{
+    if( !strncmp( comp_name, "OMX.SEC.", 8 ) ) {
+        switch( *hal_format ) {
+        case OMX_COLOR_FormatYUV420SemiPlanar:
+            *hal_format = 0x105; // HAL_PIXEL_FORMAT_YCbCr_420_SP
+            break;
+        case OMX_COLOR_FormatYUV420Planar:
+            *hal_format = 0x101; // HAL_PIXEL_FORMAT_YCbCr_420_P
+            break;
+        }
+    }
+    else if( !strcmp( comp_name, "OMX.TI.720P.Decoder" ) ||
+        !strcmp( comp_name, "OMX.TI.Video.Decoder" ) )
+        *hal_format = 0x14; // HAL_PIXEL_FORMAT_YCbCr_422_I
+#if ANDROID_API <= 13 // Required on msm8660 on 3.2, not required on 4.1
+    else if( !strcmp( comp_name, "OMX.qcom.video.decoder.avc" ))
+        *hal_format = 0x108;
+#endif
+
+    return OMX_ErrorNone;
+}
+
 #endif
 }
 
