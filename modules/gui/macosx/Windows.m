@@ -256,7 +256,7 @@
 
     BOOL b_inFullscreen = [self fullscreen] || ([self respondsToSelector:@selector(inFullscreenTransition)] && [(VLCVideoWindowCommon *)self inFullscreenTransition]);
 
-    if(OSX_MAVERICKS && b_inFullscreen && constrainedRect.size.width == screenRect.size.width
+    if((OSX_MAVERICKS || OSX_YOSEMITE) && b_inFullscreen && constrainedRect.size.width == screenRect.size.width
           && constrainedRect.size.height != screenRect.size.height
           && abs(screenRect.size.height - constrainedRect.size.height) <= 25.) {
 
