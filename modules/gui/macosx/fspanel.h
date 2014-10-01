@@ -45,7 +45,6 @@
                 styleMask: (NSUInteger)aStyle
                   backing: (NSBackingStoreType)bufferingType
                     defer: (BOOL)flag;
-- (void)awakeFromNib;
 - (BOOL)canBecomeKeyWindow;
 - (void)dealloc;
 

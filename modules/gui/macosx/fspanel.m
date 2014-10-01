@@ -48,6 +48,10 @@
                     defer:(BOOL)flag
 {
     id win = [super initWithContentRect:contentRect styleMask:NSTexturedBackgroundWindowMask backing:bufferingType defer:flag];
+
+    if (!win)
+        return win;
+
     self.contentView = [[VLCFSPanelView alloc] initWithFrame:contentRect];
     [win setOpaque:NO];
     [win setHasShadow: NO];
@@ -61,11 +65,7 @@
     hideAgainTimer = fadeTimer = nil;
     [self setFrameAutosaveName:@"fspanel"];
     [self setNonActive:nil];
-    return win;
-}
 
-- (void)awakeFromNib
-{
     [self setContentView:[[VLCFSPanelView alloc] initWithFrame: [self frame]]];
     BOOL isInside = (NSPointInRect([NSEvent mouseLocation],[self frame]));
     [[self contentView] addTrackingRect:[[self contentView] bounds] owner:self userData:nil assumeInside:isInside];
@@ -79,18 +79,20 @@
 
     /* get a notification if VLC isn't the active app anymore */
     [[NSNotificationCenter defaultCenter]
-    addObserver: self
-       selector: @selector(setNonActive:)
-           name: NSApplicationDidResignActiveNotification
-         object: NSApp];
+     addObserver: self
+     selector: @selector(setNonActive:)
+     name: NSApplicationDidResignActiveNotification
+     object: NSApp];
 
     /* Get a notification if VLC is the active app again.
      Needed as becomeKeyWindow does not get called when window is activated by clicking */
     [[NSNotificationCenter defaultCenter]
-    addObserver: self
-       selector: @selector(setActive:)
-           name: NSApplicationDidBecomeActiveNotification
-         object: NSApp];
+     addObserver: self
+     selector: @selector(setActive:)
+     name: NSApplicationDidBecomeActiveNotification
+     object: NSApp];
+
+    return win;
 }
 
 /* make sure that we don't become key, since we can't handle hotkeys */
