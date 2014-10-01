@@ -656,6 +656,20 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
 
         json_value_free(p_data);
     }
+    else if (namespace_ == "urn:x-cast:com.google.cast.tp.connection")
+    {
+        json_value *p_data = json_parse(msg.payload_utf8().c_str());
+        std::string type((*p_data)["type"]);
+        json_value_free(p_data);
+
+        if (type == "CLOSE")
+        {
+            msg_Warn(p_stream, "received close message");
+            vlc_mutex_lock(&p_sys->lock);
+            p_sys->i_status = CHROMECAST_CONNECTION_DEAD;
+            vlc_mutex_unlock(&p_sys->lock);
+        }
+    }
     else
     {
         msg_Err(p_stream, "Unknown namespace: %s", msg.namespace_().c_str());
@@ -860,10 +874,17 @@ static void* chromecastThread(void* p_data)
                 msg_Err(p_stream, "The connection to the Chromecast died.");
                 vlc_mutex_locker locker(&p_sys->lock);
                 p_sys->i_status = CHROMECAST_CONNECTION_DEAD;
-                atomic_store(&p_sys->ab_error, true);
-                break;
             }
         }
+
+        vlc_mutex_lock(&p_sys->lock);
+        if ( p_sys->i_status == CHROMECAST_CONNECTION_DEAD )
+        {
+            atomic_store(&p_sys->ab_error, true);
+            vlc_mutex_unlock(&p_sys->lock);
+            break;
+        }
+        vlc_mutex_unlock(&p_sys->lock);
 
         vlc_restorecancel(canc);
     }
