@@ -1405,8 +1405,11 @@ void CloseEncoder( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
-    /*FIXME: we should use avcodec_free_frame, but we don't require so new avcodec that has it*/
+#if (LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(54, 28, 0))
+    avcodec_free_frame( &p_sys->frame );
+#else
     av_freep( &p_sys->frame );
+#endif
 
     vlc_avcodec_lock();
     avcodec_close( p_sys->p_context );
