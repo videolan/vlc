@@ -3220,11 +3220,6 @@ then
       if test "${SYS}" != "darwin"; then
         VLC_ADD_PLUGIN([vout_sdl])
       fi
-      if test "${SYS}" != "mingw32" -a "${SYS}" != "os2"; then
-        VLC_ADD_LIBS([vout_sdl],[${X_LIBS} ${X_PRE_LIBS} -lX11])
-      fi
-      VLC_ADD_CFLAGS([vout_sdl],[${SDL_CFLAGS}])
-      VLC_ADD_LIBS([vout_sdl],[${SDL_LIBS}])
 
       # SDL_image
       AS_IF([ test "${enable_sdl_image}" != "no"],[
@@ -3336,12 +3331,8 @@ dnl
 AC_ARG_ENABLE(android-surface,
   [  --enable-android-surface   Android Surface video output module (default disabled)])
 if test "${enable_android_surface}" = "yes"; then
-  if test "${HAVE_ANDROID}" = "1"; then
      VLC_ADD_PLUGIN([android_surface])
-     VLC_ADD_LIBS([android_surface], [-ldl])
      VLC_ADD_PLUGIN([android_opaque])
-     VLC_ADD_LIBS([android_opaque], [-ldl])
-  fi
 fi
 
 dnl
@@ -3469,10 +3460,6 @@ then
   if test "${have_aa}" = "true"
   then
     VLC_ADD_PLUGIN([aa])
-    VLC_ADD_LIBS([aa],[-laa])
-    if test "${SYS}" != "mingw32"; then
-      VLC_ADD_LIBS([aa],[${X_LIBS} ${X_PRE_LIBS} -lX11])
-    fi
   fi
 fi
 

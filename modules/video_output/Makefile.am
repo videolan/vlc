@@ -1,16 +1,6 @@
 voutdir = $(pluginsdir)/video_output
-
 noinst_LTLIBRARIES =
 vout_LTLIBRARIES =
-
-SOURCES_aa = aa.c
-SOURCES_fb = fb.c
-SOURCES_vout_sdl = sdl.c
-SOURCES_directfb = directfb.c
-SOURCES_vmem = vmem.c
-SOURCES_yuv = yuv.c
-SOURCES_android_surface = android/surface.c android/utils.c android/utils.h
-SOURCES_android_opaque = android/opaque.c android/utils.c android/utils.h
 
 if HAVE_DECKLINK
 libdecklinkoutput_plugin_la_SOURCES = decklink.cpp
@@ -221,6 +211,7 @@ if HAVE_KVA
 vout_LTLIBRARIES += libkva_plugin.la
 endif
 
+
 ### Android ###
 
 libegl_android_plugin_la_SOURCES = egl.c
@@ -229,14 +220,70 @@ libegl_android_plugin_la_LIBADD = $(EGL_LIBS)
 
 libandroid_native_window_plugin_la_SOURCES = android/nativewindow.c android/utils.c
 libandroid_native_window_plugin_la_CFLAGS = $(AM_CFLAGS)
-libandroid_native_window_plugin_la_LIBADD = -ldl
+libandroid_native_window_plugin_la_LIBADD = $(LIBDL)
+
+libandroid_opaque_plugin_la_SOURCES = android/opaque.c android/utils.c android/utils.h
+libandroid_opaque_plugin_la_CFLAGS = $(AM_CFLAGS)
+libandroid_opaque_plugin_la_LIBADD = $(LIBDL)
+libandroid_opaque_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+EXTRA_LTLIBRARIES += libandroid_opaque_plugin.la
+
+libandroid_surface_plugin_la_SOURCES = android/surface.c android/utils.c android/utils.h
+libandroid_surface_plugin_la_CFLAGS = $(AM_CFLAGS)
+libandroid_surface_plugin_la_LIBADD = $(LIBDL)
+libandroid_surface_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+EXTRA_LTLIBRARIES += libandroid_surface_plugin.la
 
 if HAVE_ANDROID
 vout_LTLIBRARIES += libandroid_native_window_plugin.la
+vout_LTLIBRARIES += $(LTLIBandroid_opaque)
+vout_LTLIBRARIES += $(LTLIBandroid_surface)
 if HAVE_EGL
 vout_LTLIBRARIES += libegl_android_plugin.la
 endif
 endif
+
+
+### FrameBuffer ###
+
+libdirectfb_plugin_la_SOURCES = directfb.c
+libdirectfb_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_directfb)
+libdirectfb_plugin_la_LIBADD = $(LIBS_directfb)
+libdirectfb_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+EXTRA_LTLIBRARIES += libdirectfb_plugin.la
+vout_LTLIBRARIES += $(LTLIBdirectfb)
+
+libfb_plugin_la_SOURCES = fb.c
+libfb_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+EXTRA_LTLIBRARIES += libfb_plugin.la
+vout_LTLIBRARIES += $(LTLIBfb)
+
+
+### Simple DirectMedia Layer ###
+libvout_sdl_plugin_la_SOURCES = sdl.c
+libvout_sdl_plugin_la_CFLAGS = $(AM_CFLAGS) $(SDL_CFLAGS)
+libvout_sdl_plugin_la_LIBADD = $(SDL_LIBS)
+if !HAVE_WIN32
+if !HAVE_OS2
+libvout_sdl_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIBS) -lX11
+endif
+endif
+libvout_sdl_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+EXTRA_LTLIBRARIES += libvout_sdl_plugin.la
+vout_LTLIBRARIES += $(LTLIBvout_sdl)
+
+
+
+### ASCII Art ###
+libaa_plugin_la_SOURCES = aa.c
+libaa_plugin_la_LIBADD = -laa
+if !HAVE_WIN32
+libaa_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIBS) -lX11
+endif
+libaa_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+EXTRA_LTLIBRARIES += libaa_plugin.la
+vout_LTLIBRARIES += $(LTLIBaa)
+
 
 ### Coloured ASCII art ###
 libcaca_plugin_la_SOURCES = caca.c
@@ -251,8 +298,11 @@ libcaca_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 EXTRA_LTLIBRARIES += libcaca_plugin.la
 vout_LTLIBRARIES += $(LTLIBcaca)
 
+
 ### Common ###
 libvdummy_plugin_la_SOURCES = vdummy.c
+libvmem_plugin_la_SOURCES = vmem.c
+libyuv_plugin_la_SOURCES = yuv.c
 
 vout_LTLIBRARIES += \
 	libvdummy_plugin.la \
