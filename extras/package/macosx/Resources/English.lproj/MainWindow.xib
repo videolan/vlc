@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">13C64</string>
+    <string key="IBDocument.SystemVersion">13F34</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1265.19</string>
-    <string key="IBDocument.HIToolboxVersion">697.40</string>
+    <string key="IBDocument.AppKitVersion">1265.21</string>
+    <string key="IBDocument.HIToolboxVersion">698.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <object class="NSArray" key="dict.sortedKeys">
@@ -22,9 +22,9 @@
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <integer value="5260"/>
-      <integer value="4850"/>
       <integer value="5605"/>
       <integer value="4682"/>
+      <integer value="4850"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -2540,6 +2540,14 @@
           </object>
           <int key="connectionID">5619</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_dropzone_img</string>
+            <reference key="source" ref="498338108"/>
+            <reference key="destination" ref="684815277"/>
+          </object>
+          <int key="connectionID">5620</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -4133,7 +4141,7 @@
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">5619</int>
+      <int key="maxID">5620</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -4812,6 +4820,7 @@
               <string>o_chosen_category_lbl</string>
               <string>o_dropzone_box</string>
               <string>o_dropzone_btn</string>
+              <string>o_dropzone_img</string>
               <string>o_dropzone_lbl</string>
               <string>o_dropzone_view</string>
               <string>o_left_split_view</string>
@@ -4866,6 +4875,7 @@
               <string>id</string>
               <string>id</string>
               <string>id</string>
+              <string>id</string>
             </object>
           </object>
           <object class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -4875,6 +4885,7 @@
               <string>o_chosen_category_lbl</string>
               <string>o_dropzone_box</string>
               <string>o_dropzone_btn</string>
+              <string>o_dropzone_img</string>
               <string>o_dropzone_lbl</string>
               <string>o_dropzone_view</string>
               <string>o_left_split_view</string>
@@ -4912,6 +4923,10 @@
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_dropzone_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_dropzone_img</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
@@ -5368,11 +5383,9 @@
               <string>o_save_accessory_text</string>
               <string>o_save_accessory_view</string>
               <string>o_search_field</string>
-              <string>o_search_field_other</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -5423,7 +5436,6 @@
               <string>o_save_accessory_text</string>
               <string>o_save_accessory_view</string>
               <string>o_search_field</string>
-              <string>o_search_field_other</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
@@ -5513,10 +5525,6 @@
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_search_field</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_search_field_other</string>
                 <string key="candidateClassName">id</string>
               </object>
             </object>
@@ -5703,7 +5711,7 @@
         <object class="IBPartialClassDescription">
           <string key="className">NSApplication</string>
           <string key="superclassName">NSResponder</string>
-          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="1011542144">
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
             <string key="majorKey">IBFrameworkSource</string>
             <string key="minorKey">AppKit.framework/Headers/NSApplication.h</string>
           </object>
@@ -5851,10 +5859,6 @@
             <string key="majorKey">IBFrameworkSource</string>
             <string key="minorKey">AppKit.framework/Headers/NSAccessibility.h</string>
           </object>
-        </object>
-        <object class="IBPartialClassDescription">
-          <string key="className">NSObject</string>
-          <reference key="sourceIdentifier" ref="1011542144"/>
         </object>
         <object class="IBPartialClassDescription">
           <string key="className">NSObject</string>
@@ -6143,13 +6147,6 @@
           <object class="IBClassDescriptionSource" key="sourceIdentifier">
             <string key="majorKey">IBFrameworkSource</string>
             <string key="minorKey">WebKit.framework/Headers/WebFrameLoadDelegate.h</string>
-          </object>
-        </object>
-        <object class="IBPartialClassDescription">
-          <string key="className">NSObject</string>
-          <object class="IBClassDescriptionSource" key="sourceIdentifier">
-            <string key="majorKey">IBFrameworkSource</string>
-            <string key="minorKey">WebKit.framework/Headers/WebJavaPlugIn.h</string>
           </object>
         </object>
         <object class="IBPartialClassDescription">

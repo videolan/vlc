@@ -176,6 +176,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_dropzone_btn setTitle: _NS("Open media...")];
     [[o_dropzone_btn cell] accessibilitySetOverrideValue:_NS("Click to open an advanced dialog to select the media to play. You can also drop files here to play.") forAttribute:NSAccessibilityDescriptionAttribute];
     [o_dropzone_lbl setStringValue: _NS("Drop media here")];
+    [o_dropzone_img setImage: imageFromRes(@"dropzone")];
 
     [o_podcast_add_btn setTitle: _NS("Subscribe")];
     [o_podcast_remove_btn setTitle: _NS("Unsubscribe")];
@@ -325,9 +326,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
     o_sidebaritems = [[NSMutableArray alloc] init];
     SideBarItem *libraryItem = [SideBarItem itemWithTitle:_NS("LIBRARY") identifier:@"library"];
     SideBarItem *playlistItem = [SideBarItem itemWithTitle:_NS("Playlist") identifier:@"playlist"];
-    [playlistItem setIcon: [NSImage imageNamed:@"sidebar-playlist"]];
+    [playlistItem setIcon: imageFromRes(@"sidebar-playlist")];
     SideBarItem *medialibraryItem = [SideBarItem itemWithTitle:_NS("Media Library") identifier:@"medialibrary"];
-    [medialibraryItem setIcon: [NSImage imageNamed:@"sidebar-playlist"]];
+    [medialibraryItem setIcon: imageFromRes(@"sidebar-playlist")];
     SideBarItem *mycompItem = [SideBarItem itemWithTitle:_NS("MY COMPUTER") identifier:@"mycomputer"];
     SideBarItem *devicesItem = [SideBarItem itemWithTitle:_NS("DEVICES") identifier:@"devices"];
     SideBarItem *lanItem = [SideBarItem itemWithTitle:_NS("LOCAL NETWORK") identifier:@"localnetwork"];
@@ -352,7 +353,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             case SD_CAT_INTERNET:
                 [internetItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                 if (!strncmp(*ppsz_name, "podcast", 7))
-                    [[internetItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-podcast"]];
+                    [[internetItems lastObject] setIcon: imageFromRes(@"sidebar-podcast")];
                 else
                     [[internetItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
                 [[internetItems lastObject] setSdtype: SD_CAT_INTERNET];
@@ -366,18 +367,18 @@ static VLCMainWindow *_o_sharedInstance = nil;
                 break;
             case SD_CAT_LAN:
                 [lanItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
-                [[lanItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-local"]];
+                [[lanItems lastObject] setIcon: imageFromRes(@"sidebar-local")];
                 [[lanItems lastObject] setSdtype: SD_CAT_LAN];
                 [[lanItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String:*ppsz_longname]];
                 break;
             case SD_CAT_MYCOMPUTER:
                 [mycompItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                 if (!strncmp(*ppsz_name, "video_dir", 9))
-                    [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-movie"]];
+                    [[mycompItems lastObject] setIcon: imageFromRes(@"sidebar-movie")];
                 else if (!strncmp(*ppsz_name, "audio_dir", 9))
-                    [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-music"]];
+                    [[mycompItems lastObject] setIcon: imageFromRes(@"sidebar-music")];
                 else if (!strncmp(*ppsz_name, "picture_dir", 11))
-                    [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-pictures"]];
+                    [[mycompItems lastObject] setIcon: imageFromRes(@"sidebar-pictures")];
                 else
                     [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
                 [[mycompItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String:*ppsz_longname]];

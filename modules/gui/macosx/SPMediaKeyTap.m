@@ -256,7 +256,6 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     [_delegate mediaKeyTap:self receivedMediaKeyEvent:event];
 }
 
-
 -(void)eventTapThread;
 {
     _tapThreadRL = CFRunLoopGetCurrent();

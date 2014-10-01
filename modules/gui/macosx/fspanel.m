@@ -390,8 +390,8 @@
     [o_button setBezelStyle: NSRegularSquareBezelStyle];                                        \
     [o_button setBordered: NO];                                                                 \
     [o_button setFont:[NSFont systemFontOfSize:0]];                                             \
-    [o_button setImage:[NSImage imageNamed:imageOff]];                                 \
-    [o_button setAlternateImage:[NSImage imageNamed:imageOn]];                         \
+    [o_button setImage:imageFromRes(imageOff)];                                 \
+    [o_button setAlternateImage:imageFromRes(imageOn)];                         \
     [o_button sizeToFit];                                                                       \
     [o_button setTarget: self];                                                                 \
     [o_button setAction: @selector(action:)];                                                   \
@@ -486,11 +486,11 @@
     addTextfield(VLCTimeField, o_streamLength_txt, NSRightTextAlignment, systemFontOfSize, whiteColor);
     [o_streamLength_txt setRemainingIdentifier: @"DisplayFullscreenTimeAsTimeRemaining"];
 
-    o_background_img = [[NSImage imageNamed:@"fs_background"] retain];
-    o_vol_sld_img = [[NSImage imageNamed:@"fs_volume_slider_bar"] retain];
-    o_vol_mute_img = [[NSImage imageNamed:@"fs_volume_mute_highlight"] retain];
-    o_vol_max_img = [[NSImage imageNamed:@"fs_volume_max_highlight"] retain];
-    o_time_sld_img = [[NSImage imageNamed:@"fs_time_slider"] retain];
+    o_background_img = [imageFromRes(@"fs_background") retain];
+    o_vol_sld_img = [imageFromRes(@"fs_volume_slider_bar") retain];
+    o_vol_mute_img = [imageFromRes(@"fs_volume_mute_highlight") retain];
+    o_vol_max_img = [imageFromRes(@"fs_volume_max_highlight") retain];
+    o_time_sld_img = [imageFromRes(@"fs_time_slider") retain];
 
     return view;
 }
@@ -517,14 +517,14 @@
 
 - (void)setPlay
 {
-    [o_play setImage:[NSImage imageNamed:@"fs_play_highlight"]];
-    [o_play setAlternateImage: [NSImage imageNamed:@"fs_play"]];
+    [o_play setImage:imageFromRes(@"fs_play_highlight")];
+    [o_play setAlternateImage: imageFromRes(@"fs_play")];
 }
 
 - (void)setPause
 {
-    [o_play setImage: [NSImage imageNamed:@"fs_pause_highlight"]];
-    [o_play setAlternateImage: [NSImage imageNamed:@"fs_pause"]];
+    [o_play setImage: imageFromRes(@"fs_pause_highlight")];
+    [o_play setAlternateImage: imageFromRes(@"fs_pause")];
 }
 
 - (void)setStreamTitle:(NSString *)o_title
@@ -683,7 +683,7 @@
 - (void)drawKnobInRect:(NSRect)knobRect
 {
     NSRect image_rect;
-    NSImage *img = [NSImage imageNamed:@"fs_time_slider_knob_highlight"];
+    NSImage *img = imageFromRes(@"fs_time_slider_knob_highlight");
     image_rect.size = [img size];
     image_rect.origin.x = 0;
     image_rect.origin.y = 0;
@@ -727,7 +727,7 @@
 - (void)drawKnobInRect:(NSRect) knobRect
 {
     NSRect image_rect;
-    NSImage *img = [NSImage imageNamed:@"fs_volume_slider_knob_highlight"];
+    NSImage *img = imageFromRes(@"fs_volume_slider_knob_highlight");
     image_rect.size = [img size];
     image_rect.origin.x = 0;
     image_rect.origin.y = 0;

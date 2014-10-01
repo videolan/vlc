@@ -67,7 +67,7 @@
 - (void)awakeFromNib
 {
     [self setAutoresizesSubviews: YES];
-    [self setImagesLeft:[NSImage imageNamed:@"topbar-dark-left"] middle: [NSImage imageNamed:@"topbar-dark-center-fill"] right:[NSImage imageNamed:@"topbar-dark-right"]];
+    [self setImagesLeft:imageFromRes(@"topbar-dark-left") middle: imageFromRes(@"topbar-dark-center-fill") right:imageFromRes(@"topbar-dark-right")];
 
     [self loadButtonIcons];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(controlTintChanged:) name: NSControlTintDidChangeNotification object: nil];

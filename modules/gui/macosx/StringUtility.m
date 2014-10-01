@@ -26,6 +26,7 @@
 
 #import "intf.h"
 #import "StringUtility.h"
+#import "CompatibilityFixes.h"
 
 #import <vlc_keys.h>
 #import <vlc_strings.h>
@@ -392,5 +393,16 @@ NSString *toNSStr(const char *str) {
     return returnStr;
 }
 
-
 @end
+
+NSImage *imageFromRes(NSString *o_id)
+{
+    NSString *result = @"";
+    if (OSX_YOSEMITE) {
+        result = [result stringByAppendingString:@"ys-"];
+    }
+
+    result = [result stringByAppendingString:o_id];
+
+    return [NSImage imageNamed:result];
+}
