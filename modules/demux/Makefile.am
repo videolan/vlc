@@ -121,7 +121,9 @@ libdemux_stl_plugin_la_SOURCES = demux/stl.c
 libdemux_stl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 demux_LTLIBRARIES += libdemux_stl_plugin.la
 
-libasf_plugin_la_SOURCES = demux/asf/asf.c demux/asf/libasf.c demux/asf/libasf.h demux/asf/libasf_guid.h
+libasf_plugin_la_SOURCES = demux/asf/asf.c demux/asf/libasf.c demux/asf/libasf.h \
+                           demux/asf/asfpacket.c demux/asf/asfpacket.h \
+                           demux/asf/libasf_guid.h
 demux_LTLIBRARIES += libasf_plugin.la
 
 libavi_plugin_la_SOURCES = demux/avi/avi.c demux/avi/libavi.c demux/avi/libavi.h
