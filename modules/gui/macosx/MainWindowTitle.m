@@ -92,55 +92,37 @@
     [o_green_btn setNeedsDisplay];
 }
 
+- (NSImage *)getButtonImage:(NSString *)o_id
+{
+    NSString *o_name = @"";
+    if (OSX_SNOW_LEOPARD) {
+        o_name = @"snowleo-";
+    } else if (OSX_YOSEMITE) {
+        o_name = @"yosemite-";
+    } else { // OSX_LION, OSX_MOUNTAIN_LION, OSX_MAVERICKS
+        o_name = @"lion-";
+    }
+
+    o_name = [o_name stringByAppendingString:o_id];
+
+    if ([NSColor currentControlTint] != NSBlueControlTint) {
+        o_name = [o_name stringByAppendingString:@"-graphite"];
+    }
+
+    return [NSImage imageNamed:o_name];
+}
+
 - (void)loadButtonIcons
 {
-    if (!OSX_SNOW_LEOPARD) {
-        if ([NSColor currentControlTint] == NSBlueControlTint)
-        {
-            o_red_img = [[NSImage imageNamed:@"lion-window-close"] retain];
-            o_red_over_img = [[NSImage imageNamed:@"lion-window-close-over"] retain];
-            o_red_on_img = [[NSImage imageNamed:@"lion-window-close-on"] retain];
-            o_yellow_img = [[NSImage imageNamed:@"lion-window-minimize"] retain];
-            o_yellow_over_img = [[NSImage imageNamed:@"lion-window-minimize-over"] retain];
-            o_yellow_on_img = [[NSImage imageNamed:@"lion-window-minimize-on"] retain];
-            o_green_img = [[NSImage imageNamed:@"lion-window-zoom"] retain];
-            o_green_over_img = [[NSImage imageNamed:@"lion-window-zoom-over"] retain];
-            o_green_on_img = [[NSImage imageNamed:@"lion-window-zoom-on"] retain];
-        } else {
-            o_red_img = [[NSImage imageNamed:@"lion-window-close-graphite"] retain];
-            o_red_over_img = [[NSImage imageNamed:@"lion-window-close-over-graphite"] retain];
-            o_red_on_img = [[NSImage imageNamed:@"lion-window-close-on-graphite"] retain];
-            o_yellow_img = [[NSImage imageNamed:@"lion-window-minimize-graphite"] retain];
-            o_yellow_over_img = [[NSImage imageNamed:@"lion-window-minimize-over-graphite"] retain];
-            o_yellow_on_img = [[NSImage imageNamed:@"lion-window-minimize-on-graphite"] retain];
-            o_green_img = [[NSImage imageNamed:@"lion-window-zoom-graphite"] retain];
-            o_green_over_img = [[NSImage imageNamed:@"lion-window-zoom-over-graphite"] retain];
-            o_green_on_img = [[NSImage imageNamed:@"lion-window-zoom-on-graphite"] retain];
-        }
-    } else {
-        if ([NSColor currentControlTint] == NSBlueControlTint)
-        {
-            o_red_img = [[NSImage imageNamed:@"snowleo-window-close"] retain];
-            o_red_over_img = [[NSImage imageNamed:@"snowleo-window-close-over"] retain];
-            o_red_on_img = [[NSImage imageNamed:@"snowleo-window-close-on"] retain];
-            o_yellow_img = [[NSImage imageNamed:@"snowleo-window-minimize"] retain];
-            o_yellow_over_img = [[NSImage imageNamed:@"snowleo-window-minimize-over"] retain];
-            o_yellow_on_img = [[NSImage imageNamed:@"snowleo-window-minimize-on"] retain];
-            o_green_img = [[NSImage imageNamed:@"snowleo-window-zoom"] retain];
-            o_green_over_img = [[NSImage imageNamed:@"snowleo-window-zoom-over"] retain];
-            o_green_on_img = [[NSImage imageNamed:@"snowleo-window-zoom-on"] retain];
-        } else {
-            o_red_img = [[NSImage imageNamed:@"snowleo-window-close-graphite"] retain];
-            o_red_over_img = [[NSImage imageNamed:@"snowleo-window-close-over-graphite"] retain];
-            o_red_on_img = [[NSImage imageNamed:@"snowleo-window-close-on-graphite"] retain];
-            o_yellow_img = [[NSImage imageNamed:@"snowleo-window-minimize-graphite"] retain];
-            o_yellow_over_img = [[NSImage imageNamed:@"snowleo-window-minimize-over-graphite"] retain];
-            o_yellow_on_img = [[NSImage imageNamed:@"snowleo-window-minimize-on-graphite"] retain];
-            o_green_img = [[NSImage imageNamed:@"snowleo-window-zoom-graphite"] retain];
-            o_green_over_img = [[NSImage imageNamed:@"snowleo-window-zoom-over-graphite"] retain];
-            o_green_on_img = [[NSImage imageNamed:@"snowleo-window-zoom-on-graphite"] retain];
-        }
-    }
+    o_red_img = [[self getButtonImage:@"window-close"] retain];
+    o_red_over_img = [[self getButtonImage:@"window-close-over"] retain];
+    o_red_on_img = [[self getButtonImage:@"window-close-on"] retain];
+    o_yellow_img = [[self getButtonImage:@"window-minimize"] retain];
+    o_yellow_over_img = [[self getButtonImage:@"window-minimize-over"] retain];
+    o_yellow_on_img = [[self getButtonImage:@"window-minimize-on"] retain];
+    o_green_img = [[self getButtonImage:@"window-zoom"] retain];
+    o_green_over_img = [[self getButtonImage:@"window-zoom-over"] retain];
+    o_green_on_img = [[self getButtonImage:@"window-zoom-on"] retain];
 
     [o_red_btn setImage: o_red_img];
     [o_red_btn setAlternateImage: o_red_on_img];
