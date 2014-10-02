@@ -121,6 +121,7 @@ static void msgConnect(sout_stream_t *p_stream, std::string destinationId);
 static void msgClose(sout_stream_t *p_stream, std::string destinationId);
 static void msgLaunch(sout_stream_t *p_stream);
 static void msgLoad(sout_stream_t *p_stream);
+static void msgStatus(sout_stream_t *p_stream);
 
 static void *chromecastThread(void *data);
 
@@ -778,6 +779,18 @@ static void msgClose(sout_stream_t *p_stream, std::string destinationId)
     p_sys->messagesToSend.push(msg);
 }
 
+static void msgStatus(sout_stream_t *p_stream)
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    std::stringstream ss;
+    ss << "{\"type\":\"GET_STATUS\"}";
+
+    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.receiver",
+        castchannel::CastMessage_PayloadType_STRING, ss.str());
+
+    p_sys->messagesToSend.push(msg);
+}
 
 static void msgLaunch(sout_stream_t *p_stream)
 {
@@ -859,7 +872,10 @@ static void* chromecastThread(void* p_data)
         }
 
         if (b_pingTimeout)
+        {
             msgPing(p_stream);
+            msgStatus(p_stream);
+        }
 
         if (b_msgReceived)
         {
