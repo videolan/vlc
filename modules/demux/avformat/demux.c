@@ -328,17 +328,10 @@ int OpenDemux( vlc_object_t *p_this )
     {
         AVStream *s = p_sys->ic->streams[i];
         AVCodecContext *cc = s->codec;
-
-        es_out_id_t  *es;
+        es_out_id_t  *es = NULL;
         es_format_t  fmt;
         vlc_fourcc_t fcc;
         const char *psz_type = "unknown";
-
-        if( cc->codec_id == AV_CODEC_ID_NONE )
-        {
-            p_sys->i_tk++;
-            continue;
-        }
 
         if( !GetVlcFourcc( cc->codec_id, NULL, &fcc, NULL ) )
             fcc = VLC_FOURCC( 'u', 'n', 'd', 'f' );
@@ -346,8 +339,13 @@ int OpenDemux( vlc_object_t *p_this )
 #if LIBAVFORMAT_VERSION_INT >= ((54<<16)+(2<<8)+0)
         /* Do not use the cover art as a stream */
         if( s->disposition == AV_DISPOSITION_ATTACHED_PIC )
-            continue;
+            fcc = 0;
 #endif
+        if( fcc == 0 )
+        {
+            TAB_APPEND( p_sys->i_tk, p_sys->tk, NULL );
+            continue;
+        }
 
         switch( cc->codec_type )
         {
@@ -595,8 +593,8 @@ int OpenDemux( vlc_object_t *p_this )
 
             msg_Dbg( p_demux, "adding es: %s codec = %4.4s (%d)",
                      psz_type, (char*)&fcc, cc->codec_id  );
-            TAB_APPEND( p_sys->i_tk, p_sys->tk, es );
         }
+        TAB_APPEND( p_sys->i_tk, p_sys->tk, es );
     }
     p_sys->tk_pcr = xcalloc( p_sys->i_tk, sizeof(*p_sys->tk_pcr) );
 
@@ -647,7 +645,7 @@ void CloseDemux( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    FREENULL( p_sys->tk );
+    free( p_sys->tk );
     free( p_sys->tk_pcr );
 
     if( p_sys->ic )
@@ -792,7 +790,10 @@ static int Demux( demux_t *p_demux )
         UpdateSeekPoint( p_demux, p_sys->i_pcr );
     }
 
-    es_out_Send( p_demux->out, p_sys->tk[pkt.stream_index], p_frame );
+    if( p_sys->tk[pkt.stream_index] != NULL )
+        es_out_Send( p_demux->out, p_sys->tk[pkt.stream_index], p_frame );
+    else
+        block_Release( p_frame );
 
     av_free_packet( &pkt );
     return 1;
