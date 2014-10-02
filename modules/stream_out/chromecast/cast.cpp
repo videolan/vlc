@@ -103,6 +103,12 @@ struct sout_stream_sys_t
 
 #define SOUT_CFG_PREFIX "sout-chromecast-"
 
+/* deadline regarding pings sent from receiver */
+#define PING_WAIT_TIME 6000
+#define PING_WAIT_RETRIES 0
+/* deadline regarding pong we expect after pinging the receiver */
+#define PONG_WAIT_TIME 500
+#define PONG_WAIT_RETRIES 2
 
 /*****************************************************************************
  * Local prototypes
@@ -462,7 +468,8 @@ static int sendMessages(sout_stream_t *p_stream)
 // Use here only C linkage and POD types as this function is a cancelation point.
 extern "C" int recvPacket(sout_stream_t *p_stream, bool &b_msgReceived,
                           uint32_t &i_payloadSize, int i_sock_fd, vlc_tls_t *p_tls,
-                          unsigned *pi_received, char *p_data, bool *pb_pingTimeout)
+                          unsigned *pi_received, char *p_data, bool *pb_pingTimeout,
+                          int *pi_wait_delay, int *pi_wait_retries)
 {
     struct pollfd ufd[1];
     ufd[0].fd = i_sock_fd;
@@ -472,18 +479,33 @@ extern "C" int recvPacket(sout_stream_t *p_stream, bool &b_msgReceived,
      * If we do not receive one after 6 seconds, we send a PING.
      * If after this PING, we do not receive a PONG, then we consider the
      * connection as dead. */
-    if (poll(ufd, 1, 6000) == 0)
+    if (poll(ufd, 1, *pi_wait_delay) == 0)
     {
         if (*pb_pingTimeout)
         {
-            msg_Err(p_stream, "No PONG answer received from the Chromecast");
-            return 0; // Connection died
+            if (!*pi_wait_retries)
+            {
+                msg_Err(p_stream, "No PONG answer received from the Chromecast");
+                return 0; // Connection died
+            }
+            (*pi_wait_retries)--;
         }
-        msg_Warn(p_stream, "No PING received from the Chromecast, sending a PING");
+        else
+        {
+            /* now expect a pong */
+            *pi_wait_delay = PONG_WAIT_TIME;
+            *pi_wait_retries = PONG_WAIT_RETRIES;
+            msg_Warn(p_stream, "No PING received from the Chromecast, sending a PING");
+        }
         *pb_pingTimeout = true;
     }
     else
+    {
         *pb_pingTimeout = false;
+        /* reset to default ping waiting */
+        *pi_wait_delay = PING_WAIT_TIME;
+        *pi_wait_retries = PING_WAIT_RETRIES;
+    }
 
     int i_ret;
 
@@ -882,6 +904,9 @@ static void* chromecastThread(void* p_data)
     char p_packet[PACKET_MAX_LEN];
     bool b_pingTimeout = false;
 
+    int i_waitdelay = PING_WAIT_TIME;
+    int i_retries = PING_WAIT_RETRIES;
+
     msgAuth(p_stream);
     sendMessages(p_stream);
     vlc_restorecancel(canc);
@@ -891,7 +916,8 @@ static void* chromecastThread(void* p_data)
         bool b_msgReceived = false;
         uint32_t i_payloadSize = 0;
         int i_ret = recvPacket(p_stream, b_msgReceived, i_payloadSize, p_sys->i_sock_fd,
-                               p_sys->p_tls, &i_received, p_packet, &b_pingTimeout);
+                               p_sys->p_tls, &i_received, p_packet, &b_pingTimeout,
+                               &i_waitdelay, &i_retries);
 
         canc = vlc_savecancel();
         // Not cancellation-safe part.
