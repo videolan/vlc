@@ -43,6 +43,8 @@ static const struct
     int i_cat;
 } codecs_table[] =
 {
+    { 0, AV_CODEC_ID_NONE, UNKNOWN_ES },
+
     /*
      * Video Codecs
      */

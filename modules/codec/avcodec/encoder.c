@@ -279,6 +279,9 @@ int OpenEncoder( vlc_object_t *p_this )
         psz_namecodec = "Raw video";
     }
 
+    if( i_cat == UNKNOWN_ES )
+        return VLC_EGENERIC;
+
     if( p_enc->fmt_out.i_cat == VIDEO_ES && i_cat != VIDEO_ES )
     {
         msg_Err( p_enc, "\"%s\" is not a video encoder", psz_namecodec );

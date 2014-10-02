@@ -255,7 +255,8 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* *** determine codec type *** */
     if( !GetFfmpegCodec( p_dec->fmt_in.i_codec, &i_cat, &i_codec_id,
-                             &psz_namecodec ) )
+                             &psz_namecodec )
+     || i_cat == UNKNOWN_ES )
     {
         return VLC_EGENERIC;
     }
