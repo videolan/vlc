@@ -609,22 +609,51 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
         if (type == "RECEIVER_STATUS")
         {
             json_value applications = (*p_data)["status"]["applications"];
+            const json_value *p_app = NULL;
             for (unsigned i = 0; i < applications.u.array.length; ++i)
             {
                 std::string appId(applications[i]["appId"]);
                 if (appId == APP_ID)
-                    p_sys->appTransportId = std::string(applications[i]["transportId"]);
+                {
+                    p_app = &applications[i];
+                    vlc_mutex_lock(&p_sys->lock);
+                    if (p_sys->appTransportId.empty())
+                        p_sys->appTransportId = std::string(applications[i]["transportId"]);
+                    vlc_mutex_unlock(&p_sys->lock);
+                    break;
+                }
             }
-            vlc_mutex_locker locker(&p_sys->lock);
-            if (!p_sys->appTransportId.empty()
-                && p_sys->i_status == CHROMECAST_AUTHENTICATED)
+
+            vlc_mutex_lock(&p_sys->lock);
+            if ( p_app )
             {
-                p_sys->i_status = CHROMECAST_APP_STARTED;
-                msgConnect(p_stream, p_sys->appTransportId);
-                msgLoad(p_stream);
-                p_sys->i_status = CHROMECAST_MEDIA_LOAD_SENT;
-                vlc_cond_signal(&p_sys->loadCommandCond);
+                if (!p_sys->appTransportId.empty()
+                        && p_sys->i_status == CHROMECAST_AUTHENTICATED)
+                {
+                    p_sys->i_status = CHROMECAST_APP_STARTED;
+                    msgConnect(p_stream, p_sys->appTransportId);
+                    msgLoad(p_stream);
+                    p_sys->i_status = CHROMECAST_MEDIA_LOAD_SENT;
+                    vlc_cond_signal(&p_sys->loadCommandCond);
+                }
             }
+            else
+            {
+                switch(p_sys->i_status)
+                {
+                /* If the app is no longer present */
+                case CHROMECAST_APP_STARTED:
+                case CHROMECAST_MEDIA_LOAD_SENT:
+                    msg_Warn(p_stream, "app is no longer present. closing");
+                    msgClose(p_stream, p_sys->appTransportId);
+                    i_ret = -1;
+                    // ft
+                default:
+                    break;
+                }
+
+            }
+            vlc_mutex_unlock(&p_sys->lock);
         }
         else
         {
