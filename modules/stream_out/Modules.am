@@ -72,7 +72,6 @@ dummy.cpp:
 
 # Chromecast plugin
 SUFFIXES += .proto .pb.cc
-BUILT_SOURCES += chromecast/cast_channel.pb.cc
 
 %.pb.cc: %.proto
 	$(PROTOC) --cpp_out=. -I$(srcdir) $<
@@ -82,5 +81,6 @@ SOURCES_stream_out_chromecast = chromecast/cast_channel.proto chromecast/cast.cp
 nodist_libstream_out_chromecast_plugin_la_SOURCES = chromecast/cast_channel.pb.cc
 
 if BUILD_CHROMECAST
+BUILT_SOURCES += chromecast/cast_channel.pb.cc
 stream_out_LTLIBRARIES += libstream_out_chromecast_plugin.la
 endif
