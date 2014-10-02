@@ -315,7 +315,7 @@ VLC_API size_t block_FifoPut( block_fifo_t *, block_t * );
 VLC_API void block_FifoWake( block_fifo_t * );
 VLC_API block_t * block_FifoGet( block_fifo_t * ) VLC_USED;
 VLC_API block_t * block_FifoShow( block_fifo_t * );
-size_t block_FifoSize( const block_fifo_t *p_fifo ) VLC_USED;
-VLC_API size_t block_FifoCount( const block_fifo_t *p_fifo ) VLC_USED;
+size_t block_FifoSize(block_fifo_t *) VLC_USED;
+VLC_API size_t block_FifoCount(block_fifo_t *) VLC_USED;
 
 #endif /* VLC_BLOCK_H */
