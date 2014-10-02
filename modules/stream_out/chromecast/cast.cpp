@@ -325,6 +325,7 @@ static void Close(vlc_object_t *p_this)
         sendMessages(p_stream);
         // ft
     case CHROMECAST_TLS_CONNECTED:
+    case CHROMECAST_CONNECTION_DEAD:
         disconnectChromecast(p_stream);
         p_sys->i_status = CHROMECAST_DISCONNECTED;
         // ft
@@ -388,8 +389,12 @@ static void disconnectChromecast(sout_stream_t *p_stream)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    vlc_tls_SessionDelete(p_sys->p_tls);
-    vlc_tls_Delete(p_sys->p_creds);
+    if (p_sys->p_tls)
+    {
+        vlc_tls_SessionDelete(p_sys->p_tls);
+        vlc_tls_Delete(p_sys->p_creds);
+        p_sys->p_tls = NULL;
+    }
 }
 
 
