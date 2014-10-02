@@ -701,7 +701,7 @@ dnl Check for dynamic plugins
 LIBDL=""
 have_dynamic_objects="no"
 VLC_SAVE_FLAGS
-AC_SEARCH_LIBS(dlopen, [dl svld], [
+AC_SEARCH_LIBS(dlsym, [dl svld], [
   AS_IF([test "$ac_cv_search_dlopen" != "none required"], [
     LIBDL="$ac_cv_search_dlopen"
   ])
