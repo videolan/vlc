@@ -43,6 +43,11 @@
     NSImage * o_fullscreen_img;
     NSImage * o_fullscreen_over_img;
     NSImage * o_fullscreen_on_img;
+    // old native fullscreen images
+    NSImage * o_old_fullscreen_img;
+    NSImage * o_old_fullscreen_over_img;
+    NSImage * o_old_fullscreen_on_img;
+
     NSShadow * o_window_title_shadow;
     NSDictionary * o_window_title_attributes_dict;
 

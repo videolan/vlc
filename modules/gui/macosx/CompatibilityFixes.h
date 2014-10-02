@@ -29,7 +29,7 @@
 #define OSX_LION (NSAppKitVersionNumber < 1162 && NSAppKitVersionNumber >= 1115.2)
 #define OSX_MOUNTAIN_LION (NSAppKitVersionNumber < 1244 && NSAppKitVersionNumber >= 1162)
 #define OSX_MAVERICKS (NSAppKitVersionNumber < 1334 && NSAppKitVersionNumber >= 1244)
-#define OSX_YOSEMITE NSAppKitVersionNumber >= 1334
+#define OSX_YOSEMITE (NSAppKitVersionNumber >= 1334)
 
 
 #pragma mark -

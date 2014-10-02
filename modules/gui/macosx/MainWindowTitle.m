@@ -60,6 +60,9 @@
     [o_fullscreen_img release];
     [o_fullscreen_over_img release];
     [o_fullscreen_on_img release];
+    [o_old_fullscreen_img release];
+    [o_old_fullscreen_over_img release];
+    [o_old_fullscreen_on_img release];
 
     [o_window_title_shadow release];
     [o_window_title_attributes_dict release];
@@ -140,6 +143,9 @@
     [o_fullscreen_img release];
     [o_fullscreen_over_img release];
     [o_fullscreen_on_img release];
+    [o_old_fullscreen_img release];
+    [o_old_fullscreen_over_img release];
+    [o_old_fullscreen_on_img release];
 
     o_red_img = [[self getButtonImage:@"window-close"] retain];
     o_red_over_img = [[self getButtonImage:@"window-close-over"] retain];
@@ -158,6 +164,12 @@
         o_fullscreen_on_img = [[self getButtonImage:@"window-fullscreen-on"] retain];
     }
 
+    // old native fullscreen images are not available in graphite style
+    // thus they are loaded directly here
+    o_old_fullscreen_img = [[NSImage imageNamed:@"lion-window-fullscreen"] retain];
+    o_old_fullscreen_on_img = [[NSImage imageNamed:@"lion-window-fullscreen-on"] retain];
+    o_old_fullscreen_over_img = [[NSImage imageNamed:@"lion-window-fullscreen-over"] retain];
+
     [o_red_btn setImage: o_red_img];
     [o_red_btn setAlternateImage: o_red_on_img];
     [[o_red_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
@@ -170,8 +182,9 @@
     [self updateGreenButton];
     [[o_green_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
     [[o_green_btn cell] setTag: 2];
-    [o_fullscreen_btn setImage: [NSImage imageNamed:@"window-fullscreen"]];
-    [o_fullscreen_btn setAlternateImage: [NSImage imageNamed:@"window-fullscreen-on"]];
+
+    [o_fullscreen_btn setImage: o_old_fullscreen_img];
+    [o_fullscreen_btn setAlternateImage: o_old_fullscreen_on_img];
     [[o_fullscreen_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
     [[o_fullscreen_btn cell] setTag: 3];
 }
@@ -265,9 +278,9 @@
 - (void)setWindowFullscreenButtonOver:(BOOL)b_value
 {
     if (b_value)
-        [o_fullscreen_btn setImage: [NSImage imageNamed:@"window-fullscreen-over"]];
+        [o_fullscreen_btn setImage: o_old_fullscreen_over_img];
     else
-        [o_fullscreen_btn setImage: [NSImage imageNamed:@"window-fullscreen"]];
+        [o_fullscreen_btn setImage: o_old_fullscreen_img];
 }
 
 - (void)mouseDown:(NSEvent *)event
