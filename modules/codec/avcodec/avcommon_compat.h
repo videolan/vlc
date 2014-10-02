@@ -42,7 +42,12 @@
 
 static inline void avcodec_free_context( AVCodecContext **ctx )
 {
-    av_freep( ctx );
+    if( !*ctx )
+        return;
+
+    av_free( (*ctx)->extradata );
+    av_free( *ctx );
+    *ctx = NULL;
 }
 #endif
 
