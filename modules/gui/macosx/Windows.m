@@ -335,9 +335,8 @@
 
     if (b_nativeFullscreenMode) {
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
-    } else {
-        [o_titlebar_view setFullscreenButtonHidden: YES];
     }
+
 
     [super awakeFromNib];
 }
@@ -643,6 +642,17 @@
         [self recreateHideMouseTimer];
 
     [super mouseMoved: theEvent];
+}
+
+#pragma mark -
+#pragma mark Key events
+
+- (void)flagsChanged:(NSEvent *)theEvent
+{
+    BOOL b_alt_pressed = ([theEvent modifierFlags] & NSAlternateKeyMask) != 0;
+    [o_titlebar_view informModifierPressed: b_alt_pressed];
+
+    [super flagsChanged:theEvent];
 }
 
 #pragma mark -

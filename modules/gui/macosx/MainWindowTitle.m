@@ -57,6 +57,9 @@
     [o_green_img release];
     [o_green_over_img release];
     [o_green_on_img release];
+    [o_fullscreen_img release];
+    [o_fullscreen_over_img release];
+    [o_fullscreen_on_img release];
 
     [o_window_title_shadow release];
     [o_window_title_attributes_dict release];
@@ -66,6 +69,16 @@
 
 - (void)awakeFromNib
 {
+    b_nativeFullscreenMode = NO;
+#ifdef MAC_OS_X_VERSION_10_7
+    if (!OSX_SNOW_LEOPARD)
+        b_nativeFullscreenMode = var_InheritBool(VLCIntf, "macosx-nativefullscreenmode");
+#endif
+
+    if (!b_nativeFullscreenMode || OSX_YOSEMITE) {
+        [o_fullscreen_btn setHidden: YES];
+    }
+
     [self setAutoresizesSubviews: YES];
     [self setImagesLeft:imageFromRes(@"topbar-dark-left") middle: imageFromRes(@"topbar-dark-center-fill") right:imageFromRes(@"topbar-dark-right")];
 
@@ -75,21 +88,22 @@
 
 - (void)controlTintChanged:(NSNotification *)notification
 {
-    [o_red_img release];
-    [o_red_over_img release];
-    [o_red_on_img release];
-    [o_yellow_img release];
-    [o_yellow_over_img release];
-    [o_yellow_on_img release];
-    [o_green_img release];
-    [o_green_over_img release];
-    [o_green_on_img release];
-
     [self loadButtonIcons];
 
     [o_red_btn setNeedsDisplay];
     [o_yellow_btn setNeedsDisplay];
     [o_green_btn setNeedsDisplay];
+}
+
+- (void)informModifierPressed:(BOOL)b_is_altkey;
+{
+    BOOL b_state_changed = b_alt_pressed != b_is_altkey;
+
+    b_alt_pressed = b_is_altkey;
+
+    if (b_state_changed) {
+        [self updateGreenButton];
+    }
 }
 
 - (NSImage *)getButtonImage:(NSString *)o_id
@@ -114,6 +128,19 @@
 
 - (void)loadButtonIcons
 {
+    [o_red_img release];
+    [o_red_over_img release];
+    [o_red_on_img release];
+    [o_yellow_img release];
+    [o_yellow_over_img release];
+    [o_yellow_on_img release];
+    [o_green_img release];
+    [o_green_over_img release];
+    [o_green_on_img release];
+    [o_fullscreen_img release];
+    [o_fullscreen_over_img release];
+    [o_fullscreen_on_img release];
+
     o_red_img = [[self getButtonImage:@"window-close"] retain];
     o_red_over_img = [[self getButtonImage:@"window-close-over"] retain];
     o_red_on_img = [[self getButtonImage:@"window-close-on"] retain];
@@ -124,6 +151,13 @@
     o_green_over_img = [[self getButtonImage:@"window-zoom-over"] retain];
     o_green_on_img = [[self getButtonImage:@"window-zoom-on"] retain];
 
+    // these files are only available in the yosemite variant
+    if (OSX_YOSEMITE) {
+        o_fullscreen_img = [[self getButtonImage:@"window-fullscreen"] retain];
+        o_fullscreen_over_img = [[self getButtonImage:@"window-fullscreen-over"] retain];
+        o_fullscreen_on_img = [[self getButtonImage:@"window-fullscreen-on"] retain];
+    }
+
     [o_red_btn setImage: o_red_img];
     [o_red_btn setAlternateImage: o_red_on_img];
     [[o_red_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
@@ -132,14 +166,39 @@
     [o_yellow_btn setAlternateImage: o_yellow_on_img];
     [[o_yellow_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
     [[o_yellow_btn cell] setTag: 1];
-    [o_green_btn setImage: o_green_img];
-    [o_green_btn setAlternateImage: o_green_on_img];
+
+    [self updateGreenButton];
     [[o_green_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
     [[o_green_btn cell] setTag: 2];
     [o_fullscreen_btn setImage: [NSImage imageNamed:@"window-fullscreen"]];
     [o_fullscreen_btn setAlternateImage: [NSImage imageNamed:@"window-fullscreen-on"]];
     [[o_fullscreen_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
     [[o_fullscreen_btn cell] setTag: 3];
+}
+
+- (void)updateGreenButton
+{
+    // default image for old version, or if native fullscreen is
+    // disabled on yosemite, or if alt key is pressed
+    if (!OSX_YOSEMITE || !b_nativeFullscreenMode || b_alt_pressed) {
+
+        if (b_mouse_over) {
+            [o_green_btn setImage: o_green_over_img];
+            [o_green_btn setAlternateImage: o_green_on_img];
+        } else {
+            [o_green_btn setImage: o_green_img];
+            [o_green_btn setAlternateImage: o_green_on_img];
+        }
+    } else {
+
+        if (b_mouse_over) {
+            [o_green_btn setImage: o_fullscreen_over_img];
+            [o_green_btn setAlternateImage: o_fullscreen_on_img];
+        } else {
+            [o_green_btn setImage: o_fullscreen_img];
+            [o_green_btn setAlternateImage: o_fullscreen_on_img];
+        }
+    }
 }
 
 - (BOOL)mouseDownCanMoveWindow
@@ -153,9 +212,13 @@
         [[self window] performClose: sender];
     else if (sender == o_yellow_btn)
         [[self window] miniaturize: sender];
-    else if (sender == o_green_btn)
-        [[self window] performZoom: sender];
-    else if (sender == o_fullscreen_btn) {
+    else if (sender == o_green_btn) {
+        if (OSX_YOSEMITE && b_nativeFullscreenMode && !b_alt_pressed) {
+            [[self window] toggleFullScreen:self];
+        } else {
+            [[self window] performZoom: sender];
+        }
+    } else if (sender == o_fullscreen_btn) {
         // same action as native fs button
         [[self window] toggleFullScreen:self];
 
@@ -185,22 +248,18 @@
     [o_attributed_title release];
 }
 
-- (void)setFullscreenButtonHidden:(BOOL)b_value
-{
-    [o_fullscreen_btn setHidden: b_value];
-}
-
 - (void)setWindowButtonOver:(BOOL)b_value
 {
+    b_mouse_over = b_value;
     if (b_value) {
         [o_red_btn setImage: o_red_over_img];
         [o_yellow_btn setImage: o_yellow_over_img];
-        [o_green_btn setImage: o_green_over_img];
     } else {
         [o_red_btn setImage: o_red_img];
         [o_yellow_btn setImage: o_yellow_img];
-        [o_green_btn setImage: o_green_img];
     }
+
+    [self updateGreenButton];
 }
 
 - (void)setWindowFullscreenButtonOver:(BOOL)b_value
