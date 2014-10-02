@@ -880,7 +880,7 @@ static void blurayInitOverlay(demux_t *p_demux, int plane, int width, int height
         return;
     }
     /* two references: vout + demux */
-    ov->released_once = ATOMIC_FLAG_INIT;
+    atomic_flag_clear(&ov->released_once);
 
     p_upd_sys->p_overlay = ov;
     subpicture_updater_t updater = {
