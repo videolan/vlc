@@ -273,8 +273,10 @@
 - (IBAction)openSpecialMediaFolder:(id)sender;
 - (IBAction)dvdreadOptionChanged:(id)sender;
 - (IBAction)vcdOptionChanged:(id)sender;
-- (NSString *)getVolumeTypeFromMountPath:(NSString *)mountPath;
-- (NSString *)getBSDNodeFromMountPath:(NSString *)mountPath;
+
+// static helper functions
++ (NSString *)getVolumeTypeFromMountPath:(NSString *)mountPath;
++ (NSString *)getBSDNodeFromMountPath:(NSString *)mountPath;
 
 - (void)openNet;
 - (IBAction)openNetModeChanged:(id)sender;

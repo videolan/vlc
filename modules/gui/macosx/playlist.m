@@ -1066,21 +1066,20 @@
     if ([[NSFileManager defaultManager] fileExistsAtPath:o_path isDirectory:&b_dir] && b_dir &&
         [[NSWorkspace sharedWorkspace] getFileSystemInfoForPath:o_path isRemovable: &b_rem
                                                      isWritable:&b_writable isUnmountable:NULL description:NULL type:NULL] && b_rem && !b_writable && [o_nsurl isFileURL]) {
-        id o_vlc_open = [[VLCMain sharedInstance] open];
 
-        NSString *diskType = [o_vlc_open getVolumeTypeFromMountPath: o_path];
+        NSString *diskType = [VLCOpen getVolumeTypeFromMountPath: o_path];
         msg_Dbg(p_intf, "detected optical media of type %s in the file input", [diskType UTF8String]);
 
         if ([diskType isEqualToString: kVLCMediaDVD])
-            o_uri = [NSString stringWithFormat: @"dvdnav://%@", [o_vlc_open getBSDNodeFromMountPath: o_path]];
+            o_uri = [NSString stringWithFormat: @"dvdnav://%@", [VLCOpen getBSDNodeFromMountPath: o_path]];
         else if ([diskType isEqualToString: kVLCMediaVideoTSFolder])
             o_uri = [NSString stringWithFormat: @"dvdnav://%@", o_path];
         else if ([diskType isEqualToString: kVLCMediaAudioCD])
-            o_uri = [NSString stringWithFormat: @"cdda://%@", [o_vlc_open getBSDNodeFromMountPath: o_path]];
+            o_uri = [NSString stringWithFormat: @"cdda://%@", [VLCOpen getBSDNodeFromMountPath: o_path]];
         else if ([diskType isEqualToString: kVLCMediaVCD])
-            o_uri = [NSString stringWithFormat: @"vcd://%@#0:0", [o_vlc_open getBSDNodeFromMountPath: o_path]];
+            o_uri = [NSString stringWithFormat: @"vcd://%@#0:0", [VLCOpen getBSDNodeFromMountPath: o_path]];
         else if ([diskType isEqualToString: kVLCMediaSVCD])
-            o_uri = [NSString stringWithFormat: @"vcd://%@@0:0", [o_vlc_open getBSDNodeFromMountPath: o_path]];
+            o_uri = [NSString stringWithFormat: @"vcd://%@@0:0", [VLCOpen getBSDNodeFromMountPath: o_path]];
         else if ([diskType isEqualToString: kVLCMediaBD] || [diskType isEqualToString: kVLCMediaBDMVFolder])
             o_uri = [NSString stringWithFormat: @"bluray://%@", o_path];
         else
