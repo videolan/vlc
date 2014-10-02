@@ -317,13 +317,16 @@ static void Close(vlc_object_t *p_this)
     case CHROMECAST_APP_STARTED:
         // Generate the close messages.
         msgClose(p_stream, p_sys->appTransportId);
+        // ft
     case CHROMECAST_AUTHENTICATED:
         msgClose(p_stream, "receiver-0");
         // Send the just added close messages.
         sendMessages(p_stream);
+        // ft
     case CHROMECAST_TLS_CONNECTED:
         disconnectChromecast(p_stream);
         p_sys->i_status = CHROMECAST_DISCONNECTED;
+        // ft
     default:
         break;
     }
