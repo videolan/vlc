@@ -757,7 +757,7 @@ static int Demux( demux_t *p_demux )
             p_stream->time_base.den - i_start_time + VLC_TS_0;
     }
     if( pkt.duration > 0 && p_frame->i_length <= 0 )
-        p_frame->i_length = pkt.duration * 1000000 *
+        p_frame->i_length = pkt.duration * INT64_C(1000000) *
             p_stream->time_base.num /
             p_stream->time_base.den;
 
