@@ -1,5 +1,6 @@
 GNU=http://ftp.gnu.org/gnu
 APACHE=http://mirror.csclub.uwaterloo.ca/apache
+SF= http://downloads.sourceforge.net/project
 
 YASM_VERSION=1.2.0
 #YASM_URL=$(CONTRIB_VIDEOLAN)/yasm-$(YASM_VERSION).tar.gz
@@ -22,7 +23,7 @@ M4_URL=$(GNU)/m4/m4-$(M4_VERSION).tar.gz
 
 PKGCFG_VERSION=0.27.1-1
 #PKGCFG_URL=http://downloads.videolan.org/pub/videolan/testing/contrib/pkg-config-$(PKGCFG_VERSION).tar.gz
-PKGCFG_URL=http://sourceforge.net/projects/pkgconfiglite/files/$(PKGCFG_VERSION)/pkg-config-lite-$(PKGCFG_VERSION).tar.gz/download
+PKGCFG_URL=$(SF)/pkgconfiglite/$(PKGCFG_VERSION)/pkg-config-lite-$(PKGCFG_VERSION).tar.gz
 
 TAR_VERSION=1.26
 TAR_URL=$(GNU)/tar/tar-$(TAR_VERSION).tar.bz2
