@@ -301,6 +301,7 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     const char *mime = NULL;
     switch (p_dec->fmt_in.i_codec) {
+    case VLC_CODEC_HEVC: mime = "video/hevc"; break;
     case VLC_CODEC_H264: mime = "video/avc"; break;
     case VLC_CODEC_H263: mime = "video/3gpp"; break;
     case VLC_CODEC_MP4V: mime = "video/mp4v-es"; break;
