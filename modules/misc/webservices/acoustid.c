@@ -81,9 +81,9 @@ static void parse_recordings( vlc_object_t *p_obj, json_value *node, acoustid_re
             record->psz_title = strdup( value->u.string.ptr );
         value = jsongetbyname( recordnode, "id" );
         if ( value && value->type == json_string )
-            strncpy( record->sz_musicbrainz_id, value->u.string.ptr, MB_ID_SIZE );
+            memcpy( record->s_musicbrainz_id, value->u.string.ptr, MB_ID_SIZE );
         parse_artists( jsongetbyname( recordnode, "artists" ), record );
-        msg_Dbg( p_obj, "recording %d title %s %36s %s", i, record->psz_title, record->sz_musicbrainz_id, record->psz_artist );
+        msg_Dbg( p_obj, "recording %d title %s %36s %s", i, record->psz_title, record->s_musicbrainz_id, record->psz_artist );
     }
 }
 
