@@ -36,6 +36,7 @@
 #include <vlc_block_helper.h>
 #include <vlc_cpu.h>
 #include "../h264_nal.h"
+#include "../hevc_nal.h"
 
 #include "omxil.h"
 #include "omxil_core.h"
@@ -1194,6 +1195,15 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
             convert_sps_pps( p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
                              p_header->pBuffer, p_header->nAllocLen,
                              (uint32_t*) &p_header->nFilledLen, NULL );
+        }
+        else if( p_dec->fmt_in.i_codec == VLC_CODEC_HEVC && !p_sys->in.b_direct )
+        {
+            p_header->nFilledLen = 0;
+            convert_hevc_nal_units( p_dec, p_dec->fmt_in.p_extra,
+                                    p_dec->fmt_in.i_extra,
+                                    p_header->pBuffer, p_header->nAllocLen,
+                                    (uint32_t*) &p_header->nFilledLen,
+                                    &p_sys->i_nal_size_length );
         }
         else if(p_sys->in.b_direct)
         {
