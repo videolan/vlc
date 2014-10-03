@@ -1,8 +1,7 @@
 ## Generic instructions about VLC Lua meta scripts.
-$Id$
 
-There is 3 types of Lua meta modules: art, fetcher and reader.
-See their own README.txt for documentation.
+There are 3 types of Lua meta modules: art, fetcher and reader.
+See their respective README.txt for documentation.
 
 See lua/README.txt for generic documentation about Lua usage in VLC.
 
