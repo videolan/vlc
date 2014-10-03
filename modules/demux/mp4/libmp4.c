@@ -1472,16 +1472,19 @@ static int MP4_ReadBox_WMA2( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET2BYTESLE( p_WMA2->Format.nBlockAlign );
     MP4_GET2BYTESLE( p_WMA2->Format.wBitsPerSample );
 
-    if ( i_read < 0 )
+    uint16_t i_cbSize;
+    MP4_GET2BYTESLE( i_cbSize );
+
+    if ( i_read < 0 || i_cbSize > i_read )
         goto error;
 
-    p_WMA2->i_extra = i_read;
+    p_WMA2->i_extra = i_cbSize;
     if ( p_WMA2->i_extra )
     {
-        p_WMA2->p_extra = malloc( i_read );
+        p_WMA2->p_extra = malloc( p_WMA2->i_extra );
         if ( ! p_WMA2->p_extra )
             goto error;
-        memcpy( p_WMA2->p_extra, p_peek, i_read );
+        memcpy( p_WMA2->p_extra, p_peek, p_WMA2->i_extra );
     }
 
     MP4_READBOX_EXIT( 1 );
