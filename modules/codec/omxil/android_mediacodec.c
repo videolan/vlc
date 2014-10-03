@@ -37,6 +37,7 @@
 #include <vlc_cpu.h>
 
 #include "../h264_nal.h"
+#include "../hevc_nal.h"
 #include <OMX_Core.h>
 #include <OMX_Component.h>
 #include "omxil_utils.h"
@@ -480,6 +481,10 @@ static int OpenDecoder(vlc_object_t *p_this)
             convert_sps_pps(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
                             ptr, buf_size,
                             &size, &p_sys->nal_size);
+        } else if (p_dec->fmt_in.i_codec == VLC_CODEC_HEVC) {
+            convert_hevc_nal_units(p_dec, p_dec->fmt_in.p_extra,
+                                   p_dec->fmt_in.i_extra, ptr, buf_size,
+                                   &size, &p_sys->nal_size);
         } else {
             memcpy(ptr, p_dec->fmt_in.p_extra, size);
         }
