@@ -395,6 +395,7 @@ static const struct
 {
     { VLC_CODEC_MPGV, OMX_VIDEO_CodingMPEG2, "video_decoder.mpeg2" },
     { VLC_CODEC_MP4V, OMX_VIDEO_CodingMPEG4, "video_decoder.mpeg4" },
+    { VLC_CODEC_HEVC, OMX_VIDEO_CodingAutoDetect, "video_decoder.hevc" },
     { VLC_CODEC_H264, OMX_VIDEO_CodingAVC,   "video_decoder.avc"   },
     { VLC_CODEC_H263, OMX_VIDEO_CodingH263,  "video_decoder.h263"  },
     { VLC_CODEC_WMV1, OMX_VIDEO_CodingWMV,   "video_decoder.wmv1"  },
