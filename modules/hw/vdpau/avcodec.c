@@ -185,7 +185,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const es_format_t *fmt)
             if ((fmt->i_profile & FF_PROFILE_H264_INTRA)
              && (fmt->i_level == 11))
                 level = VDP_DECODER_LEVEL_H264_1b;
-         default:
+        default:
             break;
     }
 
