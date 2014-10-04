@@ -52,7 +52,6 @@ struct vout_display_sys_t
     picture_pool_t *pool; /* picture pool */
     unsigned char *base;
     size_t length;
-    int fd;
 
     int x;
     int y;
@@ -88,6 +87,15 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
     if (req > MAX_PICTURES)
         req = MAX_PICTURES;
 
+    char bufpath[] = "/tmp/"PACKAGE_NAME"XXXXXX";
+    int fd = mkostemp(bufpath, O_CLOEXEC);
+    if (fd == -1)
+    {
+        msg_Err(vd, "cannot create buffers: %s", vlc_strerror_c(errno));
+        return NULL;
+    }
+    unlink(bufpath);
+
     /* We need one extra line to cover for horizontal crop offset */
     unsigned stride = 4 * ((vd->fmt.i_width + 31) & ~31);
     unsigned lines = (vd->fmt.i_height + 31 + 1) & ~31;
@@ -96,24 +104,27 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
 
     sys->length = picsize * req;
 
-    if (ftruncate(sys->fd, sys->length))
+    if (ftruncate(fd, sys->length))
     {
         msg_Err(vd, "cannot allocate buffers: %s", vlc_strerror_c(errno));
+        close(fd);
         return NULL;
     }
 
-    sys->base = mmap(NULL, sys->length, PROT_READ|PROT_WRITE, MAP_SHARED,
-                     sys->fd, 0);
+    sys->base = mmap(NULL, sys->length, PROT_READ|PROT_WRITE, MAP_SHARED, fd,
+                     0);
     if (sys->base == MAP_FAILED)
     {
         msg_Err(vd, "cannot map buffers: %s", vlc_strerror_c(errno));
+        close(fd);
         goto error;
     }
 #ifndef NDEBUG
     memset(sys->base, 0x80, sys->length); /* gray fill */
 #endif
 
-    sys->shm_pool = wl_shm_create_pool(sys->shm, sys->fd, sys->length);
+    sys->shm_pool = wl_shm_create_pool(sys->shm, fd, sys->length);
+    close(fd);
     if (sys->shm_pool == NULL)
         goto error;
 
@@ -178,7 +189,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
 error:
     if (sys->base != MAP_FAILED)
         munmap(sys->base, sys->length);
-    ftruncate(sys->fd, 0); /* "free" memory */
     return NULL;
 }
 
@@ -372,18 +382,8 @@ static int Open(vlc_object_t *obj)
     sys->eventq = NULL;
     sys->shm = NULL;
     sys->pool = NULL;
-    sys->fd = -1;
     sys->x = 0;
     sys->y = 0;
-
-    char bufpath[] = "/tmp/"PACKAGE_NAME"XXXXXX";
-    sys->fd = mkostemp(bufpath, O_CLOEXEC);
-    if (sys->fd == -1)
-    {
-        msg_Err(vd, "cannot create buffers: %s", vlc_strerror_c(errno));
-        goto error;
-    }
-    unlink(bufpath);
 
     /* Get window */
     vout_window_cfg_t wcfg = {
@@ -445,8 +445,6 @@ error:
         wl_event_queue_destroy(sys->eventq);
     if (sys->embed != NULL)
         vout_display_DeleteWindow(vd, sys->embed);
-    if (sys->fd != -1)
-        close(sys->fd);
     free(sys);
     return VLC_EGENERIC;
 }
@@ -462,7 +460,6 @@ static void Close(vlc_object_t *obj)
     wl_display_flush(sys->embed->display.wl);
     wl_event_queue_destroy(sys->eventq);
     vout_display_DeleteWindow(vd, sys->embed);
-    close(sys->fd);
     free(sys);
 }
 
