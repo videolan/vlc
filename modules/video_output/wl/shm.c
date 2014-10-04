@@ -50,8 +50,6 @@ struct vout_display_sys_t
     struct wl_shm_pool *shm_pool;
 
     picture_pool_t *pool; /* picture pool */
-    unsigned char *base;
-    size_t length;
 
     int x;
     int y;
@@ -60,8 +58,11 @@ struct vout_display_sys_t
 static void PictureDestroy(picture_t *pic)
 {
     struct wl_buffer *buf = (struct wl_buffer *)pic->p_sys;
+    const long pagemask = sysconf(_SC_PAGE_SIZE) - 1;
+    size_t picsize = pic->p[0].i_pitch * pic->p[0].i_lines;
 
-    wl_buffer_destroy(buf);
+    munmap(pic->p[0].p_pixels, (picsize + pagemask) & ~pagemask);
+    wl_buffer_destroy(buf); /* XXX: what if wl_display is already gone? */
 }
 
 static void buffer_release_cb(void *data, struct wl_buffer *buffer)
@@ -101,32 +102,33 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
     unsigned lines = (vd->fmt.i_height + 31 + 1) & ~31;
     const long pagemask = sysconf(_SC_PAGE_SIZE) - 1;
     size_t picsize = ((stride * lines) + pagemask) & ~pagemask;
+    size_t length = picsize * req;
 
-    sys->length = picsize * req;
-
-    if (ftruncate(fd, sys->length))
+    if (ftruncate(fd, length))
     {
         msg_Err(vd, "cannot allocate buffers: %s", vlc_strerror_c(errno));
         close(fd);
         return NULL;
     }
 
-    sys->base = mmap(NULL, sys->length, PROT_READ|PROT_WRITE, MAP_SHARED, fd,
-                     0);
-    if (sys->base == MAP_FAILED)
+    void *base = mmap(NULL, length, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+    if (base == MAP_FAILED)
     {
         msg_Err(vd, "cannot map buffers: %s", vlc_strerror_c(errno));
         close(fd);
-        goto error;
+        return NULL;
     }
 #ifndef NDEBUG
-    memset(sys->base, 0x80, sys->length); /* gray fill */
+    memset(base, 0x80, length); /* gray fill */
 #endif
 
-    sys->shm_pool = wl_shm_create_pool(sys->shm, fd, sys->length);
+    sys->shm_pool = wl_shm_create_pool(sys->shm, fd, length);
     close(fd);
     if (sys->shm_pool == NULL)
-        goto error;
+    {
+        munmap(base, length);
+        return NULL;
+    }
 
     picture_t *pics[MAX_PICTURES];
     picture_resource_t res = {
@@ -153,8 +155,10 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
             break;
 
         res.p_sys = (picture_sys_t *)buf;
-        res.p[0].p_pixels = sys->base + count * picsize;
+        res.p[0].p_pixels = base;
+        base = ((char *)base) + picsize;
         offset += picsize;
+        length -= picsize;
 
         picture_t *pic = picture_NewFromResource(&vd->fmt, &res);
         if (unlikely(pic == NULL))
@@ -167,12 +171,10 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
         pics[count++] = pic;
     }
 
+    if (length > 0)
+        munmap(base, length); /* Left-over buffers */
     if (count == 0)
-    {
-        wl_shm_pool_destroy(sys->shm_pool);
-        munmap(sys->base, sys->length);
         goto error;
-    }
 
     wl_display_flush(sys->embed->display.wl);
 
@@ -181,14 +183,11 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
     {
         while (count > 0)
             picture_Release(pics[--count]);
-        wl_shm_pool_destroy(sys->shm_pool);
         goto error;
     }
     return sys->pool;
-
 error:
-    if (sys->base != MAP_FAILED)
-        munmap(sys->base, sys->length);
+    wl_shm_pool_destroy(sys->shm_pool);
     return NULL;
 }
 
@@ -231,7 +230,6 @@ static void ResetPictures(vout_display_t *vd)
 
     picture_pool_Delete(sys->pool);
     wl_shm_pool_destroy(sys->shm_pool);
-    munmap(sys->base, sys->length);
 
     sys->pool = NULL;
 }
