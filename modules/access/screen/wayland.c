@@ -193,6 +193,7 @@ static block_t *Shoot(demux_t *demux)
         msg_Err(demux, "buffer creation error: %s", vlc_strerror_c(errno));
         return NULL;
     }
+    unlink(bufpath);
 
     /* NOTE: one extra line for overflow if screen-left > 0 */
     uint32_t pitch = 4u * sys->width;
