@@ -58,7 +58,7 @@ struct vlc_va_sys_t
     uint16_t height;
 };
 
-static int Lock(vlc_va_t *va, void **opaque, uint8_t **data)
+static vlc_vdp_video_field_t *CreateSurface(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
     VdpVideoSurface surface;
@@ -70,15 +70,23 @@ static int Lock(vlc_va_t *va, void **opaque, uint8_t **data)
     {
         msg_Err(va, "%s creation failure: %s", "video surface",
                 vdp_get_error_string(sys->vdp, err));
-        return VLC_EGENERIC;
+        return NULL;
     }
 
     vlc_vdp_video_field_t *field = vlc_vdp_video_create(sys->vdp, surface);
     if (unlikely(field == NULL))
+        vdp_video_surface_destroy(sys->vdp, surface);
+    return field;
+}
+
+static int Lock(vlc_va_t *va, void **opaque, uint8_t **data)
+{
+    vlc_vdp_video_field_t *field = CreateSurface(va);
+    if (unlikely(field == NULL))
         return VLC_ENOMEM;
 
-    *data = (void *)(uintptr_t)surface;
     *opaque = field;
+    *data = (void *)(uintptr_t)field->frame->surface;
     return VLC_SUCCESS;
 }
 
