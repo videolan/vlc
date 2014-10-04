@@ -150,10 +150,17 @@ int XCB_picture_Alloc (vout_display_t *vd, picture_resource_t *res,
 }
 
 picture_t *XCB_picture_NewFromResource (const video_format_t *restrict fmt,
-                                        const picture_resource_t *restrict res)
+                                        const picture_resource_t *restrict res,
+                                        xcb_connection_t *conn)
 {
     picture_t *pic = picture_NewFromResource (fmt, res);
     if (unlikely(pic == NULL))
+    {
+        xcb_shm_seg_t seg = (uintptr_t)res->p_sys;
+
+        if (seg != 0)
+            xcb_shm_detach (conn, seg);
         shmdt (res->p[0].p_pixels);
+    }
     return pic;
 }

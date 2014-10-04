@@ -34,7 +34,8 @@ bool XCB_shm_Check (vlc_object_t *obj, xcb_connection_t *conn);
 int XCB_picture_Alloc (vout_display_t *, picture_resource_t *, size_t size,
                        xcb_connection_t *, xcb_shm_seg_t);
 picture_t *XCB_picture_NewFromResource (const video_format_t *,
-                                        const picture_resource_t *);
+                                        const picture_resource_t *,
+                                        xcb_connection_t *);
 
 static inline xcb_shm_seg_t XCB_picture_GetSegment(const picture_t *pic)
 {

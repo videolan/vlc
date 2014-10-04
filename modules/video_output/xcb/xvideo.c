@@ -661,7 +661,8 @@ static void PoolAlloc (vout_display_t *vd, unsigned requested_count)
             res.p[1].p_pixels = buf;
         }
 
-        pic_array[count] = XCB_picture_NewFromResource (&vd->fmt, &res);
+        pic_array[count] = XCB_picture_NewFromResource (&vd->fmt, &res,
+                                                        p_sys->conn);
         if (unlikely(pic_array[count] == NULL))
             break;
     }

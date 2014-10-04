@@ -393,13 +393,10 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 
         if (XCB_picture_Alloc (vd, &res, size, sys->conn, seg))
             break;
-        pic_array[count] = XCB_picture_NewFromResource (&vd->fmt, &res);
+        pic_array[count] = XCB_picture_NewFromResource (&vd->fmt, &res,
+                                                        sys->conn);
         if (unlikely(pic_array[count] == NULL))
-        {
-            if (seg != 0)
-                xcb_shm_detach (sys->conn, seg);
             break;
-        }
     }
     xcb_flush (sys->conn);
 
