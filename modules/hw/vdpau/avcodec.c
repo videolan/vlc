@@ -132,18 +132,8 @@ static int Setup(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chromap)
         return VLC_EGENERIC;
     }
 
-    unsigned surfaces = 2;
-    switch (profile)
-    {
-      case VDP_DECODER_PROFILE_H264_BASELINE:
-      case VDP_DECODER_PROFILE_H264_MAIN:
-      case VDP_DECODER_PROFILE_H264_HIGH:
-        surfaces = 16;
-        break;
-    }
-
     err = vdp_decoder_create(sys->vdp, sys->device, profile, sys->width,
-                             sys->height, surfaces, &hwctx->decoder);
+                             sys->height, avctx->refs, &hwctx->decoder);
     if (err != VDP_STATUS_OK)
     {
         msg_Err(va, "%s creation failure: %s", "decoder",
