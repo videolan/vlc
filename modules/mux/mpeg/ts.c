@@ -1691,19 +1691,8 @@ static block_t *Add_ADTS( block_t *p_data, es_format_t *p_fmt )
 
     int i_channels = (p_extra[i_index == 0x0f ? 4 : 1] >> 3) & 0x0f;
 
-    /* keep a copy in case block_Realloc() fails */
-    block_t *p_bak_block = block_Duplicate( p_data );
-    if( !p_bak_block ) /* OOM, block_Realloc() is likely to lose our block */
-        return p_data; /* the frame isn't correct but that's the best we have */
-
     block_t *p_new_block = block_Realloc( p_data, ADTS_HEADER_SIZE,
                                             p_data->i_buffer );
-    if( !p_new_block )
-        return p_bak_block; /* OOM, send the (incorrect) original frame */
-
-    block_Release( p_bak_block ); /* we don't need the copy anymore */
-
-
     uint8_t *p_buffer = p_new_block->p_buffer;
 
     /* fixed header */
