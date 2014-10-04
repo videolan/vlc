@@ -1323,7 +1323,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
 
             if( p_input->p_fmt->i_codec == VLC_CODEC_MP4A )
                 p_data = Add_ADTS( p_data, p_input->p_fmt );
-             else if( p_input->p_fmt->i_codec == VLC_CODEC_OPUS )
+            else if( p_input->p_fmt->i_codec == VLC_CODEC_OPUS )
                 p_data = Pack_Opus( p_data );
         }
         else
