@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_fourcc.h>
 #include <vlc_picture.h>
+#include <vlc_atomic.h>
 #include <vlc_xlib.h>
 #include "vlc_vdpau.h"
 #include "../../codec/avcodec/va.h"
@@ -56,6 +57,7 @@ struct vlc_va_sys_t
     VdpDevice device;
     uint16_t width;
     uint16_t height;
+    vlc_vdp_video_field_t **pool;
 };
 
 static vlc_vdp_video_field_t *CreateSurface(vlc_va_t *va)
@@ -79,11 +81,46 @@ static vlc_vdp_video_field_t *CreateSurface(vlc_va_t *va)
     return field;
 }
 
+static void DestroySurface(vlc_vdp_video_field_t *field)
+{
+    assert(field != NULL);
+    field->destroy(field);
+}
+
+static vlc_vdp_video_field_t *GetSurface(vlc_va_t *va)
+{
+    vlc_va_sys_t *sys = va->sys;
+    vlc_vdp_video_field_t *f;
+
+    for (unsigned i = 0; (f = sys->pool[i]) != NULL; i++)
+    {
+        uintptr_t expected = 1;
+
+        if (atomic_compare_exchange_strong(&f->frame->refs, &expected, 2))
+        {
+            vlc_vdp_video_field_t *field = vlc_vdp_video_copy(f);
+            atomic_fetch_sub(&f->frame->refs, 1);
+            return field;
+        }
+    }
+
+    /* All pictures in the pool are referenced. Try to make a new one. */
+    return CreateSurface(va);
+}
+
 static int Lock(vlc_va_t *va, void **opaque, uint8_t **data)
 {
-    vlc_vdp_video_field_t *field = CreateSurface(va);
-    if (unlikely(field == NULL))
-        return VLC_ENOMEM;
+    vlc_vdp_video_field_t *field;
+    unsigned tries = (CLOCK_FREQ + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP;
+
+    while ((field = GetSurface(va)) == NULL)
+    {
+        if (--tries == 0)
+            return VLC_ENOMEM;
+        /* Out of video RAM, wait for some time as in src/input/decoder.c.
+         * XXX: Both this and the core should use a semaphore or a CV. */
+        msleep(VOUT_OUTMEM_SLEEP);
+    }
 
     *opaque = field;
     *data = (void *)(uintptr_t)field->frame->surface;
@@ -94,8 +131,7 @@ static void Unlock(void *opaque, uint8_t *data)
 {
     vlc_vdp_video_field_t *field = opaque;
 
-    assert(field != NULL);
-    field->destroy(field);
+    DestroySurface(field);
     (void) data;
 }
 
@@ -127,6 +163,10 @@ static int Setup(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chromap)
          && sys->height == avctx->coded_height)
             return VLC_SUCCESS;
 
+        for (unsigned i = 0; sys->pool[i] != NULL; i++)
+            sys->pool[i]->destroy(sys->pool[i]);
+        free(sys->pool);
+
         vdp_decoder_destroy(sys->vdp, hwctx->decoder);
         hwctx->decoder = VDP_INVALID_HANDLE;
     }
@@ -140,12 +180,39 @@ static int Setup(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chromap)
         return VLC_EGENERIC;
     }
 
+    vlc_vdp_video_field_t **pool = malloc(sizeof (*pool) * (avctx->refs + 6));
+    if (unlikely(pool == NULL))
+        return VLC_ENOMEM;
+
+    int i = 0;
+    while (i < avctx->refs + 5)
+    {
+        pool[i] = CreateSurface(va);
+        if (pool[i] == NULL)
+            break;
+        i++;
+    }
+    pool[i] = NULL;
+
+    if (i < avctx->refs + 3)
+    {
+        msg_Err(va, "not enough video RAM");
+        while (i > 0)
+            DestroySurface(pool[--i]);
+        free(pool);
+        return VLC_ENOMEM;
+    }
+    sys->pool = pool;
+
     err = vdp_decoder_create(sys->vdp, sys->device, profile, sys->width,
                              sys->height, avctx->refs, &hwctx->decoder);
     if (err != VDP_STATUS_OK)
     {
         msg_Err(va, "%s creation failure: %s", "decoder",
                 vdp_get_error_string(sys->vdp, err));
+        while (i > 0)
+            DestroySurface(pool[--i]);
+        free(pool);
         hwctx->decoder = VDP_INVALID_HANDLE;
         return VLC_EGENERIC;
     }
@@ -286,7 +353,13 @@ static void Close(vlc_va_t *va, AVCodecContext *avctx)
     AVVDPAUContext *hwctx = avctx->hwaccel_context;
 
     if (hwctx->decoder != VDP_INVALID_HANDLE)
+    {
+        for (unsigned i = 0; sys->pool[i] != NULL; i++)
+            DestroySurface(sys->pool[i]);
+        free(sys->pool);
+
         vdp_decoder_destroy(sys->vdp, hwctx->decoder);
+    }
     vdp_release_x11(sys->vdp);
     av_freep(&avctx->hwaccel_context);
     free(sys);
