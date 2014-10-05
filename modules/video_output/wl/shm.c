@@ -56,6 +56,7 @@ struct vout_display_sys_t
 
     int x;
     int y;
+    bool use_buffer_transform;
 };
 
 static void PictureDestroy(picture_t *pic)
@@ -378,6 +379,9 @@ static void registry_global_cb(void *data, struct wl_registry *registry,
     if (!strcmp(iface, "wl_scaler"))
         sys->scaler = wl_registry_bind(registry, name, &wl_scaler_interface,
                                        1);
+    else
+    if (!strcmp(iface, "wl_compositor"))
+        sys->use_buffer_transform = vers >= 2;
 }
 
 static void registry_global_remove_cb(void *data, struct wl_registry *registry,
@@ -410,6 +414,7 @@ static int Open(vlc_object_t *obj)
     sys->pool = NULL;
     sys->x = 0;
     sys->y = 0;
+    sys->use_buffer_transform = false;
 
     /* Get window */
     vout_window_cfg_t wcfg = {
@@ -442,22 +447,40 @@ static int Open(vlc_object_t *obj)
     wl_shm_add_listener(sys->shm, &shm_cbs, vd);
     wl_display_roundtrip_queue(display, sys->eventq);
 
+    struct wl_surface *surface = sys->embed->handle.wl;
     if (sys->scaler != NULL)
-        sys->viewport = wl_scaler_get_viewport(sys->scaler,
-                                               sys->embed->handle.wl);
+        sys->viewport = wl_scaler_get_viewport(sys->scaler, surface);
     else
         sys->viewport = NULL;
 
     /* Determine our pixel format */
-    video_format_t fmt_pic;
+    static const enum wl_output_transform transforms[8] = {
+        [ORIENT_TOP_LEFT] = WL_OUTPUT_TRANSFORM_NORMAL,
+        [ORIENT_TOP_RIGHT] = WL_OUTPUT_TRANSFORM_FLIPPED,
+        [ORIENT_BOTTOM_LEFT] = WL_OUTPUT_TRANSFORM_FLIPPED_180,
+        [ORIENT_BOTTOM_RIGHT] = WL_OUTPUT_TRANSFORM_180,
+        [ORIENT_LEFT_TOP] = WL_OUTPUT_TRANSFORM_FLIPPED_270,
+        [ORIENT_LEFT_BOTTOM] = WL_OUTPUT_TRANSFORM_90,
+        [ORIENT_RIGHT_TOP] = WL_OUTPUT_TRANSFORM_270,
+        [ORIENT_RIGHT_BOTTOM] = WL_OUTPUT_TRANSFORM_FLIPPED_90,
+    };
 
-    video_format_ApplyRotation(&fmt_pic, &vd->fmt);
-    fmt_pic.i_chroma = VLC_CODEC_RGB32;
+    if (sys->use_buffer_transform)
+    {
+        wl_surface_set_buffer_transform(surface,
+                                        transforms[vd->fmt.orientation]);
+    }
+    else
+    {
+        video_format_t fmt = vd->fmt;
+        video_format_ApplyRotation(&vd->fmt, &fmt);
+    }
+
+    vd->fmt.i_chroma = VLC_CODEC_RGB32;
 
     vd->info.has_pictures_invalid = sys->viewport == NULL;
     vd->info.has_event_thread = true;
 
-    vd->fmt = fmt_pic;
     vd->pool = Pool;
     vd->prepare = Prepare;
     vd->display = Display;
