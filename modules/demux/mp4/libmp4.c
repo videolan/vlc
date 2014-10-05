@@ -1539,6 +1539,21 @@ static void MP4_FreeBox_strf( MP4_Box_t *p_box )
     FREENULL( p_box->data.p_strf->p_extra );
 }
 
+static int MP4_ReadBox_ASF( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_ASF_t );
+
+    MP4_Box_data_ASF_t *p_asf = p_box->data.p_asf;
+
+    if (i_read != 8)
+        MP4_READBOX_EXIT( 0 );
+
+    MP4_GET1BYTE( p_asf->i_stream_number );
+    /* remaining is unknown */
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 static int MP4_ReadBox_stsdext_chan( stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_chan_t );
@@ -3607,6 +3622,8 @@ static const struct
     { ATOM_yuv2,    MP4_ReadBox_sample_vide,  MP4_FreeBox_sample_vide, 0 },
 
     { ATOM_strf,    MP4_ReadBox_strf,         MP4_FreeBox_strf,        ATOM_WMV3 }, /* flip4mac */
+    { ATOM_ASF ,    MP4_ReadBox_ASF,          MP4_FreeBox_Common,      ATOM_WMV3 }, /* flip4mac */
+    { ATOM_ASF ,    MP4_ReadBox_ASF,          MP4_FreeBox_Common,      ATOM_wave }, /* flip4mac */
 
     { ATOM_mp4s,    MP4_ReadBox_sample_mp4s,  MP4_FreeBox_Common, 0 },
 

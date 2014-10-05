@@ -214,6 +214,7 @@
 #define ATOM_drmi VLC_FOURCC( 'd', 'r', 'm', 'i' )
 #define ATOM_frma VLC_FOURCC( 'f', 'r', 'm', 'a' )
 #define ATOM_skcr VLC_FOURCC( 's', 'k', 'c', 'r' )
+#define ATOM_ASF  VLC_FOURCC( 'A', 'S', 'F', ' ' )
 
 #define ATOM_text VLC_FOURCC( 't', 'e', 'x', 't' )
 #define ATOM_tx3g VLC_FOURCC( 't', 'x', '3', 'g' )
@@ -1061,6 +1062,11 @@ typedef struct
     char    *p_extra;
 } MP4_Box_data_strf_t;
 
+typedef struct
+{
+    uint8_t i_stream_number;
+} MP4_Box_data_ASF_t;
+
 /* According to Apple's CoreAudio/CoreAudioTypes.h */
 #define MP4_CHAN_USE_CHANNELS_DESC           0
 #define MP4_CHAN_USE_CHANNELS_BITMAP         (1<<16)
@@ -1380,6 +1386,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_hvcC_t *p_hvcC;
     MP4_Box_data_WMA2_t *p_WMA2; /* flip4mac Little endian audio config */
     MP4_Box_data_strf_t *p_strf; /* flip4mac Little endian video config */
+    MP4_Box_data_ASF_t  *p_asf;  /* flip4mac asf streams indicator */
 
     MP4_Box_data_data_t *p_data;
 
