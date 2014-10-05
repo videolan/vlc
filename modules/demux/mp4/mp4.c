@@ -104,6 +104,12 @@ struct demux_sys_t
 
     /* */
     input_title_t *p_title;
+
+    /* ASF in MP4 */
+    asf_packet_sys_t asfpacketsys;
+    uint64_t i_preroll;         /* foobar */
+    int64_t  i_preroll_start;
+    mp4_track_t *p_current_track; /* avoids matching stream_number */
 };
 
 #define BOXDATA(type) type->data.type
@@ -144,6 +150,11 @@ static mtime_t LeafGetFragmentTimeOffset( demux_t *p_demux, mp4_fragment_t * );
 static int LeafGetTrackAndChunkByMOOVPos( demux_t *p_demux, uint64_t *pi_pos,
                                       mp4_track_t **pp_tk, unsigned int *pi_chunk );
 static int LeafMapTrafTrunContextes( demux_t *p_demux, MP4_Box_t *p_moof );
+
+/* ASF Handlers */
+static asf_track_info_t * MP4ASF_GetTrackInfo( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number );
+static void MP4ASF_Send(asf_packet_sys_t *p_packetsys, uint8_t i_stream_number, block_t **pp_frame);
+static void MP4ASF_ResetFrames( demux_sys_t *p_sys );
 
 /* Helpers */
 
@@ -483,7 +494,26 @@ static void MP4_Block_Send( demux_t *p_demux, mp4_track_t *p_track, block_t *p_b
                              p_track->rgi_chans_reordering,
                              p_track->fmt.i_codec );
     }
-    es_out_Send( p_demux->out, p_track->p_es, p_block );
+
+    /* ASF packets in mov */
+    if( p_track->p_asf )
+    {
+        /* Fake a new stream from MP4 block */
+        stream_t *p_stream = p_demux->s;
+        p_demux->s = stream_MemoryNew( p_demux, p_block->p_buffer, p_block->i_buffer, true );
+        if ( p_demux->s )
+        {
+            p_track->i_dts_backup = p_block->i_dts;
+            p_track->i_pts_backup = p_block->i_pts;
+            /* And demux it as ASF packet */
+            DemuxASFPacket( &p_demux->p_sys->asfpacketsys, p_block->i_buffer, p_block->i_buffer );
+            stream_Delete(p_demux->s);
+        }
+        block_Release(p_block);
+        p_demux->s = p_stream;
+    }
+    else
+        es_out_Send( p_demux->out, p_track->p_es, p_block );
 }
 
 /*****************************************************************************
@@ -859,6 +889,15 @@ static int Open( vlc_object_t * p_this )
     /* */
     LoadChapter( p_demux );
 
+    p_sys->asfpacketsys.p_demux = p_demux;
+    p_sys->asfpacketsys.pi_preroll = &p_sys->i_preroll;
+    p_sys->asfpacketsys.pi_preroll_start = &p_sys->i_preroll_start;
+    p_sys->asfpacketsys.pf_doskip = NULL;
+    p_sys->asfpacketsys.pf_send = MP4ASF_Send;
+    p_sys->asfpacketsys.pf_gettrackinfo = MP4ASF_GetTrackInfo;
+    p_sys->asfpacketsys.pf_updatetime = NULL;
+    p_sys->asfpacketsys.pf_setaspectratio = NULL;
+
     return VLC_SUCCESS;
 
 error:
@@ -1118,6 +1157,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date )
     }
     MP4_UpdateSeekpoint( p_demux );
 
+    MP4ASF_ResetFrames( p_sys );
     es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
 
     return VLC_SUCCESS;
@@ -1220,6 +1260,7 @@ static int LeafSeekToTime( demux_t *p_demux, mtime_t i_nztime )
             return VLC_EGENERIC;
     }
 
+    MP4ASF_ResetFrames( p_sys );
     /* And set next display time in that trun/fragment */
     es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TS_0 + i_nztime );
     return VLC_SUCCESS;
@@ -2976,6 +3017,56 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 break;
             }
 
+            case ATOM_WMA2:
+            {
+                MP4_Box_t *p_WMA2 = MP4_BoxGet( p_sample, "wave/WMA2" );
+                if( p_WMA2 && BOXDATA(p_WMA2) )
+                {
+                    p_track->fmt.audio.i_channels = BOXDATA(p_WMA2)->Format.nChannels;
+                    p_track->fmt.audio.i_rate = BOXDATA(p_WMA2)->Format.nSamplesPerSec;
+                    p_track->fmt.i_bitrate = BOXDATA(p_WMA2)->Format.nAvgBytesPerSec * 8;
+                    p_track->fmt.audio.i_blockalign = BOXDATA(p_WMA2)->Format.nBlockAlign;
+                    p_track->fmt.audio.i_bitspersample = BOXDATA(p_WMA2)->Format.wBitsPerSample;
+                    p_track->fmt.i_extra = BOXDATA(p_WMA2)->i_extra;
+                    if( p_track->fmt.i_extra > 0 )
+                    {
+                        p_track->fmt.p_extra = malloc( BOXDATA(p_WMA2)->i_extra );
+                        memcpy( p_track->fmt.p_extra, BOXDATA(p_WMA2)->p_extra,
+                                p_track->fmt.i_extra );
+                    }
+                    p_track->p_asf = MP4_BoxGet( p_sample, "wave/ASF " );
+                }
+                else
+                {
+                    msg_Err( p_demux, "missing WMA2 %4.4s", (char*) &p_sample->p_father->i_type );
+                    assert(false);
+                }
+                break;
+            }
+
+            case ATOM_WMV3:
+            {
+                MP4_Box_t *p_strf = MP4_BoxGet(  p_sample, "strf", 0 );
+                if ( p_strf && BOXDATA(p_strf) )
+                {
+                    p_track->fmt.i_codec = VLC_CODEC_WMV3;
+                    p_track->fmt.video.i_width = BOXDATA(p_strf)->bmiHeader.biWidth;
+                    p_track->fmt.video.i_visible_width = p_track->fmt.video.i_width;
+                    p_track->fmt.video.i_height = BOXDATA(p_strf)->bmiHeader.biHeight;
+                    p_track->fmt.video.i_visible_height =p_track->fmt.video.i_height;
+                    p_track->fmt.video.i_bits_per_pixel = BOXDATA(p_strf)->bmiHeader.biBitCount;
+                    p_track->fmt.i_extra = BOXDATA(p_strf)->i_extra;
+                    if( p_track->fmt.i_extra > 0 )
+                    {
+                        p_track->fmt.p_extra = malloc( BOXDATA(p_strf)->i_extra );
+                        memcpy( p_track->fmt.p_extra, BOXDATA(p_strf)->p_extra,
+                                p_track->fmt.i_extra );
+                    }
+                    p_track->p_asf = MP4_BoxGet( p_sample, "ASF " );
+                }
+                break;
+            }
+
             default:
                 msg_Dbg( p_demux, "Unrecognized FourCC %4.4s", (char *)&p_sample->i_type );
                 break;
@@ -3469,6 +3560,9 @@ static void MP4_TrackDestroy( mp4_track_t *p_track )
     {
         FREENULL( p_track->p_sample_size );
     }
+
+    if ( p_track->asfinfo.p_frame )
+        block_ChainRelease( p_track->asfinfo.p_frame );
 }
 
 static int MP4_TrackSelect( demux_t *p_demux, mp4_track_t *p_track,
@@ -5610,6 +5704,64 @@ static int DemuxAsLeaf( demux_t *p_demux )
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
 
     return 1;
+}
+
+/* ASF Handlers */
+inline static mp4_track_t *MP4ASF_GetTrack( asf_packet_sys_t *p_packetsys,
+                                            uint8_t i_stream_number )
+{
+    demux_sys_t *p_sys = p_packetsys->p_demux->p_sys;
+    for ( unsigned int i=0; i<p_sys->i_tracks; i++ )
+    {
+        if ( p_sys->track[i].p_asf &&
+             i_stream_number == p_sys->track[i].BOXDATA(p_asf)->i_stream_number )
+        {
+            return &p_sys->track[i];
+        }
+    }
+    return NULL;
+}
+
+static asf_track_info_t * MP4ASF_GetTrackInfo( asf_packet_sys_t *p_packetsys,
+                                               uint8_t i_stream_number )
+{
+    mp4_track_t *p_track = MP4ASF_GetTrack( p_packetsys, i_stream_number );
+    if ( p_track )
+        return &p_track->asfinfo;
+    else
+        return NULL;
+}
+
+static void MP4ASF_Send( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number,
+                         block_t **pp_frame )
+{
+    mp4_track_t *p_track = MP4ASF_GetTrack( p_packetsys, i_stream_number );
+    if ( !p_track )
+    {
+        block_Release( *pp_frame );
+    }
+    else
+    {
+        block_t *p_gather = block_ChainGather( *pp_frame );
+        p_gather->i_dts = p_track->i_dts_backup;
+        p_gather->i_pts = p_track->i_pts_backup;
+        es_out_Send( p_packetsys->p_demux->out, p_track->p_es, p_gather );
+    }
+
+    *pp_frame = NULL;
+}
+
+static void MP4ASF_ResetFrames( demux_sys_t *p_sys )
+{
+    for ( unsigned int i=0; i<p_sys->i_tracks; i++ )
+    {
+        mp4_track_t *p_track = &p_sys->track[i];
+        if( p_track->asfinfo.p_frame )
+        {
+            block_ChainRelease( p_track->asfinfo.p_frame );
+            p_track->asfinfo.p_frame = NULL;
+        }
+    }
 }
 
 #undef BOXDATA

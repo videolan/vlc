@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include "libmp4.h"
+#include "../asf/asfpacket.h"
 
 /* Contain all information about a chunk */
 typedef struct
@@ -134,6 +135,11 @@ typedef struct
         uint64_t   i_traf_base_offset;
     } context;
 
+    /* ASF packets handling */
+    MP4_Box_t       *p_asf;
+    mtime_t          i_dts_backup;
+    mtime_t          i_pts_backup;
+    asf_track_info_t asfinfo;
 } mp4_track_t;
 
 typedef struct mp4_fragment_t mp4_fragment_t;
