@@ -127,6 +127,7 @@ endif
 ### Wayland ###
 libwl_shm_plugin_la_SOURCES = video_output/wl/shm.c
 nodist_libwl_shm_plugin_la_SOURCES = video_output/wl/scaler-protocol.c
+libwl_shm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/video_output/wl
 libwl_shm_plugin_la_CFLAGS = $(WAYLAND_CLIENT_CFLAGS)
 libwl_shm_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS)
 EXTRA_DIST += video_output/wayland/scaler.xml

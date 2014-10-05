@@ -24,6 +24,7 @@
 # include <config.h>
 #endif
 
+#include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,6 +35,7 @@
 #include <unistd.h>
 
 #include <wayland-client.h>
+#include "scaler-client-protocol.h"
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -47,6 +49,8 @@ struct vout_display_sys_t
     vout_window_t *embed; /* VLC window */
     struct wl_event_queue *eventq;
     struct wl_shm *shm;
+    struct wl_scaler *scaler;
+    struct wl_viewport *viewport;
 
     picture_pool_t *pool; /* picture pool */
 
@@ -98,7 +102,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
 
     /* We need one extra line to cover for horizontal crop offset */
     unsigned stride = 4 * ((vd->fmt.i_width + 31) & ~31);
-    unsigned lines = (vd->fmt.i_height + 31 + 1) & ~31;
+    unsigned lines = (vd->fmt.i_height + 31 + (sys->viewport == NULL)) & ~31;
     const long pagemask = sysconf(_SC_PAGE_SIZE) - 1;
     size_t picsize = ((stride * lines) + pagemask) & ~pagemask;
     size_t length = picsize * req;
@@ -139,10 +143,13 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
             },
         },
     };
-    size_t offset = 4 * vd->fmt.i_x_offset + stride * vd->fmt.i_y_offset;
+    size_t offset = 0;
     unsigned width = vd->fmt.i_visible_width;
     unsigned height = vd->fmt.i_visible_height;
     unsigned count = 0;
+
+    if (sys->viewport == NULL) /* Poor man's crop */
+        offset += 4 * vd->fmt.i_x_offset + stride * vd->fmt.i_y_offset;
 
     while (count < req)
     {
@@ -197,7 +204,7 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic)
 
     wl_surface_attach(surface, buf, sys->x, sys->y);
     wl_surface_damage(surface, 0, 0,
-                      vd->fmt.i_visible_width, vd->fmt.i_visible_height);
+                      vd->cfg->display.width, vd->cfg->display.height);
     wl_display_flush(display);
 
     sys->x = 0;
@@ -244,8 +251,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             vout_display_place_t place;
             video_format_t src;
 
-            sys->x += vd->fmt.i_visible_width / 2;
-            sys->y += vd->fmt.i_visible_height / 2;
+            assert(sys->viewport == NULL);
 
             vout_display_PlacePicture(&place, &vd->source, vd->cfg, false);
             video_format_ApplyRotation(&src, &vd->source);
@@ -260,10 +266,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
                                                 / src.i_visible_width;
             vd->fmt.i_y_offset = src.i_y_offset * place.height
                                                 / src.i_visible_height;
-
-            sys->x -= vd->fmt.i_visible_width / 2;
-            sys->y -= vd->fmt.i_visible_height / 2;
-
             ResetPictures(vd);
             break;
         }
@@ -282,12 +284,27 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         }
 
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+        case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
+        case VOUT_DISPLAY_CHANGE_ZOOM:
+        case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+        case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         {
-            const vout_display_cfg_t *cfg =
-                va_arg(ap, const vout_display_cfg_t *);
-            const bool forced = va_arg(ap, int);
+            const vout_display_cfg_t *cfg;
+            const video_format_t *src;
 
-            if (forced)
+            if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT
+             || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP)
+            {
+                src = va_arg(ap, const video_format_t *);
+                cfg = vd->cfg;
+            }
+            else
+            {
+                src = &vd->source;
+                cfg = va_arg(ap, const vout_display_cfg_t *);
+            }
+
+            if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE && va_arg(ap, int))
             {
                 vout_display_SendEventDisplaySize(vd, cfg->display.width,
                                                   cfg->display.height,
@@ -296,20 +313,31 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             }
 
             vout_display_place_t place;
-            vout_display_PlacePicture(&place, &vd->source, cfg, false);
 
-            if (place.width == vd->fmt.i_visible_width
-             && place.height == vd->fmt.i_visible_height)
-                break;
-            /* fall through */
+            vout_display_PlacePicture(&place, &vd->source, vd->cfg, false);
+            sys->x += place.width / 2;
+            sys->y += place.height / 2;
+
+            vout_display_PlacePicture(&place, src, cfg, false);
+            sys->x -= place.width / 2;
+            sys->y -= place.height / 2;
+
+            if (sys->viewport != NULL)
+            {
+                video_format_t fmt;
+
+                video_format_ApplyRotation(&fmt, src);
+                wl_viewport_set(sys->viewport,
+                                wl_fixed_from_int(fmt.i_x_offset),
+                                wl_fixed_from_int(fmt.i_y_offset),
+                                wl_fixed_from_int(fmt.i_visible_width),
+                                wl_fixed_from_int(fmt.i_visible_height),
+                                place.width, place.height);
+            }
+            else
+                vout_display_SendEventPicturesInvalid(vd);
+            break;
         }
-        case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
-        case VOUT_DISPLAY_CHANGE_ZOOM:
-        case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
-        case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-             vout_display_SendEventPicturesInvalid(vd);
-             break;
-
         default:
              msg_Err(vd, "unknown request %d", query);
              return VLC_EGENERIC;
@@ -346,6 +374,10 @@ static void registry_global_cb(void *data, struct wl_registry *registry,
 
     if (!strcmp(iface, "wl_shm"))
         sys->shm = wl_registry_bind(registry, name, &wl_shm_interface, 1);
+    else
+    if (!strcmp(iface, "wl_scaler"))
+        sys->scaler = wl_registry_bind(registry, name, &wl_scaler_interface,
+                                       1);
 }
 
 static void registry_global_remove_cb(void *data, struct wl_registry *registry,
@@ -374,6 +406,7 @@ static int Open(vlc_object_t *obj)
     sys->embed = NULL;
     sys->eventq = NULL;
     sys->shm = NULL;
+    sys->scaler = NULL;
     sys->pool = NULL;
     sys->x = 0;
     sys->y = 0;
@@ -409,13 +442,19 @@ static int Open(vlc_object_t *obj)
     wl_shm_add_listener(sys->shm, &shm_cbs, vd);
     wl_display_roundtrip_queue(display, sys->eventq);
 
+    if (sys->scaler != NULL)
+        sys->viewport = wl_scaler_get_viewport(sys->scaler,
+                                               sys->embed->handle.wl);
+    else
+        sys->viewport = NULL;
+
     /* Determine our pixel format */
     video_format_t fmt_pic;
 
     video_format_ApplyRotation(&fmt_pic, &vd->fmt);
     fmt_pic.i_chroma = VLC_CODEC_RGB32;
 
-    vd->info.has_pictures_invalid = true;
+    vd->info.has_pictures_invalid = sys->viewport == NULL;
     vd->info.has_event_thread = true;
 
     vd->fmt = fmt_pic;
@@ -449,6 +488,10 @@ static void Close(vlc_object_t *obj)
 
     ResetPictures(vd);
 
+    if (sys->viewport != NULL)
+        wl_viewport_destroy(sys->viewport);
+    if (sys->scaler != NULL)
+        wl_scaler_destroy(sys->scaler);
     wl_shm_destroy(sys->shm);
     wl_display_flush(sys->embed->display.wl);
     wl_event_queue_destroy(sys->eventq);
