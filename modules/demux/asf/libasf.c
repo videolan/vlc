@@ -543,7 +543,9 @@ static int ASF_ReadObject_stream_properties( stream_t *s, asf_object_t *p_obj )
     p_sp->i_type_specific_data_length = GetDWLE( p_peek + 64 );
     p_sp->i_error_correction_data_length = GetDWLE( p_peek + 68 );
     p_sp->i_flags = GetWLE( p_peek + 72 );
-        p_sp->i_stream_number = p_sp->i_flags&0x07f;
+    p_sp->i_stream_number = p_sp->i_flags&0x07f;
+    if ( p_sp->i_stream_number > ASF_MAX_STREAMNUMBER )
+        return VLC_EGENERIC;
     p_sp->i_reserved = GetDWLE( p_peek + 74 );
     i_peek -= 78;
 
@@ -828,13 +830,15 @@ static int ASF_ReadObject_stream_bitrate_properties( stream_t *s,
     p_data = &p_peek[24];
 
     p_sb->i_bitrate = ASF_READ2();
-    if( p_sb->i_bitrate > 127 )
-        p_sb->i_bitrate = 127;  /* Buggy ? */
+    if( p_sb->i_bitrate > ASF_MAX_STREAMNUMBER )
+        p_sb->i_bitrate = ASF_MAX_STREAMNUMBER;  /* Buggy ? */
     for( i = 0; i < p_sb->i_bitrate; i++ )
     {
         if( !ASF_HAVE(2 + 4) )
             break;
         p_sb->bitrate[i].i_stream_number = (uint8_t) ASF_READ2()& 0x7f;
+        if ( p_sb->bitrate[i].i_stream_number > ASF_MAX_STREAMNUMBER )
+            return VLC_EGENERIC;
         p_sb->bitrate[i].i_avg_bitrate = ASF_READ4();
     }
     p_sb->i_bitrate = i;
@@ -879,6 +883,8 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
     p_esp->i_maximum_object_size = GetDWLE( &p_data[40] );
     p_esp->i_flags = GetDWLE( &p_data[44] );
     p_esp->i_stream_number = GetWLE( &p_data[48] );
+    if ( p_esp->i_stream_number > ASF_MAX_STREAMNUMBER )
+        return VLC_EGENERIC;
     p_esp->i_language_index = GetWLE( &p_data[50] );
     p_esp->i_average_time_per_frame= GetQWLE( &p_data[52] );
     p_esp->i_stream_name_count = GetWLE( &p_data[60] );
@@ -1021,12 +1027,19 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
 
     p_ae->i_stream_number_count = ASF_READ2();
     p_ae->pi_stream_number = calloc( p_ae->i_stream_number_count, sizeof(uint16_t) );
+    if ( !p_ae->pi_stream_number )
+        return VLC_ENOMEM;
 
     for( i = 0; i < p_ae->i_stream_number_count; i++ )
     {
         if( !ASF_HAVE(2) )
             break;
         p_ae->pi_stream_number[i] = ASF_READ2();
+        if ( p_ae->pi_stream_number[i] > ASF_MAX_STREAMNUMBER )
+        {
+            free( p_ae->pi_stream_number );
+            return VLC_EGENERIC;
+        }
     }
     p_ae->i_stream_number_count = i;
 
@@ -1133,6 +1146,11 @@ static int ASF_ReadObject_bitrate_mutual_exclusion( stream_t *s, asf_object_t *p
         if( !ASF_HAVE(2) )
             break;
         p_ex->pi_stream_numbers[i] = ASF_READ2();
+        if ( p_ex->pi_stream_numbers[i] > ASF_MAX_STREAMNUMBER )
+        {
+            free( p_ex->pi_stream_numbers );
+            return VLC_EGENERIC;
+        }
     }
 
 #ifdef ASF_DEBUG

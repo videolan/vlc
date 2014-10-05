@@ -21,6 +21,8 @@
  *****************************************************************************/
 
 
+#define ASF_MAX_STREAMNUMBER 127
+
 /*****************************************************************************
  * Structure needed for decoder
  *****************************************************************************/
@@ -244,7 +246,7 @@ typedef struct
     {
         uint8_t  i_stream_number;
         uint32_t i_avg_bitrate;
-    } bitrate[128];
+    } bitrate[ASF_MAX_STREAMNUMBER + 1];
 } asf_object_stream_bitrate_properties_t;
 
 

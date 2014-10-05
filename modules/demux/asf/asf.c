@@ -72,7 +72,7 @@ static int Demux  ( demux_t * );
 static int Control( demux_t *, int i_query, va_list args );
 static void FlushRemainingPackets( demux_t *p_demux );
 
-#define MAX_ASF_TRACKS 128
+#define MAX_ASF_TRACKS (ASF_MAX_STREAMNUMBER + 1)
 #define ASF_PREROLL_FROM_CURRENT -1
 
 typedef struct
@@ -745,6 +745,8 @@ static int DemuxPayload(demux_t *p_demux, struct asf_packet_t *pkt, int i_payloa
 
     bool b_packet_keyframe = pkt->p_peek[pkt->i_skip] >> 7;
     uint8_t i_stream_number = pkt->p_peek[pkt->i_skip++] & 0x7f;
+    if ( i_stream_number >= MAX_ASF_TRACKS )
+        goto skip;
 
     uint32_t i_media_object_number = 0;
     if (GetValue2b(&i_media_object_number, pkt->p_peek, &pkt->i_skip, pkt->left - pkt->i_skip, pkt->property >> 4) < 0)
