@@ -374,6 +374,14 @@ static int Open (vlc_object_t *obj)
 
     if (!var_InheritBool (obj, "overlay"))
         return VLC_EGENERIC;
+    else
+    {   /* NOTE: Reject hardware surface formats. Blending would break. */
+        const vlc_chroma_description_t *chroma =
+            vlc_fourcc_GetChromaDescription(vd->source.i_chroma);
+        if (chroma != NULL && chroma->plane_count == 0)
+            return VLC_EGENERIC;
+    }
+
     p_sys = malloc (sizeof (*p_sys));
     if (p_sys == NULL)
         return VLC_ENOMEM;
