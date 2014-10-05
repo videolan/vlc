@@ -162,7 +162,8 @@ static void registry_global_cb(void *data, struct wl_registry *registry,
 
     if (!strcmp(iface, "wl_compositor"))
         sys->compositor = wl_registry_bind(registry, name,
-                                           &wl_compositor_interface, 1);
+                                           &wl_compositor_interface,
+                                           (vers < 2) ? vers : 2);
     else
     if (!strcmp(iface, "wl_output"))
         sys->output = wl_registry_bind(registry, name, &wl_output_interface,
