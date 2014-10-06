@@ -125,19 +125,20 @@ endif
 
 
 ### Wayland ###
-libwl_shm_plugin_la_SOURCES = video_output/wl/shm.c
-nodist_libwl_shm_plugin_la_SOURCES = video_output/wl/scaler-protocol.c
-libwl_shm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/video_output/wl
+libwl_shm_plugin_la_SOURCES = video_output/wayland/shm.c
+nodist_libwl_shm_plugin_la_SOURCES = video_output/wayland/scaler-protocol.c
+libwl_shm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-I$(builddir)/video_output/wayland
 libwl_shm_plugin_la_CFLAGS = $(WAYLAND_CLIENT_CFLAGS)
 libwl_shm_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS)
 EXTRA_DIST += video_output/wayland/scaler.xml
 CLEANFILES += $(nodist_libwl_shm_plugin_la_SOURCES)
 if HAVE_WAYLAND
-BUILT_SOURCES += video_output/wl/scaler-client-protocol.h
+BUILT_SOURCES += video_output/wayland/scaler-client-protocol.h
 vout_LTLIBRARIES += libwl_shm_plugin.la
 endif
 
-libwl_shell_surface_plugin_la_SOURCES = video_output/wl/shell_surface.c
+libwl_shell_surface_plugin_la_SOURCES = video_output/wayland/shell_surface.c
 libwl_shell_surface_plugin_la_CFLAGS = $(WAYLAND_CLIENT_CFLAGS)
 libwl_shell_surface_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS) $(LIBPTHREAD)
 if HAVE_WAYLAND

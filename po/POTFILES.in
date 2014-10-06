@@ -1176,8 +1176,8 @@ modules/video_output/msw/wingdi.c
 modules/video_output/sdl.c
 modules/video_output/vdummy.c
 modules/video_output/vmem.c
-modules/video_output/wl/shell_surface.c
-modules/video_output/wl/shm.c
+modules/video_output/wayland/shell_surface.c
+modules/video_output/wayland/shm.c
 modules/video_output/xcb/glx.c
 modules/video_output/xcb/window.c
 modules/video_output/xcb/x11.c
