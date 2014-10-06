@@ -69,7 +69,7 @@ enum
 struct sout_stream_sys_t
 {
     sout_stream_sys_t()
-        : i_status(CHROMECAST_DISCONNECTED), p_out(NULL)
+        : p_tls(NULL), i_status(CHROMECAST_DISCONNECTED), p_out(NULL)
     {
         atomic_init(&ab_error, false);
     }
@@ -115,7 +115,7 @@ struct sout_stream_sys_t
  *****************************************************************************/
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
-static void Clean(sout_stream_sys_t *p_sys);
+static void Clean(sout_stream_t *p_stream);
 static int connectChromecast(sout_stream_t *p_stream, char *psz_ipChromecast);
 static void disconnectChromecast(sout_stream_t *p_stream);
 static int sendMessages(sout_stream_t *p_stream);
@@ -213,7 +213,7 @@ static int Open(vlc_object_t *p_this)
     if (psz_ipChromecast == NULL)
     {
         msg_Err(p_stream, "No Chromecast receiver IP provided");
-        Clean(p_sys);
+        Clean(p_stream);
         return VLC_EGENERIC;
     }
 
@@ -222,7 +222,7 @@ static int Open(vlc_object_t *p_this)
     if (p_sys->i_sock_fd < 0)
     {
         msg_Err(p_stream, "Could not connect the Chromecast");
-        Clean(p_sys);
+        Clean(p_stream);
         return VLC_EGENERIC;
     }
     p_sys->i_status = CHROMECAST_TLS_CONNECTED;
@@ -231,7 +231,7 @@ static int Open(vlc_object_t *p_this)
     if (net_GetSockAddress(p_sys->i_sock_fd, psz_localIP, NULL))
     {
         msg_Err(p_this, "Cannot get local IP address");
-        Clean(p_sys);
+        Clean(p_stream);
         return VLC_EGENERIC;
     }
     p_sys->serverIP = psz_localIP;
@@ -239,7 +239,7 @@ static int Open(vlc_object_t *p_this)
     char *psz_mux = var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "mux");
     if (psz_mux == NULL)
     {
-        Clean(p_sys);
+        Clean(p_stream);
         return VLC_EGENERIC;
     }
     char *psz_chain = NULL;
@@ -249,7 +249,7 @@ static int Open(vlc_object_t *p_this)
     free(psz_mux);
     if (i_bytes < 0)
     {
-        Clean(p_sys);
+        Clean(p_stream);
         return VLC_EGENERIC;
     }
 
@@ -257,7 +257,7 @@ static int Open(vlc_object_t *p_this)
     free(psz_chain);
     if (p_sys->p_out == NULL)
     {
-        Clean(p_sys);
+        Clean(p_stream);
         return VLC_EGENERIC;
     }
 
@@ -269,7 +269,7 @@ static int Open(vlc_object_t *p_this)
                   VLC_THREAD_PRIORITY_LOW))
     {
         msg_Err(p_stream, "Could not start the Chromecast talking thread");
-        Clean(p_sys);
+        Clean(p_stream);
         return VLC_EGENERIC;
     }
 
@@ -290,7 +290,7 @@ static int Open(vlc_object_t *p_this)
         msg_Err(p_stream, "Timeout reached before sending the media loading command");
         vlc_cancel(p_sys->chromecastThread);
         vlc_join(p_sys->chromecastThread, NULL);
-        Clean(p_sys);
+        Clean(p_stream);
         return VLC_EGENERIC;
     }
 
@@ -330,30 +330,29 @@ static void Close(vlc_object_t *p_this)
         // Send the just added close messages.
         sendMessages(p_stream);
         // ft
-    case CHROMECAST_TLS_CONNECTED:
-    case CHROMECAST_CONNECTION_DEAD:
-        disconnectChromecast(p_stream);
-        p_sys->i_status = CHROMECAST_DISCONNECTED;
-        // ft
     default:
         break;
     }
 
-    Clean(p_sys);
+    Clean(p_stream);
 }
 
 
 /**
  * @brief Clean and release the variables in a sout_stream_sys_t structure
  */
-static void Clean(sout_stream_sys_t *p_sys)
+static void Clean(sout_stream_t *p_stream)
 {
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
     if (p_sys->p_out)
     {
         vlc_mutex_destroy(&p_sys->lock);
         vlc_cond_destroy(&p_sys->loadCommandCond);
         sout_StreamChainDelete(p_sys->p_out, p_sys->p_out);
     }
+
+    disconnectChromecast(p_stream);
 
     delete p_sys;
 }
@@ -400,6 +399,7 @@ static void disconnectChromecast(sout_stream_t *p_stream)
         vlc_tls_SessionDelete(p_sys->p_tls);
         vlc_tls_Delete(p_sys->p_creds);
         p_sys->p_tls = NULL;
+        p_sys->i_status = CHROMECAST_DISCONNECTED;
     }
 }
 
