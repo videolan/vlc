@@ -1,6 +1,8 @@
-SOURCES_vod_rtsp = rtsp.c
+miscdir = $(pluginsdir)/misc
+misc_LTLIBRARIES =
+EXTRA_LTLIBRARIES =
 
-SOURCES_xml = xml/libxml.c
+include $(top_srcdir)/modules/common.am
 
 libaudioscrobbler_plugin_la_SOURCES = audioscrobbler.c
 libaudioscrobbler_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBPTHREAD)
@@ -71,8 +73,15 @@ misc_LTLIBRARIES += \
 	liblogger_plugin.la \
 	libstats_plugin.la
 
+libvod_rtsp_plugin_la_SOURCES = rtsp.c
+libvod_rtsp_plugin_la_LIBADD = $(SOCKET_LIBS)
 if ENABLE_SOUT
-misc_LTLIBRARIES += \
-	libvod_rtsp_plugin.la \
-	$(NULL)
+misc_LTLIBRARIES += libvod_rtsp_plugin.la
 endif
+
+libxml_plugin_la_SOURCES = xml/libxml.c
+libxml_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBXML2_CFLAGS)
+libxml_plugin_la_LIBADD = $(LIBXML2_LIBS)
+libxml_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(miscdir)' $(LDFLAGS_xml)
+EXTRA_LTLIBRARIES += libxml_plugin.la
+misc_LTLIBRARIES += $(LTLIBxml)
