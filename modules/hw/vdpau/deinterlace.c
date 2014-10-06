@@ -91,6 +91,7 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
     }
 
     src->b_progressive = true;
+    dst->b_progressive = true;
     return src;
 }
 
