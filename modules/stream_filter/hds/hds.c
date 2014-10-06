@@ -430,6 +430,15 @@ static uint8_t* parse_afrt( vlc_object_t* p_this,
         s->fragment_run_count++;
     }
 
+    if ( s->fragment_runs[s->fragment_run_count-1].fragment_number_start == 0 &&
+         s->fragment_runs[s->fragment_run_count-1].fragment_timestamp == 0 &&
+         s->fragment_runs[s->fragment_run_count-1].fragment_duration == 0 &&
+         s->fragment_runs[s->fragment_run_count-1].discont == 0 )
+    {
+        /* ignore sentinel value */
+        s->fragment_run_count--;
+    }
+
     return data_p;
 }
 
