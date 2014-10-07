@@ -18,7 +18,7 @@ freetype: freetype-$(FREETYPE2_VERSION).tar.gz .sum-freetype2
 	$(call pkg_static, "builds/unix/freetype2.in")
 	$(MOVE)
 
-DEPS_freetype = zlib $(DEPS_zlib)
+DEPS_freetype2 = zlib $(DEPS_zlib)
 
 .freetype2: freetype
 	sed -i.orig s/-ansi// $</builds/unix/configure
