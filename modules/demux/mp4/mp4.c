@@ -2255,7 +2255,7 @@ static void TrackGetESSampleRate( demux_t *p_demux,
         return;
     }
 
-    if( p_track->i_chunk_count <= 0 )
+    if( p_track->i_chunk_count == 0 )
         return;
 
     /* */
@@ -2295,7 +2295,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
     demux_sys_t *p_sys = p_demux->p_sys;
     unsigned int i_sample_description_index;
 
-    if( p_sys->b_fragmented )
+    if( p_sys->b_fragmented || p_track->i_chunk_count == 0 )
         i_sample_description_index = 1; /* XXX */
     else
         i_sample_description_index =
