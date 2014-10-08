@@ -161,8 +161,6 @@ static int Open( vlc_object_t * p_this )
     }
 
     p_sys->packet_sys.p_demux = p_demux;
-    p_sys->packet_sys.pi_preroll = &p_sys->p_fp->i_preroll;
-    p_sys->packet_sys.pi_preroll_start = &p_sys->i_preroll_start;
     p_sys->packet_sys.pf_doskip = Packet_DoSkip;
     p_sys->packet_sys.pf_send = Packet_Send;
     p_sys->packet_sys.pf_gettrackinfo = Packet_GetTrackInfo;
@@ -592,13 +590,18 @@ static void Packet_UpdateTime( asf_packet_sys_t *p_packetsys, uint8_t i_stream_n
                                mtime_t i_time )
 {
     asf_track_t *tk = p_packetsys->p_demux->p_sys->track[i_stream_number];
-    tk->i_time = i_time;
+    if ( tk )
+        tk->i_time = i_time;
 }
 
 static asf_track_info_t * Packet_GetTrackInfo( asf_packet_sys_t *p_packetsys,
                                                uint8_t i_stream_number )
 {
-    return & p_packetsys->p_demux->p_sys->track[i_stream_number]->info;
+    asf_track_t *tk = p_packetsys->p_demux->p_sys->track[i_stream_number];
+    if (!tk)
+        return NULL;
+    else
+        return & tk->info;
 }
 
 static bool Packet_DoSkip( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number, bool b_packet_keyframe )
@@ -640,6 +643,8 @@ static void Packet_Send(asf_packet_sys_t *p_packetsys, uint8_t i_stream_number, 
     demux_t *p_demux = p_packetsys->p_demux;
     demux_sys_t *p_sys = p_demux->p_sys;
     const asf_track_t *tk = p_sys->track[i_stream_number];
+    if ( !tk )
+        return;
 
     block_t *p_gather = block_ChainGather( *pp_frame );
 
@@ -755,6 +760,7 @@ static int DemuxInit( demux_t *p_demux )
     }
     p_sys->i_data_begin = 0;
     p_sys->i_data_end   = 0;
+    p_sys->i_preroll_start = 0;
     p_sys->meta         = NULL;
 
     /* Now load all object ( except raw data ) */
@@ -1211,6 +1217,10 @@ static int DemuxInit( demux_t *p_demux )
         }
     }
 #endif
+
+    p_sys->packet_sys.pi_preroll = &p_sys->p_fp->i_preroll;
+    p_sys->packet_sys.pi_preroll_start = &p_sys->i_preroll_start;
+
     return VLC_SUCCESS;
 
 error:
