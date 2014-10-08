@@ -460,9 +460,10 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
             {
                 p_chk->strf.vids.p_bih->biSize = p_chk->common.i_chunk_size;
             }
-            uint64_t i_extrasize = p_chk->common.i_chunk_size - sizeof(VLC_BITMAPINFOHEADER);
-            if( i_extrasize > 0 )
+            if ( p_chk->common.i_chunk_size > sizeof(VLC_BITMAPINFOHEADER) )
             {
+                uint64_t i_extrasize = p_chk->common.i_chunk_size - sizeof(VLC_BITMAPINFOHEADER);
+
                 /* There's a color palette appended, set up VLC_BITMAPINFO */
                 memcpy( &p_chk->strf.vids.p_bih[1],
                         p_buff + 8 + sizeof(VLC_BITMAPINFOHEADER), /* 8=fourrc+size */
