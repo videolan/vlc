@@ -3224,7 +3224,8 @@ static int MP4_ReadBox_sdtp( stream_t *p_stream, MP4_Box_t *p_box )
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "i_sample_count is %"PRIu32"", i_sample_count );
-    msg_Dbg( p_stream,
+    if ( i_sample_count > 3 )
+        msg_Dbg( p_stream,
              "read box: \"sdtp\" head: %"PRIx8" %"PRIx8" %"PRIx8" %"PRIx8"",
                  p_sdtp->p_sample_table[0],
                  p_sdtp->p_sample_table[1],
