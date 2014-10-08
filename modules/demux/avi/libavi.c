@@ -471,12 +471,12 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
                 if ( !p_chk->strf.vids.p_bih->biClrUsed )
                     p_chk->strf.vids.p_bih->biClrUsed = (1 << p_chk->strf.vids.p_bih->biBitCount);
 
-                if( i_extrasize > (UINT32_MAX * sizeof(uint32_t)) )
+                if( i_extrasize / sizeof(uint32_t) > UINT32_MAX )
                     p_chk->strf.vids.p_bih->biClrUsed = UINT32_MAX;
                 else
                 {
                     p_chk->strf.vids.p_bih->biClrUsed =
-                            __MAX( i_extrasize / sizeof(uint32_t),
+                            __MIN( i_extrasize / sizeof(uint32_t),
                                    p_chk->strf.vids.p_bih->biClrUsed );
                 }
 
