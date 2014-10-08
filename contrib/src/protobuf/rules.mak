@@ -23,11 +23,6 @@ endif
 
 .protobuf: protobuf
 	$(RECONF)
-# Local protoc Compiler
-ifdef HAVE_CROSS_COMPILE
-	cd $< && ./configure --prefix="$(PREFIX)" && $(MAKE) install
-	cd $< && $(MAKE) clean
-endif
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --with-protoc=protoc
 	cd $< && $(MAKE) install
 	touch $@
