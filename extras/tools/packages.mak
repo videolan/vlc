@@ -42,3 +42,7 @@ SED_URL=$(GNU)/sed/sed-$(SED_VERSION).tar.bz2
 
 ANT_VERSION=1.9.4
 ANT_URL=$(APACHE)/ant/binaries/apache-ant-$(ANT_VERSION)-bin.tar.bz2
+
+PROTOBUF_VERSION := 2.5.0
+PROTOBUF_URL := https://protobuf.googlecode.com/files/protobuf-$(PROTOBUF_VERSION).tar.bz2
+

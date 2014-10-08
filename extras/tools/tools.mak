@@ -265,6 +265,24 @@ CLEAN_PKG += ant
 DISTCLEAN_PKG += apache-ant-$(ANT_VERSION).tar.bz2
 CLEAN_FILE += .ant
 
+
+# Protobuf Protoc
+
+protobuf-$(PROTOBUF_VERSION).tar.bz2:
+	$(call download,$(PROTOBUF_URL))
+
+protobuf: protobuf-$(PROTOBUF_VERSION).tar.bz2
+	$(UNPACK)
+	$(MOVE)
+
+.protoc: protobuf
+	(cd $< && ./configure --prefix="$(PREFIX)" && $(MAKE) && $(MAKE) install)
+	touch $@
+
+CLEAN_PKG += protobuf
+DISTCLEAN_PKG += protobuf-$(PROTOBUF_VERSION).tar.bz2
+CLEAN_FILE += .protoc
+
 #
 #
 #

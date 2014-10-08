@@ -80,6 +80,7 @@ check yasm
 check_tar
 check ragel
 check_sed
+check protoc
 
 [ -n "$NEEDED" ] && mkdir -p build/
 
