@@ -32,7 +32,7 @@ endif
 
 ### OpenGL ###
 # TODO: merge all three source files (?)
-libgles2_plugin_la_SOURCES = video_output/opengl.c video_output/opengl.h
+libgles2_plugin_la_SOURCES = video_output/opengl.c video_output/opengl.h \
 	video_output/gl.c
 libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES=2
 libgles2_plugin_la_LIBADD = $(GLES2_LIBS)
