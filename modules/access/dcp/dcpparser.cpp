@@ -248,7 +248,6 @@ int AssetMap::Parse ( )
         }
     }
 
-
     /* Look for PKLs path */
     if ( (_p_asset_list == NULL) ||  (_p_asset_list->size() == 0) ) {
         msg_Err( p_demux, "Asset list empty" );
@@ -423,27 +422,41 @@ int Asset::Parse( xml_reader_t *p_xmlReader, string p_node, int p_type)
                             switch(_tag) {
                                 /* Case of complex nodes */
                                 case ASSET_PACKING_LIST:
-                                    /* case of <PackinkList/> tag, bur not compliant with SMPTE-429-9 2007*/
+                                    /* case of <PackingList/> tag, bur not compliant with SMPTE-429-9 2007*/
                                     if (xml_ReaderIsEmptyElement( p_xmlReader))
+                                    {
                                         this->b_is_packing_list = true;
+                                    }
                                     else if ( XmlFile::ReadEndNode( this->p_demux, p_xmlReader, node, type, s_value ) )
+                                    {
+                                        msg_Err(this->p_demux, "Missing end node in %s", node.c_str());
                                         return -1;
+                                    }
                                     if ( s_value == "true" )
                                         this->b_is_packing_list = true;
                                     break;
                                 case ASSET_CHUNK_LIST:
                                     if ( this->parseChunkList(p_xmlReader, node, type ) )
+                                    {
+                                        msg_Err(this->p_demux, "Error parsing chunk list: %s", node.c_str());
                                         return -1;
+                                    }
                                     this->s_path = this->chunk_vec[0].getPath();
                                     break;
                                 case ASSET_ID:
                                     if ( XmlFile::ReadEndNode( this->p_demux, p_xmlReader, node, type, s_value ) )
+                                    {
+                                        msg_Err(this->p_demux, "Missing end node in %s", node.c_str());
                                         return -1;
+                                    }
                                     this->s_id = s_value;
                                     break;
                                 case ASSET_ANNOTATION_TEXT:
                                     if ( XmlFile::ReadEndNode( this->p_demux, p_xmlReader, node, type, s_value ) )
+                                    {
+                                        msg_Err(this->p_demux, "Missing end node in %s", node.c_str());
                                         return -1;
+                                    }
                                     this->s_annotation = s_value;
                                     break;
                                 case ASSET_ORIGINAL_FILENAME:
@@ -453,7 +466,7 @@ int Asset::Parse( xml_reader_t *p_xmlReader, string p_node, int p_type)
                                     /* Asset tags not in AssetMap */
                                     break;
                                 default:
-                                    msg_Warn(this->p_demux, "Unknow ASSET_TAG: %i", _tag );
+                                    msg_Warn(this->p_demux, "Unknown ASSET_TAG: %i", _tag );
                                     break;
                             }
                             /* break the for loop as a tag is found*/
@@ -461,10 +474,14 @@ int Asset::Parse( xml_reader_t *p_xmlReader, string p_node, int p_type)
                         }
                     }
                     if( _tag == ASSET_UNKNOWN )
+                    {
+                        msg_Err(this->p_demux, "Unknown ASSET_TAG: %s", node.c_str());
                         return -1;
+                    }
                     break;
                 }
             case XML_READER_TEXT:
+                msg_Err(this->p_demux, " Text element found in Asset");
                 return -1;
             case XML_READER_ENDELEM:
                 if ( node != s_root_node) {
@@ -668,6 +685,7 @@ int AssetMap::ParseAssetList (xml_reader_t *p_xmlReader, const string p_node, in
                 if ( unlikely(asset == NULL) )
                     return -1;
                 if (asset->Parse(p_xmlReader, node, type)){
+                    msg_Err(this->p_demux, "Error parsing Asset in AssetMap");
                     delete asset;
                     return -1;
                 }
@@ -766,14 +784,15 @@ int XmlFile::ReadEndNode( demux_t *p_demux, xml_reader_t *p_xmlReader, string p_
     if (p_type != XML_READER_STARTELEM)
         return -1;
 
-    if( XmlFile::ReadNextNode( p_demux, p_xmlReader, node ) == XML_READER_TEXT )
+    int n = XmlFile::ReadNextNode( p_demux, p_xmlReader, node );
+    if( n == XML_READER_TEXT )
     {
         s_value = node;
-        if( ( XmlFile::ReadNextNode( p_demux, p_xmlReader, node ) == XML_READER_ENDELEM ) &&
-                node == p_node)
+        n = XmlFile::ReadNextNode( p_demux, p_xmlReader, node );
+        if( ( n == XML_READER_ENDELEM ) && node == p_node)
             return 0;
     }
-    return -1;
+    return n == XML_READER_ENDELEM ? 0 : -1;
 }
 /*
  * Reads first node in XML and returns
