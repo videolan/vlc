@@ -696,6 +696,9 @@ AC_CHECK_LIB(m,lrintf, [
   AC_DEFINE(HAVE_LRINTF, 1, [Define to 1 if you have the lrintf function])
   VLC_ADD_LIBS([skins2],[-lm])
 ])
+AC_CHECK_LIB(m,nanf,
+  AC_DEFINE(HAVE_NANF, 1, [Define to 1 if you have the NANF function])
+)
 
 dnl Check for dynamic plugins
 LIBDL=""

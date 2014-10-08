@@ -353,7 +353,7 @@ long nrand48 (unsigned short subi[3]);
 
 /* math.h */
 
-#ifdef __ANDROID__
+#ifndef HAVE_NANF
 #define nanf(tagp) NAN
 #endif
 
