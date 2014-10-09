@@ -160,9 +160,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
-    var_Create( p_vout, "video-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "video-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-
     var_Create( p_vout, "mouse-hide-timeout",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
