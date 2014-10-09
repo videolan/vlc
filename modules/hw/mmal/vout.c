@@ -144,7 +144,7 @@ static void input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer);
 static int query_resolution(vout_display_t *vd, unsigned *width, unsigned *height);
 static void tvservice_cb(void *callback_data, uint32_t reason, uint32_t param1,
                 uint32_t param2);
-static void adjust_refresh_rate(vout_display_t *vd);
+static void adjust_refresh_rate(vout_display_t *vd, const video_format_t *fmt);
 static int set_latency_target(vout_display_t *vd, bool enable);
 
 /* DispManX */
@@ -412,7 +412,7 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
     show_background(vd, cfg->is_fullscreen);
     sys->adjust_refresh_rate = var_InheritBool(vd, MMAL_ADJUST_REFRESHRATE_NAME);
     if (sys->adjust_refresh_rate) {
-        adjust_refresh_rate(vd);
+        adjust_refresh_rate(vd, fmt);
         set_latency_target(vd, true);
     }
 
@@ -754,12 +754,12 @@ static int set_latency_target(vout_display_t *vd, bool enable)
     return VLC_SUCCESS;
 }
 
-static void adjust_refresh_rate(vout_display_t *vd)
+static void adjust_refresh_rate(vout_display_t *vd, const video_format_t *fmt)
 {
     TV_DISPLAY_STATE_T display_state;
     TV_SUPPORTED_MODE_NEW_T supported_modes[VC_TV_MAX_MODE_IDS];
     int num_modes;
-    double frame_rate = (double)vd->fmt.i_frame_rate / vd->fmt.i_frame_rate_base;
+    double frame_rate = (double)fmt->i_frame_rate / fmt->i_frame_rate_base;
     int best_id = -1;
     double best_score, score;
     int i;
