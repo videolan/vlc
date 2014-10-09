@@ -253,6 +253,9 @@ case "${OS}" in
 			*i686*)
 			add_make "PLATFORM_SHORT_ARCH := x86"
 			;;
+			*x86_64*)
+			add_make "PLATFORM_SHORT_ARCH := x86_64"
+			;;
 			*mipsel*)
 			add_make "PLATFORM_SHORT_ARCH := mips"
 			;;
