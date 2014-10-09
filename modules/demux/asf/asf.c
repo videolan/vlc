@@ -1024,7 +1024,7 @@ static int DemuxInit( demux_t *p_demux )
 
                 if( p_sp->i_type_specific_data_length > sizeof( WAVEFORMATEX ) &&
                     i_format != WAVE_FORMAT_MPEGLAYER3 &&
-                    i_format != WAVE_FORMAT_MPEG )
+                    i_format != WAVE_FORMAT_MPEG && i_data >= 19 )
                 {
                     GET_CHECKED( fmt.i_extra, __MIN( GetWLE( &p_data[16] ),
                                          p_sp->i_type_specific_data_length -
