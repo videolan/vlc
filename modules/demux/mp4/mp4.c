@@ -2004,12 +2004,24 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
     {
         mp4_chunk_t *lastchunk = &p_demux_track->chunk[p_demux_track->i_chunk_count - 1];
         uint64_t i_total_size = lastchunk->i_offset;
-        for( uint32_t i=0; i<lastchunk->i_sample_count; i++)
+
+        if ( p_demux_track->i_sample_size != 0 ) /* all samples have same size */
         {
-            if( p_demux_track->i_sample_size == 0 )
+            i_total_size += (uint64_t)p_demux_track->i_sample_size * lastchunk->i_sample_count;
+        }
+        else
+        {
+            if( (uint64_t)lastchunk->i_sample_count + p_demux_track->i_chunk_count - 1 > stsz->i_sample_count )
+            {
+                msg_Err( p_demux, "invalid samples table: stsz table is too small" );
+                return VLC_EGENERIC;
+            }
+
+            for( uint32_t i=stsz->i_sample_count - lastchunk->i_sample_count;
+                 i<stsz->i_sample_count; i++)
+            {
                 i_total_size += stsz->i_entry_size[i];
-            else
-                i_total_size += p_demux_track->i_sample_size;
+            }
         }
 
         if ( i_total_size > p_sys->moovfragment.i_chunk_range_max_offset )
