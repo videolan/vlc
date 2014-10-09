@@ -694,7 +694,7 @@ static void ASF_fillup_es_priorities_ex( demux_sys_t *p_sys, void *p_hdr,
         /* Just set highest prio on highest in the group */
         for ( uint16_t i = 1; i < p_mutex->i_stream_number_count; i++ )
         {
-            if ( p_prios->i_count > p_sys->i_track ) break;
+            if ( p_prios->i_count > p_sys->i_track || i > p_sys->i_track ) break;
             p_prios->pi_stream_numbers[ p_prios->i_count++ ] = p_mutex->pi_stream_number[ i ];
         }
     }
@@ -721,7 +721,7 @@ static void ASF_fillup_es_bitrate_priorities_ex( demux_sys_t *p_sys, void *p_hdr
         /* Just remove < highest */
         for ( uint16_t i = 1; i < p_bitrate_mutex->i_stream_number_count; i++ )
         {
-            if ( p_prios->i_count > p_sys->i_track ) break;
+            if ( p_prios->i_count > p_sys->i_track || i > p_sys->i_track ) break;
             p_prios->pi_stream_numbers[ p_prios->i_count++ ] = p_bitrate_mutex->pi_stream_numbers[ i ];
         }
     }
