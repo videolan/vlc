@@ -399,11 +399,10 @@ static int ControlReopenDevice(vout_display_t *vd)
     memset(&cfg, 0, sizeof(cfg));
     cfg.use_desktop = sys->use_desktop;
     if (!sys->use_desktop) {
-        cfg.win.type   = VOUT_WINDOW_TYPE_HWND;
-        cfg.win.x      = sys->desktop_save.win.left;
-        cfg.win.y      = sys->desktop_save.win.top;
-        cfg.win.width  = sys->desktop_save.win.right  - sys->desktop_save.win.left;
-        cfg.win.height = sys->desktop_save.win.bottom - sys->desktop_save.win.top;
+        cfg.x      = sys->desktop_save.win.left;
+        cfg.y      = sys->desktop_save.win.top;
+        cfg.width  = sys->desktop_save.win.right  - sys->desktop_save.win.left;
+        cfg.height = sys->desktop_save.win.bottom - sys->desktop_save.win.top;
     }
 
     event_hwnd_t hwnd;

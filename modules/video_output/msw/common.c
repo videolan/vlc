@@ -78,11 +78,10 @@ int CommonInit(vout_display_t *vd)
 #ifdef MODULE_NAME_IS_directdraw
     cfg.use_overlay = sys->use_overlay;
 #endif
-    cfg.win.type   = VOUT_WINDOW_TYPE_HWND;
-    cfg.win.x      = var_InheritInteger(vd, "video-x");
-    cfg.win.y      = var_InheritInteger(vd, "video-y");
-    cfg.win.width  = vd->cfg->display.width;
-    cfg.win.height = vd->cfg->display.height;
+    cfg.x      = var_InheritInteger(vd, "video-x");
+    cfg.y      = var_InheritInteger(vd, "video-y");
+    cfg.width  = vd->cfg->display.width;
+    cfg.height = vd->cfg->display.height;
 
     event_hwnd_t hwnd;
     if (EventThreadStart(sys->event, &hwnd, &cfg))
