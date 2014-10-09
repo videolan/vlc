@@ -100,12 +100,9 @@ void VideoWidget::sync( void )
 /**
  * Request the video to avoid the conflicts
  **/
-WId VideoWidget::request( int *pi_x, int *pi_y,
-                          unsigned int *pi_width, unsigned int *pi_height,
+WId VideoWidget::request( unsigned int *pi_width, unsigned int *pi_height,
                           bool b_keep_size )
 {
-    msg_Dbg( p_intf, "Video was requested %i, %i", *pi_x, *pi_y );
-
     if( stable )
     {
         msg_Dbg( p_intf, "embedded video already in use" );

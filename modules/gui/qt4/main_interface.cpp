@@ -203,8 +203,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* VideoWidget connects for asynchronous calls */
     b_videoFullScreen = false;
-    connect( this, SIGNAL(askGetVideo(WId*,int*,int*,unsigned*,unsigned *)),
-             this, SLOT(getVideoSlot(WId*,int*,int*,unsigned*,unsigned*)),
+    connect( this, SIGNAL(askGetVideo(WId*,unsigned*,unsigned *)),
+             this, SLOT(getVideoSlot(WId*,unsigned*,unsigned*)),
              Qt::BlockingQueuedConnection );
     connect( this, SIGNAL(askReleaseVideo( void )),
              this, SLOT(releaseVideoSlot( void )),
@@ -681,8 +681,7 @@ void MainInterface::toggleFSC()
  * All window provider queries must be handled through signals or events.
  * That's why we have all those emit statements...
  */
-WId MainInterface::getVideo( int *pi_x, int *pi_y,
-                             unsigned int *pi_width, unsigned int *pi_height )
+WId MainInterface::getVideo( unsigned int *pi_width, unsigned int *pi_height )
 {
     if( !videoWidget )
         return 0;
@@ -690,11 +689,11 @@ WId MainInterface::getVideo( int *pi_x, int *pi_y,
     /* This is a blocking call signal. Results are returned through pointers.
      * Beware of deadlocks! */
     WId id;
-    emit askGetVideo( &id, pi_x, pi_y, pi_width, pi_height );
+    emit askGetVideo( &id, pi_width, pi_height );
     return id;
 }
 
-void MainInterface::getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
+void MainInterface::getVideoSlot( WId *p_id,
                                   unsigned *pi_width, unsigned *pi_height )
 {
     /* Hidden or minimized, activate */
@@ -702,8 +701,7 @@ void MainInterface::getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
         toggleUpdateSystrayMenu();
 
     /* Request the videoWidget */
-    WId ret = videoWidget->request( pi_x, pi_y,
-                                    pi_width, pi_height, !b_autoresize );
+    WId ret = videoWidget->request( pi_width, pi_height, !b_autoresize );
     *p_id = ret;
     if( ret ) /* The videoWidget is available */
     {

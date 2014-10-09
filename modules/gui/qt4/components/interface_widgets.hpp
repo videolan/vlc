@@ -59,7 +59,7 @@ public:
     VideoWidget( intf_thread_t * );
     virtual ~VideoWidget();
 
-    WId request( int *, int *, unsigned int *, unsigned int *, bool );
+    WId request( unsigned int *, unsigned int *, bool );
     void  release( void );
     void  sync( void );
 

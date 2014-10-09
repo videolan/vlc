@@ -70,8 +70,7 @@ public:
     static const QEvent::Type ToolbarsNeedRebuild;
 
     /* Video requests from core */
-    WId  getVideo( int *pi_x, int *pi_y,
-                  unsigned int *pi_width, unsigned int *pi_height );
+    WId  getVideo( unsigned int *pi_width, unsigned int *pi_height );
     void releaseVideo( void );
     int  controlVideo( int i_query, va_list args );
 
@@ -209,8 +208,7 @@ public slots:
 #endif
 
     /* Manage the Video Functions from the vout threads */
-    void getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
-                       unsigned *pi_width, unsigned *pi_height );
+    void getVideoSlot( WId *p_id, unsigned *pi_width, unsigned *pi_height );
     void releaseVideoSlot( void );
 
     void emitBoss();
@@ -261,8 +259,7 @@ private slots:
     void continuePlayback();
 
 signals:
-    void askGetVideo( WId *p_id, int *pi_x, int *pi_y,
-                      unsigned *pi_width, unsigned *pi_height );
+    void askGetVideo( WId *p_id, unsigned *pi_width, unsigned *pi_height );
     void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );
     void askVideoSetFullScreen( bool );
