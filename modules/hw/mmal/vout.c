@@ -58,6 +58,10 @@
 #define MMAL_ADJUST_REFRESHRATE_TEXT N_("Adjust HDMI refresh rate to the video.")
 #define MMAL_ADJUST_REFRESHRATE_LONGTEXT N_("Adjust HDMI refresh rate to the video.")
 
+/* Ideal rendering phase target is at rough 25% of frame duration */
+#define PHASE_OFFSET_TARGET ((double)0.25)
+#define PHASE_CHECK_INTERVAL 100
+
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
@@ -110,6 +114,10 @@ struct vout_display_sys_t {
     unsigned display_height;
     bool need_configure_display;
 
+    bool adjust_refresh_rate;
+    int next_phase_check;
+    int phase_offset;
+
     int layer;
     bool opaque;
 };
@@ -126,6 +134,8 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
 /* VLC vout display callbacks */
 static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count);
+static void vd_prepare(vout_display_t *vd, picture_t *picture,
+                subpicture_t *subpicture);
 static void vd_display(vout_display_t *vd, picture_t *picture,
                 subpicture_t *subpicture);
 static int vd_control(vout_display_t *vd, int query, va_list args);
@@ -152,6 +162,7 @@ static void dmx_region_update(struct dmx_region_t *dmx_region,
 static void dmx_region_delete(struct dmx_region_t *dmx_region,
                 DISPMANX_UPDATE_HANDLE_T update);
 static void show_background(vout_display_t *vd, bool enable);
+static void maintain_phase_sync(vout_display_t *vd);
 
 static int Open(vlc_object_t *object)
 {
@@ -276,6 +287,7 @@ static int Open(vlc_object_t *object)
     vlc_mutex_init(&sys->manage_mutex);
 
     vd->pool = vd_pool;
+    vd->prepare = vd_prepare;
     vd->display = vd_display;
     vd->control = vd_control;
     vd->manage = vd_manage;
@@ -403,7 +415,8 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
     show_background(vd, cfg->is_fullscreen);
-    if (var_InheritBool(vd, MMAL_ADJUST_REFRESHRATE_NAME)) {
+    sys->adjust_refresh_rate = var_InheritBool(vd, MMAL_ADJUST_REFRESHRATE_NAME);
+    if (sys->adjust_refresh_rate) {
         adjust_refresh_rate(vd);
         set_latency_target(vd, true);
     }
@@ -500,6 +513,20 @@ out:
     return sys->picture_pool;
 }
 
+static void vd_prepare(vout_display_t *vd, picture_t *picture,
+                subpicture_t *subpicture)
+{
+    vout_display_sys_t *sys = vd->sys;
+    picture_sys_t *pic_sys = picture->p_sys;
+
+    if (!sys->adjust_refresh_rate || pic_sys->displayed)
+        return;
+
+    /* Apply the required phase_offset to the picture, so that vd_display()
+     * will be called at the corrected time from the core */
+    picture->date += sys->phase_offset;
+}
+
 static void vd_display(vout_display_t *vd, picture_t *picture,
                 subpicture_t *subpicture)
 {
@@ -535,6 +562,10 @@ static void vd_display(vout_display_t *vd, picture_t *picture,
 
     if (subpicture)
         subpicture_Delete(subpicture);
+
+    if (sys->next_phase_check == 0 && sys->adjust_refresh_rate)
+        maintain_phase_sync(vd);
+    sys->next_phase_check = (sys->next_phase_check + 1) % PHASE_CHECK_INTERVAL;
 }
 
 static int vd_control(vout_display_t *vd, int query, va_list args)
@@ -900,6 +931,54 @@ static void dmx_region_delete(struct dmx_region_t *dmx_region,
     vc_dispmanx_element_remove(update, dmx_region->element);
     vc_dispmanx_resource_delete(dmx_region->resource);
     free(dmx_region);
+}
+
+static void maintain_phase_sync(vout_display_t *vd)
+{
+    MMAL_PARAMETER_VIDEO_RENDER_STATS_T render_stats = {
+        .hdr = { MMAL_PARAMETER_VIDEO_RENDER_STATS, sizeof(render_stats) },
+    };
+    int32_t frame_duration = 1000000 /
+        ((double)vd->fmt.i_frame_rate /
+        vd->fmt.i_frame_rate_base);
+    vout_display_sys_t *sys = vd->sys;
+    int32_t phase_offset;
+    MMAL_STATUS_T status;
+
+    status = mmal_port_parameter_get(sys->input, &render_stats.hdr);
+    if (status != MMAL_SUCCESS) {
+        msg_Err(vd, "Failed to read render stats on control port %s (status=%"PRIx32" %s)",
+                        sys->input->name, status, mmal_status_to_string(status));
+        return;
+    }
+
+    if (render_stats.valid) {
+#ifndef NDEBUG
+        msg_Dbg(vd, "render_stats: match: %u, period: %u ms, phase: %u ms, hvs: %u",
+                render_stats.match, render_stats.period / 1000, render_stats.phase / 1000,
+                render_stats.hvs_status);
+#endif
+
+        if (render_stats.phase > 0.1 * frame_duration &&
+                render_stats.phase < 0.75 * frame_duration)
+            return;
+
+        phase_offset = frame_duration * PHASE_OFFSET_TARGET - render_stats.phase;
+        if (phase_offset < 0)
+            phase_offset += frame_duration;
+        else
+            phase_offset %= frame_duration;
+
+        sys->phase_offset += phase_offset;
+        sys->phase_offset %= frame_duration;
+        msg_Dbg(vd, "Apply phase offset of %"PRId32" ms (total offset %"PRId32" ms)",
+                phase_offset / 1000, sys->phase_offset / 1000);
+
+        /* Reset the latency target, so that it does not get confused
+         * by the jump in the offset */
+        set_latency_target(vd, false);
+        set_latency_target(vd, true);
+    }
 }
 
 static void show_background(vout_display_t *vd, bool enable)
