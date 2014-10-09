@@ -75,6 +75,9 @@ struct decoder_sys_t {
     MMAL_ES_FORMAT_T *output_format;
     MMAL_QUEUE_T *decoded_pictures;
     vlc_mutex_t mutex;
+
+    bool b_top_field_first;
+    bool b_progressive;
 };
 
 /* Utilities */
@@ -290,6 +293,7 @@ static void CloseDecoder(decoder_t *dec)
 
 static int change_output_format(decoder_t *dec)
 {
+    MMAL_PARAMETER_VIDEO_INTERLACE_TYPE_T interlace_type;
     decoder_sys_t *sys = dec->p_sys;
     MMAL_STATUS_T status;
     int pool_size;
@@ -360,6 +364,19 @@ static int change_output_format(decoder_t *dec)
     dec->fmt_out.video.i_frame_rate = sys->output->format->es->video.frame_rate.num;
     dec->fmt_out.video.i_frame_rate_base = sys->output->format->es->video.frame_rate.den;
 
+    /* Query interlaced type */
+    interlace_type.hdr.id = MMAL_PARAMETER_VIDEO_INTERLACE_TYPE;
+    interlace_type.hdr.size = sizeof(MMAL_PARAMETER_VIDEO_INTERLACE_TYPE_T);
+    status = mmal_port_parameter_get(sys->output, &interlace_type.hdr);
+    if (status != MMAL_SUCCESS) {
+        msg_Warn(dec, "Failed to query interlace type from decoder output port (status=%"PRIx32" %s)",
+                status, mmal_status_to_string(status));
+    } else {
+        sys->b_progressive = (interlace_type.eMode == MMAL_InterlaceProgressive);
+        sys->b_top_field_first = sys->b_progressive ?
+            (interlace_type.eMode == MMAL_InterlaceFieldsInterleavedUpperFirst) : false;
+        msg_Dbg(dec, "Detected %s video", sys->b_progressive ? "progressive" : "interlaced");
+    }
 
 out:
     mmal_format_free(sys->output_format);
@@ -474,6 +491,8 @@ static picture_t *decode(decoder_t *dec, block_t **pblock)
         if (buffer) {
             ret = (picture_t *)buffer->user_data;
             ret->date = buffer->pts;
+            ret->b_progressive = sys->b_progressive;
+            ret->b_top_field_first = sys->b_top_field_first;
 
             mmal_buffer_header_reset(buffer);
             mmal_buffer_header_release(buffer);
