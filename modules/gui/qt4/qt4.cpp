@@ -309,19 +309,9 @@ vlc_module_begin ()
 
         set_callbacks( OpenDialogs, Close )
 
-#if (defined (Q_OS_WIN) && !defined (_WIN32_X11_)) || defined (Q_OS_OS2)
     add_submodule ()
-        set_capability( "vout window hwnd", 0 )
+        set_capability( "vout window", 0 )
         set_callbacks( WindowOpen, WindowClose )
-#elif defined (Q_OS_DARWIN)
-    add_submodule ()
-        set_capability( "vout window nsobject", 0 )
-        set_callbacks( WindowOpen, WindowClose )
-#elif defined (QT5_HAS_X11) || defined (Q_WS_X11)
-    add_submodule ()
-        set_capability( "vout window xid", 0 )
-        set_callbacks( WindowOpen, WindowClose )
-#endif
 
 vlc_module_end ()
 

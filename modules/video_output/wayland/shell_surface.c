@@ -311,7 +311,7 @@ vlc_module_begin ()
     set_description (N_("Wayland shell surface"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout surface wl", 10)
+    set_capability ("vout window", 10)
     set_callbacks (Open, Close)
 
     add_string ("wl-display", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true)

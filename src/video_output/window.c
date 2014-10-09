@@ -61,34 +61,9 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
     memset(&window->handle, 0, sizeof(window->handle));
     window->control = NULL;
     window->sys = NULL;
-    window->type = cfg->type;
 
-    const char *type;
-    switch (cfg->type) {
-#if defined(_WIN32) || defined(__OS2__)
-    case VOUT_WINDOW_TYPE_HWND:
-        type = "vout window hwnd";
-        break;
-#endif
-#ifdef __APPLE__
-    case VOUT_WINDOW_TYPE_NSOBJECT:
-        type = "vout window nsobject";
-        break;
-#endif
-    case VOUT_WINDOW_TYPE_XID:
-        type = "vout window xid";
-        break;
-    case VOUT_WINDOW_TYPE_ANDROID_NATIVE:
-        type = "vout window anative";
-        break;
-    case VOUT_WINDOW_TYPE_WAYLAND:
-        type = "vout surface wl";
-        break;
-    default:
-        assert(0);
-    }
-
-    w->module = vlc_module_load(window, type, module, module && *module,
+    w->module = vlc_module_load(window, "vout window", module,
+                                module && *module,
                                 vout_window_start, window, cfg);
     if (!w->module) {
         vlc_object_release(window);

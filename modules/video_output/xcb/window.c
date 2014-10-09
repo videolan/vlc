@@ -63,7 +63,7 @@ vlc_module_begin ()
     set_description (N_("X11 video window (XCB)"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout window xid", 10)
+    set_capability ("vout window", 10)
     set_callbacks (Open, Close)
 
     /* Obsolete since 1.1.0: */
@@ -77,7 +77,7 @@ vlc_module_begin ()
     set_description (N_("Embedded window video"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout window xid", 70)
+    set_capability ("vout window", 70)
     set_callbacks (EmOpen, EmClose)
     add_shortcut ("embed-xid")
 

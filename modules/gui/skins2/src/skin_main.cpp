@@ -528,11 +528,7 @@ vlc_module_begin ()
     add_shortcut( "skins" )
 
     add_submodule ()
-#if defined( _WIN32 ) || defined( __OS2__ )
-        set_capability( "vout window hwnd", 51 )
-#else
-        set_capability( "vout window xid", 51 )
-#endif
+        set_capability( "vout window", 51 )
         set_callbacks( WindowOpen, WindowClose )
 
 vlc_module_end ()

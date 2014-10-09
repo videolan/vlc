@@ -184,7 +184,7 @@ vlc_module_begin()
 
     add_submodule()
         set_description("Mac OS X Video Output Provider")
-        set_capability("vout window nsobject", 100)
+        set_capability("vout window", 100)
         set_callbacks(WindowOpen, WindowClose)
 
         set_section(N_("Video output"), 0)
