@@ -68,9 +68,11 @@ typedef struct {
     /* Window handle type */
     unsigned type;
 
+#ifdef __APPLE__
     /* Window position hint */
     int x;
     int y;
+#endif
 
     /* Windows size hint */
     unsigned width;
