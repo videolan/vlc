@@ -74,6 +74,10 @@ struct vout_window_sys_t
  */
 static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
+    if (cfg->type != VOUT_WINDOW_TYPE_INVALID
+     && cfg->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
+        return VLC_EGENERIC;
+
     vout_window_sys_t *p_sys = malloc(sizeof (*p_sys));
     if (p_sys == NULL)
         return VLC_ENOMEM;
@@ -100,6 +104,7 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     if (p_sys->window == NULL)
         goto error;
 
+    wnd->type = VOUT_WINDOW_TYPE_ANDROID_NATIVE;
     wnd->handle.anativewindow = p_sys->window;
     wnd->control = Control;
     wnd->sys = p_sys;

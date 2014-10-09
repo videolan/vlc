@@ -659,9 +659,12 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
         msg_Dbg( p_wnd, "Qt interface not found" );
         return VLC_EGENERIC;
     }
-    if( p_intf->p_sys->voutWindowType != cfg->type )
+
+    if( cfg->type != VOUT_WINDOW_TYPE_INVALID
+     && cfg->type != p_intf->p_sys->voutWindowType )
         return VLC_EGENERIC;
-    switch( cfg->type )
+
+    switch( p_intf->p_sys->voutWindowType )
     {
         case VOUT_WINDOW_TYPE_XID:
             if( var_InheritBool( p_wnd, "video-wallpaper" ) )
@@ -685,7 +688,9 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     if( !wid )
         return VLC_EGENERIC;
 
-    switch( cfg->type )
+    p_wnd->type = p_intf->p_sys->voutWindowType;
+
+    switch( p_wnd->type )
     {
         case VOUT_WINDOW_TYPE_XID:
             p_wnd->handle.xid = (uintptr_t)wid;
@@ -697,6 +702,8 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
         case VOUT_WINDOW_TYPE_NSOBJECT:
             p_wnd->handle.nsobject = (void *)wid;
             break;
+        default:
+            assert(0);
     }
 
     p_wnd->control = WindowControl;

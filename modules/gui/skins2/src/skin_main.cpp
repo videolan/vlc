@@ -344,6 +344,16 @@ static void WindowCloseLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
 
 static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
 {
+    if( cfg->type != VOUT_WINDOW_TYPE_INVALID )
+    {
+#ifdef X11_SKINS
+        if( cfg->type != VOUT_WINDOW_TYPE_XID )
+#else
+        if( cfg->type != VOUT_WINDOW_TYPE_HWND )
+#endif
+            return VLC_EGENERIC;
+    }
+
     vout_window_sys_t* sys;
 
     vlc_mutex_lock( &skin_load.mutex );
@@ -372,6 +382,11 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
     pWnd->sys = sys;
     pWnd->sys->cfg = *cfg;
     pWnd->sys->pIntf = pIntf;
+#ifdef X11_SKINS
+    pWnd->type = VOUT_WINDOW_TYPE_XID;
+#else
+    pWnd->type = VOUT_WINDOW_TYPE_HWND;
+#endif
     pWnd->control = WindowControl;
 
     // force execution in the skins2 thread context
