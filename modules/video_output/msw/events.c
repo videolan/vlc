@@ -757,18 +757,13 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     rect_window.right  = rect_window.left + p_event->width;
     rect_window.bottom = rect_window.top  + p_event->height;
 
-    if( var_GetBool( vd, "video-deco" ) )
-    {
+    i_style = var_GetBool( vd, "video-deco" )
         /* Open with window decoration */
-        AdjustWindowRect( &rect_window, WS_OVERLAPPEDWINDOW|WS_SIZEBOX, 0 );
-        i_style = WS_OVERLAPPEDWINDOW|WS_SIZEBOX|WS_VISIBLE|WS_CLIPCHILDREN;
-    }
-    else
-    {
+        ? WS_OVERLAPPEDWINDOW|WS_SIZEBOX
         /* No window decoration */
-        AdjustWindowRect( &rect_window, WS_POPUP, 0 );
-        i_style = WS_POPUP|WS_VISIBLE|WS_CLIPCHILDREN;
-    }
+        : WS_POPUP;
+    AdjustWindowRect( &rect_window, i_style, 0 );
+    i_style |= WS_VISIBLE|WS_CLIPCHILDREN;
 
     if( p_event->hparent )
     {
