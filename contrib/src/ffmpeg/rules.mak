@@ -81,6 +81,13 @@ FFMPEGCONF += --cpu=armv6 --disable-neon
 endif
 endif
 
+# ARM64 stuff
+ifeq ($(ARCH),aarch64)
+ifndef HAVE_DARWIN_OS
+FFMPEGCONF += --arch=aarch64
+endif
+endif
+
 # MIPS stuff
 ifeq ($(ARCH),mipsel)
 FFMPEGCONF += --arch=mips

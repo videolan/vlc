@@ -35,6 +35,11 @@ POSTPROCCONF += --enable-neon
 endif
 endif
 
+# ARM64 stuff
+ifeq ($(ARCH),aarch64)
+POSTPROCCONF += --arch=aarch64
+endif
+
 # MIPS stuff
 ifeq ($(ARCH),mipsel)
 POSTPROCCONF += --arch=mips
