@@ -674,7 +674,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     RECT       rect_window;
     WNDCLASS   wc;                            /* window class components */
     TCHAR      vlc_path[MAX_PATH+1];
-    int        i_style, i_stylex;
+    int        i_style;
 
     msg_Dbg( vd, "Win32VoutCreateWindow" );
 
@@ -762,21 +762,17 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
         /* Open with window decoration */
         AdjustWindowRect( &rect_window, WS_OVERLAPPEDWINDOW|WS_SIZEBOX, 0 );
         i_style = WS_OVERLAPPEDWINDOW|WS_SIZEBOX|WS_VISIBLE|WS_CLIPCHILDREN;
-        i_stylex = 0;
     }
     else
     {
         /* No window decoration */
         AdjustWindowRect( &rect_window, WS_POPUP, 0 );
         i_style = WS_POPUP|WS_VISIBLE|WS_CLIPCHILDREN;
-        i_stylex = 0; // WS_EX_TOOLWINDOW; Is TOOLWINDOW really needed ?
-                      // It messes up the fullscreen window.
     }
 
     if( p_event->hparent )
     {
         i_style = WS_VISIBLE|WS_CLIPCHILDREN|WS_CHILD;
-        i_stylex = 0;
 
         /* allow user to regain control over input events if requested */
         bool b_mouse_support = var_InheritBool( vd, "mouse-events" );
@@ -789,7 +785,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
 
     /* Create the window */
     p_event->hwnd =
-        CreateWindowEx( WS_EX_NOPARENTNOTIFY | i_stylex,
+        CreateWindowEx( WS_EX_NOPARENTNOTIFY,
                     p_event->class_main,             /* name of window class */
                     _T(VOUT_TITLE) _T(" (VLC Video Output)"),/* window title */
                     i_style,                                 /* window style */
