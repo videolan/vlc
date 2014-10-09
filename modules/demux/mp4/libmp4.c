@@ -3005,6 +3005,8 @@ static int MP4_ReadBox_chpl( stream_t *p_stream, MP4_Box_t *p_box )
         uint64_t i_start;
         uint8_t i_len;
         int i_copy;
+        if ( i_read < 9 )
+            break;
         MP4_GET8BYTES( i_start );
         MP4_GET1BYTE( i_len );
 
@@ -3021,6 +3023,10 @@ static int MP4_ReadBox_chpl( stream_t *p_stream, MP4_Box_t *p_box )
         p_peek += i_copy;
         i_read -= i_copy;
     }
+
+    if ( i != p_chpl->i_chapter )
+        p_chpl->i_chapter = i;
+
     /* Bubble sort by increasing start date */
     do
     {
