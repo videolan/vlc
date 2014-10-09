@@ -791,7 +791,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     p_event->hwnd =
         CreateWindowEx( WS_EX_NOPARENTNOTIFY | i_stylex,
                     p_event->class_main,             /* name of window class */
-                    _T(VOUT_TITLE) _T(" (VLC Video Output)"),  /* window title */
+                    _T(VOUT_TITLE) _T(" (VLC Video Output)"),/* window title */
                     i_style,                                 /* window style */
                     (!p_event->x) ? (UINT)CW_USEDEFAULT :
                         (UINT)p_event->x,            /* default X coordinate */
