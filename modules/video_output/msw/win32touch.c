@@ -150,7 +150,7 @@ LRESULT DecodeGesture( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture,
                         }
                         break;
                     default:
-                        msg_Err( p_this, "Unmanaged dwFlag: %i", gi.dwFlags );
+                        msg_Err( p_this, "Unmanaged dwFlag: %lx", gi.dwFlags );
                 }
                 bHandled = TRUE;
                 break;
