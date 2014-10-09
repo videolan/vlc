@@ -687,8 +687,6 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     #endif
         vout_window_cfg_t wnd_cfg = {
             .type = VOUT_WINDOW_TYPE_HWND,
-            .x = p_event->x,
-            .y = p_event->y,
             .width = p_event->width,
             .height = p_event->height,
         };

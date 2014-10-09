@@ -133,8 +133,6 @@ vout_window_t *XCB_parent_Create (vout_display_t *vd,
 {
     vout_window_cfg_t cfg = {
         .type = VOUT_WINDOW_TYPE_XID,
-        .x = var_InheritInteger (vd, "video-x"),
-        .y = var_InheritInteger (vd, "video-y"),
         .width  = vd->cfg->display.width,
         .height = vd->cfg->display.height,
     };

@@ -96,8 +96,6 @@ static int Control (vout_display_t *, int, va_list);
 static vout_window_t *MakeWindow (vout_display_t *vd)
 {
     vout_window_cfg_t cfg = {
-        .x = var_InheritInteger (vd, "video-x"),
-        .y = var_InheritInteger (vd, "video-y"),
         .width = vd->cfg->display.width,
         .height = vd->cfg->display.height,
     };
