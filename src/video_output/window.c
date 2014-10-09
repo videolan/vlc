@@ -68,28 +68,21 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
 #if defined(_WIN32) || defined(__OS2__)
     case VOUT_WINDOW_TYPE_HWND:
         type = "vout window hwnd";
-        window->handle.hwnd = NULL;
         break;
 #endif
 #ifdef __APPLE__
     case VOUT_WINDOW_TYPE_NSOBJECT:
         type = "vout window nsobject";
-        window->handle.nsobject = NULL;
         break;
 #endif
     case VOUT_WINDOW_TYPE_XID:
         type = "vout window xid";
-        window->handle.xid = 0;
-        window->display.x11 = NULL;
         break;
     case VOUT_WINDOW_TYPE_ANDROID_NATIVE:
         type = "vout window anative";
-        window->handle.anativewindow = NULL;
         break;
     case VOUT_WINDOW_TYPE_WAYLAND:
         type = "vout surface wl";
-        window->handle.wl = NULL;
-        window->display.wl = NULL;
         break;
     default:
         assert(0);

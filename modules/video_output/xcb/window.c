@@ -566,6 +566,7 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
     p_sys->embedded = true;
     p_sys->keys = NULL;
+    wnd->display.x11 = NULL;
     wnd->handle.xid = window;
     wnd->control = Control;
     wnd->sys = p_sys;

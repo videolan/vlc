@@ -380,6 +380,8 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
     CmdExecuteBlock::executeWait( CmdGenericPtr( cmd ) );
 
 #ifdef X11_SKINS
+    pWnd->display.x11 = NULL;
+
     if( !pWnd->handle.xid )
 #else
     if( !pWnd->handle.hwnd )
