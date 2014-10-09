@@ -609,10 +609,9 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, cons
         cfg->align.vertical = VOUT_DISPLAY_ALIGN_BOTTOM;
 }
 
-vout_window_t * vout_NewDisplayWindow(vout_thread_t *vout, vout_display_t *vd,
+vout_window_t * vout_NewDisplayWindow(vout_thread_t *vout,
                                       const vout_window_cfg_t *cfg)
 {
-    VLC_UNUSED(vd);
     vout_window_cfg_t cfg_override = *cfg;
 
     if (!var_InheritBool( vout, "embedded-video"))
@@ -651,10 +650,8 @@ vout_window_t * vout_NewDisplayWindow(vout_thread_t *vout, vout_display_t *vd,
     return window;
 }
 
-void vout_DeleteDisplayWindow(vout_thread_t *vout, vout_display_t *vd,
-                              vout_window_t *window)
+void vout_DeleteDisplayWindow(vout_thread_t *vout, vout_window_t *window)
 {
-    VLC_UNUSED(vd);
     if (!vout->p->window.is_unused && vout->p->window.object == window) {
         vout->p->window.is_unused = true;
     } else if (vout->p->window.is_unused && vout->p->window.object && !window) {

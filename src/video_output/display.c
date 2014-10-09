@@ -749,8 +749,9 @@ static vout_window_t *VoutDisplayNewWindow(vout_display_t *vd, const vout_window
         return vout_window_New(VLC_OBJECT(osys->vout), "$window", &cfg_override);
     }
 #endif
-    return vout_NewDisplayWindow(osys->vout, vd, cfg);
+    return vout_NewDisplayWindow(osys->vout, cfg);
 }
+
 static void VoutDisplayDelWindow(vout_display_t *vd, vout_window_t *window)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
@@ -762,7 +763,7 @@ static void VoutDisplayDelWindow(vout_display_t *vd, vout_window_t *window)
         return;
     }
 #endif
-    vout_DeleteDisplayWindow(osys->vout, vd, window);
+    vout_DeleteDisplayWindow(osys->vout, window);
 }
 
 static void VoutDisplayFitWindow(vout_display_t *vd, bool default_size)
@@ -1446,14 +1447,16 @@ static vout_window_t *SplitterNewWindow(vout_display_t *vd, const vout_window_cf
     cfg.x += 0;//output->window.i_x; FIXME
     cfg.y += 0;//output->window.i_y;
 
-    return vout_NewDisplayWindow(osys->vout, vd, &cfg);
+    return vout_NewDisplayWindow(osys->vout, &cfg);
 }
+
 static void SplitterDelWindow(vout_display_t *vd, vout_window_t *window)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    vout_DeleteDisplayWindow(osys->vout, vd, window);
+    vout_DeleteDisplayWindow(osys->vout, window);
 }
+
 static void SplitterEvent(vout_display_t *vd, int event, va_list args)
 {
     //vout_display_owner_sys_t *osys = vd->owner.sys;
