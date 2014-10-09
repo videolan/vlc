@@ -140,6 +140,7 @@ static int query_resolution(vout_display_t *vd, unsigned *width, unsigned *heigh
 static void tvservice_cb(void *callback_data, uint32_t reason, uint32_t param1,
                 uint32_t param2);
 static void adjust_refresh_rate(vout_display_t *vd);
+static int set_latency_target(vout_display_t *vd, bool enable);
 
 /* DispManX */
 static void display_subpicture(vout_display_t *vd, subpicture_t *subpicture);
@@ -402,8 +403,10 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
     show_background(vd, cfg->is_fullscreen);
-    if (var_InheritBool(vd, MMAL_ADJUST_REFRESHRATE_NAME))
+    if (var_InheritBool(vd, MMAL_ADJUST_REFRESHRATE_NAME)) {
         adjust_refresh_rate(vd);
+        set_latency_target(vd, true);
+    }
 
     if (fmt != &vd->fmt)
         memcpy(&vd->fmt, fmt, sizeof(video_format_t));
@@ -697,6 +700,32 @@ static void tvservice_cb(void *callback_data, uint32_t reason, uint32_t param1, 
     vlc_mutex_lock(&sys->manage_mutex);
     sys->need_configure_display = true;
     vlc_mutex_unlock(&sys->manage_mutex);
+}
+
+static int set_latency_target(vout_display_t *vd, bool enable)
+{
+    vout_display_sys_t *sys = vd->sys;
+    MMAL_STATUS_T status;
+
+    MMAL_PARAMETER_AUDIO_LATENCY_TARGET_T latency_target = {
+        .hdr = { MMAL_PARAMETER_AUDIO_LATENCY_TARGET, sizeof(latency_target) },
+        .enable = enable ? MMAL_TRUE : MMAL_FALSE,
+        .filter = 2,
+        .target = 4000,
+        .shift = 3,
+        .speed_factor = -135,
+        .inter_factor = 500,
+        .adj_cap = 20
+    };
+
+    status = mmal_port_parameter_set(sys->input, &latency_target.hdr);
+    if (status != MMAL_SUCCESS) {
+        msg_Err(vd, "Failed to configure latency target on input port %s (status=%"PRIx32" %s)",
+                        sys->input->name, status, mmal_status_to_string(status));
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
 }
 
 static void adjust_refresh_rate(vout_display_t *vd)
