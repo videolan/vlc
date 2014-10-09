@@ -24,6 +24,9 @@
 #include <vlc_common.h>
 #include <interface/mmal/mmal.h>
 
+/* Think twice before changing this. Incorrect values cause havoc. */
+#define NUM_ACTUAL_OPAQUE_BUFFERS 20
+
 struct picture_sys_t {
     vlc_object_t *owner;
 

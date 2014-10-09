@@ -42,11 +42,6 @@
 #include <interface/vmcs_host/vc_tvservice.h>
 #include <interface/vmcs_host/vc_dispmanx.h>
 
-/* This value must match the define in codec/mmal.c
- * Think twice before changing this. Incorrect values cause havoc.
- */
-#define NUM_ACTUAL_OPAQUE_BUFFERS 22
-
 #define MAX_BUFFERS_IN_TRANSIT 2
 #define VC_TV_MAX_MODE_IDS 127
 

@@ -36,10 +36,11 @@
 #include <interface/mmal/util/mmal_util.h>
 #include <interface/mmal/util/mmal_default_components.h>
 
-/* This value must match the define in video_output/mmal.c
- * Think twice before changing this. Incorrect values cause havoc.
- */
-#define NUM_ACTUAL_OPAQUE_BUFFERS 22
+#include "mmal_picture.h"
+
+/* We need a smaller size of available buffer headers than actual buffers
+ * in the decoder to avoid stalls. MMAL seems a a bit picky here */
+#define NUM_OPAQUE_BUFFER_HEADERS (NUM_ACTUAL_OPAQUE_BUFFERS - 2)
 
 /* These are only required when combined with image_fx filter. But as they
  * won't do much harm besides using a few MB GPU memory, keep them always on
@@ -313,7 +314,7 @@ static int change_output_format(decoder_t *dec)
 
     if (sys->opaque) {
         sys->output->buffer_num = NUM_ACTUAL_OPAQUE_BUFFERS;
-        pool_size = sys->output->buffer_num_recommended;
+        pool_size = NUM_OPAQUE_BUFFER_HEADERS;
     } else {
         sys->output->buffer_num = __MAX(sys->output->buffer_num_recommended,
                 MIN_NUM_BUFFERS_IN_TRANSIT);
@@ -425,7 +426,7 @@ static void fill_output_port(decoder_t *dec)
 {
     decoder_sys_t *sys = dec->p_sys;
     /* allow at least 2 buffers in transit */
-    unsigned max_buffers_in_transit = __MAX(sys->output->buffer_num_recommended,
+    unsigned max_buffers_in_transit = __MAX(sys->output_pool->headers_num,
             MIN_NUM_BUFFERS_IN_TRANSIT);
     unsigned buffers_available = mmal_queue_length(sys->output_pool->queue);
     unsigned buffers_in_transit = sys->output_pool->headers_num - buffers_available -
