@@ -530,6 +530,11 @@ static void vd_display(vout_display_t *vd, picture_t *picture,
     MMAL_BUFFER_HEADER_T *buffer = pic_sys->buffer;
     MMAL_STATUS_T status;
 
+    if (picture->format.i_frame_rate != vd->fmt.i_frame_rate ||
+        picture->format.i_frame_rate_base != vd->fmt.i_frame_rate_base) {
+        configure_display(vd, NULL, &picture->format);
+    }
+
     if (!pic_sys->displayed || !sys->opaque) {
         buffer->cmd = 0;
         buffer->length = sys->input->buffer_size;
