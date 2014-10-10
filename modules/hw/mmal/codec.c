@@ -373,8 +373,8 @@ static int change_output_format(decoder_t *dec)
                 status, mmal_status_to_string(status));
     } else {
         sys->b_progressive = (interlace_type.eMode == MMAL_InterlaceProgressive);
-        sys->b_top_field_first = sys->b_progressive ?
-            (interlace_type.eMode == MMAL_InterlaceFieldsInterleavedUpperFirst) : false;
+        sys->b_top_field_first = sys->b_progressive ? true :
+            (interlace_type.eMode == MMAL_InterlaceFieldsInterleavedUpperFirst);
         msg_Dbg(dec, "Detected %s video", sys->b_progressive ? "progressive" : "interlaced");
     }
 
