@@ -375,7 +375,10 @@ static int change_output_format(decoder_t *dec)
         sys->b_progressive = (interlace_type.eMode == MMAL_InterlaceProgressive);
         sys->b_top_field_first = sys->b_progressive ? true :
             (interlace_type.eMode == MMAL_InterlaceFieldsInterleavedUpperFirst);
-        msg_Dbg(dec, "Detected %s video", sys->b_progressive ? "progressive" : "interlaced");
+        msg_Dbg(dec, "Detected %s%s video (%d)",
+                sys->b_progressive ? "progressive" : "interlaced",
+                sys->b_progressive ? "" : (sys->b_top_field_first ? " tff" : " bff"),
+                interlace_type.eMode);
     }
 
 out:
