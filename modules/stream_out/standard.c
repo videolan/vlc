@@ -306,7 +306,7 @@ static void checkAccessMux( sout_stream_t *p_stream, char *psz_access,
 {
     if( exactMatch( psz_access, "mmsh", 4 ) && !exactMatch( psz_mux, "asfh", 4 ) )
         msg_Err( p_stream, "mmsh output is only valid with asfh mux" );
-    else if( exactMatch( psz_access, "file", 4 ) &&
+    else if( !exactMatch( psz_access, "file", 4 ) &&
              ( exactMatch( psz_mux, "mov", 3 ) || exactMatch( psz_mux, "mp4", 3 ) ) )
         msg_Err( p_stream, "mov and mp4 mux are only valid with file output" );
     else if( exactMatch( psz_access, "udp", 3 ) )
