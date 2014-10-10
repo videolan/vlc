@@ -372,7 +372,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     if( !b_cached )
     {
-        if( p_sys->i_last_page != i_wanted_page )
+        if( p_sys->b_text && p_sys->i_last_page != i_wanted_page )
         {
             /* We need to reset the subtitle */
             p_spu = Subpicture( p_dec, &fmt, true,
