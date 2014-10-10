@@ -22,6 +22,6 @@ DEPS_freetype2 = zlib $(DEPS_zlib)
 
 .freetype2: freetype
 	sed -i.orig s/-ansi// $</builds/unix/configure
-	cd $< && GNUMAKE=$(MAKE) $(HOSTVARS) ./configure --with-harfbuzz=no --with-zlib=yes --without-png $(HOSTCONF)
+	cd $< && GNUMAKE=$(MAKE) $(HOSTVARS) ./configure --with-harfbuzz=no --with-zlib=yes --without-png --with-bzip2=no $(HOSTCONF)
 	cd $< && $(MAKE) && $(MAKE) install
 	touch $@
