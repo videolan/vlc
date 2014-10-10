@@ -50,6 +50,11 @@ ifeq ($(ARCH),i386)
 POSTPROCCONF += --arch=x86
 endif
 
+# x86_64 stuff
+ifeq ($(ARCH),x86_64)
+POSTPROCCONF += --arch=x64_64
+endif
+
 # Darwin
 ifdef HAVE_DARWIN_OS
 POSTPROCCONF += --arch=$(ARCH) --target-os=darwin

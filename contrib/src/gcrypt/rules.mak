@@ -40,6 +40,9 @@ ifdef HAVE_ANDROID
 ifeq ($(ANDROID_ABI), x86)
 GCRYPT_CONF += ac_cv_sys_symbol_underscore=no
 endif
+ifeq ($(ANDROID_ABI), x86_64)
+GCRYPT_CONF += ac_cv_sys_symbol_underscore=no
+endif
 endif
 
 .gcrypt: libgcrypt

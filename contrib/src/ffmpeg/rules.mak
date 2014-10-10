@@ -100,6 +100,13 @@ FFMPEGCONF += --arch=x86
 endif
 endif
 
+# x86_64 stuff
+ifeq ($(ARCH),x86_64)
+ifndef HAVE_DARWIN_OS
+FFMPEGCONF += --arch=x86_64
+endif
+endif
+
 # Darwin
 ifdef HAVE_DARWIN_OS
 FFMPEGCONF += --arch=$(ARCH) --target-os=darwin
