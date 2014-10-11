@@ -1,6 +1,9 @@
 Changes between 2.2.x and 3.0.0-git:
 --------------------------------
 
+Core:
+ * Support wayland surface type
+
 Access:
  * Support HDS (Http Dynamic Streaming) from Adobe (f4m, f4v, etc.)
  * New SMB access module using libdsm
@@ -14,15 +17,31 @@ Decoder:
  * Support 4:4:4 chroma sampling with VDPAU hw acceleration
  * Support for ARIB B24 subtitles
  * Support for Daala video
-
-Encoder:
- * Support for Daala video
+ * Important improvements for the MMAL decoder and output for rPI
+ * Support HEVC hardware decoding using OMX and MediaCodec
+ * Support VP9 and WMV3 decoding using OMX and performance improvements
 
 Demuxers:
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)
- * Opus in MPEG Transport Stream
- * Daala in Ogg
+ * Support Opus in MPEG Transport Stream
+ * Support Daala in Ogg
  * Support EIA-608 subtitles in MP4/mov
+ * Support WMV and WMAV in MP4/mov, aka Flip4Mac files
+ * Support bitmap audio channel reordering in MP4/mov
+
+Video ouput:
+ * Wayland shell surface window provider
+ * Wayland shared memory video output
+ * Support rotation in Android NativeWindow output
+
+Video filter:
+ * Hardware deinterlacing on the rPI, using MMAL
+
+Stream Output:
+ * Chromecast output module
+
+Encoder:
+ * Support for Daala video in 4:2:0 and 4:4:4
 
 Muxers:
  * Added fragmented/streamable MP4 muxer
@@ -34,6 +53,7 @@ Service Discovery:
 
 Mac OS X Interface
  * new AppleScript API giving access to audio desynchronization
+ * Port to Yosemite X.10
 
 Skins2:
  * Support key accelerators
