@@ -1449,8 +1449,17 @@ static int ThreadReinit(vout_thread_t *vout,
     }
     state.sar.num = 0;
     state.sar.den = 0;
+
     /* FIXME current vout "variables" are not in sync here anymore
      * and I am not sure what to do */
+    if (state.cfg.display.sar.num <= 0 || state.cfg.display.sar.den <= 0) {
+        state.cfg.display.sar.num = 1;
+        state.cfg.display.sar.den = 1;
+    }
+    if (state.cfg.zoom.num <= 0 || state.cfg.zoom.den <= 0) {
+        state.cfg.zoom.num = 1;
+        state.cfg.zoom.den = 1;
+    }
 
     vout->p->original = original;
     vout->p->dpb_size = cfg->dpb_size;
