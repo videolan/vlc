@@ -154,12 +154,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     vout->p->title.position = var_InheritInteger(vout, "video-title-position");
 
     /* Get splitter name if present */
-    char *splitter_name = var_InheritString(vout, "video-splitter");
-    if (splitter_name && *splitter_name) {
-        vout->p->splitter_name = splitter_name;
-    } else {
-        free(splitter_name);
-    }
+    vout->p->splitter_name = var_InheritString(vout, "video-splitter");
 
     /* */
     vout_InitInterlacingSupport(vout, vout->p->displayed.is_interlaced);
