@@ -159,6 +159,24 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     /* */
     vout_InitInterlacingSupport(vout, vout->p->displayed.is_interlaced);
 
+    /* Window */
+    if (vout->p->splitter_name == NULL) {
+        vout_window_cfg_t wcfg = {
+            .is_standalone = !var_InheritBool(vout, "embedded-video"),
+            .type = VOUT_WINDOW_TYPE_INVALID,
+            // TODO: take pixel A/R, crop and zoom into account
+#ifdef __APPLE__
+            .x = var_InheritInteger(vout, "video-x"),
+            .y = var_InheritInteger(vout, "video-y"),
+#endif
+            .width = cfg->fmt->i_visible_width,
+            .height = cfg->fmt->i_visible_height,
+        };
+
+        vout->p->window = vout_window_New(VLC_OBJECT(vout), "$window", &wcfg);
+    } else
+        vout->p->window = NULL;
+
     /* */
     vlc_object_set_destructor(vout, VoutDestructor);
 
@@ -607,45 +625,26 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, cons
 vout_window_t * vout_NewDisplayWindow(vout_thread_t *vout,
                                       const vout_window_cfg_t *cfg)
 {
-    vout_window_cfg_t cfg_override = *cfg;
+    vout_window_t *window = vout->p->window;
 
     assert(vout->p->splitter_name == NULL);
-    if (!var_InheritBool( vout, "embedded-video"))
-        cfg_override.is_standalone = true;
 
-    vout_window_t *window = vout->p->window.object;
+    if (window == NULL)
+        return NULL;
+    if (cfg->type != VOUT_WINDOW_TYPE_INVALID && cfg->type != window->type)
+        return NULL;
 
-    if (window != NULL) {
-        if (!cfg_override.is_standalone == !vout->p->window.cfg.is_standalone &&
-            cfg_override.type           == vout->p->window.cfg.type) {
-            /* Reuse the stored window */
-            msg_Dbg(vout, "Reusing previous vout window");
-
-            if (cfg_override.width  != vout->p->window.cfg.width ||
-                cfg_override.height != vout->p->window.cfg.height)
-                vout_window_SetSize(window,
-                                    cfg_override.width, cfg_override.height);
-            vout->p->window.cfg = cfg_override;
-            return window;
-        }
-
-        vout_window_Delete(window);
-    }
-
-    window = vout_window_New(VLC_OBJECT(vout), "$window", &cfg_override);
-    if (window != NULL)
-        vout->p->window.cfg = cfg_override;
-    vout->p->window.object = window;
+    vout_window_SetSize(window, cfg->width, cfg->height);
     return window;
 }
 
 void vout_DeleteDisplayWindow(vout_thread_t *vout, vout_window_t *window)
 {
-    if (window == NULL && vout->p->window.object != NULL) {
-        vout_window_Delete(vout->p->window.object);
-        vout->p->window.object = NULL;
+    if (window == NULL && vout->p->window != NULL) {
+        vout_window_Delete(vout->p->window);
+        vout->p->window = NULL;
     }
-    assert(vout->p->window.object == window);
+    assert(vout->p->window == window);
 }
 
 /* */
@@ -1382,7 +1381,6 @@ static void ThreadStop(vout_thread_t *vout, vout_display_state_t *state)
 
 static void ThreadInit(vout_thread_t *vout)
 {
-    vout->p->window.object   = NULL;
     vout->p->dead            = false;
     vout->p->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
     vout->p->pause.is_on     = false;
@@ -1393,8 +1391,8 @@ static void ThreadInit(vout_thread_t *vout)
 
 static void ThreadClean(vout_thread_t *vout)
 {
-    if (vout->p->window.object != NULL)
-        vout_window_Delete(vout->p->window.object);
+    if (vout->p->window != NULL)
+        vout_window_Delete(vout->p->window);
     vout_chrono_Clean(&vout->p->render);
     vout->p->dead = true;
     vout_control_Dead(&vout->p->control);

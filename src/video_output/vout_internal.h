@@ -69,10 +69,7 @@ struct vout_thread_sys_t
     filter_t        *spu_blend;
 
     /* Video output window */
-    struct {
-        vout_window_cfg_t cfg;
-        vout_window_t     *object;
-    } window;
+    vout_window_t   *window;
 
     /* Thread & synchronization */
     vlc_thread_t    thread;
