@@ -510,6 +510,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "vmem-width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
     var_Create (mp, "vmem-height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
     var_Create (mp, "vmem-pitch", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    var_Create (mp, "avcodec-hw", VLC_VAR_STRING);
     var_Create (mp, "drawable-xid", VLC_VAR_INTEGER);
 #if defined (_WIN32) || defined (__OS2__)
     var_Create (mp, "drawable-hwnd", VLC_VAR_INTEGER);
@@ -975,6 +976,7 @@ void libvlc_video_set_callbacks( libvlc_media_player_t *mp,
     var_SetAddress( mp, "vmem-display", display_cb );
     var_SetAddress( mp, "vmem-data", opaque );
     var_SetString( mp, "vout", "vmem" );
+    var_SetString( mp, "avcodec-hw", "none" );
 }
 
 void libvlc_video_set_format_callbacks( libvlc_media_player_t *mp,
@@ -1055,6 +1057,7 @@ void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
 {
     assert (p_mi != NULL);
 
+    var_SetString (p_mi, "avcodec-hw", "");
     var_SetString (p_mi, "vout", drawable ? "xid" : "any");
     var_SetString (p_mi, "window", drawable ? "embed-xid,any" : "any");
     var_SetInteger (p_mi, "drawable-xid", drawable);
