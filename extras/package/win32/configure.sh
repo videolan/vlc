@@ -28,4 +28,4 @@ OPTIONS="
       --enable-zvbi --disable-telx
       --enable-nls"
 
-sh "$(dirname $0)"/../../../configure ${OPTIONS} $*
+sh "$(dirname $0)"/../../../configure ${OPTIONS}  "$@"
