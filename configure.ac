@@ -1734,7 +1734,7 @@ PKG_ENABLE_MODULES_VLC([DSM], [dsm], [libdsm], [libdsm SMB/CIFS access/sd module
 dnl
 dnl sftp access support
 dnl
-PKG_ENABLE_MODULES_VLC([SFTP], [access_sftp], [libssh2], (support SFTP file transfer via libssh2), [auto])
+PKG_ENABLE_MODULES_VLC([SFTP], [sftp], [libssh2], (support SFTP file transfer via libssh2), [auto])
 
 dnl
 dnl  Video4Linux 2
