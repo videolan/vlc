@@ -176,6 +176,8 @@ static int Open(vlc_object_t *p_this)
 
     if (fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE)
         return VLC_EGENERIC;
+    if (vout_display_IsWindowed(vd))
+        return VLC_EGENERIC;
 
     /* Allocate structure */
     vout_display_sys_t *sys = (struct vout_display_sys_t*)calloc(1, sizeof(*sys));
