@@ -1,6 +1,6 @@
 # protobuf
-PROTOBUF_VERSION := 2.5.0
-PROTOBUF_URL := https://protobuf.googlecode.com/files/protobuf-$(PROTOBUF_VERSION).tar.bz2
+PROTOBUF_VERSION := 2.6.0
+PROTOBUF_URL := https://protobuf.googlecode.com/svn/rc/protobuf-$(PROTOBUF_VERSION).tar.bz2
 
 PKGS += protobuf
 ifeq ($(call need_pkg,"protobuf"),)
@@ -24,5 +24,5 @@ endif
 .protobuf: protobuf
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --with-protoc=protoc
-	cd $< && $(MAKE) install
+	cd $< && $(MAKE) && $(MAKE) install
 	touch $@
