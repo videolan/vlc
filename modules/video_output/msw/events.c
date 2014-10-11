@@ -683,8 +683,8 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
 
     #ifdef MODULE_NAME_IS_direct3d
     if( !p_event->use_desktop )
-    {
     #endif
+    {
         vout_window_cfg_t wnd_cfg = {
             .type = VOUT_WINDOW_TYPE_HWND,
             .width = p_event->width,
@@ -697,10 +697,11 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
             p_event->hparent = p_event->parent_window->handle.hwnd;
         else
             p_event->hparent = NULL;
-    #ifdef MODULE_NAME_IS_direct3d
     }
+    #ifdef MODULE_NAME_IS_direct3d
     else
     {
+        vout_display_DeleteWindow(vd, NULL);
         p_event->parent_window = NULL;
         p_event->hparent = GetDesktopHandle(vd);
     }
