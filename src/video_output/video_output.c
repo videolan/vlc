@@ -620,45 +620,37 @@ vout_window_t * vout_NewDisplayWindow(vout_thread_t *vout,
 
     vout_window_t *window = vout->p->window.object;
 
-    if (vout->p->window.is_unused && window != NULL) {
+    if (window != NULL) {
         if (!cfg_override.is_standalone == !vout->p->window.cfg.is_standalone &&
             cfg_override.type           == vout->p->window.cfg.type) {
             /* Reuse the stored window */
             msg_Dbg(vout, "Reusing previous vout window");
+
             if (cfg_override.width  != vout->p->window.cfg.width ||
                 cfg_override.height != vout->p->window.cfg.height)
                 vout_window_SetSize(window,
                                     cfg_override.width, cfg_override.height);
-            vout->p->window.is_unused = false;
-            vout->p->window.cfg       = cfg_override;
+            vout->p->window.cfg = cfg_override;
             return window;
         }
 
         vout_window_Delete(window);
-        vout->p->window.is_unused = true;
-        vout->p->window.object    = NULL;
     }
 
     window = vout_window_New(VLC_OBJECT(vout), "$window", &cfg_override);
-    if (window != NULL) {
-        vout->p->window.is_unused = false;
-        vout->p->window.cfg       = cfg_override;
-        vout->p->window.object    = window;
-    }
+    if (window != NULL)
+        vout->p->window.cfg = cfg_override;
+    vout->p->window.object = window;
     return window;
 }
 
 void vout_DeleteDisplayWindow(vout_thread_t *vout, vout_window_t *window)
 {
-    if (!vout->p->window.is_unused && vout->p->window.object == window) {
-        vout->p->window.is_unused = true;
-    } else if (vout->p->window.is_unused && vout->p->window.object && !window) {
+    if (window == NULL && vout->p->window.object != NULL) {
         vout_window_Delete(vout->p->window.object);
-        vout->p->window.is_unused = true;
-        vout->p->window.object    = NULL;
-    } else if (window) {
-        vout_window_Delete(window);
+        vout->p->window.object = NULL;
     }
+    assert(vout->p->window.object == window);
 }
 
 /* */
@@ -1395,22 +1387,19 @@ static void ThreadStop(vout_thread_t *vout, vout_display_state_t *state)
 
 static void ThreadInit(vout_thread_t *vout)
 {
-    vout->p->window.is_unused = true;
-    vout->p->window.object    = NULL;
-    vout->p->dead             = false;
-    vout->p->is_late_dropped  = var_InheritBool(vout, "drop-late-frames");
-    vout->p->pause.is_on      = false;
-    vout->p->pause.date       = VLC_TS_INVALID;
+    vout->p->window.object   = NULL;
+    vout->p->dead            = false;
+    vout->p->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
+    vout->p->pause.is_on     = false;
+    vout->p->pause.date      = VLC_TS_INVALID;
 
     vout_chrono_Init(&vout->p->render, 5, 10000); /* Arbitrary initial time */
 }
 
 static void ThreadClean(vout_thread_t *vout)
 {
-    if (vout->p->window.object) {
-        assert(vout->p->window.is_unused);
+    if (vout->p->window.object != NULL)
         vout_window_Delete(vout->p->window.object);
-    }
     vout_chrono_Clean(&vout->p->render);
     vout->p->dead = true;
     vout_control_Dead(&vout->p->control);

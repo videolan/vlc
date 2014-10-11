@@ -70,7 +70,6 @@ struct vout_thread_sys_t
 
     /* Video output window */
     struct {
-        bool              is_unused;
         vout_window_cfg_t cfg;
         vout_window_t     *object;
     } window;
