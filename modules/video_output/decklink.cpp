@@ -681,16 +681,8 @@ end:
 
 static int ControlVideo(vout_display_t *vd, int query, va_list args)
 {
-    VLC_UNUSED(vd);
-    const vout_display_cfg_t *cfg;
-
-    switch (query) {
-    case VOUT_DISPLAY_CHANGE_FULLSCREEN:
-        cfg = va_arg(args, const vout_display_cfg_t *);
-        return cfg->is_fullscreen ? VLC_EGENERIC : VLC_SUCCESS;
-    default:
-        return VLC_EGENERIC;
-    }
+    (void) vd; (void) query; (void) args;
+    return VLC_EGENERIC;
 }
 
 static int OpenVideo(vlc_object_t *p_this)
