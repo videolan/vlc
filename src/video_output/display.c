@@ -1445,14 +1445,14 @@ static vout_window_t *SplitterNewWindow(vout_display_t *vd, const vout_window_cf
     vout_window_cfg_t cfg = *cfg_ptr;
     cfg.is_standalone = true;
 
-    return vout_NewDisplayWindow(osys->vout, &cfg);
+    return vout_window_New(VLC_OBJECT(osys->vout), "$window", &cfg);
 }
 
 static void SplitterDelWindow(vout_display_t *vd, vout_window_t *window)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
-
-    vout_DeleteDisplayWindow(osys->vout, window);
+    if (window != NULL)
+        vout_window_Delete(window);
+    (void) vd;
 }
 
 static void SplitterEvent(vout_display_t *vd, int event, va_list args)
