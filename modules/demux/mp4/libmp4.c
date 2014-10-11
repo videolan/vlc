@@ -4033,13 +4033,15 @@ static void MP4_BoxDumpStructure_Internal( stream_t *s,
         }
         if( MP4_BOX_TYPE_ASCII() )
             snprintf( &str[i_level * 4], sizeof(str) - 4*i_level,
-                      "+ %4.4s size %"PRIu64" offset %ld%s",
-                        (char*)&p_box->i_type, p_box->i_size, p_box->i_pos,
+                      "+ %4.4s size %"PRIu64" offset %ju%s",
+                      (char*)&p_box->i_type, p_box->i_size,
+                      (uintmax_t)p_box->i_pos,
                     p_box->e_flags & BOX_FLAG_INCOMPLETE ? " (\?\?\?\?)" : "" );
         else
             snprintf( &str[i_level * 4], sizeof(str) - 4*i_level,
-                      "+ c%3.3s size %"PRIu64" offset %ld%s",
-                        (char*)&p_box->i_type+1, p_box->i_size, p_box->i_pos,
+                      "+ c%3.3s size %"PRIu64" offset %ju%s",
+                        (char*)&p_box->i_type+1, p_box->i_size,
+                      (uintmax_t)p_box->i_pos,
                     p_box->e_flags & BOX_FLAG_INCOMPLETE ? " (\?\?\?\?)" : "" );
         msg_Dbg( s, "%s", str );
     }
