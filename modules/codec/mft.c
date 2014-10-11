@@ -745,7 +745,8 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, void **result)
     }
     else /* An error not listed above occurred */
     {
-        msg_Err(p_dec, "Unexpected error in IMFTransform::ProcessOutput: %#x", hr);
+        msg_Err(p_dec, "Unexpected error in IMFTransform::ProcessOutput: %#lx",
+                hr);
         goto error;
     }
 
