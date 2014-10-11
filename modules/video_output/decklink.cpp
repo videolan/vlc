@@ -476,6 +476,8 @@ static struct decklink_sys_t *OpenDecklink(vout_display_t *vd)
 
     vlc_mutex_unlock(&decklink_sys->lock);
 
+    vout_display_DeleteWindow(vd, NULL);
+
     return decklink_sys;
 
 error:
