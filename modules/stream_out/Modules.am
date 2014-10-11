@@ -73,7 +73,7 @@ dummy.cpp:
 # Chromecast plugin
 SUFFIXES += .proto .pb.cc
 
-%.pb.cc: %.proto
+%.pb.h %.pb.cc: %.proto
 	$(PROTOC) --cpp_out=. -I$(srcdir) $<
 
 SOURCES_stream_out_chromecast = chromecast/cast_channel.proto chromecast/cast.cpp \
