@@ -412,6 +412,13 @@ AS_IF([test -n "${CONTRIB_DIR}"], [
 ])
 AC_SUBST(CONTRIB_DIR)
 
+dnl Add extras/tools to the PATH
+TOOLS_DIR="${srcdir}/extras/tools/build"
+AS_IF([test -d "${TOOLS_DIR}"], [
+    TOOLS_DIR=`cd "${TOOLS_DIR}" && pwd`
+    export PATH="${TOOLS_DIR}":$PATH
+])
+
 dnl
 dnl  Libtool
 dnl  It's very bad, but our former custom system was worst
