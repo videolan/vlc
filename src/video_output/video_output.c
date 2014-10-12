@@ -648,6 +648,23 @@ void vout_DeleteDisplayWindow(vout_thread_t *vout, vout_window_t *window)
     assert(vout->p->window == window);
 }
 
+void vout_SetDisplayWindowSize(vout_thread_t *vout,
+                               unsigned width, unsigned height)
+{
+    vout_window_t *window = vout->p->window;
+
+    if (window != NULL)
+    /* Request a resize of the window. If it fails, there is nothing to do.
+     * If it succeeds, the window will emit a resize event later. */
+        vout_window_SetSize(window, width, height);
+    else
+    if (vout->p->display.vd != NULL)
+    /* Force a resize of window-less display. This is not allowed to fail,
+     * although the display is allowed to ignore the size anyway. */
+        /* FIXME: remove this, fix MSW and OS/2 window providers */
+        vout_display_SendEventDisplaySize(vout->p->display.vd, width, height);
+}
+
 /* */
 static picture_t *VoutVideoFilterInteractiveNewPicture(filter_t *filter)
 {
