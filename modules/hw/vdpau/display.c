@@ -362,11 +362,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
                              values);
         break;
     }
-    case VOUT_DISPLAY_CHANGE_FULLSCREEN:
-    {
-        const vout_display_cfg_t *c = va_arg(ap, const vout_display_cfg_t *);
-        return vout_window_SetFullScreen(sys->embed, c->is_fullscreen);
-    }
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     {
         const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);

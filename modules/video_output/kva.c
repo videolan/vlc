@@ -447,14 +447,10 @@ static int Control( vout_display_t *vd, int query, va_list args )
 
     case VOUT_DISPLAY_CHANGE_FULLSCREEN:
     {
-        vout_display_cfg_t cfg = *va_arg(args, const vout_display_cfg_t *);
+        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
 
-        if( sys->parent_window )
-            vout_window_SetFullScreen(sys->parent_window, cfg.is_fullscreen);
-        else
-            WinPostMsg( sys->client, WM_VLC_FULLSCREEN_CHANGE,
-                        MPFROMLONG( cfg.is_fullscreen ), 0 );
-
+        WinPostMsg( sys->client, WM_VLC_FULLSCREEN_CHANGE,
+                    MPFROMLONG( cfg->is_fullscreen ), 0 );
         return VLC_SUCCESS;
     }
 

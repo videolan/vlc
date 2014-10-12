@@ -243,13 +243,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
       case VOUT_DISPLAY_RESET_PICTURES: // not needed
         assert(0);
 #endif
-      case VOUT_DISPLAY_CHANGE_FULLSCREEN:
-      {
-        const vout_display_cfg_t *c =
-            va_arg (ap, const vout_display_cfg_t *);
-
-        return vout_window_SetFullScreen (sys->gl->surface, c->is_fullscreen);
-      }
 
       case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
       case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
