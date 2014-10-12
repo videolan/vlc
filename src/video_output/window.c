@@ -113,8 +113,10 @@ void vout_window_Delete(vout_window_t *window)
 }
 
 /* Video output display integration */
+#include <vlc_vout.h>
 #include <vlc_vout_display.h>
 #include "window.h"
+#include "event.h"
 
 typedef struct vout_display_window
 {
@@ -140,6 +142,13 @@ static void vout_display_window_ResizeNotify(vout_window_t *window,
     vlc_mutex_unlock(&state->lock);
 }
 
+static void vout_display_window_CloseNotify(vout_window_t *window)
+{
+    vout_thread_t *vout = (vout_thread_t *)window->p_parent;
+
+    vout_SendEventClose(vout);
+}
+
 /**
  * Creates a video window, initially without any attached display.
  */
@@ -158,6 +167,7 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout,
     vout_window_owner_t owner = {
         .sys = state,
         .resized = vout_display_window_ResizeNotify,
+        .closed = vout_display_window_CloseNotify,
     };
     vout_window_t *window;
 
