@@ -601,6 +601,9 @@ vlc_epg_SetCurrent
 vlc_epg_Merge
 vlc_gl_Create
 vlc_gl_Destroy
+vlc_gl_surface_Create
+vlc_gl_surface_CheckSize
+vlc_gl_surface_Destroy
 vlm_Control
 vlm_Delete
 vlm_ExecuteCommand

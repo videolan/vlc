@@ -30,6 +30,7 @@
  */
 
 struct vout_window_t;
+struct vout_window_cfg_t;
 
 /**
  * A VLC GL context (and its underlying surface)
@@ -91,5 +92,11 @@ static inline void *vlc_gl_GetProcAddress(vlc_gl_t *gl, const char *name)
 {
     return (gl->getProcAddress != NULL) ? gl->getProcAddress(gl, name) : NULL;
 }
+
+VLC_API vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *,
+                                        const struct vout_window_cfg_t *,
+                                        struct vout_window_t **) VLC_USED;
+VLC_API bool vlc_gl_surface_CheckSize(vlc_gl_t *, unsigned *w, unsigned *h);
+VLC_API void vlc_gl_surface_Destroy(vlc_gl_t *);
 
 #endif /* VLC_GL_H */

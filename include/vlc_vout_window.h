@@ -61,7 +61,7 @@ enum {
     VOUT_WINDOW_SET_FULLSCREEN, /* int b_fullscreen */
 };
 
-typedef struct {
+typedef struct vout_window_cfg_t {
     /* If true, a standalone window is requested */
     bool is_standalone;
 
