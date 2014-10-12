@@ -96,8 +96,13 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
         case VOUT_WINDOW_SET_STATE:
             return VLC_EGENERIC;
         case VOUT_WINDOW_SET_SIZE:
-            assert(0);
+        {
+            unsigned width = va_arg (ap, unsigned);
+            unsigned height = va_arg (ap, unsigned);
+
+            vout_window_ReportSize(wnd, width, height);
             break;
+        }
         case VOUT_WINDOW_SET_FULLSCREEN:
         {
             bool fs = va_arg(ap, int);
@@ -264,7 +269,8 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     wnd->handle.wl = surface;
     wnd->display.wl = display;
     wnd->control = Control;
-    (void) cfg;
+
+    vout_window_ReportSize(wnd, cfg->width, cfg->height);
     return VLC_SUCCESS;
 
 error:
