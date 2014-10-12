@@ -272,7 +272,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         vlc_gl_ReleaseCurrent (sys->gl);
         return VLC_SUCCESS;
       }
-
+#if !USE_OPENGL_ES
       case VOUT_DISPLAY_GET_OPENGL:
       {
         vlc_gl_t **pgl = va_arg (ap, vlc_gl_t **);
@@ -280,7 +280,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         *pgl = sys->gl;
         return VLC_SUCCESS;
       }
-
+#endif
       default:
         msg_Err (vd, "Unknown request %d", query);
     }

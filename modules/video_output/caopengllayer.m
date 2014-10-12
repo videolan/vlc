@@ -334,12 +334,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             return VLC_SUCCESS;
         }
 
-        case VOUT_DISPLAY_GET_OPENGL:
-        {
-            vlc_gl_t **gl = va_arg (ap, vlc_gl_t **);
-            *gl = &sys->gl;
-            return VLC_SUCCESS;
-        }
         case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
         {
             return VLC_SUCCESS;
