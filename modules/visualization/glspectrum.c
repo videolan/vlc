@@ -29,8 +29,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
-#include <vlc_vout.h>
-#include <vlc_vout_wrapper.h>
+#include <vlc_vout_window.h>
 #include <vlc_opengl.h>
 #include <vlc_filter.h>
 #include <vlc_rand.h>
@@ -76,8 +75,6 @@ vlc_module_end()
 struct filter_sys_t
 {
     vlc_thread_t thread;
-    vlc_sem_t    ready;
-    bool         b_error;
 
     /* Audio data */
     unsigned i_channels;
@@ -86,15 +83,10 @@ struct filter_sys_t
     int16_t *p_prev_s16_buff;
 
     /* Opengl */
-    vout_thread_t  *p_vout;
-    vout_display_t *p_vd;
+    vlc_gl_t *gl;
 
     float f_rotationAngle;
     float f_rotationIncrement;
-
-    /* Window size */
-    int i_width;
-    int i_height;
 
     /* FFT window parameters */
     window_param wind_param;
@@ -128,10 +120,6 @@ static int Open(vlc_object_t * p_this)
         return VLC_ENOMEM;
 
     /* Create the object for the thread */
-    vlc_sem_init(&p_sys->ready, 0);
-    p_sys->b_error = false;
-    p_sys->i_width = var_InheritInteger(p_filter, "glspectrum-width");
-    p_sys->i_height = var_InheritInteger(p_filter, "glspectrum-height");
     p_sys->i_channels = aout_FormatNbChannels(&p_filter->fmt_in.audio);
     p_sys->i_prev_nb_samples = 0;
     p_sys->p_prev_s16_buff = NULL;
@@ -147,18 +135,23 @@ static int Open(vlc_object_t * p_this)
     if (p_sys->fifo == NULL)
         goto error;
 
+    /* Create the openGL provider */
+    vout_window_cfg_t cfg = {
+        .width = var_InheritInteger(p_filter, "glspectrum-width"),
+        .height = var_InheritInteger(p_filter, "glspectrum-height"),
+    };
+
+    p_sys->gl = vlc_gl_surface_Create(p_this, &cfg, NULL);
+    if (p_sys->gl == NULL)
+    {
+        block_FifoRelease(p_sys->fifo);
+        goto error;
+    }
+
     /* Create the thread */
     if (vlc_clone(&p_sys->thread, Thread, p_filter,
                   VLC_THREAD_PRIORITY_VIDEO))
         goto error;
-
-    /* Wait for the displaying thread to be ready. */
-    vlc_sem_wait(&p_sys->ready);
-    if (p_sys->b_error)
-    {
-        vlc_join(p_sys->thread, NULL);
-        goto error;
-    }
 
     p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
@@ -167,7 +160,6 @@ static int Open(vlc_object_t * p_this)
     return VLC_SUCCESS;
 
 error:
-    vlc_sem_destroy(&p_sys->ready);
     free(p_sys);
     return VLC_EGENERIC;
 }
@@ -187,13 +179,9 @@ static void Close(vlc_object_t *p_this)
     vlc_join(p_sys->thread, NULL);
 
     /* Free the ressources */
-    vout_DeleteDisplay(p_sys->p_vd, NULL);
-    vlc_object_release(p_sys->p_vout);
-
+    vlc_gl_surface_Destroy(p_sys->gl);
     block_FifoRelease(p_sys->fifo);
     free(p_sys->p_prev_s16_buff);
-
-    vlc_sem_destroy(&p_sys->ready);
     free(p_sys);
 }
 
@@ -355,53 +343,7 @@ static void *Thread( void *p_data )
 {
     filter_t  *p_filter = (filter_t*)p_data;
     filter_sys_t *p_sys = p_filter->p_sys;
-
-    video_format_t fmt;
-    vlc_gl_t *gl;
-    unsigned int i_last_width = 0;
-    unsigned int i_last_height = 0;
-
-    /* Create the openGL provider */
-    p_sys->p_vout =
-        (vout_thread_t *)vlc_object_create(p_filter, sizeof(vout_thread_t));
-    if (!p_sys->p_vout)
-        goto error;
-
-    /* Configure the video format for the opengl provider. */
-    video_format_Init(&fmt, 0);
-    video_format_Setup(&fmt, VLC_CODEC_RGB32, p_sys->i_width, p_sys->i_height,
-                       p_sys->i_width, p_sys->i_height, 0, 1 );
-    fmt.i_sar_num = 1;
-    fmt.i_sar_den = 1;
-
-    /* Init vout state. */
-    vout_display_state_t state;
-    memset(&state, 0, sizeof(state));
-    state.cfg.display.sar.num = 1;
-    state.cfg.display.sar.den = 1;
-    state.cfg.is_display_filled = true;
-    state.cfg.zoom.num = 1;
-    state.cfg.zoom.den = 1;
-    state.sar.num = 1;
-    state.sar.den = 1;
-
-    p_sys->p_vd = vout_NewDisplay(p_sys->p_vout, &fmt, &state,
-                                  "opengl", 1000000, 1000000);
-    if (!p_sys->p_vd)
-    {
-        vlc_object_release(p_sys->p_vout);
-        goto error;
-    }
-
-    gl = vout_GetDisplayOpengl(p_sys->p_vd);
-    if (!gl)
-    {
-        vout_DeleteDisplay(p_sys->p_vd, NULL);
-        vlc_object_release(p_sys->p_vout);
-        goto error;
-    }
-
-    vlc_sem_post(&p_sys->ready);
+    vlc_gl_t *gl = p_sys->gl;
 
     vlc_gl_MakeCurrent(gl);
     initOpenGLScene();
@@ -414,21 +356,11 @@ static void *Thread( void *p_data )
         block_t *block = block_FifoGet(p_sys->fifo);
 
         int canc = vlc_savecancel();
+        unsigned win_width, win_height;
 
         vlc_gl_MakeCurrent(gl);
-        /* Manage the events */
-        vout_ManageDisplay(p_sys->p_vd, true);
-        if (p_sys->p_vd->cfg->display.width != i_last_width ||
-            p_sys->p_vd->cfg->display.height != i_last_height)
-        {
-            /* FIXME it is not perfect as we will have black bands */
-            vout_display_place_t place;
-            vout_display_PlacePicture(&place, &p_sys->p_vd->source,
-                                      p_sys->p_vd->cfg, false);
-
-            i_last_width  = p_sys->p_vd->cfg->display.width;
-            i_last_height = p_sys->p_vd->cfg->display.height;
-        }
+        if (vlc_gl_surface_CheckSize(gl, &win_width, &win_height))
+            glViewport(0, 0, win_width, win_height);
 
         /* Horizontal scale for 20-band equalizer */
         const unsigned xscale[] = {0,1,2,3,4,5,6,7,8,11,15,20,27,
@@ -562,9 +494,4 @@ release:
     }
 
     assert(0);
-
-error:
-    p_sys->b_error = true;
-    vlc_sem_post(&p_sys->ready);
-    return NULL;
 }
