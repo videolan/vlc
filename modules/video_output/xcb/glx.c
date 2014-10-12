@@ -90,10 +90,9 @@ static int Open (vlc_object_t *obj)
     /* Get window, connect to X server (via XCB) */
     xcb_connection_t *conn;
     const xcb_screen_t *scr;
-    uint16_t width, height;
     vout_window_t *surface;
 
-    surface = XCB_parent_Create (vd, &conn, &scr, &width, &height);
+    surface = XCB_parent_Create (vd, &conn, &scr);
     if (surface == NULL)
     {
         free (sys);
@@ -134,7 +133,6 @@ static int Open (vlc_object_t *obj)
     if (vout_window_SetFullScreen (surface, fs))
         fs = false;
     vout_display_SendEventFullscreen (vd, fs);
-    vout_display_SendEventDisplaySize (vd, width, height);
 
     return VLC_SUCCESS;
 

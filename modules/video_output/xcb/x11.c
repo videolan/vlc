@@ -115,8 +115,7 @@ static int Open (vlc_object_t *obj)
     /* Get window, connect to X server */
     xcb_connection_t *conn;
     const xcb_screen_t *scr;
-    uint16_t width, height;
-    sys->embed = XCB_parent_Create (vd, &conn, &scr, &width, &height);
+    sys->embed = XCB_parent_Create (vd, &conn, &scr);
     if (sys->embed == NULL)
     {
         free (sys);
@@ -275,7 +274,8 @@ found_format:;
         xcb_create_pixmap (conn, sys->depth, pixmap, scr->root, 1, 1);
         c = xcb_create_window_checked (conn, sys->depth, sys->window,
                                        sys->embed->handle.xid, 0, 0,
-                                       width, height, 0,
+                                       vd->cfg->display.width,
+                                       vd->cfg->display.height, 0,
                                        XCB_WINDOW_CLASS_INPUT_OUTPUT,
                                        vid, mask, values);
         xcb_map_window (conn, sys->window);
@@ -315,7 +315,6 @@ found_format:;
     if (is_fullscreen && vout_window_SetFullScreen (sys->embed, true))
         is_fullscreen = false;
     vout_display_SendEventFullscreen (vd, is_fullscreen);
-    vout_display_SendEventDisplaySize (vd, width, height);
 
     return VLC_SUCCESS;
 

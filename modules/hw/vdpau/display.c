@@ -448,8 +448,7 @@ static int Open(vlc_object_t *obj)
         return VLC_ENOMEM;
 
     const xcb_screen_t *screen;
-    uint16_t width, height;
-    sys->embed = XCB_parent_Create(vd, &sys->conn, &screen, &width, &height);
+    sys->embed = XCB_parent_Create(vd, &sys->conn, &screen);
     if (sys->embed == NULL)
     {
         free(sys);
@@ -687,7 +686,6 @@ static int Open(vlc_object_t *obj)
     if (is_fullscreen && vout_window_SetFullScreen(sys->embed, true))
         is_fullscreen = false;
     vout_display_SendEventFullscreen(vd, is_fullscreen);
-    vout_display_SendEventDisplaySize(vd, width, height);
 
     return VLC_SUCCESS;
 
