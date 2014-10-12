@@ -410,7 +410,6 @@ struct vout_display_owner_sys_t {
     bool ch_display_size;
     int  display_width;
     int  display_height;
-    bool display_is_fullscreen;
     bool display_is_forced;
 
     int  fit_window;
@@ -707,11 +706,10 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         /* */
         vlc_mutex_lock(&osys->lock);
 
-        osys->ch_display_size       = true;
-        osys->display_width         = width;
-        osys->display_height        = height;
-        osys->display_is_fullscreen = is_fullscreen;
-        osys->display_is_forced     = false;
+        osys->ch_display_size   = true;
+        osys->display_width     = width;
+        osys->display_height    = height;
+        osys->display_is_forced = false;
 
         vlc_mutex_unlock(&osys->lock);
         break;
@@ -791,11 +789,10 @@ static void VoutDisplayFitWindow(vout_display_t *vd, bool default_size)
 
     vlc_mutex_lock(&osys->lock);
 
-    osys->ch_display_size       = true;
-    osys->display_width         = display_width;
-    osys->display_height        = display_height;
-    osys->display_is_fullscreen = osys->cfg.is_fullscreen;
-    osys->display_is_forced     = true;
+    osys->ch_display_size   = true;
+    osys->display_width     = display_width;
+    osys->display_height    = display_height;
+    osys->display_is_forced = true;
 
     vlc_mutex_unlock(&osys->lock);
 }
@@ -865,7 +862,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         bool ch_display_size       = osys->ch_display_size;
         int  display_width         = osys->display_width;
         int  display_height        = osys->display_height;
-        bool display_is_fullscreen = osys->display_is_fullscreen;
         bool display_is_forced     = osys->display_is_forced;
         osys->ch_display_size = false;
 
@@ -922,8 +918,11 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             cfg.display.width  = display_width;
             cfg.display.height = display_height;
 
-            if (!cfg.is_fullscreen != !display_is_fullscreen ||
-                vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &cfg, display_is_forced)) {
+            osys->width_saved  = osys->cfg.display.width;
+            osys->height_saved = osys->cfg.display.height;
+
+            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,
+                                     &cfg, display_is_forced)) {
                 if (!display_is_forced)
                     msg_Err(vd, "Failed to resize display");
 
@@ -933,11 +932,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             }
             osys->cfg.display.width  = display_width;
             osys->cfg.display.height = display_height;
-
-            if (!display_is_fullscreen) {
-                osys->width_saved  = display_width;
-                osys->height_saved = display_height;
-            }
         }
         /* */
         if (osys->ch_display_filled) {
