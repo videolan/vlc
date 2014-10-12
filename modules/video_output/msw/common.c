@@ -328,8 +328,8 @@ void UpdateRects(vout_display_t *vd,
                                     point.x, point.y,
                                     rect.right, rect.bottom);
     if (is_resized)
-        vout_display_SendEventDisplaySize(vd, rect.right, rect.bottom, cfg->is_fullscreen);
-    if (!is_forced && !has_moved && !is_resized )
+        vout_display_SendEventDisplaySize(vd, rect.right, rect.bottom);
+    if (!is_forced && !has_moved && !is_resized)
         return;
 
     /* Update the window position and size */

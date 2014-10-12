@@ -301,8 +301,7 @@ static int Open(vlc_object_t *object)
     vc_tv_register_callback(tvservice_cb, vd);
 
     if (query_resolution(vd, &sys->display_width, &sys->display_height) >= 0) {
-        vout_display_SendEventDisplaySize(vd, sys->display_width, sys->display_height,
-                        vd->cfg->is_fullscreen);
+        vout_display_SendEventDisplaySize(vd, sys->display_width, sys->display_height);
     } else {
         sys->display_width = vd->cfg->display.width;
         sys->display_height = vd->cfg->display.height;
@@ -607,7 +606,7 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
         case VOUT_DISPLAY_CHANGE_FULLSCREEN:
             tmp_cfg = va_arg(args, const vout_display_cfg_t *);
             vout_display_SendEventDisplaySize(vd, sys->display_width,
-                            sys->display_height, tmp_cfg->is_fullscreen);
+                            sys->display_height);
             ret = VLC_SUCCESS;
             break;
 
@@ -658,7 +657,7 @@ static void vd_manage(vout_display_t *vd)
         if (query_resolution(vd, &width, &height) >= 0) {
             sys->display_width = width;
             sys->display_height = height;
-            vout_display_SendEventDisplaySize(vd, width, height, vd->cfg->is_fullscreen);
+            vout_display_SendEventDisplaySize(vd, width, height);
         }
 
         sys->need_configure_display = false;

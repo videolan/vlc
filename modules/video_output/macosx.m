@@ -239,7 +239,7 @@ static int Open (vlc_object_t *this)
     vd->control = Control;
 
     /* */
-    vout_display_SendEventDisplaySize (vd, vd->fmt.i_visible_width, vd->fmt.i_visible_height, false);
+    vout_display_SendEventDisplaySize (vd, vd->fmt.i_visible_width, vd->fmt.i_visible_height);
 
     return VLC_SUCCESS;
 
@@ -644,7 +644,7 @@ static void OpenglSwap (vlc_gl_t *gl)
 
             vout_display_PlacePicture (&place, &vd->source, &cfg_tmp, false);
             vd->sys->place = place;
-            vout_display_SendEventDisplaySize (vd, bounds.size.width, bounds.size.height, vd->cfg->is_fullscreen);
+            vout_display_SendEventDisplaySize (vd, bounds.size.width, bounds.size.height);
         }
     }
 

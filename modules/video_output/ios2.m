@@ -201,7 +201,7 @@ static int Open(vlc_object_t *this)
     /* forward our dimensions to the vout core */
     CGSize viewSize = sys->viewContainer.frame.size;
     vout_display_SendEventFullscreen(vd, false);
-    vout_display_SendEventDisplaySize(vd, (int)viewSize.width, (int)viewSize.height, false);
+    vout_display_SendEventDisplaySize(vd, (int)viewSize.width, (int)viewSize.height);
 
     /* */
     [[NSNotificationCenter defaultCenter] addObserver:sys->glESView
@@ -502,8 +502,7 @@ static void OpenglESSwap(vlc_gl_t *gl)
             vout_display_PlacePicture(&place, &_voutDisplay->source, &cfg_tmp, false);
             _voutDisplay->sys->place = place;
             vout_display_SendEventDisplaySize(_voutDisplay, viewSize.width * scaleFactor,
-                                              viewSize.height * scaleFactor,
-                                              _voutDisplay->cfg->is_fullscreen);
+                                              viewSize.height * scaleFactor);
         }
     }
 

@@ -203,7 +203,7 @@ static int Open (vlc_object_t *p_this)
     else
         outputSize = [sys->container visibleRect].size;
     vout_display_SendEventFullscreen(vd, false);
-    vout_display_SendEventDisplaySize(vd, (int)outputSize.width, (int)outputSize.height, false);
+    vout_display_SendEventDisplaySize(vd, (int)outputSize.width, (int)outputSize.height);
 
     [pool release];
     return VLC_SUCCESS;
@@ -429,7 +429,7 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
 
     CGSize boundsSize = self.bounds.size;
     if (_vd)
-        vout_display_SendEventDisplaySize(_vd, boundsSize.width, boundsSize.height, _vd->cfg->is_fullscreen);
+        vout_display_SendEventDisplaySize(_vd, boundsSize.width, boundsSize.height);
 }
 
 - (BOOL)canDrawInCGLContext:(CGLContextObj)glContext pixelFormat:(CGLPixelFormatObj)pixelFormat forLayerTime:(CFTimeInterval)timeInterval displayTime:(const CVTimeStamp *)timeStamp

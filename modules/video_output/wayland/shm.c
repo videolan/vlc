@@ -308,8 +308,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE && va_arg(ap, int))
             {
                 vout_display_SendEventDisplaySize(vd, cfg->display.width,
-                                                  cfg->display.height,
-                                                  vd->cfg->is_fullscreen);
+                                                  cfg->display.height);
                 return VLC_EGENERIC;
             }
 
@@ -492,7 +491,7 @@ static int Open(vlc_object_t *obj)
         is_fullscreen = false;
     vout_display_SendEventFullscreen(vd, is_fullscreen);
     vout_display_SendEventDisplaySize(vd, vd->cfg->display.width,
-                                      vd->cfg->display.height, is_fullscreen);
+                                      vd->cfg->display.height);
     return VLC_SUCCESS;
 
 error:

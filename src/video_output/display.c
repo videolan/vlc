@@ -699,9 +699,7 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
     case VOUT_DISPLAY_EVENT_DISPLAY_SIZE: {
         const int width  = (int)va_arg(args, int);
         const int height = (int)va_arg(args, int);
-        const bool is_fullscreen = (bool)va_arg(args, int);
-        msg_Dbg(vd, "VoutDisplayEvent 'resize' %dx%d %s",
-                width, height, is_fullscreen ? "fullscreen" : "window");
+        msg_Dbg(vd, "VoutDisplayEvent 'resize' %dx%d", width, height);
 
         /* */
         vlc_mutex_lock(&osys->lock);

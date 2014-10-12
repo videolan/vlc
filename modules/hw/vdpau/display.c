@@ -687,7 +687,7 @@ static int Open(vlc_object_t *obj)
     if (is_fullscreen && vout_window_SetFullScreen(sys->embed, true))
         is_fullscreen = false;
     vout_display_SendEventFullscreen(vd, is_fullscreen);
-    vout_display_SendEventDisplaySize(vd, width, height, is_fullscreen);
+    vout_display_SendEventDisplaySize(vd, width, height);
 
     return VLC_SUCCESS;
 

@@ -134,7 +134,7 @@ static int Open (vlc_object_t *obj)
     if (vout_window_SetFullScreen (surface, fs))
         fs = false;
     vout_display_SendEventFullscreen (vd, fs);
-    vout_display_SendEventDisplaySize (vd, width, height, fs);
+    vout_display_SendEventDisplaySize (vd, width, height);
 
     return VLC_SUCCESS;
 

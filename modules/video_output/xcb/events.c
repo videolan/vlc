@@ -249,7 +249,7 @@ static void
 HandleParentStructure (vout_display_t *vd,
                        const xcb_configure_notify_event_t *ev)
 {
-    vout_display_SendEventDisplaySize (vd, ev->width, ev->height, vd->cfg->is_fullscreen);
+    vout_display_SendEventDisplaySize (vd, ev->width, ev->height);
 }
 
 /**
