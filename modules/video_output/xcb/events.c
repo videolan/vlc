@@ -265,11 +265,6 @@ static int ProcessEvent (vout_display_t *vd, xcb_connection_t *conn,
                                     (xcb_visibility_notify_event_t *)ev);
             break;
 
-        /* FIXME I am not sure it is the right one */
-        case XCB_DESTROY_NOTIFY:
-            vout_display_SendEventClose (vd);
-            break;
-
         case XCB_MAPPING_NOTIFY:
             break;
 
