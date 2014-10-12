@@ -264,14 +264,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
       {
         const vout_display_cfg_t *c = va_arg (ap, const vout_display_cfg_t *);
         const video_format_t *src = &vd->source;
-
-        if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE && va_arg (ap, int))
-        {
-            vout_window_SetSize (sys->gl->surface,
-                                 c->display.width, c->display.height);
-            return VLC_EGENERIC;
-        }
-
         vout_display_place_t place;
 
         vout_display_PlacePicture (&place, src, c, false);

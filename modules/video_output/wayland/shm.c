@@ -305,13 +305,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
                 cfg = va_arg(ap, const vout_display_cfg_t *);
             }
 
-            if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE && va_arg(ap, int))
-            {
-                vout_window_SetSize(sys->embed,
-                                    cfg->display.width, cfg->display.height);
-                return VLC_EGENERIC;
-            }
-
             vout_display_place_t place;
 
             vout_display_PlacePicture(&place, &vd->source, vd->cfg, false);

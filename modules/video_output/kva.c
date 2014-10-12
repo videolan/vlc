@@ -480,22 +480,10 @@ static int Control( vout_display_t *vd, int query, va_list args )
     case VOUT_DISPLAY_CHANGE_ZOOM:
     {
         const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
-        bool  is_forced = query == VOUT_DISPLAY_CHANGE_ZOOM ||
-                          va_arg(args, int);
 
-        if( is_forced )
-        {
-            if( sys->parent_window )
-            {
-                vout_window_SetSize(sys->parent_window,
-                                    cfg->display.width, cfg->display.height);
-            }
-            else
-                WinPostMsg( sys->client, WM_VLC_SIZE_CHANGE,
-                            MPFROMLONG( cfg->display.width ),
-                            MPFROMLONG( cfg->display.height ));
-        }
-
+        WinPostMsg( sys->client, WM_VLC_SIZE_CHANGE,
+                    MPFROMLONG( cfg->display.width ),
+                    MPFROMLONG( cfg->display.height ));
         return VLC_SUCCESS;
     }
 

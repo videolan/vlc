@@ -926,7 +926,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             osys->height_saved = osys->cfg.display.height;
 
             if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,
-                                     &cfg, false)) {
+                                     &cfg)) {
                 msg_Err(vd, "Failed to resize display");
 
                 /* We ignore the resized */

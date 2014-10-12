@@ -553,14 +553,30 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
     vout_display_sys_t *sys = vd->sys;
 
     switch (query) {
-    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:   /* const vout_display_cfg_t *p_cfg, int is_forced */
+    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:   /* const vout_display_cfg_t *p_cfg */
+    {   /* Update dimensions */
+        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
+        RECT rect_window = {
+            .top    = 0,
+            .left   = 0,
+            .right  = cfg->display.width,
+            .bottom = cfg->display.height,
+        };
+
+        AdjustWindowRect(&rect_window, EventThreadGetWindowStyle(sys->event), 0);
+        SetWindowPos(sys->hwnd, 0, 0, 0,
+                     rect_window.right - rect_window.left,
+                     rect_window.bottom - rect_window.top, SWP_NOMOVE);
+        UpdateRects(vd, cfg, &vd->source, false);
+        return VLC_SUCCESS;
+    }
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED: /* const vout_display_cfg_t *p_cfg */
     case VOUT_DISPLAY_CHANGE_ZOOM:           /* const vout_display_cfg_t *p_cfg */
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:  /* const video_format_t *p_source */
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP: {  /* const video_format_t *p_source */
         const vout_display_cfg_t *cfg;
         const video_format_t *source;
-        bool  is_forced = true;
+
         if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP ||
             query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT) {
             cfg    = vd->cfg;
@@ -568,28 +584,8 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
         } else {
             cfg    = va_arg(args, const vout_display_cfg_t *);
             source = &vd->source;
-            if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
-                is_forced = va_arg(args, int);
         }
-        if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE && is_forced) {
-            /* Update dimensions */
-            if (sys->parent_window) {
-                vout_window_SetSize(sys->parent_window, cfg->display.width, cfg->display.height);
-            } else {
-                RECT rect_window;
-                rect_window.top    = 0;
-                rect_window.left   = 0;
-                rect_window.right  = cfg->display.width;
-                rect_window.bottom = cfg->display.height;
-                AdjustWindowRect(&rect_window, EventThreadGetWindowStyle(sys->event), 0);
-
-                SetWindowPos(sys->hwnd, 0, 0, 0,
-                             rect_window.right - rect_window.left,
-                             rect_window.bottom - rect_window.top, SWP_NOMOVE);
-            }
-            return VLC_EGENERIC;
-        }
-        UpdateRects(vd, cfg, source, is_forced);
+        UpdateRects(vd, cfg, source, false);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_WINDOW_STATE: {       /* unsigned state */

@@ -353,7 +353,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
             const vout_display_cfg_t *cfg;
             const video_format_t *source;
-            bool is_forced = false;
 
             if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
                 source = (const video_format_t *)va_arg (ap, const video_format_t *);
@@ -361,14 +360,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             } else {
                 source = &vd->source;
                 cfg = (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
-                if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
-                    is_forced = (bool)va_arg (ap, int);
-            }
-
-            if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE && is_forced
-                && vout_window_SetSize (sys->embed, cfg->display.width, cfg->display.height)) {
-                [o_pool release];
-                return VLC_EGENERIC;
             }
 
             /* we always use our current frame here, because we have some size constraints
