@@ -631,7 +631,6 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
 
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_RESET_PICTURES:
-        case VOUT_DISPLAY_GET_OPENGL:
             msg_Warn(vd, "Unsupported control query %d", query);
             break;
 

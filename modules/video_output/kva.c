@@ -511,7 +511,6 @@ static int Control( vout_display_t *vd, int query, va_list args )
 
     case VOUT_DISPLAY_RESET_PICTURES:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
-    case VOUT_DISPLAY_GET_OPENGL:
         /* TODO */
         break;
     }
