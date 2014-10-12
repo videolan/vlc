@@ -80,6 +80,11 @@ typedef struct {
 
 } vout_window_cfg_t;
 
+typedef struct vout_window_owner {
+    void *sys;
+    void (*resized)(vout_window_t *, unsigned width, unsigned height);
+} vout_window_owner_t;
+
 /**
  * FIXME do we need an event system in the window too ?
  * or the window user will take care of it ?
@@ -118,6 +123,8 @@ struct vout_window_t {
      * A module is free to use it as it wishes.
      */
     vout_window_sys_t *sys;
+
+    vout_window_owner_t owner;
 };
 
 /**
@@ -128,7 +135,7 @@ struct vout_window_t {
  / vout_display_NewWindow() and vout_display_DeleteWindow() instead.
  * This enables recycling windows.
  */
-VLC_API vout_window_t * vout_window_New(vlc_object_t *, const char *module, const vout_window_cfg_t *);
+VLC_API vout_window_t * vout_window_New(vlc_object_t *, const char *module, const vout_window_cfg_t *, const vout_window_owner_t *);
 
 /**
  * Deletes a window created by vout_window_New().
@@ -184,6 +191,13 @@ static inline int vout_window_SetSize(vout_window_t *window,
 static inline int vout_window_SetFullScreen(vout_window_t *window, bool full)
 {
     return vout_window_Control(window, VOUT_WINDOW_SET_FULLSCREEN, full);
+}
+
+static inline void vout_window_ReportSize(vout_window_t *window,
+                                          unsigned width, unsigned height)
+{
+    if (window->owner.resized != NULL)
+        window->owner.resized(window, width, height);
 }
 
 #endif /* VLC_VOUT_WINDOW_H */

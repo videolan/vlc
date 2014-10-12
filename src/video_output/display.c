@@ -746,7 +746,8 @@ static vout_window_t *VoutDisplayNewWindow(vout_display_t *vd, const vout_window
         if (!var_InheritBool(osys->vout, "embedded-video"))
             cfg_override.is_standalone = true;
 
-        return vout_window_New(VLC_OBJECT(osys->vout), "$window", &cfg_override);
+        return vout_window_New(VLC_OBJECT(osys->vout), "$window",
+                               &cfg_override, NULL);
     }
 #endif
     return vout_NewDisplayWindow(osys->vout, cfg);
@@ -1445,7 +1446,7 @@ static vout_window_t *SplitterNewWindow(vout_display_t *vd, const vout_window_cf
     vout_window_cfg_t cfg = *cfg_ptr;
     cfg.is_standalone = true;
 
-    return vout_window_New(VLC_OBJECT(osys->vout), "$window", &cfg);
+    return vout_window_New(VLC_OBJECT(osys->vout), "$window", &cfg, NULL);
 }
 
 static void SplitterDelWindow(vout_display_t *vd, vout_window_t *window)

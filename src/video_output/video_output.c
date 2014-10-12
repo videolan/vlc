@@ -173,7 +173,8 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
             .height = cfg->fmt->i_visible_height,
         };
 
-        vout->p->window = vout_window_New(VLC_OBJECT(vout), "$window", &wcfg);
+        vout->p->window = vout_window_New(VLC_OBJECT(vout), "$window", &wcfg,
+                                          NULL);
     } else
         vout->p->window = NULL;
 

@@ -51,9 +51,9 @@ static int vout_window_start(void *func, va_list ap)
     return activate(wnd, cfg);
 }
 
-vout_window_t *vout_window_New(vlc_object_t *obj,
-                               const char *module,
-                               const vout_window_cfg_t *cfg)
+vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
+                               const vout_window_cfg_t *cfg,
+                               const vout_window_owner_t *owner)
 {
     window_t *w = vlc_custom_create(obj, sizeof(*w), "window");
     vout_window_t *window = &w->wnd;
@@ -61,6 +61,11 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
     memset(&window->handle, 0, sizeof(window->handle));
     window->control = NULL;
     window->sys = NULL;
+
+    if (owner != NULL)
+        window->owner = *owner;
+    else
+        window->owner.resized = NULL;
 
     w->module = vlc_module_load(window, "vout window", module,
                                 module && *module,
