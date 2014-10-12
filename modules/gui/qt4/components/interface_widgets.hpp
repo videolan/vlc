@@ -50,6 +50,7 @@ class QPixmap;
 class QHBoxLayout;
 class QMenu;
 class QSlider;
+struct vout_window_t;
 
 /******************** Video Widget ****************/
 class VideoWidget : public QFrame
@@ -59,7 +60,7 @@ public:
     VideoWidget( intf_thread_t * );
     virtual ~VideoWidget();
 
-    WId request( unsigned int *, unsigned int *, bool );
+    WId request( struct vout_window_t *, unsigned int *, unsigned int *, bool );
     void  release( void );
     void  sync( void );
 
@@ -69,8 +70,11 @@ protected:
         return NULL;
     }
 
+    virtual void resizeEvent(QResizeEvent *);
+
 private:
     intf_thread_t *p_intf;
+    vout_window_t *p_window;
 
     QWidget *stable;
     QLayout *layout;

@@ -35,8 +35,6 @@
 
 #include "menus.hpp"             /* Popup menu on bgWidget */
 
-#include <vlc_vout.h>
-
 #include <QLabel>
 #include <QToolButton>
 #include <QPalette>
@@ -64,6 +62,9 @@
 #include <math.h>
 #include <assert.h>
 
+#include <vlc_vout.h>
+#include <vlc_vout_window.h>
+
 /**********************************************************************
  * Video Widget. A simple frame on which video is drawn
  * This class handles resize issues
@@ -78,6 +79,7 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i )
     layout = new QHBoxLayout( this );
     layout->setContentsMargins( 0, 0, 0, 0 );
     stable = NULL;
+    p_window = NULL;
     show();
 }
 
@@ -85,6 +87,7 @@ VideoWidget::~VideoWidget()
 {
     /* Ensure we are not leaking the video output. This would crash. */
     assert( !stable );
+    assert( !p_window );
 }
 
 void VideoWidget::sync( void )
@@ -100,14 +103,16 @@ void VideoWidget::sync( void )
 /**
  * Request the video to avoid the conflicts
  **/
-WId VideoWidget::request( unsigned int *pi_width, unsigned int *pi_height,
-                          bool b_keep_size )
+WId VideoWidget::request( struct vout_window_t *p_wnd, unsigned int *pi_width,
+                          unsigned int *pi_height, bool b_keep_size )
 {
     if( stable )
     {
         msg_Dbg( p_intf, "embedded video already in use" );
         return 0;
     }
+    assert( !p_window );
+
     if( b_keep_size )
     {
         *pi_width  = size().width();
@@ -148,6 +153,7 @@ WId VideoWidget::request( unsigned int *pi_width, unsigned int *pi_height,
     XSelectInput( dpy, w, attr.your_event_mask );
 #endif
     sync();
+    p_window = p_wnd;
     return stable->winId();
 }
 
@@ -168,6 +174,15 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
     sync();
 }
 
+void VideoWidget::resizeEvent( QResizeEvent *event )
+{
+    if( p_window != NULL )
+        vout_window_ReportSize( p_window, event->size().width(),
+                                event->size().height() );
+
+    QWidget::resizeEvent( event );
+}
+
 void VideoWidget::release( void )
 {
     msg_Dbg( p_intf, "Video is not needed anymore" );
@@ -177,6 +192,7 @@ void VideoWidget::release( void )
         layout->removeWidget( stable );
         stable->deleteLater();
         stable = NULL;
+        p_window = NULL;
     }
 
     updateGeometry();

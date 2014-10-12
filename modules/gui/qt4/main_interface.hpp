@@ -55,6 +55,7 @@ class QVBoxLayout;
 class QMenu;
 class QSize;
 class StandardPLPanel;
+struct vout_window_t;
 
 class MainInterface : public QVLCMW
 {
@@ -70,7 +71,8 @@ public:
     static const QEvent::Type ToolbarsNeedRebuild;
 
     /* Video requests from core */
-    WId  getVideo( unsigned int *pi_width, unsigned int *pi_height );
+    WId  getVideo( struct vout_window_t *,
+                   unsigned int *pi_width, unsigned int *pi_height );
     void releaseVideo( void );
     int  controlVideo( int i_query, va_list args );
 
@@ -208,7 +210,8 @@ public slots:
 #endif
 
     /* Manage the Video Functions from the vout threads */
-    void getVideoSlot( WId *p_id, unsigned *pi_width, unsigned *pi_height );
+    void getVideoSlot( WId *p_id, struct vout_window_t *,
+                       unsigned *pi_width, unsigned *pi_height );
     void releaseVideoSlot( void );
 
     void emitBoss();
@@ -259,7 +262,7 @@ private slots:
     void continuePlayback();
 
 signals:
-    void askGetVideo( WId *p_id, unsigned *pi_width, unsigned *pi_height );
+    void askGetVideo( WId *, struct vout_window_t *, unsigned *, unsigned * );
     void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );
     void askVideoSetFullScreen( bool );
