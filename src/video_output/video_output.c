@@ -1265,7 +1265,15 @@ static void ThreadChangeFullscreen(vout_thread_t *vout, bool fullscreen)
 
 static void ThreadChangeWindowState(vout_thread_t *vout, unsigned state)
 {
-    vout_SetWindowState(vout->p->display.vd, state);
+    vout_window_t *window = vout->p->window;
+
+    if (window != NULL)
+        vout_window_SetState(window, state);
+    else
+    if (vout->p->display.vd != NULL)
+        /* FIXME: remove this event, fix MSW and OS/2 window providers */
+        vout_display_SendEvent(vout->p->display.vd,
+                               VOUT_DISPLAY_EVENT_WINDOW_STATE, state);
 }
 
 static void ThreadChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
