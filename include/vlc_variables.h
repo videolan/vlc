@@ -428,7 +428,8 @@ static inline int64_t var_IncInteger( vlc_object_t *p_obj, const char *psz_name 
 {
     vlc_value_t val;
     val.i_int = 1;
-    var_GetAndSet( p_obj, psz_name, VLC_VAR_INTEGER_ADD, &val );
+    if( var_GetAndSet( p_obj, psz_name, VLC_VAR_INTEGER_ADD, &val ) )
+        return 0;
     return val.i_int;
 }
 #define var_IncInteger(a,b) var_IncInteger( VLC_OBJECT(a), b )
@@ -442,7 +443,8 @@ static inline int64_t var_DecInteger( vlc_object_t *p_obj, const char *psz_name 
 {
     vlc_value_t val;
     val.i_int = -1;
-    var_GetAndSet( p_obj, psz_name, VLC_VAR_INTEGER_ADD, &val );
+    if( var_GetAndSet( p_obj, psz_name, VLC_VAR_INTEGER_ADD, &val ) )
+        return 0;
     return val.i_int;
 }
 #define var_DecInteger(a,b) var_DecInteger( VLC_OBJECT(a), b )
@@ -452,7 +454,8 @@ static inline uint64_t var_OrInteger( vlc_object_t *obj, const char *name,
 {
     vlc_value_t val;
     val.i_int = v;
-    var_GetAndSet( obj, name, VLC_VAR_INTEGER_OR, &val );
+    if( var_GetAndSet( obj, name, VLC_VAR_INTEGER_OR, &val ) )
+        return 0;
     return val.i_int;
 }
 #define var_OrInteger(a,b,c) var_OrInteger(VLC_OBJECT(a),b,c)
@@ -462,7 +465,8 @@ static inline uint64_t var_NAndInteger( vlc_object_t *obj, const char *name,
 {
     vlc_value_t val;
     val.i_int = v;
-    var_GetAndSet( obj, name, VLC_VAR_INTEGER_NAND, &val );
+    if( var_GetAndSet( obj, name, VLC_VAR_INTEGER_NAND, &val ) )
+        return 0;
     return val.i_int;
 }
 #define var_NAndInteger(a,b,c) var_NAndInteger(VLC_OBJECT(a),b,c)
@@ -664,7 +668,8 @@ static inline int var_CountChoices( vlc_object_t *p_obj, const char *psz_name )
 static inline bool var_ToggleBool( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val;
-    var_GetAndSet( p_obj, psz_name, VLC_VAR_BOOL_TOGGLE, &val );
+    if( var_GetAndSet( p_obj, psz_name, VLC_VAR_BOOL_TOGGLE, &val ) )
+        return false;
     return val.b_bool;
 }
 #define var_ToggleBool(a,b) var_ToggleBool( VLC_OBJECT(a),b )
