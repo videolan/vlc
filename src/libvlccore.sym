@@ -638,7 +638,6 @@ vout_GetDisplayOpengl
 vout_SetDisplayFullscreen
 vout_SetDisplayFilled
 vout_SetDisplayZoom
-vout_SetWindowState
 vout_SetDisplayAspect
 vout_SetDisplayCrop
 vout_display_GetDefaultDisplaySize
