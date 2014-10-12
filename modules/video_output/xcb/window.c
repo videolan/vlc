@@ -392,6 +392,10 @@ static void ProcessEvent (vout_window_t *wnd, xcb_generic_event_t *ev)
             vout_window_ReportSize (wnd, cne->width, cne->height);
             break;
         }
+        case XCB_DESTROY_NOTIFY:
+            vout_window_ReportClose (wnd);
+            break;
+
         case XCB_MAPPING_NOTIFY:
             break;
 
