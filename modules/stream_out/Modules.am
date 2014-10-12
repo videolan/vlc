@@ -81,6 +81,6 @@ SOURCES_stream_out_chromecast = chromecast/cast_channel.proto chromecast/cast.cp
 nodist_libstream_out_chromecast_plugin_la_SOURCES = chromecast/cast_channel.pb.cc chromecast/cast_channel.pb.h
 
 if BUILD_CHROMECAST
-BUILT_SOURCES += chromecast/cast_channel.pb.cc chromecast/cast_channel.pb.h
+BUILT_SOURCES += chromecast/cast_channel.pb.h
 stream_out_LTLIBRARIES += libstream_out_chromecast_plugin.la
 endif
