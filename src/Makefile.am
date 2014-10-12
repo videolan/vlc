@@ -192,6 +192,9 @@ if HAVE_WIN32
 libvlccore_la_DEPENDENCIES += libvlc_win32_rc.$(OBJEXT)
 libvlccore_la_LDFLAGS += -Wl,libvlc_win32_rc.$(OBJEXT) -avoid-version
 endif
+if HAVE_OS2
+libvlccore_la_LDFLAGS += -avoid-version
+endif
 if HAVE_DBUS
 libvlccore_la_LIBADD += $(DBUS_LIBS)
 endif
