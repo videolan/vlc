@@ -83,6 +83,7 @@ typedef struct {
 typedef struct vout_window_owner {
     void *sys;
     void (*resized)(vout_window_t *, unsigned width, unsigned height);
+    void (*closed)(vout_window_t *);
 } vout_window_owner_t;
 
 /**
@@ -198,6 +199,12 @@ static inline void vout_window_ReportSize(vout_window_t *window,
 {
     if (window->owner.resized != NULL)
         window->owner.resized(window, width, height);
+}
+
+static inline void vout_window_ReportClose(vout_window_t *window)
+{
+    if (window->owner.closed != NULL)
+        window->owner.closed(window);
 }
 
 #endif /* VLC_VOUT_WINDOW_H */
