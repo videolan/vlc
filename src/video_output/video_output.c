@@ -50,6 +50,7 @@
 #include "vout_internal.h"
 #include "interlacing.h"
 #include "display.h"
+#include "window.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -173,8 +174,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
             .height = cfg->fmt->i_visible_height,
         };
 
-        vout->p->window = vout_window_New(VLC_OBJECT(vout), "$window", &wcfg,
-                                          NULL);
+        vout->p->window = vout_display_window_New(vout, &wcfg);
     } else
         vout->p->window = NULL;
 
@@ -642,7 +642,7 @@ vout_window_t * vout_NewDisplayWindow(vout_thread_t *vout,
 void vout_DeleteDisplayWindow(vout_thread_t *vout, vout_window_t *window)
 {
     if (window == NULL && vout->p->window != NULL) {
-        vout_window_Delete(vout->p->window);
+        vout_display_window_Delete(vout->p->window);
         vout->p->window = NULL;
     }
     assert(vout->p->window == window);

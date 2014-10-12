@@ -39,6 +39,7 @@
 #include <libvlc.h>
 
 #include "display.h"
+#include "window.h"
 
 #include "event.h"
 
@@ -734,6 +735,7 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
 static vout_window_t *VoutDisplayNewWindow(vout_display_t *vd, const vout_window_cfg_t *cfg)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_window_t *window;
 
 #ifdef ALLOW_DUMMY_VOUT
     if (!osys->vout->p) {
@@ -742,25 +744,31 @@ static vout_window_t *VoutDisplayNewWindow(vout_display_t *vd, const vout_window
         if (!var_InheritBool(osys->vout, "embedded-video"))
             cfg_override.is_standalone = true;
 
-        return vout_window_New(VLC_OBJECT(osys->vout), "$window",
-                               &cfg_override, NULL);
+        window = vout_display_window_New(osys->vout, &cfg_override);
     }
+    else
 #endif
-    return vout_NewDisplayWindow(osys->vout, cfg);
+        window = vout_NewDisplayWindow(osys->vout, cfg);
+
+    if (window != NULL)
+        vout_display_window_Attach(window, vd);
+    return window;
 }
 
 static void VoutDisplayDelWindow(vout_display_t *vd, vout_window_t *window)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
+    if (window != NULL)
+        vout_display_window_Detach(window);
 #ifdef ALLOW_DUMMY_VOUT
     if (!osys->vout->p) {
         if( window)
-            vout_window_Delete(window);
-        return;
+            vout_display_window_Delete(window);
     }
 #endif
-    vout_DeleteDisplayWindow(osys->vout, window);
+    else
+        vout_DeleteDisplayWindow(osys->vout, window);
 }
 
 static void VoutDisplayFitWindow(vout_display_t *vd, bool default_size)
@@ -1434,17 +1442,23 @@ struct video_splitter_owner_t {
 static vout_window_t *SplitterNewWindow(vout_display_t *vd, const vout_window_cfg_t *cfg_ptr)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_window_t *window;
 
     vout_window_cfg_t cfg = *cfg_ptr;
     cfg.is_standalone = true;
 
-    return vout_window_New(VLC_OBJECT(osys->vout), "$window", &cfg, NULL);
+    window = vout_display_window_New(osys->vout, &cfg);
+    if (window != NULL)
+        vout_display_window_Attach(window, vd);
+    return window;
 }
 
 static void SplitterDelWindow(vout_display_t *vd, vout_window_t *window)
 {
-    if (window != NULL)
-        vout_window_Delete(window);
+    if (window != NULL) {
+        vout_display_window_Detach(window);
+        vout_display_window_Delete(window);
+    }
     (void) vd;
 }
 
