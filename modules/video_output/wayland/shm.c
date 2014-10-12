@@ -278,12 +278,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             return vout_window_SetFullScreen(sys->embed, cfg->is_fullscreen);
         }
 
-        case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
-        {
-            unsigned state = va_arg(ap, unsigned);
-            return vout_window_SetState(sys->embed, state);
-        }
-
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         case VOUT_DISPLAY_CHANGE_ZOOM:

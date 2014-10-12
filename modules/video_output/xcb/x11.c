@@ -495,11 +495,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                               values);
         return VLC_SUCCESS;
     }
-    case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
-    {
-        unsigned state = va_arg (ap, unsigned);
-        return vout_window_SetState (sys->embed, state);
-    }
 
     case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:

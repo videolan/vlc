@@ -463,12 +463,7 @@ static int Control( vout_display_t *vd, int query, va_list args )
         const unsigned state = va_arg( args, unsigned );
         const bool is_on_top = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
 
-        if( sys->parent_window )
-        {
-            if( vout_window_SetState( sys->parent_window, state ))
-                return VLC_EGENERIC;
-        }
-        else if( is_on_top )
+        if( is_on_top )
             WinSetWindowPos( sys->frame, HWND_TOP, 0, 0, 0, 0, SWP_ZORDER );
 
         sys->is_on_top = is_on_top;

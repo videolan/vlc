@@ -788,11 +788,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         xcb_flush (p_sys->conn);
         return VLC_SUCCESS;
     }
-    case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
-    {
-        unsigned state = va_arg (ap, unsigned);
-        return vout_window_SetState (p_sys->embed, state);
-    }
 
     /* Hide the mouse. It will be send when
      * vout_display_t::info.b_hide_mouse is false */
