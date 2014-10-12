@@ -189,7 +189,9 @@ enum {
     VOUT_DISPLAY_EVENT_PICTURES_INVALID,    /* The buffer are now invalid and need to be changed */
 
     VOUT_DISPLAY_EVENT_FULLSCREEN,
+#if defined(_WIN32) || defined(__OS2__)
     VOUT_DISPLAY_EVENT_WINDOW_STATE,
+#endif
 
     VOUT_DISPLAY_EVENT_DISPLAY_SIZE,        /* The display size need to change : int i_width, int i_height */
 
@@ -360,10 +362,12 @@ static inline void vout_display_SendEventFullscreen(vout_display_t *vd, bool is_
 {
     vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_FULLSCREEN, is_fullscreen);
 }
+#if defined(_WIN32)
 static inline void vout_display_SendWindowState(vout_display_t *vd, unsigned state)
 {
     vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_WINDOW_STATE, state);
 }
+#endif
 /* The mouse position (State and Moved event) must be expressed against vout_display_t::source unit */
 static inline void vout_display_SendEventMouseState(vout_display_t *vd, int x, int y, int button_mask)
 {

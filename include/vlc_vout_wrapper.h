@@ -62,7 +62,9 @@ static inline void vout_display_Display(vout_display_t *vd,
  */
 typedef struct {
     vout_display_cfg_t cfg;
+#if defined(_WIN32) || defined(__OS2__)
     unsigned wm_state;
+#endif
     struct {
         int num;
         int den;

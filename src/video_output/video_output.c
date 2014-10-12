@@ -1269,11 +1269,12 @@ static void ThreadChangeWindowState(vout_thread_t *vout, unsigned state)
 
     if (window != NULL)
         vout_window_SetState(window, state);
-    else
+#if defined(_WIN32) || defined(__OS2__)
+    else /* FIXME: remove this event */
     if (vout->p->display.vd != NULL)
-        /* FIXME: remove this event, fix MSW and OS/2 window providers */
         vout_display_SendEvent(vout->p->display.vd,
                                VOUT_DISPLAY_EVENT_WINDOW_STATE, state);
+#endif
 }
 
 static void ThreadChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
@@ -1353,12 +1354,14 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
         var_Create(vout, "video-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
         VoutGetDisplayCfg(vout, &state_default.cfg, vout->p->display.title);
 
+#if defined(_WIN32) || defined(__OS2__)
         bool below = var_InheritBool(vout, "video-wallpaper");
         bool above = var_CreateGetBool(vout, "video-on-top");
 
         state_default.wm_state = below ? VOUT_WINDOW_STATE_BELOW
                                : above ? VOUT_WINDOW_STATE_ABOVE
                                : VOUT_WINDOW_STATE_NORMAL;
+#endif
         state_default.sar.num = 0;
         state_default.sar.den = 0;
 

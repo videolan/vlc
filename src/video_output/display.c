@@ -337,7 +337,6 @@ struct vout_display_owner_sys_t {
 
     /* */
     vout_display_cfg_t cfg;
-    unsigned     wm_state_initial;
     struct {
         unsigned num;
         unsigned den;
@@ -361,10 +360,11 @@ struct vout_display_owner_sys_t {
         unsigned num;
         unsigned den;
     } zoom;
-
+#if defined(_WIN32) || defined(__OS2__)
     bool ch_wm_state;
     unsigned wm_state;
-
+    unsigned wm_state_initial;
+#endif
     bool ch_sar;
     struct {
         unsigned num;
@@ -681,7 +681,7 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         vlc_mutex_unlock(&osys->lock);
         break;
     }
-
+#if defined(_WIN32) || defined(__OS2__)
     case VOUT_DISPLAY_EVENT_WINDOW_STATE: {
         const unsigned state = va_arg(args, unsigned);
 
@@ -695,7 +695,7 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         vlc_mutex_unlock(&osys->lock);
         break;
     }
-
+#endif
     case VOUT_DISPLAY_EVENT_DISPLAY_SIZE: {
         const int width  = (int)va_arg(args, int);
         const int height = (int)va_arg(args, int);
@@ -857,9 +857,11 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         bool is_fullscreen  = osys->is_fullscreen;
         osys->ch_fullscreen = false;
 
+#if defined(_WIN32) || defined(__OS2__)
         bool ch_wm_state  = osys->ch_wm_state;
         unsigned wm_state  = osys->wm_state;
         osys->ch_wm_state = false;
+#endif
 
         bool ch_display_size       = osys->ch_display_size;
         int  display_width         = osys->display_width;
@@ -881,7 +883,9 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             !reset_pictures &&
             !osys->ch_display_filled &&
             !osys->ch_zoom &&
+#if defined(_WIN32) || defined(__OS2__)
             !ch_wm_state &&
+#endif
             !osys->ch_sar &&
             !osys->ch_crop) {
 
@@ -980,6 +984,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
             vout_SendEventZoom(osys->vout, osys->cfg.zoom.num, osys->cfg.zoom.den);
         }
+#if defined(_WIN32) || defined(__OS2__)
         /* */
         if (ch_wm_state) {
             if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE, wm_state)) {
@@ -991,6 +996,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             /* */
             vout_SendEventOnTop(osys->vout, osys->wm_state_initial);
         }
+#endif
         /* */
         if (osys->ch_sar) {
             video_format_t source = vd->source;
@@ -1286,7 +1292,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vout_display_cfg_t *cfg = &osys->cfg;
 
     *cfg = state->cfg;
-    osys->wm_state_initial = -1;
     osys->sar_initial.num = state->sar.num;
     osys->sar_initial.den = state->sar.den;
     vout_display_GetDefaultDisplaySize(&cfg->display.width, &cfg->display.height,
@@ -1317,9 +1322,14 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
                                            &osys->height_saved,
                                            source, &cfg_windowed);
     }
+
     osys->zoom.num = cfg->zoom.num;
     osys->zoom.den = cfg->zoom.den;
+#if defined(_WIN32) || defined(__OS2__)
+    osys->wm_state_initial = VOUT_WINDOW_STATE_NORMAL;
     osys->wm_state = state->wm_state;
+    osys->ch_wm_state = true;
+#endif
     osys->fit_window = 0;
     osys->event.fifo = NULL;
 
@@ -1363,8 +1373,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     if (osys->sar.num != source->i_sar_num ||
         osys->sar.den != source->i_sar_den)
         osys->ch_sar = true;
-    if (osys->wm_state != osys->wm_state_initial)
-        osys->ch_wm_state = true;
 
     return p_display;
 }
@@ -1376,7 +1384,9 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_state_t *state)
     if (state) {
         if (!osys->is_wrapper )
             state->cfg = osys->cfg;
+#if defined(_WIN32) || defined(__OS2__)
         state->wm_state = osys->wm_state;
+#endif
         state->sar.num  = osys->sar_initial.num;
         state->sar.den  = osys->sar_initial.den;
     }
