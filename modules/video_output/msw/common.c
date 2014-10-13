@@ -472,7 +472,7 @@ static int CommonControlSetFullscreen(vout_display_t *vd, bool is_fullscreen)
 
     /* */
     if (sys->parent_window)
-        return vout_window_SetFullScreen(sys->parent_window, is_fullscreen);
+        return VLC_EGENERIC;
 
     /* */
     HWND hwnd = sys->hparent && sys->hfswnd ? sys->hfswnd : sys->hwnd;

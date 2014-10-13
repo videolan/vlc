@@ -310,12 +310,6 @@ found_format:;
     vd->control = Control;
     vd->manage = Manage;
 
-    /* */
-    bool is_fullscreen = vd->cfg->is_fullscreen;
-    if (is_fullscreen && vout_window_SetFullScreen (sys->embed, true))
-        is_fullscreen = false;
-    vout_display_SendEventFullscreen (vd, is_fullscreen);
-
     return VLC_SUCCESS;
 
 error:

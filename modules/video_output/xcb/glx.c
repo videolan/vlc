@@ -128,12 +128,6 @@ static int Open (vlc_object_t *obj)
     vd->control = Control;
     vd->manage = Manage;
 
-    /* */
-    bool fs = vd->cfg->is_fullscreen;
-    if (vout_window_SetFullScreen (surface, fs))
-        fs = false;
-    vout_display_SendEventFullscreen (vd, fs);
-
     return VLC_SUCCESS;
 
 error:

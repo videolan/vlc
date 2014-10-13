@@ -150,11 +150,6 @@ static int Open (vlc_object_t *obj)
     if (sys->vgl == NULL)
         goto error;
 
-    bool fs = vd->cfg->is_fullscreen;
-    if (vout_window_SetFullScreen (sys->gl->surface, fs))
-        fs = false;
-    vout_display_SendEventFullscreen (vd, fs);
-
     vd->sys = sys;
     vd->info.has_pictures_invalid = false;
     vd->info.has_event_thread = false;
