@@ -149,8 +149,10 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
+    vlc_mutex_destroy( &p_sys->cyclic_block_mutex );
+    vlc_mutex_destroy( &p_sys->lock );
     vlc_sem_destroy( &p_sys->ready );
-    free (p_sys );
+    free( p_sys );
     return VLC_EGENERIC;
 }
 
@@ -171,6 +173,7 @@ static void Close( vlc_object_t *p_this )
 
     /* Free the ressources */
     vlc_sem_destroy( &p_sys->ready );
+    vlc_mutex_destroy( &p_sys->cyclic_block_mutex );
     vlc_mutex_destroy( &p_sys->lock );
     delete p_sys->vsxu_cyclic_buffer;
     free( p_sys );
