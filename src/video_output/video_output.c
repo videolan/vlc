@@ -174,7 +174,15 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
             .height = cfg->fmt->i_visible_height,
         };
 
-        vout->p->window = vout_display_window_New(vout, &wcfg);
+        vout_window_t *window = vout_display_window_New(vout, &wcfg);
+        if (window != NULL)
+        {
+            if (var_InheritBool(vout, "video-wallpaper"))
+                vout_window_SetState(window, VOUT_WINDOW_STATE_BELOW);
+            else if (var_InheritBool(vout, "video-on-top"))
+                vout_window_SetState(window, VOUT_WINDOW_STATE_ABOVE);
+        }
+        vout->p->window = window;
     } else
         vout->p->window = NULL;
 
