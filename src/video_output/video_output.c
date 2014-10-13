@@ -1351,12 +1351,11 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
 
     vout_display_state_t state_default;
     if (!state) {
-        var_Create(vout, "video-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
         VoutGetDisplayCfg(vout, &state_default.cfg, vout->p->display.title);
 
 #if defined(_WIN32) || defined(__OS2__)
         bool below = var_InheritBool(vout, "video-wallpaper");
-        bool above = var_CreateGetBool(vout, "video-on-top");
+        bool above = var_InheritBool(vout, "video-on-top");
 
         state_default.wm_state = below ? VOUT_WINDOW_STATE_BELOW
                                : above ? VOUT_WINDOW_STATE_ABOVE
