@@ -204,6 +204,7 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
+    vlc_mutex_destroy( &p_sys->lock );
     vlc_sem_destroy( &p_sys->ready );
     free (p_sys );
     return VLC_EGENERIC;
