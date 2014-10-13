@@ -308,6 +308,7 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     /* Initialize OpenGL callbacks */
     gl->makeCurrent = MakeCurrent;
     gl->releaseCurrent = ReleaseCurrent;
+    gl->resize = NULL;
     gl->swap = SwapBuffers;
     gl->getProcAddress = GetSymbol;
     gl->lock = NULL;

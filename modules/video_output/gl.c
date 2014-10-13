@@ -123,6 +123,8 @@ static int Open (vlc_object_t *obj)
     if (sys->gl == NULL)
         goto error;
 
+    vlc_gl_Resize (sys->gl, cfg.width, cfg.height);
+
     /* Initialize video display */
     const vlc_fourcc_t *spu_chromas;
 
@@ -233,6 +235,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         vout_display_place_t place;
 
         vout_display_PlacePicture (&place, src, c, false);
+        vlc_gl_Resize (sys->gl, place.width, place.height);
         vlc_gl_MakeCurrent (sys->gl);
         glViewport (place.x, place.y, place.width, place.height);
         vlc_gl_ReleaseCurrent (sys->gl);

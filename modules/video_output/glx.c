@@ -205,6 +205,7 @@ static int Open (vlc_object_t *obj)
     gl->sys = sys;
     gl->makeCurrent = MakeCurrent;
     gl->releaseCurrent = ReleaseCurrent;
+    gl->resize = NULL;
     gl->swap = SwapBuffers;
     gl->getProcAddress = GetSymbol;
     gl->lock = NULL;

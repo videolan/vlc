@@ -133,8 +133,10 @@ vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *obj,
     vlc_gl_t *gl = vlc_gl_Create(surface, VLC_OPENGL, "glx");
     if (gl == NULL) {
         vout_window_Delete(surface);
-        goto error;
+        return NULL;
     }
+
+    vlc_gl_Resize(gl, cfg->width, cfg->height);
     return gl;
 
 error:
@@ -165,6 +167,8 @@ bool vlc_gl_surface_CheckSize(vlc_gl_t *gl, unsigned *restrict width,
         *height = sys->height;
         sys->width = -1;
         sys->height = -1;
+
+        vlc_gl_Resize(gl, *width, *height);
         ret = true;
     }
     vlc_mutex_unlock(&sys->lock);

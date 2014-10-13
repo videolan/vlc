@@ -47,6 +47,7 @@ struct vlc_gl_t
 
     int  (*makeCurrent)(vlc_gl_t *);
     void (*releaseCurrent)(vlc_gl_t *);
+    void (*resize)(vlc_gl_t *, unsigned, unsigned);
     void (*swap)(vlc_gl_t *);
     int  (*lock)(vlc_gl_t *);
     void (*unlock)(vlc_gl_t *);
@@ -81,6 +82,12 @@ static inline void vlc_gl_Unlock(vlc_gl_t *gl)
 {
     if (gl->unlock != NULL)
         gl->unlock(gl);
+}
+
+static inline void vlc_gl_Resize(vlc_gl_t *gl, unsigned w, unsigned h)
+{
+    if (gl->resize != NULL)
+        gl->resize(gl, w, h);
 }
 
 static inline void vlc_gl_Swap(vlc_gl_t *gl)
