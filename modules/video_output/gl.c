@@ -93,30 +93,6 @@ static void PictureRender (vout_display_t *, picture_t *, subpicture_t *);
 static void PictureDisplay (vout_display_t *, picture_t *, subpicture_t *);
 static int Control (vout_display_t *, int, va_list);
 
-static vout_window_t *MakeWindow (vout_display_t *vd)
-{
-    vout_window_cfg_t cfg = {
-        .width = vd->cfg->display.width,
-        .height = vd->cfg->display.height,
-    };
-    vout_window_t *wnd;
-
-#if defined(_WIN32)
-    cfg.type = VOUT_WINDOW_TYPE_HWND;
-#elif defined(__ANDROID__)
-    cfg.type = VOUT_WINDOW_TYPE_ANDROID_NATIVE;
-#else
-    cfg.type = VOUT_WINDOW_TYPE_XID;
-#endif
-
-    wnd = vout_display_NewWindow (vd, &cfg);
-    if (wnd != NULL)
-        return wnd;
-
-    msg_Err (vd, "parent window not available");
-    return NULL;
-}
-
 /**
  * Allocates a surface and an OpenGL context for video output.
  */
@@ -130,9 +106,18 @@ static int Open (vlc_object_t *obj)
     sys->gl = NULL;
     sys->pool = NULL;
 
-    vout_window_t *surface = MakeWindow (vd);
+    vout_window_cfg_t cfg = {
+        .type = VOUT_WINDOW_TYPE_INVALID, /* any */
+        .width = vd->cfg->display.width,
+        .height = vd->cfg->display.height,
+    };
+
+    vout_window_t *surface = vout_display_NewWindow (vd, &cfg);
     if (surface == NULL)
+    {
+        msg_Err (vd, "parent window not available");
         goto error;
+    }
 
     sys->gl = vlc_gl_Create (surface, API, "$" MODULE_VARNAME);
     if (sys->gl == NULL)
