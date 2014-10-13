@@ -310,8 +310,6 @@ static void *Thread( void *p_data )
     projectM::Settings settings;
 #endif
 
-    vlc_savecancel();
-
     /* Create the openGL provider */
     p_sys->p_vout =
         (vout_thread_t *)vlc_object_create( p_filter, sizeof(vout_thread_t) );
