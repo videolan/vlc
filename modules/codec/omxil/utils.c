@@ -408,6 +408,8 @@ static const struct
     { VLC_CODEC_RV20, OMX_VIDEO_CodingRV,    "video_decoder.rv"    },
     { VLC_CODEC_RV30, OMX_VIDEO_CodingRV,    "video_decoder.rv"    },
     { VLC_CODEC_RV40, OMX_VIDEO_CodingRV,    "video_decoder.rv"    },
+    { VLC_CODEC_VP8,  OMX_VIDEO_CodingAutoDetect, "video_decoder.vp8" },
+    { VLC_CODEC_VP9,  OMX_VIDEO_CodingAutoDetect, "video_decoder.vp9" },
     { 0, 0, 0 }
 };
 
