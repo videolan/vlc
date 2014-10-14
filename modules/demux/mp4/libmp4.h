@@ -93,6 +93,7 @@
 #define ATOM_mfra VLC_FOURCC( 'm', 'f', 'r', 'a' )
 #define ATOM_mfro VLC_FOURCC( 'm', 'f', 'r', 'o' )
 #define ATOM_tfra VLC_FOURCC( 't', 'f', 'r', 'a' )
+#define ATOM_keys VLC_FOURCC( 'k', 'e', 'y', 's' )
 
 #define ATOM_nmhd VLC_FOURCC( 'n', 'm', 'h', 'd' )
 #define ATOM_mp2v VLC_FOURCC( 'm', 'p', '2', 'v' )
@@ -1193,6 +1194,16 @@ typedef struct
 
 typedef struct
 {
+    uint32_t i_entry_count;
+    struct
+    {
+        uint32_t i_namespace;
+        char    *psz_value;
+    } *p_entries;
+} MP4_Box_data_keys_t;
+
+typedef struct
+{
     uint32_t i_track_number;
     uint32_t i_track_total;
 
@@ -1347,6 +1358,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_dvc1_t *p_dvc1;
     MP4_Box_data_chan_t *p_chan;
     MP4_Box_data_enda_t *p_enda;
+    MP4_Box_data_keys_t *p_keys;
     MP4_Box_data_gnre_t *p_gnre;
     MP4_Box_data_trkn_t *p_trkn;
     MP4_Box_data_iods_t *p_iods;

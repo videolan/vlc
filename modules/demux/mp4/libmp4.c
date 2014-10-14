@@ -3090,6 +3090,60 @@ static void MP4_FreeBox_tref_generic( MP4_Box_t *p_box )
     FREENULL( p_box->data.p_tref_generic->i_track_ID );
 }
 
+static int MP4_ReadBox_keys( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_keys_t );
+
+    if ( i_read < 8 )
+        MP4_READBOX_EXIT( 0 );
+
+    uint32_t i_count;
+    MP4_GET4BYTES( i_count ); /* reserved + flags */
+    if ( i_count != 0 )
+        MP4_READBOX_EXIT( 0 );
+
+    MP4_GET4BYTES( i_count );
+    p_box->data.p_keys->p_entries = calloc( i_count, sizeof(*p_box->data.p_keys->p_entries) );
+    if ( !p_box->data.p_keys->p_entries )
+        MP4_READBOX_EXIT( 0 );
+    p_box->data.p_keys->i_entry_count = i_count;
+
+    uint32_t i=0;
+    for( ; i < i_count; i++ )
+    {
+        if ( i_read < 8 )
+            break;
+        uint32_t i_keysize;
+        MP4_GET4BYTES( i_keysize );
+        if ( (i_keysize < 8) || (i_keysize - 4 > i_read) )
+            break;
+        MP4_GETFOURCC( p_box->data.p_keys->p_entries[i].i_namespace );
+        i_keysize -= 8;
+        p_box->data.p_keys->p_entries[i].psz_value = malloc( i_keysize + 1 );
+        if ( !p_box->data.p_keys->p_entries[i].psz_value )
+            break;
+        memcpy( p_box->data.p_keys->p_entries[i].psz_value, p_peek, i_keysize );
+        p_box->data.p_keys->p_entries[i].psz_value[i_keysize] = 0;
+        p_peek += i_keysize;
+        i_read -= i_keysize;
+#ifdef MP4_ULTRA_VERBOSE
+        msg_Dbg( p_stream, "read box: \"keys\": %u '%s'", i + 1,
+                 p_box->data.p_keys->p_entries[i].p_value );
+#endif
+    }
+    if ( i < i_count )
+        p_box->data.p_keys->i_entry_count = i;
+
+    MP4_READBOX_EXIT( 1 );
+}
+
+static void MP4_FreeBox_keys( MP4_Box_t *p_box )
+{
+    for( uint32_t i=0; i<p_box->data.p_keys->i_entry_count; i++ )
+        free( p_box->data.p_keys->p_entries[i].psz_value );
+    free( p_box->data.p_keys->p_entries );
+}
+
 static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
 {
     uint8_t meta_data[8];
@@ -3544,6 +3598,7 @@ static const struct
     { ATOM_enda,    MP4_ReadBox_enda,         MP4_FreeBox_Common, 0 },
     { ATOM_iods,    MP4_ReadBox_iods,         MP4_FreeBox_Common, 0 },
     { ATOM_pasp,    MP4_ReadBox_pasp,         MP4_FreeBox_Common, 0 },
+    { ATOM_keys,    MP4_ReadBox_keys,         MP4_FreeBox_keys,   ATOM_meta },
 
     /* Nothing to do with this box */
     { ATOM_mdat,    MP4_ReadBoxSkip,          MP4_FreeBox_Common, 0 },
