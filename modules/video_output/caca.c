@@ -88,6 +88,8 @@ static int Open(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
 
+    if (vout_display_IsWindowed(vd))
+        return VLC_EGENERIC;
 #if !defined(__APPLE__) && !defined(_WIN32)
 # ifndef X_DISPLAY_MISSING
     if (!vlc_xlib_init(object))
@@ -166,7 +168,6 @@ static int Open(vlc_object_t *object)
         msg_Err(vd, "cannot initialize libcaca");
         goto error;
     }
-    vout_display_DeleteWindow(vd, NULL);
 
     if (vd->cfg->display.title)
         caca_set_display_title(sys->dp,
