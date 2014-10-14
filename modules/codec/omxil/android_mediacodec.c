@@ -400,7 +400,7 @@ static int OpenDecoder(vlc_object_t *p_this)
             msg_Warn(p_dec, "Exception occurred in MediaCodecInfo.getCapabilitiesForType");
             (*env)->ExceptionClear(env);
             (*env)->DeleteLocalRef(env, info);
-            break;
+            continue;
         } else if (codec_capabilities) {
             profile_levels = (*env)->GetObjectField(env, codec_capabilities, p_sys->profile_levels_field);
             if (profile_levels)
