@@ -37,7 +37,9 @@
 
 #include "utils.h"
 
-extern JavaVM *myVm;
+#define THREAD_NAME "ANativeWindow"
+extern int jni_attach_thread(JNIEnv **env, const char *thread_name);
+extern void jni_detach_thread();
 extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void jni_UnlockAndroidSurface();
 extern void  jni_SetAndroidSurfaceSize(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
@@ -89,9 +91,9 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
         goto error;
 
     JNIEnv *p_env;
-    (*myVm)->AttachCurrentThread(myVm, &p_env, NULL);
+    jni_attach_thread(&p_env, THREAD_NAME);
     p_sys->window = p_sys->native_window.winFromSurface(p_env, javaSurface); // ANativeWindow_fromSurface call.
-    (*myVm)->DetachCurrentThread(myVm);
+    jni_detach_thread();
 
     jni_UnlockAndroidSurface();
 

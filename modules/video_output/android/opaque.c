@@ -50,7 +50,9 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 vlc_module_end()
 
-extern JavaVM *myVm;
+#define THREAD_NAME "vout_mediacodec"
+extern int jni_attach_thread(JNIEnv **env, const char *thread_name);
+extern void jni_detach_thread();
 extern jobject jni_LockAndGetSubtitlesSurface();
 extern void  jni_UnlockAndroidSurface();
 
@@ -124,9 +126,9 @@ static void DisplaySubpicture(vout_display_t *vd, subpicture_t *subpicture)
     if (!sys->window)
     {
         JNIEnv *p_env;
-        (*myVm)->AttachCurrentThread(myVm, &p_env, NULL);
+        jni_attach_thread(&p_env, THREAD_NAME);
         sys->window = sys->native_window.winFromSurface(p_env, jsurf);
-        (*myVm)->DetachCurrentThread(myVm);
+        jni_detach_thread();
     }
 
     ANativeWindow_Buffer buf = { 0 };

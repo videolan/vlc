@@ -73,7 +73,9 @@ vlc_module_end()
  * JNI prototypes
  *****************************************************************************/
 
-extern JavaVM *myVm;
+#define THREAD_NAME "AndroidSurface"
+extern int jni_attach_thread(JNIEnv **env, const char *thread_name);
+extern void jni_detach_thread();
 extern void *jni_LockAndGetAndroidSurface();
 extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void  jni_UnlockAndroidSurface();
@@ -370,9 +372,9 @@ static int  AndroidLockSurface(picture_t *picture)
         sys->jsurf = jsurf;
         if (!sys->window) {
             JNIEnv *p_env;
-            (*myVm)->AttachCurrentThread(myVm, &p_env, NULL);
+            jni_attach_thread(&p_env, THREAD_NAME);
             sys->window = sys->native_window.winFromSurface(p_env, jsurf);
-            (*myVm)->DetachCurrentThread(myVm);
+            jni_detach_thread();
         }
         // Using sys->window instead of the native surface object
         // as parameter to the unlock function
