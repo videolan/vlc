@@ -986,7 +986,12 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         jobject buf = (*env)->GetObjectArrayElement(env, p_sys->input_buffers, index);
         jsize size = (*env)->GetDirectBufferCapacity(env, buf);
         uint8_t *bufptr = (*env)->GetDirectBufferAddress(env, buf);
-        if (size > p_block->i_buffer)
+        if (size < 0) {
+            msg_Err(p_dec, "Java buffer has invalid size");
+            p_sys->error_state = true;
+            break;
+        }
+        if ((size_t) size > p_block->i_buffer)
             size = p_block->i_buffer;
         memcpy(bufptr, p_block->p_buffer, size);
 
