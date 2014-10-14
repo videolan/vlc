@@ -81,6 +81,7 @@ check_tar
 check ragel
 check_sed
 check protoc
+check ant
 
 [ -n "$NEEDED" ] && mkdir -p build/
 
