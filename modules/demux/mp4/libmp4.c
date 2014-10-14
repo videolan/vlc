@@ -3533,6 +3533,7 @@ static const struct
     { ATOM_esds,    MP4_ReadBox_esds,         MP4_FreeBox_esds, ATOM_wave }, /* mp4a in wave chunk */
     { ATOM_esds,    MP4_ReadBox_esds,         MP4_FreeBox_esds, ATOM_mp4a },
     { ATOM_esds,    MP4_ReadBox_esds,         MP4_FreeBox_esds, ATOM_mp4v },
+    { ATOM_esds,    MP4_ReadBox_esds,         MP4_FreeBox_esds, ATOM_mp4s },
     { ATOM_dcom,    MP4_ReadBox_dcom,         MP4_FreeBox_Common, 0 },
     { ATOM_cmvd,    MP4_ReadBox_cmvd,         MP4_FreeBox_cmvd, 0 },
     { ATOM_avcC,    MP4_ReadBox_avcC,         MP4_FreeBox_avcC, ATOM_avc1 },
@@ -3634,7 +3635,7 @@ static const struct
     { ATOM_ASF ,    MP4_ReadBox_ASF,          MP4_FreeBox_Common,      ATOM_WMV3 }, /* flip4mac */
     { ATOM_ASF ,    MP4_ReadBox_ASF,          MP4_FreeBox_Common,      ATOM_wave }, /* flip4mac */
 
-    { ATOM_mp4s,    MP4_ReadBox_sample_mp4s,  MP4_FreeBox_Common, 0 },
+    { ATOM_mp4s,    MP4_ReadBox_sample_mp4s,  MP4_FreeBox_Common,      ATOM_stsd },
 
     /* XXX there is 2 box where we could find this entry stbl and tref*/
     { ATOM_hint,    MP4_ReadBox_default,      MP4_FreeBox_Common, 0 },
