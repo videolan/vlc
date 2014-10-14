@@ -121,6 +121,10 @@ static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
 static int Open(vlc_object_t *this)
 {
     vout_display_t *vd = (vout_display_t *)this;
+
+    if (vout_display_IsWindowed(vd))
+        return VLC_EGENERIC;
+
     vout_display_sys_t *sys = calloc (1, sizeof(*sys));
     NSAutoreleasePool *autoreleasePool = nil;
 
@@ -137,8 +141,6 @@ static int Open(vlc_object_t *this)
     UIView* viewContainer = var_CreateGetAddress (vd, "drawable-nsobject");
     if (!viewContainer || ![viewContainer isKindOfClass:[UIView class]])
         goto bailout;
-
-    vout_display_DeleteWindow (vd, NULL);
 
     /* This will be released in Close(), on
      * main thread, after we are done using it. */
