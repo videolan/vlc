@@ -76,6 +76,9 @@ static int Open(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
 
+    if (vout_display_IsWindowed(vd))
+        return VLC_EGENERIC;
+
     vd->sys = sys = calloc(1, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
@@ -110,8 +113,6 @@ static int Open(vlc_object_t *object)
     int height;
 
     primary->GetSize(primary, &width, &height);
-
-    vout_display_DeleteWindow(vd, NULL);
 
     /* */
     video_format_t fmt;
