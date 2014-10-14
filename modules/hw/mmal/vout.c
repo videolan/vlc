@@ -185,6 +185,9 @@ static int Open(vlc_object_t *object)
     int ret = VLC_SUCCESS;
     unsigned i;
 
+    if (vout_display_IsWindowed(vd))
+        return VLC_EGENERIC;
+
     sys = calloc(1, sizeof(struct vout_display_sys_t));
     if (!sys)
         return VLC_ENOMEM;
