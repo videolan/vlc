@@ -742,10 +742,10 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                     p_sys->inflight_picture[index] = p_pic;
                 } else {
                     jobject buf = (*env)->GetObjectArrayElement(env, p_sys->output_buffers, index);
-                    jsize buf_size = (*env)->GetDirectBufferCapacity(env, buf);
+                    //jsize buf_size = (*env)->GetDirectBufferCapacity(env, buf);
                     uint8_t *ptr = (*env)->GetDirectBufferAddress(env, buf);
 
-                    int size = (*env)->GetIntField(env, p_sys->buffer_info, p_sys->size_field);
+                    //int size = (*env)->GetIntField(env, p_sys->buffer_info, p_sys->size_field);
                     int offset = (*env)->GetIntField(env, p_sys->buffer_info, p_sys->offset_field);
                     ptr += offset; // Check the size parameter as well
 
