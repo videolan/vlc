@@ -405,6 +405,25 @@ static inline void vout_display_DeleteWindow(vout_display_t *vd,
     vd->owner.window_del(vd, window);
 }
 
+static inline bool vout_display_IsWindowed(vout_display_t *vd)
+{
+#ifndef __cplusplus
+    vout_window_cfg_t cfg = {
+        .width = vd->cfg->display.width,
+        .height = vd->cfg->display.height,
+    };
+#else
+    vout_window_cfg_t cfg;
+    memset(&cfg, 0, sizeof (cfg));
+    cfg.width = vd->cfg->display.width;
+    cfg.height = vd->cfg->display.height;
+#endif
+    vout_window_t *window = vout_display_NewWindow(vd, &cfg);
+    if (window != NULL)
+        vout_display_DeleteWindow(vd, window);
+    return window != NULL;
+}
+
 /**
  * Computes the default display size given the source and
  * the display configuration.
