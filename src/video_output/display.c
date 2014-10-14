@@ -43,10 +43,6 @@
 
 #include "event.h"
 
-/* It must be present as long as a vout_display_t must be created using a dummy
- * vout (as an opengl provider) */
-#define ALLOW_DUMMY_VOUT
-
 static void SplitterClose(vout_display_t *vd);
 
 /*****************************************************************************
@@ -418,13 +414,7 @@ struct vout_display_owner_sys_t {
         vlc_thread_t thread;
         block_fifo_t *fifo;
     } event;
-
-#ifdef ALLOW_DUMMY_VOUT
-    vlc_mouse_t vout_mouse;
-#endif
 };
-
-static void DummyVoutSendDisplayEventMouse(vout_thread_t *, vlc_mouse_t *fallback, const vlc_mouse_t *m);
 
 static void VoutDisplayCreateRender(vout_display_t *vd)
 {
@@ -592,11 +582,7 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
 
     /* */
     vout_SendEventMouseVisible(osys->vout);
-#ifdef ALLOW_DUMMY_VOUT
-    DummyVoutSendDisplayEventMouse(osys->vout, &osys->vout_mouse, &m);
-#else
     vout_SendDisplayEventMouse(osys->vout, &m);
-#endif
     vlc_mutex_unlock(&osys->lock);
 }
 
@@ -733,21 +719,7 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
 static vout_window_t *VoutDisplayNewWindow(vout_display_t *vd, const vout_window_cfg_t *cfg)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
-    vout_window_t *window;
-
-#ifdef ALLOW_DUMMY_VOUT
-    if (!osys->vout->p) {
-        vout_window_cfg_t cfg_override = *cfg;
-
-        if (!var_InheritBool(osys->vout, "embedded-video"))
-            cfg_override.is_standalone = true;
-
-        window = vout_display_window_New(osys->vout, &cfg_override);
-    }
-    else
-#endif
-        window = vout_NewDisplayWindow(osys->vout, cfg);
-
+    vout_window_t *window = vout_NewDisplayWindow(osys->vout, cfg);
     if (window != NULL)
         vout_display_window_Attach(window, vd);
     return window;
@@ -759,14 +731,7 @@ static void VoutDisplayDelWindow(vout_display_t *vd, vout_window_t *window)
 
     if (window != NULL)
         vout_display_window_Detach(window);
-#ifdef ALLOW_DUMMY_VOUT
-    if (!osys->vout->p) {
-        if( window)
-            vout_display_window_Delete(window);
-    }
-#endif
-    else
-        vout_DeleteDisplayWindow(osys->vout, window);
+    vout_DeleteDisplayWindow(osys->vout, window);
 }
 
 static void VoutDisplayFitWindow(vout_display_t *vd, bool default_size)
@@ -790,13 +755,7 @@ static void VoutDisplayFitWindow(vout_display_t *vd, bool default_size)
     unsigned display_height;
     vout_display_GetDefaultDisplaySize(&display_width, &display_height,
                                        &vd->source, &cfg);
-
-#ifdef ALLOW_DUMMY_VOUT
-    if (!osys->vout->p)
-        vout_display_SendEventDisplaySize(vd, display_width, display_height);
-    else
-#endif
-        vout_SetDisplayWindowSize(osys->vout, display_width, display_height);
+    vout_SetDisplayWindowSize(osys->vout, display_width, display_height);
 }
 
 static void VoutDisplayCropRatio(int *left, int *top, int *right, int *bottom,
@@ -1337,9 +1296,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
 
     osys->sar.num = osys->sar_initial.num ? osys->sar_initial.num : source->i_sar_num;
     osys->sar.den = osys->sar_initial.den ? osys->sar_initial.den : source->i_sar_den;
-#ifdef ALLOW_DUMMY_VOUT
-    vlc_mouse_Init(&osys->vout_mouse);
-#endif
 
     vout_display_owner_t owner;
     if (owner_ptr) {
@@ -1695,25 +1651,3 @@ void vout_SendDisplayEventMouse(vout_thread_t *vout, const vlc_mouse_t *m)
         vout_SendEventMouseDoubleClick(vout);
     vout->p->mouse = *m;
 }
-#ifdef ALLOW_DUMMY_VOUT
-static void DummyVoutSendDisplayEventMouse(vout_thread_t *vout, vlc_mouse_t *fallback, const vlc_mouse_t *m)
-{
-    vout_thread_sys_t p;
-
-    if (!vout->p) {
-        p.mouse = *fallback;
-        vlc_mutex_init(&p.filter.lock);
-        p.filter.chain_static = NULL;
-        p.filter.chain_interactive = NULL;
-        p.spu = NULL;
-        vout->p = &p;
-    }
-    vout_SendDisplayEventMouse(vout, m);
-    if (vout->p == &p) {
-        vlc_mutex_destroy(&p.filter.lock);
-        *fallback = p.mouse;
-        vout->p = NULL;
-    }
-}
-#endif
-
