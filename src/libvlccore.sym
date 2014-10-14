@@ -631,17 +631,6 @@ vout_OSDText
 vout_Request
 vout_window_New
 vout_window_Delete
-vout_NewDisplay
-vout_DeleteDisplay
-vout_AreDisplayPicturesInvalid
-vout_IsDisplayFiltered
-vout_FilterDisplay
-vout_ManageDisplay
-vout_SetDisplayFullscreen
-vout_SetDisplayFilled
-vout_SetDisplayZoom
-vout_SetDisplayAspect
-vout_SetDisplayCrop
 vout_display_GetDefaultDisplaySize
 vout_display_PlacePicture
 vout_display_SendMouseMovedDisplayCoordinates
