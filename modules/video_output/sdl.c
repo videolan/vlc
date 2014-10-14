@@ -116,6 +116,8 @@ static int Open(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
 
+    if (vout_display_IsWindowed(vd))
+        return VLC_EGENERIC;
 #if !defined(_WIN32) && !defined(__OS2__)
     if (!vlc_xlib_init (object))
         return VLC_EGENERIC;
@@ -191,7 +193,6 @@ static int Open(vlc_object_t *object)
         msg_Err(vd, "no video mode available");
         goto error;
     }
-    vout_display_DeleteWindow(vd, NULL);
 
     sys->display = SDL_SetVideoMode(display_width, display_height,
                                     sys->display_bpp, sys->display_flags);
