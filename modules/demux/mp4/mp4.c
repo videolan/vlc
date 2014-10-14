@@ -1476,23 +1476,33 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_META:
         {
             vlc_meta_t *p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t*);
-            MP4_Box_t  *p_string;
 
-            MP4_Box_t *p_covr = MP4_BoxGet( p_sys->p_root, "/moov/udta/meta/ilst/covr/data[0]" );
-            if ( p_covr )
-                vlc_meta_SetArtURL( p_meta, "attachment://picture0" );
+            const char *psz_roots[] = { "/moov/udta/meta/ilst",
+                                        "/moov/meta/ilst",
+                                        "/moov/udta/meta",
+                                        "/moov/udta",
+                                        "/meta/ilst",
+                                        "/udta",
+                                        NULL };
 
-            MP4_Box_t  *p_udta = MP4_BoxGet( p_sys->p_root, "/moov/udta/meta/ilst" );
-            if( p_udta == NULL )
+            const MP4_Box_t *p_covr = NULL;
+            const MP4_Box_t *p_udta = NULL;
+
+            for( int i_index = 0; psz_roots[i_index] && !p_udta; i_index++ )
             {
-                p_udta = MP4_BoxGet( p_sys->p_root, "/moov/udta" );
-                if( p_udta == NULL && p_covr == NULL )
-                    return VLC_EGENERIC;
-                else
-                    return VLC_SUCCESS;
+                p_udta = MP4_BoxGet( p_sys->p_root, psz_roots[i_index] );
+                if ( p_udta )
+                {
+                    p_covr = MP4_BoxGet( p_sys->p_root, "covr/data[0]" );
+                    if ( p_covr )
+                        vlc_meta_SetArtURL( p_meta, "attachment://picture0" );
+                }
             }
 
-            for( p_string = p_udta->p_first; p_string != NULL;
+            if( p_udta == NULL && p_covr == NULL )
+                return VLC_EGENERIC;
+
+            for( const MP4_Box_t * p_string = p_udta->p_first; p_string != NULL;
                  p_string = p_string->p_next )
             {
 
@@ -1622,6 +1632,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 {
                     if( p_string->i_type == xa9typetoextrameta[i].xa9_type )
                     {
+                        assert( BOXDATA(p_string) );
                         char *psz_utf = strdup( BOXDATA(p_string)->psz_text ? BOXDATA(p_string)->psz_text : "" );
                         if( psz_utf )
                         {
