@@ -285,6 +285,8 @@
 #define ATOM_covr VLC_FOURCC( 'c', 'o', 'v', 'r' )
 
 #define ATOM_chap VLC_FOURCC( 'c', 'h', 'a', 'p' )
+#define ATOM_SDLN VLC_FOURCC( 'S', 'D', 'L', 'N' )
+#define ATOM_vndr VLC_FOURCC( 'v', 'n', 'd', 'r' )
 
 /* Do you want some debug information on all read boxes ? */
 #ifndef NDEBUG

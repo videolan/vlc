@@ -3738,6 +3738,8 @@ static const struct
     { ATOM_gnre,    MP4_ReadBox_gnre,         MP4_FreeBox_Common,  ATOM_udta },
     { ATOM_name,    MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
     { ATOM_trkn,    MP4_ReadBox_trkn,         MP4_FreeBox_Common,  ATOM_udta },
+    { ATOM_vndr,    MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
+    { ATOM_SDLN,    MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
 
     /* iTunes/Quicktime meta info */
     { ATOM_meta,    MP4_ReadBox_meta,         MP4_FreeBox_Common,  0 },

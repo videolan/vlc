@@ -1626,6 +1626,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     { ATOM_0xa9sol, N_("Soloist") },
                     { ATOM_0xa9thx, N_("Thanks") },
                     { ATOM_0xa9xpd, N_("Executive Producer") },
+                    { ATOM_vndr,    N_("Vendor") },
                     { 0, "" },
                 };
                 for( unsigned i = 0; xa9typetoextrameta[i].xa9_type; i++ )
