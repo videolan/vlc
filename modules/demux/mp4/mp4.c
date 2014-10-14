@@ -1476,7 +1476,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_META:
         {
             vlc_meta_t *p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t*);
-            MP4_Box_t  *p_0xa9xxx;
+            MP4_Box_t  *p_string;
 
             MP4_Box_t *p_covr = MP4_BoxGet( p_sys->p_root, "/moov/udta/meta/ilst/covr/data[0]" );
             if ( p_covr )
@@ -1492,21 +1492,21 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     return VLC_SUCCESS;
             }
 
-            for( p_0xa9xxx = p_udta->p_first; p_0xa9xxx != NULL;
-                 p_0xa9xxx = p_0xa9xxx->p_next )
+            for( p_string = p_udta->p_first; p_string != NULL;
+                 p_string = p_string->p_next )
             {
 
-                if( !p_0xa9xxx || !BOXDATA(p_0xa9xxx) )
+                if( !p_string || !BOXDATA(p_string) )
                     continue;
 
                 /* FIXME FIXME: should convert from whatever the character
                  * encoding of MP4 meta data is to UTF-8. */
-#define SET(fct) do { char *psz_utf = strdup( BOXDATA(p_0xa9xxx)->psz_text ? BOXDATA(p_0xa9xxx)->psz_text : "" ); \
+#define SET(fct) do { char *psz_utf = strdup( BOXDATA(p_string)->psz_text ? BOXDATA(p_string)->psz_text : "" ); \
     if( psz_utf ) { EnsureUTF8( psz_utf );  \
                     fct( p_meta, psz_utf ); free( psz_utf ); } } while(0)
 
                 /* XXX Becarefull p_udta can have box that are not 0xa9xx */
-                switch( p_0xa9xxx->i_type )
+                switch( p_string->i_type )
                 {
                 case ATOM_0xa9nam: /* Full name */
                     SET( vlc_meta_SetTitle );
@@ -1531,8 +1531,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     break;
 
                 case ATOM_gnre:
-                    if( p_0xa9xxx->data.p_gnre->i_genre <= NUM_GENRES )
-                        vlc_meta_SetGenre( p_meta, ppsz_genres[p_0xa9xxx->data.p_gnre->i_genre - 1] );
+                    if( p_string->data.p_gnre->i_genre <= NUM_GENRES )
+                        vlc_meta_SetGenre( p_meta, ppsz_genres[p_string->data.p_gnre->i_genre - 1] );
                     break;
 
                 case ATOM_0xa9alb: /* Album */
@@ -1546,12 +1546,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 {
                     char psz_trck[11];
                     snprintf( psz_trck, sizeof( psz_trck ), "%i",
-                              p_0xa9xxx->data.p_trkn->i_track_number );
+                              p_string->data.p_trkn->i_track_number );
                     vlc_meta_SetTrackNum( p_meta, psz_trck );
-                    if( p_0xa9xxx->data.p_trkn->i_track_total > 0 )
+                    if( p_string->data.p_trkn->i_track_total > 0 )
                     {
                         snprintf( psz_trck, sizeof( psz_trck ), "%i",
-                                  p_0xa9xxx->data.p_trkn->i_track_total );
+                                  p_string->data.p_trkn->i_track_total );
                         vlc_meta_Set( p_meta, vlc_meta_TrackTotal, psz_trck );
                     }
                     break;
@@ -1620,9 +1620,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 };
                 for( unsigned i = 0; xa9typetoextrameta[i].xa9_type; i++ )
                 {
-                    if( p_0xa9xxx->i_type == xa9typetoextrameta[i].xa9_type )
+                    if( p_string->i_type == xa9typetoextrameta[i].xa9_type )
                     {
-                        char *psz_utf = strdup( BOXDATA(p_0xa9xxx)->psz_text ? BOXDATA(p_0xa9xxx)->psz_text : "" );
+                        char *psz_utf = strdup( BOXDATA(p_string)->psz_text ? BOXDATA(p_string)->psz_text : "" );
                         if( psz_utf )
                         {
                              EnsureUTF8( psz_utf );
@@ -2739,12 +2739,10 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
             switch( p_box_iter->i_type )
             {
                 case ATOM_0xa9nam:
-                    p_track->fmt.psz_description =
-                        strdup( p_box_iter->data.p_0xa9xxx->psz_text );
-                    break;
                 case ATOM_name:
                     p_track->fmt.psz_description =
-                        strdup( p_box_iter->data.p_name->psz_text );
+                        strdup( p_box_iter->data.p_string->psz_text );
+                default:
                     break;
             }
         }

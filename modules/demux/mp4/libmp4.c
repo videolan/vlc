@@ -2852,27 +2852,27 @@ static int MP4_ReadBox_drms( stream_t *p_stream, MP4_Box_t *p_box )
     return 1;
 }
 
-static int MP4_ReadBox_name( stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_String( stream_t *p_stream, MP4_Box_t *p_box )
 {
-    MP4_READBOX_ENTER( MP4_Box_data_name_t );
+    MP4_READBOX_ENTER( MP4_Box_data_string_t );
 
-    p_box->data.p_name->psz_text = malloc( p_box->i_size + 1 - 8 ); /* +\0, -name, -size */
-    if( p_box->data.p_name->psz_text == NULL )
+    p_box->data.p_string->psz_text = malloc( p_box->i_size + 1 - 8 ); /* +\0, -name, -size */
+    if( p_box->data.p_string->psz_text == NULL )
         MP4_READBOX_EXIT( 0 );
 
-    memcpy( p_box->data.p_name->psz_text, p_peek, p_box->i_size - 8 );
-    p_box->data.p_name->psz_text[p_box->i_size - 8] = '\0';
+    memcpy( p_box->data.p_string->psz_text, p_peek, p_box->i_size - 8 );
+    p_box->data.p_string->psz_text[p_box->i_size - 8] = '\0';
 
 #ifdef MP4_VERBOSE
-        msg_Dbg( p_stream, "read box: \"name\" text=`%s'",
-                 p_box->data.p_name->psz_text );
+        msg_Dbg( p_stream, "read box: \"%4.4s\" text=`%s'", (char *) & p_box->i_type,
+                 p_box->data.p_string->psz_text );
 #endif
     MP4_READBOX_EXIT( 1 );
 }
 
-static void MP4_FreeBox_name( MP4_Box_t *p_box )
+static void MP4_FreeBox_String( MP4_Box_t *p_box )
 {
-    FREENULL( p_box->data.p_name->psz_text );
+    FREENULL( p_box->data.p_string->psz_text );
 }
 
 static int MP4_ReadBox_data( stream_t *p_stream, MP4_Box_t *p_box )
@@ -2902,9 +2902,9 @@ static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
 {
     uint16_t i16;
 
-    MP4_READBOX_ENTER( MP4_Box_data_0xa9xxx_t );
+    MP4_READBOX_ENTER( MP4_Box_data_string_t );
 
-    p_box->data.p_0xa9xxx->psz_text = NULL;
+    p_box->data.p_string->psz_text = NULL;
 
     MP4_GET2BYTES( i16 );
 
@@ -2915,20 +2915,20 @@ static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_GET2BYTES( i16 );
         if( i_length >= i_read ) i_length = i_read + 1;
 
-        p_box->data.p_0xa9xxx->psz_text = malloc( i_length );
-        if( p_box->data.p_0xa9xxx->psz_text == NULL )
+        p_box->data.p_string->psz_text = malloc( i_length );
+        if( p_box->data.p_string->psz_text == NULL )
             MP4_READBOX_EXIT( 0 );
 
         i_length--;
-        memcpy( p_box->data.p_0xa9xxx->psz_text,
+        memcpy( p_box->data.p_string->psz_text,
                 p_peek, i_length );
-        p_box->data.p_0xa9xxx->psz_text[i_length] = '\0';
+        p_box->data.p_string->psz_text[i_length] = '\0';
 
 #ifdef MP4_VERBOSE
         msg_Dbg( p_stream,
                  "read box: \"c%3.3s\" text=`%s'",
                  ((char*)&p_box->i_type + 1),
-                 p_box->data.p_0xa9xxx->psz_text );
+                 p_box->data.p_string->psz_text );
 #endif
     }
     else
@@ -2955,18 +2955,18 @@ static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
             {
                 // the rest is the text
                 i_data_len -= 12;
-                p_box->data.p_0xa9xxx->psz_text = malloc( i_data_len + 1 );
-                if( p_box->data.p_0xa9xxx->psz_text == NULL )
+                p_box->data.p_string->psz_text = malloc( i_data_len + 1 );
+                if( p_box->data.p_string->psz_text == NULL )
                     MP4_READBOX_EXIT( 0 );
 
-                memcpy( p_box->data.p_0xa9xxx->psz_text,
+                memcpy( p_box->data.p_string->psz_text,
                         p_peek, i_data_len );
-                p_box->data.p_0xa9xxx->psz_text[i_data_len] = '\0';
+                p_box->data.p_string->psz_text[i_data_len] = '\0';
 #ifdef MP4_VERBOSE
         msg_Dbg( p_stream,
                  "read box: \"c%3.3s\" text=`%s'",
                  ((char*)&p_box->i_type+1),
-                 p_box->data.p_0xa9xxx->psz_text );
+                 p_box->data.p_string->psz_text );
 #endif
             }
             else
@@ -2980,7 +2980,7 @@ static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
 }
 static void MP4_FreeBox_0xa9xxx( MP4_Box_t *p_box )
 {
-    FREENULL( p_box->data.p_0xa9xxx->psz_text );
+    FREENULL( p_box->data.p_string->psz_text );
 }
 
 /* Chapter support */
@@ -3735,7 +3735,7 @@ static const struct
     { ATOM_chpl,    MP4_ReadBox_chpl,         MP4_FreeBox_chpl,    ATOM_udta },
     { ATOM_covr,    MP4_ReadBoxContainer,     MP4_FreeBox_Common,  ATOM_udta },
     { ATOM_gnre,    MP4_ReadBox_gnre,         MP4_FreeBox_Common,  ATOM_udta },
-    { ATOM_name,    MP4_ReadBox_name,         MP4_FreeBox_name,    ATOM_udta },
+    { ATOM_name,    MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
     { ATOM_trkn,    MP4_ReadBox_trkn,         MP4_FreeBox_Common,  ATOM_udta },
 
     /* iTunes/Quicktime meta info */

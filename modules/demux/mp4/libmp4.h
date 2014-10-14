@@ -1007,7 +1007,7 @@ typedef struct
 {
     char *psz_text;
 
-} MP4_Box_data_name_t;
+} MP4_Box_data_string_t;
 
 typedef struct
 {
@@ -1382,10 +1382,8 @@ typedef union MP4_Box_data_s
     MP4_Box_data_rmqu_t *p_rmqu;
     MP4_Box_data_rmvc_t *p_rmvc;
 
-    MP4_Box_data_0xa9xxx_t *p_0xa9xxx;
     MP4_Box_data_chpl_t *p_chpl;
     MP4_Box_data_tref_generic_t *p_tref_generic;
-    MP4_Box_data_name_t *p_name;
 
     MP4_Box_data_tfrf_t *p_tfrf;
     MP4_Box_data_tfxd_t *p_tfxd;
@@ -1394,6 +1392,8 @@ typedef union MP4_Box_data_s
     MP4_Box_data_strf_t *p_strf; /* flip4mac Little endian video config */
     MP4_Box_data_ASF_t  *p_asf;  /* flip4mac asf streams indicator */
 
+    /* for generic handlers */
+    MP4_Box_data_string_t *p_string;
     MP4_Box_data_data_t *p_data;
 
     void                *p_payload; /* for unknow type */
