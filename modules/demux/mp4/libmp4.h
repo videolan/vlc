@@ -1312,6 +1312,28 @@ typedef struct
 
 typedef struct
 {
+    enum
+    {
+        DATA_WKT_RESERVED = 0,
+        DATA_WKT_UTF8 = 1,
+        DATA_WKT_UTF16 = 2,
+        DATA_WKT_SJIS = 3,
+        DATA_WKT_UTF8_SORT = 4,
+        DATA_WKT_UTF16_SORT = 5,
+        DATA_WKT_JPEG = 13,
+        DATA_WKT_PNG = 14,
+        DATA_WKT_BE_SIGNED = 21,
+        DATA_WKT_BE_UNSIGNED = 22,
+        DATA_WKT_BE_FLOAT32 = 23,
+        DATA_WKT_BE_FLOAT64 = 24,
+        DATA_WKT_BMP = 27,
+        DATA_WKT_QUICKTIME_METADATA_ATOM = 28,
+    } e_wellknowntype;
+    struct
+    {
+        uint16_t i_country;
+        uint16_t i_language;
+    } locale;
     uint8_t *p_blob;
     uint32_t i_blob;
 } MP4_Box_data_data_t;
