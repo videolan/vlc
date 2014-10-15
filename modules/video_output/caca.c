@@ -323,7 +323,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
     case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
-        return VLC_SUCCESS;
+        return VLC_EGENERIC;
 
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         if (sys->dither)
