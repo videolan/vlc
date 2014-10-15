@@ -116,6 +116,9 @@ struct vout_display_sys_t {
     unsigned display_width;
     unsigned display_height;
 
+    int i_frame_rate_base;
+    int i_frame_rate;
+
     int next_phase_check;
     int phase_offset;
     int layer;
@@ -192,9 +195,6 @@ static int Open(vlc_object_t *object)
 
     vd->info.has_hide_mouse = true;
     sys->opaque = vd->fmt.i_chroma == VLC_CODEC_MMAL_OPAQUE;
-
-    vd->fmt.i_sar_num = vd->source.i_sar_num;
-    vd->fmt.i_sar_den = vd->source.i_sar_den;
 
     status = mmal_component_create(MMAL_COMPONENT_DEFAULT_VIDEO_RENDERER, &sys->component);
     if (status != MMAL_SUCCESS) {
@@ -398,7 +398,7 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
             return -EINVAL;
         }
     } else {
-        fmt = &vd->fmt;
+        fmt = &vd->source;
     }
 
     if (!cfg)
@@ -434,9 +434,6 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
         adjust_refresh_rate(vd, fmt);
         set_latency_target(vd, true);
     }
-
-    if (fmt != &vd->fmt)
-        memcpy(&vd->fmt, fmt, sizeof(video_format_t));
 
     return 0;
 }
@@ -549,12 +546,14 @@ static void vd_display(vout_display_t *vd, picture_t *picture,
     MMAL_BUFFER_HEADER_T *buffer = pic_sys->buffer;
     MMAL_STATUS_T status;
 
-    if (picture->format.i_frame_rate != vd->fmt.i_frame_rate ||
-        picture->format.i_frame_rate_base != vd->fmt.i_frame_rate_base ||
+    if (picture->format.i_frame_rate != sys->i_frame_rate ||
+        picture->format.i_frame_rate_base != sys->i_frame_rate_base ||
         picture->b_progressive != sys->b_progressive ||
         picture->b_top_field_first != sys->b_top_field_first) {
         sys->b_top_field_first = picture->b_top_field_first;
         sys->b_progressive = picture->b_progressive;
+        sys->i_frame_rate = picture->format.i_frame_rate;
+        sys->i_frame_rate_base = picture->format.i_frame_rate_base;
         configure_display(vd, NULL, &picture->format);
     }
 
@@ -596,7 +595,6 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
     vout_display_sys_t *sys = vd->sys;
     vout_display_cfg_t cfg;
     const vout_display_cfg_t *tmp_cfg;
-    video_format_t fmt;
     const video_format_t *tmp_fmt;
     int ret = VLC_EGENERIC;
 
@@ -634,22 +632,9 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
             break;
 
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
-            fmt = vd->fmt;
-            tmp_fmt = va_arg(args, const video_format_t *);
-            fmt.i_sar_num = tmp_fmt->i_sar_num;
-            fmt.i_sar_den = tmp_fmt->i_sar_den;
-            if (configure_display(vd, NULL, &fmt) >= 0)
-                ret = VLC_SUCCESS;
-            break;
-
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-            fmt = vd->fmt;
             tmp_fmt = va_arg(args, const video_format_t *);
-            fmt.i_x_offset = tmp_fmt->i_x_offset;
-            fmt.i_y_offset = tmp_fmt->i_y_offset;
-            fmt.i_visible_width = tmp_fmt->i_visible_width;
-            fmt.i_visible_height = tmp_fmt->i_visible_height;
-            if (configure_display(vd, NULL, &fmt) >= 0)
+            if (configure_display(vd, NULL, tmp_fmt) >= 0)
                 ret = VLC_SUCCESS;
             break;
 
@@ -984,8 +969,8 @@ static void maintain_phase_sync(vout_display_t *vd)
         .hdr = { MMAL_PARAMETER_VIDEO_RENDER_STATS, sizeof(render_stats) },
     };
     int32_t frame_duration = 1000000 /
-        ((double)vd->fmt.i_frame_rate /
-        vd->fmt.i_frame_rate_base);
+        ((double)vd->source.i_frame_rate /
+        vd->source.i_frame_rate_base);
     vout_display_sys_t *sys = vd->sys;
     int32_t phase_offset;
     MMAL_STATUS_T status;
