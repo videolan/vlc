@@ -623,14 +623,6 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
             }
             break;
 
-        case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
-            cfg = *vd->cfg;
-            tmp_cfg = va_arg(args, const vout_display_cfg_t *);
-            cfg.is_display_filled = tmp_cfg->is_display_filled;
-            if (configure_display(vd, &cfg, NULL) >= 0)
-                ret = VLC_SUCCESS;
-            break;
-
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
             tmp_fmt = va_arg(args, const video_format_t *);
