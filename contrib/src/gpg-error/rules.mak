@@ -1,5 +1,5 @@
 # GPGERROR
-GPGERROR_VERSION := 1.15
+GPGERROR_VERSION := 1.16
 GPGERROR_URL := ftp://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-$(GPGERROR_VERSION).tar.bz2
 
 $(TARBALLS)/libgpg-error-$(GPGERROR_VERSION).tar.bz2:
@@ -13,7 +13,6 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/gpg-error/windres-make.patch
 endif
 	$(APPLY) $(SRC)/gpg-error/missing-unistd-include.patch
-	$(APPLY) $(SRC)/gpg-error/gpgerror-android.patch
 	$(MOVE)
 	cp $@/src/syscfg/lock-obj-pub.arm-unknown-linux-androideabi.h $@/src/syscfg/lock-obj-pub.linux-android.h
 ifdef HAVE_IOS
