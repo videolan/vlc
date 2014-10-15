@@ -310,6 +310,41 @@ static int MP4_ReadBoxSkip( stream_t *p_stream, MP4_Box_t *p_box )
     return 1;
 }
 
+static int MP4_ReadBox_ilst( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    if( p_box->i_size < 8 || stream_Read( p_stream, NULL, 8 ) < 8 )
+        return 0;
+
+    /* Find our handler */
+    if ( !p_box->i_handler && p_box->p_father )
+    {
+        const MP4_Box_t *p_sibling = p_box->p_father->p_first;
+        while( p_sibling )
+        {
+            if ( p_sibling->i_type == ATOM_hdlr && p_sibling->data.p_hdlr )
+            {
+                p_box->i_handler = p_sibling->data.p_hdlr->i_handler_type;
+                break;
+            }
+            p_sibling = p_sibling->p_next;
+        }
+    }
+
+    switch( p_box->i_handler )
+    {
+    case 0:
+        msg_Warn( p_stream, "no handler for ilst atom" );
+        return 0;
+    case VLC_FOURCC('m','d','t','a'):
+        return MP4_ReadBoxContainerChildrenIndexed( p_stream, p_box, 0, true );
+    case VLC_FOURCC('m','d','i','r'):
+        return MP4_ReadBoxContainerChildren( p_stream, p_box, 0 );
+    default:
+        msg_Warn( p_stream, "Unknown ilst handler type '%4.4s'", (char*)&p_box->i_handler );
+        return 0;
+    }
+}
+
 static int MP4_ReadBox_ftyp( stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_ftyp_t );
@@ -3584,7 +3619,7 @@ static const struct
     { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_stsd },
     { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_mp4a }, /* some quicktime mp4a/wave/mp4a.. */
     { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_WMA2 }, /* flip4mac */
-    { ATOM_ilst,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_meta },
+    { ATOM_ilst,    MP4_ReadBox_ilst,         MP4_FreeBox_Common, ATOM_meta },
     { ATOM_mvex,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_moov },
     { ATOM_mvex,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_ftyp },
 
