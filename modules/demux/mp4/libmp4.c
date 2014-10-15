@@ -335,9 +335,9 @@ static int MP4_ReadBox_ilst( stream_t *p_stream, MP4_Box_t *p_box )
     case 0:
         msg_Warn( p_stream, "no handler for ilst atom" );
         return 0;
-    case VLC_FOURCC('m','d','t','a'):
+    case HANDLER_mdta:
         return MP4_ReadBoxContainerChildrenIndexed( p_stream, p_box, 0, true );
-    case VLC_FOURCC('m','d','i','r'):
+    case HANDLER_mdir:
         return MP4_ReadBoxContainerChildren( p_stream, p_box, 0 );
     default:
         msg_Warn( p_stream, "Unknown ilst handler type '%4.4s'", (char*)&p_box->i_handler );
@@ -3237,8 +3237,8 @@ static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
     /* Mandatory */
     const MP4_Box_t *p_hdlr = MP4_BoxGet( p_box, "hdlr" );
     if ( !p_hdlr || !BOXDATA(p_hdlr) ||
-         ( BOXDATA(p_hdlr)->i_handler_type != VLC_FOURCC('m', 'd', 't', 'a') &&
-           BOXDATA(p_hdlr)->i_handler_type != VLC_FOURCC('m', 'd', 'i', 'r') ) ||
+         ( BOXDATA(p_hdlr)->i_handler_type != HANDLER_mdta &&
+           BOXDATA(p_hdlr)->i_handler_type != HANDLER_mdir ) ||
          BOXDATA(p_hdlr)->i_version != 0 )
         return 0;
 

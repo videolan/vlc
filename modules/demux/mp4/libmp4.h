@@ -289,6 +289,9 @@
 #define ATOM_SDLN VLC_FOURCC( 'S', 'D', 'L', 'N' )
 #define ATOM_vndr VLC_FOURCC( 'v', 'n', 'd', 'r' )
 
+#define HANDLER_mdta VLC_FOURCC('m', 'd', 't', 'a')
+#define HANDLER_mdir VLC_FOURCC('m', 'd', 'i', 'r')
+
 /* Do you want some debug information on all read boxes ? */
 #ifndef NDEBUG
 # define MP4_VERBOSE  1
