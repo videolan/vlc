@@ -85,6 +85,11 @@ struct dmx_region_t {
 };
 
 struct vout_display_sys_t {
+    vlc_cond_t buffer_cond;
+    vlc_mutex_t buffer_mutex;
+    vlc_mutex_t manage_mutex;
+
+    plane_t planes[3];
     picture_t **pictures;
     picture_pool_t *picture_pool;
 
@@ -92,12 +97,8 @@ struct vout_display_sys_t {
     MMAL_PORT_T *input;
     MMAL_POOL_T *pool;
     struct dmx_region_t *dmx_region;
-    plane_t planes[3];
     int i_planes;
 
-    vlc_mutex_t buffer_mutex;
-    vlc_mutex_t manage_mutex;
-    vlc_cond_t buffer_cond;
     uint32_t buffer_size;
     int buffers_in_transit;
     unsigned num_buffers;
@@ -107,13 +108,13 @@ struct vout_display_sys_t {
     DISPMANX_RESOURCE_HANDLE_T bkg_resource;
     unsigned display_width;
     unsigned display_height;
-    bool need_configure_display;
 
-    bool adjust_refresh_rate;
     int next_phase_check;
     int phase_offset;
-
     int layer;
+
+    bool need_configure_display;
+    bool adjust_refresh_rate;
     bool opaque;
 };
 
